@@ -34,13 +34,15 @@ no_index:
 requires:
   Alien::Base: '0.038'
   Alien::Build: '0.25'
+  Test::Alien: '0'
+  Test::Alien::Diag: '0'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/thibaultduponchelle/Alien-Libevent/issues
   homepage: https://metacpan.org/release/Alien-Libevent
   license: http://dev.perl.org/licenses/
   repository: https://github.com/thibaultduponchelle/Alien-Libevent.git
-version: '2.7'
+version: '2.8'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.26'
   requires:

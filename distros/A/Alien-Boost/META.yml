@@ -4,14 +4,6 @@ author:
   - 'Thibault Duponchelle <thibault.duponchelle@gmail.com>'
 build_requires:
   Alien::Build::MM: '0.25'
-  Archive::Tar: '0'
-  HTTP::Tiny: '0.044'
-  IO::Socket::SSL: '1.56'
-  Mojo::DOM58: '1.00'
-  Net::SSLeay: '1.49'
-  Sort::Versions: '0'
-  URI: '0'
-  URI::Escape: '0'
 configure_requires:
   Alien::Build: '1.19'
   Alien::Build::MM: '0.25'
@@ -36,14 +28,16 @@ no_index:
 requires:
   Alien::Base: '0.038'
   Alien::Build: '0.25'
+  Test::Alien: '0'
   Test::Alien::CPP: '0'
+  Test::Alien::Diag: '0'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/thibaultduponchelle/Alien-Boost/issues
   homepage: https://metacpan.org/release/Alien-Boost
   license: http://dev.perl.org/licenses/
   repository: https://github.com/thibaultduponchelle/Alien-Boost.git
-version: '1.3'
+version: '1.4'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.26'
   requires:

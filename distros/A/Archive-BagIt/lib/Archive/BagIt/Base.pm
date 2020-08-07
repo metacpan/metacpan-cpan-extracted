@@ -1,8 +1,6 @@
 package Archive::BagIt::Base;
 use strict;
 use warnings;
-use Moo;
-
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Encode qw(decode);
@@ -14,14 +12,13 @@ use Class::Load qw(load_class);
 use Carp;
 use List::Util qw(uniq);
 use POSIX qw(strftime);
+use Moo;
 
-our $VERSION = '0.063'; # VERSION
+our $VERSION = '0.065'; # VERSION
 
 # ABSTRACT: The common base for Archive::BagIt. This is the module for experts. ;)
 
 use Sub::Quote;
-
-my $DEBUG=0;
 
 
 
@@ -46,9 +43,34 @@ sub BUILD {
 
 has 'parallel' => ( # used for parallel verify, only usefull if bagits with many files expected!
     is        => 'rw',
-    predicate => 'has_parallel',
-    default   => undef,
+    lazy      => 1,
 );
+
+sub has_parallel {
+    my $self = shift;
+    if ((exists $self->{parallel}) && ($self->{parallel})) {
+        return 1
+    } else {
+        return;
+    }
+}
+
+###############################################
+
+
+has 'force_utf8' => (
+    is        => 'rw',
+    lazy      => 1,
+);
+
+sub has_force_utf8 {
+    my $self = shift;
+    if ((exists $self->{force_utf8}) && ($self->{force_utf8})) {
+        return 1;
+    } else {
+        return;
+    }
+}
 
 ###############################################
 
@@ -107,7 +129,7 @@ has 'payload_path' => (
 
 sub _build_payload_path {
     my ($self) = @_;
-    return $self->bag_path."/data";
+    return File::Spec->catdir($self->bag_path, "data");
 }
 
 ###############################################
@@ -312,6 +334,7 @@ sub delete_baginfo_by_key {
     if (defined $idx) {
         delete $self->{bag_info}[$idx];
     }
+    return 1;
 }
 
 ###############################################
@@ -503,30 +526,64 @@ sub _build_tagmanifest_files {
   return \@tagmanifest_files;
 }
 
-sub _build_payload_files{
-  my($self) = @_;
-  my $payload_dir = $self->payload_path;
-  my @payload=();
-  File::Find::find( sub{
-    $File::Find::name = decode ('UTF-8', $File::Find::name);
-    $_ = decode ('UTF-8', $_);
-    if (-f $_) {
-        my $rel_path=File::Spec->catdir($self->rel_payload_path,File::Spec->abs2rel($File::Find::name, $payload_dir));
-        push(@payload,$rel_path);
+sub __file_find { # own implementation, because File::Find has problems with UTF8 encoded Paths under MSWin32
+    # finds recursively all files in given directory.
+    # if $excludedir is defined, the content will be excluded
+    my ($self,$dir, $excludedir) = @_;
+    if (defined $excludedir) {
+        $excludedir = File::Spec->rel2abs( $excludedir);
     }
-    elsif($self->metadata_path_arr > $self->payload_path_arr && -d _ && $_ eq $self->rel_metadata_path) {
-        #print "pruning ".$File::Find::name."\n";
-        $File::Find::prune=1;
-    }
-    else {
-        #payload directories
-    }
-    #print "name: ".$File::Find::name."\n";
-  }, $payload_dir);
-  @payload = sort @ payload;
-  return wantarray ? @payload : \@payload;
-
+    my @file_paths;
+    my $finder;
+    $finder = sub {
+        my $current_dir = shift; #absolute path
+        my @todo;
+        my @tmp_file_paths;
+        opendir( my $dh, $current_dir);
+        while ( my $local_entry = readdir($dh) ) {
+            next if $local_entry =~ m/^\.{1,2}$/;
+            my $is_portable = $local_entry =~ m/^[a-zA-Z0-9._-]+$/;
+            if (! $is_portable) {
+                my $local_entry_utf8 = decode("UTF-8", $local_entry);
+                if ((!$self->has_force_utf8)) {
+                    my $hexdump = "0x" . unpack('H*', $local_entry);
+                    carp "possible non portable pathname detected in $dir, got path (hexdump)='$hexdump'(hex),  decoded path='$local_entry_utf8'\n";
+                }
+                $local_entry = $local_entry_utf8;
+            }
+            my $path_entry = File::Spec->catdir($current_dir, $local_entry);
+            if (-f $path_entry) {
+                push @tmp_file_paths, $path_entry;
+            } elsif (-d $path_entry) {
+                next if ((defined $excludedir) && ($path_entry eq $excludedir));
+                push @todo, $path_entry;
+            } else {
+                croak "not a file nor a dir found '$path_entry'";
+            }
+        }
+        closedir($dh);
+        push @file_paths, sort @tmp_file_paths;
+        foreach my $subdir (sort @todo) {
+            &$finder($subdir);
+        }
+    };
+    my $absolute = File::Spec->rel2abs( $dir );
+    &$finder($absolute);
+    @file_paths = map { File::Spec->abs2rel( $_, $dir)} @file_paths;
+    return @file_paths;
 }
+
+sub _build_payload_files{
+    my ($self) = @_;
+    my $payload_dir = $self->payload_path;
+    my $reldir = File::Spec->abs2rel($payload_dir, $self->bag_path());
+    $reldir =~ s/^\.$//;
+    my @payload = map {
+        $reldir eq "" ? $_ : File::Spec->catfile($reldir, $_)
+    } $self->__file_find($payload_dir, File::Spec->rel2abs($self->metadata_path));
+    return wantarray ? @payload : \@payload;
+}
+
 
 sub __build_read_bagit_txt {
     my($self) = @_;
@@ -545,13 +602,12 @@ sub __build_read_bagit_txt {
     return ($version_string, $encoding_string, $file);
 }
 
-
 sub _build_bag_version {
     my($self) = @_;
     my ($version_string, $encoding_string, $file) = $self->__build_read_bagit_txt();
     croak "Version line missed in '$file" unless defined $version_string;
     if ($version_string =~ /^BagIt-Version: ([01]\.[0-9]+)$/) {
-        return $1
+        return $1;
     } else {
         $version_string =~ s/\r/<CR>/;
         $version_string =~ s/^\N{U+FEFF}/<BOM>/;
@@ -650,28 +706,14 @@ sub _build_bag_info {
 }
 
 sub _build_non_payload_files {
-  my($self) = @_;
-  my @non_payload = ();
-  File::Find::find( sub{
-    $File::Find::name = decode('UTF-8', $File::Find::name);
-    $_=decode ('UTF-8', $_);
-    if (-f $_) {
-        my $rel_path=File::Spec->catdir($self->rel_metadata_path,File::Spec->abs2rel($File::Find::name, $self->metadata_path));
-        #print "pushing ".$rel_path." payload_dir: $payload_dir \n";
-        push(@non_payload,$rel_path);
-    }
-    elsif($self->metadata_path_arr < $self->payload_path_arr && -d _ && $_ eq $self->rel_payload_path) {
-        #print "pruning ".$File::Find::name."\n";
-        $File::Find::prune=1;
-    }
-    else {
-        #payload directories
-    }
-    #print "name: ".$File::Find::name."\n";
-  }, $self->metadata_path);
-  @non_payload = sort @non_payload;
-  return wantarray ? @non_payload : \@non_payload;
-
+    my ($self) = @_;
+    my $non_payload_dir = $self->metadata_path();
+    my $reldir = File::Spec->abs2rel($non_payload_dir, $self->bag_path());
+    $reldir =~ s/^\.$//;
+    my @non_payload = map {
+        $reldir eq "" ? $_ : File::Spec->catfile($reldir, $_)
+    } $self->__file_find($non_payload_dir, File::Spec->rel2abs($self->payload_path));
+    return wantarray ? @non_payload : \@non_payload;
 }
 
 sub _build_forced_fixity_algorithm {
@@ -754,6 +796,7 @@ sub verify_bag {
         my $res = $self->manifests->{$algorithm}->verify_manifest($self->payload_files, $return_all_errors);
         if ((defined $res) && ($res ne "1")) { push @errors, $res; }
     }
+
     foreach my $algorithm ( keys %{ $self->manifests }) {
         my $res = $self->manifests->{$algorithm}->verify_tagmanifest($self->non_payload_files, $return_all_errors);
         if ((defined $res) && ($res ne "1")) { push @errors, $res; }
@@ -775,7 +818,7 @@ sub calc_payload_oxum {
     my $streamcount = scalar @payload;
     foreach my $local_name (@payload) {# local_name is relative to bagit base
         my $file = File::Spec->catfile($self->bag_path(), $local_name);
-        my $sb = stat($file);
+        my $sb = File::stat::stat($file) or croak "file $file error, $!";
         $octets += $sb->size;
     }
     return ($octets, $streamcount);
@@ -846,10 +889,10 @@ sub store {
 
 
 sub init_metadata {
-    my ($class, $bag_path) = @_;
+    my ($class, $bag_path, $options) = @_;
     $bag_path =~ s#/$##; # replace trailing slash
     unless ( -d $bag_path) { croak ( "source bag directory '$bag_path' doesn't exist"); }
-    my $self = $class->new(bag_path=>$bag_path);
+    my $self = $class->new(bag_path=>$bag_path, %$options);
     carp "no payload path" if ! -d $self->payload_path;
     unless ( -d $self->payload_path) {
         rename ($bag_path, $bag_path.".tmp");
@@ -860,29 +903,21 @@ sub init_metadata {
         #metadata path is not the root path for some reason
         mkdir ($self->metadata_path);
     }
-
     $self->store();
-    # FIXME: deprecated?
-    #foreach my $algorithm (keys %{$self->manifests}) {
-        #$self->manifests->{$algorithm}->create_bagit();
-        #$self->manifests->{$algorithm}->create_baginfo();
-    #}
-
-
-
     return $self;
 }
 
 
 sub make_bag {
-  my ($class, $bag_path) = @_;
+  my ($class, $bag_path, $options) = @_;
   my $isa = ref $class;
   if ($isa eq "Archive::BagIt::Base") { # not a class, but an object!
     croak "make_bag() only a class subroutine, not useable with objects. Try store() instead!\n";
   }
-  my $self = $class->init_metadata($bag_path);
+  my $self = $class->init_metadata($bag_path, $options);
   return $self;
 }
+
 
 
 __PACKAGE__->meta->make_immutable;
@@ -901,83 +936,11 @@ Archive::BagIt::Base - The common base for Archive::BagIt. This is the module fo
 
 =head1 VERSION
 
-version 0.063
-
-=head1 SYNOPSIS
-
-This modules will hopefully help with the basic commands needed to create
-and verify a bag. This part supports BagIt 1.0 according to RFC 8493 ([https://tools.ietf.org/html/rfc8493](https://tools.ietf.org/html/rfc8493)).
-
-You only need to know the following methods first:
-
-=head2 read a BagIt
-
-    use Archive::BagIt::Base;
-
-    #read in an existing bag:
-    my $bag_dir = "/path/to/bag";
-    my $bag = Archive::BagIt::Base->new($bag_dir);
-
-=head2 construct a BagIt around a payload
-
-    use Archive::BagIt::Base;
-    my $bag2 = Archive::BagIt::Base->make_bag($bag_dir);
-
-=head2 verify a BagIt-dir
-
-    use Archive::BagIt::Base;
-
-    # Validate a BagIt archive against its manifest
-    my $bag3 = Archive::BagIt::Base->new($bag_dir);
-    my $is_valid1 = $bag3->verify_bag();
-
-    # Validate a BagIt archive against its manifest, report all errors
-    my $bag4 = Archive::BagIt::Base->new($bag_dir);
-    my $is_valid2 = $bag4->verify_bag( {report_all_errors => 1} );
-
-=head2 read a BagIt-dir, change something, store
-
-Because all methods operate lazy, you should ensure to parse parts of the bag *BEFORE* you modify it.
-Otherwise it will be overwritten!
-
-    use Archive::BagIt::Base;
-    my $bag5 = Archive::BagIt::Base->new($bag_dir); # lazy, nothing happened
-    $bag5->load(); # this updates the object representation by parsing the given $bag_dir
-    $bag5->store(); # this writes the bag new
-
-=head1 NAME
-
-Archive::BagIt::Base - The common base for Archive::BagIt. This is the module for experts. ;)
-
-=head1 VERSION
-
-version 0.063
+version 0.065
 
 =head1 NAME
 
 Achive::BagIt::Base - The common base for both Bagit and dotBagIt
-
-=head1 AUTHORS
-
-=over
-
-=item Robert Schmidt, E<lt>rjeschmi at gmail.comE<gt>
-
-=item William Wueppelmann, E<lt>william at c7a.caE<gt>
-
-=item Andreas Romeyke, E<lt>pause at andreas minus romeyke.deE<gt>
-
-=back
-
-=head1 CONTRIBUTORS
-
-=over
-
-=item Serhiy Bolkun
-
-=item Russell McOrmond
-
-=back
 
 =head1 SOURCE
 
@@ -1024,7 +987,7 @@ See L<https://datatracker.ietf.org/doc/rfc8493/?include_text=1> for details.
 
 =item use modern perl code
 
-=item add code to easily update outdated Bags to v1.0
+=item add flag to enable very strict verify
 
 =back
 
@@ -1052,7 +1015,7 @@ It depends. On my system with SSD and a 38MB bag with 48 payload files the resul
    Base         5.10/s         107%         102%           --         -10%
    Fast         5.69/s         131%         125%          11%           --
 
-On network filesystem (CIFS, 1GB) with same Bag:
+On network filesystem (CIFS, 1Gb) with same Bag:
 
                   Rate FastParallel         Fast BaseParallel         Base
    FastParallel 1.97/s           --         -10%         -15%         -20%
@@ -1070,6 +1033,57 @@ You could try this:
    my $bag=Archive::BagIt::Base->new( $my_old_bag_filepath );
    $bag->load();
    $bag->store();
+
+=head2 How to create UTF-8 based paths under MS Windows?
+
+For versions < Windows10: I have no idea and suggestions for a portable solution are very welcome!
+For Windows 10: Thanks to L<https://superuser.com/questions/1033088/is-it-possible-to-set-locale-of-a-windows-application-to-utf-8/1451686#1451686>
+you have to enable UTF-8 support via 'System Administration' -> 'Region' -> 'Administrative'
+-> 'Region Settings' -> Flag 'Use Unicode UTF-8 for worldwide language support'
+
+Hint: The better way is to use only portable filenames. See L<perlport> for details.
+
+=head1 SYNOPSIS
+
+This modules will hopefully help with the basic commands needed to create
+and verify a bag. This part supports BagIt 1.0 according to RFC 8493 ([https://tools.ietf.org/html/rfc8493](https://tools.ietf.org/html/rfc8493)).
+
+You only need to know the following methods first:
+
+=head2 read a BagIt
+
+    use Archive::BagIt::Base;
+
+    #read in an existing bag:
+    my $bag_dir = "/path/to/bag";
+    my $bag = Archive::BagIt::Base->new($bag_dir);
+
+=head2 construct a BagIt around a payload
+
+    use Archive::BagIt::Base;
+    my $bag2 = Archive::BagIt::Base->make_bag($bag_dir);
+
+=head2 verify a BagIt-dir
+
+    use Archive::BagIt::Base;
+
+    # Validate a BagIt archive against its manifest
+    my $bag3 = Archive::BagIt::Base->new($bag_dir);
+    my $is_valid1 = $bag3->verify_bag();
+
+    # Validate a BagIt archive against its manifest, report all errors
+    my $bag4 = Archive::BagIt::Base->new($bag_dir);
+    my $is_valid2 = $bag4->verify_bag( {report_all_errors => 1} );
+
+=head2 read a BagIt-dir, change something, store
+
+Because all methods operate lazy, you should ensure to parse parts of the bag *BEFORE* you modify it.
+Otherwise it will be overwritten!
+
+    use Archive::BagIt::Base;
+    my $bag5 = Archive::BagIt::Base->new($bag_dir); # lazy, nothing happened
+    $bag5->load(); # this updates the object representation by parsing the given $bag_dir
+    $bag5->store(); # this writes the bag new
 
 =head1 METHODS
 
@@ -1103,6 +1117,8 @@ The arguments are:
 =item C<parallel> - if set and Parallel::Iterator available, it verifies files in parallel.
       Hint: use it only for very large bagits, because overhead for parallelization
 
+=item C<force_utf8> - if set the warnings about non portable filenames are disabled (default: enabled)
+
 =back
 
 The bag object will use $bag_dir, BUT an existing $bag_dir is not read. If you use C<store()> an existing bag will be overwritten!
@@ -1112,6 +1128,12 @@ See C<load()> if you want to parse/modify an existing bag.
 =head2 has_parallel()
 
 to check if parallelization is possible.
+
+=head2 has_force_utf8()
+
+to check if force_utf8() was set.
+
+If set it ignores warnings about potential filepath problems.
 
 =head2 bag_path([$new_value])
 
@@ -1291,17 +1313,6 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 You can make new bug reports, and view existing ones, through the
 web interface at L<http://rt.cpan.org>.
-
-=head1 AUTHOR
-
-Rob Schmidt <rjeschmi@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

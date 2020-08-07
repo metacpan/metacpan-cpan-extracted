@@ -3,13 +3,13 @@ package Set::Similarity;
 use strict;
 use warnings;
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use Carp 'croak';
 
 sub new {
   my $class = shift;
-  
+
   # uncoverable condition false
   bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
 }
@@ -25,7 +25,7 @@ sub similarity {
 
 sub _any {
   my ($self, $any, $width) = @_;
-	
+
   if (ref($any) eq 'ARRAY') {
     return $any;
   }
@@ -56,7 +56,7 @@ sub from_tokens {
 
   return 1 if (!(scalar @$tokens1 || scalar @$tokens2));
   return 0 unless (scalar @$tokens1 && scalar @$tokens2 );
-    
+
   return $self->from_sets(
     [$self->uniq($tokens1)],
     [$self->uniq($tokens2)],
@@ -65,16 +65,16 @@ sub from_tokens {
 
 sub from_sets { croak 'Method "from_sets" not implemented in subclass' }
 
-sub intersection { 
+sub intersection {
   my %uniq;
   @uniq{@{$_[1]}} = ();
   scalar grep { exists $uniq{$_} } @{$_[2]};
 }
 
 sub uniq {
-  my %uniq; 
+  my %uniq;
   @uniq{@{$_[1]}} = ();
-  return keys %uniq; 
+  return keys %uniq;
 }
 
 sub combined_length {
@@ -106,23 +106,23 @@ Set::Similarity - similarity measures for sets
 =head1 SYNOPSIS
 
  use Set::Similarity::Dice;
- 
+
  # object method
  my $dice = Set::Similarity::Dice->new;
  my $similarity = $dice->similarity('Photographer','Fotograf');
- 
+
  # class method
  my $dice = 'Set::Similarity::Dice';
  my $similarity = $dice->similarity('Photographer','Fotograf');
- 
+
  # from 2-grams
  my $width = 2;
  my $similarity = $dice->similarity('Photographer','Fotograf',$width);
- 
+
  # from arrayref of tokens
  my $similarity = $dice->similarity(['a','b'],['b']);
 
- # from hashref of features 
+ # from hashref of features
  my $bird = {
    wings    => true,
    eyes     => true,
@@ -137,10 +137,10 @@ Set::Similarity - similarity measures for sets
    feathers => false,
    hairs    => true,
    legs     => true,
-   arms     => true, 
+   arms     => true,
  };
  my $similarity = $dice->similarity($bird,$mammal);
- 
+
  # from arrayref sets
  my $bird = [qw(
    wings
@@ -172,7 +172,7 @@ The Jaccard coefficient measures similarity between sample sets, and is defined 
 
 The Tanimoto coefficient is the ratio of the number of features common to both sets to the total number of features, i.e.
 
-( A intersect B ) / ( A + B - ( A intersect B ) ) # the same as Jaccard 
+( A intersect B ) / ( A + B - ( A intersect B ) ) # the same as Jaccard
 
 The range is 0 to 1 inclusive.
 
@@ -195,11 +195,11 @@ All methods can be used as class or object methods.
 =head2 similarity
 
   my $similarity = $object->similarity($any1,$any1,$width);
-  
+
 C<$any> can be an arrayref, a hashref or a string. Strings are tokenized into n-grams of width C<$width>.
 
 C<$width> must be integer, or defaults to 1.
-  
+
 =head2 from_tokens
 
   my $similarity = $object->from_tokens(['a','b'],['b']);
@@ -207,19 +207,19 @@ C<$width> must be integer, or defaults to 1.
 =head2 from_sets
 
   my $similarity = $object->from_sets(['a'],['b']);
-  
+
 Croaks if called directly. This method should be implemented in a child module.
 
 =head2 intersection
 
   my $intersection_size = $object->intersection(['a'],['b']);
-  
+
 =head2 uniq
 
   my @uniq = $object->uniq(['a','b']);
-  
+
 Transforms an arrayref of strings into an array of unique elements.
-  
+
 =head2 combined_length
 
   my $set_size_sum = $object->combined_length(['a'],['b']);
@@ -227,7 +227,7 @@ Transforms an arrayref of strings into an array of unique elements.
 =head2 min
 
   my $min_set_size = $object->min(['a'],['b']);
-  
+
 =head2 ngrams
 
   my @monograms = $object->ngrams('abc');
@@ -236,7 +236,7 @@ Transforms an arrayref of strings into an array of unique elements.
 =head2 _any
 
   my $arrayref = $object->_any($any,$width);
-  
+
 =head1 SEE ALSO
 
 L<Set::Similarity::Cosine>
@@ -262,7 +262,7 @@ L<http://github.com/wollmers/Set-Similarity>
 
 =head1 AUTHOR
 
-Helmut Wollmersdorfer, E<lt>helmut.wollmersdorfer@gmail.comE<gt>
+Helmut Wollmersdorfer, E<lt>helmut@wollmersdorfer.atE<gt>
 
 =begin html
 
@@ -272,7 +272,7 @@ Helmut Wollmersdorfer, E<lt>helmut.wollmersdorfer@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2015 by Helmut Wollmersdorfer
+Copyright (C) 2013-2020 by Helmut Wollmersdorfer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -37,9 +37,9 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::Portion;
 use AsposeSlidesCloud::Object::ResourceBase;
 use AsposeSlidesCloud::Object::ResourceUri;
-use AsposeSlidesCloud::Object::ResourceUriElement;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -314,7 +314,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'portion_list' => {
-    	datatype => 'ARRAY[ResourceUriElement]',
+    	datatype => 'ARRAY[Portion]',
     	base_name => 'PortionList',
     	description => 'List of portion links.',
     	format => '',
@@ -344,7 +344,7 @@ __PACKAGE__->swagger_types( {
     'east_asian_line_break' => 'string',
     'latin_line_break' => 'string',
     'right_to_left' => 'string',
-    'portion_list' => 'ARRAY[ResourceUriElement]'
+    'portion_list' => 'ARRAY[Portion]'
 } );
 
 __PACKAGE__->attribute_map( {

@@ -1,0 +1,74 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 8b8fc2e24ba55a7918cc1fc3c7dd58c661e7cb394989add54907a59b2916f58b Changes
+SHA256 0f0a17be718b7d2db73779add346bad68a2d5f9ec153959828923559be54c59c MANIFEST
+SHA256 e0e993031fd45b2261a62fe2c22c4aa39c029ed2559f892cafa7f4119bfba982 MANIFEST.SKIP
+SHA256 8e0d195e4444f55e0a458325b43fe6df3d0b525858aabef7a10140f7e452a972 META.json
+SHA256 c2ae2d9a076da21a4dbec298eb09cbc51687f581a91409cca163a61ddca764cd META.yml
+SHA256 6855459fee809917f58ab99988bf5d21b0c69f9bc1c79fc903cdfaf081545cf6 Makefile.PL
+SHA256 1ad9ce0f9dea4bc7e49114716e61acc6ee51eaf792de50b7bdc5130dd95302b9 README
+SHA256 b5be52d908afef421e52a2fdda3750444940e9db19d97bc1bde714866a376cf6 README.md
+SHA256 c7b72d8a6ac525b22f018e53f5aee8e5734ebd66e0c7c4fbbc8e4c25cebf1813 lib/Math/Matrix.pm
+SHA256 3cb42cd68e2ee0180f38268a8caf31aa782358f1a158c8b971a417b0b4efb9f8 t/00-signature.t
+SHA256 5b97957d07a53792e72ce7760934e227de5d22ca7d9049ade5caaf9d6ab7c14c t/01-load.t
+SHA256 4bc1bb7eec94f6fc251ad94975cb37a177cfebf8004006f0406ac658c7f6db12 t/absolute.t
+SHA256 fa1c7b0e323766acf28c1a1a65ba356defc4b5a44a271dd744ffbb345c456334 t/as_string.t
+SHA256 0876677742596ad9b5bf456f679c18c4b839390a2d67bcc48e125964ba4731de t/basic.t
+SHA256 9e84488ff1a754ea4274dcb11b0a035d361b4d9d268619885bf65c1bd1eec860 t/clone-math-complex.t
+SHA256 89174a55f0d5cb6d5a244b52bc4d62ead878cc7bac1087cf19349dde9cfb19fd t/clone-math-real.t
+SHA256 cb75758137e99e9bbbfb9c8c4b9bac4799e37f33c75e469c7f57d410b1420978 t/clone.t
+SHA256 3302c508d5de957b64df98f8379ccc241dd8aa93b65c98878635258c7bab1646 t/concat.t
+SHA256 5f38d456d554c33550f9e5b799467211dcdda4759aae8b5c5aec7bd4d0ea2dc6 t/cross_product.t
+SHA256 05cf2c7d8288a9b6f48a79259d57fa86ba85e96f9da56aa7cc0fea7606fb2845 t/determinant-math-complex.t
+SHA256 1461c9e7272f9766951e47f9b4de658c056600fe8de5bd82419d6a8683455547 t/determinant-math-real.t
+SHA256 d3e002f390ec36b1579513fd7dbbb2406dbaba6490f7627b479feca10a1e6bd7 t/determinant.t
+SHA256 3981946dd1c77b8622ac5ba49684827261cf9fa174a7064ca4d65bca45f62769 t/diagonal.t
+SHA256 2f00d79314c54345a954aac6c34b8f6f71d2210dad7d6789a59b53bf1ffabdca t/dot_product.t
+SHA256 5770cbc13e148d577854d1344d39031d97c83394acfd615fc3c240bdee8d441c t/extension.t
+SHA256 d610683c79a983a54a5068316590e066c1d2899200329b803d4ab9e3e0263008 t/lib/Math/Matrix/Complex.pm
+SHA256 4f8940f4d556e92b173c9e5af734db8cb0e4205137416581522b73b54f014710 t/lib/Math/Matrix/Real.pm
+SHA256 c63942316288d65d4f93adb0650d01e3fe06eaf5b93770837f780ad2ebff45c1 t/lib/Math/Real.pm
+SHA256 58a344c219e9a788f9d9df0e19516b1809323d328a01054b27edd4ac0f0ef859 t/negative.t
+SHA256 d72cb9de4f71c4feac2854f049b9d20186bae8a3b2fc4ef816456f3b7654bd6c t/new.t
+SHA256 36387c818c27e630290909e722e3ea4c043ce99c77df05d2ca7549287170dc81 t/new_identity.t
+SHA256 e873d70650ffea3c2923996eb31c9388c69db0fc88c60a8186280eb10696ac95 t/normalize.t
+SHA256 28f662d094430f8265564ca7ca35177b36748505028609105969f3c8de59e205 t/slice-math-complex.t
+SHA256 b811914cf4f78813e53f8bff79a2b3fb9b795a877deeffbc76b05d5ce0916efe t/slice-math-real.t
+SHA256 e938f0b075941034f9f802823f4c0612fe74b50558a16b43c1e7ad8bb6c8e65d t/slice.t
+SHA256 4c64195e8b3fee90bf7d025d654bf4fd2c8ae2bea7787c965ef0b94a9a440e88 t/version.t
+SHA256 51b34197196515bc2fc29daf632edd7b00e975d0f18fff88247d6dacbadbc43e xt/author-changelog.t
+SHA256 37edc8bc6ae28560b47f65506479189a6b4f091ce4b5a0a0d870fa829d8e9a63 xt/author-git.t
+SHA256 3895f91b6c6a050c93926abafd9db783f70a0ea96b5a16880f19bea536e9955e xt/release-cpan-changes.t
+SHA256 3f3c44f4c1d2b7bd15dafc9e372745b71dde066780c01e43328ae708f876b799 xt/release-kwalitee.t
+SHA256 4a0f3dda9cb3ca48fd8a646eaa7a584c74741eb990be5a85f44e172bb0ac4000 xt/release-pod-coverage.t
+SHA256 719727b9d070d578d1b260726488405a50297cedad0caf1bf172ddcea3a0d4ed xt/release-pod-syntax.t
+SHA256 719727b9d070d578d1b260726488405a50297cedad0caf1bf172ddcea3a0d4ed xt/release-pod.t
+SHA256 2af76a23b802226e78950bdc4e9f409aa8765c221d3f27d1f067a98fb0a7f92f xt/release-portability.t
+SHA256 365f0d117b1555121cc55e247d1e12db946592e3ab060303d40e784d1c0d543b xt/release-synopsis.t
+SHA256 4eccf03fbe993f81dae7dbd4ffe00e49f59666e7c2612954a454c31fe3e33b6c xt/release-unused-vars.t
+SHA256 d326c0695d9453313ee410b4ee7e81d01f0326e2891f39d2887c2388de8c5afd xt/release-version.t
+SHA256 c3bd4cb3c18538c4405716b6d98a34b7aeffba3ed441164bef0daf42bc503aca xt/release-whitespaces.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJfLVO/AAoJEGcmPl2fr166YRwH+wS68py0qt8PfWF/vXTVnxB6
+XRWMIrcq4DferB0n2plVuCgmIh2JXj89BF/BOzD9u37Mi3Z2vk/qRs4jZwTU5M/h
+IuXp8FWgXNlRa1FO2PPCHM25mYiC4rG+aPMYewwExGOgYxjf11y+tnoLmJSpXWxi
+wuPcn+aVklb2lyN9Drf3lKyKdDKL1a/nAWIt3LjtP8ZgKZajjLl22iw4hYcz17PM
+sPDKpjSKjn6DI9Jwf45KgbrR/VE0x/3V/vlhJ5YG7rYc4pHxs1XPa68kfMlogIEM
+xTcUbaO3Hzl5FZZdMV4Gl4N1CtQhUtP/ckQOZ+tcjPqMW4ABfbBMwIDz1zmWly0=
+=V1w6
+-----END PGP SIGNATURE-----

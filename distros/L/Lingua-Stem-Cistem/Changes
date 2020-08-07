@@ -1,5 +1,14 @@
 Revision history for Lingua::Stem::Cistem
 
+0.08  2020-08-06 18:14:55 CEST
+        - prepare stable release
+
+0.07  2019-11-06 16:17:00 CET
+        - improved pod
+
+0.06  2019-11-06 11:48:51 CET
+        - correct scharp s in POD
+
 0.05  2019-09-01 14:51:53 CEST
 
         - fixed typo (by Mohammad S Anwar)

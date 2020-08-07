@@ -2,7 +2,7 @@ package Test2::Event::Ok;
 use strict;
 use warnings;
 
-our $VERSION = '1.302175';
+our $VERSION = '1.302177';
 
 
 BEGIN { require Test2::Event; our @ISA = qw(Test2::Event) }
@@ -69,7 +69,14 @@ sub facet_data {
     };
 
     if (my @exra_amnesty = $self->extra_amnesty) {
-        unshift @{$out->{amnesty}} => @exra_amnesty;
+        my %seen;
+
+        # It is possible the extra amnesty can be a duplicate, so filter it.
+        $out->{amnesty} = [
+            grep { !$seen{defined($_->{tag}) ? $_->{tag} : ''}->{defined($_->{details}) ? $_->{details} : ''}++ }
+                @exra_amnesty,
+                @{$out->{amnesty}},
+        ];
     }
 
     return $out;

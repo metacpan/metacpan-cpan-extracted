@@ -27,12 +27,12 @@ my %WriteMakefileArgs = (
     "Scope::Guard" => 0,
     "Sub::Info" => "0.002",
     "Term::Table" => "0.013",
-    "Test2::API" => "1.302158",
+    "Test2::API" => "1.302176",
     "Time::HiRes" => 0,
     "overload" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.000130",
+  "VERSION" => "0.000132",
   "test" => {
     "TESTS" => "t/*.t t/acceptance/*.t t/behavior/*.t t/modules/*.t t/modules/AsyncSubtest/*.t t/modules/AsyncSubtest/Event/*.t t/modules/Bundle/*.t t/modules/Compare/*.t t/modules/Plugin/*.t t/modules/Require/*.t t/modules/Tools/*.t t/modules/Util/*.t t/modules/Util/Table/*.t t/modules/Workflow/*.t t/modules/Workflow/Task/*.t t/regression/*.t"
   }
@@ -50,7 +50,7 @@ my %FallbackPrereqs = (
   "Scope::Guard" => 0,
   "Sub::Info" => "0.002",
   "Term::Table" => "0.013",
-  "Test2::API" => "1.302158",
+  "Test2::API" => "1.302176",
   "Time::HiRes" => 0,
   "overload" => 0,
   "utf8" => 0

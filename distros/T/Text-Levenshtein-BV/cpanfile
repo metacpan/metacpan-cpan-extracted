@@ -4,7 +4,8 @@ requires 'perl', '5.010001';
 
 on test => sub {
   requires 'Test::More', '0.88';
-  requires 'Test::Deep', '0';
+  #requires 'Test::Deep', '0';
+  requires 'Text::Levenshtein';
 };
 
 on 'develop' => sub {

@@ -1,7 +1,7 @@
 package App::ListDebianReleases;
 
-our $DATE = '2020-02-21'; # DATE
-our $VERSION = '0.070'; # VERSION
+our $DATE = '2020-04-27'; # DATE
+our $VERSION = '0.071'; # VERSION
 
 1;
 # ABSTRACT: List Debian releases (CLI)
@@ -18,7 +18,7 @@ App::ListDebianReleases - List Debian releases (CLI)
 
 =head1 VERSION
 
-This document describes version 0.070 of App::ListDebianReleases (from Perl distribution App-ListDebianReleases), released on 2020-02-21.
+This document describes version 0.071 of App::ListDebianReleases (from Perl distribution App-ListDebianReleases), released on 2020-04-27.
 
 =head1 DESCRIPTION
 

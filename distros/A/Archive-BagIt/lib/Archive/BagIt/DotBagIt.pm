@@ -1,6 +1,6 @@
 package Archive::BagIt::DotBagIt;
 
-our $VERSION = '0.063'; # VERSION
+our $VERSION = '0.065'; # VERSION
 use strict;
 use warnings;
 use Sub::Quote;
@@ -51,15 +51,7 @@ Archive::BagIt::DotBagIt
 
 =head1 VERSION
 
-version 0.063
-
-=head1 NAME
-
-Archive::BagIt::DotBagIt
-
-=head1 VERSION
-
-version 0.063
+version 0.065
 
 =head1 NAME
 
@@ -75,17 +67,6 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 You can make new bug reports, and view existing ones, through the
 web interface at L<http://rt.cpan.org>.
-
-=head1 AUTHOR
-
-Rob Schmidt <rjeschmi@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

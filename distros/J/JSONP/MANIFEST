@@ -1,11 +1,10 @@
 buildme
-Changes
 lib/JSONP.pm
-LICENSE
+lib/JSONP.pm.1.99
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-README
+README.pod
 t/JSONP.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

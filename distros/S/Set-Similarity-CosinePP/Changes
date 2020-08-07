@@ -1,5 +1,8 @@
 Revision history for Set::Similarity::CosinePP
 
+0.016  2020-08-06 18:33:10 CEST
+       - improve Kwalitee by provides
+
 0.015  2016-11-24 12:16:41 CET
        - travis for Perl 5.24
 

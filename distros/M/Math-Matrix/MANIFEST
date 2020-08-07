@@ -1,8 +1,49 @@
-MANIFEST
+Changes
+lib/Math/Matrix.pm
 Makefile.PL
-Matrix.pm
-t/basic.t
-t/extension.t
-t/diagonal.t
+MANIFEST			This list of files
+MANIFEST.SKIP
 README
-META.yml                                 Module meta-data (added by MakeMaker)
+README.md
+t/00-signature.t
+t/01-load.t
+t/absolute.t
+t/as_string.t
+t/basic.t
+t/clone-math-complex.t
+t/clone-math-real.t
+t/clone.t
+t/concat.t
+t/cross_product.t
+t/determinant-math-complex.t
+t/determinant-math-real.t
+t/determinant.t
+t/diagonal.t
+t/dot_product.t
+t/extension.t
+t/lib/Math/Matrix/Complex.pm
+t/lib/Math/Matrix/Real.pm
+t/lib/Math/Real.pm
+t/negative.t
+t/new.t
+t/new_identity.t
+t/normalize.t
+t/slice-math-complex.t
+t/slice-math-real.t
+t/slice.t
+t/version.t
+xt/author-changelog.t
+xt/author-git.t
+xt/release-cpan-changes.t
+xt/release-kwalitee.t
+xt/release-pod-coverage.t
+xt/release-pod-syntax.t
+xt/release-pod.t
+xt/release-portability.t
+xt/release-synopsis.t
+xt/release-unused-vars.t
+xt/release-version.t
+xt/release-whitespaces.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

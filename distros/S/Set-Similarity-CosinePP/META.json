@@ -4,7 +4,7 @@
       "Helmut Wollmersdorfer, <helmut.wollmersdorfer@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.034, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -15,12 +15,12 @@
    "name" : "Set-Similarity-CosinePP",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "eg",
+         "examples",
          "inc",
          "share",
-         "eg",
-         "examples"
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.14",
+            "Dist::Milla" : "v1.0.20",
             "Test::Pod" : "1.41"
          }
       },
@@ -48,6 +48,12 @@
          }
       }
    },
+   "provides" : {
+      "Set::Similarity::CosinePP" : {
+         "file" : "lib/Set/Similarity/CosinePP.pm",
+         "version" : "0.016"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -60,10 +66,12 @@
          "web" : "https://github.com/wollmers/Set-Similarity-CosinePP"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_contributors" : [
       "Helmut Wollmersdorfer <helmut@wollmersdorfer.at>",
       "Helmut Wollmersdorfer <helmut.wollmersdorfer@fixpunkt.de>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.15",
+   "x_static_install" : 1
 }
 

@@ -352,7 +352,7 @@ sub fire_event {
     # regardless of what javascript will be executed because of fire_event,
     # at least make sure to wait until we have a page to work with.
     Gtk3::main_iteration
-        while $self->inspector->is_loading or not $self->inspector->get_html_source;
+        while (Gtk3::events_pending);
 
     return $result;
 }

@@ -12,12 +12,12 @@ DESCRIPTION
     and reporting.
 
 RT VERSION
-    Works with RT 4.4.x, not tested with 4.6.x yet.
+    Works with RT 4.4.x and 5.0.x.
 
 INSTALLATION
-    perl Makefile.PL
-    make
-    make install
+    "perl Makefile.PL"
+    "make"
+    "make install"
         May need root permissions
 
     Edit your /opt/rt4/etc/RT_SiteConfig.pm

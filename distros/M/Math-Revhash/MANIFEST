@@ -9,5 +9,7 @@ t/00-load.t
 t/1-basic.t
 t/2-oo.t
 t/3-args.t
+t/4-predefined.t
+t/5-unsafe.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

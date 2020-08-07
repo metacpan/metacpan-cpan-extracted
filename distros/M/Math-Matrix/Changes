@@ -1,0 +1,44 @@
+0.9 2020-08-07
+
+ * Fix typos in POD and add more documentation and examples.
+
+ * Extended new() to handle empty matrices and allow the matrix to be specified
+   as a single argument.
+
+ * Improve code so subclassing works better.
+
+ * Add many new tests to confirm existing and new behaviour.
+
+ * Misellaneous modernizations.
+
+ * This release closes CPAN RT ##104334 and #109353.
+
+0.8 2013-09-30 09:21
+
+ * Add support for unary minus ([rt.cpan.org #88821] support for overload of
+   unary minus, Diab Jerius)
+
+0.7 2013-05-18 08:15
+
+ * Replaced transpose functions
+   (https://rt.cpan.org/Public/Bug/Display.html?id=42919)
+
+0.6 2013-05-17 10:24:40
+
+ * John M. Gamble added diagonal() and tridiagonal() methods
+
+0.5 2002-06-02 15:47:40
+
+ * Bill Denney added pinvert function
+
+0.3 2001-04-17 11:10:15
+
+ * Extensions from Brian Watson
+
+0.2 1996-07-10 17:48:14 pfeifer
+
+ * Fixes from Mike Beachy <beachy@chem.columbia.edu>
+
+0.1 1995-10-25 09:48:39 pfeifer
+
+ * Initial revision

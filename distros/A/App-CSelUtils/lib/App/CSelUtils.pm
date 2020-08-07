@@ -1,7 +1,9 @@
 package App::CSelUtils;
 
-our $DATE = '2020-04-14'; # DATE
-our $VERSION = '0.085'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-29'; # DATE
+our $DIST = 'App-CSelUtils'; # DIST
+our $VERSION = '0.086'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,8 +39,7 @@ _
         pos => 1,
     },
     file => {
-        schema => 'str*',
-        'x.schema.entity' => 'filename',
+        schema => 'filename*',
         pos => 0,
         default => '-',
     },
@@ -429,7 +430,7 @@ App::CSelUtils - Utilities related to Data::CSel
 
 =head1 VERSION
 
-This document describes version 0.085 of App::CSelUtils (from Perl distribution App-CSelUtils), released on 2020-04-14.
+This document describes version 0.086 of App::CSelUtils (from Perl distribution App-CSelUtils), released on 2020-04-29.
 
 =head1 DESCRIPTION
 
@@ -474,7 +475,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<expr> => I<str>
 
-=item * B<file> => I<str> (default: "-")
+=item * B<file> => I<filename> (default: "-")
 
 =item * B<node_actions> => I<array[str]> (default: ["print_as_string"])
 

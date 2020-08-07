@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,12 +15,16 @@ meta-spec:
 name: Set-Similarity-CosinePP
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Set::Similarity::CosinePP:
+    file: lib/Set/Similarity/CosinePP.pm
+    version: '0.016'
 requires:
   Set::Similarity: '0.022'
   parent: '0'
@@ -29,7 +33,9 @@ resources:
   bugtracker: https://github.com/wollmers/Set-Similarity-CosinePP/issues
   homepage: https://github.com/wollmers/Set-Similarity-CosinePP
   repository: https://github.com/wollmers/Set-Similarity-CosinePP.git
-version: '0.015'
+version: '0.016'
 x_contributors:
   - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
   - 'Helmut Wollmersdorfer <helmut.wollmersdorfer@fixpunkt.de>'
+x_serialization_backend: 'YAML::Tiny version 1.66'
+x_static_install: 1

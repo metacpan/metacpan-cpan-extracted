@@ -8,13 +8,11 @@ use utf8;
 use lib qw(../lib/);
 
 use Test::More;
-use Test::Deep;
+#use Test::Deep;
 #cmp_deeply([],any());
 
 use Text::Levenshtein::BV;
 use Text::Levenshtein qw(distance);
-
-use Data::Dumper;
 
 my $examples = [
   ['ttatc__cg',
@@ -63,8 +61,7 @@ my $examples = [
     're'],
   [ 'abcdefg_',
     '_bcdefgh'],
-  [ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVY_', # l=52
-    '_bcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVYZ'],
+
   [ 'aabbcc',
     'abc'],
   [ 'aaaabbbbcccc',
@@ -75,6 +72,8 @@ my $examples = [
 
 
 my $examples2 = [
+  [ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVY_', # l=52
+    '_bcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVYZ'],
   [ 'abcdefghijklmnopqrstuvwxyz0123456789!"$%&/()=?ABCDEFGHIJKLMNOPQRSTUVY_',
     '_bcdefghijklmnopqrstuvwxyz0123456789!"$%&/()=?ABCDEFGHIJKLMNOPQRSTUVYZ'],
   [ 'abcdefghijklmnopqrstuvwxyz0123456789"$%&/()=?ABCDEFGHIJKLMNOPQRSTUVY_',

@@ -19,7 +19,7 @@ BEGIN {
 }
 use Pod::Coverage::TrustPod;
 
-my %skip = map { $_ => 1 } qw( Exporter::Extensible::UnimportScopeGuard );
+my %skip = map { $_ => 1 } qw( Exporter::Extensible::UnimportScopeGuard Exporter::Extensible::Compat );
 
 my @modules;
 for my $module ( all_modules() ) {

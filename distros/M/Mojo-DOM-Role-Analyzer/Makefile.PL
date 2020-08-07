@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Devel::Confess" => 0,
+    "Log::Log4perl::Shortcuts" => 0,
     "Mojo::Dom" => "7.42",
     "Role::Tiny" => 0,
     "overload" => 0,
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,6 +40,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Devel::Confess" => 0,
+  "Log::Log4perl::Shortcuts" => 0,
   "Mojo::DOM" => 0,
   "Mojo::Dom" => "7.42",
   "Role::Tiny" => 0,

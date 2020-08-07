@@ -1,5 +1,12 @@
 Revision history for RT-Extension-AssetAutoName
 
+0.05 2020-08-06
+ - Brown paper bag release.
+ - Update support RT versions in the docs.
+
+0.04 2020-08-06
+ - Works on RT 5.0.0, remove upper limit on version.
+
 0.03 2020-04-21
  - Use the hack of inserting a newline in the "package" statement to hide
    the namespace of RT::Assets from PAUSE.

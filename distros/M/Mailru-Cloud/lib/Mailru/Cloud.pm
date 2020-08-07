@@ -14,7 +14,7 @@ use Encode;
 use IO::Socket::SSL;
 use base qw/Mailru::Cloud::Auth/;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 my $BUFF_SIZE = 512;
 
@@ -76,7 +76,6 @@ sub downloadFile {
 
     my $FL;
     my $ua = $self->{ua};
-    $DB::single = 1;
     my $url = 'https://cloclo5.datacloudmail.ru/get/' . uri_escape($cloud_file) . '?x-email=' . uri_escape($self->{email});
     my $res = $ua->get($url, ':read_size_hint' => $BUFF_SIZE, ':content_cb' => sub {
                                                                                         if (not $FL) {
@@ -325,7 +324,7 @@ __END__
 B<Mailru::Cloud> - Simple REST API cloud mail.ru client
 
 =head1 VERSION
-    version 0.08
+    version 0.09
 
 =head1 SYNOPSYS
 

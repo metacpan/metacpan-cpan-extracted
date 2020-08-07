@@ -23,5 +23,5 @@ requires:
   OpenTracing::Implementation: '0.03'
   OpenTracing::Interface: v0.204.0
   aliased: '0'
-version: v0.71.1
+version: v0.72.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

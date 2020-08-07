@@ -1,0 +1,66 @@
+{
+   "abstract" : "Weighted QM-like superpositions with lazy evaluation",
+   "author" : [
+      "Bartosz Jarzyna <brtastic.dev@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Quantum-Superpositions-Lazy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Entropy" : "0",
+            "List::MoreUtils" : "0",
+            "Moo" : "0",
+            "Sort::Key" : "0",
+            "Type::Tiny" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.024"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mock::Sub" : "0",
+            "Test::Exception" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brtastic/perl-quantum-superpositions-lazy/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Quantum-Superpositions-Lazy",
+      "license" : [
+         "https://dev.perl.org/licenses"
+      ],
+      "repository" : {
+         "url" : "https://github.com/brtastic/perl-quantum-superpositions-lazy"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

@@ -213,7 +213,7 @@ my $configure_wordpress=sub {
          ' unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel'.
          ' ncurses-devel xmlto autoconf libmcrypt libmcrypt-devel'.
          ' libcurl libcurl-devel libicu libicu-devel re2c'.
-         ' libpng-devel.x86_64 freetype-devel.x86_64 '.
+         ' libpng-devel.x86_64 freetype-devel.x86_64 cmake '.
          ' oniguruma oniguruma-devel tcl tcl-devel git-all',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1364,6 +1364,9 @@ END
          'groupadd mysql');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'useradd -r -g mysql mysql');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ls -1 /opt/source/mariadb/_CPack_Packages/Linux/RPM/*rpm',
+         '__display__');
       my @rpm_files=split "\n", $stdout;
       foreach my $rpm (@rpm_files) {
          next if $rpm!~/64-common/;
@@ -1725,13 +1728,22 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /usr/local/php7/etc/conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ./php.ini-production /usr/local/php7/lib/php.ini',
+         'cp -v ./php.ini-production /usr/local/php7/etc/php.ini',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i \'s/post_max_size = 8M/post_max_size = 500M/\' ".
+         "/usr/local/php7/etc/php.ini");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i \'s/upload_max_filesize = 2M/upload_max_filesize = 500M/\' ".
+         "/usr/local/php7/etc/php.ini");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i \'s/max_execution_time = 30/max_execution_time = 7500/\' ".
+         "/usr/local/php7/etc/php.ini");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i \'s/memory_limit = 128M/memory_limit = 256M/\' '.
+         '/usr/local/php7/etc/php.ini');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /usr/local/php7/etc/conf.d','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ./php.ini-production /usr/local/php7/lib/php.ini',
-         '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /usr/local/php7/etc/php-fpm.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.

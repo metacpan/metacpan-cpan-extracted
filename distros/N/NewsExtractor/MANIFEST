@@ -31,6 +31,7 @@ lib/NewsExtractor/SiteSpecificExtractor/estate_ltn_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/focustaiwan_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/hk_crntt_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/hk_on_cc.pm
+lib/NewsExtractor/SiteSpecificExtractor/m_news_cctv_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/money_udn_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/new_ctv_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/newnet_tw.pm

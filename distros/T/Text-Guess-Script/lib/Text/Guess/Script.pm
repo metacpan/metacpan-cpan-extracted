@@ -3,9 +3,11 @@ package Text::Guess::Script;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Unicode::Normalize;
+use Unicode::UCD qw(charscript prop_value_aliases);
+use charnames ':full'; # ord($char)
 
 our @codes;
 
@@ -16,6 +18,14 @@ sub new {
 }
 
 sub guess {
+  my ($self, $text) = @_;
+
+  my $guesses = $self->guesses($text);
+
+  return $guesses->[0]->[0];
+}
+
+sub guesses {
   my ($self, $text) = @_;
 
   my $text_NFC = NFC($text);
@@ -49,9 +59,44 @@ sub guess {
     }
   }
 
-  my ($guess) = sort { $guesses->{$b} <=> $guesses->{$a} } keys(%$guesses);
-  return $guess;
+  my $result = [
+  	map { [ $_, $guesses->{$_}/scalar(@tokens) ] }
+    sort { $guesses->{$b} <=> $guesses->{$a} }
+    keys(%$guesses)
+  ];
+  return $result;
 }
+
+sub _guesses {
+  my ($self, $text) = @_;
+
+  my $text_NFC = NFC($text);
+
+  my @tokens = $text_NFC =~ m/(.)/xmsg;
+
+  my $chars = {};
+  for my $token (@tokens) {
+    $chars->{$token}++;
+  }
+
+  my $guesses = {};
+  my @other_codes = @codes;
+  my @seen_codes;
+
+  for my $char (keys %$chars) {
+    my ($code, $name) = prop_value_aliases("Script",charscript(ord($char)));
+
+    $guesses->{$code} += $chars->{$char};
+  }
+
+  my $result = [
+  	map { [ $_, $guesses->{$_}/scalar(@tokens) ] }
+    sort { $guesses->{$b} <=> $guesses->{$a} }
+    keys(%$guesses)
+  ];
+  return $result;
+}
+
 
 BEGIN {
 @codes = qw(
@@ -312,7 +357,7 @@ L<http://github.com/wollmers/Text-Guess-Script>
 
 =head1 AUTHOR
 
-Helmut Wollmersdorfer E<lt>helmut.wollmersdorfer@gmail.comE<gt>
+Helmut Wollmersdorfer E<lt>helmut@wollmersdorfer.atE<gt>
 
 =begin html
 
@@ -322,7 +367,7 @@ Helmut Wollmersdorfer E<lt>helmut.wollmersdorfer@gmail.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2016- Helmut Wollmersdorfer
+Copyright 2016-2020 Helmut Wollmersdorfer
 
 =head1 LICENSE
 

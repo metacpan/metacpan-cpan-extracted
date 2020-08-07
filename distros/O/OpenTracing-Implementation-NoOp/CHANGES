@@ -2,6 +2,13 @@ CHANGE LOG
 ==========
 
 
+2020-08-06 - v0.72.0
+--------------------
+
+Change return of ScopeManager->get_active_scope to none
+instead of producing infinite new scopes
+
+
 2020-06-16 - v0.71.1
 --------------------
 

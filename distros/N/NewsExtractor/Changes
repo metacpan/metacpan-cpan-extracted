@@ -1,3 +1,8 @@
+v0.36.0 2020-08-07T08:56:18+0800
+  - Add a site-specific extractor for www.eventsinfocus.org
+  - Add a site-specific extractor for m.news.cctv.com
+  - Improve the extractor of newnet.tw
+
 v0.35.0 2020-07-31T08:36:15+0800
   - re-format the dateline extracted from www.thinkingtaiwan.com
   - Handle a few special cases on chinatimes and ebc.

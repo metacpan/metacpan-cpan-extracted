@@ -1,5 +1,8 @@
 Revision history for Set::Similarity::CosinePDL
 
+0.014  2020-08-06 18:27:05 CEST
+       - improve Kwalitee by provides
+
 0.013  2016-11-24 12:19:39 CET
        - travis for Perl 5.24
 

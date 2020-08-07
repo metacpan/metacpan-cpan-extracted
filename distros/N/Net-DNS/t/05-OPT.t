@@ -1,4 +1,4 @@
-# $Id: 05-OPT.t 1784 2020-05-24 19:27:13Z willem $	-*-perl-*-
+# $Id: 05-OPT.t 1796 2020-07-28 08:22:47Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -81,7 +81,7 @@ foreach my $method (qw(class ttl)) {
 
 
 {
-	my $rr = new Net::DNS::RR( name => '.', type => $type, version => 1, rcode => 16 );
+	my $rr = new Net::DNS::RR( type => $type, version => 1, rcode => 16 );
 	$rr->{rdlength} = 0;					# inbound OPT RR only
 	like( $rr->string, '/BADVER/', 'opt->rcode(16)' );
 }

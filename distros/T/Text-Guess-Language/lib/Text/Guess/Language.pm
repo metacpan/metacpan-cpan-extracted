@@ -3,7 +3,7 @@ package Text::Guess::Language;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Unicode::Normalize;
 use Text::Guess::Language::Words;
@@ -17,10 +17,17 @@ sub new {
 sub guess {
   my ($self, $text) = @_;
 
+  my $guesses = $self->guesses($text);
+
+  return $guesses->[0]->[0];
+}
+
+sub guesses {
+  my ($self, $text) = @_;
+
   my $text_NFC = NFC(lc($text));
 
   my @tokens = $text_NFC =~ m/([\p{Letter}\p{Mark}]+)/xmsg;
-  #print Dumper(\@tokens);
 
   my $words = Text::Guess::Language::Words->words();
 
@@ -28,14 +35,31 @@ sub guess {
 
   for my $token (@tokens) {
     if (exists $words->{$token}) {
-      #print $token,': ',join(',',@{$words->{$token}}),"\n";
       for my $lang (@{$words->{$token}}) {
         $guesses->{$lang}++;
       }
     }
   }
-  my ($guess) = sort { $guesses->{$b} <=> $guesses->{$a} } keys(%$guesses);
-  return $guess;
+
+  my $result = [
+  	map { [ $_, $guesses->{$_}/scalar(@tokens) ] }
+    sort { $guesses->{$b} <=> $guesses->{$a} }
+    keys(%$guesses)
+  ];
+  return $result;
+}
+
+sub languages {
+  my ($self) = @_;
+
+  my $languages = {};
+
+  my $words = Text::Guess::Language::Words->words();
+
+  for my $word (keys %{$words}) {
+    map { $languages->{$_}++ }  @{$words->{$word}};
+  }
+  return (sort keys %{$languages});
 }
 
 
@@ -111,7 +135,7 @@ L<http://github.com/wollmers/Text-Guess-Language>
 
 =head1 AUTHOR
 
-Helmut Wollmersdorfer E<lt>helmut.wollmersdorfer@gmail.comE<gt>
+Helmut Wollmersdorfer E<lt>helmut@wollmersdorfer.atE<gt>
 
 =begin html
 
@@ -121,7 +145,7 @@ Helmut Wollmersdorfer E<lt>helmut.wollmersdorfer@gmail.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2016- Helmut Wollmersdorfer
+Copyright 2016-2020 Helmut Wollmersdorfer
 
 =head1 LICENSE
 

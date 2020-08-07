@@ -10,7 +10,7 @@ use 5.010001;
 require Exporter;
 
 BEGIN {
-    $Lingua::Stem::Cistem::VERSION     = '0.05';
+    $Lingua::Stem::Cistem::VERSION     = '0.08';
     @Lingua::Stem::Cistem::ISA         = qw(Exporter);
     @Lingua::Stem::Cistem::EXPORT      = qw();
     @Lingua::Stem::Cistem::EXPORT_OK   = qw(stem segment stem_robust segment_robust);
@@ -123,10 +123,10 @@ sub stem_robust {
     #my $length = scalar (($word =~ m/\X/g)); # does not work
 
     while($length > 3) {
-        if( $length>5 && ($word =~ s/e[mr]$// || $word =~ s/nd$//) ) {$length -= 2;}
-        elsif( (!($ucfirst) || $case_insensitive) && $word =~ s/t$//) {$length--;}
-        elsif( $word =~ s/[esn]$//) {$length--;}
-        else { last; }
+        if ( $length>5 && ($word =~ s/e[mr]$// || $word =~ s/nd$//) ) {$length -= 2;}
+        elsif ( (!($ucfirst) || $case_insensitive) && $word =~ s/t$//) {$length--;}
+        elsif ( $word =~ s/[esn]$//) {$length--;}
+        else  { last; }
     }
 
     $word =~ s/(.)\*/$1$1/g;
@@ -273,9 +273,11 @@ Default is is the previous behavior, i.e. remove the prefix 'ge'.
 
 =head1 OFFICIAL IMPLEMENTATION
 
+=encoding UTF-8
+
 It is based on the paper
 
-    Leonie Weissweiler, Alexander Fraser (2017).
+    Leonie Weißweiler, Alexander Fraser (2017).
     Developing a Stemmer for German Based on a Comparative Analysis of Publicly Available Stemmers.
     In Proceedings of the German Society for Computational Linguistics and Language Technology (GSCL)
 
@@ -427,8 +429,10 @@ Helmut Wollmersdorfer E<lt>helmut@wollmersdorfer.atE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2019 Helmut Wollmersdorfer
-Copyright 2017 Leonie Weissweiler (original version)
+=encoding UTF-8
+
+Copyright 2019-2020 Helmut Wollmersdorfer
+Copyright 2017 Leonie Weißweiler (original version)
 
 =head1 LICENSE
 

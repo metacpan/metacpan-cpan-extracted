@@ -1,3 +1,11 @@
+0.071   2020-04-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Perinci::CmdLine::POD to render a more
+          complete usage line of Perinci::CmdLine scripts in POD (now all
+          options are listed, not just '[options]').
+
 0.070   2020-02-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Update backend module name.

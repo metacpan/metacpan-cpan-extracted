@@ -1,4 +1,6 @@
 #!/bin/bash
+podselect lib/JSONP.pm > README.pod
+rm ./MANIFEST
 perl Makefile.PL 
 make manifest 
 make dist clean

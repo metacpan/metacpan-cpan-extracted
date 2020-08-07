@@ -95,6 +95,11 @@ lib/RapidApp/Module/Explorer.pm
 lib/RapidApp/Module/ExtComponent.pm
 lib/RapidApp/Module/Grid.pm
 lib/RapidApp/Module/Grid/Role/ExcelExport.pm
+lib/RapidApp/Module/Grid/SearchBox.pm
+lib/RapidApp/Module/Grid/SearchBox/AllKeywords.pm
+lib/RapidApp/Module/Grid/SearchBox/AnyKeywords.pm
+lib/RapidApp/Module/Grid/SearchBox/Exact.pm
+lib/RapidApp/Module/Grid/SearchBox/Normal.pm
 lib/RapidApp/Module/HtmlContent.pm
 lib/RapidApp/Module/Meta/Trait/ExtProp.pm
 lib/RapidApp/Module/MimeIframe.pm
@@ -286,6 +291,7 @@ share/assets/icons/document_save.png
 share/assets/icons/edit_pictogram.png
 share/assets/icons/element_copy.png
 share/assets/icons/element_into.png
+share/assets/icons/element_view.png
 share/assets/icons/email.png
 share/assets/icons/email_14x14.png
 share/assets/icons/email_go.png
@@ -294,6 +300,7 @@ share/assets/icons/environment_network.png
 share/assets/icons/exclamation.png
 share/assets/icons/expand-all.gif
 share/assets/icons/film_14x14.png
+share/assets/icons/flash.png
 share/assets/icons/folder.png
 share/assets/icons/folder_network.png
 share/assets/icons/folder_up.png
@@ -311,6 +318,7 @@ share/assets/icons/funnel_new_edit.png
 share/assets/icons/garbage.png
 share/assets/icons/gears.png
 share/assets/icons/gears_24x24.png
+share/assets/icons/gears_view.png
 share/assets/icons/gray_down.png
 share/assets/icons/gray_down_with_pencil.png
 share/assets/icons/gray_pencil.png
@@ -331,6 +339,7 @@ share/assets/icons/magnify-tiny.gif
 share/assets/icons/multisort.png
 share/assets/icons/multisort_cancel.png
 share/assets/icons/multisort_remove.png
+share/assets/icons/nav_up_left_blue.png
 share/assets/icons/openvpn_gui.png
 share/assets/icons/openvpn_gui_green.png
 share/assets/icons/openvpn_gui_red.png
@@ -518,6 +527,7 @@ share/assets/misc/images/cross_tiny.png
 share/assets/misc/images/dbi_explorer_logo.gif
 share/assets/misc/images/dirty.gif
 share/assets/misc/images/form-collapse-icon.gif
+share/assets/misc/images/gears_view_48x48.png
 share/assets/misc/images/htmleditorplugins/edit-char.png
 share/assets/misc/images/htmleditorplugins/edit-findandreplace.png
 share/assets/misc/images/htmleditorplugins/edit-heading-h1.png

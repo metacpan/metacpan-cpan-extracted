@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::os390;
 
 #
-# $Id: os390.pm 1719 2018-11-04 05:01:43Z willem $
+# $Id: os390.pm 1795 2020-07-27 11:00:29Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1719 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1795 $)[1];
 
 
 =head1 NAME
@@ -17,8 +17,9 @@ use strict;
 use warnings;
 use base qw(Net::DNS::Resolver::Base);
 
+use IO::File;
 
-local $ENV{PATH} = '/bin:/usr/bin';
+local $ENV{PATH} = join ':', grep $_, qw(/bin /usr/bin), $ENV{PATH};
 my $sysname = eval {`sysvar SYSNAME 2>/dev/null`} || '';
 chomp $sysname;
 
@@ -54,18 +55,18 @@ my %option = (				## map MVS config option names
 sub _init {
 	my $defaults = shift->_defaults;
 	my %stop;
-	local $ENV{PATH} = '/bin:/usr/bin';
+	local $ENV{PATH} = join ':', grep $_, qw(/bin /usr/bin), $ENV{PATH};
 
 	foreach my $dataset ( Net::DNS::Resolver::Base::_untaint( grep defined, @dataset ) ) {
 		eval {
-			my $filehandle;				# "cat" able to read MVS dataset
-			open( $filehandle, '-|', qq[cat "$dataset" 2>/dev/null] ) or die "$dataset: $!";
-
+			local $_;
 			my @nameserver;
 			my @searchlist;
-			local $_;
 
-			while (<$filehandle>) {
+			my $handle = new IO::File( qq[cat "$dataset" 2>/dev/null], '-|' )
+					or die "$dataset: $!";	# "cat" able to read MVS datasets
+
+			while (<$handle>) {
 				s/[;#].*$//;			# strip comment
 				s/^\s+//;			# strip leading white space
 				next unless $_;			# skip empty line
@@ -122,7 +123,7 @@ sub _init {
 				};
 			}
 
-			close($filehandle);
+			close($handle);
 
 			$defaults->nameserver(@nameserver) if @nameserver && !$stop{nameserver}++;
 			$defaults->searchlist(@searchlist) if @searchlist && !$stop{search}++;

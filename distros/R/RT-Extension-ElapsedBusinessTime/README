@@ -8,12 +8,12 @@ DESCRIPTION
     configurable to define what constitutes a business day.
 
 RT VERSION
-    Works with RT 4.4.x, not tested with 4.6.x yet.
+    Works with RT 4.4.x and RT 5.0.x.
 
 INSTALLATION
-    perl Makefile.PL
-    make
-    make install
+    "perl Makefile.PL"
+    "make"
+    "make install"
         May need root permissions
 
     Edit your /opt/rt4/etc/RT_SiteConfig.pm
@@ -89,7 +89,7 @@ AUTHOR
     or via the web at
         http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ElapsedBusinessTime
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2019 by Catalyst Cloud Ltd
+    This software is Copyright (c) 2019-2020 by Catalyst Cloud Ltd
 
     This is free software, licensed under:
 

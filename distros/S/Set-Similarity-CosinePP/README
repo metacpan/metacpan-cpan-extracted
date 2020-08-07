@@ -6,11 +6,10 @@ NAME
 SYNOPSIS
 
      use Set::Similarity::CosinePP;
-     
+    
      # object method
      my $cosine = Set::Similarity::CosinePP->new;
      my $similarity = $cosine->similarity('Photographer','Fotograf');
-     
 
 DESCRIPTION
 
@@ -26,7 +25,6 @@ METHODS
  from_sets
 
       my $similarity = $object->from_sets(['a'],['b']);
-     
 
     This method expects two arrayrefs of strings as parameters. The
     parameters are not checked, thus can lead to funny results or uncatched
@@ -47,7 +45,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2013-2014 by Helmut Wollmersdorfer
+    Copyright (C) 2013-2020 by Helmut Wollmersdorfer
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

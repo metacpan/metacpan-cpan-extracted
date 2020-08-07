@@ -19,7 +19,7 @@ $Data::Dumper::Indent=1;
 
 my ($service_url, $query, $check, $nameservers, $entity, $help,
     $debug, $verbose, $expand, $short, $use_cache, $header_secret,
-    $header_proxy, $referral_ip, $whois_fmt, $force_ipv4);
+    $header_proxy, $referral_ip, $whois_fmt, $force_ipv);
 
 ##
 # Default test values unless overrided by their parameters
@@ -27,9 +27,9 @@ my $use_test_values  = 1;
 my $test_service_url = $ENV{RDAP_SERVICE_URL}             || 'https://rdap.test.norid.no';
 my $test_secret      = $ENV{RDAP_GDPR_LAYER_ACCESS_TOKEN} || '';
 my $test_proxy       = $ENV{RDAP_GDPR_NORID_PROXY}        || '';
-my $test_referral_ip = 0; # or and ip, like '1.2.3.4';
+my $test_referral_ip = 0; # or an ip, like '1.2.3.4';
 my $test_expand      = 0;
-my $test_force_ipv4  = 1;
+my $test_force_ipv   = 4;
 
 GetOptions(
     'service_url|s:s'   => \$service_url,
@@ -47,7 +47,7 @@ GetOptions(
     'help|h'	        => \$help,
     'verbose|v'         => \$verbose,
     'whois_fmt|w'       => \$whois_fmt,
-    'force_ipv4|f:i'    => \$force_ipv4,
+    'force_ipv|f:i'     => \$force_ipv,
 );
 
 pod2usage('-verbose' => 99, '-sections' => [qw(NAME DESCRIPTION USAGE)]) if ($help);
@@ -56,18 +56,26 @@ unless ($query) {
     pod2usage("A query (-q) being a domainname, identity, nameserver name or a handle must be specified!\n");
 }
 
+if ($force_ipv) {
+    if ($force_ipv == 4) {
+	# Use ipv4 only sockets and addresses
+	print STDERR "Connecting forcibly over ipv4\n" if ($debug);
+	use IO::Socket::SSL 'inet4';
+    } elsif ($force_ipv == 6) {
+	print STDERR "Connecting forcibly over ipv6\n" if ($debug);
+	use IO::Socket::SSL 'inet6';
+    } else {
+	pod2usage("The -f option must specify 4 or 6!\n");
+    }
+}
+
 if ($use_test_values) {
     $service_url   = $test_service_url unless $service_url;
     $header_secret = $test_secret      unless defined($header_secret);
     $header_proxy  = $test_proxy       unless defined($header_proxy);
     $referral_ip   = $test_referral_ip unless defined($referral_ip);
     $expand        = $test_expand      unless $expand;
-    $force_ipv4    = $test_force_ipv4  unless defined($force_ipv4);
-}
-
-if ($force_ipv4) {
-    # Use ipv4 only sockets and addresses
-    use IO::Socket::SSL 'inet4';
+    $force_ipv     = $test_force_ipv   unless defined($force_ipv);
 }
 
 sub print_warnings {
@@ -126,7 +134,7 @@ $ro->lookup($query, $check, $nameservers, $entity);
 
 if ($debug) {
     print STDERR "$0: Looked up: ", $ro->_method, "/ ", $ro->_full_url;
-    print STDERR " (connecting over ipv4 since force_ipv4 option is set)" if ($force_ipv4);
+    print STDERR " (connecting over ipv $force_ipv since force_ipv option is set)" if ($force_ipv);
     print STDERR "\n";
 }
 
@@ -251,7 +259,8 @@ Mandatory arguments:
   -e: lookup entity instead of doing a search
   -s: present short result ( only when -w not set)
   -x: expand result, do additinal lookups if data is truncated
-  -f: force ipv4 connection
+  -f: force ipv4 (-f 4) or ipv6 (-f 6) connection, else use what your system picks
+      Note: option added to force mode if you experience DNS/connect problems
 
  Format for output of the result:
 
@@ -260,7 +269,10 @@ Mandatory arguments:
 
   Other:
   -d: debug: 1: Simple debug, 5: activate also ua debug in http lookup
-      libraries
+      libraries.
+      Note: debug is disabled in RDAPLookup.pm, so uncomment
+      commented debug code lines to activate for debug option,
+      you will need LWP::ConsoleLogger::Easy to debug.
   -u: activate Net::RDAP library caching
   -v: verbose: dump JSON result received from RDAP
   -h: help

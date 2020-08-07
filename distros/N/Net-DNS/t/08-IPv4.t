@@ -1,4 +1,4 @@
-# $Id: 08-IPv4.t 1784 2020-05-24 19:27:13Z willem $ -*-perl-*-
+# $Id: 08-IPv4.t 1794 2020-07-03 13:36:51Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -19,7 +19,6 @@ my $NOIP = qw(0.0.0.0);
 
 my @nsdname = qw(
 		ns.net-dns.org
-		mcvax.nlnet.nl
 		ns.nlnetlabs.nl
 		);
 
@@ -312,7 +311,7 @@ SKIP: {
 }
 
 
-{
+SKIP: {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
 	$resolver->tcp_timeout(10);
 
@@ -325,6 +324,7 @@ SKIP: {
 
 	my $iterator = $resolver->axfr('net-dns.org');
 	ok( ref($iterator), '$resolver->axfr() returns iterator in scalar context' );
+	skip( 'AXFR iterator tests', 4 ) unless $iterator;
 
 	my $soa = $iterator->();
 	is( ref($soa), 'Net::DNS::RR::SOA', '$iterator->() returns initial SOA RR' );
@@ -356,7 +356,7 @@ SKIP: {
 	ok( !scalar(@notauth), "mismatched zone\t[$notauth]" );
 
 	eval { $resolver->tsig($bad_key) };
-	skip( 'failed AXFR tests', 3 ) if $@;
+	skip( 'TSIG failure reporting', 2 ) if $@;
 	my @unverifiable = $resolver->axfr();
 	my $errorstring	 = $resolver->errorstring;
 	ok( !scalar(@unverifiable), "mismatched key\t[$errorstring]" );

@@ -1,20 +1,25 @@
---- #YAML:1.0
-name:               Math-Matrix
-version:            0.7
-abstract:           ~
-author:  []
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+---
+abstract: unknown
+author:
+  - 'Peter John Acklam <pjacklam@gmail.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:  {}
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  Math::Complex: '0'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.58'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Matrix
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  repository: https://github.com/pjacklam/p5-Math-Matrix.git
+version: '0.9'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

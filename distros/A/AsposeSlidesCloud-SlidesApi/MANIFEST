@@ -159,6 +159,7 @@ lib/AsposeSlidesCloud/Object/XpsExportOptions.pm
 lib/AsposeSlidesCloud/SlidesApi.pm
 LICENSE
 MakeFile.pl
+prove.pl
 MANIFEST			This list of files
 README.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)

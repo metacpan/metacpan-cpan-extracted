@@ -1,0 +1,33 @@
+Changes
+examples/dice-roll.pl
+examples/factors.pl
+examples/prime.pl
+examples/sourcing.pl
+examples/statistics.pl
+lib/Quantum/Superpositions/Lazy.pm
+lib/Quantum/Superpositions/Lazy/Computation.pm
+lib/Quantum/Superpositions/Lazy/ComputedState.pm
+lib/Quantum/Superpositions/Lazy/Operation/ComputationalOp.pm
+lib/Quantum/Superpositions/Lazy/Operation/LogicOp.pm
+lib/Quantum/Superpositions/Lazy/Role/Collapsible.pm
+lib/Quantum/Superpositions/Lazy/Role/Operation.pm
+lib/Quantum/Superpositions/Lazy/State.pm
+lib/Quantum/Superpositions/Lazy/Statistics.pm
+lib/Quantum/Superpositions/Lazy/Superposition.pm
+lib/Quantum/Superpositions/Lazy/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/01-foundation.t
+t/02-weights.t
+t/03-addition.t
+t/04-operators.t
+t/05-states.t
+t/06-logic.t
+t/07-logic-to-superpos.t
+t/08-statistics.t
+t/09-sourcing.t
+t/99-examples.t
+t/lib/StateTesters.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

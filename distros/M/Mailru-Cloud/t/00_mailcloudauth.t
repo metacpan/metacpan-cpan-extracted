@@ -3,13 +3,13 @@
 #
 #         FILE: 00_mailcloudauth.t
 #
-#  DESCRIPTION: 
+#  DESCRIPTION:
 #
 #        FILES: ---
 #         BUGS: ---
 #        NOTES: ---
-#       AUTHOR: YOUR NAME (), 
-# ORGANIZATION: 
+#       AUTHOR: YOUR NAME (),
+# ORGANIZATION:
 #      VERSION: 1.0
 #      CREATED: 05.11.2017 19:11:34
 #     REVISION: ---
@@ -28,8 +28,8 @@ BEGIN {
     use_ok("Mailru::Cloud");
 }
 
-my $login                   = $ENV{MAILRU_LOGIN} || 'petr.davydov.80@bk.ru';
-my $password                = $ENV{MAILRU_LOGIN} ? $ENV{MAILRU_PASSWD} : '@F3bHlkIS7Ou';
+my $login                   = $ENV{MAILRU_LOGIN};
+my $password                = $ENV{MAILRU_PASSWD};
 my $uploadFile              = "$Bin/test_upload.f";
 my $download_file           = "$Bin/test_download";
 my $create_folder           = "/Test/temp" . int(rand(10000));
@@ -41,7 +41,10 @@ my $cloud = Mailru::Cloud->new;
 isa_ok($cloud, "Mailru::Cloud");
 
 SKIP: {
-    
+
+    skip "MAILRU_LOGIN not sets. Skip tests..." if not $login;
+    skip "MAILRU_PASSWD not sets. Skip tests..." if not $password;
+
     my $login_status = $cloud->login(-login => $login, -password => $password);
     skip "Skip tests. Cant login with username: $login" if not $login_status;
 
@@ -116,7 +119,7 @@ sub test_listFiles {
     my $list = $cloud->listFiles();
     my $found = grep {$_->{name} eq basename($uploadFile)} @$list;
     ok ($found, 'Test list files folder /');
-    
+
     #Test not exists folder
     eval {$cloud->listFiles(-path => 'not real path')};
     like ($@, qr/Folder.+not exists/, "Test on listFiles fake folder");

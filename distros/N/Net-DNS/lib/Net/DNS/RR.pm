@@ -1,9 +1,9 @@
 package Net::DNS::RR;
 
 #
-# $Id: RR.pm 1762 2020-02-02 21:39:02Z willem $
+# $Id: RR.pm 1796 2020-07-28 08:22:47Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1762 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1796 $)[1];
 
 
 =head1 NAME
@@ -139,6 +139,7 @@ sub _new_string {
 	}
 
 	$self->_parse_rdata(@token);				# parse arguments
+	$self->_post_parse();
 	return $self;
 }
 
@@ -195,6 +196,7 @@ sub _new_hash {
 	};
 	die ref($self) eq __PACKAGE__ ? "type $type not implemented" : () if $@;
 
+	$self->_post_parse();
 	return $self;
 }
 
@@ -502,9 +504,8 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 
 
 sub _format_rdata {			## format rdata portion of RR string
-	my $data = shift->rdata;
-	my $size = length($data);				# RFC3597 unknown RR format
-	my @data = ( '\\#', $size, split /(\S{32})/, unpack 'H*', $data );
+	my $rdata = shift->rdata;				# RFC3597 unknown RR format
+	my @rdata = ( '\\#', length($rdata), split /(\S{32})/, unpack 'H*', $rdata );
 }
 
 
@@ -513,6 +514,9 @@ sub _parse_rdata {			## parse RR attributes in argument list
 	die join ' ', 'type', $self->type, 'not implemented' if ref($self) eq __PACKAGE__;
 	die join ' ', 'no zone file representation defined for', $self->type;
 }
+
+
+sub _post_parse { }			## parser post processing
 
 
 sub _defaults { }			## set attribute default values
@@ -724,7 +728,8 @@ sub _deprecate {
 my %ignore = map( ( $_ => 1 ), @core, 'annotation', '#' );
 
 sub _empty {
-	not( $_[0]->{'#'} ||= scalar grep !$ignore{$_}, keys %{$_[0]} );
+	my $self = shift;
+	not( $self->{'#'} ||= scalar grep !$ignore{$_}, keys %$self );
 }
 
 
@@ -737,13 +742,14 @@ sub _wrap {
 	foreach (@text) {
 		s/\\034/\\"/g;					# unescape "
 		s/\\092/\\\\/g;					# unescape escape
-		if ( ( $coln += 1 + length ) > $cols ) {	# start new line
-			push @line, join ' ', @fill if scalar @fill;
+		$coln += ( length || next ) + 1;
+		if ( $coln > $cols ) {				# start new line
+			push( @line, join ' ', @fill ) if @fill;
 			$coln = length;
 			@fill = ();
 		}
-		$coln = $cols if chomp;				# force line break
-		push( @fill, $_ );
+		$coln = $cols	  if chomp;			# force line break
+		push( @fill, $_ ) if length;
 	}
 	push @line, join ' ', @fill;
 	return @line;
@@ -758,11 +764,15 @@ sub DESTROY { }				## Avoid tickling AUTOLOAD (in cleanup)
 
 sub AUTOLOAD {				## Default method
 	my $self = shift;
-	my $oref = ref($self);
+	my ($method) = reverse split /::/, $AUTOLOAD;
+
+	for ($method) {			## tolerate mixed-case attribute name
+		return $self->$_(@_) if tr [A-Z-] [a-z_];
+	}
 
 	no strict q/refs/;
-	my ($method) = reverse split /::/, $AUTOLOAD;
 	*{$AUTOLOAD} = sub {undef};	## suppress repetition and deep recursion
+	my $oref = ref($self);
 	croak qq[$self has no class method "$method"] unless $oref;
 
 	my $string = $self->string;

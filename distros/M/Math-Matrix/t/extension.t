@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#                              -*- Mode: Perl -*- 
+#                              -*- Mode: Perl -*-
 # $Basename$
 # $Revision: 1.3 $
 # Author          : Ulrich Pfeifer
@@ -7,9 +7,9 @@
 # Last Modified By: Ulrich Pfeifer
 # Last Modified On: Wed Oct 24 09:30:58 2001
 # Language        : CPerl
-# 
+#
 # (C) Copyright 2001, UUNET Deutschland GmbH, Germany
-# 
+#
 
 use strict;
 use Test;

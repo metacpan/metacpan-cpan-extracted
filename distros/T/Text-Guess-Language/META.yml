@@ -1,14 +1,14 @@
 ---
 abstract: 'Guess language from text using top 1000 words'
 author:
-  - 'Helmut Wollmersdorfer <helmut.wollmersdorfer@gmail.com>'
+  - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
 build_requires:
   Test::Deep: '0'
   Test::More: '0.88'
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,12 +16,19 @@ meta-spec:
 name: Text-Guess-Language
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Text::Guess::Language:
+    file: lib/Text/Guess/Language.pm
+    version: '0.05'
+  Text::Guess::Language::Words:
+    file: lib/Text/Guess/Language/Words.pm
+    version: '0.05'
 requires:
   Unicode::Normalize: '0'
   perl: '5.008000'
@@ -29,6 +36,6 @@ resources:
   bugtracker: https://github.com/wollmers/Text-Guess-Language/issues
   homepage: https://github.com/wollmers/Text-Guess-Language
   repository: https://github.com/wollmers/Text-Guess-Language.git
-version: '0.04'
-x_contributors:
-  - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
+version: '0.05'
+x_serialization_backend: 'YAML::Tiny version 1.66'
+x_static_install: 1

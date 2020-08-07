@@ -1,4 +1,4 @@
-# $Id: 03-rr.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
+# $Id: 03-rr.t 1795 2020-07-27 11:00:29Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 108;
@@ -144,7 +144,7 @@ local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 
 
 {				## check for exception for nonexistent attribute
-	my $method = 'bogus';
+	my $method = 'bogus-method';
 	foreach my $testcase (
 		[ type => 'A' ],
 		[ type => 'ATMA' ],
@@ -320,6 +320,8 @@ eval {					## exercise printing functions
 	select( ( select(TEMP), $object->dump )[0] );
 	close(TEMP);
 	unlink($filename);
+
+	Net::DNS::RR::_wrap( 'exercise', '', "\n", "\n", "line\n", 'wrapping' );
 };
 
 

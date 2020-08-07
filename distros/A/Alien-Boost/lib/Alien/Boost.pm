@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 
 =head1 NAME
 
@@ -15,9 +15,6 @@ Alien::Boost - Wrapper for installing Boost
 Alien::Boost is a wrapper to install Boost library. Modules
 that depend on Boost can depend on Alien::Boost and use the
 CPAN shell to install it for you.
-
-Win32 is currently not supported, please help supporting it if
-you're interested.
 
 =head1 AUTHOR
 

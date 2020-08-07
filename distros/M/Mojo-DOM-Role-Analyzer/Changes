@@ -1,5 +1,13 @@
 Revision history for Mojo-DOM-Role-Analyzer
 
+0.009     2020-08-05 22:46:39-04:00 America/New_York
+
+- add methods for determining "closest" nodes and associated tests
+- add distance method for finding distance between nodes
+- add common method for finding common ancestor
+- code improvements
+- various doc improvements
+
 0.008     2020-08-05 09:42:41-04:00 America/New_York
 
 - add min. Mojo::DOM version requirement

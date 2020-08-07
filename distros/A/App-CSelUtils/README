@@ -2,8 +2,8 @@ NAME
     App::CSelUtils - Utilities related to Data::CSel
 
 VERSION
-    This document describes version 0.085 of App::CSelUtils (from Perl
-    distribution App-CSelUtils), released on 2020-04-14.
+    This document describes version 0.086 of App::CSelUtils (from Perl
+    distribution App-CSelUtils), released on 2020-04-29.
 
 DESCRIPTION
     This distribution contains the following utilities:
@@ -39,7 +39,7 @@ FUNCTIONS
 
     *   expr => *str*
 
-    *   file => *str* (default: "-")
+    *   file => *filename* (default: "-")
 
     *   node_actions => *array[str]* (default: ["print_as_string"])
 

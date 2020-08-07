@@ -24,6 +24,8 @@ my %WriteMakefileArgs = (
   "NAME" => "Alien::Boost",
   "PREREQ_PM" => {
     "Alien::Base" => "0.038",
+    "Test::Alien" => "0",
+    "Test::Alien::Diag" => "0",
     "Test::Alien::CPP" => "0",
   },
   META_MERGE => {

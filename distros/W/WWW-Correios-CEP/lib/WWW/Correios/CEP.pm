@@ -5,7 +5,7 @@ use warnings;
 use LWP::UserAgent;
 use HTML::TreeBuilder::XPath;
 
-our $VERSION = 1.02;
+our $VERSION = 1.031;
 
 use Encode;
 use utf8;
@@ -218,7 +218,7 @@ If there is more than one address, it returns a list of hashrefs in list context
 just the first hashref in scalar context, together with an "C<address_count>" key with
 the total returned addresses.
 
-If $as_html_tree is passed, the list hahsref is changed to raw object of HTML::TreeBuilder::XPath->findnodes()
+If $as_html_tree is passed, return a list of Tree::XPathEngine::NodeSet (from HTML::TreeBuilder::XPath->findnodes())
 
 =head1 SEE ALSO
 

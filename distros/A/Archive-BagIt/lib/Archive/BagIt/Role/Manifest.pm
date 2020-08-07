@@ -231,6 +231,10 @@ sub _verify_XXX_manifests {
         }
     }
     # second check if each file from manifest_entries for given alg exists in payload
+    my %normalised_files;
+    foreach my $file (@files) {
+        $normalised_files{ normalize_payload_filepath( $file )} = 1;
+    }
     foreach my $local_mf_entry_path (keys %{$xxmanifest_entries->{$algorithm}}) {
         if ( # to avoid escapes via manifest-files
             check_if_payload_filepath_violates($local_mf_entry_path)
@@ -238,7 +242,7 @@ sub _verify_XXX_manifests {
             &$subref_invalid_report_or_die("file '$local_mf_entry_path' not allowed in '$local_xxfilename' (bag-path:'$bagit'")
         }
         else {
-            unless (List::Util::any {normalize_payload_filepath($_) eq $local_mf_entry_path} @files) {
+            unless (exists $normalised_files{$local_mf_entry_path}) {
                 &$subref_invalid_report_or_die(
                     "file '$local_mf_entry_path' NOT found, but expected via '$local_xxfilename' (bag-path:'$bagit')!"
                 );
@@ -360,15 +364,7 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.063
-
-=head1 NAME
-
-Archive::BagIt::Role::Manifest - A role that handles all manifest files for a specific Algorithm
-
-=head1 VERSION
-
-version 0.063
+version 0.065
 
 =head2 calc_digests($bagit, $digestobj, $filenames_ref, $opts)
 
@@ -402,17 +398,6 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 You can make new bug reports, and view existing ones, through the
 web interface at L<http://rt.cpan.org>.
-
-=head1 AUTHOR
-
-Rob Schmidt <rjeschmi@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

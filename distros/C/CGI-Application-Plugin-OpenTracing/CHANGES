@@ -1,7 +1,14 @@
 CHANGE LOG
 ==========
 
+2020-08-05 - v0.103.1
+---------------------
+
+Report server errors when happening during 'run' to see more showing up
+
+
 2020-08-05 - v0.103.0
+---------------------
 
 Exceptions and error handling are now set at the right spans
 Allow bootstrapping with default tracer from env-var

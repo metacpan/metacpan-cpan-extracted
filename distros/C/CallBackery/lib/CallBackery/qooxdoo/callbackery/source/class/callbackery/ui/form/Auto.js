@@ -59,6 +59,16 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 }
             });
             if (s.widget == 'header') {
+                var header = options.widget = 
+                    new qx.ui.basic.Label().set({
+                        font: 'bold'
+                    });
+                if (s.key){
+                    this._ctrl[s.key] = header;
+                }
+                if (s.set){
+                    header.set(s.set);
+                }
                 form.addGroupHeader(s.label != null ? this.xtr(s.label) : null,options);
                 return;
             }

@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Debian::Releases::PERLANCAR" => 0,
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Lite" => "1.820",
+    "Perinci::CmdLine::Lite" => "1.827",
     "Perinci::Sub::Property::result::table" => 0
   },
   "TEST_REQUIRES" => {
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.070",
+  "VERSION" => "0.071",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,7 +61,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Lite" => "1.820",
+  "Perinci::CmdLine::Lite" => "1.827",
   "Perinci::Sub::Property::result::table" => 0,
   "Test::More" => 0
 );

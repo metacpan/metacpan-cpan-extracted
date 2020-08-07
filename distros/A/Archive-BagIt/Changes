@@ -1,10 +1,103 @@
 ==================================================
-Changes from 2019-08-01 00:00:00 +0000 to present.
+Changes from 2019-08-07 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.063 at 2020-07-31 13:56:36 +0000
+version 0.065 at 2020-08-06 14:31:41 +0000
 ------------------------------------------
+
+  Change: 2905f05abbd3c593c5afddd6468863047858ba40
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-06 16:23:57 +0000
+
+    - typo fix 
+
+  Change: 79cf5256bcb25960e2d01d8a1f8d9b0b46315c1e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-06 16:08:57 +0000
+
+    - refactoring, fixed complexity for file checks from an O(n^2) to
+    O(n) in _verify_XXX_manifests() 
+
+  Change: b365a0f139eda1ac2b7f302dd3173705bfeb4117
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-06 15:42:01 +0000
+
+    - refactoring, speedup via portable check - refactoring, files will
+    be sorted while reading 
+
+  Change: 4cf43c81eeee1d146072c1e01d335dccb81c03fa
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-06 14:48:54 +0000
+
+    - added tests to check if force_utf8 flag works as expected 
+
+  Change: ecd15eae61e9e34f43af5f59d6f02418aac0a5b0
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-06 14:48:28 +0000
+
+    - added checks if parallel flag is set 
+
+  Change: b7372c7441a8e1c0260e2df2c8bdc4bbcb57a83b
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-06 14:47:56 +0000
+
+    - updated POD - make_bag() knows about option 'force_utf8' 
+
+------------------------------------------
+version 0.064 at 2020-08-05 16:22:30 +0000
+------------------------------------------
+
+  Change: 24378738576b66a0498cd1e5979017cfb24af530
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-05 18:22:30 +0000
+
+    Released 0.064-TRIAL 
+
+  Change: 79c10dc3e1658cd3ec4c839bee406101daf48d18
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-05 18:21:39 +0000
+
+    - Dist::Zilla / Podweaver / POD cleanup to avoid multiple sections 
+
+  Change: db137da99f2ce5784a7ec8c3c0fa1d8842a900d4
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-05 18:03:49 +0000
+
+    - bugfix, force_utf8 - bugfix, parallel - bugfix, fixed portability
+    warning - reenabled usage of __file_find() for _build_payload_files()
+    and _build_non_payload_files(), because File::Find doe not work very
+    well with UTF-8 filenames 
+
+  Change: bc9189a310ba86ba4789fe2de55efcc0b43869c9
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-05 15:33:22 +0000
+
+    - portability fix in _build_payload_path() - add __file_find() -
+    added hints about non portable filenames - added fix if stat() is not
+    processed 
+
+  Change: 1afb300e564accb8000f61aebabdbc299914ab28
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-05 15:30:42 +0000
+
+    - add checks for __file_find() 
+
+  Change: 617903ba61f831c03231096df4230454b0c5b0a1
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-05 15:29:59 +0000
+
+    - removed entry because part of @Author::DOHERTY 
+
+------------------------------------------
+version 0.063 at 2020-07-31 13:56:58 +0000
+------------------------------------------
+
+  Change: 1092a22acaccb202836e6a599a081910b0225526
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-31 15:56:58 +0000
+
+    Released 0.063 
 
   Change: ecec4b48092b62c56c9df73e393aaf0bf85bfbd6
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -1325,5 +1418,5 @@ version 0.055 at 2020-04-15 09:44:51 +0000
     Adding a plugin structure 
 
 ================================================
-Plus 9 releases after 2019-08-01 00:00:00 +0000.
+Plus 9 releases after 2019-08-07 00:00:00 +0000.
 ================================================

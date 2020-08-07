@@ -333,6 +333,7 @@ t/regression/721-nested-streamed-subtest.t
 t/regression/757-reset_in_subtest.t
 t/regression/812-todo.t
 t/regression/817-subtest-todo.t
+t/regression/862-intercept_tb_todo.t
 t/regression/buffered_subtest_plan_buffered.t
 t/regression/builder_does_not_init.t
 t/regression/errors_facet.t

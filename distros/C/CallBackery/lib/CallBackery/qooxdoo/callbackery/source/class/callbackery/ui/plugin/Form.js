@@ -31,6 +31,10 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         this.addListener('appear',function () {
             this._loadData();
         }, this);
+        // a map of pending reconfigure requests. The keys are the
+        // names of the fields for which we postponed reconfiguration.
+        // With that we avoid multi-reconfiguration per field.
+        this._reconfPending = new Map();
         this._actionResponseHandler = this._action.addListener('actionResponse',function(e){
             var data = e.getData();
             switch(data.action){
@@ -75,6 +79,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         _getParentFormData: null,
         _hasTrigger: null,
         _reConfFormInProgress: null,
+        _reconfPending: null,
 
         _populate: function(){
             var cfg = this._cfg;
@@ -120,7 +125,8 @@ qx.Class.define("callbackery.ui.plugin.Form", {
 
                 if (!s.key){
                     return;
-                }                var control = form.getControl(s.key);
+                }
+                var control = form.getControl(s.key);
                 var callback = function(e){
                     var data = e.getData();
                     // handle events from selectboxes
@@ -134,7 +140,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     }
                     var required = control.getRequired();
                     if (required){
-                        if (data == null || data == '' ){
+                        if (data === null || data === '' ){
                             control.setValid(false);
                             return;
                         }
@@ -155,8 +161,13 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                             }
                         }, 'validatePluginData',cfg.name,s.key,form.getData());
                     }
-                    if (s.triggerFormReset && ! this._loading){
-                        this._reconfForm(s.key);
+                    if (s.triggerFormReset){
+                        if (this._loading) {
+                            this._reconfPending.set(s.key, 1);
+                        }
+                        else {
+                            this._reconfForm(s.key);
+                        }
                     }
                 };
                 if (control.getSelection){
@@ -168,7 +179,10 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             },this);
         },
         _reconfForm: function(triggerField){
-            if (this._reConfFormInProgress) return;
+            if (this._reConfFormInProgress) {
+                this._reconfPending.set(triggerField, 1);
+                return;
+            }
             if (!this._form) return;
 
             var that = this;
@@ -179,11 +193,23 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     that._reConfFormHandler(pluginConfig.form);
                 }
                 that._reConfFormInProgress = false;
+                that._executeReconfPending();
             }, 'getPluginConfig', that._cfg.name,{
                 triggerField: triggerField,
                 currentFormData: that._form.getData()
             });
         },
+
+        // execute first pending reconfiguration request, if any
+        // and delete it from the map
+        _executeReconfPending: function(){
+            if (this._reconfPending.size > 0) {
+                let pending = this._reconfPending.keys().next().value;
+                this._reconfPending.delete(pending);
+                this._reconfForm(pending);
+            }
+        },
+
         _reConfFormHandler: function(formCfg){
             if (! this._form) return;
             var buttonMap = this._action.getButtonMap();
@@ -248,6 +274,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     }
                 }
                 that._loading--;
+                that._executeReconfPending();
             },'getPluginData',this._cfg.name,'allFields',parentFormData,{ currentFormData: this._form.getData()});
         },
         _loadData: function(){
@@ -278,6 +305,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 }
                 busy.hide();
                 that._loading--;
+                that._executeReconfPending();
             },'getPluginData',this._cfg.name,'allFields',parentFormData,{ currentFormData: this._form.getData()});
         }
     },

@@ -67,7 +67,7 @@
    "provides" : {
       "Plack::Request::WithEncoding" : {
          "file" : "lib/Plack/Request/WithEncoding.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -81,9 +81,10 @@
          "web" : "https://github.com/moznion/Plack-Request-WithEncoding"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [
-      "Songmu <y.songmu@gmail.com>"
+      "Songmu <y.songmu@gmail.com>",
+      "commojun <junpooooow@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1

@@ -1,0 +1,38 @@
+use alienfile;
+use Config;
+
+configure { requires 'Alien::Build::Plugin::Build::Make' => '0.01' };
+
+plugin 'Probe::Vcpkg' => (
+    name     => 'libsodium',
+    ffi_name => 'libsodium',
+);
+plugin 'PkgConfig' => (
+    pkg_name => 'libsodium',
+    minimum_version => '1.0.3',
+);
+
+share {
+    my $run_upstream_tests = ($ENV{AUTOMATED_TESTING} || $ENV{RELEASE_TESTING}) ? 1 : 0;
+
+    plugin Download => (
+        url     => 'https://download.libsodium.org/libsodium/releases/',
+        version => qr/^libsodium-([0-9.]+)-stable\.tar\.gz$/,
+    );
+
+    plugin Extract => 'tar.gz';
+
+    # requires 'Alien::Autotools';
+    plugin 'Build::Autoconf' => ();
+
+    build [
+        # 'sh autogen.sh',
+        '%{configure}',
+        '%{make}',
+        '%{make} install',
+    ];
+
+    test(['%{make} check']) if $run_upstream_tests;
+
+    plugin 'Gather::IsolateDynamic' => ();
+};

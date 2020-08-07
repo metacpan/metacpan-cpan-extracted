@@ -1,5 +1,11 @@
 Revision history for WWW::WebKit2
 
-0.11 Mon Mar 23 15:27:00 CET 2020
+0.11 Fri July 24 15:27:00 CET 2020
 
 Changing drag and drop to use javascript rather than simulated mouse controls.
+Getting HTML source with webkit_web_resource_get_data_finish rather than with javascript
+Change to page waiting technique used inside fire event
+Addition of proxy settings via webkit network proxy
+
+0.111 Tue July 28 16:10:00 CET 2020
+Change to how page loading is checked in fire events.

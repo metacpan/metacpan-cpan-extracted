@@ -38,7 +38,7 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
 #validate tests
 
 {
-  my $bag = $Class->new({bag_path=>$SRC_BAG});
+  my $bag = $Class->new({bag_path=>$SRC_BAG, parallel => 1});
   ok($bag,        "Object created");
   isa_ok ($bag,   $Class);
 
@@ -47,7 +47,7 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
   note ("bag path:", explain $bag->bag_path);
   note ("metadata path: ", explain $bag->metadata_path);
   note explain $bag->tagmanifest_files;
-  ok($bag->parallel(1), "parallel => 1");
+  is($bag->parallel, 1, "parallel set");
   my $result = $bag->verify_bag;
   ok($result,     "Bag verifies");
 }
@@ -73,7 +73,9 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
 
   ok ($bag,       "Object created");
   isa_ok ($bag,   $Class);
-  ok($bag->parallel(1), "parallel => 1");
+  isnt($bag->parallel, 1, "parallel not set");
+  ok($bag->parallel(1), "set parallel");
+  isnt($bag->parallel(1), "parallel set");
   my $result = $bag->verify_bag();
   ok($result,     "Bag verifies");
 

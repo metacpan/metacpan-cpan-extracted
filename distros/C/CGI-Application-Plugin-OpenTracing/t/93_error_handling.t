@@ -74,6 +74,26 @@ global_tracer_cmp_easy(
     ], 'run_method with an embedded span dies'
 );
 
+eval { $mech->get('https://test.tst/test.cgi?rm=nothinghere') };
+global_tracer_cmp_easy(
+    [
+        {
+            operation_name      => 'cgi_application_request',
+            level               => 0,
+            tags => {
+                'component'        => 'CGI::Application',
+                'http.method'      => 'GET',
+                'http.url'         => 'https://test.tst/test.cgi',
+                'http.query.rm'    => 'nothinghere',
+                'http.status_code' => 500,
+                'error'            => 1,
+                'run_mode'         => 'nothinghere',
+                'message'          => re(qr/No such run mode/),
+            },
+        },
+    ], 'invalid runmode selected'
+);
+
 {
     package MyTest::SurvivingApp;
     use base 'MyTest::DyingApp';

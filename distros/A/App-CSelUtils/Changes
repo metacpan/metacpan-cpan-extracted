@@ -1,3 +1,9 @@
+0.086   2020-04-29  Released-By: PERLANCAR; Urgency: low
+
+	- Tweak Rinci metadata: replace deprecated
+	  x.schema.{,element_}entity with more specific schema.
+
+
 0.085   2020-04-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option: --node-actions-on-descendants.

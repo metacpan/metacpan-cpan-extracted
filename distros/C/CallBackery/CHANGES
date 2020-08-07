@@ -1,3 +1,17 @@
+0.34.5 2020-08-07 16:05:10 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - false was treated as null in the required field check ... 
+
+0.34.4 2020-08-06 14:52:40 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - make sure that no reconf requests get lost if data is entered into the form while it is still loading
+
+0.34.3 2020-08-06 09:41:36 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - sync the visibility setting to 'note' properties
+ - allow visibility seting on header elements in forms
+ - improve left side spacing for forms with header sections and no side notes
+
 0.34.2 2020-07-31 13:49:05 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - translate on selectbox content reconfiguration

@@ -1,6 +1,6 @@
 package MariaDB::NonBlocking::Promises::Pool;
 
-use constant DEBUG => $ENV{MariaDB_NonBlocking_DEBUG} // 0;
+use constant DEBUG => $ENV{MariaDB_NonBlocking_DEBUG} // $ENV{DEBUG_ALL} // 0;
 sub TELL (@) {
     say STDERR __PACKAGE__, ': ', join " ", @_;
 }
@@ -38,6 +38,11 @@ use constant {
     PENDING_STACKTRACE => 4,            # Stacktrace from the place the query was scheduled
     PENDING_RETRIES_REMAINING => 5,     # ...
     PENDING_SCHEDULED_TIME    => 6,      # hires unix timestamp of when the query was scheduled, for eventlog purposes
+};
+
+use constant {
+    MYSQL_POOL_EXTEND_STRATEGY_MINIMUM_CONNECTIONS => 'min',
+    MYSQL_POOL_EXTEND_STRATEGY_MAXIMUM_CONNECTIONS => 'max',
 };
 
 sub _format_connection_error { # Override
@@ -98,6 +103,7 @@ my %default_settings = (
         # If we need to extend the pool, how many
         # connections do we extend it by in parallel?
         max_extend_at_a_time  => 1, # at most do X connections at once
+        extend_strategy       => MYSQL_POOL_EXTEND_STRATEGY_MAXIMUM_CONNECTIONS,
 
         query_retries         => 2,
     },
@@ -106,6 +112,7 @@ my %default_settings = (
         low_water_mark        => 1,
         max_extend_at_a_time  => 1,
         query_retries         => 1,
+        extend_strategy       => MYSQL_POOL_EXTEND_STRATEGY_MINIMUM_CONNECTIONS,
     },
 );
 
@@ -313,19 +320,36 @@ sub _connector_class { 'MariaDB::NonBlocking::Promises' } # override if desired
 # Removes ghost connections, and extends the pool if needed
 sub _check_and_maybe_extend_pool_size {
     my ($outside_pool) = @_;
-
     my $pool = $outside_pool;
 
-    # Return if pool has more than the low water mark
-    return if $pool->{pool_size} >= $pool->{low_water_mark};
+    # Return if pool already at max size
+    return if $outside_pool->{pool_size} >= $outside_pool->{high_water_mark};
 
-    my $needed_connections = $pool->{high_water_mark} - $pool->{pool_size};
+    my $extend_strategy = $outside_pool->{extend_strategy} ||= MYSQL_POOL_EXTEND_STRATEGY_MINIMUM_CONNECTIONS;
 
-    $needed_connections -= $pool->{_counters}{connections_currently_connecting} || 0;
-    DEBUG && TELL "Going to extend the pool by $needed_connections";
+    # Return if pool has more than the low water mark, and the extend strategy is 'minimum'
+    return if $outside_pool->{pool_size} >= $outside_pool->{low_water_mark}
+            && $extend_strategy eq MYSQL_POOL_EXTEND_STRATEGY_MINIMUM_CONNECTIONS;
+
+    my $needed_connections;
+    if ($extend_strategy eq MYSQL_POOL_EXTEND_STRATEGY_MINIMUM_CONNECTIONS) {
+        $needed_connections = $outside_pool->{low_water_mark} - $outside_pool->{pool_size};
+    } else { # $extend_strategy eq MYSQL_POOL_EXTEND_STRATEGY_MAXIMUM_CONNECTIONS
+        $needed_connections = $outside_pool->{high_water_mark} - $outside_pool->{pool_size};
+    }
+
 
     # Should never happen:
     return if $needed_connections < 1;
+
+    $needed_connections = $outside_pool->{max_extend_at_a_time} || 1
+        if $needed_connections > $outside_pool->{max_extend_at_a_time};
+
+    $needed_connections -= $pool->{_counters}{connections_currently_connecting} || 0;
+
+    # Should never happen:
+    return if $needed_connections < 1;
+    DEBUG && TELL "Going to extend the pool by $needed_connections";
 
     my $max_extend = $pool->{max_extend_at_a_time} || 1;
 
@@ -333,6 +357,8 @@ sub _check_and_maybe_extend_pool_size {
 
     # preemptively expand the pool size to prevent overextending
     $pool->{pool_size} += $needed_connections;
+
+    my $pool_name    = $pool->{pool_name};
 
     my $connecting_here = $needed_connections;
     weaken($pool);
@@ -359,6 +385,7 @@ sub _check_and_maybe_extend_pool_size {
             $pool->{currently_connecting}{$refaddr} = $initial_connection;
 
             my $t0 = time;
+            DEBUG && TELL "Will start connecting to $pool_name";
             return $initial_connection->connect($connection_args)->then(sub {
                 # Success
                 return unless $pool;
@@ -392,22 +419,30 @@ sub _check_and_maybe_extend_pool_size {
 
                 my $confession = $pool->_format_connection_error($error, $connection_args);
 
-                if ( $pool->{pool_size} > 0 || !$pool->pool_has_any_pending ) {
+                if ( $pool->{pool_size} > 0 ) {
+                    DEBUG && TELL "Failed to connect to $pool_name and have other connections, warning and moving on";
                     # Well... One connection failed, but we still have some in the pool,
                     # or we don't have any pending queries, therefore we don't care.
                     # Just toss a warning, in the hope that this is transient.
                     warn $confession;
                     return;
                 }
-
-                # Failed to extend the pool to even 1 connection, and we have
-                # pending queries.  Fail the queries now.
-                my $pool_name    = $pool->{pool_name};
-                my $error_string = "Connection pool for $pool_name is empty and we failed to extend it.  All pending queries will be marked as failed. Error: $confession";
-                # $error_string has the confession AND the stacktrace
-                $pool->fail_pending($error_string);
-                # Don't rethrow, let the actual promises deal with the fallout
-                return;
+                elsif ( $pool->pool_has_any_pending ) {
+                    DEBUG && TELL "Failed to connect to $pool_name and have no other connections, failing all pending";
+                    # Failed to extend the pool to even 1 connection, and we have
+                    # pending queries.  Fail the queries now.
+                    my $error_string = "Connection pool for $pool_name is empty and we failed to extend it.  All pending queries will be marked as failed. Error: $confession";
+                    # $error_string has the confession AND the stacktrace
+                    $pool->fail_pending($error_string);
+                    # Don't rethrow, let the actual promises deal with the fallout
+                    return;
+                }
+                else {
+                    DEBUG && TELL "Failed to connect, but have no pending queries, so just throwing a warning";
+                    # Huh.  Well, the connect failed but we don't have any pending
+                    # connections, so who cares.
+                    warn $confession;
+                }
             })->finally(sub {
                 delete $pool->{currently_connecting}{$refaddr} if $pool;
             });
@@ -416,9 +451,12 @@ sub _check_and_maybe_extend_pool_size {
             $pool->{_counters}{connections_currently_connecting}--;
         })->then($start_new_connection);
     }), 1..$max_extend )->then(sub {
-        $pool->_start_running_queries_if_needed if $pool;
+        DEBUG && TELL "Done connecting to $pool_name, start running queries";
+
+        $pool->_start_running_queries_if_needed if $pool && $pool->pool_has_any_pending;
         return;
     })->catch(sub {
+        DEBUG && TELL "Failed connecting to $pool_name";
         # We get here if, somehow, _start_running_queries_if_needed died.
         my $error = $_[0];
         $pool->fail_pending($error) if $pool;

@@ -15,8 +15,8 @@ use base qw(Net::RDAP);
 use Net::RDAP::EPPStatusMap;
 use Net::RDAP::Error;
 use NOLookup;
-#use NOLookup::Whois::WhoisLookup;
-use LWP::ConsoleLogger::Easy qw /debug_ua /;
+# debug only for dev env.
+#use LWP::ConsoleLogger::Easy qw /debug_ua /;
 use Sys::HostIP;
 use Data::Validate::IP qw(is_ip);
 
@@ -233,9 +233,10 @@ sub _lookup_rdap {
 
     my $ua = $self->ua;
 
-    if ($self->{debug} && $self->{debug} > 1) {
-	debug_ua ( $ua, 5 );
-    }
+# debug only for dev env.
+#    if ($self->{debug} && $self->{debug} > 1) {
+#	debug_ua ( $ua, 5 );
+#    }
 
     $ua->default_header( Charset           => "UTF-8");
     $ua->default_header( 'Content-Type'    => "application/rdap+json");

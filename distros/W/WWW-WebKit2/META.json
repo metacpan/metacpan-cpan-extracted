@@ -42,7 +42,7 @@
             "Carp" : "0",
             "Glib" : "0",
             "Gtk3" : "0",
-            "Gtk3::WebKit2" : "0.01",
+            "Gtk3::WebKit2" : "0.011",
             "Moose" : "0",
             "Time::HiRes" : "0",
             "X11::Xlib" : "0"
@@ -50,6 +50,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.11",
+   "version" : "0.111",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -16,7 +16,7 @@ use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '2.16';
+our $VERSION = '2.17';
 
 =encoding utf8
 
@@ -588,9 +588,8 @@ is the same as:
 
 sub debug {
 	my ($self, $switch) = @_;
-	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
-	$switch = 1 unless defined $switch;
-	$switch = ! ! $switch;
+	return $self unless (reftype $self // '') eq 'HASH';
+	$switch = defined $switch ? !!$switch : 1;
 	$self->{_debug} = $switch;
 	$self->{_pretty} = $switch;
 	$self;
@@ -611,8 +610,7 @@ is the same as:
 sub pretty {
 	my ($self, $switch) = @_;
 	return $self unless (reftype $self // '') eq 'HASH';
-	$switch = 1 unless defined $switch;
-	$switch = ! ! $switch;
+	$switch = defined $switch ? !!$switch : 1;
 	$self->{_pretty} = $switch;
 	$self;
 }
@@ -625,9 +623,8 @@ call this method if you are going to deploy the script under plain http protocol
 
 sub insecure {
 	my ($self, $switch) = @_;
-	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
-	$switch = 1 unless defined $switch;
-	$switch = ! ! $switch;
+	return $self unless (reftype $self // '') eq 'HASH';
+	$switch = defined $switch ? !!$switch : 1;
 	$self->{_insecure_session} = $switch;
 	$self;
 }
@@ -640,9 +637,8 @@ call this method if you want to omit the I<req> parameter and want that a sub wi
 
 sub rest {
 	my ($self, $switch) = @_;
-	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
-	$switch = 1 unless defined $switch;
-	$switch = ! ! $switch;
+	return $self unless (reftype $self // '') eq 'HASH';
+	$switch = defined $switch ? !!$switch : 1;
 	$self->{_rest} = $switch;
 	$self;
 }
@@ -655,7 +651,7 @@ call this method with desired expiration time for cookie in B<seconds>, the defa
 
 sub set_session_expiration {
 	my ($self, $expiration) = @_;
-	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
+	return $self unless (reftype $self // '') eq 'HASH';
 	$self->{_session_expiration} = $expiration;
 	$self;
 }
@@ -681,9 +677,8 @@ call this function to enable output in simple JSON format (not enclosed within j
 
 sub plain_json {
 	my ($self, $switch) = @_;
-	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
-	$switch = 1 unless defined $switch;
-	$switch = ! ! $switch;
+	return $self unless (reftype $self // '') eq 'HASH';
+	$switch = defined $switch ? !!$switch : 1;
 	$self->{_plain_json} = $switch;
 	$self;
 }

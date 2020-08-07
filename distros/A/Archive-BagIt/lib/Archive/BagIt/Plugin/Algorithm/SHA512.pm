@@ -69,15 +69,7 @@ Archive::BagIt::Plugin::Algorithm::SHA512 - The default SHA algorithms plugin (d
 
 =head1 VERSION
 
-version 0.063
-
-=head1 NAME
-
-Archive::BagIt::Plugin::Algorithm::SHA512 - The default SHA algorithms plugin (default for v1.0)
-
-=head1 VERSION
-
-version 0.063
+version 0.065
 
 =head1 AVAILABILITY
 
@@ -89,17 +81,6 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 You can make new bug reports, and view existing ones, through the
 web interface at L<http://rt.cpan.org>.
-
-=head1 AUTHOR
-
-Rob Schmidt <rjeschmi@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

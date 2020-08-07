@@ -21,6 +21,8 @@ my %WriteMakefileArgs = (
   },
   "PREREQ_PM" => {
     "Alien::Base" => "0.038",
+    "Test::Alien" => "0",
+    "Test::Alien::Diag" => "0",
   },
   "DISTNAME" => "Alien-Libevent",
   "LICENSE" => "perl",

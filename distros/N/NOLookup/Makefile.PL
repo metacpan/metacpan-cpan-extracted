@@ -34,7 +34,6 @@ my %WriteMakefileArgs = (
     "IO::Socket" => 0,
     "IO::Socket::SSL" => 0,
     "JSON" => 0,
-    "LWP::ConsoleLogger::Easy" => 0,
     "List::MoreUtils" => 0,
     "Net::DNS::Domain" => 0,
     "Net::IP" => 0,
@@ -57,7 +56,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.98"
   },
-  "VERSION" => "1.19",
+  "VERSION" => "1.21",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,7 +73,6 @@ my %FallbackPrereqs = (
   "IO::Socket" => 0,
   "IO::Socket::SSL" => 0,
   "JSON" => 0,
-  "LWP::ConsoleLogger::Easy" => 0,
   "List::MoreUtils" => 0,
   "Net::DNS::Domain" => 0,
   "Net::IP" => 0,

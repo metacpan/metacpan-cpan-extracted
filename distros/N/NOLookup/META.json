@@ -30,7 +30,6 @@
             "IO::Socket" : "0",
             "IO::Socket::SSL" : "0",
             "JSON" : "0",
-            "LWP::ConsoleLogger::Easy" : "0",
             "List::MoreUtils" : "0",
             "Net::DNS::Domain" : "0",
             "Net::IP" : "0",
@@ -59,7 +58,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.19",
+   "version" : "1.21",
    "x_generated_by_perl" : "v5.30.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

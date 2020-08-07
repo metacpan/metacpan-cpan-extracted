@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,6 +22,10 @@ no_index:
     - share
     - t
     - xt
+provides:
+  Lingua::Stem::Cistem:
+    file: lib/Lingua/Stem/Cistem.pm
+    version: '0.08'
 requires:
   Exporter: '0.00'
   perl: '5.010001'
@@ -29,7 +33,8 @@ resources:
   bugtracker: https://github.com/wollmers/Lingua-Stem-Cistem/issues
   homepage: https://github.com/wollmers/Lingua-Stem-Cistem
   repository: https://github.com/wollmers/Lingua-Stem-Cistem.git
-version: '0.05'
+version: '0.08'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'YAML::Tiny version 1.66'
+x_static_install: 1

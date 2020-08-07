@@ -1,10 +1,9 @@
 #
-# $Id: Makefile.PL 1791 2020-06-26 14:34:36Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1795 2020-07-27 11:00:29Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Getopt::Long;
 use ExtUtils::MakeMaker;
 use constant MM => eval $ExtUtils::MakeMaker::VERSION;
 
@@ -35,9 +34,13 @@ my $platform = $platform{$^O} || {};
 
 
 my %prerequisite = (
+	'Carp'		 => 1.10,
 	'Digest::HMAC'	 => 1.03,
 	'Digest::MD5'	 => 2.13,
 	'Digest::SHA'	 => 5.23,
+	'Encode'	 => 2.26,
+	'Exporter'	 => 5.56,
+	'File::Find'	 => 1.05,
 	'File::Spec'	 => 0.86,
 	'IO::File'	 => 1.08,
 	'IO::Select'	 => 1.14,
@@ -47,7 +50,8 @@ my %prerequisite = (
 	'PerlIO'	 => 1.05,
 	'Scalar::Util'	 => 1.25,
 	'Time::Local'	 => 1.19,
-	'Test::More'	 => 0.52,
+	'Test::Builder'	 => 0,
+	'Test::More'	 => 0,
 	%$platform
 	);
 
@@ -64,40 +68,13 @@ delete $prerequisite{'Net::DNS::SEC'};	## MUST NOT list Net::DNS::SEC dependency
 delete $optional{'Net::DNS::SEC'};	## Require explicit user action to install Net::DNS::SEC.
 
 
-my @debris = qw(
-		.resolv.conf *.lock
-		t/IPv6.enabled
-		t/online.enabled t/online.nonfatal
-		);
-
-
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1';
-use constant INET_FALLBACK => !USE_SOCKET_IP && eval 'require IO::Socket::INET';
-
-
-# clean up existing makefile
-unlink('Makefile');
-
-WriteMakefile(				## Makefile & distribution metadata
-	%metadata,
-	PREREQ_PM  => {%prerequisite},
-	META_MERGE => {recommends => {%optional}},
-	clean	   => {FILES => "@debris"},
-	);
-
-
-# clean up the online testing flag file.
-unlink("t/online.enabled");
-unlink("t/online.disabled");
-
-# clean up the IPv6 testing flag file.
-unlink("t/IPv6.enabled");
-unlink("t/IPv6.disabled");
+my @debris = qw(.resolv.conf *.lock);
 
 
 #
 # Get the command line args
 #
+use constant USE_GETOPT => defined eval 'use Getopt::Long; 1';
 
 my $help = 0;
 my $IPv6_tests;
@@ -111,7 +88,7 @@ my @options = (
 	);
 
 
-unless ( GetOptions(@options) ) {
+if ( USE_GETOPT && !GetOptions(@options) ) {
 	print "Error: Unrecognized option.\n";
 	print "Try perl Makefile.PL --help for more information\n";
 	exit 1;
@@ -146,8 +123,11 @@ EOT
 
 
 #
-# Check if we have internet connection	(code lifted from LWP)
+# Enable tests if we have internet connection	(code lifted from LWP)
 #
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1';
+use constant INET_FALLBACK => !USE_SOCKET_IP && eval 'require IO::Socket::INET';
+
 if ($online_tests) {
 	my $class = USE_SOCKET_IP ? 'IO::Socket::IP' : 'IO::Socket::INET';
 
@@ -171,15 +151,19 @@ EOT
 }
 
 
+# set up online testing configuration files.
+my $enable   = 't/online.enabled';
+my $IPv6     = 't/IPv6.enabled';
+my $nonfatal = 't/online.nonfatal';
+push @debris, $enable, $IPv6, $nonfatal;
+
 if ($online_tests) {
-	my $enable = 't/online.enabled';
-	open( ENABLED, ">$enable" ) || die "Can't touch $enable $!";
-	close(ENABLED) || die "Can't touch $enable $!";
+	open( ENABLED, '>', $enable ) or die "Can't touch $enable $!";
+	close(ENABLED);
 
 	if ( $online_tests == 2 ) {
-		my $nonfatal = 't/online.nonfatal';
-		open( NONFATAL, ">$nonfatal" ) || die "Can't touch $nonfatal $!";
-		close(NONFATAL) || die "Can't touch $nonfatal $!";
+		open( NONFATAL, '>', $nonfatal ) or die "Can't touch $nonfatal $!";
+		close(NONFATAL);
 		print "\nActivating Non Fatal Online Tests...\n";
 	} else {
 		print "\nActivating Online Tests...\n";
@@ -187,10 +171,9 @@ if ($online_tests) {
 
 	$IPv6_tests = 1 unless defined $IPv6_tests;
 	if ( USE_SOCKET_IP && $IPv6_tests ) {
-		my $enable = 't/IPv6.enabled';
 		print "\nActivating IPv6 Tests...\n";
-		open( ENABLED, ">$enable" ) || die "Can't touch $enable $!";
-		close(ENABLED) || die "Can't touch $enable $!";
+		open( ENABLED, '>', $IPv6 ) or die "Can't touch $IPv6 $!";
+		close(ENABLED);
 	}
 
 	print <<EOT;
@@ -204,6 +187,14 @@ lies within Net::DNS or elsewhere.
 
 EOT
 }
+
+
+WriteMakefile(				## Makefile & distribution metadata
+	%metadata,
+	PREREQ_PM  => {%prerequisite},
+	META_MERGE => {recommends => {%optional}},
+	clean	   => {FILES => "@debris"},
+	);
 
 
 package MY;				## customise generated Makefile

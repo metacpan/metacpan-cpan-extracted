@@ -1,4 +1,4 @@
-#                              -*- Mode: Perl -*- 
+#                              -*- Mode: Perl -*-
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl test.pl'
 
@@ -39,33 +39,32 @@ $u->print("The proof that A*x yields v?");
 print "ok 6\n";
 
 for (0..2) {
-  if (equal($v->[0]->[$_],$u->[0]->[$_])) {
-    printf "ok %d\n", $_ + 7;
-  } else {
-    printf "not ok %d\n", $_ + 7;
-  }
+    if (equal($v->[0]->[$_],$u->[0]->[$_])) {
+        printf "ok %d\n", $_ + 7;
+    } else {
+        printf "not ok %d\n", $_ + 7;
+    }
 }
 
 # operator overloading
 eval {
-$b = ~($A * $x);
-$b->print("transpose(A*x) overloaded");
-$c = $b - $v;
-$c->print("=v (transpose(A*x) - v   ");
+    $b = ~($A * $x);
+    $b->print("transpose(A*x) overloaded");
+    $c = $b - $v;
+    $c->print("=v (transpose(A*x) - v   ");
 };
 if ($@) {
-  print "not ok 10\n";
+    print "not ok 10\n";
 } else {
-  print "ok 10\n";
+    print "ok 10\n";
 }
 
-
 sub equal {
-  my ($a,$b) = @_;
+    my ($a,$b) = @_;
 
-  if ($a > $b) {
-    $a - $b < $Math::Matrix::eps;
-  } else {
-    $b - $a < $Math::Matrix::eps;
-  }
+    if ($a > $b) {
+        $a - $b < $Math::Matrix::eps;
+    } else {
+        $b - $a < $Math::Matrix::eps;
+    }
 }

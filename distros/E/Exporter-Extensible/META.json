@@ -15,6 +15,7 @@
    "name" : "Exporter-Extensible",
    "no_index" : {
       "package" : [
+         "Exporter::Extensible::Compat",
          "Exporter::Extensible::UnimportScopeGuard"
       ]
    },
@@ -59,7 +60,7 @@
          "web" : "https://github.com/nrdvana/perl-Exporter-Extensible"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_generated_by_perl" : "v5.26.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }

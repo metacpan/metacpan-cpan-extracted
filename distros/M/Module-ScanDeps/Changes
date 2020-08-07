@@ -1,3 +1,9 @@
+1.28  2020-08-06
+
+- placate cperl ("Attempt to change hash while iterating over it.")
+
+- make _find_encoding() more robust
+    
 1.27  2019-01-15
 
 - fixes by Shawn Laffan <shawnlaffan@gmail.com>

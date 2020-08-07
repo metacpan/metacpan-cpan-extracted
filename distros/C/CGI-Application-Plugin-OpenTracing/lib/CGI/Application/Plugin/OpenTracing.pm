@@ -3,7 +3,7 @@ package CGI::Application::Plugin::OpenTracing;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.103.0';
+our $VERSION = 'v0.103.1';
 
 use syntax 'maybe';
 
@@ -42,11 +42,62 @@ sub import {
     $caller->add_callback( teardown  => \&teardown  );
     $caller->add_callback( error     => \&error     );
     
-    no strict 'refs';
-    *{ $caller . '::fallback' } = \&fallback;
+
+    my $run_glob = do { no strict 'refs'; \*{ $caller . '::run' } };
+    my $run_orig
+        = defined &$run_glob
+        ? \&run_glob
+        : eval "package $caller;"  # SUPER works based on the package it's defined in
+             . 'sub { my $self = shift; $self->SUPER::run(@_) }';
+    *$run_glob = _wrap_run($run_orig);
+
+    return;
 }
 
+sub _wrap_run {
+    my ($orig) = @_;
 
+    return sub {
+        my $cgi_app = shift;
+
+        my $res;
+        my $wantarray = wantarray;    # eval has its own
+        my $ok = eval {
+            if ($wantarray) {
+                $res = [ $cgi_app->$orig(@_) ];
+            }
+            else {
+                $res = $cgi_app->$orig(@_);
+            }
+            1;
+        };
+        return $wantarray ? @$res : $res if $ok;
+
+        my $error = $@;
+
+        my $request_span = _plugin_get_scope($cgi_app, CGI_REQUEST)->get_span;
+        $request_span->add_tag('http.status_code' => 500);
+
+        _cascade_set_failed_spans($cgi_app, $error);
+
+        die $error;
+    };
+}
+
+sub _cascade_set_failed_spans {
+    my ($cgi_app, $error, $root_span) = @_;
+    my $root_addr = refaddr($root_span) if defined $root_span;
+
+    my $tracer = _plugin_get_tracer($cgi_app);
+    while (my $scope = $tracer->get_scope_manager->get_active_scope()) {
+        my $span = $scope->get_span();
+        last if defined $root_addr and $root_addr eq refaddr($span);
+
+        $span->add_tags(error => 1, message => $error);
+        $scope->close();
+    }
+    return;
+}
 
 sub init {
     my $cgi_app = shift;
@@ -123,24 +174,11 @@ sub teardown {
 
 sub error {
     my ($cgi_app, $error) = @_;
-    
-    my $root_addr;
-    if ($cgi_app->error_mode()) {    # run span should continue
-        $root_addr = refaddr(_plugin_get_scope($cgi_app, CGI_RUN)->get_span);
-    }
-    else {                           # we're dying right after this hook
-        my $request_span = _plugin_get_scope($cgi_app, CGI_REQUEST)->get_span;
-        $request_span->add_tag('http.status_code' => 500);
-    }
-    
-    my $tracer = _plugin_get_tracer($cgi_app);
-    while (my $scope = $tracer->get_scope_manager->get_active_scope()) {
-        my $span = $scope->get_span();
-        last if defined $root_addr and $root_addr eq refaddr($span);
-        
-        $span->add_tags(error => 1, message => $error);
-        $scope->close();
-    }
+    return if not $cgi_app->error_mode();    # we're dying
+
+    # run span should continue
+    my $root = _plugin_get_scope($cgi_app, CGI_RUN)->get_span;
+    _cascade_set_failed_spans($cgi_app, $error, $root);
     
     return;
 }

@@ -45,7 +45,7 @@
    "provides" : {
       "NewsExtractor" : {
          "file" : "lib/NewsExtractor.pm",
-         "version" : "v0.35.0"
+         "version" : "v0.36.0"
       },
       "NewsExtractor::Article" : {
          "file" : "lib/NewsExtractor/Article.pm"
@@ -103,6 +103,9 @@
       },
       "NewsExtractor::SiteSpecificExtractor::hk_on_cc" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/hk_on_cc.pm"
+      },
+      "NewsExtractor::SiteSpecificExtractor::m_news_cctv_com" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/m_news_cctv_com.pm"
       },
       "NewsExtractor::SiteSpecificExtractor::money_udn_com" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/money_udn_com.pm"
@@ -220,7 +223,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.35.0",
+   "version" : "v0.36.0",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : "CC0-1.0",
    "x_static_install" : "1"

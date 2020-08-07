@@ -4,7 +4,7 @@ BEGIN { chdir 't' if -d 't' }
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Test::More tests => 41;
+use Test::More tests => 46;
 use Test::Exception;
 use strict;
 
@@ -61,4 +61,9 @@ ok(Archive::BagIt::Role::Manifest::check_if_payload_filepath_violates('LPT7'), '
 ok(Archive::BagIt::Role::Manifest::check_if_payload_filepath_violates('LPT8'), 'Windows reserved name LPT8');
 ok(Archive::BagIt::Role::Manifest::check_if_payload_filepath_violates('LPT9'), 'Windows reserved name LPT9');
 
+use_ok('Archive::BagIt::Base');
+my $obj = new_ok('Archive::BagIt::Base');
+is($obj->__file_find(qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag)), 13, '__file_find');
+is($obj->__file_find(qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag/data)), 9, '__file_find');
+is($obj->__file_find(qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag), qw(../bagit_conformance_suite/v0.97/valid/bag-in-a-bag/data)), 4, '__file_find');
 1;

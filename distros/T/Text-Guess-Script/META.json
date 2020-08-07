@@ -1,10 +1,10 @@
 {
    "abstract" : "Guess script from text using ISO-15924 codes",
    "author" : [
-      "Helmut Wollmersdorfer <helmut.wollmersdorfer@gmail.com>"
+      "Helmut Wollmersdorfer <helmut@wollmersdorfer.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.034, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -15,12 +15,12 @@
    "name" : "Text-Guess-Script",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "eg",
+         "examples",
          "inc",
          "share",
-         "eg",
-         "examples"
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.14",
+            "Dist::Milla" : "v1.0.20",
             "Test::MinimumVersion" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "0",
@@ -52,6 +52,12 @@
          }
       }
    },
+   "provides" : {
+      "Text::Guess::Script" : {
+         "file" : "lib/Text/Guess/Script.pm",
+         "version" : "0.04"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -64,9 +70,8 @@
          "web" : "https://github.com/wollmers/Text-Guess-Script"
       }
    },
-   "version" : "0.03",
-   "x_contributors" : [
-      "Helmut Wollmersdorfer <helmut@wollmersdorfer.at>"
-   ]
+   "version" : "0.04",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.15",
+   "x_static_install" : 1
 }
 

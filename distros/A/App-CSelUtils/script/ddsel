@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-04-14'; # DATE
-our $VERSION = '0.085'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.086'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +30,7 @@ ddsel - Select Perl data structure elements using CSel (CSS-selector-like) synta
 
 =head1 VERSION
 
-This document describes version 0.085 of ddsel (from Perl distribution App-CSelUtils), released on 2020-04-14.
+This document describes version 0.086 of ddsel (from Perl distribution App-CSelUtils), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -80,7 +80,7 @@ Can be specified multiple times.
 
 =item B<--expr>=I<s>
 
-=item B<--file>=I<filename>
+=item B<--file>=I<s>
 
 Default value:
 

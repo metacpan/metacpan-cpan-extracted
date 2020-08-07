@@ -11,7 +11,7 @@ use Carp;
 use Exporter 'import';
 use Math::BigInt;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK = qw( revhash revunhash );
@@ -39,13 +39,17 @@ our $UNSAFE = 0;
 
 # Parse and prepare arguments
 # This function is used by revhash, revunhash and new subroutines
-sub argsparse {
-    my ($data, $len, $A, $B) = @_;
+sub _argsparse {
+    my ($data, $len, $A, $B, $C) = @_;
 
     croak "data not defined" unless defined $data;
     croak "Invalid length specified" unless defined $len and $len > 0;
 
-    my $C = 10 ** $len;
+    if (defined $C) {
+        croak "Hash C value is invalid" unless $C > 0;
+    } else {
+        $C = 10 ** $len;
+    }
 
     croak "data ($data) is out of range" unless $data > 0 and $data < $C;
 
@@ -68,25 +72,17 @@ sub argsparse {
 }
 
 # Calculate hash of number
-# args: $number, $length, $A, $B
+# args: $number, $length, $A, $B, $C
 sub revhash {
-    if ($UNSAFE) {
-        $_[4] = 10 ** $_[1];
-    } else {
-        @_ = argsparse @_;
-    }
+    @_ = _argsparse @_ unless $UNSAFE;
 
     sprintf "%0$_[1]d", $_[0] * $_[2] % $_[4];
 }
 
 # Calculate original number of hash
-# args: $hash, $length, $A, $B
+# args: $hash, $length, $A, $B, $C
 sub revunhash {
-    if ($UNSAFE) {
-        $_[4] = 10 ** $_[1];
-    } else {
-        @_ = argsparse @_;
-    }
+    @_ = _argsparse @_ unless $UNSAFE;
 
     $_[0] * $_[3] % $_[4];
 }
@@ -98,11 +94,11 @@ sub hash { @_ = ($_[1], @{$_[0]}); goto &revhash }
 sub unhash { @_ = ($_[1], @{$_[0]}); goto &revunhash }
 
 # OO ctor
-# args: $class, $length, $A, $B
+# args: $class, $length, $A, $B, $C
 sub new {
     my $obj;
 
-    (undef, @{$obj}) = argsparse(1, @_[1..3]);
+    (undef, @{$obj}) = _argsparse(1, @_[1..4]);
 
     bless $obj, $_[0];
 }
@@ -124,13 +120,14 @@ Math::Revhash - Reversible hashes library
     use Math::Revhash qw( revhash revunhash );
 
     # OO style
-    my $revhash = Math::Revhash->new( $length, $A, $B );
+    my $revhash = Math::Revhash->new( $length, $A, $B, $C );
     my $hash = $revhash->hash( $number );
     my $number = $revhash->unhash( $hash );
 
     # Procedural style
-    my $hash = revhash( $number, $length, $A, $B );
-    my $number = revunhash( $hash, $length, $A, $B );
+    my $hash = revhash( $number, $length, $A, $B, $C );
+    my $hash = revhash( $number, 5 );
+    my $number = revunhash( $hash, $length, $A, $B, $C );
 
     # See UNSAFE MODE
     $Math::Revhash::UNSAFE = 1;
@@ -157,7 +154,7 @@ calculation.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 revhash($number, $length, $A, $B)
+=head2 revhash($number, $length, $A, $B, $C)
 
 =over 4
 
@@ -184,11 +181,17 @@ You are encouraged to play around it on your own.
 
 I<(optional)> modular inverse of C<$A>:
 
-    $B = Math::BigInt->bmodinv($A, 10 ** $len)
+    $B = Math::BigInt->bmodinv($A, 10 ** $length)
+
+=item C<$C> --
+
+I<(optional)> as our numbers are decimal, C<10> to the power of C<$length>:
+
+    $C = 10 ** $length
 
 =back
 
-=head2 revunhash($hash, $length, $A, $B)
+=head2 revunhash($hash, $length, $A, $B, $C)
 
 =over 4
 
@@ -206,9 +209,9 @@ alias for revhash.
 
 alias for revunhash.
 
-=head2 new($length, $A, $B)
+=head2 new($length, $A, $B, $C)
 
-object constructor that stores C<$length>, C<$A>, and C<$B> in the object.
+object constructor that checks and stores all the parameters inside new object.
 
 =head1 UNSAFE MODE
 

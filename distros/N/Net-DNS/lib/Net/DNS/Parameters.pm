@@ -1,15 +1,15 @@
 package Net::DNS::Parameters;
 
 #
-# $Id: Parameters.pm 1779 2020-05-11 09:11:17Z willem $
+# $Id: Parameters.pm 1795 2020-07-27 11:00:29Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1779 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1795 $)[1];
 
 
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2020-05-07)
+##	(last updated 2020-06-30)
 ##
 ################################################
 
@@ -107,6 +107,8 @@ my @typebyname = (
 	OPENPGPKEY => 61,					# RFC7929
 	CSYNC	   => 62,					# RFC7477
 	ZONEMD	   => 63,					# draft-wessels-dns-zone-digest
+	SVCB	   => 64,					# draft-ietf-dnsop-svcb-https-00
+	HTTPS	   => 65,					# draft-ietf-dnsop-svcb-https-00
 	SPF	   => 99,					# RFC7208
 	UINFO	   => 100,					# IANA-Reserved
 	UID	   => 101,					# IANA-Reserved
@@ -184,7 +186,7 @@ our %rcodebyname = @rcodebyname;
 
 # Registry: DNS EDNS0 Option Codes (OPT)
 my @ednsoptionbyname = (
-	LLQ		 => 1,					# RFC-sekar-dns-llq-06
+	LLQ		 => 1,					# RFC8764
 	UL		 => 2,					# http://files.dns-sd.org/draft-sekar-dns-ul.txt
 	NSID		 => 3,					# RFC5001
 	DAU		 => 5,					# RFC6975
@@ -233,10 +235,10 @@ my @dsotypebyname = (
 	KEEPALIVE	  => 0x0001,				# RFC8490
 	RETRYDELAY	  => 0x0002,				# RFC8490
 	ENCRYPTIONPADDING => 0x0003,				# RFC8490
-	SUBSCRIBE	  => 0x0040,				# RFC-ietf-dnssd-push-25
-	PUSH		  => 0x0041,				# RFC-ietf-dnssd-push-25
-	UNSUBSCRIBE	  => 0x0042,				# RFC-ietf-dnssd-push-25
-	RECONFIRM	  => 0x0043,				# RFC-ietf-dnssd-push-25
+	SUBSCRIBE	  => 0x0040,				# RFC8765
+	PUSH		  => 0x0041,				# RFC8765
+	UNSUBSCRIBE	  => 0x0042,				# RFC8765
+	RECONFIRM	  => 0x0043,				# RFC8765
 	);
 our %dsotypebyval = reverse @dsotypebyname;
 push @dsotypebyname, map /^\d/ ? $_ : lc($_), @dsotypebyname;
@@ -298,62 +300,66 @@ sub typebyval {
 
 sub opcodebyname {
 	my $arg = shift;
-	return $opcodebyname{$arg} if defined $opcodebyname{$arg};
-	return 0 + $arg if $arg =~ /^\d/;
+	my $val = $opcodebyname{$arg};
+	return $val if defined $val;
+	return $arg if $arg =~ /^\d/;
 	croak qq[unknown opcode "$arg"];
 }
 
 sub opcodebyval {
 	my $val = shift;
-	$opcodebyval{$val} || return $val;
+	$opcodebyval{$val} || return "$val";
 }
 
 
 sub rcodebyname {
 	my $arg = shift;
-	return $rcodebyname{$arg} if defined $rcodebyname{$arg};
-	return 0 + $arg if $arg =~ /^\d/;
+	my $val = $rcodebyname{$arg};
+	return $val if defined $val;
+	return $arg if $arg =~ /^\d/;
 	croak qq[unknown rcode "$arg"];
 }
 
 sub rcodebyval {
 	my $val = shift;
-	$rcodebyval{$val} || return $val;
+	$rcodebyval{$val} || return "$val";
 }
 
 
 sub ednsoptionbyname {
 	my $arg = shift;
-	return $ednsoptionbyname{$arg} if defined $ednsoptionbyname{$arg};
-	return 0 + $arg if $arg =~ /^\d/;
+	my $val = $ednsoptionbyname{$arg};
+	return $val if defined $val;
+	return $arg if $arg =~ /^\d/;
 	croak qq[unknown option "$arg"];
 }
 
 sub ednsoptionbyval {
 	my $val = shift;
-	$ednsoptionbyval{$val} || return $val;
+	$ednsoptionbyval{$val} || return "$val";
 }
 
 
 sub dsotypebyname {
 	my $arg = shift;
-	return $dsotypebyname{$arg} if defined $dsotypebyname{$arg};
-	return 0 + $arg if $arg =~ /^\d/;
+	my $val = $dsotypebyname{$arg};
+	return $val if defined $val;
+	return $arg if $arg =~ /^\d/;
 	croak qq[unknown DSO type "$arg"];
 }
 
 sub dsotypebyval {
 	my $val = shift;
-	$dsotypebyval{$val} || return $val;
+	$dsotypebyval{$val} || return "$val";
 }
 
 
 sub register {				## register( 'TOY', 1234 )	(NOT part of published API)
 	my ( $mnemonic, $rrtype ) = map uc($_), @_;		# uncoverable pod
 	$rrtype = rand(255) + 65280 unless $rrtype;
+	croak qq["$mnemonic" is a CLASS identifier] if defined $classbyname{$mnemonic};
 	for ( typebyval( $rrtype = int $rrtype ) ) {
-		croak qq["$mnemonic" is a CLASS identifier] if $classbyname{$mnemonic};
-		return $rrtype if /^$mnemonic$/;    # duplicate registration
+		return $rrtype if /^$mnemonic$/;		# duplicate registration
 		croak qq["$mnemonic" conflicts with TYPE$rrtype ($_)] unless /^TYPE\d+$/;
 		my $known = $typebyname{$mnemonic};
 		croak qq["$mnemonic" conflicts with TYPE$known] if $known;

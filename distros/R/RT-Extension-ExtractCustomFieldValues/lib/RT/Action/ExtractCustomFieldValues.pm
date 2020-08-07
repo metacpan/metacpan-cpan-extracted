@@ -41,6 +41,7 @@ sub TemplateConfig {
     }
 
     my $Separator = '\|';
+    my $ValueSeparator = ',';
     my @lines = split( /[\n\r]+/, $content);
     my @results;
     for (@lines) {
@@ -53,10 +54,15 @@ sub TemplateConfig {
             $Separator = $1;
             next;
         }
+        if (/^ValueSeparator=(.+)$/) {
+            $ValueSeparator = $1;
+            next;
+        }
         my %line;
         @line{qw/CFName Field Match PostEdit Options/}
             = split(/$Separator/);
         $_ = '' for grep !defined, values %line;
+        $line{ValueSeparator} = $ValueSeparator;
         push @results, \%line;
     }
     return \@results;
@@ -220,7 +226,7 @@ sub ProcessCF {
     if ( $args{CustomField}->SingleValue() ) {
         push @values, $args{Value};
     } else {
-        @values = split( ',', $args{Value} );
+        @values = split( /$args{ValueSeparator}/, $args{Value} );
     }
 
     foreach my $value ( grep defined && length, @values ) {

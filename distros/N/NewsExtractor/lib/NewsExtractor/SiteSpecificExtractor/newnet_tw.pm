@@ -3,7 +3,13 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::GenericExtractor';
 
-use Importer 'NewsExtractor::TextUtil' => 'u';
+use Importer 'NewsExtractor::TextUtil' => qw( parse_dateline_ymdhms u );
+
+sub headline {
+    my ($self) = @_;
+    my $el = $self->dom->at('h4 > b');
+    return $el->all_text;
+}
 
 sub content_text {
     my ($self) = @_;
@@ -17,23 +23,9 @@ sub dateline {
     my ($dateline, $el);
     if ($el = $self->dom->at('b > font[color=darkred]')) {
         # Example: 日期:2020/7/8 下午 08:52:39
-        ($dateline) = $el->all_text =~ m/採訪:\S+ 日期:(.+)\z/;
+        $dateline = parse_dateline_ymdhms( $el->all_text(), '+08:00' );
     }
-
-    return undef unless $dateline;
-
-    my @t = $dateline =~ m/([0-9]+)/g;
-    $t[3] += 12 if $dateline =~ /下午/;
-
-    return u(sprintf(
-        '%04d-%02d-%02dT%02d:%02d:%02d+08:00',
-        $t[0],                  # year
-        $t[1],                  # month
-        $t[2],                  # mday
-        $t[3],                  # hour
-        $t[4],                  # minute
-        $t[5],                  # sec
-    ));
+    return $dateline;
 }
 
 sub journalist {
@@ -44,7 +36,7 @@ sub journalist {
     my ($txt, $el);
 
     if ($el = $self->dom->at('b > font[color=darkred]')) {
-        ($txt) = $el->all_text =~ m/採訪:(\S+) 日期/;
+        ($txt) = $el->all_text =~ m/ (?:專題|採訪): \s* (\S+) \s* 日期/x;
     }
     if ((!$txt) && ($el = $self->dom->at('#ctl00_ContentPlaceHolder1_UpdatePanel2 a[href*="Search.aspx?report="]'))) {
         $txt = $el->text;

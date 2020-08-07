@@ -1,39 +1,10 @@
 # NAME
 
-Archive::BagIt
+Archive::BagIt - An interface to make and verify bags according to the BagIt standard
 
 # VERSION
 
-version 0.063
-
-# SYNOPSIS
-
-This modules will hopefully help with the basic commands needed to create
-and verify a bag. My intention is not to be strict and enforce all of the
-specification. The reference implementation is the java version
-and I will endeavour to maintain compatibility with it.
-
-    use Archive::BagIt;
-
-    #read in an existing bag:
-    my $bag_dir = "/path/to/bag";
-    my $bag = Archive::BagIt->new($bag_dir);
-
-
-    #construct bag in an existing directory
-    my $bag2 = Archive::BagIt->make_bag($bag_dir);
-
-    # Validate a BagIt archive against its manifest
-    my $bag3 = Archive::BagIt->new($bag_dir);
-    my $is_valid = $bag3->verify_bag();
-
-# NAME
-
-Archive::BagIt
-
-# VERSION
-
-version 0.063
+version 0.065
 
 # WARNING
 
@@ -44,10 +15,6 @@ support BagIt 1.0 according to RFC 8493 (\[https://tools.ietf.org/html/rfc8493\]
 
 Also: Check out Archive::BagIt::Fast if you are willing to add some extra dependencies to get
 better speed by mmap-ing files.
-
-# NAME
-
-Archive::BagIt - An interface to make and verify bags according to the BagIt standard
 
 # SUBROUTINES
 
@@ -94,29 +61,12 @@ Return an array with the list of manifest files that exist in the bag
 
 Return an array with the list of tagmanifest files
 
-# AUTHORS
-
-- Robert Schmidt, &lt;rjeschmi at gmail.com>
-- William Wueppelmann, &lt;william at c7a.ca>
-- Andreas Romeyke, &lt;pause at andreas minus romeyke.de>
-
-# CONTRIBUTORS
-
-- Serhiy Bolkun
-- Russell McOrmond
-
 # SOURCE
 
 The original development version is on github at [http://github.com/rjeschmi/Archive-BagIt](http://github.com/rjeschmi/Archive-BagIt)
 and may be cloned from there.
 
 The actual development version is available at [https://art1pirat.spdns.org/art1/Archive-BagIt](https://art1pirat.spdns.org/art1/Archive-BagIt)
-
-# BUGS
-
-Please report any bugs or feature requests to `bug-archive-bagit at rt.cpan.org`, or through
-the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Archive-BagIt](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Archive-BagIt).  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
 
 # SUPPORT
 
@@ -142,14 +92,26 @@ You can also look for information at:
 
     [http://search.cpan.org/dist/Archive-BagIt/](http://search.cpan.org/dist/Archive-BagIt/)
 
-# COPYRIGHT
+# SYNOPSIS
 
-Copyright (c) 2012, the above named author(s).
+This modules will hopefully help with the basic commands needed to create
+and verify a bag. My intention is not to be strict and enforce all of the
+specification. The reference implementation is the java version
+and I will endeavour to maintain compatibility with it.
 
-# LICENSE
+    use Archive::BagIt;
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+    #read in an existing bag:
+    my $bag_dir = "/path/to/bag";
+    my $bag = Archive::BagIt->new($bag_dir);
+
+
+    #construct bag in an existing directory
+    my $bag2 = Archive::BagIt->make_bag($bag_dir);
+
+    # Validate a BagIt archive against its manifest
+    my $bag3 = Archive::BagIt->new($bag_dir);
+    my $is_valid = $bag3->verify_bag();
 
 # AVAILABILITY
 
@@ -161,17 +123,6 @@ site near you, or see [https://metacpan.org/module/Archive::BagIt/](https://meta
 
 You can make new bug reports, and view existing ones, through the
 web interface at [http://rt.cpan.org](http://rt.cpan.org).
-
-# AUTHOR
-
-Rob Schmidt <rjeschmi@gmail.com>
-
-# COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 # AUTHOR
 

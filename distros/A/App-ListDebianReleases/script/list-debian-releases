@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Debian/Releases/PERLANCAR/list_debian_releases
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2020-02-21'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-27'; # DATE
 our $DIST = 'App-ListDebianReleases'; # DIST
-our $VERSION = '0.070'; # VERSION
+our $VERSION = '0.071'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,103 @@ list-debian-releases - List of Debian releases
 
 =head1 VERSION
 
-This document describes version 0.070 of list-debian-releases (from Perl distribution App-ListDebianReleases), released on 2020-02-21.
+This document describes version 0.071 of list-debian-releases (from Perl distribution App-ListDebianReleases), released on 2020-04-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-debian-releases [options] [query]
+ % list-debian-releases [--apache-httpd-version-contains=s]
+     [--apache-httpd-version-in-json=s] [--apache-httpd-version-in=s+]
+     [--apache-httpd-version-is=s] [--apache-httpd-version-isnt=s]
+     [--apache-httpd-version-max=s] [--apache-httpd-version-min=s]
+     [--apache-httpd-version-not-contains=s]
+     [--apache-httpd-version-not-in-json=s]
+     [--apache-httpd-version-not-in=s+] [--apache-httpd-version-xmax=s]
+     [--apache-httpd-version-xmin=s] [--apache-httpd-version=s]
+     [--bash-version-contains=s] [--bash-version-in-json=s]
+     [--bash-version-in=s+] [--bash-version-is=s] [--bash-version-isnt=s]
+     [--bash-version-max=s] [--bash-version-min=s]
+     [--bash-version-not-contains=s] [--bash-version-not-in-json=s]
+     [--bash-version-not-in=s+] [--bash-version-xmax=s]
+     [--bash-version-xmin=s] [--bash-version=s] [--code-name-contains=s]
+     [--code-name-in-json=s] [--code-name-in=s+] [--code-name-is=s]
+     [--code-name-isnt=s] [--code-name-max=s] [--code-name-min=s]
+     [--code-name-not-contains=s] [--code-name-not-in-json=s]
+     [--code-name-not-in=s+] [--code-name-xmax=s] [--code-name-xmin=s]
+     [--code-name=s] [--detail] [--eoldate-in-json=s] [--eoldate-in=s+]
+     [--eoldate-is=s] [--eoldate-isnt=s] [--eoldate-max=s]
+     [--eoldate-min=s] [--eoldate-not-in-json=s] [--eoldate-not-in=s+]
+     [--eoldate-xmax=s] [--eoldate-xmin=s] [--eoldate=s]
+     [--exclude-field=s+] [--exclude-fields-json=s] [--field=s+]
+     [--fields-json=s] [--format=s] [--json] [-l]
+     [--linux-version-contains=s] [--linux-version-in-json=s]
+     [--linux-version-in=s+] [--linux-version-is=s]
+     [--linux-version-isnt=s] [--linux-version-max=s]
+     [--linux-version-min=s] [--linux-version-not-contains=s]
+     [--linux-version-not-in-json=s] [--linux-version-not-in=s+]
+     [--linux-version-xmax=s] [--linux-version-xmin=s] [--linux-version=s]
+     [--mariadb-version-contains=s] [--mariadb-version-in-json=s]
+     [--mariadb-version-in=s+] [--mariadb-version-is=s]
+     [--mariadb-version-isnt=s] [--mariadb-version-max=s]
+     [--mariadb-version-min=s] [--mariadb-version-not-contains=s]
+     [--mariadb-version-not-in-json=s] [--mariadb-version-not-in=s+]
+     [--mariadb-version-xmax=s] [--mariadb-version-xmin=s]
+     [--mariadb-version=s] [--mysql-version-contains=s]
+     [--mysql-version-in-json=s] [--mysql-version-in=s+]
+     [--mysql-version-is=s] [--mysql-version-isnt=s]
+     [--mysql-version-max=s] [--mysql-version-min=s]
+     [--mysql-version-not-contains=s] [--mysql-version-not-in-json=s]
+     [--mysql-version-not-in=s+] [--mysql-version-xmax=s]
+     [--mysql-version-xmin=s] [--mysql-version=s] [--(no)naked-res]
+     [--nginx-version-contains=s] [--nginx-version-in-json=s]
+     [--nginx-version-in=s+] [--nginx-version-is=s]
+     [--nginx-version-isnt=s] [--nginx-version-max=s]
+     [--nginx-version-min=s] [--nginx-version-not-contains=s]
+     [--nginx-version-not-in-json=s] [--nginx-version-not-in=s+]
+     [--nginx-version-xmax=s] [--nginx-version-xmin=s] [--nginx-version=s]
+     [--no-detail] [--no-random] [--nodetail] [--norandom]
+     [--page-result[=s]] [--perl-version-contains=s]
+     [--perl-version-in-json=s] [--perl-version-in=s+]
+     [--perl-version-is=s] [--perl-version-isnt=s] [--perl-version-max=s]
+     [--perl-version-min=s] [--perl-version-not-contains=s]
+     [--perl-version-not-in-json=s] [--perl-version-not-in=s+]
+     [--perl-version-xmax=s] [--perl-version-xmin=s] [--perl-version=s]
+     [--php-version-contains=s] [--php-version-in-json=s]
+     [--php-version-in=s+] [--php-version-is=s] [--php-version-isnt=s]
+     [--php-version-max=s] [--php-version-min=s]
+     [--php-version-not-contains=s] [--php-version-not-in-json=s]
+     [--php-version-not-in=s+] [--php-version-xmax=s]
+     [--php-version-xmin=s] [--php-version=s]
+     [--postgresql-version-contains=s] [--postgresql-version-in-json=s]
+     [--postgresql-version-in=s+] [--postgresql-version-is=s]
+     [--postgresql-version-isnt=s] [--postgresql-version-max=s]
+     [--postgresql-version-min=s] [--postgresql-version-not-contains=s]
+     [--postgresql-version-not-in-json=s] [--postgresql-version-not-in=s+]
+     [--postgresql-version-xmax=s] [--postgresql-version-xmin=s]
+     [--postgresql-version=s] [--python-version-contains=s]
+     [--python-version-in-json=s] [--python-version-in=s+]
+     [--python-version-is=s] [--python-version-isnt=s]
+     [--python-version-max=s] [--python-version-min=s]
+     [--python-version-not-contains=s] [--python-version-not-in-json=s]
+     [--python-version-not-in=s+] [--python-version-xmax=s]
+     [--python-version-xmin=s] [--python-version=s] [--random]
+     [--reldate-in-json=s] [--reldate-in=s+] [--reldate-is=s]
+     [--reldate-isnt=s] [--reldate-max=s] [--reldate-min=s]
+     [--reldate-not-in-json=s] [--reldate-not-in=s+] [--reldate-xmax=s]
+     [--reldate-xmin=s] [--reldate=s] [--result-limit=s] [--result-start=s]
+     [--ruby-version-contains=s] [--ruby-version-in-json=s]
+     [--ruby-version-in=s+] [--ruby-version-is=s] [--ruby-version-isnt=s]
+     [--ruby-version-max=s] [--ruby-version-min=s]
+     [--ruby-version-not-contains=s] [--ruby-version-not-in-json=s]
+     [--ruby-version-not-in=s+] [--ruby-version-xmax=s]
+     [--ruby-version-xmin=s] [--ruby-version=s] [--sort-json=s] [--sort=s+]
+     [--version-arg=s] [--version-contains=s] [--version-in-json=s]
+     [--version-in=s+] [--version-is=s] [--version-isnt=s]
+     [--version-max=s] [--version-min=s] [--version-not-contains=s]
+     [--version-not-in-json=s] [--version-not-in=s+] [--version-xmax=s]
+     [--version-xmin=s] [--with-field-names] [--without-field-names]
+     [query]
 
 =head1 DESCRIPTION
 

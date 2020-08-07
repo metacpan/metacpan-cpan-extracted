@@ -1,5 +1,8 @@
 Revision history for Text::Guess::Language
 
+0.05  2020-08-06 19:39:54 CEST
+        - improve Kwalitee by provides
+
 0.04  2016-03-06 23:49:05 CET
         - use strict
 

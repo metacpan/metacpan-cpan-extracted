@@ -1,4 +1,13 @@
-$Id: Changes 1792 2020-06-26 14:43:25Z willem $                       -*-text-*-
+$Id: Changes 1801 2020-08-05 15:49:06Z willem $                       -*-text-*-
+
+
+**** 1.26 Aug, 6, 2020
+
+	Add HTTPS/SVCB packages.
+
+Fix rt.cpan.org #132921
+
+	EDNS OPT handling
 
 
 **** 1.25 Jun 26, 2020

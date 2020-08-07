@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,12 +15,16 @@ meta-spec:
 name: Set-Similarity-CosinePDL
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Set::Similarity::CosinePDL:
+    file: lib/Set/Similarity/CosinePDL.pm
+    version: '0.014'
 requires:
   PDL: '0'
   Set::Similarity: '0.022'
@@ -31,7 +35,9 @@ resources:
   bugtracker: https://github.com/wollmers/Set-Similarity-CosinePDL/issues
   homepage: https://github.com/wollmers/Set-Similarity-CosinePDL
   repository: https://github.com/wollmers/Set-Similarity-CosinePDL.git
-version: '0.013'
+version: '0.014'
 x_contributors:
   - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
   - 'Helmut Wollmersdorfer <helmut.wollmersdorfer@fixpunkt.de>'
+x_serialization_backend: 'YAML::Tiny version 1.66'
+x_static_install: 1

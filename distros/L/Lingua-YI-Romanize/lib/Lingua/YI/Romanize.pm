@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Unicode::Normalize;
 
@@ -107,58 +107,62 @@ $normalize_combinings = [
 ["\x{05E4}\x{05BF}","\x{FB4E}"], # HEBREW LETTER PE WITH RAFE
 ["\x{05E9}\x{05C2}","\x{FB2B}"], # HEBREW LETTER SHIN WITH SIN DOT
 ["\x{05EA}\x{05BC}","\x{FB4A}"], # HEBREW LETTER TAV WITH DAGESH
-["\x{FB20}","\x{05E2}"], # HEBREW LETTER ALTERNATIVE AYIN
-["\x{05E4}","\x{05BF}"], # HEBREW LETTER PE
+["\x{FB20}","\x{05E2}"],         # HEBREW LETTER ALTERNATIVE AYIN
+["\x{05E4}","\x{05BF}"],         # HEBREW LETTER PE
 ];
 
 
 $yivo2latn = [
-["\x{05D3}\x{05D6}\x{05E9}",'dzh','d͡ʒ'],
-["\x{05D6}\x{05E9}",'zh','ʒ'],
-["\x{05D8}\x{05E9}",'tsh','t͡ʃ'],
-["\x{05D0}",'',''],
-["\x{FB2E}",'a','a'],
-["\x{FB2F}",'o','ɔ'],
-["\x{05D1}",'b','b'],
-["\x{FB31}",'','b'],
-["\x{FB4C}",'v','v'],
-["\x{05D2}",'g','ɡ'],
-["\x{05D3}",'d','d'],
-["\x{05D4}",'h','h'],
-["\x{05D5}",'u','ʊ'],
-["\x{FB35}",'u','ʊ'],
-# "\x{05D5}" HEBREW LETTER VAV,"\x{05B9}" HEBREW POINT HOLAM|וֹ|(none)|(none)|ɔ, ɔj|(o,oj)|khoylem|Non-YIVO alternative to אָ and וי.
-["\x{05F0}",'v','v'],
-["\x{05F1}",'oy','ɔj'],
-["\x{05D6}",'z','z'],
-["\x{05D7}",'kh','x'],
-["\x{05D8}",'t','t'],
-# TODO "\x{05D9}" HEBREW LETTER YOD|י|y, i|y, i|j, i|j, i|yud|Consonantal [j] when the first character in a syllable. Vocalic [i] otherwise.
-["\x{FB1D}",'i','i'],
-["\x{05F2}",'ey','ɛj'],
-["\x{FB1F}",'ay','aj'],
-["\x{FB3B}",'k','k'],
-["\x{05DB}",'kh','x'],
-["\x{05DA}",'kh','x'],
-["\x{05DC}",'l','l'], # TODO: ʎ
-["\x{05DE}",'m','m'],
-["\x{05DD}",'m','m'],
-["\x{05E0}",'n','n'],
-["\x{05DF}",'n','n'], # TODO: ŋ, m
-["\x{05E1}",'s','s'],
-["\x{05E2}",'e','ɛ'], # TODO: ə
-["\x{FB44}",'p','p'],
-["\x{FB4E}",'f','f'],
-["\x{05E3}",'f','f'],
-["\x{05BF}",'f','f'],
-["\x{05E6}",'ts','ts'],
-["\x{05E5}",'ts','ts'],
-["\x{05E7}",'k','k'],
-["\x{05E8}",'r','ʀ'],
-["\x{05E9}",'sh','ʃ'],
-["\x{FB2B}",'s','s'],
-["\x{FB4A}",'t','t'],
-["\x{05EA}",'s','s'],
+["\x{05D3}\x{05D6}\x{05E9}", 'dzh', 'd͡ʒ'],
+["\x{05D6}\x{05E9}",         'zh',  'ʒ'  ],
+["\x{05D8}\x{05E9}",         'tsh', 't͡ʃ'],
+["\x{05D0}",                 '',    ''   ],
+["\x{FB2E}",                 'a',   'a'  ],
+["\x{FB2F}",                 'o',   'ɔ'  ],
+["\x{05D1}",                 'b',   'b'  ],
+["\x{FB31}",                  '',   'b'  ],
+["\x{FB4C}",                 'v',   'v'  ],
+["\x{05D2}",                 'g',   'ɡ'  ],
+["\x{05D3}",                 'd',   'd'  ],
+["\x{05D4}",                 'h',   'h'  ],
+["\x{05D5}",                 'u',   'ʊ'  ],
+["\x{FB35}",                 'u',   'ʊ'  ],
+# "\x{05D5}" HEBREW LETTER VAV,
+# "\x{05B9}" HEBREW POINT HOLAM
+# |וֹ|(none)|(none)|ɔ, ɔj|(o,oj)|khoylem|Non-YIVO alternative to אָ and וי.
+["\x{05F0}",                 'v',   'v'  ],
+["\x{05F1}",                 'oy',  'ɔj' ],
+["\x{05D6}",                 'z',   'z'  ],
+["\x{05D7}",                 'kh',  'x'  ],
+["\x{05D8}",                 't',   't'  ],
+# TODO "\x{05D9}" HEBREW LETTER YOD
+# |י|y, i|y, i|j, i|j, i|yud|Consonantal [j]
+# when the first character in a syllable. Vocalic [i] otherwise.
+["\x{FB1D}",                 'i',   'i'  ],
+["\x{05F2}",                 'ey',  'ɛj' ],
+["\x{FB1F}",                 'ay',  'aj' ],
+["\x{FB3B}",                 'k',   'k'  ],
+["\x{05DB}",                 'kh',  'x'  ],
+["\x{05DA}",                 'kh',  'x'  ],
+["\x{05DC}",                 'l',   'l'  ], # TODO: ʎ
+["\x{05DE}",                 'm',   'm'  ],
+["\x{05DD}",                 'm',   'm'  ],
+["\x{05E0}",                 'n',   'n'  ],
+["\x{05DF}",                 'n',   'n'  ], # TODO: ŋ, m
+["\x{05E1}",                 's',   's'  ],
+["\x{05E2}",                 'e',   'ɛ'  ], # TODO: ə
+["\x{FB44}",                 'p',   'p'  ],
+["\x{FB4E}",                 'f',   'f'  ],
+["\x{05E3}",                 'f',   'f'  ],
+["\x{05BF}",                 'f',   'f'  ],
+["\x{05E6}",                 'ts',  'ts' ],
+["\x{05E5}",                 'ts',  'ts' ],
+["\x{05E7}",                 'k',   'k'  ],
+["\x{05E8}",                 'r',   'ʀ'  ],
+["\x{05E9}",                 'sh',  'ʃ'  ],
+["\x{FB2B}",                 's',   's'  ],
+["\x{FB4A}",                 't',   't'  ],
+["\x{05EA}",                 's',   's'  ],
 ];
 
 $vowels = [
@@ -302,7 +306,7 @@ L<http://github.com/wollmers/Lingua-YI-Romanize>
 
 =head1 AUTHOR
 
-Helmut Wollmersdorfer E<lt>helmut.wollmersdorfer@gmail.comE<gt>
+Helmut Wollmersdorfer E<lt>helmut@wollmersdorfer.atE<gt>
 
 =begin html
 
@@ -312,7 +316,7 @@ Helmut Wollmersdorfer E<lt>helmut.wollmersdorfer@gmail.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2016 Helmut Wollmersdorfer
+Copyright 2016-2020 Helmut Wollmersdorfer
 
 =head1 LICENSE
 

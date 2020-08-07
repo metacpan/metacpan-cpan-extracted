@@ -2,14 +2,15 @@ package Test2::Tools::Grab;
 use strict;
 use warnings;
 
-our $VERSION = '0.000130';
+our $VERSION = '0.000132';
 
 use Test2::Util::Grabber;
+use Test2::EventFacet::Trace();
 
 our @EXPORT = qw/grab/;
 use base 'Exporter';
 
-sub grab { Test2::Util::Grabber->new() }
+sub grab { Test2::Util::Grabber->new(trace => Test2::EventFacet::Trace->new(frame => [caller(0)]) ) }
 
 1;
 

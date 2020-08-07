@@ -1,5 +1,9 @@
 Revision history for Dancer2-Plugin-Auth-HTTP-Basic-DWIW
 
+0.08    2020-08-07
+        - first first argument to route sub from Dancer2::Core::DSL
+          to Dancer2::Core::App - thanks github @m-doughty!
+
 0.07    2019-11-05
         - log error when check_login handler fails
 

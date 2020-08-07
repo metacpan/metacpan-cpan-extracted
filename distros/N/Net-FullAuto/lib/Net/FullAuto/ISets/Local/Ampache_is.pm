@@ -339,13 +339,10 @@ if ($b==1) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /usr/local/php7/etc/conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ./php.ini-production /usr/local/php7/lib/php.ini',
+         'cp -v ./php.ini-production /usr/local/php7/etc/php.ini',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /usr/local/php7/etc/conf.d','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ./php.ini-production /usr/local/php7/lib/php.ini',
-         '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -vp /usr/local/php7/etc/php-fpm.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -831,11 +828,11 @@ END
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/php7/bin/pecl config-set php_ini '.
-      '/usr/local/php7/lib/php.ini',
+      '/usr/local/php7/etc/php.ini',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/php7/bin/pear config-set php_ini '.
-      '/usr/local/php7/lib/php.ini',
+      '/usr/local/php7/etc/php.ini',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget --random-wait --progress=dot '.
@@ -1930,24 +1927,21 @@ END
    ($hash,$output,$error)=run_aws_cmd($c);
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s/post_max_size = 8M/post_max_size = 500M/\' ".
-      "/usr/local/php7/lib/php.ini");
+      "/usr/local/php7/etc/php.ini");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s/upload_max_filesize = 2M/upload_max_filesize = 500M/\' ".
-      "/usr/local/php7/lib/php.ini");
+      "/usr/local/php7/etc/php.ini");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s/max_execution_time = 30/max_execution_time = 7500/\' ".
-      "/usr/local/php7/lib/php.ini");
+      "/usr/local/php7/etc/php.ini");
    ($stdout,$stderr)=$handle->cmd($sudo.
       'sed -i \'s/memory_limit = 128M/memory_limit = 256M/\' '.
-      '/usr/local/php7/lib/php.ini');
+      '/usr/local/php7/etc/php.ini');
    # https://www.toptal.com/php/getting-the-most-out-of-your-log-files-a-practical-guide
    ($stdout,$stderr)=$handle->cmd($sudo.
       'sed -i \'s|;error_log = syslog|error_log = '.
       '/usr/local/php7/var/log/php_error.log|\' '.
-      '/usr/local/php7/lib/php.ini');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'cp -v /usr/local/php7/lib/php.ini /usr/local/php7/etc',
-      '__display__');
+      '/usr/local/php7/etc/php.ini');
    ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm restart');
    # https://aaronsadler.uk/2016/june/26/mount-google-drive-on-headless-centos-7-server/
    ($stdout,$stderr)=$handle->cmd($sudo.

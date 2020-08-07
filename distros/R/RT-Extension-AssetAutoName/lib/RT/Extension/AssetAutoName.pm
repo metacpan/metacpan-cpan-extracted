@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::AssetAutoName;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -21,7 +21,7 @@ and reporting.
 
 =head1 RT VERSION
 
-Works with RT 4.4.x, not tested with 4.6.x yet.
+Works with RT 4.4.x and 5.0.x.
 
 =head1 INSTALLATION
 

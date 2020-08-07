@@ -1,5 +1,9 @@
 Revision history for Alien-Libevent
 
+2.8      Wed Aug 06 2020
+         - Add Test::Alien::Diag as prereq
+         - Add Test::Alien as prereq
+
 2.7      Wed Aug 05 2020
          - No specific version for Test::Alien
 

@@ -2,8 +2,8 @@ NAME
     App::ListDebianReleases - List Debian releases (CLI)
 
 VERSION
-    This document describes version 0.070 of App::ListDebianReleases (from
-    Perl distribution App-ListDebianReleases), released on 2020-02-21.
+    This document describes version 0.071 of App::ListDebianReleases (from
+    Perl distribution App-ListDebianReleases), released on 2020-04-27.
 
 DESCRIPTION
     See the included script list-debian-releases.

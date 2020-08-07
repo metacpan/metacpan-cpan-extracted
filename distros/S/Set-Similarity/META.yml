@@ -1,14 +1,14 @@
 ---
 abstract: 'similarity measures for sets'
 author:
-  - 'Helmut Wollmersdorfer, <helmut.wollmersdorfer@gmail.com>'
+  - 'Helmut Wollmersdorfer, <helmut@wollmersdorfer.at>'
 build_requires:
   Test::Exception: '0'
   Test::More: '0.88'
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,12 +16,28 @@ meta-spec:
 name: Set-Similarity
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Set::Similarity:
+    file: lib/Set/Similarity.pm
+    version: '0.027'
+  Set::Similarity::Cosine:
+    file: lib/Set/Similarity/Cosine.pm
+    version: '0.027'
+  Set::Similarity::Dice:
+    file: lib/Set/Similarity/Dice.pm
+    version: '0.027'
+  Set::Similarity::Jaccard:
+    file: lib/Set/Similarity/Jaccard.pm
+    version: '0.027'
+  Set::Similarity::Overlap:
+    file: lib/Set/Similarity/Overlap.pm
+    version: '0.027'
 requires:
   Carp: '0'
   parent: '0'
@@ -30,9 +46,9 @@ resources:
   bugtracker: https://github.com/wollmers/Set-Similarity/issues
   homepage: https://github.com/wollmers/Set-Similarity
   repository: https://github.com/wollmers/Set-Similarity.git
-version: '0.026'
+version: '0.027'
 x_contributors:
   - 'helmut <helmut@acerone.woll.internal>'
-  - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
   - 'Helmut Wollmersdorfer <helmut.wollmersdorfer@fixpunkt.de>'
-  - 'wollmers <helmut@wollmersdorfer.at>'
+x_serialization_backend: 'YAML::Tiny version 1.66'
+x_static_install: 1

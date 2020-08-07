@@ -1,5 +1,14 @@
 Revision history for Perl extension NOLookup
 
+1.21 2020-08-07
+     - bin/no_rdap.pl: adjust -f option to force either ipv4 or ipv6,
+       nice if some dns/connect problem should occur.
+
+1.20 2020-08-06
+     - Comment out use of LWP::ConsoleLogger::Easy as it complicates
+       debian build for prod. environments. Activate debug code
+       manually when doing development stuff.
+
 1.19 2020-06-30
      - Added more RDAP support.
      - Also added some whois utility functions for converting RDAP to

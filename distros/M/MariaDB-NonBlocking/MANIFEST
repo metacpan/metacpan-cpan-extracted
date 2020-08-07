@@ -26,5 +26,7 @@ t/05-update-promise.t
 t/06-cyclic-refs.t
 t/07-pool.t
 Pakket.json
+deps/mariadb-connector-c-3.1.9-src.tar.gz
+deps/statically_link_auth_plugins.patch
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

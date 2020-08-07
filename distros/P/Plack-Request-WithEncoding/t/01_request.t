@@ -173,6 +173,34 @@ subtest 'accessor (not decoded)' => sub {
     };
 };
 
+subtest 'nested request' => sub {
+    my $req = build_nested_request();
+
+    subtest 'get encoding information' => sub {
+        is $req->encoding, 'utf-8';
+    };
+
+    subtest 'Decoded rightly' => sub {
+        my $foo = $req->parameters->{foo};
+        while (my ($k, $v) = each %$foo) {
+            ok is_utf8($k);
+            ok is_utf8($v);
+        }
+        my $bar = $req->parameters->get_all('bar');
+        for my $b (@$bar) {
+            ok is_utf8($b);
+        }
+        ok is_utf8($req->parameters->{baz});
+    };
+
+    is_deeply $req->parameters->{foo}, {
+        'ほげ' => 'こんにちは世界',
+        hoge  => 'ふが',
+    }, 'get nested hashref value of parameter';
+
+    is_deeply $req->parameters->get_all('bar'), ['ほげ', 'ふが', 'ひげ'], 'get nested arrayref value of parameter';
+};
+
 done_testing;
 
 sub build_request {
@@ -198,6 +226,33 @@ sub build_request {
         REQUEST_METHOD => 'GET',
         HTTP_HOST      => $host,
         PATH_INFO      => $path,
+    });
+
+    return $req;
+}
+
+sub build_nested_request {
+    my $body = Hash::MultiValue->new(
+        foo => {
+            encode_utf8('ほげ') => encode_utf8('こんにちは世界'),
+            hoge => encode_utf8('ふが'),
+        },
+        bar => [
+            encode_utf8('ほげ'),
+            encode_utf8('ふが'),
+            encode_utf8('ひげ'),
+        ],
+        baz => encode_utf8('こんにちは'),
+    );
+
+    my $host  = 'example.com';
+    my $path  = '/hoge/fuga';
+
+    my $req = Plack::Request::WithEncoding->new({
+        'plack.request.body' => $body,
+        REQUEST_METHOD       => 'POST',
+        HTTP_HOST            => $host,
+        PATH_INFO            => $path,
     });
 
     return $req;

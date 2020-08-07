@@ -55,7 +55,7 @@
          "web" : "https://github.com/zhmylove/math-revhash"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:ZHMYLOVE",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.00"

@@ -1,23 +1,37 @@
 Revision history for Perl extension Alien::Sodium.
 
-1.0.8.0 2015-12-27 21:38:06
-    Upgrade library to version 1.0.8, released on Dec 25, 2015.
+2.000     2020-08-06
+  - Bump major version to use decimal versions
+  - Upgrade library to version 1.0.18
+  - Re-organize Changes file
+  - Run CI via GH workflows/actions
+  - Keep Makefile.PL and META.json in the repo for easy CI
+  - Update documentation
+  - Make the README.md mirror the POD
+  - Use dzil [@Starter]
+  - Use alienfile
+  - Add mailmap to get contributors correct
+  - Add FFI test
+  - Add XS test
+  - Keep a license file in the repo
+  - Don't package upstream library, download it from their site
+  - Get rid of PodWeaver stuff (the docs are small enough)
 
-1.0.7.0 2015-12-24 02:41:25
-    Upgrade library to version 1.0.7, released on Dec 9, 2015.
+1.0.8.0  2015-12-27 21:38:06
+  - Upgrade library to version 1.0.8
 
-1.0.6.0 2015-11-10 01:57:31
-    Upgrade library to version 1.0.6, released on Oct 25, 2015.
+1.0.7.0  2015-12-24
+  - Upgrade library to version 1.0.7
 
-1.0.3.1 2015-07-16 22:34:27
-    [gh#1] use correct pkg-config name for libsodium
-        by Graham Ollis
-    [gh#2] require libsodium 1.0.3
-        by Graham Ollis
+1.0.6.0  2015-11-10
+  - Upgrade library to version 1.0.6
 
-1.0.3.0 2015-05-12 00:01:29
-    Upgrade library to version 1.0.3, released on May 9, 2015.
+1.0.3.1  2015-07-16
+  - Use correct pkg-config name for libsodium (Graham Ollis - gh#1)
+  - Require libsodium 1.0.3 (Graham Ollis - gh#2)
 
-0.01   2014-02-04 00:28:01
-	Initial version.
+1.0.3.0  2015-05-12
+  - Upgrade library to version 1.0.3
 
+0.01     2014-02-04
+  - Initial version.

@@ -1,4 +1,4 @@
-# $Id: 05-TSIG.t 1779 2020-05-11 09:11:17Z willem $	-*-perl-*-
+# $Id: 05-TSIG.t 1796 2020-07-28 08:22:47Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -114,11 +114,13 @@ my $hash = {};
 {
 	# Check default signing function using test cases from RFC2202, section 2.
 
+	my $expected = new Net::DNS::RR( type => 'TSIG', algorithm => 'HMAC-MD5.SIG-ALG.REG.INT' );
+
 	my $tsig      = new Net::DNS::RR( type => 'TSIG', fudge => 300 );
 	my $function  = $tsig->sig_function;			# default signing function
 	my $algorithm = $tsig->algorithm;			# default algorithm
 
-	is( $algorithm, 'HMAC-MD5.SIG-ALG.REG.INT', 'Check algorithm correctly identified' );
+	is( $algorithm, $expected->algorithm, 'Check algorithm correctly identified' );
 
 	{
 		my $data   = pack 'H*', '4869205468657265';

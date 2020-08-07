@@ -1,0 +1,77 @@
+{
+   "abstract" : "adds the zilla object and the logger to your bundles",
+   "author" : [
+      "Sven Kirmess <sven.kirmess@kzone.ch>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Role-PluginBundle-Zilla",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::PluginBundle" : "0",
+            "List::Util" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Scalar::Util" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Moose" : "0",
+            "Test::DZil" : "0",
+            "Test::More" : "0.88",
+            "Test::TempDir::Tiny" : "0",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Role::PluginBundle::Zilla" : {
+         "file" : "lib/Dist/Zilla/Role/PluginBundle/Zilla.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skirmess/Dist-Zilla-Role-PluginBundle-Zilla/issues"
+      },
+      "homepage" : "https://github.com/skirmess/Dist-Zilla-Role-PluginBundle-Zilla",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skirmess/Dist-Zilla-Role-PluginBundle-Zilla.git",
+         "web" : "https://github.com/skirmess/Dist-Zilla-Role-PluginBundle-Zilla"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231",
+   "x_spdx_expression" : "BSD-2-Clause-FreeBSD"
+}
+

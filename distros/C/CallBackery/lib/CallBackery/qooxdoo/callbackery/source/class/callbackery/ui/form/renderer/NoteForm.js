@@ -17,6 +17,7 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
      * @param vizWidget {Widget} visualization widget to embed
      */
     construct: function(form) {
+        this._gotNote = false;
         this.base(arguments,form);
         var fl = this._getLayout();
         // have plenty of space for input, not for the labels
@@ -24,25 +25,57 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
         fl.setColumnAlign(0, "left", "top");
         fl.setColumnFlex(1, 4);
         fl.setColumnMinWidth(1, 130);
-        fl.setColumnFlex(2,1);
+        console.log(this._gotNote);
+        fl.setColumnFlex(2, this._gotNote ? 1 : 0);
         fl.setColumnMaxWidth(2,250);
         fl.setSpacingY(0);
     },
 
     members: {
+        _gotNote: null,
         addItems: function(items,names,title,itemOptions,headerOptions){
             // add the header
-            if (title != null) {
-                this._add(
-                    this._createHeader(title), {row: this._row, column: 0, colSpan: 3}
-                );
+            if (title) {
+                if (headerOptions && headerOptions.widget){
+                    this._add(
+                        headerOptions.widget.set({
+                            value: title,
+                            paddingTop: this._row == 0 ? 0 :10
+                        }),{
+                            row: this._row++, 
+                            column: 0, 
+                            colSpan: 3
+                        }
+                    );
+                }
+                else {
+                    this._add(
+                        this._createHeader(title), {
+                            row: this._row++,
+                            column: 0,
+                            colSpan: 3
+                        }
+                    );
+                }
                 this._row++;
-                if (headerOptions != null && headerOptions.note != null){
-                    this._add(new qx.ui.basic.Label(headerOptions.note).set({
+                if (headerOptions 
+                    && headerOptions.note){
+                    var note = new qx.ui.basic.Label(
+                        headerOptions.note).set({
                         rich: true,
-                        alignX: 'left'
-                    }),{ row: this._row, column: 0, colSpan: 3});
-                    this._row++;
+                        alignX: 'left',
+                        paddingBottom: 12,
+                        paddingRight: 10
+                    });
+                    this._add(note,{ 
+                        row: this._row++,
+                        column: 0,
+                        colSpan: 3
+                    });
+                    if (headerOptions.widget) {
+                        this._connectVisibility(
+                            headerOptions.widget,note);
+                    }
                 }
             }
 
@@ -66,14 +99,18 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
                 that._add(item, {row: that._row, column: 1});
                 if (itemOptions != null && itemOptions[i] != null) {
                     if ( itemOptions[i].note ){
-                        that._add(new qx.ui.basic.Label(itemOptions[i].note).set({
+                        that._gotNote = true;
+                        var note = new qx.ui.basic.Label(
+                            itemOptions[i].note).set({
                             rich: true,
-                            marginLeft: 20,
-                            marginRight: 20
-                        }),{
+                            paddingLeft: 20,
+                            paddingRight: 20
+                        });
+                        that._add(note,{
                             row: that._row,
                             column: 2
                         });
+                        that._connectVisibility(item, note);
                     }
                 }
                 if ( itemOptions[i].copyOnTap
@@ -99,6 +136,7 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
                 }
                 that._row++;
                 that._connectVisibility(item, label);
+                
                 // store the names for translation
                 if (qx.core.Environment.get("qx.dynlocale")) {
                     that._names.push({

@@ -13,13 +13,20 @@ sub dateline {
 sub journalist {
     my ($self) = @_;
     my $txt = $self->content_text;
-    my ($x) = $txt =~ m{\A(\S+)／\S+報導\n};
-    unless ($x) {
-        ($x) = $txt =~ m{\A\S*(文／\S+\s+圖／\S+)\n};
+
+    my @regexps = (
+        qr{\A(\S+)／\S+報導\n},
+        qr{\A\S*(報導／\S+\s+攝影／\S+)\n},
+        qr{\A\S*(文／\S+\s+圖／\S+)\n},
+        qr{ \A\S*(\S{3})\n }x,
+    );
+
+    my ($x);
+    for my $re (@regexps) {
+        ($x) = $txt =~ $re;
+        last if $x;
     }
-    unless ($x) {
-        ($x) = $txt =~ m/ \A\S*(\S{3})\n /x;
-    }
+
     return $x;
 }
 

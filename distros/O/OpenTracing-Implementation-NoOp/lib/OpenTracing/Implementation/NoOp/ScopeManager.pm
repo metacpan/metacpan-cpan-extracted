@@ -15,7 +15,7 @@ None of the methods will do anything useful.
 
 =cut
 
-our $VERSION = 'v0.71.1';
+our $VERSION = 'v0.72.0';
 
 
 
@@ -31,9 +31,7 @@ sub activate_span {
     OpenTracing::Implementation::NoOp::Scope->new( )
 }
 
-sub get_active_scope {
-    OpenTracing::Implementation::NoOp::Scope->new( )
-}
+sub get_active_scope { return }
 
 
 

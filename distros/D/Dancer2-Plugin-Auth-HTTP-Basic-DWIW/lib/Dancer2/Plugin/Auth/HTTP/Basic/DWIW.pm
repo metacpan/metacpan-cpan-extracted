@@ -3,7 +3,7 @@ use warnings;
 
 package Dancer2::Plugin::Auth::HTTP::Basic::DWIW;
 # ABSTRACT: HTTP Basic authentication plugin for Dancer2 that does what I want.
-$Dancer2::Plugin::Auth::HTTP::Basic::DWIW::VERSION = '0.07';
+$Dancer2::Plugin::Auth::HTTP::Basic::DWIW::VERSION = '0.08';
 use MIME::Base64;
 use Dancer2::Plugin;
 
@@ -47,7 +47,7 @@ register http_basic_auth => sub {
         };
 
         unless ($@) {
-            return $sub->($dsl, @other_stuff);
+            return $sub->($dsl->app, @other_stuff);
         }
         else {
             my $error_code = ${$@};
@@ -107,7 +107,7 @@ Dancer2::Plugin::Auth::HTTP::Basic::DWIW - HTTP Basic authentication plugin for 
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -180,7 +180,7 @@ Mara Sophie Grosch (LittleFox) <littlefox@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Mara Sophie Grosch (LittleFox).
+This software is copyright (c) 2020 by Mara Sophie Grosch (LittleFox).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

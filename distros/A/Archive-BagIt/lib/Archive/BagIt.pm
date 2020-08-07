@@ -1,5 +1,6 @@
 package Archive::BagIt;
-our $VERSION = '0.063'; # VERSION
+our $VERSION = '0.065'; # VERSION
+# ABSTRACT: An interface to make and verify bags according to the BagIt standard
 use strict;
 use warnings;
 use utf8;
@@ -372,6 +373,7 @@ sub tagmanifest_files {
 }
 
 
+
 1; # End of Archive::BagIt
 
 __END__
@@ -382,40 +384,11 @@ __END__
 
 =head1 NAME
 
-Archive::BagIt
+Archive::BagIt - An interface to make and verify bags according to the BagIt standard
 
 =head1 VERSION
 
-version 0.063
-
-=head1 SYNOPSIS
-
-This modules will hopefully help with the basic commands needed to create
-and verify a bag. My intention is not to be strict and enforce all of the
-specification. The reference implementation is the java version
-and I will endeavour to maintain compatibility with it.
-
-    use Archive::BagIt;
-
-    #read in an existing bag:
-    my $bag_dir = "/path/to/bag";
-    my $bag = Archive::BagIt->new($bag_dir);
-
-
-    #construct bag in an existing directory
-    my $bag2 = Archive::BagIt->make_bag($bag_dir);
-
-    # Validate a BagIt archive against its manifest
-    my $bag3 = Archive::BagIt->new($bag_dir);
-    my $is_valid = $bag3->verify_bag();
-
-=head1 NAME
-
-Archive::BagIt
-
-=head1 VERSION
-
-version 0.063
+version 0.065
 
 =head1 WARNING
 
@@ -426,10 +399,6 @@ support BagIt 1.0 according to RFC 8493 ([https://tools.ietf.org/html/rfc8493](h
 
 Also: Check out Archive::BagIt::Fast if you are willing to add some extra dependencies to get
 better speed by mmap-ing files.
-
-=head1 NAME
-
-Archive::BagIt - An interface to make and verify bags according to the BagIt standard
 
 =head1 SUBROUTINES
 
@@ -476,40 +445,12 @@ Return an array with the list of manifest files that exist in the bag
 
 Return an array with the list of tagmanifest files
 
-=head1 AUTHORS
-
-=over
-
-=item Robert Schmidt, E<lt>rjeschmi at gmail.comE<gt>
-
-=item William Wueppelmann, E<lt>william at c7a.caE<gt>
-
-=item Andreas Romeyke, E<lt>pause at andreas minus romeyke.deE<gt>
-
-=back
-
-=head1 CONTRIBUTORS
-
-=over
-
-=item Serhiy Bolkun
-
-=item Russell McOrmond
-
-=back
-
 =head1 SOURCE
 
 The original development version is on github at L<http://github.com/rjeschmi/Archive-BagIt>
 and may be cloned from there.
 
 The actual development version is available at L<https://art1pirat.spdns.org/art1/Archive-BagIt>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-archive-bagit at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Archive-BagIt>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -539,14 +480,26 @@ L<http://search.cpan.org/dist/Archive-BagIt/>
 
 =back
 
-=head1 COPYRIGHT
+=head1 SYNOPSIS
 
-Copyright (c) 2012, the above named author(s).
+This modules will hopefully help with the basic commands needed to create
+and verify a bag. My intention is not to be strict and enforce all of the
+specification. The reference implementation is the java version
+and I will endeavour to maintain compatibility with it.
 
-=head1 LICENSE
+    use Archive::BagIt;
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+    #read in an existing bag:
+    my $bag_dir = "/path/to/bag";
+    my $bag = Archive::BagIt->new($bag_dir);
+
+
+    #construct bag in an existing directory
+    my $bag2 = Archive::BagIt->make_bag($bag_dir);
+
+    # Validate a BagIt archive against its manifest
+    my $bag3 = Archive::BagIt->new($bag_dir);
+    my $is_valid = $bag3->verify_bag();
 
 =head1 AVAILABILITY
 
@@ -558,17 +511,6 @@ site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
 You can make new bug reports, and view existing ones, through the
 web interface at L<http://rt.cpan.org>.
-
-=head1 AUTHOR
-
-Rob Schmidt <rjeschmi@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

@@ -1,5 +1,21 @@
 Revision history for MariaDB-NonBlocking
 
+0.23    2020-08-06
+        * Do not statically link to the gss/kerberos auth plugin;
+          breaks compilation on OSX, and it actually makes sense
+          to dynamically link to it.
+
+0.22    2020-08-06
+        * When compiling mariadb-connector-c, statically link against
+          the authentication plugins.
+
+0.21    2020-08-06
+        * Bundled mariadb-connector-c source to make compiling this
+          less dependent on the environment.
+        * Fixed an infinite loop on connection errors.
+        * Connection pool now has two different connection
+          strategies.
+
 0.20    2019-03-20
         * SSL was broken older (pre-2018) versions of mariadb-connector-c.
           Again x3.

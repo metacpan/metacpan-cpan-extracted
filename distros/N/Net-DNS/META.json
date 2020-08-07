@@ -38,9 +38,13 @@
             "Net::LibIDN2" : "1"
          },
          "requires" : {
+            "Carp" : "1.1",
             "Digest::HMAC" : "1.03",
             "Digest::MD5" : "2.13",
             "Digest::SHA" : "5.23",
+            "Encode" : "2.26",
+            "Exporter" : "5.56",
+            "File::Find" : "1.05",
             "File::Spec" : "0.86",
             "IO::File" : "1.08",
             "IO::Select" : "1.14",
@@ -49,13 +53,14 @@
             "MIME::Base64" : "2.13",
             "PerlIO" : "1.05",
             "Scalar::Util" : "1.25",
-            "Test::More" : "0.52",
+            "Test::Builder" : "0",
+            "Test::More" : "0",
             "Time::Local" : "1.19",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.25",
+   "version" : "1.26",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

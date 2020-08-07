@@ -286,6 +286,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'data_point_type' => {
+    	datatype => 'string',
+    	base_name => 'DataPointType',
+    	description => '',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -305,7 +312,8 @@ __PACKAGE__->swagger_types( {
     'marker' => 'SeriesMarker',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
-    'line_format' => 'LineFormat'
+    'line_format' => 'LineFormat',
+    'data_point_type' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -325,7 +333,8 @@ __PACKAGE__->attribute_map( {
     'marker' => 'Marker',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
-    'line_format' => 'LineFormat'
+    'line_format' => 'LineFormat',
+    'data_point_type' => 'DataPointType'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

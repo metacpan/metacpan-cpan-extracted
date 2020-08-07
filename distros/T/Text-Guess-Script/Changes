@@ -1,5 +1,8 @@
 Revision history for Text::Guess::Script
 
+0.04  2020-08-06 19:27:47 CEST
+        - improve Kwalitee by provides
+
 0.03  2016-03-14 07:43:56 CET
         - required perl version 5.8.5
 

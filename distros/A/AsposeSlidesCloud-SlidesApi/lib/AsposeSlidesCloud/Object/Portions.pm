@@ -37,9 +37,9 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::Portion;
 use AsposeSlidesCloud::Object::ResourceBase;
 use AsposeSlidesCloud::Object::ResourceUri;
-use AsposeSlidesCloud::Object::ResourceUriElement;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -180,9 +180,9 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'portion_links' => {
-    	datatype => 'ARRAY[ResourceUriElement]',
-    	base_name => 'PortionLinks',
+    'items' => {
+    	datatype => 'ARRAY[Portion]',
+    	base_name => 'Items',
     	description => 'List of portion links.',
     	format => '',
     	read_only => '',
@@ -192,13 +192,13 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'self_uri' => 'ResourceUri',
     'alternate_links' => 'ARRAY[ResourceUri]',
-    'portion_links' => 'ARRAY[ResourceUriElement]'
+    'items' => 'ARRAY[Portion]'
 } );
 
 __PACKAGE__->attribute_map( {
     'self_uri' => 'SelfUri',
     'alternate_links' => 'AlternateLinks',
-    'portion_links' => 'PortionLinks'
+    'items' => 'Items'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

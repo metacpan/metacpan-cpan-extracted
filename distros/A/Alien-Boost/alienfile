@@ -35,3 +35,12 @@ share {
   
 };
 
+sys {
+
+  gather sub {
+    my($build) =@_;
+    $build->runtime_prop->{libs}          = "-lboost_program_options";
+    $build->runtime_prop->{libs_static}   = "-lboost_program_options";
+  };
+};
+

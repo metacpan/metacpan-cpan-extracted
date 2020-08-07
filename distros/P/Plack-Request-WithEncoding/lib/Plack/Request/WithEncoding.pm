@@ -7,7 +7,7 @@ use Encode ();
 use Carp ();
 use Hash::MultiValue;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 use constant KEY_BASE_NAME    => 'plack.request.withencoding';
 use constant DEFAULT_ENCODING => 'utf-8';
@@ -81,9 +81,30 @@ sub _decode_parameters {
     my @flatten = $stuff->flatten;
     my @decoded;
     while ( my ($k, $v) = splice @flatten, 0, 2 ) {
-        push @decoded, $encoding->decode($k), $encoding->decode($v);
+        push @decoded, $self->_decode($encoding, $k), $self->_decode($encoding, $v);
     }
     return Hash::MultiValue->new(@decoded);
+}
+
+sub _decode {
+    my ($self, $encoding, $data) = @_;
+
+    if (ref $data eq "ARRAY") {
+        my @result;
+        for my $d (@$data) {
+            push @result, $self->_decode($encoding, $d);
+        }
+        return \@result;
+    }
+    elsif (ref $data eq "HASH") {
+        my %result;
+        while (my ($k, $v) = each %$data) {
+            $result{$self->_decode($encoding, $k)} = $self->_decode($encoding, $v);
+        }
+        return \%result;
+    }
+
+    return defined $data ? $encoding->decode($data) : undef;
 }
 
 1;

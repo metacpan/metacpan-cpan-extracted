@@ -4,25 +4,25 @@
       "Andrew Ruthven, Catalyst Cloud Ltd <puck@catalystcloud.nz>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Module::Install version 1.19, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "RT-Extension-ElapsedBusinessTime",
    "no_index" : {
       "directory" : [
-         "t",
+         "html",
          "inc"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.59"
+            "ExtUtils::MakeMaker" : "6.36"
          }
       },
       "configure" : {
@@ -31,13 +31,23 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Dates::Holiday" : "0"
+         },
          "requires" : {
             "Set::Object" : "0",
-            "Try::Tiny" : "0",
-            "perl" : "5.008003"
+            "Try::Tiny" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03"
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "0.05",
+   "x_module_install_rtx_version" : "0.40",
+   "x_requires_rt" : "4.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

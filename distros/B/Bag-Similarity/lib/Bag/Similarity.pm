@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use 5.008_005;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 use Carp 'croak';
 
@@ -165,7 +165,7 @@ Croaks if called directly. This method should be implemented in a child module.
 
 =head1 AUTHOR
 
-Helmut Wollmersdorfer E<lt>helmut.wollmersdorfer@gmail.comE<gt>
+Helmut Wollmersdorfer E<lt>helmut@wollmersdorfer.atE<gt>
 
 =begin html
 
@@ -175,7 +175,7 @@ Helmut Wollmersdorfer E<lt>helmut.wollmersdorfer@gmail.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2014-2015 Helmut Wollmersdorfer
+Copyright 2014-2020 Helmut Wollmersdorfer
 
 =head1 LICENSE
 

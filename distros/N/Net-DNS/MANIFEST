@@ -53,6 +53,7 @@ lib/Net/DNS/RR/EUI64.pm
 lib/Net/DNS/RR/GPOS.pm
 lib/Net/DNS/RR/HINFO.pm
 lib/Net/DNS/RR/HIP.pm
+lib/Net/DNS/RR/HTTPS.pm
 lib/Net/DNS/RR/IPSECKEY.pm
 lib/Net/DNS/RR/ISDN.pm
 lib/Net/DNS/RR/KEY.pm
@@ -86,6 +87,7 @@ lib/Net/DNS/RR/SOA.pm
 lib/Net/DNS/RR/SPF.pm
 lib/Net/DNS/RR/SRV.pm
 lib/Net/DNS/RR/SSHFP.pm
+lib/Net/DNS/RR/SVCB.pm
 lib/Net/DNS/RR/TKEY.pm
 lib/Net/DNS/RR/TLSA.pm
 lib/Net/DNS/RR/TSIG.pm

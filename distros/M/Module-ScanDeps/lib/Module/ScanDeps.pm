@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use vars qw( $VERSION @EXPORT @EXPORT_OK @ISA $CurrentPackage @IncludeLibs $ScanFileRE );
 
-$VERSION   = '1.27';
+$VERSION   = '1.28';
 @EXPORT    = qw( scan_deps scan_deps_runtime );
 @EXPORT_OK = qw( scan_line scan_chunk add_deps scan_deps_runtime path_to_inc_name );
 
@@ -1024,10 +1024,10 @@ sub scan_chunk {
 }
 
 sub _find_encoding {
+    my ($enc) = @_;
     return unless $] >= 5.008 and eval { require Encode; %Encode::ExtModule };
 
-    my $mod = $Encode::ExtModule{ Encode::find_encoding($_[0])->name }
-      or return;
+    my $mod = eval { $Encode::ExtModule{ Encode::find_encoding($enc)->name } } or return;
     $mod =~ s{::}{/}g;
     return "$mod.pm";
 }
@@ -1362,7 +1362,7 @@ BEGIN { my $_0 = $ENV{MSD_ORIGINAL_FILE}; *0 = \$_0; }
     require Config;
     my $dlext = $Config::Config{dlext};
 
-    while (my ($k, $v) = each %_INC)
+    foreach my $k (keys %_INC)
     {
         # NOTES:
         # (1) An unsuccessful "require" may store an undefined value into %INC.
@@ -1373,6 +1373,8 @@ BEGIN { my $_0 = $ENV{MSD_ORIGINAL_FILE}; *0 = \$_0; }
         #     "Class/MOP/Class/Immutable/Moose/Meta/Class.pm" => "(set by Moose)"
         #     On some architectures (e.g. Windows) Cwd::abs_path() will throw
         #     an exception for such a pathname.
+
+        my $v = $_INC{$k};
         if (defined $v && !ref $v && -e $v)
         {
             $_INC{$k} = Cwd::abs_path($v);
@@ -1473,8 +1475,8 @@ sub _info2rv {
 
     require File::Spec;
 
-    while (my ($key, $path) = each %{ $info->{'%INC'} }) {
-        $path =~ s:\\:/:g;
+    foreach my $key (keys %{ $info->{'%INC'} }) {
+        (my $path = $info->{'%INC'}{$key}) =~ s:\\:/:g;
         $key =~ s:\\:/:g;
         $key =~ s/$strip_inc_prefix// if File::Spec->file_name_is_absolute($key);
 

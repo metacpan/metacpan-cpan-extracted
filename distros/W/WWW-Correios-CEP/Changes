@@ -1,5 +1,9 @@
 Revision history for Perl extension WWW::Correios::CEP
 
+
+1.031
+    - Bump version on .pm
+
 1.03
     - Fix pod example
     - Add Test::RequiresInternet
