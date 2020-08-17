@@ -314,7 +314,6 @@ typedef struct genericStack {
     if ((_genericStackExtend_wantedLength > GENERICSTACK_DEFAULT_LENGTH) &&	\
 	(_genericStackExtend_wantedLength > _genericStackExtend_currentLength)) { \
       int _genericStackExtend_wantedHeapLength = _genericStackExtend_wantedLength - GENERICSTACK_DEFAULT_LENGTH; \
-      int _genericStackExtend_currentHeapLength = _genericStackExtend_currentLength - GENERICSTACK_DEFAULT_LENGTH; \
       int _genericStackExtend_newHeapLength;				\
       genericStackItem_t *_genericStackExtend_heapItems = stackName->heapItems; \
       short _genericStackExtend_memsetb;				\

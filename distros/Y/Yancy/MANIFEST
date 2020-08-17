@@ -40,6 +40,7 @@ eg/docker/Dockerfile
 eg/docker/Dockerfile.mysql
 eg/docker/Dockerfile.pg
 eg/docker/Dockerfile.sqlite
+eg/etl-viewer/myapp.pl
 eg/limited-editor/.gitignore
 eg/limited-editor/README.md
 eg/limited-editor/cpanfile
@@ -218,6 +219,7 @@ t/plugin/auth/token.t
 t/plugin/editor.t
 t/plugin/file.t
 t/plugin/form/bootstrap4.t
+t/register.t
 t/schema/dbicdump.pl
 t/schema/mysql.sql
 t/schema/openapi.pl

@@ -4,7 +4,7 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::GenericExtractor';
 
-use Importer 'NewsExtractor::TextUtil' => qw(parse_dateline_ymdhms);
+use Importer 'NewsExtractor::TextUtil' => qw(reformat_dateline);
 
 sub dateline {
     my ($self) = @_;
@@ -12,7 +12,7 @@ sub dateline {
     $el = $el->next() or return;
     my ($x) = $el->all_text =~ m/發佈日期:\s+(\S+?)\s+觀看次數/sm;
     $x or return;
-    return parse_dateline_ymdhms($x, '+08:00');
+    return reformat_dateline($x, '+08:00');
 }
 
 1;

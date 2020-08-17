@@ -1,0 +1,1 @@
+print notDefined;  // expect: [Line 1] Error at 'notDefined': Undefined variable 'notDefined'.

@@ -1,5 +1,14 @@
 Revision history for Wasm},
 
+0.19      2020-08-17 02:55:34 -0600
+  - The deprecated store method on Wasm::Wasmtime::Module has been removed (gh#93)
+  - The deprecated ability to create a Wasm::Wasmtime::Instance instance without a
+    Wasm::Wasmtime::Store object has been removed (gh#93)
+  - You may now pass a Wasm::Wasmtime::Engine instance into the
+    Wasm::Wasmtime::Module constructor (gh#93)
+  - Passing a Wasm::Wasmtime::Store instance into the Wasm::Wasmtime::Module
+    constructor is now deprecated, pass a Wasm::Wasmtime::Engine instead (gh#93)
+
 0.18      2020-07-21 17:26:23 -0600
   - Added get_one_by_name method to Wasm::Wasmtime::Linker class (gh#73, gh#87)
   - Added Wasm::Trap class (gh#86, gh#89)

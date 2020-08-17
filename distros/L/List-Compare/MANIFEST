@@ -61,7 +61,6 @@ t/49_lc_subset.t
 t/50_lcf_subset.t
 t/90_oo_errors.t
 t/91_func_errors.t
-t/IO/CaptureOutput.pm
 t/Test/ListCompareSpecial.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

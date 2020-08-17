@@ -9,7 +9,7 @@ my $store = Wasm::Wasmtime::Store->new;
 
 # Here we can compile a `Module` which is then ready for instantiation
 # afterwards
-my $module = Wasm::Wasmtime::Module->new( $store, file => path(__FILE__)->parent->child('hello.wat') );
+my $module = Wasm::Wasmtime::Module->new( $store->engine, file => path(__FILE__)->parent->child('hello.wat') );
 
 # Our module needs one import, so we'll create that here.
 sub say_hello

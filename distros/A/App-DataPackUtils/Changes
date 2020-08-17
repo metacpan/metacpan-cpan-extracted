@@ -1,28 +1,34 @@
-0.05    2017-03-21 (PERLANCAR)
+0.06    2020-04-30  Released-By: PERLANCAR; Urgency: low
+
+	- Tweak Rinci metadata: replace deprecated
+	  x.schema.{,element_}entity with more specific schema.
+
+
+0.05    2017-03-21  Released-By: PERLANCAR
 
         - [build] Rebuild to remove unneeded dependency on Perl::osnames.
 
         - Tweak examples.
 
 
-0.04    2016-02-06 (PERLANCAR)
+0.04    2016-02-06  Released-By: PERLANCAR
 
 	- Replace dump-datapack-script with datapack-info, so the interface is
           consistent with fatpack-info.
 
 
-0.03    2016-02-06 (PERLANCAR)
+0.03    2016-02-06  Released-By: PERLANCAR
 
 	- Add script: dump-datapack-script.
 
 
-0.02    2015-06-18 (PERLANCAR)
+0.02    2015-06-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention App::DataSectionSeekableUtils.
 
 
-0.01    2015-06-17 (PERLANCAR)
+0.01    2015-06-17  Released-By: PERLANCAR
 
         - First release.

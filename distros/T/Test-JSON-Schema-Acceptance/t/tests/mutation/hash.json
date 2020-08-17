@@ -1,0 +1,13 @@
+[
+    {
+        "description": "mutation of hashes",
+        "schema": { "foo": { "string": "1", "int": 1 } },
+        "tests": [
+            {
+                "description": "object of integers",
+                "data": { "foo": { "string": "1", "int": 1 } },
+                "valid": true
+            }
+        ]
+    }
+]

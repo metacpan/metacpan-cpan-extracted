@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,6 +27,11 @@ no_index:
     - examples
     - author
     - builder
+optional_features:
+  https:
+    description: 'SSL support'
+    recommends:
+      LWP::Protocol::https: '0'
 provides:
   LWP::Protocol::http::hosts:
     file: lib/LWP/Protocol/http/hosts.pm
@@ -34,7 +39,7 @@ provides:
     file: lib/LWP/Protocol/https/hosts.pm
   LWP::UserAgent::DNS::Hosts:
     file: lib/LWP/UserAgent/DNS/Hosts.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   LWP::Protocol: '0'
   LWP::Protocol::http: '0'
@@ -45,9 +50,12 @@ resources:
   bugtracker: https://github.com/masaki/p5-LWP-UserAgent-DNS-Hosts/issues
   homepage: https://github.com/masaki/p5-LWP-UserAgent-DNS-Hosts
   repository: git://github.com/masaki/p5-LWP-UserAgent-DNS-Hosts.git
-version: '0.13'
+version: '0.14'
 x_authority: cpan:MASAKI
 x_contributors:
+  - 'Anirvan Chatterjee <anirvan@users.noreply.github.com>'
+  - 'Masaki Nakagawa <masaki.nakagawa@gmail.com>'
+  - 'Petr Písař <ppisar@redhat.com>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
-  - 'ikasam_a <masaki.nakagawa@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

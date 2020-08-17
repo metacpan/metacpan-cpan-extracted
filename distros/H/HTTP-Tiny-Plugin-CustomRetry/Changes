@@ -1,3 +1,15 @@
-0.001    2019-04-13 (PERLANCAR)
+0.003   2020-08-15  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Add (DEPRECATED) prefix in Abstract.
+
+
+0.002   2020-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Deprecate in favor of HTTP::Tiny::Plugin::Retry.
+
+
+0.001    2019-04-13  Released-By: PERLANCAR
 
          - First release.

@@ -68,7 +68,7 @@ unless ($@) {
                 test_warnings => 1
             );
         },
-        match(qr#Test warning output:\n<.*check_env.t>\nAGGREGATE_TEST_WARN\n#),
+        match(qr#Test warning output:\n<.*check_env.t>\nAGGREGATE_TEST_WARN\nAGGREGATE_TEST_WARNx2\n#),
         "Got expected warning"
     );
     check_output($run, "including failure on repeat == -1");
@@ -82,7 +82,8 @@ sub check_output {
     my $r    = shift || $root || '';
     my %warn = ();
     my $pass = $ENV{AGGREGATE_TEST_WARN} ? 0 : 100;
-    $warn{warnings} = 'AGGREGATE_TEST_WARN' if $ENV{AGGREGATE_TEST_WARN};
+    $warn{warnings} = "AGGREGATE_TEST_WARN\nAGGREGATE_TEST_WARNx2\n"
+        if $ENV{AGGREGATE_TEST_WARN};
 
     is(
         $run,

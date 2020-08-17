@@ -3,7 +3,7 @@ package Crypt::Perl;
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 =encoding utf-8
 
@@ -66,7 +66,11 @@ production logic is ported from elsewhere. There has been no formal security
 review. L<I found at least one security flaw|https://github.com/kjur/jsrsasign/issues/221>
 in one of the source libraries; there may be more.
 
-Of course, L<OpenSSL has not been trouble-free, either|https://www.openssl.org/news/vulnerabilities.html>!
+For this reason it is best to restrict use of this library to internal systems.
+Public-facing interfaces should prefer more “visible” cryptographic libraries
+like the ones mentioned elsewhere here.
+
+Of course, L<OpenSSL has not been trouble-free, either!|https://www.openssl.org/news/vulnerabilities.html>
 
 Caveat emptor.
 
@@ -109,6 +113,9 @@ what we know!
 The Ed25519 logic is ported from L<forge.js|https://github.com/digitalbazaar/forge/blob/master/lib/ed25519.js>.
 
 Other parts are ported from L<LibTomCrypt|http://www.libtom.net>.
+
+Special thanks to Antonio de la Piedra for having submitted
+multiple high-quality, in-depth bug reports.
 
 =head1 LICENSE
 

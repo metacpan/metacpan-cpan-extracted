@@ -11,9 +11,9 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Alien::Base
-  Alien::Base::ModuleBuild
   Alien::Build
-  File::ShareDir
+  Alien::Build::MM
+  ExtUtils::MakeMaker
   Test2::V0
   Test::Alien
   Test::Alien::Diag
@@ -65,7 +65,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (sort @modules)
 {

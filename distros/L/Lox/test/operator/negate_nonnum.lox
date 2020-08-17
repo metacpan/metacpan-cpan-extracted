@@ -1,0 +1,1 @@
+-"s"; // expect: [Line 1] Error at '-': Operand must be a number.

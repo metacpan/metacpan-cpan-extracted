@@ -1,5 +1,5 @@
 package App::Sky;
-$App::Sky::VERSION = '0.4.1';
+$App::Sky::VERSION = '0.4.2';
 use strict;
 use warnings;
 
@@ -14,11 +14,12 @@ __END__
 
 =head1 NAME
 
-App::Sky
+App::Sky - wrapper to rsync/etc. to upload files to a remote server and give
+download links.
 
 =head1 VERSION
 
-version 0.4.1
+version 0.4.2
 
 =head1 SYNOPSIS
 
@@ -53,16 +54,7 @@ Then you can use commands such as:
 
 And get in return a URL to where it was uploaded.
 
-=head1 NAME
-
-App::Sky - wrapper to rsync/etc. to upload files to a remote server and give
-download links.
-
-=head1 VERSION
-
-version 0.4.1
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -83,35 +75,11 @@ L<https://metacpan.org/release/App-Sky>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-Sky>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Sky>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Sky>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-Sky>
 
 =item *
 

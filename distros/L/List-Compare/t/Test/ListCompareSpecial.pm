@@ -1,6 +1,7 @@
 package Test::ListCompareSpecial;
 # Contains test subroutines for distribution with List::Compare
 require Exporter;
+use strict;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
     ok_capture_error ok_seen_a  ok_seen_h ok_any_h _capture
@@ -319,14 +320,14 @@ sub make_array_seen_hash {
     return \@arrseen;
 }
 
-@a0 = qw(abel abel baker camera delta edward fargo golfer);
-@a1 = qw(baker camera delta delta edward fargo golfer hilton);
-@a2 = qw(fargo golfer hilton icon icon jerky);
-@a3 = qw(fargo golfer hilton icon icon);
-@a4 = qw(fargo fargo golfer hilton icon);
-@a8 = qw(kappa lambda mu);
+our @a0 = qw(abel abel baker camera delta edward fargo golfer);
+our @a1 = qw(baker camera delta delta edward fargo golfer hilton);
+our @a2 = qw(fargo golfer hilton icon icon jerky);
+our @a3 = qw(fargo golfer hilton icon icon);
+our @a4 = qw(fargo fargo golfer hilton icon);
+our @a8 = qw(kappa lambda mu);
 
-%h0 = (
+our %h0 = (
 	abel     => 2,
 	baker    => 1,
 	camera   => 1,
@@ -336,7 +337,7 @@ sub make_array_seen_hash {
 	golfer   => 1,
 );
 
-%h1 = (
+our %h1 = (
 	baker    => 1,
 	camera   => 1,
 	delta    => 2,
@@ -346,7 +347,7 @@ sub make_array_seen_hash {
 	hilton   => 1,
 );
 
-%h2 = (
+our %h2 = (
 	fargo    => 1,
 	golfer   => 1,
 	hilton   => 1,
@@ -354,38 +355,38 @@ sub make_array_seen_hash {
 	jerky    => 1,	
 );
 
-%h3 = (
+our %h3 = (
 	fargo    => 1,
 	golfer   => 1,
 	hilton   => 1,
 	icon     => 2,
 );
 
-%h4 = (
+our %h4 = (
 	fargo    => 2,
 	golfer   => 1,
 	hilton   => 1,
 	icon     => 1,
 );
 
-%h5 = (
+our %h5 = (
 	golfer   => 1,
 	lambda   => 0,
 );
 
-%h6 = (
+our %h6 = (
 	golfer   => 1,
 	mu       => 00,
 );
 
-%h7 = (
+our %h7 = (
 	golfer   => 1,
 	nu       => 'nothing',
 );
 
-%h8 = map {$_, 1} qw(kappa lambda mu);
+our %h8 = map {$_, 1} qw(kappa lambda mu);
 
-$test_member_which_dual = [
+our $test_member_which_dual = [
   [ qw( 0   ) ],
   [ qw( 0 1 ) ],
   [ qw( 0 1 ) ],
@@ -399,7 +400,7 @@ $test_member_which_dual = [
   [ qw(     ) ],
 ];
 
-$test_member_which_mult = [
+our $test_member_which_mult = [
   [ qw( 0         ) ],
   [ qw( 0 1       ) ],
   [ qw( 0 1       ) ],
@@ -413,7 +414,7 @@ $test_member_which_mult = [
   [ qw(           ) ],
 ];
 
-$test_members_which =  {
+our $test_members_which =  {
     abel      => [ 1, [ qw< 0   > ] ],
     baker     => [ 2, [ qw< 0 1 > ] ],
     camera    => [ 2, [ qw< 0 1 > ] ],
@@ -427,10 +428,10 @@ $test_members_which =  {
     zebra     => [ 0, [ qw<     > ] ],
 };
 
-$test_member_any_dual = [ 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0 ];
-$test_member_any_mult = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ];
+our $test_member_any_dual = [ 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0 ];
+our $test_member_any_mult = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 ];
 
-$test_members_any = {
+our $test_members_any = {
     abel    => 1,
     baker   => 1,
     camera  => 1,
@@ -444,7 +445,7 @@ $test_members_any = {
     zebra   => 0,
 };
 
-$test_members_any_mult = {
+our $test_members_any_mult = {
     abel    => 1,
     baker   => 1,
     camera  => 1,
@@ -458,7 +459,7 @@ $test_members_any_mult = {
     zebra   => 0,
 };
 
-$test_members_which_mult = {
+our $test_members_which_mult = {
     abel        => [ qw< 0         > ],
     baker       => [ qw< 0 1       > ],
     camera      => [ qw< 0 1       > ],

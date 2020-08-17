@@ -1,5 +1,37 @@
 Revision history for Perl module Text::Table::Tiny
 
+1.00 2020-08-07 NEILB
+    - Added align parameter, which can be used to set a common alignment
+      for all columns, or per-column alignment.
+    - Added style parameter, which takes values 'classic' (existing look),
+      'boxrule' (for ANSI box rule characters), or 'norule', which can
+      be think of tabular formatting.
+    - Added compact parameter, which suppresses the space padding on either
+      side of all columns.
+    - Added indent parameter, which can take either a string, or an integer
+      count of the number of spaces to prefix every row with.
+    - Completely rewritten both code and documentation.
+    - Back compat with original interface is still maintained (I think!),
+      but it's not mentioned in the documentation.
+    - Now handles TTY escape sequences, so you can color or otherwise highlight
+      the text, and the column widths will still come out right.
+
+0.05_03 2020-08-06 NEILB
+    - Added a bunch of examples to the documentation
+    - Mentioned in the doc that you need to binmode with boxrule style
+    - Set Github issues as the bugtracker
+    - Added boxrule examples to the doc, so want to do another dev
+      release to whether they come out ok on MetaCPAN, etc.
+
+0.05_02 2020-08-04 NEILB
+    - The align parameter was still expecting previous idea of an 'lrc' string.
+    - Can now specify a single alignment which applies to all columns.
+    - Handle ANSI escape codes, so they don't mess up alignment
+
+0.05_01 2020-08-03 NEILB
+    - Complete rewrite to add new formatting options.
+    - See http://neilb.org/2019/08/06/text-table-tiny-changes.html
+
 0.05 2019-01-25 NEILB
     - generate_table() was die'ing if no rows were passed, which resulted
       in a suboptimal error message. Now croaks; added fatal test for this.

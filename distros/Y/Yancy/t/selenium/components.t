@@ -40,32 +40,32 @@ my %data = (
         {
             name => 'Philip J. Fry',
             email => 'fry@example.com',
-            department => 'Delivery Boy',
+            department => 'support',
         },
         {
             name => 'Turanga Leela',
             email => 'eye@example.com',
-            department => 'Pilot',
+            department => 'support',
         },
         {
             name => 'Bender B. Rodriguez',
             email => 'benderisgreat@example.com',
-            department => 'Cook',
+            department => 'unknown',
         },
         {
             name => 'Professor Hubert Farnsworth',
             email => 'ceo@example.com',
-            department => 'Mad Scientist',
+            department => 'admin',
         },
         {
             name => 'John A. Zoidberg',
             email => 'crab@example.com',
-            department => 'Doctor',
+            department => 'unknown',
         },
         {
             name => 'Hermes Conrad',
             email => 'hermes.conrad@example.com',
-            department => 'Filing',
+            department => 'admin',
         },
     ],
 );
@@ -92,6 +92,12 @@ sub init_app {
         schema => 'employees',
         template => 'test_table',
     );
+    $app->routes->get( '/table/feed' )->to(
+        controller => 'Yancy',
+        action => 'feed',
+        schema => 'employees',
+        interval => 1,
+    )->name( 'table_feed' );
 
     return $app;
 }
@@ -102,7 +108,7 @@ my $t = Test::Mojo->with_roles("+Selenium")->new( $app )
     ->setup_or_skip_all;
 
 subtest table => sub {
-    $t->navigate_ok( '/table' )
+    $t->navigate_ok( '/table?limit=3' )
         ->wait_for( '#test-table tbody tr' )
         ->live_text_like(
             '#test-table thead th:nth-child(1)',
@@ -135,7 +141,7 @@ subtest table => sub {
         )
         ->live_text_like(
             '#test-table tbody tr:nth-child(1) td:nth-child(3)',
-            qr{Delivery Boy},
+            qr{support},
             'first employee department is correct',
         )
         ->live_element_exists(
@@ -194,8 +200,8 @@ subtest table => sub {
         )
         ->wait_for( '#test-table tbody tr' )
         ->live_text_like(
-            '#test-table tbody tr:nth-child(1) td:nth-child(1)',
-            qr{Bender},
+            '#test-table tbody tr:nth-child(1) td:nth-child(3)',
+            qr{admin},
             'employees are sorted by Department, ascending',
         )
         ->click_ok(
@@ -204,8 +210,8 @@ subtest table => sub {
         )
         ->wait_for( '#test-table tbody tr' )
         ->live_text_like(
-            '#test-table tbody tr:nth-child(1) td:nth-child(1)',
-            qr{Leela},
+            '#test-table tbody tr:nth-child(1) td:nth-child(3)',
+            qr{unknown},
             'employees are sorted by Department, descending',
         )
         ->click_ok(
@@ -214,8 +220,8 @@ subtest table => sub {
         )
         ->wait_for( '#test-table tbody tr' )
         ->live_text_like(
-            '#test-table tbody tr:nth-child(1) td:nth-child(1)',
-            qr{John A. Zoidberg},
+            '#test-table tbody tr:nth-child(1) td:nth-child(3)',
+            qr{support},
             'next page of employees, sorted by Department, descending',
         )
         ->live_element_exists(
@@ -271,6 +277,56 @@ subtest table => sub {
         #->wait_for( 900 )
 };
 
+subtest 'table (websocket)' => sub {
+    my $feed_url = $t->ua->server->nb_url->scheme( 'ws' )->path( '/table/feed' );
+    $t->navigate_ok( '/table?src=' . $feed_url )
+        ->wait_for( '#test-table tbody tr' )
+        ->live_text_like(
+            '#test-table tbody tr:nth-child(1) td:nth-child(1)',
+            qr{Fry},
+            'first employee name is correct',
+        )
+        #->wait_for( 900 )
+        ;
+
+    my $i = scalar @{ $data{employees} } + 1;
+    my $id = $t->app->yancy->backend->create( employees => {
+        name => 'Scruffy',
+        email => 'scruffy@example.com',
+        department => 'unknown',
+    } );
+    $t->wait_for( '#test-table tbody tr:nth-child(7)' )
+      ->live_text_like(
+            "#test-table tbody tr:nth-child($i) td:nth-child(1)",
+            qr{Scruffy},
+            'new employee is added',
+      )
+      ;
+
+    $t->app->yancy->backend->set( employees => $id, { department => 'support' } );
+    $t->wait_until( sub {
+        my $el = $_->find_element_by_css( "#test-table tbody tr:nth-child($i) td:nth-child(3)" )
+            || return;
+        return $el->get_text !~ /unknown/;
+    } )
+      ->live_text_like(
+            "#test-table tbody tr:nth-child($i) td:nth-child(3)",
+            qr{support},
+            'employee department is set',
+      )
+      ;
+
+    $t->app->yancy->backend->delete( employees => $id );
+    $t->wait_until( sub {
+            my @els = $_->find_elements( "#test-table tbody tr:nth-child($i)", 'css' );
+            return !@els;
+        } )
+      ->live_element_exists_not(
+          "#test-table tbody tr:nth-child($i)",
+          'employee is deleted',
+      )
+      ;
+};
 
 
 done_testing;
@@ -297,11 +353,13 @@ __DATA__
 
 <main id="app">
     <yancy-table id="test-table"
-        limit="3"
+        <% if ( my $limit = param 'limit' ) {%>limit="<%= $limit %>"<% } %>
         :columns="[ 'name', { title: 'E-mail', template: '<a href=&quot;mailto:{email}&quot;>{email}</a>' }, { title: 'Job', field: 'department' } ]"
+        <% if ( my $src = param 'src' ) {%>src="<%= $src %>"<% } %>
     ></yancy-table>
 </main>
 
 <script>
     var vm = new Vue({ el: '#app' });
 </script>
+

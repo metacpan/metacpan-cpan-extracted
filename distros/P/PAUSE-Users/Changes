@@ -1,5 +1,8 @@
 Revision history for Perl module PAUSE::Users
 
+0.09 2020-08-03 NEILB
+    - Switched cpan-whois to use Text::Table::Tiny for columnar output.
+
 0.08 2020-08-03 NEILB
     - Added script cpan-whois, which dumps information about one or more
       users to stdout.

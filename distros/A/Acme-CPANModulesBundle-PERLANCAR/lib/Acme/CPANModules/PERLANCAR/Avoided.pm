@@ -1,7 +1,9 @@
 package Acme::CPANModules::PERLANCAR::Avoided;
 
-our $DATE = '2020-07-21'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-09'; # DATE
+our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 our $LIST = {
     summary => "Modules I'm currently avoiding",
@@ -143,6 +145,18 @@ Has non-core dependencies to <pm:Sub::Exporter> and <pm:Sub::Install>.
 _
             alternate_modules => ['String::Elide::Tiny'],
         },
+
+        {
+            module => 'Module::AutoLoad',
+            description => <<'_',
+
+Contains remote exploit. Ref:
+<https://news.perlfoundation.org/post/malicious-code-found-in-cpan-package> (Jul
+28, 2020).
+
+_
+            alternate_modules => ['lib::xi', 'CPAN::AutoINC', 'Module::AutoINC'],
+        },
     ],
 };
 
@@ -161,7 +175,7 @@ Acme::CPANModules::PERLANCAR::Avoided - Modules I'm currently avoiding
 
 =head1 VERSION
 
-This document describes version 0.006 of Acme::CPANModules::PERLANCAR::Avoided (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2020-07-21.
+This document describes version 0.007 of Acme::CPANModules::PERLANCAR::Avoided (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2020-08-09.
 
 =head1 DESCRIPTION
 
@@ -275,6 +289,15 @@ Has non-core dependencies to L<Sub::Exporter> and L<Sub::Install>.
 
 
 Alternate modules: L<String::Elide::Tiny>
+
+=item * L<Module::AutoLoad>
+
+Contains remote exploit. Ref:
+L<https://news.perlfoundation.org/post/malicious-code-found-in-cpan-package> (Jul
+28, 2020).
+
+
+Alternate modules: L<lib::xi>, L<CPAN::AutoINC>, L<Module::AutoINC>
 
 =back
 

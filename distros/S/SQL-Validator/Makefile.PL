@@ -21,7 +21,9 @@ my %WriteMakefileArgs = (
     "Data::Object::ClassHas" => "2.01",
     "Data::Object::Exception" => "2.02",
     "JSON::Validator" => "4.01",
-    "routines" => "0.02"
+    "routines" => "0.02",
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Data::Object::Class" => "2.02",
@@ -30,9 +32,11 @@ my %WriteMakefileArgs = (
     "IO::Socket::SSL" => "2.009",
     "JSON::Validator" => "4.01",
     "Test::Auto" => "0.12",
-    "routines" => "0.02"
+    "routines" => "0.02",
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +50,9 @@ my %FallbackPrereqs = (
   "IO::Socket::SSL" => "2.009",
   "JSON::Validator" => "4.01",
   "Test::Auto" => "0.12",
-  "routines" => "0.02"
+  "routines" => "0.02",
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

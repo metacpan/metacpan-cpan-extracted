@@ -1,6 +1,11 @@
 Changelog for SQL-Validator
 
-0.01 2020-07-25T05:13:51
+0.02 2020-08-10T04:31:51
+ - Add release updates
+ - Cleanup and relaunch (#3)
+
+0.01 2020-07-25T05:13:52
+ - Built release version 0.01
  - Add release updates
  - Initial implementation
  - Initial commit

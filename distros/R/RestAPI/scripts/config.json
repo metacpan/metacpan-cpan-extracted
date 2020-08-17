@@ -1,0 +1,11 @@
+{
+  "basicAuth"   : 1,
+  "realm"       : "",
+  "username"    : "payload",
+  "password"    : "GUsoRkiNARdbAcYC",
+  "scheme"      : "http",
+  "server"      : "payload.cerebro.bskyb.com:9352",
+  "http_verb"   : "POST",
+  "encoding"    : "application/json",
+  "payload"     : "{\"foo\":\"bar\"}"
+}

@@ -44,6 +44,7 @@ lib/NewsExtractor/SiteSpecificExtractor/news_tvbs_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/newtalk_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/talk_ltn_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/turnnewsapp_com.pm
+lib/NewsExtractor/SiteSpecificExtractor/www_aljazeera_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_allnews_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_bcc_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_digitimes_com_tw.pm
@@ -56,6 +57,7 @@ lib/NewsExtractor/SiteSpecificExtractor/www_ksnews_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_mdnkids_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_nownews_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_ntdtv_com.pm
+lib/NewsExtractor/SiteSpecificExtractor/www_penghutimes_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_peopo_org.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_rti_org_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_rvn_com_tw.pm
@@ -78,4 +80,5 @@ t/type-NewspaperName.t
 t/type-Text.t
 t/util-normalize-whitespace.t
 t/util-parse-dateline-ymdhms.t
+t/util-reformat-dateline.t
 t/util-u.t

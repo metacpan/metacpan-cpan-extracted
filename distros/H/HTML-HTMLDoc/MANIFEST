@@ -3,8 +3,6 @@ Changes
 LICENSE
 MANIFEST
 META.json
-META.yml
-Makefile.PL
 README.md
 TODO
 cpanfile
@@ -13,3 +11,4 @@ lib/HTML/HTMLDoc/PDF.pm
 minil.toml
 t/00_compile.t
 testdata/testimage.gif
+META.yml

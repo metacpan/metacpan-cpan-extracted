@@ -7,5 +7,7 @@
 MANIFEST.bak
 MYMETA.yml
 MYMETA.json
+META\..*
 .tidyall.d/
-
+\.swp$
+^cover_db

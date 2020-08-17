@@ -2,7 +2,7 @@
 use inc::Module::Install;
 include 'Module::AutoInstall';
 
-version(3.055);
+version(3.056);
 all_from('lib/WWW/Search/Ebay.pm');
 
 requires(perl => 5.005);

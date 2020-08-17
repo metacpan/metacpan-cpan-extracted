@@ -20,9 +20,9 @@ DSL-style
         return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello World' ] ];
     };
 
-    printf "You can connect to your server at %s.\n", $httpd->host_port;
+    printf "Listening on address:port %s\n", $httpd->host_port;
     # or
-    printf "You can connect to your server at 127.0.0.1:%d.\n", $httpd->port;
+    printf "Listening on address %s port %s\n", $httpd->host, $httpd->port;
 
     # access to fake HTTP server
     use LWP::UserAgent;
@@ -70,7 +70,7 @@ Test::Fake::HTTPD is a fake HTTP server module for testing.
 
     Starts **HTTPS** server and returns the guard instance.
 
-    If you use this method, you MUST install [HTTP::Daemon::SSL](https://metacpan.org/pod/HTTP::Daemon::SSL).
+    If you use this method, you MUST install [HTTP::Daemon::SSL](https://metacpan.org/pod/HTTP%3A%3ADaemon%3A%3ASSL).
 
         extra_daemon_args
             SSL_key_file  => "certs/server-key.pem",
@@ -109,9 +109,13 @@ Test::Fake::HTTPD is a fake HTTP server module for testing.
 
         queue size for listen (default: 5)
 
+    - `host`
+
+        local address to listen on (default: 127.0.0.1)
+
     - `port`
 
-        local bind port number (default: auto detection)
+        TCP port to listen on (default: auto detection)
 
         my $httpd = Test::Fake::HTTPD->new(
             timeout => 10,
@@ -131,21 +135,27 @@ Test::Fake::HTTPD is a fake HTTP server module for testing.
 
         my $scheme = $httpd->scheme;
 
+- `host`
+
+    Returns the address the server is listening on.
+
 - `port`
 
-    Returns a port number of running.
+    Returns the TCP port the server is listening on.
 
         my $port = $httpd->port;
 
 - `host_port`
 
-    Returns a URI host\_port of running. ("127.0.0.1:{port}")
+    Returns the host:port from `endpoint` (e.g., "127.0.0.1:1234", "\[::1\]:1234").
 
         my $host_port = $httpd->host_port;
 
 - `endpoint`
 
-    Returns an endpoint URI of running. ("http://127.0.0.1:{port}" URI object)
+    Returns a URI object to the running server (e.g., "http://127.0.0.1:1234",
+    "https://\[::1\]:1234"). If `host` returns `undef`, `''`, `'0.0.0.0'`,
+    or `'::'`, the host portion of the URI is set to `localhost`.
 
         use LWP::UserAgent;
 
@@ -170,4 +180,4 @@ it under the same terms as Perl itself.
 
 # SEE ALSO
 
-[Test::TCP](https://metacpan.org/pod/Test::TCP), [HTTP::Daemon](https://metacpan.org/pod/HTTP::Daemon), [HTTP::Daemon::SSL](https://metacpan.org/pod/HTTP::Daemon::SSL), [HTTP::Message::PSGI](https://metacpan.org/pod/HTTP::Message::PSGI)
+[Test::TCP](https://metacpan.org/pod/Test%3A%3ATCP), [HTTP::Daemon](https://metacpan.org/pod/HTTP%3A%3ADaemon), [HTTP::Daemon::SSL](https://metacpan.org/pod/HTTP%3A%3ADaemon%3A%3ASSL), [HTTP::Message::PSGI](https://metacpan.org/pod/HTTP%3A%3AMessage%3A%3APSGI)

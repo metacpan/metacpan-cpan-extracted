@@ -1,7 +1,9 @@
 package App::GenPericmdCompleterScript;
 
-our $DATE = '2020-04-08'; # DATE
-our $VERSION = '0.121'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-30'; # DATE
+our $DIST = 'App-GenPericmdCompleterScript'; # DIST
+our $VERSION = '0.122'; # VERSION
 
 use 5.010001;
 use strict;
@@ -107,11 +109,10 @@ _
         },
         output_file => {
             summary => 'Path to output file',
-            schema => ['str*'],
+            schema => ['filename*'],
             default => '-',
             cmdline_aliases => { o=>{} },
             tags => ['category:output'],
-            'x.schema.entity' => 'filename',
         },
         overwrite => {
             schema => [bool => default => 0],
@@ -465,7 +466,7 @@ App::GenPericmdCompleterScript - Generate Perinci::CmdLine completer script
 
 =head1 VERSION
 
-This document describes version 0.121 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2020-04-08.
+This document describes version 0.122 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2020-04-30.
 
 =head1 FUNCTIONS
 
@@ -506,7 +507,7 @@ What to put on shebang line.
 
 Load extra modules.
 
-=item * B<output_file> => I<str> (default: "-")
+=item * B<output_file> => I<filename> (default: "-")
 
 Path to output file.
 

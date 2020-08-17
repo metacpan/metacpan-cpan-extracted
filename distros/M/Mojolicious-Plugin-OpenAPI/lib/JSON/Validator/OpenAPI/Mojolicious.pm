@@ -2,6 +2,8 @@ package JSON::Validator::OpenAPI::Mojolicious;
 use Mojo::Base 'JSON::Validator';
 
 use Carp 'confess';
+use Mojo::JSON qw(false true);
+use Mojo::Parameters;
 use Mojo::Util;
 use Scalar::Util 'looks_like_number';
 use Time::Local ();
@@ -9,8 +11,7 @@ use Time::Local ();
 use constant DEBUG   => $ENV{JSON_VALIDATOR_DEBUG} || 0;
 use constant IV_SIZE => eval 'require Config;$Config::Config{ivsize}';
 
-our %COLLECTION_RE = (pipes => qr{\|}, csv => qr{,}, ssv => qr{\s}, tsv => qr{\t});
-our %VERSIONS      = (
+our %VERSIONS = (
   v2 => 'http://swagger.io/v2/schema.json',
   v3 => 'https://spec.openapis.org/oas/3.0/schema/2019-04-02'
 );
@@ -89,6 +90,11 @@ sub validate_request {
       $value = $self->_coerce_by_collection_format($value, $p);
     }
 
+    if ($type eq 'object') {
+      $value  = $self->_coerce_object_by_style($c, $value, $p);
+      $exists = defined $value ? 1 : 0;
+    }
+
     ($exists, $value) = (1, $p->{schema}{default})
       if !$exists
       and $p->{schema}
@@ -115,7 +121,7 @@ sub validate_response {
   return JSON::Validator::E('/' => "No responses rules defined for status $status.")
     unless my $res_schema = $schema->{responses}{$status} || $schema->{responses}{default};
 
-  if ($self->version eq '3') {
+  if ($self->version eq '3' and $res_schema->{content}) {
     my $accept = $self->_negotiate_accept_header($c, $res_schema);
     return JSON::Validator::E('/' => "No responses rules defined for $accept.")
       unless $res_schema = $res_schema->{content}{$accept};
@@ -164,10 +170,10 @@ sub _coerce_input {
   }
   elsif ($type eq 'boolean') {
     if (!$_[2] or $_[2] =~ /^(?:false)$/) {
-      $_[2] = Mojo::JSON->false;
+      $_[2] = false;
     }
     elsif ($_[2] =~ /^(?:1|true)$/) {
-      $_[2] = Mojo::JSON->true;
+      $_[2] = true;
     }
   }
 }
@@ -213,8 +219,8 @@ sub _coerce_by_collection_format {
     return $data;
   }
 
-  my $re = $collection_format eq 'custom' ? $custom_re : $COLLECTION_RE{$collection_format} || ',';
-
+  my $re
+    = $collection_format eq 'custom' ? $custom_re : $self->_re_for_collection($collection_format);
   my $single = ref $data eq 'ARRAY' ? 0 : ($data = [$data]);
 
   for my $i (0 .. @$data - 1) {
@@ -223,6 +229,93 @@ sub _coerce_by_collection_format {
   }
 
   return $single ? $data->[0] : $data;
+}
+
+sub _coerce_object_default_explode {
+  my ($self, $in) = @_;
+  return $in eq 'cookie' || $in eq 'query' ? true : false;
+}
+
+sub _coerce_object_default_style {
+  my ($self, $in) = @_;
+  return 'form'   if $in eq 'cookie' or $in eq 'query';
+  return 'simple' if $in eq 'header' or $in eq 'path';
+  return undef;
+}
+
+sub _coerce_object_by_style {
+  my ($self, $c, $data, $p) = @_;
+
+  my $style   = $p->{style}   // $self->_coerce_object_default_style($p->{in});
+  my $explode = $p->{explode} // $self->_coerce_object_default_explode($p->{in});
+  return $data unless $style;
+
+  # Special serializations
+  if ($style eq 'form' && $explode) {
+    return $c->req->url->query->to_hash;
+  }
+  elsif ($style eq 'deepObject') {
+    return $self->_coerce_deep_object($c, $p);
+  }
+
+  return unless defined $data;
+
+  if ($explode) {
+    return $data unless my $re = $self->_re_for_object_explode_true($style);
+    return if $style eq 'matrix' && $data !~ s/^;//;
+    return if $style eq 'label'  && $data !~ s/^\.//;
+    my $params = Mojo::Parameters->new;
+    $params->append(Mojo::Parameters->new($_)) for split /$re/, $data;
+    return $params->to_hash;
+  }
+  else {
+    return $data unless my $re = $self->_re_for_object_explode_false($style);
+    return if $style eq 'matrix' && $data !~ s/^;\Q$p->{name}\E=//;
+    return if $style eq 'label'  && $data !~ s/^\.//;
+    return Mojo::Parameters->new->pairs([split /$re/, $data])->to_hash;
+  }
+}
+
+sub _coerce_deep_object {
+  my ($self, $c, $p) = @_;
+
+  my (@pairs, $result) = @{$c->req->params->pairs};
+  while (my ($k, $v) = splice(@pairs, 0, 2)) {
+
+    # Retrieve the list of the deep keys
+    my @deep_keys;
+    push @deep_keys, $2 while ($k =~ s/^(\Q$p->{name}\E)\[([^]]*)\]/$1/);
+    next unless @deep_keys;
+
+    # Build the deep object
+    my $last_ref = \$result;
+    foreach my $key (@deep_keys) {
+      if ($key eq '' || $key =~ /^\d+$/) {
+        $$last_ref //= [];
+        $key = ($#{$$last_ref} + 1) if $key eq '';
+        $$last_ref->[$key] //= undef;
+        $last_ref = \$$last_ref->[$key];
+      }
+      else {
+        $$last_ref //= {};
+        $$last_ref->{$key} //= undef;
+        $last_ref = \$$last_ref->{$key};
+      }
+    }
+
+    # Set the value into the last reference
+    if (!defined $$last_ref) {
+      $$last_ref = $v;
+    }
+    elsif (ref $$last_ref eq 'ARRAY') {
+      push @{$$last_ref}, $v;
+    }
+    else {
+      $$last_ref = [$$last_ref, $v];
+    }
+  }
+
+  return $result;
 }
 
 sub _confess_invalid_in {
@@ -300,7 +393,7 @@ sub _match_number {
   my ($name, $val, $format) = @_;
   return 'Does not look like an integer' if $name =~ m!^int! and $val !~ /^-?\d+(\.\d+)?$/;
   return 'Does not look like a number.' unless looks_like_number $val;
-  return undef unless $format;
+  return undef                          unless $format;
   return undef if $val eq unpack $format, pack $format, $val;
   return "Does not match $name format.";
 }
@@ -334,6 +427,32 @@ sub _negotiate_accept_header {
 
   # Could not find any valid content type
   return $accept;
+}
+
+sub _re_for_collection {
+  my ($self, $style) = @_;
+  return qr{,}  if $style eq 'csv';
+  return qr{\s} if $style eq 'ssv';
+  return qr{\t} if $style eq 'tsv';
+  return qr{\|} if $style eq 'pipes';
+  return ',';
+}
+
+sub _re_for_object_explode_false {
+  my ($self, $style) = @_;
+  return qr{,}  if $style eq 'form' or $style eq 'matrix' or $style eq 'simple';
+  return qr{\.} if $style eq 'label';
+  return qr{\|} if $style eq 'pipeDelimited';
+  return qr{\s} if $style eq 'spaceDelimited';
+  return undef;
+}
+
+sub _re_for_object_explode_true {
+  my ($self, $style) = @_;
+  return qr{\.} if $style eq 'label';
+  return qr{;}  if $style eq 'matrix';
+  return qr{,}  if $style eq 'simple';
+  return undef;
 }
 
 sub _resolve_ref {
@@ -478,7 +597,8 @@ sub _validate_type_object {
   if ($self->version eq '3') {
     for my $key (keys %properties) {
       next unless $properties{$key}{nullable};
-      $properties{$key} = {%{$properties{$key}}};
+      my $tied = tied %{$properties{$key}};
+      $properties{$key} = $tied ? {%{$tied->schema}} : {%{$properties{$key}}};
       $properties{$key}{type} = ['null', _to_list($properties{$key}{type})];
     }
   }

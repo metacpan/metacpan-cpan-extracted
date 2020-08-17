@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.401';
+our $VERSION = '0.411';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -82,7 +82,7 @@ my $set = {
 
     right_margin                => $^O eq 'MSWin32' ? 1 : 2,
     list_sort_order             => 'Desc',
-    error_get_download_infos    => [],
+    failed_fetching_data        => 'FAILED fetching required data!',
 };
 
 my $opt = get_defaults();
@@ -136,12 +136,13 @@ if ( ! @ids ) {
 my $data = {};
 
 if ( @ids ) {
-    my $chosen_videos = from_arguments_to_choices( $set, $opt, $data, @ids );
-    print_video_infos( $set, $opt, $data, $chosen_videos );
-    download( $set, $opt, $data, $chosen_videos, 0 );
+    my $chosen = from_arguments_to_choices( $set, $opt, $data, @ids );
+    print_video_infos( $set, $opt, $data, $chosen );
+    download( $set, $opt, $data, $chosen );
     add_uploaders_to_history( $set, $opt, $data ) if $opt->{max_size_history};
 }
 elsif ( ! @ids && ( %{$set->{history}} || %{$set->{sticky}} ) ) {
+    my $clear_screen = 1;
     my $old_idx = 0;
 
     MENU: while ( 1 ) {
@@ -150,7 +151,8 @@ elsif ( ! @ids && ( %{$set->{history}} || %{$set->{sticky}} ) ) {
         # Choose
         my $idx = choose(
             $menu,
-            { prompt => 'Choose:', layout => 3, undef => '  QUIT', clear_screen => 1, index => 1, default => $old_idx }
+            { prompt => 'Choose:', layout => 3, undef => '  QUIT',
+              clear_screen => $clear_screen, index => 1, default => $old_idx }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             exit;
@@ -165,9 +167,11 @@ elsif ( ! @ids && ( %{$set->{history}} || %{$set->{sticky}} ) ) {
         if ( $menu->[$idx] eq $uploader ) {
             my @chosen_uploaders = choose_videos_from_saved_uploaders( $set, $opt );
             next if ! @chosen_uploaders;
-            my $chosen_videos = from_arguments_to_choices( $set, $opt, $data, @chosen_uploaders );
-            print_video_infos( $set, $opt, $data, $chosen_videos );
-            download( $set, $opt, $data, $chosen_videos, 1 );
+            my $chosen = from_arguments_to_choices( $set, $opt, $data, @chosen_uploaders );
+            print_video_infos( $set, $opt, $data, $chosen );
+            my $total = download( $set, $opt, $data, $chosen );
+            $clear_screen = $total ? 0 : 1;
+            say "";
         }
         elsif ( $menu->[$idx] eq $sticky ) {
            edit_sticky_file( $set, $opt );
@@ -178,14 +182,6 @@ elsif ( ! @ids && ( %{$set->{history}} || %{$set->{sticky}} ) ) {
 
 if ( ! @ids ) {
     say "No arguments" and exit;
-}
-
-
-if ( @{$set->{error_get_download_infos}} ) {
-    say "\nError fetching download infos:";
-    for my $video_id ( @{$set->{error_get_download_infos}} ) {
-        say '  ' . $video_id;
-    }
 }
 
 
@@ -202,7 +198,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.401
+Version 0.411
 
 =cut
 
@@ -355,7 +351,11 @@ Sort the history
 
 For the first [value of I<additional information>] uploader video list entries is downloaded and shown additional
 information. The uploader video list is ordered is adopted from the output returned by C<--dump-single-json> from
-C<youtube-dl>.
+C<youtube-dl>. See also the following option I<Max processes>.
+
+=head3 Max processes
+
+If I<Additional information> is enabled I<Max processes> sets how many data-downloads are done in parallel.
 
 =head3 Sort order
 

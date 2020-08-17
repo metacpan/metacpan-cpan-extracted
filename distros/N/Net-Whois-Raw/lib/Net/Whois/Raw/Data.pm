@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99029';
+$Net::Whois::Raw::Data::VERSION = '2.99030';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -529,7 +529,7 @@ our %servers = qw(
     IE               whois.domainregistry.ie
     IL               whois.isoc.org.il
     IM               whois.nic.im
-    IN               whois.inregistry.net
+    IN               whois.registry.in
     IO               whois.nic.io
     IR               whois.nic.ir
     IS               whois.isnic.is
@@ -2233,7 +2233,6 @@ our %notfound = (
     'whois.domainregistry.ie' => 'Not Registered',
     'whois.isoc.org.il'       => 'No data was found',
     'whois.nic.im'            => 'The domain \S+ was not found',
-    'whois.inregistry.net'    => 'NOT FOUND',
     'whois.nic.io'            => '^NOT FOUND',
     'whois.isnic.is'          => 'No entries found',
     'whois.nic.it'            => 'Status:\s+AVAILABLE',
@@ -3694,7 +3693,7 @@ our %strip = (
     'whois.isoc.org.il' => [
         '^%',
     ],
-    'whois.inregistry.net' => [ # .IN
+    'whois.registry.in' => [ # .IN
         '^Access to \.IN WHOIS',
         '^determining the contents',
         '^\.IN registry database',
@@ -4529,7 +4528,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99029
+version 2.99030
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ package BSON::ObjectId;
 # ABSTRACT: Legacy BSON type wrapper for Object IDs (DEPRECATED)
 
 use version;
-our $VERSION = 'v1.12.1';
+our $VERSION = 'v1.12.2';
 
 use Carp;
 
@@ -59,7 +59,7 @@ BSON::ObjectId - Legacy BSON type wrapper for Object IDs (DEPRECATED)
 
 =head1 VERSION
 
-version v1.12.1
+version v1.12.2
 
 =head1 DESCRIPTION
 
@@ -86,7 +86,7 @@ Stefan G. <minimalist@lavabit.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2020 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

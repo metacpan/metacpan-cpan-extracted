@@ -1,5 +1,9 @@
 Revision history for Perl extension POSIX-strftime-Compiler
 
+0.44 2020-08-10T07:10:35Z
+
+   - Check tzdata before test
+
 0.43 2020-07-26T07:23:50Z
 
    - Test issues with space in perl path name #9

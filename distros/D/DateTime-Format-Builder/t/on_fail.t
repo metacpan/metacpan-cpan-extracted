@@ -49,7 +49,7 @@ use DateTime::Format::Builder;
     is( $good_parse->day   => 9,    "Day good" );
 
     my $bad_parse = eval { $o->parse_datetime("Fnerk") };
-    ok( !$@, "Bad parse gives no error" );
+    ok( !$@,                      "Bad parse gives no error" );
     ok( ( !defined($bad_parse) ), "Bad parse correctly gives undef" );
 }
 

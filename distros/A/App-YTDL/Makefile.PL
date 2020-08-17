@@ -57,6 +57,7 @@ WriteMakefile(
         'IPC::System::Simple'       => 0,
         'JSON'                      => 0,
         'List::MoreUtils'           => 0,
+        'Parallel::ForkManager'     => '0.7.6',
         'Pod::Usage'                => 0,
         'Term::ANSIScreen'          => 0,
         'Term::Choose'              => '1.711',

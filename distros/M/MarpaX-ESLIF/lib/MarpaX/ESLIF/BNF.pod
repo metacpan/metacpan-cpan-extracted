@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 3.0.32
+version 4.0.1
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ There are three types of explicit terminals.
 
 =item * Strings
 
-They can be single (C<'>), double-quoted (C<">), or LEFT DOUBLE QUOTATION MARK (C<“>) then RIGHT DOUBLE QUOTATION MARK (C<”>) enclosed. The content is any valid unicode character, and the C<\> character can be used to escape the expected right-side quote character (i.e. C<'>, C<">, or C<”>) or C<\> itself. The C<:i> modifier can be used to force case-insensitive match:
+They can be single (C<'>), double-quoted (C<">), or LEFT DOUBLE QUOTATION MARK (C<“>) then RIGHT DOUBLE QUOTATION MARK (C<”>) enclosed. The content is any valid unicode character, and the C<\> character can be used to escape the expected right-side quote character (i.e. C<'>, C<">, or C<”>) or C<\> itself. The C<i> modifier can be used to force case-insensitive match:
 
   'string'
   'string':i
@@ -69,7 +69,8 @@ They can be single (C<'>), double-quoted (C<">), or LEFT DOUBLE QUOTATION MARK (
   "string\"s\\"
   “str'"\”ing”:i
 
-Please note this is really a I<quoted string>, B<not> a string terminal. I.e. everything inside the quoted is taken as-is, with no interpretation.
+and the modifier C<c> to force unicode character mode. Internally a string is nothing else but a regular expression, so the exact implementation of the C<i> and C<c> modifiers correspond to the PCRE2 flags listed below in the I<Regular expression> section. A string created with no modifier is faster when doing comparison (internally MarpaX::ESLIF will switch to a brutal memory comparison instead of calling the PCRE2 engine).
+Please note this is really a I<quoted string>, B<not> a string terminal. I.e. everything inside the quote is taken as-is, with no interpretation.
 
 =item * Character classes
 
@@ -399,12 +400,19 @@ The grammar's C<symbol-action> can be overwritten by setting such entry in C<:le
   :lexeme   ::= symbolname2 symbol-action => Custom_action
   :terminal ::= 'ThisTerminal' symbol-action => ::lua->lua_custom_action
 
-A lexeme or a terminal can have a C<if-action> setting, that applies I<only> when the lexeme or a terminal is discovered via the automatic scan. The C<if-action> must refers to a callback in user-land's recognizer interface or in embedded lua interpreter, and must return a boolean:
+A lexeme or a terminal can have a C<if-action> setting, that applies I<only> when the lexeme or a terminal is discovered via the automatic scan. The C<if-action> must refer to a callback in user-land's recognizer interface or in embedded lua interpreter, and must return a boolean:
 
   :lexeme   ::= symbolname1 if-action => Custom_action1
   :lexeme   ::= symbolname2 if-action => lua::->Custom_action2
 
 Please note that the C<if-action> will always be called with an argument of type ARRAY (i.e. up to the implementation to convert that to a multibyte string, if any).
+
+A lexeme or a terminal can have a C<regex-action> setting, that always applies, regardless if the parsing is done using the automatic scan or not. C<regex-action> is a transversal grammar setting; and can be set only via C<::default> meta rule:
+
+  ::default ::= regex-action => Custom_regexaction1
+  ::default   ~ regex-action => lua::->Custom_regexaction2
+
+If a regular expression has a callout in the form C<(?CX)> (where C<X> is a number> or C<(?C"string")>, the C<regex-action> is called with a I<block> argument. This <block> argument is a hash in perl, a table in lua, and an I<ESLIFRegexCallout> instance in java.
 
 =item Non-lexeme events
 
@@ -760,40 +768,42 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | <event action>
                                    | <default encoding>
                                    | <fallback encoding>
-  <action>                       ::= 'action' '=>' <action name>
-                                   | 'action' '=>' <string literal>
-  <left association>             ::= 'assoc' '=>' 'left'
-  <right association>            ::= 'assoc' '=>' 'right'
-  <group association>            ::= 'assoc' '=>' 'group'
-  <separator specification>      ::= 'separator' '=>' <single symbol>
-  <proper specification>         ::= 'proper' '=>' <false>
-                                   | 'proper' '=>' <true>
-  <hide separator specification> ::= 'hide-separator' '=>' <false>
-                                   | 'hide-separator' '=>' <true>
-  <rank specification>           ::= 'rank' '=>' <signed integer>
-  <null ranking specification>   ::= 'null-ranking' '=>' <null ranking constant>
-                                   | 'null' 'rank' '=>' <null ranking constant>
+                                   | <regex action>
+  <action>                       ::= 'action' /=>|\x{21D2}/u <action name>
+                                   | 'action' /=>|\x{21D2}/u <string literal>
+  <left association>             ::= 'assoc' /=>|\x{21D2}/u 'left'
+  <right association>            ::= 'assoc' /=>|\x{21D2}/u 'right'
+  <group association>            ::= 'assoc' /=>|\x{21D2}/u 'group'
+  <separator specification>      ::= 'separator' /=>|\x{21D2}/u <single symbol>
+  <proper specification>         ::= 'proper' /=>|\x{21D2}/u <false>
+                                   | 'proper' /=>|\x{21D2}/u <true>
+  <hide separator specification> ::= 'hide-separator' /=>|\x{21D2}/u <false>
+                                   | 'hide-separator' /=>|\x{21D2}/u <true>
+  <rank specification>           ::= 'rank' /=>|\x{21D2}/u <signed integer>
+  <null ranking specification>   ::= 'null-ranking' /=>|\x{21D2}/u <null ranking constant>
+                                   | 'null' 'rank' /=>|\x{21D2}/u <null ranking constant>
   <null ranking constant>        ::= 'low'
                                    | 'high'
-  <priority specification>       ::= 'priority' '=>' <signed integer>
-  <pause specification>          ::= 'pause' '=>' 'before'
-                                   | 'pause' '=>' 'after'
-  <event specification>          ::= 'event' '=>' <event initialization>
+  <priority specification>       ::= 'priority' /=>|\x{21D2}/u <signed integer>
+  <pause specification>          ::= 'pause' /=>|\x{21D2}/u 'before'
+                                   | 'pause' /=>|\x{21D2}/u 'after'
+  <event specification>          ::= 'event' /=>|\x{21D2}/u <event initialization>
   <event initialization>         ::= <event name> <event initializer>
   <event initializer>            ::= '=' <on or off>
   <on or off>                    ::= 'on'
                                    | 'off'
   <event initializer>            ::=
-  <latm specification>           ::= 'latm' '=>' <false>
-                                   | 'latm' '=>' <true>
-  <naming>                       ::= 'name' '=>' <alternative name>
+  <latm specification>           ::= 'latm' /=>|\x{21D2}/u <false>
+                                   | 'latm' /=>|\x{21D2}/u <true>
+  <naming>                       ::= 'name' /=>|\x{21D2}/u <alternative name>
   <null adverb>                  ::= ','
-  <symbol action>                ::= 'symbol-action' '=>' <symbol action name>
-                                   | 'symbol-action' '=>' <string literal>
-  <if action>                    ::= 'if-action' '=>' <if action name>
-  <event action>                 ::= 'event-action' '=>' <event action name>
-  <default encoding>             ::= 'default-encoding' '=>' <default encoding name>
-  <fallback encoding>            ::= 'fallback-encoding' '=>' <fallback encoding name>
+  <symbol action>                ::= 'symbol-action' /=>|\x{21D2}/u <symbol action name>
+                                   | 'symbol-action' /=>|\x{21D2}/u <string literal>
+  <if action>                    ::= 'if-action' /=>|\x{21D2}/u <if action name>
+  <regex action>                 ::= 'regex-action' /=>|\x{21D2}/u <regex action name>
+  <event action>                 ::= 'event-action' /=>|\x{21D2}/u <event action name>
+  <default encoding>             ::= 'default-encoding' /=>|\x{21D2}/u <default encoding name>
+  <fallback encoding>            ::= 'fallback-encoding' /=>|\x{21D2}/u <fallback encoding name>
   <alternative name>             ::= <standard name>
                                    | <quoted name>
   <event name>                   ::= <restricted ascii graph name>
@@ -803,8 +813,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | ':discard[switch]'
   <lhs>                          ::= <symbol name>
   <rhs>                          ::= <rhs alternative>+
-  <rhs alternative>              ::= <single symbol>
-                                   | <symbol name> '@' <grammar reference>
+  <rhs alternative>              ::= <rhs primary>
                                    | '(-' <priorities> '-)'
                                    | '(' <priorities> ')'
                                    | '(-' <rhs primary> '-' <rhs primary> <adverb list> '-)'
@@ -847,6 +856,8 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | '::true'
                                    | '::false'
   <if action name>               ::= <restricted ascii graph name>
+                                   | <lua action name>
+  <regex action name>            ::= <restricted ascii graph name>
                                    | <lua action name>
   <event action name>            ::= <restricted ascii graph name>
                                    | <lua action name>

@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2019 Joelle Maslak
+# Copyright (C) 2015-2020 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -41,7 +41,6 @@ alarm 120;    # It would be nice if we did this a better way, since
         is( $result, 'TeStInG', "Child process 1 ran properly" );
         last;
     }
-    $wu->start( sub { print $wfh "TeStInG\n"; } );
 
     close $rfh;
 }

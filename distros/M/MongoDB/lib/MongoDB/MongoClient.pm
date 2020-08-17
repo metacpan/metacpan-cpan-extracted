@@ -19,7 +19,7 @@ package MongoDB::MongoClient;
 # ABSTRACT: A connection to a MongoDB server or multi-server deployment
 
 use version;
-our $VERSION = 'v2.2.1';
+our $VERSION = 'v2.2.2';
 
 use Moo;
 use MongoDB::ClientSession;
@@ -2001,7 +2001,7 @@ MongoDB::MongoClient - A connection to a MongoDB server or multi-server deployme
 
 =head1 VERSION
 
-version v2.2.1
+version v2.2.2
 
 =head1 SYNOPSIS
 
@@ -3371,7 +3371,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MongoDB, Inc.
+This software is Copyright (c) 2020 by MongoDB, Inc.
 
 This is free software, licensed under:
 

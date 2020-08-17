@@ -1,6 +1,13 @@
 Revision history for App-YTDL
 
 
+0.411   2020-08-16
+        - Resolution 'manually': start the downloads only after the user has selected all formats.
+
+0.410   2020-08-13
+        - Use "Parallel::ForkManager" to enable the download of the additional information in parallel.
+        - Update UI.
+
 0.401   2020-07-22
         - Code refactoring.
         - New format for sticky and history files.

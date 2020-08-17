@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Log::Dispatchouli;
 # ABSTRACT: a simple wrapper around Log::Dispatch
-$Log::Dispatchouli::VERSION = '2.019';
+$Log::Dispatchouli::VERSION = '2.021';
 use Carp ();
 use File::Spec ();
 use Log::Dispatch;
@@ -149,8 +149,6 @@ sub new {
 
   my $pid_prefix = exists $arg->{log_pid} ? $arg->{log_pid} : 1;
 
-  my $self = bless {} => $class;
-
   my $log = Log::Dispatch->new(
     $pid_prefix
     ? (
@@ -160,6 +158,8 @@ sub new {
       )
     : ()
   );
+
+  my $self = bless { dispatcher => $log } => $class;
 
   if ($arg->{to_file}) {
     require Log::Dispatch::File;
@@ -195,20 +195,10 @@ sub new {
   }
 
   if ($arg->{facility} and not $self->env_value('NOSYSLOG')) {
-    require Log::Dispatch::Syslog;
-    $log->add(
-      Log::Dispatch::Syslog->new(
-        name      => 'syslog',
-        min_level => 'debug',
-        facility  => $arg->{facility},
-        ident     => $ident,
-        logopt    => 'pid',
-        socket    => $arg->{syslog_socket} || 'native',
-        callbacks => sub {
-          ( my $m = {@_}->{message} ) =~ s/\n/<LF>/g;
-          $m
-        },
-      ),
+    $self->setup_syslog_output(
+      facility  => $arg->{facility},
+      socket    => $arg->{syslog_socket},
+      ident     => $ident,
     );
   }
 
@@ -224,7 +214,6 @@ sub new {
     );
   }
 
-  $self->{dispatcher} = $log;
   $self->{prefix}     = $arg->{prefix};
   $self->{ident}      = $ident;
   $self->{config_id}  = $config_id;
@@ -251,9 +240,8 @@ for my $dest (qw(out err)) {
   my $name = "std$dest";
   my $code = sub {
     return if $_[0]->dispatcher->output($name);
-    require Log::Dispatch::Screen;
     $_[0]->dispatcher->add(
-      Log::Dispatch::Screen->new(
+      $_[0]->stdio_dispatcher_class->new(
         name      => "std$dest",
         min_level => 'debug',
         stderr    => ($dest eq 'err' ? 1 : 0),
@@ -265,6 +253,26 @@ for my $dest (qw(out err)) {
 
   no strict 'refs';
   *{"enable_std$dest"} = $code;
+}
+
+sub setup_syslog_output {
+  my ($self, %arg) = @_;
+
+  require Log::Dispatch::Syslog;
+  $self->{dispatcher}->add(
+    Log::Dispatch::Syslog->new(
+      name      => 'syslog',
+      min_level => 'debug',
+      facility  => $arg{facility},
+      ident     => $arg{ident},
+      logopt    => 'pid',
+      socket    => $arg{socket} || 'native',
+      callbacks => sub {
+        ( my $m = {@_}->{message} ) =~ s/\n/<LF>/g;
+        $m
+      },
+    ),
+  );
 }
 
 #pod =method log
@@ -645,6 +653,19 @@ sub logger { $_[0] }
 
 sub dispatcher   { $_[0]->{dispatcher} }
 
+#pod =method stdio_dispatcher_class
+#pod
+#pod This method is an experimental feature to allow you to pick an alternate
+#pod dispatch class for stderr and stdio.  By default, Log::Dispatch::Screen is
+#pod used.  B<This feature may go away at any time.>
+#pod
+#pod =cut
+
+sub stdio_dispatcher_class {
+  require Log::Dispatch::Screen;
+  return 'Log::Dispatch::Screen';
+}
+
 #pod =head1 METHODS FOR API COMPATIBILITY
 #pod
 #pod To provide compatibility with some other loggers, most specifically
@@ -712,7 +733,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 2.019
+version 2.021
 
 =head1 SYNOPSIS
 
@@ -886,6 +907,12 @@ current logger will not throw an exception, and will simply do no thing.
 
 This returns the underlying Log::Dispatch object.  This is not the method
 you're looking for.  Move along.
+
+=head2 stdio_dispatcher_class
+
+This method is an experimental feature to allow you to pick an alternate
+dispatch class for stderr and stdio.  By default, Log::Dispatch::Screen is
+used.  B<This feature may go away at any time.>
 
 =head1 LOGGER PREFIX
 
@@ -1061,7 +1088,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christopher J. Madsen Dagfinn Ilmari Mannsåker Dan Book George Hartzell Jon Stuart Matt Phillips Olivier Mengué Randy Stauner Sawyer X
+=for stopwords Christopher J. Madsen Dagfinn Ilmari Mannsåker Dan Book George Hartzell Jon Stuart Matt Phillips Olivier Mengué Randy Stauner Ricardo Signes Sawyer X
 
 =over 4
 
@@ -1099,13 +1126,17 @@ Randy Stauner <randy@magnificent-tears.com>
 
 =item *
 
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
 Sawyer X <xsawyerx@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

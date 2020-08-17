@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Test-JSON-Schema-Acceptance",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Test::JSON::Schema::Acceptance",
   "PREREQ_PM" => {
     "File::ShareDir" => 0,
@@ -30,8 +30,11 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "MooX::TypeTiny" => "0.002002",
     "Path::Tiny" => "0.062",
-    "Test::Fatal" => 0,
-    "Test::More" => "0.88",
+    "Storable" => "3.00",
+    "Test2::API" => 0,
+    "Test2::Todo" => 0,
+    "Test2::Tools::Compare" => 0,
+    "Try::Tiny" => 0,
     "Types::Common::Numeric" => 0,
     "Types::Standard" => "1.010002",
     "if" => 0,
@@ -42,17 +45,20 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "JSON::PP" => 0,
+    "Test2::Suite" => "0.000131",
     "Test::Deep" => 0,
+    "Test::Fatal" => 0,
     "Test::File::ShareDir" => 0,
     "Test::More" => "0.88",
-    "Test::Tester" => "0.108",
+    "Test::Simple" => "1.302176",
     "Test::Warnings" => 0,
     "feature" => 0,
     "lib" => 0,
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.999",
+  "VERSION" => "1.000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,16 +70,23 @@ my %FallbackPrereqs = (
   "File::ShareDir" => 0,
   "File::Spec" => 0,
   "JSON::MaybeXS" => "1.004001",
+  "JSON::PP" => 0,
   "List::Util" => "1.33",
   "Moo" => 0,
   "MooX::TypeTiny" => "0.002002",
   "Path::Tiny" => "0.062",
+  "Storable" => "3.00",
+  "Test2::API" => 0,
+  "Test2::Suite" => "0.000131",
+  "Test2::Todo" => 0,
+  "Test2::Tools::Compare" => 0,
   "Test::Deep" => 0,
   "Test::Fatal" => 0,
   "Test::File::ShareDir" => 0,
   "Test::More" => "0.88",
-  "Test::Tester" => "0.108",
+  "Test::Simple" => "1.302176",
   "Test::Warnings" => 0,
+  "Try::Tiny" => 0,
   "Types::Common::Numeric" => 0,
   "Types::Standard" => "1.010002",
   "feature" => 0,

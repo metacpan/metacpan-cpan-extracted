@@ -1021,6 +1021,27 @@ Primarily useful for direct inspection and debugging.
 =cut
 
 ##========================================================================
+## Formats: Text-based: CONLLU
+=pod
+
+=item L<CONLLU|DTA::CAB::Format::CONLLU>
+
+[L<example|http://www.deutschestextarchiv.de/cab?fmt=conllu&q=EJn+zamer+Elephant+gillt+ohngef%C3%A4hr+zweyhundert+Thaler.+Ceterum+censeo+Carthaginem+esse+delendam.>]
+
+"Vertical" text format containing conforming to the
+CONLL-U format conventions as described under
+L<https://universaldependencies.org/format.html>.
+Supports various additional annotations in the CONLL-U "MISC" field,
+including full dump of CAB-internal token structure as for the L</TJ> format.
+
+This may be a good choice for data interchange with other NLP tools
+which also support the CONLL-U format, but note that additional
+postprocessing will be required if you want CAB's canonical modern
+forms to appear in the CONLL-U "FORM" field.
+
+=cut
+
+##========================================================================
 ## Formats: Text-based: CSV
 =pod
 

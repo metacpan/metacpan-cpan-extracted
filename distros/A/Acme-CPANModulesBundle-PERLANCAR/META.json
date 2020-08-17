@@ -41,6 +41,7 @@
       "x_mentions" : {
          "x_mentions" : {
             "App::CreateSparseFile" : "0",
+            "CPAN::AutoINC" : "0",
             "Carp::Always::Dump" : "0",
             "Cpanel::JSON::XS" : "0",
             "Data::Sah" : "0",
@@ -72,6 +73,8 @@
             "Log::Any::IfLOG" : "0",
             "Log::ger" : "0",
             "Log::ger::App" : "0",
+            "Module::AutoINC" : "0",
+            "Module::AutoLoad" : "0",
             "Module::List::WithPath" : "0",
             "Module::Path" : "0",
             "Module::Path::More" : "0",
@@ -83,7 +86,8 @@
             "String::Elide::Tiny" : "0",
             "String::Tools" : "0",
             "String::Truncate" : "0",
-            "Unix::Passwd::File" : "0"
+            "Unix::Passwd::File" : "0",
+            "lib::xi" : "0"
          }
       }
    },
@@ -99,7 +103,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModulesBundle-PERLANCAR"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

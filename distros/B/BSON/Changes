@@ -1,5 +1,12 @@
 Revision history for BSON
 
+v1.12.2   2020-08-13 10:56:21-04:00 America/New_York
+
+  [!!! END OF LIFE NOTICE !!!]
+
+  - As of August 13, 2020, the BSON library has reached end of life
+    and is no longer supported by MongoDB.
+
 v1.12.1   2019-08-13 08:17:13-04:00 America/New_York
 
   [!!! END OF LIFE NOTICE !!!]

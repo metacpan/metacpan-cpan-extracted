@@ -69,9 +69,20 @@ sub compile_mariadb_connector_c {
             -DWITH_SSL=OPENSSL
         );
 
-        # cargo-cult; without this cmake cannot find openssl, but why is it hardcoded to these directories??
-        push @cmake_args, qw<-DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib>
+        # cargo-cult; without this cmake in OSX cannot find openssl, but why is it hardcoded to these directories??
+        push @cmake_args,
+            qw<
+                -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl
+                -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib
+            >
             if $^O eq 'darwin';
+
+        # Internal zlib ends up causing memory corruption due to
+        # certain "internal" zlib symbols being in the global namespace,
+        # causing silent clashes with the system zlib library.
+        push @cmake_args, qw<
+            -DWITH_EXTERNAL_ZLIB=yes
+        >;
         _run(cmake => @cmake_args);
         _run(make => qw< mariadb_config >);
         _run(make => qw< mariadbclient  >);
@@ -330,5 +341,9 @@ WriteMakefile(
     CCFLAGS   => $ccflags,
     LDDLFLAGS => $lddlflags,
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'MariaDB-NonBlocking-* t/lib.pl dist/*' },
+    clean => { FILES => [
+        'MariaDB-NonBlocking-*',
+        't/lib.pl',
+        'deps/mariadb-connector-c-3.1.9-src',
+    ] },
 );

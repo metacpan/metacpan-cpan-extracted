@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 use Moose;
 use namespace::autoclean;
@@ -13,19 +13,17 @@ with 'Dist::Zilla::Role::EncodingProvider';
 
 use MooseX::Types::Moose qw(CodeRef);
 
-has _set_file_encodings_code_ref => (
+has set_file_encodings => (
     is       => 'ro',
     isa      => 'CodeRef',
-    init_arg => 'set_file_encodings',
+    reader   => '_set_file_encodings',
     required => 1,
 );
 
 sub set_file_encodings {
     my $self = shift;
 
-    my $code_ref = $self->_set_file_encodings_code_ref;
-    return if !defined $code_ref;
-
+    my $code_ref = $self->_set_file_encodings;
     return $self->$code_ref(@_);
 }
 
@@ -45,7 +43,7 @@ Dist::Zilla::Plugin::Code::EncodingProvider - something that sets a files' encod
 
 =head1 VERSION
 
-Version 0.001
+Version 0.003
 
 =head1 SYNOPSIS
 
@@ -55,7 +53,6 @@ Version 0.001
 
     use Moose;
     with 'Dist::Zilla::Role::PluginBundle';
-    use Dist::Zilla::Plugin::Code::EncodingProvider;
 
     sub bundle_config {
         my ( $class, $section ) = @_;
@@ -63,7 +60,7 @@ Version 0.001
         my @plugins;
         push @plugins, [
             'SomeUniqueName',
-            'Dist::Zilla::Plugin::Code::BeforeBuild',
+            'Dist::Zilla::Plugin::Code::EncodingProvider',
             {
                 set_file_encodings => [
                     sub {
@@ -83,13 +80,12 @@ Version 0.001
 
     use Moose;
     with 'Dist::Zilla::Role::PluginBundle::Easy';
-    use Dist::Zilla::Plugin::Code::EncodingProvider;
 
     sub configure {
         my ( $self ) = @_;
 
         $self->add_plugins([
-            'Code::BeforeBuild',
+            'Code::EncodingProvider',
             {
                 set_file_encodings => [
                     sub {

@@ -18,10 +18,10 @@ use strict;
 use warnings;
 
 package BSON::XS;
-# ABSTRACT: XS implementation of MongoDB's BSON serialization
+# ABSTRACT: XS implementation of MongoDB's BSON serialization (EOL)
 
 use version;
-our $VERSION = 'v0.8.3';
+our $VERSION = 'v0.8.4';
 
 # cached for efficiency during decoding
 # XXX eventually move this into XS
@@ -47,43 +47,34 @@ sub _printable {
 
 =head1 NAME
 
-BSON::XS - XS implementation of MongoDB's BSON serialization
+BSON::XS - XS implementation of MongoDB's BSON serialization (EOL)
 
 =head1 VERSION
 
-version v0.8.3
+version v0.8.4
 
 =head1 END OF LIFE NOTICE
 
-Version v0.8.0 is the final feature release of the MongoDB BSON::XS
-library.  The library is now in a 12-month "sunset" period and will
-receive security patches and critical bug fixes only.  The BSON::XS
-library will be end-of-life and unsupported on August 13, 2020.
+Version v0.8.0 was the final feature release of the MongoDB BSON::XS
+library and v0.8.4 is the final patch release.
+
+B<As of August 13, 2020, the MongoDB Perl driver and related libraries have
+reached end of life and are no longer supported by MongoDB.> See the
+L<August 2019 deprecation
+notice|https://www.mongodb.com/blog/post/the-mongodb-perl-driver-is-being-deprecated>
+for rationale.
+
+If members of the community wish to continue development, they are welcome
+to fork the code under the terms of the Apache 2 license and release it
+under a new namespace.  Specifications and test files for MongoDB drivers
+and libraries are published in an open repository:
+L<mongodb/specifications|https://github.com/mongodb/specifications/tree/master/source>.
 
 =head1 DESCRIPTION
 
 This module contains an XS implementation for BSON encoding and
 decoding.  There is no public API.  Use the L<BSON> module and it will
 choose the best implementation for you.
-
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
-=head1 SUPPORT
-
-=head2 Bugs / Feature Requests
-
-Please report any bugs or feature requests through the issue tracker
-at L<https://jira.mongodb.org/browse/PERL>.
-You will be notified automatically of any progress on your issue.
-
-=head2 Source Code
-
-This is open source software.  The code repository is available for
-public review and contribution under the terms of the license.
-
-L<https://github.com/mongodb/mongo-perl-bson-xs>
-
-  git clone https://github.com/mongodb/mongo-perl-bson-xs.git
 
 =head1 AUTHOR
 

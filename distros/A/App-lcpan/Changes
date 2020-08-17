@@ -1,3 +1,14 @@
+1.062   2020-08-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix completion of whatsnew's --my-author.
+
+	[subcommand update]
+
+        - Add retrying and retry options: retry_max_attempts, retry_delay.
+
+        - We now use LWP::UserAgent::Plugin.
+
+
 1.061   2020-06-11  Released-By: PERLANCAR; Urgency: medium
 
 	[subcommand mentions]

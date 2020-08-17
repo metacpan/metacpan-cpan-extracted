@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t t/Statements/*.t t/Statements/Expressions/*.t t/Statements/Expressions/OpListKeywordExpr/*.t t/Statements/Expressions/OpNullaryKeywordExpr/*.t t/Statements/Expressions/OpUnaryKeywordExpr/*.t t/Statements/Expressions/Value/*.t t/Statements/Expressions/Value/Literal/*.t t/Statements/Expressions/Value/NonLiteral/*.t"
   }

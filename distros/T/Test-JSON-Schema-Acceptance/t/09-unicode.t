@@ -45,7 +45,7 @@ $accepter->acceptance(
 
     is($schema->{const}, 'ಠ_ಠ', 'schema was decoded from data file correctly')
       &&
-    is($data, 'ಠ_ಠ', 'data was decoded from file correctlyproperly passed characters that occupy multiple bytes in unicode')
+    is($data, 'ಠ_ಠ', 'data was decoded from file correctly, and properly passed characters that occupy multiple bytes in unicode')
       &&
     is($data, $schema->{const}, 'data and schema decode identically');
   },

@@ -3,16 +3,42 @@ package Make;
 use strict;
 use warnings;
 
-our $VERSION = '1.2.0';
+our $VERSION = '2.002';
 
-use Carp;
+use Carp qw(confess croak);
 use Config;
 use Cwd;
 use File::Spec;
 use Make::Target ();
+use Make::Rule   ();
+use File::Temp;
+use Text::Balanced qw(extract_bracketed);
+use Text::ParseWords qw(parse_line);
+## no critic (ValuesAndExpressions::ProhibitConstantPragma)
+use constant DEBUG => $ENV{MAKE_DEBUG};
+## use critic
+require Make::Functions;
 
+my $DEFAULTS_AST;
 my %date;
-my $generation = 0;    # lexical cross-package scope used!
+my %fs_function_map = (
+    glob          => sub { glob $_[0] },
+    fh_open       => sub { open my $fh, $_[0], $_[1] or die "open @_: $!"; $fh },
+    fh_write      => sub { my $fh = shift; print {$fh} @_ },
+    file_readable => sub { -r $_[0] },
+    mtime         => sub { ( stat $_[0] )[9] },
+);
+
+## no critic (Subroutines::RequireArgUnpacking Subroutines::RequireFinalReturn)
+sub load_modules {
+    for (@_) {
+        my $pkg = $_;    # to not mutate inputs
+        $pkg =~ s#::#/#g;
+        ## no critic (Modules::RequireBarewordIncludes)
+        eval { require "$pkg.pm"; 1 } or die;
+        ## use critic
+    }
+}
 
 sub phony {
     my ( $self, $name ) = @_;
@@ -21,18 +47,15 @@ sub phony {
 
 sub suffixes {
     my ($self) = @_;
-    return keys %{ $self->{'SUFFIXES'} };
+    ## no critic (Subroutines::ProhibitReturnSort)
+    return sort keys %{ $self->{'SUFFIXES'} };
+    ## use critic
 }
 
-#
-# Construct a new 'target' (or find old one)
-# - used by parser to add to data structures
-#
-sub Target {
+sub target {
     my ( $self, $target ) = @_;
     unless ( exists $self->{Depend}{$target} ) {
-        my $t = Make::Target->new( $self, $target );
-        $self->{Depend}{$target} = $t;
+        my $t = $self->{Depend}{$target} = Make::Target->new( $target, $self );
         if ( $target =~ /%/ ) {
             $self->{Pattern}{$target} = $t;
         }
@@ -40,106 +63,69 @@ sub Target {
             $self->{Dot}{$target} = $t;
         }
         else {
-            push( @{ $self->{Targets} }, $t );
+            $self->{Vars}{'.DEFAULT_GOAL'} ||= $target;
         }
     }
     return $self->{Depend}{$target};
 }
 
-#
+sub has_target {
+    my ( $self, $target ) = @_;
+    return exists $self->{Depend}{$target};
+}
+
 # Utility routine for patching %.o type 'patterns'
-#
+my %pattern_cache;
+
 sub patmatch {
-    my $key = shift;
-    local $_ = shift;
-    my $pat = $key;
-    $pat =~ s/\./\\./;
-    $pat =~ s/%/(\[^\/\]*)/;
-    if (/$pat$/) {
+    my ( $pat, $target ) = @_;
+    return $target if $pat eq '%';
+    ## no critic (BuiltinFunctions::RequireBlockMap)
+    $pattern_cache{$pat} = join '(.*)', map quotemeta, split /%/, $pat
+        if !exists $pattern_cache{$pat};
+    ## use critic
+    $pat = $pattern_cache{$pat};
+    if ( $target =~ /^$pat$/ ) {
         return $1;
     }
     return;
 }
 
-#
-# old vpath lookup routine
-#
 sub locate {
-    my $self = shift;
-    local $_ = shift;
-    return $_ if ( -r $_ );
-    foreach my $key ( keys %{ $self->{vpath} } ) {
-        my $Pat;
-        if ( defined( $Pat = patmatch( $key, $_ ) ) ) {
-            foreach my $dir ( split( /:/, $self->{vpath}{$key} ) ) {
-                return "$dir/$_" if ( -r "$dir/$_" );
-            }
+    my ( $self, $file ) = @_;
+    my $readable = $self->fsmap->{file_readable};
+    foreach my $key ( sort keys %{ $self->{Vpath} } ) {
+        next unless defined( my $Pat = patmatch( $key, $file ) );
+        foreach my $dir ( @{ $self->{Vpath}{$key} } ) {
+            ( my $maybe_file = $dir ) =~ s/%/$Pat/g;
+            return $maybe_file if $readable->($maybe_file);
         }
     }
     return;
 }
 
-#
-# Convert traditional .c.o rules into GNU-like into %o : %c
-#
+# Convert traditional .c.o rules into GNU-like into %.o : %.c
 sub dotrules {
     my ($self) = @_;
-    foreach my $t ( keys %{ $self->{Dot} } ) {
-        my $e = $self->subsvars($t);
-        $self->{Dot}{$e} = delete $self->{Dot}{$t} unless ( $t eq $e );
-    }
-    my (@suffix) = $self->suffixes;
-    foreach my $t (@suffix) {
-        my $d;
-        my $r = delete $self->{Dot}{$t};
-        if ( defined $r ) {
-            my @rule = ( $r->colon ) ? ( $r->colon->depend ) : ();
-            if (@rule) {
-                delete $self->{Dot}{ $t->Name };
-                print STDERR $t->Name, " has dependants\n";
-                push( @{ $self->{Targets} }, $r );
-            }
-            else {
-                # print STDERR "Build \% : \%$t\n";
-                $self->Target('%')->dcolon( [ '%' . $t ], scalar $r->colon->command );
-            }
+    my @suffix = $self->suffixes;
+    my $Dot    = delete $self->{Dot};
+    foreach my $f (@suffix) {
+        foreach my $t ( '', @suffix ) {
+            delete $self->{Depend}{ $f . $t };
+            next unless my $r = delete $Dot->{ $f . $t };
+            DEBUG and print STDERR "Pattern %$t : %$f\n";
+            my $target   = $self->target( '%' . $t );
+            my @dotrules = @{ $r->rules };
+            die "Failed on pattern rule for '$f$t', too many rules"
+                if @dotrules != 1;
+            my $thisrule = $dotrules[0];
+            die "Failed on pattern rule for '$f$t', no prereqs allowed"
+                if @{ $thisrule->prereqs };
+            my $rule = Make::Rule->new( '::', [ '%' . $f ], $thisrule->recipe );
+            $self->target( '%' . $t )->add_rule($rule);
         }
-        foreach my $d (@suffix) {
-            $r = delete $self->{Dot}{ $t . $d };
-            if ( defined $r ) {
-
-                # print STDERR "Build \%$d : \%$t\n";
-                $self->Target( '%' . $d )->dcolon( [ '%' . $t ], scalar $r->colon->command );
-            }
-        }
-    }
-    foreach my $t ( keys %{ $self->{Dot} } ) {
-        push( @{ $self->{Targets} }, delete $self->{Dot}{$t} );
     }
     return;
-}
-
-#
-# Return 'full' pathname of name given directory info.
-# - may be the place to do vpath stuff ?
-#
-
-my %pathname;
-
-sub pathname {
-    my ( $self, $name ) = @_;
-    my $hash = $self->{'Pathname'};
-    unless ( exists $hash->{$name} ) {
-        if ( File::Spec->file_name_is_absolute($name) ) {
-            $hash->{$name} = $name;
-        }
-        else {
-            $name =~ s,^\./,,;
-            $hash->{$name} = File::Spec->catfile( $self->{Dir}, $name );
-        }
-    }
-    return $hash->{$name};
-
 }
 
 #
@@ -147,27 +133,10 @@ sub pathname {
 #
 sub date {
     my ( $self, $name ) = @_;
-    my $path = $self->pathname($name);
-    unless ( exists $date{$path} ) {
-        $date{$path} = -M $path;
+    unless ( exists $date{$name} ) {
+        $date{$name} = $self->fsmap->{mtime}->($name);
     }
-    return $date{$path};
-}
-
-#
-# Check to see if name is a target we can make or an existing
-# file - used to see if pattern rules are valid
-# - Needs extending to do vpath lookups
-#
-## no critic (Subroutines::ProhibitBuiltinHomonyms)
-sub exists {
-## use critic
-    my ( $self, $name ) = @_;
-    return 1 if ( exists $self->{Depend}{$name} );
-    return 1 if defined $self->date($name);
-
-    # print STDERR "$name '$path' does not exist\n";
-    return 0;
+    return $date{$name};
 }
 
 #
@@ -175,300 +144,268 @@ sub exists {
 # .c.o rules are already converted to this form
 #
 sub patrule {
-    my ( $self, $target ) = @_;
-
-    # print STDERR "Trying pattern for $target\n";
-    foreach my $key ( keys %{ $self->{Pattern} } ) {
-        my $Pat;
-        if ( defined( $Pat = patmatch( $key, $target ) ) ) {
-            my $t = $self->{Pattern}{$key};
-            foreach my $rule ( $t->dcolon ) {
-                my @dep = $rule->exp_depend;
-                if (@dep) {
-                    my $dep = $dep[0];
-                    $dep =~ s/%/$Pat/g;
-
-                    # print STDERR "Try $target : $dep\n";
-                    if ( $self->exists($dep) ) {
-                        foreach (@dep) {
-                            s/%/$Pat/g;
-                        }
-                        return ( \@dep, scalar $rule->command );
-                    }
+    my ( $self, $target, $kind ) = @_;
+    DEBUG and print STDERR "Trying pattern for $target\n";
+    foreach my $key ( sort keys %{ $self->{Pattern} } ) {
+        DEBUG and print STDERR " Pattern $key trying\n";
+        next unless defined( my $Pat = patmatch( $key, $target ) );
+        DEBUG and print STDERR " Pattern $key matched ($Pat)\n";
+        my $t = $self->{Pattern}{$key};
+        foreach my $rule ( @{ $t->rules } ) {
+            my @dep = @{ $rule->prereqs };
+            DEBUG and print STDERR "  Try rule : @dep\n";
+            next unless @dep;
+            my @failed;
+            for my $this_dep (@dep) {
+                $this_dep =~ s/%/$Pat/g;
+                next if $self->date($this_dep) or $self->has_target($this_dep);
+                my $maybe = $self->locate($this_dep);
+                if ( defined $maybe ) {
+                    $this_dep = $maybe;
+                    next;
                 }
+                push @failed, $this_dep;
             }
-        }
-    }
-    return ();
-}
-
-#
-# Old code to handle vpath stuff - not used yet
-#
-sub needs {
-    my ( $self, $target ) = @_;
-    unless ( $self->{Done}{$target} ) {
-        if ( exists $self->{Depend}{$target} ) {
-            my @depend = split( /\s+/, $self->subsvars( $self->{Depend}{$target} ) );
-            foreach (@depend) {
-                $self->needs($_);
-            }
-        }
-        else {
-            my $vtarget = $self->locate($target);
-            if ( defined $vtarget ) {
-                $self->{Need}{$vtarget} = $target;
-            }
-            else {
-                $self->{Need}{$target} = $target;
-            }
+            DEBUG and print STDERR "  " . ( @failed ? "Failed: (@failed)" : "Matched (@dep)" ) . "\n";
+            next if @failed;
+            return Make::Rule->new( $kind, \@dep, $rule->recipe );
         }
     }
     return;
 }
 
-#
-# Substitute $(xxxx) and $x style variable references
-# - should handle ${xxx} as well
-# - recurses till they all go rather than doing one level,
-#   which may need fixing
-#
-## no critic (RequireArgUnpacking)
-sub subsvars {
-    my $self = shift;
-    local $_ = shift;
-    my @var = @_;
-## use critic
-    push( @var, $self->{Override}, $self->{Vars}, \%ENV );
-    croak("Trying to subsitute undef value") unless ( defined $_ );
-    ## no critic (Variables::ProhibitMatchVars)
-    while ( /(?<!\$)\$\(([^()]+)\)/ || /(?<!\$)\$([<\@^?*])/ ) {
-        my ( $key, $head, $tail ) = ( $1, $`, $' );
-        ## use critic
-        my $value;
-        if ( $key =~ /^([\w._]+|\S)(?::(.*))?$/ ) {
-            my ( $var, $op ) = ( $1, $2 );
-            foreach my $hash (@var) {
-                $value = $hash->{$var};
-                if ( defined $value ) {
-                    last;
-                }
-            }
-            unless ( defined $value ) {
-                die "$var not defined in '$_'" unless ( length($var) > 1 );
-                $value = '';
-            }
-            if ( defined $op ) {
-                if ( $op =~ /^s(.).*\1.*\1/ ) {
-                    local $_ = $self->subsvars($value);
-                    $op =~ s/\\/\\\\/g;
-                    next unless $op;
-
-                    #I'm not sure what purpose this eval served, and it
-                    #creates some warnings. Removing until I know a good
-                    #reason for it's existence.
-                    #eval { $op . 'g' };
-                    $value = $_;
-                }
-                else {
-                    die "$var:$op = '$value'\n";
-                }
-            }
+sub evaluate_macro {
+    my ( $key, @args ) = @_;
+    my ( $function_packages, $vars_search_list, $fsmap ) = @args;
+    my $value;
+    return '' if !length $key;
+    if ( $key =~ /^([\w._]+|\S)(?::(.*))?$/ ) {
+        my ( $var, $subst ) = ( $1, $2 );
+        foreach my $hash (@$vars_search_list) {
+            last if defined( $value = $hash->{$var} );
         }
-        elsif ( $key =~ /wildcard\s*(.*)$/ ) {
-            $value = join( ' ', glob( $self->pathname($1) ) );
+        $value = '' if !defined $value;
+        if ( defined $subst ) {
+            my @parts = split /=/, $subst, 2;
+            die "Syntax error: expected form x=y in '$subst'" if @parts != 2;
+            $value = join ' ', Make::Functions::patsubst( $fsmap, @parts, $value );
         }
-        elsif ( $key =~ /shell\s*(.*)$/ ) {
-            $value = join( ' ', split( '\n', `$1` ) );
-        }
-        elsif ( $key =~ /addprefix\s*([^,]*),(.*)$/ ) {
-            $value = join( ' ', map { $1 . $_ } split( '\s+', $2 ) );
-        }
-        elsif ( $key =~ /notdir\s*(.*)$/ ) {
-            my @files = split( /\s+/, $1 );
-            foreach (@files) {
-                s#^.*/([^/]*)$#$1#;
-            }
-            $value = join( ' ', @files );
-        }
-        elsif ( $key =~ /dir\s*(.*)$/ ) {
-            my @files = split( /\s+/, $1 );
-            foreach (@files) {
-                s#^(.*)/[^/]*$#$1#;
-            }
-            $value = join( ' ', @files );
-        }
-        elsif ( $key =~ /^subst\s+([^,]*),([^,]*),(.*)$/ ) {
-            my ( $a, $b ) = ( $1, $2 );
-            $value = $3;
-            $a =~ s/\./\\./;
-            $value =~ s/$a/$b/;
-        }
-
-        # ($mktmp) appears to be a dmake only macro
-        # its not yet clear to me just how temporary this temporary
-        # file is expected to be, but hopefully we can replace this
-        # with Path::Tiny->tempfile or the use of File::Temp directly
-        # this also only handles one use of the macro, where the content
-        # and filename are provided together. they may be provided
-        # separately, which I don't think we handle yet
-        elsif ( $key =~ /^mktmp,(\S+)\s*(.*)$/ ) {
-            my ( $file, $content ) = ( $1, $2 );
-            open( my $tmp, ">", $file ) or die "Cannot open $file: $!";
-            $content =~ s/\\n//g;
-            print TMP $content;
-            close(TMP);
-
-            # will have to see if we really want to return the filename
-            # here, or if returning the filehandle is the right thing to do
-            $value = $file;
-        }
-        else {
-            warn "Cannot evaluate '$key' in '$_'\n";
-        }
-        $_ = "$head$value$tail";
     }
-    s/\$\$/\$/g;
-    return $_;
+    elsif ( $key =~ /([\w._]+)\s+(.*)$/ ) {
+        my ( $func, $args ) = ( $1, $2 );
+        my $code;
+        foreach my $package (@$function_packages) {
+            last if $code = $package->can($func);
+        }
+        die "'$func' not found in (@$function_packages)" if !defined $code;
+        ## no critic (BuiltinFunctions::RequireBlockMap)
+        $value = join ' ', $code->( $fsmap, map subsvars( $_, @args ), split /\s*,\s*/, $args );
+        ## use critic
+    }
+    elsif ( $key =~ /^\S*\$/ ) {
+
+        # something clever, expand it
+        $key = subsvars( $key, @args );
+        return evaluate_macro( $key, @args );
+    }
+    return subsvars( $value, @args );
 }
 
-#
-# Split a string into tokens - like split(/\s+/,...) but handling
-# $(keyword ...) with embedded \s
-# Perhaps should also understand "..." and '...' ?
-#
-sub tokenize {
-    local $_ = $_[0];
-    my @result = ();
-    s/\s+$//;
-    while ( length($_) ) {
-        s/^\s+//;
-        last unless (/^\S/);
-        my $token = "";
-        while (/^\S/) {
-            ## no critic (Variables::ProhibitMatchVars)
-            if (s/^\$([\(\{])//) {
-                $token .= $&;
-                my $paren = $1 eq '(';
-                my $brace = $1 eq '{';
-                my $count = 1;
-                while ( length($_) && ( $paren || $brace ) ) {
-                    s/^.//;
-                    $token .= $&;
-                    $paren += ( $& eq '(' );
-                    $paren -= ( $& eq ')' );
-                    $brace += ( $& eq '{' );
-                    $brace -= ( $& eq '}' );
-                }
-                die "Mismatched {} in $_[0]" if ($brace);
-                die "Mismatched () in $_[0]" if ($paren);
-            }
-            elsif (s/^(\$\S?|[^\s\$]+)//) {
-                $token .= $&;
-            }
-            ## use critic
+sub subsvars {
+    my ( $remaining, $function_packages, $vars_search_list, $fsmap ) = @_;
+    confess "Trying to expand undef value" unless defined $remaining;
+    my $ret = '';
+    my $found;
+    while (1) {
+        last unless $remaining =~ s/(.*?)\$//;
+        $ret .= $1;
+        my $char = substr $remaining, 0, 1;
+        if ( $char eq '$' ) {
+            $ret .= $char;    # literal $
+            substr $remaining, 0, 1, '';
+            next;
         }
-        push( @result, $token );
+        elsif ( $char =~ /[\{\(]/ ) {
+            ( $found, my $tail ) = extract_bracketed $remaining, '{}()', '';
+            die "Syntax error in '$remaining'" if !defined $found;
+            $found     = substr $found, 1, -1;
+            $remaining = $tail;
+        }
+        else {
+            $found = substr $remaining, 0, 1, '';
+        }
+        my $value = evaluate_macro( $found, $function_packages, $vars_search_list, $fsmap );
+        if ( !defined $value ) {
+            warn "Cannot evaluate '$found'\n";
+            $value = '';
+        }
+        $ret .= $value;
     }
-    return (wantarray) ? @result : \@result;
+    return $ret . $remaining;
+}
+
+# Perhaps should also understand "..." and '...' ?
+# like GNU make will need to understand \ to quote spaces, for deps
+# also C:\xyz as a non-target (overlap with parse_makefile)
+sub tokenize {
+    my ( $string, @extrasep ) = @_;
+    ## no critic ( BuiltinFunctions::RequireBlockGrep BuiltinFunctions::RequireBlockMap)
+    my $pat  = join '|', '\s+', map quotemeta, @extrasep;
+    my @toks = grep length, parse_line $pat, 1, $string;
+    ## use critic
+    s/\\(\s)/$1/g for @toks;
+    return \@toks;
+}
+
+sub get_full_line {
+    my ($fh) = @_;
+    my $final = my $line = <$fh>;
+    return if !defined $line;
+    $final =~ s/\r?\n\z//;
+    while ( $final =~ /\\$/ ) {
+        $final =~ s/\s*\\\z//;
+        $line = <$fh>;
+        last if !defined $line;
+        $line =~ s/\s*\z//;
+        $line =~ s/^\s*/ /;
+        $final .= $line;
+    }
+    return $final;
+}
+
+sub set_var {
+    my ( $self, $name, $value ) = @_;
+    $self->{Vars}{$name} = $value;
+}
+
+sub vars {
+    my ($self) = @_;
+    $self->{Vars};
+}
+
+sub function_packages {
+    my ($self) = @_;
+    $self->{FunctionPackages};
+}
+
+sub fsmap {
+    my ($self) = @_;
+    $self->{FSFunctionMap};
+}
+
+sub expand {
+    my ( $self, $text ) = @_;
+    return subsvars( $text, $self->function_packages, [ $self->vars, \%ENV ], $self->fsmap );
+}
+
+sub process_ast_bit {
+    my ( $self, $type, @args ) = @_;
+    return if $type eq 'comment';
+    if ( $type eq 'include' ) {
+        my $opt = $args[0];
+        my ($tokens) = tokenize( $self->expand( $args[1] ) );
+        foreach my $file (@$tokens) {
+            eval {
+                my $mf  = $self->fsmap->{fh_open}->( '<', $file );
+                my $ast = parse_makefile($mf);
+                close($mf);
+                $self->process_ast_bit(@$_) for @$ast;
+                1;
+            } or warn $@ if $opt ne '-';
+        }
+    }
+    elsif ( $type eq 'var' ) {
+        $self->set_var( $args[0], defined $args[1] ? $args[1] : "" );
+    }
+    elsif ( $type eq 'vpath' ) {
+        my ( $pattern, @vpath ) = @args;
+        $self->{Vpath}{$pattern} = \@vpath;
+    }
+    elsif ( $type eq 'rule' ) {
+        my ( $targets, $kind, $prereqs, $cmnds ) = @args;
+        ($prereqs) = tokenize( $self->expand($prereqs) );
+        ($targets) = tokenize( $self->expand($targets) );
+        unless ( @$targets == 1 and $targets->[0] =~ /^\.[A-Z]/ ) {
+            $self->target($_) for @$prereqs;    # so "exist or can be made"
+        }
+        my $rule = Make::Rule->new( $kind, $prereqs, $cmnds );
+        $self->target($_)->add_rule($rule) for @$targets;
+    }
+    return;
 }
 
 #
 # read makefile (or fragment of one) either as a result
 # of a command line, or an 'include' in another makefile.
 #
-sub makefile {
-    my ( $self, $makefile, $name ) = @_;
-    local $_;
-    print STDERR "Reading $name\n";
-Makefile:
-    while (<$makefile>) {
+sub parse_makefile {
+    my ($fh) = @_;
+    my @ast;
+    local $_ = get_full_line($fh);
+    while (1) {
         last unless ( defined $_ );
-        chomp($_);
-        if (/\\$/) {
-            chop($_);
-            s/\s*$//;
-            my $more = <$makefile>;
-            $more =~ s/^\s*/ /;
-            $_ .= $more;
-            redo;
-        }
-        next if (/^\s*#/);
-        next if (/^\s*$/);
-        s/#.*$//;
         s/^\s+//;
+        next if !length;
         if (/^(-?)include\s+(.*)$/) {
-            my $opt = $1;
-            foreach my $file ( tokenize( $self->subsvars($2) ) ) {
-                my $path = $self->pathname($file);
-                if ( open( my $mf, "<", $path ) ) {
-                    $self->makefile( $mf, $path );
-                    close($mf);
-                }
-                else {
-                    warn "Cannot open $path: $!" unless ( $opt eq '-' );
-                }
-            }
+            push @ast, [ 'include', $1, $2 ];
+        }
+        elsif (s/^#+\s*//) {
+            push @ast, [ 'comment', $_ ];
         }
         elsif (/^\s*([\w._]+)\s*:?=\s*(.*)$/) {
-            $self->{Vars}{$1} = ( defined $2 ) ? $2 : "";
-
-            #    print STDERR "$1 = ",$self->{Vars}{$1},"\n";
+            push @ast, [ 'var', $1, $2 ];
         }
         elsif (/^vpath\s+(\S+)\s+(.*)$/) {
-            my ( $pat, $path ) = ( $1, $2 );
-            $self->{Vpath}{$pat} = $path;
+            my ( $pattern, $path ) = ( $1, $2 );
+            my @path = @{ tokenize $path, $Config{path_sep} };
+            push @ast, [ 'vpath', $pattern, @path ];
         }
-        elsif (/^\s*([^:]*)(::?)\s*(.*)$/) {
-            my ( $target, $kind, $depend ) = ( $1, $2, $3 );
-            my @cmnds;
-            if ( $depend =~ /^([^;]*);(.*)$/ ) {
-                ( $depend, $cmnds[0] ) = ( $1, $2 );
-            }
-            while (<$makefile>) {
+        elsif (
+            /^
+                \s*
+                ([^:\#]*?)
+                \s*
+                (::?)
+                \s*
+                ((?:[^;\#]*\#.*|.*?))
+                (?:\s*;\s*(.*))?
+            $/sx
+            )
+        {
+            my ( $target, $kind, $prereqs, $maybe_cmd ) = ( $1, $2, $3, $4 );
+            my @cmnds = defined $maybe_cmd ? ($maybe_cmd) : ();
+            $prereqs =~ s/\s*#.*//;
+            while ( defined( $_ = get_full_line($fh) ) ) {
                 next if (/^\s*#/);
                 next if (/^\s*$/);
                 last unless (/^\t/);
-                chop($_);
-                if (/\\$/) {
-                    chop($_);
-                    $_ .= ' ';
-                    $_ .= <$makefile>;
-                    redo;
-                }
                 next if (/^\s*$/);
                 s/^\s+//;
                 push( @cmnds, $_ );
             }
-            $depend =~ s/\s\s+/ /;
-            $target =~ s/\s\s+/ /;
-            my @depend = tokenize($depend);
-            foreach ( tokenize($target) ) {
-                my $t     = $self->Target($_);
-                my $index = 0;
-                if ( $kind eq '::' || /%/ ) {
-                    $t->dcolon( \@depend, \@cmnds );
-                }
-                else {
-                    $t->colon( \@depend, \@cmnds );
-                }
-            }
-            redo Makefile;
+            push @ast, [ 'rule', $target, $kind, $prereqs, \@cmnds ];
+            redo;
         }
         else {
             warn "Ignore '$_'\n";
         }
     }
-    return;
+    continue {
+        $_ = get_full_line($fh);
+    }
+    return \@ast;
 }
 
 sub pseudos {
     my $self = shift;
     foreach my $key (qw(SUFFIXES PHONY PRECIOUS PARALLEL)) {
+        delete $self->{Depend}{ '.' . $key };
         my $t = delete $self->{Dot}{ '.' . $key };
         if ( defined $t ) {
             $self->{$key} = {};
-            foreach my $dep ( $t->colon->exp_depend ) {
+            ## no critic (BuiltinFunctions::RequireBlockMap)
+            foreach my $dep ( map @{ $_->prereqs }, @{ $t->rules } ) {
+                ## use critic
                 $self->{$key}{$dep} = 1;
             }
         }
@@ -476,36 +413,29 @@ sub pseudos {
     return;
 }
 
-sub ExpandTarget {
-    my $self = shift;
-    foreach my $t ( @{ $self->{'Targets'} } ) {
-        $t->ExpandTarget;
-    }
-    foreach my $t ( @{ $self->{'Targets'} } ) {
-        $t->ProcessColon;
+sub find_makefile {
+    my ( $file, $extra_names, $fsmap ) = @_;
+    return $file if defined $file;
+    for ( qw(makefile Makefile), @{ $extra_names || [] } ) {
+        return $_ if $fsmap->{file_readable}->($_);
     }
     return;
 }
 
 sub parse {
     my ( $self, $file ) = @_;
-    if ( defined $file ) {
-        $file = $self->pathname($file);
+    $file = find_makefile $file, $self->{GNU} ? ['GNUmakefile'] : [], $self->fsmap;
+    my $fh;
+    if ( ref $file eq 'SCALAR' ) {
+        open my $tfh, "+<", $file;
+        $fh = $tfh;
     }
     else {
-        my @files = qw(makefile Makefile);
-        unshift( @files, 'GNUmakefile' ) if ( $self->{GNU} );
-        foreach my $name (@files) {
-            $file = $self->pathname($name);
-            if ( -r $file ) {
-                $self->{Makefile} = $name;
-                last;
-            }
-        }
+        $fh = $self->fsmap->{fh_open}->( '<', $file );
     }
-    open( my $mf, "<", $file ) or croak("Cannot open $file: $!");
-    $self->makefile( $mf, $file );
-    close($mf);
+    my $ast = parse_makefile($fh);
+    $self->process_ast_bit(@$_) for @$ast;
+    undef $fh;
 
     # Next bits should really be done 'lazy' on need.
 
@@ -517,41 +447,38 @@ sub parse {
 sub PrintVars {
     my $self = shift;
     local $_;
-    foreach ( keys %{ $self->{Vars} } ) {
-        print "$_ = ", $self->{Vars}{$_}, "\n";
+    my $vars = $self->vars;
+    foreach ( sort keys %$vars ) {
+        print "$_ = ", $vars->{$_}, "\n";
     }
     print "\n";
     return;
 }
 
-sub exec {
-    my $self = shift;
-    undef %date;
-    $generation++;
-    if ( $^O eq 'MSWin32' ) {
-        my $cwd = cwd();
-        my $ret;
-        chdir $self->{Dir};
-        $ret = system(@_);
-        chdir $cwd;
-        return $ret;
-    }
-    else {
-        my $pid = fork;
-        if ($pid) {
-            waitpid $pid, 0;
-            return $?;
-        }
-        else {
-            my $dir = $self->{Dir};
-            chdir($dir) || die "Cannot cd to $dir";
-
-            # handle leading VAR=value here ?
-            # To handle trivial cases like ': libpTk.a' force using /bin/sh
-            exec( "/bin/sh", "-c", @_ ) || confess "Cannot exec " . join( ' ', @_ );
-        }
-    }
+sub parse_cmdline {
+    my ($line) = @_;
+    $line =~ s/^([\@\s-]*)//;
+    my $prefix = $1;
+    my %parsed = ( line => $line );
+    $parsed{silent}   = 1 if $prefix =~ /\@/;
+    $parsed{can_fail} = 1 if $prefix =~ /-/;
+    return \%parsed;
 }
+
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub exec {
+    my ( $self, $line ) = @_;
+    undef %date;
+    my $parsed = parse_cmdline($line);
+    print "$parsed->{line}\n" unless $parsed->{silent};
+    my $code = system $parsed->{line};
+    if ( $code && !$parsed->{can_fail} ) {
+        $code >>= 8;
+        die "Code $code from $parsed->{line}";
+    }
+    return;
+}
+## use critic
 
 ## no critic (Subroutines::RequireFinalReturn)
 sub NextPass { shift->{Pass}++ }
@@ -559,126 +486,141 @@ sub pass     { shift->{Pass} }
 ## use critic
 
 ## no critic (RequireArgUnpacking)
-sub apply {
-    my $self   = shift;
-    my $method = shift;
-    $self->NextPass;
-    my @targets = ();
-
-    # print STDERR join(' ',Apply => $method,@_),"\n";
+sub parse_args {
+    my ( @vars, @targets );
     foreach (@_) {
         if (/^(\w+)=(.*)$/) {
-
-            # print STDERR "OVERRIDE: $1 = $2\n";
-            $self->{Override}{$1} = $2;
+            push @vars, [ $1, $2 ];
         }
         else {
-            push( @targets, $_ );
+            push @targets, $_;
         }
     }
-    #
-    # This expansion is dubious as it alters the database
-    # as a function of current values of Override.
-    #
-    $self->ExpandTarget;    # Process $(VAR) :
-    @targets = ( $self->{'Targets'}[0] )->Name unless (@targets);
-
-    # print STDERR join(' ',Targets => $method,map($_->Name,@targets)),"\n";
-    foreach (@targets) {
-        my $t = $self->{Depend}{$_};
-        unless ( defined $t ) {
-            print STDERR join( ' ', $method, @_ ), "\n";
-            die "Cannot `$method' - no target $_";
-        }
-        $t->$method();
-    }
-    return;
+    return \@vars, \@targets;
 }
 ## use critic
 
-## no critic (Subroutines::RequireFinalReturn RequireArgUnpacking)
+sub apply {
+    my ( $self, $method, @args ) = @_;
+    $self->NextPass;
+    my ( $vars, $targets ) = parse_args(@args);
+    $self->set_var(@$_) for @$vars;
+    $targets = [ $self->{Vars}{'.DEFAULT_GOAL'} ] unless @$targets;
+    ## no critic (BuiltinFunctions::RequireBlockGrep BuiltinFunctions::RequireBlockMap)
+    my @bad_targets = grep !$self->{Depend}{$_}, @$targets;
+    die "Cannot '$method' (@args) - no target @bad_targets" if @bad_targets;
+    return map $self->target($_)->recurse($method), @$targets;
+    ## use critic
+}
+
+# Spew a shell script to perfom the 'make' e.g. make -n
 sub Script {
-    shift->apply( Script => @_ );
+    my ( $self, @args ) = @_;
+    my $com = ( $^O eq 'MSWin32' ) ? 'rem ' : '# ';
+    my @results;
+    for ( $self->apply( Make => @args ) ) {
+        my ( $name, @cmd ) = @$_;
+        push @results, $com . $name . "\n";
+        ## no critic (BuiltinFunctions::RequireBlockMap)
+        push @results, map parse_cmdline($_)->{line} . "\n", @cmd;
+        ## use critic
+    }
+    return @results;
 }
 
 sub Print {
-    shift->apply( Print => @_ );
+    my ( $self, @args ) = @_;
+    return $self->apply( Print => @args );
 }
 
 sub Make {
-    shift->apply( Make => @_ );
+    my ( $self, @args ) = @_;
+    for ( $self->apply( Make => @args ) ) {
+        my ( $name, @cmd ) = @$_;
+        $self->exec($_) for @cmd;
+    }
+    return;
 }
-## use critic
 
 sub new {
     my ( $class, %args ) = @_;
-    unless ( defined $args{Dir} ) {
-        chomp( $args{Dir} = getcwd() );
-    }
     my $self = bless {
+        Pattern          => {},                      # GNU style %.o : %.c
+        Dot              => {},                      # Trad style .c.o
+        Vpath            => {},                      # vpath %.c info
+        Vars             => {},                      # Variables defined in makefile
+        Depend           => {},                      # hash of targets
+        Pass             => 0,                       # incremented each sweep
+        Done             => {},
+        FunctionPackages => [qw(Make::Functions)],
+        FSFunctionMap    => \%fs_function_map,
         %args,
-        Pattern  => {},    # GNU style %.o : %.c
-        Dot      => {},    # Trad style .c.o
-        Vpath    => {},    # vpath %.c info
-        Vars     => {},    # Variables defined in makefile
-        Depend   => {},    # hash of targets
-        Targets  => [],    # ordered version so we can find 1st one
-        Pass     => 0,     # incremented each sweep
-        Pathname => {},    # cache of expanded names
-        Need     => {},
-        Done     => {},
     }, $class;
-    $self->{Vars}{CC}     = $Config{cc};
-    $self->{Vars}{AR}     = $Config{ar};
-    $self->{Vars}{CFLAGS} = $Config{optimize};
-    $self->makefile( \*DATA, __FILE__ );
-    $self->parse( $self->{Makefile} );
+    $self->set_var( 'CC',     $Config{cc} );
+    $self->set_var( 'AR',     $Config{ar} );
+    $self->set_var( 'CFLAGS', $Config{optimize} );
+    load_modules( @{ $self->function_packages } );
+    $DEFAULTS_AST ||= parse_makefile( \*DATA );
+    $self->process_ast_bit(@$_) for @$DEFAULTS_AST;
     return $self;
 }
 
 =head1 NAME
 
-Make - module for processing makefiles
+Make - Pure-Perl implementation of a somewhat GNU-like make.
 
 =head1 SYNOPSIS
 
-	require Make;
-	my $make = Make->new(...);
-	$make->parse($file);
-	$make->Script(@ARGV)
-	$make->Make(@ARGV)
-	$make->Print(@ARGV)
+    require Make;
+    my $make = Make->new;
+    $make->parse($file);
+    $make->Make(@ARGV);
 
-        my $targ = $make->Target($name);
-        $targ->colon([dependancy...],[command...]);
-        $targ->dolon([dependancy...],[command...]);
-        my @depends  = $targ->colon->depend;
-        my @commands = $targ->colon->command;
+    # to see what it would have done
+    print $make->Script(@ARGV);
+
+    # to see an expanded version of the makefile
+    $make->Print(@ARGV);
+
+    my $targ = $make->target($name);
+    my $rule = Make::Rule->new(':', \@prereqs, \@recipe);
+    $targ->add_rule($rule);
+    my @rules = @{ $targ->rules };
+
+    my @prereqs  = @{ $rule->prereqs };
+    my @commands = @{ $rule->recipe };
 
 =head1 DESCRIPTION
 
-Make->new creates an object if C<new(Makefile =E<gt> $file)> is specified
-then it is parsed. If not the usual makefile Makefile sequence is
-used. (If GNU => 1 is passed to new then GNUmakefile is looked for first.)
+Implements in pure Perl a somewhat GNU-like make, intended to be highly
+customisable.
 
-C<$make-E<gt>Make(target...)> 'makes' the target(s) specified
-(or the first 'real' target in the makefile).
+Via pure-perl-make Make has built perl/Tk from the C<MakeMaker> generated
+Makefiles...
 
-C<$make-E<gt>Print> can be used to 'print' to current C<select>'ed stream
-a form of the makefile with all variables expanded.
+=head1 MAKEFILE SYNTAX
 
-C<$make-E<gt>Script(target...)> can be used to 'print' to
-current C<select>'ed stream the equivalent bourne shell script
-that a make would perform i.e. the output of C<make -n>.
+Broadly, there are macros, directives, and rules (including recipes).
 
-There are other methods (used by parse) which can be used to add and
-manipulate targets and their dependants. There is a hierarchy of classes
-which is still evolving. These classes and their methods will be documented when
-they are a little more stable.
+Macros:
 
-The syntax of makefile accepted is reasonably generic, but I have not re-read
-any documentation yet, rather I have implemented my own mental model of how
-make works (then fixed it...).
+    varname = value
+
+Directives:
+
+    vpath %.c src/%.c
+    [-]include otherfile.mk # - means no warn on failure to include
+
+Please note the C<vpath> does not have the GNU-make behaviour of
+discarding the found path if an inferred target must be rebuilt, since
+this is too non-deterministic / confusing behaviour for this author.
+
+Rules:
+
+    target : prerequisite1 prerequisite2[; immediate recipe]
+    (tab character)follow-on recipe...
+
+Recipe lines can start with C<@> (do not echo), C<-> (continue on failure).
 
 In addition to traditional
 
@@ -690,14 +632,150 @@ GNU make's 'pattern' rules e.g.
 	%.o : %.c
 		$(CC) -c ...
 
-Likewise a subset of GNU makes $(function arg...) syntax is supported.
+The former gets internally translated to the latter.
 
-Via pure-perl-make Make has built perl/Tk from the C<MakeMaker> generated Makefiles...
+=head1 METHODS
+
+There are other methods (used by parse) which can be used to add and
+manipulate targets and their prerequites.
+
+=head2 new
+
+Class method, takes pairs of arguments in name/value form. Arguments:
+
+=head3 Vars
+
+A hash-ref of values that sets variables, overridable by the makefile.
+
+=head3 Jobs
+
+Number of concurrent jobs to run while building. Not implemented.
+
+=head3 GNU
+
+If true, then F<GNUmakefile> is looked for first.
+
+=head3 FunctionPackages
+
+Array-ref of package names to search for GNU-make style
+functions. Defaults to L<Make::Functions>.
+
+=head3 FSFunctionMap
+
+Hash-ref of file-system functions by which to access the
+file-system. Created to help testing, but might be more widely useful.
+Defaults to code accessing the actual local filesystem. The various
+functions are expected to return real Perl filehandles. Relevant keys:
+C<glob>, C<fh_open>, C<fh_write>, C<mtime>.
+
+=head2 parse
+
+Parses the given makefile. If none or C<undef>, these files will be tried,
+in order: F<GNUmakefile> if L</GNU>, F<makefile>, F<Makefile>.
+
+If a scalar-ref, will be makefile text.
+
+=head2 Make
+
+Given a target-name, builds the target(s) specified, or the first 'real'
+target in the makefile.
+
+=head2 Print
+
+Print to current C<select>'ed stream a form of the makefile with all
+variables expanded.
+
+=head2 Script
+
+Print to current C<select>'ed stream the equivalent bourne shell script
+that a make would perform i.e. the output of C<make -n>.
+
+=head2 set_var
+
+Given a name and value, sets the variable to that.
+
+May gain a "type" parameter to distinguish immediately-expanded from
+recursively-expanded (the default).
+
+=head2 expand
+
+Uses L</subsvars> to return its only arg with any macros expanded.
+
+=head2 target
+
+Find or create L<Make::Target> for given target-name.
+
+=head2 has_target
+
+Find L<Make::Target> for given target-name, or undef.
+
+=head2 patrule
+
+Search registered pattern-rules for one matching given
+target-name. Returns a L<Make::Rule> for that of the given kind, or false.
+
+Uses GNU make's "exists or can be made" algorithm on each rule's proposed
+requisite to see if that rule matches.
+
+=head1 ATTRIBUTES
+
+These are read-only.
+
+=head2 vars
+
+Returns a hash-ref of the current set of variables.
+
+=head2 function_packages
+
+Returns an array-ref of the packages to search for macro functions.
+
+=head2 fsmap
+
+Returns a hash-ref of the L</FSFunctionMap>.
+
+=head1 FUNCTIONS
+
+=head2 parse_makefile
+
+Given a file-handle, returns array-ref of Abstract Syntax-Tree (AST)
+fragments, representing the contents of that file. Each is an array-ref
+whose first element is the node-type (C<comment>, C<include>, C<vpath>,
+C<var>, C<rule>), followed by relevant data.
+
+=head2 tokenize
+
+Given a line, returns array-ref of the space-separated "tokens". Also
+splits on any further args.
+
+=head2 subsvars
+
+    my $expanded = Make::subsvars(
+        'hi $(shell echo there)',
+        \@function_packages,
+        [ \%vars ],
+        $fsmap,
+    );
+    # "hi there"
+
+Given a piece of text, will substitute any macros in it, either a
+single-character macro, or surrounded by either C<{}> or C<()>. These
+can be nested. Uses the array-ref as a list of hashes to search
+for values.
+
+If the macro is of form C<$(varname:a=b)>, then this will be a GNU
+(and others) make-style "substitution reference". First "varname" will
+be expanded. Then all occurrences of "a" at the end of words within
+the expanded text will be replaced with "b". This is intended for file
+suffixes.
+
+For GNU-make style functions, see L<Make::Functions>.
+
+=head1 DEBUGGING
+
+To see debugging messages on C<STDERR>, set environment variable
+C<MAKE_DEBUG> to a true value;
 
 =head1 BUGS
-
-At present C<new> must always find a makefile, and
-C<$make-E<gt>parse($file)> can only be used to augment that file.
 
 More attention needs to be given to using the package to I<write> makefiles.
 
@@ -705,15 +783,13 @@ The rules for matching 'dot rules' e.g. .c.o   and/or pattern rules e.g. %.o : %
 are suspect. For example give a choice of .xs.o vs .xs.c + .c.o behaviour
 seems a little odd.
 
-Variables are probably substituted in different 'phases' of the process
-than in make(1) (or even GNU make), so 'clever' uses will probably not
-work.
-
-UNIXisms abound.
-
 =head1 SEE ALSO
 
 L<pure-perl-make>
+
+L<https://pubs.opengroup.org/onlinepubs/9699919799/utilities/make.html> POSIX standard for make
+
+L<https://www.gnu.org/software/make/manual/make.html> GNU make docs
 
 =head1 AUTHOR
 

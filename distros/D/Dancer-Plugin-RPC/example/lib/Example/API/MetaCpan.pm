@@ -1,12 +1,10 @@
 package Example::API::MetaCpan;
 use Moo;
-use Scalar::Util qw/ blessed /;
+use Types::Standard qw( InstanceOf );
 
 has mc_client => (
     is       => 'ro',
-    isa      => sub {
-        die "Invalid MetaCpan-Client" unless blessed($_[0]) eq 'Client::MetaCpan';
-    },
+    isa      => InstanceOf['Client::MetaCpan'],
     required => 1
 );
 

@@ -4,7 +4,7 @@ use Wasm::Wasmtime;
 
 my $store = Wasm::Wasmtime::Store->new;
 my $instance = Wasm::Wasmtime::Instance->new(
-  Wasm::Wasmtime::Module->new($store, wat => q{
+  Wasm::Wasmtime::Module->new($store->engine, wat => q{
     (module
       (func (export "foo") (param i32 i32) (result i32)
         local.get 0

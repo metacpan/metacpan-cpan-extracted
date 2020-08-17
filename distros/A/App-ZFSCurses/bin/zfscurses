@@ -1,0 +1,129 @@
+#!/usr/bin/env perl
+
+use 5.10.1;
+use strict;
+use warnings;
+use autodie;
+
+use Term::ANSIColor qw#colored#;
+use Getopt::Long;
+use Pod::Usage;
+
+use constant E_ERROR => colored( 'ERROR', 'red' );
+
+=head1 NAME
+
+zfscurses - curses UI to query/modify a ZFS dataset/snapshot properties.
+
+zfscurses is a curses UI to display a list of ZFS datasets or a list of ZFS
+snapshots depending on the selected view.
+
+=cut
+
+=head1 VERSION
+
+Version 1.210.
+
+=cut
+
+our $VERSION = '1.210';
+
+=head1 SYNOPSIS
+
+zfscurses [-hm] [view]
+
+    -m|--man        display man page
+    -h|--help       display help
+
+    [view]          start zfscurses in selected view
+      ├─ datasets     show datasets found on the system
+      └─ snapshots    show snapshots found on the system
+
+=cut
+
+my $opts = {};
+my @args = ( 'help|h', 'man|m' );
+
+GetOptions( $opts, @args );
+
+$opts->{help} and pod2usage( verbose => 1, exitval => -1 );
+$opts->{man}  and pod2usage( verbose => 2, exitval => -1 );
+
+my $view = shift @ARGV;
+( defined $view )
+  or pod2usage(
+    -msg     => E_ERROR . "! You MUST specify a view!\n",
+    -verbose => 1,
+    -exitval => -1
+);
+
+if ( $view eq 'datasets' ) {
+    require App::ZFSCurses::UI::Datasets;
+    App::ZFSCurses::UI::Datasets->new->draw_and_run();
+}
+elsif ( $view eq 'snapshots' ) {
+    require App::ZFSCurses::UI::Snapshots;
+    App::ZFSCurses::UI::Snapshots->new->draw_and_run();
+}
+else {
+    pod2usage(
+        -msg     => E_ERROR . "! unknown view: \"$view\"",
+        -verbose => 1,
+        -exitval => -1
+    );
+}
+
+=head1 KEYSTROKES
+
+Use the following keystrokes to navigate around the UI.
+
+=over 5
+
+=item Up/Down
+
+Move the cursor up or down.
+
+=item Enter/Space
+
+Validate/confirm selection.
+
+=item Tab
+
+Move focus around.
+
+=item Ctrl+q
+
+Quit the UI.
+
+=item F1
+
+When browsing a dataset/snapshot properties, F1 will show a help message about
+the selected property. You must first select a property with the Enter/Space
+keystroke.
+
+=back
+
+=cut
+
+=head1 MOUSE
+
+Mouse support is enabled. You can click on any UI component: textbox, list,
+button.
+
+=head1 SEE ALSO
+
+L<App::ZFSCurses> to understand the guts of the application.
+
+=head1 AUTHOR
+
+Patrice Clement <monsieurp at cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2020 by Patrice Clement.
+
+This is free software, licensed under the (three-clause) BSD License.
+
+See the LICENSE file.
+
+=cut

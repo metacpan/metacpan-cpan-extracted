@@ -1,0 +1,52 @@
+{
+   "abstract" : "A Perl implementation of the Lox programming language",
+   "author" : [
+      "David Farrell"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Lox",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Getopt::Long" : "0",
+            "Test::More" : "0",
+            "perl" : "5.024000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dnmfarrell/Perl-Lox.git",
+         "web" : "https://github.com/dnmfarrell/Perl-Lox"
+      }
+   },
+   "version" : 0.02,
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

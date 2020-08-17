@@ -3,9 +3,9 @@ package DateTime::Format::Builder::Parser::Quick;
 use strict;
 use warnings;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
-use vars qw( %dispatch_data );
+our %dispatch_data;
 
 use Params::Validate qw( SCALAR OBJECT CODEREF validate );
 
@@ -59,54 +59,64 @@ DateTime::Format::Builder::Parser::Quick - Use another formatter, simply
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 
     use DateTime::Format::Builder (
-    parsers => { parse_datetime => [
-        { Quick => 'DateTime::Format::HTTP' },
-        { Quick => 'DateTime::Format::Mail' },
-        { Quick => 'DateTime::Format::IBeat' },
-    ]});
+        parsers => {
+            parse_datetime => [
+                { Quick => 'DateTime::Format::HTTP' },
+                { Quick => 'DateTime::Format::Mail' },
+                { Quick => 'DateTime::Format::IBeat' },
+            ]
+        }
+    );
 
-is the same as:
+    # is the same as
 
     use DateTime::Format::HTTP;
     use DateTime::Format::Mail;
     use DateTime::Format::IBeat;
 
     use DateTime::Format::Builder (
-    parsers => { parse_datetime => [
-        sub { eval { DateTime::Format::HTTP->parse_datetime( $_[1] ) } },
-        sub { eval { DateTime::Format::Mail->parse_datetime( $_[1] ) } },
-        sub { eval { DateTime::Format::IBeat->parse_datetime( $_[1] ) } },
-    ]});
+        parsers => {
+            parse_datetime => [
+                sub {
+                    eval { DateTime::Format::HTTP->parse_datetime( $_[1] ) }
+                },
+                sub {
+                    eval { DateTime::Format::Mail->parse_datetime( $_[1] ) }
+                },
+                sub {
+                    eval { DateTime::Format::IBeat->parse_datetime( $_[1] ) }
+                },
+            ]
+        }
+    );
 
-(These two pieces of code can both be found in the test
-suite; one as F<quick.t>, the other as F<fall.t>.)
+(These two pieces of code can both be found in the test suite; one as
+F<quick.t>, the other as F<fall.t>.)
 
 =head1 DESCRIPTION
 
-C<Quick> adds a parser that allows some shortcuts when
-writing fairly standard and mundane calls to other
-formatting modules.
+C<Quick> adds a parser that allows some shortcuts when writing fairly standard
+and mundane calls to other formatting modules.
 
 =head1 SPECIFICATION
 
 C<Quick> has two keys, one optional.
 
-The C<Quick> keyword should have an argument of either an
-object or a class name. If it's a class name then the class
-is C<use>d.
+The C<Quick> keyword should have an argument of either an object or a class
+name. If it's a class name then the class is C<use>d.
 
-The C<method> keyword is optional with a default of
-C<parse_datetime>. It's either name of the method to invoke
-on the object, or a reference to a piece of code.
+The C<method> keyword is optional with a default of C<parse_datetime>. It's
+either name of the method to invoke on the object, or a reference to a piece
+of code.
 
 In any case, the resultant code ends up looking like:
 
-     my $rv = $Quick->$method( $date );
+    my $rv = $Quick->$method($date);
 
 =head1 SEE ALSO
 
@@ -119,7 +129,7 @@ L<DateTime::Format::Builder>
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Builder> or via email to L<bug-datetime-format-builder@rt.cpan.org|mailto:bug-datetime-format-builder@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/DateTime-Format-Builder/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
@@ -137,13 +147,13 @@ Dave Rolsky <autarch@urth.org>
 
 =item *
 
-Iain Truskett
+Iain Truskett <spoon@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

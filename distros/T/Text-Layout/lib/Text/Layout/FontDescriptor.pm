@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.018.3";
+our $VERSION = "0.019";
 
 =head1 NAME
 
@@ -90,9 +90,7 @@ sub get_font {
     $self->{font} ||= do {
 	croak("Forgot to pass a layout context to get_font?")
 	  unless UNIVERSAL::isa( $context, 'Text::Layout' );
-	croak("Cannot load font $self (no loader defined)")
-	  unless $self->{loader};
-	$self->{loader}->( $self, $context, $self->{loader_data} );
+	$context->load_font( $self->{loader_data} );
     };
 }
 

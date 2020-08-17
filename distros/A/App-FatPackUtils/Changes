@@ -1,54 +1,60 @@
-0.120   2019-02-08 (PERLANCAR)
+0.121   2020-04-30  Released-By: PERLANCAR; Urgency: low
+
+	- Tweak Rinci metadata: replace deprecated
+	  x.schema.{,element_}entity with more specific schema.
+
+
+0.120   2019-02-08  Released-By: PERLANCAR
 
 	- Also recognize scripts produced by Module::FatPack.
 
 
-0.11    2017-07-04 (PERLANCAR)
+0.11    2017-07-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Fix dzil plugin ordering.
 
 
-0.10    2017-07-04 (PERLANCAR)
+0.10    2017-07-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Tweak Abstract.
 
 
-0.09    2017-07-04 (PERLANCAR)
+0.09    2017-07-04  Released-By: PERLANCAR
 
 	- Add script: fatpack-extract.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.08    2016-12-29 (PERLANCAR)
+0.08    2016-12-29  Released-By: PERLANCAR
 
 	- Add utility: update-fatpack-snippets.
 
 
-0.07    2016-02-06 (PERLANCAR)
+0.07    2016-02-06  Released-By: PERLANCAR
 
 	- [Bugfix] fatpack-info: file_size information was broken.
 
 
-0.06    2016-02-06 (PERLANCAR)
+0.06    2016-02-06  Released-By: PERLANCAR
 
 	- fatpack-info: Now can search script in PATH.
 
 	- fatpack-info: Add option --show-module-version (-V).
 
 
-0.05    2016-01-18 (PERLANCAR)
+0.05    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.04    2015-09-03 (PERLANCAR)
+0.04    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -57,18 +63,18 @@
 	  requirement.
 
 
-0.03    2015-07-03 (PERLANCAR)
+0.03    2015-07-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Update mention (fatten renamed to depak).
 
 
-0.02    2015-06-17 (PERLANCAR)
+0.02    2015-06-17  Released-By: PERLANCAR
 
 	- Add script: fatpack-modules.
 
 
-0.01    2015-04-16 (PERLANCAR)
+0.01    2015-04-16  Released-By: PERLANCAR
 
         - First release.

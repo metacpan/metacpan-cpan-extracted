@@ -31,7 +31,8 @@ my @files = (
     't/pages/6.html',
     't/pages/7.html',
     't/pages/8.html',
-    't/pages/9.html'
+    't/pages/9.html',
+    't/response_cache_ok.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

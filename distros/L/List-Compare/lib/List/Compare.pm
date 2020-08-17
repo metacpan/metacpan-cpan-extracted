@@ -1,5 +1,5 @@
 package List::Compare;
-$VERSION = '0.53';
+our $VERSION = '0.55';
 use strict;
 local $^W = 1;
 use Carp;
@@ -10,8 +10,7 @@ use List::Compare::Base::_Auxiliary qw(
 
 sub new {
     my $class = shift;
-    my (@args, $unsorted, $accelerated);
-    my ($argument_error_status, $nextarg, @testargs);
+    my (@args, $unsorted, $accelerated, $argument_error_status, $nextarg, @testargs);
     if (@_ == 1 and (ref($_[0]) eq 'HASH')) {
         my $argref = shift;
         die "Need to pass references to 2 or more seen-hashes or \n  to provide a 'lists' key within the single hash being passed by reference"
@@ -195,10 +194,13 @@ sub get_unique_all {
     return [ $data{'unique'}, $data{'complement'} ];
 }
 
-*get_Lonly = \&get_unique;
-*get_Aonly = \&get_unique;
-*get_Lonly_ref = \&get_unique_ref;
-*get_Aonly_ref = \&get_unique_ref;
+{
+    no warnings 'once';
+    *get_Lonly = \&get_unique;
+    *get_Aonly = \&get_unique;
+    *get_Lonly_ref = \&get_unique_ref;
+    *get_Aonly_ref = \&get_unique_ref;
+}
 
 sub get_complement {
     return @{ get_complement_ref(shift) };
@@ -216,10 +218,13 @@ sub get_complement_all {
     return [ $data{'complement'}, $data{'unique'} ];
 }
 
-*get_Ronly = \&get_complement;
-*get_Bonly = \&get_complement;
-*get_Ronly_ref = \&get_complement_ref;
-*get_Bonly_ref = \&get_complement_ref;
+{
+    no warnings 'once';
+    *get_Ronly = \&get_complement;
+    *get_Bonly = \&get_complement;
+    *get_Ronly_ref = \&get_complement_ref;
+    *get_Bonly_ref = \&get_complement_ref;
+}
 
 sub get_symmetric_difference {
     return @{ get_symmetric_difference_ref(shift) };
@@ -231,12 +236,15 @@ sub get_symmetric_difference_ref {
     return $data{'symmetric_difference'};
 }
 
-*get_symdiff  = \&get_symmetric_difference;
-*get_LorRonly = \&get_symmetric_difference;
-*get_AorBonly = \&get_symmetric_difference;
-*get_symdiff_ref  = \&get_symmetric_difference_ref;
-*get_LorRonly_ref = \&get_symmetric_difference_ref;
-*get_AorBonly_ref = \&get_symmetric_difference_ref;
+{
+    no warnings 'once';
+    *get_symdiff  = \&get_symmetric_difference;
+    *get_LorRonly = \&get_symmetric_difference;
+    *get_AorBonly = \&get_symmetric_difference;
+    *get_symdiff_ref  = \&get_symmetric_difference_ref;
+    *get_LorRonly_ref = \&get_symmetric_difference_ref;
+    *get_AorBonly_ref = \&get_symmetric_difference_ref;
+}
 
 sub get_nonintersection {
     my $class = shift;
@@ -258,7 +266,7 @@ sub is_LsubsetR {
     return $data{'LsubsetR_status'};
 }
 
-*is_AsubsetB = \&is_LsubsetR;
+{ no warnings 'once'; *is_AsubsetB = \&is_LsubsetR; }
 
 sub is_RsubsetL {
     my $class = shift;
@@ -266,7 +274,7 @@ sub is_RsubsetL {
     return $data{'RsubsetL_status'};
 }
 
-*is_BsubsetA = \&is_RsubsetL;
+{ no warnings 'once'; *is_BsubsetA = \&is_RsubsetL; }
 
 sub is_LequivalentR {
     my $class = shift;
@@ -274,7 +282,7 @@ sub is_LequivalentR {
     return $data{'LequivalentR_status'};
 }
 
-*is_LeqvlntR = \&is_LequivalentR;
+{ no warnings 'once'; *is_LeqvlntR = \&is_LequivalentR; }
 
 sub is_LdisjointR {
     my $class = shift;
@@ -308,13 +316,10 @@ sub is_member_which_ref {
     croak "Method call requires exactly 1 argument (no references):  $!"
         unless (@_ == 1 and ref($_[0]) ne 'ARRAY');
     my %data = %$class;
-    my ($arg, @found);
-    $arg = shift;
+    my $arg = shift;
+    my @found = ();
     if (exists ${$data{'seenL'}}{$arg}) { push @found, 0; }
     if (exists ${$data{'seenR'}}{$arg}) { push @found, 1; }
-    if ( (! exists ${$data{'seenL'}}{$arg}) &&
-         (! exists ${$data{'seenR'}}{$arg}) )
-       { @found = (); }
     return \@found;
 }
 
@@ -326,11 +331,9 @@ sub are_members_which {
     my (@args, %found);
     @args = @{$_[0]};
     for (my $i=0; $i<=$#args; $i++) {
+        @{$found{$args[$i]}} = ();
         if (exists ${$data{'seenL'}}{$args[$i]}) { push @{$found{$args[$i]}}, 0; }
         if (exists ${$data{'seenR'}}{$args[$i]}) { push @{$found{$args[$i]}}, 1; }
-        if ( (! exists ${$data{'seenL'}}{$args[$i]}) &&
-             (! exists ${$data{'seenR'}}{$args[$i]}) )
-           { @{$found{$args[$i]}} = (); }
     }
     return \%found;
 }
@@ -448,10 +451,13 @@ sub get_unique_all {
     return [ get_unique_ref($class), get_complement_ref($class) ];
 }
 
-*get_Lonly = \&get_unique;
-*get_Aonly = \&get_unique;
-*get_Lonly_ref = \&get_unique_ref;
-*get_Aonly_ref = \&get_unique_ref;
+{
+    no warnings 'once';
+    *get_Lonly = \&get_unique;
+    *get_Aonly = \&get_unique;
+    *get_Lonly_ref = \&get_unique_ref;
+    *get_Aonly_ref = \&get_unique_ref;
+}
 
 sub get_complement {
     return @{ get_complement_ref(shift) };
@@ -470,10 +476,13 @@ sub get_complement_all {
     return [ get_complement_ref($class), get_unique_ref($class) ];
 }
 
-*get_Ronly = \&get_complement;
-*get_Bonly = \&get_complement;
-*get_Ronly_ref = \&get_complement_ref;
-*get_Bonly_ref = \&get_complement_ref;
+{
+    no warnings 'once';
+    *get_Ronly = \&get_complement;
+    *get_Bonly = \&get_complement;
+    *get_Ronly_ref = \&get_complement_ref;
+    *get_Bonly_ref = \&get_complement_ref;
+}
 
 sub get_symmetric_difference {
     return @{ get_symmetric_difference_ref(shift) };
@@ -487,12 +496,15 @@ sub get_symmetric_difference_ref {
       : return [ sort @{_symmetric_difference_engine($data{'L'}, $data{'R'})} ];
 }
 
-*get_symdiff  = \&get_symmetric_difference;
-*get_LorRonly = \&get_symmetric_difference;
-*get_AorBonly = \&get_symmetric_difference;
-*get_symdiff_ref  = \&get_symmetric_difference_ref;
-*get_LorRonly_ref = \&get_symmetric_difference_ref;
-*get_AorBonly_ref = \&get_symmetric_difference_ref;
+{
+    no warnings 'once';
+    *get_symdiff  = \&get_symmetric_difference;
+    *get_LorRonly = \&get_symmetric_difference;
+    *get_AorBonly = \&get_symmetric_difference;
+    *get_symdiff_ref  = \&get_symmetric_difference_ref;
+    *get_LorRonly_ref = \&get_symmetric_difference_ref;
+    *get_AorBonly_ref = \&get_symmetric_difference_ref;
+}
 
 sub get_nonintersection {
     return @{ get_nonintersection_ref(shift) };
@@ -512,7 +524,7 @@ sub is_LsubsetR {
     return _is_LsubsetR_engine($data{'L'}, $data{'R'});
 }
 
-*is_AsubsetB  = \&is_LsubsetR;
+{ no warnings 'once'; *is_AsubsetB  = \&is_LsubsetR; }
 
 sub is_RsubsetL {
     my $class = shift;
@@ -520,7 +532,7 @@ sub is_RsubsetL {
     return _is_RsubsetL_engine($data{'L'}, $data{'R'});
 }
 
-*is_BsubsetA  = \&is_RsubsetL;
+{ no warnings 'once'; *is_BsubsetA  = \&is_RsubsetL; }
 
 sub is_LequivalentR {
     my $class = shift;
@@ -528,7 +540,7 @@ sub is_LequivalentR {
     return _is_LequivalentR_engine($data{'L'}, $data{'R'});
 }
 
-*is_LeqvlntR = \&is_LequivalentR;
+{ no warnings 'once'; *is_LeqvlntR = \&is_LequivalentR; }
 
 sub is_LdisjointR {
     my $class = shift;
@@ -745,12 +757,9 @@ sub _print_equivalence_chart_engine {
 sub _is_member_which_engine {
     my ($l, $r, $arg) = @_;
     my ($hrefL, $hrefR) = _calc_seen($l, $r);
-    my (@found);
+    my @found = ();
     if (exists ${$hrefL}{$arg}) { push @found, 0; }
     if (exists ${$hrefR}{$arg}) { push @found, 1; }
-    if ( (! exists ${$hrefL}{$arg}) &&
-         (! exists ${$hrefR}{$arg}) )
-       { @found = (); }
     return \@found;
 }
 
@@ -760,11 +769,9 @@ sub _are_members_which_engine {
     my @args = @{$arg};
     my (%found);
     for (my $i=0; $i<=$#args; $i++) {
+        @{$found{$args[$i]}} = ();
         if (exists ${$hrefL}{$args[$i]}) { push @{$found{$args[$i]}}, 0; }
         if (exists ${$hrefR}{$args[$i]}) { push @{$found{$args[$i]}}, 1; }
-        if ( (! exists ${$hrefL}{$args[$i]}) &&
-             (! exists ${$hrefR}{$args[$i]}) )
-           { @{$found{$args[$i]}} = (); }
     }
     return \%found;
 }
@@ -1065,8 +1072,11 @@ sub get_Lonly_ref {
     get_unique_ref($class, $index);
 }
 
-*get_Aonly = \&get_Lonly;
-*get_Aonly_ref = \&get_Lonly_ref;
+{
+    no warnings 'once';
+    *get_Aonly = \&get_Lonly;
+    *get_Aonly_ref = \&get_Lonly_ref;
+}
 
 sub get_complement {
     my $class = shift;
@@ -1105,8 +1115,11 @@ sub get_Ronly_ref {
     &get_complement_ref($class, $index);
 }
 
-*get_Bonly = \&get_Ronly;
-*get_Bonly_ref = \&get_Ronly_ref;
+{
+    no warnings 'once';
+    *get_Bonly = \&get_Ronly;
+    *get_Bonly_ref = \&get_Ronly_ref;
+}
 
 sub get_symmetric_difference {
     return @{ get_symmetric_difference_ref(shift) };
@@ -1118,8 +1131,11 @@ sub get_symmetric_difference_ref {
     return $data{'symmetric_difference'};
 }
 
-*get_symdiff  = \&get_symmetric_difference;
-*get_symdiff_ref  = \&get_symmetric_difference_ref;
+{
+    no warnings 'once';
+    *get_symdiff  = \&get_symmetric_difference;
+    *get_symdiff_ref  = \&get_symmetric_difference_ref;
+}
 
 sub get_LorRonly {
     my $class = shift;
@@ -1137,8 +1153,11 @@ sub get_LorRonly_ref {
     get_symmetric_difference_ref($class);
 }
 
-*get_AorBonly = \&get_LorRonly;
-*get_AorBonly_ref = \&get_LorRonly_ref;
+{
+    no warnings 'once';
+    *get_AorBonly = \&get_LorRonly;
+    *get_AorBonly_ref = \&get_LorRonly_ref;
+}
 
 sub get_nonintersection {
     return @{ get_nonintersection_ref(shift) };
@@ -1159,7 +1178,7 @@ sub is_LsubsetR {
     return $subset_status;
 }
 
-*is_AsubsetB = \&is_LsubsetR;
+{ no warnings 'once'; *is_AsubsetB = \&is_LsubsetR; }
 
 sub is_RsubsetL {
     my $class = shift;
@@ -1174,7 +1193,7 @@ sub is_RsubsetL {
     return $subset_status;
 }
 
-*is_BsubsetA = \&is_RsubsetL;
+{ no warnings 'once'; *is_BsubsetA = \&is_RsubsetL; }
 
 sub is_LequivalentR {
     my $class = shift;
@@ -1185,7 +1204,7 @@ sub is_LequivalentR {
     return $equivalent_status;
 }
 
-*is_LeqvlntR = \&is_LequivalentR;
+{ no warnings 'once'; *is_LeqvlntR = \&is_LequivalentR; }
 
 sub is_LdisjointR {
     my $class = shift;
@@ -1416,8 +1435,11 @@ sub get_symmetric_difference_ref {
     return [ $unsortflag ? @symmetric_difference : sort(@symmetric_difference) ];
 }
 
-*get_symdiff = \&get_symmetric_difference;
-*get_symdiff_ref = \&get_symmetric_difference_ref;
+{
+    no warnings 'once';
+    *get_symdiff = \&get_symmetric_difference;
+    *get_symdiff_ref = \&get_symmetric_difference_ref;
+}
 
 sub get_LorRonly {
     my $class = shift;
@@ -1435,8 +1457,11 @@ sub get_LorRonly_ref {
     get_symmetric_difference_ref($class);
 }
 
-*get_AorBonly = \&get_LorRonly;
-*get_AorBonly_ref = \&get_LorRonly_ref;
+{
+    no warnings 'once';
+    *get_AorBonly = \&get_LorRonly;
+    *get_AorBonly_ref = \&get_LorRonly_ref;
+}
 
 sub get_unique {
     my $class = shift;
@@ -1479,8 +1504,11 @@ sub get_Lonly_ref {
     get_unique_ref($class, $index);
 }
 
-*get_Aonly = \&get_Lonly;
-*get_Aonly_ref = \&get_Lonly_ref;
+{
+    no warnings 'once';
+    *get_Aonly = \&get_Lonly;
+    *get_Aonly_ref = \&get_Lonly_ref;
+}
 
 sub get_complement {
     my $class = shift;
@@ -1524,8 +1552,11 @@ sub get_Ronly_ref {
     &get_complement_ref($class, $index);
 }
 
-*get_Bonly = \&get_Ronly;
-*get_Bonly_ref = \&get_Ronly_ref;
+{
+    no warnings 'once';
+    *get_Bonly = \&get_Ronly;
+    *get_Bonly_ref = \&get_Ronly_ref;
+}
 
 sub is_LsubsetR {
     my $class = shift;
@@ -1534,7 +1565,7 @@ sub is_LsubsetR {
     return $subset_status;
 }
 
-*is_AsubsetB = \&is_LsubsetR;
+{ no warnings 'once'; *is_AsubsetB = \&is_LsubsetR; }
 
 sub is_RsubsetL {
     my $class = shift;
@@ -1549,7 +1580,7 @@ sub is_RsubsetL {
     return $subset_status;
 }
 
-*is_BsubsetA = \&is_RsubsetL;
+{ no warnings 'once'; *is_BsubsetA = \&is_RsubsetL; }
 
 sub is_LequivalentR {
     my $class = shift;
@@ -1561,7 +1592,7 @@ sub is_LequivalentR {
     return ${$xequivalentref}[$index_left][$index_right];
 }
 
-*is_LeqvlntR = \&is_LequivalentR;
+{ no warnings 'once'; *is_LeqvlntR = \&is_LequivalentR; }
 
 sub is_LdisjointR {
     my $class = shift;
@@ -1713,14 +1744,16 @@ sub get_version {
 
 #################### DOCUMENTATION ####################
 
+=encoding utf-8
+
 =head1 NAME
 
 List::Compare - Compare elements of two or more lists
 
 =head1 VERSION
 
-This document refers to version 0.53 of List::Compare.  This version was
-released June 07 2015.
+This document refers to version 0.55 of List::Compare.  This version was
+released August 16 2020.
 
 =head1 SYNOPSIS
 
@@ -3076,6 +3109,14 @@ union.
 
 =item *
 
+Data::Compare - compare perl data structures
+(L<http://search.cpan.org/dist/Data-Compare/>)
+
+This library compares Perl data structures recursively.  Comes recommended by
+Slaven Rezić!
+
+=item *
+
 List::Util - A selection of general-utility list subroutines
 (L<http://search.cpan.org/dist/Scalar-List-Utils/>)
 
@@ -3165,13 +3206,13 @@ or through the web interface at L<http://rt.cpan.org>.
 James E. Keenan (jkeenan@cpan.org).  When sending correspondence, please
 include 'List::Compare' or 'List-Compare' in your subject line.
 
-Creation date:  May 20, 2002.  Last modification date:  June 07 2015.
+Creation date:  May 20, 2002.  Last modification date:  August 16 2020.
 
 Development repository: L<https://github.com/jkeenan/list-compare>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-15 James E. Keenan.  United States.  All rights reserved.
+Copyright (c) 2002-20 James E. Keenan.  United States.  All rights reserved.
 This is free software and may be distributed under the same terms as Perl
 itself.
 

@@ -78,7 +78,7 @@ sub dateline {
     elsif ($guess = $dom->at(".content .writer span:nth-child(2)")) {
         ($dateline) = $guess->text =~ m#([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2})#;
     }
-    elsif ($guess = $dom->at("div.content-wrapper-right > div > div > div:nth-child(4), span.f12_15a_g2")) {
+    elsif ($guess = $dom->at("div.content-wrapper-right > div > div > div:nth-child(4)")) {
         ($dateline) = $guess->text =~ m#([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})#;
     }
     elsif ($guess = $dom->at("span#ctl00_ContentPlaceHolder1_News_Label, #ctl00_ContentPlaceHolder1_UpdatePanel2 font[color=darkred]")) {
@@ -147,8 +147,6 @@ sub journalist {
         $ret = $guess->attr('content');
     } elsif ( $guess = $dom->at('.bt_xmic span[itemprop=author], div.tdb_single_author a.tdb-author-name, div.field-item a[href^=/author/], div.content_reporter a[itemprop=author], span[itemprop=author] a, div.author div.intro a div.name, div.article-author > h5 > a, div.article-meta > div.article-author > a, div.authorInfo li.authorName > a, .article .writer > p, .info_author, .news-info dd[itemprop=author], .content_reporter a, .top_title span.reporter_name, .post-heading time span, header .article-meta .article-author,  .article_header > .author > span:first-child, .mid-news > .m-left-side > .maintype-wapper > .subtype-sort, .newsCon > .newsInfo > span:first-child, .newsdetail_content > .title > h4 > a[href^="/news/searchresult/news?search_text="], .m-from-author > .m-from-author__name, .post-author-name a[itemprop*=author], a.post-author-avatar .post-author-name > b, div#news_content div.author') ) {
         $ret = $guess->text;
-    } elsif ($guess = $dom->at('span.f12_15a_g2')) {
-        ($ret) = $guess->text =~ m{／記者 (.+?)／};
     } elsif ($guess = $dom->at('div#yt_container_placeholder + p')) {
         ($ret) = $guess->text =~ m{\A \s* (.+) \s+ 報導 \s+ / }x;
     } elsif ($guess = $dom->at('h4.font_color5')) {

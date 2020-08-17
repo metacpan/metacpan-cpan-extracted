@@ -36,7 +36,6 @@ typedef enum    marpaESLIF_matcher_value   marpaESLIF_matcher_value_t;
 typedef enum    marpaESLIF_event_type      marpaESLIF_event_type_t;
 typedef struct  marpaESLIF_readerContext   marpaESLIF_readerContext_t;
 typedef struct  marpaESLIF_cloneContext    marpaESLIF_cloneContext_t;
-typedef         marpaESLIFValueType_t      marpaESLIF_stack_type_t;
 typedef struct  marpaESLIF_lexeme_data     marpaESLIF_lexeme_data_t;
 typedef struct  marpaESLIF_alternative     marpaESLIF_alternative_t;
 typedef         marpaESLIFAction_t         marpaESLIF_action_t;
@@ -84,14 +83,16 @@ struct marpaESLIF_regex_option_map {
 };
 
 struct marpaESLIF_regex {
-  pcre2_code          *patternp;     /* Compiled pattern */
-  pcre2_match_data    *match_datap;  /* Match data */
+  pcre2_code            *patternp;     /* Compiled pattern */
+  pcre2_match_data      *match_datap;  /* Match data */
 #ifdef PCRE2_CONFIG_JIT
-  short                jitCompleteb; /* Eventual optimized JIT */
-  short                jitPartialb;
+  short                  jitCompleteb; /* Eventual optimized JIT */
+  short                  jitPartialb;
 #endif
-  short                isAnchoredb;  /* Remember if pattern was allocated with PCRE2_ANCHORED (set automatically or not) */
-  short                utfb;         /* Is UTF mode enabled in that pattern ? */
+  short                  isAnchoredb;  /* Remember if pattern was allocated with PCRE2_ANCHORED (set automatically or not) */
+  short                  utfb;         /* Is UTF mode enabled in that pattern ? */
+  pcre2_compile_context *ccontextp;    /* Output of pcre2_compile_context */
+  short                  calloutb;     /* Do this regex have any callout ? */
 };
 
 struct marpaESLIF_terminal {
@@ -132,6 +133,7 @@ struct marpaESLIFSymbol {
     marpaESLIF_terminal_t     *terminalp; /* Symbol is a terminal */
     marpaESLIF_meta_t         *metap;     /* Symbol is a meta identifier, i.e. a rule */
   } u;
+  marpaESLIF_t                *marpaESLIFp;
   short                        startb;                 /* Start symbol ? */
   short                        discardb;               /* Discard LHS symbol (i.e. :discard) ? */
   short                        discardRhsb;            /* Discard RHS symbol ? */
@@ -217,6 +219,7 @@ struct marpaESLIF_grammar {
   marpaESLIFAction_t    *defaultSymbolActionp;               /* Default action for symbols - never NULL */
   marpaESLIFAction_t    *defaultRuleActionp;                 /* Default action for rules - never NULL */
   marpaESLIFAction_t    *defaultEventActionp;                /* Default action for events - can be NULL */
+  marpaESLIFAction_t    *defaultRegexActionp;                /* Default regex action, it is transversal and applies to all regexes of a grammar - can be NULL */
   int                    starti;                             /* Default start symbol ID - filled during grammar validation */
   char                  *starts;                             /* Default start symbol name - filled during grammar validation - shallow pointer */
   int                   *ruleip;                             /* Array of rule IDs - filled by grammar validation */
@@ -252,6 +255,7 @@ struct marpaESLIF {
 #ifdef HAVE_LOCALE_H
   struct lconv           *lconvp;
 #endif
+  const uint8_t          *tablesp;                     /* Output of pcre2_maketables */
 };
 
 struct marpaESLIFGrammar {
@@ -299,7 +303,7 @@ struct marpaESLIFValue {
   marpaESLIF_rule_t           *rulep;
   char                        *actions; /* True external name of best-effort ASCII in case of literal */
   marpaESLIF_string_t         *stringp; /* Not NULL only when is a literal - then callback is forced to be internal */
-  lua_State                   *L;
+  lua_State                   *L;       /* Shallow copy of the L that is in the top-level recognizer */
   void                        *marpaESLIFLuaValueContextp;
   genericStack_t               _beforePtrStack;
   genericStack_t              *beforePtrStackp;
@@ -355,7 +359,7 @@ struct marpaESLIFRecognizer {
   marpaESLIFEvent_t           *eventArrayp;        /* For the events */
   size_t                       eventArrayl;        /* Current number of events */
   size_t                       eventArraySizel;    /* Real allocated size (to avoid constant free/deletes) */
-  marpaESLIFRecognizer_t      *parentRecognizerp;
+  marpaESLIFRecognizer_t      *marpaESLIFRecognizerParentp;
   char                        *lastCompletionEvents; /* A trick to avoid having to fetch the array event when a discard subgrammar succeed */
   marpaESLIF_symbol_t         *lastCompletionSymbolp; /* Ditto */
   char                        *discardEvents;     /* Set by a child discard recognizer that reaches a completion event */
@@ -390,8 +394,6 @@ struct marpaESLIFRecognizer {
   short                        pristineb;           /* 1: pristine, i.e. can be reused, 0: have at least one thing that happened at the raw grammar level, modulo the eventual initial events */
   genericHash_t                _marpaESLIFRecognizerHash; /* Cache of recognizers ready for re-use - shared with all children (lexeme mode) */
   genericHash_t               *marpaESLIFRecognizerHashp;
-  genericStack_t               _marpaESLIFRecognizerStack; /* Cache of recognizers already malloced - not ready for reuse, just already allocated */
-  genericStack_t              *marpaESLIFRecognizerStackp; /* Cache of recognizers already malloced - not ready for reuse, just already allocated */
   marpaESLIF_stream_t          _marpaESLIF_stream;  /* A stream is always owned by one recognizer */
   marpaESLIF_stream_t         *marpaESLIF_streamp;  /* ... But the stream pointer can be shared with others */
   size_t                       previousMaxMatchedl;       /* Always computed */
@@ -427,14 +429,25 @@ struct marpaESLIFRecognizer {
   size_t                       lastDiscardl;    /* Number of bytes */
   char                        *lastDiscards;    /* Bytes */
 
-  /* For lua if-action callback */
-  lua_State                   *L;
+  /* For lua action callbacks */
+  lua_State                   *L;              /* Only owned by the top-level recognizer */
   char                        *ifactions;
   char                        *eventactions;
+  char                        *regexactions;
 
   /* For _marpaESLIF_flatten_pointers optimization */
   genericStack_t               _marpaESLIFValueResultFlattenStack;
   genericStack_t              *marpaESLIFValueResultFlattenStackp;
+
+  /* When doing regex callback, only the "offset_vector" part is variable, all other */
+  /* members of the regex's TABLE argument can be created once and modified in-place */
+  size_t                       _offset_vector_allocl;
+  marpaESLIFValueResultPair_t  _marpaESLIFCalloutBlockPairs[_MARPAESLIFCALLOUTBLOCK_SIZE];
+  marpaESLIFValueResult_t      _marpaESLIFCalloutBlock;
+  marpaESLIFValueResult_t     *marpaESLIFCalloutBlockp;
+
+  /* We always maintain a shallow pointer to the top-level recognizer, to ease access to lua state */
+  marpaESLIFRecognizer_t      *marpaESLIFRecognizerTopp;
 };
 
 struct marpaESLIF_lexeme_data {
@@ -496,7 +509,10 @@ marpaESLIFRecognizerOption_t marpaESLIFRecognizerOption_default_template = {
   MARPAESLIF_BUFSIZ, /* bufsizl */
   50,                /* buftriggerperci */
   50,                /* bufaddperci */
-  NULL               /* ifActionResolverp */
+  NULL,              /* ifActionResolverp */
+  NULL,              /* eventActionResolverp */
+  NULL,              /* regexActionResolverp */
+  NULL               /* importerp */
 };
 
 marpaESLIFValueOption_t marpaESLIFValueOption_default_template = {

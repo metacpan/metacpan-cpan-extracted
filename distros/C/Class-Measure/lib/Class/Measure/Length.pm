@@ -2,7 +2,7 @@ package Class::Measure::Length;
 use 5.008001;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =encoding utf8
 
@@ -189,8 +189,17 @@ __PACKAGE__->reg_convs(
 1;
 __END__
 
-=head1 AUTHORS AND LICENSE
+=head1 SUPPORT
 
-See L<GIS::Distance/AUTHORS> and L<GIS::Distance/LICENSE>.
+See L<Class::Measure/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<Class::Measure/AUTHORS>.
+
+=head1 LICENSE
+
+See L<Class::Measure/LICENSE>.
 
 =cut
+

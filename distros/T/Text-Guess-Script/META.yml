@@ -25,14 +25,14 @@ no_index:
 provides:
   Text::Guess::Script:
     file: lib/Text/Guess/Script.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Unicode::Normalize: '0'
-  perl: '5.008005'
+  perl: '5.016001'
 resources:
   bugtracker: https://github.com/wollmers/Text-Guess-Script/issues
   homepage: https://github.com/wollmers/Text-Guess-Script
   repository: https://github.com/wollmers/Text-Guess-Script.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.66'
 x_static_install: 1

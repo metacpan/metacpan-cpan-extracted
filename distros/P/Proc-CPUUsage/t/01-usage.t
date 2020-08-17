@@ -9,12 +9,12 @@ my $usage;
 my $cpu = Proc::CPUUsage->new;
 ok($cpu);
 sleep(1);
-$usage = $cpu->usage;
-ok($usage < .1, "Sleepy process, little usage ($usage)");
+my $little_usage = $cpu->usage;
+ok($little_usage < .1, "Sleepy process, little usage ($little_usage)");
 
 for (my $i = 0; $i < 500_000; $i++) {};
-$usage = $cpu->usage;
-ok($usage > .5, "Active process, big usage ($usage)");
+my $big_usage = $cpu->usage;
+ok($big_usage > $little_usage, "Active process, big usage ($big_usage) > little usage ($little_usage)");
 
 ## No support for getrusage()
 my @bad_replies = (

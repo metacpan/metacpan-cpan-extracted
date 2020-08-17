@@ -31,7 +31,7 @@ SYNOPSIS
   
       has foo => ( is => "ro" );
       has bar => ( is => "rw", isa => Types::Standard::Int );
-      has foo => ( is => "ro", required => 1 );
+      has baz => ( is => "ro", required => 1 );
 
     Tokens which don't start with a colon are created as attributes in your
     package. Tokens starting with a colon are flags that affect either the

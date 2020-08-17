@@ -4,6 +4,7 @@ use lib 'lib/';
 our $VERSION = '0.01';
 
 use Dancer ':syntax';
+use Dancer::RPCPlugin::DefaultRoute;
 use Example::EndpointConfig;
 
 use Bread::Board;
@@ -67,4 +68,5 @@ no Bread::Board;
     }
 }
 
+setup_default_route();
 1;

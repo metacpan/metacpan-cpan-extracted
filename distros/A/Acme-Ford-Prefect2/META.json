@@ -4,8 +4,8 @@
       "Graham Ollis <plicease@cpan.org>",
       "Joel A Berger <joel.a.berger@gmail.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,14 +17,14 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Acme::Alien::DontPanic2" : "2.1100"
+            "Acme::Alien::DontPanic2" : "2.2900"
          }
       },
       "configure" : {
          "requires" : {
-            "Acme::Alien::DontPanic2" : "2.1100",
-            "Alien::Base::Wrapper" : "2.11",
-            "ExtUtils::MakeMaker" : "6.64",
+            "Acme::Alien::DontPanic2" : "2.2900",
+            "Alien::Base::Wrapper" : "2.29",
+            "ExtUtils::MakeMaker" : "0",
             "perl" : "5.006"
          }
       },
@@ -32,6 +32,10 @@
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
@@ -47,7 +51,7 @@
       },
       "runtime" : {
          "requires" : {
-            "DynaLoader" : "0",
+            "XSLoader" : "0",
             "perl" : "5.006"
          }
       },
@@ -63,19 +67,20 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Perl5-Alien/Acme-Ford-Prefect2/issues"
+         "web" : "https://github.com/PerlAlien/Acme-Ford-Prefect2/issues"
       },
       "homepage" : "https://metacpan.org/pod/Acme::Ford::Prefect2",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Perl5-Alien/Acme-Ford-Prefect2.git",
-         "web" : "https://github.com/Perl5-Alien/Acme-Ford-Prefect2"
+         "url" : "git://github.com/PerlAlien/Acme-Ford-Prefect2.git",
+         "web" : "https://github.com/PerlAlien/Acme-Ford-Prefect2"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.1100",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "version" : "2.2900",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }
 

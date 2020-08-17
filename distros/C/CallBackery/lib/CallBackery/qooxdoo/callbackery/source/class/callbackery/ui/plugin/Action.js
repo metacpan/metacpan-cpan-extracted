@@ -211,17 +211,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         case 'popup':
                             var popup = new callbackery.ui.Popup(btCfg,getFormData);
 
-                            let appRoot = this.getApplicationRoot();
-                            let bounds = appRoot.getBounds();
-                            // make sure the window does not get larger than the screen
-                            if (bounds) {
-                                if (!popup.getMaxWidth()) {
-                                    popup.setMaxWidth(bounds.width-20);
-                                }
-                                if (!popup.getMaxHeight()) {
-                                    popup.setMaxHeight(bounds.height-20);
-                                }
-                            }
+                            var appRoot = this.getApplicationRoot();
                     
                             popup.addListenerOnce('close',function(){
                                 // wait for stuff to happen before we rush into

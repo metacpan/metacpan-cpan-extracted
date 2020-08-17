@@ -3,14 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.0402';
+our $VERSION = '0.0500';
 
 use strict;
 use warnings;
 
 use MIDI;
-use MIDI::Event;
-use MIDI::Track;
 use MIDI::Simple;
 use Music::Tempo;
 
@@ -39,23 +37,6 @@ sub setup_score {
     $score->patch_change( $args{channel}, $args{patch} );
 
     return $score;
-}
-
-
-sub new_track {
-    my %args = (
-        channel => 0,
-        patch   => 0,
-        tempo   => 500000,
-        @_,
-    );
-
-    my $track = MIDI::Track->new;
-
-    $track->new_event( 'set_tempo', 0, $args{tempo} );
-    $track->new_event( 'patch_change', 0, $args{channel}, $args{patch} );
-
-    return $track;
 }
 
 
@@ -157,6 +138,18 @@ sub dump {
     }
 }
 
+
+sub midi_format {
+    my (@notes) = @_;
+    my @formatted;
+    for my $note (@notes) {
+        $note =~ s/#/s/;
+        $note =~ s/b/f/;
+        push @formatted, $note;
+    }
+    return @formatted;
+}
+
 1;
 
 __END__
@@ -171,7 +164,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.0402
+version 0.0500
 
 =head1 SYNOPSIS
 
@@ -181,9 +174,9 @@ version 0.0402
 
   MIDI::Util::set_chan_patch( $score, 0, 1 );
 
-  my $track = MIDI::Util::new_track( channel => 0, patch => 1, tempo => 450_000 );
-
   my $dump = MIDI::Util::dump('volume');
+
+  my @notes = midi_format('C','C#','Db','D'); # C, Cs, Df, D
 
 =head1 DESCRIPTION
 
@@ -216,25 +209,6 @@ Named parameters and defaults:
   channel: 0
   patch:   0
   octave:  4
-
-=head2 new_track
-
-  $track = MIDI::Util::new_track;  # Use defaults
-
-  $track = MIDI::Util::new_track(  # Override defaults
-    channel => $channel,
-    patch   => $patch,
-    tempo   => $tempo,
-  );
-
-Set the B<channel>, B<patch>, and B<tempo> and return a L<MIDI::Track>
-object.
-
-Named parameters and defaults:
-
-  channel: 0
-  patch:   0
-  tempo:   500000
 
 =head2 set_chan_patch
 
@@ -272,6 +246,13 @@ L<MIDI::Simple>, and L<MIDI::Event> internal lists:
   Text_events
   Nontext_meta_events
 
+=head2 midi_format
+
+  @formatted = MIDI::Util::midi_format(@notes);
+
+Change sharp C<#> and flat C<b>, in the list of named notes, to the
+L<MIDI::Simple> C<s> and C<f> respectively.
+
 =head1 SEE ALSO
 
 L<MIDI>
@@ -290,7 +271,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

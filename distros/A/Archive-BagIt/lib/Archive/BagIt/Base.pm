@@ -10,11 +10,10 @@ use File::stat;
 use Digest::MD5;
 use Class::Load qw(load_class);
 use Carp;
-use List::Util qw(uniq);
 use POSIX qw(strftime);
 use Moo;
 
-our $VERSION = '0.065'; # VERSION
+our $VERSION = '0.066'; # VERSION
 
 # ABSTRACT: The common base for Archive::BagIt. This is the module for experts. ;)
 
@@ -238,7 +237,7 @@ sub get_baginfo_values_by_key {
 
 sub is_baginfo_key_reserved_as_uniq {
     my ($self, $searchkey) = @_;
-    return $searchkey =~ m/(Bagging-Date)|(Bag-Size)|(Payload-Oxum)|(Bag-Group-Identifier)|(Bag-Count)/i;
+    return $searchkey =~ m/^(Bagging-Date)|(Bag-Size)|(Payload-Oxum)|(Bag-Group-Identifier)|(Bag-Count)$/i;
 }
 
 ###############################################
@@ -246,23 +245,22 @@ sub is_baginfo_key_reserved_as_uniq {
 
 sub is_baginfo_key_reserved {
     my ($self, $searchkey) = @_;
-    my @reserved = qw(
-        Source-Organization
-        Organisation-Adress
-        Contact-Name
-        Contact-Phone
-        Contact-Email
-        External-Description
-        Bagging-Date
-        External-Identifier
-        Bag-Size
-        Payload-Oxum
-        Bag-Group-Identifier
-        Bag-Count
-        Internal-Sender-Identifier
-        Internal-Sender-Description
-    );
-    return List::Util::any { (lc $searchkey) eq (lc $_) } @reserved;
+    return $searchkey =~ m/^
+        (Source-Organization)|
+        (Organisation-Adress)|
+        (Contact-Name)|
+        (Contact-Phone)|
+        (Contact-Email)|
+        (External-Description)|
+        (Bagging-Date)|
+        (External-Identifier)|
+        (Bag-Size)|
+        (Payload-Oxum)|
+        (Bag-Group-Identifier)|
+        (Bag-Count)|
+        (Internal-Sender-Identifier)|
+        (Internal-Sender-Description)$/ix
+    
 }
 
 ###############################################
@@ -321,6 +319,18 @@ sub verify_baginfo {
                 }
             }
         }
+    }
+    # check for payload oxum
+    my ($loaded_payloadoxum) = $self->get_baginfo_values_by_key('Payload-Oxum');
+    if (defined $loaded_payloadoxum) {
+        my ($octets, $streamcount) = $self->calc_payload_oxum();
+        if ("$octets.$streamcount" ne $loaded_payloadoxum) {
+            push @{$self->{errors}}, "Payload-Oxum differs, calculated $octets.$streamcount but $loaded_payloadoxum was expected by bag-info.txt";
+            $ret = undef;
+        }
+    } else {
+        push @{$self->{errors}}, "Payload-Oxum was expected in bag-info.txt, but not found!";
+        $ret = undef;
     }
     return $ret;
 }
@@ -547,7 +557,12 @@ sub __file_find { # own implementation, because File::Find has problems with UTF
                 my $local_entry_utf8 = decode("UTF-8", $local_entry);
                 if ((!$self->has_force_utf8)) {
                     my $hexdump = "0x" . unpack('H*', $local_entry);
-                    carp "possible non portable pathname detected in $dir, got path (hexdump)='$hexdump'(hex),  decoded path='$local_entry_utf8'\n";
+                    $local_entry =~m/[^a-zA-Z0-9._-]/;
+
+                    carp "possible non portable pathname detected in $dir,\n",
+                        "got path (hexdump)='$hexdump'(hex),\n",
+                        "decoded path='$local_entry_utf8'\n",
+                        "              "." "x length($`)."^"."------- first non portable char\n"; #$` eq $PREMATCH
                 }
                 $local_entry = $local_entry_utf8;
             }
@@ -792,11 +807,14 @@ sub verify_bag {
     # check forced fixity
 
     my @errors;
+
+
+    # check for manifests
     foreach my $algorithm ( keys %{ $self->manifests }) {
         my $res = $self->manifests->{$algorithm}->verify_manifest($self->payload_files, $return_all_errors);
         if ((defined $res) && ($res ne "1")) { push @errors, $res; }
     }
-
+    #check for tagmanifests
     foreach my $algorithm ( keys %{ $self->manifests }) {
         my $res = $self->manifests->{$algorithm}->verify_tagmanifest($self->non_payload_files, $return_all_errors);
         if ((defined $res) && ($res ne "1")) { push @errors, $res; }
@@ -936,7 +954,7 @@ Archive::BagIt::Base - The common base for Archive::BagIt. This is the module fo
 
 =head1 VERSION
 
-version 0.065
+version 0.066
 
 =head1 NAME
 

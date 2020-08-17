@@ -1,0 +1,89 @@
+NAME
+    Zodiac::Angle - Class for zodiac_angle manipulation.
+
+SYNOPSIS
+     use Zodiac::Angle;
+
+     my $obj = Zodiac::Angle->new(%params);
+     my $zodiac_angle = $obj->angle2zodiac($angle);
+     my $angle = $obj->zodiac2angle($zodiac_angle);
+
+METHODS
+  "new"
+     my $obj = Zodiac::Angle->new(%params);
+
+    Constructor.
+
+    Returns instance of 'Zodiac::Angle'.
+
+  "angle2zodiac"
+     my $zodiac_angle = $obj->angle2zodiac($angle);
+
+    Convert angle to Zodiac angle.
+
+    Returns zodiac angle string.
+
+  "zodiac2angle"
+     my $angle = $obj->zodiac2angle($zodiac_angle);
+
+    Convert Zodiac angle to angle.
+
+    Returns angle.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Zodiac::Angle;
+     use Unicode::UTF8 qw(encode_utf8);
+
+     # Object.
+     my $obj = Zodiac::Angle->new;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 angle\n";
+             exit 1;
+     }
+     my $angle = $ARGV[0];
+
+     my $zodiac_angle = Zodiac::Angle->new->angle2zodiac($angle);
+
+     # Print out.
+     print 'Angle: '.$angle."\n";
+     print 'Zodiac angle: '.encode_utf8($zodiac_angle)."\n";
+
+     # Output without arguments:
+     # Usage: __SCRIPT__ angle
+
+     # Output with '0.5' argument:
+     # Angle: 0.5
+     # Zodiac angle: 0°♈30′
+
+DEPENDENCIES
+    Class::Utils, Readonly, Unicode::UTF8.
+
+SEE ALSO
+    Zodiac::Angle::SwissEph
+        Class for zodiac_angle manipulation based on SwissEph.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Zodiac-Angle>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2020
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

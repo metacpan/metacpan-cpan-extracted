@@ -32,6 +32,13 @@ local $ENV{EDITOR} = 'vim';
 }
 
 {
+    my $text        = 'lib/Open/This.pm#L17-L18';
+    my $line_number = Open::This::_maybe_extract_line_number( \$text );
+    is( $line_number, 17,                 'GitHub line range' );
+    is( $text,        'lib/Open/This.pm', 'GitHub line range stripped' );
+}
+
+{
     my $text        = 'lib/Open/This.pm-17-';
     my $line_number = Open::This::_maybe_extract_line_number( \$text );
     is( $line_number, 17, 'git-grep context line_number' );

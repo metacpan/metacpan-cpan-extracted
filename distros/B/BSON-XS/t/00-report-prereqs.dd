@@ -34,8 +34,7 @@ do { my $x = {
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
                                       'Test::Version' => '1',
-                                      'Tie::IxHash' => '0',
-                                      'inc::MakeMaker' => '0'
+                                      'Tie::IxHash' => '0'
                                     }
                     },
        'runtime' => {

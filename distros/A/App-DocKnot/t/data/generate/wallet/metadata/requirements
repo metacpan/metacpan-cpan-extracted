@@ -1,0 +1,59 @@
+The wallet client requires the C
+[remctl](https://www.eyrie.org/~eagle/software/remctl/) client library and
+a Kerberos library.  It will build with either MIT Kerberos or Heimdal.
+
+The wallet server is written in Perl and requires Perl 5.8.0 or later plus
+the following Perl modules:
+
+* Date::Parse (part of the TimeDate distribution)
+* DBI
+* DBIx::Class
+* Module::Build
+* SQL::Translator
+
+You will also need a DBD Perl module for the database backend that you
+intend to use, and the DateTime::Format::* module corresponding to that
+DBD module (such as DateTime::Format::SQLite or DateTime::Format::PG).
+
+Currently, the server has only been tested against SQLite 3, MySQL 5, and
+PostgreSQL, and prebuilt SQL files (for database upgrades) are only
+provided for those servers.  It will probably not work fully with other
+database backends.  Porting is welcome.
+
+The wallet server is intended to be run under `remctld` and use `remctld`
+to do authentication.  It can be ported to any other front-end, but doing
+so will require writing a new version of `server/wallet-backend` that
+translates the actions in that protocol into calls to the Wallet::Server
+Perl object.
+
+The keytab support in the wallet server supports Heimdal and MIT Kerberos
+KDCs and has experimental support for Active Directory.  The Heimdal
+support requires the Heimdal::Kadm5 Perl module.  The MIT Kerberos support
+requires the MIT Kerberos `kadmin` client program be installed.  The
+Active Directory support requires the Net::LDAP, Authen::SASL, and
+IPC::Run Perl modules and the `msktutil` client program.
+
+To support the unchanging flag on keytab objects with an MIT Kerberos KDC,
+the Net::Remctl Perl module (shipped with remctl) must be installed on the
+server and the `keytab-backend` script must be runnable via remctl on the
+KDC.  This script also requires an MIT Kerberos `kadmin.local` binary that
+supports the `-norandkey` option to `ktadd`.  This option is included in
+MIT Kerberos 1.7 and later.
+
+The WebAuth keyring object support in the wallet server requires the
+WebAuth Perl module from
+[WebAuth 4.4.0 or later](https://www.eyrie.org/~eagle/software/webauth/).
+
+The Duo integration object support in the wallet server requires the
+[Net::Duo](https://www.eyrie.org/~eagle/software/net-duo/), JSON, and
+Perl6::Slurp Perl modules.
+
+The password object support in the wallet server requires the
+Crypt::GeneratePassword Perl module.
+
+The LDAP attribute ACL verifier requires the Authen::SASL and Net::LDAP
+Perl modules.  This verifier only works with LDAP servers that support
+GSS-API binds.
+
+The NetDB ACL verifier (only of interest at sites using NetDB to manage
+DNS) requires the Net::Remctl Perl module.

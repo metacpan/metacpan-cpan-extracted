@@ -10,6 +10,7 @@ html/Callbacks/RT-Extension-TimeTracking/Ticket/Elements/EditTransactionCustomFi
 html/Callbacks/RT-Extension-TimeTracking/Ticket/Elements/ShowBasics/EndOfList
 html/Elements/ShowCustomFieldActor
 html/Tools/MyWeek.html
+html/Tools/TimeSearch.html
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm

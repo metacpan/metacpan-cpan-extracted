@@ -36,13 +36,21 @@ qx.Class.define("callbackery.ui.Login", {
             showMaximize         : false,
             showClose            : false,
             resizable            : false,
+            allowGrowX: true,
+            allowShrinkX: true,
+            allowGrowY: true,
+            allowShrinkY: true,
             contentPaddingLeft   : 30,
             contentPaddingRight  : 30,
             contentPaddingTop    : 20,
             contentPaddingBottom : 20,
+            width                : 500,
             centerOnContainerResize: true,
             centerOnAppear: true
         });
+        this.getApplicationRoot().addListener('resize',this.__setMaxWidth,this);
+        this.__setMaxWidth();
+        this.addListener('resize',() => { this.center()});
         this.getChildControl('captionbar').exclude();
         this.getChildControl('pane').set({
             decorator : new qx.ui.decoration.Decorator().set({
@@ -55,11 +63,18 @@ qx.Class.define("callbackery.ui.Login", {
         var grid = new qx.ui.layout.Grid(10, 10);
         this.setLayout(grid);
         grid.setColumnAlign(1, 'right', 'middle');
-        grid.setColumnWidth(0, 200);
-        grid.setColumnWidth(2, 200);
+        grid.setColumnFlex(0,2);
+        //grid.setColumnWidth(0, 120);
+        //grid.setColumnWidth(2, 160);
         if (cfg.logo){
             this.add(new qx.ui.basic.Image(cfg.logo).set({
-                alignX : 'left'
+                alignX : 'left',
+                allowGrowX: true,
+                allowShrinkX: true,
+                allowGrowY: true,
+                allowShrinkY: true,
+                scale: true
+
             }), {
                 row     : 0,
                 column  : 0,
@@ -70,7 +85,10 @@ qx.Class.define("callbackery.ui.Login", {
         if (! cfg.hide_password) {
             this.add(new qx.ui.basic.Image("icon/64/status/dialog-password.png").set({
                 alignY : 'top',
-                alignX : 'right'
+                alignX : 'right',
+                allowShrinkX: true,
+                allowShrinkY: true,
+                scale: true
             }),
             {
                 row     : 2,
@@ -84,7 +102,9 @@ qx.Class.define("callbackery.ui.Login", {
             column : 1
         });
 
-        var username = new qx.ui.form.TextField();
+        var username = new qx.ui.form.TextField().set({
+            minWidth: 160
+        });
         username.getContentElement().setAttribute("name", "cbUsername");
         username.getContentElement().setAttribute("autocomplete", "on");
 
@@ -100,7 +120,9 @@ qx.Class.define("callbackery.ui.Login", {
                 column : 1
             });
 
-            var password = new qx.ui.form.PasswordField();
+            var password = new qx.ui.form.PasswordField().set({
+                minWidth: 160
+            });;
             password.getContentElement().setAttribute("name", "cbPassword");
             password.getContentElement().setAttribute("autocomplete", "on");
 
@@ -297,6 +319,13 @@ qx.Class.define("callbackery.ui.Login", {
                 popup.open();
             },this);
             return button;
+        },
+        __setMaxWidth: function() {
+            let bounds = this.getApplicationRoot().getBounds();
+            // make sure the window does not get larger than the screen by default ... 
+            if (bounds) {
+                this.setMaxWidth(bounds.width-20);
+            }
         }
     }
 });

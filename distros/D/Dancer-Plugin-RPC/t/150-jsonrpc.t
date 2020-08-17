@@ -1,8 +1,5 @@
-#! perl -w
-use strict;
-use lib 't/lib';
-
-use Test::More;
+#! perl -I. -w
+use t::Test::abeltje;
 
 use TestProject;
 use Dancer::Test;

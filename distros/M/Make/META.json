@@ -4,13 +4,13 @@
       "Nick Ing-Simmons"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Make",
    "no_index" : {
@@ -31,12 +31,22 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Code::TidyAll" : "0.41",
+            "Test::Perl::Critic" : "1.02",
+            "Test::Pod" : "1.00",
+            "Test::Version" : "1.003001"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "Config" : "0",
             "Cwd" : "0",
             "File::Spec" : "0",
+            "Text::Balanced" : "2.03",
+            "Text::ParseWords" : "3.30",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -44,10 +54,7 @@
       },
       "test" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::Compile" : "1.002001",
-            "Test::More" : "1.00",
-            "Test::Pod" : "1.00"
+            "Test::More" : "1.00"
          }
       }
    },
@@ -64,6 +71,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#perl"
    },
-   "version" : "v1.2.0",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "2.002",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

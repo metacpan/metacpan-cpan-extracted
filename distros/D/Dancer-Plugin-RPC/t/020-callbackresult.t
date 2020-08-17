@@ -1,9 +1,5 @@
-#! perl -w
-use strict;
-
-use Test::More;
-use Test::Fatal;
-use Test::NoWarnings ();
+#! perl -I. -w
+use t::Test::abeltje;
 
 use Dancer::RPCPlugin::CallbackResult;
 
@@ -29,6 +25,4 @@ use Dancer::RPCPlugin::CallbackResult;
     is("$cbr", "fail (42 => The error is in the message)", "stringify-overload");
 }
 
-Test::NoWarnings::had_no_warnings();
-$Test::NoWarnings::do_end_test = 0;
 done_testing();

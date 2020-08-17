@@ -1,5 +1,22 @@
 Revision history for Perl extension HTML-HTMLDoc
 
+0.21 2020-08-13T15:19:46Z
+
+    - Highlight the requirement for 'htmldoc' in the POD.
+    - Add use of Devel::CheckBin to check for the presence of 'htmldoc'.
+
+0.20 2020-08-12T18:19:29Z
+
+   - Improved test for presence of htmldoc program.
+
+0.19 2020-08-11T17:05:03Z
+
+   - Correct version number issue to please PAUSE.
+
+0.18.1 2020-08-11T17:00:22Z
+
+   - Fix for doctype test failing on CentOS/Fedora, FreeBSD and older Ubuntu.
+
 0.17 2020-08-03T19:16:07Z
 
     - Make all tests work with tests for new functions.

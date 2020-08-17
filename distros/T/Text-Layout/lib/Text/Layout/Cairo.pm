@@ -7,9 +7,9 @@ use Carp;
 
 package Text::Layout::Cairo;
 
-sub init {
-    my ( $pkg, @args ) = @_;
-    bless {} => $pkg;
+sub new {
+    my ( $pkg, @data ) = @_;
+    croak("Text::Layout::Cairo: Not yet implemented");
 }
 
 1;

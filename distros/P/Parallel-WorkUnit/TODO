@@ -1,4 +1,6 @@
 Todo Items:
 
   * Support some form of remote execution
+  * Debug "unable to close filehandle $_[...] properly: Invalid
+    argument" on Windows in 12-Nested.t
 

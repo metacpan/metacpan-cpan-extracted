@@ -135,8 +135,7 @@ Mojo::Collection - Collection
   say $collection->join("\n");
 
   # Chain methods
-  $collection->map(sub { ucfirst })->shuffle->each(sub {
-    my ($word, $num) = @_;
+  $collection->map(sub { ucfirst })->shuffle->each(sub ($word, $num) {
     say "$num: $word";
   });
 
@@ -191,8 +190,7 @@ Evaluate callback for each element in collection, or return all elements as a li
 element will be the first argument passed to the callback, and is also available as C<$_>.
 
   # Make a numbered list
-  $collection->each(sub {
-    my ($e, $num) = @_;
+  $collection->each(sub ($e, $num) {
     say "$num: $e";
   });
 

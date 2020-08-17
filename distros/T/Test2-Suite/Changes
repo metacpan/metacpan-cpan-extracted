@@ -1,3 +1,15 @@
+0.000135  2020-08-16 21:44:24-07:00 America/Los_Angeles
+
+    - No changes since last trial
+
+0.000134  2020-08-15 13:11:30-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix 5.8 support
+
+0.000133  2020-08-14 21:59:19-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add summary of missing/extra elements in compare diagnostics
+
 0.000132  2020-08-06 18:10:48-07:00 America/Los_Angeles
 
     - Fix min Test2 version

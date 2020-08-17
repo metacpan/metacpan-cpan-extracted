@@ -1,5 +1,43 @@
 Revision history for Mojo-DOM-Role-Analyzer
 
+0.015     2020-08-16 11:38:46-04:00 America/New_York
+
+- add Travis-CI config file
+- improve tag analsis output
+- fix testing bug
+
+0.014     2020-08-13 17:08:04-04:00 America/New_York
+
+- add module preqrequisite
+- fix bug in compare method
+- improve how secondary enclosing tags are calucated
+- return more useful data from tag_analysis method
+
+0.013     2020-08-11 23:21:32-04:00 America/New_York
+
+- fix infinite loop in tag_analysis method
+- improve and tighten tag_analysis code
+
+0.012     2020-08-09 19:36:44-04:00 America/New_York
+
+- remove another unneeded functions
+- remove redundant plugin from dist.ini
+- typo fixes to docs
+
+0.011     2020-08-09 09:42:11-04:00 America/New_York
+
+- documentation updates
+- refactor and improve methods related to finding common nodes
+- add new Mojo::Collection::Role for containing new methods on collections
+- thanks to mst for helping with ideas for improvement
+- add new is_ancestor_to method
+
+0.010     2020-08-08 09:38:06-04:00 America/New_York
+
+- add tag_analysis method along with documentation and test for it
+- improved documentation
+- changed how closer methods determine which tag is closer
+
 0.009     2020-08-05 22:46:39-04:00 America/New_York
 
 - add methods for determining "closest" nodes and associated tests

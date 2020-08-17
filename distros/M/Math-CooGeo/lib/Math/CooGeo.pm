@@ -7,7 +7,7 @@ use Exporter;
 our @ISA=qw(Exporter);
 our @EXPORT=qw(distance midpoint slope gradient);
 
-our $VERSION='1.0.12';
+our $VERSION='1.0.13';
 our $LIBRARY=__PACKAGE__;
 
 sub distance(x1,y1,x2,y2){return sqrt((x2-x1)**2+(y2-y1)**2)}

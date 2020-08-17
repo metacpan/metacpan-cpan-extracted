@@ -1,4 +1,4 @@
-# DocKnot 3.04
+# DocKnot 3.05
 
 [![Build
 status](https://github.com/rra/docknot/workflows/build/badge.svg)](https://github.com/rra/docknot/actions)
@@ -62,8 +62,8 @@ The following additional Perl modules are required to use it:
 * IO::Compress::Xz (part of IO-Compress-LZMA)
 * IPC::Run
 * IPC::System::Simple
-* JSON
-* List::MoreUtils
+* JSON::MaybeXS
+* List::SomeUtils
 * Perl6::Slurp
 * Template (part of Template Toolkit)
 
@@ -100,6 +100,7 @@ suite.  The following additional Perl modules will be used by the test
 suite if present:
 
 * Devel::Cover
+* Perl::Critic::Freenode
 * Test::MinimumVersion
 * Test::Perl::Critic
 * Test::Pod

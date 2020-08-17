@@ -2,8 +2,8 @@ NAME
     Bencher::Backend - Backend for Bencher
 
 VERSION
-    This document describes version 1.050 of Bencher::Backend (from Perl
-    distribution Bencher-Backend), released on 2020-06-18.
+    This document describes version 1.051 of Bencher::Backend (from Perl
+    distribution Bencher-Backend), released on 2020-08-16.
 
 FUNCTIONS
   bencher
@@ -57,6 +57,8 @@ FUNCTIONS
         Add datasets.
 
     *   detail => *bool*
+
+        Show detailed information for each result.
 
     *   env_hashes => *array[hash]*
 
@@ -241,11 +243,15 @@ FUNCTIONS
 
         Only include some perls.
 
+    *   keep_tempdir => *bool*
+
+        Do not cleanup temporary directory when bencher ends.
+
     *   module_startup => *bool*
 
         Benchmark module startup overhead instead of normal benchmark.
 
-    *   multimodver => *str*
+    *   multimodver => *perl::modname*
 
         Benchmark multiple module versions.
 
@@ -449,6 +455,10 @@ FUNCTIONS
         If your code runs for many seconds, you might want to skip this test
         and set this to 0.
 
+    *   tidy => *bool*
+
+        Run perltidy over generated scripts.
+
     *   with_args_size => *bool*
 
         Also return memory usage of item's arguments.
@@ -532,7 +542,7 @@ FUNCTIONS
   format_result
     Usage:
 
-     format_result($envres, $formatters, $options, $exclude_formatters) -> [status, msg, payload, meta]
+     format_result( [ \%optional_named_args ] , $envres, $formatters, $options) -> [status, msg, payload, meta]
 
     Format bencher result.
 
@@ -544,7 +554,7 @@ FUNCTIONS
 
         Enveloped result from bencher.
 
-    *   $exclude_formatters => *any*
+    *   exclude_formatters => *any*
 
         Exclude Formatters specification.
 

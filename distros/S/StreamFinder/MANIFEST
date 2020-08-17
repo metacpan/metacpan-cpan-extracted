@@ -2,6 +2,8 @@ Changes
 lib/StreamFinder.pm
 lib/StreamFinder/Apple.pm
 lib/StreamFinder/BannedVideo.pm
+lib/StreamFinder/Bitchute.pm
+lib/StreamFinder/Blogger.pm
 lib/StreamFinder/Brighteon.pm
 lib/StreamFinder/IHeartRadio.pm
 lib/StreamFinder/RadioNet.pm

@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::Util qw/pkg_to_file/;
 
-our $VERSION = '1.000020';
+our $VERSION = '1.000023';
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase qw/<_command_info_hash/;
@@ -234,6 +234,23 @@ Can be specified multiple times
 =back
 
 =head2 COMMAND OPTIONS
+
+=head3 Git Options
+
+=over 4
+
+=item --git-change-base master
+
+=item --git-change-base HEAD^
+
+=item --git-change-base df22abe4
+
+=item --no-git-change-base
+
+Find files changed by all commits in the current branch from most recent stopping when a commit is found that is also present in the history of the branch/commit specified as the change base.
+
+
+=back
 
 =head3 Help and Debugging
 

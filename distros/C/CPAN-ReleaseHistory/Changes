@@ -1,5 +1,9 @@
 Revision history for Perl module CPAN::ReleaseHistory
 
+0.16 2020-08-08 NEILB
+    - Added script cpan-release-history, which lists all releases of
+      a given distribution, in reverse chronological order.
+
 0.15 2016-07-17 NEILB
     - Fixed a bug: if you used --neo and --user together,
       it would report the first release of a dist you did as a neocpanism,

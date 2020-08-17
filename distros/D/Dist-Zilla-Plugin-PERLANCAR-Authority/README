@@ -1,0 +1,113 @@
+NAME
+    Dist::Zilla::Plugin::PERLANCAR::Authority - Add the $AUTHORITY variable
+    and metadata to your distribution
+
+VERSION
+    This document describes version 0.001 of
+    Dist::Zilla::Plugin::PERLANCAR::Authority (from Perl distribution
+    Dist-Zilla-Plugin-PERLANCAR-Authority), released on 2020-08-10.
+
+DESCRIPTION
+    Fork note: This plugin is a fork of Dist::Zilla::Plugin::Authority. When
+    PAUSE credential is not found, this plugin will set $AUTHORITY to
+    "cpan:<none>" instead of bailing out. TODO: bail if PAUSE credentials is
+    not found and we are doing a release (instead of just 'dzil test' or
+    'dzil build'). The rest is Dist::Zilla::Plugin::Authority's
+    documentation.
+
+    This plugin adds the authority data to your distribution. It adds the
+    data to your modules and metadata. Normally it looks for the PAUSE
+    author id in your Dist::Zilla configuration. If you want to override it,
+    please use the 'authority' attribute.
+
+            # In your dist.ini:
+            [Authority]
+
+    This code will be added to any package declarations in your perl files:
+
+            our $AUTHORITY = 'cpan:APOCAL';
+
+    Your metadata ( META.yml or META.json ) will have an entry looking like
+    this:
+
+            x_authority => 'cpan:APOCAL'
+
+ATTRIBUTES
+  authority
+    The authority you want to use. It should be something like
+    "cpan:APOCAL".
+
+    Defaults to the username set in the %PAUSE stash in the global
+    config.ini or dist.ini ( Dist::Zilla v4 addition! )
+
+    If you prefer to not put it in config/dist.ini you can put it in
+    "~/.pause" just like Dist::Zilla did before v4.
+
+  do_metadata
+    A boolean value to control if the authority should be added to the
+    metadata.
+
+    Defaults to true.
+
+  do_munging
+    A boolean value to control if the $AUTHORITY variable should be added to
+    the modules.
+
+    Defaults to true.
+
+  locate_comment
+    A boolean value to control if the $AUTHORITY variable should be added
+    where a "# AUTHORITY" comment is found. If this is set then an
+    appropriate comment is found, and "our $AUTHORITY = 'cpan:PAUSEID';" is
+    inserted preceding the comment on the same line.
+
+    This basically implements what OurPkgVersion does for PkgVersion.
+
+    Defaults to false.
+
+    NOTE: If you use this method, then we will not use the pkg style of
+    declaration! That way, we keep the line numbering consistent.
+
+  authority_style
+    A value to control the type of the $AUTHORITY declaration. There are two
+    styles: 'pkg' or 'our'. In the past this module defaulted to the 'pkg'
+    style but due to various issues 'our' is now the default. Here's what
+    both styles would look like in the resulting code:
+
+            # pkg
+            BEGIN {
+                    $Dist::Zilla::Plugin::Authority::AUTHORITY = 'cpan:APOCAL';
+            }
+
+            # our
+            our $AUTHORITY = 'cpan:APOCAL';
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-PERLANCAR-Authority>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-PERLANCAR-Authority
+    >.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-PER
+    LANCAR-Authority>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Dist::Zilla::Plugin::Authority
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

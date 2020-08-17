@@ -1,6 +1,6 @@
 package Quantum::Superpositions::Lazy::Operation::ComputationalOp;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use v5.24; use warnings;
 use Moo;
@@ -45,6 +45,8 @@ my %types = (
 	q{sqrt}  => [1, sub { sqrt $a }],
 	q{int}   => [1, sub { int $a }],
 	q{abs}   => [1, sub { abs $a }],
+
+	q{_transform}   => [2, sub { $b->($a) }],
 );
 
 use namespace::clean;

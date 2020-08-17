@@ -28,6 +28,7 @@ script/packed-type.pl
 t/client-browse-async.t
 t/client-browse.t
 t/client-browsenext-async.t
+t/client-config-context.t
 t/client-config-default.t
 t/client-config.t
 t/client-connect-async.t
@@ -36,6 +37,7 @@ t/client-disconnect-async.t
 t/client-leak.t
 t/client-read-async.t
 t/client-server-read-write.t
+t/client-statecallback.t
 t/client-variant.t
 t/client.t
 t/critic.t

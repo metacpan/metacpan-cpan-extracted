@@ -1,0 +1,1 @@
+"1" - 1; // expect: [Line 1] Error at '-': Operands must be two numbers.

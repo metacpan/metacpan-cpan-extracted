@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Text::Table::Tiny qw/ generate_table /;
 
 my $rows = [
@@ -25,6 +25,15 @@ is($t1, q%+--------+-----------+------+-----------------+
 |        |           |      | That's showbiz! |
 +--------+-----------+------+-----------------+%,
 'rows and header row');
+
+my $t1 = generate_table( rows => $rows, header_row => 1, indent => 2 );
+is($t1, q%  +--------+-----------+------+-----------------+
+  | Elvis  | Priscilla |      |                 |
+  +--------+-----------+------+-----------------+
+  | Liquor | Beer      | Wine |                 |
+  |        |           |      | That's showbiz! |
+  +--------+-----------+------+-----------------+%,
+'rows and header row with indent');
 
 my $t2 = generate_table( rows => $rows, separate_rows => 1 );
 is($t2,q%+--------+-----------+------+-----------------+

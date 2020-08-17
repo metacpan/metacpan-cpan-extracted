@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+=head1 NAME
+
+docker-construct - Construct the filesystem of an exported docker image.
+
+=head1 SYNOPSIS
+
+    docker-construct [--quiet|-q] [--include_config] IMAGE DIR
+
+=head1 DESCRIPTION
+
+docker-construct reconstructs the filesystem of an exported docker image. That
+is, it takes a tarball exported by C<docker save> and recreates the filesystem
+with all of the layers flattened in a directory. C<IMAGE> is the path to
+the image tarball to use and C<DIR> is the directory to extract the image
+into. 
+
+=head1 OPTIONS
+
+=over 4
+
+=item * I<-q>, I<--quiet>
+
+If specified, will not output progress on stderr.
+
+=item * I<--include_config>
+
+If specified, the image's config json file will be added to the root of the
+extracted filesystem as F<config.json>. (If there happened to be file with
+that name there anyway, this will overwrite it).
+
+=back
+=cut
+
+use Getopt::Long qw(:config auto_help);
+use Pod::Usage qw(pod2usage);
+
+use Docker::Construct qw(construct);
+
+my ($quiet, $config);
+GetOptions(
+    'q|quiet'           => \$quiet,
+    'include_config'    => \$config
+);
+
+my ($image, $dir) = @ARGV;
+pod2usage "Invalid arguments." unless (defined $image && defined $dir);
+
+eval {
+    construct(
+        image           => $image,
+        dir             => $dir,
+        quiet           => $quiet,
+        include_config  => $config
+    ); 1;
+};
+if ($@) {
+    print STDERR "docker-construct: $@";
+    exit 1;
+}
+
+exit;
+
+=head1 SEE ALSO
+
+L<Docker::Construct>
+
+=head1 AUTHOR
+
+Cameron Tauxe, C<< <camerontauxe at gmail.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2020 by Cameron Tauxe.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

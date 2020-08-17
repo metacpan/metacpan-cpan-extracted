@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Progress-Any"
       }
    },
-   "version" : "0.216",
+   "version" : "0.218",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

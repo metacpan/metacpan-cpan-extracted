@@ -9,7 +9,7 @@ WriteMakefile(
     VERSION_FROM    => 'lib/List/Compare.pm',
     ABSTRACT_FROM   => 'lib/List/Compare.pm',
     ( $mm_ver < 6.63_03 ? 'BUILD_REQUIRES' : 'TEST_REQUIRES' ) => {
-                     'IO::CaptureOutput' => 0,
+                     'Capture::Tiny' => 0,
                      'Test::Simple' => 0.10,
                     },
     LICENSE      => "perl",

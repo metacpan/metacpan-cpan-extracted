@@ -1,0 +1,3 @@
+fun foo() {}
+
+class Subclass < foo {} // expect: [Line 3] Error at 'foo': Superclass must be a class.

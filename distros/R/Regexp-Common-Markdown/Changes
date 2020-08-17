@@ -1,0 +1,19 @@
+Revision history for Perl module Regexp::Common::Markdown
+
+0.1.4 2020-08-16T12:45:26+0900
+    - Updated the paragrah regular expression to be more accurate to make distinction between unordered list (*) and bold (**) or emphasis (*)
+    - Corrected function.pl to remove dependency
+
+0.1.3 2020-08-15T16:38:53+0900
+    - Updated the regular expression for the extended code block. See https://regex101.com/r/Y9lPAz/2
+
+0.1.2 2020-08-14T21:16:06+0900
+    - Added missing dependency for Regexp::Common::Email::Address and Regexp::Common::URI
+    - Added support for superscript and subscript
+    - Added capture name for line break: br_all
+
+0.1.1 2020-08-10T21:26:16+0900
+    - Added support for superscript, including for Microsoft version of superscript.
+
+0.1.0 2020-08-10T21:09:23+0900
+    - original version; created by ExtUtils::ModuleMaker 0.63

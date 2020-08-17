@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Symbol::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '3.0.32'; # VERSION
+our $VERSION = '4.0.1'; # VERSION
 
 
 #
@@ -305,7 +305,7 @@ MarpaX::ESLIF::Grammar::Symbol::Properties - ESLIF Grammar Symbol Properties
 
 =head1 VERSION
 
-version 3.0.32
+version 4.0.1
 
 =head1 SYNOPSIS
 
@@ -324,7 +324,7 @@ version 3.0.32
   :start   ::= Expression
   :default ::=             action        => do_op
                            symbol-action => do_symbol
-                           free-action   => do_free     # Supported but useless
+
   :desc    ::= 'Calculator'
   :discard ::= whitespaces event  => discard_whitespaces$
   :discard ::= comment     event  => discard_comment$

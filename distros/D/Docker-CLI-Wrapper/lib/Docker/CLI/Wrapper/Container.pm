@@ -1,5 +1,5 @@
 package Docker::CLI::Wrapper::Container;
-$Docker::CLI::Wrapper::Container::VERSION = '0.0.5';
+$Docker::CLI::Wrapper::Container::VERSION = '0.0.6';
 use strict;
 use warnings;
 use 5.014;
@@ -80,7 +80,7 @@ Docker::CLI::Wrapper::Container - manage a container.
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head1 SYNOPSIS
 
@@ -94,7 +94,11 @@ version 0.0.5
     );
     $obj->clean_up();
     $obj->run_docker();
-    $obj->exe_bash_code({code => qq#set -e -x; printf "%s\\n" "Hello world!"});
+    $obj->exe_bash_code(
+        {
+            code => qq#set -e -x; printf "%s\\n" "Hello world!"# ,
+        }
+    );
     $obj->clean_up();
 
 =head1 METHODS

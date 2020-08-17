@@ -9,15 +9,25 @@ my %WriteMakefileArgs = (
     "CONFIGURE_REQUIRES" => {
         "ExtUtils::MakeMaker" => 0
     },
-    "DISTNAME"   => "Make",
-    "EXE_FILES"  => [],
-    "LICENSE"    => "perl",
-    "META_MERGE" => {
+    "VERSION_FROM" => "lib/Make.pm",
+    "NAME"         => "Make",
+    "EXE_FILES"    => [ glob 'scripts/*' ],
+    "LICENSE"      => "perl",
+    "META_MERGE"   => {
         dynamic_config => 0,
         'meta-spec'    => { version => 2 },
         no_index       => { directory => ['t'] },
-        prereqs        => { runtime => { requires => { perl => '5.006' } } },
-        resources      => {
+        prereqs        => {
+            develop => {
+                requires => {
+                    "Test::Version"       => "1.003001",
+                    "Test::Pod"           => "1.00",
+                    "Test::Code::TidyAll" => "0.41",
+                    "Test::Perl::Critic"  => "1.02",
+                },
+            },
+        },
+        resources => {
             bugtracker => { web => 'http://github.com/klp2/Make/issues' },
             homepage   => 'http://metacpan.org/pod/Make',
             repository => {
@@ -29,25 +39,19 @@ my %WriteMakefileArgs = (
         },
     },
     "MIN_PERL_VERSION" => "5.006",
-    "NAME"             => "Make",
     "PREREQ_PM"        => {
-        "Carp"       => 0,
-        "Config"     => 0,
-        "Cwd"        => 0,
-        "File::Spec" => 0,
-        "strict"     => 0,
-        "warnings"   => 0
+        "Carp"             => 0,
+        "Config"           => 0,
+        "Cwd"              => 0,
+        "File::Spec"       => 0,
+        "strict"           => 0,
+        "warnings"         => 0,
+        "Text::Balanced"   => '2.03',
+        "Text::ParseWords" => '3.30',
     },
     "TEST_REQUIRES" => {
-        "ExtUtils::MakeMaker" => 0,
-        "Test::Compile"       => "1.002001",
-        "Test::More"          => "1.00",
-        "Test::Pod"           => "1.00",
+        "Test::More" => "1.00",
     },
-    "VERSION" => "1.2.0",
-    "test"    => {
-        "TESTS" => "t/*.t"
-    }
 );
 
 my %FallbackPrereqs = (
@@ -57,11 +61,11 @@ my %FallbackPrereqs = (
     "File::Spec"          => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec"          => 0,
-    "Test::Compile"       => "1.002001",
     "Test::More"          => "1.00",
-    "Test::Pod"           => "1.00",
+    "Text::Balanced"      => '2.03',
+    "Text::ParseWords"    => '3.30',
     "strict"              => 0,
-    "warnings"            => 0
+    "warnings"            => 0,
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

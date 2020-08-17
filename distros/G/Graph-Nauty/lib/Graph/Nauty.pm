@@ -7,16 +7,17 @@ require Exporter;
 our @ISA = qw( Exporter );
 our @EXPORT_OK = qw( are_isomorphic automorphism_group_size orbits );
 
-our $VERSION = '0.1.1'; # VERSION
+our $VERSION = '0.1.2'; # VERSION
 
 require XSLoader;
 XSLoader::load('Graph::Nauty', $VERSION);
 
 sub _nauty_graph
 {
-    my( $graph, $color_sub ) = @_;
+    my( $graph, $color_sub, $order_sub ) = @_;
 
     $color_sub = sub { "$_[0]" } unless $color_sub;
+    $order_sub = sub { "$_[0]" } unless $order_sub;
 
     my $nauty_graph = {
         nv  => scalar $graph->vertices,
@@ -29,7 +30,7 @@ sub _nauty_graph
     my $n = 0;
     my $vertices = { map { $_ => { index => $n++, vertice => $_ } }
                      sort { $color_sub->( $a ) cmp $color_sub->( $b ) ||
-                            $a cmp $b}
+                            $order_sub->( $a ) cmp $order_sub->( $b ) }
                          $graph->vertices };
 
     my @breaks;
@@ -66,10 +67,10 @@ sub automorphism_group_size
 
 sub orbits
 {
-    my( $graph, $color_sub ) = @_;
+    my( $graph, $color_sub, $order_sub ) = @_;
 
     my( $nauty_graph, $labels, $breaks, $orbits ) =
-        _nauty_graph( $graph, $color_sub );
+        _nauty_graph( $graph, $color_sub, $order_sub );
     my $statsblk = sparsenauty( $nauty_graph, $labels, $breaks, $orbits,
                                 1,
                                 undef );

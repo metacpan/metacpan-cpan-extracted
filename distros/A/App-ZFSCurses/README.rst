@@ -1,7 +1,7 @@
 App::ZFSCurses
 ==============
 
-a curses UI to display and/or change ZFS datasets properties.
+a curses UI to display and/or change a ZFS dataset/snapshot properties.
 
 Quickstart
 ----------
@@ -13,24 +13,31 @@ installed using `cpanm <https://metacpan.org/pod/App::cpanminus>`_.
 
     $ cpanm App::ZFSCurses
 
-Once installed, start App::ZFSCurses with the following command:
+``zfscurses`` can be run in two different "views":
 
 .. code-block:: console
 
-    $ zfscurses
+    $ zfscurses datasets
 
-Needless to say you must use the ZFS filesystem for zfscurses to work. In case
+to display the list of ZFS datasets found on the system.
+
+.. code-block:: console
+
+    $ zfscurses snapshots
+
+to display the list of ZFS snapshots found on the system.
+
+Make sure to run ``zfscurses --help`` to display the help. A manual page can be
+shown using ``zfscurses --man``.
+
+Needless to say you must use the ZFS filesystem for ``zfscurses`` to work. In case
 you don't, a warning will show up and the application will automatically exit.
 
 Backend
 -------
 
-App::ZFScurses leverages the `zfs` command to do the heavy lifting and
-to present information in a comprehensive way to the user. Precisely, two
-subcommands are heavily used:
-
-- `zfs list -t filesystem`
-- `zfs get all dataset`
+App::ZFScurses leverages the ``zfs`` command to do the heavy lifting and
+to present information in a comprehensive way to the user.
 
 Navigation
 ----------
@@ -43,8 +50,14 @@ following keystrokes:
 - **Enter/Space** → validate selection.
 - **Tab** → change focus around.
 - **Ctrl+q** → quit the UI.
-- **F1** → when browsing a dataset properties, F1 will show a help message about the
-  selected property. You must first select a property using Enter/Space.
+- **F1** → when browsing a dataset/snapshot properties, F1 will show a help
+  message about the selected property. You must first select a property using
+  Enter/Space.
+
+Listboxes showing the different datasets/snapshots/properties are searchable:
+
+- **/** → search forward in the list.
+- **?** → search backward in the list.
 
 Mouse
 -----

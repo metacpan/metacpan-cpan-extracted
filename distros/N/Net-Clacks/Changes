@@ -1,5 +1,15 @@
-@  changeset:   127:d4d7fb0f2a11
+@  changeset:   129:c85bf9bc6157
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Sat Aug 08 23:50:15 2020 +0200
+|  summary:     Add persistanceinterval setting (defaults to 10)
+|
+o  changeset:   128:fbe24a387a3a
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Mon Jul 13 11:15:06 2020 +0200
+|  summary:     Update Changes
+|
+o  changeset:   127:d4d7fb0f2a11
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Mon Jul 13 11:13:07 2020 +0200
 |  summary:     BF variable scope

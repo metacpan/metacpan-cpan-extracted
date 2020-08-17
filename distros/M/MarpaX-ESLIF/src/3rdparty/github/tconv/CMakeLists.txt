@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (tconv 1 0 61)
+MYPACKAGESTART (tconv 1 0 63)
 
 ####################
 # Specific options #
@@ -224,19 +224,12 @@ IF (NOT TCONV_USE_ICU)
   MESSAGE (STATUS "ICU plugin is disabled")
   SET (ICU_FOUND FALSE)
 ELSE ()
-  FIND_PACKAGE (ICU)
+  FIND_PACKAGE (ICU COMPONENTS uc i18n)
 ENDIF ()
 IF (ICU_FOUND)
   SET (TCONV_HAVE_ICU 1)
   SET (icu_src src/tconv/charset/tconv_charset_ICU.c src/tconv/convert/tconv_convert_ICU.c)
   LIST (APPEND libtconv_src ${icu_src})
-  IF (NOT ("${ICU_INCLUDE_DIRS}" STREQUAL ""))
-    LIST (APPEND libtconv_inc ${ICU_INCLUDE_DIRS})
-  ENDIF ()
-  SET_SOURCE_FILES_PROPERTIES(${icu_src}
-    PROPERTIES
-    COMPILE_FLAGS ${ICU_C_FLAGS_SHARED}
-    )
 ENDIF ()
 
 # -----
@@ -268,7 +261,7 @@ FOREACH (_target tconv tconv_static)
     TARGET_INCLUDE_DIRECTORIES(${_target} PRIVATE ${libtconv_inc})
   ENDIF ()
   IF (ICU_FOUND)
-    TARGET_LINK_LIBRARIES(${_target} PUBLIC ${ICU_LINK_FLAGS})
+    TARGET_LINK_LIBRARIES(${_target} PUBLIC ICU::ICU)
   ENDIF ()
   IF (NOT ("${CMAKE_DL_LIBS}" STREQUAL ""))
     TARGET_LINK_LIBRARIES(${_target} PUBLIC ${CMAKE_DL_LIBS})

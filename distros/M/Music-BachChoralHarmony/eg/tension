@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper::Compact 'ddc';
+use Chart::LinesPoints;
+use List::Util qw/max/;
+use Music::BachChoralHarmony;
+use Music::Tension::Cope;
+
+my $width  = shift || 800;
+my $height = shift || 400;
+
+my $tension = Music::Tension::Cope->new;
+
+my $bach = Music::BachChoralHarmony->new;
+my $songs = $bach->parse();
+
+my @scale = 0 .. 11;
+
+my %by_song;
+
+for my $song ( sort keys %$songs ) {
+    for my $event ( @{ $songs->{$song}{events} } ) {
+        # Convert the bitstring to scale notes
+        my @notes;
+        my $i = 0;
+        for my $bit ( split //, $event->{notes} ) {
+            push @notes, $scale[$i]
+                if $bit;
+            $i++;
+        }
+        # Tally the tension defined by the notes
+        push @{ $by_song{$song} }, scalar($tension->vertical(\@notes));
+    }
+}
+#warn(__PACKAGE__,' ',__LINE__," MARK: ",ddc(\%by_song));exit;
+
+for my $song (sort keys %by_song) {
+    my $chart = Chart::LinesPoints->new($width, $height);
+
+    $chart->set(
+        legend       => 'none',
+        title        => 'Tension Over Time in ' . $song,
+        x_label      => 'Chord',
+        y_label      => 'Tension',
+        include_zero => 'true',
+        precision    => 2,
+        skip_x_ticks => 4,
+        brush_size   => 2,
+        pt_size      => 4,
+        y_grid_lines => 'true',
+    );
+
+    $chart->add_dataset(1 .. @{ $by_song{$song} });
+    $chart->add_dataset(@{ $by_song{$song} });
+
+    $chart->png("$song.png");
+
+#    last;
+}

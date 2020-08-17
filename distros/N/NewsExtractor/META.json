@@ -28,6 +28,7 @@
          "requires" : {
             "File::Slurp" : "0",
             "HTML::ExtractContent" : "0",
+            "HTTP::Date" : "0",
             "IO::Socket::SSL" : "2.009",
             "Importer" : "0",
             "JSON" : "0",
@@ -45,7 +46,7 @@
    "provides" : {
       "NewsExtractor" : {
          "file" : "lib/NewsExtractor.pm",
-         "version" : "v0.36.0"
+         "version" : "v0.38.0"
       },
       "NewsExtractor::Article" : {
          "file" : "lib/NewsExtractor/Article.pm"
@@ -143,6 +144,9 @@
       "NewsExtractor::SiteSpecificExtractor::turnnewsapp_com" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/turnnewsapp_com.pm"
       },
+      "NewsExtractor::SiteSpecificExtractor::www_aljazeera_com" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_aljazeera_com.pm"
+      },
       "NewsExtractor::SiteSpecificExtractor::www_allnews_tw" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_allnews_tw.pm"
       },
@@ -178,6 +182,9 @@
       },
       "NewsExtractor::SiteSpecificExtractor::www_ntdtv_com" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_ntdtv_com.pm"
+      },
+      "NewsExtractor::SiteSpecificExtractor::www_penghutimes_com" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_penghutimes_com.pm"
       },
       "NewsExtractor::SiteSpecificExtractor::www_peopo_org" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_peopo_org.pm"
@@ -223,7 +230,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.36.0",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perltaiwan/NewsExtractor/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perltaiwan/NewsExtractor.git",
+         "web" : "https://github.com/perltaiwan/NewsExtractor"
+      }
+   },
+   "version" : "v0.38.0",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : "CC0-1.0",
    "x_static_install" : "1"

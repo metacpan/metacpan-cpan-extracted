@@ -8,7 +8,6 @@ sync
         {
             config_file              ./files/config/serge_test.cfg
             resource_directory       ./files/resources
-            file_mask                *.xliff
             file_format              xliff
         }
     }

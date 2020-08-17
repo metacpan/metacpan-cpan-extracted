@@ -1,3 +1,9 @@
+0.09 2020-08-11
+-Fix warning when calling `to_toml(from_toml(...))`
+-Fix bug allowing perl to stringify numbers (thanks oschwald)
+-Fix bug disallowing weird forms of nan (+nan, -nan)
+-Behavior change: return Math::Big(Int|Float) for large numbers (thanks oschwald)
+
 0.08 2020-06-25
 -Fix bug in TOML table output generation (thanks ijackson)
 

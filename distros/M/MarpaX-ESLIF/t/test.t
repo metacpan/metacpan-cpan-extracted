@@ -77,6 +77,17 @@ sub isWithTrack {
     return $isWithTrack;
 }
 
+sub RegexAction {
+    my ($self, $block) = @_;
+    $self->{log}->tracef("Regex callback: %s", $block);
+    foreach (qw/calloutNumber calloutString subject pattern captureTop captureLast offsetVector mark startMatch currentPosition nextItem/) {
+        my $method = 'get' . ucfirst($_);
+        $self->{log}->tracef("Regex callback: %s: %s", $_, $block->$method);
+    }
+    $self->{log}->tracef("Regex callback: %s", $block);
+    return 0;
+}
+
 package MyValue;
 use strict;
 use diagnostics;
@@ -275,7 +286,7 @@ use Encode qw/decode encode/;
 # Init log
 #
 our $defaultLog4perlConf = '
-log4perl.rootLogger              = INFO, Screen
+log4perl.rootLogger              = TRACE, Screen
 log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr  = 0
 log4perl.appender.Screen.layout  = PatternLayout
@@ -342,6 +353,7 @@ ok($currentLevel >= 0, "Current level is >= 0");
 my %GRAMMAR_PROPERTIES_BY_LEVEL = (
     '0' => { defaultRuleAction   => "do_op",
              defaultEventAction  => undef,
+             defaultRegexAction  => 'lua_regexAction',
              defaultSymbolAction => "do_symbol",
              description         => "Grammar level 0",
              discardId           => 1,
@@ -355,6 +367,7 @@ my %GRAMMAR_PROPERTIES_BY_LEVEL = (
              fallbackEncoding    => "UTF-8" },
     '1' => { defaultRuleAction   => "::concat",
              defaultEventAction  => undef,
+             defaultRegexAction  => 'RegexAction',
              defaultSymbolAction => "::transfer",
              description         => "Grammar level 1",
              discardId           => -1,
@@ -546,7 +559,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
                                              MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_ACCESSIBLE,
-                 show => "<Expression[3]> ::= '(' <Expression[0]> ')' action => ::copy[1] name => 'Expression is ()'" },
+                 show => "<Expression[3]> ::= /\\((?C\"LParen\")/ <Expression[0]> ')' action => ::copy[1] name => 'Expression is ()'" },
         '9' => { action                   => undef,
                  description              => "Expression is **",
                  discardEvent             => undef,
@@ -706,7 +719,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
                                              MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_ACCESSIBLE,
-                 show                     => "<NUMBER> ~ /[\\d]+/" },
+                 show                     => "<NUMBER> ~ /[\\d]+(?C\"NUMBER\")/" },
         '1' => { action                   => undef,
                  description              => "Rule No 1",
                  discardEvent             => undef,
@@ -1012,7 +1025,7 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  start => 0,
                  top => 0,
                  type => MarpaX::ESLIF::Symbol::Type->MARPAESLIF_SYMBOLTYPE_META},
-        '10' => {description => "'('",
+        '10' => {description => "/\\((?C\"LParen\")/",
                  discard => 0,
                  discardEvent => undef,
                  discardEventInitialState => 1,
@@ -1302,7 +1315,7 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  start => 0,
                  top => 1,
                  type => MarpaX::ESLIF::Symbol::Type->MARPAESLIF_SYMBOLTYPE_META},
-        '1' => { description => "/[\\d]+/",
+        '1' => { description => "/[\\d]+(?C\"NUMBER\")/",
                  discard => 0,
                  discardEvent => undef,
                  discardEventInitialState => 1,
@@ -1774,10 +1787,11 @@ sub doCmpProperties {
 
 __DATA__
 :start   ::= Expression
-:default ::=             action            => do_op
-                         symbol-action     => do_symbol
-                         default-encoding  => ASCII
-                         fallback-encoding => UTF-8
+:default ::=             action                => do_op
+                         symbol-action         => do_symbol
+                         default-encoding      => ASCII
+                         fallback-encoding     => UTF-8
+                         regex-action          => ::lua->lua_regexAction
 :discard ::= whitespaces event  => discard_whitespaces$
 :discard ::= comment     event  => discard_comment$
 
@@ -1789,7 +1803,7 @@ event Expression$ = completed Expression
 event ^Expression = predicted Expression
 Expression ::=
     Number                                           action => do_int            name => 'Expression is Number'
-    | '(' Expression ')'              assoc => group action => ::copy[1]         name => 'Expression is ()'
+    | /\((?C"LParen")/ Expression ')'              assoc => group action => ::copy[1]         name => 'Expression is ()'
    ||     Expression '**' Expression  assoc => right                             name => 'Expression is **'
    ||     Expression  '*' Expression                                             name => 'Expression is *'
     |     Expression  '/' Expression                                             name => 'Expression is /'
@@ -1798,7 +1812,10 @@ Expression ::=
 
 :lexeme ::= NUMBER pause => before event => ^NUMBER symbol-action => perl_number priority => 1 if-action => ::lua->test_if_action
 :lexeme ::= NUMBER pause => after  event => NUMBER$ priority => 0
-NUMBER     ~ /[\d]+/
+
+:default ~ regex-action => RegexAction
+
+NUMBER     ~ /[\d]+(?C"NUMBER")/
 whitespaces ::= WHITESPACES
 WHITESPACES ~ [\s]+
 comment ::= /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/)))/u
@@ -1806,5 +1823,11 @@ comment ::= /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/)
 <luascript>
 function test_if_action(lexeme)
   return true
+end
+function lua_regexAction(callout)
+  print('Lua regex callback: '..tostring(callout))
+  print('... Callout number: '..tostring(callout['callout_number']))
+  print('... Callout string: '..tostring(callout['callout_string']))
+  return 0
 end
 </luascript>

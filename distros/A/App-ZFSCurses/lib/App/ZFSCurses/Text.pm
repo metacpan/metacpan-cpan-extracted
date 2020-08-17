@@ -1,6 +1,6 @@
 package App::ZFSCurses::Text;
 
-use 5.006;
+use 5.10.1;
 use strict;
 use warnings;
 
@@ -9,17 +9,17 @@ $Text::Wrap::columns = 80;
 
 =head1 NAME
 
-App::ZFSCurses::Text - UI texts and messages.
+App::ZFSCurses::Text - Translate UI texts and messages.
 
 =cut
 
 =head1 VERSION
 
-Version 1.02.
+Version 1.210.
 
 =cut
 
-our $VERSION = '1.100';
+our $VERSION = '1.210';
 
 =head1 METHODS
 
@@ -47,6 +47,26 @@ sub title {
     return 'ZFScurses';
 }
 
+=head2 title_datasets
+
+Return the text title in the datasets view.
+
+=cut
+
+sub title_datasets {
+    return title() . ': Datasets';
+}
+
+=head2 title_snapshots
+
+Return the text title in the datasets view.
+
+=cut
+
+sub title_snapshots {
+    return title() . ': Snapshots';
+}
+
 =head2 top_label_datasets
 
 Return the top label text in the dataset screen.
@@ -58,6 +78,17 @@ sub top_label_datasets {
       . "Please select a dataset:";
 }
 
+=head2 top_label_snapshots
+
+Return the top label text in the snapshot screen.
+
+=cut
+
+sub top_label_snapshots {
+    return "List of all ZFS snapshots found on your system.\n"
+      . "Please select a snapshot:";
+}
+
 =head2 top_label_properties
 
 Return the top label text in the properties screen.
@@ -65,10 +96,14 @@ Return the top label text in the properties screen.
 =cut
 
 sub top_label_properties {
-    my $self    = shift;
-    my $dataset = shift;
-    return "List of ZFS properties for the \"$dataset\" dataset.\n"
-      . "Please select a property to change:";
+    my $self   = shift;
+    my $type   = shift;
+    my $value  = shift;
+
+    my $text = "List of ZFS properties for the \"$value\" $type.";
+    $text .= "\nPlease select a property to change:" if $type eq 'dataset';
+
+    return $text;
 }
 
 =head2 footer
@@ -100,6 +135,21 @@ sub exit_dialog {
     return 'Quit ZFScurses?';
 }
 
+=head2 destroy_confirmation
+
+Return the text when destroying an object.
+
+=cut
+
+sub destroy_confirmation {
+    my $self     = shift;
+    my $type     = shift;
+    my $value    = shift;
+    return "WARNING! YOU ARE ABOUT TO DESTROY DATA!"
+      . "\n\n"
+      . "Do you really want to destroy the $type\n\"$value\"?";
+}
+
 =head2 f1_help
 
 Return the text about the F1 key. This method is given to the footer method
@@ -119,6 +169,16 @@ Return the text when a property is not selected.
 
 sub select_property {
     return 'Please select a property!';
+}
+
+=head2 select_snapshot
+
+Return the text when a snapshot is not selected.
+
+=cut
+
+sub select_snapshot {
+    return 'Please select a snapshot!';
 }
 
 =head2 select_dataset
@@ -259,7 +319,7 @@ Patrice Clement <monsieurp at cpan.org>
 
 This software is copyright (c) 2020 by Patrice Clement.
 
-This is free software, licensed under the (three-clause) clause BSD License.
+This is free software, licensed under the (three-clause) BSD License.
 
 See the LICENSE file.
 
@@ -328,3 +388,4 @@ casesensitivity%Indicates whether the file name matching algorithm used by the f
 normalization%Indicates whether the file system should perform a unicode normalization of file names whenever two file names are compared, and which normalization algorithm should be used. File names are always stored unmodified, names are normalized as part of any comparison process. If this property is set to a legal value other than none, and the utf8only property was left unspecified, the utf8only property is automatically set to on. The default value of the normalization property is none. This property cannot be changed after the file system is created.
 utf8only%Indicates whether the file system should reject file names that include characters that are not present in the UTF-8 character code set. If this property is explicitly set to off, the normalization property must either not be explicitly set or be set to none. The default value for the utf8only property is off. This property cannot be changed after the file system is created.
 dnodesize%Specifies a compatibility mode or literal value for the size of dnodes in the file system. The default value is legacy. Setting this property to a value other than legacy requires the large_dnode pool feature to be enabled. Consider setting dnodesize to auto if the dataset uses the xattr=sa property setting and the workload makes heavy use of extended attributes. This may be applicable to SELinux-enabled systems, Lustre servers, and Samba servers, for example. Literal values are supported for cases where the optimal size is known in advance and for performance testing. Leave dnodesize set to legacy if you need to receive a send stream of this dataset on a pool that doesn't enable the large_dnode feature, or if you need to import this pool on a system that doesn't support the large_dnode feature.
+version%The on-disk version of this file system, which is independent of the pool version. This property can only be set to later supported versions.

@@ -1,5 +1,10 @@
 Revision history for Docker-CLI-Wrapper
 
+0.0.6       2020-08-15
+    - Correct missing end-delimiter in the code in the synopses.
+        - Thanks to metacpan.
+    - Revise some English grammar in the POD.
+
 0.0.5       2020-04-10
     - Improve the synopses and the POD docs.
 

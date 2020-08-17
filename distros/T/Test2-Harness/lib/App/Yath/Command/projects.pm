@@ -2,7 +2,7 @@ package App::Yath::Command::projects;
 use strict;
 use warnings;
 
-our $VERSION = '1.000020';
+our $VERSION = '1.000023';
 
 use parent 'App::Yath::Command::test';
 use Test2::Harness::Util::HashBase;
@@ -268,6 +268,24 @@ Can be specified multiple times
 
 =over 4
 
+=item --coverage-from path/to/log.jsonl
+
+=item --coverage-from http://example.com/coverage
+
+=item --coverage-from path/to/coverage.json
+
+=item --no-coverage-from
+
+Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
+
+
+=item --coverage-url-use-post
+
+=item --no-coverage-url-use-post
+
+If coverage_from is a url, use the http POST method with a list of changed files. This allows the server to tell us what tests to run instead of downloading all the coverage data and determining what tests to run from that.
+
+
 =item --default-at-search ARG
 
 =item --default-at-search=ARG
@@ -341,6 +359,17 @@ Can be specified multiple times
 Specify valid test filename extensions, default: t and t2
 
 Can be specified multiple times
+
+
+=item --maybe-coverage-from path/to/log.jsonl
+
+=item --maybe-coverage-from http://example.com/coverage
+
+=item --maybe-coverage-from path/to/coverage.json
+
+=item --no-maybe-coverage-from
+
+Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
 
 
 =item --maybe-durations file.json
@@ -425,6 +454,23 @@ Show output for the start of a job. (Default: off unless -v)
 =item --no-show-run-info
 
 Show the run configuration when a run starts. (Default: off, unless -vv)
+
+
+=back
+
+=head3 Git Options
+
+=over 4
+
+=item --git-change-base master
+
+=item --git-change-base HEAD^
+
+=item --git-change-base df22abe4
+
+=item --no-git-change-base
+
+Find files changed by all commits in the current branch from most recent stopping when a commit is found that is also present in the history of the branch/commit specified as the change base.
 
 
 =back
@@ -549,6 +595,15 @@ Specify the name of the log file. This option implies -L.
 Specify the format for automatically-generated log files. Overridden by --log-file, if given. This option implies -L (Default: \$YATH_LOG_FILE_FORMAT, if that is set, or else "%!P%Y-%m-%d~%H:%M:%S~%!U~%!p.jsonl"). This is a string in which percent-escape sequences will be replaced as per POSIX::strftime. The following special escape sequences are also replaced: (%!P : Project name followed by a ~, if a project is defined, otherwise empty string) (%!U : the unique test run ID) (%!p : the process ID) (%!S : the number of seconds since local midnight UTC)
 
 Can also be set with the following environment variables: C<YATH_LOG_FILE_FORMAT>, C<TEST2_HARNESS_LOG_FORMAT>
+
+
+=item --write-coverage
+
+=item --write-coverage=coverage.json
+
+=item --no-write-coverage
+
+Create a json file of all coverage data seen during the run (This implies --cover-files).
 
 
 =back
@@ -882,6 +937,13 @@ Use Devel::Cover to calculate test coverage. This disables forking. If no args a
 Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
 
 
+=item --dbi-profiling
+
+=item --no-dbi-profiling
+
+Use Test2::Plugin::DBIProfile to collect database profiling data
+
+
 =item --event-timeout SECONDS
 
 =item --et SECONDS
@@ -1092,6 +1154,13 @@ Can also be set with the following environment variables: C<T2_WORKDIR>, C<YATH_
 =item --no-yathui-api-key
 
 Yath-UI API key. This is not necessary if your Yath-UI instance is set to single-user
+
+
+=item --yathui-coverage
+
+=item --no-yathui-coverage
+
+Poll coverage data from Yath-UI to determine what tests should be run for changed files
 
 
 =item --yathui-durations

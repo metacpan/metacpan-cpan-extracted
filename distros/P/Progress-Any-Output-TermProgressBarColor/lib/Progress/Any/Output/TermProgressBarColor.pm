@@ -1,9 +1,9 @@
 package Progress::Any::Output::TermProgressBarColor;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-10'; # DATE
+our $DATE = '2020-08-15'; # DATE
 our $DIST = 'Progress-Any-Output-TermProgressBarColor'; # DIST
-our $VERSION = '0.248'; # VERSION
+our $VERSION = '0.249'; # VERSION
 
 use 5.010001;
 use strict;
@@ -215,7 +215,8 @@ sub _handle_unknown_conversion {
             (" " x ($bwidth-$self->{_x}-$bfilled));
     }
 
-    my $msg = $args{args}{message};
+    my $msg = $args{args}{'message.alt.output.TermProgressBarColor'} //
+        $args{args}{message};
     if ($conv eq 'B' && defined $msg) {
         if ($msg =~ m!</elspan!) {
             require String::Elide::Parts;
@@ -332,7 +333,7 @@ Progress::Any::Output::TermProgressBarColor - Output progress to terminal as col
 
 =head1 VERSION
 
-This document describes version 0.248 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2020-07-10.
+This document describes version 0.249 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2020-08-15.
 
 =head1 SYNOPSIS
 
@@ -472,6 +473,26 @@ again before showing.
 
 Set C<freq> to e.g. -0.1 or -0.05. The default C<freq>, when unset, is -0.5
 which means to update output at most once every 0.5 second.
+
+=head2 How to display a different message for this output?
+
+For example, this output formats message using L<String::Elide::Parts> so inside
+the message, substrings can be tagged for eliding priority:
+
+ <elspan prio=2>Downloading </elspan><elspan prio=3 truncate=middle>http://127.0.0.1:7007/2.mp4 </elspan>37.3M/139.5M
+
+while another output like L<Progress::Any::Output::TermMessage> does not use
+String::Elide::Parts. It should just display the string as:
+
+ Downloading http://127.0.0.1:7007/2.mp4 37.3M/139.5M
+
+In the indicator, you can provide a specific message for this output:
+
+ $progress->update(
+     message => 'Downloading http://127.0.0.1:7007/2.mp4 37.3M/139.5M',
+     'message.alt.output.TermProgressBarColor' => '<elspan prio=2>Downloading </elspan><elspan prio=3 truncate=middle>http://127.0.0.1:7007/2.mp4 </elspan>37.3M/139.5M',
+     ...
+ );
 
 =head1 ENVIRONMENT
 

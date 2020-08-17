@@ -80,6 +80,15 @@
 #define HAVE_NEG_NAN
 #define STR_NEG_INF "---"
 #define STR_NEG_NAN "?"
+#elif defined(_AIX)
+/* xlC compiler: __TOS_AIX__ FIXME: This does not work yet. GH #165 */
+#define STR_INF "INF.0"
+#define STR_INF2 "-INF.0"
+#define HAVE_NEG_NAN
+#define HAVE_QNAN
+#define STR_NAN "NaN"
+//#define STR_QNAN "NaNQ"
+#define STR_QNAN "NANQ"
 #else
 #define STR_INF "inf"
 #define STR_NAN "nan"
@@ -151,12 +160,6 @@ mingw_modfl(long double x, long double *ip)
 }
 #endif
 
-#if defined(_AIX)
-#define HAVE_QNAN
-#undef STR_QNAN
-#define STR_QNAN "NANQ"
-#endif
-
 /* some old perls do not have this, try to make it work, no */
 /* guarantees, though. if it breaks, you get to keep the pieces. */
 #ifndef UTF8_MAXBYTES
@@ -200,7 +203,17 @@ mingw_modfl(long double x, long double *ip)
 #  define assert_not_ROK(sv)
 # endif
 #endif
+/* 5.8 problem, it was renamed to HINT_BYTES with 5.8.0 */
+#if PERL_VERSION < 7
+ #ifndef HINT_BYTES
+   #define HINT_BYTES 8
+ #endif
+#endif 
 /* compatibility with perl <5.14 */
+/* added with 5.13.6 */
+#ifndef sv_cmp_flags
+# define sv_cmp_flags(a,b,flags) sv_cmp((a),(b))
+#endif
 #ifndef SvTRUE_nomg
 #define SvTRUE_nomg SvTRUE
 #endif
@@ -1202,12 +1215,21 @@ he_cmp_fast (const void *a_, const void *b_)
   return cmp;
 }
 
-/* compare hash entries, used when some keys are sv's or utf-x */
+/* compare hash entries, used when some keys are SV's or UTF-8 */
 static int
 he_cmp_slow (const void *a, const void *b)
 {
   dTHX;
   return sv_cmp (HeSVKEY_force (*(HE **)b), HeSVKEY_force (*(HE **)a));
+}
+
+/* compare tied hash entries, guaranteed SV's */
+static int
+he_cmp_tied (const void *a, const void *b)
+{
+  dTHX;
+  /* skip GMAGIC */
+  return sv_cmp_flags (HeKEY_sv (*(HE **)b), HeKEY_sv (*(HE **)a), 0);
 }
 
 static void
@@ -1272,30 +1294,35 @@ encode_hv (pTHX_ enc_t *enc, HV *hv, SV *typesv)
   encode_ch (aTHX_ enc, '{');
 
   /* for canonical output we have to sort by keys first */
-  /* caused by randomised hash orderings */
-  if (enc->json.flags & F_CANONICAL && !SvTIED_mg((SV*)hv, PERL_MAGIC_tied))
+  /* caused by randomised hash orderings or unknown tied behaviour. */
+  if (enc->json.flags & F_CANONICAL)
     {
       RITER_T i, count = hv_iterinit (hv);
+      HE *hes_stack [STACK_HES];
+      HE **hes = hes_stack;
+      int is_tied = 0;
 
       if (SvMAGICAL (hv))
         {
+          if (SvTIED_mg((SV*)hv, PERL_MAGIC_tied))
+            is_tied = 1;
+          /* really should be calling magic_scalarpack(hv, mg) here, but I doubt it will be correct */
+          /* TODO For tied hashes we should check if the iterator is already canonical (same sort order)
+             as it would be with a DB tree e.g. and skip our slow sorting. */
+
           /* need to count by iterating. could improve by dynamically building the vector below */
           /* but I don't care for the speed of this special case. */
-          /* note also that we will run into undefined behaviour when the two iterations */
-          /* do not result in the same count, something I might care for in some later release. */
-
           count = 0;
           while (hv_iternext (hv))
             ++count;
 
-          hv_iterinit (hv);
+          (void)hv_iterinit (hv);
         }
 
-      if (count)
+      /* one key does not need to be sorted */
+      if (count > 0)
         {
-          int fast = 1;
-          HE *hes_stack [STACK_HES];
-          HE **hes = hes_stack;
+          int has_utf8 = 0;
 
           /* allocate larger arrays on the heap */
           if (count > STACK_HES)
@@ -1305,33 +1332,70 @@ encode_hv (pTHX_ enc_t *enc, HV *hv, SV *typesv)
             }
 
           i = 0;
+          /* fill the HE vector and check if SVKEY or UTF8 */
           while ((he = hv_iternext (hv)))
             {
-              hes [i++] = he;
-              if (HeKLEN (he) < 0 || HeKUTF8 (he))
-                fast = 0;
+              if (UNLIKELY(is_tied))
+                { // tied entries are completely freed in the next iteration
+                  HE *he1;
+                  Newz(0,he1,1,HE);
+                  he1->hent_hek = safecalloc (1, sizeof (struct hek) + sizeof (SV*) + 2);
+                  HeVAL(he1) = hv_iterval(hv, he);
+                  HeSVKEY_set (he1, hv_iterkeysv(he));
+                  hes[i++] = he1;
+                }
+              else
+                hes[i++] = he;
+              /* check the SV for UTF8 and seperate use bytes handling */
+              if (!has_utf8)
+                {
+                  if (He_IS_SVKEY(he))
+                    has_utf8 = SvUTF8(HeSVKEY(he));
+                  else
+                    has_utf8 = HeKUTF8(he);
+                }
             }
 
+          /* Undefined behaviour when the two iterations do not result in the same count.
+             With threads::shared or broken tie. The last HEs might be NULL then or we'll
+             miss some. */
+          if (i != count)
+            croak ("Unstable %shash key counts %d vs %d in subsequent runs",
+                   is_tied ? "tied " : "", (int)count, (int)i);
           assert (i == count);
 
-          if (fast)
-            qsort (hes, count, sizeof (HE *), he_cmp_fast);
-          else
+          /* one key does not need to be sorted */
+          if (count > 1)
             {
-              /* hack to forcefully disable "use bytes" */
-              COP cop = *PL_curcop;
-              cop.op_private = 0;
 
-              ENTER;
-              SAVETMPS;
+              if (!has_utf8)
+                {
+                  /* TODO With threads::shared check for qsort_r */
+                  qsort (hes, count, sizeof (HE *), is_tied ? he_cmp_tied : he_cmp_fast);
+                }
+              else
+                {
+                  /* hack to forcefully disable "use bytes".
+                     Changed in 5.9.4 a98fe34d09e2476f1a21bfb9dc730dc9ab02b0b4 */
+                  COP cop = *PL_curcop;
+#if PERL_VERSION < 10
+                  cop.op_private &= ~HINT_BYTES;
+#else
+                  cop.cop_hints &= ~HINT_BYTES;
+#endif
 
-              SAVEVPTR (PL_curcop);
-              PL_curcop = &cop;
+                  ENTER;
+                  SAVETMPS;
 
-              qsort (hes, count, sizeof (HE *), he_cmp_slow);
+                  SAVEVPTR (PL_curcop);
+                  PL_curcop = &cop;
 
-              FREETMPS;
-              LEAVE;
+                  /* TODO With threads::shared check for qsort_r */
+                  qsort (hes, count, sizeof (HE *), is_tied ? he_cmp_tied : he_cmp_slow);
+
+                  FREETMPS;
+                  LEAVE;
+                }
             }
 
           encode_nl (aTHX_ enc); ++enc->indent;
@@ -1342,7 +1406,7 @@ encode_hv (pTHX_ enc_t *enc, HV *hv, SV *typesv)
               I32 klen;
 
               encode_indent (aTHX_ enc);
-              he = hes [count];
+              he = hes[count];
               retrieve_hk (aTHX_ he, &key, &klen);
               encode_hk (aTHX_ enc, key, klen);
 
@@ -1355,10 +1419,18 @@ encode_hv (pTHX_ enc_t *enc, HV *hv, SV *typesv)
                   typesv = *typesv_ref;
                 }
 
-              encode_sv (aTHX_ enc, UNLIKELY(SvMAGICAL (hv)) ? hv_iterval (hv, he) : HeVAL (he), typesv);
+              encode_sv(aTHX_ enc,
+                        (is_tied || !SvMAGICAL(hv)) ? HeVAL(he)
+                        : hv_iterval(hv, he),
+                        typesv);
 
+              if (is_tied)
+                {
+                  Safefree (he->hent_hek);
+                  Safefree (he);
+                }
               if (count)
-                encode_comma (aTHX_ enc);
+                encode_comma(aTHX_ enc);
             }
 
           encode_nl (aTHX_ enc); --enc->indent; encode_indent (aTHX_ enc);
@@ -1389,12 +1461,15 @@ encode_hv (pTHX_ enc_t *enc, HV *hv, SV *typesv)
                     typesv = *typesv_ref;
                   }
 
-                encode_sv (aTHX_ enc, UNLIKELY(SvMAGICAL (hv)) ? hv_iterval (hv, he) : HeVAL (he), typesv);
+                  encode_sv(aTHX_ enc,
+                            UNLIKELY(SvMAGICAL(hv)) ? hv_iterval(hv, he)
+                                                    : HeVAL(he),
+                            typesv);
 
-                if (!(he = hv_iternext (hv)))
-                  break;
+                  if (!(he = hv_iternext(hv)))
+                    break;
 
-                encode_comma (aTHX_ enc);
+                  encode_comma(aTHX_ enc);
               }
 
             encode_nl (aTHX_ enc); --enc->indent; encode_indent (aTHX_ enc);
@@ -1431,11 +1506,20 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
 
   if (isref && SvAMAGIC(sv))
     ;
-  /* if no string overload found, check allow_stringify */
+  /* if no string overload found, check allow_stringify, allow_unknown
+     and allow_blessed. */
   else if (!MyAMG(sv) && !(enc->json.flags & F_ALLOW_STRINGIFY)) {
-    if (isref && !(enc->json.flags & F_ALLOW_UNKNOWN))
-      croak ("cannot encode reference to scalar '%s' unless the scalar is 0 or 1",
+    if ((isref != 0) && ((enc->json.flags & F_ALLOW_UNKNOWN) == 0)) {
+      croak ("cannot encode reference to scalar '%s' unless the scalar is 0 or 1 "
+             "without allow_unknown",
              SvPV_nolen (sv_2mortal (newRV_inc (sv))));
+    }
+    else if ((isref == 0) && ((enc->json.flags & F_ALLOW_BLESSED) == 0)) {
+      croak ("encountered %s '%s', but allow_blessed, allow_stringify or "
+             "TO_JSON/FREEZE method missing",
+             SvOBJECT(sv) ? "object" : "reference",
+             SvPV_nolen (sv_2mortal (newRV_inc (sv))));
+    }
     encode_const_str (aTHX_ enc, "null", 4, 0);
     return;
   }
@@ -1444,7 +1528,11 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
     /* the essential of pp_stringify */
 #if PERL_VERSION > 7
     pv = newSVpvs("");
-    sv_copypv(pv, sv);
+    if (!isref && !(enc->json.flags & F_ALLOW_STRINGIFY)) {
+      sv_copypv(pv, newRV(sv));
+    } else {
+      sv_copypv(pv, sv);
+    }
     SvSETMAGIC(pv);
     str = SvPVutf8_force(pv, len);
 #else
@@ -1551,14 +1639,20 @@ encode_bool_obj (pTHX_ enc_t *enc, SV *sv, int force_conversion, int as_string)
     {
       if (as_string)
         encode_ch (aTHX_ enc, '"');
-      if (SvIV_nomg (sv))
+      /* we need to apply threads_shared magic */
+      if
+#ifdef USE_ITHREADS
+         (SvIV (sv))
+#else
+         (SvIV_nomg (sv))
+#endif
         encode_const_str (aTHX_ enc, "true", 4, 0);
       else
         encode_const_str (aTHX_ enc, "false", 5, 0);
       if (as_string)
         encode_ch (aTHX_ enc, '"');
     }
-  else if (force_conversion && enc->json.flags & F_CONV_BLESSED)
+  else if (force_conversion && enc->json.flags & (F_ALLOW_BLESSED|F_CONV_BLESSED))
     {
       if (as_string)
         encode_ch (aTHX_ enc, '"');
@@ -1691,15 +1785,15 @@ encode_rv (pTHX_ enc_t *enc, SV *rv)
   else if (svt < SVt_PVAV && svt != SVt_PVGV && svt != SVt_PVHV && svt != SVt_PVAV)
     {
       if (!encode_bool_ref (aTHX_ enc, sv))
-      {
-      if (enc->json.flags & F_ALLOW_STRINGIFY)
-        encode_stringify(aTHX_ enc, sv, SvROK(sv));
-      else if (enc->json.flags & F_ALLOW_UNKNOWN)
-        encode_const_str (aTHX_ enc, "null", 4, 0);
-      else
-        croak ("cannot encode reference to scalar '%s' unless the scalar is 0 or 1",
-               SvPV_nolen (sv_2mortal (newRV_inc (sv))));
-      }
+        {
+          if (enc->json.flags & F_ALLOW_STRINGIFY)
+            encode_stringify(aTHX_ enc, sv, SvROK(sv));
+          else if (enc->json.flags & F_ALLOW_UNKNOWN)
+            encode_const_str (aTHX_ enc, "null", 4, 0);
+          else
+            croak ("cannot encode reference to scalar '%s' unless the scalar is 0 or 1",
+                   SvPV_nolen (sv_2mortal (newRV_inc (sv))));
+        }
     }
   else if (enc->json.flags & F_ALLOW_UNKNOWN)
     encode_const_str (aTHX_ enc, "null", 4, 0);
@@ -1857,7 +1951,7 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
   else if (type == JSON_TYPE_FLOAT)
     {
       int is_bigobj = 0;
-      char *savecur, *saveend;
+      char *savecur = NULL, *saveend = NULL;
       char inf_or_nan = 0;
 #ifdef NEED_NUMERIC_LOCALE_C
 # ifdef HAS_USELOCALE

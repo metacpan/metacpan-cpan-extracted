@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use 5.016000;
+use 5.016;
 use ExtUtils::MakeMaker;
 
 BEGIN {
@@ -86,7 +86,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "JSON-Schema-Draft201909",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.016000",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "JSON::Schema::Draft201909",
   "PL_FILES" => {},
   "PREREQ_PM" => {
@@ -108,7 +108,6 @@ my %WriteMakefileArgs = (
     "Syntax::Keyword::Try" => "0.11",
     "Types::Standard" => "1.010002",
     "constant" => 0,
-    "feature" => 0,
     "if" => 0,
     "namespace::clean" => 0,
     "overload" => 0,
@@ -123,14 +122,14 @@ my %WriteMakefileArgs = (
     "Test::Deep::UnorderedPairs" => 0,
     "Test::Fatal" => 0,
     "Test::File::ShareDir" => 0,
-    "Test::JSON::Schema::Acceptance" => "0.999",
+    "Test::JSON::Schema::Acceptance" => "1.000",
     "Test::More" => "0.96",
     "Test::Warnings" => "0.027",
     "lib" => 0,
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -160,12 +159,11 @@ my %FallbackPrereqs = (
   "Test::Deep::UnorderedPairs" => 0,
   "Test::Fatal" => 0,
   "Test::File::ShareDir" => 0,
-  "Test::JSON::Schema::Acceptance" => "0.999",
+  "Test::JSON::Schema::Acceptance" => "1.000",
   "Test::More" => "0.96",
   "Test::Warnings" => "0.027",
   "Types::Standard" => "1.010002",
   "constant" => 0,
-  "feature" => 0,
   "if" => 0,
   "lib" => 0,
   "namespace::clean" => 0,

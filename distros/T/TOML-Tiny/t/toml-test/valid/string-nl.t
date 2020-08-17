@@ -12,13 +12,13 @@ binmode STDIN,  ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 
 my $expected1 = {
-               'lit_nl_end' => 'value\\n',
                'nl_mid' => 'val
 ue',
-               'lit_nl_mid' => 'val\\nue',
+               'lit_nl_uni' => 'val\\ue',
                'nl_end' => 'value
 ',
-               'lit_nl_uni' => 'val\\ue'
+               'lit_nl_mid' => 'val\\nue',
+               'lit_nl_end' => 'value\\n'
              };
 
 
@@ -34,19 +34,24 @@ is($actual, $expected1, 'string-nl - from_toml') or do{
   diag 'EXPECTED:';
   diag Dumper($expected1);
 
+  diag '';
   diag 'ACTUAL:';
   diag Dumper($actual);
 };
 
-is(eval{ from_toml(to_toml($actual)) }, $actual, 'string-nl - to_toml') or do{
+is(eval{ scalar from_toml(to_toml($actual)) }, $expected1, 'string-nl - to_toml') or do{
+  diag "ERROR: $@" if $@;
+
   diag 'INPUT:';
   diag Dumper($actual);
 
-  diag 'TOML OUTPUT:';
+  diag '';
+  diag 'GENERATED TOML:';
   diag to_toml($actual);
 
-  diag 'REPARSED OUTPUT:';
-  diag Dumper(from_toml(to_toml($actual)));
+  diag '';
+  diag 'REPARSED FROM GENERATED TOML:';
+  diag Dumper(scalar from_toml(to_toml($actual)));
 };
 
 done_testing;

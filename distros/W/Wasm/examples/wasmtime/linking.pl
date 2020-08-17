@@ -19,8 +19,8 @@ my $wasi = Wasm::Wasmtime::WasiInstance->new(
 $linker->define_wasi($wasi);
 
 # Load and compile our two modules
-my $module1 = Wasm::Wasmtime::Module->new($store, file => path(__FILE__)->parent->child('linking1.wat') );
-my $module2 = Wasm::Wasmtime::Module->new($store, file => path(__FILE__)->parent->child('linking2.wat') );
+my $module1 = Wasm::Wasmtime::Module->new($store->engine, file => path(__FILE__)->parent->child('linking1.wat') );
+my $module2 = Wasm::Wasmtime::Module->new($store->engine, file => path(__FILE__)->parent->child('linking2.wat') );
 
 # Instantiate our first module which only uses WASI, then register that
 # instance with the linker since the next linking will use it.

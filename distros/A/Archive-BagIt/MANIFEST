@@ -8,6 +8,7 @@ META.yml
 Makefile.PL
 README.developer
 README.mkdn
+_Deparsed_XSubs.pm
 bagit_conformance_suite/LICENSE.md
 bagit_conformance_suite/README.1st
 bagit_conformance_suite/README.md

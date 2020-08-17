@@ -7,7 +7,7 @@ use Carp;
 use LWP::Protocol;
 use Scope::Guard qw(guard);
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 $VERSION = eval $VERSION;
 
 our @Protocols = qw(http https);
@@ -172,7 +172,7 @@ Registers a pair of hostname and peer ip address.
 
 equals to:
 
-  LWP::UserAgent::DNS::Hosts->regiter_hosts('example.com', '127.0.0.1');
+  LWP::UserAgent::DNS::Hosts->register_hosts('example.com', '127.0.0.1');
 
 =item register_hosts(%host_addr_pairs)
 

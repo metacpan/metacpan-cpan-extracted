@@ -4,6 +4,11 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.721 2020-08-17
+  * HP34420A: Add setter/getter for input filter state
+  * Countdown: Never call Time::HiRes::sleep with a negative argument
+  * Documentation improvements
+
 3.720 2020-07-26
   * ZI_MFLI: Add various setters/getters for the signal inputs
 

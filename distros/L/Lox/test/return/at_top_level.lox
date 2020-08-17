@@ -1,0 +1,1 @@
+return "wat"; // expect: [Line 1] Error at 'return': Can only return from functions.

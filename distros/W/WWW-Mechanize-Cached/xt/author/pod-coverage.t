@@ -28,7 +28,7 @@ plan tests => scalar @modules;
 my %trustme = ();
 
 my @also_private = (
-                  qr/^FOREIGNBUILDARGS$/u
+                  qr/^FOREIGNBUILDARGS$/
                 );
 
 for my $module ( sort @modules ) {

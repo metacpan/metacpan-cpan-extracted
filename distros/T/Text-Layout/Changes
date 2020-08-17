@@ -1,5 +1,17 @@
 Revision history for Text::Layout
 
+0.019	2020-08-16
+
+	Add support for C<< <span font_desc="..."> >>. See
+	tests/pdfapi3.pl for an example how to use this to embed RTL
+	texts. Note, however, that this currently relies on the native
+	harfbuzz library to correctly determine ('guess') the
+	characteristics of the text.
+
+	Eliminated backend loading in favour of derived classes.
+
+	Enable font caching for PDF::API2.
+
 0.018.3	2020-05-19
 
 	Dropped testing with PDF::Builder. Text::Layout will continue

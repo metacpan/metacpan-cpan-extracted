@@ -5,7 +5,7 @@ use warnings;
 package Mom;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003';
+our $VERSION   = '0.004';
 
 use parent qw( MooX::Press );
 use Carp qw();
@@ -146,7 +146,7 @@ Is (roughly) a shortcut for:
   
   has foo => ( is => "ro" );
   has bar => ( is => "rw", isa => Types::Standard::Int );
-  has foo => ( is => "ro", required => 1 );
+  has baz => ( is => "ro", required => 1 );
 
 Tokens which don't start with a colon are created as attributes in
 your package. Tokens starting with a colon are flags that affect either

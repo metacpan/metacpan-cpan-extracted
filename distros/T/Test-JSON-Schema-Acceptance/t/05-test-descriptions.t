@@ -3,7 +3,7 @@ use strict;
 use warnings;
 no if "$]" >= 5.031009, feature => 'indirect';
 
-use Test::Tester 0.108;
+use Test2::API 'intercept';
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep;
@@ -14,7 +14,7 @@ use SchemaParser;
 my $accepter = Test::JSON::Schema::Acceptance->new(test_dir => 't/tests/simple-booleans');
 my $parser = SchemaParser->new;
 
-my ($premature, @results) = run_tests(
+my $events = intercept(
   sub {
     $accepter->acceptance(sub {
       my ($schema, $input_data) = @_;
@@ -23,23 +23,20 @@ my ($premature, @results) = run_tests(
   }
 );
 
+my @bool_tests = grep $_->isa('Test2::Event::Ok'), @$events;
+is(@bool_tests, 18, 'found all the tests');
+
 cmp_deeply(
-  \@results,
-  array_each(
-    superhashof({
-      ok => 1,
-      actual_ok => 1,
-      diag => '',
-      reason => '',
-      type => '',
-      depth => 1,
-    })
-  ),
+  \@bool_tests,
+  array_each(methods(
+    pass => 1,
+    effective_pass => 1,
+  )),
   'all tests pass',
 );
 
 cmp_deeply(
-  [ map $_->{name}, @results ],
+  [ map $_->name, @bool_tests ],
   [
     map {
       my $file = $_;

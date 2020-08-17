@@ -1,3 +1,11 @@
+0.141		2020-08-17	T. R. Wyant
+    Attribute url_iridium_status_mccants now warns on all accesses. In
+    the first release after February 15 2021 all accesses will be fatal,
+    and it will be dropped from the list returned by attribute_names().
+
+    Remove prototypes from testing subroutines defined in t/*.t and
+    inc/My/Module/Test/*.pm.
+
 0.140		2020-07-11	T. R. Wyant
     Add Celestrak Supplemental catalog for Planet.
 

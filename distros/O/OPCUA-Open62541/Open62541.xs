@@ -168,6 +168,8 @@ typedef struct ClientCallbackData {
 typedef struct OPCUA_Open62541_ClientConfig {
 	struct OPCUA_Open62541_Logger	clc_logger;
 	UA_ClientConfig *	clc_clientconfig;
+	SV *			clc_clientcontext;
+	SV *			clc_statecallback;
 	SV *			clc_storage;
 } * OPCUA_Open62541_ClientConfig;
 
@@ -1880,6 +1882,59 @@ clientCallbackPerl(UA_Client *ua_client, void *userdata, UA_UInt32 requestId,
 	deleteClientCallbackData(ccd);
 }
 
+static void
+clientStateCallback(UA_Client *ua_client,
+#ifdef HAVE_UA_CLIENT_GETSTATE_3
+    UA_SecureChannelState channelState, UA_SessionState sessionState,
+    UA_StatusCode connectStatus)
+#else
+    UA_ClientState clientState)
+#endif
+{
+	dTHX;
+	dSP;
+	SV *sv;
+	OPCUA_Open62541_Client client;
+
+	sv = UA_Client_getContext(ua_client);
+	DPRINTF("client context sv %p, SvOK %d, SvROK %d, sv_derived_from %d",
+	    sv, SvOK(sv), SvROK(sv),
+	    sv_derived_from(sv, "OPCUA::Open62541::Client"));
+	if (!(SvOK(sv) && SvROK(sv) &&
+	    sv_derived_from(sv, "OPCUA::Open62541::Client"))) {
+		CROAK("Client context is not a OPCUA::Open62541::Client");
+	}
+	client = INT2PTR(OPCUA_Open62541_Client, SvIV(SvRV(sv)));
+
+	DPRINTF("ua_client %p, client %p", ua_client, client);
+
+	ENTER;
+	SAVETMPS;
+
+	PUSHMARK(SP);
+#ifdef HAVE_UA_CLIENT_GETSTATE_3
+	EXTEND(SP, 4);
+	PUSHs(sv);
+	sv = newSViv(channelState);
+	mPUSHs(sv);
+	sv = newSViv(sessionState);
+	mPUSHs(sv);
+	sv = newSViv(connectStatus);
+	mPUSHs(sv);
+#else
+	EXTEND(SP, 2);
+	PUSHs(sv);
+	sv = newSViv(clientState);
+	mPUSHs(sv);
+#endif
+	PUTBACK;
+
+	call_sv(client->cl_config.clc_statecallback, G_VOID | G_DISCARD);
+
+	FREETMPS;
+	LEAVE;
+}
+
 #ifndef HAVE_UA_CLIENT_CONNECTASYNC
 
 static void
@@ -2588,6 +2643,18 @@ UA_Server_browse(server, maxReferences, bd)
     OUTPUT:
 	RETVAL
 
+UA_BrowseResult
+UA_Server_browseNext(server, releaseContinuationPoint, continuationPoint)
+	OPCUA_Open62541_Server			server
+	UA_Boolean				releaseContinuationPoint
+	OPCUA_Open62541_ByteString		continuationPoint
+    CODE:
+	RETVAL = UA_Server_browseNext(server->sv_server,
+	    releaseContinuationPoint, continuationPoint);
+    OUTPUT:
+	RETVAL
+
+
 # 11.7 Information Model Callbacks
 
 #ifdef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
@@ -3063,6 +3130,12 @@ UA_Client_getConfig(client)
 	    client, client->cl_client, RETVAL, RETVAL->clc_clientconfig);
 	/* When client goes out of scope, config still uses its memory. */
 	RETVAL->clc_storage = SvREFCNT_inc(SvRV(ST(0)));
+	/*
+	 * Set clientContext to OPCUA_Open62541_Client.  This will allow
+	 * us to reach back from the UA client to the XS client.  The
+	 * SV is created on the stack during OUTPUT.
+	 */
+	client->cl_config.clc_clientconfig->clientContext = ST(0);
     OUTPUT:
 	RETVAL
 
@@ -3220,7 +3293,7 @@ UA_Client_getState(client)
     OUTPUT:
 	RETVAL
 
-#else /* HAVE_UA_CLIENT_GETSTATE_STATUSCODE */
+#else /* HAVE_UA_CLIENT_GETSTATE_3 */
 
 UA_ClientState
 UA_Client_getState(client)
@@ -3231,7 +3304,7 @@ UA_Client_getState(client)
     OUTPUT:
 	RETVAL
 
-#endif /* HAVE_UA_CLIENT_GETSTATE_STATUSCODE */
+#endif /* HAVE_UA_CLIENT_GETSTATE_3 */
 
 UA_StatusCode
 UA_Client_sendAsyncBrowseRequest(client, request, callback, data, outoptReqId)
@@ -3355,16 +3428,65 @@ UA_ClientConfig_DESTROY(config)
     CODE:
 	DPRINTF("config %p, clc_clientconfig %p, clc_storage %p",
 	    config, config->clc_clientconfig, config->clc_storage);
+	/*
+	 * XXX The client context and state callback should live longer than
+	 * the config.  They should live until the client dies, but reference
+	 * counting the client SV in the client object does not work.
+	 */
+	config->clc_clientconfig->clientContext = NULL;
+	config->clc_clientconfig->stateCallback = NULL;
+	SvREFCNT_dec(config->clc_clientcontext);
+	SvREFCNT_dec(config->clc_statecallback);
 	/* Delayed client destroy after client config destroy. */
 	SvREFCNT_dec(config->clc_storage);
 
 UA_StatusCode
 UA_ClientConfig_setDefault(config)
 	OPCUA_Open62541_ClientConfig	config
+    PREINIT:
+	SV *				client;
     CODE:
+	client = config->clc_clientconfig->clientContext;
 	RETVAL = UA_ClientConfig_setDefault(config->clc_clientconfig);
+	config->clc_clientconfig->clientContext = client;
     OUTPUT:
 	RETVAL
+
+SV *
+UA_ClientConfig_getClientContext(config)
+	OPCUA_Open62541_ClientConfig	config
+    CODE:
+	RETVAL = newSVsv(config->clc_clientcontext);
+    OUTPUT:
+	RETVAL
+
+void
+UA_ClientConfig_setClientContext(config, context)
+	OPCUA_Open62541_ClientConfig	config
+	SV *				context
+    CODE:
+	SvREFCNT_dec(config->clc_clientcontext);
+	config->clc_clientcontext = newSVsv(context);
+
+void
+UA_ClientConfig_setStateCallback(config, callback)
+	OPCUA_Open62541_ClientConfig	config
+	SV *				callback
+    INIT:
+	if (SvOK(callback) &&
+	    !(SvROK(callback) && SvTYPE(SvRV(callback)) == SVt_PVCV)) {
+		CROAK("Context '%s' is not a CODE reference",
+		    SvPV_nolen(callback));
+	}
+    CODE:
+	SvREFCNT_dec(config->clc_statecallback);
+	if (SvOK(callback)) {
+		config->clc_statecallback = newSVsv(callback);
+		config->clc_clientconfig->stateCallback = clientStateCallback;
+	} else {
+		config->clc_statecallback = NULL;
+		config->clc_clientconfig->stateCallback = NULL;
+	}
 
 OPCUA_Open62541_Logger
 UA_ClientConfig_getLogger(config)

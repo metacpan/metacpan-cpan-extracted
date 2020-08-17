@@ -1,5 +1,9 @@
 Revision history for Perl extension Minion-Backend-MongoDB
 
+1.06 2020-03-14T12:11:10Z (ebruni)
+
+    - In purge, solved a bugged default value for older param
+    - In purge, add an older_field to set on which field check for job age
 
 1.05 2019-12-18T14:31:45Z (ebruni)
 

@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Color::ANSI::Util" => "0.164",
     "Monkey::Patch::Action" => "0.060",
-    "Progress::Any" => "0.216",
+    "Progress::Any" => "0.219",
     "String::Elide::Parts" => "0.07",
     "Text::ANSI::Util" => "0.22",
     "strict" => 0,
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "Progress::Any::Output" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.248",
+  "VERSION" => "0.249",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +47,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Monkey::Patch::Action" => "0.060",
-  "Progress::Any" => "0.216",
+  "Progress::Any" => "0.219",
   "Progress::Any::Output" => 0,
   "String::Elide::Parts" => "0.07",
   "Test::More" => "0.98",

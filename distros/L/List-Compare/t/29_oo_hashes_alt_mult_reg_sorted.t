@@ -6,7 +6,7 @@ use Test::More tests => 104;
 use List::Compare;
 use lib ("./t");
 use Test::ListCompareSpecial qw( :seen :wrap :hashes :results );
-use IO::CaptureOutput qw( capture );
+use Capture::Tiny q|:all|;
 
 my @pred = ();
 my %seen = ();
@@ -61,11 +61,7 @@ like($@,
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @unique = $lcm->get_Lonly(2); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @unique = $lcm->get_Lonly(2); };
     is_deeply(\@unique, \@pred, "Got expected unique");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Lonly or its alias defaults/,
@@ -74,11 +70,7 @@ like($@,
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $unique_ref = $lcm->get_Lonly_ref(2); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $unique_ref = $lcm->get_Lonly_ref(2); };
     is_deeply($unique_ref, \@pred, "Got expected unique");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Lonly_ref or its alias defaults/,
@@ -87,11 +79,7 @@ like($@,
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @unique = $lcm->get_Aonly(2); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @unique = $lcm->get_Aonly(2); };
     is_deeply(\@unique, \@pred, "Got expected unique");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Lonly or its alias defaults/,
@@ -100,11 +88,7 @@ like($@,
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $unique_ref = $lcm->get_Aonly_ref(2); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $unique_ref = $lcm->get_Aonly_ref(2); };
     is_deeply($unique_ref, \@pred, "Got expected unique");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Lonly_ref or its alias defaults/,
@@ -121,11 +105,7 @@ is_deeply($unique_ref, \@pred, "Got expected unique");
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @unique = $lcm->get_Lonly(); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @unique = $lcm->get_Lonly(); };
     is_deeply(\@unique, \@pred, "Got expected unique");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Lonly or its alias defaults/,
@@ -134,11 +114,7 @@ is_deeply($unique_ref, \@pred, "Got expected unique");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $unique_ref = $lcm->get_Lonly_ref(); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $unique_ref = $lcm->get_Lonly_ref(); };
     is_deeply($unique_ref, \@pred, "Got expected unique");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Lonly_ref or its alias defaults/,
@@ -147,11 +123,7 @@ is_deeply($unique_ref, \@pred, "Got expected unique");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @unique = $lcm->get_Aonly(); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @unique = $lcm->get_Aonly(); };
     is_deeply(\@unique, \@pred, "Got expected unique");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Lonly or its alias defaults/,
@@ -160,11 +132,7 @@ is_deeply($unique_ref, \@pred, "Got expected unique");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $unique_ref = $lcm->get_Aonly_ref(); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $unique_ref = $lcm->get_Aonly_ref(); };
     is_deeply($unique_ref, \@pred, "Got expected unique");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Lonly_ref or its alias defaults/,
@@ -198,11 +166,7 @@ like($@,
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @complement = $lcm->get_Ronly(1); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @complement = $lcm->get_Ronly(1); };
     is_deeply(\@complement, \@pred, "Got expected complement");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Ronly or its alias defaults/,
@@ -211,11 +175,7 @@ like($@,
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $complement_ref = $lcm->get_Ronly_ref(1); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $complement_ref = $lcm->get_Ronly_ref(1); };
     is_deeply($complement_ref, \@pred, "Got expected complement");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Ronly_ref or its alias defaults/,
@@ -224,11 +184,7 @@ like($@,
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @complement = $lcm->get_Bonly(1); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @complement = $lcm->get_Bonly(1); };
     is_deeply(\@complement, \@pred, "Got expected complement");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Ronly or its alias defaults/,
@@ -237,11 +193,7 @@ like($@,
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $complement_ref = $lcm->get_Bonly_ref(1); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $complement_ref = $lcm->get_Bonly_ref(1); };
     is_deeply($complement_ref, \@pred, "Got expected complement");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Ronly_ref or its alias defaults/,
@@ -258,11 +210,7 @@ is_deeply($complement_ref, \@pred, "Got expected complement");
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @complement = $lcm->get_Ronly(); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @complement = $lcm->get_Ronly(); };
     is_deeply(\@complement, \@pred, "Got expected complement");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Ronly or its alias defaults/,
@@ -271,11 +219,7 @@ is_deeply($complement_ref, \@pred, "Got expected complement");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $complement_ref = $lcm->get_Ronly_ref(); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $complement_ref = $lcm->get_Ronly_ref(); };
     is_deeply($complement_ref, \@pred, "Got expected complement");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Ronly_ref or its alias defaults/,
@@ -284,11 +228,7 @@ is_deeply($complement_ref, \@pred, "Got expected complement");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @complement = $lcm->get_Bonly(); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @complement = $lcm->get_Bonly(); };
     is_deeply(\@complement, \@pred, "Got expected complement");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Ronly or its alias defaults/,
@@ -297,11 +237,7 @@ is_deeply($complement_ref, \@pred, "Got expected complement");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $complement_ref = $lcm->get_Bonly_ref(); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $complement_ref = $lcm->get_Bonly_ref(); };
     is_deeply($complement_ref, \@pred, "Got expected complement");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_Ronly_ref or its alias defaults/,
@@ -335,11 +271,7 @@ is_deeply($symmetric_difference_ref, \@pred, "Got expected symmetric_difference"
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @symmetric_difference = $lcm->get_LorRonly; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @symmetric_difference = $lcm->get_LorRonly; };
     is_deeply(\@symmetric_difference, \@pred, "Got expected symmetric_difference");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_LorRonly or its alias defaults/,
@@ -348,11 +280,7 @@ is_deeply($symmetric_difference_ref, \@pred, "Got expected symmetric_difference"
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $symmetric_difference_ref = $lcm->get_LorRonly_ref; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $symmetric_difference_ref = $lcm->get_LorRonly_ref; };
     is_deeply($symmetric_difference_ref, \@pred, "Got expected symmetric_difference");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_LorRonly_ref or its alias defaults/,
@@ -361,11 +289,7 @@ is_deeply($symmetric_difference_ref, \@pred, "Got expected symmetric_difference"
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @symmetric_difference = $lcm->get_AorBonly; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @symmetric_difference = $lcm->get_AorBonly; };
     is_deeply(\@symmetric_difference, \@pred, "Got expected symmetric_difference");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_LorRonly or its alias defaults/,
@@ -374,11 +298,7 @@ is_deeply($symmetric_difference_ref, \@pred, "Got expected symmetric_difference"
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $symmetric_difference_ref = $lcm->get_AorBonly_ref; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $symmetric_difference_ref = $lcm->get_AorBonly_ref; };
     is_deeply($symmetric_difference_ref, \@pred, "Got expected symmetric_difference");
     like($stderr,
         qr/When comparing 3 or more lists, \&get_LorRonly_ref or its alias defaults/,
@@ -431,11 +351,7 @@ like($@,
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $RL = $lcm->is_RsubsetL; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $RL = $lcm->is_RsubsetL; };
     ok(! $RL, "Got expected subset relationship");
     like($stderr,
         qr/When comparing 3 or more lists, \&is_RsubsetL or its alias is restricted/,
@@ -444,11 +360,7 @@ like($@,
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $RL = $lcm->is_BsubsetA; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $RL = $lcm->is_BsubsetA; };
     ok(! $RL, "Got expected subset relationship");
     like($stderr,
         qr/When comparing 3 or more lists, \&is_RsubsetL or its alias is restricted/,
@@ -479,20 +391,14 @@ like($@,
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $rv = $lcm->print_subset_chart; },
-        \$stdout,
-    );
+    $stdout = capture_stdout { $rv = $lcm->print_subset_chart; };
     ok($rv, "print_subset_chart() returned true value");
     like($stdout, qr/Subset Relationships/,
         "Got expected chart header");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $rv = $lcm->print_equivalence_chart; },
-        \$stdout,
-    );
+    $stdout = capture_stdout { $rv = $lcm->print_equivalence_chart; };
     ok($rv, "print_equivalence_chart() returned true value");
     like($stdout, qr/Equivalence Relationships/,
         "Got expected chart header");
@@ -569,3 +475,4 @@ my $scalar = 'test';
 eval { $lcm_bad = List::Compare->new( { lists => [ \$scalar, \%h0, \%h1 ] } ); };
 like($@, qr/Must pass all array references or all hash references/,
     "Got expected error message from bad constructor");
+

@@ -48,6 +48,6 @@
          "web" : "https://gitlab.com/DeBos/Math-CooGeo"
       }
    },
-   "version" : "v1.0.12",
+   "version" : "v1.0.13",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

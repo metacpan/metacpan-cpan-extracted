@@ -1,5 +1,9 @@
 Revision history for Perl module Alien
 
+0.96      2020-08-10 06:57:07 -0600
+  - New GitHub org for Alien: https://github.com/PerlAlien
+  - Update documentation.
+
 0.95      2017-07-13 12:10:25 +0000
   - Fix some broken links
   - Fix some typos

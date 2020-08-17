@@ -45,7 +45,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw( );
 
-our $VERSION = '0.33';
+our $VERSION = '0.37';
 
 sub AUTOLOAD {
 
@@ -130,7 +130,9 @@ but C<"make test TEST_DB=1"> needs it.
 I highly recommend using:
 
   $ source "$(pkg-config --variable=prefix yottadb)"/ydb_env_set
+
 and
+
   $ source "$(pkg-config --variable=prefix yottadb)"/ydb_env_unset
 
 for basic setup of environment and databases.
@@ -303,10 +305,9 @@ Stefan Traby E<lt>stefan@hello-penguin.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018, 2019 by Stefan Traby
+Copyright (C) 2018, 2019, 2020 by Stefan Traby
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.26.1 or,
-at your option, any later version of Perl 5 you may have available.
+it under terms of the GNU Affero General Public License Version 3.
 
 =cut

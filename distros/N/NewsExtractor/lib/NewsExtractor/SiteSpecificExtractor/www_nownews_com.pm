@@ -3,7 +3,7 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::SiteSpecificExtractor';
 
-use Importer 'NewsExtractor::TextUtil' => qw( parse_dateline_ymdhms html2text );
+use Importer 'NewsExtractor::TextUtil' => qw( reformat_dateline html2text );
 
 sub headline {
     my ($self) = @_;
@@ -18,7 +18,7 @@ sub content_text {
 
 sub dateline {
     my ($self) = @_;
-    return parse_dateline_ymdhms( $self->dom->at('div.newsInfo')->all_text(), '+08:00' );
+    return reformat_dateline( $self->dom->at('div.newsInfo')->all_text(), '+08:00' );
 }
 
 sub journalist {

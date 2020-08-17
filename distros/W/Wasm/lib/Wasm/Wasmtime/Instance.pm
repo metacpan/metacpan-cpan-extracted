@@ -13,7 +13,7 @@ use Ref::Util qw( is_ref is_blessed_ref is_plain_coderef is_plain_scalarref );
 use Carp ();
 
 # ABSTRACT: Wasmtime instance class
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 $ffi_prefix = 'wasm_instance_';
@@ -66,14 +66,7 @@ $ffi->attach( [ wasmtime_instance_new => 'new' ] => ['wasm_store_t','wasm_module
   my $module = shift;
   my $store = is_blessed_ref($_[0]) && $_[0]->isa('Wasm::Wasmtime::Store')
     ? shift
-    : do {
-      if(warnings::enabled("deprecated"))
-      {
-        Carp::carp('Creating a Wasm::Wasmtime::Instance instance without a Wasm::Wasmtime::Store object is deprecated and will be removed in a future version of Wasm::Wasmtime');
-      }
-      no warnings 'deprecated';
-      $module->store;
-    };
+    : Carp::croak('Creating a Wasm::Wasmtime::Instance instance without a Wasm::Wasmtime::Store object is no longer allowed');
 
   my $ptr;
   my @keep;
@@ -163,14 +156,14 @@ Wasm::Wasmtime::Instance - Wasmtime instance class
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
  use Wasm::Wasmtime;
  
  my $store = Wasm::Wasmtime::Store->new;
- my $module = Wasm::Wasmtime::Module->new($store, wat => '(module)');
+ my $module = Wasm::Wasmtime::Module->new($store->engine, wat => '(module)');
  my $instance = Wasm::Wasmtime::Instance->new($module, $store, []);
 
 =head1 DESCRIPTION
@@ -191,16 +184,6 @@ This class represents an instance of a WebAssembly module L<Wasm::Wasmtime::Modu
  my $instance = Wasm::Wasmtime::Instance->new(
    $module,    # Wasm::Wasmtime::Module
    $store,     # Wasm::Wasmtime::Store
-   \@imports,  # array reference of Wasm::Wasmtime::Extern
- );
- 
- # deprecated usage: without $store
- my $instance = Wasm::Wasmtime::Instance->new(
-   $module     # Wasm::Wasmtime::Module
- );
- # deprecated usage: without $store
- my $instance = Wasm::Wasmtime::Instance->new(
-   $module,    # Wasm::Wasmtime::Module
    \@imports,  # array reference of Wasm::Wasmtime::Extern
  );
 
@@ -226,12 +209,6 @@ For a memory import, a memory object will be created.  You won't be able to
 access it from Perl space, but at least it won't die.
 
 =back
-
-[B<Deprecated>: Will be removed in a future version of L<Wasm::Wasmtime>]
-
-You can create an L<Wasm::Wasmtime::Instance> instance without a
-L<Wasm::Wasmtime::Store> object, but this usage is deprecated, and will
-be removed from a future version of L<Wasm::Wasmtime>.
 
 =head1 METHODS
 

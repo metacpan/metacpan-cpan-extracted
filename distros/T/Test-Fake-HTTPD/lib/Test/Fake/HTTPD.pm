@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed weaken);
 use Carp qw(croak);
 use Exporter qw(import);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 $VERSION = eval $VERSION;
 
 our @EXPORT = qw(
@@ -42,7 +42,13 @@ if ($ENABLE_SSL) {
 
 sub new {
     my ($class, %args) = @_;
-    bless { timeout => 5, listen => 5, scheme => 'http', %args }, $class;
+    bless {
+        host => '127.0.0.1',
+        timeout => 5,
+        listen => 5,
+        scheme => 'http',
+        %args
+    }, $class;
 }
 
 our $DAEMON_MAP = {
@@ -63,13 +69,15 @@ sub run {
         : %EXTRA_DAEMON_ARGS;
 
     $self->{server} = Test::TCP->new(
+        ($self->host ? (host => $self->host) : ()),
         code => sub {
             my $port = shift;
 
             my $d;
             for (1..10) {
                 $d = $self->_daemon_class->new(
-                    LocalAddr => '127.0.0.1',
+                    # Note: IO::Socket::IP ignores LocalAddr if LocalHost is set.
+                    ($self->host ? (LocalAddr => $self->host) : ()),
                     LocalPort => $port,
                     Timeout   => $self->{timeout},
                     Proto     => 'tcp',
@@ -80,7 +88,10 @@ sub run {
                 Time::HiRes::sleep(0.1);
             }
 
-            croak("Can't accepted on 127.0.0.1:$port") unless $d;
+            croak(sprintf("failed to listen on address %s port %s%s",
+                          $self->host || '<default>',
+                          $self->port || '<default>',
+                          $@ eq '' ? '' : ": $@")) unless $d;
 
             $d->accept; # wait for port check from parent process
 
@@ -105,6 +116,11 @@ sub scheme {
     return $self->{scheme};
 }
 
+sub host {
+    my $self = shift;
+    return $self->{host};
+}
+
 sub port {
     my $self = shift;
     return $self->{server} ? $self->{server}->port : 0;
@@ -117,8 +133,12 @@ sub host_port {
 
 sub endpoint {
     my $self = shift;
-    my $url = sprintf '%s://127.0.0.1:%d', $self->scheme, $self->port;
-    return URI->new($url);
+    my $uri = URI->new($self->scheme . ':');
+    my $host = $self->host;
+    $host = 'localhost' if !defined($host) || $host eq '' || $host eq '0.0.0.0' || $host eq '::';
+    $uri->host($host);
+    $uri->port($self->port);
+    return $uri;
 }
 
 sub _is_win32 { $^O eq 'MSWin32' }
@@ -176,9 +196,9 @@ DSL-style
         return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello World' ] ];
     };
 
-    printf "You can connect to your server at %s.\n", $httpd->host_port;
+    printf "Listening on address:port %s\n", $httpd->host_port;
     # or
-    printf "You can connect to your server at 127.0.0.1:%d.\n", $httpd->port;
+    printf "Listening on address %s port %s\n", $httpd->host, $httpd->port;
 
     # access to fake HTTP server
     use LWP::UserAgent;
@@ -273,9 +293,13 @@ timeout value (default: 5)
 
 queue size for listen (default: 5)
 
+=item * C<host>
+
+local address to listen on (default: 127.0.0.1)
+
 =item * C<port>
 
-local bind port number (default: auto detection)
+TCP port to listen on (default: auto detection)
 
 =back
 
@@ -297,21 +321,27 @@ Returns a scheme of running, "http" or "https".
 
   my $scheme = $httpd->scheme;
 
+=item * C<host>
+
+Returns the address the server is listening on.
+
 =item * C<port>
 
-Returns a port number of running.
+Returns the TCP port the server is listening on.
 
   my $port = $httpd->port;
 
 =item * C<host_port>
 
-Returns a URI host_port of running. ("127.0.0.1:{port}")
+Returns the host:port from C<endpoint> (e.g., "127.0.0.1:1234", "[::1]:1234").
 
   my $host_port = $httpd->host_port;
 
 =item * C<endpoint>
 
-Returns an endpoint URI of running. ("http://127.0.0.1:{port}" URI object)
+Returns a URI object to the running server (e.g., "http://127.0.0.1:1234",
+"https://[::1]:1234"). If C<host> returns C<undef>, C<''>, C<'0.0.0.0'>,
+or C<'::'>, the host portion of the URI is set to C<localhost>.
 
   use LWP::UserAgent;
 

@@ -258,6 +258,7 @@ sub doparse {
                 my $value = doparse($marpaESLIFRecognizerObject, undef, $recursionLevel + 1);
                 # Inject object's value
                 $marpaESLIFRecognizer->lexemeRead('OBJECT_FROM_INNER_GRAMMAR', $value, 0); # Stream moved synchroenously
+                $marpaESLIFRecognizerObject->unshare();
             }
             elsif ($event->{event} eq '^RCURLY') {
                 # Force read of the RCURLY lexeme

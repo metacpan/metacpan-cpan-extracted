@@ -1,3 +1,26 @@
-0.001    2019-04-12 (PERLANCAR)
+0.004   2020-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix one-off bug in number of attempts.
+
+
+0.003   2020-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] retry_if was not implemented.
+
+	- Add option 'strategy' to add retrying strategy using
+	  Algorithm::Backoff.
+
+        - [bugfix] A few other minor fixes.
+
+
+0.002   2020-08-14  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention HTTP::Tiny::Plugin::CustomRetry,
+	  LWP::UserAgent::Plugin::Retry.
+
+
+0.001    2019-04-12  Released-By: PERLANCAR
 
          - First release.

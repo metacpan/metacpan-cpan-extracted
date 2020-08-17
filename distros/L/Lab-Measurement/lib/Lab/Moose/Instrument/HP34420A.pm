@@ -1,12 +1,11 @@
 package Lab::Moose::Instrument::HP34420A;
-$Lab::Moose::Instrument::HP34420A::VERSION = '3.720';
+$Lab::Moose::Instrument::HP34420A::VERSION = '3.721';
 #ABSTRACT: HP 34420A nanovolt meter.
 
 use v5.20;
 
 # So far only one channel. Could add support for two channels
 # by using validated_channel_(setter/getter) in the SCPI/SENSE roles.
-
 
 use Moose;
 use Moose::Util::TypeConstraints 'enum';
@@ -56,6 +55,24 @@ sub route_terminals {
     $self->cached_route_terminals($value);
 }
 
+
+cache input_filter_state => ( getter => 'input_filter_state_query' );
+
+sub input_filter_state_query {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->cached_input_filter_state(
+        $self->query( command => 'INP:FILT:STAT?', %args ) );
+}
+
+sub input_filter_state {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [ 0 .. 1 ] ) }
+    );
+    $self->write( command => "INP:FILT:STAT? $value", %args );
+    return $self->cached_input_filter_state($value);
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;
@@ -72,7 +89,7 @@ Lab::Moose::Instrument::HP34420A - HP 34420A nanovolt meter.
 
 =head1 VERSION
 
-version 3.720
+version 3.721
 
 =head1 SYNOPSIS
 
@@ -116,12 +133,19 @@ Perform voltage/current measurement.
 
 Set/get used measurement channel. Allowed values: C<FRON[1], FRON2>.
 
+=head2 input_filter_state/input_filter_state_query
+
+ $dmm->input_filter_state(value => 0); # Filter OFF
+ $dmm->input_filter_state(value => 1); # Filter ON
+
+Enable/Disable input filter. Allowed values: C<0>, C<1>.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

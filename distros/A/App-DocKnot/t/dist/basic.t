@@ -82,9 +82,9 @@ my $dist = App::DocKnot::Dist->new({ distdir => $distdir, perl => $^X });
 capture_stdout {
     eval { $dist->make_distribution() };
 };
-ok(-f File::Spec->catfile($distdir, 'Empty-1.00.tar.gz'), 'dist exists');
-ok(-f File::Spec->catfile($distdir, 'Empty-1.00.tar.xz'), 'xz dist exists');
-ok(!-f File::Spec->catfile($distdir, 'Empty-1.00.tar'), 'tarball missing');
+ok(-e File::Spec->catfile($distdir, 'Empty-1.00.tar.gz'), 'dist exists');
+ok(-e File::Spec->catfile($distdir, 'Empty-1.00.tar.xz'), 'xz dist exists');
+ok(!-e File::Spec->catfile($distdir, 'Empty-1.00.tar'), 'tarball missing');
 is($@, q{}, 'no errors');
 
 # If we add an ignored file to the source tree, this should not trigger any

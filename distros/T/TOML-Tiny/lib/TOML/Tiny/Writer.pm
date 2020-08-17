@@ -1,5 +1,5 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.08';
+$TOML::Tiny::Writer::VERSION = '0.09';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -15,7 +15,7 @@ my @KEYS;
 
 sub to_toml {
   my $data = shift;
-  my %param = @_;
+  my $param = ref($_[1]) eq 'HASH' ? $_[1] : undef;
   my @buff_assign;
   my @buff_tables;
 
@@ -24,7 +24,7 @@ sub to_toml {
       # Generate simple key/value pairs for scalar data
       for my $k (grep{ ref($data->{$_}) !~ /HASH|ARRAY/ } sort keys %$data) {
         my $key = to_toml_key($k);
-        my $val = to_toml($data->{$k}, %param);
+        my $val = to_toml($data->{$k}, $param);
         push @buff_assign, "$key=$val";
       }
 
@@ -53,7 +53,7 @@ sub to_toml {
         # Non-table values become an inline table
         if (@inline) {
           my $key = to_toml_key($k);
-          my $val = to_toml(\@inline, %param);
+          my $val = to_toml(\@inline, $param);
           push @buff_assign, "$key=$val";
         }
 
@@ -80,19 +80,19 @@ sub to_toml {
           # Generate [table]
           push @KEYS, $k;
           push @buff_tables, '', '[' . join('.', map{ to_toml_key($_) } @KEYS) . ']';
-          push @buff_tables, to_toml($data->{$k}, %param);
+          push @buff_tables, to_toml($data->{$k}, $param);
           pop @KEYS;
         }
       }
     }
 
     when ('ARRAY') {
-      if (@$data && $param{strict_arrays}) {
+      if (@$data && $param->{strict_arrays}) {
         my ($ok, $err) = is_strict_array($data);
         die "toml: found heterogenous array, but strict_arrays is set ($err)\n" unless $ok;
       }
 
-      push @buff_tables, '[' . join(', ', map{ to_toml($_, %param) } @$data) . ']';
+      push @buff_tables, '[' . join(', ', map{ to_toml($_, $param) } @$data) . ']';
     }
 
     when ('SCALAR') {
@@ -101,7 +101,7 @@ sub to_toml {
       } elsif ($$_ eq '0') {
         return 'false';
       } else {
-        push @buff_assign, to_toml($$_, %param);
+        push @buff_assign, to_toml($$_, $param);
       }
     }
 
@@ -136,7 +136,7 @@ sub to_toml {
     }
 
     when ('Math::BigFloat') {
-      return $data->bnstr;
+      return $data->bstr;
     }
 
     when ('') {
@@ -203,7 +203,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 AUTHOR
 

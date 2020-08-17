@@ -37,6 +37,13 @@ use Acme::Alien::DontPanic2 ();
       print " acme    $old   -> $new\n";
       s/$old/$new/;
     }
+    elsif(/^alien = Acme::Alien::DontPanic2\@(\S+)\s*$/)
+    {
+      my $old = $1;
+      my $new = Acme::Alien::DontPanic2->VERSION;
+      print " acme    $old   -> $new\n";
+      s/$old/$new/;
+    }
   }
 
   path('dist.ini')->spew(@lines);

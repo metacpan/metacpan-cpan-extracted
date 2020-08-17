@@ -1,0 +1,191 @@
+package App::lcpan::Manual::Cookbook;
+
+# AUTHORITY
+# DATE
+our $DIST = 'App-CSVUtils'; # DIST
+# VERSION
+
+1;
+# ABSTRACT: App::CSVUtils cookbook
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+App::lcpan::Manual::Cookbook - App::CSVUtils cookbook
+
+=head1 VERSION
+
+This document describes version 0.032 of App::lcpan::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2020-08-16.
+
+=head1 DESCRIPTION
+
+This document lists the various tasks you can do with the scripts included in
+L<App::CSVUtils> distribution.
+
+=head1 ADDING COLUMNS
+
+TODO.
+
+=head1 ADDING ROWS
+
+TODO.
+
+=head1 ADDING SUMMARY ROW (TOTAL, AVERAGE, ETC)
+
+TODO.
+
+=head1 CONVERTING TO OTHER FORMATS
+
+=head2 To CSV
+
+TODO.
+
+=head2 To JSON
+
+TODO.
+
+=head2 To Perl data structure
+
+TODO.
+
+=head2 To TSV
+
+TODO.
+
+=head2 To YAML
+
+TODO.
+
+=head1 DEALING WITH NEWLINES IN CSV
+
+TODO.
+
+=head1 DEALING WITH NON-STANDARD CSV
+
+The utilities allow you to set input's field separator (`--sep-char`), quote
+character (`--quote-char`), and escape character (`--escape-char`), so if you
+have semicolon as the field separator, e.g.:
+
+ name;age;rank
+ andi;20;staff
+ budi;30;manager
+ cinta;17;associate
+
+and you want to sort by age:
+
+ % csv-sort-rows INPUT.CSV --sep-char ';' --by-field age
+
+These parameters will be passed to L<Text::CSV>'s attributes with the
+corresponding names.
+
+Likewise, you can customize output's field separator (`--output-sep-char`),
+quote character (`--output-quote-char`), and escape character
+(`--output-escape-char`).
+
+=head1 FILTERING (SELECTING) COLUMNS
+
+TODO.
+
+=head1 FILTERING (SELECTING) ROWS
+
+TODO.
+
+=head1 GETTING INFORMATION ABOUT CSV
+
+ % csv-info INPUT.CSV
+
+Sample output:
+
+=head2 Listing the column names
+
+TODO.
+
+=head1 MERGING CSV
+
+TODO.
+
+See also L</SPLITTING CSV>.
+
+=head1 MODIFYING COLUMNS
+
+TODO.
+
+=head1 MODIFYING ROWS
+
+TODO.
+
+=head1 PERFORMING SET OPERATIONS WITH CSV
+
+TODO.
+
+=head1 SORTING COLUMNS
+
+TODO.
+
+=head1 SORTING ROWS
+
+TODO.
+
+=head1 SPLITTING CSV
+
+TODO.
+
+See also L</MERGING CSV>.
+
+=head1 TRANSPOSING
+
+Transposing, like in a two-dimensional matrix, means switching row and colum
+indices to produce a new CSV where the columns become rows and vice versa. For
+example:
+
+ name,age
+ andi,20
+ budi,30
+ cinta,17
+
+becomes:
+
+ name,andi,budi,cinta
+ age,20,30,17
+
+To do this:
+
+ % csv-transpose INPUT.CSV
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Acme::CPANModules::WorkingWithCSV>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

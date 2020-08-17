@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 use List::Util 'first';
 
@@ -248,6 +248,7 @@ sub _detect_linux_distribution_fallback {
 		 '14.04' => 'trusty',
 		 '16.04' => 'xenial',
 		 '18.04' => 'bionic',
+		 '20.04' => 'focal',
 		}->{$info{linuxdistroversion}};
 	    return \%info;
 	} else {

@@ -5,6 +5,7 @@
 use strict;
 use warnings;
 
+use 5.008;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
@@ -15,13 +16,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Graph-Nauty",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Graph::Nauty",
   "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
     "Graph" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.1.1",
+  "VERSION" => "0.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }

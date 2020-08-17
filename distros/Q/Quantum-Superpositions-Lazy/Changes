@@ -4,3 +4,7 @@ Revision history for Perl extension Quantum::Superpositions::Lazy.
 	- original version; created by h2xs 1.23 with options
 		-AXn Quantum::Superpositions::Lazy
 
+1.01  Sat Aug 8
+	- add a manual with an introduction to the topic
+	- add superposition transformations using a custom code reference
+

@@ -14,9 +14,11 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Graph-Nauty
+requires:
+  perl: '5.008'
 resources:
   bugtracker: https://github.com/merkys/graph-nauty/issues
   homepage: http://search.cpan.org/dist/
   repository: git://github.com/merkys/graph-nauty.git
-version: 0.1.1
+version: 0.1.2
 x_serialization_backend: 'YAML::Tiny version 1.70'

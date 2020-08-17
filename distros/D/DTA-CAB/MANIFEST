@@ -109,6 +109,7 @@ CAB/Fork/Pool.pm
 CAB/Format.pm
 CAB/Format/Builtin.pm
 CAB/Format/CorpusExplorerPlugin.pm
+CAB/Format/CONLLU.pm
 CAB/Format/CSV.pm
 CAB/Format/CSV1g.pm
 CAB/Format/ExpandList.pm

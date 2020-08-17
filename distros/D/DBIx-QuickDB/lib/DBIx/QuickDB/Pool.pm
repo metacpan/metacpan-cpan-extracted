@@ -2,13 +2,14 @@ package DBIx::QuickDB::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
 use File::Path qw/remove_tree make_path/;
 use Digest::SHA qw/sha1_hex/;
 use Scalar::Util qw/refaddr/;
+use Time::HiRes qw/time/;
 
 use DBIx::QuickDB;
 
@@ -50,6 +51,31 @@ sub init {
     $self->{+UPDATE_CHECKSUMS} //= 1;
 
     $self->{+DATABASES} //= {};
+}
+
+sub clear_old_cache {
+    my $self = shift;
+    my ($age) = @_;
+
+    my $dir = $self->{+CACHE_DIR};
+
+    opendir(my $dh, $dir) or die "Could not open cache dir '$dir': $!";
+    for my $name (readdir($dh)) {
+        next if $name =~ m/\./;
+
+        my $full = "$dir/$name";
+        next unless -d $full;
+
+        my $file = "$full/cloned";
+        next unless -f $file;
+
+        open(my $fh, '<', $file) or next;
+        chomp(my $stamp = <$fh>);
+
+        next unless $age <= (time - $stamp);
+
+        eval { remove_tree($full, {safe => 1}); 1 } or warn $@;
+    }
 }
 
 sub export {
@@ -189,7 +215,9 @@ sub fetch_db {
 
     delete $params{caller};
 
-    return $self->vivify_db($spec)->clone(autostart => 1, autostop => 1, %{$spec->{clone_args} || {}}, %params);
+    my $from = $self->vivify_db($spec);
+
+    return $from->clone(autostart => 1, autostop => 1, cleanup => 1, %{$spec->{clone_args} || {}}, %params);
 }
 
 sub vivify_db {
@@ -322,6 +350,7 @@ sub build_via_clone {
     my $from_spec = $self->{+DATABASES}->{$spec->{from}};
     my $from      = $self->vivify_db($from_spec);
 
+    $self->write_clone_stamp($from);
     $spec->{driver} = $from_spec->{driver};
     $spec->{driver_args} //= $from_spec->{driver_args};
     $spec->{clone_args}  //= $from_spec->{clone_args};
@@ -356,7 +385,21 @@ sub build_via_driver {
         $self->{+LIBRARY}->$builder($db, name => $spec->{name}, dir => $dir, qdb => $self);
     }
 
+    $self->write_clone_stamp($db);
+
     return $db;
+}
+
+sub write_clone_stamp {
+    my $self = shift;
+    my ($db) = @_;
+
+    my $stamp = time();
+    open(my $fh, '>', $db->dir . '/cloned') or die "$!";
+    print $fh $stamp, "\n";
+    close($fh);
+
+    return $stamp;
 }
 
 sub unlock {
@@ -985,6 +1028,12 @@ effected by anything you do. When you are done simply disgard the copy.
 If the database, or ant of its parents have not been built yet, they will be
 built before you get your fresh copy. The first time this is called may be
 slow, but future calls will use cached data making them very fast.
+
+=item $pool->clear_old_cache($age_in_seconds);
+
+This will check all database directories in the cashe dir to see when they were
+last cloned, if the last clone was at or before the specified age then the dir
+will be deleted.
 
 =back
 

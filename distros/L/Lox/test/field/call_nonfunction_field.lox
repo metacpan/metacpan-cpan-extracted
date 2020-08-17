@@ -1,0 +1,6 @@
+class Foo {}
+
+var foo = Foo();
+foo.bar = "not fn";
+
+foo.bar(); // expect: [Line 6] Error at ')': Can only call functions and classes.

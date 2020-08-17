@@ -19,3 +19,4 @@ nytprof.out
 *.bs
 List-Compare-*.tar.gz
 /nytprof/
+*.swp

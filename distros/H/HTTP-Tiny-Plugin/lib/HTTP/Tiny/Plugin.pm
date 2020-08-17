@@ -1,7 +1,9 @@
 package HTTP::Tiny::Plugin;
 
-our $DATE = '2019-04-14'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-14'; # DATE
+our $DIST = 'HTTP-Tiny-Plugin'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -61,14 +63,19 @@ sub _run_hooks {
 }
 
 sub request {
-    my ($self, $method, $url, $options) = @_;
+    my $r = {http=>$_[0], ua=>$_[0], argv=>[@_]};
+    my $self = shift;
 
-    my $r = {ht=>$self, argv=>\@_};
+    goto RETURN_RESPONSE
+        if $self->_run_hooks('before_request_once', {all=>1}, $r) == 99;
+
     while (1) {
-        $r->{response} = $self->SUPER::request($method, $url, $options)
+        $r->{response} = $self->SUPER::request(@_)
             unless $self->_run_hooks('before_request', {all=>1}, $r) == 99;
         last unless $self->_run_hooks('after_request', {all=>1}, $r) == 98;
     }
+
+  RETURN_RESPONSE:
     $r->{response};
 }
 
@@ -87,7 +94,7 @@ HTTP::Tiny::Plugin - HTTP::Tiny with plugins
 
 =head1 VERSION
 
-This document describes version 0.002 of HTTP::Tiny::Plugin (from Perl distribution HTTP-Tiny-Plugin), released on 2019-04-14.
+This document describes version 0.003 of HTTP::Tiny::Plugin (from Perl distribution HTTP-Tiny-Plugin), released on 2020-08-14.
 
 =head1 SYNOPSIS
 
@@ -142,17 +149,17 @@ information. Keys that are common for all hooks:
 
 Hash.
 
-=item * ht
+=item * http
 
 Object. The HTTP::Tiny object.
+
+=item * ua
+
+Like C<http>.
 
 =item * hook
 
 The current hook name.
-
-=item * hook
-
-The hook name.
 
 =item * argv
 
@@ -216,15 +223,28 @@ Below is the list of hooks in order of execution during a request:
 
 =over
 
+=item * before_request_once
+
+Will be called before C<request()> (and before L</before_request> hook). All
+plugins will be called. Stage will interpret 99 (skip calling C<request()>).
+When request is skipped, request() will return undef.
+
+When an L</after_request> plugin returns 98 (repeat), this hook will not be
+repeated, but L</before_request> hook will.
+
 =item * before_request
 
 Will be called before C<request()>. All plugins will be called. Stage will
-interpret 99 (skip calling C<request()>).
+interpret 99 (skip calling C<request()>, including skipping L</after_request>).
+When request is skipped, request() will return undef.
+
+See also: L</before_request_once>.
 
 =item * after_request
 
-Will be called before C<request()>. All plugins will be called. Stage will
-interpret 98 (repeat calling C<request()>).
+Will be called after C<request()>. All plugins will be called. Stage will
+interpret 98 (repeat calling C<request()>, including the L</before_request> hook
+but not the L</before_request_once> hook).
 
 =back
 
@@ -269,13 +289,17 @@ feature.
 
 L<HTTP::Tiny>
 
+L<LWP::UserAgent::Plugin>
+
+L<HTTP::Tiny::Patch::Plugin>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

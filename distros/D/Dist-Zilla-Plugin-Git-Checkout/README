@@ -1,0 +1,91 @@
+NAME
+
+    Dist::Zilla::Plugin::Git::Checkout - clone and checkout a Git
+    repository
+
+VERSION
+
+    Version 0.002
+
+SYNOPSIS
+
+      # in dist.ini:
+      [Git::Checkout]
+      repo = https://github.com/skirmess/dzil-inc.git
+
+DESCRIPTION
+
+    This plugin clones, or if it is already cloned, fetches and updates a
+    Git repository.
+
+    The plugin runs during the initialization phase, which is the same for
+    bundles and plugins. You can check out a Git repository and load
+    bundles or plugins from this repository.
+
+      # in dist.ini
+      [Git::Checkout]
+      repo = https://github.com/skirmess/dzil-inc.git
+
+      ; add the lib directory inside the checked out Git repository to @INC
+      [lib]
+      lib = dzil-inc/lib
+
+      ; this bundle is run from inside the checked out Git repositories lib
+      ; directory
+      [@BundleFromRepository]
+
+USAGE
+
+ checkout
+
+    Specifies what to check out. This can be a branch, a tag or a revision.
+    Defaults to master.
+
+ dir
+
+    The repositories workspace is checked out into this directory. This
+    defaults to the basename of the repo without the .git suffix.
+
+ push_url
+
+    Allows you to specify a different push url for the repositories origin.
+    One possible scenario would be if you would like to clone via http but
+    push via ssh. This is optional.
+
+ repo
+
+    Specifies the address of the repository to clone. This is required.
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the issue tracker at
+    https://github.com/skirmess/Dist-Zilla-Plugin-Git-Checkout/issues. You
+    will be notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/skirmess/Dist-Zilla-Plugin-Git-Checkout
+
+      git clone https://github.com/skirmess/Dist-Zilla-Plugin-Git-Checkout.git
+
+AUTHOR
+
+    Sven Kirmess <sven.kirmess@kzone.ch>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2020 by Sven Kirmess.
+
+    This is free software, licensed under:
+
+      The (two-clause) FreeBSD License
+
+SEE ALSO
+
+    Dist::Zilla, lib
+

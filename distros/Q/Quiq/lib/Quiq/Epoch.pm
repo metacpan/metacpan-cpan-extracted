@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.185';
+our $VERSION = '1.186';
 
 use Time::HiRes ();
 use Time::Local ();
@@ -293,12 +293,12 @@ Anzahl Sekunden (Integer)
 
 =head4 Description
 
-Ermittele den Offset der lokalen Zeitzone gegenüber UTC in Sekunden
-und liefere diesen zurück.
+Ermittele den aktuellen Offset der lokalen Zeitzone gegenüber UTC
+in Sekunden und liefere diesen zurück.
 
 =head4 Example
 
-  Quiq::Epoch->tzOffset;
+  Quiq::Epoch->tzOffset; # MEST
   ==>
   7200
 
@@ -508,7 +508,7 @@ sub asIso {
 
 =head1 VERSION
 
-1.185
+1.186
 
 =head1 AUTHOR
 

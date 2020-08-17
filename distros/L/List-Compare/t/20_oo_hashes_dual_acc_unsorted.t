@@ -6,7 +6,7 @@ use Test::More tests => 109;
 use List::Compare;
 use lib ("./t");
 use Test::ListCompareSpecial qw( :seen :wrap :hashes :results );
-use IO::CaptureOutput qw( capture );
+use Capture::Tiny q|:all|;
 
 my @pred = ();
 my %seen = ();
@@ -44,11 +44,7 @@ ok(unseen(\%seen, \@unpred),
 %pred = map {$_, 1} qw( abel baker camera delta edward fargo golfer hilton );
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @shared = $lcu->get_shared; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @shared = $lcu->get_shared; };
     $seen{$_}++ foreach (@shared);
     is_deeply(\%seen, \%pred, "unsorted:  got expected shared");
     ok(unseen(\%seen, \@unpred),
@@ -60,11 +56,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $shared_ref = $lcu->get_shared_ref; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $shared_ref = $lcu->get_shared_ref; };
     $seen{$_}++ foreach (@{$shared_ref});
     is_deeply(\%seen, \%pred, "unsorted:  got expected shared");
     ok(unseen(\%seen, \@unpred),
@@ -260,11 +252,7 @@ ok(unseen(\%seen, \@unpred),
 @unpred = qw| baker camera delta edward fargo golfer icon jerky |;
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @nonintersection = $lcu->get_nonintersection; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @nonintersection = $lcu->get_nonintersection; };
     $seen{$_}++ foreach (@nonintersection);
     is_deeply(\%seen, \%pred, "unsorted:  Got expected nonintersection");
     ok(unseen(\%seen, \@unpred),
@@ -275,11 +263,7 @@ ok(unseen(\%seen, \@unpred),
 %seen = ();
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $nonintersection_ref = $lcu->get_nonintersection_ref; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $nonintersection_ref = $lcu->get_nonintersection_ref; };
     $seen{$_}++ foreach (@{$nonintersection_ref});
     is_deeply(\%seen, \%pred, "unsorted:  Got expected nonintersection");
     ok(unseen(\%seen, \@unpred),
@@ -338,20 +322,14 @@ ok(! $disj, "Got expected disjoint relationship");
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $rv = $lcu->print_subset_chart; },
-        \$stdout,
-    );
+    $stdout = capture_stdout { $rv = $lcu->print_subset_chart; };
     ok($rv, "print_subset_chart() returned true value");
     like($stdout, qr/Subset Relationships/,
         "Got expected chart header");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $rv = $lcu->print_equivalence_chart; },
-        \$stdout,
-    );
+    $stdout = capture_stdout { $rv = $lcu->print_equivalence_chart; };
     ok($rv, "print_equivalence_chart() returned true value");
     like($stdout, qr/Equivalence Relationships/,
         "Got expected chart header");
@@ -466,4 +444,5 @@ ok($lcaccu_s, "Constructor worked with -u and --accelerated options");
 
 my $lcaccu_e  = List::Compare->new('-u', '--accelerated', \%h3, \%h4);
 ok($lcaccu_e, "Constructor worked with -u and --accelerated options");
+
 

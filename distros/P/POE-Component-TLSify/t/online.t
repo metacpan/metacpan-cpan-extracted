@@ -76,10 +76,12 @@ POE::Component::Client::TCP->new
 		# TODO are there other "errors" that is harmless?
 		$error = "Normal disconnection" unless $error;
 		my $msg = "Got CLIENT $syscall error $errno: $error";
-		unless ( $syscall eq 'read' and $errno == 0 ) {
-			fail( $msg );
-		} else {
+		if ( $syscall eq 'read' and $errno == 0 ) {
 			diag( $msg ) if $ENV{TEST_VERBOSE};
+    } elsif ( $syscall eq 'write' and $errno == 32 ) {
+			diag( $msg ) if $ENV{TEST_VERBOSE};
+		} else {
+			fail( $msg );
 		}
 	},
 );

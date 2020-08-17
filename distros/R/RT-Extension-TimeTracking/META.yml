@@ -26,6 +26,6 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-timetracking
-version: '0.20'
+version: '0.21'
 x_module_install_rtx_version: '0.42'
 x_requires_rt: 5.0.0

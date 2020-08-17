@@ -1,8 +1,5 @@
-#! perl -w
-use strict;
-
-use Test::More;
-use Test::NoWarnings ();
+#! perl -I. -w
+use t::Test::abeltje;
 
 use Dancer::RPCPlugin::PluginNames;
 
@@ -61,6 +58,4 @@ use Dancer::RPCPlugin::PluginNames;
     }
 }
 
-Test::NoWarnings::had_no_warnings();
-$Test::NoWarnings::do_end_test = 0;
 done_testing();

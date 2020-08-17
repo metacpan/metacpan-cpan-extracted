@@ -1,5 +1,5 @@
 
-my $VERSION = 1.15;
+my $VERSION = 1.16;
 
 use strict;
 use warnings;
@@ -53,9 +53,9 @@ foreach my $oResult (@ao)
          qq'result Title ($sTitle) is not empty');
   like($oResult->description, qr{([0-9]+|no)\s+bids?},
        'result bidcount is ok');
-  my $sDate = $oResult->change_date || '';
-  DEBUG_DATE && diag(qq{raw result date is '$sDate'});
-  diag(Dumper($oResult)) unless isnt($sDate, '', "change_date ($sDate) is not empty");
+  my $sDate = $oResult->end_date || '';
+  DEBUG_DATE && diag(qq{raw end date is '$sDate'});
+  diag(Dumper($oResult)) unless isnt($sDate, '', "end_date ($sDate) is not empty");
   # It is not possible to test the order of results in this way,
   # because eBay sometimes sticks paid (advertised) auctions at the
   # top of the page (and those are not in order).

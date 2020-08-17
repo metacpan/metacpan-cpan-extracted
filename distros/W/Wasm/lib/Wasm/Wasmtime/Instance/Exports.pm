@@ -23,7 +23,7 @@ use overload
   fallback => 1;
 
 # ABSTRACT: Wasmtime instance exports class
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 sub new
@@ -87,14 +87,14 @@ Wasm::Wasmtime::Instance::Exports - Wasmtime instance exports class
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
  use Wasm::Wasmtime;
  
  my $store = Wasm::Wasmtime::Store->new;
- my $module = Wasm::Wasmtime::Module->new( $store, wat => q{
+ my $module = Wasm::Wasmtime::Module->new( $store->engine, wat => q{
    (module
     (func (export "add") (param i32 i32) (result i32)
       local.get 0

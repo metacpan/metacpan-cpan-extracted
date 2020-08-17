@@ -2,7 +2,9 @@ use strict;
 use warnings FATAL => 'all';
 
 package MarpaX::ESLIF;
-use MarpaX::ESLIF::String;   # Make sure it is loaded, the XS is using it
+use parent qw/MarpaX::ESLIF::Base/;
+use MarpaX::ESLIF::String;       # Make sure it is loaded, the XS is using it
+use MarpaX::ESLIF::RegexCallout; # Make sure it is loaded, the XS is using it
 
 # ABSTRACT: ESLIF is Extended ScanLess InterFace
 
@@ -10,6 +12,27 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 use vars qw/$VERSION/;
 use Config;
+
+#
+# Base required class methods
+#
+sub _CLONABLE { return sub { 1 } }
+sub _ALLOCATE { return \&MarpaX::ESLIF::allocate }
+sub _DISPOSE  { return \&MarpaX::ESLIF::dispose }
+sub _EQ {
+    return sub {
+        my ($class, $args_ref, $loggerInterface) = @_;
+
+        my $definedLoggerInterface = defined($loggerInterface); # It is legal to create an eslif with no logger interface
+        my $_definedLoggerInterface = defined($args_ref->[0]);
+        return
+            (
+             (! $definedLoggerInterface && ! $_definedLoggerInterface)
+             ||
+             ($definedLoggerInterface && $_definedLoggerInterface && ($loggerInterface == $args_ref->[0]))
+            )
+    }
+}
 
 #
 # Internal routine used at bootstrap that says is nvtype is a double
@@ -39,7 +62,7 @@ BEGIN {
 # Bootstrap
 #
 BEGIN {
-    our $VERSION = '3.0.32'; # VERSION
+    our $VERSION = '4.0.1'; # VERSION
 
     require XSLoader;
     # Modules that we depent on bootstrap
@@ -56,69 +79,18 @@ use MarpaX::ESLIF::Grammar::Rule::Properties;
 use MarpaX::ESLIF::Grammar::Symbol::Properties;
 use MarpaX::ESLIF::JSON;
 use MarpaX::ESLIF::Logger::Level;
+use MarpaX::ESLIF::Recognizer;
+use MarpaX::ESLIF::Symbol;
 use MarpaX::ESLIF::Symbol::PropertyBitSet;
 use MarpaX::ESLIF::Symbol::EventBitSet;
 use MarpaX::ESLIF::Symbol::Type;
+use MarpaX::ESLIF::Value;
 use MarpaX::ESLIF::Value::Type;
 use MarpaX::ESLIF::Rule::PropertyBitSet;
 
 
-my @REGISTRY = ();
-
-sub _logger_to_self {
-    my ($class, $loggerInterface) = @_;
-
-    my $definedLoggerInterface = defined($loggerInterface);
-
-    foreach (@REGISTRY) {
-        my $_loggerInterface = $_->_getLoggerInterface;
-        my $_definedLoggerInterface = defined($_loggerInterface);
-	return $_
-            if (
-                (! $definedLoggerInterface && ! $_definedLoggerInterface)
-                ||
-                ($definedLoggerInterface && $_definedLoggerInterface && ($loggerInterface == $_loggerInterface))
-            )
-    }
-
-    return
-}
-
-sub new {
-  my ($class, $loggerInterface) = @_;
-
-  my $self = $class->_logger_to_self($loggerInterface);
-
-  push(@REGISTRY, $self = bless [ MarpaX::ESLIF::Engine->allocate($loggerInterface), $loggerInterface ], $class) if ! defined($self);
-
-  return $self
-}
-
 sub getInstance {
     goto &new
-}
-
-sub _getInstance {
-    return $_[0]->[0]
-}
-
-sub _getLoggerInterface {
-    return $_[0]->[1]
-}
-
-sub version {
-    MarpaX::ESLIF::Engine->version($_[0]->[0])
-}
-
-sub CLONE {
-    #
-    # One perl thread <-> one perl interpreter
-    #
-    map { $_->[0] = MarpaX::ESLIF::Engine->allocate($_->_getLoggerInterface) } @REGISTRY
-}
-
-sub DESTROY {
-    MarpaX::ESLIF::Engine->dispose($_[0]->[0])
 }
 
 
@@ -139,7 +111,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 3.0.32
+version 4.0.1
 
 =head1 SYNOPSIS
 
@@ -253,6 +225,12 @@ L<MarpaX::ESLIF::Introduction>, L<PCRE2|http://www.pcre.org/>, L<MarpaX::ESLIF::
 =head1 AUTHOR
 
 Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Jean-Damien Durand
+
+Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>
 
 =head1 COPYRIGHT AND LICENSE
 

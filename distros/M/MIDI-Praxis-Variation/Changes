@@ -1,5 +1,8 @@
 Revision history for MIDI::Praxis::Variation
 
+0.0605 2020-08-11 15:58:56
+    - Improve SYNOPSIS.
+
 0.0604 2020-05-31 08:20:56
     - Add eg/half-again to illustrate diminution().
 

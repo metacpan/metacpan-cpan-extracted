@@ -1,5 +1,5 @@
 package Minion::Backend::MongoDB;
-$Minion::Backend::MongoDB::VERSION = '1.05';
+$Minion::Backend::MongoDB::VERSION = '1.06';
 # ABSTRACT: MongoDB backend for Minion
 
 use Mojo::Base 'Minion::Backend';
@@ -298,10 +298,11 @@ sub purge {
 
     # options keys: queues, states, older, tasks
     # defaults
-    $opts->{older} //= $s->minion->missing_after;
+    $opts->{older} //= $s->minion->remove_after;
+    $opts->{older_field} //= 'finished';
 
     my %match;
-    $match{created} = {'$lt' => DateTime->now->add(seconds =>
+    $match{$opts->{older_field}} = {'$lt' => DateTime->now->add(seconds =>
         -$opts->{older})};
     foreach (qw/queue state task/) {
         $match{$_}   = {'$in' => $opts->{$_.'s'}} if ($opts->{$_.'s'});
@@ -681,7 +682,7 @@ Minion::Backend::MongoDB - MongoDB backend for Minion
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -691,9 +692,8 @@ version 1.05
 
 =head1 DESCRIPTION
 
-L<Minion::Backend::MongoDB> is a L<MongoDB> backend for L<Minion>
-derived from L<Minion::Backend::Pg> and supports its methods and tests
-up to 9.13 (2019-08-29).
+This is a L<MongoDB> backend for L<Minion> v10.01 (2019-12-16) derived from
+L<MongoDB::Minion::Pg> and which supports all its features.
 
 =head1 ATTRIBUTES
 
@@ -1133,7 +1133,15 @@ These options are currently available:
 
 Value in seconds to purge jobs older than this value.
 
-Default: $minion->missing_after
+Default: $minion->remove_after
+
+=item older_field
+
+  older_field => 'created'
+
+What date field to use to check if job is older than.
+
+Default: 'finished'
 
 =item queues
 
@@ -1283,7 +1291,7 @@ Emiliano Bruni <info@ebruni.it>, Andrey Khozov <avkhozov@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Emiliano Bruni, Andrey Khozov.
+This software is Copyright (c) 2019-2020 by Emiliano Bruni, Andrey Khozov.
 
 This is free software, licensed under:
 

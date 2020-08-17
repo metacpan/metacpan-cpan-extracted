@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::modules;
 
-our $DATE = '2020-06-11'; # DATE
-our $VERSION = '1.061'; # VERSION
+our $DATE = '2020-08-13'; # DATE
+our $VERSION = '1.062'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::lcpan::Cmd::modules - List modules/packages
 
 =head1 VERSION
 
-This document describes version 1.061 of App::lcpan::Cmd::modules (from Perl distribution App-lcpan), released on 2020-06-11.
+This document describes version 1.062 of App::lcpan::Cmd::modules (from Perl distribution App-lcpan), released on 2020-08-13.
 
 =head1 FUNCTIONS
 
@@ -115,7 +115,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.30.2")
+=item * B<perl_version> => I<str> (default: "v5.30.0")
 
 Set base Perl version for determining core modules.
 

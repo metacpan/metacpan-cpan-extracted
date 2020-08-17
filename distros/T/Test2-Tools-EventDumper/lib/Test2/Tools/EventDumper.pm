@@ -2,10 +2,10 @@ package Test2::Tools::EventDumper;
 use strict;
 use warnings;
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000012';
 
 use Carp qw/croak/;
-use Scalar::Util qw/blessed/;
+use Scalar::Util qw/blessed reftype/;
 
 our @EXPORT = qw/dump_event dump_events/;
 use base 'Exporter';
@@ -78,7 +78,7 @@ sub dump_events {
         unless $events;
 
     croak "dump_events() requires an array reference, Got: $events"
-        unless ref($events) eq 'ARRAY';
+        unless reftype($events) eq 'ARRAY';
 
     croak "dump_events() requires an array reference of Test2::Event (or subclass) instances, some array elements are not Test2::Event instances"
         if grep { !$_ || !blessed($_) || !$_->isa('Test2::Event') } @$events;
@@ -328,7 +328,16 @@ __END__
 
 =head1 NAME
 
-Test2::Tools::EventDumper - Tool for dumping Test2::Event structures.
+Test2::Tools::EventDumper - *DEPRECATED* Tool for dumping Test2::Event structures.
+
+=head1 DEPRECATED
+
+This deprecation release is made in advance of a new Test2::API release that
+provides a better intercept() tool that returns a structure that makes testing
+better. Verifying events as event types is no longer recommended as tools can
+and will change what events they generate regularly. What you want to test is
+what assertions were made, what diags were generated, etc, without looking at
+specific event types.
 
 =head1 DESCRIPTION
 

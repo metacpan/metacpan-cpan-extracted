@@ -12,7 +12,7 @@ use lib qw{ inc };
 use My::Module::Test;
 
 my $skip;
-$skip = site_check 'celestrak.com'
+$skip = site_check( 'celestrak.com' )
     and plan skip_all => $skip;
 
 my $st = Astro::SpaceTrack->new();
@@ -23,7 +23,8 @@ $st->set(
 
 SKIP: {
 
-    is_success_or_skip $st, 'iridium_status', 'Get Iridium status (Kelso)', 2;
+    is_success_or_skip( $st,
+	'iridium_status', 'Get Iridium status (Kelso)', 2 );
 
     is $st->content_type(), 'iridium-status',
 	"Content type is 'iridium-status'";
@@ -35,4 +36,6 @@ done_testing;
 
 1;
 
-# ex: set textwidth=72 :
+__END__
+
+# ex: set filetype=perl textwidth=72 :

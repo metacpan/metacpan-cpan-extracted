@@ -14,7 +14,7 @@ plan skip_all => 'Test::Perl::Critic 1.02 required' if $@;
 
 # NOTE: New files will be tested automatically.
 
-my @files = ( Perl::Critic::Utils::all_perl_files(qw( Makefile.PL bin lib t )) );
+my @files = ( Perl::Critic::Utils::all_perl_files(qw( Makefile.PL scripts lib )) );
 
 foreach my $file (@files) {
     critic_ok( $file, $file );

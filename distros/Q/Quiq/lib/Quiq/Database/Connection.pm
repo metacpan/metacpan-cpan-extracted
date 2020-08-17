@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.185';
+our $VERSION = '1.186';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -251,19 +251,21 @@ sub new {
 
 =head4 Synopsis
 
-  $db = $class->newFromSbit($db);
+  $db = $class->newFromSbit($db,@opt);
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub newFromSbit {
-    my ($class,$db) = @_;
+    my ($class,$db) = splice @_,0,2;
+    # @_: @opt
 
     return $class->new($db->udlDbms,
         -handle => $db->dbh,
-        -log => 0,
+        # -log => 1,
         # -logfile => '/tmp/tsplot.log',
+        @_,
     );
 }
 
@@ -5240,7 +5242,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.185
+1.186
 
 =head1 AUTHOR
 

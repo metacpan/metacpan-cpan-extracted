@@ -4,7 +4,7 @@
       "Johan Vromans <jvromans@squirrel.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -44,7 +44,7 @@
             "File::LoadLines" : "0.02",
             "Image::Info" : "1.41",
             "JSON::PP" : "2.27203",
-            "PDF::API2" : "2.02",
+            "PDF::API2" : "2.036",
             "String::Interpolate::Named" : "0.05",
             "Text::Layout" : "0.018",
             "perl" : "5.01"
@@ -61,11 +61,11 @@
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/App/Music/ChordPro.pm",
-         "version" : "v0.974.1"
+         "version" : "0.976"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "v0.974.1"
+         "version" : "0.976"
       }
    },
    "release_status" : "stable",
@@ -81,6 +81,6 @@
          "url" : "https://github.com/sciurius/chordpro"
       }
    },
-   "version" : "v0.974.1",
+   "version" : "0.976",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

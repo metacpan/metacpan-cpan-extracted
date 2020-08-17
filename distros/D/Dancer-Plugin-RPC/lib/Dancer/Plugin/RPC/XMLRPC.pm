@@ -360,4 +360,12 @@ Creates a (partial) dispatch table from data provided in POD.
 
 (c) MMXV - Abe Timmerman <abeltje@cpan.org>
 
+=begin podcover_can_suck
+
+=head2 PLUGIN_NAME
+
+L<Test::Pod::Coverage> fails this test without this section :'(
+
+=end podcover_can_suck
+
 =cut

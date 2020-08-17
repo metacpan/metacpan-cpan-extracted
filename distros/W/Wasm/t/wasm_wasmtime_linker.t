@@ -27,11 +27,11 @@ my $wasi   = Wasm::Wasmtime::WasiInstance->new(
 );
 
 my $instance2 = Wasm::Wasmtime::Instance->new(
-  Wasm::Wasmtime::Module->new($store, wat => '(module)' ),
+  Wasm::Wasmtime::Module->new($store->engine, wat => '(module)' ),
   $store,
 );
 
-my $module2 = Wasm::Wasmtime::Module->new($store, wat => '(module)' );
+my $module2 = Wasm::Wasmtime::Module->new($store->engine, wat => '(module)' );
 
 is(
   Wasm::Wasmtime::Linker->new(

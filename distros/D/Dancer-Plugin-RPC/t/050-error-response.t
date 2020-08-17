@@ -1,9 +1,5 @@
-#! perl -w
-use strict;
-use lib 't/lib';
-
-use Test::More;
-use Test::NoWarnings ();
+#! perl -I. -w
+use t::Test::abeltje;
 
 use Dancer::RPCPlugin::ErrorResponse;
 
@@ -82,6 +78,4 @@ use Dancer::RPCPlugin::ErrorResponse;
     );
 }
 
-Test::NoWarnings::had_no_warnings();
-$Test::NoWarnings::do_end_test = 0;
 done_testing();

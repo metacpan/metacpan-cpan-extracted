@@ -3,19 +3,13 @@
 set -ex
 
 cd $(mktemp -d)
-curl -L https://github.com/Perl5-Alien/Alien-Build/tarball/master | tar zxf -
+curl -L https://github.com/PerlAlien/Alien-Build/tarball/main | tar zxf -
 cd $(ls -1)
 dzil-dzil authordeps --missing | dzil-cpanm -n
 dzil-dzil install --install-command 'cpanm -n .'
 
 cd $(mktemp -d)
-curl -L https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/tarball/master | tar zxf -
-cd $(ls -1)
-dzil-dzil authordeps --missing | dzil-cpanm -n
-dzil-dzil install --install-command 'cpanm -n .'
-
-cd $(mktemp -d)
-curl -L https://github.com/Perl5-Alien/Acme-Alien-DontPanic/tarball/master | tar zxf -
+curl -L https://github.com/PerlAlien/Acme-Alien-DontPanic/tarball/main | tar zxf -
 cd $(ls -1)
 dzil-dzil authordeps --missing | dzil-cpanm -n
 dzil-dzil install --install-command 'cpanm -n .'

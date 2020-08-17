@@ -1,20 +1,22 @@
 package App::ZFSCurses::WidgetFactory;
 
 use 5.10.1;
+use strict;
+use warnings;
 
 =head1 NAME
 
-App::ZFSCurses::WidgetFactory - a factory to create widgets.
+App::ZFSCurses::WidgetFactory - Create widgets.
 
 =head1 METHODS
 
 =head1 VERSION
 
-Version 1.100.
+Version 1.212.
 
 =cut
 
-our $VERSION = '1.100';
+our $VERSION = '1.212';
 
 =head2 new
 
@@ -42,8 +44,8 @@ sub new {
             'used',              'usedbychildren',
             'usedbydataset',     'usedbyrefreservation',
             'usedbysnapshots',   'userrefs',
-            'version',           'volsize',
-            'written'
+            'volsize',           'written',
+            'utf8only'
         ]
     );
 
@@ -189,7 +191,7 @@ sub fill_property_hash {
             $self->{properties}->{$property} = \$values;
         }
         else {
-            $self->{properties}->{$property} = \@values;
+            $self->{properties}->{$property} = [ sort @values ];
         }
     }
 }
@@ -238,12 +240,11 @@ Patrice Clement <monsieurp at cpan.org>
 
 This software is copyright (c) 2020 by Patrice Clement.
 
-This is free software, licensed under the (three-clause) clause BSD License.
+This is free software, licensed under the (three-clause) BSD License.
 
 See the LICENSE file.
 
 =cut
-
 
 1;
 
@@ -263,7 +264,6 @@ exec%on,off
 jailed%off,on
 logbias%latency,throughput
 mlslabel%label,none
-mountpoint%path,none,legacy
 nbmand%on,off
 normalization%none,formC,formD,formKC,formKD
 primarycache%all,none,metadata
@@ -273,9 +273,9 @@ secondarycache%all,none,metadata
 setuid%on,off
 sharenfs%on,off,opts
 sharesmb%on,off,opts
+version%1,2,3,4,5,current
 snapdir%hidden,visible
 sync%standard,always,disabled
-utf8only%on,off
 volmode%default,geom,dev,none
 vscan%off,on
 xattr%off,on
@@ -286,4 +286,5 @@ recordsize%ALNUM
 refquota%ALNUM
 refreservation%ALNUM
 reservation%ALNUM
+mountpoint%ALNUM
 volsize%ALNUM

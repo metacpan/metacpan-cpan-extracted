@@ -1,5 +1,5 @@
 ---
-abstract: 'Reversible hashes library'
+abstract: 'Reverse hash computation library'
 author:
   - 'Sergei Zhmylev <zhmylove@cpan.org>'
 build_requires:
@@ -26,7 +26,7 @@ requires:
 resources:
   bugtracker: https://github.com/zhmylove/math-revhash/issues
   repository: https://github.com/zhmylove/math-revhash.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:ZHMYLOVE
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

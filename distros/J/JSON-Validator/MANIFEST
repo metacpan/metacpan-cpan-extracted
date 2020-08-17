@@ -105,6 +105,7 @@ t/load-json.t
 t/load-yaml.t
 t/more-bundle.t
 t/random-errors.t
+t/recursive_data_protection.t
 t/relative-ref.t
 t/remotes/folder/folderInteger.json
 t/remotes/integer.json

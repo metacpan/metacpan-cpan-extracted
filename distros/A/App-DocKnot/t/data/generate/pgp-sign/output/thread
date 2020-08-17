@@ -1,0 +1,180 @@
+\==[doc]      [2] [\bullet(packed)[\link[\1][\2]]]
+\==[program]  [3]
+    [\tablerow[\1 \version[\2]] [\release[\2]]
+        [\link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+        (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+              [PGP signature])]
+        [\link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+        (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+              [PGP signature])]]
+\==[download] [3]
+    [\1 \version[\2]\break
+     \link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+     (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+           [signature])\break
+     \link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+     (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+           [signature])\break
+    Released \release[\2]]
+
+\heading[PGP::Sign][software]
+
+\h1[PGP::Sign]
+
+\quote(broken)[
+
+    This above all: to thine own self be true,
+    And it must follow, as the night the day,
+    Thou canst not then be false to any man.
+
+][William Shakespeare][\cite[Hamlet]]
+
+\div(sidebar)[
+    \h2[Download]
+
+    \download[PGP::Sign][pgp-sign]
+        [perl/PGP-Sign-\version[pgp-sign]]
+
+    \link[https://packages.debian.org/source/sid/libpgp-sign-perl]
+         [Debian packages] \break
+    \link[https://archives.eyrie.org/software/ARCHIVE/PGP-Sign/]
+         [Archive]
+
+    \h2[Documentation]
+
+    \link[readme.html][General overview] \break
+    \link[news.html][Change summary] \break
+    \link[docs.html][Module documentation] \break
+    \link[thanks.html][Thanks and credits]
+
+    \h2[Development]
+
+    \link[todo.html][To-do list] \break
+    \link[https://github.com/rra/pgp-sign]
+         [GitHub] \break
+    \link[https://rt.cpan.org/Dist/Display.html?Name=PGP-Sign]
+         [Bug tracker] \break
+    \link[https://git.eyrie.org/?p=perl/pgp-sign.git]
+         [Git repository] \break
+    \link[https://metacpan.org/release/PGP-Sign]
+         [MetaCPAN] \break
+    \link[https://tracker.debian.org/pkg/libpgp-sign-perl]
+         [Debian package tracker]
+]
+
+\h2[Blurb]
+
+PGP::Sign is a Perl module for generating and verifying detached OpenPGP
+signatures of textual data using GnuPG.  It was written to support Netnews
+article signatures for signed control messages and PGPMoose.
+
+\h2[Description]
+
+PGP::Sign is a Perl module that can generate and verify OpenPGP signatures
+on some data.  Currently, only textual data (data that can be processed
+using GnuPG's \code[--textmode] option) is supported.  It uses GnuPG under
+the hood to do the work.
+
+The original purpose of this module was to factor out common code in a
+News::Article class written by Andrew Gierth that handled PGPMoose and
+control message signatures.  It is used to verify control message
+signatures for the ftp.isc.org Netnews metadata archive, and to generate
+signed control messages for the Big Eight Usenet hierarchies.
+
+Data to be signed or verified can be passed into PGP::Sign in a wide
+variety of formats: scalars, arrays, open files, even code references that
+act as generators.  Keys with passphrases are supported and the passphrase
+is passed to GnuPG securely (although getting the passphrase to the
+PGP::Sign module is a problem for the calling application).
+
+This module supports both GnuPG v2 and GnuPG v1 and, when used with GnuPG
+v1, supports using OpenPGP keys and generating and verifying signatures
+that are backward-compatible with PGP 2.6.2.
+
+PGP::Sign provides both a (recommended) object-oriented API and a (legacy)
+function-based API that uses global variables for configuration and is
+backward-compatible with earlier versions of PGP::Sign.
+
+\h2[Requirements]
+
+Perl 5.20 or later and Module::Build are required to build this module,
+and IPC::Run is required to use it.  Either GnuPG v2 or GnuPG v1
+(selectable at runtime) is also required.  It has not been tested with
+versions of GnuPG older than 1.4.23.
+
+PGP::Sign uses IPC::Run features that are documented as not available on
+Windows (primarily higher-numbered file descriptors) and has never been
+tested with Gpg4win, so will probably not work on Windows (or, for that
+matter, other non-UNIX systems).
+
+\h2[Download]
+
+The distribution:
+
+\table[][
+    \program[PGP::Sign][pgp-sign]
+        [perl/PGP-Sign-\version[pgp-sign]]
+]
+
+An \link[https://archives.eyrie.org/software/ARCHIVE/PGP-Sign/] [archive
+of older releases] is also available.
+
+PGP::Sign is packaged for Debian as libpgp-sign-perl.  See the
+\link[https://tracker.debian.org/pkg/libpgp-sign-perl][Debian package
+tracker] for more information.
+
+PGP::Sign is available from CPAN as the
+\link[https://metacpan.org/release/PGP-Sign]
+[PGP-Sign distribution].
+
+PGP::Sign is maintained using the Git version control system.  To check
+out the current development tree, see
+\link[https://github.com/rra/pgp-sign][GitHub] or clone:
+
+\pre[    https://git.eyrie.org/git/perl/pgp-sign.git]
+
+Pull requests on GitHub are welcome.  You can also
+\link[https://git.eyrie.org/?p=perl/pgp-sign.git][browse the current
+development source].
+
+\h2[Documentation]
+
+User documentation:
+
+\doc[readme.html][README]
+\doc[news.html][Change summary]
+\doc[docs.html][Module documentation]
+\doc[thanks.html][Thanks and credits]
+\doc[license.html][License and copyright]
+
+Developer documentation:
+
+\doc[todo.html][To-do list]
+\doc[https://github.com/rra/pgp-sign]
+    [GitHub]
+\doc[https://rt.cpan.org/Dist/Display.html?Name=PGP-Sign]
+    [Bug tracker]
+
+\h2[License]
+
+The PGP::Sign package as a whole is covered by the following copyright and
+license:
+
+\block[
+
+    Copyright 1997-2000, 2002, 2004, 2018, 2020
+        Russ Allbery <rra@cpan.org>
+
+    This program is free software; you may redistribute it and/or modify
+    it under the same terms as Perl itself.  This means that you may
+    choose between the two licenses that Perl is released under: the GNU
+    GPL and the Artistic License.  Please see your Perl distribution for
+    the details and copies of the licenses.
+
+]
+
+Some individual source files are covered by other, compatible licenses.
+For complete copyright and license information, see the file
+\link[license.html][LICENSE] in the PGP::Sign source distribution.
+
+\signature

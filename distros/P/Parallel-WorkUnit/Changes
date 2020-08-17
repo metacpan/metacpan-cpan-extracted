@@ -1,5 +1,30 @@
+2.202270  2020-08-14 21:19:08+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.net>
+ * [bugfix] No longer bring in AnyEvent as a recommended dependency
+ * [bugfix] Eliminate warning during tests on Windows
+
+2.202230  2020-08-10 00:57:22+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.net>
+ Bring forward changes from Trial releases:
+ * [bugfix] Remove requirement for Thread::Queue
+ * [bugfix] AnyEvent no longer erroniously required
+ * [bugfix] use_anyevent => <val> passed to constructor now honored
+ * [bugfix] max_children => <val> passed to constructor now honored
+
+2.202160  2020-08-03 01:47:35+00:00 UTC (TRIAL RELEASE)
+ Joelle Maslak <jmaslak@antelope.net>
+ * [bugfix] Remove requirement for Thread::Queue
+ * Trial Release
+
+2.202150  2020-08-02 23:16:52+00:00 UTC (TRIAL RELEASE)
+ Joelle Maslak <jmaslak@antelope.net>
+ * [bugfix] AnyEvent no longer erroniously required
+ * [bugfix] use_anyevent => <val> passed to constructor now honored
+ * [bugfix] max_children => <val> passed to constructor now honored
+ * Trial Release
+
 2.201890  2020-07-07 02:19:50+00:00 UTC
- - Migrated testing to Test2
+ * Migrated testing to Test2
 
 2.191821  2019-07-01 07:13:01-06:00 America/Denver
  * Add procedural interface (see Parallel::WorkUnit::Procedural)

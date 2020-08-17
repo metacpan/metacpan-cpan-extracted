@@ -1,0 +1,9 @@
+class Base {}
+
+class Derived < Base {
+  foo() {
+    super.doesNotExist(1); // expect: [Line 5] Error at 'doesNotExist': Undefined property 'doesNotExist'.
+  }
+}
+
+Derived().foo();

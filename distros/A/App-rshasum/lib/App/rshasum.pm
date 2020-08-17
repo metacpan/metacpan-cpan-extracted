@@ -1,5 +1,5 @@
 package App::rshasum;
-$App::rshasum::VERSION = '0.6.1';
+$App::rshasum::VERSION = '0.8.0';
 use 5.016;
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ sub _worker
 
     my $digest     = $args->{digest};
     my $output_cb  = $args->{output_cb};
-    my @prunes     = @{ $args->{prune_re} || [] };
+    my @prunes     = ( map { qr/$_/ } @{ $args->{prune_re} || [] } );
     my $start_path = ( $args->{start_path} // "." );
 
     my $t = Digest->new($digest);
@@ -36,9 +36,14 @@ FILES:
         }
         if ( $r->is_file )
         {
-            my $d = Digest->new($digest);
-            open my $fh, '<', $r->path;
+            my $fh;
+            if ( not( open $fh, '<', $r->path ) )
+            {
+                warn "Could not open @{[$r->path]} ; skipping";
+                next FILES;
+            }
             binmode $fh;
+            my $d = Digest->new($digest);
             $d->addfile($fh);
             close $fh;
             my $s = $d->hexdigest . '  ' . $path . "\n";
@@ -61,10 +66,15 @@ sub run
         'digest=s'     => \$digest,
         'skip=s'       => \@skips,
         'start-path=s' => \$start_path,
-    ) or die "foo $!";
+    ) or die "Unknown flags $!";
     if ( not defined($digest) )
     {
         die "Please give a --digest=[digest] argument.";
+    }
+    if (@ARGV)
+    {
+        die
+qq#Leftover arguments "@ARGV" in the command line. (Did you intend to use --start-path ?)#;
     }
     return shift()->_worker(
         {
@@ -90,7 +100,7 @@ App::rshasum - recursive shasum.
 
 =head1 VERSION
 
-version 0.6.1
+version 0.8.0
 
 =head1 SYNOPSIS
 
@@ -101,7 +111,7 @@ version 0.6.1
 =head1 DESCRIPTION
 
 A recursive digest calculator that prints digests for all files
-in a directory tree, as well as a total, summary digest of the output.
+in a directory tree, as well as a total, summary, digest of the output.
 
 =head1 FLAGS
 
@@ -115,8 +125,8 @@ The digest algorithm to use. Required. E.g:
 
 =head2 --skip
 
-Perl 5 regexes which when matched against the relative path,
-skips and prunes them.
+Perl 5 regexes which when matched against the relative paths,
+skip and prune them.
 
 Can be specified more than one time.
 
@@ -130,6 +140,17 @@ current working directory).
 =head2 run
 
 Runs the app.
+
+=head1 SEE ALSO
+
+L<https://github.com/rhash/RHash> - "recursive hash". Seems to emit the
+tree in an unpredictable, not-always-sorted, order.
+
+L<https://www.shlomifish.org/open-source/projects/File-Dir-Dumper/> - also
+on CPAN. Dumps metadata and supports caching the digests.
+
+L<https://github.com/gokyle/rshasum> - written in golang, but slurps
+entire files into memory (see L<https://github.com/gokyle/rshasum/issues/1> ).
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

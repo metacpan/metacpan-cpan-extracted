@@ -3,10 +3,24 @@ use alienfile;
 # If the probe fails to find an already installed libevent, the
 # "share" block contains instructions for downloading and
 # installing it.
-#
-probe [ 
-  'test -f /usr/include/boost/version.hpp',
-];
+
+plugin 'Probe::CBuilder' => (
+  libs   => '-L/opt/libfoo/lib -lboost_program_options',
+);
+
+# Test lib AND header inclusion
+#use ExtUtils::CppGuess;
+#use Devel::CheckLib;
+
+#my $guess = ExtUtils::CppGuess->new;
+#my %mb_opts = $guess->module_build_options;  # even though not using Module::Build
+
+#check_lib_or_exit(
+#    lib => 'boost_program_options',
+#    header => 'boost/program_options.hpp',
+#    ccflags => $mb_opts{extra_compiler_flags},
+#    ldflags  => $mb_opts{extra_linker_flags}
+#);
 
 share {
 
@@ -20,7 +34,7 @@ share {
   plugin 'Extract';
 
   build [
-    './bootstrap.sh',
+    './bootstrap.sh --without-libraries=python',
     './b2 install --prefix=%{.install.prefix} link=static cxxflags=-fPIC',
   ];
 

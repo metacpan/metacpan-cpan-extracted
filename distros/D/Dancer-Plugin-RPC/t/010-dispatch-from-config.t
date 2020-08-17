@@ -1,9 +1,6 @@
-#! perl -w
-use strict;
-use lib 't/lib';
+#! perl -I. -w
+use t::Test::abeltje;
 
-use Test::More;
-use Test::Fatal;
 use Dancer::Test;
 
 use Dancer::RPCPlugin::DispatchFromConfig;

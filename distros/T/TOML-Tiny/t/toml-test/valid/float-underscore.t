@@ -12,54 +12,57 @@ binmode STDIN,  ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 
 my $expected1 = {
-               'after' => bless( {
-                                   '_file' => '(eval 393)',
-                                   'code' => sub {
-                                                 BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
-                                                 use strict;
-                                                 no feature ':all';
-                                                 use feature ':5.16';
-                                                 require Math::BigFloat;
-                                                 'Math::BigFloat'->new('3141.5927')->beq($_);
-                                             },
-                                   'name' => '<Custom Code>',
-                                   'operator' => 'CODE(...)',
-                                   '_lines' => [
-                                                 6
-                                               ]
-                                 }, 'Test2::Compare::Custom' ),
                'before' => bless( {
-                                    '_lines' => [
-                                                  6
-                                                ],
+                                    'name' => 'Math::BigFloat->new("3141.5927")->beq($_)',
+                                    '_file' => '(eval 339)',
                                     'operator' => 'CODE(...)',
-                                    'name' => '<Custom Code>',
+                                    '_lines' => [
+                                                  7
+                                                ],
                                     'code' => sub {
-                                                  BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
+                                                  BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x50"}
                                                   use strict;
                                                   no feature ':all';
                                                   use feature ':5.16';
                                                   require Math::BigFloat;
-                                                  'Math::BigFloat'->new('3141.5927')->beq($_);
-                                              },
-                                    '_file' => '(eval 392)'
+                                                  my $got = 'Math::BigFloat'->new($_);
+                                                  'Math::BigFloat'->new('3141.5927')->beq($got);
+                                              }
                                   }, 'Test2::Compare::Custom' ),
                'exponent' => bless( {
                                       '_lines' => [
-                                                    6
+                                                    7
                                                   ],
-                                      '_file' => '(eval 391)',
+                                      'operator' => 'CODE(...)',
                                       'code' => sub {
-                                                    BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
+                                                    BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x50"}
                                                     use strict;
                                                     no feature ':all';
                                                     use feature ':5.16';
                                                     require Math::BigFloat;
-                                                    'Math::BigFloat'->new('3e14')->beq($_);
+                                                    my $got = 'Math::BigFloat'->new($_);
+                                                    'Math::BigFloat'->new('3e14')->beq($got);
                                                 },
-                                      'operator' => 'CODE(...)',
-                                      'name' => '<Custom Code>'
-                                    }, 'Test2::Compare::Custom' )
+                                      'name' => 'Math::BigFloat->new("3e14")->beq($_)',
+                                      '_file' => '(eval 341)'
+                                    }, 'Test2::Compare::Custom' ),
+               'after' => bless( {
+                                   '_file' => '(eval 340)',
+                                   'name' => 'Math::BigFloat->new("3141.5927")->beq($_)',
+                                   'code' => sub {
+                                                 BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x50"}
+                                                 use strict;
+                                                 no feature ':all';
+                                                 use feature ':5.16';
+                                                 require Math::BigFloat;
+                                                 my $got = 'Math::BigFloat'->new($_);
+                                                 'Math::BigFloat'->new('3141.5927')->beq($got);
+                                             },
+                                   'operator' => 'CODE(...)',
+                                   '_lines' => [
+                                                 7
+                                               ]
+                                 }, 'Test2::Compare::Custom' )
              };
 
 
@@ -72,19 +75,24 @@ is($actual, $expected1, 'float-underscore - from_toml') or do{
   diag 'EXPECTED:';
   diag Dumper($expected1);
 
+  diag '';
   diag 'ACTUAL:';
   diag Dumper($actual);
 };
 
-is(eval{ from_toml(to_toml($actual)) }, $actual, 'float-underscore - to_toml') or do{
+is(eval{ scalar from_toml(to_toml($actual)) }, $expected1, 'float-underscore - to_toml') or do{
+  diag "ERROR: $@" if $@;
+
   diag 'INPUT:';
   diag Dumper($actual);
 
-  diag 'TOML OUTPUT:';
+  diag '';
+  diag 'GENERATED TOML:';
   diag to_toml($actual);
 
-  diag 'REPARSED OUTPUT:';
-  diag Dumper(from_toml(to_toml($actual)));
+  diag '';
+  diag 'REPARSED FROM GENERATED TOML:';
+  diag Dumper(scalar from_toml(to_toml($actual)));
 };
 
 done_testing;

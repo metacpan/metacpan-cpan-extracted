@@ -1,0 +1,163 @@
+                              PGP::Sign 1.00
+               (create and verify detached PGP signatures)
+                Maintained by Russ Allbery <rra@cpan.org>
+
+  Copyright 1997-2000, 2002, 2004, 2018, 2020 Russ Allbery <rra@cpan.org>.
+  This software is distributed under the same terms as Perl itself.
+  Please see the section LICENSE below for more information.
+
+BLURB
+
+  PGP::Sign is a Perl module for generating and verifying detached OpenPGP
+  signatures of textual data using GnuPG.  It was written to support
+  Netnews article signatures for signed control messages and PGPMoose.
+
+DESCRIPTION
+
+  PGP::Sign is a Perl module that can generate and verify OpenPGP
+  signatures on some data.  Currently, only textual data (data that can be
+  processed using GnuPG's --textmode option) is supported.  It uses GnuPG
+  under the hood to do the work.
+
+  The original purpose of this module was to factor out common code in a
+  News::Article class written by Andrew Gierth that handled PGPMoose and
+  control message signatures.  It is used to verify control message
+  signatures for the ftp.isc.org Netnews metadata archive, and to generate
+  signed control messages for the Big Eight Usenet hierarchies.
+
+  Data to be signed or verified can be passed into PGP::Sign in a wide
+  variety of formats: scalars, arrays, open files, even code references
+  that act as generators.  Keys with passphrases are supported and the
+  passphrase is passed to GnuPG securely (although getting the passphrase
+  to the PGP::Sign module is a problem for the calling application).
+
+  This module supports both GnuPG v2 and GnuPG v1 and, when used with
+  GnuPG v1, supports using OpenPGP keys and generating and verifying
+  signatures that are backward-compatible with PGP 2.6.2.
+
+  PGP::Sign provides both a (recommended) object-oriented API and a
+  (legacy) function-based API that uses global variables for configuration
+  and is backward-compatible with earlier versions of PGP::Sign.
+
+REQUIREMENTS
+
+  Perl 5.20 or later and Module::Build are required to build this module,
+  and IPC::Run is required to use it.  Either GnuPG v2 or GnuPG v1
+  (selectable at runtime) is also required.  It has not been tested with
+  versions of GnuPG older than 1.4.23.
+
+  PGP::Sign uses IPC::Run features that are documented as not available on
+  Windows (primarily higher-numbered file descriptors) and has never been
+  tested with Gpg4win, so will probably not work on Windows (or, for that
+  matter, other non-UNIX systems).
+
+BUILDING AND INSTALLATION
+
+  PGP::Sign uses Module::Build and can be installed using the same process
+  as any other Module::Build module:
+
+      perl Build.PL
+      ./Build
+      ./Build install
+
+  You will have to run the last command as root unless you're installing
+  into a local Perl module tree in your home directory.
+
+TESTING
+
+  PGP::Sign comes with a test suite, which you can run after building
+  with:
+
+      ./Build test
+
+  If a test fails, you can run a single test with verbose output via:
+
+      ./Build test --test_files <path-to-test>
+
+  The following additional Perl modules will be used by the test suite if
+  present:
+
+  * Devel::Cover
+  * Test::MinimumVersion
+  * Test::Perl::Critic
+  * Test::Pod
+  * Test::Pod::Coverage
+  * Test::Spelling
+  * Test::Strict
+  * Test::Synopsis
+
+  All are available on CPAN.  Those tests will be skipped if the modules
+  are not available.
+
+  To enable tests that don't detect functionality problems but are used to
+  sanity-check the release, set the environment variable RELEASE_TESTING
+  to a true value.  To enable tests that may be sensitive to the local
+  environment or that produce a lot of false positives without uncovering
+  many problems, set the environment variable AUTHOR_TESTING to a true
+  value.
+
+SUPPORT
+
+  The PGP::Sign web page at:
+
+      https://www.eyrie.org/~eagle/software/pgp-sign/
+
+  will always have the current version of this package, the current
+  documentation, and pointers to any additional resources.
+
+  For bug tracking, use the CPAN bug tracker at:
+
+      https://rt.cpan.org/Dist/Display.html?Name=PGP-Sign
+
+  However, please be aware that I tend to be extremely busy and work
+  projects often take priority.  I'll save your report and get to it as
+  soon as I can, but it may take me a couple of months.
+
+SOURCE REPOSITORY
+
+  PGP::Sign is maintained using Git.  You can access the current source on
+  GitHub at:
+
+      https://github.com/rra/pgp-sign
+
+  or by cloning the repository at:
+
+      https://git.eyrie.org/git/perl/pgp-sign.git
+
+  or view the repository via the web at:
+
+      https://git.eyrie.org/?p=perl/pgp-sign.git
+
+  The eyrie.org repository is the canonical one, maintained by the author,
+  but using GitHub is probably more convenient for most purposes.  Pull
+  requests are gratefully reviewed and normally accepted.  It's probably
+  better to use the CPAN bug tracker than GitHub issues, though, to keep
+  all Perl module issues in the same place.
+
+LICENSE
+
+  The PGP::Sign package as a whole is covered by the following copyright
+  statement and license:
+
+    Copyright 1997-2000, 2002, 2004, 2018, 2020
+        Russ Allbery <rra@cpan.org>
+
+    This program is free software; you may redistribute it and/or modify
+    it under the same terms as Perl itself.  This means that you may
+    choose between the two licenses that Perl is released under: the GNU
+    GPL and the Artistic License.  Please see your Perl distribution for
+    the details and copies of the licenses.
+
+  Some files in this distribution are individually released under
+  different licenses, all of which are compatible with the above general
+  package license but which may require preservation of additional
+  notices.  All required notices, and detailed information about the
+  licensing of each file, are recorded in the LICENSE file.
+
+  Files covered by a license with an assigned SPDX License Identifier
+  include SPDX-License-Identifier tags to enable automated processing of
+  license information.  See https://spdx.org/licenses/ for more
+  information.
+
+  For any copyright range specified by files in this package as YYYY-ZZZZ,
+  the range specifies every single year in that closed interval.

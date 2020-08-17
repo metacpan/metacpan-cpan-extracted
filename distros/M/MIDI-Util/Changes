@@ -1,5 +1,11 @@
 Revision history for MIDI-Util
 
+0.0500 2020-08-13 15:34:46
+    - Remove the unused new_track() function.
+
+0.0403 2020-08-13 14:01:22
+    - Add the midi_format() function.
+
 0.0402 2019-12-06 06:49:51
     - Only set the patch if given a patch.
     - Improve documentation.

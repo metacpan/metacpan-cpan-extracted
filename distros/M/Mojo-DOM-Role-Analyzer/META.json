@@ -4,7 +4,7 @@
       "Steve Dondley <s@dondley.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -22,9 +22,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Devel::Confess" : "0",
-            "Log::Log4perl::Shortcuts" : "0",
-            "Mojo::Dom" : "7.42",
+            "Class::Method::Modifiers" : "0",
+            "Mojolicious" : "7.42",
             "Role::Tiny" : "0",
             "overload" : "0",
             "strict" : "0",
@@ -34,6 +33,7 @@
       "test" : {
          "requires" : {
             "Mojo::DOM" : "0",
+            "Path::Tiny" : "0",
             "Test::More" : "0",
             "Test::Most" : "0"
          }
@@ -50,8 +50,9 @@
          "web" : "https://github.com/sdondley/Mojo-DOM-Role-Analyzer"
       }
    },
-   "version" : "0.009",
+   "version" : "0.015",
    "x_generated_by_perl" : "v5.24.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

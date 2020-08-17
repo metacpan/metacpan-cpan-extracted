@@ -1,5 +1,5 @@
 ---
-abstract: 'curses UI to query and modify a ZFS dataset properties.'
+abstract: 'curses UI to query/modify a ZFS dataset/snapshot properties.'
 author:
   - 'Patrice Clement <monsieurp@cpan.org>'
 build_requires:
@@ -29,7 +29,7 @@ resources:
   homepage: https://gitlab.com/monsieurp/App-ZFSCurses
   license: https://opensource.org/licenses/BSD-3-Clause
   repository: https://gitlab.com/monsieurp/App-ZFSCurses.git
-version: '1.100'
+version: '1.212'
 x_licence:
   - bsd
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

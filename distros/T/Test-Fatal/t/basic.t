@@ -75,3 +75,4 @@ like(
   qr{false exception},
   "we throw a new exception if the exception is false",
 );
+

@@ -1,0 +1,140 @@
+=pod
+
+=head1 NAME
+
+Quantum::Superpositions::Lazy::Manual - reference to get you started
+
+=head1 SYNOPSIS
+
+I<(The following introduction is not meant to be very accurate. It's here to
+help people not familiar with the subject get a general understanding. Please
+refer to a credible source if you want to dig deeper into this topic.)>
+
+Advances in quantum physics have changed the way we perceive the reality. At
+quantum scale nothing is certain and everything is just a
+wave of probability
+as long as a conscious being is not looking.
+
+Particles which are not observed are considered to be in a state of
+superposition - they are in all of their possible states at the same time. It's
+not due to the fact that we don't know any better, but because the wave of
+probability has not yet been collapsed by an act of observation. When the
+object is observed, the wave collapses and we see it in a single random state.
+
+An even weirder phenomenon is quantum entanglement. It is possible to generate
+two entangled particles which will have their properties correlated. Observing
+one of these particles will collapse both of them, as long as we can be certain
+about the correlation of the resulting states.
+
+=head2 The purpose of the module
+
+This module is taking the logic behind these quantum phenomena and puts it to
+use in Perl. It is possible to create superpositions out of arrays, mix
+(entangle) them together with regular Perl mathematical / string operators and
+collapse them.  It is also possible to get an entire list of possible states
+and do logical or statistical operations on them.
+
+Each superposition state contains a numeric weight and a scalar value.
+Collapsing takes the weights into account during state randomization and saves
+the value as the outcome. The superposition will keep returning that value
+until an object is reset.
+
+Using superpositions with Perl operators will lead to creation of new special
+type of superposition called I<computation>. These types share the common
+interface but differ in way they obtain their states. Computation will hold the
+references to objects it acts upon and only produce a list of states once it is
+required. A superposition can have additional states if it consists of other
+superpositions - nested superpositions work as if they were a single object.
+
+=head1 CASE STUDY #1
+
+Lets say we want to use the module to just get something randomly, like a full
+person name with a title:
+
+	use Quantum::Superpositions::Lazy;
+
+	my $titles_male = superpos(qw(Mr Sir Dr));
+	my $titles_female = superpos(qw(Mrs Miss Ms Dr));
+
+	my $names_male = superpos(qw(David Paul Joseph));
+	my $names_female = superpos(qw(Jessica Diana Clara));
+
+	my $surnames = superpos(qw(Smith Hayes Milton));
+
+	my $male_name = $titles_male . ' ' . $names_male . ' ' . $surnames;
+	my $female_name = $titles_female . ' ' . $names_female . ' ' . $surnames;
+
+	my $random_person = superpos([48, $male_name], [52, $female_name]);
+	my $full_name = $random_person->collapse;
+	print $full_name;
+
+First, we construct the superpositions holding strings in their respective
+categories. We don't specify any weights here, so all the states are as
+probable to occur.
+
+We then join the parts of the name together with spaces in between. The
+I<$name_male> and I<$female_name> are still superpositions that are not yet
+collapsed, so the outcome is still unknown.
+
+The last step is to put the names together in one superposition so that we can
+get both types at random. We use weigths here so that the probability is not
+the same - we will get a couple more female names in the long run. The first
+element of each array reference is the weight value.
+
+Once this is complete, we're ready to observe by using the I<collapse> method.
+At this moment the actual randomization will occur and we will get a single
+male or female name as a string scalar.
+
+=head1 CASE STUDY #2
+
+Getting one state at random can be useful but gives us no information about the
+entire situation. We can get some more information about the previously
+constructed I<$random_person> superposition by examining its complete set of
+states.
+
+Up until this moment the module was behaving nicely and did not take more
+memory or CPU cycles than needed, however once we want to know everything about
+the superposition it has no choice but to generate the entire thing. This means
+that we can get complete states, fetch statistical data or perform logical
+operations, but for them to work every possible full name will have to be
+generated. For this very simple example this will be a total of 63 states.
+
+	use Quantum::Superpositions::Lazy qw(fetch_matches);
+
+	my $top = $random_person->stats->most_probable;
+	my $unwanted = 'Mr David Smith';
+	if ($top eq $unwanted) {
+		my $others = fetch_matches { $top ne $unwanted };
+		print join "\n", map { $_->value } $others->states->@*;
+	}
+
+Here, we first get a set of most probable outcomes for the random name. A
+return value of that method is a new superposition containing all the states
+that match that criterion.
+
+Next, we define one name that we'd like not to have on our final list. It may
+be surprising that a list of most probable outcomes is actually consisting of
+male names, even though we gave females a higher weight. This is because of the
+one extra title, the females have higher weight in total but their individual
+weights are smaller.
+
+The I<if> statement is a check if the unwanted name is actually possible in our
+top names superpositions. The return value of that logical operation is boolean
+by default.
+
+With sanity checks out of the way, we can remove the name from the
+superposition. To do this we will create a new superposition that contains all
+the states but this one with the help of I<fetch_matches> function. Any logical
+operation in the code block following the function will no longer return
+boolean (the default behavior) but a new superposition consisting of states
+that would individually compare as true.
+
+The last line prints the list of names that we can get from the random
+generator, so that we can check if the unwanted name was indeed removed.
+
+=head1 FURTHER READING
+
+Refer to the examples directory for more code examples or to each individual
+package for more in-depth information. A good place to start would be
+L<Quantum::Superpositions::Lazy> or
+L<Quantum::Superpositions::Lazy::Superposition>.

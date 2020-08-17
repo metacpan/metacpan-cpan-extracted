@@ -12,11 +12,11 @@ Net::SMTP::Bulk::AnyEvent - NonBlocking batch SMTP using Net::SMTP interface cia
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 =head2 new(%options, Hosts=>[\%options2,\%options3])
 
@@ -69,13 +69,16 @@ sub new {
     $self->{func} = $new{Callbacks};
     $self->{global_timeout} = $new{GlobalTimeout}||120;
     $self->{last_active}=time;
+    $self->{start_time}=time;
     $self->{timer_actions}=[];
+    $self->{runtime_limit}=$new{RuntimeLimit}||0;
     $self->{defaults}={
                        threads=>$new{Threads}||2,
                        port=>$new{Port}||25,
                        timeout=>$new{Timeout}||30,
                        secure=>$new{Secure}||0,
                        pipe=>$new{Pipeline}||0,
+                       
 		       sleep=>{
                                hang=>0,
                                fail=>0,
@@ -204,13 +207,14 @@ sub quit {
     my $id = shift || time;    
     
     my $timer;
-    
-    if ($self->{global_timeout} > 0) {
-        $timer = AnyEvent->timer(
-                             after=> int(($self->{global_timeout}+1)/2)+1,
-                             cb=> sub {
-                                
-                                if ( ($self->{last_active} + $self->{global_timeout}) < time ) {
+    print "start timer\n";
+
+        $timer   = AnyEvent->timer(
+    	interval => 1,
+    	cb       => sub {
+
+
+                              if ( $self->{global_timeout} > 0 and ($self->{last_active} + $self->{global_timeout}) < time ) {
                                     
                                     
                                     my $r=$self->_FUNC('global_hang',$self,[-1,-1],0,[]);
@@ -232,7 +236,7 @@ sub quit {
                                                     $self->reconnect([$h,$t],99,1);
                                                     $end=0;
                                                 } else {
-                                                    $self->{fh}{threads}{ $h }{ $t }->destroy if defined($self->{fh}{threads}{ $h }{ $t });
+                                                    $self->{fh}{ $h }{ $t }->destroy if defined($self->{fh}{ $h }{ $t });
                                                 }
                                                 
                                                 
@@ -242,18 +246,41 @@ sub quit {
                                         
                                         if ($end == 1) {
                                             undef($timer);
-                                            undef($timer2);
+                                        
                                             $self->{cv}->send;
                                         }
                                         
  
                                 }
-                                
-                             }
-                             
-                             );
-    }
-    
+
+       	my @actions;
+		foreach my $i ( 0 .. $#{ $self->{timer_actions} } ) {
+			$self->{timer_actions}[$i][0]++;
+                        #print "OK(  $self->{timer_actions}[$i][0] >= $self->{timer_actions}[$i][1] )\n";
+			if ( $self->{timer_actions}[$i][0] >= $self->{timer_actions}[$i][1] ) {
+				&{ $self->{timer_actions}[$i][2] }( @{ $self->{timer_actions}[$i][3] } );
+			
+			} else {
+				push(@actions,$self->{timer_actions}[$i]);
+			}
+		
+		}
+		$self->{timer_actions}=\@actions;
+         
+        if ($self->{runtime_limit} and $self->{start_time} + $self->{runtime_limit} < time ) {  print "LIMIT!\n";
+    $self->_FUNC('runtime_limit',$self,$k,0,[$self->{on_queue}{ $k->[0] }{ $k->[1] }]);
+
+          undef($timer);
+                                        
+         $self->{cv}->send;
+
+        }
+
+  
+
+
+	},
+    );    
 
     my $total=0;
     foreach my $h ( keys(%{ $self->{threads} })  ) {
@@ -275,38 +302,20 @@ sub quit {
     }
     
 
-    my $timer2   = AnyEvent->timer(
-    	interval => 1,
-    	cb       => sub {
-       	my @actions;
-		foreach my $i ( 0 .. $#{ $self->{timer_actions} } ) {
-			$self->{timer_actions}[$i][0]++;
-                        #print "OK(  $self->{timer_actions}[$i][0] >= $self->{timer_actions}[$i][1] )\n";
-			if ( $self->{timer_actions}[$i][0] >= $self->{timer_actions}[$i][1] ) {
-				&{ $self->{timer_actions}[$i][2] }( @{ $self->{timer_actions}[$i][3] } );
-			
-			} else {
-				push(@actions,$self->{timer_actions}[$i]);
-			}
-		
-		}
-		$self->{timer_actions}=\@actions;
 
-	},
-    );    
     
     #$self->_BULK();
     $self->{cv}->recv if $total > 0;
      
     undef($timer) if defined($timer);
-    undef($timer2) if defined($timer2);
+
      
     my $rt1=$self->_FUNC('complete',$self,[-1,-1],0,[]);
     foreach my $h ( keys(%{ $self->{threads} })  ) {
         foreach my $t ( 0..$self->{threads}{ $h } ) {
             
             my $rt2=$self->_FUNC('end_thread',$self,$k,0,[]);
-            $self->{fh}{threads}{ $h }{ $t }->destroy if defined($self->{fh}{threads}{ $h }{ $t });
+            $self->{fh}{ $h }{ $t }->destroy if defined($self->{fh}{ $h }{ $t });
             
              $self->_DEBUG([$h,$t],'End Queue : (PASS:'.($self->{stats}{ $h }{ $t }{queue}{pass}).'|HANG:'.($self->{stats}{ $h }{ $t }{queue}{hang}).'|FAIL:'.($self->{stats}{ $h }{ $t }{queue}{fail}).'|TOTAL:'.$self->{stats}{ $h }{ $t }{queue}{total}.')',5) if $self->{debug} >= 1;
             $self->{stats}{ $h }{ $t }{queue}{id}=0;
@@ -349,6 +358,7 @@ sub _PREPARE {
     my $hosts=shift;
     $self->{order}=[];
     $self->{open_threads}=0;
+    
     foreach my $i ( 0..$#{$hosts} ) {
    
         my %new=( %{$hosts->[$i]} );

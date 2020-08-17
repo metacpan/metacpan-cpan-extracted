@@ -1,5 +1,5 @@
 package CPAN::ReleaseHistory;
-$CPAN::ReleaseHistory::VERSION = '0.15';
+$CPAN::ReleaseHistory::VERSION = '0.16';
 use 5.006;
 use Moo;
 use MooX::Role::CachedURL 0.06;

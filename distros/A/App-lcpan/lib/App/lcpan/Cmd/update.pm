@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::update;
 
-our $DATE = '2020-06-11'; # DATE
-our $VERSION = '1.061'; # VERSION
+our $DATE = '2020-08-13'; # DATE
+our $VERSION = '1.062'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::lcpan::Cmd::update - Create/update local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.061 of App::lcpan::Cmd::update (from Perl distribution App-lcpan), released on 2020-06-11.
+This document describes version 1.062 of App::lcpan::Cmd::update (from Perl distribution App-lcpan), released on 2020-08-13.
 
 =head1 FUNCTIONS
 
@@ -85,6 +85,14 @@ If set, skip downloading files larger than this.
 =item * B<remote_url> => I<str>
 
 Select CPAN mirror to download from.
+
+=item * B<retry_delay> => I<int>
+
+Number of seconds to delay between retry attempt.
+
+=item * B<retry_max_attempts> => I<int>
+
+Number of retry attempts on failed HTTP request.
 
 =item * B<skip_file_indexing_pass_1> => I<bool>
 

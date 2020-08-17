@@ -1,5 +1,10 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.022 2020-08-17
+    - Implement setStateCallback() and call Perl from callback.
+    - Implement client config get and setClientContext().
+    - Implement server browseNext().
+
 0.021 2020-07-28
     - Implement generic server read().
     - Implement server config get and setMaxSecureChannels().

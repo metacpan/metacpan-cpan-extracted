@@ -14,14 +14,14 @@ for my $id ( keys %$songs ) {
 #warn "MARK: $id\n" if $songs->{$id}{key} eq 'A_m';
     $score{ $songs->{$id}{key} }++;
 }
-#exit;
+#use Data::Dumper;warn Dumper\%score;exit;
 
 use Chart::Bars;
 my $chart = Chart::Bars->new( 800, 400 );
 
 $chart->set(
     legend       => 'none',
-    title        => 'Keys of All Chorales',
+    title        => 'Keys of Chorales',
     x_label      => 'Key',
     y_label      => 'Songs',
     precision    => 0,

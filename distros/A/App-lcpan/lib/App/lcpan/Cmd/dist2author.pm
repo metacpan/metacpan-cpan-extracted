@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::dist2author;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2020-08-13'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.061'; # VERSION
+our $VERSION = '1.062'; # VERSION
 
 use 5.010001;
 use strict;
@@ -74,7 +74,7 @@ App::lcpan::Cmd::dist2author - Get author of distribution(s)
 
 =head1 VERSION
 
-This document describes version 1.061 of App::lcpan::Cmd::dist2author (from Perl distribution App-lcpan), released on 2020-06-11.
+This document describes version 1.062 of App::lcpan::Cmd::dist2author (from Perl distribution App-lcpan), released on 2020-08-13.
 
 =head1 FUNCTIONS
 

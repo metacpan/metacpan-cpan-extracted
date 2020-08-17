@@ -1,0 +1,50 @@
+NAME
+    CSS::Struct - Struct oriented CSS manipulation.
+
+STRUCTURE
+     Perl structure:
+
+     Reference to array.
+     [type, data]
+
+     Types:
+     a - At-rules.
+     c - Comment.
+     d - Definition.
+     e - End of selector.
+     i - Instruction.
+     r - Raw section.
+     s - Selector.
+
+     Data:
+     a - $at_rule, $file
+     c - @comment
+     d - $key, $value
+     e - No argument.
+     i - $target, $code
+     r - @raw_data
+     s - $selector
+
+SEE ALSO
+    CSS::Struct::Output
+        Base class for CSS::Struct::Output::*.
+
+    CSS::Struct::Output::Raw
+        Raw printing 'CSS::Struct' structure to CSS code.
+
+    CSS::Struct::Output::Indent
+        Indent printing 'CSS::Struct' structure to CSS code.
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2007-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

@@ -40,7 +40,9 @@ DESCRIPTION
     I highly recommend using:
 
       $ source "$(pkg-config --variable=prefix yottadb)"/ydb_env_set
+
     and
+
       $ source "$(pkg-config --variable=prefix yottadb)"/ydb_env_unset
 
     for basic setup of environment and databases.
@@ -179,9 +181,8 @@ AUTHOR
     Stefan Traby <stefan@hello-penguin.com>
 
 COPYRIGHT AND LICENSE
-    Copyright (C) 2018, 2019 by Stefan Traby
+    Copyright (C) 2018, 2019, 2020 by Stefan Traby
 
     This library is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself, either Perl version 5.26.1 or, at
-    your option, any later version of Perl 5 you may have available.
+    under terms of the GNU Affero General Public License Version 3.
 

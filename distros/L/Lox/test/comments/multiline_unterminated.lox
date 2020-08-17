@@ -1,0 +1,5 @@
+/*
+  /*
+    print "comment";
+*/
+// expect: [Line 6] Error at 'EOF': Unterminated multi-line comment.

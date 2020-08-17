@@ -21,18 +21,15 @@ name: Parallel-WorkUnit
 provides:
   Parallel::WorkUnit:
     file: lib/Parallel/WorkUnit.pm
-    version: '2.201890'
+    version: '2.202270'
   Parallel::WorkUnit::Procedural:
     file: lib/Parallel/WorkUnit/Procedural.pm
-    version: '2.201890'
-recommends:
-  AnyEvent: '7.14'
+    version: '2.202270'
 requires:
-  AnyEvent: '0'
   Carp: '0'
   Exporter: '0'
   IO::Handle: '0'
-  IO::Pipe: '0'
+  IO::Pipely: '0'
   IO::Select: '0'
   POSIX: '0'
   Scalar::Util: '0'
@@ -47,7 +44,7 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Parallel-WorkUnit/issues
   repository: git://github.com/jmaslak/Parallel-WorkUnit.git
-version: '2.201890'
+version: '2.202270'
 x_contributor_covenant:
   version: 0.02
 x_generated_by_perl: v5.32.0

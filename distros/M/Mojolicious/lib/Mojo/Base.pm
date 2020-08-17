@@ -19,7 +19,7 @@ use constant ROLES => !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.00000
 # async/await support requires Future::AsyncAwait 0.36+
 use constant ASYNC => $ENV{MOJO_NO_ASYNC}
   ? 0
-  : !!(eval { require Future::AsyncAwait; Future::AsyncAwait->VERSION('0.36'); 1; });
+  : !!(eval { require Future::AsyncAwait; Future::AsyncAwait->VERSION('0.36'); 1 });
 
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }
@@ -266,12 +266,11 @@ Fluent interfaces are a way to design object-oriented APIs around method chainin
 with the goal of making the readability of the source code close to written prose.
 
   package Duck;
-  use Mojo::Base -base;
+  use Mojo::Base -base, -signatures;
 
   has 'name';
 
-  sub quack {
-    my $self = shift;
+  sub quack ($self) {
     my $name = $self->name;
     say "$name: Quack!"
   }

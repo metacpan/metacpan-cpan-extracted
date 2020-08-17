@@ -15,7 +15,7 @@ name: NewsExtractor
 provides:
   NewsExtractor:
     file: lib/NewsExtractor.pm
-    version: v0.36.0
+    version: v0.38.0
   NewsExtractor::Article:
     file: lib/NewsExtractor/Article.pm
   NewsExtractor::CSSExtractor:
@@ -80,6 +80,8 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/talk_ltn_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::turnnewsapp_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/turnnewsapp_com.pm
+  NewsExtractor::SiteSpecificExtractor::www_aljazeera_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_aljazeera_com.pm
   NewsExtractor::SiteSpecificExtractor::www_allnews_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_allnews_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_bcc_com_tw:
@@ -104,6 +106,8 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_nownews_com.pm
   NewsExtractor::SiteSpecificExtractor::www_ntdtv_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_ntdtv_com.pm
+  NewsExtractor::SiteSpecificExtractor::www_penghutimes_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_penghutimes_com.pm
   NewsExtractor::SiteSpecificExtractor::www_peopo_org:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_peopo_org.pm
   NewsExtractor::SiteSpecificExtractor::www_rti_org_tw:
@@ -135,6 +139,7 @@ provides:
 requires:
   File::Slurp: '0'
   HTML::ExtractContent: '0'
+  HTTP::Date: '0'
   IO::Socket::SSL: '2.009'
   Importer: '0'
   JSON: '0'
@@ -146,7 +151,10 @@ requires:
   Type::Tiny: '0'
   Types::URI: '0'
   YAML: '0'
-version: v0.36.0
+resources:
+  bugtracker: https://github.com/perltaiwan/NewsExtractor/issues
+  repository: https://github.com/perltaiwan/NewsExtractor.git
+version: v0.38.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: CC0-1.0
 x_static_install: '1'

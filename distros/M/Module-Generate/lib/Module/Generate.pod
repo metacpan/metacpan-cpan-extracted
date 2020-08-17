@@ -6,7 +6,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
@@ -84,6 +84,14 @@ Provide a name for the distribution.
 Provide a path where the generated files will be compiled.
 
 	my $module = Module::Generate->lib('./path/to/lib');
+
+=cut
+
+=head2 tlib
+
+Provide a path where the generated test will be compiled.
+
+	my $module = Module::Generate->tlib('./path/to/t');
 
 =cut
 
@@ -289,6 +297,14 @@ Provide pod text that describes the sub.
 Provide a code example which will be suffixed to the pod definition.
 
 	$sub->example('$foo->name');
+
+=cut
+
+=head2 test
+
+Provide tests for the sub.
+
+	$sub->test(['is', '$obj->name', q|'test'|], [ ... ], ...)
 
 =cut
 

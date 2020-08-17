@@ -1,5 +1,22 @@
 Revision history for MariaDB-NonBlocking
 
+0.25    2020-08-11
+        * When bundling mariadb-connector-c, use the system zlib
+          instead of the bundled one -- potentially sidestepping
+          issues with system-zlib having global symbols changed
+          by the bundled zlib.
+        * `make distclean` now actually cleans up everything
+        * Promises Pool no longer uses an XS implementation of
+          caller() to gather stacktraces; instead, implementors
+          can provide whatever stacktrace they want.
+        * Minor tweaks to the XS code
+
+0.24    2020-08-10
+        * Queries failing during global destruction no longer
+          break due to the deferred object being released too early
+        * Query timeout of '0' now means 'no timeout';
+          using 'undef' gets the previous behavior of 'sane' defaults.
+
 0.23    2020-08-06
         * Do not statically link to the gss/kerberos auth plugin;
           breaks compilation on OSX, and it actually makes sense

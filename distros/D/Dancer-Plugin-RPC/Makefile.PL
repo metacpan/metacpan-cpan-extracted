@@ -25,9 +25,11 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => '6.55_02',
     },
     BUILD_REQUIRES     => {
-        'Test::Fatal'      => '0.010',
-        'Test::More'       => '0.88',    # done_testing()
-        'Test::NoWarnings' => '1.00',
+        'Test::Fatal'          => '0.010',
+        'Test::More'           => '0.88',    # done_testing()
+        'Test::Warnings'       => '0.030',
+        'Moo'                  => 2,
+        'namespace::autoclean' => 0,
         %$prereq_pm
     },
 

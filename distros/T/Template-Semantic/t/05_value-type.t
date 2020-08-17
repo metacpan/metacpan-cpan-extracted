@@ -1,3 +1,5 @@
+use FindBin;
+use lib "$FindBin::Bin/..";
 use t::TestBase;
 run_template_process;
 
@@ -34,9 +36,9 @@ package main;
     <span>Booo!</span>
 </root>
 
-=== elem x scalarref
+=== elem x scalarref (TODO)
 --- vars
-'//span' => \'hey <b>you</b>!'
+'//span' => \'hey&mdash;<b>you</b>!'
 --- template
 <root>
     <div>
@@ -46,7 +48,7 @@ package main;
 --- expected
 <root>
     <div>
-        <span>hey <b>you</b>!</span>
+        <span>hey&mdash;<b>you</b>!</span>
     </div>
 </root>
 
@@ -338,16 +340,16 @@ use XML::LibXML;
     <span>xxx</span>
 </root>
 
-=== elem x sub (return scalarref)
+=== elem x sub (return scalarref) (TODO)
 --- vars
-'//span' => sub { \'<b>xx</b>x' }
+'//span' => sub { \'<b>xx</b>&mdash;x' }
 --- template
 <root>
     <span>bar</span>
 </root>
 --- expected
 <root>
-    <span><b>xx</b>x</span>
+    <span><b>xx</b>&mdash;x</span>
 </root>
 
 === elem x sub (return undef)
@@ -517,16 +519,16 @@ package main;
     <span title="xxx &gt; yyy">bar</span>
 </root>
 
-=== attr x scalar-ref
+=== attr x scalar-ref (TODO)
 --- vars
-'//span/@title' => \'<b>xxx</b> > yyy'
+'//span/@title' => \'<b>xxx</b> > yyy&sup2;'
 --- template
 <root>
     <span title="bar">bar</span>
 </root>
 --- expected
 <root>
-    <span title="xxx &gt; yyy">bar</span>
+    <span title="xxx &gt; yyy&sup2;">bar</span>
 </root>
 
 === attr x undef
@@ -708,16 +710,16 @@ use XML::LibXML;
     <span>xxx &gt; yyy</span>
 </div>
 
-=== text x scalar-ref
+=== text x scalar-ref (TODO)
 --- vars
-'//span/text()' => \'<b>xxx</b> > yyy'
+'//span/text()' => \'<b>xxx</b> > yyy&sup2;'
 --- template
 <root>
     <span>bar</span>
 </root>
 --- expected
 <root>
-    <span>xxx &gt; yyy</span>
+    <span>xxx &gt; yyy&sup2;</span>
 </root>
 
 === text x undef
@@ -899,16 +901,16 @@ use XML::LibXML;
     <!--xxx > yyy-->
 </div>
 
-=== comment x scalar-ref
+=== comment x scalar-ref (TODO)
 --- vars
-'//comment()[1]' => \'<b>xxx</b> > yyy'
+'//comment()[1]' => \'<b>xxx</b> > yyy&sup2;'
 --- template
 <root>
     <!-- foo -->
 </root>
 --- expected
 <root>
-    <!--<b>xxx</b> > yyy-->
+    <!--<b>xxx</b> > yyy&sup2;-->
 </root>
 
 === comment x undef
@@ -1090,16 +1092,16 @@ use XML::LibXML;
     <![CDATA[xxx > yyy]]>
 </div>
 
-=== cdata x scalar-ref
+=== cdata x scalar-ref (TODO)
 --- vars
-'//text()[2]' => \'<b>xxx</b> > yyy'
+'//text()[2]' => \'<b>xxx</b> > yyy&sup2;'
 --- template
 <root>
     <![CDATA[ foo ]]>
 </root>
 --- expected
 <root>
-    <![CDATA[<b>xxx</b> > yyy]]>
+    <![CDATA[<b>xxx</b> > yyy&sup2;]]>
 </root>
 
 === cdata x undef
@@ -1418,3 +1420,52 @@ use XML::LibXML;
 --- expected
 <div>foo</div>
 
+=== multi hash
+--- vars
+'a' => { '.' => 'xxx' }
+--- template
+<div><a></a><span><a></a></span><a></a></div>
+--- expected
+<div><a>xxx</a><span><a>xxx</a></span><a>xxx</a></div>
+
+=== multi sub hash
+--- vars
+'a' => sub { { '.' => 'xxx' } }
+--- template
+<div><a></a><span><a></a></span><a></a></div>
+--- expected
+<div><a>xxx</a><span><a>xxx</a></span><a>xxx</a></div>
+
+=== multi scalar
+--- vars
+'a' => 'xxx'
+--- template
+<div><a></a><span><a></a></span><a></a></div>
+--- expected
+<div><a>xxx</a><span><a>xxx</a></span><a>xxx</a></div>
+
+=== multi github issue #3
+--- vars
+'.navigation' => [ { 'a' => 'Link 1' }, { 'a' => 'Link 2' } ]
+--- template
+<body>
+    <ul id="topnav">
+        <li class="navigation"><a href="...">Top Nav</a></li>
+    </ul>
+    <div id="content">...</div>
+    <ul id="bottomnav">
+        <li class="navigation"><a href="...">Bottom Nav</a></li>
+    </ul>
+</body>
+--- expected
+<body>
+    <ul id="topnav">
+        <li class="navigation"><a href="...">Link 1</a></li>
+        <li class="navigation"><a href="...">Link 2</a></li>
+    </ul>
+    <div id="content">...</div>
+    <ul id="bottomnav">
+        <li class="navigation"><a href="...">Link 1</a></li>
+        <li class="navigation"><a href="...">Link 2</a></li>
+    </ul>
+</body>

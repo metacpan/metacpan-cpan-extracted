@@ -42,7 +42,7 @@
       "runtime" : {
          "requires" : {
             "Unicode::Normalize" : "0",
-            "perl" : "5.008005"
+            "perl" : "5.016001"
          }
       },
       "test" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "Text::Guess::Script" : {
          "file" : "lib/Text/Guess/Script.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/wollmers/Text-Guess-Script"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.15",
    "x_static_install" : 1
 }

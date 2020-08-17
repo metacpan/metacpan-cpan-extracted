@@ -1,0 +1,39 @@
+---
+abstract: 'A object oriented Perl module to interact with the EtcD version 2 API'
+author:
+  - 'Gary L. Greene, Jr. <greeneg@tolharadys.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-EtcDv2
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - private
+requires:
+  Data::Dumper: '0'
+  Errno: '0'
+  HTTP::Request: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Throw: '0'
+  Try::Tiny: '0'
+  boolean: '0'
+  perl: '5.030'
+  strictures: '0'
+resources:
+  bugtracker: https://github.com/greeneg/Net-EtcDv2/issues
+  repository: https://github.com/greeneg/Net-EtcDv2.git
+version: v0.0.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

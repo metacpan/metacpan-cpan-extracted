@@ -15,13 +15,12 @@ use autodie;
 
 use Carp;
 use Test2::V0;
-# use Test2::Tools::Warnings;
 
 my %RESULTS;
 
 SKIP: {
     if ( !eval { require AnyEvent } ) {
-        skip 'AnyEvent not installed', 53;
+        skip_all('AnyEvent not installed');
     }
 
     require AnyEvent;
@@ -58,6 +57,24 @@ SKIP: {
         ok( exists( $RESULTS{$_} ), "Worker First Exec $_ returned properly" );
     }
     is( $wu->count, 0, "no processes running after waitall()" );
+
+    # We're going to spawn 10 children and test the return value
+    # BUT...unlike the above test, we're going to wait on a conditional
+    # variable rather than waitone().
+    $PROCS = 10;
+    my @cv;
+    for ( 0 .. $PROCS - 1 ) {
+        my $v = $_;
+        $cv[$v] = AnyEvent->condvar;
+        $wu->async( sub { return $v; }, sub { $cv[$v]->send; cb(@_) } );
+        is( $wu->count, 1 + $v, 1 + $v . " workers are executing [CV]" );
+    }
+
+    for ( 0 .. $PROCS - 1 ) {
+        $cv[$_]->recv;
+        ok( exists( $RESULTS{$_} ), "Worker First Exec $_ returned properly [CV]" );
+    }
+    is( $wu->count, 0, "no processes running after condvar wait [CV]" );
 
     # We're going to spawn 10 children and test the return value, using
     # asyncs() to spawn them at once.
@@ -151,7 +168,7 @@ SKIP: {
 
     # Same thing, but with wait and another process waitalling
     $pid = $wu->async( sub { die "Error!"; }, sub { return; } );
-    my $wu2 = Parallel::WorkUnit->new( { use_anyevent => 1 } );
+    my $wu2 = Parallel::WorkUnit->new( use_anyevent => 1 );
     $wu2->async( sub { sleep .1; }, sub { return; } );
     $wu2->waitall();
     like(

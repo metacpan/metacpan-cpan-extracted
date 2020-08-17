@@ -3,7 +3,7 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::GenericExtractor';
 
-use Importer 'NewsExtractor::TextUtil' => qw( normalize_whitespace parse_dateline_ymdhms );
+use Importer 'NewsExtractor::TextUtil' => qw( normalize_whitespace reformat_dateline );
 
 sub headline {
     my ($self) = @_;
@@ -22,7 +22,7 @@ sub dateline {
 
     # opinion.udn.com
     if ($el = $self->dom->at('.story_bady_info > time[datetime]')) {
-        return parse_dateline_ymdhms($el->all_text, '+08:00');
+        return reformat_dateline($el->all_text, '+08:00');
     }
 }
 

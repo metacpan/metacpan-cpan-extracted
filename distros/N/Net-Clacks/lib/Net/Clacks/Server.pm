@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 14;
+our $VERSION = 15;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -135,6 +135,12 @@ sub init {
         $self->{persistance} = 1;
     } else {
         $self->{persistance} = 0;
+    }
+
+    if(!defined($self->{config}->{persistanceinterval})) {
+        $self->{persistanceinterval} = 10;
+    } else {
+        $self->{persistanceinterval} = $self->{config}->{persistanceinterval};
     }
 
     if(!defined($self->{config}->{interclacksreconnecttimeout})) {
@@ -1036,7 +1042,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             }
         }
 
-        if($savecache && time > ($lastsavecache + 10)) { # only every 10 seconds
+        if($savecache && time > ($lastsavecache + $self->{persistanceinterval})) {
             $savecache = 0;
             $lastsavecache = time;
             if($self->{persistance}) {

@@ -1,7 +1,7 @@
 package App::DataPackUtils;
 
-our $DATE = '2017-03-21'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2020-04-30'; # DATE
+our $VERSION = '0.06'; # VERSION
 
 use 5.010001;
 
@@ -20,7 +20,7 @@ App::DataPackUtils - Collection of CLI utilities related to Module::DataPack
 
 =head1 VERSION
 
-This document describes version 0.05 of App::DataPackUtils (from Perl distribution App-DataPackUtils), released on 2017-03-21.
+This document describes version 0.06 of App::DataPackUtils (from Perl distribution App-DataPackUtils), released on 2020-04-30.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

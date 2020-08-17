@@ -1,2 +1,3 @@
 name = "Class-Measure"
 authority="cpan:BLUEFEET"
+markdown_maker = "Pod::Markdown::Github"

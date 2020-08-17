@@ -233,7 +233,7 @@ void *dlopen( const char *file, int mode )
         hModule = GetModuleHandle( NULL );
 
         if( !hModule )
-            save_err_ptr_str( file );
+            save_err_str( "(null)" );
     }
     else
     {
@@ -432,7 +432,10 @@ void *dlsym( void *handle, const char *name )
                             continue;
                         symbol = GetProcAddress( modules[i], name );
                         if( symbol != NULL )
+                        {
+                            free( modules );
                             goto end;
+                        }
                     }
 
                 }

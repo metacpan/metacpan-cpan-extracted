@@ -1,7 +1,7 @@
 package standard;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Enforce Standard Perl syntax with Guacamole
-$standard::VERSION = '0.006';
+$standard::VERSION = '0.007';
 use strict;
 use warnings;
 use experimental qw< signatures >;
@@ -70,7 +70,7 @@ standard - Enforce Standard Perl syntax with Guacamole
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -176,6 +176,9 @@ The following bareword filehandles are supported:
     if ( -f $foo && -r _ )    {...} # not ok
     if ( -f $foo && -r $foo ) {...} $ ok
 
+C<_> is an ambiguous bareword identifier. For example, using it in
+C<print> is parsed different than when used with C<-r>.
+
 =item * C<given> / C<when> / C<default>
 
 Not supported.
@@ -185,7 +188,7 @@ Not supported.
 =head2 Things we changed
 
 The following are limitations that Standard Perl has which the perl
-interepreter doesn't.
+interpreter doesn't.
 
 =head3 Q-Like values delimiters
 
@@ -238,6 +241,14 @@ C<()>, C<[]>, C<{}>, C<< E<lt> E<gt> >>, C<//>, C<!!>, and C<||>.
 
     foo $bar   # not ok
     foo($bar)  # ok
+
+There is an exception for methods:
+
+    $foo->bar()         # ok
+    $foo->bar           # also ok
+
+    $foo->bar()->baz()  # ok
+    $foo->bar->baz      # also ok
 
 =item * Subroutines can have attributes and signatures
 
@@ -304,10 +315,21 @@ This might be changed.
 
 =over 4
 
-=item * map that attempts to return a pair must use parenthesis
+=item * C<map> that attempts to return a pair must use parenthesis
 
     map {   $_ => 1   }, @foo  # not ok
     map { ( $_ => 1 ) }, @foo  # ok
+
+=back
+
+=head3 Eval
+
+=over 4
+
+=item * C<eval> only supports a block, not an expression
+
+    eval { ... }   # ok
+    eval " ... "   # not ok
 
 =back
 

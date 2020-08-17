@@ -1,4 +1,4 @@
-                               DocKnot 3.04
+                               DocKnot 3.05
                     (package documentation generator)
                 Maintained by Russ Allbery <rra@cpan.org>
 
@@ -58,8 +58,8 @@ REQUIREMENTS
   * IO::Compress::Xz (part of IO-Compress-LZMA)
   * IPC::Run
   * IPC::System::Simple
-  * JSON
-  * List::MoreUtils
+  * JSON::MaybeXS
+  * List::SomeUtils
   * Perl6::Slurp
   * Template (part of Template Toolkit)
 
@@ -90,6 +90,7 @@ TESTING
   suite if present:
 
   * Devel::Cover
+  * Perl::Critic::Freenode
   * Test::MinimumVersion
   * Test::Perl::Critic
   * Test::Pod

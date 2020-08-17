@@ -1,5 +1,10 @@
 Revision history for Open-This
 
+0.000024  2020-08-14 15:36:10Z
+    - Deal more gracefully with GitHub line number ranges (GH#37) (Olaf Alders)
+    - Remove redundant variable (GH#35) (Novgorodcev Cyrill)
+    - Fix contributor name (GH#34) (Boris Däppen)
+
 0.000023  2020-05-20 18:39:49Z
     - Parse file paths from "mvn test" output (GH#33) (Olaf Alders)
 
@@ -33,8 +38,8 @@ Revision history for Open-This
     - ot can now open binaries which are in the user's path (GH#13) (Olaf Alders)
 
 0.000015  2019-01-28 21:43:33Z
-    - Don't exec if $EDITOR is empty, die with message (GH#9) (Boris Dppen)
-    - Render the command name in description as a link (GH#7) (Boris Dppen)
+    - Don't exec if $EDITOR is empty, die with message (GH#9) (Boris Däppen)
+    - Render the command name in description as a link (GH#7) (Boris Däppen)
 
 0.000014  2018-12-18 21:57:14Z
     - Fix parsing of GitHub links (GH#6) (Olaf Alders)

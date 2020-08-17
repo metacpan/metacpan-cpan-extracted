@@ -98,6 +98,7 @@ typedef enum bootstrap_grammar_G1_enum {
   G1_TERMINAL___ROW,
   G1_TERMINAL___TABLE,
   G1_TERMINAL_IF_ACTION,
+  G1_TERMINAL_REGEX_ACTION,
   G1_TERMINAL___AST,
   G1_TERMINAL_EVENT_ACTION,
   G1_TERMINAL_DEFAULT_ENCODING,
@@ -182,6 +183,8 @@ typedef enum bootstrap_grammar_G1_enum {
   G1_META_LUASCRIPT_SOURCE,
   G1_META_IF_ACTION,
   G1_META_IFACTION_NAME,
+  G1_META_REGEX_ACTION,
+  G1_META_REGEXACTION_NAME,
   G1_META_EVENT_ACTION,
   G1_META_EVENTACTION_NAME,
   G1_META_DEFAULT_ENCODING,
@@ -288,6 +291,8 @@ bootstrap_grammar_meta_t bootstrap_grammar_G1_metas[] = {
   { G1_META_LUASCRIPT_SOURCE,                 "lua script source",                         0,       0,           0,            0 },
   { G1_META_IF_ACTION,                        "if action",                                 0,       0,           0,            0 },
   { G1_META_IFACTION_NAME,                    "if action name",                            0,       0,           0,            0 },
+  { G1_META_REGEX_ACTION,                     "regex action",                              0,       0,           0,            0 },
+  { G1_META_REGEXACTION_NAME,                 "regex action name",                         0,       0,           0,            0 },
   { G1_META_EVENT_ACTION,                     "event action",                              0,       0,           0,            0 },
   { G1_META_EVENTACTION_NAME,                 "event action name",                         0,       0,           0,            0 },
   { G1_META_DEFAULT_ENCODING,                 "default encoding",                          0,       0,           0,            0 },
@@ -1018,6 +1023,14 @@ bootstrap_grammar_terminal_t bootstrap_grammar_G1_terminals[] = {
     NULL, NULL
 #endif
   },
+  { G1_TERMINAL_REGEX_ACTION, MARPAESLIF_TERMINAL_TYPE_STRING, NULL,
+    "'regex-action'",
+#ifndef MARPAESLIF_NTRACE
+    "regex-action", "regex"
+#else
+    NULL, NULL
+#endif
+  },
   { G1_TERMINAL___AST, MARPAESLIF_TERMINAL_TYPE_STRING, NULL,
     "'::ast'",
 #ifndef MARPAESLIF_NTRACE
@@ -1226,6 +1239,7 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
   { G1_META_ADVERB_ITEM,                      G1_RULE_ADVERB_ITEM_19,                         MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_EVENT_ACTION                         }, -1,                        -1,      -1,              0, G1_ACTION_ADVERB_ITEM_19 },
   { G1_META_ADVERB_ITEM,                      G1_RULE_ADVERB_ITEM_20,                         MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_DEFAULT_ENCODING                     }, -1,                        -1,      -1,              0, G1_ACTION_ADVERB_ITEM_20 },
   { G1_META_ADVERB_ITEM,                      G1_RULE_ADVERB_ITEM_21,                         MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_FALLBACK_ENCODING                    }, -1,                        -1,      -1,              0, G1_ACTION_ADVERB_ITEM_21 },
+  { G1_META_ADVERB_ITEM,                      G1_RULE_ADVERB_ITEM_22,                         MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_REGEX_ACTION                         }, -1,                        -1,      -1,              0, G1_ACTION_ADVERB_ITEM_22 },
   { G1_META_ACTION,                           G1_RULE_ACTION_1,                               MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_ACTION,
                                                                                                                                      G1_TERMINAL_THEN,
                                                                                                                                      G1_META_ACTION_NAME                          }, -1,                        -1,      -1,              0, G1_ACTION_ACTION_1 },
@@ -1321,6 +1335,9 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
   { G1_META_IF_ACTION,                        G1_RULE_IF_ACTION,                              MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_IF_ACTION,
                                                                                                                                      G1_TERMINAL_THEN,
                                                                                                                                      G1_META_IFACTION_NAME                        }, -1,                        -1,      -1,              0, G1_ACTION_IFACTION },
+  { G1_META_REGEX_ACTION,                     G1_RULE_REGEX_ACTION,                           MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_REGEX_ACTION,
+                                                                                                                                     G1_TERMINAL_THEN,
+                                                                                                                                     G1_META_REGEXACTION_NAME                     }, -1,                        -1,      -1,              0, G1_ACTION_REGEXACTION },
   { G1_META_ALTERNATIVE_NAME,                 G1_RULE_ALTERNATIVE_NAME_1,                     MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_STANDARD_NAME                        }, -1,                        -1,      -1,              0, G1_ACTION_ALTERNATIVE_NAME_1 },
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions
@@ -1339,39 +1356,36 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions
   */
-  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_1,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_SINGLE_SYMBOL                        }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_1 },
-  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_2,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_META_SYMBOL_NAME,
-                                                                                                                                     G1_TERMINAL_AT_SIGN,
-                                                                                                                                     G1_META_GRAMMAR_REFERENCE                    }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_2 },
-  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_3,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_HIDE_LEFT,
+  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_1,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_RHS_PRIMARY                          }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_1 },
+  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_2,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_HIDE_LEFT,
                                                                                                                                      G1_META_PRIORITIES,
-                                                                                                                                     G1_TERMINAL_HIDE_RIGHT                       }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_3 },
-  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_4,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_LPAREN,
+                                                                                                                                     G1_TERMINAL_HIDE_RIGHT                       }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_2 },
+  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_3,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_TERMINAL_LPAREN,
                                                                                                                                      G1_META_PRIORITIES,
-                                                                                                                                     G1_TERMINAL_RPAREN                           }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_4 },
+                                                                                                                                     G1_TERMINAL_RPAREN                           }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_3 },
 
-  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_5,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 6, { G1_TERMINAL_HIDE_LEFT,
+  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_4,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 6, { G1_TERMINAL_HIDE_LEFT,
                                                                                                                                      G1_META_RHS_PRIMARY,
                                                                                                                                      G1_TERMINAL_MINUS,
                                                                                                                                      G1_META_RHS_PRIMARY,
                                                                                                                                      G1_META_ADVERB_LIST,
-                                                                                                                                     G1_TERMINAL_HIDE_RIGHT                       }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_5 },
-  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_6,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 6, { G1_TERMINAL_LPAREN,
+                                                                                                                                     G1_TERMINAL_HIDE_RIGHT                       }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_4 },
+  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_5,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 6, { G1_TERMINAL_LPAREN,
                                                                                                                                      G1_META_RHS_PRIMARY,
                                                                                                                                      G1_TERMINAL_MINUS,
                                                                                                                                      G1_META_RHS_PRIMARY,
                                                                                                                                      G1_META_ADVERB_LIST,
-                                                                                                                                     G1_TERMINAL_RPAREN                           }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_6 },
-  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_7,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 5, { G1_TERMINAL_HIDE_LEFT,
+                                                                                                                                     G1_TERMINAL_RPAREN                           }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_5 },
+  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_6,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 5, { G1_TERMINAL_HIDE_LEFT,
                                                                                                                                      G1_META_RHS_PRIMARY,
                                                                                                                                      G1_META_QUANTIFIER,
                                                                                                                                      G1_META_ADVERB_LIST,
-                                                                                                                                     G1_TERMINAL_HIDE_RIGHT                       }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_7 },
-  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_8,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 5, { G1_TERMINAL_LPAREN,
+                                                                                                                                     G1_TERMINAL_HIDE_RIGHT                       }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_6 },
+  { G1_META_RHS_ALTERNATIVE,                  G1_RULE_RHS_ALTERNATIVE_7,                      MARPAESLIF_RULE_TYPE_ALTERNATIVE, 5, { G1_TERMINAL_LPAREN,
                                                                                                                                      G1_META_RHS_PRIMARY,
                                                                                                                                      G1_META_QUANTIFIER,
                                                                                                                                      G1_META_ADVERB_LIST,
-                                                                                                                                     G1_TERMINAL_RPAREN                           }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_8 },
+                                                                                                                                     G1_TERMINAL_RPAREN                           }, -1,                        -1,      -1,              0, G1_ACTION_RHS_ALTERNATIVE_7 },
   { G1_META_RHS_PRIMARY,                      G1_RULE_RHS_PRIMARY_1,                          MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_SINGLE_SYMBOL                        }, -1,                        -1,      -1,              0, G1_ACTION_RHS_PRIMARY_1 },
   { G1_META_RHS_PRIMARY,                      G1_RULE_RHS_PRIMARY_2,                          MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { G1_META_SYMBOL_NAME,
                                                                                                                                      G1_TERMINAL_AT_SIGN,
@@ -1418,6 +1432,8 @@ bootstrap_grammar_rule_t bootstrap_grammar_G1_rules[] = {
   { G1_META_SYMBOLACTION_NAME,                G1_RULE_SYMBOLACTION_NAME_10,                   MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_TERMINAL___JSONF                          }, -1,                        -1,      -1,              0, G1_ACTION_SYMBOLACTION_NAME_10 },
   { G1_META_IFACTION_NAME,                    G1_RULE_IFACTION_NAME_1,                        MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_RESTRICTED_ASCII_GRAPH_NAME          }, -1,                        -1,      -1,              0, G1_ACTION_IFACTION_NAME_1 },
   { G1_META_IFACTION_NAME,                    G1_RULE_IFACTION_NAME_2,                        MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_LUA_ACTION_NAME                      }, -1,                        -1,      -1,              0, G1_ACTION_IFACTION_NAME_2 },
+  { G1_META_REGEXACTION_NAME,                 G1_RULE_REGEXACTION_NAME_1,                     MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_RESTRICTED_ASCII_GRAPH_NAME          }, -1,                        -1,      -1,              0, G1_ACTION_REGEXACTION_NAME_1 },
+  { G1_META_REGEXACTION_NAME,                 G1_RULE_REGEXACTION_NAME_2,                     MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { G1_META_LUA_ACTION_NAME                      }, -1,                        -1,      -1,              0, G1_ACTION_REGEXACTION_NAME_2 },
   /*
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb  actions
   */

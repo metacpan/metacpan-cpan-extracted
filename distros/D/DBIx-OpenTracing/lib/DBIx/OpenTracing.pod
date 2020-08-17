@@ -59,6 +59,28 @@ L<OpenTracing conventions|https://opentracing.io/specification/conventions/>:
 
 =back
 
+=head1 IMPORT ARGUMENTS
+
+It's possible to pick a default tag selection with an import argument.
+The following are supported:
+
+=over 4
+
+=item -none
+
+no tags by default, can be shown with L<show_tags>
+
+=item -safe
+
+no tags which could contain sensitive data (SQL statement, bind values, username and db),
+can be shown with L<show_tags>
+
+=item -secure
+
+hide the same tags as L<-safe> but it's not possible to show them in any way
+
+=back
+
 =head1 METHODS
 
 =head2 disable
@@ -86,6 +108,30 @@ the end of current scope. However, until that scope is over,
 calls to L<enable> and L<enable_temprarily> will be ignored.
 Use this if you want to make sure absolutely nothing is traced within
 the scope, regardless of what any called functions are doing.
+
+=head2 hide_tags
+
+Will cause all the specified tags to be skipped when creating spans.
+This can be used to hide sensitive SQL statements.
+See L<DBIx::OpenTracing::Constants> for tag names.
+
+=head2 show_tags
+
+Will cause previously hidden tags to start appearing again.
+
+=head2 hide_tags_temporarily
+
+Same as L<hide_tags> but only works until the end of current scope.
+
+=head2 show_tags_temporarily
+
+Same as L<show_tags> but only works until the end of current scope.
+
+=head2 disable_tags
+
+Similarly to L<suspend>, will hide all specified tags until the end of
+current scope and not allow them to be shown by calls to L<show_tags>
+or L<show_tags_temporarily> until then.
 
 =head1 AUTHOR
  

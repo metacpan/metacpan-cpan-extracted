@@ -19,7 +19,7 @@ package MongoDB::QueryResult::Filtered;
 # ABSTRACT: An iterator for Mongo query results with client-side filtering
 
 use version;
-our $VERSION = 'v2.2.1';
+our $VERSION = 'v2.2.2';
 
 use Moo;
 use Types::Standard qw(
@@ -83,7 +83,7 @@ MongoDB::QueryResult::Filtered - An iterator for Mongo query results with client
 
 =head1 VERSION
 
-version v2.2.1
+version v2.2.2
 
 =for Pod::Coverage has_next
 
@@ -115,7 +115,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MongoDB, Inc.
+This software is Copyright (c) 2020 by MongoDB, Inc.
 
 This is free software, licensed under:
 

@@ -1,5 +1,5 @@
 package Docker::CLI::Wrapper::Base;
-$Docker::CLI::Wrapper::Base::VERSION = '0.0.5';
+$Docker::CLI::Wrapper::Base::VERSION = '0.0.6';
 use strict;
 use warnings;
 use 5.014;
@@ -70,7 +70,7 @@ Docker::CLI::Wrapper::Base - base class.
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head1 METHODS
 

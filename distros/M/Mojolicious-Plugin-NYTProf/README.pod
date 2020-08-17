@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.22
+0.23
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,17 @@ Or
     $self->plugin(NYTProf => $mojo_config);
   }
 
-Then run your app. Profiles generated can be seen by visting /nytprof and reports
+Then run your app - you should start your app with the env variables:
+
+  PERL5OPT='-d:NYTProf'
+  NYTPROF=start=no
+
+without this, things go a bit haywire (most obviously manifested as broken links
+in the report) because otherwise any code compiled before the C<plugin> call
+cannot be covered, as described in the docs:
+L<https://metacpan.org/pod/Devel::NYTProf#RUN-TIME-CONTROL-OF-PROFILING>
+
+Profiles generated can be seen by visting /nytprof and reports
 will be generated on the fly when you click on a specific profile.
 
 =cut
@@ -59,7 +69,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 METHODS
 

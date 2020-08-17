@@ -1,10 +1,10 @@
 NAME
-    HTTP::Tiny::Plugin::CustomRetry - Retry failed request
+    HTTP::Tiny::Plugin::CustomRetry - (DEPRECATED) Retry failed request
 
 VERSION
-    This document describes version 0.001 of HTTP::Tiny::Plugin::CustomRetry
+    This document describes version 0.003 of HTTP::Tiny::Plugin::CustomRetry
     (from Perl distribution HTTP-Tiny-Plugin-CustomRetry), released on
-    2019-04-14.
+    2020-08-15.
 
 SYNOPSIS
      use HTTP::Tiny::Plugin 'CustomRetry' => {
@@ -16,6 +16,9 @@ SYNOPSIS
      my $res  = HTTP::Tiny::Plugin->new->get("http://www.example.com/");
 
 DESCRIPTION
+    DEPRECATION NOTICE: This plugin is now deprecated, in favor of
+    HTTP::Tiny::Plugin::Retry which now supports Algorithm::Backoff too.
+
     This plugin retries failed response using one of available backoff
     strategy in "Algorithm::Backoff::*" (e.g.
     Algorithm::Backoff::Exponential).
@@ -55,11 +58,13 @@ BUGS
 SEE ALSO
     HTTP::Tiny::Plugin
 
+    HTTP::Tiny::Plugin::Retry.
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

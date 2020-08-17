@@ -1,7 +1,7 @@
 package Guacamole;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: A parser toolkit for Standard Perl
-$Guacamole::VERSION = '0.006';
+$Guacamole::VERSION = '0.007';
 use strict;
 use warnings;
 use Marpa::R2;
@@ -2139,7 +2139,7 @@ Guacamole - A parser toolkit for Standard Perl
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

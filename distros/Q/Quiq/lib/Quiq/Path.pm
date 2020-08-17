@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.185';
+our $VERSION = '1.186';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -2874,6 +2874,117 @@ sub rename {
 
 # -----------------------------------------------------------------------------
 
+=head3 numberBasePaths() - Nummeriere die Basisnamen der Pfade
+
+=head4 Synopsis
+
+  $this->numberBasePaths(\@paths,$width,$step,@opts);
+
+=head4 Arguments
+
+=over 4
+
+=item @path
+
+Die Menge der Pfade.
+
+=item $width
+
+Die Breite (Anzahl der Stellen) der Nummer.
+
+=item $step
+
+Die Schrittweite der Nummerierung.
+
+=back
+
+=head4 Description
+
+Sortiere die Basisnamen der Pfade B<@paths> lexikalisch und
+nummeriere ihre Basisnamen durch, beginnend mit Nummer B<$step> und
+Schrittweite B<$step>. Pfade mit dem gleichen Basisnamen aber
+unterschiedlichen Extensions erhalten die gleiche Nummer, behalten
+aber ihre unterschiedliche Extension.
+
+=head4 Example
+
+  $ ls
+  a.jpg
+  a.xcf
+  x.jpg
+  
+  $ perl -MQuiq::Path -E 'Quiq::Path->numberBasePaths([$p->glob("*")],5,10)'
+  
+  $ ls
+  00010.jpg
+  00010.xcf
+  00020.jpg
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub numberBasePaths {
+    my ($this,$pathA,$width,$step) = @_;
+
+    my $verbose = 0;
+
+    # Baue Liste der Basisnamen auf
+
+    my %basePath;
+    for my $path (@$pathA) {
+        my ($dir,undef,$base,$ext) = $this->split($path);
+
+        if ($dir ne '') {
+            $base = "$dir/$base";
+        }
+        my $arr = $basePath{$base} //= [];
+        push @$arr,$ext;
+    }
+
+    my $n = $step;
+    my @newPaths;
+    for (sort keys %basePath) {
+        my $oldBasePath = $_;
+        my ($dir) = $this->split($oldBasePath);
+        
+        my $newBasePath;
+        if ($dir ne '') {
+            $newBasePath = "$dir/";
+        }
+        $newBasePath .= sprintf '%0*d',$width,$n;
+        if ($verbose) {
+            say "$oldBasePath => $newBasePath";
+        }
+        for my $ext (@{$basePath{$oldBasePath}}) {
+            my $oldPath = $oldBasePath;
+            my $newPath = $newBasePath;
+            if ($ext ne '') {
+                $oldPath .= ".$ext";
+                $newPath .= ".$ext.tmp";
+            }
+            if ($verbose) {
+                say "  $oldPath => $newPath";
+            }
+            $this->rename($oldPath,$newPath,-overwrite=>0);
+            push @newPaths,$newPath;
+        }
+
+        $n += $step;
+    }
+
+    # Entferne Endung .tmp
+
+    for my $tmpPath (@newPaths) {
+        (my $newPath = $tmpPath) =~ s/\.tmp$//;
+        $this->rename($tmpPath,$newPath,-overwrite=>0);
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 numberPaths() - Nummeriere Pfade
 
 =head4 Synopsis
@@ -3368,7 +3479,7 @@ sub uid {
 
 =head1 VERSION
 
-1.185
+1.186
 
 =head1 AUTHOR
 

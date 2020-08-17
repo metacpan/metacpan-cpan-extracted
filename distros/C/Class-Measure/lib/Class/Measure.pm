@@ -2,7 +2,7 @@ package Class::Measure;
 use 5.008001;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =encoding utf8
 
@@ -28,6 +28,7 @@ The methods described here are available in all Class::Measure classes.
 =cut
 
 use Carp qw( croak );
+use Scalar::Util qw(looks_like_number);
 
 use overload 
     '+'=>\&_ol_add, '-'=>\&_ol_sub, 
@@ -140,7 +141,7 @@ sub set_value {
 =head2 reg_units
 
     Class::Measure::Length->reg_units(
-        'inch', 'foot', 'yard'
+        'inch', 'foot', 'yard',
     );
 
 Registers one or more units for use in the specified
@@ -255,13 +256,14 @@ sub reg_convs {
     my $class = ref($self) || $self;
     while(@_){
         my($from,$to,$conv);
-        if( $_[0] =~ /^-?[0-9.]+$/s ){
+        # First check for coderef to avoid seeing units as number in that case:
+        if( ref($_[2]) eq 'CODE' ){
+            ($from,$to,$conv) = splice(@_,0,3);
+        }elsif( looks_like_number($_[0]) ){
             ($conv,$from,$to) = splice(@_,0,3);
             $conv = 1 / $conv;
-        }elsif( $_[1] =~ /^-?[0-9.]+$/s){
+        }elsif( looks_like_number($_[1]) ){
             ($from,$conv,$to) = splice(@_,0,3);
-        }elsif( ref($_[2]) eq 'CODE' ){
-            ($from,$to,$conv) = splice(@_,0,3);
         }else{
             croak('Invalid arguments');
         }
@@ -300,7 +302,7 @@ sub _conv {
     foreach $unit (@$path){
         my $conv = $units->{$prev_unit}->{$unit};
         if( ref($conv) ){
-            $value = \&{$conv}( $value, $prev_unit, $unit );
+            $value = &{$conv}( $value, $prev_unit, $unit );
         }else{
             $value = $value * $units->{$prev_unit}->{$unit};
         }
@@ -442,7 +444,8 @@ L<https://github.com/bluefeet/Class-Measure/issues>
 
 =head1 AUTHORS
 
-    Aran Clary Deltac <bluefeet@cpan.org>
+    Aran Clary Deltac <bluefeet@gmail.com>
+    Roland van Ipenburg <roland@rolandvanipenburg.com>
 
 =head1 LICENSE
 

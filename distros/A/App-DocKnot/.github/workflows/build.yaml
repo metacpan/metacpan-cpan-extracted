@@ -24,6 +24,7 @@ jobs:
       fail-fast: false
       matrix:
         perl-version:
+          - "5.32"
           - "5.30"
           - "5.28"
           - "5.26"
@@ -34,10 +35,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: perl -V
-        run: perl -V
-      - name: Install Dependencies
-        run: cpm install -g --show-build-log-on-failure
+      - uses: perl-actions/install-with-cpm@v1.3
+        with:
+          cpanfile: "cpanfile"
+          args: "--with-suggests"
+          sudo: false
       - name: Build.PL
         run: perl Build.PL
       - name: make test

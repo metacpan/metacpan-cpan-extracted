@@ -36,7 +36,10 @@ sub extract_data_list {
     else {
         $ex = $h_ref->{extractor_key} // 'no_ex_key';
         my $id = $h_ref->{id};
-        extract_data_single( $set, $opt, $data, $h_ref );
+        my $single_data = extract_data_single( $set, $opt, $h_ref );
+        for my $key ( keys %$single_data ) {
+            $data->{$ex}{$up}{$id}{$key} = $single_data->{$key};
+        }
         $data->{$ex}{$up}{$id}{title} ||= sprintf 'no_title_%s', $id;
         $data->{$ex}{$up}{$id}{video_order} = $set->{video_count}++;
         $ids = [ $id ];
@@ -46,10 +49,8 @@ sub extract_data_list {
 
 
 sub extract_data_single {
-    my ( $set, $opt, $data, $h_ref ) = @_;
-    my $ex = $h_ref->{extractor_key} // 'no_ex_key';
-    my $up = $h_ref->{uploader_id} // 'no_up_id';
-    my $id = $h_ref->{id};
+    my ( $set, $opt, $h_ref ) = @_;
+    my $single_data = {};
     my $fmt_to_info = {};
     my $c = 1;
     for my $format ( @{$h_ref->{formats}} ) {
@@ -64,54 +65,54 @@ sub extract_data_single {
     my @keys = qw(uploader uploader_url description format_id like_count dislike_count average_rating
                   raters duration extractor extractor_key title upload_date view_count webpage_url); # age_limit annotations categories
     for my $key ( @keys ) {
-        $data->{$ex}{$up}{$id}{$key} = $h_ref->{$key} if defined $h_ref->{$key};
+        $single_data->{$key} = $h_ref->{$key} if defined $h_ref->{$key};
     }
-    $data->{$ex}{$up}{$id}{fmt_to_info} = $fmt_to_info;
-    _prepare_data( $data, $ex, $up, $id );
-    $data->{$ex}{$up}{$id}{video_order} = $set->{video_count}++;
-    return;
+    $single_data->{fmt_to_info} = $fmt_to_info;
+    _prepare_data( $single_data );
+    $single_data->{video_order} = $set->{video_count}++;
+    return $single_data;
 }
 
 
 sub _prepare_data {
-    my ( $data, $ex, $up, $id ) = @_;
-    $data->{$ex}{$up}{$id}{url} = $data->{$ex}{$up}{$id}{webpage_url};
-    if ( $data->{$ex}{$up}{$id}{upload_date} ) {
-        if ( $data->{$ex}{$up}{$id}{upload_date} =~ /^(\d{4})(\d{2})(\d{2})\z/ ) {
-            $data->{$ex}{$up}{$id}{upload_date}     = $1 . '-' . $2 . '-' . $3;
-            $data->{$ex}{$up}{$id}{upload_datetime} = $1 . '-' . $2 . '-' . $3 . 'T00:00:00';
+    my ( $single_data ) = @_;
+    $single_data->{url} = $single_data->{webpage_url};
+    if ( $single_data->{upload_date} ) {
+        if ( $single_data->{upload_date} =~ /^(\d{4})(\d{2})(\d{2})\z/ ) {
+            $single_data->{upload_date}     = $1 . '-' . $2 . '-' . $3;
+            $single_data->{upload_datetime} = $1 . '-' . $2 . '-' . $3 . 'T00:00:00';
         }
-        if ( $data->{$ex}{$up}{$id}{upload_date} =~ /^(\d\d\d\d-\d\d-\d\d)T(\d\d:\d\d:\d\d)/ ) {
-            $data->{$ex}{$up}{$id}{upload_date} = $1;
-            $data->{$ex}{$up}{$id}{upload_datetime} = $1 . 'T' . $2;
+        if ( $single_data->{upload_date} =~ /^(\d\d\d\d-\d\d-\d\d)T(\d\d:\d\d:\d\d)/ ) {
+            $single_data->{upload_date} = $1;
+            $single_data->{upload_datetime} = $1 . 'T' . $2;
         }
     }
-    if ( ! $data->{$ex}{$up}{$id}{upload_date} && $data->{$ex}{$up}{$id}{upload_date_rel} ) {
-        $data->{$ex}{$up}{$id}{upload_date} = $data->{$ex}{$up}{$id}{upload_date_rel};
+    if ( ! $single_data->{upload_date} && $single_data->{upload_date_rel} ) {
+        $single_data->{upload_date} = $single_data->{upload_date_rel};
     }
-    $data->{$ex}{$up}{$id}{duration}        ||= '-:--:--';
-    $data->{$ex}{$up}{$id}{upload_date}     ||= '';
-    $data->{$ex}{$up}{$id}{upload_datetime} ||= '0000-00-00T00:00:00';
-    if ( $data->{$ex}{$up}{$id}{duration} =~ /^[0-9]+\z/ ) {
-        $data->{$ex}{$up}{$id}{duration} = sec_to_time( $data->{$ex}{$up}{$id}{duration}, 1 );
+    $single_data->{duration}        ||= '-:--:--';
+    $single_data->{upload_date}     ||= '';
+    $single_data->{upload_datetime} ||= '0000-00-00T00:00:00';
+    if ( $single_data->{duration} =~ /^[0-9]+\z/ ) {
+        $single_data->{duration} = sec_to_time( $single_data->{duration}, 1 );
     }
-    if ( $data->{$ex}{$up}{$id}{like_count} && $data->{$ex}{$up}{$id}{dislike_count} ) {
-        $data->{$ex}{$up}{$id}{raters}         ||= $data->{$ex}{$up}{$id}{like_count} + $data->{$ex}{$up}{$id}{dislike_count};
-        $data->{$ex}{$up}{$id}{average_rating}
-        ||= ( $data->{$ex}{$up}{$id}{like_count} * 5 + $data->{$ex}{$up}{$id}{dislike_count} ) / $data->{$ex}{$up}{$id}{raters}; #
+    if ( $single_data->{like_count} && $single_data->{dislike_count} ) {
+        $single_data->{raters}         ||= $single_data->{like_count} + $single_data->{dislike_count};
+        $single_data->{average_rating}
+        ||= ( $single_data->{like_count} * 5 + $single_data->{dislike_count} ) / $single_data->{raters}; #
     }
-    if ( $data->{$ex}{$up}{$id}{average_rating} ) {
-        $data->{$ex}{$up}{$id}{average_rating} = sprintf "%.2f", $data->{$ex}{$up}{$id}{average_rating};
+    if ( $single_data->{average_rating} ) {
+        $single_data->{average_rating} = sprintf "%.2f", $single_data->{average_rating};
     }
-    if ( $data->{$ex}{$up}{$id}{raters} ) {
-        $data->{$ex}{$up}{$id}{raters} = insert_sep( $data->{$ex}{$up}{$id}{raters} );
+    if ( $single_data->{raters} ) {
+        $single_data->{raters} = insert_sep( $single_data->{raters} );
     }
-    if ( $data->{$ex}{$up}{$id}{view_count} ) {
-        $data->{$ex}{$up}{$id}{view_count_raw} = $data->{$ex}{$up}{$id}{view_count};
-        $data->{$ex}{$up}{$id}{view_count} = insert_sep( $data->{$ex}{$up}{$id}{view_count} );
+    if ( $single_data->{view_count} ) {
+        $single_data->{view_count_raw} = $single_data->{view_count};
+        $single_data->{view_count} = insert_sep( $single_data->{view_count} );
     }
     else {
-        $data->{$ex}{$up}{$id}{view_count} = 0;
+        $single_data->{view_count} = 0;
     }
 }
 

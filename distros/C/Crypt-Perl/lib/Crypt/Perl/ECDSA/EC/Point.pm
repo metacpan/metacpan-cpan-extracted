@@ -3,6 +3,11 @@ package Crypt::Perl::ECDSA::EC::Point;
 use strict;
 use warnings;
 
+#----------------------------------------------------------------------
+# NOTE TO SELF: This module’s internal coordinates are
+# homogeneous/projective coordinates, not Cartesian.
+#----------------------------------------------------------------------
+
 use Crypt::Perl::BigInt ();
 
 my ($bi1, $bi2, $bi3);
@@ -31,7 +36,13 @@ sub new {
         curve => $curve,
         x => $x,
         y => $y,
+
+        # Generally z won’t be given since we expect
+        # Cartesian coordinates as input. But accepting
+        # z allows this constructor to receive Jacobi
+        # coordinates as well.
         z => $z || $bi1->copy(),
+
         zinv => undef,
     };
 
@@ -46,14 +57,14 @@ sub is_infinity {
     return( ($self->{'z'}->is_zero() && !$self->{'y'}->to_bigint()->is_zero()) || 0 );
 }
 
-#returns ECFieldElement
+#returns ECFieldElement (Cartesian)
 sub get_x {
     my ($self) = @_;
 
     return $self->_get_x_or_y('x');
 }
 
-#returns ECFieldElement
+#returns ECFieldElement (Cartesian)
 #Used in key generation (not signing … ?)
 sub get_y {
     my ($self) = @_;
@@ -82,7 +93,6 @@ sub negate {
     return (ref $self)->new(@args);
 }
 
-#Did the quadratic formula explode???
 sub twice {
     my ($self) = @_;
 
@@ -157,51 +167,52 @@ sub twice {
 sub dump {
     my ($self, $label) = @_;
 
+    $label = q<> if !defined $label;
+
     printf "$label.x: %s\n", $self->{'x'}->to_bigint()->as_hex();
     printf "$label.y: %s\n", $self->{'y'}->to_bigint()->as_hex();
     printf "$label.z: %s\n", $self->{'z'}->as_hex();
 }
 
-#yowza ...
 sub multiply {
     my ($self, $k) = @_;
-#print "in mult\n";
-#$self->dump('self');
 
     if ($self->is_infinity()) {
         return $self;
     }
 
-    #TODO
-    #if ($k->signum() == 0) {
-    #    return $self->{'curve'}->getInfinity();     #should this happen?
-    #}
+    # “Montgomery ladder” algorithm taken from Wikipedia:
+    #
+    # R0 ← 0
+    # R1 ← P
+    # for i from m downto 0 do
+    #     if di = 0 then
+    #         R1 ← point_add(R0, R1)
+    #         R0 ← point_double(R0)
+    #     else
+    #         R0 ← point_add(R0, R1)
+    #         R1 ← point_double(R1)
+    # return R0
+    #
+    # This thwarts the timing attacks that can recover private keys
+    # by running the standard “double-and-add” algorithm over and over
+    # and analyzing response times.
 
-#print "here2\n";
-    my $e = $k;
-    my $h = $e->copy()->bmul($bi3);
-#print "h: " . $h->as_hex() . $/;
+    my $r0 = ref($self)->new_infinity();
+    my $r1 = $self;
 
-    my $neg = $self->negate();
-#$neg->dump('neg');
-    my $R = $self;
-
-#print "start loop: " . (_MBI_bit_length($h) - 2) . $/;
-    for my $i ( reverse( 1 .. ($h->bit_length() - 2) ) ) {
-        $R = $R->twice();
-#$R->dump("R, loop $i");
-
-        my $hbit = $h->test_bit($i);
-        my $ebit = $e->test_bit($i);
-#print "hbit [$hbit], ebit [$ebit]\n";
-
-        if ($hbit != $ebit) {
-            $R = $R->add( $hbit ? $self : $neg );
+    for my $i ( reverse( 0 .. ($k->bit_length() - 1) ) ) {
+        if ($k->test_bit($i)) {
+            $r0 = $r0->add($r1);
+            $r1 = $r1->twice();
         }
-#$R->dump("R, end of loop");
+        else {
+            $r1 = $r0->add($r1);
+            $r0 = $r0->twice();
+        }
     }
 
-    return $R;
+    return $r0;
 }
 
 #$b isa ECPoint
@@ -283,7 +294,7 @@ sub add {
     #var y3 = x1v2.multiply(THREE).multiply(u).subtract(y1.multiply(v3)).subtract(zu2.multiply(u)).multiply(b.z).add(u.multiply(v3)).mod(this.curve.q);
     #my $y3 = $z2 * (3 * $x1 * $u * $v2 - $y1 * $v3 - $z1 * ($u ** 3)) + $u * $v3;
     my $y3 = $u->copy()->bmul($bi3)->bmul($x1);
-    $y3->bmuladd($v2, $y1->bmul($v3)->bneg());      #no more y1 after this
+    $y3->bmuladd($v2, $y1->copy()->bmul($v3)->bneg());      #no more y1 after this
     $y3->bsub( $u->copy()->bpow($bi3)->bmul($z1) );
 
     $y3->bmuladd( $z2, $u->bmul($v3) );             #we don’t need $u anymore

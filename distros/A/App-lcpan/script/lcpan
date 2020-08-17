@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-06-11'; # DATE
-our $VERSION = '1.061'; # VERSION
+our $DATE = '2020-08-13'; # DATE
+our $VERSION = '1.062'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.061 of lcpan (from Perl distribution App-lcpan), released on 2020-06-11.
+This document describes version 1.062 of lcpan (from Perl distribution App-lcpan), released on 2020-08-13.
 
 =head1 SYNOPSIS
 
@@ -1048,10 +1048,6 @@ Shortcut for --log-level=info.
 
 Display program's version and exit.
 
-=item B<--view-result>
-
-View output using a viewer.
-
 =back
 
 =head2 Options for subcommand author
@@ -1197,7 +1193,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -1245,11 +1241,11 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
-=item B<--author-arg>=I<s>*
-
 =item B<--author-isnt>=I<s@>
 
 Can be specified multiple times.
+
+=item B<--author>=I<s>*
 
 =item B<--author>=I<s@>
 
@@ -1293,7 +1289,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -1762,7 +1758,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -1848,7 +1844,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--phase>=I<s>
 
@@ -3056,7 +3052,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -3270,7 +3266,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.30.2"
+ "v5.30.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -4305,6 +4301,14 @@ Skip updating the index.
 
 Select CPAN mirror to download from.
 
+=item B<--retry-delay>=I<s>
+
+Number of seconds to delay between retry attempt.
+
+=item B<--retry-max-attempts>=I<s>
+
+Number of retry attempts on failed HTTP request.
+
 =item B<--skip-file-indexing-pass-1>
 
 =item B<--skip-file-indexing-pass-2>
@@ -4567,7 +4571,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
 
- author (see --author-arg)
+ author (see --author)
  authors (see --author)
  authors_arent (see --author-isnt)
  include_core (see --exclude-core)
@@ -5252,6 +5256,8 @@ List of available configuration parameters:
  include_author (see --include-author)
  max_file_size (see --max-file-size)
  remote_url (see --remote-url)
+ retry_delay (see --retry-delay)
+ retry_max_attempts (see --retry-max-attempts)
  skip_file_indexing_pass_1 (see --skip-file-indexing-pass-1)
  skip_file_indexing_pass_2 (see --skip-file-indexing-pass-2)
  skip_file_indexing_pass_3 (see --skip-file-indexing-pass-3)

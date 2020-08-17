@@ -1,5 +1,8 @@
 Revision history for Test2-Aggregate
 
+0.15    2020-08-10
+        Fix for test_warnings output showing only first line of STDERR.
+
 0.14    2020-07-21
         Fix for a CPAN tester.
         POD update.

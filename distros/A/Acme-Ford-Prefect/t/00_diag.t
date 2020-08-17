@@ -12,12 +12,10 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   Acme::Alien::DontPanic
   Alien::Base::Wrapper
-  DynaLoader
-  ExtUtils::Installed
   ExtUtils::MakeMaker
-  File::Find
   Test2::V0
   Test::Alien::Diag
+  XSLoader
 );
 
 
@@ -62,7 +60,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (sort @modules)
 {

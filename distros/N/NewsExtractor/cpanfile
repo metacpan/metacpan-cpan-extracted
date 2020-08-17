@@ -11,3 +11,4 @@ requires 'Try::Tiny';
 requires 'Type::Tiny';
 requires 'Types::URI';
 requires 'YAML';
+requires 'HTTP::Date';

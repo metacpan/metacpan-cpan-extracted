@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
 
+0.028     2020-08-12 09:08:25-04:00 America/New_York
+
+  [Changed]
+
+  - Passed a test name in the call to `pass()` in the generated test
+    file. This makes the output nicer when the test is run via
+    Test2::Harness. (Dave Rolsky)
+
+
 0.027     2017-05-07 22:59:43-04:00 America/New_York
 
   [Fixed]

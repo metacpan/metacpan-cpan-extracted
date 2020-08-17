@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use MIDI::Drummer::Tiny;
+
+my $d = MIDI::Drummer::Tiny->new(
+    file      => $0 . '.mid',
+    signature => '5/4',
+    bpm       => 100,
+    bars      => 8,
+);
+
+$d->count_in(1);
+
+$d->metronome54;
+
+$d->write;

@@ -17,7 +17,7 @@ use Test::EOL;
 my @files = (
     'lib/MIDI/Util.pm',
     't/00-compile.t',
-    't/01-methods.t'
+    't/01-functions.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

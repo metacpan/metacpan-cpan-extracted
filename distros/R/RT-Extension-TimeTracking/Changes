@@ -1,5 +1,8 @@
 Revision history for RT-Extension-TimeTracking
 
+0.21 2020-08-13
+ - Add "Time Search" page
+
 0.20 2020-07-24
  - Add RT 5 support and drop RT 4 support
 

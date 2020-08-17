@@ -1,5 +1,12 @@
 Revision history for Test-Fatal
 
+0.016     2020-08-08 22:00:14-04:00 America/New_York
+        - no changes since trial release of 0.015
+
+0.015     2018-03-10 17:06:11-05:00 America/New_York (TRIAL RELEASE)
+        - add default descriptions to tests
+        - work on ancient Test::Builder code
+
 0.014     2014-12-09 18:35:59-05:00 America/New_York
         - avoid assuming that t/todo.t is always called t/todo.t
 

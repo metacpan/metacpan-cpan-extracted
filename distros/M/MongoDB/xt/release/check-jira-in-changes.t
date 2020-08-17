@@ -10,13 +10,6 @@ use Test::More;
 plan skip_all => "Disabled" if $ENV{NO_JIRA_CHECK};
 
 my @commits = split /\n/, <<'EOC';
-c40e1e14 (sandbox/master, origin/master, origin/HEAD) PERL-1127 Support Pipelines in BulkWriteView
-3e1db167 PERL-1129 Apply TLS options from URI
-9be7a7e5 PERL-1118 - Improve URI stringify sanitization
-24f1f7c7 (shadowcat/staging) PERL-1121 - Fix BulkWriteResult inserted IDs
-e554b859 PERL-1126 - Reset str to bool for URI options during SRV re-parsing
-16b2782f PERL-1125 Use Num for expire time instead of Int
-b17b7825 PERL-1081: Require retryable writes tests to run on mongos 4.2+
 
 EOC
 

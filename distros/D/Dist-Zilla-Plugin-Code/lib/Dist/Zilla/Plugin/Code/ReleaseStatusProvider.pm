@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 use Moose;
 use namespace::autoclean;
@@ -13,19 +13,17 @@ with 'Dist::Zilla::Role::ReleaseStatusProvider';
 
 use MooseX::Types::Moose qw(CodeRef);
 
-has _provide_release_status_code_ref => (
+has provide_release_status => (
     is       => 'ro',
     isa      => 'CodeRef',
-    init_arg => 'provide_release_status',
+    reader   => '_provide_release_status',
     required => 1,
 );
 
 sub provide_release_status {
     my $self = shift;
 
-    my $code_ref = $self->_provide_release_status_code_ref;
-    return if !defined $code_ref;
-
+    my $code_ref = $self->_provide_release_status;
     return $self->$code_ref(@_);
 }
 
@@ -45,7 +43,7 @@ Dist::Zilla::Plugin::Code::ReleaseStatusProvider - something that provides a rel
 
 =head1 VERSION
 
-Version 0.001
+Version 0.003
 
 =head1 SYNOPSIS
 
@@ -55,7 +53,6 @@ Version 0.001
 
     use Moose;
     with 'Dist::Zilla::Role::PluginBundle';
-    use Dist::Zilla::Plugin::Code::ReleaseStatusProvider;
 
     sub bundle_config {
         my ( $class, $section ) = @_;
@@ -63,7 +60,7 @@ Version 0.001
         my @plugins;
         push @plugins, [
             'SomeUniqueName',
-            'Dist::Zilla::Plugin::Code::BeforeBuild',
+            'Dist::Zilla::Plugin::Code::ReleaseStatusProvider',
             {
                 provide_release_status => [
                     sub {
@@ -83,13 +80,12 @@ Version 0.001
 
     use Moose;
     with 'Dist::Zilla::Role::PluginBundle::Easy';
-    use Dist::Zilla::Plugin::Code::ReleaseStatusProvider;
 
     sub configure {
         my ( $self ) = @_;
 
         $self->add_plugins([
-            'Code::BeforeBuild',
+            'Code::ReleaseStatusProvider',
             {
                 provide_release_status => [
                     sub {

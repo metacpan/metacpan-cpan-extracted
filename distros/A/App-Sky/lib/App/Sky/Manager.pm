@@ -1,5 +1,5 @@
 package App::Sky::Manager;
-$App::Sky::Manager::VERSION = '0.4.1';
+$App::Sky::Manager::VERSION = '0.4.2';
 use strict;
 use warnings;
 
@@ -163,19 +163,11 @@ __END__
 
 =head1 NAME
 
-App::Sky::Manager
-
-=head1 VERSION
-
-version 0.4.1
-
-=head1 NAME
-
 App::Sky::Manager - manager for the configuration.
 
 =head1 VERSION
 
-version 0.4.1
+version 0.4.2
 
 =head1 METHODS
 
@@ -254,7 +246,7 @@ The upload command to execute (as an array reference of strings).
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -275,35 +267,11 @@ L<https://metacpan.org/release/App-Sky>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-Sky>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Sky>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Sky>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-Sky>
 
 =item *
 

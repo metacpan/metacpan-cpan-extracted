@@ -1,3 +1,34 @@
+1.186 2020-08-10
+================
+
+[Quiq::Database::Connection]
+* newFromSbit() - um Optionen erweitert
+
+[Quiq::Epoch]
+* Doku bearbeitet
+
+[Quiq::FileHandle]
+* Fehlermeldung erweitert
+
+[Quiq::JavaScript]
+* Basisklasse eingeführt
+* code() - Methode hinzugefügt
+
+[Quiq::Path]
+* numberBasePaths() - Methode hinzugefügt
+
+[Quiq::PlotlyJs]
+* Doku erweitert
+
+[Quiq::PlotlyJs::XY::DiagramGroup]
+* erweitert
+
+[Quiq::PlotlyJs::XY::Parameter]
+* erweitert
+
+[Quiq::Template]
+* combine() - Tilde-Expansion hinzugefügt
+
 1.185 2020-07-14
 ================
 

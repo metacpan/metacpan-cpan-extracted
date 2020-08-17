@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2019 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2019, 2020 Kevin Ryde
 
 # This file is part of Tie-TZ.
 #
@@ -25,7 +25,7 @@ use vars qw($VERSION);
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-$VERSION = 10;
+$VERSION = 11;
 
 sub new {
   my ($class, %self) = @_;
@@ -214,7 +214,7 @@ The time check works for the GNU C Library where a bad timezone comes out as
 GMT, but might not be enough elsewhere.  Place names the same as GMT are no
 good of course, and if the system makes a bogus zone come out as say the
 default local time then they won't be detected (unless that local time
-happens to be GMT too).  If wrong the suggestion for now is not to use
+happens to be GMT too).  If wrong, the suggestion for now is not to use
 C<choose> but put in a setting unconditionally,
 
     my $acc = Time::TZ->new (tz => 'SomeWhere');
@@ -279,7 +279,7 @@ http://user42.tuxfamily.org/tie-tz/index.html
 
 =head1 COPYRIGHT
 
-Copyright 2007, 2008, 2009, 2010, 2011, 2019 Kevin Ryde
+Copyright 2007, 2008, 2009, 2010, 2011, 2019, 2020 Kevin Ryde
 
 Tie-TZ is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

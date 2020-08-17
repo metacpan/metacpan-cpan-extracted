@@ -13,14 +13,14 @@ use lib qw{ inc };
 use My::Module::Test;
 
 my $skip;
-$skip = site_check 'mike.mccants'
+$skip = site_check( 'mike.mccants' )
     and plan skip_all => $skip;
 
 my $st = Astro::SpaceTrack->new();
 
 SKIP: {
-    is_success_or_skip $st, qw{ mccants classified },
-	'Get classified elements', 2;
+    is_success_or_skip( $st, qw{ mccants classified },
+	'Get classified elements', 2 );
 
     is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -28,8 +28,8 @@ SKIP: {
 }
 
 SKIP: {
-    is_success_or_skip $st, qw{ mccants integrated },
-	'Get integrated elements', 2;
+    is_success_or_skip( $st, qw{ mccants integrated },
+	'Get integrated elements', 2 );
 
     is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -52,8 +52,8 @@ SKIP: {
 
     my $count = 2 + ( $do_cache_check ? 3 : 0 );
 
-    is_success_or_skip $st, 'mccants', @opt, 'mcnames',
-	'Get molczan-style magnitudes', $count;
+    is_success_or_skip( $st, 'mccants', @opt, 'mcnames',
+	'Get molczan-style magnitudes', $count );
 
     is $st->content_type(), 'molczan', "Content type is 'molczan'";
 
@@ -81,8 +81,8 @@ SKIP: {
 
 	SKIP: {
 
-	    is_success_or_skip $st, qw{ mccants -file }, $temp->filename(),
-		'mcnames', 'Get molczan-style magnitudes from cache', 2;
+	    is_success_or_skip( $st, qw{ mccants -file }, $temp->filename(),
+		'mcnames', 'Get molczan-style magnitudes from cache', 2 );
 
 	    my $obj_pragmata = $st->{_pragmata};
 	    $dump
@@ -121,8 +121,8 @@ EOD
 
 SKIP: {
 
-    is_success_or_skip $st, qw{ mccants quicksat },
-	'Get quicksat-style magnitudes', 2;
+    is_success_or_skip( $st, qw{ mccants quicksat },
+	'Get quicksat-style magnitudes', 2 );
 
     is $st->content_type(), 'quicksat', "Content type is 'quicksat'";
 
@@ -131,7 +131,7 @@ SKIP: {
 
 SKIP: {
 
-    is_success_or_skip $st, qw{ mccants rcs }, 'Get McCants-format RCS data', 2;
+    is_success_or_skip( $st, qw{ mccants rcs }, 'Get McCants-format RCS data', 2 );
 
     is $st->content_type(), 'rcs.mccants', "Content type is 'rcs.mccants'";
 
@@ -140,8 +140,8 @@ SKIP: {
 
 SKIP: {
 
-    is_success_or_skip $st, qw{ mccants vsnames },
-	'Get molczan-style magnitudes for visual satellites', 2;
+    is_success_or_skip( $st, qw{ mccants vsnames },
+	'Get molczan-style magnitudes for visual satellites', 2 );
 
     is $st->content_type(), 'molczan', "Content type is 'molczan'";
 
@@ -152,4 +152,6 @@ done_testing;
 
 1;
 
-# ex: set textwidth=72 :
+__END__
+
+# ex: set filetype=perl textwidth=72 :

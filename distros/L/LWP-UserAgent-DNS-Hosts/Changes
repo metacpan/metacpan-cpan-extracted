@@ -1,5 +1,8 @@
 Revision history for Perl extension LWP::UserAgent::DNS::Hosts
 
+0.14 2020-08-16T04:57:40Z
+	- update testing certificate (#8)
+
 0.13 2018-02-26T10:01:53Z
 	- fix typo (#7)
 

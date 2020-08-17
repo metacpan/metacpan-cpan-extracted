@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Path - Schemas related to filesystem path
 
 VERSION
-    This document describes version 0.013 of Sah::Schemas::Path (from Perl
-    distribution Sah-Schemas-Path), released on 2020-02-11.
+    This document describes version 0.014 of Sah::Schemas::Path (from Perl
+    distribution Sah-Schemas-Path), released on 2020-08-08.
 
 SAH SCHEMAS
     *   dirname
@@ -17,6 +17,12 @@ SAH SCHEMAS
     *   pathname
 
         Filesystem path name.
+
+    *   pathnames
+
+        List of filesystem path names.
+
+        Coerces from string by expanding the glob pattern in the string.
 
 HOMEPAGE
     Please visit the project's homepage at

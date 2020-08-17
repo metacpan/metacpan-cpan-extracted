@@ -1,9 +1,9 @@
 package App::CSVUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-03'; # DATE
+our $DATE = '2020-08-16'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 use 5.010001;
 use strict;
@@ -562,6 +562,7 @@ $SPEC{csvutil} = {
                 'csv',
                 #'setop', # not implemented in csvutil
                 #'lookup-fields', # not implemented in csvutil
+                'transpose',
             ]],
             req => 1,
             pos => 0,
@@ -597,8 +598,8 @@ sub csvutil {
     my $i = 0;
     my $header_row_count = 0;
     my $data_row_count = 0;
-    my $fields = [];
-    my %field_idxs;
+    my $fields = []; # field names, in order
+    my %field_idxs; # key = field name, val = index (0-based)
 
     my $code;
     my $field_idx;
@@ -685,6 +686,7 @@ sub csvutil {
             } elsif ($action eq 'sort-rows') {
             } elsif ($action eq 'each-row') {
             } elsif ($action eq 'csv') {
+            } elsif ($action eq 'transpose') {
             }
         } # if i==1 (header row)
 
@@ -899,6 +901,8 @@ sub csvutil {
             }
         } elsif ($action eq 'sort-rows') {
             push @$rows, $row unless $i == 1;
+        } elsif ($action eq 'transpose') {
+            push @$rows, $row;
         } elsif ($action eq 'convert-to-hash') {
             if ($i == $args{_row_number}) {
                 $selected_row = $row;
@@ -1057,6 +1061,20 @@ sub csvutil {
         }
         for my $row (@$rows) {
             $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
+        }
+    }
+
+    if ($action eq 'transpose') {
+        my $transposed_rows = [];
+        for my $rownum (0..$#{$rows}) {
+            for my $colnum (0..$#{$fields}) {
+                $transposed_rows->[$colnum][$rownum] =
+                    $rows->[$rownum][$colnum];
+            }
+        }
+        for my $rownum (0..$#{$transposed_rows}) {
+            $res .= _get_csv_row($csv_emitter, $transposed_rows->[$rownum],
+                                 $rownum+1, $outputs_header);
         }
     }
 
@@ -1648,6 +1666,22 @@ sub csv_convert_to_hash {
 
     csvutil(%args, action=>'convert-to-hash',
             _row_number=>$args{row_number} // 2);
+}
+
+$SPEC{csv_transpose} = {
+    v => 1.1,
+    summary => 'Transpose a CSV',
+    args => {
+        %args_common,
+        %args_csv_output,
+        %arg_filename_0,
+    },
+    tags => ['outputs_csv'],
+};
+sub csv_transpose {
+    my %args = @_;
+
+    csvutil(%args, action=>'transpose');
 }
 
 $SPEC{csv2td} = {
@@ -2411,7 +2445,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.031 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2020-08-03.
+This document describes version 0.032 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2020-08-16.
 
 =head1 DESCRIPTION
 
@@ -2464,6 +2498,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-split>
 
 =item * L<csv-sum>
+
+=item * L<csv-transpose>
 
 =item * L<csv2csv>
 
@@ -5331,6 +5367,122 @@ that contains extra information.
 
 Return value:  (any)
 
+
+
+=head2 csv_transpose
+
+Usage:
+
+ csv_transpose(%args) -> [status, msg, payload, meta]
+
+Transpose a CSV.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+Use C<-> to read from stdin.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether input CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 =for Pod::Coverage ^(csvutil)$
 
 =head1 FAQ
@@ -5372,6 +5524,15 @@ L<App::TSVUtils>
 L<App::LTSVUtils>
 
 L<App::SerializeUtils>
+
+
+L<csv-select-row>.
+
+L<csvgrep>.
+
+L<setop>.
+
+L<csv-split>.
 
 =head1 AUTHOR
 

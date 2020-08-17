@@ -1,4 +1,9 @@
-0.002   2019-04-14 (PERLANCAR)
+0.003   2020-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add hook: before_request_once.
+
+
+0.002   2019-04-14  Released-By: PERLANCAR
 
 	- Observe HTTP_TINY_PLUGINS.
 
@@ -6,6 +11,6 @@
 	  plugins during import.
 
 
-0.001    2019-04-12 (PERLANCAR)
+0.001    2019-04-12  Released-By: PERLANCAR
 
          - First release.

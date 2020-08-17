@@ -1,5 +1,12 @@
 Revision history for BSON-XS
 
+v0.8.4    2020-08-13 10:53:15-04:00 America/New_York
+
+  [!!! END OF LIFE NOTICE !!!]
+
+  - As of August 13, 2020, the BSON-XS library has reached end of life
+    and is no longer supported by MongoDB.
+
 v0.8.3    2020-04-13 10:56:53-04:00 America/New_York
 
     [Fixed]

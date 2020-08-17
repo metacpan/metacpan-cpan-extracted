@@ -7,7 +7,6 @@ sync
         data
         {
             config_file              ./files/config/serge_test.cfg
-            file_mask                *.xliff
             file_format              xliff
             languages                de es fr-ca
         }

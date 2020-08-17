@@ -5,7 +5,7 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader
-our $VERSION = '0.2.0'; # VERSION
+our $VERSION = '0.2.1'; # VERSION
 
 1;
 
@@ -57,15 +57,17 @@ references:
 
     {
         "symbol"    => "C",
-        "isotope"   => "13",
+        "isotope"   => 13,
         "chirality" => "@@",
         "hcount"    => 3,
         "charge"    => "+",
         "class"     => 0,
+        "number"    => 0,
     }
 
-Except for C<symbol> and C<class>, all keys of hash are optional. Per
-OpenSMIILES specification, default value for C<class> is 0.
+Except for C<symbol>, C<class> and C<number>, all keys of hash are
+optional. Per OpenSMIILES specification, default value for C<class> is
+0.
 
 =head3 Bonds
 

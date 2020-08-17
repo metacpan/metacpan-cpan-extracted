@@ -23,6 +23,7 @@ my @modules = qw(
   Dist::Zilla::Plugin::Code::FileGatherer
   Dist::Zilla::Plugin::Code::FileMunger
   Dist::Zilla::Plugin::Code::FilePruner
+  Dist::Zilla::Plugin::Code::Initialization
   Dist::Zilla::Plugin::Code::InstallTool
   Dist::Zilla::Plugin::Code::LicenseProvider
   Dist::Zilla::Plugin::Code::MetaProvider
@@ -32,6 +33,7 @@ my @modules = qw(
   Dist::Zilla::Plugin::Code::Releaser
   Dist::Zilla::Plugin::Code::TestRunner
   Dist::Zilla::Plugin::Code::VersionProvider
+  Dist::Zilla::PluginBundle::Code
 );
 
 plan tests => scalar @modules;

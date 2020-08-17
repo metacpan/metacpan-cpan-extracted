@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.53 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.54 {
 
   use 5.014;
   use Moose;
@@ -292,7 +292,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.53
+version 2.54
 
 =head1 SYNOPSIS
 

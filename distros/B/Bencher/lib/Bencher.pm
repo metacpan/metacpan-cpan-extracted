@@ -1,7 +1,7 @@
 package Bencher;
 
-our $DATE = '2020-06-18'; # DATE
-our $VERSION = '1.050'; # VERSION
+our $DATE = '2020-08-16'; # DATE
+our $VERSION = '1.051'; # VERSION
 
 1;
 # ABSTRACT: A benchmark framework
@@ -18,7 +18,7 @@ Bencher - A benchmark framework
 
 =head1 VERSION
 
-This document describes version 1.050 of Bencher (from Perl distribution Bencher), released on 2020-06-18.
+This document describes version 1.051 of Bencher (from Perl distribution Bencher), released on 2020-08-16.
 
 =head1 SYNOPSIS
 
@@ -35,8 +35,8 @@ to use. You can also permute multiple perls and multiple module versions.
 
 B<Scenario>. A hash data structure that lists I<participants>, I<datasets>, and
 other things. The bencher CLI can accept a scenario from a module (under
-C<Bencher::Scenario::*> namespace), a script, or from command-line option. See
-L</"SCENARIO">.
+C<Bencher::Scenario::*> namespace or C<Acme::CPANModules::*> namespace), a
+script, or from command-line option. See L</"SCENARIO">.
 
 B<Participant>. What to run or benchmark. Usually a Perl code or code template,
 or a command or command template. See L</"participants">.
@@ -78,6 +78,10 @@ benchmark.
 
 There are several kinds of code you can specify:
 
+=over
+
+=item * module
+
 First, you can just specify C<module> (str, a Perl module name). This is useful
 when running scenario in L<module_startup mode/"Running benchmark in module
 startup mode">. Also useful to instruct Bencher to load the module. When not in
@@ -85,16 +89,28 @@ module startup mode, there is no code in this participant to run. In addition to
 C<module> you can also specify C<import_args> which can be a string or an
 arrayref.
 
+=item * modules
+
 You can also specify C<modules> (an array of Perl module names) if you want to
 benchmark several modules together. Similarly, this is only useful for running
 in module startup mode. To specify import arguments for each of these modules,
 use C<import_args_array>.
+
+=item * code
 
 You can specify C<code> (a coderef) which contains the code to benchmark.
 However, the point of Bencher is to use C<fcall_template> or at least
 C<code_template> to be able to easily permute the code with datasets (see
 below). So you should only specify C<code> when you cannot specify
 C<fcall_template> or C<code_template> or the other way.
+
+B<Caveat:> if you run bencher in multiperl or multi-module-version mode, the
+current implementaiton will fill the code templates and dump the scenario into a
+temporary script and run that script with separate perl processes. The dumped
+coderef will lack 'use' statement or code in BEGIN block. Avoid using that in
+your code.
+
+=item * fcall_template
 
 You can specify C<fcall_template>, and this is the recommended way whenever
 possible. It is a string containing a function call code, in the form of:
@@ -124,6 +140,8 @@ automatically encoded as Perl value, so it's safe to use arrayref or complex
 structures as argument values (however, you can use C<< <...:raw> >> to avoid
 this automatic encoding).
 
+=item * code_template
+
 Aside from C<fcall_template>, you can also use C<code_template> (a string
 containing arbitrary code), in the cases where the code you want to benchmark
 cannot be expressed as a simple function/method call, for example (taken from
@@ -140,6 +158,14 @@ Like in C<fcall_template>, words enclosed in C<< <...> >> will be replaced with
 actual data. When generating actual code, Bencher will enclose the code template
 with C<sub { .. }>.
 
+B<Caveat:> if you run bencher in multiperl or multi-module-version mode, the
+current implementaiton will fill the code templates and dump the scenario into a
+temporary script and run that script with separate perl processes. The dumped
+coderef will lack 'use' statement or code in BEGIN block. Avoid using that in
+your code.
+
+=item * cmdline, cmdline_template, perl_cmdline, perl_cmdline_templates
+
 Or, if you are benchmarking external commands, you specify C<cmdline> (array or
 strings, or strings) or C<cmdline_template> (array/str) or C<perl_cmdline> or
 C<perl_cmdline_template> instead. An array cmdline will not use shell, while the
@@ -150,6 +176,8 @@ filled with the arguments, the values will automatically be shell-escaped
 
 When using code template, code will be generated and eval-ed in the C<main>
 package.
+
+=back
 
 =head3 Specifying participant's name
 

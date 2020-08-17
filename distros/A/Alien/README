@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.95
+    version 0.96
 
 SYNOPSIS
 
@@ -12,14 +12,12 @@ SYNOPSIS
 
 DESCRIPTION
 
-    Alien is a package that exists just to hold together an idea, the idea
-    of Alien:: packages, so there is no code here, just motivation for
-    Alien.
+    The intent of the Alien namespace is to provide a mechanism for
+    specifying, installing and using non-native dependencies on CPAN.
+    Frequently this is a C library used by XS (see perlxs) or FFI (see
+    FFI::Platypus), but it could be anything non-Perl usable from Perl.
 
-    The intent of Alien is to provide a mechanism for specifying,
-    installing and using non-native dependencies on CPAN. Frequently, this
-    is a C library used by XS, but it could be anything non-Perl usable
-    from Perl. Typical characteristics of an Alien distribution include:
+    Typical characteristics of an Alien distribution include:
 
     Probe for or install library during the build process
 
@@ -27,7 +25,7 @@ DESCRIPTION
       extended to probe for an existing system library that meets the
       criteria of the Alien module. If it cannot be found the library is
       downloaded from the Internet and installed into a share directory
-      (See File::ShareDir).
+      (See File::ShareDir::Dist).
 
       Usually, though not necessarily, this is a C library. It could be
       anything though, some JavaScript, Java .class files. Anything
@@ -45,17 +43,19 @@ DESCRIPTION
       Alien::Foo->libs class methods to return the compiler and library
       flags required for using the library.
 
-    These are suggestions only, and this module does not provide a
-    framework, because the needs of a non-native dependency on CPAN are
-    potentially quite diverse. That being said, if your library uses a
-    standard build system, like autoconf, make or CMake you should consider
-    using Alien::Build and Alien::Base which makes it easy to write Alien
-    modules that work with many common types of package build systems.
+    These are guidelines, and this module does not provide an
+    implementation or a framework, because of the diverse nature of
+    non-Perl dependencies on CPAN. The more common cases are handled by the
+    Alien::Base + Alien::Build system, which is recommended if you want to
+    avoid reinventing the wheel. See the "SEE ALSO" section below for
+    helpful resources.
 
 CAVEATS
 
     This section contains some recommendations from my own experience in
-    writing Alien modules and from working on the Alien::Base team.
+    writing Alien modules and from working on the Alien::Base +
+    Alien::Build team. The Alien::Build FAQ (Alien::Build::Manual::FAQ)
+    also addresses a number of implementation specific gotchas.
 
     When building from source code, build static libraries whenever
     possible
@@ -146,15 +146,17 @@ ORIGINAL MANIFESTO
 
     Be sane.
 
-SUPPORT
-
-    No support needed.
-
 SEE ALSO
 
-    alienfile
+    Alien::Build::Manual::Alien
 
-      A specification for probing, building packages for Aliens.
+      Documentation for building Aliens using the Alien::Base +
+      Alien::Build system. Intended for as a starting point for Alien users
+      and Alien authors.
+
+    Alien::Build::Manual::FAQ
+
+      Quick answers (FAQ) for many common Alien issues.
 
     Alien::Build
 
@@ -166,11 +168,6 @@ SEE ALSO
 
       An (optional) base class and framework for creating Alien
       distributions.
-
-    Alien::Base::FAQ
-
-      Frequently Asked Questions for Alien::Base. Mostly specific to
-      Alien::Base, but also addresses some challenges for Alien in general.
 
     #native on irc.perl.org <http://chat.mibbit.com/#native@irc.perl.org>
 
@@ -184,6 +181,10 @@ SEE ALSO
       This mailing list is mainly for Alien::Base, and announcements for
       new versions will be posted there, but general Alien inquires are
       also welcome.
+
+    https://github.com/PerlAlien
+
+      The Perl Alien organization on GitHub.
 
 AUTHORS
 

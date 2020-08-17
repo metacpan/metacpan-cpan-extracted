@@ -1,3 +1,18 @@
+1.051   2020-08-16  Released-By: PERLANCAR; Urgency: high
+
+        - Merge two releases 1.050 and 1.050.1.
+
+
+1.050.1  2020-08-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add bencher options: tidy, keep_tempdir.
+
+	- [Rinci metadata] Tweak argument categories.
+
+        - UPDATE 2020-08-16: rename release from 1.050 to 1.050.1 and cancel
+          (duplicate).
+
+
 1.050   2020-06-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Observe module_startup_precision property.

@@ -1,0 +1,69 @@
+{
+   "abstract" : "A object oriented Perl module to interact with the EtcD version 2 API",
+   "author" : [
+      "Gary L. Greene, Jr. <greeneg@tolharadys.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-EtcDv2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "private"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Errno" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Status" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Throw" : "0",
+            "Try::Tiny" : "0",
+            "boolean" : "0",
+            "perl" : "5.030",
+            "strictures" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/greeneg/Net-EtcDv2/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/greeneg/Net-EtcDv2.git",
+         "web" : "https://github.com/greeneg/Net-EtcDv2"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

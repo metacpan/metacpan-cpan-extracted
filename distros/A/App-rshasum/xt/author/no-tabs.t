@@ -10,6 +10,7 @@ my @files = (
     'bin/rshasum',
     'lib/App/rshasum.pm',
     't/00-compile.t',
+    't/argv.t',
     't/data/1/0.txt',
     't/data/1/2.txt',
     't/data/1/foo/empty',

@@ -17,7 +17,7 @@ use Test::NoTabs;
 my @files = (
     'lib/MIDI/Util.pm',
     't/00-compile.t',
-    't/01-methods.t'
+    't/01-functions.t'
 );
 
 notabs_ok($_) foreach @files;

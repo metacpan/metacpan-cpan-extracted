@@ -9,7 +9,7 @@ use Wasm::Wasmtime::Instance;
 my $store = wasm_store();
 
 is(
-  Wasm::Wasmtime::Instance->new(Wasm::Wasmtime::Module->new($store, wat => '(module)'), $store),
+  Wasm::Wasmtime::Instance->new(Wasm::Wasmtime::Module->new($store->engine, wat => '(module)'), $store),
   object {
     call [ isa => 'Wasm::Wasmtime::Instance' ] => T();
     call module => object {
@@ -20,7 +20,7 @@ is(
 );
 
 is(
-  Wasm::Wasmtime::Instance->new(Wasm::Wasmtime::Module->new($store, wat => q{
+  Wasm::Wasmtime::Instance->new(Wasm::Wasmtime::Module->new($store->engine, wat => q{
     (module
       (func (export "add") (param i32 i32) (result i32)
         local.get 0
@@ -97,7 +97,7 @@ wasm_instance_ok [], '(module)';
 is(
   dies {
     Wasm::Wasmtime::Instance->new(
-      Wasm::Wasmtime::Module->new( $store, wat => q{
+      Wasm::Wasmtime::Module->new( $store->engine, wat => q{
         (module
           (func $hello (import "" "hello"))
           (func (export "run") (call $hello))
@@ -114,7 +114,7 @@ is(
   my $it_works;
 
   my $store = Wasm::Wasmtime::Store->new;
-  my $module = Wasm::Wasmtime::Module->new( $store, wat => q{
+  my $module = Wasm::Wasmtime::Module->new( $store->engine, wat => q{
     (module
       (func $hello (import "" "hello"))
       (func (export "run") (call $hello))
@@ -173,47 +173,6 @@ is(
   });
 
   isa_ok $memory, 'Wasm::Wasmtime::Memory';
-}
-
-{
-  my $module = Wasm::Wasmtime::Module->new(wat => '(module)');
-  my @warnings;
-
-  isa_ok do {
-    local $SIG{__WARN__} = sub {
-      push @warnings, @_;
-    };
-    Wasm::Wasmtime::Instance->new($module);
-  }, 'Wasm::Wasmtime::Instance';
-
-  note 'Wasm::Wasmtime::Instance->new($module);';
-  note "warning:$_" for @warnings;
-
-  is
-    \@warnings,
-    bag {
-      item match qr/Creating a Wasm::Wasmtime::Instance instance without a Wasm::Wasmtime::Store object is deprecated and will be removed in a future version of Wasm::Wasmtime/;
-      etc;
-    },
-    'deprecation warning',
-  ;
-
-  no warnings 'deprecated';
-  @warnings = ();
-  Wasm::Wasmtime::Instance->new($module);
-
-  note 'no warnings \'deprecated\'; Wasm::Wasmtime::Instance->new($module);';
-  note "warning:$_" for @warnings;
-
-  is
-    \@warnings,
-    array {
-      all_items !match qr/Creating a Wasm::Wasmtime::Instance instance without a Wasm::Wasmtime::Store object is deprecated and will be removed in a future version of Wasm::Wasmtime/;
-      etc;
-    },
-    'can turn off deprecation warning',
-  ;
-
 }
 
 done_testing;

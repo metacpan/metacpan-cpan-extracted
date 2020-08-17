@@ -1,5 +1,5 @@
 {
-   "abstract" : "Reversible hashes library",
+   "abstract" : "Reverse hash computation library",
    "author" : [
       "Sergei Zhmylev <zhmylove@cpan.org>"
    ],
@@ -55,7 +55,7 @@
          "web" : "https://github.com/zhmylove/math-revhash"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:ZHMYLOVE",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.00"

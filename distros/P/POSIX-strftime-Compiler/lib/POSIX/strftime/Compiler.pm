@@ -8,7 +8,7 @@ use Time::Local qw//;
 use POSIX qw//;
 use base qw/Exporter/;
 
-our $VERSION = "0.43";
+our $VERSION = "0.44";
 our @EXPORT_OK = qw/strftime/;
 
 use constant {

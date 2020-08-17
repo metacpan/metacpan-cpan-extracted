@@ -1,6 +1,7 @@
 # vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
 use strict;
 use warnings;
+use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
@@ -17,7 +18,7 @@ BEGIN {
 }
 
 use Test::Warnings 0.027 ':fail_on_warning';
-use Test::JSON::Schema::Acceptance 0.999;
+use Test::JSON::Schema::Acceptance 1.000;
 use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Draft201909' => 'share' } };
 use JSON::Schema::Draft201909;
 
@@ -32,24 +33,10 @@ my $js = JSON::Schema::Draft201909->new(%options);
 my $js_short_circuit = JSON::Schema::Draft201909->new(%options, short_circuit => 1);
 
 my $add_resource = sub {
-  my ($uri, $data) = @_;
-  $js->add_schema($uri => $data);
-  $js_short_circuit->add_schema($uri => $data);
+  my ($uri, $schema) = @_;
+  $js->add_schema($uri => $schema);
+  $js_short_circuit->add_schema($uri => $schema);
 };
-
-# TODO: moving into TJSA 1.000
-my $base = Mojo::URL->new('http://localhost:1234');
-$accepter->additional_resources->visit(
-  sub {
-    my ($path) = @_;
-    return if not $path->is_file or $path !~ /\.json$/;
-    my $data = $accepter->_json_decoder->decode($path->slurp_raw);
-    my $file = $path->relative($accepter->additional_resources);
-    my $uri = Mojo::URL->new($file)->base($base)->to_abs;
-    $add_resource->($uri => $data);
-  },
-  { recurse => 1 },
-);
 
 my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0, convert_blessed => 1, canonical => 1, pretty => 1);
 $encoder->indent_length(2) if $encoder->can('indent_length');
@@ -76,6 +63,7 @@ $accepter->acceptance(
 
     $result;
   },
+  add_resource => $add_resource,
   @ARGV ? (tests => { file => \@ARGV }) : (),
   $ENV{NO_TODO} ? () : ( todo_tests => [
     { file => [
@@ -95,9 +83,9 @@ $accepter->acceptance(
           optional/format/idn-email.json
         ) ) : (),
       ] },
-    { file => 'refRemote.json', group_description => [      # TODO: waiting for test suite PR 360
-        'base URI change - change folder', 'base URI change - change folder in subschema',
-      ] },
+    # TODO: see JSON-Schema-Test-Suite #424
+    { file => 'refRemote.json', group_description => 'base URI change - change folder' },
+
     # various edge cases that are difficult to accomodate
     { file => 'optional/format/date-time.json', group_description => 'validation of date-time strings',
       test_description => 'case-insensitive T and Z' },
@@ -106,11 +94,10 @@ $accepter->acceptance(
     { file => 'optional/format/iri.json', group_description => 'validation of IRIs',  # see test suite issue 395
       test_description => 'an invalid IRI based on IPv6' },
     { file => 'optional/format/idn-hostname.json',
-      group_description => 'validation of internationalized host names',
-      test_description => [
-        'contains illegal char U+302E Hangul single dot tone mark', # IDN decoder likes this
-        'valid Chinese Punycode',                     # Data::Validate::Domain doesn't like this
-      ] },
+      group_description => 'validation of internationalized host names' }, # IDN decoder, Data::Validate::Domain both have issues
+    { file => 'optional/format/uri.json',
+      test_description => 'validation of URIs',
+      test_description => 'an invalid URI with comma in scheme' },  # Mojo::URL does not fully validate
     $Config{ivsize} < 8 || $Config{nvsize} < 8 ?            # see issue #10
       { file => 'const.json',
         group_description => 'float and integers are equal up to 64-bit representation limits',
@@ -150,6 +137,7 @@ $accepter->acceptance(
 # 2020-06-09  0.999  Looks like you failed 165 tests of 1055.
 # 2020-06-10  0.999  Looks like you failed 104 tests of 1055.
 # 2020-07-07  0.999  Looks like you failed 31 tests of 1055.
+# 2020-08-11  1.000  Looks like you failed 46 tests of 1210.
 
 
 END {
@@ -167,19 +155,19 @@ DIAG
 done_testing;
 __END__
 
-# Results using Test::JSON::Schema::Acceptance 0.999
-# with commit 817b724b7a64d7c18a8232aa32b5f1cc1d6dd153 (2.0.0-215-g817b724)
+# Results using Test::JSON::Schema::Acceptance 1.000
+# with commit ec18a7d0c24b4286f101e7e6956b89a2d4cbc59d (2.0.0-257-gec18a7d)
 # from git://github.com/json-schema-org/JSON-Schema-Test-Suite.git:
 #
 # filename                                    pass  fail
 # ------------------------------------------------------
-# additionalItems.json                          11     0
+# additionalItems.json                          13     0
 # additionalProperties.json                     15     0
 # allOf.json                                    30     0
 # anchor.json                                    6     0
 # anyOf.json                                    18     0
 # boolean_schema.json                           18     0
-# const.json                                    38     0
+# const.json                                    50     0
 # contains.json                                 18     0
 # default.json                                   4     0
 # defs.json                                      2     0
@@ -188,7 +176,7 @@ __END__
 # enum.json                                     31     0
 # exclusiveMaximum.json                          4     0
 # exclusiveMinimum.json                          4     0
-# format.json                                  102     0
+# format.json                                  114     0
 # id.json                                       13     0
 # if-then-else.json                             22     0
 # items.json                                    26     0
@@ -206,30 +194,30 @@ __END__
 # not.json                                      12     0
 # oneOf.json                                    27     0
 # pattern.json                                   9     0
-# patternProperties.json                        21     0
+# patternProperties.json                        22     0
 # properties.json                               20     0
 # propertyNames.json                            10     0
-# ref.json                                      30     0
-# refRemote.json                                11     4
+# ref.json                                      32     0
+# refRemote.json                                13     2
 # required.json                                  9     0
 # type.json                                     80     0
 # unevaluatedItems.json                         33     0
-# unevaluatedProperties.json                    39     0
-# uniqueItems.json                              62     0
+# unevaluatedProperties.json                    51     0
+# uniqueItems.json                              64     0
 # optional/bignum.json                           4     5
 # optional/content.json                          6     4
-# optional/ecmascript-regex.json                13    10
+# optional/ecmascript-regex.json                31    10
 # optional/non-bmp-regex.json                   12     0
 # optional/refOfUnknownKeyword.json              4     0
 # optional/format/date-time.json                 8     1
 # optional/format/date.json                      2     1
-# optional/format/duration.json                  2     0
-# optional/format/email.json                     2     0
+# optional/format/duration.json                 17     0
+# optional/format/email.json                     9     0
 # optional/format/hostname.json                 12     0
-# optional/format/idn-email.json                 2     0
-# optional/format/idn-hostname.json             12     2
-# optional/format/ipv4.json                      5     0
-# optional/format/ipv6.json                      4     0
+# optional/format/idn-email.json                 4     0
+# optional/format/idn-hostname.json             29    16
+# optional/format/ipv4.json                      6     0
+# optional/format/ipv6.json                     29     0
 # optional/format/iri-reference.json             5     2
 # optional/format/iri.json                       8     1
 # optional/format/json-pointer.json             32     0
@@ -238,4 +226,5 @@ __END__
 # optional/format/time.json                      3     0
 # optional/format/uri-reference.json             7     0
 # optional/format/uri-template.json              3     1
-# optional/format/uri.json                      19     0
+# optional/format/uri.json                      19     1
+# optional/format/uuid.json                     12     0

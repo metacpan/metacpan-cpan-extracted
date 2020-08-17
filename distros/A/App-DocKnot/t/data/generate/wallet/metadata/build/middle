@@ -1,0 +1,33 @@
+If you are upgrading the wallet server from an earlier installed version,
+run `wallet-admin upgrade` after installation to upgrade the database
+schema.  See the wallet-admin manual page for more information.
+
+You can pass the `--with-wallet-server` and `--with-wallet-port` options
+to configure to compile in a default wallet server and port.  If no port
+is set, the remctl default port is used.  If no server is set, the server
+must be specified either in `krb5.conf` configuration or on the wallet
+command line or the client will exit with an error.
+
+By default, wallet uses whatever Perl executable exists in the current
+`PATH`.  That Perl's path is what the server scripts will use, and that
+Perl's configuration will be used to determine where the server Perl
+modules will be installed.
+
+To specify a particular Perl executable to use, either set the `PERL`
+environment variable or pass it to configure like:
+
+```
+    ./configure PERL=/path/to/my/perl
+```
+
+By default, wallet installs itself under `/usr/local` except for the
+server Perl modules, which are installed into whatever default site module
+path is used by your Perl installation.  To change the installation
+location of the files other than the Perl modules, pass the `--prefix=DIR`
+argument to configure.
+
+If remctl was installed in a path not normally searched by your compiler,
+you must specify its installation prefix to configure with the
+`--with-remctl=DIR` option, or alternately set the path to the include
+files and libraries separately with `--with-remctl-include=DIR` and
+`--with-remctl-lib=DIR`.

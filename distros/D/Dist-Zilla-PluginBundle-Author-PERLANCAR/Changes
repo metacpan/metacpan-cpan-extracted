@@ -1,3 +1,13 @@
+0.602   2020-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add plugin: PERLANCAR::CheckPendingRelease.
+
+
+0.601   2020-08-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Replace Authority with PERLANCAR::Authority.
+
+
 0.600   2020-04-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Stop using a custom FileFinder like this:

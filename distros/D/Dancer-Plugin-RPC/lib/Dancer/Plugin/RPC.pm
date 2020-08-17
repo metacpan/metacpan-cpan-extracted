@@ -2,7 +2,7 @@ package Dancer::Plugin::RPC;
 use warnings;
 use strict;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 # Will be set from the request-handler for the callback scope
 our $ROUTE_INFO = {

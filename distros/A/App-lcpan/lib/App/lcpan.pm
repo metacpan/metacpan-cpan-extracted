@@ -1,9 +1,9 @@
 package App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2020-08-13'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.061'; # VERSION
+our $VERSION = '1.062'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1557,6 +1557,7 @@ sub _index_sub {
 
 sub _update_files {
     require IPC::System::Options;
+    require JSON::PP;
 
     my %args = @_;
     _set_args_default(\%args);
@@ -1566,17 +1567,23 @@ sub _update_files {
     my $remote_url = $args{remote_url} // "http://mirrors.kernel.org/cpan";
     my $max_file_size = $args{max_file_size};
 
-    my @filter_args;
+    my %plugin_args;
     if ($args{max_file_size}) {
-        push @filter_args, "-size", $args{max_file_size};
+        $plugin_args{FilterLcpan}{max_size} = $args{max_file_size};
     }
     if ($args{include_author} && @{ $args{include_author} }) {
-        push @filter_args, "-include_author", join(";", @{$args{include_author}});
+        $plugin_args{FilterLcpan}{include_author} = $args{include_author};
     }
     if ($args{exclude_author} && @{ $args{exclude_author} }) {
-        push @filter_args, "-exclude_author", join(";", @{$args{exclude_author}});
+        $plugin_args{FilterLcpan}{exclude_author} = $args{exclude_author};
     }
-    push @filter_args, "-verbose", 1 if log_is_info();
+    $plugin_args{FilterLcpan}{verbose} = 1 if log_is_info();
+    if (defined $args{retry_max_attempts}) {
+        $plugin_args{Retry}{max_attempts} = $args{retry_max_attempts};
+    }
+    if (defined $args{retry_delay}) {
+        $plugin_args{Retry}{delay} = $args{retry_delay};
+    }
 
     my @cmd = (
         "minicpan",
@@ -1585,8 +1592,8 @@ sub _update_files {
         "-r", $remote_url,
     );
     my $env = {};
-    $env->{PERL5OPT} = "-MLWP::Protocol::Patch::CountBytesIn -MEnd::PrintBytesIn -MLWP::UserAgent::Patch::FilterLcpan=".join(",", @filter_args)
-        if @filter_args;
+    $env->{LWP_USERAGENT_PLUGINS} = JSON::PP::encode_json([%plugin_args]);
+    $env->{PERL5OPT} = "-MLWP::Protocol::Patch::CountBytesIn -MEnd::PrintBytesIn -MLWP::UserAgent::Patch::Plugin";
 
     IPC::System::Options::system(
         {die=>1, log=>1, env=>$env},
@@ -2480,6 +2487,16 @@ _
             summary => 'If set, skip downloading files larger than this',
             schema => 'int',
             tags => ['category:filtering'],
+        },
+        retry_max_attempts => {
+            summary => 'Number of retry attempts on failed HTTP request',
+            schema => 'int',
+            tags => ['category:retry'],
+        },
+        retry_delay => {
+            summary => 'Number of seconds to delay between retry attempt',
+            schema => 'int',
+            tags => ['category:retry'],
         },
         include_author => {
             summary => 'Only include files from certain author(s)',
@@ -4706,7 +4723,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.061 of App::lcpan (from Perl distribution App-lcpan), released on 2020-06-11.
+This document describes version 1.062 of App::lcpan (from Perl distribution App-lcpan), released on 2020-08-13.
 
 =head1 SYNOPSIS
 
@@ -4958,7 +4975,7 @@ using the C<index_name>.
 
 Recurse for a number of levels (-1 means unlimited).
 
-=item * B<perl_version> => I<str> (default: "v5.30.2")
+=item * B<perl_version> => I<str> (default: "v5.30.0")
 
 Set base Perl version for determining core modules.
 
@@ -5282,7 +5299,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.30.2")
+=item * B<perl_version> => I<str> (default: "v5.30.0")
 
 Set base Perl version for determining core modules.
 
@@ -5524,7 +5541,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.30.2")
+=item * B<perl_version> => I<str> (default: "v5.30.0")
 
 Set base Perl version for determining core modules.
 
@@ -5988,6 +6005,14 @@ If set, skip downloading files larger than this.
 =item * B<remote_url> => I<str>
 
 Select CPAN mirror to download from.
+
+=item * B<retry_delay> => I<int>
+
+Number of seconds to delay between retry attempt.
+
+=item * B<retry_max_attempts> => I<int>
+
+Number of retry attempts on failed HTTP request.
 
 =item * B<skip_file_indexing_pass_1> => I<bool>
 

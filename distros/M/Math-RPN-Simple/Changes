@@ -1,5 +1,13 @@
 Revision history for Math-RPN-Simple
 
+1.1.15 - 2020-08-13
+
+	Added backup files to .gitignore file.
+
+1.1.14 - 2020-07-14
+
+	Added Twitter to Contact section in README.md file.
+
 1.1.13 - 2020-07-14
 
 	Added missing changes.

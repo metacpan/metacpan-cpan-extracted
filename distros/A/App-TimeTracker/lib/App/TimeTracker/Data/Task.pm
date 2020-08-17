@@ -178,10 +178,7 @@ sub do_start {
 
 sub rounded_minutes {
     my $self = shift;
-    my $sec  = $self->seconds;
-    my $rest = 60 - $sec % 60;
-    my $min  = ( $sec + $rest ) / 60;
-    return $min;
+    return sprintf "%.0f", $self->seconds/60;
 }
 
 sub get_detail {
@@ -212,7 +209,7 @@ App::TimeTracker::Data::Task - App::TimeTracker Task storage
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 DESCRIPTION
 

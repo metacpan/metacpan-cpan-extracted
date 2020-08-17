@@ -1,3 +1,21 @@
+0.34.9 2020-08-15 11:06:17 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix popup resizing regression
+
+0.34.8 2020-08-13 10:34:13 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - placeholder translation in notes fixed
+ - add automatic response to available space on login and popup dialog
+
+0.34.7 2020-08-12 14:35:31 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix regression in popup disposal code
+
+0.34.6 2020-08-12 14:06:26 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - reposition login window as the logo loads
+ - move max size logic into the popup window code
+
 0.34.5 2020-08-07 16:05:10 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - false was treated as null in the required field check ... 

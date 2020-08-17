@@ -1,0 +1,20 @@
+#!perl
+use strict;
+use warnings;
+use Getopt::Long 'GetOptions';
+use Lox;
+
+GetOptions(
+  'debug' => \my $debug,
+);
+
+if (@ARGV > 1) {
+  print "Usage: plox [script]\n";
+  exit 64;
+}
+elsif (@ARGV == 1) {
+  Lox::run_file($ARGV[0], $debug);
+}
+else {
+  Lox::run_prompt($debug);
+}

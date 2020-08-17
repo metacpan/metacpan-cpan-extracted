@@ -2,8 +2,8 @@ NAME
     Bencher - A benchmark framework
 
 VERSION
-    This document describes version 1.050 of Bencher (from Perl distribution
-    Bencher), released on 2020-06-18.
+    This document describes version 1.051 of Bencher (from Perl distribution
+    Bencher), released on 2020-08-16.
 
 SYNOPSIS
     See bencher CLI.
@@ -18,8 +18,8 @@ DESCRIPTION
 TERMINOLOGY
     Scenario. A hash data structure that lists *participants*, *datasets*,
     and other things. The bencher CLI can accept a scenario from a module
-    (under "Bencher::Scenario::*" namespace), a script, or from command-line
-    option. See "SCENARIO".
+    (under "Bencher::Scenario::*" namespace or "Acme::CPANModules::*"
+    namespace), a script, or from command-line option. See "SCENARIO".
 
     Participant. What to run or benchmark. Usually a Perl code or code
     template, or a command or command template. See "participants".
@@ -59,80 +59,106 @@ SCENARIO
    Specifying participant's code
     There are several kinds of code you can specify:
 
-    First, you can just specify "module" (str, a Perl module name). This is
-    useful when running scenario in "Running benchmark in module startup
-    mode" in module_startup mode. Also useful to instruct Bencher to load
-    the module. When not in module startup mode, there is no code in this
-    participant to run. In addition to "module" you can also specify
-    "import_args" which can be a string or an arrayref.
+    *   module
 
-    You can also specify "modules" (an array of Perl module names) if you
-    want to benchmark several modules together. Similarly, this is only
-    useful for running in module startup mode. To specify import arguments
-    for each of these modules, use "import_args_array".
+        First, you can just specify "module" (str, a Perl module name). This
+        is useful when running scenario in "Running benchmark in module
+        startup mode" in module_startup mode. Also useful to instruct
+        Bencher to load the module. When not in module startup mode, there
+        is no code in this participant to run. In addition to "module" you
+        can also specify "import_args" which can be a string or an arrayref.
 
-    You can specify "code" (a coderef) which contains the code to benchmark.
-    However, the point of Bencher is to use "fcall_template" or at least
-    "code_template" to be able to easily permute the code with datasets (see
-    below). So you should only specify "code" when you cannot specify
-    "fcall_template" or "code_template" or the other way.
+    *   modules
 
-    You can specify "fcall_template", and this is the recommended way
-    whenever possible. It is a string containing a function call code, in
-    the form of:
+        You can also specify "modules" (an array of Perl module names) if
+        you want to benchmark several modules together. Similarly, this is
+        only useful for running in module startup mode. To specify import
+        arguments for each of these modules, use "import_args_array".
 
-     MODULENAME::FUNCTIONAME(ARG, ...)
+    *   code
 
-    or
+        You can specify "code" (a coderef) which contains the code to
+        benchmark. However, the point of Bencher is to use "fcall_template"
+        or at least "code_template" to be able to easily permute the code
+        with datasets (see below). So you should only specify "code" when
+        you cannot specify "fcall_template" or "code_template" or the other
+        way.
 
-     CLASSNAME->FUNCTIONAME(ARG, ...)
+        Caveat: if you run bencher in multiperl or multi-module-version
+        mode, the current implementaiton will fill the code templates and
+        dump the scenario into a temporary script and run that script with
+        separate perl processes. The dumped coderef will lack 'use'
+        statement or code in BEGIN block. Avoid using that in your code.
 
-    For example:
+    *   fcall_template
 
-     Text::Levenshtein::fastdistance(<word1>, <word2>)
+        You can specify "fcall_template", and this is the recommended way
+        whenever possible. It is a string containing a function call code,
+        in the form of:
 
-    Another example:
+         MODULENAME::FUNCTIONAME(ARG, ...)
 
-     Module::CoreList->is_code(<module>)
+        or
 
-    It can be used to benchmark a function call or a method call. From this
-    format, Bencher can easily extract the module name so user can also run
-    in module startup mode.
+         CLASSNAME->FUNCTIONAME(ARG, ...)
 
-    By using a template, Bencher can generate actual codes from this
-    template by combining it with datasets. The words enclosed in "<...>"
-    will be replaced with actual arguments specified in "datasets". The
-    arguments are automatically encoded as Perl value, so it's safe to use
-    arrayref or complex structures as argument values (however, you can use
-    "<...:raw>" to avoid this automatic encoding).
+        For example:
 
-    Aside from "fcall_template", you can also use "code_template" (a string
-    containing arbitrary code), in the cases where the code you want to
-    benchmark cannot be expressed as a simple function/method call, for
-    example (taken from Bencher::Scenario::ComparisonOps):
+         Text::Levenshtein::fastdistance(<word1>, <word2>)
 
-     participants => [
-         {name=>'1k-numeq'      , code_template=>'my $val =     1; for (1..1000) { if ($val ==     1) {} if ($val ==     2) {} }'},
-         {name=>'1k-streq-len1' , code_template=>'my $val = "a"  ; for (1..1000) { if ($val eq "a"  ) {} if ($val eq "b"  ) {} }'},
-         {name=>'1k-streq-len3' , code_template=>'my $val = "foo"; for (1..1000) { if ($val eq "foo") {} if ($val eq "bar") {} }'},
-         {name=>'1k-streq-len10', code_template=>'my $val = "abcdefghij"; for (1..1000) { if ($val eq "abcdefghij") {} if ($val eq "klmnopqrst") {} }'},
-     ],
+        Another example:
 
-    Like in "fcall_template", words enclosed in "<...>" will be replaced
-    with actual data. When generating actual code, Bencher will enclose the
-    code template with "sub { .. }".
+         Module::CoreList->is_code(<module>)
 
-    Or, if you are benchmarking external commands, you specify "cmdline"
-    (array or strings, or strings) or "cmdline_template" (array/str) or
-    "perl_cmdline" or "perl_cmdline_template" instead. An array cmdline will
-    not use shell, while the string version will use shell. "perl_cmdline*"
-    are the same as "cmdline*" except the first implicit argument/prefix is
-    perl. When the cmdline template is filled with the arguments, the values
-    will automatically be shell-escaped (unless you use the "<...:raw>"
-    syntax).
+        It can be used to benchmark a function call or a method call. From
+        this format, Bencher can easily extract the module name so user can
+        also run in module startup mode.
 
-    When using code template, code will be generated and eval-ed in the
-    "main" package.
+        By using a template, Bencher can generate actual codes from this
+        template by combining it with datasets. The words enclosed in
+        "<...>" will be replaced with actual arguments specified in
+        "datasets". The arguments are automatically encoded as Perl value,
+        so it's safe to use arrayref or complex structures as argument
+        values (however, you can use "<...:raw>" to avoid this automatic
+        encoding).
+
+    *   code_template
+
+        Aside from "fcall_template", you can also use "code_template" (a
+        string containing arbitrary code), in the cases where the code you
+        want to benchmark cannot be expressed as a simple function/method
+        call, for example (taken from Bencher::Scenario::ComparisonOps):
+
+         participants => [
+             {name=>'1k-numeq'      , code_template=>'my $val =     1; for (1..1000) { if ($val ==     1) {} if ($val ==     2) {} }'},
+             {name=>'1k-streq-len1' , code_template=>'my $val = "a"  ; for (1..1000) { if ($val eq "a"  ) {} if ($val eq "b"  ) {} }'},
+             {name=>'1k-streq-len3' , code_template=>'my $val = "foo"; for (1..1000) { if ($val eq "foo") {} if ($val eq "bar") {} }'},
+             {name=>'1k-streq-len10', code_template=>'my $val = "abcdefghij"; for (1..1000) { if ($val eq "abcdefghij") {} if ($val eq "klmnopqrst") {} }'},
+         ],
+
+        Like in "fcall_template", words enclosed in "<...>" will be replaced
+        with actual data. When generating actual code, Bencher will enclose
+        the code template with "sub { .. }".
+
+        Caveat: if you run bencher in multiperl or multi-module-version
+        mode, the current implementaiton will fill the code templates and
+        dump the scenario into a temporary script and run that script with
+        separate perl processes. The dumped coderef will lack 'use'
+        statement or code in BEGIN block. Avoid using that in your code.
+
+    *   cmdline, cmdline_template, perl_cmdline, perl_cmdline_templates
+
+        Or, if you are benchmarking external commands, you specify "cmdline"
+        (array or strings, or strings) or "cmdline_template" (array/str) or
+        "perl_cmdline" or "perl_cmdline_template" instead. An array cmdline
+        will not use shell, while the string version will use shell.
+        "perl_cmdline*" are the same as "cmdline*" except the first implicit
+        argument/prefix is perl. When the cmdline template is filled with
+        the arguments, the values will automatically be shell-escaped
+        (unless you use the "<...:raw>" syntax).
+
+        When using code template, code will be generated and eval-ed in the
+        "main" package.
 
    Specifying participant's name
     By default, Bencher will attempt to figure out the name for a

@@ -6,7 +6,7 @@ use 5.010;
 
 our $VERSION;
 BEGIN {
-    $VERSION = '0.55';
+    $VERSION = '0.56';
     my $execed = shift if @ARGV && $ARGV[0] eq '+'; # don't recursively call perl again for -p
     return unless @ARGV and $ARGV[0] =~ /^-/s;
     my $onepl = qr/[oOrhv?]|[pP](?:[1-9][0-9]*)?/; # simple pl opts, reflect these in doc/html
@@ -310,7 +310,7 @@ usage: pl {-{BbeE} program} [-o] [-Vversion] [-perlopt...] [--] [main program] [
   --color[=when]    colorize the output; when can be 'never', 'always', or 'auto' (the default)
 These options are handled by perl:
 EOF
-	p { Echo if /^\s+-[0acCdDfFiImMntTuUvwWX]/ } $^X, '-h';
+	piped { Echo if /^\s+-[0acCdDfFiImMntTuUvwWX]/ } $^X, '-h';
     }
     print <<\EOF;
 Predefined functions:
@@ -550,77 +550,87 @@ BEGIN {
 	return;
     }
 
-    # Assemble a program that works under perl -n, etc., while adding in pl's options.
-    @pl::bit[2, 4, 11, 13, 22] = # Don't pollute eval with my-var
-      ('sub pl::prog { $pl::last = 1;',
-       'LINE: {',		# dummy loop
-       '} continue {',		# program didn't do last
-       '$pl::last = 0 }',
-       '}');
+    {
+	# Assemble a program that works under perl -n, etc., while adding in pl's options.
+	# This is wild stuff, as it has to blend in various options, while potentially accomodating an outer loop.
+	my @prog;
+	@prog[2, 4, 11, 13, 22] =
+	  ('sub pl::prog { $pl::last = 1;',
+	   'LINE: {',		# dummy loop
+	   '} continue {',		# program didn't do last
+	   '$pl::last = 0 }',
+	   '}');
 
-    while( @pl::opts ) {	# no for, need to shift
-	$_ = shift @pl::opts;
-	if( /^--color(?:()|=(a)lways|=(n)ever|=auto)$/s ) {
-	    $pl::c = defined( $1 ) || $2 ? 1 : $3 ? 0 : undef;
-	    next;
-	} elsif( /[?h]/ ) {
-	    help undef;
-	    exit;
-	} elsif( /v/ ) {
-	    echo "This is pl v$VERSION, with perl $^V
+	while( @pl::opts ) {	# no for, need to shift
+	    $_ = shift @pl::opts;
+	    if( /^--color(?:()|=(a)lways|=(n)ever|=auto)$/s ) {
+		$pl::c = defined( $1 ) || $2 ? 1 : $3 ? 0 : undef;
+		next;
+	    } elsif( /[?h]/ ) {
+		help undef;
+		exit;
+	    } elsif( /v/ ) {
+		echo "This is pl v$VERSION, with perl $^V
 
 Copyright 1997-2020, Daniel Pfeiffer
 
 Pl may be copied only under the terms of either the Artistic License or the
 GNU General Public License, which may be found in the Perl 5 source kit.";
-	    exit;
-	}
-
-	if( /([be])/i ) {
-	    my $bit = "\n#line 1 \"-$1 option\"\n" . shift( @pl::opts ) . "\n;";
-	    if( /B/ ) {
-		$pl::bit[0] = $bit;
-	    } elsif( /b/ ) {
-		$pl::bit[5] = 'if( ($pl::exARGV //= "") ne $ARGV ) { ' . $bit . '; $pl::exARGV = $ARGV; }';
-	    } elsif( /e/ ) {
-		$pl::bit[8] = "\n;INIT { \$pl::_e = sub{$bit} }";
-		$pl::_e = '&$pl::_e(); ';
-	    } else {
-		$pl::bit[9] = "\n;END { $bit }";
+		exit;
 	    }
+
+	    if( /([be])/i ) {
+		# put ; after \n as user may end with a comment
+		my $bit = "\n#line 1 \"-$1 option\"\n" . shift( @pl::opts ) . "\n;";
+		if( /b/ ) {
+		    # Do it each time ARGV changes
+		    $prog[5] = 'if( ($pl::exARGV //= "") ne $ARGV ) {' . $bit . '$pl::exARGV = $ARGV; }';
+		} elsif( /B/ ) {
+		    $prog[0] = $bit;
+		} elsif( /e/ ) {
+		    $prog[8] = "\nINIT { \$pl::_e = sub { $bit }}";
+		    $pl::_e = '&$pl::_e();';
+		} else {
+		    $prog[9] = "\n;END { $bit }";
+		}
+	    }
+	    @prog[3, 14] =
+	      (/O/ ? 'for $ARGV (@ARGV) {' : 'for(@ARGV) {',
+	       '} continue { ++$ARGIND; last if $pl::last }')
+		if /o/i;
+	    if( /p([1-9][0-9]*)?/i ) {
+		my $p = $1;
+		$prog[1] = '$pl::_pn = 0;';
+		@prog[6, 10] =
+		  ('$pl::_P = do {',
+		   '}') if /P/;
+		$prog[12] = '++$pl::_pn, print or die "-p destination: $!\n"' . (/P/ ? 'if $pl::_P;' : ';');
+		$prog[13] =~ s/0/\$pl::_pn >= $p ? 2 : 0/ if $p;
+	    }
+	    $pl::_r = 1 if /r/;
 	}
-	@pl::bit[3, 14] =
-	  (/O/ ? 'for $ARGV (@ARGV) {' : 'for(@ARGV) {',
-	   '} continue { ++$ARGIND; last if $pl::last }')
-	    if /o/i;
-	if( /p([1-9][0-9]*)?/i ) {
-	    my $p = $1;
-	    $pl::bit[1] = '$pl::_p = 0;';
-	    @pl::bit[6, 10] =
-	      ('$pl::_P = do {',
-	       '}') if /P/;
-	    $pl::bit[12] = ' ++$pl::_p, print or die "-p destination: $!\n"' . (/P/ ? ' if $pl::_P;' : ';');
-	    $pl::bit[13] =~ s/0/\$pl::_p >= $p/ if $p;
-	}
-	$pl::_r = 1 if /r/;
-    }
-    $pl::bit[7] = @ARGV ? "\n#line 1 \"perlcode\"\n" . shift() . ";\n" : ';';
-    $pl::bit[14] //= 		# ! -[oO]
-      ' if( $pl::last || eof ) { ++$ARGIND; ' .
-      ($pl::_r ? 'close ARGV; $pl::_p = 0;' : 'if( $pl::last ) { my $d = $.; close ARGV; $. = $d }') .
-      ($pl::_e // '') . ' }';
-    undef $_;
-    @pl::c{qw(B I G R E)} = $pl::c // (-t STDOUT && $^O !~ /^MSWin/) ?
-      map "\e[${_}m", 1, 3, 32, 31, '' :
-      ('')x5;
+	$prog[7] = @ARGV ? "\n#line 1 \"main program\"\n" . shift() . "\n;" : ';';
+	#$prog[13] =~ s/\$pl::last =( \$pl::_pn >= \d+)/ if($1 ) { &\$pl::_e() if \$pl::_e; exit }/ unless $pl::_r || $prog[14];
+	$prog[14] //= 		# ! -[oO]
+	  'if( $pl::last || eof ) { ++$ARGIND;' .
+	    ($pl::_r ? 'close ARGV; $pl::_pn = 0;' : 'if( $pl::last ) { my $d = $.; close ARGV; $. = $d }') .
+	      ($pl::_e // '') .
+		($pl::_r ? '}' : 'exit if $pl::last == 2 }');
+	# Don't pollute eval with my-vars
+	$_ = join '', grep defined, @prog;
+    };
     #no warnings 'experimental';	# overridden by -W
     no strict;
-#echo join '', map $_ // '', @pl::bit;
-    eval join '', map $_ // '', splice @pl::bit;
+    if( $ENV{PLDUMP} ) { open STDOUT, '| perltidy -cb'; echo; exit }
+    eval;
     if( $@ ) {
 	warn $@;
 	exit 255;
     }
+    undef $_;
+    @pl::c{qw(B I G R E)} = $pl::c // (-t STDOUT && $^O !~ /^MSWin/) ?
+      map "\e[${_}m", 1, 3, 32, 31, '' :
+      ('')x5;
 }
 &pl::prog; # will be called repeatedly if -n
 
@@ -756,22 +766,23 @@ double C<$Q(uote)>.  Same for hard-to-print values:
     pl 'echo \"Perl", \@ARGV, undef' one liner
     pl 'e \"Perl", \@A, undef' one liner
 
-Print up to 3 matching lines, resetting count (and C<$.>) for each file:
-
-    pl -rP3 '/Perl.*one.*liner/' file1 file2 file3
-
 Loop over args, printing each with line ending.  And same, SHOUTING:
 
     pl -opl '' Perl one liner
     pl -opl '$_ = uc' Perl one liner
 
+Print up to 3 matching lines, resetting count (and C<$.>) for each file:
+
+    pl -rP3 '/Perl.*one.*liner/' file*
+
 Count hits in magic statistics hash C<%N(UMBER)>:
 
-    pl -n '++$NUMBER{$1} while /(Perl|one|liner)/g' file1 file2 file3
-    pl -n '++$N{$1} while /(Perl|one|liner)/g' file1 file2 file3
+    pl -n '++$NUMBER{$1} while /(Perl|one|liner)/g' file*
+    pl -n '++$N{$1} while /(Perl|one|liner)/g' file*
 
 Though they are sometimes slightly, sometimes quite a bit more complicated,
-most Perl one-liners from the internet work, just by omitting C<-e> or C<-E>.
+most Perl one-liners from the internet work, just by omitting C<-e> or C<-E>
+(there may be only one, but you can just as well concatenate them with C<<;>).
 See L<minor differences|/"Minor Differences with perl -e"> for exceptions.
 
 =head1 DESCRIPTION
@@ -913,6 +924,30 @@ first, keep the line in a variable and empty C<$_>.  When C<$1> is again true,
 it must be the last matching line.  Append the keep variable to it.
 
     pl -pi 'if( /(f)rom/.../(t)o/ ) { if( $1 eq "f" ) { $k = $_; $_ = "" } elsif( $1 ) { $_ .= $k }}' file*
+
+=item Rename a file depending on contents
+
+This reads each file without newlines in a B<-ln> loop.  When it finds the
+C<package> declaration, which gives the logical name of this file, it replaces
+double-colons with slashes.  It renames the file to the result.  The C<last>
+statement then makes this the last line read of the current file, continuing
+with the next file:
+
+    pl -ln 'if( s/^\s*package\s+([^\s;]+).*/$1/ ) { s!::!/!g; rename $ARGV, "$_.pm" or warn "$ARGV -> $_.pm: $!\n"; last }' *.pm
+    pl -ln 'if( s/^\s*package\s+([^\s;]+).*/$1/ ) { s!::!/!g; rename $A, "$_.pm" or warn "$A -> $_.pm: $!\n"; last }' *.pm
+
+This assumes all files are at the root of the destination directories.  If not
+you must add the common part of the target directories before C<$_>.
+
+On Windows this won't quite work, because that locks the file while reading.
+So there you must add C<close ARGV;> (or C<close A;>) before the C<rename>.
+
+For Java, it's a bit more complicated, because the full name is split into a
+C<package> followed by a C<class> or similar statement.  Join them when we
+find the latter:
+
+    pl -n 'if( /^\s*package\s+([^\s;]+)/ ) { $d = $1 =~ tr+.+/+r } elsif( /^\s*(?:(?:public|private|protected|abstract|final)\s+)*(?:class|interface|enum|record)\s+([^\s;]+)/ ) { rename $ARGV, "$d/$1.java" or warn "$ARGV -> $d/$1.java: $!\n"; last }' *.java
+    pl -n 'if( /^\s*package\s+([^\s;]+)/ ) { $d = $1 =~ tr+.+/+r } elsif( /^\s*(?:(?:public|private|protected|abstract|final)\s+)*(?:class|interface|enum|record)\s+([^\s;]+)/ ) { rename $A, "$d/$1.java" or warn "$A -> $d/$1.java: $!\n"; last }' *.java
 
 =item Delete matching files, except last one
 
@@ -1082,13 +1117,13 @@ escaped from the Shell as C<\\t>:
     pl -n 'k if s/(.+?)\t//' *.tsv
 
 The same, with a colon as separator, if you want to compare passwd files from
-several hosts:
+several hosts.  Here we addifionally need to ignore commented out lines:
 
-    pl -F: Keydiff /etc/passwd passwd*
-    pl -F: K /etc/passwd passwd*
+    pl -F: 'Keydiff unless /^#/' /etc/passwd passwd*
+    pl -F: 'K unless /^#/' /etc/passwd passwd*
 
-    pl -n 'keydiff if s/(.+?)://' /etc/passwd passwd*
-    pl -n 'k if s/(.+?)://' /etc/passwd passwd*
+    pl -n 'keydiff if s/^([^#].*?)://' /etc/passwd passwd*
+    pl -n 'k if s/^([^#].*?)://' /etc/passwd passwd*
 
 =item Diff several zip archives by member name
 
@@ -1414,7 +1449,7 @@ automatically adds C</u>:
     pl 'echo grep({tr/\n / /s; s/.*: \{ /pl $quote/u; s/; \}.*/$quote/u;} pl::pretty(\&pl::prog))'
     pl 'e grep({tr/\n / /s; s/.*: \{ /pl $q/u; s/; \}.*/$q/u;} pl::pretty(\&pl::prog))'
 
-Even though decompilation rarely comes up as quine cheating, indirectly the
+Even though decompilation rarely comes up as a quine no-go, indirectly the
 above does read its source.  So it might be considered a cheating quine.  To
 placate those who think so, here's a constructive way of doing it, with a
 format string that gets fed to itself:
@@ -1434,6 +1469,16 @@ list):
 
     &echof(qw(&echof(qw(%s)x2))x2)
     &f(qw(&f(qw(%s)x2))x2)
+
+=item Just another pl hacker,
+
+I<If you can't convince them, confuse them! ;-)>
+
+Just adapted from another Perl hacker, this obfuscated mock turtle soup
+L<JAPH|https://en.wikipedia.org/wiki/Just_another_Perl_hacker> is left for you
+to figure out:
+
+    pl -plo y' ya-zyOoh, Turtleneck phrase Jar! 'y xguietlbickheqjectnokhd
 
 =back
 

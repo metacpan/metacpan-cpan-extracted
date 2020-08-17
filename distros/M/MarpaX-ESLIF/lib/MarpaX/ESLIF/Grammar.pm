@@ -2,25 +2,32 @@ use strict;
 use warnings FATAL => 'all';
 
 package MarpaX::ESLIF::Grammar;
+use parent qw/MarpaX::ESLIF::Base/;
 
 # ABSTRACT: MarpaX::ESLIF's grammar
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '3.0.32'; # VERSION
-
+our $VERSION = '4.0.1'; # VERSION
 
 #
-# Tiny wrapper on MarpaX::ESLIF::Grammar->new, that is using the instance as void *.
-# Could have been writen in the XS itself, but I feel it is more comprehensible like
-# this.
+# Base required class methods
 #
-sub new {
-    my $class = shift;
-    my $eslif = shift;
+sub _CLONABLE { return sub { 1 } }
+sub _ALLOCATE { return \&MarpaX::ESLIF::Grammar::allocate }
+sub _DISPOSE  { return \&MarpaX::ESLIF::Grammar::dispose }
+sub _EQ {
+    return sub {
+        my ($class, $args_ref, $eslif, $data) = @_;
 
-    my $self = $class->_new($eslif->_getInstance, @_);
-    return $self
+        my $definedData = defined($data);
+        my $_definedData = defined($args_ref->[1]);
+    
+        return
+            ($eslif == $args_ref->[0])
+            &&
+            ($definedData && $_definedData && ($data eq $args_ref->[1]))
+    }
 }
 
 
@@ -38,7 +45,7 @@ MarpaX::ESLIF::Grammar - MarpaX::ESLIF's grammar
 
 =head1 VERSION
 
-version 3.0.32
+version 4.0.1
 
 =head1 SYNOPSIS
 
@@ -55,7 +62,7 @@ version 3.0.32
   :start   ::= Expression
   :default ::=             action        => do_op
                            symbol-action => do_symbol
-                           free-action   => do_free     # Supported but useless
+
   :desc    ::= 'Calculator'
   :discard ::= whitespaces event  => discard_whitespaces$
   :discard ::= comment     event  => discard_comment$
@@ -143,7 +150,7 @@ Returns the description of the current level, with the same encoding as found in
 
 Returns the description of the grammar at indice C<$level>, with the same encoding as found in the grammar.
 
-=head2 $eslifGrammar->currentRuleIds
+=head2 $eslifGrammar->currentRuleIds()
 
   printf "Current Rule Ids: %s\n", join(' ', @{$eslifGrammar->currentRuleIds});
 
@@ -157,7 +164,7 @@ I<Rule identifiers are integers that uniquely identify a rule>.
 
 Returns the list of rule identifiers at indice C<$level>, as a reference to an array of integers.
 
-=head2 $eslifGrammar->currentSymbolIds
+=head2 $eslifGrammar->currentSymbolIds()
 
   printf "Current Symbol Ids: %s\n", join(' ', @{$eslifGrammar->currentSymbolIds});
 
@@ -169,7 +176,7 @@ Returns the list of symbol identifiers at current level, as a reference to an ar
 
 Returns the list of symbol identifiers at indice C<$level>, as a reference to an array of integers.
 
-=head2 $eslifGrammar->currentProperties
+=head2 $eslifGrammar->currentProperties()
 
   use Data::Dumper; printf "Current Properties: %s\n", Dumper($eslifGrammar->currentProperties);
 
@@ -267,7 +274,7 @@ Please refer to L<MarpaX::ESLIF::Recognizer::Interface> and L<MarpaX::ESLIF::Val
 
 =head1 SEE ALSO
 
-L<MarpaX::ESLIF::Recognizer::Interface>, L<MarpaX::ESLIF::Recognizer::Interface>, L<MarpaX::ESLIF::Value::Interface>, L<MarpaX::ESLIF::Grammar::Properties>, L<MarpaX::ESLIF::Grammar::Rule::Properties>, L<MarpaX::ESLIF::Grammar::Symbol::Properties>
+L<MarpaX::ESLIF>, L<MarpaX::ESLIF::Recognizer::Interface>, L<MarpaX::ESLIF::Value::Interface>, L<MarpaX::ESLIF::Grammar::Properties>, L<MarpaX::ESLIF::Grammar::Rule::Properties>, L<MarpaX::ESLIF::Grammar::Symbol::Properties>
 
 =head1 AUTHOR
 

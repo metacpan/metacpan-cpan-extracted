@@ -1,5 +1,14 @@
 Revision history for App::TimeTracker
 
+3.004	2020-08-10T07:34:58
+    - make this/last doc example a bit clearer (Thomas Klausner)
+    - Document the --from, --to, --this and --last options (Paul Cochrane)
+    - Fix off-by-one rounding error in Task->rounded_minutes (Paul Cochrane)
+    - Add assertions to test of `current` command (Paul Cochrane)
+    - Remove leading zero from integer (Paul Cochrane)
+    - Purge trailing whitespace in source files (Paul Cochrane)
+
+
 3.003  2020-08-02T17:40:42
     - Sort list of available commands for consistency (Paul Cochrane)
     - Stop gathering vim `.swp` files when building dist (Paul Cochrane)
@@ -210,7 +219,7 @@ Revision history for App::TimeTracker
 2.008  2011-08-09T15:30:53+0200
     - this is going to be the first release to CPAN since 0.21
     - relaxed decoding of json config files
-    - started to add docs 
+    - started to add docs
     - back to per-dir config files, much saner
     - new commands: show_config, init
     - Better datetime parsing
@@ -261,7 +270,7 @@ Revision history for App::TimeTracker
 
 
 0.20    2009-02-12
-    - switched to new storage system (filesystem base, not sqlite, to 
+    - switched to new storage system (filesystem base, not sqlite, to
       make syncing via git et.al. easier
 
 

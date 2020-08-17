@@ -18,6 +18,7 @@ eg/ratio
 eg/roman
 eg/shannon
 eg/show_chords
+eg/tension
 eg/to_midi
 lib/Music/BachChoralHarmony.pm
 share/jsbach_BWV_keys_titles.txt

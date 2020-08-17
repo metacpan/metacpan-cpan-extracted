@@ -2,37 +2,40 @@ use strict;
 use warnings FATAL => 'all';
 
 package MarpaX::ESLIF::JSON::Decoder;
-use MarpaX::ESLIF::JSON::Decoder::RecognizerInterface;
 use parent qw/MarpaX::ESLIF::Grammar/;
+use MarpaX::ESLIF::JSON::Decoder::RecognizerInterface;
+
+#
+# Base required class methods
+#
+sub _ALLOCATE { return \&MarpaX::ESLIF::JSON::Decoder::allocate }
+sub _EQ {
+    return sub {
+        my ($class, $args_ref, $eslif, $strict) = @_;
+
+        my $definedStrict = defined($strict);
+        my $_definedStrict = defined($args_ref->[1]);
+    
+        return
+            ($eslif == $args_ref->[0])
+            &&
+            ($definedStrict && $_definedStrict && ($strict == $args_ref->[1]))
+    }
+}
 
 # ABSTRACT: ESLIF's JSON decoder interface
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '3.0.32'; # VERSION
+our $VERSION = '4.0.1'; # VERSION
 
-
-
-#
-# Tiny wrapper on MarpaX::ESLIF::JSON::Decoder->new, that is using the instance as void *.
-# Could have been writen in the XS itself, but I feel it is more comprehensible like
-# this.
-#
-sub new {
-    my $class = shift;
-    my $eslif = shift;
-    my $strict = shift // 1;
-
-    my $self = $class->_new($eslif->_getInstance, $strict);
-    return $self
-}
 
 
 sub decode {
     my ($self, $string, %options) = @_;
 
     my $recognizerInterface = MarpaX::ESLIF::JSON::Decoder::RecognizerInterface->new($string, $options{encoding});
-    return MarpaX::ESLIF::JSON::Decoder::_decode($self, $recognizerInterface, $options{disallowDupkeys}, $options{maxDepth}, $options{noReplacementCharacter})
+    return $self->_decode($recognizerInterface, $options{disallowDupkeys}, $options{maxDepth}, $options{noReplacementCharacter})
 }
 
 
@@ -50,7 +53,7 @@ MarpaX::ESLIF::JSON::Decoder - ESLIF's JSON decoder interface
 
 =head1 VERSION
 
-version 3.0.32
+version 4.0.1
 
 =head1 DESCRIPTION
 

@@ -9,7 +9,7 @@
 # The canonical version of this file is maintained in the rra-c-util package,
 # which can be found at <https://www.eyrie.org/~eagle/software/rra-c-util/>.
 #
-# Copyright 2018-2019 Russ Allbery <eagle@eyrie.org>
+# Copyright 2018-2020 Russ Allbery <eagle@eyrie.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -31,7 +31,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-use 5.008;
+use 5.010;
 use strict;
 use warnings;
 
@@ -58,6 +58,7 @@ my @IGNORE = (
 );
 my @IGNORE_PATHS = (
     qr{ \A [.] / [.] git/ }xms,               # Version control files
+    qr{ \A [.] / [.] pc/ }xms,                # quilt metadata files
     qr{ \A [.] /_build/ }xms,                 # Module::Build metadata
     qr{ \A [.] /blib/ }xms,                   # Perl build system artifacts
     qr{ \A [.] /cover_db/ }xms,               # Artifacts from coverage testing

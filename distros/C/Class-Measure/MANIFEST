@@ -7,6 +7,8 @@ cpanfile
 lib/Class/Measure.pm
 lib/Class/Measure/Length.pm
 minil.toml
+t/conv_via_sub.t
+t/exponential_notation.t
 t/length.t
 t/measure.t
 META.yml

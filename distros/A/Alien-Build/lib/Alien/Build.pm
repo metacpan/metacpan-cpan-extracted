@@ -13,7 +13,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '2.28'; # VERSION
+our $VERSION = '2.29'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -132,7 +132,7 @@ sub load
   unless(defined $self->meta->prop->{network})
   {
     $self->meta->prop->{network} = 1;
-    ## https://github.com/Perl5-Alien/Alien-Build/issues/23#issuecomment-341114414
+    ## https://github.com/PerlAlien/Alien-Build/issues/23#issuecomment-341114414
     #$self->meta->prop->{network} = 0 if $ENV{NO_NETWORK_TESTING};
     $self->meta->prop->{network} = 0 if (defined $ENV{ALIEN_INSTALL_NETWORK}) && ! $ENV{ALIEN_INSTALL_NETWORK};
   }
@@ -1165,7 +1165,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 2.28
+version 2.29
 
 =head1 SYNOPSIS
 
@@ -2013,7 +2013,7 @@ project GitHub Issue tracker:
 
 =over 4
 
-=item L<https://github.com/Perl5-Alien/Alien-Build/issues>
+=item L<https://github.com/PerlAlien/Alien-Build/issues>
 
 =back
 
@@ -2022,7 +2022,7 @@ pull-request on the project GitHub:
 
 =over 4
 
-=item L<https://github.com/Perl5-Alien/Alien-Build/pulls>
+=item L<https://github.com/PerlAlien/Alien-Build/pulls>
 
 =back
 
@@ -2059,7 +2059,7 @@ the same license as the rest of the Alien::Build and related tools distributed a
 C<Alien-Build>.  Joel Berger thanked a number of people who helped in in the development
 of L<Alien::Base>, in the documentation for that module.
 
-I would also like to acknowledge the other members of the Perl5-Alien github
+I would also like to acknowledge the other members of the PerlAlien github
 organization, Zakariyya Mughal (sivoais, ZMUGHAL) and mohawk (ETJ).  Also important
 in the early development of L<Alien::Build> were the early adopters Chase Whitener
 (genio, CAPOEIRAB, author of L<Alien::libuv>), William N. Braswell, Jr (willthechill,

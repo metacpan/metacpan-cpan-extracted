@@ -49,25 +49,25 @@ But `%E[cCxXyY]` and `%O[deHImMSuUVwWy]` are not supported, just remove E and O 
 
 # A RECOMMEND MODULE
 
-- [Time::TZOffset](https://metacpan.org/pod/Time::TZOffset)
+- [Time::TZOffset](https://metacpan.org/pod/Time%3A%3ATZOffset)
 
-    If [Time::TZOffset](https://metacpan.org/pod/Time::TZOffset) is available, P::s::Compiler use it for more faster time zone offset calculation.
+    If [Time::TZOffset](https://metacpan.org/pod/Time%3A%3ATZOffset) is available, P::s::Compiler use it for more faster time zone offset calculation.
     I strongly recommend you to install this if you use `%z`.
 
 # PERFORMANCE ISSUES ON WINDOWS
 
 Windows and Cygwin and some system may not support `%z` and `%Z`. For these system, 
 POSIX::strftime::Compiler calculate time zone offset and find zone name. This is not fast.
-If you need performance on Windows and Cygwin, please install [Time::TZOffset](https://metacpan.org/pod/Time::TZOffset)
+If you need performance on Windows and Cygwin, please install [Time::TZOffset](https://metacpan.org/pod/Time%3A%3ATZOffset)
 
 # SEE ALSO
 
-- [POSIX::strftime::GNU](https://metacpan.org/pod/POSIX::strftime::GNU)
+- [POSIX::strftime::GNU](https://metacpan.org/pod/POSIX%3A%3Astrftime%3A%3AGNU)
 
     POSIX::strftime::Compiler is built on POSIX::strftime::GNU::PP code
 
 - [POSIX](https://metacpan.org/pod/POSIX)
-- [Apache::LogFormat::Compiler](https://metacpan.org/pod/Apache::LogFormat::Compiler)
+- [Apache::LogFormat::Compiler](https://metacpan.org/pod/Apache%3A%3ALogFormat%3A%3ACompiler)
 
 # LICENSE
 

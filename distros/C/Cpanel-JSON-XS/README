@@ -161,9 +161,11 @@ DESCRIPTION
 
       - #72 parsing of illegal unicode or non-unicode characters.
 
-      - #96 locale-insensitive numeric conversion
+      - #96 locale-insensitive numeric conversion.
 
       - #154 numeric conversion fixed since 5.22, using the same strtold as perl5.
+
+      - #167 sort tied hashes with canonical.
 
     - public maintenance and bugtracker
 
@@ -225,10 +227,10 @@ FUNCTIONAL INTERFACE
         For the type argument see Cpanel::JSON::XS::Type.
 
     $is_boolean = Cpanel::JSON::XS::is_bool $scalar
-        Returns true if the passed scalar represents either "JSON::XS::true"
-        or "JSON::XS::false", two constants that act like 1 and 0,
+        Returns true if the passed scalar represents either "JSON::PP::true"
+        or "JSON::PP::false", two constants that act like 1 and 0,
         respectively and are used to represent JSON "true" and "false"
-        values in Perl.
+        values in Perl. (Also recognizes the booleans produced by JSON::XS.)
 
         See MAPPING, below, for more information on how JSON values are
         mapped to Perl.
@@ -587,7 +589,11 @@ OBJECT-ORIENTED INTERFACE
 
         This setting has no effect when decoding JSON texts.
 
-        This setting has currently no effect on tied hashes.
+        This is now also done with tied hashes, contrary to JSON::XS. But
+        note that with most large tied hashes stored as tree it is advised
+        to sort the iterator already and don't sort the hash output here.
+        Most such iterators are already sorted, as such e.g. DB_File with
+        "DB_BTREE".
 
     $json = $json->sort_by (undef, 0, 1 or a block)
         This currently only (un)sets the "canonical" option, and ignores
@@ -615,7 +621,7 @@ OBJECT-ORIENTED INTERFACE
         If $enable is true (or missing), then "decode" will return Perl
         non-object boolean variables (1 and 0) for JSON booleans ("true" and
         "false"). If $enable is false, then "decode" will return
-        "Cpanel::JSON::XS::Boolean" objects for JSON booleans.
+        "JSON::PP::Boolean" objects for JSON booleans.
 
     $json = $json->allow_singlequote ([$enable])
     $enabled = $json->get_allow_singlequote
@@ -762,7 +768,8 @@ OBJECT-ORIENTED INTERFACE
         "TO_JSON" method found) is being encoded. Has no effect on "decode".
 
         If $enable is false (the default), then "encode" will throw an
-        exception when it encounters a blessed object.
+        exception when it encounters a blessed object without
+        "convert_blessed" and a "TO_JSON" method.
 
         This setting has no effect on "decode".
 
@@ -1325,11 +1332,11 @@ MAPPING
         When "unblessed_bool" is set to true, then JSON "true" becomes 1 and
         JSON "false" becomes 0.
 
-        Otherwise these JSON atoms become "Cpanel::JSON::XS::true" and
-        "Cpanel::JSON::XS::false", respectively. They are
-        "JSON::PP::Boolean" objects and are overloaded to act almost exactly
-        like the numbers 1 and 0. You can check whether a scalar is a JSON
-        boolean by using the "Cpanel::JSON::XS::is_bool" function.
+        Otherwise these JSON atoms become "JSON::PP::true" and
+        "JSON::PP::false", respectively. They are "JSON::PP::Boolean"
+        objects and are overloaded to act almost exactly like the numbers 1
+        and 0. You can check whether a scalar is a JSON boolean by using the
+        "Cpanel::JSON::XS::is_bool" function.
 
         The other round, from perl to JSON, "!0" which is represented as
         "yes" becomes "true", and "!1" which is represented as "no" becomes
@@ -2067,6 +2074,9 @@ SECURITY CONSIDERATIONS
 THREADS
     Cpanel::JSON::XS has proper ithreads support, unlike JSON::XS. If you
     encounter any bugs with thread support please report them.
+
+    From Version 4.00 - 4.19 you couldn't encode true with threads::shared
+    magic.
 
 BUGS
     While the goal of the Cpanel::JSON::XS module is to be correct, that

@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.061 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2020-06-11.
+    This document describes version 1.062 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2020-08-13.
 
 SYNOPSIS
     See lcpan script.
@@ -242,7 +242,7 @@ FUNCTIONS
 
         Recurse for a number of levels (-1 means unlimited).
 
-    *   perl_version => *str* (default: "v5.30.2")
+    *   perl_version => *str* (default: "v5.30.0")
 
         Set base Perl version for determining core modules.
 
@@ -543,7 +543,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.30.2")
+    *   perl_version => *str* (default: "v5.30.0")
 
         Set base Perl version for determining core modules.
 
@@ -774,7 +774,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.30.2")
+    *   perl_version => *str* (default: "v5.30.0")
 
         Set base Perl version for determining core modules.
 
@@ -1205,6 +1205,14 @@ FUNCTIONS
     *   remote_url => *str*
 
         Select CPAN mirror to download from.
+
+    *   retry_delay => *int*
+
+        Number of seconds to delay between retry attempt.
+
+    *   retry_max_attempts => *int*
+
+        Number of retry attempts on failed HTTP request.
 
     *   skip_file_indexing_pass_1 => *bool*
 

@@ -125,7 +125,8 @@ I<StreamFinder.pl> and run it from the command line with a supported streaming
 site URL as the argument.  You can then edit it to tailor it to your needs.
 
 The currently-supported websites are:  banned.video 
-(L<StreamFinder::BannedVideo>), brighteon.com (L<StreamFinder::Brighteon>), 
+(L<StreamFinder::BannedVideo>), bitchute.com (L<StreamFinder::Bitchute>, 
+blogger.com (L<StreamFinder::Blogger>), brighteon.com (L<StreamFinder::Brighteon>), 
 iheartradio.com (L<StreamFinder::IHeartRadio>), podcasts.apple.com 
 (L<StreamFinder::Apple>), radio.net (L<StreamFinder::RadioNet>), 
 radionomy.com (L<StreamFinder::Radionomy>), reciva.com (L<StreamFinder::Reciva>), 
@@ -142,8 +143,8 @@ to Facebook!
 
 NOTE:  Radionomy appears to be defunct.
 
-NOTE:  For some sites, ie. Youtube, Vimeo, Brighteon, and BannedVideo, etc. 
-the "station" object actually refers to a specific video or podcast, but 
+NOTE:  For some sites, ie. Youtube, Vimeo, Brighteon, Bitchute, and BannedVideo, 
+etc. the "station" object actually refers to a specific video or podcast, but 
 functions the same way.
 
 Each site is supported by a separate subpackage (StreamFinder::I<Package>), 
@@ -408,15 +409,15 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.30';
+our $VERSION = '1.31';
 our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Apple BannedVideo Brighteon IHeartRadio RadioNet Radionomy Reciva 
-		Tunein Vimeo Spreaker Youtube));
+my @supported_mods = (qw(Apple BannedVideo Bitchute Blogger Brighteon IHeartRadio
+		RadioNet Radionomy Reciva Tunein Vimeo Spreaker Youtube));
 
 my %haveit;
 
@@ -461,6 +462,10 @@ sub new
 #		return new StreamFinder::Facebook($url, @args);
 #	} elsif ($haveit{'Youtube'} && $url =~ m#\b(?:youtube|youtu|yt)\.\/#) {
 #		return new StreamFinder::Youtube($url, @args);
+	} elsif ($haveit{'Bitchute'} && $url =~ m#www\.bitchute\.com\/#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+		return new StreamFinder::Bitchute($url, @args);
+	} elsif ($haveit{'Blogger'} && $url =~ m#www\.blogger\.com\/#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+		return new StreamFinder::Blogger($url, @args);
 	} elsif ($haveit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		return new StreamFinder::Youtube($url, @args);
 	} else {

@@ -11,7 +11,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot 3.04;
+package App::DocKnot 3.05;
 
 use 5.024;
 use autodie;
@@ -20,7 +20,7 @@ use warnings;
 use File::BaseDir qw(config_files);
 use File::ShareDir qw(module_file);
 use File::Spec;
-use JSON;
+use JSON::MaybeXS qw(JSON);
 use Perl6::Slurp;
 
 ##############################################################################
@@ -131,7 +131,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2019 Russ Allbery <rra@cpan.org>
+Copyright 2013-2020 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

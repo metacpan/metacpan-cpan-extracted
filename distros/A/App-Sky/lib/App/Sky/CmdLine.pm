@@ -1,5 +1,5 @@
 package App::Sky::CmdLine;
-$App::Sky::CmdLine::VERSION = '0.4.1';
+$App::Sky::CmdLine::VERSION = '0.4.2';
 use strict;
 use warnings;
 
@@ -44,6 +44,20 @@ sub _basic_usage
     exit(-1);
 }
 
+sub _is_copy_to_clipboard
+{
+    my ( $self, $flag ) = @_;
+
+    return ( $flag =~ /\A(--copy|-x)\z/ );
+}
+
+sub _shift
+{
+    my $self = shift;
+
+    return shift( @{ $self->argv() } );
+}
+
 sub run
 {
     my ($self) = @_;
@@ -62,7 +76,7 @@ sub run
         return $self->_basic_help();
     }
 
-    if ( $verb =~ /\A(--copy|-x)\z/ )
+    if ( $self->_is_copy_to_clipboard($verb) )
     {
         $copy = 1;
 
@@ -106,7 +120,9 @@ sub run
 
         if ($copy)
         {
-            eval "use Clipboard 0.19;";
+            require Clipboard;
+            Clipboard->VERSION('0.19');
+            Clipboard->import('');
             Clipboard->copy_to_all_selections($URL);
         }
 
@@ -131,10 +147,33 @@ sub run
     #     $self->argv(),
     # );
 
-    my $filename = shift( @{ $self->argv() } );
+    my $filename = $self->_shift();
+
+ARGS_LOOP:
+    while ( $filename =~ /\A-/ )
+    {
+        if ( $self->_is_copy_to_clipboard($filename) )
+        {
+            $copy     = 1;
+            $filename = $self->_shift();
+        }
+        elsif ( $filename eq '--' )
+        {
+            $filename = $self->_shift();
+            last ARGS_LOOP;
+        }
+        else
+        {
+            die qq#Unrecognized argument "$filename"!#;
+        }
+    }
 
     if ( not( ( $op eq 'upload' ) ? ( -f $filename ) : ( -d $filename ) ) )
     {
+        if ( $op eq 'upload' )
+        {
+            die qq#"up" can only upload files. '$filename' is not a file!#;
+        }
         die
 "Can only upload directories. '$filename' is not a valid directory name.";
     }
@@ -165,19 +204,11 @@ __END__
 
 =head1 NAME
 
-App::Sky::CmdLine
-
-=head1 VERSION
-
-version 0.4.1
-
-=head1 NAME
-
 App::Sky::CmdLine - command line program
 
 =head1 VERSION
 
-version 0.4.1
+version 0.4.2
 
 =head1 METHODS
 
@@ -189,7 +220,7 @@ The array of command line arguments - should be supplied to the constructor.
 
 Run the application.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -210,35 +241,11 @@ L<https://metacpan.org/release/App-Sky>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-Sky>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Sky>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Sky>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-Sky>
 
 =item *
 

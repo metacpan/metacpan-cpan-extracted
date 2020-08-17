@@ -3,7 +3,7 @@ use warnings;
 use Wasm::Wasmtime;
 
 my $store = Wasm::Wasmtime::Store->new;
-my $module = Wasm::Wasmtime::Module->new( $store, wat => q{
+my $module = Wasm::Wasmtime::Module->new( $store->engine, wat => q{
   (module
    (func (export "add") (param i32 i32) (result i32)
      local.get 0

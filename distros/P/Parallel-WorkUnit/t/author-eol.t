@@ -33,7 +33,6 @@ my @files = (
     't/11-RequireCodelike.t',
     't/12-Nested.t',
     't/13-Start.t',
-    't/14-Start-ForceThread.t',
     't/15-Procedural.t',
     't/author-critic.t',
     't/author-eol.t',

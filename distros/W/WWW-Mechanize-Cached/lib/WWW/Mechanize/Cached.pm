@@ -15,7 +15,7 @@ use Carp qw( carp croak );
 use Data::Dump qw( dump );
 use Storable qw( nfreeze thaw );
 
-our $VERSION = '1.53';
+our $VERSION = '1.54';
 
 has is_cached        => ( is => 'rw', isa => Maybe [Bool], default => undef );
 has positive_cache   => ( is => 'rw', isa => Bool, default => 1 );
@@ -188,15 +188,15 @@ sub _response_cache_ok {
 
     my $size;
     {
-        ## no critic (ValuesAndExpressions::ProhibitAccessOfPrivateData)
-        if ( exists $headers->{'client-transfer-encoding'} ) {
-            for my $cte ( @{ $headers->{'client-transfer-encoding'} } ) {
+        if ( $headers->header('Client-Transfer-Encoding') ) {
+            my @cte = $headers->header('Client-Transfer-Encoding');
+            for my $cte (@cte) {
 
                 # Transfer-Encoding = chunked means document consistency
                 # is independent of Content-Length value,
                 # and that Content-Length can be safely ignored.
                 # Its not obvious how the lower levels represent a
-                # failed chuncked-transfer yet.
+                # failed chunked-transfer yet.
                 # But its safe to say relying on content-length proves pointless.
                 return 1 if $cte eq 'chunked';
             }
@@ -264,6 +264,7 @@ sub _cache_ok {
     return 1;
 }
 
+no warnings;
 "We miss you, Spoon";    ## no critic
 
 # ABSTRACT: Cache response to be polite
@@ -280,7 +281,7 @@ WWW::Mechanize::Cached - Cache response to be polite
 
 =head1 VERSION
 
-version 1.53
+version 1.54
 
 =head1 SYNOPSIS
 

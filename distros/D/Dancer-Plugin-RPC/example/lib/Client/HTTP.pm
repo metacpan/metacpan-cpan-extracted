@@ -1,31 +1,31 @@
 package Client::HTTP;
 use Moo::Role;
+use Types::Standard qw( InstanceOf Maybe HashRef Int );
 
 with 'MooseX::Log::Log4perl::Easy';
 
-use Scalar::Util 'blessed';
 use URI;
 use HTTP::Tiny;
 
 our $VERSION = '0.90';
 
 has base_uri => (
-    is  => 'ro',
-    isa => sub {
-        die "Invalid URI ($_[0])" unless blessed($_[0]) =~ m{^URI::https?$};
-    },
+    is     => 'ro',
+    isa    => InstanceOf ['URI::http', 'URI::https'],
     coerce => sub { return URI->new($_[0]); }
 );
 has client => (
     is  => 'lazy',
-    isa => sub { die "Invalid user-agent" unless blessed($_[0]) eq 'HTTP::Tiny' },
+    isa => InstanceOf['HTTP::Tiny'],
 );
 has ssl_opts => (
     is      => 'ro',
+    isa     => Maybe[HashRef],
     default => undef
 );
 has timeout => (
     is      => 'ro',
+    isa     => Int,
     default => 300
 );
 
@@ -40,6 +40,7 @@ sub _build_client {
     );
 }
 
+use namespace::autoclean;
 1;
 
 =head1 COPYRIGHT

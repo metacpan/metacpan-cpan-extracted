@@ -57,7 +57,7 @@
    "provides" : {
       "Mom" : {
          "file" : "lib/Mom.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,10 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Mom/project"
    },
-   "version" : "0.003",
+   "version" : "0.004",
+   "x_contributors" : [
+      "Brian Greenfield (BRIANG) <briang@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

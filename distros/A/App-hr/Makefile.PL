@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+
 
 use ExtUtils::MakeMaker;
 
@@ -18,7 +18,6 @@ my %WriteMakefileArgs = (
     "script/hr"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::hr",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
@@ -35,7 +34,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.261",
+  "VERSION" => "0.262",
   "test" => {
     "TESTS" => "t/*.t"
   }

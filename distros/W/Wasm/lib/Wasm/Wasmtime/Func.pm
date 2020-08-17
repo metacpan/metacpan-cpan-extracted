@@ -20,7 +20,7 @@ use overload
   ;
 
 # ABSTRACT: Wasmtime function class
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 $ffi_prefix = 'wasm_func_';
@@ -168,7 +168,7 @@ Wasm::Wasmtime::Func - Wasmtime function class
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -176,7 +176,7 @@ version 0.18
  use Wasm::Wasmtime;
  
  my $store = Wasm::Wasmtime::Store->new;
- my $module = Wasm::Wasmtime::Module->new( $store, wat => q{
+ my $module = Wasm::Wasmtime::Module->new( $store->engine, wat => q{
    (module
     (func (export "add") (param i32 i32) (result i32)
       local.get 0
@@ -193,7 +193,7 @@ version 0.18
  use Wasm::Wasmtime;
  
  my $store = Wasm::Wasmtime::Store->new;
- my $module = Wasm::Wasmtime::Module->new( $store, wat => q{
+ my $module = Wasm::Wasmtime::Module->new( $store->engine, wat => q{
    (module
      (func $hello (import "" "hello"))
      (func (export "run") (call $hello))

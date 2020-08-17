@@ -223,6 +223,10 @@ sub _dircopy {
         next if $_ eq $updir;
         next if $_ eq $curdir;
         #
+        # Copy only the version of pcre2 we use
+        #
+        next if $_ eq 'pcre2-10.23';
+        #
         # Do not copy known garbage
         #
         next if $_ eq 'latest';
@@ -274,6 +278,7 @@ sub _dircopy {
         next if $_ eq 'Win32';
         next if $_ eq 'ipch';
         next if $_ eq 'CMake-codecov';
+        next if $_ eq 'testdata';
         if ($_ eq 'tar') {
           #
           # We skip only 'tar' directory of marpaESLIF

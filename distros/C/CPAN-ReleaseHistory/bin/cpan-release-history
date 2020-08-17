@@ -1,0 +1,94 @@
+#!/usr/local/bin/perl
+#
+# cpan-release-history - show all releases of a given distribution
+#
+use strict;
+use warnings;
+use CPAN::ReleaseHistory;
+use Text::Table::Tiny 1.00 qw/ generate_table /;
+
+die "usage $0 <dist-name>\n" unless @ARGV == 1;
+
+my $iterator = CPAN::ReleaseHistory->new()
+               ->release_iterator(well_formed => 1);
+my @entries;
+
+while (my $release = $iterator->next_release) {
+
+    # The convention is that any Raku releases go in a Perl6 directory
+    # Let's guess that a directory Raku will be supported soon as well
+    next if $release->path =~ m!/Perl6/!;
+    next if $release->path =~ m!/Raku/!;
+
+    my $distinfo = $release->distinfo;
+    my @tm       = gmtime($release->timestamp);
+
+    next unless $distinfo->dist eq $ARGV[0];
+
+    unshift(@entries,
+                [
+                    $distinfo->version,
+                    sprintf("%d-%.2d-%.2d", $tm[5] + 1900, $tm[4] + 1, $tm[3]),
+                    $distinfo->cpanid,
+                ]
+            );
+}
+
+print generate_table(rows => \@entries,
+                     top_and_tail => 1, include_header => 1,
+                     style => 'norule', align => 'left'), "\n";
+exit 0;
+
+=head1 NAME
+
+cpan-release-history - show all releases of a distribution
+
+=head1 SYNOPSIS
+
+ cpan-release-history String-Parity
+  1.34   2015-11-06   NEILB
+  1.33   2015-10-25   NEILB
+  1.32   2014-03-28   NEILB
+  1.31   1996-12-11   WINKO
+
+=head1 DESCRIPTION
+
+This script displays all I<releases> of a given CPAN I<distribution>,
+in reverse chronological order.
+The information displayed is:
+
+=over 4
+
+=item *
+
+The version of the release.
+
+=item *
+
+The date of the release.
+
+=item *
+
+The PAUSE id of the CPAN author who uploaded the release.
+
+=back
+
+=head1 SEE ALSO
+
+L<CPAN::ReleaseHistory> is the module used to get the information.
+
+=head1 REPOSITORY
+
+L<https://github.com/neilbowers/CPAN-ReleaseHistory>
+
+=head1 AUTHOR
+
+Neil Bowers E<lt>neilb@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Neil Bowers <neilb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

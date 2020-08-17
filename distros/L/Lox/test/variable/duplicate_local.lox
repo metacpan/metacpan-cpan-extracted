@@ -1,0 +1,4 @@
+{
+  var a = "value";
+  var a = "other"; // expect: [Line 3] Error at 'a': Variable with this name already declared in this scope.
+}

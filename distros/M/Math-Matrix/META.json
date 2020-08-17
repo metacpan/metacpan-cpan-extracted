@@ -33,7 +33,6 @@
       },
       "test" : {
          "requires" : {
-            "Math::Complex" : "0",
             "Test::More" : "0.94"
          }
       }
@@ -46,6 +45,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-Matrix"
       }
    },
-   "version" : "0.9",
+   "version" : "0.91",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

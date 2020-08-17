@@ -33,7 +33,7 @@
             "ExtUtils::MakeMaker" : "6.64",
             "ExtUtils::ParseXS" : "3.30",
             "File::Which" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.008004"
          }
       },
       "develop" : {
@@ -88,17 +88,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Perl5-Alien/Alien-Build/issues"
+         "web" : "https://github.com/PerlAlien/Alien-Build/issues"
       },
       "homepage" : "https://metacpan.org/pod/Alien::Build",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Perl5-Alien/Alien-Build.git",
-         "web" : "https://github.com/Perl5-Alien/Alien-Build"
+         "url" : "git://github.com/PerlAlien/Alien-Build.git",
+         "web" : "https://github.com/PerlAlien/Alien-Build"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.28",
+   "version" : "2.29",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -129,7 +129,7 @@
       "Paul Evans (leonerd, PEVANS)",
       "H\u00e5kon H\u00e6gland (hakonhagland, HAKONH)"
    ],
-   "x_generated_by_perl" : "v5.32.0",
+   "x_generated_by_perl" : "v5.33.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

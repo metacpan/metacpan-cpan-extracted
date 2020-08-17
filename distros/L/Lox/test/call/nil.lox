@@ -1,0 +1,1 @@
+nil(); // expect: [Line 1] Error at ')': Can only call functions and classes.

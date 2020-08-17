@@ -1,7 +1,9 @@
 package HTTP::Tiny::Plugin::Retry;
 
-our $DATE = '2019-04-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-14'; # DATE
+our $DIST = 'HTTP-Tiny-Plugin-Retry'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,27 +13,87 @@ use Log::ger;
 use Time::HiRes qw(sleep);
 
 sub after_request {
-    my ($self, $r) = @_;
+    my ($class, $r) = @_;
 
     $r->{config}{max_attempts} //=
-        $ENV{HTTP_TINY_PLUGIN_RETRY_MAX_ATTEMPTS} // 3;
+        $ENV{HTTP_TINY_PLUGIN_RETRY_MAX_ATTEMPTS} // 4;
     $r->{config}{delay}        //=
         $ENV{HTTP_TINY_PLUGIN_RETRY_DELAY}        // 2;
+    if (defined $r->{config}{strategy}) {
+        require Module::Load::Util;
+        $r->{http}{_backoff_obj} //=
+            Module::Load::Util::instantiate_class_with_optional_args(
+                {ns_prefix => 'Algorithm::Backoff'}, $r->{config}{strategy});
+    }
 
-    return -1 if $r->{response}{status} !~ /\A[5]/;
+    my $is_success;
+    if (defined $r->{config}{retry_if}) {
+        my $ref = ref $r->{config}{retry_if};
+        if ($ref eq 'Regexp' or !$ref) {
+            $is_success++ unless $r->{response}{status} =~ $r->{config}{retry_if};
+        } elsif ($ref eq 'ARRAY') {
+            $is_success++ unless grep { $_ == $r->{response}{status} } @{ $r->{config}{retry_if} };
+        } elsif ($ref eq 'CODE') {
+            $is_success++ unless $r->{config}{retry_if}->($class, $r);
+        } else {
+            die "Please supply a scalar/Regexp/arrayref/coderef retry_if";
+        }
+    } else {
+        $is_success++ if $r->{response}{status} !~ /\A[5]/;
+    }
+
+  SUCCESS: {
+        last unless $is_success;
+        if ($r->{http}{_backoff_obj}) {
+            my $delay_on_success = $r->{http}{_backoff_obj}->success;
+            if ($delay_on_success > 0) {
+                log_trace "Delaying for %.1f second(s) after successful request", $delay_on_success;
+                sleep $delay_on_success;
+            }
+        }
+        return -1;
+    }
+
+    # FAILURE
+
     $r->{retries} //= 0;
-    return 0 if $r->{config}{max_attempts} &&
-        $r->{retries} >= $r->{config}{max_attempts};
+    my $max_attempts;
+    my $delay;
+    my $should_give_up;
+    if ($r->{http}{_backoff_obj}) {
+        $delay = $r->{http}{_backoff_obj}->failure;
+        $should_give_up++ if $delay < 0;
+        $max_attempts = $r->{http}{_backoff_obj}{max_attempts};
+    } else {
+        $should_give_up++ if $r->{config}{max_attempts} &&
+            1+$r->{retries} >= $r->{config}{max_attempts};
+        $max_attempts = $r->{config}{max_attempts};
+        $delay = $r->{config}{delay};
+    }
+
+    my ($http, $method, $url, $options) = @{ $r->{argv} };
+
+  GIVE_UP: {
+        last unless $should_give_up;
+        log_trace "Failed requesting %s %s (%s - %s), giving up",
+        $method,
+        $url,
+        $r->{response}{status},
+        $r->{response}{reason};
+        return 0;
+    }
+
     $r->{retries}++;
-    my ($ht, $method, $url, $options) = @{ $r->{argv} };
-    log_trace "Failed requesting %s (%s - %s), retrying in %.1f second(s) (%d of %d) ...",
+
+    log_trace "Failed requesting %s %s (%s - %s), retrying in %.1f second(s) (attempt %d of %d) ...",
+        $method,
         $url,
         $r->{response}{status},
         $r->{response}{reason},
-        $r->{config}{delay},
-        $r->{retries},
-        $r->{config}{max_attempts};
-    sleep $r->{config}{delay};
+        $delay,
+        1+$r->{retries},
+        $max_attempts;
+    sleep $delay;
     98; # repeat request()
 }
 
@@ -50,7 +112,7 @@ HTTP::Tiny::Plugin::Retry - Retry failed request
 
 =head1 VERSION
 
-This document describes version 0.001 of HTTP::Tiny::Plugin::Retry (from Perl distribution HTTP-Tiny-Plugin-Retry), released on 2019-04-12.
+This document describes version 0.004 of HTTP::Tiny::Plugin::Retry (from Perl distribution HTTP-Tiny-Plugin-Retry), released on 2020-08-14.
 
 =head1 SYNOPSIS
 
@@ -74,7 +136,7 @@ L</retry_if>).
 
 =head2 max_attempts
 
-Int.
+Int. Default 4.
 
 =head2 delay
 
@@ -82,8 +144,21 @@ Float.
 
 =head2 retry_if
 
-Regex or code. If regex, then will be matched against response status. If code,
-will be called with arguments: C<< ($self, $response) >>.
+Regex (or scalra), or arrayref, or coderef. If regex or scalar, then will be
+matched against response status. If array, then will be assumed to be status
+codes to trigger retry. If coderef, will be called with arguments: C<< ($class,
+$response) >> (C<$class> is the plugin class name) and a true return value will
+trigger retry.
+
+=head2 strategy
+
+L<Algorithm::Backoff>::* module name, without the prefix and with optional
+arguments (see L<Module::Load::Util/instantiate_class_with_optional_args>), e.g.
+C<"Constant">, C<< ["Exponential" => {initial_delay=>2, max_delay=>100}] >>,
+C<"Exponential=initial_delay,2,max_delay,100">.
+
+If set, will use delay and maximum attempt values from specified
+Algorithm::Backoff backoff strategry instead of C<max_attempts> and C<delay>.
 
 =head1 ENVIRONMENT
 
@@ -115,13 +190,16 @@ feature.
 
 L<HTTP::Tiny::Plugin>
 
+Equivalent plugin for L<LWP::UserAgent::Plugin>:
+L<LWP::UserAgent::Plugin::Retry>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2019 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2019, 2020 Kevin Ryde
 
 # This file is part of Tie-TZ.
 #
@@ -24,7 +24,7 @@ use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS $TZ);
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-$VERSION = 10;
+$VERSION = 11;
 
 @ISA = ('Exporter');
 @EXPORT_OK = qw($TZ);
@@ -126,7 +126,7 @@ Tie::TZ - tied $TZ setting %ENV and calling tzset()
 =head1 DESCRIPTION
 
 C<Tie::TZ> provides a tied C<$TZ> variable which gets and sets the TZ
-environment variable C<$ENV{'TZ'}>.  When it changes C<%ENV> it calls
+environment variable C<$ENV{'TZ'}>.  When it changes C<%ENV>, it calls
 C<tzset()> (see L<POSIX>) if available, ensuring the C library notices the
 change for subsequent C<localtime()> etc.
 
@@ -150,9 +150,9 @@ complete program.
       # TZ restored when the die unwinds
     }
 
-Storing C<undef> to C<$TZ> deletes C<$ENV{'TZ'}> and unsets the environment
-variable.  This generally means the timezone goes back to the system default
-(F</etc/timezone> or wherever).
+Storing C<undef> to C<$TZ> deletes C<$ENV{'TZ'}> which unsets the
+environment variable.  This generally means the timezone goes back to the
+system default (F</etc/timezone> or wherever).
 
 As an optimization, if a store to C<$TZ> is already what C<$ENV{'TZ'}>
 contains then C<POSIX::tzset()> is not called.  This is helpful if some of
@@ -163,7 +163,7 @@ the startup value then the C<POSIX> module is not even loaded.
 If C<tzset()> is not implemented on your system then C<Tie::TZ> just sets
 the environment variable.  This is only likely on a very old or very limited
 C library.  Of course setting the environment variable might or might not
-affect the timezone in force (see L<perlport/Time and Date>).
+actually affect the timezone in force (see L<perlport/Time and Date>).
 
 =head2 Uses
 
@@ -178,8 +178,8 @@ are some cases where you do need it,
 Using Perl-level C<localtime()> in threaded Perl 5.8.8 (whether using
 threads or not).  Normally Perl arranges to call C<tzset()> if the C library
 doesn't (based on a configure test, see L<Config>).  But in 5.8.8 and
-earlier Perl didn't do that on C<localtime_r>, and in some versions of GNU C
-that function needed an explicit C<tzset()>.
+earlier, Perl didn't do that on C<localtime_r>, and in some versions of GNU
+C that function needed an explicit C<tzset()>.
 
 =item *
 
@@ -236,7 +236,7 @@ http://user42.tuxfamily.org/tie-tz/index.html
 
 =head1 COPYRIGHT
 
-Copyright 2008, 2009, 2010, 2011, 2019 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2019, 2020 Kevin Ryde
 
 Tie-TZ is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

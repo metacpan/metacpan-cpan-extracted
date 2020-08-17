@@ -1,6 +1,6 @@
 package Lab::Connection::Socket::Trace;
 #ABSTRACT: ???
-$Lab::Connection::Socket::Trace::VERSION = '3.720';
+$Lab::Connection::Socket::Trace::VERSION = '3.721';
 use v5.20;
 
 use warnings;
@@ -33,7 +33,7 @@ Lab::Connection::Socket::Trace - ???
 
 =head1 VERSION
 
-version 3.720
+version 3.721
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -4,7 +4,7 @@
       "Neil Bowers <neil@bowers.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,6 +26,7 @@
             "Getopt::Long" : "0",
             "Moo" : "0",
             "MooX::Role::CachedURL" : "0.06",
+            "Text::Table::Tiny" : "1.00",
             "autodie" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -47,7 +48,8 @@
          "web" : "https://github.com/neilbowers/CPAN-ReleaseHistory"
       }
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.16",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

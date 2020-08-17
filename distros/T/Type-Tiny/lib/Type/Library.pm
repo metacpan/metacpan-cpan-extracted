@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Library::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Library::VERSION   = '1.010002';
+	$Type::Library::VERSION   = '1.010003';
 }
 
 $Type::Library::VERSION =~ tr/_//d;
@@ -245,7 +245,7 @@ sub _exporter_fail
 			my $t;
 			
 			if ($type) {
-				my $t = $params ? $type->parameterize(@$params) : $type;
+				$t = $params ? $type->parameterize(@$params) : $type;
 			}
 			else
 			{

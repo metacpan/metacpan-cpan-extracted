@@ -1,5 +1,9 @@
 Revision history for Perl module Crypt::Perl
 
+0.33 Mon Aug 10 2020
+- Switch EC point multiplication algorithm to thwart timing attacks.
+  (reported by Antonio de la Piedra)
+
 0.32 Thu Jun 4 2020
 - Fix issue #14: Fix ECDSA verify when r and s are small.
   (reported by Antonio de la Piedra)

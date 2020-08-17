@@ -1,0 +1,1 @@
+true + "s"; // expect: [Line 1] Error at '+': Operands must be two numbers or two strings.

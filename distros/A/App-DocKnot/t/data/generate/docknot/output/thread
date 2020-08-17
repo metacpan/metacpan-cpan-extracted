@@ -101,8 +101,8 @@ The following additional Perl modules are required to use it:
 \bullet(packed)[IO::Compress::Xz (part of IO-Compress-LZMA)]
 \bullet(packed)[IPC::Run]
 \bullet(packed)[IPC::System::Simple]
-\bullet(packed)[JSON]
-\bullet(packed)[List::MoreUtils]
+\bullet(packed)[JSON::MaybeXS]
+\bullet(packed)[List::SomeUtils]
 \bullet(packed)[Perl6::Slurp]
 \bullet(packed)[Template (part of Template Toolkit)]
 

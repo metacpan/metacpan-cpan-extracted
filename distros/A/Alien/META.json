@@ -5,7 +5,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -25,9 +25,13 @@
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -44,7 +48,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "perl" : "5.006"
          }
       }
@@ -52,17 +56,20 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/Alien/issues"
+         "web" : "https://github.com/PerlAlien/Alien/issues"
       },
       "homepage" : "https://metacpan.org/pod/Alien",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/Alien.git",
-         "web" : "https://github.com/plicease/Alien"
+         "url" : "git://github.com/PerlAlien/Alien.git",
+         "web" : "https://github.com/PerlAlien/Alien"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.95",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0224"
+   "version" : "0.96",
+   "x_generated_by_perl" : "v5.33.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
 }
 

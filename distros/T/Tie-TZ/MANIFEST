@@ -10,6 +10,7 @@ debian/watch
 devel/byname.pl
 devel/datecalc.pl
 devel/ithreads.pl
+devel/junk/SelectTZ.pm
 devel/leak.pl
 devel/lib/Test/POSIX/TzsetNotImplemented.pm
 devel/run.pl
@@ -22,7 +23,6 @@ devel/undef.pl
 devel/Z-tz.c
 examples/tie-tz.pl
 examples/time-tz.pl
-junk/SelectTZ.pm
 lib/Tie/TZ.pm
 lib/Time/TZ.pm
 Makefile.PL

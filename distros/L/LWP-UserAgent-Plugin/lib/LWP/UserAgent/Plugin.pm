@@ -1,7 +1,9 @@
 package LWP::UserAgent::Plugin;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-13'; # DATE
+our $DIST = 'LWP-UserAgent-Plugin'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -46,9 +48,12 @@ sub set_plugins {
 sub _run_hooks {
     my ($self, $hook, $opts, $r) = @_;
 
+    log_trace "[LWP::UserAgent::Plugin] -> running hook %s", $hook if $ENV{LWP_USERAGENT_PLUGIN_TRACE};
+
     my $status;
     for my $p (@plugins) {
         next unless $p->[0]->can($hook);
+        log_trace "[LWP::UserAgent::Plugin]   -> handler from plugin %s", $p->[0] if $ENV{LWP_USERAGENT_PLUGIN_TRACE};
         local $r->{config} = $p->[1];
         local $r->{hook} = $hook;
         $status = $p->[0]->$hook($r);
@@ -57,17 +62,31 @@ sub _run_hooks {
         }
         last if $status == 98 || $status == 99;
     }
-    $status // -1;
+    $status //= -1;
+    log_trace "[LWP::UserAgent::Plugin] <- return hook %s, status %d", $hook, $status if $ENV{LWP_USERAGENT_PLUGIN_TRACE};
+    $status;
 }
 
 sub request {
-    my $r = {ua=>$_[0], argv=>[@_]};
+    my $r = {ua=>$_[0], argv=>[@_], method=>'request'};
     my $self = shift;
 
     while (1) {
         $r->{response} = $self->SUPER::request(@_)
             unless $self->_run_hooks('before_request', {all=>1}, $r) == 99;
         last unless $self->_run_hooks('after_request', {all=>1}, $r) == 98;
+    }
+    $r->{response};
+}
+
+sub mirror {
+    my $r = {ua=>$_[0], argv=>[@_], method=>'mirror'};
+    my $self = shift;
+
+    while (1) {
+        $r->{response} = $self->SUPER::mirror(@_)
+            unless $self->_run_hooks('before_mirror', {all=>1}, $r) == 99;
+        last unless $self->_run_hooks('after_mirror', {all=>1}, $r) == 98;
     }
     $r->{response};
 }
@@ -87,7 +106,7 @@ LWP::UserAgent::Plugin - LWP::UserAgent with plugins
 
 =head1 VERSION
 
-This document describes version 0.001 of LWP::UserAgent::Plugin (from Perl distribution LWP-UserAgent-Plugin), released on 2019-04-15.
+This document describes version 0.004 of LWP::UserAgent::Plugin (from Perl distribution LWP-UserAgent-Plugin), released on 2020-08-13.
 
 =head1 SYNOPSIS
 
@@ -139,6 +158,11 @@ Hooks will be called with argument C<$r>, a hash that contains various
 information. Keys that are common for all hooks:
 
 =over
+
+=item * method
+
+The related LWP::UserAgent method. For example, in C<before_request> and
+C<after_request> hook, the value is C<request>.
 
 =item * config
 
@@ -228,6 +252,16 @@ interpret 99 (skip calling C<request()>).
 Will be called before C<request()>. All plugins will be called. Stage will
 interpret 98 (repeat calling C<request()>).
 
+=item * before_mirror
+
+Will be called before C<mirror()>. All plugins will be called. Stage will
+interpret 99 (skip calling C<mirror()>).
+
+=item * after_mirror
+
+Will be called before C<request()>. All plugins will be called. Stage will
+interpret 98 (repeat calling C<mirror()>).
+
 =back
 
 =head1 METHODS
@@ -246,6 +280,10 @@ prefix. After each plugin name, an optional hashref can be specified to
 configure the plugin.
 
 =head1 ENVIRONMENT
+
+=head2 LWP_USERAGENT_PLUGIN_TRACE
+
+Bool. If set to true, will produce more trace log statements.
 
 =head2 LWP_USERAGENT_PLUGINS
 
@@ -281,7 +319,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

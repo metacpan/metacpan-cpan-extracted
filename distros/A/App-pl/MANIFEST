@@ -5,9 +5,9 @@ Makefile.PL
 App/pl.pm
 pl
 pl.cmd
-t/a.txt
-t/b.txt
-t/c.txt
+t/atom-weight-1.csv
+t/atom-weight-2.csv
+t/atom-weight-3.csv
 t/cli-loop.t
 t/diff.t
 t/unit.t

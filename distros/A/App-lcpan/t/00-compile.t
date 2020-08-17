@@ -99,7 +99,7 @@ my @module_files = (
     'App/lcpan/Cmd/x_mentions_for_mod.pm',
     'App/lcpan/PodParser.pm',
     'End/PrintBytesIn.pm',
-    'LWP/UserAgent/Patch/FilterLcpan.pm'
+    'LWP/UserAgent/Plugin/FilterLcpan.pm'
 );
 
 my @scripts = (

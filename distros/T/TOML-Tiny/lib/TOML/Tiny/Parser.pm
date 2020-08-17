@@ -1,6 +1,6 @@
 package TOML::Tiny::Parser;
 # ABSTRACT: parser used by TOML::Tiny
-$TOML::Tiny::Parser::VERSION = '0.08';
+$TOML::Tiny::Parser::VERSION = '0.09';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -8,9 +8,12 @@ use v5.18;
 
 use Carp;
 use Data::Dumper;
-use TOML::Tiny::Grammar;
-use TOML::Tiny::Tokenizer;
 use TOML::Tiny::Util qw(is_strict_array);
+
+require Math::BigFloat;
+require Math::BigInt;
+require TOML::Tiny::Grammar;
+require TOML::Tiny::Tokenizer;
 
 our $TRUE  = 1;
 our $FALSE = 0;
@@ -24,8 +27,8 @@ eval{
 sub new {
   my ($class, %param) = @_;
   bless{
-    inflate_integer  => $param{inflate_integer}  || sub{ shift },
-    inflate_float    => $param{inflate_float}    || sub{ shift },
+    inflate_integer  => $param{inflate_integer},
+    inflate_float    => $param{inflate_float},
     inflate_datetime => $param{inflate_datetime} || sub{ shift },
     inflate_boolean  => $param{inflate_boolean}  || sub{ shift eq 'true' ? $TRUE : $FALSE },
     strict_arrays    => $param{strict_arrays},
@@ -263,8 +266,8 @@ sub parse_value {
 
   for ($token->{type}) {
     return $token->{value} when 'string';
-    return $self->{inflate_float}->($token->{value}) when 'float';
-    return $self->{inflate_integer}->($token->{value}) when 'integer';
+    return $self->inflate_float($token) when 'float';
+    return $self->inflate_integer($token) when 'integer';
     return $self->{inflate_boolean}->($token->{value}) when 'bool';
     return $self->{inflate_datetime}->($token->{value}) when 'datetime';
     return $self->parse_inline_table when 'inline_table';
@@ -325,6 +328,88 @@ sub parse_inline_table {
   return $table;
 }
 
+sub inflate_float {
+  my $self  = shift;
+  my $token = shift;
+  my $value = $token->{value};
+
+  # Caller-defined inflation routine
+  if ($self->{inflate_float}) {
+    return $self->{inflate_float}->($value);
+  }
+
+  return 'NaN' if $value =~ /^[-+]?nan$/i;
+  return 'inf' if $value =~ /^\+?inf$/i;
+  return '-inf' if $value =~ /^-inf$/i;
+
+  # Not a bignum
+  if (0 + $value eq $value) {
+    return 0 + $value;
+  }
+
+  #-----------------------------------------------------------------------------
+  # Scientific notation is a hairier situation. In order to determine whether a
+  # value will fit inside a perl svnv, we can't just coerce the value to a
+  # number and then test it against the string, because, for example, this will
+  # always be false:
+  #
+  #     9 eq "3e2"
+  #
+  # Instead, we are forced to test the coerced value against a BigFloat, which
+  # is capable of holding the number.
+  #-----------------------------------------------------------------------------
+  if ($value =~ /[eE]/) {
+    if (Math::BigFloat->new($value)->beq(0 + $value)) {
+      return 0 + $value;
+    }
+  }
+
+  return Math::BigFloat->new($value);
+}
+
+sub inflate_integer {
+  my $self  = shift;
+  my $token = shift;
+  my $value = $token->{value};
+
+  # Caller-defined inflation routine
+  if ($self->{inflate_integer}) {
+    return $self->{inflate_integer}->($value);
+  }
+
+  # Hex
+  if ($value =~ /^0x/) {
+    no warnings 'portable';
+    my $hex = hex $value;
+    my $big = Math::BigInt->new($value);
+    return $big->beq($hex) ? $hex : $big;
+  }
+
+  # Octal
+  if ($value =~ /^0o/) {
+    no warnings 'portable';
+    $value =~ s/^0o/0/;
+    my $oct = oct $value;
+    my $big = Math::BigInt->from_oct($value);
+    return $big->beq($oct) ? $oct : $big;
+  }
+
+  # Binary
+  if ($value =~ /^0b/) {
+    no warnings 'portable';
+    my $bin = oct $value; # oct handles 0b as binary
+    my $big = Math::BigInt->new($value);
+    return $big->beq($bin) ? $bin : $big;
+  }
+
+  # Not a bignum
+  if (0 + $value eq $value) {
+    return 0 + $value;
+  }
+
+  return Math::BigInt->new($value);
+}
+
 1;
 
 __END__
@@ -339,7 +424,7 @@ TOML::Tiny::Parser - parser used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 AUTHOR
 

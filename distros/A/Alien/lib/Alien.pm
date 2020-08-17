@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: External libraries wrapped up for your viewing pleasure!
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 
 1;
@@ -21,7 +21,7 @@ Alien - External libraries wrapped up for your viewing pleasure!
 
 =head1 VERSION
 
-version 0.95
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -29,23 +29,22 @@ version 0.95
 
 =head1 DESCRIPTION
 
-Alien is a package that exists just to hold together an idea, the idea
-of Alien:: packages, so there is no code here, just motivation for Alien.
+The intent of the Alien namespace is to provide a mechanism for specifying,
+installing and using non-native dependencies on CPAN.  Frequently this is
+a C library used by XS (see L<perlxs>) or FFI (see L<FFI::Platypus>), but
+it could be anything non-Perl usable from Perl.
 
-The intent of Alien is to provide a mechanism for specifying, installing 
-and using non-native dependencies on CPAN.  Frequently, this is a C 
-library used by XS, but it could be anything non-Perl usable from Perl.  
 Typical characteristics of an Alien distribution include:
 
 =over 4
 
 =item Probe for or install library during the build process
 
-Usually this means that L<Module::Build> or L<ExtUtils::MakeMaker> will 
-be extended to probe for an existing system library that meets the 
-criteria of the Alien module.  If it cannot be found the library is 
-downloaded from the Internet and installed into a share directory (See 
-L<File::ShareDir>).
+Usually this means that L<Module::Build> or L<ExtUtils::MakeMaker> will
+be extended to probe for an existing system library that meets the
+criteria of the Alien module.  If it cannot be found the library is
+downloaded from the Internet and installed into a share directory (See
+L<File::ShareDir::Dist>).
 
 Usually, though not necessarily, this is a C library.  It could be
 anything though, some JavaScript, Java C<.class> files.  Anything imaginable.
@@ -63,50 +62,51 @@ library flags required for using the library.
 
 =back
 
-These are suggestions only, and this module does not provide a 
-framework, because the needs of a non-native dependency on CPAN are 
-potentially quite diverse.  That being said, if your library uses a 
-standard build system, like C<autoconf>, C<make> or C<CMake> you should 
-consider using L<Alien::Build> and L<Alien::Base> which makes it easy to 
-write Alien modules that work with many common types of package build 
-systems.
+These are guidelines, and this module does not provide an implementation
+or a framework, because of the diverse nature of non-Perl dependencies
+on CPAN.  The more common cases are handled by the L<Alien::Base> +
+L<Alien::Build> system, which is recommended if you want to avoid
+reinventing the wheel.  See the L</SEE ALSO> section below for helpful
+resources.
 
 =head1 CAVEATS
 
 This section contains some recommendations from my own experience in
-writing Alien modules and from working on the L<Alien::Base> team.
+writing Alien modules and from working on the L<Alien::Base> +
+L<Alien::Build> team.  The L<Alien::Build> FAQ (L<Alien::Build::Manual::FAQ>)
+also addresses a number of implementation specific gotchas.
 
 =over 4
 
 =item When building from source code, build static libraries whenever possible
 
-Or at least isolate the dynamic libraries so they can be used by FFI, 
-but do not use them to build XS modules.  The reason for this is that if 
-an end user upgrades their version of C<Alien::Foo> it may break the 
-already installed version of C<Foo::XS> that used it when it was 
+Or at least isolate the dynamic libraries so they can be used by FFI,
+but do not use them to build XS modules.  The reason for this is that if
+an end user upgrades their version of C<Alien::Foo> it may break the
+already installed version of C<Foo::XS> that used it when it was
 installed.
 
 =item On Windows (ActiveState, Strawberry Perl)
 
-Many open source libraries use C<autoconf> and other Unix focused tools 
-that may not be easily available to the native (non-Cygwin) windows 
-Perl. L<Alien::MSYS> provides just enough of these tools for C<autoconf> 
-and may be sufficient for some other build tools.  Also, L<Alien::Build> 
-and L<Alien::Base> have hooks to detect C<autoconf> and inject 
+Many open source libraries use C<autoconf> and other Unix focused tools
+that may not be easily available to the native (non-Cygwin) windows
+Perl. L<Alien::MSYS> provides just enough of these tools for C<autoconf>
+and may be sufficient for some other build tools.  Also, L<Alien::Build>
+and L<Alien::Base> have hooks to detect C<autoconf> and inject
 L<Alien::MSYS> as a requirement on Windows when it is needed.
 
 =item MB vs EUMM
 
-The original Alien documentation recommends the use of L<Module::Build> 
-(MB), which at the time was recommended over L<ExtUtils::MakeMaker> 
-(EUMM).  Many Alien distributions have been written using MB.  Including 
-the original installer that came with L<Alien::Base>, 
-L<Alien::Base::ModuleBuild>.  I believe this is because it is an easier 
-build system to adapt to the Alien concept.  MB is no longer universally 
-recommended over EUMM, and has been removed from Perl's core, so if you 
-can, this author recommends using EUMM instead.  L<Alien::Build> and 
-L<Alien::Build::MM> provide tools for creating EUMM based Aliens.  
-Another example worth looking at is L<Alien::pkgconf>, which uses EUMM, 
+The original Alien documentation recommends the use of L<Module::Build>
+(MB), which at the time was recommended over L<ExtUtils::MakeMaker>
+(EUMM).  Many Alien distributions have been written using MB.  Including
+the original installer that came with L<Alien::Base>,
+L<Alien::Base::ModuleBuild>.  I believe this is because it is an easier
+build system to adapt to the Alien concept.  MB is no longer universally
+recommended over EUMM, and has been removed from Perl's core, so if you
+can, this author recommends using EUMM instead.  L<Alien::Build> and
+L<Alien::Build::MM> provide tools for creating EUMM based Aliens.
+Another example worth looking at is L<Alien::pkgconf>, which uses EUMM,
 but isn't based on L<Alien::Base> or L<Alien::Build>.
 
 =back
@@ -167,33 +167,28 @@ Preferably use L<Module::Build>. [ see caveats above ]
 
 Be sane.
 
-=head1 SUPPORT
-
-No support needed.
-
 =head1 SEE ALSO
 
 =over 4
 
-=item L<alienfile>
+=item L<Alien::Build::Manual::Alien>
 
-A specification for probing, building packages for Aliens.
+Documentation for building L<Alien>s using the L<Alien::Base> + L<Alien::Build> system.
+Intended for as a starting point for Alien users and Alien authors.
+
+=item L<Alien::Build::Manual::FAQ>
+
+Quick answers (FAQ) for many common Alien issues.
 
 =item L<Alien::Build>
 
-A new installer agnostic Alien builder, intended to replace 
-L<Alien::Base::ModuleBuild>.  See L<Alien::Build::Manual::AlienAuthor> 
+A new installer agnostic Alien builder, intended to replace
+L<Alien::Base::ModuleBuild>.  See L<Alien::Build::Manual::AlienAuthor>
 for details on how to create your own L<Alien::Build> based Alien.
 
 =item L<Alien::Base>
 
 An (optional) base class and framework for creating Alien distributions.
-
-=item L<Alien::Base::FAQ>
-
-Frequently Asked Questions for L<Alien::Base>.  Mostly specific to 
-L<Alien::Base>, but also addresses some challenges for Alien in 
-general.
 
 =item L<#native on irc.perl.org|http://chat.mibbit.com/#native@irc.perl.org>
 
@@ -204,6 +199,10 @@ in Perl.  It is specifically geared to Alien, L<Alien::Base> and FFI.
 
 This mailing list is mainly for L<Alien::Base>, and announcements for new
 versions will be posted there, but general Alien inquires are also welcome.
+
+=item L<https://github.com/PerlAlien>
+
+The Perl Alien organization on GitHub.
 
 =back
 

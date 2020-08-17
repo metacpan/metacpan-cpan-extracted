@@ -1,5 +1,9 @@
 Revision history for Perl Acme-Alien-DontPanic
 
+2.2600    2020-08-12 04:15:50 -0600
+  - Require Alien::Build 2.26
+  - Migrated from Alien::Base::ModuleBuild to Alien::Build::MM
+
 2.1100    2020-03-09 03:09:37 -0600
   - Require Alien::Build 2.11 Alien::Base::ModuleBuild 1.14
 

@@ -1,0 +1,3 @@
+PGP::Sign is a Perl module for generating and verifying detached OpenPGP
+signatures of textual data using GnuPG.  It was written to support Netnews
+article signatures for signed control messages and PGPMoose.

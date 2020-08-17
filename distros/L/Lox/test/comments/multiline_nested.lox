@@ -1,0 +1,6 @@
+/*
+  /*
+    print "comment";
+  */
+*/
+print "foo"; // expect: foo

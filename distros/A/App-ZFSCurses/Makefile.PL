@@ -7,9 +7,9 @@ WriteMakefile(
 	NAME         => 'App::ZFSCurses',
 	AUTHOR       => 'Patrice Clement <monsieurp@cpan.org>',
 	VERSION_FROM => 'lib/App/ZFSCurses.pm',
-	ABSTRACT     => 'curses UI to query and modify a ZFS dataset properties.',
+	ABSTRACT     => 'curses UI to query/modify a ZFS dataset/snapshot properties.',
 	LICENSE      => 'bsd',
-	EXE_FILES    => [ 'script/zfscurses' ],
+	EXE_FILES    => [ 'bin/zfscurses' ],
 	MIN_PERL_VERSION   => '5.006',
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => '0',

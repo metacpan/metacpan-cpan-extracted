@@ -59,3 +59,8 @@ Stop the Example daemon (simple way):
     $ carton exec -- bin/example.pl stop
 
 Or just press ^C if you started the daemon in the foreground.
+
+* Different port
+As 3000 seems a popular port, one can also run the example-deamon on a different port:
+
+    $ APP_PORT=3456 carton exec -- bin/example.pl <start | foreground>

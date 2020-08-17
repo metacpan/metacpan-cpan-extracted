@@ -1,5 +1,12 @@
 Revision history for Log-Dispatchouli
 
+2.021     2020-08-12 11:48:57-04:00 America/New_York
+        - add another experimental means to replace how Syslog output is set up
+
+2.020     2020-02-06 13:45:44-05:00 America/New_York (TRIAL RELEASE)
+        - add stdio_dispatcher_class, so you can subclass the Screen dispatcher
+          for stderr and stdio; this is experimental!
+
 2.019     2019-07-27 16:13:30-04:00 America/New_York
         - fix an initialization ordering bug for loggers using stdio
 

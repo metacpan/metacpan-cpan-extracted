@@ -8,7 +8,7 @@ Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back da
 
 =head1 VERSION
 
-version 2.201890
+version 2.202270
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ version 2.201890
 
 
   #
-  # AnyEvent Interface
+  # AnyEvent Interface (only usable if AnyEvent is installed)
   #
   use AnyEvent;
   my $wu = Parallel::WorkUnit->new();
@@ -73,7 +73,8 @@ the information, serialized, back).  It was designed to be very simple
 for a developer to use, with the ability to pass reasonably large amounts
 of data back to the parent process.
 
-This module is also designed to work with AnyEvent when desired.
+This module is also designed to work with AnyEvent when desired, but it
+does not require AnyEvent to be installed for other functionality to work.
 
 There are many other Parallel::* applications in CPAN - it would be worth
 any developer's time to look through those and choose the best one.
@@ -160,11 +161,6 @@ can spawn a new child regardless of the number of children already
 spawned. However, you children started with this method still count
 against the limit used by C<queue()>.
 
-Note: on Windows with threaded Perl, if C<AnyEvent> is not installed,
-threads instead of forks are used.  See C<thread> for the caveats
-that apply.  The PID returned is instead a meaningless (outside of
-this module) counter, not associated with any Windows thread identifier.
-
 =head2 asyncs( $children, sub { ... }, \&callback )
 
   $wu->asyncs( 10, sub { return 1 }, \&callback );
@@ -179,7 +175,7 @@ This functions similarly to the C<async()> method, with a couple
 key differences.
 
 First, it takes an additional parameter, C<$children>, that specifies
-the number of child threads to spawn.  Like the C<async()> method,
+the number of child processes to spawn.  Like the C<async()> method,
 the children are spawned immediately, regardless of the value of
 the C<max_children> attribute.
 
@@ -231,7 +227,7 @@ routine, then returns.
 =head2 count()
 
 This method returns the number of currently outstanding
-threads (in either a running state or a waiting to send their
+processes (in either a running state or a waiting to send their
 output).
 
 =head2 queue( sub { ... }, \&callback )
@@ -263,9 +259,9 @@ many other children are running.
 
 This method is similar to C<async()>, but unlike C<async()>, no provision to
 receive return value or wait on the child is made.  This is somewhat similar
-to C<start> in Perl 6 (but differs as this starts a subprocess, not a new
-thread (except on Windows), and there is thus no shared data (changes to data
-in the child process will not be seen in the parent process).
+to C<start> in Raku (but differs as this starts a subprocess, not a new
+thread, and there is thus no shared data (changes to data in the child process
+will not be seen in the parent process).
 
 Note that the child inherits all open file descriptors.
 

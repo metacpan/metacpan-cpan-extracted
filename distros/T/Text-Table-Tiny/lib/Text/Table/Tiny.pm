@@ -1,106 +1,196 @@
-use 5.006;
+package Text::Table::Tiny;
+$Text::Table::Tiny::VERSION = '1.00';
+use 5.010;
 use strict;
 use warnings;
-package Text::Table::Tiny;
-$Text::Table::Tiny::VERSION = '0.05';
+use utf8;
 use parent 'Exporter';
-use List::Util qw();
-use Carp qw/ croak /;
-
+use Carp         qw/ croak /;
+use Ref::Util    qw/ is_arrayref is_ref /;
 our @EXPORT_OK = qw/ generate_table /;
 
-# ABSTRACT: makes simple tables from two-dimensional arrays, with limited templating options
-
-
-our $COLUMN_SEPARATOR = '|';
-our $ROW_SEPARATOR = '-';
-our $CORNER_MARKER = '+';
+# Legacy package globals, that can be used to customise the look.
+# These are only used in the "classic" style.
+# I wish I could drop them, but I don't want to break anyone's code.
+our $COLUMN_SEPARATOR     = '|';
+our $ROW_SEPARATOR        = '-';
+our $CORNER_MARKER        = '+';
 our $HEADER_ROW_SEPARATOR = '=';
 our $HEADER_CORNER_MARKER = 'O';
 
-sub generate_table {
+my %charsets = (
+    classic => { TLC => '+', TT => '+', TRC => '+', HR => '-', VR => '|', FHR => '=', LT => '+', RT => '+', FLT => 'O', FRT => 'O', HC => '+', FHC => 'O', BLC => '+', BT => '+', BRC => '+' },
+    boxrule => { TLC => '┌', TT => '┬', TRC => '┐', HR => '─', VR => '│', FHR => '═', LT => '├', RT => '┤', FLT => '╞', FRT => '╡', HC => '┼', FHC => '╪', BLC => '└', BT => '┴', BRC => '┘' },
+    norule  => { TLC => ' ', TT => ' ', TRC => ' ', HR => ' ', VR => ' ', FHR => ' ', LT => ' ', RT => ' ', FLT => ' ', FRT => ' ', HC => ' ', FHC => ' ', BLC => ' ', BT => ' ', BRC => ' ' },
+);
 
-    my %params = @_;
-    my $rows = $params{rows} or croak "generate_table(): you must pass the 'rows' argument!";
+sub generate_table
+{
+    my %param   = @_;
+    my $rows    = $param{rows} or croak "you must pass the 'rows' argument!";
+    my @rows    = @$rows;
+    my @widths  = _calculate_widths($rows);
 
-    # foreach col, get the biggest width
-    my $widths = _maxwidths($rows);
-    my $max_index = _max_array_index($rows);
+    $param{style}  //= 'classic';
 
-    # use that to get the field format and separators
-    my $format = _get_format($widths);
-    my $row_sep = _get_row_separator($widths);
-    my $head_row_sep = _get_header_row_separator($widths);
+    $param{indent} //= '';
+    $param{indent} = ' ' x $param{indent} if $param{indent} =~ /^[0-9]+$/;
 
-    # here we go...
-    my @table;
-    push(@table, $row_sep) unless $params{top_and_tail};
+    my $style   = $param{style};
+    croak "unknown style '$style'" if not exists($charsets{ $style });
+    my $char    = $charsets{$style};
 
-    # if the first row's a header:
-    my $data_begins = 0;
-    if ( $params{header_row} ) {
-        my $header_row = $rows->[0];
-        $data_begins++;
-        push @table, sprintf(
-                         $format, 
-                         map { defined($header_row->[$_]) ? $header_row->[$_] : '' } (0..$max_index)
-                     );
-        push @table, $params{separate_rows} ? $head_row_sep : $row_sep;
+    if ($style eq 'classic') {
+        $char->{TLC} = $char->{TRC} = $char->{TT} = $char->{LT} = $char->{RT} = $char->{HC} = $char->{BLC} = $char->{BT} = $char->{BRC} = $CORNER_MARKER;
+        $char->{HR}  = $ROW_SEPARATOR;
+        $char->{VR}  = $COLUMN_SEPARATOR;
+        $char->{FLT} = $char->{FRT} = $char->{FHC} = $HEADER_CORNER_MARKER;
+        $char->{FHR} = $HEADER_ROW_SEPARATOR;
     }
 
-    # then the data
-    my $row_number = 0;
-    my $last_line_number = int(@$rows);
-    $last_line_number-- if $params{header_row};
-    foreach my $row ( @{ $rows }[$data_begins..$#$rows] ) {
-        $row_number++;
-        push(@table, sprintf(
-                             $format, 
-                             map { defined($row->[$_]) ? $row->[$_] : '' } (0..$max_index)
-                            ));
-
-        push(@table, $row_sep) if $params{separate_rows} && (!$params{top_and_tail} || $row_number < $last_line_number);
-
+    my $header;
+    my @align;
+    if (defined $param{align}) {
+        @align = is_arrayref($param{align})
+               ? @{ $param{align} }
+               : ($param{align}) x int(@widths)
+               ;
+    }
+    else {
+        @align = ('l') x int(@widths);
     }
 
-    # this will have already done the bottom if called explicitly
-    push(@table, $row_sep) unless $params{separate_rows} || $params{top_and_tail};
-    return join("\n",grep {$_} @table);
+    $header = shift @rows if $param{header_row};
+
+    my $table = _top_border(\%param, \@widths, $char)
+                ._header_row(\%param, $header, \@widths, \@align, $char)
+                ._header_rule(\%param, \@widths, $char)
+                ._body(\%param, \@rows, \@widths, \@align, $char)
+                ._bottom_border(\%param, \@widths, $char);
+    chop($table);
+
+    return $table;
 }
 
+sub _top_border
+{
+    my ($param, $widths, $char) = @_;
 
-sub _maxwidths {
+    return '' if $param->{top_and_tail};
+    return _rule_row($param, $widths, $char->{TLC}, $char->{HR}, $char->{TT}, $char->{TRC});
+
+    return '' if $param->{top_and_tail};
+    my $pad = $param->{compact} ? '' : $char->{HR};
+
+    return $param->{indent}
+           .$char->{TLC}
+           .join($char->{TT}, map { $pad.($char->{HR} x $_).$pad } @$widths)
+           .$char->{TRC}
+           ."\n"
+           ;
+}
+
+sub _bottom_border
+{
+    my ($param, $widths, $char) = @_;
+
+    return '' if $param->{top_and_tail};
+    return _rule_row($param, $widths, $char->{BLC}, $char->{HR}, $char->{BT}, $char->{BRC});
+}
+
+sub _rule_row
+{
+    my ($param, $widths, $le, $hr, $cross, $re) = @_;
+    my $pad = $param->{compact} ? '' : $hr;
+
+    return $param->{indent}
+           .$le
+           .join($cross, map { $pad.($hr x $_).$pad } @$widths)
+           .$re
+           ."\n"
+           ;
+}
+
+sub _header_row
+{
+    my ($param, $row, $widths, $align, $char) = @_;
+    return '' unless $param->{header_row};
+
+    return _text_row($param, $row, $widths, $align, $char);
+}
+
+sub _header_rule
+{
+    my ($param, $widths, $char) = @_;
+    return '' unless $param->{header_row};
+    my $fancy = $param->{separate_rows} ? 'F' : '';
+
+    return _rule_row($param, $widths, $char->{"${fancy}LT"}, $char->{"${fancy}HR"}, $char->{"${fancy}HC"}, $char->{"${fancy}RT"});
+}
+
+sub _body
+{
+    my ($param, $rows, $widths, $align, $char) = @_;
+    my $divider = $param->{separate_rows} ? _rule_row($param, $widths, $char->{LT}, $char->{HR}, $char->{HC}, $char->{RT}) : '';
+
+    return join($divider, map { _text_row($param, $_, $widths, $align, $char) } @$rows);
+}
+
+sub _text_row
+{
+    my ($param, $row, $widths, $align, $char) = @_;
+    my @columns = @$row;
+    my $text = $param->{indent}.$char->{VR};
+
+    for (my $i = 0; $i < @$widths; $i++) {
+        $text .= _format_column($columns[$i] // '', $widths->[$i], $align->[$i] // 'l', $param, $char);
+        $text .= $char->{VR};
+    }
+    $text .= "\n";
+
+    return $text;
+}
+
+sub _format_column
+{
+    my ($text, $width, $align, $param, $char) = @_;
+    my $pad = $param->{compact} ? '' : ' ';
+
+    if ($align eq 'r' || $align eq 'right') {
+        return $pad.' ' x ($width - tty_length($text)).$text.$pad;
+    }
+    elsif ($align eq 'c' || $align eq 'center' || $align eq 'centre') {
+        my $total_spaces = $width - tty_length($text);
+        my $left_spaces  = int($total_spaces / 2);
+        my $right_spaces = $left_spaces;
+        $right_spaces++ if $total_spaces % 2 == 1;
+        return $pad.(' ' x $left_spaces).$text.(' ' x $right_spaces).$pad;
+    }
+    else {
+        return $pad.$text.' ' x ($width - tty_length($text)).$pad;
+    }
+}
+
+sub _calculate_widths
+{
     my $rows = shift;
-    # what's the longest array in this list of arrays?
-    my $max_index = _max_array_index($rows);
-    my $widths = [];
-    for my $i (0..$max_index) {
-        # go through the $i-th element of each array, find the longest
-        my $max = List::Util::max(map {defined $$_[$i] ? length($$_[$i]) : 0} @$rows);
-        push @$widths, $max;
+    my @widths;
+    foreach my $row (@$rows) {
+        my @columns = @$row;
+        for (my $i = 0; $i < @columns; $i++) {
+            next unless defined($columns[$i]);
+            $widths[$i] = tty_length($columns[$i]) if !defined($widths[$i])
+                                                   || tty_length($columns[$i]) > $widths[$i];
+        }
     }
-    return $widths;
+    return @widths;
 }
 
-# return highest top-index from all rows in case they're different lengths
-sub _max_array_index {
-    my $rows = shift;
-    return List::Util::max( map { $#$_ } @$rows );
-}
-
-sub _get_format {
-    my $widths = shift;
-    return "$COLUMN_SEPARATOR ".join(" $COLUMN_SEPARATOR ",map { "%-${_}s" } @$widths)." $COLUMN_SEPARATOR";
-}
-
-sub _get_row_separator {
-    my $widths = shift;
-    return "$CORNER_MARKER$ROW_SEPARATOR".join("$ROW_SEPARATOR$CORNER_MARKER$ROW_SEPARATOR",map { $ROW_SEPARATOR x $_ } @$widths)."$ROW_SEPARATOR$CORNER_MARKER";
-}
-
-sub _get_header_row_separator {
-    my $widths = shift;
-    return "$HEADER_CORNER_MARKER$HEADER_ROW_SEPARATOR".join("$HEADER_ROW_SEPARATOR$HEADER_CORNER_MARKER$HEADER_ROW_SEPARATOR",map { $HEADER_ROW_SEPARATOR x $_ } @$widths)."$HEADER_ROW_SEPARATOR$HEADER_CORNER_MARKER";
+sub tty_length
+{
+    my $string = shift;
+    $string =~ s/\e\[[0-9]+(;[0-9]+)?[ABCDEFGHJKSTfmin]//msg;
+    return length($string);
 }
 
 # Back-compat: 'table' is an alias for 'generate_table', but isn't exported
@@ -112,50 +202,60 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
-Text::Table::Tiny - simple text tables from 2D arrays, with limited templating options
+Text::Table::Tiny - generate simple text tables from 2D arrays
 
 =head1 SYNOPSIS
 
-    use Text::Table::Tiny 0.04 qw/ generate_table /;
+ use Text::Table::Tiny 1.00 qw/ generate_table /;
 
-    my $rows = [
-        # header row
-        ['Name', 'Rank', 'Serial'],
-        # rows
-        ['alice', 'pvt', '123456'],
-        ['bob',   'cpl', '98765321'],
-        ['carol', 'brig gen', '8745'],
-    ];
-    print generate_table(rows => $rows, header_row => 1);
+ my $rows = [
+   [qw/ Pokemon     Type     Count /],
+   [qw/ Abra        Psychic      5 /],
+   [qw/ Ekans       Poison     123 /],
+   [qw/ Feraligatr  Water     5678 /],
+ ];
+
+ print generate_table(rows => $rows, header_row => 1), "\n";
 
 
 =head1 DESCRIPTION
 
 This module provides a single function, C<generate_table>, which formats
 a two-dimensional array of data as a text table.
+There are a number of options for adjusting the output format,
+but the intention is that the default option is good enough for most uses.
 
 The example shown in the SYNOPSIS generates the following table:
 
-    +-------+----------+----------+
-    | Name  | Rank     | Serial   |
-    +-------+----------+----------+
-    | alice | pvt      | 123456   |
-    | bob   | cpl      | 98765321 |
-    | carol | brig gen | 8745     |
-    +-------+----------+----------+
+ +------------+---------+-------+
+ | Pokemon    | Type    | Count |
+ +------------+---------+-------+
+ | Abra       | Psychic | 5     |
+ | Ekans      | Poison  | 123   |
+ | Feraligatr | Water   | 5678  |
+ +------------+---------+-------+
 
 B<NOTE>: the interface changed with version 0.04, so if you
 use the C<generate_table()> function illustrated above,
 then you need to require at least version 0.04 of this module,
 as shown in the SYNOPSIS.
 
+B<NOTE 2>: some of the options described below were added in version 1.00,
+so your best bet is to require version 1.00,
+as per the SYNOPSIS.
+
 
 =head2 generate_table()
 
-The C<generate_table> function understands three arguments,
+The C<generate_table> function understands a number of arguments,
 which are passed as a hash.
+The only required argument is B<rows>.
+Where arguments were not supported in the original release,
+the first supporting version is noted.
 
 =over 4
 
@@ -191,6 +291,54 @@ top_and_tail
 If given a true value, then the top and bottom border lines will be skipped.
 This reduces the vertical height of the generated table.
 
+Added in 0.04.
+
+=item *
+
+align
+
+This takes an array ref with one entry per column,
+to specify the alignment of that column.
+Legal values are 'l', 'c', and 'r'.
+You can also specify a single alignment for all columns.
+ANSI escape codes are handled.
+
+Added in 1.00.
+
+=item *
+
+style
+
+Specifies the format of the output table.
+The default is C<'classic'>,
+but other options are C<'boxrule'> and C<'norule'>.
+
+If you use the C<boxrule> style,
+you'll probably need to run C<binmode(STDOUT, ':utf8')>.
+
+Added in 1.00.
+
+
+=item *
+
+indent
+
+Specify an indent that should be prefixed to every line
+of the generated table.
+This can either be a string of spaces,
+or an integer giving the number of spaces wanted.
+
+Added in 1.00.
+
+=item *
+
+compact
+
+If set to a true value then we omit the single space padding on either
+side of every column.
+
+Added in 1.00.
+
 =back
 
 
@@ -202,75 +350,122 @@ If you just pass the data and no other options:
 
 You get minimal ruling:
 
-    +-------+----------+----------+
-    | Name  | Rank     | Serial   |
-    | alice | pvt      | 123456   |
-    | bob   | cpl      | 98765321 |
-    | carol | brig gen | 8745     |
-    +-------+----------+----------+
+ +------------+---------+-------+
+ | Pokemon    | Type    | Count |
+ | Abra       | Psychic | 5     |
+ | Ekans      | Poison  | 123   |
+ | Feraligatr | Water   | 5678  |
+ +------------+---------+-------+
 
-If you want lines between every row, and also want a separate header:
+If you want a separate header, set the header_row option to a true value,
+as shown in the SYNOPSIS.
 
- generate_table(rows => $rows, header_row => 1, separate_rows => 1);
+To take up fewer lines,
+you can miss out the top and bottom rules,
+by setting C<top_and_tail> to a true value:
 
-You get the maximally ornate:
+ generate_table(rows => $rows, header_row => 1, top_and_tail => 1);
 
-    +-------+----------+----------+
-    | Name  | Rank     | Serial   |
-    O=======O==========O==========O
-    | alice | pvt      | 123456   |
-    +-------+----------+----------+
-    | bob   | cpl      | 98765321 |
-    +-------+----------+----------+
-    | carol | brig gen | 8745     |
-    +-------+----------+----------+
+This will generate the following:
 
-=head1 FORMAT VARIABLES
+ | Pokemon    | Type    | Count |
+ +------------+---------+-------+
+ | Abra       | Psychic | 5     |
+ | Ekans      | Poison  | 123   |
+ | Feraligatr | Water   | 5678  |
 
-You can set a number of package variables inside the C<Text::Table::Tiny> package
-to configure the appearance of the table.
-This interface is likely to be deprecated in the future,
-and some other mechanism provided.
+If you want a more stylish looking table,
+set the C<style> parameter to C<'boxrule'>:
 
-=over 4
+ binmode(STDOUT,':utf8');
+ generate_table(rows => $rows, header_row => 1, style => 'boxrule');
 
-=item *
+This uses the ANSI box rule characters.
+Note that you will need to ensure UTF output.
 
-$Text::Table::Tiny::COLUMN_SEPARATOR = '|';
+ ┌────────────┬─────────┬───────┐
+ │ Pokemon    │ Type    │ Count │
+ ├────────────┼─────────┼───────┤
+ │ Abra       │ Psychic │ 5     │
+ │ Ekans      │ Poison  │ 123   │
+ │ Feraligatr │ Water   │ 5678  │
+ └────────────┴─────────┴───────┘
 
-=item *
+You might want to right-align numeric values:
 
-$Text::Table::Tiny::ROW_SEPARATOR = '-';
+ generate_table( ... , align => [qw/ l l r /] );
 
-=item *
+The C<align> parameter can either take an arrayref,
+or a string with an alignment to apply to all columns:
 
-$Text::Table::Tiny::CORNER_MARKER = '+';
+ ┌────────────┬─────────┬───────┐
+ │ Pokemon    │ Type    │ Count │
+ ├────────────┼─────────┼───────┤
+ │ Abra       │ Psychic │     5 │
+ │ Ekans      │ Poison  │   123 │
+ │ Feraligatr │ Water   │  5678 │
+ └────────────┴─────────┴───────┘
 
-=item *
+If you're using the boxrule style,
+you might feel you can remove the padding on either side of every column,
+done by setting C<compact> to a true value:
 
-$Text::Table::Tiny::HEADER_ROW_SEPARATOR = '=';
+ ┌──────────┬───────┬─────┐
+ │Pokemon   │Type   │Count│
+ ├──────────┼───────┼─────┤
+ │Abra      │Psychic│    5│
+ │Ekans     │Poison │  123│
+ │Feraligatr│Water  │ 5678│
+ └──────────┴───────┴─────┘
 
-=item *
+You can also ask for a rule between each row,
+in which case the header rule becomes stronger.
+This works best when combined with the boxrule style:
 
-$Text::Table::Tiny::HEADER_CORNER_MARKER = 'O';
+ generate_table( ... , separate_rows => 1 );
 
-=back
+Which results in the following:
 
+ ┌────────────┬─────────┬───────┐
+ │ Pokemon    │ Type    │ Count │
+ ╞════════════╪═════════╪═══════╡
+ │ Abra       │ Psychic │     5 │
+ ├────────────┼─────────┼───────┤
+ │ Ekans      │ Poison  │   123 │
+ ├────────────┼─────────┼───────┤
+ │ Feraligatr │ Water   │  5678 │
+ └────────────┴─────────┴───────┘
 
-=head1 PREVIOUS INTERFACE
+You can use this with the other styles,
+but I'm not sure you'd want to.
+ 
+If you just want columnar output,
+use the C<norule> style:
 
-Prior to version 0.04 this module provided a function called C<table()>,
-which wasn't available for export. It took exactly the same arguments:
+ generate_table( ... , style => 'norule' );
 
- use Text::Table::Tiny;
- my $rows = [ ... ];
- print Text::Table::Tiny::table(rows => $rows, separate_rows => 1, header_row => 1);
+which results in:
 
-For backwards compatibility this interface is still supported.
-The C<table()> function isn't available for export though.
+  
+  Pokemon      Type      Count
+  
+  Abra         Psychic       5
+  Ekans        Poison      123
+  Feraligatr   Water      5678
+   
+
+Note that everywhere you saw a line on the previous tables,
+there will be a space character in this version.
+So you may want to combine the C<top_and_tail> option,
+to suppress the extra blank lines before and after
+the body of the table.
 
 
 =head1 SEE ALSO
+
+My L<blog post|http://neilb.org/2019/08/06/text-table-tiny-changes.html>
+where I described changes to formatting;
+this has more examples.
 
 There are many modules for formatting text tables on CPAN.
 A good number of them are listed in the
@@ -285,13 +480,15 @@ L<https://github.com/neilb/Text-Table-Tiny>
 
 =head1 AUTHOR
 
-Creighton Higgins <chiggins@chiggins.com>
+Neil Bowers <neilb@cpan.org>
 
-Now maintained by Neil Bowers <neilb@cpan.org>
+The original version was written by Creighton Higgins <chiggins@chiggins.com>,
+but the module was entirely rewritten for 0.05_01.
+
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Creighton Higgins.
+This software is copyright (c) 2020 by Neil Bowers.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

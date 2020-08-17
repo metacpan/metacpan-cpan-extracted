@@ -2,8 +2,8 @@
 
 ## no critic: InputOutput::ProhibitReadlineInForLoop
 
-our $DATE = '2019-02-08'; # DATE
-our $VERSION = '0.120'; # VERSION
+our $DATE = '2020-04-30'; # DATE
+our $VERSION = '0.121'; # VERSION
 
 use 5.010;
 use strict;
@@ -18,8 +18,7 @@ $SPEC{fatpack_info} = {
     summary => 'Given a fatpacked script, show various info',
     args => {
         script => {
-            schema => 'str*',
-            'x.schema.entity' => 'filename',
+            schema => 'filename*',
             req => 1,
             pos => 0,
             completion => sub {
@@ -168,13 +167,16 @@ fatpack-info - Given a fatpacked script, show various info
 
 =head1 VERSION
 
-This document describes version 0.120 of fatpack-info (from Perl distribution App-FatPackUtils), released on 2019-02-08.
+This document describes version 0.121 of fatpack-info (from Perl distribution App-FatPackUtils), released on 2020-04-30.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % fatpack-info [options] <script>
+ % fatpack-info [-V] [--config-path=path | -c] [--config-profile=profile |
+     -P] [--format=name] [--json] [-l] [--list-modules] [--(no)naked-res]
+     [--no-config | -C] [--no-env] [--page-result[=program]]
+     [--show-module-version] <script>
 
 Examples:
 
@@ -194,7 +196,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--script>=I<filename>*
+=item B<--script>=I<s>*
 
 =item B<--show-module-version>, B<-V>
 
@@ -212,7 +214,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -272,6 +274,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -383,7 +389,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,40 @@
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
+use strict;
+use warnings;
+no if "$]" >= 5.031009, feature => 'indirect';
+
+use Test::More 0.88;
+use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
+use Test::Deep;
+use Test::JSON::Schema::Acceptance;
+use JSON::PP;
+
+my %additional_resources;
+
+my $accepter = Test::JSON::Schema::Acceptance->new(
+  test_dir => 't/tests/add_resource',
+  additional_resources => 't/tests/add_resource/remotes',
+  include_optional => 0,
+);
+
+$accepter->acceptance(
+  validate_data => sub {
+    my ($schema, $data) = @_;
+    return 1; # all schemas evaluate to true here
+  },
+  add_resource => sub {
+    my ($uri, $schema) = @_;
+    $additional_resources{$uri} = $schema;
+  },
+);
+
+cmp_deeply(
+  \%additional_resources,
+  {
+    'http://localhost:1234/remote1.json' => { '$defs' => { foo => JSON::PP::true } },
+    'http://localhost:1234/subfolder/remote2.json' => { '$defs' => { bar => JSON::PP::false } },
+  },
+  'user-supplied subref is called with additional resources found in test directory',
+);
+
+done_testing;

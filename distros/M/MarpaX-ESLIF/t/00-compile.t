@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'MarpaX/ESLIF.pm',
+    'MarpaX/ESLIF/Base.pm',
     'MarpaX/ESLIF/Event/Type.pm',
     'MarpaX/ESLIF/Grammar.pm',
     'MarpaX/ESLIF/Grammar/Properties.pm',
@@ -20,11 +21,15 @@ my @module_files = (
     'MarpaX/ESLIF/JSON/Decoder/RecognizerInterface.pm',
     'MarpaX/ESLIF/JSON/Encoder.pm',
     'MarpaX/ESLIF/Logger/Level.pm',
+    'MarpaX/ESLIF/Recognizer.pm',
+    'MarpaX/ESLIF/RegexCallout.pm',
     'MarpaX/ESLIF/Rule/PropertyBitSet.pm',
     'MarpaX/ESLIF/String.pm',
+    'MarpaX/ESLIF/Symbol.pm',
     'MarpaX/ESLIF/Symbol/EventBitSet.pm',
     'MarpaX/ESLIF/Symbol/PropertyBitSet.pm',
     'MarpaX/ESLIF/Symbol/Type.pm',
+    'MarpaX/ESLIF/Value.pm',
     'MarpaX/ESLIF/Value/Type.pm'
 );
 

@@ -1,15 +1,12 @@
 package Tags::Output::Structure;
 
-# Pragmas.
 use base qw(Tags::Output);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Flush.
 sub flush {
@@ -128,6 +125,7 @@ __END__
 =head1 SYNOPSYS
 
  use Tags::Output::Structure;
+
  my $obj = Tags::Output::Structure->new(%parameters);
  $obj->finalize;
  my $ret_ar = $obj->flush($reset_flag);
@@ -221,11 +219,9 @@ __END__
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Data::Printer;
  use Tags::Output::Structure;
 
@@ -292,11 +288,9 @@ __END__
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Tags::Output::Structure;
 
  # Object.
@@ -352,19 +346,24 @@ Install the Tags modules.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Tags-Output-Structure>
+
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2012-2015 Michal Špaček
- BSD 2-Clause License
+© 2012-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

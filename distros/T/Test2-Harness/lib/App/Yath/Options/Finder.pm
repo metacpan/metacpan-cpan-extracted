@@ -2,7 +2,7 @@ package App::Yath::Options::Finder;
 use strict;
 use warnings;
 
-our $VERSION = '1.000020';
+our $VERSION = '1.000023';
 
 use Test2::Harness::Util qw/mod2file/;
 
@@ -41,6 +41,46 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
 
     option only_long => (
         description => "Only run tests that have their duration flag set to 'LONG'",
+    );
+
+    option show_changed_files => (
+        description => "Print a list of changed files if any are found",
+        applicable => \&changes_applicable,
+    );
+
+    option changed_only => (
+        description => "Only search for tests for changed files (Requires --coverage-from, also requires a list of changes either from the --changed option, or a plugin that implements changed_files())",
+        applicable => \&changes_applicable,
+    );
+
+    option changed => (
+        type => 'm',
+        description => "Specify one or more files as having been changed.",
+        long_examples => [' path/to/file'],
+        applicable => \&changes_applicable,
+    );
+
+    option changes_plugin => (
+        type => 's',
+        description => "What plugin should be used to detect changed files.",
+        long_examples => [' Git', ' +App::Yath::Plugin::Git'],
+        applicable => \&changes_applicable,
+    );
+
+    option coverage_from => (
+        type => 's',
+        description => "Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.",
+        long_examples => [' path/to/log.jsonl', ' http://example.com/coverage', ' path/to/coverage.json']
+    );
+
+    option maybe_coverage_from => (
+        type => 's',
+        description => "Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.",
+        long_examples => [' path/to/log.jsonl', ' http://example.com/coverage', ' path/to/coverage.json']
+    );
+
+    option coverage_url_use_post => (
+        description => 'If coverage_from is a url, use the http POST method with a list of changed files. This allows the server to tell us what tests to run instead of downloading all the coverage data and determining what tests to run from that.',
     );
 
     option durations => (
@@ -109,6 +149,7 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
 sub _post_process {
     my %params   = @_;
     my $settings = $params{settings};
+    my $options  = $params{options};
 
     $settings->finder->field(default_search => ['./t', './t2', 'test.pl'])
         unless $settings->finder->default_search && @{$settings->finder->default_search};
@@ -120,6 +161,12 @@ sub _post_process {
         unless @{$settings->finder->extensions};
 
     s/^\.//g for @{$settings->finder->extensions};
+
+    unless ($options->command_class && $options->command_class->isa('App::Yath::Command::projects')) {
+        die "--changed-only, --changed, and --changes-plugin require --coverage_from or --maybe-coverage-from.\n"
+            if $settings->finder->changed_only
+            && !($settings->finder->coverage_from || $settings->finder->maybe_coverage_from);
+    }
 }
 
 sub normalize_class {
@@ -163,6 +210,14 @@ sub finder_action {
     $handler->($slot, $class);
 }
 
+sub changes_applicable {
+    my ($option, $options) = @_;
+
+    # Cannot use this options with projects
+    return 0 if $options->command_class && $options->command_class->isa('App::Yath::Command::projects');
+    return 1;
+}
+
 1;
 
 __END__
@@ -203,6 +258,49 @@ Specify what Finder subclass to use when searching for files/processing the file
 =head3 Finder Options
 
 =over 4
+
+=item --changed path/to/file
+
+=item --no-changed
+
+Specify one or more files as having been changed.
+
+Can be specified multiple times
+
+
+=item --changed-only
+
+=item --no-changed-only
+
+Only search for tests for changed files (Requires --coverage-from, also requires a list of changes either from the --changed option, or a plugin that implements changed_files())
+
+
+=item --changes-plugin Git
+
+=item --changes-plugin +App::Yath::Plugin::Git
+
+=item --no-changes-plugin
+
+What plugin should be used to detect changed files.
+
+
+=item --coverage-from path/to/log.jsonl
+
+=item --coverage-from http://example.com/coverage
+
+=item --coverage-from path/to/coverage.json
+
+=item --no-coverage-from
+
+Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
+
+
+=item --coverage-url-use-post
+
+=item --no-coverage-url-use-post
+
+If coverage_from is a url, use the http POST method with a list of changed files. This allows the server to tell us what tests to run instead of downloading all the coverage data and determining what tests to run from that.
+
 
 =item --default-at-search ARG
 
@@ -279,6 +377,17 @@ Specify valid test filename extensions, default: t and t2
 Can be specified multiple times
 
 
+=item --maybe-coverage-from path/to/log.jsonl
+
+=item --maybe-coverage-from http://example.com/coverage
+
+=item --maybe-coverage-from path/to/coverage.json
+
+=item --no-maybe-coverage-from
+
+Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
+
+
 =item --maybe-durations file.json
 
 =item --maybe-durations http://example.com/durations.json
@@ -311,6 +420,13 @@ Only run tests that have their duration flag set to 'LONG'
 List of tests and test directories to use instead of the default search paths. Typically these can simply be listed as command line arguments without the --search prefix.
 
 Can be specified multiple times
+
+
+=item --show-changed-files
+
+=item --no-show-changed-files
+
+Print a list of changed files if any are found
 
 
 =back

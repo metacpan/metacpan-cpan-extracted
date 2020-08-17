@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use 5.008004;
 
-# ABSTRACT: Interface to WebAssembly Memory
-our $VERSION = '0.18'; # VERSION
+# ABSTRACT: Interface to WebAssembly functions
+our $VERSION = '0.19'; # VERSION
 
 
 1;
@@ -18,11 +18,11 @@ __END__
 
 =head1 NAME
 
-Wasm::Func - Interface to WebAssembly Memory
+Wasm::Func - Interface to WebAssembly functions
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 

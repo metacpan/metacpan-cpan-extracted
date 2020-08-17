@@ -1,0 +1,23 @@
+The test suite requires `remctld` be installed and available in the user's
+path or in `/usr/local/sbin` or `/usr/sbin`; and that `sqlite3`, `kinit`,
+and either `kvno` or `kgetcred` be installed and available on the user's
+path.  The test suite will also need to be able to bind to 127.0.0.1 on
+ports 11119 and 14373 to test client/server network interactions.
+
+The test suite uses a SQLite database for server-side and end-to-end
+testing and therefore requires the DBD::SQLite and
+DateTime::Format::SQLite Perl modules.
+
+All of the requirements listed above will be required to run the full test
+suite of server functionality, but tests will be selectively skipped if
+their requirements aren't found.
+
+The following additional Perl modules will be used if present:
+
+* Test::MinimumVersion
+* Test::Pod
+* Test::Spelling
+* Test::Strict
+
+All are available on CPAN.  Those tests will be skipped if the modules are
+not available.

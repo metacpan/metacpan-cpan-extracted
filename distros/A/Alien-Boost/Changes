@@ -1,5 +1,11 @@
 Revision history for Alien-libpcre},
 
+1.6      2020-08-14 06:57:34 -0600
+         - Do not build -lboost_python 
+
+1.5      2020-08-10 06:57:34 -0600
+         - Better probe testing lib
+
 1.4      2020-08-05 06:57:34 -0600
          - Add -lboost_program_options for system install
          - Add Test::Alien::Diag to prereqs

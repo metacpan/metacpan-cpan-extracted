@@ -6,7 +6,7 @@ The following additional Perl modules are required to use it:
 * IO::Compress::Xz (part of IO-Compress-LZMA)
 * IPC::Run
 * IPC::System::Simple
-* JSON
-* List::MoreUtils
+* JSON::MaybeXS
+* List::SomeUtils
 * Perl6::Slurp
 * Template (part of Template Toolkit)

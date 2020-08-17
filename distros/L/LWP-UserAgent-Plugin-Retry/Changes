@@ -1,0 +1,19 @@
+0.003   2020-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Synchronize features with
+	  HTTP::Tiny::Plugin::Retry: remove retry_{server,client}_errors
+	  options, add retry_if & strategy options.
+
+	- [bugfix] Fix one-off error in number of attempts.
+
+
+0.002   2020-08-14  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak See Also section.
+
+
+0.001    2020-08-13  Released-By: PERLANCAR
+
+         - First release.

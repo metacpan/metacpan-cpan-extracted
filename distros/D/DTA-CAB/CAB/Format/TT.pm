@@ -20,7 +20,7 @@ our @ISA = qw(DTA::CAB::Format);
 BEGIN {
   DTA::CAB::Format->registerFormat(name=>__PACKAGE__, filenameRegex=>qr/\.(?i:t|tt|ttt|cab\-t|cab\-tt|cab\-ttt)$/);
   DTA::CAB::Format->registerFormat(name=>__PACKAGE__, short=>$_)
-      foreach (qw(t t0 cab-t cagb-tt));
+      foreach (qw(t t0 cab-t cab-tt));
 }
 
 ##==============================================================================

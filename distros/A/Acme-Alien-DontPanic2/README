@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.1100
+    version 2.2900
 
 DESCRIPTION
 
@@ -27,7 +27,7 @@ SEE ALSO
 
 SOURCE REPOSITORY
 
-    http://github.com/Perl5-Alien/Acme-Alien-DontPanic2
+    http://github.com/PerlAlien/Acme-Alien-DontPanic2
 
 AUTHORS
 

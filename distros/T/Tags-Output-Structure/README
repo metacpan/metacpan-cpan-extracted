@@ -3,6 +3,7 @@ NAME
 
 SYNOPSYS
      use Tags::Output::Structure;
+
      my $obj = Tags::Output::Structure->new(%parameters);
      $obj->finalize;
      my $ret_ar = $obj->flush($reset_flag);
@@ -79,11 +80,9 @@ ERRORS
              Ending bad tag: '%s' in block of tag '%s'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Data::Printer;
      use Tags::Output::Structure;
 
@@ -149,11 +148,9 @@ EXAMPLE1
      # ]
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Tags::Output::Structure;
 
      # Object.
@@ -199,15 +196,19 @@ SEE ALSO
     Task::Tags
         Install the Tags modules.
 
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-Output-Structure>
+
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2012-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2012-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

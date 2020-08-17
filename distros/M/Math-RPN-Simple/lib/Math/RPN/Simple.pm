@@ -9,7 +9,7 @@ use List::Util qw(any);
 our @ISA=qw(Exporter);
 our @EXPORT=qw(to_infix to_postfix evaluate_infix evaluate_postfix);
 
-our $VERSION='1.1.14';
+our $VERSION='1.1.15';
 our $LIBRARY=__PACKAGE__;
 
 sub to_infix{

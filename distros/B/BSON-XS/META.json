@@ -1,10 +1,10 @@
 {
-   "abstract" : "XS implementation of MongoDB's BSON serialization",
+   "abstract" : "XS implementation of MongoDB's BSON serialization (EOL)",
    "author" : [
       "David Golden <david@mongodb.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -60,8 +60,7 @@
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
             "Test::Version" : "1",
-            "Tie::IxHash" : "0",
-            "inc::MakeMaker" : "0"
+            "Tie::IxHash" : "0"
          }
       },
       "runtime" : {
@@ -111,27 +110,27 @@
    "provides" : {
       "BSON::XS" : {
          "file" : "lib/BSON/XS.pm",
-         "version" : "v0.8.3"
+         "version" : "v0.8.4"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://jira.mongodb.org/browse/PERL"
+         "web" : "https://github.com/mongodb-labs/mongo-perl-bson-xs/issues"
       },
-      "homepage" : "https://github.com/mongodb/mongo-perl-bson-xs",
+      "homepage" : "https://github.com/mongodb-labs/mongo-perl-bson-xs",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/mongodb/mongo-perl-bson-xs.git",
-         "web" : "https://github.com/mongodb/mongo-perl-bson-xs"
+         "url" : "https://github.com/mongodb-labs/mongo-perl-bson-xs.git",
+         "web" : "https://github.com/mongodb-labs/mongo-perl-bson-xs"
       }
    },
-   "version" : "v0.8.3",
+   "version" : "v0.8.4",
    "x_authority" : "cpan:MONGODB",
    "x_contributors" : [
       "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>"
    ],
-   "x_generated_by_perl" : "v5.30.1",
+   "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Apache-2.0"
 }

@@ -1,3 +1,9 @@
+0.249   2020-08-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Use message from 'message.alt.output.TermProgressBarColor'
+	  update() parameter, if available.
+
+
 0.248   2020-07-10  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Do proper per-instance monkey-patching to avoid artefacts

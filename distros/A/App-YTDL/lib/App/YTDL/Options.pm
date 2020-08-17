@@ -76,6 +76,7 @@ sub get_defaults {
         filename_format              => 3,
         list_sort_item               => 'upload_date',
         max_info_width               => 120,
+        max_processes                => 5,
         max_size_history             => 50,
         no_height_ok                 => 1,
         no_warnings                  => 0,
@@ -140,10 +141,11 @@ sub _groups {
             [ 'sort_history_by_timestamp', "- History sort" ],
         ],
         group_list_menu => [
-            [ 'entries_with_info',       "- Additional info"   ],
-            [ 'list_sort_item',          "- Sort order"      ],
-            [ 'show_view_count',         "- Show view count" ],
-            [ 'show_video_id',           "- Show video id"   ],
+            [ 'entries_with_info', "- Additional info" ],
+            [ 'max_processes',     "- Max processes"   ],
+            [ 'list_sort_item',    "- Sort order"      ],
+            [ 'show_view_count',   "- Show view count" ],
+            [ 'show_video_id',     "- Show video id"   ],
         ],
         group_yt_dl_config_file => [
             [ 'yt_dl_config_location',        "- set yt-dl config location"   ],
@@ -359,6 +361,12 @@ sub set_options {
                 my $sep_w = 1;
                 my $w = $digits + int( ( $digits - 1 ) / 3 ) * $sep_w;
                 my $info = sprintf "Number of entries with additional information\nNow: %${w}s", insert_sep( $opt->{$key} );
+                my $name = 'New: ';
+                _opt_number_range( $set, $opt, $key, $name, $info, $digits );
+            }
+            elsif ( $key eq "max_processes" ) {
+                my $digits = 2;
+                my $info = sprintf "Fetching additional information: the maximum number of parallel downloads";
                 my $name = 'New: ';
                 _opt_number_range( $set, $opt, $key, $name, $info, $digits );
             }

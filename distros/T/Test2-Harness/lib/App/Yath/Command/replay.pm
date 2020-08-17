@@ -2,7 +2,7 @@ package App::Yath::Command::replay;
 use strict;
 use warnings;
 
-our $VERSION = '1.000020';
+our $VERSION = '1.000023';
 
 use App::Yath::Options;
 require App::Yath::Command::test;
@@ -378,6 +378,23 @@ Show output for the start of a job. (Default: off unless -v)
 =item --no-show-run-info
 
 Show the run configuration when a run starts. (Default: off, unless -vv)
+
+
+=back
+
+=head3 Git Options
+
+=over 4
+
+=item --git-change-base master
+
+=item --git-change-base HEAD^
+
+=item --git-change-base df22abe4
+
+=item --no-git-change-base
+
+Find files changed by all commits in the current branch from most recent stopping when a commit is found that is also present in the history of the branch/commit specified as the change base.
 
 
 =back

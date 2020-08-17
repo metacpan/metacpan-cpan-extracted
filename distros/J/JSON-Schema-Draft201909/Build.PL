@@ -20,7 +20,7 @@ if (!grep { $_ } values %errors)
     use strict;
     use warnings;
 
-    use v5.16.0;
+    use 5.016;
     # use Module::Build::Tiny 0.034;
     Module::Build::Tiny::Build_PL();
 }
@@ -82,14 +82,14 @@ EOW
         "ExtUtils::MakeMaker" => 0,
         "File::ShareDir::Install" => "0.06",
         "Module::Build::Tiny" => "0.034",
-        "perl" => "v5.16.0"
+        "perl" => "5.016"
       },
       "dist_abstract" => "Validate data against a schema",
       "dist_author" => [
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Draft201909",
-      "dist_version" => "0.011",
+      "dist_version" => "0.012",
       "license" => "perl",
       "module_name" => "JSON::Schema::Draft201909",
       "recursive_test_files" => 1,
@@ -112,11 +112,10 @@ EOW
         "Syntax::Keyword::Try" => "0.11",
         "Types::Standard" => "1.010002",
         "constant" => 0,
-        "feature" => 0,
         "if" => 0,
         "namespace::clean" => 0,
         "overload" => 0,
-        "perl" => "v5.16.0",
+        "perl" => "5.016",
         "strict" => 0,
         "warnings" => 0
       },
@@ -131,12 +130,12 @@ EOW
         "Test::Deep::UnorderedPairs" => 0,
         "Test::Fatal" => 0,
         "Test::File::ShareDir" => 0,
-        "Test::JSON::Schema::Acceptance" => "0.999",
+        "Test::JSON::Schema::Acceptance" => "1.000",
         "Test::More" => "0.96",
         "Test::Warnings" => "0.027",
         "lib" => 0,
         "open" => 0,
-        "perl" => "v5.16.0",
+        "perl" => "5.016",
         "utf8" => 0
       }
     );
@@ -150,12 +149,12 @@ EOW
       "Test::Deep::UnorderedPairs" => 0,
       "Test::Fatal" => 0,
       "Test::File::ShareDir" => 0,
-      "Test::JSON::Schema::Acceptance" => "0.999",
+      "Test::JSON::Schema::Acceptance" => "1.000",
       "Test::More" => "0.96",
       "Test::Warnings" => "0.027",
       "lib" => 0,
       "open" => 0,
-      "perl" => "v5.16.0",
+      "perl" => "5.016",
       "utf8" => 0
     );
 

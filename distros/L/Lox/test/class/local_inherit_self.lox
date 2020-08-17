@@ -1,0 +1,3 @@
+{
+  class Foo < Foo {} // expect: [Line 2] Error at 'Foo': A class cannot inherit from itself.
+}

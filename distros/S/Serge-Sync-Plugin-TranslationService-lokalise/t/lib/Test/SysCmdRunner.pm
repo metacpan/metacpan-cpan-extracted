@@ -73,7 +73,7 @@ sub run_cmd {
         my $commands_ref = $self->{commands};
 
 
-        die "$command not found" unless ref($commands_ref) eq 'ARRAY';
+        die "'$command' not found" unless ref($commands_ref) eq 'ARRAY';
 
         my @commands = @$commands_ref;
 

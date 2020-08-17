@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Text::SlackEmoji;
 # ABSTRACT: data for mapping Slack :emoji_strings: into Unicode text
-$Text::SlackEmoji::VERSION = '0.006';
+$Text::SlackEmoji::VERSION = '0.007';
 use File::ShareDir ();
 
 #pod =head1 SYNOPSIS
@@ -73,7 +73,7 @@ Text::SlackEmoji - data for mapping Slack :emoji_strings: into Unicode text
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -109,6 +109,12 @@ using the Slack app, at least when possible.
 =head1 AUTHOR
 
 Ricardo Signes <rjbs@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Rob N ★
+
+Rob N ★ <robn@robn.io>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -475,29 +475,33 @@ sub _load_attribs_worked {
     my ( $class, $meta ) = @_;
     $meta->add_attribute(
         'from' => {
-            isa        => 'TT::DateTime',
-            is         => 'ro',
-            coerce     => 1,
-            lazy_build => 1,
-            #cmd_aliases => [qw/start/],
+            isa           => 'TT::DateTime',
+            is            => 'ro',
+            coerce        => 1,
+            lazy_build    => 1,
+            #cmd_aliases  => [qw/start/],
+            documentation => 'Beginning of time period to report',
         } );
     $meta->add_attribute(
         'to' => {
-            isa    => 'TT::DateTime',
-            is     => 'ro',
-            coerce => 1,
-            #cmd_aliases => [qw/end/],
-            lazy_build => 1,
+            isa           => 'TT::DateTime',
+            is            => 'ro',
+            coerce        => 1,
+            #cmd_aliases  => [qw/end/],
+            lazy_build    => 1,
+            documentation => 'End of time period to report',
         } );
     $meta->add_attribute(
         'this' => {
-            isa => 'TT::Duration',
-            is  => 'ro',
+            isa           => 'TT::Duration',
+            is            => 'ro',
+            documentation => 'Filter by current time period [day|week|month|year], e.g. "--this day" => today',
         } );
     $meta->add_attribute(
         'last' => {
-            isa => 'TT::Duration',
-            is  => 'ro',
+            isa           => 'TT::Duration',
+            is            => 'ro',
+            documentation => 'Filter by previous time period [day|week|month|year], e.g. "--last day" => yesterday',
         } );
     $meta->add_attribute(
         'fprojects' => {
@@ -628,7 +632,8 @@ sub _say_current_report_interval {
 }
 
 no Moose::Role;
-1;
+
+q{ listening to: Train noises on my way from Wien to Graz }
 
 __END__
 
@@ -642,7 +647,7 @@ App::TimeTracker::Command::Core - App::TimeTracker Core commands
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 CORE COMMANDS
 

@@ -4,7 +4,7 @@ BEGIN { chdir 't' if -d 't' }
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Test::More tests => 117;
+use Test::More tests => 122;
 use Test::Exception;
 use strict;
 
@@ -42,6 +42,7 @@ sub _prepare_bag {
     write_file("$bag_dir/data/payload1.txt", "PAYLOAD1" );
     write_file("$bag_dir/data/payload2.txt", "PAYLOAD2" );
     write_file("$bag_dir/data/payload3.txt", "PAYLOAD3" );
+    return;
 }
 
 sub _modify_bag { # writes invalid checksum to a manifestfile
@@ -51,7 +52,9 @@ sub _modify_bag { # writes invalid checksum to a manifestfile
     $invalid_checksum = "0" x 32;
     $tm =~ s/^([\S]+)/$invalid_checksum/;
     write_file($file_to_modify, $tm);
+    return;
 }
+
 
 foreach my $prefix (@prefix_manifestfiles) {
     foreach my $alg (@alg) {
@@ -106,8 +109,7 @@ foreach my $prefix (@prefix_manifestfiles) {
             qr{file.*'data/payload1.txt'.* invalid, digest.*'}s,
             "check if bag fails verification of broken fixity for payload (all errors)"
         );
- my $bag_invalid2 = new_ok("Archive::BagIt::Base" => [ bag_path => $bag_dir ]);
-
+        my $bag_invalid2 = new_ok("Archive::BagIt::Base" => [ bag_path => $bag_dir ]);
         throws_ok(
             sub {
                 $bag_invalid2->verify_bag(
@@ -208,6 +210,32 @@ foreach my $prefix (@prefix_manifestfiles) {
 
         my $bag = new_ok ("Archive::BagIt::Base" => [ bag_path => $bagdir ]);
         ok(sub{ $bag->verify_bag();}, "conformance v1.0, pass: $descr");
+    }
+
+    { # check if payload oxum is verified correctly
+        my $bag_dir = File::Temp::tempdir(CLEANUP => 1);
+        _prepare_bag($bag_dir);
+        my $bag_ok = Archive::BagIt::Base->make_bag($bag_dir);
+        isa_ok($bag_ok, 'Archive::BagIt::Base', "create new valid IE bagit");
+        ok($bag_ok->verify_bag(), "check if bag is verified correctly");
+        # modify payload oxum
+        my $bif = File::Spec->catfile($bag_dir, "bag-info.txt");
+        my $bi = read_file($bif );
+        $bi =~ s/Payload-Oxum: .*/Payload-Oxum: 0.0/;
+        write_file($bif, $bi);
+        # also modify tagmanifest files to be valid
+        my $bag = Archive::BagIt::Base->new( $bag_dir);
+        foreach my $algorithm ( keys %{ $bag->manifests }) {
+            ok($bag->manifests->{$algorithm}->create_tagmanifest(), "rewrite tagmanifests for $algorithm");
+        }
+        my $bag_invalid = Archive::BagIt::Base->new( $bag_dir);
+        throws_ok(
+            sub {
+                $bag_invalid->verify_bag(
+                    { return_all_errors => 1 }
+                )
+            }, qr{bag verify for bagit version '1.0' failed with invalid files}, "check if bag fails verification of broken Payload-Oxum"
+        );
     }
 
 }

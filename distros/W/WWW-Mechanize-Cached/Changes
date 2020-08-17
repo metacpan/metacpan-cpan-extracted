@@ -1,5 +1,8 @@
 Revision history for Perl module WWW::Mechanize::Cached
 
+1.54      2020-08-10 22:37:25Z
+    - Don't poke at HTTP::Header internals (GH#24) (Olaf Alders)
+
 1.53      2020-02-24 21:07:31Z
     - Remove warnings on new() (GH#15) (Jonathan Rubin, simbabque)
     - Remove new warnings (GH#22) (Julien Fiegehenn)

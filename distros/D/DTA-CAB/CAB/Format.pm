@@ -1412,6 +1412,16 @@ registerd as:
 
  name=>__PACKAGE__, short=>'xl', filenameRegex=>qr/\.(?i:xl|xlist|l|lst)$/
 
+=item L<DTA::CAB::Format::CONLLU|DTA::CAB::Format::CONLLU>
+
+Datum parser|formatter for "vertical" text conforming to the L<C<CONLL-U>|https://universaldependencies.org/format.html>
+format, with optional special handling for additional C<MISC> fields, including
+C<json=JSON> for embedding L<DTA::CAB::Format::TJ|DTA::CAB::Format::TJ> CAB-token structure.
+Registered as:
+
+ name=>__PACKAGE__, filenameRegex=>qr/\.(?i:conllu|conll[_-]u|cab[\.-]connlu|cab[\.-]conll[\.-]u)$/
+
+Aliases: C<conllu conll-u cab-conllu cab-conll-u>
 
 =item L<DTA::CAB::Format::JSON|DTA::CAB::Format::JSON>
 
@@ -1686,7 +1696,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2019 by Bryan Jurish
+Copyright (C) 2009-2020 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.24.1 or,

@@ -4,13 +4,13 @@
       "James E Keenan (jkeenan@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "List-Compare",
    "no_index" : {
@@ -32,7 +32,7 @@
       },
       "test" : {
          "requires" : {
-            "IO::CaptureOutput" : "0",
+            "Capture::Tiny" : "0",
             "Test::Simple" : "0.1"
          }
       }
@@ -49,5 +49,6 @@
          "web" : "https://github.com/jkeenan/list-compare"
       }
    },
-   "version" : "0.53"
+   "version" : "0.55",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

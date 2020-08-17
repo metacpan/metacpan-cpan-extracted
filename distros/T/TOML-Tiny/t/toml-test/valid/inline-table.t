@@ -12,118 +12,124 @@ binmode STDIN,  ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 
 my $expected1 = {
+               'simple' => {
+                             'a' => bless( {
+                                             'code' => sub {
+                                                           BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x50"}
+                                                           use strict;
+                                                           no feature ':all';
+                                                           use feature ':5.16';
+                                                           require Math::BigInt;
+                                                           my $got = 'Math::BigInt'->new($_);
+                                                           'Math::BigInt'->new('1')->beq($got);
+                                                       },
+                                             'operator' => 'CODE(...)',
+                                             '_lines' => [
+                                                           7
+                                                         ],
+                                             '_file' => '(eval 352)',
+                                             'name' => 'Math::BigInt->new("1")->beq($_)'
+                                           }, 'Test2::Compare::Custom' )
+                           },
+               'str-key' => {
+                              'a' => bless( {
+                                              'code' => sub {
+                                                            BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x50"}
+                                                            use strict;
+                                                            no feature ':all';
+                                                            use feature ':5.16';
+                                                            require Math::BigInt;
+                                                            my $got = 'Math::BigInt'->new($_);
+                                                            'Math::BigInt'->new('1')->beq($got);
+                                                        },
+                                              '_lines' => [
+                                                            7
+                                                          ],
+                                              'operator' => 'CODE(...)',
+                                              '_file' => '(eval 351)',
+                                              'name' => 'Math::BigInt->new("1")->beq($_)'
+                                            }, 'Test2::Compare::Custom' )
+                            },
                'name' => {
                            'last' => 'Preston-Werner',
                            'first' => 'Tom'
                          },
                'point' => {
-                            'x' => bless( {
-                                            '_lines' => [
-                                                          6
-                                                        ],
-                                            'code' => sub {
-                                                          BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
-                                                          use strict;
-                                                          no feature ':all';
-                                                          use feature ':5.16';
-                                                          require Math::BigInt;
-                                                          'Math::BigInt'->new('1')->beq($_);
-                                                      },
-                                            '_file' => '(eval 401)',
-                                            'name' => '<Custom Code>',
-                                            'operator' => 'CODE(...)'
-                                          }, 'Test2::Compare::Custom' ),
                             'y' => bless( {
-                                            '_lines' => [
-                                                          6
-                                                        ],
+                                            '_file' => '(eval 349)',
+                                            'name' => 'Math::BigInt->new("2")->beq($_)',
                                             'code' => sub {
-                                                          BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
+                                                          BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x50"}
                                                           use strict;
                                                           no feature ':all';
                                                           use feature ':5.16';
                                                           require Math::BigInt;
-                                                          'Math::BigInt'->new('2')->beq($_);
+                                                          my $got = 'Math::BigInt'->new($_);
+                                                          'Math::BigInt'->new('2')->beq($got);
                                                       },
-                                            '_file' => '(eval 400)',
                                             'operator' => 'CODE(...)',
-                                            'name' => '<Custom Code>'
+                                            '_lines' => [
+                                                          7
+                                                        ]
+                                          }, 'Test2::Compare::Custom' ),
+                            'x' => bless( {
+                                            '_file' => '(eval 350)',
+                                            'name' => 'Math::BigInt->new("1")->beq($_)',
+                                            'code' => sub {
+                                                          BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x50"}
+                                                          use strict;
+                                                          no feature ':all';
+                                                          use feature ':5.16';
+                                                          require Math::BigInt;
+                                                          my $got = 'Math::BigInt'->new($_);
+                                                          'Math::BigInt'->new('1')->beq($got);
+                                                      },
+                                            'operator' => 'CODE(...)',
+                                            '_lines' => [
+                                                          7
+                                                        ]
                                           }, 'Test2::Compare::Custom' )
                           },
-               'simple' => {
-                             'a' => bless( {
-                                             'name' => '<Custom Code>',
-                                             'operator' => 'CODE(...)',
-                                             '_file' => '(eval 399)',
-                                             'code' => sub {
-                                                           BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
-                                                           use strict;
-                                                           no feature ':all';
-                                                           use feature ':5.16';
-                                                           require Math::BigInt;
-                                                           'Math::BigInt'->new('1')->beq($_);
-                                                       },
-                                             '_lines' => [
-                                                           6
-                                                         ]
-                                           }, 'Test2::Compare::Custom' )
-                           },
                'table-array' => [
                                   {
                                     'a' => bless( {
-                                                    'name' => '<Custom Code>',
+                                                    '_lines' => [
+                                                                  7
+                                                                ],
                                                     'operator' => 'CODE(...)',
-                                                    '_file' => '(eval 403)',
                                                     'code' => sub {
-                                                                  BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
+                                                                  BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x50"}
                                                                   use strict;
                                                                   no feature ':all';
                                                                   use feature ':5.16';
                                                                   require Math::BigInt;
-                                                                  'Math::BigInt'->new('1')->beq($_);
+                                                                  my $got = 'Math::BigInt'->new($_);
+                                                                  'Math::BigInt'->new('1')->beq($got);
                                                               },
-                                                    '_lines' => [
-                                                                  6
-                                                                ]
+                                                    'name' => 'Math::BigInt->new("1")->beq($_)',
+                                                    '_file' => '(eval 347)'
                                                   }, 'Test2::Compare::Custom' )
                                   },
                                   {
                                     'b' => bless( {
-                                                    'name' => '<Custom Code>',
+                                                    'name' => 'Math::BigInt->new("2")->beq($_)',
+                                                    '_file' => '(eval 348)',
+                                                    '_lines' => [
+                                                                  7
+                                                                ],
                                                     'operator' => 'CODE(...)',
                                                     'code' => sub {
-                                                                  BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
+                                                                  BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x50"}
                                                                   use strict;
                                                                   no feature ':all';
                                                                   use feature ':5.16';
                                                                   require Math::BigInt;
-                                                                  'Math::BigInt'->new('2')->beq($_);
-                                                              },
-                                                    '_file' => '(eval 404)',
-                                                    '_lines' => [
-                                                                  6
-                                                                ]
+                                                                  my $got = 'Math::BigInt'->new($_);
+                                                                  'Math::BigInt'->new('2')->beq($got);
+                                                              }
                                                   }, 'Test2::Compare::Custom' )
                                   }
-                                ],
-               'str-key' => {
-                              'a' => bless( {
-                                              '_file' => '(eval 402)',
-                                              'code' => sub {
-                                                            BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
-                                                            use strict;
-                                                            no feature ':all';
-                                                            use feature ':5.16';
-                                                            require Math::BigInt;
-                                                            'Math::BigInt'->new('1')->beq($_);
-                                                        },
-                                              'name' => '<Custom Code>',
-                                              'operator' => 'CODE(...)',
-                                              '_lines' => [
-                                                            6
-                                                          ]
-                                            }, 'Test2::Compare::Custom' )
-                            }
+                                ]
              };
 
 
@@ -138,19 +144,24 @@ is($actual, $expected1, 'inline-table - from_toml') or do{
   diag 'EXPECTED:';
   diag Dumper($expected1);
 
+  diag '';
   diag 'ACTUAL:';
   diag Dumper($actual);
 };
 
-is(eval{ from_toml(to_toml($actual)) }, $actual, 'inline-table - to_toml') or do{
+is(eval{ scalar from_toml(to_toml($actual)) }, $expected1, 'inline-table - to_toml') or do{
+  diag "ERROR: $@" if $@;
+
   diag 'INPUT:';
   diag Dumper($actual);
 
-  diag 'TOML OUTPUT:';
+  diag '';
+  diag 'GENERATED TOML:';
   diag to_toml($actual);
 
-  diag 'REPARSED OUTPUT:';
-  diag Dumper(from_toml(to_toml($actual)));
+  diag '';
+  diag 'REPARSED FROM GENERATED TOML:';
+  diag Dumper(scalar from_toml(to_toml($actual)));
 };
 
 done_testing;

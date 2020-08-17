@@ -36,6 +36,7 @@
             "Config" : "0",
             "Exporter" : "0",
             "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
             "Test::More" : "0",
             "XSLoader" : "0",
             "perl" : "5.006",
@@ -44,6 +45,15 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.9760",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Perl/perl5/issues"
+      },
+      "homepage" : "https://github.com/Perl/perl5",
+      "repository" : {
+         "url" : "https://github.com/Perl/perl5.git"
+      }
+   },
+   "version" : "1.9764",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -7,6 +7,8 @@ requires "Data::Object::Exception" => "2.02";
 requires "JSON::Validator" => "4.01";
 requires "perl" => "5.014";
 requires "routines" => "0.02";
+requires "strict" => "0";
+requires "warnings" => "0";
 
 on 'test' => sub {
   requires "Data::Object::Class" => "2.02";
@@ -17,6 +19,8 @@ on 'test' => sub {
   requires "Test::Auto" => "0.12";
   requires "perl" => "5.014";
   requires "routines" => "0.02";
+  requires "strict" => "0";
+  requires "warnings" => "0";
 };
 
 on 'configure' => sub {

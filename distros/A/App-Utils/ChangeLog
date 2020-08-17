@@ -1,18 +1,28 @@
--*- mode: Fundamental; -*-
-App::Utils Perl package
+Revision history for Perl extension App::Utils
 
-2020-05-13 17:11:41 Version 0.01 Vlado Keselj
- - Initial release
- - included command "date-tag"
+0.053 2020-08-09 14:40:10 ADT
+ - documentation improvements, changes to synchronize with the blog
+   http://vlado.ca/blog/perl-app.html
 
-2020-05-13 19:54:37 Version 0.02
- - Correcting minor typos
- - added command "save"
+0.052 2020-07-27 12:42:32 ADT
+ - documentation improvements
 
-2020-05-13 20:39:27 Version 0.03
- - added command "remove-empty-dirs"
-
-2020-05-30 18:05:42 Version 0.051
+0.051 2020-05-30 18:05:42
  - move utility commands into directory "bin/"
  - improving documentation
  - added "date-tag-file"
+
+0.03 2020-05-13 20:39:27
+ - added command "remove-empty-dirs"
+
+0.02 2020-05-13 19:54:37
+ - Correcting minor typos
+ - added command "save"
+
+0.01 2020-05-13 17:11:41 Vlado Keselj vlado@dnlp.ca
+ - Initial release
+ - included command "date-tag"
+ - Emacs settings:
+ # Local Variables:
+ # mode: Fundamental;
+ # End:

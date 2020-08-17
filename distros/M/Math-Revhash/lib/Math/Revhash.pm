@@ -11,7 +11,7 @@ use Carp;
 use Exporter 'import';
 use Math::BigInt;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK = qw( revhash revunhash );
@@ -65,7 +65,7 @@ sub _argsparse {
     } else {
         $B = $AB->{$len}->[1];
     }
-    $B = Math::BigInt->bmodinv($A, $C) unless defined $B;
+    $B = Math::BigInt->new($A)->bmodinv($C) unless defined $B;
     croak "Invalid B value for such length and A" if Math::BigInt->is_nan($B);
 
     return ($data, $len, $A, $B, $C);
@@ -113,7 +113,7 @@ __END__
 
 =head1 NAME
 
-Math::Revhash - Reversible hashes library
+Math::Revhash - Reverse hash computation library
 
 =head1 SYNOPSIS
 
@@ -138,91 +138,99 @@ This module is intended for fast and lightweight numbers reversible hashing.
 Say there are millions of entries inside RDBMS and each entry identified with
 sequential primary key.
 Sometimes we want to expose this key to users, i.e. in case it is a session ID.
-Due to multiple reasons it could be a good idea to hide from the outer world
+Due to several reasons it could be a good idea to hide from the outer world
 that those session IDs are just a generic sequence of integers.
 This module will perform fast, lightweight and reversible translation between
 simple sequence C<1, 2, 3, ...> and something like C<3287, 8542, 1337, ...>
 without need for hash-table lookups, large memory storage and any other
-expensive things.
+expensive mechanisms.
 
 So far, this module is only capable of translating positive non-zero integers.
-To use the module you can either choose one of existing hash lengths: 1..9, or
-specify any positive C<$length> with non-default C<$A> parameter.
-In any case C<data> for hashing should not exceed predefined hash length.
-C<$B> parameter could also be specified to avoid extra modular inverse
-calculation.
+To use the module you can either choose one of hash lengths: 1..9,
+for which all other parameters are pre-defined, or specify any positive
+C<$length> with non-default C<$A> parameter (see below).
+In any case C<$number> for hashing should not exceed predefined hash length.
+C<$B> and C<$C> parameters could also be specified to avoid extra modular
+inverse and power calculation, respectively.
 
-=head1 SUBROUTINES/METHODS
+=head1 SUBROUTINES
 
-=head2 revhash($number, $length, $A, $B, $C)
+=head2 revhash
+
+Compute C<$hash = revhash($number, $length, $A, $B, $C)>
 
 =over 4
 
-=item C<$number> --
+=item C<$number> is the source number to be hashed.
 
-the number to be hashed.
+=item C<$length> is required hash length in digits.
 
-=item C<$length> --
+=item C<$A> I<(optional for pre-defined lengths)> is the first parameter of
+hash function.
 
-required hash length.
-
-=item C<$A> --
-
-I<(optional for pre-defined lengths)> a parameter of hash function.
 There are some hard-coded C<$A> values for pre-defined lengths.
 You are free to specify any positive C<$A> to customize the function.
 It is recommended to choose only primary numbers for C<$A> to avoid possible
 collisions.
 C<$A> should not be too short or too huge digit number.
-It's recommended to start with any primary number close to C<10 ** ($len + 1)>.
+It is recommended to start with any primary number close to
+C<10 ** ($length + 1)>.
 You are encouraged to play around it on your own.
 
-=item C<$B> --
+=item C<$B> I<(optional)> is the second parameter of hash function.
 
-I<(optional)> modular inverse of C<$A>:
+It is a modular inverse of C<$A> and is
+being computed as C<$B = Math::BigInt-E<gt>bmodinv($A, 10 ** $length)> unless
+explicitly specified.
 
-    $B = Math::BigInt->bmodinv($A, 10 ** $length)
+=item C<$C> I<(optional)> is the third parameter of hash function.
 
-=item C<$C> --
-
-I<(optional)> as our numbers are decimal, C<10> to the power of C<$length>:
-
-    $C = 10 ** $length
+As our numbers are decimal it is just C<10> to the power of C<$length>:
+C<$C = 10 ** $length>.
 
 =back
 
-=head2 revunhash($hash, $length, $A, $B, $C)
+=head2 revunhash
+
+Compute C<$number = revunhash($hash, $length, $A, $B, $C)>.
+It takes the same arguments as C<revhash> besides:
 
 =over 4
 
-=item C<$hash> --
-
-hash value that should be translated back to a number.
+=item C<$hash> is hash value that should be translated back to a number.
 
 =back
 
-=head2 hash($number)
+=head2 hash
 
-alias for revhash.
+Just an object oriented alias for revhash: C<$hash = $obj-E<gt>hash($number)>.
+All the hash function parameters will be taken from the object itself.
 
-=head2 unhash($hash)
+=head2 unhash
 
-alias for revunhash.
+Just an object oriented alias for revunhash:
+C<$number = $obj-E<gt>unhash($hash)>.
+All the hash function parameters will be taken from the object itself.
 
-=head2 new($length, $A, $B, $C)
+=head2 new
 
-object constructor that checks and stores all the parameters inside new object.
+C<$obj = Math::Revhash-E<gt>new($length, $A, $B, $C)> is an object constructor
+that will firstly check and vivify all the arguments and store them inside
+new object.
 
 =head1 UNSAFE MODE
 
-Arguments parsing and parameters auto-computing takes some time.
+Arguments parsing and parameters auto-computing takes some time thus sometimes
+it would be preffered to avoid this phase on every translation operation.
 There is an UNSAFE mode to speed up the whole process (see SYNOPSIS).
-In this mode all arguments becomes mandatory.
+In this mode all arguments become mandatory on C<revhash/revunhash> calls.
+You can either use OO style and still imply and check arguments on object
+creation, or use procedural style and specify each argument on every call.
 Use this mode with extra caution.
 
 =head1 AUTHOR
 
-Sergei Zhmylev, C<< <zhmylove@cpan.org> >>
+Sergei Zhmylev, C<E<lt>zhmylove@cpan.orgE<gt>>
 
 =head1 BUGS
 

@@ -1,0 +1,33 @@
+---
+abstract: 'Docker client'
+author:
+  - 'Tudor Marghidanu'
+build_requires:
+  Test::More: '1.302177'
+  Test::Pod: '1.52'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Docker-Client
+provides:
+  Docker::Client:
+    file: lib/Docker/Client.pm
+    version: v0.1.1
+requires:
+  Array::Utils: '0.5'
+  Class::Inspector: '1.36'
+  File::ShareDir: '1.00'
+  Moose: '2.2013'
+  OpenAPI::Client: '0.25'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: https://gitlab.com/marghidanu/docker-client.git
+version: v0.1.1
+x_contributors:
+  - 'Tudor Marghidanu <tudor@marghidanu.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

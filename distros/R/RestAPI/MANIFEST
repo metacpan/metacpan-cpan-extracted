@@ -1,0 +1,26 @@
+Changes
+cpanfile
+cpanfile.snapshot
+ignore.txt
+Jenkinsfile
+lib/RestAPI.pm
+LICENSE.md
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+scripts/config.json
+scripts/rest-client.pl
+t/00-load.t
+t/01-set-q-params.t
+t/02-get-request-no-server.t
+t/03-get-request.t
+t/04-test-post-request.t
+t/05-test-json-payload.t
+t/06-test-metrics.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

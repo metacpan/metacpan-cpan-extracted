@@ -9,7 +9,7 @@ use List::Util qw(uniq any first);
 use Moose::Util::TypeConstraints qw(enum subtype where);
 use namespace::autoclean;
 
-our $VERSION = '2.7';
+our $VERSION = '2.8';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -262,6 +262,7 @@ sub configure {
                 match    => '\.ztb$', # Mintlab specific, just a zip file
                 match    => '\.pdf$',
                 match    => '\.odt$',
+                match    => '\.msg$',
             ]
         ],
 
@@ -360,7 +361,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 2.7
+version 2.8
 
 =head1 SYNOPSIS
 

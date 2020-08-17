@@ -1,9 +1,9 @@
 package Bencher::Scenarios::TextTableTiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-04'; # DATE
+our $DATE = '2020-08-08'; # DATE
 our $DIST = 'Bencher-Scenarios-TextTableTiny'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Scenarios for benchmarking Text::Table::Tiny
@@ -20,7 +20,7 @@ Bencher::Scenarios::TextTableTiny - Scenarios for benchmarking Text::Table::Tiny
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenarios::TextTableTiny (from Perl distribution Bencher-Scenarios-TextTableTiny), released on 2020-08-04.
+This document describes version 0.002 of Bencher::Scenarios::TextTableTiny (from Perl distribution Bencher-Scenarios-TextTableTiny), released on 2020-08-08.
 
 =head1 DESCRIPTION
 

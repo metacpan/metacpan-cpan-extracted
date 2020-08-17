@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '3.0.32'; # VERSION
+our $VERSION = '4.0.1'; # VERSION
 
 
 #
@@ -27,6 +27,7 @@ sub new {
                    defaultSymbolAction => $args{defaultSymbolAction},
                    defaultRuleAction   => $args{defaultRuleAction},
                    defaultEventAction  => $args{defaultEventAction},
+                   defaultRegexAction  => $args{defaultRegexAction},
                    startId             => $args{startId},
                    discardId           => $args{discardId},
                    symbolIds           => $args{symbolIds},
@@ -95,6 +96,13 @@ sub getDefaultEventAction {
 }
 
 
+sub getDefaultRegexAction {
+  my ($self) = @_;
+
+  return $self->{defaultRegexAction}
+}
+
+
 sub getStartId {
   my ($self) = @_;
 
@@ -150,7 +158,7 @@ MarpaX::ESLIF::Grammar::Properties - ESLIF Grammar Properties
 
 =head1 VERSION
 
-version 3.0.32
+version 4.0.1
 
 =head1 SYNOPSIS
 
@@ -169,7 +177,7 @@ version 3.0.32
   :start   ::= Expression
   :default ::=             action        => do_op
                            symbol-action => do_symbol
-                           free-action   => do_free     # Supported but useless
+
   :desc    ::= 'Calculator'
   :discard ::= whitespaces event  => discard_whitespaces$
   :discard ::= comment     event  => discard_comment$
@@ -241,6 +249,10 @@ Grammar default rule action
 
 Grammar default event action
 
+=item defaultRegexAction
+
+Grammar default regex action
+
 =item startId
 
 Start symbol Id
@@ -298,6 +310,10 @@ Returns grammar's default rule action, can be null
 =head2 $self->getDefaultEventAction
 
 Returns grammar's default event action, can be null
+
+=head2 $self->getDefaultRegexAction
+
+Returns grammar's default regex action, can be null
 
 =head2 $self->getStartId
 

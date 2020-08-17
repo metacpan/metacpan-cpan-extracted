@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 use Moose;
 use namespace::autoclean;
@@ -13,19 +13,17 @@ with 'Dist::Zilla::Role::InstallTool';
 
 use MooseX::Types::Moose qw(CodeRef);
 
-has _setup_installer_code_ref => (
+has setup_installer => (
     is       => 'ro',
     isa      => 'CodeRef',
-    init_arg => 'setup_installer',
+    reader   => '_setup_installer',
     required => 1,
 );
 
 sub setup_installer {
     my $self = shift;
 
-    my $code_ref = $self->_setup_installer_code_ref;
-    return if !defined $code_ref;
-
+    my $code_ref = $self->_setup_installer;
     return $self->$code_ref(@_);
 }
 
@@ -45,7 +43,7 @@ Dist::Zilla::Plugin::Code::InstallTool - something that creates an install progr
 
 =head1 VERSION
 
-Version 0.001
+Version 0.003
 
 =head1 SYNOPSIS
 
@@ -55,7 +53,6 @@ Version 0.001
 
     use Moose;
     with 'Dist::Zilla::Role::PluginBundle';
-    use Dist::Zilla::Plugin::Code::InstallTool;
 
     sub bundle_config {
         my ( $class, $section ) = @_;
@@ -63,7 +60,7 @@ Version 0.001
         my @plugins;
         push @plugins, [
             'SomeUniqueName',
-            'Dist::Zilla::Plugin::Code::BeforeBuild',
+            'Dist::Zilla::Plugin::Code::InstallTool',
             {
                 setup_installer => [
                     sub {
@@ -83,13 +80,12 @@ Version 0.001
 
     use Moose;
     with 'Dist::Zilla::Role::PluginBundle::Easy';
-    use Dist::Zilla::Plugin::Code::InstallTool;
 
     sub configure {
         my ( $self ) = @_;
 
         $self->add_plugins([
-            'Code::BeforeBuild',
+            'Code::InstallTool',
             {
                 setup_installer => [
                     sub {

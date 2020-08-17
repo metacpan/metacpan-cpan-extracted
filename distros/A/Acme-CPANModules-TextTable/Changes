@@ -1,4 +1,20 @@
-0.002   2019-02-24 (PERLANCAR)
+0.005   2020-08-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Note that Text::Table::Tiny (1.00) now can draw using box-drawing
+	  characters.
+
+
+0.004   2020-08-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add entry: Text::Table::Sprintf.
+
+
+0.003   2020-08-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Note that Text::Table::Tiny supports color as of 1.00.
+
+
+0.002   2019-02-24  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,6 +22,6 @@
 	  show sample benchmark.
 
 
-0.001   2019-01-11 (PERLANCAR)
+0.001   2019-01-11  Released-By: PERLANCAR
 
         - First release, converted from Bencher::Scenario::TextTableModules.

@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_select_fields
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-03'; # DATE
+our $DATE = '2020-08-16'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ csv-select-fields - Only output selected field(s)
 
 =head1 VERSION
 
-This document describes version 0.031 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2020-08-03.
+This document describes version 0.032 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2020-08-16.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,8 @@ Usage:
      [--noheader] [--nooutput-header] [--nooutput-tsv] [--notsv]
      [--output-escape-char=s] [--output-header] [--output-quote-char=s]
      [--output-sep-char=s] [--output-tsv] [--page-result[=program]]
-     [--quote-char=s] [--sep-char=s] [--tsv] <filename> [fields] ...
+     [--quote-char=s] [--sep-char=s] [--tsv] [--view-result[=program]]
+     <filename> [fields] ...
 
 =head1 OPTIONS
 
@@ -219,6 +220,10 @@ ignored.
 =item B<--page-result>
 
 Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 

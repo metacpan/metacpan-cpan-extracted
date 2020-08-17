@@ -1,5 +1,5 @@
 package POE::Component::TLSify;
-$POE::Component::TLSify::VERSION = '0.02';
+$POE::Component::TLSify::VERSION = '0.06';
 #ABSTRACT: Makes using SSL/TLS in the world of POE easy!
 
 use strict;
@@ -91,7 +91,7 @@ POE::Component::TLSify - Makes using SSL/TLS in the world of POE easy!
 
 =head1 VERSION
 
-version 0.02
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.185';
+our $VERSION = '1.186';
 
 use Quiq::Perl;
 use Quiq::Database::ResultSet::Object;
@@ -173,7 +173,7 @@ sub makeTable {
 
 =head1 VERSION
 
-1.185
+1.186
 
 =head1 AUTHOR
 

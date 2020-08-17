@@ -1,0 +1,4 @@
+fun foo(arg,
+        arg) { // expect: [Line 2] Error at 'arg': Variable with this name already declared in this scope.
+  "body";
+}

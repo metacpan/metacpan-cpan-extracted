@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Core;
 
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 use YAML::PP::Schema::JSON qw/
     represent_int represent_float represent_literal represent_bool

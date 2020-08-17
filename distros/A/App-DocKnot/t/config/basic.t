@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot::Config module API.
 #
-# Copyright 2019 Russ Allbery <rra@cpan.org>
+# Copyright 2019-2020 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -12,7 +12,7 @@ use warnings;
 
 use File::ShareDir qw(module_file);
 use File::Spec;
-use JSON;
+use JSON::MaybeXS qw(JSON);
 use Perl6::Slurp;
 
 use Test::More tests => 7;

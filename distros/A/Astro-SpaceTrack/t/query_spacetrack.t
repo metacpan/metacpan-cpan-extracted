@@ -24,7 +24,7 @@ my $start_epoch = '2012/04/01';
 if ( $ENV{SPACETRACK_TEST_LIVE} ) {
     diag 'live test against space track. be aware of their usage guidelines';
     my $skip;
-    $skip = site_check $space_track_domain	# To make sure we have account
+    $skip = site_check( $space_track_domain )	# To make sure we have account
 	and plan skip_all	=> $skip;
 
     $st = Astro::SpaceTrack->new(
@@ -55,38 +55,38 @@ $st->set( space_track_version => $desired_content_interface );
 
 SKIP: {
 
-    is_success $st, 'login', 'Log in to Space-Track'
+    is_success( $st, 'login', 'Log in to Space-Track' )
 	or skip 'Not logged in', 1;
 
     my $rslt = HTTP::Response->new();
 
-    not_defined $st->content_type(), 'Content type should be undef'
+    not_defined( $st->content_type(), 'Content type should be undef' )
 	or diag( 'content_type is ', $st->content_type() );
 
-    not_defined $st->content_source(), 'Content source should be undef'
+    not_defined( $st->content_source(), 'Content source should be undef' )
 	or diag( 'content_source is ', $st->content_source() );
 
-    not_defined $st->content_interface(),
-	    'Content interface should be undef'
+    not_defined( $st->content_interface(),
+	    'Content interface should be undef' )
 	or diag 'content_interface is ', $st->content_interface();
 
-    not_defined $st->content_type( $rslt ), 'Result type should be undef'
-	or diag( 'content_type is ', $st->content_type() );
+    not_defined( $st->content_type( $rslt ), 'Result type should be undef' )
+	or diag( 'content_type is ', $st->content_type( $rslt ) );
 
-    not_defined $st->content_source( $rslt ),
-	    'Result source should be undef'
+    not_defined( $st->content_source( $rslt ),
+	    'Result source should be undef' )
 	or diag( 'content_source is ', $st->content_source( $rslt ) );
 
-    not_defined $st->content_interface( $rslt ),
-	    'Result interface should be undef'
+    not_defined( $st->content_interface( $rslt ),
+	    'Result interface should be undef' )
 	or diag 'content_interface is ', $st->content_interface( $rslt );
 
-    is_error $st, spacetrack => 'fubar',
-	404, 'Fetch a non-existent catalog entry';
+    is_error( $st, spacetrack => 'fubar',
+	404, 'Fetch a non-existent catalog entry' );
 
     SKIP: {
-	is_success_or_skip $st, spacetrack => 'inmarsat',
-	    'Fetch a catalog entry', 3;
+	is_success_or_skip( $st, spacetrack => 'inmarsat',
+	    'Fetch a catalog entry', 3 );
 
 	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -98,8 +98,8 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, retrieve => 25544,
-	    'Retrieve ISS orbital elements', 3;
+	is_success_or_skip( $st, retrieve => 25544,
+	    'Retrieve ISS orbital elements', 3 );
 
 	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -111,8 +111,8 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, file => 't/file.dat',
-	    'Retrieve orbital elements specified by file', 3;
+	is_success_or_skip( $st, file => 't/file.dat',
+	    'Retrieve orbital elements specified by file', 3 );
 
 	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -124,8 +124,8 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, retrieve => '25544-25546',
-	    'Retrieve a range of orbital elements', 3;
+	is_success_or_skip( $st, retrieve => '25544-25546',
+	    'Retrieve a range of orbital elements', 3 );
 
 	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -137,8 +137,8 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, search_name => 'zarya',
-	    "Search for name 'zarya'", 3;
+	is_success_or_skip( $st, search_name => 'zarya',
+	    "Search for name 'zarya'", 3 );
 
 	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -150,9 +150,9 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, search_name => -notle => 'zarya',
+	is_success_or_skip( $st, search_name => -notle => 'zarya',
 	    "Search for name 'zarya', but only retrieve search results",
-	    3;
+	    3 );
 
 	is $st->content_type(), 'search', "Content type is 'search'";
 
@@ -164,8 +164,8 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, search_id => '98067A',
-	    "Search for ID '98067A'", 3;
+	is_success_or_skip( $st, search_id => '98067A',
+	    "Search for ID '98067A'", 3 );
 
 	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -177,9 +177,9 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, search_id => -notle => '98067A',
+	is_success_or_skip( $st, search_id => -notle => '98067A',
 	    "Search for ID '98067A', but only retrieve search results",
-	    3;
+	    3 );
 
 	is $st->content_type(), 'search', "Content type is 'search'";
 
@@ -191,8 +191,8 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, search_oid => 25544,
-	    "Search for OID 25544", 3;
+	is_success_or_skip( $st, search_oid => 25544,
+	    "Search for OID 25544", 3 );
 
 	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -204,9 +204,9 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, search_oid => -notle => 25544,
+	is_success_or_skip( $st, search_oid => -notle => 25544,
 	    "Search for OID 25544, but only retrieve search results",
-	    3;
+	    3 );
 
 	is $st->content_type(), 'search', "Content type is 'search'";
 
@@ -218,8 +218,8 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, search_decay => '2010-1-10',
-	    'Search for bodies decayed January 10 2010', 3;
+	is_success_or_skip( $st, search_decay => '2010-1-10',
+	    'Search for bodies decayed January 10 2010', 3 );
 
 	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -231,9 +231,9 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, search_decay => -notle => '2010-1-10',
+	is_success_or_skip( $st, search_decay => -notle => '2010-1-10',
 	    'Search for bodies decayed Jan 10 2010, but only retrieve search results',
-	    3;
+	    3 );
 
 	is $st->content_type(), 'search', "Content type is 'search'";
 
@@ -245,8 +245,8 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, search_date => $search_date,
-	    "Search for date '$search_date'", 3;
+	is_success_or_skip( $st, search_date => $search_date,
+	    "Search for date '$search_date'", 3 );
 
 	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -258,9 +258,9 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, search_date => -notle => $search_date,
+	is_success_or_skip( $st, search_date => -notle => $search_date,
 	    "Search for date '$search_date', but only retrieve search results",
-	    3;
+	    3 );
 
 	is $st->content_type(), 'search', "Content type is 'search'";
 
@@ -272,8 +272,8 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, retrieve => -start_epoch => $start_epoch, 25544,
-	    "Retrieve ISS orbital elements for epoch $start_epoch", 3;
+	is_success_or_skip( $st, retrieve => -start_epoch => $start_epoch, 25544,
+	    "Retrieve ISS orbital elements for epoch $start_epoch", 3 );
 
 	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -285,7 +285,7 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, 'box_score', 'Retrieve satellite box score', 3;
+	is_success_or_skip( $st, 'box_score', 'Retrieve satellite box score', 3 );
 
 	is $st->content_type(), 'box_score',
 	    "Content type is 'box_score'";
@@ -298,9 +298,9 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, spacetrack_query_v2 =>
+	is_success_or_skip( $st, spacetrack_query_v2 =>
 	    qw{ basicspacedata query class tle_latest NORAD_CAT_ID 25544 },
-	    'Get ISS data via general query', 3;
+	    'Get ISS data via general query', 3 );
 
 	is $st->content_type(), 'orbit',
 	    "Content type is 'orbit'";
@@ -313,9 +313,9 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, spacetrack_query_v2 =>
+	is_success_or_skip( $st, spacetrack_query_v2 =>
 	    qw{ basicspacedata modeldef class tle_latest },
-	    'Get tle_latest model definition', 3;
+	    'Get tle_latest model definition', 3 );
 
 	is $st->content_type(), 'modeldef',
 	    "Content type is 'modeldef'";
@@ -328,7 +328,7 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, 'country_names', 'Retrieve country names', 3;
+	is_success_or_skip( $st, 'country_names', 'Retrieve country names', 3 );
 
 	is $st->content_type(), 'country_names',
 	    q{Content type is 'country_names'};
@@ -341,7 +341,7 @@ SKIP: {
     }
 
     SKIP: {
-	is_success_or_skip $st, 'launch_sites', 'Retrieve launch sites', 3;
+	is_success_or_skip( $st, 'launch_sites', 'Retrieve launch sites', 3 );
 
 	is $st->content_type(), 'launch_sites',
 	    q{Content type is 'launch_sites'};
@@ -357,12 +357,12 @@ SKIP: {
 	my $number_skipped = 13;
 
 	my $skip;
-	$skip = site_check 'celestrak.com'
+	$skip = site_check( 'celestrak.com' )
 	    and skip $skip, $number_skipped;
 
 	SKIP: {
-	    is_success_or_skip $st, celestrak => 'stations',
-		'Fetch Celestrak stations', 3;
+	    is_success_or_skip( $st, celestrak => 'stations',
+		'Fetch Celestrak stations', 3 );
 
 	    is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -377,8 +377,8 @@ SKIP: {
 
 	SKIP: {
 
-	    is_success_or_skip $st, celestrak => 'stations',
-		'Fetch Celestrak stations with fallback', 3;
+	    is_success_or_skip( $st, celestrak => 'stations',
+		'Fetch Celestrak stations with fallback', 3 );
 
 	    is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -393,22 +393,22 @@ SKIP: {
 
 	SKIP: {
 
-	    is_success_or_skip $st, celestrak => 'stations',
-		'Fetch Celestrak stations with fallback, without account', 3;
+	    is_success_or_skip( $st, celestrak => 'stations',
+		'Fetch Celestrak stations with fallback, without account', 3 );
 
 	    is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
 	    is $st->content_source(), 'celestrak',
 		"Content source is 'celestrak'";
 
-	    not_defined $st->content_interface(),
-		'Content version is not defined';
+	    not_defined( $st->content_interface(),
+		'Content version is not defined' );
 	}
 
 	$st->set( fallback => 0 );
 
-	is_not_success $st, celestrak => 'stations',
-	    'Fetch Celestrak stations without fallback or account fails';
+	is_not_success( $st, celestrak => 'stations',
+	    'Fetch Celestrak stations without fallback or account fails' );
 
     }
 
@@ -420,4 +420,4 @@ done_testing;
 
 __END__
 
-#! ex: set textwidth=72 :
+# ex: set filetype=perl textwidth=72 :

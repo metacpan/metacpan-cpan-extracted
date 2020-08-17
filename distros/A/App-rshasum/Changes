@@ -1,5 +1,22 @@
 Revision history for App-rshasum
 
+0.8.0       2020-08-16
+    - Add [ReadmeMarkdownFromPod]
+    - Add "SEE ALSO" section.
+    - Add whitespace in a warning.
+
+0.6.4       2020-08-16
+    - Avoid accepting leftover non-flag command line arguments
+        - Instead of --start
+
+0.6.3       2020-08-16
+    - Handle open() failures on files (and subsequent binmode exception)
+    more gracefully.
+
+0.6.2       2020-08-16
+    - Grammar corrections in the documentation.
+    - Precompile --skip regexes using qr/$_/ .
+
 0.6.1       2020-04-28
     - Require perl-5.016-or-above.
         - http://cpantesters.org/cpan/report/2e68abc4-8249-11ea-b61b-de5d1f24ea8f .

@@ -1,5 +1,29 @@
 Revision history for App-ZFSCurses
 
+1.212
+  - Backend.pm: don't die automatically upon failure (remove autodie).
+  - WidgetFactory.pm: add help for version property.
+  - WidgetFactory.pm: make some properties ro and some rw.
+
+1.211
+  - fix a typo in a function name Datasets.pm.
+
+1.210
+  - add a Destroy button to the Datasets view.
+  - refactor code in the Backend module.
+  - fix typos in the documentation.
+
+1.200
+  - zfscurses can now show ZFS snapshots on your system!
+  - zfscurses allows you to destroy them if you wish.
+  - Split program into 2 "views".
+  - "zfscurses datasets" runs the "datasets" view: show found datasets.
+  - "zfscurses snapshots" runs the "snapshots" view: show found snapshots.
+  - Datasets.pm: new module in charge of drawing the "dataset" view.
+  - Snapshots.pm: new module in charge of drawing the "snapshot" view.
+  - Move zfscurses script from script/ to bin/ directory.
+  - Improve documentation.
+
 1.100
   - Document mouse settings.
   - UI.pm: return if no dataset has been found in the list.

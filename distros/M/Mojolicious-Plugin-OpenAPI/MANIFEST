@@ -1,6 +1,6 @@
+.github/workflows/ci-ubuntu.yml
 .perltidyrc
 .proverc
-.travis.yml
 .vstags
 Changes
 cpanfile
@@ -23,6 +23,7 @@ t/basic-coerce.t
 t/basic-correct-order-of-paths.t
 t/basic-custom-formats.t
 t/basic-custom-renderer.t
+t/basic-custom-validation.t
 t/basic-empty-response.t
 t/basic-invalid-json-input.t
 t/basic-legacy-swagger2.t
@@ -67,6 +68,7 @@ t/v3-invalid_file_refs.t
 t/v3-invalid_file_refs_no_path.t
 t/v3-nullable.t
 t/v3-style-array.t
+t/v3-style-object.t
 t/v3-tutorial.t
 t/v3-valid_file_refs.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

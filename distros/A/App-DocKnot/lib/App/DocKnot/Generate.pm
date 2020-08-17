@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Generate 3.04;
+package App::DocKnot::Generate 3.05;
 
 use 5.024;
 use autodie;
@@ -345,7 +345,7 @@ sub _wrap_paragraph {
     }
 
     # If this looks like a bunch of short lines, leave it alone.
-    if ($paragraph =~ m{ \A [^\n]{1,40} \n [^\n]{1,40} \n }xms) {
+    if ($paragraph =~ m{ \A (?: \Q$indent\E [^\n]{1,45} \n ){3,} }xms) {
         return $paragraph;
     }
 

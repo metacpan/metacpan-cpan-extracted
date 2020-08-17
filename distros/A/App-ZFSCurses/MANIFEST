@@ -1,15 +1,17 @@
+bin/zfscurses
 Changes
 ignore.txt
 lib/App/ZFSCurses.pm
 lib/App/ZFSCurses/Backend.pm
 lib/App/ZFSCurses/Text.pm
 lib/App/ZFSCurses/UI.pm
+lib/App/ZFSCurses/UI/Datasets.pm
+lib/App/ZFSCurses/UI/Snapshots.pm
 lib/App/ZFSCurses/WidgetFactory.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.rst
-script/zfscurses
 t/00-compile.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

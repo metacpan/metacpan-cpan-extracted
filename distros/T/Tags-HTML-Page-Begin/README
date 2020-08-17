@@ -1,0 +1,208 @@
+NAME
+    Tags::HTML::Page::Begin - Tags helper for HTML page begin.
+
+SYNOPSIS
+     use Tags::HTML::Page::Begin;
+
+     my $obj = Tags::HTML::Page::Begin->new(%params);
+     $obj->process;
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::Page::Begin->new(%params);
+
+    Constructor.
+
+    *       "application-name"
+
+            Application name.
+
+            Default name is undef.
+
+    *       "author"
+
+            Author name.
+
+            Default value is undef.
+
+    *       "css"
+
+            'CSS::Struct::Output' object for process_css processing.
+
+            Default value is undef.
+
+    *       "charset"
+
+            Document character set.
+
+            Default value is 'UTF-8'.
+
+    *       "description"
+
+            Document description.
+
+            Default value is undef.
+
+    *       "doctype"
+
+            Document doctype string.
+
+            Default value is '<!DOCTYPE html>'.
+
+    *       "generator"
+
+            Generator value.
+
+            Default value is 'Perl module: Tags::HTML::Page::Begin, Version:
+            __MODULE_VERSION__'.
+
+    *       "keywords"
+
+            Document keywords.
+
+            Default value is undef.
+
+    *       "lang"
+
+            Hash with language information for output. Keys are: 'title'.
+
+            Default value is reference to hash with these value: 'title' =>
+            'Page title'
+
+    *       "refresh"
+
+            Page refresh time in seconds.
+
+            Default value is undef.
+
+    *       "script_js"
+
+            List of JavaScript scripts.
+
+            Default value is reference to blank array.
+
+    *       "script_js_src"
+
+            List of JavaScript links.
+
+            Default value is reference to blank array.
+
+    *       "tags"
+
+            'Tags::Output' object.
+
+            It's required.
+
+            Default value is undef.
+
+    *       "viewport"
+
+            Document viewport.
+
+            Default value is undef.
+
+  "process"
+     $obj->process;
+
+    Process Tags structure for output.
+
+    Returns undef.
+
+ERRORS
+     new():
+             Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+             Parameter 'script_js' must be a array.
+             Parameter 'script_js_src' must be a array.
+             Parameter 'tags' must be a 'Tags::Output::*' class.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::Page::Begin;
+     use Tags::HTML::Page::End;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $tags = Tags::Output::Indent->new(
+             'preserved' => ['style'],
+             'xml' => 1,
+     );
+     my $css = CSS::Struct::Output::Indent->new;
+     my $begin = Tags::HTML::Page::Begin->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+     my $end = Tags::HTML::Page::End->new(
+             'tags' => $tags,
+     );
+
+     # Process page
+     $css->put(
+            ['s', 'div'],
+            ['d', 'color', 'red'],
+            ['d', 'background-color', 'black'],
+            ['e'],
+     );
+     $begin->process;
+     $tags->put(
+            ['b', 'div'],
+            ['d', 'Hello world!'],
+            ['e', 'div'],
+     );
+     $end->process;
+
+     # Print out.
+     print $tags->flush;
+
+     # Output:
+     # <!DOCTYPE html>
+     # <html>
+     #   <head>
+     #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+     #     <meta charset="UTF-8" />
+     #     <meta name="generator" content=
+     #       "Perl module: Tags::HTML::Page::Begin, Version: 0.06" />
+     #     <title>
+     #       Page title
+     #     </title>
+     #     <style type="text/css">
+     # div {
+     #      color: red;
+     #      background-color: black;
+     # }
+     # </style>
+     #   </head>
+     #   <body>
+     #     <div>
+     #       Hello world!
+     #     </div>
+     #   </body>
+     # </html>
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, Readonly.
+
+SEE ALSO
+    Tags::HTML::Page::End
+        Tags helper for HTML page end.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-Page-Begin>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2020
+
+    BSD 2-Clause License
+
+VERSION
+    0.07
+

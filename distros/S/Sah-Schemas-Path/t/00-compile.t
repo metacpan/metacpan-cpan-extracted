@@ -6,9 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Data/Sah/Coerce/perl/To_array/From_str/expand_glob.pm',
     'Data/Sah/Filter/perl/Path/expand_tilde.pm',
     'Data/Sah/Filter/perl/Path/expand_tilde_when_on_unix.pm',
     'Data/Sah/Filter/perl/Path/strip_slashes.pm',
@@ -19,12 +20,14 @@ my @module_files = (
     'Sah/Schema/filename/unix.pm',
     'Sah/Schema/pathname.pm',
     'Sah/Schema/pathname/unix.pm',
+    'Sah/Schema/pathnames.pm',
     'Sah/SchemaR/dirname.pm',
     'Sah/SchemaR/dirname/unix.pm',
     'Sah/SchemaR/filename.pm',
     'Sah/SchemaR/filename/unix.pm',
     'Sah/SchemaR/pathname.pm',
     'Sah/SchemaR/pathname/unix.pm',
+    'Sah/SchemaR/pathnames.pm',
     'Sah/Schemas/Path.pm'
 );
 

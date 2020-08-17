@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.010002';
+	$Types::Standard::VERSION   = '1.010003';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -29,12 +29,13 @@ my $is_class_loaded;
 
 BEGIN {
 	$is_class_loaded = q{sub {
+		no strict 'refs';
 		return !!0 if ref $_[0];
 		return !!0 if not $_[0];
 		return !!0 if ref(do { my $tmpstr = $_[0]; \$tmpstr }) ne 'SCALAR';
-		my $stash = do { no strict 'refs'; \%{"$_[0]\::"} };
-		return !!1 if exists $stash->{'ISA'};
-		return !!1 if exists $stash->{'VERSION'};
+		my $stash = \%{"$_[0]\::"};
+		return !!1 if exists($stash->{'ISA'}) && *{$stash->{'ISA'}}{ARRAY} && @{$_[0].'::ISA'};
+		return !!1 if exists($stash->{'VERSION'});
 		foreach my $globref (values %$stash) {
 			return !!1
 				if ref \$globref eq 'GLOB'
@@ -997,6 +998,9 @@ B<< Int >>
 
 An integer; that is a string of digits 0 to 9, optionally prefixed with a
 hyphen-minus character.
+
+Expect inconsistent results for dualvars, and numbers too high (or negative
+numbers too low) for Perl to safely represent as an integer.
 
 =item *
 

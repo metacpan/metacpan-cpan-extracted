@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Dist 3.04;
+package App::DocKnot::Dist 3.05;
 
 use 5.024;
 use autodie;
@@ -27,7 +27,8 @@ use IO::Compress::Xz       ();
 use IO::Uncompress::Gunzip ();
 use IPC::Run qw(run);
 use IPC::System::Simple qw(systemx);
-use List::MoreUtils qw(any lastval);
+use List::SomeUtils qw(lastval);
+use List::Util qw(any);
 
 # Base commands to run for various types of distributions.  Additional
 # variations may be added depending on additional configuration parameters.

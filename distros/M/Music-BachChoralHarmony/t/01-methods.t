@@ -10,14 +10,13 @@ use_ok 'Music::BachChoralHarmony';
 my $data_file = 'share/jsbach_chorals_harmony.data';
 my $key_title = 'share/jsbach_BWV_keys_titles.txt';
 
-ok -e $data_file, 'data_file exists';
-ok -e $key_title, 'key_title exists';
-
-my $bach = Music::BachChoralHarmony->new(
+my $bach = new_ok 'Music::BachChoralHarmony' => [
     data_file => $data_file,
     key_title => $key_title,
-);
-isa_ok $bach, 'Music::BachChoralHarmony';
+];
+
+ok -e $bach->data_file, 'data_file exists';
+ok -e $bach->key_title, 'key_title exists';
 
 my $songs;
 lives_ok {

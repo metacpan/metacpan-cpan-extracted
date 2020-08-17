@@ -7,7 +7,7 @@ use DateTime::Format::Builder;
 
 # Does verbose() work properly?
 SKIP: {
-    skip "This test requires perl 5.8", 4 unless $] >= 5.007;
+    skip "This test requires perl 5.8",      4 unless $] >= 5.007;
     skip "Verbose is temporarily out of it", 4;
 
     my $str;

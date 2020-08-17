@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Binary;
 
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 use MIME::Base64 qw/ decode_base64 encode_base64 /;
 use YAML::PP::Common qw/ YAML_ANY_SCALAR_STYLE /;

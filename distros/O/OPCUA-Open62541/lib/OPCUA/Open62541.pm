@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -95,6 +95,8 @@ magically.
 =item $status_code = $server->writeValue(\%nodeId, $value)
 
 =item \%browseResult = $server->browse($maxReferences, \%browseDescription)
+
+=item \%browseResult = $server->browseNext($releaseContinuationPoint, $continuationPoint)
 
 =item $server->setAdminSessionContext($context)
 
@@ -219,6 +221,12 @@ run_iterate() or open62541 may try to operate on a non existent socket.
 =over 4
 
 =item $status_code = $client_config->setDefault()
+
+=item $context = $client_config->getClientContext()
+
+=item $client_config->setClientContext($context)
+
+=item $client_config->setStateCallback($callback)
 
 =item $logger = $client_config->getLogger()
 

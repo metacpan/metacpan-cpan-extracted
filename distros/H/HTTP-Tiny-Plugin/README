@@ -2,8 +2,8 @@ NAME
     HTTP::Tiny::Plugin - HTTP::Tiny with plugins
 
 VERSION
-    This document describes version 0.002 of HTTP::Tiny::Plugin (from Perl
-    distribution HTTP-Tiny-Plugin), released on 2019-04-14.
+    This document describes version 0.003 of HTTP::Tiny::Plugin (from Perl
+    distribution HTTP-Tiny-Plugin), released on 2020-08-14.
 
 SYNOPSIS
      # set plugins to use, globally
@@ -51,17 +51,17 @@ DESCRIPTION
 
         Hash.
 
-    *   ht
+    *   http
 
         Object. The HTTP::Tiny object.
+
+    *   ua
+
+        Like "http".
 
     *   hook
 
         The current hook name.
-
-    *   hook
-
-        The hook name.
 
     *   argv
 
@@ -115,15 +115,30 @@ DESCRIPTION
   List of available hooks
     Below is the list of hooks in order of execution during a request:
 
+    *   before_request_once
+
+        Will be called before "request()" (and before "before_request"
+        hook). All plugins will be called. Stage will interpret 99 (skip
+        calling "request()"). When request is skipped, request() will return
+        undef.
+
+        When an "after_request" plugin returns 98 (repeat), this hook will
+        not be repeated, but "before_request" hook will.
+
     *   before_request
 
         Will be called before "request()". All plugins will be called. Stage
-        will interpret 99 (skip calling "request()").
+        will interpret 99 (skip calling "request()", including skipping
+        "after_request"). When request is skipped, request() will return
+        undef.
+
+        See also: "before_request_once".
 
     *   after_request
 
-        Will be called before "request()". All plugins will be called. Stage
-        will interpret 98 (repeat calling "request()").
+        Will be called after "request()". All plugins will be called. Stage
+        will interpret 98 (repeat calling "request()", including the
+        "before_request" hook but not the "before_request_once" hook).
 
 METHODS
   set_plugins
@@ -161,11 +176,15 @@ BUGS
 SEE ALSO
     HTTP::Tiny
 
+    LWP::UserAgent::Plugin
+
+    HTTP::Tiny::Patch::Plugin
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

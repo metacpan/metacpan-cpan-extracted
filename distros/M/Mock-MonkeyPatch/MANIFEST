@@ -5,6 +5,7 @@ MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
+README
 cpanfile
 lib/Mock/MonkeyPatch.pm
 t/basic.t

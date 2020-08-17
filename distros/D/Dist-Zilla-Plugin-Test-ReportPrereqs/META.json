@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -35,7 +35,6 @@
          "requires" : {
             "Dist::Zilla" : "5",
             "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
-            "English" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "IO::Handle" : "0",
@@ -46,12 +45,12 @@
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
-            "Test::Version" : "1",
-            "blib" : "1.01"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -92,7 +91,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Test::ReportPrereqs" : {
          "file" : "lib/Dist/Zilla/Plugin/Test/ReportPrereqs.pm",
-         "version" : "0.027"
+         "version" : "0.028"
       }
    },
    "release_status" : "stable",
@@ -107,15 +106,18 @@
          "web" : "https://github.com/dagolden/Dist-Zilla-Plugin-Test-ReportPrereqs"
       }
    },
-   "version" : "0.027",
+   "version" : "0.028",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Brendan Byrd <Perl@ResonatorSoft.org>",
+      "Dave Rolsky <autarch@urth.org>",
       "Karen Etheridge <ether@cpan.org>",
       "Kent Fredric <kentfredric@gmail.com>",
       "Randy Stauner <randy@magnificent-tears.com>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Apache-2.0"
 }
 

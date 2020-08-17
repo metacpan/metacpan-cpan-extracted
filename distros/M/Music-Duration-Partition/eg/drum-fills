@@ -57,7 +57,7 @@ sub beat {
         my $patch;
 
         # Play the fill motif
-        for my $i (0 .. @$motif - 1) {
+        for my $i (0 .. $#$motif) {
             # Descend the kit for each beat
             if ($n % 2 == 0) {
                 $patch = $d->snare         if $i == 0 || $i == 1;

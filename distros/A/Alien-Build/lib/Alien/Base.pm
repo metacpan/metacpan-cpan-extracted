@@ -10,7 +10,7 @@ use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '2.28'; # VERSION
+our $VERSION = '2.29'; # VERSION
 
 
 sub import {
@@ -625,7 +625,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 2.28
+version 2.29
 
 =head1 SYNOPSIS
 
@@ -1058,7 +1058,7 @@ If you find a bug, please report it on the projects issue tracker on GitHub:
 
 =over 4
 
-=item L<https://github.com/Perl5-Alien/Alien-Base/issues>
+=item L<https://github.com/PerlAlien/Alien-Base/issues>
 
 =back
 
@@ -1077,7 +1077,7 @@ request.
 
 =over 4
 
-=item L<https://github.com/Perl5-Alien/Alien-Base/pulls>
+=item L<https://github.com/PerlAlien/Alien-Base/pulls>
 
 =back
 

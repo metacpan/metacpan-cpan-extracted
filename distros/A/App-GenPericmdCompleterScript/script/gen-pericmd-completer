@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-08'; # DATE
+our $DATE = '2020-04-30'; # DATE
 our $DIST = 'App-GenPericmdCompleterScript'; # DIST
-our $VERSION = '0.121'; # VERSION
+our $VERSION = '0.122'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,13 +36,27 @@ gen-pericmd-completer - Generate Perinci::CmdLine completer script
 
 =head1 VERSION
 
-This document describes version 0.121 of gen-pericmd-completer (from Perl distribution App-GenPericmdCompleterScript), released on 2020-04-08.
+This document describes version 0.122 of gen-pericmd-completer (from Perl distribution App-GenPericmdCompleterScript), released on 2020-04-30.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % gen-pericmd-completer [options] <program_name> <url>
+ % gen-pericmd-completer [--completion-json=s] [--completion=s]
+     [--config-path=path | -c] [--config-profile=profile | -P]
+     [--default-subcommand=s] [--exclude-package-functions-match=s]
+     [--format=name] [--get-subcommand-from-arg=s]
+     [--include-package-functions-match=s] [--interpreter-path=s] [--json]
+     [--load-module-json=s] [--load-module=s+] [--(no)naked-res]
+     [--no-config | -C] [--no-env] [--no-overwrite] [--no-per-arg-json]
+     [--no-per-arg-yaml] [--no-read-config] [--no-read-env]
+     [--no-skip-format] [--no-strip] [--nooverwrite] [--noper-arg-json]
+     [--noper-arg-yaml] [--noread-config] [--noread-env] [--noskip-format]
+     [--nostrip] [-o=s] [--output-file=s] [--overwrite]
+     [--page-result[=program]] [--per-arg-json] [--per-arg-yaml]
+     [--read-config] [--read-env] [-s=s] [--skip-format] [--strip]
+     [--subcommands-from-package-functions] [--subcommands-json=s]
+     [--subcommands=s] <program_name> <url>
 
 =head1 OPTIONS
 
@@ -171,7 +185,7 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--output-file>=I<filename>, B<-o>
+=item B<--output-file>=I<s>, B<-o>
 
 Path to output file.
 

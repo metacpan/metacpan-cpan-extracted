@@ -22,7 +22,7 @@ sub _module
   my $store = eval { wasm_store() };
   return $ctx->fail_and_release($name, "error creating store object", "$@") if $@;
 
-  my $module = eval { Wasm::Wasmtime::Module->new($store, wat => $wat) };
+  my $module = eval { Wasm::Wasmtime::Module->new($store->engine, wat => $wat) };
   return $ctx->fail_and_release($name, "error loading module", "$@") if $@;
 
   $ctx->release;

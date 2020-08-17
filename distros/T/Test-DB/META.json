@@ -1,0 +1,70 @@
+{
+   "abstract" : "Temporary Databases for Testing",
+   "author" : [
+      "Al Newkirk <awncorp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-DB",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.643",
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Role::Buildable" : "0.03",
+            "Data::Object::Role::Immutable" : "2.01",
+            "Data::Object::Role::Stashable" : "2.01",
+            "perl" : "5.014",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBI" : "1.643",
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Role::Buildable" : "0.03",
+            "Data::Object::Role::Immutable" : "2.01",
+            "Data::Object::Role::Stashable" : "2.01",
+            "Test::Auto" : "0.12",
+            "perl" : "5.014",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iamalnewkirk/test-db/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Test-DB",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/iamalnewkirk/test-db.git",
+         "web" : "https://github.com/iamalnewkirk/test-db"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:AWNCORP",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.21",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

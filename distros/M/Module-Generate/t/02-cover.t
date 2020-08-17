@@ -207,7 +207,7 @@ subtest 'sub' => sub {
 	ok(my $class = Module::Generate->class('Test'));
 	ok($class->sub('bar'));
 	my %class = %Module::Generate::CLASS;
-	is_deeply($class{Test}->{SUBS}->{bar}, {INDEX => 5});
+	is_deeply($class{Test}->{SUBS}->{bar}, {INDEX => 5, TEST => [['can_ok', '$obj', "'bar'"]]});
 };
 
 subtest 'code' => sub {

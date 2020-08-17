@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0604';
+our $VERSION = '0.0605';
 
 use MIDI::Simple;
 
@@ -291,31 +291,31 @@ MIDI::Praxis::Variation - Variation techniques used in music composition
 
 =head1 VERSION
 
-version 0.0604
+version 0.0605
 
 =head1 SYNOPSIS
 
   use MIDI::Praxis::Variation ':all';
+
+  # Or import individually by function name:
+  # use MIDI::Praxis::Variation qw(augmentation diminution etc);
 
   my @notes = qw(C5 E5 G5);
   my @dura = qw(qn qn);
 
   my @x = augmentation(@dura);
   @x = diminution(@dura);
-  my $x = dur('qn');
+  my $y = dur('qn');
   @x = inversion('B4', @notes);
-  $x = note_name_to_number('C5');
-  $x = note2num('C5'); # Alias for note_name_to_number()
+  $y = note2num('C5');
   @x = ntup(2, @notes);
-  @x = original(@notes);
-  @x = notes2nums(@notes); # Alias for original()
-  $x = raugmentation(1.5, @dura);
-  $x = rdiminution(1.5, @dura);
+  @x = notes2nums(@notes);
+  $y = raugmentation(1.5, @dura);
+  $y = rdiminution(1.5, @dura);
   @x = retrograde(@notes);
   @x = retrograde_inversion('B4', @notes);
-  @x = transposition(@notes);
-  $x = tye(@dura);
-  $x = tie_durations(@dura); # Alias for tye()
+  @x = transposition(-12, @notes); # Transpose an octave down
+  $y = tie_durations(@dura);
 
 =head1 DESCRIPTION
 

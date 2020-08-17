@@ -5,7 +5,7 @@ use warnings;
 package Dist::Zilla::Plugin::Test::ReportPrereqs;
 # ABSTRACT: Report on prerequisite versions during automated testing
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 use Dist::Zilla 4 ();
 
@@ -223,7 +223,7 @@ Dist::Zilla::Plugin::Test::ReportPrereqs - Report on prerequisite versions durin
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
@@ -307,7 +307,7 @@ L<Dist::Zilla::Plugin::ReportVersions::Tiny> -- static list only, loads modules 
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -332,13 +332,17 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Brendan Byrd Karen Etheridge Kent Fredric Randy Stauner Yanick Champoux
+=for stopwords Brendan Byrd Dave Rolsky Karen Etheridge Kent Fredric Randy Stauner Yanick Champoux
 
 =over 4
 
 =item *
 
 Brendan Byrd <Perl@ResonatorSoft.org>
+
+=item *
+
+Dave Rolsky <autarch@urth.org>
 
 =item *
 
@@ -560,6 +564,6 @@ if ( @dep_errors ) {
     );
 }
 
-pass;
+pass('Reported prereqs');
 
 # vim: ts=4 sts=4 sw=4 et:

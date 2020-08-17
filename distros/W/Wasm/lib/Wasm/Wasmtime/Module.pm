@@ -10,10 +10,11 @@ use Wasm::Wasmtime::Module::Exports;
 use Wasm::Wasmtime::Module::Imports;
 use Wasm::Wasmtime::ImportType;
 use Wasm::Wasmtime::ExportType;
+use Ref::Util qw( is_blessed_ref );
 use Carp ();
 
 # ABSTRACT: Wasmtime module class
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 $ffi_prefix = 'wasm_module_';
@@ -21,7 +22,6 @@ $ffi->load_custom_type('::PtrObject' => 'wasm_module_t' => __PACKAGE__);
 
 sub _args
 {
-  my $store = defined $_[0] && ref($_[0]) eq 'Wasm::Wasmtime::Store' ? shift : Wasm::Wasmtime::Store->new;
   my $wasm;
   my $data;
   if(@_ == 1)
@@ -60,26 +60,43 @@ sub _args
       }
     }
   }
-  ($store, \$wasm, \$data);
+  (\$wasm, \$data);
 }
 
 
 $ffi->attach( [ wasmtime_module_new => 'new' ] => ['wasm_engine_t', 'wasm_byte_vec_t*', 'opaque*'] => 'wasmtime_error_t' => sub {
   my $xsub = shift;
   my $class = shift;
-  my($store, $wasm, $data) = _args(@_);
+  my $store;
+  my $engine;
+  if(defined $_[0] && is_blessed_ref $_[0])
+  {
+    if($_[0]->isa('Wasm::Wasmtime::Engine'))
+    {
+      $engine = shift;
+    }
+    elsif($_[0]->isa('Wasm::Wasmtime::Store'))
+    {
+      Carp::carp("Passing a Wasm::Wasmtime::Store into the module constructor is deprecated, please pass a Wasm::Wasmtime::Engine object instead");
+      $store = shift;
+      $engine = $store->engine;
+    }
+  }
+  $engine ||= Wasm::Wasmtime::Engine->new;
+  my($wasm, $data) = _args(@_);
   my $ptr;
-  if(my $error = $xsub->($store->engine, $$wasm, \$ptr))
+  if(my $error = $xsub->($engine, $$wasm, \$ptr))
   {
     Carp::croak("error creating module: " . $error->message);
   }
-  bless { ptr => $ptr, store => $store }, $class;
+  bless { ptr => $ptr, engine => $engine, store => $store }, $class;
 });
 
 $ffi->attach( [ wasmtime_module_validate => 'validate' ] => ['wasm_store_t', 'wasm_byte_vec_t*'] => 'wasmtime_error_t' => sub {
   my $xsub = shift;
   my $class = shift;
-  my($store, $wasm, $data) = _args(@_);
+  my $store = defined $_[0] && ref($_[0]) eq 'Wasm::Wasmtime::Store' ? shift : Wasm::Wasmtime::Store->new;
+  my($wasm, $data) = _args(@_);
   my $error = $xsub->($store, $$wasm);
   wantarray  ## no critic (Freenode::Wantarray)
     ? $error ? (0, $error->message) : (1, '')
@@ -113,18 +130,7 @@ $ffi->attach( [ imports => '_imports' ] => [ 'wasm_module_t', 'wasm_importtype_v
 });
 
 
-sub engine { shift->{store}->engine }
-
-
-sub store
-{
-  my($self) = @_;
-  if(warnings::enabled("deprecated"))
-  {
-    Carp::carp('The store method for the Wasm::Wasmtime::Module class is deprecated and will be removed in a future version of Wasm::Wasmtime');
-  }
-  $self->{store};
-}
+sub engine { shift->{engine} }
 
 
 sub to_string
@@ -156,7 +162,7 @@ Wasm::Wasmtime::Module - Wasmtime module class
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -176,15 +182,15 @@ This class represents a WebAssembly module.
 =head2 new
 
  my $module = Wasm::Wasmtime::Module->new(
-   $store,        # Wasm::Wasmtime::Store
+   $engine,       # Wasm::Wasmtime::Engine
    wat => $wat,   # WebAssembly Text
  );
  my $module = Wasm::Wasmtime::Module->new(
-   $store,        # Wasm::Wasmtime::Store
+   $engine,       # Wasm::Wasmtime::Engine
    wasm => $wasm, # WebAssembly binary
  );
  my $module = Wasm::Wasmtime::Module->new(
-   $store,        # Wasm::Wasmtime::Store
+   $engine,       # Wasm::Wasmtime::Engine
    file => $path, # Filename containing WebAssembly binary (.wasm) or WebAssembly Text (.wat)
  );
  my $module = Wasm::Wasmtime::Module->new(
@@ -198,8 +204,27 @@ This class represents a WebAssembly module.
  );
 
 Create a new WebAssembly module object.  You must provide either WebAssembly Text (WAT), WebAssembly binary (Wasm), or a
-filename of a file that contains WebAssembly binary (Wasm).  If the optional L<Wasm::Wasmtime::Store> object is not provided
+filename of a file that contains WebAssembly binary (Wasm).  If the optional L<Wasm::Wasmtime::Engine> object is not provided
 one will be created for you.
+
+[Deprecated]
+
+ my $module = Wasm::Wasmtime::Module->new(
+   $store,        # Wasm::Wasmtime::Store
+   wat => $wat,   # WebAssembly Text
+ );
+ my $module = Wasm::Wasmtime::Module->new(
+   $store,        # Wasm::Wasmtime::Store
+   wasm => $wasm, # WebAssembly binary
+ );
+ my $module = Wasm::Wasmtime::Module->new(
+   $store,        # Wasm::Wasmtime::Store
+   file => $path, # Filename containing WebAssembly binary (.wasm) or WebAssembly Text (.wat)
+ );
+
+You can provide a L<Wasm::Wasmtime::Store> instance instead of a L<Wasm::Wasmtime::Engine>.  Although the store
+instance is no longer required internally to create a module instance, the engine object which is needed can
+be found from the store.  This form will be removed in a future version.
 
 =head1 METHODS
 
@@ -248,14 +273,6 @@ Returns a list of L<Wasm::Wasmtime::ImportType> objects for the objects imported
  my $engine = $module->engine;
 
 Returns the L<Wasm::Wasmtime::Engine> object used by this module.
-
-=head2 store
-
- my $store = $module->store;
-
-[B<Deprecated>: Will be removed in a future version of L<Wasm::Wasmtime>]
-
-Returns the L<Wasm::Wasmtime::Store> object used by this module.
 
 =head2 to_string
 

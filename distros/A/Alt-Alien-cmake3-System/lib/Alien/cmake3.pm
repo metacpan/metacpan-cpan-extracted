@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 # ABSTRACT: Find or download or build cmake 3 or better
-our $VERSION = '0.0402'; # VERSION
+our $VERSION = '0.0501'; # VERSION
 
 
 sub cflags       { '' }
@@ -39,7 +39,7 @@ Alien::cmake3 - Find or download or build cmake 3 or better
 
 =head1 VERSION
 
-version 0.0402
+version 0.0501
 
 =head1 SYNOPSIS
 

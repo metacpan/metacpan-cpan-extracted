@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot command dispatch error handling.
 #
-# Copyright 2018-2019 Russ Allbery <rra@cpan.org>
+# Copyright 2018-2020 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -57,8 +57,9 @@ is_error($@, 'generate-all: too many arguments', 'Too many arguments');
 
 # Trigger an error in a submodule to test error rewriting.
 eval { $docknot->run('generate', '-m', '/nonexistent', 'readme') };
-is_error($@,
-    'generate: metadata path /nonexistent does not exist or is not a directory'
+is_error(
+    $@,
+'generate: metadata path /nonexistent does not exist or is not a directory',
 );
 
 # Check for a missing required argument.

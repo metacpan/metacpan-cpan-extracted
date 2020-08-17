@@ -8,6 +8,7 @@ use GraphViz2;
 use Music::BachChoralHarmony;
 
 my $id = shift || '000106b_';
+my $thresh = shift || 1;
 
 #my $bach = Music::BachChoralHarmony->new( data_file => 'share/jsbach_chorals_harmony.data', key_title => 'share/jsbach_BWV_keys_titles.txt' );
 my $bach = Music::BachChoralHarmony->new;
@@ -26,6 +27,7 @@ for my $struct ( @{ $progression->{events} } ) {
 
     $last = $chord;
 }
+#use Data::Dumper;warn Dumper [map {"$_ => $score{$_}"} sort {$score{$a} <=> $score{$b}} keys %score];exit;
 
 my $g = GraphViz2->new(
     global => { directed => 1 },
@@ -39,6 +41,8 @@ my %edges;
 my $key = $progression->{key};
 
 for my $bigram ( keys %score ) {
+    next unless $score{$bigram} >= $thresh;
+
     my ( $i, $j ) = split ' ', $bigram;
 
     my $color = $i eq $key ? 'red' : 'black';

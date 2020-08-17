@@ -1,4 +1,8 @@
 
+8.58  2020-08-05
+  - Improved app and lite_app generators to use templates with subroutine signatures.
+  - Updated all documentation to use subroutine signatures. (kiwiroy)
+
 8.57  2020-07-16
   - Added support for YAML config files.
   - Added module Mojolicious::Plugin::NotYAMLConfig.

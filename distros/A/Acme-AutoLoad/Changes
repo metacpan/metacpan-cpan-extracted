@@ -1,0 +1,37 @@
+Revision history for Perl extension Acme::AutoLoad.
+
+0.08  Tue Aug 12 14:00 2020
+ - Require special ENV for network tests.
+ - Include self bootstrap loading test.
+ - Documental changes.
+
+0.07  Tue Aug 11 20:00 2020
+ - Renamed Module::AutoLoad to Acme::AutoLoad namespace
+ - Removed all single and double quotes from MAGIC LINE
+   and moved everything onto one single line to reduce
+   shell escape conflicts with -e from commandline
+ - Removed network hops and confusing obfuscation
+
+0.06  Tue Jul  3 14:30 2018
+ - Avoid using st.aticpan.org
+
+0.05  Tue Jul  3 14:00 2018
+ - Ported to use the new fastapi.metacpan.org
+
+0.04  Sun Feb  8 10:00 2015
+ - More accurate t/01_network.t test for HTTP/0.9 support.
+ - Shortened MAGIC a few more characters.
+
+0.03  Sat Feb  7 23:00 2015
+ - More gracefully handle case where MANIFEST contains
+   prefix, but not the full stub, such as:
+   "MLEHMANN/common-sense-3.73/sense.pm"
+ - Adjust %INC assignment for sub modules found in lib.
+
+0.02  Tue Sep 13 14:00 2011
+ - Documental cleanup.
+ - No functional changes.
+
+0.01  Mon Sep  5 14:00 2011
+ - Initial release
+ - Created by h2xs -X Module::AutoLoad

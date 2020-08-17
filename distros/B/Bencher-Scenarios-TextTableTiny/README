@@ -3,9 +3,9 @@ NAME
     Text::Table::Tiny
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Bencher::Scenarios::TextTableTiny (from Perl distribution
-    Bencher-Scenarios-TextTableTiny), released on 2020-08-04.
+    Bencher-Scenarios-TextTableTiny), released on 2020-08-08.
 
 DESCRIPTION
     This distribution contains the following Bencher scenario modules:

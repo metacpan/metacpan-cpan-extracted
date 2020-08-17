@@ -6,7 +6,7 @@ use Test::More tests => 110;
 use List::Compare;
 use lib ("./t");
 use Test::ListCompareSpecial qw( :seen :wrap :hashes :results );
-use IO::CaptureOutput qw( capture );
+use Capture::Tiny q|:all|;
 
 my @pred = ();
 my %seen = ();
@@ -91,11 +91,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { @unique = $lcmu->get_Lonly(2); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @unique = $lcmu->get_Lonly(2); };
     $seen{$_}++ foreach (@unique);
     is_deeply(\%seen, \%pred, "unsorted:  got expected unique");
     ok(unseen(\%seen, \@unpred),
@@ -109,11 +105,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { $unique_ref = $lcmu->get_Lonly_ref(2); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $unique_ref = $lcmu->get_Lonly_ref(2); };
     $seen{$_}++ foreach (@{$unique_ref});
     is_deeply(\%seen, \%pred, "unsorted:  got expected unique");
     ok(unseen(\%seen, \@unpred),
@@ -127,11 +119,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { @unique = $lcmu->get_Aonly(2); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @unique = $lcmu->get_Aonly(2); };
     $seen{$_}++ foreach (@unique);
     is_deeply(\%seen, \%pred, "unsorted:  got expected unique");
     ok(unseen(\%seen, \@unpred),
@@ -145,11 +133,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { $unique_ref = $lcmu->get_Aonly_ref(2); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $unique_ref = $lcmu->get_Aonly_ref(2); };
     $seen{$_}++ foreach (@{$unique_ref});
     is_deeply(\%seen, \%pred, "unsorted:  got expected unique");
     ok(unseen(\%seen, \@unpred),
@@ -192,11 +176,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { @complement = $lcmu->get_Bonly(1); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @complement = $lcmu->get_Bonly(1); };
     $seen{$_}++ foreach (@complement);
     is_deeply(\%seen, \%pred, "unsorted:  got expected complement");
     ok(unseen(\%seen, \@unpred),
@@ -210,11 +190,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { $complement_ref = $lcmu->get_Bonly_ref(1); },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $complement_ref = $lcmu->get_Bonly_ref(1); };
     $seen{$_}++ foreach (@{$complement_ref});
     is_deeply(\%seen, \%pred, "unsorted:  got expected complement");
     ok(unseen(\%seen, \@unpred),
@@ -244,11 +220,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { @complement = $lcmu->get_Ronly; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @complement = $lcmu->get_Ronly; };
     $seen{$_}++ foreach (@complement);
     is_deeply(\%seen, \%pred, "unsorted:  got expected complement");
     ok(unseen(\%seen, \@unpred),
@@ -262,11 +234,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { $complement_ref = $lcmu->get_Ronly_ref; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $complement_ref = $lcmu->get_Ronly_ref; };
     $seen{$_}++ foreach (@{$complement_ref});
     is_deeply(\%seen, \%pred, "unsorted:  got expected complement");
     ok(unseen(\%seen, \@unpred),
@@ -280,11 +248,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { @complement = $lcmu->get_Bonly; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @complement = $lcmu->get_Bonly; };
     $seen{$_}++ foreach (@complement);
     is_deeply(\%seen, \%pred, "unsorted:  got expected complement");
     ok(unseen(\%seen, \@unpred),
@@ -298,11 +262,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { $complement_ref = $lcmu->get_Bonly_ref; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $complement_ref = $lcmu->get_Bonly_ref; };
     $seen{$_}++ foreach (@{$complement_ref});
     is_deeply(\%seen, \%pred, "unsorted:  got expected complement");
     ok(unseen(\%seen, \@unpred),
@@ -346,11 +306,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { @symmetric_difference = $lcmu->get_LorRonly; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @symmetric_difference = $lcmu->get_LorRonly; };
     $seen{$_}++ foreach (@symmetric_difference);
     is_deeply(\%seen, \%pred, "unsorted:  Got expected symmetric difference");
     ok(unseen(\%seen, \@unpred),
@@ -364,11 +320,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { $symmetric_difference_ref = $lcmu->get_LorRonly_ref; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $symmetric_difference_ref = $lcmu->get_LorRonly_ref; };
     $seen{$_}++ foreach (@{$symmetric_difference_ref});
     is_deeply(\%seen, \%pred, "unsorted:  Got expected symmetric difference");
     ok(unseen(\%seen, \@unpred),
@@ -378,11 +330,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { @symmetric_difference = $lcmu->get_AorBonly; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @symmetric_difference = $lcmu->get_AorBonly; };
     $seen{$_}++ foreach (@symmetric_difference);
     is_deeply(\%seen, \%pred, "unsorted:  Got expected symmetric difference");
     ok(unseen(\%seen, \@unpred),
@@ -396,11 +344,7 @@ ok(unseen(\%seen, \@unpred),
 
 {
     my ($stdout, $stderr);
-    capture(
-        sub { $symmetric_difference_ref = $lcmu->get_AorBonly_ref; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $symmetric_difference_ref = $lcmu->get_AorBonly_ref; };
     $seen{$_}++ foreach (@{$symmetric_difference_ref});
     is_deeply(\%seen, \%pred, "unsorted:  Got expected symmetric difference");
     ok(unseen(\%seen, \@unpred),
@@ -482,11 +426,7 @@ ok(! $LR, "Got expected subset relationship");
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $RL = $lcmu->is_RsubsetL; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $RL = $lcmu->is_RsubsetL; };
     ok(! $RL, "Got expected subset relationship");
     like($stderr,
         qr/When comparing 3 or more lists, \&is_RsubsetL or its alias is restricted/,
@@ -495,11 +435,7 @@ ok(! $LR, "Got expected subset relationship");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $RL = $lcmu->is_BsubsetA; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $RL = $lcmu->is_BsubsetA; };
     ok(! $RL, "Got expected subset relationship");
     like($stderr,
         qr/When comparing 3 or more lists, \&is_RsubsetL or its alias is restricted/,
@@ -518,20 +454,14 @@ ok(! $eqv, "Got expected equivalence relationship");
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $rv = $lcmu->print_subset_chart; },
-        \$stdout,
-    );
+    $stdout = capture_stdout { $rv = $lcmu->print_subset_chart; };
     ok($rv, "print_subset_chart() returned true value");
     like($stdout, qr/Subset Relationships/,
         "Got expected chart header");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $rv = $lcmu->print_equivalence_chart; },
-        \$stdout,
-    );
+    $stdout = capture_stdout { $rv = $lcmu->print_equivalence_chart; };
     ok($rv, "print_equivalence_chart() returned true value");
     like($stdout, qr/Equivalence Relationships/,
         "Got expected chart header");
@@ -579,3 +509,4 @@ ok($disj, "Got expected disjoint relationship");
 
 my $lcmun   = List::Compare->new('--unsorted', \%h0, \%h1, \%h2, \%h3, \%h4);
 ok($lcmu_dj, "List::Compare constructor returned true value");
+

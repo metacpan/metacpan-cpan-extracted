@@ -3,7 +3,7 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::GenericExtractor';
 
-use Importer 'NewsExtractor::TextUtil' => 'parse_dateline_ymdhms';
+use Importer 'NewsExtractor::TextUtil' => 'reformat_dateline';
 
 sub _build_content_text {
     my ($self) = @_;
@@ -32,7 +32,7 @@ sub journalist {
 sub dateline {
     my ($self) = @_;
     my $el = $self->dom->at(".fncnews-content > .info > span.small-gray-text") or return;
-    return parse_dateline_ymdhms($el->all_text(), '+08:00');
+    return reformat_dateline($el->all_text(), '+08:00');
 }
 
 1;

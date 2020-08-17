@@ -1,0 +1,34 @@
+---
+abstract: 'a base module to interact with a REST API interface'
+author:
+  - 'Marco Masetti <marco.masetti@sky.uk>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RestAPI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '3.06'
+  Getopt::Long: '2.51'
+  JSON::XS: '4.02'
+  LWP::ConsoleLogger::Everywhere: '0.000042'
+  LWP::UserAgent: '5.46'
+  Log::Log4perl: '1.50'
+  Moo: '2.004000'
+  Time::HiRes: '1.9721'
+  Types::Standard: '1.010002'
+  XML::Simple: '2.25'
+  namespace::autoclean: '0.29'
+  perl: '5.006'
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

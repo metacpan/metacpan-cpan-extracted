@@ -1,8 +1,8 @@
 package App::ZFSCurses::Backend;
 
-use 5.006;
-use strict;
 use warnings;
+use strict;
+use 5.10.1;
 
 =head1 NAME
 
@@ -12,11 +12,11 @@ App::ZFSCurses::Backend - Perform backend operations.
 
 =head1 VERSION
 
-Version 1.100.
+Version 1.212.
 
 =cut
 
-our $VERSION = '1.100';
+our $VERSION = '1.212';
 
 =head1 METHODS
 
@@ -56,20 +56,45 @@ sub get_zfs_datasets {
     my $self = shift;
 
     my @zfs_list_args = ( 'zfs', 'list', '-t', 'filesystem' );
+    my @zfs_datasets  = ();
 
-    my @zfs_datasets = ();
+    {
+        open( my $zfs_list_fh, '-|', @zfs_list_args )
+          or die "can't run @zfs_list_args: $!";
 
-    open( ZFS_LIST_PIPE, '-|', @zfs_list_args )
-      or die "can't run @zfs_list_args: $!";
-
-    while (<ZFS_LIST_PIPE>) {
-        chomp;
-        push @zfs_datasets, $_;
+        while (<$zfs_list_fh>) {
+            chomp;
+            push @zfs_datasets, $_;
+        }
     }
 
-    close ZFS_LIST_PIPE;
-
     return [ grep { !m/^.*?none$/ } sort @zfs_datasets ];
+}
+
+=head2 get_zfs_snapshots
+
+Return ZFS snapshots found on the system. This method runs "zfs list -t
+snapshot" behind the scenes.
+
+=cut
+
+sub get_zfs_snapshots {
+    my $self = shift;
+
+    my @zfs_list_args = ( 'zfs', 'list', '-t', 'snapshot' );
+    my @zfs_snapshots = ();
+
+    {
+        open( my $zfs_list_fh, '-|', @zfs_list_args )
+          or die "can't run @zfs_list_args: $!";
+
+        while (<$zfs_list_fh>) {
+            chomp;
+            push @zfs_snapshots, $_;
+        }
+    }
+
+    return [ grep { !m/^.*?none$/ } sort @zfs_snapshots ];
 }
 
 =head2 get_zfs_properties
@@ -85,27 +110,27 @@ sub get_zfs_properties {
     @_ == 1 || die qq#Usage: get_zfs_properties(dataset)#;
     my $dataset = shift;
 
-    my @zfs_get_args = ( 'zfs', 'get', 'all', $dataset );
-
+    my @zfs_get_args   = ( 'zfs', 'get', 'all', $dataset );
     my @zfs_properties = ();
 
-    open( ZFS_GET_PIPE, '-|', @zfs_get_args )
-      or die "can't run @zfs_get_args: $!";
+    {
+        open( my $zfs_get_fh, '-|', @zfs_get_args )
+          or die "can't run @zfs_get_args: $!";
 
-    while (<ZFS_GET_PIPE>) {
-        chomp;
-        my $properties = ( split /^(.*?)(\s+)(.*?)$/, $_ )[3];
+        while (<$zfs_get_fh>) {
+            chomp;
+            my $properties = ( split /^(.*?)(\s+)(.*?)$/, $_ )[3];
 
-        # Unsupported properties on FreeBSD.
-        # See man zfs.
-        if ( $^O eq 'freebsd' ) {
-            next if ( $properties =~ /(mlslabel|devices|nbmand|xattr|vscan)/ );
+            # Unsupported properties on FreeBSD.
+            # See man zfs.
+            if ( $^O eq 'freebsd' ) {
+                next
+                  if ( $properties =~ /(mlslabel|devices|nbmand|xattr|vscan)/ );
+            }
+
+            push @zfs_properties, $properties;
         }
-
-        push @zfs_properties, $properties;
     }
-
-    close ZFS_GET_PIPE;
 
     return [ sort @zfs_properties ];
 }
@@ -133,18 +158,36 @@ a value
 
 sub set_zfs_property {
     my $self = shift;
-
     @_ == 3 || die qq#Usage: set_zfs_property(dataset, property, value)#;
-    my ( $dataset, $property, $value ) = @_;
 
+    my ( $dataset, $property, $value ) = @_;
     my @zfs_set_args = ( 'zfs', 'set', "$property=$value", "$dataset" );
 
-    open( ZFS_SET_PIPE, '-|', @zfs_set_args )
+    open( my $zfs_set_fh, '-|', @zfs_set_args )
       or die "can't run @zfs_set_args: $!";
 
-    close ZFS_SET_PIPE;
+    close $zfs_set_fh;
 }
 
+=head2 destroy_zfs
+
+Destroy a given object: snapshot, dataset, volume.
+
+=cut
+
+sub destroy_zfs {
+    my $self = shift;
+
+    @_ == 1 || die qq#Usage: destroy_zfs(object)#;
+    my $object = shift;
+
+    my @zfs_destroy_args = ( 'zfs', 'destroy', '-r', $object );
+
+    open( my $zfs_destroy_fh, '-|', @zfs_destroy_args )
+      or die "can't run @zfs_destroy_args $!";
+
+    close $zfs_destroy_fh;
+}
 
 =head1 SEE ALSO
 
@@ -158,7 +201,7 @@ Patrice Clement <monsieurp at cpan.org>
 
 This software is copyright (c) 2020 by Patrice Clement.
 
-This is free software, licensed under the (three-clause) clause BSD License.
+This is free software, licensed under the (three-clause) BSD License.
 
 See the LICENSE file.
 

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.185';
+our $VERSION = '1.186';
 
 use Quiq::Hash;
 use HTML::TreeBuilder ();
@@ -35,10 +35,11 @@ L<Quiq::Hash>
 
 =head1 DESCRIPTION
 
-Die L<Dokumentation zu Plotly.js|https://plot.ly/javascript/> ist umfangreich. Ein wichtiger
-Teil davon, die L<Full Reference|https://plot.ly/javascript/reference/> mit der Beschreibung aller Attribute
-ist allerdings umständlich zu handhaben. Diese Klasse erzeugt eine
-L<übersichtlichere Fassung der Full Reference|https://s31tz.github.io/plotlyjs-reference.html>.
+Die L<Dokumentation zu Plotly.js|https://plot.ly/javascript/> ist
+umfangreich. Ein wichtiger Teil davon, die
+L<Full Reference|https://plot.ly/javascript/reference/> mit der Beschreibung aller
+Attribute ist allerdings umständlich zu handhaben. Diese Klasse
+erzeugt eine L<übersichtlichere Fassung der Full Reference|https://s31tz.github.io/plotlyjs-reference.html>.
 
 =head1 EXAMPLE
 
@@ -371,7 +372,7 @@ sub asHtml {
 
 =head1 VERSION
 
-1.185
+1.186
 
 =head1 AUTHOR
 

@@ -1,7 +1,7 @@
 package Sah::SchemaR::pathname;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2020-08-08'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 our $rschema = ["str",[{prefilters=>["Path::expand_tilde_when_on_unix","Path::strip_slashes_when_on_unix"],summary=>"Filesystem path name","x.completion"=>["filename"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::pathname - Filesystem path name
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::pathname (from Perl distribution Sah-Schemas-Path), released on 2020-02-11.
+This document describes version 0.014 of Sah::SchemaR::pathname (from Perl distribution Sah-Schemas-Path), released on 2020-08-08.
 
 =head1 DESCRIPTION
 

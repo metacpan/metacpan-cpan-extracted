@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
@@ -186,6 +186,35 @@ sub DumpFile {
     YAML::PP->new->dump_file($file, @data);
 }
 
+sub preserved_scalar {
+    my ($self, $value, %args) = @_;
+    my $scalar = YAML::PP::Preserve::Scalar->new(
+        value => $value,
+        %args,
+    );
+    return $scalar;
+}
+
+sub preserved_mapping {
+    my ($self, $hash, %args) = @_;
+    my $data = {};
+    tie %$data, 'YAML::PP::Preserve::Hash';
+    %$data = %$hash;
+    my $t = tied %$data;
+    $t->{style} = $args{style};
+    return $data;
+}
+
+sub preserved_sequence {
+    my ($self, $array, %args) = @_;
+    my $data = [];
+    tie @$data, 'YAML::PP::Preserve::Array';
+    push @$data, @$array;
+    my $t = tied @$data;
+    $t->{style} = $args{style};
+    return $data;
+}
+
 package YAML::PP::Preserve::Hash;
 # experimental
 use Tie::Hash;
@@ -251,9 +280,71 @@ sub SCALAR {
     return scalar %{ $self->{data} };
 }
 
+package YAML::PP::Preserve::Array;
+# experimental
+use Tie::Array;
+use base qw/ Tie::StdArray /;
+
+sub TIEARRAY {
+    my ($class) = @_;
+    my $self = bless {
+        data => [],
+    }, $class;
+    return $self;
+}
+
+sub FETCH {
+    my ($self, $i) = @_;
+    return $self->{data}->[ $i ];
+}
+sub FETCHSIZE {
+    my ($self) = @_;
+    return $#{ $self->{data} } + 1;
+}
+
+sub STORE {
+    my ($self, $i, $val) = @_;
+    $self->{data}->[ $i ] = $val;
+}
+sub PUSH {
+    my ($self, @args) = @_;
+    push @{ $self->{data} }, @args;
+}
+sub STORESIZE {
+    my ($self, $i) = @_;
+    $#{ $self->{data} } = $i - 1;
+}
+sub DELETE {
+    my ($self, $i) = @_;
+    delete $self->{data}->[ $i ];
+}
+sub EXISTS {
+    my ($self, $i) = @_;
+    return exists $self->{data}->[ $i ];
+}
+sub CLEAR {
+    my ($self) = @_;
+    $self->{data} = [];
+}
+sub SHIFT {
+    my ($self) = @_;
+    shift @{ $self->{data} };
+}
+sub UNSHIFT {
+    my ($self, @args) = @_;
+    unshift @{ $self->{data} }, @args;
+}
+sub SPLICE {
+    my ($self, $offset, $length, @args) = @_;
+    splice @{ $self->{data} }, $offset, $length, @args;
+}
+sub EXTEND {}
+
+
 package YAML::PP::Preserve::Scalar;
 
 use overload
+    fallback => 1,
     '+' => \&value,
     '""' => \&value,
     'bool' => \&value,
@@ -358,7 +449,7 @@ Some utility scripts, mostly useful for debugging:
 
 YAML::PP is a modular YAML processor.
 
-It aims to support C<YAML 1.2> and C<YAML 1.1>. See L<http://yaml.org/>.
+It aims to support C<YAML 1.2> and C<YAML 1.1>. See L<https://yaml.org/>.
 Some (rare) syntax elements are not yet supported and documented below.
 
 YAML is a serialization language. The YAML input is called "YAML Stream".
@@ -531,7 +622,10 @@ Preserving scalar styles is still experimental.
     # Preserve the quoting style of scalars
     my $yp = YAML::PP->new( preserve => PRESERVE_SCALAR_STYLE );
 
-    # Preserve order and scalar style
+    # Preserve block/flow style (since 0.024)
+    my $yp = YAML::PP->new( preserve => PRESERVE_FLOW_STYLE );
+
+    # Combine, e.g. preserve order and scalar style
     my $yp = YAML::PP->new( preserve => PRESERVE_ORDER | PRESERVE_SCALAR_STYLE );
 
 Do NOT rely on the internal implementation of it.
@@ -547,9 +641,18 @@ If you load the following input:
     - "double"
     - |
       literal
+    ---
+    block mapping:
+      flow sequence: [a, b]
+    flow mapping: {a: b}
 
-    my $yp = YAML::PP->new( preserve => PRESERVE_ORDER | PRESERVE_SCALAR_STYLE );
-    my ($hash, $styles) = $yp->load_file($file);
+with this code:
+
+    my $yp = YAML::PP->new(
+        preserve => PRESERVE_ORDER | PRESERVE_SCALAR_STYLE | PRESERVE_FLOW_STYLE
+    );
+    my ($hash, $styles, $flow) = $yp->load_file($file);
+    $yp->dump_file($hash, $styles, $flow);
 
 Then dumping it will return the same output.
 Only folded block scalars '>' cannot preserve the style yet.
@@ -566,6 +669,9 @@ a scalar, the object will be replaced by a simple scalar.
 
 You can also pass C<1> as a value. In this case all preserving options will be
 enabled, also if there are new options added in the future.
+
+There are also methods to craete preserved nodes from scratch. See the
+C<preserved_(scalar|mapping|sequence> L<"METHODS"> below.
 
 =back
 
@@ -621,6 +727,65 @@ L<YAML::PP::Writer> and output a string.
         writer => $writer,
     );
     $yp->dump($data);
+
+=head2 preserved_scalar
+
+Since version 0.024
+
+Experimental. Please report bugs or let me know this is useful and works.
+
+You can define a certain scalar style when dumping data.
+Figuring out the best style is a hard task and practically impossible to get
+it right for all cases. It's also a matter of taste.
+
+    use YAML::PP::Common qw/ PRESERVE_SCALAR_STYLE /;
+    my $yp = YAML::PP->new(
+        preserve => PRESERVE_SCALAR_STYLE,
+    );
+    # a single linebreak would normally be dumped with double quotes: "\n"
+    my $scalar = $yp->preserved_scalar("\n", style => YAML_LITERAL_SCALAR_STYLE );
+
+    my $data = { literal => $scalar };
+    my $dump = $yp->dump_string($data);
+    # output
+    ---
+    literal: |+
+
+    ...
+
+
+=head2 preserved_mapping, preserved_sequence
+
+Since version 0.024
+
+Experimental. Please report bugs or let me know this is useful and works.
+
+With this you can define which nodes are dumped with the more compact flow
+style instead of block style.
+
+If you add C<PRESERVE_ORDER> to the C<preserve> option, it will also keep the
+order of the keys in a hash.
+
+    use YAML::PP::Common qw/ PRESERVE_ORDER PRESERVE_FLOW_STYLE /;
+    my $yp = YAML::PP->new(
+        preserve => PRESERVE_FLOW_STYLE | PRESERVE_ORDER
+    );
+
+    my $hash = $yp->preserved_mapping({}, style => YAML_FLOW_MAPPING_STYLE);
+    # Add values after initialization to preserve order
+    %$hash = (z => 1, a => 2, y => 3, b => 4);
+
+    my $array = $yp->preserved_sequence([23, 24], style => YAML_FLOW_SEQUENCE_STYLE);
+
+    my $data = $yp->preserved_mapping({});
+    %$data = ( map => $hash, seq => $array );
+
+    my $dump = $yp->dump_string($data);
+    # output
+    ---
+    map: {z: 1, a: 2, y: 3, b: 4}
+    seq: [23, 24]
+
 
 =head2 loader
 
@@ -1050,7 +1215,7 @@ and created a matrix view.
 
 L<https://github.com/perlpunk/yaml-test-matrix>
 
-You can find the latest build at L<http://matrix.yaml.io>
+You can find the latest build at L<https://matrix.yaml.io>
 
 As of this writing, the test matrix only contains valid test cases.
 Invalid ones will be added.
@@ -1086,6 +1251,8 @@ Felix answered countless questions about the YAML Specification.
 =item L<YAML::PP::LibYAML>
 
 =item L<YAML::LibYAML::API>
+
+=item L<https://www.yaml.info>
 
 =back
 

@@ -1,0 +1,598 @@
+#!perl
+
+our $DATE = '2020-04-30'; # DATE
+our $VERSION = '0.230'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => '/Perinci/CmdLine/Gen/gen_pericmd_script',
+    log => 1,
+)->run;
+
+# ABSTRACT: Generate Perinci::CmdLine CLI script
+# PODNAME: gen-pericmd-script
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+gen-pericmd-script - Generate Perinci::CmdLine CLI script
+
+=head1 VERSION
+
+This document describes version 0.230 of gen-pericmd-script (from Perl distribution App-GenPericmdScript), released on 2020-04-30.
+
+=head1 SYNOPSIS
+
+Create a Perinci::CmdLine script:
+
+ % gen-pericmd-script /App/MyApp/myfunc > mycli
+
+Some more options (turn on debugging, output to file, overwrite existing output,
+will automatically chmod +x the file and run L<shcompgen> if it's available on
+the system and output dir is in PATH, pick Perinci::CmdLine::Any backend):
+
+ % gen-pericmd-script --debug \
+     -o /path/to/mycli --overwrite \
+     --cmdline Perinci::CmdLine::Classic \
+     /App/MyApp/myfunc
+
+With subcommands:
+
+ % gen-pericmd-script /App/MyApp/ \
+     -s update:/App/MyApp/update -s delete:/App/MyApp/delete \
+     > mycli
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--allow-unknown-opts>
+
+Will be passed to Perinci::CmdLine constructor.
+
+=item B<--classic>
+
+Shortcut for --cmdline=classic.
+
+See C<--cmdline>.
+
+=item B<--cmdline>=I<s>
+
+Specify module to use.
+
+Default value:
+
+ "Perinci::CmdLine::Any"
+
+=item B<--code-after-end>=I<s>
+
+=item B<--code-before-instantiate-cmdline>=I<s>
+
+=item B<--config-dir>=I<s@>
+
+Will be passed to Perinci::CmdLine constructor.
+
+Can be specified multiple times.
+
+=item B<--config-dirs-json>=I<s>
+
+Will be passed to Perinci::CmdLine constructor (JSON-encoded).
+
+See C<--config-dir>.
+
+=item B<--config-filename-json>=I<s>
+
+Will be passed to Perinci::CmdLine constructor (JSON-encoded).
+
+See C<--config-filename>.
+
+=item B<--config-filename>=I<s>
+
+Will be passed to Perinci::CmdLine constructor.
+
+=item B<--copt-help-getopt>=I<s>
+
+=item B<--copt-version-getopt>=I<s>
+
+=item B<--default-dry-run>
+
+Whether to set default_dry_run, will be passed to Perinci::CmdLine constructor.
+
+=item B<--default-format>=I<s>
+
+Set default format.
+
+=item B<--default-log-level>=I<s>
+
+Valid values:
+
+ ["trace","debug","info","warn","error","fatal","none"]
+
+=item B<--default-subcommand>=I<s>
+
+Will be passed to Perinci::CmdLine constructor.
+
+=item B<--env-name>=I<s>
+
+Will be passed to Perinci::CmdLine constructor.
+
+=item B<--exclude-package-functions-match>=I<s>
+
+Exclude package functions matching this pattern.
+
+=item B<--extra-urls-for-version-json>=I<s>
+
+Will be passed to Perinci::CmdLine constructor (JSON-encoded).
+
+See C<--extra-urls-for-version>.
+
+=item B<--extra-urls-for-version>=I<s@>
+
+Will be passed to Perinci::CmdLine constructor.
+
+Can be specified multiple times.
+
+=item B<--include-package-functions-match>=I<s>
+
+Only include package functions matching this pattern.
+
+=item B<--inline>
+
+Shortcut for --cmdline=inline.
+
+See C<--cmdline>.
+
+=item B<--interpreter-path>=I<s>
+
+What to put on shebang line.
+
+=item B<--lite>
+
+Shortcut for --cmdline=lite.
+
+See C<--cmdline>.
+
+=item B<--load-module-json>=I<s>
+
+Load extra modules (JSON-encoded).
+
+See C<--load-module>.
+
+=item B<--load-module>=I<s@>
+
+Load extra modules.
+
+Can be specified multiple times.
+
+=item B<--log>
+
+Will be passed to Perinci::CmdLine constructor.
+
+=item B<--no-copt-help-enable>
+
+=item B<--no-copt-version-enable>
+
+=item B<--no-pod>
+
+Currently only Perinci::CmdLine::Inline generates POD.
+
+
+=item B<--no-prefer-lite>
+
+Prefer Perinci::CmdLine::Classic backend.
+
+=item B<--no-ssl-verify-hostname>
+
+=item B<--pass-cmdline-object>
+
+Will be passed to Perinci::CmdLine constructor.
+
+Currently irrelevant when generating with Perinci::CmdLine::Inline.
+
+
+=item B<--per-arg-json>
+
+Will be passed to Perinci::CmdLine constructor.
+
+=item B<--per-arg-yaml>
+
+Will be passed to Perinci::CmdLine constructor.
+
+=item B<--read-config>
+
+Will be passed to Perinci::CmdLine constructor.
+
+=item B<--read-env>
+
+Will be passed to Perinci::CmdLine constructor.
+
+=item B<--script-name>=I<s>
+
+=item B<--script-summary>=I<s>
+
+=item B<--script-version>=I<s>
+
+Use this for version number instead.
+
+=item B<--skip-format>
+
+Assume that function returns raw text which needs no formatting.
+
+=item B<--subcommand>=I<s>%, B<-s>
+
+Hash of subcommand entries, where each entry is "url[:summary]".
+
+An optional summary can follow the URL, e.g.:
+
+    URL[:SUMMARY]
+
+Example (on CLI):
+
+    --subcommand add=/My/App/add_item --subcommand bin='/My/App/bin_item:Delete an item'
+
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--subcommands-from-package-functions>
+
+Form subcommands from functions under package's URL.
+
+This is an alternative to the `subcommands` option. Instead of specifying each
+subcommand's name and URL, you can also specify that subcommand names are from
+functions under the package URL in `url`. So for example if `url` is `/My/App/`,
+hen all functions under `/My/App` are listed first. If the functions are:
+
+    foo
+    bar
+    baz_qux
+
+then the subcommands become:
+
+    foo => /My/App/foo
+    bar => /My/App/bar
+    "baz-qux" => /My/App/baz_qux
+
+
+=item B<--subcommands-json>=I<s>
+
+Hash of subcommand entries, where each entry is "url[:summary]" (JSON-encoded).
+
+See C<--subcommand>.
+
+=item B<--url-json>=I<s>
+
+URL to function (or package, if you have subcommands) (JSON-encoded).
+
+See C<--url>.
+
+=item B<--url>=I<s>*
+
+URL to function (or package, if you have subcommands).
+
+=item B<--use-cleanser>
+
+Whether to use data cleansing before outputting to JSON.
+
+=item B<--use-utf8>
+
+Whether to set utf8 flag on output, will be passed to Perinci::CmdLine constructor.
+
+=item B<--validate-args>
+
+Will be passed to Perinci::CmdLine constructor.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--output-file>=I<s>, B<-o>
+
+Path to output file.
+
+Default value:
+
+ "-"
+
+=item B<--overwrite>
+
+Whether to overwrite output if previously exists.
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--allow-prereq-json>=I<s>
+
+Allow script to depend on these modules (JSON-encoded).
+
+See C<--allow-prereq>.
+
+=item B<--allow-prereq>=I<s@>
+
+Allow script to depend on these modules.
+
+Sometimes, as in the case of using `Perinci::CmdLine::Inline`, dependency to
+some modules (e.g. non-core XS modules) are prohibited because the goal is to
+have a free-standing script. This option allows whitelisting some extra modules.
+
+If you use `Perinci::CmdLine::Inline`, this option will be passed to it.
+
+
+Can be specified multiple times.
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--pack-deps>
+
+Whether to pack dependencies in Perinci::CmdLine::Inline script.
+
+Will be passed to <pm:Perinci::CmdLine>'s `gen_inline_pericmd_script`'s
+`pack_deps` option.
+
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C gen-pericmd-script gen-pericmd-script
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete gen-pericmd-script 'p/*/`gen-pericmd-script`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/gen-pericmd-script.conf>, F<~/gen-pericmd-script.conf>, or F</etc/gen-pericmd-script.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ allow_prereq (see --allow-prereq)
+ allow_unknown_opts (see --allow-unknown-opts)
+ cmdline (see --cmdline)
+ code_after_end (see --code-after-end)
+ code_before_instantiate_cmdline (see --code-before-instantiate-cmdline)
+ config_dirs (see --config-dir)
+ config_filename (see --config-filename)
+ copt_help_enable (see --no-copt-help-enable)
+ copt_help_getopt (see --copt-help-getopt)
+ copt_version_enable (see --no-copt-version-enable)
+ copt_version_getopt (see --copt-version-getopt)
+ default_dry_run (see --default-dry-run)
+ default_format (see --default-format)
+ default_log_level (see --default-log-level)
+ default_subcommand (see --default-subcommand)
+ env_name (see --env-name)
+ exclude_package_functions_match (see --exclude-package-functions-match)
+ extra_urls_for_version (see --extra-urls-for-version)
+ format (see --format)
+ include_package_functions_match (see --include-package-functions-match)
+ interpreter_path (see --interpreter-path)
+ load_module (see --load-module)
+ log (see --log)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ output_file (see --output-file)
+ overwrite (see --overwrite)
+ pack_deps (see --pack-deps)
+ pass_cmdline_object (see --pass-cmdline-object)
+ per_arg_json (see --per-arg-json)
+ per_arg_yaml (see --per-arg-yaml)
+ pod (see --no-pod)
+ prefer_lite (see --no-prefer-lite)
+ read_config (see --read-config)
+ read_env (see --read-env)
+ script_name (see --script-name)
+ script_summary (see --script-summary)
+ script_version (see --script-version)
+ skip_format (see --skip-format)
+ ssl_verify_hostname (see --no-ssl-verify-hostname)
+ subcommands (see --subcommand)
+ subcommands_from_package_functions (see --subcommands-from-package-functions)
+ url (see --url)
+ use_cleanser (see --use-cleanser)
+ use_utf8 (see --use-utf8)
+ validate_args (see --validate-args)
+
+=head1 ENVIRONMENT
+
+=head2 GEN_PERICMD_SCRIPT_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/gen-pericmd-script.conf>
+
+F<~/gen-pericmd-script.conf>
+
+F</etc/gen-pericmd-script.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-GenPericmdScript>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-GenPericmdScript>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GenPericmdScript>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Perinci::CmdLine::Manual>
+
+L<Dist::Zilla::Plugin::GenPericmdScript>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

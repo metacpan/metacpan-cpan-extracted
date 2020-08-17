@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::TimeTracking;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 RT->AddStyleSheets("time_tracking.css");
 RT->AddJavaScript("time_tracking.js");
@@ -29,6 +29,29 @@ our %WEEK_INDEX = (
     Friday    => 5,
     Saturday  => 6,
 );
+
+sub AllChildren {
+    my $self = shift;
+    my $ticket = shift or return;
+
+    my @tickets;
+    my %seen;
+
+    my $find_children;
+    $find_children = sub {
+        my $parent = shift;
+        my $links  = $parent->Members;
+        while ( my $link = $links->Next ) {
+            my $obj = $link->BaseObj;
+            next unless $obj && UNIVERSAL::isa( $obj, 'RT::Ticket' );
+            next if $seen{ $obj->id }++;
+            push @tickets, $obj;
+            $find_children->( $obj );
+        }
+    };
+    $find_children->( $ticket );
+    return @tickets;
+}
 
 =head1 NAME
 

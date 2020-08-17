@@ -30,6 +30,8 @@ qx.Class.define("callbackery.ui.Popup", {
             centerOnContainerResize: true,
             centerOnAppear: true
         });
+        this.getApplicationRoot().addListener('resize',this.__autoMax,this);
+        this.__autoMax();
 
         if (cfg.set){
             this.set(cfg.set);
@@ -63,6 +65,16 @@ qx.Class.define("callbackery.ui.Popup", {
                 screen.fireDataEvent('actionResponse',{action: 'cancel'});
             }
         },this);
+    },
+    members: {
+        __autoMax: function() {
+            let bounds = this.getApplicationRoot().getBounds();
+            // make sure the window does not get larger than the screen by default ... 
+            if (bounds) {
+                this.setMaxWidth(bounds.width-20);
+                this.setMaxHeight(bounds.height-20);
+            }
+        }
     },
     events: {
         actionResponse: 'qx.event.type.Data'

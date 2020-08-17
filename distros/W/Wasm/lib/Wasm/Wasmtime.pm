@@ -25,7 +25,7 @@ use Wasm::Wasmtime::WasiConfig;
 use Wasm::Wasmtime::WasiInstance;
 
 # ABSTRACT: Perl interface to Wasmtime
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 1;
@@ -42,7 +42,7 @@ Wasm::Wasmtime - Perl interface to Wasmtime
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ version 0.18
  
  my $store = Wasm::Wasmtime::Store->new;
  
- my $module = Wasm::Wasmtime::Module->new($store, wat => q{
+ my $module = Wasm::Wasmtime::Module->new($store->engine, wat => q{
    (module
  
      ;; callback we can make back into perl space

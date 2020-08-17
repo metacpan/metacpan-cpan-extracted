@@ -6,6 +6,7 @@
 
 package DTA::CAB::Format::TJ;
 use DTA::CAB::Format;
+use DTA::CAB::Format::TT;
 use DTA::CAB::Datum ':all';
 use IO::File;
 use Carp;

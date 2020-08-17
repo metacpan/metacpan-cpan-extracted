@@ -27,12 +27,12 @@ my $t = App::TimeTracker->new(home=>$tmp,config=>{});
         projects=>['TimeTracker'],
     });
     is(scalar @files,7,'got 7 files');
-    is((scalar grep { /App_TimeTracker/ } @files),7,'all match project'); 
+    is((scalar grep { /App_TimeTracker/ } @files),7,'all match project');
 }
 
 {
     my @files = $t->find_task_files({
-        from=>DateTime->new(year=>'2011',month=>5,day=>01),
+        from=>DateTime->new(year=>'2011',month=>5,day=>1),
         projects=>['oe1'],
     });
     is(scalar @files,16,'got 16 files');

@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModulesBundle-PERLANCAR
   homepage: https://metacpan.org/release/Acme-CPANModulesBundle-PERLANCAR
   repository: git://github.com/perlancar/perl-Acme-CPANModulesBundle-PERLANCAR.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

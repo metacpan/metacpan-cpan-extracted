@@ -11,6 +11,8 @@ build_requires:
   Test::Auto: '0.12'
   perl: '5.014'
   routines: '0.02'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -27,11 +29,13 @@ requires:
   JSON::Validator: '4.01'
   perl: '5.014'
   routines: '0.02'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/iamalnewkirk/sql-validator/issues
   homepage: https://metacpan.org/release/SQL-Validator
   repository: git://github.com/iamalnewkirk/sql-validator.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:AWNCORP
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

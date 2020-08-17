@@ -1,0 +1,3226 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'lib';
+use feature 'say';
+
+use SQL::Engine;
+use Test::DB;
+
+my $sql = SQL::Engine->new(
+  grammar => 'postgres',
+  validator => undef,
+);
+
+my $testdb = Test::DB->new;
+my $mysql = $testdb->create(
+  database => 'postgres',
+);
+
+my $dbh = $mysql->dbh;
+
+say "using @{[$mysql->dsn]}\n";
+
+# database-create operations
+
+# * database create
+#
+# CREATE DATABASE todoapp
+
+$sql->database_create(
+  name => 'todoapp'
+);
+
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+
+# database-drop operations
+
+# * database drop
+#
+# DROP DATABASE todoapp
+
+$sql->database_drop(
+  name => 'todoapp'
+);
+
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+
+# schema-create operations
+
+# * schema create
+#
+# CREATE SCHEMA private
+
+$sql->schema_create(
+  name => 'private',
+);
+
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+
+# schema-drop operations
+
+# * schema drop
+#
+# DROP SCHEMA private
+
+$sql->schema_drop(
+  name => 'private',
+);
+
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+
+# schema-rename operations
+
+# * schema rename
+#
+# ALTER SCHEMA RENAME private TO restricted
+
+$sql->schema_create(
+  name => 'private',
+);
+
+$sql->schema_rename(
+  name => {
+    old => 'private',
+    new => 'restricted'
+  }
+);
+
+$sql->schema_drop(
+  name => 'restricted',
+);
+
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+
+# table-create operations
+
+# * table
+#
+# CREATE TABLE users (id int PRIMARY KEY)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users',
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * table, many columns
+#
+# CREATE TABLE users (id int PRIMARY KEY, name text, created datetime, updated
+# datetime, deleted datetime)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->table_drop(
+  name => 'users',
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * table, temporary
+#
+# CREATE TEMPORARY TABLE users (id int PRIMARY KEY, name text, created
+# datetime, updated datetime, deleted datetime)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ],
+  temp => 1
+);
+
+$sql->table_drop(
+  name => 'users',
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * table, subquery
+#
+# CREATE TABLE people AS SELECT * FROM users
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->table_create(
+  name => 'people',
+  query => {
+    select => {
+      from => {
+        table => 'users'
+      },
+      columns => [
+        {
+          column => '*'
+        }
+      ]
+    }
+  }
+);
+
+$sql->table_drop(
+  name => 'people',
+);
+
+$sql->table_drop(
+  name => 'users',
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# table-drop operations
+
+# * table
+#
+# DROP TABLE users
+
+$sql->table_create(
+  name => 'people',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'people'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * table, condition
+#
+# DROP TABLE users CASCADE
+
+$sql->table_create(
+  name => 'people',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'people',
+  condition => 'cascade'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# table-rename operations
+
+# * table rename
+#
+# ALTER TABLE peoples RENAME TO people
+
+$sql->table_create(
+  name => 'peoples',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->table_rename(
+  name => {
+    old => 'peoples',
+    new => 'people'
+  }
+);
+
+$sql->table_drop(
+  name => 'people',
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# column-create operations
+
+# * column type
+#
+# ALTER TABLE users ADD COLUMN accessed datetime
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->column_create(
+  for => {
+    table => 'users'
+  },
+  column => {
+    name => 'accessed',
+    type => 'datetime'
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * column type, nullable
+#
+# ALTER TABLE users ADD COLUMN accessed datetime NULL
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->column_create(
+  for => {
+    table => 'users'
+  },
+  column => {
+    name => 'accessed',
+    type => 'datetime',
+    nullable => 1
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * column type, nullable, default
+#
+# ALTER TABLE users ADD COLUMN accessed datetime NULL DEFAULT now()
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->column_create(
+  for => {
+    table => 'users'
+  },
+  column => {
+    name => 'accessed',
+    type => 'datetime',
+    nullable => 1,
+    default => {
+      function => ['now']
+    }
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * column type, nullable, primary key
+#
+# ALTER TABLE users ADD COLUMN ref uuid PRIMARY KEY
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'name',
+      type => 'string'
+    }
+  ]
+);
+
+$sql->column_create(
+  for => {
+    table => 'users'
+  },
+  column => {
+    name => 'ref',
+    type => 'uuid',
+    primary => 1
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# column-drop operations
+
+# * column drop
+#
+# ALTER TABLE users DROP COLUMN accessed
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->column_create(
+  for => {
+    table => 'users'
+  },
+  column => {
+    name => 'accessed',
+    type => 'datetime',
+    nullable => 1,
+    default => {
+      function => ['now']
+    }
+  }
+);
+
+$sql->column_drop(
+  table => 'users',
+  column => 'accessed'
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# column-rename operations
+
+# * column rename
+#
+# ALTER TABLE users RENAME COLUMN accessed TO accessed_at
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->column_create(
+  for => {
+    table => 'users'
+  },
+  column => {
+    name => 'accessed',
+    type => 'datetime',
+    nullable => 1,
+    default => {
+      function => ['now']
+    }
+  }
+);
+
+$sql->column_rename(
+  for => {
+    table => 'users'
+  },
+  name => {
+    old => 'accessed',
+    new => 'accessed_at'
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# column-change operations
+
+# * change type, nullable
+#
+# ALTER TABLE users ALTER COLUMN accessed datetime NULL
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->column_change(
+  for => {
+    table => 'users'
+  },
+  column => {
+    name => 'deleted',
+    type => 'datetime',
+    nullable => 1
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+
+# * change type, default
+#
+# ALTER TABLE users ALTER COLUMN accessed datetime DEFAULT now()
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->column_change(
+  for => {
+    table => 'users'
+  },
+  column => {
+    name => 'deleted',
+    type => 'datetime',
+    default => { function => ['now'] }
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+
+# * change type, nullable default
+#
+# ALTER TABLE users ALTER COLUMN accessed datetime SET NULL DEFAULT now()
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->column_change(
+  for => {
+    table => 'users'
+  },
+  column => {
+    name => 'deleted',
+    type => 'datetime',
+    default => { function => ['now'] },
+    nullable => 1,
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+
+# constraint-create operations
+
+# * constraint
+#
+# ALTER TABLE users ADD CONSTRAINT foreign_users_profile_id (profile_id) REFERENCES profiles (id)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'profile_id',
+      type => 'integer'
+    }
+  ]
+);
+
+$sql->table_create(
+  name => 'profiles',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->constraint_create(
+  source => {
+    table => 'users',
+    column => 'profile_id'
+  },
+  target => {
+    table => 'profiles',
+    column => 'id'
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$sql->table_drop(
+  name => 'profiles'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * named constraint
+#
+# ALTER TABLE users ADD CONSTRAINT user_profile_id (profile_id) REFERENCES profiles (id)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'profile_id',
+      type => 'integer'
+    }
+  ]
+);
+
+$sql->table_create(
+  name => 'profiles',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->constraint_create(
+  source => {
+    table => 'users',
+    column => 'profile_id'
+  },
+  target => {
+    table => 'profiles',
+    column => 'id'
+  },
+  name => 'user_profile_id'
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$sql->table_drop(
+  name => 'profiles'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * named constraint, on update, on delete
+#
+# ALTER TABLE ADD CONSTRAINT user_defined_name (user_id) REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'profile_id',
+      type => 'integer'
+    }
+  ]
+);
+
+$sql->table_create(
+  name => 'profiles',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->constraint_create(
+  on => {
+    update => 'cascade',
+    delete => 'cascade'
+  },
+  source => {
+    table => 'users',
+    column => 'profile_id'
+  },
+  target => {
+    table => 'profiles',
+    column => 'id'
+  },
+  name => 'user_profile_id'
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$sql->table_drop(
+  name => 'profiles'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# constraint-drop operations
+
+# * constraint
+#
+# ALTER TABLE DROP CONSTRAINT generated
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'profile_id',
+      type => 'integer'
+    }
+  ]
+);
+
+$sql->table_create(
+  name => 'profiles',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->constraint_create(
+  source => {
+    table => 'users',
+    column => 'profile_id'
+  },
+  target => {
+    table => 'profiles',
+    column => 'id'
+  },
+);
+
+$sql->constraint_drop(
+  source => {
+    table => 'users',
+    column => 'profile_id'
+  },
+  target => {
+    table => 'profiles',
+    column => 'id'
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$sql->table_drop(
+  name => 'profiles'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * named constraint
+#
+# ALTER TABLE DROP CONSTRAINT user_defined_name
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'profile_id',
+      type => 'integer'
+    }
+  ]
+);
+
+$sql->table_create(
+  name => 'profiles',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    }
+  ]
+);
+
+$sql->constraint_create(
+  on => {
+    update => 'cascade',
+    delete => 'cascade'
+  },
+  source => {
+    table => 'users',
+    column => 'profile_id'
+  },
+  target => {
+    table => 'profiles',
+    column => 'id'
+  },
+  name => 'user_profile_id'
+);
+
+$sql->constraint_drop(
+  source => {
+    table => 'users',
+    column => 'profile_id'
+  },
+  target => {
+    table => 'profiles',
+    column => 'id'
+  },
+  name => 'user_profile_id'
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$sql->table_drop(
+  name => 'profiles'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# index-create operations
+
+# * index
+#
+# CREATE INDEX index_users_email ON users (name)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'number',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'string'
+    }
+  ]
+);
+
+$sql->index_create(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'name'
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * unique index
+#
+# CREATE UNIQUE INDEX unique_users_email ON users (email)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'number',
+      primary => 1
+    },
+    {
+      name => 'email',
+      type => 'string'
+    }
+  ]
+);
+
+$sql->index_create(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'email'
+    }
+  ],
+  unique => 1
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * named index
+#
+# CREATE INDEX user_name_index ON users (name)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'number',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'string'
+    }
+  ]
+);
+
+$sql->index_create(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'name'
+    }
+  ],
+  name => 'user_name_index'
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * named unique index
+#
+# CREATE UNIQUE INDEX user_email_unique ON users (email)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'number',
+      primary => 1
+    },
+    {
+      name => 'email',
+      type => 'string'
+    }
+  ]
+);
+
+$sql->index_create(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'email'
+    }
+  ],
+  name => 'user_email_unique',
+  unique => 1
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * multi-column index
+#
+# CREATE INDEX index_users_login_email ON users (login, email)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'number',
+      primary => 1
+    },
+    {
+      name => 'email',
+      type => 'string'
+    },
+    {
+      name => 'login',
+      type => 'string'
+    }
+  ]
+);
+
+$sql->index_create(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'login'
+    },
+    {
+      column => 'email'
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# index-drop operations
+
+# * index
+#
+# DROP INDEX generated
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'number',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'string'
+    },
+  ]
+);
+
+$sql->index_create(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'name'
+    },
+  ]
+);
+
+$sql->index_drop(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'name'
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * unique index
+#
+# DROP INDEX generated
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'number',
+      primary => 1
+    },
+    {
+      name => 'email',
+      type => 'string'
+    },
+  ]
+);
+
+$sql->index_create(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'email'
+    },
+  ],
+  unique => 1
+);
+
+$sql->index_drop(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'email'
+    }
+  ],
+  unique => 1
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * named index
+#
+# DROP INDEX user_defined_name
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'number',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'string'
+    },
+  ]
+);
+
+$sql->index_create(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'name'
+    },
+  ],
+  name => 'user_name_index'
+);
+
+$sql->index_drop(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'name'
+    }
+  ],
+  name => 'user_name_index'
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# transaction operations
+
+# * transaction
+#
+# BEGIN;
+# ...;
+# END;
+
+$sql->transaction(
+  queries => [
+    {
+      'table-create' => {
+        name => 'users',
+        columns => [
+          {
+            name => 'id',
+            type => 'integer',
+            primary => 1
+          }
+        ]
+      }
+    },
+    {
+      'table-drop' => {
+        name => 'users',
+        safe => 1
+      }
+    }
+  ]
+);
+
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+
+# * transaction mode
+#
+# BEGIN DEFERRED;
+# CREATE TABLE ...;
+# END;
+
+$sql->transaction(
+  mode => [
+    'isolation',
+    'level',
+    'serializable',
+  ],
+  queries => [
+    {
+      'table-create' => {
+        name => 'users',
+        columns => [
+          {
+            name => 'id',
+            type => 'integer',
+            primary => 1
+          },
+          {
+            name => 'name',
+            type => 'text',
+          },
+          {
+            name => 'created',
+            type => 'datetime',
+          },
+          {
+            name => 'updated',
+            type => 'datetime',
+          },
+          {
+            name => 'deleted',
+            type => 'datetime',
+          },
+        ]
+      }
+    },
+    {
+      'table-drop' => {
+        name => 'users',
+        safe => 1
+      }
+    }
+  ]
+);
+
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+
+# view-create operations
+
+# * view
+#
+# CREATE VIEW active_users AS (SELECT * FROM users WHERE deleted IS NULL)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->view_create(
+  name => 'active_users',
+  query => {
+    select => {
+      from => {
+        table => 'users'
+      },
+      columns => [
+        {
+          column => '*'
+        }
+      ],
+      where => [
+        {
+          'not-null' => {
+            column => 'deleted'
+          }
+        }
+      ]
+    }
+  }
+);
+
+$sql->view_drop(
+  name => 'active_users'
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * view, temporary
+#
+# CREATE TEMPORARY VIEW active_users AS (SELECT * FROM users WHERE deleted IS NULL)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->view_create(
+  name => 'active_users',
+  query => {
+    select => {
+      from => {
+        table => 'users'
+      },
+      columns => [
+        {
+          column => '*'
+        }
+      ],
+      where => [
+        {
+          'not-null' => {
+            column => 'deleted'
+          }
+        }
+      ]
+    }
+  },
+  temp => 1
+);
+
+$sql->view_drop(
+  name => 'active_users'
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# view-drop operations
+
+# * view drop
+#
+# DROP VIEW active_users
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->view_create(
+  name => 'active_users',
+  query => {
+    select => {
+      from => {
+        table => 'users'
+      },
+      columns => [
+        {
+          column => '*'
+        }
+      ],
+      where => [
+        {
+          'not-null' => {
+            column => 'deleted'
+          }
+        }
+      ]
+    }
+  }
+);
+
+$sql->view_drop(
+  name => 'active_users'
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# insert operations
+
+# * insert, values only
+#
+# INSERT INTO users VALUES (NULL, 'Rob Zombie', now(), now(), now())
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      increment => 1,
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'timestamp',
+    },
+    {
+      name => 'updated',
+      type => 'timestamp',
+    },
+    {
+      name => 'deleted',
+      type => 'timestamp',
+    },
+  ]
+);
+
+$sql->insert(
+  into => {
+    table => 'users'
+  },
+  values => [
+    {
+      value => 1
+    },
+    {
+      value => 'Rob Zombie'
+    },
+    {
+      value => {
+        function => ['now']
+      }
+    },
+    {
+      value => {
+        function => ['now']
+      }
+    },
+    {
+      value => {
+        function => ['now']
+      }
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * insert, columns, values
+#
+# INSERT INTO users (id, name, created, updated, deleted) VALUES (NULL, 'Rob Zombie', now(), now(), now())
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      increment => 1,
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->insert(
+  into => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'id'
+    },
+    {
+      column => 'name'
+    },
+    {
+      column => 'created'
+    },
+    {
+      column => 'updated'
+    },
+    {
+      column => 'deleted'
+    }
+  ],
+  values => [
+    {
+      value => 1
+    },
+    {
+      value => 'Rob Zombie'
+    },
+    {
+      value => {
+        function => ['now']
+      }
+    },
+    {
+      value => {
+        function => ['now']
+      }
+    },
+    {
+      value => {
+        function => ['now']
+      }
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * insert, defaults only
+#
+# INSERT INTO users DEFAULT VALUES
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->insert(
+  into => {
+    table => 'users'
+  },
+  default => 1
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[NO SUPPORT] ', $op->statement;
+  # $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * insert, select columns
+#
+# INSERT INTO people (name, user_id) SELECT name, id FROM users
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->table_create(
+  name => 'people',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'user_id',
+      type => 'integer',
+    },
+  ]
+);
+
+$sql->insert(
+  into => {
+    table => 'people'
+  },
+  columns => [
+    {
+      column => 'name'
+    },
+    {
+      column => 'user_id'
+    }
+  ],
+  query => {
+    select => {
+      from => {
+        table => 'users'
+      },
+      columns => [
+        {
+          column => 'name'
+        },
+        {
+          column => 'id'
+        }
+      ]
+    }
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$sql->table_drop(
+  name => 'people'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * insert, select columns, where clause
+#
+# INSERT INTO people (name, user_id) SELECT (name, id) FROM users WHERE deleted IS NOT NULL
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->table_create(
+  name => 'people',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'user_id',
+      type => 'integer',
+    },
+  ]
+);
+
+$sql->insert(
+  into => {
+    table => 'people'
+  },
+  columns => [
+    {
+      column => 'name'
+    },
+    {
+      column => 'user_id'
+    }
+  ],
+  query => {
+    select => {
+      from => {
+        table => 'users'
+      },
+      columns => [
+        {
+          column => 'name'
+        },
+        {
+          column => 'id'
+        }
+      ],
+      where => [
+        {
+          'not-null' => {
+            column => 'deleted'
+          }
+        }
+      ]
+    }
+  }
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$sql->table_drop(
+  name => 'people'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# update operations
+
+# * update
+#
+# UPDATE users SET updated = now()
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->update(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'updated',
+      value => { function => ['now'] }
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * update, where clause
+#
+# UPDATE users SET name = cancat('[deleted]', ' ', name) WHERE deleted IS NOT NULL
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->update(
+  for => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'name',
+      value => {
+        function => ['concat', '[deleted]', ' ', { column => 'name' }]
+      }
+    }
+  ],
+  where => [
+    {
+      'not-null' => {
+        column => 'deleted'
+      }
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * update, where subquery
+#
+# UPDATE users u SET updated = now() WHERE u.id IN (SELECT id FROM users x JOIN tasklists t ON x.id = t.user_id WHERE x.id = ?)
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->table_create(
+  name => 'tasklists',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+  ]
+);
+
+$sql->update(
+  for => {
+    table => 'users',
+    alias => 'u1'
+  },
+  columns => [
+    {
+      column => 'updated',
+      alias => 'u1',
+      value => { function => ['now'] }
+    }
+  ],
+  where => [
+    {
+      in => [
+        {
+          column => 'id',
+          alias => 'u1'
+        },
+        {
+          subquery => {
+            select => {
+              from => {
+                table => 'users',
+                alias => 'u2'
+              },
+              columns => [
+                {
+                  column => 'id',
+                  alias => 'u2'
+                }
+              ],
+              joins => [
+                {
+                  with => {
+                    table => 'tasklists',
+                    alias => 't1'
+                  },
+                  having => [
+                    {
+                      eq => [
+                        {
+                          column => 'id',
+                          alias => 'u2'
+                        },
+                        {
+                          column => 'user_id',
+                          alias => 't1'
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              where => [
+                {
+                  eq => [
+                    {
+                      column => 'id',
+                      alias => 'u2'
+                    },
+                    {
+                      binding => 'user_id'
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$sql->table_drop(
+  name => 'tasklists'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[NO SUPPORT] ', $op->statement;
+  # $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# delete operations
+
+# * delete
+#
+# DELETE FROM tasklists
+
+$sql->table_create(
+  name => 'tasklists',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+  ]
+);
+
+$sql->delete(
+  from => {
+    table => 'tasklists'
+  }
+);
+
+$sql->table_drop(
+  name => 'tasklists'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * delete, where clause
+#
+# DELETE FROM tasklists WHERE deleted IS NOT NULL
+
+$sql->table_create(
+  name => 'tasklists',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->delete(
+  from => {
+    table => 'tasklists'
+  },
+  where => [
+    {
+      'not-null' => {
+        column => 'deleted'
+      }
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'tasklists'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# select operations
+
+# * select star
+#
+# SELECT * FROM users
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->select(
+  from => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => '*'
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * select columns
+#
+# SELECT id, name, created FROM users
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->select(
+  from => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => 'id'
+    },
+    {
+      column => 'name'
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * select star, where clause
+#
+# SELECT * FROM users WHERE id = ?
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->select(
+  from => {
+    table => 'users'
+  },
+  columns => [
+    {
+      column => '*'
+    }
+  ],
+  where => [
+    {
+      eq => [{column => 'id'}, {binding => 'id'}]
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute($op->parameters({ id => time }));
+}
+$dbh->rollback;
+
+# * select, join, aliases
+#
+# SELECT * FROM users u JOIN tasklists t ON u.id = t.user_id WHERE u.id = ?
+
+$sql->table_create(
+  name => 'users',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+    {
+      name => 'created',
+      type => 'datetime',
+    },
+    {
+      name => 'updated',
+      type => 'datetime',
+    },
+    {
+      name => 'deleted',
+      type => 'datetime',
+    },
+  ]
+);
+
+$sql->table_create(
+  name => 'tasklists',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+  ]
+);
+
+$sql->select(
+  from => {
+    table => 'users',
+    alias => 'u'
+  },
+  columns => [
+    {
+      column => '*',
+      alias => 'u'
+    }
+  ],
+  joins => [
+    {
+      with => {
+        table => 'tasklists',
+        alias => 't'
+      },
+      having => [
+        {
+          eq => [
+            {
+              column => 'id',
+              alias => 'u'
+            },
+            {
+              column => 'user_id',
+              alias => 't'
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  where => [
+    {
+      eq => [
+        {
+          column => 'id',
+          alias => 'u'
+        },
+        {
+          binding => 'id'
+        }
+      ]
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'users'
+);
+
+$sql->table_drop(
+  name => 'tasklists'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute($op->parameters({ id => time }));
+}
+$dbh->rollback;
+
+# * select column, aggrate, group-by
+#
+# SELECT count(user_id) FROM tasklists GROUP BY user_id
+
+$sql->table_create(
+  name => 'tasklists',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+  ]
+);
+
+$sql->select(
+  from => {
+    table => 'tasklists'
+  },
+  columns => [
+    {
+      function => ['count', { column => 'user_id' }]
+    }
+  ],
+  group_by => [
+    {
+      column => 'user_id'
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'tasklists'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * select column, aggrate, group-by, having
+#
+# SELECT count(user_id) FROM tasklists GROUP BY user_id HAVING count(user_id) > 1
+
+$sql->table_create(
+  name => 'tasklists',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+  ]
+);
+
+$sql->select(
+  from => {
+    table => 'tasklists'
+  },
+  columns => [
+    {
+      function => ['count', { column => 'user_id' }]
+    }
+  ],
+  group_by => [
+    {
+      column => 'user_id'
+    }
+  ],
+  having => [
+    {
+      gt => [
+        {
+          function => ['count', { column => 'user_id' }]
+        },
+        1
+      ]
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'tasklists'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * select star, order-by
+#
+# SELECT * FROM tasklists ORDER BY user_id
+
+$sql->table_create(
+  name => 'tasklists',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+  ]
+);
+
+$sql->select(
+  from => {
+    table => 'tasklists'
+  },
+  columns => [
+    {
+      column => '*'
+    }
+  ],
+  order_by => [
+    {
+      column => 'user_id'
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'tasklists'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * select star, order-by (bi-direction)
+#
+# SELECT * FROM tasklists ORDER BY user_id, id DESC
+
+$sql->table_create(
+  name => 'tasklists',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+  ]
+);
+
+$sql->select(
+  from => {
+    table => 'tasklists'
+  },
+  columns => [
+    {
+      column => '*'
+    }
+  ],
+  order_by => [
+    {
+      column => 'user_id'
+    },
+    {
+      column => 'id',
+      sort => 'desc'
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'tasklists'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * select star, limit
+#
+# SELECT * FROM tasks LIMIT 5
+
+$sql->table_create(
+  name => 'tasks',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'tasklist_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+  ]
+);
+
+$sql->select(
+  from => {
+    table => 'tasks'
+  },
+  columns => [
+    {
+      column => '*'
+    }
+  ],
+  rows => {
+    limit => 5
+  }
+);
+
+$sql->table_drop(
+  name => 'tasks'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * select star, limit, offset
+#
+# SELECT * FROM tasks LIMIT 5, 1
+
+$sql->table_create(
+  name => 'tasks',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'tasklist_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+  ]
+);
+
+$sql->select(
+  from => {
+    table => 'tasks'
+  },
+  columns => [
+    {
+      column => '*'
+    }
+  ],
+  rows => {
+    limit => 5,
+    offset => 1
+  }
+);
+
+$sql->table_drop(
+  name => 'tasks'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;
+
+# * select star, aliases, multiple tables
+#
+# SELECT t1.*, t2.* FROM tasklists t1, tasks t2 WHERE t2.tasklist_id = t1.id
+
+$sql->table_create(
+  name => 'tasklists',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+  ]
+);
+
+$sql->table_create(
+  name => 'tasks',
+  columns => [
+    {
+      name => 'id',
+      type => 'integer',
+      primary => 1
+    },
+    {
+      name => 'user_id',
+      type => 'integer'
+    },
+    {
+      name => 'tasklist_id',
+      type => 'integer'
+    },
+    {
+      name => 'name',
+      type => 'text',
+    },
+  ]
+);
+
+$sql->select(
+  from => [
+    {
+      table => 'tasklists',
+      alias => 't1'
+    },
+    {
+      table => 'tasks',
+      alias => 't2'
+    }
+  ],
+  columns => [
+    {
+      column => '*',
+      alias => 't1'
+    },
+    {
+      column => '*',
+      alias => 't1'
+    }
+  ],
+  where => [
+    {
+      eq => [
+        {
+          column => 'tasklist_id',
+          alias => 't2'
+        },
+        {
+          column => 'id',
+          alias => 't1'
+        }
+      ]
+    }
+  ]
+);
+
+$sql->table_drop(
+  name => 'tasklists'
+);
+
+$sql->table_drop(
+  name => 'tasks'
+);
+
+$dbh->begin_work;
+while (my $op = $sql->operations->pull) {
+  say '[POSTGRES] ', $op->statement;
+  $dbh->prepare($op->statement)->execute;
+}
+$dbh->rollback;

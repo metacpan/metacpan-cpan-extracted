@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Moo" => 0,
     "MooX::Role::CachedURL" => "0.04",
+    "Text::Table::Tiny" => 0,
     "autodie" => 0,
     "feature" => 0,
     "strict" => 0,
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "MooX::Role::CachedURL" => "0.04",
   "Test::More" => "0.88",
+  "Text::Table::Tiny" => 0,
   "autodie" => 0,
   "feature" => 0,
   "strict" => 0,

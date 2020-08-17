@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 # shortcuts
 #  os and distros
@@ -1083,6 +1083,11 @@ sub mapping {
        [package => 'pkg-config']],
      ],
 
+     [cpanmod => 'FFI::Platypus::Lang::Pascal',
+      [like_debian,
+       [package => 'fp-compiler']],
+     ],
+
      [cpanmod => 'File::ExtAttr',
       [like_debian,
        [package => 'libattr1-dev']],
@@ -1136,7 +1141,7 @@ sub mapping {
       [os_openbsd,
        [package => [ 'firefox' ]]],
       [like_debian,
-       [linuxdistrocodename => [qw(trusty xenial bionic eoan)],
+       [linuxdistrocodename => [qw(trusty xenial bionic eoan focal)],
 	[package => [qw(firefox xvfb xauth)]]], # there's no firefox-esr for Ubuntu
        [package => [ 'firefox-esr', 'xvfb', 'xauth' ]]],
       [like_fedora,
@@ -1627,6 +1632,10 @@ sub mapping {
       [like_debian,
        [before_ubuntu_trusty,
 	[package => []]], # not available in wheezy
+       [package => 'htmldoc']],
+      [like_fedora,
+       [linuxdistro => 'centos', linuxdistroversion => {'>=', 8, '<', 9}, # not available (maybe not yet?) for CentOS8
+	[package => []]],
        [package => 'htmldoc']],
      ],
 
@@ -2295,6 +2304,17 @@ sub mapping {
        [package => 'libmaxminddb-devel']], # works
      ],
 
+     [cpanmod => 'Media::MediaInfoLib',
+      [os_freebsd,
+       [package => 'libmediainfo']],
+      [like_debian,
+       [before_ubuntu_trusty,
+	[package => []]],
+       [package => 'libmediainfo-dev']],
+      [like_fedora,
+       [package => 'libmediainfo-devel']],
+     ],
+
      [cpanmod => 'Mhash',
       [os_freebsd,
        [package => 'mhash']],
@@ -2740,7 +2760,9 @@ sub mapping {
       [os_freebsd,
        [package => ['libgnome-keyring', 'pkgconf']]],
       [like_debian,
-       [package => 'libgnome-keyring-dev']],
+       [before_debian_buster,
+	[package => 'libgnome-keyring-dev']],
+       [package => []]], # not available for buster and later
       [like_fedora,
        [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
 	[package => 'gnome-keyring-devel']],

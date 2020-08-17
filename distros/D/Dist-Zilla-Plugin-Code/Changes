@@ -1,5 +1,16 @@
 Revision history for Dist-Zilla-Plugin-Code
 
+0.003  2020-08-10 16:36:00 UTC
+
+  - Fixed link in documentation
+
+0.002  2020-08-07 16:19:52 UTC
+
+  - New module Dist::Zilla::Plugin::Code::Initialization
+  - New module Dist::Zilla::PluginBundle::Code
+  - Fixed synopsis
+  - Improved error message if required arg is not given
+
 0.001  2020-08-01 23:54:13 UTC
 
   - Initial release

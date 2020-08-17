@@ -91,7 +91,7 @@ no_tz   = $no_tz_str
 
     is $data->{with_tz}, $with_tz_str, 'datetime with time zone reproduced faithfully';
     is $data->{no_tz}, $no_tz_str, 'datetime without time zone reproduced faithfully';
-  }
+  };
 };
 
 done_testing;

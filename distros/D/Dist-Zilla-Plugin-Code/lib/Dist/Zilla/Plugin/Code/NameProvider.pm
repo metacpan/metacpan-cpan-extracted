@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 use Moose;
 use namespace::autoclean;
@@ -13,19 +13,17 @@ with 'Dist::Zilla::Role::NameProvider';
 
 use MooseX::Types::Moose qw(CodeRef);
 
-has _provide_name_code_ref => (
+has provide_name => (
     is       => 'ro',
     isa      => 'CodeRef',
-    init_arg => 'provide_name',
+    reader   => '_provide_name',
     required => 1,
 );
 
 sub provide_name {
     my $self = shift;
 
-    my $code_ref = $self->_provide_name_code_ref;
-    return if !defined $code_ref;
-
+    my $code_ref = $self->_provide_name;
     return $self->$code_ref(@_);
 }
 
@@ -45,7 +43,7 @@ Dist::Zilla::Plugin::Code::NameProvider - something that provides a name for the
 
 =head1 VERSION
 
-Version 0.001
+Version 0.003
 
 =head1 SYNOPSIS
 
@@ -55,7 +53,6 @@ Version 0.001
 
     use Moose;
     with 'Dist::Zilla::Role::PluginBundle';
-    use Dist::Zilla::Plugin::Code::NameProvider;
 
     sub bundle_config {
         my ( $class, $section ) = @_;
@@ -63,7 +60,7 @@ Version 0.001
         my @plugins;
         push @plugins, [
             'SomeUniqueName',
-            'Dist::Zilla::Plugin::Code::BeforeBuild',
+            'Dist::Zilla::Plugin::Code::NameProvider',
             {
                 provide_name => [
                     sub {
@@ -83,13 +80,12 @@ Version 0.001
 
     use Moose;
     with 'Dist::Zilla::Role::PluginBundle::Easy';
-    use Dist::Zilla::Plugin::Code::NameProvider;
 
     sub configure {
         my ( $self ) = @_;
 
         $self->add_plugins([
-            'Code::BeforeBuild',
+            'Code::NameProvider',
             {
                 provide_name => [
                     sub {

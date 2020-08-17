@@ -19,7 +19,7 @@ package MongoDB::BulkWriteResult;
 # ABSTRACT: MongoDB bulk write result document
 
 use version;
-our $VERSION = 'v2.2.1';
+our $VERSION = 'v2.2.2';
 
 # empty superclass for backcompatibility; add a variable to the
 # package namespace so Perl thinks it's a real package
@@ -341,7 +341,7 @@ MongoDB::BulkWriteResult - MongoDB bulk write result document
 
 =head1 VERSION
 
-version v2.2.1
+version v2.2.2
 
 =head1 SYNOPSIS
 
@@ -542,7 +542,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MongoDB, Inc.
+This software is Copyright (c) 2020 by MongoDB, Inc.
 
 This is free software, licensed under:
 

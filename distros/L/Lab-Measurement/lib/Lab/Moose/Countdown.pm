@@ -1,5 +1,5 @@
 package Lab::Moose::Countdown;
-$Lab::Moose::Countdown::VERSION = '3.720';
+$Lab::Moose::Countdown::VERSION = '3.721';
 #ABSTRACT: Verbose countdown/delay with pretty printing of remaining time
 
 use v5.20;
@@ -32,7 +32,7 @@ sub countdown {
 
     while () {
         my $remaining = $delay - ( time() - $t1 );
-        if ( $remaining < 0.5 ) {
+        if ( $remaining < 0.5 and $remaining > 0 ) {
             sleep $remaining;
             last;
         }
@@ -56,7 +56,7 @@ Lab::Moose::Countdown - Verbose countdown/delay with pretty printing of remainin
 
 =head1 VERSION
 
-version 3.720
+version 3.721
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,7 @@ Default C<$prefix> is C<"Sleeping for">.
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

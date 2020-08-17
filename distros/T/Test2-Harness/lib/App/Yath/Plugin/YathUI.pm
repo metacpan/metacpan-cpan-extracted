@@ -2,7 +2,7 @@ package App::Yath::Plugin::YathUI;
 use strict;
 use warnings;
 
-our $VERSION = '1.000020';
+our $VERSION = '1.000023';
 
 use File::Spec;
 use Test2::Harness::Util qw/read_file mod2file/;
@@ -72,6 +72,12 @@ option_group {prefix => 'yathui', category => "YathUI Options"} => sub {
         applicable => \&can_finder,
     );
 
+    option coverage => (
+        description => "Poll coverage data from Yath-UI to determine what tests should be run for changed files",
+        default => 0,
+        applicable => \&can_finder,
+    );
+
     option medium_duration => (
         type => 's',
         description => "Minimum duration length (seconds) before a test goes from SHORT to MEDIUM",
@@ -103,31 +109,35 @@ option_group {prefix => 'yathui', category => "YathUI Options"} => sub {
 
         my $has_durations = $has_finder && $settings->yathui->durations;
         my $has_upload    = $has_logger && $settings->yathui->upload;
+        my $has_coverage  = $has_finder && $settings->yathui->coverage;
 
-        return unless $has_durations || $has_upload;
+        return unless $has_durations || $has_upload || $has_coverage;
 
-        die "'--yathui-url URL' is required to use durations or upload a log"
-            unless $settings->yathui->url;
-        die "'--yathui-project NAME' is required to use durations or upload a log"
-            unless $settings->yathui->project;
+        my $url     = $settings->yathui->url     or die "'--yathui-url URL' is required to use durations, coverage, or upload a log";
+        my $project = $settings->yathui->project or die "'--yathui-project NAME' is required to use durations, coverage, or upload a log";
+        my $grace   = $settings->yathui->grace;
+
+        $url =~ s{/+$}{}g;
 
         if ($has_upload) {
             $settings->logging->field(log => 1);
             $settings->logging->field(bzip2 => 1);
         }
 
-        return unless $has_durations;
+        if ($has_coverage) {
+            my $curl = join '/' => ($url, 'coverage', $project);
+            $settings->finder->field(($grace ? 'maybe_coverage_from' : 'coverage_from'), $curl);
+        }
 
-        my $project = $settings->yathui->project;
-        my $url     = $settings->yathui->url;
-        my $med     = $settings->yathui->medium_duration;
-        my $long    = $settings->yathui->long_duration;
-        my $grace   = $settings->yathui->grace;
+        if ($has_durations) {
+            my $med  = $settings->yathui->medium_duration;
+            my $long = $settings->yathui->long_duration;
 
-        $url =~ s{/+$}{}g;
-        $url = join '/' => ($url, 'durations', $project, $med, $long);
+            my $durl = join '/' => ($url, 'durations', $project, $med, $long);
+            $settings->finder->field(($grace ? 'maybe_durations' : 'durations'), $durl);
+        }
 
-        $settings->finder->field(($grace ? 'maybe_durations' : 'durations'), $url);
+        return;
     };
 };
 
@@ -267,6 +277,13 @@ have yath automatically upload logs or retrieve durations data
 =item --no-yathui-api-key
 
 Yath-UI API key. This is not necessary if your Yath-UI instance is set to single-user
+
+
+=item --yathui-coverage
+
+=item --no-yathui-coverage
+
+Poll coverage data from Yath-UI to determine what tests should be run for changed files
 
 
 =item --yathui-durations

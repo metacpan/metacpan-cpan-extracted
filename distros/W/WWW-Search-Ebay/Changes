@@ -1,3 +1,7 @@
+2020-08-15  Kingpin  <martin@ubuntu>
+
+	* lib/WWW/Search/Ebay.pm (_parse_tree): fixed parser for new page format
+
 2020-04-04  Kingpin  <martin@ubuntu>
 
 	* lib/WWW/Search/Ebay.pm (_get_result_count_elements): new HTML patterns

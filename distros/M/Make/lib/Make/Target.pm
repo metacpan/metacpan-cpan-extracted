@@ -2,24 +2,24 @@ package Make::Target;
 
 use strict;
 use warnings;
+## no critic (ValuesAndExpressions::ProhibitConstantPragma)
+use constant DEBUG => $ENV{MAKE_DEBUG};
+## use critic
 
-our $VERSION = '1.2.0';
+our $VERSION = '2.002';
 
-use Carp;
-use Cwd;
-use Make::Rule;
-
-#
 # Intermediate 'target' package
 # There is an instance of this for each 'target' that apears on
 # the left hand side of a rule i.e. for each thing that can be made.
-#
 sub new {
-    my ( $class, $info, $target ) = @_;
+    my ( $class, $name, $info ) = @_;
     return bless {
-        NAME     => $target,    # name of thing
-        MAKEFILE => $info,      # Makefile context
-        Pass     => 0           # Used to determine if 'done' this sweep
+        NAME       => $name,    # name of thing
+        MAKEFILE   => $info,    # Makefile context
+        RULES      => [],
+        RULE_TYPE  => undef,    # undef, :, ::
+        HAS_RECIPE => undef,    # undef, boolean
+        Pass       => 0,        # Used to determine if 'done' this sweep
     }, $class;
 }
 
@@ -34,158 +34,70 @@ sub phony {
     return $self->Info->phony( $self->Name );
 }
 
-## no critic (RequireArgUnpacking)
-sub colon {
-    my $self = shift;
-    if (@_) {
-        if ( exists $self->{COLON} ) {
-            my $dep = $self->{COLON};
-            if ( @_ == 1 ) {
-
-                # merging an existing rule
-                my $other = shift;
-                $dep->depend( scalar $other->depend );
-                $dep->command( scalar $other->command );
-            }
-            else {
-                $dep->depend(shift);
-                $dep->command(shift);
-            }
-        }
-        else {
-            $self->{COLON} = ( @_ == 1 ) ? shift->clone($self) : Make::Rule->new( $self, ':', @_ );
-        }
-    }
-    if ( exists $self->{COLON} ) {
-        return (wantarray) ? ( $self->{COLON} ) : $self->{COLON};
-    }
-    else {
-        return (wantarray) ? () : undef;
-    }
+sub has_recipe {
+    my ($self) = @_;
+    return $self->{HAS_RECIPE} if defined $self->{HAS_RECIPE};
+    ## no critic (BuiltinFunctions::RequireBlockGrep)
+    return $self->{HAS_RECIPE} = grep @{ $_->recipe }, @{ $self->{RULES} };
+    ## use critic
 }
 
-sub dcolon {
-    my $self = shift;
-    if (@_) {
-        my $rule = ( @_ == 1 ) ? shift->clone($self) : Make::Rule->new( $self, '::', @_ );
-        $self->{DCOLON} = [] unless ( exists $self->{DCOLON} );
-        push( @{ $self->{DCOLON} }, $rule );
+sub rules {
+    my ($self) = @_;
+    if ( !$self->phony && !$self->has_recipe ) {
+        my $rule = $self->Info->patrule( $self->Name, $self->{RULE_TYPE} || ':' );
+        DEBUG and print STDERR "Implicit rule (", $self->Name, "): @{ $rule ? $rule->prereqs : ['none'] }\n";
+        $self->add_rule($rule) if $rule;
     }
-    return ( exists $self->{DCOLON} ) ? @{ $self->{DCOLON} } : ();
+    return $self->{RULES};
+}
+
+sub add_rule {
+    my ( $self, $rule ) = @_;
+    my $new_kind = $rule->kind;
+    my $kind     = $self->{RULE_TYPE} ||= $new_kind;
+    die "Target '$self->{NAME}' had '$kind' but tried to add '$new_kind'"
+        if $kind ne $new_kind;
+    $self->{HAS_RECIPE} ||= undef;    # reset if was no or unknown
+    return push @{ shift->{RULES} }, $rule;
 }
 
 sub Name {
     return shift->{NAME};
 }
 
+sub Base {
+    my $name = shift->{NAME};
+    $name =~ s/\.[^.]+$//;
+    return $name;
+}
+
 sub Info {
     return shift->{MAKEFILE};
 }
 
-sub ProcessColon {
-    my ($self) = @_;
-    my $c = $self->colon;
-    $c->find_commands if $c;
-    return;
-}
-
-sub ExpandTarget {
-    my ($self) = @_;
-    my $target = $self->Name;
-    my $info   = $self->Info;
-    my $colon  = delete $self->{COLON};
-    my $dcolon = delete $self->{DCOLON};
-    foreach my $expand ( split( /\s+/, $info->subsvars($target) ) ) {
-        next unless defined($expand);
-        my $t = $info->Target($expand);
-        if ( defined $colon ) {
-            $t->colon($colon);
-        }
-        foreach my $d ( @{$dcolon} ) {
-            $t->dcolon($d);
-        }
-    }
-    return;
-}
-
 sub done {
     my $self = shift;
-    my $info = $self->Info;
-    my $pass = $info->pass;
+    my $pass = $self->Info->pass;
     return 1 if ( $self->{Pass} == $pass );
     $self->{Pass} = $pass;
     return 0;
 }
 
+# as part of "out of date" processing, if any child is remade, I need too
 sub recurse {
-    my ( $self, $method, @args ) = @_;
+    my ( $self, $method ) = @_;
+    return if $self->done;
     my $info = $self->Info;
-    my $i    = 0;
-    foreach my $rule ( $self->colon, $self->dcolon ) {
-        my $j = 0;
-        foreach my $dep ( $rule->exp_depend ) {
-
-            # This is a dumb fix around regex issues with using Strawberry perl.
-            # This may not fix for all versions of Strawberry perl or all versions
-            # of windows, but is a hacky work-around until a real fix can be implemented
-            if ( ( $dep =~ m/libConfig.pm/ ) and ( $^O eq 'MSWin32' ) ) {
-                print STDERR "we got here with $dep\n";
-                $dep =~ s#libConfig.pm#lib//Config.pm#;
-            }
-            if ( ( $dep =~ m/COREconfig.h/ ) and ( $^O eq 'MSWin32' ) ) {
-                print STDERR "we got here with $dep\n";
-                $dep =~ s#COREconfig.h#CORE//config.h#;
-            }
-
-            my $t = $info->{Depend}{$dep};
-            if ( defined $t ) {
-                $t->$method(@args);
-            }
-            else {
-                unless ( $info->exists($dep) ) {
-                    my $dir = cwd();
-                    die "Cannot recurse $method - no target $dep in $dir";
-                }
-            }
-        }
+    my @results;
+    DEBUG and print STDERR "Build " . $self->Name, "\n";
+    foreach my $rule ( @{ $self->rules } ) {
+        ## no critic (BuiltinFunctions::RequireBlockMap)
+        push @results, map $info->target($_)->recurse($method), @{ $rule->prereqs };
+        ## use critic
+        push @results, $rule->$method($self);
     }
-    return;
-}
-
-sub Script {
-    my $self = shift;
-    my $info = $self->Info;
-    my $rule = $self->colon;
-    return if ( $self->done );
-    $self->recurse('Script');
-    foreach my $rule ( $self->colon, $self->dcolon ) {
-        $rule->Script;
-    }
-    return;
-}
-
-sub Make {
-    my $self = shift;
-    my $info = $self->Info;
-    my $rule = $self->colon;
-    return if ( $self->done );
-    $self->recurse('Make');
-    foreach my $rule ( $self->colon, $self->dcolon ) {
-        $rule->Make;
-    }
-    return;
-}
-
-sub Print {
-    my $self = shift;
-    my $info = $self->Info;
-    return if ( $self->done );
-    my $rule = $self->colon;
-    foreach my $rule ( $self->colon, $self->dcolon ) {
-        $rule->Print;
-    }
-    $self->recurse('Print');
-    return;
+    return @results;
 }
 
 1;

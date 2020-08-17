@@ -6,8 +6,14 @@ README.md
 LICENSE.md
 lib/DBIx/OpenTracing.pm
 lib/DBIx/OpenTracing.pod
-t/sqlite.t
+lib/DBIx/OpenTracing/Constants.pm
+t/import-none.t
+t/import-safe.t
+t/import-secure.t
+t/mem.t
 t/mysql.t
+t/postgresql.t
+t/sqlite.t
 t/lib/Test/DBIx/OpenTracing.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

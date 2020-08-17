@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README
+cpanfile
 dist.ini
 examples/mock-multiple-filecheck-import.t
 examples/mock-multiple-filecheck-run.t

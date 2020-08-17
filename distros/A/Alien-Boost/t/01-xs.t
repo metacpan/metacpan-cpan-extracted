@@ -32,7 +32,7 @@ subtest xs => sub {
 MODULE = Boost PACKAGE = Boost
  
 int 
-mytest()
+main()
     INIT:
     CODE:
       boost::program_options::options_description generic("Generic options");
@@ -42,7 +42,7 @@ mytest()
 EOM
  
   xs_ok $xs, with_subtest {
-    ok(Boost::mytest());
+    ok(Boost::main());
   };
  
 };

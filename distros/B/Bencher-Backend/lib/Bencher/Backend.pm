@@ -1,9 +1,9 @@
 package Bencher::Backend;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-18'; # DATE
+our $DATE = '2020-08-16'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.050'; # VERSION
+our $VERSION = '1.051'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,12 +35,25 @@ sub _ver_or_vers {
 }
 
 sub _get_tempfile_path {
-    my ($filename) = @_;
+    my ($args, $filename) = @_;
     state $tempdir = do {
         require File::Temp;
-        File::Temp::tempdir(CLEANUP => log_is_debug() ? 0:1);
+        File::Temp::tempdir(CLEANUP => $args->{keep_tempdir} || log_is_debug() ? 0:1);
     };
     "$tempdir/$filename";
+}
+
+sub _maybe_tidy_script {
+    require IPC::System::Options;
+
+    my ($args, $path) = @_;
+    return unless $args->{tidy};
+    my $rand = int(1_000_000*rand());
+    rename $path, "$path.$rand" or die "Can't rename $path -> $path.$rand: $!";
+    IPC::System::Options::system(
+        {log=>1, die=>1},
+        "perltidy", "$path.$rand", "-o", $path,
+    );
 }
 
 sub _fill_template {
@@ -62,9 +75,9 @@ sub _fill_template {
 }
 
 sub _get_process_size {
-    my ($parsed, $it) = @_;
+    my ($args, $parsed, $it) = @_;
 
-    my $script_path = _get_tempfile_path("get_process_size-$it->{seq}");
+    my $script_path = _get_tempfile_path($args, "get_process_size-$it->{seq}");
 
     log_debug("Creating script to measure get process size at %s ...", $script_path);
     {
@@ -101,6 +114,7 @@ sub _get_process_size {
         print $fh "\n";
 
         close $fh or die "Can't write to $script_path: $!";
+        _maybe_tidy_script($args, $script_path);
     }
 
     # run the script
@@ -2350,6 +2364,7 @@ the scenario specification.
 _
             schema => ['str*'],
             cmdline_aliases => {f=>{}},
+            tags => ['category:scenario', 'category:participant'],
         },
         scenario_module => {
             summary => 'Load a scenario from a Bencher::Scenario:: Perl module',
@@ -2363,6 +2378,7 @@ _
             schema => 'perl::modname*',
             cmdline_aliases => {m=>{}},
             completion => sub { _complete_scenario_module(@_) },
+            tags => ['category:scenario', 'category:participant'],
         },
         cpanmodules_module => {
             summary => 'Load a scenario from an Acme::CPANModules:: Perl module',
@@ -2374,11 +2390,13 @@ An <pm:Acme::CPANModules> module can also contain benchmarking information, e.g.
 _
             schema => 'perl::modname*',
             completion => sub { _complete_cpanmodules_module(@_) },
+            tags => ['category:scenario', 'category:participant'],
         },
         scenario => {
             summary => 'Load a scenario from data structure',
             schema => ['hash*'], # XXX bencher::scenario
             tags => ['hidden-cli'],
+            tags => ['category:scenario', 'category:participant'],
         },
         participants => {
             'summary' => 'Add participants',
@@ -2387,6 +2405,7 @@ _
                 participant => $_alias_spec_add_participant,
                 p => $_alias_spec_add_participant,
             },
+            tags => ['category:participant'],
         },
         datasets => {
             summary => 'Add datasets',
@@ -2395,6 +2414,7 @@ _
                 dataset => $_alias_spec_add_dataset,
                 d => $_alias_spec_add_dataset,
             },
+            tags => ['category:dataset'],
         },
         env_hashes => {
             summary => 'Add environment hashes',
@@ -2563,6 +2583,7 @@ When action=show-items-result, will print result as-is instead of dumping as
 Perl.
 
 _
+            tags => ['category:output'],
         },
         test => {
             summary => 'Whether to test participant code once first before benchmarking',
@@ -2586,6 +2607,7 @@ _
             tags => ['category:action'],
         },
         detail => {
+            summary => 'Show detailed information for each result',
             schema => ['bool*'],
             cmdline_aliases => {l=>{}},
         },
@@ -2953,6 +2975,7 @@ Also note that due to the way this is currently implemented, benchmark code that
 contains closures (references to variables outside the code) won't work.
 
 _
+            tags => ['category:multiperl'],
         },
         include_perls => {
             'x.name.is_plural' => 1,
@@ -2960,7 +2983,7 @@ _
             'summary.alt.plurality.singular' => 'Add specified perl to include list',
             schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_perl(@_) },
-            tags => ['category:filtering'],
+            tags => ['category:filtering', 'category:multiperl'],
         },
         exclude_perls => {
             'x.name.is_plural' => 1,
@@ -2968,12 +2991,12 @@ _
             'summary.alt.plurality.singular' => 'Add specified perl to exclude list',
             schema => ['array*', of=>['str*'], 'x.perl.coerce_rules' => ['From_str::comma_sep']],
             element_completion => sub { _complete_perl(@_) },
-            tags => ['category:filtering'],
+            tags => ['category:filtering', 'category:multiperl'],
         },
 
         multimodver => {
             summary => 'Benchmark multiple module versions',
-            schema => ['str*'],
+            schema => ['perl::modname*'],
             description => <<'_',
 
 If set to a module name, will search for all (instead of the first occurrence)
@@ -2983,6 +3006,7 @@ Currently only one module can be multi version.
 
 _
             completion => sub { _complete_participant_module(@_, apply_filters=>0) },
+            tags => ['category:multi-module-version'],
         },
         include_path => {
             summary => 'Additional module search paths',
@@ -3003,9 +3027,40 @@ Used when searching for scenario module, or when in multimodver mode.
 
 _
             cmdline_aliases => {I=>{}},
+            tags => ['category:multi-module-version'],
         },
         # XXX include-mod-version
         # XXX exclude-mod-version
+
+
+#         code_before => {
+#             summary => 'Run perl code when running in multiperl or multi-module-version mode',
+#             schema => ['array*', of=>'str*'],
+#             description => <<'_',
+
+# Due to the way multiperl (`--multiperl`) and multi-module-version
+# (`--multimodver`) modes are currently implemented, code templates of the
+# participants are first turned into coderefs then dumped into a temporary script.
+# Each benchmark item is then run by a separate perl process.
+
+# The dumped coderef code might lack e.g. the original `use` statement or code in
+# BEGIN block. For example:
+
+#     code_template => q(use MyMod '$foo'; $foo->bar() for 1..1000),
+
+# when the code template is turned into coderef and dumped:
+
+#     code => sub { $main::foo->bar() for 1..1000 },
+
+# This is where this option can be used to work around this current limitation. In
+# this case, we can add:
+
+#     code_before => 'use Progress::Any q($progress)',
+
+# _
+#             tags => ['category:multiperl', 'category:multi-module-version'],
+#         },
+
 
         on_failure => {
             summary => "What to do when there is a failure",
@@ -3074,11 +3129,11 @@ _
                     remaining => $_code_remaining,
                 );
             },
-            tags => ['category:format'],
+            tags => ['category:output'],
         },
         scientific_notation => {
             schema => ['bool', is=>1],
-            tags => ['category:format'],
+            tags => ['category:output'],
         },
 
         with_result_size => {
@@ -3104,10 +3159,12 @@ _
         capture_stdout => {
             summary => 'Trap output to stdout',
             schema => 'bool',
+            tags => ['category:output'],
         },
         capture_stderr => {
             summary => 'Trap output to stderr',
             schema => 'bool',
+            tags => ['category:output'],
         },
 
         with_process_size => {
@@ -3140,7 +3197,7 @@ is text (where the extra metadata is not shown).
 
 _
             schema => ['bool'],
-            tags => ['category:result'],
+            tags => ['category:output'],
         },
 
         save_result => {
@@ -3162,7 +3219,7 @@ _
         result_dir => {
             summary => 'Directory to use when saving benchmark result',
             schema => 'dirname*',
-            tags => ['category:result'],
+            tags => ['category:output'],
             description => <<'_',
 
 Default is from `BENCHER_RESULT_DIR` environment variable, or the home
@@ -3173,7 +3230,7 @@ _
         result_filename => {
             summary => 'Filename to use when saving benchmark result',
             schema => 'filename*',
-            tags => ['category:result'],
+            tags => ['category:output'],
             description => <<'_',
 
 Default is:
@@ -3198,7 +3255,17 @@ _
         note => {
             summary => 'Put additional note in the result',
             schema => ['str*'],
-            tags => ['category:result'],
+            tags => ['category:output'],
+        },
+        tidy => {
+            summary => 'Run perltidy over generated scripts',
+            schema => 'bool*',
+            tags => ['category:debugging'],
+        },
+        keep_tempdir => {
+            summary => 'Do not cleanup temporary directory when bencher ends',
+            schema => 'bool*',
+            tags => ['category:debugging'],
         },
     },
 };
@@ -3774,7 +3841,7 @@ sub bencher {
                 }
 
                 if ($with_process_size) {
-                    _get_process_size($parsed, $it);
+                    _get_process_size(\%args, $parsed, $it);
                 }
 
                 push @$fitems, $it;
@@ -3989,7 +4056,7 @@ sub bencher {
             my %item_mems; # key = item seq
             for my $perl (sort keys %perl_exes) {
                 for my $modver (sort keys %perl_opts) {
-                    my $scd_path = _get_tempfile_path("scenario-$perl");
+                    my $scd_path = _get_tempfile_path(\%args, "scenario-$perl");
                     $sc->{items} = [];
                     for my $it (@$items) {
                         next unless $it->{perl} eq $perl;
@@ -4003,7 +4070,8 @@ sub bencher {
                     open my($fh), ">", $scd_path or die "Can't open file $scd_path: $!";
                     print $fh dmp($sc), ";\n";
                     close $fh;
-                    my $res_path = _get_tempfile_path("benchresult-$perl");
+                    _maybe_tidy_script(\%args, $scd_path);
+                    my $res_path = _get_tempfile_path(\%args, "benchresult-$perl");
                     my $cmd = join(
                         " ",
                         $perl_exes{$perl},
@@ -4266,7 +4334,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.050 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2020-06-18.
+This document describes version 1.051 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2020-08-16.
 
 =head1 FUNCTIONS
 
@@ -4323,6 +4391,8 @@ L<Acme::CPANModules::TextTable>.
 Add datasets.
 
 =item * B<detail> => I<bool>
+
+Show detailed information for each result.
 
 =item * B<env_hashes> => I<array[hash]>
 
@@ -4502,11 +4572,15 @@ Used when searching for scenario module, or when in multimodver mode.
 
 Only include some perls.
 
+=item * B<keep_tempdir> => I<bool>
+
+Do not cleanup temporary directory when bencher ends.
+
 =item * B<module_startup> => I<bool>
 
 Benchmark module startup overhead instead of normal benchmark.
 
-=item * B<multimodver> => I<str>
+=item * B<multimodver> => I<perl::modname>
 
 Benchmark multiple module versions.
 
@@ -4700,6 +4774,10 @@ By default, participant code is run once first for testing (e.g. whether it dies
 or return the correct result) before benchmarking. If your code runs for many
 seconds, you might want to skip this test and set this to 0.
 
+=item * B<tidy> => I<bool>
+
+Run perltidy over generated scripts.
+
 =item * B<with_args_size> => I<bool>
 
 Also return memory usage of item's arguments.
@@ -4795,7 +4873,7 @@ Return value:  (any)
 
 Usage:
 
- format_result($envres, $formatters, $options, $exclude_formatters) -> [status, msg, payload, meta]
+ format_result( [ \%optional_named_args ] , $envres, $formatters, $options) -> [status, msg, payload, meta]
 
 Format bencher result.
 
@@ -4809,7 +4887,7 @@ Arguments ('*' denotes required arguments):
 
 Enveloped result from bencher.
 
-=item * B<$exclude_formatters> => I<any>
+=item * B<exclude_formatters> => I<any>
 
 Exclude Formatters specification.
 

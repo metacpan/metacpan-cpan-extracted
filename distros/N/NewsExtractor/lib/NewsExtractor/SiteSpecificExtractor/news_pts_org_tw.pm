@@ -1,18 +1,27 @@
 package NewsExtractor::SiteSpecificExtractor::news_pts_org_tw;
 use utf8;
 use Moo;
-extends 'NewsExtractor::GenericExtractor';
 
-sub dateline {
+extends 'NewsExtractor::JSONLDExtractor';
+with 'NewsExtractor::Role::ContentTextExtractor';
+
+use Importer 'NewsExtractor::TextUtil' => ('html2text', 'reformat_dateline');
+
+sub journalist {
     my ($self) = @_;
-    my $dom = $self->dom;
-    my $el_date = $dom->at(".mid-news > .m-left-side > .maintype-wapper > h2");
-    return undef unless $el_date;
-
-    my $dateline = ($el_date->text =~ s/[年月]/-/gr =~ s/日//r);
-    $dateline =~ s/\b([0-9])\b/0$1/g;
-    $dateline .= 'T23:59:59+08:00';
-    return $dateline;
+    return $self->schema_ld->{author};
 }
+
+around content_text => sub {
+    my $orig = shift;
+    my $ret = $orig->(@_);
+    return html2text($ret);
+};
+
+around dateline => sub {
+    my $orig = shift;
+    my $ret = $orig->(@_);
+    return reformat_dateline($ret, '+08:00');
+};
 
 1;

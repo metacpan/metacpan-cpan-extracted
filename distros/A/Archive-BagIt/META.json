@@ -106,47 +106,47 @@
    "provides" : {
       "Archive::BagIt" : {
          "file" : "lib/Archive/BagIt.pm",
-         "version" : "0.065"
+         "version" : "0.066"
       },
       "Archive::BagIt::Base" : {
          "file" : "lib/Archive/BagIt/Base.pm",
-         "version" : "0.065"
+         "version" : "0.066"
       },
       "Archive::BagIt::DotBagIt" : {
          "file" : "lib/Archive/BagIt/DotBagIt.pm",
-         "version" : "0.065"
+         "version" : "0.066"
       },
       "Archive::BagIt::Fast" : {
          "file" : "lib/Archive/BagIt/Fast.pm",
-         "version" : "0.065"
+         "version" : "0.066"
       },
       "Archive::BagIt::Plugin::Algorithm::MD5" : {
          "file" : "lib/Archive/BagIt/Plugin/Algorithm/MD5.pm",
-         "version" : "0.065"
+         "version" : "0.066"
       },
       "Archive::BagIt::Plugin::Algorithm::SHA512" : {
          "file" : "lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm",
-         "version" : "0.065"
+         "version" : "0.066"
       },
       "Archive::BagIt::Plugin::Manifest::MD5" : {
          "file" : "lib/Archive/BagIt/Plugin/Manifest/MD5.pm",
-         "version" : "0.065"
+         "version" : "0.066"
       },
       "Archive::BagIt::Plugin::Manifest::SHA512" : {
          "file" : "lib/Archive/BagIt/Plugin/Manifest/SHA512.pm",
-         "version" : "0.065"
+         "version" : "0.066"
       },
       "Archive::BagIt::Role::Algorithm" : {
          "file" : "lib/Archive/BagIt/Role/Algorithm.pm",
-         "version" : "0.065"
+         "version" : "0.066"
       },
       "Archive::BagIt::Role::Manifest" : {
          "file" : "lib/Archive/BagIt/Role/Manifest.pm",
-         "version" : "0.065"
+         "version" : "0.066"
       },
       "Archive::BagIt::Role::Plugin" : {
          "file" : "lib/Archive/BagIt/Role/Plugin.pm",
-         "version" : "0.065"
+         "version" : "0.066"
       }
    },
    "release_status" : "stable",
@@ -158,7 +158,7 @@
          "web" : "https://art1pirat.spdns.org/art1/Archive-BagIt"
       }
    },
-   "version" : "0.065",
+   "version" : "0.066",
    "x_contributors" : [
       "Andreas Romeyke <art1@andreas-romeyke.de>",
       "Michiel Beijen <michiel.beijen@gmail.com>",

@@ -4,7 +4,7 @@ package WWW::Search::Ebay;
 use strict;
 use warnings;
 
-our $VERSION = 2.281;
+our $VERSION = 2.282;
 
 =head1 NAME
 
@@ -753,7 +753,7 @@ sub _get_itemtitle_tds
   {
   my $self = shift;
   my $tree = shift;
-  printf STDERR (" TTT this is Ebay::_get_itemtitle_tds") if (1 < $self->{_debug});
+  printf STDERR (" TTT this is Ebay::_get_itemtitle_tds\n") if (1 < $self->{_debug});
   my @ao = $tree->look_down(_tag => 'td',
                             class => 'details',
                            );
@@ -973,10 +973,11 @@ sub _parse_tree
     $hit->bid_count(0);
     # The rest of the info about this item is in sister <LI> elements
     # to the right:
-    my @aoSibs = $oTDtitle->parent->parent->look_down(_tag => q{li});
+    my $sTag = 'li';
+    my @aoSibs = $oTDtitle->parent->look_down(_tag => $sTag);
     # The parent itself is an <LI> tag:
     shift @aoSibs;
-    warn " DDD before loop, there are ", scalar(@aoSibs), " sibling TDs\n" if (1 < $self->{_debug});
+    warn " DDD before loop, there are ", scalar(@aoSibs), " sibling $sTag tags\n" if (1 < $self->{_debug});
  SIBLING_TD:
     while (my $oTDsib = shift @aoSibs)
       {
@@ -992,7 +993,7 @@ sub _parse_tree
           # they appear out of order.
           } # if
         } # if
-      print STDERR " DDD   looking at TD'$sColumn' ===$s===\n" if (DEBUG_COLUMNS || (1 < $self->{_debug}));
+      print STDERR " DDD   looking at $sTag'$sColumn' ===$s===\n" if (DEBUG_COLUMNS || (1 < $self->{_debug}));
       if ($sColumn =~ m'price')
         {
         next TD unless $self->_parse_price($oTDsib, $hit);
@@ -1028,7 +1029,8 @@ sub _parse_tree
           $iCategory = $self->_parse_category($oTDsib);
           } # if
         } # if 'extras'
-      # Any other class="" value will cause the <LI> to be ignored.
+      # Any other class="" value will cause this <LI> to be ignored.
+      print STDERR " DDD     don't know how to process $sTag'$sColumn' ===$s===\n" if (DEBUG_COLUMNS || (1 < $self->{_debug}));
       } # while
     my $sDesc = $self->_create_description($hit);
     $hit->description($sDesc);

@@ -172,12 +172,17 @@ sub _Lexer
                                         (?<hcount>H[0-9]?)?
                                         (?<charge>--|\+\+|[-+][0-9]{0,2})?
                                         (:(?<class>[0-9]+))? \]//x ) {
-        my $atom = { %+ };
+        my $atom = { %+, number => $self->{USER}{ATOMNO} };
+        $self->{USER}{ATOMNO} ++;
         $self->{USER}{CHARNO} += length $&;
 
         if( $atom->{hcount} ) {
             $atom->{hcount} =~ s/^H//;
             $atom->{hcount} = $atom->{hcount} ? int $atom->{hcount} : 1;
+        }
+
+        if( $atom->{isotope} ) {
+            $atom->{isotope} = int $atom->{isotope};
         }
 
         # Atom class is an arbitrary number, 0 by default
@@ -188,7 +193,10 @@ sub _Lexer
 
     # Bracketless atoms
     if( $self->YYData->{INPUT} =~ s/^(Br|Cl|[BCINOPSFbcnops])// ) {
-        my $atom = { symbol => $1 };
+        my $atom = { symbol => $1,
+                     class  => 0,
+                     number => $self->{USER}{ATOMNO} };
+        $self->{USER}{ATOMNO} ++;
         $self->{USER}{CHARNO} += length $&;
         return ( 'atom', $atom );
     }
@@ -204,7 +212,7 @@ sub _Lexer
     if( $char ne '' ) {
         $self->YYData->{INPUT} = substr( $self->YYData->{INPUT}, 1 );
     }
-    $self->{USER}{CHARNO}++;
+    $self->{USER}{CHARNO} ++;
     return( $char, $char );
 }
 
@@ -216,7 +224,8 @@ sub parse
     $self->YYData->{INPUT}   = $string;
     $self->{USER}{GRAPHS}    = [];
     $self->{USER}{RINGBONDS} = {};
-    $self->{USER}{CHARNO} = 0;
+    $self->{USER}{ATOMNO}    = 0;
+    $self->{USER}{CHARNO}    = 0;
     $self->YYParse( yylex => \&_Lexer,
                     yyerror => \&_Error,
                     yydebug => $options->{debug} );
@@ -235,7 +244,11 @@ sub parse
             if( !$options->{raw} ) {
                 next unless exists $atom->{hcount};
                 for (1..$atom->{hcount}) {
-                    $graph->add_edge( $atom, { symbol => 'H' } );
+                    $graph->add_edge( $atom,
+                                      { symbol => 'H',
+                                        class  => 0,
+                                        number => $self->{USER}{ATOMNO} } );
+                    $self->{USER}{ATOMNO} ++;
                 }
                 delete $atom->{hcount};
             }

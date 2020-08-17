@@ -20,7 +20,7 @@ $now->set_time_zone('local');
 my $basetf = $now->ymd('').'-';
 my $tracker_dir = $home->subdir($now->year,sprintf("%02d",$now->month));
 
-{ # init 
+{ # init
     @ARGV=('init');
     my $class = $p->setup_class({});
 
@@ -60,6 +60,8 @@ my $c1 = $p->load_config($tmp->subdir(qw(some_project)));
     my $class = $p->setup_class($c1);
     my $t = $class->name->new(home=>$home, config=>$c1, _current_project=>'some_project');
     trap {$t->cmd_current };
+    like($trap->stdout, qr/^Working \d{2}:\d{2}:\d{2} on some_project/, 'current project is some_project');
+    like($trap->stdout, qr/Started at 14:00:00/, 'project start time is correct');
 }
 
 { # stop
@@ -72,6 +74,9 @@ my $c1 = $p->load_config($tmp->subdir(qw(some_project)));
     my $task = App::TimeTracker::Data::Task->load($tracker_dir->file($basetf.'140000_some_project.trc')->stringify);
     is($task->seconds,15 * 60,'task seconds');
     is($task->duration,'00:15:00','task duration');
+
+    trap {$t->cmd_current};
+    like($trap->stdout, qr/Worked 15 minutes from 14:00:00 till 14:15:00/, '');
 }
 
 { # append

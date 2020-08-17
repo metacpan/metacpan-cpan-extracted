@@ -1,0 +1,2 @@
+super.foo; // expect: [Line 1] Error at 'super': Cannot use 'super' outside of a class.
+super.foo("bar"); // expect: [Line 2] Error at 'super': Cannot use 'super' outside of a class.

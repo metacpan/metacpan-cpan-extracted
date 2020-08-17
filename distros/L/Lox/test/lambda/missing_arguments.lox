@@ -1,0 +1,3 @@
+var f = fun (a, b) {};
+
+f(1); // expect: [Line 3] Error at ')': Expected 2 arguments but got 1.

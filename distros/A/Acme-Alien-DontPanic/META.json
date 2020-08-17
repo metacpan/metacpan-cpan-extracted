@@ -5,7 +5,7 @@
       "Joel A Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,11 +15,18 @@
    },
    "name" : "Acme-Alien-DontPanic",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.40",
+            "Alien::Build::MM" : "0.40",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Alien::Base::ModuleBuild" : "1.14",
-            "Alien::Build" : "2.11",
-            "File::ShareDir" : "1.03",
+            "Alien::Build" : "2.26",
+            "Alien::Build::MM" : "0.40",
+            "ExtUtils::MakeMaker" : "6.52",
             "perl" : "5.006"
          }
       },
@@ -27,6 +34,10 @@
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
             "Test::More" : "0.98",
@@ -40,8 +51,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "2.11",
-            "File::ShareDir" : "1.03",
+            "Alien::Base" : "2.26",
             "perl" : "5.006"
          }
       },
@@ -57,19 +67,38 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Perl5-Alien/Acme-Alien-DontPanic/issues"
+         "web" : "https://github.com/PerlAlien/Acme-Alien-DontPanic/issues"
       },
       "homepage" : "https://metacpan.org/pod/Acme::Alien::DontPanic",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Perl5-Alien/Acme-Alien-DontPanic.git",
-         "web" : "https://github.com/Perl5-Alien/Acme-Alien-DontPanic"
+         "url" : "git://github.com/PerlAlien/Acme-Alien-DontPanic.git",
+         "web" : "https://github.com/PerlAlien/Acme-Alien-DontPanic"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.1100",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "version" : "2.2600",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.31",
+      "requires" : {
+         "share" : {
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }
 

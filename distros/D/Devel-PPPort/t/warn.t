@@ -16,7 +16,7 @@ BEGIN {
   if ($ENV{'PERL_CORE'}) {
     chdir 't' if -d 't';
     unshift @INC, '../lib' if -d '../lib' && -d '../ext';
-    require Config; import Config;
+    require Config; Config->import;
     use vars '%Config';
     if (" $Config{'extensions'} " !~ m[ Devel/PPPort ]) {
       print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
@@ -48,7 +48,7 @@ package Devel::PPPort;
 use vars '@ISA';
 require DynaLoader;
 @ISA = qw(DynaLoader);
-bootstrap Devel::PPPort;
+Devel::PPPort->bootstrap;
 
 package main;
 
@@ -60,15 +60,15 @@ $SIG{'__WARN__'} = sub { $warning = $_[0] };
 
 $warning = '';
 Devel::PPPort::warner();
-ok("$]" >= 5.004 ? $warning =~ /^warner bar:42/ : $warning eq '');
+ok(ivers($]) >= ivers("5.004") ? $warning =~ /^warner bar:42/ : $warning eq '');
 
 $warning = '';
 Devel::PPPort::Perl_warner();
-ok("$]" >= 5.004 ? $warning =~ /^Perl_warner bar:42/ : $warning eq '');
+ok(ivers($]) >= ivers("5.004") ? $warning =~ /^Perl_warner bar:42/ : $warning eq '');
 
 $warning = '';
 Devel::PPPort::Perl_warner_nocontext();
-ok("$]" >= 5.004 ? $warning =~ /^Perl_warner_nocontext bar:42/ : $warning eq '');
+ok(ivers($]) >= ivers("5.004") ? $warning =~ /^Perl_warner_nocontext bar:42/ : $warning eq '');
 
 $warning = '';
 Devel::PPPort::ckWARN();
@@ -78,5 +78,5 @@ $^W = 1;
 
 $warning = '';
 Devel::PPPort::ckWARN();
-ok("$]" >= 5.004 ? $warning =~ /^ckWARN bar:42/ : $warning eq '');
+ok(ivers($]) >= ivers("5.004") ? $warning =~ /^ckWARN bar:42/ : $warning eq '');
 

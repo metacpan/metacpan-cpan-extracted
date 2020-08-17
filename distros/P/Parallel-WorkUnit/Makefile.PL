@@ -17,11 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008000",
   "NAME" => "Parallel::WorkUnit",
   "PREREQ_PM" => {
-    "AnyEvent" => 0,
     "Carp" => 0,
     "Exporter" => 0,
     "IO::Handle" => 0,
-    "IO::Pipe" => 0,
+    "IO::Pipely" => 0,
     "IO::Select" => 0,
     "POSIX" => 0,
     "Scalar::Util" => 0,
@@ -41,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::UseAllModules" => "0.15"
   },
-  "VERSION" => "2.201890",
+  "VERSION" => "2.202270",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,13 +48,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "AnyEvent" => 0,
   "Carp" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
-  "IO::Pipe" => 0,
+  "IO::Pipely" => 0,
   "IO::Select" => 0,
   "POSIX" => 0,
   "Scalar::Util" => 0,
@@ -83,7 +81,6 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 if ( $^O eq 'MSWin32' ) {
-	$WriteMakefileArgs{PREREQ_PM}{'Thread::Queue'} = $FallbackPrereqs{'Thread::Queue'} = '3.12';
 	$WriteMakefileArgs{PREREQ_PM}{'threads'} = $FallbackPrereqs{'threads'} = '0';
 }
 

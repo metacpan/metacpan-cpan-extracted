@@ -14,7 +14,7 @@ use My::Module::Test;
 my $st = Astro::SpaceTrack->new();
 
 my $skip;
-$skip = site_check 'celestrak.com'
+$skip = site_check( 'celestrak.com' )
     and plan skip_all => $skip;
 
 $st->set(
@@ -23,14 +23,14 @@ $st->set(
 
 SKIP: {
 
-    is_success_or_skip $st, celestrak => 'stations',
-    'Direct-fetch celestrak stations', 4;
+    is_success_or_skip( $st, celestrak => 'stations',
+    'Direct-fetch celestrak stations', 4 );
 
     is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
     is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
 
-    my $resp = most_recent_http_response;
+    my $resp = most_recent_http_response(  );
 
     is $st->content_type( $resp ), 'orbit', "Result type is 'orbit'";
 
@@ -39,8 +39,8 @@ SKIP: {
 }
 
 SKIP: {
-    is_success_or_skip $st, celestrak => 'iridium',
-	'Direct-fetch Celestrak iridium', 2;
+    is_success_or_skip( $st, celestrak => 'iridium',
+	'Direct-fetch Celestrak iridium', 2 );
 
     is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -49,14 +49,14 @@ SKIP: {
 
 SKIP: {
 
-    is_error_or_skip $st, celestrak => 'fubar',
-	404, 'Direct-fetch non-existent Celestrak catalog';
+    is_error_or_skip( $st, celestrak => 'fubar',
+	404, 'Direct-fetch non-existent Celestrak catalog' );
 
 }
 
 SKIP: {
-    is_success_or_skip $st, celestrak_supplemental => 'orbcomm',
-	'Fetch Celestrak supplemental Orbcomm data', 2;
+    is_success_or_skip( $st, celestrak_supplemental => 'orbcomm',
+	'Fetch Celestrak supplemental Orbcomm data', 2 );
 
     is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
@@ -64,8 +64,8 @@ SKIP: {
 }
 
 SKIP: {
-    is_success_or_skip $st, celestrak_supplemental => '-rms', 'intelsat',
-	'Fetch Celestrak supplemental Intelsat RMS data', 2;
+    is_success_or_skip( $st, celestrak_supplemental => '-rms', 'intelsat',
+	'Fetch Celestrak supplemental Intelsat RMS data', 2 );
 
     is $st->content_type(), 'rms', "Content type is 'rms'";
 
@@ -76,4 +76,6 @@ done_testing;
 
 1;
 
-# ex: set textwidth=72 :
+__END__
+
+# ex: set filetype=perl textwidth=72 :

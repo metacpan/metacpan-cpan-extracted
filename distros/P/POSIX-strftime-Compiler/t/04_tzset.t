@@ -4,10 +4,25 @@ use Test::More;
 use POSIX qw//;
 use Time::Local;
 use POSIX::strftime::Compiler qw/strftime/;
+use File::Basename;
+
+my $inc = join ' ', map { "-I\"$_\"" } @INC;
+my $dir = dirname(__FILE__);
 
 eval {
     POSIX::tzset;
     die q!tzset is implemented on this ! . $^O  .q!. But Windows can't change tz inside script! if $^O =~ m/^(MSWin32|cygwin)$/i;
+};
+if ( $@ ) {
+    plan skip_all => $@;
+}
+
+eval {
+    local $ENV{TEST_TZ} = 'Australia/Darwin';
+    my $d = `"$^X" $inc $dir/02_timezone.pl %z 0 0 0 10 0 113`;
+    if ($d !~ m!^\+0930!) {
+        die "tzdada is not enough: $d";
+    }
 };
 if ( $@ ) {
     plan skip_all => $@;

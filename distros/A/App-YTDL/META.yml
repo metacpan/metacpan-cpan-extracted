@@ -32,6 +32,7 @@ requires:
   IPC::System::Simple: '0'
   JSON: '0'
   List::MoreUtils: '0'
+  Parallel::ForkManager: v0.7.6
   Pod::Usage: '0'
   Term::ANSIScreen: '0'
   Term::Choose: '1.711'
@@ -47,5 +48,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-YTDL.git
-version: '0.401'
+version: '0.411'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

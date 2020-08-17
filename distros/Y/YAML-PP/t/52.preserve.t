@@ -5,8 +5,10 @@ use Test::More;
 use Test::Deep;
 use FindBin '$Bin';
 use YAML::PP;
-use YAML::PP::Common qw/ PRESERVE_ORDER PRESERVE_SCALAR_STYLE /;
-
+use YAML::PP::Common qw/
+    PRESERVE_ORDER PRESERVE_SCALAR_STYLE PRESERVE_FLOW_STYLE
+    YAML_LITERAL_SCALAR_STYLE YAML_FLOW_MAPPING_STYLE YAML_FLOW_SEQUENCE_STYLE
+/;
 
 subtest 'preserve-scalar-style' => sub {
     my $yp = YAML::PP->new( preserve => PRESERVE_ORDER | PRESERVE_SCALAR_STYLE );
@@ -111,6 +113,10 @@ EOM
     $data->{z} = 99;
     @keys = keys %$data;
     is("@keys", "a y b x c z", 'keys()');
+    my $scalar = scalar %$data;
+    if ($] >= 5.026) {
+        is(scalar %$data, 6, 'scalar');
+    }
 
     my @values = values %$data;
     is("@values", "2 3 4 5 6 99", 'values()');
@@ -120,6 +126,7 @@ EOM
 
     %$data = ();
     is(scalar keys %$data, 0, 'clear');
+    is(scalar %$data, 0, 'clear');
 };
 
 subtest 'object-order' => sub {
@@ -140,6 +147,108 @@ EOM
     my $data = $yp->load_string($yaml);
     my $dump = $yp->dump_string($data);
     is($dump, $yaml, 'load-dump object with preserved hash key order');
+};
+
+subtest 'preserve-flow' => sub {
+    my $yp = YAML::PP->new(
+        preserve => PRESERVE_FLOW_STYLE,
+    );
+    my $yaml = <<'EOM';
+---
+map: {z: 1, a: 2, y: 3, b: 4}
+seq: [c, b, {y: z}]
+EOM
+    my $exp_sorted = <<'EOM';
+---
+map: {a: 2, b: 4, y: 3, z: 1}
+seq: [c, b, {y: z}]
+EOM
+    my $data = $yp->load_string($yaml);
+    my $dump = $yp->dump_string($data);
+    is($dump, $exp_sorted, 'load-dump with preserve flow');
+    is(exists($data->{seq}->[0]), 1, 'load sequence');
+    is(exists($data->{seq}->[3]), !1, 'load sequence');
+
+    $yp = YAML::PP->new(
+        preserve => PRESERVE_FLOW_STYLE | PRESERVE_ORDER
+    );
+    $data = $yp->load_string($yaml);
+    $dump = $yp->dump_string($data);
+    is($dump, $yaml, 'load-dump with preserve flow && order');
+
+    $yp = YAML::PP->new(
+        schema => [qw/ + Perl /],
+        preserve => PRESERVE_FLOW_STYLE | PRESERVE_ORDER,
+    );
+    $yaml = <<'EOM';
+--- !perl/hash:Foo
+map: {z: 1, a: 2, y: 3, b: 4}
+seq: [c, b, {y: z}]
+EOM
+    $data = $yp->load_string($yaml);
+    $dump = $yp->dump_string($data);
+    is($dump, $yaml, 'load-dump object with preserved flow && order');
+};
+
+subtest 'create-preserve' => sub {
+    my $yp = YAML::PP->new(
+        preserve => PRESERVE_SCALAR_STYLE | PRESERVE_FLOW_STYLE | PRESERVE_ORDER
+    );
+    my $scalar = $yp->preserved_scalar("\n", style => YAML_LITERAL_SCALAR_STYLE );
+    my $data = { literal => $scalar };
+    my $dump = $yp->dump_string($data);
+    my $yaml = <<'EOM';
+---
+literal: |+
+
+...
+EOM
+    is($dump, $yaml, 'dump with preserved scalar');
+
+    my $hash = $yp->preserved_mapping({}, style => YAML_FLOW_MAPPING_STYLE);
+    %$hash = (z => 1, a => 2, y => 3, b => 4);
+    my $array = $yp->preserved_sequence([23, 24], style => YAML_FLOW_SEQUENCE_STYLE);
+    $data = $yp->preserved_mapping({});
+    %$data = ( map => $hash, seq => $array );
+    $dump = $yp->dump_string($data);
+    $yaml = <<'EOM';
+---
+map: {z: 1, a: 2, y: 3, b: 4}
+seq: [23, 24]
+EOM
+    is($dump, $yaml, 'dump with preserved flow && order');
+
+};
+subtest 'tie-array' => sub {
+    my $x = YAML::PP->preserved_sequence([23, 24], style => YAML_FLOW_SEQUENCE_STYLE);
+    @$x = (25, 26);
+    is("@$x", '25 26', 'STORE');
+    unshift @$x, 24;
+    is("@$x", '24 25 26', 'UNSHIFT');
+    shift @$x;
+    is("@$x", '25 26', 'SHIFT');
+    splice @$x, 1, 1, 99, 100;
+    is("@$x", '25 99 100', 'SPLICE');
+    delete $x->[1];
+    {
+        no warnings 'uninitialized';
+        is("@$x", '25  100', 'DELETE');
+    }
+    $x->[1] = 99;
+    $#$x = 1;
+    is("@$x", '25 99', 'STORESIZE');
+};
+
+subtest 'tie-scalar' => sub {
+    my $scalar = YAML::PP->preserved_scalar("abc", style => YAML_LITERAL_SCALAR_STYLE );
+    like $scalar, qr{abc}, 'Regex';
+    ok($scalar eq 'abc', 'eq');
+    ok('abc' eq $scalar, 'eq');
+    ok($scalar gt 'abb', 'gt');
+
+    $scalar = YAML::PP->preserved_scalar(23, style => YAML_LITERAL_SCALAR_STYLE );
+    ok($scalar > 22, '>');
+    ok($scalar <= 23, '<=');
 };
 
 done_testing;

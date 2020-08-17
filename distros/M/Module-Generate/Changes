@@ -26,3 +26,6 @@ Revision history for Module-Generate
 
 0.17	2020-08-05
 	- Add missing pod sections
+
+0.18	2020-08-16
+	- Generate test files

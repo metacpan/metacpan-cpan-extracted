@@ -18,7 +18,7 @@ my $store = Wasm::Wasmtime::Store->new(
 );
 
 print "Compiling module...\n";
-my $module = Wasm::Wasmtime::Module->new( $store, file => path(__FILE__)->parent->child('multi.wat') );
+my $module = Wasm::Wasmtime::Module->new( $store->engine, file => path(__FILE__)->parent->child('multi.wat') );
 
 print "Creating callback...\n";
 sub callback_func

@@ -1,3 +1,12 @@
+0.262   2020-04-27 Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Perinci::CmdLine::POD to render a more
+          complete usage line of Perinci::CmdLine scripts in POD (now all
+          options are listed, not just '[options]').
+
+
 0.261   2019-07-30  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix the use of Term::Size::chars.

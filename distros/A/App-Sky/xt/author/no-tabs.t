@@ -19,8 +19,7 @@ my @files = (
     't/config-validate.t',
     't/data/sample-configs/shlomif1/config.yaml',
     't/manager.t',
-    't/module.t',
-    't/style-trailing-space.t'
+    't/module.t'
 );
 
 notabs_ok($_) foreach @files;

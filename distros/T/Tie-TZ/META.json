@@ -50,6 +50,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : 10,
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : 11,
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

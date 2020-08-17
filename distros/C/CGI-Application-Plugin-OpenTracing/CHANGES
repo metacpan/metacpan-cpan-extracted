@@ -1,6 +1,12 @@
 CHANGE LOG
 ==========
 
+2020-08-14 - v0.103.2
+---------------------
+
+Fixing warnings, dependencies, and 'run' spans eval
+
+
 2020-08-05 - v0.103.1
 ---------------------
 

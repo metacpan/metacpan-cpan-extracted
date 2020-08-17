@@ -2,14 +2,12 @@ package Acme::Ford::Prefect;
 
 use strict;
 use warnings;
+use XSLoader;
 
 # ABSTRACT: Test Module for Alien::Base
-our $VERSION = '2.1100'; # VERSION
+our $VERSION = '2.2900'; # VERSION
 
-require DynaLoader;
-our @ISA = 'DynaLoader';
-__PACKAGE__->bootstrap($VERSION);
-$VERSION = eval $VERSION;
+XSLoader::load(__PACKAGE__, $VERSION);
 
 1;
 
@@ -25,7 +23,7 @@ Acme::Ford::Prefect - Test Module for Alien::Base
 
 =head1 VERSION
 
-version 2.1100
+version 2.2900
 
 =head1 SYNOPSIS
 

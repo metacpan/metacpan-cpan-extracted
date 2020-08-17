@@ -3,22 +3,21 @@
 .perltidyrc
 .tidyallrc
 .travis.yml
-bmake
 Changes
 lib/Make.pm
+lib/Make/Functions.pm
 lib/Make/Rule.pm
 lib/Make/Rule/Vars.pm
 lib/Make/Target.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.json
-pure-perl-make
 README
-t/00-compile.t
+scripts/pure-perl-make
 t/94-version.t
 t/95-tidyall.t
 t/96-perl-critic.t
 t/97-pod.t
 t/make.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -34,6 +34,7 @@ use Carp;
         'B-./my-sample.socket',    # .
         'T-/dev/random',           # .
         'B-/dev/random',           # .
+        'c-/dev/random',           # .
     );
 
     push @SKIP, 'k-/tmp' if $^O =~ qr{darwin}i;

@@ -3,9 +3,9 @@ NAME
     script
 
 VERSION
-    This document describes version 0.121 of App::GenPericmdCompleterScript
+    This document describes version 0.122 of App::GenPericmdCompleterScript
     (from Perl distribution App-GenPericmdCompleterScript), released on
-    2020-04-08.
+    2020-04-30.
 
 FUNCTIONS
   gen_pericmd_completer_script
@@ -41,7 +41,7 @@ FUNCTIONS
 
         Load extra modules.
 
-    *   output_file => *str* (default: "-")
+    *   output_file => *filename* (default: "-")
 
         Path to output file.
 

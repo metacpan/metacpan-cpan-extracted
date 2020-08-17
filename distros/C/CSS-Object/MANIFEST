@@ -1,0 +1,35 @@
+Changes
+CONTRIBUTING.md
+lib/CSS/Object.pm
+lib/CSS/Object/Builder.pm
+lib/CSS/Object/Comment.pm
+lib/CSS/Object/Element.pm
+lib/CSS/Object/Format.pm
+lib/CSS/Object/Format/Inline.pm
+lib/CSS/Object/Parser.pm
+lib/CSS/Object/Parser/Default.pm
+lib/CSS/Object/Parser/Enhanced.pm
+lib/CSS/Object/Property.pm
+lib/CSS/Object/Rule.pm
+lib/CSS/Object/Rule/At.pm
+lib/CSS/Object/Rule/Keyframes.pm
+lib/CSS/Object/Selector.pm
+lib/CSS/Object/Value.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/01_basic.t
+t/02_parse_default.t
+t/03_search.t
+t/04_format_simple.t
+t/05_format_inline.t
+t/06_builder.t
+t/07_pod.t
+t/css_oddities
+t/css_selector_groups
+t/css_selectors
+t/css_simple
+t/css_tiny
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

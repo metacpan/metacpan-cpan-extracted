@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +31,7 @@ no_index:
 provides:
   Test::Fake::HTTPD:
     file: lib/Test/Fake/HTTPD.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -47,9 +47,12 @@ resources:
   bugtracker: https://github.com/masaki/Test-Fake-HTTPD/issues
   homepage: https://github.com/masaki/Test-Fake-HTTPD
   repository: git://github.com/masaki/Test-Fake-HTTPD.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:MASAKI
 x_contributors:
   - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Petr Písař <ppisar@redhat.com>'
+  - 'Richard Hansen <rhansen@rhansen.org>'
   - 'ikasam_a <masaki.nakagawa@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

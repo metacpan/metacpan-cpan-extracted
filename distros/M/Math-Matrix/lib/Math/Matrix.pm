@@ -412,7 +412,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.9';
+our $VERSION = '0.91';
 our $eps = 0.00001;
 
 use overload

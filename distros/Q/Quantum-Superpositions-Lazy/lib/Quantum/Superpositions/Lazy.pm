@@ -1,6 +1,6 @@
 package Quantum::Superpositions::Lazy;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use v5.24; use warnings;
 use feature qw(signatures);
@@ -167,6 +167,10 @@ kinds of not very serious work.
 =item * obtaining the sources of each and every state, which is the exact set calculation parameters used to obtain it
 
 =back
+
+=head1 GETTING STARTED
+
+Refer to L<Quantum::Superpositions::Lazy::Manual> for a quick tutorial.
 
 =head1 FUNCTIONS
 

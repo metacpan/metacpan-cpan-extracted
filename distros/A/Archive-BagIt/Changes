@@ -1,10 +1,51 @@
 ==================================================
-Changes from 2019-08-07 00:00:00 +0000 to present.
+Changes from 2019-08-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.065 at 2020-08-06 14:31:41 +0000
+version 0.066 at 2020-08-14 13:47:09 +0000
 ------------------------------------------
+
+  Change: 038340ab8721a41d87732f28d1ae22aa170e47c9
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-11 13:27:10 +0000
+
+    - refactoring, is_baginfo_key_reserved() uses pattern matching now 
+
+  Change: 610f9c7e1d3dbf023a70fea84af3ec7715f19ae9
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-07 12:36:01 +0000
+
+    - added paylod-oxum checks in verify_baginfo() - more descriptive
+    output in _file_find() if non portable pathnames detected 
+
+  Change: 61805b7325c5de81d147f025ae2c8d31aae39a67
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-07 12:34:47 +0000
+
+    - added test to check if payload oxum is verified 
+
+  Change: 035e569a94039a1e2ef465325870b164e89d6e62
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-06 16:34:25 +0000
+
+    - fixed dzil problem 
+
+  Change: fa7917f31a845cecc1c1a7fefb0a9883b1dde6cb
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-06 16:34:06 +0000
+
+    - new by dzil 
+
+------------------------------------------
+version 0.065 at 2020-08-06 14:32:13 +0000
+------------------------------------------
+
+  Change: bfd725b9eb668b0a6f51cc3ba5a8a0a5dc25f38c
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-08-06 16:32:13 +0000
+
+    Released 0.065 
 
   Change: 2905f05abbd3c593c5afddd6468863047858ba40
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -1418,5 +1459,5 @@ version 0.055 at 2020-04-15 09:44:51 +0000
     Adding a plugin structure 
 
 ================================================
-Plus 9 releases after 2019-08-07 00:00:00 +0000.
+Plus 9 releases after 2019-08-15 00:00:00 +0000.
 ================================================

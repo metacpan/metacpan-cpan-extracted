@@ -2,13 +2,13 @@ package App::Yath::Options::Workspace;
 use strict;
 use warnings;
 
-our $VERSION = '1.000020';
+our $VERSION = '1.000023';
 
 use File::Spec();
 use File::Path qw/remove_tree/;
 use File::Temp qw/tempdir/;
 
-use Test2::Harness::Util qw/clean_path/;
+use Test2::Harness::Util qw/clean_path chmod_tmp/;
 
 use App::Yath::Options;
 
@@ -46,6 +46,7 @@ option_group {prefix => 'workspace', category => "Workspace Options"} => sub {
             }
             else {
                 mkdir($workdir) or die "Could not create workdir: $!";
+                chmod_tmp($workdir);
             }
 
             return;
@@ -59,6 +60,7 @@ option_group {prefix => 'workspace', category => "Workspace Options"} => sub {
             DIR     => $settings->workspace->tmp_dir,
             CLEANUP => !($settings->debug->keep_dirs || $params{command}->always_keep_dir),
         );
+        chmod_tmp($tmpdir);
 
         $settings->workspace->field(workdir => $tmpdir);
     };

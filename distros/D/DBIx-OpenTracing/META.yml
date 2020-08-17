@@ -20,12 +20,14 @@ no_index:
     - t
     - inc
 requires:
-  DBI: '0'
+  DBI: '1.639'
   OpenTracing::GlobalTracer: '0'
   OpenTracing::Implementation: '0'
+  Package::Constants: '0'
+  SQL::Statement: '1.412'
   Scope::Context: '0'
   Syntax::Feature::Maybe: '0'
   perl: '5.014'
   syntax: '0'
-version: v0.0.3
+version: v0.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

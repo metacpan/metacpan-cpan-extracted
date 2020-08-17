@@ -1,0 +1,58 @@
+{
+   "abstract" : "call a subroutine when new code finishes compiling",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "B-Hooks-OP-Check-LeaveEval",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0",
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "version" : "0.77"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::OP::Check" : "0.22",
+            "ExtUtils::Depends" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/s-nez/b-hooks-op-check-leaveeval.git",
+         "web" : "https://github.com/s-nez/b-hooks-op-check-leaveeval"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

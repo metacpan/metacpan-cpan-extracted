@@ -16,15 +16,11 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
-                      'recommends' => {
-                                        'AnyEvent' => '7.14'
-                                      },
                       'requires' => {
-                                      'AnyEvent' => '0',
                                       'Carp' => '0',
                                       'Exporter' => '0',
                                       'IO::Handle' => '0',
-                                      'IO::Pipe' => '0',
+                                      'IO::Pipely' => '0',
                                       'IO::Select' => '0',
                                       'POSIX' => '0',
                                       'Scalar::Util' => '0',

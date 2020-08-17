@@ -1,6 +1,15 @@
 /**
+ * NOTE: The Yancy components are experimental right now: Once the
+ * editor is rebuilt to use these components, the experimental label can
+ * be removed.
+ *
+ * For an example of how to use this component, see
+ * https://github.com/preaction/Yancy/tree/master/eg/etl-viewer
+ *
  * TODO: Find documentation format for these components and generate
  * HTML from them for the website
+ * https://github.com/vuedoc/md looks like a good candidate...
+ * https://github.com/vuejs/vuejs.org/blob/master/writing-guide.md
  * TODO: If src is the current URL, use the History API to change the
  * location to include query params we're using
  */
@@ -16,7 +25,18 @@ Vue.component( 'yancy-table', {
         },
         /**
          * The URL to fetch items from. Must be routed to a Yancy
-         * list action. Defaults to the current URL.
+         * list or feed action. Defaults to the current URL.
+         *
+         * This component will send an Accept header for
+         * application/json, to allow for content negotiation.
+         *
+         * TODO: Allow(require?) a Yancy controller action to include
+         * $schema and $id in the JSON response. This would require
+         * another route configured to display the actual schema that
+         * could then be linked from the JSON response...
+         * (https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8)
+         * But, once we have that, we can provide a default for the
+         * columns property...
          */
         src: {
             type: String,
@@ -42,20 +62,52 @@ Vue.component( 'yancy-table', {
         };
     },
     mounted: function () {
-        this.fetchPage( this.page );
+        if ( this.src.match( /^wss?:/ ) ) {
+            this.ws = new WebSocket( this.src );
+            this.ws.onmessage = ( msg ) => this.handleMessage( msg );
+        }
+        else {
+            this.fetchPage( this.page );
+        }
     },
     methods: {
+        handleMessage: function ( msg ) {
+            let res = JSON.parse( msg.data );
+            if ( res.method == 'list' ) {
+                this.items = res.items;
+                this.page = Math.floor( res.offset / res.limit ) + 1;
+                this.totalPages = Math.ceil( res.total / res.limit );
+            }
+            else if ( res.method == 'delete' ) {
+                this.items.splice( res.index, 1 );
+            }
+            else if ( res.method == 'create' ) {
+                this.items.splice( res.index, 0, res.item );
+            }
+            else if ( res.method == 'set' ) {
+                for ( let k in res.item ) {
+                    this.items[ res.index ][ k ] = res.item[ k ];
+                }
+            }
+        },
+
         fetchPage: function ( page ) {
             if ( this.fetching ) return;
             this.fetching = true;
             this.page = page;
             this.error = '';
 
-            var query = {
-                    $limit: this.limit,
-                    $offset: this.limit * ( this.page - 1 )
-                };
+            var query = { };
 
+            // First add any query parameters already on the page, to
+            // preserve search queries
+            for ( const [ key, value ] of (new URL(document.location)).searchParams ) {
+                query[ key ] = value;
+            }
+
+            // Now add the parameters for this page of results
+            query.$limit = this.limit;
+            query.$offset = this.limit * ( this.page - 1 );
             if ( this.sortColumn != null ) {
                 var dir = this.sortDirection > 0 ? 'asc' : 'desc';
                 query.$order_by = [ dir, this.sortColumn ].join( ':' );
@@ -67,7 +119,6 @@ Vue.component( 'yancy-table', {
                 data: query,
                 dataType: 'json',
                 success: function ( data, status, jqXHR ) {
-                    console.log( 'Got data from ' + this.src );
                     if ( query.$offset > data.total ) {
                         // We somehow got to a page that doesn't exist,
                         // so go to the first page instead
@@ -153,4 +204,3 @@ Vue.component( 'yancy-table', {
     },
 
 } );
-

@@ -29,5 +29,5 @@ resources:
   bugtracker: https://gitlab.com/DeBos/Proxy-Scraper/issues
   homepage: https://gitlab.com/DeBos/Proxy-Scraper
   repository: https://gitlab.com/DeBos/Proxy-Scraper.git
-version: v2.1.10
+version: v2.1.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

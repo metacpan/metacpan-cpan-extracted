@@ -25,4 +25,4 @@ $accepter->acceptance(
   },
 );
 
-Test::More::done_testing;
+Test2::Tools::Basic::done_testing;

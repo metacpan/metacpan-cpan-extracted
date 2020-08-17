@@ -1,0 +1,10 @@
+Revision history for Dist-Zilla-Plugin-Git-Checkout
+
+0.002  2020-08-10 16:33:27 UTC
+
+  - Don't assume that root from Test::DZil is a Path::Tiny object
+  - Set user.name and user.email in Git test repo beforing commiting to it from basic.t
+
+0.001  2020-08-08 23:40:44 UTC
+
+  - Initial release

@@ -1,0 +1,3 @@
+var a = "a";
+var b = "b";
+a + b = "value"; // expect: [Line 3] Error at '=': Invalid assignment target.

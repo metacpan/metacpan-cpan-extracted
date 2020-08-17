@@ -1,6 +1,6 @@
 #!/usr/bin/perl
-# date-tag - print a date-tag in form YYYY-MM-DD-hhmmss
-# 2020 Vlado Keselj http://web.cs.dal.ca/~vlado
+# date-tag - print a date-tag in the format YYYY-MM-DD-hhmmss
+# 2020 Vlado Keselj vlado@dnlp.ca http://vlado.ca
 
 use POSIX;
 print strftime("%Y-%m-%d-%H%M%S\n", localtime(time));
@@ -10,36 +10,33 @@ __END__ # Documentation
 
 =head1 NAME
 
-date-tag - print a date-tag in form C<YYYY-MM-DD-hhmmss>
-
-=head1 DESCRIPTION
-
-A simple command that prints one line of with the current date-time tag in
-the form C<YYYY-MM-DD-hhmmss>.
+date-tag - print a date-tag in the format C<YYYY-MM-DD-hhmmss>
 
 =head1 SYNOPSIS
 
  $ date-tag
  2020-05-13-154542
 
+=head1 DESCRIPTION
+
+A simple command that prints one line of with the current date-time tag in
+the format C<YYYY-MM-DD-hhmmss>.
+
 =head1 AUTHOR
 
-Vlado Keselj http://web.cs.dal.ca/~vlado
+Vlado Keselj vlado@dnlp.ca http://vlado.ca
 
 =head1 LICENSE
 
-Artistic License 1.0 L<perlartistic>
+Perl License (perl)
 
-=head1 INSTALLATION
+=head1 SCRIPT CATEGORIES
 
-Using C<cpan>:
+CPAN
+Unix/System_administration
 
- $ cpan App::Utils
+=head1 README
 
-Manual install:
-
- $ perl Makefile.PL
- $ make
- $ make install
+date-tag - print a date-tag in the format C<YYYY-MM-DD-hhmmss>
 
 =cut

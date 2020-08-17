@@ -9,6 +9,6 @@ if ($@) {
     plan skip_all => "Test::Pod 1.00 required for testing POD";
 }
 
-my @files = ( 'pure-perl-make', 'bmake', all_pod_files( ('lib') ) );
+my @files = ( 'scripts/pure-perl-make', all_pod_files( ('lib') ) );
 
 all_pod_files_ok(@files);

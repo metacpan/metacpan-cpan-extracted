@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000014';
+our $VERSION = '0.000015';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -148,7 +148,10 @@ sub clone {
     clone_dir($orig_dir, $new_dir, verbose => (($self->{+VERBOSE} // 0) > 2) ? 1 : 0);
 
     my $class = ref($self);
-    my %ok = map {$_ => 1} DBIx::QuickDB::Util::HashBase::attr_list($class);
+    my %ok = (
+        cleanup => 1,
+        map {$_ => 1} DBIx::QuickDB::Util::HashBase::attr_list($class),
+    );
     my @bad = grep { !$ok{$_} } keys %params;
 
     confess "Invalid options to clone(): " . join(', ' => @bad)

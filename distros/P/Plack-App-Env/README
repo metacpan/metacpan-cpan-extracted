@@ -1,0 +1,97 @@
+NAME
+    Plack::App::Env - Plack Env dump application.
+
+SYNOPSIS
+     use Plack::App::Env;
+
+     my $obj = Plack::App::Env->new(%parameters);
+     my $psgi_ar = $obj->call($env);
+     my $app = $obj->to_app;
+
+METHODS
+  "new"
+     my $obj = Plack::App::Env->new(%parameters);
+
+    Constructor.
+
+    Returns instance of object.
+
+  "call"
+     my $psgi_ar = $obj->call($env);
+
+    Implementation of env dump.
+
+    Returns reference to array (PSGI structure).
+
+  "to_app"
+     my $app = $obj->to_app;
+
+    Creates Plack application.
+
+    Returns Plack::Component object.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Plack::App::Env;
+     use Plack::Runner;
+
+     # Run application with one PYX file.
+     my $app = Plack::App::Env->new->to_app;
+     Plack::Runner->new->run($app);
+
+     # Output:
+     # HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+     # > curl http://localhost:5000/
+     # \ {
+     #     HTTP_ACCEPT            "*/*",
+     #     HTTP_HOST              "localhost:5000",
+     #     HTTP_USER_AGENT        "curl/7.64.0",
+     #     PATH_INFO              "/",
+     #     psgi.errors            *main::STDERR  (read/write, layers: unix perlio),
+     #     psgi.input             *HTTP::Server::PSGI::$input  (layers: scalar),
+     #     psgi.multiprocess      "",
+     #     psgi.multithread       "",
+     #     psgi.nonblocking       "",
+     #     psgi.run_once          "",
+     #     psgi.streaming         1,
+     #     psgi.url_scheme        "http",
+     #     psgi.version           [
+     #         [0] 1,
+     #         [1] 1
+     #     ],
+     #     psgix.harakiri         1,
+     #     psgix.input.buffered   1,
+     #     psgix.io               *Symbol::GEN1  (read/write, layers: unix perlio),
+     #     QUERY_STRING           "",
+     #     REMOTE_ADDR            "127.0.0.1",
+     #     REMOTE_PORT            39562,
+     #     REQUEST_METHOD         "GET",
+     #     REQUEST_URI            "/",
+     #     SCRIPT_NAME            "",
+     #     SERVER_NAME            0,
+     #     SERVER_PORT            5000,
+     #     SERVER_PROTOCOL        "HTTP/1.1"
+     # }
+
+DEPENDENCIES
+    Data::Printer, Plack::Component.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Plack-App-Env>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2020 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

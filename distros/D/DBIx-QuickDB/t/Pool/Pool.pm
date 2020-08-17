@@ -11,6 +11,27 @@ use Capture::Tiny qw/capture/;
 my $caller = caller;
 my $driver = $caller ? $caller->DRIVER : 'PostgreSQL';
 
+sub check_cloned {
+    my $db = shift;
+    return unless -f $db->dir . "/cloned";
+    open(my $fh, '<', $db->dir . "/cloned") or die "$!";
+    chomp(my $stamp = <$fh>);
+    return $stamp;
+}
+
+sub alter_cloned {
+    my $db = shift;
+    my ($delta) = @_;
+    return unless -f $db->dir . "/cloned";
+
+    my $stamp = check_cloned($db);
+    $stamp += $delta;
+
+    open(my $fh, '>', $db->dir . "/cloned") or die "$!";
+    print $fh $stamp, "\n";
+    1;
+}
+
 ok($driver, "Got a driver ($driver)") or die "Cannot continue without a driver";
 
 use DBIx::QuickDB::Pool cache_dir => tempdir(CLEANUP => 1), verbose => 0;
@@ -52,6 +73,16 @@ my $start = time();
 my $base = db($driver);
 my $total = time() - $start;
 note(sprintf("Initialized DB from scratch in %.6f seconds", $total));
+
+my $ddb = delete QDB_POOL->{databases}->{$driver}->{db};
+QDB_POOL->clear_old_cache(500);
+ok(-d $ddb->dir, "Did not Delete the directory when expiring cache");
+alter_cloned($ddb, -1000);
+QDB_POOL->clear_old_cache(500);
+ok(!-d $ddb->dir, "Deleted the directory when expiring cache");
+
+$base = db($driver);
+my $stamp = check_cloned(QDB_POOL->{databases}->{$driver}->{db});
 
 isa_ok($base, ['DBIx::QuickDB::Driver', "DBIx::QuickDB::Driver::$driver"], "Got the database");
 
@@ -98,6 +129,7 @@ my $foo1 = db('foo');
 $total = time() - $start;
 note(sprintf("Initialized 'foo' from $driver in %.6f seconds", $total));
 isnt($foo1->dir, QDB_POOL()->{databases}->{foo}->{dir}, "The copy does not have the original data dir");
+isnt($stamp, check_cloned(QDB_POOL->{databases}->{$driver}->{db}), "clone stamp changed");
 
 $start = time();
 my $foo2 = db('foo');
@@ -239,6 +271,7 @@ subtest reclaim => sub {
     ok(db('bar'), "Got bar");
     $total = time() - $start;
     note(sprintf("Initialized 'bar' from reclaiming the entire chain in %.6f seconds", $total));
+
 };
 
 subtest init => sub {

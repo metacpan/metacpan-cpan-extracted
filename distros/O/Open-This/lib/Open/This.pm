@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000023';
+our $VERSION = '0.000024';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -29,7 +29,6 @@ sub parse_text {
     my $text = join q{ }, @_;
 
     return undef if !$text;
-    my $file_name;
     my %parsed = ( original_text => $text );
 
     my ( $line, $col ) = _maybe_extract_line_number( \$text );
@@ -202,7 +201,9 @@ sub _maybe_extract_line_number {
     }
 
     # Github links: foo/bar.go#L100
-    if ( $$text =~ s{(\w)#L(\d+)\b}{$1} ) {
+    # Github links: foo/bar.go#L100-L110
+    # In this case, discard everything after the matching line number as well.
+    if ( $$text =~ s{(\w)#L(\d+)\b.*}{$1} ) {
         return $2;
     }
 
@@ -337,7 +338,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000023
+version 0.000024
 
 =head1 DESCRIPTION
 
@@ -365,6 +366,11 @@ Copy/pasting a C<git-grep> result.
 Copy/pasting a partial GitHub URL.
 
     ot lib/Foo/Bar.pm#L100 # vim +100 Foo/Bar.pm
+
+Copy/pasting a full GitHub URL.
+
+    ot https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L17-L21
+    # vim +17 lib/Open/This.pm
 
 Open a local file on the GitHub web site in your web browser.  From within a
 checked out copy of https://github.com/oalders/open-this

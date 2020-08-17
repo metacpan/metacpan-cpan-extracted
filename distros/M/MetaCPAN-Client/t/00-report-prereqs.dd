@@ -15,7 +15,7 @@ do { my $x = {
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
-                                      'WWW::Mechanize::Cached' => '1.50'
+                                      'WWW::Mechanize::Cached' => '1.54'
                                     }
                     },
        'runtime' => {
@@ -41,7 +41,7 @@ do { my $x = {
                    'recommends' => {
                                      'CPAN::Meta' => '2.120900',
                                      'HTTP::Tiny::Mech' => '1.001002',
-                                     'WWW::Mechanize::Cached' => '1.50'
+                                     'WWW::Mechanize::Cached' => '1.54'
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',

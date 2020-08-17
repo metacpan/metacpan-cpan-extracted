@@ -69,7 +69,7 @@ Archive::BagIt::Plugin::Algorithm::SHA512 - The default SHA algorithms plugin (d
 
 =head1 VERSION
 
-version 0.065
+version 0.066
 
 =head1 AVAILABILITY
 

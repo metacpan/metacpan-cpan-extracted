@@ -1,7 +1,7 @@
 package Sah::SchemaR::filename::unix;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2020-08-08'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 our $rschema = ["str",[{match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem file name on a Unix system","x.completion"=>["filename"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::filename::unix - Filesystem file name on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::filename::unix (from Perl distribution Sah-Schemas-Path), released on 2020-02-11.
+This document describes version 0.014 of Sah::SchemaR::filename::unix (from Perl distribution Sah-Schemas-Path), released on 2020-08-08.
 
 =head1 DESCRIPTION
 

@@ -15,7 +15,7 @@ SQL::Validator
 
 =tagline
 
-Validate JSON-SQL Schemas
+Validate JSON-SQL
 
 =cut
 
@@ -43,13 +43,15 @@ method: validate
   #     into => {
   #       table => 'users'
   #     },
-  #     default => true
+  #     default => 1
   #   }
   # });
 
-  # i.e. INSERT INTO users DEFAULT VALUES;
+  # i.e. represents (INSERT INTO "users" DEFAULT VALUES)
 
-  # $sql->error->report('insert')
+  # die $sql->error if !$valid;
+
+  # $sql->error->report('insert');
 
 =cut
 
@@ -65,7 +67,8 @@ version: ro, opt, Str
 
 This package provides a
 L<json-sql|https://github.com/iamalnewkirk/json-sql#readme> data structure
-validation library based around L<json-schema|https://json-schema.org>.
+validation library based on the JSON-SQL L<json-schema|https://json-schema.org>
+standard.
 
 =cut
 
@@ -81,7 +84,7 @@ error() : InstanceOf["SQL::Validator::Error"]
 
   # given: synopsis
 
-  $sql->validate({});
+  $sql->validate({select => {}});
 
   my $error = $sql->error;
 
@@ -89,7 +92,7 @@ error() : InstanceOf["SQL::Validator::Error"]
 
   # given: synopsis
 
-  $sql->validate({select => {}});
+  $sql->validate({select => { from => { table => 'users' } } });
 
   my $error = $sql->error;
 
@@ -112,7 +115,7 @@ validate(HashRef $schema) : Bool
       into => {
         table => 'users'
       },
-      default => 'true'
+      default => 1
     }
   });
 
@@ -124,12 +127,14 @@ validate(HashRef $schema) : Bool
 
   my $valid = $sql->validate({
     insert => {
-      table => 'users',
-      default => 'true'
+      into => {
+        table => 'users'
+      },
+      default => 'true' # coerced booleans
     }
   });
 
-  # INVALID
+  # VALID
 
 =example-3 validate
 
@@ -183,7 +188,7 @@ $subs->example(-1, 'validate', 'method', fun($tryable) {
 });
 
 $subs->example(-2, 'validate', 'method', fun($tryable) {
-  ok !(my $result = $tryable->result);
+  ok my $result = $tryable->result;
 
   $result
 });

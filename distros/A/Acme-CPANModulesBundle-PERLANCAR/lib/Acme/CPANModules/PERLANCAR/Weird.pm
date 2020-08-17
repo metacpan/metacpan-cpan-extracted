@@ -1,7 +1,7 @@
 package Acme::CPANModules::PERLANCAR::Weird;
 
-our $DATE = '2020-07-21'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2020-08-09'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 our $LIST = {
     summary => 'Weird modules',
@@ -40,7 +40,7 @@ Acme::CPANModules::PERLANCAR::Weird - Weird modules
 
 =head1 VERSION
 
-This document describes version 0.006 of Acme::CPANModules::PERLANCAR::Weird (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2020-07-21.
+This document describes version 0.007 of Acme::CPANModules::PERLANCAR::Weird (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2020-08-09.
 
 =head1 DESCRIPTION
 

@@ -13,9 +13,9 @@ $modules{$_} = $_ for qw(
   Acme::Alien::DontPanic2
   Alien::Base::Wrapper
   Data::Dumper
-  DynaLoader
   ExtUtils::MakeMaker
   Test2::V0
+  XSLoader
 );
 
 $post_diag = sub {
@@ -64,7 +64,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (sort @modules)
 {

@@ -3,7 +3,7 @@ package DateTime::Format::Builder::Parser::Strptime;
 use strict;
 use warnings;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 use DateTime::Format::Strptime 1.04;
 use Params::Validate qw( validate SCALAR HASHREF );
@@ -73,23 +73,22 @@ DateTime::Format::Builder::Parser::Strptime - strptime based date parsing
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 
-   my $parser = DateTime::Format::Builder->create_parser(
-	strptime => '%e/%b/%Y:%H:%M:%S %z',
-   );
+    my $parser = DateTime::Format::Builder->create_parser(
+        strptime => '%e/%b/%Y:%H:%M:%S %z',
+    );
 
 =head1 SPECIFICATION
 
 =over 4
 
-=item *
+=item * strptime
 
-B<strptime> takes as its argument a strptime string.
-See L<DateTime::Format::Strptime> for more information
-on valid patterns.
+B<strptime> takes as its argument a strptime string. See
+L<DateTime::Format::Strptime> for more information on valid patterns.
 
 =back
 
@@ -104,7 +103,7 @@ L<DateTime::Format::Builder>
 
 =head1 SUPPORT
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Builder> or via email to L<bug-datetime-format-builder@rt.cpan.org|mailto:bug-datetime-format-builder@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/DateTime-Format-Builder/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
@@ -122,13 +121,13 @@ Dave Rolsky <autarch@urth.org>
 
 =item *
 
-Iain Truskett
+Iain Truskett <spoon@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

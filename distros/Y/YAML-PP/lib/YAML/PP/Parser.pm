@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Parser;
 
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -603,7 +603,8 @@ sub start_mapping {
 sub end_document {
     my ($self, $implicit) = @_;
 
-    if ($self->lexer->flowcontext) {
+    my $event_types = $self->events;
+    if ($event_types->[-1] =~ m/FLOW/) {
         die "Unexpected end of flow context";
     }
     if ($self->new_node) {
@@ -611,7 +612,6 @@ sub end_document {
     }
     $self->remove_nodes(-1);
 
-    my $event_types = $self->events;
     if ($event_types->[-1] eq 'STR') {
         return;
     }

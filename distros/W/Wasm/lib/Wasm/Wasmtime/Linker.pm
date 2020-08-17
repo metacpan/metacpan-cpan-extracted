@@ -14,7 +14,7 @@ use Ref::Util qw( is_blessed_ref );
 use Carp ();
 
 # ABSTRACT: Wasmtime linker class
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 $ffi_prefix = 'wasmtime_linker_';
@@ -153,7 +153,7 @@ Wasm::Wasmtime::Linker - Wasmtime linker class
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -175,7 +175,7 @@ version 0.18
  # Create a logger module + instance
  my $logger = $linker->instantiate(
    Wasm::Wasmtime::Module->new(
-     $store,
+     $store->engine,
      wat => q{
        (module
          (type $fd_write_ty (func (param i32 i32 i32 i32) (result i32)))
@@ -212,7 +212,7 @@ version 0.18
  # Create a caller module + instance
  my $caller = $linker->instantiate(
    Wasm::Wasmtime::Module->new(
-     $store,
+     $store->engine,
      wat => q{
        (module
          (import "logger" "log" (func $log (param i32 i32)))

@@ -1,5 +1,12 @@
 Revision history for Perl module Net::SMTP::Bulk
 
+0.24 2020-08-08
+    - Use of centralized timer for Net::SMTP::Bulk::AnyEvent
+    - Global Timeout now works properly in Net::SMTP::Bulk::AnyEvent
+    - Fixed proper filehandle destroy for Net::SMTP::Bulk::AnyEvent
+    - Added RuntimeLimit for Net::SMTP::Bulk::AnyEvent
+    - THIS MARKS THE LAST BUGFIX RELEASE BEFORE COMPLETE REWRITE, NEXT RELEASE WILL BE MORE SCALABLE AND INCLUDE MOJO SUPPORT, CODE WILL PROBABLY REMAIN BACKWARDS COMPATIBLE
+
 0.23 2016-09-07
     - Fixed new line issue in body Net::SMTP::Bulk::AnyEvent
 

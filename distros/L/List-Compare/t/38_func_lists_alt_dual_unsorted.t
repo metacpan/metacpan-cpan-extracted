@@ -6,7 +6,7 @@ use Test::More tests =>  38;
 use List::Compare::Functional qw(:originals :aliases);
 use lib ("./t");
 use Test::ListCompareSpecial qw( :seen :func_wrap :arrays :results );
-use IO::CaptureOutput qw( capture );
+use Capture::Tiny q|:all|;
 
 my @pred = ();
 my %seen = ();
@@ -193,3 +193,4 @@ is_deeply(\%seen, \%pred, "Got predicted quantities in bag");
 ok(unseen(\%seen, \@unpred),
     "bag:  All non-expected elements correctly excluded");
 %seen = ();
+

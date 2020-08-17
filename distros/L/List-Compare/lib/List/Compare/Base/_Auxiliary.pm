@@ -1,8 +1,8 @@
 package List::Compare::Base::_Auxiliary;
-$VERSION = 0.53;
+our $VERSION = 0.55;
 use Carp;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw|
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw|
     _validate_2_seenhashes
     _validate_seen_hash
     _validate_multiple_seenhashes
@@ -39,7 +39,7 @@ use Carp;
     _alt_construct_tester_4
     _alt_construct_tester_5
 |;
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
     calculate => [ qw(
         _calculate_array_seen_only
         _calculate_seen_only
@@ -73,8 +73,7 @@ my $bad_lists_msg = q{If argument is single hash ref, you must have a 'lists' ke
 
 sub _validate_2_seenhashes {
     my ($refL, $refR) = @_;
-    my (%seenL, %seenR);
-    my (%badentriesL, %badentriesR);
+    my (%seenL, %seenR, %badentriesL, %badentriesR);
     foreach (keys %$refL) {
         if (${$refL}{$_} =~ /^\d+$/ and ${$refL}{$_} > 0) {
             $seenL{$_} = ${$refL}{$_};
@@ -288,7 +287,7 @@ sub _subset_subengine {
                     $xsubset[$i][$j] = _is_list_subset($seen{$i}, $seen{$j});
                     $xsubset[$j][$i] = 0;
                 }
-                elsif ( scalar(keys %{ $seen{$i} }) > scalar(keys %{ $seen{$j} }) ){
+                else {
                     $xsubset[$j][$i] = _is_list_subset($seen{$j}, $seen{$i});
                     $xsubset[$i][$j] = 0;
                 }
@@ -717,8 +716,8 @@ List::Compare::Base::_Auxiliary - Internal use only
 
 =head1 VERSION
 
-This document refers to version 0.53 of List::Compare::Base::_Auxiliary.
-This version was released June 07 2015.
+This document refers to version 0.55 of List::Compare::Base::_Auxiliary.
+This version was released August 16 2020.
 
 =head1 SYNOPSIS
 
@@ -730,8 +729,8 @@ List::Compare::Functional.  They are not intended to be publicly callable.
 James E. Keenan (jkeenan@cpan.org).  When sending correspondence, please
 include 'List::Compare' or 'List-Compare' in your subject line.
 
-Creation date:  May 20, 2002.  Last modification date:  February 25 2015.
-Copyright (c) 2002-15 James E. Keenan.  United States.  All rights reserved.
+Creation date:  May 20, 2002.  Last modification date:  February 25 2020.
+Copyright (c) 2002-20 James E. Keenan.  United States.  All rights reserved.
 This is free software and may be distributed under the same terms as Perl
 itself.
 

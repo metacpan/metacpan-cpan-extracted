@@ -18,7 +18,7 @@ $linker->define_wasi($wasi);
 # Create a logger module + instance
 my $logger = $linker->instantiate(
   Wasm::Wasmtime::Module->new(
-    $store,
+    $store->engine,
     wat => q{
       (module
         (type $fd_write_ty (func (param i32 i32 i32 i32) (result i32)))
@@ -55,7 +55,7 @@ $linker->define_instance("logger", $logger);
 # Create a caller module + instance
 my $caller = $linker->instantiate(
   Wasm::Wasmtime::Module->new(
-    $store,
+    $store->engine,
     wat => q{
       (module
         (import "logger" "log" (func $log (param i32 i32)))

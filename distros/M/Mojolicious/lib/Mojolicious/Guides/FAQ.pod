@@ -177,8 +177,7 @@ closed immediately.
   # The variable $ua goes out of scope and gets destroyed too early
   Mojo::IOLoop->timer(5 => sub {
     my $ua = Mojo::UserAgent->new;
-    $ua->get('https://mojolicious.org' => sub {
-      my ($ua, $tx) = @_;
+    $ua->get('https://mojolicious.org' => sub ($ua, $tx) {
       say $tx->result->dom->at('title')->text;
     });
   });
@@ -203,8 +202,7 @@ weakened.
   my $tx = $c->render_later->tx;
   $c->ua->get_p('https://mojolicious.org')->then(sub {
     $c->render(text => 'Visited mojolicious.org');
-  })->catch(sub {
-    my $err = shift;
+  })->catch(sub ($err) {
     $tx;
     $c->reply->exception($err);
   });
@@ -217,8 +215,8 @@ authors.
 
 =head1 SUPPORT
 
-If you have any questions the documentation might not yet answer, don't hesitate to ask on the L<mailing
-list|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net> (L<chat
-now!|https://webchat.freenode.net/#mojo>).
+If you have any questions the documentation might not yet answer, don't hesitate to ask in the
+L<Google Group|http://groups.google.com/group/mojolicious> or the official IRC channel C<#mojo> on C<irc.freenode.net>
+(L<chat now!|https://webchat.freenode.net/#mojo>).
 
 =cut

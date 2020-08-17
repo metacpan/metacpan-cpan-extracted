@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000020';
+our $VERSION = '1.000023';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -302,6 +302,23 @@ Can be specified multiple times
 
 =head2 COMMAND OPTIONS
 
+=head3 Git Options
+
+=over 4
+
+=item --git-change-base master
+
+=item --git-change-base HEAD^
+
+=item --git-change-base df22abe4
+
+=item --no-git-change-base
+
+Find files changed by all commits in the current branch from most recent stopping when a commit is found that is also present in the history of the branch/commit specified as the change base.
+
+
+=back
+
 =head3 Help and Debugging
 
 =over 4
@@ -390,6 +407,13 @@ Use Test2::Plugin::Cover to collect coverage data for what files are touched by 
 =item --no-daemon
 
 Start the runner as a daemon (Default: True)
+
+
+=item --dbi-profiling
+
+=item --no-dbi-profiling
+
+Use Test2::Plugin::DBIProfile to collect database profiling data
 
 
 =item --event-timeout SECONDS

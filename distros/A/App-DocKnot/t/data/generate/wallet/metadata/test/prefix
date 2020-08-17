@@ -1,0 +1,8 @@
+The wallet comes with a comprehensive test suite, but it requires some
+configuration in order to test anything other than low-level utility
+functions.  To enable the full test suite, follow the instructions in:
+
+* `tests/config/README`
+* `perl/t/data/README`
+
+Now, you can run the test suite with:

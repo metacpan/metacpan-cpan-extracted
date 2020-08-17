@@ -2,6 +2,7 @@ use 5.008004;
 use Test2::V0 -no_srand => 1;
 use lib 't/lib';
 use Test2::Tools::Wasm;
+use Wasm::Wasmtime::Engine;
 use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::Module;
 use Wasm::Wasmtime::Wat2Wasm;
@@ -25,7 +26,7 @@ is(
 );
 
 is(
-  Wasm::Wasmtime::Module->new(Wasm::Wasmtime::Store->new, wat2wasm('(module)')),
+  Wasm::Wasmtime::Module->new(Wasm::Wasmtime::Engine->new, wat2wasm('(module)')),
   object {
     call ['isa', 'Wasm::Wasmtime::Module'] => T();
     call engine => object {
@@ -34,6 +35,34 @@ is(
   },
   'explicit engine',
 );
+
+{
+  my @warnings;
+  local $SIG{__WARN__} = sub {
+    push @warnings, @_;
+  };
+
+  is(
+    Wasm::Wasmtime::Module->new(Wasm::Wasmtime::Store->new, wat2wasm('(module)')),
+    object {
+      call ['isa', 'Wasm::Wasmtime::Module'] => T();
+      call engine => object {
+        call ['isa', 'Wasm::Wasmtime::Engine'] => T();
+      };
+    },
+    'explicit store',
+  );
+
+  note "warning:$_" for @warnings;
+  is
+    \@warnings,
+    bag {
+      item match qr/Passing a Wasm::Wasmtime::Store into the module constructor is deprecated, please pass a Wasm::Wasmtime::Engine object instead/;
+      etc;
+    },
+    'deprecation warning',
+  ;
+}
 
 is(
   Wasm::Wasmtime::Module->new(wat => '(module)'),
@@ -218,48 +247,6 @@ is(
   },
   'exports',
 );
-
-# test deprecation warnings on store method
-{
-  my $module = Wasm::Wasmtime::Module->new(wat => '(module)');
-  my @warnings;
-
-  isa_ok do {
-    local $SIG{__WARN__} = sub {
-      push @warnings, @_;
-    };
-    $module->store;
-  }, 'Wasm::Wasmtime::Store';
-
-  note '$module->store';
-  note "warning:$_" for @warnings;
-
-  is
-    \@warnings,
-    bag {
-      item match qr/The store method for the Wasm::Wasmtime::Module class is deprecated and will be removed in a future version of Wasm::Wasmtime/;
-      etc;
-    },
-    'deprecation warning',
-  ;
-
-  no warnings 'deprecated';
-  @warnings = ();
-  $module->store;
-
-  note 'no warnings \'deprecated\'; $module->store';
-  note "warning:$_" for @warnings;
-
-  is
-    \@warnings,
-    array {
-      all_items !match qr/The store method for the Wasm::Wasmtime::Module class is deprecated and will be removed in a future version of Wasm::Wasmtime/;
-      etc;
-    },
-    'can turn off deprecation warning',
-  ;
-
-}
 
 wasm_module_ok '(module)';
 

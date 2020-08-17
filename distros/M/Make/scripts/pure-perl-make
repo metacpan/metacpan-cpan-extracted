@@ -1,0 +1,89 @@
+#!perl
+use strict;
+use warnings;
+
+use 5.005;    # Need look-behind assertions
+
+use Getopt::Std;
+use Make;
+
+my %opt;
+
+getopts( 'Dgnpf:j:C:', \%opt );
+
+chdir $opt{C} if $opt{C};
+
+my $info = Make->new(
+    GNU      => $opt{'g'},
+    Vars     => { MAKE => "$^X $0" },
+    Jobs     => $opt{'j'},
+);
+$info->parse($opt{'f'});
+
+if ( $opt{'D'} ) {
+    require Data::Dumper;
+    print Data::Dumper::DumperX($info);
+}
+elsif ( $opt{'p'} ) {
+    $info->Print(@ARGV);
+}
+elsif ( $opt{'n'} ) {
+    print $info->Script(@ARGV);
+}
+else {
+    $info->Make(@ARGV);
+}
+
+=head1 NAME
+
+pure-perl-make - a perl 'make' replacement
+
+=head1 SYNOPSIS
+
+  pure-perl-make [-D] [-n] [-p] [-g] [-f Makefile] [-C directory] targets
+
+=head1 DESCRIPTION
+
+Performs the same function as make(1) but is written entirely in perl.
+A subset of GNU make extensions is supported.
+For details see L<Make> for the underlying perl module.
+
+=head1 FLAGS
+
+=head2 -D
+
+Don't build, just L<Data::Dumper/DumperX> the L<Make> object.
+
+=head2 -n
+
+Don't build, just print what building would have done.
+
+=head2 -p
+
+Don't build, just print the expanded makefile.
+
+=head2 -g
+
+Turn on L<Make/GNU>.
+
+=head1 BUGS
+
+=over
+
+=item *
+
+No B<-k> flag
+
+I strongly suspect there are lots more.
+
+=back
+
+=head1 SEE ALSO
+
+L<Make>, make(1)
+
+=head1 AUTHOR
+
+Nick Ing-Simmons
+
+=cut

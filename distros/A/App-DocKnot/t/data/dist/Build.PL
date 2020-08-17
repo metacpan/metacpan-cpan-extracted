@@ -5,11 +5,11 @@
 # Used to test constructing distributions for Perl modules.  This is a minimum
 # build script, just enough to support the dist action and let tests run.
 #
-# Copyright 2018-2019 Russ Allbery <rra@cpan.org>
+# Copyright 2018-2020 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
-use strict;
+use 5.024;
 use warnings;
 
 use Module::Build;

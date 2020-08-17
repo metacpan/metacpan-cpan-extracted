@@ -50,6 +50,12 @@ is( $wu->max_children(), 5, 'Max children defaults to 5' );
 $wu->max_children(10);
 is( $wu->max_children(), 10, 'Max children is 10' );
 
+$wu = Parallel::WorkUnit->new( { max_children => 10 } );
+is( $wu->max_children(), 10, 'Max children is 10 (hashref option)' );
+
+$wu = Parallel::WorkUnit->new( max_children => 10 );
+is( $wu->max_children(), 10, 'Max children is 10 (new option)' );
+
 $wu->max_children(2);
 is( $wu->max_children(), 2, 'Max children defaults to 2' );
 

@@ -1,6 +1,6 @@
 package TOML::Tiny;
 # ABSTRACT: a minimal, pure perl TOML parser and serializer
-$TOML::Tiny::VERSION = '0.08';
+$TOML::Tiny::VERSION = '0.09';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -76,7 +76,7 @@ TOML::Tiny - a minimal, pure perl TOML parser and serializer
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -144,6 +144,25 @@ Homogenous array strictures are enabled by passing C<strict_arrays>:
   my $result = from_toml(q{mixed=[1, 2, "three"]})
 
 Additional arguments may be passed after the toml source string; see L</new>.
+
+=head3 GOTCHAS
+
+=over
+
+=item Big integers and floats
+
+C<TOML> supports integers and floats larger than what many perls support.  when
+C<TOML::Tiny> encounters a value it may not be able to represent as a number,
+it will instead return a L<Math::BigInt> or L<Math::BigFloat>. This behavior
+can be overridden by providing inflation routines:
+
+  my $toml = TOML::Tiny->new(
+    inflate_float => sub{
+      return do_something_else_with_floats( $_[0] );
+    };
+  );
+
+=back
 
 =head2 to_toml
 
@@ -279,27 +298,30 @@ If you wish to override this, you can provide your own routine to generate value
 =item inflate_integer
 
 TOML integers are 64 bit and may not match the size of the compiled perl's
-internal integer type. By default, integers are left as-is as perl strings
-which may be upgraded as needed by the caller.
+internal integer type. By default, C<TOML::Tiny> coerces numbers that fit
+within a perl number by adding C<0>. For bignums, a L<Math::BigInt> is
+returned. This may be overridden by providing an inflation routine:
 
   my $parser = TOML::Tiny->new(
     inflate_integer => sub{
-      use bignum;
-      return 0 + shift;
-    }
+      my $parsed = shift;
+      return sprintf 'the number "%d"', $parsed;
+    };
   );
 
 =item inflate_float
 
 TOML floats are 64 bit and may not match the size of the compiled perl's
-internal float type. By default, floats are left as-is as perl strings which
-may be upgraded as needed by the caller.
+internal float type. As with integers, floats are coerced to numbers and large
+floats are upgraded to L<Math::BigFloat>s. The special strings C<NaN> and
+C<inf> may also be returned. You can override this by specifying an inflation
+routine.
 
   my $parser = TOML::Tiny->new(
     inflate_float => sub{
-      use bignum;
-      return 0 + shift;
-    }
+      my $parsed = shift;
+      return sprintf '"%0.8f" is a float', $parsed;
+    };
   );
 
 =item strict_arrays
@@ -390,6 +412,8 @@ A big thank you to those who have contributed code or bug reports:
 =item L<ijackson|https://github.com/ijackson>
 
 =item L<noctux|https://github.com/noctux>
+
+=item L<oschwald|https://github.com/oschwald>
 
 =back
 

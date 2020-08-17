@@ -9,7 +9,7 @@ use HTML::HTMLDoc::PDF;
 use vars qw(@ISA $VERSION);
 
 @ISA = qw();
-$VERSION = '0.17';
+$VERSION = '0.21';
 my $DEBUG = 0;
 
 ###############
@@ -1267,6 +1267,13 @@ HTML::HTMLDoc - Perl interface to the htmldoc program for producing PDF Files fr
   # and all other desired configuration methods
   print $htmldoc->get_htmldoc_command();
 
+=head1 PREREQUISITE
+
+This module is just a front-end to the HTMLDOC program, therefore you must have 
+that program installed prior to attempting to install and utilize this module.
+
+The HTMLDOC home page at L<https://www.msweet.org/htmldoc>
+
 =head1 DESCRIPTION
 
 This module provides an OO interface to the HTMLDOC program.  HTMLDOC is a command
@@ -1280,9 +1287,6 @@ HTMLDOC-specific comment options detailed here: L<https://www.msweet.org/htmldoc
 
 The HTMLDOC home page at L<https://www.msweet.org/htmldoc> and includes complete
 documentation for the program and a link to the GitHub repo.
-
-You will need to install HTMLDOC prior to installing this module, and it is
-recommended to experiment with the 'htmldoc' command prior to utilizing this module.
 
 All the config-setting modules return true for success or false for failure. You can
 test if errors occurred by calling the error-method.

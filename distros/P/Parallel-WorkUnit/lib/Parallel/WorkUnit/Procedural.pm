@@ -4,7 +4,7 @@
 #
 
 package Parallel::WorkUnit::Procedural;
-$Parallel::WorkUnit::Procedural::VERSION = '2.201890';
+$Parallel::WorkUnit::Procedural::VERSION = '2.202270';
 use v5.8;
 
 # ABSTRACT: Provide procedural paradigm forking with ability to pass back data
@@ -72,7 +72,7 @@ Parallel::WorkUnit::Procedural - Provide procedural paradigm forking with abilit
 
 =head1 VERSION
 
-version 2.201890
+version 2.202270
 
 =head1 SYNOPSIS
 

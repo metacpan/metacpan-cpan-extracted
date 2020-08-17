@@ -4,10 +4,19 @@ use strict;
 
 use Test::Builder::Tester tests => 4;
 
-use Test::More;
+use Test::More 0.65;
 use Test::Fatal;
 
 my $file = __FILE__;
+
+if (!eval { Test::Builder::Tester->VERSION(1.20) }) { # Test::More 0.96
+    my $builder = Test::Builder->new;
+    no warnings 'redefine';
+    *test_out = sub {
+        Test::Builder::Tester::test_out(@_);
+        $builder->todo_output($builder->output);
+    }
+}
 
 {
     my $line = __LINE__ + 13;

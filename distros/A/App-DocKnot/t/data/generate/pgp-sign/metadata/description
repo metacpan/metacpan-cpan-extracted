@@ -1,0 +1,24 @@
+PGP::Sign is a Perl module that can generate and verify OpenPGP signatures
+on some data.  Currently, only textual data (data that can be processed
+using GnuPG's `--textmode` option) is supported.  It uses GnuPG under the
+hood to do the work.
+
+The original purpose of this module was to factor out common code in a
+News::Article class written by Andrew Gierth that handled PGPMoose and
+control message signatures.  It is used to verify control message
+signatures for the ftp.isc.org Netnews metadata archive, and to generate
+signed control messages for the Big Eight Usenet hierarchies.
+
+Data to be signed or verified can be passed into PGP::Sign in a wide
+variety of formats: scalars, arrays, open files, even code references that
+act as generators.  Keys with passphrases are supported and the passphrase
+is passed to GnuPG securely (although getting the passphrase to the
+PGP::Sign module is a problem for the calling application).
+
+This module supports both GnuPG v2 and GnuPG v1 and, when used with GnuPG
+v1, supports using OpenPGP keys and generating and verifying signatures
+that are backward-compatible with PGP 2.6.2.
+
+PGP::Sign provides both a (recommended) object-oriented API and a (legacy)
+function-based API that uses global variables for configuration and is
+backward-compatible with earlier versions of PGP::Sign.

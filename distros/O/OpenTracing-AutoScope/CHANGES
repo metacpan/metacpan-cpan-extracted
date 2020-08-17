@@ -2,6 +2,20 @@ CHANGE LOG
 ==========
 
 
+2020-08-14 - v0.106.1
+---------------------
+
+### Reverted
+  - Remove runtime-load checking because of breaking bugs
+
+
+2020-08-13 - v0.106.0
+---------------------
+
+### Fixed
+  - WrapScope now properly wraps modules loaded at runtime
+
+
 2020-07-30 - v0.105.0
 ---------------------
 

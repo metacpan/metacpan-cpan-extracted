@@ -14,7 +14,7 @@ Lab::Measurement::Installation - Installation guide for Lab::Measurement
 
 =head1 VERSION
 
-version 3.720
+version 3.721
 
 =head1 Introduction
 
@@ -81,11 +81,15 @@ these modules contains detailed installation instructions.
 
 =back
 
-=head2 Notes
-
 If you want to install Lab::Measurement and its dependencies into your home
 directory, please take a look at L<plenv|https://github.com/tokuhirom/plenv> or
 L<perlbrew|https://perlbrew.pl/>. 
+
+=head2 Upgrading
+
+You can upgrade your Lab::Measurement installation by running cpanm again:
+
+ cpanm Lab::Measurement
 
 =head1 COPYRIGHT AND LICENSE
 

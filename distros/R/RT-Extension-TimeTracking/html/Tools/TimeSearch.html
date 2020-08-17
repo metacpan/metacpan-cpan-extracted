@@ -1,0 +1,242 @@
+<& /Elements/Header, Title => loc("Time Search") &>
+
+<& /Elements/Tabs &>
+
+<& /Elements/ListActions, actions => \@results &>
+
+<div class="time_tracking time_search">
+
+<form>
+  <div class="form-row">
+    <div class="col-3 label"><&|/l&>Ticket Query</&>:</div>
+    <div class="col-9 value"><textarea name="Query" rows="8" cols="72"><% $Query %></textarea></div>
+  </div>
+  <div class="form-row">
+      <div class="col-3 label"><&|/l&>Start Date</&>:</div>
+      <div class="col-9 value"><& /Elements/SelectDate, ShowTime => 0, Name => 'StartDate', Default => $start_date->Date(Format=>'ISO', Timezone => 'user') &></div>
+  </div>
+  <div class="form-row">
+      <div class="col-3 label"><&|/l&>End Date</&>:</div>
+      <div class="col-9 value"><& /Elements/SelectDate, ShowTime => 0, Name => 'EndDate', Default => $end_date->Date(Format=>'ISO', Timezone => 'user') &></div>
+  </div>
+  <div class="form-row include-children">
+      <div class="col-3 label"><&|/l&>Include All Children?</&></div>
+      <div class="col-9 value"><& /Widgets/Form/Boolean:InputOnly, Name => 'IncludeChildren', CurrentValue => $IncludeChildren &></div>
+  </div>
+  <div class="form-row">
+    <div class="col-12">
+      <& /Elements/Submit, Name => 'DoSearch', Label => loc("Search") &>
+    </div>
+  </div>
+</form>
+
+% if ( $ARGS{DoSearch} ) {
+
+<div>
+
+% if ( %ticket_worked ) {
+<table class="table ticket-list collection-as-table">
+    <tr class="collection-as-table">
+        <th class="collection-as-table"><&|/l&>id</&></th>
+        <th class="collection-as-table"><&|/l&>Subject</&></th>
+        <th class="collection-as-table"><&|/l&>Queue</&></th>
+        <th class="collection-as-table"><&|/l&>Status</&></th>
+        <th class="collection-as-table"><&|/l&>Owner</&></th>
+% if ( $display_cf ){
+        <th class="collection-as-table"><% $display_cf %></th>
+% }
+        <th class="collection-as-table"><&|/l&>Time Worked</&></th>
+        <th class="collection-as-table"><&|/l&>Time Estimated</&></th>
+    </tr>
+% my $i = 1;
+% for my $ticket_id ( sort { $a <=> $b } keys %ticket_worked ) {
+% my $entry = $ticket_worked{$ticket_id};
+% my $ticket = $entry->{ticket};
+    <tr class="<% $i++ % 2 ? 'oddline' : 'evenline' %>">
+        <td class="collection-as-table">
+        <a href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $ticket->id %>"><% $ticket->id %></a>
+        </td>
+        <td class="collection-as-table">
+        <a href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $ticket->id %>"><% $ticket->Subject %></a>
+        </td>
+        <td class="collection-as-table"><% $ticket->QueueObj->Name %></td>
+        <td class="collection-as-table"><% $ticket->Status %></td>
+        <td class="collection-as-table"><% $ticket->OwnerObj->Name %></td>
+% if ( $display_cf ){
+        <td class="collection-as-table"><% $ticket->FirstCustomFieldValue($display_cf) %></td>
+% }
+        <td class="collection-as-table"><& /Ticket/Elements/ShowTime, minutes => $entry->{time_worked} &></td>
+        <td class="collection-as-table"><& /Ticket/Elements/ShowTime, minutes => $ticket->TimeEstimated &></td>
+    </tr>
+% }
+</table>
+% }
+
+</div>
+
+<hr />
+<div class="time_worked">
+<span class="label"><&|/l&>Total Time Worked</&>:</span> <span class="value"><& /Ticket/Elements/ShowTime, minutes => $total_time_worked &></span>
+</div>
+% }
+
+% $m->callback( CallbackName => 'End', Query => $Query, StartDate => $start_date, EndDate => $end_date, TicketWorked => \%ticket_worked );
+
+</div>
+<%INIT>
+
+my @results;
+my $user = $session{CurrentUser};
+
+my $start_date = RT::Date->new( $user );
+if ( $StartDate ) {
+    $start_date->Set( Value => $StartDate, Format => 'unknown' );
+}
+else {
+    $start_date->SetToNow;
+    my ( $ret, $week_start_date ) =
+      RT::Extension::TimeTracking::WeekStartDate( $user, $start_date, RT->Config->Get( 'TimeTrackingFirstDayOfWeek' ) );
+    $start_date = $week_start_date if $ret;
+}
+$start_date->SetToMidnight( Timezone => 'user' );
+
+my $end_date = RT::Date->new( $user );
+if ( $EndDate ) {
+    $end_date->Set( Value => $EndDate, Format => 'unknown' );
+}
+else {
+    $end_date->SetToNow;
+}
+$end_date->SetToMidnight( Timezone => 'user' );
+
+my $exclusive_end_date = RT::Date->new( $user );
+$exclusive_end_date->Set( Value => $end_date->Unix, Format => 'Unix' );
+$exclusive_end_date->AddDays( 1 );
+
+my %ticket_worked;
+my $total_time_worked = 0;
+
+# Do we need to load a CF for display?
+my $display_cf;
+if ( $display_cf = RT->Config->Get( 'TimeTrackingDisplayCF' ) ) {
+    my $confirm_cf = RT::CustomField->new( RT->SystemUser );
+    my ( $ret, $msg ) = $confirm_cf->Load( $display_cf );
+
+    if ( not $ret ) {
+        RT::Logger->error(
+            "Unable to load custom field $display_cf " . "defined via config option TimeTrackingDisplayCF: $msg" );
+        undef $display_cf;
+    }
+}
+
+if ( $ARGS{DoSearch} ) {
+    my $tickets = RT::Tickets->new( $user );
+    if ( $Query ) {
+        my ( $ret, $msg ) = $tickets->FromSQL( $Query );
+        push @results, $msg unless $ret;
+    }
+    else {
+        push @results, loc( 'No query' );
+    }
+    MaybeRedirectForResults(
+        Actions   => \@results,
+        Arguments => { StartDate => $StartDate, EndDate => $EndDate, Query => $Query },
+    );
+
+    my @tickets = map { $_, $IncludeChildren ? ( RT::Extension::TimeTracking->AllChildren( $_ ) ) : () }
+      @{ $tickets->ItemsArrayRef };
+    my @ticket_ids = List::MoreUtils::uniq( map { $_->id } @tickets );
+
+    my $txns = RT::Transactions->new( $user );
+    $txns->Limit(
+        FIELD => 'ObjectType',
+        VALUE => 'RT::Ticket',
+    );
+    $txns->Limit(
+        FIELD    => 'ObjectID',
+        VALUE    => \@ticket_ids,
+        OPERATOR => 'IN',
+    );
+
+    $txns->Limit(
+        FIELD    => 'TimeTaken',
+        VALUE    => 0,
+        OPERATOR => '!=',
+    );
+
+    $txns->Limit(
+        FIELD    => 'Created',
+        VALUE    => $start_date->ISO(),
+        OPERATOR => '>=',
+    );
+    $txns->Limit(
+        FIELD           => 'Created',
+        VALUE           => $exclusive_end_date->ISO(),
+        OPERATOR        => '<',
+        ENTRYAGGREGATOR => 'AND',
+    );
+
+    while ( my $txn = $txns->Next ) {
+        my $ticket = $txn->Object;
+        next if $txn->FirstCustomFieldValue( 'Worked Date' );    # we handle this in the next part
+        $ticket_worked{ $ticket->id } ||= { ticket => $ticket, };
+        $ticket_worked{ $ticket->id }{time_worked} += $txn->TimeTaken;
+        $total_time_worked += $txn->TimeTaken;
+    }
+
+    $txns = RT::Transactions->new( $user );
+    $txns->Limit(
+        FIELD => 'ObjectType',
+        VALUE => 'RT::Ticket',
+    );
+    $txns->Limit(
+        FIELD    => 'ObjectID',
+        VALUE    => \@ticket_ids,
+        OPERATOR => 'IN',
+    );
+
+    $txns->Limit(
+        FIELD    => 'TimeTaken',
+        VALUE    => 0,
+        OPERATOR => '!=',
+    );
+
+    my $cf = RT::CustomField->new( $user );
+    $cf->Load( 'Worked Date' );
+    my $cf_alias = $txns->Join(
+        ALIAS1 => 'main',
+        FIELD1 => 'id',
+        TABLE2 => 'ObjectCustomFieldValues',
+        FIELD2 => 'ObjectId'
+    );
+    $txns->Limit( ALIAS => $cf_alias, FIELD => 'CustomField', VALUE => $cf->id );
+    $txns->Limit( ALIAS => $cf_alias, FIELD => 'ObjectType',  VALUE => 'RT::Transaction' );
+    $txns->Limit(
+        ALIAS    => $cf_alias,
+        FIELD    => 'Content',
+        VALUE    => $start_date->ISO( Time => 0, Timezone => 'user' ),
+        OPERATOR => '>='
+    );
+    $txns->Limit(
+        ALIAS           => $cf_alias,
+        FIELD           => 'Content',
+        VALUE           => $exclusive_end_date->ISO( Time => 0, Timezone => 'user' ),
+        OPERATOR        => '<',
+        ENTRYAGGREGATOR => 'AND',
+    );
+
+    while ( my $txn = $txns->Next ) {
+        my $ticket = $txn->Object;
+        $ticket_worked{ $ticket->id } ||= { ticket => $ticket, };
+        $ticket_worked{ $ticket->id }{time_worked} += $txn->TimeTaken;
+        $total_time_worked += $txn->TimeTaken;
+    }
+}
+</%INIT>
+
+<%ARGS>
+$Query => undef
+$StartDate => undef
+$EndDate => undef
+$IncludeChildren => 1
+</%ARGS>

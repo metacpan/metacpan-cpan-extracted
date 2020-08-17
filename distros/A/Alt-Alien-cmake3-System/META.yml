@@ -8,9 +8,10 @@ build_requires:
   perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  IPC::Cmd: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,10 +24,12 @@ requires:
   IPC::Cmd: '0'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/plicease/Alt-Alien-cmake3-System/issues
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/PerlAlien/Alt-Alien-cmake3-System/issues
   homepage: https://metacpan.org/pod/Alt::Alien::cmake3::System
-  repository: git://github.com/plicease/Alt-Alien-cmake3-System.git
-version: '0.0402'
-x_generated_by_perl: v5.26.1
+  repository: git://github.com/PerlAlien/Alt-Alien-cmake3-System.git
+version: '0.0501'
+x_generated_by_perl: v5.33.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

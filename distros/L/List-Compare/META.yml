@@ -3,13 +3,13 @@ abstract: 'Compare elements of two or more lists'
 author:
   - 'James E Keenan (jkeenan@cpan.org)'
 build_requires:
+  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
-  IO::CaptureOutput: '0'
   Test::Simple: '0.1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,4 +23,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=List-Compare
   homepage: http://thenceforward.net/perl/modules/List-Compare/
   repository: https://github.com/jkeenan/list-compare.git
-version: '0.53'
+version: '0.55'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

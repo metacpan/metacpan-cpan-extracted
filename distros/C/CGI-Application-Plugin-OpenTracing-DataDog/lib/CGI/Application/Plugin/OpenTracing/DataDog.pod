@@ -1,0 +1,100 @@
+
+=head1 NAME
+
+CGI::Application::Plugin::OpenTracing::DataDog - Simple CGI with DataDog tracing
+
+
+
+=head1 VERSION
+
+This is version 'v0.1.0'
+
+
+
+=head1 SYNOPSIS
+
+    package My::CGI::App;
+    
+    use base 'CGI::Application';
+    use CGI::Application::Plugin::OpenTracing::DataDog
+        default_resource_name => 'my/index.cgi'
+    ;
+
+
+
+=head1 DESCRIPTION
+
+This module will make integrations for L<CGI::Application> based services even
+more convenient for those using DataDog as backend.
+
+
+
+=head1 ENVIRONMENT VARIABLES
+
+
+
+=head2 C<OPENTRACING_IMLEMENTATION>
+
+Set this one explitly to C<NoOp> to disable tracing. That is, the NoOp-Tracer is
+preventing code braakage but does not do much and certainly not send data across
+the network.
+
+Use this as DevOps to disable tracing with DataDog.
+
+This is opposite behavior compared to L<CGI::Application::Plugin::OpenTracing>,
+where it explictely needs to be set to enable tracing with a specific tracer
+implememtatation and fall back to NoOp.
+
+Setting this to anything else then C<NoOp> or C<DataDog> will cause compilation
+errors.
+
+
+
+=head1 CAVEAT
+
+At bootstrap the C<default_resource_name> MUST be set to a non empty string. Not
+doing so will be considered as a breaking error.
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Implementation::DataDog>
+
+Sending traces to DataDog using Agent.
+
+=item L<CGI::Application::Plugin::OpenTracing>
+
+Use OpenTracing in CGI Applications
+
+=item L<OpenTracing::Manual::Instrumentation>
+
+For Application developers and Devops
+
+=back
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'CGI::Application::Plugin::OpenTracing::DataDog'
+is Copyright (C) 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+=cut

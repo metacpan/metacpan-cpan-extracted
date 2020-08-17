@@ -1,5 +1,23 @@
                        User-Visible DocKnot Changes
 
+DocKnot 3.05 (2020-08-09)
+
+    Change the heuristic for when to refrain from wrapping output
+    paragraphs to require they start with three short lines rather than
+    two, ignore the indentation, and increase the threshold for a short
+    line to 45 characters from 40.
+
+    Force the badge for the Debian version in README.md to point to
+    unstable rather than stable.
+
+    Depend on JSON::MaybeXS instead of JSON, and List::SomeUtils instead
+    of List::MoreUtils.
+
+    Update to rra-c-util 8.3:
+
+    * Fix style issues caught by Perl::Critic::Freenode.
+    * Ignore debian/changelog when checking for obsolete strings.
+
 DocKnot 3.04 (2020-05-16)
 
     Change the vcs.travis metadata key to vcs.status.travis.  This will

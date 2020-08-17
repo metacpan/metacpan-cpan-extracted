@@ -25,7 +25,6 @@ use Time::HiRes  qw(time);  # for high-res time
 use List::Util   qw(shuffle sum);
 use Scalar::Util qw(weaken refaddr);
 
-use MariaDB::NonBlocking           qw(); # currently needed for get_simple_stacktrace()
 use MariaDB::NonBlocking::Promises qw(); # our default connector class
 
 use if DEBUG, 'Digest::MD5' => qw(md5_hex); # dumb fingerprinting when DEBUG is true
@@ -68,7 +67,7 @@ sub _log_query_timings { # Override
 }
 
 sub _deal_with_query_warnings { # Override
-    my ($pool, $query, $warnings, $stacktrace) = @_;
+    my ($pool, $query, $warnings, $raw_stacktrace) = @_;
 }
 
 sub _preprocess_query { # Override
@@ -77,7 +76,12 @@ sub _preprocess_query { # Override
 }
 
 sub _postprocess_query { # Override
-    my ($pool, $conn, $query, $query_start_time, $stack) = @_;
+    my ($pool, $conn, $query, $query_start_time, $raw_stack) = @_;
+}
+
+sub get_raw_stacktrace { # Override
+    my ($pool, $stracktrace_ignore) = @_;
+    return [];
 }
 
 sub _can_retry_error { # Override
@@ -151,12 +155,11 @@ sub run_query {
     $pending[PENDING_QUERY()]      = [$query, $bind];
     $pending[PENDING_ATTR()]       = $attr;
     $pending[PENDING_DEFERRED()]   = $deferred;
-    $pending[PENDING_STACKTRACE()] = \MariaDB::NonBlocking::get_simple_stacktrace($STACKTRACE_IGNORE);
+    $pending[PENDING_STACKTRACE()] = $pool->get_raw_stacktrace($STACKTRACE_IGNORE);
     $pool->_add_to_pending(\@pending);
 
     return $deferred->promise;
 }
-
 
 our $MYSQL_MAX_EXECUTION_TIME = 4;
 sub new {
@@ -167,7 +170,7 @@ sub new {
     $database_name //= $schema_name;
     $mode          //= 'ro';
 
-    my $max_execution_time = $new_args->{max_execution_time} || $MYSQL_MAX_EXECUTION_TIME || 4;
+    my $max_execution_time = $new_args->{max_execution_time} // $MYSQL_MAX_EXECUTION_TIME;
 
     my $pool_name  = $schema_name ne $database_name
                    ? join('-', $schema_name, $database_name, $mode)
@@ -512,12 +515,19 @@ sub _add_to_pending_array {
     return;
 }
 
+sub format_stacktrace { # override
+    my ($pool, $raw_stacktrace) = @_;
+    return "";
+}
+
 sub fail_pending {
     my ($pool, $error_string) = @_;
     while ( my $pending = $pool->_get_from_pending() ) {
+        next unless $pending;
         my $deferred       = $pending->[PENDING_DEFERRED];
-        my $stacktrace_ref = $pending->[PENDING_STACKTRACE];
-        $deferred->reject($error_string . $$stacktrace_ref)
+        next unless $deferred; # global destruction
+        my $stacktrace = $pool->format_stacktrace($pending->[PENDING_STACKTRACE]);
+        $deferred->reject($error_string . $stacktrace)
             if $deferred->is_in_progress;
     }
 }
@@ -527,7 +537,7 @@ sub fail_queries_left_scheduled_for_too_long {
     my $pending_queries = $pool->{pending_queries} // [];
     return unless @$pending_queries;
 
-    my $time_in_seconds_a_query_can_remain_in_the_pool_without_being_run = $pool->{max_execution_time};
+    my $time_in_seconds_a_query_can_remain_in_the_pool_without_being_run = $pool->{max_scheduling_time} // $pool->{max_execution_time} // 4;
     $time_in_seconds_a_query_can_remain_in_the_pool_without_being_run *= 1.5;
 
     my $time      = time;
@@ -549,8 +559,8 @@ sub fail_queries_left_scheduled_for_too_long {
     foreach my $pending (@removed) {
         my $query_id       = refaddr $pending;
         my $deferred       = $pending->[PENDING_DEFERRED];
-        my $stacktrace_ref = $pending->[PENDING_STACKTRACE];
-        my $timeout_message = sprintf(<<"EOERROR", $scheduling_timeout, $query_id, $$stacktrace_ref);
+        my $stacktrace     = $pool->format_stacktrace($pending->[PENDING_STACKTRACE]);
+        my $timeout_message = sprintf(<<"EOERROR", $scheduling_timeout, $query_id, $stacktrace);
 MySQL query (nonblocking) could not be started after %d seconds, so we are marking it as failed.
 Query ID: %d
 See http://go/:Nt for details on how to deal with this.
@@ -560,7 +570,7 @@ Stacktrace:
 EOERROR
 
         $deferred->reject($timeout_message)
-            if $deferred->is_in_progress;
+            if $deferred && $deferred->is_in_progress;
     }
 }
 
@@ -571,7 +581,7 @@ sub _add_to_pending {
     # Start the retry counter
     $to_enqueue->[PENDING_SCHEDULED_TIME]      = time;
     $to_enqueue->[PENDING_RETRIES_REMAINING] //= $pool->{query_retries};
-    $to_enqueue->[PENDING_STACKTRACE]        //= \''; # No stacktrace given
+    $to_enqueue->[PENDING_STACKTRACE]        //= $pool->get_raw_stacktrace($STACKTRACE_IGNORE); # No stacktrace given
 
     # add to the current pending pool
     $pool->_add_to_pending_array($to_enqueue);
@@ -589,7 +599,7 @@ sub _add_to_pending {
 
 use constant SHOW_WARNINGS_SQL => 'SHOW WARNINGS';
 sub _report_warnings_and_return_to_pool {
-    my ($outside_pool, $outside_conn, $query, $stacktrace) = @_;
+    my ($outside_pool, $outside_conn, $query, $raw_stacktrace) = @_;
 
     my $time0 = time();
     my $cpu0  = times;
@@ -612,7 +622,7 @@ sub _report_warnings_and_return_to_pool {
 
         return unless is_arrayref($warnings);
 
-        return $pool->_deal_with_query_warnings( $query, $warnings, $stacktrace );
+        return $pool->_deal_with_query_warnings( $query, $warnings, $raw_stacktrace );
     },
     sub {
         # reject handler:
@@ -646,11 +656,14 @@ sub _run_query {
     $attr->{want_hashrefs} = 1 unless exists $attr->{want_hashrefs};
 
     # Force all queries to have timeouts.
-    $attr->{perl_timeout}
-        = ($attr->{timeout}//0) <= 0
-            # Default to slightly higher than the MySQL timeout:
-            ? $outside_pool->{max_execution_time} * 1.2
-            : $attr->{timeout};
+    if ( !defined $attr->{timeout} || $attr->{timeout} < 0 ) {
+        # Default to slightly higher than the MySQL timeout:
+        $attr->{perl_timeout} = $outside_pool->{max_execution_time} * 1.2;
+    }
+    else {
+        # timeout may be zero:
+        $attr->{perl_timeout} = $attr->{timeout};
+    }
 
     my $conn = $outside_conn;
     weaken($conn);
@@ -723,8 +736,11 @@ sub _run_query {
 
         $error = $pool->_format_query_error($query, $error, $conn, $time0, $cpu0);
 
-        $deferred->reject($error . ${$pending->[PENDING_STACKTRACE]})
-            if $deferred->is_in_progress; # fail the promise
+        if ( $deferred && $deferred->is_in_progress ) {
+            # fail the promise
+            my $stacktrace = $pool->format_stacktrace($pending->[PENDING_STACKTRACE]);
+            $deferred->reject($error . $stacktrace);
+        }
 
         # TODO so... here we could check if the connection
         # is still viable and add it back into the pool.
@@ -736,8 +752,11 @@ sub _run_query {
     })->catch(sub {
         my $e = $_[0];
 
-        # TODO: is this double-appending the stacktrace?
-        $deferred->reject( "Error when running query: $e" . ${$pending->[PENDING_STACKTRACE]} ) if $deferred->is_in_progress;
+        if ( $deferred && $deferred->is_in_progress ) {
+            # TODO: is this double-appending the stacktrace?
+            my $stacktrace = $pool->format_stacktrace($pending->[PENDING_STACKTRACE]);
+            $deferred->reject( "Error when running query: $e" . $stacktrace );
+        }
 
         $pool->_remove_connection_and_extend( $conn ) if $pool;
     })->finally(sub {
@@ -800,7 +819,7 @@ sub _start_running_queries_if_needed {
         eval {
             $pool->_log_time_to_be_scheduled($pending->[PENDING_SCHEDULED_TIME]);
 
-            if ( !$deferred->is_in_progress ) {
+            if ( !$deferred || !$deferred->is_in_progress ) {
                 # Probably timed out
                 DEBUG && TELL "Found already finished query in the deferred queue";
                 next PENDING;
@@ -821,8 +840,10 @@ sub _start_running_queries_if_needed {
             my $e = $@ || 'zombie error';
             DEBUG && TELL "Failed to run query: $e";
 
-            $deferred->reject($e . ${$pending->[PENDING_STACKTRACE]})
-                if $deferred->is_in_progress;
+            if ( $deferred && $deferred->is_in_progress ) {
+                my $stacktrace = $pool->format_stacktrace($pending->[PENDING_STACKTRACE]);
+                $deferred->reject($e . $stacktrace);
+            }
             next PENDING;
         };
         return $p;

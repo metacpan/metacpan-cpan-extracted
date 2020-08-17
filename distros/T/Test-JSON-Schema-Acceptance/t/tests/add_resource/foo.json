@@ -1,0 +1,13 @@
+[
+    {
+        "description": "empty schema",
+        "schema": {},
+        "tests": [
+            {
+                "description": "integer",
+                "data": 2,
+                "valid": true
+            }
+        ]
+    }
+]

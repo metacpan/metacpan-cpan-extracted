@@ -27,6 +27,7 @@ lib/Dancer/Plugin/RPC/JSONRPC.pm
 lib/Dancer/Plugin/RPC/RESTRPC.pm
 lib/Dancer/Plugin/RPC/XMLRPC.pm
 lib/Dancer/RPCPlugin/CallbackResult.pm
+lib/Dancer/RPCPlugin/DefaultRoute.pm
 lib/Dancer/RPCPlugin/DispatchFromConfig.pm
 lib/Dancer/RPCPlugin/DispatchFromPod.pm
 lib/Dancer/RPCPlugin/DispatchItem.pm
@@ -44,6 +45,10 @@ t/030-dispatchmethodlist.t
 t/040-flatten-data.t
 t/050-error-response.t
 t/060-plugin-names.t
+t/070-default-route-no-rpc.t
+t/071-default-route-xmlrpc.t
+t/072-default-route-jsonrpc.t
+t/073-default-route-restrpc.t
 t/100-xmlrpc.t
 t/150-jsonrpc.t
 t/175-restrpc.t
@@ -51,8 +56,12 @@ t/200-register-xmlrpc.t
 t/250-register-jsonrpc.t
 t/275-register-restrpc.t
 t/400-list_methods.t
+t/Test/abeltje.pm
 t/bin/app.pl
 t/config.yml
+t/lib/MyTest/API.pm
+t/lib/MyTest/Client.pm
+t/lib/MyTest/Exception.pm
 t/lib/SOMERPC.pm
 t/lib/TestProject.pm
 t/lib/TestProject/ApiCalls.pm

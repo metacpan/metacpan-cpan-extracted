@@ -5,7 +5,7 @@ use warnings;
 use base 'Alien::Base';
 
 # ABSTRACT: Test Module for Alien::Base + Alien::Build
-our $VERSION = '2.1100'; # VERSION
+our $VERSION = '2.2900'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Acme::Alien::DontPanic2 - Test Module for Alien::Base + Alien::Build
 
 =head1 VERSION
 
-version 2.1100
+version 2.2900
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ L<Acme::Ford::Prefect>
 
 =head1 SOURCE REPOSITORY
 
-L<http://github.com/Perl5-Alien/Acme-Alien-DontPanic2>
+L<http://github.com/PerlAlien/Acme-Alien-DontPanic2>
 
 =head1 AUTHORS
 

@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Scenarios-TextTableTiny"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

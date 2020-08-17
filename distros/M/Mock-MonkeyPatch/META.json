@@ -1,16 +1,16 @@
 {
    "abstract" : "Monkey patching with test mocking in mind",
    "author" : [
-      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+      "Joel Berger, <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.018",
+   "generated_by" : "App::ModuleBuildTiny version 0.028",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mock-MonkeyPatch",
    "prereqs" : {
@@ -21,7 +21,12 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.018"
+            "App::ModuleBuildTiny" : "0.028"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Sub::Util" : "1.40"
          }
       },
       "test" : {
@@ -33,7 +38,7 @@
    "provides" : {
       "Mock::MonkeyPatch" : {
          "file" : "lib/Mock/MonkeyPatch.pm",
-         "version" : "0.04"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -48,6 +53,7 @@
          "url" : "http://github.com/jberger/Mock-MonkeyPatch"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

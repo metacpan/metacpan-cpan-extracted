@@ -25,7 +25,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-my $want_version = 10;
+my $want_version = 11;
 is ($Tie::TZ::VERSION, $want_version, 'VERSION variable');
 is (Tie::TZ->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { Tie::TZ->VERSION($want_version); 1 },

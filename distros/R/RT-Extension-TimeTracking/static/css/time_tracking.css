@@ -24,6 +24,7 @@ div.time_worked_day {
     right: 5px;
 }
 
+div.time_search div.time_worked,
 div.time_worked_week {
     text-align: right;
 }
@@ -37,3 +38,6 @@ div.time_tracking h2 {
     margin-top: 30px;
 }
 
+div.time_tracking div.include-children div.value {
+    margin-top: 5px;
+}

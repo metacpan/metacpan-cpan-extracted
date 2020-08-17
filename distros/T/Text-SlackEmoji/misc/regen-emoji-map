@@ -1,32 +1,42 @@
 #!perl
-use 5.23.8;
+use 5.32.0;
 use strict;
 use warnings;
 
-# perl5120delta - 5.12.0 == Unicode 5.2
-# perl5140delta - 5.14.0 == Unicode 6
-# perl5160delta - 5.16.0 == Unicode 6.1
-# perl5180delta - 5.18.0 == Unicode 6.2
-# perl5200delta - 5.20.0 == Unicode 6.3
-# perl5220delta - 5.22.0 == Unicode 7
-# perl5240delta - 5.24.0 == Unicode 8
+# perl5120delta - 5.12.0 == Unicode 5.2  - V5_2
+# perl5140delta - 5.14.0 == Unicode 6    - V6_0
+# perl5160delta - 5.16.0 == Unicode 6.1  - V6_1
+# perl5180delta - 5.18.0 == Unicode 6.2  - V6_2
+# perl5200delta - 5.20.0 == Unicode 6.3  - V6_3
+# perl5220delta - 5.22.0 == Unicode 7    - V7_0
+# perl5240delta - 5.24.0 == Unicode 8    - V8_0
+# perl5260delta - 5.26.0 == Unicode 9    - V9_0
+# perl5280delta - 5.28.0 == Unicode 10   - V10_0
+# perl5300delta - 5.30.0 == Unicode 12.1 - V12_1
+# perl5320delta - 5.32.0 == Unicode 13   - V13_0
 my %min_perl = (
-  V5_2 => '5.012',
-  V6_0 => '5.014',
-  V6_1 => '5.016',
-  V6_2 => '5.018',
-  V6_3 => '5.020',
-  V7_0 => '5.022',
-  V8_0 => '5.023008', # placeholder for 5.024
+  52  => '5.012',
+  60  => '5.014',
+  61  => '5.016',
+  62  => '5.018',
+  63  => '5.020',
+  70  => '5.022',
+  80  => '5.024',
+  90  => '5.026',
+  100 => '5.028',
+  110 => '5.030',
+  120 => '5.030',
+  121 => '5.030',
+  130 => '5.032',
 );
-
-my $MIN_AGE = 'V5_2';
-my $MAX_AGE = 'V8_0';
 
 use HTTP::Tiny;
 use JSON;
-use List::Util qw(maxstr);
+use List::Util qw(min max);
 use Unicode::UCD 'charprop';
+
+my $MIN_AGE = min keys %min_perl;
+my $MAX_AGE = max keys %min_perl;
 
 my $res = HTTP::Tiny->new->get(
   "https://raw.githubusercontent.com/iamcal/emoji-data/master/emoji.json",
@@ -41,11 +51,11 @@ my $data = JSON->new->decode($json);
 my %emoji;
 
 for my $char (sort { $a->{short_name} cmp $b->{short_name} } @$data) {
-  my @points  = split /-/, ($char->{variations}->[0] || $char->{unified});
+  my @points  = split /-/, $char->{unified};
 
-  my $max_age = maxstr map {; charprop( hex("0x$_"), "Age") } @points;
-  if ($max_age lt $MIN_AGE) { $max_age = $MIN_AGE }
-  if ($max_age gt $MAX_AGE) { die "can't handle unicode age $max_age\n" }
+  my $max_age = max map {; charprop( hex("0x$_"), "Age") =~ s/[^0-9]+//gr } @points;
+  if ($max_age < $MIN_AGE) { $max_age = $MIN_AGE }
+  if ($max_age > $MAX_AGE) { die "can't handle unicode age $max_age\n" }
 
   my $perl = $min_perl{ $max_age };
   die "can't handle $max_age\n" unless $perl;

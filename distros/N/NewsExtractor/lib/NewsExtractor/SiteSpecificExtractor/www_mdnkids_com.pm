@@ -3,11 +3,11 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::GenericExtractor';
 
-use Importer 'NewsExtractor::TextUtil' => qw(parse_dateline_ymdhms);
+use Importer 'NewsExtractor::TextUtil' => qw(reformat_dateline);
 
 sub dateline {
     my ($self) = @_;
-    return parse_dateline_ymdhms( $self->dom->at('td.newsbox_content_txt')->all_text(), '+08:00' );
+    return reformat_dateline( $self->dom->at('td.newsbox_content_txt')->all_text(), '+08:00' );
 }
 
 sub journalist {

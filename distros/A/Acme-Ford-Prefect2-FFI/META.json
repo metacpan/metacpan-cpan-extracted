@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -24,6 +24,10 @@
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
             "Test::More" : "0.98",
@@ -38,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Acme::Alien::DontPanic2" : "2.1100",
+            "Acme::Alien::DontPanic2" : "2.2900",
             "FFI::CheckLib" : "0.15",
             "FFI::Platypus" : "1.00",
             "FFI::Platypus::Declare" : "0",
@@ -55,19 +59,20 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Perl5-Alien/Acme-Ford-Prefect2-FFI/issues"
+         "web" : "https://github.com/PerlAlien/Acme-Ford-Prefect2-FFI/issues"
       },
       "homepage" : "https://metacpan.org/pod/Acme::Ford::Prefect2::FFI",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Perl5-Alien/Acme-Ford-Prefect2-FFI.git",
-         "web" : "https://github.com/Perl5-Alien/Acme-Ford-Prefect2-FFI"
+         "url" : "git://github.com/PerlAlien/Acme-Ford-Prefect2-FFI.git",
+         "web" : "https://github.com/PerlAlien/Acme-Ford-Prefect2-FFI"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.1100",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "version" : "2.2900",
+   "x_generated_by_perl" : "v5.33.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }
 

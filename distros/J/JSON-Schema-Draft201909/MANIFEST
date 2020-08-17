@@ -34,9 +34,6 @@ t/additional-tests.t
 t/additional-tests/README
 t/additional-tests/anchor.json
 t/additional-tests/format-duration.json
-t/additional-tests/format-idn-email.json
-t/additional-tests/format-ipv6.json
-t/additional-tests/format-uuid.json
 t/additional-tests/future-keywords-draft2019-09.json
 t/additional-tests/id.json
 t/additional-tests/invalid-id-and-anchor.json
@@ -46,7 +43,7 @@ t/additional-tests/not-an-id.json
 t/additional-tests/recursiveRef.json
 t/additional-tests/ref-and-id.json
 t/additional-tests/ref.json
-t/additional-tests/unevaluatedProperties.json
+t/additional-tests/unicode.json
 t/annotations.t
 t/booleans.t
 t/cached-metaschemas.t
@@ -58,6 +55,7 @@ t/find-identifiers.t
 t/formats.t
 t/lib/Helper.pm
 t/max_traversal_depth.t
+t/pattern.t
 t/ref.t
 t/type.t
 t/zzz-acceptance.t

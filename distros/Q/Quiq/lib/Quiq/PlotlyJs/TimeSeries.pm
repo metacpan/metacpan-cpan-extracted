@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.185';
+our $VERSION = '1.186';
 
 use Quiq::Json;
 use Quiq::Template;
@@ -137,7 +137,7 @@ Windgeschwindigkeits-Messung)
 
 <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
 <script type="text/javascript" src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<div id="plot" class="plotly-timeseries" style="height: 400px; border: 1px dotted #b0b0b0; margin-bottom: 0.8em;"></div>
+<div id="plot" class="plotly-timeseries" style="height: 400px; border: 1px dotted #b0b0b0;"></div>
 <script type="text/javascript">
   $(function() {
     var plot = Plotly.newPlot('plot',[{
@@ -631,7 +631,7 @@ sub js {
 
 =head1 VERSION
 
-1.185
+1.186
 
 =head1 AUTHOR
 

@@ -5,20 +5,23 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  JSON::PP: '0'
+  Test2::Suite: '0.000131'
   Test::Deep: '0'
+  Test::Fatal: '0'
   Test::File::ShareDir: '0'
   Test::More: '0.88'
-  Test::Tester: '0.108'
+  Test::Simple: '1.302176'
   Test::Warnings: '0'
   feature: '0'
   lib: '0'
   open: '0'
-  perl: v5.10.0
+  perl: '5.014'
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
-  perl: '5.010'
+  perl: '5.014'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -36,7 +39,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '0.999'
+    version: '1.000'
 requires:
   File::ShareDir: '0'
   JSON::MaybeXS: '1.004001'
@@ -44,23 +47,26 @@ requires:
   Moo: '0'
   MooX::TypeTiny: '0.002002'
   Path::Tiny: '0.062'
-  Test::Fatal: '0'
-  Test::More: '0.88'
+  Storable: '3.00'
+  Test2::API: '0'
+  Test2::Todo: '0'
+  Test2::Tools::Compare: '0'
+  Try::Tiny: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '1.010002'
   if: '0'
   namespace::clean: '0'
-  perl: v5.10.0
+  perl: '5.014'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '0.999'
+version: '1.000'
 x_Dist_Zilla:
   perl:
-    version: '5.031011'
+    version: '5.032000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeBuild
@@ -82,10 +88,33 @@ x_Dist_Zilla:
           quiet: 0
           run:
             - 'git submodule update --remote'
-            - "echo \"run './update-share' to commit submodule updates to share/\""
+            - "if [[ -n $(git status --untracked --porcelain share) ]]; then echo \"!!! submodule has changed! run './update-share' to commit updates to share/\"; fi"
           version: '0.048'
       name: Run::BeforeRelease
       version: '0.048'
+    -
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename:
+            - index.js
+            - package.json
+            - tox.ini
+          exclude_match:
+            - ^bin/
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: share
+          prune_directory: []
+          root: share
+        Dist::Zilla::Plugin::Git::GatherDir:
+          include_untracked: 0
+      name: 'Gather sharedir'
+      version: '2.046'
+    -
+      class: inc::OldShareDirFiles
+      name: =inc::OldShareDirFiles
+      version: ~
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -301,7 +330,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Author::ETHER/Test::ReportPrereqs'
-      version: '0.027'
+      version: '0.028'
     -
       class: Dist::Zilla::Plugin::Test::Portability
       config:
@@ -512,7 +541,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.25.0
+          git_version: 2.28.0
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -579,7 +608,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20200428'
+          Module::CoreList: '5.20200717'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -604,7 +633,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.046'
@@ -612,7 +641,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -620,7 +649,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -646,7 +675,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.046'
@@ -729,7 +758,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -742,11 +771,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.999
+          tag: v1.000
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -783,7 +812,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -805,7 +834,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.046'
@@ -854,37 +883,22 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: requires
-      name: DevelopRequires
+          phase: runtime
+          type: suggests
+      name: RuntimeSuggests
       version: '6.015'
     -
-      class: Dist::Zilla::Plugin::Git::GatherDir
+      class: Dist::Zilla::Plugin::Prereqs
       config:
-        Dist::Zilla::Plugin::GatherDir:
-          exclude_filename:
-            - index.js
-            - package.json
-            - tox.ini
-          exclude_match:
-            - ^bin/
-          follow_symlinks: 0
-          include_dotfiles: 0
-          prefix: share
-          prune_directory: []
-          root: share
-        Dist::Zilla::Plugin::Git::GatherDir:
-          include_untracked: 0
-      name: 'Gather sharedir'
-      version: '2.046'
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::GenerateFile
       name: submodule_status
       version: '6.015'
-    -
-      class: inc::OldShareDirFiles
-      name: =inc::OldShareDirFiles
-      version: ~
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: ShareDir
@@ -943,7 +957,7 @@ x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Ben Hutton <relequestual@cpan.org>'
   - 'Daniel Perrett <dp13@sanger.ac.uk>'
-x_generated_by_perl: v5.31.11
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT
 x_static_install: 0

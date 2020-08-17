@@ -1,0 +1,6 @@
+0.02 2020-08-11T23:20:44+02:00
+ - Fix computation and improve example to 1 degree of zodiac.
+ - Rename variable $angle_degree to better name $full_angle_degree.
+
+0.01 2020-08-11T14:26:20+02:00
+ - First version.

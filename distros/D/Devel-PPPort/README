@@ -61,7 +61,7 @@ version of this module:
 If you find any bugs, Devel::PPPort doesn't seem to build on your
 system, or any of its tests fail, please file an issue here:
 
-  https://github.com/mhx/Devel-PPPort/issues/
+  https://github.com/Dual-Life/Devel-PPPort/issues
 
 to create a ticket for the module.
 

@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Module/FatPack/fatpack_modules
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2019-02-08'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-30'; # DATE
 our $DIST = 'App-FatPackUtils'; # DIST
-our $VERSION = '0.120'; # VERSION
+our $VERSION = '0.121'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,13 +36,27 @@ fatpack-modules - Generate source code that contains fatpacked modules
 
 =head1 VERSION
 
-This document describes version 0.120 of fatpack-modules (from Perl distribution App-FatPackUtils), released on 2019-02-08.
+This document describes version 0.121 of fatpack-modules (from Perl distribution App-FatPackUtils), released on 2020-04-30.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % fatpack-modules [options] [module_name] ...
+ % fatpack-modules [--add-begin-block] [--assume-strict]
+     [--config-path=path | -c] [--config-profile=profile | -P]
+     [--format=name] [--json] [--line-prefix=s] [-m=s+] [--module-name=s+]
+     [--module-names-json=s] [--module-src key=s] [--module-srcs-json=s]
+     [--(no)naked-res] [--no-add-begin-block] [--no-assume-strict]
+     [--no-config | -C] [--no-env] [--no-overwrite] [--no-stripper]
+     [--no-stripper-comment] [--no-stripper-log]
+     [--no-stripper-maintain-linum] [--no-stripper-pod] [--no-stripper-ws]
+     [--noadd-begin-block] [--noassume-strict] [--nooverwrite]
+     [--nostripper] [--nostripper-comment] [--nostripper-log]
+     [--nostripper-maintain-linum] [--nostripper-pod] [--nostripper-ws]
+     [-o=s] [--output=s] [--overwrite] [--page-result[=program]] [--pm]
+     [--postamble=s] [--preamble=s] [--put-hook-at-the-end] [--stripper]
+     [--stripper-comment] [--stripper-log] [--stripper-maintain-linum]
+     [--stripper-pod] [--stripper-ws] [module_name] ...
 
 Examples:
 
@@ -69,9 +84,11 @@ C<*> marks required options.
 
 Surround the code inside BEGIN { }.
 
-=item B<--line-prefix>=I<s>
+=item B<--assume-strict>
 
-=item B<--no-assume-strict>
+Assume code runs under stricture.
+
+=item B<--line-prefix>=I<s>
 
 =item B<--pm>
 
@@ -92,7 +109,7 @@ Put the require hook at the end of @INC using "push" instead of at the front usi
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -199,6 +216,10 @@ Output filename.
 
 Overwrite output if previously exists.
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =back
 
 =head2 Stripping options
@@ -298,7 +319,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 List of available configuration parameters:
 
  add_begin_block (see --add-begin-block)
- assume_strict (see --no-assume-strict)
+ assume_strict (see --assume-strict)
  format (see --format)
  line_prefix (see --line-prefix)
  module_names (see --module-name)
@@ -353,7 +374,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

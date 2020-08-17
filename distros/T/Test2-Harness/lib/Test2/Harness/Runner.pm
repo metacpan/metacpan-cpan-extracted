@@ -2,7 +2,7 @@ package Test2::Harness::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000020';
+our $VERSION = '1.000023';
 
 use File::Spec();
 
@@ -11,7 +11,7 @@ use Fcntl qw/LOCK_EX LOCK_UN LOCK_NB/;
 use Long::Jump qw/setjump longjump/;
 use Time::HiRes qw/sleep time/;
 
-use Test2::Harness::Util qw/clean_path file2mod mod2file open_file parse_exit write_file_atomic process_includes/;
+use Test2::Harness::Util qw/clean_path file2mod mod2file open_file parse_exit write_file_atomic process_includes chmod_tmp/;
 use Test2::Harness::Util::Queue();
 
 use Test2::Harness::Runner::Constants;
@@ -84,6 +84,7 @@ sub init {
     my $tmp_dir = File::Spec->catdir($self->{+DIR}, 'tmp');
     unless (-d $tmp_dir) {
         mkdir($tmp_dir) or die "Could not create temp dir: $!";
+        chmod_tmp($tmp_dir);
     }
     $self->{+TMP_DIR} = $tmp_dir;
 

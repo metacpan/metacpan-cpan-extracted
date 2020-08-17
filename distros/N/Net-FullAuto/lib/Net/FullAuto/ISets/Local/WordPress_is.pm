@@ -213,7 +213,7 @@ my $configure_wordpress=sub {
          ' unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel'.
          ' ncurses-devel xmlto autoconf libmcrypt libmcrypt-devel'.
          ' libcurl libcurl-devel libicu libicu-devel re2c'.
-         ' libpng-devel.x86_64 freetype-devel.x86_64 cmake '.
+         ' libpng-devel.x86_64 freetype-devel.x86_64 cmake'.
          ' oniguruma oniguruma-devel tcl tcl-devel git-all',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -958,42 +958,71 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.'service nginx start',
          '__display__');
       ($stdout,$stderr)=$handle->cwd("$nginx_path/nginx");
-      foreach my $num (1..3) {
-         sleep 3;
-         ($stdout,$stderr)=clean_filehandle($handle);
-         $handle->print($sudo.
-            "certbot --nginx -d $domain_url -d www.$domain_url");
-         $prompt=$handle->prompt();
-         my $output='';
-         while (1) {
-            $output.=fetch($handle);
-            last if $output=~/$prompt/;
-            print $output;
-            if (-1<index $output,'Attempt to reinstall') {
-               $handle->print('1');
-               $output='';
-            } elsif (-1<index $output,'No redirect') {
-               $handle->print('2');
-               $output='';
-            } elsif (-1<index $output,'Enter email address') {
-               $handle->print('brian.kelly@fullauto.com');
-               $output='';
-            } elsif (-1<index $output,'Terms of Service') {
-               $handle->print('A');
-               $output='';
-            } elsif (-1<index $output,'Would you be willing') {
-               $handle->print('Y');
-               $output='';
-            } elsif ((-1<index $output,'existing certificate')
-                  && (-1==index $output,'--duplicate')) {
-               $handle->print('C');
-               $output='';
-            }
-         }
-         ($stdout,$stderr)=clean_filehandle($handle);
+      test_for_amazon_ec2();
+      if ($main::amazon) {
+         ($stdout,$stderr)=$handle->cmd('wget https://dl.eff.org/certbot-auto');
+         ($stdout,$stderr)=$handle->cmd('chmod -v a+x certbot-auto','__display__');
+         my $ad='%SP%%SP%}%NL%'.
+            '  BOOTSTRAP_VERSION="BootstrapRpmCommon $BOOTSTRAP_RPM_COMMON_VERSION"%NL%'.
+            'elif grep -i "Amazon Linux" /etc/issue > /dev/null 2>&1 || \%NL%'.
+            '     grep %SQ%cpe:.*:amazon_linux:2%SQ% /etc/os-release > /dev/null 2>&1; then%NL%'.
+            '  Bootstrap() {%NL%'.
+            '    ExperimentalBootstrap "Amazon Linux" BootstrapRpmCommon%NL%'.
+            '  }%NL%'.
+            '  BOOTSTRAP_VERSION="BootstrapRpmCommon $BOOTSTRAP_RPM_COMMON_VERSION"';
+         ($stdout,$stderr)=$handle->cmd(
+            "sed -i -e '/Amazon Linux. BootstrapRpmCommon/{n;N;d}' certbot-auto");
+         ($stdout,$stderr)=$handle->cmd(
+            "${sudo}sed -i \'/Amazon Linux. BootstrapRpmCommon/a$ad\' certbot-auto");
+         ($stdout,$stderr)=$handle->cmd(
+            "${sudo}sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
+            'certbot-auto');
+         ($stdout,$stderr)=$handle->cmd(
+            "${sudo}sed -i \'s/%SP%/ /g\' ".
+            'certbot-auto');
+         ($stdout,$stderr)=$handle->cmd("${sudo}sed -i \"s/%SQ%/\'/g\" ".
+            'certbot-auto');
          ($stdout,$stderr)=$handle->cmd($sudo.
-            'grep Certbot /etc/nginx/nginx.conf');
-         last if $stdout;
+            "certbot --debug --nginx -d $domain_url -d www.$domain_url",
+            '__display__');
+      } else {
+         foreach my $num (1..3) {
+            sleep 3;
+            ($stdout,$stderr)=clean_filehandle($handle);
+            $handle->print($sudo.
+               "certbot --nginx -d $domain_url -d www.$domain_url");
+            $prompt=$handle->prompt();
+            my $output='';
+            while (1) {
+               $output.=fetch($handle);
+               last if $output=~/$prompt/;
+               print $output;
+               if (-1<index $output,'Attempt to reinstall') {
+                  $handle->print('1');
+                  $output='';
+               } elsif (-1<index $output,'No redirect') {
+                  $handle->print('2');
+                  $output='';
+               } elsif (-1<index $output,'Enter email address') {
+                  $handle->print('brian.kelly@fullauto.com');
+                  $output='';
+               } elsif (-1<index $output,'Terms of Service') {
+                  $handle->print('A');
+                  $output='';
+               } elsif (-1<index $output,'Would you be willing') {
+                  $handle->print('Y');
+                  $output='';
+               } elsif ((-1<index $output,'existing certificate')
+                     && (-1==index $output,'--duplicate')) {
+                  $handle->print('C');
+                  $output='';
+               }
+            }
+            ($stdout,$stderr)=clean_filehandle($handle);
+            ($stdout,$stderr)=$handle->cmd($sudo.
+               'grep Certbot /etc/nginx/nginx.conf');
+            last if $stdout;
+         }
       }
       # https://ssldecoder.org
 $do=0;
@@ -1512,6 +1541,9 @@ END
       } elsif (-1<index $output,'Set root password? [Y/n]') {
          $handle->print('n');
          next;
+      } elsif (-1<index $output,'Switch to unix_socket authentication [Y/n]') {
+         $handle->print('n');
+         next;
       } elsif (-1<index $output,'Remove anonymous users? [Y/n]') {
          $handle->print('Y');
          next;
@@ -1667,7 +1699,7 @@ END
          'git checkout -b remotes/origin/stable',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         './autogen.sh','__display__');
+         './autogen.sh -s','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './configure','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1830,10 +1862,16 @@ END
          'http://pear.php.net/go-pear.phar',
          '__display__');
       $handle->print($sudo.'/usr/local/bin/php /opt/source/go-pear.phar');
+      my $outputt='';
       while (my $line=fetch($handle)) {
          last if $line=~/$prompt/s;
-         if ($line=~/Enter to continue:\s*$/s) {
+         $outputt.=$line;
+         if ($outputt=~/Enter to continue:\s*$/s) {
             $handle->print();
+            $outputt='';
+         } elsif (-1<index $outputt,'/php.ini>? [Y/n] :') {
+            $handle->print('n');
+            $outputt='';
          }
       }
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1877,6 +1915,12 @@ END
       "--admin_password=$service_and_cert_password ".
       '--allow-root --path=/var/www/html/wordpress',
       '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/wp plugin install really-simple-ssl '.
+      '--path=/var/www/html/wordpress','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/wp plugin activate really-simple-ssl '.
+      '--path=/var/www/html/wordpress','__display__');
 $do=0;
 if ($do==1) {
    my $theme='memberlite';
@@ -3311,6 +3355,10 @@ if ($do==1) {
       "https://artifacts.elastic.co/downloads/".
       "elasticsearch/elasticsearch-5.0.0.rpm",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'rpm --install elasticsearch-*rpm','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl daemon-reload','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl enable elasticsearch','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl start elasticsearch','__display__');
@@ -3762,6 +3810,66 @@ sub exit_on_error {
    };alarm(0);
    print "\n\n";
    cleanup;
+
+}
+
+sub test_for_amazon_ec2 {
+
+   if ($^O eq 'linux' || $^O eq 'freebsd') {
+      if ((-e "/etc/system-release-cpe") &&
+            ((-1<index `cat /etc/system-release-cpe`,'amazon:linux') ||
+            (-1<index `cat /etc/system-release-cpe`,'amazon_linux'))) {
+         $main::amazon{'ami'}='';
+         $main::system_type='ami';
+      } elsif ((-e "/etc/os-release") &&
+            (-1<index `cat /etc/os-release`,'ubuntu')) {
+         if (-e "/usr/bin/ec2metadata") {
+            $main::amazon{'ubuntu'}='';
+         }
+         $main::system_type='ubuntu';
+      } elsif ($^O eq 'freebsd') {
+         if ((-e "/usr/local/bin/aws") &&
+               (-1<index `cat /usr/local/bin/aws`,'aws.amazon')) {
+            $main::amazon{'freebsd'}='';
+         }
+         $main::system_type='freebsd';
+      } elsif (-e "/etc/SuSE-release") {
+         if (-e "/etc/profile.d/amazonEC2.sh") {
+            $main::amazon{'suse'}='';
+         }
+         $main::system_type='suse';
+      } elsif ((-e "/etc/system-release-cpe") &&
+            (-1<index `cat /etc/system-release-cpe`,
+            'fedoraproject')) {
+         if (-e "/etc/yum/pluginconf.d/amazon-id.conf") {
+            $main::amazon{'fedora'}='';
+         }
+         $main::system_type='fedora';
+      } elsif ((-e "/etc/system-release-cpe") &&
+            (-1<index `cat /etc/system-release-cpe`,
+            'redhat:enterprise_linux')) {
+         if (-e "/etc/yum/pluginconf.d/amazon-id.conf") {
+            $main::amazon{'rhel'}='';
+         }
+         $main::system_type='rhel';
+      } elsif ((-e "/etc/system-release-cpe") &&
+            (-1<index `cat /etc/system-release-cpe`,
+            'centos:linux')) {
+         if ((-e "/sys/hypervisor/compilation/compiled_by") &&
+               (-1<index `cat /sys/hypervisor/compilation/compiled_by`,
+               'amazon')) {
+            $main::amazon{'centos'}='';
+         }
+         $main::system_type='centos';
+      } elsif (-e "/etc/gentoo-release") {
+         if ((-e "/sys/hypervisor/compilation/compiled_by") &&
+               (-1<index `cat /sys/hypervisor/compilation/compiled_by`,
+               'amazon')) {
+            $main::amazon{'gentoo'}='';
+         }
+         $main::system_type='gentoo';
+      }
+   } else { $main::system_type=$^O }
 
 }
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Common;
 
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 use base 'Exporter';
 
@@ -18,7 +18,7 @@ our @EXPORT_OK = qw/
     YAML_ANY_MAPPING_STYLE
     YAML_BLOCK_MAPPING_STYLE YAML_FLOW_MAPPING_STYLE
 
-    PRESERVE_ALL PRESERVE_ORDER PRESERVE_SCALAR_STYLE
+    PRESERVE_ALL PRESERVE_ORDER PRESERVE_SCALAR_STYLE PRESERVE_FLOW_STYLE
 /;
 
 use constant {
@@ -30,17 +30,18 @@ use constant {
     YAML_FOLDED_SCALAR_STYLE        => 5,
     YAML_QUOTED_SCALAR_STYLE        => 'Q', # deprecated
 
-    YAML_ANY_SEQUENCE_STYLE   => 'any',
-    YAML_BLOCK_SEQUENCE_STYLE => 'block',
-    YAML_FLOW_SEQUENCE_STYLE  => 'flow',
+    YAML_ANY_SEQUENCE_STYLE   => 0,
+    YAML_BLOCK_SEQUENCE_STYLE => 1,
+    YAML_FLOW_SEQUENCE_STYLE  => 2,
 
-    YAML_ANY_MAPPING_STYLE   => 'any',
-    YAML_BLOCK_MAPPING_STYLE => 'block',
-    YAML_FLOW_MAPPING_STYLE  => 'flow',
+    YAML_ANY_MAPPING_STYLE   => 0,
+    YAML_BLOCK_MAPPING_STYLE => 1,
+    YAML_FLOW_MAPPING_STYLE  => 2,
 
     PRESERVE_ALL          => 1,
     PRESERVE_ORDER        => 2,
     PRESERVE_SCALAR_STYLE => 4,
+    PRESERVE_FLOW_STYLE   => 8,
 };
 
 my %scalar_style_to_string = (

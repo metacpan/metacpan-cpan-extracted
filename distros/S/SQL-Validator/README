@@ -1,6 +1,6 @@
 NAME
 
-    SQL::Validator - Validate JSON-SQL Schemas
+    SQL::Validator - Validate JSON-SQL
 
 ABSTRACT
 
@@ -17,19 +17,22 @@ SYNOPSIS
       #     into => {
       #       table => 'users'
       #     },
-      #     default => true
+      #     default => 1
       #   }
       # });
     
-      # i.e. INSERT INTO users DEFAULT VALUES;
+      # i.e. represents (INSERT INTO "users" DEFAULT VALUES)
     
-      # $sql->error->report('insert')
+      # die $sql->error if !$valid;
+    
+      # $sql->error->report('insert');
 
 DESCRIPTION
 
     This package provides a json-sql
     <https://github.com/iamalnewkirk/json-sql#readme> data structure
-    validation library based around json-schema <https://json-schema.org>.
+    validation library based on the JSON-SQL json-schema
+    <https://json-schema.org> standard.
 
 ATTRIBUTES
 
@@ -68,7 +71,7 @@ METHODS
 
         # given: synopsis
       
-        $sql->validate({});
+        $sql->validate({select => {}});
       
         my $error = $sql->error;
 
@@ -76,7 +79,7 @@ METHODS
 
         # given: synopsis
       
-        $sql->validate({select => {}});
+        $sql->validate({select => { from => { table => 'users' } } });
       
         my $error = $sql->error;
 
@@ -95,7 +98,7 @@ METHODS
             into => {
               table => 'users'
             },
-            default => 'true'
+            default => 1
           }
         });
       
@@ -107,12 +110,14 @@ METHODS
       
         my $valid = $sql->validate({
           insert => {
-            table => 'users',
-            default => 'true'
+            into => {
+              table => 'users'
+            },
+            default => 'true' # coerced booleans
           }
         });
       
-        # INVALID
+        # VALID
 
     validate example #3
 

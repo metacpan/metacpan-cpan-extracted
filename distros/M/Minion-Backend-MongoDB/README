@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.05
+    version 1.06
 
 SYNOPSIS
 
@@ -14,9 +14,8 @@ SYNOPSIS
 
 DESCRIPTION
 
-    Minion::Backend::MongoDB is a MongoDB backend for Minion derived from
-    Minion::Backend::Pg and supports its methods and tests up to 9.13
-    (2019-08-29).
+    This is a MongoDB backend for Minion v10.01 (2019-12-16) derived from
+    MongoDB::Minion::Pg and which supports all its features.
 
 ATTRIBUTES
 
@@ -428,7 +427,15 @@ METHODS
 
       Value in seconds to purge jobs older than this value.
 
-      Default: $minion->missing_after
+      Default: $minion->remove_after
+
+    older_field
+
+        older_field => 'created'
+
+      What date field to use to check if job is older than.
+
+      Default: 'finished'
 
     queues
 
@@ -571,7 +578,8 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2019 by Emiliano Bruni, Andrey Khozov.
+    This software is Copyright (c) 2019-2020 by Emiliano Bruni, Andrey
+    Khozov.
 
     This is free software, licensed under:
 

@@ -14,8 +14,8 @@ sub run_query {
 
     $conn->SUPER::run_query(
         $sql, $extra, $bind,
-        sub { $deferred->resolve(@_) },
-        sub { $deferred->reject(@_) },
+        sub { $deferred->resolve(@_) if $deferred },
+        sub { $deferred->reject(@_)  if $deferred },
         $extra->{perl_timeout} || 0,
     );
 
@@ -28,8 +28,8 @@ sub ping {
     my $deferred = AnyEvent::XSPromises::deferred();
 
     $conn->SUPER::ping(
-        sub { $deferred->resolve(@_) },
-        sub { $deferred->reject(@_) },
+        sub { $deferred->resolve(@_) if $deferred },
+        sub { $deferred->reject(@_)  if $deferred },
         $extra->{perl_timeout} || 0,
     );
 
@@ -43,8 +43,8 @@ sub connect {
 
     $conn->SUPER::connect(
         $connect_args,
-        sub { $deferred->resolve(@_) },
-        sub { $deferred->reject(@_) },
+        sub { $deferred->resolve(@_) if $deferred },
+        sub { $deferred->reject(@_)  if $deferred },
         $extra->{perl_timeout},
     );
 

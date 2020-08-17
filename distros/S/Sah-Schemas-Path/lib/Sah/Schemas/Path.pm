@@ -1,7 +1,7 @@
 package Sah::Schemas::Path;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2020-08-08'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 1;
 # ABSTRACT: Schemas related to filesystem path
@@ -18,7 +18,7 @@ Sah::Schemas::Path - Schemas related to filesystem path
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2020-02-11.
+This document describes version 0.014 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2020-08-08.
 
 =head1 SAH SCHEMAS
 
@@ -35,6 +35,13 @@ Filesystem file name.
 =item * L<pathname|Sah::Schema::pathname>
 
 Filesystem path name.
+
+=item * L<pathnames|Sah::Schema::pathnames>
+
+List of filesystem path names.
+
+Coerces from string by expanding the glob pattern in the string.
+
 
 =back
 

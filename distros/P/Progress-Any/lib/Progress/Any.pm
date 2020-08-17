@@ -1,7 +1,9 @@
 package Progress::Any;
 
-our $DATE = '2020-07-09'; # DATE
-our $VERSION = '0.216'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-07-10'; # DATE
+our $DIST = 'Progress-Any'; # DIST
+our $VERSION = '0.218'; # VERSION
 
 use 5.010001;
 use strict;
@@ -419,6 +421,11 @@ sub update {
                         message   => $message,
                         priority  => $priority,
                         time      => $now,
+
+                        # temporary, internal API. to let an output module know
+                        # the same update() when there are multiple instances of
+                        # it
+                        _update_id => $now,
                     );
                     $output->{_mtime} = $now;
                     $output->{_pos}   = $pos;
@@ -595,7 +602,7 @@ Progress::Any - Record progress to any output
 
 =head1 VERSION
 
-This document describes version 0.216 of Progress::Any (from Perl distribution Progress-Any), released on 2020-07-09.
+This document describes version 0.218 of Progress::Any (from Perl distribution Progress-Any), released on 2020-07-10.
 
 =head1 SYNOPSIS
 
@@ -617,7 +624,7 @@ Sample output:
  % ./script.pl
   60% [Doing item 6====           ]3s left
 
-Another example, this time with terminal message as output (see :
+Another example, this time with terminal message as output:
 
  use Progress::Any '$progress';
  use Progress::Any::Output 'TermMessage', template => '[%n] %P/%T (%6.2p%%) %m';

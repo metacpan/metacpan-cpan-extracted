@@ -1,5 +1,11 @@
 Revision history for Perl module Mock-MonkeyPatch
 
+1.01 2020-08-10
+  - Fix undeclared dependency on Sub::Util (1.40+)
+
+1.00 2020-08-08
+  - Installed mocks have same prototype as original
+
 0.04 2016-02-17
   - Fix documentation typo (preaction)
 

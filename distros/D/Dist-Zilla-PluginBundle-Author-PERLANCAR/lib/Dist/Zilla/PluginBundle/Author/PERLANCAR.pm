@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2020-04-03'; # DATE
-our $VERSION = '0.600'; # VERSION
+our $DATE = '2020-08-14'; # DATE
+our $VERSION = '0.602'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -10,6 +10,11 @@ use Dist::Zilla::PluginBundle::Filter;
 
 sub configure {
     my $self = shift;
+
+    # we want these to be loaded early
+    $self->add_plugins(
+        'PERLANCAR::CheckPendingRelease', # before ConfirmRelease
+    );
 
     $self->add_bundle(Filter => {
         -bundle => '@Classic',
@@ -32,7 +37,7 @@ sub configure {
         'MetaJSON',
         'MetaConfig',
         #'GenShellCompletion', # 2017-07-07 - disabled because i want to use DZP:StaticInstall to set x_static_install whenever possible. DZP:StaticInstall doesn't allow InstallTool plugins other than from MakeMaker and ModuleBuildTiny
-        ['Authority' => {locate_comment=>1}],
+        ['PERLANCAR::Authority' => {locate_comment=>1}],
         'OurDate',
         'OurDist',
         ['OurPkgVersion' => {overwrite=>1}],
@@ -72,7 +77,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.600 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2020-04-03.
+This document describes version 0.602 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2020-08-14.
 
 =head1 SYNOPSIS
 

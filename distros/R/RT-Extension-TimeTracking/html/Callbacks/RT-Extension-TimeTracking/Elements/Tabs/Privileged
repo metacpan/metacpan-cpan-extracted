@@ -7,6 +7,14 @@ Menu()->child('tools')->child(
     sort_order  => 2.5,
 );
 
+Menu()->child('tools')->child(
+    'time_search',
+    title       => loc("Time Search"),
+    description => loc("Find time worked for specified tickets between dates"),
+    path        => '/Tools/TimeSearch.html',
+    sort_order  => 2.6,
+);
+
 my $request_path = $HTML::Mason::Commands::r->path_info;
 $request_path =~ s!/{2,}!/!g;
 if ( $request_path =~ m{^/Tools/MyWeek.html} && $DECODED_ARGS->{'User'} && $DECODED_ARGS->{'User'} != $session{CurrentUser}->id ) {

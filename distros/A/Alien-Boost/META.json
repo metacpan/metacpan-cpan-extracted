@@ -36,6 +36,7 @@
          "requires" : {
             "Alien::Build" : "1.19",
             "Alien::Build::MM" : "0.25",
+            "ExtUtils::CBuilder" : "0",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -63,7 +64,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.4",
+   "version" : "1.6",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.26",
       "requires" : {

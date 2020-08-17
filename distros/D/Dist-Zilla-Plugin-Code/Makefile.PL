@@ -32,6 +32,8 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::LicenseProvider" => 0,
     "Dist::Zilla::Role::MetaProvider" => 0,
     "Dist::Zilla::Role::NameProvider" => 0,
+    "Dist::Zilla::Role::Plugin" => 0,
+    "Dist::Zilla::Role::PluginBundle" => 0,
     "Dist::Zilla::Role::PrereqSource" => 0,
     "Dist::Zilla::Role::ReleaseStatusProvider" => 0,
     "Dist::Zilla::Role::Releaser" => 0,
@@ -44,9 +46,9 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Capture::Tiny" => 0,
     "Dist::Zilla::File::InMemory" => 0,
     "Dist::Zilla::Role::FileFinderUser" => 0,
-    "Dist::Zilla::Role::PluginBundle" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "Test::DZil" => 0,
     "Test::Fatal" => 0,
@@ -54,7 +56,7 @@ my %WriteMakefileArgs = (
     "Test::TempDir::Tiny" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +64,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Capture::Tiny" => 0,
   "Dist::Zilla::File::InMemory" => 0,
   "Dist::Zilla::Role::AfterBuild" => 0,
   "Dist::Zilla::Role::AfterRelease" => 0,
@@ -79,6 +82,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Role::LicenseProvider" => 0,
   "Dist::Zilla::Role::MetaProvider" => 0,
   "Dist::Zilla::Role::NameProvider" => 0,
+  "Dist::Zilla::Role::Plugin" => 0,
   "Dist::Zilla::Role::PluginBundle" => 0,
   "Dist::Zilla::Role::PluginBundle::Easy" => 0,
   "Dist::Zilla::Role::PrereqSource" => 0,

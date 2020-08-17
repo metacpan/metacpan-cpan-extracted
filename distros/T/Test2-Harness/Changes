@@ -1,3 +1,24 @@
+1.000023  2020-08-14 21:18:29-07:00 America/Los_Angeles
+
+    - No changes since trial
+
+1.000022  2020-08-13 15:18:07-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Make failure to chmod things non-fatal to fix bsd testing
+    - Fix spelling issues
+    - Make chmod stuff more correct
+
+1.000021  2020-08-04 21:03:28-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add changed_files plugin hook
+    - Make git plugin support changed_files hook
+    - Add Test2::Harness::Log docs
+    - Add 'cover-files' option using Test2::Plugin::Cover
+    - Add coverage aggregator tool
+    - Add ability to run tests that cover changed files
+    - Add dbi-profiling option
+    - Fix permissions on temp dirs (may still have some issues)
+
 1.000020  2020-07-08 22:25:23-07:00 America/Los_Angeles
 
     - reduce version of Data::UUID required

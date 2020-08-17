@@ -2,6 +2,14 @@ Revision history for Math-CooGeo
 
 All notable changes to this project will be documented in this file.
 
+1.1.13 - 2020-08-13
+
+	Added backup files to .gitignore file.
+
+1.1.12 - 2020-07-14
+
+	Added Twitter to Contact section in README.md file.
+
 1.1.11 - 2020-07-14
 
 	Added missing changes.

@@ -1,7 +1,7 @@
 package List::Compare::Functional;
-$VERSION = 0.53;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw|
+our $VERSION = '0.55';
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw|
     get_intersection
     get_intersection_ref
     get_union
@@ -36,7 +36,7 @@ $VERSION = 0.53;
     get_bag_ref
     get_version
 |;
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
     main => [ qw(
         get_intersection
         get_union
@@ -249,8 +249,11 @@ sub _symmetric_difference_engine {
     return \@symmetric_difference;
 }
 
-*get_symdiff  = \&get_symmetric_difference;
-*get_symdiff_ref  = \&get_symmetric_difference_ref;
+{
+    no warnings 'once';
+    *get_symdiff  = \&get_symmetric_difference;
+    *get_symdiff_ref  = \&get_symmetric_difference_ref;
+}
 
 sub get_shared {
     return @{ get_shared_ref(@_) };
@@ -335,7 +338,7 @@ sub is_LequivalentR {
     return _is_LequivalentR_engine(_argument_checker_4($argref));
 }
 
-*is_LeqvlntR = \&is_LequivalentR;
+{ no warnings 'once'; *is_LeqvlntR = \&is_LequivalentR; }
 
 sub _is_LequivalentR_engine {
     my $testedref = pop(@_);
@@ -513,8 +516,8 @@ List::Compare::Functional - Compare elements of two or more lists
 
 =head1 VERSION
 
-This document refers to version 0.53 of List::Compare::Functional.
-This version was released June 07 2015.  The first released
+This document refers to version 0.55 of List::Compare::Functional.
+This version was released August 16 2020.  The first released
 version of List::Compare::Functional was v0.21.  Its version numbers
 are set to be consistent with the other parts of the List::Compare
 distribution.
@@ -1678,8 +1681,8 @@ James E. Keenan (jkeenan@cpan.org).  When sending correspondence, please
 include 'List::Compare::Functional' or 'List-Compare-Functional' in your
 subject line.
 
-Creation date:  May 20, 2002.  Last modification date:  June 07 2015.
-Copyright (c) 2002-15 James E. Keenan.  United States.  All rights reserved.
+Creation date:  May 20, 2002.  Last modification date:  August 16 2020.
+Copyright (c) 2002-20 James E. Keenan.  United States.  All rights reserved.
 This is free software and may be distributed under the same terms as Perl
 itself.
 

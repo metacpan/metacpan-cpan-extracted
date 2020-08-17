@@ -582,8 +582,7 @@ THX_do_work(pTHX_ SV* self, IV event)
                     maria->is_cont = FALSE;
                     state          = STATE_STANDBY;
 
-                    /* Release this */
-                    maria->run_query = NULL;
+                    maria->run_query = FALSE;
 
                     errstring = mysql_error(maria->mysql);
                 }
@@ -595,7 +594,7 @@ THX_do_work(pTHX_ SV* self, IV event)
                     maria->is_cont = FALSE; /* hooray! */
 
                     /* finally, release the query string */
-                    maria->run_query = NULL;
+                    maria->run_query = FALSE;
 
                     if ( maria->store_query_result ) {
                         state = STATE_STORE_RESULT;
@@ -819,7 +818,7 @@ THX_do_work(pTHX_ SV* self, IV event)
         maria->last_status   = 0;
 
         if ( maria->run_query ) {
-            maria->run_query = NULL;
+            maria->run_query = FALSE;
         }
 
         if (!errstring)
@@ -1112,7 +1111,9 @@ CODE:
     maria->socket_fd     = -1;
     maria->thread_id     = -1;
     maria->store_query_result = TRUE;
-    maria->query_sv      = newSVpvs("");
+    maria->query_sv      = newSV(0);
+    SvUPGRADE(maria->query_sv, SVt_PV);
+    SvPOK_on(maria->query_sv);
 
     maybe_init_mysql_connection(maria->mysql);
 
@@ -1260,6 +1261,12 @@ CODE:
         if ( svp && *svp ) {
             maria->want_hashrefs = cBOOL(SvTRUE(*svp));
         }
+    }
+
+    if ( !maria->query_sv ) {
+        maria->query_sv = newSV(0);
+        SvUPGRADE(maria->query_sv, SVt_PV);
+        SvPOK_on(maria->query_sv);
     }
 
     /* TODO implement prepared statements, then check if we have one here */
@@ -1618,40 +1625,3 @@ CODE:
     dMARIA;
     disconnect_generic(maria);
 
-SV*
-get_simple_stacktrace(HV* ignored_packages)
-PREINIT:
-    HV* stash;
-    I32 level = 0;
-    I32 found = 0;
-    const PERL_CONTEXT *cx;
-CODE:
-    RETVAL = newSVpvs("");
-    while ( level < 20 && found < 3 ) {
-        SV* package;
-        STRLEN len;
-        const char *key, *frame_file;
-        const COP *lcop;
-        IV frame_line;
-
-        cx = caller_cx(level++, NULL);
-        if ( !cx ) break; /* no more frames, we are done*/
-        if ( CxTYPE(cx) != CXt_SUB ) continue; /* not a sub, ignore */
-
-        stash = CopSTASH(cx->blk_oldcop);
-        if (!stash || SvTYPE(stash) != SVt_PVHV) continue; /* no package, ignore */
-
-        package = newSVhek(HvNAME_HEK(stash));
-        key = SvPV_const(package, len);
-        /* were we asked to skip this one in particular? */
-        if ( hv_exists(ignored_packages, key, (SvUTF8(package) ? -(I32)len : (I32)len)) ) continue;
-
-        /* Found a useful frame! Get the file & package */
-        frame_file = OutCopFILE(cx->blk_oldcop);
-        lcop = NULL; /*closest_cop(cx->blk_oldcop, OpSIBLING(cx->blk_oldcop), cx->blk_sub.retop, TRUE); */
-        if (!lcop)
-            lcop = cx->blk_oldcop;
-        frame_line = CopLINE(lcop);
-        sv_catpvf(RETVAL, "\n    %"SVf" (%s:%"IVdf")", package, frame_file, frame_line);
-    }
-OUTPUT: RETVAL

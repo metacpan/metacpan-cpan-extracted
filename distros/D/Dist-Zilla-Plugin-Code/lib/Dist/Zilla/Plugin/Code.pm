@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 1;
 
@@ -20,7 +20,7 @@ Dist::Zilla::Plugin::Code - dynamically create plugins from a bundle
 
 =head1 VERSION
 
-Version 0.001
+Version 0.003
 
 =head1 DESCRIPTION
 
@@ -70,6 +70,10 @@ something that munges files within the distribution
 
 something that prunes files from the distribution
 
+=item L<Dist::Zilla::Plugin::Code::Initialization>
+
+something that runs when plugins are initialized
+
 =item L<Dist::Zilla::Plugin::Code::InstallTool>
 
 something that creates an install program for a dist
@@ -105,6 +109,10 @@ something that tests the dist
 =item L<Dist::Zilla::Plugin::Code::VersionProvider>
 
 something that provides a version number for the dist
+
+=item L<Dist::Zilla::PluginBundle::Code>
+
+a dynamic bundle
 
 =back
 

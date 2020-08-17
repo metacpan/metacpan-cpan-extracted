@@ -16,8 +16,9 @@ my $j = 0;
 
 for my $n ( 1 .. $d->bars * 4 ) {
     if ( $n % 2 == 0 ) {
-        $d->note( $d->eighth, $d->closed_hh );
-        $d->note( $d->eighth, $d->closed_hh );
+        $d->note( $d->triplet_eighth, $d->closed_hh );
+        $d->rest($d->triplet_eighth);
+        $d->note( $d->triplet_eighth, $d->closed_hh );
     }
     else {
         if ( $j % 2 == 0 ) {

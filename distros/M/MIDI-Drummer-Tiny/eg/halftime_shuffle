@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MIDI::Drummer::Tiny;
+
+my $d = MIDI::Drummer::Tiny->new(
+    file   => "$0.mid",
+    bpm    => 70,
+    volume => 127,
+);
+
+for my $n (1 .. $d->bars) {
+    $d->note($d->triplet_eighth, $d->closed_hh, $d->kick);
+    $d->rest($d->triplet_eighth);
+    $d->note($d->triplet_eighth, $d->closed_hh);
+
+    $d->note($d->triplet_eighth, $d->closed_hh);
+    $d->rest($d->triplet_eighth);
+    $d->note($d->triplet_eighth, $d->closed_hh, $d->kick);
+
+    $d->note($d->triplet_eighth, $d->closed_hh, $d->snare);
+    $d->rest($d->triplet_eighth);
+    $d->note($d->triplet_eighth, $d->closed_hh);
+
+    $d->note($d->triplet_eighth, $d->closed_hh);
+    $d->rest($d->triplet_eighth);
+    $d->note($d->triplet_eighth, $d->closed_hh, $d->kick);
+}
+
+$d->note($d->quarter, $d->ride1, $d->kick);
+
+$d->write;

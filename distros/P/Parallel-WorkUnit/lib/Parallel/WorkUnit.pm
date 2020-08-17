@@ -1,10 +1,10 @@
 
-# Copyright (C) 2015-2019 Joelle Maslak
+# Copyright (C) 2015-2020 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Parallel::WorkUnit;
-$Parallel::WorkUnit::VERSION = '2.201890';
+$Parallel::WorkUnit::VERSION = '2.202270';
 use v5.8;
 
 # ABSTRACT: Provide multi-paradigm forking with ability to pass back data
@@ -13,34 +13,16 @@ use strict;
 use warnings;
 use autodie;
 
-use Scalar::Util qw(blessed reftype weaken);
-use Try::Tiny;
-
-#
-# Setting up threads, on Win32, if appropriate
-#
-
-my $use_anyevent_pipe;
-## no critic (BuiltinFunctions::ProhibitStringyEval)
-$use_anyevent_pipe = eval 'use AnyEvent::Util qw//; 1' if $^O eq 'MSWin32';
-## critic
-
-our $use_threads;
-## no critic (BuiltinFunctions::ProhibitStringyEval)
-$use_threads = eval 'use threads qw//; 1' if ( ( $^O eq 'MSWin32' ) && ( !$use_anyevent_pipe ) );
-## critic
-if ($use_threads) { eval 'use Thread::Queue;'; }
-
-my $use_thread_queue = ( $use_threads && ( !$use_anyevent_pipe ) );
-
 use Carp;
 
 use overload;
 use IO::Handle;
-use IO::Pipe;
+use IO::Pipely qw(pipely);
 use IO::Select;
 use POSIX ':sys_wait_h';
+use Scalar::Util qw(blessed reftype weaken);
 use Storable;
+use Try::Tiny;
 
 use namespace::autoclean;
 
@@ -181,32 +163,6 @@ sub _subprocs {
     }
 }
 
-# This only gets used on Win32.
-sub _queue {
-    if ( $#_ == 0 ) {
-        return shift->{_queue};
-    } elsif ( $#_ == 1 ) {
-        my ( $self, $val ) = @_;
-        $self->{_queue} = $val;
-        return $val;
-    } else {
-        confess("Invalid call");
-    }
-}
-
-# This only gets used on Win32.
-sub _child_queue {
-    if ( $#_ == 0 ) {
-        return shift->{_child_queue};
-    } elsif ( $#_ == 1 ) {
-        my ( $self, $val ) = @_;
-        $self->{_child_queue} = $val;
-        return $val;
-    } else {
-        confess("Invalid call");
-    }
-}
-
 # XXX: Add validation that _count is a positive integer
 # This only gets used on Win32.
 sub _count {
@@ -268,10 +224,6 @@ sub new {
     # Initialize parent PID
     $self->_parent_pid($$);
 
-    if ($use_thread_queue) {
-        $self->_queue( Thread::Queue->new() );
-    }
-
     # Make a weak reference and shove it into the ALL_WU array
     my $weakself = $self;
     weaken $weakself;
@@ -279,6 +231,18 @@ sub new {
 
     # Do some housekeeping on @ALL_WU, so it is somewhat bounded
     @ALL_WU = grep { defined $$_ } @ALL_WU;
+
+    # Do we have any arguments?
+    if (scalar(@_) > 0) {
+        my %args = (scalar(@_) == 1) ? %{shift()} : @_;
+
+        if (exists $args{use_anyevent}) {
+            $self->use_anyevent($args{use_anyevent});
+        }
+        if (exists $args{max_children}) {
+            $self->max_children($args{max_children});
+        }
+    }
 
     return $self;
 }
@@ -319,40 +283,20 @@ sub async {
     # If there are pending errors, throw that.
     if ( defined( $self->_last_error ) ) { die( $self->_last_error ); }
 
-    my $pipe;
-    if ($use_anyevent_pipe) {
-        $pipe = [];
-        (@$pipe) = AnyEvent::Util::portable_pipe();
-    } else {
-        $pipe = IO::Pipe->new();
-    }
+    my $pipe = [ pipely() ];
 
-    my ( $pid, $thr );
-    if ($use_threads) {
-        $pid = $self->_count();
-        $self->_count( $pid + 1 );
-
-        $thr = threads->create( sub { $self->_child( $sub, $pipe, $pid ); } );
-        if ( !defined($thr) ) { die "thread creation failed: $!"; }
-    } else {
-        $pid = fork();
-    }
+    my $pid = fork();
 
     if ($pid) {
         # We are in the parent process
 
-        if ($use_anyevent_pipe) {
-            $pipe = $pipe->[0];
-        } else {
-            $pipe->reader();
-        }
+        $pipe = $pipe->[0];
 
         $self->_subprocs()->{$pid} = {
             fh       => $pipe,
             anyevent => undef,
             callback => $callback,
             caller   => [ caller() ],
-            thread   => $thr
         };
 
         # Set up anyevent listener if appropriate
@@ -364,14 +308,9 @@ sub async {
 
     } else {
         # We are in the child process
-        if ($use_anyevent_pipe) {
-            $pipe = $pipe->[1];
-        } else {
-            $pipe->writer();
-        }
-        $pipe->autoflush(1);
+        $pipe = $pipe->[1];
 
-        return $self->_child( $sub, $pipe, undef );
+        return $self->_child( $sub, $pipe );
     }
 }
 
@@ -395,28 +334,23 @@ sub asyncs {
 }
 
 sub _child {
-    if ( scalar(@_) != 4 ) { confess 'invalid call'; }
-    my ( $self, $sub, $pipe, $pid ) = @_;
+    if ( scalar(@_) != 3 ) { confess 'invalid call'; }
+    my ( $self, $sub, $pipe ) = @_;
 
     # Cleanup ALL_WU
     @ALL_WU = grep { defined $$_ } @ALL_WU;
     foreach my $wu ( map { $$_ } @ALL_WU ) {
-        $wu->_clear_all( $wu == $self );
+        $wu->_clear_all();
     }
 
     try {
         my $result = $sub->();
-        $self->_send_result( $pipe, $result, $pid );
+        $self->_send_result( $pipe, $result );
     } catch {
-        $self->_send_error( $pipe, $_, $pid );
+        $self->_send_error( $pipe, $_ );
     };
 
-    # Windows doesn't do fork(), it does threads...
-    if ($use_threads) {
-        return 1;
-    } else {
-        exit();
-    }
+    exit();
 }
 
 
@@ -495,45 +429,25 @@ sub _waitone {
     weaken $sp;    # To avoid some Windows warnings
     if ( !keys(%$sp) ) { return; }
 
-    if ($use_thread_queue) {
-        # On Windows
-        #
-        my $child = $self->_queue()->dequeue();
+    # On everything but Windows
+    #
+    my $s = IO::Select->new();
+    foreach ( keys(%$sp) ) { $s->add( $sp->{$_}{fh} ); }
 
-        my $thr = $self->_subprocs()->{$child}{thread};
-        $self->_read_result($child);
-        $thr->join();
+    my @ready = $s->can_read();
 
-        # Start queued children, if needed
-        $self->_start_queued_children();
+    foreach my $fh (@ready) {
+        foreach my $child ( keys(%$sp) ) {
+            if ( defined( $fh->fileno() ) ) {
+                if ( $fh->fileno() == $sp->{$child}{fh}->fileno() ) {
+                    $self->_read_result($child);
 
-        return 1;
-    } else {
-        # On everything but Windows
-        #
-        my $s = IO::Select->new();
-        foreach ( keys(%$sp) ) { $s->add( $sp->{$_}{fh} ); }
+                    waitpid( $child, 0 );
 
-        my @ready = $s->can_read();
+                    # Start queued children, if needed
+                    $self->_start_queued_children();
 
-        foreach my $fh (@ready) {
-            foreach my $child ( keys(%$sp) ) {
-                if ( defined( $fh->fileno() ) ) {
-                    if ( $fh->fileno() == $sp->{$child}{fh}->fileno() ) {
-                        my $thr = $self->_subprocs()->{$child}{thread};
-                        $self->_read_result($child);
-
-                        if ($use_threads) {
-                            $thr->join();
-                        } else {
-                            waitpid( $child, 0 );
-                        }
-
-                        # Start queued children, if needed
-                        $self->_start_queued_children();
-
-                        return 1;    # We don't want to read more than one!
-                    }
+                    return 1;    # We don't want to read more than one!
                 }
             }
         }
@@ -573,14 +487,9 @@ sub _wait {
         return;
     }
 
-    my $thr    = $self->_subprocs()->{$pid}{thread};
     my $result = $self->_read_result($pid);
 
-    if ($use_threads) {
-        $thr->join();
-    } else {
-        waitpid( $pid, 0 );
-    }
+    waitpid( $pid, 0 );
 
     return $result;
 }
@@ -624,31 +533,27 @@ sub queue {
 }
 
 sub _send_result {
-    if ( $#_ != 3 ) { confess 'invalid call'; }
-    my ( $self, $fh, $msg, $pid ) = @_;
+    if ( $#_ != 2 ) { confess 'invalid call'; }
+    my ( $self, $fh, $msg ) = @_;
 
-    return $self->_send( $fh, 'RESULT', $msg, $pid );
+    return $self->_send( $fh, 'RESULT', $msg );
 }
 
 sub _send_error {
-    if ( $#_ != 3 ) { confess 'invalid call'; }
-    my ( $self, $fh, $err, $pid ) = @_;
+    if ( $#_ != 2 ) { confess 'invalid call'; }
+    my ( $self, $fh, $err ) = @_;
 
-    return $self->_send( $fh, 'ERROR', $err, $pid );
+    return $self->_send( $fh, 'ERROR', $err );
 }
 
 sub _send {
-    if ( $#_ != 4 ) { confess 'invalid call'; }
-    my ( $self, $fh, $type, $data, $pid ) = @_;
+    if ( $#_ != 3 ) { confess 'invalid call'; }
+    my ( $self, $fh, $type, $data ) = @_;
 
     my $msg = Storable::freeze( \$data );
 
     if ( !defined($msg) ) {
         die 'freeze() returned undef for child return value';
-    }
-
-    if ($use_thread_queue) {
-        $self->_child_queue()->enqueue($pid);
     }
 
     $fh->write($type);
@@ -695,15 +600,12 @@ sub _read_result {
     my $data = ${ Storable::thaw($result) };
 
     my $caller = $self->_subprocs()->{$child}{caller};
-    my $thr    = $self->_subprocs()->{$child}{thread};
     delete $self->_subprocs()->{$child};
     $fh->close();
 
     if ( $type eq 'RESULT' ) {
         $cinfo->{callback}->($data);
     } else {
-        if ($use_threads) { $thr->join(); }
-
         my $err =
             "Child (created at "
           . $caller->[1]
@@ -813,13 +715,9 @@ sub _add_anyevent_watcher {
 }
 
 # Used to clear all sub-processes, etc, in child process.
-#
-# Parameter one should be the object to clear
-# Parameter 2 determines whether or not we keep _queue (saving into
-# _child_queue)
 sub _clear_all {
-    if ( $#_ != 1 ) { confess 'invalid call' }
-    my ( $self, $keep_queue ) = @_;
+    if ( $#_ != 0 ) { confess 'invalid call' }
+    my ( $self ) = @_;
 
     $self->_cv(undef);
     $self->_last_error(undef);
@@ -833,15 +731,6 @@ sub _clear_all {
         local $SIG{__WARN__} = sub { };
         $self->_subprocs( {} );
     };
-
-    if ( defined( $self->_queue() ) ) {
-        if ($keep_queue) {
-            $self->_child_queue( $self->_queue() );
-        } else {
-            $self->_child_queue(undef);
-        }
-        $self->_queue( Thread::Queue->new() );
-    }
 
     return;
 }
@@ -857,7 +746,14 @@ sub start {
         confess("Parameter to start() is not a code (or codelike) reference");
     }
 
-    _start_child($sub);
+    my $pid = fork();
+
+    if ( !$pid ) {
+        # We are in the child process.
+        $sub->();
+        exit();
+    }
+
     return;
 }
 
@@ -872,29 +768,6 @@ sub _codelike {
     if ( blessed($thing) && overload::Method( $thing, '()' ) ) { return 1; }
 
     return;
-}
-
-# Start sub process and/or thread
-#
-sub _start_child {
-    if ( $#_ != 0 ) { confess 'invalid call'; }
-    my ($sub) = @_;
-
-    if ($use_threads) {
-        my $thr = threads->create($sub);
-        if ( !defined($thr) ) { die "thread creation failed: $!"; }
-
-        # Windows doesn't do fork(), it does threads...
-        return;
-    } else {
-        my $pid = fork();
-
-        if ( !$pid ) {
-            # We are in the child process.
-            $sub->();
-            exit();
-        }
-    }
 }
 
 # Destructor emits warning if sub processes are running
@@ -922,7 +795,7 @@ Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back da
 
 =head1 VERSION
 
-version 2.201890
+version 2.202270
 
 =head1 SYNOPSIS
 
@@ -962,7 +835,7 @@ version 2.201890
 
 
   #
-  # AnyEvent Interface
+  # AnyEvent Interface (only usable if AnyEvent is installed)
   #
   use AnyEvent;
   my $wu = Parallel::WorkUnit->new();
@@ -987,7 +860,8 @@ the information, serialized, back).  It was designed to be very simple
 for a developer to use, with the ability to pass reasonably large amounts
 of data back to the parent process.
 
-This module is also designed to work with AnyEvent when desired.
+This module is also designed to work with AnyEvent when desired, but it
+does not require AnyEvent to be installed for other functionality to work.
 
 There are many other Parallel::* applications in CPAN - it would be worth
 any developer's time to look through those and choose the best one.
@@ -1074,11 +948,6 @@ can spawn a new child regardless of the number of children already
 spawned. However, you children started with this method still count
 against the limit used by C<queue()>.
 
-Note: on Windows with threaded Perl, if C<AnyEvent> is not installed,
-threads instead of forks are used.  See C<thread> for the caveats
-that apply.  The PID returned is instead a meaningless (outside of
-this module) counter, not associated with any Windows thread identifier.
-
 =head2 asyncs( $children, sub { ... }, \&callback )
 
   $wu->asyncs( 10, sub { return 1 }, \&callback );
@@ -1093,7 +962,7 @@ This functions similarly to the C<async()> method, with a couple
 key differences.
 
 First, it takes an additional parameter, C<$children>, that specifies
-the number of child threads to spawn.  Like the C<async()> method,
+the number of child processes to spawn.  Like the C<async()> method,
 the children are spawned immediately, regardless of the value of
 the C<max_children> attribute.
 
@@ -1145,7 +1014,7 @@ routine, then returns.
 =head2 count()
 
 This method returns the number of currently outstanding
-threads (in either a running state or a waiting to send their
+processes (in either a running state or a waiting to send their
 output).
 
 =head2 queue( sub { ... }, \&callback )
@@ -1177,9 +1046,9 @@ many other children are running.
 
 This method is similar to C<async()>, but unlike C<async()>, no provision to
 receive return value or wait on the child is made.  This is somewhat similar
-to C<start> in Perl 6 (but differs as this starts a subprocess, not a new
-thread (except on Windows), and there is thus no shared data (changes to data
-in the child process will not be seen in the parent process).
+to C<start> in Raku (but differs as this starts a subprocess, not a new
+thread, and there is thus no shared data (changes to data in the child process
+will not be seen in the parent process).
 
 Note that the child inherits all open file descriptors.
 

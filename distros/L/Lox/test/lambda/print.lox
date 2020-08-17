@@ -1,0 +1,4 @@
+var foo = fun () {};
+print foo; // expect: <fn lambda>
+
+print clock; // expect: <native fn>

@@ -8,7 +8,7 @@ use Carp ();
 use Wasm::Trap;
 
 # ABSTRACT: Write Perl extensions using Wasm
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 our %WASM;
@@ -163,7 +163,7 @@ sub import
   Carp::croak("The wasm_ namespace is reserved for internal use") if $package =~ /^wasi_/;
   Carp::croak("Wasm for $package already loaded") if $inst{$package};
 
-  my $module = Wasm::Wasmtime::Module->new($linker->store, @module);
+  my $module = Wasm::Wasmtime::Module->new($linker->store->engine, @module);
 
   foreach my $import (@{ $module->imports })
   {
@@ -329,7 +329,7 @@ Wasm - Write Perl extensions using Wasm
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -494,7 +494,7 @@ have the virtual memory address size limits and sets this configuration
 for you.  For production you can set the environment variable
 C<PERL_WASM_WASMTIME_MEMORY> to tune the appropriate memory settings
 exactly as you want to (see the environment section of
-L<Wasm::Wasmtime>.
+L<Wasm::Wasmtime>).
 
 =head1 SEE ALSO
 

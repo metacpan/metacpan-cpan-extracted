@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.1100
+    version 2.2900
 
 SYNOPSIS
 
@@ -44,7 +44,7 @@ SEE ALSO
 
 SOURCE REPOSITORY
 
-    http://github.com/Perl5-Alien/Acme-Ford-Prefect2
+    http://github.com/PerlAlien/Acme-Ford-Prefect2
 
 AUTHORS
 

@@ -26,11 +26,11 @@ Test2::Aggregate - Aggregate tests for increased speed
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 DESCRIPTION
 
@@ -343,7 +343,7 @@ sub _process_warnings {
     my @clean    = ();
 
     foreach my $warn (@warnings) {
-        if ($warn =~ m/(.*)->Test2::Aggregate\n(.*\S.*)/) {
+        if ($warn =~ m/(.*)->Test2::Aggregate\n(.*\S.*)/s) {
             push @clean, "<$1>\n$2";
             $args->{stats}->{$1}->{warnings} = $2;
             $args->{stats}->{$1}->{pass_perc} = 0;

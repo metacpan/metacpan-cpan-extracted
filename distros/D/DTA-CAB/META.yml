@@ -50,5 +50,5 @@ requires:
   Unicode::String: '2.09'
   Unicruft: '0.03'
   XML::LibXML: '2.0001'
-version: '1.112'
+version: '1.113'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -186,8 +186,9 @@ my @additional_srcdir = ();
 # We provide ourself PCRE2
 # ------------------------
 {
-    local $CWD = File::Spec->catdir('3rdparty', 'untar', 'pcre2-10.23');
-    print "... Compiling pcre2\n";
+    my $PCRE2_VERSION = '10.33';
+    local $CWD = File::Spec->catdir('3rdparty', 'untar', "pcre2-${PCRE2_VERSION}");
+    print "... Compiling pcre2 version ${PCRE2_VERSION}\n";
     my $fh;
     open($fh, '>', 'config_autoconf.ini') || die "Cannot open config_autoconf.ini, $!";
 
@@ -222,7 +223,9 @@ AUTOCONF
     }
     $ac->define_var('LINK_SIZE', 2);
     $ac->define_var('MATCH_LIMIT', 10000000);
+    $ac->define_var('MATCH_LIMIT_DEPTH', 10000000);
     $ac->define_var('MATCH_LIMIT_RECURSION', 10000000);
+    $ac->define_var('HEAP_LIMIT', 20000000);
     $ac->define_var('NEWLINE_DEFAULT', 2,'LF');
     $ac->define_var('PARENS_NEST_LIMIT', 250);
     $ac->define_var('PCRE2GREP_BUFSIZE', 20480);
@@ -247,8 +250,10 @@ AUTOCONF
   pcre2_compile.c
   pcre2_config.c
   pcre2_context.c
+  pcre2_convert.c
   pcre2_dfa_match.c
   pcre2_error.c
+  pcre2_extuni.c
   pcre2_find_bracket.c
   pcre2_jit_compile.c
   pcre2_maketables.c
@@ -257,6 +262,7 @@ AUTOCONF
   pcre2_newline.c
   pcre2_ord2utf.c
   pcre2_pattern_info.c
+  pcre2_script_run.c
   pcre2_serialize.c
   pcre2_string_utils.c
   pcre2_study.c
@@ -282,7 +288,7 @@ AUTOCONF
 	);
   }
 }
-push(@additional_includes, File::Spec->catdir('3rdparty', 'untar', 'pcre2-10.23'));
+push(@additional_includes, File::Spec->catdir('3rdparty', 'untar', 'pcre2-10.33'));
 
 # -------------------------------------------
 # marpaESLIF embeds my unpanic version of lua

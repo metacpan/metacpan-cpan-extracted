@@ -9,7 +9,7 @@ use App::UpdateCPANfile::PackageDetails;
 use CPAN::DistnameInfo;
 use Module::CoreList;
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 
 sub new {
     my ($class, $path, $snapshot_path, $options) = @_;
@@ -121,7 +121,7 @@ sub create_update_dependencies_changeset {
 
         my $latest_version = $self->package_details->latest_version_for_package($module);
         next if $self->_is_core_module($module, $latest_version);
-        if (defined $latest_version && (! defined $required_version || $required_version ne "== $latest_version")) {
+        if (defined $latest_version && (! defined $required_version || $required_version ne "== $latest_version") && ($latest_version ne 'undef')) {
             push @$added_dependencies, [ $module, "== $latest_version"];
         }
     }

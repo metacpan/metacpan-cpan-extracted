@@ -12,10 +12,6 @@ use lib 'inc';
 
 use Mock::LWP::UserAgent;
 
-sub is_resp (@);
-sub warning_like (@);
-sub year();
-
 use constant DUMP_REQUEST => Astro::SpaceTrack->DUMP_REQUEST |
     Astro::SpaceTrack->DUMP_NO_EXECUTE;
 use constant DUMP_NONE => Astro::SpaceTrack->DUMP_NONE;
@@ -36,7 +32,7 @@ my $st = Astro::SpaceTrack->new(
 
 my $base_url = $st->_make_space_track_base_url();
 
-is_resp qw{retrieve 25544}, [ {
+is_resp( qw{retrieve 25544}, [ {
 	args => [
 	    basicspacedata	=> 'query',
 	    class	=> 'tle_latest',
@@ -49,18 +45,18 @@ is_resp qw{retrieve 25544}, [ {
 	url => "$base_url/basicspacedata/query/class/tle_latest/format/tle/orderby/OBJECT_NUMBER%20asc/OBJECT_NUMBER/25544/ORDINAL/1",
 	version => 2,
     } ],
-;
+ );
 
 $st->set( dump_headers => DUMP_NONE );
 
-is_resp qw{retrieve 25544}, <<'EOD';
+is_resp( qw{retrieve 25544}, <<'EOD' );
 1 25544U First line of data
 2 25544 Second line of data
 EOD
 
 $st->set( dump_headers => DUMP_REQUEST );
 
-is_resp qw{retrieve -sort catnum 25544}, [ {
+is_resp( qw{retrieve -sort catnum 25544}, [ {
 	args => [
 	    basicspacedata	=> 'query',
 	    class	=> 'tle_latest',
@@ -73,9 +69,9 @@ is_resp qw{retrieve -sort catnum 25544}, [ {
 	url => "$base_url/basicspacedata/query/class/tle_latest/format/tle/orderby/OBJECT_NUMBER%20asc/OBJECT_NUMBER/25544/ORDINAL/1",
 	version => 2,
     } ],
-;
+ );
 
-is_resp qw{retrieve -sort epoch 25544}, [ {
+is_resp( qw{retrieve -sort epoch 25544}, [ {
 	args => [
 	    basicspacedata	=> 'query',
 	    class	=> 'tle_latest',
@@ -88,9 +84,9 @@ is_resp qw{retrieve -sort epoch 25544}, [ {
 	url => "$base_url/basicspacedata/query/class/tle_latest/format/tle/orderby/EPOCH%20asc/OBJECT_NUMBER/25544/ORDINAL/1",
 	version => 2,
     } ],
-;
+ );
 
-is_resp qw{retrieve -descending 25544}, [ {
+is_resp( qw{retrieve -descending 25544}, [ {
 	args => [
 	    basicspacedata	=> 'query',
 	    class	=> 'tle_latest',
@@ -103,9 +99,9 @@ is_resp qw{retrieve -descending 25544}, [ {
 	url => "$base_url/basicspacedata/query/class/tle_latest/format/tle/orderby/OBJECT_NUMBER%20desc/OBJECT_NUMBER/25544/ORDINAL/1",
 	version => 2,
     } ],
-;
+ );
 
-is_resp qw{retrieve -last5 25544}, [ {
+is_resp( qw{retrieve -last5 25544}, [ {
 	args => [
 	    basicspacedata	=> 'query',
 	    class	=> 'tle_latest',
@@ -118,11 +114,11 @@ is_resp qw{retrieve -last5 25544}, [ {
 	url => "$base_url/basicspacedata/query/class/tle_latest/format/tle/orderby/OBJECT_NUMBER%20asc/OBJECT_NUMBER/25544/ORDINAL/1--5",
 	version => 2,
     } ],
-;
+ );
 
 $st->set( dump_headers => DUMP_NONE );
 
-is_resp qw{retrieve -last5 25544}, <<'EOD';
+is_resp( qw{retrieve -last5 25544}, <<'EOD' );
 1 25544U First line of data
 2 25544 Second line of data
 1 25544U First line of data
@@ -141,7 +137,7 @@ $st->set( dump_headers => DUMP_REQUEST );
     no warnings qw{ uninitialized };
     local $ENV{SPACETRACK_REST_FRACTIONAL_DATE} = undef;
 
-    is_resp qw{retrieve -start_epoch 2009-04-01 25544}, [ {
+    is_resp( qw{retrieve -start_epoch 2009-04-01 25544}, [ {
 	    args => [
 		basicspacedata	=> 'query',
 		class	=> 'tle',
@@ -154,9 +150,9 @@ $st->set( dump_headers => DUMP_REQUEST );
 	    url => "$base_url/basicspacedata/query/class/tle/format/tle/orderby/OBJECT_NUMBER%20asc/EPOCH/2009-04-01%2000:00:00--2009-04-02%2000:00:00/OBJECT_NUMBER/25544",
 	    version => 2,
 	} ],
-    ;
+     );
 
-    is_resp qw{retrieve -last5 -start_epoch 2009-04-01 25544}, [ {
+    is_resp( qw{retrieve -last5 -start_epoch 2009-04-01 25544}, [ {
 	    args => [
 		basicspacedata	=> 'query',
 		class	=> 'tle',
@@ -169,9 +165,9 @@ $st->set( dump_headers => DUMP_REQUEST );
 	    url => "$base_url/basicspacedata/query/class/tle/format/tle/orderby/OBJECT_NUMBER%20asc/EPOCH/2009-04-01%2000:00:00--2009-04-02%2000:00:00/OBJECT_NUMBER/25544",
 	    version => 2,
 	} ],
-    ;
+     );
 
-    is_resp qw{retrieve -end_epoch 2009-04-01 25544}, [ {
+    is_resp( qw{retrieve -end_epoch 2009-04-01 25544}, [ {
 	    args => [
 		basicspacedata	=> 'query',
 		class	=> 'tle',
@@ -184,9 +180,9 @@ $st->set( dump_headers => DUMP_REQUEST );
 	    url => "$base_url/basicspacedata/query/class/tle/format/tle/orderby/OBJECT_NUMBER%20asc/EPOCH/2009-03-31%2000:00:00--2009-04-01%2000:00:00/OBJECT_NUMBER/25544",
 	    version => 2,
 	} ],
-    ;
+     );
 
-    is_resp qw{retrieve -start_epoch 2009-03-01 -end_epoch 2009-04-01 25544}, [ {
+    is_resp( qw{retrieve -start_epoch 2009-03-01 -end_epoch 2009-04-01 25544}, [ {
 	    args => [
 		basicspacedata	=> 'query',
 		class	=> 'tle',
@@ -199,7 +195,7 @@ $st->set( dump_headers => DUMP_REQUEST );
 	    url => "$base_url/basicspacedata/query/class/tle/format/tle/orderby/OBJECT_NUMBER%20asc/EPOCH/2009-03-01%2000:00:00--2009-04-01%2000:00:00/OBJECT_NUMBER/25544",
 	    version => 2,
 	} ],
-    ;
+     );
 
 }
 
@@ -216,7 +212,7 @@ EOD
     no warnings qw{ uninitialized };
     local $ENV{SPACETRACK_REST_RANGE_OPERATOR} = undef;
 
-    is_resp retrieve => 1 .. 66, [
+    is_resp( retrieve => 1 .. 66, [
 	{
 	    args => [
 		basicspacedata	=> 'query',
@@ -244,11 +240,11 @@ EOD
 	    version	=> 2
 	},
     ],
-    ;
+     );
 
     $st->set( dump_headers => DUMP_NONE );
 
-    is_resp retrieve => 1 .. 66, <<'EOD';
+    is_resp( retrieve => 1 .. 66, <<'EOD' );
 1 00004U First line of data
 2 00004 Second line of data
 1 00005U First line of data
@@ -366,11 +362,11 @@ EOD
     $st->set( dump_headers => DUMP_REQUEST );
 }
 
-is_resp qw{set with_name 1}, 'OK';
+is_resp( qw{set with_name 1}, 'OK' );
 
 # NOTE That the following request is forced to JSON format so that we
 # can build a NASA-format TLE from the result.
-is_resp qw{retrieve 25544}, [ {
+is_resp( qw{retrieve 25544}, [ {
 	args => [
 	    basicspacedata	=> 'query',
 	    class	=> 'tle_latest',
@@ -384,11 +380,11 @@ is_resp qw{retrieve 25544}, [ {
 	url => "$base_url/basicspacedata/query/class/tle_latest/format/3le/orderby/OBJECT_NUMBER%20asc/predicates/OBJECT_NAME,TLE_LINE1,TLE_LINE2/OBJECT_NUMBER/25544/ORDINAL/1",
 	version => 2,
     } ],
-;
+ );
 
 $st->set( dump_headers => DUMP_NONE );
 
-is_resp qw{retrieve 25544}, <<'EOD';
+is_resp( qw{retrieve 25544}, <<'EOD' );
 ISS (ZARYA)
 1 25544U First line of data
 2 25544 Second line of data
@@ -396,7 +392,7 @@ EOD
 
 $st->set( dump_headers => DUMP_REQUEST );
 
-is_resp qw{search_date 2009-04-01}, [
+is_resp( qw{search_date 2009-04-01}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -413,15 +409,15 @@ is_resp qw{search_date 2009-04-01}, [
 	version => 2,
     },
 ],
-;
+ );
 
 $st->set( dump_headers => DUMP_NONE );
 
-is_resp qw{search_date 2009-04-01}, '412 No catalog IDs specified.';
+is_resp( qw{search_date 2009-04-01}, '412 No catalog IDs specified.' );
 
 $st->set( dump_headers => DUMP_REQUEST );
 
-is_resp qw{search_date -status all 2009-04-01}, [
+is_resp( qw{search_date -status all 2009-04-01}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -437,9 +433,9 @@ is_resp qw{search_date -status all 2009-04-01}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_date -status onorbit 2009-04-01}, [
+is_resp( qw{search_date -status onorbit 2009-04-01}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -456,9 +452,9 @@ is_resp qw{search_date -status onorbit 2009-04-01}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_date -status decayed 2009-04-01}, [
+is_resp( qw{search_date -status decayed 2009-04-01}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -475,9 +471,9 @@ is_resp qw{search_date -status decayed 2009-04-01}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_date -exclude debris 2009-04-01}, [
+is_resp( qw{search_date -exclude debris 2009-04-01}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -495,9 +491,9 @@ is_resp qw{search_date -exclude debris 2009-04-01}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_date -include payload 2009-04-01}, [
+is_resp( qw{search_date -include payload 2009-04-01}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -515,9 +511,9 @@ is_resp qw{search_date -include payload 2009-04-01}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_date -exclude rocket 2009-04-01}, [
+is_resp( qw{search_date -exclude rocket 2009-04-01}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -535,11 +531,11 @@ is_resp qw{search_date -exclude rocket 2009-04-01}, [
 	version => 2,
     },
 ],
-;
+ );
 
 {
     no warnings qw{qw};	## no critic (ProhibitNoWarnings)
-    is_resp qw{search_date -exclude debris,rocket 2009-04-01}, [
+    is_resp( qw{search_date -exclude debris,rocket 2009-04-01}, [
 	{
 	    args => [
 		basicspacedata	=> 'query',
@@ -557,10 +553,10 @@ is_resp qw{search_date -exclude rocket 2009-04-01}, [
 	version => 2,
 	},
     ],
-    ;
+     );
 }
 
-is_resp qw{search_date -exclude debris -exclude rocket 2009-04-01}, [
+is_resp( qw{search_date -exclude debris -exclude rocket 2009-04-01}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -578,9 +574,9 @@ is_resp qw{search_date -exclude debris -exclude rocket 2009-04-01}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_id 98067}, [
+is_resp( qw{search_id 98067}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -597,11 +593,11 @@ is_resp qw{search_id 98067}, [
 	version => 2,
     },
 ],
-;
+ );
 
 $st->set( dump_headers => DUMP_NONE );
 
-is_resp qw{search_id 98067}, <<'EOD';
+is_resp( qw{search_id 98067}, <<'EOD' );
 ISS (ZARYA)
 1 25544U First line of data
 2 25544 Second line of data
@@ -708,7 +704,7 @@ EOD
 
 $st->set( dump_headers => DUMP_REQUEST );
 
-is_resp qw{search_id 98}, [
+is_resp( qw{search_id 98}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -725,9 +721,9 @@ is_resp qw{search_id 98}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_id 98067A}, [
+is_resp( qw{search_id 98067A}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -744,11 +740,11 @@ is_resp qw{search_id 98067A}, [
 	version => 2,
     },
 ],
-;
+ );
 
 $st->set( dump_headers => DUMP_NONE );
 
-is_resp qw{search_id 98067A}, <<'EOD';
+is_resp( qw{search_id 98067A}, <<'EOD' );
 ISS (ZARYA)
 1 25544U First line of data
 2 25544 Second line of data
@@ -758,7 +754,7 @@ $st->set( dump_headers => DUMP_REQUEST );
 
 # TODO update below here
 
-is_resp qw{search_id -status all 98067}, [
+is_resp( qw{search_id -status all 98067}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -774,9 +770,9 @@ is_resp qw{search_id -status all 98067}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_id -status onorbit 98067}, [
+is_resp( qw{search_id -status onorbit 98067}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -793,9 +789,9 @@ is_resp qw{search_id -status onorbit 98067}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_id -status decayed 98067}, [
+is_resp( qw{search_id -status decayed 98067}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -812,9 +808,9 @@ is_resp qw{search_id -status decayed 98067}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_id -exclude debris 98067}, [
+is_resp( qw{search_id -exclude debris 98067}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -832,9 +828,9 @@ is_resp qw{search_id -exclude debris 98067}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_id -exclude rocket 98067}, [
+is_resp( qw{search_id -exclude rocket 98067}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -852,11 +848,11 @@ is_resp qw{search_id -exclude rocket 98067}, [
 	version => 2,
     },
 ],
-;
+ );
 
 {
     no warnings qw{qw};	## no critic (ProhibitNoWarnings)
-    is_resp qw{search_id -exclude debris,rocket 98067}, [
+    is_resp( qw{search_id -exclude debris,rocket 98067}, [
 	{
 	    args => [
 		basicspacedata	=> 'query',
@@ -874,10 +870,10 @@ is_resp qw{search_id -exclude rocket 98067}, [
 	version => 2,
 	}
     ],
-    ;
+     );
 }
 
-is_resp qw{search_id -exclude debris -exclude rocket 98067}, [
+is_resp( qw{search_id -exclude debris -exclude rocket 98067}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -895,9 +891,9 @@ is_resp qw{search_id -exclude debris -exclude rocket 98067}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_name ISS}, [
+is_resp( qw{search_name ISS}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -914,9 +910,9 @@ is_resp qw{search_name ISS}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_name -status all ISS}, [
+is_resp( qw{search_name -status all ISS}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -932,9 +928,9 @@ is_resp qw{search_name -status all ISS}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_name -status onorbit ISS}, [
+is_resp( qw{search_name -status onorbit ISS}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -951,9 +947,9 @@ is_resp qw{search_name -status onorbit ISS}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_name -status decayed ISS}, [
+is_resp( qw{search_name -status decayed ISS}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -970,9 +966,9 @@ is_resp qw{search_name -status decayed ISS}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_name -exclude debris ISS}, [
+is_resp( qw{search_name -exclude debris ISS}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -990,9 +986,9 @@ is_resp qw{search_name -exclude debris ISS}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{search_name -exclude rocket ISS}, [
+is_resp( qw{search_name -exclude rocket ISS}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -1010,11 +1006,11 @@ is_resp qw{search_name -exclude rocket ISS}, [
 	version => 2,
     },
 ],
-;
+ );
 
 {
     no warnings qw{qw};	## no critic (ProhibitNoWarnings)
-    is_resp qw{search_name -exclude debris,rocket ISS}, [ {
+    is_resp( qw{search_name -exclude debris,rocket ISS}, [ {
 	args => [
 	    basicspacedata	=> 'query',
 	    class	=> 'satcat',
@@ -1030,10 +1026,10 @@ is_resp qw{search_name -exclude rocket ISS}, [
 	url => "$base_url/basicspacedata/query/class/satcat/format/json/orderby/OBJECT_NUMBER%20asc/predicates/all/CURRENT/Y/DECAY/null-val/OBJECT_NAME/~~ISS/OBJECT_TYPE/OTHER,PAYLOAD,TBA,UNKNOWN",
 	version => 2,
 	} ],
-    ;
+     );
 }
 
-is_resp qw{search_name -exclude debris -exclude rocket ISS}, [
+is_resp( qw{search_name -exclude debris -exclude rocket ISS}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -1051,9 +1047,9 @@ is_resp qw{search_name -exclude debris -exclude rocket ISS}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{ search_oid 25544 }, [
+is_resp( qw{ search_oid 25544 }, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -1070,11 +1066,11 @@ is_resp qw{ search_oid 25544 }, [
 	version => 2,
     },
 ],
-;
+ );
 
 $st->set( dump_headers => DUMP_NONE );
 
-is_resp qw{ search_oid 25544 }, <<'EOD';
+is_resp( qw{ search_oid 25544 }, <<'EOD' );
 ISS (ZARYA)
 1 25544U First line of data
 2 25544 Second line of data
@@ -1082,7 +1078,7 @@ EOD
 
 $st->set( dump_headers => DUMP_REQUEST );
 
-is_resp qw{ search_oid -format json 25544 }, [
+is_resp( qw{ search_oid -format json 25544 }, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -1099,11 +1095,11 @@ is_resp qw{ search_oid -format json 25544 }, [
 	version => 2,
     },
 ],
-;
+ );
 
 $st->set( dump_headers => DUMP_NONE );
 
-is_resp qw{ search_oid -format json 25544 },
+is_resp( qw{ search_oid -format json 25544 },
 [
    {
       'COMMENT'	=> 'GENERATED VIA SPACETRACK.ORG API',
@@ -1119,11 +1115,11 @@ is_resp qw{ search_oid -format json 25544 },
       'TLE_LINE2'	=> '2 25544 Second line of data',
    }
 ]
-;
+ );
 
 $st->set( dump_headers => DUMP_REQUEST );
 
-is_resp qw{ search_oid -format tle 25544 }, [
+is_resp( qw{ search_oid -format tle 25544 }, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -1140,18 +1136,18 @@ is_resp qw{ search_oid -format tle 25544 }, [
 	version => 2,
     },
 ],
-;
+ );
 
 $st->set( dump_headers => DUMP_NONE );
 
-is_resp qw{ search_oid -format tle 25544 }, <<'EOD';
+is_resp( qw{ search_oid -format tle 25544 }, <<'EOD' );
 1 25544U First line of data
 2 25544 Second line of data
 EOD
 
 $st->set( dump_headers => DUMP_REQUEST );
 
-is_resp qw{ search_oid -format 3le 25544 }, [
+is_resp( qw{ search_oid -format 3le 25544 }, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -1168,11 +1164,11 @@ is_resp qw{ search_oid -format 3le 25544 }, [
 	version => 2,
     },
 ],
-;
+ );
 
 $st->set( dump_headers => DUMP_NONE );
 
-is_resp qw{ search_oid -format 3le 25544 }, <<'EOD';
+is_resp( qw{ search_oid -format 3le 25544 }, <<'EOD' );
 0 ISS (ZARYA)
 1 25544U First line of data
 2 25544 Second line of data
@@ -1183,7 +1179,7 @@ EOD
 
     $st->set( with_name => 1 );
 
-    is_resp search_oid => {}, 25544, <<'EOD';
+    is_resp( search_oid => {}, 25544, <<'EOD' );
 ISS (ZARYA)
 1 25544U First line of data
 2 25544 Second line of data
@@ -1191,7 +1187,7 @@ EOD
 
     $st->set( with_name => 0 );
 
-    is_resp search_oid => {}, 25544, <<'EOD';
+    is_resp( search_oid => {}, 25544, <<'EOD' );
 1 25544U First line of data
 2 25544 Second line of data
 EOD
@@ -1201,7 +1197,7 @@ EOD
 
 $st->set( dump_headers => DUMP_REQUEST );
 
-is_resp qw{spacetrack iridium}, [
+is_resp( qw{spacetrack iridium}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -1219,9 +1215,9 @@ is_resp qw{spacetrack iridium}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{ spacetrack special }, [
+is_resp( qw{ spacetrack special }, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -1237,12 +1233,12 @@ is_resp qw{ spacetrack special }, [
 	version	=> 2
     },
 ],
-;
+ );
 
-is_resp qw{set with_name 0}, 'OK';
+is_resp( qw{set with_name 0}, 'OK' );
 
 
-is_resp qw{spacetrack iridium}, [
+is_resp( qw{spacetrack iridium}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -1259,9 +1255,9 @@ is_resp qw{spacetrack iridium}, [
 	version => 2,
     },
 ],
-;
+ );
 
-is_resp qw{retrieve -json -since_file 1848000 25544 25546}, [
+is_resp( qw{retrieve -json -since_file 1848000 25544 25546}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -1276,12 +1272,12 @@ is_resp qw{retrieve -json -since_file 1848000 25544 25546}, [
 	version	=> 2,
     }
 ],
-;
+ );
 
 =begin comment
 
 # TODO Not supported by Space Track v2 interface
-is_resp qw{spacetrack 10}, {
+is_resp( qw{spacetrack 10}, {
 	args => [
 	    basicspacedata	=> 'query',
 	],
@@ -1289,13 +1285,13 @@ is_resp qw{spacetrack 10}, {
 	url => $base_url,
 	version => 2,
     },
-;
+ );
 
 =end comment
 
 =cut
 
-is_resp qw{box_score}, [
+is_resp( qw{box_score}, [
     {
 	args => [
 	    basicspacedata	=> 'query',
@@ -1308,18 +1304,18 @@ is_resp qw{box_score}, [
 	version => 2,
     },
 ],
-;
+ );
 
 done_testing;
 
 my $warning;
 
-sub warning_like (@) {
+sub warning_like {
     splice @_, 0, 0, $warning;
     goto &like;
 }
 
-sub is_resp (@) {	## no critic (RequireArgUnpacking)
+sub is_resp {	## no critic (RequireArgUnpacking)
     my @args = @_;
     my $opt = HASH_REF eq ref $args[0] ? shift @args : {};
     my $method = shift @args;
@@ -1366,8 +1362,12 @@ sub is_resp (@) {	## no critic (RequireArgUnpacking)
     goto &is;
 }
 
-sub year () {
+sub year {
     return (localtime)[5] + 1900;
 }
 
 1;
+
+__END__
+
+# ex: set filetype=perl textwidth=72 :

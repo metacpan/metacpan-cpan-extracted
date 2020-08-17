@@ -1,0 +1,36 @@
+0.07 2020-08-13T22:34:27+02:00
+ - Add test for errors in 'script_js' constructor parameter.
+ - Add test for errors in 'script_js_src' constructor parameter.
+ - Change bugtracker to github.
+ - Simplify code in 'script_js' and 'script_js_src' parameters.
+
+0.06 2020-08-12T23:13:53+02:00
+ - Add multiple meta elements to header.
+ - Add script_js and script_js_src constructor parameters.
+ - Add spaces to code in head element.
+ - Fix doc example output.
+ - Fix module description.
+ - Fix 'css' constructor parameter requirements in doc.
+
+0.05 2020-08-11T22:13:45+02:00
+ - Add tests for process() method.
+ - Fix ERRORS section in doc.
+ - Sort constructor parameters in doc.
+
+0.04 2020-08-10T01:10:33+02:00
+ - Fix CSS processing.
+
+0.03 2020-08-10T00:58:15+02:00
+ - Add XML mode of Tags to EXAMPLE section in doc.
+ - Add test for constructor.
+ - Remove obsolete File::Object test dependency.
+ - Remove obsolete Test::Warn test dependency.
+ - Remove process_css() method, we don't need build-in css.
+
+0.02 2020-08-09T14:47:20+02:00
+ - Fix DEPENDENCIES section in doc.
+ - Fix ERRORS section in doc.
+ - Fix module name in doc.
+
+0.01 2020-08-09T14:39:22+02:00
+ - First version.

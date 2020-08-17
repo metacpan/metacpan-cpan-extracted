@@ -1,0 +1,1 @@
+123.foo = "value"; // expect: [Line 1] Error at 'foo': Only instances have fields.

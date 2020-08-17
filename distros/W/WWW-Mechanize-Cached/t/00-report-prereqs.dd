@@ -63,6 +63,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'HTTP::Request' => '0',
+                                   'HTTP::Response' => '0',
                                    'Path::Tiny' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0',

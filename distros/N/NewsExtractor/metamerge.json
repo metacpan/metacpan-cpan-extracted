@@ -1,4 +1,14 @@
 {
     "name": "NewsExtractor",
-    "x_static_install": true
+    "x_static_install": true,
+    "resources": {
+        "bugtracker": {
+            "web": "https://github.com/perltaiwan/NewsExtractor/issues"
+        },
+        "repository": {
+            "web": "https://github.com/perltaiwan/NewsExtractor",
+            "url": "https://github.com/perltaiwan/NewsExtractor.git",
+            "type": "git"
+        }
+    }
 }

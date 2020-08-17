@@ -2,15 +2,17 @@ package Plack::Middleware::TimeOverHTTP;
 
 # ABSTRACT: time over HTTP middleware
 
+use v5.8.5;
+
 use strict;
 use warnings;
 
 use parent 'Plack::Middleware';
 
 use HTTP::Status qw/ :constants /;
-use Time::HiRes qw/ clock_gettime CLOCK_REALTIME /;
+use Time::HiRes 1.9764 qw/ clock_gettime CLOCK_REALTIME /;
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.2';
 
 sub call {
     my ( $self, $env ) = @_;
@@ -47,7 +49,7 @@ Plack::Middleware::TimeOverHTTP - time over HTTP middleware
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.2
 
 =head1 SYNOPSIS
 
@@ -75,7 +77,7 @@ on IP address. You will need to use additional middleware for that.
 =head1 SEE ALSO
 
 The "Time Over HTTPS specification" at
-L<http://phk.freebsd.dk/time/20151129.html>.
+L<http://phk.freebsd.dk/time/20151129/>.
 
 =head1 AUTHOR
 
@@ -83,7 +85,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -10,13 +10,18 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Graph-Nauty",
    "prereqs" : {
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -38,7 +43,7 @@
          "web" : "https://github.com/merkys/graph-nauty"
       }
    },
-   "version" : "0.1.1",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "0.1.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -1,5 +1,24 @@
 Revision history for MIDI-Drummer
 
+0.1100 2020-08-14 17:19:40
+    - Add the ->accent_note method.
+    - Add an example program illustrating the James Brown, "Cold Sweat" groove.
+
+0.1001 2020-08-11 07:02:59
+    - Add eg/waltz. Why not?
+    - Remove a mistaken hihat from ->metronome54.
+
+0.1000 2020-08-10 12:34:49
+    - Add dotted duration aliases.
+    - Add the ->set_time_sig method.
+
+0.0904 2020-08-08 08:42:46
+    - Use the closed hi-hat for the 4/4 metronome.
+
+0.0903 2020-08-08 08:26:24
+    - Add 5/4 and 5/8 metronomes and an example program.
+    - Add a halftime "Purdie" shuffle example program.
+
 0.0902 2020-06-09 10:19:42
     - Improve documentation.
     - Add an eighth-note flag to ->metronome44.

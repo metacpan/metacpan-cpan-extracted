@@ -1,3 +1,10 @@
+0.2.1 2020-08-13
+
+    - Adding 'number' atom field to store atom positions in the initial
+      SMILES string.
+    - Making 'class' atom field mandatory.
+    - Making 'isotope' atom field an integer.
+
 0.2.0 2020-05-20
 
     - Fixing an issue with graph merging.

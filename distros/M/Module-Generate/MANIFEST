@@ -11,6 +11,7 @@ t/00-load.t
 t/01-idea.t
 t/02-cover.t
 t/03-open.t
+t/04-test.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

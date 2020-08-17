@@ -1,0 +1,331 @@
+\==[doc]      [2] [\bullet(packed)[\link[\1][\2]]]
+\==[program]  [3]
+    [\tablerow[\1 \version[\2]] [\release[\2]]
+        [\link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+        (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+              [PGP signature])]
+        [\link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+        (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+              [PGP signature])]]
+\==[download] [3]
+    [\1 \version[\2]\break
+     \link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+     (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+           [signature])\break
+     \link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+     (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+           [signature])\break
+    Released \release[\2]]
+
+\heading[wallet][software]
+
+\h1[wallet]
+
+\quote(broken)[
+
+    An architect
+    who does not believe
+    in privacy
+    may also lack faith
+    in keeping out the rain
+
+][John M. Ford][\cite[Growing Up Weightless]]
+
+\div(sidebar)[
+    \h2[Download]
+
+    \download[wallet][wallet]
+        [kerberos/wallet-\version[wallet]]
+
+    \link[https://archives.eyrie.org/software/ARCHIVE/wallet/]
+         [Archive]
+
+    \h2[Documentation]
+
+    \link[readme.html][General overview] \break
+    \link[news.html][Change summary] \break
+    \link[setup.html][Setup and configuration] \break
+    \link[config.html][Configuration options] \break
+    \link[objects-and-schemes.html][Objects and ACL schemes] \break
+    \link[wallet.html][wallet] \break
+    \link[wallet-admin.html][wallet-admin] \break
+    \link[wallet-backend.html][wallet-backend] \break
+    \link[wallet-report.html][wallet-report] \break
+    \link[keytab-backend.html][keytab-backend] \break
+    \link[naming.html][Stanford wallet naming policy] \break
+    \link[thanks.html][Thanks and credits]
+
+    \h2[Development]
+
+    \link[todo.html][To-do list] \break
+    \link[design.html][Overall design] \break
+    \link[design-acl.html][ACL design] \break
+    \link[design-api.html][Server module API design] \break
+    \link[notes.html][Implementation notes] \break
+    \link[https://github.com/rra/wallet]
+         [GitHub] \break
+    \link[https://github.com/rra/wallet/issues]
+         [Bug tracker] \break
+    \link[https://git.eyrie.org/?p=kerberos/wallet.git]
+         [Git repository] \break
+    \link[https://www.openhub.net/p/wallet]
+         [Open HUB code analysis]
+]
+
+\h2[Blurb]
+
+The wallet is a system for managing secure data, authorization rules to
+retrieve or change that data, and audit rules for documenting actions
+taken on that data.  Objects of various types may be stored in the wallet
+or generated on request and retrieved by authorized users.  The wallet
+tracks ACLs, metadata, and trace information.  It is built on top of the
+remctl protocol and uses Kerberos GSS-API authentication.  One of the
+object types it supports is Kerberos keytabs, making it suitable as a
+user-accessible front-end to Kerberos kadmind with richer ACL and metadata
+operations.
+
+\h2[Description]
+
+The wallet is a client/server system using a central server with a
+supporting database and a stand-alone client that can be widely
+distributed to users.  The server runs on a secure host with access to a
+local database; tracks object metadata such as ACLs, attributes, history,
+expiration, and ownership; and has the necessary access privileges to
+create wallet-managed objects in external systems (such as Kerberos
+service principals).  The client uses the remctl protocol to send commands
+to the server, store and retrieve objects, and query object metadata.  The
+same client can be used for both regular user operations and wallet
+administrative actions.
+
+All wallet actions are controlled by a fine-grained set of ACLs.  Each
+object has an owner ACL and optional get, store, show, destroy, and flags
+ACLs that control more specific actions.  A global administrative ACL
+controls access to administrative actions.  An ACL consists of zero or
+more entries, each of which is a generic scheme and identifier pair,
+allowing the ACL system to be extended to use any existing authorization
+infrastructure.  Supported ACL types include Kerberos principal names,
+regexes matching Kerberos principal names, and LDAP attribute checks.
+
+Currently, the object types supported are simple files, passwords,
+Kerberos keytabs, WebAuth keyrings, and Duo integrations.  By default,
+whenever a Kerberos keytab object is retrieved from the wallet, the key is
+changed in the Kerberos KDC and the wallet returns a keytab for the new
+key.  However, a keytab object can also be configured to preserve the
+existing keys when retrieved.  Included in the wallet distribution is a
+script that can be run via remctl on an MIT Kerberos KDC to extract the
+existing key for a principal, and the wallet system will use that
+interface to retrieve the current key if the unchanging flag is set on a
+Kerberos keytab object for MIT Kerberos.  (Heimdal doesn't require any
+special support.)
+
+\h2[Requirements]
+
+The wallet client requires the C
+\link[https://www.eyrie.org/~eagle/software/remctl/][remctl] client
+library and a Kerberos library.  It will build with either MIT Kerberos or
+Heimdal.
+
+The wallet server is written in Perl and requires Perl 5.8.0 or later plus
+the following Perl modules:
+
+\bullet(packed)[Date::Parse (part of the TimeDate distribution)]
+\bullet(packed)[DBI]
+\bullet(packed)[DBIx::Class]
+\bullet(packed)[Module::Build]
+\bullet(packed)[SQL::Translator]
+
+You will also need a DBD Perl module for the database backend that you
+intend to use, and the DateTime::Format::* module corresponding to that
+DBD module (such as DateTime::Format::SQLite or DateTime::Format::PG).
+
+Currently, the server has only been tested against SQLite 3, MySQL 5, and
+PostgreSQL, and prebuilt SQL files (for database upgrades) are only
+provided for those servers.  It will probably not work fully with other
+database backends.  Porting is welcome.
+
+The wallet server is intended to be run under \code[remctld] and use
+\code[remctld] to do authentication.  It can be ported to any other
+front-end, but doing so will require writing a new version of
+\code[server/wallet-backend] that translates the actions in that protocol
+into calls to the Wallet::Server Perl object.
+
+The keytab support in the wallet server supports Heimdal and MIT Kerberos
+KDCs and has experimental support for Active Directory.  The Heimdal
+support requires the Heimdal::Kadm5 Perl module.  The MIT Kerberos support
+requires the MIT Kerberos \code[kadmin] client program be installed.  The
+Active Directory support requires the Net::LDAP, Authen::SASL, and
+IPC::Run Perl modules and the \code[msktutil] client program.
+
+To support the unchanging flag on keytab objects with an MIT Kerberos KDC,
+the Net::Remctl Perl module (shipped with remctl) must be installed on the
+server and the \code[keytab-backend] script must be runnable via remctl on
+the KDC.  This script also requires an MIT Kerberos \code[kadmin.local]
+binary that supports the \code[-norandkey] option to \code[ktadd].  This
+option is included in MIT Kerberos 1.7 and later.
+
+The WebAuth keyring object support in the wallet server requires the
+WebAuth Perl module from
+\link[https://www.eyrie.org/~eagle/software/webauth/][WebAuth 4.4.0 or
+later].
+
+The Duo integration object support in the wallet server requires the
+\link[https://www.eyrie.org/~eagle/software/net-duo/][Net::Duo], JSON, and
+Perl6::Slurp Perl modules.
+
+The password object support in the wallet server requires the
+Crypt::GeneratePassword Perl module.
+
+The LDAP attribute ACL verifier requires the Authen::SASL and Net::LDAP
+Perl modules.  This verifier only works with LDAP servers that support
+GSS-API binds.
+
+The NetDB ACL verifier (only of interest at sites using NetDB to manage
+DNS) requires the Net::Remctl Perl module.
+
+To bootstrap from a Git checkout, or if you change the Automake files and
+need to regenerate Makefile.in, you will need Automake 1.11 or later.  For
+bootstrap or if you change configure.ac or any of the m4 files it includes
+and need to regenerate configure or config.h.in, you will need Autoconf
+2.64 or later.  Perl is also required to generate manual pages from a
+fresh Git checkout.
+
+\h2[Download]
+
+The distribution:
+
+\table[][
+    \program[wallet][wallet]
+        [kerberos/wallet-\version[wallet]]
+]
+
+An \link[https://archives.eyrie.org/software/ARCHIVE/wallet/] [archive of
+older releases] is also available.
+
+A Debian package is available from my \link[../debian.html][personal
+repository].
+
+wallet is maintained using the Git version control system.  To check out
+the current development tree, see
+\link[https://github.com/rra/wallet][GitHub] or clone:
+
+\pre[    https://git.eyrie.org/git/kerberos/wallet.git]
+
+Pull requests on GitHub are welcome.  You can also
+\link[https://git.eyrie.org/?p=kerberos/wallet.git][browse the current
+development source].
+
+\h2[Documentation]
+
+\div(left)[
+    \class(first)[User documentation:]
+
+    \doc[readme.html][README]
+    \doc[news.html][Change summary]
+    \doc[setup.html][Setup and configuration]
+    \doc[config.html][Configuration options]
+    \doc[objects-and-schemes.html][Objects and ACL schemes]
+    \doc[wallet.html][wallet]
+    \doc[wallet-admin.html][wallet-admin]
+    \doc[wallet-backend.html][wallet-backend]
+    \doc[wallet-report.html][wallet-report]
+    \doc[keytab-backend.html][keytab-backend]
+    \doc[naming.html][Stanford wallet naming policy]
+    \doc[thanks.html][Thanks and credits]
+    \doc[license.html][License and copyright]
+
+    Developer documentation:
+
+    \doc[todo.html][To-do list]
+    \doc[design.html][Overall design]
+    \doc[design-acl.html][ACL design]
+    \doc[design-api.html][Server module API design]
+    \doc[notes.html][Implementation notes]
+    \doc[https://github.com/rra/wallet]
+        [GitHub]
+    \doc[https://github.com/rra/wallet/issues]
+        [Bug tracker]
+    \doc[https://www.openhub.net/p/wallet]
+        [Open HUB code analysis]
+
+    Contributed programs:
+
+    \doc[ad-keytab.html][ad-keytab]
+    \doc[used-principals.html][used-principals]
+    \doc[wallet-contacts.html][wallet-contacts]
+    \doc[wallet-rekey-periodic.html][wallet-rekey-periodic]
+    \doc[wallet-summary.html][wallet-summary]
+    \doc[wallet-unknown-hosts.html][wallet-unknown-hosts]
+
+]
+
+\div(right)[
+    \class(first)[API documentation:]
+
+    \doc[api/acl.html][Wallet::ACL]
+    \doc[api/acl-base.html][Wallet::ACL::Base]
+    \doc[api/acl-external.html][Wallet::ACL::External]
+    \doc[api/acl-krb5.html][Wallet::ACL::Krb5]
+    \doc[api/acl-krb5-regex.html][Wallet::ACL::Krb5::Regex]
+    \doc[api/acl-ldap-attr.html][Wallet::ACL::LDAP::Attribute]
+    \doc[api/acl-ldap-attr-root.html][Wallet::ACL::LDAP::Attribute::Root]
+    \doc[api/acl-nested.html][Wallet::ACL::Nested]
+    \doc[api/acl-netdb.html][Wallet::ACL::NetDB]
+    \doc[api/acl-netdb-root.html][Wallet::ACL::NetDB::Root]
+    \doc[api/admin.html][Wallet::Admin]
+    \doc[api/config.html][Wallet::Config]
+    \doc[api/database.html][Wallet::Database]
+    \doc[api/kadmin.html][Wallet::Kadmin]
+    \doc[api/kadmin-ad.html][Wallet::Kadmin::AD]
+    \doc[api/kadmin-heimdal.html][Wallet::Kadmin::Heimdal]
+    \doc[api/kadmin-mit.html][Wallet::Kadmin::MIT]
+    \doc[api/object-base.html][Wallet::Object::Base]
+    \doc[api/object-duo.html][Wallet::Object::Duo]
+    \doc[api/object-file.html][Wallet::Object::File]
+    \doc[api/object-keytab.html][Wallet::Object::Keytab]
+    \doc[api/object-password.html][Wallet::Object::Password]
+    \doc[api/object-wakeyring.html][Wallet::Object::WAKeyring]
+    \doc[api/policy-stanford.html][Wallet::Policy::Stanford]
+    \doc[api/report.html][Wallet::Report]
+    \doc[api/schema.html][Wallet::Schema]
+    \doc[api/server.html][Wallet::Server]
+]
+
+\h2(after)[License]
+
+The wallet package as a whole is covered by the following copyright and
+license:
+
+\block[
+
+    Copyright 2014, 2016, 2018
+        Russ Allbery <eagle@eyrie.org>
+
+    Copyright 2006-2010, 2012-2014
+        The Board of Trustees of the Leland Stanford Junior University
+
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+]
+
+Some individual source files are covered by other, compatible licenses.
+For complete copyright and license information, see the file
+\link[license.html][LICENSE] in the wallet source distribution.
+
+\signature

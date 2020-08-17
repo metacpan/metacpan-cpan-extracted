@@ -3,7 +3,7 @@ use strict;
 use warnings;
 no if "$]" >= 5.031009, feature => 'indirect';
 
-use Test::Tester 0.108;
+use Test2::API 'intercept';
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::JSON::Schema::Acceptance;
@@ -62,7 +62,7 @@ foreach my $test (
   { todo_count => 9+3, todo_tests => [ { file => 'foo.json' }, { group_description => 'true schema' } ] },
 ) {
   my $todo_count = delete $test->{todo_count};
-  my ($premature, @results) = run_tests(
+  my $events = intercept(
     sub {
       $accepter->acceptance(
         validate_data => sub {
@@ -74,9 +74,15 @@ foreach my $test (
     }
   );
 
-  is(scalar(grep $_->{type} eq 'skip', @results), 0, 'skipped no tests');
-  is(scalar(grep $_->{type} eq 'todo_skip', @results), 0, 'todo_skipped no tests');
-  is(scalar(grep $_->{type} eq 'todo', @results), $todo_count, 'right number of tests are marked TODO');
+  is(scalar(grep $_->isa('Test2::Event::Skip'), @$events), 0, 'skipped and todo_skipped no tests');
+  is(
+    scalar(
+      grep exists $_->{assert} && (grep $_->{tag} eq 'TODO', @{$_->{amnesty} // []}),
+      map $_->facet_data, @$events
+    ),
+    $todo_count,
+    'right number of tests are marked TODO',
+  );
 }
 
 done_testing;

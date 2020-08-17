@@ -1,7 +1,8 @@
 package App::Utils;
-# 2020 Vlado Keselj http://web.cs.dal.ca/~vlado
+# App::Utils - some useful command-line utilities
+# 2020 Vlado Keselj vlado@dnlp.ca http://vlado.ca
 
-our $VERSION = 0.051;
+our $VERSION = 0.053;
 
 =head1 NAME
 
@@ -23,7 +24,7 @@ F<save> - save a snapshot of given files in C<saved.d> directory
 
 =head1 AUTHOR
 
-Vlado Keselj http://web.cs.dal.ca/~vlado
+Vlado Keselj vlado@dnlp.ca http://vlado.ca
 
 =head1 INSTALLATION
 

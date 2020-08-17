@@ -7,9 +7,9 @@ use Carp;
 
 package Text::Layout::Pango;
 
-sub init {
-    my ( $pkg, @args ) = @_;
-    bless {} => $pkg;
+sub new {
+    my ( $pkg, @data ) = @_;
+    croak("Text::Layout::Pango: Not yet implemented");
 }
 
 1;

@@ -1,0 +1,23 @@
+Changelog for SQL-Engine
+
+0.03 2020-08-15T16:53:05
+ - Add release updates
+ - Implement union query support (#21)
+ - Fix uninitialized value in join usage (#19)
+
+0.02 2020-08-14T22:49:05
+ - Built release version 0.02
+ - Add release updates
+ - Implement additional join types (#16)
+ - Implement boolean column criterion (#15)
+ - Implement expression/criteria negation (#14)
+ - Implement support for inline constraints on create-table (#12)
+ - Implement support for returning after mutation (#13)
+ - Address MSSQL SQL syntax errors (#11)
+
+0.01 2020-08-12T04:08:31
+ - Built release version 0.01
+ - Add release updates
+ - Prepare initial release
+ - Initial implementation (#2)
+ - Initial commit

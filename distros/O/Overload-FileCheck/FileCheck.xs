@@ -14,9 +14,6 @@
 #include <XSUB.h>
 #include <embed.h>
 
-#define NEED_sv_2pv_flags
-#include "ppport.h"
-
 #include "FileCheck.h"
 
 /*

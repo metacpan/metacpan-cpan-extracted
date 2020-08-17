@@ -25,8 +25,9 @@ do { my $x = {
                       'requires' => {
                                       'HTTP::Status' => '0',
                                       'Plack::Middleware' => '0',
-                                      'Time::HiRes' => '0',
+                                      'Time::HiRes' => '1.9764',
                                       'parent' => '0',
+                                      'perl' => 'v5.8.5',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

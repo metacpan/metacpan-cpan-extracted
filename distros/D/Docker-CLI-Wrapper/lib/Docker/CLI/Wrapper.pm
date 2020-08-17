@@ -1,5 +1,5 @@
 package Docker::CLI::Wrapper;
-$Docker::CLI::Wrapper::VERSION = '0.0.5';
+$Docker::CLI::Wrapper::VERSION = '0.0.6';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Docker::CLI::Wrapper - a wrapper for the CLI of docker and compatible tools.
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,11 @@ version 0.0.5
     );
     $obj->clean_up();
     $obj->run_docker();
-    $obj->exe_bash_code({code => qq#set -e -x; printf "%s\\n" "Hello world!"});
+    $obj->exe_bash_code(
+        {
+            code => qq#set -e -x; printf "%s\\n" "Hello world!"# ,
+        }
+    );
     $obj->clean_up();
 
 =head1 DESCRIPTION
@@ -42,8 +46,8 @@ Interface (CLI).
 They were extracted from several programs I wrote that used Docker for
 L<CI|https://github.com/shlomif/Freenode-programming-channel-FAQ/blob/master/FAQ_with_ToC__generated.md#what-do-continuous-integration-ci-services-such-as-travis-ci-jenkins-or-appveyor-provide>
 
-It is possible that Dockerfiles give similar functionality, but I was too
-lazy to learn them.
+It is possible that Dockerfiles provide similar functionality, but I was too
+lazy to properly learn how to write them.
 
 =head1 SEE ALSO
 

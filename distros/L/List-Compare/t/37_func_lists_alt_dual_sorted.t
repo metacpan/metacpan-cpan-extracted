@@ -6,7 +6,7 @@ use Test::More tests =>  50;
 use List::Compare::Functional qw(:originals :aliases);
 use lib ("./t");
 use Test::ListCompareSpecial qw( :seen :func_wrap :arrays :results );
-use IO::CaptureOutput qw( capture );
+use Capture::Tiny q|:all|;
 
 my @pred = ();
 my %seen = ();
@@ -118,10 +118,7 @@ ok(! $disj, "Got expected disjoint relationship");
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $rv = print_subset_chart( { lists => [ \@a0, \@a1 ] } ); },
-        \$stdout,
-    );
+    $stdout = capture_stdout { $rv = print_subset_chart( { lists => [ \@a0, \@a1 ] } ); };
     ok($rv, "print_subset_chart() returned true value");
     like($stdout, qr/Subset Relationships/,
         "Got expected chart header");
@@ -138,10 +135,7 @@ like($@, qr/^Need to define 'lists' key properly/,
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $rv = print_equivalence_chart( { lists => [ \@a0, \@a1 ] } ); },
-        \$stdout,
-    );
+    $stdout = capture_stdout { $rv = print_equivalence_chart( { lists => [ \@a0, \@a1 ] } ); };
     ok($rv, "print_equivalence_chart() returned true value");
     like($stdout, qr/Equivalence Relationships/,
         "Got expected chart header");
@@ -219,3 +213,4 @@ ok(0 == scalar(@{get_intersection_ref( { lists => [ \@a4, \@a8 ] } )}),
     "no intersection, as expected");
 $disj = is_LdisjointR( { lists => [ \@a4, \@a8 ] } );
 ok($disj, "disjoint correctly determined");
+

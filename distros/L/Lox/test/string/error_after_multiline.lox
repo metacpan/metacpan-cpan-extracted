@@ -1,0 +1,7 @@
+// Tests that we correctly track the line info across multiline strings.
+var a = "1
+2
+3
+";
+
+err; // // expect: [Line 7] Error at 'err': Undefined variable 'err'.

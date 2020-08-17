@@ -3,13 +3,13 @@ use strict;
 use warnings;
 
 package BSON;
-# ABSTRACT: BSON serialization and deserialization
+# ABSTRACT: BSON serialization and deserialization (EOL)
 
 use base 'Exporter';
 our @EXPORT_OK = qw/encode decode/;
 
 use version;
-our $VERSION = 'v1.12.1';
+our $VERSION = 'v1.12.2';
 
 use Carp;
 use Config;
@@ -937,18 +937,28 @@ sub _iso8601_to_epochms {
 
 =head1 NAME
 
-BSON - BSON serialization and deserialization
+BSON - BSON serialization and deserialization (EOL)
 
 =head1 VERSION
 
-version v1.12.1
+version v1.12.2
 
 =head1 END OF LIFE NOTICE
 
-Version v1.12.0 is the final feature release of the MongoDB BSON
-library.  The library is now in a 12-month "sunset" period and will
-receive security patches and critical bug fixes only.  The BSON
-library will be end-of-life and unsupported on August 13, 2020.
+Version v1.12.0 was the final feature release of the MongoDB BSON library
+and version v1.12.2 is the final patch release.
+
+B<As of August 13, 2020, the MongoDB Perl driver and related libraries have
+reached end of life and are no longer supported by MongoDB.> See the
+L<August 2019 deprecation
+notice|https://www.mongodb.com/blog/post/the-mongodb-perl-driver-is-being-deprecated>
+for rationale.
+
+If members of the community wish to continue development, they are welcome
+to fork the code under the terms of the Apache 2 license and release it
+under a new namespace.  Specifications and test files for MongoDB drivers
+and libraries are published in an open repository:
+L<mongodb/specifications|https://github.com/mongodb/specifications/tree/master/source>.
 
 =head1 SYNOPSIS
 
@@ -1472,25 +1482,6 @@ transferred ongoing maintenance to MongoDB, Inc.
 The C<bson_xxxx> helper functions in L<BSON::Types> were inspired by similar
 work in L<Mango::BSON> by Sebastian Riedel.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
-=head1 SUPPORT
-
-=head2 Bugs / Feature Requests
-
-Please report any bugs or feature requests through the issue tracker
-at L<https://jira.mongodb.org/browse/PERL>.
-You will be notified automatically of any progress on your issue.
-
-=head2 Source Code
-
-This is open source software.  The code repository is available for
-public review and contribution under the terms of the license.
-
-L<https://github.com/mongodb/mongo-perl-bson>
-
-  git clone https://github.com/mongodb/mongo-perl-bson.git
-
 =head1 AUTHORS
 
 =over 4
@@ -1559,7 +1550,7 @@ Oleg Kostyuk <cub@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2020 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

@@ -1,9 +1,5 @@
-#! perl -w
-use warnings;
-use strict;
-
-use Test::More;
-use Test::NoWarnings ();
+#! perl -I. -w
+use t::Test::abeltje;
 
 use Dancer::RPCPlugin::FlattenData;
 
@@ -39,6 +35,4 @@ use Dancer::RPCPlugin::FlattenData;
     ) or diag(explain($flat));
 }
 
-Test::NoWarnings::had_no_warnings();
-$Test::NoWarnings::do_end_test = 0;
 done_testing();

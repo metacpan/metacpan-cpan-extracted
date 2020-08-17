@@ -132,5 +132,22 @@ subtest 'redefine warnings for ORIGINAL' => sub {
   ok !$warn, 'no warnings';
 };
 
+{
+  package Local::Func;
+  sub has_prototype (\@) { 1 }
+}
+
+subtest 'no prototype warnings' => sub {
+  my $warn = 0;
+  local $SIG{__WARN__} = sub { $warn++ };
+  my $got;
+  my $mock = Mock::MonkeyPatch->patch('Local::Func::has_prototype' => sub{ $got = [@_] });
+  ok !$warn, 'no warnings';
+  my @in = (0,1,2,3);
+  Local::Func::has_prototype(@in);
+  is_deeply $mock->arguments, [\@in], 'Got a reference to array, not the array itself';
+  is_deeply $got, [\@in], 'Got a reference to array, not the array itself';
+};
+
 done_testing;
 

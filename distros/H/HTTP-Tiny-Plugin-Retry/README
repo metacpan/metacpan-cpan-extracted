@@ -2,8 +2,8 @@ NAME
     HTTP::Tiny::Plugin::Retry - Retry failed request
 
 VERSION
-    This document describes version 0.001 of HTTP::Tiny::Plugin::Retry (from
-    Perl distribution HTTP-Tiny-Plugin-Retry), released on 2019-04-12.
+    This document describes version 0.004 of HTTP::Tiny::Plugin::Retry (from
+    Perl distribution HTTP-Tiny-Plugin-Retry), released on 2020-08-14.
 
 SYNOPSIS
      use HTTP::Tiny::Plugin 'Retry' => {
@@ -21,14 +21,28 @@ DESCRIPTION
 
 CONFIGURATION
   max_attempts
-    Int.
+    Int. Default 4.
 
   delay
     Float.
 
   retry_if
-    Regex or code. If regex, then will be matched against response status.
-    If code, will be called with arguments: "($self, $response)".
+    Regex (or scalra), or arrayref, or coderef. If regex or scalar, then
+    will be matched against response status. If array, then will be assumed
+    to be status codes to trigger retry. If coderef, will be called with
+    arguments: "($class, $response)" ($class is the plugin class name) and a
+    true return value will trigger retry.
+
+  strategy
+    Algorithm::Backoff::* module name, without the prefix and with optional
+    arguments (see "instantiate_class_with_optional_args" in
+    Module::Load::Util), e.g. "Constant", "["Exponential" =>
+    {initial_delay=>2, max_delay=>100}]",
+    "Exponential=initial_delay,2,max_delay,100".
+
+    If set, will use delay and maximum attempt values from specified
+    Algorithm::Backoff backoff strategry instead of "max_attempts" and
+    "delay".
 
 ENVIRONMENT
   HTTP_TINY_PLUGIN_RETRY_MAX_ATTEMPTS
@@ -56,11 +70,14 @@ BUGS
 SEE ALSO
     HTTP::Tiny::Plugin
 
+    Equivalent plugin for LWP::UserAgent::Plugin:
+    LWP::UserAgent::Plugin::Retry.
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

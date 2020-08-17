@@ -5,34 +5,33 @@ author:
   - 'Joel Berger'
 build_requires:
   Acme::Alien::DontPanic: '0'
-  ExtUtils::Installed: '0'
-  File::Find: '0'
   Test2::V0: '0.000060'
   Test::Alien::Diag: '0'
   perl: '5.006'
 configure_requires:
-  Acme::Alien::DontPanic: '2.1100'
+  Acme::Alien::DontPanic: '2.2600'
   Alien::Base::Wrapper: '1.02'
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Acme-Ford-Prefect
 requires:
-  DynaLoader: '0'
+  XSLoader: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/Perl5-Alien/Acme-Ford-Prefect/issues
+  bugtracker: https://github.com/PerlAlien/Acme-Ford-Prefect/issues
   homepage: https://metacpan.org/pod/Acme::Ford::Prefect
-  repository: git://github.com/Perl5-Alien/Acme-Ford-Prefect.git
-version: '2.1100'
-x_generated_by_perl: v5.28.1
+  repository: git://github.com/PerlAlien/Acme-Ford-Prefect.git
+version: '2.2900'
+x_generated_by_perl: v5.33.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

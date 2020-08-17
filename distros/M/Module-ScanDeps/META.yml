@@ -34,5 +34,5 @@ resources:
   MailingList: mailto:par@perl.org
   bugtracker: https://rt.cpan.org/Dist/Display.html?Queue=Module-ScanDeps
   repository: git://github.com/rschupp/Module-ScanDeps.git
-version: '1.28'
+version: '1.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

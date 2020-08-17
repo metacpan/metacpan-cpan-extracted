@@ -1,0 +1,4 @@
+class Foo {}
+
+var foo = Foo();
+foo(); // expect: [Line 4] Error at ')': Can only call functions and classes.

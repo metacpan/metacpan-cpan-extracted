@@ -6,7 +6,7 @@ package BSON::DBRef;
 # ABSTRACT: BSON type wrapper for MongoDB DBRefs
 
 use version;
-our $VERSION = 'v1.12.1';
+our $VERSION = 'v1.12.2';
 
 use Tie::IxHash;
 use Moo 2.002004;
@@ -170,7 +170,7 @@ BSON::DBRef - BSON type wrapper for MongoDB DBRefs
 
 =head1 VERSION
 
-version v1.12.1
+version v1.12.2
 
 =head1 SYNOPSIS
 
@@ -259,7 +259,7 @@ Stefan G. <minimalist@lavabit.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Stefan G. and MongoDB, Inc.
+This software is Copyright (c) 2020 by Stefan G. and MongoDB, Inc.
 
 This is free software, licensed under:
 

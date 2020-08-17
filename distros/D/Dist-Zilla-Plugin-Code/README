@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.001
+    Version 0.003
 
 DESCRIPTION
 
@@ -52,6 +52,10 @@ DESCRIPTION
 
       something that prunes files from the distribution
 
+    Dist::Zilla::Plugin::Code::Initialization
+
+      something that runs when plugins are initialized
+
     Dist::Zilla::Plugin::Code::InstallTool
 
       something that creates an install program for a dist
@@ -87,6 +91,10 @@ DESCRIPTION
     Dist::Zilla::Plugin::Code::VersionProvider
 
       something that provides a version number for the dist
+
+    Dist::Zilla::PluginBundle::Code
+
+      a dynamic bundle
 
 SUPPORT
 

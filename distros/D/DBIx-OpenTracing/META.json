@@ -32,9 +32,11 @@
       },
       "runtime" : {
          "requires" : {
-            "DBI" : "0",
+            "DBI" : "1.639",
             "OpenTracing::GlobalTracer" : "0",
             "OpenTracing::Implementation" : "0",
+            "Package::Constants" : "0",
+            "SQL::Statement" : "1.412",
             "Scope::Context" : "0",
             "Syntax::Feature::Maybe" : "0",
             "perl" : "5.014",
@@ -43,8 +45,10 @@
       },
       "test" : {
          "recommends" : {
+            "DBD::Pg" : "0",
             "DBD::SQLite" : "0",
             "DBD::mysql" : "0",
+            "Test::PostgreSQL" : "0",
             "Test::mysqld" : "0"
          },
          "requires" : {
@@ -54,6 +58,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.3",
+   "version" : "v0.0.5",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

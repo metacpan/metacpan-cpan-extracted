@@ -7,17 +7,20 @@ use Carp;
 
 package Text::Layout::Markdown;
 
-sub init {
-    my ( $pkg, @args ) = @_;
-    bless {} => $pkg;
+#### API
+sub new {
+    my ( $pkg, @data ) = @_;
+    my $self = $pkg->SUPER::new;
+    $self;
 }
 
+#### API
 sub render {
-    my ( $ctx ) = @_;
+    my ( $self ) = @_;
     my $res = "";
-    foreach my $fragment ( @{ $ctx->{_content} } ) {
+    foreach my $fragment ( @{ $self->{_content} } ) {
 	next unless length($fragment->{text});
-	my $f = $fragment->{font} || $ctx->{_currentfont};
+	my $f = $fragment->{font} || $self->{_currentfont};
 	my $open = "";
 	my $close = "";
 	if ( $f->{style} eq "italic" ) {
@@ -37,17 +40,15 @@ sub render {
     $res;
 }
 
+#### API
 sub bbox {
-    my ( $ctx ) = @_;
+    my ( $self ) = @_;
     [ 0, -5, 10, 15 ];		# dummy
 }
 
+#### API
 sub load_font {
-    my ( $ctx, $description ) = @_;
-    if ( !$description->{font} && $description->{load} ) {
-	$description->{cache}->{font} =
-	$description->{font} = $description->{load};
-    }
+    my ( $self, $description ) = @_;
     return $description;
 }
 

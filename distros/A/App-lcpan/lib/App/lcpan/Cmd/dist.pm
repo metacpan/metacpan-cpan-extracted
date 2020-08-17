@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::dist;
 
-our $DATE = '2020-06-11'; # DATE
-our $VERSION = '1.061'; # VERSION
+our $DATE = '2020-08-13'; # DATE
+our $VERSION = '1.062'; # VERSION
 
 use 5.010;
 use strict;
@@ -46,7 +46,7 @@ App::lcpan::Cmd::dist - Show a single distribution
 
 =head1 VERSION
 
-This document describes version 1.061 of App::lcpan::Cmd::dist (from Perl distribution App-lcpan), released on 2020-06-11.
+This document describes version 1.062 of App::lcpan::Cmd::dist (from Perl distribution App-lcpan), released on 2020-08-13.
 
 =head1 FUNCTIONS
 

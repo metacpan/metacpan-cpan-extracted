@@ -13,7 +13,7 @@ use HTTP::Date;
 use HTTP::Status qw{ :constants };
 use Test::More 0.96;	# For subtest
 
-our $VERSION = '0.140';
+our $VERSION = '0.141';
 
 # Set the following to zero if Space Track (or any other SSL host)
 # starts using a certificate that can not be verified.
@@ -51,7 +51,7 @@ $Astro::SpaceTrack::SPACETRACK_IDENTITY_KEY = {
 
 my $rslt;
 
-sub is_error (@) {		## no critic (RequireArgUnpacking,ProhibitSubroutinePrototypes)
+sub is_error {		## no critic (RequireArgUnpacking)
     my ( $obj, $method, @args ) = @_;
     my ( $code, $name ) = splice @args, -2, 2;
     $rslt = eval { $obj->$method( @args ) };
@@ -63,7 +63,7 @@ sub is_error (@) {		## no critic (RequireArgUnpacking,ProhibitSubroutinePrototyp
     goto &ok;
 }
 
-sub is_error_or_skip (@) {		## no critic (RequireArgUnpacking,ProhibitSubroutinePrototypes)
+sub is_error_or_skip {		## no critic (RequireArgUnpacking)
     my ( $obj, $method, @args ) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $code, $name ) = splice @args, -2, 2;
@@ -75,7 +75,7 @@ sub is_error_or_skip (@) {		## no critic (RequireArgUnpacking,ProhibitSubroutine
     return cmp_ok $got, '==', $code, $name;
 }
 
-sub is_not_success (@) {	## no critic (RequireArgUnpacking,ProhibitSubroutinePrototypes)
+sub is_not_success {	## no critic (RequireArgUnpacking)
     my ( $obj, $method, @args ) = @_;
     my $name = pop @args;
     $rslt = eval { $obj->$method( @args ) };
@@ -87,7 +87,7 @@ sub is_not_success (@) {	## no critic (RequireArgUnpacking,ProhibitSubroutinePro
     goto &ok;
 }
 
-sub is_success (@) {	## no critic (RequireArgUnpacking,ProhibitSubroutinePrototypes)
+sub is_success {	## no critic (RequireArgUnpacking)
     my ( $obj, $method, @args ) = @_;
     my $name = pop @args;
     $rslt = eval { $obj->$method( @args ) }
@@ -101,7 +101,7 @@ sub is_success (@) {	## no critic (RequireArgUnpacking,ProhibitSubroutinePrototy
     goto &ok;
 }
 
-sub is_success_or_skip (@) {	## no critic (RequireArgUnpacking,ProhibitSubroutinePrototypes)
+sub is_success_or_skip {	## no critic (RequireArgUnpacking)
     my ( $obj, $method, @args ) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my $skip = pop @args;
@@ -135,7 +135,7 @@ sub most_recent_http_response {
     return $rslt;
 }
 
-sub not_defined ($$) {	## no critic (ProhibitSubroutinePrototypes)
+sub not_defined {
     @_ = ( ! defined $_[0], @_[1 .. $#_] );
     goto &ok;
 }
@@ -160,7 +160,7 @@ sub not_defined ($$) {	## no critic (ProhibitSubroutinePrototypes)
 	};
     }
 
-    sub prompt (@) {	## no critic (ProhibitSubroutinePrototypes)
+    sub prompt {
 	my @args = @_;
 	my $opt = HASH_REF eq ref $args[0] ? shift @args : {};
 	$readkey_loaded
@@ -228,7 +228,7 @@ sub not_defined ($$) {	## no critic (ProhibitSubroutinePrototypes)
 
     my $ua;
 
-    sub set_skip ($;$) {	## no critic (ProhibitSubroutinePrototypes)
+    sub set_skip {
 	my ( $site, $skip ) = @_;
 	exists $info{$site}{url}
 	    or die "Programming error. '$site' unknown";
@@ -236,7 +236,7 @@ sub not_defined ($$) {	## no critic (ProhibitSubroutinePrototypes)
 	return;
     }
 
-    sub site_check (@) {	## no critic (ProhibitSubroutinePrototypes)
+    sub site_check {
 	my @sites = @_;
 	my @rslt = grep { defined $_ } map { _site_check( $_ ) } @sites
 	    or return;
@@ -401,7 +401,7 @@ sub spacetrack_user {
     return;
 }
 
-sub throws_exception (@) {	## no critic (RequireArgUnpacking,ProhibitSubroutinePrototypes)
+sub throws_exception {	## no critic (RequireArgUnpacking)
     my ( $obj, $method, @args ) = @_;
     my $name = pop @args;
     my $exception = pop @args;

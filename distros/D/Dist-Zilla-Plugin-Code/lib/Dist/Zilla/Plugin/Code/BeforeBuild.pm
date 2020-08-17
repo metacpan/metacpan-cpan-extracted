@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 use Moose;
 use namespace::autoclean;
@@ -13,19 +13,17 @@ with 'Dist::Zilla::Role::BeforeBuild';
 
 use MooseX::Types::Moose qw(CodeRef);
 
-has _before_build_code_ref => (
+has before_build => (
     is       => 'ro',
     isa      => 'CodeRef',
-    init_arg => 'before_build',
+    reader   => '_before_build',
     required => 1,
 );
 
 sub before_build {
     my $self = shift;
 
-    my $code_ref = $self->_before_build_code_ref;
-    return if !defined $code_ref;
-
+    my $code_ref = $self->_before_build;
     return $self->$code_ref(@_);
 }
 
@@ -45,7 +43,7 @@ Dist::Zilla::Plugin::Code::BeforeBuild - something that runs before building rea
 
 =head1 VERSION
 
-Version 0.001
+Version 0.003
 
 =head1 SYNOPSIS
 
@@ -55,7 +53,6 @@ Version 0.001
 
     use Moose;
     with 'Dist::Zilla::Role::PluginBundle';
-    use Dist::Zilla::Plugin::Code::BeforeBuild;
 
     sub bundle_config {
         my ( $class, $section ) = @_;
@@ -83,7 +80,6 @@ Version 0.001
 
     use Moose;
     with 'Dist::Zilla::Role::PluginBundle::Easy';
-    use Dist::Zilla::Plugin::Code::BeforeBuild;
 
     sub configure {
         my ( $self ) = @_;

@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Test::More;
 if ( eval { require PDF::API2 } ) {
-    plan tests => 9;
+    plan tests => 7;
 }
 else {
     plan skip_all => "PDF::API2 not installed";
@@ -21,12 +21,9 @@ my $text = $page->text;
 ok( $text, "Create PDF page text" );
 
 # Create a layout.
-require Text::Layout;
-my $layout = Text::Layout->new($pdf);
+require Text::Layout::PDFAPI2;
+my $layout = Text::Layout::PDFAPI2->new($pdf);
 ok( $layout, "Create layout");
-# For auto-detecting the backend, it must be loaded before the 'new' call.
-is( $layout->{_be}, 'Text::Layout::PDFAPI2', 'Backend' );
-ok( $layout->{_be}->can("load_font"), 'Has loader' );
 
 # Create a FontConfig.
 require Text::Layout::FontConfig;

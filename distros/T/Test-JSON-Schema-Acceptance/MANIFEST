@@ -14,6 +14,9 @@ inc/OldShareDirFiles.pm
 lib/Test/JSON/Schema/Acceptance.pm
 share/LICENSE
 share/README.md
+share/remotes/baseUriChange/folderInteger.json
+share/remotes/baseUriChangeFolder/folderInteger.json
+share/remotes/baseUriChangeFolderInSubschema/folderInteger.json
 share/remotes/folder/folderInteger.json
 share/remotes/integer.json
 share/remotes/name-defs.json
@@ -76,6 +79,7 @@ share/tests/draft2019-09/optional/format/time.json
 share/tests/draft2019-09/optional/format/uri-reference.json
 share/tests/draft2019-09/optional/format/uri-template.json
 share/tests/draft2019-09/optional/format/uri.json
+share/tests/draft2019-09/optional/format/uuid.json
 share/tests/draft2019-09/optional/non-bmp-regex.json
 share/tests/draft2019-09/optional/refOfUnknownKeyword.json
 share/tests/draft2019-09/pattern.json
@@ -289,8 +293,13 @@ t/10-exception.t
 t/11-additional-resources.t
 t/12-include-optional.t
 t/13-empty-test-dir.t
+t/14-add-resource.t
+t/15-mutation.t
 t/99-sanity.t
 t/lib/SchemaParser.pm
+t/tests/add_resource/foo.json
+t/tests/add_resource/remotes/remote1.json
+t/tests/add_resource/remotes/subfolder/remote2.json
 t/tests/bad/invalid-schema.json
 t/tests/empty/keep
 t/tests/include_optional/extra/foo.json
@@ -298,6 +307,7 @@ t/tests/include_optional/foo.json
 t/tests/include_optional/optional/alpha.json
 t/tests/include_optional/optional/beta.json
 t/tests/include_optional/zulu.json
+t/tests/mutation/hash.json
 t/tests/simple-booleans/bar.json
 t/tests/simple-booleans/foo.json
 t/tests/subset/bar.json

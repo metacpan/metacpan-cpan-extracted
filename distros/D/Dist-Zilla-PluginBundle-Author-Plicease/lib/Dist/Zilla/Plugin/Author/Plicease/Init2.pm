@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.53 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.54 {
 
   use 5.014;
   use Moose;
@@ -385,7 +385,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.53
+version 2.54
 
 =head1 DESCRIPTION
 
@@ -454,7 +454,8 @@ script:
 jobs:
   include:
     - env: CIP_TAG=static
-    - env: CIP_TAG=5.31
+    - env: CIP_TAG=5.33
+    - env: CIP_TAG=5.32
     - env: CIP_TAG=5.30
     - env: CIP_TAG=5.28
     - env: CIP_TAG=5.26

@@ -3,9 +3,9 @@ use strict;
 use warnings;
 no if "$]" >= 5.031009, feature => 'indirect';
 
-use Test::Tester 0.108;
+use Test2::API 'intercept';
 use Test::More 0.88;
-use Test::Warnings qw(warnings had_no_warnings :no_end_test);
+use Test::Warnings 'warnings';
 use Test::Deep;
 use Test::JSON::Schema::Acceptance;
 use lib 't/lib';
@@ -30,7 +30,7 @@ foreach my $test (
 ) {
   my $todo_count = delete $test->{todo_count};
   my @warnings;
-  my ($premature, @results) = run_tests(
+  my $events = intercept(
     sub {
       @warnings = warnings {
         $accepter->acceptance(
@@ -44,9 +44,15 @@ foreach my $test (
     }
   );
 
-  is(scalar(grep $_->{type} eq 'skip', @results), 0, 'skipped no tests');
-  is(scalar(grep $_->{type} eq 'todo_skip', @results), 0, 'todo_skipped no tests');
-  is(scalar(grep $_->{type} eq 'todo', @results), $todo_count, $todo_count.' tests marked TODO');
+  is(scalar(grep $_->isa('Test2::Event::Skip'), @$events), 0, 'skipped and todo_skipped no tests');
+  is(
+    scalar(
+      grep exists $_->{assert} && (grep $_->{tag} eq 'TODO', @{$_->{amnesty} // []}),
+      map $_->facet_data, @$events
+    ),
+    $todo_count,
+    $todo_count.' tests are marked TODO',
+  );
 
   cmp_deeply(
     \@warnings,
@@ -55,5 +61,4 @@ foreach my $test (
   );
 }
 
-had_no_warnings if $ENV{AUTHOR_TESTING};
 done_testing;

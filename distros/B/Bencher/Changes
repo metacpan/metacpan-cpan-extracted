@@ -1,3 +1,20 @@
+1.051   2020-08-16  Released-By: PERLANCAR; Urgency: high
+
+        - Merge 1.050 and 1.050.1.
+
+
+1.050.1 2020-08-15  Released-By: PERLANCAR; Urgency: medium; Status: Cancelled
+
+	- Mention support of loading scenario from Acme::CPANModules::*
+	  module.
+
+	- Mention caveat of missing use/BEGIN-block code in
+	  multiperl/multimodver mode.
+
+        - UPDATE 2020-08-16: rename release from 1.050 to 1.050.1 and cancel
+          this release (duplicate).
+
+
 1.050   2020-06-18  Released-By: PERLANCAR; Urgency: medium
 
         - Resynchronize version number with Bencher-Backend.

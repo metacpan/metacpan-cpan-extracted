@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,6 +19,7 @@ requires:
   Getopt::Long: '0'
   Moo: '0'
   MooX::Role::CachedURL: '0.06'
+  Text::Table::Tiny: '1.00'
   autodie: '0'
   perl: '5.006'
   strict: '0'
@@ -26,5 +27,6 @@ requires:
 resources:
   homepage: https://github.com/neilbowers/CPAN-ReleaseHistory
   repository: https://github.com/neilbowers/CPAN-ReleaseHistory.git
-version: '0.15'
-x_serialization_backend: 'YAML::Tiny version 1.62'
+version: '0.16'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

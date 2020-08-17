@@ -8,6 +8,7 @@ package DTA::CAB::Format::Builtin;
 use DTA::CAB::Format;
 
 #use DTA::CAB::Format::Freeze;
+use DTA::CAB::Format::CONLLU;   ##-- CONLL-U format with some TT- and TJ-like features
 use DTA::CAB::Format::CSV;
 use DTA::CAB::Format::CSV1g;
 use DTA::CAB::Format::Null;

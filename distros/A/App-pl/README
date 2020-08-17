@@ -16,18 +16,18 @@ double "$Q(uote)".  Same for hard-to-print values:
     pl 'echo \"Perl", \@ARGV, undef' one liner
     pl 'e \"Perl", \@A, undef' one liner
 
-Print up to 3 matching lines, resetting count (and "$.") for each file:
-
-    pl -rP3 '/Perl.*one.*liner/' file1 file2 file3
-
 Loop over args, printing each with line ending.  And same, shouting:
 
     pl -opl '' Perl one liner
     pl -opl '$_ = uc' Perl one liner
 
-Count hits in magic statistics hash "%n(umber)":
+Print up to 3 matching lines, resetting count (and "$.") for each file:
 
-    pl -n '++$n{$1} while /(Perl|one|liner)/g' file1 file2 file3
+    pl -rP3 '/Perl.*one.*liner/' file*
+
+Count hits in magic statistics hash "%N(UMBER)":
+
+    pl -n '++$N{$1} while /(Perl|one|liner)/g' file*
 
 Though they are sometimes slightly, sometimes quite a bit more complicated,
 most Perl one-liners from the internet work, just by omitting "-e" or "-E".
@@ -35,10 +35,9 @@ Known minor differences are:
 
 * don't "goto LINE", but "next LINE" is fine
 
-* in a "-n" loop "last" goes straight to the next file instead of behaving like
-"exit"
+* in a "-n" loop "last" is per file instead of behaving like "exit"
 
-* using "pop", etc. to implicitly modify "@A(RGV)" works in "-b" begin code,
+* using "pop", etc. to implicitly modify "@A(RGV)" works in "-B" begin code,
 but not in your main program (which gets compiled to a function)
 
 * shenanigans with unbalanced braces won't work

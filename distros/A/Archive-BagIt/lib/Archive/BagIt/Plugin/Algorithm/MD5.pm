@@ -71,7 +71,7 @@ Archive::BagIt::Plugin::Algorithm::MD5 - The MD5 algorithm plugin (default for v
 
 =head1 VERSION
 
-version 0.065
+version 0.066
 
 =head1 AVAILABILITY
 

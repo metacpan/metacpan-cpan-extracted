@@ -1,0 +1,54 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CGI-Application-Plugin-OpenTracing-DataDog",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Application::Plugin::OpenTracing" : "v0.103.1",
+            "Carp" : "0",
+            "Import::Into" : "0",
+            "OpenTracing::Implementation::DataDog" : "v0.42.1",
+            "Readonly" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Response::Maker" : "0",
+            "JSON::MaybeXS" : "0",
+            "Test::Most" : "0",
+            "Test::WWW::Mechanize::CGIApp" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

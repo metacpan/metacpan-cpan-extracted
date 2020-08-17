@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Config 3.04;
+package App::DocKnot::Config 3.05;
 
 use 5.024;
 use autodie;
@@ -18,7 +18,7 @@ use warnings;
 
 use Carp qw(croak);
 use File::Spec;
-use JSON;
+use JSON::MaybeXS qw(JSON);
 use Perl6::Slurp;
 
 # Additional files to load from the metadata directory if they exist.  The

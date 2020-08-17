@@ -5,6 +5,7 @@ author:
 build_requires:
   CGI::Application: '0'
   ExtUtils::MakeMaker: '0'
+  LWP::UserAgent: '6.42'
   Test::MockObject: '0'
   Test::Most: '0'
   Test::OpenTracing::Integration: v0.102.0
@@ -27,7 +28,8 @@ requires:
   HTTP::Status: '0'
   OpenTracing::GlobalTracer: '0'
   OpenTracing::Implementation: v0.31.0
+  Sub::Name: '0'
   Syntax::Feature::Maybe: '0'
   Time::HiRes: '0'
-version: v0.103.1
+version: v0.103.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

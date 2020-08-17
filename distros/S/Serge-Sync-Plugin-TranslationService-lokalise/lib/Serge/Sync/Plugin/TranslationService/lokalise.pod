@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Serge::Sync::Plugin::TranslationService::lokalise - L<Lokalise|https://lokalise.co> synchronization plugin for L<Serge|https://serge.io/> based on L<Lokalise CLI|https://docs.lokalise.co/api-and-cli/lokalise-cli-tool>
+Serge::Sync::Plugin::TranslationService::lokalise - L<Lokalise|https://lokalise.co> synchronization plugin for L<Serge|https://serge.io/> based on L<Lokalise CLI v2|https://github.com/lokalise/lokalise-cli-2-go>
 
 =head1 SYNOPSIS
 

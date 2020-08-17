@@ -140,6 +140,12 @@ Version 14 has only internal bugfixes and no externally incompatible changes.
 The main "feature" of this release is more internal error checking. This is to detect broken connections sooner and a bit
 more reliable.
 
+=head2 VERSION 15
+
+Version 15 adds the configuration variable "persistanceinterval" (defaults to 10 seconds for backward compatibility). This defined the
+interval in which a persistance file is written. You could lower it for more frequent checkpointing, but more importantly you could
+increase to longer time spans to reduce disk activity.
+
 =head1 AUTHOR
 
 Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>

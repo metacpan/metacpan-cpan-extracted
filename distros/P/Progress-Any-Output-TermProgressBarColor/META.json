@@ -34,7 +34,7 @@
          "requires" : {
             "Color::ANSI::Util" : "0.164",
             "Monkey::Patch::Action" : "0.060",
-            "Progress::Any" : "0.216",
+            "Progress::Any" : "0.219",
             "String::Elide::Parts" : "0.07",
             "Text::ANSI::Util" : "0.22",
             "perl" : "5.010001",
@@ -68,12 +68,17 @@
          "web" : "https://github.com/perlancar/perl-Progress-Any-Output-TermProgressBarColor"
       }
    },
-   "version" : "0.248",
+   "version" : "0.249",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
             "config" : {
@@ -163,7 +168,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.602"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -232,9 +237,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",

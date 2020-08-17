@@ -3,7 +3,6 @@ abstract: unknown
 author:
   - 'Peter John Acklam <pjacklam@gmail.com>'
 build_requires:
-  Math::Complex: '0'
   Test::More: '0.94'
 configure_requires:
   ExtUtils::MakeMaker: '6.58'
@@ -21,5 +20,5 @@ no_index:
 requires: {}
 resources:
   repository: https://github.com/pjacklam/p5-Math-Matrix.git
-version: '0.9'
+version: '0.91'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

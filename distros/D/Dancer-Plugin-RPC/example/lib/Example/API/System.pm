@@ -1,5 +1,6 @@
 package Example::API::System;
 use Moo;
+use Types::Standard qw( Str Num );
 
 our $VERSION = '0.00';
 
@@ -11,14 +12,17 @@ use POSIX ();
 
 has app_version => (
     is       => 'ro',
+    isa      => Str,
     required => 1
 );
 has app_name => (
     is       => 'ro',
+    isa      => Str,
     required => 1
 );
 has active_since => (
     is       => 'ro',
+    isa      => Num,
     required => 1
 );
 

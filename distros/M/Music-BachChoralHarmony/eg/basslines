@@ -10,7 +10,7 @@ use lib '/Users/gene/sandbox/Music-ToRoman/lib';
 use Music::ToRoman;
 
 my $size   = shift || 3; # Number of notes to consider
-my $in_key = shift || 'major'; # maj, minor, min, m
+my $in_key = shift || 'maj'; # maj, min, m
 my $min    = shift // 1;
 
 $in_key = 'major'
@@ -31,6 +31,8 @@ for my $song ( sort keys %$songs ) {
 
     # Get the scale name
     my $name = $key =~ /M/ ? 'major' : 'minor';
+
+    # Strip the key to just the note
     $key =~ s/_?M//i;
 
     # Skip if not the right key

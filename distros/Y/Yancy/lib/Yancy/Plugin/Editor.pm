@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.065';
+our $VERSION = '1.066';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -228,10 +228,12 @@ sub register {
         state $auth_cb = $c->yancy->can( 'auth' )
                     && $c->yancy->auth->can( 'require_user' )
                     && $c->yancy->auth->require_user( $config->{require_user} || () );
-        if ( !$auth_cb && !exists $config->{require_user} ) {
-            derp qq{*** Editor without authentication is deprecated and will be\n}
-                . qq{removed in v2.0. Configure an Auth plugin or set \n}
-                . qq{`editor.require_user => undef` to silence this warning\n};
+        if ( !$auth_cb && !exists $config->{require_user} && !defined $config->{route} ) {
+            $app->log->warn(
+                qq{*** Cannot verify that admin editor is behind authentication.\n}
+                . qq{Add a Yancy Auth plugin, add a `route` to the Yancy plugin config,\n}
+                . qq{or set `editor.require_user => undef` to silence this warning\n}
+            );
         }
         return $auth_cb ? $auth_cb->( $c ) : 1;
     };
@@ -699,7 +701,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.065
+version 1.066
 
 =head1 SYNOPSIS
 

@@ -31,15 +31,11 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "AnyEvent" : "7.14"
-         },
          "requires" : {
-            "AnyEvent" : "0",
             "Carp" : "0",
             "Exporter" : "0",
             "IO::Handle" : "0",
-            "IO::Pipe" : "0",
+            "IO::Pipely" : "0",
             "IO::Select" : "0",
             "POSIX" : "0",
             "Scalar::Util" : "0",
@@ -70,11 +66,11 @@
    "provides" : {
       "Parallel::WorkUnit" : {
          "file" : "lib/Parallel/WorkUnit.pm",
-         "version" : "2.201890"
+         "version" : "2.202270"
       },
       "Parallel::WorkUnit::Procedural" : {
          "file" : "lib/Parallel/WorkUnit/Procedural.pm",
-         "version" : "2.201890"
+         "version" : "2.202270"
       }
    },
    "release_status" : "stable",
@@ -88,7 +84,7 @@
          "web" : "https://github.com/jmaslak/Parallel-WorkUnit"
       }
    },
-   "version" : "2.201890",
+   "version" : "2.202270",
    "x_contributor_covenant" : {
       "version" : 0.02
    },

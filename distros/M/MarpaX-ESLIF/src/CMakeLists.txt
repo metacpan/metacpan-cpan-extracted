@@ -7,7 +7,7 @@ ENDIF ()
 # when we do make marpaESLIFPerlRelease
 #
 # SET (MYPACKAGE_DEBUG TRUE)
-MYPACKAGESTART (marpaESLIF 3 0 32)
+MYPACKAGESTART (marpaESLIF 4 0 1)
 
 ###########
 # Library #
@@ -75,7 +75,7 @@ MYPACKAGETESTEXECUTABLE(exceptionTester4           test/exceptionTester4.c)
 # Dependencies #
 ################
 MYPACKAGEDEPENDENCY (genericLogger "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericLogger" LIBS LOCAL)
-MYPACKAGEDEPENDENCY (pcre2         "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/untar/pcre2-10.23"    LIBS LOCAL STATIC)
+MYPACKAGEDEPENDENCY (pcre2         "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/untar/pcre2-10.33"    LIBS LOCAL STATIC)
 MYPACKAGEDEPENDENCY (genericStack  "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericStack"  LIBS LOCAL STATIC)
 MYPACKAGEDEPENDENCY (genericHash   "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericHash"   LIBS LOCAL STATIC)
 MYPACKAGEDEPENDENCY (marpaWrapper  "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/marpaWrapper"  LIBS LOCAL STATIC)

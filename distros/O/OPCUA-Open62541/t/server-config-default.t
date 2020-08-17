@@ -66,6 +66,7 @@ lives_ok { $config->setMaxSecureChannels(23) }
 no_leaks_ok { $config->setMaxSecureChannels(23) }
     "custom max secure channels leak";
 
-ok(my $maxsecurechannels = $config->getMaxSecureChannels(), "max secure channels get");
+ok(my $maxsecurechannels = $config->getMaxSecureChannels(),
+    "max secure channels get");
 no_leaks_ok { $config->getMaxSecureChannels() } "max secure channels leak";
 is($maxsecurechannels, 23, "max secure channels");

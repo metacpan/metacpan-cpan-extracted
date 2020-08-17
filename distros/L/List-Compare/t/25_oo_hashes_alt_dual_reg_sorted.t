@@ -6,7 +6,7 @@ use Test::More tests =>  79;
 use List::Compare;
 use lib ("./t");
 use Test::ListCompareSpecial qw( :seen :wrap :hashes :results );
-use IO::CaptureOutput qw( capture );
+use Capture::Tiny q|:all|;
 
 my @pred = ();
 my %seen = ();
@@ -42,22 +42,14 @@ is_deeply($intersection_ref, \@pred, "Got expected intersection");
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @shared = $lc->get_shared; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @shared = $lc->get_shared; };
     is_deeply( \@shared, \@pred, "Got expected shared");
     like($stderr, qr/please consider re-coding/,
         "Got expected warning");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $shared_ref = $lc->get_shared_ref; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $shared_ref = $lc->get_shared_ref; };
     is_deeply( $shared_ref, \@pred, "Got expected shared");
     like($stderr, qr/please consider re-coding/,
         "Got expected warning");
@@ -145,22 +137,14 @@ is_deeply($symmetric_difference_ref, \@pred, "Got expected symmetric_difference"
 @pred = qw( abel hilton );
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { @nonintersection = $lc->get_nonintersection; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { @nonintersection = $lc->get_nonintersection; };
     is_deeply( \@nonintersection, \@pred, "Got expected nonintersection");
     like($stderr, qr/please consider re-coding/,
         "Got expected warning");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $nonintersection_ref = $lc->get_nonintersection_ref; },
-        \$stdout,
-        \$stderr,
-    );
+    $stderr = capture_stderr { $nonintersection_ref = $lc->get_nonintersection_ref; };
     is_deeply($nonintersection_ref, \@pred, "Got expected nonintersection");
     like($stderr, qr/please consider re-coding/,
         "Got expected warning");
@@ -197,20 +181,14 @@ ok(! $disj, "Got expected disjoint relationship");
 
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $rv = $lc->print_subset_chart; },
-        \$stdout,
-    );
+    $stdout = capture_stdout { $rv = $lc->print_subset_chart; };
     ok($rv, "print_subset_chart() returned true value");
     like($stdout, qr/Subset Relationships/,
         "Got expected chart header");
 }
 {
     my ($rv, $stdout, $stderr);
-    capture(
-        sub { $rv = $lc->print_equivalence_chart; },
-        \$stdout,
-    );
+    $stdout = capture_stdout { $rv = $lc->print_equivalence_chart; };
     ok($rv, "print_equivalence_chart() returned true value");
     like($stdout, qr/Equivalence Relationships/,
         "Got expected chart header");
@@ -342,3 +320,4 @@ like($@, qr/Must pass all array references or all hash references/,
 eval { $lc_bad = List::Compare->new( { lists => [ \%h0 ] } ) };
 like($@, qr/Must pass at least 2 references/,
     "Got expected error message from bad constructor");
+

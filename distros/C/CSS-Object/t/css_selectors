@@ -1,0 +1,33 @@
+/*                */ 
+/* SELECTOR TESTS */
+/*                */
+
+*			{ foo: bar; }	/* universal */
+E			{ foo: bar; }	/* element */
+E F			{ foo: bar; }	/* descendant */
+E > F			{ foo: bar; }	/* child */
+E:first-child		{ foo: bar; }	/* pseudo-class */
+E:lang(c)		{ foo: bar; }	/* pseudo-class with arguments */
+E + F			{ foo: bar; }	/* adjacent elements */
+E[foo]			{ foo: bar; }	/* element attribute detector */
+E[foo="warning"]	{ foo: bar; }	/* element attribute selector */
+E[foo~="foo"]		{ foo: bar; }	/* element attribute selector with space list */
+E[lang|="en"]		{ foo: bar; }	/* element attribute selector with hyphen list */
+DIV.warning		{ foo: bar; }	/* class */
+E#myid			{ foo: bar; }	/* id */
+*.warning		{ foo: bar; }	/* universal class */
+.warning		{ foo: bar; }	/* universal class (implicit) */
+*#myid			{ foo: bar; }	/* universal id */
+#myid			{ foo: bar; }	/* universal id (implicit) */
+[lang=fr]		{ foo: bar; }	/* universal language */
+A, B, C			{ foo: bar; }	/* groups */
+A * B			{ foo: bar; }	/* universal as descendant */
+A B>C D			{ foo: bar; }	/* descendants with child */
+A[b="c"][d="e"]		{ foo: bar; }	/* multiple attribute selectors */
+A:focus:hover		{ foo: bar; }	/* double pseudo class */
+
+
+/*   */
+/* X */
+/*   */
+

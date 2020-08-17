@@ -33,7 +33,7 @@ LWP::UserAgent::DNS::Hosts - Override LWP HTTP/HTTPS request's host like /etc/ho
 LWP::UserAgent::DNS::Hosts is a module to override HTTP/HTTPS request
 peer addresses that uses LWP::UserAgent.
 
-This module concept was got from [LWP::Protocol::PSGI](https://metacpan.org/pod/LWP::Protocol::PSGI).
+This module concept was got from [LWP::Protocol::PSGI](https://metacpan.org/pod/LWP%3A%3AProtocol%3A%3APSGI).
 
 # METHODS
 
@@ -48,7 +48,7 @@ This module concept was got from [LWP::Protocol::PSGI](https://metacpan.org/pod/
 
     equals to:
 
-        LWP::UserAgent::DNS::Hosts->regiter_hosts('example.com', '127.0.0.1');
+        LWP::UserAgent::DNS::Hosts->register_hosts('example.com', '127.0.0.1');
 
 - register\_hosts(%host\_addr\_pairs)
 
@@ -105,4 +105,4 @@ it under the same terms as Perl itself.
 
 # SEE ALSO
 
-[LWP::Protocol](https://metacpan.org/pod/LWP::Protocol), [LWP::Protocol::http](https://metacpan.org/pod/LWP::Protocol::http), [LWP::Protocol::https](https://metacpan.org/pod/LWP::Protocol::https)
+[LWP::Protocol](https://metacpan.org/pod/LWP%3A%3AProtocol), [LWP::Protocol::http](https://metacpan.org/pod/LWP%3A%3AProtocol%3A%3Ahttp), [LWP::Protocol::https](https://metacpan.org/pod/LWP%3A%3AProtocol%3A%3Ahttps)

@@ -1,0 +1,7 @@
+lib/Mojolicious/Plugin/StrictCORS.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+t/basic.t

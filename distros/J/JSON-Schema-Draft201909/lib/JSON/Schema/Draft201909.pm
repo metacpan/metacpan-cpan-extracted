@@ -1,14 +1,14 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.010-12-g1d7c752
+package JSON::Schema::Draft201909; # git description: v0.011-8-g62d7177
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
+use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
-use feature 'fc';
 use JSON::MaybeXS 1.004001 'is_bool';
 use Syntax::Keyword::Try 0.11;
 use Carp qw(croak carp);
@@ -1673,7 +1673,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

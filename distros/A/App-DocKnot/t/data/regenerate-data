@@ -20,7 +20,7 @@ use lib 'blib/lib';
 use App::DocKnot;
 use App::DocKnot::Generate;
 
-# For each subdirectory of t/data, regenerate each file in the output
+# For each subdirectory of t/data/generate, regenerate each file in the output
 # subdirectory using the metadata subdirectory and the template matching the
 # output name.  Special-case the docknot subdirectory, which uses DocKnot's
 # own metadata.

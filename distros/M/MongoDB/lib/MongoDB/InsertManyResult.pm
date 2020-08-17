@@ -19,7 +19,7 @@ package MongoDB::InsertManyResult;
 # ABSTRACT: MongoDB single insert result object
 
 use version;
-our $VERSION = 'v2.2.1';
+our $VERSION = 'v2.2.2';
 
 use Moo;
 use MongoDB::_Constants;
@@ -100,7 +100,7 @@ MongoDB::InsertManyResult - MongoDB single insert result object
 
 =head1 VERSION
 
-version v2.2.1
+version v2.2.2
 
 =head1 SYNOPSIS
 
@@ -180,7 +180,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MongoDB, Inc.
+This software is Copyright (c) 2020 by MongoDB, Inc.
 
 This is free software, licensed under:
 

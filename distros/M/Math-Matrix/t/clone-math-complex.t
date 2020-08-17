@@ -3,10 +3,19 @@
 use strict;
 use warnings;
 
+use Test::More;
+
+# Ensure a recent version of Math::Complex. Math Complex didn't support any way
+# of cloning/copying Math::Complex objects before version 1.57.
+
+my $min_math_complex_ver = 1.57;
+eval "use Math::Complex $min_math_complex_ver";
+plan skip_all => "Math::Complex $min_math_complex_ver required" if $@;
+
+plan tests => 22;
+
 use lib 't/lib';
 use Math::Matrix::Complex;
-
-use Test::More tests => 22;
 
 my $xdata = [[1, 2, 3], [4, 5, 6]];
 

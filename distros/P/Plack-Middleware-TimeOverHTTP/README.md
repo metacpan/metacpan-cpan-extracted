@@ -4,7 +4,7 @@ Plack::Middleware::TimeOverHTTP - time over HTTP middleware
 
 # VERSION
 
-version v0.1.0
+version v0.1.2
 
 # SYNOPSIS
 
@@ -34,7 +34,7 @@ on IP address. You will need to use additional middleware for that.
 # SEE ALSO
 
 The "Time Over HTTPS specification" at
-[http://phk.freebsd.dk/time/20151129.html](http://phk.freebsd.dk/time/20151129.html).
+[http://phk.freebsd.dk/time/20151129/](http://phk.freebsd.dk/time/20151129/).
 
 # AUTHOR
 
@@ -42,7 +42,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

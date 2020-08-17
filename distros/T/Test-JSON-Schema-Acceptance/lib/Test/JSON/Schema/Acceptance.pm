@@ -1,15 +1,19 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v0.998-2-g13ca4ca
+package Test::JSON::Schema::Acceptance; # git description: v0.999-18-g5f865f3
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '0.999';
+our $VERSION = '1.000';
 
+use 5.014;
 no if "$]" >= 5.031009, feature => 'indirect';
-use Test::More ();
-use Test::Fatal ();
+use Test2::API ();
+use Test2::Todo;
+use Test2::Tools::Compare ();
+use Try::Tiny;
 use JSON::MaybeXS 1.004001;
+use Storable 3.00 ();
 use File::ShareDir 'dist_dir';
 use Moo;
 use MooX::TypeTiny 0.002002;
@@ -86,16 +90,28 @@ sub acceptance {
   die 'cannot provide both "validate_data" and "validate_json_string"'
     if $options->{validate_data} and $options->{validate_json_string};
 
-  $self->_run_tests($self->_test_data, $options);
-
-}
-
-sub _run_tests {
-  my ($self, $tests, $options) = @_;
-
-  Test::More::note('running tests in '.$self->test_dir.'...');
-
   warn "'skip_tests' option is deprecated" if $options->{skip_tests};
+
+  my $ctx = Test2::API::context;
+
+  if ($options->{add_resource}) {
+    my $base = 'http://localhost:1234'; # TODO? make this customizable
+    $ctx->note('adding resources under '.$base.'...');
+    $self->additional_resources->visit(
+      sub {
+        my ($path) = @_;
+        return if not $path->is_file or $path !~ /\.json$/;
+        my $data = $self->_json_decoder->decode($path->slurp_raw);
+        my $file = $path->relative($self->additional_resources);
+        my $uri = $base.'/'.$file;
+        $options->{add_resource}->($uri => $data);
+      },
+      { recurse => 1 },
+    );
+  }
+
+  $ctx->note('running tests in '.$self->test_dir.'...');
+  my $tests = $self->_test_data;
 
   # [ { file => .., pass => .., fail => .. }, ... ]
   my @results;
@@ -106,6 +122,8 @@ sub _run_tests {
       and not grep $_ eq $one_file->{file},
         (ref $options->{tests}{file} eq 'ARRAY'
           ? @{$options->{tests}{file}} : $options->{tests}{file});
+
+    $ctx->note('');
 
     foreach my $test_group (@{$one_file->{json}}) {
       next if $options->{tests} and $options->{tests}{group_description}
@@ -129,64 +147,97 @@ sub _run_tests {
 
   $self->_set_results(\@results);
 
-  my $diag = sub { Test::More->builder->${\ ($self->verbose ? 'diag' : 'note') }(@_) };
+  my $diag = $self->verbose ? 'diag' : 'note';
 
-  $diag->("\n\n".'Results using '.ref($self).' '.$self->VERSION);
+  $ctx->$diag("\n\n".'Results using '.ref($self).' '.$self->VERSION);
 
   my $submodule_status = path(dist_dir('Test-JSON-Schema-Acceptance'), 'submodule_status');
   if ($submodule_status->exists and $submodule_status->parent->subsumes($self->test_dir)) {
     chomp(my ($commit, $url) = $submodule_status->lines);
-    $diag->('with commit '.$commit);
-    $diag->('from '.$url.':');
+    $ctx->$diag('with commit '.$commit);
+    $ctx->$diag('from '.$url.':');
   }
 
-  $diag->('');
+  $ctx->$diag('');
   my $length = max(10, map length $_->{file}, @$tests);
-  $diag->(sprintf('%-'.$length.'s  pass  fail', 'filename'));
-  $diag->('-'x($length + 12));
-  $diag->(sprintf('%-'.$length.'s   %3d   %3d', @{$_}{qw(file pass fail)}))
+  $ctx->$diag(sprintf('%-'.$length.'s  pass  fail', 'filename'));
+  $ctx->$diag('-'x($length + 12));
+  $ctx->$diag(sprintf('%-'.$length.'s   %3d   %3d', @{$_}{qw(file pass fail)}))
     foreach @results;
-  $diag->('');
+  $ctx->$diag('');
+
+  $ctx->release;
 }
 
 sub _run_test {
   my ($self, $one_file, $test_group, $test, $options) = @_;
 
-  TODO: {
-    local $::TODO = 'Test marked TODO via deprecated "skip_tests"'
-      if ref $options->{skip_tests} eq 'ARRAY'
-        and grep +(($test_group->{description}.' - '.$test->{description}) =~ /$_/),
-          @{$options->{skip_tests}};
+  my $todo;
+  $todo = Test2::Todo->new(reason => 'Test marked TODO via deprecated "skip_tests"')
+    if ref $options->{skip_tests} eq 'ARRAY'
+      and grep +(($test_group->{description}.' - '.$test->{description}) =~ /$_/),
+        @{$options->{skip_tests}};
 
-    local $::TODO = 'Test marked TODO via "todo_tests"'
-      if $options->{todo_tests}
-        and any {
-          my $o = $_;
-          (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? @{$o->{file}} : $o->{file}))
-            and
-          (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? @{$o->{group_description}} : $o->{group_description}))
-            and
-          (not $o->{test_description} or grep $_ eq $test->{description}, (ref $o->{test_description} eq 'ARRAY' ? @{$o->{test_description}} : $o->{test_description}))
-        }
-        @{$options->{todo_tests}};
+  $todo = Test2::Todo->new(reason => 'Test marked TODO via "todo_tests"')
+    if $options->{todo_tests}
+      and any {
+        my $o = $_;
+        (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? @{$o->{file}} : $o->{file}))
+          and
+        (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? @{$o->{group_description}} : $o->{group_description}))
+          and
+        (not $o->{test_description} or grep $_ eq $test->{description}, (ref $o->{test_description} eq 'ARRAY' ? @{$o->{test_description}} : $o->{test_description}))
+      }
+      @{$options->{todo_tests}};
 
-    my $test_name = $one_file->{file}.': "'.$test_group->{description}.'" - "'.$test->{description}.'"';
+  my $test_name = $one_file->{file}.': "'.$test_group->{description}.'" - "'.$test->{description}.'"';
 
-    my $result;
-    my $exception = Test::Fatal::exception {
-      $result = $options->{validate_data}
-        ? $options->{validate_data}->($test_group->{schema}, $test->{data})
-        : $options->{validate_json_string}->($test_group->{schema}, $self->_json_decoder->encode($test->{data}));
-    };
+  my ($result, $exception, $schema_before, $data_before, $schema_after, $data_after);
+  try {
+    {
+      local $Storable::flags = Storable::BLESS_OK | Storable::TIE_OK;
+      ($schema_before, $data_before) = map Storable::freeze(\$_),
+        $test_group->{schema}, $test->{data};
+    }
 
-    my $got = $result ? 'true' : 'false';
-    my $expected = $test->{valid} ? 'true' : 'false';
+    $result = $options->{validate_data}
+      ? $options->{validate_data}->($test_group->{schema}, $test->{data})
+      : $options->{validate_json_string}->($test_group->{schema}, $self->_json_decoder->encode($test->{data}));
 
-    local $Test::Builder::Level = $Test::Builder::Level + 3;
-
-    return Test::More::fail($test_name.' died: '.$exception) if $exception;
-    return Test::More::is($got, $expected, $test_name);
+    {
+      local $Storable::flags = Storable::BLESS_OK | Storable::TIE_OK;
+      ($schema_after, $data_after) = map Storable::freeze(\$_),
+        $test_group->{schema}, $test->{data};
+    }
   }
+  catch {
+    chomp($exception = $_);
+  };
+
+  my $got = $result ? 'true' : 'false';
+  my $expected = $test->{valid} ? 'true' : 'false';
+
+  my $ctx = Test2::API::context;
+
+  my $pass = Test2::API::run_subtest($test_name,
+    sub {
+      my $ctx = Test2::API::context;
+      $exception
+        ? $ctx->fail('died: '.$exception)
+        : Test2::Tools::Compare::is($got, $expected, 'result is '.($test->{valid}?'':'in').'valid');
+
+      Test2::Tools::Compare::is($data_after, $data_before, 'evaluator did not mutate data')
+        if not $exception and $data_before ne $data_after;
+      Test2::Tools::Compare::is($schema_after, $schema_before, 'evaluator did not mutate schema')
+        if not $exception and $schema_before ne $schema_after;
+
+      $ctx->release;
+    },
+    { buffered => 1, inherit_trace => 1 },
+  );
+
+  $ctx->release;
+  return $pass;
 }
 
 has _json_decoder => (
@@ -265,7 +316,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 0.999
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -385,7 +436,8 @@ L<https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/master/README.m
 A directory of additional resources which should be made available to the implementation under the
 base URI C<http://localhost:1234>. This is automatically provided if you did not override
 C</test_dir>; otherwise, you need to supply it yourself, if any tests require it (for example by
-containing C<< {"$ref": "http://localhost:1234/foo.json/#a/b/c"} >>).
+containing C<< {"$ref": "http://localhost:1234/foo.json/#a/b/c"} >>). If you supply an
+L</add_resource> value to L</acceptance> (see below), this will be done for you.
 
 =head2 verbose
 
@@ -428,6 +480,14 @@ The subroutine should return truthy or falsey depending on if the schema was val
 not.
 
 Either C<validate_data> or C<validate_json_string> is required.
+
+=head3 add_resource
+
+Optional. A subroutine reference, which will be called at the start of L</acceptance> multiple
+times, with two arguments: a URI (string), and a data structure containing schema data to be
+associated with that URI, for use in some tests that use additional resources (see above). If you do
+not provide this option, you will be responsible for ensuring that those additional resources are
+made available to your implementation for the successful execution of the tests that rely on them.
 
 =head3 tests
 

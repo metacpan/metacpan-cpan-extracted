@@ -1,0 +1,8 @@
+0.02 2020-08-07T20:03:40+02:00
+ - Add examples/ dir to META.yml.
+ - Fix test dependencies.
+ - Regen README file.
+ - Update examples/ex1.pl example.
+
+0.01 2020-08-07T19:59:05+02:00
+ - First version.

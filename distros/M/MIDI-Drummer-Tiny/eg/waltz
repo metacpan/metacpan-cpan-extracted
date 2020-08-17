@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use MIDI::Drummer::Tiny;
+
+my $d = MIDI::Drummer::Tiny->new(
+    file      => $0 . '.mid',
+    signature => '3/4',
+    bpm       => 100,
+    bars      => 16,
+);
+
+$d->count_in(1);
+
+for my $n (1 .. $d->bars) {
+    $d->note($d->eighth, $d->ride1, $n % 2 ? $d->kick : $d->snare);
+    $d->note($d->eighth, $d->ride1);
+    $d->note($d->eighth, $d->ride1);
+}
+
+$d->write;

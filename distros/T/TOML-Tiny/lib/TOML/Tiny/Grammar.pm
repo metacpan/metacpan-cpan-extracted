@@ -1,6 +1,6 @@
 package TOML::Tiny::Grammar;
 # ABSTRACT: exports regex definitions used to parse TOML source
-$TOML::Tiny::Grammar::VERSION = '0.08';
+$TOML::Tiny::Grammar::VERSION = '0.09';
 use strict;
 use warnings;
 use v5.18;
@@ -39,6 +39,7 @@ our @EXPORT = qw(
   $Integer
 
   $Float
+  $SpecialFloat
 );
 
 our $WS      = qr/[\x20\x09]/;     # space, tab
@@ -122,7 +123,7 @@ our $Integer      = qr/$Hex | $Oct | $Bin | $Dec/x;
 # Float
 #-----------------------------------------------------------------------------
 our $Exponent     = qr/[eE] $Dec/x;
-our $SpecialFloat = qr/[-+]? (?:inf) | (?:nan)/x;
+our $SpecialFloat = qr/[-+]? (?: (?:inf) | (?:nan) )/x;
 our $Fraction     = qr/\. $DecChar (?> _? $DecChar)*/x;
 
 our $Float = qr{
@@ -145,7 +146,7 @@ TOML::Tiny::Grammar - exports regex definitions used to parse TOML source
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -216,6 +217,8 @@ Exports various regexex for parsing TOML source.
 =head3 $Integer
 
 =head3 $Float
+
+=head2 $SpecialFloat
 
 =head1 AUTHOR
 

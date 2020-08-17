@@ -6,7 +6,7 @@ use Test::More tests =>  30;
 use List::Compare;
 use lib ("./t");
 use Test::ListCompareSpecial qw( :seen :wrap :arrays :hashes :results );
-use IO::CaptureOutput qw( capture );
+use Capture::Tiny q|:all|;
 
 my @pred = ();
 my %seen = ();
@@ -207,6 +207,7 @@ like($@,
     qr/Key:\s+hilton\s+Value:\s+0/s,
     "Got expected error message for right-hand hash which was not a seen-hash"
 );
+
 
 
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.185';
+our $VERSION = '1.186';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -214,6 +214,9 @@ ist eine Vereinfachung, sie instantiiert intern ein Template-Objekt,
 wendet darauf die Methode replace() an und liefert den
 resultierenden Text zurück.
 
+Eine Tilde (~) kann als Zeilenfortsetzungszeichen im
+Template verwendet werden.
+
 =head4 Example
 
   $js = Quiq::Template->combine(
@@ -243,7 +246,7 @@ sub combine {
         template => \$template,
     );
 
-    $template = Quiq::Unindent->string($template);
+    $template = Quiq::Unindent->string('~',$template);
     my $tpl = $class->new('text',\$template);
     $tpl->replace(@$placeholderA);
 
@@ -874,7 +877,7 @@ sub asStringNL {
 
 =head1 VERSION
 
-1.185
+1.186
 
 =head1 AUTHOR
 

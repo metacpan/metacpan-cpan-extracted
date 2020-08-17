@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -32,6 +32,11 @@ sub class {
 
 sub lib {
 	$CLASS{LIB} = $_[1];
+	return ref $_[0] ? $_[0] : bless {}, $_[0];
+}
+
+sub tlib {
+	$CLASS{TLIB} = $_[1];
 	return ref $_[0] ? $_[0] : bless {}, $_[0];
 }
 
@@ -131,6 +136,10 @@ sub new {
 		my (\$cls, \%args) = (shift, scalar \@_ == 1 ? \%{\$_[0]} : \@_);
 		bless \\%args, \$cls;
 	}";
+	$CLASS{CURRENT}{SUBS}{CURRENT}{TEST} = [
+		['ok', sprintf 'my $obj = %s->new', $CLASS{CURRENT}{NAME}],
+		['isa_ok', '$obj', qq|'$CLASS{CURRENT}{NAME}'|], 
+	];
 	return $self;
 }
 
@@ -149,6 +158,13 @@ sub accessor {
 		}
 		return \$self->{$sub}
 	}";
+	$CLASS{CURRENT}{SUBS}{CURRENT}{TEST} = [
+		['can_ok', qq|\$obj|, qq|'$sub'|],
+		['is',  qq|\$obj->$sub|, 'undef'],
+		['is',  qq|\$obj->$sub('test')|, qq|'test'|], 
+		['deep',qq|\$obj->$sub({ a => 'b' })|, qq|{ a => 'b' }|],
+		['deep',qq|\$obj->$sub|, qq|{ a => 'b' }|]
+	];
 	return $self;
 }
 
@@ -157,6 +173,9 @@ sub sub {
 	$CLASS{CURRENT}{SUBS}{CURRENT} = $CLASS{CURRENT}{SUBS}{$sub} = {
 		INDEX => $SUB_INDEX++
 	};
+	$CLASS{CURRENT}{SUBS}{CURRENT}{TEST} = [
+		['can_ok', qq|\$obj|, qq|'$sub'|],
+	];
 	return $self;
 }
 
@@ -188,12 +207,19 @@ sub example {
 	return $self;
 }
 
+sub test {
+	my ($self, @tests) = @_;
+	push @{$CLASS{CURRENT}{SUBS}{CURRENT}{TEST}}, @tests;
+	return $self;
+}
+
 sub generate {
 	my ($self, %args) = @_;
 
-	my @classes = sort grep { $_ !~ m/^(LIB|AUTHOR|EMAIL|VERSION|DIST|CURRENT|MACRO)$/ } keys %CLASS;
+	my @classes = sort grep { $_ !~ m/^(LIB|TLIB|AUTHOR|EMAIL|VERSION|DIST|CURRENT|MACRO)$/ } keys %CLASS;
 
 	my $lib = $CLASS{LIB} || ".";
+	my $tlib = $CLASS{TLIB};
 	if ($CLASS{DIST}) {
 		my $distro = delete $CLASS{DIST};
 		Module::Starter->create_distro(
@@ -206,6 +232,7 @@ sub generate {
 			%{$args{DIST}}
 		);
 		$lib = "$lib/$distro/lib";
+		$tlib = "$lib/$distro/t";
 	}
 
 	for my $class (@classes) {
@@ -226,13 +253,27 @@ sub generate {
 		open(my $fh, '>', $file) or die "Cannot open file to write $!";
 		print $fh $cls;
 		close $fh;
+		if ($tlib) {
+			my $test_file = _perl_tidy(
+				sprintf(
+					qq{use Test::More; use strict; use warnings;%sdone_testing();},
+						_build_tests($CLASS{$class})
+				)
+			);
+			my $file = sprintf "%s/%s.t", $tlib, $class;
+			_make_path($file);
+			open(my $fh, '>', $file) or die "Cannot open file to write $!";
+			print $fh $test_file;
+			close $fh;
+		}
 	}
 }
+
 
 sub _make_path {
 	my $path = abs_path();
 	for (split '/', $_[0]) {
-		next if $_ =~ m/\.pm/;
+		next if $_ =~ m/\.pm|\.t/;
 		$path .= "/$_";
 		$path =~ m/(.*)/;
 		if (! -d $1) {
@@ -386,6 +427,68 @@ sub _perl_tidy {
 	return $dest_string;
 }
 
+sub _build_tests {
+	my ($class, $obj_ok) = shift;
+
+	my $tests = sprintf("BEGIN { use_ok('%s'); }", $class->{NAME});
+
+	if ($class->{SUBS}->{new}->{TEST}) {
+		$tests .= sprintf "subtest 'new' => sub { plan tests => %s; %s };",
+			scalar @{$class->{SUBS}->{new}->{TEST}}, 
+			join '', map{ _build_test($_) } @{ $class->{SUBS}->{new}->{TEST} };
+		$obj_ok = $class->{SUBS}->{new}->{TEST}->[0];
+	}
+
+	for my $sub (sort { ($class->{SUBS}->{$b}->{ACCESSOR} || 0) <=> ($class->{SUBS}->{$a}->{ACCESSOR} || 0) }  keys %{$class->{SUBS}}) {
+		next if $sub eq 'new';
+		unshift @{$class->{SUBS}->{$sub}->{TEST}}, $obj_ok;
+		$tests .= sprintf "subtest '%s' => sub { plan tests => %s; %s };", 
+			$sub, 
+			scalar @{$class->{SUBS}->{$sub}->{TEST}}, 
+			join '', map{ _build_test($_) } @{ $class->{SUBS}->{$sub}->{TEST} };
+	}
+
+	return $tests;
+}
+
+our %TESTS;
+BEGIN {
+	%TESTS = (
+		ok => sub {
+			return sprintf q|ok(%s, q{%s});|, $_[1], $_[2] || $_[1];
+		},
+		can_ok => sub {
+			return sprintf q|can_ok(%s, %s);|, $_[1], $_[2];
+		},
+		isa_ok => sub {
+			return sprintf q|isa_ok(%s, %s);|, $_[1], $_[2];
+		},
+		is => sub {
+			return sprintf q|is(%s, %s, q{%s});|, $_[1], $_[2], $_[3] || $_[1];
+		},
+		isnt => sub {
+			return sprintf q|isnt(%s, %s, q{%s});|, $_[1], $_[2], $_[3] || $_[1];
+		},
+		like => sub {
+			return sprintf q|like(%s, %s, q{%s});|, $_[1], $_[2], $_[3] || $_[1];
+		},
+		unlike => sub {
+			return sprintf q|unlike(%s, %s, q{%s});|, $_[1], $_[2], $_[3] || $_[1];
+		},	
+		deep => sub {
+			return sprintf q|is_deeply(%s, %s, q{%s});|, $_[1], $_[2], $_[3] || $_[1];
+		},
+		eval => sub {
+			return sprintf q|eval {%s}; like($@, qr/%s/, q{%s});|, $_[1], $_[2], $_[3] || $_[1];
+		}
+	);
+}
+
+sub _build_test {
+	my $test = shift;
+	return ref $test ? $TESTS{$test->[0]}->(@{$test}) : $test;
+}
+
 1;
 
 __DATA__
@@ -465,7 +568,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
@@ -542,6 +645,14 @@ Provide a name for the distribution.
 Provide a path where the generated files will be compiled.
 
 	my $module = Module::Generate->lib('./path/to/lib');
+
+=cut
+
+=head2 tlib
+
+Provide a path where the generated test will be compiled.
+
+	my $module = Module::Generate->tlib('./path/to/t');
 
 =cut
 
@@ -747,6 +858,14 @@ Provide pod text that describes the sub.
 Provide a code example which will be suffixed to the pod definition.
 
 	$sub->example('$foo->name');
+
+=cut
+
+=head2 test
+
+Provide tests for the sub.
+
+	$sub->test(['is', '$obj->name', q|'test'|], [ ... ], ...)
 
 =cut
 

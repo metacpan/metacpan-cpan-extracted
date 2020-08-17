@@ -15,17 +15,17 @@ my $st = Astro::SpaceTrack->new();
 
 $st->set( webcmd => undef );
 
-is_success $st, 'banner', 'Get banner';
+is_success( $st, 'banner', 'Get banner' );
 
-is_success $st, 'help', 'Get internal help';
+is_success( $st, 'help', 'Get internal help' );
 
 is $st->content_type(), 'help', "Content type is 'help'";
 
-not_defined $st->content_source(), "Content source is undef";
+not_defined( $st->content_source(), "Content source is undef" );
 
-is_success $st, 'names', 'celestrak', 'Retrieve Celestrak catalog names';
+is_success( $st, 'names', 'celestrak', 'Retrieve Celestrak catalog names' );
 
-is_not_success $st, 'names', 'bogus', 'Can not retrieve bogus catalog names';
+is_not_success( $st, 'names', 'bogus', 'Can not retrieve bogus catalog names' );
 
 $st->set( banner => undef, filter => 1 );
 $st->shell( '', '# comment', 'set banner 1', 'exit' );
@@ -35,4 +35,6 @@ done_testing;
 
 1;
 
-# ex: set textwidth=72 :
+__END__
+
+# ex: set filetype=perl textwidth=72 :

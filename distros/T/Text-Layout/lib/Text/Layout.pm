@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.018.3";
+our $VERSION = "0.019";
 
 =head1 NAME
 
@@ -130,9 +130,16 @@ use Text::Layout::FontConfig;
 
 =item new( $pdf )
 
-Creates a new layout instance.
+Creates a new layout instance for PDF::API2. This is for convenience.
+It is equivalent to
 
-The arguments are passed to the backend. Read its documentation.
+    use Text::Layout::PDFAPI2;
+    $layout = Text::Layout::PDFAPI2->new($pdf);
+
+For other implementations only the above method can be used.
+
+The argument is the I<context> for text formatting. In the case of
+PDF::API2 this will be a PDF::API2 object.
 
 =back
 
@@ -141,30 +148,21 @@ The arguments are passed to the backend. Read its documentation.
 sub new {
     my ( $pkg, @data ) = @_;
 
-    my $be = __PACKAGE__."::Markdown";
-
-    if ( @data >= 2 && $data[0] eq "backend") {
-	shift;
-	$be = shift;
+    $pkg =~ s/::$//;
+    if ( $pkg eq __PACKAGE__ ) {
+	# For convenience (and backward compatibility)...
+	unless ( @data >= 1 && ref($data[0]) =~ /^PDF::(API2|Builder)\b/ ) {
+	    croak("Please instanciate a backend, e.g. ".__PACKAGE__."::PDFAPI2");
+	}
+	require Text::Layout::PDFAPI2;
+	return Text::Layout::PDFAPI2->new(@data); # CUL8R
     }
-    if ( $INC{"PDF/API2.pm"} || $INC{"PDF/Builder.pm"} ) {
-	$be = __PACKAGE__."::PDFAPI2";
-    }
-    elsif ( $INC{"Cairo.pm"} ) {
-	$be = __PACKAGE__."::Cairo";
-    }
-    elsif ( $INC{"Pango.pm"} ) {
-	$be = __PACKAGE__."::Pango";
-    }
-    eval "require $be" or croak($@);
-    Text::Layout::FontConfig->set_loader( $be->can("load_font") );
-    bless { _be      => $be,
-	    _context => $be->init(@data),
+    bless { _context => undef,
 	    _fonts   => {},
 	    _content => [],
 	    _px2pu   => \&px2pu,
 	    _pu2px   => \&pu2px,
-	  };
+	  } => $pkg;
 }
 
 =over
@@ -198,7 +196,7 @@ sub copy {
 
 =item get_context
 
-Gets the context (PDF document) of this layout.
+Gets the context of this layout.
 
 =back
 
@@ -314,6 +312,7 @@ Implementation note: Although all markup is parsed, not all is implemented.
 
 =cut
 
+use Text::ParseWords;
 use constant STEP => 0.8;	# TODO: Optimal value?
 
 my %magstep =
@@ -356,19 +355,21 @@ sub set_markup {
     my $span;
     $span = sub {
 	my ( $v ) = @_;
-	# Split the span attributes.
-	foreach my $k ( split(' ',$v) ) {
+	# Split the span attributes. Note that shellwords is so kind to
+	# split 'font="xx yy"' as a single word 'font=xx yy'.
+	foreach my $k ( shellwords($v) ) {
 
 	    # key=value
 	    if ( $k =~ /^([-\w]+)=(.+)$/ ) {
 		my ( $k, $v ) = ( $1, $2 );
 
-		# Strip quotes.
-		$v =~ s/^(["'])(.*)\1$/$2/;
+		# Strip quotes. Shouldn't be necessary now we use shellwords.
+		# $v =~ s/^(["'])(.*)\1$/$2/;
 
 		# <span font_desc="Sans 20">
 		if ( $k =~ /^(font_desc)$/ ) {
-		    # NYI.
+		    $fcur = Text::Layout::FontConfig->from_string($v);
+		    $fsiz = $fcur->get_size if $fcur->get_size;
 		}
 
 		# <span face="Sans">
@@ -1158,7 +1159,7 @@ be the width of the layout.
 C<y> will reflect the offset when text is centered vertically or
 bottom aligned. It will be zero for top aligned text.
 
-Implementation note: Since the PDF support layer cannot calculate ink,
+Implementation note: Since the PDF::API support layer cannot calculate ink,
 this function returns two identical extents.
 
 =back
@@ -1378,8 +1379,7 @@ NOTE: Some fonts do not include accents on capital letters in the ascend.
 
 sub get_pixel_bbox {
     my ( $self ) = @_;
-    no strict 'refs';
-    my $res = "$self->{_be}::bbox"->( $self );
+    my $res = $self->bbox;
     wantarray ? @$res : $res;
 }
 
@@ -1398,7 +1398,7 @@ graphics environment.
 
 Use this instead of Pango::Cairo::show_layout().
 
-$text must be an object created by PDF $page->text method.
+For PDF::API2, $text must be an object created by the $page->text method.
 
 =back
 
@@ -1406,8 +1406,7 @@ $text must be an object created by PDF $page->text method.
 
 sub show {
     my ( $self, @data ) = @_;
-    no strict 'refs';
-    "$self->{_be}::render"->( $self, @data );
+    $self->render( @data );
 }
 
 =over

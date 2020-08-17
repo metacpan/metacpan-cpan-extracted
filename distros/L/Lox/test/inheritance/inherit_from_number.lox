@@ -1,0 +1,2 @@
+var Number = 123;
+class Foo < Number {} // expect: [Line 2] Error at 'Number': Superclass must be a class.

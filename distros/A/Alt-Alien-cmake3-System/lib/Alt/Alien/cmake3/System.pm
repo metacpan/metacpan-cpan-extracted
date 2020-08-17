@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 # ABSTRACT: Simplified alternative to Alien::cmake3 that uses system cmake
-our $VERSION = '0.0402'; # VERSION
+our $VERSION = '0.0501'; # VERSION
 
 
 sub can_run
@@ -28,7 +28,7 @@ Alt::Alien::cmake3::System - Simplified alternative to Alien::cmake3 that uses s
 
 =head1 VERSION
 
-version 0.0402
+version 0.0501
 
 =head1 SYNOPSIS
 

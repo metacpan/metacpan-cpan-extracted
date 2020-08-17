@@ -1,0 +1,8 @@
+0.02 2020-08-16T10:59:22+02:00
+ - Add tests for constructor.
+ - Change bugtracker to Github.
+ - Fix module description.
+ - Regen README file.
+
+0.01 2020-08-12T00:23:29+02:00
+ - First version.

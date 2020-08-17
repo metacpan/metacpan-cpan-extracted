@@ -19,7 +19,7 @@ package MongoDB::WriteConcern;
 # ABSTRACT: Encapsulate and validate a write concern
 
 use version;
-our $VERSION = 'v2.2.1';
+our $VERSION = 'v2.2.2';
 
 use Moo;
 use MongoDB::Error;
@@ -152,7 +152,7 @@ MongoDB::WriteConcern - Encapsulate and validate a write concern
 
 =head1 VERSION
 
-version v2.2.1
+version v2.2.2
 
 =head1 SYNOPSIS
 
@@ -220,7 +220,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by MongoDB, Inc.
+This software is Copyright (c) 2020 by MongoDB, Inc.
 
 This is free software, licensed under:
 

@@ -4,16 +4,16 @@ Class::Measure - Create, compare, and convert units of measurement.
 
 # SYNOPSIS
 
-See [Class::Measure::Length](https://metacpan.org/pod/Class::Measure::Length) for some examples.
+See [Class::Measure::Length](https://metacpan.org/pod/Class%3A%3AMeasure%3A%3ALength) for some examples.
 
 # DESCRIPTION
 
 This is a base class that is inherited by the Class::Measure 
-classes.  This distribution comes with the class [Class::Measure::Length](https://metacpan.org/pod/Class::Measure::Length).
+classes.  This distribution comes with the class [Class::Measure::Length](https://metacpan.org/pod/Class%3A%3AMeasure%3A%3ALength).
 
-The classes [Class::Measure::Area](https://metacpan.org/pod/Class::Measure::Area), [Class::Measure::Mass](https://metacpan.org/pod/Class::Measure::Mass),
-[Class::Measure::Space](https://metacpan.org/pod/Class::Measure::Space), [Class::Measure::Temperature](https://metacpan.org/pod/Class::Measure::Temperature),
-and [Class::Measure::Volume](https://metacpan.org/pod/Class::Measure::Volume) are planned and will be added soon.
+The classes [Class::Measure::Area](https://metacpan.org/pod/Class%3A%3AMeasure%3A%3AArea), [Class::Measure::Mass](https://metacpan.org/pod/Class%3A%3AMeasure%3A%3AMass),
+[Class::Measure::Space](https://metacpan.org/pod/Class%3A%3AMeasure%3A%3ASpace), [Class::Measure::Temperature](https://metacpan.org/pod/Class%3A%3AMeasure%3A%3ATemperature),
+and [Class::Measure::Volume](https://metacpan.org/pod/Class%3A%3AMeasure%3A%3AVolume) are planned and will be added soon.
 
 The methods described here are available in all Class::Measure classes.
 
@@ -21,33 +21,41 @@ The methods described here are available in all Class::Measure classes.
 
 ## new
 
-    my $m = new Class::Measure::Length( 1, 'inch' );
+```perl
+my $m = new Class::Measure::Length( 1, 'inch' );
+```
 
 Creates a new measurement object.  You must pass an initial
 measurement and default unit.
 
 In most cases the measurement class that you are using
 will export a method to create new measurements.  For
-example [Class::Measure::Length](https://metacpan.org/pod/Class::Measure::Length) exports the
+example [Class::Measure::Length](https://metacpan.org/pod/Class%3A%3AMeasure%3A%3ALength) exports the
 `length()` method.
 
 ## unit
 
-    my $unit = $m->unit();
+```perl
+my $unit = $m->unit();
+```
 
 Returns the object's default unit.
 
 ## set\_unit
 
-    $m->set_unit( 'feet' );
+```
+$m->set_unit( 'feet' );
+```
 
 Sets the default unit of the measurement.
 
 ## value
 
-    my $yards = $m->value('yards');
-    my $val = $m->value();
-    print "$m is the same as $val when in a string\n";
+```perl
+my $yards = $m->value('yards');
+my $val = $m->value();
+print "$m is the same as $val when in a string\n";
+```
 
 Retrieves the value of the measurement in the
 default unit.  You may specify a unit in which
@@ -58,18 +66,22 @@ stringifying the object.
 
 ## set\_value
 
-    my $m = length( 0, 'inches' );
-    $m->set_value( 12 ); # 12 inches.
-    $m->set_value( 1, 'foot' ); # 1 foot.
+```perl
+my $m = length( 0, 'inches' );
+$m->set_value( 12 ); # 12 inches.
+$m->set_value( 1, 'foot' ); # 1 foot.
+```
 
 Sets the measurement in the default unit.  You may
 specify a new default unit as well.
 
 ## reg\_units
 
-    Class::Measure::Length->reg_units(
-        'inch', 'foot', 'yard'
-    );
+```
+Class::Measure::Length->reg_units(
+    'inch', 'foot', 'yard',
+);
+```
 
 Registers one or more units for use in the specified
 class.  Units should be in the singular, most common,
@@ -77,17 +89,21 @@ form.
 
 ## units
 
-    my @units = Class::Measure::Length->units();
+```perl
+my @units = Class::Measure::Length->units();
+```
 
 Returns a list of all registered units.
 
 ## reg\_aliases
 
-    Class::Measure::Length->reg_aliases(
-        ['feet','ft'] => 'foot',
-        ['in','inches'] => 'inch',
-        'yards' => 'yard'
-    );
+```perl
+Class::Measure::Length->reg_aliases(
+    ['feet','ft'] => 'foot',
+    ['in','inches'] => 'inch',
+    'yards' => 'yard'
+);
+```
 
 Register alternate names for units.  Expects two
 arguments per unit to alias.  The first argument
@@ -96,23 +112,29 @@ the second argument being the unit to alias them to.
 
 ## reg\_convs
 
-    Class::Measure::Length->reg_convs(
-        12, 'inches' => 'foot',
-        'yard' => '3', 'feet'
-    );
+```perl
+Class::Measure::Length->reg_convs(
+    12, 'inches' => 'foot',
+    'yard' => '3', 'feet'
+);
+```
 
 Registers a unit conversion.  There are three distinct
 ways to specify a new conversion.  Each requires three
 arguments.
 
-    $count1, $unit1 => $unit2
-    $unit1 => $count2, $unit2
+```perl
+$count1, $unit1 => $unit2
+$unit1 => $count2, $unit2
+```
 
 These first two syntaxes create automatic reverse conversions
 as well.  So, saying there are 12 inches in a foot implies
 that there are 1/12 feet in an inch.
 
-    $unit1 => $unit2, $sub
+```perl
+$unit1 => $unit2, $sub
+```
 
 The third syntax accepts a subroutine as the last argument
 the subroutine will be called with the value of $unit1 and
@@ -128,7 +150,10 @@ Class-Measure GitHub issue tracker:
 
 # AUTHORS
 
-    Aran Clary Deltac <bluefeet@cpan.org>
+```
+Aran Clary Deltac <bluefeet@gmail.com>
+Roland van Ipenburg <roland@rolandvanipenburg.com>
+```
 
 # LICENSE
 

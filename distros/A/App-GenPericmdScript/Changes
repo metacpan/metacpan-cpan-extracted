@@ -1,30 +1,34 @@
-Revision history for App-GenPericmdScript
+0.230   2020-04-29  Released-By: PERLANCAR; Urgency: low
 
-0.22    2015-10-12 (PERLANCAR)
+        - [build] Rebuild with updated deps to remove dependency to the
+          deprecated Perinci::Sub::ArgEntity::*.
+
+
+0.22    2015-10-12  Released-By: PERLANCAR
 
 	- [Incompatible change] Split backend module to Perinci-CmdLine-Gen
           (backend functionality now resides in Perinci::CmdLine::Gen).
 
 
-0.21    2015-09-29 (PERLANCAR)
+0.21    2015-09-29  Released-By: PERLANCAR
 
 	- [Bugfix] script_name was not passed Perinci::CmdLine constructor.
 
 	- Add options: config_dirs, env_name.
 
 
-0.20    2015-09-28 (PERLANCAR)
+0.20    2015-09-28  Released-By: PERLANCAR
 
 	- Add option: default_subcommand.
 
 
-0.19    2015-09-28 (PERLANCAR)
+0.19    2015-09-28  Released-By: PERLANCAR
 
 	- Don't die when unable to meta url, to allow func+meta embedded in
 	  the script e.g. via code_before_instantiate_cmdline.
 
 
-0.18    2015-09-26 (PERLANCAR)
+0.18    2015-09-26  Released-By: PERLANCAR
 
 	- Add options: read_config, read_env.
 
@@ -34,18 +38,18 @@ Revision history for App-GenPericmdScript
 	- [ux] Add alias function gen_pericmd_script.
 
 
-0.17    2015-09-15 (PERLANCAR)
+0.17    2015-09-15  Released-By: PERLANCAR
 
 	- Add option: pass_cmdline_object (passed to Perinci::CmdLine
 	  constructor).
 
 
-0.16    2015-09-12 (PERLANCAR)
+0.16    2015-09-12  Released-By: PERLANCAR
 
 	- Add option: script_summary.
 
 
-0.15    2015-09-10 (PERLANCAR)
+0.15    2015-09-10  Released-By: PERLANCAR
 
         - [Incompatible change] Rename snippet_* options to code_*, to be
           consistent with Perinci::CmdLine::Inline.
@@ -53,7 +57,7 @@ Revision history for App-GenPericmdScript
         - Add option: code_after_end.
 
 
-0.14    2015-09-09 (PERLANCAR)
+0.14    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -62,7 +66,7 @@ Revision history for App-GenPericmdScript
 	  requirement.
 
 
-0.13    2015-08-17 (PERLANCAR)
+0.13    2015-08-17  Released-By: PERLANCAR
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
@@ -70,23 +74,23 @@ Revision history for App-GenPericmdScript
 	  ssl_verify_hostname explicitly set to 0.
 
 
-0.12    2015-07-08 (PERLANCAR)
+0.12    2015-07-08  Released-By: PERLANCAR
 
 	- Add option: skip_format (passed to pericmd backend).
 
 
-0.11    2015-07-06 (PERLANCAR)
+0.11    2015-07-06  Released-By: PERLANCAR
 
 	- Return result metadata: func.cmdline_module_inlined if module
 	  used is Perinci::CmdLine::Inline.
 
 
-0.10    2015-07-02 (PERLANCAR)
+0.10    2015-07-02  Released-By: PERLANCAR
 
 	- Add our signature even when we use Perinci::CmdLine::Inline.
 
 
-0.09    2015-07-02 (PERLANCAR)
+0.09    2015-07-02  Released-By: PERLANCAR
 
 	- [Bugfix] Didn't pass script_name to Perinci::CmdLine::Inline's
           program_name.
@@ -95,48 +99,48 @@ Revision history for App-GenPericmdScript
           program_version).
 
 
-0.08    2015-07-02 (PERLANCAR)
+0.08    2015-07-02  Released-By: PERLANCAR
 
 	- Add support for Perinci::CmdLine::Inline.
 
 
-0.07    2015-07-01 (PERLANCAR)
+0.07    2015-07-01  Released-By: PERLANCAR
 
 	- Add option to pass to Perinci::CmdLine object constructor:
 	  extra_urls_for_version.
 
 
-0.06    2015-07-01 (PERLANCAR)
+0.06    2015-07-01  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Re-upload.
 
 
-0.05    2015-07-01 (PERLANCAR)
+0.05    2015-07-01  Released-By: PERLANCAR
 
         - Add #DIST to generated script (for Dist::Zilla::Plugin::OurDist).
 
 
-0.04    2015-03-06 (PERLANCAR)
+0.04    2015-03-06  Released-By: PERLANCAR
 
 	- Add options: --subcommands-from-package-functions,
 	  --{include,exclude}-package-functions-match.
 
 
-0.03    2015-03-06 (PERLANCAR)
+0.03    2015-03-06  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Tweak indentation in output and POD.
 
 
-0.02    2015-03-01 (PERLANCAR)
+0.02    2015-03-01  Released-By: PERLANCAR
 
 	- Forgot to empty output if we are outputing to file instead of
 	  stdout.
 
 
-0.01    2015-03-01 (PERLANCAR)
+0.01    2015-03-01  Released-By: PERLANCAR
 
         - First release.

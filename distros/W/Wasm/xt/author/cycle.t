@@ -33,7 +33,7 @@ subtest 'instance' => sub {
   my $store = Wasm::Wasmtime::Store->new;
   my $instance = Wasm::Wasmtime::Instance->new(
     Wasm::Wasmtime::Module->new(
-      $store,
+      $store->engine,
       wat => q{
         (module
           (func (export "add") (param i32 i32) (result i32)

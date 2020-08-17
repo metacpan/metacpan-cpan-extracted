@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.0902';
+our $VERSION = '0.1100';
 
 use Moo;
 use MIDI::Simple;
@@ -40,7 +40,7 @@ has pan       => ( is => 'ro', default => sub { 0 } );
 has file      => ( is => 'ro', default => sub { 'MIDI-Drummer.mid' } );
 has bars      => ( is => 'ro', default => sub { 4 } );
 has score     => ( is => 'ro', default => sub { MIDI::Simple->new_score } );
-has signature => ( is => 'ro', default => sub { '4/4' });
+has signature => ( is => 'rw', default => sub { '4/4' });
 has beats     => ( is => 'rw' );
 has divisions => ( is => 'rw' );
 
@@ -66,15 +66,17 @@ has hi_floor_tom  => ( is => 'ro', default => sub { 'n43' } );
 has low_floor_tom => ( is => 'ro', default => sub { 'n41' } );
 
 
-# duration
 has whole             => ( is => 'ro', default => sub { 'wn' } );
 has half              => ( is => 'ro', default => sub { 'hn' } );
 has quarter           => ( is => 'ro', default => sub { 'qn' } );
 has triplet_quarter   => ( is => 'ro', default => sub { 'tqn' } );
+has dotted_quarter    => ( is => 'ro', default => sub { 'dqn' } );
 has eighth            => ( is => 'ro', default => sub { 'en' } );
 has triplet_eighth    => ( is => 'ro', default => sub { 'ten' } );
+has dotted_eighth     => ( is => 'ro', default => sub { 'den' } );
 has sixteenth         => ( is => 'ro', default => sub { 'sn' } );
 has triplet_sixteenth => ( is => 'ro', default => sub { 'tsn' } );
+has dotted_sixteenth  => ( is => 'ro', default => sub { 'dsn' } );
 
 
 sub note { return shift->score->n(@_) }
@@ -86,7 +88,7 @@ sub rest { return shift->score->r(@_) }
 sub count_in {
     my $self = shift;
     my $bars = shift || $self->bars;
-    for my $i ( 1 .. $self->beats * $bars) {
+    for my $i ( 1 .. $self->beats * $bars ) {
         $self->note( $self->quarter, $self->closed_hh );
     }
 }
@@ -104,22 +106,22 @@ sub metronome {
     for my $n ( 1 .. $self->beats * $bars ) {
         if ( $n % 2 == 0 )
         {
-            $self->note( $self->quarter, $self->open_hh, $self->snare );
+            $self->note( $self->quarter, $self->closed_hh, $self->snare );
         }
         else {
             if ( $flag == 0 )
             {
-                $self->note( $self->quarter, $self->open_hh, $self->kick );
+                $self->note( $self->quarter, $self->closed_hh, $self->kick );
             }
             else
             {
                 if ( $i % 2 == 0 )
                 {
-                    $self->note( $self->quarter, $self->open_hh, $self->kick );
+                    $self->note( $self->quarter, $self->closed_hh, $self->kick );
                 }
                 else
                 {
-                    $self->note( $self->eighth, $self->open_hh, $self->kick );
+                    $self->note( $self->eighth, $self->closed_hh, $self->kick );
                     $self->note( $self->eighth, $self->kick );
                 }
             }
@@ -142,6 +144,66 @@ sub metronome34 {
 }
 
 
+sub metronome54 {
+    my $self = shift;
+    my $bars = shift || $self->bars;
+    for my $n (1 .. $bars) {
+        $self->note($self->quarter, $self->closed_hh, $self->kick);
+        $self->note($self->quarter, $self->closed_hh);
+        $self->note($self->quarter, $self->closed_hh, $self->snare);
+        $self->note($self->quarter, $self->closed_hh);
+        if ($n % 2) {
+            $self->note($self->quarter, $self->closed_hh);
+        }
+        else {
+            $self->note($self->eighth, $self->closed_hh);
+            $self->note($self->eighth, $self->kick);
+        }
+    }
+}
+
+
+sub metronome58 {
+    my $self = shift;
+    my $bars = shift || $self->bars;
+    for my $n (1 .. $bars) {
+        $self->note($self->eighth, $self->closed_hh, $self->kick);
+        $self->note($self->sixteenth, $self->closed_hh);
+        $self->note($self->sixteenth, $self->kick);
+        $self->note($self->eighth, $self->closed_hh, $self->snare);
+        $self->note($self->sixteenth, $self->closed_hh);
+        $self->note($self->sixteenth, $self->snare);
+        $self->note($self->sixteenth, $self->closed_hh);
+        $self->note($self->sixteenth, $self->kick);
+    }
+}
+
+
+sub set_time_sig {
+    my $self = shift;
+    my $signature = shift || $self->signature;
+    $self->signature($signature);
+    my ($beats, $divisions) = split /\//, $signature;
+    $self->beats($beats);
+    $self->divisions($divisions);
+    $self->score->time_signature(
+        $self->beats,
+        ( $self->divisions == 8 ? 3 : 2),
+        ( $self->divisions == 8 ? 24 : 18 ),
+        8
+    );
+}
+
+
+sub accent_note {
+    my $self = shift;
+    my $volume = shift;
+    $self->score->Volume($volume->[0]);
+    $self->note(@_);
+    $self->score->Volume($volume->[1]);
+}
+
+
 sub write {
     my $self = shift;
     $self->score->write_score( $self->file );
@@ -161,7 +223,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.0902
+version 0.1100
 
 =head1 SYNOPSIS
 
@@ -170,20 +232,25 @@ version 0.0902
  my $d = MIDI::Drummer::Tiny->new(
     file      => 'drums.mid',
     bpm       => 100,
-    signature => '3/4',
-    bars      => 32,
+    signature => '5/4',
+    bars      => 8,
     kick      => 'n36', # Override default patch
     snare     => 'n40', # "
  );
 
  $d->count_in(1);  # Closed hi-hat for 1 bar
 
- $d->metronome34;  # 3/4 time for the number of bars
+ $d->metronome54;  # 5/4 time for the number of bars
 
- $d->rest( $d->whole );
+ $d->set_time_sig('4/4');
 
+ $d->rest($d->whole);
+
+ $d->metronome44;  # 4/4 time for the number of bars
+
+ # Alternate kick and snare
  $d->note( $d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare )
-    for 1 .. $d->beats * $d->bars;  # Alternate kick and snare in 4/4 time
+    for 1 .. $d->beats * $d->bars;
 
  $d->write;
 
@@ -290,15 +357,13 @@ B<beats> / B<divisions>
 
 =over 4
 
-=item whole
+=item whole, half
 
-=item half
+=item quarter, triplet_quarter, dotted_quarter
 
-=item quarter, triplet_quarter
+=item eighth, triplet_eighth, dotted_eighth
 
-=item eighth, triplet_eighth
-
-=item sixteenth, triplet_sixteenth
+=item sixteenth, triplet_sixteenth, dotted_sixteenth
 
 =back
 
@@ -356,6 +421,37 @@ eighth-note kicks.
   $d->metronome34($bars);
 
 Add a steady 3/4 beat to the score.
+
+=head2 metronome54
+
+  $d->metronome54;
+  $d->metronome54($bars);
+
+Add a 5/4 beat to the score.
+
+=head2 metronome58
+
+  $d->metronome58;
+  $d->metronome58($bars);
+
+Add a 5/8 beat to the score.
+
+=head2 set_time_sig
+
+  $d->set_time_sig('5/4');
+
+Set the B<signature>, B<beats>, B<divisions>, and the B<score>
+C<time_signature> values based on the given string.
+
+=head2 accent_note
+
+  $d->accent_note([$accent, $resume], $d->sixteenth, $d->snare);
+
+Play an accented note.
+
+For instance, this can be a "ghosted note", where the B<accent> is a
+smaller number (< 50), or an "accented note" that is greater than the
+current (B<resume>) volume.
 
 =head2 write
 

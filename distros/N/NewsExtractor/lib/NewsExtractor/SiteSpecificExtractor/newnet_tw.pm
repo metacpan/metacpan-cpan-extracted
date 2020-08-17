@@ -3,7 +3,7 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::GenericExtractor';
 
-use Importer 'NewsExtractor::TextUtil' => qw( parse_dateline_ymdhms u );
+use Importer 'NewsExtractor::TextUtil' => qw( reformat_dateline u );
 
 sub headline {
     my ($self) = @_;
@@ -23,7 +23,7 @@ sub dateline {
     my ($dateline, $el);
     if ($el = $self->dom->at('b > font[color=darkred]')) {
         # Example: 日期:2020/7/8 下午 08:52:39
-        $dateline = parse_dateline_ymdhms( $el->all_text(), '+08:00' );
+        $dateline = reformat_dateline( $el->all_text(), '+08:00' );
     }
     return $dateline;
 }

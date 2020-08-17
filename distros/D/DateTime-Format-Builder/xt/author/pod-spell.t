@@ -24,8 +24,8 @@ Färber
 Hoblitt
 ICal
 Iain
-Ian
 JHOBLITT
+James
 KELLAN
 Kellan
 Maki
@@ -36,6 +36,7 @@ Parser
 PayPal
 Quick
 RICKM
+Raspass
 Regex
 Rolsky
 Rolsky's
@@ -43,15 +44,14 @@ Strptime
 Truskett
 Tutorial
 autarch
-author
 daisuke
 drolsky
 durations
 generic
+jraspass
 kickstarting
 lib
 multilength
-no
 overrideable
 params
 postprocess

@@ -10,18 +10,18 @@ build_requires:
   Test::Deep::UnorderedPairs: '0'
   Test::Fatal: '0'
   Test::File::ShareDir: '0'
-  Test::JSON::Schema::Acceptance: '0.999'
+  Test::JSON::Schema::Acceptance: '1.000'
   Test::More: '0.96'
   Test::Warnings: '0.027'
   lib: '0'
   open: '0'
-  perl: v5.16.0
+  perl: '5.016'
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
   Module::Build::Tiny: '0.034'
-  perl: v5.16.0
+  perl: '5.016'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 keywords:
@@ -44,19 +44,19 @@ no_index:
 provides:
   JSON::Schema::Draft201909:
     file: lib/JSON/Schema/Draft201909.pm
-    version: '0.011'
+    version: '0.012'
   JSON::Schema::Draft201909::Annotation:
     file: lib/JSON/Schema/Draft201909/Annotation.pm
-    version: '0.011'
+    version: '0.012'
   JSON::Schema::Draft201909::Document:
     file: lib/JSON/Schema/Draft201909/Document.pm
-    version: '0.011'
+    version: '0.012'
   JSON::Schema::Draft201909::Error:
     file: lib/JSON/Schema/Draft201909/Error.pm
-    version: '0.011'
+    version: '0.012'
   JSON::Schema::Draft201909::Result:
     file: lib/JSON/Schema/Draft201909/Result.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   Carp: '0'
   File::ShareDir: '0'
@@ -76,18 +76,17 @@ requires:
   Syntax::Keyword::Try: '0.11'
   Types::Standard: '1.010002'
   constant: '0'
-  feature: '0'
   if: '0'
   namespace::clean: '0'
   overload: '0'
-  perl: v5.16.0
+  perl: '5.016'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Draft201909/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Draft201909
   repository: https://github.com/karenetheridge/JSON-Schema-Draft201909.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -307,7 +306,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Author::ETHER/Test::ReportPrereqs'
-      version: '0.027'
+      version: '0.028'
     -
       class: Dist::Zilla::Plugin::Test::Portability
       config:
@@ -556,7 +555,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.25.0
+          git_version: 2.28.0
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -648,7 +647,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.046'
@@ -656,7 +655,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -664,7 +663,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -690,7 +689,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.046'
@@ -773,7 +772,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -786,11 +785,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.011
+          tag: v0.012
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -827,7 +826,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -849,7 +848,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.046'

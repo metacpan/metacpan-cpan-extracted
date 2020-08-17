@@ -32,6 +32,16 @@ eq_or_diff(
 eq_or_diff(
     [
         to_editor_args(
+            'https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L75-L80'
+        )
+    ],
+    [ '+75', 'lib/Open/This.pm' ],
+    'full https GitHub URL with fragment and line range'
+);
+
+eq_or_diff(
+    [
+        to_editor_args(
             'https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L75x'
         )
     ],

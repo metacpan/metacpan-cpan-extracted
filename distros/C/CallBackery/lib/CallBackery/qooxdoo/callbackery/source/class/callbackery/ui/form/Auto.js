@@ -54,7 +54,8 @@ qx.Class.define("callbackery.ui.form.Auto", {
             var options = {};
             ['note','copyOnTap','copyFailMsg','copySuccessMsg'].forEach(function(prop){
                 if (s[prop]){
-                    options[prop] = qx.lang.Type.isString(s[prop]) ?
+                    options[prop] = qx.lang.Type.isString(s[prop]) 
+                    || qx.lang.Type.isArray(s[prop]) ?
                         that.xtr(s[prop]) : s[prop];
                 }
             });

@@ -20,7 +20,7 @@ docmake - a tool to render DocBook/XML into various output formats.
 
 =head1 VERSION
 
-version 0.0900
+version 0.1000
 
 =head1 SYNOPSIS
 

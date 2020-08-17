@@ -3,6 +3,8 @@ Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 TODO:
 * Get dual license to work with dzil
 
+2.8       2020-08-14 16:45:48Z
+
 2.7       2020-06-02 02:03:41Z
 
     * Fix array['str'] bug with copy files and exclude files in dist.ini

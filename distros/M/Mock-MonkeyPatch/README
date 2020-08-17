@@ -1,0 +1,225 @@
+NAME
+
+    Mock::MonkeyPatch - Monkey patching with test mocking in mind
+
+SYNOPSIS
+
+      {
+        package MyApp;
+    
+        sub gen_item_id {
+          my $type = shift;
+          # calls external service and gets id for $type
+        }
+    
+        sub build_item {
+          my $type = shift;
+          my $item = Item->new(type => $type);
+          $item->id(gen_item_id($type));
+          return $item;
+        }
+      }
+    
+      use Test::More;
+      use MyApp;
+      use Mock::MonkeyPatch;
+    
+      my $mock = Mock::MonkeyPatch->patch(
+        'MyApp::gen_item_id' => sub { 'abcd' }
+      );
+    
+      my $item = MyApp::build_item('rubber_chicken');
+      is $item->id, 'abcd', 'building item calls MyApp::gen_random_id';
+      ok $mock->called, 'the mock was indeed called';
+      is_deeply $mock->arguments, ['rubber_chicken'], 'the mock was called with expected arguments';
+
+DESCRIPTION
+
+    Mocking is a common tool, especially for testing. By strategically
+    replacing a subroutine, one can isolate segments (units) of code to
+    test individually. When this is done it is important to know that the
+    mocked sub was actually called and with what arguments it was called.
+
+    Mock::MonkeyPatch injects a subroutine in the place of an existing one.
+    It returns an object by which you can revisit the manner in which the
+    mocked subroutine was called. Further when the object goes out of scope
+    (or when the "restore" method is called) the original subroutine is
+    replaced.
+
+CONSTRUCTOR
+
+ patch
+
+      my $mock = Mock::MonkeyPatch->patch('MyPackage::foo' => sub { ... });
+      my $mock = Mock::MonkeyPatch->patch('MyPackage::foo' => sub { ... }, \%options);
+
+    Mock a subroutine and return a object to represent it. Takes a fully
+    qualifed subroutine name, a subroutine reference to call in its place,
+    and optionally a hash reference of additional constructor arguments.
+
+    The replacement subroutine will be wrapped in a one that will store
+    calling data, then injected in place of the original. Within the
+    replacement subroutine the original is available as the fully qualified
+    subroutine Mock::MonkeyPatch::ORIGINAL. This can be used to inject
+    behavior before, after, or even around the original. This includes
+    munging the arguments passed to the origial (though the actual
+    arguments are what are stored). For example usage, see "COOKBOOK".
+
+    Currently the optional hashref only accepts one option, an initial
+    value for "store_arguments" which is true if not given.
+
+    The wrapper will have the same prototype as the mocked function if one
+    exists. The replacement need not have any prototype, the arguments
+    received by the wrapper will be passed to the given sub as they were
+    received. (If this doesn't make any sense to you, don't worry about
+    it.)
+
+METHODS
+
+ arguments
+
+      my $args = $mock->arguments;
+      my $args_second_time = $mock->arguments(1);
+
+    Returns an array reference containing the arguments that were passed to
+    the mocked subroutine (but see also "store_arguments"). Optionally an
+    integer may be passed which designates the call number to fetch
+    arguments in the same manner of indexing an array (zero indexed). If
+    not given, 0 is assumed, representing the first time the mock was
+    called. Returns undef if the mocked subroutine was not called (or was
+    not called enough times).
+
+      use Test::More;
+      is_deeply $mock->arguments, [1, 2, 3], 'called with the right arguments';
+
+ called
+
+      my $time_called = $mock->called;
+
+    Returns the number of times the mocked subroutine was called. This
+    means that that there should be values available from "arguments" up to
+    the value of $mock->called - 1.
+
+      use Test::More;
+      ok $mock->called, 'mock was called';
+      is $mock->called, 3, 'mock was called three times';
+
+ method_arguments
+
+      my $args = $mock->method_arguments;
+      my $args_third_time = $mock->method_arguments(2, 'MyClass');
+
+    A wrapper around "arguments" convenient for when the mocked subroutine
+    is called as a method. Like "arguments" it returns a subroutine
+    reference, though it removes the first arguments which is the invocant.
+    It also can take a call number designation.
+
+    Additionally it takes a class name to test against the invocant as
+    $invocant->isa('Class::Name'). If the invocant is not an instance of
+    the class or a subclass thereof it returns undef.
+
+      use Test::More;
+      is_deeply $mock->method_arguments(0, 'FrobberCo::Employee'),
+        ['some', 'arguments'], 'mock method called with known arguments on a FrobberCo::Employee instance';
+
+ reset
+
+      $mock = $mock->reset;
+
+    Reset the historical information stored in the mock, including
+    "arguments" and "called". Returns the mock instance for chaining if
+    desired.
+
+    Note that this does not restore the original method. for that, see
+    "restore".
+
+      use Test::More;
+      is $mock->called, 3, 'called 3 times';
+      is $mock->reset->called, 0, 'called zero times after reset';
+
+ restore
+
+      $mock = $mock->restore;
+
+    Restore the original method to its original place in the symbol table.
+    This method is also called automatically when the object goes out of
+    scope and is garbage collected. Returns the mock instance for chaining
+    if desired. This method can only be called once!
+
+    Note that this does not reset historical information stored in the
+    mock, for that, see "reset".
+
+ store_arguments
+
+      $mock = $mock->store_arguments(0);
+
+    When true, the default if not passed to the constructor, arguments
+    passed to the mocked subroutine are stored and accessible later via
+    "arguments" and "method_arguments". However sometimes this isn't
+    desirable, especially in cases where the reference count of items in
+    the arguments matter; notably when an object should be destroyed and
+    the destructor's behavior is important. When this is true set
+    store_arguments to a false value and only an empty array reference will
+    be stored.
+
+    When used as a setter, it returns the mock instance for chaining if
+    desired.
+
+COOKBOOK
+
+ Run code before the original
+
+    The original version of the mocked function (read: the code that was
+    available via the symbol at the time the mock was initiated) is
+    available via the fully qualified symbol Mock::MonkeyPatch::ORIGINAL.
+    You can call this in your mock if for example you want to do some setup
+    before calling the function.
+
+      my $mock = $self->patch($symbol, sub {
+        # do some stuff before the original
+        do_mocked_stuff(@_);
+        # then call the original function/method
+        Mock::MonkeyPatch::ORIGINAL(@_);
+      });
+
+ Using ORIGINAL in a nonblocking environment
+
+    Since the ORIGINAL symbol is implemented via local if you want to call
+    it after leaving the scope you need to store a reference to the
+    function in a lexical.
+
+      my $mock = $self->patch($symbol, sub {
+        my @args = @_;
+        my $orig = \&Mock::MonkeyPatch::ORIGINAL;
+        Mojo::IOLoop->timer(1 => sub { $orig->(@args) });
+      });
+
+SEE ALSO
+
+      * Test::MockObject
+
+      * Mock::Quick
+
+      * Mock::Sub
+
+SOURCE REPOSITORY
+
+    http://github.com/jberger/Mock-MonkeyPatch
+
+AUTHOR
+
+    Joel Berger, <joel.a.berger@gmail.com>
+
+CONTRIBUTORS
+
+      * Doug Bell (preaction)
+
+      * Brian Medley (bpmedley)
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 by Joel Berger and "CONTRIBUTORS"
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

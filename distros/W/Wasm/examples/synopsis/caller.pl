@@ -21,7 +21,7 @@ sub print_wasm_string
 
 my $store = Wasm::Wasmtime::Store->new;
 my $instance = Wasm::Wasmtime::Instance->new(
-  Wasm::Wasmtime::Module->new($store, wat => q{
+  Wasm::Wasmtime::Module->new($store->engine, wat => q{
     (module
       (import "" "print_wasm_string" (func $print_wasm_string (param i32)))
       (func (export "run")

@@ -1,5 +1,12 @@
 # Change history for the MongoDB Perl driver:
 
+v2.2.2    2020-08-13 11:04:29-04:00 America/New_York
+
+  [!!! END OF LIFE NOTICE !!!]
+
+  - As of August 13, 2020, the MongoDB Perl driver has reached end of life
+    and is no longer supported by MongoDB.
+
 v2.2.1    2019-12-12 23:29:11-05:00 America/New_York
 
   [!!! END OF LIFE NOTICE !!!]

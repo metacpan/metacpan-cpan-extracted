@@ -59,7 +59,7 @@ sub beat {
         my $patch;
 
         # Play the fill motif
-        for my $i (0 .. @$motif - 1) {
+        for my $i (0 .. $#$motif) {
             if ($n % 6 == 1) {
                 $patch = fill_1($i);
             }

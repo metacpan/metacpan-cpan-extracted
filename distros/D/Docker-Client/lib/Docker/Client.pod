@@ -1,0 +1,548 @@
+=encoding utf-8
+
+=head1 NAME
+
+Docker::Client - Docker client based on official OpenAPI specs
+
+=head1 SYNOPSIS
+
+    use Docker::Client;
+
+    my $client = Docker::Client->new();
+
+    my $tx = $client->ContainerCreate(
+        {},
+        json => {
+            Image        => 'ubuntu',
+            AttachStdin  => 0,
+            AttachStdout => 1,
+            AttachStderr => 1,
+            Tty          => 1,
+            Cmd          => [ '/bin/bash', '-c', 'tail -f /etc/resolv.conf' ],
+            OpenStdin    => 0,
+            StdinOnce    => 0
+        }
+    );
+
+    my $container = $ctx->result()->json();
+
+    $tx = $client->ContainerStart( { id => $container->{Id} } );
+    if ( !$tx->result()->is_success() ) {
+        ...
+    }
+
+    ## Getting container logs
+    $client->api()->on(
+        after_build_tx => sub {
+            my ( $ua, $tx ) = @_;
+
+            $tx->res()->content()->unsubscribe('read')->on(
+                read => sub {
+                    my ( $content, $bytes ) = @_;
+                    
+                    say $bytes;
+                }
+            );
+        }
+    );
+
+    $client->ContainerLogs(
+        {
+            id     => $container->{Id},
+            stderr => 1,
+            stdout => 1,
+            follow => 1,
+        }
+    );
+
+    $client->api()->unsubscribe('after_build_tx');
+
+    ## Stopping the container
+    $tx = $client->ContainerStop( { id => $container->{Id} } );
+    if ( !$tx->result()->is_success() ) {
+        ...
+    }
+
+=head1 DESCRIPTION
+
+This module is built on top of L<OpenAPI::Client> and the official OpenAPI specifications from docker.com. It supports multiple versions of Docker API, and in the local context, it doesn't require exposing the Docker API server on a TCP socket as it makes use of the "/var/run/docker.sock" file.
+Under the hood the all requests are handled by a L<Mojo::UserAgent> instance, which is highly configurable. 
+
+This module is B<EXPERIMENTAL>, the methods are subject to change. In the future, I might hide all API calls under custom-methods implementations to resemble a high-level API; also, I welcome any suggestions.
+
+=head1 ATTRIBUTES
+
+=head2 endpoint
+
+The Docker REST endpoint. Defaults to 'http+unix://var/run/docker.sock'.
+
+=head2 version
+
+The Docker OpenAPI spec version. Defaults to 'v1.40', lower value supported is 'v1.25'.
+
+=head2 ua
+
+The L<Mojo::UserAgent> object used to perform the requests.
+
+=head1 METHODS
+
+All methods are generated from the OpenAPI spec upon class instantiation and have the same name as the OperationId property. 
+
+=head2 MethodName
+
+    my $tx = $client->MethodName( \%params, %content );
+
+Returns a L<Mojo::HTTP::Transation> object which contains the response with some additional features.
+
+=head2 MethodName_p
+
+    my $promise = $client->MethodName_p( \%params, %content );
+    $promise->then(sub { 
+        my $tx = shift;
+        ...
+    });
+
+Same as above, but returning a L<Mojo::Promise> object.
+
+For the latest version (1.40) the methods are:
+
+=over
+
+=item *
+
+ContainerList
+
+=item *
+
+ContainerCreate
+
+=item *
+
+ContainerInspect
+
+=item *
+
+ContainerTop
+
+=item *
+
+ContainerLogs
+
+=item *
+
+ContainerChanges
+
+=item *
+
+ContainerExport
+
+=item *
+
+ContainerStats
+
+=item *
+
+ContainerResize
+
+=item *
+
+ContainerStart
+
+=item *
+
+ContainerStop
+
+=item *
+
+ContainerRestart
+
+=item *
+
+ContainerKill
+
+=item *
+
+ContainerUpdate
+
+=item *
+
+ContainerRename
+
+=item *
+
+ContainerPause
+
+=item *
+
+ContainerUnpause
+
+=item *
+
+ContainerAttach
+
+=item *
+
+ContainerAttachWebsocket
+
+=item *
+
+ContainerWait
+
+=item *
+
+ContainerDelete
+
+=item *
+
+ContainerArchiveInfo
+
+=item *
+
+ContainerArchive
+
+=item *
+
+PutContainerArchive
+
+=item *
+
+ContainerPrune
+
+=item *
+
+ImageList
+
+=item *
+
+ImageBuild
+
+=item *
+
+BuildPrune
+
+=item *
+
+ImageCreate
+
+=item *
+
+ImageInspect
+
+=item *
+
+ImageHistory
+
+=item *
+
+ImagePush
+
+=item *
+
+ImageTag
+
+=item *
+
+ImageDelete
+
+=item *
+
+ImageSearch
+
+=item *
+
+ImagePrune
+
+=item *
+
+SystemAuth
+
+=item *
+
+SystemInfo
+
+=item *
+
+SystemVersion
+
+=item *
+
+SystemPing
+
+=item *
+
+SystemPingHead
+
+=item *
+
+ImageCommit
+
+=item *
+
+SystemEvents
+
+=item *
+
+SystemDataUsage
+
+=item *
+
+ImageGet
+
+=item *
+
+ImageGetAll
+
+=item *
+
+ImageLoad
+
+=item *
+
+ContainerExec
+
+=item *
+
+ExecStart
+
+=item *
+
+ExecResize
+
+=item *
+
+ExecInspect
+
+=item *
+
+VolumeList
+
+=item *
+
+VolumeCreate
+
+=item *
+
+VolumeInspect
+
+=item *
+
+VolumeDelete
+
+=item *
+
+VolumePrune
+
+=item *
+
+NetworkList
+
+=item *
+
+NetworkInspect
+
+=item *
+
+NetworkDelete
+
+=item *
+
+NetworkCreate
+
+=item *
+
+NetworkConnect
+
+=item *
+
+NetworkDisconnect
+
+=item *
+
+NetworkPrune
+
+=item *
+
+PluginList
+
+=item *
+
+GetPluginPrivileges
+
+=item *
+
+PluginPull
+
+=item *
+
+PluginInspect
+
+=item *
+
+PluginDelete
+
+=item *
+
+PluginEnable
+
+=item *
+
+PluginDisable
+
+=item *
+
+PluginUpgrade
+
+=item *
+
+PluginCreate
+
+=item *
+
+PluginPush
+
+=item *
+
+PluginSet
+
+=item *
+
+NodeList
+
+=item *
+
+NodeInspect
+
+=item *
+
+NodeDelete
+
+=item *
+
+NodeUpdate
+
+=item *
+
+SwarmInspect
+
+=item *
+
+SwarmInit
+
+=item *
+
+SwarmJoin
+
+=item *
+
+SwarmLeave
+
+=item *
+
+SwarmUpdate
+
+=item *
+
+SwarmUnlockkey
+
+=item *
+
+SwarmUnlock
+
+=item *
+
+ServiceList
+
+=item *
+
+ServiceCreate
+
+=item *
+
+ServiceInspect
+
+=item *
+
+ServiceDelete
+
+=item *
+
+ServiceUpdate
+
+=item *
+
+ServiceLogs
+
+=item *
+
+TaskList
+
+=item *
+
+TaskInspect
+
+=item *
+
+TaskLogs
+
+=item *
+
+SecretList
+
+=item *
+
+SecretCreate
+
+=item *
+
+SecretInspect
+
+=item *
+
+SecretDelete
+
+=item *
+
+SecretUpdate
+
+=item *
+
+ConfigList
+
+=item *
+
+ConfigCreate
+
+=item *
+
+ConfigInspect
+
+=item *
+
+ConfigDelete
+
+=item *
+
+ConfigUpdate
+
+=item *
+
+DistributionInspect
+
+=item *
+
+Session
+
+
+=back
+
+=head1 AUTHOR
+
+Tudor Marghidanu C<tudor@marghidanu.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2020, Tudor Marghidanu.
+
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
+
+=cut

@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000020';
+our $VERSION = '1.000023';
 
 use App::Yath::Options;
 
@@ -15,7 +15,7 @@ use Test2::Harness::IPC;
 use Test2::Harness::Runner::State;
 
 use Test2::Harness::Util::JSON qw/encode_json decode_json JSON/;
-use Test2::Harness::Util qw/mod2file open_file/;
+use Test2::Harness::Util qw/mod2file open_file chmod_tmp/;
 use Test2::Util::Table qw/table/;
 
 use Test2::Harness::Util::Term qw/USE_ANSI_COLOR/;
@@ -48,6 +48,8 @@ use Test2::Harness::Util::HashBase qw/
     +state
 
     <final_data
+
+    <coverage_aggregator
 /;
 
 include_options(
@@ -239,6 +241,12 @@ sub render {
     my $logger    = $self->logger;
     my $plugins = $self->settings->harness->plugins;
 
+    my $cover = $settings->logging->write_coverage;
+    if ($cover) {
+        require Test2::Harness::Log::CoverageAggregator;
+        $self->{+COVERAGE_AGGREGATOR} //= Test2::Harness::Log::CoverageAggregator->new();
+    }
+
     $plugins = [grep {$_->can('handle_event')} @$plugins];
 
     # render results from log
@@ -277,6 +285,12 @@ sub render {
         }
         else {
             $_->render_event($e) for @$renderers;
+
+            $self->{+COVERAGE_AGGREGATOR}->process_event($e) if $cover && (
+                $e->{facet_data}->{coverage} ||
+                $e->{facet_data}->{harness_job_end} ||
+                $e->{facet_data}->{harness_job_start}
+            );
         }
 
         $self->{+TESTS_SEEN}++   if $e->{facet_data}->{harness_job_launch};
@@ -287,6 +301,7 @@ sub render {
         $ipc->wait() if $ipc;
     }
 }
+
 
 sub stop {
     my $self = shift;
@@ -305,13 +320,30 @@ sub stop {
     $ipc->wait(all => 1);
     $ipc->stop;
 
+    my $cover = $settings->logging->write_coverage;
+    if ($cover) {
+        my $coverage = $self->{+COVERAGE_AGGREGATOR}->coverage;
+
+        if (open(my $fh, '>', $cover)) {
+            print $fh encode_json($coverage);
+            close($fh);
+        }
+        else {
+            warn "Could not write coverage file '$cover': $!";
+        }
+    }
+
     unless ($settings->display->quiet > 2) {
         printf STDERR "\nNo tests were seen!\n" unless $self->{+TESTS_SEEN};
 
-        printf("\nKeeping work dir: %s\n", $self->workdir) if $settings->debug->keep_dirs;
+        printf("\nKeeping work dir: %s\n", $self->workdir)
+            if $settings->debug->keep_dirs;
 
         print "\nWrote log file: " . $settings->logging->log_file . "\n"
             if $settings->logging->log;
+
+        print "\nWrote coverage file: $cover\n"
+            if $cover;
     }
 }
 
@@ -333,6 +365,7 @@ sub build_run {
     my $run = $settings->build(run => 'Test2::Harness::Run');
 
     mkdir($run->run_dir($dir)) or die "Could not make run dir: $!";
+    chmod_tmp($dir);
 
     return $self->{+RUN} = $run;
 }
@@ -509,7 +542,7 @@ sub render_final_data {
     if (my $rows = $final_data->{retried}) {
         print "\nThe following jobs failed at least once:\n";
         print join "\n" => table(
-            header => ['Job ID', 'Times Run', 'Test File', "Succeded Eventually?"],
+            header => ['Job ID', 'Times Run', 'Test File', "Succeeded Eventually?"],
             rows   => $rows,
         );
         print "\n";
@@ -959,6 +992,49 @@ Can be specified multiple times
 
 =over 4
 
+=item --changed path/to/file
+
+=item --no-changed
+
+Specify one or more files as having been changed.
+
+Can be specified multiple times
+
+
+=item --changed-only
+
+=item --no-changed-only
+
+Only search for tests for changed files (Requires --coverage-from, also requires a list of changes either from the --changed option, or a plugin that implements changed_files())
+
+
+=item --changes-plugin Git
+
+=item --changes-plugin +App::Yath::Plugin::Git
+
+=item --no-changes-plugin
+
+What plugin should be used to detect changed files.
+
+
+=item --coverage-from path/to/log.jsonl
+
+=item --coverage-from http://example.com/coverage
+
+=item --coverage-from path/to/coverage.json
+
+=item --no-coverage-from
+
+Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
+
+
+=item --coverage-url-use-post
+
+=item --no-coverage-url-use-post
+
+If coverage_from is a url, use the http POST method with a list of changed files. This allows the server to tell us what tests to run instead of downloading all the coverage data and determining what tests to run from that.
+
+
 =item --default-at-search ARG
 
 =item --default-at-search=ARG
@@ -1034,6 +1110,17 @@ Specify valid test filename extensions, default: t and t2
 Can be specified multiple times
 
 
+=item --maybe-coverage-from path/to/log.jsonl
+
+=item --maybe-coverage-from http://example.com/coverage
+
+=item --maybe-coverage-from path/to/coverage.json
+
+=item --no-maybe-coverage-from
+
+Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
+
+
 =item --maybe-durations file.json
 
 =item --maybe-durations http://example.com/durations.json
@@ -1066,6 +1153,13 @@ Only run tests that have their duration flag set to 'LONG'
 List of tests and test directories to use instead of the default search paths. Typically these can simply be listed as command line arguments without the --search prefix.
 
 Can be specified multiple times
+
+
+=item --show-changed-files
+
+=item --no-show-changed-files
+
+Print a list of changed files if any are found
 
 
 =back
@@ -1116,6 +1210,23 @@ Show output for the start of a job. (Default: off unless -v)
 =item --no-show-run-info
 
 Show the run configuration when a run starts. (Default: off, unless -vv)
+
+
+=back
+
+=head3 Git Options
+
+=over 4
+
+=item --git-change-base master
+
+=item --git-change-base HEAD^
+
+=item --git-change-base df22abe4
+
+=item --no-git-change-base
+
+Find files changed by all commits in the current branch from most recent stopping when a commit is found that is also present in the history of the branch/commit specified as the change base.
 
 
 =back
@@ -1240,6 +1351,15 @@ Specify the name of the log file. This option implies -L.
 Specify the format for automatically-generated log files. Overridden by --log-file, if given. This option implies -L (Default: \$YATH_LOG_FILE_FORMAT, if that is set, or else "%!P%Y-%m-%d~%H:%M:%S~%!U~%!p.jsonl"). This is a string in which percent-escape sequences will be replaced as per POSIX::strftime. The following special escape sequences are also replaced: (%!P : Project name followed by a ~, if a project is defined, otherwise empty string) (%!U : the unique test run ID) (%!p : the process ID) (%!S : the number of seconds since local midnight UTC)
 
 Can also be set with the following environment variables: C<YATH_LOG_FILE_FORMAT>, C<TEST2_HARNESS_LOG_FORMAT>
+
+
+=item --write-coverage
+
+=item --write-coverage=coverage.json
+
+=item --no-write-coverage
+
+Create a json file of all coverage data seen during the run (This implies --cover-files).
 
 
 =back
@@ -1573,6 +1693,13 @@ Use Devel::Cover to calculate test coverage. This disables forking. If no args a
 Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
 
 
+=item --dbi-profiling
+
+=item --no-dbi-profiling
+
+Use Test2::Plugin::DBIProfile to collect database profiling data
+
+
 =item --event-timeout SECONDS
 
 =item --et SECONDS
@@ -1783,6 +1910,13 @@ Can also be set with the following environment variables: C<T2_WORKDIR>, C<YATH_
 =item --no-yathui-api-key
 
 Yath-UI API key. This is not necessary if your Yath-UI instance is set to single-user
+
+
+=item --yathui-coverage
+
+=item --no-yathui-coverage
+
+Poll coverage data from Yath-UI to determine what tests should be run for changed files
 
 
 =item --yathui-durations

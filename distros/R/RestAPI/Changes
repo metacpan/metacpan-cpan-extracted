@@ -1,0 +1,7 @@
+Revision history for RestAPI
+
+0.01    26.09.2017
+        First version
+0.08    01.10.2018
+        RestAPI::do() returns only the response data back
+

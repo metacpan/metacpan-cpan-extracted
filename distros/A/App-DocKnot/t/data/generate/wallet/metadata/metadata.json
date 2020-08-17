@@ -1,0 +1,261 @@
+{
+    "name": "wallet",
+    "version": "1.4",
+    "synopsis": "secure data management system",
+    "maintainer": "Russ Allbery <eagle@eyrie.org>",
+    "copyrights": [
+        {
+            "holder": "Russ Allbery <eagle@eyrie.org>",
+            "years": "2014, 2016, 2018",
+        },
+        {
+            "holder": "The Board of Trustees of the Leland Stanford Junior University",
+            "years": "2006-2010, 2012-2014",
+        },
+    ],
+    "license": "Expat",
+    "build": {
+        "autotools": true,
+        "automake": "1.11",
+        "autoconf": "2.64",
+        "install": true,
+        "kerberos": true,
+        "lancaster": true,
+        "manpages": true,
+        "reduced_depends": true,
+        "type": "Autoconf",
+    },
+    "support": {
+        "email": "eagle@eyrie.org",
+        "github": "rra/wallet",
+        "listname": "kerberos",
+        "listurl": "https://mailman.mit.edu/mailman/listinfo/kerberos",
+        "web": "https://www.eyrie.org/~eagle/software/wallet/",
+    },
+    "vcs": {
+        "type": "Git",
+        "url": "https://git.eyrie.org/git/kerberos/wallet.git",
+        "browse": "https://git.eyrie.org/?p=kerberos/wallet.git",
+        "github": "rra/wallet",
+        "openhub": "https://www.openhub.net/p/wallet",
+        "status": {
+            "workflow": "build",
+        },
+    },
+    "readme": {
+        "sections": [
+            { "title": "Configuration" },
+        ],
+    },
+    "quote": {
+        "author": "John M. Ford",
+        "broken": true,
+        "work": "Growing Up Weightless",
+    },
+    "distribution": {
+        "section": "kerberos",
+        "tarname": "wallet",
+        "version": "wallet",
+    },
+    "debian": {
+        "personal": true,
+    },
+    "docs": {
+        "user": [
+            {
+                "name": "setup",
+                "title": "Setup and configuration",
+            },
+            {
+                "name": "config",
+                "title": "Configuration options",
+            },
+            {
+                "name": "objects-and-schemes",
+                "title": "Objects and ACL schemes",
+            },
+            {
+                "name": "wallet",
+                "title": "wallet",
+            },
+            {
+                "name": "wallet-admin",
+                "title": "wallet-admin",
+            },
+            {
+                "name": "wallet-backend",
+                "title": "wallet-backend",
+            },
+            {
+                "name": "wallet-report",
+                "title": "wallet-report",
+            },
+            {
+                "name": "keytab-backend",
+                "title": "keytab-backend",
+            },
+            {
+                "name": "naming",
+                "title": "Stanford wallet naming policy",
+            },
+            {
+                "name": "thanks",
+                "title": "Thanks and credits",
+            },
+        ],
+        "developer": [
+            {
+                "name": "design",
+                "title": "Overall design",
+            },
+            {
+                "name": "design-acl",
+                "title": "ACL design",
+            },
+            {
+                "name": "design-api",
+                "title": "Server module API design",
+            },
+            {
+                "name": "notes",
+                "title": "Implementation notes",
+            },
+        ],
+        "contrib": [
+            {
+                "name": "ad-keytab",
+                "title": "ad-keytab",
+            },
+            {
+                "name": "used-principals",
+                "title": "used-principals",
+            },
+            {
+                "name": "wallet-contacts",
+                "title": "wallet-contacts",
+            },
+            {
+                "name": "wallet-rekey-periodic",
+                "title": "wallet-rekey-periodic",
+            },
+            {
+                "name": "wallet-summary",
+                "title": "wallet-summary",
+            },
+            {
+                "name": "wallet-unknown-hosts",
+                "title": "wallet-unknown-hosts",
+            }
+        ],
+        "api": [
+            {
+                "name": "api/acl",
+                "title": "Wallet::ACL",
+            },
+            {
+                "name": "api/acl-base",
+                "title": "Wallet::ACL::Base",
+            },
+            {
+                "name": "api/acl-external",
+                "title": "Wallet::ACL::External",
+            },
+            {
+                "name": "api/acl-krb5",
+                "title": "Wallet::ACL::Krb5",
+            },
+            {
+                "name": "api/acl-krb5-regex",
+                "title": "Wallet::ACL::Krb5::Regex",
+            },
+            {
+                "name": "api/acl-ldap-attr",
+                "title": "Wallet::ACL::LDAP::Attribute",
+            },
+            {
+                "name": "api/acl-ldap-attr-root",
+                "title": "Wallet::ACL::LDAP::Attribute::Root",
+            },
+            {
+                "name": "api/acl-nested",
+                "title": "Wallet::ACL::Nested",
+            },
+            {
+                "name": "api/acl-netdb",
+                "title": "Wallet::ACL::NetDB",
+            },
+            {
+                "name": "api/acl-netdb-root",
+                "title": "Wallet::ACL::NetDB::Root",
+            },
+            {
+                "name": "api/admin",
+                "title": "Wallet::Admin",
+            },
+            {
+                "name": "api/config",
+                "title": "Wallet::Config",
+            },
+            {
+                "name": "api/database",
+                "title": "Wallet::Database",
+            },
+            {
+                "name": "api/kadmin",
+                "title": "Wallet::Kadmin",
+            },
+            {
+                "name": "api/kadmin-ad",
+                "title": "Wallet::Kadmin::AD",
+            },
+            {
+                "name": "api/kadmin-heimdal",
+                "title": "Wallet::Kadmin::Heimdal",
+            },
+            {
+                "name": "api/kadmin-mit",
+                "title": "Wallet::Kadmin::MIT",
+            },
+            {
+                "name": "api/object-base",
+                "title": "Wallet::Object::Base",
+            },
+            {
+                "name": "api/object-duo",
+                "title": "Wallet::Object::Duo",
+            },
+            {
+                "name": "api/object-file",
+                "title": "Wallet::Object::File",
+            },
+            {
+                "name": "api/object-keytab",
+                "title": "Wallet::Object::Keytab",
+            },
+            {
+                "name": "api/object-password",
+                "title": "Wallet::Object::Password",
+            },
+            {
+                "name": "api/object-wakeyring",
+                "title": "Wallet::Object::WAKeyring",
+            },
+            {
+                "name": "api/policy-stanford",
+                "title": "Wallet::Policy::Stanford",
+            },
+            {
+                "name": "api/report",
+                "title": "Wallet::Report",
+            },
+            {
+                "name": "api/schema",
+                "title": "Wallet::Schema",
+            },
+            {
+                "name": "api/server",
+                "title": "Wallet::Server",
+            },
+        ],
+    },
+}

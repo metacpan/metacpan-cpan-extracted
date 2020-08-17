@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.23     2020-08-10
+        - [Doc] Document necessary ENV variables for non-broken report links
+
 0.22     2019-07-01
         - Bump Mojolicious version requirement to 8.00
         - Add nonblocking example to ExampleApp

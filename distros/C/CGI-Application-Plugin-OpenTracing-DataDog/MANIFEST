@@ -1,0 +1,22 @@
+CHANGES
+cpanfile
+lib/CGI/Application/Plugin/OpenTracing/DataDog.pm
+lib/CGI/Application/Plugin/OpenTracing/DataDog.pod
+LICENSE.md
+Makefile.PL
+MANIFEST
+README.md
+t/lib/Test/CGI/Application/Plugin/OpenTracing/Utils.pm
+t/lib/UserAgent/Fake.pm
+t/00_use_ok.t
+t/01_use_ok_environment.t
+t/02_use_ok_environment_noop.t
+t/02_use_ok_environment_package.t
+t/02_use_ok_environment_x.t
+t/11_options.t
+t/12_options_bootstrap.t
+t/12_options_combined.t
+t/12_options_import.t
+t/90_component.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

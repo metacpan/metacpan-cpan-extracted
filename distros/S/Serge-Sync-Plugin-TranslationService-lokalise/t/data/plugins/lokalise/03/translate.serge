@@ -7,7 +7,6 @@ sync
         data
         {
             resource_directory       ./files/resources
-            file_mask                *.xliff
             file_format              xliff
             languages                de es fr-ca
         }

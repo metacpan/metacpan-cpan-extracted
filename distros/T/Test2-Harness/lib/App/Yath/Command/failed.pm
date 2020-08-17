@@ -2,7 +2,7 @@ package App::Yath::Command::failed;
 use strict;
 use warnings;
 
-our $VERSION = '1.000020';
+our $VERSION = '1.000023';
 
 use Test2::Util::Table qw/table/;
 use Test2::Harness::Util::File::JSONL;
@@ -86,7 +86,7 @@ sub run {
 
     print "\nThe following jobs failed at least once:\n";
     print join "\n" => table(
-        header => ['Job ID', 'Times Run', 'Test File', "Succeded Eventually?"],
+        header => ['Job ID', 'Times Run', 'Test File', "Succeeded Eventually?"],
         rows   => $rows,
     );
     print "\n";
@@ -254,6 +254,23 @@ Can be specified multiple times
 =item --no-brief
 
 Show only files that failed, newline separated, no other output. If a file dailed once but passed on a retry it will NOT be shown.
+
+
+=back
+
+=head3 Git Options
+
+=over 4
+
+=item --git-change-base master
+
+=item --git-change-base HEAD^
+
+=item --git-change-base df22abe4
+
+=item --no-git-change-base
+
+Find files changed by all commits in the current branch from most recent stopping when a commit is found that is also present in the history of the branch/commit specified as the change base.
 
 
 =back

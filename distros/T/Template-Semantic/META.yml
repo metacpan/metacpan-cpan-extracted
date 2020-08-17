@@ -3,31 +3,52 @@ abstract: 'Use pure XHTML/XML as a template'
 author:
   - 'Naoki Tomita <tomita@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
+  ExtUtils::MakeMaker: '6.59'
+  Test::Base: '0'
+  Test::More: '0.94'
+  Test::Requires: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: Template::Semantic
+  version: '1.4'
 name: Template-Semantic
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Template::Semantic:
+    file: lib/Template/Semantic.pm
+    version: '0.10'
+  Template::Semantic::Document:
+    file: lib/Template/Semantic/Document.pm
+  Template::Semantic::Filter:
+    file: lib/Template/Semantic/Filter.pm
 requires:
-  Filter::Util::Call: 0
-  HTML::Selector::XPath: 0.09
-  Scalar::Util: 1.19
-  XML::LibXML: 1.69
-  perl: 5.8.0
+  HTML::Selector::XPath: '0.17'
+  Scalar::Util: '1.19'
+  XML::LibXML: '1.69'
+  perl: '5.008000'
 resources:
-  bugtracker: http://github.com/tomi-ru/Template-Semantic/issues
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/tomi-ru/Template-Semantic
-version: 0.09
+  bugtracker: https://github.com/tomill/Template-Semantic/issues
+  homepage: https://github.com/tomill/Template-Semantic
+  repository: git://github.com/tomill/Template-Semantic.git
+version: '0.10'
+x_contributors:
+  - 'Alex Peters <lxp@cpan.org>'
+  - 'Hans Dieter Pearcey <hdp@weftsoar.net>'
+  - 'Squeeks <squeek@cpan.org>'
+  - 'vividsnow <vividsnow@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

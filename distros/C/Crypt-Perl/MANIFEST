@@ -102,6 +102,7 @@ lib/Crypt/Perl/X509/SCT.pm
 lib/Crypt/Perl/X509v3.pm
 t/Crypt-Perl-ASN1-BitString.t
 t/Crypt-Perl-BigInt.t
+t/Crypt-Perl-ECDSA-EC-Point.t
 t/Crypt-Perl-ECDSA-Generate.t
 t/Crypt-Perl-ECDSA-Math.t
 t/Crypt-Perl-ECDSA-Parse.t

@@ -12,7 +12,7 @@ use Data::Object::Class;
 use Data::Object::ClassHas;
 use JSON::Validator;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 our $GITHUB_SOURCE = 'iamalnewkirk/json-sql';
 
@@ -27,7 +27,8 @@ has schema => (
 fun new_schema($self) {
   my $version = $self->version;
   my $specification = "schemas/$version/rulesets.yaml";
-  "https://raw.githubusercontent.com/$GITHUB_SOURCE/master/$specification"
+  $ENV{SQL_VALIDATOR_SCHEMA}
+    || "https://raw.githubusercontent.com/$GITHUB_SOURCE/master/$specification"
 }
 
 has validator => (
@@ -37,6 +38,8 @@ has validator => (
 );
 
 fun new_validator($self) {
+  local $ENV{JSON_VALIDATOR_CACHE_ANYWAYS} = 1
+    unless exists $ENV{JSON_VALIDATOR_CACHE_ANYWAYS};
   JSON::Validator->new
 }
 
@@ -81,7 +84,7 @@ method validate(HashRef $schema) {
 
 =head1 NAME
 
-SQL::Validator - Validate JSON-SQL Schemas
+SQL::Validator - Validate JSON-SQL
 
 =cut
 
@@ -102,13 +105,15 @@ Validate JSON-SQL Schemas
   #     into => {
   #       table => 'users'
   #     },
-  #     default => true
+  #     default => 1
   #   }
   # });
 
-  # i.e. INSERT INTO users DEFAULT VALUES;
+  # i.e. represents (INSERT INTO "users" DEFAULT VALUES)
 
-  # $sql->error->report('insert')
+  # die $sql->error if !$valid;
+
+  # $sql->error->report('insert');
 
 =cut
 
@@ -116,7 +121,8 @@ Validate JSON-SQL Schemas
 
 This package provides a
 L<json-sql|https://github.com/iamalnewkirk/json-sql#readme> data structure
-validation library based around L<json-schema|https://json-schema.org>.
+validation library based on the JSON-SQL L<json-schema|https://json-schema.org>
+standard.
 
 =cut
 
@@ -168,7 +174,7 @@ The error method validates the JSON-SQL schema provided.
 
   # given: synopsis
 
-  $sql->validate({});
+  $sql->validate({select => {}});
 
   my $error = $sql->error;
 
@@ -180,7 +186,7 @@ The error method validates the JSON-SQL schema provided.
 
   # given: synopsis
 
-  $sql->validate({select => {}});
+  $sql->validate({select => { from => { table => 'users' } } });
 
   my $error = $sql->error;
 
@@ -205,7 +211,7 @@ The validate method validates the JSON-SQL schema provided.
       into => {
         table => 'users'
       },
-      default => 'true'
+      default => 1
     }
   });
 
@@ -221,12 +227,14 @@ The validate method validates the JSON-SQL schema provided.
 
   my $valid = $sql->validate({
     insert => {
-      table => 'users',
-      default => 'true'
+      into => {
+        table => 'users'
+      },
+      default => 'true' # coerced booleans
     }
   });
 
-  # INVALID
+  # VALID
 
 =back
 

@@ -193,7 +193,7 @@ sub test_verify : Tests(14) {
         is(
             $ecdsa->verify( $msg, $sig ),
             1,
-            "$name: verify() - positive",
+            "$name: verify() identifies match",
         );
 
         my $bad_sig = $sig;
@@ -202,7 +202,7 @@ sub test_verify : Tests(14) {
         is(
             $ecdsa->verify( $msg, $bad_sig ),
             0,
-            "$name: verify() - negative",
+            "$name: verify() identifies non-match",
         );
     }
 

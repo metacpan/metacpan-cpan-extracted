@@ -1,0 +1,2 @@
+class Foo {}
+Foo.bar = "value"; // expect: [Line 2] Error at 'bar': Only instances have fields.

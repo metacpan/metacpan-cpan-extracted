@@ -1,0 +1,104 @@
+NAME
+    CSS::Struct::Output::Indent - Indent printing 'CSS::Struct' structure to
+    CSS code.
+
+SYNOPSIS
+     use CSS::Struct::Output::Indent;
+
+     my $css = CSS::Struct::Output::Indent->new(%parameters);
+     $css->put(@data);
+     $css->flush;
+     $css->reset;
+
+METHODS
+    "new(%parameters)"
+             Constructor.
+
+            *       "auto_flush"
+
+                     Auto flush flag.
+                     Default is 0.
+
+            *       "comment_delimeters"
+
+                     Reference to array with begin and end comment delimeter.
+                     Default value is ['/*', '*/'].
+                     Possible values are:
+                     - ['/*', '*/']
+                     - ['<!--', '-->'],
+
+            *       "next_indent"
+
+                     Indent string.
+                     Default value is TAB.
+
+            *       "output_handler"
+
+                     Handler for print output strings.
+                     Must be a GLOB.
+                     Default is undef.
+
+            *       "skip_bad_types"
+
+                     Flag, that means bad 'CSS::Struct' types skipping.
+                     Default value is 0.
+
+            *       "skip_comments"
+
+                     Flag, that means comment skipping.
+                     Default value is 0.
+
+    "flush($reset_flag)"
+             Flush CSS structure in object.
+             If defined 'output_handler' flush to its.
+             Or return code.
+             If enabled $reset_flag, then resets internal variables via reset method.
+
+    "put(@data)"
+             Put CSS structure in format specified in L<CSS::Struct>.
+
+    "reset()"
+             Resets internal variables.
+
+ERRORS
+     From CSS::Struct::Core:
+             Auto-flush can't use without output handler.
+             Bad comment delimeters.
+             Bad data.
+             Bad number of arguments.
+                     ('CSS::Struct' structure array),
+             Bad type of data.
+             Cannot write to output handler.
+             No opened selector.
+             Output handler is bad file handler.
+             Unknown parameter '%s'.
+
+DEPENDENCIES
+    CSS::Struct::Output, Indent, Readonly.
+
+SEE ALSO
+    CSS::Struct
+        Struct oriented CSS manipulation.
+
+    CSS::Struct::Output
+        Base class for CSS::Struct::Output::*.
+
+    CSS::Struct::Output::Raw
+        Raw printing 'CSS::Struct' structure to CSS code.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/CSS-Struct-Output-Indent>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2011-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

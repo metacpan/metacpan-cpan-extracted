@@ -12,12 +12,6 @@
 #include <pthread.h>
 #endif
 
-#if 0
-#define MYDEBUG(s,r) do { fprintf(stderr, "%s: rc=%d\n", (s), (r)); fflush (stderr); } while (0)
-#else
-#define MYDEBUG(s,r)
-#endif
-
 static const char *zstatus(void)
 {
         static char buf[8192];
@@ -40,7 +34,11 @@ static const char *zstatus(void)
         return buf;
 }
 
-#define YDB_CROAK(x) do { if (x) croak ("YottaDB-Error: %d %s", (x), zstatus()); } while (0)
+#define YDB_CROAK(x) do { \
+                          if ((x) == YDB_TP_RESTART) croak ("|TP_RESTART|"); \
+                          if ((x) == YDB_TP_ROLLBACK) croak ("|TP_ROLLBACK|"); \
+                          if (x) croak ( __FILE__ ":%d YottaDB-Error: %d %s", __LINE__, (x), zstatus()); \
+                        } while (0)
 
 
 static int my_transaction (void *addr)
@@ -50,9 +48,12 @@ static int my_transaction (void *addr)
         int cnt;
         int ret;
         SV *errtmp;
+        SV *svret;
+
+        ret = YDB_TP_ROLLBACK;
 
         ENTER;
-        SAVETMPS;
+        /* SAVETMPS; */
         PUSHMARK(SP);
         PUTBACK;
         cnt = call_sv (func, G_SCALAR|G_NOARGS|G_EVAL);
@@ -60,17 +61,24 @@ static int my_transaction (void *addr)
         errtmp = ERRSV;
         if(cnt != 1)
             croak ("This should never happen(tm)");
-        ret = POPi;
+        svret = POPs;
         PUTBACK;
-        FREETMPS;
+        /* FREETMPS; */
         LEAVE;
         if(SvTRUE(errtmp)) {
                 // it died in some way. we rollback.
-                // sv_dump(tmp);
-                ret = YDB_TP_ROLLBACK;
+                // except if $@ =~ /^\|TP_RESTART\|/
+                {
+                        char *p = SvPV_nolen (errtmp);
+                        if (!strncmp (p, "|TP_RESTART|", 12))
+                                ret = YDB_TP_RESTART;
+                }
+        } else {
+                ret = SvIV (svret);
         }
-        MYDEBUG("my_transaction", ret);
-        return ret;
+        if (ret == YDB_TP_RESTART || ret == YDB_OK)
+                return ret;
+        return YDB_TP_ROLLBACK;
 }
 
 #ifndef NO_CHILD_INIT
@@ -260,8 +268,10 @@ CODE:
                 free (ret.buf_addr);
                 XSRETURN_UNDEF;
         }
-        YDB_CROAK(rc);
-
+        if (rc) {
+                free (ret.buf_addr);
+                YDB_CROAK(rc);
+        }
         RETVAL = newSVpvn (ret.buf_addr, ret.len_used);
         free (ret.buf_addr);
 OUTPUT:
@@ -293,7 +303,6 @@ CODE:
         }
 
         rc = ydb_set_s (&yname, items - 2, subs, &subs[items - 2]);
-        MYDEBUG("ydb_set_s", rc);
         YDB_CROAK(rc);
 OUTPUT:
 
@@ -321,7 +330,6 @@ CODE:
                 subs[i].buf_addr = ptr;
         }
         rc = ydb_delete_s (&yname, items - 1, subs, (ix == 0) ? YDB_DEL_TREE : YDB_DEL_NODE);
-        MYDEBUG("ydb_delete_s", rc);
         YDB_CROAK(rc);
 OUTPUT:
 
@@ -416,7 +424,6 @@ PPCODE:
         for (i = 0; i < retlen; i++) {
                 PUSHs (sv_2mortal (newSVpvn (ret[i].buf_addr, ret[i].len_used)));
         }
-       
         free (alloc);
 
 SV *
@@ -611,7 +618,7 @@ IV
 y_trans (func, transid, ...)
         SV *func
         char *transid
-        PROTOTYPE: &$;@
+PROTOTYPE: &$;@
 PREINIT:
         int rc;
         int i;
@@ -629,16 +636,24 @@ CODE:
                 vars[i].len_used = vars[i].len_alloc = len;
                 vars[i].buf_addr = ptr;
         }
+
         rc = ydb_tp_s (my_transaction, (void *) func, transid, items - 2, vars);
-        MYDEBUG("ydb_tp_s", rc);
-        if (rc != YDB_TP_ROLLBACK
-            && rc != YDB_TP_RESTART)
+        if (rc != YDB_TP_ROLLBACK)
                 YDB_CROAK(rc);
-        if (SvTRUE(ERRSV))
-                croak_sv (ERRSV);
-        /* we croak in void-context if rc != 0 */
-        if (GIMME_V == G_VOID && rc) {
-            croak ("y_trans: ydb_tp_s rc=%d in void context.", rc);
+        if (SvTRUE(ERRSV)) {
+                // don't croak on "|TP_ROLLBACK|" or "|TP_RESTART|"
+                {
+                        STRLEN len;
+                        char *p = SvPV (ERRSV, len);
+                        if (strncmp (p, "|TP_RESTART|", 12)
+                            && strncmp (p, "|TP_ROLLBACK|", 13))
+                                croak_sv (ERRSV);
+                }
+        } else  {
+                /* we croak in void-context if rc != 0 */
+                if (GIMME_V == G_VOID && rc) {
+                        croak ("y_trans: ydb_tp_s rc=%d in void context.", rc);
+                }
         }
         RETVAL = rc;
 OUTPUT:

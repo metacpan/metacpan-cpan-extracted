@@ -1,0 +1,8 @@
+class A {}
+
+class B < A {
+  method() {
+    // expect: [Line 6] Error at ';': Expect '.' after 'super'.
+    super;
+  }
+}

@@ -5,7 +5,6 @@ use warnings;
 use Path::Tiny qw( path );
 use Alien::Build ();
 use Alien::Base ();
-use Alien::Base::ModuleBuild ();
 
 {
   my @lines = path('dist.ini')->lines;
@@ -37,13 +36,6 @@ use Alien::Base::ModuleBuild ();
       print " ab      $old   -> $new\n";
       s/$old/$new/;
     }
-    elsif(/^Alien::Base::ModuleBuild\s*=\s*(.*)\s*$/)
-    {
-      my $old = $1;
-      my $new = Alien::Base::ModuleBuild->VERSION;
-      print " ab      $old   -> $new\n";
-      s/$old/$new/;
-    }
   }
 
   path('dist.ini')->spew(@lines);
@@ -57,7 +49,7 @@ use Alien::Base::ModuleBuild ();
   my $next  = shift @lines;
 
   unshift @lines, $title, $blank, $next,
-    "  - Require Alien::Build @{[ Alien::Build->VERSION ]} Alien::Base::ModuleBuild @{[ Alien::Base::ModuleBuild->VERSION ]}\n";
+    "  - Require Alien::Build @{[ Alien::Build->VERSION ]}\n";
 
   path('Changes')->spew(@lines);
 }

@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.66  2020-08-16
+	- mapping update
+	- recognize Ubuntu 20.04 codename
+
 0.65  2020-06-30
 	- mapping update
 	  (especially changed DBD::Pg @ freebsd to depend on

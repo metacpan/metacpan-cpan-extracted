@@ -4,7 +4,7 @@
       "Johan Vromans <jvromans@squirrel.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown",
       "perl_5"
@@ -34,7 +34,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Music::ChordPro" : "0.972",
+            "App::Music::ChordPro" : "0.975",
             "Wx" : "0.9912"
          }
       },
@@ -47,11 +47,11 @@
    "provides" : {
       "App::Music::ChordPro::Wx" : {
          "file" : "lib/App/Music/ChordPro/Wx.pm",
-         "version" : "0.972"
+         "version" : "0.975"
       },
       "wxchordpro" : {
          "file" : "script/wxchordpro",
-         "version" : "0.972"
+         "version" : "0.975"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "url" : "https://github.com/sciurius/wxchordpro"
       }
    },
-   "version" : "0.972",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.975",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

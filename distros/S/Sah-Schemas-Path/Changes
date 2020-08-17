@@ -1,3 +1,8 @@
+0.014   2020-08-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schema: pathnames.
+
+
 0.013   2020-02-11  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] D'oh, fix filter rule name again.

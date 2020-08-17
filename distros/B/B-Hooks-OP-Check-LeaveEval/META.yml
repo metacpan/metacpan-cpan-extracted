@@ -1,0 +1,30 @@
+---
+abstract: 'call a subroutine when new code finishes compiling'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::Depends: '0'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  version: '0.77'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: B-Hooks-OP-Check-LeaveEval
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  B::Hooks::OP::Check: '0.22'
+  ExtUtils::Depends: '0'
+  perl: '5.010001'
+resources:
+  repository: https://github.com/s-nez/b-hooks-op-check-leaveeval.git
+version: v0.0.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

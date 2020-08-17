@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file datatype="plaintext" original="self" source-language="en" target-language="es">
+        <body>
+            <trans-unit id="hello_world" >
+                <source>Hello world!</source>
+                <target>¡Hola mundo!</target>
+            </trans-unit>
+            <trans-unit id="file_menu"  restype="caption">
+                <source>File</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="file_menu_new"  restype="menuitem">
+                <source>New</source>
+                <target></target>
+            </trans-unit>
+            <trans-unit id="file_menu_exit">
+                <source>Exit</source>
+                <target></target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

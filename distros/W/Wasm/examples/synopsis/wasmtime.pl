@@ -5,7 +5,7 @@ use PeekPoke::FFI qw( poke );
 
 my $store = Wasm::Wasmtime::Store->new;
 
-my $module = Wasm::Wasmtime::Module->new($store, wat => q{
+my $module = Wasm::Wasmtime::Module->new($store->engine, wat => q{
   (module
 
     ;; callback we can make back into perl space

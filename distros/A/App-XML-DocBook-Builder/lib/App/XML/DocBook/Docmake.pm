@@ -1,5 +1,5 @@
 package App::XML::DocBook::Docmake;
-$App::XML::DocBook::Docmake::VERSION = '0.0900';
+$App::XML::DocBook::Docmake::VERSION = '0.1000';
 use 5.014;
 use strict;
 use warnings;
@@ -34,6 +34,7 @@ my %modes = (
     'help' => {
         standalone => 1,
     },
+    'manpages'  => {},
     'xhtml'     => {},
     'xhtml-1_1' => {
         real_mode => "xhtml",
@@ -201,10 +202,12 @@ Available commands:
     help - this help screen.
 
     fo - convert to XSL-FO.
+    manpages - convert to Unix manpage (nroff)
     rtf - convert to RTF (MS Word).
     pdf - convert to PDF (Adobe Acrobat).
     xhtml - convert to XHTML.
     xhtml-1_1 - convert to XHTML-1.1.
+    xhtml5 - convert to XHTML5
 EOF
 }
 
@@ -251,6 +254,21 @@ sub _mkdir
     my ( $self, $dir ) = @_;
 
     mkpath($dir);
+}
+
+sub _run_mode_manpages
+{
+    my $self = shift;
+
+    # Create the directory, because xsltproc requires it.
+    if ( $self->_trailing_slash )
+    {
+        # die "don't add trailing_slash";
+
+        # $self->_mkdir( $self->_output_path() );
+    }
+
+    return $self->_run_xslt();
 }
 
 sub _run_mode_xhtml
@@ -534,7 +552,7 @@ sub _output_cmd_comp
 }
 
 package App::XML::DocBook::Docmake::CmdComponent;
-$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0900';
+$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.1000';
 use Class::XSAccessor {
     accessors => [
 
@@ -568,7 +586,7 @@ App::XML::DocBook::Docmake - translate DocBook/XML to other formats
 
 =head1 VERSION
 
-version 0.0900
+version 0.1000
 
 =head1 SYNOPSIS
 
@@ -591,51 +609,6 @@ Runs the object.
 =head1 AUTHOR
 
 Shlomi Fish, C<< <shlomif at cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-app-docbook-xml-docmake at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App::XML::DocBook::Docmake>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc App::XML::DocBook::Docmake
-
-You can also look for information at:
-
-=over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/App::XML::DocBook::Docmake>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/App::XML::DocBook::Docmake>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::XML::DocBook::Docmake>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/App::XML::DocBook::Docmake>
-
-=back
-
-=head1 ACKNOWLEDGEMENTS
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Shlomi Fish.
-
-This program is released under the following license: MIT/X11 License.
-( L<http://www.opensource.org/licenses/mit-license.php> ).
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

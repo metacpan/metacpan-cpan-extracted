@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Test::More;
 if ( eval { require PDF::API2 } ) {
-    plan tests => 27;
+    plan tests => 28;
 }
 else {
     plan skip_all => "PDF::API2 not installed";
@@ -21,6 +21,7 @@ my $text = $page->text;
 # Create a layout.
 require Text::Layout;
 my $layout = Text::Layout->new($pdf);
+isa_ok( $layout, 'Text::Layout::PDFAPI2', 'Implicit backend' );
 
 # Create a FontConfig.
 require Text::Layout::FontConfig;

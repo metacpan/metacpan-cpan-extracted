@@ -1,5 +1,17 @@
 Revision history for Perl module YAML::PP
 
+0.024 2020-08-17 12:07:01+02:00
+
+    - Parser: fix flow mappings on one line
+    - Improve utility tools yamlpp-load(-dump) (add new options --merge,
+      --perl and --module) #35
+    - Minor improvements to emitter scalar style output
+    - Emitter supports flow style
+    - Support for preserving flow style in Loader/Dumper
+    - Create preserved nodes from scratch with preserved_* methods
+    - Minor fixes for the Perl schema and globs
+    - Update testsuite to data-2020-08-01
+
 0.023 2020-07-09 22:09:50+02:00
 
     - Support loading and dumping typeglobs. Issue #15

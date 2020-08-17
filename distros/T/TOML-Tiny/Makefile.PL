@@ -20,20 +20,20 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Data::Dumper" => 0,
     "DateTime::Format::RFC3339" => 0,
-    "Exporter" => 0
+    "Exporter" => 0,
+    "Math::BigInt" => "1.999718"
   },
   "TEST_REQUIRES" => {
     "Data::Dumper" => 0,
     "DateTime::Format::ISO8601" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Math::BigInt" => "1.999718",
     "TOML::Parser" => 0,
     "Test2::V0" => 0,
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t t/toml-test/invalid/*.t t/toml-test/valid/*.t"
   }

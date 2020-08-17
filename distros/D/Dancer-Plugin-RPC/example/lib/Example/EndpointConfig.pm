@@ -1,6 +1,6 @@
 package Example::EndpointConfig;
 use Moo;
-use Scalar::Util qw/ blessed /;
+use Types::Standard qw( Maybe Enum HashRef CodeRef InstanceOf );
 
 =head1 NAME
 
@@ -69,38 +69,26 @@ This hashref is directly passed to L<Dancer::Plugin::RPC>
 
 has publish => (
     is       => 'ro',
-    isa      => sub {
-        die "Invalid publishing method ($_[0])" unless$_[0] =~ m/^(?:config|pod)$/;
-    },
+    isa      => Enum[qw( config  pod )],
     required => 1
 );
 has callback => (
     is       => 'ro',
-    isa      => sub {
-        die "callback should be a coderef" unless ref($_[0]) eq 'CODE' || !defined($_[0]);
-    },
+    isa      => Maybe[CodeRef],
     required => 0
 );
 has bread_board => (
     is       => 'ro',
-    isa      => sub {
-        die "Invalid bread_board ($_[0])"
-            unless blessed($_[0]) eq 'Bread::Board::Container';
-    },
+    isa      => InstanceOf['Bread::Board::Container'],
     required => 1
 );
 has code_wrapper => (
     is   => 'lazy',
-    isa  => sub {
-        die "code_wrapper should be a coderef" unless ref($_[0]) eq 'CODE';
-    },
+    isa  => CodeRef,
 );
 has plugin_arguments => (
     is       => 'ro',
-    isa      => sub {
-        die "Invalid plugin_aruments ($_[0])"
-            unless ref($_[0]) eq 'HASH' || !defined($_[0]);
-    },
+    isa      => Maybe[HashRef],
     required => 0,
 );
 

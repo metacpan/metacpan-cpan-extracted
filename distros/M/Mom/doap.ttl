@@ -25,7 +25,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Mom";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Mom/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Mom/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Mom/v_0-003>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Mom/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Mom/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Mom/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Mom/v_0-004>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-mom>;
@@ -56,6 +56,28 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Mom-0.003.tar.gz>;
 	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Mom/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Mom-0.004"^^xsd:string;
+	dc:issued            "2020-08-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix typo in SYNOPSIS.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/briang>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-mom/pull/1>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Mom-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/briang>
+	a                    foaf:Person;
+	foaf:name            "Brian Greenfield";
+	foaf:nick            "BRIANG";
+	foaf:page            <https://metacpan.org/author/BRIANG>.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

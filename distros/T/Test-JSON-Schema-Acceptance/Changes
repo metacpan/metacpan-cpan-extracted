@@ -1,5 +1,12 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.000     2020-08-13 19:24:23Z
+        - new "add_resource" option, for providing a subref for easy use of
+          additional schema resources used by the test suite
+        - raise minimum required perl to 5.14
+        - now checking for data and schema mutation during evaluation
+        - updated test suite to commit ec18a7d0c24b4286f101e7e6956b89a2d4cbc59d
+
 0.999     2020-06-08 23:31:40Z
         - fix type constraint for test data, and add a test to verify it
 

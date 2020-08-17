@@ -9,13 +9,14 @@ use PDF::API2;
 use lib "../lib";
 use Text::Layout;
 use Text::Layout::FontConfig;
+eval { require HarfBuzz::Shaper }
+  or warn("HarfBuzz::Shaper not found. Expect incorrect results!\n");
 
 # Create document and graphics environment.
 my $pdf = PDF::API2->new();
 $pdf->mediabox( 595, 842 );	# A4
 
 # Set up page and get the text context.
-# Markup::Simple *only* uses the text context, and only for rendering.
 my $page = $pdf->page;
 my $text = $page->text;
 
@@ -31,7 +32,7 @@ sub main {
 
     # Start...
     my $x = 0;
-    my $y = 500;
+    my $y = 700;
 
     # Text to render.
     $layout->set_markup( q{Áhe <i><span foreground="red">quick</span> <span size="20"><b>brown</b></span></i> fox} );
@@ -43,9 +44,6 @@ sub main {
     # Render it.
     showlayout( $x, $y );
 
-    # Showoff.
-    showbb( $x, $y );
-
     $y -= 100;
 
     # Right align text.
@@ -54,9 +52,6 @@ sub main {
 
     # Render it.
     showlayout( $x, $y );
-
-    # Showoff.
-    showbb( $x, $y );
 
     $y -= 100;
 
@@ -76,9 +71,6 @@ sub main {
     # Render it.
     showlayout( $x, $y );
 
-    # Showoff.
-    showbb( $x, $y );
-
     $y -= 100;
 
     # This will only work properly with the HarfBuzz driver.
@@ -97,7 +89,6 @@ sub main {
       "\N{DEVANAGARI LETTER GA}";
     $layout->set_markup($phrase);
     showlayout( $x, $y );
-    showbb( $x, $y );
 
     # Ship out.
     $pdf->saveas("pdfapi2.pdf");
@@ -110,57 +101,8 @@ my $gfx;
 sub showlayout {
     my ( $x, $y ) = @_;
     $layout->show( $x, $y, $text);
-}
-
-sub showloc {
-    my ( $x, $y, $d, $col ) = @_;
-    $x ||= 0; $y ||= 0; $d ||= 50; $col ||= "blue";
     $gfx //= $page->gfx;
-
-    line( $x-$d, $y, 2*$d, 0, $col );
-    line( $x, $y-$d, 0, 2*$d, $col );
-}
-
-sub showbb {
-    my ( $x, $y, $col ) = @_;
-    $col ||= "magenta";
-    $gfx //= $page->gfx;
-
-    # Bounding box, top-left coordinates.
-    my %e = %{($layout->get_pixel_extents)[1]};
-    printf( "EXT: %.2f %.2f %.2f %.2f\n", @e{qw( x y width height )} );
-
-    # NOTE: Some fonts include natural spacing in the bounding box.
-    # NOTE: Some fonts exclude accents on capitals from the bounding box.
-
-    $gfx->save;
-    $gfx->translate( $x, $y );
-    showloc();
-
-    # Show baseline.
-    line( $e{x}, $layout->get_baseline/$PANGO_SCALE, $e{width}-$e{x}, 0, $col );
-
-    # Show bounding box.
-    $gfx->linewidth( 0.25 );
-    $gfx->strokecolor($col);
-    $e{height} = -$e{height};		# PDF coordinates
-    $gfx->rectxy( $e{x}, $e{y}, $e{width}, $e{height} );;
-    $gfx->stroke;
-    $gfx->restore;
-}
-
-sub line {
-    my ( $x, $y, $w, $h, $col ) = @_;
-    $col ||= "black";
-    $gfx //= $page->gfx;
-
-    $gfx->save;
-    $gfx->move( $x, $y );
-    $gfx->line( $x+$w, $y+$h );
-    $gfx->linewidth(0.5);
-    $gfx->strokecolor($col);
-    $gfx->stroke;
-    $gfx->restore;
+    $layout->showbb($gfx);
 }
 
 sub setup_fonts {

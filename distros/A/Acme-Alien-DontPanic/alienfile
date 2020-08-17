@@ -1,0 +1,35 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'dontpanic';
+
+plugin 'Probe::CommandLine' => (
+  command   => 'dontpanic',
+  secondary => 1,
+);
+
+share {
+
+  plugin Download => (
+    url     => 'https://alienfile.org/dontpanic/',
+    version => qr/([0-9\.]+)\.tar\.gz$/,
+  );
+  plugin Extract => 'tar.gz';
+  plugin 'Build::Autoconf';
+  
+  test [ '%{make} check' ];
+
+  ffi {
+  
+    build [
+      # TODO: under windows, dll is installed in bin.  setting --bindir doesn't seem to work for the .dll
+      # only the .exe.
+      '%{configure} --enable-shared --disable-static --libdir=%{.install.autoconf_prefix}/dynamic',
+      '%{make}',
+      '%{make} install',
+    ];
+    
+    test [ '%{make} check' ];
+  
+  };
+
+};

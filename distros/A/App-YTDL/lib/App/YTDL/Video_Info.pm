@@ -19,30 +19,37 @@ use App::YTDL::ExtractData qw( extract_data_single );
 
 sub print_video_infos {
     my ( $set, $opt, $data, $chosen ) = @_;
+    if ( ! %$data ) {
+        return;
+    }
     my ( $cols, $rows ) = get_term_size();
     print "\n\n\n\n", '=' x $cols, "\n\n", "\n" x $rows;
     print locate( 1, 1 ), cldown;
     say 'Quality: ', $opt->{quality};
     say 'Agent  : ', $opt->{useragent} if $opt->{useragent};
     print "\n";
-    my $count = 1;
+    my $count = 0;
 
     EXTRACTOR_KEY: for my $ex ( sort keys %$data ) {
 
         UPLOADER_ID: for my $up ( sort keys %{$data->{$ex}} ) {
 
             VIDEO_ID: for my $id ( @{$chosen->{$ex}{$up}} ) {
+                $count++;
                 my $key_len = 12;
                 $data->{$ex}{$up}{$id}{count} = $count;
                 my @print_array = _linefolded_print_info( $set, $opt, $data, $ex, $up, $id, $key_len );
+                print "\r", clline;
                 printf "%*.*s : %s\n", $key_len, $key_len, 'video', $count;
                 say for @print_array;
                 print "\n";
-                $count++;
             }
         }
     }
-    print "\n";
+    #print "\n";
+    if ( $count == 0 ) {
+        print cls;
+    }
     return;
 }
 
@@ -52,13 +59,21 @@ sub _prepare_print_info {
     my @keys = qw(title extractor author duration raters avg_rating view_count published description);
     if ( ! exists $data->{$ex}{$up}{$id}{fmt_to_info} ) {
         my $url = $data->{$ex}{$up}{$id}{url};
-        my $message = "** GET download info: ...";
-        my $h_ref = get_download_info( $set, $opt, $url, $message, 0 );
-        extract_data_single( $set, $opt, $data, $h_ref );
+        print "\r** GET video data: ...";
+        my $h_ref;
+        if ( eval { $h_ref = get_download_info( $set, $opt, $url, 0 ); 1 } ) {
+            my $single_data = extract_data_single( $set, $opt, $h_ref );
+            for my $key ( keys %$single_data ) {
+                $data->{$ex}{$up}{$id}{$key} = $single_data->{$key};
+            }
+        }
+        else {
+            $data->{$ex}{$up}{$id}{description} = $set->{failed_fetching_data};
+        }
     }
-    $data->{$ex}{$up}{$id}{published}  = $data->{$ex}{$up}{$id}{upload_date};
-    $data->{$ex}{$up}{$id}{author}     = $data->{$ex}{$up}{$id}{uploader};
-    $data->{$ex}{$up}{$id}{avg_rating} = $data->{$ex}{$up}{$id}{average_rating};
+    $data->{$ex}{$up}{$id}{published}  = $data->{$ex}{$up}{$id}{upload_date}    if defined $data->{$ex}{$up}{$id}{upload_date};
+    $data->{$ex}{$up}{$id}{author}     = $data->{$ex}{$up}{$id}{uploader}       if defined $data->{$ex}{$up}{$id}{uploader};
+    $data->{$ex}{$up}{$id}{avg_rating} = $data->{$ex}{$up}{$id}{average_rating} if defined $data->{$ex}{$up}{$id}{average_rating};
     for my $key ( @keys ) {
         next if ! $data->{$ex}{$up}{$id}{$key};
         $data->{$ex}{$up}{$id}{$key} =~ s/\R/ /g;
@@ -88,7 +103,7 @@ sub _linefolded_print_info {
             { init_tab => '' , subseq_tab => ' ' x $s_tab, join => 0 }
         );
     }
-    return @print_array if ! @print_array;
+    return () if ! @print_array;
     # auto width:
     my $ratio = @print_array / $maxrows;
     my $begin = 0.70;

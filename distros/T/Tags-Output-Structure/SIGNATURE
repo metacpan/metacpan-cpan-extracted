@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,47 +12,47 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 653c42335a1652d73db324a4d2072eceb2e98b49 Changes
-SHA1 59eb82858eb4fad4d198101c284fbf4254443437 LICENSE
-SHA1 4ea32b153385e543822d7b64c721e17701e9c49b MANIFEST
-SHA1 ec64e84612d110105b9e07a813238fb392fe23cd META.yml
-SHA1 2daeaba900eea16e26b3d76c0f8a0debcf67b738 Makefile.PL
-SHA1 acd83f35f611eaafe8306e0413efa67ff1100cc1 README
-SHA1 29a9509236e689020891be9038c7f74ca07e6e0f Structure.pm
-SHA1 ae51ddf87881434b24be350c3bc2b1f0b73c8622 examples/ex1.pl
-SHA1 69c7580fc69cbc6e0d9cc933fb4e9fc5e0de5ed0 examples/ex2.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 7a3fdbd8d2533ff875488bc4570a807363960e91 t/Tags-Output-Structure/01-use.t
-SHA1 2d2cd054b155bfb32966b7511bb0e2b7b63a8e14 t/Tags-Output-Structure/02-version.t
-SHA1 3059b738a2c50d68d033b223b2e3037c69eb399c t/Tags-Output-Structure/03-new.t
-SHA1 25188df10a75b5372f0633663bf51f6d4149c7ad t/Tags-Output-Structure/04-put-comment.t
-SHA1 c2b50e828caa165b4c56a1480465a33d48b658df t/Tags-Output-Structure/05-put-simple_tag.t
-SHA1 4ca6ac2fffa63ccab74aef772cbc8ce0f0107ac8 t/Tags-Output-Structure/06-put-tag.t
-SHA1 6aaf20880471721b83b2c8f5668b8146641176ee t/Tags-Output-Structure/07-put-instruction.t
-SHA1 972801626b0257defb8465149ce454f0352f70d6 t/Tags-Output-Structure/08-put-cdata.t
-SHA1 81e427e7c0eb79e318f361e073be7a01c9dd0644 t/Tags-Output-Structure/09-put-raw.t
-SHA1 273a5c24518a186505a4e721f828513f58c52f6d xt/Tags-Output-Structure/01-pod_coverage.t
-SHA1 1f276f315ead75a39cc51f07ea83d635f52d3a1c xt/Tags-Output-Structure/02-pod.t
+SHA256 ebc4efa397b0d9a4e558257474425e895f2edda681743a83798dd495f0098908 Changes
+SHA256 1ae39daee8ea9b57b471d2c15aae3939c74e92af2daced627a4abf8866cdd546 LICENSE
+SHA256 5b76c060014b48ccd8635438140a5b228484c78c91f84292fdf51310780fdd36 MANIFEST
+SHA256 93a80f82b5bc035deda74326704e0c9321a21f21676f6edb6766be617b814c7f META.yml
+SHA256 9bc4f9019a7de982d803b0af461e6ff55ca73f1415b4d435ad65c8b450e9cf6a Makefile.PL
+SHA256 c0bb920dcdf90b85040bdfb34993c88dfdee26c3e64503490a4c794975f2be24 README
+SHA256 b60c7abbf3a797f6d7a34ea46efa08ff69434f774f4a463b68c0a60cff6172f8 Structure.pm
+SHA256 22cadbf9615a17f0c3126af2426dcc3289c8aa36162350593dd7d6bdb14f16e0 examples/ex1.pl
+SHA256 6dfc00504f53309ab8fb5e2b29dafce6e897ded530f6a3df995c6d8caa896c32 examples/ex2.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 591d956fc82122e3aaf263d032bd9de0fe3628137d5b9dd46b1f49b70eaad60c t/Tags-Output-Structure/01-use.t
+SHA256 af0dc8a17c100370aea20a9a5a4ccb78937506a499c979752d78dedef196ba39 t/Tags-Output-Structure/02-version.t
+SHA256 e6ffef764d018500c75781f7df27da110d198d4758cf34794dfc8e4a56b8bb3c t/Tags-Output-Structure/03-new.t
+SHA256 7f778b58d1fca70b88aac2b28a08655def08f072ab2feb127e4c242f04401851 t/Tags-Output-Structure/04-put-comment.t
+SHA256 df6ca15bda0306a5eeeb34b2327956625ad51ed75ed93988dd9bd7994ebc4e5e t/Tags-Output-Structure/05-put-simple_tag.t
+SHA256 7385a670a0ee782d08779c64782db8afd9827ce84fec51187325a65b025ff68e t/Tags-Output-Structure/06-put-tag.t
+SHA256 146c0e2983ef5203b3f7397b7dbca484b4a72cae531928b15be10049cb981fd2 t/Tags-Output-Structure/07-put-instruction.t
+SHA256 8a97676fdd2d820508c75082174f3ef88f67e5187198296f729aa1d68610867b t/Tags-Output-Structure/08-put-cdata.t
+SHA256 82c4e7def57c0fec9c979cc8d6ba52876b80fb7ec715f73f3c9c54bf4c65aaac t/Tags-Output-Structure/09-put-raw.t
+SHA256 603acf89f673d0c7ab75a0bb43a31c4034fb046152dda68a4cd5121b599cbb0b xt/Tags-Output-Structure/01-pod_coverage.t
+SHA256 33273f5d67e4b354d02a3b4c381586984090719c98394926c6cf4b18bc692930 xt/Tags-Output-Structure/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWMpLqAAoJEJe+XXKaIuTlaXIH/0pGuZmDlxmao6g+5EiAK9h7
-VvC3s5PMp0iJe+0EnYqlkgMnSm/2FAn6estKztstTjAd3bfBRZcRU6PcmPtb1Twl
-WeyRDIwv++x3wuqZ77dUbih5g2p0+LVO0/93xR6KGzrbvlTXLbdqcPUmO6RQ8/0h
-XlOz2tdTgmyYehRAIGdvhFkbeCARHOnjRLXCLLYsMp45fnEt6fhu/TimLSAA/Pwg
-1gzBziObtln0mDZX/nL0n7KGJ2aW/ZAxtFkmW4bbE+w2JFNpfqqCfDdHxyHutMxG
-ctPpBCjo3GCOEBMooBggzi7FzvLpVL9C/ecsgsEAgRNhKQPm4UnKOY1IjvTG4Mc=
-=+BkK
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl8zAGwACgkQKyiOZjWe
+rHYJHgf8CTP0MQNVlxaemrZcV7HR9utw1DForrS9HVmxn804wdoF9zr2LjVWA1um
+GAJUUvVCFgYjARtBMclG5XDR3fH0Yng/klSHSPOQ/ctONOsw2fU+S+eluA7AUizD
+R+HY7rXUg2lFyFaTL3loWbVxwBS5C9g0lRcHDrUc2kmnn8rMqfxvX5ghg4BY+3wB
+/hR3UOc7l/91XMAkC8mNf8eN3Zn/XuNt7VPfcq4m9SakwQ04Q8Wnezh4kg7C9R34
+Aky+nHwzKd45vJ3LzLHBxwGvwoSjLin2ZLohQkEhDkmasP4esgbMRw2WrX1BAHex
+TZdL4B/9/rHiJZJuouCqqMBba6LTSw==
+=bjCV
 -----END PGP SIGNATURE-----

@@ -1,6 +1,26 @@
 ==================================================
-Changes from 2015-08-05 00:00:00 +0000 to present.
+Changes from 2015-08-19 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.06 at 2020-08-17 12:11:44 +0000
+-----------------------------------------
+
+  Change: d3c7f87d2b78cc611d6cfa6be97b45f5d5744ae1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-08-17 13:11:44 +0000
+
+    Work around the remaining CPAN Tester fails 
+
+-----------------------------------------
+version 0.04 at 2020-08-11 19:28:31 +0000
+-----------------------------------------
+
+  Change: 3412f80c9afb98e12c5842ac44c03d948780bdd5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-08-11 20:28:31 +0000
+
+    We can ignore connection reset by peer errors too 
 
 -----------------------------------------
 version 0.02 at 2020-07-22 13:41:16 +0000

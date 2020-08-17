@@ -22,6 +22,6 @@ requires:
 resources:
   bugtracker: https://github.com/dragosv/serge-plugins/issues
   repository: https://github.com/dragosv/serge-plugins.git
-version: 0.901.2
+version: 0.902.0
 x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

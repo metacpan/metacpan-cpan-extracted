@@ -1,0 +1,69 @@
+NAME
+    LWP::UserAgent::Plugin::Retry - Retry failed requests
+
+VERSION
+    This document describes version 0.003 of LWP::UserAgent::Plugin::Retry
+    (from Perl distribution LWP-UserAgent-Plugin-Retry), released on
+    2020-08-14.
+
+SYNOPSIS
+     use LWP::UserAgent::Plugin 'Retry' => {
+         max_attempts => 3, # optional, default 3
+         delay        => 2, # optional, default 2
+         retry_if     => qr/^[45]/, # optional, default is only 5xx errors are retried
+     };
+
+     my $res  = HTTP::Tiny::Plugin->new->get("http://www.example.com/");
+
+DESCRIPTION
+    This plugin retries failed response. By default only retries 5xx
+    failures, as 4xx are considered to be client's fault (but you can
+    configure it with "retry_if").
+
+CONFIGURATION
+  max_attempts
+    Int. Default 4.
+
+  delay
+    Float.
+
+ENVIRONMENT
+  LWP_USERAGENT_PLUGIN_RETRY_MAX_ATTEMPTS
+    Int.
+
+  LWP_USERAGENT_PLUGIN_RETRY_DELAY
+    Int.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/LWP-UserAgent-Plugin-Retry>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-LWP-UserAgent-Plugin-Retry>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=LWP-UserAgent-Plugin-
+    Retry>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    LWP::UserAgent::Plugin
+
+    Existing non-plugin solutions: LWP::UserAgent::Determined,
+    LWP::UserAgent::ExponentialBackoff.
+
+    Equivalent plugin for HTTP::Tiny::Plugin: HTTP::Tiny::Plugin::Retry
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

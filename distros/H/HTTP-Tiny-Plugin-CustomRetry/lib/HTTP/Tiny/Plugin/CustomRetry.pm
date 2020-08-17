@@ -1,7 +1,9 @@
 package HTTP::Tiny::Plugin::CustomRetry;
 
-our $DATE = '2019-04-14'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-15'; # DATE
+our $DIST = 'HTTP-Tiny-Plugin-CustomRetry'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,7 +25,7 @@ sub after_request {
         $pkg->new(%{$r->{config}{strategy_options} // {}});
     };
 
-    my ($ht, $method, $url, $options) = @{ $r->{argv} };
+    my ($http, $method, $url, $options) = @{ $r->{argv} };
 
     my $fail;
     if (ref $r->{config}{retry_if} eq 'Regexp') {
@@ -55,7 +57,7 @@ sub after_request {
 }
 
 1;
-# ABSTRACT: Retry failed request
+# ABSTRACT: (DEPRECATED) Retry failed request
 
 __END__
 
@@ -65,11 +67,11 @@ __END__
 
 =head1 NAME
 
-HTTP::Tiny::Plugin::CustomRetry - Retry failed request
+HTTP::Tiny::Plugin::CustomRetry - (DEPRECATED) Retry failed request
 
 =head1 VERSION
 
-This document describes version 0.001 of HTTP::Tiny::Plugin::CustomRetry (from Perl distribution HTTP-Tiny-Plugin-CustomRetry), released on 2019-04-14.
+This document describes version 0.003 of HTTP::Tiny::Plugin::CustomRetry (from Perl distribution HTTP-Tiny-Plugin-CustomRetry), released on 2020-08-15.
 
 =head1 SYNOPSIS
 
@@ -82,6 +84,9 @@ This document describes version 0.001 of HTTP::Tiny::Plugin::CustomRetry (from P
  my $res  = HTTP::Tiny::Plugin->new->get("http://www.example.com/");
 
 =head1 DESCRIPTION
+
+B<DEPRECATION NOTICE:> This plugin is now deprecated, in favor of
+L<HTTP::Tiny::Plugin::Retry> which now supports L<Algorithm::Backoff> too.
 
 This plugin retries failed response using one of available backoff strategy in
 C<Algorithm::Backoff::*> (e.g. L<Algorithm::Backoff::Exponential>).
@@ -129,13 +134,15 @@ feature.
 
 L<HTTP::Tiny::Plugin>
 
+L<HTTP::Tiny::Plugin::Retry>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

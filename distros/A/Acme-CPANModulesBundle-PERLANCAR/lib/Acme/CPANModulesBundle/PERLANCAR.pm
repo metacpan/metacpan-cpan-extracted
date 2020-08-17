@@ -1,7 +1,7 @@
 package Acme::CPANModulesBundle::PERLANCAR;
 
-our $DATE = '2020-07-21'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2020-08-09'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: PERLANCAR's collection of Acme::CPANModules::* modules
@@ -18,7 +18,7 @@ Acme::CPANModulesBundle::PERLANCAR - PERLANCAR's collection of Acme::CPANModules
 
 =head1 VERSION
 
-This document describes version 0.006 of Acme::CPANModulesBundle::PERLANCAR (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2020-07-21.
+This document describes version 0.007 of Acme::CPANModulesBundle::PERLANCAR (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2020-08-09.
 
 =head1 DESCRIPTION
 

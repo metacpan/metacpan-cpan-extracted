@@ -4,34 +4,30 @@ use warnings FATAL => 'all';
 package MarpaX::ESLIF::JSON::Encoder;
 use parent qw/MarpaX::ESLIF::Grammar/;
 
+#
+# Base required class methods
+#
+sub _ALLOCATE { return \&MarpaX::ESLIF::JSON::Encoder::allocate }
+sub _EQ {
+    return sub {
+        my ($class, $args_ref, $eslif, $strict) = @_;
+
+        my $definedStrict = defined($strict);
+        my $_definedStrict = defined($args_ref->[1]);
+    
+        return
+            ($eslif == $args_ref->[0])
+            &&
+            ($definedStrict && $_definedStrict && ($strict == $args_ref->[1]))
+    }
+}
+
 # ABSTRACT: ESLIF's JSON encoder interface
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '3.0.32'; # VERSION
+our $VERSION = '4.0.1'; # VERSION
 
-
-
-#
-# Tiny wrapper on MarpaX::ESLIF::JSON::Encoder->new, that is using the instance as void *.
-# Could have been writen in the XS itself, but I feel it is more comprehensible like
-# this.
-#
-sub new {
-    my $class = shift;
-    my $eslif = shift;
-    my $strict = shift // 1;
-
-    my $self = $class->_new($eslif->_getInstance, $strict);
-    return $self
-}
-
-
-sub encode {
-    my ($self, $value) = @_;
-
-    return MarpaX::ESLIF::JSON::Encoder::_encode($self, $value)
-}
 
 
 1;
@@ -48,7 +44,7 @@ MarpaX::ESLIF::JSON::Encoder - ESLIF's JSON encoder interface
 
 =head1 VERSION
 
-version 3.0.32
+version 4.0.1
 
 =head1 DESCRIPTION
 

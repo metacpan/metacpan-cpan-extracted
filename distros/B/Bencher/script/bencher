@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-06-18'; # DATE
-our $VERSION = '1.050'; # VERSION
+our $DATE = '2020-08-16'; # DATE
+our $VERSION = '1.051'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +32,7 @@ bencher - A benchmark framework (CLI)
 
 =head1 VERSION
 
-This document describes version 1.050 of bencher (from Perl distribution Bencher), released on 2020-06-18.
+This document describes version 1.051 of bencher (from Perl distribution Bencher), released on 2020-08-16.
 
 =head1 SYNOPSIS
 
@@ -148,39 +148,9 @@ C<*> marks required options.
 
 =over
 
-=item B<--capture-stderr>
-
-Trap output to stderr.
-
-=item B<--capture-stdout>
-
-Trap output to stdout.
-
-=item B<--cpanmodules-module>=I<s>
-
-Load a scenario from an Acme::CPANModules:: Perl module.
-
-An <pm:Acme::CPANModules> module can also contain benchmarking information, e.g.
-<pm:Acme::CPANModules::TextTable>.
-
-
-=item B<--dataset>=I<s>
-
-Add a dataset.
-
-See C<--datasets>.
-
-=item B<--datasets-json>=I<s>
-
-Add datasets (JSON-encoded).
-
-See C<--datasets>.
-
-=item B<--datasets>=I<s>
-
-Add datasets.
-
 =item B<--detail>, B<-l>
+
+Show detailed information for each result.
 
 =item B<--env-hash>=I<s>
 
@@ -197,48 +167,6 @@ See C<--env-hashes>.
 =item B<--env-hashes>=I<s>
 
 Add environment hashes.
-
-=item B<--include-path-json>=I<s>, B<-I>
-
-Additional module search paths (JSON-encoded).
-
-See C<--include-path>.
-
-=item B<--include-path>=I<s@>
-
-Add path to module search path.
-
-Used when searching for scenario module, or when in multimodver mode.
-
-
-Can be specified multiple times.
-
-=item B<--multimodver>=I<s>
-
-Benchmark multiple module versions.
-
-If set to a module name, will search for all (instead of the first occurrence)
-of the module in `@INC`. Then will generate items for each version.
-
-Currently only one module can be multi version.
-
-
-=item B<--multiperl>
-
-Benchmark against multiple perls.
-
-Requires <pm:App::perlbrew> to be installed. Will use installed perls from the
-perlbrew installation. Each installed perl must have <pm:Bencher::Backend>
-module installed (in addition to having all modules that you want to benchmark,
-obviously).
-
-By default, only perls having Bencher::Backend will be included. Use
-`--include-perl` and `--exclude-perl` to include and exclude which perls you
-want.
-
-Also note that due to the way this is currently implemented, benchmark code that
-contains closures (references to variables outside the code) won't work.
-
 
 =item B<--on-failure>=I<s>
 
@@ -271,22 +199,6 @@ item's result not being equal to expected result.
 There is an extra choice of `warn` for this type of failure, which is to print a
 warning to STDERR and continue.
 
-
-=item B<--participant>=I<s>
-
-Add a participant.
-
-See C<--participants>.
-
-=item B<--participants-json>=I<s>
-
-Add participants (JSON-encoded).
-
-See C<--participants>.
-
-=item B<--participants>=I<s>
-
-Add participants.
 
 =item B<--precision-limit>=I<s>
 
@@ -328,14 +240,6 @@ for(1..100){ ... } >>).
 This setting overrides `default_precision` property in the scenario.
 
 
-=item B<--raw>
-
-Show "raw" data.
-
-When action=show-items-result, will print result as-is instead of dumping as
-Perl.
-
-
 =item B<--runner>=I<s>
 
 Runner module to use.
@@ -365,23 +269,6 @@ When this is turned on, will save a JSON file after benchmark, containing the
 result along with metadata. The directory of the JSON file will be determined
 from the `results_dir` option, while the filename from the `results_filename`
 option.
-
-
-=item B<--scenario-file>=I<s>, B<-f>
-
-Load a scenario from a Perl file.
-
-Perl file will be do()'ed and the last expression should be a hash containing
-the scenario specification.
-
-
-=item B<--scenario-module>=I<s>, B<-m>
-
-Load a scenario from a Bencher::Scenario:: Perl module.
-
-Will try to load module `Bencher::Scenario::<NAME>` and expect to find a package
-variable in the module called `$scenario` which should be a hashref containing
-the scenario specification.
 
 
 =item B<--test>
@@ -420,18 +307,6 @@ Also return memory usage of each item code's result (return value).
 
 Memory size is measured using <pm:Devel::Size>.
 
-
-=item B<-d>=I<s>
-
-Add a dataset.
-
-See C<--datasets>.
-
-=item B<-p>=I<s>
-
-Add a participant.
-
-See C<--participants>.
 
 =back
 
@@ -570,6 +445,48 @@ Set configuration profile to use.
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
+
+=back
+
+=head2 Dataset options
+
+=over
+
+=item B<--dataset>=I<s>
+
+Add a dataset.
+
+See C<--datasets>.
+
+=item B<--datasets-json>=I<s>
+
+Add datasets (JSON-encoded).
+
+See C<--datasets>.
+
+=item B<--datasets>=I<s>
+
+Add datasets.
+
+=item B<-d>=I<s>
+
+Add a dataset.
+
+See C<--datasets>.
+
+=back
+
+=head2 Debugging options
+
+=over
+
+=item B<--keep-tempdir>
+
+Do not cleanup temporary directory when bencher ends.
+
+=item B<--tidy>
+
+Run perltidy over generated scripts.
 
 =back
 
@@ -985,26 +902,6 @@ See C<--include-perl>.
 
 =back
 
-=head2 Format options
-
-=over
-
-=item B<--scientific-notation>
-
-=item B<--sort>=I<s@>
-
-Default value:
-
- ["-time"]
-
-Can be specified multiple times.
-
-=item B<--sorts-json>=I<s>
-
-See C<--sort>.
-
-=back
-
 =head2 Logging options
 
 =over
@@ -1031,9 +928,95 @@ Shortcut for --log-level=info.
 
 =back
 
+=head2 Multi module version options
+
+=over
+
+=item B<--include-path-json>=I<s>, B<-I>
+
+Additional module search paths (JSON-encoded).
+
+See C<--include-path>.
+
+=item B<--include-path>=I<s@>
+
+Add path to module search path.
+
+Used when searching for scenario module, or when in multimodver mode.
+
+
+Can be specified multiple times.
+
+=item B<--multimodver>=I<s>
+
+Benchmark multiple module versions.
+
+If set to a module name, will search for all (instead of the first occurrence)
+of the module in `@INC`. Then will generate items for each version.
+
+Currently only one module can be multi version.
+
+
+=back
+
+=head2 Multiperl options
+
+=over
+
+=item B<--exclude-perl>=I<s@>
+
+Add specified perl to exclude list.
+
+Can be specified multiple times.
+
+=item B<--exclude-perls-json>=I<s>
+
+Exclude some perls (JSON-encoded).
+
+See C<--exclude-perl>.
+
+=item B<--include-perl>=I<s@>
+
+Add specified perl to include list.
+
+Can be specified multiple times.
+
+=item B<--include-perls-json>=I<s>
+
+Only include some perls (JSON-encoded).
+
+See C<--include-perl>.
+
+=item B<--multiperl>
+
+Benchmark against multiple perls.
+
+Requires <pm:App::perlbrew> to be installed. Will use installed perls from the
+perlbrew installation. Each installed perl must have <pm:Bencher::Backend>
+module installed (in addition to having all modules that you want to benchmark,
+obviously).
+
+By default, only perls having Bencher::Backend will be included. Use
+`--include-perl` and `--exclude-perl` to include and exclude which perls you
+want.
+
+Also note that due to the way this is currently implemented, benchmark code that
+contains closures (references to variables outside the code) won't work.
+
+
+=back
+
 =head2 Output options
 
 =over
+
+=item B<--capture-stderr>
+
+Trap output to stderr.
+
+=item B<--capture-stdout>
+
+Trap output to stdout.
 
 =item B<--format>=I<s>
 
@@ -1068,23 +1051,21 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--note>=I<s>
+
+Put additional note in the result.
+
 =item B<--page-result>
 
 Filter output through a pager.
 
-=item B<--view-result>
+=item B<--raw>
 
-View output using a viewer.
+Show "raw" data.
 
-=back
+When action=show-items-result, will print result as-is instead of dumping as
+Perl.
 
-=head2 Result options
-
-=over
-
-=item B<--note>=I<s>
-
-Put additional note in the result.
 
 =item B<--result-dir>=I<s>
 
@@ -1126,6 +1107,124 @@ This is put in result metadata under `func.*` keys.
 The default is to true (return extra metadata) unless when run as CLI and format
 is text (where the extra metadata is not shown).
 
+
+=item B<--scientific-notation>
+
+=item B<--sort>=I<s@>
+
+Default value:
+
+ ["-time"]
+
+Can be specified multiple times.
+
+=item B<--sorts-json>=I<s>
+
+See C<--sort>.
+
+=back
+
+=head2 Participant options
+
+=over
+
+=item B<--cpanmodules-module>=I<s>
+
+Load a scenario from an Acme::CPANModules:: Perl module.
+
+An <pm:Acme::CPANModules> module can also contain benchmarking information, e.g.
+<pm:Acme::CPANModules::TextTable>.
+
+
+=item B<--participant>=I<s>
+
+Add a participant.
+
+See C<--participants>.
+
+=item B<--participants-json>=I<s>
+
+Add participants (JSON-encoded).
+
+See C<--participants>.
+
+=item B<--participants>=I<s>
+
+Add participants.
+
+=item B<--scenario-file>=I<s>, B<-f>
+
+Load a scenario from a Perl file.
+
+Perl file will be do()'ed and the last expression should be a hash containing
+the scenario specification.
+
+
+=item B<--scenario-json>=I<s>
+
+Load a scenario from data structure (JSON-encoded).
+
+See C<--scenario>.
+
+=item B<--scenario-module>=I<s>, B<-m>
+
+Load a scenario from a Bencher::Scenario:: Perl module.
+
+Will try to load module `Bencher::Scenario::<NAME>` and expect to find a package
+variable in the module called `$scenario` which should be a hashref containing
+the scenario specification.
+
+
+=item B<--scenario>=I<s>
+
+Load a scenario from data structure.
+
+=item B<-p>=I<s>
+
+Add a participant.
+
+See C<--participants>.
+
+=back
+
+=head2 Scenario options
+
+=over
+
+=item B<--cpanmodules-module>=I<s>
+
+Load a scenario from an Acme::CPANModules:: Perl module.
+
+An <pm:Acme::CPANModules> module can also contain benchmarking information, e.g.
+<pm:Acme::CPANModules::TextTable>.
+
+
+=item B<--scenario-file>=I<s>, B<-f>
+
+Load a scenario from a Perl file.
+
+Perl file will be do()'ed and the last expression should be a hash containing
+the scenario specification.
+
+
+=item B<--scenario-json>=I<s>
+
+Load a scenario from data structure (JSON-encoded).
+
+See C<--scenario>.
+
+=item B<--scenario-module>=I<s>, B<-m>
+
+Load a scenario from a Bencher::Scenario:: Perl module.
+
+Will try to load module `Bencher::Scenario::<NAME>` and expect to find a package
+variable in the module called `$scenario` which should be a hashref containing
+the scenario specification.
+
+
+=item B<--scenario>=I<s>
+
+Load a scenario from data structure.
 
 =back
 
@@ -1245,6 +1344,7 @@ List of available configuration parameters:
  include_participants (see --include-participant)
  include_path (see --include-path)
  include_perls (see --include-perl)
+ keep_tempdir (see --keep-tempdir)
  log_level (see --log-level)
  module_startup (see --module-startup)
  multimodver (see --multimodver)
@@ -1262,11 +1362,13 @@ List of available configuration parameters:
  return_meta (see --return-meta)
  runner (see --runner)
  save_result (see --save-result)
+ scenario (see --scenario)
  scenario_file (see --scenario-file)
  scenario_module (see --scenario-module)
  scientific_notation (see --scientific-notation)
  sorts (see --sort)
  test (see --test)
+ tidy (see --tidy)
  with_args_size (see --with-args-size)
  with_process_size (see --with-process-size)
  with_result_size (see --with-result-size)

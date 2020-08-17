@@ -233,3 +233,9 @@ List::Compare::Functional; other internal code clean-up
 0.53 Sun Jun  7 10:49:24 MDT 2015
     - Accept patch submitted by Paulo Custodio reworking, and correcting,
       changes originally published in 0.50.
+
+0.54 Sun Aug 16 14:21:36 EDT 2020
+    - Prepare for future version of Perl with strict- and warnings-by-default.
+
+0.55 Sun Aug 16 18:37:07 EDT 2020
+    - In test suite, replace IO::CaptureOutput with Capture::Tiny.

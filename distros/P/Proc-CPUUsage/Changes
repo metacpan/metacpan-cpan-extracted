@@ -1,5 +1,8 @@
 Revision history for Proc-CPUUsage
 
+1.002  Mon Aug 10 08:17:48 UTC 2020
+         - Merge #4, thanks @ramin-fs
+
 1.001  Sat Oct 10 12:47:18 UTC 2009
          - Fix CPAN Testers failures: their servers are fast...
 

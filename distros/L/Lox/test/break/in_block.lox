@@ -1,0 +1,4 @@
+{
+  // expect: [Line 3] Error at 'break': Can only break out of loops.
+  break;
+}
