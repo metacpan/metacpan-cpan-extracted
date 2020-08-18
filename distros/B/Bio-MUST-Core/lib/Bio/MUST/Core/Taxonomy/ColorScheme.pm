@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Taxonomy::ColorScheme;
 # ABSTRACT: Helper class providing color scheme for taxonomic annotations
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.202070';
+$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.202310';
 use Moose;
 use namespace::autoclean;
 
@@ -19,6 +19,7 @@ use List::AllUtils qw(mesh uniq each_array);
 
 use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:files);
+use aliased 'Bio::MUST::Core::SeqId';
 with 'Bio::MUST::Core::Roles::Commentable',
      'Bio::MUST::Core::Roles::Taxable';
 
@@ -186,7 +187,9 @@ sub store_itol_colors {
 
     for my $node ( @{ $tree->tree->get_entities } ){
         my $color = $self->hex( $node->get_generic($key), q{#} );
-        my @descendants = map { $_->get_name } @{ $node->get_terminals };
+        my @descendants = map { 
+            SeqId->new( full_id => $_->get_name )->foreign_id
+        } @{ $node->get_terminals };
         my $node_name
             = @descendants > 1 ? $descendants[0] . '|' . $descendants[-1]
             :                    $descendants[0]
@@ -272,7 +275,7 @@ Bio::MUST::Core::Taxonomy::ColorScheme - Helper class providing color scheme for
 
 =head1 VERSION
 
-version 0.202070
+version 0.202310
 
 =head1 SYNOPSIS
 

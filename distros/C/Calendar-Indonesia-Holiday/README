@@ -2,9 +2,9 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.325 of Calendar::Indonesia::Holiday
+    This document describes version 0.326 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
-    2020-07-30.
+    2020-08-18.
 
 SYNOPSIS
      use Calendar::Indonesia::Holiday qw(

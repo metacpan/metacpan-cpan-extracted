@@ -2,8 +2,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 3;
-use Test::Warnings;
+use Test::More tests => 4;
+use Test::Warnings qw[ :no_end_test had_no_warnings ];
 
 use Shared::Examples::Net::Amazon::S3::Request (
     qw[ behaves_like_net_amazon_s3_request ],
@@ -16,7 +16,7 @@ behaves_like_net_amazon_s3_request 'put object' => (
     with_value      => 'foo',
 
     expect_request_method   => 'PUT',
-    expect_request_path     => 'some-bucket/some/key',
+    expect_request_uri      => 'https://some-bucket.s3.amazonaws.com/some/key',
     expect_request_headers  => { },
 );
 
@@ -28,7 +28,7 @@ behaves_like_net_amazon_s3_request 'put object with acl' => (
     with_value      => 'foo',
 
     expect_request_method   => 'PUT',
-    expect_request_path     => 'some-bucket/some/key',
+    expect_request_uri      => 'https://some-bucket.s3.amazonaws.com/some/key',
     expect_request_headers  => { 'x-amz-acl' => 'private' },
 );
 
@@ -40,7 +40,8 @@ behaves_like_net_amazon_s3_request 'put object with service side encryption' => 
     with_value      => 'foo',
 
     expect_request_method   => 'PUT',
-    expect_request_path     => 'some-bucket/some/key',
+    expect_request_uri      => 'https://some-bucket.s3.amazonaws.com/some/key',
     expect_request_headers  => { 'x-amz-server-side-encryption' => 'AES256' },
 );
 
+had_no_warnings;

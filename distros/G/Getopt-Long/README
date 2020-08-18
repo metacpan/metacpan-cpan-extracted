@@ -16,8 +16,8 @@ of newgetopt.pl that came with Perl 4. It is fully upward compatible.
 In fact, the Perl 5 version of newgetopt.pl is just a wrapper around
 the module.
 
-For complete documentation, see the Getopt::Long POD document or use
-the command
+For complete documentation, see "https://metacpan.org/release/Getopt-Long"
+or use the command
 
     perldoc Getopt::Long
 
@@ -63,26 +63,26 @@ By default, single-letter option names are case sensitive.
 
 * Flexibility:
 
-  - options can have alternative names, using an alternative name
-    will behave as if the primary name was used;
-  - options can be negatable, e.g. "debug" will switch it on, while
+  - Options can have alternative names, using an alternative name
+    will behave as if the primary name was used.
+  - Options can be negatable, e.g. "debug" will switch it on, while
     "nodebug" will switch it off.    
-  - options can set values, but also add values producing an array
+  - Options can set values, but also add values producing an array
     of values instead of a single scalar value, or set values in a hash.
-  - options can have multiple values, e.g., "--position 25 624".
+  - Options can have multiple values, e.g., "--position 25 624".
 
 * Options linkage
 
 Using Getopt::Long gives the programmer ultimate control over the
 command line options and how they must be handled:
 
-  - by setting a global variable in the calling program;
-  - by setting a specified variable;
-  - by entering the option name and the value in an associative array
-    (hash) or object (if it is a blessed hash);
-  - by calling a user-specified subroutine with the option name and
+  - By setting a global variable in the calling program.
+  - By setting a specified variable.
+  - By entering the option name and the value in an associative array
+    (hash) or object (if it is a blessed hash).
+  - By calling a user-specified subroutine with the option name and
     the value as arguments (for hash options: the name, key and value);
-  - combinations of the above.
+  - Combinations of the above.
 
 * Customization:
 
@@ -96,86 +96,8 @@ and
 
     use Getopt::Long;
     Getopt::Long::Configure qw(bundling no_ignore_case);
-    
-Some of the possible customizations. Most of them take a "no_" prefix
-to reverse the effect:
 
-  - default
-
-	Restore default settings.
-
-  - auto_abbrev      
-
-	Allow option names to be abbreviated to uniqueness. 
-
-  - getopt_compat   
-
-	Allow '+' to start options.
-
-  - gnu_compat
-
-	Compatibility with GNU getopt_long().
-
-  - permute
-  - require_order           
-
-	Whether non-options are allowed to be mixed with options.
-
-	permute means that 
-
-	    -foo arg1 -bar arg2 arg3
-
-	is equivalent to
-
-	    -foo -bar arg1 arg2 arg3
-
-	(provided -foo does not take an argument value).
-
-	require_order means that options processing
-	terminates when the first non-option is encountered.
-
-	    -foo arg1 -bar arg2 arg3
-
-	is equivalent to
-
-	    -foo -- arg1 -bar arg2 arg3
-
-  - bundling
-
-	Setting this variable to a non-zero value will allow 
-	single-character options to be bundled. To distinguish bundles
-	from long option names, long options must be introduced with 
-	"--" and single-character options (and bundles) with "-".
-
-  - ignore_case      
-
-	Ignore case when matching options.
-
-  - pass_through
-
-	Do not issue error messages for unknown options, but leave
-	them (pass-through) in @ARGV.
-
-  - prefix
-
-	The string that starts options. See also prefix_pattern.
-
-  - prefix_pattern
-
-	A Perl pattern that identifies the strings that introduce
-	options. Default is --|-|\+ unless environment variable
-	POSIXLY_CORRECT has been set, in which case it is --|-.
-
-  - long_prefix_pattern
-
-        A perl pattern that is used to identify which prefixes
-        should be treated as long style. Any prefixes that don't
-        match this pattern will have short option semantics.
-        Defaults to --.
-
-  - debug
-
-	Enable copious debugging output.
+See the documentation for all possibilities.
 
 * Object oriented interface:
 
@@ -192,10 +114,7 @@ AVAILABILITY
 The official version for module Getopt::Long comes with the Perl 5
 distribution. 
 Newer versions will be made available on the Comprehensive Perl Archive
-Network (CPAN), see "http://www.perl.com/CPAN/authors/Johan_Vromans".
-Or use the CPAN search engine:
-  http://search.cpan.org/search?mode=module&query=Getopt::Long
-  http://search.cpan.org/search?module=Getopt::Long
+Network (CPAN), see "https://metacpan.org/release/Getopt-Long".
 
 COPYRIGHT AND DISCLAIMER
 ========================
@@ -210,5 +129,5 @@ later version.
 -------------------------------------------------------------------
 Johan Vromans                                  jvromans@squirrel.nl
 Squirrel Consultancy                         Exloo, the Netherlands
-http://www.squirrel.nl       http://www.squirrel.nl/people/jvromans
+https://www.squirrel.nl                   https://johan.vromans.org
 ------------------ "Arms are made for hugging" --------------------

@@ -118,12 +118,6 @@ sub choose_videos {
                 $line .= sprintf "%*s  ", $upload_date_w, $data->{$ex}{$up}{$id}{upload_date} // '' if $has_upload_date;
                 $line .= sprintf "%*s  ", $view_count_w,  $data->{$ex}{$up}{$id}{view_count}  // '' if $has_view_count && ( $opt->{list_sort_item} eq 'view_count_raw' || $opt->{show_view_count} );
             }
-            else {
-                if ( $has_view_count + $has_duration + $has_upload_date ) {
-                    $prompt .= '_';
-                    # it was never meant to get here
-                }
-            }
             $line .= sprintf "%s", $title;
             push @str_videos, $line;
             push @avail_ids, $id;

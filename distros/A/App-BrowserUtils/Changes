@@ -1,3 +1,11 @@
+0.010   2020-08-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak browser detection (check exec also in addition to fname).
+
+	- ps-firefox et al: On text format output, avoid things that break
+	  table rendering.
+
+
 0.009   2020-07-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Search for 'firefox' in addition to 'firefox-bin' for firefox

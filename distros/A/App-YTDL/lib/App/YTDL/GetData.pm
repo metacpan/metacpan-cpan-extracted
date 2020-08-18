@@ -39,7 +39,7 @@ sub get_download_info {
             my $error = $@;
             chomp $error;
             print "  $count/$opt->{retries}  $webpage_url: $error\n";
-            sleep $opt->{retries} * 3;
+            sleep $opt->{retries} * 2;
         }
     }
     my $h_ref = decode_json( $json_all );

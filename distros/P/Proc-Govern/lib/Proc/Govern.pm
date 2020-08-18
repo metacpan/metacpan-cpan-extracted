@@ -1,9 +1,9 @@
 package Proc::Govern;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2020-08-18'; # DATE
 our $DIST = 'Proc-Govern'; # DIST
-our $VERSION = '0.209'; # VERSION
+our $VERSION = '0.211'; # VERSION
 
 use 5.010001;
 use strict;
@@ -63,7 +63,11 @@ sub _kill {
     my $h = $self->{h};
     $self->_resume if $self->{suspended};
     log_debug "[govproc] Killing child ...";
-    $self->{restart} = 0;
+
+    # we turn this off because restarting is done by the child signal handle.
+    # restart_if_failed will be set (again) by do_start().
+    $self->{restart_if_failed} = 0;
+
     $h->kill_kill;
 }
 
@@ -248,9 +252,15 @@ Upon timeout, exit code is set to 124.
 _
             tags => ['category:timeout'],
         },
-        restart => {
+        restart_if_failed => {
             schema => ['bool'],
             summary => 'If set to true, do restart',
+            tags => ['category:restart'],
+        },
+        restart_if_no_output_after => {
+            schema => ['uint*'],
+            summary => 'If set to positive number, restart when there is no '.
+                'output after this many seconds',
             tags => ['category:restart'],
         },
         # not yet defined
@@ -388,6 +398,7 @@ sub govern_process {
     ###
 
     my $out;
+    my $last_out_time = time(); # for restarting after no output for some time
   LOG_STDOUT: {
         if ($args{log_stdout}) {
             require File::Write::Rotate;
@@ -396,6 +407,7 @@ sub govern_process {
             $fwrargs{prefix}   = $name;
             my $fwr = File::Write::Rotate->new(%fwrargs);
             $out = sub {
+                $last_out_time = time();
                 print STDOUT $_[0]//'' if $showout;
                 # XXX prefix with timestamp, how long script starts,
                 $_[0] =~ s/^/STDOUT: /mg;
@@ -403,6 +415,7 @@ sub govern_process {
             };
         } else {
             $out = sub {
+                $last_out_time = time();
                 print STDOUT $_[0]//'' if $showout;
             };
         }
@@ -505,15 +518,15 @@ sub govern_process {
     };
 
     my $chld_handler;
-    $self->{restart} = $args{restart};
+    $self->{restart_if_failed} = $args{restart_if_failed};
     $chld_handler = sub {
         $SIG{CHLD} = $chld_handler;
-        if ($self->{restart}) {
+        if ($self->{restart_if_failed}) {
             log_debug "[govproc] Child died";
             $do_start->();
         }
     };
-    local $SIG{CHLD} = $chld_handler if $args{restart};
+    local $SIG{CHLD} = $chld_handler if $args{restart_if_failed};
 
     my $lastlw_time;
     my ($noss_screensaver, $noss_timeout, $noss_lastprevent_time);
@@ -539,6 +552,7 @@ sub govern_process {
         }
         my $now = time();
 
+      TIMEOUT:
         if (defined $args{timeout}) {
             if ($now - $start_time >= $args{timeout}) {
                 $err->("Timeout ($args{timeout}s), killing child ...\n");
@@ -549,6 +563,15 @@ sub govern_process {
             }
         }
 
+      RESTART_IF_NO_OUTPUT_AFTER: {
+            last unless $args{restart_if_no_output_after};
+            last unless $now - $last_out_time >= $args{restart_if_no_output_after};
+            $err->("No output after $args{restart_if_no_output_after}s, restarting ...\n");
+            $self->_kill;
+            $do_start->();
+        }
+
+      LOAD_CONTROL:
         if ($lw && (!$lastlw_time || $lastlw_time <= ($now-$lwfreq))) {
             log_debug "[govproc] Checking load";
             if (!$self->{suspended}) {
@@ -639,7 +662,7 @@ Proc::Govern - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.209 of Proc::Govern (from Perl distribution Proc-Govern), released on 2019-11-29.
+This document describes version 0.211 of Proc::Govern (from Perl distribution Proc-Govern), released on 2020-08-18.
 
 =head1 SYNOPSIS
 
@@ -689,7 +712,9 @@ To use as Perl module:
      load_check_every => 20,    # optional, default 10. frequency of load checking (in seconds).
 
      # restart options
-     restart => 1,              # optional. if set to 1, will restart command if exit code is not zero.
+     restart_if_failed => 1,              # optional. if set to 1, will restart command if exit code is not zero.
+     restart_if_no_output_after => 60,    # optional. if set to a positive number, will restart command after no
+                                          #           stdout output after this many seconds
 
      # screensaver control options
      no_screensaver => 1,       # optional. if set to 1, will prevent screensaver from being activated while command
@@ -795,10 +820,6 @@ Another instance is already running (when C<single_instance> option is true).
 
 =back
 
-=head1 CAVEATS
-
-Not yet tested on Win32.
-
 =head1 FUNCTIONS
 
 
@@ -900,7 +921,7 @@ If not given, will be taken from command.
 
 =item * B<nice> => I<int>
 
-Set nice/priority level.
+Set niceE<sol>priority level.
 
 =item * B<no_screensaver> => I<true>
 
@@ -919,9 +940,13 @@ Otherwise, will print an error message C<< Program E<lt>NAMEE<gt> already runnin
 
 Directory to put PID file in.
 
-=item * B<restart> => I<bool>
+=item * B<restart_if_failed> => I<bool>
 
 If set to true, do restart.
+
+=item * B<restart_if_no_output_after> => I<uint>
+
+If set to positive number, restart when there is no output after this many seconds.
 
 =item * B<show_stderr> => I<bool> (default: 1)
 
@@ -950,6 +975,7 @@ sent the KILL signal.
 The killing is implemented using L<IPC::Run>'s C<kill_kill()>.
 
 Upon timeout, exit code is set to 124.
+
 
 =back
 
@@ -994,6 +1020,10 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 CAVEATS
+
+Not yet tested on Win32.
 
 =head1 SEE ALSO
 
@@ -1059,7 +1089,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

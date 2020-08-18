@@ -1,7 +1,9 @@
 package Calendar::Indonesia::Holiday;
 
-our $DATE = '2020-07-30'; # DATE
-our $VERSION = '0.325'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-18'; # DATE
+our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
+our $VERSION = '0.326'; # VERSION
 
 use 5.010001;
 use strict;
@@ -822,8 +824,9 @@ my %year_holidays;
 
 {
     my $hijra2020;
-    my $mawlid2020;
+    my $eidula2020;
     my $eidulf2020;
+    my $mawlid2020;
     $year_holidays{2020} = [
         # - new year
         _h_chnewyear ({_expand_dm("25-01")}, {hyear=>2571}),
@@ -836,17 +839,17 @@ my %year_holidays;
         _h_eidulf    ({_expand_dm("24-05")}, {hyear=>1441, day=>1}),
         ($eidulf2020 = _h_eidulf({_expand_dm("25-05")}, {hyear=>1441, day=>2})),
         # - pancasila day
-        ($hijra2020 = _h_eidula ({_expand_dm("31-07")}, {hyear=>1441})),
+        ($eidula2020 = _h_eidula ({_expand_dm("31-07")}, {hyear=>1441})),
         # - independence day
-        _h_hijra     ({_expand_dm("20-08")}, {hyear=>1442}),
+        ($hijra2020 = _h_hijra     ({_expand_dm("20-08")}, {hyear=>1442})),
         ($mawlid2020 = _h_mawlid({_expand_dm("29-10")}, {hyear=>1442})),
         # - christmas
     ];
 
     push @{ $year_holidays{2020} }, (
         _jointlv     ({_expand_dm("21-08")}, {holiday=>$hijra2020}),
-        _jointlv     ({_expand_dm("28-08")}, {holiday=>$mawlid2020}),
-        _jointlv     ({_expand_dm("30-08")}, {holiday=>$mawlid2020}),
+        _jointlv     ({_expand_dm("28-10")}, {holiday=>$mawlid2020}),
+        _jointlv     ({_expand_dm("30-10")}, {holiday=>$mawlid2020}),
         _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
         _jointlv     ({_expand_dm("28-12")}, {holiday=>$eidulf2020}),
         _jointlv     ({_expand_dm("29-12")}, {holiday=>$eidulf2020}),
@@ -1179,7 +1182,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.325 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2020-07-30.
+This document describes version 0.326 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2020-08-18.
 
 =head1 SYNOPSIS
 

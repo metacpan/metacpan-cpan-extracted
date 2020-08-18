@@ -1,9 +1,9 @@
 package App::FirefoxUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-19'; # DATE
+our $DATE = '2020-08-18'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -158,7 +158,7 @@ App::FirefoxUtils - Utilities related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.014 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2020-07-19.
+This document describes version 0.015 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2020-08-18.
 
 =head1 SYNOPSIS
 

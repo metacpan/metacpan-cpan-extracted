@@ -4,7 +4,7 @@
       "Leo Lapworth <llap@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -59,11 +59,12 @@
             "Pod::Usage" : "0",
             "Ref::Util" : "0",
             "Regexp::Common" : "0",
-            "Scalar::Util" : "0",
+            "Safe::Isa" : "0",
             "Sub::Override" : "0",
             "Term::Encoding" : "0",
             "Term::ProgressBar::Simple" : "0",
             "Test::Deep" : "0",
+            "Test::LWP::UserAgent" : "0",
             "Test::More" : "0",
             "Time::Piece" : "0",
             "URI" : "0",
@@ -85,10 +86,10 @@
             "LWP::Simple" : "0",
             "Moose::Meta::Class" : "0",
             "Test::Exception" : "0",
-            "Test::LoadAllModules" : "0",
             "Test::MockTime" : "0",
             "Test::Warnings" : "0",
             "lib" : "0",
+            "utf8" : "0",
             "vars" : "0"
          }
       }
@@ -104,7 +105,7 @@
          "web" : "https://github.com/rustyconover/net-amazon-s3"
       }
    },
-   "version" : "0.89",
+   "version" : "0.90",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",
       "Ali Anari <ali@anari.me>",
@@ -116,6 +117,7 @@
       "Douglas Sims <ratsbane@gmail.com>",
       "Dylan William Hardison <dylan@hardison.net>",
       "Eden Crane <>",
+      "Emanuele Tomasi aka targzeta <e.tomasi@namirial.com>",
       "Florian Schlichting <fsfs@debian.org>",
       "Gabriel Andrade <gabriel@zumba.home>",
       "Gabriel Andrade <gabriel@Zumba.local>",
@@ -142,6 +144,7 @@
       "Rusty Conover <rustyconover@users.noreply.github.com>",
       "Rusty Conover <rusty@luckydinosaur.com>",
       "Rusty Conover <rusty@parrotsnap.com>",
+      "Sherwin Daganato <sherwin@daganato.com>",
       "Slobodan Mis\u030ckovic\u0301 <slobodan@miskovic.ca>",
       "Steven Berler <steven.berler@dreamhost.com>",
       "Struan Bartlett <struan.bartlett@NewsNow.co.uk>",
@@ -150,7 +153,8 @@
       "toritori0318 <toritori0318@gmail.com>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
-   "x_generated_by_perl" : "v5.28.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

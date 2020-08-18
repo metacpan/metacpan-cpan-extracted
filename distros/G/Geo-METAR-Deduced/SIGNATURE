@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 6e281d2748da5d6526b4c057ae04f2ef008ffaa8a9d1821769c0633af4ee7736 Build.PL
+SHA256 7e44b4421e14e3d61bf0531c59b562486ae2ab2134d7f7cb7c1d9027c8a0791b CONTRIBUTING
+SHA256 b6a5eea9e8e54be44d303d0801880e46672655356ca884d06a3c149e423dbea3 Changes
+SHA256 804564096cfb5a4481682abe222dc2a8a16aacec6362036695b3f72968d49e6e MANIFEST
+SHA256 0df73f7952714fb37925f5ecc19b06814f57f9e7781d5b4947ee3bc81bd658cb META.json
+SHA256 0ec16b584d1b045f9300e1ac8314c65a38e5ed6ef9019f075aa0d9b754ffc1d6 META.yml
+SHA256 206ba9de8b7bd478518e21e08461a3a77caa9bf24bb70941d46af1643749126d README
+SHA256 5a01273bede2706ab02accb1e1e523416e2d28858bac45723f3f88c02cfe5af6 lib/Geo/METAR/Deduced.pm
+SHA256 a610bb13f8edc26c721f02e7e23ee2bf0b93212d0dce9150159f2945ac12eb76 t/00_base.t
+SHA256 f4576a0c623861ea1dd376eee888b2b47d067a2b6af0d8d2ecf1db632596a1a3 t/00_signature.t
+SHA256 cc2d8046b0aff3078d2790eebfd5ce896bebcf325d658b2ab5ad07f341f95231 t/01_ceiling.t
+SHA256 a36d1b80421dd231a2eb25d6b8110bb9c70b9a1c9a8d4b9e8cfb692b6a5cb24e t/02_rules.t
+SHA256 50dc527a0c5905ea191f2e4247b3cefc92baabd03d8322d2bc5104cfa1210410 t/03_visibility.t
+SHA256 2c2a453d33c6612ae1ac7f133b18d3b3e59443a0cbfe01afa51ba68a258effc3 t/04_field.t
+SHA256 e2810ff409ca34d4b6c171e651de97b308a58cbc1425726147bc5b366393f0d1 t/05_flight.t
+SHA256 216c6017ba4913411d6f6d6e5118331664e7c3d39277f1a4427931c6012fd3bb t/09_pod.t
+SHA256 ca7604762403cfcf9250a3bf2234b679b264e95a49e349da0f7592c62a5db306 t/10_pod-coverage.t
+SHA256 f2b9e6c30649bb8d0e5f5deaf83223a6da041335e9dc47501d81f572c06ddf69 t/11_test-coverage.t
+SHA256 96857f752432cd16222745f8770ab0f4d20c32ca899a690171cbf6fa70154edf t/12_manifest.t
+SHA256 d58c1c0951821900ca2b737665aa1f2481e54a682a37d45f723f73ac6735cb58 t/13_critic.t
+SHA256 c82c20e83b98d9cb542f307a8daa889fe7ac86bf3a7a12f54525abdb403c9b64 t/14_kwalitee.t
+SHA256 f175fe8836d8d6280674a4cd4b0e502d09696af81143f19fbae58626baef1c96 t/metar.t
+SHA256 75e58e2c4055cd2ced251a5e2a6386288e6141d1b1e4095706c6c520cf9f20a0 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEvYf4QHPIBtxYypUK0CoozoF5mv8FAl874eQACgkQ0CoozoF5
+mv/s/RAAjnlCEsMX9riC9qgxSL1EURVQvb3bqG9J2mYDq7kyHaPfyu45PMP7Tgzy
+UXCTKzzrPdo/qAV5rm6iR8EOdpsVekSpEqtR8BUnM4r0xg4zGr633u7uCuV6uDWR
+rFP9ycl3vVdelRMMKowO3qVGEJuDy5VnBqS7AFIJLUn9plQ78ZaTQ2CKH8LAkKYk
+TZaaOI8SxytH3PencHypWxKVe3dHGmdkn6NsSckokfKzV7/HcWYypjLPwhGt1Qyu
+Uu7KrlAiz/0NzWSCiRK4eD73ddnUi2IKlM/uDFKp0AwcAhjd8tZw5yNXZU/+ABxY
+EbL9psEAbuH9Jv7oISldpNDeLPeu8wNhiO0gYtpP81DzDN4LG8nWpZkc/U5cWNmY
+UFjQwBVi6DjGQeSje1ouGdISWJPv2fW7QNk/VEQ2VDucXM1s+X1ZYT1piZSvPPWE
+A40riQeNMlj1SD3ezhY1CXikQHQmMIBoE6aHV04jm2rQcGjXglcPZiBzZE4giJrx
+xvmzvAanw1y3aPGZZQ240GtHNp4EEKaaVTPEe8owPxhBC0ckwNLoFhTG6YWQtSAx
+TC6mgruXtg7hfuZxfYGbSxS6Wst75qtt/5UJfkOp3OTxqmVBfUfKwe6SY/HopYGz
+Xf1+fDMzUW+tw1rjtAbllFsKNYhi5qx4++0J9oxRGlnA1ATjZeA=
+=87Me
+-----END PGP SIGNATURE-----

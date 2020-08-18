@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.186';
+our $VERSION = '1.187';
 
 use Quiq::Json;
 use Quiq::JavaScript;
@@ -22,7 +22,7 @@ use Quiq::Html::Widget::Button;
 
 =head1 NAME
 
-Quiq::PlotlyJs::XY::DiagramGroup - Erzeuge eine Gruppe von XY-Plots
+Quiq::PlotlyJs::XY::DiagramGroup - Gruppe von XY-Diagrammen
 
 =head1 BASE CLASS
 
@@ -31,7 +31,7 @@ L<Quiq::Hash>
 =head1 DESCRIPTION
 
 Diese Klasse ist ein Perl-Wrapper für die Erzeugung einer Gruppe
-von XY-Plots auf Basis von Plotly.js, Beispiel siehe
+von XY-Diagrammen auf Basis von Plotly.js, Beispiel siehe
 L<Plotly.js: Plotten und analysieren einer Gruppe von Zeitreihen|http://fseitz.de/blog/index.php?/archives/157-Plotly.js-Plotten-und-analysieren-einer-Gruppe-von-Zeitreihen.html>.
 
 Die Diagrammgruppe zeichnet sich dadurch aus, dass durch alle
@@ -162,8 +162,8 @@ Zeitbereich B<$begin> und B<$end>.
 
 Die Instantiierung eines Parameters:
 
-  push @par,Quiq::PlotlyJs::XY::Parameter->new(
-      name => $par_name,
+  push @par,Quiq::PlotlyJs::XY::Diagram->new(
+      title => $par_name,
       unit => Encode::decode('utf-8',$par->par_unit),
       color => '#'.$par->par_color,
       # x => scalar($valT->values('val_time')),
@@ -253,6 +253,17 @@ Klasse aller Rangeslider.
 
 =over 4
 
+=item diagrams => \@diagrams
+
+Liste der Diagramm-Objekte. Die Diagramm-Objekte sind vom Typ
+B<< Quiq::PlotlyJs::XY::Diagram >> und definieren die Metadaten
+für die einzelnen Diagramme der Diagramm-Gruppe.
+
+=item fontSize => $n
+
+Fontgröße der Achsenbeschriftungen. Aus dieser Größe wird die Größe
+der sonstigen Fonts (Titel, Y-Titel) abgeleitet.
+
 =item height => $n (Default: 300)
 
 Höhe eines Diagramms in Pixeln.
@@ -261,12 +272,11 @@ Höhe eines Diagramms in Pixeln.
 
 Name der Diagramm-Gruppe. Der Name wird als CSS-Id für den
 äußeren div-Container der Diagramm-Gruppe und als Namespace
-für die Funktionen genutzt genutzt.
+für die Funktionen genutzt.
 
-=item parameters => \@parameters
+=item shape => $shape (Default: 'Spline')
 
-Liste der Parameter-Objekte. Die Paramater-Objekte sind vom Typ
-B<< Quiq::PlotlyJs::XY::Parameter >>.
+Anfangsauswahl des Shape-Menüs auf allen Diagrammen.
 
 =item strict => $bool (Default: 1)
 
@@ -296,9 +306,11 @@ sub new {
     # @_: @attVal
 
     my $self = $class->SUPER::new(
+        diagrams => [],
+        fontSize => undef,
         height => 300,
         name => 'dgr',
-        parameters => [],
+        shape => 'Spline',
         strict => 1,
         width => undef,
         xAxisType => 'date',
@@ -348,12 +360,14 @@ sub html {
     my ($self,$h) = @_;
 
     # Objektattribute
-    my ($height,$name,$parameterA,$strict,$width,$xAxisType) =
-        $self->get(qw/height name parameters strict width xAxisType/);
+    my ($diagramA,$fontSize,$height,$name,$shape,$strict,$width,
+        $xAxisType) =
+        $self->get(qw/diagrams fontSize height name shape strict width
+        xAxisType/);
 
-    # Kein Code, wenn keine Parameter
+    # Kein Code, wenn keine Diagram
 
-    if (!@$parameterA) {
+    if (!@$diagramA) {
         return '';
     }
 
@@ -424,15 +438,6 @@ sub html {
     my $xMax = undef;
     my $yMin = -1;
     my $yMax = 1;
-
-    # HTML-Code
-
-    my $html = '';
-
-    my $i = 0;
-    for my $par (@$parameterA) {
-        $html .= $self->htmlDiagram($h,++$i,$par,$paperBackground);
-    }
 
     # JavaScript-Code
 
@@ -515,10 +520,31 @@ sub html {
             // Füge Daten zum Diagramm hinzu. Gibt es keine Daten,
             // zeige "No data found" an und diable Rangeslider
             // und Shape
-            let setTrace = function (name,i,trace,layout,x,y,z) {
+            let setTrace = function (name,i,trace,layout,shape,x,y,z) {
                 trace.x = x;
                 trace.y = y;
-                trace.marker.color = z;
+                if (shape == 'Spline') {
+                    trace.mode = 'lines';
+                    trace.line.shape = 'spline';
+                    trace.marker.color = trace.line.color;
+                }
+                else if (shape == 'Linear') {
+                    trace.mode = 'lines';
+                    trace.line.shape = 'linear';
+                    trace.marker.color = trace.line.color;
+                }
+                else if (shape == 'Marker') {
+                    trace.mode = 'markers';
+                    trace.marker.color = trace.line.color;
+                }
+                else {
+                    trace.mode = 'markers';
+                    trace.marker = {
+                        color: z,
+                        size: 3,
+                        symbol: 'circle',
+                    }
+                }
                 if (z.length) {
                     // console.log(z);
                     vars.zArrays[i-1] = z.slice();
@@ -541,12 +567,13 @@ sub html {
                 let dId = name+'-d'+i;
                 Plotly.deleteTraces(dId,0);
                 Plotly.addTraces(dId,trace);
+                $('#'+name+'-c'+i).html(x.length.toString()+' values');
 
                 return;
             };
 
             // Lade Daten asynchron per Ajax und füge sie zum Diagramm hinzu
-            let loadDataSetTrace = function (name,i,trace,layout,url) {
+            let loadDataSetTrace = function (name,i,trace,layout,shape,url) {
                 // Daten per Ajax besorgen
                 console.log(url);
                 $.ajax({
@@ -579,13 +606,13 @@ sub html {
                             if (arr.length > 2)
                                 z.push(arr[2]);
                         }
-                        setTrace(name,i,trace,layout,x,y,z);
+                        setTrace(name,i,trace,layout,shape,x,y,z);
                     },
                 });
             };
 
             let generatePlot = function (name,i,title,yTitle,color,~
-                    xMin,xMax,yMin,yMax,showRangeSlider,url,x,y,z) {
+                    xMin,xMax,yMin,yMax,showRangeSlider,shape,url,x,y,z) {
 
                 let t = $.extend(true,{},trace);
                 t.line.color = color;
@@ -603,9 +630,9 @@ sub html {
                 Plotly.newPlot(dId,[t],l,config).then(
                     function() {
                         if (url)
-                            loadDataSetTrace(name,i,t,l,url);
+                            loadDataSetTrace(name,i,t,l,shape,url);
                         else
-                            setTrace(name,i,t,l,x,y,z);
+                            setTrace(name,i,t,l,shape,x,y,z);
                     },
                     function() {
                         alert('ERROR: plot creation failed: '+title);
@@ -654,6 +681,7 @@ sub html {
                 text => $title,
                 font => $j->o(
                     color => $color,
+                    size => $fontSize? int($fontSize*1.5): undef,
                 ),
                 yref => 'container', # container, paper
                 yanchor => 'top',
@@ -683,6 +711,9 @@ sub html {
                 # tickangle => 30,
                 ticklen => $xTickLen,
                 tickcolor => $axisColor,
+                tickfont => $j->o(
+                    size => $fontSize,
+                ),
                 #tickformatstops => [
                 #],
                 showspikes => \'true',
@@ -713,6 +744,9 @@ sub html {
                 # autorange => \'true',
                 ticklen => $yTickLen,
                 tickcolor => $axisColor,
+                tickfont => $j->o(
+                    size => $fontSize,
+                ),
                 gridcolor => $gridColor,
                 showspikes => \'true',
                 side => $ySide,
@@ -724,6 +758,7 @@ sub html {
                     text => $yTitle,
                     font => $j->o(
                         color => $color,
+                        size => $fontSize? int($fontSize*1.3): undef,
                     ),
                 ),
                 zeroline => \'true',
@@ -745,26 +780,36 @@ sub html {
         ),
     );
 
-    # * Ready-Handler
-
-    my $tmp = '';
-    $i = 0;
-    for my $par (@$parameterA) {
-        $tmp .= $self->jsDiagram($j,++$i,$par);
-    }
-    $js .= Quiq::JQuery::Function->ready($tmp);
-
     # Gesamter HTML-Code
 
     return $h->cat(
         $h->tag('div',
             id => $name,
             class => 'diagramGroup',
-            '-',
-            $html,
+            do {
+                # HTML-Code der Diagramme
+                
+                my $tmp = '';
+                my $i = 0;
+                for my $par (@$diagramA) {
+                    $tmp .= $self->htmlDiagram($h,++$i,$par,
+                        $paperBackground);
+                }
+                $tmp;
+            }
         ),
         $h->tag('script',
-            $js,
+            '-',
+            $js,do {
+                # Ready-Handler
+
+                my $tmp = '';
+                my $i = 0;
+                for my $par (@$diagramA) {
+                    $tmp .= $self->jsDiagram($j,++$i,$par);
+                }
+                Quiq::JQuery::Function->ready($tmp);
+            },
         ),
     );
 }
@@ -810,20 +855,23 @@ sub htmlDiagram {
 
     # Objektattribute
 
-    my ($height,$name,$width) = $self->get(qw/height name width/);
+    my ($height,$name,$shape,$width) = $self->get(qw/height name shape width/);
 
     # HTML erzeugen
 
-    my $parameterName = $par->name;
+    my $parameterName = $par->title;
     my $zName = $par->zName;
     my $color = $par->color;
-    return Quiq::Html::Table::Simple->html($h,
-        width => $width? "${width}px": '100%',
+    return $h->tag('div',
         style => [
             border => '1px dotted #b0b0b0',
            'margin-top' => '0.6em',
            'background-color' => $paperBackground,
+            position => 'relative',
         ],
+        '-',
+        Quiq::Html::Table::Simple->html($h,
+        width => $width? "${width}px": '100%',
         rows => [
             [[
                 id => "$name-d$i",
@@ -845,6 +893,7 @@ sub htmlDiagram {
                 ).
                 ' | Shape: '.Quiq::Html::Widget::SelectMenu->html($h,
                     id => "$name-s$i",
+                    value => $shape,
                     options => [
                         'Spline',
                         'Linear',
@@ -901,7 +950,13 @@ sub htmlDiagram {
                     title => 'Download plot graphic as PNG',
                 ),
            ]]
-        ],
+        ]),
+        $h->tag('div',
+           id =>  "$name-c$i",
+           style => 'position: absolute; bottom: 0.3em; right: 0.5em',
+           ''
+        ),
+        $par->get('html'), # optionaler HTML-Code
     );
 }
 
@@ -948,7 +1003,7 @@ sub jsDiagram {
 
     # Objektattribute
 
-    my $name = $self->get('name');
+    my ($name,$shape) = $self->get('name','shape');
 
     # JavaScript erzeugen
 
@@ -961,16 +1016,16 @@ sub jsDiagram {
     my $url = $par->url;
     if ($url) {
         return sprintf("$name.generatePlot('%s',%s,'%s','%s','%s','%s'".
-                ",'%s',%s,%s,%s,'%s');\n",
-            $name,$i,$par->name,$par->unit,$par->color,
-            $xMin,$xMax,$yMin,$yMax,$showRangeSlider,$url);
+                ",'%s',%s,%s,%s,'%s','%s');\n",
+            $name,$i,$par->title,$par->unit,$par->color,
+            $xMin,$xMax,$yMin,$yMax,$showRangeSlider,$shape,$url);
     }
     else {
         # mit x,y,z
         return sprintf("$name.generatePlot('%s',%s,'%s','%s','%s','%s'".
-                ",'%s',%s,%s,%s,'',%s,%s,%s);\n",
-            $name,$i,$par->name,$par->unit,$par->color,
-            $xMin,$xMax,$yMin,$yMax,$showRangeSlider,
+                ",'%s',%s,%s,%s,'%s','',%s,%s,%s);\n",
+            $name,$i,$par->title,$par->unit,$par->color,
+            $xMin,$xMax,$yMin,$yMax,$showRangeSlider,$shape,
             scalar($j->encode($par->x)),scalar($j->encode($par->y)),
             scalar($j->encode($par->z)));
     }
@@ -980,7 +1035,7 @@ sub jsDiagram {
 
 =head1 VERSION
 
-1.186
+1.187
 
 =head1 AUTHOR
 

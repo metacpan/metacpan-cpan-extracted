@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "B::Hooks::EndOfScope" : "0",
+            "B::Hooks::OP::Check::LeaveEval" : "v0.0.3",
             "List::MoreUtils" : "0",
             "OpenTracing::GlobalTracer" : "0",
             "OpenTracing::Implementation::NoOp" : "0",
@@ -52,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.106.1",
+   "version" : "v0.106.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

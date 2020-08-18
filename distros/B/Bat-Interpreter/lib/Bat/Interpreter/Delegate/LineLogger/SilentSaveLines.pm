@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 with 'Bat::Interpreter::Role::LineLogger';
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.024';    # VERSION
 
 has 'lines' => ( is      => 'ro',
                  isa     => ArrayRef,
@@ -35,7 +35,7 @@ Bat::Interpreter::Delegate::LineLogger::SilentSaveLines
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

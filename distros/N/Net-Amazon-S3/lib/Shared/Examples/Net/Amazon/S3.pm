@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::VERSION = '0.89';
+$Shared::Examples::Net::Amazon::S3::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -13,6 +13,7 @@ use Ref::Util (
 
 use Test::Deep;
 use Test::More;
+use Test::LWP::UserAgent;
 
 use Net::Amazon::S3;
 
@@ -28,10 +29,98 @@ our @EXPORT_OK = (
     qw[ expect_operation_list_all_my_buckets ],
     qw[ expect_operation_bucket_create ],
     qw[ expect_operation_bucket_delete ],
+    qw[ with_fixture ],
+    qw[ fixture ],
+    qw[ with_response_fixture ],
 );
 
+my %fixtures;
+sub fixture {
+    my ($name) = @_;
+
+    $fixtures{$name} = eval "require Shared::Examples::Net::Amazon::S3::Fixture::$name"
+        unless defined $fixtures{$name};
+
+    die "Fixture $name not found: $@"
+        unless defined $fixtures{$name};
+
+    return +{ %{ $fixtures{$name} } };
+}
+
+sub with_fixture {
+    my ($name) = @_;
+
+    my $fixture = fixture ($name);
+    return wantarray
+        ? %$fixture
+        : $fixture
+        ;
+}
+
+sub with_response_fixture {
+    my ($name) = @_;
+
+    my $fixture = fixture ($name);
+    my $response_fixture = {};
+
+    for my $key (keys %$fixture) {
+        my $new_key;
+        $new_key ||= "with_response_data" if $key eq 'content';
+        $new_key ||= "with_$key" if $key =~ m/^response/;
+        $new_key ||= "with_response_header_$key";
+
+        $response_fixture->{$new_key} = $fixture->{$key};
+    }
+
+    return wantarray
+        ? %$response_fixture
+        : $response_fixture
+        ;
+}
+
+
+sub s3_api {
+    my $api = Net::Amazon::S3->new (@_);
+
+    $api->ua (Test::LWP::UserAgent->new (network_fallback => 0));
+
+    $api;
+}
+
+sub s3_api_mock_http_response {
+    my ($self, $api, %params) = @_;
+
+    $params{with_response_code} ||= HTTP::Status::HTTP_OK;
+
+    my %headers = (
+        content_type => 'application/xml',
+        (
+            map {
+                m/^with_response_header_(.*)/;
+				defined $1 && length $1
+					? ($1 => $params{$_})
+					: ()
+            } keys %params
+        ),
+        %{ $params{with_response_headers} || {} },
+    );
+
+    $api->ua->map_response (
+        sub {
+            ${ $params{into} } = $_[0];
+            1;
+        },
+        HTTP::Response->new (
+            $params{with_response_code},
+            HTTP::Status::status_message ($params{with_response_code}),
+            [ %headers ],
+            $params{with_response_data},
+        ),
+    );
+}
+
 sub s3_api_with_signature_4 {
-    Net::Amazon::S3->new (
+    s3_api (
         @_,
         aws_access_key_id     => 'AKIDEXAMPLE',
         aws_secret_access_key => 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY',
@@ -42,7 +131,7 @@ sub s3_api_with_signature_4 {
 }
 
 sub s3_api_with_signature_2 {
-    Net::Amazon::S3->new (
+    s3_api (
         @_,
         aws_access_key_id     => 'AKIDEXAMPLE',
         aws_secret_access_key => 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY',
@@ -93,6 +182,8 @@ sub _keys_operation {
         qw[ with_response_code ],
         qw[ with_response_data ],
         qw[ with_response_headers ],
+        qw[ with_response_header_content_type ],
+        qw[ with_response_header_content_length ],
         qw[ expect_s3_err ],
         qw[ expect_s3_errstr ],
         qw[ expect_data ],
@@ -175,7 +266,7 @@ sub _expect_operation {
     my $operation = delete $params{-operation};
 
     my $api = $class->_default_with_api (\%params);
-    my $guard = $class->_mock_http_response (%params, into => \ (my $request));
+    $class->_mock_http_response ($api, %params, into => \ (my $request));
 
     if (my $code = $class->can ($operation)) {
         subtest $title => sub {
@@ -437,7 +528,7 @@ Shared::Examples::Net::Amazon::S3 - used for testing and as example
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 AUTHOR
 

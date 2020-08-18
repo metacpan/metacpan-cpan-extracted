@@ -1,4 +1,4 @@
-# Copyrights 2001-2019 by [Mark Overmeer].
+# Copyrights 2001-2020 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Box::Dir;
 use vars '$VERSION';
-$VERSION = '3.008';
+$VERSION = '3.009';
 
 use base 'Mail::Box';
 
@@ -103,7 +103,15 @@ sub folderToDirectory($$)
     $dir;
 }
 
-#-------------------------------------------
+sub storeMessage($)
+{   my ($self, $message) = @_;
+    $self->SUPER::storeMessage($message);
+    my $fn = $message->filename or return $message;
+    $self->{MBD_by_fn}{$fn} = $message;
+}
+
+
+sub messageInFile($) { $_[0]->{MBD_by_fn}{$_[1]} }
 
 
 sub readMessageFilenames() {shift->notImplemented}

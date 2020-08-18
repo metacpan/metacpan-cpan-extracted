@@ -154,8 +154,8 @@ lib/Quiq/Perl.pm
 lib/Quiq/PlotlyJs.pm
 lib/Quiq/PlotlyJs/Reference.pm
 lib/Quiq/PlotlyJs/TimeSeries.pm
+lib/Quiq/PlotlyJs/XY/Diagram.pm
 lib/Quiq/PlotlyJs/XY/DiagramGroup.pm
-lib/Quiq/PlotlyJs/XY/Parameter.pm
 lib/Quiq/Pod/Generator.pm
 lib/Quiq/PostgreSql/Catalog.pm
 lib/Quiq/PostgreSql/CopyFormat.pm
@@ -369,8 +369,8 @@ t/bin/Quiq/Perl.t
 t/bin/Quiq/PlotlyJs.t
 t/bin/Quiq/PlotlyJs/Reference.t
 t/bin/Quiq/PlotlyJs/TimeSeries.t
+t/bin/Quiq/PlotlyJs/XY/Diagram.t
 t/bin/Quiq/PlotlyJs/XY/DiagramGroup.t
-t/bin/Quiq/PlotlyJs/XY/Parameter.t
 t/bin/Quiq/Pod/Generator.t
 t/bin/Quiq/PostgreSql/Catalog.t
 t/bin/Quiq/PostgreSql/CopyFormat.t

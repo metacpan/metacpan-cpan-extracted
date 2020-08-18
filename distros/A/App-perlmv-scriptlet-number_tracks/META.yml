@@ -26,11 +26,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-scriptlet-number_tracks
   homepage: https://metacpan.org/release/App-perlmv-scriptlet-number_tracks
   repository: git://github.com/perlancar/perl-App-perlmv-scriptlet-number_tracks.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::perlmv
+      name: perlmv
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -282,6 +286,10 @@ x_Dist_Zilla:
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
               version: '0.082'
+            -
+              class: Pod::Weaver::Plugin::perlmv
+              name: -perlmv
+              version: '0.001'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

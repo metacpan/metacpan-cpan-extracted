@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Module::Generate' => '0.17',
+        'Module::Generate' => '0.19',
 	'Switch::Again' => '0.07'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

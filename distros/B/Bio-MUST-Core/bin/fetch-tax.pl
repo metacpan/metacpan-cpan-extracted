@@ -160,7 +160,7 @@ for my $infile (@ARGV_infiles) {
     # output assembled taxonomy lines
     my $outfile = change_suffix($infile, $suffix);
     open my $out, '>', $outfile;
-    say {$out} '#' for $comment_n;
+    say {$out} '#' for 1..$comment_n;
     @rows = sort { $a->[0] cmp $b->[0] } @rows if $sort;
     say {$out} join $sep, @{$_} for @rows;
 }
@@ -175,7 +175,7 @@ fetch-tax.pl - Fetch information from the NCBI Taxonomy database
 
 =head1 VERSION
 
-version 0.202070
+version 0.202310
 
 =head1 USAGE
 

@@ -41,7 +41,7 @@ mask-ali.pl - Mask an ALI file according to BLOCKS file(s)
 
 =head1 VERSION
 
-version 0.202070
+version 0.202310
 
 =head1 USAGE
 

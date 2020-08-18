@@ -3,7 +3,7 @@ package Hades;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use Module::Generate;
 use Switch::Again qw/switch/;
 
@@ -16,7 +16,7 @@ sub run {
 	my ($class, $args) = @_;
 	$args->{eval} = _read_file($args->{file}) if $args->{file};
 	my $mg = Module::Generate->start;
-	$args->{$_} && $mg->$_($args->{$_}) for (qw/dist lib author email version/);
+	$args->{$_} && $mg->$_($args->{$_}) for (qw/dist lib tlib author email version/);
 	my $self = $class->new($args);
 	my ($index, $ident, @lines, @line, @innerline, $nested) = (0, '');
 	while ($index < length $self->{eval}) {
@@ -143,7 +143,7 @@ sub run {
 												},
 												qr/^(\:coerce|\:co)/ => sub {
 													my $value = shift;
-													$value =~ s/(\:co|\:coerce)\((.*)\)$/$2/g;
+													$value =~ s/(\:co|\:coerce)\((.*)\)$/$2/sg;
 													$meta{$name}->{coerce} = $value;
 													if ($meta{$name}->{params_map}) {
 														$meta{$name}->{params_map}->{
@@ -153,7 +153,7 @@ sub run {
 												},
 												qr/^(\:default|\:d)/ => sub {
 													my $value = shift;
-													$value =~ s/.*\((.*)\)/$1/;
+													$value =~ s/.*\((.*)\)/$1/sg;
 													$value = '"' . $value . '"'
 														if $value !~ m/^(\{|\[|\"|\'|q)|(\d+)/;
 													$meta{$name}->{default} =  $value;
@@ -169,12 +169,17 @@ sub run {
 												},
 												qr/^(\:trigger|\:tr)/ => sub {
 													my $value = shift;
-													$value =~ s/(\:tr|\:trigger)\((.*)\)$/$2/g;
+													$value =~ s/(\:tr|\:trigger)\((.*)\)$/$2/sg;
 													$meta{$name}->{trigger} = $value;
+												},
+												qr/^(\:test|\z)/ => sub {
+													my $value = shift;
+													$value =~ s/^(\:test|\:z)\(\s*(.*)\s*\)$/$2/sg;
+													push @{$meta{$name}->{test}}, eval '(' . $value . ')';
 												},
 												qr/^(\:type|\:t)/ => sub {
 													my $value = shift;
-													$value =~ s/.*\((.*)\)/$1/;
+													$value =~ s/.*\((.*)\)/$1/sg;
 													push @{$meta{$name}->{type}}, $value;
 													if ($meta{$name}->{params_map}) {
 														$meta{$name}->{params_map}->{
@@ -206,7 +211,7 @@ sub run {
 													}
 													return \$self->{$name};
 												}|;
-												$mg->accessor($name)->code($code);
+												$mg->accessor($name)->code($code)->clear_tests->test($self->build_tests($name, $meta{$name}));
 											} elsif ($meta{$name}->{meta} eq 'MODIFY') {
 												my $before_code = $meta{$name}->{before} || "";
 												my $around_code = $meta{$name}->{around} || qq|my \@res = \$self->\$orig(\@params);|;
@@ -216,7 +221,7 @@ sub run {
 													$before_code$around_code$after_code
 													return \@res;
 												}|;
-												$mg->sub($name)->code($code)->pod(qq|call $name method.|);
+												$mg->sub($name)->code($code)->pod(qq|call $name method.|)->test($self->build_tests($name, $meta{$name}));
 											} else {
 												my $code = $meta{$name}->{code};
 												my ($params, $subtype, $params_explanation) = ( '', '', '' );
@@ -229,8 +234,17 @@ sub run {
 														my $pm = $meta{$name}->{params_map}->{$param};
 														$subtype .= $self->build_coerce($name, $param, $pm->{coerce});
 														if ($pm->{type}) {
-															my $error_message = qq|die qq{$pm->{type}: invalid value $param for variable \\$param in method $name};|;
-															$subtype .= $self->build_type($name, $pm->{type}, $param, $error_message);
+															my $error_message = ($pm->{type} !~ m/^(Optional|Any|Item)/ 
+																? qq|$param = defined $param ? $param : 'undef';| : q||)
+																. qq|die qq{$pm->{type}: invalid value $param for variable \\$param in method $name};|;
+															$subtype .= $self->build_type(
+																$name, 
+																$pm->{type}, 
+																$param, 
+																$error_message, 
+																($pm->{type} !~ m/^(Optional|Any|Item)/ 
+																	? qq|! defined($param) \|\|| : q||)
+															);
 															$params_explanation .= qq|param $param to be a $pm->{type}|;
 														} else {
 															$params_explanation .= qq|param $param to be any value including undef|;
@@ -245,7 +259,8 @@ sub run {
 												my $example = qq|\$obj->$name($params)|;
 												$mg->sub($name)->code($code)
 													->pod(qq|call $name method. Expects $params_explanation.|)
-													->example($example);
+													->example($example)
+													->test($self->build_tests($name, $meta{$name}));
 											}
 											if ($meta{$name}->{clearer}) {
 												$mg->sub(qq|clear_$name|)
@@ -255,7 +270,12 @@ sub run {
 													return \$self;
 												}|)
 												->pod(qq|clear $name accessor|)
-												->example(qq|\$obj->clear_$name|);
+												->example(qq|\$obj->clear_$name|)
+												->test(
+													$self->build_tests($name, $meta{$name}, "success"),
+													['ok', qq|\$obj->clear_$name|],
+													['is', qq|\$obj->$name|, 'undef']
+												);
 											}
 											if ($meta{$name}->{predicate}) {
 												$mg->sub(qq|has_$name|)
@@ -264,14 +284,25 @@ sub run {
 													return !! \$self->{$name};
 												}|)
 												->pod(qq|has_$name will return true if $name accessor has a value.|)
-												->example(qq|\$obj->has_$name|);
+												->example(qq|\$obj->has_$name|)
+												->test(
+													($meta{$name}->{required} || $meta{$name}->{default} ? (
+														['ok', qq|delete \$obj->{$name}|]
+													) : ()),
+													['is', qq|\$obj->has_$name|, q|''|], 
+													$self->build_tests($name, $meta{$name}, 'success'),
+													['is', qq|\$obj->has_$name|, 1],
+												);
 											}
 										}
 							};
 			}
 			my %class = %Module::Generate::CLASS;
 			my $accessors = q|(|;
+			my %test_data;
 			map {
+				push @{$test_data{test_data_columns}}, $_;
+				$test_data{$_} = [ $self->build_test_data($meta{$_}{type}[0] ? $meta{$_}{type}[0] : 'Any', '', 1) ];	
 				$accessors .= qq|$_ => {|;
 				$accessors .= qq|required=>1,| if $meta{$_}{required};
 				$accessors .= qq|default=>$meta{$_}{default},| if $meta{$_}{default};
@@ -292,6 +323,7 @@ sub run {
 				return \$self;
 			}|;
 			$class{CURRENT}{SUBS}{new}{CODE} = $code;
+			$class{CURRENT}{SUBS}{new}{TEST} = [$self->build_tests('new', \%meta, 'new', \%class, \%test_data)];
 		}
 	}
 	$mg->generate;
@@ -331,9 +363,10 @@ sub build_private {
 }
 
 sub build_type {
-	my ($self, $name, $type, $value, $error_string, $code) = @_;
+	my ($self, $name, $type, $value, $error_string, $subcode, $code) = @_;
 	$value ||= '$value';
 	$code ||= '';
+	$subcode ||= '';
 	if ($type) {
 		$error_string ||=  qq|die qq{$type: invalid value $value for accessor $name};|;
 		my $switch = switch
@@ -346,26 +379,26 @@ sub build_type {
 			qr/^(Bool)$/ => sub {
 				return qq|
 					my \$ref = ref $value;
-					if ((\$ref \|\| 'SCALAR') ne 'SCALAR' \|\| (\$ref ? \$$value : $value) !~ m/^(1\|0)\$/) {
+					if ($subcode (\$ref \|\| 'SCALAR') ne 'SCALAR' \|\| (\$ref ? \$$value : $value) !~ m/^(1\|0)\$/) {
 						$error_string
 					}
 					$value = !!(\$ref ? \$$value : $value) ? 1 : 0;|;
 			},
 			qr/^(Str)$/ => sub {
 				return qq|
-					if (ref $value \|\| $value !~ m/.+/) {
+					if ($subcode ref $value \|\| $value !~ m/.+/) {
 						$error_string
 					}|;
 			},
 			qr/^(Num)$/ => sub {
 				return qq|
-					if (ref $value \|\| $value !~ m/^[-+\\d]\\d*\\.?\\d\*\$/) {
+					if ($subcode ref $value \|\| $value !~ m/^[-+\\d]\\d*\\.?\\d\*\$/) {
 						$error_string
 					}|;
 			},
 			qr/^(Int)$/ => sub {
 				return qq|
-					if (ref $value \|\| $value !~ m/^[-+\\d]\\d\*\$/) {
+					if ($subcode ref $value \|\| $value !~ m/^[-+\\d]\\d\*\$/) {
 						$error_string
 					}|;
 			},
@@ -399,7 +432,7 @@ sub build_type {
 			},
 			qr/^(ArrayRef)$/ => sub {
 				return qq|
-					if ((ref($value) \|\| "") ne "ARRAY") {
+					if ($subcode (ref($value) \|\| "") ne "ARRAY") {
 						$error_string
 					}|;
 			},
@@ -410,8 +443,8 @@ sub build_type {
 					if ((ref($value) \|\| "") ne "ARRAY") {
 						$error_string
 					}|;
-				my $new_error_string = $self->extend_error_string($error_string, $value, '$item', qq| expected $matches[0]|);
-				my $sub_code = $self->build_type($name, $matches[0], '$item', $new_error_string);
+				my $new_error_string = $self->extend_error_string($error_string, $value, '$item', qq| expected $matches[0]|, $matches[0]);
+				my $sub_code = $self->build_type($name, $matches[0], '$item', $new_error_string, ($matches[0] !~ m/^(Optional|Any|Item)/ ? qq|! defined(\$item) \|\|| : q||));
 				$code .= qq|
 					for my \$item (\@{ $value }) {$sub_code
 					}| if $sub_code;
@@ -442,9 +475,9 @@ sub build_type {
 					if ((ref($value) \|\| "") ne "HASH") {
 						$error_string
 					}|;
-				$error_string =~ s/};$/ expected $matches[1]};/;
-				$error_string =~ s/\$value/\$item/;
-				my $sub_code = $self->build_type($name, $matches[1], '$item', $error_string);
+			
+				my $new_error_string = $self->extend_error_string($error_string, $value, '$item', qq| expected $matches[1]|, $matches[1]);
+				my $sub_code = $self->build_type($name, $matches[1], '$item', $new_error_string, ($matches[1] !~ m/^(Optional|Any|Item)/ ? qq|! defined(\$item) \|\|| : q||));
 				$code .= qq|
 					for my \$item (values \%{ $value }) {$sub_code
 					}| if $sub_code;
@@ -483,8 +516,9 @@ sub build_type {
 					}|;
 				my $key_error_string = $self->extend_error_string($error_string, $value, '$key', qq| expected $matches[0]|);
 				my $key_sub_code = $self->build_type($name, $matches[0], '$key', $key_error_string);
-				my $value_error_string = $self->extend_error_string($error_string, $value, '$val', qq| expected $matches[1]|);
-				my $value_sub_code = $self->build_type($name, $matches[1], '$val', $value_error_string);
+				$key_sub_code =~ s/ref \$key \|\| //;;
+				my $value_error_string = $self->extend_error_string($error_string, $value, '$val', qq| expected $matches[1]|, $matches[0]);
+				my $value_sub_code = $self->build_type($name, $matches[1], '$val', $value_error_string, ($matches[1] !~ m/^(Optional|Any|Item)/ ? qq|! defined(\$val) \|\|| : q||));
 				$code .= qq|
 					for my \$key (keys \%{ $value }) {
 						my \$val = ${value}->{\$key};$key_sub_code$value_sub_code
@@ -501,8 +535,8 @@ sub build_type {
 				my $i = 0;
 				for my $match (@matches) {
 					(my $new_value = $value) .= qq|->[$i]|;
-					my $item_error_string = $self->extend_error_string($error_string, $value, $new_value, qq| expected $match for index $i|);
-					my $key_sub_code = $self->build_type($name, $match, $new_value, $item_error_string);
+					my $item_error_string = $self->extend_error_string($error_string, $value, $new_value, qq| expected $match for index $i|, $match);
+					my $key_sub_code = $self->build_type($name, $match, $new_value, $item_error_string, ($match !~ m/^(Optional|Any|Item)/ ? qq|! defined($new_value) \|\|| : q||));
 					$code .= $key_sub_code;
 					$i++;
 				}
@@ -524,8 +558,8 @@ sub build_type {
 					}
 					my ($k, $v) = map { my $h = $_; $h =~ s/^\s*|\s*$//g; $h; } split('=>', $match, 2);
 					(my $new_value = $value) .= qq|->{$k}|;
-					my $new_error_string = $self->extend_error_string($error_string, $value, $new_value, qq| expected $v for $k|);
-					$sub_code .= $self->build_type($k, $v, $new_value, $new_error_string);
+					my $new_error_string = $self->extend_error_string($error_string, $value, $new_value, qq| expected $v for $k|, $v);
+					$sub_code .= $self->build_type($k, $v, $new_value, $new_error_string, ($v !~ m/^(Optional|Any|Item)/ ? qq|! defined($new_value) \|\|| : q||));
 				}
 				my $code = qq|
 					if ((ref($value) \|\| "") ne "HASH") {
@@ -547,15 +581,345 @@ sub build_type {
 }
 
 sub extend_error_string {
-	my ($self, $error_string, $value, $new_value, $message) = @_;
-	(my $new_error_string = $error_string) =~ s/\Q$value\E/$new_value/;
+	my ($self, $new_error_string, $value, $new_value, $message, $type) = @_;
+	my $old_type = quotemeta(qq|$value = defined $value ? $value : 'undef';|);
+	$new_error_string =~ s/^$old_type//;
+ 	$new_error_string =~ s/\Q$value\E/$new_value/;
 	$new_error_string =~ s/};$/$message};/;
+	if ($type && $type !~ m/^(Optional|Any|Item)/) {
+		$new_error_string = qq|$new_value = defined $new_value ? $new_value : 'undef';| . $new_error_string;
+	}
 	return $new_error_string;
 }
 
 sub index {
 	my ($self, $index) = @_;
 	return substr $self->{eval}, $index, 1;
+}
+
+sub build_test_data {
+	my ($self, $type, $name, $required) = @_;
+	my $switch = switch
+		qr/^(Any)$/ => sub {
+			return $self->_generate_test_string;
+		},
+		qr/^(Item)$/ => sub {
+			return $self->_generate_test_string;
+		},
+		qr/^(Bool)$/ => sub {
+			return (q|1|, q|[]|, q|{}|);
+		},
+		qr/^(Str)$/ => sub {
+			return ($self->_generate_test_string, q|[]|, q|\1|, q|''|); 
+		},
+		qr/^(Num)$/ => sub {
+			return (q|100.555|, q|[]|, $self->_generate_test_string);
+		},
+		qr/^(Int)$/ => sub {
+			return (q|10|, q|[]|, $self->_generate_test_string);
+		},
+		qr/^(Ref)$/ => sub {
+			return (q|{ test => 'test' }|, $self->_generate_test_string, q|1|); 
+		},
+		qr/^(Ref\[(.*)\])$/ => sub {
+			my ($val, @matches) = @_;
+			$matches[1] = '"' . $matches[1] . '"' if $matches[1] =~ m/^[a-zA-Z]/;
+			return (
+				qq|bless { test => 'test' }, $matches[1]|, 
+				qq|bless { test => 'test' }, $matches[1] . 'Error'|,
+				$self->_generate_test_string
+			);
+		},
+		qr/^(ScalarRef)$/ => sub {
+			return ( q|\1|, 1, q|[]|);
+		},
+		qr/^(ScalarRef\[(.*)\])$/ => sub {
+			my ($val, @matches) = @_;
+			$matches[1] = '"' . $matches[1] . '"' if $matches[1] =~ m/^[a-zA-Z]/;
+			return (
+				qq|bless \"", $matches[1]|, 
+				qq|bless \"", $matches[1] . 'Error'|,
+				$self->_generate_test_string,
+				q|{}|
+			);
+		},
+		qr/^(ArrayRef)$/ => sub {
+			return (
+				qq|['test']|, 
+				qq|{}|,
+				$self->_generate_test_string
+			);
+		},
+		qr/^(ArrayRef\[(.*)\])$/ => sub {
+			my ($val, @matches) = @_;
+			@matches = map { my $h = $_; $h =~ s/^\s*|\s*//g; $h; } split ',', $matches[1];
+			my @values = $self->build_test_data($matches[0], $name, $required);
+			push @values, 'undef' unless $matches[0] =~ m/^Optional/;
+			return (
+				(map {
+					my $v = $_;
+					sprintf q|[ %s ]|, join ", ", map { $v } 0 .. $matches[1] - 1;
+				} @values),
+				($matches[1] > 0 ? (
+					qq|[]| 
+				) : ( )),
+				($matches[2] ? ( 
+					sprintf q|[ %s ]|, join ", ", map { $values[0] } 0 .. $matches[2] + 1
+				) : ( )),
+				q|{}|,
+				$self->_generate_test_string
+			);
+		},
+		qr/^(HashRef)$/ => sub {
+			return (
+				q|{ 'test' => 'test' }|,
+				q|[]|,
+				$self->_generate_test_string
+			);
+		},
+		qr/^(HashRef\[(.*)\])$/ => sub {
+			my ($val, @matches) = @_;
+			my @values = $self->build_test_data($matches[1], $name, $required);
+			push @values, 'undef' unless $matches[1] =~ qr/^Optional/;
+			return (
+				(map {
+					sprintf q|{ test => %s }|, $_;
+				} @values),
+				q|[]|,
+				$self->_generate_test_string 
+			);
+		},
+		qr/^(CodeRef)$/ => sub {
+			return (
+				q|sub {}|,
+				q|[]|,
+				$self->_generate_test_string
+			);
+		},
+		qr/^(RegexpRef)$/ => sub {
+			return (
+				q|qr/abc/|,
+				q|[]|,
+				$self->_generate_test_string
+			);
+		},
+		qr/^(GlobRef)$/ => sub {
+			return (
+				q|do { open my $fh, '>', \''; $fh; }|,
+				q|[]|,
+				$self->_generate_test_string
+			);
+		},
+		qr/^(Object)$/ => sub {
+			return (
+				q|bless {}, 'Test'|,
+				q|[]|,
+				$self->_generate_test_string
+			);
+		},
+		qr/^(Map\[(.*)\])$/ => sub {
+			my ($val, @matches) = @_;
+			@matches = map { my $h = $_; $h =~ s/^\s*|\s*//g; $h; } split ',', $matches[1];
+			my @keys = $self->build_test_data($matches[0], $name, $required);
+			my @values = $self->build_test_data($matches[1], $name, $required);
+			push @values, 'undef' unless $matches[1] =~ m/^Optional/;
+			return (
+				(map {
+					sprintf q|{ %s => %s }|, $keys[0], $_;
+				} @values),
+				qq|{ '' => $values[0] }|,
+				q|[]|,
+				$self->_generate_test_string
+			);
+		},
+		qr/^(Tuple\[(.*)\])$/ => sub {
+			my ($val, @matches) = @_;
+			@matches = map { my $h = $_; $h =~ s/^\s*|\s*//g; $h; } split ',', $matches[1];
+			my @tuple = map {
+				[ $self->build_test_data($_, $name, $required), ($_ =~ m/^Optional/ ? () : 'undef') ];
+			} @matches;
+			my $d = 0;
+			return (
+				 (map {
+					my ($tup, $m) = ($_, 0, $d++);
+					map {
+						my $ah = $_;
+						$m++ == 0 && $d > 1 ? () :
+						sprintf q|[ %s ]|, join ', ', map {$d - 1 == $_ ? $ah : $tuple[$_]->[0] } 0 .. $#tuple;
+					} @{$tup};
+				} @tuple),
+				q|[]|,
+				q|{}|,
+				$self->_generate_test_string
+			);
+		},
+		qr/^(Dict\[(.*)\])$/ => sub {
+			my ($val, @matches) = @_;
+			@matches = split ',', $matches[1];
+			my %map;
+			while (@matches) {
+				my ($match) = (shift @matches);
+				if ($match =~ m/(Map|Tuple|ArrayRef|Dict)\[/) {
+					my $lame = sub {
+						my $copy = shift;
+						while ($copy =~ s/\[[^\[\]]+\]//g) {}
+						return ($copy =~ m/\[|\[/) ? 1 : 0;
+					};
+					while ($lame->($match .=  ', ' . shift @matches)) {}
+				}
+				my ($k, $v) = map { my $h = $_; $h =~ s/^\s*|\s*$//g; $h; } split('=>', $match, 2);
+				my @values = $self->build_test_data($v, $name, $required);
+				push @values, 'undef' unless $v =~ m/^Optional/;
+				$map{$k} = \@values;
+				push @{ $map{_dict_columns} }, $k;
+			}
+			my $d = 0;
+			return (
+				 (map {
+					my ($dict, $m) = ($_, 0, $d++);
+					map {
+						my $ah = $_;
+						$m++ == 0 && $d > 1 ? () :
+						sprintf q|{ %s }|, join ', ', map {$dict eq $_ ? qq|$_ => $ah| : sprintf( q|%s => %s|, $_, $map{$_}->[0]) } @{$map{_dict_columns}};
+					} @{$map{$dict}};
+				} @{$map{_dict_columns}}), q|{}|, q|[]|, $self->_generate_test_string
+			);
+		},
+		qr/^(Optional\[(.*)\])$/ => sub {
+			my ($val, @matches) = @_;
+			my @values = $self->build_test_data($matches[1], $name, $required);
+			$values[0] = 'undef' unless $required;
+			return @values;
+		};
+	return $switch->($type);
+}
+
+sub build_tests {
+	my ($self, $name, $meta, $mod, $class, $test_data) = @_;
+	my @tests = ();
+	$mod ? $mod ne 'new' ? do {
+		my ($valid) = $self->build_test_data($meta->{type}->[0] || 'Any', $name);
+		push @tests, ['deep', qq|\$obj->$name($valid)|, $valid];
+	} : do {
+		my $valid =  join(', ', map { sprintf '%s => %s', $_, $test_data->{$_}->[0] } grep { $meta->{$_}->{required} } @{$test_data->{test_data_columns}});
+		push @tests, [
+			'ok', 
+			sprintf(
+				'my $obj = %s->new({%s})', 
+				$class->{CURRENT}->{NAME},
+				$valid
+			)
+		], [
+			'ok', 
+			sprintf(
+				'$obj = %s->new(%s)', 
+				$class->{CURRENT}->{NAME},
+				$valid
+			)
+		], ['isa_ok', '$obj', qq|'$class->{CURRENT}->{NAME}'|]; 
+		my $d = 0;	
+		for my $key (@{$test_data->{test_data_columns}}) {
+			if ($meta->{$key}->{default}) {
+				$valid = join(', ', map { $key ne $_ ? ( sprintf '%s => %s', $_, $test_data->{$_}->[0] ) : () } @{$test_data->{test_data_columns}});
+				push @tests, [
+					'ok', 
+					sprintf(
+						'$obj = %s->new({%s})',
+						$class->{CURRENT}->{NAME},
+						$valid
+					),
+				], [
+					'ok', 
+					sprintf(
+						'$obj = %s->new(%s)',
+						$class->{CURRENT}->{NAME},
+						$valid
+					),
+				], [ 'is', qq|\$obj->$key|, $meta->{$key}->{default} ];
+			} elsif ($meta->{$key}->{required}) {
+				push @tests, [
+					'eval', 
+					sprintf(
+						'$obj = %s->new({%s})',
+						$class->{CURRENT}->{NAME},
+						join(', ', map { $key ne $_ ? ( sprintf '%s => %s', $_, $test_data->{$_}->[0] ) : () } @{$test_data->{test_data_columns}})
+					),
+					'required'
+				];
+			}
+			my $m = 0;
+			for my $ah (@{$test_data->{$key}}) {
+				if ($m++ == 0) {
+					next if $d > 0;
+					push @tests, [
+						'ok', 
+						sprintf q|$obj = %s->new({ %s })|, 
+						$class->{CURRENT}->{NAME},
+						join ', ', map {$key eq $_ ? qq|$_ => $ah| : sprintf( q|%s => %s|, $_, $test_data->{$_}->[0]) } @{$test_data->{test_data_columns}}
+					];
+				} else {
+					push @tests, [
+						'eval', 
+						sprintf(
+							q|$obj = %s->new({ %s })|, 
+							$class->{CURRENT}->{NAME},
+							join ', ', map {$key eq $_ ? qq|$_ => $ah| : sprintf( q|%s => %s|, $_, $test_data->{$_}->[0]) } @{$test_data->{test_data_columns}}
+						),
+						'invalid value|greater|atleast'
+					];
+				}
+			}
+			$d++;
+		}
+	} : $meta->{meta} eq 'ACCESSOR' ? do {
+		push @tests, ['can_ok', qq|\$obj|, qq|'$name'|];
+		$meta->{private} ? do {
+			push @tests, ['eval', qq|\$obj->name|, 'private method'];
+		} : do {
+			push @tests, ['is', qq|\$obj->$name|, 'undef'] if !$meta->{required} && !$meta->{default};
+			my (@test_cases) = $self->build_test_data($meta->{type}->[0] || 'Any', $name);
+			if (scalar @test_cases > 1) {
+				my $valid = shift @test_cases;
+				push @tests, ['deep', qq|\$obj->$name($valid)|, $valid];
+				unless ($meta->{coerce}) {
+					for (@test_cases) {
+						push @tests, ['eval', qq|\$obj->$name($_)|, 'invalid value|greater|atleast' ];
+					}
+				}
+				push @tests, ['deep', qq|\$obj->$name|, $valid];
+			}
+		};
+	} : do {
+		$meta->{private} ? do {
+			push @tests, ['eval', qq|\$obj->name|, 'private method'];
+		} : $meta->{param} && do {
+			my %test_data = map {
+				$_ => [
+					$self->build_test_data($meta->{params_map}->{$_}->{type} || 'Any', $name), q|undef|
+				]
+			} @{ $meta->{param} };
+			for my $key (@{$meta->{param}}) {
+				for my $ah (splice @{$test_data{$key}}, 1) {
+					push @tests, [
+						'eval', 
+						sprintf(
+							q|$obj->%s(%s)|, 
+							$name,
+							join ', ', map {$key eq $_ ? $ah : $test_data{$_}->[0]} @{$meta->{param}}
+						),
+						'invalid value|greater|atleast'
+					];
+				}
+			}
+		}
+	};
+	push @tests, @{$meta->{test}} if $meta->{test};
+	return @tests;
+}
+
+sub _generate_test_string {
+	my @data = qw/penthos curae nosoi geras phobos limos aporia thanatos algea hypnos gaudia/;
+	return sprintf q|'%s'|, $data[int(rand(scalar @data))];
 }
 
 1;
@@ -568,7 +932,7 @@ Hades - The great new Hades!
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -672,6 +1036,10 @@ Provide a name for the distribution.
 =item lib
 
 Provide a path where the generated files will be compiled.
+
+=item tlib
+
+Provide a path where the generates test files will be compiled.
 
 =item author
 
@@ -911,6 +1279,15 @@ Add type checking to the accessor.
 
 =cut
 
+=head3 :test | :z
+
+Add tests associated to the accessor.
+	
+	dokimi :z(['ok', '$obj->dokimi'])
+	dokimes :z(['deep', '$obj->dokimes({})', q|{}|)
+
+=cut
+
 =head2 Methods
 
 Declare a sub routine/method.
@@ -970,6 +1347,15 @@ Setting private makes the method only available to the class.
 	dokimes :private $one %two {
 		... perl code ...
 	}
+
+=cut
+
+=head3 :test | :z
+
+Add tests associated to the sub.
+	
+	dokimi :z(['ok', '$obj->dokimi']) { }
+	dokimes :test(['deep', '$obj->dokimes({})', q|{}|) { }
 
 =cut
 
@@ -1183,6 +1569,273 @@ Accepting a list of type constraints for each slot in the hash.
 Used in conjunction with Dict and Tuple to specify slots that are optional and may be omitted.
 
 	dokimi :t(Optional[Str])
+
+=cut
+
+=head2 Testing
+
+Hades can auto-generate test files. If you take the following example:
+
+	use Hades;
+	Hades->run({
+		eval => q|Dokimes {
+			curae :r :default(5)
+			penthos :t(Str) :r
+			nosoi :default(3) :t(Int) :clearer
+			limos
+				$test :t(Str)
+				:test(
+					['ok', '$obj->penthos(2) && $obj->nosoi(2) && $obj->curae(5)'],
+					['is', '$obj->limos("yay")', 5 ],
+					['ok', '$obj->penthos(5)' ],
+					['is', '$obj->limos("yay")', q{''}]
+				)
+				{ if ($_[0]->penthos == $_[0]->nosoi) { return $_[0]->curae; } }
+		}|,
+		lib => 'lib',
+		tlib => 't/lib',
+	});
+
+
+It will generate a test file located at t/lib/Dokimes.t which looks like:
+
+	use Test::More;
+	use strict;
+	use warnings;
+	BEGIN { use_ok('Dokimes'); }
+	subtest 'new' => sub {
+		plan tests => 16;
+		ok( my $obj = Dokimes->new( { curae => 'hypnos', penthos => 'aporia' } ),
+			q{my $obj = Dokimes->new({curae => 'hypnos', penthos => 'aporia'})}
+		);
+		ok( $obj = Dokimes->new( curae => 'hypnos', penthos => 'aporia' ),
+			q{$obj = Dokimes->new(curae => 'hypnos', penthos => 'aporia')}
+		);
+		isa_ok( $obj, 'Dokimes' );
+		ok( $obj = Dokimes->new( { penthos => 'aporia', nosoi => 10 } ),
+			q{$obj = Dokimes->new({penthos => 'aporia', nosoi => 10})}
+		);
+		ok( $obj = Dokimes->new( penthos => 'aporia', nosoi => 10 ),
+			q{$obj = Dokimes->new(penthos => 'aporia', nosoi => 10)}
+		);
+		is( $obj->curae, 5, q{$obj->curae} );
+		ok( $obj = Dokimes->new(
+				{ curae => 'hypnos', penthos => 'aporia', nosoi => 10 }
+			),
+			q{$obj = Dokimes->new({ curae => 'hypnos', penthos => 'aporia', nosoi => 10 })}
+		);
+		eval { $obj = Dokimes->new( { curae => 'hypnos', nosoi => 10 } ) };
+		like( $@, qr/required/,
+			q{$obj = Dokimes->new({curae => 'hypnos', nosoi => 10})} );
+		eval {
+			$obj = Dokimes->new(
+				{ curae => 'hypnos', penthos => [], nosoi => 10 } );
+		};
+		like(
+			$@,
+			qr/invalid value|greater|atleast/,
+			q{$obj = Dokimes->new({ curae => 'hypnos', penthos => [], nosoi => 10 })}
+		);
+		eval {
+			$obj = Dokimes->new(
+				{ curae => 'hypnos', penthos => \1, nosoi => 10 } );
+		};
+		like(
+			$@,
+			qr/invalid value|greater|atleast/,
+			q{$obj = Dokimes->new({ curae => 'hypnos', penthos => \1, nosoi => 10 })}
+		);
+		eval {
+			$obj = Dokimes->new(
+				{ curae => 'hypnos', penthos => '', nosoi => 10 } );
+		};
+		like(
+			$@,
+			qr/invalid value|greater|atleast/,
+			q{$obj = Dokimes->new({ curae => 'hypnos', penthos => '', nosoi => 10 })}
+		);
+		ok( $obj = Dokimes->new( { curae => 'hypnos', penthos => 'aporia' } ),
+			q{$obj = Dokimes->new({curae => 'hypnos', penthos => 'aporia'})}
+		);
+		ok( $obj = Dokimes->new( curae => 'hypnos', penthos => 'aporia' ),
+			q{$obj = Dokimes->new(curae => 'hypnos', penthos => 'aporia')}
+		);
+		is( $obj->nosoi, 3, q{$obj->nosoi} );
+		eval {
+			$obj = Dokimes->new(
+				{ curae => 'hypnos', penthos => 'aporia', nosoi => [] } );
+		};
+		like(
+			$@,
+			qr/invalid value|greater|atleast/,
+			q{$obj = Dokimes->new({ curae => 'hypnos', penthos => 'aporia', nosoi => [] })}
+		);
+		eval {
+			$obj = Dokimes->new(
+				{ curae => 'hypnos', penthos => 'aporia', nosoi => 'limos' } );
+		};
+		like(
+			$@,
+			qr/invalid value|greater|atleast/,
+			q{$obj = Dokimes->new({ curae => 'hypnos', penthos => 'aporia', nosoi => 'limos' })}
+		);
+	};
+	subtest 'curae' => sub {
+		plan tests => 2;
+		ok( my $obj = Dokimes->new( { curae => 'hypnos', penthos => 'aporia' } ),
+			q{my $obj = Dokimes->new({curae => 'hypnos', penthos => 'aporia'})}
+		);
+		can_ok( $obj, 'curae' );
+	};
+	subtest 'penthos' => sub {
+		plan tests => 7;
+		ok( my $obj = Dokimes->new( { curae => 'hypnos', penthos => 'aporia' } ),
+			q{my $obj = Dokimes->new({curae => 'hypnos', penthos => 'aporia'})}
+		);
+		can_ok( $obj, 'penthos' );
+		is_deeply( $obj->penthos('curae'), 'curae', q{$obj->penthos('curae')} );
+		eval { $obj->penthos( [] ) };
+		like( $@, qr/invalid value|greater|atleast/, q{$obj->penthos([])} );
+		eval { $obj->penthos( \1 ) };
+		like( $@, qr/invalid value|greater|atleast/, q{$obj->penthos(\1)} );
+		eval { $obj->penthos('') };
+		like( $@, qr/invalid value|greater|atleast/, q{$obj->penthos('')} );
+		is_deeply( $obj->penthos, 'curae', q{$obj->penthos} );
+	};
+	subtest 'nosoi' => sub {
+		plan tests => 6;
+		ok( my $obj = Dokimes->new( { curae => 'hypnos', penthos => 'aporia' } ),
+			q{my $obj = Dokimes->new({curae => 'hypnos', penthos => 'aporia'})}
+		);
+		can_ok( $obj, 'nosoi' );
+		is_deeply( $obj->nosoi(10), 10, q{$obj->nosoi(10)} );
+		eval { $obj->nosoi( [] ) };
+		like( $@, qr/invalid value|greater|atleast/, q{$obj->nosoi([])} );
+		eval { $obj->nosoi('phobos') };
+		like( $@, qr/invalid value|greater|atleast/, q{$obj->nosoi('phobos')} );
+		is_deeply( $obj->nosoi, 10, q{$obj->nosoi} );
+	};
+	subtest 'limos' => sub {
+		plan tests => 10;
+		ok( my $obj = Dokimes->new( { curae => 'hypnos', penthos => 'aporia' } ),
+			q{my $obj = Dokimes->new({curae => 'hypnos', penthos => 'aporia'})}
+		);
+		can_ok( $obj, 'limos' );
+		eval { $obj->limos( [] ) };
+		like( $@, qr/invalid value|greater|atleast/, q{$obj->limos([])} );
+		eval { $obj->limos( \1 ) };
+		like( $@, qr/invalid value|greater|atleast/, q{$obj->limos(\1)} );
+		eval { $obj->limos('') };
+		like( $@, qr/invalid value|greater|atleast/, q{$obj->limos('')} );
+		eval { $obj->limos(undef) };
+		like( $@, qr/invalid value|greater|atleast/, q{$obj->limos(undef)} );
+		ok( $obj->penthos(2) && $obj->nosoi(2) && $obj->curae(5),
+			q{$obj->penthos(2) && $obj->nosoi(2) && $obj->curae(5)}
+		);
+		is( $obj->limos("yay"), 5, q{$obj->limos("yay")} );
+		ok( $obj->penthos(5), q{$obj->penthos(5)} );
+		is( $obj->limos("yay"), '', q{$obj->limos("yay")} );
+	};
+	subtest 'clear_nosoi' => sub {
+		plan tests => 5;
+		ok( my $obj = Dokimes->new( { curae => 'hypnos', penthos => 'aporia' } ),
+			q{my $obj = Dokimes->new({curae => 'hypnos', penthos => 'aporia'})}
+		);
+		can_ok( $obj, 'clear_nosoi' );
+		is_deeply( $obj->nosoi(10), 10, q{$obj->nosoi(10)} );
+		ok( $obj->clear_nosoi, q{$obj->clear_nosoi} );
+		is( $obj->nosoi, undef, q{$obj->nosoi} );
+	};
+	done_testing();
+
+
+and has 100% test coverage.
+
+	cover --test
+	
+	------------------- ------ ------ ------ ------ ------ ------
+	File                  stmt   bran   cond    sub   time  total
+	------------------- ------ ------ ------ ------ ------ ------
+	blib/lib/Dokimes.pm  100.0  100.0  100.0  100.0  100.0  100.0
+	Total                100.0  100.0  100.0  100.0  100.0  100.0
+	------------------- ------ ------ ------ ------ ------ ------
+
+=cut
+
+=head3 tests
+
+Unfortunately not all code can have auto generated tests, so you should use the :test attribute to define additional
+to test custom logic.
+
+=cut
+
+=head4 ok
+
+This simply evaluates any expression ($got eq $expected is just a simple example) and uses that to determine if the test succeeded or failed. A true expression passes, a false one fails. 
+
+	['ok', '$obj->$method']
+
+=cut
+
+=head4 can_ok
+
+Checks to make sure the $module or $object can do these @methods (works with functions, too).
+
+	['can_ok', '$obj', $method]
+
+=cut
+
+=head4 isa_ok
+
+Checks to see if the given $object->isa($class). Also checks to make sure the object was defined in the first place. Handy for this sort of thing:
+
+	['isa_ok', '$obj', $class]
+
+=cut
+
+=head4 is
+
+Similar to ok(), is() and isnt() compare their two arguments with eq and ne respectively and use the result of that to determine if the test succeeded or failed. So these:
+
+	['is', '$obj->$method', $expected]
+
+=cut
+
+=head4 isnt
+
+	['isnt', '$obj->$method', $expected]
+
+=cut
+
+=head4 like
+
+Similar to ok(), like() matches $got against the regex qr/expected/.
+
+	['like', '$obj->$method', $expected_regex]
+
+=cut
+
+=head4 unlike
+
+Works exactly as like(), only it checks if $got does not match the given pattern.
+
+	['unlike', '$obj->$method', $expected_regex]
+
+=cut
+
+=head4 deep
+
+Similar to is(), except that if $got and $expected are references, it does a deep comparison walking each data structure to see if they are equivalent. If the two structures are different, it will display the place where they start differing.
+
+	['deep', '$obj->$method', $expected]
+
+=cut
+
+=head4 eval
+
+Evaluate code that you expect to die and check the warning using like.
+
+	['eval', '$obj->$method", $error_expected]
 
 =cut
 

@@ -15,7 +15,7 @@ use LWP::Protocol ();
 use Scalar::Util qw(blessed);
 use Try::Tiny qw(try catch);
 
-our $VERSION = '6.46';
+our $VERSION = '6.47';
 
 sub new
 {
@@ -783,7 +783,10 @@ sub cookie_jar {
 	}
 	$self->{cookie_jar} = $jar;
         $self->set_my_handler("request_prepare",
-            $jar ? sub { $jar->add_cookie_header($_[0]); } : undef,
+            $jar ? sub {
+                return if $_[0]->header("Cookie");
+                $jar->add_cookie_header($_[0]);
+            } : undef,
         );
         $self->set_my_handler("response_done",
             $jar ? sub { $jar->extract_cookies($_[0]); } : undef,

@@ -4,22 +4,31 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 # VERSION
 
-version 0.89
+version 0.90
 
 # SYNOPSIS
 
     use Net::Amazon::S3;
+    use Net::Amazon::S3::Authorization::Basic;
+    use Net::Amazon::S3::Authorization::IAM;
     my $aws_access_key_id     = 'fill me in';
     my $aws_secret_access_key = 'fill me in too';
 
-    my $s3 = Net::Amazon::S3->new(
-        {   aws_access_key_id     => $aws_access_key_id,
-            aws_secret_access_key => $aws_secret_access_key,
-            # or use an IAM role.
-            use_iam_role          => 1
+    my $s3 = Net::Amazon::S3->new (
+      authorization_context => Net::Amazon::S3::Authorization::Basic->new (
+        aws_access_key_id     => $aws_access_key_id,
+        aws_secret_access_key => $aws_secret_access_key,
+      ),
+      retry => 1,
+    );
 
-            retry                 => 1,
-        }
+    # or use an IAM role.
+    my $s3 = Net::Amazon::S3->new (
+      authorization_context => Net::Amazon::S3::Authorization::IAM->new (
+        aws_access_key_id     => $aws_access_key_id,
+        aws_secret_access_key => $aws_secret_access_key,
+      ),
+      retry => 1,
     );
 
     # a bucket is a globally-unique directory
@@ -110,7 +119,36 @@ Development of this code happens here: https://github.com/rustyconover/net-amazo
 
 Create a new S3 client object. Takes some arguments:
 
+- authorization\_context
+
+    Class that provides authorization informations.
+
+    See one of available implementations for more
+
+    - [Net::Amazon::S3::Authorization::Basic](https://metacpan.org/pod/Net::Amazon::S3::Authorization::Basic)
+    - [Net::Amazon::S3::Authorization::IAM](https://metacpan.org/pod/Net::Amazon::S3::Authorization::IAM)
+
+- vendor
+
+    Instance of [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net::Amazon::S3::Vendor) holding vendor specific deviations.
+
+    S3 became widely used object storage protocol with many vendors providing
+    different feature sets and different compatibility level.
+
+    One common difference is bucket's HEAD request to determine its region.
+
+    To maintain currently known differences along with any differencies that
+    may rise in feature it's better to hold vendor specification in dedicated
+    classes. This also allows users to build their own fine-tuned vendor classes.
+
+    - [Net::Amazon::S3::Vendor::Amazon](https://metacpan.org/pod/Net::Amazon::S3::Vendor::Amazon)
+    - [Net::Amazon::S3::Vendor::Generic](https://metacpan.org/pod/Net::Amazon::S3::Vendor::Generic)
+
 - aws\_access\_key\_id
+
+    Deprecated.
+
+    When used it's used to create authorization context.
 
     Use your Access Key ID as the value of the AWSAccessKeyId parameter
     in requests you send to Amazon Web Services (when required). Your
@@ -118,6 +156,10 @@ Create a new S3 client object. Takes some arguments:
     request.
 
 - aws\_secret\_access\_key
+
+    Deprecated.
+
+    When used it's used to create authorization context.
 
     Since your Access Key ID is not encrypted in requests to AWS, it
     could be discovered and used by anyone. Services that are not free
@@ -129,21 +171,33 @@ Create a new S3 client object. Takes some arguments:
 
 - aws\_session\_token
 
+    Deprecated.
+
+    When used it's used to create authorization context.
+
     If you are using temporary credentials provided by the AWS Security Token
     Service, set the token here, and it will be added to the request in order to
     authenticate it.
 
 - use\_iam\_role
 
+    Deprecated.
+
+    When used it's used to create authorization context.
+
     If you'd like to use IAM provided temporary credentials, pass this option
     with a true value.
 
 - secure
 
+    Deprecated.
+
     Set this to `0` if you don't want to use SSL-encrypted connections when talking
     to S3. Defaults to `1`.
 
     To use SSL-encrypted connections, LWP::Protocol::https is required.
+
+    See [#vendor](https://metacpan.org/pod/#vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net::Amazon::S3::Vendor).
 
 - keep\_alive\_cache\_size
 
@@ -162,23 +216,35 @@ Create a new S3 client object. Takes some arguments:
 
 - host
 
+    Deprecated.
+
     The S3 host endpoint to use. Defaults to 's3.amazonaws.com'. This allows
     you to connect to any S3-compatible host.
 
+    See [#vendor](https://metacpan.org/pod/#vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net::Amazon::S3::Vendor).
+
 - use\_virtual\_host
+
+    Deprecated.
 
     Use the virtual host method ('bucketname.s3.amazonaws.com') instead of specifying the
     bucket at the first part of the path. This is particularly useful if you want to access
     buckets not located in the US-Standard region (such as EU, Asia Pacific or South America).
     See [http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html](http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html) for the pros and cons.
 
+    See [#vendor](https://metacpan.org/pod/#vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net::Amazon::S3::Vendor).
+
 - authorization\_method
+
+    Deprecated.
 
     Authorization implementation package name.
 
     This library provides [Net::Amazon::S3::Signature::V2](https://metacpan.org/pod/Net::Amazon::S3::Signature::V2) and [Net::Amazon::S3::Signature::V4](https://metacpan.org/pod/Net::Amazon::S3::Signature::V4)
 
     Default is Signature 4 if host is `s3.amazonaws.com`, Signature 2 otherwise
+
+    See [#vendor](https://metacpan.org/pod/#vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net::Amazon::S3::Vendor).
 
 ### Notes
 

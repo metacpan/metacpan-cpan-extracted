@@ -2,9 +2,9 @@ NAME
     App::perlmv::scriptlet::number_tracks - Add track number to filenames
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     App::perlmv::scriptlet::number_tracks (from Perl distribution
-    App-perlmv-scriptlet-number_tracks), released on 2020-08-03.
+    App-perlmv-scriptlet-number_tracks), released on 2020-08-04.
 
 SYNOPSIS
     In tracks.txt:
@@ -57,7 +57,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    perlmv
+    perlmv (from App::perlmv)
 
 AUTHOR
     perlancar <perlancar@cpan.org>

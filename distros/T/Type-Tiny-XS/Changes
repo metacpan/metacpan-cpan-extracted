@@ -6,6 +6,18 @@ Home page:    <https://metacpan.org/release/Type-Tiny-XS>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny-XS>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.021	2020-08-18
+
+ [ Bug Fixes ]
+ - Fix Enum test case for when Type::Parser is not available.
+
+0.020	2020-08-17
+
+ - Allow Enum[] to take a list of quoted strings rather than just
+   barewords.
+   Andrew Ruder++
+   <https://github.com/tobyink/p5-type-tiny-xs/pull/12>
+
 0.019	2020-08-05
 
  [ Packaging ]

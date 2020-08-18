@@ -2,6 +2,13 @@ CHANGE LOG
 ==========
 
 
+2020-08-17 - v0.106.2
+---------------------
+
+### Fixed
+  - Restore runtime-load with a new implementation
+
+
 2020-08-14 - v0.106.1
 ---------------------
 

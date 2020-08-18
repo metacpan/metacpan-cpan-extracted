@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2015-2017 Joelle Maslak
+# Copyright (C) 2015-2020 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package JTM::Boilerplate;
 # ABSTRACT: Default Boilerplate for Joelle Maslak's Code
-$JTM::Boilerplate::VERSION = '2.190700';
+$JTM::Boilerplate::VERSION = '2.202310';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ sub import ( $self, $type = 'script' ) {
     English->import::into($target);
     Smart::Comments->import::into( $target, '-ENV', '###' );
 
-    feature->import::into( $target, 'postderef' );    # Not needed if feature budle >= 5.23.1
+    feature->import::into( $target, 'postderef' );    # Not needed if feature bundle >= 5.23.1
 
     # We haven't been using this
     # feature->import::into($target, 'refaliasing');
@@ -75,6 +75,15 @@ sub import ( $self, $type = 'script' ) {
     warnings->unimport::out_of( $target, 'experimental::re_strict' );
     re->import( 'strict' );
 
+    if ( $PERL_VERSION ge v5.32.0 ) {
+        # Turn off indirect syntax
+        feature->unimport::out_of( $target, 'indirect' );
+
+        # Turn on isa
+        feature->import::into( $target, 'isa' );
+        warnings->unimport::out_of( $target, 'experimental::isa' );
+    }
+
     return;
 }
 
@@ -92,7 +101,7 @@ JTM::Boilerplate - Default Boilerplate for Joelle Maslak's Code
 
 =head1 VERSION
 
-version 2.190700
+version 2.202310
 
 =head1 SYNOPSIS
 
@@ -123,7 +132,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2019 by Joelle Maslak.
+This software is copyright (c) 2015-2020 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

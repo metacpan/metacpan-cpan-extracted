@@ -2,10 +2,33 @@ Type-Tiny
 =========
 
 Created:      2013-03-23
-Home page:    <http://typetiny.toby.ink/>
+Home page:    <https://typetiny.toby.ink/>
 Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+1.010004	2020-08-18
+
+ [ Bug Fixes ]
+ - Fix XSifying Enum[] where the strings contain certain non-word
+   characters.
+   Andrew Ruder++
+   <https://github.com/tobyink/p5-type-tiny-xs/pull/12>
+   <https://github.com/tobyink/p5-type-tiny/pull/59>
+ - Type::Params compile_named using both the head and named_to_list options
+   would cause compilation error.
+   Fixes RT#132419.
+   Hauke D++
+   Sandor Patocs++
+   <https://rt.cpan.org/Ticket/Display.html?id=132419>
+ - Workaround RT#121957 by avoiding attempting to XSify Enum type
+   constraints with more than 50 possible strings.
+   Fixes RT#121957.
+   Diab Jerius++
+   <https://rt.cpan.org/Ticket/Display.html?id=121957>
+
+ [ Documentation ]
+ - Link to HTTPS version of Type::Tiny web page.
 
 1.010003	2020-08-08	The Crazy 88
 

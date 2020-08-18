@@ -1,0 +1,36 @@
+---
+abstract: 'deduce aviation information from parsed METAR data'
+author:
+  - 'Roland van Ipenburg <roland@rolandvanipenburg.com>'
+build_requires:
+  Test::More: '0.86'
+  Test::NoWarnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-METAR-Deduced
+provides:
+  Geo::METAR::Deduced:
+    file: lib/Geo/METAR/Deduced.pm
+    version: v0.0.1
+requires:
+  Class::Measure::Scientific::FX_992vb: '0'
+  Data::Dumper: '0'
+  English: '0'
+  Geo::ICAO: '0'
+  Geo::METAR: '0'
+  Log::Log4perl: '0'
+  Moose: '0'
+  MooseX::NonMoose: '0'
+  Readonly: '1.03'
+  Set::Scalar: '0'
+  perl: v5.16.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -12,15 +12,30 @@ use Carp;
 use Data::Dump qw(dump);
 use Data::Table::Text qw(:all !trim);
 use feature qw(say current_sub);
+use utf8;
 
-#D1 Preprocess                                                                  # Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
+#D1 Preprocess                                                                  # Preprocess ▷ and ▶ as method dispatch operators.
 
 sub trim($)                                                                     #P Remove trailing white space and comment
  {my ($s) = @_;                                                                 # String
   $s =~ s(\s*//.*\n) ()r;
  }
 
-sub preprocess($$$;$)                                                           # Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
+sub method($)                                                                   #P Check whether a line of C code defines a method, returning (return, name, flags, comment) if it is, else ()
+ {my ($line) = @_;                                                              # Line of C code
+  if ($line =~ m(\Astatic\s*(.*?)(\w+)\s+//(\w*)\s*(.*)\Z))                     # Static function is always a method
+   {return ($1, $2, $3, $4)
+   }
+  if ($line =~ m(\A(.*?)(\w+)\s+//(\w*)\s*(.*)\Z))                              # Static function is always a method
+   {my @r = my ($return, $name, $flags, $comment) = ($1, $2, $3, $4);
+    if ($flags and $flags =~ m([C]))                                            # Constructor
+     {return @r
+     }
+   }
+  ()
+  }
+
+sub c($$$;$)                                                                    # Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
  {my ($inputFile, $cFile, $hFile, $column) = @_;                                # Input file, C output file, H output file, optional start column for comments (80)
 
   my $commentColumn = ($column // 80) - 1;                                      # Column in which to start comments
@@ -35,20 +50,22 @@ sub preprocess($$$;$)                                                           
     my %duplicates; my @duplicates;                                             # Duplication check for first parameter plus short method name
     for my $i(keys @code)                                                       # Index of each line
      {my $line = $code[$i];
-      if ($line =~ m(\Astatic\s*(.*?)(\w+)\s+//(\w*)\s*(.*)\Z))                 # Parse function return, name, description comment
-       {my $m = $2;
-        $methods{$m}{return}  = $1;                                             # Return type
-        $methods{$m}{flags}   = {map {$_=>1} split //, $3};                     # Flags after comment start
-        $methods{$m}{comment} = $4;                                             # Comment
+
+      my ($return, $name, $flags, $comment) = method($line);                    # Parse function return, name, description comment
+      if ($name)
+       {$methods{$name}{return}  = $return;                                     # Return type
+        $methods{$name}{flags}   = {map {$_=>1} split //, $flags};              # Flags after comment start
+        $methods{$name}{comment} = $comment;                                    # Comment
+       ($methods{$name}{name})   = split /_/, $name;                            # Short name as used after call operator
         push @forwards, join ' ', trim($line);                                  # Save function definition for forward declaration
 
         for $i($i+1..$#code)                                                    # Parameter definitions
          {$line = $code[$i];
           if ($line =~ m(\A\s*[(]?(.*?)\s*(\w+)[,)]\s*//\s*(.*)\Z))             # Variable: Get type, parameter name, comment
-           {push $methods{$m}{parameters}->@*, [$1, $2, $3];
+           {push $methods{$name}{parameters}->@*, [$1, $2, $3];
            }
           elsif ($line =~ m(\A\s*(.*?)\s*\(\*(\s*(const)?\s*\w+)\)\s*(.*?)[,\)]\s*//\s*(.*)\Z)) # Function: Get type, parameter name, comment
-           {push $methods{$m}{parameters}->@*, ["$1 (*$2) $4", $2, $5];
+           {push $methods{$name}{parameters}->@*, ["$1 (*$2) $4", $2, $5];
            }
 
           push @forwards, trim($line);                                          # Save function definition for forward declaration
@@ -56,15 +73,13 @@ sub preprocess($$$;$)                                                           
          }
 
         $forwards[-1] .= ';';                                                   # Terminate forward declaration
-        if (my $o = $methods{$m}{structure} = $methods{$m}{parameters}[0][0])   # Structure parameter
+        if (my $o = $methods{$name}{structure} = $methods{$name}{parameters}[0][0])   # Structure parameter
          {$o =~ s((\A|\s+)const\s+) ();                                         # Remove const from structure name
-          $structures{$o}{$m}++;                                                # Record methods in each structure
-          my ($n) = split /_/, $m;                                              # Short name
-          $methods{$m}{name} = $n;                                              # Method name
-          if (my $d = $duplicates{"$n$o"})                                      # Check for duplicate
-           {push @duplicates, [$n, $o, $i, $d];                                 # Record duplicate
+          $structures{$o}{$name}++;                                             # Record methods in each structure
+          if (my $d = $duplicates{"$name$o"})                                   # Check for duplicate
+           {push @duplicates, [$name, $o, $i, $d];                              # Record duplicate
            }
-          $duplicates{"$n$o"} = $i;
+          $duplicates{"$name$o"} = $i;
          }
        }
      }
@@ -72,13 +87,17 @@ sub preprocess($$$;$)                                                           
      {confess join "\n", "Duplicates:", dump(\@duplicates);
      }
     if (1)                                                                      # Locate tests for each method
-     {my %m = map { $methods{$_}{name}=>1}                                      # Methods that need tests
-              grep{!$methods{$_}{flags}{P}}                                     # Exclude private methods
-              keys %methods;
+     {my %m;                                                                    # Methods that need tests
+      for my $m(sort keys %methods)
+       {next if $methods{$m}{flags}{P};                                         # Ignore private methods marked with P
+        $m{$methods{$m}{name}}++;
+       }
+
       for my $l(@code)                                                          # Each code line
        {my @t = $l =~ m((//T\w+))g;
         delete $m{s(\A//T) ()r} for @t;
        }
+
       if (keys %m)                                                              # Report methods that need tests
        {lll "The following methods need tests:\n",
         join "\n", sort keys %m;
@@ -86,10 +105,15 @@ sub preprocess($$$;$)                                                           
      }
    }
 
+#  if (! keys %methods)
+#   {confess "No methods starting with static found in file: %inputFile";
+#   }
+
   if (1)                                                                        # Write structures
    {my @h;                                                                      # Generated code
     for my $s(sort keys %structures)                                            # Each structure
-     {push @h, "struct ProtoTypes_$s {";                                        # Start structure
+     {next if $s =~ m([*&_]);                                                   # The names of structures which are objects cannot contain operators
+      push @h, "struct ProtoTypes_$s {";                                        # Start structure
       for my $m(sort keys $structures{$s}->%*)                                  # Methods in structure
        {my $method = $methods{$m};                                              # Method
         my $s  = join '', '  ', $$method{return}, ' (*',  $$method{name}, ')('; # Start signature
@@ -124,9 +148,11 @@ sub preprocess($$$;$)                                                           
     $c =~ s{(\w+)\s*▷\s*(\w+)\s*\(} {$1.proto->$2($1, }gs;                      # Method call with arguments
     $c =~ s{(\w+)\s*▷\s*(\w+)}      {$1.proto->$2($1)}gs;                       # Method call with no arguments
 
-    $c =~ s(\s+\n) (\n)gs;
-    owf($cFile, qq(#line 0 "$inputFile"\n).$c);                                 # Output C file
+    $c =~ s( +\n) (\n)gs;                                                       # Remove trailing spaces at line ends
+    owf($cFile, qq(#line 0 "$inputFile"\n\n).$c);                               # Output C file
    }
+
+  {methods => \%methods, structures => \%structures, tests => \%tests}          # Methods, structures, tests found
  }
 
 #D0
@@ -176,7 +202,7 @@ to:
 Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
 
 
-Version 20200810.
+Version 20200811.
 
 
 The following sections describe the methods in each functional area of this
@@ -186,9 +212,9 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 =head1 Preprocess
 
-Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
+Preprocess ▷ and ▶ as method dispatch operators.
 
-=head2 preprocess($inputFile, $cFile, $hFile, $column)
+=head2 c($inputFile, $cFile, $hFile, $column)
 
 Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
 
@@ -210,15 +236,13 @@ B<Example:>
     return node;
    }
   END
-
+  
     my $c = temporaryFile.'.c';                                                   # Translated C file
     my $h = temporaryFile.'.h';                                                   # Prototypes in H file
-
-
-    preprocess($s, $c, $h);                                                       # Preprocess  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-
-    ok index(readFile($c), <<END) > -1;                                            # Generated C file. Remove first line as it contains source file name
+  
+    c($s, $c, $h);                                                                # Preprocess
+  
+    ok index(readFile($c), <<END) > -1;                                           # Generated C file. Remove first line as it contains source file name
   static Node setKey_node_node_string                                             // Copy a string into the key field of a node //TsetKey
    (const Tree   tree,                                                            // Tree
     const Node   node,                                                            // Node
@@ -227,7 +251,7 @@ B<Example:>
     return node;
    }
   END
-
+  
     ok index(readFile($h), <<END) > -1;                                            # Generated H prototypes file
   static Node setKey_node_node_string
    (const Tree   tree,
@@ -241,7 +265,7 @@ B<Example:>
    } const ProtoTypes_Tree =
   {setKey_node_node_string};
   END
-
+  
 
 
 =head1 Private Methods
@@ -253,13 +277,22 @@ Remove trailing white space and comment
      Parameter  Description
   1  $s         String
 
+=head2 method($line)
+
+Check whether a line of C code defines a method, returning (return, name, flags, comment) if it is, else ()
+
+     Parameter  Description
+  1  $line      Line of C code
+
 
 =head1 Index
 
 
-1 L<preprocess|/preprocess> - Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
+1 L<c|/c> - Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
 
-2 L<trim|/trim> - Remove trailing white space and comment
+2 L<method|/method> - Check whether a line of C code defines a method, returning (return, name, flags, comment) if it is, else ()
+
+3 L<trim|/trim> - Remove trailing white space and comment
 
 =head1 Installation
 
@@ -307,14 +340,14 @@ use warnings FATAL=>qw(all);
 use strict;
 require v5.26;
 use Time::HiRes qw(time);
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 my $startTime = time();
 my $localTest = ((caller(1))[0]//'Preprocess::Ops') eq "Preprocess::Ops";       # Local testing mode
 Test::More->builder->output("/dev/null") if $localTest;                         # Suppress output in local testing mode
 makeDieConfess;
 
-  if (1) {                                                                      #Tpreprocess
+  if (1) {                                                                      #Tc
   my $s = writeTempFile(<<END);
 static Node setKey_node_node_string                                             // Copy a string into the key field of a node //TsetKey
  (const Tree   tree,                                                            // Tree
@@ -328,7 +361,7 @@ END
   my $c = temporaryFile.'.c';                                                   # Translated C file
   my $h = temporaryFile.'.h';                                                   # Prototypes in H file
 
-  preprocess($s, $c, $h);                                                       # Preprocess
+  c($s, $c, $h);                                                                # Preprocess
 
   ok index(readFile($c), <<END) > -1;                                           # Generated C file. Remove first line as it contains source file name
 static Node setKey_node_node_string                                             // Copy a string into the key field of a node //TsetKey
@@ -354,6 +387,35 @@ struct ProtoTypes_Tree {
 {setKey_node_node_string};
 END
    }
+
+  if (1) {
+  my $s = writeTempFile(<<END);
+Node newNode                                                                    //C Create a new node //TnewNode
+ (const string key)                                                             // Input key
+ {return node;
+ }
+END
+
+  my $c = temporaryFile.'.c';                                                   # Translated C file
+  my $h = temporaryFile.'.h';                                                   # Prototypes in H file
+
+  my $r = c($s, $c, $h);                                                        # Preprocess
+
+  is_deeply $r,
+   {methods =>
+     {newNode =>
+       {comment    => "Create a new node //TnewNode",
+        flags      => { C => 1 },
+        name       => "newNode",
+        parameters => [["const string", "key", "Input key"]],
+        return     => "Node ",
+        structure  => "const string",
+       },
+     },
+    structures => {string => { newNode => 1 }},
+    tests => {},
+   };
+ }
 
 done_testing;
 

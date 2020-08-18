@@ -57,12 +57,17 @@
          "web" : "https://github.com/perlancar/perl-App-perlmv-scriptlet-number_tracks"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::perlmv",
+            "name" : "perlmv",
+            "version" : "0.002"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
             "config" : {
@@ -378,6 +383,11 @@
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
                         "version" : "0.082"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::perlmv",
+                        "name" : "-perlmv",
+                        "version" : "0.001"
                      }
                   ]
                }

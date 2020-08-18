@@ -1,3 +1,16 @@
+0.338   2020-08-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+        [Documentation]
+
+	- Add Description (finally).
+
+	- Mention IPC::System::Simple and Proc::Govern.
+
+	- Format POD for easier linking.
+
+
 0.337   2020-06-06  Released-By: PERLANCAR; Urgency: medium
 
 	- run(): Allow capture_stdout & capture_stderr to be coderef in

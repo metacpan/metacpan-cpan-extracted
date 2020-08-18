@@ -2,9 +2,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 4;
+use Test::More tests => 5;
 use Test::Deep;
-use Test::Warnings;
+use Test::Warnings qw[ :no_end_test had_no_warnings ];
 
 use Shared::Examples::Net::Amazon::S3::Request (
     qw[ behaves_like_net_amazon_s3_request ],
@@ -17,7 +17,7 @@ behaves_like_net_amazon_s3_request 'set object access control with header acl' =
     with_acl_short  => 'private',
 
     expect_request_method   => 'PUT',
-    expect_request_path     => 'some-bucket/some/key?acl',
+    expect_request_uri      => 'https://some-bucket.s3.amazonaws.com/some/key?acl',
     expect_request_headers  => { 'x-amz-acl' => 'private' },
 );
 
@@ -28,7 +28,7 @@ behaves_like_net_amazon_s3_request 'set object access control with body acl' => 
     with_acl_xml    => 'private',
 
     expect_request_method   => 'PUT',
-    expect_request_path     => 'some-bucket/some/key?acl',
+    expect_request_uri      => 'https://some-bucket.s3.amazonaws.com/some/key?acl',
     expect_request_headers  => { },
 );
 
@@ -50,3 +50,4 @@ behaves_like_net_amazon_s3_request 'set object access control with both body and
     throws          => re( qr/can not provide both acl_xml and acl_short/ ),
 );
 
+had_no_warnings;

@@ -1,0 +1,55 @@
+NAME
+    Pod::Weaver::Plugin::perlmv - Plugin to use when building App::perlmv
+    and App::perlmv::scriptlet::* distribution
+
+VERSION
+    This document describes version 0.002 of Pod::Weaver::Plugin::perlmv
+    (from Perl distribution Pod-Weaver-Plugin-perlmv), released on
+    2020-08-04.
+
+SYNOPSIS
+    In your weaver.ini:
+
+     [-perlmv]
+
+DESCRIPTION
+    This plugin is to be used when building App::perlmv and
+    "App::perlmv::scriptlet::*" distribution. Currently it does the
+    following for each lib/App/perlmv/scriptlet/* pm file:
+
+    *   Fill Description section from scriptlet's description
+
+    *   Mention some scripts/modules in the See Also section, including
+        perlmv and App::perlmv
+
+CONFIGURATION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Plugin-perlmv>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-perlmv>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-per
+    lmv>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::perlmv
+
+    Dist::Zilla::Plugin::perlmv
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

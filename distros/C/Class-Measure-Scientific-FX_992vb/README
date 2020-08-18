@@ -1,0 +1,35 @@
+Class::Measure::Scientific::FX_992vb is Copyright (C) 2020, Roland van Ipenburg
+
+Class::Measure::Scientific::FX_992vb version v0.0.1
+===================================================
+
+This module can be used to convert measurements like the CASIO fx-992vb.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Moose
+  Log::Log4perl
+  Class::Measure
+  Log::Log4perl
+  Moose
+  MooseX::NonMoose
+  Readonly 1.03
+  version
+
+LICENSE INFORMATION
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.14.0 or, at your option,
+any later version of Perl 5 you may have available.  For more details, see
+the full text of the licenses in the directory LICENSES.

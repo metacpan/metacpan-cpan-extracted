@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  OpenTracing::Implementation::NoOp: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Log4perl-OpenTracing
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Hash::Fold: '0'
+  Log::Log4perl: '0'
+  OpenTracing::GlobalTracer: '0'
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

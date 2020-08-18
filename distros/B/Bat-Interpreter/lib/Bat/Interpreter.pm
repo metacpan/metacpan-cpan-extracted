@@ -11,9 +11,10 @@ use Data::Dumper;
 use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use Bat::Interpreter::Delegate::LineLogger::Silent;
+use File::Glob;
 use namespace::autoclean;
 
-our $VERSION = '0.023';    # VERSION
+our $VERSION = '0.024';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -332,7 +333,18 @@ sub _handle_condition {
         $path = $self->_variable_substitution( $path, $context );
         $path = $self->_adjust_path($path);
         $context->{'current_line'} .= 'EXIST ' . $path;
-        return -e $path;
+
+        # Glob expansion
+        my @paths       = File::Glob::bsd_glob($path);
+        my $file_exists = 1;
+        if (@paths) {
+            for my $expanded_path (@paths) {
+                $file_exists = $file_exists && -e $expanded_path;
+            }
+            return $file_exists;
+        } else {
+            return 0;    # If bsd_glob returns and empty array there is no such file
+        }
     } else {
         die "Condition type $type not implemented";
     }
@@ -472,7 +484,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3::Request;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::Request::VERSION = '0.89';
+$Shared::Examples::Net::Amazon::S3::Request::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -16,6 +16,8 @@ use XML::LibXML;
 
 use Net::Amazon::S3;
 use Net::Amazon::S3::Bucket;
+
+use Shared::Examples::Net::Amazon::S3;
 
 our @EXPORT_OK = (
     qw[ behaves_like_net_amazon_s3_request ],
@@ -75,7 +77,9 @@ sub expect_request_instance {
         keys %params
         ;
 
-    $with{s3} = bless {}, 'Net::Amazon::S3';
+    $with{s3} = Shared::Examples::Net::Amazon::S3::s3_api_with_signature_2 (
+        host => $params{with_host} || 's3.amazonaws.com',
+    );
 
     my $test_class = _test_class $params{request_class},
         map +( $_ => $params{$_} ),
@@ -100,15 +104,15 @@ sub expect_request_instance {
     return $request;
 }
 
-sub expect_request_path {
+sub expect_request_uri {
     my ($request, $expected) = @_;
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     return cmp_deeply
-        $request->http_request->path,
+        $request->http_request->request_uri,
         $expected,
-        "it builds expected request path"
+        "it builds expected request uri"
         ;
 }
 
@@ -159,7 +163,7 @@ sub behaves_like_net_amazon_s3_request {
 
     subtest $title => sub {
         plan tests => 2 + scalar grep exists $params{$_},
-            qw[ expect_request_path ],
+            qw[ expect_request_uri ],
             qw[ expect_request_method ],
             qw[ expect_request_headers ],
             qw[ expect_request_content ],
@@ -168,8 +172,8 @@ sub behaves_like_net_amazon_s3_request {
         expect_request_class $params{request_class};
         my $request = expect_request_instance %params;
 
-        expect_request_path $request => $params{expect_request_path}
-            if exists  $params{expect_request_path};
+        expect_request_uri $request => $params{expect_request_uri}
+            if exists  $params{expect_request_uri};
 
         expect_request_method $request => $params{expect_request_method}
             if exists  $params{expect_request_method};
@@ -196,7 +200,7 @@ Shared::Examples::Net::Amazon::S3::Request - used for testing and as example
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 AUTHOR
 

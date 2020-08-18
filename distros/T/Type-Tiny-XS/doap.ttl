@@ -25,7 +25,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Type-Tiny-XS";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-019>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-021>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-type-tiny-xs>;
@@ -353,6 +353,41 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-XS-0.019.tar.gz>;
 	doap:revision        "0.019"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-020>
+	a                    doap:Version;
+	dc:identifier        "Type-Tiny-XS-0.020"^^xsd:string;
+	dc:issued            "2020-08-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Allow Enum[] to take a list of quoted strings rather than just barewords.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/aeruder>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-type-tiny-xs/pull/12>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-XS-0.020.tar.gz>;
+	doap:revision        "0.020"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-021>
+	a                    doap:Version;
+	dc:identifier        "Type-Tiny-XS-0.021"^^xsd:string;
+	dc:issued            "2020-08-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix Enum test case for when Type::Parser is not available.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-XS-0.021.tar.gz>;
+	doap:revision        "0.021"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/aeruder>
+	a                    foaf:Person;
+	foaf:name            "Andrew Ruder";
+	foaf:nick            "AERUDER";
+	foaf:page            <https://metacpan.org/author/AERUDER>.
 
 <http://purl.org/NET/cpan-uri/person/haarg>
 	a                    foaf:Person;

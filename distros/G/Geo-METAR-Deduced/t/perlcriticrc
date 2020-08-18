@@ -1,0 +1,3 @@
+severity = 1
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Moose::before Moose::has Moose::after Moose::extends Readonly::Readonly Readonly::Scalar Readonly::Array Readonly::Hash

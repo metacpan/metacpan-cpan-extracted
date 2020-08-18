@@ -216,11 +216,6 @@ sub download {
                         @backup_fmt_data = ();
                     }
                 }
-                if ( $opt->{entries_with_info} == 0 ) {
-                    for my $id ( @sorted_ids ) {
-                        delete $data->{$ex}{$up}{$id}; #
-                    }
-                }
             }
         }
         say "";

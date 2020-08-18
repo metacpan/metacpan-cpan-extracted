@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0513';
+our $VERSION = '0.0514';
 
 use Moo;
 use strictures 2;
@@ -152,7 +152,7 @@ Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0513
+version 0.0514
 
 =head1 SYNOPSIS
 

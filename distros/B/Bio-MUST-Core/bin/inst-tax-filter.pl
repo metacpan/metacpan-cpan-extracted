@@ -82,7 +82,7 @@ inst-tax-filter.pl - Apply a taxonomic filter to a (UniProt) FASTA database
 
 =head1 VERSION
 
-version 0.202070
+version 0.202310
 
 =head1 USAGE
 

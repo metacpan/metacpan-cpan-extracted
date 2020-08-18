@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.186';
+our $VERSION = '1.187';
 
 use Quiq::Converter;
 use Quiq::Hash;
@@ -353,6 +353,53 @@ sub extractPropertiesToObject {
 
 # -----------------------------------------------------------------------------
 
+=head3 extractPropertiesToVariables() - Extrahiere Properties und weise sie an Variablen zu
+
+=head4 Synopsis
+
+  $class->extractPropertiesToVariables(\@params,@propRef);
+
+=head4 Arguments
+
+=over 4
+
+=item @params
+
+Parameterliste, z.B. @_.
+
+=item @propRef
+
+Liste der Properties (und ggf. Optionen) und ihrer Variablenreferenzen.
+
+=back
+
+=head4 Description
+
+Extrahiere Properties (und ggf. Optionen) aus der Parameterliste @params.
+Enthält die Parameterliste unbekannte Properties (oder Optionen)
+wird eine Exception geworfen. Die Methode wird typischerweise
+zur Verarbeitung von Methodenparametern genutzt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub extractPropertiesToVariables {
+    my ($class,$paramA) = splice @_,0,2;
+
+    $class->extract(1,1,undef,$paramA,0,@_);
+    if (@$paramA) {
+        $class->throw(
+            'PARAM-00099: Unexpected parameter(s)',
+            Parameters => "@$paramA",
+        );
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 extractToObject() - Extrahiere Parameter und speichere Optionen in Objekt
 
 =head4 Synopsis
@@ -428,7 +475,7 @@ sub extractToObject {
 
 =head1 VERSION
 
-1.186
+1.187
 
 =head1 AUTHOR
 

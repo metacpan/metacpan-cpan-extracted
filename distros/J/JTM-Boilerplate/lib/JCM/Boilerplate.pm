@@ -5,7 +5,7 @@
 
 package JCM::Boilerplate;
 # ABSTRACT: Default Boilerplate for Joelle Maslak's Code
-$JCM::Boilerplate::VERSION = '2.190700';
+$JCM::Boilerplate::VERSION = '2.202310';
 use strict;
 use warnings;
 
@@ -92,7 +92,7 @@ JCM::Boilerplate - Default Boilerplate for Joelle Maslak's Code
 
 =head1 VERSION
 
-version 2.190700
+version 2.202310
 
 =head1 SYNOPSIS
 
@@ -123,7 +123,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2019 by Joelle Maslak.
+This software is copyright (c) 2015-2020 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

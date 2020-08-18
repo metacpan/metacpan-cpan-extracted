@@ -1,0 +1,58 @@
+{
+   "abstract" : "deduce aviation information from parsed METAR data",
+   "author" : [
+      "Roland van Ipenburg <roland@rolandvanipenburg.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geo-METAR-Deduced",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.86",
+            "Test::NoWarnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Measure::Scientific::FX_992vb" : "0",
+            "Data::Dumper" : "0",
+            "English" : "0",
+            "Geo::ICAO" : "0",
+            "Geo::METAR" : "0",
+            "Log::Log4perl" : "0",
+            "Moose" : "0",
+            "MooseX::NonMoose" : "0",
+            "Readonly" : "1.03",
+            "Set::Scalar" : "0",
+            "perl" : "v5.16.0"
+         }
+      }
+   },
+   "provides" : {
+      "Geo::METAR::Deduced" : {
+         "file" : "lib/Geo/METAR/Deduced.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

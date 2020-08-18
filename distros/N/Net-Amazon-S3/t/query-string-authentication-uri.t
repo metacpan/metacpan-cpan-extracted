@@ -2,8 +2,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 2;
-use Test::Warnings;
+use Test::More tests => 3;
+use Test::Warnings qw[ :no_end_test had_no_warnings ];
 use Test::Deep;
 use Test::MockTime (
     qw[ set_fixed_time ],
@@ -41,3 +41,4 @@ expect_net_amazon_s3_feature "Signature V2 query_string_authentication_uri" => (
     expect_uri      => 'https://some-bucket.s3.amazonaws.com/some/key?AWSAccessKeyId=AKIDEXAMPLE&Expires=1315734360&Signature=YtOFhJwsOcNKz5xW7dF6TlrqZT0%3D',
 );
 
+had_no_warnings;

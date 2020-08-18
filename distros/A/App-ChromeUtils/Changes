@@ -1,3 +1,16 @@
+0.008   2020-08-18  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.007 and 0.007.1.
+
+
+0.007.1 2020-08-18  Released-By: PERLANCAR; Urgency: medium; Status: Cancelled
+
+	- [ux] [cli ps-chrome] Make text output saner.
+
+        - UPDATE 2020-08-18: rename release from 0.005 to 0.007.1 and cancel
+          release (duplicate).
+
+
 0.007   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utilities: start-chrome, restart-chrome,

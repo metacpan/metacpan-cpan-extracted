@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Perl's system() and readpipe/qx replacement, with options",
+  "ABSTRACT" => "Perl's system(), readpipe()/qx, IPC::Run's run(), start() (with more options)",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.337",
+  "VERSION" => "0.338",
   "test" => {
     "TESTS" => "t/*.t"
   }

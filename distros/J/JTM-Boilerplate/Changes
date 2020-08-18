@@ -1,3 +1,9 @@
+2.202310  2020-08-18 16:22:33+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.net>
+ * Enable "no feature qw(indirect)" on 5.32+
+ * Enable isa operator on 5.32+
+ * Upgrade required version of Parallel::WorkUnit
+
 2.190700  2019-03-11 14:11:06-06:00 America/Denver
  Joelle Maslak <jmaslak@antelope.net>
  * Remove Net::LDAP and Mail::Sender

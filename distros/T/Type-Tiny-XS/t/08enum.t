@@ -21,7 +21,7 @@ the same terms as the Perl 5 programming language system itself.
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More;
 
 use_ok('Type::Tiny::XS');
 
@@ -38,3 +38,19 @@ ok !$check->({})                            => 'no {}';
 ok !$check->([])                            => 'no []';
 ok !$check->("")                            => 'no ""';
 ok !$check->(undef)                         => 'no undef';
+
+if ( eval { require Type::Parser } ) {
+	my $quoted_check = Type::Tiny::XS::get_coderef_for('Enum["a b", "c, d", "-\""]');
+	
+	ok  $quoted_check->("a b")                         => 'yes "a b"';
+	ok  $quoted_check->("c, d")                        => 'yes "c, d"';
+	ok  $quoted_check->("-\"")                         => 'yes "-\""';
+	ok !$quoted_check->("quux")                        => 'no "quux"';
+	ok !$quoted_check->("FOO")                         => 'no "FOO"';
+	ok !$quoted_check->({})                            => 'no {}';
+	ok !$quoted_check->([])                            => 'no []';
+	ok !$quoted_check->("")                            => 'no ""';
+	ok !$quoted_check->(undef)                         => 'no undef';
+}
+
+done_testing;

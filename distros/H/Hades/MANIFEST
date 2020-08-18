@@ -8,6 +8,7 @@ t/00-load.t
 t/01-idea.t
 t/02-attributes.t
 t/03-subs.t
+t/04-test.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

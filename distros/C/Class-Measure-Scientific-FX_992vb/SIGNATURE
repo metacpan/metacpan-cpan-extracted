@@ -1,0 +1,66 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 6cf0926d0fe8ba365682a955e55a57f288ca74a7a2f6cfffcdf8cb4d18af742e Build.PL
+SHA256 ae074f38850bf2011c0f87248d2e8f56a0f2a1a177c68664ba10458f6f4dc423 CONTRIBUTING
+SHA256 31359409c19d4277a34660e5238d37ece0155079fceb6efdd1e3bdfbff9c74a7 Changes
+SHA256 3833746a2f7b6af7f92049ef727687770b442148b8c5cfb3f871afd18fbadc9e MANIFEST
+SHA256 375c6be91fec97910fb275f2633575dc33f2d6061df5161e784647d9a7499412 META.json
+SHA256 dc8502b58ee61bfd242e374a7ba43bf41bbc24a7bb36c99527dd729d7027c75f META.yml
+SHA256 20e97310e17e6ce5959e9791a4a3bd46e9f3e23e193f5d08de37b45405850d53 README
+SHA256 a39777f445529a95297157c00e026f07142e7c723cda79dd71067fe02bce9cdf lib/Class/Measure/Scientific/FX_992vb.pm
+SHA256 0b4f424e265f760793ac4eef8bffd58c9629193a7226d26a91694f65daa347ad t/00_base.t
+SHA256 f4576a0c623861ea1dd376eee888b2b47d067a2b6af0d8d2ecf1db632596a1a3 t/00_signature.t
+SHA256 048cbb8ea04eb01156945eec8d0b141e94116fde3d8dfd63ff0d71e59d9e0046 t/01_acceleration.t
+SHA256 398cae46786168dac5ce4077a37f45d6c7a5f57ca5a017d9321421867a845250 t/01_angle.t
+SHA256 21208d749e446019c1464e8ad22cb9e6a92ba494a7a5b8e71e393473980a8d40 t/01_area.t
+SHA256 f2500c60d6258699f1424ef8b15f872f823a68d8b8dc31a4f8e108391f45082e t/01_duration.t
+SHA256 bb08b14f263f75f384cea60d29ccc147eca843a2f30588bda2c03c58c6eaf048 t/01_energy.t
+SHA256 a4653e2f456b67888c51c5eb96987fb78e531c173f03c7c784f8b3ad772dbe95 t/01_force.t
+SHA256 e1ed52e85c8e85084d2502d617b02615bde5b10b688fa7f881fc852e997bf4c7 t/01_length.t
+SHA256 6073ea79d48e3faa59ea7ceb8c4995f4907657d3e10a600cbe480a9c0d53ef36 t/01_mass.t
+SHA256 d5ad80063d363539c635db813f533e24c4f2b1f9de496ab3f67c2e8b7045bdeb t/01_misc.t
+SHA256 d059dab26fdb3bf9c03d2e0e2d4cf9fe063a72a7591e0633337a552db66e83fc t/01_power.t
+SHA256 d0c06f9b919ebf4991aa534df39180e95afdb84ee919c577f5f55b0ab59b3214 t/01_pressure.t
+SHA256 7fab8843c138fb61085aaa51f86165050af5910d47da33589148a2c564a62a51 t/01_speed.t
+SHA256 c537d0c69380772263248f84e2399fe88dce808df661bd8a7f3fc0a023a8df50 t/01_temperature.t
+SHA256 35ba37adf3383f3b32f5dfc1774fa58489e0fcaceb3d3d68be5511d8d7c162ac t/01_volume.t
+SHA256 caece4cb6d37fc4737287ea6518b6a7749ae8fa66126e38d110b602b7c0f5258 t/02_dimensionless.t
+SHA256 d05d3eb928b0edeb1f955a2d6c9fda7b55927f0da4bc18ccbb9fbd54a0a009c7 t/03_cross_unit.t
+SHA256 c3a2eab123d9463e0ae0346e18672af63d490a3a1493108ab40cbecf19451cb2 t/04_const.t
+SHA256 216c6017ba4913411d6f6d6e5118331664e7c3d39277f1a4427931c6012fd3bb t/09_pod.t
+SHA256 ca7604762403cfcf9250a3bf2234b679b264e95a49e349da0f7592c62a5db306 t/10_pod-coverage.t
+SHA256 956bf75a7fa9e610d9755ae6585d75d6c7589ed8e1f7903d8e7e710a7634f609 t/11_test-coverage.t
+SHA256 96857f752432cd16222745f8770ab0f4d20c32ca899a690171cbf6fa70154edf t/12_manifest.t
+SHA256 7cbfc2dca7eff42003c59963070c58eb4f041ba6e0dcfeb7ed67aded2f7d0b5a t/13_critic.t
+SHA256 c82c20e83b98d9cb542f307a8daa889fe7ac86bf3a7a12f54525abdb403c9b64 t/14_kwalitee.t
+SHA256 75e58e2c4055cd2ced251a5e2a6386288e6141d1b1e4095706c6c520cf9f20a0 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEvYf4QHPIBtxYypUK0CoozoF5mv8FAl87nE0ACgkQ0CoozoF5
+mv8ZyQ//Sj4pH2cILwriHFUAWI5UWAZy9o9Z24u3NF7bulvqzhdMr5Vo5pxlD0Qq
+cBHifhZ06zQiD+4Esa/XR33AMhRqckCDfzEWWPFHqFDeJX/fBHaX4VKZA3KwcRIe
+PRr/+jhPmli+6KM6B/x9p6lHbGtmuQvblPiTNLtbSxgeVqxpMhXZbI8r/GnYnL4u
+zo/1Tzh0IHGaGR+ExRcchYRfD3RNnvcl6KH/RT8F/qNGHu2u5PKwsB0mGYBrxC2a
+KjVGWC8p5yP/AY0HBAU1kRirN4wD16wfvATyOsRZt71MM61QvqWNhs3TBzXXZos9
+qVd/mZnaoEZoSQEzfaHIVnk+QiK6noVm8LbCewMY2PBZhD1dy7qvR+fWEBylB4zO
+0sG5CKW3BpmcTqk9iP5wz2V+0zyDfFqsZNtJQa90xO5a3cOX3e+jdmy4h5sWp2ME
+h3qqc/qrEEtgcdy5q95q2SoMOWe71bJlwidSfvpp1YHNxWnVyenX/w5o+Uqzou+M
+HQ7tQR4scHbn7IR6/uSHzv6mjACWe+vBDMbRxd5eyJQXD+BdoZaWJd4zNI/Tuec/
+H1doXPf8mzHhdR/NrY3wNm1K9mtUenirky/kghb+vhhoZxpNTPeiAg7VQ38qV9O1
+4e9xi6PfFEXAgZL2AE3162etv3EpmuJyx5e+J0RsbCk/wTNPtJk=
+=MWDq
+-----END PGP SIGNATURE-----

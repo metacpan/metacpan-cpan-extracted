@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Bucket;
-$Net::Amazon::S3::Bucket::VERSION = '0.89';
+$Net::Amazon::S3::Bucket::VERSION = '0.90';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Carp;
@@ -14,7 +14,9 @@ has 'region' => (
     is => 'ro',
     lazy => 1,
     predicate => 'has_region',
-    default => sub { $_[0]->_head_region },
+    default => sub {
+		return $_[0]->account->vendor->guess_bucket_region ($_[0]);
+	},
 );
 
 __PACKAGE__->meta->make_immutable;
@@ -433,7 +435,7 @@ Net::Amazon::S3::Bucket - convenience object for working with Amazon S3 buckets
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 SYNOPSIS
 

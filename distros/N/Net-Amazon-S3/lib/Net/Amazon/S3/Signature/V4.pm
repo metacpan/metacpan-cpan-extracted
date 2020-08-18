@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Signature::V4;
 # ABSTRACT: V4 signatures
-$Net::Amazon::S3::Signature::V4::VERSION = '0.89';
+$Net::Amazon::S3::Signature::V4::VERSION = '0.90';
 use Moose;
 
 use Net::Amazon::S3::Signature::V4Implementation;
@@ -34,19 +34,13 @@ sub redirect_handler {
     return $request;
 }
 
-sub _bucket_region {
-    my ($self) = @_;
-
-    return $self->http_request->region;
-}
-
 sub _sign {
     my ($self, $region) = @_;
 
     return Net::Amazon::S3::Signature::V4Implementation->new(
         $self->http_request->s3->aws_access_key_id,
         $self->http_request->s3->aws_secret_access_key,
-        $region || $self->_bucket_region,
+        $region || $self->http_request->region,
         's3',
     );
 }
@@ -73,11 +67,7 @@ sub sign_request {
         $request->header( $Net::Amazon::S3::Signature::V4Implementation::X_AMZ_CONTENT_SHA256 => $sha->hexdigest );
     }
 
-    unless ($request->header ('x-amz-security-token')) {
-        my $aws_session_token = $self->http_request->s3->aws_session_token;
-        $request->header ('x-amz-security-token' => $aws_session_token)
-            if defined $aws_session_token;
-    }
+	$self->_append_authorization_headers ($request);
 
     my $sign = $self->_sign( $region );
     $self->_host_to_region_host( $sign, $request );
@@ -89,11 +79,7 @@ sub sign_request {
 sub sign_uri {
     my ($self, $request, $expires_at) = @_;
 
-    unless ($request->uri->query_param('x-amz-security-token')) {
-        my $aws_session_token = $self->http_request->s3->aws_session_token;
-        $request->uri->query_param('x-amz-security-token' => $aws_session_token)
-            if defined $aws_session_token;
-    }
+	$self->_append_authorization_query_params ($request);
 
     my $sign = $self->_sign;
     $self->_host_to_region_host( $sign, $request );
@@ -115,7 +101,7 @@ Net::Amazon::S3::Signature::V4 - V4 signatures
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 AUTHOR
 

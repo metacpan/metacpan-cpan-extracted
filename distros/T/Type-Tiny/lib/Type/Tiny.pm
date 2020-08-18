@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY   = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION     = '1.010003';
+	$Type::Tiny::VERSION     = '1.010004';
 	$Type::Tiny::XS_VERSION  = '0.016';
 }
 
@@ -2204,7 +2204,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<The Type::Tiny homepage|http://typetiny.toby.ink/>.
+L<The Type::Tiny homepage|https://typetiny.toby.ink/>.
 
 L<Type::Tiny::Manual>, L<Type::API>.
 

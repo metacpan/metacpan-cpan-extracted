@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3::Client;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::Client::VERSION = '0.89';
+$Shared::Examples::Net::Amazon::S3::Client::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -29,6 +29,8 @@ our @EXPORT_OK = (
     qw[ expect_client_object_fetch ],
 );
 
+*with_fixture = *Shared::Examples::Net::Amazon::S3::with_fixture;
+
 sub _exporter_expand_sub {
     my ($self, $name, $args, $globals) = @_;
 
@@ -52,29 +54,12 @@ sub _default_with_api {
 }
 
 sub _mock_http_response {
-    my ($self, %params) = @_;
+    my ($self, $api, %params) = @_;
 
-    $params{with_response_code} ||= HTTP::Status::HTTP_OK;
-
-    my %headers = (
-        content_type => 'application/xml',
-        %{ $params{with_response_headers} || {} },
-    );
-
-    my $guard = Sub::Override->new;
-    $guard->replace (
-        'Net::Amazon::S3::Client::_send_request_raw' => sub {
-            ${ $params{into} } = $_[1];
-            HTTP::Response->new (
-                $params{with_response_code},
-                HTTP::Status::status_message ($params{with_response_code}),
-                [ %headers ],
-                $params{with_response_data},
-            ),
-        }
-    );
-
-    $guard;
+    Shared::Examples::Net::Amazon::S3->s3_api_mock_http_response (
+        $api->s3,
+        %params,
+    )
 }
 
 sub expect_signed_uri {
@@ -224,7 +209,7 @@ Shared::Examples::Net::Amazon::S3::Client - used for testing and as example
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 AUTHOR
 

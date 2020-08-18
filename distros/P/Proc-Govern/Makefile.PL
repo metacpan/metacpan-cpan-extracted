@@ -21,14 +21,11 @@ my %WriteMakefileArgs = (
   "NAME" => "Proc::Govern",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
-    "File::Write::Rotate" => "0.29",
     "Getopt::Long" => "2.50",
     "IPC::Run" => 0,
     "IPC::Run::Patch::Setuid" => "0.003",
-    "Log::ger" => "0.027",
-    "Proc::PID::File" => "1.27",
+    "Log::ger" => "0.037",
     "Time::HiRes" => 0,
-    "Unix::Uptime" => "0.400",
     "strict" => 0,
     "warnings" => 0
   },
@@ -38,7 +35,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.209",
+  "VERSION" => "0.211",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,17 +45,14 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Exporter" => "5.57",
   "File::Spec" => 0,
-  "File::Write::Rotate" => "0.29",
   "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "IPC::Run" => 0,
   "IPC::Run::Patch::Setuid" => "0.003",
-  "Log::ger" => "0.027",
-  "Proc::PID::File" => "1.27",
+  "Log::ger" => "0.037",
   "Test::More" => "0.98",
   "Time::HiRes" => 0,
-  "Unix::Uptime" => "0.400",
   "strict" => 0,
   "warnings" => 0
 );

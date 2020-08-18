@@ -1,9 +1,9 @@
 package App::BrowserUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-19'; # DATE
+our $DATE = '2020-08-18'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -19,18 +19,55 @@ $SPEC{':package'} = {
 
 our %browsers = (
     firefox => {
-        # in some OS like linux the binary is firefox-bin, while in some other
-        # like FreeBSD, it's firefox.
-        browser_fname_pat => qr/\A(Web Content|WebExtensions|firefox-bin|firefox)\z/,
+        filter => sub {
+            my $p = shift;
+            # in some OS like linux the binary is firefox-bin, while in some
+            # other like FreeBSD, it's firefox.
+            do { $p->{_note} = "exec is firefox or firefox-bin"; goto FOUND } if defined $p->{exec} && $p->{exec} =~ m![/\\](firefox-bin|firefox)\z!;
+            do { $p->{_note} = "fname looks like firefox"; goto FOUND } if $p->{fname} =~ /\A(Web Content|WebExtensions|firefox-bin|firefox)\z/;
+            goto NOT_FOUND;
+          FOUND:
+            log_trace "Found firefox process (PID=%d, cmdline=%s, note=%s)", $p->{pid}, $p->{cmndline}, $p->{_note};
+            return 1;
+          NOT_FOUND:
+            0;
+        },
     },
     chrome => {
-        browser_fname_pat => qr/\A(chrome)\z/,
+        filter => sub {
+            my $p = shift;
+            do { $p->{_note} = "fname looks like chrome"; goto FOUND } if $p->{fname} =~ /\A(chrome)\z/;
+            goto NOT_FOUND;
+          FOUND:
+            log_trace "Found firefox process (PID=%d, cmdline=%s, note=%s)", $p->{pid}, $p->{cmndline}, $p->{_note};
+            return 1;
+          NOT_FOUND:
+            0;
+        },
     },
     opera => {
-        browser_fname_pat => qr/\A(opera)\z/,
+        filter => sub {
+            my $p = shift;
+            do { $p->{_note} = "fname looks like opera"; goto FOUND } if $p->{fname} =~ /\A(opera)\z/;
+            goto NOT_FOUND;
+          FOUND:
+            log_trace "Found opera process (PID=%d, cmdline=%s, note=%s)", $p->{pid}, $p->{cmndline}, $p->{_note};
+            return 1;
+          NOT_FOUND:
+            0;
+        },
     },
     vivaldi => {
-        browser_fname_pat => qr/\A(vivaldi-bin)\z/,
+        filter => sub {
+            my $p = shift;
+            do { $p->{_note} = "fname looks like vivaldi"; goto FOUND } if $p->{fname} =~ /\A(vivaldi-bin)\z/;
+            goto NOT_FOUND;
+          FOUND:
+            log_trace "Found vivaldi process (PID=%d, cmdline=%s, note=%s)", $p->{pid}, $p->{cmndline}, $p->{_note};
+            return 1;
+          NOT_FOUND:
+            0;
+        },
     },
 );
 
@@ -138,27 +175,33 @@ sub _do_browser {
 
     my ($which_action, $which_browser, %args) = @_;
 
-    my $browser_fname_pat = $browsers{$which_browser}{browser_fname_pat}
+    my $browser_fname_pat = $browsers{$which_browser}{filter}
         or return [400, "Unknown browser '$which_browser'"];
 
     my $procs = Proc::Find::find_proc(
         detail => 1,
-        filter => sub {
-            my $p = shift;
-
-            if ($args{users} && @{ $args{users} }) {
-                return 0 unless grep { $p->{uid} == $_ } @{ $args{users} };
-            }
-            return 0 unless $p->{fname} =~ $browser_fname_pat;
-            log_trace "Found PID %d (cmdline=%s, fname=%s, uid=%d)", $p->{pid}, $p->{cmndline}, $p->{fname}, $p->{uid};
-            1;
-        },
+        filter => $browsers{$which_browser}{filter},
     );
 
     my @pids = map { $_->{pid} } @$procs;
 
     if ($which_action eq 'ps') {
-        return [200, "OK", $procs, {'table.fields'=>[qw/pid uid euid state/]}];
+        if ($args{-cmdline_r} && (!defined($args{-cmdline_r}{format}) ||
+                $args{-cmdline_r}{format} =~ /text/)) {
+            # convert arrayrefs etc so the result can still be rendered as
+            # simple 2d table
+            for my $proc (@$procs) {
+                # too big
+                delete $proc->{environ};
+                delete $proc->{cmndline}; # duplicate info with cmdline
+
+                for my $key (keys %$proc) {
+                    $proc->{$key} = join(" ", @{ $proc->{$key} })
+                        if ref $proc->{$key} eq 'ARRAY';
+                }
+            }
+        }
+        return [200, "OK", $procs, {'table.fields'=>[qw/pid uid euid state cmdline/]}];
     } elsif ($which_action eq 'pause') {
         kill STOP => @pids;
         [200, "OK", "", {"func.pids" => \@pids}];
@@ -223,7 +266,7 @@ sub ps_browsers {
     for my $browser (sort keys %browsers) {
         my $res = _do_browser('ps', $browser, %args);
         return $res unless $res->[0] == 200;
-        push @rows, @{$res->[2]};
+        push @rows, @{$res->[2]}; # XXX remove duplicate?
     }
     [200, "OK", \@rows];
 }
@@ -555,7 +598,7 @@ App::BrowserUtils - Utilities related to browsers, particularly modern GUI ones
 
 =head1 VERSION
 
-This document describes version 0.009 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2020-07-19.
+This document describes version 0.010 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2020-08-18.
 
 =head1 SYNOPSIS
 

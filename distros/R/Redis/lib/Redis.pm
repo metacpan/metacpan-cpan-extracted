@@ -8,7 +8,7 @@
 #   The Artistic License 2.0 (GPL Compatible)
 #
 package Redis;
-$Redis::VERSION = '1.997';
+$Redis::VERSION = '1.998';
 # ABSTRACT: Perl binding for Redis database
 # VERSION
 # AUTHORITY
@@ -925,7 +925,7 @@ Redis - Perl binding for Redis database
 
 =head1 VERSION
 
-version 1.997
+version 1.998
 
 =head1 SYNOPSIS
 

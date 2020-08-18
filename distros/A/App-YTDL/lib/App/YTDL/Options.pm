@@ -77,6 +77,7 @@ sub get_defaults {
         list_sort_item               => 'upload_date',
         max_info_width               => 120,
         max_processes                => 5,
+        max_rows_description         => 3,
         max_size_history             => 50,
         no_height_ok                 => 1,
         no_warnings                  => 0,
@@ -133,8 +134,9 @@ sub _groups {
             [ 'timeout',    "- Timeout"          ],
         ],
         group_output => [
-            [ 'no_warnings',    "- Disable warnings" ],
-            [ 'max_info_width', "- Max info width"   ],
+            [ 'no_warnings',          "- Disable warnings" ],
+            [ 'max_info_width',       "- Max info width"   ],
+            [ 'max_rows_description', "- Max rows of description" ],
         ],
         group_history => [
             [ 'max_size_history',          "- Size history" ],
@@ -386,6 +388,12 @@ sub set_options {
             elsif ( $key eq "max_info_width" ) {
                 my $digits = 3;
                 my $info = sprintf "Max Info width\nNow: %${digits}s", insert_sep( $opt->{$key} );
+                my $name = 'New: ';
+                _opt_number_range( $set, $opt, $key, $name, $info, $digits );
+            }
+            elsif ( $key eq "max_rows_description" ) {
+                my $digits = 2;
+                my $info = sprintf "Max Rows of description\nNow: %${digits}s", insert_sep( $opt->{$key} );
                 my $name = 'New: ';
                 _opt_number_range( $set, $opt, $key, $name, $info, $digits );
             }

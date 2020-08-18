@@ -1,3 +1,10 @@
+0.002   2020-08-04  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Add dzil and Pod::Weaver plugin 'perlmv'.
+
+
 0.001   2020-08-03  Released-By: PERLANCAR
 
         - First release.

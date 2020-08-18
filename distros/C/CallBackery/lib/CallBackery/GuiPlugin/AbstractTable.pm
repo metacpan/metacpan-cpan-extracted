@@ -144,14 +144,27 @@ sub makeExportAction {
                 firstRow => 0,
                 lastRow => $self->getTableRowCount($args)
             });
-            my @titles = map {$_->{key}} @{$self->tableCfg};
+
+            # Use the (translated) table headers in row 1.
+            # Or the keys if undefined.
+            my $loc = CallBackery::Translate->new(localeRoot=>$self->app->home->child("share"));
+            $loc->setLocale($self->user->userInfo->{lang} // 'en');
+            my @titles = map {
+                $_->{label}
+                    ? ((ref $_->{label} eq 'CallBackery::Translate')
+                        ? $loc->tra($_->{label}[0])
+                        : $_->{label})
+                    : $_->{key};
+            } @{$self->tableCfg};
+
+            my @keys = map {$_->{key}} @{$self->tableCfg};
 
             if ($type eq 'CSV') {
                 my $csv = Text::CSV->new;
                 $csv->combine(@titles);
                 my $csv_str = $csv->string . "\n";
                 for my $record (@$data) {
-                    $csv->combine(map {$record->{$_}} @titles);
+                    $csv->combine(map {$record->{$_}} @keys);
                     $csv_str .= $csv->string . "\n";
                 }
                 my $asset = Mojo::Asset::Memory->new;
@@ -173,7 +186,7 @@ sub makeExportAction {
                 my $row = 2;
                 for my $record (@$data) {
                     $col = 0;
-                    map {$worksheet->write($row, $col, $record->{$_}); $col++} @titles;
+                    map {$worksheet->write($row, $col, $record->{$_}); $col++} @keys;
                     $row++;
                 }
 

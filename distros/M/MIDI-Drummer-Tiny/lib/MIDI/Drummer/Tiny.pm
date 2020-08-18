@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.1100';
+our $VERSION = '0.1101';
 
 use Moo;
 use MIDI::Simple;
@@ -179,6 +179,38 @@ sub metronome58 {
 }
 
 
+sub metronome74 {
+    my $self = shift;
+    my $bars = shift || $self->bars;
+    for my $n (1 .. $bars) {
+        $self->note($self->quarter, $self->closed_hh, $self->kick);
+        $self->note($self->quarter, $self->closed_hh);
+        $self->note($self->quarter, $self->closed_hh, $self->snare);
+        $self->note($self->eighth, $self->closed_hh);
+        $self->note($self->eighth, $self->kick);
+        $self->note($self->quarter, $self->closed_hh, $self->kick);
+        $self->note($self->quarter, $self->closed_hh, $self->snare);
+        $self->note($self->quarter, $self->closed_hh);
+    }
+}
+
+
+sub metronome78 {
+    my $self = shift;
+    my $bars = shift || $self->bars;
+    for my $n (1 .. $bars) {
+        $self->note($self->eighth, $self->closed_hh, $self->kick);
+        $self->note($self->eighth, $self->closed_hh);
+        $self->note($self->eighth, $self->closed_hh);
+        $self->note($self->sixteenth, $self->closed_hh, $self->kick);
+        $self->note($self->sixteenth, $self->kick);
+        $self->note($self->eighth, $self->closed_hh, $self->snare);
+        $self->note($self->eighth, $self->closed_hh);
+        $self->note($self->eighth, $self->closed_hh);
+    }
+}
+
+
 sub set_time_sig {
     my $self = shift;
     my $signature = shift || $self->signature;
@@ -223,7 +255,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.1100
+version 0.1101
 
 =head1 SYNOPSIS
 
@@ -435,6 +467,20 @@ Add a 5/4 beat to the score.
   $d->metronome58($bars);
 
 Add a 5/8 beat to the score.
+
+=head2 metronome74
+
+  $d->metronome74;
+  $d->metronome74($bars);
+
+Add a 7/4 beat to the score.
+
+=head2 metronome78
+
+  $d->metronome78;
+  $d->metronome78($bars);
+
+Add a 7/8 beat to the score.
 
 =head2 set_time_sig
 

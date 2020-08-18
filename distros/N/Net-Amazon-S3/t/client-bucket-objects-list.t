@@ -2,29 +2,18 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 6;
+use Test::More tests => 7;
 use Test::Deep;
-use Test::Warnings;
+use Test::Warnings qw[ :no_end_test had_no_warnings ];
 
 use Shared::Examples::Net::Amazon::S3::Client (
+    qw[ with_response_fixture ],
     qw[ expect_client_bucket_objects_list ],
-);
-
-use Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::List (
-    qw[ list_bucket_objects_v1 ],
-    qw[ list_bucket_objects_v1_with_filter ],
-    qw[ list_bucket_objects_v1_with_delimiter ],
-    qw[ list_bucket_objects_v1_with_prefix_and_delimiter ],
-);
-
-use Shared::Examples::Net::Amazon::S3::Error (
-    qw[ fixture_error_access_denied ],
-    qw[ fixture_error_no_such_bucket ],
 );
 
 expect_client_bucket_objects_list 'list objects (version 1)' => (
     with_bucket             => 'some-bucket',
-    with_response_data      => list_bucket_objects_v1,
+    with_response_fixture ('response::bucket_objects_list_v1'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?max-keys=1000' },
     expect_data             => methods (get_more => [
         all (
@@ -49,7 +38,7 @@ expect_client_bucket_objects_list 'list objects (version 1)' => (
 expect_client_bucket_objects_list 'list objects with filters (version 1)' => (
     with_bucket             => 'some-bucket',
     # truncated is not supported by shared examples yet (multiple requests => client reads while is truncated)
-    with_response_data      => list_bucket_objects_v1_with_filter,
+    with_response_fixture ('response::bucket_objects_list_v1_with_filter'),
     with_prefix             => 'N',
     with_marker             => 'Ned',
     with_max_keys           => 40,
@@ -77,7 +66,7 @@ expect_client_bucket_objects_list 'list objects with filters (version 1)' => (
 # Client doesn't support common prefixes
 expect_client_bucket_objects_list 'list objects with delimiter (version 1)' => (
     with_bucket             => 'some-bucket',
-    with_response_data      => list_bucket_objects_v1_with_delimiter,
+    with_response_fixture ('response::bucket_objects_list_v1_with_delimiter'),
     with_delimiter          => '/',
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?delimiter=%2F&max-keys=1000' },
     expect_data             => methods (get_more => [
@@ -95,7 +84,7 @@ expect_client_bucket_objects_list 'list objects with delimiter (version 1)' => (
 # Client doesn't support common prefixes
 expect_client_bucket_objects_list 'list objects with prefix and delimiter (version 1)' => (
     with_bucket             => 'some-bucket',
-    with_response_data      => list_bucket_objects_v1_with_prefix_and_delimiter,
+    with_response_fixture ('response::bucket_objects_list_v1_with_prefix_and_delimiter'),
     with_delimiter          => '/',
     with_prefix             => 'photos/2006/',
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?delimiter=%2F&max-keys=1000&prefix=photos%2F2006%2F' },
@@ -104,7 +93,7 @@ expect_client_bucket_objects_list 'list objects with prefix and delimiter (versi
 
 expect_client_bucket_objects_list 'error access denied' => (
     with_bucket             => 'some-bucket',
-    fixture_error_access_denied,
+    with_response_fixture ('error::access_denied'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?max-keys=1000' },
     expect_data             => code(sub {
         return 0, "expect throw but lives" if eval { $_[0]->get_more; 1 };
@@ -116,7 +105,7 @@ expect_client_bucket_objects_list 'error access denied' => (
 
 expect_client_bucket_objects_list 'error no such bucket' => (
     with_bucket             => 'some-bucket',
-    fixture_error_no_such_bucket,
+    with_response_fixture ('error::no_such_bucket'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?max-keys=1000' },
     expect_data             => methods (get_more => undef),
     expect_data             => code(sub {
@@ -127,3 +116,4 @@ expect_client_bucket_objects_list 'error no such bucket' => (
     }),
 );
 
+had_no_warnings;

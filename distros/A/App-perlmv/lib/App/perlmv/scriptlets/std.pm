@@ -1,9 +1,9 @@
 package App::perlmv::scriptlets::std;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-03'; # DATE
+our $DATE = '2020-08-18'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.601'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use 5.010;
 use strict;
@@ -108,7 +108,7 @@ App::perlmv::scriptlets::std - A collection of perlmv scriptlets
 
 =head1 VERSION
 
-This document describes version 0.601 of App::perlmv::scriptlets::std (from Perl distribution App-perlmv), released on 2020-08-03.
+This document describes version 0.604 of App::perlmv::scriptlets::std (from Perl distribution App-perlmv), released on 2020-08-18.
 
 =head1 SCRIPTLETS
 

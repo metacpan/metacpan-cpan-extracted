@@ -2,8 +2,8 @@ NAME
     App::ChromeUtils - Utilities related to Google Chrome browser
 
 VERSION
-    This document describes version 0.007 of App::ChromeUtils (from Perl
-    distribution App-ChromeUtils), released on 2020-06-13.
+    This document describes version 0.008 of App::ChromeUtils (from Perl
+    distribution App-ChromeUtils), released on 2020-08-18.
 
 SYNOPSIS
 DESCRIPTION

@@ -1,3 +1,16 @@
+0.211   2020-08-18  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [incompatible change] Rename --restart to --restart-if-failed.
+
+        - [experimental] Add option --restart-if-no-output-after.
+
+
+0.210   2020-08-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Downgrade some deps from RuntimeRequires to RuntimeRecommends to
+	  make this distro slimmer.
+
+
 0.209   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update coerce rule names (Data::Sah::Coerce 0.034+).

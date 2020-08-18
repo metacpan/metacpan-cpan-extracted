@@ -1,6 +1,6 @@
 package Bio::MUST::Core::PostPred::Composition;
 # ABSTRACT: Posterior predictive test for compositional bias
-$Bio::MUST::Core::PostPred::Composition::VERSION = '0.202070';
+$Bio::MUST::Core::PostPred::Composition::VERSION = '0.202310';
 use Moose;
 use namespace::autoclean;
 
@@ -116,7 +116,7 @@ Bio::MUST::Core::PostPred::Composition - Posterior predictive test for compositi
 
 =head1 VERSION
 
-version 0.202070
+version 0.202310
 
 =head1 SYNOPSIS
 

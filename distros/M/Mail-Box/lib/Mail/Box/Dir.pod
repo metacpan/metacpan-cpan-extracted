@@ -378,6 +378,11 @@ Inherited, see L<Mail::Box/"Internals">
 
 Inherited, see L<Mail::Box/"Internals">
 
+=item $obj-E<gt>B<messageInFile>($filename)
+
+Returns the folder message which is found the indicated C<filename>.  This
+may be useful when some external tool reports filename to be opened.
+
 =item $obj-E<gt>B<read>(%options)
 
 Inherited, see L<Mail::Box/"Internals">
@@ -594,12 +599,12 @@ were changes made.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.008,
-built on October 04, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box distribution version 3.009,
+built on August 18, 2020. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2020 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

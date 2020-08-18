@@ -1,0 +1,92 @@
+
+=head1 NAME
+
+Log::Log4perl::OpenTracing - inject logs with OpenTracing SpanContext
+
+
+
+=head1 SYNOPSIS
+
+    use Log::Log4perl;
+    use Log::Log4perl::OpenTracing;
+    
+    my $config = q{
+        log4perl.rootLogger           = TRACE, json
+        log4perl.appender.json        = Log::Log4perl::Appender::File
+        log4perl.appender.json.layout = Log::Log4perl::Layout::JSON::Readable
+        log4perl.appender.json.layout.field.message  = %m{chomp}
+        log4perl.appender.json.layout.field.time     = %d
+        log4perl.appender.json.layout.field.trace-id = %O{opentracing.trace_id}
+        log4perl.appender.json.layout.field.span-id  = %O{opentracing.span_id}
+        log4perl.appender.json.layout.canonical      = 1
+        log4perl.appender.json.layout.first_fields   = time, trace-id, span-id
+    };
+    
+    Log::Log4perl::init( \$config );
+
+
+
+=head1 DESCRIPTION
+
+This module bridges the gap between Logging and OpenTracing. Some tracing
+backends are capable to correlate log-messages with spans and traces. This could
+be achieved by adding the span-id and the trace-id to the logfiles.
+
+This module introduces a new C<%O> (capital letter 'O') I<placeholder> that can
+be used with L<PatternLayout|Log::Log4perl::Layout::PatternLayout>s.
+
+The information that is availabale, depends on the implementation specific
+L<< C<inject_context>|OpenTracing::Interface::Tracer#inject_context >> method
+for a hash reference. Since OpenTracing has no control on what data is being
+exposed from that C<inject_context> method, nor what keys are used, or any data
+structures (like C<baggage_items>), this module uses a 'dotted' key syntax for
+nested data. Check with the specific implementation for what data is injected.
+
+
+
+=head1 CAVEAT
+
+This module uses L<Hash::Fold> to C<flatten> the data structure that come from
+C<inject_context>. That flettening may potentially lead to issues where data
+structures might lead to the same 'flattened' key if one would forge a structure
+that already has a C<.> (dot) in its keys.
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Interface::Tracer>
+
+A role that defines the Tracer interface.
+
+=item L<Log::Log4perl>
+
+Log4j implementation for Perl
+
+=back
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'Log::Log4perl::OpenTracing'
+is Copyright (C) 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+=cut

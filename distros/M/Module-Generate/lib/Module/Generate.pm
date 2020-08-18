@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -213,6 +213,12 @@ sub test {
 	return $self;
 }
 
+sub clear_tests {
+	my ($self) = @_;
+	$CLASS{CURRENT}{SUBS}{CURRENT}{TEST} = [];
+	return $self;
+}
+
 sub generate {
 	my ($self, %args) = @_;
 
@@ -231,10 +237,10 @@ sub generate {
 			email => 'email@lnation.org',
 			%{$args{DIST}}
 		);
-		$lib = "$lib/$distro/lib";
 		$tlib = "$lib/$distro/t";
+		$lib = "$lib/$distro/lib";
 	}
-
+	
 	for my $class (@classes) {
 		my $cls = _perl_tidy(
 			sprintf(
@@ -568,7 +574,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 

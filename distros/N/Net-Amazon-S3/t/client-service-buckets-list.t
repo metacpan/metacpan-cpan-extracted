@@ -2,25 +2,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 3;
+use Test::More tests => 4;
 use Test::Deep;
-use Test::Warnings;
+use Test::Warnings qw[ :no_end_test had_no_warnings ];
 
 use Shared::Examples::Net::Amazon::S3::Client (
+    qw[ with_response_fixture ],
     qw[ expect_client_list_all_my_buckets ],
 );
 
-use Shared::Examples::Net::Amazon::S3::Operation::Service::Buckets::List (
-    qw[ buckets_list_with_displayname ],
-    qw[ buckets_list_without_displayname ],
-);
-
-use Shared::Examples::Net::Amazon::S3::Error (
-    qw[ fixture_error_access_denied ],
-);
-
 expect_client_list_all_my_buckets 'list all my buckets with displayname' => (
-    with_response_data  => buckets_list_with_displayname,
+    with_response_fixture ('response::service_list_buckets_with_owner_displayname'),
     expect_request      => { GET => 'https://s3.amazonaws.com/' },
     expect_data         => [
         all (
@@ -39,7 +31,7 @@ expect_client_list_all_my_buckets 'list all my buckets with displayname' => (
 );
 
 expect_client_list_all_my_buckets 'list all my buckets without displayname' => (
-    with_response_data  => buckets_list_without_displayname,
+    with_response_fixture ('response::service_list_buckets_without_owner_displayname'),
     expect_request      => { GET => 'https://s3.amazonaws.com/' },
     expect_data         => [
         all (
@@ -58,8 +50,9 @@ expect_client_list_all_my_buckets 'list all my buckets without displayname' => (
 );
 
 expect_client_list_all_my_buckets 'list all my buckets without displayname' => (
-    fixture_error_access_denied,
+    with_response_fixture ('error::access_denied'),
     expect_request      => { GET => 'https://s3.amazonaws.com/' },
     throws              => qr/^AccessDenied: Access denied error message/,
 );
 
+had_no_warnings;

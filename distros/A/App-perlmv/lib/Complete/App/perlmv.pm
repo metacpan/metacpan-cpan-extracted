@@ -1,9 +1,9 @@
 package Complete::App::perlmv;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-03'; # DATE
+our $DATE = '2020-08-18'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.601'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use 5.010001;
 use strict;
@@ -62,7 +62,7 @@ Complete::App::perlmv - Completion routines related to App::perlmv
 
 =head1 VERSION
 
-This document describes version 0.601 of Complete::App::perlmv (from Perl distribution App-perlmv), released on 2020-08-03.
+This document describes version 0.604 of Complete::App::perlmv (from Perl distribution App-perlmv), released on 2020-08-18.
 
 =head1 FUNCTIONS
 

@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.411';
+our $VERSION = '0.412';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -49,10 +49,14 @@ END {
 }
 
 
-my ( $arg_file, $help );
-GetOptions( 'f|file=s@' => \$arg_file, 'h|?|help' => \$help )
+my ( $arg_file, $help, $version );
+GetOptions( 'f|file=s@' => \$arg_file, 'h|?|help' => \$help, 'v|version' => \$version )
 or pod2usage( -message => $!, -verbose => 99, -sections => "SYNOPSIS" );
 
+if ( $version ) {
+    say 'App::YTDL, version ' . $main::VERSION;
+    exit;
+}
 
 my $my_videos = File::HomeDir->my_videos || curdir; ##
 if ( ! -d $my_videos ) {
@@ -198,7 +202,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.411
+Version 0.412
 
 =cut
 
@@ -396,6 +400,12 @@ Ignore C<youtube-dl> warnings (I<--no-warnings>).
 =head3 Max info width
 
 Set the maximum width of the video info output.
+
+=head3 Max rows of descriptions
+
+Limit the rows of the description in the video info output.
+
+Setting this option to C<0> means no limit.
 
 =head2 Youtube-dl config file
 

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Ali::Stash;
 # ABSTRACT: Thin wrapper for an indexed Ali read from disk
-$Bio::MUST::Core::Ali::Stash::VERSION = '0.202070';
+$Bio::MUST::Core::Ali::Stash::VERSION = '0.202310';
 use Moose;
 use namespace::autoclean;
 
@@ -99,7 +99,7 @@ Bio::MUST::Core::Ali::Stash - Thin wrapper for an indexed Ali read from disk
 
 =head1 VERSION
 
-version 0.202070
+version 0.202310
 
 =head1 SYNOPSIS
 

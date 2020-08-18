@@ -46,8 +46,8 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: t/03positiveint.t
-Copyright: This software is copyright (c) 2014, 2018 by Toby Inkster.
+Files: dist.ini
+Copyright: Copyright 2014 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/gh8.t
@@ -58,8 +58,8 @@ Files: t/10bool.t
 Copyright: This software is copyright (c) 2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: dist.ini
-Copyright: Copyright 2014 Toby Inkster.
+Files: t/03positiveint.t
+Copyright: This software is copyright (c) 2014, 2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

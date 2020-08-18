@@ -1,3 +1,10 @@
+0.015   2020-08-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak/fix browser detection (via App::BrowserUtils 0.010).
+
+        - [ux] [cli ps-firefox] Make text output saner.
+
+
 0.014   2020-07-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump App::BrowserUtils to 0.009 (updated firefox's process name

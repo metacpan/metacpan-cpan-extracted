@@ -1,5 +1,13 @@
 Revision history for Perl module Net::Amazon::S3:
 
+0.90 2020-08-18 16:00 +0
+    - Support intelligent_tiering, glacier, and deep_archive storage classes
+	  (thanks Sherwin Daganato)
+	- Object availability predicate (thanks Emanuele Tomasi)
+	- fix default region handling (#77, #78, #80)
+    - new authentication context architecture
+	  See Net::Amazon::S3::Authorization::IAM for future incompatiblity warning
+
 0.89 Tue 11 Feb 2020 20:26:26
     - fix signature v4 test (Ali Zia)
 

@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '1.010003';
+	$Type::Params::VERSION   = '1.010004';
 }
 
 $Type::Params::VERSION =~ tr/_//d;
@@ -628,7 +628,7 @@ sub compile_named
 	}
 	
 	if ($options{head} || $options{tail}) {
-		$code[-1] = 'my @R = ' . $code[-1];
+		$code[-1] = 'my @R = ' . $code[-1] . ';';
 		push @code, 'unshift @R, @head;' if $options{head};
 		push @code, 'push @R, @tail;' if $options{tail};
 		push @code, '@R;';
@@ -1688,7 +1688,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<The Type::Tiny homepage|http://typetiny.toby.ink/>.
+L<The Type::Tiny homepage|https://typetiny.toby.ink/>.
 
 L<Type::Tiny>, L<Type::Coercion>, L<Types::Standard>.
 

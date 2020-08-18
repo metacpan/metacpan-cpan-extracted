@@ -1,3 +1,24 @@
+0.604   2020-08-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Make $PERLMV available to scriptlet.
+
+
+0.603   2020-08-04  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Use dzil and Pod::Weaver plugin 'perlmv'.
+
+
+0.602   2020-08-03  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Add 'use Getopt::Long::Complete' in script/perlmv et al so we
+	  can detect the script as using GLC and produce appropriate
+	  documentation.
+
+
 0.601   2020-08-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Allow specifying arguments for code (-a, --arg).

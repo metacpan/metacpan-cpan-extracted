@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Tree::VERSION = '0.202070';
+$Bio::MUST::Core::Tree::VERSION = '0.202310';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -259,7 +259,10 @@ sub store_itol_collapse {
 
             my $taxon    = $node->get_generic('taxon');
             my $collapse = $node->get_generic('taxon_collapse');
-            my @descendants = map { $_->get_name } @{ $node->get_terminals };
+            my @descendants = map { 
+                SeqId->new( full_id => $_->get_name )->foreign_id
+            } @{ $node->get_terminals };
+
             my $node_name
                 = @descendants > 1 ? $descendants[0] . '|' . $descendants[-1]
                 : $descendants[0]
@@ -541,7 +544,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.202070
+version 0.202310
 
 =head1 SYNOPSIS
 

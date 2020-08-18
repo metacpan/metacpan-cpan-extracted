@@ -1,5 +1,5 @@
 package Net::Amazon::S3::HTTPRequest;
-$Net::Amazon::S3::HTTPRequest::VERSION = '0.89';
+$Net::Amazon::S3::HTTPRequest::VERSION = '0.90';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use HTTP::Date;
@@ -49,19 +49,20 @@ has region => (
     default => sub { $_[0]->bucket->region },
 );
 
+has request_uri => (
+    is => 'ro',
+    init_arg => undef,
+    lazy => 1,
+    builder => '_build_uri',
+);
+
 __PACKAGE__->meta->make_immutable;
 
-# make the HTTP::Request object
-sub _build_request {
-    my $self     = shift;
+sub _build_uri {
+    my ($self) = @_;
 
-    my $method   = $self->method;
-    my $path     = $self->path;
-    my $headers  = $self->headers;
-    my $content  = $self->content;
-    my $metadata = $self->metadata;
+    my $path = $self->path;
 
-    my $http_headers = $self->_merge_meta( $headers, $metadata );
     my $protocol = $self->s3->secure ? 'https' : 'http';
     my $host = $self->s3->host;
     my $uri = "$protocol://$host/$path";
@@ -71,6 +72,21 @@ sub _build_request {
         # see http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html
         $uri =~ s{$host/(.*?)/}{$1.$host/};
     }
+
+    return $uri;
+}
+
+# make the HTTP::Request object
+sub _build_request {
+    my $self     = shift;
+
+    my $method   = $self->method;
+    my $headers  = $self->headers;
+    my $content  = $self->content;
+    my $metadata = $self->metadata;
+
+    my $http_headers = $self->_merge_meta( $headers, $metadata );
+    my $uri          = $self->request_uri;
 
     return HTTP::Request->new( $method, $uri, $http_headers, $content );
 }
@@ -125,7 +141,7 @@ Net::Amazon::S3::HTTPRequest - Create a signed HTTP::Request
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 SYNOPSIS
 

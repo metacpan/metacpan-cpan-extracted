@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.186';
+our $VERSION = '1.187';
 
 use Quiq::Json;
 use Quiq::Template;
@@ -16,7 +16,7 @@ use Quiq::Template;
 
 =head1 NAME
 
-Quiq::PlotlyJs::TimeSeries - Erzeuge Zeitreihen-Plot auf Basis von Plotly.js
+Quiq::PlotlyJs::TimeSeries - Zeitreihen-Plot auf Basis von Plotly.js
 
 =head1 BASE CLASS
 
@@ -631,7 +631,7 @@ sub js {
 
 =head1 VERSION
 
-1.186
+1.187
 
 =head1 AUTHOR
 

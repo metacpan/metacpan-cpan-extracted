@@ -1,7 +1,6 @@
-#package Net::Amazon::Signature::V4;
 package Net::Amazon::S3::Signature::V4Implementation;
 # ABSTRACT: Implements the Amazon Web Services signature version 4, AWS4-HMAC-SHA256 (copy of Net::Amazon::Signature::V4)
-
+$Net::Amazon::S3::Signature::V4Implementation::VERSION = '0.90';
 
 use strict;
 use warnings;
@@ -23,9 +22,6 @@ our $X_AMZ_DATE           = 'X-Amz-Date';
 our $X_AMZ_EXPIRES        = 'X-Amz-Expires';
 our $X_AMZ_SIGNEDHEADERS  = 'X-Amz-SignedHeaders';
 our $X_AMZ_SIGNATURE      = 'X-Amz-Signature';
-
-
-our $VERSION = '0.19';
 
 
 
@@ -229,7 +225,6 @@ sub _authorization {
 
 }
 
-
 sub _simplify_uri {
 	my $orig_uri = shift;
 	my @parts = split /\//, $orig_uri;
@@ -300,8 +295,7 @@ sub _req_timepiece {
 	return _str_to_timepiece($date);
 }
 
-
-1; # End of Net::Amazon::Signature::V4
+1;
 
 __END__
 
@@ -315,32 +309,21 @@ Net::Amazon::S3::Signature::V4Implementation - Implements the Amazon Web Service
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-This module signs an HTTP::Request to Amazon Web Services by appending an Authorization header. Amazon Web Services signature version 4, AWS4-HMAC-SHA256, is used.
+This package clones L<Net::Amazon::Signature::V4> 0.19 adding support for
+signing URIs (GET request)
 
-    use Net::Amazon::Signature::V4;
+Until https://github.com/Grinnz/Net-Amazon-Signature-V4/pull/5 will be merged
+we have to maintain our clone.
 
-    my $sig = Net::Amazon::Signature::V4->new( $access_key_id, $secret, $endpoint, $service );
-    my $req = HTTP::Request->parse( $request_string );
-    my $signed_req = $sig->sign( $req );
-    ...
+=head1 Net::Amazon::Signature::S4 AUTHORS
 
-The primary purpose of this module is to be used by Net::Amazon::Glacier.
+Tim Nordenfur, C<< <tim at gurka.se> >>
 
-=head1 VERSION
-
-Version 0.19
-
-=head1 METHODS
-
-=head2 new( $access_key_id, $secret, $endpoint, $service )
-
-Constructs the signature object, which is used to sign requests.
-
-Note that the access key ID is an alphanumeric string, not your account ID. The endpoint could be "eu-west-1", and the service could be "glacier".
+Maintained by Dan Book, C<< <dbook at cpan.org> >>
 
 =head2 sign( $request )
 
@@ -355,56 +338,6 @@ C<< $expires_in >> integer value in range 1..604800 (1 second .. 7 days).
 C<< $expires_in >> default value is its maximum: 604800
 
 The signed uri is returned.
-
-=head1 AUTHOR
-
-Tim Nordenfur, C<< <tim at gurka.se> >>
-
-Maintained by Dan Book, C<< <dbook at cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-net-amazon-signature-v4 at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Amazon-Signature-V4>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Net::Amazon::Signature::V4
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Amazon-Signature-V4>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Net-Amazon-Signature-V4>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Net-Amazon-Signature-V4>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Net-Amazon-Signature-V4/>
-
-=back
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2012 Tim Nordenfur.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.
 
 =head1 AUTHOR
 

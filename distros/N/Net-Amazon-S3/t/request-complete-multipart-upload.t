@@ -2,9 +2,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 3;
+use Test::More tests => 4;
 use Test::Deep;
-use Test::Warnings;
+use Test::Warnings qw[ :no_end_test had_no_warnings ];
 
 use Shared::Examples::Net::Amazon::S3::Request (
     qw[ behaves_like_net_amazon_s3_request ],
@@ -19,7 +19,7 @@ behaves_like_net_amazon_s3_request 'abort multipart upload with empty parts' => 
     with_part_numbers   => [ ],
 
     expect_request_method   => 'POST',
-    expect_request_path     => 'some-bucket/some/key?uploadId=123%26456',
+    expect_request_uri      => 'https://some-bucket.s3.amazonaws.com/some/key?uploadId=123%26456',
     expect_request_headers  => {
         'Content-MD5' => ignore,
         'Content-Length' => ignore,
@@ -39,7 +39,7 @@ behaves_like_net_amazon_s3_request 'abort multipart upload with some parts' => (
     with_part_numbers   => [ 1, 2 ],
 
     expect_request_method   => 'POST',
-    expect_request_path     => 'some-bucket/some/key?uploadId=123%26456',
+    expect_request_uri      => 'https://some-bucket.s3.amazonaws.com/some/key?uploadId=123%26456',
     expect_request_headers  => {
         'Content-MD5' => ignore,
         'Content-Length' => ignore,
@@ -69,3 +69,5 @@ behaves_like_net_amazon_s3_request 'abort multipart upload with uneven argument 
 
     throws              => re( qr/must have an equally sized list of etags and part numbers/ ),
 );
+
+had_no_warnings;

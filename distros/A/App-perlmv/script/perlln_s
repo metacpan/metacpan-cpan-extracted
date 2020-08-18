@@ -1,11 +1,12 @@
 #!perl
 
-our $DATE = '2020-08-03'; # DATE
-our $VERSION = '0.601'; # VERSION
+our $DATE = '2020-08-18'; # DATE
+our $VERSION = '0.604'; # VERSION
 
 use strict;
 use warnings;
 use App::perlmv;
+use Getopt::Long::Complete; # just so we can detect script as using Getopt::Long::Complete
 
 my $pmv = App::perlmv->new;
 $pmv->{ 'mode' } = 'symlink';
@@ -27,11 +28,45 @@ perlln_s - Symlink files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.601 of perlln_s (from Perl distribution App-perlmv), released on 2020-08-03.
+This document describes version 0.604 of perlln_s (from Perl distribution App-perlmv), released on 2020-08-18.
 
 =head1 DESCRIPTION
 
 See L<perlmv> for more documentation.
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C perlln_s perlln_s
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete perlln_s 'p/*/`perlln_s`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
 
 =head1 HOMEPAGE
 

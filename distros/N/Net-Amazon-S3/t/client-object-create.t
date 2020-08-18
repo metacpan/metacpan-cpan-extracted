@@ -2,17 +2,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 5;
+use Test::More tests => 6;
 use Test::Deep;
-use Test::Warnings;
+use Test::Warnings qw[ :no_end_test had_no_warnings ];
 
 use Shared::Examples::Net::Amazon::S3::Client (
+    qw[ with_response_fixture ],
     qw[ expect_client_object_create ],
-);
-
-use Shared::Examples::Net::Amazon::S3::Error (
-    qw[ fixture_error_access_denied ],
-    qw[ fixture_error_no_such_bucket ],
 );
 
 expect_client_object_create 'create object from scalar value' => (
@@ -87,7 +83,7 @@ expect_client_object_create 'error access denied' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
     with_value              => 'some value',
-    fixture_error_access_denied,
+    with_response_fixture ('error::access_denied'),
     expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/some-key' },
     throws                  => qr/^AccessDenied: Access denied error message/,
 );
@@ -96,8 +92,10 @@ expect_client_object_create 'error no such bucket' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
     with_value              => 'some value',
-    fixture_error_no_such_bucket,
+    with_response_fixture ('error::no_such_bucket'),
     expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/some-key' },
     expect_data             => bool (0),
     throws                  => qr/^NoSuchBucket: No such bucket error message/,
 );
+
+had_no_warnings;

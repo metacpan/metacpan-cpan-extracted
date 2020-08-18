@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Signature::V2;
 # ABSTRACT: V2 signatures
-$Net::Amazon::S3::Signature::V2::VERSION = '0.89';
+$Net::Amazon::S3::Signature::V2::VERSION = '0.90';
 use Moose;
 use URI::Escape qw( uri_escape_utf8 );
 use HTTP::Date qw[ time2str ];
@@ -46,16 +46,12 @@ sub _add_auth_header {
 
     my $aws_access_key_id     = $self->http_request->s3->aws_access_key_id;
     my $aws_secret_access_key = $self->http_request->s3->aws_secret_access_key;
-    my $aws_session_token     = $self->http_request->s3->aws_session_token;
 
     if ( not $request->headers->header('Date') ) {
         $request->header( Date => time2str(time) );
     }
 
-    if ( not $request->header('x-amz-security-token') and
-         defined $aws_session_token ) {
-        $request->header( 'x-amz-security-token' => $aws_session_token );
-    }
+	$self->_append_authorization_headers ($request);
 
     my $canonical_string = $self->_canonical_string( $request );
     my $encoded_canonical = $self->_encode( $canonical_string );
@@ -161,7 +157,7 @@ Net::Amazon::S3::Signature::V2 - V2 signatures
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 AUTHOR
 

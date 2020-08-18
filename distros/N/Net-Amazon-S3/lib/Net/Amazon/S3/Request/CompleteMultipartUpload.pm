@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::CompleteMultipartUpload;
-$Net::Amazon::S3::Request::CompleteMultipartUpload::VERSION = '0.89';
+$Net::Amazon::S3::Request::CompleteMultipartUpload::VERSION = '0.90';
 use Moose 0.85;
 use Digest::MD5 qw/md5 md5_hex/;
 use MIME::Base64;
@@ -57,7 +57,7 @@ Net::Amazon::S3::Request::CompleteMultipartUpload - An internal class to complet
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 SYNOPSIS
 

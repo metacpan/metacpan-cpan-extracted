@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.186';
+our $VERSION = '1.187';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -57,6 +57,10 @@ Filehandle, von der die Benutzereingabe gelesen wird.
 =item -outHandle => $fh (Default: *STDOUT)
 
 Filehandle, auf die der Prompt geschrieben wird.
+
+=item -sloppy => $bool (Default: 0)
+
+Beschränke die möglichen Antworten nicht auf die Liste $valSpec.
 
 =item -timer => \$t (Default: undef)
 
@@ -134,6 +138,7 @@ sub askUser {
     my $default = undef;
     my $in = *STDIN;
     my $out = *STDOUT;
+    my $sloppy = 0;
     my $timer = undef;
     my $timeout = undef;
     my $ttyIn = 0;
@@ -147,6 +152,7 @@ sub askUser {
             -default => \$default,
             -inHandle => \$in,
             -outHandle => \$out,
+            -sloppy => \$sloppy,
             -timer => \$timer,
             -timeout => \$timeout,
             -ttyIn => \$ttyIn,
@@ -257,7 +263,7 @@ sub askUser {
 
         if (@values) {
            next if !defined $answ; # kein Ausstieg mit ^D
-           next if !grep { $_ eq $answ } @values;
+           next if !$sloppy && !grep { $_ eq $answ } @values;
         }
         last; # Ausstieg
     }
@@ -326,7 +332,7 @@ sub ansiEsc {
 
 =head1 VERSION
 
-1.186
+1.187
 
 =head1 AUTHOR
 

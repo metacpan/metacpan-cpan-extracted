@@ -1,11 +1,12 @@
 #!perl
 
-our $DATE = '2020-08-03'; # DATE
-our $VERSION = '0.601'; # VERSION
+our $DATE = '2020-08-18'; # DATE
+our $VERSION = '0.604'; # VERSION
 
 use strict;
 use warnings;
 use App::perlmv;
+use Getopt::Long::Complete; # just so we can detect script as using Getopt::Long::Complete
 
 my $pmv = App::perlmv->new;
 #$pmv->{ 'mode' } = 'move'; # the default
@@ -27,7 +28,7 @@ perlmv - Rename/move files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.601 of perlmv (from Perl distribution App-perlmv), released on 2020-08-03.
+This document describes version 0.604 of perlmv (from Perl distribution App-perlmv), released on 2020-08-18.
 
 =head1 SYNOPSIS
 
@@ -146,6 +147,12 @@ The following variables are also available to the Perl code:
 
 =over 4
 
+=item * C<$PERLMV> (object)
+
+The L<App::perlmv> object. No matter what CLI is being run (L<perlmv>,
+L<perlrename>, L<perlcp>, ...) the variable is still L<$PERLMV>. Can be used to
+get various settings. The Perl code is not supposed to modify this value.
+
 =item * C<$FILES> (arrayref)
 
 The list of items to be processed. The Perl code is not supposed to modify this
@@ -237,6 +244,40 @@ L<App::perlmv::scriptlet::rename_common_suffix>).
  -x <NAME> Execute a scriptlet. Can be specified multiple times. -x is optional
      if there is only one scriptlet to execute, and scriptlet name is specified
      as the first argument, and there is no -e specified.
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C perlmv perlmv
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete perlmv 'p/*/`perlmv`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
 
 =head1 FAQ
 

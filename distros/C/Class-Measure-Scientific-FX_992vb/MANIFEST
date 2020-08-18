@@ -1,0 +1,35 @@
+Build.PL
+Changes
+CONTRIBUTING
+lib/Class/Measure/Scientific/FX_992vb.pm
+MANIFEST			This list of files
+README
+t/00_base.t
+t/00_signature.t
+t/01_acceleration.t
+t/01_angle.t
+t/01_area.t
+t/01_duration.t
+t/01_energy.t
+t/01_force.t
+t/01_length.t
+t/01_mass.t
+t/01_misc.t
+t/01_power.t
+t/01_pressure.t
+t/01_speed.t
+t/01_temperature.t
+t/01_volume.t
+t/02_dimensionless.t
+t/03_cross_unit.t
+t/04_const.t
+t/09_pod.t
+t/10_pod-coverage.t
+t/11_test-coverage.t
+t/12_manifest.t
+t/13_critic.t
+t/14_kwalitee.t
+t/perlcriticrc
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

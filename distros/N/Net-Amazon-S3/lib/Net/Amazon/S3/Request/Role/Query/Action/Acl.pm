@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Action::Acl;
 # ABSTRACT: acl query action role
-$Net::Amazon::S3::Request::Role::Query::Action::Acl::VERSION = '0.89';
+$Net::Amazon::S3::Request::Role::Query::Action::Acl::VERSION = '0.90';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Action' => { action => 'acl' };
@@ -19,7 +19,7 @@ Net::Amazon::S3::Request::Role::Query::Action::Acl - acl query action role
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 AUTHOR
 

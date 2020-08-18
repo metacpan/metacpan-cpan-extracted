@@ -1,3 +1,31 @@
+1.187 2020-08-18
+================
+
+[Quiq::Database::Connection]
+* stmt() - Alias gen() definiert
+* select() - Option -sql hinzugefügt
+
+[Quiq::Gd::Image]
+* drawCross() - implementiert
+
+[Quiq::Parameters]
+* extractPropertiesToVariables() - hinzugefügt
+
+[Quiq::PlotlyJs::TimeSeries]
+* Doku bearbeitet
+
+[Quiq::PlotlyJs::XY::Diagram]
+* umbenannt von Quiq::PlotlyJs::XY::Parameter
+
+[Quiq::PlotlyJs::XY::DiagramGroup]
+* weiter entwickelt
+
+[Quiq::Sql::Analyzer]
+* Doku bearbeitet
+
+[Quiq::Terminal]
+* askUser() - Option -sloppy hinzugefügt
+
 1.186 2020-08-10
 ================
 

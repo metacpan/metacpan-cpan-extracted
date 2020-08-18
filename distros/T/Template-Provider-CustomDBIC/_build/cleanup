@@ -1,4 +1,4 @@
 do{ my $x = {
-       'blib' => 1
+       'Template-Provider-CustomDBIC-*' => 1
      };
 $x; }

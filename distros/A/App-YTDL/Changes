@@ -1,6 +1,11 @@
 Revision history for App-YTDL
 
 
+0.412   2020-08-18
+        - New option "Max rows of description".
+        - Bugfix in Download.pm [RT #133176 Gabor Szabo].
+        - Add command line option '-v' [RT #133177 Gabor Szabo]
+
 0.411   2020-08-16
         - Resolution 'manually': start the downloads only after the user has selected all formats.
 

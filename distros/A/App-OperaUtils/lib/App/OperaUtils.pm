@@ -1,9 +1,9 @@
 package App::OperaUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-08-18'; # DATE
 our $DIST = 'App-OperaUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -158,7 +158,7 @@ App::OperaUtils - Utilities related to the Opera browser
 
 =head1 VERSION
 
-This document describes version 0.005 of App::OperaUtils (from Perl distribution App-OperaUtils), released on 2020-06-13.
+This document describes version 0.006 of App::OperaUtils (from Perl distribution App-OperaUtils), released on 2020-08-18.
 
 =head1 SYNOPSIS
 

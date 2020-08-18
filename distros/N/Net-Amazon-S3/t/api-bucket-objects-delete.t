@@ -2,27 +2,19 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 3;
+use Test::More tests => 4;
 use Test::Deep;
-use Test::Warnings;
+use Test::Warnings qw[ :no_end_test had_no_warnings ];
 
 use Shared::Examples::Net::Amazon::S3::API (
+    qw[ with_response_fixture ],
     qw[ expect_api_bucket_objects_delete ],
-);
-
-use Shared::Examples::Net::Amazon::S3::Error (
-    qw[ fixture_error_access_denied ],
-    qw[ fixture_error_no_such_bucket ],
-);
-
-use Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::Delete (
-    qw[ fixture_response_quiet_without_errors ],
 );
 
 expect_api_bucket_objects_delete 'delete multiple objects' => (
     with_bucket             => 'some-bucket',
     with_keys               => [qw[ key-1 key-2 ]],
-    fixture_response_quiet_without_errors,
+    with_response_fixture ('response::bucket_objects_delete_quiet_without_errors'),
     expect_request          => { POST => 'https://some-bucket.s3.amazonaws.com/?delete' },
     expect_data             => bool (1),
     expect_request_content  => <<'XML',
@@ -37,7 +29,7 @@ XML
 expect_api_bucket_objects_delete 'with error access denied' => (
     with_bucket             => 'some-bucket',
     with_keys               => [qw[ key-1 key-2 ]],
-    fixture_error_access_denied,
+    with_response_fixture ('error::access_denied'),
     expect_request          => { POST => 'https://some-bucket.s3.amazonaws.com/?delete' },
     expect_data             => bool (0),
     expect_s3_err           => 'AccessDenied',
@@ -47,10 +39,11 @@ expect_api_bucket_objects_delete 'with error access denied' => (
 expect_api_bucket_objects_delete 'with error no such bucket' => (
     with_bucket             => 'some-bucket',
     with_keys               => [qw[ key-1 key-2 ]],
-    fixture_error_no_such_bucket,
+    with_response_fixture ('error::no_such_bucket'),
     expect_request          => { POST => 'https://some-bucket.s3.amazonaws.com/?delete' },
     expect_data             => bool (0),
     expect_s3_err           => 'NoSuchBucket',
     expect_s3_errstr        => 'No such bucket error message',
 );
 
+had_no_warnings;

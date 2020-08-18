@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BrowserUtils/browsers_are_paused
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-19'; # DATE
+our $DATE = '2020-08-18'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ browsers-are-paused - Check whether browsers are paused
 
 =head1 VERSION
 
-This document describes version 0.009 of browsers-are-paused (from Perl distribution App-BrowserUtils), released on 2020-07-19.
+This document describes version 0.010 of browsers-are-paused (from Perl distribution App-BrowserUtils), released on 2020-08-18.
 
 =head1 SYNOPSIS
 

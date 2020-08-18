@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Marker;
 # ABSTRACT: marker query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Marker::VERSION = '0.89';
+$Net::Amazon::S3::Request::Role::Query::Param::Marker::VERSION = '0.90';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
@@ -23,7 +23,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Marker - marker query param role
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 AUTHOR
 

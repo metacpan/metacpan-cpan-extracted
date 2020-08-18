@@ -1,3 +1,21 @@
+Changes in version 2.52
+-----------------------
+
+* Added 'given' method to the callback object. This method return the
+  name of the option as passed by the user.
+
+* Fix bug https://rt.cpan.org/Ticket/History.html?id=127584.
+  This is the case when an option has :s% and nothing was passed. This
+  currently gives a perl warning, issue a real error message instead.
+
+* Added some tests, see https://rt.cpan.org/Ticket/Display.html?id=87581
+
+* Fix doc issue 36380.
+
+* Change CHANGES to Changes.
+
+* Update links in README.
+
 Changes in version 2.51
 -----------------------
 

@@ -10,7 +10,7 @@ our @EXPORT_OK = qw( print_video_infos );
 
 use List::MoreUtils        qw( none );
 use Term::ANSIScreen       qw( :cursor :screen );
-use Term::Choose::LineFold qw( line_fold );
+use Term::Choose::LineFold qw( line_fold print_columns cut_to_printwidth );
 use Term::Choose::Util     qw( get_term_size );
 
 use App::YTDL::GetData     qw( get_download_info );
@@ -97,11 +97,25 @@ sub _linefolded_print_info {
         $data->{$ex}{$up}{$id}{$key} =~ s/\s+\z//;
         ( my $kk = $key ) =~ s/_/ /g;
         my $pr_key = sprintf "%*.*s : ", $key_len, $key_len, $kk;
-        push @print_array, line_fold(
+        my @folded = line_fold(
             $pr_key . $data->{$ex}{$up}{$id}{$key},
             $col_max,
             { init_tab => '' , subseq_tab => ' ' x $s_tab, join => 0 }
         );
+        if ( $key eq 'description' ) {
+            if ( $opt->{max_rows_description} && @folded > $opt->{max_rows_description} ) {
+                splice @folded, $opt->{max_rows_description};
+                #$#folded = $opt->{max_rows_description} - 1;
+                if ( print_columns( $folded[-1] ) > $col_max - 4 ) {
+                    $folded[-1] =~ s/(?<=\s)\S+\s*\z//;
+                    $folded[-1] .= '...';
+                }
+                else {
+                    $folded[-1] .= $folded[-1] =~ /\s\z/ ? '...' : ' ...';
+                }
+            }
+        }
+        push @print_array, @folded;
     }
     return () if ! @print_array;
     # auto width:

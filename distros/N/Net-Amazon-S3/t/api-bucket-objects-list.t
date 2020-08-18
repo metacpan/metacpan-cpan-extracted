@@ -2,34 +2,22 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 7;
+use Test::More tests => 8;
 use Test::Deep;
-use Test::Warnings;
+use Test::Warnings qw[ :no_end_test had_no_warnings ];
 
 use Shared::Examples::Net::Amazon::S3 (
     qw[ s3_api_with_signature_2 ],
 );
 
 use Shared::Examples::Net::Amazon::S3::API (
+    qw[ with_response_fixture ],
     qw[ expect_api_bucket_objects_list ],
-);
-
-use Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::List (
-    qw[ list_bucket_objects_v1 ],
-    qw[ list_bucket_objects_v1_with_filter_truncated ],
-    qw[ list_bucket_objects_v1_with_delimiter ],
-    qw[ list_bucket_objects_v1_with_prefix_and_delimiter ],
-    qw[ list_bucket_objects_v1_google_cloud_storage ],
-);
-
-use Shared::Examples::Net::Amazon::S3::Error (
-    qw[ fixture_error_access_denied ],
-    qw[ fixture_error_no_such_bucket ],
 );
 
 expect_api_bucket_objects_list 'list objects (version 1)' => (
     with_bucket             => 'some-bucket',
-    with_response_data      => list_bucket_objects_v1,
+    with_response_fixture ('response::bucket_objects_list_v1'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/' },
     expect_data             => {
         bucket => 'some-bucket',
@@ -60,7 +48,7 @@ expect_api_bucket_objects_list 'list objects (version 1)' => (
 
 expect_api_bucket_objects_list 'list objects with filters (version 1)' => (
     with_bucket             => 'some-bucket',
-    with_response_data      => list_bucket_objects_v1_with_filter_truncated,
+    with_response_fixture ('response::bucket_objects_list_v1_with_filter_truncated'),
     with_prefix             => 'N',
     with_marker             => 'Ned',
     with_max_keys           => 40,
@@ -94,7 +82,7 @@ expect_api_bucket_objects_list 'list objects with filters (version 1)' => (
 
 expect_api_bucket_objects_list 'list objects with delimiter (version 1)' => (
     with_bucket             => 'some-bucket',
-    with_response_data      => list_bucket_objects_v1_with_delimiter,
+    with_response_fixture ('response::bucket_objects_list_v1_with_delimiter'),
     with_delimiter          => '/',
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?delimiter=%2F' },
     expect_data             => {
@@ -121,7 +109,7 @@ expect_api_bucket_objects_list 'list objects with delimiter (version 1)' => (
 
 expect_api_bucket_objects_list 'list objects with prefix and delimiter (version 1)' => (
     with_bucket             => 'some-bucket',
-    with_response_data      => list_bucket_objects_v1_with_prefix_and_delimiter,
+    with_response_fixture ('response::bucket_objects_list_v1_with_prefix_and_delimiter'),
     with_delimiter          => '/',
     with_prefix             => 'photos/2006/',
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?delimiter=%2F&prefix=photos%2F2006%2F' },
@@ -142,7 +130,7 @@ expect_api_bucket_objects_list 'list objects with prefix and delimiter (version 
 
 expect_api_bucket_objects_list 'error access denied' => (
     with_bucket             => 'some-bucket',
-    fixture_error_access_denied,
+    with_response_fixture ('error::access_denied'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/' },
     expect_data             => bool (0),
     expect_s3_err           => 'AccessDenied',
@@ -151,7 +139,7 @@ expect_api_bucket_objects_list 'error access denied' => (
 
 expect_api_bucket_objects_list 'error no such bucket' => (
     with_bucket             => 'some-bucket',
-    fixture_error_no_such_bucket,
+    with_response_fixture ('error::no_such_bucket'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/' },
     expect_data             => bool (0),
     expect_s3_err           => 'NoSuchBucket',
@@ -160,7 +148,7 @@ expect_api_bucket_objects_list 'error no such bucket' => (
 
 expect_api_bucket_objects_list 'list objects (version 1) on Google Cloud Storage' => (
     with_bucket             => 'gcs-bucket',
-    with_response_data      => list_bucket_objects_v1_google_cloud_storage,
+    with_response_fixture ('response::bucket_objects_list_v1_google_cloud_storage'),
     with_s3                 => s3_api_with_signature_2(host => 'storage.googleapis.com'),
     expect_request          => { GET => 'https://gcs-bucket.storage.googleapis.com/' },
     expect_data             => {
@@ -189,3 +177,5 @@ expect_api_bucket_objects_list 'list objects (version 1) on Google Cloud Storage
         } ],
     },
 );
+
+had_no_warnings;

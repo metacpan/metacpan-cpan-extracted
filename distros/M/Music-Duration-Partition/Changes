@@ -1,5 +1,8 @@
 Revision history for Music-Duration-Partition
 
+0.0514 2020-08-17 09:47:06
+    - Simplify the eg/seven-eight program.
+
 0.0513 2020-08-15 10:46:34
     - Add the eg/seven-eight example "groove generator" program.
 

@@ -1,9 +1,9 @@
 package App::ChromeUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-08-18'; # DATE
 our $DIST = 'App-ChromeUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -158,7 +158,7 @@ App::ChromeUtils - Utilities related to Google Chrome browser
 
 =head1 VERSION
 
-This document describes version 0.007 of App::ChromeUtils (from Perl distribution App-ChromeUtils), released on 2020-06-13.
+This document describes version 0.008 of App::ChromeUtils (from Perl distribution App-ChromeUtils), released on 2020-08-18.
 
 =head1 SYNOPSIS
 

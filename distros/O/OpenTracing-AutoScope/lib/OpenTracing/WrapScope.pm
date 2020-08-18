@@ -1,9 +1,9 @@
 package OpenTracing::WrapScope;
-our $VERSION = 'v0.106.1';
+our $VERSION = 'v0.106.2';
 use strict;
 use warnings;
 use warnings::register;
-use B::Hooks::EndOfScope;
+use B::Hooks::OP::Check::LeaveEval;
 use Carp qw/croak/;
 use List::Util qw/uniq/;
 use OpenTracing::GlobalTracer;
@@ -29,6 +29,29 @@ no warnings 'redefine';
 };
 }
 
+my %subs_to_install;
+END {
+    foreach my $sub (keys %subs_to_install) {
+        warnings::warn "OpenTracing::WrapScope couldn't find sub: $sub";
+    }
+}
+
+sub _register_to_install {
+    undef $subs_to_install{$_} foreach @_;
+}
+
+# try to install any available subs whenever we get new code
+B::Hooks::OP::Check::LeaveEval::register(sub {
+    return unless %subs_to_install;
+
+    foreach my $sub (keys %subs_to_install) {
+        next unless defined &$sub;
+        install_wrapped($sub);
+        delete $subs_to_install{$sub};
+    }
+    return;
+});
+
 sub import {
     shift;    # __PACKAGE__
     my $target_package = caller;
@@ -49,9 +72,9 @@ sub import {
     if ($use_env and $ENV{OPENTRACING_WRAPSCOPE_FILE}) {
         push @files, split ':', $ENV{OPENTRACING_WRAPSCOPE_FILE};
     }
-    push @subs, map { _load_sub_spec($_) } grep { -f } map { glob } @files;
+    push @subs, map { _load_sub_spec($_) } grep { -f } map { glob } uniq @files;
 
-    on_scope_end { install_wrapped(uniq @subs) };
+    _register_to_install(@subs);
 
     return;
 }

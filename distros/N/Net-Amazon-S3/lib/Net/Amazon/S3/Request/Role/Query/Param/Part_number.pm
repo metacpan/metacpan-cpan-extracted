@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Part_number;
 # ABSTRACT: partNumber query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Part_number::VERSION = '0.89';
+$Net::Amazon::S3::Request::Role::Query::Param::Part_number::VERSION = '0.90';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
@@ -24,7 +24,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Part_number - partNumber query par
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 AUTHOR
 

@@ -1,10 +1,10 @@
 NAME
-    IPC::System::Options - Perl's system() and readpipe/qx replacement, with
-    options
+    IPC::System::Options - Perl's system(), readpipe()/qx, IPC::Run's run(),
+    start() (with more options)
 
 VERSION
-    This document describes version 0.337 of IPC::System::Options (from Perl
-    distribution IPC-System-Options), released on 2020-06-06.
+    This document describes version 0.338 of IPC::System::Options (from Perl
+    distribution IPC-System-Options), released on 2020-08-18.
 
 SYNOPSIS
      use IPC::System::Options qw(system readpipe run start);
@@ -68,8 +68,23 @@ SYNOPSIS
      $h->finish;
 
 DESCRIPTION
+    This module provides replacement (wrapper) for Perl's "system()",
+    "readpipe()" (qx//, a.k.a. the backtick operator), as well as IPC::Run's
+    "start()" and "run()". The wrappers give you options like
+    forcing/avoiding use of shell (like what IPC::System::Simple offers
+    you), logging the arguments and/or output (using Log::ger), temporarily
+    setting environment variables, temporarily setting working directory,
+    dying on non-zero exit code, capturing (or tee-ing) output
+    (stdout/stderr) (using Capture::Tiny), and a few others. They are meant
+    as a convenience so you can just call "system()" (or the other wrapper
+    target) instead of doing some additional setup and cleanup yourself.
+
 FUNCTIONS
-  system([ \%opts ], @args)
+  system
+    Usage:
+
+     system([ \%opts ], @args) => $child_error ($?)
+
     Just like perl's "system()" except that it accepts an optional hash
     first argument to specify options. Currently known options:
 
@@ -202,7 +217,11 @@ FUNCTIONS
         non-success, a warning log is produced and "readpipe()" does not log
         the result.
 
-  readpipe([ \%opts ], @args)
+  readpipe
+    Usage:
+
+     readpipe([ \%opts ], @args) => $output
+
     Just like perl's "readpipe()" (a.k.a. "qx()" a.k.a. `` a.k.a. the
     backtick operator) except that it accepts an optional hash first
     argument to specify options. And it can accept multiple arguments (in
@@ -269,7 +288,11 @@ FUNCTIONS
 
         See option documentation in "system()".
 
-  run([ \%opts ], @args)
+  run
+    Usage:
+
+     run([ \%opts ], @args) => $is_success
+
     Like "system()", but uses IPC::Run's "run()". Known options:
 
     *   lang => str
@@ -312,7 +335,11 @@ FUNCTIONS
 
         See option documentation in "system()".
 
-  start([ \%opts ], @args)
+  start
+    Usage:
+
+     start([ \%opts ], @args) => $harness
+
     Like "run()", but uses IPC::Run's "start()". For known options, see
     "run()".
 
@@ -330,6 +357,15 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    IPC::System::Simple also provides wrapper for "system()" and
+    "readpipe()" with some additional behavior, although its scope is not as
+    extensive as IPC::System::Options.
+
+    Proc::Govern similarly provide a run+options function, with a different
+    set of options, including system load watching, logging output to file,
+    disabling and screensaver or power management.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

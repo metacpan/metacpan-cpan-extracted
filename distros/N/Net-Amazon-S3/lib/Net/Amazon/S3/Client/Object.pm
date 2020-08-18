@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Object;
-$Net::Amazon::S3::Client::Object::VERSION = '0.89';
+$Net::Amazon::S3::Client::Object::VERSION = '0.90';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use DateTime::Format::HTTP;
@@ -18,7 +18,8 @@ enum 'AclShort' =>
     # Current list at https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
     [ qw(private public-read public-read-write aws-exec-read authenticated-read bucket-owner-read bucket-owner-full-control log-delivery-write ) ];
 enum 'StorageClass' =>
-    [ qw(standard reduced_redundancy standard_ia onezone_ia) ];
+    # Current list at https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html#AmazonS3-PutObject-request-header-StorageClass
+    [ qw(standard reduced_redundancy standard_ia onezone_ia intelligent_tiering glacier deep_archive) ];
 
 has 'client' =>
     ( is => 'ro', isa => 'Net::Amazon::S3::Client', required => 1 );
@@ -231,10 +232,6 @@ sub _put {
 
     confess 'Error uploading ' . $http_response->as_string
         if $http_response->code != 200;
-
-    my $etag = $self->_etag($http_response);
-
-    confess "Corrupted upload got $etag expected $md5_hex" if $etag ne $md5_hex;
 }
 
 sub put_filename {
@@ -355,6 +352,92 @@ sub query_string_authentication_uri {
     )->query_string_authentication_uri( $self->expires->epoch, $query_form );
 }
 
+sub head {
+    my $self = shift;
+
+    my $http_request =
+        Net::Amazon::S3::Request::GetObject->new(
+            s3     => $self->client->s3,
+            bucket => $self->bucket->name,
+            key    => $self->key,
+            method => 'HEAD',
+        )->http_request;
+
+    my $http_response = $self->client->_send_request($http_request);
+
+    confess 'Error head-object ' . $http_response->as_string
+        if $http_response->code != 200;
+
+    my %metadata;
+    my $headers = $http_response->headers;
+    foreach my $name ($headers->header_field_names) {
+        if ($self->_is_metadata_header($name)) {
+            my $metadata_name = $self->_format_metadata_name($name);
+            $metadata{$metadata_name} = $http_response->header($name);
+        }
+    }
+
+    return \%metadata;
+}
+
+sub _is_metadata_header {
+    my (undef, $header) = @_;
+    $header = lc($header);
+
+    my %valid_metadata_headers = map +($_ => 1), (
+        'accept-ranges',
+        'cache-control',
+        'etag',
+        'expires',
+        'last-modified',
+    );
+
+    return 1 if exists $valid_metadata_headers{$header};
+    return 1 if $header =~ m/^x-amz-(?!id-2$)/;
+    return 1 if $header =~ m/^content-/;
+    return 0;
+}
+
+sub _format_metadata_name {
+    my (undef, $header) = @_;
+    $header = lc($header);
+    $header =~ s/^x-amz-//;
+
+    my $metadata_name = join('', map (ucfirst, split(/-/, $header)));
+    $metadata_name = 'ETag' if ($metadata_name eq 'Etag');
+
+    return $metadata_name;
+}
+
+sub available {
+    my $self = shift;
+
+    my %metadata = %{$self->head};
+
+    # An object is available if:
+    # - the storage class isn't GLACIER;
+    # - the storage class is GLACIER and the object was fully restored (Restore: ongoing-request="false");
+    my $glacier = (exists($metadata{StorageClass}) and $metadata{StorageClass} eq 'GLACIER') ? 1 : 0;
+    my $restored = (exists($metadata{Restore}) and $metadata{Restore} =~ m/ongoing-request="false"/) ? 1 : 0;
+    return (!$glacier or $restored) ? 1 :0;
+}
+
+sub restore {
+    my $self = shift;
+    my (%conf) = @_;
+
+    my $http_request =
+        Net::Amazon::S3::Request::RestoreObject->new(
+            s3     => $self->client->s3,
+            bucket => $self->bucket->name,
+            key    => $self->key,
+            days   => $conf{days},
+            tier   => $conf{tier},
+        )->http_request;
+
+    return $self->client->_send_request($http_request);
+}
+
 sub _content_sub {
     my $self      = shift;
     my $filename  = shift;
@@ -427,7 +510,7 @@ Net::Amazon::S3::Client::Object - An easy-to-use Amazon S3 client object
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -449,6 +532,9 @@ version 0.89
   # to get the vaue of an object
   my $value = $object->get;
 
+  # to get the metadata of an object
+  my %metadata = %{$object->head};
+
   # to see if an object exists
   if ($object->exists) { ... }
 
@@ -467,6 +553,17 @@ version 0.89
 
   # return the URI of a publically-accessible object
   my $uri = $object->uri;
+
+  # to view if an object is available for downloading
+  # Basically, the storage class isn't GLACIER or the object was
+  # fully restored
+  $object->available;
+
+  # to restore an object on a GLACIER storage class
+  $object->restore(
+    days => 1,
+    tier => 'Standard',
+  );
 
   # to store a new object with server-side encryption enabled
   my $object = $bucket->object(
@@ -531,6 +628,11 @@ This module represents objects in buckets.
   # to get the vaue of an object
   my $value = $object->get;
 
+=head2 head
+
+  # to get the metadata of an object
+  my %metadata = %{$object->head};
+
 =head2 get_decoded
 
   # get the value of an object, and decode any Content-Encoding and/or
@@ -557,6 +659,21 @@ This module represents objects in buckets.
   # show the key
   print $object->key . "\n";
 
+=head2 available
+
+  # to view if an object is available for downloading
+  # Basically, the storage class isn't GLACIER or the object was
+  # fully restored
+  $object->available;
+
+=head2 restore
+
+  # to restore an object on a GLACIER storage class
+  $object->restore(
+    days => 1,
+    tier => 'Standard',
+  );
+
 =head2 put
 
   # to create a new object
@@ -576,8 +693,9 @@ You may also set Content-Encoding using C<content_encoding>, and
 Content-Disposition using C<content_disposition>.
 
 You may specify the S3 storage class by setting C<storage_class> to either
-C<standard>, C<reduced_redundancy>, C<standard_ia>, or C<onezone_ia>;
-the default is C<standard>.
+C<standard>, C<reduced_redundancy>, C<standard_ia>, C<onezone_ia>,
+C<intelligent_tiering>, C<glacier>, or C<deep_archive>; the default
+is C<standard>.
 
 You may set website-redirect-location object metadata by setting
 C<website_redirect_location> to either another object name in the same
@@ -605,8 +723,9 @@ You may also set Content-Encoding using C<content_encoding>, and
 Content-Disposition using C<content_disposition>.
 
 You may specify the S3 storage class by setting C<storage_class> to either
-C<standard>, C<reduced_redundancy>, C<standard_ia>, or C<onezone_ia>;
-the default is C<standard>.
+C<standard>, C<reduced_redundancy>, C<standard_ia>, C<onezone_ia>,
+C<intelligent_tiering>, C<glacier>, or C<deep_archive>; the default
+is C<standard>.
 
 You may set website-redirect-location object metadata by setting
 C<website_redirect_location> to either another object name in the same

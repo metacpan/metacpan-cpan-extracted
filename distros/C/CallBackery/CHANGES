@@ -1,3 +1,7 @@
+0.34.10 2020-08-17 20:33:34 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - translate headers in excel export
+
 0.34.9 2020-08-15 11:06:17 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix popup resizing regression

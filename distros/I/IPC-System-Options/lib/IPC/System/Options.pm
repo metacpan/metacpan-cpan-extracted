@@ -1,9 +1,9 @@
 package IPC::System::Options;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-06'; # DATE
+our $DATE = '2020-08-18'; # DATE
 our $DIST = 'IPC-System-Options'; # DIST
-our $VERSION = '0.337'; # VERSION
+our $VERSION = '0.338'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -463,7 +463,7 @@ sub start {
 }
 
 1;
-# ABSTRACT: Perl's system() and readpipe/qx replacement, with options
+# ABSTRACT: Perl's system(), readpipe()/qx, IPC::Run's run(), start() (with more options)
 
 __END__
 
@@ -473,11 +473,11 @@ __END__
 
 =head1 NAME
 
-IPC::System::Options - Perl's system() and readpipe/qx replacement, with options
+IPC::System::Options - Perl's system(), readpipe()/qx, IPC::Run's run(), start() (with more options)
 
 =head1 VERSION
 
-This document describes version 0.337 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2020-06-06.
+This document describes version 0.338 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2020-08-18.
 
 =head1 SYNOPSIS
 
@@ -543,11 +543,25 @@ L<IPC::Run> for more details) which you can then call C<finish()>, etc on.
 
 =head1 DESCRIPTION
 
+This module provides replacement (wrapper) for Perl's C<system()>, C<readpipe()>
+(qx//, a.k.a. the backtick operator), as well as L<IPC::Run>'s C<start()> and
+C<run()>. The wrappers give you options like forcing/avoiding use of shell (like
+what L<IPC::System::Simple> offers you), logging the arguments and/or output
+(using L<Log::ger>), temporarily setting environment variables, temporarily
+setting working directory, dying on non-zero exit code, capturing (or tee-ing)
+output (stdout/stderr) (using L<Capture::Tiny>), and a few others. They are
+meant as a convenience so you can just call C<system()> (or the other wrapper
+target) instead of doing some additional setup and cleanup yourself.
+
 =for Pod::Coverage ^(backtick)$
 
 =head1 FUNCTIONS
 
-=head2 system([ \%opts ], @args)
+=head2 system
+
+Usage:
+
+ system([ \%opts ], @args) => $child_error ($?)
 
 Just like perl's C<system()> except that it accepts an optional hash first
 argument to specify options. Currently known options:
@@ -679,7 +693,11 @@ warning log is produced and C<readpipe()> does not log the result.
 
 =back
 
-=head2 readpipe([ \%opts ], @args)
+=head2 readpipe
+
+Usage:
+
+ readpipe([ \%opts ], @args) => $output
 
 Just like perl's C<readpipe()> (a.k.a. C<qx()> a.k.a. C<``> a.k.a. the backtick
 operator) except that it accepts an optional hash first argument to specify
@@ -749,7 +767,11 @@ See option documentation in C<system()>.
 
 =back
 
-=head2 run([ \%opts ], @args)
+=head2 run
+
+Usage:
+
+ run([ \%opts ], @args) => $is_success
 
 Like C<system()>, but uses L<IPC::Run>'s C<run()>. Known options:
 
@@ -797,7 +819,11 @@ See option documentation in C<system()>.
 
 =back
 
-=head2 start([ \%opts ], @args)
+=head2 start
+
+Usage:
+
+ start([ \%opts ], @args) => $harness
 
 Like C<run()>, but uses L<IPC::Run>'s C<start()>. For known options, see
 C<run()>.
@@ -817,6 +843,16 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<IPC::System::Simple> also provides wrapper for C<system()> and C<readpipe()>
+with some additional behavior, although its scope is not as extensive as
+IPC::System::Options.
+
+L<Proc::Govern> similarly provide a run+options function, with a different set
+of options, including system load watching, logging output to file, disabling
+and screensaver or power management.
 
 =head1 AUTHOR
 

@@ -3,18 +3,18 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.186';
+our $VERSION = '1.187';
 
 =encoding utf8
 
 =head1 NAME
 
-Quiq - Class library for rapid development (German documentation)
+Quiq - Class library for rapid development
 
 =head1 DESCRIPTION
 
 Diese Klassenbibliothek enthält anwendungsunabhängige Klassen,
-die ich in Perl-Projekten (nur Unix/Linux) nutze. Sie sind nach
+die ich in Projekten (nur Unix/Linux) nutze. Sie sind nach
 einheitlichen Prinzipien konzipiert. Die Bibliothek befindet
 sich unter kontinuierlicher Weiterentwicklung.
 
@@ -632,15 +632,15 @@ L<Quiq::PlotlyJs::Reference> - Erzeuge Plotly.js Reference Manual
 
 =item *
 
-L<Quiq::PlotlyJs::TimeSeries> - Erzeuge Zeitreihen-Plot auf Basis von Plotly.js
+L<Quiq::PlotlyJs::TimeSeries> - Zeitreihen-Plot auf Basis von Plotly.js
 
 =item *
 
-L<Quiq::PlotlyJs::XY::DiagramGroup> - Erzeuge eine Gruppe von XY-Plots
+L<Quiq::PlotlyJs::XY::Diagram> - Metadaten eines XY-Diagramms
 
 =item *
 
-L<Quiq::PlotlyJs::XY::Parameter> - Ein zu plottender Parameter
+L<Quiq::PlotlyJs::XY::DiagramGroup> - Gruppe von XY-Diagrammen
 
 =item *
 
@@ -874,7 +874,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.186
+1.187
 
 =head1 AUTHOR
 

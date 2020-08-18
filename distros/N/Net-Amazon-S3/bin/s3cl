@@ -311,7 +311,7 @@ s3cl - Command line for Amazon s3 cloud storage
 
 =head1 VERSION
 
-version 0.89
+version 0.90
 
 =head1 SYNOPSIS
 

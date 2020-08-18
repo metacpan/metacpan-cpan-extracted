@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.186';
+our $VERSION = '1.187';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -418,9 +418,19 @@ sub strict {
 
   $sqlObj = $db->stmt;
 
-=head4 Alias
+=head4 Aliases
+
+=over 2
+
+=item *
 
 sqlEngine()
+
+=item *
+
+gen()
+
+=back
 
 =head4 Description
 
@@ -440,6 +450,7 @@ sub stmt {
 {
     no warnings 'once';
     *sqlEngine = \&stmt;
+    *gen = \&stmt;
 }
 
 # -----------------------------------------------------------------------------
@@ -2094,7 +2105,7 @@ sub primaryKey {
 
 =head4 Synopsis
 
-  $tab|@rows|$cur = $db->select(@select,@opt);
+  $tab|@rows|$cur|$stmt = $db->select(@select,@opt);
 
 =head4 Options
 
@@ -2124,6 +2135,10 @@ Siehe Quiq::Database::Connection/sql().
 
 Siehe Quiq::Database::Connection/sql().
 
+=item -sql => $bool (Default: 0)
+
+Führe das Statement nicht aus, sondern liefere das SQL-Statemement zurück.
+
 =item -tableClass => $tableClass
 
 Siehe Quiq::Database::Connection/sql().
@@ -2146,6 +2161,7 @@ sub select {
     my $fetchMode = 1;
     my $raw = 0;
     my $rowClass = undef;
+    my $sql => 0;
     my $tableClass = undef;
 
     Quiq::Option->extract(-mode=>'sloppy',\@_,
@@ -2155,10 +2171,14 @@ sub select {
         -fetchMode => \$fetchMode,
         -raw => \$raw,
         -rowClass => \$rowClass,
+        -sql => \$sql,
         -tableClass => \$tableClass,
     );
 
     my $stmt = $self->stmt->select(@_);
+    if ($sql) {
+        return $stmt;
+    }
     my $cur = $self->sql($stmt,
         -cache => $cache,
         -chunkSize => $chunkSize,
@@ -5242,7 +5262,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.186
+1.187
 
 =head1 AUTHOR
 

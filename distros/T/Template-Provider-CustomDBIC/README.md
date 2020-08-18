@@ -14,7 +14,7 @@ Template::Provider::CustomDBIC - Load templates using DBIx::Class
     my $resultset = $schema->resultset('Template');
 
 If all of your templates are stored in a single table the most convenient
-method is to pass the provider a [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx::Class::ResultSet).
+method is to pass the provider a [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet).
 
     my $template = Template->new({
         LOAD_TEMPLATES => [
@@ -31,8 +31,8 @@ method is to pass the provider a [DBIx::Class::ResultSet](https://metacpan.org/p
 # DESCRIPTION
 
 Template::Provider::CustomDBIC allows a [Template](https://metacpan.org/pod/Template) object to fetch its data using
-[DBIx::Class](https://metacpan.org/pod/DBIx::Class) instead of, or in addition to, the default filesystem-based
-[Template::Provider](https://metacpan.org/pod/Template::Provider).
+[DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) instead of, or in addition to, the default filesystem-based
+[Template::Provider](https://metacpan.org/pod/Template%3A%3AProvider).
 
 ## SCHEMA
 
@@ -45,12 +45,12 @@ raised.
 - A column containing the actual template content itself. This is what will be
 compiled and returned when the template is processed.
 - A column containing the time the template was last modified. This must return
-- or be inflated to - a date string recognisable by [Date::Parse](https://metacpan.org/pod/Date::Parse).
+- or be inflated to - a date string recognisable by [Date::Parse](https://metacpan.org/pod/Date%3A%3AParse).
 
 ## OPTIONS
 
 In addition to supplying a RESULTSET or SCHEMA and the standard
-[Template::Provider](https://metacpan.org/pod/Template::Provider) options, you may set the following preferences:
+[Template::Provider](https://metacpan.org/pod/Template%3A%3AProvider) options, you may set the following preferences:
 
 - COLUMN\_NAME
 
@@ -99,11 +99,11 @@ providers.
 
 # SEE ALSO
 
-[Template](https://metacpan.org/pod/Template), [Template::Provider](https://metacpan.org/pod/Template::Provider), [DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema)
+[Template](https://metacpan.org/pod/Template), [Template::Provider](https://metacpan.org/pod/Template%3A%3AProvider), [DBIx::Class::Schema](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema)
 
 # DIAGNOSTICS
 
-In addition to errors raised by [Template::Provider](https://metacpan.org/pod/Template::Provider) and [DBIx::Class](https://metacpan.org/pod/DBIx::Class),
+In addition to errors raised by [Template::Provider](https://metacpan.org/pod/Template%3A%3AProvider) and [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass),
 Template::Provider::CustomDBIC may generate the following error messages:
 
 - `A valid DBIx::Class::Schema or ::ResultSet is required`
@@ -112,26 +112,26 @@ Template::Provider::CustomDBIC may generate the following error messages:
 
 - `%s not valid: must be of the form $table/$template`
 
-    When using Template::Provider::CustomDBIC with a [DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema) object, the
+    When using Template::Provider::CustomDBIC with a [DBIx::Class::Schema](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema) object, the
     template name passed to `->process()` must start with the name of the
     result set to search in.
 
 - `'%s' is not a valid result set for the given schema`
 
-    Couldn't find the result set %s in the given [DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema) object.
+    Couldn't find the result set %s in the given [DBIx::Class::Schema](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema) object.
 
 - `Could not retrieve '%s' from the result set '%s'`
 
 # DEPENDENCIES
 
 - [Carp](https://metacpan.org/pod/Carp)
-- [Date::Parse](https://metacpan.org/pod/Date::Parse)
-- [File::Path](https://metacpan.org/pod/File::Path)
-- [File::Spec](https://metacpan.org/pod/File::Spec)
-- [Template::Provider](https://metacpan.org/pod/Template::Provider)
+- [Date::Parse](https://metacpan.org/pod/Date%3A%3AParse)
+- [File::Path](https://metacpan.org/pod/File%3A%3APath)
+- [File::Spec](https://metacpan.org/pod/File%3A%3ASpec)
+- [Template::Provider](https://metacpan.org/pod/Template%3A%3AProvider)
 
 Additionally, use of this module requires an object of the class
-[DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema) or [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx::Class::ResultSet).
+[DBIx::Class::Schema](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema) or [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet).
 
 # BUGS
 

@@ -1,10 +1,17 @@
 do{ my $x = {
-       'recommends' => {},
-       'build_requires' => {
-                             'ExtUtils::CBuilder' => 0
-                           },
+       'requires' => {
+                       'File::Spec' => '0',
+                       'File::Path' => '0',
+                       'Date::Parse' => '0',
+                       'Template::Provider' => '0'
+                     },
        'conflicts' => {},
+       'build_requires' => {
+                             'DBIx::Class' => '0',
+                             'DBD::SQLite' => '1.11',
+                             'Test::More' => '0'
+                           },
        'test_requires' => {},
-       'requires' => {}
+       'recommends' => {}
      };
 $x; }

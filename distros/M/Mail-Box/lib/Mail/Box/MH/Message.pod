@@ -667,12 +667,12 @@ unreadible for some other reason.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.008,
-built on October 04, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Box distribution version 3.009,
+built on August 18, 2020. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2020 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

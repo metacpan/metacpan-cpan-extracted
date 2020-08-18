@@ -1,0 +1,23 @@
+use strict;
+use warnings;
+use utf8;
+
+use Test::More;
+use Test::Warn;
+$ENV{AUTHOR_TESTING} && eval { require Test::NoWarnings };
+
+use version;
+
+plan tests => 4;
+
+require Class::Measure::Scientific::FX_992vb;
+my $m = Class::Measure::Scientific::FX_992vb->power( 1, 'W' );
+is( $m->W(),    1,                  q{1 Watt via power} );
+is( $m->PS(),   0.0013596216173039, q{1 Watt in metric horsepower} );
+is( $m->BTUh(), 3.41214163315381,   q{1 Watt in BTU per hour} );
+
+my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
+SKIP: {
+    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
+}
+$ENV{AUTHOR_TESTING} && Test::NoWarnings::had_no_warnings();

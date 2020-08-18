@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.186';
+our $VERSION = '1.187';
 
 # -----------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ Boolean
 =head4 Description
 
 Prüfe, ob SQL-Statement $stmt ein C<CREATE FUNCTION> oder C<CREATE OR
-REPLACE FUNCTION> Statemtn enthält. Wenn ja, liefere 1, andernfalls 0.
+REPLACE FUNCTION> Statement enthält. Wenn ja, liefere 1, andernfalls 0.
 
 =cut
 
@@ -68,7 +68,7 @@ sub isCreateFunction {
 
 =head1 VERSION
 
-1.186
+1.187
 
 =head1 AUTHOR
 

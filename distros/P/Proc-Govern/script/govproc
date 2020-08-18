@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.209'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-18'; # DATE
+our $DIST = 'Proc-Govern'; # DIST
+our $VERSION = '0.211'; # VERSION
 
 use 5.010;
 use strict;
@@ -9,6 +11,8 @@ use warnings;
 
 use Getopt::Long;
 use Proc::Govern;
+
+$|++;
 
 my @SAVE_ARGV = @ARGV;
 
@@ -26,7 +30,8 @@ my $success = GetOptions(
     "name|n=s"               => \$opts{name},
     "nice=i"                 => \$opts{nice},
     "single-instance"        => \$opts{single_instance},
-    "restart"                => \$opts{restart},
+    "restart-if-failed"      => \$opts{restart_if_failed},
+    "restart-if-no-output-after=i" => \$opts{restart_if_no_output_after},
     "show-stderr!"           => \$opts{show_stderr},
     "log-stderr-dir=s"       => \$opts{log_stderr_dir},
     "log-stderr-size=i"      => \$opts{log_stderr_size},
@@ -67,7 +72,10 @@ Options:
   --name=S                  Set process name.
   --nice=I                  Set nice level/priority.
   --single-instance         Prevent running multiple instances simultaneously.
-  --restart                 Restart when child process dies/exits.
+  --restart-if-failed       Restart when child process dies/exits.
+  --restart-if-no-output-after=N
+                            Restart if there is no output after this many
+                              seconds.
   --no-show-stderr          Hide stderr output (but you can still log it).
   --log-stderr-dir=S        Enable logging of stderr and set log directory.
   --log-stderr-size=N       Set log file size limit, in bytes, default 10MB.
@@ -159,7 +167,7 @@ govproc - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.209 of govproc (from Perl distribution Proc-Govern), released on 2019-11-29.
+This document describes version 0.211 of govproc (from Perl distribution Proc-Govern), released on 2020-08-18.
 
 =head1 SYNOPSIS
 
@@ -210,7 +218,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

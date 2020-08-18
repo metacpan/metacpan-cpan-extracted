@@ -2,9 +2,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 3;
+use Test::More tests => 4;
 use Test::Deep;
-use Test::Warnings;
+use Test::Warnings qw[ :no_end_test had_no_warnings ];
 
 use Shared::Examples::Net::Amazon::S3::Request (
     qw[ behaves_like_net_amazon_s3_request ],
@@ -16,7 +16,7 @@ behaves_like_net_amazon_s3_request 'delete multi object with empty keys' => (
     with_keys       => [],
 
     expect_request_method   => 'POST',
-    expect_request_path     => 'some-bucket/?delete',
+    expect_request_uri      => 'https://some-bucket.s3.amazonaws.com/?delete',
     expect_request_headers  => {
         'Content-MD5' => 'hWgjGHog2fcu6stNeIAJsw==',
         'Content-Length' => 76,
@@ -35,7 +35,7 @@ behaves_like_net_amazon_s3_request 'delete multi object with some keys' => (
     with_keys       => [ 'some/key', '<another/key>' ],
 
     expect_request_method   => 'POST',
-    expect_request_path     => 'some-bucket/?delete',
+    expect_request_uri      => 'https://some-bucket.s3.amazonaws.com/?delete',
     expect_request_headers  => {
         'Content-MD5' => '+6onPaU8IPGxGhWh0ULBJg==',
         'Content-Length' => 159,
@@ -57,3 +57,5 @@ behaves_like_net_amazon_s3_request 'delete multi object with more than 1_000 key
 
     throws          => re( qr/The maximum number of keys is 1000/ ),
 );
+
+had_no_warnings;

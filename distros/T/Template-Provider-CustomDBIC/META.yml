@@ -7,9 +7,9 @@ build_requires:
   DBIx::Class: '0'
   Test::More: '0'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,13 +28,20 @@ no_index:
 provides:
   Template::Provider::CustomDBIC:
     file: lib/Template/Provider/CustomDBIC.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Date::Parse: '0'
   File::Path: '0'
   File::Spec: '0'
   Template::Provider: '0'
-version: '0.04'
+resources:
+  bugtracker: https://github.com/itnode/Template-Provider-CustomDBIC/issues
+  homepage: https://github.com/itnode/Template-Provider-CustomDBIC
+  repository: git://github.com/itnode/Template-Provider-CustomDBIC.git
+version: '0.05'
 x_contributors:
   - 'Dave Cardwell <dcardwell@cpan.org>'
   - 'Jens Gassmann <jens.gassmann@atomix.de>'
+  - 'Patrick Jendral <pj@gassmann.it>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

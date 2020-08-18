@@ -2,8 +2,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 15;
-use Test::Warnings;
+use Test::More tests => 16;
+use Test::Warnings qw[ :no_end_test had_no_warnings ];
 
 use Moose::Meta::Class;
 
@@ -82,3 +82,4 @@ request_path 'object request should uri-escape key',
     expect      => 'some-bucket/some/%20%25/key',
     ;
 
+had_no_warnings;

@@ -1,3 +1,15 @@
+0.006   2020-08-18  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.005 and 0.005.1.
+
+
+0.005.1 2020-08-18  Released-By: PERLANCAR; Urgency: medium; Status: Cancelled
+
+	- [ux] [cli ps-opera] Make text output saner.
+
+        - Rename release from 0.004 to 0.005.1 and cancel (duplicate).
+
+
 0.005   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utilities: start-opera, restart-opera, opera-has-processes.

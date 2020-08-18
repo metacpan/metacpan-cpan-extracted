@@ -1,4 +1,4 @@
-# Copyrights 2001-2019 by [Mark Overmeer].
+# Copyrights 2001-2020 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Box::Message;
 use vars '$VERSION';
-$VERSION = '3.008';
+$VERSION = '3.009';
 
 use base 'Mail::Message';
 

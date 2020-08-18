@@ -2,8 +2,8 @@ NAME
     Proc::Govern - Run child process and govern its various aspects
 
 VERSION
-    This document describes version 0.209 of Proc::Govern (from Perl
-    distribution Proc-Govern), released on 2019-11-29.
+    This document describes version 0.211 of Proc::Govern (from Perl
+    distribution Proc-Govern), released on 2020-08-18.
 
 SYNOPSIS
     To use as Perl module:
@@ -52,7 +52,9 @@ SYNOPSIS
          load_check_every => 20,    # optional, default 10. frequency of load checking (in seconds).
 
          # restart options
-         restart => 1,              # optional. if set to 1, will restart command if exit code is not zero.
+         restart_if_failed => 1,              # optional. if set to 1, will restart command if exit code is not zero.
+         restart_if_no_output_after => 60,    # optional. if set to a positive number, will restart command after no
+                                              #           stdout output after this many seconds
 
          # screensaver control options
          no_screensaver => 1,       # optional. if set to 1, will prevent screensaver from being activated while command
@@ -147,9 +149,6 @@ EXIT CODES
 
         Another instance is already running (when "single_instance" option
         is true).
-
-CAVEATS
-    Not yet tested on Win32.
 
 FUNCTIONS
   govern_process
@@ -274,9 +273,14 @@ FUNCTIONS
 
         Directory to put PID file in.
 
-    *   restart => *bool*
+    *   restart_if_failed => *bool*
 
         If set to true, do restart.
+
+    *   restart_if_no_output_after => *uint*
+
+        If set to positive number, restart when there is no output after
+        this many seconds.
 
     *   show_stderr => *bool* (default: 1)
 
@@ -342,6 +346,9 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
+CAVEATS
+    Not yet tested on Win32.
+
 SEE ALSO
     Forks::Super (since 2009) extends the fork(), wait(), and waitpid()
     functions with some process/job management features, e.g. set timeout,
@@ -402,8 +409,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013,
-    2012 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014,
+    2013, 2012 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

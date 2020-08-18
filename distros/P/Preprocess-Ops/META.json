@@ -32,7 +32,7 @@
    "provides" : {
       "Preprocess::Ops" : {
          "file" : "lib/Preprocess/Ops.pm",
-         "version" : "20200811"
+         "version" : "20200817"
       }
    },
    "release_status" : "stable",
@@ -41,6 +41,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20200811",
+   "version" : "20200817",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }
