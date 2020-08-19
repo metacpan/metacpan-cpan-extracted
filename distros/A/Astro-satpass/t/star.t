@@ -41,13 +41,14 @@ coordinates.
 
 EOD
 
-tolerance $alpha, ( ( 14.390 / 60 + 46 ) / 60 + 2 ) / 12 * PI, $tolerance,
-    'Right ascension of Theta Persei 2028 Nov 13.19';
+tolerance( $alpha, ( ( 14.390 / 60 + 46 ) / 60 + 2 ) / 12 * PI, $tolerance,
+    'Right ascension of Theta Persei 2028 Nov 13.19' );
 
-tolerance $delta, deg2rad ( ( 7.45 / 60 + 21 ) / 60 + 49 ), $tolerance,
-    'Declination of Theta Persei 2028 Nov 13.19';
+tolerance( $delta, deg2rad ( ( 7.45 / 60 + 21 ) / 60 + 49 ), $tolerance,
+    'Declination of Theta Persei 2028 Nov 13.19' );
 
 done_testing;
 
 1;
-__END__
+
+# ex: set filetype=perl textwidth=72 :

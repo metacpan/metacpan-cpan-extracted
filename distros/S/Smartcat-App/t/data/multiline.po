@@ -1,0 +1,15 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+"Generated-By: Serge 1.4\n"
+
+#. /long_segment/other
+#: File: translate-b2b-test-4.en.yml
+#: ID: 5a8d523247672c47403d1c60cf0cbf91
+msgctxt "/long_segment/other"
+msgid ""
+"Test one: <ul><li>UTF-8</li><li>UTF-9</li><li>More text</li><li>Even longer "
+"text that should split it in too</li></ul>"
+msgstr ""

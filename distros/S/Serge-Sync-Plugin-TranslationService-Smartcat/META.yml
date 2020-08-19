@@ -22,14 +22,13 @@ no_index:
     - t
     - xt
 requires:
-  Serge: v1.3.2
-  Smartcat::App: v0.0.3
+  Smartcat::App: v0.0.4
   perl: '5.008005'
 resources:
   bugtracker: https://github.com/smartcatai/smartcat-serge-sync-plugin/issues
   homepage: https://github.com/smartcatai/smartcat-serge-sync-plugin
   repository: https://github.com/smartcatai/smartcat-serge-sync-plugin.git
-version: 0.0.5
+version: 0.0.6
 x_contributors:
   - 'Igor Afanasyev <afan@evernote.com>'
   - 'smartcatai <github@smartcat.pro>'

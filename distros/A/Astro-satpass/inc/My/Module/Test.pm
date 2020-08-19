@@ -5,7 +5,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 use Exporter qw{ import };
 
@@ -116,7 +116,7 @@ sub format_time {
 	$parts[4] + 1, @parts[ 3, 2, 1, 0 ];
 }
 
-sub magnitude (@) {
+sub magnitude {
     my ( $tle, @arg ) = @_;
     my ( $time, $want, $name ) = splice @arg, -3;
     my $got;
@@ -139,7 +139,7 @@ sub magnitude (@) {
     }
 }
 
-sub tolerance (@) {
+sub tolerance {
     my ( $got, $want, $tolerance, $title, $fmtr ) = @_;
     $fmtr ||= sub { return $_[0] };
     $title =~ s{ (?<! [.] ) \z }{.}smx;
@@ -157,7 +157,7 @@ EOD
     return ok( $rslt, $title );
 }
 
-sub tolerance_frac (@) {
+sub tolerance_frac {
     my ( $got, $want, $tolerance, $title, $fmtr ) = @_;
     @_ = ( $got, $want, $tolerance * abs $want, $title, $fmtr );
     goto &tolerance;
@@ -182,7 +182,7 @@ sub tolerance_frac (@) {
 	},
     );
 
-    sub velocity_sanity ($$;$) {
+    sub velocity_sanity {
 	my ( $method, $body, $sta ) = @_;
 	my $time = $body->universal();
 	my @rslt;
@@ -284,6 +284,19 @@ are also provided, on a line after the event.
 This subroutine converts a given Perl time into an ISO-8601-ish GMT
 time. It is used by C<format_pass()>.
 
+=head2 magnitude
+
+ magnitude( $tle, $station, $time, $want, $name );
+ magnitude( $tle, $time, $want, $name );
+
+This subroutine tests whether the magnitude of the satellite specified
+by C<$tle>, seen from the given C<$station> at the given C<$time>, has
+the value C<$want> to one decimal place. Argument C<$name> is the name
+of the test.
+
+If argument C<$station> is omitted, the C<station> attribute of the TLE
+is used.
+
 =head2 tolerance
 
  tolerance $got, $want, $tolerance, $title, $formatter
@@ -300,8 +313,6 @@ to code used to format the C<$got> and C<$want> values for display if
 the test fails. The formatter will be called with a single argument,
 which is the value to display.
 
-This subroutine is prototyped C<(@)>.
-
 =head2 tolerance_frac
 
  tolerance_frac $got, $want, $tolerance, $title
@@ -310,8 +321,6 @@ This subroutine is a variant on C<tolerance()> in which the tolerance is
 expressed as a fraction of the C<$want> value. It is actually just a
 stub that replaces the C<$tolerance> argument by
 C<< abs( $want * $tolerance ) >> and then does a C<goto &tolerance>.
-
-This subroutine is prototyped C<(@)>.
 
 =head1 SUPPORT
 

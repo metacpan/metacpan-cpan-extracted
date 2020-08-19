@@ -14,10 +14,11 @@ Module::Build->new(
         'Readonly'         => 1.03,
         'List::MoreUtils'  => 0,
     },
-    build_requires => {
+    build_requires => {},
+    test_requires  => {
         'Test::More'       => 0.86,
         'Test::NoWarnings' => 0,
+        'Test::Warn'       => 0,
     },
-    test_requires => {},
-    sign          => 1,
+    sign => 1,
 )->create_build_script;

@@ -173,14 +173,14 @@ Astro::Coord::ECI->set (debug => 0);
 	    0.579094339305825, -2.060487233536, 6373.41803380646,
 	)->geodetic();
 
-    tolerance_frac $lat, .58217396455, 1e-6,
-	'Geocentric to geodetic: latitude';
+    tolerance_frac( $lat, .58217396455, 1e-6,
+	'Geocentric to geodetic: latitude' );
 
-    tolerance_frac $long, -2.060487233536, 1e-6,
-	'Geocentric to geodetic: longitude';
+    tolerance_frac( $long, -2.060487233536, 1e-6,
+	'Geocentric to geodetic: longitude' );
 
-    tolerance_frac $elev, 1.706, 1e-3,
-	'Geocentric to geodetic: height above sea level';
+    tolerance_frac( $elev, 1.706, 1e-3,
+	'Geocentric to geodetic: height above sea level' );
 
 #	[IAU76 => -0.579094339305825, 1.08110542005979, 6373.41803380646,
 #		[-.58217396455, 1e-6], [1.08110542005979, 1e-6], [1.706, 1e-3]],
@@ -192,14 +192,14 @@ Astro::Coord::ECI->set (debug => 0);
 	    -0.579094339305825, 1.08110542005979, 6373.41803380646,
 	)->geodetic();
 
-    tolerance_frac $lat, -.58217396455, 1e-6,
-	'Geocentric to geodetic: latitude';
+    tolerance_frac( $lat, -.58217396455, 1e-6,
+	'Geocentric to geodetic: latitude' );
 
-    tolerance_frac $long, 1.08110542005979, 1e-6,
-	'Geocentric to geodetic: longitude';
+    tolerance_frac( $long, 1.08110542005979, 1e-6,
+	'Geocentric to geodetic: longitude' );
 
-    tolerance_frac $elev, 1.706, 1e-3,
-	'Geocentric to geodetic: height above sea level';
+    tolerance_frac( $elev, 1.706, 1e-3,
+	'Geocentric to geodetic: height above sea level' );
 }
 
 # geodetic -> Earth-Centered, Earth-Fixed
@@ -224,27 +224,27 @@ EOD
 	Astro::Coord::ECI->new( ellipsoid => 'GRS80' )->
 	geodetic( .58217396455, -2.060487233536, 1.706 )->ecef();
 
-    tolerance_frac $x, -2508.9754549, 1e-5,
-	'Geodetic to ECEF: X';
+    tolerance_frac( $x, -2508.9754549, 1e-5,
+	'Geodetic to ECEF: X' );
 
-    tolerance_frac $y, -4707.4038939, 1e-5,
-	'Geodetic to ECEF: Y';
+    tolerance_frac( $y, -4707.4038939, 1e-5,
+	'Geodetic to ECEF: Y' );
 
-    tolerance_frac $z, 3487.9532711, 1e-5,
-	'Geodetic to ECEF: Z';
+    tolerance_frac( $z, 3487.9532711, 1e-5,
+	'Geodetic to ECEF: Z' );
 
     ( $x, $y, $z ) =
 	Astro::Coord::ECI->new( ellipsoid => 'GRS80' )->
 	geodetic( -.58217396455, 1.08110542005979, 1.706 )->ecef();
 
-    tolerance_frac $x, 2508.9754549, 1e-5,
-	'Geodetic to ECEF: X';
+    tolerance_frac( $x, 2508.9754549, 1e-5,
+	'Geodetic to ECEF: X' );
 
-    tolerance_frac $y, 4707.4038939, 1e-5,
-	'Geodetic to ECEF: Y';
+    tolerance_frac( $y, 4707.4038939, 1e-5,
+	'Geodetic to ECEF: Y' );
 
-    tolerance_frac $z, -3487.9532711, 1e-5,
-	'Geodetic to ECEF: Z';
+    tolerance_frac( $z, -3487.9532711, 1e-5,
+	'Geodetic to ECEF: Z' );
 }
 
 
@@ -259,27 +259,27 @@ EOD
 	Astro::Coord::ECI->new( ellipsoid => 'GRS80' )->
 	ecef( -2508.9754549, -4707.4038939, 3487.9532711 )->geodetic();
 
-    tolerance_frac $lat, .58217396455, 1e-5,
-	'ECEF to Geodetic: latitude';
+    tolerance_frac( $lat, .58217396455, 1e-5,
+	'ECEF to Geodetic: latitude' );
 
-    tolerance_frac $long, -2.060487233536, 1e-5,
-	'ECEF to Geodetic: longitude';
+    tolerance_frac( $long, -2.060487233536, 1e-5,
+	'ECEF to Geodetic: longitude' );
 
-    tolerance_frac $elev, 1.706, 1e-5,
-	'ECEF to Geodetic: height above sea level';
+    tolerance_frac( $elev, 1.706, 1e-5,
+	'ECEF to Geodetic: height above sea level' );
 
     ( $lat, $long, $elev ) =
 	Astro::Coord::ECI->new( ellipsoid => 'GRS80' )->
 	ecef( 2508.9754549, 4707.4038939, -3487.9532711 )->geodetic();
 
-    tolerance_frac $lat, -.58217396455, 1e-5,
-	'ECEF to Geodetic: latitude';
+    tolerance_frac( $lat, -.58217396455, 1e-5,
+	'ECEF to Geodetic: latitude' );
 
-    tolerance_frac $long, 1.08110542005979, 1e-5,
-	'ECEF to Geodetic: longitude';
+    tolerance_frac( $long, 1.08110542005979, 1e-5,
+	'ECEF to Geodetic: longitude' );
 
-    tolerance_frac $elev, 1.706, 1e-5,
-	'ECEF to Geodetic: height above sea level';
+    tolerance_frac( $elev, 1.706, 1e-5,
+	'ECEF to Geodetic: height above sea level' );
 }
 
 
@@ -295,11 +295,11 @@ EOD
 	Astro::Coord::ECI->new( ellipsoid => 'WGS72' )->
 	geodetic( deg2rad( 40 ), deg2rad( -75 ), 0 )->eci( $time );
 
-    tolerance_frac $x, 1703.295, 1e-6, 'Geodetic to ECI: X';
+    tolerance_frac( $x, 1703.295, 1e-6, 'Geodetic to ECI: X' );
 
-    tolerance_frac $y, 4586.650, 1e-6, 'Geodetic to ECI: Y';
+    tolerance_frac( $y, 4586.650, 1e-6, 'Geodetic to ECI: Y' );
 
-    tolerance_frac $z, 4077.984, 1e-6, 'Geodetic to ECI: Z';
+    tolerance_frac( $z, 4077.984, 1e-6, 'Geodetic to ECI: Z' );
 
     $time = greg_time_gm( 0, 0, 9, 1, 9, 1995 );
 
@@ -307,11 +307,11 @@ EOD
 	Astro::Coord::ECI->new( ellipsoid => 'WGS72' )->
 	geodetic( deg2rad( -40 ), deg2rad( 105 ), 0 )->eci( $time );
 
-    tolerance_frac $x, -1703.295, 1e-6, 'Geodetic to ECI: X';
+    tolerance_frac( $x, -1703.295, 1e-6, 'Geodetic to ECI: X' );
 
-    tolerance_frac $y, -4586.650, 1e-6, 'Geodetic to ECI: Y';
+    tolerance_frac( $y, -4586.650, 1e-6, 'Geodetic to ECI: Y' );
 
-    tolerance_frac $z, -4077.984, 1e-6, 'Geodetic to ECI: Z';
+    tolerance_frac( $z, -4077.984, 1e-6, 'Geodetic to ECI: Z' );
 }
 
 
@@ -327,15 +327,15 @@ EOD
 	Astro::Coord::ECI->new( ellipsoid => 'WGS72' )->
 	eci( 1703.295, 4586.650, 4077.984, $time )->geodetic();
 
-    tolerance_frac $lat, deg2rad( 40 ), 1e-6,
-	'ECI to geodetic: latitude';
+    tolerance_frac( $lat, deg2rad( 40 ), 1e-6,
+	'ECI to geodetic: latitude' );
 
-    tolerance_frac $long, deg2rad( -75 ), 1e-6,
-	'ECI to geodetic: longitude';
+    tolerance_frac( $long, deg2rad( -75 ), 1e-6,
+	'ECI to geodetic: longitude' );
 
     $elev += EQUATORIALRADIUS;
-    tolerance_frac $elev, EQUATORIALRADIUS, 1e-6,
-	'ECI to geodetic: distance from center';
+    tolerance_frac( $elev, EQUATORIALRADIUS, 1e-6,
+	'ECI to geodetic: distance from center' );
 
     $time = greg_time_gm( 0, 0, 9, 1, 9, 1995 );
 
@@ -343,15 +343,15 @@ EOD
 	Astro::Coord::ECI->new( ellipsoid => 'WGS72' )->
 	eci( -1703.295, -4586.650, -4077.984, $time )->geodetic();
 
-    tolerance_frac $lat, deg2rad( -40 ), 1e-6,
-	'ECI to geodetic: latitude';
+    tolerance_frac( $lat, deg2rad( -40 ), 1e-6,
+	'ECI to geodetic: latitude' );
 
-    tolerance_frac $long, deg2rad( 105 ), 1e-6,
-	'ECI to geodetic: longitude';
+    tolerance_frac( $long, deg2rad( 105 ), 1e-6,
+	'ECI to geodetic: longitude' );
 
     $elev += EQUATORIALRADIUS;
-    tolerance_frac $elev, EQUATORIALRADIUS, 1e-6,
-	'ECI to geodetic: distance from center';
+    tolerance_frac( $elev, EQUATORIALRADIUS, 1e-6,
+	'ECI to geodetic: distance from center' );
 }
 
 
@@ -381,14 +381,14 @@ EOD
 
     my ( $azm, $elev, $rng ) = $sta->azel( $sat );
 
-    tolerance_frac $azm, deg2rad( 171.906 ), 1e-3,
-	'Azimuth for observer';
+    tolerance_frac( $azm, deg2rad( 171.906 ), 1e-3,
+	'Azimuth for observer' );
 
-    tolerance_frac $elev, deg2rad( 45.682 ), 1e-3,
-	'Elevation for observer';
+    tolerance_frac( $elev, deg2rad( 45.682 ), 1e-3,
+	'Elevation for observer' );
 
-    tolerance_frac $rng, 37355.457, 1e-3,
-	'Range for observer';
+    tolerance_frac( $rng, 37355.457, 1e-3,
+	'Range for observer' );
 
     # Same as above tests, but with the station in the 'station'
     # attribute.
@@ -397,14 +397,14 @@ EOD
 
     ( $azm, $elev, $rng ) = $sat->azel();
 
-    tolerance_frac $azm, deg2rad( 171.906 ), 1e-3,
-	'Azimuth for observer';
+    tolerance_frac( $azm, deg2rad( 171.906 ), 1e-3,
+	'Azimuth for observer' );
 
-    tolerance_frac $elev, deg2rad( 45.682 ), 1e-3,
-	'Elevation for observer';
+    tolerance_frac( $elev, deg2rad( 45.682 ), 1e-3,
+	'Elevation for observer' );
 
-    tolerance_frac $rng, 37355.457, 1e-3,
-	'Range for observer';
+    tolerance_frac( $rng, 37355.457, 1e-3,
+	'Range for observer' );
 
     # enu
     # Tests: enu()
@@ -414,14 +414,14 @@ EOD
 
     my ( $East, $North, $Up ) = $sat->enu();
 
-    tolerance $East, 3675, 10,
-	'East for observer';
+    tolerance( $East, 3675, 10,
+	'East for observer' );
 
-    tolerance $North, -25840, 10,
-	'North for observer';
+    tolerance( $North, -25840, 10,
+	'North for observer' );
 
-    tolerance $Up, 26746, 10,
-	'Up for observer';
+    tolerance( $Up, 26746, 10,
+	'Up for observer' );
 }
 
 # atmospheric refraction.
@@ -433,8 +433,8 @@ EOD
     my $got = Astro::Coord::ECI->
 	correct_for_refraction( deg2rad( .5541 ) );
 
-    tolerance_frac $got, deg2rad( 57.864 / 60 ), 1e-4,
-	'Correction for atmospheric refraction';
+    tolerance_frac( $got, deg2rad( 57.864 / 60 ), 1e-4,
+	'Correction for atmospheric refraction' );
 }
 
 
@@ -448,8 +448,8 @@ EOD
 
     my $got = $A->angle ($B, $C);
 
-    tolerance $got, deg2rad( 90 ), 1e-6,
-	'Angle between two points as seen from a third';
+    tolerance( $got, deg2rad( 90 ), 1e-6,
+	'Angle between two points as seen from a third' );
 }
 
 # Nutation
@@ -460,12 +460,12 @@ EOD
 	timegm( 0, 0, 0, 10, 3, 87 ) );
 
     # Tolerance .5 seconds of arc
-    tolerance $delta_psi, -1.8364e-5, .00001,
-	'nutation in longitude: Midnight Nov 3 1987: Meeus ex 22.a';
+    tolerance( $delta_psi, -1.8364e-5, .00001,
+	'nutation in longitude: Midnight Nov 3 1987: Meeus ex 22.a' );
 
     # Tolerance .1 seconds of arc
-    tolerance $delta_epsilon, 4.5781e-5, .000001,
-	'nutation in obliquity: Midnight Nov 3 1987: Meeus ex 22.a';
+    tolerance( $delta_epsilon, 4.5781e-5, .000001,
+	'nutation in obliquity: Midnight Nov 3 1987: Meeus ex 22.a' );
 }
 
 # Obliquity
@@ -475,8 +475,8 @@ EOD
     my $epsilon = CLASS->obliquity(
 	timegm( 0, 0, 0, 10, 3, 87 ) );
 
-    tolerance $epsilon, 0.409167475225493, .00001,
-	'obliquity: Midnight Nov 3 1987: Meeus ex 22.a';
+    tolerance( $epsilon, 0.409167475225493, .00001,
+	'obliquity: Midnight Nov 3 1987: Meeus ex 22.a' );
 }
 
 # Equation of time
@@ -485,8 +485,8 @@ EOD
 {
     my $got = CLASS->equation_of_time( timegm( 0, 0, 0, 13, 9, 92 ) );
 
-    tolerance $got, 13 * 60 + 42.7, .1,
-	'equation_of_time: Midnight Oct 13 1992: Meeus ex 28b';
+    tolerance( $got, 13 * 60 + 42.7, .1,
+	'equation_of_time: Midnight Oct 13 1992: Meeus ex 28b' );
 
 }
 
@@ -515,11 +515,11 @@ use constant LIGHTYEAR2KILOMETER => 9.4607e12;
     my ( $alpha, $delta ) = $eci->precess( $utim )->equatorial();
     my $tolerance = 1e-6;
 
-    tolerance $alpha, $alphae, $tolerance,
-	'Precession of equinoxes: right ascension';
+    tolerance( $alpha, $alphae, $tolerance,
+	'Precession of equinoxes: right ascension' );
 
-    tolerance $delta, $deltae, $tolerance,
-	'Precession of equinoxes: declination';
+    tolerance( $delta, $deltae, $tolerance,
+	'Precession of equinoxes: declination' );
 }
 
 {
@@ -545,11 +545,11 @@ use constant LIGHTYEAR2KILOMETER => 9.4607e12;
     my ( $alpha, $delta ) = $eci->precess( $utim )->equatorial();
     my $tolerance = 1e-6;
 
-    tolerance $alpha, $alphae, $tolerance,
-	'Precession of equinoxes: right ascension';
+    tolerance( $alpha, $alphae, $tolerance,
+	'Precession of equinoxes: right ascension' );
 
-    tolerance $delta, $deltae, $tolerance,
-	'Precession of equinoxes: declination';
+    tolerance( $delta, $deltae, $tolerance,
+	'Precession of equinoxes: declination' );
 
     cmp_ok $sta->get( 'equinox_dynamical' ), '==', $time,
 	'Station object was precessed';
@@ -574,12 +574,12 @@ use constant LIGHTYEAR2KILOMETER => 9.4607e12;
     my ( $lat, $long ) = Astro::Coord::ECI->equatorial(
 	deg2rad( 116.328942 ), deg2rad( 28.026183 ), 1e12, $time )->ecliptic();
 
-    tolerance_frac $lat, deg2rad( 6.684170 ), 1e-6,
-	'Equatorial to Ecliptic: latitude';
+    tolerance_frac( $lat, deg2rad( 6.684170 ), 1e-6,
+	'Equatorial to Ecliptic: latitude' );
 
 
-    tolerance_frac $long, deg2rad( 113.215630 ), 1e-6,
-	'Equatorial to Ecliptic: longitude';
+    tolerance_frac( $long, deg2rad( 113.215630 ), 1e-6,
+	'Equatorial to Ecliptic: longitude' );
 }
 
 
@@ -594,11 +594,11 @@ use constant LIGHTYEAR2KILOMETER => 9.4607e12;
     my ( $ra, $dec ) = Astro::Coord::ECI->ecliptic(
 	deg2rad( 6.684170 ), deg2rad( 113.215630 ), 1e12, $time )->equatorial();
 
-    tolerance_frac $ra, deg2rad( 116.328942 ), 1e-6,
-	'Ecliptic to Equatorial: Right ascension';
+    tolerance_frac( $ra, deg2rad( 116.328942 ), 1e-6,
+	'Ecliptic to Equatorial: Right ascension' );
 
-    tolerance_frac $dec, deg2rad( 28.026183 ), 1e-6,
-	'Ecliptic to Equatorial: Declination';
+    tolerance_frac( $dec, deg2rad( 28.026183 ), 1e-6,
+	'Ecliptic to Equatorial: Declination' );
 }
 
 use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
@@ -622,11 +622,11 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
 	)->eci();
     my $tolerance = 1e-5;
 
-    tolerance_frac $x, $expx, $tolerance, 'Ecliptic to ECI: X';
+    tolerance_frac( $x, $expx, $tolerance, 'Ecliptic to ECI: X' );
 
-    tolerance_frac $y, $expy, $tolerance, 'Ecliptic to ECI: Y';
+    tolerance_frac( $y, $expy, $tolerance, 'Ecliptic to ECI: Y' );
 
-    tolerance_frac $z, $expz, $tolerance, 'Ecliptic to ECI: Z';
+    tolerance_frac( $z, $expz, $tolerance, 'Ecliptic to ECI: Z' );
 }
 
 # universal time to local mean time
@@ -698,14 +698,14 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
 	    equatorial();
     my @got = $station->equatorial ($body);
 
-    tolerance $got[0], $want[0], 0.000001,
-	'Right ascension relative to explicit location';
+    tolerance( $got[0], $want[0], 0.000001,
+	'Right ascension relative to explicit location' );
 
-    tolerance $got[1], $want[1], 0.000001,
-	'Declination relative to explicit location';
+    tolerance( $got[1], $want[1], 0.000001,
+	'Declination relative to explicit location' );
 
-    tolerance $got[2], $want[2], 0.000001,
-	'Right ascension relative to explicit location';
+    tolerance( $got[2], $want[2], 0.000001,
+	'Right ascension relative to explicit location' );
 
 }	# End local symbol block.
 
@@ -732,14 +732,14 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
     $body->set( station => $station );
     my @got = $body->equatorial_apparent();
 
-    tolerance $got[0], $want[0], 0.000001,
-	'Right ascension relative to station attribute';
+    tolerance( $got[0], $want[0], 0.000001,
+	'Right ascension relative to station attribute' );
 
-    tolerance $got[1], $want[1], 0.000001,
-	'Declination relative to station attribute';
+    tolerance( $got[1], $want[1], 0.000001,
+	'Declination relative to station attribute' );
 
-    tolerance $got[2], $want[2], 0.000001,
-	'Right ascension relative to station attribute';
+    tolerance( $got[2], $want[2], 0.000001,
+	'Right ascension relative to station attribute' );
 
 }	# End local symbol block.
 
@@ -797,17 +797,17 @@ ok( ! Astro::Coord::ECI->represents( 'Astro::Coord::ECI::TLE' ),
 
     $body->set( station => $sta );
 
-    velocity_sanity ecef => $body;
+    velocity_sanity( ecef => $body );
 
-    velocity_sanity neu => $body->universal( $time );
+    velocity_sanity( neu => $body->universal( $time ) );
 
-    velocity_sanity enu => $body->universal( $time );
+    velocity_sanity( enu => $body->universal( $time ) );
 
-    velocity_sanity azel => $body->universal( $time ), $sta;
+    velocity_sanity( azel => $body->universal( $time ), $sta );
 
-    velocity_sanity azel => $body->universal( $time );
+    velocity_sanity( azel => $body->universal( $time ) );
 
-    velocity_sanity eci => $sta->universal( $time );
+    velocity_sanity( eci => $sta->universal( $time ) );
 
     {
 	$body->set( frequency => 1_000_000 );
@@ -815,7 +815,7 @@ ok( ! Astro::Coord::ECI->represents( 'Astro::Coord::ECI::TLE' ),
 	if ( @azel > 6 ) {
 	    # This is just to be sure it is calculated consistently; I
 	    # have no idea whether I am getting the right answer.
-	    tolerance $azel[6], .25, 0.01, 'Doppler shift';
+	    tolerance( $azel[6], .25, 0.01, 'Doppler shift' );
 	} else {
 	    fail 'No Doppler calculated';
 	}
@@ -832,7 +832,7 @@ ok( ! Astro::Coord::ECI->represents( 'Astro::Coord::ECI::TLE' ),
 	$body->azel() );
     my @coord = qw{ X Y Z X_dot Y_dot Z_dot };
     foreach my $inx ( 0 .. 5 ) {
-	tolerance $got[$inx], $want[$inx], 1e-12, $coord[$inx];
+	tolerance( $got[$inx], $want[$inx], 1e-12, $coord[$inx] );
     }
 }
 
@@ -859,4 +859,4 @@ done_testing;
 
 1;
 
-# ex: set textwidth=72 :
+# ex: set filetype=perl textwidth=72 :

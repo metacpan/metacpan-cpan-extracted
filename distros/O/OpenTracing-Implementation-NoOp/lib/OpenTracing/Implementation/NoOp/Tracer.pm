@@ -15,7 +15,7 @@ None of the methods will do anything useful.
 
 =cut
 
-our $VERSION = 'v0.72.0';
+our $VERSION = 'v0.72.1';
 
 
 
@@ -43,7 +43,7 @@ sub start_span {
     OpenTracing::Implementation::NoOp::Span->new( )
 }
 
-sub inject_context { }
+sub inject_context { $_[1] } # carrier
 
 sub extract_context { undef }
 

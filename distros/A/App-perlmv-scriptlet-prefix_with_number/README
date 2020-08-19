@@ -1,0 +1,70 @@
+NAME
+    App::perlmv::scriptlet::prefix_with_number - Prefix filenames with
+    number (usually to make them easily sortable)
+
+VERSION
+    This document describes version 0.001 of
+    App::perlmv::scriptlet::prefix_with_number (from Perl distribution
+    App-perlmv-scriptlet-prefix_with_number), released on 2020-08-18.
+
+SYNOPSIS
+    The default is sorted ascibetically:
+
+     % perlmv prefix-with-number foo bar.txt baz.mp3
+
+     1-bar.txt
+     2-baz.mp3
+     3-foo
+
+    Don't sort ("-T" perlmv option), use two digits:
+
+     % perlmv prefix-with-number -T -a digits=2 foo bar.txt baz.mp3
+
+     01-foo
+     02-bar.txt
+     03-baz.mp3
+
+DESCRIPTION
+SCRIPTLET ARGUMENTS
+    Arguments can be passed using the "-a" ("--arg") perlmv option, e.g. "-a
+    name=val".
+
+  digits
+    Required. Number of digits to use (1 means 1,2,3,..., 2 means
+    01,02,03,...); the default is to autodetect.
+
+  interval
+    Interval from one number to the next.
+
+  start
+    Number to start from.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-perlmv-scriptlet-prefix_with_number>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-perlmv-scriptlet-prefix_with_numb
+    er>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-scriptlet-
+    prefix_with_number>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    perlmv (from App::perlmv)
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

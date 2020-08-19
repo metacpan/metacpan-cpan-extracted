@@ -1,10 +1,10 @@
 package Mojolicious::Plugin::AdditionalValidationChecks;
 
-# ABSTRACT: Add addtional validation checks
+# ABSTRACT: Add additional validation checks
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Email::Valid;
 use Scalar::Util qw(looks_like_number);
@@ -295,11 +295,11 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::AdditionalValidationChecks - Add addtional validation checks
+Mojolicious::Plugin::AdditionalValidationChecks - Add additional validation checks
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 

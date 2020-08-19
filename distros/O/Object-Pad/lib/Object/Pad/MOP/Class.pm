@@ -8,7 +8,7 @@ package Object::Pad::MOP::Class;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 # This is an XS-implemented object type provided by Object::Pad itself
 require Object::Pad;
@@ -19,10 +19,10 @@ C<Object::Pad::MOP::Class> - meta-object representation of a C<Object::Pad> clas
 
 =head1 DESCRIPTION
 
-Instances of this class represent a class implemented by L<Object::Pad>.
-Accessors provide information about the class, and methods that can alter the
-class, typically by adding new elements to it, allow a program to extend
-existing classes.
+Instances of this class represent a class or role implemented by
+L<Object::Pad>. Accessors provide information about the class or role, and
+methods that can alter the class, typically by adding new elements to it, 
+allow a program to extend existing classes.
 
 Where possible, this API is designed to be compatible with L<MOP::Class>.
 
@@ -32,6 +32,16 @@ which C<Object::Pad> is expermental.
 =cut
 
 =head1 METHODS
+
+=head2 is_class
+
+=head2 is_role
+
+   $bool = $metaclass->is_class
+   $bool = $metaclass->is_role
+
+Exactly one of these methods will return true, depending on whether this
+metaclass instance represents a true C<class>, or a C<role>.
 
 =head2 name
 
@@ -47,6 +57,13 @@ Returns a list of superclasses, as L<Object::Pad::MOP::Class> instances.
 
 Because C<Object::Pad> does not support multiple superclasses, this list will
 contain at most one item.
+
+=head2 roles
+
+   @roles = $metaclass->roles
+
+Returns a list of roles implemented by this class, as
+L<Object::Pad::MOP::Class> instances.
 
 =head2 add_BUILD
 

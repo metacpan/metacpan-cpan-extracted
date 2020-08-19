@@ -14,13 +14,9 @@ use Pod::Usage;
 use POSIX qw{ strftime };
 use Time::Local;
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 local $Astro::Coord::ECI::Sun::Singleton = 0;
-
-sub sayx (@) {
-    return print @_, "\n";
-}
 
 my %opt;
 
@@ -60,16 +56,16 @@ foreach my $usno ( @{ $data->{data} } ) {
     { Equinox => 1, Solstice => 1 }->{$usno->{phenom}}
 	or next;
     my ( $time, $quarter, $desc ) = $my_sun->next_quarter();
-    sayx "$year $desc";
+    sayx( "$year $desc" );
     my ( undef, $lon ) = $my_sun->ecliptic();
-    sayx '     Astro::Coord::ECI::Sun time ', format_time( $time ),
-	'; longitude ', format_lon( $lon );
+    sayx( '     Astro::Coord::ECI::Sun time ', format_time( $time ),
+	'; longitude ', format_lon( $lon ) );
     my ( $hr, $min ) = split qr<:>smx, $usno->{time};
     $time = timegm( 0, $min, $hr, $usno->{day}, $usno->{month}-1,
 	$usno->{year} );
     ( undef, $lon ) = $usno_sun->ecliptic( $time );
-    sayx '    U. S. Naval Observatory time ', format_time( $time ),
-	'; longitude ', format_lon( $lon );
+    sayx( '    U. S. Naval Observatory time ', format_time( $time ),
+	'; longitude ', format_lon( $lon ) );
 }
 
 sub format_lon {
@@ -80,6 +76,10 @@ sub format_lon {
 sub format_time {
     my ( $time ) = @_;
     return strftime( '%Y-%m-%dT%H:%M:%SZ', gmtime $time );
+}
+
+sub sayx {
+    return print @_, "\n";
 }
 
 __END__

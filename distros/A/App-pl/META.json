@@ -38,6 +38,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.56",
+   "version" : "0.57",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

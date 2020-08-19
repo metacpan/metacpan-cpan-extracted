@@ -27,6 +27,9 @@ t/Config.t
 t/Utils.t
 t/author-pod-syntax.t
 t/basic.t
+t/data/empty-id-with-context.po
+t/data/empty.po
+t/data/multiline.po
 t/data/test.config
 t/data/test_validate_log.config
 t/project.t

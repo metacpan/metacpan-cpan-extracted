@@ -51,11 +51,11 @@ my $copy = $_ = <<EOF;
 begin
 bof
 0;atom-weight-1.csv:1 0,n,Neutronium,18:noble gas,1
-0;atom-weight-1.csv:2 1,H,Hydrogen,1:H and alkali metal,1.008
+0;atom-weight-1.csv:2 1,H,Hydrogen,1:H & alkali metal,1.008
 0;atom-weight-1.csv:3 4,Be,Beryllium,2:alkaline earth metal,9.012
 0;atom-weight-1.csv:4 41,Nb,Niobium,5:no name,92.906
 0;atom-weight-1.csv:5 74,W,Tungsten,6:transition metal,183.84
-0;atom-weight-1.csv:6 8,O,Oxygen,16:O and chalcogen,15.999
+0;atom-weight-1.csv:6 8,O,Oxygen,16:O & chalcogen,15.999
 0;atom-weight-1.csv:7 80,Hg,Mercury,12:no name,200.592
 eof
 bof
@@ -63,7 +63,7 @@ bof
 1;atom-weight-2.csv:2 110,Ds,Darmstadtium,10:transition metal,[281]
 1;atom-weight-2.csv:3 4,Pl,Perlium,2:pl basis,5.32.0
 1;atom-weight-2.csv:4 74,W,Wolfram,6:transition metal,183.8
-1;atom-weight-2.csv:5 8,O,Oxygen,16:O and chalcogen,16
+1;atom-weight-2.csv:5 8,O,Oxygen,16:O & chalcogen,16
 1;atom-weight-2.csv:6 80,Hg,Quicksilver,12:no name,200.6
 eof
 bof

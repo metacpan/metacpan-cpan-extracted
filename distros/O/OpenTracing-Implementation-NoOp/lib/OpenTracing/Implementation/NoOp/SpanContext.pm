@@ -15,7 +15,7 @@ None of the methods will do anything useful.
 
 =cut
 
-our $VERSION = 'v0.72.0';
+our $VERSION = 'v0.72.1';
 
 
 

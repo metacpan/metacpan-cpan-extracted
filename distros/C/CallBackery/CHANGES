@@ -1,3 +1,15 @@
+0.34.13 2020-08-19 01:05:57 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - regressions regressions ... arg
+
+0.34.12 2020-08-19 01:02:43 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix copy message translation
+
+0.34.11 2020-08-19 00:16:55 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fixed copy success message
+
 0.34.10 2020-08-17 20:33:34 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - translate headers in excel export

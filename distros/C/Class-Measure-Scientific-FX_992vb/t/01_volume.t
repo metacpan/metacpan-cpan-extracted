@@ -10,25 +10,31 @@ use version;
 
 plan tests => 35;
 
+sub iz {
+    my ( $got, $exp, $msg ) = @_;
+    my $FMT = q{%.15g};
+    return is( sprintf( $FMT, $got ), sprintf( $FMT, $exp ), $msg );
+}
+
 require Class::Measure::Scientific::FX_992vb;
 my $m = Class::Measure::Scientific::FX_992vb->volume( 1, 'm3' );
-is( $m->m3(),         1,                q{1m3 via volume} );
-is( $m->bbl(),        6.2898107707486,  q{1m3 in barrel via volume} );
-is( $m->dry_barrel(), 8.64848980964333, q{1m3 in dry barrel via volume} );
-is( $m->bushel_uk(),  27.4960998260312, q{1m3 in bushel uk via volume} );
-is( $m->bu(),         28.3775932639421, q{1m3 in bushel via volume} );
-is( $m->cu(),         4226.75283773037, q{1m3 in cu via volume} );
-is( $m->pt_dry(),     1816.16596853606, q{1m3 in dry pint via volume} );
-is( $m->fbm(),        423.776000657863, q{1m3 in board foot via volume} );
-is( $m->floz_uk(),    35195.0077685717, q{1m3 in fluid ounce UK via volume} );
-is( $m->floz_us(),    33814.022701843,  q{1m3 in fluid ounce US via volume} );
-is( $m->gal_uk(),     219.968798553573, q{1m3 in gallon UK via volume} );
-is( $m->gal_us(),     264.172052358148, q{1m3 in gallon US via volume} );
-is( $m->pk(),         113.510373033607, q{1m3 in peck via volume} );
-is( $m->pt_uk(),      1759.75038842859, q{1m3 in pint via volume} );
-is( $m->pt_us(),      2113.37641886519, q{1m3 in liquid pint via volume} );
-is( $m->tbsp(),       67628.0454034573, q{1m3 in tablespoon via volume} );
-is( $m->tsp(),        202884.136211058, q{1m3 in teaspoon via volume} );
+iz( $m->m3(),         1,                q{1m3 via volume} );
+iz( $m->bbl(),        6.2898107707486,  q{1m3 in barrel via volume} );
+iz( $m->dry_barrel(), 8.64848980964333, q{1m3 in dry barrel via volume} );
+iz( $m->bushel_uk(),  27.4960998260312, q{1m3 in bushel uk via volume} );
+iz( $m->bu(),         28.3775932639421, q{1m3 in bushel via volume} );
+iz( $m->cu(),         4226.75283773037, q{1m3 in cu via volume} );
+iz( $m->pt_dry(),     1816.16596853606, q{1m3 in dry pint via volume} );
+iz( $m->fbm(),        423.776000657863, q{1m3 in board foot via volume} );
+iz( $m->floz_uk(),    35195.0077685717, q{1m3 in fluid ounce UK via volume} );
+iz( $m->floz_us(),    33814.022701843,  q{1m3 in fluid ounce US via volume} );
+iz( $m->gal_uk(),     219.968798553573, q{1m3 in gallon UK via volume} );
+iz( $m->gal_us(),     264.172052358148, q{1m3 in gallon US via volume} );
+iz( $m->pk(),         113.510373033607, q{1m3 in peck via volume} );
+iz( $m->pt_uk(),      1759.75038842859, q{1m3 in pint via volume} );
+iz( $m->pt_us(),      2113.37641886519, q{1m3 in liquid pint via volume} );
+iz( $m->tbsp(),       67628.0454034573, q{1m3 in tablespoon via volume} );
+iz( $m->tsp(),        202884.136211058, q{1m3 in teaspoon via volume} );
 
 # https://en.wikipedia.org/wiki/Barrel_(unit)
 $m = Class::Measure::Scientific::FX_992vb->volume( .1, 'm3' );

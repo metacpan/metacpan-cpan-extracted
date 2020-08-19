@@ -110,6 +110,13 @@ KEYWORDS
     itself; the concept should not be confused with per-object-instance
     data, which here is called "slots").
 
+    One or more roles can be composed into the class by the keyword
+    implements
+
+       class Name implements ROLE, ROLE,... {
+          ...
+       }
+
     The following class attributes are supported:
 
   :repr(TYPE)
@@ -163,6 +170,40 @@ KEYWORDS
     common forms of hash reference to be inspected by Data::Dumper, etc.
     This is the default representation type, and does not have to be
     specifically requested.
+
+ role
+
+       role Name :ATTRS... {
+          ...
+       }
+    
+       role Name :ATTRS...;
+
+    Since version 0.32.
+
+    Similar to class, but provides a package that defines a new role. A
+    role acts simliar to a class in some respects, and differently in
+    others.
+
+    Like a class, a role can have a version, and named methods.
+
+       role Name VERSION {
+          method a { ... }
+          method b { ... }
+       }
+
+    A role does not provide a constructor, and instances cannot directly be
+    constructed. A role cannot extend a class.
+
+    A role can declare that it requires methods of given names from any
+    class that implements the role.
+
+       role Name {
+          requires METHOD;
+       }
+
+    Currently, a role cannot provide instance slots, though it is hoped
+    that a later version of this module will provide these.
 
  has
 
@@ -328,6 +369,14 @@ KEYWORDS
     method BUILD {...}) will create a builder block instead. As of version
     0.31 such attempts will print a warning at compiletime, and a later
     version may remove this altogether.
+
+ requires
+
+       requires NAME;
+
+    Declares that this role requires a method of the given name from any
+    class that implements it. It is an error at compiletime if the
+    implementing class does not provide such a method.
 
 IMPLIED PRAGMATA
 

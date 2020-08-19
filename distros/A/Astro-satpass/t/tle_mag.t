@@ -8,9 +8,6 @@ use warnings;
 use Astro::Coord::ECI::TLE;
 use Test::More 0.88;	# Because of done_testing();
 
-sub clear (;$);
-sub succeeds (@);
-
 my @rslt;
 
 note <<'EOD';
@@ -18,55 +15,55 @@ This test is of the proper population of the magnitude table only.
 Actual computation tests are done elsewhere.
 EOD
 
-succeeds clear => 'Clearing the magnitude table';
+succeeds( clear => 'Clearing the magnitude table' );
 
-succeeds show => 'Retrieving the empty magnitude table';
+succeeds( show => 'Retrieving the empty magnitude table' );
 
 is_deeply \@rslt, [], 'There are no magnitudes in the table';
 
-succeeds magnitude => { 25544 => -1.0 },
-    'Setting the magnitude table directly';
+succeeds( magnitude => { 25544 => -1.0 },
+    'Setting the magnitude table directly' );
 
-succeeds show => 'Retrieving the magnitude table';
+succeeds( show => 'Retrieving the magnitude table' );
 
 is_deeply \@rslt, [ 25544 => -1.0 ],
     'Contents of magnitude table are as expected';
 
-succeeds show => 5,
-    'Retrieving a magnitude which is not in the table';
+succeeds( show => 5,
+    'Retrieving a magnitude which is not in the table' );
 
 is_deeply \@rslt, [], 'The retrieval of 00005 returned nothing';
 
-succeeds add => 00005 => 11, 'Adding OID 5';
+succeeds( add => 00005 => 11, 'Adding OID 5' );
 
-succeeds show => 5, 'Retrieving an added magnitude';
+succeeds( show => 5, 'Retrieving an added magnitude' );
 
 is_deeply \@rslt, [ '00005' => 11 ],
     'Got back correct magnitude for OID 5';
 
-succeeds show => 25544, 'Retrieving originally-loaded magnitude';
+succeeds( show => 25544, 'Retrieving originally-loaded magnitude' );
 
 is_deeply \@rslt, [ 25544, -1.0 ],
     'Got back correct originally-loaded magnitude';
 
-succeeds show => 'Retrieving all loaded magnitudes';
+succeeds( show => 'Retrieving all loaded magnitudes' );
 
 is_deeply { @rslt }, {
     '00005'	=> 11,
     '25544'	=> -1,
 }, 'The contents of the magnitude table are as expected';
 
-succeeds drop => 5, 'Dropping OID 5';
+succeeds( drop => 5, 'Dropping OID 5' );
 
-succeeds show => 'Retrieving modified magnitudes';
+succeeds( show => 'Retrieving modified magnitudes' );
 
 is_deeply \@rslt, [ 25544 => -1 ],
     'Dropped body is gone from table';
 
-succeeds molczan => 't/mcnames.mag',
-    'Loading a Molczan-format magnitude file';
+succeeds( molczan => 't/mcnames.mag',
+    'Loading a Molczan-format magnitude file' );
 
-succeeds show => 'Retrieving Molczan-format magnitudes';
+succeeds( show => 'Retrieving Molczan-format magnitudes' );
 
 my $want = {
     '20580'	=> 3.0,
@@ -77,10 +74,10 @@ my $want = {
 is_deeply { @rslt }, $want, 'Got the expected data from the load';
 
 if ( open my $fh, '<', 't/mcnames.mag' ) {
-    clear;
-    succeeds molczan => $fh, 'Loading a Molczan-format file handle';
+    clear(  );
+    succeeds( molczan => $fh, 'Loading a Molczan-format file handle' );
     close $fh;
-    succeeds show => 'Retrieve data loaded from file handle';
+    succeeds( show => 'Retrieve data loaded from file handle' );
     is_deeply { @rslt }, $want,
 	'Got the expected data from the handle';
 } else {
@@ -90,12 +87,12 @@ t/mcnames.mag: $!
 EOD
 }
 
-clear;
+clear(  );
 
-succeeds quicksat => 't/quicksat.mag',
-    'Loading a Quicksat-format magnitude file';
+succeeds( quicksat => 't/quicksat.mag',
+    'Loading a Quicksat-format magnitude file' );
 
-succeeds show => 'Retrieving Quicksat-format magnitudes';
+succeeds( show => 'Retrieving Quicksat-format magnitudes' );
 
 $want = {
     '20580'	=> 2.2,
@@ -106,10 +103,10 @@ $want = {
 is_deeply { @rslt }, $want, 'Got the expected data from the load';
 
 if ( open my $fh, '<', 't/quicksat.mag' ) {
-    clear;
-    succeeds quicksat => $fh, 'Loading a Quicksat-format file handle';
+    clear(  );
+    succeeds( quicksat => $fh, 'Loading a Quicksat-format file handle' );
     close $fh;
-    succeeds show => 'Retrieve data loaded from file handle';
+    succeeds( show => 'Retrieve data loaded from file handle' );
     is_deeply { @rslt }, $want,
 	'Expected data is 0.7 mag dimmer than file contents';
 } else {
@@ -119,7 +116,7 @@ t/quicksat.mag: $!
 EOD
 }
 
-succeeds adjust => 'Getting the magnitude adjustment';
+succeeds( adjust => 'Getting the magnitude adjustment' );
 
 cmp_ok $rslt[0], '==', 0, 'The default magnitude adjustment is zero';
 
@@ -139,13 +136,13 @@ EOD
 cmp_ok $tle->get( 'intrinsic_magnitude' ), '==', -1.3,
     'The intrinsic magnitude got set to -1.3';
 
-succeeds adjust => 0.7, 'Setting the magnitude adjustment to 0.7';
+succeeds( adjust => 0.7, 'Setting the magnitude adjustment to 0.7' );
 
-succeeds adjust => 'Retrieving the new magnitude adjustment';
+succeeds( adjust => 'Retrieving the new magnitude adjustment' );
 
 cmp_ok $rslt[0], '==', 0.7, 'The magnitude adjustment is now 0.7';
 
-succeeds show => 25544, 'Retrieving the magnitude table entry for our OID';
+succeeds( show => 25544, 'Retrieving the magnitude table entry for our OID' );
 
 cmp_ok { @rslt }->{'25544'}, '==', -1.3,
     'Magnitude table still has -1.3';
@@ -164,7 +161,7 @@ cmp_ok 0 + sprintf( '%.1f', $tle->get( 'intrinsic_magnitude' ) ), '==', -0.6,
 
 done_testing;
 
-sub clear (;$) {
+sub clear {
     my ( $name ) = @_;
     defined $name
 	or $name = 'Clear magnitude table';
@@ -182,7 +179,7 @@ sub clear (;$) {
     goto \&pass;
 }
 
-sub succeeds (@) {
+sub succeeds {
     my ( @args ) = @_;
     my $title = pop @args;
     eval {
@@ -198,4 +195,4 @@ sub succeeds (@) {
 
 1;
 
-# ex: set textwidth=72 :
+# ex: set filetype=perl textwidth=72 :

@@ -849,4 +849,4 @@ sub get_oid {
 
 1;
 
-# ex: set textwidth=72 :
+# ex: set filetype=perl textwidth=72 :

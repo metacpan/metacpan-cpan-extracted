@@ -51,35 +51,35 @@
    "provides" : {
       "Astro::Coord::ECI" : {
          "file" : "lib/Astro/Coord/ECI.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Astro::Coord::ECI::Mixin" : {
          "file" : "lib/Astro/Coord/ECI/Mixin.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Astro::Coord::ECI::Moon" : {
          "file" : "lib/Astro/Coord/ECI/Moon.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Astro::Coord::ECI::Star" : {
          "file" : "lib/Astro/Coord/ECI/Star.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Astro::Coord::ECI::Sun" : {
          "file" : "lib/Astro/Coord/ECI/Sun.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Astro::Coord::ECI::TLE" : {
          "file" : "lib/Astro/Coord/ECI/TLE.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Astro::Coord::ECI::TLE::Set" : {
          "file" : "lib/Astro/Coord/ECI/TLE/Set.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Astro::Coord::ECI::Utils" : {
          "file" : "lib/Astro/Coord/ECI/Utils.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       }
    },
    "release_status" : "stable",
@@ -97,6 +97,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI"
       }
    },
-   "version" : "0.114",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.115",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -17,6 +17,7 @@ use YAML::XS;
 exit run(@ARGV) unless caller;
 
 sub run {
+    pod2usage -verbose => 1, -noperldoc => 1 if not @_;
     GetOptionsFromArray(\@_,
         'spec=s'    => \my $spec_file,
         'file=s'    => \my @files,
@@ -35,11 +36,11 @@ sub run {
 
     my %args;
     %args = %{ YAML::XS::LoadFile($spec_file) } if defined $spec_file;
-    push @{ $args{files} },   @files;
+    push @{ $args{files} },   (@files,   @{ $args{file}   // [] });
+    push @{ $args{filters} }, (@filters, @{ $args{filter} // [] });
     push @{ $args{ignore} },  @ignore;
     push @{ $args{include} }, @include;
     push @{ $args{exclude} }, @exclude;
-    push @{ $args{filters} }, @filters;
 
     my @subs = OpenTracing::WrapScope::ConfigGenerator::examine_files(%args);
 
@@ -146,12 +147,12 @@ __END__
 
 =head1 NAME
 
-generate_wrap_config.pl - generate input for OpenTracing::WrapScope
+opentracing_wrapscope_generator - generate input for OpenTracing::WrapScope
 
 =head1 SYNOPSIS
 
-  generate_wrap_config.pl --out wrapscope.conf --file 'lib/*.pm'
-  generate_wrap_config.pl --file 'bin/*.pl' --filter complexity=5
+  opentracing_wrapscope_generator --out wrapscope.conf --file 'lib/*.pm'
+  opentracing_wrapscope_generator --file 'bin/*.pl' --filter complexity=5
 
 =head1 OPTIONS
 
@@ -219,11 +220,11 @@ For example, given this file:
 
 calling:
 
-  generate_wrap_config.pl --spec wrapscope_gen_config.yaml
+  opentracing_wrapscope_generator --spec wrapscope_gen_config.yaml
 
 is equivalent to:
 
-  generate_wrap_config.pl \
+  opentracing_wrapscope_generator \
     --file 'bin/*.pl' \
     --file 'lib/*.pm' \
     --filter exclude_private \

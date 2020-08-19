@@ -1,0 +1,11 @@
+etc/gqmt.d/github-mutation-delete-pkg-version-id.tt
+etc/gqmt.d/github-query-all-versions.tt
+gqmt
+lib/App/gqmt.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

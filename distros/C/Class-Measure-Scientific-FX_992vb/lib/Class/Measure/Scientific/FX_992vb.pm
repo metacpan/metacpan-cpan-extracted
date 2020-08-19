@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2020, Roland van Ipenburg
-package Class::Measure::Scientific::FX_992vb v0.0.1;
+package Class::Measure::Scientific::FX_992vb v0.0.2;
 use Moose;
 use MooseX::NonMoose;
 use List::MoreUtils qw(uniq);
@@ -391,7 +391,7 @@ Class::Measure::Scientific::FX_992vb - units of measurement like the CASIO fx-99
 
 =head1 VERSION
 
-This document describes Class::Measure::Scientific::FX_992vb v0.0.1.
+This document describes Class::Measure::Scientific::FX_992vb v0.0.2.
 
 =head1 SYNOPSIS
 

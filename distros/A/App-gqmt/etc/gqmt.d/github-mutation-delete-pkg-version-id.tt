@@ -1,0 +1,4 @@
+mutation {
+  deletePackageVersion( input: {packageVersionId:"[% id %]"} )
+    { success }
+}

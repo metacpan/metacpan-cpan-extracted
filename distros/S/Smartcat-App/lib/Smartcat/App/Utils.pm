@@ -93,20 +93,23 @@ sub save_file {
 
 sub are_po_files_empty {
     my $filepaths = shift;
-    my $res = 1;
+    my $empty = 1;
 
     for my $filepath (@$filepaths) {
-      open(my $fh, $filepath) or die "Can't read $filepath: $!\n";
-      binmode($fh);
-      while (my $line = <$fh>) {
-        $res = ($1 eq "") if $line =~ m/msgid "(.*)"/;
-        last if !$res;
-      }
-      close $fh;
-      last if !$res;
-    }
+        open(my $fh, $filepath) or die "Can't read $filepath: $!\n";
+        binmode($fh, ':utf8');
+        my $text = join('', <$fh>);
+        close $fh;
 
-    return $res;
+        # join multi-line entries
+        $text =~ s/"\n"//sg;
+
+        if ($text =~ m/msgid "[^"]/s) {
+            $empty = undef;
+            last;
+        }
+    }
+    return $empty;
 }
 
 

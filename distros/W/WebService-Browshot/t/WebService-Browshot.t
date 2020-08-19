@@ -8,11 +8,9 @@ require_ok( 'WebService::Browshot' );
 
 my $browshot = WebService::Browshot->new(
 	key	=> 'vPTtKKLBtPUNxVwwfEKlVvekuxHyTXyi',
-	base	=> 'http://127.0.0.1:3000/api/v1/',
-	debug	=> 0,
 );
 
-is($browshot->api_version(), '1.14', "API version");
+is($browshot->api_version(), '1.24', "API version");
 
 SKIP: {
 	skip "env BROWSHOT_REMOTE_TESTS not set", 130 if (! $ENV{BROWSHOT_REMOTE_TESTS});
@@ -143,7 +141,7 @@ SKIP: {
 	$screenshot = $browshot->screenshot_create(url => '-');
 	ok( exists $screenshot->{error}, 				"Screenshot failed");
 
-	$screenshot = $browshot->screenshot_create(url => 'http://browshot.com/', cache => 999999, instance_id => 12);
+	$screenshot = $browshot->screenshot_create(url => 'https://browshot.com/', cache => 999999, instance_id => 12);
 	ok( exists $screenshot->{id}, 				"Screenshot ID is present");
 	ok( exists $screenshot->{status}, 			"Screenshot status is present");
 	ok( exists $screenshot->{priority}, 			"Screenshot priority is present");

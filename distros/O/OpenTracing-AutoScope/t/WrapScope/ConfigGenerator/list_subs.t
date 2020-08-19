@@ -3,7 +3,7 @@ use File::Spec;
 use FindBin;
 
 use lib 'bin';
-do 'generate_wrap_config.pl';
+do 'opentracing_wrapscope_generator';
 
 use constant SAMPLE_DIR => "$FindBin::Bin/samples";
 

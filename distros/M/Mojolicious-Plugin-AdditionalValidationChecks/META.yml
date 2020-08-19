@@ -1,5 +1,5 @@
 ---
-abstract: 'Add addtional validation checks'
+abstract: 'Add additional validation checks'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
 build_requires:
@@ -20,7 +20,7 @@ name: Mojolicious-Plugin-AdditionalValidationChecks
 provides:
   Mojolicious::Plugin::AdditionalValidationChecks:
     file: lib/Mojolicious/Plugin/AdditionalValidationChecks.pm
-    version: '0.16'
+    version: '0.17'
 requires:
   Email::Valid: '1.192'
   Mojo::URL: '0'
@@ -33,9 +33,10 @@ resources:
   bugtracker: http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks/issues
   homepage: http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks
   repository: http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks.git
-version: '0.16'
+version: '0.17'
 x_contributors:
   - 'Florian Heyer <info@heyer-it.de>'
+  - 'Graham Knop <haarg@haarg.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'

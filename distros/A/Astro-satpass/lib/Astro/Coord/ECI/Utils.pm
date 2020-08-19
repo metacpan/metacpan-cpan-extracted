@@ -142,7 +142,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -1652,7 +1652,7 @@ sub __instance {
 
 }
 
-sub __sprintf($@) {		## no critic (ProhibitSubroutinePrototypes)
+sub __sprintf {
     my ( $tplt, @args ) = @_;
     defined $tplt
 	or return undef;	## no critic (ProhibitExplicitReturnUndef)

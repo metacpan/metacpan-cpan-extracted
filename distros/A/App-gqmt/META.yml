@@ -1,0 +1,32 @@
+---
+abstract: 'a stub module for gqmt'
+author:
+  - 'Zeus Panchenko <zeus@gnu.org.ua>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-gqmt
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Printer: '0.38'
+  File::Basename: '2.00'
+  Getopt::Long: '2.00'
+  JSON: '2.00'
+  LWP::UserAgent: '6.00'
+  Pod::Usage: '1.00'
+  Time::Piece: '1.05'
+  perl: '5.016001'
+resources:
+  repository: ssh://git@github.com:z-eos/gqmt.git
+version: '0.2'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

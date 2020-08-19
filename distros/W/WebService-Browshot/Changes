@@ -106,3 +106,6 @@ Revision history for Perl extension WebService::Browshot.
 1.14.1 Tue Dec 30 2014 20:43:00
 	- Remove deprecated API calls
 	- Update unit tests
+
+1.24.0 Tue Aug 18 21:20:00
+	- screenshot_thumbnail_file creates the directory structure as needed

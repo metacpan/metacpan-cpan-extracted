@@ -1,12 +1,14 @@
 /* vi: set ft=c inde=: */
 
-#define padlist_dump(pl)  S_padlist_dump(aTHX_ pl)
-static void S_padlist_dump(pTHX_ PADLIST *padlist)
+#define padlist_dump_depth(pl, depth)  S_padlist_dump_depth(aTHX_ pl, depth)
+static void S_padlist_dump_depth(pTHX_ PADLIST *padlist, I32 depth)
 {
-  fprintf(stderr, "PADLIST = %p\n", padlist);
+  fprintf(stderr, "PADLIST = %p / PAD[%d]", padlist, depth);
 
   PADNAMELIST *pnl = PadlistNAMES(padlist);
-  PAD         *pad1 = PadlistARRAY(padlist)[1];
+  PAD         *pad = PadlistARRAY(padlist)[depth];
+
+  fprintf(stderr, " = %p\n", pad);
 
   PADOFFSET padix;
   for(padix = 0; padix <= PadnamelistMAX(pnl); padix++) {
@@ -26,9 +28,11 @@ static void S_padlist_dump(pTHX_ PADLIST *padlist)
     fprintf(stderr, " [%d..%d]",
         COP_SEQ_RANGE_LOW(pn), COP_SEQ_RANGE_HIGH(pn));
 
-    fprintf(stderr, " = %p\n", PadARRAY(pad1)[padix]);
+    fprintf(stderr, " = %p\n", PadARRAY(pad)[padix]);
   }
 }
+
+#define padlist_dump(pl)  padlist_dump_depth(pl, 1)
 
 static void debug_sv_summary(const SV *sv)
 {

@@ -5,6 +5,12 @@ Log::Log4perl::OpenTracing - inject logs with OpenTracing SpanContext
 
 
 
+=head1 VERSION
+
+This is documentation for version 'v0.1.1'
+
+
+
 =head1 SYNOPSIS
 
     use Log::Log4perl;

@@ -231,7 +231,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -8262,14 +8262,14 @@ sub _next_elevation_screen {
 #
 #   $ eg/visual -merge
 #
-# Last-Modified: Thu, 18 Jun 2020 03:33:36 GMT
+# Last-Modified: Sat, 08 Aug 2020 22:27:28 GMT
 
 # The following constants are unsupported, and may be modified or
 # revoked at any time. They exist to support
 # xt/author/magnitude_status.t
 use constant _CELESTRAK_VISUAL => 'Thu, 18 Jun 2020 03:33:36 GMT';
 use constant _MCCANTS_VSNAMES  => 'Thu, 25 May 2017 00:30:11 GMT';
-use constant _MCCANTS_QUICKSAT => 'Thu, 25 May 2017 00:00:55 GMT';
+use constant _MCCANTS_QUICKSAT => 'Sat, 08 Aug 2020 22:27:28 GMT';
 
 %magnitude_table = (
   '00694' => 3.5,
@@ -8521,7 +8521,10 @@ use constant _MCCANTS_QUICKSAT => 'Thu, 25 May 2017 00:00:55 GMT';
   '39203' => 4.5,
   '39364' => 4.5,
   '40354' => 4.9,
+  '40382' => 3.4,
+  '41395' => 3.9,
   '41765' => 3.9, # Assumed 3.9 (old Tiangong 1 value)
+  '42689' => 4.9,
 );
 
 1;

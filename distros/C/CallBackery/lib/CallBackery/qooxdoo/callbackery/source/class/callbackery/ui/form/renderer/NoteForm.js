@@ -115,10 +115,12 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
                 }
                 if ( itemOptions[i].copyOnTap
                         && item.getReadOnly()){
-                    var copyFailMsg = itemOptions[i].copyFailMsg || 
-                        that.tr("Select %1 and press [ctrl]+[c]",labelName);
-                    var copySuccessMsg = itemOptions[i].copySuccessMsg || 
-                        that.tr("Select %1 and press [ctrl]+[c]",labelName);
+                    var copyFailMsg = itemOptions[i].copyFailMsg
+                        ? that.xtr(itemOptions[i].copyFailMsg)
+                        : that.tr("Select %1 and press [ctrl]+[c]",labelName);
+                    var copySuccessMsg = itemOptions[i].copySuccessMsg
+                        ? that.xtr(itemOptions[i].copySuccessMsg)
+                        : that.tr("%1 copied",labelName);
 
                     item.addListener('tap',function(e){
                         try {

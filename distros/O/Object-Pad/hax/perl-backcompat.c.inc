@@ -11,6 +11,8 @@ typedef SV PADNAME;
 #  define PadnameOUTER(pn)        (SvFAKE(pn) && !SvPAD_STATE(pn))
 #  define PadnamelistARRAY(pnl)   AvARRAY(pnl)
 #  define PadnamelistMAX(pnl)     AvFILLp(pnl)
+
+#  define PadARRAY(p)             AvARRAY(p)
 #endif
 
 #ifndef av_top_index

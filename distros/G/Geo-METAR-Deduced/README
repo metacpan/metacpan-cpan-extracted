@@ -1,6 +1,6 @@
 Geo::METAR::Deduced is Copyright (C) 2020, Roland van Ipenburg
 
-Geo::METAR::Deduced version v0.0.1
+Geo::METAR::Deduced version v0.0.2
 ==================================
 
 This module can be used to deduce aviation information from parsed METAR data.

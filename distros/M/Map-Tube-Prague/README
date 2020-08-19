@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Map::Tube::Prague;
+
      my $obj = Map::Tube::Prague->new;
      my $routes_ar = $obj->get_all_routes($from, $to);
      my $line = $obj->get_line_by_id($line_id);
@@ -67,11 +68,9 @@ METHODS
              Returns string with XML.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Prague;
 
@@ -88,11 +87,9 @@ EXAMPLE1
      # Route: Dejvická (Linka A), Hradčanská (Linka A), Malostranská (Linka A), Staroměstská (Linka A), Můstek (Linka A, Tunnel), Můstek (Linka B, Tunnel), Náměstí Republiky (Linka B), Florenc (Linka B, Tunnel), Florenc (Linka C, Tunnel), Vltavská (Linka C), Nádraží Holešovice (Linka C), Kobylisy (Linka C), Ládví (Linka C)
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::Prague;
 
      # Object.
@@ -108,11 +105,9 @@ EXAMPLE2
      # XML file: .*/prague-map.xml
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::GraphViz;
      use Map::Tube::GraphViz::Utils qw(node_color_without_label);
      use Map::Tube::Prague;
@@ -136,11 +131,9 @@ EXAMPLE3
      # -rw-r--r-- 1 skim skim 166110 Apr  6 23:12 Prague.png
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::Prague;
 
      # Object.
@@ -157,6 +150,54 @@ EXAMPLE4
      # Linka B
      # Linka C
 
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Encode qw(encode_utf8);
+     use Map::Tube::Prague;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 line\n";
+             exit 1;
+     }
+     my $line = $ARGV[0];
+
+     # Object.
+     my $obj = Map::Tube::Prague->new;
+
+     # Get stations for line.
+     my $stations_ar = $obj->get_stations($line);
+
+     # Print out.
+     map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+     # Output:
+     # Usage: __PROG__ line
+
+     # Output with 'foo' argument.
+     # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+     # Output with 'Linka A' argument.
+     # Nemocnice Motol
+     # Petřiny
+     # Nádraží Veleslavín
+     # Bořislavka
+     # Dejvická
+     # Hradčanská
+     # Malostranská
+     # Staroměstská
+     # Můstek
+     # Muzeum
+     # Náměstí Míru
+     # Jiřího z Poděbrad
+     # Flora
+     # Želivského
+     # Strašnická
+     # Skalka
+     # Depo Hostivař
+
 DEPENDENCIES
     File::Share, Map::Tube, Moo, namespace::clean.
 
@@ -171,18 +212,20 @@ SEE ALSO
         Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-Prague>
+    <https://github.com/michal-josef-spacek/Map-Tube-Prague>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2020 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.13
+    0.15
 

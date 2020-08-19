@@ -1,3 +1,9 @@
+0.115		2020-08-19	T. R. Wyant
+    Remove prototypes from testing subroutines defined in t/*.t and
+    inc/My/Module/Test/*.pm
+
+    Update canned satellite magnitude table.
+
 0.114		2020-06-25	T. R. Wyant
     Document undef as argument to equation_of_time()
 

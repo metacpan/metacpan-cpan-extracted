@@ -27,7 +27,7 @@ $G = $R = $E = '' unless eval { require Algorithm::Diff };
 #pl -F, --color K *.csv | pl -pB '@c{1, 3, 32, 31, ""} = qw(B I G R E)' 's/\e\[(\d*)m/\${$c{$1}}/g; s/\t?\$\{[BI]\}.*\$\{\KE/e/'
 $_ = <<EOF;
 ${B}1${e}
-	${G}1,H,Hydrogen,1:${R}H ${G}a${R}nd a${G}lkali metal,1${R}.008${E}
+	${G}1,H,Hydrogen,1:${R}H & ${G}alkali metal,1${R}.008${E}
 	${I}n/a${e}
 	${G}1,H,Hydrogen,1:alkali metal,1${E}
 ${B}4${e}
@@ -35,9 +35,9 @@ ${B}4${e}
 	${G}4,${R}Pl${G},${R}P${G}erlium,2:${R}p${G}l ${R}b${G}a${R}sis${G},${R}5${G}.${R}3${G}2${R}.0${E}
 	${I}n/a${e}
 ${B}8${e}
-	${G}8,O,Oxygen,16:O and chalcogen,1${R}5.999${E}
-	${G}8,O,Oxygen,16:O and chalcogen,1${R}6${E}
-	${G}8,O,Oxygen,16:O and chalcogen,1${R}6${E}
+	${G}8,O,Oxygen,16:O ${R}&${G} chalcogen,1${R}5.999${E}
+	${G}8,O,Oxygen,16:O ${R}&${G} chalcogen,1${R}6${E}
+	${G}8,O,Oxygen,16:O ${R}and${G} chalcogen,1${R}6${E}
 ${B}41${e}
 	${G}41,Nb,${R}Ni${G}obium,5:no name,9${R}2.906${E}
 	${I}n/a${e}

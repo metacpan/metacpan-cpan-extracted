@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2020, Roland van Ipenburg
-package Geo::METAR::Deduced v0.0.1;
+package Geo::METAR::Deduced v0.0.2;
 use Moose;
 use MooseX::NonMoose;
 use Geo::METAR;
@@ -180,7 +180,7 @@ sub time {
 
 sub mode {
     my $self = shift;
-    return $self->{'MOD'};
+    return $self->{'modifier'};
 }
 
 sub wind_dir {
@@ -433,7 +433,7 @@ Geo::METAR::Deduced - deduce aviation information from parsed METAR data
 
 =head1 VERSION
 
-This document describes Geo::METAR::Deduced v0.0.1.
+This document describes Geo::METAR::Deduced v0.0.2.
 
 =head1 SYNOPSIS
 

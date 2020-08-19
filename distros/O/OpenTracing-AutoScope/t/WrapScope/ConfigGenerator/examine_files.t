@@ -5,7 +5,7 @@ use File::Temp;
 use YAML::XS;
 
 use lib 'bin';
-do 'generate_wrap_config.pl';
+do 'opentracing_wrapscope_generator';
 
 my $cwd = getcwd();
 END { chdir $cwd }                    # don't screw up other tests

@@ -14,12 +14,6 @@
    },
    "name" : "Geo-METAR-Deduced",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0.86",
-            "Test::NoWarnings" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.42"
@@ -39,12 +33,19 @@
             "Set::Scalar" : "0",
             "perl" : "v5.16.0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.86",
+            "Test::NoWarnings" : "0",
+            "Test::Warn" : "0"
+         }
       }
    },
    "provides" : {
       "Geo::METAR::Deduced" : {
          "file" : "lib/Geo/METAR/Deduced.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       }
    },
    "release_status" : "stable",
@@ -53,6 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v0.0.1",
+   "version" : "v0.0.2",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

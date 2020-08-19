@@ -29,14 +29,14 @@ use Test::More 0.88;
     my ( $lat, $long, $delta ) = Astro::Coord::ECI::Moon->
 	dynamical( $time )->ecliptic();
 
-    tolerance_frac $lat, deg2rad( -3.229126 ), 1e-6,
-	'Ecliptic latitude of Moon April 12 1992 00:00:00 dynamical';
+    tolerance_frac( $lat, deg2rad( -3.229126 ), 1e-6,
+	'Ecliptic latitude of Moon April 12 1992 00:00:00 dynamical' );
 
-    tolerance_frac $long, deg2rad( 133.167265 ), 1e-6,
-	'Ecliptic longitude of Moon April 12 1992 00:00:00 dynamical';
+    tolerance_frac( $long, deg2rad( 133.167265 ), 1e-6,
+	'Ecliptic longitude of Moon April 12 1992 00:00:00 dynamical' );
 
-    tolerance_frac $delta, 368409.7, 1e-6,
-	'Ecliptic distance to Moon April 12 1992 00:00:00 dynamical';
+    tolerance_frac( $delta, 368409.7, 1e-6,
+	'Ecliptic distance to Moon April 12 1992 00:00:00 dynamical' );
 }
 
 # phase of the moon.
@@ -51,8 +51,8 @@ use Test::More 0.88;
     $got >= PI
 	and $got -= TWOPI;
 
-    tolerance $got, 0, 1e-4,
-	'Phase of Moon February 18 1977 3:37:42 dynamical';
+    tolerance( $got, 0, 1e-4,
+	'Phase of Moon February 18 1977 3:37:42 dynamical' );
 }
 
 # Phase angle and illuminated fraction.
@@ -64,11 +64,11 @@ use Test::More 0.88;
     my ( $phase, $illum ) =
 	Astro::Coord::ECI::Moon->dynamical( $time )->phase();
 
-    tolerance $phase, deg2rad( 180 - 69.0756 ), 3e-3,
-	'Phase of Moon April 12 1992 00:00:00 dynamical';
+    tolerance( $phase, deg2rad( 180 - 69.0756 ), 3e-3,
+	'Phase of Moon April 12 1992 00:00:00 dynamical' );
 
-    tolerance $illum, .6786, .01,
-	'Fraction of Moon illuminated April 12 1992 00:00:00 dynamical';
+    tolerance( $illum, .6786, .01,
+	'Fraction of Moon illuminated April 12 1992 00:00:00 dynamical' );
 }
 
 
@@ -84,15 +84,15 @@ use Test::More 0.88;
 
     my $got = $moon->dynamical( $time )->next_quarter( 0 );
 
-    tolerance $got, $want, $tolerance,
+    tolerance( $got, $want, $tolerance,
 	'Next new Moon after February 1 1977 00:00:00 dynamical',
-	\&format_time;
+	\&format_time );
 
     $got = $moon->dynamical( $time )->next_quarter_hash( 0 );
 
-    tolerance $got->{time}, $want, $tolerance,
+    tolerance( $got->{time}, $want, $tolerance,
 	'Hash of next new Moon after February 1 1977 00:00:00 dynamical',
-	\&format_time;
+	\&format_time );
 }
 
 
@@ -144,9 +144,9 @@ SKIP: {
 
     is $events[0][3], 'Moon rise', q{First event description is 'Moon rise'};
 
-    tolerance $events[0][0], greg_time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
+    tolerance( $events[0][0], greg_time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
 	'Moon rise occurred at January 1 2008 6:15:00 GMT',
-	\&format_time;
+	\&format_time );
 
     @events > 1
 	or skip 'Only one event found', 8;
@@ -158,9 +158,9 @@ SKIP: {
     is $events[1][3], 'Moon transits meridian',
 	q{Second event description is 'Moon transits meridian'};
 
-    tolerance $events[1][0], greg_time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
+    tolerance( $events[1][0], greg_time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
 	'Moon culmination occurred at January 1 2008 11:46:00 GMT',
-	\&format_time;
+	\&format_time );
 
     @events > 2
 	or skip 'Only two events found', 4;
@@ -171,9 +171,9 @@ SKIP: {
 
     is $events[2][3], 'Moon set', q{Third event description is 'Moon set'};
 
-    tolerance $events[2][0], greg_time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
+    tolerance( $events[2][0], greg_time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
 	'Moon set occurred at January 1 2008 17:08:00 GMT',
-	\&format_time;
+	\&format_time );
 }
 
 SKIP: {
@@ -204,9 +204,9 @@ SKIP: {
 
     is $events[0][3], 'Moon rise', q{First event description is 'Moon rise'};
 
-    tolerance $events[0][0], greg_time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
+    tolerance( $events[0][0], greg_time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
 	'Moon rise occurred at January 1 2008 6:15:00 GMT',
-	\&format_time;
+	\&format_time );
 
     @events > 1
 	or skip 'Only one event found', 8;
@@ -218,9 +218,9 @@ SKIP: {
     is $events[1][3], 'Moon transits meridian',
 	q{Second event description is 'Moon transits meridian'};
 
-    tolerance $events[1][0], greg_time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
+    tolerance( $events[1][0], greg_time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
 	'Moon culmination occurred at January 1 2008 11:46:00 GMT',
-	\&format_time;
+	\&format_time );
 
     @events > 2
 	or skip 'Only two events found', 4;
@@ -231,9 +231,9 @@ SKIP: {
 
     is $events[2][3], 'Moon set', q{Third event description is 'Moon set'};
 
-    tolerance $events[2][0], greg_time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
+    tolerance( $events[2][0], greg_time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
 	'Moon set occurred at January 1 2008 17:08:00 GMT',
-	\&format_time;
+	\&format_time );
 }
 
 SKIP: {
@@ -264,9 +264,9 @@ SKIP: {
     is $events[0]{almanac}{description}, 'Moon rise',
 	q{First event description is 'Moon rise'};
 
-    tolerance $events[0]{time}, greg_time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
+    tolerance( $events[0]{time}, greg_time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
 	'Moon rise occurred at January 1 2008 6:15:00 GMT',
-	\&format_time;
+	\&format_time );
 
     @events > 1
 	or skip 'Only one event found', 8;
@@ -280,9 +280,9 @@ SKIP: {
     is $events[1]{almanac}{description}, 'Moon transits meridian',
 	q{Second event description is 'Moon transits meridian'};
 
-    tolerance $events[1]{time}, greg_time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
+    tolerance( $events[1]{time}, greg_time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
 	'Moon culmination occurred at January 1 2008 11:46:00 GMT',
-	\&format_time;
+	\&format_time );
 
     @events > 2
 	or skip 'Only two events found', 4;
@@ -296,13 +296,13 @@ SKIP: {
     is $events[2]{almanac}{description}, 'Moon set',
 	q{Third event description is 'Moon set'};
 
-    tolerance $events[2]{time}, greg_time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
+    tolerance( $events[2]{time}, greg_time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
 	'Moon set occurred at January 1 2008 17:08:00 GMT',
-	\&format_time;
+	\&format_time );
 }
 
 done_testing;
 
 1;
 
-# ex: set textwidth=72 :
+# ex: set filetype=perl textwidth=72 :

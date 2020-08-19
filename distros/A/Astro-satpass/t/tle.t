@@ -121,7 +121,7 @@ sub data {
 		my $title = sprintf '%s %s ECI %s at %s',
 		    $tle->get( 'id' ), $model, $name[$inx],
 		    format_deltat( $deltat );
-		tolerance $got[$inx], $want[$inx], $tolerance[$inx], $title;
+		tolerance( $got[$inx], $want[$inx], $tolerance[$inx], $title );
 	    }
 	}
 	return;
@@ -950,4 +950,4 @@ __DATA__
     1320.00000000   -2842.06876757    2278.42343492    5472.33437150    1.691852635   -6.693216335    3.671022712
     1440.00000000    2742.55398832   -6079.67009123    -326.39012649    1.948497651    1.211072678   -7.356193131
 
-# ex: set textwidth=72 :
+# ex: set filetype=perl textwidth=72 :

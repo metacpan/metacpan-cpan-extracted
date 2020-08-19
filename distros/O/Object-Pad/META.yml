@@ -12,7 +12,7 @@ configure_requires:
   Module::Build: '0.4004'
   XS::Parse::Sublike::Builder: '0.10'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,21 +21,21 @@ name: Object-Pad
 provides:
   Object::Pad:
     file: lib/Object/Pad.pm
-    version: '0.31'
+    version: '0.32'
   Object::Pad::MOP::Class:
     file: lib/Object/Pad/MOP/Class.pm
-    version: '0.31'
+    version: '0.32'
   Object::Pad::MOP::Method:
     file: lib/Object/Pad/MOP/Method.pm
-    version: '0.31'
+    version: '0.32'
   Object::Pad::MOP::Slot:
     file: lib/Object/Pad/MOP/Slot.pm
-    version: '0.31'
+    version: '0.32'
 requires:
   XS::Parse::Sublike: '0.10'
   indirect: '0'
   perl: '5.016'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.31'
+version: '0.32'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

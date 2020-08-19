@@ -124,8 +124,8 @@ The following magnitude test is really only a regression test, since I
 have no idea what the correct magnitude is.
 EOD
 
-magnitude $tle, $sta, $pass[0]{events}[2]{time},
-    0.6, 'Magnitude at max of pass 1';
+magnitude( $tle, $sta, $pass[0]{events}[2]{time},
+    0.6, 'Magnitude at max of pass 1' );
 
 is format_pass( $pass[1] ), <<'EOD', 'Pass 2';
 1980/10/14 05:32:49   0.0 204.8  1691.2 lit   rise
@@ -667,4 +667,4 @@ done_testing;
 
 1;
 
-# ex: set textwidth=72 :
+# ex: set filetype=perl textwidth=72 :

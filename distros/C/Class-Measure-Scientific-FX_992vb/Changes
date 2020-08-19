@@ -1,4 +1,8 @@
 Revision history for Perl extension Class::Measure::Scientific::FX_992vb.
 
+v0.0.2 Wed Aug 19 10:43:47 UTC 2020
+       RT#133182: handle perl configured with -Duselongdouble in tests
+       RT#133183: require Test::Warn for tests
+
 v0.0.1 Tue Aug 18 09:11:27 UTC 2020
        Initial release.

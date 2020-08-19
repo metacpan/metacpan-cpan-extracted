@@ -12,98 +12,94 @@ use My::Module::Test qw{ :tolerance format_time };
 use My::Module::SetDelegate;
 use Test::More 0.88;
 
-sub choose_epoch (@);
-sub compare_times (@);
-sub insert (@);
-
 {
     my $set = Astro::Coord::ECI::TLE::Set->new();
 
-    insert $set, greg_time_gm( 0, 0, 0, 2, 6, 2006 ), 99999, 'Anonymous',
-	'Add first member';
+    insert( $set, greg_time_gm( 0, 0, 0, 2, 6, 2006 ), 99999, 'Anonymous',
+	'Add first member' );
 
-    insert $set, greg_time_gm( 0, 0, 0, 4, 6, 2006 ), 99999, 'Anonymous',
-	'Add second member';
+    insert( $set, greg_time_gm( 0, 0, 0, 4, 6, 2006 ), 99999, 'Anonymous',
+	'Add second member' );
 
-    choose_epoch $set, select => greg_time_gm( 0, 0, 0, 1, 6, 2006 ),
+    choose_epoch( $set, select => greg_time_gm( 0, 0, 0, 1, 6, 2006 ),
 	greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
-	'Select epoch before first member';
+	'Select epoch before first member' );
 
-    choose_epoch $set, select => greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
+    choose_epoch( $set, select => greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
 	greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
-	'Select epoch of first member';
+	'Select epoch of first member' );
 
-    choose_epoch $set, select => greg_time_gm( 0, 0, 0, 3, 6, 2006 ),
+    choose_epoch( $set, select => greg_time_gm( 0, 0, 0, 3, 6, 2006 ),
 	greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
-	'Select epoch between first and second member';
+	'Select epoch between first and second member' );
 
-    choose_epoch $set, select => greg_time_gm( 0, 0, 0, 4, 6, 2006 ),
+    choose_epoch( $set, select => greg_time_gm( 0, 0, 0, 4, 6, 2006 ),
 	greg_time_gm( 0, 0, 0, 4, 6, 2006 ),
-	'Select epoch of second member';
+	'Select epoch of second member' );
 
-    choose_epoch $set, select => greg_time_gm( 0, 0, 0, 5, 6, 2006 ),
+    choose_epoch( $set, select => greg_time_gm( 0, 0, 0, 5, 6, 2006 ),
 	greg_time_gm( 0, 0, 0, 4, 6, 2006 ),
-	'Select epoch after second member';
+	'Select epoch after second member' );
 
     my $time = greg_time_gm( 0, 0, 0, 1, 6, 2006 );
     my $tle = $set->universal( $time );
 
-    compare_times $tle->get( 'epoch' ), greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
-	'Setting time before first member returns first member';
+    compare_times( $tle->get( 'epoch' ), greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
+	'Setting time before first member returns first member' );
 
-    compare_times $tle->universal(), $time,
-	q{Member's time is original time set};
+    compare_times( $tle->universal(), $time,
+	q{Member's time is original time set} );
 
-    compare_times $set->universal(), $time,
-	q{Set's time is original time set};
+    compare_times( $set->universal(), $time,
+	q{Set's time is original time set} );
 
     $time = greg_time_gm( 0, 0, 0, 2, 6, 2006 );
     $tle = $set->universal( $time );
 
-    compare_times $tle->get( 'epoch' ), greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
-	'Setting time of first member returns first member';
+    compare_times( $tle->get( 'epoch' ), greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
+	'Setting time of first member returns first member' );
 
-    compare_times $tle->universal(), $time,
-	q{Member's time is original time set};
+    compare_times( $tle->universal(), $time,
+	q{Member's time is original time set} );
 
-    compare_times $set->universal(), $time,
-	q{Set's time is original time set};
+    compare_times( $set->universal(), $time,
+	q{Set's time is original time set} );
 
     $time = greg_time_gm( 0, 0, 0, 3, 6, 2006 );
     $tle = $set->universal( $time );
 
-    compare_times $tle->get( 'epoch' ), greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
-	'Setting time between members returns first member';
+    compare_times( $tle->get( 'epoch' ), greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
+	'Setting time between members returns first member' );
 
-    compare_times $tle->universal(), $time,
-	q{Member's time is original time set};
+    compare_times( $tle->universal(), $time,
+	q{Member's time is original time set} );
 
-    compare_times $set->universal(), $time,
-	q{Set's time is original time set};
+    compare_times( $set->universal(), $time,
+	q{Set's time is original time set} );
 
     $time = greg_time_gm( 0, 0, 0, 4, 6, 2006 );
     $tle = $set->universal( $time );
 
-    compare_times $tle->get( 'epoch' ), greg_time_gm( 0, 0, 0, 4, 6, 2006 ),
-	'Setting time of second member returns second member';
+    compare_times( $tle->get( 'epoch' ), greg_time_gm( 0, 0, 0, 4, 6, 2006 ),
+	'Setting time of second member returns second member' );
 
-    compare_times $tle->universal(), $time,
-	q{Member's time is original time set};
+    compare_times( $tle->universal(), $time,
+	q{Member's time is original time set} );
 
-    compare_times $set->universal(), $time,
-	q{Set's time is original time set};
+    compare_times( $set->universal(), $time,
+	q{Set's time is original time set} );
 
     $time = greg_time_gm( 0, 0, 0, 5, 6, 2006 );
     $tle = $set->universal( $time );
 
-    compare_times $tle->get( 'epoch' ), greg_time_gm( 0, 0, 0, 4, 6, 2006 ),
-	'Setting time after second member returns second member';
+    compare_times( $tle->get( 'epoch' ), greg_time_gm( 0, 0, 0, 4, 6, 2006 ),
+	'Setting time after second member returns second member' );
 
-    compare_times $tle->universal(), $time,
-	q{Member's time is original time set};
+    compare_times( $tle->universal(), $time,
+	q{Member's time is original time set} );
 
-    compare_times $set->universal(), $time,
-	q{Set's time is original time set};
+    compare_times( $set->universal(), $time,
+	q{Set's time is original time set} );
 
     my @members = $set->members();
 
@@ -123,9 +119,9 @@ sub insert (@);
 	is $members[0]->get( 'name' ), 'Nemo',
 	    q{First member's name should be 'Nemo'};
 
-	compare_times $members[0]->get( 'epoch' ),
+	compare_times( $members[0]->get( 'epoch' ),
 	    greg_time_gm( 0, 0, 0, 2, 6, 2006 ),
-	    q{First member's epoch should be July 2 2006};
+	    q{First member's epoch should be July 2 2006} );
 
 	@members > 1
 	    or skip '$set->members() only returned 1 member', 2;
@@ -133,9 +129,9 @@ sub insert (@);
 	is $members[1]->get( 'name' ), 'Nemo',
 	    q{Second member's name should be 'Nemo'};
 
-	compare_times $members[1]->get( 'epoch' ),
+	compare_times( $members[1]->get( 'epoch' ),
 	    greg_time_gm( 0, 0, 0, 4, 6, 2006 ),
-	    q{Second member's epoch should be July 4 2006};
+	    q{Second member's epoch should be July 4 2006} );
     }
 
     $set->clear();
@@ -296,7 +292,7 @@ sub insert (@);
 
 done_testing;
 
-sub choose_epoch (@) {
+sub choose_epoch {
     my ( $set, $method, $epoch, $want, $title ) = @_;
     my $got;
     eval {
@@ -315,7 +311,7 @@ sub format_gmt {
     return format_time( $time ) . ' GMT';
 }
 
-sub insert (@) {
+sub insert {
     my ( $set, $epoch, $oid, $name, $title ) = @_;
     eval {
 	$set->add( dummy( $epoch, $oid, $name ) );
@@ -328,7 +324,7 @@ sub insert (@) {
     goto &pass;
 }
 
-sub compare_times (@) {
+sub compare_times {
     my ( $got, $want, $title ) = @_;
     @_ = ( $got, $want, 1, $title, \&format_gmt );
     goto &tolerance;
@@ -368,4 +364,4 @@ EOD
 
 1;
 
-# ex: set textwidth=72 :
+# ex: set filetype=perl textwidth=72 :

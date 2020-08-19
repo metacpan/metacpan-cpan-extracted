@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Carp;
 
@@ -134,6 +134,12 @@ or lexical variables. (These are annotations about the class itself; the
 concept should not be confused with per-object-instance data, which here is
 called "slots").
 
+One or more roles can be composed into the class by the keyword C<implements>
+
+   class Name implements ROLE, ROLE,... {
+      ...
+   }
+
 The following class attributes are supported:
 
 =head3 :repr(TYPE)
@@ -184,6 +190,39 @@ instance is a blessed hash reference or some other kind.
 This achieves the best combination of DWIM while still allowing the common
 forms of hash reference to be inspected by C<Data::Dumper>, etc. This is the
 default representation type, and does not have to be specifically requested.
+
+=head2 role
+
+   role Name :ATTRS... {
+      ...
+   }
+
+   role Name :ATTRS...;
+
+I<Since version 0.32.>
+
+Similar to C<class>, but provides a package that defines a new role. A role
+acts simliar to a class in some respects, and differently in others.
+
+Like a class, a role can have a version, and named methods.
+
+   role Name VERSION {
+      method a { ... }
+      method b { ... }
+   }
+
+A role does not provide a constructor, and instances cannot directly be
+constructed. A role cannot extend a class.
+
+A role can declare that it requires methods of given names from any class that
+implements the role.
+
+   role Name {
+      requires METHOD;
+   }
+
+Currently, a role cannot provide instance slots, though it is hoped that a
+later version of this module will provide these.
 
 =head2 has
 
@@ -345,6 +384,14 @@ Currently attempts to create a method named C<BUILD> (i.e. with syntax
 C<method BUILD {...}>) will create a builder block instead. As of version 0.31
 such attempts will print a warning at compiletime, and a later version may
 remove this altogether.
+
+=head2 requires
+
+   requires NAME;
+
+Declares that this role requires a method of the given name from any class
+that implements it. It is an error at compiletime if the implementing class
+does not provide such a method.
 
 =head1 IMPLIED PRAGMATA
 
@@ -511,10 +558,10 @@ sub import_into
    my $class = shift;
    my ( $caller, @syms ) = @_;
 
-   @syms or @syms = qw( class method has );
+   @syms or @syms = qw( class role method has requires );
 
    my %syms = map { $_ => 1 } @syms;
-   delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class method has );
+   delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class role method has requires );
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }

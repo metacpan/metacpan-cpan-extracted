@@ -1,6 +1,6 @@
 CHANGES
 cpanfile
-bin/generate_wrap_config.pl
+bin/opentracing_wrapscope_generator
 lib/OpenTracing/AutoScope.pm
 lib/OpenTracing/AutoScope.pod
 lib/OpenTracing/WrapScope.pm

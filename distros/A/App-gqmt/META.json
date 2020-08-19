@@ -1,0 +1,56 @@
+{
+   "abstract" : "a stub module for gqmt",
+   "author" : [
+      "Zeus Panchenko <zeus@gnu.org.ua>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-gqmt",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Printer" : "0.38",
+            "File::Basename" : "2.00",
+            "Getopt::Long" : "2.00",
+            "JSON" : "2.00",
+            "LWP::UserAgent" : "6.00",
+            "Pod::Usage" : "1.00",
+            "Time::Piece" : "1.05",
+            "perl" : "5.016001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "ssh://git@github.com:z-eos/gqmt.git",
+         "web" : "https://github.com/z-eos/gqmt.git"
+      }
+   },
+   "version" : "0.2",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

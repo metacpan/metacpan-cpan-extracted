@@ -3,6 +3,7 @@ examples/ex1.pl
 examples/ex2.pl
 examples/ex3.pl
 examples/ex4.pl
+examples/ex5.pl
 images/ex3.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
@@ -28,10 +29,11 @@ SIGNATURE
 t/Map-Tube-Prague/01-use.t
 t/Map-Tube-Prague/02-version.t
 t/Map-Tube-Prague/03-map.t
-t/Map-Tube-Prague/04-get_node_by_id.t
-t/Map-Tube-Prague/05-get_node_by_name.t
-t/Map-Tube-Prague/06-get_shortest_route.t
-t/Map-Tube-Prague/07-name.t
-t/Map-Tube-Prague/08-xml.t
+t/Map-Tube-Prague/04-get_lines.t
+t/Map-Tube-Prague/05-get_node_by_id.t
+t/Map-Tube-Prague/06-get_node_by_name.t
+t/Map-Tube-Prague/07-get_shortest_route.t
+t/Map-Tube-Prague/08-name.t
+t/Map-Tube-Prague/09-xml.t
 xt/Map-Tube-Prague/01-pod_coverage.t
 xt/Map-Tube-Prague/02-pod.t

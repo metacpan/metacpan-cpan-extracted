@@ -32,14 +32,14 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
 ##  my ( $lat, $long, $rho ) = $sun->ecliptic();
     my ( undef, $long, $rho ) = $sun->ecliptic();
 
-    tolerance_frac $long, deg2rad( 199.90895 ), 1e-5,
-    'Ecliptic longitude of the Sun October 13 1992 00:00:00 dynamical';
+    tolerance_frac( $long, deg2rad( 199.90895 ), 1e-5,
+	'Ecliptic longitude of the Sun October 13 1992 00:00:00 dynamical' );
 
-    tolerance_frac $rho, .99766 * ASTRONOMICAL_UNIT, 1e-5,
-    'Distance (AU) to the Sun October 13 1992 00:00:00 dynamical';
+    tolerance_frac( $rho, .99766 * ASTRONOMICAL_UNIT, 1e-5,
+	'Distance (AU) to the Sun October 13 1992 00:00:00 dynamical' );
 
-    tolerance_frac $sun->geometric_longitude(), deg2rad( 199.90988 ), 1e-5,
-    'Geometric longitude of the Sun October 13 1992 00:00:00 dynamical';
+    tolerance_frac( $sun->geometric_longitude(), deg2rad( 199.90988 ), 1e-5,
+	'Geometric longitude of the Sun October 13 1992 00:00:00 dynamical' );
 }
 
 # Sunrise, noon, and sunset
@@ -65,62 +65,62 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
     my $time = greg_time_gm( 0, 0, 0, 20, 2, 2005 ) - $zone;
     $sta->universal( $time );
 
-    tolerance $sta->next_elevation( $sun, 0, 1 ) + $zone,
+    tolerance( $sta->next_elevation( $sun, 0, 1 ) + $zone,
 	greg_time_gm( 0, 11, 6, 20, 2, 2005 ), 30,
-	'Sunrise Washington DC March 11 2005', \&format_time;
+	'Sunrise Washington DC March 11 2005', \&format_time );
 
-    tolerance $sta->next_meridian( $sun ) + $zone,
+    tolerance( $sta->next_meridian( $sun ) + $zone,
 	greg_time_gm( 0, 16, 12, 20, 2, 2005 ), 30,
-	'Local noon Washington DC March 11 2005', \&format_time;
+	'Local noon Washington DC March 11 2005', \&format_time );
 
-    tolerance $sta->next_elevation( $sun, 0, 1 ) + $zone,
+    tolerance( $sta->next_elevation( $sun, 0, 1 ) + $zone,
 	greg_time_gm( 0, 20, 18, 20, 2, 2005 ), 30,
-	'Sunset Washington DC March 11 2005', \&format_time;
+	'Sunset Washington DC March 11 2005', \&format_time );
 
     $time = greg_time_gm( 0, 0, 0, 21, 5, 2005 ) - $zone;
     $sta->universal( $time );
 
-    tolerance $sta->next_elevation( $sun, 0, 1 ) + $zone,
+    tolerance( $sta->next_elevation( $sun, 0, 1 ) + $zone,
 	greg_time_gm( 0, 43, 4, 21, 5, 2005 ), 30,
-	'Sunrise Washington DC June 21 2005', \&format_time;
+	'Sunrise Washington DC June 21 2005', \&format_time );
 
-    tolerance $sta->next_meridian( $sun ) + $zone,
+    tolerance( $sta->next_meridian( $sun ) + $zone,
 	greg_time_gm( 0, 10, 12, 21, 5, 2005 ), 30,
-	'Local noon Washington DC June 21 2005', \&format_time;
+	'Local noon Washington DC June 21 2005', \&format_time );
 
-    tolerance $sta->next_elevation( $sun, 0, 1 ) + $zone,
+    tolerance( $sta->next_elevation( $sun, 0, 1 ) + $zone,
 	greg_time_gm( 0, 37, 19, 21, 5, 2005 ), 30,
-	'Sunset Washington DC June 21 2005', \&format_time;
+	'Sunset Washington DC June 21 2005', \&format_time );
 
     $time = greg_time_gm( 0, 0, 0, 22, 8, 2005 ) - $zone;
     $sta->universal( $time );
 
-    tolerance $sta->next_elevation( $sun, 0, 1 ) + $zone,
+    tolerance( $sta->next_elevation( $sun, 0, 1 ) + $zone,
 	greg_time_gm( 0, 56, 5, 22, 8, 2005 ), 30,
-	'Sunrise Washington DC September 22 2005', \&format_time;
+	'Sunrise Washington DC September 22 2005', \&format_time );
 
-    tolerance $sta->next_meridian( $sun ) + $zone,
+    tolerance( $sta->next_meridian( $sun ) + $zone,
 	greg_time_gm( 0, 1, 12, 22, 8, 2005 ), 30,
-	'Local noon Washington DC September 22 2005', \&format_time;
+	'Local noon Washington DC September 22 2005', \&format_time );
 
-    tolerance $sta->next_elevation( $sun, 0, 1 ) + $zone,
+    tolerance( $sta->next_elevation( $sun, 0, 1 ) + $zone,
 	greg_time_gm( 0, 5, 18, 22, 8, 2005 ), 30,
-	'Sunset Washington DC September 22 2005', \&format_time;
+	'Sunset Washington DC September 22 2005', \&format_time );
 
     $time = greg_time_gm( 0, 0, 0, 21, 11, 2005 ) - $zone;
     $sta->universal( $time );
 
-    tolerance $sta->next_elevation( $sun, 0, 1 ) + $zone,
+    tolerance( $sta->next_elevation( $sun, 0, 1 ) + $zone,
 	greg_time_gm( 0, 23, 7, 21, 11, 2005 ), 30,
-	'Sunrise Washington DC December 21 2005', \&format_time;
+	'Sunrise Washington DC December 21 2005', \&format_time );
 
-    tolerance $sta->next_meridian( $sun ) + $zone,
+    tolerance( $sta->next_meridian( $sun ) + $zone,
 	greg_time_gm( 0, 6, 12, 21, 11, 2005 ), 30,
-	'Local noon Washington DC December 21 2005', \&format_time;
+	'Local noon Washington DC December 21 2005', \&format_time );
 
-    tolerance $sta->next_elevation( $sun, 0, 1 ) + $zone,
+    tolerance( $sta->next_elevation( $sun, 0, 1 ) + $zone,
 	greg_time_gm( 0, 50, 16, 21, 11, 2005 ), 30,
-	'Sunset Washington DC December 21 2005', \&format_time;
+	'Sunset Washington DC December 21 2005', \&format_time );
 }
 
 {
@@ -134,62 +134,62 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
     my $time = greg_time_gm( 0, 0, 0, 20, 2, 2005 ) - $zone;
     $sun->universal( $time );
 
-    tolerance $sun->next_elevation( 0, 1 ) + $zone,
+    tolerance( $sun->next_elevation( 0, 1 ) + $zone,
 	greg_time_gm( 0, 11, 6, 20, 2, 2005 ), 30,
-	'Sunrise Washington DC March 11 2005', \&format_time;
+	'Sunrise Washington DC March 11 2005', \&format_time );
 
-    tolerance $sun->next_meridian() + $zone,
+    tolerance( $sun->next_meridian() + $zone,
 	greg_time_gm( 0, 16, 12, 20, 2, 2005 ), 30,
-	'Local noon Washington DC March 11 2005', \&format_time;
+	'Local noon Washington DC March 11 2005', \&format_time );
 
-    tolerance $sun->next_elevation( 0, 1 ) + $zone,
+    tolerance( $sun->next_elevation( 0, 1 ) + $zone,
 	greg_time_gm( 0, 20, 18, 20, 2, 2005 ), 30,
-	'Sunset Washington DC March 11 2005', \&format_time;
+	'Sunset Washington DC March 11 2005', \&format_time );
 
     $time = greg_time_gm( 0, 0, 0, 21, 5, 2005 ) - $zone;
     $sun->universal( $time );
 
-    tolerance $sun->next_elevation( 0, 1 ) + $zone,
+    tolerance( $sun->next_elevation( 0, 1 ) + $zone,
 	greg_time_gm( 0, 43, 4, 21, 5, 2005 ), 30,
-	'Sunrise Washington DC June 21 2005', \&format_time;
+	'Sunrise Washington DC June 21 2005', \&format_time );
 
-    tolerance $sun->next_meridian() + $zone,
+    tolerance( $sun->next_meridian() + $zone,
 	greg_time_gm( 0, 10, 12, 21, 5, 2005 ), 30,
-	'Local noon Washington DC June 21 2005', \&format_time;
+	'Local noon Washington DC June 21 2005', \&format_time );
 
-    tolerance $sun->next_elevation( 0, 1 ) + $zone,
+    tolerance( $sun->next_elevation( 0, 1 ) + $zone,
 	greg_time_gm( 0, 37, 19, 21, 5, 2005 ), 30,
-	'Sunset Washington DC June 21 2005', \&format_time;
+	'Sunset Washington DC June 21 2005', \&format_time );
 
     $time = greg_time_gm( 0, 0, 0, 22, 8, 2005 ) - $zone;
     $sun->universal( $time );
 
-    tolerance $sun->next_elevation( 0, 1 ) + $zone,
+    tolerance( $sun->next_elevation( 0, 1 ) + $zone,
 	greg_time_gm( 0, 56, 5, 22, 8, 2005 ), 30,
-	'Sunrise Washington DC September 22 2005', \&format_time;
+	'Sunrise Washington DC September 22 2005', \&format_time );
 
-    tolerance $sun->next_meridian() + $zone,
+    tolerance( $sun->next_meridian() + $zone,
 	greg_time_gm( 0, 1, 12, 22, 8, 2005 ), 30,
-	'Local noon Washington DC September 22 2005', \&format_time;
+	'Local noon Washington DC September 22 2005', \&format_time );
 
-    tolerance $sun->next_elevation( 0, 1 ) + $zone,
+    tolerance( $sun->next_elevation( 0, 1 ) + $zone,
 	greg_time_gm( 0, 5, 18, 22, 8, 2005 ), 30,
-	'Sunset Washington DC September 22 2005', \&format_time;
+	'Sunset Washington DC September 22 2005', \&format_time );
 
     $time = greg_time_gm( 0, 0, 0, 21, 11, 2005 ) - $zone;
     $sun->universal( $time );
 
-    tolerance $sun->next_elevation( 0, 1 ) + $zone,
+    tolerance( $sun->next_elevation( 0, 1 ) + $zone,
 	greg_time_gm( 0, 23, 7, 21, 11, 2005 ), 30,
-	'Sunrise Washington DC December 21 2005', \&format_time;
+	'Sunrise Washington DC December 21 2005', \&format_time );
 
-    tolerance $sun->next_meridian() + $zone,
+    tolerance( $sun->next_meridian() + $zone,
 	greg_time_gm( 0, 6, 12, 21, 11, 2005 ), 30,
-	'Local noon Washington DC December 21 2005', \&format_time;
+	'Local noon Washington DC December 21 2005', \&format_time );
 
-    tolerance $sun->next_elevation( 0, 1 ) + $zone,
+    tolerance( $sun->next_elevation( 0, 1 ) + $zone,
 	greg_time_gm( 0, 50, 16, 21, 11, 2005 ), 30,
-	'Sunset Washington DC December 21 2005', \&format_time;
+	'Sunset Washington DC December 21 2005', \&format_time );
 }
 
 
@@ -210,20 +210,20 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
     my $tolerance = 1 * 60;
 
     $sun->next_quarter();
-    tolerance $sun->dynamical(), greg_time_gm( 29, 34, 12, 20, 2, 2005 ),
-	$tolerance, 'March equinox 2005', \&format_dyn;
+    tolerance( $sun->dynamical(), greg_time_gm( 29, 34, 12, 20, 2, 2005 ),
+	$tolerance, 'March equinox 2005', \&format_dyn );
 
     $sun->next_quarter();
-    tolerance $sun->dynamical(), greg_time_gm( 12, 47, 6, 21, 5, 2005 ),
-	$tolerance, 'June solstice 2005', \&format_dyn;
+    tolerance( $sun->dynamical(), greg_time_gm( 12, 47, 6, 21, 5, 2005 ),
+	$tolerance, 'June solstice 2005', \&format_dyn );
 
     $sun->next_quarter();
-    tolerance $sun->dynamical(), greg_time_gm( 14, 24, 22, 22, 8, 2005 ),
-	$tolerance, 'September equinox 2005', \&format_dyn;
+    tolerance( $sun->dynamical(), greg_time_gm( 14, 24, 22, 22, 8, 2005 ),
+	$tolerance, 'September equinox 2005', \&format_dyn );
 
     $sun->next_quarter();
-    tolerance $sun->dynamical(), greg_time_gm( 1, 36, 18, 21, 11, 2005 ),
-	$tolerance, 'December solstice 2005', \&format_dyn;
+    tolerance( $sun->dynamical(), greg_time_gm( 1, 36, 18, 21, 11, 2005 ),
+	$tolerance, 'December solstice 2005', \&format_dyn );
 }
 
 
@@ -297,8 +297,8 @@ EOD
     is $almanac[1]{almanac}{description}, 'begin twilight',
 	q{Second event description is 'begin twilight'};
 
-    tolerance $almanac[1]{time}, greg_time_gm( 0, 57, 11, 1, 0, 2008 ), 60,
-	'Time twilight begins', \&format_gmt;
+    tolerance( $almanac[1]{time}, greg_time_gm( 0, 57, 11, 1, 0, 2008 ), 60,
+	'Time twilight begins', \&format_gmt );
 
     @almanac > 2
 	or skip 'Only 2 events returned', 16;
@@ -312,8 +312,8 @@ EOD
     is $almanac[2]{almanac}{description}, 'Sunrise',
 	q{Third event description is 'Sunrise'};
 
-    tolerance $almanac[2]{time}, greg_time_gm( 0, 27, 12, 1, 0, 2008 ), 60,
-	'Time of Sunrise', \&format_gmt;
+    tolerance( $almanac[2]{time}, greg_time_gm( 0, 27, 12, 1, 0, 2008 ), 60,
+	'Time of Sunrise', \&format_gmt );
 
     @almanac > 3
 	or skip 'Only 3 events returned', 12;
@@ -327,8 +327,8 @@ EOD
     is $almanac[3]{almanac}{description}, 'local noon',
 	q{Fourth event description is 'local noon'};
 
-    tolerance $almanac[3]{time}, greg_time_gm( 0, 12, 17, 1, 0, 2008 ), 60,
-	'Time of local noon', \&format_gmt;
+    tolerance( $almanac[3]{time}, greg_time_gm( 0, 12, 17, 1, 0, 2008 ), 60,
+	'Time of local noon', \&format_gmt );
 
     @almanac > 4
 	or skip 'Only 4 events returned', 8;
@@ -342,8 +342,8 @@ EOD
     is $almanac[4]{almanac}{description}, 'Sunset',
 	q{Fifth event description is 'Sunset'};
 
-    tolerance $almanac[4]{time}, greg_time_gm( 0, 56, 21, 1, 0, 2008 ), 60,
-	'Time of Sunset', \&format_gmt;
+    tolerance( $almanac[4]{time}, greg_time_gm( 0, 56, 21, 1, 0, 2008 ), 60,
+	'Time of Sunset', \&format_gmt );
 
     @almanac > 5
 	or skip 'Only 5 events returned', 4;
@@ -357,8 +357,8 @@ EOD
     is $almanac[5]{almanac}{description}, 'end twilight',
 	q{Sixth event description is 'end twilight'};
 
-    tolerance $almanac[5]{time}, greg_time_gm( 0, 26, 22, 1, 0, 2008 ), 60,
-	'Time twilight ends', \&format_gmt;
+    tolerance( $almanac[5]{time}, greg_time_gm( 0, 26, 22, 1, 0, 2008 ), 60,
+	'Time twilight ends', \&format_gmt );
 }
 
 SKIP: {
@@ -408,8 +408,8 @@ EOD
     is $almanac[1]{almanac}{description}, 'begin twilight',
 	q{Second event description is 'begin twilight'};
 
-    tolerance $almanac[1]{time}, greg_time_gm( 0, 57, 11, 1, 0, 2008 ), 60,
-	'Time twilight begins', \&format_gmt;
+    tolerance( $almanac[1]{time}, greg_time_gm( 0, 57, 11, 1, 0, 2008 ), 60,
+	'Time twilight begins', \&format_gmt );
 
     @almanac > 2
 	or skip 'Only 2 events returned', 16;
@@ -423,8 +423,8 @@ EOD
     is $almanac[2]{almanac}{description}, 'Sunrise',
 	q{Third event description is 'Sunrise'};
 
-    tolerance $almanac[2]{time}, greg_time_gm( 0, 27, 12, 1, 0, 2008 ), 60,
-	'Time of Sunrise', \&format_gmt;
+    tolerance( $almanac[2]{time}, greg_time_gm( 0, 27, 12, 1, 0, 2008 ), 60,
+	'Time of Sunrise', \&format_gmt );
 
     @almanac > 3
 	or skip 'Only 3 events returned', 12;
@@ -438,8 +438,8 @@ EOD
     is $almanac[3]{almanac}{description}, 'local noon',
 	q{Fourth event description is 'local noon'};
 
-    tolerance $almanac[3]{time}, greg_time_gm( 0, 12, 17, 1, 0, 2008 ), 60,
-	'Time of local noon', \&format_gmt;
+    tolerance( $almanac[3]{time}, greg_time_gm( 0, 12, 17, 1, 0, 2008 ), 60,
+	'Time of local noon', \&format_gmt );
 
     @almanac > 4
 	or skip 'Only 4 events returned', 8;
@@ -453,8 +453,8 @@ EOD
     is $almanac[4]{almanac}{description}, 'Sunset',
 	q{Fifth event description is 'Sunset'};
 
-    tolerance $almanac[4]{time}, greg_time_gm( 0, 56, 21, 1, 0, 2008 ), 60,
-	'Time of Sunset', \&format_gmt;
+    tolerance( $almanac[4]{time}, greg_time_gm( 0, 56, 21, 1, 0, 2008 ), 60,
+	'Time of Sunset', \&format_gmt );
 
     @almanac > 5
 	or skip 'Only 5 events returned', 4;
@@ -468,8 +468,8 @@ EOD
     is $almanac[5]{almanac}{description}, 'end twilight',
 	q{Sixth event description is 'end twilight'};
 
-    tolerance $almanac[5]{time}, greg_time_gm( 0, 26, 22, 1, 0, 2008 ), 60,
-	'Time twilight ends', \&format_gmt;
+    tolerance( $almanac[5]{time}, greg_time_gm( 0, 26, 22, 1, 0, 2008 ), 60,
+	'Time twilight ends', \&format_gmt );
 }
 
 # Test ability to set Sun
@@ -499,4 +499,4 @@ sub format_gmt {
 
 1;
 
-# ex: set textwidth=72 :
+# ex: set filetype=perl textwidth=72 :

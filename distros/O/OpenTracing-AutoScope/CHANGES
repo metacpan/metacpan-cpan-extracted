@@ -2,6 +2,13 @@ CHANGE LOG
 ==========
 
 
+2020-08-17 - v0.106.3
+---------------------
+
+### Added
+  - Provided a script to generate OpenTracing::WrapScope config files
+
+
 2020-08-17 - v0.106.2
 ---------------------
 

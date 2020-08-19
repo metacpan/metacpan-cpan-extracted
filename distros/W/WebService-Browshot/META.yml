@@ -3,24 +3,27 @@ abstract: 'Perl extension for Browshot (L<https://browshot.com/>), a web service
 author:
   - 'Julien Sobrier <julien@sobrier.net>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: WebService-Browshot
 no_index:
   directory:
     - t
     - inc
 requires:
-  IO::Socket::SSL: 0
-  JSON: 0
-  LWP::Protocol::https: 0
-  LWP::UserAgent: 0
-  URI::Encode: 0
-version: v1.14.1
+  File::Basename: '0'
+  File::Path: '0'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  URI::Encode: '0'
+version: v1.24.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

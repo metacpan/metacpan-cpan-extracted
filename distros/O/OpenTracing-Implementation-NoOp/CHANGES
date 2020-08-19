@@ -2,6 +2,12 @@ CHANGE LOG
 ==========
 
 
+2020-08-18 - v0.72.1
+--------------------
+
+Return 'carrier' on calling `inject_context` instead of the erroneous `undef`
+
+
 2020-08-06 - v0.72.0
 --------------------
 

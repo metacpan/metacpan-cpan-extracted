@@ -1,4 +1,8 @@
 Revision history for Perl extension Geo::METAR::Deduced.
 
+v0.0.2 Wed Aug 19 12:20:31 UTC 2020
+       - RT#133189 avoid undef METAR mode
+       - require Test::Warn for testing
+
 v0.0.1 Tue Aug 18 13:46:37 UTC 2020
        Initial release.

@@ -1,11 +1,11 @@
 NAME
 
-    Mojolicious::Plugin::AdditionalValidationChecks - Add addtional
+    Mojolicious::Plugin::AdditionalValidationChecks - Add additional
     validation checks
 
 VERSION
 
-    version 0.16
+    version 0.17
 
 SYNOPSIS
 

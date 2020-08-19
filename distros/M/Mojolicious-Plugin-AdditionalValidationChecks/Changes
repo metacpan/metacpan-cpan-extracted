@@ -1,6 +1,11 @@
 Release history for Mojolicious-Plugin-AdditionalValidationChecks
 =================================================================
 
+0.17 2020-08-19 16:32:00
+
+  * fix typo (thanks @haarg, GH#6)
+  * Add CPANCover badge to README
+
 0.15 2018-12-31 12:53:00
 
   * Improve checks and tests

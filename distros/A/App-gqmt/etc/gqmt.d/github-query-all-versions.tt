@@ -1,0 +1,27 @@
+query { repository(name: "[% repo %]", owner: "[% user %]") {
+  packages(first: [% num %] names: ["[% pkg %]"]) {
+      nodes {
+        id
+        name
+        versions(last: [% num %][% cursor %]) {
+          nodes {
+            id
+            version
+            files(first:1, orderBy: {direction: DESC, field: CREATED_AT}) {
+              totalCount
+              nodes {
+                updatedAt
+              }
+            }
+          }
+          pageInfo {
+            endCursor
+            hasNextPage
+            hasPreviousPage
+            startCursor
+          }
+        }
+      }
+    }
+  }
+}

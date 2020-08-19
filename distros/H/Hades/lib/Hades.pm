@@ -3,13 +3,13 @@ package Hades;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use Module::Generate;
 use Switch::Again qw/switch/;
 
 sub new {
-	my ($class, $args) = @_;
-	bless $args, $class;
+	my ($class, %args) = (shift, scalar @_ == 1 ? %{$_[0]} : @_);
+	bless \%args, $class;
 }
 
 sub run {
@@ -49,14 +49,16 @@ sub run {
 							push @line, $ident;
 							$ident = '';
 						}
-				: $first_char =~ m/\{/
+				: $first_char =~ m/\{/ && $ident !~ m/\\$/
 					? ! $nested
 						? $nested++
 						: do {
+							push @innerline, $ident;
+							$ident = '';
 							push @innerline, '{';
 							$nested++;
 						}
-					: $first_char =~ m/\}/ && do { $nested--; 1; }
+					: $first_char =~ m/\}/ && $ident !~ m/\\$/ && do { $nested--; 1; }
 						? ! $nested
 							? do {
 								push @line, [@innerline] if @innerline;
@@ -64,6 +66,8 @@ sub run {
 								(@innerline, @line) = ((), ());
 							}
 							: do {
+								push @innerline, $ident;
+								$ident = '';
 								push @innerline, '}';
 								if ($nested == 1) {
 									push @line, [@innerline];
@@ -77,6 +81,7 @@ sub run {
 	if (scalar @lines) {
 		my $last_token;
 		for my $class (@lines) {
+			$self->can('before_class') && $self->before_class($mg, $class);
 			if ($class->[0] eq 'macro') {
 				shift @{$class};
 				$mg->macro(shift @{$_}, join(' ', @{$_}) . ';') for @{$class};
@@ -198,135 +203,23 @@ sub run {
 												}
 											);
 											$switch->(shift @{$token}) while scalar @{$token};
-											if ($meta{$name}->{meta} eq 'ACCESSOR') {
-												my $private = $self->build_private($name, $meta{$name}->{private});
-												my $type = $self->build_coerce($name, '$value', $meta{$name}->{coerce})
-
-												. $self->build_type($name, $meta{$name}->{type}[0]);
-												my $trigger = $self->build_trigger($name, '$value', $meta{$name}->{trigger});
-												my $code = qq|{
-													my ( \$self, \$value ) = \@_; $private
-													if ( defined \$value ) { $type
-														\$self->{$name} = \$value; $trigger
-													}
-													return \$self->{$name};
-												}|;
-												$mg->accessor($name)->code($code)->clear_tests->test($self->build_tests($name, $meta{$name}));
-											} elsif ($meta{$name}->{meta} eq 'MODIFY') {
-												my $before_code = $meta{$name}->{before} || "";
-												my $around_code = $meta{$name}->{around} || qq|my \@res = \$self->\$orig(\@params);|;
-												my $after_code = $meta{$name}->{after} || "";
-												my $code = qq|{
-													my (\$orig, \$self, \@params) = ('SUPER::$name', \@_);
-													$before_code$around_code$after_code
-													return \@res;
-												}|;
-												$mg->sub($name)->code($code)->pod(qq|call $name method.|)->test($self->build_tests($name, $meta{$name}));
-											} else {
-												my $code = $meta{$name}->{code};
-												my ($params, $subtype, $params_explanation) = ( '', '', '' );
-												$subtype .= $self->build_private($name)
-													if $meta{$name}->{private};
-												if ($meta{$name}->{param}) {
-													for my $param (@{ $meta{$name}->{param} }) {
-														$params_explanation .= ', ' if $params_explanation;
-														$params .= ', ' .  $param;
-														my $pm = $meta{$name}->{params_map}->{$param};
-														$subtype .= $self->build_coerce($name, $param, $pm->{coerce});
-														if ($pm->{type}) {
-															my $error_message = ($pm->{type} !~ m/^(Optional|Any|Item)/ 
-																? qq|$param = defined $param ? $param : 'undef';| : q||)
-																. qq|die qq{$pm->{type}: invalid value $param for variable \\$param in method $name};|;
-															$subtype .= $self->build_type(
-																$name, 
-																$pm->{type}, 
-																$param, 
-																$error_message, 
-																($pm->{type} !~ m/^(Optional|Any|Item)/ 
-																	? qq|! defined($param) \|\|| : q||)
-															);
-															$params_explanation .= qq|param $param to be a $pm->{type}|;
-														} else {
-															$params_explanation .= qq|param $param to be any value including undef|;
-														}
-													}
-												}
-												$code = qq|{
-													my (\$self $params) = \@_; $subtype
-													$code;
-												}|;
-												$params =~ s/^,\s*//;
-												my $example = qq|\$obj->$name($params)|;
-												$mg->sub($name)->code($code)
-													->pod(qq|call $name method. Expects $params_explanation.|)
-													->example($example)
-													->test($self->build_tests($name, $meta{$name}));
-											}
-											if ($meta{$name}->{clearer}) {
-												$mg->sub(qq|clear_$name|)
-												->code(qq|{
-													my (\$self) = \@_;
-													delete \$self->{$name};
-													return \$self;
-												}|)
-												->pod(qq|clear $name accessor|)
-												->example(qq|\$obj->clear_$name|)
-												->test(
-													$self->build_tests($name, $meta{$name}, "success"),
-													['ok', qq|\$obj->clear_$name|],
-													['is', qq|\$obj->$name|, 'undef']
-												);
-											}
-											if ($meta{$name}->{predicate}) {
-												$mg->sub(qq|has_$name|)
-												->code(qq|{
-													my (\$self) = \@_;
-													return !! \$self->{$name};
-												}|)
-												->pod(qq|has_$name will return true if $name accessor has a value.|)
-												->example(qq|\$obj->has_$name|)
-												->test(
-													($meta{$name}->{required} || $meta{$name}->{default} ? (
-														['ok', qq|delete \$obj->{$name}|]
-													) : ()),
-													['is', qq|\$obj->has_$name|, q|''|], 
-													$self->build_tests($name, $meta{$name}, 'success'),
-													['is', qq|\$obj->has_$name|, 1],
-												);
-											}
+											$meta{$name}->{meta} eq 'ACCESSOR'
+												? $self->build_accessor($mg, $name, \%meta)
+												: $meta{$name}->{meta} eq 'MODIFY'
+													? $self->build_modify($mg, $name, \%meta)
+													: $self->build_sub($mg, $name, \%meta);
+											$self->build_clearer($mg, $name, \%meta) if $meta{$name}->{clearer};
+											$self->build_predicate($mg, $name, \%meta) if $meta{$name}->{predicate};
 										}
 							};
 			}
-			my %class = %Module::Generate::CLASS;
-			my $accessors = q|(|;
-			my %test_data;
-			map {
-				push @{$test_data{test_data_columns}}, $_;
-				$test_data{$_} = [ $self->build_test_data($meta{$_}{type}[0] ? $meta{$_}{type}[0] : 'Any', '', 1) ];	
-				$accessors .= qq|$_ => {|;
-				$accessors .= qq|required=>1,| if $meta{$_}{required};
-				$accessors .= qq|default=>$meta{$_}{default},| if $meta{$_}{default};
-				$accessors .= qq|},|;
-			} grep { $meta{$_}{meta} eq 'ACCESSOR' } keys %meta;
-			$accessors .= q|)|;
-			my $new = $class{CURRENT}{PARENT} || $class{CURRENT}{BASE} ? 'my $self = $cls->SUPER::new(%args)' : 'my $self = bless {}, $cls';
-			my $code = qq|{
-				my (\$cls, \%args) = (shift(), scalar \@_ == 1 ? \%{\$_[0]} : \@_);
-				$new;
-				my \%accessors = $accessors;
-				for my \$accessor ( keys \%accessors ) {
-					my \$value = \$self->\$accessor(defined \$args{\$accessor} ? \$args{\$accessor} : \$accessors{\$accessor}->{default});
-					unless (!\$accessors{\$accessor}->{required} \|\| defined \$value) {
-						die "\$accessor accessor is required";
-					}
-				}
-				return \$self;
-			}|;
-			$class{CURRENT}{SUBS}{new}{CODE} = $code;
-			$class{CURRENT}{SUBS}{new}{TEST} = [$self->build_tests('new', \%meta, 'new', \%class, \%test_data)];
+			$self->build_new($mg, \%meta);
+			$self->can('after_class') && $self->after_class($mg, \%meta);
 		}
 	}
+	$self->can('before_generate') && $self->before_generate($mg);
 	$mg->generate;
+	$self->can('after_generate') && $self->after_generate($mg);
 }
 
 sub _read_file {
@@ -335,6 +228,141 @@ sub _read_file {
 	my $content = do { local $/; <$fh>; };
 	close $fh;
 	return $content;
+}
+
+sub build_new {
+	my ($self, $mg, $meta) = @_;
+	my %class = %Module::Generate::CLASS;
+	my $accessors = q|(|;
+	map {
+		$accessors .= qq|$_ => {|;
+		$accessors .= qq|required=>1,| if $meta->{$_}->{required};
+		$accessors .= qq|default=>$meta->{$_}->{default},| if $meta->{$_}->{default};
+		$accessors .= qq|},|;
+	} grep { $meta->{$_}->{meta} eq 'ACCESSOR' } keys %{$meta};
+	$accessors .= q|)|;
+	my $new = $class{CURRENT}->{PARENT} || $class{CURRENT}->{BASE} ? 'my $self = $cls->SUPER::new(%args)' : 'my $self = bless {}, $cls';
+	my $code = qq|{
+		my (\$cls, \%args) = (shift(), scalar \@_ == 1 ? \%{\$_[0]} : \@_);
+		$new;
+		my \%accessors = $accessors;
+		for my \$accessor ( keys \%accessors ) {
+			my \$value = \$self->\$accessor(defined \$args{\$accessor} ? \$args{\$accessor} : \$accessors{\$accessor}->{default});
+			unless (!\$accessors{\$accessor}->{required} \|\| defined \$value) {
+				die "\$accessor accessor is required";
+			}
+		}
+		return \$self;
+	}|;
+	$class{CURRENT}{SUBS}{new}{CODE} = $code;
+	$class{CURRENT}{SUBS}{new}{TEST} = [$self->build_tests('new', $meta, 'new', \%class)];
+}
+
+sub build_accessor {
+	my ($self, $mg, $name, $meta) = @_;
+	my $private = $self->build_private($name, $meta->{$name}->{private});
+	my $type = $self->build_coerce($name, '$value', $meta->{$name}->{coerce})
+	. $self->build_type($name, $meta->{$name}->{type}[0]);
+	my $trigger = $self->build_trigger($name, '$value', $meta->{$name}->{trigger});
+	my $code = qq|{
+		my ( \$self, \$value ) = \@_; $private
+		if ( defined \$value ) { $type
+			\$self->{$name} = \$value; $trigger
+		}
+		return \$self->{$name};
+	}|;
+	$mg->accessor($name)->code($code)->clear_tests->test($self->build_tests($name, $meta->{$name}));
+}
+
+sub build_modify {
+	my ($self, $mg, $name, $meta) = @_;
+	my $before_code = $meta->{$name}->{before} || "";
+	my $around_code = $meta->{$name}->{around} || qq|my \@res = \$self->\$orig(\@params);|;
+	my $after_code = $meta->{$name}->{after} || "";
+	my $code = qq|{
+		my (\$orig, \$self, \@params) = ('SUPER::$name', \@_);
+		$before_code$around_code$after_code
+		return wantarray ? \@res : \$res[0];
+	}|;
+	$mg->sub($name)->code($code)->pod(qq|call $name method.|)->test($self->build_tests($name, $meta->{$name}));
+}
+
+sub build_sub {
+	my ($self, $mg, $name, $meta) = @_;
+	my $code = $meta->{$name}->{code};
+	my ($params, $subtype, $params_explanation) = ( '', '', '' );
+	$subtype .= $self->build_private($name)
+		if $meta->{$name}->{private};
+	if ($meta->{$name}->{param}) {
+		for my $param (@{ $meta->{$name}->{param} }) {
+			$params_explanation .= ', ' if $params_explanation;
+			$params .= ', ' .  $param;
+			my $pm = $meta->{$name}->{params_map}->{$param};
+			$subtype .= $self->build_coerce($name, $param, $pm->{coerce});
+			if ($pm->{type}) {
+				my $error_message = ($pm->{type} !~ m/^(Optional|Any|Item)/
+					? qq|$param = defined $param ? $param : 'undef';| : q||)
+					. qq|die qq{$pm->{type}: invalid value $param for variable \\$param in method $name};|;
+				$subtype .= $self->build_type(
+					$name,
+					$pm->{type},
+					$param,
+					$error_message,
+					($pm->{type} !~ m/^(Optional|Any|Item)/
+						? qq|! defined($param) \|\|| : q||)
+				);
+				$params_explanation .= qq|param $param to be a $pm->{type}|;
+			} else {
+				$params_explanation .= qq|param $param to be any value including undef|;
+			}
+		}
+	}
+	$code = qq|{
+		my (\$self $params) = \@_; $subtype
+		$code;
+	}|;
+	$params =~ s/^,\s*//;
+	my $example = qq|\$obj->$name($params)|;
+	$mg->sub($name)->code($code)
+		->pod(qq|call $name method. Expects $params_explanation.|)
+		->example($example)
+		->test($self->build_tests($name, $meta->{$name}));
+}
+
+sub build_clearer {
+	my ($self, $mg, $name, $meta) = @_;
+	$mg->sub(qq|clear_$name|)
+		->code(qq|{
+			my (\$self) = \@_;
+			delete \$self->{$name};
+			return \$self;
+		}|)
+		->pod(qq|clear $name accessor|)
+		->example(qq|\$obj->clear_$name|)
+		->test(
+			$self->build_tests($name, $meta->{$name}, "success"),
+			['ok', qq|\$obj->clear_$name|],
+			['is', qq|\$obj->$name|, 'undef']
+		);
+}
+
+sub build_predicate {
+	my ($self, $mg, $name, $meta) = @_;
+	$mg->sub(qq|has_$name|)
+		->code(qq|{
+			my (\$self) = \@_;
+			return !! \$self->{$name};
+		}|)
+		->pod(qq|has_$name will return true if $name accessor has a value.|)
+		->example(qq|\$obj->has_$name|)
+		->test(
+			($meta->{$name}->{required} || $meta->{$name}->{default} ? (
+				['ok', qq|delete \$obj->{$name}|]
+			) : ()),
+			['is', qq|\$obj->has_$name|, q|''|],
+			$self->build_tests($name, $meta->{$name}, 'success'),
+			['is', qq|\$obj->has_$name|, 1],
+		);
 }
 
 sub build_coerce {
@@ -386,7 +414,7 @@ sub build_type {
 			},
 			qr/^(Str)$/ => sub {
 				return qq|
-					if ($subcode ref $value \|\| $value !~ m/.+/) {
+					if ($subcode ref $value) {
 						$error_string
 					}|;
 			},
@@ -475,7 +503,7 @@ sub build_type {
 					if ((ref($value) \|\| "") ne "HASH") {
 						$error_string
 					}|;
-			
+
 				my $new_error_string = $self->extend_error_string($error_string, $value, '$item', qq| expected $matches[1]|, $matches[1]);
 				my $sub_code = $self->build_type($name, $matches[1], '$item', $new_error_string, ($matches[1] !~ m/^(Optional|Any|Item)/ ? qq|! defined(\$item) \|\|| : q||));
 				$code .= qq|
@@ -610,7 +638,7 @@ sub build_test_data {
 			return (q|1|, q|[]|, q|{}|);
 		},
 		qr/^(Str)$/ => sub {
-			return ($self->_generate_test_string, q|[]|, q|\1|, q|''|); 
+			return ($self->_generate_test_string, q|[]|, q|\1|);
 		},
 		qr/^(Num)$/ => sub {
 			return (q|100.555|, q|[]|, $self->_generate_test_string);
@@ -619,13 +647,13 @@ sub build_test_data {
 			return (q|10|, q|[]|, $self->_generate_test_string);
 		},
 		qr/^(Ref)$/ => sub {
-			return (q|{ test => 'test' }|, $self->_generate_test_string, q|1|); 
+			return (q|{ test => 'test' }|, $self->_generate_test_string, q|1|);
 		},
 		qr/^(Ref\[(.*)\])$/ => sub {
 			my ($val, @matches) = @_;
 			$matches[1] = '"' . $matches[1] . '"' if $matches[1] =~ m/^[a-zA-Z]/;
 			return (
-				qq|bless { test => 'test' }, $matches[1]|, 
+				qq|bless { test => 'test' }, $matches[1]|,
 				qq|bless { test => 'test' }, $matches[1] . 'Error'|,
 				$self->_generate_test_string
 			);
@@ -637,7 +665,7 @@ sub build_test_data {
 			my ($val, @matches) = @_;
 			$matches[1] = '"' . $matches[1] . '"' if $matches[1] =~ m/^[a-zA-Z]/;
 			return (
-				qq|bless \"", $matches[1]|, 
+				qq|bless \"", $matches[1]|,
 				qq|bless \"", $matches[1] . 'Error'|,
 				$self->_generate_test_string,
 				q|{}|
@@ -645,7 +673,7 @@ sub build_test_data {
 		},
 		qr/^(ArrayRef)$/ => sub {
 			return (
-				qq|['test']|, 
+				qq|['test']|,
 				qq|{}|,
 				$self->_generate_test_string
 			);
@@ -661,9 +689,9 @@ sub build_test_data {
 					sprintf q|[ %s ]|, join ", ", map { $v } 0 .. $matches[1] - 1;
 				} @values),
 				($matches[1] > 0 ? (
-					qq|[]| 
+					qq|[]|
 				) : ( )),
-				($matches[2] ? ( 
+				($matches[2] ? (
 					sprintf q|[ %s ]|, join ", ", map { $values[0] } 0 .. $matches[2] + 1
 				) : ( )),
 				q|{}|,
@@ -686,7 +714,7 @@ sub build_test_data {
 					sprintf q|{ test => %s }|, $_;
 				} @values),
 				q|[]|,
-				$self->_generate_test_string 
+				$self->_generate_test_string
 			);
 		},
 		qr/^(CodeRef)$/ => sub {
@@ -727,7 +755,6 @@ sub build_test_data {
 				(map {
 					sprintf q|{ %s => %s }|, $keys[0], $_;
 				} @values),
-				qq|{ '' => $values[0] }|,
 				q|[]|,
 				$self->_generate_test_string
 			);
@@ -795,77 +822,82 @@ sub build_test_data {
 }
 
 sub build_tests {
-	my ($self, $name, $meta, $mod, $class, $test_data) = @_;
+	my ($self, $name, $meta, $mod, $class) = @_;
 	my @tests = ();
 	$mod ? $mod ne 'new' ? do {
 		my ($valid) = $self->build_test_data($meta->{type}->[0] || 'Any', $name);
 		push @tests, ['deep', qq|\$obj->$name($valid)|, $valid];
 	} : do {
-		my $valid =  join(', ', map { sprintf '%s => %s', $_, $test_data->{$_}->[0] } grep { $meta->{$_}->{required} } @{$test_data->{test_data_columns}});
+		my %test_data;
+		map {
+			push @{$test_data{test_data_columns}}, $_;
+			$test_data{$_} = [ $self->build_test_data($meta->{$_}->{type}->[0] ? $meta->{$_}->{type}->[0] : 'Any', '', 1) ];
+		} grep { $meta->{$_}->{meta} eq 'ACCESSOR' } keys %{$meta};
+		my $valid =  join(', ', map { sprintf '%s => %s', $_, $test_data{$_}->[0] } grep { $meta->{$_}->{required} } @{$test_data{test_data_columns}});
 		push @tests, [
-			'ok', 
+			'ok',
 			sprintf(
-				'my $obj = %s->new({%s})', 
+				'my $obj = %s->new({%s})',
 				$class->{CURRENT}->{NAME},
 				$valid
 			)
 		], [
-			'ok', 
+			'ok',
 			sprintf(
-				'$obj = %s->new(%s)', 
+				'$obj = %s->new(%s)',
 				$class->{CURRENT}->{NAME},
 				$valid
 			)
-		], ['isa_ok', '$obj', qq|'$class->{CURRENT}->{NAME}'|]; 
-		my $d = 0;	
-		for my $key (@{$test_data->{test_data_columns}}) {
+		], ['isa_ok', '$obj', qq|'$class->{CURRENT}->{NAME}'|];
+		my $d = 0;
+		for my $key (@{$test_data{test_data_columns}}) {
 			if ($meta->{$key}->{default}) {
-				$valid = join(', ', map { $key ne $_ ? ( sprintf '%s => %s', $_, $test_data->{$_}->[0] ) : () } @{$test_data->{test_data_columns}});
+				$valid = join(', ', map { $key ne $_ ? ( sprintf '%s => %s', $_, $test_data{$_}->[0] ) : () } @{$test_data{test_data_columns}});
 				push @tests, [
-					'ok', 
+					'ok',
 					sprintf(
 						'$obj = %s->new({%s})',
 						$class->{CURRENT}->{NAME},
 						$valid
 					),
 				], [
-					'ok', 
+					'ok',
 					sprintf(
 						'$obj = %s->new(%s)',
 						$class->{CURRENT}->{NAME},
 						$valid
 					),
-				], [ 'is', qq|\$obj->$key|, $meta->{$key}->{default} ];
+				], [ 'deep', qq|\$obj->$key|, $meta->{$key}->{default} ];
 			} elsif ($meta->{$key}->{required}) {
 				push @tests, [
-					'eval', 
+					'eval',
 					sprintf(
 						'$obj = %s->new({%s})',
 						$class->{CURRENT}->{NAME},
-						join(', ', map { $key ne $_ ? ( sprintf '%s => %s', $_, $test_data->{$_}->[0] ) : () } @{$test_data->{test_data_columns}})
+						join(', ', map { $key ne $_ ? ( sprintf '%s => %s', $_, $test_data{$_}->[0] ) : () } @{$test_data{test_data_columns}})
 					),
 					'required'
 				];
 			}
 			my $m = 0;
-			for my $ah (@{$test_data->{$key}}) {
+			for my $ah (@{$test_data{$key}}) {
 				if ($m++ == 0) {
 					next if $d > 0;
 					push @tests, [
-						'ok', 
-						sprintf q|$obj = %s->new({ %s })|, 
+						'ok',
+						sprintf q|$obj = %s->new({ %s })|,
 						$class->{CURRENT}->{NAME},
-						join ', ', map {$key eq $_ ? qq|$_ => $ah| : sprintf( q|%s => %s|, $_, $test_data->{$_}->[0]) } @{$test_data->{test_data_columns}}
+						join ', ', map {$key eq $_ ? qq|$_ => $ah| : sprintf( q|%s => %s|, $_, $test_data{$_}->[0]) } @{$test_data{test_data_columns}}
 					];
 				} else {
 					push @tests, [
-						'eval', 
+						'eval',
 						sprintf(
-							q|$obj = %s->new({ %s })|, 
+							q|$obj = %s->new({ %s })|,
 							$class->{CURRENT}->{NAME},
-							join ', ', map {$key eq $_ ? qq|$_ => $ah| : sprintf( q|%s => %s|, $_, $test_data->{$_}->[0]) } @{$test_data->{test_data_columns}}
+							join ', ', map {$key eq $_ ? qq|$_ => $ah| : sprintf( q|%s => %s|, $_, $test_data{$_}->[0]) } @{$test_data{test_data_columns}}
 						),
-						'invalid value|greater|atleast'
+						'invalid|type|constraint|greater|atleast'
 					];
 				}
 			}
@@ -883,7 +915,7 @@ sub build_tests {
 				push @tests, ['deep', qq|\$obj->$name($valid)|, $valid];
 				unless ($meta->{coerce}) {
 					for (@test_cases) {
-						push @tests, ['eval', qq|\$obj->$name($_)|, 'invalid value|greater|atleast' ];
+						push @tests, ['eval', qq|\$obj->$name($_)|, 'invalid|value|type|constraint|greater|atleast' ];
 					}
 				}
 				push @tests, ['deep', qq|\$obj->$name|, $valid];
@@ -895,19 +927,19 @@ sub build_tests {
 		} : $meta->{param} && do {
 			my %test_data = map {
 				$_ => [
-					$self->build_test_data($meta->{params_map}->{$_}->{type} || 'Any', $name), q|undef|
+					$self->build_test_data($meta->{params_map}->{$_}->{type} || 'Any', $name), ($meta->{params_map}->{$_}->{type} || 'Any') !~ m/^(|Optional|Any|Item)/ ? q|undef| : ()
 				]
 			} @{ $meta->{param} };
 			for my $key (@{$meta->{param}}) {
 				for my $ah (splice @{$test_data{$key}}, 1) {
 					push @tests, [
-						'eval', 
+						'eval',
 						sprintf(
-							q|$obj->%s(%s)|, 
+							q|$obj->%s(%s)|,
 							$name,
 							join ', ', map {$key eq $_ ? $ah : $test_data{$_}->[0]} @{$meta->{param}}
 						),
-						'invalid value|greater|atleast'
+						'invalid|value|type|constraint|greater|atleast'
 					];
 				}
 			}
@@ -928,11 +960,11 @@ __END__
 
 =head1 NAME
 
-Hades - The great new Hades!
+Hades - Less is more, more is less!
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -1282,7 +1314,7 @@ Add type checking to the accessor.
 =head3 :test | :z
 
 Add tests associated to the accessor.
-	
+
 	dokimi :z(['ok', '$obj->dokimi'])
 	dokimes :z(['deep', '$obj->dokimes({})', q|{}|)
 
@@ -1353,7 +1385,7 @@ Setting private makes the method only available to the class.
 =head3 :test | :z
 
 Add tests associated to the sub.
-	
+
 	dokimi :z(['ok', '$obj->dokimi']) { }
 	dokimes :test(['deep', '$obj->dokimes({})', q|{}|) { }
 
@@ -1752,7 +1784,7 @@ It will generate a test file located at t/lib/Dokimes.t which looks like:
 and has 100% test coverage.
 
 	cover --test
-	
+
 	------------------- ------ ------ ------ ------ ------ ------
 	File                  stmt   bran   cond    sub   time  total
 	------------------- ------ ------ ------ ------ ------ ------
@@ -1771,7 +1803,7 @@ to test custom logic.
 
 =head4 ok
 
-This simply evaluates any expression ($got eq $expected is just a simple example) and uses that to determine if the test succeeded or failed. A true expression passes, a false one fails. 
+This simply evaluates any expression ($got eq $expected is just a simple example) and uses that to determine if the test succeeded or failed. A true expression passes, a false one fails.
 
 	['ok', '$obj->$method']
 

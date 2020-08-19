@@ -18,12 +18,16 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Graph::Nauty",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Data::Dumper" => 0,
+    "Graph::Undirected" => 0,
+    "Scalar::Util" => 0
+  },
   "TEST_REQUIRES" => {
-    "Graph" => 0,
+    "Graph::Undirected" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.1.2",
+  "VERSION" => "0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,7 +39,9 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
-  "Graph" => 0,
+  "Data::Dumper" => 0,
+  "Graph::Undirected" => 0,
+  "Scalar::Util" => 0,
   "Test::More" => 0
 );
 

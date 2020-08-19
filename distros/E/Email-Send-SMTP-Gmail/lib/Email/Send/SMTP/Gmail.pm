@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-$VERSION='1.30';
+$VERSION='1.32';
 require Net::SMTP;
 use Authen::SASL;
 use MIME::Base64;
@@ -72,7 +72,8 @@ sub _initsmtp{
           $port=25;
       }
   }
- print "Connecting to $smtp using $layer with $auth on port $port and timeout of $timeout\n" if $debug;
+
+  print "Connecting to $smtp using $layer with $auth on port $port and timeout of $timeout\n" if $debug;
   # Set security layer from $layer
   if($layer eq 'none')
   {
@@ -336,10 +337,10 @@ sub send
            $self->{sender}->datasend("Content-Transfer-Encoding: base64\n");
            if ((defined $properties{'-disposition'}) and ('inline' eq lc($properties{'-disposition'}))) {
               $self->{sender}->datasend("Content-ID: <$fileName>\n");
-              $self->{sender}->datasend("Content-Disposition: inline; =filename=\"$fileName\"\n\n");
+              $self->{sender}->datasend("Content-Disposition: inline; filename=\"$fileName\"\n\n");
            }
            else {
-             $self->{sender}->datasend("Content-Disposition: attachment; =filename=\"$fileName\"\n\n");
+             $self->{sender}->datasend("Content-Disposition: attachment; filename=\"$fileName\"\n\n");
            }
 
            # Google requires us to divide the attachment
@@ -402,12 +403,11 @@ sub send
            $self->{sender}->datasend("Content-Transfer-Encoding: base64\n");
            if ((defined $properties{'-disposition'}) and ('inline' eq lc($properties{'-disposition'}))) {
               $self->{sender}->datasend("Content-ID: <$fileName>\n");
-              $self->{sender}->datasend("Content-Disposition: inline; =filename=\"$fileName\"\n\n");
+              $self->{sender}->datasend("Content-Disposition: inline; filename=\"$fileName\"\n\n");
            }
            else {
-             $self->{sender}->datasend("Content-Disposition: attachment; =filename=\"$fileName\"\n\n");
+             $self->{sender}->datasend("Content-Disposition: attachment; filename=\"$fileName\"\n\n");
            }
-           # $self->{sender}->datasend("Content-Disposition: attachment; =filename=\"$fileName\"\n\n");
 
            # Google requires us to divide the attachment
            # First read -> Encode -> Send in chunks of 76
@@ -475,7 +475,7 @@ Email::Send::SMTP::Gmail - Sends emails with attachments supporting Auth over TL
                                                     -login=>'whateveraddress@gmail.com',
                                                     -pass=>'whatever_pass');
 
-   print "session error: $error" unless ($email!=-1);
+   print "session error: $error" unless ($mail!=-1);
 
    $mail->send(-to=>'target@xxx.com', -subject=>'Hello!', -body=>'Just testing it',
                -attachments=>'full_path_to_file');
@@ -654,7 +654,7 @@ L<http://search.cpan.org/dist/Email-Send-SMTP-Gmail/>
 
 =item * Repository
 
-L<http://github.com/NoAuth/Bugs.html?Dist=Email-Send-SMTP-Gmail>
+L<https://github.com/xpeco/Email-Send-SMTP-Gmail>
 
 =back
 

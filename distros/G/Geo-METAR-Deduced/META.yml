@@ -5,6 +5,7 @@ author:
 build_requires:
   Test::More: '0.86'
   Test::NoWarnings: '0'
+  Test::Warn: '0'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
@@ -17,7 +18,7 @@ name: Geo-METAR-Deduced
 provides:
   Geo::METAR::Deduced:
     file: lib/Geo/METAR/Deduced.pm
-    version: v0.0.1
+    version: v0.0.2
 requires:
   Class::Measure::Scientific::FX_992vb: '0'
   Data::Dumper: '0'
@@ -32,5 +33,5 @@ requires:
   perl: v5.16.0
 resources:
   license: http://dev.perl.org/licenses/
-version: v0.0.1
+version: v0.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,22 @@
+0.15 2020-08-19T18:07:59+02:00
+ - Fix use lib in Makefile.PL.
+ - Update author github username.
+ - Update dependency to Map::Tube.
+
+0.14 2020-08-19T18:00:32+02:00
+ - Add EXAMPLE5 section to doc.
+ - Add test for get_lines().
+ - Fix encoding in Changes file.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Implement station order.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rewrite XML map to new version with line IDs.
+ - Update Module::Install to 1.19 version.
+ - Update author name.
+ - Update copyright years to 2020.
+ - Update to Map::Tube 3.41.
+
 0.13 2015-10-16T12:36:19+02:00
  - Add tests for get_node_by_id() and get_node_by_name() methods.
  - Improve description for get_lines() in doc.
@@ -70,7 +89,7 @@
  - Describe get_all_routes() method as EXPERIMENTAL.
  - Fix REPOSITORY section in doc.
  - Fix get_shortest_route() method description in doc.
- - Fix map (bad edge between Jinonice and Nov� Butovice).
+ - Fix map (bad edge between Jinonice and Nové Butovice).
  - Improve abstract to readable version.
 
 0.03 2014-12-03T07:59:33+01:00
