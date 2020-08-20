@@ -25,12 +25,12 @@ use File::Path qw(mkpath);
 use File::Rsync::Mirror::Recentfile::FakeBigFloat qw(:all);
 use File::Temp;
 use List::Util qw(first max min);
-use Scalar::Util qw(reftype);
+use Scalar::Util qw(blessed reftype);
 use Storable;
 use Time::HiRes qw();
 use YAML::Syck;
 
-use version; our $VERSION = qv('0.0.8');
+use version; our $VERSION = qv('0.0.9');
 
 use constant MAX_INT => ~0>>1; # anything better?
 use constant DEFAULT_PROTOCOL => 1;
@@ -531,11 +531,15 @@ we are a mirroring slave.
 
 sub done {
     my($self) = @_;
+    require File::Rsync::Mirror::Recentfile::Done;
     my $done = $self->_done;
     if (!$done) {
-        require File::Rsync::Mirror::Recentfile::Done;
         $done = File::Rsync::Mirror::Recentfile::Done->new();
         $done->_rfinterval ($self->interval);
+        $self->_done ( $done );
+    } elsif (!blessed $done) {
+        # when the serializer does not support blessed objects
+        bless $done, 'File::Rsync::Mirror::Recentfile::Done';
         $self->_done ( $done );
     }
     return $done;

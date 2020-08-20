@@ -39,7 +39,13 @@ if ($ARGV[0]){
         $version .= "-TRIAL";
     }
 }
-# $version .= "-TRIAL";
+my $trial = 0;
+if ($trial) {
+    $version .= "-TRIAL";
+    if ($trial > 1) {
+        $version .= $trial;
+    }
+}
 
 my $provides = {
                 "File::Rsync::Mirror::Recent" =>
@@ -150,6 +156,10 @@ META.yml: metafile
 
 setversion:
 	$(PERL) Makefile.PL --setversion
+
+reversion:
+	$(NOECHO) $(ECHO) AGAINST_TAG=$(AGAINST_TAG)
+	$(PERL) dagolden-reversion-gist.pl $(AGAINST_TAG)
 
 verify-changes-date:
 	@$(PERL) -ne 'BEGIN{my@t=(localtime)[5,4,3];$$t[0]+=1900;$$t[1]++;$$t=sprintf"%04d-%02d-%02d",@t}' \

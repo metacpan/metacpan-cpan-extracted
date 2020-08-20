@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +20,10 @@ no_index:
 provides:
   File::Rsync::Mirror::Recent:
     file: lib/File/Rsync/Mirror/Recent.pm
-    version: v0.4.5
+    version: v0.4.6
   File::Rsync::Mirror::Recentfile:
     file: lib/File/Rsync/Mirror/Recentfile.pm
-    version: v0.0.8
+    version: v0.0.9
   File::Rsync::Mirror::Recentfile::Done:
     file: lib/File/Rsync/Mirror/Recentfile/Done.pm
     version: v0.0.8
@@ -55,5 +55,5 @@ requires:
   version: '0'
 resources:
   repository: git://repo.or.cz/rersyncrecent.git
-version: 0.4.5
+version: 0.4.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

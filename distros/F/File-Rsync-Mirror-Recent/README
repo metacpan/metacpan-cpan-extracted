@@ -3,7 +3,7 @@ rersyncrecent / File-Rsync-Mirror-Recent
 This is about speeding up rsync operation on large trees to many
 places. Uses a small metadata cocktail and pull technology. Although
 designed for the general purpose of mirroring large trees it's primary
-goal is to get CPAN sped up (CPEEDPAN). See README.mirrorcpan for a
+goal is to get CPAN sped up (CPEEDPAN). See HOWTO.mirrorcpan for a
 plan for a better CPAN backbone.
 
 INSTALLATION

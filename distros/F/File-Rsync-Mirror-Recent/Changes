@@ -1,3 +1,18 @@
+2020-06-21  k  <andk@cpan.org>
+
+	* release 0.4.6
+
+	* fail reports have been seen by testers running the tests in parallel;
+	not regarding this as a showstopper, releasing as stable
+
+2020-04-13  k  <andk@cpan.org>
+
+	* release 0.4.6-TRIAL
+
+	* address #131966: recent YAML and YAML::XS etc. do not support blessed
+	attributes anymore; we now rebless the attribute "done" on the getter
+	when it is not blessed (thanks to Slaven Rezić for reporting)
+
 2017-10-04  k  <andk@cpan.org>
 
 	* release 0.4.5
