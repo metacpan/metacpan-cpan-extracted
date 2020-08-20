@@ -1,5 +1,5 @@
 package Net::Amazon::S3;
-$Net::Amazon::S3::VERSION = '0.90';
+$Net::Amazon::S3::VERSION = '0.91';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -137,13 +137,14 @@ sub _build_arg_vendor {
 }
 
 around BUILDARGS => sub {
-	my ($orig, $class, %args) = @_;
+	my ($orig, $class) = (shift, shift);
+	my $args = $class->$orig (@_);
 
 	# support compat authorization arguments
-	$args{authorization_context} = _build_arg_authorization_context \%args;
-	$args{vendor}                = _build_arg_vendor                \%args;
+	$args->{authorization_context} = _build_arg_authorization_context $args;
+	$args->{vendor}                = _build_arg_vendor                $args;
 
-    $class->$orig (%args);
+    $args;
 };
 
 
@@ -511,7 +512,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 

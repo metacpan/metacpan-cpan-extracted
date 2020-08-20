@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 7;
-use Test::Deep;
+use Test::Deep v0.111; # 0.111 => obj_isa
 use Test::Warnings qw[ :no_end_test had_no_warnings ];
 
 use Shared::Examples::Net::Amazon::S3::Client (

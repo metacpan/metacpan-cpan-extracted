@@ -110,6 +110,7 @@ t/api-bucket-create.t
 t/api-bucket-delete.t
 t/api-bucket-objects-delete.t
 t/api-bucket-objects-list.t
+t/api-construct.t
 t/api-object-acl-get.t
 t/api-object-acl-set.t
 t/api-object-create.t

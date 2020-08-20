@@ -1,5 +1,14 @@
 Revision history for Perl module IO::Tee.
 
+0.66 2020-08-19 NEILB
+    - Fix to the testsuite for Windows, so now it passes.
+      Thanks to IKEGAMI
+
+0.65_01 2020-08-16 NEILB
+    - A fix to the Windows tests, proposed suggested by IKEGAMI.
+      CPAN Testers has been mainly reporting fails, so hoping this
+      helps turn things green! Thanks Eric.
+
 0.65 2017-08-16 NEILB
     - Added "use warnings", changed "use vars ..." to our $VERSION, etc.
     - Switched to Dist::Zilla

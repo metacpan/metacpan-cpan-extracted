@@ -342,14 +342,14 @@ perl_to_libyaml_event(yaml_emitter_t *emitter, HV *perl_event)
         }
         else if (strEQ(type, "mapping_start_event")) {
             ok = yaml_mapping_start_event_initialize(
-                &event, anchor_name, tag_name, 0, 0);
+                &event, anchor_name, tag_name, 0, style);
         }
         else if (strEQ(type, "mapping_end_event")) {
             ok = yaml_mapping_end_event_initialize(&event);
         }
         else if (strEQ(type, "sequence_start_event")) {
             ok = yaml_sequence_start_event_initialize(
-                &event, anchor_name, tag_name, 0, 0);
+                &event, anchor_name, tag_name, 0, style);
         }
         else if (strEQ(type, "sequence_end_event")) {
             ok = yaml_sequence_end_event_initialize(&event);

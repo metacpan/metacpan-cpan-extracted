@@ -51,7 +51,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::response::bucket_objects_list_v1_wit
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 AUTHOR
 

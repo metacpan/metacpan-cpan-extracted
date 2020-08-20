@@ -66706,3 +66706,16 @@ T/TA/TARAS/Serge-Sync-Plugin-TranslationService-Smartcat-0.0.6.tar.gz
 T/TA/TARAS/Smartcat-App-0.0.4.tar.gz
 J/JS/JSOBRIER/WebService-Browshot-1.24.0.tar.gz
 M/MI/MIKEJONES/WebService-Mattermost-0.22.tar.gz
+P/PL/PLICEASE/Alien-OpenSSL-0.11.tar.gz
+P/PE/PERLANCAR/App-PickRandomLines-0.020.tar.gz
+P/PE/PERLANCAR/App-SubtitleUtils-0.001.tar.gz
+A/AS/ASPOSE/AsposeCellsCloud-CellsApi-20.8.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000537.tar.gz
+I/IP/IPENBURG/Class-Measure-Scientific-FX_992vb-v0.0.4.tar.gz
+F/FA/FAYLAND/Dist-Zilla-Plugin-GitHubREADME-Badge-0.31.tar.gz
+I/IP/IPENBURG/Geo-METAR-Deduced-v0.0.4.tar.gz
+N/NE/NEILB/IO-Tee-0.66.tar.gz
+V/VA/VANHOESEL/Log-Log4perl-OpenTracing-v0.1.2.tar.gz
+L/LD/LDIDRY/Mojolicious-Plugin-CoverDb-0.04.tar.gz
+B/BA/BARNEY/Net-Amazon-S3-0.91.tar.gz
+T/TI/TINITA/YAML-LibYAML-API-0.010.tar.gz

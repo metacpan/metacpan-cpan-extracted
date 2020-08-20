@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Vendor::Generic;
-$Net::Amazon::S3::Vendor::Generic::VERSION = '0.90';
+$Net::Amazon::S3::Vendor::Generic::VERSION = '0.91';
 use Moose 0.85;
 
 # ABSTRACT: Generic S3 vendor
@@ -20,7 +20,7 @@ Net::Amazon::S3::Vendor::Generic - Generic S3 vendor
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 

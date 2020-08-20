@@ -192,15 +192,17 @@ sub call_api {
     if($get_token){
         $_url = $self->{config}{base_url} . $resource_path;
     }
-
+  
     # build query 
     if (%$query_params) {
         $_url = ($_url . '?' . eval { URI::Query->new($query_params)->stringify });
     }
-
+  
+  
     # body data
     $body_data = to_json($body_data->to_hash) if defined $body_data && $body_data->can('to_hash'); # model to json string
     my $_body_data = %$post_params ? $post_params : $body_data;
+  
     # Make the HTTP request
     my $_request;
     if ($method eq 'POST') {
@@ -208,20 +210,18 @@ sub call_api {
         $header_params->{'Content-Type'} = lc $header_params->{'Content-Type'} eq 'multipart/form' ? 
             'form-data' : $header_params->{'Content-Type'};
         
-        # $_request = POST($_url, %$header_params, Content => $_body_data);
         if($_body_data){
             $_request = POST($_url, %$header_params, Content => $_body_data);
         }
         else{
             $_request = POST($_url, %$header_params);
-        }
+        }  
     }
     elsif ($method eq 'PUT') {
         # multipart
         $header_params->{'Content-Type'}  = lc $header_params->{'Content-Type'} eq 'multipart/form' ? 
             'form-data' : $header_params->{'Content-Type'};
   
-        # $_request = PUT($_url, %$header_params, Content => $_body_data);
         if($_body_data){
             $_request = PUT($_url, %$header_params, Content => $_body_data);
         }
@@ -237,14 +237,12 @@ sub call_api {
         else{
            $_request = GET($_url, %$header_params);
         }
-        
     }
     elsif ($method eq 'HEAD') {
         my $headers = HTTP::Headers->new(%$header_params);
         $_request = HEAD($_url,%$header_params); 
     }
     elsif ($method eq 'DELETE') { #TODO support form data
-    
         my $headers = HTTP::Headers->new(%$header_params);
         if($_body_data){
             $_request = DELETE($_url, %$headers, Content => $_body_data);
@@ -263,7 +261,7 @@ sub call_api {
     #printf $self->{ua}->ssl_opts;############################################
     $self->{ua}->timeout($self->{http_timeout} || $self->{config}{http_timeout});
     $self->{ua}->agent($self->{http_user_agent} || $self->{config}{http_user_agent});
-
+    
     $log->debugf("REQUEST: %s", $_request->as_string);
     my $_response = $self->{ua}->request($_request);
     $log->debugf("RESPONSE: %s", $_response->as_string);
@@ -271,6 +269,7 @@ sub call_api {
     unless ($_response->is_success) {
         croak(sprintf "API Exception(%s): %s\n%s", $_response->code, $_response->message, $_response->content);
     }
+       
     return $_response->content;
   
 }

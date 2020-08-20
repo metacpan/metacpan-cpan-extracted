@@ -22,7 +22,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::error::bucket_already_exists - Share
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 AUTHOR
 

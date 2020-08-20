@@ -2,7 +2,7 @@ package Mojolicious::Plugin::CoverDb;
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 use Mojo::Collection 'c';
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 sub register ($self, $app, $conf = {}) {
     if ($app->mode eq 'development') {

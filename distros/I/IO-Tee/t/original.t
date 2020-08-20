@@ -85,6 +85,7 @@ $t3 and ($t3->autoflush(1), $t3->flush)
     my $contents = join('', $t8->getlines);
     print((($contents eq $expected) ? '' : 'not '), "ok 25\n");
 
+    $expected =~ s/\n/\r\n/g if $^O =~ /Win32/;
     $t8 = IO::File->new('<test.5');
     $t7 = IO::Tee->new($t8);
     $contents = '';

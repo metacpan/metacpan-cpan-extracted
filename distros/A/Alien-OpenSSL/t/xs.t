@@ -1,8 +1,11 @@
 use Test2::V0;
 use Test::Alien;
 use Alien::OpenSSL;
+use Test::Alien::Diag qw( alien_diag );
 
 alien_ok 'Alien::OpenSSL';
+
+alien_diag 'Alien::OpenSSL';
 
 my $xs = do { local $/; <DATA> };
 

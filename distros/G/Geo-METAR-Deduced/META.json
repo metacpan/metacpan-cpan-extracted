@@ -45,15 +45,18 @@
    "provides" : {
       "Geo::METAR::Deduced" : {
          "file" : "lib/Geo/METAR/Deduced.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/rolandvanipenburg/geo-metar-deduced"
+      }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.0.4",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

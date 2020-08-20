@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Authorization::Basic;
-$Net::Amazon::S3::Authorization::Basic::VERSION = '0.90';
+$Net::Amazon::S3::Authorization::Basic::VERSION = '0.91';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -29,7 +29,7 @@ Net::Amazon::S3::Authorization::Basic - Basic authorization information
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 

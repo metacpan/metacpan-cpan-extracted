@@ -1,5 +1,5 @@
 package Net::Amazon::S3::HTTPRequest;
-$Net::Amazon::S3::HTTPRequest::VERSION = '0.90';
+$Net::Amazon::S3::HTTPRequest::VERSION = '0.91';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use HTTP::Date;
@@ -141,7 +141,7 @@ Net::Amazon::S3::HTTPRequest - Create a signed HTTP::Request
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 

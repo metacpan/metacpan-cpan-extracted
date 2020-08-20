@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Vendor;
-$Net::Amazon::S3::Vendor::VERSION = '0.90';
+$Net::Amazon::S3::Vendor::VERSION = '0.91';
 use Moose 0.85;
 
 # ABSTRACT: Base class for vendor specific behaviour
@@ -59,7 +59,7 @@ Net::Amazon::S3::Vendor - Base class for vendor specific behaviour
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 

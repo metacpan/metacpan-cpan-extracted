@@ -1,5 +1,9 @@
-Revision history for App-PickRandomLines
+0.020   2020-04-29  Released-By: PERLANCAR; Urgency: medium
 
-0.01    2015-11-23 (PERLANCAR)
+	- Tweak Rinci metadata: replace deprecated
+	  x.schema.{,element_}entity with more specific schema.
+
+
+0.01    2015-11-23  Released-By: PERLANCAR
 
         - First release.

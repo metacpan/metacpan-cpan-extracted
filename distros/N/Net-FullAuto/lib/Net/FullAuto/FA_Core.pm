@@ -18512,7 +18512,10 @@ sub ftm_login
                $hostlabel}{'IdentityFile'} &&
                $Net::FullAuto::FA_Core::Hosts{
                $hostlabel}{'IdentityFile'})) {
-            $determine_password->('',0,$hostlabel,$password);
+            if ($hostlabel!~/__Master_${$}__/ && !$identityfile
+                  && !(exists $Hosts{$hostlabel}{'cyberark'})) {
+               $determine_password->('',0,$hostlabel,$password);
+            }
             unless ($password) {
                if ($su_id) {
                   $ftm_passwd=&Net::FullAuto::FA_Core::getpasswd($hostlabel,

@@ -23,5 +23,5 @@ requires:
   Hash::Fold: '0'
   Log::Log4perl: '0'
   OpenTracing::GlobalTracer: '0'
-version: v0.1.1
+version: v0.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::InitiateMultipartUpload;
-$Net::Amazon::S3::Request::InitiateMultipartUpload::VERSION = '0.90';
+$Net::Amazon::S3::Request::InitiateMultipartUpload::VERSION = '0.91';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request::Object';
@@ -32,7 +32,7 @@ Net::Amazon::S3::Request::InitiateMultipartUpload - An internal class to begin a
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 

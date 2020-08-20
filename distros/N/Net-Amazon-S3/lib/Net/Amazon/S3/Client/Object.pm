@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Object;
-$Net::Amazon::S3::Client::Object::VERSION = '0.90';
+$Net::Amazon::S3::Client::Object::VERSION = '0.91';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use DateTime::Format::HTTP;
@@ -510,7 +510,7 @@ Net::Amazon::S3::Client::Object - An easy-to-use Amazon S3 client object
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 

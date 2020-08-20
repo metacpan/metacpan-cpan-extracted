@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2020, Roland van Ipenburg
-package Class::Measure::Scientific::FX_992vb v0.0.2;
+package Class::Measure::Scientific::FX_992vb v0.0.4;
 use Moose;
 use MooseX::NonMoose;
 use List::MoreUtils qw(uniq);
@@ -391,7 +391,7 @@ Class::Measure::Scientific::FX_992vb - units of measurement like the CASIO fx-99
 
 =head1 VERSION
 
-This document describes Class::Measure::Scientific::FX_992vb v0.0.2.
+This document describes Class::Measure::Scientific::FX_992vb v0.0.4.
 
 =head1 SYNOPSIS
 
@@ -832,6 +832,9 @@ constant|https://en.wikipedia.org/wiki/Fine-structure_constant>
 C<Class::Measure::Scientific::FX_992vb::a()> as I<7.2973506e-3>
 
 =back
+
+Please report any bugs or feature requests at L<RT for
+rt.cpan.org|https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Measure-Scientific-FX_992vb>.
 
 =head1 AUTHOR
 

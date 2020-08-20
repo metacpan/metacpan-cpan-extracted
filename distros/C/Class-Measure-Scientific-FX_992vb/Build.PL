@@ -20,5 +20,11 @@ Module::Build->new(
         'Test::NoWarnings' => 0,
         'Test::Warn'       => 0,
     },
+    meta_merge => {
+        resources => {
+            repository =>
+'https://bitbucket.org/rolandvanipenburg/class-measure-scientific-fx_992vb',
+        },
+    },
     sign => 1,
 )->create_build_script;

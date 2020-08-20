@@ -12,6 +12,8 @@ use YAML::PP::Common qw/
     YAML_ANY_SCALAR_STYLE YAML_PLAIN_SCALAR_STYLE
     YAML_SINGLE_QUOTED_SCALAR_STYLE YAML_DOUBLE_QUOTED_SCALAR_STYLE
     YAML_LITERAL_SCALAR_STYLE YAML_FOLDED_SCALAR_STYLE
+    YAML_FLOW_MAPPING_STYLE YAML_BLOCK_MAPPING_STYLE
+    YAML_FLOW_SEQUENCE_STYLE YAML_BLOCK_SEQUENCE_STYLE
 /;
 
 my $yaml = <<'EOM';
@@ -47,7 +49,7 @@ EOM
 my @exp_events = (
     { name => 'stream_start_event' },
     { name => 'document_start_event', implicit => 1 },
-    { name => 'mapping_start_event', style => 'block', },
+    { name => 'mapping_start_event', style => YAML_BLOCK_MAPPING_STYLE, },
 
     { name => 'scalar_event', value => 'z', style => YAML_PLAIN_SCALAR_STYLE },
     { name => 'scalar_event', value => '1', style => YAML_PLAIN_SCALAR_STYLE },
@@ -58,7 +60,7 @@ my @exp_events = (
     { name => 'scalar_event', value => 'b', style => YAML_PLAIN_SCALAR_STYLE },
     { name => 'scalar_event', value => '0b10', style => YAML_PLAIN_SCALAR_STYLE },
     { name => 'scalar_event', value => 'x', style => YAML_PLAIN_SCALAR_STYLE },
-    { name => 'mapping_start_event', style => 'block', },
+    { name => 'mapping_start_event', style => YAML_BLOCK_MAPPING_STYLE, },
     { name => 'scalar_event', value => 'y', style => YAML_PLAIN_SCALAR_STYLE },
     { name => 'scalar_event', value => 'z', style => YAML_PLAIN_SCALAR_STYLE },
     { name => 'mapping_end_event' },
@@ -71,7 +73,7 @@ my @exp_events = (
         version_directive => { major => 1, minor => 2 },
     },
 
-    { name => 'sequence_start_event', style => 'block', anchor => 'yes' },
+    { name => 'sequence_start_event', style => YAML_BLOCK_SEQUENCE_STYLE, anchor => 'yes' },
     { name => 'scalar_event', value => 'YES', style => YAML_PLAIN_SCALAR_STYLE },
     { name => 'scalar_event', value => '0b10', style => YAML_PLAIN_SCALAR_STYLE },
 

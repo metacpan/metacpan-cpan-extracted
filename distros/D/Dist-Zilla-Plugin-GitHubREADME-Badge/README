@@ -26,6 +26,7 @@ SYNOPSIS
         badges = docker_automated
         badges = docker_build
         badges = github_actions/test
+        badges = cpancover
         place = bottom
         phase = release
 

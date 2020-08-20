@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   Mojolicious: '8.58'
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

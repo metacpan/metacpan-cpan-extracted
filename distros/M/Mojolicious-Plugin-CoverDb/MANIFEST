@@ -5,6 +5,7 @@ MANIFEST			This list of files
 README
 README.md
 t/basic.t
+t/cover_db/coverage.html
 t/fake_cover_db/test.html
 t/with_coverage_html.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

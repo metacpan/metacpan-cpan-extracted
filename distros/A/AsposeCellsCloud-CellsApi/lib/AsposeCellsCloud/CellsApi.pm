@@ -38,8 +38,6 @@ use AsposeCellsCloud::ApiClient;
 
 use base "Class::Data::Inheritable";
 
-my  $VERSION = '20.7';
-
 __PACKAGE__->mk_classdata('method_documentation' => {});
 
 sub new {
@@ -76,7 +74,7 @@ sub new {
 # @param int $minute  (optional, default to 0)
 # @param int $second  (optional, default to 0)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -134,7 +132,7 @@ sub new {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -232,8 +230,8 @@ sub cells_auto_filter_delete_worksheet_date_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -276,7 +274,7 @@ sub cells_auto_filter_delete_worksheet_date_filter {
 # @param int $field_index  (required)
 # @param string $criteria  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -304,7 +302,7 @@ sub cells_auto_filter_delete_worksheet_date_filter {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -367,8 +365,8 @@ sub cells_auto_filter_delete_worksheet_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -409,7 +407,7 @@ sub cells_auto_filter_delete_worksheet_filter {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -427,7 +425,7 @@ sub cells_auto_filter_delete_worksheet_filter {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -475,8 +473,8 @@ sub cells_auto_filter_get_worksheet_auto_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -517,7 +515,7 @@ sub cells_auto_filter_get_worksheet_auto_filter {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -535,7 +533,7 @@ sub cells_auto_filter_get_worksheet_auto_filter {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -583,8 +581,8 @@ sub cells_auto_filter_post_worksheet_auto_filter_refresh {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -626,7 +624,7 @@ sub cells_auto_filter_post_worksheet_auto_filter_refresh {
 # @param string $sheet_name  (required)
 # @param int $field_index  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -649,7 +647,7 @@ sub cells_auto_filter_post_worksheet_auto_filter_refresh {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -707,8 +705,8 @@ sub cells_auto_filter_post_worksheet_match_blanks {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -750,7 +748,7 @@ sub cells_auto_filter_post_worksheet_match_blanks {
 # @param string $sheet_name  (required)
 # @param int $field_index  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -773,7 +771,7 @@ sub cells_auto_filter_post_worksheet_match_blanks {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -831,8 +829,8 @@ sub cells_auto_filter_post_worksheet_match_non_blanks {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -878,7 +876,7 @@ sub cells_auto_filter_post_worksheet_match_non_blanks {
 # @param boolean $match_blanks  (optional)
 # @param boolean $refresh  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -921,7 +919,7 @@ sub cells_auto_filter_post_worksheet_match_non_blanks {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -999,8 +997,8 @@ sub cells_auto_filter_put_worksheet_color_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -1055,7 +1053,7 @@ sub cells_auto_filter_put_worksheet_color_filter {
 # @param boolean $match_blanks  (optional)
 # @param boolean $refresh  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -1118,7 +1116,7 @@ sub cells_auto_filter_put_worksheet_color_filter {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -1231,8 +1229,8 @@ sub cells_auto_filter_put_worksheet_custom_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -1284,7 +1282,7 @@ sub cells_auto_filter_put_worksheet_custom_filter {
 # @param boolean $match_blanks  (optional)
 # @param boolean $refresh  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -1357,7 +1355,7 @@ sub cells_auto_filter_put_worksheet_custom_filter {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -1475,8 +1473,8 @@ sub cells_auto_filter_put_worksheet_date_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -1522,7 +1520,7 @@ sub cells_auto_filter_put_worksheet_date_filter {
 # @param boolean $match_blanks  (optional)
 # @param boolean $refresh  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -1565,7 +1563,7 @@ sub cells_auto_filter_put_worksheet_date_filter {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -1653,8 +1651,8 @@ sub cells_auto_filter_put_worksheet_dynamic_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -1700,7 +1698,7 @@ sub cells_auto_filter_put_worksheet_dynamic_filter {
 # @param boolean $match_blanks  (optional)
 # @param boolean $refresh  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -1743,7 +1741,7 @@ sub cells_auto_filter_put_worksheet_dynamic_filter {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -1831,8 +1829,8 @@ sub cells_auto_filter_put_worksheet_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -1880,7 +1878,7 @@ sub cells_auto_filter_put_worksheet_filter {
 # @param boolean $match_blanks  (optional)
 # @param boolean $refresh  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -1933,7 +1931,7 @@ sub cells_auto_filter_put_worksheet_filter {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -2041,8 +2039,8 @@ sub cells_auto_filter_put_worksheet_filter_top10 {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -2089,7 +2087,7 @@ sub cells_auto_filter_put_worksheet_filter_top10 {
 # @param boolean $match_blanks  (optional)
 # @param boolean $refresh  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -2137,7 +2135,7 @@ sub cells_auto_filter_put_worksheet_filter_top10 {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -2235,8 +2233,8 @@ sub cells_auto_filter_put_worksheet_icon_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -2279,7 +2277,7 @@ sub cells_auto_filter_put_worksheet_icon_filter {
 # @param int $autoshape_number The autoshape number. (required)
 # @param string $format Exported format. (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -2307,7 +2305,7 @@ sub cells_auto_filter_put_worksheet_icon_filter {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -2365,8 +2363,8 @@ sub cells_autoshapes_get_worksheet_autoshape {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -2414,7 +2412,7 @@ sub cells_autoshapes_get_worksheet_autoshape {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -2432,7 +2430,7 @@ sub cells_autoshapes_get_worksheet_autoshape {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -2480,8 +2478,8 @@ sub cells_autoshapes_get_worksheet_autoshapes {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -2523,7 +2521,7 @@ sub cells_autoshapes_get_worksheet_autoshapes {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $chart_index The chart index. (required)
 # @param string $folder Workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -2546,7 +2544,7 @@ sub cells_autoshapes_get_worksheet_autoshapes {
         description => 'Workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -2599,8 +2597,8 @@ sub cells_chart_area_get_chart_area {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -2649,7 +2647,7 @@ sub cells_chart_area_get_chart_area {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $chart_index The chart index. (required)
 # @param string $folder Workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -2672,7 +2670,7 @@ sub cells_chart_area_get_chart_area {
         description => 'Workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -2725,8 +2723,8 @@ sub cells_chart_area_get_chart_area_border {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -2775,7 +2773,7 @@ sub cells_chart_area_get_chart_area_border {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $chart_index The chart index. (required)
 # @param string $folder Workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -2798,7 +2796,7 @@ sub cells_chart_area_get_chart_area_border {
         description => 'Workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -2851,8 +2849,8 @@ sub cells_chart_area_get_chart_area_fill_format {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -2901,7 +2899,7 @@ sub cells_chart_area_get_chart_area_fill_format {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $chart_index The chart index. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -2924,7 +2922,7 @@ sub cells_chart_area_get_chart_area_fill_format {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -2977,8 +2975,8 @@ sub cells_charts_delete_worksheet_chart_legend {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -3027,7 +3025,7 @@ sub cells_charts_delete_worksheet_chart_legend {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $chart_index The chart index. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -3050,7 +3048,7 @@ sub cells_charts_delete_worksheet_chart_legend {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -3103,8 +3101,8 @@ sub cells_charts_delete_worksheet_chart_title {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -3152,7 +3150,7 @@ sub cells_charts_delete_worksheet_chart_title {
 # @param string $name Workbook name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -3170,7 +3168,7 @@ sub cells_charts_delete_worksheet_chart_title {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -3218,8 +3216,8 @@ sub cells_charts_delete_worksheet_clear_charts {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -3261,7 +3259,7 @@ sub cells_charts_delete_worksheet_clear_charts {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $chart_index The chart index. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -3284,7 +3282,7 @@ sub cells_charts_delete_worksheet_clear_charts {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -3337,8 +3335,8 @@ sub cells_charts_delete_worksheet_delete_chart {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -3388,7 +3386,7 @@ sub cells_charts_delete_worksheet_delete_chart {
 # @param int $chart_number The chart number. (required)
 # @param string $format The exported file format. (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -3416,7 +3414,7 @@ sub cells_charts_delete_worksheet_delete_chart {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -3474,8 +3472,8 @@ sub cells_charts_get_worksheet_chart {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -3524,7 +3522,7 @@ sub cells_charts_get_worksheet_chart {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $chart_index The chart index. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -3547,7 +3545,7 @@ sub cells_charts_get_worksheet_chart {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -3600,8 +3598,8 @@ sub cells_charts_get_worksheet_chart_legend {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -3650,7 +3648,7 @@ sub cells_charts_get_worksheet_chart_legend {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $chart_index The chart index. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -3673,7 +3671,7 @@ sub cells_charts_get_worksheet_chart_legend {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -3726,8 +3724,8 @@ sub cells_charts_get_worksheet_chart_title {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -3775,7 +3773,7 @@ sub cells_charts_get_worksheet_chart_title {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -3793,7 +3791,7 @@ sub cells_charts_get_worksheet_chart_title {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -3841,8 +3839,8 @@ sub cells_charts_get_worksheet_charts {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -3885,7 +3883,7 @@ sub cells_charts_get_worksheet_charts {
 # @param int $chart_index  (required)
 # @param Chart $chart  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -3913,7 +3911,7 @@ sub cells_charts_get_worksheet_charts {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -3966,8 +3964,8 @@ sub cells_charts_post_worksheet_chart {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -4022,7 +4020,7 @@ sub cells_charts_post_worksheet_chart {
 # @param int $chart_index The chart index. (required)
 # @param Legend $legend  (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -4050,7 +4048,7 @@ sub cells_charts_post_worksheet_chart {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -4103,8 +4101,8 @@ sub cells_charts_post_worksheet_chart_legend {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -4159,7 +4157,7 @@ sub cells_charts_post_worksheet_chart_legend {
 # @param int $chart_index The chart index. (required)
 # @param Title $title Chart title (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -4187,7 +4185,7 @@ sub cells_charts_post_worksheet_chart_legend {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -4240,8 +4238,8 @@ sub cells_charts_post_worksheet_chart_title {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -4304,7 +4302,7 @@ sub cells_charts_post_worksheet_chart_title {
 # @param boolean $is_auto_get_serial_name Specifies whether auto update serial name.  (optional, default to true)
 # @param string $title Specifies chart title name. (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -4372,7 +4370,7 @@ sub cells_charts_post_worksheet_chart_title {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -4475,8 +4473,8 @@ sub cells_charts_put_worksheet_add_chart {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -4518,7 +4516,7 @@ sub cells_charts_put_worksheet_add_chart {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $chart_index The chart index. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -4541,7 +4539,7 @@ sub cells_charts_put_worksheet_add_chart {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -4594,8 +4592,8 @@ sub cells_charts_put_worksheet_chart_legend {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -4645,7 +4643,7 @@ sub cells_charts_put_worksheet_chart_legend {
 # @param int $chart_index The chart index. (required)
 # @param Title $title Chart title. (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -4673,7 +4671,7 @@ sub cells_charts_put_worksheet_chart_legend {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -4726,8 +4724,8 @@ sub cells_charts_put_worksheet_chart_title {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -4781,7 +4779,7 @@ sub cells_charts_put_worksheet_chart_title {
 # @param string $sheet_name  (required)
 # @param int $index  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -4804,7 +4802,7 @@ sub cells_charts_put_worksheet_chart_title {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -4857,8 +4855,8 @@ sub cells_conditional_formattings_delete_worksheet_conditional_formatting {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -4910,7 +4908,7 @@ sub cells_conditional_formattings_delete_worksheet_conditional_formatting {
 # @param int $total_rows  (required)
 # @param int $total_columns  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -4948,7 +4946,7 @@ sub cells_conditional_formattings_delete_worksheet_conditional_formatting {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -5036,8 +5034,8 @@ sub cells_conditional_formattings_delete_worksheet_conditional_formatting_area {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -5078,7 +5076,7 @@ sub cells_conditional_formattings_delete_worksheet_conditional_formatting_area {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -5096,7 +5094,7 @@ sub cells_conditional_formattings_delete_worksheet_conditional_formatting_area {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -5144,8 +5142,8 @@ sub cells_conditional_formattings_delete_worksheet_conditional_formattings {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -5187,7 +5185,7 @@ sub cells_conditional_formattings_delete_worksheet_conditional_formattings {
 # @param string $sheet_name  (required)
 # @param int $index  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -5210,7 +5208,7 @@ sub cells_conditional_formattings_delete_worksheet_conditional_formattings {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -5263,8 +5261,8 @@ sub cells_conditional_formattings_get_worksheet_conditional_formatting {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -5312,7 +5310,7 @@ sub cells_conditional_formattings_get_worksheet_conditional_formatting {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -5330,7 +5328,7 @@ sub cells_conditional_formattings_get_worksheet_conditional_formatting {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -5378,8 +5376,8 @@ sub cells_conditional_formattings_get_worksheet_conditional_formattings {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -5422,7 +5420,7 @@ sub cells_conditional_formattings_get_worksheet_conditional_formattings {
 # @param string $cell_area  (required)
 # @param FormatCondition $formatcondition  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -5450,7 +5448,7 @@ sub cells_conditional_formattings_get_worksheet_conditional_formattings {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -5508,8 +5506,8 @@ sub cells_conditional_formattings_put_worksheet_conditional_formatting {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -5561,7 +5559,7 @@ sub cells_conditional_formattings_put_worksheet_conditional_formatting {
 # @param string $formula1  (required)
 # @param string $formula2  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -5609,7 +5607,7 @@ sub cells_conditional_formattings_put_worksheet_conditional_formatting {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -5712,8 +5710,8 @@ sub cells_conditional_formattings_put_worksheet_format_condition {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -5763,7 +5761,7 @@ sub cells_conditional_formattings_put_worksheet_format_condition {
 # @param int $index  (required)
 # @param string $cell_area  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -5791,7 +5789,7 @@ sub cells_conditional_formattings_put_worksheet_format_condition {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -5854,8 +5852,8 @@ sub cells_conditional_formattings_put_worksheet_format_condition_area {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -5908,7 +5906,7 @@ sub cells_conditional_formattings_put_worksheet_format_condition_area {
 # @param string $formula1  (required)
 # @param string $formula2  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -5951,7 +5949,7 @@ sub cells_conditional_formattings_put_worksheet_format_condition_area {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -6044,8 +6042,8 @@ sub cells_conditional_formattings_put_worksheet_format_condition_condition {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -6096,7 +6094,7 @@ sub cells_conditional_formattings_put_worksheet_format_condition_condition {
 # @param int $columns The columns. (required)
 # @param boolean $update_reference The update reference. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -6129,7 +6127,7 @@ sub cells_conditional_formattings_put_worksheet_format_condition_condition {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -6202,8 +6200,8 @@ sub cells_delete_worksheet_columns {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -6226,11 +6224,12 @@ sub cells_delete_worksheet_columns {
         my $_base_value = $self->{api_client}->to_path_value($args{'column_index'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
-    
+
     $self->{api_client}->check_access_token();
     my $_body_data;
     # authentication setting, if any
     my $auth_settings = [qw()];
+
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6251,7 +6250,7 @@ sub cells_delete_worksheet_columns {
 # @param string $sheet_name The worksheet bame. (required)
 # @param int $row_index The row index. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -6274,7 +6273,7 @@ sub cells_delete_worksheet_columns {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -6327,8 +6326,8 @@ sub cells_delete_worksheet_row {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -6379,7 +6378,7 @@ sub cells_delete_worksheet_row {
 # @param int $total_rows Number of rows to be operated. (optional, default to 1)
 # @param boolean $update_reference Indicates if update references in other worksheets. (optional, default to true)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -6412,7 +6411,7 @@ sub cells_delete_worksheet_row {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -6480,8 +6479,8 @@ sub cells_delete_worksheet_rows {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -6523,7 +6522,7 @@ sub cells_delete_worksheet_rows {
 # @param string $sheet_name Worksheet name. (required)
 # @param string $cell_name The cell&#39;s  name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -6546,7 +6545,7 @@ sub cells_delete_worksheet_rows {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -6599,8 +6598,8 @@ sub cells_get_cell_html_string {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -6649,7 +6648,7 @@ sub cells_get_cell_html_string {
 # @param string $sheet_name Worksheet name. (required)
 # @param string $cell_or_method_name The cell&#39;s or method name. (Method name like firstcell, endcell etc.) (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -6672,7 +6671,7 @@ sub cells_get_cell_html_string {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -6725,8 +6724,8 @@ sub cells_get_worksheet_cell {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -6775,7 +6774,7 @@ sub cells_get_worksheet_cell {
 # @param string $sheet_name Worksheet name. (required)
 # @param string $cell_name Cell&#39;s name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -6798,7 +6797,7 @@ sub cells_get_worksheet_cell {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -6851,8 +6850,8 @@ sub cells_get_worksheet_cell_style {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -6902,7 +6901,7 @@ sub cells_get_worksheet_cell_style {
 # @param int $offest Begginig offset. (optional, default to 0)
 # @param int $count Maximum amount of cells in the response. (optional, default to 0)
 # @param string $folder Document&#39;s folder name. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -6930,7 +6929,7 @@ sub cells_get_worksheet_cell_style {
         description => 'Document&#39;s folder name.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -6988,8 +6987,8 @@ sub cells_get_worksheet_cells {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -7031,7 +7030,7 @@ sub cells_get_worksheet_cells {
 # @param string $sheet_name The worksheet name. (required)
 # @param int $column_index The column index. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -7054,7 +7053,7 @@ sub cells_get_worksheet_cells {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -7107,8 +7106,8 @@ sub cells_get_worksheet_column {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -7156,7 +7155,7 @@ sub cells_get_worksheet_column {
 # @param string $name The workbook name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder The workdook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -7174,7 +7173,7 @@ sub cells_get_worksheet_column {
         description => 'The workdook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -7222,8 +7221,8 @@ sub cells_get_worksheet_columns {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -7265,7 +7264,7 @@ sub cells_get_worksheet_columns {
 # @param string $sheet_name The worksheet name. (required)
 # @param int $row_index The row index. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -7288,7 +7287,7 @@ sub cells_get_worksheet_columns {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -7341,8 +7340,8 @@ sub cells_get_worksheet_row {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -7390,7 +7389,7 @@ sub cells_get_worksheet_row {
 # @param string $name The workbook name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder The workdook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -7408,7 +7407,7 @@ sub cells_get_worksheet_row {
         description => 'The workdook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -7456,8 +7455,8 @@ sub cells_get_worksheet_rows {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -7499,7 +7498,7 @@ sub cells_get_worksheet_rows {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $hyperlink_index The hyperlink&#39;s index. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -7522,7 +7521,7 @@ sub cells_get_worksheet_rows {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -7575,8 +7574,8 @@ sub cells_hypelinks_delete_worksheet_hyperlink {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -7624,7 +7623,7 @@ sub cells_hypelinks_delete_worksheet_hyperlink {
 # @param string $name Document name. (required)
 # @param string $sheet_name Worksheet name. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -7642,7 +7641,7 @@ sub cells_hypelinks_delete_worksheet_hyperlink {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -7690,8 +7689,8 @@ sub cells_hypelinks_delete_worksheet_hyperlinks {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -7733,7 +7732,7 @@ sub cells_hypelinks_delete_worksheet_hyperlinks {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $hyperlink_index The hyperlink&#39;s index. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -7756,7 +7755,7 @@ sub cells_hypelinks_delete_worksheet_hyperlinks {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -7809,8 +7808,8 @@ sub cells_hypelinks_get_worksheet_hyperlink {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -7858,7 +7857,7 @@ sub cells_hypelinks_get_worksheet_hyperlink {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -7876,7 +7875,7 @@ sub cells_hypelinks_get_worksheet_hyperlink {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -7924,8 +7923,8 @@ sub cells_hypelinks_get_worksheet_hyperlinks {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -7968,7 +7967,7 @@ sub cells_hypelinks_get_worksheet_hyperlinks {
 # @param int $hyperlink_index The hyperlink&#39;s index. (required)
 # @param Hyperlink $hyperlink Hyperlink object (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -7996,7 +7995,7 @@ sub cells_hypelinks_get_worksheet_hyperlinks {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -8049,8 +8048,8 @@ sub cells_hypelinks_post_worksheet_hyperlink {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -8108,7 +8107,7 @@ sub cells_hypelinks_post_worksheet_hyperlink {
 # @param int $total_columns  (required)
 # @param string $address  (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -8151,7 +8150,7 @@ sub cells_hypelinks_post_worksheet_hyperlink {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -8249,8 +8248,8 @@ sub cells_hypelinks_put_worksheet_hyperlink {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -8292,7 +8291,7 @@ sub cells_hypelinks_put_worksheet_hyperlink {
 # @param string $sheet_name The worksheet name. (required)
 # @param int $list_object_index List object index (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -8315,7 +8314,7 @@ sub cells_hypelinks_put_worksheet_hyperlink {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -8368,8 +8367,8 @@ sub cells_list_objects_delete_worksheet_list_object {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -8417,7 +8416,7 @@ sub cells_list_objects_delete_worksheet_list_object {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -8435,7 +8434,7 @@ sub cells_list_objects_delete_worksheet_list_object {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -8483,8 +8482,8 @@ sub cells_list_objects_delete_worksheet_list_objects {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -8526,7 +8525,7 @@ sub cells_list_objects_delete_worksheet_list_objects {
 # @param string $sheet_name The worksheet name. (required)
 # @param int $listobjectindex list object index. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -8549,7 +8548,7 @@ sub cells_list_objects_delete_worksheet_list_objects {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -8602,8 +8601,8 @@ sub cells_list_objects_get_worksheet_list_object {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -8651,7 +8650,7 @@ sub cells_list_objects_get_worksheet_list_object {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -8669,7 +8668,7 @@ sub cells_list_objects_get_worksheet_list_object {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -8717,8 +8716,8 @@ sub cells_list_objects_get_worksheet_list_objects {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -8761,7 +8760,7 @@ sub cells_list_objects_get_worksheet_list_objects {
 # @param int $list_object_index list Object index (required)
 # @param ListObject $list_object listObject dto in request body. (optional)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -8789,7 +8788,7 @@ sub cells_list_objects_get_worksheet_list_objects {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -8842,8 +8841,8 @@ sub cells_list_objects_post_worksheet_list_object {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -8897,7 +8896,7 @@ sub cells_list_objects_post_worksheet_list_object {
 # @param string $sheet_name  (required)
 # @param int $list_object_index  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -8920,7 +8919,7 @@ sub cells_list_objects_post_worksheet_list_object {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -8973,8 +8972,8 @@ sub cells_list_objects_post_worksheet_list_object_convert_to_range {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -9024,7 +9023,7 @@ sub cells_list_objects_post_worksheet_list_object_convert_to_range {
 # @param int $list_object_index  (required)
 # @param DataSorter $data_sorter  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -9052,7 +9051,7 @@ sub cells_list_objects_post_worksheet_list_object_convert_to_range {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -9105,8 +9104,8 @@ sub cells_list_objects_post_worksheet_list_object_sort_table {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -9162,7 +9161,7 @@ sub cells_list_objects_post_worksheet_list_object_sort_table {
 # @param string $destsheet_name  (required)
 # @param CreatePivotTableRequest $request  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -9195,7 +9194,7 @@ sub cells_list_objects_post_worksheet_list_object_sort_table {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -9258,8 +9257,8 @@ sub cells_list_objects_post_worksheet_list_object_summarize_with_pivot_table {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -9315,9 +9314,11 @@ sub cells_list_objects_post_worksheet_list_object_summarize_with_pivot_table {
 # @param int $start_column The start row of the list range. (required)
 # @param int $end_row The start row of the list range. (required)
 # @param int $end_column The start row of the list range. (required)
-# @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
 # @param boolean $has_headers Whether the range has headers. (optional, default to true)
+# @param ListObject $list_object List Object (optional)
+# @param string $folder Document&#39;s folder. (optional)
+# @param string $storage_name storage name. (optional)
+# @param boolean $has_headers2 Whether the range has headers. (optional, default to true)
 {
     my $params = {
     'name' => {
@@ -9350,17 +9351,27 @@ sub cells_list_objects_post_worksheet_list_object_summarize_with_pivot_table {
         description => 'The start row of the list range.',
         required => '1',
     },
+    'has_headers' => {
+        data_type => 'boolean',
+        description => 'Whether the range has headers.',
+        required => '0',
+    },
+    'list_object' => {
+        data_type => 'ListObject',
+        description => 'List Object',
+        required => '0',
+    },
     'folder' => {
         data_type => 'string',
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
     },
-    'has_headers' => {
+    'has_headers2' => {
         data_type => 'boolean',
         description => 'Whether the range has headers.',
         required => '0',
@@ -9443,18 +9454,23 @@ sub cells_list_objects_put_worksheet_list_object {
     }
 
     # query params
+    if ( exists $args{'has_headers'}) {
+        $query_params->{'hasHeaders'} = $self->{api_client}->to_query_value($args{'has_headers'});
+    }
+
+    # query params
     if ( exists $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # query params
-    if ( exists $args{'has_headers'}) {
-        $query_params->{'hasHeaders'} = $self->{api_client}->to_query_value($args{'has_headers'});
+    if ( exists $args{'has_headers2'}) {
+        $query_params->{'hasHeaders'} = $self->{api_client}->to_query_value($args{'has_headers2'});
     }
 
     # path params
@@ -9473,6 +9489,11 @@ sub cells_list_objects_put_worksheet_list_object {
 
     $self->{api_client}->check_access_token();
     my $_body_data;
+    # body params
+    if ( exists $args{'list_object'}) {
+        $_body_data = $args{'list_object'};
+    }
+
     # authentication setting, if any
     my $auth_settings = [qw()];
 
@@ -9496,7 +9517,7 @@ sub cells_list_objects_put_worksheet_list_object {
 # @param string $sheet_name The worsheet name. (required)
 # @param int $ole_object_index Ole object index (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -9519,7 +9540,7 @@ sub cells_list_objects_put_worksheet_list_object {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -9572,8 +9593,8 @@ sub cells_ole_objects_delete_worksheet_ole_object {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -9621,7 +9642,7 @@ sub cells_ole_objects_delete_worksheet_ole_object {
 # @param string $name The workbook name. (required)
 # @param string $sheet_name The worsheet name. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -9639,7 +9660,7 @@ sub cells_ole_objects_delete_worksheet_ole_object {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -9687,8 +9708,8 @@ sub cells_ole_objects_delete_worksheet_ole_objects {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -9731,7 +9752,7 @@ sub cells_ole_objects_delete_worksheet_ole_objects {
 # @param int $object_number The object number. (required)
 # @param string $format The exported object format. (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -9759,7 +9780,7 @@ sub cells_ole_objects_delete_worksheet_ole_objects {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -9817,8 +9838,8 @@ sub cells_ole_objects_get_worksheet_ole_object {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -9866,7 +9887,7 @@ sub cells_ole_objects_get_worksheet_ole_object {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -9884,7 +9905,7 @@ sub cells_ole_objects_get_worksheet_ole_object {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -9932,8 +9953,8 @@ sub cells_ole_objects_get_worksheet_ole_objects {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -9976,7 +9997,7 @@ sub cells_ole_objects_get_worksheet_ole_objects {
 # @param int $ole_object_index Ole object index (required)
 # @param OleObject $ole Ole Object (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -10004,7 +10025,7 @@ sub cells_ole_objects_get_worksheet_ole_objects {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -10057,8 +10078,8 @@ sub cells_ole_objects_post_update_worksheet_ole_object {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -10118,7 +10139,7 @@ sub cells_ole_objects_post_update_worksheet_ole_object {
 # @param string $ole_file OLE filename (optional)
 # @param string $image_file Image filename (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -10171,7 +10192,7 @@ sub cells_ole_objects_post_update_worksheet_ole_object {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -10249,8 +10270,8 @@ sub cells_ole_objects_put_worksheet_ole_object {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -10297,7 +10318,7 @@ sub cells_ole_objects_put_worksheet_ole_object {
 # @param string $sheet_name  (required)
 # @param int $index  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -10320,7 +10341,7 @@ sub cells_ole_objects_put_worksheet_ole_object {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -10373,8 +10394,8 @@ sub cells_page_breaks_delete_horizontal_page_break {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -10423,7 +10444,7 @@ sub cells_page_breaks_delete_horizontal_page_break {
 # @param string $sheet_name  (required)
 # @param int $row  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -10446,7 +10467,7 @@ sub cells_page_breaks_delete_horizontal_page_break {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -10499,8 +10520,8 @@ sub cells_page_breaks_delete_horizontal_page_breaks {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -10542,7 +10563,7 @@ sub cells_page_breaks_delete_horizontal_page_breaks {
 # @param string $sheet_name  (required)
 # @param int $index  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -10565,7 +10586,7 @@ sub cells_page_breaks_delete_horizontal_page_breaks {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -10618,8 +10639,8 @@ sub cells_page_breaks_delete_vertical_page_break {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -10668,7 +10689,7 @@ sub cells_page_breaks_delete_vertical_page_break {
 # @param string $sheet_name  (required)
 # @param int $column  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -10691,7 +10712,7 @@ sub cells_page_breaks_delete_vertical_page_break {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -10744,8 +10765,8 @@ sub cells_page_breaks_delete_vertical_page_breaks {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -10787,7 +10808,7 @@ sub cells_page_breaks_delete_vertical_page_breaks {
 # @param string $sheet_name  (required)
 # @param int $index  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -10810,7 +10831,7 @@ sub cells_page_breaks_delete_vertical_page_breaks {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -10863,8 +10884,8 @@ sub cells_page_breaks_get_horizontal_page_break {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -10912,7 +10933,7 @@ sub cells_page_breaks_get_horizontal_page_break {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -10930,7 +10951,7 @@ sub cells_page_breaks_get_horizontal_page_break {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -10978,8 +10999,8 @@ sub cells_page_breaks_get_horizontal_page_breaks {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -11021,7 +11042,7 @@ sub cells_page_breaks_get_horizontal_page_breaks {
 # @param string $sheet_name  (required)
 # @param int $index  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -11044,7 +11065,7 @@ sub cells_page_breaks_get_horizontal_page_breaks {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -11097,8 +11118,8 @@ sub cells_page_breaks_get_vertical_page_break {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -11146,7 +11167,7 @@ sub cells_page_breaks_get_vertical_page_break {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -11164,7 +11185,7 @@ sub cells_page_breaks_get_vertical_page_break {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -11212,8 +11233,8 @@ sub cells_page_breaks_get_vertical_page_breaks {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -11259,7 +11280,7 @@ sub cells_page_breaks_get_vertical_page_breaks {
 # @param int $start_column  (optional)
 # @param int $end_column  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -11302,7 +11323,7 @@ sub cells_page_breaks_get_vertical_page_breaks {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -11375,8 +11396,8 @@ sub cells_page_breaks_put_horizontal_page_break {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -11422,7 +11443,7 @@ sub cells_page_breaks_put_horizontal_page_break {
 # @param int $start_row  (optional)
 # @param int $end_row  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -11465,7 +11486,7 @@ sub cells_page_breaks_put_horizontal_page_break {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -11538,8 +11559,8 @@ sub cells_page_breaks_put_vertical_page_break {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -11580,7 +11601,7 @@ sub cells_page_breaks_put_vertical_page_break {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -11598,7 +11619,7 @@ sub cells_page_breaks_put_vertical_page_break {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -11646,8 +11667,8 @@ sub cells_page_setup_delete_header_footer {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -11688,7 +11709,7 @@ sub cells_page_setup_delete_header_footer {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -11706,7 +11727,7 @@ sub cells_page_setup_delete_header_footer {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -11754,8 +11775,8 @@ sub cells_page_setup_get_footer {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -11796,7 +11817,7 @@ sub cells_page_setup_get_footer {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -11814,7 +11835,7 @@ sub cells_page_setup_get_footer {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -11862,8 +11883,8 @@ sub cells_page_setup_get_header {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -11904,7 +11925,7 @@ sub cells_page_setup_get_header {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -11922,7 +11943,7 @@ sub cells_page_setup_get_header {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -11970,8 +11991,8 @@ sub cells_page_setup_get_page_setup {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -12015,7 +12036,7 @@ sub cells_page_setup_get_page_setup {
 # @param string $script  (required)
 # @param boolean $is_first_page  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -12048,7 +12069,7 @@ sub cells_page_setup_get_page_setup {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -12126,8 +12147,8 @@ sub cells_page_setup_post_footer {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -12171,7 +12192,7 @@ sub cells_page_setup_post_footer {
 # @param string $script  (required)
 # @param boolean $is_first_page  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -12204,7 +12225,7 @@ sub cells_page_setup_post_footer {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -12282,8 +12303,8 @@ sub cells_page_setup_post_header {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -12325,7 +12346,7 @@ sub cells_page_setup_post_header {
 # @param string $sheet_name  (required)
 # @param PageSetup $page_setup  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -12348,7 +12369,7 @@ sub cells_page_setup_post_header {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -12396,8 +12417,8 @@ sub cells_page_setup_post_page_setup {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -12444,7 +12465,7 @@ sub cells_page_setup_post_page_setup {
 # @param string $sheet_name The worsheet name. (required)
 # @param int $picture_index Picture index (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -12467,7 +12488,7 @@ sub cells_page_setup_post_page_setup {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -12520,8 +12541,8 @@ sub cells_pictures_delete_worksheet_picture {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -12569,7 +12590,7 @@ sub cells_pictures_delete_worksheet_picture {
 # @param string $name Document name. (required)
 # @param string $sheet_name Worksheet name. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -12587,7 +12608,7 @@ sub cells_pictures_delete_worksheet_picture {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -12635,8 +12656,8 @@ sub cells_pictures_delete_worksheet_pictures {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -12679,7 +12700,7 @@ sub cells_pictures_delete_worksheet_pictures {
 # @param int $picture_index The picture index. (required)
 # @param string $format The exported object format. (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -12707,7 +12728,7 @@ sub cells_pictures_delete_worksheet_pictures {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -12765,8 +12786,8 @@ sub cells_pictures_get_worksheet_picture {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -12814,7 +12835,7 @@ sub cells_pictures_get_worksheet_picture {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -12832,7 +12853,7 @@ sub cells_pictures_get_worksheet_picture {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -12880,8 +12901,8 @@ sub cells_pictures_get_worksheet_pictures {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -12924,7 +12945,7 @@ sub cells_pictures_get_worksheet_pictures {
 # @param int $picture_index The picture&#39;s index. (required)
 # @param Picture $picture Picture object (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -12952,7 +12973,7 @@ sub cells_pictures_get_worksheet_pictures {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -13005,8 +13026,8 @@ sub cells_pictures_post_worksheet_picture {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -13065,7 +13086,7 @@ sub cells_pictures_post_worksheet_picture {
 # @param int $lower_right_column The image low right column. (optional, default to 0)
 # @param string $picture_path The picture path, if not provided the picture data is inspected in the request body. (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -13113,7 +13134,7 @@ sub cells_pictures_post_worksheet_picture {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -13186,8 +13207,8 @@ sub cells_pictures_put_worksheet_add_picture {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -13236,7 +13257,7 @@ sub cells_pictures_put_worksheet_add_picture {
 # @param string $pivot_field_type The fields area type. (required)
 # @param PivotTableFieldRequest $request Dto that conrains field indexes (optional)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -13269,7 +13290,7 @@ sub cells_pictures_put_worksheet_add_picture {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -13332,8 +13353,8 @@ sub cells_pivot_tables_delete_pivot_table_field {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -13387,7 +13408,7 @@ sub cells_pivot_tables_delete_pivot_table_field {
 # @param string $sheet_name The worksheet name. (required)
 # @param int $pivot_table_index Pivot table index (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -13410,7 +13431,7 @@ sub cells_pivot_tables_delete_pivot_table_field {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -13463,8 +13484,8 @@ sub cells_pivot_tables_delete_worksheet_pivot_table {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -13515,7 +13536,7 @@ sub cells_pivot_tables_delete_worksheet_pivot_table {
 # @param int $field_index  (required)
 # @param boolean $need_re_calculate  (optional, default to false)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -13548,7 +13569,7 @@ sub cells_pivot_tables_delete_worksheet_pivot_table {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -13611,8 +13632,8 @@ sub cells_pivot_tables_delete_worksheet_pivot_table_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -13669,7 +13690,7 @@ sub cells_pivot_tables_delete_worksheet_pivot_table_filter {
 # @param int $pivot_table_index  (required)
 # @param boolean $need_re_calculate  (optional, default to false)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -13697,7 +13718,7 @@ sub cells_pivot_tables_delete_worksheet_pivot_table_filter {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -13755,8 +13776,8 @@ sub cells_pivot_tables_delete_worksheet_pivot_table_filters {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -13804,7 +13825,7 @@ sub cells_pivot_tables_delete_worksheet_pivot_table_filters {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -13822,7 +13843,7 @@ sub cells_pivot_tables_delete_worksheet_pivot_table_filters {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -13870,8 +13891,8 @@ sub cells_pivot_tables_delete_worksheet_pivot_tables {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -13915,7 +13936,7 @@ sub cells_pivot_tables_delete_worksheet_pivot_tables {
 # @param int $pivot_field_index The field index in the base fields. (required)
 # @param string $pivot_field_type The fields area type. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -13948,7 +13969,7 @@ sub cells_pivot_tables_delete_worksheet_pivot_tables {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -14021,8 +14042,8 @@ sub cells_pivot_tables_get_pivot_table_field {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -14071,7 +14092,7 @@ sub cells_pivot_tables_get_pivot_table_field {
 # @param string $sheet_name The worksheet name. (required)
 # @param int $pivottable_index  (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -14094,7 +14115,7 @@ sub cells_pivot_tables_get_pivot_table_field {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -14147,8 +14168,8 @@ sub cells_pivot_tables_get_worksheet_pivot_table {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -14198,7 +14219,7 @@ sub cells_pivot_tables_get_worksheet_pivot_table {
 # @param int $pivot_table_index  (required)
 # @param int $filter_index  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -14226,7 +14247,7 @@ sub cells_pivot_tables_get_worksheet_pivot_table {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -14284,8 +14305,8 @@ sub cells_pivot_tables_get_worksheet_pivot_table_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -14341,7 +14362,7 @@ sub cells_pivot_tables_get_worksheet_pivot_table_filter {
 # @param string $sheet_name  (required)
 # @param int $pivot_table_index  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -14364,7 +14385,7 @@ sub cells_pivot_tables_get_worksheet_pivot_table_filter {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -14417,8 +14438,8 @@ sub cells_pivot_tables_get_worksheet_pivot_table_filters {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -14466,7 +14487,7 @@ sub cells_pivot_tables_get_worksheet_pivot_table_filters {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -14484,7 +14505,7 @@ sub cells_pivot_tables_get_worksheet_pivot_table_filters {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -14532,8 +14553,8 @@ sub cells_pivot_tables_get_worksheet_pivot_tables {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -14579,7 +14600,7 @@ sub cells_pivot_tables_get_worksheet_pivot_tables {
 # @param Style $style Style dto in request body. (optional)
 # @param boolean $need_re_calculate  (optional, default to false)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -14622,7 +14643,7 @@ sub cells_pivot_tables_get_worksheet_pivot_tables {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -14700,8 +14721,8 @@ sub cells_pivot_tables_post_pivot_table_cell_style {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -14760,7 +14781,7 @@ sub cells_pivot_tables_post_pivot_table_cell_style {
 # @param boolean $is_hide  (required)
 # @param boolean $need_re_calculate  (optional, default to false)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -14808,7 +14829,7 @@ sub cells_pivot_tables_post_pivot_table_cell_style {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -14906,8 +14927,8 @@ sub cells_pivot_tables_post_pivot_table_field_hide_item {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -14959,7 +14980,7 @@ sub cells_pivot_tables_post_pivot_table_field_hide_item {
 # @param string $from  (required)
 # @param string $to  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -14997,7 +15018,7 @@ sub cells_pivot_tables_post_pivot_table_field_hide_item {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -15080,8 +15101,8 @@ sub cells_pivot_tables_post_pivot_table_field_move_to {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -15132,7 +15153,7 @@ sub cells_pivot_tables_post_pivot_table_field_move_to {
 # @param Style $style Style dto in request body. (optional)
 # @param boolean $need_re_calculate  (optional, default to false)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -15165,7 +15186,7 @@ sub cells_pivot_tables_post_pivot_table_field_move_to {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -15223,8 +15244,8 @@ sub cells_pivot_tables_post_pivot_table_style {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -15278,7 +15299,7 @@ sub cells_pivot_tables_post_pivot_table_style {
 # @param string $sheet_name The worksheet name. (required)
 # @param int $pivot_table_index Pivot table index (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -15301,7 +15322,7 @@ sub cells_pivot_tables_post_pivot_table_style {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -15354,8 +15375,8 @@ sub cells_pivot_tables_post_worksheet_pivot_table_calculate {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -15407,7 +15428,7 @@ sub cells_pivot_tables_post_worksheet_pivot_table_calculate {
 # @param int $column  (optional)
 # @param string $dest_cell_name  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -15445,7 +15466,7 @@ sub cells_pivot_tables_post_worksheet_pivot_table_calculate {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -15513,8 +15534,8 @@ sub cells_pivot_tables_post_worksheet_pivot_table_move {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -15566,7 +15587,7 @@ sub cells_pivot_tables_post_worksheet_pivot_table_move {
 # @param PivotTableFieldRequest $request Dto that conrains field indexes (optional)
 # @param boolean $need_re_calculate  (optional, default to false)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -15604,7 +15625,7 @@ sub cells_pivot_tables_post_worksheet_pivot_table_move {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -15672,8 +15693,8 @@ sub cells_pivot_tables_put_pivot_table_field {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -15727,7 +15748,7 @@ sub cells_pivot_tables_put_pivot_table_field {
 # @param string $sheet_name The worksheet name. (required)
 # @param CreatePivotTableRequest $request CreatePivotTableRequest dto in request body. (optional)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 # @param string $source_data The data for the new PivotTable cache. (optional)
 # @param string $dest_cell_name The cell in the upper-left corner of the PivotTable report&#39;s destination range. (optional)
 # @param string $table_name The name of the new PivotTable report. (optional)
@@ -15754,7 +15775,7 @@ sub cells_pivot_tables_put_pivot_table_field {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -15822,8 +15843,8 @@ sub cells_pivot_tables_put_worksheet_pivot_table {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # query params
@@ -15892,7 +15913,7 @@ sub cells_pivot_tables_put_worksheet_pivot_table {
 # @param PivotFilter $filter  (optional)
 # @param boolean $need_re_calculate  (optional, default to false)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -15925,7 +15946,7 @@ sub cells_pivot_tables_put_worksheet_pivot_table {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -15983,8 +16004,8 @@ sub cells_pivot_tables_put_worksheet_pivot_table_filter {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -16039,7 +16060,7 @@ sub cells_pivot_tables_put_worksheet_pivot_table_filter {
 # @param string $cell_name  (required)
 # @param CalculationOptions $options  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -16067,7 +16088,7 @@ sub cells_pivot_tables_put_worksheet_pivot_table_filter {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -16120,8 +16141,8 @@ sub cells_post_cell_calculate {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -16176,7 +16197,7 @@ sub cells_post_cell_calculate {
 # @param string $cell_name  (required)
 # @param ARRAY[FontSetting] $options  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -16204,7 +16225,7 @@ sub cells_post_cell_calculate {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -16257,8 +16278,8 @@ sub cells_post_cell_characters {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -16316,7 +16337,7 @@ sub cells_post_cell_characters {
 # @param int $end_row The end row. (optional)
 # @param int $end_column The end column. (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -16359,7 +16380,7 @@ sub cells_post_cell_characters {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -16432,8 +16453,8 @@ sub cells_post_clear_contents {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -16479,7 +16500,7 @@ sub cells_post_clear_contents {
 # @param int $end_row The end row. (optional)
 # @param int $end_column The end column. (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -16522,7 +16543,7 @@ sub cells_post_clear_contents {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -16595,8 +16616,8 @@ sub cells_post_clear_formats {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -16639,7 +16660,7 @@ sub cells_post_clear_formats {
 # @param int $column_index The column index. (required)
 # @param Style $style Style dto (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -16667,7 +16688,7 @@ sub cells_post_clear_formats {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -16720,8 +16741,8 @@ sub cells_post_column_style {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -16779,7 +16800,7 @@ sub cells_post_column_style {
 # @param int $row Source row (optional)
 # @param int $column Source column (optional)
 # @param string $folder Folder name (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -16822,7 +16843,7 @@ sub cells_post_column_style {
         description => 'Folder name',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -16900,8 +16921,8 @@ sub cells_post_copy_cell_into_cell {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -16953,7 +16974,7 @@ sub cells_post_copy_cell_into_cell {
 # @param int $column_number The copied column number (required)
 # @param string $worksheet The Worksheet (optional, default to )
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -16991,7 +17012,7 @@ sub cells_post_copy_cell_into_cell {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -17074,8 +17095,8 @@ sub cells_post_copy_worksheet_columns {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -17120,7 +17141,7 @@ sub cells_post_copy_worksheet_columns {
 # @param int $row_number The copied row number (required)
 # @param string $worksheet worksheet (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -17158,7 +17179,7 @@ sub cells_post_copy_worksheet_columns {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -17241,8 +17262,8 @@ sub cells_post_copy_worksheet_rows {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -17286,7 +17307,7 @@ sub cells_post_copy_worksheet_rows {
 # @param int $last_index The last column index to be operated. (required)
 # @param boolean $hide columns visible state (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -17319,7 +17340,7 @@ sub cells_post_copy_worksheet_rows {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -17392,8 +17413,8 @@ sub cells_post_group_worksheet_columns {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -17437,7 +17458,7 @@ sub cells_post_group_worksheet_columns {
 # @param int $last_index The last row index to be operated. (required)
 # @param boolean $hide rows visible state (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -17470,7 +17491,7 @@ sub cells_post_group_worksheet_columns {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -17543,8 +17564,8 @@ sub cells_post_group_worksheet_rows {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -17587,7 +17608,7 @@ sub cells_post_group_worksheet_rows {
 # @param int $start_column The begin column index to be operated. (required)
 # @param int $total_columns Number of columns to be operated. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -17615,7 +17636,7 @@ sub cells_post_group_worksheet_rows {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -17683,8 +17704,8 @@ sub cells_post_hide_worksheet_columns {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -17727,7 +17748,7 @@ sub cells_post_hide_worksheet_columns {
 # @param int $startrow The begin row index to be operated. (required)
 # @param int $total_rows Number of rows to be operated. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -17755,7 +17776,7 @@ sub cells_post_hide_worksheet_columns {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -17823,8 +17844,8 @@ sub cells_post_hide_worksheet_rows {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -17867,7 +17888,7 @@ sub cells_post_hide_worksheet_rows {
 # @param int $row_index The row index. (required)
 # @param Style $style Style dto (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -17895,7 +17916,7 @@ sub cells_post_hide_worksheet_rows {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -17948,8 +17969,8 @@ sub cells_post_row_style {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -18003,7 +18024,7 @@ sub cells_post_row_style {
 # @param string $sheet_name Worksheet name. (required)
 # @param string $cell_name The cell name. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -18026,7 +18047,7 @@ sub cells_post_row_style {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -18079,8 +18100,8 @@ sub cells_post_set_cell_html_string {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -18131,7 +18152,7 @@ sub cells_post_set_cell_html_string {
 # @param string $value Range value (required)
 # @param string $type Value data type (like \&quot;int\&quot;) (required)
 # @param string $folder Folder name (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -18164,7 +18185,7 @@ sub cells_post_set_cell_html_string {
         description => 'Folder name',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -18242,8 +18263,8 @@ sub cells_post_set_cell_range_value {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -18286,7 +18307,7 @@ sub cells_post_set_cell_range_value {
 # @param int $column_index The column index. (required)
 # @param double $width The width. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -18314,7 +18335,7 @@ sub cells_post_set_cell_range_value {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -18377,8 +18398,8 @@ sub cells_post_set_worksheet_column_width {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -18428,7 +18449,7 @@ sub cells_post_set_worksheet_column_width {
 # @param int $first_index The first column index to be operated. (required)
 # @param int $last_index The last column index to be operated. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -18456,7 +18477,7 @@ sub cells_post_set_worksheet_column_width {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -18524,8 +18545,8 @@ sub cells_post_ungroup_worksheet_columns {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -18569,7 +18590,7 @@ sub cells_post_ungroup_worksheet_columns {
 # @param int $last_index The last row index to be operated. (required)
 # @param boolean $is_all Is all row to be operated (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -18602,7 +18623,7 @@ sub cells_post_ungroup_worksheet_columns {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -18675,8 +18696,8 @@ sub cells_post_ungroup_worksheet_rows {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -18720,7 +18741,7 @@ sub cells_post_ungroup_worksheet_rows {
 # @param int $total_columns Number of columns to be operated. (required)
 # @param double $width The new column width. (optional, default to 50.0)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -18753,7 +18774,7 @@ sub cells_post_ungroup_worksheet_rows {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -18826,8 +18847,8 @@ sub cells_post_unhide_worksheet_columns {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -18871,7 +18892,7 @@ sub cells_post_unhide_worksheet_columns {
 # @param int $total_rows Number of rows to be operated. (required)
 # @param double $height The new row height. (optional, default to 15.0)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -18904,7 +18925,7 @@ sub cells_post_unhide_worksheet_columns {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -18977,8 +18998,8 @@ sub cells_post_unhide_worksheet_rows {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -19021,7 +19042,7 @@ sub cells_post_unhide_worksheet_rows {
 # @param string $cell_name The cell name. (required)
 # @param Style $style with update style settings. (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -19049,7 +19070,7 @@ sub cells_post_unhide_worksheet_rows {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -19102,8 +19123,8 @@ sub cells_post_update_worksheet_cell_style {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -19158,7 +19179,7 @@ sub cells_post_update_worksheet_cell_style {
 # @param string $range The range. (required)
 # @param Style $style with update style settings. (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -19186,7 +19207,7 @@ sub cells_post_update_worksheet_cell_style {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -19244,8 +19265,8 @@ sub cells_post_update_worksheet_range_style {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -19293,7 +19314,7 @@ sub cells_post_update_worksheet_range_style {
 # @param int $row_index The row index. (required)
 # @param double $height The new row height. (optional, default to 0.0)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -19321,7 +19342,7 @@ sub cells_post_update_worksheet_range_style {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -19379,8 +19400,8 @@ sub cells_post_update_worksheet_row {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -19432,7 +19453,7 @@ sub cells_post_update_worksheet_row {
 # @param string $type The value type. (optional)
 # @param string $formula Formula for cell (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -19470,7 +19491,7 @@ sub cells_post_update_worksheet_row {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -19538,8 +19559,8 @@ sub cells_post_worksheet_cell_set_value {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -19591,7 +19612,7 @@ sub cells_post_worksheet_cell_set_value {
 # @param int $total_rows The total rows (required)
 # @param int $total_columns The total columns. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -19629,7 +19650,7 @@ sub cells_post_worksheet_cell_set_value {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -19717,8 +19738,8 @@ sub cells_post_worksheet_merge {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -19763,7 +19784,7 @@ sub cells_post_worksheet_merge {
 # @param int $total_rows The total rows (required)
 # @param int $total_columns The total columns. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -19801,7 +19822,7 @@ sub cells_post_worksheet_merge {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -19889,8 +19910,8 @@ sub cells_post_worksheet_unmerge {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -19930,7 +19951,7 @@ sub cells_post_worksheet_unmerge {
 # 
 # @param string $name The document name. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -19943,7 +19964,7 @@ sub cells_post_worksheet_unmerge {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -19986,8 +20007,8 @@ sub cells_properties_delete_document_properties {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -20021,7 +20042,7 @@ sub cells_properties_delete_document_properties {
 # @param string $name The document name. (required)
 # @param string $property_name The property name. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -20039,7 +20060,7 @@ sub cells_properties_delete_document_properties {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -20087,8 +20108,8 @@ sub cells_properties_delete_document_property {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -20128,7 +20149,7 @@ sub cells_properties_delete_document_property {
 # 
 # @param string $name The document name. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -20141,7 +20162,7 @@ sub cells_properties_delete_document_property {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -20184,8 +20205,8 @@ sub cells_properties_get_document_properties {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -20219,7 +20240,7 @@ sub cells_properties_get_document_properties {
 # @param string $name The document name. (required)
 # @param string $property_name The property name. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -20237,7 +20258,7 @@ sub cells_properties_get_document_properties {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -20285,8 +20306,8 @@ sub cells_properties_get_document_property {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -20328,7 +20349,7 @@ sub cells_properties_get_document_property {
 # @param string $property_name The property name. (required)
 # @param CellsDocumentProperty $property with new property value. (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -20351,7 +20372,7 @@ sub cells_properties_get_document_property {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -20399,8 +20420,8 @@ sub cells_properties_put_document_property {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -20449,7 +20470,7 @@ sub cells_properties_put_document_property {
 # @param int $columns The columns. (required)
 # @param boolean $update_reference The update reference. (optional, default to true)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -20482,7 +20503,7 @@ sub cells_properties_put_document_property {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -20550,8 +20571,8 @@ sub cells_put_insert_worksheet_columns {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -20600,7 +20621,7 @@ sub cells_put_insert_worksheet_columns {
 # @param string $sheet_name The worksheet name. (required)
 # @param int $row_index The new row index. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -20623,7 +20644,7 @@ sub cells_put_insert_worksheet_columns {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -20676,8 +20697,8 @@ sub cells_put_insert_worksheet_row {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -20728,7 +20749,7 @@ sub cells_put_insert_worksheet_row {
 # @param int $total_rows Number of rows to be operated. (optional, default to 1)
 # @param boolean $update_reference Indicates if update references in other worksheets. (optional, default to true)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -20761,7 +20782,7 @@ sub cells_put_insert_worksheet_row {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -20829,8 +20850,8 @@ sub cells_put_insert_worksheet_rows {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -20876,7 +20897,7 @@ sub cells_put_insert_worksheet_rows {
 # @param int $row_count the count of rows in the range (optional)
 # @param int $column_count the count of columns in the range (optional)
 # @param string $folder Workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -20919,7 +20940,7 @@ sub cells_put_insert_worksheet_rows {
         description => 'Workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -20992,8 +21013,8 @@ sub cells_ranges_get_worksheet_cells_range_value {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -21036,7 +21057,7 @@ sub cells_ranges_get_worksheet_cells_range_value {
 # @param double $value  (required)
 # @param Range $range  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -21064,7 +21085,7 @@ sub cells_ranges_get_worksheet_cells_range_value {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -21122,8 +21143,8 @@ sub cells_ranges_post_worksheet_cells_range_column_width {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -21170,7 +21191,7 @@ sub cells_ranges_post_worksheet_cells_range_column_width {
 # @param string $sheet_name worksheet name (required)
 # @param Range $range range in worksheet  (optional)
 # @param string $folder Workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -21193,7 +21214,7 @@ sub cells_ranges_post_worksheet_cells_range_column_width {
         description => 'Workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -21241,8 +21262,8 @@ sub cells_ranges_post_worksheet_cells_range_merge {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -21291,7 +21312,7 @@ sub cells_ranges_post_worksheet_cells_range_merge {
 # @param int $dest_column The start column of the dest range. (required)
 # @param Range $range range in worksheet  (optional)
 # @param string $folder Workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -21324,7 +21345,7 @@ sub cells_ranges_post_worksheet_cells_range_merge {
         description => 'Workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -21392,8 +21413,8 @@ sub cells_ranges_post_worksheet_cells_range_move_to {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -21440,7 +21461,7 @@ sub cells_ranges_post_worksheet_cells_range_move_to {
 # @param string $sheet_name worksheet name (required)
 # @param RangeSetOutlineBorderRequest $range_operate Range Set OutlineBorder Request  (optional)
 # @param string $folder Workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -21463,7 +21484,7 @@ sub cells_ranges_post_worksheet_cells_range_move_to {
         description => 'Workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -21511,8 +21532,8 @@ sub cells_ranges_post_worksheet_cells_range_outline_border {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -21560,7 +21581,7 @@ sub cells_ranges_post_worksheet_cells_range_outline_border {
 # @param double $value  (required)
 # @param Range $range  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -21588,7 +21609,7 @@ sub cells_ranges_post_worksheet_cells_range_outline_border {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -21646,8 +21667,8 @@ sub cells_ranges_post_worksheet_cells_range_row_height {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -21694,7 +21715,7 @@ sub cells_ranges_post_worksheet_cells_range_row_height {
 # @param string $sheet_name worksheet name (required)
 # @param RangeSetStyleRequest $range_operate Range Set Style Request  (optional)
 # @param string $folder Workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -21717,7 +21738,7 @@ sub cells_ranges_post_worksheet_cells_range_row_height {
         description => 'Workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -21765,8 +21786,8 @@ sub cells_ranges_post_worksheet_cells_range_style {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -21813,7 +21834,7 @@ sub cells_ranges_post_worksheet_cells_range_style {
 # @param string $sheet_name worksheet name (required)
 # @param Range $range range in worksheet  (optional)
 # @param string $folder Workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -21836,7 +21857,7 @@ sub cells_ranges_post_worksheet_cells_range_style {
         description => 'Workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -21884,8 +21905,8 @@ sub cells_ranges_post_worksheet_cells_range_unmerge {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -21935,7 +21956,7 @@ sub cells_ranges_post_worksheet_cells_range_unmerge {
 # @param boolean $is_converted True: converted to other data type if appropriate. (optional, default to false)
 # @param boolean $set_style True: set the number format to cell&#39;s style when converting to other data type (optional, default to false)
 # @param string $folder Workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -21973,7 +21994,7 @@ sub cells_ranges_post_worksheet_cells_range_unmerge {
         description => 'Workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -22041,8 +22062,8 @@ sub cells_ranges_post_worksheet_cells_range_value {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -22089,7 +22110,7 @@ sub cells_ranges_post_worksheet_cells_range_value {
 # @param string $sheet_name worksheet name (required)
 # @param RangeCopyRequest $range_operate copydata,copystyle,copyto,copyvalue (optional)
 # @param string $folder Workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -22112,7 +22133,7 @@ sub cells_ranges_post_worksheet_cells_range_value {
         description => 'Workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -22160,8 +22181,8 @@ sub cells_ranges_post_worksheet_cells_ranges {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -22210,7 +22231,7 @@ sub cells_ranges_post_worksheet_cells_ranges {
 # @param boolean $is_auto_fit_rows Autofit rows. (optional, default to false)
 # @param boolean $is_auto_fit_columns Autofit columns. (optional, default to false)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -22243,7 +22264,7 @@ sub cells_ranges_post_worksheet_cells_ranges {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -22301,8 +22322,8 @@ sub cells_save_as_post_document_save_as {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -22342,7 +22363,7 @@ sub cells_save_as_post_document_save_as {
 # @param string $sheet_name worksheet name. (required)
 # @param int $shapeindex shape index in worksheet shapes. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -22365,7 +22386,7 @@ sub cells_save_as_post_document_save_as {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -22418,8 +22439,8 @@ sub cells_shapes_delete_worksheet_shape {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -22467,7 +22488,7 @@ sub cells_shapes_delete_worksheet_shape {
 # @param string $name document name. (required)
 # @param string $sheet_name worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -22485,7 +22506,7 @@ sub cells_shapes_delete_worksheet_shape {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -22533,8 +22554,8 @@ sub cells_shapes_delete_worksheet_shapes {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -22576,7 +22597,7 @@ sub cells_shapes_delete_worksheet_shapes {
 # @param string $sheet_name worksheet name. (required)
 # @param int $shapeindex shape index in worksheet shapes. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -22599,7 +22620,7 @@ sub cells_shapes_delete_worksheet_shapes {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -22652,8 +22673,8 @@ sub cells_shapes_get_worksheet_shape {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -22701,7 +22722,7 @@ sub cells_shapes_get_worksheet_shape {
 # @param string $name document name. (required)
 # @param string $sheet_name worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -22719,7 +22740,7 @@ sub cells_shapes_get_worksheet_shape {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -22767,8 +22788,8 @@ sub cells_shapes_get_worksheet_shapes {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -22811,7 +22832,7 @@ sub cells_shapes_get_worksheet_shapes {
 # @param int $shapeindex shape index in worksheet shapes. (required)
 # @param Shape $dto  (optional)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -22839,7 +22860,7 @@ sub cells_shapes_get_worksheet_shapes {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -22892,8 +22913,8 @@ sub cells_shapes_post_worksheet_shape {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -22945,15 +22966,16 @@ sub cells_shapes_post_worksheet_shape {
 # 
 # @param string $name document name. (required)
 # @param string $sheet_name worksheet name. (required)
-# @param string $drawing_type shape object type (required)
-# @param int $upper_left_row Upper left row index. (required)
-# @param int $upper_left_column Upper left column index. (required)
-# @param int $top Represents the vertical offset of Spinner from its left row, in unit of pixel. (required)
-# @param int $left Represents the horizontal offset of Spinner from its left column, in unit of pixel. (required)
-# @param int $width Represents the height of Spinner, in unit of pixel. (required)
-# @param int $height Represents the width of Spinner, in unit of pixel. (required)
+# @param Shape $shape_dto  (optional)
+# @param string $drawing_type shape object type (optional)
+# @param int $upper_left_row Upper left row index. (optional)
+# @param int $upper_left_column Upper left column index. (optional)
+# @param int $top Represents the vertical offset of Spinner from its left row, in unit of pixel. (optional)
+# @param int $left Represents the horizontal offset of Spinner from its left column, in unit of pixel. (optional)
+# @param int $width Represents the height of Spinner, in unit of pixel. (optional)
+# @param int $height Represents the width of Spinner, in unit of pixel. (optional)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -22966,47 +22988,52 @@ sub cells_shapes_post_worksheet_shape {
         description => 'worksheet name.',
         required => '1',
     },
+    'shape_dto' => {
+        data_type => 'Shape',
+        description => '',
+        required => '0',
+    },
     'drawing_type' => {
         data_type => 'string',
         description => 'shape object type',
-        required => '1',
+        required => '0',
     },
     'upper_left_row' => {
         data_type => 'int',
         description => 'Upper left row index.',
-        required => '1',
+        required => '0',
     },
     'upper_left_column' => {
         data_type => 'int',
         description => 'Upper left column index.',
-        required => '1',
+        required => '0',
     },
     'top' => {
         data_type => 'int',
         description => 'Represents the vertical offset of Spinner from its left row, in unit of pixel.',
-        required => '1',
+        required => '0',
     },
     'left' => {
         data_type => 'int',
         description => 'Represents the horizontal offset of Spinner from its left column, in unit of pixel.',
-        required => '1',
+        required => '0',
     },
     'width' => {
         data_type => 'int',
         description => 'Represents the height of Spinner, in unit of pixel.',
-        required => '1',
+        required => '0',
     },
     'height' => {
         data_type => 'int',
         description => 'Represents the width of Spinner, in unit of pixel.',
-        required => '1',
+        required => '0',
     },
     'folder' => {
         data_type => 'string',
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -23031,41 +23058,6 @@ sub cells_shapes_put_worksheet_shape {
     # verify the required parameter 'sheet_name' is set
     unless (exists $args{'sheet_name'}) {
       croak("Missing the required parameter 'sheet_name' when calling cells_shapes_put_worksheet_shape");
-    }
-
-    # verify the required parameter 'drawing_type' is set
-    unless (exists $args{'drawing_type'}) {
-      croak("Missing the required parameter 'drawing_type' when calling cells_shapes_put_worksheet_shape");
-    }
-
-    # verify the required parameter 'upper_left_row' is set
-    unless (exists $args{'upper_left_row'}) {
-      croak("Missing the required parameter 'upper_left_row' when calling cells_shapes_put_worksheet_shape");
-    }
-
-    # verify the required parameter 'upper_left_column' is set
-    unless (exists $args{'upper_left_column'}) {
-      croak("Missing the required parameter 'upper_left_column' when calling cells_shapes_put_worksheet_shape");
-    }
-
-    # verify the required parameter 'top' is set
-    unless (exists $args{'top'}) {
-      croak("Missing the required parameter 'top' when calling cells_shapes_put_worksheet_shape");
-    }
-
-    # verify the required parameter 'left' is set
-    unless (exists $args{'left'}) {
-      croak("Missing the required parameter 'left' when calling cells_shapes_put_worksheet_shape");
-    }
-
-    # verify the required parameter 'width' is set
-    unless (exists $args{'width'}) {
-      croak("Missing the required parameter 'width' when calling cells_shapes_put_worksheet_shape");
-    }
-
-    # verify the required parameter 'height' is set
-    unless (exists $args{'height'}) {
-      croak("Missing the required parameter 'height' when calling cells_shapes_put_worksheet_shape");
     }
 
     # parse inputs
@@ -23124,8 +23116,8 @@ sub cells_shapes_put_worksheet_shape {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -23144,6 +23136,11 @@ sub cells_shapes_put_worksheet_shape {
 
     $self->{api_client}->check_access_token();
     my $_body_data;
+    # body params
+    if ( exists $args{'shape_dto'}) {
+        $_body_data = $args{'shape_dto'};
+    }
+
     # authentication setting, if any
     my $auth_settings = [qw()];
 
@@ -23232,7 +23229,7 @@ sub cells_task_post_run_task {
 # @param string $name The document name. (required)
 # @param WorkbookEncryptionRequest $encryption Encryption settings, only password can be specified. (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -23250,7 +23247,7 @@ sub cells_task_post_run_task {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -23293,8 +23290,8 @@ sub cells_workbook_delete_decrypt_document {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -23332,7 +23329,7 @@ sub cells_workbook_delete_decrypt_document {
 # 
 # @param string $name The document name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -23345,7 +23342,7 @@ sub cells_workbook_delete_decrypt_document {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -23388,8 +23385,8 @@ sub cells_workbook_delete_document_unprotect_from_changes {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -23423,7 +23420,7 @@ sub cells_workbook_delete_document_unprotect_from_changes {
 # @param string $name The document name. (required)
 # @param WorkbookProtectionRequest $protection Protection settings, only password can be specified. (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -23441,7 +23438,7 @@ sub cells_workbook_delete_document_unprotect_from_changes {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -23484,8 +23481,8 @@ sub cells_workbook_delete_unprotect_document {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -23523,7 +23520,7 @@ sub cells_workbook_delete_unprotect_document {
 # 
 # @param string $name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -23536,7 +23533,7 @@ sub cells_workbook_delete_unprotect_document {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -23579,8 +23576,8 @@ sub cells_workbook_delete_workbook_background {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -23614,7 +23611,7 @@ sub cells_workbook_delete_workbook_background {
 # @param string $name The workbook name. (required)
 # @param string $name_name The name. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -23632,7 +23629,7 @@ sub cells_workbook_delete_workbook_background {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -23680,8 +23677,8 @@ sub cells_workbook_delete_workbook_name {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -23721,7 +23718,7 @@ sub cells_workbook_delete_workbook_name {
 # 
 # @param string $name The workbook name. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -23734,7 +23731,7 @@ sub cells_workbook_delete_workbook_name {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -23777,8 +23774,8 @@ sub cells_workbook_delete_workbook_names {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -23815,7 +23812,7 @@ sub cells_workbook_delete_workbook_names {
 # @param boolean $is_auto_fit Set document rows to be autofit. (optional, default to false)
 # @param boolean $only_save_table Only save table data. (optional, default to false)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 # @param string $out_path The document output folder. (optional)
 {
     my $params = {
@@ -23849,7 +23846,7 @@ sub cells_workbook_delete_workbook_names {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -23917,8 +23914,8 @@ sub cells_workbook_get_workbook {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # query params
@@ -23956,7 +23953,7 @@ sub cells_workbook_get_workbook {
 # 
 # @param string $name The workbook name. (required)
 # @param string $folder The document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -23969,7 +23966,7 @@ sub cells_workbook_get_workbook {
         description => 'The document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -24012,8 +24009,8 @@ sub cells_workbook_get_workbook_default_style {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -24047,7 +24044,7 @@ sub cells_workbook_get_workbook_default_style {
 # @param string $name The workbook name. (required)
 # @param string $name_name The name. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -24065,7 +24062,7 @@ sub cells_workbook_get_workbook_default_style {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -24113,8 +24110,8 @@ sub cells_workbook_get_workbook_name {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -24155,7 +24152,7 @@ sub cells_workbook_get_workbook_name {
 # @param string $name The workbook name. (required)
 # @param string $name_name The name. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -24173,7 +24170,7 @@ sub cells_workbook_get_workbook_name {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -24221,8 +24218,8 @@ sub cells_workbook_get_workbook_name_value {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -24262,7 +24259,7 @@ sub cells_workbook_get_workbook_name_value {
 # 
 # @param string $name The workbook name. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -24275,7 +24272,7 @@ sub cells_workbook_get_workbook_name_value {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -24318,8 +24315,8 @@ sub cells_workbook_get_workbook_names {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -24352,7 +24349,7 @@ sub cells_workbook_get_workbook_names {
 # 
 # @param string $name Document name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -24365,7 +24362,7 @@ sub cells_workbook_get_workbook_names {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -24408,8 +24405,8 @@ sub cells_workbook_get_workbook_settings {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -24442,7 +24439,7 @@ sub cells_workbook_get_workbook_settings {
 # 
 # @param string $name The workbook name. (required)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -24455,7 +24452,7 @@ sub cells_workbook_get_workbook_settings {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -24498,8 +24495,8 @@ sub cells_workbook_get_workbook_text_items {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -24536,7 +24533,7 @@ sub cells_workbook_get_workbook_text_items {
 # @param int $end_row End row. (optional)
 # @param boolean $only_auto Only auto. (optional, default to false)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -24569,7 +24566,7 @@ sub cells_workbook_get_workbook_text_items {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -24627,8 +24624,8 @@ sub cells_workbook_post_autofit_workbook_rows {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -24667,7 +24664,7 @@ sub cells_workbook_post_autofit_workbook_rows {
 # @param string $name The document name. (required)
 # @param WorkbookEncryptionRequest $encryption Encryption parameters. (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -24685,7 +24682,7 @@ sub cells_workbook_post_autofit_workbook_rows {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -24728,8 +24725,8 @@ sub cells_workbook_post_encrypt_document {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -24768,7 +24765,7 @@ sub cells_workbook_post_encrypt_document {
 # @param string $name  (required)
 # @param String $importdata  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -24786,7 +24783,7 @@ sub cells_workbook_post_encrypt_document {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -24834,8 +24831,8 @@ sub cells_workbook_post_import_data {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -24874,7 +24871,7 @@ sub cells_workbook_post_import_data {
 # @param string $name The document name. (required)
 # @param WorkbookProtectionRequest $protection The protection settings. (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -24892,7 +24889,7 @@ sub cells_workbook_post_import_data {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -24935,8 +24932,8 @@ sub cells_workbook_post_protect_document {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -24976,7 +24973,7 @@ sub cells_workbook_post_protect_document {
 # @param CalculationOptions $options Calculation Options. (optional)
 # @param boolean $ignore_error ignore Error. (optional)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -24999,7 +24996,7 @@ sub cells_workbook_post_protect_document {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -25047,8 +25044,8 @@ sub cells_workbook_post_workbook_calculate_formula {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -25087,7 +25084,7 @@ sub cells_workbook_post_workbook_calculate_formula {
 # @param string $name The workbook name. (required)
 # @param string $xml_file The xml file full path, if empty the data is read from request body. (optional)
 # @param string $folder The workbook folder full path. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 # @param string $out_path Path to save result (optional)
 {
     my $params = {
@@ -25106,7 +25103,7 @@ sub cells_workbook_post_workbook_calculate_formula {
         description => 'The workbook folder full path.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -25159,8 +25156,8 @@ sub cells_workbook_post_workbook_get_smart_marker_result {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # query params
@@ -25199,7 +25196,7 @@ sub cells_workbook_post_workbook_get_smart_marker_result {
 # @param string $name Document name. (required)
 # @param WorkbookSettings $settings Workbook Setting DTO (optional)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -25217,7 +25214,7 @@ sub cells_workbook_post_workbook_get_smart_marker_result {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -25260,8 +25257,8 @@ sub cells_workbook_post_workbook_settings {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -25305,7 +25302,7 @@ sub cells_workbook_post_workbook_settings {
 # @param int $vertical_resolution Image vertical resolution. (optional, default to 0)
 # @param string $folder The workbook folder. (optional)
 # @param string $out_folder out Folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -25348,7 +25345,7 @@ sub cells_workbook_post_workbook_settings {
         description => 'out Folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -25421,8 +25418,8 @@ sub cells_workbook_post_workbook_split {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -25456,7 +25453,7 @@ sub cells_workbook_post_workbook_split {
 # @param string $name Workbook name. (required)
 # @param string $merge_with The workbook to merge with. (required)
 # @param string $folder Source workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -25474,7 +25471,7 @@ sub cells_workbook_post_workbook_split {
         description => 'Source workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -25527,8 +25524,8 @@ sub cells_workbook_post_workbooks_merge {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -25563,7 +25560,7 @@ sub cells_workbook_post_workbooks_merge {
 # @param string $old_value The old value. (required)
 # @param string $new_value The new value. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -25586,7 +25583,7 @@ sub cells_workbook_post_workbooks_merge {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -25649,8 +25646,8 @@ sub cells_workbook_post_workbooks_text_replace {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -25684,7 +25681,7 @@ sub cells_workbook_post_workbooks_text_replace {
 # @param string $name Document name. (required)
 # @param string $text Text sample. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -25702,7 +25699,7 @@ sub cells_workbook_post_workbooks_text_replace {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -25755,8 +25752,8 @@ sub cells_workbook_post_workbooks_text_search {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -25889,7 +25886,7 @@ sub cells_workbook_put_convert_workbook {
 # @param string $name Document name. (required)
 # @param PasswordRequest $password Modification password. (optional)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -25907,7 +25904,7 @@ sub cells_workbook_put_convert_workbook {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -25950,8 +25947,8 @@ sub cells_workbook_put_document_protect_from_changes {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -25990,7 +25987,7 @@ sub cells_workbook_put_document_protect_from_changes {
 # @param string $name  (required)
 # @param string $png  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -26008,7 +26005,7 @@ sub cells_workbook_put_document_protect_from_changes {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -26056,8 +26053,8 @@ sub cells_workbook_put_workbook_background {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -26098,7 +26095,7 @@ sub cells_workbook_put_workbook_background {
 # @param string $data_file Smart marker data file, if the data not provided the request content is checked for the data. (optional)
 # @param boolean $is_write_over write over file. (optional)
 # @param string $folder The new document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -26126,7 +26123,7 @@ sub cells_workbook_put_workbook_background {
         description => 'The new document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -26184,8 +26181,8 @@ sub cells_workbook_put_workbook_create {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -26218,7 +26215,7 @@ sub cells_workbook_put_workbook_create {
 # 
 # @param string $name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 # @param TextWaterMarkerRequest $text_water_marker_request The text water marker request. (optional)
 {
     my $params = {
@@ -26232,7 +26229,7 @@ sub cells_workbook_put_workbook_create {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -26280,8 +26277,8 @@ sub cells_workbook_put_workbook_water_marker {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -26321,7 +26318,7 @@ sub cells_workbook_put_workbook_water_marker {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $validation_index The validation index. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -26344,7 +26341,7 @@ sub cells_workbook_put_workbook_water_marker {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -26397,8 +26394,8 @@ sub cells_worksheet_validations_delete_worksheet_validation {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -26446,7 +26443,7 @@ sub cells_worksheet_validations_delete_worksheet_validation {
 # @param string $name Document name. (required)
 # @param string $sheet_name Worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -26464,7 +26461,7 @@ sub cells_worksheet_validations_delete_worksheet_validation {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -26512,8 +26509,8 @@ sub cells_worksheet_validations_delete_worksheet_validations {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -26555,7 +26552,7 @@ sub cells_worksheet_validations_delete_worksheet_validations {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $validation_index The validation index. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -26578,7 +26575,7 @@ sub cells_worksheet_validations_delete_worksheet_validations {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -26631,8 +26628,8 @@ sub cells_worksheet_validations_get_worksheet_validation {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -26680,7 +26677,7 @@ sub cells_worksheet_validations_get_worksheet_validation {
 # @param string $name Document name. (required)
 # @param string $sheet_name Worksheet name. (required)
 # @param string $folder Document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -26698,7 +26695,7 @@ sub cells_worksheet_validations_get_worksheet_validation {
         description => 'Document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -26746,8 +26743,8 @@ sub cells_worksheet_validations_get_worksheet_validations {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -26790,7 +26787,7 @@ sub cells_worksheet_validations_get_worksheet_validations {
 # @param int $validation_index The validation index. (required)
 # @param Validation $validation  (optional)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -26818,7 +26815,7 @@ sub cells_worksheet_validations_get_worksheet_validations {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -26871,8 +26868,8 @@ sub cells_worksheet_validations_post_worksheet_validation {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -26925,8 +26922,9 @@ sub cells_worksheet_validations_post_worksheet_validation {
 # @param string $name Document name. (required)
 # @param string $sheet_name Worksheet name. (required)
 # @param string $range Specified cells area (optional)
+# @param Validation $validation validation (optional)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -26944,12 +26942,17 @@ sub cells_worksheet_validations_post_worksheet_validation {
         description => 'Specified cells area',
         required => '0',
     },
+    'validation' => {
+        data_type => 'Validation',
+        description => 'validation',
+        required => '0',
+    },
     'folder' => {
         data_type => 'string',
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -27002,8 +27005,8 @@ sub cells_worksheet_validations_put_worksheet_validation {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -27022,6 +27025,11 @@ sub cells_worksheet_validations_put_worksheet_validation {
 
     $self->{api_client}->check_access_token();
     my $_body_data;
+    # body params
+    if ( exists $args{'validation'}) {
+        $_body_data = $args{'validation'};
+    }
+
     # authentication setting, if any
     my $auth_settings = [qw()];
 
@@ -27045,7 +27053,7 @@ sub cells_worksheet_validations_put_worksheet_validation {
 # @param string $sheet_name The worksheet name. (required)
 # @param ProtectSheetParameter $protect_parameter with protection settings. Only password is used here. (optional)
 # @param string $folder Document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -27068,7 +27076,7 @@ sub cells_worksheet_validations_put_worksheet_validation {
         description => 'Document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -27116,8 +27124,8 @@ sub cells_worksheets_delete_unprotect_worksheet {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -27163,7 +27171,7 @@ sub cells_worksheets_delete_unprotect_worksheet {
 # @param string $name Document name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -27181,7 +27189,7 @@ sub cells_worksheets_delete_unprotect_worksheet {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -27229,8 +27237,8 @@ sub cells_worksheets_delete_worksheet {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -27271,7 +27279,7 @@ sub cells_worksheets_delete_worksheet {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -27289,7 +27297,7 @@ sub cells_worksheets_delete_worksheet {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -27337,8 +27345,8 @@ sub cells_worksheets_delete_worksheet_background {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -27380,7 +27388,7 @@ sub cells_worksheets_delete_worksheet_background {
 # @param string $sheet_name The worksheet name. (required)
 # @param string $cell_name The cell name (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -27403,7 +27411,7 @@ sub cells_worksheets_delete_worksheet_background {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -27456,8 +27464,8 @@ sub cells_worksheets_delete_worksheet_comment {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -27505,7 +27513,7 @@ sub cells_worksheets_delete_worksheet_comment {
 # @param string $name  (required)
 # @param string $sheet_name  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -27523,7 +27531,7 @@ sub cells_worksheets_delete_worksheet_comment {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -27571,8 +27579,8 @@ sub cells_worksheets_delete_worksheet_comments {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -27617,7 +27625,7 @@ sub cells_worksheets_delete_worksheet_comments {
 # @param int $freezed_rows  (required)
 # @param int $freezed_columns  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -27655,7 +27663,7 @@ sub cells_worksheets_delete_worksheet_comments {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -27743,8 +27751,8 @@ sub cells_worksheets_delete_worksheet_freeze_panes {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -27784,7 +27792,7 @@ sub cells_worksheets_delete_worksheet_freeze_panes {
 # 
 # @param string $name Document name. (required)
 # @param string $folder Document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -27797,7 +27805,7 @@ sub cells_worksheets_delete_worksheet_freeze_panes {
         description => 'Document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -27840,8 +27848,8 @@ sub cells_worksheets_get_named_ranges {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -27877,8 +27885,10 @@ sub cells_worksheets_get_named_ranges {
 # @param string $format The exported file format. (optional)
 # @param int $vertical_resolution Image vertical resolution. (optional, default to 0)
 # @param int $horizontal_resolution Image horizontal resolution. (optional, default to 0)
+# @param string $area Exported area. (optional)
+# @param int $page_index Exported page index. (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -27906,12 +27916,22 @@ sub cells_worksheets_get_named_ranges {
         description => 'Image horizontal resolution.',
         required => '0',
     },
+    'area' => {
+        data_type => 'string',
+        description => 'Exported area.',
+        required => '0',
+    },
+    'page_index' => {
+        data_type => 'int',
+        description => 'Exported page index.',
+        required => '0',
+    },
     'folder' => {
         data_type => 'string',
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -27969,13 +27989,23 @@ sub cells_worksheets_get_worksheet {
     }
 
     # query params
+    if ( exists $args{'area'}) {
+        $query_params->{'area'} = $self->{api_client}->to_query_value($args{'area'});
+    }
+
+    # query params
+    if ( exists $args{'page_index'}) {
+        $query_params->{'pageIndex'} = $self->{api_client}->to_query_value($args{'page_index'});
+    }
+
+    # query params
     if ( exists $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -28017,7 +28047,7 @@ sub cells_worksheets_get_worksheet {
 # @param string $sheet_name Worksheet name. (required)
 # @param string $formula The formula. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -28040,7 +28070,7 @@ sub cells_worksheets_get_worksheet {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -28098,8 +28128,8 @@ sub cells_worksheets_get_worksheet_calculate_formula {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -28141,7 +28171,7 @@ sub cells_worksheets_get_worksheet_calculate_formula {
 # @param string $sheet_name The worksheet name. (required)
 # @param string $cell_name The cell name (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -28164,7 +28194,7 @@ sub cells_worksheets_get_worksheet_calculate_formula {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -28217,8 +28247,8 @@ sub cells_worksheets_get_worksheet_comment {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -28266,7 +28296,7 @@ sub cells_worksheets_get_worksheet_comment {
 # @param string $name Workbook name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -28284,7 +28314,7 @@ sub cells_worksheets_get_worksheet_comment {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -28332,8 +28362,8 @@ sub cells_worksheets_get_worksheet_comments {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -28375,7 +28405,7 @@ sub cells_worksheets_get_worksheet_comments {
 # @param string $sheet_name Worksheet name. (required)
 # @param int $merged_cell_index Merged cell index. (required)
 # @param string $folder Document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -28398,7 +28428,7 @@ sub cells_worksheets_get_worksheet_comments {
         description => 'Document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -28451,8 +28481,8 @@ sub cells_worksheets_get_worksheet_merged_cell {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -28500,7 +28530,7 @@ sub cells_worksheets_get_worksheet_merged_cell {
 # @param string $name Document name. (required)
 # @param string $sheet_name The workseet name. (required)
 # @param string $folder Document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -28518,7 +28548,7 @@ sub cells_worksheets_get_worksheet_merged_cell {
         description => 'Document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -28566,8 +28596,8 @@ sub cells_worksheets_get_worksheet_merged_cells {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -28608,7 +28638,7 @@ sub cells_worksheets_get_worksheet_merged_cells {
 # @param string $name Workbook name. (required)
 # @param string $sheet_name The worksheet name. (required)
 # @param string $folder The workbook&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -28626,7 +28656,7 @@ sub cells_worksheets_get_worksheet_merged_cells {
         description => 'The workbook&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -28674,8 +28704,8 @@ sub cells_worksheets_get_worksheet_text_items {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -28715,7 +28745,7 @@ sub cells_worksheets_get_worksheet_text_items {
 # 
 # @param string $name Document name. (required)
 # @param string $folder Document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -28728,7 +28758,7 @@ sub cells_worksheets_get_worksheet_text_items {
         description => 'Document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -28771,8 +28801,8 @@ sub cells_worksheets_get_worksheets {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -28811,7 +28841,7 @@ sub cells_worksheets_get_worksheets {
 # @param int $first_row  (optional)
 # @param int $last_row  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -28854,7 +28884,7 @@ sub cells_worksheets_get_worksheets {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -28932,8 +28962,8 @@ sub cells_worksheets_post_autofit_worksheet_columns {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -28983,7 +29013,7 @@ sub cells_worksheets_post_autofit_worksheet_columns {
 # @param int $last_column  (required)
 # @param AutoFitterOptions $auto_fitter_options  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -29021,7 +29051,7 @@ sub cells_worksheets_post_autofit_worksheet_columns {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -29099,8 +29129,8 @@ sub cells_worksheets_post_autofit_worksheet_row {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -29150,7 +29180,7 @@ sub cells_worksheets_post_autofit_worksheet_row {
 # @param int $end_row End row. (optional)
 # @param boolean $only_auto Only auto. (optional, default to false)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -29188,7 +29218,7 @@ sub cells_worksheets_post_autofit_worksheet_row {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -29251,8 +29281,8 @@ sub cells_worksheets_post_autofit_worksheet_rows {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -29302,7 +29332,7 @@ sub cells_worksheets_post_autofit_worksheet_rows {
 # @param string $source_workbook  (optional)
 # @param string $source_folder  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -29340,7 +29370,7 @@ sub cells_worksheets_post_autofit_worksheet_rows {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -29408,8 +29438,8 @@ sub cells_worksheets_post_copy_worksheet {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -29456,7 +29486,7 @@ sub cells_worksheets_post_copy_worksheet {
 # @param string $sheet_name The worksheet name. (required)
 # @param WorksheetMovingRequest $moving with moving parameters. (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -29479,7 +29509,7 @@ sub cells_worksheets_post_copy_worksheet {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -29527,8 +29557,8 @@ sub cells_worksheets_post_move_worksheet {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -29575,7 +29605,7 @@ sub cells_worksheets_post_move_worksheet {
 # @param string $sheet_name  (required)
 # @param string $newname  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -29598,7 +29628,7 @@ sub cells_worksheets_post_move_worksheet {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -29656,8 +29686,8 @@ sub cells_worksheets_post_rename_worksheet {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -29699,7 +29729,7 @@ sub cells_worksheets_post_rename_worksheet {
 # @param string $sheet_name  (required)
 # @param Worksheet $sheet  (optional)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -29722,7 +29752,7 @@ sub cells_worksheets_post_rename_worksheet {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -29770,8 +29800,8 @@ sub cells_worksheets_post_update_worksheet_property {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -29818,7 +29848,7 @@ sub cells_worksheets_post_update_worksheet_property {
 # @param string $sheet_name  (required)
 # @param int $value  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -29841,7 +29871,7 @@ sub cells_worksheets_post_update_worksheet_property {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -29899,8 +29929,8 @@ sub cells_worksheets_post_update_worksheet_zoom {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -29943,7 +29973,7 @@ sub cells_worksheets_post_update_worksheet_zoom {
 # @param string $cell_name The cell name (required)
 # @param Comment $comment Comment object (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -29971,7 +30001,7 @@ sub cells_worksheets_post_update_worksheet_zoom {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -30024,8 +30054,8 @@ sub cells_worksheets_post_worksheet_comment {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -30080,7 +30110,7 @@ sub cells_worksheets_post_worksheet_comment {
 # @param string $cell_area The range to sort. (required)
 # @param DataSorter $data_sorter with sorting settings. (optional)
 # @param string $folder The workbook folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -30108,7 +30138,7 @@ sub cells_worksheets_post_worksheet_comment {
         description => 'The workbook folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -30166,8 +30196,8 @@ sub cells_worksheets_post_worksheet_range_sort {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -30214,7 +30244,7 @@ sub cells_worksheets_post_worksheet_range_sort {
 # @param string $sheet_name The worksheet name. (required)
 # @param string $text Text to search. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -30237,7 +30267,7 @@ sub cells_worksheets_post_worksheet_range_sort {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -30295,8 +30325,8 @@ sub cells_worksheets_post_worksheet_text_search {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -30339,7 +30369,7 @@ sub cells_worksheets_post_worksheet_text_search {
 # @param string $old_value The old text to replace. (required)
 # @param string $new_value The new text to replace by. (required)
 # @param string $folder Document&#39;s folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -30367,7 +30397,7 @@ sub cells_worksheets_post_worksheet_text_search {
         description => 'Document&#39;s folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -30435,8 +30465,8 @@ sub cells_worksheets_post_worsheet_text_replace {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -30479,7 +30509,7 @@ sub cells_worksheets_post_worsheet_text_replace {
 # @param int $position The new sheet position. (optional)
 # @param string $sheettype The new sheet type. (optional)
 # @param string $folder Document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -30507,7 +30537,7 @@ sub cells_worksheets_post_worsheet_text_replace {
         description => 'Document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -30565,8 +30595,8 @@ sub cells_worksheets_put_add_new_worksheet {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -30608,7 +30638,7 @@ sub cells_worksheets_put_add_new_worksheet {
 # @param string $sheet_name Worksheet name. (required)
 # @param boolean $is_visible New worksheet visibility value. (required)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -30631,7 +30661,7 @@ sub cells_worksheets_put_add_new_worksheet {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -30689,8 +30719,8 @@ sub cells_worksheets_put_change_visibility_worksheet {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -30732,7 +30762,7 @@ sub cells_worksheets_put_change_visibility_worksheet {
 # @param string $sheet_name The worksheet name. (required)
 # @param ProtectSheetParameter $protect_parameter with protection settings. (optional)
 # @param string $folder Document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -30755,7 +30785,7 @@ sub cells_worksheets_put_change_visibility_worksheet {
         description => 'Document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -30803,8 +30833,8 @@ sub cells_worksheets_put_protect_worksheet {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -30851,7 +30881,7 @@ sub cells_worksheets_put_protect_worksheet {
 # @param string $sheet_name  (required)
 # @param string $png  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -30874,7 +30904,7 @@ sub cells_worksheets_put_protect_worksheet {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -30927,8 +30957,8 @@ sub cells_worksheets_put_worksheet_background {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -30976,7 +31006,7 @@ sub cells_worksheets_put_worksheet_background {
 # @param string $cell_name The cell name (required)
 # @param Comment $comment Comment object (optional)
 # @param string $folder The document folder. (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -31004,7 +31034,7 @@ sub cells_worksheets_put_worksheet_background {
         description => 'The document folder.',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -31057,8 +31087,8 @@ sub cells_worksheets_put_worksheet_comment {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params
@@ -31115,7 +31145,7 @@ sub cells_worksheets_put_worksheet_comment {
 # @param int $freezed_rows  (required)
 # @param int $freezed_columns  (required)
 # @param string $folder  (optional)
-# @param string $storage storage name. (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -31153,7 +31183,7 @@ sub cells_worksheets_put_worksheet_comment {
         description => '',
         required => '0',
     },
-    'storage' => {
+    'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
         required => '0',
@@ -31241,8 +31271,8 @@ sub cells_worksheets_put_worksheet_freeze_panes {
     }
 
     # query params
-    if ( exists $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     # path params

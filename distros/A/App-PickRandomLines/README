@@ -1,4 +1,85 @@
-SYNOPSIS
+NAME
+    App::PickRandomLines - Pick one or more random lines from input
 
+VERSION
+    This document describes version 0.020 of App::PickRandomLines (from Perl
+    distribution App-PickRandomLines), released on 2020-04-29.
+
+SYNOPSIS
     See pick-random-lines.
+
+FUNCTIONS
+  pick_random_lines
+    Usage:
+
+     pick_random_lines(%args) -> [status, msg, payload, meta]
+
+    Pick one or more random lines from input.
+
+    TODO: * option to allow or disallow duplicates
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   algorithm => *str* (default: "scan")
+
+        "scan" is the algorithm described in the "perlfaq" manual (`perldoc
+        -q "random line"). This algorithm scans the whole input once and
+        picks one or more lines randomly from it.
+
+        "seek" is the algorithm employed by the Perl module
+        "File::RandomLine". It works by seeking a file randomly and finding
+        the next line (repeated "n" number of times). This algorithm is
+        faster when the input is very large as it avoids having to scan the
+        whole input. But it requires that the input is seekable (a single
+        file, stdin is not supported and currently multiple files are not
+        supported as well). *Might produce duplicate lines*.
+
+    *   files => *array[filename]*
+
+        If none is specified, will get input from stdin.
+
+    *   num_lines => *int* (default: 1)
+
+        If input contains less lines than the requested number of lines,
+        then will only return as many lines as the input contains.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PickRandomLines>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PickRandomLines>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PickRandomLines>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Unixish::pick.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

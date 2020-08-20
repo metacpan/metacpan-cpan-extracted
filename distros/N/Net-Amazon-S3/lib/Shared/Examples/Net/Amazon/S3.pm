@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::VERSION = '0.90';
+$Shared::Examples::Net::Amazon::S3::VERSION = '0.91';
 use strict;
 use warnings;
 
@@ -528,7 +528,7 @@ Shared::Examples::Net::Amazon::S3 - used for testing and as example
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 AUTHOR
 

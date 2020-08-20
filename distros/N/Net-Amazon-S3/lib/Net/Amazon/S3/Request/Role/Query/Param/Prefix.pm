@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Prefix;
 # ABSTRACT: prefix query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Prefix::VERSION = '0.90';
+$Net::Amazon::S3::Request::Role::Query::Param::Prefix::VERSION = '0.91';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
@@ -23,7 +23,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Prefix - prefix query param role
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 AUTHOR
 

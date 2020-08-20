@@ -1,5 +1,9 @@
 Changes for Alien::OpenSSL
 
+* 0.11
+- Better detection of OpenSSL on macOS via home brew
+- now honors the OPENSSL_PREFIX environment variable a la Net::SSLeay
+
 * 0.10
 - Change build system to Alien::Build; basically entirely contributed by
   plicease.

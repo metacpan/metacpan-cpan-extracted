@@ -12,6 +12,8 @@ use YAML::PP::Common qw/
     YAML_ANY_SCALAR_STYLE YAML_PLAIN_SCALAR_STYLE
     YAML_SINGLE_QUOTED_SCALAR_STYLE YAML_DOUBLE_QUOTED_SCALAR_STYLE
     YAML_LITERAL_SCALAR_STYLE YAML_FOLDED_SCALAR_STYLE
+    YAML_FLOW_MAPPING_STYLE YAML_BLOCK_MAPPING_STYLE
+    YAML_FLOW_SEQUENCE_STYLE YAML_BLOCK_SEQUENCE_STYLE
 /;
 
 my $yaml = <<'EOM';
@@ -83,7 +85,7 @@ subtest parse_string_events => sub {
         { name => 'mapping_start_event',
             start => { line => 2, column => 0 },
             end   => { line => 2, column => 0 },
-            style => 'block',
+            style => YAML_BLOCK_MAPPING_STYLE,
         },
         { name => 'scalar_event', style => YAML_PLAIN_SCALAR_STYLE, value => 'foo',
             start => { line => 2, column => 0 },
@@ -116,7 +118,7 @@ subtest parse_string_events => sub {
         { name => 'sequence_start_event',
             start => { line => 6, column => 0 },
             end   => { line => 6, column => 1 },
-            style => 'block',
+            style => YAML_BLOCK_SEQUENCE_STYLE,
         },
         { name => 'scalar_event', style => YAML_DOUBLE_QUOTED_SCALAR_STYLE, value => 'doublequoted',
             start => { line => 6, column => 2 },
@@ -150,7 +152,7 @@ subtest parse_string_events => sub {
         { name => 'mapping_start_event',
             start => { line => 14, column => 0 },
             end   => { line => 14, column => 0 },
-            style => 'block',
+            style => YAML_BLOCK_MAPPING_STYLE,
         },
         { name => 'scalar_event', style => YAML_PLAIN_SCALAR_STYLE, value => "a",
             start => { line => 14, column => 0 },
@@ -191,7 +193,7 @@ my @exp_file_events = (
         start => { line => 0, column => 0 },
         end   => { line => 0, column => 3 },
     },
-    { name => 'mapping_start_event', style => 'block',
+    { name => 'mapping_start_event', style => YAML_BLOCK_MAPPING_STYLE,
         start => { line => 1, column => 0 },
         end   => { line => 1, column => 0 },
     },
@@ -265,7 +267,7 @@ subtest emit_file_events => sub {
 
 subtest unicode => sub {
     my $ev = [];
-    $yaml = "[ö]";
+    $yaml = "- ö";
     YAML::LibYAML::API::parse_string_events($yaml, $ev);
     my $value = encode_utf8 $ev->[3]->{value};
     cmp_ok($value, 'eq', "ö", "utf8 parse");
@@ -283,9 +285,9 @@ subtest indent => sub {
     my @events = (
         { name => 'stream_start_event' },
         { name => 'document_start_event' },
-        { name => 'mapping_start_event', style => 'block' },
+        { name => 'mapping_start_event', style => YAML_BLOCK_MAPPING_STYLE },
         { name => 'scalar_event', value => 'a', style => YAML_PLAIN_SCALAR_STYLE },
-        { name => 'mapping_start_event', style => 'block' },
+        { name => 'mapping_start_event', style => YAML_BLOCK_MAPPING_STYLE },
         { name => 'scalar_event', value => 'b', style => YAML_PLAIN_SCALAR_STYLE },
         { name => 'scalar_event', value => 'c', style => YAML_PLAIN_SCALAR_STYLE },
         { name => 'mapping_end_event' },

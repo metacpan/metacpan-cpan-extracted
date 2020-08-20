@@ -1023,6 +1023,8 @@ yaml_emitter_emit_alias(yaml_emitter_t *emitter, SHIM(yaml_event_t *event))
 {
     if (!yaml_emitter_process_anchor(emitter))
         return 0;
+    if (emitter->simple_key_context)
+        if (!PUT(emitter, ' ')) return 0;
     emitter->state = POP(emitter, emitter->states);
 
     return 1;
@@ -1923,7 +1925,17 @@ yaml_emitter_write_plain_scalar(yaml_emitter_t *emitter,
 
     STRING_ASSIGN(string, value, length);
 
-    if (!emitter->whitespace) {
+    /**
+     * Avoid trailing spaces for empty values in block mode.
+     * In flow mode, we still want the space to prevent ambiguous things
+     * like {a:}.
+     * Currently, the emitter forbids any plain empty scalar in flow mode
+     * (e.g. it outputs {a: ''} instead), so emitter->flow_level will
+     * never be true here.
+     * But if the emitter is ever changed to allow emitting empty values,
+     * the check for flow_level is already here.
+     */
+    if (!emitter->whitespace && (length || emitter->flow_level)) {
         if (!PUT(emitter, ' ')) return 0;
     }
 

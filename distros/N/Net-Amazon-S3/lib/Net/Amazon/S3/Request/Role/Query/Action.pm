@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Action;
 # ABSTRACT: query action role
-$Net::Amazon::S3::Request::Role::Query::Action::VERSION = '0.90';
+$Net::Amazon::S3::Request::Role::Query::Action::VERSION = '0.91';
 use MooseX::Role::Parameterized;
 
 parameter action => (
@@ -29,7 +29,7 @@ Net::Amazon::S3::Request::Role::Query::Action - query action role
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 AUTHOR
 

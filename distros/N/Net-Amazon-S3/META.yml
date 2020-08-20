@@ -7,6 +7,7 @@ build_requires:
   FindBin: '0'
   LWP::Simple: '0'
   Moose::Meta::Class: '0'
+  Test::Deep: v0.111.0
   Test::Exception: '0'
   Test::MockTime: '0'
   Test::Warnings: '0'
@@ -58,10 +59,11 @@ requires:
   Ref::Util: '0'
   Regexp::Common: '0'
   Safe::Isa: '0'
+  Scalar::Util: '0'
   Sub::Override: '0'
   Term::Encoding: '0'
   Term::ProgressBar::Simple: '0'
-  Test::Deep: '0'
+  Test::Deep: v0.111.0
   Test::LWP::UserAgent: '0'
   Test::More: '0'
   Time::Piece: '0'
@@ -78,7 +80,7 @@ requires:
 resources:
   bugtracker: https://github.com/rustyconover/net-amazon-s3/issues
   repository: https://github.com/rustyconover/net-amazon-s3
-version: '0.90'
+version: '0.91'
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'
   - 'Ali Anari <ali@anari.me>'

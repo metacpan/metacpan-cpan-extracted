@@ -38,7 +38,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::response::acl - Shared::Examples pro
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3::Fixture;
 # ABSTRACT: used for testing to provide test fixtures
-$Shared::Examples::Net::Amazon::S3::Fixture::VERSION = '0.90';
+$Shared::Examples::Net::Amazon::S3::Fixture::VERSION = '0.91';
 use parent qw[ Exporter::Tiny ];
 
 use HTTP::Status;
@@ -69,7 +69,7 @@ Shared::Examples::Net::Amazon::S3::Fixture - used for testing to provide test fi
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 AUTHOR
 

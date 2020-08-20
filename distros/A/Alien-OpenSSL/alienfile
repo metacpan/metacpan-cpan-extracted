@@ -1,5 +1,40 @@
 use alienfile;
 use Config;
+use Env qw( @PKG_CONFIG_PATH @PKG_CONFIG_LIBDIR );
+
+if(defined $ENV{OPENSSL_PREFIX} && -d "$ENV{OPENSSL_PREFIX}/lib/pkgconfig") {
+  unshift @PKG_CONFIG_PATH, "$ENV{OPENSSL_PREFIX}/lib/pkgconfig";
+}
+
+if($^O eq 'darwin' && ! -d '/usr/include/openssl') {
+  # The OpenSSL that ships with recent OS X is completely broken
+  # from a developer perspective.  They provide an openssl binary,
+  # libraries and a .pc file, but no headers.  I guess the reason
+  # is OpenSSL is considered deprecated on the platform, but then
+  # why ship the .pc file?  We set PKG_CONFIG_LIBDIR to just the
+  # to skip /usr/lib/pkgconfig, unless the user has specified it.
+  # (presumably if they have set it, they have done so for a reason).
+  unless(defined $ENV{PKG_CONFIG_LIBDIR}) {
+    @PKG_CONFIG_LIBDIR = qw(
+      /usr/local/lib/pkgconfig
+      /usr/local/share/pkgconfig
+    )
+  }
+
+  if( -d '/usr/local/Cellar/openssl') {
+    require File::Glob;
+    my($dir) = File::Glob::bsd_glob('/usr/local/Cellar/openssl/*/lib/pkgconfig');
+    push @PKG_CONFIG_LIBDIR, $dir;
+  }
+
+  if( -d '/usr/local/Cellar/libressl') {
+    require File::Glob;
+    my($dir) = File::Glob::bsd_glob('/usr/local/Cellar/libressl/*/lib/pkgconfig');
+    push @PKG_CONFIG_LIBDIR, $dir;
+  }
+
+  log "overridding PKG_CONFIG_LIBDIR on macOS: $ENV{PKG_CONFIG_LIBDIR}";
+}
 
 plugin 'PkgConfig' => (
   pkg_name => 'openssl',

@@ -1,7 +1,9 @@
 package App::PickRandomLines;
 
-our $DATE = '2015-11-23'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-29'; # DATE
+our $DIST = 'App-PickRandomLines'; # DIST
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -20,8 +22,7 @@ TODO:
 _
     args => {
         files => {
-            schema => ['array*', of=>'str*'],
-            'x.schema.element_entity' => 'filename',
+            schema => ['array*', of=>'filename*'],
             'x.name.is_plural' => 1,
             pos => 0,
             greedy => 1,
@@ -37,7 +38,7 @@ _
             description => <<'_',
 
 `scan` is the algorithm described in the `perlfaq` manual (`perldoc -q "random
-line"). This algorithm scans the whole input once and pick one or more lines
+line"). This algorithm scans the whole input once and picks one or more lines
 randomly from it.
 
 `seek` is the algorithm employed by the Perl module `File::RandomLine`. It works
@@ -61,6 +62,9 @@ return as many lines as the input contains.
 _
         },
     },
+    links => [
+        {url=>'pm:Data::Unixish::pick'},
+    ],
 };
 sub pick_random_lines {
     my %args = @_;
@@ -108,7 +112,7 @@ App::PickRandomLines - Pick one or more random lines from input
 
 =head1 VERSION
 
-This document describes version 0.01 of App::PickRandomLines (from Perl distribution App-PickRandomLines), released on 2015-11-23.
+This document describes version 0.020 of App::PickRandomLines (from Perl distribution App-PickRandomLines), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -117,14 +121,18 @@ See L<pick-random-lines>.
 =head1 FUNCTIONS
 
 
-=head2 pick_random_lines(%args) -> [status, msg, result, meta]
+=head2 pick_random_lines
+
+Usage:
+
+ pick_random_lines(%args) -> [status, msg, payload, meta]
 
 Pick one or more random lines from input.
 
 TODO:
 * option to allow or disallow duplicates
 
-This function is not exportable.
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -133,7 +141,7 @@ Arguments ('*' denotes required arguments):
 =item * B<algorithm> => I<str> (default: "scan")
 
 C<scan> is the algorithm described in the C<perlfaq> manual (`perldoc -q "random
-line"). This algorithm scans the whole input once and pick one or more lines
+line"). This algorithm scans the whole input once and picks one or more lines
 randomly from it.
 
 C<seek> is the algorithm employed by the Perl module C<File::RandomLine>. It works
@@ -143,7 +151,7 @@ having to scan the whole input. But it requires that the input is seekable (a
 single file, stdin is not supported and currently multiple files are not
 supported as well). I<Might produce duplicate lines>.
 
-=item * B<files> => I<array[str]>
+=item * B<files> => I<array[filename]>
 
 If none is specified, will get input from stdin.
 
@@ -152,6 +160,7 @@ If none is specified, will get input from stdin.
 If input contains less lines than the requested number of lines, then will only
 return as many lines as the input contains.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -159,7 +168,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -181,13 +190,18 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+
+L<Data::Unixish::pick>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

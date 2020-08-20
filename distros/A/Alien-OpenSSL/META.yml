@@ -4,23 +4,13 @@ author:
   - 'Johanna Amann <johanna@icir.org>'
 build_requires:
   Alien::Build::MM: '1.30'
-  Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
-  Archive::Tar: '0'
-  Config: '0'
-  HTML::LinkExtor: '0'
-  IO::Zlib: '0'
-  Sort::Versions: '0'
-  Test::More: '0.96'
-  Text::Template: '0'
-  URI: '0'
-  URI::Escape: '0'
+  Test2::V0: '0'
+  Test::Alien::Diag: '0'
 configure_requires:
   Alien::Build: '1.30'
   Alien::Build::MM: '1.30'
-  Alien::Build::Plugin::Fetch::CurlCommand: '1.19'
-  Alien::Build::Plugin::Fetch::Wget: '1.19'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,20 +22,24 @@ no_index:
     - inc
 requires:
   Alien::Build: '1.30'
+  parent: '0'
 resources:
   bugtracker: https://github.com/0xxon/alien-openssl/issues
   homepage: https://github.com/0xxon/alien-openssl
   repository: git://github.com/0xxon/alien-openssl.git
-version: '0.10'
+version: '0.11'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 1.32'
+  generated_by: 'Alien::Build::MM version 2.28'
   requires:
     share:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Archive::Tar: '0'
       Config: '0'
-      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
+      Mojo::DOM58: '1.00'
+      Net::SSLeay: '1.49'
       Sort::Versions: '0'
       Test::More: '0.96'
       Text::Template: '0'

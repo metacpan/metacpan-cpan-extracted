@@ -37,7 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
-use AsposeCellsCloud::Object::Link;
+use AsposeCellsCloud::Object::CellsCloudFileInfo;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -126,23 +126,9 @@ __PACKAGE__->class_documentation({description => '',
 }                                 );
 
 __PACKAGE__->method_documentation({
-    'source_document' => {
-    	datatype => 'Link',
-    	base_name => 'SourceDocument',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'dest_document' => {
-    	datatype => 'Link',
-    	base_name => 'DestDocument',
-    	description => '',
-    	format => '',
-    	read_only => '',
-    		},
-    'additional_items' => {
-    	datatype => 'ARRAY[Link]',
-    	base_name => 'AdditionalItems',
+    'documents' => {
+    	datatype => 'ARRAY[CellsCloudFileInfo]',
+    	base_name => 'Documents',
     	description => '',
     	format => '',
     	read_only => '',
@@ -150,15 +136,11 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
-    'source_document' => 'Link',
-    'dest_document' => 'Link',
-    'additional_items' => 'ARRAY[Link]'
+    'documents' => 'ARRAY[CellsCloudFileInfo]'
 } );
 
 __PACKAGE__->attribute_map( {
-    'source_document' => 'SourceDocument',
-    'dest_document' => 'DestDocument',
-    'additional_items' => 'AdditionalItems'
+    'documents' => 'Documents'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

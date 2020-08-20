@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::RestoreObject;
 # ABSTRACT: An internal class implementing RestoreObject operation
-$Net::Amazon::S3::Request::RestoreObject::VERSION = '0.90';
+$Net::Amazon::S3::Request::RestoreObject::VERSION = '0.91';
 use strict;
 use warnings FATAL => 'all';
 
@@ -43,7 +43,7 @@ Net::Amazon::S3::Request::RestoreObject - An internal class implementing Restore
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 AUTHOR
 

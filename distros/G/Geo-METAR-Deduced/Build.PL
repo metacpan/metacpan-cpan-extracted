@@ -24,5 +24,11 @@ Module::Build->new(
         'Test::NoWarnings' => 0,
         'Test::Warn'       => 0,
     },
+    meta_merge => {
+        resources => {
+            repository =>
+              'https://bitbucket.org/rolandvanipenburg/geo-metar-deduced',
+        },
+    },
     sign => 1,
 )->create_build_script;

@@ -22,7 +22,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::error::access_denied - Shared::Examp
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 AUTHOR
 

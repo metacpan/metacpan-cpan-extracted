@@ -2,6 +2,13 @@ CHANGE LOG
 ==========
 
 
+2020-08-20 v0.1.2
+-----------------
+
+minor change to avoid warnings when inject_context returns an empty hashref
+
+
+
 2020-08-18 v0.1.1
 -----------------
 

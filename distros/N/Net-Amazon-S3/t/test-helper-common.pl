@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::Deep      qw[ !cmp_deeply ];
+use Test::Deep      v0.111 qw[ !cmp_deeply ];
 use Test::More      import => [qw[ !ok !is !is_deeply ]];
 use Test::Warnings  qw[ :no_end_test had_no_warnings ];
 

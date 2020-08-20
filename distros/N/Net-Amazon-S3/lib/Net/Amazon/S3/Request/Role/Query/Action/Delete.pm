@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Action::Delete;
 # ABSTRACT: delete query action role
-$Net::Amazon::S3::Request::Role::Query::Action::Delete::VERSION = '0.90';
+$Net::Amazon::S3::Request::Role::Query::Action::Delete::VERSION = '0.91';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Action' => { action => 'delete' };
@@ -19,7 +19,7 @@ Net::Amazon::S3::Request::Role::Query::Action::Delete - delete query action role
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 AUTHOR
 

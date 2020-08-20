@@ -37,7 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
-use AsposeCellsCloud::Object::SplitResultDocument;
+use AsposeCellsCloud::Object::CellsCloudFileInfo;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -127,7 +127,7 @@ __PACKAGE__->class_documentation({description => '',
 
 __PACKAGE__->method_documentation({
     'documents' => {
-    	datatype => 'ARRAY[SplitResultDocument]',
+    	datatype => 'ARRAY[CellsCloudFileInfo]',
     	base_name => 'Documents',
     	description => '',
     	format => '',
@@ -136,7 +136,7 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
-    'documents' => 'ARRAY[SplitResultDocument]'
+    'documents' => 'ARRAY[CellsCloudFileInfo]'
 } );
 
 __PACKAGE__->attribute_map( {

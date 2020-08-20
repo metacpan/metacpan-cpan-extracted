@@ -4,13 +4,13 @@
       "Johanna Amann <johanna@icir.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Alien-OpenSSL",
    "no_index" : {
@@ -22,30 +22,25 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build::MM" : "1.30",
-            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
-            "Archive::Tar" : "0",
-            "Config" : "0",
-            "HTML::LinkExtor" : "0",
-            "IO::Zlib" : "0",
-            "Sort::Versions" : "0",
-            "Test::More" : "0.96",
-            "Text::Template" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0"
+            "Alien::Build::MM" : "1.30"
          }
       },
       "configure" : {
          "requires" : {
             "Alien::Build" : "1.30",
-            "Alien::Build::MM" : "1.30",
-            "Alien::Build::Plugin::Fetch::CurlCommand" : "1.19",
-            "Alien::Build::Plugin::Fetch::Wget" : "1.19"
+            "Alien::Build::MM" : "1.30"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::Build" : "1.30"
+            "Alien::Build" : "1.30",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::Alien::Diag" : "0"
          }
       }
    },
@@ -60,16 +55,19 @@
          "url" : "git://github.com/0xxon/alien-openssl.git"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 1.32",
+      "generated_by" : "Alien::Build::MM version 2.28",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Archive::Tar" : "0",
             "Config" : "0",
-            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
+            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "Test::More" : "0.96",
             "Text::Template" : "0",
@@ -79,5 +77,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

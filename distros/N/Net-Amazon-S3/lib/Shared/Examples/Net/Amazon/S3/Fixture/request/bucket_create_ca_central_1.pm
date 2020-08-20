@@ -24,7 +24,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::request::bucket_create_ca_central_1 
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 AUTHOR
 

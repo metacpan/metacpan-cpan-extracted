@@ -3,7 +3,7 @@ package Log::Log4perl::OpenTracing;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 use Log::Log4perl::Layout::PatternLayout;
 use OpenTracing::GlobalTracer;
@@ -24,10 +24,10 @@ sub get_opentracing_context_with_curlies {
     my ($layout, $message, $category, $priority, $caller_level) = @_;
     
     my $curlies = $layout->{curlies};
-    my $context = get_opentracing_context()
+    my %context = %{ get_opentracing_context() }
         or return $OPENTRACING_NOOP_PLACEHOLDER_VALUE;
     
-    return flatten( $context )->{$curlies}
+    return flatten( \%context )->{$curlies}
 }
 
 sub get_opentracing_context {

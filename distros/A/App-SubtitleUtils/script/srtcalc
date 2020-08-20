@@ -1,0 +1,86 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-20'; # DATE
+our $DIST = 'App-SubtitleUtils'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+$secs_re = qr/[+-]?\d+(?:\.\d*)?/;
+$hms_re = qr/\d\d?:\d\d?:\d\d?(?:,\d\d\d)?/;
+$hms_re_catch = qr/(\d\d?):(\d\d?):(\d\d?)(?:,(\d\d\d))?/;
+sub hms2secs { local $_=shift; /^$hms_re_catch$/ or return; $1*3600+$2*60+$3+$4*0.001 }
+sub secs2hms { local $_=shift; /^$secs_re$/ or return "00:00:00,000"; my $ms=1000*($_-int($_)); $_=int($_); my $s=$_%60; $_-=$s; $_/=60; my $m=$_%60; $_-=$m; $_/=60; sprintf "%02d:%02d:%02d,%03d",$_,$m,$s,$ms }
+
+###
+
+die "Usage: $0 SECS_OR_HMS\nIf SECS is entered, HMS is returned. Vice versa.\n" unless @ARGV;
+
+for (@ARGV) {
+	if (/^$secs_re$/) {
+		print "$_ secs = ", secs2hms($_), "\n";
+	} elsif (/^$hms_re$/) {
+		print "$_ = ", hms2secs($_), " secs\n";
+	} else {
+		print "Invalid input: $_\n";
+	}
+}
+
+# ABSTRACT: Convert H:M:S to number of seconds, and vice versa
+# PODNAME: srtcalc
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+srtcalc - Convert H:M:S to number of seconds, and vice versa
+
+=head1 VERSION
+
+This document describes version 0.001 of srtcalc (from Perl distribution App-SubtitleUtils), released on 2020-08-20.
+
+=head1 SYNOPSIS
+
+Return H:M:S:
+
+ % srtcalc <secs> [FILE] ...
+
+Return number of seconds:
+
+ % srtcalc <h:m:s> [FILE] ...
+
+=head1 HISTORY
+
+2003-02-06 - first written
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-SubtitleUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-SubtitleUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SubtitleUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
