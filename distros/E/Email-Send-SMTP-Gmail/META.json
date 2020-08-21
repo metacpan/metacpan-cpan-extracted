@@ -1,5 +1,5 @@
 {
-   "abstract" : "Sends emails with attachments supporting Auth over TLS or SSL (for example: Google's SMTP).",
+   "abstract" : "Sends emails with attachments supporting Auth over TLS or SSL (for example: Google's SMTP and AWS SES).",
    "author" : [
       "Juan JosÃ© 'Peco' San MartÃ­n <peco@cpan.org>"
    ],
@@ -44,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.32",
+   "version" : "1.34",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

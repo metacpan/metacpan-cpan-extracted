@@ -12,7 +12,7 @@ use App::mkpkgconfig::PkgConfig::Entry;
 use constant Keyword => 'App::mkpkgconfig::PkgConfig::Entry::Keyword';
 use constant Variable => 'App::mkpkgconfig::PkgConfig::Entry::Variable';
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use IO::File   ();
 use IO::Handle ();
@@ -463,7 +463,7 @@ App::mkpkgconfig::PkgConfig - output pkg-config .pc files
 
 =head1 VERSION
 
-version v2.0.0
+version v2.0.1
 
 =head1 SYNOPSIS
 
@@ -525,7 +525,7 @@ Return a L<App::mkpkgconfig::PkgConfig::Entry::Variable> object for the requeste
 
    @variables = $obj->variables;
 
-Return a L<list of App::mkpkgconfig::PkgConfig::Entry::Variable> objects;
+Return a list of L<App::mkpkgconfig::PkgConfig::Entry::Variable> objects;
 
 =head2 keyword
 
@@ -537,7 +537,7 @@ Return a L<App::mkpkgconfig::PkgConfig::Entry::Keyword> object for the requested
 
    @keywords = $obj->keywords;
 
-Return a L<list of App::mkpkgconfig::PkgConfig::Entry::Keywords> objects;
+Return a list of L<App::mkpkgconfig::PkgConfig::Entry::Keywords> objects;
 
 =head2 add_variable
 

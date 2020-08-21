@@ -34,19 +34,19 @@ no_index:
 provides:
   App::mkpkgconfig:
     file: lib/App/mkpkgconfig.pm
-    version: v2.0.0
+    version: v2.0.1
   App::mkpkgconfig::PkgConfig:
     file: lib/App/mkpkgconfig/PkgConfig.pm
-    version: v2.0.0
+    version: v2.0.1
   App::mkpkgconfig::PkgConfig::Entry:
     file: lib/App/mkpkgconfig/PkgConfig/Entry.pm
-    version: v2.0.0
+    version: v2.0.1
   App::mkpkgconfig::PkgConfig::Entry::Keyword:
     file: lib/App/mkpkgconfig/PkgConfig/Entry.pm
-    version: v2.0.0
+    version: v2.0.1
   App::mkpkgconfig::PkgConfig::Entry::Variable:
     file: lib/App/mkpkgconfig/PkgConfig/Entry.pm
-    version: v2.0.0
+    version: v2.0.1
 requires:
   Algorithm::Dependency::Ordered: '0'
   Algorithm::Dependency::Source::HoA: '0'
@@ -63,7 +63,7 @@ requires:
   Pod::Usage: '0'
   Regexp::Common: '0'
   Regexp::Common::balanced: '0'
-  Syntax::Construct: '0'
+  Syntax::Construct: '1.008'
   constant: '0'
   namespace::clean: '0'
   parent: '0'
@@ -73,7 +73,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-mkpkgconfig
   repository: https://gitlab.com/djerius/app-mkpkgconfig.git
-version: v2.0.0
+version: v2.0.1
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

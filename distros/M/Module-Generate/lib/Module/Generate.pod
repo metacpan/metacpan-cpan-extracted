@@ -6,7 +6,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
@@ -339,6 +339,57 @@ Implement a macro that can be inserted across classes.
 	1;
 
 	__END__
+
+=head2 keyword
+
+Implement a keyword that can be used accross classes.
+
+
+	my $mg = Module::Generate
+		->author('LNATION')
+		->email('email@lnation.org');
+	$mg->keyword('with', sub {
+		my ($meta) = @_;
+		return qq|with $meta->{with};|;
+	});
+
+	$mg->keyword('has',
+		CODE => sub {
+			my ($meta) = @_;
+			$meta->{is} ||= q|'ro'|;
+			my $attributes = join ', ', map {
+				($meta->{$_} ? (sprintf "%s => %s", $_, $meta->{$_}) : ())
+			} qw/is required/;
+			my $code = qq|
+				has $meta->{has} => ( $attributes );|;
+			return $code;
+		},
+		KEYWORDS => [qw/is required/],
+		POD_TITLE => 'ATTRIBUTES',
+		POD_POD => 'get or set $keyword',
+		POD_EXAMPLE => "\$obj->\$keyword;\n\n\t\$obj->\$keyword(\$value);"
+	);
+
+	$mg->class('Keyword')
+		->use('Moo')
+		->with(qw/'Keyword::Role'/)
+			->test(
+				['ok', q|my $obj = Keyword->new( thing => 'abc', test => 'def' )|],
+				['is', q|$obj->test|, q|'def'|]
+			)
+		->has('thing')->required(1)
+			->test(
+				['ok', q|my $obj = Keyword->new( thing => 'abc' )|],
+				['is', q|$obj->thing|, q|'abc'|],
+				['eval', q|$obj = Keyword->new()|, 'required']
+			);
+
+	$mg->class('Keyword::Role')
+		->use('Moo::Role')
+		->has('test')->is(q|'rw'|)
+			->test(
+				['ok', q|my $obj = do { eval q{
+
 
 =head2 generate
 

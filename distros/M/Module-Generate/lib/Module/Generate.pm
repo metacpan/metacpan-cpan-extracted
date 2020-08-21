@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -189,6 +189,45 @@ sub macro {
 	return $self;
 }
 
+sub keyword {
+	my ($self, $name, %keyword) = (shift, shift, (! ref $_[0] ? @_ : ref $_[0] eq 'HASH' ? %{$_[0]} : (
+		CODE => $_[0],
+		KEYWORDS => $_[1] || [],
+		($_[2] ? ( POD_TITLE => $_[2] ) : ())	
+	)));
+	push @{$keyword{KEYWORDS}}, $name;
+	$CLASS{KEYWORD}{$name} = \%keyword;
+	my $MACROS = join '|', map { quotemeta($_) } keys %{$CLASS{MACRO}};
+	{
+		no strict 'refs';
+		my $cls = ref $self;
+		*{"${cls}::$name"} = sub {
+			my ($self, $value) = (shift, _stringify_struct($MACROS, @_));
+			$CLASS{CURRENT}{SUBS}{CURRENT} = $CLASS{CURRENT}{SUBS}{$SUB_INDEX} = {
+				INDEX => $SUB_INDEX++,
+				KEYWORD => $name,
+				$name => $value
+			};
+			for (qw/POD EXAMPLE/) {
+				if ($CLASS{KEYWORD}{$name}{"POD_$_"}) {
+					$CLASS{CURRENT}{SUBS}{CURRENT}{$_} = $CLASS{KEYWORD}{$name}{"POD_$_"};
+					$CLASS{CURRENT}{SUBS}{CURRENT}{$_} =~ s/\$keyword/$value/g;
+				}
+			}
+			return $self;
+		};
+		for my $add (@{$keyword{KEYWORDS}}) {
+			next if $add eq $name;
+			*{"${cls}::$add"} = sub {
+				my ($self, $code) = (shift, _stringify_struct($MACROS, @_));
+				$CLASS{CURRENT}{SUBS}{CURRENT}{$add} = $code;
+				return $self;
+			};
+		}
+	}
+	return $self;
+}
+
 sub code {
 	my ($self, $code) = @_;
 	$CLASS{CURRENT}{SUBS}{CURRENT}{CODE} = $code;
@@ -222,7 +261,7 @@ sub clear_tests {
 sub generate {
 	my ($self, %args) = @_;
 
-	my @classes = sort grep { $_ !~ m/^(LIB|TLIB|AUTHOR|EMAIL|VERSION|DIST|CURRENT|MACRO)$/ } keys %CLASS;
+	my @classes = sort grep { $_ !~ m/^(LIB|TLIB|AUTHOR|EMAIL|VERSION|DIST|CURRENT|MACRO|KEYWORD)$/ } keys %CLASS;
 
 	my $lib = $CLASS{LIB} || ".";
 	my $tlib = $CLASS{TLIB};
@@ -244,7 +283,7 @@ sub generate {
 	for my $class (@classes) {
 		my $cls = _perl_tidy(
 			sprintf(
-				qq{package %s; use strict; use warnings;%s\n%s\n%s\n%s\n1;\n\n__END__%s },
+				qq{package %s; use strict; use warnings;%s\n%s\n%s\n%s\n\n1;\n\n__END__%s },
 					$class,
 					_build_use($CLASS{$class}),
 					_build_global($CLASS{$class}{GLOBAL}),
@@ -253,8 +292,8 @@ sub generate {
 					_build_pod($class, $CLASS{$class})
 			)
 		);
-		$class =~ s/\:\:/\//g;
-		my $file = sprintf "%s/%s.pm", $lib, $class;
+		(my $path = $class) =~ s/\:\:/\//g;
+		my $file = sprintf "%s/%s.pm", $lib, $path;
 		_make_path($file);
 		open(my $fh, '>', $file) or die "Cannot open file to write $!";
 		print $fh $cls;
@@ -266,7 +305,8 @@ sub generate {
 						_build_tests($CLASS{$class})
 				)
 			);
-			my $file = sprintf "%s/%s.t", $tlib, $class;
+			$class =~ s/\:\:/-/g;
+			my $file = sprintf "%s/%s.t", $tlib,  $class;
 			_make_path($file);
 			open(my $fh, '>', $file) or die "Cannot open file to write $!";
 			print $fh $test_file;
@@ -321,6 +361,20 @@ sub _build_phase {
 	return join "\n", @codes;
 }
 
+sub _stringify_struct {
+	my ($MACROS, @struct) = @_;
+	if ($#struct > 0) {
+		return '(' . (join ", ", map {  _stringify_struct($MACROS, $_) } @struct) . ')';
+	}
+	$struct[0] = ref $struct[0] ? Dumper $struct[0] : $struct[0];
+	$struct[0] =~ s/\$VAR1 = //;
+	$struct[0] =~ s/\s*\n*\s*package Module\:\:Generate\;|use warnings\;|use strict\;//g;
+	$struct[0] =~ s/{\s*\n*/{/;
+	$struct[0] =~ s/};$/}/;
+	$struct[0] =~ s/\&($MACROS)/$CLASS{MACRO}{$1}/g;
+	return $struct[0];
+}
+
 sub _build_subs {
 	my ($class) = @_;
 	my @codes;
@@ -331,7 +385,15 @@ sub _build_subs {
 		$class->{SUBS}{$a}{INDEX} <=> $class->{SUBS}{$b}{INDEX}
 	} keys %{$class->{SUBS}}) {
 		my $code;
-		if ($class->{SUBS}{$sub}{CODE}) {
+		if ($class->{SUBS}{$sub}{KEYWORD}) {
+			my $meta = $class->{SUBS}{$sub};
+			my $keyword = $CLASS{KEYWORD}{$class->{SUBS}{$sub}{KEYWORD}}; 
+			$meta->{CODE} = _stringify_struct(
+				$MACROS, 
+				((ref($meta->{CODE}) || "") eq "ARRAY" ? @{$meta->{CODE}} : $meta->{CODE})
+			) if defined $meta->{CODE};
+			$code = $keyword->{CODE}->($meta, $keyword->{KEYWORDS});
+		} elsif ($class->{SUBS}{$sub}{CODE}) {
 			$code = ref $class->{SUBS}{$sub}{CODE} ? Dumper $class->{SUBS}{$sub}{CODE} : $class->{SUBS}{$sub}{CODE};
 			$code =~ s/\$VAR1 = //;
 			$code =~ s/sub\s*//;
@@ -355,33 +417,48 @@ sub _build_pod {
 	my $content = join '', <$d>;
 	$content =~ s/^.*\n__DATA__\n/\n/s;
 	$content =~ s/\n__END__\n.*$/\n/s;
-	my (@subs, @access);
+
+	my %sections = (
+		subs => [],
+		accessor => []
+	);
+
 	for my $sub (sort {
 		$definition->{SUBS}{$a}{INDEX} <=> $definition->{SUBS}{$b}{INDEX}
 	} keys %{$definition->{SUBS}}) {
 		my $spod = $definition->{SUBS}{$sub}{POD} ? $definition->{SUBS}{$sub}{POD} : "";
-		if ($definition->{SUBS}{$sub}{ACCESSOR}) {
-			push @access, $definition->{SUBS}{$sub}{EXAMPLE}
+		if ($definition->{SUBS}{$sub}{KEYWORD}) {
+			my $name = $definition->{SUBS}{$sub}{$definition->{SUBS}{$sub}{KEYWORD}};  
+			push @{$sections{$definition->{SUBS}{$sub}{KEYWORD}}}, $definition->{SUBS}{$sub}{EXAMPLE}
+				? sprintf("=head2 %s\n\n%s\n\n\t%s",
+					$name, $spod, $definition->{SUBS}{$sub}{EXAMPLE})
+				: sprintf("=head2 %s\n\n%s", $name, $spod);
+		} elsif ($definition->{SUBS}{$sub}{ACCESSOR}) {
+			push @{$sections{accessor}}, $definition->{SUBS}{$sub}{EXAMPLE}
 				? sprintf("=head2 %s\n\n%s\n\n\t%s",
 					$sub, $spod, $definition->{SUBS}{$sub}{EXAMPLE})
 				: sprintf("=head2 %s\n\n%s", $sub, $spod);
 		} else {
-			push @subs, $definition->{SUBS}{$sub}{EXAMPLE}
+			push @{$sections{subs}}, $definition->{SUBS}{$sub}{EXAMPLE}
 				? sprintf("=head2 %s\n\n%s\n\n\t%s",
 					$sub, $spod, $definition->{SUBS}{$sub}{EXAMPLE})
 				: sprintf("=head2 %s\n\n%s", $sub, $spod);
 		}
 	}
 
-	if (scalar @access) {
-		unshift @access, "=head1 ACCESSORS";
+	if (scalar @{$sections{accessor}}) {
+		unshift @{$sections{accessor}}, "=head1 ACCESSORS";
 	}
 
-	if (scalar @subs) {
-		unshift @subs, "=head1 SUBROUTINES/METHODS";
+	if (scalar @{$sections{subs}}) {
+		unshift @{$sections{subs}}, "=head1 SUBROUTINES/METHODS";
 	}
 
-	@subs = (@subs, @access);
+	for (keys %{$CLASS{KEYWORD}}) {
+		unshift @{$sections{$_}}, sprintf "=head1 %s", $CLASS{KEYWORD}{$_}{POD_TITLE} ||  uc($_);
+	}
+
+	my @subs = map { @{ $sections{$_} }} 'subs', 'accessor', sort keys %{$CLASS{KEYWORD}};
 
 	my $lcname = lc($class);
 	(my $safename = $class) =~ s/\:\:/-/g;
@@ -434,8 +511,7 @@ sub _perl_tidy {
 }
 
 sub _build_tests {
-	my ($class, $obj_ok) = shift;
-
+	my ($class, $obj_ok) = @_;
 	my $tests = sprintf("BEGIN { use_ok('%s'); }", $class->{NAME});
 
 	if ($class->{SUBS}->{new}->{TEST}) {
@@ -447,11 +523,12 @@ sub _build_tests {
 
 	for my $sub (sort { ($class->{SUBS}->{$b}->{ACCESSOR} || 0) <=> ($class->{SUBS}->{$a}->{ACCESSOR} || 0) }  keys %{$class->{SUBS}}) {
 		next if $sub eq 'new';
-		unshift @{$class->{SUBS}->{$sub}->{TEST}}, $obj_ok;
+		unshift @{$class->{SUBS}->{$sub}->{TEST}}, $obj_ok if $obj_ok;
 		$tests .= sprintf "subtest '%s' => sub { plan tests => %s; %s };", 
-			$sub, 
+			($class->{SUBS}->{$sub}->{KEYWORD} ? ( $class->{SUBS}->{$sub}->{KEYWORD} . ' ' . quotemeta($class->{SUBS}->{$sub}->{$class->{SUBS}->{$sub}->{KEYWORD}}) ) : $sub), 
 			scalar @{$class->{SUBS}->{$sub}->{TEST}}, 
-			join '', map{ _build_test($_) } @{ $class->{SUBS}->{$sub}->{TEST} };
+			join '', map{ _build_test($_) } @{ $class->{SUBS}->{$sub}->{TEST} }
+		if $class->{SUBS}->{$sub}->{TEST};
 	}
 
 	return $tests;
@@ -574,7 +651,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
@@ -906,6 +983,65 @@ Implement a macro that can be inserted across classes.
 	1;
 
 	__END__
+
+=head2 keyword
+
+Implement a keyword that can be used accross classes.
+
+
+	my $mg = Module::Generate
+		->author('LNATION')
+		->email('email@lnation.org');
+	$mg->keyword('with', sub {
+		my ($meta) = @_;
+		return qq|with $meta->{with};|;
+	});
+
+	$mg->keyword('has',
+		CODE => sub {
+			my ($meta) = @_;
+			$meta->{is} ||= q|'ro'|;
+			my $attributes = join ', ', map {
+				($meta->{$_} ? (sprintf "%s => %s", $_, $meta->{$_}) : ())
+			} qw/is required/;
+			my $code = qq|
+				has $meta->{has} => ( $attributes );|;
+			return $code;
+		},
+		KEYWORDS => [qw/is required/],
+		POD_TITLE => 'ATTRIBUTES',
+		POD_POD => 'get or set $keyword',
+		POD_EXAMPLE => "\$obj->\$keyword;\n\n\t\$obj->\$keyword(\$value);"
+	);
+
+	$mg->class('Keyword')
+		->use('Moo')
+		->with(qw/'Keyword::Role'/)
+			->test(
+				['ok', q|my $obj = Keyword->new( thing => 'abc', test => 'def' )|],
+				['is', q|$obj->test|, q|'def'|]
+			)
+		->has('thing')->required(1)
+			->test(
+				['ok', q|my $obj = Keyword->new( thing => 'abc' )|],
+				['is', q|$obj->thing|, q|'abc'|],
+				['eval', q|$obj = Keyword->new()|, 'required']
+			);
+
+	$mg->class('Keyword::Role')
+		->use('Moo::Role')
+		->has('test')->is(q|'rw'|)
+			->test(
+				['ok', q|my $obj = do { eval q{
+					package FooBar;
+					use Moo;
+					with 'Keyword::Role';
+					1;
+				}; 1; } && FooBar->new| ],
+				['is', q|$obj->test|, q|undef|],
+				['ok', q|$obj->test('abc')|],
+				['is', q|$obj->test|, q|'abc'|]
+			);
 
 =head2 generate
 

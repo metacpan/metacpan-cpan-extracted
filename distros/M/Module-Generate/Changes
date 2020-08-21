@@ -29,3 +29,6 @@ Revision history for Module-Generate
 
 0.18	2020-08-16
 	- Generate test files
+
+0.20    2020-08-21
+	- Implement a keyword that can be used accross classes.

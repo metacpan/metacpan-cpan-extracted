@@ -1,5 +1,5 @@
 ---
-abstract: "Sends emails with attachments supporting Auth over TLS or SSL (for example: Google's SMTP)."
+abstract: "Sends emails with attachments supporting Auth over TLS or SSL (for example: Google's SMTP and AWS SES)."
 author:
   - "Juan JosÃ© 'Peco' San MartÃ­n <peco@cpan.org>"
 build_requires:
@@ -26,5 +26,5 @@ requires:
   Net::SMTP: '3.1'
   Net::SMTP_auth: '0'
   Test::More: '0'
-version: '1.32'
+version: '1.34'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -66742,3 +66742,6 @@ L/LD/LDIDRY/Mojolicious-Plugin-CoverDb-0.05.tar.gz
 P/PE/PERLANCAR/Progress-Any-0.219.tar.gz
 J/JM/JMATES/Term-CallEditor-1.00.tar.gz
 L/LE/LEONT/version-0.9927.tar.gz
+D/DJ/DJERIUS/App-mkpkgconfig-v2.0.1.tar.gz
+P/PE/PECO/Email-Send-SMTP-Gmail-1.34.tar.gz
+L/LN/LNATION/Module-Generate-0.20.tar.gz

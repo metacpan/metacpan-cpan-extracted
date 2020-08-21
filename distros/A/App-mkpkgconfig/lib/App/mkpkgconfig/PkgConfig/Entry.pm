@@ -6,7 +6,7 @@ use warnings;
 
 use Syntax::Construct qw( non-destructive-subst );
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Regexp::Common 'balanced';
 
@@ -96,7 +96,7 @@ App::mkpkgconfig::PkgConfig::Entry - Base class for PkgConfig Keywords and Varia
 
 =head1 VERSION
 
-version v2.0.0
+version v2.0.1
 
 =head1 DESCRIPTION
 
