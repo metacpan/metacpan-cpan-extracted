@@ -1,9 +1,9 @@
 package Progress::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-10'; # DATE
+our $DATE = '2020-08-15'; # DATE
 our $DIST = 'Progress-Any'; # DIST
-our $VERSION = '0.218'; # VERSION
+our $VERSION = '0.219'; # VERSION
 
 use 5.010001;
 use strict;
@@ -399,6 +399,14 @@ sub update {
     my $message  = delete($args{message});
     my $priority = delete($args{priority}) // 'normal';
     my $force_update = delete($args{force_update});
+
+    my %other_args_for_output;
+    for (keys %args) {
+        if (/\Amessage\.alt\./) {
+            $other_args_for_output{$_} = delete $args{$_};
+        }
+    }
+
     die "Unknown argument(s) to update(): ".join(", ", keys(%args))
         if keys(%args);
 
@@ -426,6 +434,7 @@ sub update {
                         # the same update() when there are multiple instances of
                         # it
                         _update_id => $now,
+                        %other_args_for_output,
                     );
                     $output->{_mtime} = $now;
                     $output->{_pos}   = $pos;
@@ -602,7 +611,7 @@ Progress::Any - Record progress to any output
 
 =head1 VERSION
 
-This document describes version 0.218 of Progress::Any (from Perl distribution Progress-Any), released on 2020-07-10.
+This document describes version 0.219 of Progress::Any (from Perl distribution Progress-Any), released on 2020-08-15.
 
 =head1 SYNOPSIS
 

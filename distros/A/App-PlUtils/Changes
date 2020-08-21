@@ -1,3 +1,12 @@
+0.122   2020-04-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Perinci::CmdLine::POD to render a more
+          complete usage line of Perinci::CmdLine scripts in POD (now all
+          options are listed, not just '[options]').
+
+
 0.121   2019-10-17  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Simplify CLI scripts by turning off config/env reading.

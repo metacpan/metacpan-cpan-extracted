@@ -1,7 +1,9 @@
 package DateTime::Format::ISO8601::Format;
 
-our $DATE = '2018-06-24'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-21'; # DATE
+our $DIST = 'DateTime-Format-ISO8601-Format'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -112,7 +114,7 @@ DateTime::Format::ISO8601::Format - Format DateTime object as ISO8601 date/time 
 
 =head1 VERSION
 
-This document describes version 0.003 of DateTime::Format::ISO8601::Format (from Perl distribution DateTime-Format-ISO8601-Format), released on 2018-06-24.
+This document describes version 0.004 of DateTime::Format::ISO8601::Format (from Perl distribution DateTime-Format-ISO8601-Format), released on 2020-08-21.
 
 =head1 SYNOPSIS
 
@@ -173,10 +175,7 @@ Formatting date+time:
 =head1 DESCRIPTION
 
 This module formats L<DateTime> objects as ISO8601 date/time strings. It
-supplies the formatting functionality "missing from"
-L<DateTime::Format::ISO8601>. I have suggested that the formatting functionality
-is included in the latter module (see
-L<https://rt.cpan.org/Ticket/Display.html?id=125660>).
+complements L<DateTime::Format::ISO8601>.
 
 =head1 ATTRIBUTES
 
@@ -256,7 +255,12 @@ feature.
 
 =head1 SEE ALSO
 
-L<DateTime::Format::ISO8601>
+L<DateTime::Format::ISO8601>. Before v0.12, DateTime::Format::ISO8601 does not
+feature a C<format_datetime()> method, so DateTime::Format::ISO8601::Format
+supplies that functionality. After v0.12, DateTime::Format::ISO8601 already has
+C<format_datetime()>, but currently DateTime::Format::ISO8601::Format's version
+is faster and there's C<format_date> and C<format_time> as well. So I'm keeping
+this module for now.
 
 L<DateTime::Format::Duration::ISO8601> to parse and format ISO8601 durations.
 
@@ -266,7 +270,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

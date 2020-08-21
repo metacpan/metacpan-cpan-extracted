@@ -2,7 +2,22 @@ Major changes for Perl module version
 
 This is not a complete list of changes.  See repository for full details:
 
-    https://github.com/JohnPeacock/version.pm.git
+    https://github.com/Perl/version.pm
+
+0.9927
+  * Released 0.99_26 as 0.9927
+
+0.99_26
+  * Add usage error to pure-perl vcmp
+  * Quote version classname in test for 5.8 compatability
+  * Use base instead of parent for tests
+  * Update ppport.h for future compatibility
+
+0.99_25
+  * Fix stack usage in vcmp method
+  * Drop Perl 5.5 compatibility
+  * Use PERL_VERSION_GE for Perl 7 compatibility
+  * Fix typo in pod example for comparing versions.
 
 0.9924 - 2018-04-19
   * Revise CPAN metadata to advertise correct repo

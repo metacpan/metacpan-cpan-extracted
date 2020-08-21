@@ -34,10 +34,10 @@ resources:
   bugtracker: https://github.com/rjbs/CPAN-Uploader/issues
   homepage: https://github.com/rjbs/CPAN-Uploader
   repository: https://github.com/rjbs/CPAN-Uploader.git
-version: '0.103014'
+version: '0.103015'
 x_Dist_Zilla:
   perl:
-    version: '5.030002'
+    version: '5.032000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -181,7 +181,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@RJBS/Test::ReportPrereqs'
-      version: '0.027'
+      version: '0.028'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -324,7 +324,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.103014'
+          tag: '0.103015'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -436,6 +436,6 @@ x_contributors:
   - 'sungo <sungo@sungo.us>'
   - 'Torsten Raudssus <github@raudssus.de>'
   - 'Vincent Pit <perl@profvince.com>'
-x_generated_by_perl: v5.30.2
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

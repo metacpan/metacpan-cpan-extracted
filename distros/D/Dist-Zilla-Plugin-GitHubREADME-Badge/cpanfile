@@ -1,4 +1,4 @@
-requires 'perl', '5.0014';
+requires 'perl', '5.014';
 requires 'Dist::Zilla';
 requires 'Path::Tiny';
 requires 'Moose';

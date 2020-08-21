@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/FileMoveUtils.pm','lib/App/FileRenameUtils.pm','script/move-files-here','script/rename-swap'];
+my $filenames = ['lib/App/FileMoveUtils.pm','lib/App/FileRenameUtils.pm','script/move-files-here','script/mv-reverse','script/rename-swap','script/rename-to-from'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

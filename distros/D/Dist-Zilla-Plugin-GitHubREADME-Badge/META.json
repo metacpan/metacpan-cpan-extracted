@@ -43,7 +43,7 @@
             "Moose::Util::TypeConstraints" : "0",
             "Path::Tiny" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.0014"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -57,7 +57,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::GitHubREADME::Badge" : {
          "file" : "lib/Dist/Zilla/Plugin/GitHubREADME/Badge.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       }
    },
    "release_status" : "stable",
@@ -72,10 +72,11 @@
          "web" : "https://github.com/fayland/perl-Dist-Zilla-Plugin-GitHubREADME-Badge"
       }
    },
-   "version" : "0.31",
+   "version" : "0.32",
    "x_contributors" : [
       "Alex Efros <powerman@powerman.name>",
       "Chase Whitener <cwhitener@gmail.com>",
+      "James Raspass <jraspass@gmail.com>",
       "Nikolay Mishin <mi@ya.ru>",
       "Olaf Alders <olaf@wundersolutions.com>",
       "Paul Cochrane <paul@liekut.de>",

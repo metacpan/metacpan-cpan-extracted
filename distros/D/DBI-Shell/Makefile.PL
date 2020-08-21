@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.004;
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/dbish"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.004",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "DBI::Shell",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => "2.17",
     "Test::More" => 0
   },
-  "VERSION" => "11.96",
+  "VERSION" => "11.97",
   "test" => {
     "TESTS" => "t/*.t"
   }

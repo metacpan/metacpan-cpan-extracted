@@ -13,6 +13,8 @@ use strict;
 
 package DBI::Format::CSV;
 
+our $VERSION = '11.97'; # VERSION
+
 @DBI::Format::CSV::ISA = qw(DBI::Format::Base);
 
 use Text::Abbrev;
@@ -20,12 +22,10 @@ use Text::Reform qw(form break_with);
 use Text::CSV_XS;
 
 sub header {
-    my($self, $sth, $fh, $sep) = @_;
-    $self->{'fh'} = $self->setup_fh($fh);
-    $self->{'sth'} = $sth;
+    my ($self, $sth, $fh, $sep) = @_;
+	$self->SUPER::header($sth, $fh, $sep);
     $self->{'data'} = [];
     $self->{'formats'} = [];
-    $self->{sep} = $sep if defined $sep;
 
 	$self->{csv_obj} = Text::CSV_XS->new({
 			binary			=> 1,
@@ -43,32 +43,17 @@ sub header {
 sub row {
     my($self, $orig_row) = @_;
     my $i = 0;
-    my @row = @$orig_row; # don't mess with the original row
+    my @row = $self->SUPER::row([@$orig_row]); # don't alter original
 
-# default value for null, is blank.
-	my $null = $self->{'null'} || '';
 	my $columns = $self->{'columns'};
-
 	my $breaks	= $self->{'breaks'};
-
-    map {
-		if (!defined($_)) {
-			$_ = $null;
-		} else {
-			$_ =~ s/\n/\\n/g;
-			$_ =~ s/\t/\\t/g;
-			$_ =~ s/\r/\\r/g;
-			$_ =~ s/[\000-\037\177-\237]/./g;
-		}
-		++$i;
-    } @row;
 
     my $fh = $self->{'fh'};
 	my $csv = $self->{csv_obj};
 	my $status = $csv->print($fh, \@row);
 	$fh->print( "\n" );
 
-return ++$self->{rows};
+    return ++$self->{rows};
 }
 
 

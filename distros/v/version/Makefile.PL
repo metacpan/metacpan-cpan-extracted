@@ -49,10 +49,10 @@ sub write_makefile
     my %test_prereq = (
         'Test::More'            => 0.45,
         'File::Temp'            => 0.13,
-        'parent'                => 0.221,
+        'base'                  => 0,
     );
 
-    WriteMakefile( VERSION         => '0.9924',
+    WriteMakefile( VERSION         => '0.9927',
                    NAME            => 'version',
                    LICENSE         => 'perl',
                    MIN_PERL_VERSION=> 5.006002,
@@ -96,8 +96,8 @@ sub write_makefile
                        resources => {
                            repository => {
                                type => 'git',
-                               url => 'git://github.com/JohnPeacock/version.pm.git',
-                               web  => 'http://github.com/JohnPeacock/version.pm',
+                               url => 'git://github.com/Perl/version.pm.git',
+                               web  => 'https://github.com/Perl/version.pm',
                            },
                            bugtracker => {
                                web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=version',

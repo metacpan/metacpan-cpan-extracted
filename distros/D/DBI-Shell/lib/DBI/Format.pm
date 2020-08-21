@@ -22,6 +22,8 @@ use strict;
 
 package DBI::Format;
 
+our $VERSION = '11.97'; # VERSION
+
 use Text::Abbrev;
 
 sub available_formatters {
@@ -80,11 +82,106 @@ package DBI::Format::Base;
 
 use DBI qw(:sql_types);
 
+# DBI::Format::Foo objects are presently copies of the parent DBI::Shell
+# session hashref at the time of instantiation, and so are not aware of
+# `/option' updates to the parent thereafter.  Check the ->{parent} member
+# for any session-specific /option values.
+
 sub new {
     my $class = shift;
-    my $self = (@_ == 1) ? { %{shift()} } : { @_ };
+    my $self = (@_ == 1) ? { %{$_[0]}, parent => $_[0] } : { @_ };
     bless ($self, (ref($class) || $class));
     $self;
+}
+
+# Basic preparation for output, setting up 'fh', 'sth', 'rows' and possibly
+# 'sep' members.  Also caches SQL type information and sets up BOOLEAN
+# formatting, if needed.
+sub header {
+    my ($self, $sth, $fh, $sep) = @_;
+	my $types;
+
+    $self->{fh}   = $self->setup_fh($fh);
+    $self->{sth}  = $sth;
+    $self->{rows} = 0;
+    $self->{sep}  = $sep if defined $sep;
+
+	$self->{__dbi_format_sql_types} = $types = $sth->{TYPE};
+
+	# Parent DBI::Shell session may have changed `/option bool_format'
+	# since the last query we formatted, so update our internal bool
+	# display data if needed.
+	for my $t (@$types) {
+		next unless $t == SQL_BOOLEAN;
+		$self->{__dbi_format_bool_alterns} =
+		    [ split(',', $self->{parent}->{bool_format}, 2) ];
+		last;
+	}
+
+	$self;
+}
+
+# $fmt->encode_value( $value_reference, $sql_type )
+#
+# Do not call directly.  This method is called by DBI::Format::Base::row.
+#
+# Apply output encoding to a single, textual representation of a field
+# value.  This method is called _after_ NULLs and BOOLEANs have been
+# stringified.
+#
+# Base implementation escapes \n, \t and \r and translates ASCII
+# non-printables without regard to $sql_type (SQL_NUMERIC, SQL_VARCHAR,
+# etc.).  This is *not* ``safe'' for all terminals in all locales --
+# the default is merely simple encoding.
+#
+# Subclasses may override to URI- or XML-encode certain data, for example.
+#
+
+sub encode_value {
+	my ($self, $value_ref, $sql_type) = @_;
+
+	for ($$value_ref) {
+		last unless defined;
+		s/\n/\\n/g;
+		s/\t/\\t/g;
+		s/\r/\\r/g;
+		s/[\000-\037\177-\237]/./g;
+	}
+}
+
+# $fmt->row( $row_ref )
+#
+# Basic preparation of row data, responsible for formatting NULLs and
+# BOOLEANs according to `/option' values, and calling encode_value() on
+# fields.  As a convenience, also increments $fmt->{rows}.
+#
+# All subclasses should call this function from their overridden row()
+# methods.
+#
+# Note that row() modifies its argument in place, so $row_ref should be
+# a _copy_ of the (presumptively read-only) row from the active $sth.
+#
+sub row {
+    my ($self, $row) = @_;
+
+	my $i = 0;
+	for my $value (@$row) {
+        unless (defined $value) {
+            $value = $self->{parent}->{null_format};
+        }
+
+		my $sql_type = $self->{__dbi_format_sql_types}->[$i];
+		if ($sql_type == SQL_BOOLEAN) {
+            $value = $self->{__dbi_format_bool_alterns}->[ $value ? 0 : 1 ];
+        }
+
+		$self->encode_value(\$value, $sql_type);
+    } continue {
+        $i++;
+	}
+
+	$self->{rows}++;
+    return wantarray ? @$row : $row;
 }
 
 sub setup_fh {
@@ -144,29 +241,16 @@ package DBI::Format::Neat;
 @DBI::Format::Neat::ISA = qw(DBI::Format::Base);
 
 sub header {
-    my($self, $sth, $fh, $sep) = @_;
-    $self->{'fh'} = $fh = $self->setup_fh($fh);
-    $self->{'sth'} = $sth;
-    $self->{'rows'} = 0;
-    $self->{sep} = $sep if defined $sep;
-    print $fh (join($self->{sep}, @{$sth->{'NAME'}}), "\n");
+    my ($self, $sth, $fh, $sep) = @_;
+	$self->SUPER::header($sth, $fh, $sep);
+    print {$self->{fh}} (join($self->{sep}, @{$sth->{'NAME'}}), "\n");
 }
 
 sub row {
     my($self, $rowref) = @_;
-    my @row = @$rowref;
-    # XXX note that neat/neat_list output is *not* ``safe''
-    # in the sense the it does not escape any chars and
-    # may truncate the string and may translate non-printable chars.
-    # We only deal with simple escaping here.
-    foreach(@row) {
-	next unless defined;
-	s/'/\\'/g;
-	s/\n/ /g;
-    }
+    my @row = $self->SUPER::row([@$rowref]);
     my $fh = $self->{'fh'};
     print $fh (DBI::neat_list(\@row, 9999, $self->{sep}),"\n");
-    ++$self->{'rows'};
 }
 
 
@@ -179,10 +263,7 @@ use DBI qw(:sql_types);
 
 sub header {
     my($self, $sth, $fh, $sep) = @_;
-    $self->{'fh'} = $fh = $self->setup_fh($fh);
-    $self->{'sth'} = $sth;
-    $self->{'data'} = [];
-    $self->{sep} = $sep if defined $sep;
+	$self->SUPER::header($sth, $fh, $sep);
     my $types = $sth->{'TYPE'};
     my @right_justify;
     my @widths;
@@ -211,20 +292,13 @@ sub row {
     my $i = 0;
     my $col;
     my $widths = $self->{'widths'};
-    my @row = @$orig_row; # don't mess with the original row
-    map {
-	if (!defined($_)) {
-	    $_ = ' (NULL) ';
-	} else {
-	    $_ =~ s/\n/\\n/g;
-	    $_ =~ s/\t/\\t/g;
-	    $_ =~ s/[\000-\037\177-\237]/./g;
-	}
-	if (length($_) > $widths->[$i]) {
-	    $widths->[$i] = length($_);
-	}
-	++$i;
-    } @row;
+	my @row = $self->SUPER::row([@$orig_row]); # don't mess with the original row
+    for (@row) {
+        if (length > $widths->[$i]) {
+            $widths->[$i] = length;
+        }
+        ++$i;
+    }
     push @{$self->{data}}, \@row;
 }
 
@@ -270,11 +344,8 @@ use DBI qw(:sql_types);
 @DBI::Format::PartBox::ISA = qw(DBI::Format::Base);
 
 sub header {
-    my($self, $sth, $fh, $sep) = @_;
-    $self->{'fh'} = $fh = $self->setup_fh($fh);
-    $self->{'sth'} = $sth;
-    $self->{'data'} = [];
-    $self->{sep} = $sep if defined $sep;
+    my ($self, $sth, $fh, $sep) = @_;
+	$self->SUPER::header($sth, $fh, $sep);
     my $types = $sth->{'TYPE'};
     my @right_justify;
     my @widths;
@@ -302,20 +373,13 @@ sub row {
     my $i = 0;
     my $col;
     my $widths = $self->{'widths'};
-    my @row = @$orig_row; # don't mess with the original row
-    map {
-	if (!defined($_)) {
-	    $_ = ' (NULL) ';
-	} else {
-	    $_ =~ s/\n/\\n/g;
-	    $_ =~ s/\t/\\t/g;
-	    $_ =~ s/[\000-\037\177-\237]/./g;
-	}
-	if (length($_) > $widths->[$i]) {
-	    $widths->[$i] = length($_);
-	}
-	++$i;
-    } @row;
+    my @row = $self->SUPER::row([@$orig_row]); # don't mess with the original row
+    for (@row) {
+        if (length > $widths->[$i]) {
+            $widths->[$i] = length;
+        }
+        ++$i;
+    }
     push @{$self->{data}}, \@row;
 }
 
@@ -360,12 +424,9 @@ package DBI::Format::Raw;
 @DBI::Format::Raw::ISA = qw(DBI::Format::Base);
 
 sub header {
-    my($self, $sth, $fh, $sep) = @_;
-    $self->{'fh'} = $fh = $self->setup_fh($fh);
-    $self->{'sth'} = $sth;
-    $self->{'rows'} = 0;
-    $self->{sep} = $sep if defined $sep;
-    print $fh (join($self->{sep}, @{$sth->{'NAME'}}), "\n");
+    my ($self, $sth, $fh, $sep) = @_;
+	$self->SUPER::header($sth, $fh, $sep);
+    print {$self->{fh}} (join($self->{sep}, @{$sth->{'NAME'}}), "\n");
 }
 
 sub row {
@@ -374,7 +435,6 @@ sub row {
     my @row = @$rowref;
 	my $fh = $self->{'fh'};
 	print $fh (join($self->{sep}, @row), "\n");
-    ++$self->{'rows'};
 }
 
 package DBI::Format::String;
@@ -382,11 +442,8 @@ package DBI::Format::String;
 @DBI::Format::String::ISA = qw(DBI::Format::Base);
 
 sub header {
-    my($self, $sth, $fh, $sep) = @_;
-    $self->{'fh'} = $fh = $self->setup_fh($fh);
-    $self->{'sth'} = $sth;
-    $self->{'data'} = [];
-    $self->{sep} = $sep if defined $sep;
+    my ($self, $sth, $fh, $sep) = @_;
+	$self->SUPER::header($sth, $fh, $sep);
     my $types = $sth->{'TYPE'};
     my @right_justify;
     my @widths;
@@ -408,11 +465,11 @@ sub header {
 		);
     	my $format_names;
 		$format_names .= sprintf("%%-%ds ", $widths[$i]);
-    	print $fh (sprintf($format_names, $names->[$i]));
+    	print {$self->{fh}} (sprintf($format_names, $names->[$i]));
     }
     $self->{'widths'} = \@widths;
     $self->{'right_justify'} = \@right_justify;
-    print $fh "\n";
+    print {$self->{fh}} "\n";
 
 }
 
@@ -423,20 +480,9 @@ sub row {
     my $col;
     my $widths = $self->{'widths'};
     my $right_justify = $self->{'right_justify'};
-    my @row = @$orig_row; # don't mess with the original row
-    map {
-	if (!defined($_)) {
-	    $_ = ' (NULL) ';
-	} else {
-	    $_ =~ s/\n/\\n/g;
-	    $_ =~ s/\t/\\t/g;
-	    $_ =~ s/[\000-\037\177-\237]/./g;
-	}
-	++$i;
-    } @row;
+    my @row = $self->SUPER::row([@$orig_row]); # don't mess with the original row
 
     my $sth  = $self->{'sth'};
-    my $data = $self->{'data'};
     my $format_rows  = ' ';
     for (my $i = 0;  $i < $sth->{'NUM_OF_FIELDS'};  $i++) {
 	$format_rows  .= sprintf("%%"
@@ -447,7 +493,6 @@ sub row {
 
     my $fh = $self->{'fh'};
     print $fh (sprintf($format_rows, @row));
-    ++$self->{'rows'};
 }
 
 
@@ -464,8 +509,7 @@ package DBI::Format::HTML;
 
 sub header {
     my($self, $sth, $fh) = @_;
-    $self->{'fh'} = $fh = $self->setup_fh($fh);
-    $self->{'sth'} = $sth;
+	$self->SUPER::header($sth, $fh);
     $self->{'data'} = [];
     my $types = $sth->{'TYPE'};
     my @right_justify;
@@ -495,20 +539,13 @@ sub row {
     my $i = 0;
     my $col;
     my $widths = $self->{'widths'};
-    my @row = @$orig_row; # don't mess with the original row
-    map {
-	if (!defined($_)) {
-	    $_ = ' (NULL) ';
-	} else {
-	    $_ =~ s/\n/\\n/g;
-	    $_ =~ s/\t/\\t/g;
-	    $_ =~ s/[\000-\037\177-\237]/./g;
-	}
-	if (length($_) > $widths->[$i]) {
-	    $widths->[$i] = length($_);
-	}
-	++$i;
-    } @row;
+    my @row = $self->SUPER::row([@$orig_row]); # don't mess with the original row
+    for (@row) {
+        if (length($_) > $widths->[$i]) {
+            $widths->[$i] = length($_);
+        }
+        ++$i;
+    }
     push @{$self->{data}}, \@row;
 }
 

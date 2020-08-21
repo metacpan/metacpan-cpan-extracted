@@ -27,16 +27,27 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.48"
          }
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "8.58"
+            "Mojolicious" : "8.58",
+            "perl" : "5.02"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://framagit.org/luc/mojolicious-plugin-coverdb/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://framagit.org/luc/mojolicious-plugin-coverdb.git",
+         "web" : "https://framagit.org/luc/mojolicious-plugin-coverdb"
+      }
+   },
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

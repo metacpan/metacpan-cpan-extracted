@@ -1,9 +1,9 @@
 package App::VivaldiUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-08-18'; # DATE
 our $DIST = 'App-VivaldiUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -158,7 +158,7 @@ App::VivaldiUtils - Utilities related to the Vivaldi browser
 
 =head1 VERSION
 
-This document describes version 0.007 of App::VivaldiUtils (from Perl distribution App-VivaldiUtils), released on 2020-06-13.
+This document describes version 0.008 of App::VivaldiUtils (from Perl distribution App-VivaldiUtils), released on 2020-08-18.
 
 =head1 SYNOPSIS
 

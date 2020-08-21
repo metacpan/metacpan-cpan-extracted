@@ -17,6 +17,15 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: DBI-Shell
+recommends:
+  Benchmark: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  IO::File: '0'
+  Term::ReadKey: '0'
+  Term::Readline::Perl5: '0'
+  Text::ParseWords: '0'
+  Text::Wrap: '0'
 requires:
   Carp: '0'
   DBI: '0'
@@ -30,12 +39,15 @@ requires:
   Text::Abbrev: '0'
   Text::CSV_XS: '0'
   Text::Reform: '0'
-  perl: '5.004'
+  perl: '5.006'
 resources:
   repository: https://repo.or.cz/perl-DBI-Shell.git
-version: '11.96'
+version: '11.97'
 x_contributors:
+  - 'Tim Bunce <timb@cpan.org>'
+  - 'Andreas König <andk@cpan.org>'
   - 'Kent Fredric <kentnl@cpan.org>'
   - 'Rafael Kitover <rkitover@cpan.org>'
   - 'Dave Lambley <dlambley@cpan.org>'
+  - 'Mike Pomraning <mjp@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

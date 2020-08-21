@@ -533,7 +533,7 @@ Perl_new_version(pTHX_ SV *ver)
 	    under = ninstr(raw, raw+len, underscore, underscore + 1);
 	    if (under) {
 		Move(under + 1, under, raw + len - under - 1, char);
-		SvCUR(rv)--;
+		SvCUR_set(rv, SvCUR(rv) - 1);
 		*SvEND(rv) = '\0';
 	    }
 	    /* this is for consistency with the pure Perl class */
@@ -638,6 +638,8 @@ VER_NV:
             if (   strNE(locale_name_on_entry, "C")
                 && strNE(locale_name_on_entry, "POSIX"))
             {
+                /* the setlocale() call might free or overwrite the name */
+                locale_name_on_entry = savepv(locale_name_on_entry);
                 setlocale(LC_NUMERIC, "C");
             }
             else {  /* This value indicates to the restore code that we didn't
@@ -661,6 +663,8 @@ VER_NV:
                 if (   strNE(locale_name_on_entry, "C")
                     && strNE(locale_name_on_entry, "POSIX"))
                 {
+                    /* the setlocale() call might free or overwrite the name */
+                    locale_name_on_entry = savepv(locale_name_on_entry);
                     setlocale(LC_NUMERIC, "C");
                 }
                 else {  /* This value indicates to the restore code that we
@@ -693,7 +697,7 @@ VER_NV:
 #endif
 
 	if (sv) {
-                Perl_sv_catpvf(aTHX_ sv, "%.9" NVff, SvNVX(ver));
+                Perl_sv_setpvf(aTHX_ sv, "%.9" NVff, SvNVX(ver));
 	    len = SvCUR(sv);
 	    buf = SvPVX(sv);
 	}
@@ -710,6 +714,7 @@ VER_NV:
 
             if (locale_name_on_entry) {
                 setlocale(LC_NUMERIC, locale_name_on_entry);
+                Safefree(locale_name_on_entry);
             }
 
             LC_NUMERIC_UNLOCK;  /* End critical section */
@@ -718,6 +723,7 @@ VER_NV:
 
             if (locale_name_on_entry) {
                 setlocale(LC_NUMERIC, locale_name_on_entry);
+                Safefree(locale_name_on_entry);
                 LC_NUMERIC_UNLOCK;
             }
             else if (locale_obj_on_entry == PL_underlying_numeric_obj) {
@@ -753,7 +759,6 @@ VER_PV:
 	version = savepvn(SvPV(ver,len), SvCUR(ver));
 	SAVEFREEPV(version);
 #ifndef SvVOK
-#  if PERL_VERSION > 5
 	/* This will only be executed for 5.6.0 - 5.8.0 inclusive */
 	if ( len >= 3 && !instr(version,".") && !instr(version,"_")) {
 	    /* may be a v-string */
@@ -786,7 +791,6 @@ VER_PV:
 		}
 	    }
 	}
-#  endif
 #endif
     }
 #if PERL_VERSION_LT(5,17,2)

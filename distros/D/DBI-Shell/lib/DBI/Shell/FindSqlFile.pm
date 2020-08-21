@@ -2,6 +2,8 @@
 
 package DBI::Shell::FindSqlFile;
 
+our $VERSION = '11.97'; # VERSION
+
 use strict;
 use File::Find ();
 use File::Basename;

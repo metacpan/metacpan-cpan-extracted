@@ -3,9 +3,9 @@ NAME
     date/time string
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     DateTime::Format::ISO8601::Format (from Perl distribution
-    DateTime-Format-ISO8601-Format), released on 2018-06-24.
+    DateTime-Format-ISO8601-Format), released on 2020-08-21.
 
 SYNOPSIS
      use DateTime::Format::ISO8601::Format;
@@ -64,10 +64,7 @@ SYNOPSIS
 
 DESCRIPTION
     This module formats DateTime objects as ISO8601 date/time strings. It
-    supplies the formatting functionality "missing from"
-    DateTime::Format::ISO8601. I have suggested that the formatting
-    functionality is included in the latter module (see
-    <https://rt.cpan.org/Ticket/Display.html?id=125660>).
+    complements DateTime::Format::ISO8601.
 
 ATTRIBUTES
   time_zone
@@ -139,7 +136,13 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    DateTime::Format::ISO8601
+    DateTime::Format::ISO8601. Before v0.12, DateTime::Format::ISO8601 does
+    not feature a "format_datetime()" method, so
+    DateTime::Format::ISO8601::Format supplies that functionality. After
+    v0.12, DateTime::Format::ISO8601 already has "format_datetime()", but
+    currently DateTime::Format::ISO8601::Format's version is faster and
+    there's "format_date" and "format_time" as well. So I'm keeping this
+    module for now.
 
     DateTime::Format::Duration::ISO8601 to parse and format ISO8601
     durations.
@@ -148,7 +151,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

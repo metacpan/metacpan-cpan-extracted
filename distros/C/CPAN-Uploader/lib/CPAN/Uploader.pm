@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package CPAN::Uploader;
 # ABSTRACT: upload things to the CPAN
-$CPAN::Uploader::VERSION = '0.103014';
+$CPAN::Uploader::VERSION = '0.103015';
 #pod =head1 ORIGIN
 #pod
 #pod This code is mostly derived from C<cpan-upload-http> by Brad Fitzpatrick, which
@@ -68,7 +68,8 @@ sub upload_file {
       . '$file: ' . Data::Dumper::Dumper($file)
     );
   } else {
-    my $tries = ($self->{retries} > 0) ? $self->{retries} + 1 : 1;
+    my $retries = $self->{retries} || 0;
+    my $tries = ($retries > 0) ? $retries + 1 : 1;
 
     TRY: for my $try (1 .. $tries) {
       last TRY if eval { $self->_upload($file); 1 };
@@ -298,7 +299,7 @@ CPAN::Uploader - upload things to the CPAN
 
 =head1 VERSION
 
-version 0.103014
+version 0.103015
 
 =head1 METHODS
 

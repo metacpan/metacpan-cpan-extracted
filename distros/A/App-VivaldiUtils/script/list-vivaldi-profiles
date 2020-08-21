@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Vivaldi/Util/Profile/list_vivaldi_profiles
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-08-18'; # DATE
 our $DIST = 'App-VivaldiUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ list-vivaldi-profiles - List available Vivaldi profiles
 
 =head1 VERSION
 
-This document describes version 0.007 of list-vivaldi-profiles (from Perl distribution App-VivaldiUtils), released on 2020-06-13.
+This document describes version 0.008 of list-vivaldi-profiles (from Perl distribution App-VivaldiUtils), released on 2020-08-18.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,6 @@ Usage:
  % list-vivaldi-profiles [--debug] [--detail] [--format=name] [--json] [-l]
      [--log-level=level] [--(no)naked-res] [--no-detail] [--nodetail]
      [--page-result[=program]] [--quiet] [--trace] [--verbose]
-     [--view-result[=program]]
 
 =head1 DESCRIPTION
 
@@ -133,10 +132,6 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
-
-=item B<--view-result>
-
-View output using a viewer.
 
 =back
 

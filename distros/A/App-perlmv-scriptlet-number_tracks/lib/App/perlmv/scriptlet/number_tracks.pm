@@ -3,7 +3,7 @@ package App::perlmv::scriptlet::number_tracks;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-08-04'; # DATE
 our $DIST = 'App-perlmv-scriptlet-number_tracks'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -84,7 +84,7 @@ App::perlmv::scriptlet::number_tracks - Add track number to filenames
 
 =head1 VERSION
 
-This document describes version 0.002 of App::perlmv::scriptlet::number_tracks (from Perl distribution App-perlmv-scriptlet-number_tracks), released on 2020-08-04.
+This document describes version 0.003 of App::perlmv::scriptlet::number_tracks (from Perl distribution App-perlmv-scriptlet-number_tracks), released on 2020-08-04.
 
 =head1 SYNOPSIS
 
@@ -120,6 +120,14 @@ The resulting files:
 
 This scriptlet uses L<Text::Similarity::Overlaps> to match filename with track
 name. It then adds the resulting track number as filename's prefix.
+
+=head1 SCRIPTLET ARGUMENTS
+
+Arguments can be passed using the C<-a> (C<--arg>) L<perlmv> option, e.g. C<< -a name=val >>.
+
+=head2 listing_file
+
+Required. File that contains track listing. 
 
 =head1 HOMEPAGE
 

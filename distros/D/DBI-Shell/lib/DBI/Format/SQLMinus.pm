@@ -18,6 +18,8 @@ use strict;
 
 package DBI::Format::SQLMinus;
 
+our $VERSION = '11.97'; # VERSION
+
 @DBI::Format::SQLMinus::ISA = qw(DBI::Format::Base);
 
 use Text::Abbrev;
@@ -26,12 +28,10 @@ use Text::Reform qw(form break_with);
 use Data::Dumper;
 
 sub header {
-    my($self, $sth, $fh, $sep) = @_;
-    $self->{'fh'} = $self->setup_fh($fh);
-    $self->{'sth'} = $sth;
+    my ($self, $sth, $fh, $sep) = @_;
+	$self->SUPER::header($sth, $fh, $sep);
     $self->{'data'} = [];
     $self->{'formats'} = [];
-    $self->{sep} = $sep if defined $sep;
 	#
 	# determine default behavior based either on the setting in
 	# sqlminus, or pre-defined defaults.  Without sqlminus loaded,
@@ -61,7 +61,6 @@ sub header {
 
 	$self->{feedback}	= $set->{feedback};
 	$self->{limit}		= $set->{limit};
-	$self->{null}       = $set->{null};
 	$self->{pagesize}	= $set->{pagesize};
 	$self->{recsepchar}	= $set->{recsepchar};
 	$self->{recsep}		= $set->{recsep};
@@ -151,6 +150,7 @@ sub header {
 
 				if ( exists $cf->{format} and defined $cf->{format} ) {
 					$format_names = $cf->{format};
+					no warnings 'redundant';
 					$width = length sprintf( $format_names, " " );
 				}
 
@@ -291,25 +291,11 @@ sub re_headers {
 sub row {
     my($self, $orig_row) = @_;
     my $i = 0;
-    my @row = @$orig_row; # don't mess with the original row
+    my @row = $self->SUPER::row([@$orig_row]); # don't alter original
 
-# default value for null, is blank.
-	my $null = $self->{'null'} || '';
 	my $columns = $self->{'columns'};
 
 	my $breaks	= $self->{'breaks'};
-
-    map {
-		if (!defined($_)) {
-			$_ = $null;
-		} else {
-			$_ =~ s/\n/\\n/g;
-			$_ =~ s/\t/\\t/g;
-			$_ =~ s/\r/\\r/g;
-			$_ =~ s/[\000-\037\177-\237]/./g;
-		}
-		++$i;
-    } @row;
 
     my $format_rows  = ${$self->{'formats'}};
 

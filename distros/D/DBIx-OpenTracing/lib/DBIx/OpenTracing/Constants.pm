@@ -5,14 +5,27 @@ use parent 'Exporter';
 use Package::Constants;
 
 use constant {
-    DB_TAG_TYPE   => 'db.type',
-    DB_TAG_SQL    => 'db.statement',
-    DB_TAG_BIND   => 'db.statement.bind',
-    DB_TAG_USER   => 'db.user',
-    DB_TAG_DBNAME => 'db.instance',
-    DB_TAG_ROWS   => 'db.rows',
+    DB_TAG_TYPE           => 'db.type',
+    DB_TAG_SQL            => 'db.statement',
+    DB_TAG_SQL_SUMMARY    => 'db.statement_summary',
+    DB_TAG_BIND           => 'db.bind_values',
+    DB_TAG_USER           => 'db.user',
+    DB_TAG_DBNAME         => 'db.instance',
+    DB_TAG_ROWS           => 'db.rows',
+    DB_TAG_CALLER_SUB     => 'caller.subname',
+    DB_TAG_CALLER_FILE    => 'caller.file',
+    DB_TAG_CALLER_LINE    => 'caller.line',
+    DB_TAG_CALLER_PACKAGE => 'caller.package',
 };
-use constant DB_TAGS_ALL => map { no strict 'refs'; &$_ } Package::Constants->list(__PACKAGE__);
+
+use constant DB_TAGS_ALL => (
+    DB_TAG_TYPE,
+    DB_TAG_SQL,         DB_TAG_SQL_SUMMARY,
+    DB_TAG_BIND,        DB_TAG_USER,
+    DB_TAG_DBNAME,      DB_TAG_ROWS,
+    DB_TAG_CALLER_SUB,  DB_TAG_CALLER_FILE,
+    DB_TAG_CALLER_LINE, DB_TAG_CALLER_PACKAGE,
+);
 
 our @EXPORT_OK   = Package::Constants->list(__PACKAGE__);
 our %EXPORT_TAGS = (ALL => \@EXPORT_OK);

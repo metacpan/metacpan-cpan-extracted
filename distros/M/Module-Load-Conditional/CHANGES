@@ -1,3 +1,7 @@
+0.74    Fri Aug 21 09:06:21 BST 2020
+
+* strictify the test suite packages
+
 0.72    Thu 25 Jun 08:21:16 BST 2020
 
 * Avoid using indirect calls

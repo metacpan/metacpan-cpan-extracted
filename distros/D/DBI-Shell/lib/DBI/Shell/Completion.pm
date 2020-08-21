@@ -1,6 +1,8 @@
 package DBI::Shell::Completion;
 # vim:ts=4:sw=4:ai:aw:nowrapscan
 
+our $VERSION = '11.97'; # VERSION
+
 use strict;
 use Carp;
 

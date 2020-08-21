@@ -1,0 +1,79 @@
+---
+abstract: 'create pkg-config metadata files'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Const::Fast: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  perl: '5.013002'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.013002'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-mkpkgconfig
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  App::mkpkgconfig:
+    file: lib/App/mkpkgconfig.pm
+    version: v2.0.0
+  App::mkpkgconfig::PkgConfig:
+    file: lib/App/mkpkgconfig/PkgConfig.pm
+    version: v2.0.0
+  App::mkpkgconfig::PkgConfig::Entry:
+    file: lib/App/mkpkgconfig/PkgConfig/Entry.pm
+    version: v2.0.0
+  App::mkpkgconfig::PkgConfig::Entry::Keyword:
+    file: lib/App/mkpkgconfig/PkgConfig/Entry.pm
+    version: v2.0.0
+  App::mkpkgconfig::PkgConfig::Entry::Variable:
+    file: lib/App/mkpkgconfig/PkgConfig/Entry.pm
+    version: v2.0.0
+requires:
+  Algorithm::Dependency::Ordered: '0'
+  Algorithm::Dependency::Source::HoA: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  Getopt::Long::Descriptive: '0'
+  Hash::Ordered: '0'
+  IO::File: '0'
+  IO::Handle: '0'
+  List::Util: '0'
+  Moo: '0'
+  Pod::Usage: '0'
+  Regexp::Common: '0'
+  Regexp::Common::balanced: '0'
+  Syntax::Construct: '0'
+  constant: '0'
+  namespace::clean: '0'
+  parent: '0'
+  perl: '5.013002'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-mkpkgconfig
+  repository: https://gitlab.com/djerius/app-mkpkgconfig.git
+version: v2.0.0
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-only

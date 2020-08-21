@@ -1,53 +1,52 @@
 {
    "abstract" : "solicit data from an external editor",
    "author" : [
-      "Jeremy Mates <jmates@cpan.org>"
+      "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "artistic_2"
+      "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Term-CallEditor",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
          "requires" : {
             "File::Temp" : "0.18",
             "IO::Handle" : "0",
-            "Test::More" : "0.72",
-            "perl" : "5.006"
+            "perl" : "5.008"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.72"
+         }
+      }
+   },
+   "provides" : {
+      "Term::CallEditor" : {
+         "file" : "lib/Term/CallEditor.pm",
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://github.com/thrig/Term-CallEditor",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "http://opensource.org/licenses/BSD-3-Clause"
       ],
       "repository" : {
-         "url" : "http://github.com/thrig/Term-CallEditor"
+         "url" : "https://github.com/thrig/Term-CallEditor"
       }
    },
-   "version" : "0.66"
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

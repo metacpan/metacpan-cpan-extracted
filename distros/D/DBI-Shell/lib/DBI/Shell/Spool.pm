@@ -3,6 +3,7 @@
 #
 package DBI::Shell::Spool;
 
+our $VERSION = '11.97'; # VERSION
 use strict;
 use vars qw(@ISA);
 

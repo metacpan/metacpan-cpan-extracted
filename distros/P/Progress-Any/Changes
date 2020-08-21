@@ -1,3 +1,8 @@
+0.219   2020-08-15  Released-By: PERLANCAR; Urgency: medium
+
+	- update(): Allow & pass message.* arguments.
+
+
 0.218   2020-07-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Pass _update_id to output, to allow an output module know that

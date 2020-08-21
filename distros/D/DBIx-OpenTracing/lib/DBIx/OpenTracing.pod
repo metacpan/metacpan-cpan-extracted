@@ -8,7 +8,7 @@ DBIx::OpenTracing - automatically create OpenTracing spans around DBI queries
 
 =head1 VERSION
 
-v0.0.2
+v0.0.8
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,9 @@ L<OpenTracing conventions|https://opentracing.io/specification/conventions/>:
 
 =item * db.user - the user associated with the handle (not always available)
 
-=item * db.statement - the query SQL
+=item * db.statement - the query SQL (with comments removed)
+
+=item * db.statement_summary - the statement type and main affected table, for ex. "SELECT: users"
 
 =item * db.rows - the number of rows affected (not always available)
 

@@ -5,6 +5,8 @@
 
 package DBI::Shell::SQLMinus;
 
+our $VERSION = '11.97'; # VERSION
+
 use strict;
 use Text::Abbrev ();
 use Text::ParseWords;

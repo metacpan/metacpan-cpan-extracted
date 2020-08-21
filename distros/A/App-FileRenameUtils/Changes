@@ -1,3 +1,13 @@
+0.005   2020-08-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add mv-reverse as alias to rename-to-from.
+
+
+0.004   2020-08-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Add script: rename-to-from.
+
+
 0.003   2020-05-30  Released-By: PERLANCAR; Urgency: medium
 
         - Rename distro from App-RenameUtils to App-FileRenameUtils to be more

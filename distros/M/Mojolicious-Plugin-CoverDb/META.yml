@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.48'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,5 +19,9 @@ no_index:
     - inc
 requires:
   Mojolicious: '8.58'
-version: '0.04'
+  perl: '5.02'
+resources:
+  bugtracker: https://framagit.org/luc/mojolicious-plugin-coverdb/issues
+  repository: https://framagit.org/luc/mojolicious-plugin-coverdb.git
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

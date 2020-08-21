@@ -1,0 +1,80 @@
+mkpkgconfig
+
+mkpkgconfig creates a pkg-config metadata (".pc") file. pkg-config
+variables and keywords are defined on the command line, variable
+dependencies are validated, and the configuration file is output.
+"Standard" variables (such as $libdir, $datadir) may be automatically
+created, and only variables which are used are output.
+
+  Variables and Keywords
+
+pkg-config distinguishes between *variables* and *keywords*. Values for
+both may include interpolated variables, as in "Cflags: -I ${include}".
+
+Some commonly used variables have dedicated command line options:
+
+  --prefix     : base prefix for paths
+  --package    : filesystem compatible package name
+  --modversion : package version
+
+("--modversion" sets the *version* variable; the "--version" flag will
+output the version of "mkpkgconfig").
+
+"--modversion" is required. "--prefix" and "--package" may be required
+if a keyword requires them or "--auto" is set and auto-generated
+variables require it.
+
+Common keywords also have dedicated options:
+
+  --Name
+  --Conflicts
+  --Description
+  --Requires
+  --Libs
+  --Cflags
+  --URL
+
+The "--Name" and "--Description" options are required. The "Version"
+keyword is automatically set to "${version}". It is not possible to set
+it directly from the command line.
+
+Other variables and keywords may be specified via the "--var" and
+"--kwd" options, respectively:
+
+  --var name=value
+  --kwd name=value
+
+which may be used more than once.
+
+  Automatically Generated Variables
+
+"mkpkgconfig" can automatically generate a number of "standard"
+variables, such as *bindir*, *libdir*, etc, based upon the *prefix*
+variable. Use the "--list-auto" option to output a list of these
+variables.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

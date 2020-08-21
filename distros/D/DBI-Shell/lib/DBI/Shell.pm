@@ -38,7 +38,7 @@ use Carp;
 @ISA = qw(Exporter DBI::Shell::Std);
 @EXPORT = qw(shell);
 
-$VERSION = '11.96';
+our $VERSION = '11.97'; # VERSION
 
 sub new {
 	my $class = shift;
@@ -276,6 +276,8 @@ sub default_config {
 	 [ 'desc_show_long|show_long' => 1 ],
 	 [ 'desc_format=s'		=> q{partbox} ],
 	 [ 'desc_show_columns=s' => q{COLUMN_NAME,DATA_TYPE,TYPE_NAME,COLUMN_SIZE,PK,NULLABLE,COLUMN_DEF,IS_NULLABLE,REMARKS} ],
+	 [ 'null_format=s'		=> '(NULL)' ],
+	 [ 'bool_format=s'		=> q{Y,N} ],
 	 @_,
     ) {
 	$sh->add_option(@$opt_ref);
@@ -623,7 +625,13 @@ sub run {
 		if ($sh->{batch}) {
 		    die "Command '$cmd' not recognised";
 		}
-		$sh->alert("Command '$cmd' not recognised ",
+
+		my $additional = "";
+		if ($current_line =~ /$prefix(.+)/) {
+			$additional = ", does your statement contain the separator '$prefix'? See https://rt.cpan.org/Ticket/Display.html?id=21200";
+		}
+
+		$sh->alert("Command '$cmd' not recognised$additional ",
 		    "(enter ${prefix}help for help).");
 	    }
 
@@ -664,22 +672,36 @@ sub readline {
 sub run_command {
     my ($sh, $command, $output, @args) = @_;
     return unless $command;
-    local(*STDOUT) if $output;
-    local(*OUTPUT) if $output;
-    if ($output) {
-		if (open(OUTPUT, $output)) {
-			*STDOUT = *OUTPUT;
-		} else {
-			$sh->err("Couldn't open output '$output': $!");
-			$sh->run_command('current', undef, '');
-		}
+
+    my $code = "do_$command";
+    if ($sh->can("$code")) {
+        local(*STDOUT) if $output;
+        local(*OUTPUT) if $output;
+        if ($output) {
+            if (open(OUTPUT, $output)) {
+                *STDOUT = *OUTPUT;
+            } else {
+                $sh->err("Couldn't open output '$output': $!");
+                $sh->run_command('current', undef, '');
+            }
+        }
+
+       local $@;
+
+       eval {
+            $sh->$code(@args);
+        };
+        close OUTPUT if $output;
+        $sh->err("$command failed: $@") if $@;
     }
-    eval {
-		my $code = "do_$command";
-		$sh->$code(@args);
-    };
-    close OUTPUT if $output;
-    $sh->err("$command failed: $@") if $@;	
+    else {
+        if ($command eq 'spool') {
+            $sh->err("The DBI::Shell:Spool plug in needs to be installed. See https://rt.cpan.org/Ticket/Display.html?id=24538#txn-813176")
+        }
+        else {
+            $sh->err("$command does not exist, does a plug-in need to be installed?")
+        }
+    }
 return;
 }
 
@@ -1517,8 +1539,7 @@ sub do_describe {
 			my $rslt = $display->row($rowref);
     	}
 
-    	return $display->trailer($i);
-
+    	$display->trailer($i);
 	}
 
 	#
@@ -1959,7 +1980,8 @@ from Jochen's dbimon is bound to find it's way back in.
 
 The DBI::Shell module is Copyright (c) 1998 Tim Bunce. England.
 All rights reserved. Portions are Copyright by Jochen Wiedmann,
-Adam Marks and Tom Lowery.
+Adam Marks, Tom Lowery, Kent Fredric, Rafael Kitover and Mike Pomraning. It
+is currently maintained by Dave Lambley.
 
 You may distribute under the terms of either the GNU General Public
 License or the Artistic License, as specified in the Perl README file.

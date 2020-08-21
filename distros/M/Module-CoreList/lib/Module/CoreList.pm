@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20200717';
+our $VERSION = '5.20200820';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -134,8 +134,8 @@ sub changes_between {
   my $left_ver = shift;
   my $right_ver = shift;
 
-  my $left  = $version{ $left_ver };
-  my $right = $version{ $right_ver };
+  my $left  = $version{ $left_ver } || {};
+  my $right = $version{ $right_ver } || {};
 
   my %uniq = (%$left, %$right);
 
@@ -367,6 +367,7 @@ sub changes_between {
     5.030003 => '2020-06-01',
     5.032000 => '2020-06-20',
     5.033000 => '2020-07-17',
+    5.033001 => '2020-08-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -17528,6 +17529,65 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.033001 => {
+        delta_from => 5.033,
+        changed => {
+            'B'                     => '1.81',
+            'B::Deparse'            => '1.55',
+            'B::Op_private'         => '5.033001',
+            'Config'                => '5.033001',
+            'Data::Dumper'          => '2.175',
+            'Devel::PPPort'         => '3.60',
+            'Devel::Peek'           => '1.29',
+            'DynaLoader'            => '1.48',
+            'Errno'                 => '1.31',
+            'Exporter'              => '5.75',
+            'Exporter::Heavy'       => '5.75',
+            'ExtUtils::Miniperl'    => '1.10',
+            'ExtUtils::PL2Bat'      => '0.002',
+            'ExtUtils::ParseXS'     => '3.41',
+            'ExtUtils::ParseXS::Constants'=> '3.41',
+            'ExtUtils::ParseXS::CountLines'=> '3.41',
+            'ExtUtils::ParseXS::Eval'=> '3.41',
+            'ExtUtils::ParseXS::Utilities'=> '3.41',
+            'Fcntl'                 => '1.14',
+            'File::Path'            => '2.17',
+            'Hash::Util'            => '0.24',
+            'Hash::Util::FieldHash' => '1.21',
+            'IO'                    => '1.44',
+            'IO::Socket'            => '1.44',
+            'IO::Socket::UNIX'      => '1.42',
+            'IPC::Msg'              => '2.08',
+            'IPC::Semaphore'        => '2.08',
+            'IPC::SharedMem'        => '2.08',
+            'IPC::SysV'             => '2.08',
+            'JSON::PP'              => '4.05',
+            'JSON::PP::Boolean'     => '4.05',
+            'Math::Complex'         => '1.5902',
+            'Module::CoreList'      => '5.20200820',
+            'Module::CoreList::Utils'=> '5.20200820',
+            'Net::Ping'             => '2.73_01',
+            'POSIX'                 => '1.95',
+            'PerlIO::mmap'          => '0.017',
+            'Pod::Usage'            => '1.70',
+            'Safe'                  => '2.42',
+            'Socket'                => '2.030',
+            'Storable'              => '3.22',
+            'Time::HiRes'           => '1.9765',
+            'Unicode::Normalize'    => '1.28',
+            'XS::APItest'           => '1.11',
+            'XS::Typemap'           => '0.18',
+            'feature'               => '1.60',
+            'mro'                   => '1.24',
+            'strict'                => '1.12',
+            'threads'               => '2.26',
+            'threads::shared'       => '1.62',
+            'warnings'              => '1.48',
+        },
+        removed => {
+            'Moped::Msg'            => 1,
+        }
+    },
 );
 
 sub is_core
@@ -18656,6 +18716,13 @@ sub is_core
         removed => {
         }
     },
+    5.033001 => {
+        delta_from => 5.033000,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -18787,6 +18854,7 @@ sub is_core
     'ExtUtils::Manifest'    => 'cpan',
     'ExtUtils::Mkbootstrap' => 'cpan',
     'ExtUtils::Mksymlists'  => 'cpan',
+    'ExtUtils::PL2Bat'      => 'cpan',
     'ExtUtils::Packlist'    => 'cpan',
     'ExtUtils::testlib'     => 'cpan',
     'Fatal'                 => 'cpan',
@@ -19209,6 +19277,7 @@ sub is_core
     'ExtUtils::Manifest'    => 'http://github.com/Perl-Toolchain-Gang/ExtUtils-Manifest/issues',
     'ExtUtils::Mkbootstrap' => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
     'ExtUtils::Mksymlists'  => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
+    'ExtUtils::PL2Bat'      => 'http://rt.cpan.org/Public/Dist/Display.html?Name=ExtUtils-PL2Bat',
     'ExtUtils::Packlist'    => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-Install',
     'ExtUtils::testlib'     => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
     'Fatal'                 => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=autodie',

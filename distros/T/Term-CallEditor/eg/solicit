@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 #
-# Solicit data from a user via their EDITOR, printing the results on
-# STDOUT. The first argument to the script, if set, will be displayed in
-# the EDITOR. If the first argument is '-', that message will be read
-# from STDIN:
+# Solicit data from a user, printing the results on STDOUT. The first
+# argument to the script, if set, will be displayed in the EDITOR. If
+# the first argument is '-', that message will be read from STDIN:
 #
 # solicit 'Type something in'
 # echo    'Type something in' | solicit -
@@ -19,18 +18,18 @@ use Term::CallEditor qw/solicit/;
 
 my $message;
 if (@ARGV) {
-  $message = $ARGV[0] eq '-' ? \*STDIN : $ARGV[0];
+    $message = $ARGV[0] eq '-' ? \*STDIN : $ARGV[0];
 }
 
 my $fh = solicit($message);
-if ( !defined $fh ) {
-  die "error: no result from solicit: $Term::CallEditor::errstr\n";
+if (!defined $fh) {
+    die "error: no result from solicit: $Term::CallEditor::errstr\n";
 }
 print while <$fh>;
 
 END {
-  # Report problems when writing to stdout (perldoc perlopentut)
-  unless ( close(STDOUT) ) {
-    die "error: problem closing STDOUT: $!\n";
-  }
+    # Report problems when writing to stdout (perldoc perlopentut)
+    unless (close(STDOUT)) {
+        die "error: problem closing STDOUT: $!\n";
+    }
 }

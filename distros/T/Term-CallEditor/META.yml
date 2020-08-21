@@ -1,29 +1,28 @@
 ---
 abstract: 'solicit data from an external editor'
 author:
-  - 'Jeremy Mates <jmates@cpan.org>'
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0.72'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690'
-license: artistic_2
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Term-CallEditor
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Term::CallEditor:
+    file: lib/Term/CallEditor.pm
+    version: '1.00'
 requires:
   File::Temp: '0.18'
   IO::Handle: '0'
-  Test::More: '0.72'
-  perl: '5.006'
+  perl: '5.008'
 resources:
-  homepage: http://github.com/thrig/Term-CallEditor
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/thrig/Term-CallEditor
-version: '0.66'
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://github.com/thrig/Term-CallEditor
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

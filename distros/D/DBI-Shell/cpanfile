@@ -10,7 +10,15 @@ requires "Term::ReadLine" => "0";
 requires "Text::Abbrev" => "0";
 requires "Text::CSV_XS" => "0";
 requires "Text::Reform" => "0";
-requires "perl" => "5.004";
+requires "perl" => "5.006";
+recommends "Benchmark" => "0";
+recommends "File::Basename" => "0";
+recommends "File::Find" => "0";
+recommends "IO::File" => "0";
+recommends "Term::ReadKey" => "0";
+recommends "Term::Readline::Perl5" => "0";
+recommends "Text::ParseWords" => "0";
+recommends "Text::Wrap" => "0";
 
 on 'test' => sub {
   requires "Getopt::Long" => "2.17";

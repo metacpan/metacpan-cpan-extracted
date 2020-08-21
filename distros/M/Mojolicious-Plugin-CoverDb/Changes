@@ -1,0 +1,19 @@
+Revision history for Mojolicious::Plugin::CoverDb
+
+?.??.? ????-??-??
+
+0.05  2020-08-21
+	- 📌 — Specify min perl version
+	- 🔨 — Add repository informations in Makefile.PL
+
+0.04  2020-08-20
+	- 🐛 — Fix CHANGELOG and CI typo
+
+0.03  2020-08-20
+	- 🐛 — Add forgotten test file to MANIFEST
+
+0.02  2020-08-18
+	- 🐛 — Don’t use layout while using template
+
+0.01  2020-08-18
+	- 🎉 — Initial version

@@ -1,0 +1,121 @@
+#!/bin/bash
+
+install () {
+
+    cpm install -L packer Module::CoreList
+
+    # target latest perl to get modules evicted from core
+    # so can run on latest perl
+    local CPM_OPTS=(
+        --without-test                          \
+        --target-perl=5.32.0
+    )
+
+    # uses --pp directly; can't get that into PERL_MB_OPT
+    cpm install "${CPM_OPTS[@]}" Params::Validate
+
+    CPM_OPTS+=( --pureperl-only )
+
+    cpm install "${CPM_OPTS[@]}"
+
+    if (( ${#EXTRAS[*]} )); then
+        cpm install "${CPM_OPTS[@]}" "${EXTRAS[@]}"
+    fi
+}
+
+cpm () {
+    local exe=packer/bin/cpm
+    if [ ! -x $exe ]; then
+        curl -fsSL --compressed https://git.io/cpm -o $exe
+        chmod +x $exe
+    fi
+    unset -f cpm
+    cpm "$@"
+}
+
+fatpack-simple () {
+    if [ ! -f $PWD/packer/bin/fatpack-simple ]; then
+        cpm install -L packer App::FatPacker::Simple
+    fi
+    unset -f fatpack-simple
+    fatpack-simple "$@"
+}
+
+pack () {
+
+    local exclude=(
+        Class::Inspector
+        CPAN::Meta
+        CPAN::Meta::Check
+        Capture::Tiny
+        Dist::CheckConflicts
+        Module::Build
+        Sub::Info
+        Test2::Suite
+        Test::Builder
+        Test::ClassAPI
+        Test::Deep
+        Test::FailWarnings
+        Test::Fatal
+        Test::Needs
+        Test::Requires
+        Test::Tester
+        Test::Warnings
+    )
+    exclude=$(IFS=,; echo "${exclude[*]}")
+
+    fatpack-simple                                      \
+        --exclude  $exclude                             \
+        --dir $PWD/local,$DIR/lib                       \
+        -o $DIR/$EXE  $DIR/script/$EXE |& tee pack.log
+
+    perl -i.bak -pe 's{/usr/bin/perl}{/usr/bin/env perl}' $DIR/$EXE
+    rm -f $DIR/$EXE.bak
+
+    chmod +x $DIR/$EXE
+}
+
+all () {
+    install
+    pack
+}
+
+DIR=./
+USEPERL=$(plenv version)
+while getopts d:p: arg ; do
+
+    case $arg in
+        d)
+            DIR=$OPTARG
+            ;;
+
+        p)
+            USEPERL=$OPTARG
+            ;;
+
+    esac
+done
+
+shift $(( OPTIND - 1 ))
+
+mkdir -p packer/bin
+
+EXE=mkpkgconfig
+
+export PERL_ONLY=1
+
+PATH="$HOME/.plenv/bin:$PATH"
+eval "$(plenv init -)"
+
+unset PERL5LIB
+plenv shell $USEPERL
+eval $(perl -V:archname)
+
+PATH=$PWD/packer/bin:${PATH}
+export PERL5LIB=$PWD/packer/lib/perl5${PERL5LIB:+:$PERL5LIB}
+
+EXTRAS=( Devel::GlobalDestruction )
+
+eval "$@"
+
+

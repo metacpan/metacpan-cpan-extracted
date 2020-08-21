@@ -1,4 +1,4 @@
-version 0.9924
+version 0.9927
 ==================================
 
 Object oriented versions for all Perl releases from 5.6.2 onward.  Replaces
@@ -8,7 +8,7 @@ Although this code has been fully integrated into the latest Perl release
 itself (e.g. bleadperl), the CPAN release is considered upstream.  The source
 code itself is available from:
 
-    https://github.com/JohnPeacock/version.pm.git
+    https://github.com/Perl/version.pm
 
 and a bug queue here:
 

@@ -1,3 +1,18 @@
+11.97
+   - Add missing dependencies.
+   - Document some awkward behaviour. RT#21200
+
+11.96_03
+   - Add options for handling of booleans. RT#53311 (Mike Pomraning)
+
+11.96_02
+   - Add missing versions to this file. RT#39187
+   - Be more helpful if DBI::Shell::Spool is missing. RT#24538
+   - Give every .pm a version identifier.
+
+11.96_01
+   - Suppress warning in DBI::Format::SQLMinus. RT#123216 (Kent Fredric)
+
 11.96
    - Automatically save command history.
    - Remove warning message.
@@ -15,10 +30,21 @@
    - Added RT#65253, permit empty passwords.
    - Resolved RT#121136, testing without "." in @INC.
    - Resolved RT#73873, warning fix.
+   - Possibly resolved RT#12167, missing dependency on DBI.
    - Switch build to Dist::Zilla.
+
+11.95
+   - CSV formatting.
+
+11.94
+   - Documentation changes.
+
+11.93
+   - Result formatting changes
 
 11.91  2002/12/13 23:44:56  tlowery
    - Fixed version numbers
+   - Spool files
 
 11.6  2002/10/28 02:49:57  tlowery
 

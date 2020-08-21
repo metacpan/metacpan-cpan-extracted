@@ -34,6 +34,7 @@ Test::DBIx::OpenTracing::test_database(
               (5, 'very cool thing')
         ],
         delete            => 'DELETE FROM things WHERE id IN (4, 5)',
+        clear             => 'DELETE FROM things',
         select_all_multi  => 'SELECT * FROM things WHERE id IN (1, 3, 10)',
         select_all_single => 'SELECT * FROM things WHERE id = 2',
         select_column_multi => 'SELECT description FROM things WHERE id IN (2, 3, 10)',

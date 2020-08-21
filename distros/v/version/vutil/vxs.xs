@@ -43,7 +43,7 @@ VERSIONCHECK: DISABLE
 
 BOOT:
     {
-#if (PERL_REVISION == 5 && PERL_VERSION < 9)
+#if PERL_VERSION_LT(5,9,0)
 	char* file = __FILE__;
 #else
 	const char* file = __FILE__;

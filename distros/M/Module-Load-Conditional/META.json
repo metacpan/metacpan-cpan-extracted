@@ -47,6 +47,6 @@
          "url" : "https://github.com/jib/module-load-conditional"
       }
    },
-   "version" : "0.72",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.74",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

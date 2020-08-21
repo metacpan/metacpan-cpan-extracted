@@ -1,0 +1,82 @@
+NAME
+    App::OfficeUtils - Utilities related to Office suite files (.doc, .docx,
+    .odt, .xls, .xlsx, .ods, etc)
+
+VERSION
+    This document describes version 0.001 of App::OfficeUtils (from Perl
+    distribution App-OfficeUtils), released on 2020-08-21.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   doc2txt
+
+FUNCTIONS
+  officewp2txt
+    Usage:
+
+     officewp2txt(%args) -> [status, msg, payload, meta]
+
+    Convert Office word-processor format file (.doc, .docx, .odt, etc) to
+    .txt.
+
+    This utility uses one of the following backends:
+
+    *   LibreOffice
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   fmt => *bool*
+
+        Run Unix fmt over the txt output.
+
+    *   input_file* => *filename*
+
+        Path to input file.
+
+    *   output_file => *filename*
+
+        Path to output file.
+
+        If not specified, will output to stdout.
+
+    *   overwrite => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-OfficeUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-OfficeUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-OfficeUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
