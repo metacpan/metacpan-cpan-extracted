@@ -14,10 +14,17 @@ $d->count_in(1);
 
 my $j = 0;
 
+$d->rest( $d->triplet_sixteenth );
+$d->rest( $d->thirtysecond );
+$d->accent_note( 64, $d->thirtysecond, $d->low_timbale );
+$d->note( $d->triplet_sixteenth, $d->low_timbale );
+$d->accent_note( 127, $d->triplet_sixteenth, $d->low_timbale );
+$d->rest( $d->triplet_eighth );
+
 for my $n ( 1 .. $d->bars * 4 ) {
     if ( $n % 2 == 0 ) {
         $d->note( $d->triplet_eighth, $d->closed_hh );
-        $d->rest($d->triplet_eighth);
+        $d->rest( $d->triplet_eighth );
         $d->note( $d->triplet_eighth, $d->closed_hh );
     }
     else {
@@ -31,6 +38,6 @@ for my $n ( 1 .. $d->bars * 4 ) {
     }
 }
 
-$d->note( $d->quarter, $d->ride1, $d->kick );
+$d->note( $d->quarter, $d->crash1, $d->kick );
 
 $d->write;

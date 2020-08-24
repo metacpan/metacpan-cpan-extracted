@@ -26,6 +26,7 @@ use Carp;
 use autodie;
 use File::Spec;
 use Locale::PO;
+use Mojo::Loader qw(load_class);
 
 =head2 file
 
@@ -132,20 +133,13 @@ sub loadAndNewPlugin {
     my $self   = shift;
     my $plugin = shift;
 
-    my $pluginPath = $self->pluginPath;
-    for my $path (@INC){
-        for my $pPath (@$pluginPath) {
-            my @pDirs = split /::/, $pPath;
-            my $fPath = File::Spec->catdir($path, @pDirs, '*.pm');
-            for my $file (glob($fPath)) {
-                my ($volume, $modulePath, $moduleName) = File::Spec->splitpath($file);
-                $moduleName =~ s{\.pm$}{};
-                if ($plugin eq $moduleName) {
-                    require $file;
-                    no strict 'refs';
-                    return "${pPath}::${plugin}"->new();
-                }
-            }
+    my $module;
+    my $ok;
+    for my $path (@{$self->pluginPath}) {
+        if (my $e = load_class "${path}::$plugin") {
+            die mkerror(3894,"Exception: $e") if ref $e;
+        } else {
+            return "${path}::${plugin}"->new();
         }
     }
     die mkerror(123, "Plugin Module $plugin not found");
@@ -468,7 +462,7 @@ sub getConfigBlob {
     open my $dump, '|-','/usr/bin/sqlite3',$cfg->{BACKEND}{cfg_db};
     print $dump ".output $dumpfile\n";
     print $dump ".dump\n";
-    close $dump; 
+    close $dump;
     $zip->addFile({
         filename => $dumpfile,
         zipName => '{DATABASEDUMP}',

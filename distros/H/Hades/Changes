@@ -3,3 +3,17 @@ Revision history for Hades
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.07    2020-08-22
+	- Allow sub routine params to have defaults - eros $param :d(abc) { }
+	- Instantiate with a different realm that is used to generate the code. - hades -r Compiled::Params -e 'Kosmos { psyche :t(Str) }'
+
+0.08    2020-08-24
+	- skip realm tests if Moo is not installed.
+
+0.09    2020-08-24
+	- Align default predicate with Moo so use exists instead of !! 
+	- Refactor to make more extendable
+
+0.10    2020-08-24
+	- Align default predicate with Moo so use exists instead of !! 
+	- Refactor to make more extendable

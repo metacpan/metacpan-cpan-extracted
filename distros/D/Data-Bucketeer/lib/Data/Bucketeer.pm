@@ -1,15 +1,82 @@
 use strict;
 use warnings;
 package Data::Bucketeer;
-{
-  $Data::Bucketeer::VERSION = '0.003';
-}
-# ABSTRACT: sort data into buckets based on threshholds
-
+# ABSTRACT: sort data into buckets based on thresholds
+$Data::Bucketeer::VERSION = '0.004';
 use Carp qw(croak);
 use Scalar::Util ();
 use List::Util qw(first);
 
+#pod =head1 OVERVIEW
+#pod
+#pod Data::Bucketeer lets you easily map values in ranges to results.  It's for
+#pod doing table lookups where you're looking for the key in a range, not a list of
+#pod fixed values.
+#pod
+#pod For example, you sell widgets with prices based on quantity:
+#pod
+#pod   YOU ORDER    | YOU PAY, EACH
+#pod   -------------+---------------
+#pod     1 -  100   |  10 USD
+#pod   101 -  200   |   5 USD
+#pod   201 -  500   |   4 USD
+#pod   501 - 1000   |   3 USD
+#pod   1001+        |   2 USD
+#pod
+#pod This can be easily turned into a bucketeer:
+#pod
+#pod   use Data::Bucketeer;
+#pod
+#pod   my $buck = Data::Bucketeer->new({
+#pod        0 => 10,
+#pod      100 => 5,
+#pod      200 => 4,
+#pod      500 => 3,
+#pod     1000 => 2,
+#pod   });
+#pod
+#pod   my $cost = $buck->result_for( 701 ); # cost is 3
+#pod
+#pod By default, the values I<exclusive minima>.  For example, above, you end up
+#pod with a result of C<3> by having an input C<strictly greater than> 500, and
+#pod C<less than or equal to> 500.  If you want to use a different operator, you can
+#pod specify it like this:
+#pod
+#pod   my $buck = Data::Bucketeer->new( '>=', {
+#pod        1 => 10,
+#pod      101 => 5,
+#pod      201 => 4,
+#pod      501 => 3,
+#pod     1001 => 2,
+#pod   });
+#pod
+#pod   my $cost = $buck->result_for( 701 ); # cost is 3
+#pod
+#pod This distinction can be useful when dealing with non-integers.  The understood
+#pod operators are:
+#pod
+#pod =for :list
+#pod * >
+#pod * >=
+#pod * <=
+#pod * <
+#pod
+#pod If the result value is a code reference, it will be invoked with C<$_> set to
+#pod the input.  This can be used for dynamically generating results, or to throw
+#pod exceptions.  Here is a contrived example of exception-throwing:
+#pod
+#pod   my $greeting = Data::Bucketeer->new( '>=', {
+#pod     '-Inf' => sub { die "secs-into-day must be between 0 and 86399; got $_" },
+#pod
+#pod          0 => "Good evening.",
+#pod     28_800 => "Good morning.",
+#pod     43_200 => "Good afternoon.",
+#pod     61_200 => "Good evening.",
+#pod
+#pod     86_400 => sub { die "secs-into-day must be between 0 and 86399; got $_" },
+#pod   });
+#pod
+#pod =cut
 
 sub new {
   my ($class, @rest) = @_;
@@ -55,6 +122,13 @@ sub __picker_for {
   return($operator{ $type } || croak("unknown bucket operator: $type"));
 }
 
+#pod =method result_for
+#pod
+#pod   my $result = $buck->result_for( $input );
+#pod
+#pod This returns the result for the given input, as described L<above|/OVERVIEW>.
+#pod
+#pod =cut
 
 sub result_for {
   my ($self, $input) = @_;
@@ -64,6 +138,29 @@ sub result_for {
   return $result;
 }
 
+#pod =method bound_and_result_for
+#pod
+#pod   my ($bound, $result) = $buck->bound_and_result_for( $input );
+#pod
+#pod This returns two values:  the boundary key whose result was used, and the
+#pod result itself.
+#pod
+#pod Using the item quantity price above, for example:
+#pod
+#pod   my $buck = Data::Bucketeer->new({
+#pod        0 => 10,
+#pod      100 => 5,
+#pod      200 => 4,
+#pod      500 => 3,
+#pod     1000 => 2,
+#pod   });
+#pod
+#pod   my ($bound, $cost) = $buck->bound_and_result_for( 701 );
+#pod
+#pod   # $bound is 500
+#pod   # $cost  is 3
+#pod
+#pod =cut
 
 sub bound_and_result_for {
   my ($self, $input) = @_;
@@ -89,11 +186,11 @@ __END__
 
 =head1 NAME
 
-Data::Bucketeer - sort data into buckets based on threshholds
+Data::Bucketeer - sort data into buckets based on thresholds
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 OVERVIEW
 
@@ -211,6 +308,22 @@ Using the item quantity price above, for example:
 =head1 AUTHOR
 
 Ricardo Signes <rjbs@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Graham Knop Ricardo Signes
+
+=over 4
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Ricardo Signes <rjbs@users.noreply.github.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

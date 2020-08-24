@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::scripts;
 
-our $DATE = '2020-01-19'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2020-08-22'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to scripts
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::scripts - More lcpan subcommands related to scripts
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::CmdBundle::scripts (from Perl distribution App-lcpan-CmdBundle-scripts), released on 2020-01-19.
+This document describes version 0.003 of App::lcpan::CmdBundle::scripts (from Perl distribution App-lcpan-CmdBundle-scripts), released on 2020-08-22.
 
 =head1 SYNOPSIS
 

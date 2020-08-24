@@ -19,25 +19,25 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Cwd" => 0,
     "File::Copy" => 0,
-    "File::Copy::Recursive" => 0,
-    "File::Remove" => 0,
-    "File::Spec" => 0,
-    "File::Temp" => 0,
+    "File::Copy::Recursive" => "0.35",
+    "File::Remove" => "0.38",
+    "File::Spec" => "0.85",
+    "File::Temp" => "0.17",
     "IO::File" => 0,
-    "prefork" => 0,
+    "prefork" => "0.02",
     "strict" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Find" => 0,
-    "File::Spec" => 0,
+    "File::Spec" => "0.85",
     "File::Spec::Functions" => 0,
-    "Test::ClassAPI" => 0,
-    "Test::More" => 0,
+    "Test::ClassAPI" => "1.04",
+    "Test::More" => "0.47",
     "vars" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.06",
+  "VERSION" => "1.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,20 +48,26 @@ my %FallbackPrereqs = (
   "Cwd" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Copy" => 0,
-  "File::Copy::Recursive" => 0,
+  "File::Copy::Recursive" => "0.35",
   "File::Find" => 0,
-  "File::Remove" => 0,
-  "File::Spec" => 0,
+  "File::Remove" => "0.38",
+  "File::Spec" => "0.85",
   "File::Spec::Functions" => 0,
-  "File::Temp" => 0,
+  "File::Temp" => "0.17",
   "IO::File" => 0,
-  "Test::ClassAPI" => 0,
-  "Test::More" => 0,
-  "prefork" => 0,
+  "Test::ClassAPI" => "1.04",
+  "Test::More" => "0.47",
+  "prefork" => "0.02",
   "strict" => 0,
   "vars" => 0,
   "warnings" => 0
 );
+
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.038
+# Because many filesystem modules are buggier
+# on Windows, we're going to push for more aggressive
+# dependencies to get the most current bug fixes.
+requires('File::Spec', '3.24') if is_os('MSWin32') or is_os('cygwin');
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
@@ -74,3 +80,32 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.038
+sub _add_prereq {
+  my ($mm_key, $module, $version_or_range) = @_;
+  $version_or_range ||= 0;
+  warn "$module already exists in $mm_key (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
+    if exists $WriteMakefileArgs{$mm_key}{$module}
+      and $WriteMakefileArgs{$mm_key}{$module} ne '0'
+      and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
+  warn "$module already exists in FallbackPrereqs (at version $FallbackPrereqs{$mm_key}{$module}) -- need to do a sane metamerge!"
+    if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
+        and $FallbackPrereqs{$module} ne $version_or_range;
+  $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;
+  return;
+}
+
+sub is_os {
+  foreach my $os (@_) {
+    return 1 if $os eq $^O;
+  }
+  return 0;
+}
+
+sub requires { goto &runtime_requires }
+
+sub runtime_requires {
+  my ($module, $version_or_range) = @_;
+  _add_prereq(PREREQ_PM => $module, $version_or_range);
+}

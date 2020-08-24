@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Stress;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: mtpolicyd plugin for postfix stress mode
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -58,7 +58,7 @@ Mail::MtPolicyd::Plugin::Stress - mtpolicyd plugin for postfix stress mode
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

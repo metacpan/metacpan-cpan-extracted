@@ -46,6 +46,7 @@ lib/NewsExtractor/SiteSpecificExtractor/talk_ltn_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/turnnewsapp_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_aljazeera_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_allnews_tw.pm
+lib/NewsExtractor/SiteSpecificExtractor/www_bbc_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_bcc_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_digitimes_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_epochtimes_com.pm

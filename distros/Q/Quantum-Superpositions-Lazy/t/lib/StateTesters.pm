@@ -1,6 +1,6 @@
 package StateTesters;
 
-use v5.24; use warnings;
+use v5.28; use warnings;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 
@@ -21,7 +21,8 @@ sub check_probability
 
 	if ($state_weight =~ m{ \A (\d+) \. (\d+) \z }x) {
 		$state_weight = "$1." . substr "${2}000", 0, 3;
-	} else {
+	}
+	else {
 		$state_weight .= ".000";
 	}
 

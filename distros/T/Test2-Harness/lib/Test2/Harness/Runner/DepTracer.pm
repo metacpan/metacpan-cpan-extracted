@@ -2,7 +2,7 @@ package Test2::Harness::Runner::DepTracer;
 use strict;
 use warnings;
 
-our $VERSION = '1.000023';
+our $VERSION = '1.000024';
 
 use Test2::Harness::Util::HashBase qw/
     -_on
@@ -142,7 +142,7 @@ __END__
 
 =head1 NAME
 
-Test2::Harness::Runner::DepTracer - Tool for tracing module dependancies as
+Test2::Harness::Runner::DepTracer - Tool for tracing module dependencies as
 they are loaded.
 
 =head1 DESCRIPTION

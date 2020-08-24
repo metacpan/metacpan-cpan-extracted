@@ -3,14 +3,24 @@ package Algorithm::LibLinear;
 use 5.014;
 use Algorithm::LibLinear::DataSet;
 use Algorithm::LibLinear::Model;
-use Algorithm::LibLinear::Types;
 use List::Util qw/sum/;
-use Smart::Args;
+use Smart::Args::TypeTiny;
+use Types::Standard qw/ArrayRef Bool ClassName Dict Enum InstanceOf Int Num/;
 use XSLoader;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 XSLoader::load(__PACKAGE__, $VERSION);
+
+my $ClassWeight = Dict[ label => Int, weight => Num ];
+
+my $InstanceOfPackage = InstanceOf[__PACKAGE__];
+
+my $SolverDescriptor = Enum[
+    qw/L2R_LR L2R_L2LOSS_SVC_DUAL L2R_L2LOSS_SVC L2R_L1LOSS_SVC_DUAL MCSVM_CS
+       L1R_L2LOSS_SVC L1R_LR L2R_LR_DUAL L2R_L2LOSS_SVR L2R_L2LOSS_SVR_DUAL
+       L2R_L1LOSS_SVR_DUAL ONECLASS_SVM/,
+];
 
 my %default_eps = (
     L2R_LR => 0.01,
@@ -21,15 +31,13 @@ my %default_eps = (
     L1R_L2LOSS_SVC => 0.01,
     L1R_LR => 0.01,
     L2R_LR_DUAL => 0.1,
-
-    # Solvers for regression problem
-    L2R_L2LOSS_SVR => 0.001,
+    L2R_L2LOSS_SVR => 0.0001,
     L2R_L2LOSS_SVR_DUAL => 0.1,
     L2R_L1LOSS_SVR_DUAL => 0.1,
+    ONECLASS_SVM => 0.01,
 );
 
 my %solvers = (
-    # Solvers for classification problem
     L2R_LR => 0,
     L2R_L2LOSS_SVC_DUAL => 1,
     L2R_L2LOSS_SVC => 2,
@@ -38,28 +46,26 @@ my %solvers = (
     L1R_L2LOSS_SVC => 5,
     L1R_LR => 6,
     L2R_LR_DUAL => 7,
-
-    # Solvers for regression problem
     L2R_L2LOSS_SVR => 11,
     L2R_L2LOSS_SVR_DUAL => 12,
     L2R_L1LOSS_SVR_DUAL => 13,
+    ONECLASS_SVM => 21,
 );
 
 sub new {
     args
-        my $class => 'ClassName',
-        my $bias => +{ isa => 'Num', default => -1.0, },
-        my $cost => +{ isa => 'Num', default => 1, },
-        my $epsilon => +{ isa => 'Num', optional => 1, },
-        my $loss_sensitivity => +{ isa => 'Num', default => 0.1, },
+        my $class => ClassName,
+        my $bias => +{ isa => Num, default => -1.0, },
+        my $cost => +{ isa => Num, default => 1, },
+        my $epsilon => +{ isa => Num, optional => 1, },
+        my $loss_sensitivity => +{ isa => Num, default => 0.1, },
+        my $nu => +{ isa => Num, default => 0.5, },
+        my $regularize_bias => +{ isa => Bool, default => 1, },
         my $solver => +{
-            isa => 'Algorithm::LibLinear::SolverDescriptor',
+            isa => $SolverDescriptor,
             default => 'L2R_L2LOSS_SVC_DUAL',
         },
-        my $weights => +{
-            isa => 'ArrayRef[Algorithm::LibLinear::TrainingParameter::ClassWeight]',
-            default => [],
-        };
+        my $weights => +{ isa => ArrayRef[$ClassWeight], default => [], };
 
     $epsilon //= $default_eps{$solver};
     my (@weight_labels, @weights);
@@ -74,6 +80,8 @@ sub new {
         \@weight_labels,
         \@weights,
         $loss_sensitivity,
+        $nu,
+        $regularize_bias,
     );
     bless +{
       bias => $bias,
@@ -87,9 +95,9 @@ sub cost { $_[0]->training_parameter->cost }
 
 sub cross_validation {
     args
-        my $self,
-        my $data_set => 'Algorithm::LibLinear::DataSet',
-        my $num_folds => 'Int';
+        my $self => $InstanceOfPackage,
+        my $data_set => InstanceOf['Algorithm::LibLinear::DataSet'],
+        my $num_folds => Int;
 
     my $targets = $self->training_parameter->cross_validation(
         $data_set->as_problem(bias => $self->bias),
@@ -114,11 +122,11 @@ sub epsilon { $_[0]->training_parameter->epsilon }
 
 sub find_cost_parameter {
     args
-        my $self,
-        my $data_set => 'Algorithm::LibLinear::DataSet',
-        my $initial => +{ isa => 'Num', default => -1.0 },
-        my $num_folds => 'Int',
-        my $update => +{ isa => 'Bool', default => 0, };
+        my $self => $InstanceOfPackage,
+        my $data_set => InstanceOf['Algorithm::LibLinear::DataSet'],
+        my $initial => +{ isa => Num, default => -1.0 },
+        my $num_folds => Int,
+        my $update => +{ isa => Bool, default => 0, };
 
     my ($cost, undef, $accuracy) = @{
         $self->find_parameters(
@@ -134,12 +142,12 @@ sub find_cost_parameter {
 
 sub find_parameters {
     args
-        my $self,
-        my $data_set => 'Algorithm::LibLinear::DataSet',
-        my $initial_cost => +{ isa => 'Num', default => -1.0, },
-        my $initial_loss_sensitivity => +{ isa => 'Num', default => -1.0, },
-        my $num_folds => 'Int',
-        my $update => +{ isa => 'Bool', default => 0, };
+        my $self => $InstanceOfPackage,
+        my $data_set => InstanceOf['Algorithm::LibLinear::DataSet'],
+        my $initial_cost => +{ isa => Num, default => -1.0, },
+        my $initial_loss_sensitivity => +{ isa => Num, default => -1.0, },
+        my $num_folds => Int,
+        my $update => +{ isa => Bool, default => 0, };
 
     $self->training_parameter->find_parameters(
         $data_set->as_problem(bias => $self->bias),
@@ -158,8 +166,8 @@ sub training_parameter { $_[0]->{training_parameter} }
 
 sub train {
     args
-        my $self,
-        my $data_set => 'Algorithm::LibLinear::DataSet';
+        my $self => $InstanceOfPackage,
+        my $data_set => InstanceOf['Algorithm::LibLinear::DataSet'];
 
     my $raw_model = Algorithm::LibLinear::Model::Raw->train(
         $data_set->as_problem(bias => $self->bias),
@@ -170,7 +178,7 @@ sub train {
 
 sub weights {
     args
-        my $self;
+        my $self => $InstanceOfPackage;
 
     my $labels = $self->training_parameter->weight_labels;
     my $weights = $self->training_parameter->weights;
@@ -222,11 +230,11 @@ Algorithm::LibLinear - A Perl binding for LIBLINEAR, a library for classificatio
 
 Algorithm::LibLinear is an XS module that provides features of LIBLINEAR, a fast C library for classification and regression.
 
-Current version is based on LIBLINEAR 2.30, released on Mar 21, 2019.
+Current version is based on LIBLINEAR 2.41, released on July 29, 2020.
 
 =head1 METHODS
 
-=head2 new([bias => -1.0] [, cost => 1] [, epsilon => 0.1] [, loss_sensitivity => 0.1] [, solver => 'L2R_L2LOSS_SVC_DUAL'] [, weights => []])
+=head2 new([bias => -1.0] [, cost => 1] [, epsilon => 0.1] [, loss_sensitivity => 0.1] [, nu => 0.5] [, regularize_bias => 1] [, solver => 'L2R_L2LOSS_SVC_DUAL'] [, weights => []])
 
 Constructor. You can set several named parameters:
 
@@ -252,6 +260,14 @@ Default value of this parameter depends on the value of C<solver>.
 
 Epsilon in loss function of SVR (C<-p>.)
 
+=item nu
+
+Nu parameter of one-class SVM (C<-n>.)
+
+=item regularize_bias
+
+Whether to regularize the bias term (C<-R>, negated.)
+
 =item solver
 
 Kind of solver (C<-s>.)
@@ -268,7 +284,7 @@ For classification:
 
 =item 'L2R_L1LOSS_SVC_DUAL' - L2-regularized L1-loss SVC (dual problem)
 
-=item 'MCSVM_CS' - Crammer-Singer multiclass SVM
+=item 'MCSVM_CS' - Crammer-Singer multi-class SVM
 
 =item 'L1R_L2LOSS_SVC' - L1-regularized L2-loss SVC
 
@@ -287,6 +303,14 @@ For regression:
 =item 'L2R_L2LOSS_SVR_DUAL' - L2-regularized L2-loss SVR (dual problem)
 
 =item 'L2R_L1LOSS_SVR_DUAL' - L2-regularized L1-loss SVR (dual problem)
+
+=back
+
+For outlier detection:
+
+=over 4
+
+=item 'ONECLASS_SVM' - One-class SVM
 
 =back
 
@@ -321,7 +345,7 @@ The evaluation iterates N times using each different part as a test set. Then av
 Deprecated. Use C<find_parameters> instead.
 
 Shorthand alias for C<find_parameters> only works on C<cost> parameter.
-Notice that C<loss_sensitivity> is affected too whne C<update> is set.
+Notice that C<loss_sensitivity> is affected too when C<update> is set.
 
 =head2 find_parameters(data_set => $data_set, num_folds => $num_folds [, initial_cost => -1.0] [, initial_loss_sensitivity => -1.0] [, update => 0])
 
@@ -338,7 +362,7 @@ C<data_set> is same as the C<cross_validation>'s.
 
 =head1 AUTHOR
 
-Koichi SATOH E<lt>sekia@cpan.orgE<gt>
+Koichi SATO E<lt>sekia@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
@@ -356,7 +380,7 @@ L<Algorithm::SVM> - A Perl binding to LIBSVM.
 
 =head2 Algorithm::LibLinear
 
-Copyright (c) 2013-2019 Koichi SATOH. All rights reserved.
+Copyright (c) 2013-2020 Koichi SATO. All rights reserved.
 
 The MIT License (MIT)
 
@@ -368,7 +392,7 @@ THE SOFTWARE IS PROVIDED ``AS IS'', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMP
 
 =head2 LIBLINEAR
 
-Copyright (c) 2007-2019 The LIBLINEAR Project.
+Copyright (c) 2007-2020 The LIBLINEAR Project.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

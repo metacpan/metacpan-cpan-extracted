@@ -1,9 +1,9 @@
 package WordList::Test::Dynamic::OneTwo_FirstNextReset;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
+our $DATE = '2020-08-23'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.7.5'; # VERSION
+our $VERSION = '0.7.6'; # VERSION
 
 use strict;
 
@@ -36,7 +36,7 @@ sub next_word {
     else { return undef }
 }
 
-our %STATS = ("num_words_contain_whitespace",0,"num_words_contains_unicode",0,"num_words_contain_nonword_chars",0,"avg_word_len",3,"shortest_word_len",3,"longest_word_len",3,"num_words_contains_whitespace",0,"num_words",2,"num_words_contains_nonword_chars",0,"num_words_contain_unicode",0); # STATS
+our %STATS = ("num_words_contain_whitespace",0,"num_words_contains_unicode",0,"avg_word_len",3,"shortest_word_len",3,"num_words",2,"num_words_contain_unicode",0,"num_words_contain_nonword_chars",0,"longest_word_len",3,"num_words_contains_whitespace",0,"num_words_contains_nonword_chars",0); # STATS
 
 1;
 # ABSTRACT: Wordlist that returns one, two (via implementing first_word(), next_word(), and reset_iterator())
@@ -53,7 +53,7 @@ WordList::Test::Dynamic::OneTwo_FirstNextReset - Wordlist that returns one, two 
 
 =head1 VERSION
 
-This document describes version 0.7.5 of WordList::Test::Dynamic::OneTwo_FirstNextReset (from Perl distribution WordList), released on 2020-05-24.
+This document describes version 0.7.6 of WordList::Test::Dynamic::OneTwo_FirstNextReset (from Perl distribution WordList), released on 2020-08-23.
 
 =head1 SYNOPSIS
 

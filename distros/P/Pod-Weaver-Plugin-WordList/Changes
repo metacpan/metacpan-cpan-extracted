@@ -1,3 +1,8 @@
+0.062   2020-08-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Render WordList Parameters section.
+
+
 0.061   2020-05-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Show usage of first_word() and next_word() in generated Synopsis.

@@ -26,6 +26,7 @@ our @ISA = qw(DTA::TokWrap::Processor);
 ## $enc = CLASS_OR_OBJ->new(%args)
 ##  + %args, %deaults, %$enc:
 ##    (
+##     tcfVersion => $version,     ##-- attribute value for encoded /D-Spin/@version (default="5")
 ##     tcfTextSourceType => $type, ##-- attribute value for encoded //textSource/@type (default="application/tei+xml; tokenized=0")
 ##    )
 
@@ -34,6 +35,7 @@ our @ISA = qw(DTA::TokWrap::Processor);
 ##  + inherited dummy method
 sub defaults {
   return (
+          tcfVersion => "5",
 	  tcfTextSourceType => 'application/tei+xml; tokenized=0',
 	 );
 }
@@ -73,7 +75,7 @@ sub tcfencode {
   my $xroot = $xdoc->createElement('D-Spin');
   $xdoc->setDocumentElement($xroot);
   $xroot->setNamespace('http://www.dspin.de/data');
-  $xroot->setAttribute('version'=>'0.4');
+  $xroot->setAttribute('version'=>($enc->{tcfVersion}//'0.4'));
 
   ##-- document structure: metadata
   my $xmeta = $xroot->addNewChild(undef,'MetaData');

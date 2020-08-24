@@ -1,49 +1,52 @@
 Change log for Mail::AuthenticationResults
 
+1.20200824.1 2020-08-24 01:03:58+00:00 UTC
+  - Fix some POD formatting
+
 1.20200331.1 2020-03-31 03:31:13+00:00 UTC
-        - Treat an undefined value as emptystring in search
+  - Treat an undefined value as emptystring in search
 
 1.20200108 2020-01-08 03:38:09+00:00 UTC
-        - Added as_json method to return structured JSON
-          version of an instance.
-        - Properly parse strings beginning with a .
+  - Added as_json method to return structured JSON
+    version of an instance.
+  - Properly parse strings beginning with a .
 
 1.20180923 2018-09-23 13:39:01+10:00 Australia/Melbourne
-        - Added a 'has' search property to allow searching
-          for results whose children match a given search.
-        - Add a header 'isa' type to search for top level
-          header entries within a group.
-        - Add an 'authserv_id' search type to search for
-          headers from a given authserv-id within a group.
+  - Added a 'has' search property to allow searching
+    for results whose children match a given search.
+  - Add a header 'isa' type to search for top level
+    header entries within a group.
+  - Add an 'authserv_id' search type to search for
+    headers from a given authserv-id within a group.
 
 1.20180518 2018-05-18 10:10:03+10:00 Australia/Melbourne
-        - Consider CR properly when parsing an entry.
+  - Consider CR properly when parsing an entry.
 
 1.20180328 2018-03-28 21:35:34+11:00 Australia/Melbourne
-        - Folding of headers rendered as string for
-          the Mail::AuthenticationResults::Header object.
+  - Folding of headers rendered as string for
+    the Mail::AuthenticationResults::Header object.
 
 1.20180314 2018-03-14
-        - Correctly stringify zero
-        - Method to remove chindren from an instance
+  - Correctly stringify zero
+  - Method to remove chindren from an instance
 
 1.20180215 2018-02-15
-        - Perl 5.8 compatability
+  - Perl 5.8 compatability
 
 1.20180211 2018-02-11
-        - Test improvements
-        - Coverage improvements
-        - Stringify and validation improvements
+  - Test improvements
+  - Coverage improvements
+  - Stringify and validation improvements
 
 1.20180113 2018-01-13
-        - Added safe set methods
-        - General improvements
+  - Added safe set methods
+  - General improvements
 
 1.20171230 2017-12-30
-        - Improve test suite
-        - Add search method
-        - Improve parser
+  - Improve test suite
+  - Add search method
+  - Improve parser
 
 1.20171226 2017-12-26
-        - First Release, Module for handing Authentication-Results headers.
+  - First Release, Module for handing Authentication-Results headers.
 

@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::DBL;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: mtpolicyd plugin for checking helo,sender domain,rdns against an DBL
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -144,7 +144,7 @@ Mail::MtPolicyd::Plugin::DBL - mtpolicyd plugin for checking helo,sender domain,
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

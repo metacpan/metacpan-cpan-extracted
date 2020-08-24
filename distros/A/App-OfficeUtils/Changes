@@ -1,3 +1,18 @@
+0.003   2020-08-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option --return-output-file.
+
+        - Add option --libreoffice-path; also search for libreoffice in program
+          named 'soffice'.
+
+
+0.002   2020-08-21  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention App::MSOfficeUtils, App::LibreOfficeUtils.
+
+
 0.001   2020-08-21  Released-By: PERLANCAR
 
         - First release.

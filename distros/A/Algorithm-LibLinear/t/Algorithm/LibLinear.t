@@ -84,6 +84,7 @@ no_leaks_ok {
     my $data_set =
         Algorithm::LibLinear::DataSet->load(string => $input_data_set);
     my $classifier = $learner->train(data_set => $data_set);
+    my $labels = $classifier->class_labels;
 };
 
 done_testing;

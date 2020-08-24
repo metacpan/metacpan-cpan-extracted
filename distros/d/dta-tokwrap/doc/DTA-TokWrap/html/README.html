@@ -13,120 +13,119 @@
 
 
 <ul id="index">
-  <li><a href="#ABSTRACT">ABSTRACT</a></li>
-  <li><a href="#REQUIREMENTS">REQUIREMENTS</a>
-    <ul>
-      <li><a href="#dta-tokwrap-utilities">dta-tokwrap utilities</a></li>
-      <li><a href="#Perl-Modules">Perl Modules</a></li>
-    </ul>
-  </li>
-  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
-  <li><a href="#INSTALLATION">INSTALLATION</a></li>
-  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#CONTENTS">CONTENTS</a></li>
   <li><a href="#AUTHOR">AUTHOR</a></li>
 </ul>
 
-<p>README for DTA::TokWrap</p>
+<h1 id="NAME">NAME</h1>
 
-<h1 id="ABSTRACT">ABSTRACT</h1>
+<p>toc - table of contents for perl module DTA::TokWrap</p>
 
-<p>DTA::TokWrap - top-level wrapper modules &amp; scripts for DTA corpus tokenization</p>
+<h1 id="CONTENTS">CONTENTS</h1>
 
-<h1 id="REQUIREMENTS">REQUIREMENTS</h1>
+<ul>
 
-<h2 id="dta-tokwrap-utilities">dta-tokwrap utilities</h2>
+<li><p><a>DTA::TokWrap</a> - DTA tokenizer wrappers: top level</p>
 
-<p>See <i>../README.txt</i> for details.</p>
+</li>
+<li><p><a>DTA::TokWrap::Base</a> - DTA tokenizer wrappers: base class</p>
 
-<h2 id="Perl-Modules">Perl Modules</h2>
+</li>
+<li><p><a>DTA::TokWrap::CxData</a> - DTA tokenizer wrappers: utilities for binary cx-file I/O</p>
 
-<dl>
+</li>
+<li><p><a>DTA::TokWrap::Document</a> - DTA tokenizer wrappers: document wrapper</p>
 
-<dt id="Cwd">Cwd</dt>
-<dd>
+</li>
+<li><p><a>DTA::TokWrap::Document::Maker</a> - DTA tokenizer wrappers: document wrapper: make-mode</p>
 
-<p>tested version(s): 3.2501</p>
+</li>
+<li><p><a>DTA::TokWrap::Intro</a> - a gentle introduction to the DTA::TokWrap distribution</p>
 
-</dd>
-<dt id="Encode">Encode</dt>
-<dd>
+</li>
+<li><p><a>DTA::TokWrap::Logger</a> - DTA::Tokwrap logging facility using Log::Log4perl</p>
 
-<p>tested version(s): 2.23</p>
+</li>
+<li><p><a>DTA::TokWrap::Processor</a> - DTA tokenizer wrappers: base class for processor modules</p>
 
-</dd>
-<dt id="Env::Path">Env::Path</dt>
-<dd>
+</li>
+<li><p><a>DTA::TokWrap::Processor::mkbx</a> - DTA tokenizer wrappers: (bx0doc,tx) -&gt; bxdata</p>
 
-<p>tested version(s): 0.18</p>
+</li>
+<li><p><a>DTA::TokWrap::Processor::mkbx0</a> - DTA tokenizer wrappers: sxfile -&gt; bx0doc</p>
 
-</dd>
-<dt id="File::Basename">File::Basename</dt>
-<dd>
+</li>
+<li><p><a>DTA::TokWrap::Processor::mkindex</a> - DTA tokenizer wrappers: dtatw-mkindex</p>
 
-<p>tested version(s): 2.76</p>
+</li>
+<li><p><a>DTA::TokWrap::Processor::standoff</a> - DTA tokenizer wrappers: t.xml -&gt; (s.xml, w.xml, a.xml) via external filter programs</p>
 
-</dd>
-<dt id="Getopt::Long">Getopt::Long</dt>
-<dd>
+</li>
+<li><p><a>DTA::TokWrap::Processor::standoff::xsl</a> - DTA tokenizer wrappers: t.xml -&gt; (s.xml, w.xml, a.xml) via XSL</p>
 
-<p>tested version(s): 2.37</p>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tcfalign</a> - DTA tokenizer wrappers: text&lt;-&gt;token alignment for decoded TCF</p>
 
-</dd>
-<dt id="Log::Log4perl">Log::Log4perl</dt>
-<dd>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tcfdecode</a> - DTA tokenizer wrappers: TCF-&gt;TEI+ws decoding via proxy document</p>
 
-<p>tested version(s): 1.21</p>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tcfdecode0</a> - DTA tokenizer wrappers: TCF[tei,text,tokens,sentences]-&gt;TEI,text extraction</p>
 
-</dd>
-<dt id="Pod::Usage">Pod::Usage</dt>
-<dd>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tcfencode</a> - DTA tokenizer wrappers: TEI-&gt;TCF encoding</p>
 
-<p>tested version(s): 1.35</p>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tcftokenize</a> - DTA tokenizer wrappers: TCF text layer tokenization</p>
 
-</dd>
-<dt id="Time::HiRes">Time::HiRes</dt>
-<dd>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tok2xml</a> - DTA tokenizer wrappers: t -&gt; t.xml</p>
 
-<p>tested version(s): 1.9711</p>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tok2xml::perl</a> - DTA tokenizer wrappers: t -&gt; t.xml, pure-perl (slow, obsolete)</p>
 
-</dd>
-<dt id="XML::LibXML">XML::LibXML</dt>
-<dd>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tokenize</a> - DTA tokenizer wrappers: tokenizer: default (NYI)</p>
 
-<p>tested version(s): 1.66</p>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tokenize1</a> - DTA tokenizer wrappers: tokenizer post-processing</p>
 
-</dd>
-<dt id="XML::LibXSLT">XML::LibXSLT</dt>
-<dd>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tokenize::auto</a> - DTA tokenizer wrappers: auto tokenizer</p>
 
-<p>tested version(s): 1.66</p>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tokenize::dummy</a> - DTA tokenizer wrappers: dtatw-tokenize-dummy</p>
 
-</dd>
-<dt id="XML::Parser">XML::Parser</dt>
-<dd>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tokenize::http</a> - DTA tokenizer wrappers: http: external tokenizer via http (hack)</p>
 
-<p>tested version(s): 2.36</p>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tokenize::tomasotath_02x</a> - DTA tokenizer wrappers: tokenizer: dwds_tomsatotath via command-line</p>
 
-</dd>
-</dl>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tokenize::tomasotath_04x</a> - DTA tokenizer wrappers: tokenizer: dwds_tomsatotath v0.4.x via command-line</p>
 
-<h1 id="DESCRIPTION">DESCRIPTION</h1>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tokenize::tomasotath_05x</a> - DTA tokenizer wrappers: tokenizer: dwds_tomsatotath v0.5.x via command-line</p>
 
-<p>The DTA::TokWrap distribution provides wrapper modules and scripts for tokenization of DTA &quot;base-format&quot; XML documents.</p>
+</li>
+<li><p><a>DTA::TokWrap::Processor::tokenize::waste</a> - DTA tokenizer wrappers: tokenizer: moot/waste via command-line</p>
 
-<h1 id="INSTALLATION">INSTALLATION</h1>
+</li>
+<li><p><a>DTA::TokWrap::Processor::txmlanno</a> - Descript: DTA tokenizer wrappers: t.xml -&gt; t.xml, via idsplice</p>
 
-<p>Issue the following commands to the shell:</p>
+</li>
+<li><p><a>DTA::TokWrap::Utils</a> - DTA tokenizer wrappers: generic utilities</p>
 
-<pre><code> bash$ cd DTA-TokWrap-0.01   # (or wherever you unpacked this distribution)
- bash$ perl Makefile.PL      # check requirements, etc.
- bash$ make                  # build the module
- bash$ make test             # (optional): test module before installing
- bash$ make install          # install the module on your system</code></pre>
+</li>
+<li><p><a>DTA::TokWrap::Version</a> - DTA tokenizer wrappers: package version constants</p>
 
-<h1 id="SEE-ALSO">SEE ALSO</h1>
+</li>
+<li><p><a href="dta-tokwrap.perl.html">dta-tokwrap.perl</a> - top-level tokenizer wrapper for DTA XML documents</p>
 
-<p>../README.txt, perlmodinstall(1), dta-tokwrap.perl(1), DTA::TokWrap(3pm), perl(1).</p>
+</li>
+</ul>
 
 <h1 id="AUTHOR">AUTHOR</h1>
 

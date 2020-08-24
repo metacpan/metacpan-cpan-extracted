@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -156,6 +156,66 @@ in the callback.
 =item $logger = $server_config->getLogger()
 
 =item $buildinfo = $server_config->getBuildInfo()
+
+=item $server_config->setUserRightsMaskReadonly($readonly)
+
+If $readonly is set to true, only reading of attributes is allowed.
+If set to false, no additional restrictions on the UserWriteMask are made and
+attributes will also be writable (this is the default behaviour).
+Values of variable nodes are excluded from the UserWriteMask and are handled by
+the AccessLevel instead (see setUserAccessLevelReadonly()).
+
+=item $server_config->setUserAccessLevelReadonly($readonly)
+
+If $readonly is set to true, only reading of variable values is allowed
+(including reading historical data of values).
+If set to false, no additional restrictions on the AccessLevel are made and
+values will also be writable (this is the default behaviour).
+
+=item $server_config->disableUserExecutable($disable)
+
+If $disable is set to true, method nodes will not be shown as executable for
+users (UserExecutable attribute of the method node).
+If set to false, no addtional restrictions are made on the UserExecutable
+attribute of method nodes (this is the default).
+
+=item $server_config->disableUserExecutableOnObject($disable)
+
+If $disable is set to true, methods can not be executed.
+If set to false, no addtional restrictions are made on the execution of methods
+(this is the default).
+
+=item $server_config->disableAddNode($disable)
+
+If $disable is set to true, nodes can not be added.
+If set to false, nodes can be added (this is the default).
+
+=item $server_config->disableAddReference($disable)
+
+If $disable is set to true, references can not be added.
+If set to false, references can be added (this is the default).
+
+=item $server_config->disableDeleteNode($disable)
+
+If $disable is set to true, nodes can not be deleted.
+If set to false, nodes can be deleted (this is the default).
+
+=item $server_config->disableDeleteReference($disable)
+
+If $disable is set to true, references can not be deleted.
+If set to false, references can be deleted (this is the default).
+
+=item $server_config->disableHistoryUpdateUpdateData($disable)
+
+If $disable is set to true, historical data may not be inserted, replaced or
+updated.
+If set to false, no addtional restrictions are made on the modification of
+historical data (this is the default).
+
+=item $server_config->disableHistoryUpdateDeleteRawModified($disable)
+
+If $disable is set to true, historical data may not be deleted.
+If set to false, historical data can be deleted (this is the default).
 
 =back
 

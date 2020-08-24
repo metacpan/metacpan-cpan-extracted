@@ -1,8 +1,8 @@
 package Quantum::Superpositions::Lazy::Operation::LogicOp;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Moo;
 
 use feature qw(signatures);
@@ -14,14 +14,15 @@ use Types::Standard qw(Enum);
 use List::MoreUtils qw(zip);
 
 my %types = (
+
 	# type => number of parameters, code, forced reducer type
 	q{!} => [1, sub { !$a }, "all"],
 
 	q{==} => [2, sub { $a == $b }],
 	q{!=} => [2, sub { $a != $b }],
-	q{>}  => [2, sub { $a > $b }],
+	q{>} => [2, sub { $a > $b }],
 	q{>=} => [2, sub { $a >= $b }],
-	q{<}  => [2, sub { $a < $b }],
+	q{<} => [2, sub { $a < $b }],
 	q{<=} => [2, sub { $a <= $b }],
 
 	q{eq} => [2, sub { $a eq $b }],
@@ -35,17 +36,21 @@ my %types = (
 # TODO: should "one" reducer run after every iterator pair
 # or after an element is compared with the entire superposition?
 my %reducer_types = (
+
 	# type => short circuit value, code
 	q{all} => [0, sub { ($a // 1) && $b }],
 	q{any} => [1, sub { $a || $b }],
-	q{one} => [undef, sub {
-		my $val = $a // ($b ? 1 : undef);
-		$val -= 0+ $b if defined $a && $val;
-		return $val;
-	}],
+	q{one} => [
+		undef,
+		sub {
+			my $val = $a // ($b ? 1 : undef);
+			$val -= 0 + $b if defined $a && $val;
+			return $val;
+		}
+	],
 );
 
-sub extract_state($ref, $index = undef)
+sub extract_state ($ref, $index = undef)
 {
 	my $values = is_collapsible($ref) ? $ref->states : [$ref];
 
@@ -91,13 +96,13 @@ with "Quantum::Superpositions::Lazy::Role::Operation";
 
 has "+sign" => (
 	is => "ro",
-	isa => Enum[keys %types],
+	isa => Enum [keys %types],
 	required => 1,
 );
 
 has "reducer" => (
 	is => "ro",
-	isa => Enum[keys %reducer_types],
+	isa => Enum [keys %reducer_types],
 	writer => "set_reducer",
 	default => sub { $Quantum::Superpositions::Lazy::global_reducer_type },
 );
@@ -107,7 +112,7 @@ sub supported_types($self)
 	return keys %types;
 }
 
-sub run($self, @parameters)
+sub run ($self, @parameters)
 {
 	my ($param_num, $code, $forced_reducer) = $types{$self->sign}->@*;
 	@parameters = $self->_clear_parameters($param_num, @parameters);
@@ -118,6 +123,7 @@ sub run($self, @parameters)
 
 	local ($a, $b);
 	while (($a, $b) = $iterator->()) {
+
 		# $a and $b are set up for type sub
 		$b = $code->();
 		$a = $carry;
@@ -132,7 +138,7 @@ sub run($self, @parameters)
 	return !!$carry;
 }
 
-sub valid_states($self, @parameters)
+sub valid_states ($self, @parameters)
 {
 	my ($param_num, $code) = $types{$self->sign}->@*;
 	@parameters = $self->_clear_parameters($param_num, @parameters);
@@ -143,6 +149,7 @@ sub valid_states($self, @parameters)
 	local ($a, $b);
 	my ($key_a, $key_b);
 	while (($key_a, $a, $key_b, $b) = $iterator->(1)) {
+
 		# $a and $b are set up for type sub
 		my $result = $code->();
 

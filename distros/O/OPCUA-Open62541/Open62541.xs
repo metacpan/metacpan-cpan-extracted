@@ -2022,6 +2022,154 @@ clientAsyncReadCallback(UA_Client *client, void *userdata,
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
+/* 16.3 Access Control Plugin API */
+
+static UA_UInt32
+getUserRightsMask_default(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
+    void *nodeContext) {
+	return 0xFFFFFFFF;
+}
+
+static UA_UInt32
+getUserRightsMask_readonly(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
+    void *nodeContext) {
+	return 0x00000000;
+}
+
+static UA_Byte
+getUserAccessLevel_default(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
+    void *nodeContext) {
+	return 0xFF;
+}
+
+static UA_Byte
+getUserAccessLevel_readonly(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
+    void *nodeContext) {
+	return UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_HISTORYREAD;
+}
+
+static UA_Boolean
+getUserExecutable_default(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *methodId,
+    void *methodContext) {
+	return true;
+}
+
+static UA_Boolean
+getUserExecutable_false(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *methodId,
+    void *methodContext) {
+	return false;
+}
+
+static UA_Boolean
+getUserExecutableOnObject_default(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *methodId,
+    void *methodContext, const UA_NodeId *objectId, void *objectContext) {
+	return true;
+}
+
+static UA_Boolean
+getUserExecutableOnObject_false(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *methodId,
+    void *methodContext, const UA_NodeId *objectId, void *objectContext) {
+	return false;
+}
+
+static UA_Boolean
+allowAddNode_default(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext,
+    const UA_AddNodesItem *item) {
+	return true;
+}
+
+static UA_Boolean
+allowAddNode_false(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext,
+    const UA_AddNodesItem *item) {
+	return false;
+}
+
+static UA_Boolean
+allowAddReference_default(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext,
+    const UA_AddReferencesItem *item) {
+	return true;
+}
+
+static UA_Boolean
+allowAddReference_false(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext,
+    const UA_AddReferencesItem *item) {
+	return false;
+}
+
+static UA_Boolean
+allowDeleteNode_default(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext,
+    const UA_DeleteNodesItem *item) {
+	return true;
+}
+
+static UA_Boolean
+allowDeleteNode_false(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext,
+    const UA_DeleteNodesItem *item) {
+	return false;
+}
+
+static UA_Boolean
+allowDeleteReference_default(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext,
+    const UA_DeleteReferencesItem *item) {
+	return true;
+}
+
+static UA_Boolean
+allowDeleteReference_false(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext,
+    const UA_DeleteReferencesItem *item) {
+	return false;
+}
+
+#ifdef UA_ENABLE_HISTORIZING
+
+static UA_Boolean
+allowHistoryUpdateUpdateData_default(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
+    UA_PerformUpdateType performInsertReplace, const UA_DataValue *value) {
+	return true;
+}
+
+static UA_Boolean
+allowHistoryUpdateUpdateData_false(UA_Server *server, UA_AccessControl *ac,
+    const UA_NodeId *sessionId, void *sessionContext, const UA_NodeId *nodeId,
+    UA_PerformUpdateType performInsertReplace, const UA_DataValue *value) {
+	return false;
+}
+
+static UA_Boolean
+allowHistoryUpdateDeleteRawModified_default(UA_Server *server,
+    UA_AccessControl *ac, const UA_NodeId *sessionId, void *sessionContext,
+    const UA_NodeId *nodeId, UA_DateTime startTimestamp,
+    UA_DateTime endTimestamp, bool isDeleteModified) {
+	return true;
+}
+
+static UA_Boolean
+allowHistoryUpdateDeleteRawModified_false(UA_Server *server,
+    UA_AccessControl *ac, const UA_NodeId *sessionId, void *sessionContext,
+    const UA_NodeId *nodeId, UA_DateTime startTimestamp,
+    UA_DateTime endTimestamp, bool isDeleteModified) {
+	return false;
+}
+
+#endif /* UA_ENABLE_HISTORIZING*/
+
 /* 16.4 Logging Plugin API, log and clear callbacks */
 
 static void XS_pack_UA_LogLevel(SV *, UA_LogLevel) __attribute__((unused));
@@ -3069,6 +3217,132 @@ UA_ServerConfig_setMaxSessionTimeout(config, maxSessionTimeout);
 	UA_Double	maxSessionTimeout
     CODE:
 	config->svc_serverconfig->maxSessionTimeout = maxSessionTimeout;
+
+# AccessControl plugin callbacks
+
+void
+UA_ServerConfig_setUserRightsMaskReadonly(config, readonly);
+	OPCUA_Open62541_ServerConfig	config
+	SV *				readonly
+    CODE:
+	if (SvTRUE(readonly))
+		config->svc_serverconfig->accessControl.getUserRightsMask =
+		    getUserRightsMask_readonly;
+	else
+		config->svc_serverconfig->accessControl.getUserRightsMask =
+		    getUserRightsMask_default;
+
+void
+UA_ServerConfig_setUserAccessLevelReadonly(config, readonly);
+	OPCUA_Open62541_ServerConfig	config
+	SV *				readonly
+    CODE:
+	if (SvTRUE(readonly))
+		config->svc_serverconfig->accessControl.getUserAccessLevel =
+		    getUserAccessLevel_readonly;
+	else
+		config->svc_serverconfig->accessControl.getUserAccessLevel =
+		    getUserAccessLevel_default;
+
+void
+UA_ServerConfig_disableUserExecutable(config, disable);
+	OPCUA_Open62541_ServerConfig	config
+	SV *				disable
+    CODE:
+	if (SvTRUE(disable))
+		config->svc_serverconfig->accessControl.getUserExecutable =
+		    getUserExecutable_false;
+	else
+		config->svc_serverconfig->accessControl.getUserExecutable =
+		    getUserExecutable_default;
+
+void
+UA_ServerConfig_disableUserExecutableOnObject(config, disable);
+	OPCUA_Open62541_ServerConfig	config
+	SV *				disable
+    CODE:
+	if (SvTRUE(disable))
+		config->svc_serverconfig->accessControl.getUserExecutableOnObject =
+		    getUserExecutableOnObject_false;
+	else
+		config->svc_serverconfig->accessControl.getUserExecutableOnObject =
+		    getUserExecutableOnObject_default;
+
+void
+UA_ServerConfig_disableAddNode(config, disable);
+	OPCUA_Open62541_ServerConfig	config
+	SV *				disable
+    CODE:
+	if (SvTRUE(disable))
+		config->svc_serverconfig->accessControl.allowAddNode =
+		    allowAddNode_false;
+	else
+		config->svc_serverconfig->accessControl.allowAddNode =
+		    allowAddNode_default;
+
+void
+UA_ServerConfig_disableAddReference(config, disable);
+	OPCUA_Open62541_ServerConfig	config
+	SV *				disable
+    CODE:
+	if (SvTRUE(disable))
+		config->svc_serverconfig->accessControl.allowAddReference =
+		    allowAddReference_false;
+	else
+		config->svc_serverconfig->accessControl.allowAddReference =
+		    allowAddReference_default;
+
+void
+UA_ServerConfig_disableDeleteNode(config, disable);
+	OPCUA_Open62541_ServerConfig	config
+	SV *				disable
+    CODE:
+	if (SvTRUE(disable))
+		config->svc_serverconfig->accessControl.allowDeleteNode =
+		    allowDeleteNode_false;
+	else
+		config->svc_serverconfig->accessControl.allowDeleteNode =
+		    allowDeleteNode_default;
+
+void
+UA_ServerConfig_disableDeleteReference(config, disable);
+	OPCUA_Open62541_ServerConfig	config
+	SV *				disable
+    CODE:
+	if (SvTRUE(disable))
+		config->svc_serverconfig->accessControl.allowDeleteReference =
+		    allowDeleteReference_false;
+	else
+		config->svc_serverconfig->accessControl.allowDeleteReference =
+		    allowDeleteReference_default;
+
+#ifdef UA_ENABLE_HISTORIZING
+
+void
+UA_ServerConfig_disableHistoryUpdateUpdateData(config, disable);
+	OPCUA_Open62541_ServerConfig	config
+	SV *				disable
+    CODE:
+	if (SvTRUE(disable))
+		config->svc_serverconfig->accessControl.allowHistoryUpdateUpdateData =
+		    allowHistoryUpdateUpdateData_false;
+	else
+		config->svc_serverconfig->accessControl.allowHistoryUpdateUpdateData =
+		    allowHistoryUpdateUpdateData_default;
+
+void
+UA_ServerConfig_disableHistoryUpdateDeleteRawModified(config, disable);
+	OPCUA_Open62541_ServerConfig	config
+	SV *				disable
+    CODE:
+	if (SvTRUE(disable))
+		config->svc_serverconfig->accessControl.allowHistoryUpdateDeleteRawModified =
+		    allowHistoryUpdateDeleteRawModified_false;
+	else
+		config->svc_serverconfig->accessControl.allowHistoryUpdateDeleteRawModified =
+		    allowHistoryUpdateDeleteRawModified_default;
+
+#endif /* UA_ENABLE_HISTORIZING */
 
 #############################################################################
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::Client		PREFIX = UA_Client_

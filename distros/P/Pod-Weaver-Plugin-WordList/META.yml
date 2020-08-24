@@ -18,17 +18,20 @@ meta-spec:
 name: Pod-Weaver-Plugin-WordList
 requires:
   File::Slurper: '0'
-  File::Temp: '0'
+  File::Temp: '0.2307'
+  List::Util: '1.45'
+  Markdown::To::POD: '0'
   Perinci::Result::Format::Lite: '0.273'
   Pod::Weaver: '0'
   Pod::Weaver::Role::AddTextToSection: '0.06'
+  String::PodQuote: '0'
   perl: '5.010001'
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-WordList
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-WordList
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-WordList.git
-version: '0.061'
+version: '0.062'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -116,7 +119,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.060'
+      version: '0.062'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -297,7 +300,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.144'
+      version: '0.145'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

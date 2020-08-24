@@ -1,7 +1,7 @@
 package Mail::DKIM::ARC::Signer;
 use strict;
 use warnings;
-our $VERSION = '1.20200724'; # VERSION
+our $VERSION = '1.20200824'; # VERSION
 # ABSTRACT: generates a DKIM signature for a message
 
 # Copyright 2017 FastMail Pty Ltd.  All Rights Reserved.
@@ -198,6 +198,8 @@ sub finish_header {
         $self->{details} = 'No authentication results seen';
         return;
     }
+
+    $self->{Chain} = 'none' if ($self->{Chain} eq 'ar');
 
     if ( $#ams > $#as ) {
         $self->{result}        = 'skipped';
@@ -588,7 +590,7 @@ Mail::DKIM::ARC::Signer - generates a DKIM signature for a message
 
 =head1 VERSION
 
-version 1.20200724
+version 1.20200824
 
 =head1 SYNOPSIS
 

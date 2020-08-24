@@ -18,6 +18,12 @@ foreach my $f (qw(META.yml META.json MYMETA.yml MYMETA.json)) {
     or warn("$0: WARNING: failed to unlink $f: $!");
 }
 
+##-- workaround for irritating "/some/symlinked/file is encountered a second time at File/Find.pm line 79." errors
+##   under ExtUtils::MakeMaker 7.1002 (see also RT bug #99018)
+#*ExtUtils::MakeMaker::_check_files = sub {};
+#*ExtUtils::MakeMaker::check_manifest = sub {};
+do "./find.hack" if (-e "./find.hack");
+
 
 ##----------------------------------------------------------------------
 ## dummy MakeMaker

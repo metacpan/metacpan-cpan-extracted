@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,28 +12,28 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Hash: RIPEMD160
 
-SHA256 60f52155596ba32984ffb2b3dbd66e286ce8f250c148c1dba3db1bd2435b9bd6 Build.PL
-SHA256 7bc96ed850d68cdb08d50fa637ec212102e8d8d0a042ee89db41b51ab68bf958 Changes
+SHA256 4bf1fc15e0ded27f5a41ca003d6ad7bf7759cbaf34a20ef017a91ddc0232bc62 Build.PL
+SHA256 0a3e54697df3c218bf6a13f291176cce1b42c139bc692555a6d99a395199d195 Changes
 SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
 SHA256 dc6eca2bd50435d28154e6ab510f7b26b84fe3d458c85570bc157e2c69a05888 MANIFEST
-SHA256 893cdbd368698cf2cc17114619667efbb7e3e83cf3180a6745d17b5aed4ebd60 META.json
-SHA256 efc753e4e18274afbfe711a59a77c5df2e1989b12f9ded87ba45f913f5c71085 META.yml
+SHA256 db546bbe50423362cb628562354ba1bd8fbf66bca0b9bd41e3e54cea08bc559c META.json
+SHA256 87746ca0552d23b8d2a1a7aee47807cdad7ba7e18258c4a38af8e4785f9862d6 META.yml
 SHA256 ca301575f85bbe95b19db3f892659ed5b20ad81a35aae60b25e8717bec9fd20d README
 SHA256 71bcc58ad13cda0c28aca69343e44258fe19913f965ce8b5734a4099b0712232 eg/solicit
-SHA256 4bea0ac9de05024fe706ac23a146f7ada76c8908cd879461a1ef74ff23e613e5 lib/Term/CallEditor.pm
+SHA256 18b08710890234022ff2eb1601296270906192728104bd6328b54f3b9b0c8dda lib/Term/CallEditor.pm
 SHA256 c32105cc7f93b5fa610863369d09acdd71b85273c36ed6fe0c69c6ca784698f6 t/1.t
 SHA256 0bc87a42d1a13c1a686e4c6d9324be0dcbd42831be2b0a907194f56c6026774b t/pod-coverage.t
 SHA256 8e4cd9929e3ec60c761e5d486549922a7bdc5030e6af6d66fcc759ca8c7dbec6 t/pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEExz5nATgiJJxZ/1+dgZku4eEsA4UFAl8++54ACgkQgZku4eEs
-A4W0UAgAiZkLMXgeKuMD65b5Ew5PassXtg6ps5u0v1RwjyKw1qXY9klrodSJm27l
-/0sZGNwE4NyV5yW/1uLnc4RgOKB5YZN5izJTHVWqLRz+jGsRRGg37o9pFY3Uvmbz
-wIBglVke021B3wJPKcRlDFCMij78WbIVWVnWsWwrx0WCnffbZDqsNTVajxWFrc/9
-/B7bjl4y37EY1Mecb4yyhePTvJpIPSh0qUiA2Pjb9lvTKPsCvte70arnZjcEqz5H
-l74XGboyRZLR6jtRDpaTsh3KuG0NtbtG7x8xxKkvS1bxY12wA0/sCCy88Kij/6h1
-F4ZpGXtuOdnE49wZnhITrADJrt4w4g==
-=w1Ox
+iQEzBAEBAwAdFiEExz5nATgiJJxZ/1+dgZku4eEsA4UFAl9BYAgACgkQgZku4eEs
+A4X+Wgf/QfgqaX1O+cLmE2rjk/4PADW83A5cka0dOqZds5s1vJa2sgz5gzyeRkTg
+0La2ufYBCOIZUsh9tCrsUAgCuYvGKKBO/hLR8OyNu9jNmnLdGgorjF9ow3Hjdq3p
+eKnzkzsb/Rg8ZKR9dEeJjY+Ao+jmoebcA6ofDgpBKtftvukX/i5XHHoxmk5RkTs/
+7MtP3TkX3ksHPcq7UPSuy3eHMmPzJXPNtVtWehTKbq1tJqeBiZRUtORTRf5ZhRu+
+V8YOkZ706lLTJayO8KGWUnXKecbVuJbeY377AOMu0ANCrKk8KgeURW/Z6ixxALPQ
+iZI3HETKjpy6qTOAuLlV5pbfXEdbuQ==
+=+6db
 -----END PGP SIGNATURE-----

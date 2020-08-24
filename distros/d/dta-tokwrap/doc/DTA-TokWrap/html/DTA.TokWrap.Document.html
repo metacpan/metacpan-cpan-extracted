@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>DTA::TokWrap::Document - DTA tokenizer wrappers: document wrapper</title>
+<title></title>
 <link rel="stylesheet" href="dtatw.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rev="made" href="mailto:root@localhost" />
@@ -11,7 +11,7 @@
 <body>
 <table border="0" width="100%" cellspacing="0" cellpadding="3">
 <tr><td class="_podblock_" valign="middle">
-<big><strong><span class="_podblock_">&nbsp;DTA::TokWrap::Document - DTA tokenizer wrappers: document wrapper</span></strong></big>
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
 </td></tr>
 </table>
 
@@ -105,7 +105,7 @@
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
-<p>DTA::TokWrap::Document provides a perl class for representing a single DTA base-format XML file and associated indices. Together with the <a>DTA::TokWrap</a> module, this class comprises the top-level API of the DTA::TokWrap distribution.</p>
+<p>DTA::TokWrap::Document provides a perl class for representing a single DTA base-format XML file and associated indices. Together with the <a href="DTA.TokWrap.html">DTA::TokWrap</a> module, this class comprises the top-level API of the DTA::TokWrap distribution.</p>
 
 <h2 id="Globals">Globals</h2>
 
@@ -114,7 +114,7 @@
 <dt id="ISA">@ISA</dt>
 <dd>
 
-<p>DTA::TokWrap::Document inherits from <a>DTA::TokWrap::Base</a>.</p>
+<p>DTA::TokWrap::Document inherits from <a href="DTA.TokWrap.Base.html">DTA::TokWrap::Base</a>.</p>
 
 </dd>
 <dt id="TOKENIZE_CLASS">$TOKENIZE_CLASS</dt>
@@ -122,7 +122,7 @@
 
 <p>$TOKENIZE_CLASS</p>
 
-<p>Default tokenizer sub-processor class (default=&#39;<a>DTA::TokWrap::Processor::tokenize</a>&#39;).</p>
+<p>Default tokenizer sub-processor class (default=&#39;<a href="DTA.TokWrap.Processor.tokenize.html">DTA::TokWrap::Processor::tokenize</a>&#39;).</p>
 
 </dd>
 <dt id="Variables:-CX_ID-CX_XOFF-CX_XLEN-CX_TOFF-CX_TLEN-CX_TEXT-CX_ATTRS">Variables: ($CX_ID,$CX_XOFF,$CX_XLEN,$CX_TOFF,$CX_TLEN,$CX_TEXT,$CX_ATTRS)</dt>
@@ -142,7 +142,7 @@
 
 <pre><code> $doc = $CLASS_OR_OBJECT-&gt;new(%args);</code></pre>
 
-<p>Low-level constructor for document wrapper object. You should probably use either <a>DTA::TokWrap-&gt;open()</a> or <a href="#open">DTA::TokWrap::Document-&gt;open()</a> instead of calling this constructor directly.</p>
+<p>Low-level constructor for document wrapper object. You should probably use either <a href="DTA.TokWrap.html#open">DTA::TokWrap-&gt;open()</a> or <a href="#open">DTA::TokWrap::Document-&gt;open()</a> instead of calling this constructor directly.</p>
 
 <p>%args, %$doc:</p>
 
@@ -352,7 +352,7 @@
 
 <pre><code> $keyval_or_undef = $doc-&gt;makeKey($key);</code></pre>
 
-<p>Just an alias for $doc-&gt;genKey($key) here, but see <a>DTA::TokWrap::Document::Maker</a> for a more sophisticated implementation</p>
+<p>Just an alias for $doc-&gt;genKey($key) here, but see <a href="DTA.TokWrap.Document.Maker.html#makeKey">DTA::TokWrap::Document::Maker</a> for a more sophisticated implementation</p>
 
 </dd>
 </dl>
@@ -367,7 +367,7 @@
 <pre><code> $doc_or_undef = $doc-&gt;mkindex($mkindex);
  $doc_or_undef = $doc-&gt;mkindex();</code></pre>
 
-<p>see <a>DTA::TokWrap::Processor::mkindex::mkindex()</a>.</p>
+<p>see <a href="DTA.TokWrap.Processor.mkindex.html#mkindex">DTA::TokWrap::Processor::mkindex::mkindex()</a>.</p>
 
 </dd>
 <dt id="mkbx0">mkbx0</dt>
@@ -376,7 +376,7 @@
 <pre><code> $doc_or_undef = $doc-&gt;mkbx0($mkbx0);
  $doc_or_undef = $doc-&gt;mkbx0();</code></pre>
 
-<p>see <a>DTA::TokWrap::Processor::mkbx0::mkbx0()</a></p>
+<p>see <a href="DTA.TokWrap.Processor.mkbx0.html#mkbx0">DTA::TokWrap::Processor::mkbx0::mkbx0()</a></p>
 
 </dd>
 <dt id="mkbx">mkbx</dt>
@@ -385,7 +385,7 @@
 <pre><code> $doc_or_undef = $doc-&gt;mkbx($mkbx);
  $doc_or_undef = $doc-&gt;mkbx();</code></pre>
 
-<p>see <a>DTA::TokWrap::Processor::mkbx::mkbx()</a>.</p>
+<p>see <a href="DTA.TokWrap.Processor.mkbx.html#mkbx">DTA::TokWrap::Processor::mkbx::mkbx()</a>.</p>
 
 </dd>
 <dt id="tokenize">tokenize</dt>
@@ -394,7 +394,7 @@
 <pre><code> $doc_or_undef = $doc-&gt;tokenize($tokenize);
  $doc_or_undef = $doc-&gt;tokenize();</code></pre>
 
-<p>see <a>DTA::TokWrap::Processor::tokenize::tokenize()</a>, <a>DTA::TokWrap::Processor::tokenize::http::tokenize()</a>, <a>DTA::TokWrap::Processor::tokenize::tomasotath::tokenize()</a>, <a>DTA::TokWrap::Processor::tokenize::dummy::tokenize()</a>.</p>
+<p>see <a href="DTA.TokWrap.Processor.tokenize.html#tokenize">DTA::TokWrap::Processor::tokenize::tokenize()</a>, <a href="DTA.TokWrap.Processor.tokenize.http.html#tokenize">DTA::TokWrap::Processor::tokenize::http::tokenize()</a>, <a>DTA::TokWrap::Processor::tokenize::tomasotath::tokenize()</a>, <a href="DTA.TokWrap.Processor.tokenize.dummy.html#tokenize">DTA::TokWrap::Processor::tokenize::dummy::tokenize()</a>.</p>
 
 <p>Default tokenizer subclass is given by package-global $TOKENIZE_CLASS.</p>
 
@@ -405,7 +405,7 @@
 <pre><code> $doc_or_undef = $doc-&gt;tokenize1($tokenize1);
  $doc_or_undef = $doc-&gt;tokenize1();</code></pre>
 
-<p>see <a>DTA::TokWrap::Processor::tokenize1::tokenize1()</a>.</p>
+<p>see <a href="DTA.TokWrap.Processor.tokenize1.html#tokenize1">DTA::TokWrap::Processor::tokenize1::tokenize1()</a>.</p>
 
 </dd>
 <dt id="tok2xml">tok2xml</dt>
@@ -414,7 +414,7 @@
 <pre><code> $doc_or_undef = $doc-&gt;tok2xml($tok2xml);
  $doc_or_undef = $doc-&gt;tok2xml();</code></pre>
 
-<p>see <a>DTA::TokWrap::Processor::tok2xml::tok2xml()</a>.</p>
+<p>see <a href="DTA.TokWrap.Processor.tok2xml.html#tok2xml">DTA::TokWrap::Processor::tok2xml::tok2xml()</a>.</p>
 
 </dd>
 <dt id="txmlanno">txmlanno</dt>
@@ -423,7 +423,7 @@
 <pre><code> $doc_or_undef = $doc-&gt;txmlanno($txmlanno);
  $doc_or_undef = $doc-&gt;txmlanno();</code></pre>
 
-<p>see <a>DTA::TokWrap::Processor::txmlanno::txmlanno()</a>.</p>
+<p>see <a href="DTA.TokWrap.Processor.txmlanno.html#txmlanno">DTA::TokWrap::Processor::txmlanno::txmlanno()</a>.</p>
 
 </dd>
 <dt id="addws">addws</dt>
@@ -450,7 +450,7 @@
 <pre><code> $doc_or_undef = $doc-&gt;tcfencode($tcfencode)
  $doc_or_undef = $doc-&gt;tcfencode()</code></pre>
 
-<p>see <a>DTA::TokWrap::Processor::tcfencode::tcfencode()</a>.</p>
+<p>see <a href="DTA.TokWrap.Processor.tcfencode.html#tcfencode">DTA::TokWrap::Processor::tcfencode::tcfencode()</a>.</p>
 
 </dd>
 </dl>
@@ -690,11 +690,11 @@
 
 <h1 id="SEE-ALSO">SEE ALSO</h1>
 
-<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="dta-tokwrap.perl.pod:.html">dta-tokwrap.perl(1)</a>, ...</p>
+<p><a href="DTA.TokWrap.Intro.html">DTA::TokWrap::Intro(3pm)</a>, <a href="dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
 
 <h1 id="SEE-ALSO1">SEE ALSO</h1>
 
-<p><a>DTA::TokWrap::Intro(3pm)</a>, <a href="dta-tokwrap.perl.pod:.html">dta-tokwrap.perl(1)</a>, ...</p>
+<p><a href="DTA.TokWrap.Intro.html">DTA::TokWrap::Intro(3pm)</a>, <a href="dta-tokwrap.html">dta-tokwrap.perl(1)</a>, ...</p>
 
 <h1 id="AUTHOR">AUTHOR</h1>
 
@@ -708,7 +708,7 @@
 
 <table border="0" width="100%" cellspacing="0" cellpadding="3">
 <tr><td class="_podblock_" valign="middle">
-<big><strong><span class="_podblock_">&nbsp;DTA::TokWrap::Document - DTA tokenizer wrappers: document wrapper</span></strong></big>
+<big><strong><span class="_podblock_">&nbsp;</span></strong></big>
 </td></tr>
 </table>
 

@@ -1,7 +1,7 @@
 package Mail::DKIM::Canonicalization::DkCommon;
 use strict;
 use warnings;
-our $VERSION = '1.20200724'; # VERSION
+our $VERSION = '1.20200824'; # VERSION
 # ABSTRACT: dk common canonicalization
 
 # Copyright 2005-2006 Messiah College. All rights reserved.
@@ -150,7 +150,7 @@ Mail::DKIM::Canonicalization::DkCommon - dk common canonicalization
 
 =head1 VERSION
 
-version 1.20200724
+version 1.20200824
 
 =head1 AUTHORS
 

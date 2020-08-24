@@ -38,7 +38,7 @@
             "Sort::Key" : "0",
             "Type::Tiny" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.024"
+            "perl" : "5.028"
          }
       },
       "test" : {
@@ -61,6 +61,6 @@
          "url" : "https://github.com/brtastic/perl-quantum-superpositions-lazy"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,0 +1,91 @@
+#!perl
+
+use strict;
+use warnings;
+use Log::ger;
+use Log::ger::Screen;
+
+#use File::Which;
+
+unless (@ARGV >= 2) {
+    die "Usage: rename-add-prefix <prefix> <FILE>...\n";
+}
+#die "rename-add-prefix: Can't find perlmv in PATH\n" unless which("perlmv");
+
+my $prefix = shift @ARGV;
+system "perlmv", "add-prefix", "-a", "avoid_duplicate_prefix=1", "-a", "prefix=$prefix", @ARGV;
+
+# ABSTRACT: Add prefix to filenames
+# PODNAME: rename-add-prefix
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rename-add-prefix - Add prefix to filenames
+
+=head1 VERSION
+
+This document describes version 0.006 of rename-add-prefix (from Perl distribution App-FileRenameUtils), released on 2020-08-22.
+
+=head1 SYNOPSIS
+
+ % rename-add-prefix <prefix> <file>...
+
+Given these files:
+
+ foo
+ bar.txt
+ new-baz.mp4
+
+this command:
+
+ % rename-add-prefix new- *
+
+will rename them as follow:
+
+ foo -> new-foo
+ bar.txt -> new-bar.txt
+
+=head1 DESCRIPTION
+
+This is a shortcut for:
+
+ % perlmv add-prefix -a avoid_duplicate_prefix=1 -a prefix=<prefix> <file>...
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-FileRenameUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-FileRenameUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileRenameUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<App::perlmv> and its L<App::perlmv::scriptlet::add_prefix> scriptlet.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

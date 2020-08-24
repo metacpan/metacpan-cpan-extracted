@@ -1,9 +1,22 @@
 Revision history for Perl extension Algorithm::LibLinear
 
+0.21    Sun 23 Aug 2020
+        - Bundle LIBILNEAR 2.41.
+        - Bump minimum required Perl version from 5.14 to 5.16 for using
+          T_AVREF_REFCOUNT_FIXED typemap.
+        - Fix memory leaks in several methods which return ArrayRefs.
+        - Switch from Smart::Args to Smart::Args::TypeTiny for less
+          dependencies.
+        - Algorithm::LibLinear: Support new "ONECLASS_SVM" solver.
+        - Algorithm::LibLienar: Add "nu" and "regularize_bias" constructor
+          parameters.
+        - Algorithm::LibLinear::Model: Add is_oneclass_model() predicate.
+
 0.20    Wed Apr 24 2019
         - Bundle LIBLINEAR 2.30.
         - Algorithm::LibLinear: Add find_parameters() method.
-          Now find_cost_parameter() method is shorthand alias for it and deprecated.
+          Now find_cost_parameter() method is shorthand alias for it and
+          deprecated.
 
 0.19    Mon Oct 15 2018
         - Bundle LIBLINEAR 2.21.

@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::SqlList;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: mtpolicyd plugin for accessing a SQL white/black/access list
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -98,7 +98,7 @@ Mail::MtPolicyd::Plugin::SqlList - mtpolicyd plugin for accessing a SQL white/bl
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

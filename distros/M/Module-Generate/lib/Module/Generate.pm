@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -138,7 +138,7 @@ sub new {
 	}";
 	$CLASS{CURRENT}{SUBS}{CURRENT}{TEST} = [
 		['ok', sprintf 'my $obj = %s->new', $CLASS{CURRENT}{NAME}],
-		['isa_ok', '$obj', qq|'$CLASS{CURRENT}{NAME}'|], 
+		['isa_ok', '$obj', qq|'$CLASS{CURRENT}{NAME}'|],
 	];
 	return $self;
 }
@@ -161,7 +161,7 @@ sub accessor {
 	$CLASS{CURRENT}{SUBS}{CURRENT}{TEST} = [
 		['can_ok', qq|\$obj|, qq|'$sub'|],
 		['is',  qq|\$obj->$sub|, 'undef'],
-		['is',  qq|\$obj->$sub('test')|, qq|'test'|], 
+		['is',  qq|\$obj->$sub('test')|, qq|'test'|],
 		['deep',qq|\$obj->$sub({ a => 'b' })|, qq|{ a => 'b' }|],
 		['deep',qq|\$obj->$sub|, qq|{ a => 'b' }|]
 	];
@@ -193,7 +193,7 @@ sub keyword {
 	my ($self, $name, %keyword) = (shift, shift, (! ref $_[0] ? @_ : ref $_[0] eq 'HASH' ? %{$_[0]} : (
 		CODE => $_[0],
 		KEYWORDS => $_[1] || [],
-		($_[2] ? ( POD_TITLE => $_[2] ) : ())	
+		($_[2] ? ( POD_TITLE => $_[2] ) : ())
 	)));
 	push @{$keyword{KEYWORDS}}, $name;
 	$CLASS{KEYWORD}{$name} = \%keyword;
@@ -231,6 +231,12 @@ sub keyword {
 sub code {
 	my ($self, $code) = @_;
 	$CLASS{CURRENT}{SUBS}{CURRENT}{CODE} = $code;
+	return $self;
+}
+
+sub no_code {
+	my ($self, $code) = @_;
+	$CLASS{CURRENT}{SUBS}{CURRENT}{NO_CODE} = $code;
 	return $self;
 }
 
@@ -279,7 +285,7 @@ sub generate {
 		$tlib = "$lib/$distro/t";
 		$lib = "$lib/$distro/lib";
 	}
-	
+
 	for my $class (@classes) {
 		my $cls = _perl_tidy(
 			sprintf(
@@ -292,6 +298,7 @@ sub generate {
 					_build_pod($class, $CLASS{$class})
 			)
 		);
+
 		(my $path = $class) =~ s/\:\:/\//g;
 		my $file = sprintf "%s/%s.pm", $lib, $path;
 		_make_path($file);
@@ -384,19 +391,20 @@ sub _build_subs {
 	for my $sub (sort {
 		$class->{SUBS}{$a}{INDEX} <=> $class->{SUBS}{$b}{INDEX}
 	} keys %{$class->{SUBS}}) {
+		next if $class->{SUBS}{$sub}{NO_CODE};
 		my $code;
 		if ($class->{SUBS}{$sub}{KEYWORD}) {
 			my $meta = $class->{SUBS}{$sub};
-			my $keyword = $CLASS{KEYWORD}{$class->{SUBS}{$sub}{KEYWORD}}; 
+			my $keyword = $CLASS{KEYWORD}{$class->{SUBS}{$sub}{KEYWORD}};
 			$meta->{CODE} = _stringify_struct(
-				$MACROS, 
+				$MACROS,
 				((ref($meta->{CODE}) || "") eq "ARRAY" ? @{$meta->{CODE}} : $meta->{CODE})
 			) if defined $meta->{CODE};
 			$code = $keyword->{CODE}->($meta, $keyword->{KEYWORDS});
 		} elsif ($class->{SUBS}{$sub}{CODE}) {
 			$code = ref $class->{SUBS}{$sub}{CODE} ? Dumper $class->{SUBS}{$sub}{CODE} : $class->{SUBS}{$sub}{CODE};
 			$code =~ s/\$VAR1 = //;
-			$code =~ s/sub\s*//;
+			$code =~ s/^\s*sub\s*//;
 			$code =~ s/\s*\n*\s*package Module\:\:Generate\;|use warnings\;|use strict\;//g;
 			$code =~ s/{\s*\n*/{/;
 			$code =~ s/};$/}/;
@@ -428,7 +436,7 @@ sub _build_pod {
 	} keys %{$definition->{SUBS}}) {
 		my $spod = $definition->{SUBS}{$sub}{POD} ? $definition->{SUBS}{$sub}{POD} : "";
 		if ($definition->{SUBS}{$sub}{KEYWORD}) {
-			my $name = $definition->{SUBS}{$sub}{$definition->{SUBS}{$sub}{KEYWORD}};  
+			my $name = $definition->{SUBS}{$sub}{$definition->{SUBS}{$sub}{KEYWORD}};
 			push @{$sections{$definition->{SUBS}{$sub}{KEYWORD}}}, $definition->{SUBS}{$sub}{EXAMPLE}
 				? sprintf("=head2 %s\n\n%s\n\n\t%s",
 					$name, $spod, $definition->{SUBS}{$sub}{EXAMPLE})
@@ -516,7 +524,7 @@ sub _build_tests {
 
 	if ($class->{SUBS}->{new}->{TEST}) {
 		$tests .= sprintf "subtest 'new' => sub { plan tests => %s; %s };",
-			scalar @{$class->{SUBS}->{new}->{TEST}}, 
+			scalar @{$class->{SUBS}->{new}->{TEST}},
 			join '', map{ _build_test($_) } @{ $class->{SUBS}->{new}->{TEST} };
 		$obj_ok = $class->{SUBS}->{new}->{TEST}->[0];
 	}
@@ -524,9 +532,9 @@ sub _build_tests {
 	for my $sub (sort { ($class->{SUBS}->{$b}->{ACCESSOR} || 0) <=> ($class->{SUBS}->{$a}->{ACCESSOR} || 0) }  keys %{$class->{SUBS}}) {
 		next if $sub eq 'new';
 		unshift @{$class->{SUBS}->{$sub}->{TEST}}, $obj_ok if $obj_ok;
-		$tests .= sprintf "subtest '%s' => sub { plan tests => %s; %s };", 
-			($class->{SUBS}->{$sub}->{KEYWORD} ? ( $class->{SUBS}->{$sub}->{KEYWORD} . ' ' . quotemeta($class->{SUBS}->{$sub}->{$class->{SUBS}->{$sub}->{KEYWORD}}) ) : $sub), 
-			scalar @{$class->{SUBS}->{$sub}->{TEST}}, 
+		$tests .= sprintf "subtest '%s' => sub { plan tests => %s; %s };",
+			($class->{SUBS}->{$sub}->{KEYWORD} ? ( $class->{SUBS}->{$sub}->{KEYWORD} . ' ' . quotemeta($class->{SUBS}->{$sub}->{$class->{SUBS}->{$sub}->{KEYWORD}}) ) : $sub),
+			scalar @{$class->{SUBS}->{$sub}->{TEST}},
 			join '', map{ _build_test($_) } @{ $class->{SUBS}->{$sub}->{TEST} }
 		if $class->{SUBS}->{$sub}->{TEST};
 	}
@@ -557,7 +565,7 @@ BEGIN {
 		},
 		unlike => sub {
 			return sprintf q|unlike(%s, %s, q{%s});|, $_[1], $_[2], $_[3] || $_[1];
-		},	
+		},
 		deep => sub {
 			return sprintf q|is_deeply(%s, %s, q{%s});|, $_[1], $_[2], $_[3] || $_[1];
 		},
@@ -651,7 +659,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
@@ -713,7 +721,7 @@ Version 0.20
 
 Instantiate a new Module::Generate object.
 
-	my $mg = Module::Generate->start;	
+	my $mg = Module::Generate->start;
 
 =head2 dist
 
@@ -952,7 +960,7 @@ Provide tests for the sub.
 
 =cut
 
-=head2 macro 
+=head2 macro
 
 Implement a macro that can be inserted across classes.
 

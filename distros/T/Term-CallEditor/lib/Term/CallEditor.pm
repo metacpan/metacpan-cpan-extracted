@@ -15,12 +15,12 @@ use vars qw(@EXPORT @ISA $VERSION $errstr);
 @ISA    = qw(Exporter);
 use Exporter;
 
-use File::Temp qw(tempfile);
+use File::Temp 0.19 qw(tempfile);
 use IO::Handle;    # for way olden versions of Perl
 use POSIX qw(getpgrp tcgetpgrp);
 use Text::ParseWords qw(shellwords);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub solicit {
     my $message = shift;
@@ -32,7 +32,10 @@ sub solicit {
     }
 
     File::Temp->safe_level($params->{safe_level}) if exists $params->{safe_level};
-    my ($tfh, $filename) = tempfile(UNLINK => 1);
+    # NOTE olden versions of File::Temp (pre 0.2307) set EXLOCK to true,
+    # so turn that off so don't have a lock on the file that the EDITOR
+    # may then stumble over. way olden versions do not have this flag
+    my ($tfh, $filename) = tempfile(UNLINK => 1, EXLOCK => 0);
 
     unless ($tfh and $filename) {
         $errstr = 'no temporary file';

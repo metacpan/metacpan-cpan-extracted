@@ -65,6 +65,7 @@ t/Mail-DKIM.t
 t/adsp.t
 t/arc-draft-sign-tests.t
 t/arc-draft-validation-tests.t
+t/arc-signer.t
 t/arc_test_suite/LICENSE.txt
 t/arc_test_suite/README.txt
 t/arc_test_suite/arc-draft-sign-tests.yml

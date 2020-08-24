@@ -1,3 +1,7 @@
+1.11
+ - Update PREREQ_PM version of Math::MPFR to 4.14
+   (This is needed to accommodate changes in mpfr-4.1.0.)
+
 1.09
  - Cater for the possibility that _Float128 is an unknown type. (This is done in
    math_mpc_include.h.)

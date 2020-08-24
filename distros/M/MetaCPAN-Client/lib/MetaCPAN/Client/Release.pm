@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Release;
 # ABSTRACT: A Release data object
-$MetaCPAN::Client::Release::VERSION = '2.027000';
+$MetaCPAN::Client::Release::VERSION = '2.028000';
 use Moo;
 use Ref::Util qw< is_hashref >;
 use JSON::MaybeXS qw< decode_json >;
@@ -97,7 +97,7 @@ MetaCPAN::Client::Release - A Release data object
 
 =head1 VERSION
 
-version 2.027000
+version 2.028000
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ The release's status, C<latest>, C<cpan>, or C<backpan>.
 
 =head2 name
 
-The release's name, something like C<Moose>.
+The release's name, something like C<Moose-1.23>.
 
 =head2 date
 
@@ -169,7 +169,7 @@ The deprecated field value for this release.
 
 =head2 distribution
 
-The name of the distribution to which this release belongs.
+The name of the distribution to which this release belongs. Something like C<Moose>
 
 =head2 abstract
 

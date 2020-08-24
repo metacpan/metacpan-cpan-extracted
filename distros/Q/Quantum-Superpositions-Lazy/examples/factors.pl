@@ -1,4 +1,4 @@
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Test::More;
 use Quantum::Superpositions::Lazy qw(fetch_matches);
 
@@ -15,6 +15,7 @@ sub get_factors
 }
 
 my %numbers = (
+
 	# number => factors
 	78 => [2, 3, 6, 13, 26, 39],
 	37 => [],

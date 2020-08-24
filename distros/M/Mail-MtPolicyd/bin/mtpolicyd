@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: the mtpolicyd executable
 # PODNAME: mtpolicyd
 
@@ -23,7 +23,7 @@ mtpolicyd - the mtpolicyd executable
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

@@ -149,7 +149,7 @@ my $p    = TAP::Parser::SubclassTest->new(
 ----------
 
         'align25' => <<'----------',
-# do not align commas here; different container types
+# do not align internal commas here; different container types
 is_deeply( [ $a,        $a ], [ $b,               $c ] );
 is_deeply( { foo => $a, bar => $a }, { foo => $b, bar => $c } );
 is_deeply( [ \$a,       \$a ], [ \$b,             \$c ] );
@@ -220,8 +220,8 @@ my $account   = "Insert into accountlines
             params => "def",
             expect => <<'#3...........',
     my $type   = shift || "o";
-    my $fname  = ( $type eq 'oo' ? 'orte_city' : 'orte' );
-    my $suffix = ( $coord_system eq 'standard' ? '' : '-orig' );
+    my $fname  = ( $type eq 'oo'               ? 'orte_city' : 'orte' );
+    my $suffix = ( $coord_system eq 'standard' ? ''          : '-orig' );
 #3...........
         },
 
@@ -393,10 +393,10 @@ my $p = TAP::Parser::SubclassTest->new(
             source => "align25",
             params => "def",
             expect => <<'#17...........',
-# do not align commas here; different container types
-is_deeply( [ $a, $a ], [ $b, $c ] );
+# do not align internal commas here; different container types
+is_deeply( [ $a, $a ],               [ $b, $c ] );
 is_deeply( { foo => $a, bar => $a }, { foo => $b, bar => $c } );
-is_deeply( [ \$a, \$a ], [ \$b, \$c ] );
+is_deeply( [ \$a, \$a ],             [ \$b, \$c ] );
 
 #17...........
         },
@@ -447,7 +447,7 @@ foreach my $key ( sort keys %{$rtests} ) {
         perltidyrc  => \$params,
         argv        => '',             # for safety; hide any ARGV from perltidy
         stderr      => \$stderr_string,
-        errorfile => \$errorfile_string,    # not used when -se flag is set
+        errorfile   => \$errorfile_string,    # not used when -se flag is set
     );
     if ( $err || $stderr_string || $errorfile_string ) {
         print STDERR "Error output received for test '$key'\n";

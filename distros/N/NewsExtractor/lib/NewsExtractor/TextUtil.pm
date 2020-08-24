@@ -11,6 +11,7 @@ our @EXPORT = (
     'is_empty',
     'parse_dateline_ymdhms',
     'reformat_dateline',
+    'remove_control_characters',
 );
 
 sub u($) {

@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Greylist;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: This plugin implements a greylisting mechanism with an auto whitelist.
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -244,7 +244,7 @@ Mail::MtPolicyd::Plugin::Greylist - This plugin implements a greylisting mechani
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

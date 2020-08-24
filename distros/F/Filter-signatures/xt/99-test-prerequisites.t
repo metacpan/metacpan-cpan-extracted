@@ -18,7 +18,7 @@ the optional prerequisite.
 
 BEGIN {
     eval {
-        require CPAN::META::Prereqs;
+        require CPAN::Meta::Prereqs;
         require Parse::CPAN::Meta;
         require Perl::PrereqScanner::Lite;
         require Module::CoreList;
@@ -35,7 +35,14 @@ BEGIN {
     };
 };
 
-my @tests = glob 't/*.t';
+my @tests;
+if( @ARGV ) {
+    @tests = @ARGV;
+} else {
+    open my $manifest, '<', 'MANIFEST'
+        or die "Couldn't read MANIFEST: $!";
+    @tests = grep { -f $_ } grep { m!^(t/.*\.t|scripts/.*\.pl)$! } map { s!\s*$!!; $_ } <$manifest>
+}
 plan tests => 0+@tests;
 
 my $meta = Parse::CPAN::Meta->load_file('META.json');

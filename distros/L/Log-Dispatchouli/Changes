@@ -1,5 +1,8 @@
 Revision history for Log-Dispatchouli
 
+2.022     2020-08-24 13:50:15-04:00 America/New_York
+        - don't duplicate pid in syslog!
+
 2.021     2020-08-12 11:48:57-04:00 America/New_York
         - add another experimental means to replace how Syslog output is set up
 

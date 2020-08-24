@@ -23,9 +23,13 @@ use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
+#use Future::IO;
 
-our $VERSION = '0.58';
+our $VERSION = '0.60';
 our @CARP_NOT;
+
+# add Browser.setPermission , .grantPermission for
+# restricting/allowing recording, clipboard, idleDetection, ...
 
 =encoding utf-8
 
@@ -504,7 +508,7 @@ sub build_command_line {
         infobars
         popup_blocking
         gpu
-        save-password-bubble
+        save_password_bubble
     )) {
         (my $optname = $option) =~ s!_!-!g;
         if( ! exists $options->{$option}) {
@@ -2937,6 +2941,7 @@ sub decoded_content($self) {
   print $mech->content;
   print $mech->content( format => 'html' ); # default
   print $mech->content( format => 'text' ); # identical to ->text
+  print $mech->content( format => 'mhtml' ); # identical to ->captureSnapshot
 
 This always returns the content as a Unicode string. It tries
 to decode the raw content according to its input encoding.
@@ -2965,8 +2970,10 @@ sub content( $self, %options ) {
         $content= $self->decoded_content()
     } elsif ( $format eq 'text' ) {
         $content= $self->text;
+    } elsif ( $format eq 'mhtml' ) {
+        $content= $self->captureSnapshot()->{data};
     } else {
-        $self->die( qq{Unknown "format" parameter "$format"} );
+        die qq{Unknown "format" parameter "$format"};
     };
 };
 
@@ -2985,6 +2992,26 @@ sub text {
     # Waugh - this is highly inefficient but conveniently short to write
     # Maybe this should skip SCRIPT nodes...
     join '', map { $_->get_attribute('textContent') } $self->xpath('//body', single => 1 );
+}
+
+=head2 C<< $mech->captureSnapshot_future() >>
+
+=head2 C<< $mech->captureSnapshot() >>
+
+    print $mech->captureSnapshot( format => 'mhtml' )->{data};
+
+Returns the current page as MHTML.
+
+This is WWW::Mechanize::Chrome specific.
+
+=cut
+
+sub captureSnapshot_future( $self, %options ) {
+    $self->target->send_message( 'Page.captureSnapshot', %options )
+}
+
+sub captureSnapshot( $self, %options ) {
+    $self->captureSnapshot_future(%options)->get
 }
 
 =head2 C<< $mech->content_encoding() >>
@@ -3287,8 +3314,7 @@ it also C<croak>s when more than one link is found.
 
 =cut
 
-use vars '%xpath_quote';
-%xpath_quote = (
+our %xpath_quote = (
     '"' => '\"',
     #"'" => "\\'",
     #'[' => '&#91;',
@@ -3298,7 +3324,7 @@ use vars '%xpath_quote';
     #']' => '[\]]',
 );
 
-sub quote_xpath($) {
+sub quote_xpath {
     local $_ = $_[0];
     s/(['"\[\]])/$xpath_quote{$1} || $1/ge;
     $_
@@ -3381,7 +3407,7 @@ sub find_link_dom {
     };
 
     if (my $p = delete $opts{ url }) {
-        push @spec, sprintf '@href = "%s" or @src="%s"', quote_xpath $p, quote_xpath $p;
+        push @spec, sprintf '@href = "%s" or @src="%s"', quote_xpath( $p ), quote_xpath( $p );
     }
     my @tags = (sort keys %link_spec);
     if (my $p = delete $opts{ tag }) {
@@ -3951,7 +3977,7 @@ C<xpath> - Find the element to click by the XPath query
 C<dom> - Click on the passed DOM element
 
 You can use this to click on arbitrary page elements. There is no convenient
-way to pass x/y co-ordinates with this method.
+way to pass x/y co-ordinates when using the C<dom> option.
 
 =item *
 
@@ -4223,7 +4249,7 @@ are identical to those accepted by the L<< /$mech->xpath >> method.
 
 sub form_name {
     my ($self,$name,%options) = @_;
-    $name = quote_xpath $name;
+    $name = quote_xpath( $name );
     _default_limiter( single => \%options );
     $self->{current_form} = $self->selector("form[name='$name']",
         user_info => "form name '$name'",
@@ -4433,6 +4459,11 @@ The method understands very basic CSS selectors in the value for C<$selector>,
 like the C<< ->field >> method.
 
 =cut
+
+# Page.setInterceptFileChooserDialog
+# doesn't help anything, since we can only suppress that dialog but not
+# supply file names or anything. See the ->upload() method for how to actually
+# set filenames
 
 sub upload($self,$name,$value) {
     my %options;
@@ -4797,7 +4828,7 @@ sub select($self, $name, $value) {
     };
 
     for my $v (@by_value) {
-        my $option = $self->xpath( sprintf( './/option[@value="%s"]', quote_xpath $v) , node => $field, single => 1 );
+        my $option = $self->xpath( sprintf( './/option[@value="%s"]', quote_xpath( $v )) , node => $field, single => 1 );
         $option->set_attribute( 'selected' => '1' );
     };
 
@@ -5752,6 +5783,7 @@ can be specified through the C<format> option.
 
 Note that this method will only be successful with headless Chrome. At least on
 Windows, when launching Chrome with a UI, printing to PDF will be unavailable.
+See the C<html-to-pdf.pl> script in the C<examples/> directory of this distribution.
 
 This method is specific to WWW::Mechanize::Chrome.
 

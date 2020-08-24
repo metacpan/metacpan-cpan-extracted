@@ -15,15 +15,16 @@ BEGIN {
 			gaudia :t(Tuple[Str, Int])
 			oneiroi :type(Dict[name => Str, id => Optional[Int], meta => Dict[name => Str, id => Optional[Int], options => ArrayRef[Str, 1, 1]]])
 			geras { if ($_[0]->penthos == $_[0]->nosoi) { return $_[0]->curae; } } 
-		}
-		Kato::Kosmos parent Kato { 
-			algea :d([{ test => [qw/a b c/] }]) :t(ArrayRef)
 		}',
 		lib => 't/lib'
 	});
 	use lib 't/lib';
 }
-
+=pod
+	Kato::Kosmos parent Kato { 
+			algea :d([{ test => [qw/a b c/] }]) :t(ArrayRef)
+		}'
+=cut
 use Kato;
 my $okay = Kato->new({
 	oneiroi => {
@@ -105,7 +106,7 @@ my $not_okay = eval {
 };
 
 like($@, qr/^penthos accessor is required/);
-
+=pod
 use Kato::Kosmos;
 my $okay = Kato::Kosmos->new({
 	penthos => 2,
@@ -124,7 +125,7 @@ $not_okay = eval {
 };
 
 like($@, qr/^penthos accessor is required/);
-
+=cut
 
 
 done_testing;

@@ -1,8 +1,8 @@
 package Quantum::Superpositions::Lazy;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
-use v5.24; use warnings;
+use v5.28; use warnings;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 
@@ -36,7 +36,7 @@ sub import
 	goto &Exporter::import;
 }
 
-sub run_sub_as($sub, %env)
+sub run_sub_as ($sub, %env)
 {
 	local $global_reducer_type = $env{reducer_type} // $global_reducer_type;
 	local $global_compare_bool = $env{compare_bool} // $global_compare_bool;
@@ -50,7 +50,8 @@ sub superpos(@positions)
 
 	if (@positions == 1 && ref $positions[0] eq ref []) {
 		$positions_ref = $positions[0];
-	} else {
+	}
+	else {
 		$positions_ref = [@positions];
 	}
 
@@ -59,27 +60,27 @@ sub superpos(@positions)
 	);
 }
 
-sub any_state :prototype(&) ($sub)
+sub any_state : prototype(&) ($sub)
 {
 	return run_sub_as $sub, reducer_type => "any";
 }
 
-sub every_state :prototype(&) ($sub)
+sub every_state : prototype(&) ($sub)
 {
 	return run_sub_as $sub, reducer_type => "all";
 }
 
-sub one_state :prototype(&) ($sub)
+sub one_state : prototype(&) ($sub)
 {
 	return run_sub_as $sub, reducer_type => "one";
 }
 
-sub fetch_matches :prototype(&) ($sub)
+sub fetch_matches : prototype(&) ($sub)
 {
 	return run_sub_as $sub, compare_bool => 0;
 }
 
-sub with_sources :prototype(&) ($sub)
+sub with_sources : prototype(&) ($sub)
 {
 	return run_sub_as $sub, sourced_calculations => 1;
 }
@@ -257,6 +258,33 @@ The module is mostly finished feature-wise, as puting any more features into it
 would make it bloated. However, I'm open to suggestions - if you have one, open
 an issue on Github or send me an email and we can talk it through.
 
+=head2 TODO
+
+=over
+
+=item * possibly change the data type of state weights to rational numbers
+
+The precision of floating point values may not be enough for weight
+calculations in this module, even more so because often integer weights are
+re-calculated as float probabilities. Furthermore, a couple of pain spots in
+the module exist that compare floating point values with I<==> (not in critical
+places tho).
+
+Math::BigRat could be harder to handle, so this could be done by an option or
+even simply allow the user to specify either float or Math::BigRat and
+calculate accordingly.
+
+=item * add a way to plug in more measures into the ::Statistics package
+
+The statistics module offers some very basic indicators and it would be useful
+to have it extendable.
+
+=item * add a shorter module name as an alias
+
+Need input on possible names which are short enough and won't colide with anything else on CPAN.
+
+=back
+
 =head1 AUTHOR
 
 Bartosz Jarzyna, E<lt>brtastic.dev@gmail.comE<gt>
@@ -266,7 +294,7 @@ Bartosz Jarzyna, E<lt>brtastic.dev@gmail.comE<gt>
 Copyright (C) 2020 by Bartosz Jarzyna
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
+it under the same terms as Perl itself, either Perl version 5.28.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut

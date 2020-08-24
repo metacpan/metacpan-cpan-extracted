@@ -1,5 +1,8 @@
 Revision history for Perl extension File::Flat.
 
+1.07      2020-08-23 21:47:59Z
+        - restore prereqs from <= 1.04
+
 1.06      2020-07-31 16:05:45Z
         - add a $VERSION to the internal File::Flat::Object package
 

@@ -36,8 +36,9 @@ requires:
 resources:
   bugtracker: https://github.com/fastmail/mail-dkim/issues
   repository: git://github.com/fastmail/mail-dkim.git
-version: '1.20200724'
+version: '1.20200824'
 x_contributors:
+  - 'Aaron Thompson <dev@aaront.org>'
   - 'Bron Gondwana <brong@fastmail.fm>'
   - 'Christian Jaeger <ch@christianjaeger.ch>'
   - 'Damien MASCRÉ <damienmascre@free.fr>'

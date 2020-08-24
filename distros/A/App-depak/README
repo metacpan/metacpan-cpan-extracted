@@ -2,8 +2,8 @@ NAME
     App::depak - Pack your dependencies onto your script file
 
 VERSION
-    This document describes version 0.582 of App::depak (from Perl
-    distribution App-depak), released on 2020-04-08.
+    This document describes version 0.583 of App::depak (from Perl
+    distribution App-depak), released on 2020-04-29.
 
 SYNOPSIS
     See depak.
@@ -44,7 +44,7 @@ FUNCTIONS
 
         Whether to exclude core modules.
 
-    *   exclude_dist => *array[str]*
+    *   exclude_dist => *array[perl::distname]*
 
         Exclude all modules of dist.
 
@@ -53,17 +53,17 @@ FUNCTIONS
         main module of the distribution. Will determine other modules from
         the ".packlist" file.
 
-    *   exclude_list => *str*
+    *   exclude_list => *filename*
 
         Exclude modules from a list in a file.
 
-    *   exclude_module => *array[str]*
+    *   exclude_module => *array[perl::modname]*
 
         Modules to exclude.
 
         When you don't want to include a module, specify it here.
 
-    *   exclude_pattern => *array[str]*
+    *   exclude_pattern => *array[re]*
 
         Regex patterns of modules to exclude.
 
@@ -85,11 +85,11 @@ FUNCTIONS
         speed. Thus, this option requires that "lcpan" is installed and a
         fairly recent lcpan index is available.
 
-    *   include_dir => *array[str]*
+    *   include_dir => *array[dirname]*
 
         Include extra modules under directories.
 
-    *   include_dist => *array[str]*
+    *   include_dist => *array[perl::distname]*
 
         Include all modules of dist.
 
@@ -98,11 +98,11 @@ FUNCTIONS
         main module of the distribution. Will determine other modules from
         the ".packlist" file.
 
-    *   include_list => *str*
+    *   include_list => *filename*
 
         Include extra modules from a list in a file.
 
-    *   include_module => *array[str]*
+    *   include_module => *array[perl::modname]*
 
         Include extra modules.
 
@@ -121,7 +121,7 @@ FUNCTIONS
         This option requires that "lcpan" is installed and a fairly recent
         lcpan index is available.
 
-    *   input_file => *str* (default: "-")
+    *   input_file => *filename* (default: "-")
 
         Path to input file (script to be packed).
 
@@ -132,7 +132,7 @@ FUNCTIONS
 
         Pass to tracepm.
 
-    *   output_file => *str* (default: "-")
+    *   output_file => *filename* (default: "-")
 
         Path to output file.
 
@@ -259,7 +259,7 @@ FUNCTIONS
         then depak will not perform any tracing. Usually used in conjunction
         with "--include-from".
 
-    *   use => *array[str]*
+    *   use => *array[perl::modname]*
 
         Additional modules to "use".
 

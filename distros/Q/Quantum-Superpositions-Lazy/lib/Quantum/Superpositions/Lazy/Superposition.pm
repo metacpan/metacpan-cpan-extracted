@@ -1,8 +1,8 @@
 package Quantum::Superpositions::Lazy::Superposition;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Moo;
 
 use feature qw(signatures);
@@ -29,12 +29,14 @@ has "_collapsed_state" => (
 
 has "_states" => (
 	is => "ro",
-	isa => ArrayRef[
-		(InstanceOf["Quantum::Superpositions::Lazy::State"])
-			->plus_coercions(
-				ArrayRef->where(q{@$_ == 2}), q{ Quantum::Superpositions::Lazy::State->new(weight => shift @$_, value => shift @$_) },
-				~InstanceOf["Quantum::Superpositions::Lazy::State"], q{ Quantum::Superpositions::Lazy::State->new(value => $_) },
-			)
+	isa => ArrayRef [
+		(InstanceOf ["Quantum::Superpositions::Lazy::State"])
+		->plus_coercions(
+			ArrayRef->where(q{@$_ == 2}),
+			q{ Quantum::Superpositions::Lazy::State->new(weight => shift @$_, value => shift @$_) },
+			~InstanceOf ["Quantum::Superpositions::Lazy::State"],
+			q{ Quantum::Superpositions::Lazy::State->new(value => $_) },
+		)
 	],
 	coerce => 1,
 	required => 1,
@@ -50,7 +52,9 @@ has "_states" => (
 has "_weight_sum" => (
 	is => "ro",
 	lazy => 1,
-	default => sub ($self) { sum map { $_->weight } $self->_states->@* },
+	default => sub ($self) {
+		sum map { $_->weight } $self->_states->@*;
+	},
 	init_arg => undef,
 	clearer => 1,
 );
@@ -103,11 +107,13 @@ sub _build_complete_states($self)
 
 		my $value = $state->value;
 		if (is_collapsible $value) {
+
 			# all values from this state must have their weights multiplied by $coeff
 			# this way the weight sum will stay the same
 			$coeff = $state->weight / $value->weight_sum;
 			@local_states = $value->states->@*;
-		} else {
+		}
+		else {
 			@local_states = $state;
 		}
 
@@ -117,7 +123,8 @@ sub _build_complete_states($self)
 
 			if (exists $states{$result}) {
 				$states{$result} = $states{$result}->merge($copied);
-			} else {
+			}
+			else {
 				$states{$result} = $copied;
 			}
 		}

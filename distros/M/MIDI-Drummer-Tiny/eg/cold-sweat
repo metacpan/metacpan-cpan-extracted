@@ -7,10 +7,10 @@ use MIDI::Drummer::Tiny;
 my $d = MIDI::Drummer::Tiny->new(
     file   => "$0.mid",
     bpm    => 120,
-    volume => 127,
+    volume => 100,
 );
 
-my ($min, $max) = (30, 127);
+my $accent = 30;
 
 for my $n (1 .. $d->bars) {
     $d->note($d->eighth, $d->closed_hh, $d->kick);
@@ -18,10 +18,10 @@ for my $n (1 .. $d->bars) {
 
     $d->note($d->eighth, $d->closed_hh, $d->snare);
     $d->note($d->sixteenth, $d->closed_hh);
-    $d->accent_note([$min, $max], $d->sixteenth, $d->snare);
+    $d->accent_note($accent, $d->sixteenth, $d->snare);
 
     $d->note($d->sixteenth, $d->closed_hh);
-    $d->accent_note([$min, $max], $d->sixteenth, $d->snare);
+    $d->accent_note($accent, $d->sixteenth, $d->snare);
     $d->note($d->eighth, $d->open_hh, $d->kick);
 
     $d->note($d->eighth, $d->closed_hh);
@@ -30,15 +30,15 @@ for my $n (1 .. $d->bars) {
     #
 
     $d->note($d->sixteenth, $d->closed_hh);
-    $d->accent_note([$min, $max], $d->sixteenth, $d->snare);
+    $d->accent_note($accent, $d->sixteenth, $d->snare);
     $d->note($d->eighth, $d->closed_hh, $d->kick);
 
     $d->note($d->eighth, $d->closed_hh, $d->snare);
     $d->note($d->sixteenth, $d->closed_hh);
-    $d->accent_note([$min, $max], $d->sixteenth, $d->snare);
+    $d->accent_note($accent, $d->sixteenth, $d->snare);
 
     $d->note($d->sixteenth, $d->closed_hh);
-    $d->accent_note([$min, $max], $d->sixteenth, $d->snare);
+    $d->accent_note($accent, $d->sixteenth, $d->snare);
     $d->note($d->eighth, $d->closed_hh, $d->kick);
 
     $d->note($d->eighth, $d->closed_hh, $d->snare);

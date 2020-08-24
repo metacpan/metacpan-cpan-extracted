@@ -2,7 +2,7 @@ package Mail::MtPolicyd::SessionCache;
 
 use Moose;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: class for handling session cache
 
 use Mail::MtPolicyd::SessionCache::None;
@@ -67,7 +67,7 @@ Mail::MtPolicyd::SessionCache - class for handling session cache
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 AUTHOR
 

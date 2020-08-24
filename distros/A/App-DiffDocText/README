@@ -1,0 +1,35 @@
+NAME
+    App::DiffDocText - Diff the text of two Office word-processor documents
+    (.doc, .docx, .odt, etc)
+
+VERSION
+    This document describes version 0.001 of App::DiffDocText (from Perl
+    distribution App-DiffDocText), released on 2020-08-22.
+
+SYNOPSIS
+    See the included script diff-doc-text.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-DiffDocText>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-DiffDocText>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-DiffDocText>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

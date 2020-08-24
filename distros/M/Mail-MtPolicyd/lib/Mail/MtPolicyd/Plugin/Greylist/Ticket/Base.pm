@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Greylist::Ticket::Base;
 use Moose;
 
 # ABSTRACT: base class for greylisting ticket storage backends
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 has 'min_retry_wait' => ( is => 'rw', isa => 'Int', default => 60*5 );
 has 'max_retry_wait' => ( is => 'rw', isa => 'Int', default => 60*60*2 );
@@ -56,7 +56,7 @@ Mail::MtPolicyd::Plugin::Greylist::Ticket::Base - base class for greylisting tic
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 AUTHOR
 

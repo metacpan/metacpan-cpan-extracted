@@ -2,7 +2,7 @@ package Test2::Harness::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000023';
+our $VERSION = '1.000024';
 
 use File::Spec();
 
@@ -38,6 +38,8 @@ use Test2::Harness::Util::HashBase(
         <cover
 
         <event_timeout <post_exit_timeout
+
+        <resources
     },
     # From Construction
     qw{
@@ -88,6 +90,11 @@ sub init {
     }
     $self->{+TMP_DIR} = $tmp_dir;
 
+    for my $res (@{$self->{+RESOURCES}}) {
+        next if ref($res);
+        require(mod2file($res));
+    }
+
     $self->SUPER::init();
 }
 
@@ -107,10 +114,11 @@ sub state {
     my $self = shift;
 
     $self->{+STATE} //= Test2::Harness::Runner::State->new(
-        job_count => $self->{+JOB_COUNT},
-        workdir   => $self->{+DIR},
+        job_count    => $self->{+JOB_COUNT},
+        workdir      => $self->{+DIR},
         eager_stages => $self->preloader->eager_stages // {},
-        preloader => $self->preloader,
+        preloader    => $self->preloader,
+        resources    => [map { $_->new(settings => $self->settings) } @{$self->{+RESOURCES}}],
     );
 }
 

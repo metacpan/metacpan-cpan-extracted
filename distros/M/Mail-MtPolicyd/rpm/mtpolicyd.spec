@@ -1,7 +1,7 @@
 %define module_name Mail-MtPolicyd
 
 Name: mtpolicyd
-Version: 2.04
+Version: 2.05
 Release: %(date +%Y%m%d)%{dist}
 Summary: a modular policy daemon for postfix
 
@@ -98,6 +98,6 @@ fi
 %{_mandir}/man3/*
 
 %changelog
-* Fri Mar 20 2015 Markus Benning <ich@markusbenning.de> 2.04
+* Fri Mar 20 2015 Markus Benning <ich@markusbenning.de> 2.05
 - generate spec file from upstream release
 

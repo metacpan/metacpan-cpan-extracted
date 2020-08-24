@@ -2,7 +2,7 @@ package Mail::MtPolicyd::Client;
 
 use Moose;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: a policyd client class
 
 
@@ -85,7 +85,7 @@ Mail::MtPolicyd::Client - a policyd client class
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

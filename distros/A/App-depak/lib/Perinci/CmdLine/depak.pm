@@ -1,7 +1,7 @@
 package Perinci::CmdLine::depak;
 
-our $DATE = '2020-04-08'; # DATE
-our $VERSION = '0.582'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.583'; # VERSION
 
 use 5.010;
 use Log::ger;
@@ -65,7 +65,7 @@ Perinci::CmdLine::depak - Subclass of Perinci::CmdLine::Lite to set config_profi
 
 =head1 VERSION
 
-This document describes version 0.582 of Perinci::CmdLine::depak (from Perl distribution App-depak), released on 2020-04-08.
+This document describes version 0.583 of Perinci::CmdLine::depak (from Perl distribution App-depak), released on 2020-04-29.
 
 =head1 DESCRIPTION
 

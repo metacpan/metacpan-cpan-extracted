@@ -1,4 +1,4 @@
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Test::More;
 use Mock::Sub;
 use Quantum::Superpositions::Lazy::Util;
@@ -20,9 +20,11 @@ my $superpos = superpos([1 => 1], [3 => 2]);
 for my $state ($superpos->_states->@*) {
 	if ($state->value eq 1) {
 		is $state->weight, 1, "weight ok";
-	} elsif ($state->value eq 2) {
+	}
+	elsif ($state->value eq 2) {
 		is $state->weight, 3, "weight ok";
-	} else {
+	}
+	else {
 		fail "unexpected value in quantum states";
 	}
 }

@@ -32,4 +32,4 @@ unregister (UV id)
     CODE:
         SV* cb = hook_op_check_remove(OP_LEAVEEVAL, id);
         if (cb)
-            SvREFCNT_inc(cb);
+            SvREFCNT_dec(cb);

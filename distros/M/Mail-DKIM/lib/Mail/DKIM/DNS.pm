@@ -1,7 +1,7 @@
 package Mail::DKIM::DNS;
 use strict;
 use warnings;
-our $VERSION = '1.20200724'; # VERSION
+our $VERSION = '1.20200824'; # VERSION
 # ABSTRACT: performs DNS queries for Mail::DKIM
 
 # Copyright 2007, 2012 Messiah College. All rights reserved.
@@ -184,7 +184,7 @@ Mail::DKIM::DNS - performs DNS queries for Mail::DKIM
 
 =head1 VERSION
 
-version 1.20200724
+version 1.20200824
 
 =head1 DESCRIPTION
 

@@ -1,9 +1,9 @@
 package WordListBase;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
+our $DATE = '2020-08-23'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.7.5'; # VERSION
+our $VERSION = '0.7.6'; # VERSION
 
 use strict 'subs', 'vars';
 
@@ -19,6 +19,10 @@ sub new {
     for my $param_name (keys %$param_spec) {
         die "Missing required parameter '$param_name'"
             if $param_spec->{$param_name}{req} && !exists($params{$param_name});
+        # apply default
+        $params{$param_name} = $param_spec->{$param_name}{default}
+            if !defined($params{$param_name}) &&
+            exists $param_spec->{$param_name}{default};
     }
 
     bless {
@@ -45,7 +49,7 @@ WordListBase - WordList base class
 
 =head1 VERSION
 
-This document describes version 0.7.5 of WordListBase (from Perl distribution WordList), released on 2020-05-24.
+This document describes version 0.7.6 of WordListBase (from Perl distribution WordList), released on 2020-08-23.
 
 =head1 DESCRIPTION
 

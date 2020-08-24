@@ -1,0 +1,26 @@
+---
+abstract: 'Tools for Crafting Code in Perl'
+author:
+  - 'James Hunt'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Jig
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008004'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/jhunt/jig.git
+version: v0.22.0

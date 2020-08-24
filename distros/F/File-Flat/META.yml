@@ -5,17 +5,17 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Find: '0'
-  File::Spec: '0'
+  File::Spec: '0.85'
   File::Spec::Functions: '0'
-  Test::ClassAPI: '0'
-  Test::More: '0'
+  Test::ClassAPI: '1.04'
+  Test::More: '0.47'
   perl: '5.006'
   vars: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -29,29 +29,29 @@ no_index:
 provides:
   File::Flat:
     file: lib/File/Flat.pm
-    version: '1.06'
+    version: '1.07'
   File::Flat::Object:
     file: lib/File/Flat.pm
-    version: '1.06'
+    version: '1.07'
 requires:
   Cwd: '0'
   File::Copy: '0'
-  File::Copy::Recursive: '0'
-  File::Remove: '0'
-  File::Spec: '0'
-  File::Temp: '0'
+  File::Copy::Recursive: '0.35'
+  File::Remove: '0.38'
+  File::Spec: '0.85'
+  File::Temp: '0.17'
   IO::File: '0'
   perl: '5.006'
-  prefork: '0'
+  prefork: '0.02'
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Flat
   homepage: https://github.com/karenetheridge/File-Flat
   repository: https://github.com/karenetheridge/File-Flat.git
-version: '1.06'
+version: '1.07'
 x_Dist_Zilla:
   perl:
-    version: '5.032000'
+    version: '5.033001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -236,7 +236,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Author::ETHER/Test::ReportPrereqs'
-      version: '0.027'
+      version: '0.028'
     -
       class: Dist::Zilla::Plugin::Test::Portability
       config:
@@ -447,7 +447,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.25.0
+          git_version: 2.28.0
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -514,7 +514,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20200717'
+          Module::CoreList: '5.20200820'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -539,7 +539,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.046'
@@ -547,7 +547,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -555,7 +555,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -581,7 +581,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.046'
@@ -605,7 +605,7 @@ x_Dist_Zilla:
             - ppport.h
           match: []
       name: '@Author::ETHER/copy generated files'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -646,7 +646,7 @@ x_Dist_Zilla:
             - Changes
           match: []
       name: '@Author::ETHER/@Git::VersionManager/CopyFilesFromRelease'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -664,7 +664,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -677,11 +677,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.06
+          tag: v1.07
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -718,7 +718,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -740,7 +740,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.0
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.046'
@@ -789,6 +789,30 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
       version: '6.015'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '6.015'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: '6.015'
+    -
+      class: Dist::Zilla::Plugin::DynamicPrereqs
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: DynamicPrereqs
+      version: '0.038'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -842,7 +866,7 @@ x_authority: cpan:ADAMK
 x_contributors:
   - 'Adam Kennedy <adam@ali.as>'
   - 'Karen Etheridge <ether@cpan.org>'
-x_generated_by_perl: v5.32.0
+x_generated_by_perl: v5.33.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

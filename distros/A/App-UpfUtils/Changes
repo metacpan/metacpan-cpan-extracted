@@ -1,13 +1,17 @@
-Revision history for App-UpfUtils
+0.060   2020-04-29  Released-By: PERLANCAR; Urgency: low
 
-0.05    2016-01-18 (PERLANCAR)
+        - [build] Rebuild with updated Unix::Passwd::File to remove dependency
+          to the deprecated Perinci::Sub::ArgEntity::*.
+
+
+0.05    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD section ordering.
 
 
-0.04    2015-09-03 (PERLANCAR)
+0.04    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -16,7 +20,7 @@ Revision history for App-UpfUtils
 	  requirement.
 
 
-0.03    2015-03-13 (PERLANCAR)
+0.03    2015-03-13  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -24,13 +28,13 @@ Revision history for App-UpfUtils
           Perinci::Sub::ArgEntity::* (for shell completion purposes).
 
 
-0.02    2015-03-06 (PERLANCAR)
+0.02    2015-03-06  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Rebuild against Unix::Passwd::File 0.15.
 
 
-0.01    2015-03-06 (PERLANCAR)
+0.01    2015-03-06  Released-By: PERLANCAR
 
         - First release.

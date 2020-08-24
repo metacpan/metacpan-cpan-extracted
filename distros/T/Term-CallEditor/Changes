@@ -1,5 +1,9 @@
 See also the git repository. In particular,
 
+1.01    2020-08-22
+    * better manage EXLOCK which has changed over the years in
+      File::Temp
+
 1.00    2020-08-20
     * support VISUAL in addition to EDITOR
     * shellwords() used to parse VISUAL and EDITOR (less need for

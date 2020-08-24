@@ -53,9 +53,10 @@ my %module = (
         'IPC::Open3'         => 0, # for IPC on Windows
         'File::Spec'         => 0,
 
-        'Filter::signatures' => '0.09',
+        'Filter::signatures' => '0.16',
         'Carp'               => 0,
         'Future'             => '0.35', # Some smokers have 0.25 which lacks many features
+        #'Future::IO'         => 0,    # For loop-compatible ->sleep()
         'Try::Tiny'          => 0,
         'PerlX::Maybe'       => 0, # nicer syntax for optional parameters
         # You need one of the following event loops:

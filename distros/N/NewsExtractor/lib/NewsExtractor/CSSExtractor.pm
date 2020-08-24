@@ -3,7 +3,7 @@ use v5.18;
 use utf8;
 use Moo;
 extends 'NewsExtractor::TXExtractor';
-use Importer 'NewsExtractor::TextUtil'  => qw( normalize_whitespace );
+use Importer 'NewsExtractor::TextUtil'  => qw( normalize_whitespace remove_control_characters );
 
 use Types::Standard qw( InstanceOf );
 
@@ -20,9 +20,9 @@ sub _take {
     my $txt = "". $self->dom->find( $sel )->map('all_text')->join("\n\n");
     return undef if $txt eq '';
 
+    $txt = normalize_whitespace(remove_control_characters($txt));
     $txt =~ s/\s+$//;
     $txt =~ s/^\s+//;
-    $txt = normalize_whitespace($txt);
     $txt =~ s/\n\n+/\n\n/g;
     return $txt;
 }

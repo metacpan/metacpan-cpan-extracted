@@ -22,7 +22,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.47';
+our $VERSION = '1.48';
 
 # Automatically generated, see share/stations.json
 my @stations = (
@@ -224,6 +224,7 @@ my @stations = (
 ['UAMM','Ammern',8011029,10.458086,51.233346],
 ['NAMB','Amorbach',8000575,9.223147,49.645609],
 ['MAPF','Ampfing',8000576,12.410919,48.253949],
+['OSAM','Amriswil',8506109,9.301927,47.550604],
 ['LAMS','Amsdorf',8011038,11.71979,51.463561],
 ['XNAA','Amsterdam Amstel',8400057,4.9177780151367,52.346668243408],
 ['XNAB','Amsterdam Bijlmer ArenA',8400074,4.9469442367554,52.3122215271],
@@ -378,6 +379,7 @@ my @stations = (
 ['MAG','Aßling(Oberbay)',8000634,11.993518,47.989491],
 ['WBA','Baabe',8011063,13.704806,54.362315],
 ['LBB','Baalberge',8010013,11.784682,51.763048],
+['OSBAA','Baar(CH)',8502206,8.52287,47.19518],
 ['MBAE','Baar-Ebenhausen',8000678,11.460929,48.674463],
 ['ONBR','Baarn',8400086,5.2808332443237,52.208332061768],
 ['FLAS','Babenhausen Langstadt',8003559,8.945733,49.922274],
@@ -5656,6 +5658,7 @@ my @stations = (
 ['XANG','Neuratting',8101288,13.3736324507398,48.2272331074522],
 ['RKNEB','Neureut Bärenweg, Karlsruhe',723873,8.378614,49.046994],
 ['WNRR','Neuruppin Rheinsberger Tor',8010175,12.810799,52.92957],
+['WNRS','Neuruppin Seedamm',8080175,12.82751,52.92535],
 ['WNR','Neuruppin West',8010246,12.793888,52.926244],
 ['DNP','Neusalza-Spremberg',8012470,14.526247,51.034251],
 ['NNEU','Neuses(b Kronach)',8004319,11.306843,50.217153],
@@ -8950,7 +8953,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.47
+version 1.48
 
 =head1 DESCRIPTION
 

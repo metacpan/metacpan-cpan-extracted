@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::SMTPVerify;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: mtpolicyd plugin for remote SMTP address checks
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -214,7 +214,7 @@ Mail::MtPolicyd::Plugin::SMTPVerify - mtpolicyd plugin for remote SMTP address c
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

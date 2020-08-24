@@ -98,7 +98,7 @@ my %options = (
   AUTHOR => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',
   ABSTRACT => 'Perl interface to the MPC (multi precision complex) library',
   PREREQ_PM => {
-                'Math::MPFR'          => '3.23',
+                'Math::MPFR'          => '4.14',
                 'ExtUtils::MakeMaker' => '6.58',
                },
   DEFINE   => $defines,

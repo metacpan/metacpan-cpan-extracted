@@ -2,7 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.053
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
@@ -13,33 +13,35 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/upf-add-delete-user-groups',
-    'bin/upf-add-group',
-    'bin/upf-add-user',
-    'bin/upf-add-user-to-group',
-    'bin/upf-delete-group',
-    'bin/upf-delete-user',
-    'bin/upf-delete-user-from-group',
-    'bin/upf-get-group',
-    'bin/upf-get-max-gid',
-    'bin/upf-get-max-uid',
-    'bin/upf-get-user',
-    'bin/upf-get-user-groups',
-    'bin/upf-group-exists',
-    'bin/upf-is-member',
-    'bin/upf-list-groups',
-    'bin/upf-list-users',
-    'bin/upf-list-users-and-groups',
-    'bin/upf-modify-group',
-    'bin/upf-modify-user',
-    'bin/upf-set-user-groups',
-    'bin/upf-set-user-password',
-    'bin/upf-user-exists'
+    'script/upf-add-delete-user-groups',
+    'script/upf-add-group',
+    'script/upf-add-user',
+    'script/upf-add-user-to-group',
+    'script/upf-delete-group',
+    'script/upf-delete-user',
+    'script/upf-delete-user-from-group',
+    'script/upf-get-group',
+    'script/upf-get-max-gid',
+    'script/upf-get-max-uid',
+    'script/upf-get-user',
+    'script/upf-get-user-groups',
+    'script/upf-group-exists',
+    'script/upf-is-member',
+    'script/upf-list-groups',
+    'script/upf-list-users',
+    'script/upf-list-users-and-groups',
+    'script/upf-modify-group',
+    'script/upf-modify-user',
+    'script/upf-set-user-groups',
+    'script/upf-set-user-password',
+    'script/upf-user-exists'
 );
 
 # no fake home requested
 
-my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
+my @switches = (
+    -d 'blib' ? '-Mblib' : '-Ilib',
+);
 
 use File::Spec;
 use IPC::Open3;
@@ -53,14 +55,18 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-e', "require q[$lib]"))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {
@@ -75,18 +81,25 @@ foreach my $file (@scripts)
     my $line = <$fh>;
 
     close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
-    my @flags = $1 ? split(' ', $1) : ();
+    @switches = (@switches, split(' ', $1)) if $1;
+
+    close $fh and skip("$file uses -T; not testable with PERL5LIB", 1)
+        if grep { $_ eq '-T' } @switches and $ENV{PERL5LIB};
 
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, @flags, '-c', $file);
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-c', $file))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-c', $file);
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$file compiled ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     # in older perls, -c output is simply the file portion of the path being tested
     if (@_warnings = grep { !/\bsyntax OK$/ }

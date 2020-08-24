@@ -1,8 +1,8 @@
 package Quantum::Superpositions::Lazy::Role::Collapsible;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Moo::Role;
 
 use feature qw(signatures);
@@ -23,7 +23,7 @@ my %mathematical = map { $_ => 1 }
 my %logical = map { $_ => 1 }
 	Quantum::Superpositions::Lazy::Operation::LogicOp->supported_types;
 
-sub create_computation($type, @args)
+sub create_computation ($type, @args)
 {
 	return Quantum::Superpositions::Lazy::Computation->new(
 		operation => $type,
@@ -31,7 +31,7 @@ sub create_computation($type, @args)
 	);
 }
 
-sub create_logic($type, @args)
+sub create_logic ($type, @args)
 {
 	my $op = Quantum::Superpositions::Lazy::Operation::LogicOp->new(
 		sign => $type,
@@ -39,7 +39,8 @@ sub create_logic($type, @args)
 
 	if ($Quantum::Superpositions::Lazy::global_compare_bool) {
 		return $op->run(@args);
-	} else {
+	}
+	else {
 		return $op->valid_states(@args);
 	}
 }
@@ -64,11 +65,12 @@ requires qw(
 
 has "_complete_states" => (
 	is => "ro",
-	isa => ArrayRef[
-		(InstanceOf["Quantum::Superpositions::Lazy::State"])
-			->plus_coercions(
-				ArrayRef->where(q{@$_ == 2}), q{ Quantum::Superpositions::Lazy::State->new(weight => shift @$_, value => shift @$_) },
-			)
+	isa => ArrayRef [
+		(InstanceOf ["Quantum::Superpositions::Lazy::State"])
+		->plus_coercions(
+			ArrayRef->where(q{@$_ == 2}),
+			q{ Quantum::Superpositions::Lazy::State->new(weight => shift @$_, value => shift @$_) },
+		)
 	],
 	lazy => 1,
 	coerce => 1,
@@ -79,7 +81,7 @@ has "_complete_states" => (
 
 has "stats" => (
 	is => "ro",
-	isa => InstanceOf["Quantum::Superpositions::Lazy::Statistics"],
+	isa => InstanceOf ["Quantum::Superpositions::Lazy::Statistics"],
 	lazy => 1,
 	default => sub ($self) { Quantum::Superpositions::Lazy::Statistics->new(parent => $self) },
 	init_arg => undef,
@@ -91,12 +93,12 @@ sub states($self)
 	return $self->_complete_states;
 }
 
-sub stringify($self, @)
+sub stringify ($self, @)
 {
 	return $self->collapse;
 }
 
-sub operate($self, $type, @args)
+sub operate ($self, $type, @args)
 {
 	unshift @args, $self;
 	my $order = pop @args;
@@ -116,7 +118,7 @@ sub operate($self, $type, @args)
 	}
 }
 
-sub transform($self, $coderef)
+sub transform ($self, $coderef)
 {
 	return $self->operate("_transform", $coderef, undef);
 }
@@ -125,7 +127,7 @@ sub to_ket_notation($self)
 {
 	return join " + ", map {
 		($_->weight / $self->weight_sum) . "|" .
-		$_->value . ">"
+			$_->value . ">"
 	} $self->states->@*;
 }
 
@@ -135,6 +137,6 @@ use overload
 
 	q{=} => sub { shift },
 	q{""} => \&stringify,
-;
+	;
 
 1;

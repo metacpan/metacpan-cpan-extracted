@@ -1,7 +1,7 @@
 package App::UpfUtils;
 
-our $DATE = '2016-01-18'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.060'; # VERSION
 
 use 5.010001;
 
@@ -20,7 +20,7 @@ App::UpfUtils - CLI interface for Unix::Passwd::File (as separate scripts)
 
 =head1 VERSION
 
-This document describes version 0.05 of App::UpfUtils (from Perl distribution App-UpfUtils), released on 2016-01-18.
+This document describes version 0.060 of App::UpfUtils (from Perl distribution App-UpfUtils), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

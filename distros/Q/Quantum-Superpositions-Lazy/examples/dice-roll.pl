@@ -1,4 +1,4 @@
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Test::More;
 use Quantum::Superpositions::Lazy;
 use List::Util qw(sum0);
@@ -11,6 +11,7 @@ sub roll_dice
 
 	# each individual dice
 	my @dice = map { superpos(1 .. $faces) } 1 .. $number;
+
 	# a cup of dice
 	my $set = sum0 @dice;
 

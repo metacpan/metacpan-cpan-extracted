@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-PM-Berlin-Meetings",
    "no_index" : {
@@ -40,8 +40,10 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/eserte/acme-pm-berlin-meetings.git"
       }
    },
-   "version" : "201703.19"
+   "version" : "202008.24",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

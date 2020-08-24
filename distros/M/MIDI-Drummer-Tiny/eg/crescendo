@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MIDI::Drummer::Tiny;
+
+my $d = MIDI::Drummer::Tiny->new(
+    file   => "$0.mid",
+    bpm    => 100,
+    volume => 98,
+    bars   => 4,
+);
+
+$d->count_in(1);
+
+my ($min, $max) = (47, 127);
+
+for my $n (1 .. $d->bars) {
+    $d->note($d->quarter, $d->closed_hh, $d->kick);
+    $d->note($d->quarter, $d->closed_hh, $d->snare);
+    $d->note($d->eighth, $d->closed_hh, $d->kick);
+    $d->note($d->eighth, $d->kick);
+    $d->note($d->quarter, $d->closed_hh, $d->snare);
+
+    for (my $i = $min; $i < $max; $i += 10) {
+        $d->accent_note($i, $d->eighth, $d->snare, $d->hi_floor_tom);
+    }
+}
+
+$d->write;

@@ -46,7 +46,7 @@ references to objects it acts upon and only produce a list of states once it is
 required. A superposition can have additional states if it consists of other
 superpositions - nested superpositions work as if they were a single object.
 
-=head1 CASE STUDY #1
+=head1 EXAMPLE #1
 
 Lets say we want to use the module to just get something randomly, like a full
 person name with a title:
@@ -85,7 +85,7 @@ Once this is complete, we're ready to observe by using the I<collapse> method.
 At this moment the actual randomization will occur and we will get a single
 male or female name as a string scalar.
 
-=head1 CASE STUDY #2
+=head1 EXAMPLE #2
 
 Getting one state at random can be useful but gives us no information about the
 entire situation. We can get some more information about the previously

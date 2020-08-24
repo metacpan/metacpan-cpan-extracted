@@ -1,0 +1,77 @@
+NAME
+    WordList::Test::Dynamic::RandomWord::1000 - 1000 random words
+
+VERSION
+    This document describes version 0.003 of
+    WordList::Test::Dynamic::RandomWord::1000 (from Perl distribution
+    WordList-Test-Dynamic-RandomWord-1000), released on 2020-08-23.
+
+SYNOPSIS
+     use WordList::Test::Dynamic::RandomWord::1000;
+
+     my $wl = WordList::Test::Dynamic::RandomWord::1000->new;
+
+     # Pick a (or several) random word(s) from the list
+     my $word = $wl->pick;
+     my @words = $wl->pick(3);
+
+     # Check if a word exists in the list
+     if ($wl->word_exists('foo')) { ... }
+
+     # Call a callback for each word
+     $wl->each_word(sub { my $word = shift; ... });
+
+     # Iterate
+     my $first_word = $wl->first_word;
+     while (defined(my $word = $wl->next_word)) { ... }
+
+     # Get all the words
+     my @all_words = $wl->all_words;
+
+DESCRIPTION
+    This wordlist demoes a dynamic, non-deterministic wordlist.
+
+WORDLIST PARAMETERS
+    This is a parameterized wordlist module. When loading in Perl, you can
+    specify the parameters to the constructor, for example:
+
+     use WordList::Test::Dynamic::RandomWord::1000;
+     # 1000 random words, each 10-15 characters long
+     my $wl = WordList::Test::Dynamic::RandomWord::1000->(max_len => 15, min_len => 10);
+
+    When loading on the command-line, you can specify parameters using the
+    "WORDLISTNAME=ARGNAME1,ARGVAL1,ARGNAME2,ARGVAL2" syntax, like in perl's
+    "-M" option, for example:
+
+     % wordlist -w Test::Dynamic::RandomWord::1000=max_len=15,min_len=10
+
+    Known parameters:
+
+  max_len
+  min_len
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-Test-Dynamic-RandomWord-1000>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-Test-Dynamic-RandomWord-1000
+    >.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-Test-Dynamic
+    -RandomWord-1000>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,20 @@
+.dockerignore
+CONDUCT.md
+CONTRIBUTING.md
+cpanfile
+Dockerfile
+Jig-0.22.0/META.json
+Jig-0.22.0/META.yml
+lib/Jig.pm
+lib/Jig/CLI.pm
+LICENSE
+Makefile
+Makefile.PL
+MANIFEST
+MANIFEST.bak
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
+t/cli.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

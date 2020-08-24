@@ -1,4 +1,4 @@
-#######################################################################
+######################################################################
 #
 # the Perl::Tidy::Tokenizer package is essentially a filter which
 # reads lines of perl source code from a source object and provides
@@ -21,7 +21,7 @@
 package Perl::Tidy::Tokenizer;
 use strict;
 use warnings;
-our $VERSION = '20200619';
+our $VERSION = '20200822';
 
 use Perl::Tidy::LineBuffer;
 
@@ -112,7 +112,9 @@ use vars qw{
   @opening_brace_names
   @closing_brace_names
   %is_keyword_taking_list
-  %is_keyword_taking_optional_args
+  %is_keyword_taking_optional_arg
+  %is_keyword_rejecting_slash_as_pattern_delimiter
+  %is_keyword_rejecting_question_as_pattern_delimiter
   %is_q_qq_qw_qx_qr_s_y_tr_m
   %is_sub
   %is_package
@@ -365,7 +367,7 @@ sub get_saw_brace_error {
 }
 
 sub get_unexpected_error_count {
-    my ($self) = shift;
+    my ($self) = @_;
     return $self->{_unexpected_error_count};
 }
 
@@ -1824,8 +1826,9 @@ sub prepare_for_a_new_file {
 
             # a pattern cannot follow certain keywords which take optional
             # arguments, like 'shift' and 'pop'. See also '?'.
-            if (   $last_nonblank_type eq 'k'
-                && $is_keyword_taking_optional_args{$last_nonblank_token} )
+            if ( $last_nonblank_type eq 'k'
+                && $is_keyword_rejecting_slash_as_pattern_delimiter{
+                    $last_nonblank_token} )
             {
                 $is_pattern = 0;
             }
@@ -2061,8 +2064,9 @@ sub prepare_for_a_new_file {
             # Patch for rt #126965
             # a pattern cannot follow certain keywords which take optional
             # arguments, like 'shift' and 'pop'. See also '/'.
-            if (   $last_nonblank_type eq 'k'
-                && $is_keyword_taking_optional_args{$last_nonblank_token} )
+            if ( $last_nonblank_type eq 'k'
+                && $is_keyword_rejecting_question_as_pattern_delimiter{
+                    $last_nonblank_token} )
             {
                 $is_pattern = 0;
             }
@@ -2075,9 +2079,11 @@ sub prepare_for_a_new_file {
             elsif ( $expecting == UNKNOWN ) {
 
                 # In older versions of Perl, a bare ? can be a pattern
-                # delimiter.  Sometime after Perl 5.10 this seems to have
-                # been dropped, but we have to support it in order to format
-                # older programs.  For example, the following line worked
+                # delimiter.  In perl version 5.22 this was
+                # dropped, but we have to support it in order to format
+                # older programs. See:
+                ## https://perl.developpez.com/documentations/en/5.22.0/perl5211delta.html
+                # For example, the following line worked
                 # at one time:
                 #      ?(.*)? && (print $1,"\n");
                 # In current versions it would have to be written with slashes:
@@ -2414,7 +2420,7 @@ sub prepare_for_a_new_file {
 
         # type = 'pp' for pre-increment, '++' for post-increment
         '++' => sub {
-            if ( $expecting == TERM ) { $type = 'pp' }
+            if    ( $expecting == TERM ) { $type = 'pp' }
             elsif ( $expecting == UNKNOWN ) {
                 my ( $next_nonblank_token, $i_next ) =
                   find_next_nonblank_token( $i, $rtokens, $max_token_index );
@@ -2435,7 +2441,7 @@ sub prepare_for_a_new_file {
         # type = 'mm' for pre-decrement, '--' for post-decrement
         '--' => sub {
 
-            if ( $expecting == TERM ) { $type = 'mm' }
+            if    ( $expecting == TERM ) { $type = 'mm' }
             elsif ( $expecting == UNKNOWN ) {
                 my ( $next_nonblank_token, $i_next ) =
                   find_next_nonblank_token( $i, $rtokens, $max_token_index );
@@ -2911,8 +2917,8 @@ EOM
             }
             my $pre_tok  = $rtokens->[$i];        # get the next pre-token
             my $pre_type = $rtoken_type->[$i];    # and type
-            $tok  = $pre_tok;
-            $type = $pre_type;                    # to be modified as necessary
+            $tok        = $pre_tok;
+            $type       = $pre_type;              # to be modified as necessary
             $block_type = "";    # blank for all tokens except code block braces
             $container_type = "";    # blank for all tokens except some parens
             $type_sequence  = "";    # blank for all tokens except ?/:
@@ -4410,9 +4416,21 @@ sub operator_expected {
         if (   $tok eq '/'
             && $next_type eq '/'
             && $last_nonblank_type eq 'k'
-            && $is_keyword_taking_optional_args{$last_nonblank_token} )
+            && $is_keyword_rejecting_slash_as_pattern_delimiter{
+                $last_nonblank_token} )
         {
             $op_expected = OPERATOR;
+        }
+
+        # Patch to allow a ? following 'split' to be a depricated pattern
+        # delimiter.  This patch is coordinated with the omission of split from
+        # the list %is_keyword_rejecting_question_as_pattern_delimiter. This
+        # patch will force perltidy to guess.
+        elsif ($tok eq '?'
+            && $last_nonblank_type eq 'k'
+            && $last_nonblank_token eq 'split' )
+        {
+            $op_expected = UNKNOWN;
         }
         else {
             $op_expected = TERM;
@@ -5120,7 +5138,7 @@ sub peek_ahead_for_n_nonblank_pre_tokens {
 
     while ( $line = $tokenizer_self->{_line_buffer_object}->peek_ahead( $i++ ) )
     {
-        $line =~ s/^\s*//;    # trim leading blanks
+        $line =~ s/^\s*//;                 # trim leading blanks
         next if ( length($line) <= 0 );    # skip blank
         next if ( $line =~ /^#/ );         # skip comment
         ( $rpre_tokens, $rmap, $rpre_types ) =
@@ -5140,7 +5158,7 @@ sub peek_ahead_for_nonblank_token {
 
     while ( $line = $tokenizer_self->{_line_buffer_object}->peek_ahead( $i++ ) )
     {
-        $line =~ s/^\s*//;    # trim leading blanks
+        $line =~ s/^\s*//;                 # trim leading blanks
         next if ( length($line) <= 0 );    # skip blank
         next if ( $line =~ /^#/ );         # skip comment
         my ( $rtok, $rmap, $rtype ) =
@@ -7664,10 +7682,12 @@ BEGIN {
       elsif
       eof
       eq
+      evalbytes
       exec
       exists
       exit
       exp
+      fc
       fcntl
       fileno
       flock
@@ -8037,19 +8057,104 @@ BEGIN {
     @is_keyword_taking_list{@keyword_taking_list} =
       (1) x scalar(@keyword_taking_list);
 
-    # perl functions which may be unary operators
-    my @keyword_taking_optional_args = qw(
+    # perl functions which may be unary operators.
+
+    # This list is used to decide if a pattern delimited by slashes, /pattern/,
+    # can follow one of these keywords.
+    @q = qw(
+      chomp eof eval fc lc pop shift uc undef
+    );
+
+    @is_keyword_rejecting_slash_as_pattern_delimiter{@q} =
+      (1) x scalar(@q);
+
+    # These are keywords for which an arg may optionally be omitted.  They are
+    # currently only used to disambiguate a ? used as a ternary from one used
+    # as a (depricated) pattern delimiter.  In the future, they might be used
+    # to give a warning about ambiguous syntax before a /.
+    # Note: split has been omitted (see not below).
+    my @keywords_taking_optional_arg = qw(
+      abs
+      alarm
+      caller
+      chdir
       chomp
+      chop
+      chr
+      chroot
+      close
+      cos
+      defined
+      die
       eof
       eval
+      evalbytes
+      exit
+      exp
+      fc
+      getc
+      glob
+      gmtime
+      hex
+      int
+      last
       lc
+      lcfirst
+      length
+      localtime
+      log
+      lstat
+      mkdir
+      next
+      oct
+      ord
       pop
+      pos
+      print
+      printf
+      prototype
+      quotemeta
+      rand
+      readline
+      readlink
+      readpipe
+      redo
+      ref
+      require
+      reset
+      reverse
+      rmdir
+      say
+      select
       shift
+      sin
+      sleep
+      sqrt
+      srand
+      stat
+      study
+      tell
       uc
+      ucfirst
+      umask
       undef
+      unlink
+      warn
+      write
     );
-    @is_keyword_taking_optional_args{@keyword_taking_optional_args} =
-      (1) x scalar(@keyword_taking_optional_args);
+    @is_keyword_taking_optional_arg{@keywords_taking_optional_arg} =
+      (1) x scalar(@keywords_taking_optional_arg);
+
+    # This list is used to decide if a pattern delmited by question marks,
+    # ?pattern?, can follow one of these keywords.  Note that from perl 5.22
+    # on, a ?pattern? is not recognized, so we can be much more strict than
+    # with a /pattern/. Note that 'split' is not in this list. In current
+    # versions of perl a question following split must be a ternary, but
+    # in older versions it could be a pattern.  The guessing algorithm will
+    # decide.  We are combining two lists here to simplify the test.
+    @q = ( @keywords_taking_optional_arg, @operator_requestor );
+    @is_keyword_rejecting_question_as_pattern_delimiter{@q} =
+      (1) x scalar(@q);
 
     # These are not used in any way yet
     #    my @unused_keywords = qw(

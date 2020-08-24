@@ -1,25 +1,28 @@
 package Algorithm::LibLinear::DataSet;
 
 use 5.014;
-use Algorithm::LibLinear::Types;
+use Algorithm::LibLinear::Types qw/FeatureWithLabel/;
 use Carp qw//;
 use List::MoreUtils qw/none/;
-use Smart::Args;
+use Smart::Args::TypeTiny;
+use Types::Standard qw/ArrayRef ClassName FileHandle InstanceOf Num Str/;
+
+my $InstanceOfPackage = InstanceOf[__PACKAGE__];
 
 sub new {
     args
-        my $class => 'ClassName',
-        my $data_set => 'ArrayRef[Algorithm::LibLinear::LabeledData]';
+        my $class => ClassName,
+        my $data_set => ArrayRef[FeatureWithLabel];
 
     bless +{ data_set => $data_set } => $class;
 }
 
 sub load {
     args
-        my $class => 'ClassName',
-        my $fh => +{ isa => 'FileHandle', optional => 1, },
-        my $filename => +{ isa => 'Str', optional => 1, },
-        my $string => +{ isa => 'Str', optional => 1, };
+        my $class => ClassName,
+        my $fh => +{ isa => FileHandle, optional => 1, },
+        my $filename => +{ isa => Str, optional => 1, },
+        my $string => +{ isa => Str, optional => 1, };
 
     if (none { defined } ($fh, $filename, $string)) {
         Carp::croak('No source specified.');
@@ -34,8 +37,8 @@ sub load {
 
 sub add_data {
     args
-        my $self,
-        my $data => 'Algorithm::LibLinear::LabeledData';
+        my $self => $InstanceOfPackage,
+        my $data => FeatureWithLabel;
 
     push @{ $self->data_set }, $data;
 }
@@ -44,8 +47,8 @@ sub as_arrayref { $_[0]->{data_set} }
 
 sub as_problem {
     args
-        my $self,
-        my $bias => +{ isa => 'Num', default => -1.0, };
+        my $self => $InstanceOfPackage,
+        my $bias => +{ isa => Num, default => -1.0, };
 
     my (@features, @labels);
     for my $data (@{ $self->as_arrayref }) {
@@ -57,7 +60,7 @@ sub as_problem {
 
 sub as_string {
     args
-        my $self;
+        my $self => $InstanceOfPackage;
 
     my $result = '';
     for my $entry (@{ $self->as_arrayref }) {
@@ -71,8 +74,8 @@ sub as_string {
 
 sub parse_input_file {
     args_pos
-        my $class => 'ClassName',
-        my $source => 'FileHandle';
+        my $class => ClassName,
+        my $source => FileHandle;
 
     my @data_set;
     while (defined(my $line = <$source>)) {

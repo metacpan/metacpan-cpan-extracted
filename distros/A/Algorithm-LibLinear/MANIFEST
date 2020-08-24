@@ -18,8 +18,8 @@ src/liblinear/blas/dnrm2.c
 src/liblinear/blas/dscal.c
 src/liblinear/linear.cpp
 src/liblinear/linear.h
-src/liblinear/tron.cpp
-src/liblinear/tron.h
+src/liblinear/newton.cpp
+src/liblinear/newton.h
 t/Algorithm/LibLinear.t
 t/Algorithm/LibLinear/classifier.model
 t/Algorithm/LibLinear/DataSet.t
@@ -27,7 +27,6 @@ t/Algorithm/LibLinear/FeatureScaling.t
 t/Algorithm/LibLinear/Model.t
 t/Algorithm/LibLinear/Problem.t
 t/Algorithm/LibLinear/TrainingParameter.t
-typemap
 xt/01_podspell.t
 xt/02_perlcritic.t
 xt/03_pod.t

@@ -1,5 +1,29 @@
 Revision history for MIDI-Drummer
 
+0.1400 2020-08-23 12:21:18
+    - Fix eg/reggae.
+    - Add the ->flam method.
+
+0.1300 2020-08-23 09:58:26
+    - Improve documentation.
+    - Improve ->roll and ->set_time_sig code.
+    - Add 32nd, 64th and 128th Music::Duration specs.
+    - Add the ->roll method.
+    - Add the eg/crescendo program.
+    - Improve eg/reggae.
+
+0.1201 2020-08-22 15:26:43
+    - Fix the eg/waltz beat figure.
+    - Add a fill to the beginning of eg/reggae.
+    - Simplify the ->accented_note method.
+
+0.1200 2020-08-22 10:21:34
+    - Add the eg/fool-in-the-rain example program.
+    - Consolidate the metronomes into a single program.
+    - Remove the unneeded effects: reverb, chorus and pan.
+    - Add a 6/8 metronome beat.
+    - Add all remaining named percussion patches.
+
 0.1101 2020-08-17 09:34:01
     - Improve the halftime shuffle example program.
     - Add 7/4 and 7/8 metronomes.

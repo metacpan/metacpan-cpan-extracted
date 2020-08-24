@@ -1,3 +1,12 @@
+0.16 2020-08-23
+    + Fix signature parsing when there are more than 40 placeholder strings
+      This was an interesting bug to chase down. Filter::Simple replaces all
+      strings with placeholders, but if you have enough of them, one of them
+      becomes "\0\0\0(", which the signature parsing did not cope with.
+    + "use feature 'signatures';" and "no warnings 'experimental::signatures';"
+      are now allowed to have leading whitespace but still must be on a line
+      of their own.
+
 0.15 2018-08-19
     + Add mention of App::sigfix and Babble
     + Document that only a reduced set of regular expression matches is

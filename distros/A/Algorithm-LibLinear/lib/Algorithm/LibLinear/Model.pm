@@ -2,22 +2,25 @@ package Algorithm::LibLinear::Model;
 
 use 5.014;
 use Algorithm::LibLinear;  # For Algorithm::LibLinear::Model::Raw
-use Algorithm::LibLinear::Types;
+use Algorithm::LibLinear::Types qw/Feature/;
 use Carp qw//;
-use Smart::Args;
+use Smart::Args::TypeTiny;
+use Types::Standard qw/ClassName InstanceOf Int Str/;
+
+my $InstanceOfPackage = InstanceOf[__PACKAGE__];
 
 sub new {
     args
-        my $class => 'ClassName',
-        my $raw_model => 'Algorithm::LibLinear::Model::Raw';
+        my $class => ClassName,
+        my $raw_model => InstanceOf['Algorithm::LibLinear::Model::Raw'];
 
     bless +{ raw_model => $raw_model, } => $class;
 }
 
 sub load {
     args
-        my $class => 'ClassName',
-        my $filename => 'Str';
+        my $class => ClassName,
+        my $filename => Str;
 
     my $raw_model = Algorithm::LibLinear::Model::Raw->load($filename);
     $class->new(raw_model => $raw_model);
@@ -25,8 +28,12 @@ sub load {
 
 sub bias {
     args_pos
-        my $self,
-        my $label => 'Int';
+        my $self => $InstanceOfPackage,
+        my $label => +{ isa => Int, optional => 1, };
+
+    return $self->raw_model->rho if $self->is_oneclass_model;
+    # Non one-class SVM model requires label index.
+    Carp::croak('Missing mandatory label index.') unless defined $label;
 
     $self->raw_model->bias($label - 1);
 }
@@ -35,12 +42,14 @@ sub class_labels { $_[0]->raw_model->class_labels }
 
 sub coefficient {
     args_pos
-        my $self,
-        my $feature => 'Int',
-        my $label => 'Int';
+        my $self => $InstanceOfPackage,
+        my $feature => Int,
+        my $label => Int;
 
     $self->raw_model->coefficient($feature, $label - 1);
 }
+
+sub is_oneclass_model { $_[0]->raw_model->is_oneclass_model }
 
 sub is_probability_model { $_[0]->raw_model->is_probability_model }
 
@@ -50,20 +59,18 @@ sub num_classes { $_[0]->raw_model->num_classes }
 
 sub num_features { $_[0]->raw_model->num_features }
 
-sub raw_model { $_[0]->{raw_model} }
-
 sub predict {
     args
-        my $self,
-        my $feature => 'Algorithm::LibLinear::Feature';
+        my $self => $InstanceOfPackage,
+        my $feature => Feature;
 
     $self->raw_model->predict($feature);
 }
 
 sub predict_probability {
     args
-        my $self,
-        my $feature => 'Algorithm::LibLinear::Feature';
+        my $self => $InstanceOfPackage,
+        my $feature => Feature;
 
     unless ($self->is_probability_model) {
         Carp::carp(
@@ -76,16 +83,18 @@ sub predict_probability {
 
 sub predict_values {
     args
-        my $self,
-        my $feature => 'Algorithm::LibLinear::Feature';
+        my $self => $InstanceOfPackage,
+        my $feature => Feature;
 
     $self->raw_model->predict_values($feature);
 }
 
+sub raw_model { $_[0]->{raw_model} }
+
 sub save {
     args
-        my $self,
-        my $filename => 'Str';
+        my $self => $InstanceOfPackage,
+        my $filename => Str;
 
     $self->raw_model->save($filename);
 }
@@ -107,6 +116,7 @@ Algorithm::LibLinear::Model
   my $classifier = Algorithm::LibLinear::Model->load(filename => 'trained.model');
   
   my @labels = $classifier->class_labels;
+  if ($classifier->is_oneclass_model) { ... }
   if ($classifier->is_probability_model) { ... }
   if ($classifier->is_regression_model) { ... }
   say $classifier->num_classes;  # == @labels
@@ -147,9 +157,9 @@ Note that the constructor of this class is B<not> a part of public API. You can 
 
 Class method. Load a LIBLINEAR's model file and returns an instance of this class.
 
-=head2 bias($index)
+=head2 bias([$index])
 
-Returns value of the bias term corresponding to the C<$index>-th class.
+Returns value of the bias term corresponding to the C<$index>-th class. In case of one-class SVM (i.e., when C<is_oneclass_model> is true,) the C<$index> is ignored.
 
 Recall that a trained model can be represented as a function f(x) = W^t x + b, where W is a F x C matrix, b is a C-sized vector and C and F are the numbers of classes and features, respectively. This method returns b(C<$index>) in this notation.
 
@@ -164,6 +174,10 @@ Returns an ArrayRef of class labels, each of them could be returned by C<predict
 Returns value of the coefficient of classifier matrix. i.e., W(C<$feature_index>, C<$label_index>) (see C<bias> method description above.)
 
 Be careful that both indices are 1-based just same as C<bias>.
+
+=head2 is_oneclass_model
+
+Returns true if the model is trained for one-class SVM, false otherwise.
 
 =head2 is_probability_model
 

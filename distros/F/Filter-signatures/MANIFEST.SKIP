@@ -15,6 +15,7 @@ Makefile$
 ^jar/
 ^cpan/
 ^MYMETA
+^.prove
 ^.releaserc
 ^Filter-signatures-.*/
 ^Filter-signatures-.*.tar.gz$

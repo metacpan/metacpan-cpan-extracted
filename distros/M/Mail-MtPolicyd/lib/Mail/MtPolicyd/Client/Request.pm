@@ -2,7 +2,7 @@ package Mail::MtPolicyd::Client::Request;
 
 use Moose;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: a postfix policyd client request class
 
 
@@ -80,7 +80,7 @@ Mail::MtPolicyd::Client::Request - a postfix policyd client request class
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::WordList;
 
-our $DATE = '2020-05-04'; # DATE
-our $VERSION = '0.061'; # VERSION
+our $DATE = '2020-08-23'; # DATE
+our $VERSION = '0.062'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -10,7 +10,18 @@ with 'Pod::Weaver::Role::Section';
 
 use File::Slurper qw(write_text);
 use File::Temp qw(tempfile);
+use List::Util qw(first);
 use Perinci::Result::Format::Lite;
+
+sub _md2pod {
+    require Markdown::To::POD;
+
+    my ($self, $md) = @_;
+    my $pod = Markdown::To::POD::markdown_to_pod($md);
+    # make sure we add a couple of blank lines in the end
+    $pod =~ s/\s+\z//s;
+    $pod . "\n\n\n";
+}
 
 sub _process_module {
     no strict 'refs';
@@ -30,7 +41,7 @@ sub _process_module {
     my $wl_name = $package;
     $wl_name =~ s/\AWordList:://;
 
-    # add Synopsis section
+  ADD_SYNOPSIS_SECTION:
     {
         my @pod;
         push @pod, " use $package;\n\n";
@@ -60,9 +71,75 @@ sub _process_module {
                 before_section => 'DESCRIPTION',
                 ignore => 1,
             });
-    }
+    } # ADD_SYNOPSIS_SECTION
 
-    # add Statistics section
+  ADD_WORDLIST_PARAMETERS_SECTION:
+    {
+        my $params = \%{"$package\::PARAMS"};
+        last unless keys %$params;
+
+        my $examples = \@{"$package\::EXAMPLES"};
+        my $first_example_with_args = first { $_->{args} && keys %{ $_->{args} } } @$examples;
+
+        my @pod;
+
+        push @pod, <<_;
+
+This is a parameterized wordlist module. When loading in Perl, you can specify
+the parameters to the constructor, for example:
+
+ use $package;
+_
+        my $args;
+        if ($first_example_with_args) {
+            my $eg = $first_example_with_args;
+            push @pod, " # $eg->{summary}\n" if defined $eg->{summary};
+            $args = $eg->{args};
+        } else {
+            $args = {foo=>1, bar=>2};
+        }
+
+        push @pod, " my \$wl = $package\->(".
+            join(", ", map {"$_ => $args->{$_}"} sort keys %$args).");\n\n";
+
+        push @pod, <<_;
+
+When loading on the command-line, you can specify parameters using the
+C<WORDLISTNAME=ARGNAME1,ARGVAL1,ARGNAME2,ARGVAL2> syntax, like in L<perl>'s
+C<-M> option, for example:
+
+_
+
+        if ($first_example_with_args) {
+            my $eg = $first_example_with_args;
+            push @pod, " % wordlist -w $wl_name=",
+                join(",", map { "$_=$eg->{args}{$_}" } sort keys %{ $eg->{args} }), "\n\n";
+        } else {
+            push @pod, " % wordlist -w $wl_name=foo,1,bar,2 ...\n\n";
+        }
+
+        push @pod, "Known parameters:\n\n";
+        for my $paramname (sort keys %$params) {
+            my $paramspec = $params->{$paramname};
+            push @pod, "=head2 $paramname\n\n";
+            push @pod, "Required. " if $paramspec->{req};
+            if (defined $paramspec->{summary}) {
+                require String::PodQuote;
+                push @pod, String::PodQuote::pod_quote($paramspec->{summary}), ".\n\n";
+            }
+            push @pod, $self->_md2pod($paramspec->{description})
+                if $paramspec->{description};
+        }
+
+        $self->add_text_to_section(
+            $document, join("", @pod), 'WORDLIST PARAMETERS',
+            {
+                after_section => 'DESCRIPTION',
+                ignore => 1,
+            });
+    } # ADD_WORDLIST_PARAMETERS_SECTION
+
+  ADD_STATISTICS_SECTION:
     {
         no strict 'refs';
         my @pod;
@@ -82,7 +159,7 @@ sub _process_module {
                 before_section => 'DESCRIPTION',
                 ignore => 1,
             });
-    }
+    } # ADD_STATISTICS_SECTION
 
     $self->log(["Generated POD for '%s'", $filename]);
 }
@@ -115,7 +192,7 @@ Pod::Weaver::Plugin::WordList - Plugin to use when building WordList::* distribu
 
 =head1 VERSION
 
-This document describes version 0.061 of Pod::Weaver::Plugin::WordList (from Perl distribution Pod-Weaver-Plugin-WordList), released on 2020-05-04.
+This document describes version 0.062 of Pod::Weaver::Plugin::WordList (from Perl distribution Pod-Weaver-Plugin-WordList), released on 2020-08-23.
 
 =head1 SYNOPSIS
 

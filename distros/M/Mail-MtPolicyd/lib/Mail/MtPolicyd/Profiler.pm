@@ -9,7 +9,7 @@ use namespace::autoclean;
 use Mail::MtPolicyd::Profiler::Timer;
 use JSON;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: a application level profiler for mtpolicyd
 
 has 'root' => ( is => 'rw', isa => 'Mail::MtPolicyd::Profiler::Timer',
@@ -78,7 +78,7 @@ Mail::MtPolicyd::Profiler - a application level profiler for mtpolicyd
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 AUTHOR
 

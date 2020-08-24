@@ -1,4 +1,4 @@
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Test::More;
 use Quantum::Superpositions::Lazy;
 
@@ -9,12 +9,14 @@ sub is_with_precision
 }
 
 my $dataset =
+
 	# numbers from 1 to 9, with weights from 9 to 1
 	superpos(map { [$_, 10 - $_] } 1 .. 9)
-		*
+	*
+
 	# even numbers from 100 to 200, with weight from 1 to 25 to 1
 	superpos(map { [25 - abs(25 - $_), 100 + $_ * 2] } 1 .. 49)
-;
+	;
 
 my $stats = $dataset->stats;
 

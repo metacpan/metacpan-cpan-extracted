@@ -110,7 +110,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20200619';
+    $VERSION = '20200822';
 }
 
 sub streamhandle {
@@ -221,17 +221,19 @@ EOM
         # Case 1: handle encoded data
         if ($is_encoded_data) {
             if ( ref($fh) eq 'IO::File' ) {
-                $fh->binmode(":raw:encoding(UTF-8)");
+                ## binmode object call not available in older perl versions
+                ## $fh->binmode(":raw:encoding(UTF-8)");
+                binmode $fh, ":raw:encoding(UTF-8)";
             }
-            elsif ( $fh eq '-' ) {
+            elsif ( $filename eq '-' ) {
                 binmode STDOUT, ":raw:encoding(UTF-8)";
             }
         }
 
         # Case 2: handle unencoded data
         else {
-            if    ( ref($fh) eq 'IO::File' ) { $fh->binmode(); }
-            elsif ( $fh eq '-' )             { binmode STDOUT }
+            if    ( ref($fh) eq 'IO::File' ) { binmode $fh }
+            elsif ( $filename eq '-' )       { binmode STDOUT }
         }
     }
 
@@ -1066,8 +1068,10 @@ EOM
         }
 
         # MD5 sum of input file is evaluated before any prefilter
+        my $saved_input_buf;
         if ( $rOpts->{'assert-tidy'} || $rOpts->{'assert-untidy'} ) {
-            $digest_input = $md5_hex->($buf);
+            $digest_input    = $md5_hex->($buf);
+            $saved_input_buf = $buf;
         }
 
         # Prefilters and postfilters: The prefilter is a code reference
@@ -1462,9 +1466,15 @@ EOM
             if ( $rOpts->{'assert-tidy'} ) {
                 my $digest_output = $md5_hex->($buf);
                 if ( $digest_output ne $digest_input ) {
-                    $logger_object->warning(
-"assertion failure: '--assert-tidy' is set but output differs from input\n"
-                    );
+                    my $diff_msg =
+                      compare_string_buffers( $saved_input_buf, $buf,
+                        $is_encoded_data );
+                    $logger_object->warning(<<EOM);
+assertion failure: '--assert-tidy' is set but output differs from input
+EOM
+                    $logger_object->interrupt_logfile();
+                    $logger_object->warning( $diff_msg . "\n" );
+                    $logger_object->resume_logfile();
                 }
             }
             if ( $rOpts->{'assert-untidy'} ) {
@@ -1695,6 +1705,147 @@ EOM
   ERROR_EXIT:
     return 1;
 }    # end of main program perltidy
+
+sub line_diff {
+
+    # Given two strings, return
+    # $diff_marker = a string with carat (^) symbols indicating differences
+    # $pos1 = character position of first difference; pos1=-1 if no difference
+
+    # Form exclusive or of the strings, which has null characters where strings
+    # have same common characters so non-null characters indicate character
+    # differences.
+    my ( $s1, $s2 ) = @_;
+    my $diff_marker = "";
+    my $pos         = -1;
+    my $pos1        = $pos;
+    if ( defined($s1) && defined($s2) ) {
+        my $count = 0;
+        my $mask  = $s1 ^ $s2;
+
+        while ( $mask =~ /[^\0]/g ) {
+            $count++;
+            my $pos_last = $pos;
+            $pos = $-[0];
+            if ( $count == 1 ) { $pos1 = $pos; }
+            $diff_marker .= ' ' x ( $pos - $pos_last - 1 ) . '^';
+
+            # we could continue to mark all differences, but there is no point
+            last;
+        }
+    }
+    return wantarray ? ( $diff_marker, $pos1 ) : $diff_marker;
+}
+
+sub compare_string_buffers {
+
+    # Compare input and output string buffers and return a brief text
+    # description of the first difference.
+    my ( $bufi, $bufo, $is_encoded_data ) = @_;
+
+    my $leni = length($bufi);
+    my $leno = length($bufo);
+    my $msg =
+      "Input  file length is $leni chars\nOutput file length is $leno chars\n";
+    return $msg unless $leni && $leno;
+
+    my ( $fhi, $fnamei ) = streamhandle( \$bufi, 'r', $is_encoded_data );
+    my ( $fho, $fnameo ) = streamhandle( \$bufo, 'r', $is_encoded_data );
+    return $msg unless ( $fho && $fhi );    # for safety, shouldn't happen
+    my ( $linei,              $lineo );
+    my ( $counti,             $counto )              = ( 0,  0 );
+    my ( $last_nonblank_line, $last_nonblank_count ) = ( "", 0 );
+    my $truncate = sub {
+        my ( $str, $lenmax ) = @_;
+        if ( length($str) > $lenmax ) {
+            $str = substr( $str, 0, $lenmax ) . "...";
+        }
+        return $str;
+    };
+    while (1) {
+        if ($linei) {
+            $last_nonblank_line  = $linei;
+            $last_nonblank_count = $counti;
+        }
+        $linei = $fhi->getline();
+        $lineo = $fho->getline();
+
+        # compare chomp'ed lines
+        if ( defined($linei) ) { $counti++; chomp $linei }
+        if ( defined($lineo) ) { $counto++; chomp $lineo }
+
+        # see if one or both ended before a difference
+        last unless ( defined($linei) && defined($lineo) );
+
+        next if ( $linei eq $lineo );
+
+        # lines differ ...
+        my ( $line_diff, $pos1 ) = line_diff( $linei, $lineo );
+        my $reason = "Files first differ at character $pos1 of line $counti";
+
+        my ( $leading_ws_i, $leading_ws_o ) = ( "", "" );
+        if ( $linei =~ /^(\s+)/ ) { $leading_ws_i = $1; }
+        if ( $lineo =~ /^(\s+)/ ) { $leading_ws_o = $1; }
+        if ( $leading_ws_i ne $leading_ws_o ) {
+            $reason .= "; leading whitespace differs";
+            if ( $leading_ws_i =~ /\t/ ) {
+                $reason .= "; input has tab char";
+            }
+        }
+        else {
+            my ( $trailing_ws_i, $trailing_ws_o ) = ( "", "" );
+            if ( $linei =~ /(\s+)$/ ) { $trailing_ws_i = $1; }
+            if ( $lineo =~ /(\s+)$/ ) { $trailing_ws_o = $1; }
+            if ( $trailing_ws_i ne $trailing_ws_o ) {
+                $reason .= "; trailing whitespace differs";
+            }
+        }
+        $msg .= $reason . "\n";
+
+        # limit string display length
+        if ( $pos1 > 60 ) {
+            my $drop = $pos1 - 40;
+            $linei     = "..." . substr( $linei,     $drop );
+            $lineo     = "..." . substr( $lineo,     $drop );
+            $line_diff = "   " . substr( $line_diff, $drop );
+        }
+        $linei              = $truncate->( $linei,              72 );
+        $lineo              = $truncate->( $lineo,              72 );
+        $last_nonblank_line = $truncate->( $last_nonblank_line, 72 );
+
+        if ($last_nonblank_line) {
+            my $countm = $counti - 1;
+            $msg .= <<EOM;
+ $last_nonblank_count:$last_nonblank_line
+EOM
+        }
+        $line_diff = ' ' x ( 2 + length($counto) ) . $line_diff;
+        $msg .= <<EOM;
+<$counti:$linei
+>$counto:$lineo
+$line_diff 
+EOM
+        return $msg;
+    } ## end while
+
+    # no line differences found, but one file may have fewer lines
+    if ( $counti > $counto ) {
+        $msg .= <<EOM;
+Files initially match file but output file has fewer lines
+EOM
+    }
+    elsif ( $counti < $counto ) {
+        $msg .= <<EOM;
+Files initially match file but input file has fewer lines
+EOM
+    }
+    else {
+        $msg .= <<EOM;
+Text in lines of file match but checksums differ. Perhaps line endings differ.
+EOM
+    }
+    return $msg;
+}
 
 sub get_stream_as_named_file {
 
@@ -2207,14 +2358,14 @@ sub generate_options {
     #   if max is undefined, there is no upper limit
     # Parameters not listed here have defaults
     %option_range = (
-        'format'             => [ 'tidy', 'html', 'user' ],
-        'output-line-ending' => [ 'dos',  'win',  'mac', 'unix' ],
-        'space-backslash-quote'         => [ 0, 2 ],
-        'block-brace-tightness'         => [ 0, 2 ],
-        'keyword-paren-inner-tightness' => [ 0, 2 ],
-        'brace-tightness'               => [ 0, 2 ],
-        'paren-tightness'               => [ 0, 2 ],
-        'square-bracket-tightness'      => [ 0, 2 ],
+        'format'                        => [ 'tidy', 'html', 'user' ],
+        'output-line-ending'            => [ 'dos',  'win',  'mac', 'unix' ],
+        'space-backslash-quote'         => [ 0,      2 ],
+        'block-brace-tightness'         => [ 0,      2 ],
+        'keyword-paren-inner-tightness' => [ 0,      2 ],
+        'brace-tightness'               => [ 0,      2 ],
+        'paren-tightness'               => [ 0,      2 ],
+        'square-bracket-tightness'      => [ 0,      2 ],
 
         'block-brace-vertical-tightness'            => [ 0, 2 ],
         'brace-vertical-tightness'                  => [ 0, 2 ],
@@ -3879,7 +4030,7 @@ sub show_version {
     print STDOUT <<"EOM";
 This is perltidy, v$VERSION 
 
-Copyright 2000-2019, Steve Hancock
+Copyright 2000-2020, Steve Hancock
 
 Perltidy is free software and may be copied under the terms of the GNU
 General Public License, which is included in the distribution files.

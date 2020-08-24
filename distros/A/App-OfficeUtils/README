@@ -3,8 +3,8 @@ NAME
     .odt, .xls, .xlsx, .ods, etc)
 
 VERSION
-    This document describes version 0.001 of App::OfficeUtils (from Perl
-    distribution App-OfficeUtils), released on 2020-08-21.
+    This document describes version 0.003 of App::OfficeUtils (from Perl
+    distribution App-OfficeUtils), released on 2020-08-22.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -36,6 +36,8 @@ FUNCTIONS
 
         Path to input file.
 
+    *   libreoffice_path => *filename*
+
     *   output_file => *filename*
 
         Path to output file.
@@ -43,6 +45,14 @@ FUNCTIONS
         If not specified, will output to stdout.
 
     *   overwrite => *bool*
+
+    *   return_output_file => *bool*
+
+        Return the path of output file instead.
+
+        This is useful when you do not specify an output file but do not
+        want to show the converted document to stdout, but instead want to
+        get the path to a temporary output file.
 
     Returns an enveloped result (an array).
 
@@ -71,6 +81,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    App::MSOfficeUtils, App::LibreOfficeUtils
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 

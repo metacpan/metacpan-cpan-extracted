@@ -38,8 +38,9 @@ sub _choose_fmts {
             push @format_ids, $fmt;
         }
     }
-    push @choices, 'best';
-    push @format_ids, 'best';
+    my @relative_formats = ( 'best', 'bestaudio' );
+    push @choices, @relative_formats;
+    push @format_ids, @relative_formats;
     my @fmt_data;
 
     while ( 1 ) {
@@ -91,14 +92,13 @@ sub download {
     }
     my $qty;
     if ( $opt->{quality} =~ /^\s*(\d+) or less$/ ) {
-        $qty = '<=';
-        $qty .= '?' if $opt->{no_height_ok};
-        $qty .= $1;
+        my $tmp = '<=';
+        $tmp .= '?' if $opt->{no_height_ok};
+        $tmp .= $1;
+        $qty = "bestvideo[height$tmp]+bestaudio/best[height$tmp]";
     }
-    elsif ( $opt->{quality} =~ /^\s*(\d+) or better$/ ) {
-        $qty = '>=';
-        $qty .= '?' if $opt->{no_height_ok};
-        $qty .= $1;
+    elsif ( $opt->{quality} eq 'best' ) {
+        $qty = 'bestvideo+bestaudio/best';
     }
     else {
         $qty = $opt->{quality};
@@ -165,7 +165,7 @@ sub download {
                         }
                         elsif ( $keep_fmt_choices ) {
                             my @fmts = @fmt_data[ grep { ! ( $_ % 2 ) } 0 .. $#fmt_data ];
-                            my @unavailable_fmts = grep { $_ ne 'best' && ! exists $data->{$ex}{$up}{$id}{fmt_to_info}{$_} } @fmts;
+                            my @unavailable_fmts = grep { $_ !~ /^best/ && ! exists $data->{$ex}{$up}{$id}{fmt_to_info}{$_} } @fmts;
                             if ( @unavailable_fmts ) {
                                 my $info = "\n" . $id . "\n";
                                 $info .= $data->{$ex}{$up}{$id}{title} . "\n";
@@ -186,16 +186,11 @@ sub download {
                             }
                         }
                     }
-                    elsif ( $qty eq 'best' ) {
-                        @fmt_data = ( 'best' );
-                    }
                     else {
-                        @fmt_data = ( "bestvideo[height$qty]+bestaudio/best[height$qty]" );
+                        @fmt_data = ( $qty );
                     }
                     $fmt_str = join '', @fmt_data;
-                    if ( $fmt_str ne 'best' ) { # best is default; adding '-f best' + output set ??
-                        push @cmd, '-f', $fmt_str;
-                    }
+                    push @cmd, '-f', $fmt_str;
                     if ( ! $keep_fmt_choices ) {
                         $fmt_str = undef;
                     }

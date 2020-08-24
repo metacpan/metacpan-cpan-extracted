@@ -1,9 +1,10 @@
 NAME
-    WordList - Word lists
+    WordList - Specification and base class for WordList::*, modules that
+    contain word list
 
 VERSION
-    This document describes version 0.7.5 of WordList (from Perl
-    distribution WordList), released on 2020-05-24.
+    This document describes version 0.7.6 of WordList (from Perl
+    distribution WordList), released on 2020-08-23.
 
 SYNOPSIS
     Use one of the "WordList::*" modules.
@@ -55,6 +56,19 @@ DESCRIPTION
     %PARAMS package variable. It is a hash of parameter names as keys and
     parameter specification as values. Parameter specification follows
     function argument metadata specified in Rinci::function.
+
+    Examples. Examples can be specified in @EXAMPLES package variable. The
+    structure is similar to Rinci function's "examples" property. For
+    example:
+
+     # in lib/WordList/Test/Dynamic/RandomWord/1000.pm
+
+     @EXAMPLES = (
+         {
+             summary => '1000 random words, each 10 to 15 characters long',
+             args => {min_len=>10, max_len=>15},
+         }
+     );
 
 DIFFERENCES WITH GAMES::WORD::WORDLIST
     Since this is a non-compatible interface from Games::Word::Wordlist, I

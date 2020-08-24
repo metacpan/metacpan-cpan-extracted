@@ -6,6 +6,14 @@
 #3 switch_plain.switch_plain
 #4 sot.def
 #5 sot.sot
+#6 prune.def
+#7 align33.def
+#8 gnu7.def
+#9 gnu7.gnu
+#10 git33.def
+#11 git33.git33
+#12 rt133130.def
+#13 rt133130.rt133130
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -23,8 +31,17 @@ BEGIN {
     # BEGIN SECTION 1: Parameter combinations #
     ###########################################
     $rparams = {
-        'def'          => "",
-        'lop'          => "-nlop",
+        'def'   => "",
+        'git33' => <<'----------',
+-wls='->' -wrs='->'
+
+----------
+        'gnu'      => "-gnu",
+        'lop'      => "-nlop",
+        'rt133130' => <<'----------',
+# only the method should get a csc:
+-csc -cscl=sub -sal=method
+----------
         'sot'          => "-sot -sct",
         'switch_plain' => "-nola",
     };
@@ -33,6 +50,42 @@ BEGIN {
     # BEGIN SECTION 2: Sources #
     ############################
     $rsources = {
+
+        'align33' => <<'----------',
+$wl  = int( $wl * $f + .5 );
+$wr  = int( $wr * $f + .5 );
+$pag = int( $pageh * $f + .5 );
+$fe  = $opt_F ? "t" : "f";
+$cf  = $opt_U ? "t" : "f";
+$tp  = $opt_t ? "t" : "f";
+$rm  = $numbstyle ? "t" : "f";
+$pa = $showurl   ? "t" : "f";
+$nh = $seq_number ? "t" : "f";
+----------
+
+        'git33' => <<'----------',
+# test -wls='->' -wrs='->'
+use Net::Ping;
+my ($ping) = Net::Ping->new();
+$ping->ping($host);
+
+----------
+
+        'gnu7' => <<'----------',
+# hanging side comments
+if ( $seen == 1 ) {    # We're the first word so far to have
+    # this abbreviation.
+    $hashref->{$abbrev} = $word;
+}
+elsif ( $seen == 2 ) {    # We're the second word to have this
+    # abbreviation, so we can't use it.
+    delete $hashref->{$abbrev};
+}
+else {                    # We're the third word to have this
+    # abbreviation, so skip to the next word.
+    next WORD;
+}
+----------
 
         'lop' => <<'----------',
 # logical padding examples
@@ -52,6 +105,80 @@ $bits =
 lc( $self->mime_attr('content-type')
         || $self->{MIH_DefaultType}
         || 'text/plain' );
+----------
+
+        'prune' => <<'----------',
+# some tests for 'sub prune_alignment_tree'
+
+$request->header( 'User-Agent' => $agent )              if $agent;
+$request->header( 'From'       => $from )               if $from;
+$request->header( 'Range'      => "bytes=0-$max_size" ) if $max_size;
+
+for (
+    [ 'CONSTANT', sub { join "foo", "bar" },         0, "bar" ],
+    [ 'CONSTANT', sub { join "foo", "bar", 3 },      1, "barfoo3" ],
+    [ '$var',     sub { join $_, "bar" },            0, "bar" ],
+    [ '$myvar',   sub { my $var; join $var, "bar" }, 0, "bar" ],
+);
+
+[
+    [ [NewXSHdr],     [ NewXSName, NewXSArgs ],            "XSHdr" ],
+    [ [NewXSCHdrs],   [ NewXSName, NewXSArgs, GlobalNew ], "XSCHdrs" ],
+    [ [DefSyms],      [StructName],                        "MkDefSyms" ],
+    [ [NewXSSymTab],  [ DefSyms, NewXSArgs ],              "AddArgsyms" ],
+    [ [NewXSLocals],  [NewXSSymTab],                       "Sym2Loc" ],
+    [ [IsAffineFlag], [],                                  sub { return "0" } ],
+];
+
+@degen_nums[ 1, 2, 4, 8 ]         = ( 'a', 'c', 'g', 't' );
+@degen_nums[ 5, 10, 9, 6, 3, 12 ] = ( 'r', 'y', 'w', 's', 'm', 'k' );
+@degen_nums[ 14, 13, 11, 7, 15 ]  = ( 'b', 'd', 'h', 'v', 'n' );
+
+$_CreateFile   = ff( "k32", "CreateFile",   [ P, N, N, N, N, N, N ], N );
+$_CloseHandle  = ff( "k32", "CloseHandle",  [N],                     N );
+$_GetCommState = ff( "k32", "GetCommState", [ N, P ],                I );
+$_SetCommState = ff( "k32", "SetCommState", [ N, P ],                I );
+$_SetupComm    = ff( "k32", "SetupComm",    [ N, N, N ],             I );
+$_PurgeComm    = ff( "k32", "PurgeComm",    [ N, N ],                I );
+$_CreateEvent  = ff( "k32", "CreateEvent",  [ P, I, I, P ],          N );
+
+
+is_deeply \@t, [
+
+ [3],  [0],  [1],  [0],
+ 3,   [1],  3,   [1],
+ 2,   [0],  [1],  [0],
+ [1],  [1],  [1],  2,
+ 3,   [1],  2,   [3],
+ 4,   [ 7, 8 ],  9,   ["a"],
+ "b",  3,   2,   5,
+ 3,   2,   5,   3,
+  [2],    5,      4,      5,
+  [ 3, 2, 1 ],  1,      2,      3,
+  [ -1, -2, -3 ], [ -1, -2, -3 ], [ -1, -2, -3 ], [ -1, -2 ],
+  3,      [ -1, -2 ],   3,      [ -1, -2, -3 ],
+  [ !1 ],   [ 8, 7, 6 ],  [ 8, 7, 6 ],  [4],
+  !!0,
+];
+----------
+
+        'rt133130' => <<'----------',
+method sum_radlinks {
+    my ( $global_radiation_matrix, $local_radiation_matrix, $rngg ) = @_;
+    my ( $i, $j, $n1, $n2, $num );
+    my $rggij;
+    $num = @$rngg;
+    for ( $i = 0 ; $i < $num ; $i++ ) {
+        $n1 = $rngg->[$i];
+        for ( $j = 0 ; $j < $num ; $j++ ) {
+            $n2    = $rngg->[$j];
+            $rggij = $local_radiation_matrix->[$i][$j];
+            if ( $rggij && ( $n1 != $n2 ) ) {
+                $global_radiation_matrix->[$n1][$n2] += $rggij;
+            }
+        }
+    }
+}
 ----------
 
         'sot' => <<'----------',
@@ -245,6 +372,193 @@ __PACKAGE__->load_components( qw(
 ) );
 #5...........
         },
+
+        'prune.def' => {
+            source => "prune",
+            params => "def",
+            expect => <<'#6...........',
+# some tests for 'sub prune_alignment_tree'
+
+$request->header( 'User-Agent' => $agent )              if $agent;
+$request->header( 'From'       => $from )               if $from;
+$request->header( 'Range'      => "bytes=0-$max_size" ) if $max_size;
+
+for (
+    [ 'CONSTANT', sub { join "foo", "bar" },         0, "bar" ],
+    [ 'CONSTANT', sub { join "foo", "bar", 3 },      1, "barfoo3" ],
+    [ '$var',     sub { join $_, "bar" },            0, "bar" ],
+    [ '$myvar',   sub { my $var; join $var, "bar" }, 0, "bar" ],
+);
+
+[
+    [ [NewXSHdr],     [ NewXSName, NewXSArgs ],            "XSHdr" ],
+    [ [NewXSCHdrs],   [ NewXSName, NewXSArgs, GlobalNew ], "XSCHdrs" ],
+    [ [DefSyms],      [StructName],                        "MkDefSyms" ],
+    [ [NewXSSymTab],  [ DefSyms, NewXSArgs ],              "AddArgsyms" ],
+    [ [NewXSLocals],  [NewXSSymTab],                       "Sym2Loc" ],
+    [ [IsAffineFlag], [],                                  sub { return "0" } ],
+];
+
+@degen_nums[ 1, 2, 4, 8 ]         = ( 'a', 'c', 'g', 't' );
+@degen_nums[ 5, 10, 9, 6, 3, 12 ] = ( 'r', 'y', 'w', 's', 'm', 'k' );
+@degen_nums[ 14, 13, 11, 7, 15 ]  = ( 'b', 'd', 'h', 'v', 'n' );
+
+$_CreateFile   = ff( "k32", "CreateFile",   [ P, N, N, N, N, N, N ], N );
+$_CloseHandle  = ff( "k32", "CloseHandle",  [N],                     N );
+$_GetCommState = ff( "k32", "GetCommState", [ N, P ],                I );
+$_SetCommState = ff( "k32", "SetCommState", [ N, P ],                I );
+$_SetupComm    = ff( "k32", "SetupComm",    [ N, N, N ],             I );
+$_PurgeComm    = ff( "k32", "PurgeComm",    [ N, N ],                I );
+$_CreateEvent  = ff( "k32", "CreateEvent",  [ P, I, I, P ],          N );
+
+is_deeply \@t, [
+
+    [3],            [0],            [1],            [0],
+    3,              [1],            3,              [1],
+    2,              [0],            [1],            [0],
+    [1],            [1],            [1],            2,
+    3,              [1],            2,              [3],
+    4,              [ 7, 8 ],       9,              ["a"],
+    "b",            3,              2,              5,
+    3,              2,              5,              3,
+    [2],            5,              4,              5,
+    [ 3, 2, 1 ],    1,              2,              3,
+    [ -1, -2, -3 ], [ -1, -2, -3 ], [ -1, -2, -3 ], [ -1, -2 ],
+    3,              [ -1, -2 ],     3,              [ -1, -2, -3 ],
+    [ !1 ],         [ 8, 7, 6 ],    [ 8, 7, 6 ],    [4],
+    !!0,
+];
+#6...........
+        },
+
+        'align33.def' => {
+            source => "align33",
+            params => "def",
+            expect => <<'#7...........',
+$wl  = int( $wl * $f + .5 );
+$wr  = int( $wr * $f + .5 );
+$pag = int( $pageh * $f + .5 );
+$fe  = $opt_F      ? "t" : "f";
+$cf  = $opt_U      ? "t" : "f";
+$tp  = $opt_t      ? "t" : "f";
+$rm  = $numbstyle  ? "t" : "f";
+$pa  = $showurl    ? "t" : "f";
+$nh  = $seq_number ? "t" : "f";
+#7...........
+        },
+
+        'gnu7.def' => {
+            source => "gnu7",
+            params => "def",
+            expect => <<'#8...........',
+# hanging side comments
+if ( $seen == 1 ) {    # We're the first word so far to have
+                       # this abbreviation.
+    $hashref->{$abbrev} = $word;
+}
+elsif ( $seen == 2 ) {    # We're the second word to have this
+                          # abbreviation, so we can't use it.
+    delete $hashref->{$abbrev};
+}
+else {                    # We're the third word to have this
+                          # abbreviation, so skip to the next word.
+    next WORD;
+}
+#8...........
+        },
+
+        'gnu7.gnu' => {
+            source => "gnu7",
+            params => "gnu",
+            expect => <<'#9...........',
+# hanging side comments
+if ($seen == 1)
+{    # We're the first word so far to have
+     # this abbreviation.
+    $hashref->{$abbrev} = $word;
+}
+elsif ($seen == 2)
+{    # We're the second word to have this
+     # abbreviation, so we can't use it.
+    delete $hashref->{$abbrev};
+}
+else
+{    # We're the third word to have this
+     # abbreviation, so skip to the next word.
+    next WORD;
+}
+#9...........
+        },
+
+        'git33.def' => {
+            source => "git33",
+            params => "def",
+            expect => <<'#10...........',
+# test -wls='->' -wrs='->'
+use Net::Ping;
+my ($ping) = Net::Ping->new();
+$ping->ping($host);
+
+#10...........
+        },
+
+        'git33.git33' => {
+            source => "git33",
+            params => "git33",
+            expect => <<'#11...........',
+# test -wls='->' -wrs='->'
+use Net::Ping;
+my ($ping) = Net::Ping -> new();
+$ping -> ping($host);
+
+#11...........
+        },
+
+        'rt133130.def' => {
+            source => "rt133130",
+            params => "def",
+            expect => <<'#12...........',
+method sum_radlinks {
+    my ( $global_radiation_matrix, $local_radiation_matrix, $rngg ) = @_;
+    my ( $i, $j, $n1, $n2, $num );
+    my $rggij;
+    $num = @$rngg;
+    for ( $i = 0 ; $i < $num ; $i++ ) {
+        $n1 = $rngg->[$i];
+        for ( $j = 0 ; $j < $num ; $j++ ) {
+            $n2    = $rngg->[$j];
+            $rggij = $local_radiation_matrix->[$i][$j];
+            if ( $rggij && ( $n1 != $n2 ) ) {
+                $global_radiation_matrix->[$n1][$n2] += $rggij;
+            }
+        }
+    }
+}
+#12...........
+        },
+
+        'rt133130.rt133130' => {
+            source => "rt133130",
+            params => "rt133130",
+            expect => <<'#13...........',
+method sum_radlinks {
+    my ( $global_radiation_matrix, $local_radiation_matrix, $rngg ) = @_;
+    my ( $i, $j, $n1, $n2, $num );
+    my $rggij;
+    $num = @$rngg;
+    for ( $i = 0 ; $i < $num ; $i++ ) {
+        $n1 = $rngg->[$i];
+        for ( $j = 0 ; $j < $num ; $j++ ) {
+            $n2    = $rngg->[$j];
+            $rggij = $local_radiation_matrix->[$i][$j];
+            if ( $rggij && ( $n1 != $n2 ) ) {
+                $global_radiation_matrix->[$n1][$n2] += $rggij;
+            }
+        }
+    }
+} ## end sub sum_radlinks
+#13...........
+        },
     };
 
     my $ntests = 0 + keys %{$rtests};
@@ -270,7 +584,7 @@ foreach my $key ( sort keys %{$rtests} ) {
         perltidyrc  => \$params,
         argv        => '',             # for safety; hide any ARGV from perltidy
         stderr      => \$stderr_string,
-        errorfile => \$errorfile_string,    # not used when -se flag is set
+        errorfile   => \$errorfile_string,    # not used when -se flag is set
     );
     if ( $err || $stderr_string || $errorfile_string ) {
         print STDERR "Error output received for test '$key'\n";

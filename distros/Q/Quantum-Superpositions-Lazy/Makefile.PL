@@ -1,11 +1,11 @@
-use 5.024000;
+use 5.028000;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME => 'Quantum::Superpositions::Lazy',
-	MIN_PERL_VERSION => '5.024',
+	MIN_PERL_VERSION => '5.028',
 	VERSION_FROM => 'lib/Quantum/Superpositions/Lazy.pm',
 
 	TEST_REQUIRES => {

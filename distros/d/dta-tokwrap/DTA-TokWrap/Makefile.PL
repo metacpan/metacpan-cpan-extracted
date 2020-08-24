@@ -2,6 +2,13 @@
 use ExtUtils::MakeMaker;
 use 5.010; ##-- in case old EU::MM doesn't grok MIN_PERL_VERSION
 
+##-- workaround for irritating "/some/symlinked/file is encountered a second time at File/Find.pm line 79." errors
+##   under ExtUtils::MakeMaker 7.1002 (see also RT bug #99018)
+#*ExtUtils::MakeMaker::_check_files = sub {};
+#*ExtUtils::MakeMaker::check_manifest = sub {};
+do "../find.hack" if (-e "../find.hack");
+
+
 ##----------------------------------------------------------------------
 ## MAIN
 ##----------------------------------------------------------------------
@@ -137,7 +144,7 @@ sub MY::manifypods {
 
 INST_CSS ?= ../../$(CSS)
 #POD2HTMLFLAGS ?= --css="$(INST_CSS)" --backlink="(Back to Top)" --podroot=blib --podpath=script --header
-POD2HTMLFLAGS ?= --css="$(INST_CSS)" --podroot=blib --podpath=script --header
+POD2HTMLFLAGS ?= --css="$(INST_CSS)" --podroot="$(CURDIR)/blib" --podpath="./lib:./script" --header
 POD2HTML ?= pod2html $(POD2HTMLFLAGS)
 
 INST_HTMLDIR ?= blib/html
@@ -164,7 +171,7 @@ $(INST_HTMLDIR)$(DFSEP).exists :: Makefile.PL
   $rules =~ s/\\\n/\n/sg;
   my $hackit = ("\\\n"
 		."\t | ".'$(PERL) -p'." \\\n"
-		."\t   ".'-e\'sub hackhref {($$href=shift)=~s|^/*||; $$href=~s|^script/||; $$href=~s|/|'.$html_ns_sep.'|g; $$href;}\''." \\\n"
+		."\t   ".'-e\'sub hackhref {($$href=shift)=~s{^/*}{}; $$href=~s{^(?:\./)?(?:script|lib)/}{}; $$href=~s{/}{'.$html_ns_sep.'}g; $$href;}\''." \\\n"
 		."\t   ".'-e\'s/<a href="([^"]*)/\'\\\'\'<a href="\'\\\'\'.hackhref($$1)/eg;\''
                );
   #$hackit = ' | cat - ';

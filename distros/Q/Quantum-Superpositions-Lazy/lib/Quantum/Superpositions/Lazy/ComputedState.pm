@@ -1,8 +1,8 @@
 package Quantum::Superpositions::Lazy::ComputedState;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Moo;
 
 use feature qw(signatures);
@@ -24,7 +24,7 @@ has "source" => (
 
 has "operation" => (
 	is => "ro",
-	isa => ConsumerOf["Quantum::Superpositions::Lazy::Role::Operation"],
+	isa => ConsumerOf ["Quantum::Superpositions::Lazy::Role::Operation"],
 	required => 1,
 );
 
@@ -36,7 +36,7 @@ sub clone($self)
 }
 
 # TODO: allow merging with regular states
-sub merge($self, $with)
+sub merge ($self, $with)
 {
 	croak "cannot merge a state: values mismatch"
 		if $self->value ne $with->value;

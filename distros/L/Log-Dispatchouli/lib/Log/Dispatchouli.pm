@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Log::Dispatchouli;
 # ABSTRACT: a simple wrapper around Log::Dispatch
-$Log::Dispatchouli::VERSION = '2.021';
+$Log::Dispatchouli::VERSION = '2.022';
 use Carp ();
 use File::Spec ();
 use Log::Dispatch;
@@ -147,19 +147,11 @@ sub new {
         : ('stderr');
   };
 
-  my $pid_prefix = exists $arg->{log_pid} ? $arg->{log_pid} : 1;
-
-  my $log = Log::Dispatch->new(
-    $pid_prefix
-    ? (
-        callbacks => sub {
-          "[$$] ". {@_}->{message}
-        },
-      )
-    : ()
-  );
-
-  my $self = bless { dispatcher => $log } => $class;
+  my $log = Log::Dispatch->new;
+  my $self = bless {
+    dispatcher => $log,
+    log_pid    => (exists $arg->{log_pid} ? $arg->{log_pid} : 1),
+  } => $class;
 
   if ($arg->{to_file}) {
     require Log::Dispatch::File;
@@ -183,11 +175,19 @@ sub new {
         mode      => 'append',
         callbacks => do {
           if (my $format = $arg->{file_format}) {
-            sub { $format->({@_}->{message}) }
+            sub {
+              my $message = {@_}->{message};
+              $message = "[$$] $message" if $self->{log_pid};
+              $format->($message)
+            };
           } else {
             # The time format returned here is subject to change. -- rjbs,
             # 2008-11-21
-            sub { (localtime) . ' ' . {@_}->{message} . "\n" }
+            sub {
+              my $message = {@_}->{message};
+              $message = "[$$] $message" if $self->{log_pid};
+              (localtime) . " $message\n";
+            };
           }
         },
       )
@@ -210,6 +210,8 @@ sub new {
         name      => 'self',
         min_level => 'debug',
         array     => $self->{events},
+        ($self->{log_pid} ? (callbacks => sub { "[$$] ". {@_}->{message} })
+                          : ())
       ),
     );
   }
@@ -240,12 +242,16 @@ for my $dest (qw(out err)) {
   my $name = "std$dest";
   my $code = sub {
     return if $_[0]->dispatcher->output($name);
+
+    my $callback = $_[0]->{log_pid} ? sub { "[$$] " . ({@_}->{message}) . "\n" }
+                                    : sub {           ({@_}->{message}) . "\n" };
+
     $_[0]->dispatcher->add(
       $_[0]->stdio_dispatcher_class->new(
         name      => "std$dest",
         min_level => 'debug',
         stderr    => ($dest eq 'err' ? 1 : 0),
-        callbacks => sub { +{@_}->{message} . "\n" },
+        callbacks => $callback,
         ($_[0]{quiet_fatal}{"std$dest"} ? (max_level => 'info') : ()),
       ),
     );
@@ -265,7 +271,7 @@ sub setup_syslog_output {
       min_level => 'debug',
       facility  => $arg{facility},
       ident     => $arg{ident},
-      logopt    => 'pid',
+      logopt    => ($self->{log_pid} ? 'pid' : ''),
       socket    => $arg{socket} || 'native',
       callbacks => sub {
         ( my $m = {@_}->{message} ) =~ s/\n/<LF>/g;
@@ -733,7 +739,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 2.021
+version 2.022
 
 =head1 SYNOPSIS
 
@@ -1127,6 +1133,10 @@ Randy Stauner <randy@magnificent-tears.com>
 =item *
 
 Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
+Ricardo Signes <rjbs@users.noreply.github.com>
 
 =item *
 

@@ -1,4 +1,4 @@
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Test::More;
 use Quantum::Superpositions::Lazy qw(fetch_matches);
 use Data::Dumper;

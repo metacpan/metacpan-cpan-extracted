@@ -1,8 +1,8 @@
 package Quantum::Superpositions::Lazy::Util;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
-use v5.24; use warnings;
+use v5.28; use warnings;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 

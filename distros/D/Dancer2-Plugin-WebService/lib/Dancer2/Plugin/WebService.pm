@@ -5,7 +5,7 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.3.5';
+our	$VERSION = '4.3.6';
 use	strict;
 use	warnings;
 use Encode;
@@ -338,7 +338,7 @@ closedir __SESSIONDIR;
 		my $app= shift;
 
 			if ( $app->request->param('what') =~/(?i)v/ ) {
-			$plg->reply(Perl=> $], WebService=> $VERSION, Dancer2=> $Dancer2::VERSION, Application=> (exists $app->config->{version} ? $app->config->{version} : '1.0.0')    )
+			$plg->reply(Perl=> $], WebService=> $VERSION, Dancer2=> $Dancer2::VERSION)
 			}
 			elsif ( $app->request->param('what') =~/(?i)a/ ) {
 
@@ -768,7 +768,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.3.5
+version 4.3.6
 
 =head1 SYNOPSIS
 
@@ -1039,7 +1039,7 @@ so if you want to allow all users to login no matter the username or the passwor
 
 This make sense if you just want to give anyone the ability for persistent data
 
-At production enviroments, probably you want to use an external auth script e.g for the native Linux authentication
+At production enviroments, probably you want to use an external auth script e.g for the native "Linux native" authentication
 
   MODULE_INSTALL_DIR/AuthScripts/linux.sh
 
@@ -1103,7 +1103,7 @@ A sample I<config.yml> is the following.
           user2   : <any>
           <any>   : Secret4All
 
-      - Name      : Linux users
+      - Name      : Linux native
         Active    : false
         Command   : MODULE_INSTALL_DIR/AuthScripts/linux.sh
         Arguments : [ ]

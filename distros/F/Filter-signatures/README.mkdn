@@ -1,5 +1,6 @@
 
-[![Build Status](https://travis-ci.org/Corion/Filter-signatures.svg?branch=master)](https://travis-ci.org/Corion/filter-signatures)
+[![Travis Build Status](https://travis-ci.org/Corion/Filter-signatures.svg?branch=master)](https://travis-ci.org/Corion/Filter-signatures)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Filter-signatures?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Filter-signatures)
 
 # NAME
 
@@ -185,7 +186,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2015-2018 by Max Maischein `corion@cpan.org`.
+Copyright 2015-2020 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

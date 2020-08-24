@@ -2,7 +2,7 @@ package Mail::MtPolicyd::SessionCache::Memcached;
 
 use Moose;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: session cache adapter for memcached
 
 extends 'Mail::MtPolicyd::SessionCache::Base';
@@ -90,7 +90,7 @@ Mail::MtPolicyd::SessionCache::Memcached - session cache adapter for memcached
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

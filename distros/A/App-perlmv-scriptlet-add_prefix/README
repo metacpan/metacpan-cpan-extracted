@@ -1,0 +1,73 @@
+NAME
+    App::perlmv::scriptlet::add_prefix - Add prefix to filenames
+
+VERSION
+    This document describes version 0.002 of
+    App::perlmv::scriptlet::add_prefix (from Perl distribution
+    App-perlmv-scriptlet-add_prefix), released on 2020-08-22.
+
+SYNOPSIS
+    With filenames:
+
+     foo.txt
+     new-bar.txt
+
+    This command:
+
+     % perlmv add-prefix -a prefix=new- *
+
+    will rename the files as follow:
+
+     foo.txt -> new-foo.txt
+     new-bar.txt -> new-new-bar.txt
+
+    This command:
+
+     % perlmv add-prefix -a prefix=new- -a avoid_duplicate_prefix=1 *
+
+    will rename the files as follow:
+
+     foo.txt -> new-foo.txt
+
+SCRIPTLET ARGUMENTS
+    Arguments can be passed using the "-a" ("--arg") perlmv option, e.g. "-a
+    name=val".
+
+  avoid_duplicate_prefix
+    Avoid adding prefix when filename already has that prefix.
+
+  prefix
+    Required. The prefix string.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-perlmv-scriptlet-add_prefix>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-perlmv-scriptlet-add_prefix>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-scriptlet-
+    add_prefix>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::perlmv::scriptlet::add_suffix
+
+    The "remove-common-prefix" scriptlet
+
+    perlmv (from App::perlmv)
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,9 +1,9 @@
 package WordList;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
+our $DATE = '2020-08-23'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.7.5'; # VERSION
+our $VERSION = '0.7.6'; # VERSION
 
 use strict 'subs', 'vars';
 
@@ -134,7 +134,7 @@ sub all_words {
 }
 
 1;
-# ABSTRACT: Word lists
+# ABSTRACT: Specification and base class for WordList::*, modules that contain word list
 
 __END__
 
@@ -144,11 +144,11 @@ __END__
 
 =head1 NAME
 
-WordList - Word lists
+WordList - Specification and base class for WordList::*, modules that contain word list
 
 =head1 VERSION
 
-This document describes version 0.7.5 of WordList (from Perl distribution WordList), released on 2020-05-24.
+This document describes version 0.7.6 of WordList (from Perl distribution WordList), released on 2020-08-23.
 
 =head1 SYNOPSIS
 
@@ -200,6 +200,19 @@ wordlist would accept parameters. Parameters are defined in the C<%PARAMS>
 package variable. It is a hash of parameter names as keys and parameter
 specification as values. Parameter specification follows function argument
 metadata specified in L<Rinci::function>.
+
+B<Examples.> Examples can be specified in C<@EXAMPLES> package variable. The
+structure is similar to L<Rinci function|Rinci::function>'s C<examples>
+property. For example:
+
+ # in lib/WordList/Test/Dynamic/RandomWord/1000.pm
+
+ @EXAMPLES = (
+     {
+         summary => '1000 random words, each 10 to 15 characters long',
+         args => {min_len=>10, max_len=>15},
+     }
+ );
 
 =head1 DIFFERENCES WITH GAMES::WORD::WORDLIST
 

@@ -7,10 +7,11 @@ use MIDI::Drummer::Tiny;
 my $max = shift || 8;
 
 my $d = MIDI::Drummer::Tiny->new(
-    bpm   => 100,
-    file  => "$0.mid",
-    kick  => 'n36',
-    snare => 'n40',
+    bpm       => 100,
+    file      => "$0.mid",
+    kick      => 'n36',
+    snare     => 'n40',
+    signature => '5/4',
 );
 
 $d->score->synch(

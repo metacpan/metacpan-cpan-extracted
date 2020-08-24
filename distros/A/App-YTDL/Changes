@@ -1,6 +1,10 @@
 Revision history for App-YTDL
 
 
+0.413   2020-08-24
+        - Manual format choice: add the entry 'bestaudio'.
+        - Option "video resolution": removed the buggy 'res or better' entries.
+
 0.412   2020-08-18
         - New option "Max rows of description".
         - Bugfix in Download.pm [RT #133176 Gabor Szabo].

@@ -1,0 +1,35 @@
+Config::INI::Tiny
+
+This is an extremely small amount of code for parsing the INI
+configuration format, in its simplest form, as known from Microsoft
+Windows.
+
+Its design focuses on making it easy to extract whichever level of
+semantics you need from your configuration: whether you want to care
+about the order of properties; their recurrence; the order of sections;
+treating each section header as a separate unit; or however else you want
+to be able to interpret your configuration files — you can.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

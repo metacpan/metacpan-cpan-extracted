@@ -1782,6 +1782,15 @@
       "name" : "Ampfing"
    },
    {
+      "ds100" : "OSAM",
+      "eva" : 8506109,
+      "latlong" : [
+         47.550604,
+         9.301927
+      ],
+      "name" : "Amriswil"
+   },
+   {
       "ds100" : "LAMS",
       "eva" : 8011038,
       "latlong" : [
@@ -3166,6 +3175,15 @@
          11.784682
       ],
       "name" : "Baalberge"
+   },
+   {
+      "ds100" : "OSBAA",
+      "eva" : 8502206,
+      "latlong" : [
+         47.19518,
+         8.52287
+      ],
+      "name" : "Baar(CH)"
    },
    {
       "ds100" : "MBAE",
@@ -50632,6 +50650,15 @@
          12.810799
       ],
       "name" : "Neuruppin Rheinsberger Tor"
+   },
+   {
+      "ds100" : "WNRS",
+      "eva" : 8080175,
+      "latlong" : [
+         52.92535,
+         12.82751
+      ],
+      "name" : "Neuruppin Seedamm"
    },
    {
       "ds100" : "WNR",

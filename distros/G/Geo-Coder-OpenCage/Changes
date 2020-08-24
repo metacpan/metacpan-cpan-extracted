@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-OpenCage
 
+
+0.26    2020-08-22
+        - upgrade various dependencies, no code changes
+        
 0.26    2019-11-10
         no code changes
         - add test for 429 response

@@ -4,7 +4,8 @@ author:
   - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0'
+  Test::LeakTrace: '0.16'
+  Test::More: '1.302170'
 configure_requires:
   ExtUtils::Depends: '0'
   ExtUtils::MakeMaker::CPANfile: '0.09'
@@ -26,5 +27,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/s-nez/b-hooks-op-check-leaveeval.git
-version: v0.0.3
+version: v0.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

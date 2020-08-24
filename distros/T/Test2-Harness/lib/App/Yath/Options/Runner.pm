@@ -2,7 +2,7 @@ package App::Yath::Options::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000023';
+our $VERSION = '1.000024';
 
 use Test2::Util qw/IS_WIN32/;
 use Test2::Harness::Util qw/clean_path/;
@@ -44,6 +44,24 @@ option_group {prefix => 'runner', category => "Runner Options"} => sub {
         short       => 'I',
         type        => 'm',
         description => "Add a directory to your include paths",
+    );
+
+    option resources => (
+        name => 'resource',
+        short => 'R',
+        type => 'm',
+        description => "Use a resource module to assign resource assignments to individual tests",
+        long_examples  => [' Port', ' +Test2::Harness::Runner::Resource::Port'],
+        short_examples => [' Port'],
+
+        normalize => sub {
+            my $val = shift;
+
+            $val = "Test2::Harness::Runner::Resource::$val"
+            unless $val =~ s/^\+//;
+
+            return $val;
+        },
     );
 
     option tlib => (
@@ -340,6 +358,19 @@ Only do preload if at least N tests are going to be run. In some cases a full pr
 =item --no-preloads
 
 Preload a module before running tests
+
+Can be specified multiple times
+
+
+=item --resource Port
+
+=item --resource +Test2::Harness::Runner::Resource::Port
+
+=item -R Port
+
+=item --no-resource
+
+Use a resource module to assign resource assignments to individual tests
 
 Can be specified multiple times
 

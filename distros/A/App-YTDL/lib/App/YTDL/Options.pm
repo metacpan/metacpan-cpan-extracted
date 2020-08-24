@@ -82,7 +82,7 @@ sub get_defaults {
         no_height_ok                 => 1,
         no_warnings                  => 0,
         prefer_free_formats          => 1,
-        quality                      => ' 720 or less',
+        quality                      => 'manually',
         retries                      => 7,
         show_video_id                => 0,
         show_view_count              => 0,
@@ -303,19 +303,13 @@ sub set_options {
             elsif ( $key eq "quality" ) {
                 my $prompt = 'Video resolution';
                 my $list = [
+                    'manually',
                     ' 180 or less',
                     ' 360 or less',
                     ' 720 or less',
                     '1080 or less',
                     '1440 or less',
                     '2160 or less',
-                    'manually',
-                    ' 180 or better',
-                    ' 360 or better',
-                    ' 720 or better',
-                    '1080 or better',
-                    '1440 or better',
-                    '2160 or better',
                     'best'
                 ];
                 _opt_choose_from_list_value( $set, $opt, $key, $prompt, $list );
@@ -368,7 +362,7 @@ sub set_options {
             }
             elsif ( $key eq "max_processes" ) {
                 my $digits = 2;
-                my $info = sprintf "Fetching additional information: the maximum number of parallel downloads";
+                my $info = sprintf "Fetching additional information: the maximum number of parallel downloads\nNow: %${digits}s", insert_sep( $opt->{$key} );
                 my $name = 'New: ';
                 _opt_number_range( $set, $opt, $key, $name, $info, $digits );
             }
@@ -580,6 +574,11 @@ sub read_config_file {
     for my $key ( @keys ) {
         $opt->{$key} = $tmp->{$key} if defined $tmp->{$key};
     }
+    ################################################### "... or better" removed in 0.413 - Keep this for a while.
+    if ( $opt->{quality} =~ /^\s*\d+\sor\sbetter\z/ ) {
+        $opt->{quality} = 'manually';
+    }
+    ###################################################
 }
 
 

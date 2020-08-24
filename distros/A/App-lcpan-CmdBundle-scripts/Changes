@@ -1,3 +1,8 @@
+0.003   2020-08-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to lcpan 1.057+ (no more 'dist' table).
+
+
 0.002   2020-01-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump Hash::Subset dependency version.

@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::CtIpRep;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: mtpolicyd plugin for the Commtouch IP reputation service (ctipd)
 
 
@@ -146,7 +146,7 @@ Mail::MtPolicyd::Plugin::CtIpRep - mtpolicyd plugin for the Commtouch IP reputat
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

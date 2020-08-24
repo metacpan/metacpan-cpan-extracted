@@ -1,3 +1,9 @@
+0.583   2020-04-29  Released-By: PERLANCAR; Urgency: low
+
+	- Tweak Rinci metadata: replace deprecated
+	  x.schema.{,element_}entity with more specific schema.
+
+
 0.582   2020-04-08  Released-By: PERLANCAR
 
 	- [build] Rebuild, to update Sah coerce rule module names.

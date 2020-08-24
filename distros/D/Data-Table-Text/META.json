@@ -46,7 +46,7 @@
    "provides" : {
       "Data::Table::Text" : {
          "file" : "lib/Data/Table/Text.pm",
-         "version" : "20200418"
+         "version" : "20200819"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20200418",
+   "version" : "20200819",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

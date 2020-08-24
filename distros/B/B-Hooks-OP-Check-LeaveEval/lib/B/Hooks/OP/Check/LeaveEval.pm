@@ -1,7 +1,7 @@
 package B::Hooks::OP::Check::LeaveEval;
 use strict;
 use warnings;
-use version 0.77; our $VERSION = version->declare('v0.0.3');
+use version 0.77; our $VERSION = version->declare('v0.0.4');
 
 use B::Hooks::OP::Check;
 use XSLoader;

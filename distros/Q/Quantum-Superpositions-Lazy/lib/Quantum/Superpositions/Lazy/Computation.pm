@@ -1,8 +1,8 @@
 package Quantum::Superpositions::Lazy::Computation;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Moo;
 
 use feature qw(signatures);
@@ -20,8 +20,10 @@ with "Quantum::Superpositions::Lazy::Role::Collapsible";
 
 has "operation" => (
 	is => "ro",
-	isa => (ConsumerOf["Quantum::Superpositions::Lazy::Role::Operation"])
-		->plus_coercions(Str, q{Quantum::Superpositions::Lazy::Operation::ComputationalOp->new(sign => $_)}),
+	isa => (ConsumerOf ["Quantum::Superpositions::Lazy::Role::Operation"])
+		->plus_coercions(Str,
+		q{Quantum::Superpositions::Lazy::Operation::ComputationalOp->new(sign => $_)}
+		),
 	coerce => 1,
 	required => 1,
 );
@@ -64,7 +66,7 @@ sub reset($self)
 	}
 }
 
-sub _cartesian_product($self, $values1, $values2, $sourced)
+sub _cartesian_product ($self, $values1, $values2, $sourced)
 {
 	my %states;
 	for my $val1 ($values1->@*) {
@@ -74,7 +76,8 @@ sub _cartesian_product($self, $values1, $values2, $sourced)
 
 			if (exists $states{$result}) {
 				$states{$result}[0] += $probability;
-			} else {
+			}
+			else {
 				$states{$result} = [
 					$probability,
 					$result,
@@ -82,7 +85,7 @@ sub _cartesian_product($self, $values1, $values2, $sourced)
 			}
 
 			if ($sourced) {
-				my $source = [@{ $val1->[2] // [$val1->[1]] }, $val2->[1]];
+				my $source = [@{$val1->[2] // [$val1->[1]]}, $val2->[1]];
 				push $states{$result}[2]->@*, $source;
 			}
 		}
@@ -101,30 +104,37 @@ sub _build_complete_states($self)
 
 		if (is_collapsible $value) {
 			my $total = $value->weight_sum;
-			$local_states = [map {
-				[$_->weight / $total, $_->value]
-			} $value->states->@*];
-		} else {
+			$local_states = [
+				map {
+					[$_->weight / $total, $_->value]
+					} $value->states->@*
+			];
+		}
+		else {
 			$local_states = [[1, $value]];
 		}
 
 		if (defined $states) {
 			$states = $self->_cartesian_product($states, $local_states, $sourced);
-		} else {
+		}
+		else {
 			$states = $local_states;
 		}
 	}
 
 	if ($sourced) {
-		return [map {
-			Quantum::Superpositions::Lazy::ComputedState->new(
-				weight => $_->[0],
-				value => $_->[1],
-				source => $_->[2] // $_->[1],
-				operation => $self->operation,
-			)
-		} $states->@*];
-	} else {
+		return [
+			map {
+				Quantum::Superpositions::Lazy::ComputedState->new(
+					weight => $_->[0],
+					value => $_->[1],
+					source => $_->[2] // $_->[1],
+					operation => $self->operation,
+				)
+				} $states->@*
+		];
+	}
+	else {
 		return $states;
 	}
 

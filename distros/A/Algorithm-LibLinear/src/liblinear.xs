@@ -5,7 +5,10 @@
 #include "linear.h"
 
 #define NO_XSLOCKS
-#include "xshelper.h"
+#include "EXTERN.h"
+#include "XSUB.h"
+#include "perl.h"
+#include "ppport.h"
 
 namespace {
 
@@ -78,6 +81,11 @@ free_problem(pTHX_ struct problem *problem_) {
     Safefree(problem_);
 }
 
+bool
+has_less_index(const struct feature_node& a, const struct feature_node& b) {
+    return a.index < b.index;
+}
+
 struct feature_node *
 hv2feature(
     pTHX_ HV *feature_hash, int bias_index = 0, double bias = -1.0) {
@@ -90,7 +98,6 @@ hv2feature(
     I32 index_length;
     SV *value;
     struct feature_node *curr = feature_vector;
-    // XXX: Assuming that order of features doesn't matter. Right?
     while ((value = hv_iternextsv(feature_hash, &index, &index_length))) {
         curr->index = atoi(index);
         curr->value = SvNV(value);
@@ -101,11 +108,21 @@ hv2feature(
         curr->value = bias;
         ++curr;
     }
-    curr->index = -1;  // Sentinel. LIBLINEAR doesn't care about its value.
+    // Sentinel. LIBLINEAR doesn't care about its value.
+    curr->index = -1;
+    // Since LIBLINEAR 2.40, |sparse_operator::sparse_dot|, used in one-class
+    // SVM solver (|solve_oneclass_svm|), started to assume that the
+    // |feature_node| vector is sorted by |index|.
+    std::sort(
+        feature_vector,
+        // |- 1| for removing sentinel node from the range of sorting.
+        feature_vector + feature_vector_size - 1,
+        has_less_index);
     return feature_vector;
 }
 
-inline bool is_regression_solver(const struct parameter *parameter_) {
+inline bool
+is_regression_solver(const struct parameter *parameter_) {
     switch (parameter_->solver_type) {
     case L2R_L2LOSS_SVR:
     case L2R_L2LOSS_SVR_DUAL:
@@ -116,9 +133,79 @@ inline bool is_regression_solver(const struct parameter *parameter_) {
     }
 }
 
+void
+validate_parameter(
+    pTHX_
+    struct problem *problem_,
+    struct parameter *parameter_) {
+    const char *message = check_parameter(problem_, parameter_);
+    if (message) {
+        Perl_croak(aTHX_ "Invalid training parameter: %s", message);
+    }
+}
+
 }  // namespace
 
 MODULE = Algorithm::LibLinear  PACKAGE = Algorithm::LibLinear::Model::Raw  PREFIX = ll_
+
+TYPEMAP: <<'EOT'
+TYPEMAP
+AV * T_AVREF_REFCOUNT_FIXED
+
+struct model * T_LIBLINEAR_MODEL
+
+struct parameter * T_LIBLINEAR_TRAINING_PARAMETER
+
+struct problem * T_LIBLINEAR_PROBLEM
+
+INPUT
+T_LIBLINEAR_MODEL
+    if (SvROK($arg) &&
+          sv_derived_from($arg, \"Algorithm::LibLinear::Model::Raw\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type,tmp);
+    }
+    else {
+        Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+            ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+            \"$var\", \"$ntype\");
+    }
+
+T_LIBLINEAR_TRAINING_PARAMETER
+    if (SvROK($arg) &&
+          sv_derived_from($arg, \"Algorithm::LibLinear::TrainingParameter\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type,tmp);
+    }
+    else {
+        Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+            ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+            \"$var\", \"$ntype\");
+    }
+
+T_LIBLINEAR_PROBLEM
+    if (SvROK($arg) &&
+          sv_derived_from($arg, \"Algorithm::LibLinear::Problem\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type,tmp);
+    }
+    else {
+        Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+            ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+            \"$var\", \"$ntype\");
+    }
+
+OUTPUT
+T_LIBLINEAR_MODEL
+    sv_setref_pv($arg, \"Algorithm::LibLinear::Model::Raw\", (void*)$var);
+
+T_LIBLINEAR_TRAINING_PARAMETER
+    sv_setref_pv(
+        $arg, \"Algorithm::LibLinear::TrainingParameter\", (void*)$var);
+
+T_LIBLINEAR_PROBLEM
+    sv_setref_pv($arg, \"Algorithm::LibLinear::Problem\", (void*)$var);
+EOT
 
 BOOT:
     set_print_string_function(dummy_puts);
@@ -127,17 +214,16 @@ PROTOTYPES: DISABLE
 
 struct model *
 ll_train(klass, problem_, parameter_)
-    const char *klass;
     struct problem *problem_;
     struct parameter *parameter_;
 CODE:
+    validate_parameter(aTHX_ problem_, parameter_);
     RETVAL = train(problem_, parameter_);
 OUTPUT:
     RETVAL
 
 struct model *
 ll_load(klass, filename)
-    const char *klass;
     const char *filename;
 CODE:
     RETVAL = load_model(filename);
@@ -175,6 +261,14 @@ ll_coefficient(self, feature, label)
     int label;
 CODE:
     RETVAL = get_decfun_coef(self, feature, label);
+OUTPUT:
+    RETVAL
+
+bool
+ll_is_oneclass_model(self)
+    struct model* self;
+CODE:
+    RETVAL = check_oneclass_model(self);
 OUTPUT:
     RETVAL
 
@@ -268,6 +362,14 @@ CODE:
 OUTPUT:
     RETVAL
 
+double
+ll_rho(self)
+    struct model *self;
+CODE:
+    RETVAL = get_decfun_rho(self);
+OUTPUT:
+    RETVAL
+
 void
 ll_save(self, filename)
     struct model *self;
@@ -292,14 +394,15 @@ MODULE = Algorithm::LibLinear  PACKAGE = Algorithm::LibLinear::TrainingParameter
 PROTOTYPES: DISABLE
 
 struct parameter *
-ll_new(klass, solver_type, epsilon, cost, weight_labels, weights, loss_sensitivity)
-    const char *klass;
+ll_new(klass, solver_type, epsilon, cost, weight_labels, weights, loss_sensitivity, nu, regularize_bias)
     int solver_type;
     double epsilon;
     double cost;
     AV *weight_labels;
     AV *weights;
     double loss_sensitivity;
+    double nu;
+    bool regularize_bias;
 CODE:
     int num_weights = av_len(weight_labels) + 1;
     if (av_len(weights) + 1 != num_weights) {
@@ -308,24 +411,21 @@ CODE:
           "The number of weight labels is not equal to the number of"
           " weights.");
     }
+    // |init_sol| is initialized within |alloc_parameter|.
     RETVAL = alloc_parameter(aTHX_ num_weights);
+    RETVAL->solver_type = solver_type;
+    RETVAL->eps = epsilon;
+    RETVAL->C = cost;
+    RETVAL->p = loss_sensitivity;
+    RETVAL->nu = nu;
+    RETVAL->regularize_bias = regularize_bias ? 1 : 0;
     dXCPT;
     XCPT_TRY_START {
-        RETVAL->solver_type = solver_type;
-        RETVAL->eps = epsilon;
-        RETVAL->C = cost;
         int *weight_labels_ = RETVAL->weight_label;
         double *weights_ = RETVAL->weight;
         for (int i = 0; i < num_weights; ++i) {
             weight_labels_[i] = SvIV(*av_fetch(weight_labels, i, 0));
             weights_[i] = SvNV(*av_fetch(weights, i, 0));
-        }
-        RETVAL->p = loss_sensitivity;
-        // It's okay to pass NULL as 1st argument because it is never used.
-        const char *message = check_parameter(NULL, RETVAL);
-        if (message) {
-            Perl_croak(
-                aTHX_ "Training parameter is in invalid state: %s", message);
         }
     } XCPT_TRY_END
     XCPT_CATCH {
@@ -341,6 +441,7 @@ ll_cross_validation(self, problem_, num_folds)
     struct problem *problem_;
     int num_folds;
 CODE:
+    validate_parameter(aTHX_ problem_, self);
     double *targets;
     Newx(targets, problem_->l, double);
     cross_validation(problem_, self, num_folds, targets);
@@ -441,14 +542,13 @@ ll_DESTROY(self)
     struct parameter *self;
 CODE:
     free_parameter(aTHX_ self);
-    
+
 MODULE = Algorithm::LibLinear  PACKAGE = Algorithm::LibLinear::Problem  PREFIX = ll_
 
 PROTOTYPES: DISABLE
 
 struct problem *
 ll_new(klass, labels, features, bias)
-    const char *klass;
     AV *labels;
     AV *features;
     double bias;

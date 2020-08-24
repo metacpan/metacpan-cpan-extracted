@@ -2,7 +2,7 @@ package Mail::MtPolicyd::SessionCache::None;
 
 use Moose;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: dummy session caching adapter
 
 extends 'Mail::MtPolicyd::SessionCache::Base';
@@ -21,7 +21,7 @@ Mail::MtPolicyd::SessionCache::None - dummy session caching adapter
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 AUTHOR
 

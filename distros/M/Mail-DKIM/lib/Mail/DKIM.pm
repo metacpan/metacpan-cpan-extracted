@@ -1,7 +1,7 @@
 package Mail::DKIM;
 use strict;
 use warnings;
-our $VERSION = '1.20200724'; # VERSION
+our $VERSION = '1.20200824'; # VERSION
 # ABSTRACT: Signs/verifies Internet mail with DKIM/DomainKey signatures
 
 #require 5.010;
@@ -23,7 +23,7 @@ Mail::DKIM - Signs/verifies Internet mail with DKIM/DomainKey signatures
 
 =head1 VERSION
 
-version 1.20200724
+version 1.20200824
 
 =head1 SYNOPSIS
 
@@ -125,9 +125,13 @@ Bron Gondwana <brong@fastmailteam.com> (ARC)
 
 =head1 CONTRIBUTORS
 
-=for stopwords Bron Gondwana Christian Jaeger Damien MASCRÉ jasonlong José Borges Ferreira Martijn van de Streek Martin H. Sluka Mohammad S Anwar
+=for stopwords Aaron Thompson Bron Gondwana Christian Jaeger Damien MASCRÉ jasonlong José Borges Ferreira Martijn van de Streek Martin H. Sluka Mohammad S Anwar
 
 =over 4
+
+=item *
+
+Aaron Thompson <dev@aaront.org>
 
 =item *
 

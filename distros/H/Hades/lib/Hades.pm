@@ -3,7 +3,7 @@ package Hades;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 use Module::Generate;
 use Switch::Again qw/switch/;
 
@@ -17,63 +17,49 @@ sub run {
 	$args->{eval} = _read_file($args->{file}) if $args->{file};
 	my $mg = Module::Generate->start;
 	$args->{$_} && $mg->$_($args->{$_}) for (qw/dist lib tlib author email version/);
+	if ($args->{realm}) {
+		$class = sprintf "Hades::Realm::%s", $args->{realm};
+		eval "require $class";
+	}
 	my $self = $class->new($args);
+	$self->can('module_generate') && $self->module_generate($mg, $class);
 	my ($index, $ident, @lines, @line, @innerline, $nested) = (0, '');
-	while ($index < length $self->{eval}) {
+	while ($index <= length $self->{eval}) {
 		my $first_char = $self->index($index++);
-		$ident =~ m/^:.*\(/
+		$ident =~ m/^((:.*\()|(\{))/
 			? do {
 				my $copy = $ident;
-				while ($copy =~ s/\([^()]+\)//g) {}
-				if ($copy =~ m/\(|\)/) {
+				$copy =~ s/\\\{|\\\}|\\\(|\\\)//g; # remove escaped
+				1 while ($copy =~ s/\([^()]+\)|\{[^{}]+\}//g);
+				($copy =~ m/\(|\{|\)|\}/) ? do {
 					$ident .= $first_char;
-				} else {
+				} : do {
 					push @innerline, $ident;
 					$ident = '';
 				}
 			}
-			: $first_char =~ m/\s/ && $ident !~ m/^$/
-				? $nested && $nested == 1
-					? $ident =~ m/^(:|\$|\%|\@|\&)/ ? do {
-						push @innerline, $ident;
-						$ident = '';
-					} : do {
-						push @line, [@innerline] if scalar @innerline;
-						@innerline = ($ident);
-						$ident = '';
-					} : $nested
-						? do {
+			: ($first_char =~ m/\s/ && $ident !~ m/^$/)
+				? (($nested)
+					? ($ident =~ m/^(:|\$|\%|\@|\&)/) ? do {
 							push @innerline, $ident;
-							$ident = '';
 						} : do {
-							push @line, $ident;
-							$ident = '';
+							push @line, [@innerline] if scalar @innerline;
+							@innerline = ($ident);
 						}
-				: $first_char =~ m/\{/ && $ident !~ m/\\$/
-					? ! $nested
-						? $nested++
-						: do {
-							push @innerline, $ident;
-							$ident = '';
-							push @innerline, '{';
-							$nested++;
+					: do {
+						push @line, $ident;
+					}) && do { $ident = '' }
+				: ($first_char =~ m/\{/)
+					? ! $nested ? $nested++ : do {
+						push @innerline, $ident if $ident;
+						$ident = '{';
+					}
+					: ($first_char =~ m/\}/ && do { $nested--; 1; })
+						? do{
+							push @line, [@innerline] if @innerline;
+							push @lines, [@line] if @line;
+							(@innerline, @line) = ((), ());
 						}
-					: $first_char =~ m/\}/ && $ident !~ m/\\$/ && do { $nested--; 1; }
-						? ! $nested
-							? do {
-								push @line, [@innerline] if @innerline;
-								push @lines, [@line] if @line;
-								(@innerline, @line) = ((), ());
-							}
-							: do {
-								push @innerline, $ident;
-								$ident = '';
-								push @innerline, '}';
-								if ($nested == 1) {
-									push @line, [@innerline];
-									@innerline = ();
-								}
-							}
 						: do {
 							$ident .= $first_char unless $first_char =~ m/\s/;
 						};
@@ -82,139 +68,22 @@ sub run {
 		my $last_token;
 		for my $class (@lines) {
 			$self->can('before_class') && $self->before_class($mg, $class);
-			if ($class->[0] eq 'macro') {
-				shift @{$class};
-				$mg->macro(shift @{$_}, join(' ', @{$_}) . ';') for @{$class};
-				next;
-			}
-			while ($class->[0] =~ m/^(dist|lib|author|email|version)$/) {
-				$mg->$1($class->[1]);
-				shift @{$class}, shift @{$class};
-			}
-			my %meta;
-			$mg->class(shift @{$class})->new;
-			for my $token (@{$class}) {
+			my $meta = {};
+			for my $token (@{$self->build_class($mg, $class)}) {
 				! ref $token
-					? $token =~ m/^(parent|base|require|use)$/
-						? do {
-							$last_token = $token;
-						} : do {
-							$mg->$last_token($token);
-						}
+					? do { $last_token = $self->build_class_inheritance($mg, $last_token, $token); }
 					: scalar @{$token} == 1
-						? do {
-							$meta{$token->[0]}->{meta} = 'ACCESSOR';
-							$mg->accessor($token->[0]);
-						}
-						: $token->[1] eq '{'
-							? do {
-								my $name = shift @{$token};
-								$name =~ m/^(begin|unitcheck|check|init|end|new)$/
-									? $mg->$name(join ' ', @{$token})
-									: $mg->sub($name)->code(sprintf qq|{
-										my (\$self) = \@_;
-										%s
-									}|, join ' ', splice( @{$token}, 1, scalar @{$token} - 2))
-									->pod(qq|call $name method. Expects no params.|)->example(qq|\$obj->$name()|);
-							} : do {
-								my $name = shift @{$token};
-								$name =~ m/^(our)$/
-									? $mg->$name( '(' . join( ', ', @{$token}) . ')')
-									: $name =~ m/^(synopsis|abstract)$/
-										? $mg->$name(join ' ', @{$token})
-										: do {
-											$meta{$name}->{meta} = 'ACCESSOR';
-											my $switch = switch(
-												qr/^(\:around|\:ar)/ => sub {
-													$meta{$name}->{meta} = 'MODIFY';
-													while ($token->[0] ne '{') { shift @{$token} }
-													@{$token} = splice @{$token}, 1, scalar @{$token} - 2;
-													$meta{$name}->{around} = join " ", map { shift @{$token} } 0 .. scalar @{$token} - 1;
-												},
-												qr/^(\:after|\:a)/ => sub {
-													$meta{$name}->{meta} = 'MODIFY';
-													while ($token->[0] ne '{') { shift @{$token} }
-													@{$token} = splice @{$token}, 1, scalar @{$token} - 2;
-													$meta{$name}->{after} = join " ", map { shift @{$token} } 0 .. scalar @{$token} - 1;
-												},
-												qr/^(\:before|\:b)/ => sub {
-													$meta{$name}->{meta} = 'MODIFY';
-													while ($token->[0] ne '{') { shift @{$token} }
-													@{$token} = splice @{$token}, 1, scalar @{$token} - 2;
-													$meta{$name}->{before} = join " ", map { shift @{$token} } 0 .. scalar @{$token} - 1;
-												},
-												qr/^(\:clearer|\:c)$/ => sub {
-													$meta{$name}->{clearer} = 1;
-												},
-												qr/^(\:coerce|\:co)/ => sub {
-													my $value = shift;
-													$value =~ s/(\:co|\:coerce)\((.*)\)$/$2/sg;
-													$meta{$name}->{coerce} = $value;
-													if ($meta{$name}->{params_map}) {
-														$meta{$name}->{params_map}->{
-															$meta{$name}->{param}->[-1]
-														}->{coerce} = $value;
-													}
-												},
-												qr/^(\:default|\:d)/ => sub {
-													my $value = shift;
-													$value =~ s/.*\((.*)\)/$1/sg;
-													$value = '"' . $value . '"'
-														if $value !~ m/^(\{|\[|\"|\'|q)|(\d+)/;
-													$meta{$name}->{default} =  $value;
-												},
-												qr/^(\:private|\:p)$/ => sub {
-													$meta{$name}->{private} = 1;
-												},
-												qr/^(\:predicate|\:pr)$/ => sub {
-													$meta{$name}->{predicate} = 1;
-												},
-												qr/^(\:required|\:r)$/ => sub {
-													$meta{$name}->{required} = 1;
-												},
-												qr/^(\:trigger|\:tr)/ => sub {
-													my $value = shift;
-													$value =~ s/(\:tr|\:trigger)\((.*)\)$/$2/sg;
-													$meta{$name}->{trigger} = $value;
-												},
-												qr/^(\:test|\z)/ => sub {
-													my $value = shift;
-													$value =~ s/^(\:test|\:z)\(\s*(.*)\s*\)$/$2/sg;
-													push @{$meta{$name}->{test}}, eval '(' . $value . ')';
-												},
-												qr/^(\:type|\:t)/ => sub {
-													my $value = shift;
-													$value =~ s/.*\((.*)\)/$1/sg;
-													push @{$meta{$name}->{type}}, $value;
-													if ($meta{$name}->{params_map}) {
-														$meta{$name}->{params_map}->{
-															$meta{$name}->{param}->[-1]
-														}->{type} = $value;
-													}
-												},
-												qr/^(\{)/ => sub {
-													$meta{$name}->{meta} = 'METHOD';
-													pop @{$token};
-													$meta{$name}->{code} = join " ", map { shift @{$token} } 0 .. scalar @{$token} - 1;
-												},
-												qr/^(\%|\$|\@|\&)/ => sub {
-													push @{$meta{$name}->{param}}, $_[0];
-													$meta{$name}->{params_map}->{$_[0]} = {};
-												}
-											);
-											$switch->(shift @{$token}) while scalar @{$token};
-											$meta{$name}->{meta} eq 'ACCESSOR'
-												? $self->build_accessor($mg, $name, \%meta)
-												: $meta{$name}->{meta} eq 'MODIFY'
-													? $self->build_modify($mg, $name, \%meta)
-													: $self->build_sub($mg, $name, \%meta);
-											$self->build_clearer($mg, $name, \%meta) if $meta{$name}->{clearer};
-											$self->build_predicate($mg, $name, \%meta) if $meta{$name}->{predicate};
-										}
-							};
+						? $self->build_accessor_no_arguments($mg, $token, $meta)
+						: $token->[1] =~ s/^{|}$//g
+							? $self->build_sub_no_arguments($mg, $token, $meta)
+							: $token->[0] =~ m/^(our)$/
+								? $self->build_our($mg, $token, $meta)
+								: $token->[0] =~ m/^(synopsis|abstract)$/
+									? $self->build_synopsis_or_abstract($mg, $token, $meta)
+									: $self->build_sub_or_accessor($mg, $token, $meta);
 			}
-			$self->build_new($mg, \%meta);
-			$self->can('after_class') && $self->after_class($mg, \%meta);
+			$self->build_new($mg, $meta);
+			$self->can('after_class') && $self->after_class($mg, $meta);
 		}
 	}
 	$self->can('before_generate') && $self->before_generate($mg);
@@ -222,12 +91,19 @@ sub run {
 	$self->can('after_generate') && $self->after_generate($mg);
 }
 
-sub _read_file {
-	my ($file) = @_;
-	open my $fh, '<', $file;
-	my $content = do { local $/; <$fh>; };
-	close $fh;
-	return $content;
+sub build_class {
+	my ($self, $mg, $class) = @_;
+	if ($class->[0] eq 'macro') {
+		shift @{$class};
+		$mg->macro(shift @{$_}, join(' ', @{$_}) . ';') for @{$class};
+		next;
+	}
+	while ($class->[0] =~ m/^(dist|lib|author|email|version)$/) {
+		$mg->$1($class->[1]);
+		shift @{$class}, shift @{$class};
+	}
+	$mg->class(shift @{$class})->new;
+	return $class;
 }
 
 sub build_new {
@@ -256,6 +132,153 @@ sub build_new {
 	}|;
 	$class{CURRENT}{SUBS}{new}{CODE} = $code;
 	$class{CURRENT}{SUBS}{new}{TEST} = [$self->build_tests('new', $meta, 'new', \%class)];
+}
+
+
+sub build_class_inheritance {
+	my ($self, $mg, $last_token, $token) = @_;
+	($token =~ m/^(parent|base|require|use)$/) ? do {
+		$last_token = $token;
+	} : $mg->$last_token($token);
+	return $last_token;
+}
+
+sub build_accessor_no_arguments {
+	my ($self, $mg, $token, $meta) = @_;
+	$meta->{$token->[0]}->{meta} = 'ACCESSOR';
+	$mg->accessor($token->[0]);
+	return $meta;
+}
+
+sub build_sub_no_arguments {
+	my ($self, $mg, $token, $meta) = @_;
+	my $name = shift @{$token};
+	$name =~ m/^(begin|unitcheck|check|init|end|new)$/
+		? $mg->$name(join ' ', @{$token})
+		: $mg->sub($name)->code(sprintf qq|{
+			my (\$self) = \@_;
+			%s
+		}|, join ' ', @{$token})
+		->pod(qq|call $name method. Expects no params.|)->example(qq|\$obj->$name()|);
+	return $meta;
+}
+
+sub build_our {
+	my ($self, $mg, $token, $meta) = @_;
+	my $name = shift @{$token};
+	$mg->$name( '(' . join( ', ', @{$token}) . ')');
+	return $meta;
+}
+
+sub build_synopsis_or_abstract {
+	my ($self, $mg, $token, $meta) = @_;
+	my $name = shift @{$token};
+	$mg->$name(join ' ', @{$token});
+	return $meta;
+}
+
+sub build_sub_or_accessor_attributes {
+	my ($self, $name, $token, $meta) = @_;
+	my @ATTR = (
+		qr/^(\:around|\:ar)/ => sub {
+			$meta->{$name}->{meta} = 'MODIFY';
+			while ($token->[0] !~ s/^\{|\}$//g) { shift @{$token} }
+			$meta->{$name}->{around} = join " ", @{$token};
+		},
+		qr/^(\:after|\:a)/ => sub {
+			$meta->{$name}->{meta} = 'MODIFY';
+			while ($token->[0] !~ s/^\{|\}$//g) { shift @{$token} }
+			$meta->{$name}->{after} = join " ", @{$token};
+		},
+		qr/^(\:before|\:b)/ => sub {
+			$meta->{$name}->{meta} = 'MODIFY';
+			while ($token->[0] !~ s/^\{|\}$//g) { shift @{$token} }
+			$meta->{$name}->{before} = join " ", @{$token};
+		},
+		qr/^(\:clearer|\:c)$/ => sub {
+			$meta->{$name}->{clearer} = 1;
+		},
+		qr/^(\:coerce|\:co)/ => sub {
+			my $value = shift;
+			$value =~ s/(\:co|\:coerce)\((.*)\)$/$2/sg;
+			$meta->{$name}->{coerce} = $value;
+			if ($meta->{$name}->{params_map}) {
+				$meta->{$name}->{params_map}->{
+					$meta->{$name}->{param}->[-1]
+				}->{coerce} = $value;
+			}
+		},
+		qr/^(\:default|\:d)/ => sub {
+			my $value = shift;
+			$value =~ s/.*\((.*)\)/$1/sg;
+			$value = '"' . $value . '"'
+				if $value !~ m/^(\{|\[|\"|\'|q)|(\d+)/;
+			$meta->{$name}->{default} =  $value;
+			if ($meta->{$name}->{params_map}) {
+				$meta->{$name}->{params_map}->{
+					$meta->{$name}->{param}->[-1]
+				}->{default} = $value;
+			}
+		},
+		qr/^(\:private|\:p)$/ => sub {
+			$meta->{$name}->{private} = 1;
+		},
+		qr/^(\:predicate|\:pr)$/ => sub {
+			$meta->{$name}->{predicate} = 1;
+		},
+		qr/^(\:required|\:r)$/ => sub {
+			$meta->{$name}->{required} = 1;
+		},
+		qr/^(\:trigger|\:tr)/ => sub {
+			my $value = shift;
+			$value =~ s/(\:tr|\:trigger)\((.*)\)$/$2/sg;
+			$meta->{$name}->{trigger} = $value;
+		},
+		qr/^(\:test|\z)/ => sub {
+			my $value = shift;
+			$value =~ s/^(\:test|\:z)\(\s*(.*)\s*\)$/$2/sg;
+			push @{$meta->{$name}->{test}}, eval '(' . $value . ')';
+		},
+		qr/^(\:type|\:t)/ => sub {
+			my $value = shift;
+			$value =~ s/.*\((.*)\)/$1/sg;
+			push @{$meta->{$name}->{type}}, $value;
+			if ($meta->{$name}->{params_map}) {
+				$meta->{$name}->{params_map}->{
+					$meta->{$name}->{param}->[-1]
+				}->{type} = $value;
+			}
+		},
+		qr/^(\{)/ => sub {
+			my $value = shift;
+			$value =~ s/^\{|\}$//g;
+			$meta->{$name}->{meta} = 'METHOD';
+			$meta->{$name}->{code} = $value;
+		},
+		qr/^(\%|\$|\@|\&)/ => sub {
+			push @{$meta->{$name}->{param}}, $_[0];
+			$meta->{$name}->{params_map}->{$_[0]} = {};
+		}
+	);
+	return @ATTR;
+}
+
+sub build_sub_or_accessor {
+	my ($self, $mg, $token, $meta) = @_;
+	my $name = shift @{$token};
+	$meta->{$name}->{meta} = 'ACCESSOR';
+	my $switch = switch(
+		$self->build_sub_or_accessor_attributes($name, $token, $meta)
+	);
+	$switch->(shift @{$token}) while scalar @{$token};
+	$meta->{$name}->{meta} eq 'ACCESSOR'
+		? $self->build_accessor($mg, $name, $meta)
+		: $meta->{$name}->{meta} eq 'MODIFY'
+			? $self->build_modify($mg, $name, $meta)
+			: $self->build_sub($mg, $name, $meta);
+	$self->build_clearer($mg, $name, $meta) if $meta->{$name}->{clearer};
+	$self->build_predicate($mg, $name, $meta) if $meta->{$name}->{predicate};
+	return $meta;
 }
 
 sub build_accessor {
@@ -298,6 +321,8 @@ sub build_sub {
 			$params_explanation .= ', ' if $params_explanation;
 			$params .= ', ' .  $param;
 			my $pm = $meta->{$name}->{params_map}->{$param};
+			$subtype .= qq|$param = defined $param ? $param : $pm->{default};|
+				if ($pm->{default});
 			$subtype .= $self->build_coerce($name, $param, $pm->{coerce});
 			if ($pm->{type}) {
 				my $error_message = ($pm->{type} !~ m/^(Optional|Any|Item)/
@@ -323,6 +348,7 @@ sub build_sub {
 	}|;
 	$params =~ s/^,\s*//;
 	my $example = qq|\$obj->$name($params)|;
+
 	$mg->sub($name)->code($code)
 		->pod(qq|call $name method. Expects $params_explanation.|)
 		->example($example)
@@ -351,7 +377,7 @@ sub build_predicate {
 	$mg->sub(qq|has_$name|)
 		->code(qq|{
 			my (\$self) = \@_;
-			return !! \$self->{$name};
+			return exists \$self->{$name};
 		}|)
 		->pod(qq|has_$name will return true if $name accessor has a value.|)
 		->example(qq|\$obj->has_$name|)
@@ -653,8 +679,8 @@ sub build_test_data {
 			my ($val, @matches) = @_;
 			$matches[1] = '"' . $matches[1] . '"' if $matches[1] =~ m/^[a-zA-Z]/;
 			return (
-				qq|bless { test => 'test' }, $matches[1]|,
-				qq|bless { test => 'test' }, $matches[1] . 'Error'|,
+				qq|bless({ test => 'test' }, $matches[1])|,
+				qq|bless({ test => 'test' }, $matches[1] . 'Error')|,
 				$self->_generate_test_string
 			);
 		},
@@ -665,8 +691,8 @@ sub build_test_data {
 			my ($val, @matches) = @_;
 			$matches[1] = '"' . $matches[1] . '"' if $matches[1] =~ m/^[a-zA-Z]/;
 			return (
-				qq|bless \"", $matches[1]|,
-				qq|bless \"", $matches[1] . 'Error'|,
+				qq|bless( \"", $matches[1])|,
+				qq|bless( \"", $matches[1] . 'Error')|,
 				$self->_generate_test_string,
 				q|{}|
 			);
@@ -740,7 +766,7 @@ sub build_test_data {
 		},
 		qr/^(Object)$/ => sub {
 			return (
-				q|bless {}, 'Test'|,
+				q|bless({}, 'Test')|,
 				q|[]|,
 				$self->_generate_test_string
 			);
@@ -786,7 +812,7 @@ sub build_test_data {
 			my %map;
 			while (@matches) {
 				my ($match) = (shift @matches);
-				if ($match =~ m/(Map|Tuple|ArrayRef|Dict)\[/) {
+				if (@matches && $match =~ m/(Map|Tuple|ArrayRef|Dict)\[/) {
 					my $lame = sub {
 						my $copy = shift;
 						while ($copy =~ s/\[[^\[\]]+\]//g) {}
@@ -795,6 +821,7 @@ sub build_test_data {
 					while ($lame->($match .=  ', ' . shift @matches)) {}
 				}
 				my ($k, $v) = map { my $h = $_; $h =~ s/^\s*|\s*$//g; $h; } split('=>', $match, 2);
+				$v =~ s/,\s*$//;
 				my @values = $self->build_test_data($v, $name, $required);
 				push @values, 'undef' unless $v =~ m/^Optional/;
 				$map{$k} = \@values;
@@ -906,7 +933,7 @@ sub build_tests {
 	} : $meta->{meta} eq 'ACCESSOR' ? do {
 		push @tests, ['can_ok', qq|\$obj|, qq|'$name'|];
 		$meta->{private} ? do {
-			push @tests, ['eval', qq|\$obj->name|, 'private method'];
+			push @tests, ['eval', qq|\$obj->$name|, 'private method'];
 		} : do {
 			push @tests, ['is', qq|\$obj->$name|, 'undef'] if !$meta->{required} && !$meta->{default};
 			my (@test_cases) = $self->build_test_data($meta->{type}->[0] || 'Any', $name);
@@ -949,6 +976,14 @@ sub build_tests {
 	return @tests;
 }
 
+sub _read_file {
+	my ($file) = @_;
+	open my $fh, '<', $file;
+	my $content = do { local $/; <$fh>; };
+	close $fh;
+	return $content;
+}
+
 sub _generate_test_string {
 	my @data = qw/penthos curae nosoi geras phobos limos aporia thanatos algea hypnos gaudia/;
 	return sprintf q|'%s'|, $data[int(rand(scalar @data))];
@@ -964,7 +999,7 @@ Hades - Less is more, more is less!
 
 =head1 VERSION
 
-Version 0.06
+Version 0.10
 
 =cut
 
@@ -1086,6 +1121,10 @@ The authors email of the distribution/module.
 The version number of the distribution/module.
 
 =back
+
+=item realm
+
+The Hades realm that is used to generate the code.
 
 =cut
 

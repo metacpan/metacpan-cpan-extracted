@@ -51,6 +51,7 @@ use NewsExtractor::SiteSpecificExtractor::www_mdnkids_com;
 use NewsExtractor::SiteSpecificExtractor::www_nownews_com;
 use NewsExtractor::SiteSpecificExtractor::www_penghutimes_com;
 use NewsExtractor::SiteSpecificExtractor::www_aljazeera_com;
+use NewsExtractor::SiteSpecificExtractor::www_bbc_com;
 use NewsExtractor::SiteSpecificExtractor::UDN;
 use NewsExtractor::SiteSpecificExtractor::ETtoday;
 use NewsExtractor::SiteSpecificExtractor::ChinaTimes;
@@ -68,6 +69,7 @@ has extractor => (
 
 use constant {
     SiteSpecificExtractorByHost => {
+        'www.bbc.com' => 'NewsExtractor::SiteSpecificExtractor::www_bbc_com',
         'www.aljazeera.com' => 'NewsExtractor::SiteSpecificExtractor::www_aljazeera_com',
         'www.penghutimes.com' => 'NewsExtractor::SiteSpecificExtractor::www_penghutimes_com',
         'www.ustv.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_ustv_com_tw',

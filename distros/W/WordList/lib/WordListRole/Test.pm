@@ -1,9 +1,9 @@
 package WordListRole::Test;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
+our $DATE = '2020-08-23'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.7.5'; # VERSION
+our $VERSION = '0.7.6'; # VERSION
 
 use Role::Tiny;
 
@@ -24,7 +24,7 @@ WordListRole::Test - A test role
 
 =head1 VERSION
 
-This document describes version 0.7.5 of WordListRole::Test (from Perl distribution WordList), released on 2020-05-24.
+This document describes version 0.7.6 of WordListRole::Test (from Perl distribution WordList), released on 2020-08-23.
 
 =head1 PROVIDED METHODS
 

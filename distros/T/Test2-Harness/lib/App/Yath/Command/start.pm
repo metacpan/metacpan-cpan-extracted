@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000023';
+our $VERSION = '1.000024';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -509,6 +509,19 @@ Only do preload if at least N tests are going to be run. In some cases a full pr
 =item --no-preloads
 
 Preload a module before running tests
+
+Can be specified multiple times
+
+
+=item --resource Port
+
+=item --resource +Test2::Harness::Runner::Resource::Port
+
+=item -R Port
+
+=item --no-resource
+
+Use a resource module to assign resource assignments to individual tests
 
 Can be specified multiple times
 

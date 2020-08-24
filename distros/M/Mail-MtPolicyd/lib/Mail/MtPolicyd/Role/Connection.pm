@@ -6,7 +6,7 @@ use MooseX::Role::Parameterized;
 use Mail::MtPolicyd::ConnectionPool;
 
 # ABSTRACT: role to consume connections from connection pool
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 parameter name => (
   isa => 'Str',
@@ -78,7 +78,7 @@ Mail::MtPolicyd::Role::Connection - role to consume connections from connection 
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 AUTHOR
 

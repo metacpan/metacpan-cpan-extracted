@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::PostfixMap;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: mtpolicyd plugin for accessing a postfix access map
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -157,7 +157,7 @@ Mail::MtPolicyd::Plugin::PostfixMap - mtpolicyd plugin for accessing a postfix a
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package HTTP::Cookies::ChromeDevTools;
 use strict;
 use Carp qw[croak];
 
-our $VERSION = '0.58';
+our $VERSION = '0.60';
 our @CARP_NOT;
 
 use Moo 2;
@@ -88,6 +88,7 @@ cookies from is currently unsupported.
 
 sub load($self, $file=undef, %options) {
     my $driver = $options{ driver } || $self->driver;
+    # Alternative: Storage.getCookies
     my $cookies = $driver->send_message('Network.getAllCookies')->get();
     $cookies = $cookies->{cookies};
     $self->clear();

@@ -1,3 +1,7 @@
+v0.0.4 2020-08-23
+
+    - Fix memory leak after unregistering a hook
+
 v0.0.3 2020-08-16
 
     - Fix configure dependencies

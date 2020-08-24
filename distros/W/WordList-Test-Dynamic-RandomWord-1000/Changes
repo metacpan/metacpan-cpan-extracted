@@ -1,0 +1,17 @@
+0.003   2020-08-23  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [build] Add @EXAMPLES, rebuild with updated
+	  Pod::Weaver::Plugin::WordList to render list of parameters in
+	  POD.
+
+
+0.002   2020-08-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Add parameters: min_len, max_len.
+
+
+0.001   2020-05-04  Released-By: PERLANCAR
+
+        - First release.

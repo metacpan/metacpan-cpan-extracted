@@ -1,8 +1,8 @@
 package Quantum::Superpositions::Lazy::State;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Moo;
 
 use feature qw(signatures);
@@ -42,7 +42,7 @@ sub clone($self)
 	);
 }
 
-sub merge($self, $with)
+sub merge ($self, $with)
 {
 	croak "cannot merge a state: values mismatch"
 		if $self->value ne $with->value;
@@ -53,7 +53,7 @@ sub merge($self, $with)
 	);
 }
 
-sub clone_with($self, %transformers)
+sub clone_with ($self, %transformers)
 {
 	my $cloned = $self->clone;
 	for my $to_transform (keys %transformers) {

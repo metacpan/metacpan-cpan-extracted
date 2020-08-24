@@ -1,4 +1,4 @@
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Test::More;
 use Quantum::Superpositions::Lazy qw(fetch_matches with_sources);
 
@@ -11,14 +11,17 @@ sub power_sources
 	my $possible_exponents = superpos(2 .. sqrt $number);
 
 	# produce all possible powers
-	my $possible_powers = $possible_bases ** $possible_exponents;
+	my $possible_powers = $possible_bases**$possible_exponents;
 
 	# for every state, get those that match a condition
 	# (any possible power that equals the number)
-	return fetch_matches { with_sources { $possible_powers == $number } };
+	return fetch_matches {
+		with_sources { $possible_powers == $number }
+	};
 }
 
 my %numbers = (
+
 	# number => [base, exponent]
 	65536 => [[2, 16], [4, 8], [16, 4], [256, 2]],
 	9 => [[3, 2]],

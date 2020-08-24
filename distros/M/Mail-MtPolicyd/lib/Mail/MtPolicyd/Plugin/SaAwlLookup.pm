@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::SaAwlLookup;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: mtpolicyd plugin for querying a spamassassin AWL database for reputation
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -117,7 +117,7 @@ Mail::MtPolicyd::Plugin::SaAwlLookup - mtpolicyd plugin for querying a spamassas
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

@@ -6,7 +6,7 @@ use open qw(:std :utf8);
 use strict;
 
 ##-- get trim expression
-my $trim_chars = shift // '';
+my $trim_chars = shift // 'DEFAULT';
 utf8::decode($trim_chars) if (!utf8::is_utf8($trim_chars));
 if ($trim_chars eq '-' || uc($trim_chars) eq 'DEFAULT') {
   ##-- default trim expression
@@ -17,6 +17,7 @@ if ($trim_chars eq '-' || uc($trim_chars) eq 'DEFAULT') {
 		     "\x{200c}", #-- U+200C ZERO WIDTH NON-JOINER
 		     "\x{200d}", #-- U+200D ZERO WIDTH JOINER
 		     "\x{2060}", #-- U+2060 WORD JOINER
+		     "\x{fdd3}", #-- U+FDD3 Arabic Presentation Forms-A-undef- (mantis #728)
 		     "\x{feff}", #-- U+FEFF ZERO WIDTH NO-BREAK = BYTE ORDER MARK (BOM)
 		     "\x{fffe}", #-- U+FFFE <not a character>
 		    );
@@ -47,7 +48,7 @@ my $trim_re_str = join('|',
 		       '(?i:\&\#0{0,4}(?:'.join('|',@trim_dec).');)',	##-- XML character entities: decimal
 		      );
 
-#print STDERR "$0: trim_re = qr{$trim_re_str}\n";##-- DEBUG
+print STDERR "$0: trim_re = qr{$trim_re_str}\n";##-- DEBUG
 my $trim_re = qr{$trim_re_str}
   or die("$0: failed to compile trim regex qr{$trim_re_str}: $!");
 

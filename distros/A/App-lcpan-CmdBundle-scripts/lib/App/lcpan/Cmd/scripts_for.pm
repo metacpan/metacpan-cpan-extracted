@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::scripts_for;
 
-our $DATE = '2020-01-19'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2020-08-22'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -64,12 +64,11 @@ sub handle_cmd {
 
     my $sth = $dbh->prepare("SELECT
   script.name name,
-  dist.name dist,
+  file.dist_name dist,
   script.abstract abstract
 FROM script
 LEFT JOIN file ON script.file_id=file.id
-LEFT JOIN dist ON file.id=dist.file_id
-WHERE dist.name IN (".join(",", map {$dbh->quote($_->{dist})} @{$res->[2]}).")
+WHERE file.dist_name IN (".join(",", map {$dbh->quote($_->{dist})} @{$res->[2]}).")
 ORDER BY name DESC");
     $sth->execute();
 
@@ -98,7 +97,7 @@ App::lcpan::Cmd::scripts_for - Try to find whether there are scripts (CLIs) for 
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::Cmd::scripts_for (from Perl distribution App-lcpan-CmdBundle-scripts), released on 2020-01-19.
+This document describes version 0.003 of App::lcpan::Cmd::scripts_for (from Perl distribution App-lcpan-CmdBundle-scripts), released on 2020-08-22.
 
 =head1 DESCRIPTION
 
@@ -129,7 +128,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -160,6 +159,7 @@ Whether to use bootstrap database from App-lcpan-Bootstrap.
 
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
+
 
 =back
 

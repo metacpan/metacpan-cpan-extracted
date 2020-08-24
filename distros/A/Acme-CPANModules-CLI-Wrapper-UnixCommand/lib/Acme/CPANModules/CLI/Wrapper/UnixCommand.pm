@@ -1,7 +1,9 @@
 package Acme::CPANModules::CLI::Wrapper::UnixCommand;
 
-our $DATE = '2018-09-30'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-22'; # DATE
+our $DIST = 'Acme-CPANModules-CLI-Wrapper-UnixCommand'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
     summary => "Various CLIs that wrap (popular) Unix commands",
@@ -59,6 +61,12 @@ _
             script => ['diffwc', 'diffwc-filter-u'],
             'x.command' => 'diff',
         },
+        {
+            summary => 'Diffs two office word-processor documents by first converting them to plaintext',
+            module => 'App::DiffDocText',
+            script => ['diff-doc-text'],
+            'x.command' => 'diff',
+        },
     ],
 };
 
@@ -77,11 +85,9 @@ Acme::CPANModules::CLI::Wrapper::UnixCommand - Various CLIs that wrap (popular) 
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::CLI::Wrapper::UnixCommand (from Perl distribution Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2018-09-30.
+This document describes version 0.002 of Acme::CPANModules::CLI::Wrapper::UnixCommand (from Perl distribution Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2020-08-22.
 
 =head1 DESCRIPTION
-
-Various CLIs that wrap (popular) Unix commands.
 
 These CLI's usually are meant to be called as the Unix commands they wrap, e.g.:
 
@@ -109,7 +115,26 @@ If you know of others, please drop me a message.
 
 =item * L<App::diffwc> - Wraps (or filters output of) diff to add colors and highlight words
 
+=item * L<App::DiffDocText> - Diffs two office word-processor documents by first converting them to plaintext
+
 =back
+
+=head1 FAQ
+
+=head2 What are ways to use this module?
+
+Aside from reading it, you can install all the listed modules using
+L<cpanmodules>:
+
+    % cpanmodules ls-entries CLI::Wrapper::UnixCommand | cpanm -n
+
+or L<Acme::CM::Get>:
+
+    % perl -MAcme::CM::Get=CLI::Wrapper::UnixCommand -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+This module also helps L<lcpan> produce a more meaningful result for C<lcpan
+related-mods> when it comes to finding related modules for the modules listed
+in this Acme::CPANModules module.
 
 =head1 HOMEPAGE
 
@@ -139,7 +164,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

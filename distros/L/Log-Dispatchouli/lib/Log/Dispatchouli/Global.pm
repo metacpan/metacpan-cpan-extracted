@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Log::Dispatchouli::Global;
 # ABSTRACT: a system for sharing a global, dynamically-scoped logger
-$Log::Dispatchouli::Global::VERSION = '2.021';
+$Log::Dispatchouli::Global::VERSION = '2.022';
 use Carp ();
 use Log::Dispatchouli;
 use Scalar::Util ();
@@ -280,7 +280,7 @@ Log::Dispatchouli::Global - a system for sharing a global, dynamically-scoped lo
 
 =head1 VERSION
 
-version 2.021
+version 2.022
 
 =head1 DESCRIPTION
 

@@ -47,16 +47,26 @@ my $tolerance = 10e-15;
     );
 }
 
-throws_ok {
-    Algorithm::LibLinear->new(cost => 0);
-} qr/C <= 0/;
+my $data_set = Algorithm::LibLinear::DataSet->new(data_set => [
+    +{ feature => +{}, label => 1 },
+]);
 
-throws_ok {
-    Algorithm::LibLinear->new(epsilon => 0);
-} qr/eps <= 0/;
-
-throws_ok {
-    Algorithm::LibLinear->new(loss_sensitivity => -1);
-} qr/p < 0/;
+my @cases = (
+    +{ constructor_params => [ cost => 0 ], error_pattern => qr/C <= 0/ },
+    +{ constructor_params => [ epsilon => 0 ], error_pattern => qr/eps <= 0/ },
+    +{
+        constructor_params => [ loss_sensitivity => -1 ],
+        error_pattern => qr/p < 0/,
+    },
+);
+for my $case (@cases) {
+    my $learner = Algorithm::LibLinear->new(@{ $case->{constructor_params} });
+    throws_ok {
+        $learner->train(data_set => $data_set);
+    } $case->{error_pattern};
+    throws_ok {
+        $learner->cross_validation(data_set => $data_set, num_folds => 5);
+    } $case->{error_pattern};
+}
 
 done_testing;

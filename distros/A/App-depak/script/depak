@@ -2,8 +2,8 @@
 
 # FRAGMENT id=shcompgen-hint command=depak
 
-our $DATE = '2020-04-08'; # DATE
-our $VERSION = '0.582'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.583'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,7 +31,7 @@ depak - Pack your dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.582 of depak (from Perl distribution App-depak), released on 2020-04-08.
+This document describes version 0.583 of depak (from Perl distribution App-depak), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,7 @@ Do not read environment for default options.
 
 =over
 
-=item B<--input-file>=I<filename>, B<-i>
+=item B<--input-file>=I<s>, B<-i>
 
 Path to input file (script to be packed).
 
@@ -191,13 +191,13 @@ Allow adding a specified XS module.
 
 Can be specified multiple times.
 
-=item B<--exclude-dist-json>=I<distname>
+=item B<--exclude-dist-json>=I<s>
 
 Exclude all modules of dist (JSON-encoded).
 
 See C<--exclude-dist>.
 
-=item B<--exclude-dist>=I<distname>
+=item B<--exclude-dist>=I<s@>
 
 Exclude all modules of dist.
 
@@ -208,17 +208,17 @@ distribution. Will determine other modules from the `.packlist` file.
 
 Can be specified multiple times.
 
-=item B<--exclude-list>=I<filename>
+=item B<--exclude-list>=I<s>
 
 Exclude modules from a list in a file.
 
-=item B<--exclude-module-json>=I<modulename>, B<--exclude>, B<-E>
+=item B<--exclude-module-json>=I<s>, B<--exclude>, B<-E>
 
 Modules to exclude (JSON-encoded).
 
 See C<--exclude-module>.
 
-=item B<--exclude-module>=I<modulename>
+=item B<--exclude-module>=I<s@>
 
 Exclude a module.
 
@@ -269,25 +269,25 @@ Can be specified multiple times.
 
 Do not exclude core modules.
 
-=item B<--include-dir-json>=I<dirname>
+=item B<--include-dir-json>=I<s>
 
 Include extra modules under directories (JSON-encoded).
 
 See C<--include-dir>.
 
-=item B<--include-dir>=I<dirname>
+=item B<--include-dir>=I<s@>
 
 Include extra modules under a directory.
 
 Can be specified multiple times.
 
-=item B<--include-dist-json>=I<distname>
+=item B<--include-dist-json>=I<s>
 
 Include all modules of dist (JSON-encoded).
 
 See C<--include-dist>.
 
-=item B<--include-dist>=I<distname>
+=item B<--include-dist>=I<s@>
 
 Include all modules of dist.
 
@@ -298,17 +298,17 @@ distribution. Will determine other modules from the `.packlist` file.
 
 Can be specified multiple times.
 
-=item B<--include-list>=I<filename>
+=item B<--include-list>=I<s>
 
 Include extra modules from a list in a file.
 
-=item B<--include-module-json>=I<modulename>, B<--include>, B<-I>
+=item B<--include-module-json>=I<s>, B<--include>, B<-I>
 
 Include extra modules (JSON-encoded).
 
 See C<--include-module>.
 
-=item B<--include-module>=I<modulename>
+=item B<--include-module>=I<s@>
 
 Include an extra module.
 
@@ -391,13 +391,13 @@ A special value of `none` is also provided. If this is selected, then depak will
 not perform any tracing. Usually used in conjunction with `--include-from`.
 
 
-=item B<--use-json>=I<modulename>
+=item B<--use-json>=I<s>
 
 Additional modules to "use" (JSON-encoded).
 
 See C<--use>.
 
-=item B<--use>=I<modulename>
+=item B<--use>=I<s@>
 
 Additional module to "use".
 
@@ -446,7 +446,7 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--output-file>=I<filename>, B<-o>
+=item B<--output-file>=I<s>, B<-o>
 
 Path to output file.
 

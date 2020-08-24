@@ -1,5 +1,9 @@
 Revision history for CPAN-Meta-Prereqs-Filter
 
+0.005     2020-08-22 14:28:35+02:00 Europe/Amsterdam
+          - Add an explicit dependency on CPAN::Meta::Prereqs
+          - Make sanatize also clear build/test deps from develop
+
 0.004     2015-09-20 23:59:13+02:00 Europe/Amsterdam
           Update Module::CoreList dependency to 5.021
 

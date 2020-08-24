@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::Greylist::Ticket::Redis;
 use Moose;
 
 # ABSTRACT: greylisting ticket storage backend for redis
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 extends 'Mail::MtPolicyd::Plugin::Greylist::Ticket::Base';
 
@@ -58,7 +58,7 @@ Mail::MtPolicyd::Plugin::Greylist::Ticket::Redis - greylisting ticket storage ba
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 AUTHOR
 

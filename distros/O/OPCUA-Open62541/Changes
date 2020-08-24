@@ -1,5 +1,19 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.023 2020-08-24
+    - Implemnt server config methods:
+      setUserRightsMaskReadonly(),
+      setUserAccessLevelReadonly(),
+      disableUserExecutable(),
+      disableUserExecutableOnObject(),
+      disableAddNode(),
+      disableAddReference(),
+      disableDeleteNode(),
+      disableDeleteReference(),
+      disableHistoryUpdateUpdateData(),
+      disableHistoryUpdateDeleteRawModified().
+      This allows to setup a server that provides read-only data.
+
 0.022 2020-08-17
     - Implement setStateCallback() and call Perl from callback.
     - Implement client config get and setClientContext().

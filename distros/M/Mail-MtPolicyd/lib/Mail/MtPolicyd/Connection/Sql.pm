@@ -5,7 +5,7 @@ use Moose;
 extends 'Mail::MtPolicyd::Connection';
 
 # ABSTRACT: Connection pool sql connection object
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 
 use DBI;
@@ -57,7 +57,7 @@ Mail::MtPolicyd::Connection::Sql - Connection pool sql connection object
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

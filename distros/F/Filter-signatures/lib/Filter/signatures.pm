@@ -2,8 +2,7 @@ package Filter::signatures;
 use strict;
 use Filter::Simple;
 
-use vars '$VERSION';
-$VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 NAME
 
@@ -251,6 +250,9 @@ sub transform_arguments {
 
 if( $] >= 5.010 ) {
     # Perl 5.10 onwards has recursive regex patterns, and comments, and stuff
+
+# We have an interesting dependency on the format the string placeholders that
+# Filter::Simple supplies. They MUST be four characters wide.
     no warnings 'redefine';
     eval <<'PERL_5010_onwards';
 sub transform_arguments {
@@ -267,6 +269,10 @@ sub transform_arguments {
                    (?:
                      \\.            # regex escapes and references
                      |
+                     (?>".{4}")     # strings (that are placeholders)
+                     |
+                     (?>"[^"]+")    # strings (that are not placeholders, mainly for the test suite)
+                     |
                      \(
                          (?6)?      # recurse for parentheses
                      \)
@@ -275,7 +281,7 @@ sub transform_arguments {
                          (?6)?      # recurse for curly brackets
                      \}
                      |
-                     (?>[^\\\(\)\{\}]+) # other stuff
+                     (?>[^\\\(\)\{\}"]+) # other stuff
                      )+
                 )*
              \@?                    # optional slurpy discard argument at the end
@@ -339,8 +345,8 @@ if( (! $have_signatures) or $ENV{FORCE_FILTER_SIGNATURES} ) {
 FILTER_ONLY
     code_no_comments => \&transform_arguments,
     executable => sub {
-            s!^(use\s+feature\s*(['"])signatures\2;)!#$1!mg;
-            s!^(no\s+warnings\s*(['"])experimental::signatures\2;)!#$1!mg;
+            s!^\s*(use\s+feature\s*(['"])signatures\2;)!#$1!mg;
+            s!^\s*(no\s+warnings\s*(['"])experimental::signatures\2;)!#$1!mg;
     },
     ;
     # Set up a fake 'experimental::signatures' warnings category
@@ -413,7 +419,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

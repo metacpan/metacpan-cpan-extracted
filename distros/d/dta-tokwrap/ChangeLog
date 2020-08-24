@@ -1,5 +1,8 @@
 ##-*- Mode: ChangeLog; coding: utf-8; -*-
 
+UNRELEASED Mon, 15 Jun 2020 08:04:33 +0200 moocow
+	* dtatw-trim-encode.perl: added default U+FDD3 (fixes mantis #728)
+
 v0.95 Thu, 11 Jun 2020 09:07:46 +0200 moocow
 	* added scripts/dtatw-trim-(encode|decode).perl for aggressive input sanitization
 	* see mm https://dmm.bbaw.de/dstar-teambbaw/pl/8n5iz57js7b6xb979buc65mrdr

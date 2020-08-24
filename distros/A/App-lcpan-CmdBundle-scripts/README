@@ -3,9 +3,9 @@ NAME
     scripts
 
 VERSION
-    This document describes version 0.002 of App::lcpan::CmdBundle::scripts
+    This document describes version 0.003 of App::lcpan::CmdBundle::scripts
     (from Perl distribution App-lcpan-CmdBundle-scripts), released on
-    2020-01-19.
+    2020-08-22.
 
 SYNOPSIS
 DESCRIPTION

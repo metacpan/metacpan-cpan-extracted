@@ -1,9 +1,9 @@
 package WordList::Test::Dynamic::OneTwo_EachParam;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
+our $DATE = '2020-08-23'; # DATE
 our $DIST = 'WordList'; # DIST
-our $VERSION = '0.7.5'; # VERSION
+our $VERSION = '0.7.6'; # VERSION
 
 use strict;
 
@@ -38,7 +38,7 @@ WordList::Test::Dynamic::OneTwo_EachParam - Wordlist that returns one, two (via 
 
 =head1 VERSION
 
-This document describes version 0.7.5 of WordList::Test::Dynamic::OneTwo_EachParam (from Perl distribution WordList), released on 2020-05-24.
+This document describes version 0.7.6 of WordList::Test::Dynamic::OneTwo_EachParam (from Perl distribution WordList), released on 2020-08-23.
 
 =head1 SYNOPSIS
 
@@ -67,6 +67,28 @@ This document describes version 0.7.5 of WordList::Test::Dynamic::OneTwo_EachPar
 
 Just like L<WordList::Test::Dynamic::OneTwo_Each>, except it accepts a required
 parameter (C<foo>).
+
+=head1 WORDLIST PARAMETERS
+
+
+This is a parameterized wordlist module. When loading in Perl, you can specify
+the parameters to the constructor, for example:
+
+ use WordList::Test::Dynamic::OneTwo_EachParam;
+ my $wl = WordList::Test::Dynamic::OneTwo_EachParam->(bar => 2, foo => 1);
+
+
+When loading on the command-line, you can specify parameters using the
+C<WORDLISTNAME=ARGNAME1,ARGVAL1,ARGNAME2,ARGVAL2> syntax, like in L<perl>'s
+C<-M> option, for example:
+
+ % wordlist -w Test::Dynamic::OneTwo_EachParam=foo,1,bar,2 ...
+
+Known parameters:
+
+=head2 foo
+
+Required. Just a dummy, required parameter.
 
 =head1 HOMEPAGE
 

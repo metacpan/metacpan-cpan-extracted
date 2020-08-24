@@ -1,4 +1,4 @@
-package File::Flat; # git description: v1.05-6-g44d5bc8
+package File::Flat; # git description: v1.06-2-g7f3dc2c
 # ABSTRACT: Implements a flat filesystem
 
 # The File::Flat is a static class that provides a unified interface
@@ -17,7 +17,7 @@ use prefork    'File::Copy';
 use prefork    'File::Copy::Recursive';
 use prefork    'File::Remove';
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 # The main error string
 our $errstr  = '';
@@ -513,8 +513,8 @@ sub _andRemove {
 
 
 
-package File::Flat::Object; # git description: v1.05-6-g44d5bc8
-our $VERSION = '1.06';
+package File::Flat::Object; # git description: v1.06-2-g7f3dc2c
+our $VERSION = '1.07';
 
 # Instantiatable version of File::Flat.
 # 
@@ -837,7 +837,7 @@ File::Flat - Implements a flat filesystem
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 DESCRIPTION
 

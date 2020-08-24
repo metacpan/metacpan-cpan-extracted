@@ -2,8 +2,8 @@ NAME
     App::wordlist - Grep words from WordList::*
 
 VERSION
-    This document describes version 0.276 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2020-06-09.
+    This document describes version 0.277 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2020-08-23.
 
 SYNOPSIS
     See the included script wordlist.
@@ -49,6 +49,10 @@ FUNCTIONS
     *   Filter by regex:
 
          wordlist( arg => ["/fof[aeiou]/"]);
+
+    *   Select a wordlist with parameters:
+
+         wordlist( wordlists => ["MetaSyntactic=theme,dangdut"]);
 
     *   List installed wordlist modules:
 

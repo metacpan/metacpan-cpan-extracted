@@ -1,5 +1,5 @@
 package CPAN::Meta::Prereqs::Filter;
-$CPAN::Meta::Prereqs::Filter::VERSION = '0.004';
+$CPAN::Meta::Prereqs::Filter::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -13,9 +13,10 @@ my @phases = qw/configure build test runtime develop/;
 my @relationships = qw/requires recommends suggests/;
 
 my %dependents_for = (
+	configure => [ qw/build test develop/ ],
 	runtime => [ qw/build test develop/ ],
-	configure => [ qw/build test/ ],
-	build => [ 'test' ],
+	build => [ qw/test develop/ ],
+	test => [ qw/develop/ ],
 );
 
 sub _normalize_version {
@@ -110,7 +111,7 @@ CPAN::Meta::Prereqs::Filter - Filtering various things out of CPAN::Meta::Prereq
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

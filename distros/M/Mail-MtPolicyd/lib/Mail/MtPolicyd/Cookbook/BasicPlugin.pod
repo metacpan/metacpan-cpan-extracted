@@ -13,7 +13,7 @@ Mail::MtPolicyd::Cookbook::BasicModule - how to write your own mtpolicyd plugin
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 How to write your own mtpolicyd plugin
 

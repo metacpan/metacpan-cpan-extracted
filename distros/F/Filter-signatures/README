@@ -1,5 +1,3 @@
-NAME
-
 Filter::signatures - very simplistic signatures for Perl < 5.20
 
 DESCRIPTION
@@ -17,7 +15,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL
@@ -36,11 +34,34 @@ SUPPORT
 The public support forum of this module is
 L<https://perlmonks.org/>.
 
+
+
 BUG TRACKER
 
 Please report bugs in this module via the RT CPAN bug queue at
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Filter-signatures>
 or via mail to L<filter-signatures-Bugs@rt.cpan.org>.
+
+
+SEE ALSO
+
+L<perlsub/Signatures>
+
+L<App::sigfix>, which transforms your source code directly between
+the different notations without employing a source filter
+
+L<signatures> - a module that doesn't use a source filter but optree
+modification instead
+
+L<Sub::Signatures> - uses signatures to dispatch to different subroutines
+based on which subroutine matches the signature
+
+L<Method::Signatures> - this module implements subroutine signatures
+closer to Perl 6, but requires L<PPI> and L<Devel::Declare>
+
+L<Function::Parameters> - adds two new keywords for declaring subroutines and
+parses their signatures. It supports more features than core Perl, closer to
+Perl 6, but requires a C compiler and Perl 5.14+.
 
 AUTHOR
 
@@ -52,4 +73,4 @@ This module is released under the same terms as Perl itself.
 
 COPYRIGHT (c)
 
-Copyright 2015-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2020 by Max Maischein C<corion@cpan.org>.

@@ -1,5 +1,9 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 
+1.20200824 2020-08-24 UTC
+  * ARC::Signer: Set cv=none if message contains no ARC headers and no ARC result
+    Thanks to @dev-aaront-org
+
 1.20200724 2020-07-24 UTC
   * Fix test for change in live dns response
 

@@ -41,7 +41,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::LeakTrace" : "0.16",
+            "Test::More" : "1.302170"
          }
       }
    },
@@ -53,6 +54,6 @@
          "web" : "https://github.com/s-nez/b-hooks-op-check-leaveeval"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.4",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

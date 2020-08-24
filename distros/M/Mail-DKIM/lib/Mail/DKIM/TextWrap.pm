@@ -1,7 +1,7 @@
 package Mail::DKIM::TextWrap;
 use strict;
 use warnings;
-our $VERSION = '1.20200724'; # VERSION
+our $VERSION = '1.20200824'; # VERSION
 # ABSTRACT: text wrapping module written for use with DKIM
 
 use Carp;
@@ -176,7 +176,7 @@ Mail::DKIM::TextWrap - text wrapping module written for use with DKIM
 
 =head1 VERSION
 
-version 1.20200724
+version 1.20200824
 
 =head1 DESCRIPTION
 

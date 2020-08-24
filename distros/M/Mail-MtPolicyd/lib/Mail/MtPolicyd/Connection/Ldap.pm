@@ -5,7 +5,7 @@ use Moose;
 extends 'Mail::MtPolicyd::Connection';
 
 # ABSTRACT: a LDAP connection plugin for mtpolicyd
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 use Net::LDAP;
 
@@ -114,7 +114,7 @@ Mail::MtPolicyd::Connection::Ldap - a LDAP connection plugin for mtpolicyd
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

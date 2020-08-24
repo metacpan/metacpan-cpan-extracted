@@ -2,7 +2,7 @@ package App::Yath::Command::runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000023';
+our $VERSION = '1.000024';
 
 use Config qw/%Config/;
 use File::Spec;
@@ -87,6 +87,10 @@ sub generate_run_sub {
         );
 
         my $exit = $runner->process();
+
+        if ($$ == $runner_pid) {
+            $_->cleanup() for @{$runner->state->resources};
+        }
 
         my $complete = File::Spec->catfile($dir, 'complete');
         write_file_atomic($complete, '1');

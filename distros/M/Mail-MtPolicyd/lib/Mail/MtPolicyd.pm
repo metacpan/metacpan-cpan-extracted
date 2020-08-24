@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Net::Server::PreFork);
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: a modular policy daemon for postfix
 
 use Data::Dumper;
@@ -456,7 +456,7 @@ Mail::MtPolicyd - a modular policy daemon for postfix
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

@@ -18,10 +18,13 @@ my %WriteMakefileArgs = (
   "NAME" => "Pod::Weaver::Plugin::WordList",
   "PREREQ_PM" => {
     "File::Slurper" => 0,
-    "File::Temp" => 0,
+    "File::Temp" => "0.2307",
+    "List::Util" => "1.45",
+    "Markdown::To::POD" => 0,
     "Perinci::Result::Format::Lite" => "0.273",
     "Pod::Weaver" => 0,
     "Pod::Weaver::Role::AddTextToSection" => "0.06",
+    "String::PodQuote" => 0,
     "strict" => 0
   },
   "TEST_REQUIRES" => {
@@ -30,7 +33,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.061",
+  "VERSION" => "0.062",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,12 +43,15 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "File::Slurper" => 0,
   "File::Spec" => 0,
-  "File::Temp" => 0,
+  "File::Temp" => "0.2307",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => "1.45",
+  "Markdown::To::POD" => 0,
   "Perinci::Result::Format::Lite" => "0.273",
   "Pod::Weaver" => 0,
   "Pod::Weaver::Role::AddTextToSection" => "0.06",
+  "String::PodQuote" => 0,
   "Test::More" => 0,
   "strict" => 0
 );

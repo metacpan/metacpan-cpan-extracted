@@ -1,7 +1,9 @@
 package App::depak;
 
-our $DATE = '2020-04-08'; # DATE
-our $VERSION = '0.582'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-29'; # DATE
+our $DIST = 'App-depak'; # DIST
+our $VERSION = '0.583'; # VERSION
 
 use 5.010001;
 use strict;
@@ -437,12 +439,11 @@ $SPEC{depak} = {
 temporary file will be created to handle this).
 
 _
-            schema => ['str*'],
+            schema => ['filename*'],
             default => '-',
             pos => 0,
             cmdline_aliases => { i=>{} },
             tags => ['category:input'],
-            'x.schema.entity' => 'filename',
         },
         output_file => {
             summary => 'Path to output file',
@@ -451,12 +452,11 @@ _
 `-` (or if unspecified) means to output to stdout.
 
 _
-            schema => ['str*'],
+            schema => ['filename*'],
             default => '-',
             cmdline_aliases => { o=>{} },
             pos => 1,
             tags => ['category:output'],
-            'x.schema.entity' => 'filename',
         },
         include_module => {
             summary => 'Include extra modules',
@@ -467,23 +467,20 @@ When the tracing process fails to include a required module, you can add it
 here.
 
 _
-            schema => ['array*' => of => 'str*'],
+            schema => ['array*' => of => 'perl::modname*'],
             cmdline_aliases => { I=>{}, include=>{} },
             tags => ['category:module-selection'],
-            'x.schema.element_entity' => 'modulename',
         },
         include_list => {
             summary => 'Include extra modules from a list in a file',
-            schema => 'str*', # XXX filename
+            schema => 'filename*', # XXX filename
             tags => ['category:module-selection'],
-            'x.schema.entity' => 'filename',
         },
         include_dir => {
             summary => 'Include extra modules under directories',
             'summary.alt.plurality.singular' => 'Include extra modules under a directory',
-            schema => ['array*' => of => 'str*'],
+            schema => ['array*' => of => 'dirname*'],
             tags => ['category:module-selection'],
-            'x.schema.element_entity' => 'dirname',
         },
         include_dist => {
             summary => 'Include all modules of dist',
@@ -494,10 +491,9 @@ from the same distribution. Module name must be the main module of the
 distribution. Will determine other modules from the `.packlist` file.
 
 _
-            schema => ['array*' => of => 'str*'],
+            schema => ['array*' => of => 'perl::distname*'],
             cmdline_aliases => {},
             tags => ['category:module-selection'],
-            'x.schema.element_entity' => 'distname',
         },
         exclude_module => {
             summary => 'Modules to exclude',
@@ -507,10 +503,9 @@ _
 When you don't want to include a module, specify it here.
 
 _
-            schema => ['array*' => of => 'str*'],
+            schema => ['array*' => of => 'perl::modname*'],
             cmdline_aliases => { E => {}, exclude => {} },
             tags => ['category:module-selection'],
-            'x.schema.element_entity' => 'modulename',
         },
         exclude_pattern => {
             summary => 'Regex patterns of modules to exclude',
@@ -520,10 +515,9 @@ _
 When you don't want to include a pattern of modules, specify it here.
 
 _
-            schema => ['array*' => of => 'str*'],
+            schema => ['array*' => of => 're*'],
             cmdline_aliases => { p => {} },
             tags => ['category:module-selection'],
-            #'x.schema.element_entity' => 'regex',
         },
         exclude_dist => {
             summary => 'Exclude all modules of dist',
@@ -534,10 +528,9 @@ from the same distribution. Module name must be the main module of the
 distribution. Will determine other modules from the `.packlist` file.
 
 _
-            schema => ['array*' => of => 'str*'],
+            schema => ['array*' => of => 'perl::distname*'],
             cmdline_aliases => {},
             tags => ['category:module-selection'],
-            'x.schema.element_entity' => 'distname',
         },
         exclude_core => {
             summary => 'Whether to exclude core modules',
@@ -547,9 +540,8 @@ _
         },
         exclude_list => {
             summary => 'Exclude modules from a list in a file',
-            schema => 'str*', # XXX filename
+            schema => 'filename*',
             tags => ['category:module-selection'],
-            'x.schema.entity' => 'filename',
         },
         perl_version => {
             summary => 'Perl version to target, defaults to current running version',
@@ -693,7 +685,7 @@ _
         use => {
             summary => 'Additional modules to "use"',
             'summary.alt.plurality.singular' => 'Additional module to "use"',
-            schema => ['array*' => of => 'str*'],
+            schema => ['array*' => of => 'perl::modname*'],
             description => <<'_',
 
 Will be passed to the tracer. Will currently only affect the `fatpacker` and
@@ -701,7 +693,6 @@ Will be passed to the tracer. Will currently only affect the `fatpacker` and
 
 _
             tags => ['category:module-selection'],
-            'x.schema.element_entity' => 'modulename',
         },
         args => {
             summary => 'Script arguments',
@@ -907,7 +898,7 @@ App::depak - Pack your dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.582 of App::depak (from Perl distribution App-depak), released on 2020-04-08.
+This document describes version 0.583 of App::depak (from Perl distribution App-depak), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -956,7 +947,7 @@ Keep temporary directory for debugging.
 
 Whether to exclude core modules.
 
-=item * B<exclude_dist> => I<array[str]>
+=item * B<exclude_dist> => I<array[perl::distname]>
 
 Exclude all modules of dist.
 
@@ -964,17 +955,17 @@ Just like the C<exclude> option, but will exclude module as well as other module
 from the same distribution. Module name must be the main module of the
 distribution. Will determine other modules from the C<.packlist> file.
 
-=item * B<exclude_list> => I<str>
+=item * B<exclude_list> => I<filename>
 
 Exclude modules from a list in a file.
 
-=item * B<exclude_module> => I<array[str]>
+=item * B<exclude_module> => I<array[perl::modname]>
 
 Modules to exclude.
 
 When you don't want to include a module, specify it here.
 
-=item * B<exclude_pattern> => I<array[str]>
+=item * B<exclude_pattern> => I<array[re]>
 
 Regex patterns of modules to exclude.
 
@@ -994,11 +985,11 @@ To query dependencies, a local CPAN index is used for querying speed. Thus, this
 option requires that C<lcpan> is installed and a fairly recent lcpan index is
 available.
 
-=item * B<include_dir> => I<array[str]>
+=item * B<include_dir> => I<array[dirname]>
 
 Include extra modules under directories.
 
-=item * B<include_dist> => I<array[str]>
+=item * B<include_dist> => I<array[perl::distname]>
 
 Include all modules of dist.
 
@@ -1006,11 +997,11 @@ Just like the C<include> option, but will include module as well as other module
 from the same distribution. Module name must be the main module of the
 distribution. Will determine other modules from the C<.packlist> file.
 
-=item * B<include_list> => I<str>
+=item * B<include_list> => I<filename>
 
 Include extra modules from a list in a file.
 
-=item * B<include_module> => I<array[str]>
+=item * B<include_module> => I<array[perl::modname]>
 
 Include extra modules.
 
@@ -1028,7 +1019,7 @@ to use this option together with setting C<trace_method> to C<none>.
 This option requires that C<lcpan> is installed and a fairly recent lcpan index
 is available.
 
-=item * B<input_file> => I<str> (default: "-")
+=item * B<input_file> => I<filename> (default: "-")
 
 Path to input file (script to be packed).
 
@@ -1039,7 +1030,7 @@ temporary file will be created to handle this).
 
 Pass to tracepm.
 
-=item * B<output_file> => I<str> (default: "-")
+=item * B<output_file> => I<filename> (default: "-")
 
 Path to output file.
 
@@ -1161,7 +1152,7 @@ several methods available, please see C<App::tracepm> for more details.
 A special value of C<none> is also provided. If this is selected, then depak will
 not perform any tracing. Usually used in conjunction with C<--include-from>.
 
-=item * B<use> => I<array[str]>
+=item * B<use> => I<array[perl::modname]>
 
 Additional modules to "use".
 

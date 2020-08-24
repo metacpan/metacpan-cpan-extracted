@@ -3,7 +3,7 @@
    "author" : [
       "Adam Kennedy <adamk@cpan.org>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -56,13 +56,13 @@
          "requires" : {
             "Cwd" : "0",
             "File::Copy" : "0",
-            "File::Copy::Recursive" : "0",
-            "File::Remove" : "0",
-            "File::Spec" : "0",
-            "File::Temp" : "0",
+            "File::Copy::Recursive" : "0.35",
+            "File::Remove" : "0.38",
+            "File::Spec" : "0.85",
+            "File::Temp" : "0.17",
             "IO::File" : "0",
             "perl" : "5.006",
-            "prefork" : "0",
+            "prefork" : "0.02",
             "strict" : "0"
          }
       },
@@ -73,10 +73,10 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Find" : "0",
-            "File::Spec" : "0",
+            "File::Spec" : "0.85",
             "File::Spec::Functions" : "0",
-            "Test::ClassAPI" : "0",
-            "Test::More" : "0",
+            "Test::ClassAPI" : "1.04",
+            "Test::More" : "0.47",
             "perl" : "5.006",
             "vars" : "0",
             "warnings" : "0"
@@ -96,6 +96,7 @@
             "Dist::Zilla::Plugin::CheckStrictVersion" : "0",
             "Dist::Zilla::Plugin::ConfirmRelease" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
+            "Dist::Zilla::Plugin::DynamicPrereqs" : "0",
             "Dist::Zilla::Plugin::Encoding" : "0",
             "Dist::Zilla::Plugin::EnsureLatestPerl" : "0",
             "Dist::Zilla::Plugin::FileFinder::ByName" : "0",
@@ -160,11 +161,11 @@
    "provides" : {
       "File::Flat" : {
          "file" : "lib/File/Flat.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "File::Flat::Object" : {
          "file" : "lib/File/Flat.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -180,10 +181,10 @@
          "web" : "https://github.com/karenetheridge/File-Flat"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.032000"
+         "version" : "5.033001"
       },
       "plugins" : [
          {
@@ -422,7 +423,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
             "name" : "@Author::ETHER/Test::ReportPrereqs",
-            "version" : "0.027"
+            "version" : "0.028"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Portability",
@@ -697,7 +698,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.25.0",
+                  "git_version" : "2.28.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -788,7 +789,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20200717"
+                  "Module::CoreList" : "5.20200820"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -821,7 +822,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.25.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                }
             },
@@ -832,7 +833,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.25.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                }
             },
@@ -843,7 +844,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.25.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                }
             },
@@ -877,7 +878,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.25.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                }
             },
@@ -909,7 +910,7 @@
                }
             },
             "name" : "@Author::ETHER/copy generated files",
-            "version" : "0.006"
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -965,7 +966,7 @@
                }
             },
             "name" : "@Author::ETHER/@Git::VersionManager/CopyFilesFromRelease",
-            "version" : "0.006"
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -988,7 +989,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.25.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1005,12 +1006,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.06",
+                  "tag" : "v1.07",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.25.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1060,7 +1061,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.25.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1091,7 +1092,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.25.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                }
             },
@@ -1158,6 +1159,39 @@
             "class" : "Dist::Zilla::Plugin::Encoding",
             "name" : "Encoding",
             "version" : "6.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "6.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
+            "version" : "6.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DynamicPrereqs",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "DynamicPrereqs",
+            "version" : "0.038"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -1228,8 +1262,8 @@
       "Adam Kennedy <adam@ali.as>",
       "Karen Etheridge <ether@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.33.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.21",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

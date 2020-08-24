@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::LdapUserConfig;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: mtpolicyd plugin for retrieving per user configuration from LDAP
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -117,7 +117,7 @@ Mail::MtPolicyd::Plugin::LdapUserConfig - mtpolicyd plugin for retrieving per us
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

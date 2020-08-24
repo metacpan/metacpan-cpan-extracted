@@ -1,25 +1,28 @@
 package Algorithm::LibLinear::FeatureScaling;
 
 use 5.014;
-use Algorithm::LibLinear::Types;
+use Algorithm::LibLinear::Types qw/Feature FeatureWithLabel/;
 use Carp qw//;
 use List::MoreUtils qw/minmax none/;
 use List::Util qw/max/;
-use Smart::Args;
+use Smart::Args::TypeTiny;
+use Types::Standard qw/ArrayRef ClassName FileHandle InstanceOf Num Str/;
+
+my $InstanceOfPackage = InstanceOf[__PACKAGE__];
 
 sub new {
     args
-        my $class => 'ClassName',
+        my $class => ClassName,
         my $data_set => +{
-            isa => 'Algorithm::LibLinear::DataSet',
+            isa => InstanceOf['Algorithm::LibLinear::DataSet'],
             optional => 1,
         },
-        my $lower_bound => +{ isa => 'Num', default => 0, },
+        my $lower_bound => +{ isa => Num, default => 0, },
         my $min_max_values => +{
-            isa => 'ArrayRef[ArrayRef[Num]]',
+            isa => ArrayRef[ArrayRef[Num]],
             optional => 1,
         },
-        my $upper_bound => +{ isa => 'Num', default => 1.0, };
+        my $upper_bound => +{ isa => Num, default => 1.0, };
 
     unless ($data_set or $min_max_values) {
         Carp::croak('Neither "data_set" nor "min_max_values" is specified.');
@@ -38,10 +41,10 @@ sub new {
 
 sub load {
     args
-        my $class => 'ClassName',
-        my $fh => +{ isa => 'FileHandle', optional => 1, },
-        my $filename => +{ isa => 'Str', optional => 1, },
-        my $string => +{ isa => 'Str', optional => 1, };
+        my $class => ClassName,
+        my $fh => +{ isa => FileHandle, optional => 1, },
+        my $filename => +{ isa => Str, optional => 1, },
+        my $string => +{ isa => Str, optional => 1, };
 
     if (none { defined } ($filename, $fh, $string)) {
         Carp::croak('No source specified.');
@@ -75,7 +78,8 @@ sub load {
 
 sub as_string {
     args
-        my $self;
+        my $self => $InstanceOfPackage;
+
     my $acc =
         sprintf "x\n%.17g %.17g\n", $self->lower_bound, $self->upper_bound;
     my $index = 0;
@@ -87,8 +91,8 @@ sub as_string {
 
 sub compute_min_max_values {
     args
-        my $self,
-        my $data_set => 'Algorithm::LibLinear::DataSet';
+        my $self => $InstanceOfPackage,
+        my $data_set => InstanceOf['Algorithm::LibLinear::DataSet'];
 
     my @feature_vectors = map { $_->{feature} } @{ $data_set->as_arrayref };
     my $last_index = max map { keys %$_ } @feature_vectors;
@@ -106,9 +110,9 @@ sub min_max_values { $_[0]->{min_max_values} }
 
 sub save {
     args
-        my $self,
-        my $fh => +{ isa => 'FileHandle', optional => 1, },
-        my $filename => +{ isa => 'Str', optional => 1, };
+        my $self => $InstanceOfPackage,
+        my $fh => +{ isa => FileHandle, optional => 1, },
+        my $filename => +{ isa => Str, optional => 1, };
 
     unless ($filename or $fh) {
         Carp::croak('Neither "filename" nor "fh" is given.');
@@ -119,8 +123,8 @@ sub save {
 
 sub scale {
     args_pos
-        my $self,
-        my $target_type => 'Str',
+        my $self => $InstanceOfPackage,
+        my $target_type => Str,
         my $target;
 
     my $method = $self->can("scale_$target_type");
@@ -132,8 +136,8 @@ sub scale {
 
 sub scale_data_set {
     args_pos
-        my $self,
-        my $data_set => 'Algorithm::LibLinear::DataSet';
+        my $self => $InstanceOfPackage,
+        my $data_set => InstanceOf['Algorithm::LibLinear::DataSet'];
 
     my @scaled_data_set =
         map { $self->scale_labeled_data($_) } @{ $data_set->as_arrayref };
@@ -142,8 +146,8 @@ sub scale_data_set {
 
 sub scale_feature {
     args_pos
-        my $self,
-        my $feature => 'Algorithm::LibLinear::Feature';
+        my $self => $InstanceOfPackage,
+        my $feature => Feature;
 
     my ($lower_bound, $upper_bound) = ($self->lower_bound, $self->upper_bound);
     my $min_max_values = $self->min_max_values;
@@ -168,8 +172,8 @@ sub scale_feature {
 
 sub scale_labeled_data {
     args_pos
-        my $self,
-        my $labeled_data => 'Algorithm::LibLinear::LabeledData';
+        my $self => $InstanceOfPackage,
+        my $labeled_data => FeatureWithLabel;
 
     +{
         feature => $self->scale_feature($labeled_data->{feature}),

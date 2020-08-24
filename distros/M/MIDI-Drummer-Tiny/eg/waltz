@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+# https://www.virtualdrumming.com/drums/drums-basic-beats/drums-waltz-beats.html
+
 use MIDI::Drummer::Tiny;
 
 my $d = MIDI::Drummer::Tiny->new(
@@ -13,10 +15,11 @@ my $d = MIDI::Drummer::Tiny->new(
 
 $d->count_in(1);
 
+# Viennese
 for my $n (1 .. $d->bars) {
-    $d->note($d->eighth, $d->ride1, $n % 2 ? $d->kick : $d->snare);
-    $d->note($d->eighth, $d->ride1);
-    $d->note($d->eighth, $d->ride1);
+    $d->note($d->quarter, $d->ride1, $d->kick);
+    $d->note($d->quarter, $d->ride1, $d->snare);
+    $d->note($d->quarter, $d->ride1, $d->snare);
 }
 
 $d->write;

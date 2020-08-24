@@ -18,6 +18,7 @@ cmp_deeply(
         isa('Algorithm::LibLinear::Model'),
         methods(
             class_labels => [1 .. 3],
+            is_oneclass_model => bool(0),
             is_probability_model => bool(0),
             is_regression_model => bool(0),
             num_classes => 3,

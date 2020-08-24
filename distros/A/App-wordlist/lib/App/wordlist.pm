@@ -1,9 +1,9 @@
 package App::wordlist;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-08-23'; # DATE
 our $DIST = 'App-wordlist'; # DIST
-our $VERSION = '0.276'; # VERSION
+our $VERSION = '0.277'; # VERSION
 
 use 5.010001;
 use strict;
@@ -232,6 +232,12 @@ _
         {
             argv => [qw|/fof[aeiou]/|],
             summary => 'Filter by regex',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            argv => ['-w', 'MetaSyntactic=theme,dangdut'],
+            summary => 'Select a wordlist with parameters',
             test => 0,
             'x.doc.show_result' => 0,
         },
@@ -499,7 +505,7 @@ App::wordlist - Grep words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.276 of App::wordlist (from Perl distribution App-wordlist), released on 2020-06-09.
+This document describes version 0.277 of App::wordlist (from Perl distribution App-wordlist), released on 2020-08-23.
 
 =head1 SYNOPSIS
 
@@ -551,6 +557,10 @@ Examples:
 =item * Filter by regex:
 
  wordlist( arg => ["/fof[aeiou]/"]);
+
+=item * Select a wordlist with parameters:
+
+ wordlist( wordlists => ["MetaSyntactic=theme,dangdut"]);
 
 =item * List installed wordlist modules:
 

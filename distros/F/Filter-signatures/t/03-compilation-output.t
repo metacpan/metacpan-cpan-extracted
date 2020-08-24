@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More tests => 29;
+use Test::More tests => 30;
 use Data::Dumper;
 
 require Filter::signatures;
@@ -377,6 +377,21 @@ sub f { my ($a)=@_;$a = do { $x = "abc"; return substr($x,0,1)} if @_ <= 0;();
 }
 RESULT
 }
+
+# This is a test for the placeholders that Filter::Simple supplies - if you
+# have enough of them, "interesting" characters pop up within these placeholders
+# We have an interesting dependency on the format of these placeholders.
+$_ = <<'SUB';
+sub f ($a = "...(") {
+...
+}
+SUB
+Filter::signatures::transform_arguments();
+is $_, <<'RESULT', "Parentheses in (replaced) string arguments work";
+sub f { my ($a)=@_;$a = "...(" if @_ <= 0;();
+...
+}
+RESULT
 
 if( $Test::More::VERSION > 0.87 ) { # 5.8.x compatibility
     done_testing();

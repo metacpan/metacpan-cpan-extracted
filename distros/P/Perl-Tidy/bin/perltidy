@@ -386,6 +386,8 @@ For example,
 
 will cause the perltidy to treate the words 'method', 'fun', '_sub' and 'M4' to be treated the same as if they were 'sub'.  Note that if the alias words are separated by spaces then the string of words should be placed in quotes.
 
+Note that several other parameters accept a list of keywords, including 'sub' (see L<Specifying Block Types>).
+You do not need to include any sub aliases in these lists. Just include keyword 'sub' if you wish, and all aliases are automatically included.
 
 =back
 
@@ -1100,7 +1102,7 @@ Suppose the user requests that / signs have a space to the left but not to the r
        print $x /$y;
    }
 
-If formatted in this way, the program will not run (at least with recent versions of perl) because the $x is taken to be a filehandle and / is assumed to start a quote. In a complex program, there might happen to be a / which terminates the multiline quote without a syntax error, allowing the program to run, but incorrectly.
+If formatted in this way, the program will not run (at least with recent versions of perl) because the $x is taken to be a filehandle and / is assumed to start a quote. In a complex program, there might happen to be a / which terminates the multiline quote without a syntax error, allowing the program to run, but not as intended.
 
 Related issues arise with other binary operator symbols, such as + and -, and in older versions of perl there could be problems with ternary operators.  So to avoid changing program behavior, perltidy has the simple rule that whitespace around possible filehandles is left unchanged.  Likewise, whitespace around barewords is left unchanged.  The reason is that if the barewords are defined in other modules, or in code that has not even been written yet, perltidy will not have seen their prototypes and must treat them cautiously.
 
@@ -3350,7 +3352,7 @@ is broken in multiple lines in the source.
 
 =head2 Controlling Vertical Alignment
 
-Vertical alignment refers to lining up certain symbols in list of consecutive
+Vertical alignment refers to lining up certain symbols in a list of consecutive
 similar lines to improve readability.  For example, the "fat commas" are
 aligned in the following statement:
 
@@ -4052,7 +4054,7 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20200619
+This man page documents perltidy version 20200822
 
 =head1 BUG REPORTS
 

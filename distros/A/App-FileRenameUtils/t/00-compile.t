@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FileMoveUtils.pm',
@@ -16,6 +16,7 @@ my @module_files = (
 my @scripts = (
     'script/move-files-here',
     'script/mv-reverse',
+    'script/rename-add-prefix',
     'script/rename-swap',
     'script/rename-to-from'
 );

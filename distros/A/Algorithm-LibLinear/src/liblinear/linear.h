@@ -1,7 +1,7 @@
 #ifndef _LIBLINEAR_H
 #define _LIBLINEAR_H
 
-#define LIBLINEAR_VERSION 230
+#define LIBLINEAR_VERSION 241
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +23,7 @@ struct problem
 	double bias;            /* < 0 if no bias term */
 };
 
-enum { L2R_LR, L2R_L2LOSS_SVC_DUAL, L2R_L2LOSS_SVC, L2R_L1LOSS_SVC_DUAL, MCSVM_CS, L1R_L2LOSS_SVC, L1R_LR, L2R_LR_DUAL, L2R_L2LOSS_SVR = 11, L2R_L2LOSS_SVR_DUAL, L2R_L1LOSS_SVR_DUAL }; /* solver_type */
+enum { L2R_LR, L2R_L2LOSS_SVC_DUAL, L2R_L2LOSS_SVC, L2R_L1LOSS_SVC_DUAL, MCSVM_CS, L1R_L2LOSS_SVC, L1R_LR, L2R_LR_DUAL, L2R_L2LOSS_SVR = 11, L2R_L2LOSS_SVR_DUAL, L2R_L1LOSS_SVR_DUAL, ONECLASS_SVM = 21 }; /* solver_type */
 
 struct parameter
 {
@@ -36,7 +36,9 @@ struct parameter
 	int *weight_label;
 	double* weight;
 	double p;
+	double nu;
 	double *init_sol;
+	int regularize_bias;
 };
 
 struct model
@@ -47,6 +49,7 @@ struct model
 	double *w;
 	int *label;		/* label of each class */
 	double bias;
+	double rho;		/* one-class SVM only */
 };
 
 struct model* train(const struct problem *prob, const struct parameter *param);
@@ -65,6 +68,7 @@ int get_nr_class(const struct model *model_);
 void get_labels(const struct model *model_, int* label);
 double get_decfun_coef(const struct model *model_, int feat_idx, int label_idx);
 double get_decfun_bias(const struct model *model_, int label_idx);
+double get_decfun_rho(const struct model *model_);
 
 void free_model_content(struct model *model_ptr);
 void free_and_destroy_model(struct model **model_ptr_ptr);
@@ -73,6 +77,7 @@ void destroy_param(struct parameter *param);
 const char *check_parameter(const struct problem *prob, const struct parameter *param);
 int check_probability_model(const struct model *model);
 int check_regression_model(const struct model *model);
+int check_oneclass_model(const struct model *model);
 void set_print_string_function(void (*print_func) (const char*));
 
 #ifdef __cplusplus

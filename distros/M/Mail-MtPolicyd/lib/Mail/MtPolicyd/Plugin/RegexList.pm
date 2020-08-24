@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin::RegexList;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: mtpolicyd plugin for regex matching
 
 extends 'Mail::MtPolicyd::Plugin';
@@ -148,7 +148,7 @@ Mail::MtPolicyd::Plugin::RegexList - mtpolicyd plugin for regex matching
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

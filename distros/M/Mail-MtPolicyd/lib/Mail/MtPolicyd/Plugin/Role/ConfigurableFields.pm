@@ -5,7 +5,7 @@ use MooseX::Role::Parameterized;
 
 use Moose::Util::TypeConstraints;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: role for plugins using configurable fields
 
 parameter fields => (
@@ -76,7 +76,7 @@ Mail::MtPolicyd::Plugin::Role::ConfigurableFields - role for plugins using confi
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@ package Mail::MtPolicyd::Plugin;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 # ABSTRACT: a base class for plugins
 
 
@@ -53,7 +53,7 @@ Mail::MtPolicyd::Plugin - a base class for plugins
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 ATTRIBUTES
 

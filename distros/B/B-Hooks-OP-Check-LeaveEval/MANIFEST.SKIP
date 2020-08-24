@@ -1,0 +1,4 @@
+#!include_default
+\.c$
+\.o$
+\.bs$

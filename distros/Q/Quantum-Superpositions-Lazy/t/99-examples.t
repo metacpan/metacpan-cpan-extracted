@@ -1,4 +1,4 @@
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Test::More;
 use Test::Exception;
 use File::Basename;
@@ -18,6 +18,5 @@ for my $example (glob "$examples_path/*.pl") {
 		};
 	};
 }
-
 
 done_testing;

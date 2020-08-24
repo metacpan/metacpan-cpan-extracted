@@ -1,4 +1,4 @@
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Test::More;
 use Quantum::Superpositions::Lazy qw(every_state);
 
@@ -14,6 +14,7 @@ sub is_prime
 }
 
 my %numbers = (
+
 	# number => is_prime?
 	78 => 0,
 	79 => 1,
@@ -23,6 +24,7 @@ my %numbers = (
 while (my ($number, $is_prime) = each %numbers) {
 
 	my $prime = is_prime $number;
+
 	# did we succeed?
 	is $prime, !!$is_prime, "$number result ok - " . ($is_prime ? "is" : "isnt") . " prime";
 }

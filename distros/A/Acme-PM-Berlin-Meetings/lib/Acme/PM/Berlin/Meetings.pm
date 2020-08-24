@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2010,2012,2015,2016,2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2010,2012,2015,2016,2017,2020 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -14,7 +14,7 @@
 package Acme::PM::Berlin::Meetings;
 
 use strict;
-our $VERSION = '201703.19';
+our $VERSION = '202008.24';
 
 use Exporter 'import'; # needs Exporter 5.57
 our @EXPORT = qw(next_meeting);
@@ -30,12 +30,29 @@ sub next_meeting {
 sub next_meeting_dt {
     my $dt = shift;
     my $dt_berlin = $dt->clone->set_time_zone('Europe/Berlin');
+
+    # Regular exception: December meeting is in January
     if ($dt_berlin->month == 1 && $dt_berlin->day < 10) {
 	my $dec_meeting = _get_dec_meeting($dt_berlin);
 	if ($dec_meeting > $dt_berlin) {
 	    return $dec_meeting;
 	}
     }
+
+    # Exceptions
+    {
+	# August 2020 (last Wed -> last Tue)
+	my $dt_aug_2020       = DateTime->new(year=>2020, month=>8, day=>25, hour=>19, time_zone=>"Europe/Berlin");
+	my $dt_aug_2020_from  = DateTime->new(year=>2020, month=>7, day=>29, hour=>19, time_zone=>"Europe/Berlin");
+	my $dt_aug_2020_until = DateTime->new(year=>2020, month=>8, day=>26, hour=>19, time_zone=>"Europe/Berlin");
+	if ($dt_berlin > $dt_aug_2020_from && $dt_berlin < $dt_aug_2020) {
+	    return $dt_aug_2020;
+	} elsif ($dt_berlin >= $dt_aug_2020 && $dt_berlin < $dt_aug_2020_until) {
+	    $dt_berlin = $dt_aug_2020_until;
+	}
+    }
+
+    # Regular meetings
     my $last_wed_of_month = _get_last_wed_of_month($dt_berlin);
     if ($last_wed_of_month <= $dt_berlin) {
 	$dt_berlin->add(months => 1, end_of_month => 'limit');

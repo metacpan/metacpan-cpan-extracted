@@ -1,6 +1,4 @@
-#!/usr/bin/env perl
-use strict;
-use warnings;
+#!perl
 
 use Test::More;
 
@@ -14,8 +12,8 @@ is $d->beats, 4, 'beats computed';
 is $d->divisions, 4, 'divisions computed';
 
 my @score = $d->score->Score;
-is $score[1]->[0], 'time_signature', 'time signature added';
-is $score[1]->[2], $d->beats, '4 beats';
+is $score[2]->[0], 'time_signature', 'time signature added';
+is $score[2]->[2], $d->beats, '4 beats';
 
 $d->note($d->quarter, $d->closed_hh);
 @score = $d->score->Score;

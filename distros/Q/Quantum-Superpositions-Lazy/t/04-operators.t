@@ -1,4 +1,4 @@
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Test::More;
 use Quantum::Superpositions::Lazy;
 
@@ -12,7 +12,7 @@ my $a2 = superpos(3);
 my $a3;
 
 is "$a1", 6, "stringification ok";
-is -$a1, -6, "negation ok";
+is - $a1, -6, "negation ok";
 
 is $a1 . $a2, 63, "concatenation ok";
 $a3 = $a1; $a3 .= $a2;
@@ -42,8 +42,8 @@ is $a1 % $a2, 0, "modulo ok";
 $a3 = $a1; $a3 %= $a2;
 is $a3, 0, "modulo ok";
 
-is $a1 ** $a2, 216, "power ok";
-$a3 = $a1; $a3 **= $a2;
+is $a1 **$a2, 216, "power ok";
+$a3 = $a1; $a3**= $a2;
 is $a3, 216, "power ok";
 
 is $a1 << $a2, 48, "shift left ok";

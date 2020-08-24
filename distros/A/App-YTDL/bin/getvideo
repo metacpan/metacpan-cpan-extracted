@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.412';
+our $VERSION = '0.413';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -202,7 +202,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.412
+Version 0.413
 
 =cut
 
@@ -297,7 +297,7 @@ If set to I<manually>: C<+> => "merge", C<,> => "and", C</> => "or". See C<youtu
 
 =head3 No video height
 
-Download videos whose height is unknown.
+If I<Resolution> is set to a "I<res> or less": download videos whose height is unknown.
 
 - no
 

@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.58",
-            "Math::MPFR" : "3.23"
+            "Math::MPFR" : "4.14"
          }
       }
    },
@@ -45,6 +45,6 @@
          "web" : "https://github.com/sisyphus/math-mpc"
       }
    },
-   "version" : "1.09",
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

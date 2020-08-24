@@ -1,0 +1,13 @@
+Release history for Config-INI-Tiny
+
+TODO keep_comments keep_empty keep_errors
+TODO unparse from_hash
+
+0.102 Mon 24 Aug 2020
+	- Correct test plans
+
+0.101 Sun 23 Aug 2020
+	- Fewer typos in POD
+
+0.100 Sun 23 Aug 2020
+	- Initial release

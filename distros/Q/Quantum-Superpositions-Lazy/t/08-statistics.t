@@ -1,4 +1,4 @@
-use v5.24; use warnings;
+use v5.28; use warnings;
 use Test::More;
 use Quantum::Superpositions::Lazy;
 use Data::Dumper;
@@ -31,6 +31,7 @@ isa_ok $case1->stats, "Quantum::Superpositions::Lazy::Statistics";
 MOST_PROBABLE: {
 	my $items = $case_comp->stats->most_probable;
 	my %wanted = (
+
 		# 1.7 / 6 = 0.283333
 		300 => "0.283",
 	);
@@ -41,6 +42,7 @@ MOST_PROBABLE: {
 LEAST_PROBABLE: {
 	my $items = $case_comp->stats->least_probable;
 	my %wanted = (
+
 		# 0.5 / 6 = 0.083333
 		100 => "0.083",
 	);
@@ -69,11 +71,13 @@ MEDIAN: {
 	is $item, 300, "median ok";
 
 	$item = $case1->stats->median;
+
 	# Here the median should be 2, because two elements will meet
 	# the condition, and we choose the one with less weight
 	is $item, 2, "median special case ok";
 
 	$item = $case1->stats->median_num;
+
 	# Here the median should be
 	# (2 * 2 + 3 * 3) / 5.0 = 2.6
 	# because in median_num we create a weighted mean of the values
