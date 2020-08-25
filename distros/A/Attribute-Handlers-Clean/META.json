@@ -1,0 +1,48 @@
+{
+   "abstract" : "Simpler definition of attribute handlers, without messing with UNIVERSAL.",
+   "author" : [
+      "Francisco Zarabozo <zarabozo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Attribute-Handlers-Clean",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Perlmazing" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Perlmazing" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perlmazing" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Perlmazing" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON version 4.02"
+}

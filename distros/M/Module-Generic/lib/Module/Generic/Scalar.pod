@@ -56,6 +56,14 @@ Returns the object string as a string.
     print( "Hello $s\n" );
     # Hello Mary Jane
 
+=head2 append
+
+Provided with a string, and this will add it to the end of the string object.
+
+    # $s is 'Hello'
+    $s->append( ' world' );
+    # now this is: Hello world
+
 =head2 capitalise
 
 Returns a new L<Module::Generic::Scalar> object representing the string with the words capitalised, done in a smart way. That is the special words like C<and>, C<but>, C<if>, C<on>, C<or>, C<the>, C<to>, etc. are not capitalised.
@@ -105,7 +113,7 @@ Returns the hex value of the string.
 
 Given a sub string and an optional position, and this returns the position at which the sub string was found.
 
-See L<oerlfunc/"index">
+See L<perlfunc/"index">
 
 =head2 is_alpha
 
@@ -241,7 +249,7 @@ See also L</left>
 
 Given a sub string and an optional position, and this returns the position at which the sub string was found, starting from the end.
 
-See L<oerlfunc/"rindex">
+See L<perlfunc/"rindex">
 
 =head2 rtrim
 
@@ -268,6 +276,16 @@ This acts the exact same way as for L</"new">, except it acts on the current obj
 =head2 split
 
 Provided with a string or an expression and this returns the list in list context or, in scalar context, an array reference as an L<Module::Generic::Array> object.
+
+Be careful that you cannot just do like perl's original split such as:
+
+    my $a = $s->split( /\n/ );
+
+Because C</\n/> is not passed as an argument, i.e. it results in no argument being passed, so you do need to either provide the expression as C<"\n"> or as a regular expression:
+
+    my $a = $s->split( qr/\n/ );
+
+It will warn you if no argument was provided.
 
 =head2 sprintf
 

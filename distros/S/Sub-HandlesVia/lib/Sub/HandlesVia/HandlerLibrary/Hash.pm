@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Hash;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013';
+our $VERSION   = '0.014';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -67,7 +67,7 @@ my $additional_validation_for_set_and_insert = sub {
 					? '$shv_value=$shv_value_tc->assert_coerce($shv_value)'
 					: $ti->{value_type}->inline_assert('$shv_value', '$shv_value_tc'),
 			), %$callbacks),
-			{ '$shv_key_tc' => \(Str), '$shv_value_tc' => \$ti->{value_type} },
+			{ '$shv_key_tc' => \($ti->{key_type} || Str), '$shv_value_tc' => \$ti->{value_type} },
 		);
 	}
 	return;

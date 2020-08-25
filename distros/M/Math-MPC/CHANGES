@@ -1,3 +1,6 @@
+1.12
+ - Fix failure in t/out_str2.t
+
 1.11
  - Update PREREQ_PM version of Math::MPFR to 4.14
    (This is needed to accommodate changes in mpfr-4.1.0.)

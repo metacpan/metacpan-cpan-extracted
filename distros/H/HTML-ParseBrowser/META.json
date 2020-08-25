@@ -47,7 +47,7 @@
          "web" : "https://github.com/neilb/HTML-ParseBrowser"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_generated_by_perl" : "v5.28.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

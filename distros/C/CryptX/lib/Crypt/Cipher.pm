@@ -2,7 +2,7 @@ package Crypt::Cipher;
 
 use strict;
 use warnings;
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;

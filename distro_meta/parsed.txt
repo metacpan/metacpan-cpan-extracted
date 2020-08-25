@@ -66798,3 +66798,13 @@ J/JM/JMATES/Term-CallEditor-1.01.tar.gz
 D/DE/DERF/Travel-Status-DE-IRIS-1.48.tar.gz
 P/PE/PERLANCAR/WordList-0.7.6.tar.gz
 P/PE/PERLANCAR/WordList-Test-Dynamic-RandomWord-1000-0.003.tar.gz
+P/PE/PERLANCAR/App-html-css-sel-0.004.tar.gz
+Z/ZA/ZARABOZO/Attribute-Handlers-Clean-1.02.tar.gz
+M/MI/MIK/CryptX-0.069.tar.gz
+M/ME/MERKYS/Graph-Nauty-0.3.0.tar.gz
+N/NE/NEILB/HTML-ParseBrowser-1.15.tar.gz
+J/JR/JRHUNT/Jig-0.22.1.tar.gz
+H/HU/HUGMEIR/MariaDB-NonBlocking-0.26.tar.gz
+S/SI/SISYPHUS/Math-MPC-1.12.tar.gz
+J/JD/JDEGUEST/Module-Generic-v0.13.0.tar.gz
+T/TO/TOBYINK/Sub-HandlesVia-0.014.tar.gz

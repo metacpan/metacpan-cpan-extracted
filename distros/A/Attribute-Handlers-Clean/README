@@ -1,0 +1,19 @@
+Attribute::Handlers::Clean - Simpler definition of attribute handlers, without messing with UNIVERSAL.
+
+INTALL:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+On Windows, if using MSVS, replace 'make' by 'nmake'. With MinGW, make should work just fine.
+On both cases, make sure you are running commands from a command prompt that has loaded the
+required compiler environment.
+
+In the worst case scenario, since this is not an XS module, you can just copy the folder 'Attribute'
+that you can find inside of the folder 'lib', into your Perl site/lib path (e.g. C:\Perl\site\lib).
+
+After proper install, you can find the documentation via `perldoc Attribute::Handlers::Clean`.
+Or you can see it directly on MetaCPAN.

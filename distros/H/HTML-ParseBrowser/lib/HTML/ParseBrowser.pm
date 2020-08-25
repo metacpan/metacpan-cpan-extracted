@@ -1,5 +1,5 @@
 package HTML::ParseBrowser;
-$HTML::ParseBrowser::VERSION = '1.14';
+$HTML::ParseBrowser::VERSION = '1.15';
 use 5.006;
 use strict;
 use warnings;
@@ -197,9 +197,9 @@ sub Parse {
                 }
             }
             elsif (/Windows (?:Phone )?(\d+(\.\d+)?)/) {
-                $browser->{osvers} = $1;
+                $browser->{osvers} = $1 if !$browser->{osvers};
             } elsif (/Win(\w\w)/i) {
-                $browser->{osvers} = $1;
+                $browser->{osvers} = $1 if !$browser->{osvers};
             }
         }
 

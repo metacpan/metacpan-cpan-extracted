@@ -4,7 +4,7 @@ package Crypt::Cipher::SAFER_K64;
 
 use strict;
 use warnings;
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 use base qw(Crypt::Cipher);
 
@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('SAFER_K64') }
 
 =head1 NAME
 
-Crypt::Cipher::SAFER_K64 - Symmetric cipher SAFER_K64, key size: 64 bits (Crypt::CBC compliant)
+Crypt::Cipher::SAFER_K64 - Symmetric cipher SAFER_K64, key size: 64 bits
 
 =head1 SYNOPSIS
 

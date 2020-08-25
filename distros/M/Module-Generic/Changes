@@ -1,5 +1,23 @@
 Revision history for Perl module Module::Generic
 
+0.13.0 2020-07-10T10:30:10+0900
+    - Added alias method _set_get_number_as_object for convenience and pointing to _set_get_number
+    - Added the method append in Module::Generic::Scalar
+    - Added an iterator class with Module::Generic::Iterator and Module::Generic::Iterator::Element
+    - Added methods index, iterator and pos in Module::Generic::Array
+    - Improved documentation for Module::Generic::Array
+    - Corrected 2 typos in pod for Module::Generic::Scalar
+    - Added method _set_get_lvalue to make it easy to implement object oriented lvalue methods
+    - Changed the _set_get_number so that now it can also be accesed as lvalue
+    - Added method is_even and is_odd to Module::Generic::Number
+    - Added helper method _to_array_object to make it easy to create array object out of any parameters
+    - Added method "has" as an alias to method "exists" to Module::Generic::Array and Module::Generic::Hash
+    - dump now() uses Data::Dump instead of Data::Printer that offers a cleaner output
+    - Added method map() map_array and map_hash in Module::Generic::Hash
+    - Modified method as_hash in Module::Generic::Array to take an optional hash reference of options
+    - Module::Generic::Hash object can now be instantiated with no hash provided. Before it required an hash reference to be provided to instantiate the object.
+    - corrected methods map_array() and map_hash() in Module::Generic::Hash
+
 0.12.16 2020-06-17T15:03:17+0900
     - Added the helper method _is_a to simplify the check for object class
     - Added method get() and list() in Module::Generic::Array

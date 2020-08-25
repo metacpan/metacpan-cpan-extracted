@@ -1,0 +1,22 @@
+Changes
+demo/demo.pl
+demo/Demo.pm
+demo/demo2.pl
+demo/demo3.pl
+demo/demo4.pl
+demo/demo_call.pl
+demo/demo_chain.pl
+demo/demo_cycle.pl
+demo/demo_phases.pl
+demo/Descriptions.pm
+demo/MyClass.pm
+lib/Attribute/Handlers/Clean.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/constants.t
+t/data_convert.t
+t/linerep.t
+t/multi.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@ package Crypt::Cipher::Skipjack;
 
 use strict;
 use warnings;
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 use base qw(Crypt::Cipher);
 
@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('Skipjack') }
 
 =head1 NAME
 
-Crypt::Cipher::Skipjack - Symmetric cipher Skipjack, key size: 80 bits (Crypt::CBC compliant)
+Crypt::Cipher::Skipjack - Symmetric cipher Skipjack, key size: 80 bits
 
 =head1 SYNOPSIS
 

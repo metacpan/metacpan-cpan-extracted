@@ -89,7 +89,11 @@ my $count = 0;
 my $first =  '6.50000000000000000000';
 my $second = '8.25000000000000000000';
 
-if(Math::MPFR::MPFR_VERSION >= 262400) {
+my $mpfr_version = Math::MPC::_MPFR_VERSION();
+
+warn "\nMath::MPC is built against MPFR_VERSION $mpfr_version\n";
+
+if($mpfr_version >= 262400) {
   $first .=  'e0';
   $second .= 'e0';
 }
@@ -97,7 +101,11 @@ if(Math::MPFR::MPFR_VERSION >= 262400) {
 while(<$RD1>) {
      $count = $.;
      chomp;
-     unless($_ eq "($first $second)"x5) {$ok = 1}
+     unless($_ eq "($first $second)"x5) {
+       $ok = 0;
+       my $out = "expected:\n" . ("($first $second)"x5) . "\ngot:\n$_\n";
+       warn $out;
+     }
 }
 
 if($ok && $count == 1) {print "ok 1\n"}
@@ -211,14 +219,14 @@ close $RD5 or die "Can't close RD5: $!";
 close $RD6 or die "Can't close RD6: $!";
 close $RD7 or die "Can't close RD7: $!";
 
-open($WR8, '>', 'out1.txt') or die "Can't open WR8: $!";
+open($WR8, '>', 'out8.txt') or die "Can't open WR8: $!";
 #print $WR8 "6.5000000000000000\n";
 #print $WR8 "+I*\n";
 #print $WR8 "8.2500000000000000\n";
 print $WR8 "(6.5000000000000000 8.2500000000000000)\n";
 close $WR8 or die "Can't close WR8: $!";
 
-open($RD8, '<', 'out1.txt') or die "Can't open RD8: $!";
+open($RD8, '<', 'out8.txt') or die "Can't open RD8: $!";
 $ret = TRmpc_inp_str($mpc, \*$RD8, 10, MPC_RNDNN);
 close $RD8 or die "Can't close RD8: $!";
 

@@ -4,7 +4,7 @@ package Crypt::Cipher::Noekeon;
 
 use strict;
 use warnings;
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 use base qw(Crypt::Cipher);
 
@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('Noekeon') }
 
 =head1 NAME
 
-Crypt::Cipher::Noekeon - Symmetric cipher Noekeon, key size: 128 bits (Crypt::CBC compliant)
+Crypt::Cipher::Noekeon - Symmetric cipher Noekeon, key size: 128 bits
 
 =head1 SYNOPSIS
 

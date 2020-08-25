@@ -4,7 +4,7 @@ package Crypt::Cipher::Serpent;
 
 use strict;
 use warnings;
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 use base qw(Crypt::Cipher);
 
@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('Serpent') }
 
 =head1 NAME
 
-Crypt::Cipher::Serpent - Symmetric cipher Serpent, key size: 128/192/256 bits (Crypt::CBC compliant)
+Crypt::Cipher::Serpent - Symmetric cipher Serpent, key size: 128/192/256 bits
 
 =head1 SYNOPSIS
 

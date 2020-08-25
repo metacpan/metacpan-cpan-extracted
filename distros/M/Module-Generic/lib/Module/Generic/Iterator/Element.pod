@@ -1,0 +1,89 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::Iterator::Element - An Array Iterator Element Object Class
+
+=head1 SYNOPSIS
+
+    my $i = Module::Generic::Iterator->new( [qw( Joe John Mary )] );
+    # or also:
+    my $a = Module::Generic::Array->new( [qw( Joe John Mary )] );
+    my $i = $a->iterator;
+    while( $i->has_next )
+    {
+        my $elem = $i->next;
+        my $value = $elem->value;
+        # Get the next element relative to our element
+        printf( "Next value is: %s at offset %d\n", $elem->next, $elem->next->pos  );
+    }
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This is an object class for L<Module::Generic::Iterator::Element> objects as returned by various methods of L<Module::Generic::Iterator>.
+
+=head1 METHODS
+
+=head2 new
+
+Provided with an array value (whatever that may be) and an optional hash reference of parameters, and this will create a new iterator and return it.
+
+Typical parameters are:
+
+=over 4
+
+=item I<parent>
+
+This is the L<Module::Generic::Iterator> object and it is required.
+
+=back
+
+=head2 has_next
+
+Returns true if there is another item after the current one.
+
+=head2 has_prev
+
+Returns true if there is another item before the current one.
+
+=head2 next
+
+Returns the next L<Module::Generic::Iterator::Element> object relative to this object or undef if there are no more element.
+
+=head2 parent
+
+Sets or gets a L<Module::Generic::Iterator> object as the parent object for this array element.
+
+=head2 pos
+
+Returns the position of the object inside the parent array. This is read-only and returns an integer.
+
+=head2 prev
+
+Returns the previous L<Module::Generic::Iterator::Element> object relative to this object or undef if there are no more previous element.
+
+=head2 value
+
+Return the value of the L<Module::Generic::Iterator::Element> object, whatever that may be.
+
+=head1 SEE ALSO
+
+L<Module::Generic::Iterator::Element>, L<Module::Generic::Array>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

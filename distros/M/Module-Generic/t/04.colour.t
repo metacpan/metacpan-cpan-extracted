@@ -10,7 +10,7 @@ use utf8;
 BEGIN { use_ok( 'Module::Generic' ) || BAIL_OUT( "Unable to load Module::Generic" ); }
 
 my $m = Module::Generic->new(
-    debug => 3,
+    debug => 0,
     colour_open => "\{",
     colour_close => "\}",
 );

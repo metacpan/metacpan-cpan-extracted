@@ -3430,6 +3430,10 @@ SV * _MPC_VERSION(pTHX) {
      return newSVuv(MPC_VERSION);
 }
 
+SV * _MPFR_VERSION(pTHX) {
+     return newSVuv(MPFR_VERSION);
+}
+
 SV * _MPC_VERSION_NUM(pTHX_ SV * x, SV * y, SV * z) {
      return newSVuv(MPC_VERSION_NUM((unsigned long)SvUV(x), (unsigned long)SvUV(y), (unsigned long)SvUV(z)));
 }
@@ -6044,6 +6048,13 @@ SV *
 _MPC_VERSION ()
 CODE:
   RETVAL = _MPC_VERSION (aTHX);
+OUTPUT:  RETVAL
+
+
+SV *
+_MPFR_VERSION ()
+CODE:
+  RETVAL = _MPFR_VERSION (aTHX);
 OUTPUT:  RETVAL
 
 

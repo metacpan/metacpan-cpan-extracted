@@ -4,7 +4,7 @@ package Crypt::Cipher::Blowfish;
 
 use strict;
 use warnings;
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 use base qw(Crypt::Cipher);
 
@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('Blowfish') }
 
 =head1 NAME
 
-Crypt::Cipher::Blowfish - Symmetric cipher Blowfish, key size: 64-448 bits (Crypt::CBC compliant)
+Crypt::Cipher::Blowfish - Symmetric cipher Blowfish, key size: 64-448 bits
 
 =head1 SYNOPSIS
 

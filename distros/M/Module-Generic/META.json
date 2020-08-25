@@ -35,8 +35,8 @@
             "B" : "0",
             "Class::Load" : "0.25",
             "Clone" : "0.43",
+            "Data::Dump" : "1.23",
             "Data::Dumper" : "0",
-            "Data::Printer" : "0",
             "Devel::StackTrace" : "0",
             "Exporter" : "5.73",
             "JSON" : "4.02",
@@ -67,6 +67,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.12.16",
+   "version" : "v0.13.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -4,7 +4,7 @@ package Crypt::Cipher::Anubis;
 
 use strict;
 use warnings;
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 use base qw(Crypt::Cipher);
 
@@ -20,7 +20,7 @@ sub default_rounds { Crypt::Cipher::default_rounds('Anubis') }
 
 =head1 NAME
 
-Crypt::Cipher::Anubis - Symmetric cipher Anubis, key size: 128-320 bits (Crypt::CBC compliant)
+Crypt::Cipher::Anubis - Symmetric cipher Anubis, key size: 128-320 bits
 
 =head1 SYNOPSIS
 

@@ -262,6 +262,7 @@ src/ltc/headers/tomcrypt_pk.h
 src/ltc/headers/tomcrypt_pkcs.h
 src/ltc/headers/tomcrypt_private.h
 src/ltc/headers/tomcrypt_prng.h
+src/ltc/LICENSE
 src/ltc/mac/blake2/blake2bmac.c
 src/ltc/mac/blake2/blake2bmac_file.c
 src/ltc/mac/blake2/blake2bmac_memory.c
@@ -736,12 +737,14 @@ src/ltm/bn_s_mp_mul_high_digs.c
 src/ltm/bn_s_mp_sqr.c
 src/ltm/bn_s_mp_sub.c
 src/ltm/bncore.c
+src/ltm/LICENSE
 src/ltm/tommath.h
 src/ltm/tommath_class.h
 src/ltm/tommath_private.h
 src/ltm/tommath_superclass.h
 src/Makefile
 src/Makefile.nmake
+src/README.txt
 t/001_compile.t
 t/002_all_pm.t
 t/003_all_pm_pod.t

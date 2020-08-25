@@ -20,7 +20,7 @@
 #     META_MERGE => { meta-spec=>{ version=>q[2] }, resources=>{ repository=>{ type=>q[git], url=>q[https://github.com/jhunt/jig.git], web=>q[https://github.com/jhunt/jig] } } }
 #     MIN_PERL_VERSION => q[5.008004]
 #     NAME => q[Jig]
-#     PREREQ_PM => { strict=>q[0], warnings=>q[0] }
+#     PREREQ_PM => { Test::Deep=>q[0], Test::More=>q[0], strict=>q[0], warnings=>q[0] }
 #     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/Jig.pm]
 
@@ -61,11 +61,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Jig
 NAME_SYM = Jig
-VERSION = 0.22.0
+VERSION = 0.22.1
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_22_0
+VERSION_SYM = 0_22_1
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.22.0
+XS_VERSION = 0.22.1
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -256,7 +256,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Jig
-DISTVNAME = Jig-0.22.0
+DISTVNAME = Jig-0.22.1
 
 
 # --- MakeMaker macro section:
@@ -502,12 +502,14 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '    - t' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Test::Deep: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Test::More: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  perl: '\''5.008004'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  strict: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  warnings: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  repository: https://github.com/jhunt/jig.git' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: v0.22.0' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: v0.22.1' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
@@ -544,6 +546,8 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Test::Deep" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Test::More" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "perl" : "5.008004",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "strict" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "warnings" : "0"' >> META_new.json
@@ -558,7 +562,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "web" : "https://github.com/jhunt/jig"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "v0.22.0"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "v0.22.1"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -867,11 +871,13 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Jig" VERSION="0.22.0">' > Jig.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Jig" VERSION="0.22.1">' > Jig.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Tools for Crafting Code in Perl</ABSTRACT>' >> Jig.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>James Hunt</AUTHOR>' >> Jig.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Jig.ppd
 	$(NOECHO) $(ECHO) '        <PERLCORE VERSION="5,008004,0,0" />' >> Jig.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::Deep" />' >> Jig.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::More" />' >> Jig.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="strict::" />' >> Jig.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="warnings::" />' >> Jig.ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="darwin-thread-multi-2level-5.18" />' >> Jig.ppd

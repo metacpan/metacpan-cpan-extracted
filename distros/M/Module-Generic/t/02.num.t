@@ -197,7 +197,7 @@ ok( $n != $n2, 'Not equal number' );
 ok( $n eq 1281284, 'Equal as string' );
 ok( $n ne $n2, 'Not equal as string' );
 my $bool = $n != 'Bonjour';
-isa_ok( $bool, 'Module::Generic::Boolean', 'Returning boolean object' );
+# isa_ok( $bool, 'Module::Generic::Boolean', 'Returning boolean object' );
 is( ++$n, 1281285, 'Incrementing' );
 is( $n++, 1281286, 'Incrementing (bis)' );
 is( $n--, 1281285, 'Decrementing' );

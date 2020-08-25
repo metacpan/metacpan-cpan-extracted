@@ -25,9 +25,36 @@ The purpose of this class/package is to provide an object-oriented approach at a
 
 Provided with an optional array reference or an array object such as L<Module::Generic::Array>, this will create a new object and return it.
 
+=head2 as_string
+
+Returns the array as string, which is essentially the same as C<"@array">
+
+It takes an optional boolean value that, if true, will sort the array before.
+
 =head2 as_hash
 
 Returns an hash reference with the keys being the array elements and the hash values their offset value.
+
+It takes an optional hash of options:
+
+=over 4
+
+=item I<start_from>
+
+If true, the offset values will start from the number provided and not 0, as it is the case by default.
+
+=back
+
+Example:
+
+    my $a = Module::Generic::Array->new( [qw( Jack John Peter )] );
+    my $h = $a->as_hash({ start_from => 1 });
+    # $h now is:
+    {
+        Jack => 1,
+        John => 2,
+        Peter => 3,
+    }
 
 =head2 clone
 
@@ -39,7 +66,9 @@ Provided with an offset value and an optional length, and this will remove data 
 
 If no given length is provided, it removes all entries from the offset until the end.
 
-It returns a list of elements removed in list context or an array reference of it in scalar context.
+It returns a list of elements removed in list context or a new array object of it in scalar context.
+
+See also L</splice>
 
 =head2 each
 
@@ -122,6 +151,8 @@ Provided an integer representing an offset and this returns the corresponding va
     $a->get( undef() ); # abc
     $a->get( -1 ); # ghi
 
+See also L</index>
+
 =head2 grep
 
 Provided with some data, and this will do a grep on the array.
@@ -131,6 +162,34 @@ If the data provided is a code reference or a reference to a subroutine, the cod
 If the data is a regular expression, each array entry is tested against it.
 
 It returns a list of matches found in ilst context and a new L<Module::Generic::Array> in scalar context.
+
+=head2 has
+
+This is an alias for L</exists>
+
+=head2 index
+
+Provided with an index of an element in the array and this returns its corresponding value.
+
+It takes an integer and this ensures the value used is an integer by applying L<perlfunc/int>
+
+    my $a = Module::Generic::Array->new( [qw( John Jack Peter )] );
+    $a->index( 1 ); # returns Jack
+
+If there is nothing at the given offset, possibly because the array is smaller, then this would return undef.
+
+=head2 iterator
+
+This returns a new iterator to cycle through all the array items using iterator's method, such as L<Module::Generic::Iterator/next> and L<Module::Generic::Iterator/prev>. Each iterator element is an L<Module::Generic::Iterator::Element> object
+
+    my $i = $a->iterator;
+    while( $i->has_next )
+    {
+        my $elem = $i->next;
+        my $value = $elem->value;
+        # Get the next element relative to our element
+        printf( "Next value is: %s at offset %d\n", $elem->next, $elem->next->pos  );
+    }
 
 =head2 join
 
@@ -147,6 +206,8 @@ Returns the last element of the array. If there are none, instead it will return
 =head2 length
 
 Returns the size of the array, starting from 1, as a L<Module::Generic::Number> object.
+
+This is different from L</size> that returns value from 0 and -1 if the array is empty.
 
 =head2 list
 
@@ -167,6 +228,19 @@ For each iteration of the array, C<$_> is made available.
 =head2 pop
 
 Returns the last entry in the array.
+
+=head2 pos
+
+Provided with some value (references are ok too), and this will return the position of it in the array, or undef if nothing was found.
+
+    my $a = Module::Generic::Array->new( [qw( John Jack Peter )] );
+    my $offset = $a->pos( 'Jack' ); # returns 1
+    $a->pos( 'Bob' ); # Returns undef
+    my $hash = { first_name => 'John', last_name => 'Doe' };
+    $a->push( $hash );
+    $a->pos( $hash ); # Returns 3
+
+Note that it returns the position in the array of the first occurrence found. Maybe I should consider returning a list of all occurrences in list context?
 
 =head2 push
 
@@ -195,7 +269,13 @@ Returns the size of the array. It basically calls L</length>
 
 =head2 set
 
-Provided with an array or an array-based object and this replace all the data in the current object by the ones provided.
+Provided with an array, an array reference or an array-based object and this replaces all the data in the current object by the ones provided.
+
+Note that if an array object is provided, it will copy the content of that object and not set the array object itself.
+
+    $a->set( qw( John Jack Peter ) ); # Using an array of elements
+    $a->set( [qw( John Jack Peter )] ); # Using an array reference of elements
+    $a->set( $a2 ); # Using another array object, whatever its class may be
 
 =head2 shift
 
@@ -203,7 +283,11 @@ Remove the first entry and returns it.
 
 =head2 size
 
-Returns the size of the array starting from 1, and 0 if the array is empty, as a L<Module::Generic::Number> object.
+Returns the size of the array starting from 0, and -1 if the array is empty, as a L<Module::Generic::Number> object.
+
+This is equivalent to the perl variable C<$#> as documented in L<perldata>. It returns the last index in the array.
+
+This is different from L</length> that returns value from 1 and 0 if the array is empty.
 
 =head2 sort
 
@@ -211,7 +295,13 @@ Sort the array and return the new array as a list in list context or a new L<Mod
 
 =head2 splice
 
-Takes the same arguments as the L<perlfunc/"splice"> function and returns the result.
+Takes the same arguments as the L<perlfunc/"splice"> function, but its return value is different.
+
+If L</splice> is called to add new element, the array object is returned to allow chaining.
+
+If no argument is provided, it just empties the array and return the array object is returned to allow chaining.
+
+When offset and/or length are provided, it returns the list of elements found.
 
 =head2 split
 

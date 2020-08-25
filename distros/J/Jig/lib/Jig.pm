@@ -1,6 +1,6 @@
 package Jig;
 
-our $VERSION = '0.22.0';
+our $VERSION = '0.22.1';
 
 1;
 

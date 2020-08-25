@@ -18,9 +18,11 @@ no_index:
     - t
     - inc
 requires:
+  Test::Deep: '0'
+  Test::More: '0'
   perl: '5.008004'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/jhunt/jig.git
-version: v0.22.0
+version: v0.22.1

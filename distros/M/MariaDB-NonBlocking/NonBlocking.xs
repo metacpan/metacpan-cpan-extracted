@@ -15,21 +15,7 @@
     maria->query_results = MUTABLE_SV(newAV()); \
 } STMT_END
 
-/* newer connector-c releases just have MARIADB_PACKAGE_VERSION_ID which we can use. Yay
- * Otherwise we need to define it. Anti-yay.
- * */
-#ifndef MARIADB_PACKAGE_VERSION_ID
-#  if defined SERVER_STATUS_IN_TRANS_READONLY
-#    define MARIADB_PACKAGE_VERSION_ID 30004
-#  elif defined MARIADB_BASE_VERSION
-#    define MARIADB_PACKAGE_VERSION_ID 30003
-#  elif defined TLS_LIBRARY_VERSION
-#    define MARIADB_PACKAGE_VERSION_ID 30002
-#  elif defined MYSQL_CLIENT_reserved22
-#    define MARIADB_PACKAGE_VERSION_ID 30000
-# endif
-#endif
-
+/* newer connector-c releases just have MARIADB_PACKAGE_VERSION_ID which we can use. Yay */
 #ifdef MARIADB_PACKAGE_VERSION_ID
 #  if MARIADB_PACKAGE_VERSION_ID >= 30002
 #    define HAVE_SSL_ENFORCE
@@ -145,12 +131,6 @@ void
 THX_disconnect_generic(pTHX_ MariaDB_client* maria)
 #define disconnect_generic(maria) THX_disconnect_generic(aTHX_ maria)
 {
-    if ( maria->run_query ) {
-        SvREFCNT_dec(maria->query_sv);
-        maria->query_sv  = NULL;
-        maria->run_query = FALSE;
-    }
-
     if ( maria->res ) {
         /* do a best attempt... */
         int status = mysql_free_result_start(maria->res);
@@ -165,6 +145,14 @@ THX_disconnect_generic(pTHX_ MariaDB_client* maria)
         mysql_close(maria->mysql);
         Safefree(maria->mysql);
         maria->mysql = NULL;
+    }
+
+    if ( maria->run_query ) {
+        if ( maria->query_sv ) {
+            SvREFCNT_dec(maria->query_sv);
+            maria->query_sv  = NULL;
+        }
+        maria->run_query = FALSE;
     }
 
     maria->is_cont       = FALSE;
@@ -840,6 +828,7 @@ THX_quote_sv(pTHX_ MariaDB_client* maria, SV* to_be_quoted)
     STRLEN new_len_needed;
     STRLEN to_be_quoted_len;
     char * escaped_buffer;
+    char * escaped_buffer_end;
     const char* to_be_quoted_pv;
     SV *quoted_sv;
 
@@ -862,10 +851,16 @@ THX_quote_sv(pTHX_ MariaDB_client* maria, SV* to_be_quoted)
     new_len_needed = to_be_quoted_len * 2 + 3;
 
     quoted_sv      = newSV(new_len_needed);
-    escaped_buffer = SvPVX_mutable(quoted_sv);
-    escaped_buffer[0] = '\'';
-
+    SvUPGRADE(quoted_sv, SVt_PV);
     SvPOK_on(quoted_sv);
+
+    escaped_buffer     = SvPVX_mutable(quoted_sv);
+    escaped_buffer_end = escaped_buffer + new_len_needed;
+    escaped_buffer[0]  = '\'';
+
+    if( escaped_buffer > escaped_buffer_end ) {
+        croak("MariaDB::NonBlocking ASSERT FAILURE: quote() is writing past the end of the buffer: %p %p", (void*)escaped_buffer, (void*)escaped_buffer_end);
+    }
 
     new_length = mysql_real_escape_string(
         maria->mysql,
@@ -1281,7 +1276,8 @@ CODE:
         bool need_utf8_on               = cBOOL(SvUTF8(query));
         STRLEN max_size_of_query_string;
         const char* query_pv            = SvPV(query, max_size_of_query_string);
-        char *d = NULL;
+        char *d   = NULL;
+        char *end = NULL;
         IV num_bind_params;
 
         if ( max_size_of_query_string == 0 )
@@ -1295,13 +1291,16 @@ CODE:
 
         IV i = 0;
         for ( ; i < num_bind_params; i++ ) {
-            SV* query_param = *av_fetch(bind_av, i, FALSE);
+            SV** query_param_svp = av_fetch(bind_av, i, FALSE);
+            SV* query_param;
 
-            if ( !SvOK(query_param) ) {
+            if ( !query_param_svp || !*query_param_svp || !SvOK(*query_param_svp) ) {
                 /* will add a NULL, so +4 */
                 max_size_of_query_string += 4;
                 continue;
             }
+
+            query_param = *query_param_svp;
 
             if ( SvGMAGICAL(query_param) ) /* get GET magic */
                 mg_get(query_param);
@@ -1313,6 +1312,9 @@ CODE:
             max_size_of_query_string += sv_len(query_param)*2+1; /* should be +2, but we are replacing a question mark so */
         }
 
+        /* Extra four bytes our of paranoia */
+        max_size_of_query_string += 4;
+
         SvGROW(query_with_params, max_size_of_query_string);
         if ( need_utf8_on ) {
             SvUTF8_on(query_with_params);
@@ -1321,13 +1323,15 @@ CODE:
             SvUTF8_off(query_with_params);
         }
 
-        d = SvPVX(query_with_params);
+        d   = SvPVX(query_with_params);
+        end = d + max_size_of_query_string;
         i = 0; /* back to the start */
         while ( *query_pv ) {
             if ( *query_pv == '?' && !escaped ) {
                 UV new_length = 0;
                 STRLEN to_be_quoted_len;
                 const char* to_be_quoted_pv;
+                SV** to_be_quoted_svp;
                 SV *to_be_quoted;
                 bool upgraded = FALSE;
 
@@ -1336,15 +1340,16 @@ CODE:
                 if ( i >= num_bind_params )
                     croak("Not enough bind params given to run_query");
 
-                to_be_quoted = *av_fetch(bind_av, i++, FALSE);
+                to_be_quoted_svp = av_fetch(bind_av, i++, FALSE);
 
-                if ( !SvOK(to_be_quoted) ) {
+                if ( !to_be_quoted_svp || !*to_be_quoted_svp || !SvOK(*to_be_quoted_svp) ) {
                     *d++ = 'N';
                     *d++ = 'U';
                     *d++ = 'L';
                     *d++ = 'L';
                     continue;
                 }
+                to_be_quoted = *to_be_quoted_svp;
 
                 if ( need_utf8_on && !SvUTF8(to_be_quoted) ) {
                     /* temporarily upgrade to utf8 -- we will downgrade later */
@@ -1390,6 +1395,10 @@ CODE:
         );
 
         *d++ = '\0'; /* never hurts to have a NUL terminated string */
+
+        if( d > end ) {
+            croak("MariaDB::NonBlocking ASSERT FAILURE: query with placeholders is writing past the end of the buffer: %p %p", (void*)d, (void*)end);
+        }
 
         if ( i != num_bind_params ) {
             croak("Too many bind params given for query! Got %"IVdf", query needed %"IVdf, num_bind_params, i);
@@ -1507,6 +1516,7 @@ CODE:
     STRLEN retval_actual_len = 0;
     STRLEN max_retval_len    = 0;
     char *d        = NULL; /* dESTINATION */
+    char *end      = NULL;
     IV i           = 0;
     IV items_start = 1; /* 0 is $self */
     IV items_end   = items;
@@ -1565,6 +1575,7 @@ CODE:
         SvUTF8_on(RETVAL);
 
     d = SvPVX(RETVAL);
+    end = d + max_retval_len;
 
     for ( i = items_start; i < items_end; i++ ) {
         SV *identifier = ST(i);
@@ -1615,6 +1626,9 @@ CODE:
         retval_actual_len += 2;
     }
     *d++ = '\0';
+    if( d > end ) {
+        croak("MariaDB::NonBlocking ASSERT FAILURE: quote_identifier() is writing past the end of the buffer: %p %p", (void*)d, (void*)end);
+    }
     SvCUR_set(RETVAL, (STRLEN)retval_actual_len);
 }
 OUTPUT: RETVAL
@@ -1624,4 +1638,10 @@ disconnect(SV* self)
 CODE:
     dMARIA;
     disconnect_generic(maria);
+
+const char*
+mariadb_connector_version()
+CODE:
+RETVAL = MARIADB_PACKAGE_VERSION;
+OUTPUT: RETVAL
 

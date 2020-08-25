@@ -1,7 +1,9 @@
 package App::html::css::sel;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-29'; # DATE
+our $DIST = 'App-html-css-sel'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,8 +21,7 @@ $SPEC{html_css_sel} = {
             pos => 0,
         },
         file => {
-            schema => 'str*',
-            'x.schema.entity' => 'filename',
+            schema => 'filename*',
             pos => 1,
             default => '-',
         },
@@ -72,7 +73,7 @@ App::html::css::sel - Select HTML elements using CSS selector syntax
 
 =head1 VERSION
 
-This document describes version 0.003 of App::html::css::sel (from Perl distribution App-html-css-sel), released on 2019-07-26.
+This document describes version 0.004 of App::html::css::sel (from Perl distribution App-html-css-sel), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -95,9 +96,10 @@ Arguments ('*' denotes required arguments):
 
 =item * B<expr>* => I<str>
 
-=item * B<file> => I<str> (default: "-")
+=item * B<file> => I<filename> (default: "-")
 
 =item * B<match_action> => I<str> (default: "print-as-string")
+
 
 =back
 
@@ -139,7 +141,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

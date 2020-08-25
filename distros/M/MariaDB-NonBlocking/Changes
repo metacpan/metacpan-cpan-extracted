@@ -1,5 +1,9 @@
 Revision history for MariaDB-NonBlocking
 
+0.26    2020-08-21
+        * Catch writing past the end of the buffer when quoting
+          values & identifiers.
+
 0.25    2020-08-11
         * When bundling mariadb-connector-c, use the system zlib
           instead of the bundled one -- potentially sidestepping

@@ -22,5 +22,5 @@ requires:
   Math::MPFR: '4.14'
 resources:
   repository: https://github.com/sisyphus/math-mpc.git
-version: '1.11'
+version: '1.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

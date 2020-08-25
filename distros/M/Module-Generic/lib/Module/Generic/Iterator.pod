@@ -1,0 +1,106 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Generic::Iterator - An Array Iterator Object Class
+
+=head1 SYNOPSIS
+
+    my $i = Module::Generic::Iterator->new( [qw( Joe John Mary )] );
+    # or also:
+    my $a = Module::Generic::Array->new( [qw( Joe John Mary )] );
+    my $i = $a->iterator;
+    while( $i->has_next )
+    {
+        my $elem = $i->next;
+        my $value = $elem->value;
+        # Get the next element relative to our element
+        printf( "Next value is: %s at offset %d\n", $elem->next, $elem->next->pos  );
+    }
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This provides an object oriented array iterator. Each of its elements are L<Module::Generic::Iterator::Element> object
+
+=head1 METHODS
+
+=head2 new
+
+Provided with an array reference or an L<Module::Generic::Array> object, and this will create a new iterator and return it.
+
+=head2 eof
+
+Returns true if the position in the iterator has reached the end of the array.
+
+=head2 find
+
+Creates a clone of the current array object and returns it.Provided wit an array element and this returns its position in the array starting at 0.
+
+If nothing was found, this returns undef.
+
+=head2 first
+
+Returns the first element of the array.
+
+=head2 has_next
+
+Returns true if there is another item after the current one.
+
+=head2 has_prev
+
+Returns true if there is another item before the current one.
+
+=head2 last
+
+Returns the last element of the array.
+
+=head2 length
+
+Returns the size of the array, starting from 1, as a L<Module::Generic::Number> object.
+
+=head2 next
+
+Returns the next L<Module::Generic::Iterator::Element> object or undef if there are no more element.
+
+=head2 pos
+
+Sets or returns the current position in the array.
+
+This is an lvalue method.
+
+    $e->pos = 10; # Sets the current position to 10
+    my $pos = $e->pos; # Returns the current position
+
+=head2 prev
+
+Returns the previous L<Module::Generic::Iterator::Element> object or undef if there are no more previous element.
+
+=head2 reset
+
+Reset the position inside the array and sets it to 0.
+
+=head2 _find_pos
+
+Provided with an item, this returns its position in the array or undef if it is not in the array.
+
+=head1 SEE ALSO
+
+L<Module::Generic::Iterator::Element>, L<Module::Generic::Array>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

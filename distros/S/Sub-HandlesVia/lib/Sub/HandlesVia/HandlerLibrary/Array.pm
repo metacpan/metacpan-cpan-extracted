@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Array;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013';
+our $VERSION   = '0.014';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -53,7 +53,7 @@ my $additional_validation_for_push_and_unshift = sub {
 		my @rv = $coercion
 			? (
 				$self->_process_template(
-					'my @shv_values = map $shv_type_for_values->assert_coerce($_), @ARG',
+					'my @shv_values = map $shv_type_for_values->assert_coerce($_), @ARG;',
 					%$callbacks,
 				),
 				{ '$shv_type_for_values' => \$ti->{value_type} },

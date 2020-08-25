@@ -107,7 +107,7 @@ my %options = (
   ],
   LICENSE  => 'perl',
   VERSION_FROM => 'MPC.pm',
-  clean   => { FILES => 'out1.txt out2.txt out3.txt out4.txt out5.txt out6.txt out7.txt save_child_setting.txt' },
+  clean   => { FILES => 'out1.txt out2.txt out3.txt out4.txt out5.txt out6.txt out7.txt out8.txt save_child_setting.txt' },
   META_MERGE => {
    'meta-spec' => { version => 2 },
     resources => {

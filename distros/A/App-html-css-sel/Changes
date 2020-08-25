@@ -1,3 +1,9 @@
+0.004   2020-04-29  Released-By: PERLANCAR; Urgency: low
+
+	- Tweak Rinci metadata: replace deprecated
+	  x.schema.{,element_}entity with more specific schema.
+
+
 0.003   2019-07-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename utility from htmlsel to html-css-sel to be more

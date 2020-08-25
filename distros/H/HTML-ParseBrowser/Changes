@@ -1,5 +1,9 @@
 Revision history for Perl module HTML::ParseBrowser
 
+1.15 2020-08-25 NEILB
+    - "Win64" in the user agent string was resulting in wrong version
+      of Windows being reported. Bug fix from Marc Bradshaw.
+
 1.14 2020-02-20 NEILB
     - Added support for Chrome-based Edge.
       Even though the browser string says "Edg", we return the name as Edge

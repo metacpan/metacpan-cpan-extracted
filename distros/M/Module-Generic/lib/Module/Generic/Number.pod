@@ -58,6 +58,8 @@ Module::Generic::Number - Number Manipulation Object Class
     $n->from_binary( "1111101000" ) # 1000
     $n->from_hex( "0x400" ) # 1000
     my $n3 = $n->clone( 3.14159265358979323846 )->int # 3
+    $n3->is_even # false
+    $n3->is_odd # true
     # Uses POSIX::signbit
     $n3->is_negative # 0
     $n3->is_positive # 1
@@ -95,7 +97,7 @@ Module::Generic::Number - Number Manipulation Object Class
 
 =head1 VERSION
 
-    v0.3.3
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -387,6 +389,12 @@ Returns the integer portion of the number object. See L<perlfunc/"int"> for more
     # Assuming $n is an object for 3.14159265358979323846
     $n->int # 3
 
+=head2 is_even
+
+Returns true if the number is even, i.e. if the modulus of the number divided by 2 is 0.
+
+See L</is_odd>
+
 =head2 is_finite
 
 Rturns true if the number is finite, i.e. not infinity. See L<POSIX/"isfinite">
@@ -414,6 +422,12 @@ Returns true if the number object is negative, false otherwise. See L<POSIX/"sig
 =head2 is_normal
 
 Returns true if the argument is normal (that is, not a subnormal/denormal, and not an infinity, or a not-a-number). See L<POSIX/"isnormal">
+
+=head2 is_odd
+
+Returns true if the number is odd, i.e. if the modulus of the number divided by 2 is 1.
+
+See L</is_even>
 
 =head2 is_positive
 

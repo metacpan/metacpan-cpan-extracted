@@ -278,6 +278,22 @@ This returns the keys as an L<Module::Generic::Array> object, then returns the s
 
 This returns the number of keys in the hash, as a L<Module::Generic::Number> object.
 
+=head2 map
+
+Provided with a code reference and this calls L<perlfunc/map> and pass the code reference the hash key and its value.
+
+It returns a regular list, i.e. not an object, just like perl's L<perlfunc/map> would do.
+
+=head2 map_array
+
+Does the same as L</map> above, except it returns a new array as a L<Module::Generic::Array> object.
+
+=head2 map_hash
+
+Does the same as L</map> above, except it returns a new L<Module::Generic::Hash> object.
+
+For this to work properly, the code reference needs to return a key-value pair.
+
 =head2 merge
 
 Provided with an hash reference and an optional hash of parameters and this will mergge the given hash with hash in our object. It does so recursively and prevents looping by using L<Scalar::Util/"refaddr">.

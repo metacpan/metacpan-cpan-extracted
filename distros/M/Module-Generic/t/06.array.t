@@ -114,7 +114,7 @@ is( $a2->reverse->as_string, 'but disapprove I', 'reverse' );
 $a2->set( [qw( this has been set )] );
 is( "@$a2", 'this has been set', 'set' );
 is( $a2->shift, 'this', 'shift' );
-is( $a2->size, 3, 'size' );
+is( $a2->size, 2, 'size' );
 ok( $a2->length->is_positive, 'Accessing number object method' );
 is( $a->sort->as_string, 'I I but death defend disapprove it of right say say, the to to what will you your', 'sort' );
 is( $a->sort(sub
