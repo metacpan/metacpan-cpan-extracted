@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Acme::CPANModules::CLI::Wrapper::UnixCommand" : "0.002"
+            "Acme::CPANModules::CLI::Wrapper::UnixCommand" : "0.003"
          }
       },
       "test" : {
@@ -46,7 +46,8 @@
       "x_mentions" : {
          "x_mentions" : {
             "App::DiffDocText" : "0",
-            "App::diffwc" : "0"
+            "App::diffwc" : "0",
+            "App::sdif" : "0"
          }
       }
    },
@@ -62,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-DiffWrappers"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

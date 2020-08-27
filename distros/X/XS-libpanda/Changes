@@ -1,3 +1,5 @@
+1.4.7    27.08.2020
+            - exceptions: increase default backtrace depth from 50 to 150
 1.4.6    01.07.2020
             - exceptions: use more performant backtraces gathering interfaces
 1.4.5    28.06.2020

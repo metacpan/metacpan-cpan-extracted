@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-19'; # DATE
+our $DATE = '2020-08-26'; # DATE
 our $DIST = 'App-YoutubeDlIf'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 # FRAGMENT id=shcompgen-hint command=_youtube-dl
 
 use 5.010001;
@@ -36,13 +36,19 @@ youtube-dl-if - Download videos using youtube-dl with extra selection/filtering
 
 =head1 VERSION
 
-This document describes version 0.003 of youtube-dl-if (from Perl distribution App-YoutubeDlIf), released on 2020-04-19.
+This document describes version 0.004 of youtube-dl-if (from Perl distribution App-YoutubeDlIf), released on 2020-08-26.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % youtube-dl-if [options] <url_or_id> ...
+ % youtube-dl-if [--debug] [--format=name]
+     [--if-duration-not-longer-than=s] [--if-duration-not-shorter-than=s]
+     [--if-not-yet] [--json] [--log-file=s] [--log-level=level]
+     [--(no)naked-res] [--no-if-not-yet] [--noif-not-yet]
+     [--page-result[=program]] [--quiet] [--restart-if-no-output-after=s]
+     [--trace] [--url-or-id=s+] [--urls-or-ids-json=s] [--verbose]
+     <url_or_id> ...
 
 =head1 DESCRIPTION
 
@@ -62,7 +68,7 @@ File that contains list of download filenames.
 
 Default value:
 
- "/home/s1/notes/download-logs.org"
+ "/home/u1/notes/download-logs.org"
 
 =item B<--url-or-id>=I<s@>*
 
@@ -100,8 +106,14 @@ or:
 
     U9v2S49sHeQ
 
-When a video ID is found then it is assumed to be already downloaded in the past
-and will not be downloaded again.
+When a video ID in the argument is found then it is assumed to be already
+downloaded in the past and will not be downloaded again.
+
+Limitations: youtube ID is currently only looked up in arguments, so if you
+download a playlist, the items in the playlist are not checked against the ID's
+in the log file. Another limitation is that you currently have to maintain the
+log file yourself, e.g. by using 'ls -l >> ~/download-logs.org' everytime you
+finish downloading files.
 
 
 =back
@@ -172,6 +184,14 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
+
+=back
+
+=head2 Restart options
+
+=over
+
+=item B<--restart-if-no-output-after>=I<s>
 
 =back
 

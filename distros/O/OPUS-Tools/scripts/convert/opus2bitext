@@ -1,0 +1,353 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+#
+#
+# compatible options with opus2moses
+#
+#  -d dir ....... done
+#  -e srcout .... done
+#  -f trgout .... done
+#  -b alg-file .. done
+#  -1             done
+#  -c and -C .... done
+#  -x max         done (but must come from same linkGrp!)
+#  -n file-regex  done
+#  -i ........... done
+#
+#  -p alg-file .. plain sentalg file  skip?
+#
+#  -u and -U  ... source langid filter
+#  -w and -W  ... target langid filter
+
+#  -m ........... multiple files foreach aligned document
+#
+#  -s srcfactors ..... skip this?
+#  -t trgfactors ..... skip this?
+#  -r ................ not necessary?
+#
+# add option for empty lines for doc boundaries?
+#
+#   -E ............... also include empty alignments (1:0 etc)
+#   -D ............... add document boundaries (empty line)
+#
+# other differences to opus2moses:
+#  - no length filtering
+#
+
+use strict;
+use utf8;
+use open ':locale';
+
+use FindBin qw($Bin);
+use lib "$Bin/../../lib";
+use OPUS::Tools;
+
+use IO::File;
+use File::Basename qw/dirname basename/;
+use XML::Parser;
+use XML::Writer;
+
+## all options from opus2moses
+## How much do we want to be compatible?
+use vars qw($opt_1 $opt_b $opt_c $opt_C $opt_d $opt_D $opt_e $opt_E $opt_f $opt_h 
+            $opt_i $opt_l $opt_m $opt_M $opt_n $opt_p $opt_r 
+            $opt_s $opt_S $opt_t $opt_u $opt_U $opt_v $opt_w $opt_W $opt_x);
+use Getopt::Std;
+
+getopts('b:c:C:s:t:d:Dn:ie:Ef:hp:l1x:u:U:vw:W:rmMS');
+
+my $CorpusDir = $opt_d || '.';
+
+
+print STDERR "read sentence alignments\n";
+my $AlignParser = new XML::Parser(Handlers => {Start => \&AlignTagStart,
+					       End => \&AlignTagEnd});
+my $AlignHandler = $AlignParser->parse_start;
+
+my $SrcDoc = undef;
+my $TrgDoc = undef;
+my @Links = ();
+
+my $LinkScoreField = $opt_C || 'certainty';
+
+## print a new alignment file
+my $XmlWriter = &open_cesalign($opt_b) if ($opt_b);
+
+my $SrcOut = IO::File->new($opt_e, '>:utf8') if ($opt_e);
+my $TrgOut = IO::File->new($opt_f, '>:utf8') if ($opt_f);
+
+my $count = 0;
+my $readmax = $opt_x;
+while ( &read_linkgrp($AlignHandler,\$SrcDoc,\$TrgDoc,\@Links, 
+		      '-include-empty'   => $opt_E,
+		      '-one-to-one'      => $opt_1,
+		      '-read-max'        => $readmax,
+		      '-score-attribute' => $LinkScoreField,
+		      '-score-threshold' => $opt_C) ){
+
+    next unless ($SrcDoc && $TrgDoc);
+
+    ## skip certain files
+    if (&skip_file($opt_n, $SrcDoc, $TrgDoc, $opt_i)){
+	print STDERR "skip $SrcDoc <-> $TrgDoc\n";
+	next;
+    }
+
+    print STDERR "process $SrcDoc <-> $TrgDoc (",scalar(@Links)," links)\n";
+
+    my %SrcInLink = ();
+    my %TrgInLink = ();
+    &get_linked_sentids(\@Links, \%SrcInLink, \%TrgInLink);
+
+    my @SrcSents = ();
+    my @TrgSents = ();
+    my %SrcIdx = ();
+    my %TrgIdx = ();
+
+    print STDERR "read ",scalar(keys %SrcInLink)," sentences from $SrcDoc\n";
+    &read_sentences($SrcDoc, $CorpusDir, \%SrcInLink, \@SrcSents, \%SrcIdx);
+
+    print STDERR "read ",scalar(keys %TrgInLink)," sentences from $TrgDoc\n";
+    &read_sentences($TrgDoc, $CorpusDir, \%TrgInLink, \@TrgSents, \%TrgIdx);
+
+    print STDERR "print bitext\n";
+    &print_bitext(\@Links,\@SrcSents,\@TrgSents,\%SrcIdx,\%TrgIdx,$SrcOut,$TrgOut);
+    &print_linkgrp($XmlWriter,$SrcDoc,$TrgDoc,\@Links) if ($opt_b);
+
+    $count += scalar @Links;
+    if ($opt_x){
+	last if ($count>=$opt_x);
+	$readmax = $opt_x - $count;
+    }
+
+    ## document boundary
+    print "\n" if ($opt_D);
+    print $SrcOut "\n" if ($opt_e);
+    print $TrgOut "\n" if ($opt_f);
+}
+
+$SrcOut->close() if ($opt_e);
+$TrgOut->close() if ($opt_f);
+
+&close_cesalign($XmlWriter) if ($opt_b);
+
+
+
+
+
+
+sub skip_file{
+    my ($pattern, $SrcDoc, $TrgDoc, $inverse) = @_;
+    return 0 unless ($pattern);
+
+    if ($inverse){
+	return 1 if ($SrcDoc!~/$pattern/);
+	return 1 if ($TrgDoc!~/$pattern/);
+    }
+    else{
+	return 1 if ($SrcDoc=~/$pattern/);
+	return 1 if ($TrgDoc=~/$pattern/);
+    }
+    return 0;
+}
+
+
+sub open_cesalign{
+    my $file = shift;
+    my $fh = IO::File->new(">$file");
+    my $XmlWriter = XML::Writer->new( OUTPUT => $fh,
+				      DATA_MODE => 1,
+				      DATA_INDENT => 1 );
+    $XmlWriter->xmlDecl("UTF-8");
+    $XmlWriter->doctype('cesAlign', '-//CES//DTD XML cesAlign//EN', 'http://www.xces.org/dtd/xcesAlign.dtd');
+    $XmlWriter->startTag("cesAlign",version => '1.0');
+    return $XmlWriter;
+}
+
+sub close_cesalign{
+    my $XmlWriter = shift;
+    $XmlWriter->endTag('cesAlign');
+    $XmlWriter->end();
+    my $fh = $XmlWriter->getOutput();
+    $fh->close();
+}
+
+sub print_linkgrp{
+    my ($XmlWriter,$SrcDoc,$TrgDoc,$links) = @_;
+
+    $XmlWriter->startTag('linkGrp', targType => 's',
+			 fromDoc => $SrcDoc, toDoc => $TrgDoc );
+    foreach (@{$links}){
+	$XmlWriter->emptyTag('link', xtargets => $_);
+    }
+    $XmlWriter->endTag('linkGrp');
+}
+
+
+## get sentence IDs from the individual links
+sub get_linked_sentids{
+    my ($links, $SrcInLink, $TrgInLink) = @_;
+    foreach my $l (@{$links}){
+	my ($src,$trg) = split(/\;/,$l);
+	foreach (split(/\s+/,$src)){
+	    $$SrcInLink{$_} = $l;
+	}
+	foreach (split(/\s+/,$trg)){
+	    $$TrgInLink{$_} = $l;
+	}
+    }
+}
+
+
+## read all sentences from the corpus that have been part of alignments
+sub read_sentences{
+    my ($doc,$dir,$links,$sents,$idx) = @_;
+
+    my $XmlParser = new XML::Parser(Handlers => {Start => \&XmlStart,
+						 Char => \&XmlChar,
+						 End => \&XmlEnd});
+    my $XmlHandler = $XmlParser->parse_start;
+
+    $XmlHandler->{__LINKS__} = $links || {};
+    $XmlHandler->{__SENTS__} = $sents || [];
+    $XmlHandler->{__IDX__}   = $idx   || {};
+
+    my $fh;
+    die "cannot open $doc!\n" unless (&open_opus_document(\$fh,$dir,$doc));
+
+    my $NrOfSents = scalar(keys %{$links});
+    while (defined(my $line = $fh->getline())){
+	s/&(?!(#\d+|\w+);)/&amp;/gs;
+	eval { $XmlHandler->parse_more($line); };
+	if ($@){
+	    print STDERR $line;
+	    die $@;
+	}
+	## assume that we're done if there are enough sentences in the buffer
+	return if (scalar(@{$sents}) eq $NrOfSents);
+    }
+}
+
+
+sub print_bitext{
+    my ($links,$SrcSents,$TrgSents,$SrcIdx,$TrgIdx,$SrcOut,$TrgOut) = @_;
+
+    foreach my $l (@{$links}){
+	my ($src,$trg) = split(/\;/,$l);
+	foreach my $sid (split(/\s+/,$src)){
+	    if ($SrcOut){ print $SrcOut $$SrcSents[$$SrcIdx{$sid}],' '; }
+	    else{ print $$SrcSents[$$SrcIdx{$sid}],' '; }
+	}
+	if ($SrcOut){ print $SrcOut "\n"; }
+	else{ print "\t"; }
+	foreach my $tid (split(/\s+/,$trg)){
+	    if ($TrgOut){ print $TrgOut $$TrgSents[$$TrgIdx{$tid}],' '; }
+	    else{ print $$TrgSents[$$TrgIdx{$tid}],' '; }
+	}
+	if ($TrgOut){ print $TrgOut "\n"; }
+	else{ print "\n"; }
+    }
+}
+
+
+## read next linkgrp from the sentence alignment file
+
+sub read_linkgrp{
+    my ($parser, $SrcDoc, $TrgDoc, $links, %opt) = @_;
+
+    $$SrcDoc    = undef;
+    $$TrgDoc    = undef;
+    @{$links}   = ();
+
+    $parser->{__SRCDOC__} = $SrcDoc;
+    $parser->{__TRGDOC__} = $TrgDoc;
+    $parser->{__LINKS__}  = $links;
+    $parser->{__OPT__}    = \%opt;
+    $parser->{__EOD__}    = 0;
+
+    while (<>){
+	## fix un-escaped XML entities (do we need this?)
+	s/&(?!(#\d+|\w+);)/&amp;/gs;
+	eval { $parser->parse_more($_); };
+	if ($@){
+	    print STDERR $_;
+	    die $@;
+	}
+	last if ($parser->{__EOD__});
+	if ($opt{'-read-max'}){
+	    return 1 if (@{$links}>=$opt{'-read-max'});
+	}
+    }
+    return $parser->{__EOD__};
+}
+
+
+
+sub XmlStart{
+    my ($p,$e,%a)=@_;
+
+    if ($e eq 's'){
+	if (exists $p->{__LINKS__}->{$a{id}}){
+	    $p->{__SENT__}    = "";
+	    $p->{__SENTID__}  = $a{id};
+	    %{$p->{__ATTR__}} = %a;
+	}
+    }
+}
+
+sub XmlEnd{
+    if ($_[1] eq 's'){
+	## some more filtering, for example on langID?
+	if (exists $_[0]->{__SENTID__}){
+	    $_[0]->{__SENT__}=~s/\s+/ /gs;
+	    $_[0]->{__SENT__}=~s/^\s+//;
+	    $_[0]->{__SENT__}=~s/\s+$//s;
+	    push(@{$_[0]->{__SENTS__}}, $_[0]->{__SENT__});
+	    $_[0]->{__IDX__}->{$_[0]->{__SENTID__}} = $#{$_[0]->{__SENTS__}};
+	    delete $_[0]->{__SENTID__};
+	}
+    }
+}
+
+sub XmlChar{
+    $_[0]->{__SENT__}.=$_[1] if (exists $_[0]->{__SENTID__});
+}
+
+
+
+
+## XML parser handlers for sentence alignment files
+
+sub AlignTagStart{
+    my ($p,$e,%a)=@_;
+
+    if ($e eq 'linkGrp'){
+	${$p->{__SRCDOC__}} = $a{fromDoc};
+	${$p->{__TRGDOC__}} = $a{toDoc};
+    }
+    elsif ($e eq 'link'){
+	return unless (${$p->{__SRCDOC__}} && ${$p->{__TRGDOC__}});
+	my ($src,$trg) = split(/\;/,$a{xtargets});
+	if ( ($src && $trg) || ( $$p{__OPT__}{'-include-empty'} && ($src || $trg) ) ){
+
+	    ## only 1:1 alignments
+	    if ($$p{__OPT__}{'-one-to-one'}){
+		return if ($src=~/\S\s\S/);
+		return if ($trg=~/\S\s\S/);
+	    }
+
+	    ## score threshold
+	    if ($$p{__OPT__}{'-score-threshold'}){
+		if (exists $a{$$p{__OPT__}{'-score-attribute'}}){
+		    return if ($a{$$p{__OPT__}{'-score-attribute'}} < $$p{__OPT__}{'-score-threshold'});
+		}
+	    }
+
+	    push(@{$p->{__LINKS__}},$a{xtargets});
+	}
+    }
+}
+
+sub AlignTagEnd{
+    $_[0]->{__EOD__} = 1 if ($_[1] eq 'linkGrp');
+}

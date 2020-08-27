@@ -316,6 +316,103 @@ sub test_cookie {
                 },
             },
         },
+        t14a => {                            # SameSite and compatibility settings
+            path    => '/cookie3.html',
+            run     => sub {
+                $self->siteconfig->put('/xao/cookie' => {
+                    common  => {
+                        httponly    => 1,
+                        secure      => 1,
+                        expires     => '+120s',
+                        path        => '/',
+                    },
+                    $cookie_name.'-t14b' => {
+                        samesite    => 'None',
+                    },
+                    $cookie_name.'-t14c' => {
+                        samesite    => 'None',
+                        sscompat    => 1,
+                    },
+                    'c-samesite' => {
+                        sscompat    => 1,
+                    },
+                });
+
+                $self->siteconfig->add_cookie(
+                    -name       => $cookie_name.'-t14a',
+                    -value      => $cookie_value.'-t14a',
+                );
+                $self->siteconfig->add_cookie(
+                    -name       => $cookie_name.'-t14b',
+                    -value      => $cookie_value.'-t14b',
+                );
+                $self->siteconfig->add_cookie(
+                    -name       => $cookie_name.'-t14c',
+                    -value      => $cookie_value.'-t14c',
+                );
+                $self->siteconfig->add_cookie(
+                    -name       => $cookie_name.'-t14d',
+                    -value      => $cookie_value.'-t14d',
+                );
+                $self->siteconfig->add_cookie(
+                    -name       => $cookie_name.'-t14d',
+                    -value      => $cookie_value.'-t14d',
+                    -sscompat   => 1,
+                    -samesite   => 'Lax',
+                    -domain     => [ undef, 'localhost' ],
+                );
+            },
+            expect  => {
+                (map { $_ => {
+                    $cookie_name.'-t14a'            => $cookie_value.'-t14a',
+                    $cookie_name.'-t14a-sscompat'   => undef,
+                    $cookie_name.'-t14b'            => $cookie_value.'-t14b',
+                    $cookie_name.'-t14b-sscompat'   => undef,
+                    $cookie_name.'-t14c'            => $cookie_value.'-t14c',
+                    $cookie_name.'-t14c-sscompat'   => $cookie_value.'-t14c',
+                    $cookie_name.'-t14d'            => $cookie_value.'-t14d',
+                    $cookie_name.'-t14d-sscompat'   => $cookie_value.'-t14d',
+                    #
+                    'c-secure'                      => 'v-secure',              # From cookie3.html
+                    'c-samesite'                    => 'v-samesite',
+                } } qw(config stored)),
+                baked => {
+                    $cookie_name.'-t14a'            => [ qr/$cookie_name-t14a=$cookie_value-t14a/, qr/secure/i, qr/httponly/i, sub { $_[0] !~ qr/samesite=/i } ],
+                    $cookie_name.'-t14b'            => [ qr/$cookie_name-t14b=$cookie_value-t14b/, qr/secure/i, qr/httponly/i, qr/samesite=none/i],
+                    $cookie_name.'-t14c'            => [ qr/$cookie_name-t14c=$cookie_value-t14c/, qr/secure/i, qr/httponly/i, qr/samesite=none/i],
+                    $cookie_name.'-t14c-sscompat'   => [ qr/$cookie_name-t14c-sscompat=$cookie_value-t14c/, qr/secure/i, qr/httponly/i ],
+                    $cookie_name.'-t14d'            => [ qr/$cookie_name-t14d=$cookie_value-t14d/, qr/secure/i, qr/httponly/i, qr/samesite=lax/i],
+                    $cookie_name.'-t14d-sscompat'   => [ qr/$cookie_name-t14d-sscompat=$cookie_value-t14d/, qr/secure/i, qr/httponly/i ],
+                    #
+                    'c-secure'                      => [ qr/c-secure=v-secure/, qr/secure/i, qr/httponly/i, sub { $_[0] !~ qr/samesite=/i } ],
+                    'c-samesite'                    => [ qr/c-samesite=v-samesite/, qr/secure/i, qr/httponly/i, qr/samesite=lax/i ],
+                },
+            },
+        },
+        t14b => {                            # After store/parse round trip
+            path    => '/cookie1.html',
+            cookies => {
+                'c-samesite'            => undef,   # Emulating an incompatible browser
+                ($cookie_name.'-t14c')  => undef,
+            },
+            run     => sub {
+                $self->siteconfig->put('/xao/cookie/common/sscompat' => 1);
+            },
+            expect  => {
+                (map { $_ => {
+                    $cookie_name.'-t14a'            => $cookie_value.'-t14a',
+                    $cookie_name.'-t14b'            => $cookie_value.'-t14b',
+                    $cookie_name.'-t14c'            => $cookie_value.'-t14c',
+                    #
+                    'c-secure'                      => 'v-secure',
+                    'c-samesite'                    => 'v-samesite',
+                } } qw(config stored)),
+                cgi => {
+                    'c-samesite'                    => undef,
+                    $cookie_name.'-t14c'            => undef,
+                },
+            },
+        },
     );
 
     my $config=$self->siteconfig;
@@ -375,6 +472,7 @@ sub test_cookie {
 
         # Converting cookies back into a hash
         #
+        my %baked;
         foreach my $cd (@{$config->cookies}) {
             next unless defined $cd;
 
@@ -395,15 +493,19 @@ sub test_cookie {
 
             ### dprint "...cookie name='".$cd->name."' value='".$cd->value." expires=".$expires_text." (".localtime($expires)." - ".($expires<=time ? 'EXPIRED' : 'ACTIVE').")";
 
-            if($expires <= time) {
-                $wcjar->{$cd->name}=undef;
+            if($expires > time) {
+                $wcjar->{$cd->name}=$cd->value;
+                $baked{$cd->name}="$cd";
             }
             else {
-                $wcjar->{$cd->name}=$cd->value;
+                $wcjar->{$cd->name}=undef;
             }
         }
 
         %$cjar=%$wcjar;
+
+        ### dprint "WCJAR=".Dumper($wcjar);
+        ### dprint "BAKED=".Dumper(\%baked);
 
         my $expect=$tdata->{'expect'};
 
@@ -412,15 +514,15 @@ sub test_cookie {
                 "$tname - expected '$expect->{'text'}', got '$text'");
         }
 
-        foreach my $kind (qw(cgi config stored)) {
-            my $cexp=$expect->{$kind} || $expect->{'all'};
+        foreach my $kind (qw(cgi config stored baked)) {
+            my $cexp=$expect->{$kind} || ($kind eq 'baked' ? undef : $expect->{'all'});
             next unless $cexp;
 
             my $getter;
             if($kind eq 'cgi') {
                 $getter=sub {
                     my $n=shift;
-                    return $cgi->cookie($n);
+                    return $self->get_cookie($cgi, $n);
                 };
             }
             elsif($kind eq 'config') {
@@ -435,21 +537,43 @@ sub test_cookie {
                     return $wcjar->{$n};
                 };
             }
+            elsif($kind eq 'baked') {
+                $getter=sub {
+                    my $n=shift;
+                    return $baked{$n};
+                };
+            }
             else {
                 $self->assert(undef,
                     "Invalid cookie checking kind '$kind'");
             }
 
-            while(my ($n,$ev)=(each %$cexp)) {
+            while(my ($n,$evlist)=(each %$cexp)) {
                 my $cv=$getter->($n);
 
-                if(defined $ev) {
-                    $self->assert(defined($cv) && $ev eq $cv,
-                        "Expected to have cookie '$n' set to '".($ev || 'UNDEF')."', got '".($cv || 'UNDEF')."' for test $tname ($kind)");
-                }
-                else {
-                    $self->assert(!defined($cv),
-                        "Expected to have no value for '$n', got '".($cv || '<UNDEF>')."' for test $tname ($kind)");
+                $evlist=[$evlist] if !ref $evlist;
+
+                foreach my $ev (@$evlist) {
+                    if(defined $ev && ref $ev eq 'Regexp') {
+                        my $matching=defined($cv) && ($cv =~ $ev);
+                        ### dprint "=====================REGEXP== ev='$ev' cv='$cv' match=",$matching;
+                        $self->assert($matching,
+                            "Expected cookie '$n' to match '".($ev // '<UNDEF>')."', got '".($cv // '<UNDEF>')."' for test $tname ($kind)");
+                    }
+                    elsif(defined $ev && ref $ev eq 'CODE') {
+                        my $matching=defined($cv) && $ev->($cv);
+                        ### dprint "=====================CODE==== ev='$ev' cv='$cv' match=",$matching;
+                        $self->assert($matching,
+                            "Expected cookie '$n' to match CODE, got '".($cv // '<UNDEF>')."' for test $tname ($kind)");
+                    }
+                    elsif(defined $ev) {
+                        $self->assert(defined($cv) && $ev eq $cv,
+                            "Expected to have cookie '$n' set to '".($ev // '<UNDEF>')."', got '".($cv // '<UNDEF>')."' for test $tname ($kind)");
+                    }
+                    else {
+                        $self->assert(!defined($cv),
+                            "Expected to have no value for '$n', got '".($cv // '<UNDEF>')."' for test $tname ($kind)");
+                    }
                 }
             }
         }
@@ -460,6 +584,16 @@ sub test_cookie {
             dprint "IGNORED(OK-STDERR): ".substr($stderr,0,60)."...";
         }
     }
+}
+
+###############################################################################
+
+# The important element here is 'get_cookie' name, which is checked in
+# CGI for compatibility warning.
+
+sub get_cookie {
+    my ($self,$cgi,$name)=@_;
+    return $cgi->cookie($name);
 }
 
 ###############################################################################

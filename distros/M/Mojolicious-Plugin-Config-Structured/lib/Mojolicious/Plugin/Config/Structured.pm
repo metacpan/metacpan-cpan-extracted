@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Config::Structured;
-$Mojolicious::Plugin::Config::Structured::VERSION = '1.002';
+$Mojolicious::Plugin::Config::Structured::VERSION = '1.003';
 # ABSTRACT: Mojolicious Plugin for Config::Structured: locates and reads config and definition files and loads them into a Config::Structured instance, made available globally as 'conf'
 
 use 5.022;
@@ -34,7 +34,8 @@ sub register ($self, $app, $params) {
 
   my $conf = Config::Structured->new(
     config    => $conf_file,
-    structure => $def_file
+    structure => $def_file,
+    hooks     => $params->{hooks},
   )->__register_default;
 
   $app->helper(
@@ -60,7 +61,7 @@ Mojolicious::Plugin::Config::Structured - Mojolicious Plugin for Config::Structu
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 

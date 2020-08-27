@@ -1,0 +1,20 @@
+
+- better documentation
+
+- fix the use of intralingual links in opus2multi
+
+- read zip files from 64bit archives
+
+- reading from ZIP files in all scripts
+  done for opus-read, opus-cat
+
+- should we add open_document function in general lib file
+  done
+
+- new tools: 
+  moses2opus (including sentence splitter?)	done
+  opus-cat (read files from zip-archives)	done
+  opus2conllu (parsed OPUS data to conllu)
+  opus-website (websites for new releases)	almost done
+
+- more unit tests!

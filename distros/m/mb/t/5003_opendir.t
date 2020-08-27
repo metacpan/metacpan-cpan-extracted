@@ -10,6 +10,7 @@ mb::set_script_encoding('sjis');
 use vars qw(@test);
 
 use vars qw($MSWin32_MBCS);
+# always "0" because qx{chcp} cannot return right value on CPAN TEST
 $MSWin32_MBCS = 0; # ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
 
 BEGIN {

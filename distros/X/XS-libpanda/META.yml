@@ -26,5 +26,5 @@ no_index:
 requires:
   XS::Install: v1.2.18
   perl: '5.012000'
-version: v1.4.6
+version: v1.4.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

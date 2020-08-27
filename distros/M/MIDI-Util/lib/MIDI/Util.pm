@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.0500';
+our $VERSION = '0.0601';
 
 use strict;
 use warnings;
@@ -15,16 +15,19 @@ use Music::Tempo;
 
 sub setup_score {
     my %args = (
-        lead_in => 4,
-        volume  => 120,
-        bpm     => 100,
-        channel => 0,
-        patch   => 0,
-        octave  => 4,
+        lead_in   => 4,
+        volume    => 120,
+        bpm       => 100,
+        channel   => 0,
+        patch     => 0,
+        octave    => 4,
+        signature => '4/4',
         @_,
     );
 
     my $score = MIDI::Simple->new_score();
+
+    set_time_sig($score, $args{signature});
 
     $score->set_tempo( bpm_to_ms($args{bpm}) * 1000 );
 
@@ -150,6 +153,18 @@ sub midi_format {
     return @formatted;
 }
 
+
+sub set_time_sig {
+    my ($score, $signature) = @_;
+    my ($beats, $divisions) = split /\//, $signature;
+    $score->time_signature(
+        $beats,
+        ($divisions == 8 ? 3 : 2),
+        ($divisions == 8 ? 24 : 18 ),
+        8
+    );
+}
+
 1;
 
 __END__
@@ -164,7 +179,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.0500
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -174,9 +189,11 @@ version 0.0500
 
   MIDI::Util::set_chan_patch( $score, 0, 1 );
 
-  my $dump = MIDI::Util::dump('volume');
+  MIDI::Util::set_time_sig( $score, '5/4' );
 
-  my @notes = midi_format('C','C#','Db','D'); # C, Cs, Df, D
+  my $dump = MIDI::Util::dump('volume'); # length, etc.
+
+  my @notes = MIDI::Util::midi_format('C','C#','Db','D'); # C, Cs, Df, D
 
 =head1 DESCRIPTION
 
@@ -189,12 +206,13 @@ C<MIDI::Util> comprises handy MIDI utilities.
   $score = MIDI::Util::setup_score;  # Use defaults
 
   $score = MIDI::Util::setup_score(  # Override defaults
-    lead_in => $beats,
-    volume  => $volume,
-    bpm     => $bpm,
-    channel => $channel,
-    patch   => $patch,
-    octave  => $octave,
+    lead_in   => $beats,
+    volume    => $volume,
+    bpm       => $bpm,
+    channel   => $channel,
+    patch     => $patch,
+    octave    => $octave,
+    signature => $signature,
   );
 
 Set basic MIDI parameters and return a L<MIDI::Simple> object.  If
@@ -203,12 +221,13 @@ include a B<lead_in> by passing C<0> as its value.
 
 Named parameters and defaults:
 
-  lead_in: 4
-  volume:  120
-  bpm:     100
-  channel: 0
-  patch:   0
-  octave:  4
+  lead_in:   4
+  volume:    120
+  bpm:       100
+  channel:   0
+  patch:     0
+  octave:    4
+  signature: 4/4
 
 =head2 set_chan_patch
 
@@ -253,15 +272,17 @@ L<MIDI::Simple>, and L<MIDI::Event> internal lists:
 Change sharp C<#> and flat C<b>, in the list of named notes, to the
 L<MIDI::Simple> C<s> and C<f> respectively.
 
+=head2 set_time_sig
+
+  MIDI::Util::set_time_sig( $score, $signature );
+
+Set the B<score> C<time_signature> based on the given string.
+
 =head1 SEE ALSO
 
 L<MIDI>
 
-L<MIDI::Event>
-
 L<MIDI::Simple>
-
-L<MIDI::Track>
 
 L<Music::Tempo>
 

@@ -1,0 +1,59 @@
+=head1 NAME
+
+XLog::File - XLog backend for logging to file
+
+
+
+=head1 DESCRIPTION
+
+XLog::File is a simple file logging backend. It is written in C++ and is fast.
+
+It periodically checks for file existance by path and recteates it (and all folders) if it's gone.
+
+Also supports autoflush.
+
+=head1 METHODS
+
+=head4 new(\%params)
+
+Parameters are:
+
+=over
+
+=item file (required)
+
+Path to log file. If it doesn't exist it will be created including all folders (like C<mkpath>).
+
+If file could not be opened or written, an error message will be written on stderr and logger will be a stub (will do nothing when you log via XLog) until
+file can be written again.
+
+=item check_freq [=1000]
+
+Frequency in milliseconds of checking log file. If file is deleted or moved, creates file again, including all folders (if they are gone).
+
+If file can not be created or written, an error message will be written on stderr and logger will be a stub (will do nothing when you log via XLog) until
+file can be written again.
+
+=item autoflush [=false]
+
+If true will flush data to file after every log message. This is less efficient, but guarantees that all logs are written in case of application crash (like segfault). 
+
+=back
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>
+
+Crazy Panda LTD
+
+
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut
+
+1;

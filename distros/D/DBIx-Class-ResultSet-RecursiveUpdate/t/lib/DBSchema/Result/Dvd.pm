@@ -46,6 +46,8 @@ __PACKAGE__->belongs_to('current_borrower', 'DBSchema::Result::User', 'current_b
 __PACKAGE__->has_many('dvdtags', 'Dvdtag', { 'foreign.dvd' => 'self.dvd_id' });
 __PACKAGE__->has_many('viewings', 'DBSchema::Result::Viewing', { 'foreign.dvd_id' => 'self.dvd_id' });
 __PACKAGE__->many_to_many('tags', 'dvdtags' => 'tag');
+# same relationship with a name that's different from the column name
+__PACKAGE__->many_to_many('rel_tags', 'dvdtags' => 'rel_tag');
 __PACKAGE__->might_have(
     liner_notes => 'DBSchema::Result::LinerNotes', undef,
     { proxy => [ qw/notes/ ] },

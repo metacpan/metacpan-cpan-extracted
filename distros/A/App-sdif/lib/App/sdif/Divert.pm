@@ -1,7 +1,6 @@
 package App::sdif::Divert;
 
 use v5.14;
-use strict;
 use warnings;
 use utf8;
 use Encode;

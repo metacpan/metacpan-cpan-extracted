@@ -27,7 +27,7 @@ sub get_messages{
 
 sub count_messages{
 	my ($self, $grep) = @_;
-	return scalar( defined $grep ? $self->grep_messages($grep) : $self->get_messages);
+	return scalar( defined $grep ? $self->grep_messages($grep) : @{$self->get_messages});
 }
 
 1;

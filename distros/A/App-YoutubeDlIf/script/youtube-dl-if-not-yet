@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-19'; # DATE
+our $DATE = '2020-08-26'; # DATE
 our $DIST = 'App-YoutubeDlIf'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 # FRAGMENT id=shcompgen-hint command=_youtube-dl
 
 use 5.010001;
@@ -36,13 +36,18 @@ youtube-dl-if-not-yet - Download videos using youtube-dl if not already download
 
 =head1 VERSION
 
-This document describes version 0.003 of youtube-dl-if-not-yet (from Perl distribution App-YoutubeDlIf), released on 2020-04-19.
+This document describes version 0.004 of youtube-dl-if-not-yet (from Perl distribution App-YoutubeDlIf), released on 2020-08-26.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % youtube-dl-if-not-yet [options] <url_or_id> ...
+ % youtube-dl-if-not-yet [--debug] [--format=name]
+     [--if-duration-not-longer-than=s] [--if-duration-not-shorter-than=s]
+     [--json] [--log-file=s] [--log-level=level] [--(no)naked-res]
+     [--page-result[=program]] [--quiet] [--restart-if-no-output-after=s]
+     [--trace] [--url-or-id=s+] [--urls-or-ids-json=s] [--verbose]
+     <url_or_id> ...
 
 =head1 DESCRIPTION
 
@@ -64,7 +69,7 @@ File that contains list of download filenames.
 
 Default value:
 
- "/home/s1/notes/download-logs.org"
+ "/home/u1/notes/download-logs.org"
 
 =item B<--url-or-id>=I<s@>*
 
@@ -152,6 +157,14 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
+
+=back
+
+=head2 Restart options
+
+=over
+
+=item B<--restart-if-no-output-after>=I<s>
 
 =back
 

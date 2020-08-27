@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: Make HTTP/HTTPS requests to web servers to check connectivity
 use version;
-our $VERSION = 'v1.4.0'; # VERSION
+our $VERSION = 'v1.4.1'; # VERSION
 
 use strict;
 use warnings;
@@ -165,7 +165,7 @@ HealthCheck::Diagnostic::WebRequest - Make HTTP/HTTPS requests to web servers to
 
 =head1 VERSION
 
-version v1.4.0
+version v1.4.1
 
 =head1 SYNOPSIS
 

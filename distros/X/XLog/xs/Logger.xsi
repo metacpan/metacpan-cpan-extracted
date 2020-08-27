@@ -1,0 +1,11 @@
+MODULE = XLog                PACKAGE = XLog::Logger
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__).inherit("XLog::ILogger");
+}
+
+PerlObjectLogger* PerlObjectLogger::new () {
+    PROTO = Stash::from_name(CLASS).bless(Hash::create());
+    RETVAL = new PerlObjectLogger();
+}

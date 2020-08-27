@@ -18,6 +18,9 @@ is $score->Volume, 120, 'Volume';
 is $score->Channel, 0, 'Channel';
 is $score->Octave, 4, 'Octave';
 
+is [$score->Score]->[1][0], 'time_signature', 'time signature added';
+is [$score->Score]->[1][2], 4, '4 beats';
+
 lives_ok {
     MIDI::Util::set_chan_patch( $score, 1, 1 )
 } 'lives through set_chan_patch';

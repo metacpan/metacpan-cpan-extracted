@@ -1,7 +1,9 @@
 package App::CPANMetaUtils;
 
-our $DATE = '2017-06-26'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-27'; # DATE
+our $DIST = 'App-CPANMetaUtils'; # DIST
+our $VERSION = '0.011'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to CPAN Meta
@@ -18,7 +20,7 @@ App::CPANMetaUtils - CLI utilities related to CPAN Meta
 
 =head1 VERSION
 
-This document describes version 0.009 of App::CPANMetaUtils (from Perl distribution App-CPANMetaUtils), released on 2017-06-26.
+This document describes version 0.011 of App::CPANMetaUtils (from Perl distribution App-CPANMetaUtils), released on 2020-08-27.
 
 =head1 DESCRIPTION
 
@@ -40,7 +42,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-CPANMe
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-ValidateCPANMetaWithSah>.
+Source repository is at L<https://github.com/perlancar/perl-App-CPANMetaUtils>.
 
 =head1 BUGS
 
@@ -60,7 +62,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

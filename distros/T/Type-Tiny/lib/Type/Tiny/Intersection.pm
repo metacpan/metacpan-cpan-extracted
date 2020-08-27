@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Intersection::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Intersection::VERSION   = '1.010004';
+	$Type::Tiny::Intersection::VERSION   = '1.010005';
 }
 
 $Type::Tiny::Intersection::VERSION =~ tr/_//d;
@@ -108,11 +108,13 @@ sub inline_check
 		}
 	}
 	
-	if (Type::Tiny::_USE_XS and $self->{xs_sub}) {
-		return "$self->{xs_sub}\($_[0]\)";
-	}
+	my $code = sprintf '(%s)', join " and ", map $_->inline_check($_[0]), @$self;
 	
-	sprintf '(%s)', join " and ", map $_->inline_check($_[0]), @$self;
+	return "do { package Type::Tiny; $code }"
+		if $Type::Tiny::AvoidCallbacks;
+	return "$self->{xs_sub}\($_[0]\)"
+		if $self->{xs_sub};
+	return $code;
 }
 
 sub has_parent

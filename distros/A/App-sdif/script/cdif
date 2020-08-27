@@ -8,9 +8,8 @@
 ## Original version on Mar 11 1992
 ##
 
-use strict;
+use v5.14;
 use warnings;
-use 5.014;
 
 use utf8;
 use Carp;
@@ -321,8 +320,8 @@ my $converter = do {
 ## Temporary files
 ##
 use App::cdif::Tmpfile;
-my $T1 = new App::cdif::Tmpfile;
-my $T2 = new App::cdif::Tmpfile;
+my $T1 = App::cdif::Tmpfile->new;
+my $T2 = App::cdif::Tmpfile->new;
 binmode $T1->fh, ":encoding(utf8)";
 binmode $T2->fh, ":encoding(utf8)";
 
@@ -453,8 +452,7 @@ while (<DIFF>) {
 	if ($prefix) {
 	    $read_opt{prefix} = $prefix;
 	    use App::sdif::Divert;
-	    $divert = new App::sdif::Divert
-		FINAL => sub { s/^/$prefix/mg };
+	    $divert = App::sdif::Divert->new(FINAL => sub { s/^/$prefix/mg });
 	}
 
 	print_command($command);
@@ -551,9 +549,9 @@ sub compare_unified {
 
 sub compare_unified_generic {
     my($buf, $mark_re) = @_;
-    my $c = collect $buf qr/^[\t ]+$/;
-    my $o = collect $buf qr/[-]/;
-    my $n = collect $buf qr/[+]/;
+    my $c = $buf->collect(qr/^[\t ]+$/);
+    my $o = $buf->collect(qr/[-]/);
+    my $n = $buf->collect(qr/[+]/);
     compare(\$o, \$n, $mark_re);
     if ($opt_color) {
 	$c =~ s/^$mark_re//mg if not $opt_mark;
@@ -735,7 +733,7 @@ sub normal_words {
 
 sub mecab_words {
     my $text = shift;
-    state $mecab = new App::cdif::Command::Mecab;
+    state $mecab = App::cdif::Command::Mecab->new;
     $mecab->wordlist($text);
 }
 
@@ -950,6 +948,8 @@ when B<-r>I<rev> is supplied.
 
 =item B<-->B<unit>=I<word>|I<char>|I<mecab>
 
+=item B<-->B<by>=I<word>|I<char>|I<mecab>
+
 Specify the comparing unit.  Default is I<word> and compare each line
 word-by-word.  Specify I<char> if you want to compare them
 character-by-character.
@@ -960,12 +960,12 @@ External B<mecab> command has to been installed.
 
 =item B<-B>, B<--char>
 
-Shortcut for B<--context=char>.  This option is being deprecated, and
+Shortcut for B<--unit=char>.  This option is being deprecated, and
 will be removed in a future.
 
 =item B<--mecab>
 
-Shortcut for B<--context=mecab>.
+Shortcut for B<--unit=mecab>.
 
 =item B<--diff>=I<command>
 

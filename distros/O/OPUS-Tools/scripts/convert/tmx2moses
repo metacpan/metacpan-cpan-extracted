@@ -1,0 +1,214 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+#
+
+=head1 NAME
+
+tmx2moses - convert TMX into Moses plain text
+
+=head1 USAGE
+
+ tmx2moses [-r] [-o outfile-base] tmxfile
+
+=head1 OPTIONS
+
+  -o outfile ........ name of the output file
+  -r ................ always remove regional codes
+
+=head1 DESCRIPTION
+
+C<tmx2opus> converts TMX files into OPUS format. It handles translation units with several languages. Regional codes can be removed from the language attribute.
+
+
+=head1 LICENSE
+
+ ---------------------------------------------------------------------------
+ Copyright (c) 2004-2019 Joerg Tiedemann
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ ---------------------------------------------------------------------------
+
+=head1 See also
+
+This script is part of opus-tools L<https://github.com/Helsinki-NLP/opus-tools>
+See also OPUS L<http://opus.nlpl.eu> for more information about the corpus.
+
+=cut
+
+
+use strict;
+
+use IO::File;
+use File::Basename qw/dirname basename/;
+use XML::Parser;
+use XML::Writer;
+use Lingua::Sentence;
+
+use vars qw($opt_o $opt_r);
+use Getopt::Std;
+getopts('o:r');
+
+my $outfile = $opt_o || @ARGV[0] || 'text';
+
+my %LangSeg = ();
+my $CurrentLang = 'en';
+my %BitextWriter = ();
+
+
+my $TMXParser = new XML::Parser(Handlers => {Start => \&XmlTagStart,
+					     End => \&XmlTagEnd,
+					     Char => \&XmlChar});
+my $TMXHandler = $TMXParser->parse_start;
+
+
+my $count = 0;
+binmode(STDIN);
+while (<>){
+    ## fix un-escaped XML entities
+    s/&(?!(#\d+|\w+);)/&amp;/g;
+    eval { $TMXHandler->parse_more($_); };
+    if ($@){
+	print STDERR $_;
+	die $@;
+    }
+}
+
+
+
+
+
+
+sub XmlTagStart{
+    my ($p,$e,%a)=@_;
+
+    if ($e eq 'tuv'){
+	$CurrentLang = $a{'xml:lang'} if (exists $a{'xml:lang'});
+	$CurrentLang = $a{'lang'} if (exists $a{'lang'});
+
+	## replace hyphens with underscores
+	## lowercase the language IDs
+	## remove regional identifier if it is a copy of the lang ID
+	$CurrentLang=~s/\-/\_/g;
+	$CurrentLang=lc($CurrentLang);   # lower-case
+	$CurrentLang=~s/^(.*)\_\1$/$1/g; # remove copies of lang ID
+	# $CurrentLang=~s/\_[^a-z]$//g;    # remove non-alphabetic extension
+
+	## always remove regional extension if -r
+	$CurrentLang=~s/^(.*)\_.*$/$1/g if ($opt_r);
+	if ($CurrentLang=~/en/){
+	    print '';
+	}
+
+	$LangSeg{$CurrentLang} = [];
+    }
+    elsif ($e eq 'seg'){
+	$p->{OPEN_SEG} = 1;
+	push(@{$LangSeg{$CurrentLang}},'');
+    }
+}
+
+sub XmlTagEnd{
+    my ($p,$e)=@_;
+
+    if ($e eq 'tu'){
+	## print the translations collected in segments
+	print_alignments(\%LangSeg);
+	%LangSeg = ();
+    }
+    elsif ($e eq 'seg'){
+	$p->{OPEN_SEG} = 0;
+    }
+}
+
+sub XmlChar{
+    my ($p,$c)=@_;
+    if ($p->{OPEN_SEG}){
+	$LangSeg{$CurrentLang}[-1] .= $c;
+    }
+}
+
+
+sub print_alignments{
+    my $seg = shift;
+
+    return unless (ref($seg) eq 'HASH');
+    my @langs = sort keys %{$seg};
+    return unless ($#langs);
+
+    foreach my $s (0..$#langs-1){
+	foreach my $t ($s+1..$#langs){
+	    my $LangPair = "$s-$t";
+	    @{$BitextWriter{$LangPair}} = open_bitext($outfile,$langs[$s],$langs[$t]) 
+		unless ($BitextWriter{$LangPair});
+
+	    print_segments(${$BitextWriter{$LangPair}}[0], $$seg{$langs[$s]});
+	    print_segments(${$BitextWriter{$LangPair}}[1], $$seg{$langs[$t]});
+	}
+    }
+
+    $count++;
+    print STDERR '.' if (! ($count % 1000));
+    print STDERR " $count\n" if (! ($count % 50000));
+
+
+}
+
+sub print_segments{
+    my ($fh, $segments) = @_;
+
+    my $seg = join(' ',@{$segments});
+
+    ## TODO: normalize more?
+    $seg =~s/\n/ /gs;         # replace newlines
+    $seg =~s/\s{2,}/ /g;      # multiple spaces
+    s/[\x00-\x1f\x7f\n]//gs;  # control characters
+
+    print $fh $seg,"\n";
+}
+
+
+sub open_file{
+    my $file = shift;
+
+    ## make sub dir if necessary
+    my $dir = dirname($file);
+    system("mkdir -p ".$dir) unless (-d $dir);
+
+    ## open pipe to gzip if necessary
+    return $file=~/\.gz$/ ?
+	IO::File->new("| gzip -c > $file") :
+	IO::File->new(">$file");
+}
+
+
+sub open_bitext{
+    my $file = shift;
+    my $srclang = shift;
+    my $trglang = shift;
+
+    my $SrcFh = open_file($file.'.'.$srclang.'-'.$trglang.'.'.$srclang);
+    my $TrgFh = open_file($file.'.'.$srclang.'-'.$trglang.'.'.$trglang);
+
+    binmode($SrcFh, ":utf8");
+    binmode($TrgFh, ":utf8");
+
+    return ($SrcFh,$TrgFh);
+}
+
+

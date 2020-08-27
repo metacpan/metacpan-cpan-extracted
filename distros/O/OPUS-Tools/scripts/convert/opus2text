@@ -1,0 +1,123 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+
+=head1 NAME
+
+opus2text
+
+=head1 SYNOPSIS
+
+ # convert XML files from OPUS to plain text with one sentence per line
+ # (requires XML::Parser)
+
+ cat opus-xmlfiles | opus2text
+
+
+=head1 LICENSE
+
+ ---------------------------------------------------------------------------
+ Copyright (c) 2004-2019 Joerg Tiedemann
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ ---------------------------------------------------------------------------
+
+=head1 See also
+
+This script is part of opus-tools L<https://github.com/Helsinki-NLP/opus-tools>
+See also OPUS L<http://opus.nlpl.eu> for more information about the corpus.
+
+=cut
+
+
+use XML::Parser;
+
+
+my $XmlParser;
+my $XmlHandler;
+
+binmode(STDIN);
+binmode(STDOUT, ":utf8");
+
+my $ErrorCount=0;
+
+## use '>' as input delimiter when reading (usually end of XML tag)
+$/='>';
+
+while (<>){
+    ## new document!
+    if (/<\?xml/){
+	## delete everything before the XML declaration
+	s/^.*(<\?xml)/$1/s;
+	$XmlParser = new XML::Parser(Handlers => {Start => \&XmlTagStart,
+						  End => \&XmlTagEnd,
+						  Char => \&XmlChar});
+	$XmlHandler = $XmlParser->parse_start;
+    }
+
+    s/[\x00-\x08\x0B\x0C\x0E-\x1F]//g;     ## remove control characters
+    s/&(?!(#\d+|\w+);)/&amp;/g;            ## fix un-escaped XML entities
+
+    eval { $XmlHandler->parse_more($_); };
+    if ($@){
+	$ErrorCount++;
+#	warn $@;              # skip millions of warnings!
+#	print STDERR $_;
+    }
+}
+
+print STDERR "$ErrorCount errors found!" if ($ErrorCount);
+
+
+sub XmlTagStart{
+    my ($p,$e,%a)=@_;
+    if ($e eq 'w'){
+	$p->{STRING} = '';
+	$p->{TOKENIZED} = 1;
+    }
+    elsif ($e eq 's'){
+	@{$p->{WORDS}}=() if ($p->{TOKENIZED});
+	$p->{STRING} = '';
+    }
+}
+
+sub XmlChar{
+    my ($p,$c)=@_;
+    if (exists $p->{STRING}){
+	$p->{STRING}.=$c;
+    }
+}
+
+sub XmlTagEnd{
+    my ($p,$e)=@_;
+    if ($e eq 'w'){
+	push (@{$p->{WORDS}},$p->{STRING}) if (exists $p->{STRING});
+	delete $p->{STRING};
+    }
+    elsif ($e eq 's'){
+	if (@{$p->{WORDS}}){
+	    $p->{STRING} = join(' ',@{$p->{WORDS}});
+	}
+	$p->{STRING}=~s/^\s+//;
+	$p->{STRING}=~s/\s+$//;
+	$p->{STRING}=~s/\s{2,}/ /gs;
+	print $p->{STRING},"\n" if ($p->{STRING});
+	delete $p->{STRING};
+    }
+}

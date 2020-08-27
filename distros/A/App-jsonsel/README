@@ -3,8 +3,8 @@ NAME
     syntax
 
 VERSION
-    This document describes version 0.006 of App::jsonsel (from Perl
-    distribution App-jsonsel), released on 2019-08-08.
+    This document describes version 0.007 of App::jsonsel (from Perl
+    distribution App-jsonsel), released on 2020-04-29.
 
 SYNOPSIS
 FUNCTIONS
@@ -21,7 +21,7 @@ FUNCTIONS
 
     *   expr => *str*
 
-    *   file => *str* (default: "-")
+    *   file => *filename* (default: "-")
 
     *   node_actions => *array[str]* (default: ["print_as_string"])
 
@@ -44,13 +44,39 @@ FUNCTIONS
 
             dump:tag.id.class
 
-        which will result in a node printed like this:
+            which will result in a node printed like this:
 
-         HTML::Element tag=p id=undef class=undef
+            HTML::Element tag=p id=undef class=undef
 
         By default, if no attributes are specified, "id" is used. If the
         node class does not support the attribute, or if the value of the
         attribute is undef, then "undef" is shown.
+
+        *   "eval" will execute Perl code for each matching node. The Perl
+            code will be called with arguments: "($node)". For convenience,
+            $_ is also locally set to the matching node. Example in htmlsel
+            you can add this action:
+
+            eval:'print $_->tag'
+
+            which will print the tag name for each matching HTML::Element
+            node.
+
+    *   node_actions_on_descendants => *str* (default: "")
+
+        Specify how descendants should be actioned upon.
+
+        This option sets how node action is performed (See "node_actions"
+        option).
+
+        When set to '' (the default), then only matching nodes are actioned
+        upon.
+
+        When set to 'descendants_depth_first', then after each matching node
+        is actioned upon by an action, the descendants of the matching node
+        are also actioned, in depth-first order. This option is sometimes
+        necessary e.g. when your node's "as_string()" method shows a node's
+        string representation that does not include its descendants.
 
     *   select_action => *str* (default: "csel")
 
@@ -91,7 +117,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

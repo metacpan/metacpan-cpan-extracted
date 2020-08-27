@@ -1,7 +1,6 @@
 package App::sdif::LabelStack;
 
 use v5.14;
-use strict;
 use warnings;
 use Carp;
 

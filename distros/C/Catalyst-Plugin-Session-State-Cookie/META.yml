@@ -3,29 +3,32 @@ abstract: 'Maintain session IDs using cookies.'
 author:
   - 'Yuval Kogman <nothingmuch@woobling.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Moose: 0
-  Test::More: 0
+  Catalyst::Test: '0'
+  HTTP::Cookies: '0'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 0.91'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Catalyst-Plugin-Session-State-Cookie
 no_index:
   directory:
-    - inc
     - t
+    - xt
 requires:
-  Catalyst: 5.80005
-  Catalyst::Plugin::Session: 0.27
-  MRO::Compat: 0
-  Moose: 0
-  namespace::autoclean: 0
+  Catalyst: '5.80005'
+  Catalyst::Plugin::Session: '0.27'
+  MRO::Compat: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Session-State-Cookie
   license: http://dev.perl.org/licenses/
-  repository: http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Plugin-Session-State-Cookie/trunk/
-version: 0.17
+  repository: git://git.shadowcat.co.uk/catagits/Catalyst-Plugin-Session-State-Cookie.git
+version: '0.18'
+x_authority: cpan:NUFFIN
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

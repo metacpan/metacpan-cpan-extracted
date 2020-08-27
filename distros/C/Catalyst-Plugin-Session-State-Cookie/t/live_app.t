@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
@@ -8,58 +6,92 @@ use lib "$Bin/lib";
 
 use Test::More;
 
-BEGIN {
-    eval { require Test::WWW::Mechanize::Catalyst };
-    plan skip_all =>
-      "This test requires Test::WWW::Mechanize::Catalyst in order to run"
-      if $@;
-    plan skip_all => 'Test::WWW::Mechanize::Catalyst >= 0.40 required' if $Test::WWW::Mechanize::Catalyst::VERSION < 0.40;
-    plan 'no_plan';
-}
+use HTTP::Cookies;
+use Catalyst::Utils ();
 
-use Test::WWW::Mechanize::Catalyst qw/CookieTestApp/;
+use Catalyst::Test qw(CookieTestApp);
 
-my $m = Test::WWW::Mechanize::Catalyst->new;
+my $jar = HTTP::Cookies->new;
+my %cookie;
+my $get = sub {
+    my $url = shift;
+    my $req = Catalyst::Utils::request($url);
+    $jar->add_cookie_header($req);
+    my $res = request($req);
+    $jar->extract_cookies($res);
 
-$m->get_ok( "http://localhost/stream", "get page" );
-$m->content_contains( "hit number 1", "session data created" );
+    $jar->scan( sub {
+        if ($_[1] eq 'cookietestapp_session') {
+            @cookie{qw(
+                version
+                key
+                val
+                path
+                domain
+                port
+                path_spec
+                secure
+                expires
+                discard
+                hash
+            )} = @_;
+        }
+    } );
 
-my $expired;
-$m->cookie_jar->scan( sub { $expired = $_[8]; } );
+    return $res;
+};
 
-$m->get_ok( "http://localhost/page", "get page" );
-$m->content_contains( "hit number 2", "session data restored" );
+my $res;
 
-$m->get_ok( "http://localhost/stream", "get stream" );
-$m->content_contains( "hit number 3", "session data restored" );
+$res = $get->('/stream');
+ok $res->is_success, 'get page';
+like $res->content, qr/hit number 1/, 'session data created';
+
+my $expired = $cookie{expires};
+
+$res = $get->('/page');
+ok $res->is_success, 'get page';
+like $res->content, qr/hit number 2/, 'session data restored';
+
+$res = $get->('/page');
+ok $res->is_success, 'get page';
+like $res->content, qr/hit number 3/, 'session data restored';
 
 sleep 1;
 
-$m->get_ok( "http://localhost/stream", "get page" );
-$m->content_contains( "hit number 4", "session data restored" );
+$res = $get->('/page');
+ok $res->is_success, 'get page';
+like $res->content, qr/hit number 4/, 'session data restored';
 
-my $updated_expired;
-$m->cookie_jar->scan( sub { $updated_expired = $_[8]; } );
-cmp_ok( $expired, "<", $updated_expired, "cookie expiration was extended" );
+cmp_ok $expired, '<', $cookie{expires}, 'cookie expiration was extended';
+$expired = $cookie{expires};
 
-$expired = $m->cookie_jar->scan( sub { $expired = $_[8] } );
-$m->get_ok( "http://localhost/page", "get page again");
-$m->content_contains( "hit number 5", "session data restored (blah)" );
+$res = $get->('/page');
+ok $res->is_success, 'get page';
+like $res->content, qr/hit number 5/, 'session data restored';
 
 sleep 1;
 
-$m->get_ok( "http://localhost/stream", "get stream" );
-$m->content_contains( "hit number 6", "session data restored" );
+$res = $get->('/stream');
+ok $res->is_success, 'get stream';
+like $res->content, qr/hit number 6/, 'session data restored';
 
-$m->cookie_jar->scan( sub { $updated_expired = $_[8]; } );
-cmp_ok( $expired, "<", $updated_expired, "streaming also extends cookie" );
+cmp_ok $expired, '<', $cookie{expires}, 'streaming also extends cookie';
 
-$m->get_ok( "http://localhost/deleteme", "get page" );
-$m->content_is( 1, 'session id changed' );
+$res = $get->('/deleteme');
+ok $res->is_success, 'get page';
+is $res->content, '1', 'session id changed';
 
-$m->get_ok( "https://localhost/page", "get page over HTTPS - init session");
-$m->content_contains( "hit number 1", "first hit" );
-$m->get_ok( "http://localhost/page", "get page again over HTTP");
-$m->content_contains( "hit number 1", "first hit again - cookie not sent" );
-$m->get_ok( "https://localhost/page", "get page over HTTPS");
-$m->content_contains( "hit number 2", "second hit" );
+$res = $get->('https://localhost/page');
+ok $res->is_success, 'get page over HTTPS - init session';
+like $res->content, qr/hit number 1/, 'first hit';
+
+$res = $get->('http://localhost/page');
+ok $res->is_success, 'get page again over HTTP';
+like $res->content, qr/hit number 1/, 'first hit again - cookie not sent';
+
+$res = $get->('https://localhost/page');
+ok $res->is_success, 'get page over HTTPS';
+like $res->content, qr/hit number 2/, 'second hit';
+
+done_testing;

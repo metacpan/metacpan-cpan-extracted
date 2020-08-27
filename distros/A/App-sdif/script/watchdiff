@@ -9,7 +9,6 @@
 ##
 
 use v5.14;
-use strict;
 use warnings;
 
 use open ":std" => ":encoding(utf8)";
@@ -93,8 +92,8 @@ sub flush {
 }
 
 use App::cdif::Command;
-my $old = new App::cdif::Command @opt_exec;
-my $new = new App::cdif::Command @opt_exec;
+my $old = App::cdif::Command->new(@opt_exec);
+my $new = App::cdif::Command->new(@opt_exec);
 
 my @diffcmd = do {
     if ($opt_diff) {
@@ -121,7 +120,7 @@ my %termcap = pairmap { $a => ansi_code($b) } qw(
 
 sub run {
     use IO::File;
-    my $pid = (my $fh = new IO::File)->open('-|') // die "open: $@\n";
+    my $pid = (my $fh = IO::File->new)->open('-|') // die "open: $@\n";
     if ($pid == 0) {
 	open STDERR, ">&STDOUT" or die "dup: $!";
 	close STDIN;

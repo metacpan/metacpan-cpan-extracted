@@ -3,7 +3,6 @@ package App::cdif::Command::OSAscript;
 use parent "App::cdif::Command";
 
 use v5.14;
-use strict;
 use warnings;
 use utf8;
 use Carp;

@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -408,7 +408,7 @@ sub _build_subs {
 			$code =~ s/\s*\n*\s*package Module\:\:Generate\;|use warnings\;|use strict\;//g;
 			$code =~ s/{\s*\n*/{/;
 			$code =~ s/};$/}/;
-			$code =~ s/\&($MACROS)/$CLASS{MACRO}{$1}/g;
+			$code =~ s/\&($MACROS)/$CLASS{MACRO}{$1}/g if $MACROS;
 			$code = sprintf "sub %s %s", $sub, $code;
 		} else {
 			$code = sprintf "sub %s {\n\n\n}", $sub;
@@ -495,7 +495,6 @@ sub _build_pod {
 
 sub _perl_tidy {
 	my $source = shift;
-
 	my $dest_string;
 	my $stderr_string;
 	my $errorfile_string;
@@ -520,7 +519,7 @@ sub _perl_tidy {
 
 sub _build_tests {
 	my ($class, $obj_ok) = @_;
-	my $tests = sprintf("BEGIN { use_ok('%s'); }", $class->{NAME});
+	my $tests = sprintf("our (\$sub, \$globref); BEGIN { use_ok('%s'); \$sub = sub {}; \$globref = \\*globref; }", $class->{NAME});
 
 	if ($class->{SUBS}->{new}->{TEST}) {
 		$tests .= sprintf "subtest 'new' => sub { plan tests => %s; %s };",
@@ -659,7 +658,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 

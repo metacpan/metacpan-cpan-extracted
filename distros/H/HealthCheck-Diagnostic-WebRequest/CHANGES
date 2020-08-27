@@ -1,6 +1,10 @@
 Changelog for HealthCheck-Diagnostic-WebRequest
 
-v1.4.0 2020-08-04T18:25:35
+v1.4.1 2020-08-25T15:46:55
+ - Update README (Andrew Hewus Fresh)
+ - Provide Location header in 302 test (Andrew Hewus Fresh)
+
+v1.4.0 2020-08-04T18:24:52
  - Update README (Andrew Hewus Fresh)
  - Sort and uniq allowed parameters (Andrew Hewus Fresh)
  - Add a default UserAgent Timeout of 7 seconds (Andrew Hewus Fresh)
@@ -23,8 +27,8 @@ v1.3.2 2019-12-10T20:17:09
 
 v1.3.1 2019-10-24T21:14:21
  - Create distribution files (Andrew Hewus Fresh)
- - Remove gitc metadata (Andrew Hewus Fresh)
  - Convert to Bitbucket workflow (Andrew Hewus Fresh)
+ - Remove gitc metadata (Andrew Hewus Fresh)
 
 v1.3.0.0 2019-10-24T14:49:06
  - Merge remote-tracking branch 'origin/stage' into prod (Randy Sofia)

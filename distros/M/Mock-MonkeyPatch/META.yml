@@ -16,13 +16,13 @@ name: Mock-MonkeyPatch
 provides:
   Mock::MonkeyPatch:
     file: lib/Mock/MonkeyPatch.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   Sub::Util: '1.40'
 resources:
   bugtracker: http://github.com/jberger/Mock-MonkeyPatch/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mock-MonkeyPatch
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

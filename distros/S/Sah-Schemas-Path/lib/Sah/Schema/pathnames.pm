@@ -1,9 +1,9 @@
 package Sah::Schema::pathnames;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-08'; # DATE
+our $DATE = '2020-08-26'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 our $schema = [array => {
     summary => 'List of filesystem path names',
@@ -34,7 +34,7 @@ Sah::Schema::pathnames - List of filesystem path names
 
 =head1 VERSION
 
-This document describes version 0.014 of Sah::Schema::pathnames (from Perl distribution Sah-Schemas-Path), released on 2020-08-08.
+This document describes version 0.015 of Sah::Schema::pathnames (from Perl distribution Sah-Schemas-Path), released on 2020-08-26.
 
 =head1 SYNOPSIS
 

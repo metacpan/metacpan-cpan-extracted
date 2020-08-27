@@ -1,0 +1,60 @@
+{
+   "abstract" : "Unified logging API, without performance penalties.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XLog",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "Export::XS" : "v3.0.5",
+            "XS::Framework" : "v1.3.2",
+            "XS::Install" : "v1.2.18",
+            "XS::libpanda" : "v1.4.7",
+            "next::XS" : "v1.0.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Export::XS" : "v3.0.5",
+            "XS::Framework" : "v1.3.2",
+            "XS::Install" : "v1.2.18",
+            "XS::libpanda" : "v1.4.7",
+            "next::XS" : "v1.0.7"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Export::XS" : "v3.0.5",
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.96",
+            "XS::Framework" : "v1.3.2",
+            "XS::libpanda" : "v1.4.7",
+            "next::XS" : "v1.0.7"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

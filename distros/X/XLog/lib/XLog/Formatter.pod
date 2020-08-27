@@ -1,0 +1,77 @@
+=head1 NAME
+
+XLog::Formatter - Base class for pure-perl formatter backends
+
+
+
+=head1 SYNPOSIS
+
+    package MyFormatter;
+    use parent 'XLog::Formatter';
+    
+    sub new {
+        my ($class, ...) = @_;
+        my $self = $class->SUPER::new();
+        ...
+        return $self;
+    }
+    
+    sub format {
+        my ($self, $msg, $level, $module_name, $file, $line, $func) = @_;
+        return "[".time()."] $msg at $file:$line";
+    }
+
+
+=head1 DESCRIPTION
+
+This is a base class for making pure-perl formatter object. API is very simple - you need to override a single subroutine C<format> and return formatted
+string.
+
+
+=head1 METHODS
+
+=head4 new()
+
+Create backend object.
+
+Keep in mind that if you override C<new> method you MUST create object by calling C<SUPER>, not blessing new object by yourself,
+because there will be a C++ proxy object attached to perl object.
+
+
+=head4 format($msg, $level, $module_name, $file, $line, $func)
+
+You must override this method and return resulting formatted log message.
+
+The parameters are:
+
+=over
+
+=item $msg
+
+Log message as it was passed by user
+
+=item $level
+
+Log level (one of the constants)
+
+=item $module_name
+
+Log module name
+
+=item $file
+
+Filename with path where loging code is written
+
+=item $line
+
+Line in file where loging code is written
+
+=item $func
+
+Function or subroutine name where loging code is written
+
+=over
+
+=cut
+
+1;

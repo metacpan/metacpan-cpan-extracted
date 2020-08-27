@@ -5,7 +5,6 @@ lib/XS/libpanda.pm
 lib/XS/libpanda.pod
 LICENSE
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 misc/mytest.pl
 misc/trun.plx

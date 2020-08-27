@@ -1,0 +1,44 @@
+Changes
+lib/XLog.pm
+lib/XLog.pod
+lib/XLog/Console.pm
+lib/XLog/Console.pod
+lib/XLog/Formatter.pm
+lib/XLog/Formatter.pod
+lib/XLog/Formatter/Pattern.pm
+lib/XLog/Formatter/Pattern.pod
+lib/XLog/IFormatter.pm
+lib/XLog/IFormatter.pod
+lib/XLog/ILogger.pm
+lib/XLog/ILogger.pod
+lib/XLog/Logger.pm
+lib/XLog/Logger.pod
+lib/XLog/Multi.pm
+lib/XLog/Multi.pod
+Makefile.PL
+MANIFEST			This list of files
+misc/mytest.pl
+misc/threads.pl
+src/xs/xlog.cc
+src/xs/xlog.h
+t/console.t
+t/formatter.t
+t/level.t
+t/lib/MyTest.pm
+t/lib/MyTest.xs
+t/log.t
+t/logger.t
+t/module.t
+t/multi.t
+t/optimize.t
+XLog.xs
+xs/Console.xsi
+xs/Formatter.xsi
+xs/Logger.xsi
+xs/Module.xsi
+xs/Multi.xsi
+xs/util.cc
+xs/util.h
+xs/XLog.xsi
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

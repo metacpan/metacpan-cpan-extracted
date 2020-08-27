@@ -27,10 +27,10 @@ optional_features: {}
 provides:
   MooX::Pression:
     file: lib/MooX/Pression.pm
-    version: '0.518'
+    version: '0.519'
   Zydeco:
     file: lib/Zydeco.pm
-    version: '0.518'
+    version: '0.519'
 recommends:
   Class::XSAccessor: '0'
   MooX::TypeTiny: '0.002002'
@@ -41,7 +41,7 @@ requires:
   Exporter::Tiny: '1.000000'
   Import::Into: '0'
   Keyword::Simple: '0.04'
-  MooX::Press: '0.061'
+  MooX::Press: '0.062'
   PPR: '0.000023'
   Path::ScanINC: '0'
   Syntax::Keyword::Try: '0.11'
@@ -52,5 +52,5 @@ resources:
   homepage: http://zydeco.toby.ink/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-zydeco.git
-version: '0.518'
+version: '0.519'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

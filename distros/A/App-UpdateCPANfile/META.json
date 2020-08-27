@@ -72,10 +72,13 @@
    "provides" : {
       "App::UpdateCPANfile" : {
          "file" : "lib/App/UpdateCPANfile.pm",
-         "version" : "0.08"
+         "version" : "v1.0.0"
       },
       "App::UpdateCPANfile::CPANfileSnapshotParser" : {
          "file" : "lib/App/UpdateCPANfile/CPANfileSnapshotParser.pm"
+      },
+      "App::UpdateCPANfile::Change" : {
+         "file" : "lib/App/UpdateCPANfile/Change.pm"
       },
       "App::UpdateCPANfile::PackageDetails" : {
          "file" : "lib/App/UpdateCPANfile/PackageDetails.pm"
@@ -92,7 +95,7 @@
          "web" : "https://github.com/hitode909/App-UpdateCPANfile"
       }
    },
-   "version" : "0.08",
+   "version" : "1.0.0",
    "x_authority" : "cpan:HITODE",
    "x_contributors" : [
       "hitode909 <hitode909@gmail.com>"

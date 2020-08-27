@@ -470,13 +470,18 @@ CODE:
     // LIBLINEAR 2.0 resets default printer function during call of
     // find_parameter_C(). So disable it again.
     set_print_string_function(dummy_puts);
+    bool is_regression_model = self->solver_type == L2R_L2LOSS_SVR;
     if (update) {
         self->C = best_C;
-        self->p = best_p;
+        if (is_regression_model) {
+          self->p = best_p;
+        }
     }
     RETVAL = newAV();
     av_push(RETVAL, newSVnv(best_C));
-    av_push(RETVAL, newSVnv(best_p));
+    av_push(
+        RETVAL,
+        is_regression_model ? newSVnv(best_p) : newSVsv(&PL_sv_undef));
     av_push(RETVAL, newSVnv(accuracy));
 OUTPUT:
     RETVAL
@@ -510,6 +515,14 @@ ll_loss_sensitivity(self)
     struct parameter *self;
 CODE:
     RETVAL = self->p;
+OUTPUT:
+    RETVAL
+
+int
+ll_solver_type(self)
+    struct parameter *self;
+CODE:
+    RETVAL = self->solver_type;
 OUTPUT:
     RETVAL
 

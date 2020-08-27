@@ -42,14 +42,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.19.0",
+            "Getopt::EX" : "v1.19.1",
             "Getopt::EX::termcolor" : "1.06",
             "List::Util" : "1.45",
             "Term::ReadKey" : "0",
-            "Text::ANSI::Fold" : "1.06",
+            "Text::ANSI::Fold" : "1.07",
             "Text::VisualWidth::PP" : "0.05",
             "Unicode::EastAsianWidth::Detect" : "0",
-            "perl" : "5.014"
+            "perl" : "v5.14.0"
          }
       },
       "test" : {
@@ -82,7 +82,7 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v4.16.0"
+         "version" : "v4.16.1"
       },
       "App::sdif::Divert" : {
          "file" : "lib/App/sdif/Divert.pm"
@@ -114,7 +114,7 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "4.16.0",
+   "version" : "4.16.1",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

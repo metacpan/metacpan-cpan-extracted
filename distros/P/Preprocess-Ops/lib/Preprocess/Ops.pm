@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Preprocess::Ops;
-our $VERSION = 20200823;
+our $VERSION = 20200826;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -39,11 +39,42 @@ sub method($)                                                                   
 
 sub structure($)                                                                #P Check whether a line of C code defines a structure, returning (name, flags, comment) if it is, else ()
  {my ($line) = @_;                                                              # Line of C code
-  if ($line =~ m(\Astruct\s+(\w+)\s*//(w*)\s*(.*)\Z))                           # struct name, comment start, flags, comment
-   {return ($1, $2, $3)
+  if ($line =~ m(\A(typedef\s+)?struct\s+(\w+)\s*//(w*)\s*(.*)\Z))              # struct name, comment start, flags, comment
+   {return ($2, $3, $4)
    }
   ()
   }
+
+sub includeFile($$$$$)                                                          #P Expand include files so that we can pull in code and structures from other files in the includes folder.
+ {my ($lineNumber, $inputFile, $cFile, $hFile, $code) = @_;                     # Line number of line being expanded, file containing line being expanded, output C file, output H file, line of code
+  if ($code =~ m(\Ainclude\s+))                                                 # Parse include statement
+   {my (undef, $relFile, @items) = split /\s+/, $code;
+    my %items = map {$_=>1} @items;
+    my $file = sumAbsAndRel($inputFile, $relFile);
+    -e $file or confess "Cannot find include file: $file\n";
+    my @code = readFile($file);
+
+    my @c;
+    for(my $i = 0; $i < @code; ++$i)                                            # Expand include files so that we can pull in code and structures from other files in the includes folder.
+     {my  $c = $code[$i];                                                       # Replace $ with package name.
+      if ($c =~ m(\Ainclude))                                                   # Expand include in included file
+       {$c = &includeFile($i, $file, $cFile, $hFile, $c);
+       }
+      if ($c =~ m((\S+)\s*//))
+       {if ($items{$1})
+         {for(; $i < @code; ++$i)
+           {push @c, $code[$i];
+            last if $code[$i] =~ m(\A })
+           }
+         }
+       }
+     }
+    my $l = $lineNumber + 2;
+    return join '', @c, qq(#line $l "$inputFile"\n);
+#   return join '', @c;
+   }
+  confess "Unable to parse include statement:\n$code";
+ }
 
 sub c($$$;$)                                                                    # Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
  {my ($inputFile, $cFile, $hFile, $column) = @_;                                # Input file, C output file, H output file, optional start column for comments (80)
@@ -60,7 +91,15 @@ sub c($$$;$)                                                                    
   my @forwards;                                                                 # Forward declarations of functions used as methods
   my @code = readFile($inputFile);                                              # Read code
 
-  for my $c(@code)                                                              # Replace $ with package name
+  for my $i(keys @code)                                                         # Expand include files so that we can pull in code and structures from other files in the includes folder.
+   {if ($code[$i] =~ m(\Ainclude))
+     {$code[$i] = includeFile($i, $inputFile, $cFile, $hFile, $code[$i]);
+     }
+   }
+
+  @code = map {"$_\n"} split /\n/, join '', @code;                              # Resplit code plus any additions into lines
+
+  for my $c(@code)                                                              # Replace $ with package name.
    {$c =~ s(\$\$) ($baseFile)gs;                                                # $$ is base file name with first char lower cased
     $c =~ s(\$)   ($packageName)gs;                                             # $  is base file name with first character uppercased
    }
@@ -187,7 +226,8 @@ sub c($$$;$)                                                                    
 
       $c =~ s( +\Z) ()gs;                                                       # Remove trailing spaces at line ends
      }
-    owf($cFile, qq(#line 0 "$inputFile"\n\n).join('', @code));                  # Output C file
+#   owf($cFile, qq(#line 1 "$inputFile"\n).join('', @code));                    # Output C file
+    owf($cFile, join '', @code);                                                # Output C file
    }
 
   genHash(q(PreprocessOpsParse),                                                # Structure of the C program being preprocessed
@@ -255,11 +295,19 @@ Occurrences of:
 
 are replaced by:
 
-  newXXX(({proto: &Prototypes_XXX}})
+  newXXX(({struct XXX t = {proto: &ProtoTypes_$1}; t;}))
+
+Occurrences of:
+
+  newXXX(a:1)
+
+are replaced by:
+
+  newXXX(({struct XXX t = {a:1, proto: &ProtoTypes_$1}; t;}))
 
 The prototype vectors are generated by examining all the methods defined in the
-B<C>file and written to the specified B<h> file so that they can be used via
-the ▷ and ▶ operators.
+B<c> file.  The prototype vectors are written to the specified B<h> file so
+that they can be included in the B<c> file for use via the ▷ and ▶ operators.
 
 See: L<https://github.com/philiprbrenan/C/blob/master/c/z/xml/xml.c> for a
 working example.
@@ -269,7 +317,7 @@ working example.
 Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
 
 
-Version 20200823.
+Version 20200826.
 
 
 The following sections describe the methods in each functional area of this
@@ -294,106 +342,222 @@ Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
 B<Example:>
 
 
-    my $s = writeTempFile(<<END);
-  struct Node                                                                     // Node definition
-   {char * key;                                                                   // Key for the node
-   }
+    my $I   =     fpd($d, qw(includes));
   
-  Node newNode                                                                    //C Create a new node
-   (const struct Node node)                                                       // Input key
+    my $sbc = owf(fpe($d, qw(source base c)), <<'END');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  typedef struct $Node                                                            // Node definition
+   {char * key;                                                                   // Key for the node
+   } $Node;
+  
+  $Node new$Node                                                                  //C Create a new node
+   (const struct $Node node)                                                      // Input key
    {return node;
    }
   
-  static Node getKey                                                              // Get the key for a node
-   (const Node n)                                                                 // Node to dump
+  static char * key_$Node                                                         // Get the key for a node
+   (const $Node n)                                                                // Node to dump
    {return n.key;
    }
   
-  static Node dump_node                                                           // Dump a node
-   (const Node n)                                                                 // Node to dump
-   {print(n ▷ key);
+  static void dump_$Node                                                          // Dump a node
+   (const $Node n)                                                                // Node to dump
+   {printf("%s
+", n ▷ key);
    }
   
-  struct Node n = newNode(key: "a");                                              //TnewNode
-  struct Node o = newNode();                                                      //TnewNode
-  struct Node p = newNode;                                                        //TnewNode
-  n ▷ dump;                                                                       //Tdump
+  $Node n = new$Node(key: "a");                                                   //TnewNode
+  assert(!strcmp(n ▷ key, "a"));
+        n ▷ dump;                                                                 //Tdump
   END
   
   
-    my $c = temporaryFile.'.c';                                                   # Translated C file  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    my $sdc = owf(fpe($d, qw(source derived c)), <<'END');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    my $h = temporaryFile.'.h';                                                   # Prototypes in H file
+  typedef struct $Node                                                            // Node definition
+   {wchar * key;
+   } $Node;
   
-    my $r = c($s, $c, $h);                                                        # Preprocess  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+  
+  include base.c new$Node  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   
-  # owf($logFile, readFile($c));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+  include base.c key_$Node  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-  # owf($logFile, readFile($h));
-    is_deeply scalar(readFile($h)), <<END;                                                # Generated prototypes
-  Node newNode
-   (const struct Node node);
-  static Node getKey
-   (const Node n);
-  static Node dump_node
-   (const Node n);
-  struct ProtoTypes_Node {
-    Node  (*dump)(                                                                // Dump a node
-      const Node n);                                                              // Node to dump
-    Node  (*getKey)(                                                              // Get the key for a node
-      const Node n);                                                              // Node to dump
-   } const ProtoTypes_Node =
-  {dump_node, getKey};
+  
+  include base.c dump_$Node  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
   END
   
-  # dumpFile($logFile, unbless $r);
+  
+    my $bc = fpe($I, qw(base c));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $bh = fpe($I, qw(base h));
+  
+    my $dc = fpe($I, qw(derived c));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $dh = fpe($I, qw(derived h));
+  
+  
+    my $r = c($sbc, $bc, $bh);                                                    # Preprocess base.c  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+  # owf($logFile, readFile($bc)); exit;
+  
+    ok index(scalar(readFile($bc)), <<'END') > -1;                                # Generated base.c  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  typedef struct BaseNode                                                            // Node definition
+   {char * key;                                                                   // Key for the node
+   } BaseNode;
+  
+  BaseNode newBaseNode                                                                  //C Create a new node
+   (const struct BaseNode node)                                                      // Input key
+   {return node;
+   }
+  
+  static char * key_BaseNode                                                         // Get the key for a node
+   (const BaseNode n)                                                                // Node to dump
+   {return n.key;
+   }
+  
+  static void dump_BaseNode                                                          // Dump a node
+   (const BaseNode n)                                                                // Node to dump
+   {printf("%s
+", n.proto->key(n));
+   }
+  
+  BaseNode n = newBaseNode(({struct BaseNode t = {key: "a", proto: &ProtoTypes_BaseNode}; t;}));                                                   //TnewNode
+  assert(!strcmp(n.proto->key(n), "a"));
+        n.proto->dump(n);                                                                 //Tdump
+  END
+  
+  # owf($logFile, readFile($bh)); exit;
+    is_deeply scalar(readFile($bh)), <<END;                                       # Generated base.h
+  BaseNode newBaseNode
+   (const struct BaseNode node);
+  static char * key_BaseNode
+   (const BaseNode n);
+  static void dump_BaseNode
+   (const BaseNode n);
+  struct ProtoTypes_BaseNode {
+    void  (*dump)(                                                                // Dump a node
+      const BaseNode n);                                                          // Node to dump
+    char *  (*key)(                                                               // Get the key for a node
+      const BaseNode n);                                                          // Node to dump
+   } const ProtoTypes_BaseNode =
+  {dump_BaseNode, key_BaseNode};
+  END
+  
+  
+  
+    my $R = c($sdc, $dc, $dh);                                                    # Preprocess derived.c  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  # owf($logFile, readFile($dc)); exit;
+    ok index(scalar(readFile $dc), <<'END') > -1;
+  static void dump_DerivedNode                                                          // Dump a node
+   (const DerivedNode n)                                                                // Node to dump
+   {printf("%s
+", n.proto->key(n));
+   }
+  END
+  # owf($logFile, readFile($dh)); exit;
+    is_deeply scalar(readFile $dh), <<'END';
+  DerivedNode newDerivedNode
+   (const struct DerivedNode node);
+  static char * key_DerivedNode
+   (const DerivedNode n);
+  static void dump_DerivedNode
+   (const DerivedNode n);
+  struct ProtoTypes_DerivedNode {
+    void  (*dump)(                                                                // Dump a node
+      const DerivedNode n);                                                       // Node to dump
+    char *  (*key)(                                                               // Get the key for a node
+      const DerivedNode n);                                                       // Node to dump
+   } const ProtoTypes_DerivedNode =
+  {dump_DerivedNode, key_DerivedNode};
+  END
+  
+  # owf($logFile, dump(unbless $r)); exit;
+  
     is_deeply $r,
   {
     methods             => {
-                             dump_node => {
-                                            comment    => "Dump a node",
-                                            flags      => {},
-                                            name       => "dump",
-                                            parameters => [["const Node", "n", "Node to dump"]],
-                                            return     => "Node ",
-                                            structure  => "const Node",
-                                          },
-                             getKey    => {
-                                            comment    => "Get the key for a node",
-                                            flags      => {},
-                                            name       => "getKey",
-                                            parameters => [["const Node", "n", "Node to dump"]],
-                                            return     => "Node ",
-                                            structure  => "const Node",
-                                          },
-                             newNode   => {
-                                            comment    => "Create a new node",
-                                            flags      => { C => 1 },
-                                            name       => "newNode",
-                                            parameters => [["const struct Node", "node", "Input key"]],
-                                            return     => "Node ",
-                                            structure  => "const struct Node",
-                                          },
+                             dump_BaseNode => {
+                                                comment    => "Dump a node",
+                                                flags      => {},
+                                                name       => "dump",
+                                                parameters => [["const BaseNode", "n", "Node to dump"]],
+                                                return     => "void ",
+                                                structure  => "const BaseNode",
+                                              },
+                             key_BaseNode  => {
+                                                comment    => "Get the key for a node",
+                                                flags      => {},
+                                                name       => "key",
+                                                parameters => [["const BaseNode", "n", "Node to dump"]],
+                                                return     => "char * ",
+                                                structure  => "const BaseNode",
+                                              },
+                             newBaseNode   => {
+                                                comment    => "Create a new node",
+                                                flags      => { C => 1 },
+                                                name       => "newBaseNode",
+                                                parameters => [["const struct BaseNode", "node", "Input key"]],
+                                                return     => "BaseNode ",
+                                                structure  => "const struct BaseNode",
+                                              },
                            },
     structureParameters => {
-                             "Node" => { dump_node => 1, getKey => 1 },
-                             "struct Node" => { newNode => 1 },
+                             "BaseNode" => { dump_BaseNode => 1, key_BaseNode => 1 },
+                             "struct BaseNode" => { newBaseNode => 1 },
                            },
     structures          => {
-                             Node => { comment => "Node definition", flags => "", name => "Node" },
+                             BaseNode => { comment => "Node definition", flags => "", name => "BaseNode" },
                            },
-    testsFound          => { dump => 1, newNode => 3 },
-    testsNeeded         => { getKey => 1 },
+    testsFound          => { dump => 1, newNode => 1 },
+    testsNeeded         => { key => 1, newBaseNode => 1 },
   };
-   }
   
-  done_testing;
+  # owf($logFile, dump(unbless $R)); exit;
   
-  if ($localTest)
-   {say "TO finished in ", (time() - $startTime), " seconds";
-   }
-  
+    is_deeply $R,
+  {
+    methods             => {
+                             dump_DerivedNode => {
+                                                   comment    => "Dump a node",
+                                                   flags      => {},
+                                                   name       => "dump",
+                                                   parameters => [["const DerivedNode", "n", "Node to dump"]],
+                                                   return     => "void ",
+                                                   structure  => "const DerivedNode",
+                                                 },
+                             key_DerivedNode  => {
+                                                   comment    => "Get the key for a node",
+                                                   flags      => {},
+                                                   name       => "key",
+                                                   parameters => [["const DerivedNode", "n", "Node to dump"]],
+                                                   return     => "char * ",
+                                                   structure  => "const DerivedNode",
+                                                 },
+                             newDerivedNode   => {
+                                                   comment    => "Create a new node",
+                                                   flags      => { C => 1 },
+                                                   name       => "newDerivedNode",
+                                                   parameters => [["const struct DerivedNode", "node", "Input key"]],
+                                                   return     => "DerivedNode ",
+                                                   structure  => "const struct DerivedNode",
+                                                 },
+                           },
+    structureParameters => {
+                             "DerivedNode"        => { dump_DerivedNode => 1, key_DerivedNode => 1 },
+                             "struct DerivedNode" => { newDerivedNode => 1 },
+                           },
+    structures          => {
+                             DerivedNode => { comment => "Node definition", flags => "", name => "DerivedNode" },
+                           },
+    testsFound          => {},
+    testsNeeded         => { dump => 1, key => 1, newDerivedNode => 1 },
+  };
   
 
 
@@ -498,17 +662,30 @@ Check whether a line of C code defines a structure, returning (name, flags, comm
      Parameter  Description
   1  $line      Line of C code
 
+=head2 includeFile($lineNumber, $inputFile, $cFile, $hFile, $code)
+
+Expand include files so that we can pull in code and structures from other files in the includes folder.
+
+     Parameter    Description
+  1  $lineNumber  Line number of line being expanded
+  2  $inputFile   File containing line being expanded
+  3  $cFile       Output C file
+  4  $hFile       Output H file
+  5  $code        Line of code
+
 
 =head1 Index
 
 
 1 L<c|/c> - Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
 
-2 L<method|/method> - Check whether a line of C code defines a method, returning (return, name, flags, comment) if it is, else ()
+2 L<includeFile|/includeFile> - Expand include files so that we can pull in code and structures from other files in the includes folder.
 
-3 L<structure|/structure> - Check whether a line of C code defines a structure, returning (name, flags, comment) if it is, else ()
+3 L<method|/method> - Check whether a line of C code defines a method, returning (return, name, flags, comment) if it is, else ()
 
-4 L<trim|/trim> - Remove trailing white space and comment
+4 L<structure|/structure> - Check whether a line of C code defines a structure, returning (name, flags, comment) if it is, else ()
+
+5 L<trim|/trim> - Remove trailing white space and comment
 
 =head1 Installation
 
@@ -556,136 +733,212 @@ use warnings FATAL=>qw(all);
 use strict;
 require v5.26;
 use Time::HiRes qw(time);
-use Test::More tests => 4;
+use Test::More tests => 6;
 
 my $startTime = time();
 my $localTest = ((caller(1))[0]//'Preprocess::Ops') eq "Preprocess::Ops";       # Local testing mode
 Test::More->builder->output("/dev/null") if $localTest;                         # Suppress output in local testing mode
 makeDieConfess;
 
-  if (1) {
-  my $s = writeTempFile(<<END);
-static Node setKey_node_node_string                                             // Copy a string into the key field of a node //TsetKey
- (const Tree   tree,                                                            // Tree
-  const Node   node,                                                            // Node
-  const string key)                                                             // Key
- {node ▷ key = t ▶ saveString(key);                                             // Set key with saved string
-  return node;
- }
-END
-
-  my $c = temporaryFile.'.c';                                                   # Translated C file
-  my $h = temporaryFile.'.h';                                                   # Prototypes in H file
-
-  c($s, $c, $h);                                                                # Preprocess
-# owf($logFile, readFile($c)); exit;
-
-  ok index(readFile($c), <<END) > -1;                                           # Generated C file. Remove first line as it contains source file name
-static Node setKey_node_node_string                                             // Copy a string into the key field of a node //TsetKey
- (const Tree   tree,                                                            // Tree
-  const Node   node,                                                            // Node
-  const string key)                                                             // Key
- {node.proto->key(node) = t->proto->saveString(t, key);                                             // Set key with saved string
-  return node;
- }
-END
-
-  ok index(readFile($h), <<END) > -1;                                            # Generated H prototypes file
-static Node setKey_node_node_string
- (const Tree   tree,
-  const Node   node,
-  const string key);
-END
-   }
+my $d = temporaryFolder;
 
   if (1) {                                                                      #Tc
-  my $s = writeTempFile(<<END);
-struct Node                                                                     // Node definition
+  my $I   =     fpd($d, qw(includes));
+  my $sbc = owf(fpe($d, qw(source base c)), <<'END');
+typedef struct $Node                                                            // Node definition
  {char * key;                                                                   // Key for the node
- }
+ } $Node;
 
-Node newNode                                                                    //C Create a new node
- (const struct Node node)                                                       // Input key
+$Node new$Node                                                                  //C Create a new node
+ (const struct $Node node)                                                      // Input key
  {return node;
  }
 
-static Node getKey                                                              // Get the key for a node
- (const Node n)                                                                 // Node to dump
+static char * key_$Node                                                         // Get the key for a node
+ (const $Node n)                                                                // Node to dump
  {return n.key;
  }
 
-static Node dump_node                                                           // Dump a node
- (const Node n)                                                                 // Node to dump
- {print(n ▷ key);
+static void dump_$Node                                                          // Dump a node
+ (const $Node n)                                                                // Node to dump
+ {printf("%s\n", n ▷ key);
  }
 
-struct Node n = newNode(key: "a");                                              //TnewNode
-struct Node o = newNode();                                                      //TnewNode
-struct Node p = newNode;                                                        //TnewNode
-n ▷ dump;                                                                       //Tdump
+$Node n = new$Node(key: "a");                                                   //TnewNode
+assert(!strcmp(n ▷ key, "a"));
+      n ▷ dump;                                                                 //Tdump
 END
 
-  my $c = temporaryFile.'.c';                                                   # Translated C file
-  my $h = temporaryFile.'.h';                                                   # Prototypes in H file
-  my $r = c($s, $c, $h);                                                        # Preprocess
-# owf($logFile, readFile($c));
-# owf($logFile, readFile($h));
-  is_deeply scalar(readFile($h)), <<END;                                                # Generated prototypes
-Node newNode
- (const struct Node node);
-static Node getKey
- (const Node n);
-static Node dump_node
- (const Node n);
-struct ProtoTypes_Node {
-  Node  (*dump)(                                                                // Dump a node
-    const Node n);                                                              // Node to dump
-  Node  (*getKey)(                                                              // Get the key for a node
-    const Node n);                                                              // Node to dump
- } const ProtoTypes_Node =
-{dump_node, getKey};
+  my $sdc = owf(fpe($d, qw(source derived c)), <<'END');
+typedef struct $Node                                                            // Node definition
+ {wchar * key;
+ } $Node;
+
+include base.c new$Node
+include base.c key_$Node
+include base.c dump_$Node
 END
 
-# dumpFile($logFile, unbless $r);
+  my $bc = fpe($I, qw(base c));
+  my $bh = fpe($I, qw(base h));
+  my $dc = fpe($I, qw(derived c));
+  my $dh = fpe($I, qw(derived h));
+
+  my $r = c($sbc, $bc, $bh);                                                    # Preprocess base.c
+
+# owf($logFile, readFile($bc)); exit;
+  ok index(scalar(readFile($bc)), <<'END') > -1;                                # Generated base.c
+typedef struct BaseNode                                                            // Node definition
+ {char * key;                                                                   // Key for the node
+ } BaseNode;
+
+BaseNode newBaseNode                                                                  //C Create a new node
+ (const struct BaseNode node)                                                      // Input key
+ {return node;
+ }
+
+static char * key_BaseNode                                                         // Get the key for a node
+ (const BaseNode n)                                                                // Node to dump
+ {return n.key;
+ }
+
+static void dump_BaseNode                                                          // Dump a node
+ (const BaseNode n)                                                                // Node to dump
+ {printf("%s\n", n.proto->key(n));
+ }
+
+BaseNode n = newBaseNode(({struct BaseNode t = {key: "a", proto: &ProtoTypes_BaseNode}; t;}));                                                   //TnewNode
+assert(!strcmp(n.proto->key(n), "a"));
+      n.proto->dump(n);                                                                 //Tdump
+END
+
+# owf($logFile, readFile($bh)); exit;
+  is_deeply scalar(readFile($bh)), <<END;                                       # Generated base.h
+BaseNode newBaseNode
+ (const struct BaseNode node);
+static char * key_BaseNode
+ (const BaseNode n);
+static void dump_BaseNode
+ (const BaseNode n);
+struct ProtoTypes_BaseNode {
+  void  (*dump)(                                                                // Dump a node
+    const BaseNode n);                                                          // Node to dump
+  char *  (*key)(                                                               // Get the key for a node
+    const BaseNode n);                                                          // Node to dump
+ } const ProtoTypes_BaseNode =
+{dump_BaseNode, key_BaseNode};
+END
+
+
+  my $R = c($sdc, $dc, $dh);                                                    # Preprocess derived.c
+# owf($logFile, readFile($dc)); exit;
+  ok index(scalar(readFile $dc), <<'END') > -1;
+static void dump_DerivedNode                                                          // Dump a node
+ (const DerivedNode n)                                                                // Node to dump
+ {printf("%s\n", n.proto->key(n));
+ }
+END
+# owf($logFile, readFile($dh)); exit;
+  is_deeply scalar(readFile $dh), <<'END';
+DerivedNode newDerivedNode
+ (const struct DerivedNode node);
+static char * key_DerivedNode
+ (const DerivedNode n);
+static void dump_DerivedNode
+ (const DerivedNode n);
+struct ProtoTypes_DerivedNode {
+  void  (*dump)(                                                                // Dump a node
+    const DerivedNode n);                                                       // Node to dump
+  char *  (*key)(                                                               // Get the key for a node
+    const DerivedNode n);                                                       // Node to dump
+ } const ProtoTypes_DerivedNode =
+{dump_DerivedNode, key_DerivedNode};
+END
+
+# owf($logFile, dump(unbless $r)); exit;
+
   is_deeply $r,
 {
   methods             => {
-                           dump_node => {
-                                          comment    => "Dump a node",
-                                          flags      => {},
-                                          name       => "dump",
-                                          parameters => [["const Node", "n", "Node to dump"]],
-                                          return     => "Node ",
-                                          structure  => "const Node",
-                                        },
-                           getKey    => {
-                                          comment    => "Get the key for a node",
-                                          flags      => {},
-                                          name       => "getKey",
-                                          parameters => [["const Node", "n", "Node to dump"]],
-                                          return     => "Node ",
-                                          structure  => "const Node",
-                                        },
-                           newNode   => {
-                                          comment    => "Create a new node",
-                                          flags      => { C => 1 },
-                                          name       => "newNode",
-                                          parameters => [["const struct Node", "node", "Input key"]],
-                                          return     => "Node ",
-                                          structure  => "const struct Node",
-                                        },
+                           dump_BaseNode => {
+                                              comment    => "Dump a node",
+                                              flags      => {},
+                                              name       => "dump",
+                                              parameters => [["const BaseNode", "n", "Node to dump"]],
+                                              return     => "void ",
+                                              structure  => "const BaseNode",
+                                            },
+                           key_BaseNode  => {
+                                              comment    => "Get the key for a node",
+                                              flags      => {},
+                                              name       => "key",
+                                              parameters => [["const BaseNode", "n", "Node to dump"]],
+                                              return     => "char * ",
+                                              structure  => "const BaseNode",
+                                            },
+                           newBaseNode   => {
+                                              comment    => "Create a new node",
+                                              flags      => { C => 1 },
+                                              name       => "newBaseNode",
+                                              parameters => [["const struct BaseNode", "node", "Input key"]],
+                                              return     => "BaseNode ",
+                                              structure  => "const struct BaseNode",
+                                            },
                          },
   structureParameters => {
-                           "Node" => { dump_node => 1, getKey => 1 },
-                           "struct Node" => { newNode => 1 },
+                           "BaseNode" => { dump_BaseNode => 1, key_BaseNode => 1 },
+                           "struct BaseNode" => { newBaseNode => 1 },
                          },
   structures          => {
-                           Node => { comment => "Node definition", flags => "", name => "Node" },
+                           BaseNode => { comment => "Node definition", flags => "", name => "BaseNode" },
                          },
-  testsFound          => { dump => 1, newNode => 3 },
-  testsNeeded         => { getKey => 1 },
+  testsFound          => { dump => 1, newNode => 1 },
+  testsNeeded         => { key => 1, newBaseNode => 1 },
 };
- }
+
+# owf($logFile, dump(unbless $R)); exit;
+
+  is_deeply $R,
+{
+  methods             => {
+                           dump_DerivedNode => {
+                                                 comment    => "Dump a node",
+                                                 flags      => {},
+                                                 name       => "dump",
+                                                 parameters => [["const DerivedNode", "n", "Node to dump"]],
+                                                 return     => "void ",
+                                                 structure  => "const DerivedNode",
+                                               },
+                           key_DerivedNode  => {
+                                                 comment    => "Get the key for a node",
+                                                 flags      => {},
+                                                 name       => "key",
+                                                 parameters => [["const DerivedNode", "n", "Node to dump"]],
+                                                 return     => "char * ",
+                                                 structure  => "const DerivedNode",
+                                               },
+                           newDerivedNode   => {
+                                                 comment    => "Create a new node",
+                                                 flags      => { C => 1 },
+                                                 name       => "newDerivedNode",
+                                                 parameters => [["const struct DerivedNode", "node", "Input key"]],
+                                                 return     => "DerivedNode ",
+                                                 structure  => "const struct DerivedNode",
+                                               },
+                         },
+  structureParameters => {
+                           "DerivedNode"        => { dump_DerivedNode => 1, key_DerivedNode => 1 },
+                           "struct DerivedNode" => { newDerivedNode => 1 },
+                         },
+  structures          => {
+                           DerivedNode => { comment => "Node definition", flags => "", name => "DerivedNode" },
+                         },
+  testsFound          => {},
+  testsNeeded         => { dump => 1, key => 1, newDerivedNode => 1 },
+};
+   }
+
+clearFolder($d, 10);
 
 done_testing;
 

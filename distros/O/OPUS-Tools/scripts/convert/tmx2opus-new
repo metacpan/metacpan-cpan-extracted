@@ -1,0 +1,488 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+#
+
+=head1 NAME
+
+tmx2opus - convert TMX into OPUS XML
+
+=head1 USAGE
+
+  tmx2opus [OPTIONS] [-o outfile] tmxfile
+
+=head1 OPTIONS
+
+  -o outfile ........ name of the output file (default = tmxfile)
+  -p size ........... new files after <size> translation units
+  -P ................ do NOT change some property names from ParaCrawl TMX
+  -r ................ always remove regional codes
+  -u ................ store unique sentences only
+  -d ................ use DB_File to store sentences when using -u
+  -v ................ verbose output
+
+=head1 DESCRIPTION
+
+C<tmx2opus> converts TMX files into OPUS format. It handles translation units with several languages and it also does sentence-splitting based on Lingua::Sentence. Regional codes can be removed from the language attribute. If the C<outfile> has the extension C<.gz> then it will write to compressed files (corpus files and XCES link files)
+
+
+=head1 LICENSE
+
+ ---------------------------------------------------------------------------
+ Copyright (c) 2004-2019 Joerg Tiedemann
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ ---------------------------------------------------------------------------
+
+=head1 See also
+
+This script is part of opus-tools L<https://github.com/Helsinki-NLP/opus-tools>
+See also OPUS L<http://opus.nlpl.eu> for more information about the corpus.
+
+=cut
+
+
+use utf8;
+use strict;
+
+use IO::File;
+use File::Basename qw/dirname basename/;
+use XML::Parser;
+use XML::Writer;
+use Lingua::Sentence;
+
+use File::Temp qw/ tempfile /;
+use DB_File;
+# use DBM_Filter;
+
+use vars qw($opt_d $opt_o $opt_p $opt_P $opt_r $opt_u $opt_v);
+use Getopt::Std;
+getopts('do:p:Pruv');
+
+
+my $outfile = $opt_o || @ARGV[0] || 'text.xml.gz';
+
+if ($opt_u && $opt_p){
+    warn "Options -u and -p are not compatible! Value of -p is ignored!\n";
+    $opt_p = undef;
+}
+
+my $maxsize = $opt_p;          # split into parts of size <p>
+my $part = $maxsize ? 1 : 0;
+
+## partial files
+if ($part){
+    my $ext  = sprintf('%04d',$part);
+    $outfile =~s/(\.xml)(\.gz)?$/.$ext$1$2/;
+}
+
+## keeping track files used for each language
+## --> useful if we use -u and -p together
+my %outParts = ()
+my %outFiles = ()
+my %currentAlgGrp = ();
+
+
+my %LangSeg = ();
+my %LangDB = ();
+my $CurrentLang = 'en';
+
+my %SentID = ();
+my %LinkID = ();
+my %LinkProp = ();
+
+my %CorpusWriter = ();
+my %BitextWriter = ();
+my %TextSplitter = ();
+
+
+my $TMXParser = new XML::Parser(Handlers => {Start => \&XmlTagStart,
+					     End => \&XmlTagEnd,
+					     Char => \&XmlChar});
+my $TMXHandler = $TMXParser->parse_start;
+
+
+my $count = 0;
+my %counts = ();
+
+binmode(STDIN);
+while (<>){
+
+    ## fix un-escaped XML entities
+    s/&(?!(#\d+|\w+);)/&amp;/g;
+
+    ## make it possible to pipe more than one TMX file
+    ## delete everything before the XML declaration
+    if (/<\?xml/){
+	s/^.*(<\?xml)/$1/s;
+	print STDERR "\nparse TMX file\n" if ($opt_v);
+	$TMXParser = new XML::Parser(Handlers => {Start => \&XmlTagStart,
+						  End => \&XmlTagEnd,
+						  Char => \&XmlChar});
+	$TMXHandler = $TMXParser->parse_start;
+    }
+
+    eval { $TMXHandler->parse_more($_); };
+    if ($@){
+	print STDERR $_;
+	die $@;
+    }
+}
+
+&close_corpora();
+&close_bitexts();
+
+
+
+sub close_corpora{
+    foreach my $c (values %CorpusWriter){
+	close_corpus($c);
+    }
+    %CorpusWriter = ();
+}
+
+sub close_bitexts{
+    foreach my $c (values %BitextWriter){
+	close_bitext($c);
+    }
+    %BitextWriter = ();
+}
+
+
+
+
+
+
+sub XmlTagStart{
+    my ($p,$e,%a)=@_;
+
+    if ($e eq 'tuv'){
+	$CurrentLang = $a{'xml:lang'} if (exists $a{'xml:lang'});
+	$CurrentLang = $a{'lang'} if (exists $a{'lang'});
+
+	## replace hyphens with underscores
+	## lowercase the language IDs
+	## remove regional identifier if it is a copy of the lang ID
+	$CurrentLang=~s/\-/\_/g;
+	$CurrentLang=lc($CurrentLang);   # lower-case
+	$CurrentLang=~s/^(.*)\_\1$/$1/g; # remove copies of lang ID
+	# $CurrentLang=~s/\_[^a-z]$//g;    # remove non-alphabetic extension
+
+	## always remove regional extension if -r
+	$CurrentLang=~s/^(.*)\_.*$/$1/g if ($opt_r);
+
+	$LangSeg{$CurrentLang} = [];
+    }
+    elsif ($e eq 'seg'){
+	$p->{OPEN_SEG} = 1;
+	push(@{$LangSeg{$CurrentLang}},'');
+    }
+    elsif ($e eq 'prop'){
+	## skip source document properties from ParaCrawl!
+	if ($opt_P && $a{type}=~/^[a-zA-Z\-\_]*$/){
+	    $p->{OPEN_PROP} = $a{type};
+	}
+	# elsif ($a{type}=~/^(score[a-zA-Z\-\_]*|type|info)$/){
+	elsif ($a{type}=~/^(score[a-zA-Z\-\_]*|info)$/){
+	    $p->{OPEN_PROP} = $a{type};
+	}
+    }
+}
+
+sub XmlTagEnd{
+    my ($p,$e)=@_;
+
+    if ($e eq 'tu'){
+	## print the translations collected in segments
+	print_alignments(\%LangSeg);
+	%LangSeg = ();
+	%LinkProp = ();
+    }
+    elsif ($e eq 'seg'){
+	$p->{OPEN_SEG} = 0;
+    }
+    elsif ($e eq 'prop'){
+	if ($p->{OPEN_PROP}){
+	    if (exists $LinkProp{$p->{OPEN_PROP}}){
+		if ($LinkProp{$p->{OPEN_PROP}}!~/\S/){
+		    delete $LinkProp{$p->{OPEN_PROP}};
+		}
+		## fix type to standard in xces align
+		elsif ( (! $opt_P) && $p->{OPEN_PROP} eq 'type' ){
+		    $LinkProp{$p->{OPEN_PROP}}=~s/\:/\-/;
+		}
+	    }
+	    $p->{OPEN_PROP} = undef;
+	}
+    }
+}
+
+sub XmlChar{
+    my ($p,$c)=@_;
+    if ($p->{OPEN_SEG}){
+	$LangSeg{$CurrentLang}[-1] .= $c;
+    }
+    elsif ($p->{OPEN_PROP}){
+	$LinkProp{$p->{OPEN_PROP}} .= ';' 
+	    if ($LinkProp{$p->{OPEN_PROP}});
+	$LinkProp{$p->{OPEN_PROP}} .= $c;
+    }
+}
+
+
+sub print_alignments{
+    my $seg = shift;
+
+    return unless (ref($seg) eq 'HASH');
+    my @langs = sort keys %{$seg};
+    return unless ($#langs);
+
+    ## in case we want to split the data
+    ## close and reopen data files
+
+    foreach my $l (0..$#langs){
+	if ($maxsize && $counts{$l}>=$maxsize){
+	    $counts{$l} = 0;
+	    $outParts{$l}++;
+	    my $ext  = sprintf('%04d',$outParts{$l});
+	    $outFiles{$l}=~s/\.[0-9]{4}(\.xml)(\.gz)?$/.$ext$1$2/;
+	    &close_corpus($CorpusWriter{$l});
+	    delete $CorpusWriter{$l};
+	    $SentID{$l} = 0;
+	}
+    }
+
+    ## this is for the bitexts
+    ## TODO: do we need individual alignment files?
+    if ($maxsize && $count>=$maxsize){
+	$count = 0;
+	$part++;
+	my $ext  = sprintf('%04d',$part);
+	$outfile =~s/\.[0-9]{4}(\.xml)(\.gz)?$/.$ext$1$2/;
+	&close_bitexts();
+    }
+
+    my %IDs = {};
+    foreach my $s (0..$#langs){
+	@{$IDs{$langs[$s]}} = print_sentences($seg,$langs[$s]);
+    }
+
+    foreach my $s (0..$#langs-1){
+	foreach my $t ($s+1..$#langs){
+	    print_links($IDs{$langs[$s]},$IDs{$langs[$t]},$langs[$s],$langs[$t]);
+	}
+    }
+
+    $count++;
+    print STDERR '.' if (! ($count % 1000));
+    print STDERR " $count\n" if (! ($count % 50000));
+
+
+}
+
+sub print_links{
+    my ($SrcIDs,$TrgIDs,$SrcLang,$TrgLang) = @_;
+
+    my $LangPair = "$SrcLang-$TrgLang";
+    $BitextWriter{$LangPair} = &open_bitext($outfile,$SrcLang,$TrgLang) 
+	unless ($BitextWriter{$LangPair});
+    $LinkID{$LangPair}++;
+    my $link = join(' ',@{$SrcIDs}).';'.join(' ',@{$TrgIDs});
+
+    ## make some minor adjustments to link properties coming from ParaCrawl data
+    unless ($opt_P){
+	if (exists $LinkProp{'score-aligner'}){
+	    $LinkProp{'hunalign'} = $LinkProp{'score-aligner'};
+	    delete $LinkProp{'score-aligner'};
+	}
+	if (exists $LinkProp{'score-bicleaner'}){
+	    $LinkProp{'score'} = $LinkProp{'score-bicleaner'};
+	    delete $LinkProp{'score-bicleaner'};
+	}
+	delete $LinkProp{'lengthRatio'};
+    }
+
+    $BitextWriter{$LangPair}->emptyTag('link',
+				       'id' => 'L'.$LinkID{$LangPair},
+				       'xtargets' => $link, 
+				       %LinkProp );
+}
+
+sub print_sentences{
+    my ($segments,$lang) = @_;
+    $CorpusWriter{$lang} = &open_corpus($outfile,$lang) 
+	unless ($CorpusWriter{$lang});
+
+    my @ids = ();
+    my @sentences = get_sentences($segments->{$lang},$lang);
+    my $key;
+    
+    $CorpusWriter{$lang}->startTag('p') if ( $#sentences && (!$opt_u) );
+    foreach my $sent (@sentences){
+	my $sid = undef;
+	if ($opt_u){
+	    $key = $sent;
+	    utf8::encode($key) if ($opt_d);  # to make DB_FILE happy
+	    $sid = &find_sentence($key,$lang);
+	}
+	# if ($opt_v && $sid){
+	#     print STDERR "repeated sentence found (id = $sid)\n";
+	# }
+	unless ($sid){
+	    $SentID{$lang}++;
+	    $sid=$SentID{$lang};
+
+	    $CorpusWriter{$lang}->startTag('s', 'id' => $sid);
+	    $CorpusWriter{$lang}->characters($sent);
+	    $CorpusWriter{$lang}->endTag('s');
+
+	    if ($opt_u){
+		if ($opt_p){
+		    $LangDB{$lang}{$key} = $sid.' '.$outfiles{$lang};
+		} 
+		else{
+		    $LangDB{$lang}{$key} = $sid;
+		}
+	    }
+	}
+	push(@ids,$sid);
+    }
+    $CorpusWriter{$lang}->endTag('p') if ($#sentences && (!$opt_u));
+    $counts{$lang} += scalar @ids;
+    return @ids;
+}
+
+
+## check whether the sentence is stored in our cache
+sub find_sentence{
+    my ($sent,$lang) = @_;
+
+    unless (exists $LangDB{$lang}){
+	%{$LangDB{$lang}} = ();
+	## create a new DB file if necessary
+	if ($opt_d){
+	    my ($fh, $filename) = tempfile();
+	    close $fh;
+	    tie %{$LangDB{$lang}}, "DB_File", $filename ;
+	    ## this does not seem to work
+	    ## from https://www.perl.com/pub/2012/06/perlunicook-unicode-text-in-dbm-files-the-easy-way.html/
+	    # my $dbobj = tie %{$LangDB{$lang}}, "DB_File", $filename ;
+	    # $dbobj->Filter_Value_Push("utf8");
+	    print STDERR "Sentence in language $lang stored in $filename\n" if ($opt_v);
+	}
+    }
+    if (exists $LangDB{$lang}{$sent}){
+	if ($opt_p){
+	    my ($sid,$fid) = split(/\s/,$LangDB{$lang}{$sent});
+	    ## TODO: re-open new linkGrp if necessary
+	    return $sid;
+	}
+	return $LangDB{$lang}{$sent};
+    }
+    return undef;
+}
+
+sub get_sentences{
+    my $segments = shift;
+    my $lang = shift;
+
+    my @sentences = ();
+    foreach my $seg (@{$segments}){
+	if ($seg=~/\S/){
+	    $seg =~s/\n/ /gs;
+	    $seg =~s/\s{2,}/ /g;
+	    push(@sentences,$TextSplitter{$lang}->split_array($seg));
+	}
+    }
+    return @sentences;
+}
+
+
+
+sub open_file{
+    my $file = shift;
+
+    ## make sub dir if necessary
+    my $dir = dirname($file);
+    system("mkdir -p ".$dir) unless (-d $dir);
+
+    ## open pipe to gzip if necessary
+    return $file=~/\.gz$/ ?
+	IO::File->new("| gzip -c > $file") :
+	IO::File->new(">$file");
+}
+
+sub open_corpus{
+    my $file = shift;
+    my $lang = shift;
+
+    unless (exists $outFiles{$lang}){
+	my $ext  = sprintf('%04d',$outParts{$lang});
+	$outFiles{$lang}=~s/\.[0-9]{4}(\.xml)(\.gz)?$/.$ext$1$2/;
+    }
+
+    my $fh = open_file($lang.'/'.$file);
+    binmode($fh,":encoding(utf-8)");
+    my $XmlWriter = XML::Writer->new( OUTPUT => $fh,
+				      DATA_MODE => 1,
+				      DATA_INDENT => 1 );
+    $XmlWriter->xmlDecl("UTF-8");
+    $XmlWriter->startTag("text");
+
+    ## Lingua::Sentences requires 2-letter language codes
+    my $isolang = $lang;
+    $isolang =~s/[-_].+$//;
+    $isolang = 'en' unless ($isolang =~ /^[a-z][a-z]$/i);
+
+    $TextSplitter{$lang} = Lingua::Sentence->new($isolang) unless $TextSplitter{$lang};
+
+    return $XmlWriter;
+}
+
+sub open_bitext{
+    my $file = shift;
+    my $srclang = shift;
+    my $trglang = shift;
+
+    my $fh = open_file($srclang.'-'.$trglang.'/'.$file);
+    my $XmlWriter = XML::Writer->new( OUTPUT => $fh,
+				      DATA_MODE => 1,
+				      DATA_INDENT => 1 );
+    $XmlWriter->xmlDecl("UTF-8");
+    $XmlWriter->doctype('cesAlign', "-//CES//DTD XML cesAlign//EN", "");
+    $XmlWriter->startTag('cesAlign','version' => '1.0');
+    $XmlWriter->startTag('linkGrp',
+			 'targType' => 's',
+			 'fromDoc'  => $srclang.'/'.$outFiles{$srclang},
+			 'toDoc'    => $trglang.'/'.$outFiles{$trglang});
+    return $XmlWriter;
+}
+
+
+sub close_corpus{
+    my $XmlWriter = shift;
+    $XmlWriter->endTag('text');
+}
+
+sub close_bitext{
+    my $XmlWriter = shift;
+    $XmlWriter->endTag('linkGrp');
+    $XmlWriter->endTag('cesAlign');
+}
+
+

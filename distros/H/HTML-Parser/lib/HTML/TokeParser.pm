@@ -1,10 +1,11 @@
 package HTML::TokeParser;
 
-require HTML::PullParser;
-@ISA=qw(HTML::PullParser);
-$VERSION = "3.69";
-
 use strict;
+
+require HTML::PullParser;
+our @ISA = qw(HTML::PullParser);
+our $VERSION = '3.73';
+
 use Carp ();
 use HTML::Entities qw(decode_entities);
 use HTML::Tagset ();

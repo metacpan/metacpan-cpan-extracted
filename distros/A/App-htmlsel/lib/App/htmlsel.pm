@@ -1,7 +1,7 @@
 package App::htmlsel;
 
-our $DATE = '2019-08-09'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -97,7 +97,7 @@ App::htmlsel - Select HTML::Element nodes using CSel syntax
 
 =head1 VERSION
 
-This document describes version 0.009 of App::htmlsel (from Perl distribution App-htmlsel), released on 2019-08-09.
+This document describes version 0.010 of App::htmlsel (from Perl distribution App-htmlsel), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -120,7 +120,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<expr> => I<str>
 
-=item * B<file> => I<str> (default: "-")
+=item * B<file> => I<filename> (default: "-")
 
 =item * B<node_actions> => I<array[str]> (default: ["print_as_string"])
 
@@ -166,6 +166,20 @@ which will print the tag name for each matching L<HTML::Element> node.
 
 =back
 
+=item * B<node_actions_on_descendants> => I<str> (default: "")
+
+Specify how descendants should be actioned upon.
+
+This option sets how node action is performed (See C<node_actions> option).
+
+When set to '' (the default), then only matching nodes are actioned upon.
+
+When set to 'descendants_depth_first', then after each matching node is actioned
+upon by an action, the descendants of the matching node are also actioned, in
+depth-first order. This option is sometimes necessary e.g. when your node's
+C<as_string()> method shows a node's string representation that does not include
+its descendants.
+
 =item * B<select_action> => I<str> (default: "csel")
 
 Specify how we should select nodes.
@@ -175,6 +189,7 @@ expression. Note that the root node itself is not included. For more details on
 CSel expression, refer to L<Data::CSel>.
 
 C<root> will return a single node which is the root node.
+
 
 =back
 
@@ -213,7 +228,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

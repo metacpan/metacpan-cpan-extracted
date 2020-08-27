@@ -90,16 +90,16 @@ WriteMakefile(
     'MIN_PERL_VERSION'  => '5.10.1',
     'LICENSE'           => 'artistic',
     'CONFIGURE_REQUIRES'=> {
-        'XAO::Base'                 => 1.23,
+        'XAO::Base'                 => 1.27,
         'ExtUtils::MakeMaker'       => 6.64,
     },
     'TEST_REQUIRES'     => {
-        'XAO::Base'                 => 1.23,
+        'XAO::Base'                 => 1.27,
     },
     'PREREQ_PM'     => {
         'Authen::SASL::SASLprep'    => 1.1,
-        'CGI'                       => 4.14,
-        'CGI::Cookie'               => 4.14,
+        'CGI'                       => 4.50,
+        'CGI::Cookie'               => 4.50,
         'CGI::PSGI'                 => 0.15,
         'Crypt::Rijndael'           => 1.13,
         'Data::Entropy::Algorithms' => 0.007,
@@ -119,7 +119,7 @@ WriteMakefile(
         'Text::FormatTable'         => 0.01,
         'Time::HiRes'               => 1.9719,
         'Unicode::Normalize'        => 1.18,
-        'XAO::Base'                 => 1.23,
+        'XAO::Base'                 => 1.27,
         'XAO::FS'                   => 1.21,
     },
     META_MERGE => {

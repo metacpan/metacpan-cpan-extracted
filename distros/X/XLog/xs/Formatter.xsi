@@ -1,0 +1,17 @@
+MODULE = XLog                PACKAGE = XLog::Formatter
+PROTOTYPES: DISABLE
+
+PerlObjectFormatter* PerlObjectFormatter::new () {
+    PROTO = Stash::from_name(CLASS).bless(Hash::create());
+    RETVAL = new PerlObjectFormatter();
+}
+
+
+MODULE = XLog                PACKAGE = XLog::Formatter::Pattern
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__).inherit("XLog::IFormatter");
+}
+
+IFormatter* PatternFormatter::new (string_view fmt)

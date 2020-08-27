@@ -24,13 +24,12 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Sah" => "0.907",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => "0.98"
+    "Test::More" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,14 +37,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah" => "0.907",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::Sub::XCompletion::dirname" => 0,
   "Perinci::Sub::XCompletion::filename" => 0,
   "Perl::osnames" => "0.121",
-  "Test::More" => "0.98",
+  "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0
 );

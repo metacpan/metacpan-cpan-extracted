@@ -4,3 +4,5 @@ t Revision history for Perl extension Attribute-Handlers-Clean
 	- first public version; adapted from Attribute::Handlers v0.99
 1.02  Mon Aug 25 03:02:11 2020
 	- minor fixes in POD
+1.04  Mon Aug 25 03:02:11 2020
+	- fixed dependencies and unregistered namespaces in Makefile.PL

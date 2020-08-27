@@ -3,7 +3,7 @@ package OpenTracing::Log;
 use strict;
 use warnings;
 
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.003'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(OpenTracing::Common);
@@ -48,6 +48,22 @@ List of tags relating to the log entry.
 =cut
 
 sub tag_list { (shift->{tags} //= [])->@* }
+
+=head2 tag
+
+Applies key/value tags to this log message.
+
+The L<semantic conventions|https://github.com/opentracing/specification/blob/master/semantic_conventions.md>
+may be of interest here.
+
+Example usage:
+
+ $log->tag(
+  'error.kind' => 'Exception',
+  'error.object' => $exception,
+ );
+
+=cut
 
 sub tag : method {
     my ($self, %args) = @_;

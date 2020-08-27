@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+#
+# delete all information of a specific corpus
+
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../../lib";
+use OPUS::Tools;
+
+my ($corpus,$src,$trg) = @ARGV;
+
+die "specify corpus" unless (defined $corpus);
+
+if ($src || $trg){
+    die "delete specific bitext is not implemented yet!\n";
+}
+
+delete_all_corpus_info($corpus)

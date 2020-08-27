@@ -1,0 +1,689 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+#------------------------------------------------------------------------------
+# combine sentence alignments for several language pairs
+# using a pivot language as intermediate language for all other languages
+#------------------------------------------------------------------------------
+# USAGE: opus2mult xmldir pivot [lang-ids]*
+#
+# <xmldir> should be the path to the XML directory that contains 
+#          sentence alignment files
+#          for each individual language pair (e.g. xmldir/en-fr.xml.gz)
+# <pivot> is the language ID of the pivot language (e.g. en)
+# <lang-ids> are language IDs of the other language to be combined 
+#            in the multilingual corpus
+#------------------------------------------------------------------------------
+# OUTPUT: sentence alignment files for all languages together 
+#         with the pivot language
+#------------------------------------------------------------------------------
+# EXAMPLE: opus2multi OPUS/corpus/RF sv de en es fr
+#          --> combine all sentence alignments via Swedish 
+#              for German, English, Spanish and French
+#          --> alignment units will cover the same English sentences
+#------------------------------------------------------------------------------
+
+use strict;
+
+use vars qw($opt_a $opt_s $opt_h $opt_i $opt_e $opt_v $opt_E);
+use Getopt::Std;
+
+getopts('aeE:i:hs:t:v');
+
+my $EXT = $opt_E || 'xml.gz';  # file extension of alignment files
+
+if ($opt_h){
+    print <<"EOH";
+
+ opus2multi [OPTIONS] xmldir pivot [lang-ids]*
+
+------------------------------------------------------------------------------
+ combine sentence alignments for several language pairs
+ using a pivot language as intermediate language for all other languages
+------------------------------------------------------------------------------
+
+ <xmldir> should be the path to the XML directory that contains 
+          sentence alignment files
+          for each individual language pair (e.g. xmldir/en-fr.xml.gz)
+ <pivot> is the language ID of the pivot language (e.g. en)
+ <lang-ids> are language IDs of the other language to be combined 
+            in the multilingual corpus
+
+------------------------------------------------------------------------------
+ OUTPUT: sentence alignment files for all languages together 
+         with the pivot language
+------------------------------------------------------------------------------
+ EXAMPLE: opus2multi OPUS/corpus/RF/xml sv de en es fr
+          --> combine all sentence alignments via Swedish 
+              for German, English, Spanish and French
+          --> alignment units will cover the same English sentences
+------------------------------------------------------------------------------
+
+OPTIONS:
+
+ -e ................. keep segments with empty links in any of the languages
+ -i pivot-links ..... intralingual pivot link file
+ -a ................. same as -i but read intralingual links from xmldir/../alt/
+ -E ext ............. specify extension of align files (default = xml.gz)
+ -s nr .............. max number of sentences in an alignment unit
+ -h ................. this help
+
+EOH
+    exit;
+}
+
+=head1 NAME
+
+opus2multi
+
+=head1 SYNOPSIS
+
+ # Combine all sentence alignments via Swedish 
+ # for German, English, Spanish and French. 
+ # The alignment units will cover the same English sentences.
+
+ opus2multi /path/to/OPUS/corpus/RF/xml sv de en es fr
+
+ # shortcut without full path to xml-dir 
+ # (requires OPUS in some standard directory)
+
+ opus2multi RF sv de en es fr
+
+ # use intralingual links (for pivot language) to extend the data set
+ # (useful for OpenSubtitles-corpora)
+
+ opus2multi -a OpenSubtitles2016 sv de en es fr
+
+
+=head1 USAGE
+
+ opus2multi [OPTIONS] xmldir pivot [lang-ids]*
+
+OUTPUT: sentence alignment files for all languages together with the pivot language
+
+=head1 OPTIONS
+
+
+ -e ................. keep segments with empty links in any of the languages
+ -i pivot-links ..... intralingual pivot link file
+ -a ................. same as -i but read intralingual links from xmldir/../alt/
+ -s nr .............. max number of sentences in an alignment unit
+ -h ................. this help
+
+=head1 DESCRIPTION
+
+ opus2multi [OPTIONS] xmldir pivot [lang-ids]*
+
+combine sentence alignments for several language pairs
+using a pivot language as intermediate language for all other languages
+
+
+ <xmldir> should be the path to the XML directory that contains 
+          sentence alignment files
+          for each individual language pair (e.g. xmldir/en-fr.xml.gz)
+ <pivot> is the language ID of the pivot language (e.g. en)
+ <lang-ids> are language IDs of the other language to be combined 
+            in the multilingual corpus
+
+
+
+=head1 LICENSE
+
+ ---------------------------------------------------------------------------
+ Copyright (c) 2004-2019 Joerg Tiedemann
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ ---------------------------------------------------------------------------
+
+=head1 See also
+
+This script is part of opus-tools L<https://github.com/Helsinki-NLP/opus-tools>
+See also OPUS L<http://opus.nlpl.eu> for more information about the corpus.
+
+=cut
+
+
+
+my $xmldir = shift @ARGV;
+my @languages = @ARGV;
+my $pivot = shift(@languages);
+
+
+# try to find OPUS in case the given xmldir is not found
+unless (-d $xmldir){
+    if (-d "/proj/nlpl/data/OPUS/corpus/$xmldir"){
+	$xmldir = "/proj/nlpl/data/OPUS/corpus/$xmldir/xml";
+    }
+    elsif (-d "/projects/nlpl/data/OPUS/corpus/$xmldir"){
+	$xmldir = "/projects/nlpl/data/OPUS/corpus/$xmldir/xml";
+    }
+    elsif (-d "/proj/OPUS/corpus/$xmldir"){
+	$xmldir = "/proj/OPUS/corpus/$xmldir/xml";
+    }
+    elsif (-d "/home/opus/OPUS/corpus/$xmldir"){
+	$xmldir = "/home/opus/OPUS/corpus/$xmldir/xml";
+    }
+}
+
+
+my %IntraLingLinks = ();
+my $IntraLinkFile = $opt_i;
+if ($opt_a && (! $opt_i || ! -e $IntraLinkFile)){
+    if (-e "$xmldir/../alt/$pivot-$pivot.xml.gz"){
+	$IntraLinkFile = "$xmldir/../alt/$pivot-$pivot.xml.gz";
+	$opt_i = 1;
+    }
+}
+if (-e $IntraLinkFile){
+    print "read intralingual links from $IntraLinkFile ...\n";
+    read_intralingual_links($IntraLinkFile,\%IntraLingLinks);
+    # get_intralingual_links($IntraLinkFile,\%IntraLingLinks);
+}
+
+# get all document pairs that align to the same pivot language
+# (we will call it English in the following)
+
+print "find all common documents ...\n";
+my ($docs,$InterDocs) = get_common_docs($pivot,@languages);
+print "number of common aligned docs: ", scalar keys %{$docs},"\n";
+
+# read through the sentence alignment files again and get all links
+# for the selected document pairs
+
+my %links=();
+
+foreach my $l (@languages){
+    my $fromEnglish = 0;
+    if (-f "$xmldir/$l-$pivot.$EXT"){
+	open F,"gzip -cd < $xmldir/$l-$pivot.$EXT |" || 
+	    die "cannot open $xmldir/$l-$pivot.$EXT";
+    }
+    elsif (-f "$xmldir/$pivot-$l.$EXT"){
+	open F,"gzip -cd < $xmldir/$pivot-$l.$EXT |" || 
+	    die "cannot open $xmldir/$pivot-$l.$EXT";
+	$fromEnglish = 1;
+    }
+    ## another option: files with extension .all.
+    elsif (-f "$xmldir/$l-$pivot.all.$EXT"){
+	open F,"gzip -cd < $xmldir/$l-$pivot.all.$EXT |" || 
+	    die "cannot open $xmldir/$l-$pivot.all.$EXT";
+    }
+    elsif (-f "$xmldir/$pivot-$l.all.$EXT"){
+	open F,"gzip -cd < $xmldir/$pivot-$l.all.$EXT |" || 
+	    die "cannot open $xmldir/$pivot-$l.all.$EXT";
+	$fromEnglish = 1;
+    }
+    else{
+	next;
+    }
+    print "read links for $pivot-$l ...\n";
+    my ($EnglishDoc,$ForeignDoc,$idx);
+    while (<F>){
+
+	next unless (/Doc=\"/);
+	if (/Doc=\"$pivot\/([^"]+)"/){
+	    $EnglishDoc=$1;
+	    if (/Doc=\"$l\/([^"]+)"/){
+		$ForeignDoc=$1;
+	    }
+	}
+	next unless ($EnglishDoc && $ForeignDoc);
+
+	my $TargetDoc = undef;
+	if (exists $$InterDocs{$EnglishDoc}){
+	    if (exists $$InterDocs{$EnglishDoc}{$l}){
+		$TargetDoc = $$InterDocs{$EnglishDoc}{$l};
+	    }
+	}
+
+	#if (not exists $$docs{$EnglishDoc}){
+	#    next unless (exists $$InterDocs{$EnglishDoc});
+	#    next unless (exists $$InterDocs{$EnglishDoc}{$l});
+	#    next unless (exists $$InterDocs{$EnglishDoc}{$l}{$ForeignDoc});
+	#    $TargetDoc = $$InterDocs{$EnglishDoc}{$l}{$ForeignDoc};
+	#}
+	# next unless ($TargetDoc);
+	# my ($LinkedDoc,$TargetDoc) = split(/\s\=\>\s/,$$docs{$EnglishDoc}{$l});
+	# next if ($LinkedDoc ne $ForeignDoc);
+
+	print "process $EnglishDoc ...\n" if ($opt_v);
+
+	## read all links for this document
+	my %doclinks = ();
+	while (<F>){
+	    last if (/\<\/linkGrp/);
+	    if (/xtargets=\"([^"]+)"/){
+		my $link = $1;
+		my ($src,$trg) = split(/\;/,$link);
+		if ($fromEnglish){
+		    $doclinks{$trg}=$src;    # always treat English as trg
+		}
+		else{
+		    $doclinks{$src}=$trg;
+		}
+	    }
+	}
+
+	## save links in global hash
+	foreach my $trg (keys %doclinks){
+	    $links{$EnglishDoc}{$l}{$doclinks{$trg}}=$trg;
+	}
+
+	## we may also have transitive links
+	if ($opt_i and $TargetDoc){
+	    # my %translinks = transitive_links(\%doclinks,
+	    # 				      $ForeignDoc,$TargetDoc,$EnglishDoc);
+	    my %translinks = transitive_links(\%doclinks,
+	    				      $ForeignDoc,$EnglishDoc,$TargetDoc);
+	    foreach my $trg (keys %translinks){
+		$links{$TargetDoc}{$l}{$translinks{$trg}}=$trg;
+		# $links{$EnglishDoc}{$l}{$translinks{$trg}}=$trg;
+	    }
+	}
+	
+    }
+}
+
+# open
+
+
+my %fh;
+foreach my $l (@languages){
+    open $fh{$l},">$pivot-$l.xml" || die "cannot write to $pivot-$l.xml";
+    my $F = $fh{$l};
+    print $F '<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE cesAlign PUBLIC "-//CES//DTD XML cesAlign//EN" "">
+<cesAlign version="1.0">
+';
+}
+
+
+
+
+# get all minimal alignment units over all language pairs
+
+print "write links for all language pairs ...\n";
+foreach my $d (sort keys %links){
+
+    print "- write links for document $d\n" if ($opt_v);
+
+    my %e2f=();
+    my %f2e=();
+
+    foreach my $l (keys %{$links{$d}}){
+	foreach my $src (keys %{$links{$d}{$l}}){
+	    my $trg = $links{$d}{$l}{$src};
+	    my @src = split(/\s+/,$src);
+	    my @trg = split(/\s+/,$trg);
+	    foreach my $s (@src){
+		foreach my $t (@trg){
+		    $e2f{$s}{$l}{$t}=1;
+		    $f2e{$t}{$l}{$s}=1;
+		}
+	    }
+	}
+    }
+
+    # get all segments in the pivot language
+    # that are consistently linked with all languages
+
+    my @segments = ();
+    my @translations = ();
+
+    my %done = ();
+    foreach my $s (sort_ids(keys %e2f)){
+	next if ($done{$s});
+	my %srcset = ();
+	my %trgsets = ();
+	$srcset{$s} = 1;
+	my $added = 1;
+	while ($added){
+	    $added = 0;
+	    foreach my $e (keys %srcset){
+		foreach my $l (keys %{$e2f{$e}}){
+		    foreach my $f (keys %{$e2f{$e}{$l}}){
+			$trgsets{$l}{$f} = 1;
+			foreach my $e1 (keys %{$f2e{$f}{$l}}){
+			    unless (exists $srcset{$e1}){
+				$srcset{$e1} = 1;
+				$done{$e1} = 1;
+				$added++;
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	my @seg = sort_ids(keys %srcset);
+	next if ($opt_s && (@seg > $opt_s));
+
+	my $idx = @segments;
+	$segments[$idx] = join(' ',@seg);
+	%{$translations[$idx]} = ();
+	foreach my $l (@languages){
+	    my @seg = sort_ids(keys %{$trgsets{$l}});
+	    if ( ! $opt_e || $opt_s){
+	        if (( ! $opt_e && ! @seg ) || 
+		    ( $opt_s && @seg>$opt_s )){
+		    pop(@segments);
+		    pop(@translations);
+		    last;
+		}
+	    }
+	    $translations[$idx]{$l} = join(' ',@seg);
+	}
+    }
+
+    next unless (@segments);
+
+    # print links for each language pair (pivot to foreign)
+
+    foreach my $l (@languages){
+	my $F = $fh{$l};
+	print $F "<linkGrp targType=\"s\" fromDoc=\"$pivot/$d\" ";
+	print $F "toDoc=\"$l/$$docs{$d}{$l}\">\n";
+	foreach my $s (0..$#segments){
+	    print $F "<link xtargets=\"$segments[$s];$translations[$s]{$l}\" />\n";
+	}
+	print $F "</linkGrp>\n";
+    }
+}
+
+foreach my $l (@languages){
+    my $F = $fh{$l};
+    print $F "</cesAlign>\n";
+    close $fh{$l};
+}
+
+print "done!\n";
+
+
+
+sub transitive_links{
+    my ($doclinks,$srcdoc,$pivotdoc,$trgdoc) = @_;
+
+    my %links = ();
+
+    return () unless (exists $IntraLingLinks{$pivotdoc});
+    return () unless (exists $IntraLingLinks{$pivotdoc}{$trgdoc});
+
+    my %intralinks = ();
+    make_intralingual_links(\%IntraLingLinks,$pivotdoc,$trgdoc,\%intralinks);
+
+    my %a2b = ();
+    my %b2a = ();
+
+    foreach my $l (keys %{$doclinks}){
+	my @A = split(/\s+/,$l);
+	my @B = split(/\s+/,$$doclinks{$l});
+	foreach my $a (@A){
+	    foreach my $b (@B){
+		$a2b{$a}{$b} = 1;
+		$b2a{$b}{$a} = 1;
+	    }
+	}
+    }
+
+    my %b2c = ();
+    my %c2b = ();
+#    foreach my $l (keys %{$IntraLingLinks{$pivotdoc}{$trgdoc}}){
+    foreach my $l (keys %intralinks){
+	my @B = split(/\s+/,$l);
+	# my @C = split(/\s+/,$IntraLingLinks{$pivotdoc}{$trgdoc}{$l});
+	my @C = split(/\s+/,$intralinks{$l});
+	foreach my $b (@B){
+	    foreach my $c (@C){
+		$b2c{$b}{$c} = 1;
+		$c2b{$c}{$b} = 1;
+	    }
+	}
+    }
+
+    # now we search cliques from a-to-c via b in link-graph
+
+    my %done = ();
+    foreach my $s (keys %a2b){
+	next if ($done{$s});
+	my %srcset = ();
+	my %trgset = ();
+	my $added = 1;
+	$srcset{$s} = 1;
+
+	# grow source and target sets until no 
+	# further links can be added anymore
+	while ($added){
+	    $added = 0;
+	    foreach my $a (keys %srcset){
+		foreach my $b (keys %{$a2b{$a}}){
+		    foreach my $c (keys %{$b2c{$b}}){
+			unless (exists $trgset{$c}){
+			    $trgset{$c} = 1;
+			    $added++;
+			}
+		    }
+		}
+	    }
+	    foreach my $c (keys %trgset){
+		foreach my $b (keys %{$c2b{$c}}){
+		    foreach my $a (keys %{$b2a{$b}}){
+			unless (exists $srcset{$a}){
+			    $srcset{$a} = 1;
+			    $done{$a} = 1;   # mark as done
+			    $added++;
+			}
+		    }
+		}
+	    }
+	}
+
+	# make the linked segments
+	my $src = join(':',sort_ids(keys %srcset));
+	my $trg = join(':',sort_ids(keys %trgset));
+	$links{$src} = $trg;
+    }
+    return %links;
+}
+
+
+
+
+sub sort_ids{
+    return map $_->[0],
+           sort { $a->[1] <=> $b->[1] or $a->[2] <=> $b->[2] }
+                map [$_, /^s?([0-9]+).?([0-9]*)/], @_;
+}
+
+
+sub get_common_docs{
+
+    my $pivot = shift(@_);
+    my @languages = @_;
+    my $docs      = {};
+    my $InterDocs = {};
+    my %counts    = ();
+    # my %movies = ();
+
+    foreach my $l (@languages){
+	if (-f "$xmldir/$l-$pivot.$EXT"){
+	    open F,"gzip -cd < $xmldir/$l-$pivot.$EXT |" || die "cannot open $xmldir/$l-$pivot.$EXT";
+	}
+	elsif (-f "$xmldir/$pivot-$l.$EXT"){
+	    open F,"gzip -cd < $xmldir/$pivot-$l.$EXT |" || die "cannot open $xmldir/$pivot-$l.$EXT";
+	}
+	## check if there is a file with .all. instead
+	elsif (-f "$xmldir/$l-$pivot.all.$EXT"){
+	    open F,"gzip -cd < $xmldir/$l-$pivot.all.$EXT |" || die "cannot open $xmldir/$l-$pivot.all.$EXT";
+	}
+	elsif (-f "$xmldir/$pivot-$l.all.$EXT"){
+	    open F,"gzip -cd < $xmldir/$pivot-$l.all.$EXT |" || die "cannot open $xmldir/$pivot-$l.all.$EXT";
+	}
+	else{
+	    next;
+	}
+	while (<F>){
+	    if (/Doc=\"$pivot\/([^"]+)"/){
+		my $doc=$1;
+		if (/Doc=\"$l\/([^"]+)"/){
+		    $$docs{$doc}{$l}=$1;
+		    $counts{$l}++;
+		    # if ($opt_i && $opt_v){
+		    # 	my ($year,$movie,$subid) = split(/\//,$$docs{$doc}{$l});
+		    # 	$movies{"$year/$movie"}{$l}++;
+		    # }
+		}
+	    }
+	}
+    }
+    foreach (keys %{$docs}){
+	## find intermediate documents if -i is given
+	if ($opt_i){
+	    foreach my $l (@languages){
+		if (not exists $$docs{$_}{$l}){
+		    foreach my $d (keys %{$IntraLingLinks{$_}}){
+			if (exists $$docs{$d}){
+			    if ($$docs{$d}{$l}){
+				$$InterDocs{$d}{$l} = $_;          ## save the pivot document
+				$$docs{$_}{$l} = $$docs{$d}{$l};   ## add the target doc
+				last;  ## TODO: should we stop here?
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	if (keys %{$$docs{$_}} < @languages){
+	    delete $$docs{$_};
+	}
+    }
+    foreach (keys %counts){
+	print "number of documents in $_: ",$counts{$_},"\n";
+    }
+    return ($docs,$InterDocs);
+}
+
+
+## this sub is obsolete
+sub find_intermediate_file{
+    my ($docs,$engdoc,$lang) = @_;
+    if ($opt_v){
+	foreach my $d (keys %{$IntraLingLinks{$engdoc}}){
+	    if ((exists $$docs{$d}) && (exists $$docs{$d}{$lang})){
+		print "found pivot doc for $engdoc for lang $lang: $d\n";
+	    }
+	}
+    }
+    foreach my $d (keys %{$IntraLingLinks{$engdoc}}){
+	if (exists $$docs{$d}){
+	    if (exists $$docs{$d}{$lang}){
+		return ($d,$$docs{$d}{$lang});
+	    }
+	}
+    }
+    # print "no pivot doc found for $engdoc for lang $lang\n" if ($opt_v);
+    return (undef,undef);
+}
+
+
+sub get_intralingual_links{
+    my $linkfile = shift;
+    my $links = shift;
+    open F,"gzip -cd < $linkfile |" || die "cannot open $linkfile";
+    my ($fromDoc,$toDoc);
+    while (<F>){
+	if (/fromDoc=\"[^\/]+\/([^"]+)"/){
+	    $fromDoc = $1;
+	}
+	if (/toDoc=\"[^\/]+\/([^"]+)"/){
+	    $toDoc = $1;
+	}
+	if (/xtargets=\"([^"]+)"/){
+	    my $link = $1;
+	    my ($src,$trg) = split(/\;/,$link);
+	    $$links{$fromDoc}{$toDoc}{$src} = $trg;
+	    $$links{$toDoc}{$fromDoc}{$trg} = $src;
+	}
+    }
+    close F;
+}
+
+
+
+## speed up reading intralingual links:
+## avoid splitting all xtargets (do that on demand)
+
+sub read_intralingual_links{
+    my $linkfile = shift;
+    my $linked = shift;
+    open F,"gzip -cd < $linkfile |" || die "cannot open $linkfile";
+    my ($fromDoc,$toDoc);
+    my $count=0;
+    while (<F>){
+	if (/fromDoc=\"[^\/]+\/([^"]+)"/){
+	    $fromDoc = $1;
+	}
+	if (/toDoc=\"[^\/]+\/([^"]+)"/){
+	    $toDoc = $1;
+	    $$linked{$toDoc}{$fromDoc} = undef;
+	    $$linked{$fromDoc}{$toDoc} = undef;
+	    $count++;
+	    print STDERR '.' if (! ($count % 200));
+	    print STDERR " $count\n" if (! ($count % 10000));
+	}
+	if (/xtargets=/){
+	    $$linked{$fromDoc}{$toDoc} .= $_;
+	}
+    }
+    close F;
+    print "done!\n";
+}
+
+
+## split xtargets
+
+sub make_intralingual_links{
+    my $LinkedDocs = shift;
+    my $fromDoc = shift;
+    my $toDoc = shift;
+    my $links = shift;
+
+    my $inverse = 0;
+    my $linkstr;
+
+    if (defined $$LinkedDocs{$fromDoc}{$toDoc}){
+	$linkstr = $$LinkedDocs{$fromDoc}{$toDoc};
+    }
+    else{
+	$linkstr = $$LinkedDocs{$toDoc}{$fromDoc};
+	$inverse = 1;
+    }
+
+    my @lines = split(/\n/,$linkstr);
+    foreach (@lines){
+	if (/xtargets=\"([^"]+)"/){
+	    my $link = $1;
+	    my ($src,$trg) = split(/\;/,$link);
+	    if ($inverse){
+		$$links{$trg} = $src;
+	    }
+	    else{
+		$$links{$src} = $trg;
+	    }
+	}
+    }
+}

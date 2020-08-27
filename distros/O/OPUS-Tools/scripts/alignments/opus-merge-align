@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+#
+# USAGE: opus-merge-align alignfile1 alignfile2 ...
+# 
+# merge several sentence alignment files
+# overwrite repeated link groups
+# alignfiles can be conpressed with gzip
+
+
+use strict;
+
+
+## read all sentence alignment files
+## repeated link groups will overwrite earlier ones
+
+my %linkGrp = ();
+foreach (@ARGV){
+    read_alignments($_,\%linkGrp);
+}
+
+
+## print all link groups sorted by filenames
+
+print '<?xml version="1.0" encoding="utf-8"?>'."\n";
+print '<!DOCTYPE cesAlign PUBLIC "-//CES//DTD XML cesAlign//EN" "">'."\n";
+print '<cesAlign version="1.0">'."\n";
+foreach (sort keys %linkGrp){
+    print $linkGrp{$_};
+}
+print '</cesAlign>'."\n";
+
+
+
+## read sentence alignments and store in alignment hash
+## key = pair of aligned files
+
+sub read_alignments{
+    my $file = shift;
+    my $aligned = shift;
+    if ($file=~/\.gz$/){
+	open F,"gzip -cd <$file |" || die "cannot read from $file\n";
+    }
+    else{
+	open F,"<$file" || die "cannot read from $file\n";
+    }
+
+    my $filepair = undef;
+    while (<F>){
+	next if (/(\<\?xml|\<\!DOCTYPE|\<cesAlign|\<\/cesAlign\>)/);
+	if (/\<linkGrp/){
+	    /fromDoc\=\"(\S+)\"/;
+	    my $srcfile = $1;
+	    /toDoc\=\"(\S+)\"/;
+	    my $trgfile = $1;
+	    $filepair = "$srcfile-$trgfile";
+	    ## overwrite existing values!
+	    $$aligned{$filepair} = '';
+	}
+	$$aligned{$filepair} .= $_ if ($filepair);
+	if (/\<\/linkGrp/){
+	    $filepair = undef;
+	}
+    }
+}
+

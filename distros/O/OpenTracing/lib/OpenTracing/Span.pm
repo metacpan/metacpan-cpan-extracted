@@ -3,7 +3,7 @@ package OpenTracing::Span;
 use strict;
 use warnings;
 
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.003'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(OpenTracing::Common);
@@ -27,6 +27,27 @@ L<https://opentracing.io/docs/overview/spans/>
 
 use Time::HiRes ();
 use Bytes::Random::Secure qw(random_bytes_hex);
+
+=head2 new
+
+Instantiates a new span. Rarely called directly - you'd want to let the L<OpenTracing::Tracer> take
+care of this for you.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<parent> - an L<OpenTracing::Span> for a parent instance (optional)
+
+=item * C<parent_id> - the span ID for the parent (optional)
+
+=item * C<trace_id> - the current trace ID (optional)
+
+=item * C<operation_name> - what to use for this span name
+
+=back
+
+=cut
 
 sub new {
     my ($class, %args) = @_;
@@ -166,13 +187,42 @@ sub log : method {
     $log;
 }
 
+=head2 tag
+
+Applies key/value tags to this span.
+
+The L<semantic conventions|https://github.com/opentracing/specification/blob/master/semantic_conventions.md>
+may be of interest here.
+
+Example usage:
+
+ $span->tag(
+  'http.status_code' => 200,
+  'http.url' => 'https://localhost/xxx',
+  'http.method' => 'GET'
+ );
+
+=cut
+
 sub tag : method {
     my ($self, %args) = @_;
     @{$self->{tags}}{keys %args} = values %args;
     return $self;
 }
 
+=head2 tracer
+
+Returns the L<OpenTracing::Tracer> for this span.
+
+=cut
+
 sub tracer { shift->{tracer} }
+
+=head2 is_finished
+
+Returns true if this span is finished (has a L</finish_time>), otherwise false.
+
+=cut
 
 sub is_finished { defined shift->{finish_time} }
 

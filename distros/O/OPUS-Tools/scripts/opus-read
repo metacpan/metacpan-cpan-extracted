@@ -1,0 +1,364 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+
+=head1 NAME
+
+opus-read - read sentence alignment in XCES align format
+
+=head1 SYNOPSIS
+
+ # read sentence alignments and print aligned sentences
+ opus-read align-file.xml
+ opus-read align-file.xml.gz
+ opus-read corpusname/lang-pair
+ opus-read -d corpusname lang-pair
+ opus-read -d corpusname -s srclang -t trglang
+
+ # print alignments with alignment certainty > LinkThr=0
+ opus-read -c 0 align-file.xml
+
+ # print alignments with max 2 source sentences and 3 target sentences
+ opus-read -S 2 -T 3 align-file.xml
+
+ # print aligned sentences marked as 'de' (source) and 'en' (target)
+ # (this only works if sentences are marked with languages:
+ #  for example, in the German XML file: <s lang="de">...</s>)
+ opus-read -s de -t en align-file.xml
+
+ # wrap aligned sentences in simple HTML
+ opus-read -h align-file.xml
+
+ # print max 10 alignments
+ opus-read -m 10 align-file.xml
+
+ # specify home directory of aligned XML files
+ opus-read -d /path/to/xml/files align-file.xml
+
+ # print XCES align format of all 1:1 sentence alignments
+ opus-read -S 1 -T 1 -l align-file.xml
+
+=head1 USAGE
+
+ opus-read [OPTIONS] align-file.xml
+
+=head1 OPTIONS
+
+ -c <thr> ........... set a link threshold <thr>
+ -d <dir> ........... set home directory for aligned XML documents
+ -h ................. print simple HTML
+ -l ................. print links (filter mode)
+ -m <max> ........... print max <max> alignments
+ -n <regex> ......... get only documents that match the regex
+ -N <regex> ......... skip all documents that match the regex
+ -o <thr> ........... set a threshold for time overlap (subtitle data)
+ -r <release> ....... release (default = latest)
+ -s <LangID> ........ require source sentences to match <LangID>
+ -t <LangID> ........ require target sentences to match <LangID>
+ -S <max> ........... maximum number of source sentence in alignments
+ -T <max> ........... maximum number of target sentence in alignments
+ -SN <nr> ........... number of source sentence in alignments
+ -TN <nr> ........... number of target sentence in alignments
+
+=head1 DESCRIPTION
+
+C<opus-read> is a simple script to read sentence alignments stored in XCES align format and prints the aligned sentences to STDOUT. It requires monolingual alignments (ascending order, no crossing links) of sentences in linked XML files. Linked XML files are specified in the C<toDoc> and <fromDoc> attributes (see below).
+
+ <cesAlign version="1.0">
+  <linkGrp targType="s" toDoc="source1.xml" fromDoc="target1.xml">
+    <link certainty="0.88" xtargets="s1.1 s1.2;s1.1" id="SL1" />
+    ....
+  <linkGrp targType="s" toDoc="source2.xml" fromDoc="target2.xml">
+    <link certainty="0.88" xtargets="s1.1;s1.1" id="SL1" />
+
+Several parameters can be set to filter the alignments and to print only certain types of alignments.
+
+C<opus-read> can also be used to filter the XCES alignment files and to print the remaining links in the same XCES align format. Use the C<-l> flag to enable this mode.
+
+=head1 LICENSE
+
+ ---------------------------------------------------------------------------
+ Copyright (c) 2004-2019 Joerg Tiedemann
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ ---------------------------------------------------------------------------
+
+=head1 See also
+
+This script is part of opus-tools L<https://github.com/Helsinki-NLP/opus-tools>
+See also OPUS L<http://opus.nlpl.eu> for more information about the corpus.
+
+=cut
+
+
+use strict;
+use FindBin qw($Bin);
+use lib $Bin.'/../lib';
+
+use OPUS::Tools;
+use File::Basename qw(dirname basename);
+
+
+my $html=0;
+my $max=0;
+my $release='latest';
+my $SrcID=undef;
+my $TrgID=undef;
+my $MaxSrc=undef;
+my $MaxTrg=undef;
+my $NrSrc=undef;
+my $NrTrg=undef;
+my $LinkThr=undef;
+my $OverlapThr=undef;
+my $FilterMode=0;    # filter-mode: print alignment XML
+my $SkipDocs=undef;  # RE pattern for doc's to be skipped when reading
+my $GrepDocs=undef;  # RE pattern for doc's to be extracted
+my $VERBOSE=0;
+
+my $CorpusName    = undef;
+my $CorpusRelease = 'latest';
+my $CorpusType    = 'xml';
+
+while ($ARGV[0]=~/^\-/){
+    my $o=shift(@ARGV);
+    if ($o=~/^\-h/){$html=1;}
+    elsif ($o=~/^\-m/){$max=shift @ARGV;}
+    elsif ($o=~/^\-d/){$CorpusName=shift @ARGV;}
+    elsif ($o=~/^\-p/){$CorpusType=shift @ARGV;}
+    elsif ($o=~/^\-r/){$CorpusRelease=shift @ARGV;}
+    elsif ($o=~/^\-s/){$SrcID=shift @ARGV;}
+    elsif ($o=~/^\-t/){$TrgID=shift @ARGV;}
+    elsif ($o=~/^\-S/){$MaxSrc=shift @ARGV;}
+    elsif ($o=~/^\-T/){$MaxTrg=shift @ARGV;}
+    elsif ($o=~/^\-SN/){$NrSrc=shift @ARGV;}
+    elsif ($o=~/^\-TN/){$NrTrg=shift @ARGV;}
+    elsif ($o=~/^\-c/){$LinkThr=shift @ARGV;}
+    elsif ($o=~/^\-o/){$OverlapThr=shift @ARGV;}
+    elsif ($o=~/^\-n/){$GrepDocs=shift @ARGV;}
+    elsif ($o=~/^\-N/){$SkipDocs=shift @ARGV;}
+    elsif ($o=~/^\-l/){$FilterMode=1;}
+    elsif ($o=~/^\-v/){$VERBOSE=1;}
+}
+
+
+my $Bitext = shift(@ARGV);
+
+my ($fh,$CorpusDir) = open_bitext($Bitext,$CorpusName,
+				  $CorpusRelease,$CorpusType,
+				  $SrcID,$TrgID);
+
+my $srcdoc='';
+my $trgdoc='';
+
+if ($html){&PrintHtmlHeader();}
+
+my $firstSrc=1;
+my $firstTrg=1;
+
+my $SrcHandle;
+my $TrgHandle;
+
+my $count=0;
+$/ = '>';            # use tag end as input delimiter
+while (<$fh>){
+    if (/fromDoc=\"([^\"]+)\"/){
+	if ($srcdoc ne $1){
+	    $srcdoc = $1;
+	    unless ($FilterMode){
+		open_opus_document(\$SrcHandle,$CorpusDir,$srcdoc);
+	    }
+	    print STDERR "read $srcdoc - " if ($VERBOSE);
+	}
+    }
+    if (/toDoc=\"([^\"]+)\"/){
+	if ($trgdoc ne $1){
+	    $trgdoc = $1;
+	    unless ($FilterMode){
+		open_opus_document(\$TrgHandle,$CorpusDir,$trgdoc);
+		if ($html){print "<p>\n";}
+		print "\n# ".$srcdoc;
+		if ($html){print '<br>';}
+		print "\n# ".$trgdoc."\n\n";
+		if ($html){print "<p><hr>\n";}
+		else{print "================================\n";}
+	    }
+	    print STDERR "$trgdoc\n" if ($VERBOSE);
+	}
+    }
+
+    if ($srcdoc && $trgdoc){
+	if (defined $SkipDocs){
+	    next if ($srcdoc=~/$SkipDocs/);
+	    next if ($trgdoc=~/$SkipDocs/);
+	}
+	if (defined $GrepDocs){
+	    next if ($srcdoc!~/$GrepDocs/);
+	    next if ($trgdoc!~/$GrepDocs/);
+	}
+
+	if (/xtargets=\"([^\"]*)\s*\;\s*([^\"]*)\"/){
+	    my $src=$1;
+	    my $trg=$2;
+	    if (defined $LinkThr){
+		if (/certainty=\"(.*?)\"/){
+		    next if ($1<$LinkThr);
+		}
+		else{ next; }           ## TODO: is this good
+	    }
+	    if (defined $OverlapThr){
+		if (/overlap=\"(.*?)\"/){
+		    next if ($1<$OverlapThr);
+		}
+		else{ next; }           ## TODO: is this good
+	    }
+	    my $srceof=1;
+	    my $trgeof=1;
+	    $count++;
+	    if ($max and ($count>$max)){last;}
+	    my @srcsent=split(/\s/,$src);
+	    my @trgsent=split(/\s/,$trg);
+	    
+	    if (defined $MaxSrc){
+		next if (scalar @srcsent > $MaxSrc);
+	    }
+	    if (defined $MaxTrg){
+		next if (scalar @trgsent > $MaxTrg);
+	    }
+	    if (defined $NrSrc){
+		next if (scalar @srcsent != $NrSrc);
+	    }
+	    if (defined $NrTrg){
+		next if (scalar @trgsent != $NrTrg);
+	    }
+
+	    unless ($FilterMode){
+		my $SrcStr='';
+		my $TrgStr='';
+
+		my $oldDel=$/;
+		$/='</s>';
+SRCSENT:        foreach (@srcsent){
+                    while (defined(my $sent=$SrcHandle->getline())){
+			$srceof=0;
+			if ($sent=~/s [^\>]*id="$_"/s){
+			    if ($SrcID && $sent=~/lang=\".*?\"/){
+				next SRCSENT unless ($sent=~/lang=\"$SrcID\"/);
+			    }
+			    $sent=~s/^.*<s [^\>]*id/(src)/s;
+			    $sent=~s/\n/ /gs;
+			    $sent=~s/\<[^\>]*>//gs;
+			    $sent=~s/  +/ /gs;
+			    if ($html){$sent=&Str2Html($sent);}
+			    else{
+				$sent=~s/\&gt\;/\>/gs;
+				$sent=~s/\&lt\;/\</gs;
+				$sent=~s/\&amp\;/\&/gs;
+			    }
+			    $SrcStr.=$sent;
+			    if ($html){$SrcStr.="<br>";}
+			    $SrcStr.="\n";
+			    last;
+			}
+			$srceof=1;
+		    }
+                }
+
+TRGSENT:        foreach (@trgsent){
+	            while (defined(my $sent=$TrgHandle->getline())){
+			$trgeof=0;
+			if ($sent=~/s [^\>]*id="$_"/s){
+			    if ($TrgID && $sent=~/lang=\".*?\"/){
+				next TRGSENT unless ($sent=~/lang=\"$TrgID\"/);
+			    }
+			    $sent=~s/^.*<s [^\>]*id/(trg)/s;
+			    $sent=~s/\n/ /gs;
+			    $sent=~s/\<[^\>]*>//gs;
+			    $sent=~s/  +/ /gs;
+			    if ($html){$sent=&Str2Html($sent);}
+			    else{
+				$sent=~s/\&gt\;/\>/gs;
+				$sent=~s/\&lt\;/\</gs;
+				$sent=~s/\&amp\;/\&/gs;
+			    }
+			    $TrgStr.=$sent;
+			    if ($html){$TrgStr.="<br>";}
+			    $TrgStr.="\n";
+			    last;
+			}
+			$trgeof=1;
+		    }
+                }
+		if ($trgeof){
+		    open_opus_document(\$TrgHandle,$CorpusDir,$trgdoc);
+		}
+		if ($srceof){
+		    open_opus_document(\$SrcHandle,$CorpusDir,$srcdoc);
+		}
+		$/=$oldDel;
+		if ($SrcStr && $TrgStr){
+		    print $SrcStr;
+		    print $TrgStr;
+		    if ($html){print "<hr>\n";}
+		    else{print "================================\n";}
+		}
+		else{ next; }
+	    }
+	}
+    }
+    print $_ if ($FilterMode);
+}
+
+unless ($FilterMode){
+    if (not $firstSrc){close $SrcHandle;}
+    if (not $firstTrg){close $TrgHandle;}
+}
+close F;
+
+if ($html){&PrintHtmlTail();}
+
+sub Str2Html{
+    my $string=shift;
+#    $string=~s/\&/\&amp\;/gs;
+#    $string=~s/\</\&lt\;/gs;
+#    $string=~s/\>/\&gt\;/gs;
+    return $string;
+}
+
+
+sub PrintHtmlHeader{
+    print <<HEADER;
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+"http://www.w3.org/TR/REC-html40/loose.dtd"> 
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+</head>
+<body>
+HEADER
+}
+
+
+sub PrintHtmlTail{
+    print <<TAIL;
+</body>
+</html>
+TAIL
+}
+

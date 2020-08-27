@@ -233,7 +233,10 @@ $mock = mock_http_response( code => 200 );
 $results = $diagnostic->check;
 is $results->{status}, 'OK', 'Complex check: 200 is GOOD';
 
-$mock = mock_http_response( code => 302 );
+$mock = mock_http_response(
+    code    => 302,
+    headers => [ location => 'http://127.0.0.1' ], # LWP::UserAgent 6.45 bug
+);
 $results = $diagnostic->check;
 is $results->{status}, 'OK', 'Complex check: 302 is GOOD';
 

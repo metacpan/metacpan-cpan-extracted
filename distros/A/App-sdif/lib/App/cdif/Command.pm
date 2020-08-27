@@ -1,6 +1,6 @@
 package App::cdif::Command;
 
-use strict;
+use v5.14;
 use warnings;
 use utf8;
 use Carp;
@@ -23,7 +23,7 @@ sub debug {
 
 sub new {
     my $class = shift;
-    my $obj = SUPER::new $class;
+    my $obj = $class->SUPER::new;
     $obj->command(@_) if @_;
     $obj;
 }
@@ -51,7 +51,7 @@ sub execute {
     my $command = shift;
     my @command = ref $command eq 'ARRAY' ? @$command : ($command);
     use IO::File;
-    my $pid = (my $fh = new IO::File)->open('-|') // die "open: $@\n";
+    my $pid = (my $fh = IO::File->new)->open('-|') // die "open: $@\n";
     if ($pid == 0) {
 	if (my $stdin = $obj->{STDIN}) {
 	    open STDIN, "<&=", $stdin->fileno or die "open: $!\n";

@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.062	2020-08-25
+
+ - Added: Support :coerce / :coercion attributes on methods, multimethods,
+   and factory methods to also install them as a coercion.
+
 0.061	2020-04-28
 
  [ Bug Fixes ]

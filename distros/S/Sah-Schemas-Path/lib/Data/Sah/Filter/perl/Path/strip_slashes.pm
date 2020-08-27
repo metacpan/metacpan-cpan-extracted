@@ -1,9 +1,9 @@
 package Data::Sah::Filter::perl::Path::strip_slashes;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-08'; # DATE
+our $DATE = '2020-08-26'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,7 +47,7 @@ Data::Sah::Filter::perl::Path::strip_slashes
 
 =head1 VERSION
 
-This document describes version 0.014 of Data::Sah::Filter::perl::Path::strip_slashes (from Perl distribution Sah-Schemas-Path), released on 2020-08-08.
+This document describes version 0.015 of Data::Sah::Filter::perl::Path::strip_slashes (from Perl distribution Sah-Schemas-Path), released on 2020-08-26.
 
 =head1 DESCRIPTION
 

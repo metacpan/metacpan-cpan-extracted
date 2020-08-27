@@ -1,0 +1,383 @@
+=head1 NAME
+
+XLog - Unified logging API, without performance penalties.
+
+
+
+=head1 SYNPOSIS
+
+    XLog::set_logger(sub { say $_[0] });
+    XLog::set_format("%1t %c[%L/%1M]%C %f:%l,%F(): %m");
+    XLog::set_level(XLog::INFO);
+    
+    XLog::info("number=%d", $num);
+    XLog::warning("hello");
+    XLog::log(XLog::ERROR, $msg);
+    XLog::debug("msg=%s", $message); # will not be logged, because min level is INFO, and message will NOT be evaluated
+    
+    XLog::error($module, $message); # use certain log module for logging
+    
+    #callback will not be called if log level is insufficient
+    XLog::notice(sub {
+        my $msg = '';
+        for (...) {
+           ...
+           $msg .= ...
+        }
+        return $msg;
+    });
+    
+    {
+        package MyPackage;
+        our $xlog_module = XLog::Module->new("my module"); # every log in this package will use this log module
+        $xlog_module->set_level(XLog::ERROR);
+        
+        ...
+        
+        XLog::error($message); # logged with module "my module"
+        XLog::warning($message); # will not be logged / evaluated
+    }
+    
+    # set custom formatter
+    {
+        package MyFormatter;
+        use parent 'XLog::Formatter';
+        sub format {
+            my ($self, $msg, $level, $module, $file, $line, $func) = @_;
+            return "formatted message";
+        }
+    }
+    XLog::set_formatter(MyFormatter->new);
+    
+    # choose a backend for logging
+    XLog::set_logger(XLog::Console->new);
+    XLog::set_logger(XLog::File->new({file => "my.log"});
+    
+    # or log to multiple backends
+    XLog::set_logger(XLog::Multi->new([
+        {logger => XLog::Console->new, min_level => XLog::DEBUG},
+        {logger => XLog::File->new({file => "my.log"}, min_level => XLog::NOTICE, formatter => XLog::Formatter::Pattern->new("f2:%m")},
+        {logger => sub { send over network... }, min_level => XLog::ERROR},
+    ]));
+
+
+
+=head1 DESCRIPTION
+
+XLog is a centralized logging API both from perl and C level. It is written in C and is very fast.
+
+One of its main features is that if message is not to be logged (due to log level) then arguments will not be evaluated and function is not called.
+Closest example of this behaviour (but ugly and non-flexible)
+
+log("something") if $DEBUG;
+
+XLog is an API, not an implementation. You can choose which backend to use among available modules or use multiple backends via L<XLog::Multi>.
+To create your own backend see L<XLog::Logger>.
+
+XLog supports C<logging modules>. Modules are used to separate log levels in one part of the application from another so that you can enable for example debug
+logs only for part of your application, not for the whole app.
+
+
+
+=head1 LOGGING
+
+Logging is done by calling one of the logging functions, for example C<XLog::alert("message")>. Logging is only done if selected log level is equal to
+or greater than selected minimal log level (via C<XLog::set_level()>). Otherwise arguments are not evaluated and the log line doesn't take any measurable time.
+
+By default, min level is WARNING.
+
+If logging is to be done, XLog will evaluate arguments, format log message and pass it to backend. Backend is just an object (or subroutine)
+which receives a log message and must log it somewhere and somehow.
+
+
+
+=head1 LOG MODULES
+
+Log modules are used to separate logs of one part of the application from another. For example image you have network layer in your application and
+logic layer.
+
+    # network layer
+    ...
+    XLog::debug("data received: $raw_data");
+    
+    #logic layer
+    ...
+    XLog::debug("message: ".Dump($msg));
+    
+    ...
+    #somewhere
+    XLog::set_level(XLog::DEBUG);
+
+You want to debug your network layer and enable debug logs but you don't want to enable debug logs everywhere across your app.
+In this case you can create 2 log modules, use it when logging and enable debug log only for certain log module.
+
+    package NetworkLayer;
+    our $xlog_module = XLog::Module->new("network");
+    ...
+    XLog::debug($xlog_module, "data received: $raw_data");
+    
+    package LogicLayer;
+    our $xlog_module = XLog::Module->new("logic");
+    ...
+    XLog::debug($xlog_module, "message: ".Dump($msg));
+
+    ...
+    #somewhere
+    $NetworkLayer::xlog_module->set_level(XLog::DEBUG);
+    # or
+    XLog::set_level(XLog::DEBUG, "network");
+
+Now min level DEBUG is only set for C<network> log module while C<logic> still have WARNING as min level.
+
+
+Module parameter to log functions can be omitted if variable's name holding log module is C<xlog_module> and it is global and in the same package
+or lower package as logging code.
+
+    {
+        package MyApp;
+        our $xlog_module = XLog::Module->new("myapp");
+    
+        {
+            package MyApp::Other;
+            XLog::debug("hello"); # logging to myapp
+        }
+        {
+            package MyApp::NetworkLayer;
+            our $xlog_module = XLog::Module->new("network");
+            XLog::debug("hello"); # logging to network module
+        }
+        XLog::debug("hi"); # logging to myapp module
+    }
+    XLog::debug("hi"); # logging to root module
+
+
+Modules can be organised in hierarchies (parent-child).
+
+    package AAA;
+    our $xlog_module = XLog::Module->new("aaa");
+    
+    package BBB;
+    our $xlog_module = XLog::Module->new("bbb", $AAA::xlog_module);
+    
+In this case, module C<bbb> is a child of module C<aaa> and setting log level for C<aaa> also sets level for C<bbb> but not vice-versa.
+Child modules partially inherits names from their parents, so in this case the name of BBB module will be C<aaa::bbb>.
+
+
+
+=head1 FUNCTIONS
+
+=head4 set_level($level, [$module_name])
+
+If C<$module_name> is omitted, set minimum log level globally (for all modules)
+
+    XLog::set_level(XLog::DEBUG);
+    XLog::debug($message); # message is logged
+    XLog::set_level(XLog::INFO);
+    XLog::debug($message); # message is neither logged nor evaluated
+    
+    See C<LOG LEVELS>
+
+Otherwise, set minimum log level only for specified module and its children. Effect is the same as
+
+    $module->set_level($level);
+
+
+=head4 set_logger($logger)
+
+Set backend. Must be a subref or logging object compatible with XLog.
+
+If C<$logger> is subref it will receive a single parameter - formatted message.
+
+    XLog::set_logger({
+        my $msg = shift;
+        say $msg;
+    });
+    
+Or you can create an object using existing backends L<XLog::Console>, L<XLog::File>, etc...
+
+Or you can create your own backend, see L<XLog::Logger>.
+
+
+=head4 set_formatter($formatter)
+
+Set log message formatter. Must be a subref or formatter object.
+
+If C<$formatter> is a subref, it will receive the following parameters:
+
+    XLog::set_formatter(sub {
+         my ($msg, $level, $module, $file, $line, $func) = @_;
+         return "$msg at $file:$line";
+    });
+    
+=over
+
+=item $msg
+
+Log message as supplied by user
+    
+=item $level
+
+Log level constant, see C<LOG LEVELS>
+
+=item $module
+
+Log module name
+    
+=item $file
+
+File in which log message was written
+    
+=item $line
+
+Line on which log message was written
+    
+=item $func
+
+Function in which log message was written
+    
+=back
+
+Subroutine must return final log message which will be passed to backend.
+
+C<$formatter> may also be an object, for example L<XLog::Formatter::Pattern>.
+You can create your own formatter class, see L<XLog::Formatter>.
+
+
+=head4 set_format($format)
+
+Set format string. The default is C<%1t %c[%L/%1M]%C %f:%l,%F(): %m>.
+
+This is a shortcut for
+
+    XLog::set_formatter(XLog::Formatter::Pattern->new($format));
+    
+See L<XLog::Formatter::Pattern> for details
+
+
+=head4 log($level, [$module], $message, [@args])
+
+This function does logging.
+
+C<$module> is optional and if not supplied will be automatically detected by looking for global variable $xlog_module in
+class where logging line is. If no such variable detected, will look into upper class and so on. If no variable detected in the end of this process, will
+use root logging module.
+
+C<$message> must be a string or subref.
+
+If C<$message> is a string, it supports C<printf>-like format. In this case optional C<@args> are used to replace placeholders. For example
+
+    XLog::log(XLog::DEBUG, "message received: %s (%d bytes)", $msg, length($msg));
+    
+If C<$message> is a subref, it will be called and its result is used as a log message.
+
+In either case if supplied C<$level> is not sufficient for logging (i.e. message will not be logged), arguments are not evaluated. For example
+
+    XLog::set_level(XLog::INFO);
+    XLog::log(XLog::DEBUG, "message: $very_long_message"); # string in quotes is not evaluated, and $very_long_message is not interpolated
+
+
+=head4 debug([$module], $message, [@args])
+
+=head4 info(...)
+
+=head4 notice(...)
+
+=head4 warning(...)
+
+=head4 error(...)
+
+=head4 critical(...)
+
+=head4 alert(...)
+
+=head4 emergency(...)
+
+Same as C<XLog::log()> passing corresponding log level as a first arg.
+
+
+
+=head1 LOG LEVELS
+
+All constants are in XLog namespace (i.e. XLog::DEBUG).
+
+=over
+
+=item DEBUG
+
+=item INFO
+
+=item NOTICE
+
+=item WARNING
+
+=item ERROR
+
+=item CRITICAL
+
+=item ALERT
+
+=item EMERGENCY
+
+=back
+
+
+
+=head1 EVALUATION OPTIMIZATION
+
+XLog will not evaluate arguments and will not call any function (i.e. the line will be no-op) if min log level is higher than message log level and
+XLog can understand where module and message are (in arguments), because module is needed to find out minimal log level.
+
+Optimization enabled when:
+
+=over
+
+=item Module/message argument is simple
+
+In the following examples, evaluation is skipped
+    XLog::debug("message");
+    XLog::debug($message);
+    XLog::log(XLog::DEBUG, "hi");
+    XLog::debug($module, "msg=$msg"); # doesn't matter how complex is message argument
+    XLog::log(XLog::DEBUG, $module, "msg=$msg"); # doesn't matter how complex is message argument
+    
+In next examples, module/message is a complex expression, so optimizations are disabled.
+    
+    XLog::debug($cond ? $module1 : $module2, "msg=$msg");
+    XLog::debug($cond ? $msg1 : $msg2, @printf_args);
+    XLog::debug(function_returning_module_or_message(), "msg=$msg");
+    
+=item Message argument is an interpolation or concatenation (soon, not yet implemented)
+
+    XLog::debug("msg=$msg bytes=$bytes");
+    XLog::debug($msg1.$msg2.$msg3);
+
+=back
+
+
+
+=head1 SEE ALSO
+
+L<XLog::Multi>
+
+L<XLog::Console>
+
+L<XLog::File>
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>
+
+Ivan Baidakou <dmol@cpan.org>
+
+Crazy Panda LTD
+
+
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut
+
+1;

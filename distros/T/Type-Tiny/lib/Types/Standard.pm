@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.010004';
+	$Types::Standard::VERSION   = '1.010005';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -113,6 +113,18 @@ my $add_core_type = sub {
 	}
 	
 	$meta->add_type($typedef);
+};
+
+my $maybe_load_modules = sub {
+	my $code = pop;
+	if ( $Type::Tiny::AvoidCallbacks ) {
+		$code = sprintf(
+			'do { package Type::Tiny; %s; %s }',
+			join('; ', map "use $_ ()", @_),
+			$code,
+		);
+	}
+	$code;
 };
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
@@ -238,9 +250,12 @@ my $_laxnum = $meta->add_type({
 	parent     => $_str,
 	constraint => sub { looks_like_number($_) and ref(\$_) ne 'GLOB' },
 	inlined    => sub {
-		'Scalar::Util'->VERSION('1.18') # RT 132426
-			? "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1])"
-			: "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1]) && ref(\\($_[1])) ne 'GLOB'"
+		$maybe_load_modules->(
+			qw/ Scalar::Util /,
+			'Scalar::Util'->VERSION('1.18') # RT 132426
+				? "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1])"
+				: "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1]) && ref(\\($_[1])) ne 'GLOB'"
+		);
 	},
 });
 
@@ -327,7 +342,10 @@ my $_ref = $meta->$add_core_type({
 		my $reftype = shift;
 		return sub {
 			my $v = $_[1];
-			"ref($v) and Scalar::Util::reftype($v) eq q($reftype)";
+			$maybe_load_modules->(
+				qw/ Scalar::Util /,
+				"ref($v) and Scalar::Util::reftype($v) eq q($reftype)"
+			);
 		};
 	},
 	deep_explanation => sub {
@@ -358,7 +376,13 @@ my $_regexp = $meta->$add_core_type({
 	name       => "RegexpRef",
 	parent     => $_ref,
 	constraint => sub { ref($_) && !!re::is_regexp($_) or blessed($_) && $_->isa('Regexp') },
-	inlined    => sub { my $v = $_[1]; "ref($v) && !!re::is_regexp($v) or Scalar::Util::blessed($v) && $v\->isa('Regexp')" },
+	inlined    => sub {
+		my $v = $_[1];
+		$maybe_load_modules->(
+			qw/ Scalar::Util re /,
+			"ref($v) && !!re::is_regexp($v) or Scalar::Util::blessed($v) && $v\->isa('Regexp')"
+		);
+	},
 });
 
 $meta->$add_core_type({
@@ -380,8 +404,11 @@ $meta->$add_core_type({
 		or (blessed($_) && $_->isa("IO::Handle"))
 	},
 	inlined    => sub {
-		"(ref($_[1]) && Scalar::Util::openhandle($_[1])) ".
-		"or (Scalar::Util::blessed($_[1]) && $_[1]\->isa(\"IO::Handle\"))"
+		$maybe_load_modules->(
+			qw/ Scalar::Util /,
+			"(ref($_[1]) && Scalar::Util::openhandle($_[1])) ".
+			"or (Scalar::Util::blessed($_[1]) && $_[1]\->isa(\"IO::Handle\"))"
+		);
 	},
 });
 
@@ -437,7 +464,7 @@ my $_obj = $meta->$add_core_type({
 	inlined    => sub {
 		_HAS_REFUTILXS && !$Type::Tiny::AvoidCallbacks
 			? "Ref::Util::XS::is_blessed_ref($_[1])"
-			: "Scalar::Util::blessed($_[1])"
+			: $maybe_load_modules->('Scalar::Util', "Scalar::Util::blessed($_[1])")
 	},
 	is_object  => 1,
 });
@@ -626,9 +653,12 @@ $meta->add_type({
 	parent     => $_obj,
 	constraint => sub { require overload; overload::Overloaded($_) },
 	inlined    => sub {
-		$INC{'overload.pm'}
-			? "Scalar::Util::blessed($_[1]) and overload::Overloaded($_[1])"
-			: "Scalar::Util::blessed($_[1]) and do { use overload (); overload::Overloaded($_[1]) }"
+		$maybe_load_modules->(
+			qw/ Scalar::Util overload /,
+			$INC{'overload.pm'}
+				? "Scalar::Util::blessed($_[1]) and overload::Overloaded($_[1])"
+				: "Scalar::Util::blessed($_[1]) and do { use overload (); overload::Overloaded($_[1]) }"
+		);
 	},
 	constraint_generator => sub
 	{
@@ -654,9 +684,12 @@ $meta->add_type({
 		return sub {
 			require overload;
 			my $v = $_[1];
-			join " and ",
-				"Scalar::Util::blessed($v)",
-				map "overload::Method($v, q[$_])", @operations;
+			$maybe_load_modules->(
+				qw/ Scalar::Util overload /,
+				join " and ",
+					"Scalar::Util::blessed($v)",
+					map "overload::Method($v, q[$_])", @operations
+			);
 		};
 	},
 	is_object  => 1,
@@ -700,8 +733,11 @@ $meta->add_type({
 	},
 	inlined    => sub {
 		my ($self, $var) = @_;
-		$self->parent->inline_check($var)
-		. " and !!tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : Scalar::Util::reftype($var) =~ /^(SCALAR|REF)\$/ ? \${$var} : undef)"
+		$maybe_load_modules->(
+			qw/ Scalar::Util /,
+			$self->parent->inline_check($var)
+			. " and !!tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : Scalar::Util::reftype($var) =~ /^(SCALAR|REF)\$/ ? \${$var} : undef)"
+		);
 	},
 	name_generator => sub
 	{

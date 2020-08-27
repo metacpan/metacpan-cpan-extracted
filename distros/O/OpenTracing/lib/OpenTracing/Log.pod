@@ -1,4 +1,7 @@
+=encoding utf8
+
 =for comment POD_DERIVED_INDEX_GENERATED
+
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with OpenTracing::Log
 at lib/OpenTracing/Log.pm
@@ -29,6 +32,20 @@ Arrayref of tags relating to the log entry.
 =head2 tag_list
 
 List of tags relating to the log entry.
+
+=head2 tag
+
+Applies key/value tags to this log message.
+
+The L<semantic conventions|https://github.com/opentracing/specification/blob/master/semantic_conventions.md>
+may be of interest here.
+
+Example usage:
+
+ $log->tag(
+  'error.kind' => 'Exception',
+  'error.object' => $exception,
+ );
 
 =head1 INHERITED METHODS
 

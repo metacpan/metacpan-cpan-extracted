@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_array::From_str::expand_glob;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-08'; # DATE
+our $DATE = '2020-08-26'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -50,7 +50,7 @@ Data::Sah::Coerce::perl::To_array::From_str::expand_glob - Coerce glob pattern s
 
 =head1 VERSION
 
-This document describes version 0.014 of Data::Sah::Coerce::perl::To_array::From_str::expand_glob (from Perl distribution Sah-Schemas-Path), released on 2020-08-08.
+This document describes version 0.015 of Data::Sah::Coerce::perl::To_array::From_str::expand_glob (from Perl distribution Sah-Schemas-Path), released on 2020-08-26.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for Perl-Critic-Policy-HTTPCookies
 
+0.54 2020-08-27
+  - Improve a documentation link
+  - Match the "cookie_jar" string more carefully
+
 0.53 2017-01-04
   - Detect indirect method calls
 

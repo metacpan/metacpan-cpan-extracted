@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.16.1 2020-08-26T07:24:30Z
+
+    - Eliminate indirect object call.
+
 4.16.0 2020-06-30T11:21:26Z
 
     - Introduce --unit option, and integrate -B/--char/--word/--mecab option.

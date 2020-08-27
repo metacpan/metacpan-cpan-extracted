@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.061';
+our $VERSION   = '0.062';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -451,7 +451,11 @@ sub _do_coercions {
 	my ($name, %opts) = @_;
 	
 	my $qname = $builder->qualify_name($name, $opts{prefix}, $opts{extends});
-	
+	my $mytype;
+	if ($opts{type_library}) {
+		$mytype = $opts{type_library}->get_type_for_package($opts{'is_role'} ? 'role' : 'class', $qname);
+	}
+		
 	if ($opts{coerce}) {
 		if ($opts{abstract}) {
 			require Carp;
@@ -472,11 +476,6 @@ sub _do_coercions {
 			
 			my $coderef;
 			$coderef = shift @coercions if is_CodeRef $coercions[0];
-
-			my $mytype;
-			if ($opts{type_library}) {
-				$mytype = $opts{type_library}->get_type_for_package($opts{'is_role'} ? 'role' : 'class', $qname);
-			}
 			
 			if ($coderef) {
 				$builder->$method_installer($qname, { $method_name => $coderef });
@@ -485,6 +484,53 @@ sub _do_coercions {
 			if ($mytype) {
 				require B;
 				$mytype->coercion->add_type_coercions($type, sprintf('%s->%s($_)', B::perlstring($qname), $method_name));
+			}
+		}
+	}
+	
+	if ($mytype) {
+		require B;
+		
+		if ($opts{'factory'}) {
+			my @methods = $opts{'factory'}->$_handle_list;
+			while (@methods) {
+				my @method_names;
+				push(@method_names, shift @methods)
+					while (@methods and not ref $methods[0]);
+				my $coderef = shift(@methods) || \"new";
+				my $name1   = $method_names[0];
+				if (is_HashRef $coderef) {
+					my %meta = %$coderef;
+					if ( match('coercion', $meta{attributes}) or match('coerce', $meta{attributes}) ) {
+						$builder->croak('Factories used as coercions must take exactly one positional argument')
+							unless is_ArrayRef( $meta{signature} ) && 1==@{$meta{signature}} && !$meta{named};
+						
+						my $type = $opts{'reg'}->lookup( $meta{signature}[0] );
+						
+						$mytype->coercion->add_type_coercions( $type, sprintf('%s->%s($_)', B::perlstring($opts{'factory_package'}), $name1) );
+					}
+				}
+			}
+		}
+		
+		for my $thing (qw/ method multimethod /) {
+			if ($opts{$thing}) {
+				my @methods = $opts{$thing}->$_handle_list;
+				while (@methods) {
+					my $name1   = shift @methods;
+					my $coderef = shift @methods;
+					if (is_HashRef $coderef) {
+						my %meta = %$coderef;
+						if ( match('coercion', $meta{attributes}) or match('coerce', $meta{attributes}) ) {
+							$builder->croak(ucfirst($thing) . ' used as coercion must take exactly one positional argument')
+								unless is_ArrayRef( $meta{signature} ) && 1==@{$meta{signature}} && !$meta{named};
+							
+							my $type = $opts{'reg'}->lookup( $meta{signature}[0] );
+							
+							$mytype->coercion->add_type_coercions( $type, sprintf('%s->%s($_)', B::perlstring($qname), $name1) );
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1548,7 +1594,7 @@ sub _build_method_signature_check {
 	while (@sig) {
 		if (is_HashRef($sig[0]) and $sig[0]{slurpy}) {
 			push @params, shift @sig;
-			die "lolwut? after slurpy? you srs?" if @sig;
+			# die "lolwut? after slurpy? you srs?" if @sig;
 		}
 		
 		my ($name, $type, $opts) = (undef, undef, {});
@@ -2343,6 +2389,10 @@ is called, it will return a "Person" object and not some other kind of
 mammal. If you want "Person" to have a coercion, define the coercion in the
 "Person" class and don't rely on it being inherited from "Mammal".
 
+Coercions can also be specified using the attribute 'coerce' or 'coercion'
+for methods/multimethods/factory methods, if they only take a single typed
+positional argument.
+
 =item C<< subclass >> I<< (OptList) >>
 
 Set up subclasses of this class. This accepts an optlist like the class list.
@@ -2949,6 +2999,7 @@ hashref of the form:
     signature  => [ ... ],
     named      => 1,
     code       => sub { ... },
+    attributes => [ ... ],
   }
 
 The C<signature> is a specification to be passed to C<compile> or

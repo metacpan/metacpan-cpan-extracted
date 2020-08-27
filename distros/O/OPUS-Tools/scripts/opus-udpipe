@@ -1,0 +1,450 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+#
+#
+
+=head1 NAME
+
+opus-udpipe
+
+=head1 SYNOPSIS
+
+ # run OPUS raw data through English UDPipe
+ opus-udpipe -l en < raw/english.xml > parsed.xml
+
+=head1 OPTIONS:
+
+ -l <langid> ......... language ID (ISO639-1)
+ -m <modeldir> ....... path to udpipe models
+ -v <version> ........ model version
+ -D .................. print model dir (and stop)
+ -L .................. list supported languages
+ -M .................. list UDPipe models
+
+Option -M can be combined with -D and -L/-l to get various kinds of combined output.
+
+=head1 TODO
+
+Treat markup inside of sentences! 
+Now all sentence-internal markup is ignored and not printed to the parsed output.
+
+
+
+=head1 LICENSE
+
+ ---------------------------------------------------------------------------
+ Copyright (c) 2004-2019 Joerg Tiedemann
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ ---------------------------------------------------------------------------
+
+=head1 See also
+
+This script is part of opus-tools L<https://github.com/Helsinki-NLP/opus-tools>
+See also OPUS L<http://opus.nlpl.eu> for more information about the corpus.
+
+=cut
+
+
+use warnings;
+use strict;
+use open qw(:std :utf8);
+
+use Getopt::Std;
+use XML::Parser;
+use XML::Writer;
+
+use Ufal::UDPipe;
+
+use File::Basename;
+use FindBin qw($Bin);
+use lib $Bin;
+use OPUS::Tools::ISO639;
+
+our ($opt_l, $opt_m, $opt_v, $opt_D, $opt_L, $opt_M);
+
+getopts('l:m:v:DLM');
+
+my $lang         = $opt_l || 'en';
+# my $inputFormat  = 'horizontal';
+my $inputFormat  = 'horizontal';
+my $outputFormat = 'conllu';
+
+my $ModelDir = $opt_m;
+my $version  = $opt_v;
+my $host     = `hostname -d`;
+
+my $DefaultVersion = 'ud-2.0-170801';
+
+# path alternatives for model-dir
+# (in case modeldir is not given on command-line)
+
+if (exists $ENV{UDPIPE_MODELS}){
+    $ModelDir = $ENV{UDPIPE_MODELS};
+}
+elsif ($host=~/csc/){
+    $ModelDir = "/proj/nlpl/software/udpipe/latest/ud-2.0-conll17";
+}
+elsif ($host=~/uio/){
+    $ModelDir = "/projects/nlpl/software/udpipe/latest/ud-2.0-conll17";
+}
+else{
+    my $OpusTools = '/home/joerg/OPUS/tools';
+    $version = '1.2-160523' unless ($version);
+    $ModelDir = "$OpusTools/public/preprocess/udpipe/udpipe-ud-$version";
+}
+
+# set model version
+unless ($version){
+    my @mod = glob("$ModelDir/*-ud-*.udpipe");
+    if ($mod[0] =~/ud-(.*).udpipe$/){
+	$version = $1;
+    }
+    else{
+	$version = $DefaultVersion;
+    }
+}
+
+
+## NEW: scan all model names in ModelDir
+##      (rely on name-to-iso639 conversion)
+## TODO: should keep different treebank versions
+## ---> would require some flag for selecting different versions
+## ---> would require a default version per language
+
+my %UDmodels = ();
+my @AllModels = glob("$ModelDir/*-ud-*.udpipe");
+foreach (@AllModels){
+    my $modelbase = basename($_);
+    if ($modelbase=~/^(.+)\-(ud)\-$version.udpipe$/){
+	my $lang = $1;
+	$lang =~s/\_/ /g;
+	my $id = iso639_NameToTwo($lang);
+	if ($id=~/^..(\_..)?$/){
+	    $UDmodels{$id} = $modelbase unless ($UDmodels{$id});;
+	}
+	else{
+	    ($lang) = split(/\-/,$lang);
+	    $id = iso639_NameToTwo($lang);
+	    if ($id=~/^..(\_..)?$/){
+		$UDmodels{$id} = $modelbase unless ($UDmodels{$id});
+	    }
+	}
+    }
+}
+
+
+## OLD: fixed list of models
+
+# my %UDmodels = (
+# # ancient-greek-proiel-ud-$version.udpipe
+# # ancient-greek-ud-$version.udpipe
+#     ar => "arabic-ud-$version.udpipe",
+#     eu => "basque-ud-$version.udpipe",
+#     bg => "bulgarian-ud-$version.udpipe",
+#     hr => "croatian-ud-$version.udpipe",
+#     cs => "czech-ud-$version.udpipe",
+#     da => "danish-ud-$version.udpipe",
+#     nl => "dutch-ud-$version.udpipe",
+#     en => "english-ud-$version.udpipe",
+#     et => "estonian-ud-$version.udpipe",
+# # finnish-ftb-ud-$version.udpipe",
+#     fi => "finnish-ud-$version.udpipe",
+#     fr => "french-ud-$version.udpipe",
+#     de => "german-ud-$version.udpipe",
+# # gothic-ud-$version.udpipe
+#     el => "greek-ud-$version.udpipe",
+#     he => "hebrew-ud-$version.udpipe",
+#     hi => "hindi-ud-$version.udpipe",
+#     hu => "hungarian-ud-$version.udpipe",
+#     id => "indonesian-ud-$version.udpipe",
+#     ga => "irish-ud-$version.udpipe",
+#     it => "italian-ud-$version.udpipe",
+# # latin-itt-ud-$version.udpipe
+# # latin-proiel-ud-$version.udpipe
+#     la => "latin-ud-$version.udpipe",
+#     nb => "norwegian-ud-$version.udpipe",
+# # old-church-slavonic-ud-$version.udpipe
+#     fa => "persian-ud-$version.udpipe",
+#     pl => "polish-ud-$version.udpipe",
+#     pt => "portuguese-ud-$version.udpipe",
+#     ro => "romanian-ud-$version.udpipe",
+#     sl => "slovenian-ud-$version.udpipe",
+#     es => "spanish-ud-$version.udpipe",
+#     sv => "swedish-ud-$version.udpipe",
+#     ta => "tamil-ud-$version.udpipe"
+#     );
+
+
+# just list supported languages and models
+if ($opt_L){
+    if ($opt_M){
+	foreach my $l (sort keys %UDmodels){
+	    if ($opt_D){
+		print $l,':',$ModelDir,'/',$UDmodels{$l},"\n";
+	    }
+	    else{
+		print $l,':',$UDmodels{$l},"\n";
+	    }
+	}
+	exit 0;
+    }
+    print join(' ',sort keys %UDmodels);
+    print "\n";
+    exit 0;
+}
+if ($opt_M){
+    if ($opt_l){
+	if ($opt_D){
+	    print $ModelDir,'/',$UDmodels{$opt_l},"\n";
+	}
+	else{
+	    print $UDmodels{$opt_l},"\n";
+	}
+	exit 0;
+    }
+    print join("\n",sort values %UDmodels);
+    print "\n";
+    exit 0;
+}
+if ($opt_D){
+    print $ModelDir,"\n";
+    exit 0;
+}
+
+
+my $modelFile = $ModelDir.'/'.$UDmodels{$lang};
+
+print STDERR "Loading model $UDmodels{$lang} ... ";
+my $model = Ufal::UDPipe::Model::load($modelFile);
+$model or die "Cannot load model from file '$modelFile'\n";
+print STDERR "done\n";
+
+my $tokenizer = $model->newTokenizer($Ufal::UDPipe::Model::DEFAULT);
+my $conllu_output = Ufal::UDPipe::OutputFormat::newOutputFormat($outputFormat);
+my $sentence = Ufal::UDPipe::Sentence->new();
+
+# my $pipeline = Ufal::UDPipe::Pipeline->new($model,$inputFormat, 
+#					   $Ufal::UDPipe::Pipeline::DEFAULT, 
+#					   $Ufal::UDPipe::Pipeline::DEFAULT, 
+#					   $outputFormat);
+
+my $error = Ufal::UDPipe::ProcessingError->new();
+
+
+my $XmlParser = new XML::Parser(Handlers => {Start => \&XmlStart,
+					     End => \&XmlEnd,
+					     Char => \&XmlChar});
+
+my $XmlWriter = new XML::Writer( DATA_MODE=>1, 
+				 DATA_INDENT=>2, 
+				 ENCODING=>'utf-8');
+my $XmlReader = $XmlParser->parse_start;
+
+$XmlWriter->xmlDecl();
+my $sentCount=0;
+
+while (<>){
+    next if (/<\?xml\s/);
+    eval { $XmlReader->parse_more($_); };
+    if ($@){
+	warn $@;
+	print STDERR $_;
+    }
+}
+
+
+sub XmlStart{
+    my ($p,$e,%a) = @_;
+    if ($e eq 's'){
+	$$p{SENT} = '';
+	$$p{SENTID} = $a{id};
+	$$p{WIDBASE} = $a{id};
+	$$p{WIDBASE} =~s/^s/w/;
+	$$p{TAGS} = [];
+	$XmlWriter->startTag($e,%a);
+    }
+    else{
+	unless (exists $$p{SENT}){
+	    $XmlWriter->startTag($e,%a);
+	}
+	## save sentence-internal tags
+	else{
+	    my $idx = @{$$p{TAGS}};
+	    $$p{TAGS}[$idx]{tag} = $e;
+	    %{$$p{TAGS}[$idx]{attr}} = %a;
+	    $$p{TAGS}[$idx]{type} = 'open';
+	    $$p{TAGS}[$idx]{after} = $$p{SENT};
+	    $$p{TAGS}[$idx]{after}=~s/\s+//sg;
+	}
+    }
+}
+
+sub XmlEnd{
+    my ($p,$e) = @_;
+    if ($e eq 's'){
+
+	$sentCount++;
+	if (! ($sentCount % 100)){
+	    print STDERR '.';
+	}
+	if (! ($sentCount % 5000)){
+	    print STDERR $sentCount,"\n";
+	}
+
+	$$p{SENT}=~s/^\s*//;
+	$$p{SENT}=~s/\s*$//;
+	$tokenizer->setText($$p{SENT});
+	delete $$p{SENT};
+	my $nrSent=0;
+	my $sentStr = '';
+
+	while ($tokenizer->nextSentence($sentence)) {
+
+	    $model->tag($sentence, $Ufal::UDPipe::Model::DEFAULT);
+	    $model->parse($sentence, $Ufal::UDPipe::Model::DEFAULT);
+	    my $processed = $conllu_output->writeSentence($sentence);
+
+	# my $processed = $pipeline->process($$p{SENT}, $error);
+	# $error->occurred() and die "An error occurred in run_udpipe: " . $error->{message};
+
+	    ## just in case the tokeniser found additional sentence breaks
+	    if ($nrSent){
+		$XmlWriter->emptyTag('sentBreak');
+	    }
+	    $nrSent++;
+
+	
+	    my @lines = split(/\n/,$processed);
+	    foreach my $line (@lines){
+		next if ($line=~/^\#/);
+		my ($id,$word,$lemma,$upos,$xpos,$feats,$head,$deprel,$deps,$misc) 
+		    = split(/\t/,$line);
+
+		&insert_tags($sentStr,$word,$$p{TAGS});
+		$sentStr .= $word;
+		$sentStr=~s/\s+//sg; ## do we need this?
+
+		## TODO: do something more clever with multi-span tokens
+		next if ($id=~/\-/);
+		my %attr = (id => "$$p{WIDBASE}.$id");
+		$attr{lemma}=$lemma unless ($lemma eq '_');
+		$attr{upos}=$upos unless ($upos eq '_');
+		$attr{xpos}=$upos unless ($xpos eq '_');
+		$attr{feats}=$feats unless ($feats eq '_');
+		## good to have real word IDs (in case we have multiple sentences 
+		## in one unit
+		if ($head eq '0'){
+		    $attr{head} = 0;
+		}
+		else{
+		    $attr{head}="$$p{WIDBASE}.$head" unless ($head eq '_');
+		}
+		# $attr{head}="$$p{WIDBASE}.$head" unless ($head eq '_');
+		$attr{deprel}=$deprel unless ($deprel eq '_');
+		$attr{secdep}=$deps unless ($deps eq '_');
+		$attr{misc}=$misc unless ($misc eq '_');
+		$XmlWriter->startTag('w',%attr);
+		$XmlWriter->characters($word);
+		$XmlWriter->endTag('w');
+
+		&insert_tags($sentStr,' ',$$p{TAGS});
+
+	    }
+	}
+
+	if (@{$$p{TAGS}}){
+	    print STDERR "Warning: remaining tags found:";
+	    foreach my $t (@{$$p{TAGS}}){
+		print "tag = $$t{tag} ($$t{type})\n";
+	    }
+	}
+
+	$XmlWriter->endTag($e);
+    }
+    else{
+	unless (exists $$p{SENT}){
+	    $XmlWriter->endTag($e);
+	}
+	else{
+	    my $idx = @{$$p{TAGS}};
+	    $$p{TAGS}[$idx]{tag} = $e;
+	    $$p{TAGS}[$idx]{type} = 'close';
+	    $$p{TAGS}[$idx]{after} = $$p{SENT};
+	    $$p{TAGS}[$idx]{after}=~s/\s+//sg;
+	}
+    }
+}
+
+sub XmlChar{
+    my ($p,$c) = @_;
+    $$p{SENT}.=$c if (exists $$p{SENT});
+}
+
+
+
+
+
+sub insert_tags{
+    my ($before,$next,$tags)=@_;
+
+    while (@{$tags}){
+
+	## check if we should insert a tag
+	## - string before matches
+	## - token-internal tags: put start-tag before the next token
+	##                        put end-tag after
+	my $insert = 0;
+	if ($before eq $$tags[0]{after}){
+	    $insert = 1;
+	}
+	elsif (length("$before$next") <= length($$tags[0]{after})){
+	    return;  # tags should be sorted by increasing length
+	}
+	## token-internal tags (index should be 0 but 
+	elsif (index("$before$next",$$tags[0]{after})>=0){
+	    $insert = 1 if ($$tags[0]{type} eq 'open');
+	}
+	elsif (index($before,$$tags[0]{after})>=0){
+	    $insert = 1 if ($$tags[0]{type} eq 'close');
+	}
+
+	if ($insert){
+	    if ($$tags[0]{type} eq 'open'){
+		## same place as next closing tag? --> write empty tag
+		if ($$tags[0]{after} eq $$tags[1]{after}){
+		    $XmlWriter->emptyTag($$tags[0]{tag},
+					 %{$$tags[0]{attr}});
+		    shift(@{$tags});
+		}
+		else{
+		    $XmlWriter->startTag($$tags[0]{tag},
+					 %{$$tags[0]{attr}});
+		}
+	    }
+	    elsif ($$tags[0]{type} eq 'close'){
+		$XmlWriter->endTag($$tags[0]{tag});
+	    }
+	    shift(@{$tags});
+	}
+	else{
+	    return;
+	}
+    }
+}

@@ -30,10 +30,10 @@ no_index:
 provides:
   App::Music::ChordPro:
     file: lib/App/Music/ChordPro.pm
-    version: v0.976.1
+    version: '0.977'
   chordpro:
     file: script/chordpro
-    version: v0.976.1
+    version: '0.977'
 requires:
   App::Packager: '1.43'
   File::LoadLines: '0.02'
@@ -41,12 +41,12 @@ requires:
   JSON::PP: '2.27203'
   PDF::API2: '2.036'
   String::Interpolate::Named: '0.05'
-  Text::Layout: '0.018'
+  Text::Layout: '0.019'
   perl: '5.01'
 resources:
   bugtracker: https://github.com/sciurius/chordpro/issues
   homepage: http://www.chordpro.org
   license: http://dev.perl.org/licenses/
   repository: https://github.com/sciurius/chordpro
-version: v0.976.1
+version: '0.977'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

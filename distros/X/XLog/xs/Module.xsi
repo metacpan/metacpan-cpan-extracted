@@ -1,0 +1,47 @@
+MODULE = XLog               PACKAGE = XLog::Module
+PROTOTYPES: DISABLE
+
+#// ->new($name, [$level])
+#// ->new($name, $module, [$level])
+Sv new (SV* cls, string name, Sv arg1 = {}, Sv arg2 = {}) {
+    --items;
+    Module* module;
+    if (items == 1) {
+        module = new Module(name);
+    }
+    else if (items == 2) {
+        if (!arg1.defined() || arg1.is_object_ref()) module = new Module(name, xs::in<Module*>(arg1));
+        else                                         module = new Module(name, xs::in<Level>(arg1));
+    } else {
+        module = new Module(name, xs::in<Module*>(arg1), xs::in<Level>(arg2));
+    }
+    
+    // Module* has non-owning ptr typemap. In case of creating object from perl we must switch to "owning" behaviour
+    // so we need to hook sv destruction and delete the object if we created it in this method.
+    static Sv::payload_marker_t module_dtor_marker;
+    module_dtor_marker.svt_free = [](pTHX_ SV*, MAGIC* mg) {
+        delete (Module*)mg->mg_ptr;
+        return 0;
+    };
+    
+    Object o = xs::out(module, cls);
+    o.payload_attach(module, &module_dtor_marker);
+    
+    RETVAL = o.ref();
+}
+
+string Module::name () {
+    RETVAL = THIS->name;
+}
+
+Level Module::level (Sv val = {}) {
+    if (val) {
+        THIS->level = xs::in<Level>(val);
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->level;
+}
+
+void Module::set_level (Level level) {
+    THIS->set_level(level);
+}

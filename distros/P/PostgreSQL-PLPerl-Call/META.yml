@@ -1,18 +1,44 @@
 ---
 abstract: 'Simple interface for calling SQL functions from PostgreSQL PL/Perl'
 author:
-  - 'Tim Bunce <Tim.Bunce@pobox.com>'
-build_requires: {}
+  - '-'
+build_requires:
+  Test::More: '0.98'
+  Test::PostgreSQL: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.11
-generated_by: 'Dist::Zilla version 1.100660'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PostgreSQL-PLPerl-Call
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  PostgreSQL::PLPerl::Call:
+    file: lib/PostgreSQL/PLPerl/Call.pm
+    version: '1.007'
+  PostgreSQL::PLPerl::Call::PG:
+    file: lib/PostgreSQL/PLPerl/Call.pm
+    version: '1.007'
 requires:
-  DBI: 1.605
+  perl: '5.008001'
 resources:
-  repository: git@github.com:timbunce/posgtresql-plperl-call.git
-version: 1.006
+  bugtracker: https://github.com/rabbiveesh/PostgreSQL-PLPerl-Call/issues
+  homepage: https://github.com/rabbiveesh/PostgreSQL-PLPerl-Call
+  repository: git://github.com/rabbiveesh/PostgreSQL-PLPerl-Call.git
+version: '1.007'
+x_contributors:
+  - 'Veesh Goldman <rabbiveesh@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

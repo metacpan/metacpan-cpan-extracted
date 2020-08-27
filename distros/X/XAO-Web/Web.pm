@@ -15,7 +15,7 @@ use XAO::Errors qw(XAO::Web);
 # XAO::Web version number. Hand changed with every release!
 #
 use vars qw($VERSION);
-$VERSION='1.81';
+$VERSION='1.83';
 
 ###############################################################################
 
@@ -624,13 +624,16 @@ sub process ($%) {
 
     # Figuring out secure URL
     #
+    my $active_is_secure;
     my $active_url_secure;
     if($active_url =~ /^http:(\/\/.*)$/) {
         $active_url_secure='https:' . $1;
+        $active_is_secure=0;
     }
     elsif($active_url =~ /^https:(\/\/.*)$/) {
         $active_url_secure=$active_url;
         $active_url='http:' . $1;
+        $active_is_secure=1;
     }
     else {
         dprint "Wrong active URL ($active_url)";
@@ -711,7 +714,7 @@ sub process ($%) {
             my $pd=$self->analyze([ @{$pd->{'patharr'}},'index.html' ]);
             #use Data::Dumper; dprint "pd=",Dumper($pd);
             if($pd->{'objname'} ne 'Default') {
-                my $newpath=$siteconfig->get('base_url') . $path . '/';
+                my $newpath=$siteconfig->get($active_is_secure ? 'base_url_secure' : 'base_url') . $path . '/';
                 dprint "Redirecting $path to $newpath";
                 $siteconfig->header_args(
                     -Location   => $newpath,

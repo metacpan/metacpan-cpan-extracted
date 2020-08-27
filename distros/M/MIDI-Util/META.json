@@ -62,7 +62,7 @@
          "web" : "https://github.com/ology/MIDI-Util"
       }
    },
-   "version" : "0.0500",
+   "version" : "0.0601",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

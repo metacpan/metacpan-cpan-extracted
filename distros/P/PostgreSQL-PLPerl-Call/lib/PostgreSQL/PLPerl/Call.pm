@@ -1,5 +1,6 @@
+# vim: ts=8:sw=4:sts=4:et
 package PostgreSQL::PLPerl::Call;
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 =head1 NAME
 
@@ -7,7 +8,7 @@ PostgreSQL::PLPerl::Call - Simple interface for calling SQL functions from Postg
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 SYNOPSIS
 
@@ -215,7 +216,7 @@ variable in the F<postgres.conf> file.
 
     plperl.on_init='require q{plperlinit.pl};'
 
-=head plperl
+=head1 plperl
 
 You can use the L<PostgreSQL::PLPerl::Injector> module to make the
 call() function available for use in the C<plperlu> language:
@@ -273,7 +274,7 @@ our $debug = 0;
 # encapsulated package to provide an AUTOLOAD interface to call()
 use constant PG => do { 
     package PostgreSQL::PLPerl::Call::PG;
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
     sub AUTOLOAD {
         #(my $function = our $AUTOLOAD) =~ s/.*:://;
@@ -431,10 +432,19 @@ sub _mk_process_call {
 
 1;
 
+=head1 LICENSE
+
+Copyright (C) Veesh Goldman 2020 -
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Veesh Goldman E<lt>rabbiveesh@gmail.comE<gt>
+
 =begin Pod::Coverage
 
 call
 
 =end Pod::Coverage
-
-# vim: ts=8:sw=4:sts=4:et

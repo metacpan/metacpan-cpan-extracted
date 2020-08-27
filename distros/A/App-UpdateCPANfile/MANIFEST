@@ -6,10 +6,12 @@ README.md
 cpanfile
 lib/App/UpdateCPANfile.pm
 lib/App/UpdateCPANfile/CPANfileSnapshotParser.pm
+lib/App/UpdateCPANfile/Change.pm
 lib/App/UpdateCPANfile/PackageDetails.pm
 minil.toml
 script/update-cpanfile
 t/app-update-cpanfile.t
+t/change.t
 t/cpanfile-snapshot-parser.t
 t/fixtures/02packages/02packages.details.txt.gz
 t/fixtures/coremodules/cpanfile

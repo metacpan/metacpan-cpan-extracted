@@ -115,6 +115,7 @@ t/xao/projects/test/templates/blob-3.dat
 t/xao/projects/test/templates/clear.gif
 t/xao/projects/test/templates/cookie1.html
 t/xao/projects/test/templates/cookie2.html
+t/xao/projects/test/templates/cookie3.html
 t/xao/projects/test/templates/index.html
 t/xao/projects/test/templates/local.txt
 t/xao/projects/test/templates/raw

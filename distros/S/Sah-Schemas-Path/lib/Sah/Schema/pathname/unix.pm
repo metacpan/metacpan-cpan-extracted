@@ -1,9 +1,9 @@
 package Sah::Schema::pathname::unix;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-08'; # DATE
+our $DATE = '2020-08-26'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 our $schema = ["str" => {
     summary => 'Filesystem path name on a Unix system',
@@ -13,6 +13,16 @@ our $schema = ["str" => {
         'Path::expand_tilde',
         'Path::strip_slashes',
     ],
+
+    examples => [
+        {value=>'', valid=>0},
+        {value=>'/', valid=>1},
+        {value=>'foo/bar', valid=>1},
+        {value=>'foo//bar', valid=>1, validated_value=>'foo/bar'},
+        {value=>'a' x 256, valid=>0, summary=>'Path element too long'},
+        {value=>"foo\0", valid=>0, summary=>"Contains null character"},
+    ],
+
 }, {}];
 
 1;
@@ -30,7 +40,7 @@ Sah::Schema::pathname::unix - Filesystem path name on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.014 of Sah::Schema::pathname::unix (from Perl distribution Sah-Schemas-Path), released on 2020-08-08.
+This document describes version 0.015 of Sah::Schema::pathname::unix (from Perl distribution Sah-Schemas-Path), released on 2020-08-26.
 
 =head1 SYNOPSIS
 
@@ -92,6 +102,20 @@ L<Perinci::CmdLine> to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ ""  # INVALID
+
+ "/"  # valid
+
+ "foo/bar"  # valid
+
+ "foo//bar"  # valid, becomes "foo/bar"
+
+ "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"  # INVALID (Path element too long)
+
+ "foo\0"  # INVALID (Contains null character)
 
 =head1 HOMEPAGE
 

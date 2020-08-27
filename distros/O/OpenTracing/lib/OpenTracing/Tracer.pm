@@ -3,7 +3,7 @@ package OpenTracing::Tracer;
 use strict;
 use warnings;
 
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.003'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 no indirect;
@@ -40,7 +40,7 @@ use Log::Any qw($log);
 
 sub new {
     my ($class, %args) = @_;
-    $args{is_enabled} //= 1;
+    $args{span_completion_callbacks} ||= [];
     bless \%args, $class
 }
 
@@ -74,7 +74,7 @@ Returns true if this tracer is currently enabled.
 
 =cut
 
-sub is_enabled { shift->{is_enabled} }
+sub is_enabled { shift->{is_enabled} //= 0 }
 
 =head2 enable
 
@@ -114,12 +114,14 @@ sub span_list {
 
 =head2 add_span
 
-Adds a new L<OpenTracing::Span> instance to this batch.
+Adds a new L<OpenTracing::Span> instance to the pending list, if
+we're currently enabled.
 
 =cut
 
 sub add_span {
     my ($self, $span) = @_;
+    return $span unless $self->is_enabled;
     push $self->{spans}->@*, $span;
     Scalar::Util::weaken($span->{batch});
     $span
@@ -145,7 +147,36 @@ sub finish_span {
     my ($self, $span) = @_;
     $log->tracef('Finishing span %s', $span);
     undef $self->{current_span} if $self->{current_span} and refaddr($self->{current_span}) == refaddr($span);
+
+    return $span unless $self->is_enabled;
     push @{$self->{finished_spans} //= []}, $span;
+    $_->($span) for $self->span_completion_callbacks;
+    return $span;
+}
+
+sub add_span_completion_callback {
+    my ($self, $code) = @_;
+    push $self->{span_completion_callbacks}->@*, $code;
+    return $self;
+}
+
+sub remove_span_completion_callback {
+    my ($self, $code) = @_;
+    my $addr = Scalar::Util::refaddr($code);
+    my $data = $self->{span_completion_callbacks};
+    # Essentially extract_by from List::UtilsBy
+    for(my $idx = 0; ; ++$idx) {
+        last if $idx > $#$data;
+        next unless Scalar::Util::refaddr($data->[$idx]) == $addr;
+        splice @$data, $idx, 1, ();
+        # Skip the $idx change
+        redo;
+    }
+    return $self;
+}
+
+sub span_completion_callbacks {
+    shift->{span_completion_callbacks}->@*
 }
 
 sub inject {

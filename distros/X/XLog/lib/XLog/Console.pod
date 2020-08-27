@@ -1,0 +1,27 @@
+=head1 NAME
+
+XLog::Console - XLog backend for logging to console
+
+
+
+=head1 SYNPOSIS
+
+    XLog::set_logger(XLog::Console->new);
+    XLog::warning("hi");
+
+
+=head1 DESCRIPTION
+
+This is a simple backend which logs to console (stdout).
+
+
+
+=head1 METHODS
+
+=head4 new()
+
+Create backend object
+
+=cut
+
+1;

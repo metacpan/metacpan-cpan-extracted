@@ -1,11 +1,25 @@
-0.009   2017-06-26 (PERLANCAR)
+0.011   2020-08-27  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix example, add descriptions.
+
+
+0.010   2020-08-26  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak descriptions.
+
+
+0.009   2017-06-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [build] Forgot to use DZP:InsertExecsList.
 
 
-0.008   2017-03-04 (PERLANCAR)
+0.008   2017-03-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -14,19 +28,19 @@
 	- Tweak Abstract for gen-cpan-meta.
 
 
-0.007   2017-03-04 (PERLANCAR)
+0.007   2017-03-04  Released-By: PERLANCAR
 
 	- [Incompatible] Merge
 	  validate-cpan-meta-with-{sah,cpan-meta-validator} into
 	  validate-cpan-meta.
 
 
-0.006   2017-03-03 (PERLANCAR)
+0.006   2017-03-03  Released-By: PERLANCAR
 
         - Add utility: convert-cpan-meta.
 
 
-0.005   2017-03-03 (PERLANCAR)
+0.005   2017-03-03  Released-By: PERLANCAR
 
 	- Tweak Rinci metadata.
 
@@ -34,12 +48,12 @@
 	  META.
 
 
-0.004   2017-03-02 (PERLANCAR)
+0.004   2017-03-02  Released-By: PERLANCAR
 
         - Add utility: gen-cpan-meta.
 
 
-0.003   2017-03-02 (PERLANCAR)
+0.003   2017-03-02  Released-By: PERLANCAR
 
 	- [Incompatible] Rename dist from App-ValidateCPANMetaWithSah to
 	  App-CPANMetaUtils.
@@ -50,13 +64,13 @@
           META.json/META.yml.
 
 
-0.002   2017-01-08 (PERLANCAR)
+0.002   2017-01-08  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention CPAN::Meta, CPAN::Meta::Validator.
 
 
-0.001   2016-07-22 (PERLANCAR)
+0.001   2016-07-22  Released-By: PERLANCAR
 
         - First release.

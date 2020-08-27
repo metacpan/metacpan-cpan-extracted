@@ -1,0 +1,27 @@
+MODE: INLINE
+#include <panda/log/multi.h>
+
+namespace xs {
+    template <> struct Typemap<MultiLogger::Channel> : TypemapBase<MultiLogger::Channel> {
+        static MultiLogger::Channel in (const Hash& h) {
+            auto ret = MultiLogger::Channel(xs::in<ILoggerSP>(h.fetch("logger")));
+            Sv val;
+            if ((val = h.fetch("min_level"))) ret.min_level = xs::in<Level>(val);
+            if ((val = h.fetch("formatter"))) ret.formatter = xs::in<IFormatterSP>(val);
+            return ret;
+        }
+    };
+
+    template <> struct Typemap<MultiLogger*> : Typemap<ILogger*, MultiLogger*> {
+        static string package () { return "XLog::Multi"; }
+    };
+}
+
+MODULE = XLog                PACKAGE = XLog::Multi
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__).inherit("XLog::ILogger");
+}
+
+MultiLogger* MultiLogger::new (MultiLogger::Channels list)

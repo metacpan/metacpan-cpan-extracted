@@ -32,11 +32,11 @@ ISO::639::3 - Language codes and names from ISO::639
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION      = '0.02';
+our $VERSION      = '0.03';
 
 use Exporter 'import';
 our @EXPORT = qw(

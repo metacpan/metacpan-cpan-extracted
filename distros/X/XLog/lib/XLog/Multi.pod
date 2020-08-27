@@ -1,0 +1,78 @@
+=head1 NAME
+
+XLog::Multi - XLog backend for logging into multiple backends
+
+
+
+=head1 SYNOPSIS
+
+    my $multi = XLog::Multi->new([
+        {logger => XLog::Console->new, min_level => XLog::INFO},
+        {logger => XLog::File->new({file => "all.log"}), min_level => XLog::DEBUG, formatter => XLog::Formatter::Pattern->new("[%L] %t: %m")},
+        {logger => XLog::File->new({file => "error.log"}), min_level => XLog::WARNING, formatter => XLog::Formatter::Pattern->new("[%L] %t: %m")},
+    ]);
+    XLog::set_logger($multi);
+
+
+
+=head1 DESCRIPTION
+
+XLog::Multi allows to log into multiple backends with different levels and formatters.
+
+
+
+=head1 METHODS
+
+=head4 new(\@list)
+
+Creates multi backend from arrayref of backends and params. Each element on the list must be a hashref with the following info:
+
+=over
+
+=item logger [required]
+
+Backend object
+
+=item min_level [optional = DEBUG]
+
+Minimum log level for this backend. Please note that messages might not be logged even if their level higher than this param - in case if the main
+min level (XLog::set_level) is higher. For example:
+
+    XLog::set_level(XLog::WARNING); # main min level
+    
+    my $multi = XLog::Multi->new([
+        {logger => XLog::Console->new, min_level => XLog::INFO},
+        {logger => XLog::File->new({file => "error.log"}), min_level => XLog::WARNING},
+    ]);
+    XLog::set_logger($multi);
+    
+    XLog::info("hi"); # this message will not be logged
+    XLog::set_level(XLog::DEBUG);
+    XLog::info("hi"); # this message will be logged on console
+    XLog::warning("hi"); # this message will be logged both on console and to file
+
+Also note, that log message evaluation optimization is only on when message level is lower than main min level.
+Otherwise, if message level is greater than or equal to main log level, it will be evaluated anyway. Even if all min levels in Multi backend are greater
+than the message level. For example
+
+     XLog::set_level(XLog::DEBUG);
+     
+     my $multi = XLog::Multi->new([
+        {logger => XLog::Console->new, min_level => XLog::WARNING},
+    ]);
+    XLog::set_logger($multi);
+    
+    XLog::debug("hi $longmess");
+    
+C<$longmess> in this example will be interpolated but will not be logged. This is due to current limitations in optimization system.
+
+=item formatter [optional]
+
+Formatter object for this backend. If not specified, will use main formatter (XLog::set_formatter).
+
+=back
+
+
+=cut
+
+1;

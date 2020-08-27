@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-CLI-Wrapper-UnixCommand
   homepage: https://metacpan.org/release/Acme-CPANModules-CLI-Wrapper-UnixCommand
   repository: git://github.com/perlancar/perl-Acme-CPANModules-CLI-Wrapper-UnixCommand.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

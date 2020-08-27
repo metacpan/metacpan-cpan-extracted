@@ -1,0 +1,102 @@
+=head1 NAME
+
+XLog::Formatter::Pattern - XLog pattern formatter backend
+
+
+
+=head1 SYNPOSIS
+
+    XLog::set_formatter(XLog::Formatter::Pattern->new("%1t %c[%L/%1M]%C %f:%l,%F(): %m"));
+    XLog::warning("hi");
+
+
+=head1 DESCRIPTION
+
+Default formatter for XLog. Uses C<strftime>-like string syntax to format log messages. Format string is a string with a number of special tokens 
+which will be replaced with additional information.
+
+Some tokens supports up to 2 modifiers C<x> and C<y> in one of the following formats (given that C<T> is a token): %T or %xT or %x.yT or %.yT
+
+If any of C<x> or C<y> are absent, it is considered 0 (for example C<%t> is the same as C<%0t> and C<%0.0t>).
+If a token supports modifiers it will be noted below what C<x> and C<y> means.
+
+=over
+
+=item %L
+
+Level string ("debug", "info", ...)
+
+=item %M
+
+Module name
+
+=item %F
+
+Function name
+
+=item %f
+
+Filename.
+
+x=0: only filename
+x=1: full path as it appeared during loading module (perl) or compilation (C)
+
+=item %l
+
+Line number
+
+=item %m
+
+Log message
+
+=item %t
+
+Current time.
+
+Modifier C<x> chooses time format, C<y> chooses microseconds precision
+
+x=0: YYYY/MM/DD HH:MM:SS
+x=1: YY/MM/DD HH:MM:SS
+x=2: HH:MM:SS
+x=3: UNIX TIMESTAMP
+y>0: high resolution time, adds fractional part after seconds with "y" digits precision
+
+Examples:
+
+    %t: 2020/01/31 23:59:59
+    %2t: 23:59:59
+    %2.3t: 23:59:59.345
+
+=item %T
+
+Current thread id. Usually makes sense only for C code or threaded perls.
+
+=item %p
+
+Current process id.
+
+=item %P
+
+Current process title
+
+=item %c
+
+Start colored text. Insert special control characters and all text after this token will be colored according to log level. Only for unix consoles.
+
+=item %C
+
+End colored text
+
+=back
+
+
+
+=head1 METHODS
+
+=head4 new($format)
+
+Create pattern formatter object
+
+=cut
+
+1;

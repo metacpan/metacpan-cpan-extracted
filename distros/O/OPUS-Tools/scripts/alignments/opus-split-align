@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+#
+# -l <minlen> .... minimun length in number of alignments
+#
+
+use strict;
+
+use Getopt::Std;
+use File::Basename qw/basename dirname/;
+
+
+my ($opt_l,$opt_v);
+getopts('l:v');
+
+
+my $outfile = undef;
+my $content = '';
+my $count = 0;
+
+while (<>){
+    if (/\<linkGrp/){
+	/fromDoc\=\"(\S+)\"/;
+	my $srcfile = $1;
+	/toDoc\=\"(\S+)\"/;
+	my $trgfile = $1;
+	
+	my @srcdir = split(/\//,dirname($srcfile));
+	my @trgdir = split(/\//,dirname($trgfile));
+	my $srclang = shift (@srcdir);
+	my $trglang = shift (@trgdir);
+	unshift(@srcdir,"$srclang-$trglang");
+	$outfile = join('/',@srcdir);
+
+	$srcfile = basename($srcfile);
+	$trgfile = basename($trgfile);
+
+	if ($srcfile ne $trgfile){
+	    $srcfile=~s/\.xml(\.gz)?$//;
+	    $outfile .= '/'.$srcfile.'-'.$trgfile;
+	}
+	else{
+	    $outfile .= '/'.$srcfile;
+	}
+	$count = 0;
+	$content = '';
+    }
+    $content .= $_;
+    $count++;
+    if (/\<\/linkGrp\>/){
+	unless ($opt_l && ($count < $opt_l)){
+	    print STDERR "save linkfile $outfile\n" if ($opt_v);
+	    my $dir = dirname($outfile);
+	    system("mkdir -p $dir");
+	    open F,"| gzip -c >$outfile" || die "cannot write to $outfile";
+	    print F '<?xml version="1.0" encoding="utf-8"?>'."\n";
+	    print F '<!DOCTYPE cesAlign PUBLIC "-//CES//DTD XML cesAlign//EN" "">'."\n";
+	    print F '<cesAlign version="1.0">'."\n";
+	    print F $content;
+	    print F '</cesAlign>'."\n";
+	    close F;
+	}
+	$count = 0;
+	$content = '';
+    }
+}

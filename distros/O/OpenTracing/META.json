@@ -101,78 +101,89 @@
    "provides" : {
       "OpenTracing" : {
          "file" : "lib/OpenTracing.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Any" : {
          "file" : "lib/OpenTracing/Any.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Batch" : {
          "file" : "lib/OpenTracing/Batch.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Common" : {
          "file" : "lib/OpenTracing/Common.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::DSL" : {
          "file" : "lib/OpenTracing/DSL.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Integration" : {
          "file" : "lib/OpenTracing/Integration.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Integration::HTTP::Tiny" : {
          "file" : "lib/OpenTracing/Integration/HTTP/Tiny.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Log" : {
          "file" : "lib/OpenTracing/Log.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Process" : {
          "file" : "lib/OpenTracing/Process.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Protocol" : {
          "file" : "lib/OpenTracing/Protocol.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Protocol::Jaeger" : {
          "file" : "lib/OpenTracing/Protocol/Jaeger.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Protocol::Zipkin" : {
          "file" : "lib/OpenTracing/Protocol/Zipkin.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Span" : {
          "file" : "lib/OpenTracing/Span.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::SpanContext" : {
          "file" : "lib/OpenTracing/SpanContext.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::SpanProxy" : {
          "file" : "lib/OpenTracing/SpanProxy.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Tag" : {
          "file" : "lib/OpenTracing/Tag.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "OpenTracing::Tracer" : {
          "file" : "lib/OpenTracing/Tracer.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       }
    },
    "release_status" : "stable",
-   "version" : "1.002",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/team-at-cpan/OpenTracing/issues"
+      },
+      "homepage" : "https://github.com/team-at-cpan/OpenTracing",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/team-at-cpan/OpenTracing.git",
+         "web" : "https://github.com/team-at-cpan/OpenTracing"
+      }
+   },
+   "version" : "1.003",
    "x_authority" : "cpan:TEAM",
    "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.21",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

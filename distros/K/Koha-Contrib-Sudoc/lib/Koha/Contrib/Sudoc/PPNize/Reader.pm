@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::PPNize::Reader;
 # ABSTRACT: Reader du fichier ABES d'équivalence PPN biblionumber
-$Koha::Contrib::Sudoc::PPNize::Reader::VERSION = '2.32';
+$Koha::Contrib::Sudoc::PPNize::Reader::VERSION = '2.33';
 use Moose;
 
 with 'MooseX::RW::Reader::File';
@@ -31,11 +31,11 @@ __END__
 
 =head1 NAME
 
-Koha::Contrib::Sudoc::PPNize::Reader - Reader du fichier ABES d'Ã©quivalence PPN biblionumber
+Koha::Contrib::Sudoc::PPNize::Reader - Reader du fichier ABES d'équivalence PPN biblionumber
 
 =head1 VERSION
 
-version 2.32
+version 2.33
 
 =head1 AUTHOR
 
@@ -43,7 +43,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Fréderic Demians.
+This software is Copyright (c) 2020 by Fréderic Demians.
 
 This is free software, licensed under:
 

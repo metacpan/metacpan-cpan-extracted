@@ -2,7 +2,7 @@ package App::cdif::Command::Mecab;
 
 use parent "App::cdif::Command";
 
-use strict;
+use v5.14;
 use warnings;
 use utf8;
 use Carp;

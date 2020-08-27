@@ -7,7 +7,8 @@ extends 'Catalyst::Plugin::Session::State';
 use MRO::Compat;
 use Catalyst::Utils ();
 
-our $VERSION = "0.17";
+our $VERSION = '0.18';
+$VERSION =~ tr/_//d;
 
 has _deleted_session_id => ( is => 'rw' );
 
@@ -81,6 +82,10 @@ sub make_session_cookie {
     $cookie->{httponly} = 1
         unless defined $cookie->{httponly}; # default = 1 (set httponly)
 
+    $cookie->{samesite} = $cfg->{cookie_samesite};
+    $cookie->{samesite} = "Lax"
+        unless defined $cookie->{ samesite}; # default = Lax
+
     return $cookie;
 }
 
@@ -139,11 +144,8 @@ sub delete_session_id {
     $c->maybe::next::method($sid);
 }
 
-__PACKAGE__
-
+1;
 __END__
-
-=pod
 
 =head1 NAME
 
@@ -232,14 +234,14 @@ user's browser is shut down.
 If this attribute B<set to 0> the cookie will not have the secure flag.
 
 If this attribute B<set to 1> (or true for backward compatibility) - the cookie
-send by the server to the client will got the secure flag that tells the browser
-to send this cookies back to the server only via HTTPS.
+sent by the server to the client will get the secure flag that tells the browser
+to send this cookie back to the server only via HTTPS.
 
-If this attribute B<set to 2> then the cookie will got the secure flag only if
+If this attribute B<set to 2> then the cookie will get the secure flag only if
 the request that caused cookie generation was sent over https (this option is
-not good if you are mixing https and http in you application).
+not good if you are mixing https and http in your application).
 
-Default vaule is 0.
+Default value is 0.
 
 =item cookie_httponly
 
@@ -253,10 +255,30 @@ a browser is not aware of HTTPOnly the flag will be ignored.
 
 Default value is 1.
 
-Note1: Many peole are confused by the name "HTTPOnly" - it B<does not mean>
+Note1: Many people are confused by the name "HTTPOnly" - it B<does not mean>
 that this cookie works only over HTTP and not over HTTPS.
 
-Note2: This paramater requires Catalyst::Runtime 5.80005 otherwise is skipped.
+Note2: This parameter requires Catalyst::Runtime 5.80005 otherwise is skipped.
+
+=item cookie_samesite
+
+This attribute configures the value of the
+L<SameSite|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite>
+flag.
+
+If set to None, the cookie will be sent when making cross origin requests,
+including following links from other origins. This requires the
+L</cookie_secure> flag to be set.
+
+If set to Lax, the cookie will not be included when embedded in or fetched from
+other origins, but will be included when following cross origin links.
+
+If set to Strict, the cookie will not be included for any cross origin requests,
+including links from different origins.
+
+Default value is C<Lax>. This is the default modern browsers use.
+
+Note: This parameter requires Catalyst::Runtime 5.90125 otherwise is skipped.
 
 =item cookie_path
 
@@ -266,20 +288,20 @@ The path of the request url where cookie should be baked.
 
 For example, you could stick this in MyApp.pm:
 
-  __PACKAGE__->config( 'Plugin::Session' => {
-     cookie_domain  => '.mydomain.com',
-  });
+    __PACKAGE__->config( 'Plugin::Session' => {
+        cookie_domain  => '.mydomain.com',
+    });
 
 =head1 CAVEATS
 
 Sessions have to be created before the first write to be saved. For example:
 
-	sub action : Local {
-		my ( $self, $c ) = @_;
-		$c->res->write("foo");
-		$c->session( ... );
-		...
-	}
+    sub action : Local {
+        my ( $self, $c ) = @_;
+        $c->res->write("foo");
+        $c->session( ... );
+        ...
+    }
 
 Will cause a session ID to not be set, because by the time a session is
 actually created the headers have already been sent to the client.
@@ -290,20 +312,26 @@ L<Catalyst>, L<Catalyst::Plugin::Session>.
 
 =head1 AUTHORS
 
-Yuval Kogman E<lt>nothingmuch@woobling.orgE<gt>
+Yuval Kogman <nothingmuch@woobling.org>
 
 =head1 CONTRIBUTORS
 
 This module is derived from L<Catalyst::Plugin::Session::FastMmap> code, and
 has been heavily modified since.
 
-  Andrew Ford
-  Andy Grundman
-  Christian Hansen
-  Marcus Ramberg
-  Jonathan Rockway E<lt>jrockway@cpan.orgE<gt>
-  Sebastian Riedel
-  Florian Ragwitz
+Andrew Ford
+
+Andy Grundman
+
+Christian Hansen
+
+Marcus Ramberg
+
+Jonathan Rockway <jrockway@cpan.org>
+
+Sebastian Riedel
+
+Florian Ragwitz
 
 =head1 COPYRIGHT
 
@@ -317,5 +345,3 @@ This program is free software, you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-
-1;

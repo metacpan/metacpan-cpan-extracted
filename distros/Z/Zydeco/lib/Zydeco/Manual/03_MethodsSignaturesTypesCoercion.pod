@@ -526,6 +526,43 @@ strings and Person objects.
   
   $alice->greet("Bob");  # ==> "Hello Bob, I am Alice."
 
+=head3 The C<< :coercion >> attribute
+
+If you have an existing method that does something that's essentially a
+coercion:
+
+  class Person {
+    has name;
+    
+    method from_name ( Str $name ) {
+      return $class->new( name => $name );
+    }
+  }
+
+Then you'd normally make a coercion like this:
+
+  class Person {
+    has name;
+    
+    method from_name ( Str $name ) {
+      return $class->new( name => $name );
+    }
+    
+    coerce from Str via from_name;
+  }
+
+But a shortcut is:
+
+  class Person {
+    has name;
+    
+    method from_name :coercion ( Str $name ) {
+      return $class->new( name => $name );
+    }
+  }
+
+This only works when the method takes a single, typed, positional argument.
+
 =head2 Optimization
 
 Adding C<< :optimize >> to a method instructs Zydeco to perform additional

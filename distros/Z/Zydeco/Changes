@@ -7,6 +7,14 @@ Home page:    <https://metacpan.org/release/Zydeco>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.519	2020-08-25
+
+ [ Documentation ]
+ - Document :coerce / :coercion.
+
+ [ Packaging ]
+ - Use the latest version of MooX::Press.
+
 0.518	2020-04-08
 
  [ Documentation ]

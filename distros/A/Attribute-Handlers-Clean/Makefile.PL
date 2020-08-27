@@ -4,7 +4,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %dependencies = (
-	'Perlmazing' => 0,
+	'Perlmazing' => 1,
 );
 
 my %params = (
@@ -18,17 +18,29 @@ my %params = (
     CONFIGURE_REQUIRES => {
         %dependencies,
     },
-    BUILD_REQUIRES => {
+    BUILD_REQUIRES	=> {
         %dependencies,
     },
-    TEST_REQUIRES => {
+    TEST_REQUIRES	=> {
         %dependencies,
     },
-    PREREQ_PM => {
+    PREREQ_PM		=> {
         %dependencies,
     },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Attribute-Handlers-Clean-*' },
+    dist			=> {
+		COMPRESS	=> 'gzip -9f',
+		SUFFIX		=> 'gz',
+	},
+    clean			=> {
+		FILES => 'Attribute-Handlers-Clean-*',
+	},
+	META_MERGE		=> {
+		no_index	=> {
+			directory => [
+				"demo",
+			],
+		},
+	},
 );
 
 delete $params{TEST_REQUIRES} unless ExtUtils::MakeMaker->VERSION >= 6.64;

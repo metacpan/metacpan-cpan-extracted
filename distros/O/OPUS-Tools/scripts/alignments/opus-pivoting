@@ -1,0 +1,149 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+
+use File::Basename;
+
+my $algfile1 = shift(@ARGV);
+my $algfile2 = shift(@ARGV);
+
+my $base1 = basename($algfile1);
+my $base2 = basename($algfile2);
+
+
+$base1=~s/\.xml(\.gz)//;
+$base2=~s/\.xml(\.gz)//;
+
+my ($src1,$trg1) = split(/\-/,$base1);
+my ($src2,$trg2) = split(/\-/,$base2);
+
+my $pivot = undef;
+if ($src1 eq $src2){
+    $pivot = $src1;
+}
+elsif ($src1 eq $trg2){
+    $pivot = $src1;
+}
+elsif ($trg1 eq $src2){
+    $pivot = $trg1;
+}
+elsif ($trg1 eq $trg2){
+    $pivot = $trg1;
+}
+else{
+    die "no pivot language found";
+}
+
+
+
+
+if ($algfile1=~/\.gz/){
+    open(F,"gzip -cd < $algfile1 |") || die "cannot read from $algfile1";
+}
+else{
+    open(F,"<$algfile1") || die "cannot read from $algfile1";
+}
+
+print STDERR "read links from $algfile1 ...\n";
+
+my %links1=();
+my $fromDoc = undef;
+my $toDoc = undef;
+
+while (<F>){
+    if (/fromDoc=\"([^\"]+)\"/){
+	$fromDoc=$1;
+    }
+    if (/toDoc=\"([^\"]+)\"/){
+	$toDoc=$1;
+    }
+
+    if (/xtargets=\"([^\"]+)\"/){
+	my $link=$1;
+	my ($s,$t) = split(/\;/,$link);
+	if ($pivot eq $src1){
+	    $links1{$fromDoc}{$s} = "$toDoc:$t";
+	}
+	else{
+	    $links1{$toDoc}{$t} = "$fromDoc:$s";
+	}
+    }
+}
+
+close(F);
+
+
+
+
+
+
+if ($algfile2=~/\.gz/){
+    open(F,"gzip -cd < $algfile2 |") || die "cannot read from $algfile2";
+}
+else{
+    open(F,"<$algfile2") || die "cannot read from $algfile2";
+}
+
+
+print STDERR "read links from $algfile2 ...\n";
+
+my $currentFromDoc = undef;
+my $currentToDoc = undef;
+
+print '<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE cesAlign PUBLIC "-//CES//DTD XML cesAlign//EN" "">
+<cesAlign version="1.0">
+';
+
+while (<F>){
+    if (/fromDoc=\"([^\"]+)\"/){
+	$fromDoc=$1;
+    }
+    if (/toDoc=\"([^\"]+)\"/){
+	$toDoc=$1;
+    }
+    if (/xtargets=\"([^\"]+)\"/){
+	my $link=$1;
+	my ($s,$t) = split(/\;/,$link);
+	if ($pivot eq $src2){
+	    if (exists $links1{$fromDoc}){
+		if (exists $links1{$fromDoc}{$s}){
+		    my ($from,$src) = split(/\:/,$links1{$fromDoc}{$s});
+		    if ($currentFromDoc ne $from || $currentToDoc ne $toDoc){
+			if ($currentFromDoc){
+			    print "</linkGrp>\n";
+			}
+			print "<linkGrp targType=\"s\" fromDoc=\"$from\" toDoc=\"$toDoc\">\n";
+			$currentFromDoc = $from;
+			$currentToDoc = $toDoc;
+		    }
+		    print '  <link xtargets="',$src,';',$t,'" />',"\n";
+		}
+	    }
+	}
+	else{
+	    if (exists $links1{$toDoc}){
+		if (exists $links1{$toDoc}{$t}){
+		    my ($from,$src) = split(/\:/,$links1{$toDoc}{$t});
+		    if ($currentFromDoc ne $from || $currentToDoc ne $fromDoc){
+			if ($currentFromDoc){
+			    print "</linkGrp>\n";
+			}
+			print "<linkGrp targType=\"s\" fromDoc=\"$from\" toDoc=\"$fromDoc\">\n";
+			$currentFromDoc = $from;
+			$currentToDoc = $fromDoc;
+		    }
+		    print '  <link xtargets="',$src,';',$s,'" />',"\n";
+		}
+	    }
+	}
+    }
+}
+
+close(F);
+
+
+if ($currentFromDoc){
+    print "</linkGrp>\n";
+}
+print "</cesAlign>\n";

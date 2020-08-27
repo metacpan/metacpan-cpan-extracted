@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader::Authorities;
 # ABSTRACT: Chargeur de notices d'autorité
-$Koha::Contrib::Sudoc::Loader::Authorities::VERSION = '2.32';
+$Koha::Contrib::Sudoc::Loader::Authorities::VERSION = '2.33';
 use Moose;
 
 extends 'Koha::Contrib::Sudoc::Loader';
@@ -144,11 +144,11 @@ __END__
 
 =head1 NAME
 
-Koha::Contrib::Sudoc::Loader::Authorities - Chargeur de notices d'autoritÃ©
+Koha::Contrib::Sudoc::Loader::Authorities - Chargeur de notices d'autorité
 
 =head1 VERSION
 
-version 2.32
+version 2.33
 
 =head1 AUTHOR
 
@@ -156,7 +156,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Fréderic Demians.
+This software is Copyright (c) 2020 by Fréderic Demians.
 
 This is free software, licensed under:
 

@@ -1,3 +1,7 @@
+0.042		2020-08-26	T. R. Wyant
+    Remove prototypes from testing subroutines defined in t/*.t and
+    inc/My/Module/Test.pm
+
 0.041		2019-12-09	T. R. Wyant
     Track change in Arcturus radial velocity (in test)
 

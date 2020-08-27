@@ -139,6 +139,16 @@ DESCRIPTION
 
     Note that this module uses Future::AsyncAwait internally.
 
+CONSTANTS
+
+ OPENTRACING_ENABLED
+
+    Defaults to true, this can be controlled by the USE_OPENTRACING
+    environment variable.
+
+    When enabled, this will create a span for every Redis request. See
+    OpenTracing::Any for details.
+
 METHODS
 
     NOTE: For a full list of the Redis methods supported by this module,

@@ -1,6 +1,7 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
+
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::OpenTracing
 at lib/Net/Async/OpenTracing.pm
@@ -12,7 +13,23 @@ sure you change the first line.
 
 =head1 NAME
 
-Net::Async::OpenTracing - basic proof-of-concept implementation for OpenTracing APM
+Net::Async::OpenTracing - OpenTracing APM via L<IO::Async>
+
+=head1 SYNOPSIS
+
+ use Net::Async::OpenTracing;
+ use IO::Async::Loop;
+ use OpenTracing::Any qw($tracer);
+ my $loop = IO::Async::Loop->new;
+ $loop->add(
+    my $tracing = Net::Async::OpenTracing->new(
+        host => '127.0.0.1',
+        port => 6832,
+    )
+ );
+ $tracer->span(operation_name => 'example');
+ # Manual sync - generally only needed on exit
+ $tracing->sync->get;
 
 =head1 DESCRIPTION
 
@@ -21,7 +38,7 @@ the first port of call for official documentation.
 
 =head2 Setting up and testing
 
-Start up a Jæger instance in Docker like so:
+If you want to experiment with this, start by setting up a Jæger instance in Docker like so:
 
  docker run -d --name jaeger \
   -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
@@ -32,10 +49,16 @@ Start up a Jæger instance in Docker like so:
   -p 16686:16686 \
   -p 14268:14268 \
   -p 9411:9411 \
-  jaegertracing/all-in-one:1.12
+  jaegertracing/all-in-one:1.17
+
+If you have a Kubernetes stack installed then you likely already have this available.
+
+UDP port 6832 is typically the "binary Thrift" port, so that's likely where you would
+want this module configured to send data (other ports and protocols are available).
 
 Set up an L<Net::Async::OpenTracing> instance with those connection details:
 
+ use Net::Async::OpenTracing;
  my $loop = IO::Async::Loop->new;
  $loop->add(
     my $tracing = Net::Async::OpenTracing->new(
@@ -43,13 +66,13 @@ Set up an L<Net::Async::OpenTracing> instance with those connection details:
         port => 6832,
     )
  );
+ # Now generate some traffic
  {
-  my $batch = $tracing->new_batch();
-  my $span = $batch->new_span(
-   'example_span'
+  my $span = $tracer->span(
+   operation_name => 'example_span'
   );
   $span->log('test message ' . $_ . ' from the parent') for 1..3;
-  my $child = $span->new_span('child_span');
+  my $child = $span->span(operation_name => 'child_span');
   $child->log('message ' . $_ . ' from the child span') for 1..3;
  }
  # Make sure all trace data is sent
@@ -57,13 +80,98 @@ Set up an L<Net::Async::OpenTracing> instance with those connection details:
 
 You should then see a trace with 2 spans show up.
 
+=head2 configure
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<host> - where to send traces
+
+=item * C<port> - the UDP/TCP port to connect to
+
+=item * C<protocol> - how to communicate: thrift, http/thrift, etc.
+
+=item * C<items_per_batch> - number of spans to try sending each time
+
+=item * C<batches_per_loop> - number of batches to try sending for each loop iteration
+
+=item * C<tracer> - the L<OpenTracing::Tracer> instance to use, defaults to the one
+provided by L<OpenTracing::Any>
+
+=back
+
+=head2 host
+
+The hostname or IP to send spans to.
+
+=head2 port
+
+The port to send spans to.
+
+=head2 tracer
+
+The L<OpenTracing::Tracer> instance, defaults to the standard L<OpenTracing::Any>-provided one.
+
+=head1 METHODS - Internal
+
+=head2 send
+
+Performs the send and sets up the L<Future> for marking completion.
+
+=head2 send_in_progress
+
+Returns a L<Future> indicating whether a send is in progress or not (will
+be marked as L<Future/done> if the send is complete).
+
+=head2 is_sending
+
+Returns true if we are currently sending data.
+
+=head2 start_sending
+
+Trigger the send process, which will cause all pending traces to be
+sent to the remote endpoint.
+
+Does nothing if sending is already in progress.
+
+=head2 proto
+
+The L<OpenTracing::Protocol> instance.
+
+=head2 sub
+
+Sends all pending batches.
+
+=head2 sub
+
+Gathers and sends a single L<OpenTracing::Batch>.
+
+=head2 span_completion
+
+Our callback for reporting span completion.
+
+=head2 udp
+
+The remote UDP endpoint (if it exists).
+
+=head2 sync
+
+Ensure that we've sent any remaining traces. Can be called just before shutdown
+to clear off any pending items - this returns a L<Future>, so you'd want code
+similar to
+
+ $tracing->sync->get;
+
+to ensure that it completes before returning.
+
 =head1 INHERITED METHODS
 
 =over 4
 
 =item L<IO::Async::Notifier>
 
-L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
 
 =back
 
@@ -73,5 +181,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
 

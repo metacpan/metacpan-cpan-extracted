@@ -1,0 +1,40 @@
+NAME
+    App::ArgUtils - CLI utilities related to command-line arguments
+
+VERSION
+    This document describes version 0.001 of App::ArgUtils (from Perl
+    distribution App-ArgUtils), released on 2020-08-26.
+
+DESCRIPTION
+    This distribution contains CLI utilities related to command-line
+    arguments:
+
+    *   first-arg
+
+    *   last-arg
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ArgUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ArgUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ArgUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

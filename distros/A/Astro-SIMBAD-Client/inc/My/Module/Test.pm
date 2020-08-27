@@ -54,7 +54,7 @@ my $ref;	# Reference to result of method call, if it is a reference.
 my $skip;	# True to skip tests.
 my $silent;	# True to silence exceptions if $skip is true.
 
-sub access () {	## no critic (ProhibitSubroutinePrototypes)
+sub access {
     eval {
 	require LWP::UserAgent;
 	1;
@@ -66,7 +66,7 @@ sub access () {	## no critic (ProhibitSubroutinePrototypes)
     return;
 }
 
-sub call (@) {	## no critic (ProhibitSubroutinePrototypes)
+sub call {
     my ( $method, @args ) = @_;
     $obj ||= Astro::SIMBAD::Client->new();
     eval {
@@ -80,7 +80,7 @@ sub call (@) {	## no critic (ProhibitSubroutinePrototypes)
     return;
 }
 
-sub call_a (@) {	## no critic (ProhibitSubroutinePrototypes)
+sub call_a {
     my ( $method, @args ) = @_;
     $obj ||= Astro::SIMBAD::Client->new();
     eval {
@@ -94,7 +94,7 @@ sub call_a (@) {	## no critic (ProhibitSubroutinePrototypes)
     return;
 }
 
-sub canned (@) {	## no critic (ProhibitSubroutinePrototypes)
+sub canned {
     my ( @args ) = @_;
     my $want = $canned;
     foreach my $key (@args) {
@@ -112,14 +112,14 @@ sub canned (@) {	## no critic (ProhibitSubroutinePrototypes)
     return $want;
 }
 
-sub clear (@) {	## no critic (ProhibitSubroutinePrototypes)
+sub clear {
     $got = $ref = undef;	# clear
     $skip = undef;		# noskip
     $silent = undef;		# Not silent.
     return;
 }
 
-sub count () {	## no critic (ProhibitSubroutinePrototypes)
+sub count {
     if ( ARRAY_REF eq ref $got ) {
 	$got = @{ $got };
     } else {
@@ -128,12 +128,12 @@ sub count () {	## no critic (ProhibitSubroutinePrototypes)
     return;
 }
 
-sub deref (@) {	## no critic (ProhibitSubroutinePrototypes)
+sub deref {
     $got = $ref;
     goto &deref_curr;
 }
 
-sub deref_curr (@) {	## no critic (ProhibitSubroutinePrototypes)
+sub deref_curr {
     my ( @args ) = @_;
     foreach my $key (@args) {
 	my $type = ref $got;
@@ -148,13 +148,13 @@ sub deref_curr (@) {	## no critic (ProhibitSubroutinePrototypes)
     return;
 }
 
-sub dumper () {	## no critic (ProhibitSubroutinePrototypes)
+sub dumper {
 	require Data::Dumper;
 	diag Data::Dumper::Dumper( $got );
     return;
 }
 
-sub echo (@) {	## no critic (ProhibitSubroutinePrototypes)
+sub echo {
     my @args = @_;
     foreach ( @args ) {
 	note $_;
@@ -162,12 +162,12 @@ sub echo (@) {	## no critic (ProhibitSubroutinePrototypes)
     return;
 }
 
-sub end () {	## no critic (ProhibitSubroutinePrototypes)
+sub end {
     done_testing;
     return;
 }
 
-sub find (@) {	## no critic (ProhibitSubroutinePrototypes)
+sub find {
     my ( @args ) = @_;
     my $target = pop @args;
     if ( ARRAY_REF eq ref $got ) {
@@ -190,7 +190,7 @@ sub find (@) {	## no critic (ProhibitSubroutinePrototypes)
     return;
 }
 
-sub have_scheme ($) {
+sub have_scheme {
     my ( $protocol ) = @_;
     local $@ = undef;
     return eval {
@@ -199,14 +199,14 @@ sub have_scheme ($) {
     };
 }
 
-sub hidden ($) {
+sub hidden {
     my ( $module ) = @_;
     my $code = Test::Without::Module->can( 'get_forbidden_list' )
 	or return 0;
     return exists $code->()->{$module} || 0;
 }
 
-sub load_data ($) {	## no critic (ProhibitSubroutinePrototypes)
+sub load_data {
     my ( $arg ) = @_;
     if ( defined $arg ) {
 	local @INC = ( @INC, '.' );
@@ -217,7 +217,7 @@ sub load_data ($) {	## no critic (ProhibitSubroutinePrototypes)
     return;
 }
 
-sub load_module (@) {	## no critic (ProhibitSubroutinePrototypes)
+sub load_module {
     my @args = @_;
     my $prob = @args > 1 ?
 	("Can not load any of " . join (', ', @args)) :
@@ -243,7 +243,7 @@ sub load_module (@) {	## no critic (ProhibitSubroutinePrototypes)
     return;
 }
 
-sub load_module_or_skip_all (@) {
+sub load_module_or_skip_all {
     my @args = @_;
     load_module( @args );
     $skip
@@ -251,7 +251,7 @@ sub load_module_or_skip_all (@) {
     return;
 }
 
-sub module_loaded (@) {		## no critic (ProhibitSubroutinePrototypes,RequireArgUnpacking)
+sub module_loaded {		## no critic (RequireArgUnpacking)
     my ( @args ) = @_;
     $loaded{shift @args} or return;
     my $verb = shift @args;
@@ -261,11 +261,11 @@ sub module_loaded (@) {		## no critic (ProhibitSubroutinePrototypes,RequireArgUn
     goto &$code;
 }
 
-sub returned_value () { ## no critic (ProhibitSubroutinePrototypes,RequireArgUnpacking)
+sub returned_value {
     return $got;
 }
 
-sub silent (;$) { ## no critic (ProhibitSubroutinePrototypes)
+sub silent {
     my ( $arg ) = @_;
     defined $arg
 	or $arg = ! $silent;
@@ -273,12 +273,12 @@ sub silent (;$) { ## no critic (ProhibitSubroutinePrototypes)
     return;
 }
 
-sub test ($$) {		## no critic (ProhibitSubroutinePrototypes,RequireArgUnpacking)
+sub test {		## no critic (RequireArgUnpacking)
     $_[2] = 1;
     goto &_test;
 }
 
-sub test_false ($$) {	## no critic (ProhibitSubroutinePrototypes,RequireArgUnpacking)
+sub test_false {	## no critic (RequireArgUnpacking)
     $_[2] = 0;
     goto &_test;
 }
@@ -519,7 +519,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2019 by Thomas R. Wyant, III
+Copyright (C) 2011-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

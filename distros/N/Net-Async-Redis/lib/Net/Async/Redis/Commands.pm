@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '2.005'; # VERSION
+our $VERSION = '2.006'; # VERSION
 
 =head1 NAME
 
@@ -2139,7 +2139,7 @@ Return the index of matching elements on a list.
 
 =item * element
 
-=item * [FIRST rank]
+=item * [RANK rank]
 
 =item * [COUNT num-matches]
 
@@ -5164,11 +5164,9 @@ Set the string value of a key.
 
 =item * value
 
-=item * [EX seconds|PX milliseconds]
+=item * [EX seconds|PX milliseconds|KEEPTTL]
 
 =item * [NX|XX]
-
-=item * [KEEPTTL]
 
 =back
 

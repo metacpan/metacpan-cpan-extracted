@@ -15,7 +15,7 @@ configure_requires:
   Alien::Build::Plugin::Build::Make: '0.99'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ no_index:
 provides:
   Alien::hiredis:
     file: lib/Alien/hiredis.pm
-    version: '0.009'
+    version: '0.011'
 requires:
   Alien::Base: '0.038'
   parent: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Alien-hiredis/issues
   homepage: https://github.com/Grinnz/Alien-hiredis
   repository: https://github.com/Grinnz/Alien-hiredis.git
-version: '0.009'
+version: '0.011'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.30'
   requires:

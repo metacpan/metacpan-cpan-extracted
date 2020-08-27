@@ -3,8 +3,10 @@ use 5.006;
 use Carp;
 use warnings;
 use strict;
+use attributes ();
+use Perlmazing ();
 
-our $VERSION = '1.02'; # remember to update version in POD!
+our $VERSION = '1.04'; # remember to update version in POD!
 our $AUTOLOAD;
 
 my %symcache;
@@ -150,12 +152,15 @@ sub AUTOLOAD {
     croak "Attribute handler '$2' doesn't handle $1 attributes";
 }
 
-my $builtin = qr/lvalue|method|locked|unique|shared/;
+my $builtin = qr/lvalue|locked|unique|shared/; # Method left out on purpose.
+
 
 sub _gen_handler_AH_() {
     sub {
         _resolve_lastattr if _delayed_name_resolution;
         my ($pkg, $ref, @attrs) = @_;
+        push @attrs, attributes::get($ref);
+        Perlmazing::remove_duplicates(@attrs);
         my (undef, $filename, $linenum) = caller 2;
         foreach (@attrs) {
             my ($attr, $data) = /^([a-z_]\w*)(?:[(](.*)[)])?$/is or next;
@@ -269,7 +274,7 @@ Attribute::Handlers::Clean - Simpler definition of attribute handlers, without m
 
 =head1 VERSION
 
-This document describes version 1.02 of Attribute::Handlers::Clean.
+This document describes version 1.04 of Attribute::Handlers::Clean.
 
 =head1 SYNOPSIS
 
@@ -353,7 +358,7 @@ work on your classes and subclasses.
 
 The problem with altering L<UNIVERSAL> is that ALL other classes loaded in Perl can
 be affected by this pollution. It might even break things when their functionality
-relies on basic calls like C<package-E<gt>can('...')>. Still, L<Attribute::Handlers> is
+relies on basic calls like C<package->can('...')>. Still, L<Attribute::Handlers> is
 an excellent idea an implementation, but we can get away with it without polluting
 L<UNIVERSAL> by polluting only the classes using L<Attribute::Handlers::Clean> (which
 doesn't really create a problem, since putting things in L<UNIVERSAL> was already

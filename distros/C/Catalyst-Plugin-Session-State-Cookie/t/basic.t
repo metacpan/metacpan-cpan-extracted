@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
@@ -80,7 +78,14 @@ $cxt->set_session_id($sessionid);
 ok( $cookies_called, "response cookie was set when sessionid changed" );
 is_deeply(
     \%res_cookies,
-    { session => { value => $sessionid, httponly => 1, expires => 123 } },
+    {
+        session => {
+            value => $sessionid,
+            httponly => 1,
+            expires => 123,
+            samesite => 'Lax',
+        },
+    },
     "cookie was set correctly"
 );
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package DBIx::Class::ResultSet::RecursiveUpdate;
-$DBIx::Class::ResultSet::RecursiveUpdate::VERSION = '0.41';
+$DBIx::Class::ResultSet::RecursiveUpdate::VERSION = '0.42';
 # ABSTRACT: like update_or_create - but recursive
 
 use base qw(DBIx::Class::ResultSet);
@@ -36,7 +36,7 @@ sub recursive_update {
 }
 
 package DBIx::Class::ResultSet::RecursiveUpdate::Functions;
-$DBIx::Class::ResultSet::RecursiveUpdate::Functions::VERSION = '0.41';
+$DBIx::Class::ResultSet::RecursiveUpdate::Functions::VERSION = '0.42';
 use Carp::Clan qw/^DBIx::Class|^HTML::FormHandler|^Try::Tiny/;
 use Scalar::Util qw( blessed );
 use List::MoreUtils qw/ any all none /;
@@ -54,6 +54,16 @@ sub recursive_update {
         };
     $resolved ||= {};
     $ENV{DBIC_NULLABLE_KEY_NOWARN} = 1;
+
+    local $SIG{__WARN__} = sub {
+        my $level = 0;
+        my $i = 0;
+        while (1) {
+            my $sub = (caller($i++))[3] or last;
+            $level++ if $sub =~ /(?:recursive_update|_update_relation)$/;
+        }
+        warn map { s/^/"    "x$level/egmr } @_;
+    } if DEBUG;
 
     my $source = $self->result_source;
 
@@ -354,8 +364,7 @@ sub _get_columns_by_accessor {
     my %columns;
     for my $name ( $source->columns ) {
         my $info = $source->column_info($name);
-        $info->{name} = $name;
-        $columns{ $info->{accessor} || $name } = $info;
+        $columns{ $info->{accessor} || $name } = { %$info, name => $name };
     }
     return %columns;
 }
@@ -384,6 +393,7 @@ sub _get_matching_row {
 
     my @matching_rows;
     for my $row (@$rows) {
+        no warnings 'uninitialized';
         push @matching_rows, $row
             if all { $kvs->{$_} eq $row->get_column($_) }
                 grep { !ref $kvs->{$_} }
@@ -522,12 +532,19 @@ sub _update_relation {
             }
             my $related_object;
 
+            my @missing_pks = grep {
+                    my $pkcolname = $_;
+                    none { $_ eq $pkcolname } keys %pk_kvs;
+                } @pks;
+
             # support the special case where a method on the related row
             # populates one or more primary key columns and we don't have
             # all primary key values already
             # see DBSchema::Result::DVD relationship keysbymethod
             DEBUG and warn "pk columns so far: " . join (', ',
                 sort keys %pk_kvs) . "\n";
+            DEBUG and warn "pk columns missing: " . join (', ',
+                sort @missing_pks) . "\n";
             my @non_pk_columns = grep {
                     my $colname = $_;
                     none { $colname eq $_ } keys %pk_kvs
@@ -535,6 +552,51 @@ sub _update_relation {
                 sort keys %$sub_updates;
             DEBUG and warn "non-pk columns: " . join (', ',
                 @non_pk_columns) . "\n";
+            if ( scalar keys %pk_kvs != scalar @pks && @non_pk_columns) {
+                DEBUG and warn "not all primary keys available, trying " .
+                    "relationships\n";
+                my @rel_names = grep {
+                        $related_result_source->has_relationship($_)
+                    } sort keys %$sub_updates;
+
+                for my $relname (@rel_names) {
+                    my $rel_info = $related_result_source
+                        ->relationship_info($relname);
+                    next
+                        unless $rel_info->{attrs}->{accessor} eq 'single'
+                            && $rel_info->{attrs}->{is_foreign_key_constraint};
+
+                    for my $f_key ( sort keys %{$rel_info->{cond}} ) {
+                        my $col = $rel_info->{cond}->{$f_key};
+                        $col   =~ s/^self\.//;
+                        $f_key =~ s/^foreign\.//;
+
+                        next
+                            unless any { $col eq $_ } @missing_pks;
+
+                        DEBUG and warn "populating primary key column " .
+                            "'$col' from relationship '$relname'\n";
+                        # rel holds a scalar value
+                        if (keys %{$rel_info->{cond}} == 1 && !ref $sub_updates->{$relname}) {
+                            $pk_kvs{$col} = delete $sub_updates->{$relname};
+                            # optimization to not update the related row
+                            # when only the primary key of it is given
+                            $sub_updates->{$col} = $pk_kvs{$col};
+                        }
+                        # rel holds a hashref
+                        elsif (ref $sub_updates->{$relname} eq 'HASH') {
+                            $pk_kvs{$col} =
+                                $sub_updates->{$relname}->{$f_key};
+                        }
+                        else {
+                            $self->throw_exception("passing anything else " .
+                                "but a scalar or a hashref is not " .
+                                "implemented");
+                        }
+                    }
+                }
+            }
+
             if ( scalar keys %pk_kvs != scalar @pks && @non_pk_columns) {
                 DEBUG and warn "not all primary keys available, trying " .
                     "object creation\n";
@@ -851,8 +913,8 @@ sub _master_relation_cond {
     sub _inner {
         my ( $source, $cond, @foreign_ids ) = @_;
 
-        while ( my ( $f_key, $col ) = each %{$cond} ) {
-
+        for my $f_key ( sort keys %$cond ) {
+            my $col = $cond->{$f_key};
             # might_have is not master
             $col   =~ s/^self\.//;
             $f_key =~ s/^foreign\.//;
@@ -902,7 +964,7 @@ DBIx::Class::ResultSet::RecursiveUpdate - like update_or_create - but recursive
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 

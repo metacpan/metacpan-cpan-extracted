@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Acme::CPANModules::DiffWrappers",
   "PREREQ_PM" => {
-    "Acme::CPANModules::CLI::Wrapper::UnixCommand" => "0.002"
+    "Acme::CPANModules::CLI::Wrapper::UnixCommand" => "0.003"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Acme::CPANModules::CLI::Wrapper::UnixCommand" => "0.002",
+  "Acme::CPANModules::CLI::Wrapper::UnixCommand" => "0.003",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

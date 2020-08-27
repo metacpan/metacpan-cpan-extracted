@@ -3,12 +3,14 @@ package Algorithm::LibLinear;
 use 5.014;
 use Algorithm::LibLinear::DataSet;
 use Algorithm::LibLinear::Model;
+use Carp qw//;
 use List::Util qw/sum/;
+use List::MoreUtils qw/none/;
 use Smart::Args::TypeTiny;
 use Types::Standard qw/ArrayRef Bool ClassName Dict Enum InstanceOf Int Num/;
 use XSLoader;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -149,6 +151,14 @@ sub find_parameters {
         my $num_folds => Int,
         my $update => +{ isa => Bool, default => 0, };
 
+    my $solver_type = $self->training_parameter->solver_type;
+    if (none { $solver_type == $_ } @solvers{
+        qw/L2R_LR L2R_L2LOSS_SVC L2R_L2LOSS_SVR/,
+    }) {
+        my %solver_types = reverse %solvers;
+        my $solver = $solver_types{$solver_type};
+        Carp::croak('Operation is unsupported with this solver: ', $solver);
+    }
     $self->training_parameter->find_parameters(
         $data_set->as_problem(bias => $self->bias),
         $num_folds,
@@ -201,7 +211,7 @@ Algorithm::LibLinear - A Perl binding for LIBLINEAR, a library for classificatio
   my $learner = Algorithm::LibLinear->new(
     cost => 1,
     epsilon => 0.01,
-    solver => 'L2R_L2LOSS_SVC_DUAL',
+    solver => 'L2R_L2LOSS_SVC',
     weights => [
       +{ label => 1, weight => 1, },
       +{ label => -1, weight => 1, },
@@ -210,7 +220,7 @@ Algorithm::LibLinear - A Perl binding for LIBLINEAR, a library for classificatio
   # Loads a training data set from DATA filehandle.
   my $data_set = Algorithm::LibLinear::DataSet->load(fh => \*DATA);
   # Updates training parameter.
-  $learner->find_cost_parameter(data_set => $data_set, max => 1000, num_folds => 5, update => 1);
+  $learner->find_parameters(data_set => $data_set, num_folds => 5, update => 1);
   # Executes cross validation.
   my $accuracy = $learner->cross_validation(data_set => $data_set, num_folds => 5);
   # Executes training.
@@ -349,11 +359,12 @@ Notice that C<loss_sensitivity> is affected too when C<update> is set.
 
 =head2 find_parameters(data_set => $data_set, num_folds => $num_folds [, initial_cost => -1.0] [, initial_loss_sensitivity => -1.0] [, update => 0])
 
-Find the best parameters by N-fold cross validation. If C<initial_cost> or C<initial_loss_sensitivity> is a negative, the value is automatically calculated.
+Finds the best parameters by N-fold cross validation. If C<initial_cost> or C<initial_loss_sensitivity> is a negative, the value is automatically calculated.
+Works only for 3 solvers: C<'L2R_LR'>, C<'L2R_L2LOSS_SVC'> and C<'L2R_L2LOSS_SVR'>. Error will be thrown for otherwise.
 
 When C<update> is set true, the instance is updated to use the found parameters. This behaviour is disabled by default.
 
-Return value is an ArrayRef containing 3 values: found C<cost>, found C<loss_sensitivity> and mean accuracy of cross validation with the parameters.
+Return value is an ArrayRef containing 3 values: found C<cost>, found C<loss_sensitivity> (only if solver is C<'L2R_L2LOSS_SVR'>) and mean accuracy of cross validation with the found parameters.
 
 =head2 train(data_set => $data_set)
 

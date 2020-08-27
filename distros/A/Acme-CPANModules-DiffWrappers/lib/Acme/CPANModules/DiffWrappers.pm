@@ -1,17 +1,22 @@
 package Acme::CPANModules::DiffWrappers;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-22'; # DATE
+our $DATE = '2020-08-26'; # DATE
 our $DIST = 'Acme-CPANModules-DiffWrappers'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 require Acme::CPANModules::CLI::Wrapper::UnixCommand;
 my $srclist = $Acme::CPANModules::CLI::Wrapper::UnixCommand::LIST;
 
+sub _includes {
+    my ($list, $item) = @_;
+    ref $list eq 'ARRAY' ? ((grep {$_ eq $item} @$list) ? 1:0) : ($list eq $item);
+}
+
 our $LIST = {
     summary => "Wrappers for the diff Unix command",
     entries => [
-        grep { $_->{'x.command'} eq 'diff' } @{ $srclist->{entries} }
+        grep { _includes($_->{'x.command'}, 'diff') } @{ $srclist->{entries} }
     ],
 };
 
@@ -30,7 +35,7 @@ Acme::CPANModules::DiffWrappers - Wrappers for the diff Unix command
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::DiffWrappers (from Perl distribution Acme-CPANModules-DiffWrappers), released on 2020-08-22.
+This document describes version 0.002 of Acme::CPANModules::DiffWrappers (from Perl distribution Acme-CPANModules-DiffWrappers), released on 2020-08-26.
 
 =head1 INCLUDED MODULES
 
@@ -39,6 +44,8 @@ This document describes version 0.001 of Acme::CPANModules::DiffWrappers (from P
 =item * L<App::diffwc> - Wraps (or filters output of) diff to add colors and highlight words
 
 =item * L<App::DiffDocText> - Diffs two office word-processor documents by first converting them to plaintext
+
+=item * L<App::sdif> - Provides sdif (diff side-by-side with nice color theme), cdif (highlight words with nice color scheme), and watchdiff (watch command and diff output)
 
 =back
 

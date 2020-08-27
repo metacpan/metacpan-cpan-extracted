@@ -4,12 +4,12 @@ author:
   - 'Andrew Maltsev, https://ejelta.com/xao/'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  XAO::Base: '1.23'
+  XAO::Base: '1.27'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
-  XAO::Base: '1.23'
+  XAO::Base: '1.27'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: artistic
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,8 +21,8 @@ no_index:
     - inc
 requires:
   Authen::SASL::SASLprep: '1.1'
-  CGI: '4.14'
-  CGI::Cookie: '4.14'
+  CGI: '4.5'
+  CGI::Cookie: '4.5'
   CGI::PSGI: '0.15'
   Crypt::Rijndael: '1.13'
   Data::Entropy::Algorithms: '0.007'
@@ -40,9 +40,10 @@ requires:
   Text::FormatTable: '0.01'
   Time::HiRes: '1.9719'
   Unicode::Normalize: '1.18'
-  XAO::Base: '1.23'
+  XAO::Base: '1.27'
   XAO::FS: '1.21'
   perl: '5.010001'
 resources:
   repository: git://github.com/amaltsev/XAO-Web.git
-version: '1.81'
+version: '1.83'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

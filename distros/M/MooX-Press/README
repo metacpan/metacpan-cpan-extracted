@@ -583,6 +583,10 @@ DESCRIPTION
         in the "Person" class and don't rely on it being inherited from
         "Mammal".
 
+        Coercions can also be specified using the attribute 'coerce' or
+        'coercion' for methods/multimethods/factory methods, if they only take
+        a single typed positional argument.
+
     `subclass` *(OptList)*
         Set up subclasses of this class. This accepts an optlist like the
         class list. It allows subclasses to be nested as deep as you like:
@@ -1135,6 +1139,7 @@ DESCRIPTION
         signature  => [ ... ],
         named      => 1,
         code       => sub { ... },
+        attributes => [ ... ],
       }
 
     The `signature` is a specification to be passed to `compile` or

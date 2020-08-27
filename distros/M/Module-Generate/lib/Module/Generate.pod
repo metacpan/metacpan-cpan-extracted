@@ -6,7 +6,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.20
+Version 0.22
 
 =cut
 
@@ -389,7 +389,15 @@ Implement a keyword that can be used accross classes.
 		->has('test')->is(q|'rw'|)
 			->test(
 				['ok', q|my $obj = do { eval q{
-
+					package FooBar;
+					use Moo;
+					with 'Keyword::Role';
+					1;
+				}; 1; } && FooBar->new| ],
+				['is', q|$obj->test|, q|undef|],
+				['ok', q|$obj->test('abc')|],
+				['is', q|$obj->test|, q|'abc'|]
+			);
 
 =head2 generate
 

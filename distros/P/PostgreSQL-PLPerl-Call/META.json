@@ -1,25 +1,82 @@
 {
-   "resources" : {
-      "repository" : "git@github.com:timbunce/posgtresql-plperl-call.git"
-   },
-   "meta-spec" : {
-      "version" : 1.4,
-      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
-   },
-   "generated_by" : "Dist::Zilla version 1.100660",
-   "version" : "1.006",
-   "name" : "PostgreSQL-PLPerl-Call",
-   "author" : [
-      "Tim Bunce <Tim.Bunce@pobox.com>"
-   ],
-   "license" : "perl",
-   "build_requires" : {},
-   "requires" : {
-      "DBI" : "1.605"
-   },
    "abstract" : "Simple interface for calling SQL functions from PostgreSQL PL/Perl",
-   "configure_requires" : {
-      "ExtUtils::MakeMaker" : "6.11"
-   }
+   "author" : [
+      "-"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PostgreSQL-PLPerl-Call",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::PostgreSQL" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PostgreSQL::PLPerl::Call" : {
+         "file" : "lib/PostgreSQL/PLPerl/Call.pm",
+         "version" : "1.007"
+      },
+      "PostgreSQL::PLPerl::Call::PG" : {
+         "file" : "lib/PostgreSQL/PLPerl/Call.pm",
+         "version" : "1.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rabbiveesh/PostgreSQL-PLPerl-Call/issues"
+      },
+      "homepage" : "https://github.com/rabbiveesh/PostgreSQL-PLPerl-Call",
+      "repository" : {
+         "url" : "git://github.com/rabbiveesh/PostgreSQL-PLPerl-Call.git",
+         "web" : "https://github.com/rabbiveesh/PostgreSQL-PLPerl-Call"
+      }
+   },
+   "version" : "1.007",
+   "x_contributors" : [
+      "Veesh Goldman <rabbiveesh@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
 }
-

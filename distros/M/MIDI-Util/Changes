@@ -1,5 +1,12 @@
 Revision history for MIDI-Util
 
+0.0601 2020-08-26 11:02:47
+    - Add missing signature documentation.
+
+0.0600 2020-08-26 09:43:00
+    - Add and test the set_time_sig() function.
+    - Improve documentation.
+
 0.0500 2020-08-13 15:34:46
     - Remove the unused new_track() function.
 

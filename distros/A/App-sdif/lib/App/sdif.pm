@@ -1,6 +1,5 @@
 package App::sdif;
-use 5.014;
-use strict;
+use v5.14;
 use warnings;
 
 use Exporter 'import';
@@ -8,7 +7,7 @@ our @EXPORT      = qw(usage);
 our %EXPORT_TAGS = ();
 our @EXPORT_OK   = qw();
 
-our $VERSION = "4.16.0";
+our $VERSION = "4.16.1";
 
 use Pod::Usage;
 

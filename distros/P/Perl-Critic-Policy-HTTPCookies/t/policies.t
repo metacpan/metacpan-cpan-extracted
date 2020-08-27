@@ -13,6 +13,8 @@ my @ok = (
     'LWP::UserAgent -> new',
     'LWP::UserAgent->new( cookie_jar => undef )',
     'LWP::UserAgent->new( "cookie_jar" => undef )',
+    'LWP::UserAgent->new( not_a_cookie_jar => {} )',
+    'LWP::UserAgent->new( "not_a_cookie_jar" => {} )',
     # $cookies might be a HTTP::CookieJar::LWP
     'LWP::UserAgent->new( cookie_jar => $cookies )',
     'LWP::UserAgent->new( timeout => 10, max_redirect => 0 )',
@@ -36,14 +38,18 @@ my @not_ok = (
     'LWP::UserAgent->new( cookie_jar, {} )',
     'LWP::UserAgent->new("cookie_jar"=>{})',
     'new LWP::UserAgent ( cookie_jar => {} )',
+    'my $ua = LWP::UserAgent->new; $ua->cookie_jar( HTTP::Cookies->new );',
+    'my $ua = LWP::UserAgent->new; my $jar = HTTP::Cookies->new; $ua->cookie_jar($jar);',
 );
 
 my @todo_ok = (
     'LWP::UserAgent->new( cookie_jar => {}, cookie_jar => undef )',
+    'LWP::UserAgent->new( "not_a cookie_jar" => {} )',
 );
 
 my @todo_not_ok = (
     'my $ua = LWP::UserAgent->new; $ua->cookie_jar({});',
+    'my %arg = (cookie_jar => {}); LWP::Useragent->new(%arg);'
 );
 
 my $policy = 'HTTPCookies';

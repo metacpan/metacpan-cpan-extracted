@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+#
+# refresh corpus info for a given corpus
+#
+# USAGE: refresh_corpus_info.pl corpus
+
+
+use strict;
+
+use File::Basename;
+use FindBin qw($Bin);
+use lib "$Bin/../../lib";
+use OPUS::Tools;
+
+my ($corpus) = @ARGV;
+
+die "specify corpus" unless (defined $corpus);
+
+
+opendir(my $dh, "$OPUS_RELEASES/$corpus") || die "Can't open $OPUS_RELEASES/$corpus: $!";
+while (my $release = readdir($dh)) {
+    next if ($release=~/^\./);
+    next unless (-d "$OPUS_RELEASES/$corpus/$release");
+
+    my @bitexts = glob("$OPUS_RELEASES/$corpus/$release/xml/*.xml.gz");
+    my %done = ();
+
+    foreach my $b (@bitexts){
+	$b = basename($b);
+	if ($b=~/^([a-z\_]+)-([a-z\_]+).xml.gz/){
+	    my ($src,$trg) = ($1,$2);
+	    unless ($done{"$src-$trg"}){
+		print STDERR "set info for $corpus $release $src-$trg\n";
+		set_corpus_info($corpus,$release,$src,$trg);
+		$done{"$src-$trg"} = 1;
+	    }
+	}
+    }
+}
+closedir $dh;
+

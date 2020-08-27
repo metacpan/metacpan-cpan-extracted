@@ -4,7 +4,7 @@
       "Francisco Zarabozo <zarabozo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,33 +16,34 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "demo"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Perlmazing" : "0"
+            "Perlmazing" : "1"
          }
       },
       "configure" : {
          "requires" : {
-            "Perlmazing" : "0"
+            "Perlmazing" : "1"
          }
       },
       "runtime" : {
          "requires" : {
-            "Perlmazing" : "0",
+            "Perlmazing" : "1",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "Perlmazing" : "0"
+            "Perlmazing" : "1"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.02",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON version 4.02"
 }

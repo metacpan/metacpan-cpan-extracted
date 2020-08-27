@@ -3,7 +3,7 @@ package Alien::hiredis;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 
 use parent 'Alien::Base';
 

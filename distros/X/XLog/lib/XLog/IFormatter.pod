@@ -1,0 +1,11 @@
+=head1 NAME
+
+XLog::IFormatter - Base class for all formatter backends
+
+
+
+=head1 DESCRIPTION
+
+There is no user API here
+
+1;

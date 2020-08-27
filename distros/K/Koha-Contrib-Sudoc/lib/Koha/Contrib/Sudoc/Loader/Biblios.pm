@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader::Biblios;
 # ABSTRACT: Chargeur de notices biblio
-$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.32';
+$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.33';
 use Moose;
 
 extends 'Koha::Contrib::Sudoc::Loader';
@@ -161,7 +161,7 @@ Koha::Contrib::Sudoc::Loader::Biblios - Chargeur de notices biblio
 
 =head1 VERSION
 
-version 2.32
+version 2.33
 
 =head1 AUTHOR
 
@@ -169,7 +169,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Fréderic Demians.
+This software is Copyright (c) 2020 by Fréderic Demians.
 
 This is free software, licensed under:
 

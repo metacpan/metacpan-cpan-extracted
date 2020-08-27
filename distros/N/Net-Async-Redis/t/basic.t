@@ -45,6 +45,22 @@ is($redis->del('xyz')->get, 1, 'deleted a single key');
 note "Get key";
 cmp_deeply([ $redis->exists('xyz')->get ], [ 0 ], 'no longer exists');
 
+subtest 'redis database parameter' => sub {
+    $loop->add(my $redis = Net::Async::Redis->new);
+    ok(my $f = $redis->connect(
+        host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
+        port => $ENV{NET_ASYNC_REDIS_PORT} // '6379',
+        database => 2,
+    ), 'connect');
+    isa_ok($f, 'Future');
+    $loop->await($f);
+    my $id = "client_db_test_$$";
+    $redis->client_setname($id)->get;
+    my $client_info = $redis->client_list->get;
+    my (%info) = map { /(\w+)=(\S+)\s*/g } grep { /name=\Q$id/ } split /\n/, $client_info;
+    is($info{db}, 2, 'database was selected correctly');
+    done_testing;
+};
 done_testing;
 
 

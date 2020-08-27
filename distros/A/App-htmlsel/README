@@ -2,8 +2,8 @@ NAME
     App::htmlsel - Select HTML::Element nodes using CSel syntax
 
 VERSION
-    This document describes version 0.009 of App::htmlsel (from Perl
-    distribution App-htmlsel), released on 2019-08-09.
+    This document describes version 0.010 of App::htmlsel (from Perl
+    distribution App-htmlsel), released on 2020-04-29.
 
 SYNOPSIS
 FUNCTIONS
@@ -20,7 +20,7 @@ FUNCTIONS
 
     *   expr => *str*
 
-    *   file => *str* (default: "-")
+    *   file => *filename* (default: "-")
 
     *   node_actions => *array[str]* (default: ["print_as_string"])
 
@@ -60,6 +60,22 @@ FUNCTIONS
 
             which will print the tag name for each matching HTML::Element
             node.
+
+    *   node_actions_on_descendants => *str* (default: "")
+
+        Specify how descendants should be actioned upon.
+
+        This option sets how node action is performed (See "node_actions"
+        option).
+
+        When set to '' (the default), then only matching nodes are actioned
+        upon.
+
+        When set to 'descendants_depth_first', then after each matching node
+        is actioned upon by an action, the descendants of the matching node
+        are also actioned, in depth-first order. This option is sometimes
+        necessary e.g. when your node's "as_string()" method shows a node's
+        string representation that does not include its descendants.
 
     *   select_action => *str* (default: "csel")
 
@@ -101,7 +117,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

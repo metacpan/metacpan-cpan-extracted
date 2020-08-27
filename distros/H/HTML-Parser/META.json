@@ -4,13 +4,13 @@
       "Gisle Aas <gisle@activestate.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HTML-Parser",
    "no_index" : {
@@ -45,9 +45,10 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "http://github.com/gisle/html-parser"
+         "url" : "https://github.com/libwww-perl/HTML-Parser"
       },
       "x_MailingList" : "mailto:libwww@perl.org"
    },
-   "version" : "3.72"
+   "version" : "3.73",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

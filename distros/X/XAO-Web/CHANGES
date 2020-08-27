@@ -1,6 +1,32 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 550acb723c1b9fb4976518fc67c2eae7867cde1d
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Aug 26 16:15:47 2020 -0700
+
+    1.83 Added a missing MANIFEST entry
+    
+    Requires a version bump :(
+
+commit 4a2b0169814ddb4322902459aa633bdb87db2947
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Aug 26 15:24:55 2020 -0700
+
+    1.82 Support for samesite and sscompat in cookies
+    
+    Setting SameSite and optionally a compatibility setting for browsers
+    that have not caught up yet. Can be set in a global configuration or for
+    specific cookies.
+
+commit e10b79ed77c610040da91d83f93b0431772173b8
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon Jul 20 19:13:39 2020 -0700
+
+    v1.81 Test case fix for XAO::Base 1.27
+    
+    Single quote is now encoded differently.
+
 commit 7ff480a0dff0e32dcbbfaf5539548ab9647b278d
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Tue Feb 11 19:04:24 2020 -0800
@@ -53,30 +79,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Apr 26 16:10:25 2019 -0700
 
     1.77 Added max_age and headers options for maptodir
-
-commit c26fcab6b96b8a2e84ab245918b36ad8ee9914b2
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Sat Mar 2 09:35:44 2019 -0800
-
-    1.76 Fake HTTPS parameter for Plack::App::XAO
-
-commit 6d2bc977443776ad1d3171569d1eb5b5be04a8bf
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Jan 9 18:20:27 2019 -0800
-
-    1.75 Fixed <%URL%> in PSGI environment
-    
-    Due to PSGI setting PATH_INFO and REQUEST_URI to the same value CGI.pm
-    returns an empty value for url(-absolute => 1). That seems wrong, but
-    that is what it is.
-    
-    Changed to use request_uri() instead, which works in both Apache and
-    PSGI.
-
-commit 5ee03eea8570a7e74911f2a836c44c503d719d9e
-Merge: 3eb6edc 87175f5
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Mon Nov 26 17:59:14 2018 -0800
-
-    Merge branch 'master' of github.com:amaltsev/XAO-Web
 

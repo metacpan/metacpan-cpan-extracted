@@ -1,18 +1,9 @@
 package Mock::MonkeyPatch;
 
-sub _defined { defined &{$_[0]} }
-sub _patch {
-  my $p = prototype \&{$_[0]};
-  if (defined $p) {
-    Sub::Util::set_prototype($p, $_[1]);
-  }
-  *{$_[0]} = $_[1];
-}
-
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 $VERSION = eval $VERSION;
 
 use Carp ();
@@ -20,6 +11,20 @@ use Scalar::Util ();
 use Sub::Util 1.40 ();
 
 sub ORIGINAL;
+
+{
+  no strict 'refs';
+
+  sub _defined { defined &{$_[0]} }
+  sub _patch {
+    no warnings 'redefine';
+    my $p = prototype \&{$_[0]};
+    if (defined $p) {
+      Sub::Util::set_prototype($p, $_[1]);
+    }
+    *{$_[0]} = $_[1];
+  }
+}
 
 sub arguments {
   my ($self, $occurance) = @_;

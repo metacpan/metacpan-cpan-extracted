@@ -11,6 +11,8 @@ t/03-subs.t
 t/04-test.t
 t/05-realms.t
 t/06-realms-test.t
+t/07-ahh.t
+t/08-types.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -1,0 +1,15 @@
+runtime:
+  requires:
+    perl: '5.008001'
+    parent: 0
+    Alien::Base: 0
+test:
+  requires:
+    Test::More: '0.88'
+    Test::Alien: 0
+configure:
+  requires:
+    Alien::Build: '1.61'
+develop:
+  requires:
+    FFI::Platypus: 0

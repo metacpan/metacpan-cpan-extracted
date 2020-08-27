@@ -1,0 +1,48 @@
+=head1 NAME
+
+XLog::Logger - Base class for pure-perl logging backends
+
+
+
+=head1 SYNPOSIS
+
+    package MyLogger;
+    use parent 'XLog::Logger';
+    
+    sub new {
+        my ($class, ...) = @_;
+        my $self = $class->SUPER::new();
+        ...
+        return $self;
+    }
+    
+    sub log {
+        my ($self, $msg) = @_;
+        say $msg;
+    }
+
+
+=head1 DESCRIPTION
+
+This is a base class for making pure-perl logging objects.
+
+You need to define C<log> method and do logging work there.
+
+
+=head1 METHODS
+
+=head4 new()
+
+Create backend object.
+
+Keep in mind that if you override C<new> method you MUST create object by calling C<SUPER>, not blessing new object by yourself,
+because there will be a C++ proxy object attached to perl object.
+
+
+=head4 log($msg)
+
+You must override this method and do the logging work. C<$msg> is a final formatted by formatter message.
+
+=cut
+
+1;

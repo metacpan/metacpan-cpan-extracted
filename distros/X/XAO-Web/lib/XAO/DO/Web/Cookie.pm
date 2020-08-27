@@ -19,6 +19,8 @@ Displays or sets a cookie. Arguments are:
   path    => cookie visibility path (same as in CGI->cookie)
   domain  => cookie domain (same as in CGI->cookie)
   secure  => cookie secure flag (same as in CGI->cookie)
+  httponly=> cookie httpOnly flag (same as in CGI->cookie)
+  samesite=> cookie SameSite flag (Strict, Lax, or None)
   received=> when retrieving only look at actually received cookies (the
              default is to return a cookie value possibly set earlier
              in the page render)
@@ -46,20 +48,22 @@ sub display ($;%) {
         $self->siteconfig->add_cookie(
             -name       => $name,
             -value      => $args->{'value'},
-            -expires    => $args->{'expires'},
             -path       => $args->{'path'},
-            -domain     => $args->{'domain'},
-            -secure     => $args->{'secure'},
+            #
+            ($args->{'expires'}     ? (-expires  => $args->{'expires'}) : ()),
+            ($args->{'domain'}      ? (-domain   => $args->{'domain'}) : ()),
+            ($args->{'secure'}      ? (-secure   => $args->{'secure'}) : ()),
+            ($args->{'httponly'}    ? (-httponly => $args->{'httponly'}) : ()),
+            ($args->{'samesite'}    ? (-samesite => $args->{'samesite'}) : ()),
         );
-
-        return;
     }
+    else {
+        my $c=$self->siteconfig->get_cookie($name,$args->{'received'});
+        defined $c || ($c=$args->{'default'});
+        defined $c || ($c='');
 
-    my $c=$self->siteconfig->get_cookie($name,$args->{'received'});
-    defined $c || ($c=$args->{'default'});
-    defined $c || ($c='');
-
-    $self->textout($c);
+        $self->textout($c);
+    }
 }
 
 ###############################################################################

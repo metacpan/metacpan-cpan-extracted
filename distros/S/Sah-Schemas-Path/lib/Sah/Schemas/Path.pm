@@ -1,7 +1,7 @@
 package Sah::Schemas::Path;
 
-our $DATE = '2020-08-08'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2020-08-26'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 1;
 # ABSTRACT: Schemas related to filesystem path
@@ -18,7 +18,7 @@ Sah::Schemas::Path - Schemas related to filesystem path
 
 =head1 VERSION
 
-This document describes version 0.014 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2020-08-08.
+This document describes version 0.015 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2020-08-26.
 
 =head1 SAH SCHEMAS
 

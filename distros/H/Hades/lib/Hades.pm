@@ -3,7 +3,7 @@ package Hades;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use Module::Generate;
 use Switch::Again qw/switch/;
 
@@ -26,12 +26,12 @@ sub run {
 	my ($index, $ident, @lines, @line, @innerline, $nested) = (0, '');
 	while ($index <= length $self->{eval}) {
 		my $first_char = $self->index($index++);
-		$ident =~ m/^((:.*\()|(\{))/
+		$ident =~ m/^((:.*\()|(\{)|(\[))/
 			? do {
 				my $copy = $ident;
-				$copy =~ s/\\\{|\\\}|\\\(|\\\)//g; # remove escaped
-				1 while ($copy =~ s/\([^()]+\)|\{[^{}]+\}//g);
-				($copy =~ m/\(|\{|\)|\}/) ? do {
+				$copy =~ s/\\\{|\\\}|\\\(|\\\)||\\\[|\\\]//g; # remove escaped
+				1 while ($copy =~ s/\([^()]+\)|\{[^{}]+\}|\[[^\[\]]+\]//g);
+				($copy =~ m/\(|\{|\[|\)|\}|\]/) ? do {
 					$ident .= $first_char;
 				} : do {
 					push @innerline, $ident;
@@ -133,7 +133,6 @@ sub build_new {
 	$class{CURRENT}{SUBS}{new}{CODE} = $code;
 	$class{CURRENT}{SUBS}{new}{TEST} = [$self->build_tests('new', $meta, 'new', \%class)];
 }
-
 
 sub build_class_inheritance {
 	my ($self, $mg, $last_token, $token) = @_;
@@ -266,6 +265,10 @@ sub build_sub_or_accessor_attributes {
 sub build_sub_or_accessor {
 	my ($self, $mg, $token, $meta) = @_;
 	my $name = shift @{$token};
+	if ($name =~ s/^\[(.*)\]$/$1/) {
+		$self->build_sub_or_accessor($mg, [$_, @{$token}], $meta) for split / /, $1;
+		return;
+	}
 	$meta->{$name}->{meta} = 'ACCESSOR';
 	my $switch = switch(
 		$self->build_sub_or_accessor_attributes($name, $token, $meta)
@@ -401,9 +404,12 @@ sub build_coerce {
 
 sub build_trigger {
 	my ($self, $name, $param, $code) = @_;
-	return defined $code ? $code =~ m/^\w+$/
-		? qq|\$self->$code($param);|
-		: $code
+	return defined $code 
+		? $code =~ m/^1$/ 
+			? qq|\$self->_trigger_$name| 
+			: $code =~ m/^\w+$/
+				? qq|\$self->$code($param);|
+				: $code
 	: q||;
 }
 
@@ -492,7 +498,10 @@ sub build_type {
 			},
 			qr/^(ArrayRef\[(.*)\])$/ => sub {
 				my ($val, @matches) = @_;
-				@matches = map { my $h = $_; $h =~ s/^\s*|\s*//g; $h; } split ',', $matches[1];
+				my $max = $matches[1] =~ s/\,\s*(\d+)\s*$// && $1;
+				my $min = $matches[1] =~ s/\,\s*(\d+)\s*$// && $1;
+				my $type = $matches[1];
+				@matches = ($type, $min, $max);
 				my $code = qq|
 					if ((ref($value) \|\| "") ne "ARRAY") {
 						$error_string
@@ -507,14 +516,14 @@ sub build_type {
 				if $matches[1] || $matches[2];
 				$code .= qq|
 					if (\$length < $matches[1]) {
-						die qq{ArrayRef for $name must contain atleast $matches[1] items}
+						die qq{$val for $name must contain atleast $matches[1] items}
 					}|
-				if defined $matches[1];
+				if $matches[1] !~ m/^$/;
 				$code .= qq|
 					if (\$length > $matches[2]) {
-						die qq{ArrayRef for $name must not be greater than $matches[2] items}
+						die qq{$val for $name must not be greater than $matches[2] items}
 					}|
-				if defined $matches[2];
+				if $matches[2] !~ m/^$/;
 				return $code;
 			},
 			qr/^(HashRef)$/ => sub {
@@ -563,7 +572,7 @@ sub build_type {
 			},
 			qr/^(Map\[(.*)\])$/ => sub {
 				my ($val, @matches) = @_;
-				@matches = map { my $h = $_; $h =~ s/^\s*|\s*//g; $h; } split ',', $matches[1];
+				@matches = map { my $h = $_; $h =~ s/^\s*|\s*//g; $h; } split ',', $matches[1], 2;
 				my $code = qq|
 					if ((ref($value) \|\| "") ne "HASH") {
 						$error_string
@@ -587,7 +596,16 @@ sub build_type {
 						$error_string
 					}|;
 				my $i = 0;
-				for my $match (@matches) {
+				while (@matches) {
+					my ($match) = (shift @matches);
+					if ($match =~ m/(Map|Tuple|HashRef|ArrayRef|Dict)\[/) {
+						my $lame = sub {
+							my $copy = shift;
+							while ($copy =~ s/\[[^\[\]]+\]//g) {}
+							return ($copy =~ m/\[|\[/) ? 1 : 0;
+						};
+						while ($lame->($match .=  ', ' . shift @matches)) {}
+					}
 					(my $new_value = $value) .= qq|->[$i]|;
 					my $item_error_string = $self->extend_error_string($error_string, $value, $new_value, qq| expected $match for index $i|, $match);
 					my $key_sub_code = $self->build_type($name, $match, $new_value, $item_error_string, ($match !~ m/^(Optional|Any|Item)/ ? qq|! defined($new_value) \|\|| : q||));
@@ -602,7 +620,7 @@ sub build_type {
 				my $sub_code;
 				while (@matches) {
 					my ($match) = (shift @matches);
-					if ($match =~ m/(Map|Tuple|ArrayRef|Dict)\[/) {
+					if (@matches && $match =~ m/(Map|Tuple|HashRef|ArrayRef|Dict)\[/) {
 						my $lame = sub {
 							my $copy = shift;
 							while ($copy =~ s/\[[^\[\]]+\]//g) {}
@@ -691,8 +709,8 @@ sub build_test_data {
 			my ($val, @matches) = @_;
 			$matches[1] = '"' . $matches[1] . '"' if $matches[1] =~ m/^[a-zA-Z]/;
 			return (
-				qq|bless( \"", $matches[1])|,
-				qq|bless( \"", $matches[1] . 'Error')|,
+				qq|do { my \$okay = ''; bless( \\\$okay, $matches[1]) }|,
+				qq|do { my \$okay = ''; bless( \\\$okay, $matches[1] . 'Error') }|,
 				$self->_generate_test_string,
 				q|{}|
 			);
@@ -706,15 +724,18 @@ sub build_test_data {
 		},
 		qr/^(ArrayRef\[(.*)\])$/ => sub {
 			my ($val, @matches) = @_;
-			@matches = map { my $h = $_; $h =~ s/^\s*|\s*//g; $h; } split ',', $matches[1];
+			my $max = $matches[1] =~ s/\,\s*(\d+)\s*$// && $1;
+			my $min = $matches[1] =~ s/\,\s*(\d+)\s*$// && $1;
+			my $type = $matches[1];
+			@matches = ($type, $min, $max);
 			my @values = $self->build_test_data($matches[0], $name, $required);
 			push @values, 'undef' unless $matches[0] =~ m/^Optional/;
 			return (
 				(map {
 					my $v = $_;
-					sprintf q|[ %s ]|, join ", ", map { $v } 0 .. $matches[1] - 1;
+					sprintf q|[ %s ]|, join ", ", map { $v } 0 .. ($matches[1] || 1) - 1;
 				} @values),
-				($matches[1] > 0 ? (
+				(($matches[1] || 0) > 0 ? (
 					qq|[]|
 				) : ( )),
 				($matches[2] ? (
@@ -745,7 +766,7 @@ sub build_test_data {
 		},
 		qr/^(CodeRef)$/ => sub {
 			return (
-				q|sub {}|,
+				q|$sub|,
 				q|[]|,
 				$self->_generate_test_string
 			);
@@ -759,7 +780,7 @@ sub build_test_data {
 		},
 		qr/^(GlobRef)$/ => sub {
 			return (
-				q|do { open my $fh, '>', \''; $fh; }|,
+				q|$globref|,
 				q|[]|,
 				$self->_generate_test_string
 			);
@@ -773,7 +794,7 @@ sub build_test_data {
 		},
 		qr/^(Map\[(.*)\])$/ => sub {
 			my ($val, @matches) = @_;
-			@matches = map { my $h = $_; $h =~ s/^\s*|\s*//g; $h; } split ',', $matches[1];
+			@matches = map { my $h = $_; $h =~ s/^\s*|\s*//g; $h; } split ',', $matches[1], 2;
 			my @keys = $self->build_test_data($matches[0], $name, $required);
 			my @values = $self->build_test_data($matches[1], $name, $required);
 			push @values, 'undef' unless $matches[1] =~ m/^Optional/;
@@ -788,9 +809,21 @@ sub build_test_data {
 		qr/^(Tuple\[(.*)\])$/ => sub {
 			my ($val, @matches) = @_;
 			@matches = map { my $h = $_; $h =~ s/^\s*|\s*//g; $h; } split ',', $matches[1];
-			my @tuple = map {
-				[ $self->build_test_data($_, $name, $required), ($_ =~ m/^Optional/ ? () : 'undef') ];
-			} @matches;
+			my @tuple;
+			while (@matches) {
+				my ($match) = (shift @matches);
+				if ($match =~ m/(Map|Tuple|HashRef|ArrayRef|Dict)\[/) {
+					my $lame = sub {
+						my $copy = shift;
+						while ($copy =~ s/\[[^\[\]]+\]//g) {}
+						return ($copy =~ m/\[|\[/) ? 1 : 0;
+					};
+					while ($lame->($match .=  ', ' . shift @matches)) {}
+				}
+				push @tuple, [ 
+					$self->build_test_data($match, $name, $required), ($_ =~ m/^Optional/ ? () : 'undef')
+				];
+			}
 			my $d = 0;
 			return (
 				 (map {
@@ -999,7 +1032,7 @@ Hades - Less is more, more is less!
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -1008,7 +1041,7 @@ Version 0.10
 	use Hades;
 
 	Hades->run({
-		eval => 'Kosmos { penthos :d(2) :p :pr :c :t(Int) curae :r geras $nosoi :t(Int) { if ($self->penthos == $nosoi) { return $self->curae; } } }'
+		eval => 'Kosmos { [penthos curae] :t(Int) :d(2) :p :pr :c :r geras $nosoi :t(Int) :d(2) { if ($self->penthos == $nosoi) { return $self->curae; } } }'
 	});
 
 	... generates ...
@@ -1017,24 +1050,27 @@ Version 0.10
 	use strict;
 	use warnings;
 	our $VERSION = 0.01;
-
+	
 	sub new {
 		my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
 		my $self = bless {}, $cls;
-		my %accessors = ( curae => { required => 1, }, penthos => { default => 2, }, );
+		my %accessors = (
+			penthos => { required => 1, default => 2, },
+			curae   => { required => 1, default => 2, },
+		);
 		for my $accessor ( keys %accessors ) {
-			my $value = $self->$accessor(
+			my $value
+			    = $self->$accessor(
 				defined $args{$accessor}
-					? $args{$accessor}
-					: $accessors{$accessor}->{default}
-			);
+				? $args{$accessor}
+				: $accessors{$accessor}->{default} );
 			unless ( !$accessors{$accessor}->{required} || defined $value ) {
 				die "$accessor accessor is required";
 			}
 		}
 		return $self;
 	}
-
+	
 	sub penthos {
 		my ( $self, $value ) = @_;
 		my $private_caller = caller();
@@ -1049,37 +1085,57 @@ Version 0.10
 		}
 		return $self->{penthos};
 	}
-
+	
 	sub clear_penthos {
 		my ($self) = @_;
 		delete $self->{penthos};
 		return $self;
 	}
-
+	
 	sub has_penthos {
 		my ($self) = @_;
-		return !!$self->{penthos};
+		return exists $self->{penthos};
 	}
-
+	
 	sub curae {
 		my ( $self, $value ) = @_;
+		my $private_caller = caller();
+		if ( $private_caller ne __PACKAGE__ ) {
+			die "cannot call private method curae from $private_caller";
+		}
 		if ( defined $value ) {
+			if ( ref $value || $value !~ m/^[-+\d]\d*$/ ) {
+				die qq{Int: invalid value $value for accessor curae};
+			}
 			$self->{curae} = $value;
 		}
 		return $self->{curae};
 	}
-
+	
+	sub clear_curae {
+		my ($self) = @_;
+		delete $self->{curae};
+		return $self;
+	}
+	
+	sub has_curae {
+		my ($self) = @_;
+		return exists $self->{curae};
+	}
+	
 	sub geras {
 		my ( $self, $nosoi ) = @_;
-		if ( ref $nosoi || $nosoi !~ m/^[-+\d]\d*$/ ) {
+		$nosoi = defined $nosoi ? $nosoi : 5;
+		if ( !defined($nosoi) || ref $nosoi || $nosoi !~ m/^[-+\d]\d*$/ ) {
+			$nosoi = defined $nosoi ? $nosoi : 'undef';
 			die
 			    qq{Int: invalid value $nosoi for variable \$nosoi in method geras};
 		}
 		if ( $self->penthos == $nosoi ) { return $self->curae; }
 	}
-
+	
 	1;
-
+	
 	__END__
 
 =head1 SUBROUTINES/METHODS
@@ -1120,13 +1176,13 @@ The authors email of the distribution/module.
 
 The version number of the distribution/module.
 
-=back
-
 =item realm
 
 The Hades realm that is used to generate the code.
 
 =cut
+
+=back
 
 =head1 Hades
 
@@ -1272,6 +1328,7 @@ Declare an accessor for the class
 
 	Kosmos {
 		dokimi
+		dokimes	
 	}
 
 =cut
@@ -1418,6 +1475,15 @@ Setting private makes the method only available to the class.
 	dokimes :private $one %two {
 		... perl code ...
 	}
+
+=cut
+
+=head3 :default | :d
+
+The default is used when no value for the sub was passed as a param.
+
+	dokimi $str :d(Eimai o monos) { }
+	dokimes $arrayRef :default([{ ola => "peripou", o => [qw/kosmos/] }]) { }
 
 =cut
 

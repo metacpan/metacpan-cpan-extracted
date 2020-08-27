@@ -1,0 +1,11 @@
+=head1 NAME
+
+XLog::ILogger - Base class for all logging backends
+
+
+
+=head1 DESCRIPTION
+
+The is no user API here
+
+1;

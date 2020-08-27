@@ -1,0 +1,33 @@
+---
+author:
+  - 'Joerg Tiedemann'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OPUS-Tools
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Archive::Zip: 0
+  CGI: 0
+  Cwd: 0
+  DB_File: 0
+  HTML::Entities: 0
+  Lingua::Sentence: 0
+  Test::More: 0
+  Ufal::UDPipe: 0
+  XML::Parser: 0
+  XML::Writer: 0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.2.2

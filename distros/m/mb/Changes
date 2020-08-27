@@ -1,5 +1,12 @@
 Revision history for this software.
 
+0.09  2020-08-28 00:00:00
+  - supports also lstat, not only lstat()
+  - supports also stat, not only stat()
+  - supports also filetest -X testee, not only -X (testee)
+  - supports stackable file test operators
+  - created by INABA Hitoshi
+
 0.08  2020-07-28 00:00:00
   - supports also mb::getc, not only mb::getc()
   - created by INABA Hitoshi

@@ -3,9 +3,9 @@ NAME
     (popular) Unix commands
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Acme::CPANModules::CLI::Wrapper::UnixCommand (from Perl distribution
-    Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2020-08-22.
+    Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2020-08-26.
 
 DESCRIPTION
     These CLI's usually are meant to be called as the Unix commands they
@@ -33,14 +33,18 @@ INCLUDED MODULES
     *   App::rsync::new2old - Wraps rsync to check that source is newer than
         target
 
-    *   App::lcpan - Wraps cpanm to use local CPAN mirror and let you
-        specify script name to install instead of module name
-
     *   App::diffwc - Wraps (or filters output of) diff to add colors and
         highlight words
 
     *   App::DiffDocText - Diffs two office word-processor documents by
         first converting them to plaintext
+
+    *   App::sdif - Provides sdif (diff side-by-side with nice color theme),
+        cdif (highlight words with nice color scheme), and watchdiff (watch
+        command and diff output)
+
+    *   App::lcpan - Wraps cpanm to use local CPAN mirror and let you
+        specify script name to install instead of module name
 
 FAQ
   What are ways to use this module?

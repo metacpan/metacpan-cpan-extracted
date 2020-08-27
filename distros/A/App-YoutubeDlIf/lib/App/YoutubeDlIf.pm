@@ -1,9 +1,9 @@
 package App::YoutubeDlIf;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-19'; # DATE
+our $DATE = '2020-08-26'; # DATE
 our $DIST = 'App-YoutubeDlIf'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,6 +55,10 @@ our %args_common = (
         schema => 'str*',
         tags => ['category:filtering'],
     },
+    restart_if_no_output_after => {
+        schema => 'duration*',
+        tags => ['category:restart'],
+    },
 );
 
 our %arg_if_not_yet = (
@@ -77,8 +81,14 @@ or:
 
     U9v2S49sHeQ
 
-When a video ID is found then it is assumed to be already downloaded in the past
-and will not be downloaded again.
+When a video ID in the argument is found then it is assumed to be already
+downloaded in the past and will not be downloaded again.
+
+Limitations: youtube ID is currently only looked up in arguments, so if you
+download a playlist, the items in the playlist are not checked against the ID's
+in the log file. Another limitation is that you currently have to maintain the
+log file yourself, e.g. by using 'ls -l >> ~/download-logs.org' everytime you
+finish downloading files.
 
 _
         tags => ['category:filtering'],
@@ -178,7 +188,18 @@ sub youtube_dl_if {
         push @argv_for_youtube_dl, $arg;
     }
 
-    system({log=>1, die=>1}, "youtube-dl", @argv_for_youtube_dl);
+    my $do_govern;
+
+    $do_govern = 1 if defined $args{restart_if_no_output_after};
+
+    if ($do_govern) {
+        my @opts_for_govern;
+        push @opts_for_govern, "--restart-if-no-output-after", $args{restart_if_no_output_after}
+            if defined $args{restart_if_no_output_after};
+        system({log=>1, die=>1}, "govproc", @opts_for_govern, "--", "youtube-dl", @argv_for_youtube_dl);
+    } else {
+        system({log=>1, die=>1}, "youtube-dl", @argv_for_youtube_dl);
+    }
     [200];
 }
 
@@ -221,7 +242,7 @@ App::YoutubeDlIf - Download videos using youtube-dl with extra selection/filteri
 
 =head1 VERSION
 
-This document describes version 0.003 of App::YoutubeDlIf (from Perl distribution App-YoutubeDlIf), released on 2020-04-19.
+This document describes version 0.004 of App::YoutubeDlIf (from Perl distribution App-YoutubeDlIf), released on 2020-08-26.
 
 =head1 DESCRIPTION
 
@@ -266,12 +287,20 @@ or:
 
  U9v2S49sHeQ
 
-When a video ID is found then it is assumed to be already downloaded in the past
-and will not be downloaded again.
+When a video ID in the argument is found then it is assumed to be already
+downloaded in the past and will not be downloaded again.
 
-=item * B<log_file> => I<str> (default: "/home/s1/notes/download-logs.org")
+Limitations: youtube ID is currently only looked up in arguments, so if you
+download a playlist, the items in the playlist are not checked against the ID's
+in the log file. Another limitation is that you currently have to maintain the
+log file yourself, e.g. by using 'ls -l >> ~/download-logs.org' everytime you
+finish downloading files.
+
+=item * B<log_file> => I<str> (default: "/home/u1/notes/download-logs.org")
 
 File that contains list of download filenames.
+
+=item * B<restart_if_no_output_after> => I<duration>
 
 =item * B<urls_or_ids>* => I<array[str]>
 
@@ -313,9 +342,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<if_duration_not_shorter_than> => I<str>
 
-=item * B<log_file> => I<str> (default: "/home/s1/notes/download-logs.org")
+=item * B<log_file> => I<str> (default: "/home/u1/notes/download-logs.org")
 
 File that contains list of download filenames.
+
+=item * B<restart_if_no_output_after> => I<duration>
 
 =item * B<urls_or_ids>* => I<array[str]>
 

@@ -65,6 +65,30 @@ sub new ($@);
 
 ###############################################################################
 
+sub _cookie_config ($$) {
+    my ($self,$cookie_name)=@_;
+
+    my $defaults;
+
+    my $base_config=$self->base_config;
+    if($base_config && $base_config->can('get')) {
+        if(my $cookie_config=$base_config->get('/xao/cookie')) {
+            foreach my $cf ($cookie_config->{'common'}, (exists $cookie_config->{$cookie_name} ? ($cookie_config->{$cookie_name}) : ())) {
+                $cf || next;
+
+                foreach my $n (keys %$cf) {
+                    my $nn=$n =~ /^-/ ? $n : '-'.lc($n);
+                    $defaults->{$nn}=$cf->{$n};
+                }
+            }
+        }
+    }
+
+    return $defaults;
+}
+
+###############################################################################
+
 =item add_cookie (@)
 
 Adds an HTTP cookie into the internal list. Parameters are a hash in the
@@ -79,18 +103,48 @@ processing and send them out for you.
 
 Examples:
 
- $config->add_cookie($cookie);
+    $config->add_cookie($cookie);
 
- $config->add_cookie(-name => 'sessionID',
-                     -value => 'xyzzy',
-                     -expires=>'+1h');
+    $config->add_cookie(
+        -name       => 'sessionID',
+        -value      => 'xyzzy',
+        -expires    =>'+1h',
+    );
 
 For convenience, if there is a '-domain' argument and it refers to a
 list of domains the cookie is expanded into a set of cookies for all
 these domains.
 
-The get_cookie() method takes into consideration values set with
-add_cookie() as a priority over CGI cookies received.
+Parameters may also be configured as defaults or for specific cookie
+names in the site configuration /xao/cookie section:
+
+    'xao' => {
+        'cookie' => {
+            'common'    => {        # All cookies
+                'httponly'  => 1,
+                'secure'    => 1,
+            },
+            'sessionid' => {        # Specific cookie
+                'samesite'  => 'None',
+            },
+
+Due to incompatible ways various browsers treat "SameSite" cookies a
+special parameter 'sscompat' can be used to create and read two cookies --
+one with "SameSite" value and one without. This alters the behavior of
+both add_cookie() and get_cookie() methods for simplicity.
+
+            'sessionid' => {
+                'samesite'  => 'None',
+                'sscompat'  => 1,
+            },
+
+    $siteconfig->add_cookie(-name => 'sessionid', -value => $sessionid);
+
+    Set-Cookie: ...; sessionid=12345; Secure; HttpOnly; SameSite=None
+    Set-Cookie: ...; sessionid-sscompat=12345; Secure; HttpOnly
+
+The get_cookie() method takes into consideration values that were set
+with add_cookie() as a priority over CGI cookies received.
 
 =cut
 
@@ -136,6 +190,7 @@ sub add_cookie ($@) {
             elsif($pn eq 'max-age') { $chash{'-max-age'}=$pv; }
             elsif($pn eq 'secure')  { $chash{'-secure'}=$pv; }
             elsif($pn eq 'httponly'){ $chash{'-httponly'}=$pv; }
+            elsif($pn eq 'samesite'){ $chash{'-samesite'}=$pv; }
         }
 
         $cookie=\%chash;
@@ -148,22 +203,19 @@ sub add_cookie ($@) {
 
     # Applying configuration values, if any.
     #
-    my $base_config=$self->base_config;
-    if($base_config && $base_config->can('get')) {
-        if(my $cookie_config=$base_config->get('/xao/cookie')) {
-            my %defaults;
+    my $defaults=$self->_cookie_config($cookie->{'-name'});
+    $cookie=merge_refs($defaults, $cookie) if $defaults;
 
-            foreach my $cf ($cookie_config->{'common'}, $cookie_config->{$cookie->{'-name'}}) {
-                next unless $cf;
-
-                foreach my $n (keys %$cf) {
-                    my $nn=$n =~ /^-/ ? $n : '-'.lc($n);
-                    $defaults{$nn}=$cf->{$n};
-                }
-            }
-
-            $cookie=merge_refs(\%defaults,$cookie);
-        }
+    # SameSite parameter is not implemented the same in all
+    # browsers. When requested we set an additional cookie without that
+    # parameter to work in incompatible browsers.
+    #
+    if($cookie->{'-sscompat'} && $cookie->{'-samesite'}) {
+        $self->add_cookie(merge_refs($cookie, {
+            -name       => $cookie->{'-name'}.'-sscompat',
+            -sscompat   => undef,
+            -samesite   => undef,
+        }));
     }
 
     # Recursively expanding if multiple domains are given.
@@ -177,7 +229,6 @@ sub add_cookie ($@) {
         }
         return;
     }
-
     # If the new cookie has the same name, domain and path
     # as previously set one - we replace it.
     #
@@ -194,7 +245,7 @@ sub add_cookie ($@) {
             my $dnew=$cnew->domain();
             my $dstored=$cstored->domain();
 
-            ### dprint "...comparing ".$cnew->name()." with ".$cstored->name();
+            ### dprint "...comparing ",$cnew->name()," with ",$cstored->name(),"; path='",$cnew->path(),"' vs '",$cstored->path(),"'; domain='",$dnew,"' vs '",$dstored,"'";
 
             next unless
                 $cnew->name() eq $cstored->name() &&
@@ -587,7 +638,23 @@ sub get_cookie ($$;$) {
         return undef;
     }
 
-    return $self->cgi->cookie($name);
+    # When SameSite is set to None we might not get a value back from
+    # incompatible browsers. See:
+    #  https://web.dev/samesite-cookie-recipes/
+    #  https://www.chromium.org/updates/same-site/incompatible-clients
+    #
+    # Checking if 'sscompat' variant of this cookie is set, added by
+    # add_cookie() code when configured.
+    #
+    $value=$self->cgi->cookie($name);
+    if(!defined $value) {
+        my $defaults=$self->_cookie_config($name);
+        if($defaults->{'-sscompat'}) {
+            $value=$self->cgi->cookie($name.'-sscompat');
+        }
+    }
+
+    return $value;
 }
 
 ###############################################################################

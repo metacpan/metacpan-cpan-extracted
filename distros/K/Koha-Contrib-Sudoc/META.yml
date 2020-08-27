@@ -7,7 +7,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,6 +35,7 @@ requires:
   MARC::Moose::Parser::Iso2709: '0'
   MARC::Moose::Reader::File::Iso2709: '0'
   MARC::Moose::Record: '0'
+  MIME::Base64: '0'
   Mail::Box::Manager: '0'
   Modern::Perl: '0'
   Moose: '0'
@@ -55,4 +56,5 @@ resources:
   bugtracker: https://github.com/fredericd/koha-sudoc/issues
   homepage: http://www.tamil.fr/sudoc/sudoc.html
   repository: https://github.com/fredericd/koha-sudoc
-version: '2.32'
+version: '2.33'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,310 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+#
+
+=head1 NAME
+
+opus2moses - convert aligned plain text files into OPUS XML
+
+=head1 USAGE
+
+ # read sentence alignments and print aligned sentences
+ opus2moses [-b outbase] srcfile trgfile > alignfile.xml
+ opus2moses -s srclang -t trglang [-b outbase] srcfile trgfile > alignfile.xml
+ opus2moses -s srclang -t trglang [-b outbase] bitextfile > alignfile.xml
+
+=head1 OPTIONS
+
+ -b outbase ........ basename of output files
+ -m maxsize ........ split into several parts of size <maxsize>
+ -s srclang ........ language ID of source language (2-letter code)
+ -t srclang ........ language ID of target language (2-letter code)
+ -z ................ compress output files (gzip)
+ -p size ........... split into parts of size p
+ -l file ........... link likelihood file (one line per alignment)
+ -d ................ distance instead of link likelihood
+ -D ................ document boundaries by empty lines
+ -M size ........... minimum size of a document (by nr of sentences)
+
+=head1 DESCRIPTION
+
+C<moses2opus> converts a sentence-aligned corpus in plain text format (Moses format or fast_align format) into the OPUS XML-based format. It also does sentence-splitting based on Lingua::Sentence
+
+
+=head1 LICENSE
+
+ ---------------------------------------------------------------------------
+ Copyright (c) 2004-2019 Joerg Tiedemann
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ ---------------------------------------------------------------------------
+
+=head1 See also
+
+This script is part of opus-tools L<https://github.com/Helsinki-NLP/opus-tools>
+See also OPUS L<http://opus.nlpl.eu> for more information about the corpus.
+
+=cut
+
+
+use strict;
+use FindBin qw($Bin);
+use lib $Bin.'/../../lib';
+
+use OPUS::Tools;
+use IO::File;
+use File::Basename qw/dirname basename/;
+use Locale::Language;
+use XML::Writer;
+use Lingua::Sentence;
+
+use vars qw($opt_s $opt_t $opt_b $opt_z $opt_p $opt_l $opt_d $opt_D $opt_M);
+use Getopt::Std;
+getopts('dDs:t:b:zp:l:M:');
+
+
+my $srcfile = shift(@ARGV);
+my $trgfile = shift(@ARGV);
+
+my $moses = 1 if ($trgfile);
+
+my $srclang  = $opt_s || 'xx';
+my $trglang  = $opt_t || 'yy';
+my $filebase = $opt_b;
+my $maxsize  = $opt_p;          # split into parts of size <p>
+
+unless ($opt_b){
+    $filebase = $srcfile;
+    $filebase=~s/\..{2,4}$//;
+}
+
+my $part = $maxsize || $opt_D ? 1 : 0;
+
+
+## open input files
+if ($srcfile=~/\.gz/){
+    open S,"gzip -cd <$srcfile |" || die "cannot read from $srcfile!\n";
+}
+else{
+    open S,"<$srcfile" || die "cannot read from $srcfile!\n";
+}
+if ($moses){
+    if ($trgfile=~/\.gz/){
+	open T,"gzip -cd <$trgfile |" || die "cannot read from $trgfile!\n";
+    }
+    else{
+	open T,"<$trgfile" || die "cannot read from $trgfile!\n";
+    }
+}
+binmode(S,":encoding(utf-8)");
+binmode(T,":encoding(utf-8)");
+
+## file with link likelihoods
+if ($opt_l){
+    if ($opt_l=~/\.gz/){
+	open L,"gzip -cd <$opt_l |" || die "cannot read from $opt_l!\n";
+    }
+    else{
+	open L,"<$opt_l" || die "cannot read from $opt_l!\n";
+    }
+}
+
+
+## print align file header
+print '<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE cesAlign PUBLIC "-//CES//DTD XML cesAlign//EN" "">
+<cesAlign version="1.0">
+';
+
+my ($SrcWriter,$TrgWriter) = open_output($filebase,$srclang,$trglang,$part);
+
+
+## create sentence splitters
+my $SrcSplitter = Lingua::Sentence->new($srclang);
+my $TrgSplitter = Lingua::Sentence->new($trglang);
+
+
+
+## read the corpus and convert
+my $sid = 0;
+my $lid = 0;
+while (<S>){
+    chomp;
+
+    my $src = $_;
+    my $trg;
+
+    if ($moses){
+	$trg = <T>;
+	chomp $trg;
+    }
+    else{
+	($src,$trg) = split(/ \|\|\| /,$src);
+    }
+
+    ## document boundary? add a new paragraph or a new document
+    if ($src eq '' && $trg eq ''){
+	if ($opt_D){
+	    ## if smaller than minimum size of a document
+	    ## ---> concatenate and don't create a new one
+	    if ($opt_M && $sid < $opt_M){
+		$SrcWriter->emptyTag('p');
+		$TrgWriter->emptyTag('p');
+	    }
+	    else{
+		$sid = 0;
+		$part++;
+		close_output($SrcWriter,$TrgWriter);
+		($SrcWriter,$TrgWriter) = 
+		    open_output($filebase,$srclang,$trglang,$part);
+	    }
+	}
+	else{
+	    $SrcWriter->emptyTag('p');
+	    $TrgWriter->emptyTag('p');
+	}
+	next;
+    }
+
+    $sid++;
+    if ($maxsize && $sid>$maxsize){
+	$sid = 0;
+	$part++;
+	close_output($SrcWriter,$TrgWriter);
+	($SrcWriter,$TrgWriter) = 
+	    open_output($filebase,$srclang,$trglang,$part);
+    }
+
+    my @SrcSents = $SrcSplitter->split_array($src);
+    my @TrgSents = $TrgSplitter->split_array($trg);
+
+
+    my @SrcIds = write_sentences($SrcWriter,$sid,\@SrcSents);
+    my @TrgIds = write_sentences($TrgWriter,$sid,\@TrgSents);
+
+    $lid++;
+    print '<link xtargets="';
+    print join(' ',@SrcIds);
+    print ';';
+    print join(' ',@TrgIds);
+    print '" id="SL'.$lid;
+    ## add certainty if likelihood file is given
+    if ($opt_l){
+	my $prob = <L>;
+	chomp $prob;
+	$prob = 1-$prob if ($opt_d);
+	print '" certainty="'.$prob;
+    }
+    print '"/>',"\n";
+    print STDERR '.' if (! ($lid % 1000));
+    print STDERR " $lid\n" if (! ($lid % 50000));
+}
+
+close_output($SrcWriter,$TrgWriter);
+print "</cesAlign>\n";
+
+
+
+sub open_output{
+    my ($filebase,$srclang,$trglang,$part) = @_;
+    my ($srcxml,$trgxml);
+
+    ## split into parts
+    if ($part){
+	my $ext = sprintf('%04d',$part);
+	$srcxml = $srclang.'/'.$filebase.'.'.$ext.'.xml';
+	$trgxml = $trglang.'/'.$filebase.'.'.$ext.'.xml';
+    }
+    else{
+	$srcxml = $srclang.'/'.$filebase.'.xml';
+	$trgxml = $trglang.'/'.$filebase.'.xml';
+    }
+
+    ## create corpus directories
+    system("mkdir -p ".dirname($srcxml));
+    system("mkdir -p ".dirname($trgxml));
+
+    ## open corpus files
+    my ($SrcOut,$TrgOut);
+    if ($opt_z){
+	$SrcOut = IO::File->new("| gzip -c > $srcxml.gz");
+	$TrgOut = IO::File->new("| gzip -c > $trgxml.gz");
+    }
+    else{
+	$SrcOut = IO::File->new(">$srcxml");
+	$TrgOut = IO::File->new(">$trgxml");
+    }
+    binmode($SrcOut,":encoding(utf-8)");
+    binmode($TrgOut,":encoding(utf-8)");
+
+    ## open XML writers for corpus documents
+    my $SrcWriter = XML::Writer->new( OUTPUT => $SrcOut,
+				      DATA_MODE => 1,
+				      DATA_INDENT => 1 );
+    $SrcWriter->xmlDecl("UTF-8");
+    $SrcWriter->startTag("text");
+
+    my $TrgWriter = XML::Writer->new( OUTPUT => $TrgOut,
+				      DATA_MODE => 1,
+				      DATA_INDENT => 1 );
+    $TrgWriter->xmlDecl("UTF-8");
+    $TrgWriter->startTag("text");
+
+    print "<linkGrp targType=\"s\" fromDoc=\"$srcxml.gz\" toDoc=\"$trgxml.gz\" >\n";
+
+    return ($SrcWriter,$TrgWriter);
+}
+
+sub close_output{
+    my ($SrcWriter,$Trgwriter) = @_;
+    $SrcWriter->endTag('text');
+    $TrgWriter->endTag('text');
+    $SrcWriter->end();
+    $TrgWriter->end();
+    print "  </linkGrp>\n";
+}
+
+
+## write sentences and return sentence IDs
+sub write_sentences{
+    my ($writer,$id,$sents) = @_;
+
+    my @ids = ();
+    if ( $#{$sents} ){
+	$writer->startTag('p','id' => "p$id");
+	my $sid = 0;
+	foreach my $s (@{$sents}){
+	    $sid++;
+	    $writer->startTag('s','id'=>$id.'.'.$sid);
+	    $writer->characters($s);
+	    $writer->endTag('s');
+	    push(@ids,$id.'.'.$sid);
+	}
+	$writer->endTag('p');
+    }
+    else{
+	$writer->startTag('s','id'=>$id);
+	$writer->characters($$sents[0]);
+	$writer->endTag('s');
+	push(@ids,$id);
+    }
+    return @ids;
+}
+
+

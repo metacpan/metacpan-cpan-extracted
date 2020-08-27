@@ -151,6 +151,16 @@ The L<Future/catch> feature may be useful for handling these:
 
 Note that this module uses L<Future::AsyncAwait> internally.
 
+=head1 CONSTANTS
+
+=head2 OPENTRACING_ENABLED
+
+Defaults to true, this can be controlled by the C<USE_OPENTRACING>
+environment variable.
+
+When enabled, this will create a span for every Redis request. See
+L<OpenTracing::Any> for details.
+
 =head1 METHODS
 
 B<NOTE>: For a full list of the Redis methods supported by this module,

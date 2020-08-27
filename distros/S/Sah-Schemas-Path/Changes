@@ -1,6 +1,21 @@
-0.014   2020-08-08  Released-By: PERLANCAR; Urgency: medium
+0.015   2020-08-26  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.014 and 0.014.1.
+
+
+0.014.1 2020-08-08  Released-By: PERLANCAR; Urgency: medium; Status: Cancelled
 
 	- Add schema: pathnames.
+
+        - UPDATE 2020-08-26: rename release from 0.014 to 0.014.1, cancel
+          release (duplicate).
+
+
+0.014   2020-05-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Forbid empty filename/dirname/pathname.
+
+	- Add examples (tests).
 
 
 0.013   2020-02-11  Released-By: PERLANCAR; Urgency: medium

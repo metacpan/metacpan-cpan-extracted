@@ -1,5 +1,11 @@
 Revision history for Perl extension Algorithm::LibLinear
 
+0.22    Fri 28 Aug 2020
+        - Make Algorithm::LibLinear: find_parameters() / find_cost_parameter()
+          throw an error when the given solver type is unsupported.
+        - Fix documentation errors.
+        - Fix a broken test case.
+
 0.21    Sun 23 Aug 2020
         - Bundle LIBILNEAR 2.41.
         - Bump minimum required Perl version from 5.14 to 5.16 for using

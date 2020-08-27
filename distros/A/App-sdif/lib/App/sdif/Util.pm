@@ -1,7 +1,6 @@
 package App::sdif::Util;
 
 use v5.14;
-use strict;
 use warnings;
 use Carp;
 
@@ -23,9 +22,9 @@ our $NO_WARNINGS = 0;
 
 sub read_unified_2 {
     map {
-	[ collect $_ qr/[\t ]/ ], # common
-	[ collect $_ '-' ], # old
-	[ collect $_ '+' ], # new
+	[ $_->collect(qr/[\t ]/) ], # common
+	[ $_->collect('-') ], # old
+	[ $_->collect('+') ], # new
     } &read_unified;
 }
 
@@ -40,10 +39,10 @@ sub nth_re {
 
 sub read_unified_3 {
     map {
-	[ collect $_ q/  /     ], # common
-	[ collect $_ nth_re(0) ], # old ^(?:.{0}-|(?=.*\+).{0}[ ])
-	[ collect $_ nth_re(1) ], # new ^(?:.{1}-|(?=.*\+).{1}[ ])
-	[ collect $_ qr/\+/    ], # merge
+	[ $_->collect(q/  /    ) ], # common
+	[ $_->collect(nth_re(0)) ], # old ^(?:.{0}-|(?=.*\+).{0}[ ])
+	[ $_->collect(nth_re(1)) ], # new ^(?:.{1}-|(?=.*\+).{1}[ ])
+	[ $_->collect(qr/\+/   ) ], # merge
     } &read_unified;
 }
 
@@ -55,7 +54,7 @@ sub read_unified_sub {
     sub {
 	map {
 	    my $ent = $_;
-	    map { [ collect $ent $_ ] } @re;
+	    map { [ $ent->collect($_) ] } @re;
 	} &read_unified;
     }
 }
@@ -84,7 +83,7 @@ sub read_unified {
 	tr/-/-/ || tr/ / / + 1;
     };
 
-    my @stack = new App::sdif::LabelStack @lsopt;
+    my @stack = App::sdif::LabelStack->new(@lsopt);
     while (<$FH>) {
 	if ($prefix) {
 	    s/^\Q$prefix// or do {
@@ -111,7 +110,7 @@ sub read_unified {
 	     or $stack[-1]->lastlabel !~ /[^+]/
 	     # no + after +
 	     or ($stack[-1]->lastlabel =~ /[+]/ and $mark !~ /[+]/))) {
-	    push @stack, new App::sdif::LabelStack @lsopt;
+	    push @stack, App::sdif::LabelStack->new(@lsopt);
 	}
 	$stack[-1]->append($mark, $_);
 	$total -= $mark =~ /^\t/ ? $column : $marklines->($mark);

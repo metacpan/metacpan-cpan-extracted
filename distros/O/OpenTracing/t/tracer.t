@@ -19,6 +19,7 @@ subtest duration => sub {
     done_testing;
 };
 subtest chained => sub {
+    $tracer->enable;
     my $span = $tracer->span;
     isa_ok(my $child = $span->new_span, 'OpenTracing::SpanProxy');
     is($child->parent_id, $span->id, 'parent ID is correct');

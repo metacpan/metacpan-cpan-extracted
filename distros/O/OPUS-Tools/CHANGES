@@ -1,0 +1,42 @@
+
+* v0.2.2
+
+- opus2tmx and bitext2tmx added
+- opus-split-align and opus-merge-align added
+- tmx2opus and tmx2moses added
+- opus-pivoting added for pivoting between bitexts
+- new option to store XCES Align files in opus2moses
+- opus2text added; can handle tokenized and untokenized corpus files
+- xml2opus added (simple conversion from XML to XML with <s> tags
+- various bugfixing
+
+* v0.2.1
+
+- fixed opus2multi error when using intralingual links
+
+* v0.04
+
+- opus-read can read from zip files
+- opus-cat added
+- moses2opus added (added perl module dependencies!)
+- opus-website for the new release style
+
+
+* v0.03		Mon Jul  3 22:59:29 EEST 2017
+
+- opus-udpipe added (requires UDPipe perl bindings)
+- use utf-8 as default in opus-index
+- opus2multi can handle intralingual links (for OpenSubtitles)
+- opus-udpipe can handle additional XML tags
+
+
+* v0.02		Tue Jun 27 11:24:58 EEST 2017
+
+- renamed opusread to opus-read and opusindex to opus-index
+- copies various helper scripts
+- fixed problem with option -r on tokenized text
+
+
+* v0.01		Thu Nov  7 20:30:15 CET 2013
+
+- initial release

@@ -40,7 +40,7 @@ using RawTraceProducer = int(*)(void**, int);
 using BacktraceProducer = BacktraceBackendSP(*)(const Backtrace& raw_traces);
 
 struct Backtrace {
-    static const constexpr int max_depth = 50;
+    static const constexpr int max_depth = 150;
 
     Backtrace () noexcept;
     Backtrace (const Backtrace &other) noexcept;

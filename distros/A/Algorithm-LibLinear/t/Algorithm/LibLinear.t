@@ -12,8 +12,8 @@ my $input_data_set = do { local $/; <DATA> };
 {
     my $learner = new_ok 'Algorithm::LibLinear' => [
         cost => 1,
-        epsilon => 0.1,
-        solver => 'L2R_L2LOSS_SVC_DUAL',
+        epsilon => 0.01,
+        solver => 'L2R_L2LOSS_SVC',
         weights => [
             +{ label => 1, weight => 1, },
             +{ label => -1, weight => 1, },
@@ -25,12 +25,28 @@ my $input_data_set = do { local $/; <DATA> };
     isa_ok $data_set, 'Algorithm::LibLinear::DataSet';
 
     my ($found_cost, $found_loss_sensitivity) = @{
-        $learner->find_parameters(data_set => $data_set, num_folds => 5)
+        $learner->find_parameters(
+            data_set => $data_set,
+            initial_cost => 1,
+            num_folds => 5,
+        )
     };
     my ($found_cost2) = @{
-        $learner->find_cost_parameter(data_set => $data_set, num_folds => 5)
+        $learner->find_cost_parameter(
+            data_set => $data_set,
+            initial => 1,
+            num_folds => 5,
+        )
     };
     is $found_cost, $found_cost2;
+    is $found_loss_sensitivity, undef;
+
+    throws_ok {
+        my $learner = Algorithm::LibLinear->new(
+            solver => 'L2R_L2LOSS_SVC_DUAL',
+        );
+        $learner->find_parameters(data_set => $data_set, num_folds => 5);
+    } qr/unsupported/;
 
     my $classifier = $learner->train(data_set => $data_set);
     isa_ok $classifier, 'Algorithm::LibLinear::Model';

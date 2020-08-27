@@ -1,5 +1,5 @@
 package App::Metabase::Relayd::Plugin::IRC;
-$App::Metabase::Relayd::Plugin::IRC::VERSION = '0.10';
+$App::Metabase::Relayd::Plugin::IRC::VERSION = '0.14';
 # ABSTRACT: IRC plugin for metabase-relayd
 
 use strict;
@@ -73,7 +73,7 @@ sub mbrd_received {
   }
   $stamp .= ' ]';
   my $t = localtime; my $ts = $t->strftime("%Y-%m-%dT%H:%M:%S");
-  my $msg = join(' ', uc($data->{grade}), ( map { $data->{$_} } qw(distfile archname osversion) ), "perl-" . $data->{perl_version}, $stamp );
+  my $msg = join(' ', uc($data->{grade}), $data->{distfile}, 'perl-' . $data->{perl_version}, ( map { $data->{$_} } qw(archname osversion) ), $stamp );
   $heap->{_irc}->yield( 'privmsg', $_, $msg ) for _get_channels( $heap->{channels} );
   return;
 }
@@ -93,7 +93,7 @@ App::Metabase::Relayd::Plugin::IRC - IRC plugin for metabase-relayd
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -176,7 +176,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Chris Williams.
+This software is copyright (c) 2020 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

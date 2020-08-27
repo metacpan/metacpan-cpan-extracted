@@ -1,4 +1,4 @@
-ISO-639_3
+ISO-639-3
 
 The README is used to introduce the module and provide instructions on
 how to install the module, any machine dependencies it may have (for
@@ -26,21 +26,21 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc ISO::639_3
+    perldoc ISO::639::3
 
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        https://rt.cpan.org/NoAuth/Bugs.html?Dist=ISO-639_3
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=ISO-639-3
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/ISO-639_3
+        http://annocpan.org/dist/ISO-639-3
 
     CPAN Ratings
-        https://cpanratings.perl.org/d/ISO-639_3
+        https://cpanratings.perl.org/d/ISO-639-3
 
     Search CPAN
-        https://metacpan.org/release/ISO-639_3
+        https://metacpan.org/release/ISO-639-3
 
 
 LICENSE AND COPYRIGHT

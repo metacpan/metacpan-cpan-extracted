@@ -63,7 +63,9 @@
             "List::UtilsBy" : "0",
             "Log::Any" : "1.050",
             "Math::Random::Secure" : "0",
+            "Metrics::Any" : "0",
             "Mixin::Event::Dispatch::Bus" : "2.000",
+            "OpenTracing::Any" : "1.003",
             "Ryu::Async" : "0.016",
             "Scalar::Util" : "0",
             "Syntax::Keyword::Dynamically" : "0",
@@ -107,47 +109,47 @@
    "provides" : {
       "Net::Async::Redis" : {
          "file" : "lib/Net/Async/Redis.pm",
-         "version" : "2.005"
+         "version" : "2.006"
       },
       "Net::Async::Redis::Cluster" : {
          "file" : "lib/Net/Async/Redis/Cluster.pm",
-         "version" : "2.005"
+         "version" : "2.006"
       },
       "Net::Async::Redis::Cluster::Node" : {
          "file" : "lib/Net/Async/Redis/Cluster/Node.pm",
-         "version" : "2.005"
+         "version" : "2.006"
       },
       "Net::Async::Redis::Commands" : {
          "file" : "lib/Net/Async/Redis/Commands.pm",
-         "version" : "2.005"
+         "version" : "2.006"
       },
       "Net::Async::Redis::Multi" : {
          "file" : "lib/Net/Async/Redis/Multi.pm",
-         "version" : "2.005"
+         "version" : "2.006"
       },
       "Net::Async::Redis::Protocol" : {
          "file" : "lib/Net/Async/Redis/Protocol.pm",
-         "version" : "2.005"
+         "version" : "2.006"
       },
       "Net::Async::Redis::Server" : {
          "file" : "lib/Net/Async/Redis/Server.pm",
-         "version" : "2.005"
+         "version" : "2.006"
       },
       "Net::Async::Redis::Server::Connection" : {
          "file" : "lib/Net/Async/Redis/Server/Connection.pm",
-         "version" : "2.005"
+         "version" : "2.006"
       },
       "Net::Async::Redis::Server::Database" : {
          "file" : "lib/Net/Async/Redis/Server/Database.pm",
-         "version" : "2.005"
+         "version" : "2.006"
       },
       "Net::Async::Redis::Subscription" : {
          "file" : "lib/Net/Async/Redis/Subscription.pm",
-         "version" : "2.005"
+         "version" : "2.006"
       },
       "Net::Async::Redis::Subscription::Message" : {
          "file" : "lib/Net/Async/Redis/Subscription/Message.pm",
-         "version" : "2.005"
+         "version" : "2.006"
       }
    },
    "release_status" : "stable",
@@ -162,7 +164,7 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis"
       }
    },
-   "version" : "2.005",
+   "version" : "2.006",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>",
@@ -172,7 +174,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.21",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

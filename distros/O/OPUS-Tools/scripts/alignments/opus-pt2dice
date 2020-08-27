@@ -1,0 +1,181 @@
+#!/usr/bin/perl
+#
+# -d <thr> .... set Dice threshold (default = 0.01)
+# -f <thr> .... set coccurrence threshold (default = 1)
+# -s .......... disallow source language MWEs
+# -t .......... disallow target language MWEs
+# -m .......... disallow if both languages are MWEs
+# -l .......... only lower-cased letter sequences
+# -i .......... allow translations that are included in other options
+#
+#
+
+# use strict;
+use Getopt::Std;
+our ($opt_d,$opt_f,$opt_s,$opt_t,$opt_m,$opt_l,$opt_i);
+
+getopts('d:f:stmli');
+
+binmode(STDIN,":utf8");
+binmode(STDOUT,":utf8");
+
+my $DiceThr = $opt_d || 0.0001;
+my $FreqThr = $opt_f || 1;
+
+my %transl = ();
+my $current = '';
+my $lastTrg = undef;
+
+while (<>){
+    chomp;
+    my @parts = split(/ \|\|\| /);
+
+    #---------------------------------------------------
+    # different types of tests / filters are possible
+    #---------------------------------------------------
+
+    ## only one-word phrases ...
+    next if ($opt_s && $parts[0]=~/ /);
+    next if ($opt_t && $parts[1]=~/ /);
+    next if ($opt_m && $parts[0]=~/ / && $parts[1]=~/ /);
+
+    ## only if one side is a single word phrase
+#    next if ($parts[0]=~/ / && $parts[1]=~/ /);
+
+
+    my $srcword = $parts[0];
+    my $trgword = $parts[1];
+
+    # $srcword=~s/\/\S*//g;  # remove POS tag (if attached)
+    # $trgword=~s/\/\S*//g;
+
+    ## only one-word lower-case letter-phrases 
+#    next if ($srcword=~/\P{IsLl}/);
+#    next if ($trgword=~/\P{IsLl}/);
+
+    ## only lower-case letter-phrases (MWUs allowed)
+    if ($opt_l){
+	next if ($srcword=~/[^\p{IsLl}\s]/);
+	next if ($trgword=~/[^\p{IsLl}\s]/);
+    }
+    ## upper-case letters allowed
+    else{
+	next if ($srcword=~/[^\p{IsL}\s]/);
+	next if ($trgword=~/[^\p{IsL}\s]/);
+    }
+
+    my @scores = split (/ /,$parts[2]);
+    my @freqs = split (/ /,$parts[4]);
+    my $cooc1 = int($scores[0]*$freqs[0]+0.5);
+    my $cooc2 = int($scores[2]*$freqs[1]+0.5);
+
+    # should be the same ....
+    # if not approximate as average
+    if ($cooc1 != $cooc2){
+	$cooc1 = int(($cooc1+$cooc2)/2+0.5);
+    }
+    my $dice = 2*$cooc1/($freqs[0]+$freqs[1]);
+
+    if ($current ne $parts[0]){
+
+	## check if the current source token is included in previous one
+	## or vice versa; if yes skip one of them (depending on scores)
+	if (keys %transl){
+	    unless ($opt_i){
+		my $included = 0;
+		if (index($parts[0],' '.$current)>=0){ $included=1; }
+		elsif (index($parts[0],$current.' ')>=0){ $included=1; }
+		elsif (index($current,' '.$parts[0])>=0){ $included=1; }
+		elsif (index($current,$parts[0].' ')>=0){ $included=1; }
+
+		## NEW: check also target and only skip things with identical translations
+		## (this is only working if those alternatives are next to each other in the list)
+		## TODO: need to optimise this code
+		if ($included){
+		    my $skip = 0;
+		    foreach my $key (sort { $transl{$b} <=> $transl{$a} } keys %transl){
+			last if ($transl{$key} < $dice);
+			($freq,$score,$src,$trg) = split(/\t/,$key);
+			next if ($trg ne $trgword);
+
+			## delete previous option
+			if ($transl{$key} < $dice){
+			    delete $transl{$key};
+			}
+
+			## skip current option
+			else{
+			    $skip = 1;
+			}
+		    }
+		    if ($skip){ next; }
+
+		    ## OLD way: not very good - skips too much
+		    ## because it does not check the target
+		    ##
+		    # my ($highScore) = sort { $b <=> $a } values %transl;
+		    # if ($dice > $highScore){ %transl = (); }
+		    # else{ next; }
+		}
+	    }
+	}
+
+	if (keys %transl){
+
+	    ## if target options may be included in other ones: just print everything
+	    if ($opt_i){
+		print join('', sort { $transl{$b} <=> $transl{$a} } keys %transl);
+		# print "\n";
+	    }
+
+	    ## otherwise: check if the option is included in any previous one
+	    ## or any previous one is included in the current one (skip in both cases)
+	    else{
+		my @trg=();
+		foreach my $a (sort { $transl{$b} <=> $transl{$a} } keys %transl){
+		    my ($cooc,$dice,$s,$t) = split(/\t/,$a);
+
+		    my $skip = 0;
+		    foreach (@trg){
+			if (index($t,' '.$_)>=0){ $skip=1; last; }
+			if (index($t,$_.' ')>=0){ $skip=1; last; }
+			if (index($_,' '.$t)>=0){ $skip=1; last; }
+			if (index($_,$t.' ')>=0){ $skip=1; last; }
+		    }
+		    unless ($skip){
+			print $a;
+			push (@trg,$t);
+		    }
+		}
+		# print "\n";
+	    }
+	    %transl = ();
+	}
+	$current = $parts[0];
+    }
+    $lastTrg = $trgword;
+
+    # my @scores = split (/ /,$parts[2]);
+    # my @freqs = split (/ /,$parts[4]);
+    # my $cooc1 = int($scores[0]*$freqs[0]+0.5);
+    # my $cooc2 = int($scores[2]*$freqs[1]+0.5);
+
+    # # should be the same ....
+    # # if not approximate as average
+    # if ($cooc1 != $cooc2){
+    # 	$cooc1 = int(($cooc1+$cooc2)/2+0.5);
+    # }
+    # my $dice = 2*$cooc1/($freqs[0]+$freqs[1]);
+
+    if ($dice>=$DiceThr && $cooc1 >= $FreqThr){
+	my $string = join("\t",($cooc1,$dice,$parts[0],$parts[1],
+				$scores[0],$scores[1]));
+	$transl{$string."\n"} = $dice
+    }
+}
+
+
+if (keys %transl){
+    print join('', sort { $transl{$b} <=> $transl{$a} } keys %transl);
+    # print "\n";
+}

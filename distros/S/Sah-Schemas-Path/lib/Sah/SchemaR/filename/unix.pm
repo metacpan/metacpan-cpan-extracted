@@ -1,9 +1,9 @@
 package Sah::SchemaR::filename::unix;
 
-our $DATE = '2020-08-08'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2020-08-26'; # DATE
+our $VERSION = '0.015'; # VERSION
 
-our $rschema = ["str",[{match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem file name on a Unix system","x.completion"=>["filename"]}],["str"]];
+our $rschema = ["str",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"},{valid=>1,validated_value=>"foo/bar",value=>"foo//bar"},{summary=>"Path element too long",valid=>0,value=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{summary=>"Contains null character",valid=>0,value=>"foo\0"}],match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem file name on a Unix system","x.completion"=>["filename"]}],["str"]];
 
 1;
 # ABSTRACT: Filesystem file name on a Unix system
@@ -20,7 +20,7 @@ Sah::SchemaR::filename::unix - Filesystem file name on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.014 of Sah::SchemaR::filename::unix (from Perl distribution Sah-Schemas-Path), released on 2020-08-08.
+This document describes version 0.015 of Sah::SchemaR::filename::unix (from Perl distribution Sah-Schemas-Path), released on 2020-08-26.
 
 =head1 DESCRIPTION
 

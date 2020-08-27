@@ -1,17 +1,6 @@
-=head1 NAME
+Revision history for Perl extension PostgreSQL-PLPerl-Call
 
-Changes - List of significant changes to PostgreSQL::PLPerl::Call
+1.007 2020-08-26T17:08:48Z
 
-=head2 Changes in 1.006
+    - original version
 
-  Changed SP->foo to PG->foo.
-  Fixed tests.
-  Added documentation on how to enable use in PostgreSQL.
-
-=head2 Changes in 1.005
-
-  Added DBI as prerequisite.
-  Skipped tests if createdb fails (e.g. PostgreSQL not installed)
-	or DBD::Pg isn't available or can't connect.
-
-=cut

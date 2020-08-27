@@ -43,11 +43,10 @@
       },
       "test" : {
          "requires" : {
-            "Data::Sah" : "0.907",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.98"
+            "Test::More" : "0"
          }
       }
    },
@@ -63,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Path"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -545,17 +544,6 @@
                }
             },
             "name" : "DevelopX_spec",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Prereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "test",
-                  "type" : "requires"
-               }
-            },
-            "name" : "TestRequires",
             "version" : "6.012"
          },
          {

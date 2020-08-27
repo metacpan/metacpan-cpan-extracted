@@ -3,11 +3,11 @@ abstract: Simpler definition of attribute handlers, without messing with UNIVERS
 author:
 - Francisco Zarabozo <zarabozo@cpan.org>
 build_requires:
-  Perlmazing: '0'
+  Perlmazing: '1'
 configure_requires:
-  Perlmazing: '0'
+  Perlmazing: '1'
 dynamic_config: 1
-generated_by: ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010
+generated_by: ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,8 +17,9 @@ no_index:
   directory:
   - t
   - inc
+  - demo
 requires:
-  Perlmazing: '0'
+  Perlmazing: '1'
   perl: '5.006'
-version: '1.02'
-x_serialization_backend: YAML::XS version 0.67
+version: '1.04'
+x_serialization_backend: YAML::XS version 0.82

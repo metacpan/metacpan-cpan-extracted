@@ -38,7 +38,7 @@
    "provides" : {
       "Mock::MonkeyPatch" : {
          "file" : "lib/Mock/MonkeyPatch.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -53,7 +53,7 @@
          "url" : "http://github.com/jberger/Mock-MonkeyPatch"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

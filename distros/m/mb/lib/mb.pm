@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 $VERSION = $VERSION;
 
 # internal use
@@ -152,14 +152,17 @@ END
     # poor "make"
     (my $script_oo = $ARGV[0]) =~ s{\A (.*) \. ([^.]+) \z}{$1.oo.$2}xms;
     if (
-        (not -e $script_oo)            or
-        (-M $script_oo <= -M $ARGV[0]) or
-        (-M $script_oo <= -M __FILE__)
+        (not -e $script_oo)                      or
+        (_mtime($script_oo) <= _mtime($ARGV[0])) or
+        (_mtime($script_oo) <= _mtime(__FILE__))
     ) {
 
         # read application script
         mb::_open_r(my $fh, $ARGV[0]) or die "$0(@{[__LINE__]}): cant't open file: $ARGV[0]\n";
-        local $_ = CORE::do { local $/; <$fh> };
+
+        # sysread(...) has hidden binmode($fh) that's not portable
+        # local $_; sysread($fh, $_, -s $ARGV[0]);
+        local $_ = CORE::do { local $/; <$fh> }; # good!
         close $fh;
 
         # poor file locking
@@ -237,6 +240,13 @@ sub confess {
     die "\n";
 }
 
+#---------------------------------------------------------------------
+# short cut of (stat(file))[9]
+sub _mtime {
+    my($file) = @_;
+    return ((stat $file)[9]);
+}
+
 ######################################################################
 # subroutines for MBCS application programmers
 ######################################################################
@@ -276,9 +286,9 @@ sub mb::do {
             # poor "make"
             (my $prefix_file_oo = $prefix_file) =~ s{\A (.*) \. ([^.]+) \z}{$1.oo.$2}xms;
             if (
-                (not -e $prefix_file_oo)                or
-                (-M $prefix_file_oo <= -M $prefix_file) or
-                (-M $prefix_file_oo <= -M __FILE__)
+                (not -e $prefix_file_oo)                          or
+                (_mtime($prefix_file_oo) <= _mtime($prefix_file)) or
+                (_mtime($prefix_file_oo) <= _mtime(__FILE__))
             ) {
                 mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file\n";
                 local $_ = CORE::do { local $/; <$fh> };
@@ -520,9 +530,9 @@ sub mb::require {
                 # poor "make"
                 (my $prefix_file_oo = $prefix_file) =~ s{\A (.*) \. ([^.]+) \z}{$1.oo.$2}xms;
                 if (
-                    (not -e $prefix_file_oo)                or
-                    (-M $prefix_file_oo <= -M $prefix_file) or
-                    (-M $prefix_file_oo <= -M __FILE__)
+                    (not -e $prefix_file_oo)                          or
+                    (_mtime($prefix_file_oo) <= _mtime($prefix_file)) or
+                    (_mtime($prefix_file_oo) <= _mtime(__FILE__))
                 ) {
                     mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file\n";
                     local $_ = CORE::do { local $/; <$fh> };
@@ -1245,21 +1255,21 @@ sub mb::_clustered_codepoint {
 #---------------------------------------------------------------------
 # open for append by undefined filehandle
 sub mb::_open_a {
-    $_[0] = Symbol::gensym();
+    $_[0] = \do { local *_ };
     return open($_[0], ">>$_[1]");
 }
 
 #---------------------------------------------------------------------
 # open for read by undefined filehandle
 sub mb::_open_r {
-    $_[0] = Symbol::gensym();
+    $_[0] = \do { local *_ };
     return open($_[0], $_[1]);
 }
 
 #---------------------------------------------------------------------
 # open for write by undefined filehandle
 sub mb::_open_w {
-    $_[0] = Symbol::gensym();
+    $_[0] = \do { local *_ };
     return open($_[0], $_[1]);
 }
 
@@ -1380,94 +1390,6 @@ sub mb::_split {
 ######################################################################
 
 #---------------------------------------------------------------------
-# filetest -B for MSWin32
-sub mb::_B (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -B (mb::_B)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-B _,@_) : -B _;
-    }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return wantarray ? (-B $fh,@_) : -B $fh;
-    }
-    elsif (-B $_) {
-        return wantarray ? (1,@_) : 1;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-B qq{$_.}) {
-            return wantarray ? (1,@_) : 1;
-        }
-    }
-    return wantarray ? (undef,@_) : undef;
-}
-
-#---------------------------------------------------------------------
-# filetest -C for MSWin32
-sub mb::_C (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -C (mb::_C)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-C _,@_) : -C _;
-    }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return wantarray ? (-C $fh,@_) : -C $fh;
-    }
-    elsif (-e $_) {
-        return wantarray ? (-C $_,@_) : -C $_;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-e qq{$_.}) {
-            return wantarray ? (-C qq{$_.},@_) : -C qq{$_.};
-        }
-    }
-    return wantarray ? (undef,@_) : undef;
-}
-
-#---------------------------------------------------------------------
-# filetest -M for MSWin32
-sub mb::_M (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -M (mb::_M)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-M _,@_) : -M _;
-    }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return wantarray ? (-M $fh,@_) : -M $fh;
-    }
-    elsif (-e $_) {
-        return wantarray ? (-M $_,@_) : -M $_;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-e qq{$_.}) {
-            return wantarray ? (-M qq{$_.},@_) : -M qq{$_.};
-        }
-    }
-    return wantarray ? (undef,@_) : undef;
-}
-
-#---------------------------------------------------------------------
-# filetest -T for MSWin32
-sub mb::_T (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -T (mb::_T)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-T _,@_) : -T _;
-    }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return wantarray ? (-T $fh,@_) : -T $fh;
-    }
-    elsif (-T $_) {
-        return wantarray ? (1,@_) : 1;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-T qq{$_.}) {
-            return wantarray ? (1,@_) : 1;
-        }
-    }
-    return wantarray ? (undef,@_) : undef;
-}
-
-#---------------------------------------------------------------------
 # chdir() for MSWin32
 sub mb::_chdir {
 
@@ -1501,87 +1423,57 @@ sub mb::_chdir {
 }
 
 #---------------------------------------------------------------------
-# filetest -d for MSWin32
-sub mb::_d (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -d (mb::_d)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-d _,@_) : -d _;
-    }
-    elsif (-d $_) {
-        return wantarray ? (1,@_) : 1;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-d qq{$_.}) {
-            return wantarray ? (1,@_) : 1;
-        }
-    }
-    return wantarray ? (undef,@_) : undef;
-}
+# stackable filetest -X -Y -Z for MSWin32
+sub mb::_filetest {
+    my @filetest = @{ shift(@_) };
+    local $_ = @_ ? shift : (($filetest[-1] eq '-t') ? \*STDIN : $_);
+    confess "Too many arguments for filetest @filetest" if @_ and not wantarray;
 
-#---------------------------------------------------------------------
-# filetest -e for MSWin32
-sub mb::_e (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -e (mb::_e)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-e _,@_) : -e _;
+    # testee has "\x5C" octet at end
+    if (
+        ($OSNAME =~ /MSWin32/) and
+        ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms) and
+        /[\x5C]\z/
+    ) {
+        $_ = qq{$_.};
     }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return wantarray ? (-e $fh,@_) : -e $fh;
-    }
-    elsif (-e $_) {
-        return wantarray ? (1,@_) : 1;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-e qq{$_.}) {
-            return wantarray ? (1,@_) : 1;
-        }
-    }
-    return wantarray ? (undef,@_) : undef;
-}
 
-#---------------------------------------------------------------------
-# filetest -f for MSWin32
-sub mb::_f (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -f (mb::_f)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-f _,@_) : -f _;
+    # supports stackable filetest
+    my $result;
+    my $filetest = pop @filetest;
+    if ($result = CORE::eval($filetest . ' $_')) { # '$_' at 1st time, and ...
     }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return wantarray ? (-f $fh,@_) : -f $fh;
+    else {
+        return wantarray ? ($result, @_) : $result;
     }
-    elsif (-f $_) {
-        return wantarray ? (1,@_) : 1;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-f qq{$_.}) {
-            return wantarray ? (1,@_) : 1;
+    for my $filetest (CORE::reverse @filetest) {
+        if ($result = CORE::eval($filetest . ' _')) { # '_' at 2nd time or later
+        }
+        else {
+            return wantarray ? ($result, @_) : $result;
         }
     }
-    return wantarray ? (undef,@_) : undef;
+    return wantarray ? ($result, @_) : $result;
 }
 
 #---------------------------------------------------------------------
 # lstat() for MSWin32
-sub mb::_lstat (;*) {
+sub mb::_lstat {
     local $_ = shift if @_;
     if ($_ eq '_') {
         confess qq{lstat doesn't support '_'\n};
     }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return CORE::stat $fh; # not CORE::lstat
+
+    # testee has "\x5C" octet at end
+    if (
+        ($OSNAME =~ /MSWin32/) and
+        ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms) and
+        /[\x5C]\z/
+    ) {
+        $_ = qq{$_.};
     }
-    elsif (-e $_) {
-        return CORE::stat _; # not CORE::lstat
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-e qq{$_.}) {
-            return CORE::stat _; # not CORE::lstat
-        }
-    }
-    return wantarray ? () : undef;
+
+    return CORE::lstat $_;
 }
 
 #---------------------------------------------------------------------
@@ -1609,70 +1501,20 @@ sub mb::_opendir (*$) {
 }
 
 #---------------------------------------------------------------------
-# filetest -r for MSWin32
-sub mb::_r (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -r (mb::_r)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-r _,@_) : -r _;
-    }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return wantarray ? (-r $fh,@_) : -r $fh;
-    }
-    elsif (-r $_) {
-        return wantarray ? (1,@_) : 1;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-r qq{$_.}) {
-            return wantarray ? (1,@_) : 1;
-        }
-    }
-    return wantarray ? (undef,@_) : undef;
-}
-
-#---------------------------------------------------------------------
-# filetest -s for MSWin32
-sub mb::_s (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -s (mb::_s)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-s _,@_) : -s _;
-    }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return wantarray ? (-s $fh,@_) : -s $fh;
-    }
-    elsif (-e $_) {
-        return wantarray ? (-s $_,@_) : -s $_;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-e qq{$_.}) {
-            return wantarray ? (-s qq{$_.},@_) : -s qq{$_.};
-        }
-    }
-    return wantarray ? (undef,@_) : undef;
-}
-
-#---------------------------------------------------------------------
 # stat() for MSWin32
-sub mb::_stat (;*) {
+sub mb::_stat {
     local $_ = shift if @_;
-    if ($_ eq '_') {
-        if (-e _) {
-            return CORE::stat _;
-        }
+
+    # testee has "\x5C" octet at end
+    if (
+        ($OSNAME =~ /MSWin32/) and
+        ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms) and
+        /[\x5C]\z/
+    ) {
+        $_ = qq{$_.};
     }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return CORE::stat $fh;
-    }
-    elsif (-e $_) {
-        return CORE::stat _;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-e qq{$_.}) {
-            return CORE::stat _;
-        }
-    }
-    return wantarray ? () : undef;
+
+    return CORE::stat $_;
 }
 
 #---------------------------------------------------------------------
@@ -1694,72 +1536,6 @@ sub mb::_unlink {
         }
     }
     return $unlink;
-}
-
-#---------------------------------------------------------------------
-# filetest -w for MSWin32
-sub mb::_w (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -w (mb::_w)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-w _,@_) : -w _;
-    }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return wantarray ? (-w $fh,@_) : -w $fh;
-    }
-    elsif (-w $_) {
-        return wantarray ? (1,@_) : 1;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-w qq{$_.}) {
-            return wantarray ? (1,@_) : 1;
-        }
-    }
-    return wantarray ? (undef,@_) : undef;
-}
-
-#---------------------------------------------------------------------
-# filetest -x for MSWin32
-sub mb::_x (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -x (mb::_x)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-x _,@_) : -x _;
-    }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return wantarray ? (-x $fh,@_) : -x $fh;
-    }
-    elsif (-x $_) {
-        return wantarray ? (1,@_) : 1;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-x qq{$_.}) {
-            return wantarray ? (1,@_) : 1;
-        }
-    }
-    return wantarray ? (undef,@_) : undef;
-}
-
-#---------------------------------------------------------------------
-# filetest -z for MSWin32
-sub mb::_z (;*@) {
-    local $_ = shift if @_;
-    confess 'Too many arguments for -z (mb::_z)' if @_ and not wantarray;
-    if ($_ eq '_') {
-        return wantarray ? (-z _,@_) : -z _;
-    }
-    elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
-        return wantarray ? (-z $fh,@_) : -z $fh;
-    }
-    elsif (-e $_) {
-        return wantarray ? (-z $_,@_) : -z $_;
-    }
-    elsif (($OSNAME =~ /MSWin32/) and ($script_encoding =~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        if (-e qq{$_.}) {
-            return wantarray ? (-z qq{$_.},@_) : -z qq{$_.};
-        }
-    }
-    return wantarray ? (undef,@_) : undef;
 }
 
 ######################################################################
@@ -1899,6 +1675,9 @@ my @here_document_delimiter = ();
 sub parse {
     local $_ = shift if @_;
 
+    # Yes, I studied study yesterday, once again.
+    study $_; # acts between perl 5.005 to perl 5.014
+
     $term = 0;
     @here_document_delimiter = ();
 
@@ -2008,17 +1787,24 @@ sub parse_expr {
         $term = 0;
     }
 
-    # unimplemented file test operator on MSWin32
+    # file test operator on MSWin32
     # "\x2D" [-] HYPHEN-MINUS (U+002D)
-    elsif (/\G ( -[ASORWXbcgkloptu] ) \b /xmsgc) {
-        $parsed .= $1;
+
+    # -X -Y -Z _    --> mb::_filetest [qw( -X -Y -Z )], \*_
+    # -X -Y -Z FILE --> mb::_filetest [qw( -X -Y -Z )], \*FILE
+    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    #            vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \b \s* )+ ) (?= [A-Za-z_][A-Za-z0-9_]* \b ) /xmsgc) {
+        $parsed .= "mb::_filetest [qw( $1 )], ";
+        $parsed .= '\\*';
         $term = 1;
     }
 
-    # implemented file test operator on MSWin32
-    # implements run on any systems by transpiling once
-    elsif (/\G -([BCMTdefrswxz]) \b /xmsgc) {
-        $parsed .= "mb::_$1";
+    # -X -Y -Z ... --> mb::_filetest [qw( -X -Y -Z )], ...
+    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    #            vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \b \s* )+ ) \b /xmsgc) {
+        $parsed .= "mb::_filetest [qw( $1 )], ";
         $term = 1;
     }
 
@@ -2779,21 +2565,36 @@ sub parse_expr {
     }
 
     # mb::getc() --> mb::getc()
-    elsif (/\G ( mb::getc (?: \s* \( )+ \s* \) ) /xmsgc) {
+    #                       vvvvvvvvvvvvvvvvvvvvvvvvvv
+    #                           vvvvvvvvvvvv
+    elsif (/\G ( mb::getc ) (?= (?: \s* \( )+ \s* \) ) /xmsgc) {
         $parsed .= $1;
         $term = 1;
     }
 
     # mb::getc($fh) --> mb::getc($fh)
-    elsif (/\G ( mb::getc (?: \s* \( )+ \s* \$ ) /xmsgc) {
+    # mb::getc $fh  --> mb::getc $fh
+    #                       vvvvvvvvvvvvvvvvvvvvvvvvvv
+    #                           vvvvvvvvvvvv
+    elsif (/\G ( mb::getc ) (?= (?: \s* \( )* \s* \$ ) /xmsgc) {
         $parsed .= $1;
         $term = 1;
     }
 
     # mb::getc(FILE) --> mb::getc(\*FILE)
-    elsif (/\G ( mb::getc (?: \s* \( )+ \s* ) /xmsgc) {
+    # mb::getc FILE  --> mb::getc \*FILE
+    #                          vvvvvvvvvvvvvvvvvvvvv
+    #                            vvvvvvvvvvvv        vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( mb::getc ) \b ( (?: \s* \( )* \s* ) (?= [A-Za-z_][A-Za-z0-9_]* \b ) /xmsgc) {
         $parsed .= $1;
+        $parsed .= $2;
         $parsed .= '\\*';
+        $term = 1;
+    }
+
+    # mb::getc --> mb::getc
+    elsif (/\G ( mb::getc ) /xmsgc) {
+        $parsed .= $1;
         $term = 1;
     }
 
@@ -2814,9 +2615,49 @@ sub parse_expr {
         $term = 1;
     }
 
+    # lstat(), stat() on MSWin32
+
+    # lstat() --> mb::_lstat()
+    # stat()  --> mb::_stat()
+    #                           vvvvvvvvvvvvvvvvvvvvvvvvvv
+    #                               vvvvvvvvvvvv
+    elsif (/\G ( lstat | stat ) (?= (?: \s* \( )+ \s* \) ) /xmsgc) {
+        $parsed .= "mb::_$1";
+        $term = 1;
+    }
+
+    # lstat(...) --> mb::_lstat(...)
+    # stat(...)  --> mb::_stat(...)
+    #                           vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    #                               vvvvvvvvvvvv     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( lstat | stat ) (?= (?: \s* \( )* \b (?: ' | " | ` | m | q | qq | qr | qw | qx | s | tr | y | \$ ) \b ) /xmsgc) {
+        $parsed .= "mb::_$1";
+        $term = 1;
+    }
+
+    # lstat(FILE) --> mb::_lstat(\*FILE)
+    # lstat FILE  --> mb::_lstat \*FILE
+    # stat(FILE)  --> mb::_stat(\*FILE)
+    # stat FILE   --> mb::_stat \*FILE
+    #                              vvvvvvvvvvvvvvvvvvvvv
+    #                                vvvvvvvvvvvv        vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( lstat | stat ) \b ( (?: \s* \( )* \s* ) (?= [A-Za-z_][A-Za-z0-9_]* \b ) /xmsgc) {
+        $parsed .= "mb::_$1";
+        $parsed .= $2;
+        $parsed .= '\\*';
+        $term = 1;
+    }
+
+    # lstat --> mb::_lstat
+    # stat  --> mb::_stat
+    elsif (/\G ( lstat | stat ) \b /xmsgc) {
+        $parsed .= "mb::_$1";
+        $term = 1;
+    }
+
     # function --> mb::subroutine on MSWin32
     # implements run on any systems by transpiling once
-    elsif (/\G ( chdir | lstat | opendir | stat | unlink ) \b /xmsgc) {
+    elsif (/\G ( chdir | opendir | unlink ) \b /xmsgc) {
         $parsed .= "mb::_$1";
         $term = 1;
     }
@@ -4347,6 +4188,10 @@ mb - run Perl script in MBCS encoding (not only CJK ;-)
     mb::rindex_byte(...);
     mb::substr(...);
 
+  MBCS special variables:
+    $mb::PERL
+    $mb::ORIG_PROGRAM_NAME
+
   supported encodings:
     Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, UTF-8
 
@@ -4385,10 +4230,12 @@ To install this software without make, type the following:
   unlike JPerl, "Easy jobs easy" has been lost. (but we have got it again :-D)
 
   In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, UHC)
-  have any DAMEMOJI at second octet in double-byte codepoint. DAMEMOJI are
-  metacharacters. Which octets are DAMEMOJI depends on whether the enclosing
-  delimiter is single quote or double quote. This software escapes DAMEMOJI in
-  your script, generate a new script and run it.
+  have any DAMEMOJI who have metacharacters at second octet. Which characters
+  are DAMEMOJI is depends on whether the enclosing delimiter is single quote or
+  double quote.
+
+  This software escapes DAMEMOJI in your script, generate a new script and
+  run it.
 
   There are some MBCS encodings in the world.
   in Japan since 1978, JIS C 6226-1978,
@@ -4531,6 +4378,7 @@ To install this software without make, type the following:
   subroutines will not help you very much. Traditional functions of Perl are
   useful still now in octet-oriented semantics.
 
+  elder <--                     age                     --> younger
   -----------------------------------------------------------------
   bare Perl4     JPerl4                                            
   bare Perl5     JPerl5         use utf8;          mb.pm           
@@ -4680,7 +4528,7 @@ To install this software without make, type the following:
   following metacharacters ('', q{}, <<'END', qw{}, m'', s''', split(''),
   split(m''), and qr'')
   ------------------------------------------------------------------
-  hex   character
+  hex   character as US-ASCII
   ------------------------------------------------------------------
   5C    [\]    backslashed escapes
   ------------------------------------------------------------------
@@ -4689,7 +4537,7 @@ To install this software without make, type the following:
   following metacharacters ("", qq{}, <<END, <<"END", ``, qx{}, <<`END`, //,
   m//, ??, s///, split(//), split(m//), and qr//)
   ------------------------------------------------------------------
-  hex   character
+  hex   character as US-ASCII
   ------------------------------------------------------------------
   21    [!]    
   22    ["]    
@@ -4724,7 +4572,7 @@ To install this software without make, type the following:
   7E    [~]    
   ------------------------------------------------------------------
 
-=head1 How to escape DAMEMOJI
+=head1 How to escape 2nd octet of DAMEMOJI
 
   ex. Japanese KATAKANA "SO" like [ `/ ] code is "\x83\x5C" in Sjis
  
@@ -4773,10 +4621,12 @@ To install this software without make, type the following:
   ucfirst                                    mb::ucfirst
   index                                      index
   rindex                                     rindex
-  mb::getc                                   mb::getc
   mb::getc()                                 mb::getc()
-  mb::getc(FILE)                             mb::getc(\*FILE)
   mb::getc($fh)                              mb::getc($fh)
+  mb::getc $fh                               mb::getc $fh
+  mb::getc(FILE)                             mb::getc(\*FILE)
+  mb::getc FILE                              mb::getc \*FILE
+  mb::getc                                   mb::getc
   'MBCS-quotee'                              'OO-quotee'
   "MBCS-quotee"                              "OO-quotee"
   `MBCS-quotee`                              `OO-quotee`
@@ -4929,28 +4779,84 @@ To install this software without make, type the following:
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   The following conversions are for Microsoft Windows, but will always be
-  converted so that the converted script will work on any system.
+  converted so that the converted script will work on any system. Even if
+  Perl 5.00503, you can stack file test operators, -r -w -f $file works as
+  -f $file && -w _ && -r _.
 
   -----------------------------------------------------------------------------
   in your script                             script transpiled by this software
   -----------------------------------------------------------------------------
   chdir                                      mb::_chdir
-  lstat                                      mb::_lstat
   opendir                                    mb::_opendir
-  stat                                       mb::_stat
   unlink                                     mb::_unlink
-  filetest -B                                mb::_B
-  filetest -C                                mb::_C
-  filetest -M                                mb::_M
-  filetest -T                                mb::_T
-  filetest -d                                mb::_d
-  filetest -e                                mb::_e
-  filetest -f                                mb::_f
-  filetest -r                                mb::_r
-  filetest -s                                mb::_s
-  filetest -w                                mb::_w
-  filetest -x                                mb::_x
-  filetest -z                                mb::_z
+  lstat()                                    mb::_lstat()
+  lstat('a')                                 mb::_lstat('a')
+  lstat("a")                                 mb::_lstat("a")
+  lstat(`a`)                                 mb::_lstat(`a`)
+  lstat(m/a/)                                mb::_lstat(m{\G${mb::_anchor}@{[qr/a/ ]}@{[mb::_m_passed()]}})
+  lstat(q/a/)                                mb::_lstat(q/a/)
+  lstat(qq/a/)                               mb::_lstat(qq/a/)
+  lstat(qr/a/)                               mb::_lstat(qr{\G${mb::_anchor}@{[qr/a/ ]}@{[mb::_m_passed()]}})
+  lstat(qw/a/)                               mb::_lstat(qw/a/)
+  lstat(qx/a/)                               mb::_lstat(qx/a/)
+  lstat(s/a/b/)                              mb::_lstat(s{(\G${mb::_anchor})@{[qr/a/ ]}@{[mb::_s_passed()]}}{$1 . qq /b/}e)
+  lstat(tr/a/b/)                             mb::_lstat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
+  lstat(y/a/b/)                              mb::_lstat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
+  lstat($fh)                                 mb::_lstat($fh)
+  lstat(FILE)                                mb::_lstat(\*FILE)
+  lstat(_)                                   mb::_lstat(\*_)
+  lstat $fh                                  mb::_lstat $fh
+  lstat FILE                                 mb::_lstat \*FILE
+  lstat _                                    mb::_lstat \*_
+  lstat                                      mb::_lstat
+  stat()                                     mb::_stat()
+  stat('a')                                  mb::_stat('a')
+  stat("a")                                  mb::_stat("a")
+  stat(`a`)                                  mb::_stat(`a`)
+  stat(m/a/)                                 mb::_stat(m{\G${mb::_anchor}@{[qr/a/ ]}@{[mb::_m_passed()]}})
+  stat(q/a/)                                 mb::_stat(q/a/)
+  stat(qq/a/)                                mb::_stat(qq/a/)
+  stat(qr/a/)                                mb::_stat(qr{\G${mb::_anchor}@{[qr/a/ ]}@{[mb::_m_passed()]}})
+  stat(qw/a/)                                mb::_stat(qw/a/)
+  stat(qx/a/)                                mb::_stat(qx/a/)
+  stat(s/a/b/)                               mb::_stat(s{(\G${mb::_anchor})@{[qr/a/ ]}@{[mb::_s_passed()]}}{$1 . qq /b/}e)
+  stat(tr/a/b/)                              mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
+  stat(y/a/b/)                               mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
+  stat($fh)                                  mb::_stat($fh)
+  stat(FILE)                                 mb::_stat(\*FILE)
+  stat(_)                                    mb::_stat(\*_)
+  stat $fh                                   mb::_stat $fh
+  stat FILE                                  mb::_stat \*FILE
+  stat _                                     mb::_stat \*_
+  stat                                       mb::_stat
+  -A                                         mb::_filetest [qw( -A )], 
+  -B                                         mb::_filetest [qw( -B )], 
+  -C                                         mb::_filetest [qw( -C )], 
+  -M                                         mb::_filetest [qw( -M )], 
+  -O                                         mb::_filetest [qw( -O )], 
+  -R                                         mb::_filetest [qw( -R )], 
+  -S                                         mb::_filetest [qw( -S )], 
+  -T                                         mb::_filetest [qw( -T )], 
+  -W                                         mb::_filetest [qw( -W )], 
+  -X                                         mb::_filetest [qw( -X )], 
+  -b                                         mb::_filetest [qw( -b )], 
+  -c                                         mb::_filetest [qw( -c )], 
+  -d                                         mb::_filetest [qw( -d )], 
+  -e                                         mb::_filetest [qw( -e )], 
+  -f                                         mb::_filetest [qw( -f )], 
+  -g                                         mb::_filetest [qw( -g )], 
+  -k                                         mb::_filetest [qw( -k )], 
+  -l                                         mb::_filetest [qw( -l )], 
+  -o                                         mb::_filetest [qw( -o )], 
+  -p                                         mb::_filetest [qw( -p )], 
+  -r                                         mb::_filetest [qw( -r )], 
+  -s                                         mb::_filetest [qw( -s )], 
+  -t                                         mb::_filetest [qw( -t )], 
+  -u                                         mb::_filetest [qw( -u )], 
+  -w                                         mb::_filetest [qw( -w )], 
+  -x                                         mb::_filetest [qw( -x )], 
+  -z                                         mb::_filetest [qw( -z )], 
+  -r -w -f                                   mb::_filetest [qw( -r -w -f )], 
   -----------------------------------------------------------------------------
 
   Each elements in strings or regular expressions that are double-quote like are

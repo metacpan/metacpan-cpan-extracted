@@ -59,16 +59,16 @@ CONFIGURATION
         If this attribute set to 0 the cookie will not have the secure flag.
 
         If this attribute set to 1 (or true for backward compatibility) -
-        the cookie send by the server to the client will got the secure flag
-        that tells the browser to send this cookies back to the server only
+        the cookie sent by the server to the client will get the secure flag
+        that tells the browser to send this cookie back to the server only
         via HTTPS.
 
-        If this attribute set to 2 then the cookie will got the secure flag
+        If this attribute set to 2 then the cookie will get the secure flag
         only if the request that caused cookie generation was sent over
         https (this option is not good if you are mixing https and http in
-        you application).
+        your application).
 
-        Default vaule is 0.
+        Default value is 0.
 
     cookie_httponly
         If this attribute set to 0, the cookie will not have HTTPOnly flag.
@@ -82,31 +82,52 @@ CONFIGURATION
 
         Default value is 1.
 
-        Note1: Many peole are confused by the name "HTTPOnly" - it does not
+        Note1: Many people are confused by the name "HTTPOnly" - it does not
         mean that this cookie works only over HTTP and not over HTTPS.
 
-        Note2: This paramater requires Catalyst::Runtime 5.80005 otherwise
+        Note2: This parameter requires Catalyst::Runtime 5.80005 otherwise
         is skipped.
+
+    cookie_samesite
+        This attribute configures the value of the SameSite
+        <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cooki
+        e/SameSite> flag.
+
+        If set to None, the cookie will be sent when making cross origin
+        requests, including following links from other origins. This
+        requires the "cookie_secure" flag to be set.
+
+        If set to Lax, the cookie will not be included when embedded in or
+        fetched from other origins, but will be included when following
+        cross origin links.
+
+        If set to Strict, the cookie will not be included for any cross
+        origin requests, including links from different origins.
+
+        Default value is "Lax". This is the default modern browsers use.
+
+        Note: This parameter requires Catalyst::Runtime 5.90125 otherwise is
+        skipped.
 
     cookie_path
         The path of the request url where cookie should be baked.
 
     For example, you could stick this in MyApp.pm:
 
-      __PACKAGE__->config( 'Plugin::Session' => {
-         cookie_domain  => '.mydomain.com',
-      });
+        __PACKAGE__->config( 'Plugin::Session' => {
+            cookie_domain  => '.mydomain.com',
+        });
 
 CAVEATS
     Sessions have to be created before the first write to be saved. For
     example:
 
-            sub action : Local {
-                    my ( $self, $c ) = @_;
-                    $c->res->write("foo");
-                    $c->session( ... );
-                    ...
-            }
+        sub action : Local {
+            my ( $self, $c ) = @_;
+            $c->res->write("foo");
+            $c->session( ... );
+            ...
+        }
 
     Will cause a session ID to not be set, because by the time a session is
     actually created the headers have already been sent to the client.
@@ -121,13 +142,19 @@ CONTRIBUTORS
     This module is derived from Catalyst::Plugin::Session::FastMmap code,
     and has been heavily modified since.
 
-      Andrew Ford
-      Andy Grundman
-      Christian Hansen
-      Marcus Ramberg
-      Jonathan Rockway E<lt>jrockway@cpan.orgE<gt>
-      Sebastian Riedel
-      Florian Ragwitz
+    Andrew Ford
+
+    Andy Grundman
+
+    Christian Hansen
+
+    Marcus Ramberg
+
+    Jonathan Rockway <jrockway@cpan.org>
+
+    Sebastian Riedel
+
+    Florian Ragwitz
 
 COPYRIGHT
     Copyright (c) 2005 - 2009 the Catalyst::Plugin::Session::State::Cookie

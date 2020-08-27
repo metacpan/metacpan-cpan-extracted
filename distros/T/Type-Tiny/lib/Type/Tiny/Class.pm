@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::Class::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Class::VERSION   = '1.010004';
+	$Type::Tiny::Class::VERSION   = '1.010005';
 }
 
 $Type::Tiny::Class::VERSION =~ tr/_//d;
@@ -64,14 +64,15 @@ sub _build_inlined
 	my $self  = shift;
 	my $class = $self->class;
 	
-	if (Type::Tiny::_USE_XS)
-	{
-		my $xsub = Type::Tiny::XS::get_subname_for("InstanceOf[$class]");
-		return sub { my $var = $_[1]; "$xsub\($var\)" } if $xsub;
-	}
+	my $xsub;
+	$xsub = Type::Tiny::XS::get_subname_for("InstanceOf[$class]") if Type::Tiny::_USE_XS;
 	
 	sub {
 		my $var = $_[1];
+		return qq{do { use Scalar::Util (); Scalar::Util::blessed($var) and $var->isa(q[$class]) }}
+			if $Type::Tiny::AvoidCallbacks;
+		return "$xsub\($var\)"
+			if $xsub;
 		qq{Scalar::Util::blessed($var) and $var->isa(q[$class])};
 	};
 }

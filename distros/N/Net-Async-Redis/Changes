@@ -1,5 +1,13 @@
 Revision history for Net-Async-Redis
 
+2.006     2020-08-26 10:23:47+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - latest command updates from Redis 6.0.6 - main change here is ->lpos
+    renaming "first" to "rank", see https://redis.io/commands/lpos
+    - Redis database selection via URI or `database` ->configure parameter
+    - OpenTracing support via OpenTracing::Any
+
 2.005     2020-06-28 00:20:52+08:00 Asia/Kuala_Lumpur
     New features:
 

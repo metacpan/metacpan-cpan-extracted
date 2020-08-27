@@ -3,11 +3,10 @@ abstract: 'Schemas related to filesystem path'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Sah: '0.907'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0.98'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -28,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Path
   homepage: https://metacpan.org/release/Sah-Schemas-Path
   repository: git://github.com/perlancar/perl-Sah-Schemas-Path.git
-version: '0.014'
+version: '0.015'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -405,14 +404,6 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: test
-          type: requires
-      name: TestRequires
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode

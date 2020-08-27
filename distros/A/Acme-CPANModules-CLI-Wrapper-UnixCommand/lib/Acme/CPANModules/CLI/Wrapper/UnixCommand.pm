@@ -1,9 +1,9 @@
 package Acme::CPANModules::CLI::Wrapper::UnixCommand;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-22'; # DATE
+our $DATE = '2020-08-26'; # DATE
 our $DIST = 'Acme-CPANModules-CLI-Wrapper-UnixCommand'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => "Various CLIs that wrap (popular) Unix commands",
@@ -25,18 +25,21 @@ _
             script => 'sshwrap-hostcolor',
             'x.command' => 'ssh',
         },
+
         {
             summary => 'Wraps man to search for (and tab-complete) Perl module documentation',
             module => 'App::manwrap::pm',
             script => 'manwrap-pm',
             'x.command' => 'man',
         },
+
         {
             summary => 'Wraps git to do additional stuff, e.g. set user+email automatically',
             module => 'App::gitwrap',
             script => 'gitwrap',
             'x.command' => 'git',
         },
+
         {
             summary => 'Wraps rsync to add color to output, particularly highlighting deletion',
             module => 'App::rsynccolor',
@@ -49,12 +52,7 @@ _
             script => 'rsync-new2old',
             'x.command' => 'rsync',
         },
-        {
-            summary => 'Wraps cpanm to use local CPAN mirror and let you specify script name to install instead of module name',
-            module => 'App::lcpan',
-            script => ['lcpanm', 'lcpanm-script'],
-            'x.command' => 'cpanm',
-        },
+
         {
             summary => 'Wraps (or filters output of) diff to add colors and highlight words',
             module => 'App::diffwc',
@@ -66,6 +64,19 @@ _
             module => 'App::DiffDocText',
             script => ['diff-doc-text'],
             'x.command' => 'diff',
+        },
+        {
+            summary => 'Provides sdif (diff side-by-side with nice color theme), cdif (highlight words with nice color scheme), and watchdiff (watch command and diff output)',
+            module => 'App::sdif',
+            script => ['sdif', 'cdif', 'watchdiff'],
+            'x.command' => ['diff', 'watch'],
+        },
+
+        {
+            summary => 'Wraps cpanm to use local CPAN mirror and let you specify script name to install instead of module name',
+            module => 'App::lcpan',
+            script => ['lcpanm', 'lcpanm-script'],
+            'x.command' => 'cpanm',
         },
     ],
 };
@@ -85,7 +96,7 @@ Acme::CPANModules::CLI::Wrapper::UnixCommand - Various CLIs that wrap (popular) 
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::CLI::Wrapper::UnixCommand (from Perl distribution Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2020-08-22.
+This document describes version 0.003 of Acme::CPANModules::CLI::Wrapper::UnixCommand (from Perl distribution Acme-CPANModules-CLI-Wrapper-UnixCommand), released on 2020-08-26.
 
 =head1 DESCRIPTION
 
@@ -111,11 +122,13 @@ If you know of others, please drop me a message.
 
 =item * L<App::rsync::new2old> - Wraps rsync to check that source is newer than target
 
-=item * L<App::lcpan> - Wraps cpanm to use local CPAN mirror and let you specify script name to install instead of module name
-
 =item * L<App::diffwc> - Wraps (or filters output of) diff to add colors and highlight words
 
 =item * L<App::DiffDocText> - Diffs two office word-processor documents by first converting them to plaintext
+
+=item * L<App::sdif> - Provides sdif (diff side-by-side with nice color theme), cdif (highlight words with nice color scheme), and watchdiff (watch command and diff output)
+
+=item * L<App::lcpan> - Wraps cpanm to use local CPAN mirror and let you specify script name to install instead of module name
 
 =back
 

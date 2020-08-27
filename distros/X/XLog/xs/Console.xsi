@@ -1,0 +1,31 @@
+MODE: INLINE
+#include <panda/log/console.h>
+
+struct XSConsoleLogger : ConsoleLogger {
+    using ConsoleLogger::ConsoleLogger;
+    
+    void log (const string& msg, const Info&) override {
+        Io io = PL_defoutgv;
+        if (!io) return;
+        auto fp = io.ofp();
+        if (!fp) return;
+        PerlIO_write(fp, msg.data(), msg.length());
+        PerlIO_write(fp, "\n", 1);
+    }
+};
+
+namespace xs {
+    template <class TYPE> struct Typemap<ConsoleLogger*, TYPE> : Typemap<ILogger*, TYPE> {
+        static string package () { return "XLog::Console"; }
+    };
+    template <> struct Typemap<XSConsoleLogger*> : Typemap<ConsoleLogger*, XSConsoleLogger*> {};
+}
+
+MODULE = XLog               PACKAGE = XLog::Console
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__).inherit("XLog::ILogger");
+}
+
+XSConsoleLogger* XSConsoleLogger::new ()

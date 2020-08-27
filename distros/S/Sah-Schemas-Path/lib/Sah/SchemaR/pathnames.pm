@@ -1,7 +1,7 @@
 package Sah::SchemaR::pathnames;
 
-our $DATE = '2020-08-08'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2020-08-26'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 our $rschema = ["array",[{description=>"\nCoerces from string by expanding the glob pattern in the string.\n\n",of=>["pathname",{req=>1},{}],summary=>"List of filesystem path names","x.element_completion"=>["filename"],"x.perl.coerce_rules"=>["From_str::expand_glob"]}],["array"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::pathnames - List of filesystem path names
 
 =head1 VERSION
 
-This document describes version 0.014 of Sah::SchemaR::pathnames (from Perl distribution Sah-Schemas-Path), released on 2020-08-08.
+This document describes version 0.015 of Sah::SchemaR::pathnames (from Perl distribution Sah-Schemas-Path), released on 2020-08-26.
 
 =head1 DESCRIPTION
 

@@ -54,13 +54,12 @@ diff ... | sdif
     --[no]lenience      supress unexpected input warning (default on)
 
     --[no]cdif		use ``cdif'' as word context diff backend
-    --unit=s		pass through to cdif
+    --unit=s		pass through to cdif (word, char, mecab)
     --cdifopts=s	set cdif command options
 
 =cut
 
 use v5.14;
-use strict;
 use warnings;
 use utf8;
 use Encode;
@@ -284,6 +283,7 @@ for (
 {
     my($name, $type, $var, $default) = @$_;
     if ($type eq "!") {
+	next if not defined $$var;
 	next if $$var == $default;
 	unshift @opt_cdifopts, sprintf("--%s%s", $$var ? '' : 'no-', $name);
     } elsif ($type eq "=") {
@@ -531,8 +531,7 @@ while (<DIFF>) {
 	    $screen_width -= length $prefix;
 	    $read_opt{prefix} = $prefix;
 	    use App::sdif::Divert;
-	    $divert = new App::sdif::Divert
-		FINAL => sub { s/^/$prefix/mg };
+	    $divert = App::sdif::Divert->new(FINAL => sub { s/^/$prefix/mg });
 	}
 
 	print_command_n({ type => 'COMMAND' }, $command, $command);

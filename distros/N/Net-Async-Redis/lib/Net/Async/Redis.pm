@@ -9,7 +9,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '2.005';
+our $VERSION = '2.006';
 
 =head1 NAME
 
@@ -165,6 +165,8 @@ use URI::redis;
 use Cache::LRU;
 
 use Log::Any qw($log);
+use Metrics::Any qw($metrics), strict => 0;
+use OpenTracing::Any qw($tracer);
 
 use List::Util qw(pairmap);
 use Scalar::Util qw(reftype blessed);
@@ -172,6 +174,20 @@ use Scalar::Util qw(reftype blessed);
 use Net::Async::Redis::Multi;
 use Net::Async::Redis::Subscription;
 use Net::Async::Redis::Subscription::Message;
+
+=head1 CONSTANTS
+
+=head2 OPENTRACING_ENABLED
+
+Defaults to true, this can be controlled by the C<USE_OPENTRACING>
+environment variable.
+
+When enabled, this will create a span for every Redis request. See
+L<OpenTracing::Any> for details.
+
+=cut
+
+use constant OPENTRACING_ENABLED => $ENV{USE_OPENTRACING} // 1;
 
 our %ALLOWED_SUBSCRIPTION_COMMANDS = (
     SUBSCRIBE    => 1,
@@ -485,13 +501,15 @@ sub connect : method {
     for (qw(host port)) {
         $uri->$_($self->$_) if defined $self->$_;
     }
+    $uri->path('/' . $self->database) if $self->database;
+
     my $auth = $self->{auth};
     $auth //= ($uri->userinfo =~ s{^[^:]*:}{}r) if defined $uri->userinfo;
     $self->{connection} //= $self->loop->connect(
         service => $uri->port // 6379,
         host    => $uri->host,
         socktype => 'stream',
-    )->then(sub {
+    )->then(async sub {
         my ($sock) = @_;
         $self->{endpoint} = join ':', $sock->peerhost, $sock->peerport;
         $self->{local_endpoint} = join ':', $sock->sockhost, $sock->sockport;
@@ -512,9 +530,11 @@ sub connect : method {
         Scalar::Util::weaken(
             $self->{stream} = $stream
         );
-        return $self->auth($auth) if defined $auth;
+        await $self->auth($auth) if defined $auth;
+        await $self->select($uri->database) if $uri->database;
         return Future->done;
-    })->on_fail(sub { delete $self->{connection} });
+    })->on_fail(sub { delete $self->{connection} })
+      ->on_cancel(sub { delete $self->{connection} });
 }
 
 =head2 connected
@@ -731,7 +751,10 @@ sub execute_command {
             0 + (keys %{$self->{subscription_pattern_channel}})
     ) if exists $self->{pubsub} and not exists $ALLOWED_SUBSCRIPTION_COMMANDS{$cmd[0]};
 
-    my $f = $self->loop->new_future->set_label($self->command_label(@cmd));
+    my $f = $self->loop->new_future->set_label(
+        $self->command_label(@cmd)
+    );
+    $tracer->span_for_future($f) if OPENTRACING_ENABLED;
     $log->tracef("Will have to wait for %d MULTI tx", 0 + @{$self->{pending_multi}}) unless $self->{_is_multi};
     my $code = sub {
         local @{$log->{context}}{qw(redis_remote redis_local)} = ($self->endpoint, $self->local_endpoint);
@@ -792,6 +815,7 @@ sub protocol {
 
 sub host { shift->{host} }
 sub port { shift->{port} }
+sub database { shift->{database} }
 sub uri { shift->{uri} //= URI->new('redis://localhost') }
 
 =head2 stream_read_len
@@ -826,6 +850,7 @@ sub configure {
         host
         port
         auth
+        database
         pipeline_depth
         stream_read_len
         stream_write_len

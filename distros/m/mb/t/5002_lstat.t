@@ -10,22 +10,15 @@ mb::set_script_encoding('sjis');
 use vars qw(@test);
 
 use vars qw($MSWin32_MBCS);
+# always "0" because qx{chcp} cannot return right value on CPAN TEST
 $MSWin32_MBCS = 0; # ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
-
-BEGIN {
-    $SIG{__WARN__} = sub {
-        local($_) = @_;
-        /\Alstat\(\) on unopened filehandle _ at / ? return :
-        warn $_[0];
-    };
-}
 
 @test = (
 # 1
-    sub { mb::eval(q{ mkdir "5002.777.A", 0777;                         }) },
-    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ mkdir "5002.777.ソ",0777;                         }) },
-    sub { mb::eval(q{ open FILE,">5002.A";  print FILE "A"; close FILE; }) },
-    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ open FILE,">5002.ソ"; print FILE "A"; close FILE; }) },
+    sub { mb::eval(q{ open FILE,">5004.A";  print FILE "A"; close FILE; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ open FILE,">5004.ソ"; print FILE "A"; close FILE; }) },
+    sub {1},
+    sub {1},
     sub {1},
     sub {1},
     sub {1},
@@ -33,10 +26,10 @@ BEGIN {
     sub {1},
     sub {1},
 # 11
-    sub { CORE::eval(q{ @_ = lstat "5002.NOTEXTST.A";  scalar(@_) == 0 }) },
-    sub { mb::eval(  q{ @_ = lstat "5002.NOTEXTST.A";  scalar(@_) == 0 }) },
-    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(  q{ @_ = lstat "5002.NOTEXTST.ソ"; scalar(@_) == 0 }) },
-    sub { CORE::eval(q{ -e "5002.NOTEXTST.A";  @_ = eval q{ lstat _ }; scalar(@_) == 0 }) },
+    sub { CORE::eval(q{ @_ = lstat "5004.NOTEXTST.A"; scalar(@_) == 0 }) },
+    sub { mb::eval(  q{ @_ = lstat "5004.NOTEXTST.A"; scalar(@_) == 0 }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ @_ = lstat "5004.NOTEXTST.ソ"; scalar(@_) == 0 }) },
+    sub {1},
     sub {1},
     sub {1},
     sub {1},
@@ -44,32 +37,32 @@ BEGIN {
     sub {1},
     sub {1},
 # 21
-    sub { CORE::eval(q{ @_ = lstat "5002.777.A";  scalar(@_) == 13 }) },
-    sub { mb::eval(  q{ @_ = lstat "5002.777.A";  scalar(@_) == 13 }) },
-    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(  q{ @_ = lstat "5002.777.ソ"; scalar(@_) == 13 }) },
-    sub { my @a = lstat "8007.777.A"; my @b = mb::_lstat "8007.777.A"; "@a" eq "@b" },
-    sub { return 'SKIP' if $] >= 5.008; CORE::eval(q{ -e "5002.777.A";  @_ = eval q{ lstat _ }; scalar(@_) == 13 }) },
-    sub { return 'SKIP' if $] <  5.008; CORE::eval(q{ -e "5002.777.A";  @_ = eval q{ lstat _ }; scalar(@_) == 0  }) },
+    sub { CORE::eval(q{ @_ = lstat "5004.A";  scalar(@_) == 13 }) },
+    sub { mb::eval(  q{ @_ = lstat "5004.A";  scalar(@_) == 13 }) },
+    sub { my @a = lstat "5004.A"; my @b = mb::_lstat "5004.A"; "@a" eq "@b" },
+    sub {1},
+    sub {1},
+    sub {1},
     sub {1},
     sub {1},
     sub {1},
     sub {1},
 # 31
-    sub { CORE::eval(q{ @_ = lstat "5002.A";  scalar(@_) == 13 }) },
-    sub { mb::eval(  q{ @_ = lstat "5002.A";  scalar(@_) == 13 }) },
-    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(  q{ @_ = lstat "5002.ソ"; scalar(@_) == 13 }) },
-    sub { my @a = lstat "8007.A"; my @b = mb::_lstat "8007.A"; "@a" eq "@b" },
-    sub { return 'SKIP' if $] >= 5.008; CORE::eval(q{ -e "5002.A";  @_ = eval q{ lstat _ }; scalar(@_) == 13 }) },
-    sub { return 'SKIP' if $] <  5.008; CORE::eval(q{ -e "5002.A";  @_ = eval q{ lstat _ }; scalar(@_) == 0  }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ @_ = lstat "5004.ソ"; scalar(@_) == 13 }) },
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
     sub {1},
     sub {1},
     sub {1},
     sub {1},
 # 41
-    sub { mb::eval(q{ rmdir "5002.777.A";  }) },
-    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ rmdir "5002.777.ソ"; }) },
-    sub { mb::eval(q{ unlink "5002.A";     }) },
-    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ unlink "5002.ソ";    }) },
+    sub { mb::eval(q{ unlink "5004.A"; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ unlink "5004.ソ"; }) },
+    sub {1},
+    sub {1},
     sub {1},
     sub {1},
     sub {1},

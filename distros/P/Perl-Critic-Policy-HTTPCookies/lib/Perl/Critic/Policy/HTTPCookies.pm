@@ -1,5 +1,5 @@
 package Perl::Critic::Policy::HTTPCookies;
-$Perl::Critic::Policy::HTTPCookies::VERSION = '0.53';
+$Perl::Critic::Policy::HTTPCookies::VERSION = '0.54';
 use strict;
 use warnings;
 
@@ -50,7 +50,7 @@ sub _cookie_jar_violation {
 
     foreach my $token ($expression->schildren) {
         # TODO: Check the token's type, not just its content
-        if ($token =~ /cookie_jar/) {
+        if ($token =~ /\bcookie_jar\b/) {
             my $possible_operator = $token->snext_sibling;
             if (
                 blessed $possible_operator
@@ -108,7 +108,7 @@ Perl::Critic::Policy::HTTPCookies - Avoid using HTTP::Cookies
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 DESCRIPTION
 
@@ -116,8 +116,8 @@ This module provides L<< Perl::Critic >> policies to detect the use of
 L<< HTTP::Cookies >>.
 
 HTTP::Cookies takes a very lenient approach to setting cookies that does
-not work well with today's Internet:
-L<< https://github.com/libwww-perl/http-cookies/pull/7 >>
+not work well with today's Internet, described in
+L<< HTTP::Cookies/LIMITATIONS >>.
 
 Consider using L<< HTTP::CookieJar >> or L<< HTTP::CookieJar::LWP >>
 instead.
