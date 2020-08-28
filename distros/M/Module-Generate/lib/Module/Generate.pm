@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -374,6 +374,7 @@ sub _stringify_struct {
 		return '(' . (join ", ", map {  _stringify_struct($MACROS, $_) } @struct) . ')';
 	}
 	$struct[0] = ref $struct[0] ? Dumper $struct[0] : $struct[0];
+	return unless defined $struct[0];
 	$struct[0] =~ s/\$VAR1 = //;
 	$struct[0] =~ s/\s*\n*\s*package Module\:\:Generate\;|use warnings\;|use strict\;//g;
 	$struct[0] =~ s/{\s*\n*/{/;
@@ -658,7 +659,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 

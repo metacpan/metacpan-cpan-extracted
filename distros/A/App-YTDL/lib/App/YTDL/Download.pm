@@ -90,19 +90,7 @@ sub download {
     if ( ! defined $chosen || ! keys %$chosen ) {
         return;
     }
-    my $qty;
-    if ( $opt->{quality} =~ /^\s*(\d+) or less$/ ) {
-        my $tmp = '<=';
-        $tmp .= '?' if $opt->{no_height_ok};
-        $tmp .= $1;
-        $qty = "bestvideo[height$tmp]+bestaudio/best[height$tmp]";
-    }
-    elsif ( $opt->{quality} eq 'best' ) {
-        $qty = 'bestvideo+bestaudio/best';
-    }
-    else {
-        $qty = $opt->{quality};
-    }
+    my $qty = $opt->{quality};
     my $total_chosen_videos = 0;
     for my $ex ( keys %$data ) {
         for my $up ( keys %{$data->{$ex}} ) {
@@ -188,6 +176,17 @@ sub download {
                     }
                     else {
                         @fmt_data = ( $qty );
+                    }
+                    for my $el ( @fmt_data ) {
+                        if ( $el =~ /^\s*(\d+) or less\z/ ) {
+                            my $tmp = '<=';
+                            $tmp .= '?' if $opt->{no_height_ok};
+                            $tmp .= $1;
+                            $el = "bestvideo[height$tmp]+bestaudio/best[height$tmp]";
+                        }
+                        elsif ( $el eq 'best' ) {
+                            $el = 'bestvideo+bestaudio/best';
+                        }
                     }
                     $fmt_str = join '', @fmt_data;
                     push @cmd, '-f', $fmt_str;

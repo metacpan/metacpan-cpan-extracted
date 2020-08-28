@@ -1,9 +1,9 @@
 package App::ZodiacUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-31'; # DATE
+our $DATE = '2020-08-28'; # DATE
 our $DIST = 'App-ZodiacUtils'; # DIST
-our $VERSION = '0.113'; # VERSION
+our $VERSION = '0.114'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,6 +49,9 @@ _
             args => {dates=>['2015-12-17','2015-12-29']},
             result => [["2015-12-17","sagittarius"], ["2015-12-29","capricornus"]],
         }
+    ],
+    links => [
+        {url=>'prog:chinese-zodiac-of'},
     ],
 };
 sub zodiac_of {
@@ -100,7 +103,9 @@ $SPEC{chinese_zodiac_of} = {
             test => 0,
         }
     ],
-
+    links => [
+        {url=>'prog:zodiac-of'},
+    ],
 };
 sub chinese_zodiac_of {
     require Zodiac::Chinese::Table;
@@ -141,7 +146,7 @@ App::ZodiacUtils - CLI utilities related to zodiac
 
 =head1 VERSION
 
-This document describes version 0.113 of App::ZodiacUtils (from Perl distribution App-ZodiacUtils), released on 2020-01-31.
+This document describes version 0.114 of App::ZodiacUtils (from Perl distribution App-ZodiacUtils), released on 2020-08-28.
 
 =head1 DESCRIPTION
 

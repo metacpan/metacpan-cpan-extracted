@@ -1,0 +1,81 @@
+{
+   "abstract" : "Role for Mojo::UserAgent that provides resuming capability during downloads",
+   "author" : [
+      "KARJALA Corp <karjala@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-UserAgent-Role-Resume",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "0",
+            "Mojolicious" : "0",
+            "Role::Tiny" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::Transaction::HTTP::Role::Resume" : {
+         "file" : "lib/Mojo/Transaction/HTTP/Role/Resume.pm"
+      },
+      "Mojo::UserAgent::Role::Resume" : {
+         "file" : "lib/Mojo/UserAgent/Role/Resume.pm",
+         "version" : "v0.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/karjala/mojo-useragent-role-resume-for-perl/issues"
+      },
+      "homepage" : "https://gitlab.com/karjala/mojo-useragent-role-resume-for-perl",
+      "repository" : {
+         "url" : "git://gitlab.com/karjala/mojo-useragent-role-resume-for-perl.git",
+         "web" : "https://gitlab.com/karjala/mojo-useragent-role-resume-for-perl"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_authority" : "cpan:KARJALA",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

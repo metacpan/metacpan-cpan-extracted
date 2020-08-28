@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "Perinci::CmdLine::Inline" : "0.545",
+            "Perinci::CmdLine::Inline" : "0.550",
             "Pod::Coverage::TrustPod" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-App-ZodiacUtils"
       }
    },
-   "version" : "0.113",
+   "version" : "0.114",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -75,13 +75,13 @@
       "plugins" : [
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript::zodiac_of",
-            "version" : "0.421"
+            "name" : "GenPericmdScript zodiac-of",
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript::chinese_zodiac_of",
-            "version" : "0.421"
+            "name" : "GenPericmdScript chinese-zodiac-of",
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::InsertExecsList",
@@ -170,11 +170,6 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
-            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.012"
@@ -182,7 +177,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.599"
+            "version" : "0.600"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -238,7 +233,7 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
@@ -407,7 +402,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.07"
+                        "version" : "0.082"
                      }
                   ]
                }
@@ -438,7 +433,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
             "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
-            "version" : "0.250"
+            "version" : "0.251"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",
@@ -473,12 +468,14 @@
             "config" : {
                "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
                   "finder" : [
-                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                     ":ExecFiles",
+                     ":InstallModules",
+                     ":TestFiles"
                   ]
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.003"
+            "version" : "3.001.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
@@ -520,17 +517,6 @@
             "class" : "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple",
             "name" : "@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple",
             "version" : "0.04"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Prereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "test",
-                  "type" : "requires"
-               }
-            },
-            "name" : "TestRequires",
-            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",

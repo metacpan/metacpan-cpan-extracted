@@ -1,3 +1,9 @@
+0.011   2020-04-29  Released-By: PERLANCAR; Urgency: low
+
+        - [build] Rebuild with updated App::CSelUtils to remove dependency to
+          the deprecated Perinci::Sub::ArgEntity::*.
+
+
 0.010   2020-04-27  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

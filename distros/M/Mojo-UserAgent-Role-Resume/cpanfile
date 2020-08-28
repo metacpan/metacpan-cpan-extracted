@@ -1,0 +1,11 @@
+# TODO: Find and fill-in the right versions for these modules
+
+requires 'perl', '5.010';
+requires 'Mojolicious';
+requires 'Role::Tiny';
+requires 'Class::Method::Modifiers';
+
+on 'test' => sub {
+    requires 'Test::More', '0.98';
+};
+

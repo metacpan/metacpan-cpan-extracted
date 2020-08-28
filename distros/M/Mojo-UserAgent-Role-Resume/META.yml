@@ -1,0 +1,44 @@
+---
+abstract: 'Role for Mojo::UserAgent that provides resuming capability during downloads'
+author:
+  - 'KARJALA Corp <karjala@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-UserAgent-Role-Resume
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojo::Transaction::HTTP::Role::Resume:
+    file: lib/Mojo/Transaction/HTTP/Role/Resume.pm
+  Mojo::UserAgent::Role::Resume:
+    file: lib/Mojo/UserAgent/Role/Resume.pm
+    version: v0.0.3
+requires:
+  Class::Method::Modifiers: '0'
+  Mojolicious: '0'
+  Role::Tiny: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://gitlab.com/karjala/mojo-useragent-role-resume-for-perl/issues
+  homepage: https://gitlab.com/karjala/mojo-useragent-role-resume-for-perl
+  repository: git://gitlab.com/karjala/mojo-useragent-role-resume-for-perl.git
+version: v0.0.3
+x_authority: cpan:KARJALA
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,3 +1,10 @@
+0.114   2020-08-28  Released-By: PERLANCAR; Urgency: low
+
+	- [ux] Simplify CLIs: don't read from config/env.
+
+	- [doc][ux] Cross-mention between zodiac-of and chinese-zodiac-of.
+
+
 0.113   2020-01-31  Released-By: PERLANCAR; Urgency: medium
 
 	- Avoid the use of From_str::alami date coercion for now as

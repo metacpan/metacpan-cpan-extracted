@@ -23,9 +23,11 @@ my %WriteMakefileArgs = (
     "App::CSelUtils" => "0.084",
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
+    "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
+    "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
     "Org::Parser" => "0.53",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::Sub::ArgEntity::filename" => 0,
+    "Sah::Schema::filename" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -35,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,12 +48,14 @@ my %FallbackPrereqs = (
   "App::CSelUtils" => "0.084",
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
+  "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
+  "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Org::Parser" => "0.53",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::Sub::ArgEntity::filename" => 0,
+  "Sah::Schema::filename" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

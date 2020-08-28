@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-04-27'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +30,7 @@ orgsel - Select Org document elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.010 of orgsel (from Perl distribution App-orgsel), released on 2020-04-27.
+This document describes version 0.011 of orgsel (from Perl distribution App-orgsel), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ Can be specified multiple times.
 
 =item B<--expr>=I<s>
 
-=item B<--file>=I<filename>
+=item B<--file>=I<s>
 
 Default value:
 

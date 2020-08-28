@@ -5,7 +5,7 @@ package Mail::Pyzor::Client;
 # http://cpanel.net
 #
 # This is free software; you can redistribute it and/or modify it under the
-# same terms as Perl itself. See L<perlartistic>.
+# Apache 2.0 license.
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ Mail::Pyzor::Client - Pyzor client logic
 
     my $client = Mail::Pyzor::Client->new();
 
-    my $digest = Cpanel::Pyzor::Digest::get( $msg );
+    my $digest = Mail::Pyzor::Digest::get( $msg );
 
     my $check_ref = $client->check($digest);
     die $check_ref->{'Diag'} if $check_ref->{'Code'} ne '200';
@@ -124,7 +124,7 @@ from the pyzor server (defeault is 3.5)
 
 =over 3
 
-Returns a L<Cpanel::Pyzor::Client> object.
+Returns a L<Mail::Pyzor::Client> object.
 
 =back
 

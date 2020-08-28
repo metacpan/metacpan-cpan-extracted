@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 
-# Copyright (c) 2018 cPanel, LLC.
+# Copyright 2018 cPanel, LLC.
 # All rights reserved.
 # http://cpanel.net
 #
 # This is free software; you can redistribute it and/or modify it under the
-# same terms as Perl itself. See L<perlartistic>.
+# Apache 2.0 license.
 
 use strict;
 use warnings;

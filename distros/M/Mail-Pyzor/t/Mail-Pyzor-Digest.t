@@ -1,12 +1,12 @@
 #!/usr/local/cpanel/3rdparty/bin/perl -w
 
 # Copyright 2018 cPanel, LLC.
-# # All rights reserved.
-# # http://cpanel.net
-# #
-# # This is free software; you can redistribute it and/or modify it under the
-# # same terms as Perl itself. See L<perlartistic>.
+# All rights reserved.
+# http://cpanel.net
 #
+# This is free software; you can redistribute it and/or modify it under the
+# Apache 2.0 license.
+
 package t::Mail::Pyzor::Digest;
 
 use strict;

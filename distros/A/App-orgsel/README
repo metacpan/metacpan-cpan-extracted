@@ -3,8 +3,8 @@ NAME
     (CSS-selector-like) syntax
 
 VERSION
-    This document describes version 0.010 of App::orgsel (from Perl
-    distribution App-orgsel), released on 2020-04-27.
+    This document describes version 0.011 of App::orgsel (from Perl
+    distribution App-orgsel), released on 2020-04-29.
 
 SYNOPSIS
 FUNCTIONS
@@ -21,7 +21,7 @@ FUNCTIONS
 
     *   expr => *str*
 
-    *   file => *str* (default: "-")
+    *   file => *filename* (default: "-")
 
     *   node_actions => *array[str]* (default: ["print_as_string"])
 

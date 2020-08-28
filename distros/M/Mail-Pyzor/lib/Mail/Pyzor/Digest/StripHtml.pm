@@ -5,7 +5,7 @@ package Mail::Pyzor::Digest::StripHtml;
 # http://cpanel.net
 #
 # This is free software; you can redistribute it and/or modify it under the
-# same terms as Perl itself. See L<perlartistic>.
+# Apache 2.0 license.
 
 use strict;
 use warnings;

@@ -1,0 +1,7 @@
+name = "Mojo-UserAgent-Role-Resume"
+# badges = ["travis-ci.com"]
+authority="cpan:KARJALA"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

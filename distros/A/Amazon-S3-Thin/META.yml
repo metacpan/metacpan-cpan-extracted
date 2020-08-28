@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Amazon::S3::Thin:
     file: lib/Amazon/S3/Thin.pm
-    version: '0.29'
+    version: '0.30'
   Amazon::S3::Thin::Credentials:
     file: lib/Amazon/S3/Thin/Credentials.pm
   Amazon::S3::Thin::Resource:
@@ -52,11 +52,12 @@ resources:
   bugtracker: https://github.com/DQNEO/Amazon-S3-Thin/issues
   homepage: https://github.com/DQNEO/Amazon-S3-Thin
   repository: git://github.com/DQNEO/Amazon-S3-Thin.git
-version: '0.29'
+version: '0.30'
 x_contributors:
   - 'Bob Showalter <showaltb@gmail.com>'
   - 'Bob Stockdale <bstockdale@zappos.com>'
   - 'Breno G. de Oliveira <garu@cpan.org>'
+  - 'Cameron Daniel <cam.daniel@gmail.com>'
   - 'DQNEO <dqneoo@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Takumi Akiyama <t.akiym@gmail.com>'

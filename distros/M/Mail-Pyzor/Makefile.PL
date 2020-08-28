@@ -20,7 +20,7 @@ WriteMakefile1(
     VERSION_FROM  => 'lib/Mail/Pyzor.pm',      # finds \$VERSION
     AUTHOR        => 'cPanel, LLC (CPANEL)',
     ABSTRACT_FROM => 'lib/Mail/Pyzor.pm',
-    LICENSE       => 'perl',
+    LICENSE       => 'Apache 2.0',
 
     # For now we use 5.14’s /a modifier.
     MIN_PERL_VERSION => 5.014000,

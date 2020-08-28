@@ -3,7 +3,7 @@ package Hades;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 use Module::Generate;
 use Switch::Again qw/switch/;
 
@@ -404,9 +404,9 @@ sub build_coerce {
 
 sub build_trigger {
 	my ($self, $name, $param, $code) = @_;
-	return defined $code 
-		? $code =~ m/^1$/ 
-			? qq|\$self->_trigger_$name| 
+	return defined $code
+		? $code =~ m/^1$/
+			? qq|\$self->_trigger_$name|
 			: $code =~ m/^\w+$/
 				? qq|\$self->$code($param);|
 				: $code
@@ -820,7 +820,7 @@ sub build_test_data {
 					};
 					while ($lame->($match .=  ', ' . shift @matches)) {}
 				}
-				push @tuple, [ 
+				push @tuple, [
 					$self->build_test_data($match, $name, $required), ($_ =~ m/^Optional/ ? () : 'undef')
 				];
 			}
@@ -966,7 +966,7 @@ sub build_tests {
 	} : $meta->{meta} eq 'ACCESSOR' ? do {
 		push @tests, ['can_ok', qq|\$obj|, qq|'$name'|];
 		$meta->{private} ? do {
-			push @tests, ['eval', qq|\$obj->$name|, 'private method'];
+			push @tests, ['eval', qq|\$obj->$name|, 'private method|private attribute'];
 		} : do {
 			push @tests, ['is', qq|\$obj->$name|, 'undef'] if !$meta->{required} && !$meta->{default};
 			my (@test_cases) = $self->build_test_data($meta->{type}->[0] || 'Any', $name);
@@ -1032,7 +1032,7 @@ Hades - Less is more, more is less!
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -1050,7 +1050,7 @@ Version 0.11
 	use strict;
 	use warnings;
 	our $VERSION = 0.01;
-	
+
 	sub new {
 		my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
 		my $self = bless {}, $cls;
@@ -1070,7 +1070,7 @@ Version 0.11
 		}
 		return $self;
 	}
-	
+
 	sub penthos {
 		my ( $self, $value ) = @_;
 		my $private_caller = caller();
@@ -1085,18 +1085,18 @@ Version 0.11
 		}
 		return $self->{penthos};
 	}
-	
+
 	sub clear_penthos {
 		my ($self) = @_;
 		delete $self->{penthos};
 		return $self;
 	}
-	
+
 	sub has_penthos {
 		my ($self) = @_;
 		return exists $self->{penthos};
 	}
-	
+
 	sub curae {
 		my ( $self, $value ) = @_;
 		my $private_caller = caller();
@@ -1111,18 +1111,18 @@ Version 0.11
 		}
 		return $self->{curae};
 	}
-	
+
 	sub clear_curae {
 		my ($self) = @_;
 		delete $self->{curae};
 		return $self;
 	}
-	
+
 	sub has_curae {
 		my ($self) = @_;
 		return exists $self->{curae};
 	}
-	
+
 	sub geras {
 		my ( $self, $nosoi ) = @_;
 		$nosoi = defined $nosoi ? $nosoi : 5;
@@ -1133,9 +1133,9 @@ Version 0.11
 		}
 		if ( $self->penthos == $nosoi ) { return $self->curae; }
 	}
-	
+
 	1;
-	
+
 	__END__
 
 =head1 SUBROUTINES/METHODS
@@ -1328,7 +1328,7 @@ Declare an accessor for the class
 
 	Kosmos {
 		dokimi
-		dokimes	
+		dokimes
 	}
 
 =cut

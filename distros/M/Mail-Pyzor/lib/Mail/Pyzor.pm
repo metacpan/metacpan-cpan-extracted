@@ -5,12 +5,12 @@ package Mail::Pyzor;
 # http://cpanel.net
 #
 # This is free software; you can redistribute it and/or modify it under the
-# same terms as Perl itself. See L<perlartistic>.
+# Apache 2.0 license.
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 =encoding utf-8
 
@@ -35,11 +35,6 @@ the distribution includes:
 =item * L<Mail::Pyzor::Digest>
 
 =back
-
-=head1 STABILITY
-
-This module’s API is EXPERIMENTAL. Please check the changelog
-before updating to a new release.
 
 =cut
 

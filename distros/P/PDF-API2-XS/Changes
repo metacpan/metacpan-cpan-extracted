@@ -1,0 +1,4 @@
+1.000     2020-08-20
+
+    - Offload expensive PNG processing from PDF::API2 to an optional XS module
+      (written by Rob Scovell, sponsored by prayerletters.com).

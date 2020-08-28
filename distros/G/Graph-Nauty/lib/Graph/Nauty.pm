@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
     orbits_are_same
 );
 
-our $VERSION = '0.3.0'; # VERSION
+our $VERSION = '0.3.1'; # VERSION
 
 require XSLoader;
 XSLoader::load('Graph::Nauty', $VERSION);
@@ -132,12 +132,23 @@ sub orbits
 sub are_isomorphic
 {
     my( $graph1, $graph2, $color_sub ) = @_;
+    return 0 if !$graph1->could_be_isomorphic( $graph2 );
 
     my @nauty_graph1 = _nauty_graph( $graph1, $color_sub );
     my @nauty_graph2 = _nauty_graph( $graph2, $color_sub );
 
+    return 0 if $nauty_graph1[0]->{nv} != $nauty_graph2[0]->{nv};
+
     my $statsblk1 = sparsenauty( @nauty_graph1, { getcanon => 1 } );
     my $statsblk2 = sparsenauty( @nauty_graph2, { getcanon => 1 } );
+
+    for my $i (0..$nauty_graph1[0]->{nv}-1) {
+        my $j = $statsblk1->{lab}[$i];
+        my $k = $statsblk2->{lab}[$i];
+        return 0 if _cmp( $nauty_graph1[0]->{original}[$j],
+                          $nauty_graph2[0]->{original}[$k],
+                          $color_sub ) != 0;
+    }
 
     return aresame_sg( $statsblk1->{canon}, $statsblk2->{canon} );
 }
