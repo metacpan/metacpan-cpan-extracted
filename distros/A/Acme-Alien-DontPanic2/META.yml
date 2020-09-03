@@ -6,7 +6,12 @@ author:
 build_requires:
   Alien::Build: '2.29'
   Alien::Build::MB: '0.07'
+  File::Temp: '0'
+  Inline: '0.56'
+  Inline::C: '0'
+  Inline::CPP: '0'
   Module::Build: '0.28'
+  Path::Tiny: '0'
   Test2::V0: '0.000060'
   Test::Alien: '0.05'
   perl: '5.006'
@@ -30,7 +35,7 @@ resources:
   bugtracker: https://github.com/PerlAlien/Acme-Alien-DontPanic2/issues
   homepage: https://metacpan.org/pod/Acme::Alien::DontPanic2
   repository: git://github.com/PerlAlien/Acme-Alien-DontPanic2.git
-version: '2.2900'
+version: '2.2901'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
   requires:

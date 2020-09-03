@@ -1,5 +1,8 @@
 Revision history for Email::Mailer
 
+1.11      2020-09-01 10:55:39-07:00 America/Los_Angeles
+        - Fix POD bug containing improper construction
+
 1.10      2020-07-09 07:54:45-07:00 America/Los_Angeles
         - Update test regex files patterns
         - Update Travis YAML

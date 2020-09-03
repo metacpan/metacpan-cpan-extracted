@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.23';
+our $VERSION = '0.26';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -252,6 +252,12 @@ sub example {
 	return $self;
 }
 
+sub class_tests {
+	my ($self, @tests) = @_;
+	push @{$CLASS{CURRENT}{CLASS_TESTS}}, @tests;
+	return $self;
+}
+
 sub test {
 	my ($self, @tests) = @_;
 	push @{$CLASS{CURRENT}{SUBS}{CURRENT}{TEST}}, @tests;
@@ -338,7 +344,14 @@ sub _make_path {
 
 sub _build_use {
 	my @codes;
-	push @codes, map { "use $_;" } @{$_[0]->{USE}} if $_[0]->{USE};
+	if ($_[0]->{USE}) {
+		my @use = @{$_[0]->{USE}};
+		while (@use) {
+			my $mod = shift @use;
+			$mod .= ' ' . shift @use if ($use[0] && $use[0] =~ s/^\[(.*)\]$/$1/sg);
+			push @codes, "use $mod;";
+		}
+	}
 	push @codes, sprintf("use base qw/%s/;", join " ", @{$_[0]->{BASE}}) if $_[0]->{BASE};
 	push @codes, sprintf("use base qw/%s/;", join " ", @{$_[0]->{PARENT}}) if $_[0]->{PARENT};
 	push @codes, map { "use $_;" } @{$_[0]->{REQUIRE}} if $_[0]->{REQUIRE};
@@ -359,8 +372,9 @@ sub _build_phase {
 		if ($phases->{$_}) {
 			my $code = ref $phases->{$_} ? Dumper $phases->{$_} : $phases->{$_};
 			$code =~ s/\$VAR1 = //;
-			$code =~ s/sub\s*//;
-			$code =~ s/};$/}/;
+			$code =~ s/^\s*sub\s*//;
+			$code =~ s/\s*\n*\s*package Module\:\:Generate\;|use warnings\;|use strict\;//g;
+			$code =~ s/};$/}/;	
 			$code = sprintf "%s %s;", 'BEGIN', $code;
 			push @codes, $code;
 		}
@@ -481,7 +495,7 @@ sub _build_pod {
 		subs => join("\n\n", @subs),
 		synopsis => ($definition->{SYNOPSIS}
 			? $definition->{SYNOPSIS}
-			: sprintf("\n\tuse %s;\n\n\tmy \$foo = %s->new();\n\n\t...", $class, $class)
+			: sprintf("Quick summary of what the module does.\n\tuse %s;\n\n\tmy \$foo = %s->new();\n\n\t...", $class, $class)
 		),
 		author => $CLASS{AUTHOR} || "AUTHOR",
 		email => $CLASS{EMAIL} || "EMAIL"
@@ -522,6 +536,16 @@ sub _build_tests {
 	my ($class, $obj_ok) = @_;
 	my $tests = sprintf("our (\$sub, \$globref); BEGIN { use_ok('%s'); \$sub = sub {}; \$globref = \\*globref; }", $class->{NAME});
 
+	if ($class->{CLASS_TESTS}) {
+		my $c = 1;
+		for my $subset (@{$class->{CLASS_TESTS}}) {
+			$tests .= sprintf "subtest 'class_tests$c' => sub { plan tests => %s; %s };",
+				scalar @{$subset},
+				join( '', map{ _build_test($_) } @{ $subset });
+			$c++;
+		}
+	}
+
 	if ($class->{SUBS}->{new}->{TEST}) {
 		$tests .= sprintf "subtest 'new' => sub { plan tests => %s; %s };",
 			scalar @{$class->{SUBS}->{new}->{TEST}},
@@ -529,7 +553,9 @@ sub _build_tests {
 		$obj_ok = $class->{SUBS}->{new}->{TEST}->[0];
 	}
 
-	for my $sub (sort { ($class->{SUBS}->{$b}->{ACCESSOR} || 0) <=> ($class->{SUBS}->{$a}->{ACCESSOR} || 0) }  keys %{$class->{SUBS}}) {
+	for my $sub (sort {
+		($class->{SUBS}{$a}{INDEX} || 0) <=> ($class->{SUBS}{$b}{INDEX} ||0)
+	}  keys %{$class->{SUBS}}) {
 		next if $sub eq 'new';
 		unshift @{$class->{SUBS}->{$sub}->{TEST}}, $obj_ok if $obj_ok;
 		$tests .= sprintf "subtest '%s' => sub { plan tests => %s; %s };",
@@ -596,7 +622,6 @@ Version {{version}}
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
 {{synopsis}}
 
 {{subs}}
@@ -659,7 +684,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.23
+Version 0.26
 
 =cut
 
@@ -1050,6 +1075,33 @@ Implement a keyword that can be used accross classes.
 				['ok', q|$obj->test('abc')|],
 				['is', q|$obj->test|, q|'abc'|]
 			);
+
+=head2 class_tests
+
+Define additional subtests for a class.
+
+	$mg->class_tests([
+		['ok', q|my $obj = do { eval q{
+			package FooBar;
+			use Moo;
+			with 'Keyword::Role';
+			1;
+		}; 1; } && FooBar->new| ],
+		['is', q|$obj->test|, q|undef|],
+		['ok', q|$obj->test('abc')|],
+		['is', q|$obj->test|, q|'abc'|]
+	], [
+		['ok', q|my $obj = do { eval q{
+			package BarFoo;
+			use Moo;
+			with 'Keyword::Role';
+			1;
+		}; 1; } && BarFoo->new| ],
+		['is', q|$obj->test|, q|undef|],
+		['ok', q|$obj->test('abc')|],
+		['is', q|$obj->test|, q|'abc'|]
+	]);
+
 
 =head2 generate
 

@@ -667,7 +667,7 @@ XS(XS_WIN32__ODBC_Connect) // ODBC_Connect(Connection string: input) returns con
             if (items > 1){
                 int iTemp = items -1;
                 UWORD   uType;
-                UDWORD  udValue;
+                ULONG_PTR udValue;
                 char    szError[100];
 
                 while (iTemp > 1){
@@ -675,7 +675,7 @@ XS(XS_WIN32__ODBC_Connect) // ODBC_Connect(Connection string: input) returns con
                     if (SvIOKp(ST(iTemp)) || SvNOKp(ST(iTemp))){
                         udValue = SvIV(ST(iTemp));
                     }else{
-                        udValue = (UDWORD) SvPV(ST(iTemp), n_a);
+                        udValue = (ULONG_PTR) SvPV(ST(iTemp), n_a);
                     }
                     retcode = SQLSetConnectOption(h->hdbc->hdbc, uType, udValue);
                     if (retcode != SQL_SUCCESS){
@@ -1453,7 +1453,7 @@ XS(XS_WIN32__ODBC_SetConnectOption)
     dXSARGS;
     ODBC_TYPE * h;
     UWORD   uType;
-    UDWORD  udValue;
+    ULONG_PTR  udValue;
     RETCODE rResult = 0;
     STRLEN  n_a;
 
@@ -1467,7 +1467,7 @@ XS(XS_WIN32__ODBC_SetConnectOption)
     if (SvIOKp(ST(2)) || SvNOKp(ST(2))){
         udValue = SvIV(ST(2));
     }else{
-        udValue = (UDWORD) SvPV(ST(2), n_a);
+        udValue = (ULONG_PTR) SvPV(ST(2), n_a);
     }
     PUSHMARK(sp);
 
@@ -1553,7 +1553,7 @@ XS(XS_WIN32__ODBC_StmtOption)
     UCHAR   ucValue[SQL_MAX_OPTION_STRING_LENGTH + 1];
     DWORD   *dValue = (DWORD *)ucValue;
     UWORD   uOption;
-    UDWORD  udValue;
+    ULONG_PTR  udValue;
     RETCODE rResult = 0;
     STRLEN  n_a;
 
@@ -1568,7 +1568,7 @@ XS(XS_WIN32__ODBC_StmtOption)
         if (SvIOKp(ST(2)) || SvNOKp(ST(2))){
             udValue = SvIV(ST(2));
         }else{
-            udValue = (UDWORD) SvPV(ST(2), n_a);
+            udValue = (ULONG_PTR) SvPV(ST(2), n_a);
         }
     }
 

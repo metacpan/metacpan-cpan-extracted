@@ -1,22 +1,24 @@
+use strict;
+use warnings;
+
+use HTML::Parser ();
 use Test::More tests => 2;
 
-use HTML::Parser;
 my $res = "";
 
-sub decl
-{
+sub decl {
     my $t = shift;
     $res .= "[" . join("\n", map "<$_>", @$t) . "]";
 }
 
-sub text
-{
+sub text {
     $res .= shift;
 }
 
-my $p = HTML::Parser->new(declaration_h => [\&decl, "tokens"],
-			  default_h     => [\&text, "text"],
-	                 );
+my $p = HTML::Parser->new(
+    declaration_h => [\&decl, "tokens"],
+    default_h     => [\&text, "text"],
+);
 
 $p->parse(<<EOT)->eof;
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" --<comment>--
@@ -59,4 +61,3 @@ is($res, <<EOT);
 <"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <[]>]
 EOT
-

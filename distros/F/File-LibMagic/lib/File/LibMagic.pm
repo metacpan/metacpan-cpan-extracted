@@ -12,7 +12,7 @@ use List::Util qw( max );
 use Scalar::Util qw( reftype );
 use XSLoader;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -119,7 +119,7 @@ sub _constructor_params {
     my $class = shift;
 
     if ( @_ == 1 ) {
-        return ( $_[0], undef, () );
+        return ( $_[0], MAGIC_NONE(), () );
     }
 
     my %p = @_;
@@ -286,7 +286,7 @@ File::LibMagic - Determine MIME types of data or files using libmagic
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 SYNOPSIS
 

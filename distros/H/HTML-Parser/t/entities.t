@@ -1,68 +1,80 @@
-use HTML::Entities qw(decode_entities encode_entities encode_entities_numeric);
+use strict;
+use warnings;
+use utf8;
 
+use HTML::Entities qw(decode_entities encode_entities encode_entities_numeric);
 use Test::More tests => 20;
 
-$a = "V&aring;re norske tegn b&oslash;r &#230res";
+my $x = "V&aring;re norske tegn b&oslash;r &#230res";
 
-decode_entities($a);
+decode_entities($x);
 
-is($a, "Våre norske tegn bør æres");
+is($x, "VÃ¥re norske tegn bÃ¸r Ã¦res");
 
-encode_entities($a);
+encode_entities($x);
 
-is($a, "V&aring;re norske tegn b&oslash;r &aelig;res");
+is($x, "V&aring;re norske tegn b&oslash;r &aelig;res");
 
-decode_entities($a);
-encode_entities_numeric($a);
+decode_entities($x);
+encode_entities_numeric($x);
 
-is($a, "V&#xE5;re norske tegn b&#xF8;r &#xE6;res");
+is($x, "V&#xE5;re norske tegn b&#xF8;r &#xE6;res");
 
-$a = "<&>\"'";
-is(encode_entities($a), "&lt;&amp;&gt;&quot;&#39;");
-is(encode_entities_numeric($a), "&#x3C;&#x26;&#x3E;&#x22;&#x27;");
+$x = "<&>\"'";
+is(encode_entities($x),         "&lt;&amp;&gt;&quot;&#39;");
+is(encode_entities_numeric($x), "&#x3C;&#x26;&#x3E;&#x22;&#x27;");
 
-$a = "abcdef";
-is(encode_entities($a, 'a-c'), "&#97;&#98;&#99;def");
+$x = "abcdef";
+is(encode_entities($x, 'a-c'), "&#97;&#98;&#99;def");
 
-$a = "[24/7]\\";
-is(encode_entities($a, '/'), "[24&#47;7]\\");
-is(encode_entities($a, '\\/'), "[24&#47;7]\\");
-is(encode_entities($a, '\\'), "[24/7]&#92;");
-is(encode_entities($a, ']\\'), "[24/7&#93;&#92;");
+$x = "[24/7]\\";
+is(encode_entities($x, '/'),   "[24&#47;7]\\");
+is(encode_entities($x, '\\/'), "[24&#47;7]\\");
+is(encode_entities($x, '\\'),  "[24/7]&#92;");
+is(encode_entities($x, ']\\'), "[24/7&#93;&#92;");
 
 # See how well it does against rfc1866...
-$ent = $plain = "";
+my $ent   = '';
+my $plain = '';
 while (<DATA>) {
     next unless /^\s*<!ENTITY\s+(\w+)\s*CDATA\s*\"&\#(\d+)/;
-    $ent .= "&$1;";
+    $ent   .= "&$1;";
     $plain .= chr($2);
 }
 
-$a = $ent;
-decode_entities($a);
-is($a, $plain);
+$x = $ent;
+decode_entities($x);
+is($x, $plain);
 
 # Try decoding when the ";" are left out
-$a = $ent,
-$a =~ s/;//g;
-decode_entities($a);
-is($a, $plain);
+$x = $ent;
+$x =~ s/;//g;
+decode_entities($x);
+is($x, $plain);
 
 
-$a = $plain;
-encode_entities($a);
-is($a, $ent);
+$x = $plain;
+encode_entities($x);
+is($x, $ent);
 
-{   #RT #84144 - https://rt.cpan.org/Public/Bug/Display.html?id=84144
+#RT #84144 - https://rt.cpan.org/Public/Bug/Display.html?id=84144
+{
+    my %hash = ("V&aring;re norske tegn b&oslash;r &#230res" =>
+            "VÃ¥re norske tegn bÃ¸r Ã¦res",);
 
-    my %hash= (
-        "V&aring;re norske tegn b&oslash;r &#230res" => "Våre norske tegn bør æres"
-    );
+    local $@;
+    my $got;
+    my $error;
 
-    my ($got, $eval_ok);
-    $eval_ok= eval { $got= decode_entities((keys %hash)[0]); 1 };
-    is( $eval_ok, 1, "decode_entitites() when processing a key as input");
-    is( $got, (values %hash)[0], "decode_entities() decodes a key properly");
+    #<<<  do not let perltidy touch this
+    $error = $@ || 'Error' unless eval {
+        $got = decode_entities((keys %hash)[0]);
+        1;
+    };
+    #>>>
+
+    ok(!$error, "decode_entitites() when processing a key as input");
+    is($got, (values %hash)[0], "decode_entities() decodes a key properly");
 }
 
 # From: Bill Simpson-Young <bill.simpson-young@cmis.csiro.au>
@@ -71,9 +83,9 @@ is($a, $ent);
 # Date: Fri, 05 Sep 1997 16:56:55 +1000
 # Message-Id: <199709050657.QAA10089@snowy.nsw.cmis.CSIRO.AU>
 #
-# Hi. I've got a problem that has surfaced with the changes to 
-# HTML::Entities.pm for 5.11 (it doesn't happen with 5.08).  It's happening 
-# in the process of encoding then decoding special entities.  Eg, what goes 
+# Hi. I've got a problem that has surfaced with the changes to
+# HTML::Entities.pm for 5.11 (it doesn't happen with 5.08).  It's happening
+# in the process of encoding then decoding special entities.  Eg, what goes
 # in as "abc&def&ghi" comes out as "abc&def;&ghi;".
 
 is(decode_entities("abc&def&ghi&abc;&def;"), "abc&def&ghi&abc;&def;");
@@ -82,8 +94,12 @@ is(decode_entities("abc&def&ghi&abc;&def;"), "abc&def&ghi&abc;&def;");
 is(decode_entities("&apos;"), "'");
 is(encode_entities("'", "'"), "&#39;");
 
-is(decode_entities("Attention Home&#959&#969n&#1257rs...1&#1109t T&#1110&#1084e E&#957&#1257&#1075"),
-  "Attention Home\x{3BF}\x{3C9}n\x{4E9}rs...1\x{455}t T\x{456}\x{43C}e E\x{3BD}\x{4E9}\x{433}");
+is(
+    decode_entities(
+        "Attention Home&#959&#969n&#1257rs...1&#1109t T&#1110&#1084e E&#957&#1257&#1075"
+    ),
+    "Attention Home\x{3BF}\x{3C9}n\x{4E9}rs...1\x{455}t T\x{456}\x{43C}e E\x{3BD}\x{4E9}\x{433}"
+);
 is(decode_entities("{&#38;amp;&#x26;amp;&amp; also &#x42f;&#339;}"),
     "{&amp;&amp;& also \x{42F}\x{153}}");
 

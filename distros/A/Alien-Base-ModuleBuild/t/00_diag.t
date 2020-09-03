@@ -11,6 +11,7 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Acme::Alien::DontPanic
+  Acme::Alien::DontPanic2
   Alien::Base
   Alien::Base::PkgConfig
   Archive::Extract
@@ -20,9 +21,6 @@ $modules{$_} = $_ for qw(
   File::chdir
   HTML::LinkExtor
   HTTP::Tiny
-  Inline
-  Inline::C
-  Inline::CPP
   LWP::UserAgent
   List::Util
   Module::Build
@@ -79,7 +77,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (sort @modules)
 {

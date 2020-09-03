@@ -36,6 +36,15 @@ UA_BrowseRequest_DESTROY(browseRequest)
 	DPRINTF("browseRequest %p", browseRequest);
 	UA_BrowseRequest_delete(browseRequest);
 
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::BuildInfo	PREFIX = UA_BuildInfo_
+
+void
+UA_BuildInfo_DESTROY(buildInfo)
+	OPCUA_Open62541_BuildInfo	buildInfo
+    CODE:
+	DPRINTF("buildInfo %p", buildInfo);
+	UA_BuildInfo_delete(buildInfo);
+
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::Byte	PREFIX = UA_Byte_
 
 void

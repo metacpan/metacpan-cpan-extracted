@@ -89,7 +89,7 @@ for example, would encode I<just> the C<< < >>, C<< & >>, C<< > >>, and C<< "
 
   $encoded = encode_entities($input, '<>&"');
 
-and this would only encode non-plain ascii:
+and this would only encode non-plain ASCII:
 
   $encoded = encode_entities($input, '^\n\x20-\x25\x27-\x7e');
 
@@ -136,7 +136,7 @@ modify it under the same terms as Perl itself.
 =cut
 
 use strict;
-our $VERSION = '3.73';
+our $VERSION = '3.75';
 use vars qw(%entity2char %char2entity);
 
 require 5.004;

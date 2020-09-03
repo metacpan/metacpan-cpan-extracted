@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Requires 'MooseX::Role::Parameterized';
+use Test::More 0.88;
+use Test::Needs 'MooseX::Role::Parameterized';
 
 package Foo;
 use MooseX::Role::Parameterized -traits => 'MooseX::MethodAttributes::Role::Meta::Role';

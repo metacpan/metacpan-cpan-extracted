@@ -30,7 +30,7 @@ sub _timer {
 sub _cancel_timer {
     my ($id_ref) = @_;
 
-    defined $id_ref or return;
+    defined $id_ref and defined $$id_ref or return;
 
     Mojo::IOLoop->remove($$id_ref);
 }

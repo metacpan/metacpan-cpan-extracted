@@ -23,15 +23,14 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Data::Dumper" => 0,
     "Getopt::Long" => 0,
+    "List::Util" => 0,
     "Moo" => 0,
     "OpenAPI::Client" => "0.17",
     "Pod::Usage" => 0,
     "Try::Tiny" => 0,
     "Type::Tiny::Class" => 0,
     "Types::Standard" => 0,
-    "namespace::autoclean" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -43,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Mock::One" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,6 +56,7 @@ my %FallbackPrereqs = (
   "Getopt::Long" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => 0,
   "Moo" => 0,
   "OpenAPI::Client" => "0.17",
   "Pod::Usage" => 0,
@@ -68,9 +68,7 @@ my %FallbackPrereqs = (
   "Try::Tiny" => 0,
   "Type::Tiny::Class" => 0,
   "Types::Standard" => 0,
-  "namespace::autoclean" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "namespace::autoclean" => 0
 );
 
 

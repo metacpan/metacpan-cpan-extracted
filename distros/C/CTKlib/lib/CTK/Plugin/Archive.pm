@@ -10,7 +10,7 @@ CTK::Plugin::Archive - Archive plugin
 
 =head1 VERSION
 
-Version 1.00
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -58,17 +58,19 @@ Default arcdef: targz
 
 =over 8
 
-=item B<-dirin>, B<-in>, B<-input>, B<-dirsrc>, , B<-src>
+=item B<-dirin>, B<-in>, B<-dirsrc>, B<-src>, B<-source>
 
 Specifies source directory
 
 Default: current directory
 
-=item B<-fileout>, B<-outfile>, B<-archive>, B<-filedst>, , B<-dstfile>
+=item B<-file>, B<-fileout>, B<-archive>, B<-target>
 
 Specifies target archive file
 
-=item B<-list>, B<-mask>, B<-glob>, B<-file>, B<-files>, B<-regexp>
+Required parameter
+
+=item B<-list>, B<-mask>, B<-glob>, B<-files>, B<-regexp>
 
     -list => [qw/ file1.txt file2.txt file3.* /]
 
@@ -88,7 +90,7 @@ Regexp
 
 Default: undef (all files)
 
-=item B<-options>, B<-opts>, B<-arcdef>, B<-arcopts>, B<-name>, B<-arcname>
+=item B<-options>, B<-opts>, B<-arcdef>, B<-arcopts>, B<-arcname>
 
 Defines section of archive options or arcname, for example:
 
@@ -123,19 +125,19 @@ Extracting files
 
 =over 8
 
-=item B<-dirin>, B<-in>, B<-input>, B<-dirsrc>, , B<-src>
+=item B<-dirin>, B<-in>, B<-dirsrc>, B<-src>, B<-source>
 
 Specifies source directory
 
 Default: current directory
 
-=item B<-dirout>, B<-out>, B<-output>, B<-dirdst>, , B<-dst>
+=item B<-dirout>, B<-out>, B<-dirdst>, B<-dst>, B<-target>
 
-Specifies desination directory
+Specifies destination directory
 
 Default: current directory
 
-=item B<-list>, B<-mask>, B<-glob>, B<-file>, B<-files>, B<-regexp>
+=item B<-list>, B<-mask>, B<-glob>, B<-files>, B<-regexp>
 
     -list => [qw/ file1.zip file2.zip foo*.zip /]
 
@@ -155,7 +157,7 @@ Regexp
 
 Default: undef (all files)
 
-=item B<-options>, B<-opts>, B<-arcdef>, B<-arcopts>, B<-name>, B<-arcname>
+=item B<-options>, B<-opts>, B<-arcdef>, B<-arcopts>, B<-arcname>
 
 Defines section of archive options or arcname, for example:
 
@@ -237,7 +239,7 @@ Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2020 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -249,7 +251,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 use base qw/CTK::Plugin/;
 
@@ -257,7 +259,7 @@ use CTK::Util qw/ :API :FORMAT :FILE :EXT /;
 use Carp;
 use File::Spec;
 use File::Find;
-use Cwd qw/getcwd/;
+use Cwd qw/getcwd abs_path/;
 
 use constant {
     ARC_DEFAULT => "targz",
@@ -321,22 +323,29 @@ __PACKAGE__->register_method(
     method    => "fcompress",
     callback  => sub {
     my $self = shift;
-    my ($dirin, $fileout, $listmsk, $arcdef) =
-            read_attributes([
-                ['DIRIN','IN','INPUT','DIRSRC','SRC'],
-                ['FILEOUT','FILEDST','OUTFILE','DSTFILE','FOUT','ARCHIVE'],
-                ['LISTMSK','LIST','MASK','GLOB','GLOBS','FILE','FILES', 'REGEXP'],
-                ['OPTIONS','OPTS','ARCDEF','ARCOPTS','NAME','ARCNAME'],
-            ],@_) if defined $_[0];
+    my ($dirin, $fileout, $filter, $arcdef) =
+        read_attributes([
+            ['DIRSRC', 'SRC', 'SRCDIR', 'DIR', 'DIRIN', 'IN', 'DIRECTORY', 'SOURCE'],
+            ['FILEOUT', 'FILEDST', 'OUTFILE', 'DSTFILE', 'FILE', 'FILENAME', 'ARCHIVE', 'TARGET'],
+            ['FILTER', 'REGEXP','MASK', 'MSK', 'LISTMSK', 'LIST', 'FILES', 'GLOB'],
+            ['OPTIONS', 'OPTS', 'ARCDEF', 'ARCOPTS', 'NAME', 'ARCNAME'],
+        ], @_);
+    $self->error(""); # Cleanup first
 
-    $dirin //= getcwd();
-    $dirin = File::Spec->catdir(getcwd(), $dirin) unless File::Spec->file_name_is_absolute($dirin);
-    unless (defined($fileout) && length($fileout)) {
-        $self->error("Incorrect file out");
+    $dirin = _get_path($dirin);
+    unless (-e $dirin) {
+        $self->error(sprintf("Source directory not found \"%s\"", $dirin));
+        return 0;
+    }
+    $fileout //= '';
+    unless (length($fileout)) {
+        $self->error("Incorrect destination file for joining");
         return 0;
     }
     $fileout = File::Spec->catfile(getcwd(), $fileout) unless File::Spec->file_name_is_absolute($fileout);
-    $listmsk //= '';
+    $filter //= '';
+
+    # ArcDef
     $arcdef ||= ARC_DEFAULT;
     if (ref($arcdef) ne 'HASH') { $arcdef = ARC_OPTIONS()->{$arcdef} || {} };
     my $arc_create = $arcdef->{create};
@@ -351,57 +360,57 @@ __PACKAGE__->register_method(
     # Output data
     my ($fname, $fext) = _splitFile($fileout, $arc_ext);
 
-    # Find vars
+    # Prepare filter (@list or $reg)
+    my (@list, @inlist, $reg);
+    if (ref($filter) eq 'ARRAY') { @list = @$filter } # array of globs
+    elsif (ref($filter) eq 'Regexp') { $reg = $filter } # regexp
+    elsif (length($filter)) { @list = ($filter) } # glob
     my $count = 0;
-    my @list;
-    my $cond;
 
-    if (ref($listmsk) eq 'ARRAY') { @list = @$listmsk } # array of globs
-    elsif (ref($listmsk) eq 'Regexp') { $cond = $listmsk } # Regexp
-    else { @list = ($listmsk) } # glob
-
-    my $top = length($dirin) ? $dirin : getcwd();
-    my @inlist;
+    # Processing
     find({ wanted => sub {
         return if -d;
-        my $name = $_;
-        my $file = $File::Find::name;
-        my $dir = $File::Find::dir;
-        return if $dir ne $top;
+        my $name = $_; # File name only
+        my $file = $File::Find::name; # File (full path)
+        my $dir = $File::Find::dir; # Directory
+        return if $dir ne $dirin;
         @inlist = _expand_wildcards(@list) unless @inlist;
-        if ($cond) {
-            return unless $name =~ $cond;
-        } elsif(@inlist) {
+        if ($reg) {
+            return unless $name =~ $reg;
+        } elsif (@inlist) {
             return unless grep {$_ eq $name} @inlist;
+        } else {
+            return if length $filter;
         }
-        my $rplc = {
+
+        # Compress (create or add)
+        #printf "#%d Dir: %s; Name: %s; File: %s\n", $count, $dir, $name, $file;
+        my $cmd = dformat($count ? $arc_append : $arc_create, {
                 FILE    => $fileout,
                 LIST    => $name,
                 NAME    => $fname,
                 EXT     => $fext,
-            };
-
-        # Start!
-        #printf "#%d Dir: %s; Name: %s; File: %s\n", $count, $dir, $name, $file;
-        my $cmd = $count ? dformat($arc_append, $rplc) : dformat($arc_create, $rplc);
+            });
         $self->debug($cmd);
         my $errdata = "";
         my $outdata = execute( $cmd, undef, \$errdata, 1 );
         $self->debug($outdata) if defined($outdata) && length($outdata);
         $self->error($errdata) if defined($errdata) && length($errdata);
         $count++;
-    }}, $top);
+    }}, $dirin);
+    return 0 unless $count; # No files found
+
+    # PostProcessing
     my @postproc;
     if ($arc_proc && ref($arc_proc) eq "ARRAY") {@postproc = @$arc_proc}
     elsif ($arc_proc) {@postproc = ($arc_proc)}
     foreach my $proc (@postproc) {
         next unless $proc;
-        my $rplc = {
+        my $cmd = dformat($proc, {
                 FILE    => $fileout,
                 NAME    => $fname,
                 EXT     => $fext,
-            };
-        my $cmd = dformat($proc, $rplc);
+            });
         $self->debug($cmd);
         my $errdata = "";
         my $outdata = execute( $cmd, undef, \$errdata, 1 );
@@ -416,23 +425,28 @@ __PACKAGE__->register_method(
     method    => "fextract",
     callback  => sub {
     my $self = shift;
-    my ($dirin, $dirout, $listmsk, $arcdef) =
-            read_attributes([
-                ['DIRIN','IN','INPUT','DIRSRC','SRC'],
-                ['DIROUT','OUT','OUTPUT','DIRDST','DST'],
-                ['LISTMSK','LIST','MASK','GLOB','GLOBS','FILE','FILES', 'REGEXP'],
-                ['OPTIONS','OPTS','ARCDEF','ARCOPTS','NAME','ARCNAME'],
-            ],@_) if defined $_[0];
+    my ($dirin, $dirout, $filter, $arcdef) =
+        read_attributes([
+            ['DIRSRC', 'SRC', 'SRCDIR', 'DIR', 'DIRIN', 'IN', 'DIRECTORY', 'SOURCE'],
+            ['DIRDST', 'DSTDIR', 'DST', 'DEST', 'DIROUT', 'OUT', 'DESTINATION', 'TARGET'],
+            ['FILTER', 'REGEXP','MASK', 'MSK', 'LISTMSK', 'LIST', 'FILE', 'FILES', 'GLOB'],
+            ['OPTIONS', 'OPTS', 'ARCDEF', 'ARCOPTS', 'NAME', 'ARCNAME'],
+        ], @_);
+    $self->error(""); # Cleanup first
 
-    $dirin //= getcwd();
-    $dirin = File::Spec->catdir(getcwd(), $dirin) unless File::Spec->file_name_is_absolute($dirin);
-    $dirout //= getcwd();
-    $dirout = File::Spec->catdir(getcwd(), $dirout) unless File::Spec->file_name_is_absolute($dirout);
+    $dirin = _get_path($dirin);
+    unless (-e $dirin) {
+        $self->error(sprintf("Source directory not found \"%s\"", $dirin));
+        return 0;
+    }
+    $dirout = _get_path($dirout);
     unless (-e $dirout) {
         $self->error(sprintf("Destination directory not found \"%s\"", $dirout));
         return 0;
     }
-    $listmsk //= '';
+    $filter //= '';
+
+    # ArcDef
     $arcdef ||= ARC_DEFAULT;
     if (ref($arcdef) ne 'HASH') { $arcdef = ARC_OPTIONS()->{$arcdef} || {} };
     my $arc_extract = $arcdef->{extract};
@@ -441,40 +455,37 @@ __PACKAGE__->register_method(
         return 0;
     }
 
-    # Find vars
+    # Prepare filter (@list or $reg)
+    my (@list, @inlist, $reg);
+    if (ref($filter) eq 'ARRAY') { @list = @$filter } # array of globs
+    elsif (ref($filter) eq 'Regexp') { $reg = $filter } # regexp
+    elsif (length($filter)) { @list = ($filter) } # glob
     my $count = 0;
-    my @list;
-    my $cond;
 
-    if (ref($listmsk) eq 'ARRAY') { @list = @$listmsk } # array of globs
-    elsif (ref($listmsk) eq 'Regexp') { $cond = $listmsk } # Regexp
-    else { @list = ($listmsk) } # glob
-
-    # Extract!
-    my $top = length($dirin) ? $dirin : getcwd();
-    my @inlist;
+    # Processing
     find({ wanted => sub {
         return if -d;
-        my $name = $_;
-        my $file = $File::Find::name;
-        my $dir = $File::Find::dir;
-        return if $dir ne $top;
+        my $name = $_; # File name only
+        my $file = $File::Find::name; # File (full path)
+        my $dir = $File::Find::dir; # Directory
+        return if $dir ne $dirin;
         @inlist = _expand_wildcards(@list) unless @inlist;
-        if ($cond) {
-            return unless $name =~ $cond;
-        } elsif(@inlist) {
+        if ($reg) {
+            return unless $name =~ $reg;
+        } elsif (@inlist) {
             return unless grep {$_ eq $name} @inlist;
+        } else {
+            return if length $filter;
         }
 
-        my $rplc = {
+        # Extract
+        #printf "#%d Dir: %s; Name: %s; File: %s\n", $count, $dir, $name, $file;
+        my $cmd = dformat($arc_extract, {
                 FILE    => $name,
                 DIRDST  => $dirout,
                 DIROUT  => $dirout,
                 FILEOUT => File::Spec->catfile($dirout, $name),
-            };
-
-        #printf "#%d Dir: %s; Name: %s; File: %s\n", $count, $dir, $name, $file;
-        my $cmd = dformat($arc_extract, $rplc);
+            });
         $self->debug($cmd);
         my $errdata = "";
         my $outdata = execute( $cmd, undef, \$errdata, 1 );
@@ -482,7 +493,7 @@ __PACKAGE__->register_method(
         $self->error($errdata) if defined($errdata) && length($errdata);
 
         $count++;
-    }}, $top);
+    }}, $dirin);
 
     return $count; # Number of files
 });
@@ -506,6 +517,14 @@ sub _splitFile { # ("foo.txt", ".txt") -> ("foo", ".txt")
     if ($p > 0) {
         return (substr($file, 0, $p), substr($file, $p));
     }
+}
+
+sub _get_path {
+    my $d = shift;
+    return getcwd() unless defined($d) && length($d);
+    return abs_path($d) if -e $d and -l $d;
+    return File::Spec->catdir(getcwd(), $d) unless File::Spec->file_name_is_absolute($d);
+    return $d;
 }
 
 1;

@@ -254,7 +254,12 @@ sub _verify_access_token {
             }
         }
 
-        return ( $self->refresh_tokens->{ $a_token }, undef );
+        return (
+			$self->refresh_tokens->{ $a_token },
+			undef,
+			$self->refresh_tokens->{ $a_token }{ scope },
+			$self->refresh_tokens->{ $a_token }{ user_id },
+		);
     }
     elsif ( exists( $self->access_tokens->{ $a_token } ) ) {
 
@@ -271,7 +276,12 @@ sub _verify_access_token {
 
         }
 
-        return ( $self->access_tokens->{ $a_token }, undef );
+        return (
+			$self->access_tokens->{ $a_token },
+			undef,
+			$self->access_tokens->{ $a_token }{ scope },
+			$self->access_tokens->{ $a_token }{ user_id },
+		);
     }
 
     return ( 0, 'invalid_grant' );

@@ -26,7 +26,13 @@ do a release any time the standards change.
 
 =head1 VERSION 3.66  (planned 2020-12-01  sbeck)
 
-=head1 VERSION 3.65  (planned 2020-09-01  sbeck)
+=head1 VERSION 3.65  (2020-09-01  sbeck)
+
+=over 5
+
+=item NEW CODE(s)
+
+=back
 
 =head1 VERSION 3.64  (2020-06-02  sbeck)
 

@@ -1,7 +1,8 @@
-use Test::More tests => 1;
-
 use strict;
-use HTML::Parser;
+use warnings;
+
+use HTML::Parser ();
+use Test::More tests => 1;
 
 my $html = <<'EOT';
 <html>
@@ -29,12 +30,12 @@ EOT
 
 my $dump = "";
 sub tdump {
-   my @a = @_;
-   for (@a) {
+   my @data = @_;
+   for (@data) {
       $_ = "<undef>" unless defined;
       s/\n/\\n/g;
    }
-   $dump .= join("|", @a) . "\n";
+   $dump .= join("|", @data) . "\n";
 }
 
 my $p = HTML::Parser->new(default_h => [\&tdump, "event,text,dtext,is_cdata"]);

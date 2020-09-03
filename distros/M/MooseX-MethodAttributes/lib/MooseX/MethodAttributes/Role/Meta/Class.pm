@@ -1,7 +1,7 @@
 package MooseX::MethodAttributes::Role::Meta::Class;
 # ABSTRACT: metaclass role for storing code attributes
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Moose::Role;
 use Moose::Util qw/find_meta does_role/;
@@ -136,7 +136,7 @@ MooseX::MethodAttributes::Role::Meta::Class - metaclass role for storing code at
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -185,7 +185,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHORS
 

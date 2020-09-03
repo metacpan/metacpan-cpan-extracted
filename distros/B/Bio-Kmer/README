@@ -65,6 +65,18 @@ METHODS
           Examples:
           my $kmer=Bio::Kmer->new("file.fastq.gz",{kmercounter=>"jellyfish",numcpus=>4});
 
+    $kmer->ntcount()
+        Returns the number of base pairs counted. In some cases such as when
+        counting with Jellyfish, that number is not calculated; instead the
+        length is calculated by the total length of kmers. Internally, this
+        number is stored as $kmer->{_ntcount}.
+
+        Note: internally runs $kmer->histogram() if $kmer->{_ntcount} is not
+        initially found.
+
+          Arguments: None
+          Returns:   integer
+
     $kmer->count()
         Count kmers. This method is called as soon as new() is called and so
         you should never have to run this method. Internally caches the kmer

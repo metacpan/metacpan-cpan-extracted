@@ -16,4 +16,6 @@ __PACKAGE__->load_components(qw/
     Smooth::Lookup::DateTime
 /);
 
+use experimental qw/postderef signatures/;
+
 1;

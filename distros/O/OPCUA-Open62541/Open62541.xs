@@ -3169,6 +3169,13 @@ UA_ServerConfig_getBuildInfo(config)
     OUTPUT:
 	RETVAL
 
+void
+UA_ServerConfig_setBuildInfo(config, buildinfo)
+	OPCUA_Open62541_ServerConfig	config
+	OPCUA_Open62541_BuildInfo	buildinfo
+    CODE:
+	UA_BuildInfo_copy(buildinfo, &config->svc_serverconfig->buildInfo);
+
 # Limits for SecureChannels
 
 UA_UInt16

@@ -1,0 +1,87 @@
+NAME
+    Mojolicious::Plugin::InlineJSON - Bootstrap your app with inline JSON
+
+SYNOPSIS
+      # Mojolicious
+      use Mojolicious;
+      $app->plugin('InlineJSON');
+
+      # Mojolicious::Lite
+      plugin 'InlineJSON';
+
+      # in your controller
+      $c->stash(important_stuff => { data => [ ... ] });
+
+      # then, in a template
+      <script>
+         // bootstrap with literal JSON
+         var prerenderedData =  <%= js_data($important_stuff) %>
+      </script>
+
+DESCRIPTION
+    Mojolicious::Plugin::InlineJSON is a Mojolicious plugin for rendering
+    data to json in a template. This is useful for when you want to serve
+    content managed dynamically by javascript without needing any extra AJAX
+    calls after the page loads.
+
+    This plugin provides 3 different helpers for rendering JSON in a variety
+    of different ways.
+
+HELPERS
+  js_data
+      <script> 
+        var prerenderedData = <%= js_data($important_stuff) %>
+        // ...
+      </script>
+
+    "js_data" will render the perl data structure passed to it into a
+    literal javascript structure, capable of being directly consumed by
+    javascript.
+
+    In essence, it turns this
+
+      { key => 'value' }
+
+    into
+
+      { key: 'value' }
+
+    while making sure to avoid any attribute escaping or accidental tag
+    closure.
+
+  js_json_string
+      <script>
+         var jsonString = <%= js_json_string($important_stuff) %>
+         var decoded = JSON.parse(jsonString)
+         // ...
+      <script>
+
+    "js_json_string" will turn the perl data structure into JSON, and then
+    turn that into a string which can be parsed with "JSON.parse()" in JS.
+    This can be useful for places where your code would've expected an XHR
+    that you decode.
+
+  js_data_via_json
+      <script>
+         var decodedData = <%= js_data_via_json($important_stuff) %>
+         // ...
+      <script>
+
+    "js_data_via_json" is similar to "js_json_string", but it also does the
+    JSON.parse for you.
+
+AUTHORS
+    mst - Matt S. Trout (cpan:MSTROUT) "mst@shadowcat.co.uk"
+    veesh - Veesh Goldman (cpan:VEESH) "veesh@cpan.org"
+
+CONTRIBUTORS
+    None yet - maybe this software is perfect! (ahahahahahahahahaha)
+
+COPYRIGHT
+    Copyright (c) 2020 the Mojolicious::Plugin::InlineJSON "AUTHORS" and
+    "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

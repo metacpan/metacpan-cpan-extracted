@@ -1,12 +1,12 @@
-# Test option setting methods
-
-use Test::More tests => 10;
 
 use strict;
-use HTML::Parser ();
+use warnings;
 
-my $p = HTML::Parser->new(api_version => 3,
-			  xml_mode => 1);
+use HTML::Parser ();
+use Test::More tests => 10;
+
+# Test option setting methods
+my $p = HTML::Parser->new(api_version => 3, xml_mode => 1);
 my $old;
 
 $old = $p->boolean_attribute_value("foo");
@@ -23,12 +23,11 @@ ok($p->xml_mode(0));
 ok(!$p->xml_mode);
 
 my $seen_buggy_comment_warning;
-$SIG{__WARN__} =
-    sub {
-	local $_ = shift;
-	$seen_buggy_comment_warning++
-	    if /^netscape_buggy_comment\(\) is deprecated/;
-    };
+$SIG{__WARN__} = sub {
+    local $_ = shift;
+    $seen_buggy_comment_warning++
+        if /^netscape_buggy_comment\(\) is deprecated/;
+};
 
 ok(!$p->strict_comment(1));
 ok($p->strict_comment);

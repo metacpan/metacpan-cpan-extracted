@@ -58,6 +58,9 @@ sub span_generation_ok {
     my $sql_select_all_single = $statements->{select_all_single};
     selectall_single_ok($dbh, $sql_select_all_single, $tag_base);
 
+    my $sql_select_empty = $statements->{select_empty};
+    selectall_empty_ok($dbh, $sql_select_empty, $tag_base);
+
     my $sql_select_column_multi = $statements->{select_column_multi};
     selectcol_ok($dbh, $sql_select_column_multi, $tag_base);
 
@@ -191,6 +194,56 @@ sub selectall_single_ok {
             },
         }], $selectrow);
     }
+
+    return;
+}
+
+# SELECT * FROM things WHERE id = 999
+sub selectall_empty_ok {
+    my ($dbh, $sql_select, $tag_base) = @_;
+    $tag_base->{'caller.subname'} = _sub_here('selectall_empty_ok');
+
+
+    my @methods = qw[
+        selectall_array
+        selectall_arrayref
+    ];
+    foreach my $method (@methods) {
+        reset_spans();
+
+        $dbh->$method($sql_select);
+        my $result = $dbh->$method($sql_select);
+        my @result = $dbh->$method($sql_select);
+        
+        global_tracer_cmp_easy([
+            ({
+                operation_name => "dbi_$method",
+                tags => {
+                    %$tag_base,
+                    'db.statement'         => $sql_select,
+                    'db.statement_summary' => 'SELECT: things',
+                    'db.rows'              => 0,
+                },
+            }) x 3,
+        ], "$method - empty result");
+    }
+
+    reset_spans();
+    $dbh->selectall_hashref($sql_select, 'id');
+    my $result = $dbh->selectall_hashref($sql_select, 'id');
+    my @result = $dbh->selectall_hashref($sql_select, 'id');
+
+    global_tracer_cmp_easy([
+        ({
+            operation_name => 'dbi_selectall_hashref',
+            tags => {
+                %$tag_base,
+                'db.statement'         => $sql_select,
+                'db.statement_summary' => 'SELECT: things',
+                'db.rows'              => 0,
+            },
+        }) x 3,
+    ], 'selectall_hashref - empty result');
 
     return;
 }

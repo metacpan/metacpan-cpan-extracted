@@ -1,5 +1,8 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.024 2020-08-28
+    - Implemnt server config setBuildInfo().
+
 0.023 2020-08-24
     - Implemnt server config methods:
       setUserRightsMaskReadonly(),

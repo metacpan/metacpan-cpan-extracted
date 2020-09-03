@@ -12,6 +12,15 @@ BEGIN {
 			my ($self, $value) = @_;
 		})
 		->class('FooTest')
+			->class_tests([
+				['ok', 'my $obj = FooTest->new'],
+				['is', '$obj->okay(1)', q|'okay'|], 
+				['is', '$obj->okay(100)', 100]
+			], [
+				['ok', 'my $obj = FooTest->new'],
+				['is', '$obj->okay(1)', q|'okay'|], 
+				['is', '$obj->okay(200)', 200]
+			])
 			->new
 			->accessor('test')
 				->example('')

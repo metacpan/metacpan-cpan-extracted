@@ -9,7 +9,6 @@ README
 README.md
 dist.ini
 lib/Test/Dependencies.pm
-lib/Test/Dependencies/Light.pm
 t/00-load-basic.t
 t/01-load-with-exclude.t
 t/02-dependencies-default.t

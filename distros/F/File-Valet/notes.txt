@@ -1,0 +1,41 @@
+2020-08-30 12:52:18 #perl: <xenu> ttkp: cpan testers "osvers" is unreliable on windows
+2020-08-30 12:52:34 #perl: <ttkp> well that's problematic
+2020-08-30 12:52:35 #perl: <genio> yea, that's true. you have to check it yourself
+2020-08-30 12:53:16 #perl: <ttkp> next time I make a release, I'll add a diagnostic to the unit tests that reports on platform
+2020-08-30 12:53:18 #perl: <genio> https://metacpan.org/source/CAPOEIRAB/Alien-libuv-1.014/Makefile.PL#L10-25
+2020-08-30 12:53:31 #perl: <xenu> %Config in general lies about many things on windows
+2020-08-30 12:53:44 #perl: <genio> What's reported on the matrix is what was used to BUILD the version of Perl you're using on Windows
+2020-08-30 12:53:57 #perl: <genio> so, you have to check it yourself
+2020-08-30 12:54:00 #perl: <xenu> it's because people are using pre-built perls, instead of building them by themselves
+2020-08-30 12:54:06 #perl: <xenu> yeah
+2020-08-30 12:54:09 #perl: <ttkp> thanks genio, I'll use that code
+2020-08-30 12:55:59 #perl: <xenu> i'm 90% sure that on older perls Win32.pm will be unable to detect win10 (it will think it's win 8.1)
+2020-08-30 12:56:03 #perl: <xenu> but that probably doesn't matter
+2020-08-30 12:56:48 #perl: <ttkp> what do you count as "older" here?  anything before v5.32? ;-)
+2020-08-30 12:57:43 #perl: <xenu> to make a program aware of win10 it needs to have a special manifest, i don't know when it was added to perl
+2020-08-30 12:57:54 #perl: <xenu> but it certainly couldn't be done before 2015, because that's when win10 was released
+2020-08-30 12:58:33 #perl: <ttkp> okie-doke
+2020-08-30 12:59:46 #perl: <xenu> okay, i checked, it was added in 5.24.0
+2020-08-30 13:00:47 #perl: <xenu> (i said i'm 90% sure, because maybe win32.pm is using some magical way that can skip the manifest, but i doubt it)
+
+if ($^O eq 'MSWin32') {
+    my $ver;
+    my $err;
+    { # catch block
+        local $@;
+        # try
+        $err = $@ || 'Error' unless eval {
+            require Win32;
+            $ver = (Win32::GetOSVersion())[1];
+            1;
+        };
+    }
+    if ($err || $ver < 6) {
+        die("OS unsupported\nWindows needs to be Win7 or higher.\n");
+    }
+}
+
+Win32::
+  GetOSDisplayName
+  GetOSName
+  GetOSVersion

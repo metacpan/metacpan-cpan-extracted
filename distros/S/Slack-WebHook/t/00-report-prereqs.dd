@@ -19,8 +19,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Encode' => '0',
                                       'HTTP::Tiny' => '0.076',
-                                      'JSON::MaybeXS' => '0',
+                                      'JSON::XS' => '0',
                                       'Simple::Accessor' => '0',
                                       'perl' => '5.010'
                                     }

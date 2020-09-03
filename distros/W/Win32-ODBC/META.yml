@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name: Win32-ODBC
 abstract: ODBC Extension for Win32
-version: 0.035
+version: 0.036
 author:
   - Dave Roth <rothd@roth.net>
   - Jan Dubois <jand@activestate.com>

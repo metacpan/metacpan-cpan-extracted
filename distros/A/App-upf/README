@@ -1,16 +1,42 @@
-SYNOPSIS
+NAME
+    App::upf - CLI interface for Unix::Passwd::File
 
+VERSION
+    This document describes version 0.050 of App::upf (from Perl
+    distribution App-upf), released on 2020-04-29.
+
+SYNOPSIS
     See upf.
 
 DESCRIPTION
-
     This distribution includes upf, a single CLI scripts with subcommands.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-upf>.
 
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-upf>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-upf>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Unix::Passwd::File
 
-    App::UpfUtils, where each function in Unix::Passwd::File has its own
-    CLI script instead of a single CLI program for all the functions like
-    upf.
+    App::UpfUtils, where each function in Unix::Passwd::File has its own CLI
+    script instead of a single CLI program for all the functions like "upf".
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

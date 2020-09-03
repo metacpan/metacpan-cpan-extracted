@@ -56,8 +56,10 @@ The `$tx` object returned is the last HTTP transaction that took place.
     my $ua = $class->new;
     $ua->max_attempts(5);
 
-The number of attempts it will try (at most). What matters for each download is the value this attribute held
-at the time the first attempt of that download took place.
+The number of attempts it will try (at most). Defaults to 1.
+
+What matters for each download is the value this attribute held at the time the first attempt of that download was
+started.
 
 # TODO
 
@@ -65,9 +67,12 @@ at the time the first attempt of that download took place.
 - Check whether the module should also check whether "content received < total\_size\_based\_on\_headers" when
 determining whether to retry
 - Add events
-- Find the right minimum versions for its dependencies
 
-Despite all of the above, this module works.
+Other than the above, this module works.
+
+# SPONSORS
+
+This module was sponsored.
 
 # LICENSE
 

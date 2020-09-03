@@ -1,5 +1,25 @@
 Revision history for MIDI-Drummer
 
+0.1602 2020-09-02 10:11:27
+    - Improve documentation slightly again.
+
+0.1601 2020-09-01 09:28:48
+    - Fix Bézier variable names.
+    - Add accessors for the acoustic and electric snare and bass.
+    - Improve documentation slightly.
+
+0.1600 2020-08-31 15:06:44
+    - Add a Bézier curve option to the ->crescendo_roll.
+
+0.1502 2020-08-31 07:59:16
+    - Fix the ->crescendo_roll logic replacing start-span with min-max (or max-min).
+
+0.1501 2020-08-30 13:26:09
+    - Fix ->crescendo_roll documentation.
+
+0.1500 2020-08-30 13:17:38
+    - Add the ->crescendo_roll method.
+
 0.1400 2020-08-23 12:21:18
     - Fix eg/reggae.
     - Add the ->flam method.

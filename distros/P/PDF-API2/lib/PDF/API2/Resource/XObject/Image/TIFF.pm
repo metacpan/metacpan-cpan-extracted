@@ -7,7 +7,7 @@ use warnings;
 
 no warnings 'uninitialized';
 
-our $VERSION = '2.037'; # VERSION
+our $VERSION = '2.038'; # VERSION
 
 use Compress::Zlib;
 

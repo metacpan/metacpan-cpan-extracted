@@ -1,3 +1,10 @@
+1.23     2020-08-28
+
+- Fixed a bug with the Makefile.PL that caused every call to "make" to
+  recompile the object file for the package's XS code. Reported by Kent
+  Fredric. GH #28.
+
+
 1.22     2020-04-26
 
 - This is a stable release with the same changes as 1.21. See the change logs

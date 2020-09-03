@@ -1,5 +1,5 @@
 package FIDO::Raw;
-$FIDO::Raw::VERSION = '0.03';
+$FIDO::Raw::VERSION = '0.05';
 use strict;
 use warnings;
 use Carp;
@@ -50,7 +50,7 @@ FIDO::Raw - Perl bindings to the libfido2 library
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 DESCRIPTION
 

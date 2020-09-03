@@ -1,7 +1,8 @@
-use Test::More tests => 2;
-
 use strict;
-use HTML::Parser;
+use warnings;
+
+use HTML::Parser ();
+use Test::More tests => 2;
 
 my @start;
 my @text;
@@ -17,5 +18,3 @@ EOT
 is("@start", "a href abc b");
 
 is(join("", @text), "Hi\nFoo:-)\n");
-
-

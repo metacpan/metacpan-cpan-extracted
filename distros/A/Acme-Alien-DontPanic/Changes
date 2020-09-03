@@ -1,5 +1,9 @@
 Revision history for Perl Acme-Alien-DontPanic
 
+2.2900    2020-08-28 10:31:53 -0600
+  - Require Alien::Build 2.29
+  - Migrate inline tests from ABMB
+
 2.2600    2020-08-12 04:15:50 -0600
   - Require Alien::Build 2.26
   - Migrated from Alien::Base::ModuleBuild to Alien::Build::MM

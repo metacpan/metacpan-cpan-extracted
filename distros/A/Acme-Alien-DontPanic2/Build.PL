@@ -31,7 +31,7 @@ my %module_build_args = (
     "Joel A Berger <joel.a.berger\@gmail.com>"
   ],
   "dist_name" => "Acme-Alien-DontPanic2",
-  "dist_version" => "2.2900",
+  "dist_version" => "2.2901",
   "license" => "perl",
   "module_name" => "Acme::Alien::DontPanic2",
   "recursive_test_files" => 1,
@@ -40,6 +40,11 @@ my %module_build_args = (
     "perl" => "5.006"
   },
   "test_requires" => {
+    "File::Temp" => 0,
+    "Inline" => "0.56",
+    "Inline::C" => 0,
+    "Inline::CPP" => 0,
+    "Path::Tiny" => 0,
     "Test2::V0" => "0.000060",
     "Test::Alien" => "0.05",
     "perl" => "5.006"
@@ -50,7 +55,12 @@ my %module_build_args = (
 my %fallback_build_requires = (
   "Alien::Build" => "2.29",
   "Alien::Build::MB" => "0.07",
+  "File::Temp" => 0,
+  "Inline" => "0.56",
+  "Inline::C" => 0,
+  "Inline::CPP" => 0,
   "Module::Build" => "0.28",
+  "Path::Tiny" => 0,
   "Test2::V0" => "0.000060",
   "Test::Alien" => "0.05",
   "perl" => "5.006"

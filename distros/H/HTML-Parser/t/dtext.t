@@ -1,22 +1,22 @@
-#!perl -w
-
 use strict;
-use Test::More tests => 2;
+use warnings;
+use utf8;
 
 use HTML::Parser ();
+use Test::More tests => 2;
 
 my $dtext = "";
 my $text  = "";
 
-sub append
-{
+sub append {
     $dtext .= shift;
-    $text .= shift;
+    $text  .= shift;
 }
 
-my $p = HTML::Parser->new(text_h    => [\&append, "dtext, text"],
-			  default_h => [\&append, "text,  text" ],
-			 );
+my $p = HTML::Parser->new(
+    text_h    => [\&append, "dtext, text"],
+    default_h => [\&append, "text,  text" ],
+);
 
 my $doc = <<'EOT';
 <title>&aring</title>
@@ -47,8 +47,8 @@ $p->parse($doc)->eof;
 
 is($text, $doc);
 is($dtext, <<"EOT");
-<title>å</title>
-<a href="foo&aring">ååAA<A>AA</a>
+<title>Ã¥</title>
+<a href="foo&aring">Ã¥Ã¥AA<A>AA</a>
 <?&aring>
 foo\240bar
 foo\240bar
@@ -68,5 +68,5 @@ foo\240bar
 <xmp>&aring</xmp>
 <script>&aring</script>
 <ScRIPT>&aring</scRIPT>
-<skript>å</script>
+<skript>Ã¥</script>
 EOT

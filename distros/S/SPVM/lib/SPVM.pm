@@ -19,7 +19,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0907';
+our $VERSION = '0.0909';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -403,17 +403,9 @@ SPVM Core Modules.
 
 =item * L<SPVM::Comparator>
 
-=item * L<SPVM::Complex_2b>
-
 =item * L<SPVM::Complex_2d>
 
 =item * L<SPVM::Complex_2f>
-
-=item * L<SPVM::Complex_2i>
-
-=item * L<SPVM::Complex_2l>
-
-=item * L<SPVM::Complex_2s>
 
 =item * L<SPVM::Double>
 
@@ -435,10 +427,6 @@ SPVM Core Modules.
 
 =item * L<SPVM::IntList>
 
-=item * L<SPVM::IO::File>
-
-=item * L<SPVM::IO::FileHandle>
-
 =item * L<SPVM::IO::Stderr>
 
 =item * L<SPVM::IO::Stdout>
@@ -449,31 +437,11 @@ SPVM Core Modules.
 
 =item * L<SPVM::Math>
 
-=item * L<SPVM::Matrix::Byte>
-
 =item * L<SPVM::Matrix::Double>
 
 =item * L<SPVM::Matrix::Float>
 
-=item * L<SPVM::Matrix::Int>
-
-=item * L<SPVM::Matrix::Long>
-
-=item * L<SPVM::Matrix::Short>
-
 =item * L<SPVM::ObjectList>
-
-=item * L<SPVM::Quat_4b>
-
-=item * L<SPVM::Quat_4d>
-
-=item * L<SPVM::Quat_4f>
-
-=item * L<SPVM::Quat_4i>
-
-=item * L<SPVM::Quat_4l>
-
-=item * L<SPVM::Quat_4s>
 
 =item * L<SPVM::Regex>
 

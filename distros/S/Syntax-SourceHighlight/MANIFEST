@@ -1,0 +1,20 @@
+MANIFEST
+CONTRIBUTING
+README
+Changes
+Makefile.PL
+insert-version.PL
+t/00-LangMap.t
+t/01-SourceHighlight.t
+t/02-HighlightEvent.t
+t/03-UTF8.t
+SourceHighlight.cc
+SourceHighlight.hh
+lib/Syntax/SourceHighlight.pm
+lib/Syntax/SourceHighlight/HighlightEvent.pm
+lib/Syntax/SourceHighlight/HighlightToken.pm
+lib/Syntax/SourceHighlight/LangMap.pm
+lib/Syntax/SourceHighlight/SourceHighlight.pm
+example.perl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,92 @@
+lib lib
+tlib t
+author LNATION
+email email@lnation.org
+version 0.03
+Hades::Realm::Moose base Hades::Realm::OO {
+	abstract { Hades realm for Moose }
+	synopsis {
+Quick summary of what the module does:
+
+	Hades->run({
+		eval => 'Kosmos { [curae penthos] :t(Int) :d(2) :p :pr :c :r geras $nosoi :t(Int) :d(5) { if (£penthos == $nosoi) { return £curae; } } }',
+		realm => 'Moose',
+	});
+
+	... generates ...
+
+	package Kosmos;
+	use strict;
+	use warnings;
+	use Moose;
+	use MooseX::Privacy;
+	use Types::Standard qw/Int/;
+	our $VERSION = 0.01;
+
+	has curae => (
+		is        => "rw",
+		required  => 1,
+		clearer   => "clear_curae",
+		predicate => "has_curae",
+		isa       => Int,
+		default   => sub {2},
+		traits    => [qw/Private/]
+	);
+
+	has penthos => (
+		is        => "rw",
+		required  => 1,
+		clearer   => "clear_penthos",
+		predicate => "has_penthos",
+		isa       => Int,
+		default   => sub {2},
+		traits    => [qw/Private/]
+	);
+
+	sub geras {
+		my ( $self, $nosoi ) = @_;
+		$nosoi = defined $nosoi ? $nosoi : 5;
+		if ( !defined($nosoi) || ref $nosoi || $nosoi !~ m/^[-+\d]\d*$/ ) {
+			$nosoi = defined $nosoi ? $nosoi : 'undef';
+			die qq{Int: invalid value $nosoi for variable \$nosoi in method geras};
+		}
+		if ( £penthos == $nosoi ) { return £curae; }
+	}
+
+	1;
+
+	__END__
+
+NOTE: coerce attributes currently do not work with Moose
+
+	}
+	build_as_role :a {
+		$res[0]->use(q|Moose::Role|);
+		$res[0]->use(sprintf q|Types::Standard qw/%s/|, join(' ', keys %{£meta->{£current_class}->{types}}));
+	}
+	build_as_class :a {
+		$res[0]->use(q|Moose|);
+		$res[0]->use(q|MooseX::Privacy|);
+		$res[0]->use(sprintf q|Types::Standard qw/%s/|, join(' ', keys %{£meta->{£current_class}->{types}}));
+	}
+	build_has $meta :t(HashRef) { 
+		$meta->{is} ||= '"rw"';
+		my $attributes = join ', ', map {
+			($meta->{$_} ? (sprintf "%s => %s", $_, $meta->{$_}) : ())
+		} qw/is required clearer predicate isa default trigger builder/;
+		$attributes .= ', traits => [qw/Private/]' if ($meta->{private});
+		my $name = $meta->{has};
+		my $code = qq{
+			has $name => ( $attributes );};
+		return $code;
+	}
+	build_accessor_predicate $name :t(Str) $content :t(Str) {
+		return qq|"has_$name"|;
+	}
+	build_accessor_clearer $name :t(Str) $content :t(Str) {
+		return qq|"clear_$name"|;
+	}
+	build_accessor_builder $name :t(Str) $content :t(Str) {
+		return $content =~ m/^\w\w+$/ ? $content : qq|"_build_$name"|;
+	}
+}

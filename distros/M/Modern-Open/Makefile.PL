@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Modern::Open},
-    'VERSION'   => q{0.10},
+    'VERSION'   => q{0.11},
     'ABSTRACT'  => q{Autovivification, Autodie, and 3-args open support},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

@@ -214,6 +214,7 @@ sqlite_type_from_odbc_type(int type)
     switch(type) {
         case SQL_UNKNOWN_TYPE:
             return SQLITE_NULL;
+        case SQL_BOOLEAN:
         case SQL_INTEGER:
         case SQL_SMALLINT:
         case SQL_TINYINT:
@@ -223,7 +224,11 @@ sqlite_type_from_odbc_type(int type)
         case SQL_REAL:
         case SQL_DOUBLE:
             return SQLITE_FLOAT;
+        case SQL_BIT:
         case SQL_BLOB:
+        case SQL_BINARY:
+        case SQL_VARBINARY:
+        case SQL_LONGVARBINARY:
             return SQLITE_BLOB;
         default:
             return SQLITE_TEXT;
@@ -289,6 +294,8 @@ sqlite_set_result(pTHX_ sqlite3_context *context, SV *result, int is_error)
     STRLEN len;
     char *s;
     sqlite3_int64 iv;
+    AV *av;
+    SV *result2, *type;
 
     if ( is_error ) {
         s = SvPV(result, len);
@@ -299,6 +306,31 @@ sqlite_set_result(pTHX_ sqlite3_context *context, SV *result, int is_error)
     /* warn("result: %s\n", SvPV_nolen(result)); */
     if ( !SvOK(result) ) {
         sqlite3_result_null( context );
+    } else if( SvROK(result) && SvTYPE(SvRV(result)) == SVt_PVAV ) {
+        av = (AV*)SvRV(result);
+        if ( av_len(av) == 1 ) {
+            result2 = av_shift(av);
+            type    = av_shift(av);
+            if ( SvIOK(type) ) {
+                switch(sqlite_type_from_odbc_type(SvIV(type))) {
+                    case SQLITE_INTEGER:
+                        sqlite3_result_int64( context, SvIV(result2) );
+                        return;
+                    case SQLITE_FLOAT:
+                        sqlite3_result_double( context, SvNV(result2) );
+                        return;
+                    case SQLITE_BLOB:
+                        s = SvPV(result2, len);
+                        sqlite3_result_blob( context, s, len, SQLITE_TRANSIENT );
+                        return;
+                    case SQLITE_TEXT:
+                        s = SvPV(result2, len);
+                        sqlite3_result_text( context, s, len, SQLITE_TRANSIENT );
+                        return;
+                }
+            }
+        }
+        sqlite3_result_error( context, "unexpected arrayref", 19 );
     } else if( SvIOK_UV(result) ) {
         if ((UV)(sqlite3_int64)UV_MAX == UV_MAX)
             sqlite3_result_int64( context, (sqlite3_int64)SvUV(result));
@@ -1623,7 +1655,7 @@ SV *
 sqlite_db_filename(pTHX_ SV *dbh)
 {
     D_imp_dbh(dbh);
-    const char *filename;
+    const char *filename = NULL;
 
     if (!imp_dbh->db) {
         return &PL_sv_undef;

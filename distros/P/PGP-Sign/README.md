@@ -6,7 +6,7 @@ status](https://github.com/rra/pgp-sign/workflows/build/badge.svg)](https://gith
 version](https://img.shields.io/cpan/v/PGP-Sign)](https://metacpan.org/release/PGP-Sign)
 [![License](https://img.shields.io/cpan/l/PGP-Sign)](https://github.com/rra/pgp-sign/blob/master/LICENSE)
 [![Debian
-package](https://img.shields.io/debian/v/libpgp-sign-perl)](https://tracker.debian.org/pkg/libpgp-sign-perl)
+package](https://img.shields.io/debian/v/libpgp-sign-perl/unstable)](https://tracker.debian.org/pkg/libpgp-sign-perl)
 
 Copyright 1997-2000, 2002, 2004, 2018, 2020 Russ Allbery <rra@cpan.org>.
 This software is distributed under the same terms as Perl itself.  Please
@@ -48,14 +48,15 @@ backward-compatible with earlier versions of PGP::Sign.
 ## Requirements
 
 Perl 5.20 or later and Module::Build are required to build this module,
-and IPC::Run is required to use it.  Either GnuPG v2 or GnuPG v1
-(selectable at runtime) is also required.  It has not been tested with
-versions of GnuPG older than 1.4.23.
+and IPC::Run is required to use it.  Either GnuPG v2 (version 2.1.12 or
+later) or GnuPG v1 is also required.  The implementation of GnuPG can be
+selected at runtime.  It has not been tested with versions of GnuPG older
+than 1.4.23.
 
-PGP::Sign uses IPC::Run features that are documented as not available on
-Windows (primarily higher-numbered file descriptors) and has never been
-tested with Gpg4win, so will probably not work on Windows (or, for that
-matter, other non-UNIX systems).
+PGP::Sign requires the ability to redirect higher-numbered file
+descriptors via IPC::Run, and thus will not work on Windows unless Perl is
+built with some UNIX emulation layer that supports this.  It has also
+never been tested with Gpg4win.
 
 ## Building and Installation
 
@@ -84,6 +85,12 @@ If a test fails, you can run a single test with verbose output via:
 ```
     ./Build test --test_files <path-to-test>
 ```
+
+If the gpg binary found first on the PATH is too old, the tests will be
+skipped rather than fail.  This may not always be desirable, since the
+module is not usable on such a system without configuration, but the
+module can still be configured to use a GnuPG binary found elsewhere and
+therefore this doesn't represent an error in the module itself.
 
 The following additional Perl modules will be used by the test suite if
 present:

@@ -13,7 +13,7 @@ use Scalar::Util 'weaken';
 use Exporter 'import';
 our @EXPORT_OK = qw/
     rx_observable rx_of rx_concat rx_defer rx_EMPTY rx_from_event
-    rx_from_event_array rx_interval rx_merge rx_never rx_race
+    rx_from_event_array rx_interval rx_merge rx_NEVER rx_race
     rx_subject rx_throw_error rx_timer
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -193,7 +193,7 @@ sub rx_merge {
 
 my $rx_never;
 
-sub rx_never {
+sub rx_NEVER {
     return $rx_never //= rx_observable->new(sub {
         return;
     });

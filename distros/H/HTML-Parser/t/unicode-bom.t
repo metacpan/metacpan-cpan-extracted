@@ -1,17 +1,15 @@
 #!perl -w
 
 use strict;
-use Test::More tests => 2;
-use HTML::Parser;
+use warnings;
+use utf8;
 
-SKIP: {
-skip "This perl does not support Unicode", 2 if $] < 5.008;
+use HTML::Parser ();
+use Test::More tests => 2;
 
 my @parsed;
-my $p = HTML::Parser->new(
-  api_version => 3,
-  start_h => [\@parsed, 'tag, attr'],
-);
+my $p
+    = HTML::Parser->new(api_version => 3, start_h => [\@parsed, 'tag, attr'],);
 
 my @warn;
 $SIG{__WARN__} = sub {
@@ -52,12 +50,8 @@ EOT
 
 @warn = ();
 
-$p = HTML::Parser->new(
-  api_version => 3,
-  start_h => [\@parsed, 'tag'],
-);
+$p = HTML::Parser->new(api_version => 3, start_h => [\@parsed, 'tag'],);
 
 $p->parse("\xEF\xBB\xBF<head>Hi there</head>");
 $p->eof;
 ok(!@warn);
-}

@@ -11,7 +11,6 @@ use strict;
 use Data::Dumper;
 use Getopt::Long;
 use Pod::Usage;
-use WebService::KvKAPI;
 
 my %options = ();
 
@@ -32,10 +31,15 @@ GetOptions(\%options, qw(
     tradeName=s
     q=s
     rsin=s
+    pure_rsin
 ));
 
 if ($options{help}) {
     pod2usage({verbose => 1, exitval => 0});
+}
+
+if (!keys %options) {
+    pod2usage({verbose => 1, exitval => 1});
 }
 
 my $profile_search = delete $options{profile};
@@ -43,23 +47,27 @@ my $api_key        = delete $options{apiKey};
 my $raw            = delete $options{raw};
 
 my $api;
+
 if ($api_key) {
+    use WebService::KvKAPI;
     $api = WebService::KvKAPI->new(
         api_key => $api_key,
+        $options{pure_rsin}
+        ? (pure_rsin => $options{pure_rsin})
+        : (),
     );
 }
 else {
     use WebService::KvKAPI::Spoof;
     print "Using spoof mode, no api key given", $/;
+
     $api = WebService::KvKAPI::Spoof->new(
         api_key => 'spoofmode',
+        $options{pure_rsin}
+        ? (pure_rsin => $options{pure_rsin})
+        : (),
     );
 }
-
-if (!keys %options) {
-    pod2usage({verbose => 1, exitval => 1});
-}
-
 
 if ($raw) {
     print Dumper $api->api_call($raw, \%options);
@@ -83,7 +91,7 @@ query_kvk.pl - Query the Dutch Chamber of Commerce via the CLI
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 

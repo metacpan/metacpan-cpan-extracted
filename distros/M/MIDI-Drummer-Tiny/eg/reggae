@@ -14,6 +14,7 @@ $d->count_in(1);
 
 my $j = 0;
 
+$d->rest( $d->triplet_eighth );
 $d->rest( $d->triplet_sixteenth );
 $d->rest( $d->thirtysecond );
 $d->accent_note( 64, $d->thirtysecond, $d->low_timbale );

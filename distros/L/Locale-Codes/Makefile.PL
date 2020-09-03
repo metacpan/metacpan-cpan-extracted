@@ -39,7 +39,7 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Locale::Codes",
-   VERSION          => "3.64",
+   VERSION          => "3.65",
    ABSTRACT         => "a distribution of modules to handle locale codes",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
@@ -60,111 +60,111 @@ WriteMakefile(
           provides     => {
              'Locale::Codes' => {
                 file    => 'lib/Locale/Codes.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Constants' => {
                 file    => 'lib/Locale/Codes/Constants.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Country' => {
                 file    => 'lib/Locale/Codes/Country.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Country_Codes' => {
                 file    => 'lib/Locale/Codes/Country_Codes.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Country_Retired' => {
                 file    => 'lib/Locale/Codes/Country_Retired.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Currency' => {
                 file    => 'lib/Locale/Codes/Currency.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Currency_Codes' => {
                 file    => 'lib/Locale/Codes/Currency_Codes.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Currency_Retired' => {
                 file    => 'lib/Locale/Codes/Currency_Retired.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::LangExt' => {
                 file    => 'lib/Locale/Codes/LangExt.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::LangExt_Codes' => {
                 file    => 'lib/Locale/Codes/LangExt_Codes.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::LangExt_Retired' => {
                 file    => 'lib/Locale/Codes/LangExt_Retired.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::LangFam' => {
                 file    => 'lib/Locale/Codes/LangFam.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::LangFam_Codes' => {
                 file    => 'lib/Locale/Codes/LangFam_Codes.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::LangFam_Retired' => {
                 file    => 'lib/Locale/Codes/LangFam_Retired.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::LangVar' => {
                 file    => 'lib/Locale/Codes/LangVar.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::LangVar_Codes' => {
                 file    => 'lib/Locale/Codes/LangVar_Codes.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::LangVar_Retired' => {
                 file    => 'lib/Locale/Codes/LangVar_Retired.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Language' => {
                 file    => 'lib/Locale/Codes/Language.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Language_Codes' => {
                 file    => 'lib/Locale/Codes/Language_Codes.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Language_Retired' => {
                 file    => 'lib/Locale/Codes/Language_Retired.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Script' => {
                 file    => 'lib/Locale/Codes/Script.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Script_Codes' => {
                 file    => 'lib/Locale/Codes/Script_Codes.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Codes::Script_Retired' => {
                 file    => 'lib/Locale/Codes/Script_Retired.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Country' => {
                 file    => 'lib/Locale/Country.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Currency' => {
                 file    => 'lib/Locale/Currency.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Language' => {
                 file    => 'lib/Locale/Language.pm',
-                version => '3.64',
+                version => '3.65',
              },
              'Locale::Script' => {
                 file    => 'lib/Locale/Script.pm',
-                version => '3.64',
+                version => '3.65',
              },
 
           },

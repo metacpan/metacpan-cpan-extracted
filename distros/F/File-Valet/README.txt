@@ -96,6 +96,21 @@ FUNCTIONS
         $File::Valet::OK, $File::Valet::ERROR, $File::Valet::ERRNO
         appropriately.
 
+    find_home
+         my $path = find_home;
+         my $path = find_temp("/var/home", "/tmp/home");
+
+        "find_home()" performs a best-effort search for the effective user's
+        home, returning a path-string or undef if none is found.
+
+        If arguments are provided, it will return the first argument for
+        which there is a directory for which the user has write permissions.
+
+        if $ENV{HOME} is set, "find_home()" will check there for a writable
+        directory after checking any arguments.
+
+        Some effort has been made to make it cross-platform.
+
     find_temp
          my $path = find_temp();
          my $path = find_temp("/home/tmp", "/usr/tmp", ...);
@@ -109,8 +124,9 @@ FUNCTIONS
         If parameters are passed to "find_temp()", it will check those
         locations first.
 
-        If $ENV{TEMPDIR} is defined, "find_temp()" will check that location
-        after checking the locations provided as parameters.
+        If $ENV{TEMPDIR}, $ENV{TEMP} or $ENV{TMP} are defined, "find_temp()"
+        will check those locations after checking the locations provided as
+        parameters.
 
         "find_temp()" is Windows-savvy enough to check such locations as
         "C:\Windows\Temp", but might try to open locations on
@@ -235,6 +251,10 @@ FUNCTIONS
         These fields may change in future versions of this module.
 
     FURTHER DEVELOPMENT
+        A recursive descent function similar to File::Find
+        <https://metacpan.org/pod/File::Find> is planned, since "File::Find"
+        is pretty horrible and unusable.
+
         The "lockafile()" implementation goes through considerable effort to
         avoid race conditions, but there is still a very short danger window
         where an overridden lock might get double-clobbered. If a contended

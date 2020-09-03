@@ -4,7 +4,7 @@ App::tt - Time tracking application
 
 # VERSION
 
-0.12
+0.13
 
 # DESCRIPTION
 

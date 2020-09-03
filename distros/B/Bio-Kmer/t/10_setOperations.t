@@ -23,16 +23,16 @@ subtest "pure perl kmer counting and databasing" => sub{
 
   my $subtraction = $kmer1->subtract($kmer2);
   note "Subtraction of kmers: ".scalar(@$subtraction);
-  is scalar(@$subtraction), 24159, "Subtraction of kmers";
+  is scalar(@$subtraction), 24262, "Subtraction of kmers";
 
   my $intersection = $kmer1->intersection($kmer2);
   note "Intersection of kmers: ".scalar(@$intersection);
-  is scalar(@$intersection), 33948, "Intersection of all kmers";
+  is scalar(@$intersection), 33720, "Intersection of all kmers";
 
   my $union = $kmer1->union($kmer2);
 
   note "union: ".scalar(@$union);
-  is scalar(@$union), 62362, "Union of all kmers";
+  is scalar(@$union), 62297, "Union of all kmers";
 
   note "Testing to make sure there is a warning for incompatible kmer sets";
   my $invalidKmer = ["-1"];

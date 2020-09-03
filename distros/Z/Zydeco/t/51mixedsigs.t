@@ -35,6 +35,6 @@ for my $method (qw/ bar1 bar2 /) {
 #use B::Deparse;
 #note( B::Deparse->new->coderef2text(\&MyApp::Foo::bar2) );
 
-is_deeply( MyApp::Foo->foo(1,2,3), [1,3] );
+is_deeply( MyApp->new_foo->foo(1,2,3), [1,3] );
 
 done_testing;

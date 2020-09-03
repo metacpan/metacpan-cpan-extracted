@@ -3,7 +3,7 @@ Locale::Codes::Language_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Tue Jun  2 12:19:44 EDT 2020
+#    Generated on: Tue Sep  1 12:58:23 EDT 2020
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.64';
+$VERSION='3.65';
 
 $Locale::Codes::Retired{'language'}{'alpha-2'}{'code'} = {
    q(in) => q(Indonesian),
@@ -162,6 +162,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'code'} = {
    q(tdu) => q(Tempasuk Dusun),
    q(tgg) => q(Tangga),
    q(thc) => q(Tai Hang Tong),
+   q(thw) => q(Thudam),
    q(thx) => q(The),
    q(tid) => q(Tidong),
    q(tie) => q(Tingal),
@@ -594,6 +595,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(tempasuk dusun) => [ q(tdu), q(Tempasuk Dusun) ],
    q(thayore) => [ q(thd), q(Thayore) ],
    q(the) => [ q(thx), q(The) ],
+   q(thudam) => [ q(thw), q(Thudam) ],
    q(thurawal) => [ q(tbh), q(Thurawal) ],
    q(tidong) => [ q(tid), q(Tidong) ],
    q(tina sambal) => [ q(xsb), q(Tina Sambal) ],

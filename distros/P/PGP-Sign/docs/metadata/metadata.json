@@ -39,6 +39,7 @@
         "version": "pgp-sign",
         "cpan": "PGP-Sign",
         "ignore": [
+            "^\\.github/",
             "^t/data/gnupg1/random_seed$",
             "^t/data/gnupg./trustdb\\.gpg$",
         ],

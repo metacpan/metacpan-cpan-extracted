@@ -1,7 +1,7 @@
 package MooseX::MethodAttributes::Role::Meta::Method::Wrapped;
 # ABSTRACT: wrapped metamethod role allowing code attribute introspection
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Moose::Role;
 
@@ -37,7 +37,7 @@ MooseX::MethodAttributes::Role::Meta::Method::Wrapped - wrapped metamethod role 
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -54,7 +54,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHORS
 

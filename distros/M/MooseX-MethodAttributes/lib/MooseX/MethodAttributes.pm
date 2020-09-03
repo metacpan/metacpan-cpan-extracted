@@ -1,7 +1,7 @@
-package MooseX::MethodAttributes; # git description: v0.30-2-gc4a23df
+package MooseX::MethodAttributes; # git description: v0.31-13-g5621366
 # ABSTRACT: Code attribute introspection
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Moose ();
 use Moose::Exporter;
@@ -85,7 +85,7 @@ MooseX::MethodAttributes - Code attribute introspection
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -114,7 +114,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHORS
 
@@ -132,7 +132,7 @@ Tomas Doran <bobtfish@bobtfish.net>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Dave Rolsky Marcus Ramberg Peter E Karman David Steinbrunner
+=for stopwords Karen Etheridge Dave Rolsky Marcus Ramberg Graham Knop Peter E Karman David Steinbrunner
 
 =over 4
 
@@ -147,6 +147,10 @@ Dave Rolsky <autarch@urth.org>
 =item *
 
 Marcus Ramberg <marcus@nordaaker.com>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
 
 =item *
 

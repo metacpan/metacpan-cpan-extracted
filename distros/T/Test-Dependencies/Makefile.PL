@@ -19,13 +19,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Test::Dependencies",
   "PREREQ_PM" => {
+    "Module::CoreList" => "5.20200620",
     "Pod::Strip" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.30",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.24",
+  "VERSION" => "0.28",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,6 +34,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Module::CoreList" => "5.20200620",
   "Pod::Strip" => 0,
   "Test::More" => "1.30",
   "Test::Needs" => 0

@@ -10,7 +10,7 @@ ftp://ftp.info-zip.org/pub/infozip/
 1 Installing from a Unix-like distro
 ------------------------------------
 shell>gunzip MojoX-ValidateHeadLinks-1.02.tgz
-shell>tar mxvf MojoX-ValidateHeadLinks-1.02.tar
+shell>tar xvf MojoX-ValidateHeadLinks-1.02.tar
 
 On Unix-like systems, assuming you have installed Module::Build V 0.25+:
 

@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Discover or download and install curl + libcurl
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 
@@ -27,7 +27,7 @@ Alien::curl - Discover or download and install curl + libcurl
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -35,47 +35,44 @@ In your script or module:
 
  use Alien::curl;
  use Env qw( @PATH );
- 
+
  unshift @PATH, Alien::curl->bin_dir;
+
+In your Makefile.PL:
+
+ use ExtUtils::MakeMaker;
+ use Alien::Base::Wrapper ();
+
+ WriteMakefile(
+   Alien::Base::Wrapper->new('Alien::curl')->mm_args2(
+     # MakeMaker args
+     NAME => 'My::XS',
+     ...
+   ),
+ );
 
 In your Build.PL:
 
  use Module::Build;
- use Alien::curl;
+ use Alien::Base::Wrapper qw( Alien::curl !export );
+
  my $builder = Module::Build->new(
    ...
    configure_requires => {
      'Alien::curl' => '0',
      ...
    },
-   extra_compiler_flags => Alien::curl->cflags,
-   extra_linker_flags   => Alien::curl->libs,
+   Alien::Base::Wrapper->mb_args,
    ...
  );
- 
+
  $build->create_build_script;
-
-In your Makefile.PL:
-
- use ExtUtils::MakeMaker;
- use Config;
- use Alien::curl;
- 
- WriteMakefile(
-   ...
-   CONFIGURE_REQUIRES => {
-     'Alien::curl' => '0',
-   },
-   CCFLAGS => Alien::curl->cflags . " $Config{ccflags}",
-   LIBS    => [ Alien::curl->libs ],
-   ...
- );
 
 In your L<FFI::Platypus> script or module:
 
  use FFI::Platypus;
  use Alien::curl;
- 
+
  my $ffi = FFI::Platypus->new(
    lib => [ Alien::curl->dynamic_libs ],
  );
@@ -95,7 +92,11 @@ L<Alien>, L<Alien::Base>, L<Alien::Build::Manual::AlienUser>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 

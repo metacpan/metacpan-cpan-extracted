@@ -1,16 +1,20 @@
 Revision history for DTOne-Crypt
 
-0.01
-        - Initial release
-
-0.02
-        - Increase scrypt() iteration count to 2**15
-
-0.03
-        - Fix documentation
-
-0.04
-        - Enforce master key length and format requirements
+0.06  2020-08-31 22:41:40 PST
+        - Deprecate Scrypt as KDF in favor of plain AES-256-GCM
+        - Version data protocol format
 
 0.05  2020-07-20 23:53:27 PST
         - Improve test coverage
+
+0.04  2020-07-20 15:09:59 PST
+        - Enforce master key length and format requirements
+
+0.03  2020-07-20 15:08:12 PST
+        - Fix documentation
+
+0.02  2020-07-20 13:51:58 PST
+        - Increase scrypt() iteration count to 2**15
+
+0.01  2020-07-18 18:09:48 PST
+        - Initial release

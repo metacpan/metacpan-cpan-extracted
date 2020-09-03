@@ -2,6 +2,13 @@ CHANGE LOG
 ==========
 
 
+2020-08-17 - v0.106.4
+---------------------
+
+### Added
+  - A new import option to disable "couldn't find sub" warnings
+
+
 2020-08-17 - v0.106.3
 ---------------------
 

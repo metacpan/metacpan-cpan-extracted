@@ -19,4 +19,4 @@ else
   cip sudo apt-get -y install g++ libffi-dev
 fi
 
-cip exec cpanm -n env ALIEN_INSTALL_TYPE=default FFI::Platypus
+cip exec env ALIEN_INSTALL_TYPE=default cpanm -n FFI::Platypus

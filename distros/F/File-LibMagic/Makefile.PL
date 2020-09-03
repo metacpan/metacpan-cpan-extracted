@@ -12,22 +12,16 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Determine MIME types of data or files using libmagic",
   "AUTHOR" => "Andreas Fitzner, Michael Hendricks <michael\@ndrix.org>, Dave Rolsky <autarch\@urth.org>",
-  "C" => [
-    "lib/File/LibMagic.c"
-  ],
   "CONFIGURE_REQUIRES" => {
     "Config::AutoConf" => 0,
     "ExtUtils::CBuilder" => 0,
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "File-LibMagic",
-  "INC" => "-I. -Ic",
-  "LDFROM" => "LibMagic\$(OBJ_EXT)",
   "LIBS" => "-lmagic",
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "File::LibMagic",
-  "OBJECT" => "lib/File/LibMagic\$(OBJ_EXT)",
   "PM" => {
     "lib/File/LibMagic.pm" => "\$(INST_LIB)/File/LibMagic.pm",
     "lib/File/LibMagic/Constants.pm" => "\$(INST_LIB)/File/LibMagic/Constants.pm"
@@ -53,9 +47,6 @@ my %WriteMakefileArgs = (
     "lib" => 0
   },
   "VERSION_FROM" => "lib/File/LibMagic.pm",
-  "XS" => {
-    "lib/File/LibMagic.xs" => "lib/File/LibMagic.c"
-  },
   "test" => {
     "TESTS" => "t/*.t t/old-apis/*.t"
   }
@@ -65,7 +56,7 @@ $WriteMakefileArgs{DEFINE}
     = ( $WriteMakefileArgs{DEFINE} || q{} ) . $gcc_warnings;
 
 $WriteMakefileArgs{DEFINE} = ( $WriteMakefileArgs{DEFINE} || q{} ) . _defines();
-$WriteMakefileArgs{INC}    = join q{ }, _includes(), $WriteMakefileArgs{INC};
+$WriteMakefileArgs{INC}    = join q{ }, _includes();
 $WriteMakefileArgs{LIBS}   = join q{ }, _libs(), $WriteMakefileArgs{LIBS};
 
 my %FallbackPrereqs = (

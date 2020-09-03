@@ -36,6 +36,7 @@
             "File::Basename" : "2.00",
             "Getopt::Long" : "2.00",
             "JSON" : "2.00",
+            "LWP::Protocol::https" : "6.00",
             "LWP::UserAgent" : "6.00",
             "Pod::Usage" : "1.00",
             "Time::Piece" : "1.05",
@@ -51,6 +52,6 @@
          "web" : "https://github.com/z-eos/gqmt.git"
       }
    },
-   "version" : "0.2",
+   "version" : "0.8",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

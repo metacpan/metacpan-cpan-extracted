@@ -1,5 +1,9 @@
 Revision history for IO::Callback
 
+2.00    2020-08-29  cpan:TOBYINK
+        Change slot keys to be lowercase, fixes RT#132961.
+        Workaround difficulties with Test::NoWarnings, fixes RT#98861.
+
 1.12    2014-05-25  cpan:TOBYINK
         No functional changes since 1.11_01.
 

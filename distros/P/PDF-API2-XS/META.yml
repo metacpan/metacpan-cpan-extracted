@@ -17,6 +17,6 @@ requires:
   perl: v5.10.0
 resources:
   repository: git://github.com/ssimms/pdfapi2xs.git
-version: '1.000'
+version: '1.001'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

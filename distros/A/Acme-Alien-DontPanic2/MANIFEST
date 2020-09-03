@@ -18,6 +18,8 @@ perlcriticrc
 t/00_diag.t
 t/acme_alien_dontpanic2.t
 t/acme_alien_dontpanic2__ffi.t
+t/inline.t
+t/inline_cpp.t
 xt/author/critic.t
 xt/author/eol.t
 xt/author/no_tabs.t

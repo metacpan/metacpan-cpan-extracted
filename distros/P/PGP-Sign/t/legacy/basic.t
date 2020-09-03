@@ -19,12 +19,14 @@ use File::Spec;
 use IO::File;
 use IPC::Cmd qw(can_run);
 use Test::More;
-use Test::PGP qw(gpg_is_gpg1);
+use Test::PGP qw(gpg_is_gpg1 gpg2_is_new_enough);
 
 # Check that GnuPG is available.  If so, load the module and set the plan.
 BEGIN {
     if (!can_run('gpg')) {
         plan skip_all => 'gpg binary not available';
+    } elsif (!gpg_is_gpg1() && !gpg2_is_new_enough('gpg')) {
+        plan skip_all => 'gpg binary is older than 2.1.12';
     } else {
         use_ok('PGP::Sign');
     }

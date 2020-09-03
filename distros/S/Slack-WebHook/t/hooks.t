@@ -10,6 +10,7 @@ use Test2::Plugin::NoWarnings;
 use Test::MockModule ();
 
 use Slack::WebHook ();
+use JSON::XS       ();
 
 our $last_http_post_form;
 
@@ -30,27 +31,32 @@ like(
 
 ok !$last_http_post_form, "post_form was not called";
 
-my $URL = 'http://127.0.0.1';
+my $URL  = 'http://127.0.0.1';
 my $hook = Slack::WebHook->new( url => $URL );
+
+ok( ref( $hook->json ), "store a JSON object" );
 
 $hook->post('a raw message');
 http_post_was_called_with( { text => 'a raw message' }, 'a raw message using post' );
 
 $hook->post( { text => 'my custom message', custom => 'field' } );
-http_post_was_called_with( 
-{
-  'custom' => 'field',
-  'text' => 'my custom message'
-}
-, 'a custom hash using post' );
+http_post_was_called_with(
+    {
+        'custom' => 'field',
+        'text'   => 'my custom message'
+    },
+    'a custom hash using post'
+);
 
 {
     note "post_ok";
 
     $hook->post_ok('posting a simple "ok" text');
     http_post_was_called_with(
-        {   'attachments' => [
-                {   'color'     => Slack::WebHook::SLACK_COLOR_OK,
+        {
+            'attachments' => [
+                {
+                    'color'     => Slack::WebHook::SLACK_COLOR_OK,
                     'mrkdwn_in' => [
                         'text',
                         'title'
@@ -67,8 +73,10 @@ http_post_was_called_with(
         body  => qq[This is a message\nwith another line]
     );
     http_post_was_called_with(
-        {   'attachments' => [
-                {   'color'     => Slack::WebHook::SLACK_COLOR_OK,
+        {
+            'attachments' => [
+                {
+                    'color'     => Slack::WebHook::SLACK_COLOR_OK,
                     'mrkdwn_in' => [
                         'text',
                         'title'
@@ -84,21 +92,33 @@ http_post_was_called_with(
 }
 
 {
+    note "utf8";
+
+    my $msg = q[Starts of “école”];
+    $hook->post($msg);
+    http_post_was_called_with(
+        { 'text' => $msg },
+        'post( msg ) with utf8 characters'
+    );
+
+}
+
+{
     note "post_warning";
 
     $hook->post_warning('posting a simple "warning" text');
     http_post_was_called_with(
-        {   
-          'attachments' => [
-            {
-              'color' => '#f5ca46',
-              'mrkdwn_in' => [
-                'text',
-                'title'
-              ],
-              'text' => 'posting a simple "warning" text'
-            }
-          ]
+        {
+            'attachments' => [
+                {
+                    'color'     => '#f5ca46',
+                    'mrkdwn_in' => [
+                        'text',
+                        'title'
+                    ],
+                    'text' => 'posting a simple "warning" text'
+                }
+            ]
         },
         'post_warning( txt )'
     );
@@ -109,18 +129,18 @@ http_post_was_called_with(
     );
 
     http_post_was_called_with(
-        {   
-          'attachments' => [
-            {
-              'color' => '#f5ca46',
-              'mrkdwn_in' => [
-                'text',
-                'title'
-              ],
-              'text' => 'this is the _warning_ message',
-              'title' => ':warning: Warning Title'
-            }
-          ]
+        {
+            'attachments' => [
+                {
+                    'color'     => '#f5ca46',
+                    'mrkdwn_in' => [
+                        'text',
+                        'title'
+                    ],
+                    'text'  => 'this is the _warning_ message',
+                    'title' => ':warning: Warning Title'
+                }
+            ]
         },
         'post_warning( @list )'
     );
@@ -132,17 +152,17 @@ http_post_was_called_with(
 
     $hook->post_error('posting a simple *"error"* message');
     http_post_was_called_with(
-        {   
-          'attachments' => [
-            {
-              'color' => '#cc0000',
-              'mrkdwn_in' => [
-                'text',
-                'title'
-              ],
-              'text' => 'posting a simple *"error"* message'
-            }
-          ]
+        {
+            'attachments' => [
+                {
+                    'color'     => '#cc0000',
+                    'mrkdwn_in' => [
+                        'text',
+                        'title'
+                    ],
+                    'text' => 'posting a simple *"error"* message'
+                }
+            ]
         },
         'post_error( txt )'
     );
@@ -153,22 +173,21 @@ http_post_was_called_with(
     );
 
     http_post_was_called_with(
-        {   
-          'attachments' => [
-            {
-              'color' => '#cc0000',
-              'mrkdwn_in' => [
-                'text',
-                'title'
-              ],
-              'text' => 'this is the _error_ message',
-              'title' => ':criticalfail: Error Title'
-            }
-          ]
+        {
+            'attachments' => [
+                {
+                    'color'     => '#cc0000',
+                    'mrkdwn_in' => [
+                        'text',
+                        'title'
+                    ],
+                    'text'  => 'this is the _error_ message',
+                    'title' => ':criticalfail: Error Title'
+                }
+            ]
         },
         'post_error( @list )'
     );
-
 
 }
 
@@ -178,38 +197,36 @@ http_post_was_called_with(
     $hook->post_start('starting some task');
 
     http_post_was_called_with(
-        {   
-          'attachments' => [
-            {
-              'color' => '#2b3bd9',
-              'mrkdwn_in' => [
-                'text',
-                'title'
-              ],
-              'text' => 'starting some task'
-            }
-          ]
+        {
+            'attachments' => [
+                {
+                    'color'     => '#2b3bd9',
+                    'mrkdwn_in' => [
+                        'text',
+                        'title'
+                    ],
+                    'text' => 'starting some task'
+                }
+            ]
         },
         'post_start( txt )'
     );
-    
+
     $hook->_started_at( time() - ( 1 * 3600 + 12 * 60 + 45 ) );
     $hook->post_end('task is now finished');
 
     http_post_was_called_with(
-        {   
-          'attachments' => [
-            {
-              'color' => '#2eb886',
-              'mrkdwn_in' => [
-                'text',
-                'title'
-              ],
-              'text' => 
-              "task is now finished\n"
-              . "_run time: 1 hour 12 minutes 45 seconds_"
-            }
-          ]
+        {
+            'attachments' => [
+                {
+                    'color'     => '#2eb886',
+                    'mrkdwn_in' => [
+                        'text',
+                        'title'
+                    ],
+                    'text' => "task is now finished\n" . "_run time: 1 hour 12 minutes 45 seconds_"
+                }
+            ]
         },
         'post_end( txt ) - 1 hour 12 minutes 45 seconds'
     );
@@ -219,18 +236,18 @@ http_post_was_called_with(
     $hook->post_start( title => "Starting Task 42", text => "description..." );
 
     http_post_was_called_with(
-        {   
-          'attachments' => [
-            {
-              'color' => '#2b3bd9',
-              'mrkdwn_in' => [
-                'text',
-                'title'
-              ],
-              'text' => 'description...',
-              'title' => 'Starting Task 42'
-            }
-          ]
+        {
+            'attachments' => [
+                {
+                    'color'     => '#2b3bd9',
+                    'mrkdwn_in' => [
+                        'text',
+                        'title'
+                    ],
+                    'text'  => 'description...',
+                    'title' => 'Starting Task 42'
+                }
+            ]
         },
         'post_start( @list )'
     );
@@ -242,19 +259,18 @@ http_post_was_called_with(
     );
 
     http_post_was_called_with(
-        {   
-          'attachments' => [
+        {
+            'attachments' => [
                 {
-                  'color' => '#000',
-                  'mrkdwn_in' => [
-                    'text',
-                    'title'
-                  ],
-                  'text' => "task is now finished\n"
-                        . '_run time: 18 seconds_',
-                  'title' => 'Task 42 is now finished'
+                    'color'     => '#000',
+                    'mrkdwn_in' => [
+                        'text',
+                        'title'
+                    ],
+                    'text'  => "task is now finished\n" . '_run time: 18 seconds_',
+                    'title' => 'Task 42 is now finished'
                 }
-          ]
+            ]
         },
         'post_end( @list ) with custom color'
     );
@@ -263,7 +279,7 @@ http_post_was_called_with(
 ## final santiy check
 note "final santiy check";
 is $last_http_post_form, undef, "all called were check"
-    or diag explain $last_http_post_form;
+  or diag explain $last_http_post_form;
 
 done_testing;
 exit;
@@ -276,14 +292,13 @@ sub http_post_was_called_with {
     is $last_http_post_form, [
         $URL,
         { payload => D() }
-        ],
-        "last_http_post_form called"
-        or die;
+      ],
+      "last_http_post_form called"
+      or die;
 
-    my $content = eval {
-        JSON::MaybeXS::decode_json( $last_http_post_form->[1]->{payload} );
-    };
-    is $content => $expect, $msg or diag explain $content;
+    my $content = eval { JSON::XS->new->utf8(0)->decode( $last_http_post_form->[1]->{payload} ) };
+    diag "Error: ", $@ if $@;
+    is( $content, $expect, $msg ) or diag explain $content, explain $last_http_post_form->[1]->{payload};
 
     undef $last_http_post_form;    # reset;
 

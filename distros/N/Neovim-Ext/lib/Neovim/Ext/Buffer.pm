@@ -1,9 +1,10 @@
 package Neovim::Ext::Buffer;
-$Neovim::Ext::Buffer::VERSION = '0.02';
+$Neovim::Ext::Buffer::VERSION = '0.05';
 use strict;
 use warnings;
 use Tie::Array;
 use Neovim::Ext::Remote;
+use Neovim::Ext::Range;
 
 our @ISA = (qw/Neovim::Ext::Remote Tie::Array/);
 
@@ -47,7 +48,18 @@ sub FETCH
 sub STORE
 {
 	my ($this, $index, $value) = @_;
-	$this->request ('nvim_buf_set_lines', $index, $index+1, 0, defined ($value) ? [$value] : []);
+	$this->request ('nvim_buf_set_lines', $index, $index+1, 0, defined ($value) ? ["$value"] : []);
+}
+
+
+
+sub SPLICE
+{
+	my ($this, $offset, $length, @list) = @_;
+
+	$offset //= 0;
+	$length //= $this->request ('nvim_buf_line_count');
+	$this->request ('nvim_buf_set_lines', $offset, $offset+$length, 0, [map { "$_" } @list]);
 }
 
 
@@ -118,13 +130,22 @@ sub mark
 }
 
 
+
+
+sub range
+{
+	my ($this, $start, $end) = @_;
+	return Neovim::Ext::Range->new ($this, $start, $end);
+}
+
+
 =head1 NAME
 
 Neovim::Ext::Buffer - Neovim Buffer class
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNPOSIS
 
@@ -150,6 +171,10 @@ A remote Nvim buffer. A C<Neovim::Ext::Buffer> instance is a tied array referenc
 =head2 mark( $name )
 
 Return the row and column for a named mark.
+
+=head2 range( $start, $end )
+
+Return a C<Neovim::Ext::Range> which represents part of the buffer.
 
 =head2 name( [$name] )
 

@@ -1,5 +1,8 @@
 Revision history for Plack-Middleware-SignedCookies
 
+1.203 Mon 31 Aug 2020
+	- Support for streaming PSGI apps.
+
 1.202 Mon 18 Dec 2017
 	- Fix for another accidental 5.10-ism in the tests.
 	  No module code changes.

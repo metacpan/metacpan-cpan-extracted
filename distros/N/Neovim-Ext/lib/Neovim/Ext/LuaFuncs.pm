@@ -1,5 +1,5 @@
 package Neovim::Ext::LuaFuncs;
-$Neovim::Ext::LuaFuncs::VERSION = '0.02';
+$Neovim::Ext::LuaFuncs::VERSION = '0.05';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -81,7 +81,7 @@ Neovim::Ext::LuaFuncs - Neovim LuaFuncs class
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 

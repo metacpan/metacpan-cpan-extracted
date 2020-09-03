@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.253    2020-09-03
+        - Disable warnings 'closure' in END block to avoid 'Variable "%s" will not stay shared' warning.
+
 2.252    2020-07-27
         - App::DBBrowser::Table::Substatements: fixed wrong LABEL.
         - App::DBBrowser::GetContent::Read: removed unused code.

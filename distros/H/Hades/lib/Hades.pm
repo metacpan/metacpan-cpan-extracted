@@ -3,12 +3,18 @@ package Hades;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.12';
+our $VERSION = '0.17';
 use Module::Generate;
 use Switch::Again qw/switch/;
 
+our $PARENTHESES;
+BEGIN {
+	$PARENTHESES = qr{ \( (?: (?> [^()]+ ) | (??{ $PARENTHESES }) )* \) }x;
+}
+
 sub new {
 	my ($class, %args) = (shift, scalar @_ == 1 ? %{$_[0]} : @_);
+	$args{macros} = {} if !$args{macros};
 	bless \%args, $class;
 }
 
@@ -29,12 +35,16 @@ sub run {
 		$ident =~ m/^((:.*\()|(\{)|(\[))/
 			? do {
 				my $copy = $ident;
-				$copy =~ s/\\\{|\\\}|\\\(|\\\)||\\\[|\\\]//g; # remove escaped
-				1 while ($copy =~ s/\([^()]+\)|\{[^{}]+\}|\[[^\[\]]+\]//g);
+				$copy =~ s/\\\{|\\\}|\\\(|\\\)|\\\[|\\\]//g; # remove escaped
+				1 while ($copy =~ s/\([^()]*\)|\{[^{}]*\}|\[[^\[\]]*\]//g);
 				($copy =~ m/\(|\{|\[|\)|\}|\]/) ? do {
 					$ident .= $first_char;
 				} : do {
-					push @innerline, $ident;
+					if ($nested) {
+						push @innerline, $ident;
+					} else {
+						push @line, $ident;
+					}
 					$ident = '';
 				}
 			}
@@ -64,6 +74,7 @@ sub run {
 							$ident .= $first_char unless $first_char =~ m/\s/;
 						};
 	}
+
 	if (scalar @lines) {
 		my $last_token;
 		for my $class (@lines) {
@@ -74,16 +85,18 @@ sub run {
 					? do { $last_token = $self->build_class_inheritance($mg, $last_token, $token); }
 					: scalar @{$token} == 1
 						? $self->build_accessor_no_arguments($mg, $token, $meta)
-						: $token->[1] =~ s/^{|}$//g
-							? $self->build_sub_no_arguments($mg, $token, $meta)
-							: $token->[0] =~ m/^(our)$/
-								? $self->build_our($mg, $token, $meta)
-								: $token->[0] =~ m/^(synopsis|abstract)$/
-									? $self->build_synopsis_or_abstract($mg, $token, $meta)
+						: $token->[0] =~ m/^(synopsis|abstract|test)$/
+							? do { my $m = "build_$1"; $self->$m($mg, $token, $meta); }
+							: $token->[1] =~ s/^{|}$//g
+								? $self->build_sub_no_arguments($mg, $token, $meta)
+								: $token->[0] =~ m/^(our)$/
+									? $self->build_our($mg, $token, $meta)
 									: $self->build_sub_or_accessor($mg, $token, $meta);
 			}
-			$self->build_new($mg, $meta);
-			$self->can('after_class') && $self->after_class($mg, $meta);
+			if (scalar keys %{$meta}) {
+				$self->build_new($mg, $meta);
+				$self->can('after_class') && $self->after_class($mg, $meta);
+			}
 		}
 	}
 	$self->can('before_generate') && $self->before_generate($mg);
@@ -93,14 +106,14 @@ sub run {
 
 sub build_class {
 	my ($self, $mg, $class) = @_;
-	if ($class->[0] eq 'macro') {
-		shift @{$class};
-		$mg->macro(shift @{$_}, join(' ', @{$_}) . ';') for @{$class};
-		next;
-	}
-	while ($class->[0] =~ m/^(dist|lib|author|email|version)$/) {
+	while ($class->[0] =~ m/^(dist|lib|tlib|realm|author|email|version)$/) {
 		$mg->$1($class->[1]);
 		shift @{$class}, shift @{$class};
+	}
+	if ($class->[0] eq 'macro') {
+		shift @{$class};
+		$self->build_macro($mg, $class);
+		return [];
 	}
 	$mg->class(shift @{$class})->new;
 	return $class;
@@ -112,8 +125,10 @@ sub build_new {
 	my $accessors = q|(|;
 	map {
 		$accessors .= qq|$_ => {|;
-		$accessors .= qq|required=>1,| if $meta->{$_}->{required};
-		$accessors .= qq|default=>$meta->{$_}->{default},| if $meta->{$_}->{default};
+		$accessors .= qq|required => 1,| if $meta->{$_}->{required};
+		$accessors .= qq|default => $meta->{$_}->{default},| if $meta->{$_}->{default};
+		$accessors .= qq|builder => sub { my (\$self, \$value) = \@_;| . $self->build_builder($_, '$value', $meta->{$_}->{builder}) . qq|return \$value;}|
+			if $meta->{$_}->{builder};
 		$accessors .= qq|},|;
 	} grep { $meta->{$_}->{meta} eq 'ACCESSOR' } keys %{$meta};
 	$accessors .= q|)|;
@@ -123,7 +138,13 @@ sub build_new {
 		$new;
 		my \%accessors = $accessors;
 		for my \$accessor ( keys \%accessors ) {
-			my \$value = \$self->\$accessor(defined \$args{\$accessor} ? \$args{\$accessor} : \$accessors{\$accessor}->{default});
+			my \$param = defined \$args{\$accessor} ? \$args{\$accessor} : \$accessors{\$accessor}->{default};
+			my \$value = \$self->\$accessor(
+				\$accessors{\$accessor}->{builder} ? \$accessors{\$accessor}->{builder}->(
+					\$self,
+					\$param
+				) : \$param
+			);
 			unless (!\$accessors{\$accessor}->{required} \|\| defined \$value) {
 				die "\$accessor accessor is required";
 			}
@@ -153,11 +174,8 @@ sub build_sub_no_arguments {
 	my ($self, $mg, $token, $meta) = @_;
 	my $name = shift @{$token};
 	$name =~ m/^(begin|unitcheck|check|init|end|new)$/
-		? $mg->$name(join ' ', @{$token})
-		: $mg->sub($name)->code(sprintf qq|{
-			my (\$self) = \@_;
-			%s
-		}|, join ' ', @{$token})
+		? $mg->$name('{' . join( ' ', @{$token}) . '}')
+		: $mg->sub($name)->code($self->build_code($mg, $name, $self->build_sub_code($name, '', '', join ' ', @{$token})))
 		->pod(qq|call $name method. Expects no params.|)->example(qq|\$obj->$name()|);
 	return $meta;
 }
@@ -169,30 +187,52 @@ sub build_our {
 	return $meta;
 }
 
+sub build_synopsis { goto &build_synopsis_or_abstract; }
+
+sub build_abstract { goto &build_synopsis_or_abstract; }
+
+sub build_test {
+	my ($self, $mg, $token, $meta) = @_;
+	my ($name, $content) = @{$token};
+	$content =~ s/^\{\s*|\s*\}$//g;
+	$mg->class_tests(eval $content);
+	return $meta;
+}
+
 sub build_synopsis_or_abstract {
 	my ($self, $mg, $token, $meta) = @_;
-	my $name = shift @{$token};
-	$mg->$name(join ' ', @{$token});
+	my ($name, $content) = @{$token};
+	$content =~ s/^\{\s*|\s*\}$//g;
+	$mg->$name($content);
 	return $meta;
 }
 
 sub build_sub_or_accessor_attributes {
 	my ($self, $name, $token, $meta) = @_;
 	my @ATTR = (
-		qr/^(\:around|\:ar)/ => sub {
-			$meta->{$name}->{meta} = 'MODIFY';
-			while ($token->[0] !~ s/^\{|\}$//g) { shift @{$token} }
-			$meta->{$name}->{around} = join " ", @{$token};
+		'default' => sub {
+			my $value = shift;
+			push @{$meta->{$name}->{caught}}, $value;
 		},
-		qr/^(\:after|\:a)/ => sub {
+		qr/^(\:around|\:ar)$/ => sub {
 			$meta->{$name}->{meta} = 'MODIFY';
-			while ($token->[0] !~ s/^\{|\}$//g) { shift @{$token} }
-			$meta->{$name}->{after} = join " ", @{$token};
+			$token->[-1] =~ s/^\{(.*)\}$/$1/sg;
+			$meta->{$name}->{around} = pop @{$token};
 		},
-		qr/^(\:before|\:b)/ => sub {
+		qr/^(\:after|\:a)$/ => sub {
 			$meta->{$name}->{meta} = 'MODIFY';
-			while ($token->[0] !~ s/^\{|\}$//g) { shift @{$token} }
-			$meta->{$name}->{before} = join " ", @{$token};
+			$token->[-1] =~ s/^\{(.*)\}$/$1/sg;
+			$meta->{$name}->{after} = pop @{$token};
+		},
+		qr/^(\:before|\:b)$/ => sub {
+			$meta->{$name}->{meta} = 'MODIFY';
+			$token->[-1] =~ s/^\{(.*)\}$/$1/sg;
+			$meta->{$name}->{before} = pop @{$token};
+		},
+		qr/^(:builder|:bdr)/ => sub {
+			my $value = shift;
+			$value =~ s/(\:bd|\:build)\((.*)\)$/$2/sg;
+			$meta->{$name}->{builder} = $2 ? $value : 1;
 		},
 		qr/^(\:clearer|\:c)$/ => sub {
 			$meta->{$name}->{clearer} = 1;
@@ -211,13 +251,26 @@ sub build_sub_or_accessor_attributes {
 			my $value = shift;
 			$value =~ s/.*\((.*)\)/$1/sg;
 			$value = '"' . $value . '"'
-				if $value !~ m/^(\{|\[|\"|\'|q)|(\d+)/;
+				if $value !~ m/^(\{|\[|\"|\'|\$|\£|q)|(\d+)/;
 			$meta->{$name}->{default} =  $value;
 			if ($meta->{$name}->{params_map}) {
 				$meta->{$name}->{params_map}->{
 					$meta->{$name}->{param}->[-1]
 				}->{default} = $value;
 			}
+		},
+		qr/^(\:example)/ => sub {
+			my $value = shift;
+			$value =~ s/^\:example\(\s*(.*)\s*\)$/$1/sg;
+			$meta->{$name}->{example} =  $value;
+		},
+		qr/^(\:no_success_test)/ => sub {
+			$meta->{$name}->{no_success_test} = 1;
+		},
+		qr/^(\:pod)/ => sub {
+			my $value = shift;
+			$value =~ s/^:pod\(\s*(.*)\s*\)$/$1/sg;
+			$meta->{$name}->{pod} =  $value;
 		},
 		qr/^(\:private|\:p)$/ => sub {
 			$meta->{$name}->{private} = 1;
@@ -251,7 +304,7 @@ sub build_sub_or_accessor_attributes {
 		qr/^(\{)/ => sub {
 			my $value = shift;
 			$value =~ s/^\{|\}$//g;
-			$meta->{$name}->{meta} = 'METHOD';
+			$meta->{$name}->{meta} = 'METHOD' unless $meta->{$name}->{meta} eq 'MODIFY';
 			$meta->{$name}->{code} = $value;
 		},
 		qr/^(\%|\$|\@|\&)/ => sub {
@@ -279,8 +332,8 @@ sub build_sub_or_accessor {
 		: $meta->{$name}->{meta} eq 'MODIFY'
 			? $self->build_modify($mg, $name, $meta)
 			: $self->build_sub($mg, $name, $meta);
-	$self->build_clearer($mg, $name, $meta) if $meta->{$name}->{clearer};
 	$self->build_predicate($mg, $name, $meta) if $meta->{$name}->{predicate};
+	$self->build_clearer($mg, $name, $meta) if $meta->{$name}->{clearer};
 	return $meta;
 }
 
@@ -290,14 +343,26 @@ sub build_accessor {
 	my $type = $self->build_coerce($name, '$value', $meta->{$name}->{coerce})
 	. $self->build_type($name, $meta->{$name}->{type}[0]);
 	my $trigger = $self->build_trigger($name, '$value', $meta->{$name}->{trigger});
-	my $code = qq|{
+	my $code = $self->build_code($mg, $name, $self->build_accessor_code($name, $private, $type, $trigger));
+	$mg->accessor($name)->code($code)->clear_tests->test($self->build_tests($name, $meta->{$name}));
+	$meta->{$name}->{$_} && $mg->$_($self->replace_pe_string($meta->{$name}->{$_}, $name)) for qw/pod example/;
+}
+
+sub build_accessor_code {
+	my ($self, $name, $private, $type, $trigger) = @_;
+	return qq|{
 		my ( \$self, \$value ) = \@_; $private
 		if ( defined \$value ) { $type
 			\$self->{$name} = \$value; $trigger
 		}
 		return \$self->{$name};
 	}|;
-	$mg->accessor($name)->code($code)->clear_tests->test($self->build_tests($name, $meta->{$name}));
+}
+
+sub replace_pe_string {
+	my ($self, $str, $name) = @_;
+	$str =~ s/\$name/$name/g;
+	return $str;
 }
 
 sub build_modify {
@@ -305,12 +370,18 @@ sub build_modify {
 	my $before_code = $meta->{$name}->{before} || "";
 	my $around_code = $meta->{$name}->{around} || qq|my \@res = \$self->\$orig(\@params);|;
 	my $after_code = $meta->{$name}->{after} || "";
-	my $code = qq|{
+	my $code = $self->build_code($mg, $name, $self->build_modify_code($name, $before_code, $around_code, $after_code));
+	$mg->sub($name)->code($code)->pod(qq|call $name method.|)->test($self->build_tests($name, $meta->{$name}));
+	$meta->{$name}->{$_} && $mg->$_($self->replace_pe_string($meta->{$name}->{$_}, $name)) for qw/pod example/;
+}
+
+sub build_modify_code {
+	my ($self, $name, $before_code, $around_code, $after_code) =@_;
+	return qq|{
 		my (\$orig, \$self, \@params) = ('SUPER::$name', \@_);
 		$before_code$around_code$after_code
 		return wantarray ? \@res : \$res[0];
 	}|;
-	$mg->sub($name)->code($code)->pod(qq|call $name method.|)->test($self->build_tests($name, $meta->{$name}));
 }
 
 sub build_sub {
@@ -345,27 +416,53 @@ sub build_sub {
 			}
 		}
 	}
-	$code = qq|{
-		my (\$self $params) = \@_; $subtype
-		$code;
-	}|;
+	$meta->{$name}->{params_explanation} = $params_explanation;
+	$code = $self->build_code($mg, $name, $self->build_sub_code($name, $params, $subtype, $code));
 	$params =~ s/^,\s*//;
 	my $example = qq|\$obj->$name($params)|;
-
 	$mg->sub($name)->code($code)
 		->pod(qq|call $name method. Expects $params_explanation.|)
 		->example($example)
 		->test($self->build_tests($name, $meta->{$name}));
+	$meta->{$name}->{$_} && $mg->$_($self->replace_pe_string($meta->{$name}->{$_}, $name)) for qw/pod example/;
+}
+
+sub build_code {
+	my ($self, $mg, $name, $code) = @_;
+	return unless defined $code;
+	1 while $code =~ s/€(\w+(|$PARENTHESES));/$self->build_macro_code($mg, $1)/ge;
+	$code =~ s/£(\w*(\s|\$|\-|\;|\,|\{|\}|\[|\]|\)|\(|\:))/$self->build_self($1)/eg;
+	return $code;
+}
+
+sub build_self {
+	my ($self, $name) = @_;
+	return qq|\$self->$name|;
+}
+
+sub build_macro_code {
+	my ($self, $mg, $match) = @_;
+	if ($match =~ m/^(.*)($PARENTHESES)$/m) {
+		return '' unless $self->{macros}->{$1}->{code};
+		my $v =  $self->{macros}->{$1}->{code}->($self, $mg, eval qq|($2)|);
+		return $v;
+	}
+	return '' unless $self->{macros}->{$match}->{code};
+	return $self->{macros}->{$match}->{code}->($self, $mg);
+}
+
+sub build_sub_code {
+	my ($self, $name, $params, $subtype, $code) = @_;
+	return qq|{
+		my (\$self $params) = \@_; $subtype
+		$code;
+	}|;
 }
 
 sub build_clearer {
 	my ($self, $mg, $name, $meta) = @_;
 	$mg->sub(qq|clear_$name|)
-		->code(qq|{
-			my (\$self) = \@_;
-			delete \$self->{$name};
-			return \$self;
-		}|)
+		->code($self->build_code($mg, $name, $self->build_clearer_code($name)))
 		->pod(qq|clear $name accessor|)
 		->example(qq|\$obj->clear_$name|)
 		->test(
@@ -375,23 +472,46 @@ sub build_clearer {
 		);
 }
 
+sub build_clearer_code {
+	my ($self, $name) = @_;
+	return qq|{
+		my (\$self) = \@_;
+		delete \$self->{$name};
+		return \$self;
+	}|;
+}
+
 sub build_predicate {
 	my ($self, $mg, $name, $meta) = @_;
 	$mg->sub(qq|has_$name|)
-		->code(qq|{
-			my (\$self) = \@_;
-			return exists \$self->{$name};
-		}|)
+		->code($self->build_code($mg, $name, $self->build_predicate_code($name)))
 		->pod(qq|has_$name will return true if $name accessor has a value.|)
 		->example(qq|\$obj->has_$name|)
 		->test(
-			($meta->{$name}->{required} || $meta->{$name}->{default} ? (
-				['ok', qq|delete \$obj->{$name}|]
-			) : ()),
+			['ok', qq|do{ delete \$obj->{$name}; 1;}|],
 			['is', qq|\$obj->has_$name|, q|''|],
 			$self->build_tests($name, $meta->{$name}, 'success'),
 			['is', qq|\$obj->has_$name|, 1],
 		);
+}
+
+sub build_predicate_code {
+	my ($self, $name) = @_;
+	return qq|{
+		my (\$self) = \@_;
+		return exists \$self->{$name};
+	}|;
+}
+
+sub build_builder {
+	my ($self, $name, $param, $code) = @_;
+	if (defined $code) {
+		$code = "_build_$name" if $code =~ m/^1$/;
+		return $code =~ m/^\w+$/
+			? qq|$param = \$self->$code($param);|
+			: $code
+	}
+	return q||;
 }
 
 sub build_coerce {
@@ -664,6 +784,56 @@ sub extend_error_string {
 	return $new_error_string;
 }
 
+sub build_macro_attributes {
+	my ($self, $name, $token, $meta) = @_;
+	return (
+		'default' => sub {
+			my $value = shift;
+			push @{$meta->{$name}->{caught}}, $value;
+		},
+		qr/^(\:a|\:alias)/ => sub {
+			my $value = shift;
+			$value =~ s/^\:(a|alias)\(\s*(.*)\s*\)$/$2/sg;
+			push @{$meta->{$name}->{alias}}, split(' ', $value);
+		},
+		qr/^(\{)/ => sub {
+			my $value = shift;
+			$value =~ s/^\{|\}$//g;
+			$meta->{$name}->{code} = eval qq|sub { my (\$self, \$mg, \@params) = \@_; $value }|;
+		},
+	);
+}
+
+sub build_macro {
+	my ($self, $mg, $class) = @_;
+	my $meta = $self->{macros};
+	for my $macro (@{$class}) {
+		if ($macro->[-1] !~  m/^{/) {
+			my $include = sprintf "Hades::Macro::%s", shift @{$macro};
+			eval qq|require $include|;
+			die $@ if $@;
+			my $include_meta = $include->new($macro->[0] ? do {
+				$macro->[0] =~ s/^\[|\]$//g;
+				( eval qq|$macro->[0]| );
+			} : ())->meta;
+			$meta = {%{$meta}, %{$include_meta}};
+		} else {
+			my $name = shift @{$macro};
+			$meta->{$name}->{meta} = 'MACRO';
+			my $switch = switch(
+				$self->build_macro_attributes($name, $macro, $meta)
+			);
+			$switch->(shift @{$macro}) while scalar @{$macro};
+			if ($meta->{$name}->{alias}) {
+				for (@{$meta->{$name}->{alias}}) {
+					$meta->{$_} = $meta->{$name};
+				}
+			}
+		}
+	}
+	$self->{macros} = $meta;
+}
+
 sub index {
 	my ($self, $index) = @_;
 	return substr $self->{eval}, $index, 1;
@@ -890,8 +1060,10 @@ sub build_tests {
 	} : do {
 		my %test_data;
 		map {
-			push @{$test_data{test_data_columns}}, $_;
-			$test_data{$_} = [ $self->build_test_data($meta->{$_}->{type}->[0] ? $meta->{$_}->{type}->[0] : 'Any', '', 1) ];
+			unless ($meta->{$_}->{no_success_test}) {
+				push @{$test_data{test_data_columns}}, $_;
+				$test_data{$_} = [ $self->build_test_data($meta->{$_}->{type}->[0] ? $meta->{$_}->{type}->[0] : 'Any', '', 1) ]
+			}
 		} grep { $meta->{$_}->{meta} eq 'ACCESSOR' } keys %{$meta};
 		my $valid =  join(', ', map { sprintf '%s => %s', $_, $test_data{$_}->[0] } grep { $meta->{$_}->{required} } @{$test_data{test_data_columns}});
 		push @tests, [
@@ -968,22 +1140,22 @@ sub build_tests {
 		$meta->{private} ? do {
 			push @tests, ['eval', qq|\$obj->$name|, 'private method|private attribute'];
 		} : do {
-			push @tests, ['is', qq|\$obj->$name|, 'undef'] if !$meta->{required} && !$meta->{default};
-			my (@test_cases) = $self->build_test_data($meta->{type}->[0] || 'Any', $name);
+			push @tests, ['is', qq|\$obj->$name|, 'undef'] if !$meta->{no_success_test} && !$meta->{builder} && !$meta->{required} && !$meta->{default};
+			my (@test_cases) = $self->build_test_data($meta->{type}->[0] || 'Any', $name, $meta->{required} || $meta->{builder});
 			if (scalar @test_cases > 1) {
 				my $valid = shift @test_cases;
-				push @tests, ['deep', qq|\$obj->$name($valid)|, $valid];
+				push @tests, ['deep', qq|\$obj->$name($valid)|, $valid] unless $meta->{no_success_test};
 				unless ($meta->{coerce}) {
 					for (@test_cases) {
 						push @tests, ['eval', qq|\$obj->$name($_)|, 'invalid|value|type|constraint|greater|atleast' ];
 					}
 				}
-				push @tests, ['deep', qq|\$obj->$name|, $valid];
+				push @tests, ['deep', qq|\$obj->$name|, $valid] unless $meta->{no_success_test};
 			}
 		};
 	} : do {
 		$meta->{private} ? do {
-			push @tests, ['eval', qq|\$obj->name|, 'private method'];
+			push @tests, ['eval', qq|\$obj->$name|, 'private method'];
 		} : $meta->{param} && do {
 			my %test_data = map {
 				$_ => [
@@ -1032,7 +1204,7 @@ Hades - Less is more, more is less!
 
 =head1 VERSION
 
-Version 0.12
+Version 0.17
 
 =cut
 
@@ -1041,7 +1213,7 @@ Version 0.12
 	use Hades;
 
 	Hades->run({
-		eval => 'Kosmos { [penthos curae] :t(Int) :d(2) :p :pr :c :r geras $nosoi :t(Int) :d(2) { if ($self->penthos == $nosoi) { return $self->curae; } } }'
+		eval => 'Kosmos { [penthos curae] :t(Int) :d(2) :p :pr :c :r geras $nosoi :t(Int) :d(2) { if (£penthos == $nosoi) { return £curae; } } }'
 	});
 
 	... generates ...
@@ -1198,6 +1370,30 @@ Declare a new class.
 
 =cut
 
+=head3 Abstract
+
+Declare the classes Abstract.
+
+	Kosmos {
+		abstract { Afti einai i perilipsi }
+	}
+
+=cut
+
+=head3 Synopsis
+
+Declare the classes Synopsis.
+
+	Kosmos {
+		synopsis {
+			Schetika me ton Kosmos
+
+				Kosmos->new;
+		}
+	}
+
+=cut
+
 =head3 Inheritance
 
 =cut
@@ -1240,6 +1436,21 @@ Declare modules that should be included in the class.
 
 	Kosmos use Kato Vathys {
 
+	}
+
+=cut
+
+=head3 Test
+
+Declare the classes additional tests.
+
+	Kosmos {
+		test {
+			[
+				['ok', 'my $obj = Kosmos->new'],
+				['is', '$obj->dokimi', undef]
+			]
+		}
 	}
 
 =cut
@@ -1404,6 +1615,15 @@ Add type checking to the accessor.
 
 	dokimi :t(Dict[onoma => Str, id => Optional[Int], epiloges => Dict[onama => Str]])
 	dokimes :type(Str)
+
+=cut
+
+=head3 :builder | :bdr
+
+Takes a coderef which is meant to build the attributes value.
+
+	dokimi :bdr
+	dokimes :builder($value = $value->[0] if ref($value) || "" eq "ARRAY";)
 
 =cut
 
@@ -1708,6 +1928,92 @@ Used in conjunction with Dict and Tuple to specify slots that are optional and m
 	dokimi :t(Optional[Str])
 
 =cut
+
+=head2 Macros
+
+Hades has a concept of macros that allow you to write re-usable code. see L<https://metacpan.org/source/LNATION/Hades-0.17/macro-fh.hades> for an example of how to extend via macros.
+
+	macro {
+		FH [ macro => [qw/read_file write_file/], alias => { read_file => [qw/rf/], write_file => [qw/wf/] } ]
+		str2ArrayRef :a(s2ar) {
+			return qq|$params[0] = [ $params[0] ];|;
+		}
+		ArrayRef2Str :a(ar2s) {
+			return qq|$params[0] = $params[0]\->[0];|;
+		}
+	}
+	MacroKosmos {
+		eros $eros :t(Str) :d(t/test.txt) {
+			€s2ar('$eros');
+			€ar2s('$eros');
+			€wf('$eros', q|'this is a test'|);
+			return $eros;
+		}
+		psyche $psyche :t(Str) :d(t/test.txt) {
+			€rf('$psyche');
+			return $content;
+		}
+	}
+
+	... generates ...
+
+	package MacroKosmos;
+	use strict;
+	use warnings;
+	our $VERSION = 0.01;
+
+	sub new {
+		my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
+		my $self = bless {}, $cls;
+		my %accessors = ();
+		for my $accessor ( keys %accessors ) {
+			my $value
+			    = $self->$accessor(
+				defined $args{$accessor}
+				? $args{$accessor}
+				: $accessors{$accessor}->{default} );
+			unless ( !$accessors{$accessor}->{required} || defined $value ) {
+				die "$accessor accessor is required";
+			}
+		}
+		return $self;
+	}
+
+	sub eros {
+		my ( $self, $eros ) = @_;
+		$eros = defined $eros ? $eros : "t/test.txt";
+		if ( !defined($eros) || ref $eros ) {
+			$eros = defined $eros ? $eros : 'undef';
+			die qq{Str: invalid value $eros for variable \$eros in method eros};
+		}
+
+		$eros = [$eros];
+		$eros = $eros->[0];
+		open my $wh, ">", $eros or die "cannot open file for writing: $!";
+		print $wh 'this is a test';
+		close $wh;
+		return $eros;
+
+	}
+
+	sub psyche {
+		my ( $self, $psyche ) = @_;
+		$psyche = defined $psyche ? $psyche : "t/test.txt";
+		if ( !defined($psyche) || ref $psyche ) {
+			$psyche = defined $psyche ? $psyche : 'undef';
+			die
+			    qq{Str: invalid value $psyche for variable \$psyche in method psyche};
+		}
+
+		open my $fh, "<", $psyche or die "cannot open file for reading: $!";
+		my $content = do { local $/; <$fh> };
+		close $fh;
+		return $content;
+	}
+
+	1;
+
+	__END__
 
 =head2 Testing
 

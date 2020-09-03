@@ -15,6 +15,7 @@ my @types = qw(
     BrowseDescription
     BrowseNextRequest
     BrowseRequest
+    BuildInfo
     ReadRequest
     NodeId
     ExpandedNodeId

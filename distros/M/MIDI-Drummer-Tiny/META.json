@@ -33,8 +33,10 @@
       "runtime" : {
          "requires" : {
             "MIDI::Simple" : "0",
+            "Math::Bezier" : "0",
             "Moo" : "2",
             "Music::Duration" : "0",
+            "constant" : "0",
             "namespace::clean" : "0",
             "strictures" : "2"
          }
@@ -60,7 +62,7 @@
          "web" : "https://github.com/ology/MIDI-Drummer-Tiny"
       }
    },
-   "version" : "0.1400",
+   "version" : "0.1602",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

@@ -1,5 +1,5 @@
 package Mojo::UserAgent::Role::Resume;
-use 5.010;
+use 5.016;
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use Mojo::Base -role;
 
 use Scalar::Util 'refaddr';
 
-our $VERSION = "v0.0.3";
+our $VERSION = "v0.1.0";
 
 has max_attempts => 1;
 
@@ -33,7 +33,7 @@ around start => sub {
         if !eval{$orig_tx->does($TX_ROLE)} or $orig_tx->previous or $orig_tx->RESUME_previous_attempt;
 
     my $tx = $orig_tx; # $tx will always equal the first tx (ie before any redirections) of every attempt
-    my @original_build_args = $tx->_RESUME_original_arguments->@*;
+    my @original_build_args = @{ $tx->_RESUME_original_arguments() };
     my $server_is_crappy_for_ranges = 0; # has server been proven to be unreliable for ranged requests?
     my $latest_good_200_tx; # the last tx with code 200 & full headers (holds the asset that 206 tx's should append to)
     my $remaining_attempts = $self->max_attempts;
@@ -108,7 +108,7 @@ around start => sub {
             }
         }
     };
-    unshift $tx->res->subscribers('progress')->@*, $progress_handler;
+    unshift @{ $tx->res->subscribers('progress') }, $progress_handler;
 
     my $build_retry_tx = sub {
         my ($old_tx) = @_;
@@ -119,7 +119,7 @@ around start => sub {
         # TODO: Check whether we should also check for "content received < total_size_based_on_headers"
 
         my $retry_tx = $self->build_tx(@original_build_args);
-        unshift $retry_tx->res->subscribers('progress')->@*, $progress_handler;
+        unshift @{ $retry_tx->res->subscribers('progress') }, $progress_handler;
 
         if ($latest_good_200_tx and !$server_is_crappy_for_ranges) {
             # set Range: header
@@ -238,8 +238,10 @@ L<Mojo::UserAgent::Role::Resume> adds the following attribute to the L<Mojo::Use
     my $ua = $class->new;
     $ua->max_attempts(5);
 
-The number of attempts it will try (at most). What matters for each download is the value this attribute held
-at the time the first attempt of that download took place.
+The number of attempts it will try (at most). Defaults to 1.
+
+What matters for each download is the value this attribute held at the time the first attempt of that download was
+started.
 
 =head1 TODO
 
@@ -252,11 +254,13 @@ determining whether to retry
 
 =item * Add events
 
-=item * Find the right minimum versions for its dependencies
-
 =back
 
-Despite all of the above, this module works.
+Other than the above, this module works.
+
+=head1 SPONSORS
+
+This module was sponsored.
 
 =head1 LICENSE
 

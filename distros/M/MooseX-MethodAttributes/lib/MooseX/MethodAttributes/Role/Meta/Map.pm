@@ -1,23 +1,22 @@
 package MooseX::MethodAttributes::Role::Meta::Map;
 # ABSTRACT: generic role for storing code attributes used by classes and roles with attributes
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Moose::Role;
-use MooseX::Types::Moose 0.21 qw/HashRef ArrayRef Str Int/;
 
 use namespace::autoclean;
 
 has _method_attribute_map => (
     is        => 'ro',
-    isa       => HashRef[ArrayRef[Str]],
+    isa       => 'HashRef[ArrayRef[Str]]',
     lazy      => 1,
     default   => sub { +{} },
 );
 
 has _method_attribute_list => (
     is      => 'ro',
-    isa     => ArrayRef[Int],
+    isa     => 'ArrayRef[Int]',
     lazy    => 1,
     default => sub { [] },
 );
@@ -60,7 +59,7 @@ MooseX::MethodAttributes::Role::Meta::Map - generic role for storing code attrib
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -81,7 +80,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHORS
 

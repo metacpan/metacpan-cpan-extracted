@@ -30,7 +30,7 @@ Mnet::Stanza - Manipulate stanza outline text
     }
 
     # print config applying acl to shutdown interfaces, if needed
-    my @ints = Mnet::Stanza::parse($sh_run, /^interface/);
+    my @ints = Mnet::Stanza::parse($sh_run, qr/^interface/);
     foreach my $int (@ints) {
         next if $int !~ /^\s*shutdown/m;
         next if $int =~ /^\s*ip access-group DMZ in/m;
@@ -75,7 +75,6 @@ Mnet::Stanza implements the functions listed below.
 use warnings;
 use strict;
 use Carp;
-use Mnet::Log::Conditional qw( DEBUG );
 
 
 
@@ -85,8 +84,8 @@ sub trim {
 
     $output = Mnet::Stanza::trim($input)
 
-The trim function can be used to normalize stanza spacing and may be useful
-before calling the diff function or outputting a stanza to the user.
+The Mnet::Stanza::trim function can be used to normalize stanza spacing and may
+be useful before calling the diff function or outputting a stanza to the user.
 
 This function does the following:
 
@@ -105,7 +104,6 @@ by the developer. Also note that this function does not touch tabs.
 
     # read input stanza text
     my $input = shift;
-    DEBUG("trim starting, input ".length($input // "")." chars");
 
     # init trimmed output text from input, null if undefined
     my $output = $input // "";
@@ -120,7 +118,7 @@ by the developer. Also note that this function does not touch tabs.
     my $indent_init = 999999999999;
     my $indent = $indent_init;
     foreach my $line (split(/\n/, $output)) {
-        if ($line =~ /^(\s+)\S/ and length($1) < $indent) {
+        if ($line =~ /^(\s*)\S/ and length($1) < $indent) {
             $indent = length($1);
         }
     }
@@ -129,7 +127,6 @@ by the developer. Also note that this function does not touch tabs.
     $output =~ s/^ {$indent}//mg if $indent and $indent < $indent_init;
 
     # finished trim function, return trimmed output text
-    DEBUG("trim finished, output ".length($output)." chars");
     return $output;
 }
 
@@ -142,8 +139,9 @@ sub parse {
     @output = Mnet::Stanza::parse($input, qr/$match_re/)
     $output = Mnet::Stanza::parse($input, qr/$match_re/)
 
-The parse function can be used to output one or more matching stanza sections
-from the input text, either as a list of matching stanzas or a single string.
+The Mnet::Stanza::parse function can be used to output one or more matching
+stanza sections from the input text, either as a list of matching stanzas or
+a single string.
 
 Here's some sample input text:
 
@@ -164,14 +162,13 @@ Using an input match_re of qr/^interface/ the following two stanzas are output:
 
 Note that blank lines don't terminate stanzas.
 
-Refer also to the trim function in this module.
+Refer also to the Mnet::Stanza::trim function in this module.
 
 =cut
 
     # read input stanza text and match regular expression
     my $input = shift;
     my $match_re = shift // croak("missing match_re arg");
-    DEBUG("parse starting, input ".length($input // "")." chars");
 
     # init list of matched output stanzas
     #   each output stanza will include lines indented under matched line
@@ -198,7 +195,6 @@ Refer also to the trim function in this module.
     chomp(@output);
 
     # finished parse function, return output stanzas as list or string
-    DEBUG("parse finished, output ".length("@output")." chars");
     return wantarray ? @output : join("\n", @output);
 }
 
@@ -210,8 +206,8 @@ sub diff {
 
     $diff = Mnet::Stanza::diff($old, $new)
 
-The diff function checks to see if the input old and new stanza strings are
-the same.
+The Mnet::Stanza::diff function checks to see if the input old and new stanza
+strings are the same.
 
 The returned diff value will be set as follows:
 
@@ -221,15 +217,14 @@ The returned diff value will be set as follows:
     line        indicates mismatch line number and line text
     other       indicates mismatch such as extra eol chars at end
 
-Note that blank lines and all other spaces are significant. The trim function
-in this module can be used to remove extra spaces before calling this function.
+Note that blank lines and all other spaces are significant. To remove extra
+spaces use the Mnet::Stanza::trim function before calling this function.
 
 =cut
 
     # read input old and new stanzas
     my ($old, $new) = (shift, shift);
     my ($length_old, $length_new) = (length($old // ""), length($new // ""));
-    DEBUG("diff starting, input old $length_old chars, new $length_new chars");
 
     # init output diff value
     my $diff = undef;
@@ -274,7 +269,6 @@ in this module can be used to remove extra spaces before calling this function.
     }
 
     # finished diff function, return diff text
-    DEBUG("diff finished, output ".length($diff // "")." chars");
     return $diff;
 }
 

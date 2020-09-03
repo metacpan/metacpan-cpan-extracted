@@ -2,18 +2,21 @@ package Hades::Realm::Moo;
 use strict;
 use warnings;
 use base qw/Hades::Realm::OO/;
-our $VERSION = 0.01;
+our $VERSION = 0.04;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
 	my $self      = $cls->SUPER::new(%args);
 	my %accessors = ();
 	for my $accessor ( keys %accessors ) {
+		my $param
+		    = defined $args{$accessor}
+		    ? $args{$accessor}
+		    : $accessors{$accessor}->{default};
 		my $value
-		    = $self->$accessor(
-			defined $args{$accessor}
-			? $args{$accessor}
-			: $accessors{$accessor}->{default} );
+		    = $self->$accessor( $accessors{$accessor}->{builder}
+			? $accessors{$accessor}->{builder}->( $self, $param )
+			: $param );
 		unless ( !$accessors{$accessor}->{required} || defined $value ) {
 			die "$accessor accessor is required";
 		}
@@ -24,9 +27,9 @@ sub new {
 sub build_as_role {
 	my ( $orig, $self, @params ) = ( 'SUPER::build_as_role', @_ );
 	my @res = $self->$orig(@params);
-	$params[0]->use(q|Moo::Role|);
-	$params[0]->use(q|MooX::Private::Attribute|);
-	$params[0]->use(
+	$res[0]->use(q|Moo::Role|);
+	$res[0]->use(q|MooX::Private::Attribute|);
+	$res[0]->use(
 		sprintf q|Types::Standard qw/%s/|,
 		join( ' ', keys %{ $self->meta->{ $self->current_class }->{types} } )
 	);
@@ -37,9 +40,9 @@ sub build_as_role {
 sub build_as_class {
 	my ( $orig, $self, @params ) = ( 'SUPER::build_as_class', @_ );
 	my @res = $self->$orig(@params);
-	$params[0]->use(q|Moo|);
-	$params[0]->use(q|MooX::Private::Attribute|);
-	$params[0]->use(
+	$res[0]->use(q|Moo|);
+	$res[0]->use(q|MooX::Private::Attribute|);
+	$res[0]->use(
 		sprintf q|Types::Standard qw/%s/|,
 		join( ' ', keys %{ $self->meta->{ $self->current_class }->{types} } )
 	);
@@ -58,17 +61,10 @@ sub build_has {
 	$meta->{is} ||= '"rw"';
 	my $attributes = join ', ',
 	    map { ( $meta->{$_} ? ( sprintf "%s => %s", $_, $meta->{$_} ) : () ) }
-	    qw/is required clearer predicate isa private/;
-	$attributes .= ', ' . join ', ', map {
-		      $meta->{$_}
-		    ? ( $_ ne 'default' and $meta->{$_} =~ m/^[\w\d]+$/ )
-			    ? ( sprintf '%s => "%s"', $_, $meta->{$_} )
-			    : ( sprintf "%s => sub { %s }", $_, $meta->{$_} )
-		    : ()
-	} qw/default coerce trigger/;
+	    qw/is required clearer predicate isa private default coerce trigger builder/;
 	my $name = $meta->{has};
 	my $code = qq{
-					has $name => ( $attributes );};
+			has $name => ( $attributes );};
 	return $code;
 
 }
@@ -79,7 +75,7 @@ __END__
 
 =head1 NAME
 
-Hades::Realm::Moo - Hades realm for Moo!
+Hades::Realm::Moo - Hades realm for Moo
 
 =head1 VERSION
 
@@ -89,8 +85,10 @@ Version 0.01
 
 =head1 SYNOPSIS
 
+Quick summary of what the module does:
+
 	Hades->run({
-		eval => 'Kosmos { [curae penthos] :t(Int) :d(2) :p :pr :c :r geras $nosoi :t(Int) :d(5) { if ($self->penthos == $nosoi) { return $self->curae; } } }',
+		eval => 'Kosmos { [curae penthos] :t(Int) :d(2) :p :pr :c :r geras $nosoi :t(Int) :d(5) { if (£penthos == $nosoi) { return £curae; } } }',
 		realm => 'Moo',
 	});
 
@@ -105,7 +103,7 @@ Version 0.01
 	our $VERSION = 0.01;
 
 	has curae => (
-		is        => "rw",
+		is	=> "rw",
 		required  => 1,
 		clearer   => 1,
 		predicate => 1,
@@ -115,7 +113,7 @@ Version 0.01
 	);
 
 	has penthos => (
-		is        => "rw",
+		is	=> "rw",
 		required  => 1,
 		clearer   => 1,
 		predicate => 1,
@@ -129,10 +127,9 @@ Version 0.01
 		$nosoi = defined $nosoi ? $nosoi : 5;
 		if ( !defined($nosoi) || ref $nosoi || $nosoi !~ m/^[-+\d]\d*$/ ) {
 			$nosoi = defined $nosoi ? $nosoi : 'undef';
-			die
-			    qq{Int: invalid value $nosoi for variable \$nosoi in method geras};
+			die qq{Int: invalid value $nosoi for variable \$nosoi in method geras};
 		}
-		if ( $self->penthos == $nosoi ) { return $self->curae; }
+		if ( £penthos == $nosoi ) { return £curae; }
 	}
 
 	1;
@@ -163,7 +160,7 @@ call build_has method. Expects param $meta to be a HashRef.
 
 =head1 AUTHOR
 
-AUTHOR, C<< <EMAIL> >>
+LNATION, C<< <email at lnation.org> >>
 
 =head1 BUGS
 
@@ -203,7 +200,7 @@ L<https://metacpan.org/release/Hades-Realm-Moo>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by AUTHOR.
+This software is Copyright (c) 2020 by LNATION.
 
 This is free software, licensed under:
 

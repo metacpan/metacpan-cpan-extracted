@@ -21,3 +21,27 @@ Revision history for Hades
 0.11    2020-08-27
 	- allow grouping of accessors [demeter persephone] :t(ArrayRef) :d([qw/Ι Π Δ ΠΔ Η/])
 	- Increase test coverage around types
+
+0.13    2020-08-28
+	- fix abstract { } and synopsis { } sections
+	- Add test { } syntax to specify class_tests
+	- Add :pod and :example attributes to accessors and subs.
+
+0.14    2020-08-29
+	- require Types::Standard in realm tests (thanks SREZIC).
+	- catch unknown attributes with a default in the switch.
+
+0.15    2020-08-31
+	- refactor macro code to be more usefull.
+	- Adds Hades::Macro and Hades::Macro::FH.
+	- Adds £ shorthand for calling methods/accessors on $self.
+	- Adds € shorthand for calling macros.
+
+0.16    2020-09-01
+	- Adds builders to accessors - elpis :builder
+	- Fix parsing of compile phase blocks.
+
+0.17    2020-09-02
+	- Adds Hades::Macro::Dolos for some more abstraction.
+	- Adds :no_success_test attribute to skip "valid" tests on attributes that have builders/triggers.
+	- Attempt to fix parsing of macros.

@@ -1,0 +1,274 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/CekBpom/cek_bpom
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-02'; # DATE
+our $DIST = 'App-CekBpom'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/CekBpom/cek_bpom",
+    program_name => "cek-bpom",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Search BPOM products via https://cekbpom.pom.go.id/
+# PODNAME: cek-bpom
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cek-bpom - Search BPOM products via https://cekbpom.pom.go.id/
+
+=head1 VERSION
+
+This document describes version 0.003 of cek-bpom (from Perl distribution App-CekBpom), released on 2020-09-02.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % cek-bpom [--bentuk-sediaan] [--debug] [--format=name] [--json]
+     [--jumlah-dan-kemasan] [--komposisi] [--log-level=level] [--merk]
+     [--(no)naked-res] [--nama-pendaftar] [--nama-produk]
+     [--nomor-registrasi] [--npwp-pendaftar] [--page-result[=program]]
+     [--quiet] [--search-type=s] [-t=s] [--trace] [--verbose] <query>
+
+=head1 DESCRIPTION
+
+Uses L<LWP::UserAgent::Plugin> so you can add retry, caching, or additional
+HTTP client behavior by setting C<LWP_USERAGENT_PLUGINS> environment variable.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--bentuk-sediaan>
+
+Shortcut for --search-type=bentuk_sediaan.
+
+See C<--search-type>.
+
+=item B<--jumlah-dan-kemasan>
+
+Shortcut for --search-type=jumlah_dan_kemasan.
+
+See C<--search-type>.
+
+=item B<--komposisi>
+
+Shortcut for --search-type=komposisi.
+
+See C<--search-type>.
+
+=item B<--merk>
+
+Shortcut for --search-type=merk.
+
+See C<--search-type>.
+
+=item B<--nama-pendaftar>
+
+Shortcut for --search-type=nama_pendaftar.
+
+See C<--search-type>.
+
+=item B<--nama-produk>
+
+Shortcut for --search-type=nama_produk.
+
+See C<--search-type>.
+
+=item B<--nomor-registrasi>
+
+Shortcut for --search-type=nomor_registrasi.
+
+See C<--search-type>.
+
+=item B<--npwp-pendaftar>
+
+Shortcut for --search-type=npwp_pendaftar.
+
+See C<--search-type>.
+
+=item B<--query>=I<s>*
+
+=item B<--search-type>=I<s>, B<-t>
+
+Default value:
+
+ "nama_produk"
+
+Valid values:
+
+ ["bentuk_sediaan","jumlah_dan_kemasan","komposisi","merk","nama_pendaftar","nama_produk","nomor_registrasi","npwp_pendaftar"]
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C cek-bpom cek-bpom
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete cek-bpom 'p/*/`cek-bpom`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CekBpom>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CekBpom>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CekBpom>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

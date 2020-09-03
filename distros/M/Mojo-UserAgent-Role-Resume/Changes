@@ -1,5 +1,16 @@
 Revision history for Perl extension Mojo-UserAgent-Role-Resume
 
+v0.1.0 2020-08-30T14:47:05Z
+
+    - fixed wording in documentation
+    - set minimum version for all of the dependencies
+
+v0.0.4 2020-08-29T11:50:22Z
+
+    - fixed wording in documentation
+    - made the distro compatible with an older version of perl
+    - set minimum version for Mojolicious requirement
+
 v0.0.3 2020-08-28T14:28:36Z
 
     - fixed wording in documentation

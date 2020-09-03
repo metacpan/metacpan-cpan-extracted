@@ -14,6 +14,7 @@ my $tmpdir  = find_temp();
 my $dfbin   = find_bin('df');
 my $space   = defined($dfbin) ? (`$dfbin -P $tmpdir` =~ /\n[^\s]+\s+\d+\s+\d+\s+(\d+)\s+\d+\%/ ? int($1) : 0) : 0;
 my $spc_req = 102400;
+$dfbin //= '<undef>';
 print STDERR "# tmpdir = $tmpdir\n";
 print STDERR "# dfbin  = $dfbin\n";
 print STDERR "# space  = $space KB\n";

@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::SFTP::Foreign::Backend::Net_SSH2.
 
+0.11  Aug 30, 2020
+      - Error handling was broken in some cases (bug report by Stephen
+        Chouinard, #rt133241)
+
 0.10  Jan 26, 2019
       - The module was blowing up when using an unathenticated
         Net::SSH2 object (bug report and patch by Sergiy Zuban).

@@ -1,0 +1,80 @@
+lib lib
+tlib t
+author LNATION
+email email@lnation.org
+version 0.04
+Hades::Realm::Moo base Hades::Realm::OO {
+	abstract { Hades realm for Moo }
+	synopsis {
+Quick summary of what the module does:
+
+	Hades->run({
+		eval => 'Kosmos { [curae penthos] :t(Int) :d(2) :p :pr :c :r geras $nosoi :t(Int) :d(5) { if (£penthos == $nosoi) { return £curae; } } }',
+		realm => 'Moo',
+	});
+
+	... generates ...
+
+	package Kosmos;
+	use strict;
+	use warnings;
+	use Moo;
+	use MooX::Private::Attribute;
+	use Types::Standard qw/Int/;
+	our $VERSION = 0.01;
+
+	has curae => (
+		is	=> "rw",
+		required  => 1,
+		clearer   => 1,
+		predicate => 1,
+		isa       => Int,
+		private   => 1,
+		default   => sub {2}
+	);
+
+	has penthos => (
+		is	=> "rw",
+		required  => 1,
+		clearer   => 1,
+		predicate => 1,
+		isa       => Int,
+		private   => 1,
+		default   => sub {2}
+	);
+
+	sub geras {
+		my ( $self, $nosoi ) = @_;
+		$nosoi = defined $nosoi ? $nosoi : 5;
+		if ( !defined($nosoi) || ref $nosoi || $nosoi !~ m/^[-+\d]\d*$/ ) {
+			$nosoi = defined $nosoi ? $nosoi : 'undef';
+			die qq{Int: invalid value $nosoi for variable \$nosoi in method geras};
+		}
+		if ( £penthos == $nosoi ) { return £curae; }
+	}
+
+	1;
+
+	__END__
+	}
+	build_as_role :a {
+		$res[0]->use(q|Moo::Role|);
+		$res[0]->use(q|MooX::Private::Attribute|);
+		$res[0]->use(sprintf q|Types::Standard qw/%s/|, join(' ', keys %{£meta->{£current_class}->{types}}));
+	}
+	build_as_class :a {
+		$res[0]->use(q|Moo|);
+		$res[0]->use(q|MooX::Private::Attribute|);
+		$res[0]->use(sprintf q|Types::Standard qw/%s/|, join(' ', keys %{£meta->{£current_class}->{types}}));
+	}
+	build_has $meta :t(HashRef) { 
+		$meta->{is} ||= '"rw"';
+		my $attributes = join ', ', map {
+			($meta->{$_} ? (sprintf "%s => %s", $_, $meta->{$_}) : ())
+		} qw/is required clearer predicate isa private default coerce trigger builder/;
+		my $name = $meta->{has};
+		my $code = qq{
+			has $name => ( $attributes );};
+		return $code;
+	}
+}

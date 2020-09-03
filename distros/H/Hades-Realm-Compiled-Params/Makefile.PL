@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Hades'              => '0.06',
+       	'Hades'              => '0.13',
 	'Compiled::Params::OO' => '0.04'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -1,5 +1,13 @@
 Revision history for FIDO-Raw
 
+0.05      2020-09-03 16:31:38+01:00 Europe/London
+
+ - Detect the presence of libudev prior to trying to use it
+
+0.04      2020-09-01 19:21:47+01:00 Europe/London
+
+ - Update to libfido2 37c75c83
+
 0.03      2020-05-06 14:54:48+01:00 Europe/London
 
  - Fixed issue with FreeBSD 11 and older

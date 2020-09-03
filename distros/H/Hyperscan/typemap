@@ -1,0 +1,3 @@
+Hyperscan::Database T_PTROBJ
+Hyperscan::Scratch  T_PTROBJ
+Hyperscan::Stream   T_PTROBJ

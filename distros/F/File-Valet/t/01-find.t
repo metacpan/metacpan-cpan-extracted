@@ -7,9 +7,16 @@ use Test::Most;
 use lib "./lib";
 use File::Valet;
 
+# tests for find_home (kind of weak; needs improvement):
+my $home_dir = find_home;
+isnt $home_dir,  undef,     'find_home found something at all ' . ($home_dir // '<undef>');
+ok   -d $home_dir,          'find_home found something likely';
+ok   -w $home_dir,          'find_home found something writable';
+
 # tests for find_temp (kind of weak; needs improvement):
-isnt find_temp(),  undef,     'find_temp found something at all';
-ok   find_temp() =~ /t/i,     'find_temp found something likely';
+my $temp_dir = find_temp;
+isnt $temp_dir,  undef,     'find_temp found something at all ' . ($temp_dir // '<undef>');
+ok   $temp_dir =~ /t/i,     'find_temp found something likely';
 is $File::Valet::OK,    'OK', 'find_temp sets OK on success';
 is $File::Valet::ERROR, '',   'find_temp sets error on success';
 is $File::Valet::ERRNO, '',   'find_temp sets errno on success';

@@ -30,4 +30,5 @@ on 'develop' => sub {
     requires 'Dist::Zilla::Plugin::LicenseFromModule';
     requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
     requires 'Pod::Coverage::TrustPod';
+    requires 'Test::Pod::Coverage';
 };

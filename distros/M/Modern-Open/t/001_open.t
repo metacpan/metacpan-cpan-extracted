@@ -6,6 +6,8 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Modern::Open;
 
+close(STDERR);
+
 my $rc = 0;
 
 eval { $rc = open(FILE,"$0"); };

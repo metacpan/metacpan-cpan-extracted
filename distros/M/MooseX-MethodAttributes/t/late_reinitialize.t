@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More 0.88;
 
 {
     package Foo;
@@ -18,8 +18,7 @@ use Test::More;
 #         bisect and a version bump to work out when it started working!
 TODO: {
     package Bar;
-    use Test::More;
-    BEGIN { $TODO = "Known broken" }
+    BEGIN { $::TODO = "Known broken" }
     use Moose;
     BEGIN { ::ok(!Bar->meta->has_method('role_method')) }
     BEGIN { ::ok(!Bar->can('role_method')) }

@@ -1,0 +1,163 @@
+lib lib
+tlib t
+author LNATION
+email email@lnation.org
+version 0.01
+Hades::Macro::YAML base Hades::Macro {
+	abstract { Hades macro helpers for YAML }
+	synopsis {
+Quick summary of what the module does:
+
+	Hades->run({
+		eval => q|
+			macro {
+				YAML
+			}
+			Kosmos { 
+				geras $file :t(Str) :d('path/to/file.yml') { 
+					€yaml_load_file($file);
+				}
+			}
+		|;
+	});
+
+	... generates ...
+
+	}
+	our $YAML_CLASS $CLASS_LOADED
+	begin {
+		$YAML_CLASS = eval {
+			require YAML::XS;
+			'YAML::XS';
+		} || eval {
+			require YAML::PP;
+			'YAML::PP';
+		} || eval {
+			require YAML;
+			'YAML';
+		};
+		die 'No supported YAML module installed - supported modules are YAML::XS, YAML::PP or YAML' unless $YAML_CLASS;
+	}
+	macro :t(ArrayRef) :d([qw/
+		yaml_load_string
+		yaml_load_file
+		yaml_write_string
+		yaml_write_file
+	/])	
+	yaml_load_string $mg :t(Object) $str :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		unless ($CLASS_LOADED) {
+			$mg->use($YAML_CLASS);
+		}
+		(my $uf = $YAML_CLASS) =~ s/\:\:/_/g; 
+		my $cb = "_yaml_load_string_$uf";
+		return __PACKAGE__->$cb($mg, $str, $param, $list);
+	}
+	_yaml_load_string_YAML $mg :t(Object) $str :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q||;
+		$code .= qq|$param = | if $param;
+		$code .= qq|YAML::Load($str)|;
+		$code .= $list ? q|,| : q|;|;
+		return $code;
+	}
+	_yaml_load_string_YAML_XS $mg :t(Object) $str :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q||;
+		$code .= qq|$param = | if $param;
+		$code .= qq|Load($str)|;
+		$code .= $list ? q|,| : q|;|;
+		return $code;
+	}
+	_yaml_load_string_YAML_PP $mg :t(Object) $str :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q|my $lpp = YAML::PP->new;|;
+		$code .= qq|$param = | if $param;
+		$code .= qq|\$lpp->load_string($str);|;
+		$code = $list ? qq|do { $code },| : qq|$code;|;
+		return $code;
+	}
+	yaml_load_file $mg :t(Object) $file :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		unless ($CLASS_LOADED) {
+			$mg->use($YAML_CLASS);
+		}
+		(my $uf = $YAML_CLASS) =~ s/\:\:/_/g; 
+		my $cb = "_yaml_load_file_$uf";
+		return __PACKAGE__->$cb($mg, $file, $param, $list);
+	}
+	_yaml_load_file_YAML $mg :t(Object) $file :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q||;
+		$code .= qq|$param = | if $param;
+		$code .= qq|YAML::LoadFile($file)|;
+		$code .= $list ? q|,| : q|;|;
+		return $code;
+	}
+	_yaml_load_file_YAML_XS $mg :t(Object) $file :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q||;
+		$code .= qq|$param = | if $param;
+		$code .= qq|LoadFile($file)|;
+		$code .= $list ? q|,| : q|;|;
+		return $code;
+	}
+	_yaml_load_file_YAML_PP $mg :t(Object) $file :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q|my $lpp = YAML::PP->new;|;
+		$code .= qq|$param = | if $param;
+		$code .= qq|\$lpp->load_file($file);|;
+		$code = $list ? qq|do { $code },| : qq|$code;|;
+		return $code;
+	}
+	yaml_write_string $mg :t(Object) $content :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		unless ($CLASS_LOADED) {
+			$mg->use($YAML_CLASS);
+		}
+		(my $uf = $YAML_CLASS) =~ s/\:\:/_/g; 
+		my $cb = "_yaml_write_string_$uf";
+		return __PACKAGE__->$cb($mg, $content, $param, $list);
+	}
+	_yaml_write_string_YAML $mg :t(Object) $content :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q||;
+		$code .= qq|$param = | if $param;
+		$code .= qq|YAML::Dump($content)|;
+		$code .= $list ? q|,| : q|;|;
+		return $code;
+	}
+	_yaml_write_string_YAML_XS $mg :t(Object) $content :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q||;
+		$code .= qq|$param = | if $param;
+		$code .= qq|Dump($content)|;
+		$code .= $list ? q|,| : q|;|;
+		return $code;
+	}
+	_yaml_write_string_YAML_PP $mg :t(Object) $content :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q|my $wpp = YAML::PP->new;|;
+		$code .= qq|$param = | if $param;
+		$code .= qq|\$wpp->dump_string($content)|;
+		$code = $list ? qq|do { $code },| : qq|$code;|;
+		return $code;
+	}
+	yaml_write_file $mg :t(Object) $file :t(Str) $content :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		unless ($CLASS_LOADED) {
+			$mg->use($YAML_CLASS);
+		}
+		(my $uf = $YAML_CLASS) =~ s/\:\:/_/g; 
+		my $cb = "_yaml_write_file_$uf";
+		return __PACKAGE__->$cb($mg, $file, $content, $param, $list);
+	}
+	_yaml_write_file_YAML $mg :t(Object) $file :t(Str) $content :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q||;
+		$code .= qq|$param = | if $param;
+		$code .= qq|YAML::DumpFile($file, $content)|;
+		$code .= $list ? q|,| : q|;|;
+		return $code;
+	}
+	_yaml_write_file_YAML_XS $mg :t(Object) $file :t(Str) $content :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q||;
+		$code .= qq|$param = | if $param;
+		$code .= qq|DumpFile($file, $content)|;
+		$code .= $list ? q|,| : q|;|;
+		return $code;
+	}
+	_yaml_write_file_YAML_PP $mg :t(Object) $file :t(Str) $content :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q|my \$wpp = YAML::PP->new;|;
+		$code .= qq|$param = | if $param;
+		$code .= qq|\$wpp->load_file($file, $content);|;
+		$code = $list ? qq|do { $code },| : qq|$code;|;
+		return $code;
+	}
+}

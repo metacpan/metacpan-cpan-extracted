@@ -1,4 +1,6 @@
 use strict;
+use warnings;
+
 use HTML::Parser ();
 use Test::More tests => 1;
 
@@ -17,42 +19,42 @@ EOT
 my $p = HTML::Parser->new(api_version => 3);
 
 my $sum_len = 0;
-my $count = 0;
+my $count   = 0;
 my $err;
 
-$p->handler(default =>
-	    sub {
-		my($offset, $length, $offset_end, $line, $col, $text) = @_;
-		my $copy = $text;
-		$copy =~ s/\n/\\n/g;
-		substr($copy, 30) = "..." if length($copy) > 32;
-		#diag sprintf ">>> %d.%d %s", $line, $col, $copy;
-		if ($offset != $sum_len) {
-		   diag "offset mismatch $offset vs $sum_len";
-		   $err++;
-                }
-		if ($offset_end != $offset + $length) {
-		   diag "offset_end $offset_end wrong";
-		   $err++;
-                }
-		if ($length != length($text)) {
-		   diag "length mismatch";
-		   $err++;
-		}
-                if (substr($HTML, $offset, $length) ne $text) {
-		   diag "content mismatch";
-		   $err++;
-		}
-		$sum_len += $length;
-		$count++;
-	    },
-	    'offset,length,offset_end,line,column,text');
+$p->handler(
+    default => sub {
+        my ($offset, $length, $offset_end, $line, $col, $text) = @_;
+        my $copy = $text;
+        $copy =~ s/\n/\\n/g;
+        substr($copy, 30) = "..." if length($copy) > 32;
+
+        #diag sprintf ">>> %d.%d %s", $line, $col, $copy;
+        if ($offset != $sum_len) {
+            diag "offset mismatch $offset vs $sum_len";
+            $err++;
+        }
+        if ($offset_end != $offset + $length) {
+            diag "offset_end $offset_end wrong";
+            $err++;
+        }
+        if ($length != length($text)) {
+            diag "length mismatch";
+            $err++;
+        }
+        if (substr($HTML, $offset, $length) ne $text) {
+            diag "content mismatch";
+            $err++;
+        }
+        $sum_len += $length;
+        $count++;
+    },
+    'offset,length,offset_end,line,column,text'
+);
 
 for (split(//, $HTML)) {
-   $p->parse($_);
+    $p->parse($_);
 }
 $p->eof;
 
 ok($count > 5 && !$err);
-
-

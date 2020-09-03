@@ -1,5 +1,5 @@
 package FIDO::Raw::PublicKey::RS256;
-$FIDO::Raw::PublicKey::RS256::VERSION = '0.03';
+$FIDO::Raw::PublicKey::RS256::VERSION = '0.05';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ FIDO::Raw::PublicKey::RS256
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 DESCRIPTION
 

@@ -59,7 +59,7 @@
          "web" : "https://github.com/regru/Net-Whois-Raw"
       }
    },
-   "version" : "2.99030",
+   "version" : "2.99031",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

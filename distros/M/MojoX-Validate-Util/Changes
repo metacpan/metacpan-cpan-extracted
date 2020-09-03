@@ -1,5 +1,8 @@
 Revision history for Perl extension MojoX::Validate::Util.
 
+1.02  2020-08-31T17:02:44
+	- Update t/02.generic.t, t/03.email.address (code and comments).
+
 1.01  2017-08-09T09:01:00
 	- Change heading from 'Copyright' to 'Copyright and Licence' (sic), via a github pull,
 		slightly re-worded by me. Thanx Mohammad S Anwar.

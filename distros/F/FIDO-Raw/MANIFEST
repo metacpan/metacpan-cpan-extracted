@@ -108,6 +108,7 @@ deps/libcbor/src/cbor/tags.h
 deps/libfido2/LICENSE
 deps/libfido2/openbsd-compat/bsd-getline.c
 deps/libfido2/openbsd-compat/bsd-getpagesize.c
+deps/libfido2/openbsd-compat/clock_gettime.c
 deps/libfido2/openbsd-compat/err.h
 deps/libfido2/openbsd-compat/explicit_bzero.c
 deps/libfido2/openbsd-compat/explicit_bzero_win32.c
@@ -122,6 +123,7 @@ deps/libfido2/openbsd-compat/readpassphrase_win32.c
 deps/libfido2/openbsd-compat/recallocarray.c
 deps/libfido2/openbsd-compat/strlcat.c
 deps/libfido2/openbsd-compat/strlcpy.c
+deps/libfido2/openbsd-compat/time.h
 deps/libfido2/openbsd-compat/timingsafe_bcmp.c
 deps/libfido2/openbsd-compat/types.h
 deps/libfido2/src/aes256.c

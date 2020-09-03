@@ -1,0 +1,45 @@
+{
+   "abstract" : "Display text in a scrolling viewport in your terminal",
+   "author" : [
+      "Cameron Tauxe <camerontauxe@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Term-Scroller",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode::Locale" : "1.05",
+            "IO::Pty" : "1.14",
+            "Term::ReadKey" : "2.38",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Term::Scroller" : {
+         "file" : "lib/Term/Scroller.pm",
+         "version" : "1.0"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

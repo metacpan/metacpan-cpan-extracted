@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f0637c05-cdd7-497f-b658-46a3e799b927" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/lib/Google/Ads/GoogleAds/Logging/DetailStats.pm" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Google/Ads/GoogleAds/Logging/DetailStats.pm" afterDir="false" />
+    <list default="true" id="357656f9-1508-43e7-9bee-42f50097254b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/Changes" beforeDir="false" afterPath="$PROJECT_DIR$/Changes" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Perl5 script" />
+      </list>
+    </option>
   </component>
   <component name="G3PluginsProjectSettings">
     <appliedSettings>
@@ -18,7 +25,7 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectId" id="1ecMHio3nLjAYbPbVQFJRrJNI52" />
+  <component name="ProjectId" id="1fthHfpFVtgV1SaWNAOgKhlY9vl" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -29,16 +36,10 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="go.import.settings.migrated" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/t/testdata" />
     <property name="settings.editor.selected.configurable" value="PERL5_MAIN_SETTINGS" />
   </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/t/testdata" />
-    </key>
-  </component>
-  <component name="RunManager">
-    <configuration name="Tests from '101_CodeExamples.t'" type="PerlTestRunConfiguration" factoryName="Perl5 Test" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+  <component name="RunManager" selected="Perl.get_account_information.pl">
+    <configuration name="get_account_information.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
       <option name="allowRunningInParallel" value="false" />
       <option name="alternativeSdkName" />
       <option name="compileTimeBreakpointsEnabled" value="false" />
@@ -52,16 +53,106 @@
       <option name="perlParameters" value="" />
       <option name="programParameters" />
       <option name="scriptCharset" value="utf8" />
-      <option name="scriptPath" value="$PROJECT_DIR$/t/101_CodeExamples.t" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/account_management/get_account_information.pl" />
       <option name="startMode" value="RUN" />
       <option name="useAlternativeSdk" value="false" />
       <option name="workingDirectory" />
-      <JOBS_NUMBER>1</JOBS_NUMBER>
       <method v="2" />
     </configuration>
+    <configuration name="get_all_disapproved_ads.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeSdkName" />
+      <option name="compileTimeBreakpointsEnabled" value="false" />
+      <option name="consoleCharset" value="UTF-8" />
+      <option name="envs">
+        <map />
+      </option>
+      <option name="initCode" value="" />
+      <option name="nonInteractiveModeEnabled" value="false" />
+      <option name="passParentEnvs" value="true" />
+      <option name="perlParameters" value="" />
+      <option name="programParameters" value="-customer_id 7836935572 -campaign_id 1680555591" />
+      <option name="scriptCharset" value="utf8" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/campaign_management/get_all_disapproved_ads.pl" />
+      <option name="startMode" value="RUN" />
+      <option name="useAlternativeSdk" value="false" />
+      <option name="workingDirectory" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="get_all_image_assets.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeSdkName" />
+      <option name="compileTimeBreakpointsEnabled" value="false" />
+      <option name="consoleCharset" value="UTF-8" />
+      <option name="envs">
+        <map />
+      </option>
+      <option name="initCode" value="" />
+      <option name="nonInteractiveModeEnabled" value="false" />
+      <option name="passParentEnvs" value="true" />
+      <option name="perlParameters" value="" />
+      <option name="programParameters" value="--customer_id 7836935572" />
+      <option name="scriptCharset" value="utf8" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/misc/get_all_image_assets.pl" />
+      <option name="startMode" value="RUN" />
+      <option name="useAlternativeSdk" value="false" />
+      <option name="workingDirectory" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="test.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeSdkName" />
+      <option name="compileTimeBreakpointsEnabled" value="false" />
+      <option name="consoleCharset" value="UTF-8" />
+      <option name="envs">
+        <map />
+      </option>
+      <option name="initCode" value="" />
+      <option name="nonInteractiveModeEnabled" value="false" />
+      <option name="passParentEnvs" value="true" />
+      <option name="perlParameters" value="" />
+      <option name="programParameters" />
+      <option name="scriptCharset" value="utf8" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/campaign_management/test.pl" />
+      <option name="startMode" value="RUN" />
+      <option name="useAlternativeSdk" value="false" />
+      <option name="workingDirectory" />
+      <method v="2" />
+    </configuration>
+    <configuration name="use_portfolio_bidding_strategy.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeSdkName" />
+      <option name="compileTimeBreakpointsEnabled" value="false" />
+      <option name="consoleCharset" value="UTF-8" />
+      <option name="envs">
+        <map />
+      </option>
+      <option name="initCode" value="" />
+      <option name="nonInteractiveModeEnabled" value="false" />
+      <option name="passParentEnvs" value="true" />
+      <option name="perlParameters" value="" />
+      <option name="programParameters" value="-customer_id 7836935572" />
+      <option name="scriptCharset" value="utf8" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/advanced_operations/use_portfolio_bidding_strategy.pl" />
+      <option name="startMode" value="RUN" />
+      <option name="useAlternativeSdk" value="false" />
+      <option name="workingDirectory" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Perl.get_all_disapproved_ads.pl" />
+      <item itemvalue="Perl.use_portfolio_bidding_strategy.pl" />
+      <item itemvalue="Perl.test.pl" />
+      <item itemvalue="Perl.get_all_image_assets.pl" />
+      <item itemvalue="Perl.get_account_information.pl" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Perl5 Test.Tests from '101_CodeExamples.t'" />
+        <item itemvalue="Perl.get_account_information.pl" />
+        <item itemvalue="Perl.get_all_image_assets.pl" />
+        <item itemvalue="Perl.get_all_disapproved_ads.pl" />
+        <item itemvalue="Perl.test.pl" />
+        <item itemvalue="Perl.use_portfolio_bidding_strategy.pl" />
       </list>
     </recent_temporary>
   </component>
@@ -70,12 +161,23 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="f0637c05-cdd7-497f-b658-46a3e799b927" name="Default Changelist" comment="" />
-      <created>1594616342208</created>
+      <changelist id="357656f9-1508-43e7-9bee-42f50097254b" name="Default Changelist" comment="" />
+      <created>1597043209486</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1594616342208</updated>
-      <workItem from="1594616347676" duration="2205000" />
+      <updated>1597043209486</updated>
+      <workItem from="1597043211650" duration="1565000" />
+      <workItem from="1597058025843" duration="2595000" />
+      <workItem from="1597253145993" duration="349000" />
+      <workItem from="1597384817527" duration="470000" />
+      <workItem from="1597393124309" duration="2195000" />
+      <workItem from="1597675131502" duration="796000" />
+      <workItem from="1597838004129" duration="1933000" />
+      <workItem from="1597976830160" duration="813000" />
+      <workItem from="1598247925368" duration="663000" />
+      <workItem from="1598249283729" duration="8873000" />
+      <workItem from="1598496916446" duration="8920000" />
+      <workItem from="1598851103730" duration="811000" />
     </task>
     <servers />
   </component>
@@ -83,22 +185,132 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="99" y="100" width="1482" height="666" key="DiffContextDialog" timestamp="1594619354213">
-      <screen x="0" y="0" width="1680" height="865" />
+    <state x="354" y="150" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1598500436826">
+      <screen x="0" y="0" width="1792" height="983" />
     </state>
-    <state x="99" y="100" width="1482" height="666" key="DiffContextDialog/0.0.1680.865@0.0.1680.865" timestamp="1594619354213" />
-    <state x="582" y="162" width="455" height="578" key="RollbackChangesDialog" timestamp="1594619330567">
-      <screen x="0" y="0" width="1680" height="865" />
+    <state x="354" y="137" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1792.895@0.0.1792.895" timestamp="1597838049043" />
+    <state x="354" y="137" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1792.897@0.0.1792.897" timestamp="1597675225164" />
+    <state x="354" y="150" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1792.983@0.0.1792.983" timestamp="1598500436826" />
+    <state x="654" y="240" key="#xdebugger.evaluate" timestamp="1598498216568">
+      <screen x="0" y="0" width="1792" height="983" />
     </state>
-    <state x="582" y="162" width="455" height="578" key="RollbackChangesDialog/0.0.1680.865@0.0.1680.865" timestamp="1594619330567" />
-    <state x="582" y="171" width="507" height="578" key="RollbackChangesDialog/0.0.1680.913@0.0.1680.913" timestamp="1594617291500" />
-    <state x="336" y="92" width="1007" height="736" key="SettingsEditor" timestamp="1594616931235">
-      <screen x="0" y="0" width="1680" height="913" />
+    <state x="654" y="240" key="#xdebugger.evaluate/0.0.1792.983@0.0.1792.983" timestamp="1598498216568" />
+    <state x="99" y="100" width="1594" height="784" key="DiffContextDialog" timestamp="1597976899814">
+      <screen x="0" y="0" width="1792" height="983" />
     </state>
-    <state x="336" y="92" width="1007" height="736" key="SettingsEditor/0.0.1680.913@0.0.1680.913" timestamp="1594616931235" />
-    <state x="519" y="284" key="com.intellij.ide.util.TipDialog" timestamp="1594616350106">
-      <screen x="0" y="0" width="1680" height="913" />
+    <state x="99" y="100" width="1594" height="784" key="DiffContextDialog/0.0.1792.983@0.0.1792.983" timestamp="1597976899814" />
+    <state width="1750" height="316" key="GridCell.Tab.0.bottom" timestamp="1598599198101">
+      <screen x="0" y="0" width="1792" height="983" />
     </state>
-    <state x="519" y="284" key="com.intellij.ide.util.TipDialog/0.0.1680.913@0.0.1680.913" timestamp="1594616350106" />
+    <state width="1750" height="279" key="GridCell.Tab.0.bottom/0.0.1792.895@0.0.1792.895" timestamp="1597838049180" />
+    <state width="1750" height="314" key="GridCell.Tab.0.bottom/0.0.1792.897@0.0.1792.897" timestamp="1597675274715" />
+    <state width="1750" height="316" key="GridCell.Tab.0.bottom/0.0.1792.983@0.0.1792.983" timestamp="1598599198101" />
+    <state width="1750" height="316" key="GridCell.Tab.0.center" timestamp="1598599198100">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="279" key="GridCell.Tab.0.center/0.0.1792.895@0.0.1792.895" timestamp="1597838049180" />
+    <state width="1750" height="314" key="GridCell.Tab.0.center/0.0.1792.897@0.0.1792.897" timestamp="1597675274715" />
+    <state width="1750" height="316" key="GridCell.Tab.0.center/0.0.1792.983@0.0.1792.983" timestamp="1598599198100" />
+    <state width="1750" height="316" key="GridCell.Tab.0.left" timestamp="1598599198100">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="279" key="GridCell.Tab.0.left/0.0.1792.895@0.0.1792.895" timestamp="1597838049179" />
+    <state width="1750" height="314" key="GridCell.Tab.0.left/0.0.1792.897@0.0.1792.897" timestamp="1597675274715" />
+    <state width="1750" height="316" key="GridCell.Tab.0.left/0.0.1792.983@0.0.1792.983" timestamp="1598599198100" />
+    <state width="1750" height="316" key="GridCell.Tab.0.right" timestamp="1598599198101">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="279" key="GridCell.Tab.0.right/0.0.1792.895@0.0.1792.895" timestamp="1597838049180" />
+    <state width="1750" height="314" key="GridCell.Tab.0.right/0.0.1792.897@0.0.1792.897" timestamp="1597675274715" />
+    <state width="1750" height="316" key="GridCell.Tab.0.right/0.0.1792.983@0.0.1792.983" timestamp="1598599198101" />
+    <state width="1750" height="316" key="GridCell.Tab.1.bottom" timestamp="1598599198104">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.1.bottom/0.0.1792.983@0.0.1792.983" timestamp="1598599198104" />
+    <state width="1750" height="316" key="GridCell.Tab.1.center" timestamp="1598599198103">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.1.center/0.0.1792.983@0.0.1792.983" timestamp="1598599198103" />
+    <state width="1750" height="316" key="GridCell.Tab.1.left" timestamp="1598599198103">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.1.left/0.0.1792.983@0.0.1792.983" timestamp="1598599198103" />
+    <state width="1750" height="316" key="GridCell.Tab.1.right" timestamp="1598599198103">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.1.right/0.0.1792.983@0.0.1792.983" timestamp="1598599198103" />
+    <state width="1750" height="316" key="GridCell.Tab.2.bottom" timestamp="1598599198104">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.2.bottom/0.0.1792.983@0.0.1792.983" timestamp="1598599198104" />
+    <state width="1750" height="316" key="GridCell.Tab.2.center" timestamp="1598599198104">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.2.center/0.0.1792.983@0.0.1792.983" timestamp="1598599198104" />
+    <state width="1750" height="316" key="GridCell.Tab.2.left" timestamp="1598599198104">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.2.left/0.0.1792.983@0.0.1792.983" timestamp="1598599198104" />
+    <state width="1750" height="316" key="GridCell.Tab.2.right" timestamp="1598599198104">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.2.right/0.0.1792.983@0.0.1792.983" timestamp="1598599198104" />
+    <state width="1750" height="316" key="GridCell.Tab.3.bottom" timestamp="1598599198105">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.3.bottom/0.0.1792.983@0.0.1792.983" timestamp="1598599198105" />
+    <state width="1750" height="316" key="GridCell.Tab.3.center" timestamp="1598599198105">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.3.center/0.0.1792.983@0.0.1792.983" timestamp="1598599198105" />
+    <state width="1750" height="316" key="GridCell.Tab.3.left" timestamp="1598599198105">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.3.left/0.0.1792.983@0.0.1792.983" timestamp="1598599198105" />
+    <state width="1750" height="316" key="GridCell.Tab.3.right" timestamp="1598599198105">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state width="1750" height="316" key="GridCell.Tab.3.right/0.0.1792.983@0.0.1792.983" timestamp="1598599198105" />
+    <state x="667" y="206" width="449" height="577" key="RollbackChangesDialog" timestamp="1598507819620">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state x="667" y="206" width="449" height="577" key="RollbackChangesDialog/0.0.1792.983@0.0.1792.983" timestamp="1598507819620" />
+    <state x="392" y="127" key="SettingsEditor" timestamp="1597043517461">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state x="392" y="127" key="SettingsEditor/0.0.1792.983@0.0.1792.983" timestamp="1597043517461" />
+    <state x="575" y="319" key="com.intellij.ide.util.TipDialog" timestamp="1597393131936">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state x="575" y="319" key="com.intellij.ide.util.TipDialog/0.0.1792.983@0.0.1792.983" timestamp="1597393131936" />
+    <state x="493" y="223" width="810" height="538" key="find.popup" timestamp="1598497661397">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state x="493" y="223" width="810" height="538" key="find.popup/0.0.1792.983@0.0.1792.983" timestamp="1598497661397" />
+    <state x="559" y="215" width="672" height="678" key="search.everywhere.popup" timestamp="1598852687936">
+      <screen x="0" y="0" width="1792" height="983" />
+    </state>
+    <state x="559" y="215" width="672" height="678" key="search.everywhere.popup/0.0.1792.983@0.0.1792.983" timestamp="1598852687936" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="perl_line_breakpoint">
+          <url>file://$PROJECT_DIR$/examples/basic_operations/add_campaigns.pl</url>
+          <line>20</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="perl_line_breakpoint">
+          <url>file://$PROJECT_DIR$/examples/extensions/add_prices.pl</url>
+          <line>26</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="perl_line_breakpoint">
+          <url>file://$PROJECT_DIR$/examples/campaign_management/get_all_disapproved_ads.pl</url>
+          <line>108</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -1,14 +1,13 @@
-#!perl -w
+use strict;
+use warnings;
 
-use Test;
-plan tests => 6;
-
-
-use HTML::Parser;
-use File::Spec;
+use File::Spec   ();
+use HTML::Parser ();
+use Test::More tests => 6;
 
 my $events;
-my $p = HTML::Parser->new(default_h => [sub { $events .= "$_[0]\n";}, "event"]);
+my $p
+    = HTML::Parser->new(default_h => [sub { $events .= "$_[0]\n"; }, "event"]);
 
 $events = "";
 $p->eof;

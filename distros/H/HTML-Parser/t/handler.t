@@ -1,43 +1,60 @@
-# Test handler method
+use strict;
+use warnings;
 
+use HTML::Parser ();
 use Test::More tests => 11;
 
-my $testno;
-
-use HTML::Parser;
 {
+
     package MyParser;
-    use vars qw(@ISA);
-    @ISA=(HTML::Parser);
-    
-    sub foo
-    {
-	Test::More::is($_[1]{testno}, Test::More->builder->current_test + 1);
+    use strict;
+    use warnings;
+    require HTML::Parser;
+    our @ISA = qw(HTML::Parser);
+
+    sub foo {
+        Test::More::is($_[1]{testno}, Test::More->builder->current_test + 1);
     }
 
-    sub bar
-    {
-	Test::More::is($_[1], Test::More->builder->current_test + 1);
+    sub bar {
+        Test::More::is($_[1], Test::More->builder->current_test + 1);
     }
+
+    1;
 }
 
-$p = MyParser->new(api_version => 3);
+my $p = MyParser->new(api_version => 3);
 
-eval {
-    $p->handler(foo => "foo", "foo");
-};
+{
+    local $@;
+    my $error;
 
-like($@, qr/^No handler for foo events/);
+    #<<<  do not let perltidy touch this
+    $error = $@ || 'Error' unless eval {
+        $p->handler(foo => "foo", "foo");
+        1;
+    };
+    #>>>
+    like($error, qr/^No handler for foo events/);
+}
 
-eval {
-   $p->handler(start => "foo", "foo");
-};
-like($@, qr/^Unrecognized identifier foo in argspec/);
+{
+    local $@;
+    my $error;
+
+    #<<<  do not let perltidy touch this
+    $error = $@ || 'Error' unless eval {
+        $p->handler(start => "foo", "foo");
+        1;
+    };
+    #>>>
+    like($error, qr/^Unrecognized identifier foo in argspec/);
+}
 
 my $h = $p->handler(start => "foo", "self,tagname");
 ok(!defined($h));
 
-$x = \substr("xfoo", 1);
+my $x = \substr("xfoo", 1);
 $p->handler(start => $$x, "self,attr");
 $p->parse("<a testno=4>");
 
@@ -50,18 +67,24 @@ $p->parse("<a testno=6>");
 $p->handler(start => "bar", "self,'7'");
 $p->parse("<a>");
 
-eval {
-    $p->handler(start => {}, "self");
-};
-like($@, qr/^Only code or array references allowed as handler/);
+{
+    local $@;
+    my $error;
 
-$a = [];
-$p->handler(start => $a);
+    #<<<  do not let perltidy touch this
+    $error = $@ || 'Error' unless eval {
+        $p->handler(start => {}, "self");
+        1;
+    };
+    #>>>
+    like($error, qr/^Only code or array references allowed as handler/);
+}
+
+$x = [];
+$p->handler(start => $x);
 $h = $p->handler("start");
-is($p->handler("start", "foo"), $a);
+is($p->handler("start", "foo"), $x);
 
 is($p->handler("start", \&MyParser::foo, ""), "foo");
 
 is($p->handler("start"), \&MyParser::foo);
-
-

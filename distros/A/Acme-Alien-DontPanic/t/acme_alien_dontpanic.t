@@ -1,6 +1,7 @@
 use Test2::V0 -no_srand => 1;
 use Test::Alien 0.05;
 use Acme::Alien::DontPanic;
+use Data::Dumper qw( Dumper );
 
 alien_ok 'Acme::Alien::DontPanic';
 
@@ -21,6 +22,9 @@ run_ok('dontpanic')
   ->success
   ->out_like(qr{the answer to life the universe and everything is 42})
   ->note;
+
+note Dumper(Acme::Alien::DontPanic->Inline("C"));
+note Dumper(Acme::Alien::DontPanic->runtime_prop);
 
 done_testing;
 

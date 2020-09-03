@@ -1,0 +1,68 @@
+NAME
+    App::CekBpom - Check BPOM products via the command-line (CLI interface
+    for cekbpom.pom.go.id)
+
+VERSION
+    This document describes version 0.003 of App::CekBpom (from Perl
+    distribution App-CekBpom), released on 2020-09-02.
+
+DESCRIPTION
+    See included script cek-bpom.
+
+FUNCTIONS
+  cek_bpom
+    Usage:
+
+     cek_bpom(%args) -> [status, msg, payload, meta]
+
+    Search BPOM products via https://cekbpom.pom.go.id/.
+
+    Uses LWP::UserAgent::Plugin so you can add retry, caching, or additional
+    HTTP client behavior by setting "LWP_USERAGENT_PLUGINS" environment
+    variable.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   query* => *str*
+
+    *   search_type => *str* (default: "nama_produk")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CekBpom>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-CekBpom>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CekBpom>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    <https://cekbpom.pom.go.id/>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

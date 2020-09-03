@@ -1,57 +1,83 @@
-#!perl -w
-
 use strict;
-use Test::More tests => 9;
+use warnings;
+use utf8;
 
 use HTML::Entities qw(_decode_entities);
+use Test::More tests => 9;
 
-eval {
-    _decode_entities("&lt;", undef);
-};
-like($@, qr/^(?:Can't inline decode readonly string|Modification of a read-only value attempted)/);
+{
+    local $@;
+    my $error;
 
-eval {
-    my $a = "";
-    _decode_entities($a, $a);
-};
-like($@, qr/^2nd argument must be hash reference/);
+    #<<<  do not let perltidy touch this
+    $error = $@ || 'Error' unless eval {
+        _decode_entities("&lt;", undef);
+        1;
+    };
+    #>>>
+    like($error,
+        qr/^(?:Can't inline decode readonly string|Modification of a read-only value attempted)/
+    );
+}
 
-eval {
-    my $a = "";
-    _decode_entities($a, []);
-};
-like($@, qr/^2nd argument must be hash reference/);
+{
+    local $@;
+    my $error;
 
-$a = "&lt;";
-_decode_entities($a, undef);
-is($a, "&lt;");
+    #<<<  do not let perltidy touch this
+    $error = $@ || 'Error' unless eval {
+        my $x = "";
+        _decode_entities($x, $x);
+        1;
+    };
+    #>>>
+    like($error, qr/^2nd argument must be hash reference/);
+}
 
-_decode_entities($a, { "lt" => "<" });
-is($a, "<");
+{
+    local $@;
+    my $error;
 
-my $x = "x" x 20;
+    #<<<  do not let perltidy touch this
+    $error = $@ || 'Error' unless eval {
+        my $x = "";
+        _decode_entities($x, []);
+        1;
+    };
+    #>>>
+    like($error, qr/^2nd argument must be hash reference/);
+}
+
+my $x = "&lt;";
+_decode_entities($x, undef);
+is($x, "&lt;");
+
+_decode_entities($x, {"lt" => "<"});
+is($x, "<");
+
+$x = "x" x 20;
 
 my $err;
 for (":", ":a", "a:", "a:a", "a:a:a", "a:::a") {
-    my $a = $_;
-    $a =~ s/:/&a;/g;
-    my $b = $_;
-    $b =~ s/:/$x/g;
-    _decode_entities($a, { "a" => $x });
-    if ($a ne $b) {
-	diag "Something went wrong with '$_'";
-	$err++;
+    my $x = $_;
+    $x =~ s/:/&a;/g;
+    my $y = $_;
+    $y =~ s/:/$x/g;
+    _decode_entities($x, {"a" => $x});
+    if ($x ne $y) {
+        diag "Something went wrong with '$_'";
+        $err++;
     }
 }
 ok(!$err);
 
-$a = "foo&nbsp;bar";
-_decode_entities($a, \%HTML::Entities::entity2char);
-is($a, "foo\xA0bar");
+$x = "foo&nbsp;bar";
+_decode_entities($x, \%HTML::Entities::entity2char);
+is($x, "foo\xA0bar");
 
-$a = "foo&nbspbar";
-_decode_entities($a, \%HTML::Entities::entity2char);
-is($a, "foo&nbspbar");
+$x = "foo&nbspbar";
+_decode_entities($x, \%HTML::Entities::entity2char);
+is($x, "foo&nbspbar");
 
-_decode_entities($a, \%HTML::Entities::entity2char, 1);
-is($a, "foo\xA0bar");
+_decode_entities($x, \%HTML::Entities::entity2char, 1);
+is($x, "foo\xA0bar");

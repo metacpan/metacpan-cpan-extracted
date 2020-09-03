@@ -3,7 +3,7 @@ package CPANPLUS::Dist::Slackware::Plugin::Search::Xapian;
 use strict;
 use warnings;
 
-our $VERSION = '1.028';
+our $VERSION = '1.029';
 
 use CPANPLUS::Dist::Slackware::Util qw(catfile slurp spurt);
 
@@ -16,7 +16,7 @@ sub available {
 sub pre_prepare {
     my ( $plugin, $dist ) = @_;
 
-    # See L<http://trac.xapian.org/ticket/692>.
+    # See L<https://trac.xapian.org/ticket/692>.
     my $fn = 'Makefile.PL';
     if ( -f $fn ) {
         my $code = slurp($fn);
@@ -36,7 +36,7 @@ CPANPLUS::Dist::Slackware::Plugin::Search::Xapian - Patch Makefile.PL
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware::Plugin::Search::Xapian version 1.028.
+This document describes CPANPLUS::Dist::Slackware::Plugin::Search::Xapian version 1.029.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ This document describes CPANPLUS::Dist::Slackware::Plugin::Search::Xapian versio
 =head1 DESCRIPTION
 
 When building Search::Xapian up to version 1.2.21.0 with CPANPLUS the make command
-gets into an infinite loop.  Reported as bug #692 at L<http://trac.xapian.org/>.
+gets into an infinite loop.  Reported as bug #692 at L<https://trac.xapian.org/>.
 
 =head1 SUBROUTINES/METHODS
 
@@ -89,7 +89,7 @@ Andreas Voegele E<lt>voegelas@cpan.orgE<gt>
 =head1 BUGS AND LIMITATIONS
 
 Please report any bugs to C<bug-cpanplus-dist-slackware at rt.cpan.org>, or
-through the web interface at L<http://rt.cpan.org/>.
+through the web interface at L<https://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -98,6 +98,6 @@ Copyright 2015-2020 Andreas Voegele
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
-See http://dev.perl.org/licenses/ for more information.
+See https://dev.perl.org/licenses/ for more information.
 
 =cut

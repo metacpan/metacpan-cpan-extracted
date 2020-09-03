@@ -1,59 +1,122 @@
+=pod
 
 =head1 NAME
 
+OpenTracing::Manual::Instrumentation - monitor your application
 
+=head1 SYNOPSIS
 
-OpenTracing::Manual::Instrumentation - For Application developers and Devops
+  use OpenTracing::Implementation qw/FancyTracker/
+  use OpenTracing::WrapScope qw/long_sub/
+  use OpenTracing::AutoScope;
+  use OpenTracing::GlobalTracer qw/get_global_tracer/;
 
+  sub long_sub {
+     ...
+  }
 
+  sub process_requests {
+      my ($requests) = @_;
+
+      foreach my $request (@$requests) {
+          OpenTracing::AutoScope->start_guarded_span('request', tags => { id => $request->id });
+
+          if ($request->needs_initialization) {
+              OpenTracing::AutoScope->start_guarded_span('initialization');
+              $request->initialize();
+          }
+
+          my $scope_process = get_global_tracer->start_active_span('processing');
+          $request->process();
+          if ($request->is_failure) {
+              $scope_process->get_span->add_tag(error => 1);
+          }
+          $scope_process->close();
+      }
+  }
 
 =head1 DESCRIPTION
 
+This manual documents the process of instrumenting a program,
+in order to gain insights about specific parts of the code.
 
+=head1 Selecting a tracer
 
-This part of the L<OpenTracing::Manual> is about how to setup OpenTracing inside
-an exisiting (web) application and add more detailed instrumentation to specific
-parts of the code.
+In order to instrument an application, an OpenTracing-compatible
+tracer is needed, it should be part of a set of modules implementing
+L<OpenTracing::Interface>, usually living under
+the L<OpenTracing::Implementation::*> namespace.
 
+Find an OpenTracing implementation corresponding to your APM
+and proceed to the next step. Make sure it is compliant
+with L<OpenTracing::Interface>.
+Some of the available implementations are listed in
+L<OpenTracing::Manual::Ecosystem/"Implementations">.
 
+=head1 Adding OpenTracing to your Application
 
-=head1 TABLE Of CONTENTS
+=head2 Manual
 
-=over
+In order to start monitoring an application, a tracer is needed.
+In this example, a fictional C<FancyTracker> implementation will
+be used.
 
-=item L</"<Adding OpenTracing to your Application">
+First, load the implementation:
 
-=item L</"Getting Access to the bootstrapped Tracer">
+  use OpenTracing::Implementation::FancyTracker;
 
-=item L</"Use of Baggage Items for Request Parameters">
+Then, create a tracer object:
 
-=item L</"Manually adding Spans">
+  my $tracer = OpenTracinng::Implementation::FancyTracer->bootstrap_tracer;
 
-=back
+Now the tracer can be used to create new spans (logical operations which
+will be reflected in the APM). Spans are contained within scopes
+- objects which manage the spans lifetime.
+See L<https://opentracing.io/specification/conventions/> for more details
+on the naming.
 
+  my $scope = $tracer->start_active_span('short operation name');
+  my $span  = $scope->get_span();
+  ...
+  $scope->close();
 
+Of course, C<$scope->get_span()> can be skipped if direct access
+to the span is not needed. It would be needed in order to add
+extra information to the span, see L<Adding extra information to spans>.
 
-=head1 THE DETAILS
+It's useful to be able to access the tracer anywhere in the program,
+hence L<OpenTracing::GlobalTracer> exists. Set the tracer as global:
 
+  OpenTracing::GlobalTracer->set_global_tracer($tracer);
 
+and access it anywhere with:
 
-=head2 Adding OpenTracing to your Application
+  my $tracer = OpenTracing::GLobalTracer->get_global_tracer();
 
-From the point of view for application developers that want to add
-instrumentation, most likely it is just a matter of adding the right plugin to
-your framework or useragent.
+Since this is a common way of using OpenTracing, there is module
+which takes care of all the boilerplate, so instead of:
 
-    use YourFramework::Plugin::OpenTracing;
-    #
-    # use OPENTRACING_IMPLEMENTATION environment variable to select which.
+  use OpenTracing::Implementation::FancyTracker;
+  use OpenTracing::GlobalTracer;
 
-This will bootstrap a Tracer Implementation, use
-L<< C<extract_context>|OpenTracing::Interface::Tracer/
-"extract_context(-OPENTRACING_CARRIER_FORMAT-=>-$carrier-)" >>
-and
-L<< C<start_active_span>|OpenTracing::Interface::Tracer/
-"start_active_span(-$operation_name,-%options-)" >>
-with any already existing Tracer information.
+  my $tracer = OpenTracing::Implementation::FancyTracker->bootstrap_tracer();
+  OpenTracing::GlobalTracer->set_global_tracer($tracer);
+
+you can do:
+
+  use OpenTracing::Implementation 'FancyTracker';
+  ...
+  my $tracer = OpenTracing::GlobalTracer->get_global_tracer();
+
+However, even this is often not required, since the framework in use
+(like L<CGI::Application>) might have an OpenTracing plugin available,
+which will take care of all the setup. See the next section for details.
+
+=head2 Using a plugin
+
+If the program is running under a framework, like L<CGI::Application>
+an OpenTracing plugin might be available. In that case, it would
+most likely suffice to use the specific plugin.
 
 If your microservices are 'small' and 'shallow' this might be just enough what
 you need. However, you will only get tracer information on the level provided by
@@ -61,94 +124,111 @@ the plugin. That is, probably just one single rootspan. Some framework plugins
 might add another layer on top of that rootspan, like a setup-span, a run-span,
 a render-span, and a teardown-span.
 
-Incase you want more detailed information, see the next.
+=head2 Extras
 
+There are some helper modules available for common use cases.
 
+=head3 Auto-closing scopes
 
-=head2 Getting Access to the bootstrapped Tracer
+Each scope has to be closed at some point. When complex control
+flow is involved, this can get tricky and easy to miss.
 
-To get access to the Tracer, there are two ways to do so:
+Consider this loop:
 
-    use OpenTracing::GlobalTracer qw/$TRACER/;
-    #
-    # which might be `undef` if not yet bootstrapped
+  foreach my $request (@requests) {
+      my $scope = $TRACER->start_active_span('process_request');
+      next unless _is_valid($request);
 
-Or use a more reliable way:
+      _process($request);
+      $scope->close();
+  }
 
-    use aliased OpenTracing::GlobalTracer;
-    
-    my $tracer = GlobalTracer->get_global_tracer;
-    #
-    # which will always return a tracer (or croak)
+Since C<next> leaves the loop early, C<$scope->close()> never gets
+called for invalid requests. In order to account for that, the code
+would need to be changed to:
 
-In the latter approach, it may return a L<OpenTracing::Implementation::NoOp> as
-defined in the specs. But at least your application won't break because of some
-badly bootstrapped tracer, and 'production' can continue running.
+  foreach my $request (@requests) {
+      my $scope = $TRACER->start_active_span('process_request');
 
-In the examples below, C<$TRACER> will be used, but you should have used the
-class method to get one.
+      unless (_is_valid($request)) {
+          $scope->close();
+          next;
+      }
 
+      _process($request);
+      $scope->close();
+  }
 
+This can get troublesome when more conditions come into play.
+For cases like this, L<OpenTracing::AutoScope> can be used
+to create a span which will last until the end of current
+scope, regardless of how or when the scope is exited:
 
-=head2 Use of Baggage Items for Request Parameters
+  use OpenTracing::AutoScope;
 
-During some setup-stage, add Baggage Items, using L<< set_baggage_item|
-OpenTracing::Interface::Span/set_baggage_item(-$key-=>-$value-) >>
+  foreach my $request (@requests) {
+      OpenTracing::AutoScope->start_guarded_span('process_request');
+      next unless _is_valid($request);
 
-    my $customer_id = YourFramwork->request->query_param('customer_id);
-        
-    $TRACER
-        ->get_active_span
-        ->set_baggage_item( customer_id => $customer_id );
+      _process($request);
+  }
 
-Those Baggage Items will be progressed into all descendent spans and delivered
-to the Tracing Provider.
+See L<OpenTracing::AutoScope> for details.
 
+=head3 Tracing specific subroutines
 
+Often the logical operations to monitor correspond directly to subroutines.
+Instead of adding OpenTracing code to each subroutine, you can use
+L<OpenTracing::WrapScope> to automatically add it selected subroutines:
 
-=head2 Manually adding Spans
+  package Foo;
+  use OpenTracing::WrapScope qw[ foo bar ];
 
-If you like to get more detail, you can add more
-L<Spans|OpenTracing::Interface::Span>. For simplicity, Spans do
-live inside a L<Scope|OpenTracing::Interface::Scope>, handled by a
-L<ScopeManager|OpenTracing::Interface::ScopeManager>. Starting a Span will
-return a Scope. According to the spec, once finished the scope this Span lives
-in, one needs to call L<< C<close>|OpenTracing::Interface::Scope/"close" >>.
+  sub foo { ... } # will be surrounded with a span
+  sub bar { ... } # will be surrounded with a span
+  sub baz { ... } # will not be modified
 
-    sub exciting_task {
-        my $_scope = $TRACER->start_active_span( "exiting task" );
-        
-        ...
-        
-        $_scope->close;
-        
-        return
-    }
+Subroutines from other modules can also be wrapped by using
+fully qualified names:
 
-This can be annoying and even terrible if there are multiple exit points, using
-I<return early> concepts, or when bailing out halfway.
+  use OpenTracing::WrapScope 'Some::Other::method';
 
-This being Perl, we can do better using L<OpenTracing::AutoScope>:
+See L<OpenTracing::WrapScope> for details.
 
-    use OpenTracing::AutoScope;
-    
-    sub exciting_task {
-        OpenTracing::AutoScope->start_guarded_span;
-        
-        ...
-        
-        return
-    }
+=head1 Adding extra information to spans
 
-See L<< C<start_active_span>|OpenTracing::Interface::Tracer/
-"start_active_span(-$operation_name,-%options-)" >> for all the options you can
-pass in.
+=head2 Tags
 
+Tags are extra characteristics which apply to the whole span.
+For a database call, that could be the SQL statement and database name,
+for example.
 
+These can be set during the span creation:
+
+  my $scope = $tracer->start_active_span('db_sql_query', {
+    'db.statement' => $sql,
+  });
+
+Or later, but never after the span has finished:
+
+  my $span = $scope->get_span;
+  $span->add_tag('db.statement' => $sql);
+
+Only simple scalars can be used as tags, references are not allowed.
+
+=head2 Baggage items
+
+Baggage items are key-value pairs which cross process boundaries and
+are inherited by following spans. These are long-lived data pieces
+available throughout the trace.
+
+They can be added to existing spans:
+
+  $span->add_baggage_item(customer_id => $customer_id);
+
+See L<< add_baggage_item|OpenTracing::Interface::Span/add_baggage_item >>.
 
 =head1 SEE ALSO
-
-
 
 =over
 
@@ -178,19 +258,15 @@ The OpenTracing API standard.
 
 =back
 
-
-
 =head1 AUTHOR
-
-
 
 Theo van Hoesel <tvanhoesel@perceptyx.com>
 
+=head1 CONTRIBUTORS
 
+Szymon Nieznanski <snieznanski@perceptyx.com>
 
 =head1 COPYRIGHT AND LICENSE
-
-
 
 'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
 

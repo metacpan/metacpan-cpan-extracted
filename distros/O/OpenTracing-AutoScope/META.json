@@ -46,12 +46,13 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Test::Most" : "0",
             "Test::OpenTracing::Integration" : "v0.102.1"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.106.3",
+   "version" : "v0.106.4",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -9,8 +9,8 @@ $p->report_tags("a");
 
 my @doc;
 
-$p->handler(start => \&a_handler, "skipped_text, text");
-$p->handler(end_document => \@doc, '@{skipped_text}');
+$p->handler(start        => \&a_handler, "skipped_text, text");
+$p->handler(end_document => \@doc,       '@{skipped_text}');
 
 $p->parse(<<EOT)->eof;
 <title>hi</title>
@@ -23,7 +23,6 @@ sub a_handler {
     my $text = shift;
     push(@doc, uc($text));
 }
-
 
 is(join("", @doc), <<'EOT');
 <title>hi</title>
@@ -43,11 +42,15 @@ EOT
 
 $p = HTML::Parser->new(api_version => 3);
 $p->handler(comment => "");
-$p->handler(end_document => sub {
-		                my $stripped = shift;
-				#diag $stripped;
-	                        is($stripped, $expected);
-			    }, "skipped_text");
+$p->handler(
+    end_document => sub {
+        my $stripped = shift;
+
+        #diag $stripped;
+        is($stripped, $expected);
+    },
+    "skipped_text"
+);
 for (split(//, $doc)) {
     $p->parse($_);
 }
@@ -58,14 +61,14 @@ $p->eof;
 #
 my @x;
 $p = HTML::Parser->new(api_version => 3, unbroken_text => 1);
-$p->handler(text => \@x, '@{"X", skipped_text, text}');
-$p->handler(end => "");
+$p->handler(text         => \@x, '@{"X", skipped_text, text}');
+$p->handler(end          => "");
 $p->handler(end_document => \@x, '@{"Y", skipped_text}');
 
 $doc = "a a<a>b b</a>c c<x>d d</x>e";
 
 for (split(//, $doc)) {
-   $p->parse($_);
+    $p->parse($_);
 }
 $p->eof;
 
@@ -79,7 +82,7 @@ is(join(":", @x), "X::a a:X:<a>:b bc c:X:<x>:d de:Y:");
 my $skipped;
 $p = HTML::Parser->new(
     ignore_tags => ["foo"],
-    start_h => [sub {$skipped = shift}, "skipped_text"],
+    start_h     => [sub { $skipped = shift }, "skipped_text"],
 );
 
 $p->parse("\x{100}<foo>");

@@ -6,6 +6,8 @@ use Test::More tests => 1;
 
 use Config::Structured;
 
+$ENV{APP_DB_PASSWORD} = 'secure_password123';
+
 my $conf = Config::Structured->new(
   structure => <<'END'
 file_value:
@@ -21,5 +23,4 @@ END
 END
 );
 
-$ENV{APP_DB_PASSWORD} = 'secure_password123';
 is($conf->file_value, 'secure_password123', 'Conf value from referenced file');

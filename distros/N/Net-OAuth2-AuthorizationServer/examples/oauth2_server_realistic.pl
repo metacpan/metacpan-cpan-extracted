@@ -273,7 +273,12 @@ my $verify_access_token_sub = sub {
       }
     }
 
-    return $oauth2_data->{refresh_tokens}{$access_token};
+    return (
+		$oauth2_data->{refresh_tokens}{$access_token},
+		undef,
+		$oauth2_data->{refresh_tokens}{$access_token}{scope},
+		$oauth2_data->{refresh_tokens}{$access_token}{user_id},
+	);
   }
   if ( exists( $oauth2_data->{access_tokens}{$access_token} ) ) {
 
@@ -296,7 +301,12 @@ my $verify_access_token_sub = sub {
     }
 
     $c->app->log->debug( "OAuth2::Server: Access token is valid" );
-    return $oauth2_data->{access_tokens}{$access_token};
+    return (
+		$oauth2_data->{access_tokens}{$access_token},
+		undef,
+		$oauth2_data->{access_tokens}{$access_token}{scope},
+		$oauth2_data->{access_tokens}{$access_token}{user_id},
+	);
   }
 
   $c->app->log->debug( "OAuth2::Server: Access token does not exist" );

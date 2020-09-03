@@ -436,29 +436,29 @@ sub _output {
         if (not defined $self->{output}) {
             $self->debug("_output skipped, output option not set");
 
-        # handle csv output
-        } elsif ($self->{output} =~ /^csv:(.+)/) {
+        # handle csv output, refer to sub _output_csv
+        } elsif ($self->{output} =~ /^csv(:(.+))?$/) {
             $self->debug("_output calling _output_csv");
             $output = $self->_output_csv($row);
-            $file = $1;
+            $file = $2 // "/dev/stdout";
 
-        # handle dump output, call with var name arg
-        } elsif ($self->{output} =~ /^dump:([a-zA-Z]\w*):(.+)/) {
+        # handle dump output, call with var name arg, refer to sub _output_dump
+        } elsif ($self->{output} =~ /^dump(:([a-zA-Z]\w*)(:(.+))?)?$/) {
             $self->debug("_output calling _output_dump");
-            $output = $self->_output_dump($row, $1);
-            $file = $2;
+            $output = $self->_output_dump($row, $2 // "dump");
+            $file = $4 // "/dev/stdout";
 
-        # handle json output, call with var name arg
-        } elsif ($self->{output} =~ /^json:([a-zA-Z]\w*):(.+)/) {
+        # handle json output, call with var name arg, refer to sub _output_json
+        } elsif ($self->{output} =~ /^json(:([a-zA-Z]\w*)(:(.+))?)?$/) {
             $self->debug("_output calling _output_json");
-            $output = $self->_output_json($row, $1);
-            $file = $2;
+            $output = $self->_output_json($row, $2 // "json");
+            $file = $4 // "/dev/stdout";
 
-        # handle sql output, call with table name arg
-        } elsif ($self->{output} =~ /^sql:"?([^"]+)"?:(.+)/) {
+        # handle sql output, call with table name arg, refer to sub _output_sql
+        } elsif ($self->{output} =~ /^sql(:("([^"]+)"|(\w+))(:(.+))?)?$/) {
             $self->debug("_output calling _output_sql");
-            $output = $self->_output_sql($row, $1);
-            $file = $2;
+            $output = $self->_output_sql($row, $3 // $4 // "table");
+            $file = $6 // "/dev/stdout";
 
         # error on invalid output option
         } else {
@@ -504,9 +504,10 @@ sub _output_csv {
 
 =head2 output csv
 
+    csv
     csv:$file
 
-The csv output option can be used to create a csv file.
+The csv output option can be used to output a csv file, /dev/stdout by default.
 
 All csv outputs are doule quoted. Double quotes in the outut data are escaped
 with an extra double quote.
@@ -590,10 +591,12 @@ sub _output_dump {
 
 =head2 output dump
 
+    dump
+    dump $var
     dump:$var:$file
 
 The dump output option writes one row per line in L<Data::Dumper> format
-prefixed by the specified variable name.
+prefixed by the specified var name, defaulting to 'dump' and /dev/stdout.
 
 This dump output can be read back into a perl script as follows:
 
@@ -640,10 +643,13 @@ sub _output_json {
 
 =head2 output json
 
+    json
+    json:$var
     json:$var:$file
 
 The json output option writes one row per line in json format prefixed by the
-specified $var name. This requires that the L<JSON> module is available.
+specified var name, defaulting to 'json' and /dev/stdout. This requires that
+the L<JSON> module is available.
 
 The output json looks something like the example below:
 
@@ -741,11 +747,15 @@ sub _output_sql {
 
 =head2 output sql
 
+    sql
+    sql:$table
+    sql:"$table"
     sql:$table:$file
-    or sql:"$table":$file
+    sql:"$table":$file
 
-The sql output option writes one row per line as sql insert statements in
-the following format:
+The sql output option writes one row per line as sql insert statements using
+the specified table name, double-quoting non-word table names, defaulting to
+"table" and /dev/stdout, in the following format:
 
     INSERT INTO <table> (<column>, ...) VALUES (<value>, ...);
 

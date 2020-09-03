@@ -1,3 +1,10 @@
+2.038     2020-08-31
+
+    - Use PDF::API2::XS or Image::PNG::Libpng, if either is installed, to speed
+      up inclusion of PNG files with an alpha channel by an order of magnitude
+      (written by Rob Scovell, sponsored by prayerletters.com).
+
+
 2.037     2020-02-05
 
     - Allow PDF 2.0 files to be opened.

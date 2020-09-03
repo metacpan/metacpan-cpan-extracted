@@ -15,6 +15,7 @@ on 'develop' => sub {
 };
 
 on 'test' => sub {
+    requires            "Capture::Tiny";
     requires            "Test::Most";
     requires            "Test::OpenTracing::Integration", 'v0.102.1';
 };

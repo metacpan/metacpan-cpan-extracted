@@ -33,5 +33,5 @@ resources:
   homepage: https://metacpan.org/module/Net::OAuth2::AuthorizationServer
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Humanstate/net-oauth2-authorizationserver
-version: '0.26'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

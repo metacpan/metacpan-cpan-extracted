@@ -3,7 +3,7 @@ package PDF::API2::XS::ImagePNG;
 use strict;
 use warnings;
 
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.001'; # VERSION
 
 require XSLoader;
 require Exporter;

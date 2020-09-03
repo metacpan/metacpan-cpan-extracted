@@ -253,7 +253,7 @@ subtest 'check_http_response()' => sub {
       [Alien::Base::ModuleBuild::Repository::HTTP->check_http_response($res)],
       [1, "IO::Socket::SSL 1.42 must be installed for https support\n" .
           "Net::SSLeay 1.49 must be installed for https support\n" .
-          "See https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues/6#issuecomment-417097485",
+          "See https://github.com/PerlAlien/Alien-Base-ModuleBuild/issues/6#issuecomment-417097485",
           { 'content-type' => 'text/plain', 'content-length' => 110 }, "https://mytest.test" ]
     );
   };

@@ -90,14 +90,14 @@ Mnet::T::test_perl({
         extras = arg
         diff --test --replay
         @@ -1,4 +1,4 @@
-        -inf - Mnet::Opts::Cli new parsed opt cli sample = 3
-        +inf - Mnet::Opts::Cli new parsed opt cli sample = 2
-        -inf - Mnet::Opts::Cli new parsed cli arg (extra) = "arg"
-        +inf - Mnet::Opts::Cli new parsed cli arg (extra) = "extra"
-        -sample = 3
-        +sample = 2
-        -extras = arg
-        +extras = extra
+        -inf - Mnet::Opts::Cli new parsed opt cli sample = 2
+        +inf - Mnet::Opts::Cli new parsed opt cli sample = 3
+        -inf - Mnet::Opts::Cli new parsed cli arg (extra) = "extra"
+        +inf - Mnet::Opts::Cli new parsed cli arg (extra) = "arg"
+        -sample = 2
+        +sample = 3
+        -extras = extra
+        +extras = arg
     expect-eof
     debug   => '--debug',
 });

@@ -7,7 +7,7 @@ use IO::Uncompress::Gunzip qw/gunzip $GunzipError/;
 use Data::Dumper qw/Dumper/;
 use File::Which qw/which/;
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 
 use lib "$RealBin/../lib";
 use_ok 'Bio::Kmer';
@@ -40,7 +40,7 @@ SKIP:{
   my $jellyfish = which("jellyfish");
   if(! -e $jellyfish){
     #diag "Jellyfish not found in PATH. Skipping.";
-    skip("Jellyfish not found in PATH.", 14);
+    skip("Jellyfish not found in PATH.", 15);
   }
     
   my $jfVersion=`$jellyfish --version 2>/dev/null`; chomp($jfVersion);
@@ -70,5 +70,7 @@ SKIP:{
   for my $query(keys(%query)){
     is $query{$query}, $kmerJf->query($query), "Queried for $query{$query}";
   }
+
+  is($kmerJf->ntcount, 58107, "estimated length by jellyfish");
 }
 

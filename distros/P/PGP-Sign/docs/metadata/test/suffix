@@ -1,3 +1,9 @@
+If the gpg binary found first on the PATH is too old, the tests will be
+skipped rather than fail.  This may not always be desirable, since the
+module is not usable on such a system without configuration, but the
+module can still be configured to use a GnuPG binary found elsewhere and
+therefore this doesn't represent an error in the module itself.
+
 The following additional Perl modules will be used by the test suite if
 present:
 

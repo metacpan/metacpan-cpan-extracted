@@ -10,7 +10,7 @@ use Alien::Base::ModuleBuild::Utils;
 use parent 'Alien::Base::ModuleBuild::Repository';
 
 # ABSTRACT: HTTP repository handler
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 our $Has_HTML_Parser = eval { require HTML::LinkExtor; 1 };
 
@@ -161,7 +161,7 @@ sub check_http_response {
       my $reason = $res->{status} == 599 ? $res->{content} : "@{[ $res->{status} ]} @{[ $res->{reason} ]}";
       if($res->{status} == 599 && $reason =~ /https support/)
       {
-        $reason .= "See https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues/6#issuecomment-417097485";
+        $reason .= "See https://github.com/PerlAlien/Alien-Base-ModuleBuild/issues/6#issuecomment-417097485";
       }
       return ( 1, $reason, $res->{headers}, $res->{url} );
     }
@@ -183,7 +183,7 @@ Alien::Base::ModuleBuild::Repository::HTTP - HTTP repository handler
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

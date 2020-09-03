@@ -5,7 +5,6 @@ use Test::Needs;
 
 
 use_ok('Test::Dependencies');
-use_ok('Test::Dependencies::Light');
 
 
 done_testing;

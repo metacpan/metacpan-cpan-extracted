@@ -81,9 +81,8 @@ $status = $client->{client}->readDescriptionAttribute(
 );
 
 is($status, STATUSCODE_GOOD, "read description status");
-is($out->{LocalizedText_text},
-   $nodes{some_object_0}{attributes}{ObjectAttributes_description}{LocalizedText_text},
-   "read description");
+is($out->{LocalizedText_text}, $nodes{some_object_0}{attributes}
+    {ObjectAttributes_description}{LocalizedText_text}, "read description");
 
 $client->stop();
 $server->stop();

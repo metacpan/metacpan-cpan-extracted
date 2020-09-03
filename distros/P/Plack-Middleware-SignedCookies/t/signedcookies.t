@@ -12,6 +12,7 @@ sub mkck { my $kv = join ws.'='.ws, splice @_, 0, 2; join ';', map ws.$_.ws, $kv
 my ( $_s, $_h );
 
 my $mw = Plack::Middleware::SignedCookies->new( app => sub {
+	my $env = $_[0];
 	my @h = map +( 'Set-Cookie', $_ ), (
 		mkck( 'c0' ), # missing equals sign
 		mkck( 'cb', 'lorem "ipsum"' ),
@@ -19,7 +20,11 @@ my $mw = Plack::Middleware::SignedCookies->new( app => sub {
 		mkck( 'cs', 'amet, consectetur', ('SECURE') x !!$_s ),
 		mkck( 'cx', q['adipiscing elit'], ('SECURE') x !!$_s, ('HTTPONLY') x !!$_h ),
 	);
-	[ 200, \@h, [ join ';', sort split / *; */, $_[0]{'HTTP_COOKIE'}, -1 ] ];
+	sub {
+		my $writer = shift->( [ 200, \@h ] );
+		$writer->write( join ';', sort split / *; */, $env->{'HTTP_COOKIE'}, -1 );
+		$writer->close;
+	};
 } );
 
 test_psgi app => $mw->to_app, client => sub {

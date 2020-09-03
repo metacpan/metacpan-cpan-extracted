@@ -2,7 +2,7 @@
 
 'OpenTracing Manual' is Copyright (C) 2020, Perceptyx Inc, Theo van Hoesel
 
-# OpenTracing Manaual
+# OpenTracing Manual
 
 ## Description
 
@@ -12,7 +12,7 @@ OpenTracing API related Interface Definition.
 It targets three different audiences:
 
 - Application developers and Devops
-- Framwork or Integration Developers
+- Framework or Integration Developers
 - Tracing service Implementation providers
 
 Included is a list of Perl Modules and those that are on the horizon.

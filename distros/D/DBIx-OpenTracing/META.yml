@@ -29,5 +29,5 @@ requires:
   Syntax::Feature::Maybe: '0'
   perl: '5.014'
   syntax: '0'
-version: v0.0.8
+version: v0.0.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -9,18 +9,20 @@ our $VERSION = '9999';
 
 use File::Basename;
 use File::Temp;
-use Rex::Commands::File;
+use Rex::Commands::File 1.012;
 use Rex::Hook::File::Diff;
 use Test2::V0 0.000071;
 use Test::Output 0.03;
 
 plan tests => 2;
 
+my $null = File::Spec->devnull();
+
 ## no critic ( ProhibitComplexRegexes )
 
 subtest 'quick file lifecycle' => sub {
     my $file             = File::Temp->new()->filename();
-    my $rex_tmp_filename = Rex::Hook::File::Diff::get_rex_temp_file_path($file);
+    my $rex_tmp_filename = Rex::Commands::File::get_tmp_file_name($file);
 
     my @tests = (
         {
@@ -28,9 +30,9 @@ subtest 'quick file lifecycle' => sub {
             coderef         => sub { file $file, content => '1' },
             expected_output => qr{
               \A                                    # start of output
-              \QDiff for: \E$file\n                 # leading message
-              \Q--- \E/dev/null(\s+.*?)?\n          # header for original file
-              \Q+++ \E$rex_tmp_filename(\s+.*?)?\n  # header for new file
+              \QDiff for: $file\E\n                 # leading message
+              \Q--- $null\E(\s+.*?)?\n              # header for original file
+              \Q+++ $rex_tmp_filename\E(\s+.*?)?\n  # header for new file
               \Q@@ -0,0 +1 @@\E\n                   # hunk
               \Q+1\E\n                              # added line
               \Z                                    # end of output
@@ -41,9 +43,9 @@ subtest 'quick file lifecycle' => sub {
             coderef         => sub { file $file, ensure => 'absent' },
             expected_output => qr{
               \A                            # start of output
-              \QDiff for: \E$file\n         # leading message
-              \Q--- \E$file(\s+.*?)?\n      # header for original file
-              \Q+++ \E/dev/null(\s+.*?)?\n  # header for new file
+              \QDiff for: $file\E\n         # leading message
+              \Q--- $file\E(\s+.*?)?\n      # header for original file
+              \Q+++ $null\E(\s+.*?)?\n      # header for new file
               \Q@@ -1 +0,0 @@\E\n           # hunk
               \Q-1\E\n                      # added line
               \Z                            # end of output
@@ -56,7 +58,7 @@ subtest 'quick file lifecycle' => sub {
 
 subtest 'full file lifecycle' => sub {
     my $file             = File::Temp->new()->filename();
-    my $rex_tmp_filename = Rex::Hook::File::Diff::get_rex_temp_file_path($file);
+    my $rex_tmp_filename = Rex::Commands::File::get_tmp_file_name($file);
 
     my @tests = (
         {
@@ -69,9 +71,9 @@ subtest 'full file lifecycle' => sub {
             coderef         => sub { file $file, content => '1' },
             expected_output => qr{
               \A                                    # start of output
-              \QDiff for: \E$file\n                 # leading message
-              \Q--- \E$file(\s+.*?)?\n              # header for original file
-              \Q+++ \E$rex_tmp_filename(\s+.*?)?\n  # header for new file
+              \QDiff for: $file\E\n                 # leading message
+              \Q--- $file\E(\s+.*?)?\n              # header for original file
+              \Q+++ $rex_tmp_filename\E(\s+.*?)?\n  # header for new file
               \Q@@ -0,0 +1 @@\E\n                   # hunk
               \Q+1\E\n                              # added line
               \Z                                    # end of output
@@ -82,9 +84,9 @@ subtest 'full file lifecycle' => sub {
             coderef         => sub { file $file, content => '2' },
             expected_output => qr{
               \A                                    # start of output
-              \QDiff for: \E$file\n                 # leading message
-              \Q--- \E$file(\s+.*?)?\n              # header for original file
-              \Q+++ \E$rex_tmp_filename(\s+.*?)?\n  # header for new file
+              \QDiff for: $file\E\n                 # leading message
+              \Q--- $file\E(\s+.*?)?\n              # header for original file
+              \Q+++ $rex_tmp_filename\E(\s+.*?)?\n  # header for new file
               \Q@@ -1 +1 @@\E\n                     # hunk
               \Q-1\E\n                              # removed line
               \Q+2\E\n                              # added line
@@ -96,9 +98,9 @@ subtest 'full file lifecycle' => sub {
             coderef         => sub { file $file, content => q() },
             expected_output => qr{
               \A                                    # start of output
-              \QDiff for: \E$file\n                 # leading message
-              \Q--- \E$file(\s+.*?)?\n              # header for original file
-              \Q+++ \E$rex_tmp_filename(\s+.*?)?\n  # header for new file
+              \QDiff for: $file\E\n                 # leading message
+              \Q--- $file\E(\s+.*?)?\n              # header for original file
+              \Q+++ $rex_tmp_filename\E(\s+.*?)?\n  # header for new file
               \Q@@ -1 +0,0 @@\E\n                   # hunk
               \Q-2\E\n                              # removed line
               \Z                                    # end of output

@@ -1,29 +1,32 @@
-#!perl -w
-
 use strict;
-use Test;
-plan tests => 1;
+use warnings;
 
-use HTML::Parser;
+use HTML::Parser ();
+use Test::More tests => 1;
 
 my $TEXT = "";
-sub h
-{
-    my($event, $tagname, $text) = @_;
+
+sub h {
+    my ($event, $tagname, $text) = @_;
     for ($event, $tagname, $text) {
         if (defined) {
-	    s/([\n\r\t])/sprintf "\\%03o", ord($1)/ge;
-	}
-	else {
-	    $_ = "<undef>";
-	}
+            s/([\n\r\t])/sprintf "\\%03o", ord($1)/ge;
+        }
+        else {
+            $_ = "<undef>";
+        }
     }
 
     $TEXT .= "[$event,$tagname,$text]\n";
 }
 
-my $p = HTML::Parser->new(default_h => [\&h, "event,tagname,text"], empty_element_tags => 1);
-$p->parse(q(<tr><td align="center" height="100"><script src="whatever"/><SCRIPT language="JavaScript1.1">bust = Math.floor(1000000*Math.random());document.write('<SCR' + 'IPT LANGUAGE="JavaScript1.1" SRC="http://adv.virgilio.it/js.ng/site=virg&adsize=728x90&subsite=mail&sez=comfree&pos=43&bust='+bust+'?">\n');document.write('</SCR' + 'IPT>\n');</SCRIPT></td></tr>));
+my $p = HTML::Parser->new(
+    default_h          => [\&h, "event,tagname,text"],
+    empty_element_tags => 1
+);
+$p->parse(
+    q(<tr><td align="center" height="100"><script src="whatever"/><SCRIPT language="JavaScript1.1">bust = Math.floor(1000000*Math.random());document.write('<SCR' + 'IPT LANGUAGE="JavaScript1.1" SRC="http://adv.virgilio.it/js.ng/site=virg&adsize=728x90&subsite=mail&sez=comfree&pos=43&bust='+bust+'?">\n');document.write('</SCR' + 'IPT>\n');</SCRIPT></td></tr>)
+);
 $p->eof;
 
 ok($TEXT, <<'EOT');

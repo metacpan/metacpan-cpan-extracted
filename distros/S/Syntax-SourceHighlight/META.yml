@@ -1,0 +1,27 @@
+---
+abstract: 'Perl Binding to GNU Source Highlight'
+author:
+  - 'Thomas Chust <chust@web.de>'
+  - 'Matt Latusek <matlib@matlibhax.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::PkgConfig: '1.12'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Syntax-SourceHighlight
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: v5.10.0
+resources:
+  bugtracker: https://gitlab.com/Matlib/Syntax-SourceHighlight/-/issues
+  repository: https://gitlab.com/Matlib/Syntax-SourceHighlight.git
+version: v2.1.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

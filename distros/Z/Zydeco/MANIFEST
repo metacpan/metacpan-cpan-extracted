@@ -12,8 +12,10 @@ SIGNATURE
 dist.ini
 doap.ttl
 examples/bench.pl
+examples/calculator.pl
 examples/mip-087-001.pl
 examples/simple-json-encoder.pl
+examples/structs.pl
 lib/MooX/Pression.pm
 lib/Zydeco.pm
 lib/Zydeco/Manual.pod

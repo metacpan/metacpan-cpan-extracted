@@ -7,6 +7,8 @@ use lib "$FindBin::Bin/../lib";
 use Modern::Open;
 use Socket;
 
+close(STDERR);
+
 my $rc = 0;
 
 eval { $rc = socket(SOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp')); };

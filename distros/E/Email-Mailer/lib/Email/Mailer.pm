@@ -12,7 +12,7 @@ use Email::MIME 1.940;
 use Email::MIME::CreateHTML;
 use Email::Sender::Simple 'sendmail';
 
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 sub new {
     my $self = shift;
@@ -146,7 +146,7 @@ Email::Mailer - Multi-purpose emailer for HTML, auto-text, attachments, and temp
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Email-Mailer.svg)](https://travis-ci.org/gryphonshafer/Email-Mailer)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Email-Mailer/badge.png)](https://coveralls.io/r/gryphonshafer/Email-Mailer)
@@ -235,7 +235,7 @@ version 1.10
         subject => $subject,
         html    => $html,
     );
-    my $mail_1->new( from => 'different_address@example.com' );
+    my $mail_1 = $mail_0->new( from => 'different_address@example.com' );
     $mail_0->send;
     $mail_1->send;
 

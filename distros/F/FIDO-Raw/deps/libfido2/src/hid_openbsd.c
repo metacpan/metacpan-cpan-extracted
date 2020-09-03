@@ -18,7 +18,6 @@
 #include "fido.h"
 
 #define MAX_UHID	64
-#define MAX_U2FHID_LEN	64
 
 struct hid_openbsd {
 	int fd;
@@ -85,8 +84,8 @@ fido_hid_manifest(fido_dev_info_t *devlist, size_t ilen, size_t *olen)
 			explicit_bzero(di, sizeof(*di));
 			return FIDO_ERR_INTERNAL;
 		}
-		di->vendor_id = udi.udi_vendorNo;
-		di->product_id = udi.udi_productNo;
+		di->vendor_id = (int16_t)udi.udi_vendorNo;
+		di->product_id = (int16_t)udi.udi_productNo;
 		(*olen)++;
 	}
 
@@ -159,7 +158,7 @@ fido_hid_open(const char *path)
 		free(ret);
 		return (NULL);
 	}
-	ret->report_in_len = ret->report_out_len = MAX_U2FHID_LEN;
+	ret->report_in_len = ret->report_out_len = CTAP_MAX_REPORT_LEN;
 	fido_log_debug("%s: inlen = %zu outlen = %zu", __func__,
 	    ret->report_in_len, ret->report_out_len);
 
@@ -222,4 +221,20 @@ fido_hid_write(void *handle, const unsigned char *buf, size_t len)
 		return (-1);
 	}
 	return ((int)len);
+}
+
+size_t
+fido_hid_report_in_len(void *handle)
+{
+	struct hid_openbsd *ctx = handle;
+
+	return (ctx->report_in_len);
+}
+
+size_t
+fido_hid_report_out_len(void *handle)
+{
+	struct hid_openbsd *ctx = handle;
+
+	return (ctx->report_out_len);
 }

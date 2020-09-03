@@ -1,5 +1,5 @@
 package POE::Component::TLSify::ClientHandle;
-$POE::Component::TLSify::ClientHandle::VERSION = '0.06';
+$POE::Component::TLSify::ClientHandle::VERSION = '0.08';
 #ABSTRACT: Client-side handle for TLSify
 
 use strict;
@@ -59,7 +59,7 @@ POE::Component::TLSify::ClientHandle - Client-side handle for TLSify
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 DESCRIPTION
 

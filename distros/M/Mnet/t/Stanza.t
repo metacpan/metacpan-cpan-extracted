@@ -5,7 +5,7 @@
 use warnings;
 use strict;
 use Mnet::Stanza;
-use Test::More tests => 13;
+use Test::More tests => 15;
 
 # check trim function
 Test::More::is(
@@ -15,6 +15,11 @@ Test::More::is(
           trailing" . " " . "
     "), "double spaces\n indented\n  trailing", "trim"
 );
+
+# check trim not needed
+Test::More::is(
+    Mnet::Stanza::trim("stanza1\n stanza2"), "stanza1\n stanza2", "trim unneeded");
+
 
 # check parse function, returning the correct number of list elements
 #   stanza2 should be returned under stanza1, not as a separate element
@@ -29,6 +34,16 @@ my @list = Mnet::Stanza::parse(
     "), qr/^\s*stanza/
 );
 Test::More::is(scalar(@list), 2, "parse list");
+
+# check parse function, returning first item
+my ($first) =  Mnet::Stanza::parse(
+    Mnet::Stanza::trim("
+        stanza1
+         stanza2
+        extra
+    "), qr/^\S/
+);
+Test::More::is($first, "stanza1\n stanza2", "parse first");
 
 # check parse function, returning a string
 Test::More::is(

@@ -5,8 +5,9 @@ use strict;
 
 use Carp;
 use Module::CoreList;
+use Pod::Strip;
 
-use base 'Test::Builder::Module';
+use parent 'Test::Builder::Module';
 
 =head1 NAME
 
@@ -14,11 +15,11 @@ Test::Dependencies - Ensure that the dependency listing is complete
 
 =head1 VERSION
 
-Version 0.24
+Version 0.28
 
 =cut
 
-our $VERSION = '0.24';
+our $VERSION = '0.28';
 
 =head1 SYNOPSIS
 
@@ -26,17 +27,20 @@ In your t/00-dependencies.t:
 
     use CPAN::Meta;  # or CPAN::Meta::cpanfile
     use File::Find::Rule::Perl;
-    use Test::Dependencies exclude =>
-      [qw/ Your::Namespace Some::Other::Namespace /];
+
+    use Test::More;
+    use Test::Dependencies '0.28' forward_compatible => 1;
 
     my $meta = CPAN::Meta->load_file('META.yml');
-    die "No META.yml" if ! $meta;
+    plan skip_all => 'No META.yml' if ! $meta;
 
-    my @files =
-       File::Find::Rule::Perl->perl_files->in('./lib', './bin');
+    my @files = File::Find::Rule::Perl->perl_files->in('./lib', './bin');
+    ok_dependencies($meta, \@files, [qw/runtime configure build test/],
+                    undef, # all features in the cpanfile
+                    ignores => [ qw/ Your::Namespace Some::Other::Namespace / ]
+    );
 
-    ok_dependencies($meta, \@files);
-
+    done_testing;
 
 =head1 DESCRIPTION
 
@@ -51,6 +55,11 @@ The available options are:
 
 =over 4
 
+=item forward_compatible
+
+When specified and true, stops the module from outputting a plan, which
+is the default mode of operation when the module becomes 1.0.
+
 =item exclude
 
 Specifies the list of namespaces for which it is ok not to have
@@ -63,30 +72,6 @@ B<DEPRECATED>
 There used to be the option of specifying a style; the heavy style
 depended on B::PerlReq. This module stopped working somewhere around
 Perl 5.20. Specifying a style no longer has any effect.
-
-Old text:
-
-Specifies the style of module usage checking to use.  There are two
-valid values: "light" and "heavy".  The default is heavy.  The
-light style uses regular expressions to try and guess which modules
-are required.  It is fast, but can get confused by here-docs,
-multi-line strings, data sections, etc.  The heavy style actually
-compiles the file and asks perl which modules were used.  It is
-slower than the light style, but much more accurate.  If you have a
-very large project and you don't want to wait for the heavy style
-every time you run "make test," you might want to try the light
-style or look into the overrides below.
-
-Whether a style is specified or not, the style used can be overridden
-by the environment variable TDSTYLE.  This is useful, for example, if
-you want the heavy style to be used normally, but don't want to take
-the time checking dependencies on your smoke test server.
-
-Example usage:
-
-  use Test::Dependencies
-    exclude => ['Test::Dependencies'],
-    style => 'light';
 
 =back
 
@@ -102,50 +87,53 @@ sub import {
   my $callerpack = caller;
   my $tb = __PACKAGE__->builder;
   $tb->exported_to($callerpack);
-  $tb->no_plan;
 
-  if (defined $args{exclude}) {
-    foreach my $namespace (@{$args{exclude}}) {
-      croak "$namespace is not a valid namespace"
-        unless $namespace =~ m/^(?:(?:\w+::)|)+\w+$/;
-    }
-    $exclude_re = join '|', map { "^$_(\$|::)" } @{$args{exclude}};
-  }
-  else {
-      $exclude_re = qr/^$/;
-  }
+  unless ($args{forward_compatible}) {
+      $tb->no_plan;
 
-  if (defined $ENV{TDSTYLE}) {
-    _choose_style($ENV{TDSTYLE});
-  } else {
-    if (defined $args{style}) {
-      _choose_style($args{style});
-    } else {
-      _choose_style('light');
-    }
+      if (defined $args{exclude}) {
+          foreach my $namespace (@{$args{exclude}}) {
+              croak "$namespace is not a valid namespace"
+                  unless $namespace =~ m/^(?:(?:\w+::)|)+\w+$/;
+          }
+          $exclude_re = join '|', map { "^$_(\$|::)" } @{$args{exclude}};
+      }
+      else {
+          $exclude_re = qr/^$/;
+      }
   }
 
   $package->export_to_level(1, '', qw/ok_dependencies/);
 }
 
-sub _choose_style {
-  my $style = shift;
-  if (lc $style eq 'light') {
-    eval 'use Test::Dependencies::Light';
-  } elsif (lc $style eq 'heavy') {
-    eval 'use Test::Dependencies::Light';
-  } else {
-    carp "Unknown style: '", $style, "'";
-  }
+
+sub _get_modules_used_in_file {
+    my $file = shift;
+    my ($fh, $code);
+    my %used;
+
+    local $/;
+    open $fh, $file or return undef;
+    my $data = <$fh>;
+    close $fh;
+    my $p = Pod::Strip->new;
+    $p->output_string(\$code);
+    $p->parse_string_document($data);
+    $used{$2}++ while $code =~ /^\s*(use|with|extends)\s+['"]?([\w:]+)['"]?/gm;
+    while ($code =~ m{^\s*use\s+base
+                          \s+(?:qw.|(?:(?:['"]|q.|qq.)))([\w\s:]+)}gmx) {
+        $used{$_}++ for split ' ', $1;
+    }
+
+    return [keys %used];
 }
 
 sub _get_modules_used {
     my ($files) = @_;
     my @modules;
 
-    require Test::Dependencies::Light;
     foreach my $file (sort @$files) {
-        my $ret = Test::Dependencies::Light::get_modules_used_in_file($file);
+        my $ret = _get_modules_used_in_file($file);
         if (! defined $ret) {
             die "Could not determine modules used in '$file'";
         }
@@ -216,7 +204,7 @@ This is an arrayref holding zero or more names of features, or undef for all
 
 =item ignores
 
-This is a hashref listing the names of modules (and their sub-namespaces)
+This is a arrayref listing the names of modules (and their sub-namespaces)
 for which no errors are to be reported.
 
 =back
@@ -242,7 +230,12 @@ sub ok_dependencies {
     my ($meta, $files, %options) = @_;
     my $phases = $options{phases};
     my $features = $options{features};
-    my %ignores = map { $_ => 1 } @{$options{ignores} // []};
+    my $ignores_re = '^(?:' . join('|',
+                                   # create regex for sub-namespaces
+                                   map { "$_(?:::.*)?" }
+                                   @{$options{ignores} // []})
+                        . ')$';
+    $ignores_re = qr/$ignores_re/;
 
     $features //= $meta->features;
     $features = [ $features ] unless ref $features;
@@ -265,9 +258,9 @@ sub ok_dependencies {
         next if ! defined $_;
 
         my $ver = version->parse($_)->numify;
-        $minimum_perl = (defined $min_perl_ver && $min_perl_ver < $ver)
+        $minimum_perl = (defined $min_perl_ver and $min_perl_ver < $ver)
             ? $minimum_perl : $_;
-        $min_perl_ver = (defined $min_perl_ver && $min_perl_ver < $ver)
+        $min_perl_ver = (defined $min_perl_ver and $min_perl_ver < $ver)
             ? $min_perl_ver : $ver;
     }
     $minimum_perl //= "v5.0.0";
@@ -275,15 +268,21 @@ sub ok_dependencies {
 
     for my $req (@$reqs) {
         for my $mod (sort $req->required_modules) {
-            next if $mod eq 'perl';
-            next if exists $ignores{$mod} ||  $mod =~ $exclude_re;
+            next if ($mod eq 'perl'
+                     or $mod =~ $ignores_re
+                     or ($exclude_re and $mod =~ $exclude_re));
+
+            # if the module is/was deprecated from CORE,
+            # it makes sense to require it, if the dependency exists
+            next if (Module::CoreList->deprecated_in($mod)
+                     or Module::CoreList->removed_from($mod));
 
             my $req_version = $req->requirements_for_module($mod);
             my $first_in = Module::CoreList->first_release($mod, $req_version);
             my $verstr = ($req_version) ? '(' . $req_version . ')' : '';
             my $corestr = version->parse($first_in)->normal;
             $tb->ok($first_in > $min_perl_ver,
-                    "Required core module '$mod'$verstr "
+                    "Required module '$mod'$verstr "
                     . "in core (since $corestr) after minimum perl "
                     . $minimum_perl )
                 if defined $first_in;
@@ -299,21 +298,38 @@ sub ok_dependencies {
 
     foreach my $mod (sort keys %required) {
         $tb->ok(exists $used{$mod}, "Declared dependency $mod used")
-            unless exists $ignores{$mod} || $mod =~ $exclude_re;
+            unless ($mod =~ $ignores_re
+                    or ($exclude_re and $mod =~ $exclude_re));
     }
 
     foreach my $mod (sort keys %used) {
-        next if exists $ignores{$mod} ||  $mod =~ $exclude_re;
+        next if ($mod =~ $ignores_re
+                 or ($exclude_re and  $mod =~ $exclude_re));
 
         my $first_in = Module::CoreList->first_release($mod, $required{$mod});
-        $tb->ok($first_in <= $min_perl_ver || exists $required{$mod},
-                "Used core module '$mod' in core (since $first_in) "
-                . "before perl $minimum_perl or explicitly required")
-            if defined $first_in;
-
-        $tb->ok(exists $required{$mod},
-                "Used non-core module '$mod' in requirements listing")
-            unless defined $first_in or $mod =~ $exclude_re;
+        if (my $v = Module::CoreList->removed_from($mod)) {
+            $v = version->parse($v)->normal;
+            $tb->ok(exists $required{$mod},
+                    "Removed-from-CORE (in $v) module '$mod' "
+                    . 'explicitly required');
+        }
+        elsif (my $v = Module::CoreList->deprecated_in($mod)) {
+            $v = version->parse($v)->normal;
+            $tb->ok(exists $required{$mod},
+                    "Deprecated-from-CORE (in $v) module '$mod' explicitly "
+                    . 'required to anticipate removal');
+        }
+        elsif (defined $first_in) {
+            my $v = version->parse($first_in)->normal;
+            $tb->ok($first_in <= $min_perl_ver or exists $required{$mod},
+                    "Used CORE module '$mod' in core before "
+                    . "Perl $minimum_perl (since $v) "
+                    . "or explicitly required");
+        }
+        else {
+            $tb->ok(exists $required{$mod},
+                    "Used non-CORE module '$mod' in requirements listing");
+        }
     }
 }
 
@@ -365,7 +381,7 @@ L<http://search.cpan.org/dist/Test-Dependencies>
 
 =head1 LICENCE AND COPYRIGHT
 
-    Copyright (c) 2016-2019, Erik Huelsmann. All rights reserved.
+    Copyright (c) 2016-2020, Erik Huelsmann. All rights reserved.
     Copyright (c) 2007, Best Practical Solutions, LLC. All rights reserved.
 
     This module is free software; you can redistribute it and/or modify it

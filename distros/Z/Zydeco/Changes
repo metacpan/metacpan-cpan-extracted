@@ -7,6 +7,25 @@ Home page:    <https://metacpan.org/release/Zydeco>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.600	2020-09-03
+
+ - Protect lexical attributes and methods with Internals::SvREADONLY. This
+   is almost certainly what you want.
+
+0.521	2020-09-02
+
+ - Make = shortcut for method bodies smarter at deciding when to optimize
+   and when it needs to properly close over variables.
+
+0.520	2020-09-02
+
+ [ Packaging ]
+ - Use the latest version of MooX::Press.
+
+ [ Other ]
+ - Automatically import types into the caller package for each new class
+   and role as it is defined.
+
 0.519	2020-08-25
 
  [ Documentation ]

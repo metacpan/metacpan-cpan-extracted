@@ -1,6 +1,6 @@
 package Net::SFTP::Foreign::Backend::Net_SSH2;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use strict;
 use warnings;
@@ -36,19 +36,25 @@ sub _defaults {
     ( queue_size => 32 )
 }
 
+sub _make_error_string {
+    my ($self, $msg) = @_;
+    my ($err_code, $err_name, $err_str) = $self->{_ssh2}->error;
+    if ($err_code) {
+	return sprintf("%s: %s (%d): %s", $msg, $err_name, $err_code, $err_str)
+    }
+    else {
+	return $msg
+    }
+}
+
 sub _conn_failed {
     my ($self, $sftp, $msg) = @_;
-    $sftp->_conn_failed(sprintf("%s: %s (%d): %s",
-				$msg,
-				($self->{_ssh2}->error)[1, 0, 2]));
+    $sftp->_conn_failed($self->_make_error_string($msg))
 }
 
 sub _conn_lost {
     my ($self, $sftp, $msg) = @_;
-    $sftp->_conn_lost(undef, undef,
-                      sprintf("%s: %s (%d): %s",
-                              $msg,
-                              ($self->{_ssh2}->error)[1, 0, 2]));
+    $sftp->_conn_lost(undef, undef, $self->_make_error_string($msg))
 }
 
 my %auth_arg_map = qw(host hostname
@@ -97,19 +103,19 @@ sub _init_transport {
         $debug and $debug & 131072 and $ssh2->debug(1);
 
 	unless ($ssh2->connect($host, $port)) {
-	    $self->_conn_failed($sftp, "connection to remote host $host failed");
+	    $self->_conn_failed($sftp, "Connection to remote host $host failed");
 	    return;
 	}
 
 	unless ($ssh2->auth(%auth_args)) {
-	    $self->_conn_failed($sftp, "authentication failed");
+	    $self->_conn_failed($sftp, "Authentication failed");
 	    return;
 	}
     }
 
     my $channel = $self->{_channel} = $ssh2->channel;
     unless (defined $channel) {
-	$self->_conn_failed($sftp, "unable to create new session channel");
+	$self->_conn_failed($sftp, "Unable to create new session channel");
 	return;
     }
     $channel->ext_data('ignore');
@@ -132,7 +138,7 @@ sub _sysreadn {
                 sleep 0.01;
                 redo;
             }
-	    $self->_conn_lost($sftp, "read failed: " . $self->{_ssh2}->error);
+	    $self->_conn_lost($sftp, "Read failed");
 	    return undef;
 	}
         $sftp->{_read_total} += $read;
@@ -162,7 +168,7 @@ sub _do_io {
                 sleep 0.01;
                 redo;
             }
-	    $self->_conn_lost($sftp, "write failed: " . $self->{_ssh2}->error);
+	    $self->_conn_lost($sftp, "Write failed");
 	    return undef;
 	}
         $sftp->{_written_total} += $written;
@@ -179,9 +185,8 @@ sub _do_io {
 
     my $len = 4 + unpack N => $$bin;
     if ($len > 256 * 1024) {
-	$sftp->_set_status(SSH2_FX_BAD_MESSAGE);
-	$sftp->_set_error(SFTP_ERR_REMOTE_BAD_MESSAGE,
-			  "bad remote message received, len=$len");
+	$sftp->_conn_lost(SSH2_FX_BAD_MESSAGE, SFTP_ERR_REMOTE_BAD_MESSAGE,
+			  "Bad remote SFTP message received, len=$len");
 	return undef;
     }
     $self->_sysreadn($sftp, $len);
@@ -303,7 +308,7 @@ is rather limited and its performance very poor.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2009-2012, 2019 by Salvador FandiE<ntilde>o (sfandino@yahoo.com).
+Copyright (c) 2009-2012, 2019-2020 by Salvador FandiE<ntilde>o (sfandino@yahoo.com).
 
 All rights reserved. This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

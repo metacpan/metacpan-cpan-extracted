@@ -1,7 +1,7 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "an implementation of Reactive Extensions / rxjs for Perl",
    "author" : [
-      "Alexander Karelas <karjala@cpan.org>"
+      "KARJALA Corp <karjala@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.10",
@@ -57,14 +57,14 @@
    "provides" : {
       "RxPerl" : {
          "file" : "lib/RxPerl.pm",
-         "version" : "v0.14.0"
+         "version" : "v0.15.0"
       },
       "RxPerl::AnyEvent" : {
          "file" : "lib/RxPerl/AnyEvent.pm"
       },
       "RxPerl::ConnectableObservable" : {
          "file" : "lib/RxPerl/ConnectableObservable.pm",
-         "version" : "v0.14.0"
+         "version" : "v0.15.0"
       },
       "RxPerl::IOAsync" : {
          "file" : "lib/RxPerl/IOAsync.pm"
@@ -74,7 +74,7 @@
       },
       "RxPerl::Observable" : {
          "file" : "lib/RxPerl/Observable.pm",
-         "version" : "v0.14.0"
+         "version" : "v0.15.0"
       },
       "RxPerl::Operators::Creation" : {
          "file" : "lib/RxPerl/Operators/Creation.pm"
@@ -84,18 +84,18 @@
       },
       "RxPerl::Subject" : {
          "file" : "lib/RxPerl/Subject.pm",
-         "version" : "v0.14.0"
+         "version" : "v0.15.0"
       },
       "RxPerl::Subscriber" : {
          "file" : "lib/RxPerl/Subscriber.pm"
       },
       "RxPerl::Subscription" : {
          "file" : "lib/RxPerl/Subscription.pm",
-         "version" : "v0.14.0"
+         "version" : "v0.15.0"
       },
       "RxPerl::Utils" : {
          "file" : "lib/RxPerl/Utils.pm",
-         "version" : "v0.14.0"
+         "version" : "v0.15.0"
       }
    },
    "release_status" : "stable",
@@ -109,8 +109,8 @@
          "web" : "https://gitlab.com/karjala/rxperl"
       }
    },
-   "version" : "v0.14.0",
+   "version" : "v0.15.0",
    "x_authority" : "cpan:KARJALA",
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

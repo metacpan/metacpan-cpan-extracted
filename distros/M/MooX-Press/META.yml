@@ -27,10 +27,10 @@ optional_features: {}
 provides:
   MooX::Press:
     file: lib/MooX/Press.pm
-    version: '0.062'
+    version: '0.063'
   MooX::Press::Keywords:
     file: lib/MooX/Press/Keywords.pm
-    version: '0.062'
+    version: '0.063'
 requires:
   Exporter::Tiny: '1.000000'
   Import::Into: '0'
@@ -50,6 +50,6 @@ resources:
   homepage: https://metacpan.org/release/MooX-Press
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moox-press.git
-version: '0.062'
+version: '0.063'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

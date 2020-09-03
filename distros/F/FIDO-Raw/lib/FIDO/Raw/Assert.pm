@@ -1,5 +1,5 @@
 package FIDO::Raw::Assert;
-$FIDO::Raw::Assert::VERSION = '0.03';
+$FIDO::Raw::Assert::VERSION = '0.05';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ FIDO::Raw::Assert
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 DESCRIPTION
 

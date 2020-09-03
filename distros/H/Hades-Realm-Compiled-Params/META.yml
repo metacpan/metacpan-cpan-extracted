@@ -20,7 +20,7 @@ no_index:
     - inc
 requires:
   Compiled::Params::OO: '0.04'
-  Hades: '0.06'
+  Hades: '0.13'
   perl: '5.006'
-version: 0.01
+version: 0.02
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

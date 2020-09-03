@@ -1,26 +1,52 @@
 Revision history for Test-Dependencies
 
-0.24    Thu Sep 19, 2019
+0.28    2020-08-30
+        * Modules which had no minimum required version (but were
+          required!) *and* were removed from CORE incorrectly fail the
+          'declaration required' test
+
+0.27    2020-08-30
+        * Modules can be removed without having been deprecated; 0.26 assumed
+          deprecation before removal -- this release corrects that
+        * Use MetaCPAN parseable dates in Changes
+
+0.26    2020-08-30
+        * Fix uninitialized variable warnings when in 'forward_compatible' mode
+        * Upgrade Module::CoreList dep to 5.20200620 to include Perl 5.32
+          module status in tests
+
+0.25    2020-08-30
+        * New 'forward_compatible' option to stop 'plan' being emitted
+          from import() - ie. in the use statement.
+          Use this option to be 1.0 compatible
+        * Documentation correction for ok_dependencies() 'ignores' parameter.
+        * Fix 'ignores' matching only modules where it is documented to
+          specify the root of a namespace hierarchy
+        * Don't fail on requirements which have been deprecated from CORE
+        * Integrate dependency scanner in main module, removing
+          Test::Dependency::Light
+
+0.24    2019-09-19
         * Adjust dependency declaration; CPAN::Meta::Requirements is now
           a separate dist; we are using 'requirements_for_module' which
-          was added after our minimum CPAN::Meta requirement.
+          was added after our minimum CPAN::Meta requirement
 
-0.23    Sun Aug 21, 2016
+0.23    2016-08-21
         * load tests don't fail on Test::More 1.30, but do on many versions
           before it; increase minimum requirement (we'll phase out the old
           interface at some point to resolve this issue for good though)
 
-0.22    Sat Aug 20, 2016
+0.22    2016-08-20
         * don't run load tests when Test::More is version 1.1.14; it has a bug
           leading to our tests to fail incorrectly (something about plan
           being output more than once)
 
-0.21    Sun Jul 10, 2016
+0.21    2016-07-10
         * fix test breakage all over the place (thanks @kentfredrick)
         * report the minimum required version in error, instead of the
           installed-and-loaded version
 
-0.20    Wed Jun 29, 2016
+0.20    2016-06-29
         * only test files identified as 'Perl files' by File::Find::Rule::Perl
         * add support for testing runtime, test, devel deps separately
         * add support for cpanfile declared dependencies
@@ -28,49 +54,55 @@ Revision history for Test-Dependencies
           the list of core modules)
         * ... and more ...
 
-0.12    Sun Nov 15 01:01:20 CST 2009
+0.12    2009-11-15
         * don't report "perl" being a required dependency when a
           minimum perl version is listed in META.yml
 
-0.11    Thu Dec 27 15:53:30 EST 2007
-        * tests no longer run under taint mode so that CPAN testers don't fail tests
+0.11    2007-12-27
+        * tests no longer run under taint mode so that
+          CPAN testers don't fail tests
 
-0.10    Thu Dec 27 03:28:17 EST 2007
+0.10    2007-12-27
         * let users choose which method of module usage checking to use
 
-0.09    Wed Dec 26 19:51:12 EST 2007
+0.09    2007-12-26
         * work around bug in IPC::Cmd that prevented module from working
         * don't complain if specified dependencies are in core
 
-0.08    Tue Jul 25 22:34:44 EDT 2006
-        * now using IPC::Cmd for subprocess communication (to avoid cross-platform issues)
+0.08    2006-07-25
+        * now using IPC::Cmd for subprocess communication (to avoid
+          cross-platform issues)
 
-0.07    Thu Jul 20 17:51:08 EDT 2006
-        * added empty dummy file because Module::Install does not package empty directories
+0.07    2006-07-20
+        * added empty dummy file because Module::Install does not
+          package empty directories
 
-0.06    Wed Jul 19 16:31:08 EDT 2006
-        * better test descriptions when Makefile.PL contains extraneous requires calls
+0.06    2006-07-19
+        * better test descriptions when Makefile.PL contains
+          extraneous requires calls
         * no_index'd t-data
-        * forgot to bump version number in pod and forgot date in changelog in last revision
+        * forgot to bump version number in pod
+          and forgot date in changelog in last revision
 
-0.05    Tue Jul 18 22:55:58 EDT 2006
-        * removed references to test_pass (and upped Test::Builder::Tester dep to 0.64)
+0.05    2006-07-18
+        * removed references to test_pass (and upped
+          Test::Builder::Tester dep to 0.64)
         * rearranged changelog
         * added tests for empty files and directories
 
-0.04    Sat Jul 15 00:24:01 EDT 2006
+0.04    2006-07-15
         * Properly specify the dependency on Test::Builder::Tester 0.63.
         * handle empty files
 
-0.03    Tue Jul 11 16:17:32 EDT 2006
+0.03    2006-07-11
         Moved to a B::PerlReq backend for determining usage.  We
         also now use the META.yml file to determine what is listed in
         Makefile.PL.  We now differentiate between requires and
         build_requires, and complain if listed requirements are not
         actually used.
 
-0.02    Wed Jun 21 16:34:14 EDT 2006
+0.02    2006-06-21
         Minor POD cleanups
 
-0.01    Wed Jun 21 12:29:39 EDT 2006
+0.01    2006-06-21
         First release, based on Jifty's 00-dependencies.t

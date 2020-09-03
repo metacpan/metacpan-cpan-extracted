@@ -241,7 +241,7 @@ phwois - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99030
+version 2.99031
 
 =head1 SYNOPSIS
 

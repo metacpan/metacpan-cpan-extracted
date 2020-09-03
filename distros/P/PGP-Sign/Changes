@@ -1,5 +1,18 @@
                       User-Visible PGP::Sign Changes
 
+PGP::Sign 1.02 (2020-08-29)
+
+    On systems where gpg is GnuPG v1, override the path to the gpg binary
+    in the test suite.  Some tests were still incorrectly looking for a
+    gpg1 binary.
+
+    On systems where gpg as found on the PATH is GnuPG v2 but is older
+    than 2.1.12 and therefore doesn't support the command-line arguments
+    PGP::Sign uses, skip the relevant tests.  Tests are skipped rather
+    than failed because this doesn't represent a problem with the module
+    and the module can still be used with explicit configuration pointing
+    to a different version of GnuPG.
+
 PGP::Sign 1.01 (2020-07-18)
 
     Fix test suite to pass on systems where gpg is GnuPG v1.  This is

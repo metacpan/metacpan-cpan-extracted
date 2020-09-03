@@ -2,7 +2,6 @@
 
 use Test::Builder::Tester tests => 2;
 require Test::Dependencies;           # must not be 'use' to avoid import + plan set
-require Test::Dependencies::Light;    # has to happen before chdir
 
 chdir "t/data/empty";
 

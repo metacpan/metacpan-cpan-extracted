@@ -4,6 +4,20 @@ BEGIN {
 	use Hades;
 	Hades->run({
 		eval => q|KatoTest { 
+			test {
+				[
+					["ok", "my \$obj = KatoTest->new({ penthos => 2, nosoi => 2, curae => 5, geras => 'nosoi', hypnos => 'aporia' })"],
+					['is', '$obj->limos("yay")', 5 ],
+					['ok', '$obj->penthos(5)' ],
+					['is', '$obj->limos("yay")', q{''}]	
+				],
+				[
+					["ok", "my \$obj = KatoTest->new({ penthos => 2, nosoi => 2, curae => 5, geras => 'nosoi', hypnos => 'aporia' })"],
+					['is', '$obj->limos("yay")', 5 ],
+					['ok', '$obj->penthos(200)' ],
+					['is', '$obj->limos("yay")', q{''}]	
+				],
+			}
 			curae :r :default(5)
 			penthos :t(Str) 
 			phobos :t(ArrayRef[HashRef, 1, 100]) 
@@ -22,7 +36,7 @@ BEGIN {
 					['ok', '$obj->penthos(5)' ],
 					['is', '$obj->limos("yay")', q{''}]
 				) 
-				{ if ($_[0]->penthos == $_[0]->nosoi) { return $_[0]->curae; } } 
+				{ if (£penthos == £nosoi) { return $_[0]->curae; } } 
 		}|,
 		lib => 't/lib',
 		tlib => 't/lib',

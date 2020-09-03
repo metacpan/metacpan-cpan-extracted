@@ -1,5 +1,5 @@
 
-# purpose: tests Mnet::Report::Table end_errors method functionality
+# purpose: tests Mnet::Report::Table basic functionality
 
 # required modules
 use warnings;

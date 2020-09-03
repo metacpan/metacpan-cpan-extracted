@@ -3,7 +3,7 @@ package Mnet;
 # version number used by Makefile.PL
 #   these should be set to "dev", expect when creating a new release
 #   refer to developer build notes in Makefile.PL for more info
-our $VERSION = "5.20";
+our $VERSION = "5.21";
 
 =head1 NAME
 
@@ -14,15 +14,16 @@ Mnet - Testable network automation and reporting
     # sample script to report Loopback0 ip on cisco devices
     #
     #   demonstrates typical use of all major Mnet modules
-    #   refer to various Mnet modules' perldoc for more info
     #
     #   --help to list all options, or --help <option>
     #   --device <address> to connect to device with logging
     #   --username and --password should be set if necessary
     #   --batch <file.batch> to process multiple --device lines
-    #   --report csv:<file.csv> to create an output csv report
+    #   --report csv:<file.csv> to create an output csv file
     #   --record <file.test> to create replayable test file
     #   --test --replay <file.test> for regression test output
+    #
+    #   refer to various Mnet modules' perldoc for more info
 
     # load modules
     use warnings;
@@ -41,12 +42,12 @@ Mnet - Testable network automation and reporting
     Mnet::Opts::Cli::define({ getopt => "username=s" });
     Mnet::Opts::Cli::define({ getopt => "password=s", redact  => 1 });
     Mnet::Opts::Cli::define({ getopt => "report=s", default => undef,
-        help_tip    => "specify report output, like 'csv:<file>'",
+        help_tip    => "specify report output, csv, json, sql, etc",
         help_text   => "perldoc Mnet::Report::Table for more info",
     });
 
     # create object to access command line options and Mnet env variable
-    #   export Mnet="--password '<secret>'" env var to secure password
+    #   export Mnet="--password '<secret>'" env var from secure file
     my $cli = Mnet::Opts::Cli->new("Mnet");
 
     # define output --report table, will include first of any errors
@@ -66,10 +67,10 @@ Mnet - Testable network automation and reporting
     $cli = Mnet::Batch::fork($cli);
     exit if not $cli;
 
-    # ensure device error is reported if script dies before finishing
+    # output report row for device error if script dies before finishing
     $report->row_on_error({ device => $cli->device });
 
-    # use log function, set up log object for current --device
+    # call logging function, also create log object for current --device
     FATAL("missing --device") if not $cli->device;
     my $log = Mnet::Log->new({ log_id => $cli->device });
     $log->info("processing device");

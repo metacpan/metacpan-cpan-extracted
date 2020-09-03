@@ -3,6 +3,9 @@
 # Avoid version control files.
 ^\.git/
 
+# Avoid CI configuration, which Kwalitee doesn't want in the distribution.
+^\.github/
+
 # Avoid generated build files.
 \bblib/
 ^pm_to_blib$

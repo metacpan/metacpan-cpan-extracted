@@ -5,9 +5,3 @@ set -ex
 cip sudo apt-get update
 cip sudo apt-get install g++
 
-if cip exec perl -e 'exit ! ($] > 5.010001)'; then
-
-  cip exec cpanm -n Inline::C Inline::CPP
-
-fi
-

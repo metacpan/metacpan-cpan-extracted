@@ -17,7 +17,7 @@
 # updateDocumentation - detect parameter type mismatch between prototype and specified parameter
 package Data::Table::Text;
 use v5.26;
-our $VERSION = 20200819;                                                        # Version
+our $VERSION = 20200831;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -1864,7 +1864,7 @@ sub printPerlDataAsXml($;$)                                                     
       push @t, qq(<array>);
       for my $i(keys @$data)
        {my   @u;
-        push @u, qq(<e id="$i">);
+        push @u, qq(<e>);
         push @u, __SUB__->($$data[$i], $depth+2);
         push @u, qq(</e>);
         push @t, format(@u);
@@ -4540,16 +4540,18 @@ sub confirmHasCommandLineCommand($)                                             
   undef;
  }
 
-my $numberOfCpus = sub                                                          # Number of cpus
- {return 1 if $^O =~ m(bsd)i;                                                   # Apparently no nproc on BSD
+sub getNumberOfCpus                                                             #P Number of cpus
+ {return 1 if $^O !~ m(linux)i;                                                 # Presumably there is at least 1
   my $n = confirmHasCommandLineCommand(q(nproc)) ? qx(nproc) : undef;           # nproc
   return 1 unless $n;                                                           # We must have at least 1
   $n =~ s(\s+\Z) ()r;
- }->();
+ }
+
+my $numberOfCpus;                                                               # Number of cpus cache
 
 sub numberOfCpus(;$)                                                            # Number of cpus scaled by an optional factor - but only if you have nproc. If you do not have nproc but do have a convenient way for determining the number of cpus on your system please let me know.
  {my ($scale) = @_;                                                             # Scale factor
-  my $n = $numberOfCpus;
+  my $n = $numberOfCpus //= getNumberOfCpus;                                    # Cache the number of cpus as it will not change
   return $n * $scale          if $scale and $scale == int($scale);
   return int(1 + $n * $scale) if $scale and $scale != int($scale);
   $n
@@ -22124,9 +22126,9 @@ is_deeply $xml, trim(<<END);
     <a>1</a>
     <b>
     <array>
-                <e id="0"><hash><c><array><e id="0">3</e><e id="1">4</e></array></c></hash></e>
-                <e id="1"><hash><d><array><e id="0">5</e><e id="1">6</e></array></d></hash></e>
-                <e id="2"><hash><e>7</e></hash></e>
+                <e><hash><c><array><e>3</e><e>4</e></array></c></hash></e>
+                <e><hash><d><array><e>5</e><e>6</e></array></d></hash></e>
+                <e><hash><e>7</e></hash></e>
                 </array>
     </b>
     <f>8</f>

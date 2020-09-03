@@ -63,7 +63,7 @@
    "provides" : {
       "App::Timestamper::WithElapsed" : {
          "file" : "lib/App/Timestamper/WithElapsed.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/shlomif/App-Timestamper"
       }
    },
-   "version" : "0.2.1",
+   "version" : "0.4.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032000"
@@ -550,7 +550,7 @@
       }
    },
    "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.21",
    "x_spdx_expression" : "MIT"
 }
 

@@ -1,5 +1,5 @@
 package POE::Component::TLSify::ServerHandle;
-$POE::Component::TLSify::ServerHandle::VERSION = '0.06';
+$POE::Component::TLSify::ServerHandle::VERSION = '0.08';
 #ABSTRACT: Server-side handle for TLSify
 
 use strict;
@@ -33,7 +33,7 @@ sub TIEHANDLE {
 sub _check_status {
   my $self = shift;
   my $method = $self->{method};
-  unless ( $self->{socket}->$method ) {
+  unless ( eval { $self->{socket}->$method } ) {
     if ( $! != EAGAIN and $! != EWOULDBLOCK ) {
       if ( defined $self->{on_connect} ) {
         my $errval = IO::Socket::SSL->errstr;
@@ -107,7 +107,7 @@ POE::Component::TLSify::ServerHandle - Server-side handle for TLSify
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 DESCRIPTION
 

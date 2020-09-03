@@ -29,6 +29,16 @@ INSTALLATION ON CENTOS LINUX 7.5 AND ABOVE
       perl-Time-HiRes perl-Try-Tiny perl-YAML
     cpan install CTK
 
+    .. or via abalama.repo:
+
+    Install abalama repository on your platform:
+        sudo rpm -Uvh https://dist.suffit.org/repo/rhel7/abalama-release-1.00-1.el7.noarch.rpm
+        sudo yum clean all
+        sudo yum update
+        sudo yum install perl-CTKlib
+
+    See also: openfusion repo (http://repo.openfusion.net/)
+
 CREATE NEW VERSION (FOR DEVELOPER ONLY)
 
     * README         -- pod2readme lib/CTK.pm

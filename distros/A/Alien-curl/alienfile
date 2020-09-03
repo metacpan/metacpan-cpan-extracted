@@ -102,9 +102,10 @@ share {
 
   requires 'Path::Tiny';
 
+  my $ffi_target = '%{.install.autoconf_prefix}/dynamic';
   ffi {
     build [
-      "%{configure} --enable-shared --disable-static --libdir=%{.install.autoconf_prefix}/dynamic @acflags",
+      "%{configure} --enable-shared --disable-static --bindir=$ffi_target --libdir=$ffi_target @acflags",
       '%{make}',
       '%{make} install',
       sub {

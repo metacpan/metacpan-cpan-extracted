@@ -1,0 +1,14 @@
+0.003   2020-09-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Remove occasional extra newline in 'kemasan' field.
+
+
+0.002   2020-09-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add shortcut options --nama-produk, --nomor-registrasi,
+	  --nama-pendaftar, etc.
+
+
+0.001   2020-09-02  Released-By: PERLANCAR
+
+        - First release.

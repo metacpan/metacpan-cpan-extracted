@@ -97,6 +97,7 @@ Type::Tiny/Type::Tiny::XS
 Class::Method::Modifiers/Sub::Quote
 Role::Tiny
 
+MooX::Press
 Devel::StrictMode
 Syntax::Keyword::Try
 MooX::Enumeration/MooseX::Enumeration

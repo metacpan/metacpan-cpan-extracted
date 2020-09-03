@@ -1,0 +1,87 @@
+Syntax::SourceHighlight – Perl Binding to GNU Source Highlight
+
+GNU Source Highlight is a library to format code written in many programming languages as text in several markup languages. This binding to the underlying C++ library is very basic, supporting only the essential functionality.
+
+Compiling
+
+The libsource-highlight is the obvious prerequisite to compile this binding.
+
+With MakeMaker
+
+Automatic compilation with MakeMaker and PkgConfig is recommended. If you clone or download directly from git, you need to build the package first:
+
+    perl Makefile.PL
+    make dist
+
+Having got the package you may install either with cpanm Syntax-SourceHighlight-*.tar.gz (if available) or with the following commands:
+
+    tar -vxpf Syntax-SourceHighlight-*.tar.gz
+    cd Syntax-SourceHighlight-*[0-9]
+    perl Makefile.PL
+    make test
+    make install
+
+Note: Common recipes for customizing the build can be found in MakeMaker's FAQ.
+
+Note for Solaris: MakeMaker will try to mimic the way Perl was built, that is with the Sun Studio compiler. If you do not have it installed, or just want to use something else, then you need to provide your own commands to build the module. For GCC that's perl Makefile.PL CC=gcc CCCDLFLAGS=-fPIC OPTIMIZE=-O2 LD=gcc.
+
+Finally you may verify the installation by running the example script, ./example.perl.
+
+Manually
+
+If you cannot use MakeMaker for whatever reason, the binding may be built manually:
+
+• compile SourceHighlight.cc into a shared object linking against source-highlight and probably boost_regex,
+
+• insert version number in the *.pm files at the second line, like $Syntax::SourceHighlight::VERSION = 'x.y.z';,
+
+• copy the resulting *.pm files and the shared object where Perl can find it.
+
+The installation can be verified with the ./example.perl script included in the package.
+
+Example
+
+    #!/usr/bin/env perl
+    
+    use strict;
+    use warnings;
+    use Syntax::SourceHighlight;
+    
+    my $hl = Syntax::SourceHighlight->new('esc.outlang');
+    my $lm = Syntax::SourceHighlight::LangMap->new();
+    
+    my %tokens;
+    $hl->setHighlightEventListener(
+        sub {
+            my $he = shift;
+            foreach ( @{ $he->{token}->{matched} } ) {
+                next unless m/^(.*?):/s;
+                $tokens{$1}++;
+            }
+        }
+    );
+    
+    foreach (@ARGV) {
+        %tokens = ();
+        my $lang = $lm->getMappedFileNameFromFileName($_);
+        unless ($lang) {
+            warn "Cannot determine file format for '$_'.\n";
+            next;
+        }
+        $hl->highlightFile( $_, '', $lang );
+        next unless keys %tokens;
+        print(
+            "\nFound: ",
+            join( ', ', map { "$tokens{$_} ${_}s" } sort keys %tokens ),
+            "\n\n"
+        );
+    }
+
+AUTHORS
+
+Thomas Chust, chust@web.de
+Matt Latusek, matlib@matlibhax.com
+
+COPYRIGHT AND LICENSE
+Copyright  2010 by Thomas Chust
+This binding is in the Public Domain.

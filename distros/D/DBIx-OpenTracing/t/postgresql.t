@@ -38,6 +38,7 @@ Test::DBIx::OpenTracing::test_database(
         select_all_multi  => 'SELECT * FROM things WHERE id IN (1, 3, 10)',
         select_all_single => 'SELECT * FROM things WHERE id = 2',
         select_column_multi => 'SELECT description FROM things WHERE id IN (2, 3, 10)',
+        select_empty      => 'SELECT * FROM things WHERE id = 999',
         invalid => 'SELET id FORRM things',
         simple  => 'SELECT 1',
         bind => [ 'SELECT id, description FROM things WHERE id IN (?, ?)', 1, 3 ],

@@ -19,7 +19,7 @@ BEGIN {
 
 }
 
-use Test::NoWarnings;
+require Test::NoWarnings;
 our $test_nowarnings_hook = $SIG{__WARN__};
 $SIG{__WARN__} = sub {
     my $warning = shift;
@@ -53,6 +53,7 @@ foreach $use_syswrite (0, 1) {
     }
 }
 
+Test::NoWarnings::had_no_warnings();
 done_testing();
 
 sub run_test {

@@ -34,6 +34,7 @@ t/WrapScope/files.t
 t/WrapScope/hierarchy.t
 t/WrapScope/lifespan.t
 t/WrapScope/post-declare.t
+t/WrapScope/quiet-mode.t
 t/WrapScope/runtime-load.t
 t/WrapScope/samples/lib/Samples.pm
 t/WrapScope/samples/sample3.txt

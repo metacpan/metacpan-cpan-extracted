@@ -1,5 +1,5 @@
 package Neovim::Ext::Buffers;
-$Neovim::Ext::Buffers::VERSION = '0.02';
+$Neovim::Ext::Buffers::VERSION = '0.05';
 use strict;
 use warnings;
 use Class::Accessor;
@@ -56,6 +56,16 @@ sub FETCH
 {
 	my ($this, $number) = @_;
 
+	return @{$this->_fetch_buffers}[$number];
+
+}
+
+
+
+sub get_bynumber
+{
+	my ($this, $number) = @_;
+
 	foreach my $buffer (@{$this->_fetch_buffers})
 	{
 		if (tied (@{$buffer})->number == $number)
@@ -64,7 +74,6 @@ sub FETCH
 		}
 	}
 
-	# Unknown buffer
 	return undef;
 }
 
@@ -75,7 +84,7 @@ Neovim::Ext::Buffers - Neovim Buffers class
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNPOSIS
 
@@ -90,6 +99,13 @@ version 0.02
 =head1 DESCRIPTION
 
 Remote Nvim buffers.
+
+=head1 METHODS
+
+=head2 get_bynumber( $number )
+
+Retrieve the C<Neovim::Ext::Buffer> matching the buffer C<$number>. C<$number>
+is the actual buffer number, and NOT the index in this list.
 
 =cut
 

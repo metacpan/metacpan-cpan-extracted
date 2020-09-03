@@ -18,8 +18,10 @@ my %WriteMakefileArgs = (
   "NAME" => "MIDI::Drummer::Tiny",
   "PREREQ_PM" => {
     "MIDI::Simple" => 0,
+    "Math::Bezier" => 0,
     "Moo" => 2,
     "Music::Duration" => 0,
+    "constant" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
   },
@@ -31,7 +33,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.1400",
+  "VERSION" => "0.1602",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,9 +45,11 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "MIDI::Simple" => 0,
+  "Math::Bezier" => 0,
   "Moo" => 2,
   "Music::Duration" => 0,
   "Test::More" => 0,
+  "constant" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
   "strictures" => 2,

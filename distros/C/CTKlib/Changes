@@ -158,3 +158,19 @@
 2.03 Thu 19 Mar 19:01:02 MSK 2020
     * CTK::Daemon: Bug fixed - pid file must be saved with root permissions
     * CTK::Log: Bug fixed! Has been deleted the unix value from socket options defaults
+
+2.04 Fri 14 Aug 19:25:43 MSK 2020
+    * CTK::Util::read_attributes has refactored
+    - List::Util dependency has removed (uniq function)
+    + Added interface for modulus 11 (recursive) check digit calculation
+    + Added interface for FNV32a digest calculation
+    + CTK::Plugin::File: Added supporting of unique mode for the fcopy and fmove handlers
+    + Added CTK::Plugin::FTP
+    + Added CTK::Plugin::SFTP
+    + Added CTK::Plugin::Net: this module now is as ::FTP and ::SFTP interface module
+
+2.05 Tue Sep  1 00:01:22 MSK 2020
+    * Bug fixed - incorrect default value of _get_path()
+
+2.06 Wed  2 Sep 09:13:22 MSK 2020
+    * Bug fixed - now added supporting 32 bit platforms for FNV digest function

@@ -9,11 +9,11 @@ IO::Callback - Emulate file interface for a code reference
 
 =head1 VERSION
 
-Version 1.12
+Version 2.00
 
 =cut
 
-our $VERSION = '1.12';
+our $VERSION = '2.00';
 
 =head1 SYNOPSIS
 
@@ -229,9 +229,9 @@ sub open
 
     my $mode = shift or croak "mode missing in IO::Callback::new";
     if ($mode eq '<') {
-        *$self->{R} = 1;
+        *$self->{r} = 1;
     } elsif ($mode eq '>') {
-        *$self->{W} = 1;
+        *$self->{w} = 1;
     } else {
         croak qq{invalid mode "$mode" in IO::Callback::new};
     }
@@ -240,35 +240,35 @@ sub open
     ref $code eq "CODE" or croak "non-coderef second argument in IO::Callback::new";
 
     my $buf = '';
-    *$self->{Buf} = \$buf;
-    *$self->{Pos} = 0;
-    *$self->{Err} = 0;
+    *$self->{buf} = \$buf;
+    *$self->{pos} = 0;
+    *$self->{err} = 0;
     *$self->{lno} = 0;
 
     if (@_) {
         my @args = @_;
-        *$self->{Code} = sub { $code->(@_, @args) };
+        *$self->{code} = sub { $code->(@_, @args) };
     } else {
-        *$self->{Code} = $code;
+        *$self->{code} = $code;
     }
 }
 
 sub close
 {
     my $self = shift;
-    return unless defined *$self->{Code};
-    return if *$self->{Err};
-    if (*$self->{W}) {
-        my $ret = *$self->{Code}('');
+    return unless defined *$self->{code};
+    return if *$self->{err};
+    if (*$self->{w}) {
+        my $ret = *$self->{code}('');
         if ($ret and ref $ret eq 'IO::Callback::ErrorMarker') {
-            *$self->{Err} = 1;
+            *$self->{err} = 1;
             return;
         }
     }
-    foreach my $key (qw/Code Buf Eof R W Pos lno/) {
+    foreach my $key (qw/code buf eof r w pos lno/) {
         delete *$self->{$key};
     }
-    *$self->{Err} = -1;
+    *$self->{err} = -1;
     undef *$self if $] eq "5.008";  # cargo culted from IO::String
     return 1;
 }
@@ -276,13 +276,13 @@ sub close
 sub opened
 {
     my $self = shift;
-    return defined *$self->{R} || defined *$self->{W};
+    return defined *$self->{r} || defined *$self->{w};
 }
 
 sub getc
 {
     my $self = shift;
-    *$self->{R} or return $self->_ebadf;
+    *$self->{r} or return $self->_ebadf;
     my $buf;
     return $buf if $self->read($buf, 1);
     return undef;
@@ -291,18 +291,18 @@ sub getc
 sub ungetc
 {
     my ($self, $char) = @_;
-    *$self->{R} or return $self->_ebadf;
-    my $buf = *$self->{Buf};
+    *$self->{r} or return $self->_ebadf;
+    my $buf = *$self->{buf};
     $$buf = chr($char) . $$buf;
-    --*$self->{Pos};
-    delete *$self->{Eof};
+    --*$self->{pos};
+    delete *$self->{eof};
     return 1;
 }
 
 sub eof
 {
     my $self = shift;
-    return *$self->{Eof};
+    return *$self->{eof};
 }
 
 # Use something very distinctive for the error return code, since write callbacks
@@ -315,25 +315,25 @@ sub Error () {
 sub _doread {
     my $self = shift;
 
-    return unless *$self->{Code};
-    my $newbit = *$self->{Code}();
+    return unless *$self->{code};
+    my $newbit = *$self->{code}();
     if (defined $newbit) {
         if (ref $newbit) {
             if (ref $newbit eq 'IO::Callback::ErrorMarker') {
-                *$self->{Err} = 1;
+                *$self->{err} = 1;
                 return;
             } else {
                 confess "unexpected reference type ".ref($newbit)." returned by callback";
             }
         }
         if (length $newbit) {
-            ${*$self->{Buf}} .= $newbit;
+            ${*$self->{buf}} .= $newbit;
             return 1;
         }
     }
 
     # fall-through for both undef and ''
-    delete *$self->{Code};
+    delete *$self->{code};
     return;
 }
 
@@ -341,17 +341,17 @@ sub getline
 {
     my $self = shift;
 
-    *$self->{R} or return $self->_ebadf;
-    return if *$self->{Eof} || *$self->{Err};
-    my $buf = *$self->{Buf};
+    *$self->{r} or return $self->_ebadf;
+    return if *$self->{eof} || *$self->{err};
+    my $buf = *$self->{buf};
     $. = *$self->{lno};
 
     unless (defined $/) {  # slurp
         1 while $self->_doread;
-        return if *$self->{Err};
-        *$self->{Pos} += length $$buf;
-        *$self->{Eof} = 1;
-        *$self->{Buf} = \(my $newbuf = '');
+        return if *$self->{err};
+        *$self->{pos} += length $$buf;
+        *$self->{eof} = 1;
+        *$self->{buf} = \(my $newbuf = '');
         $. = ++ *$self->{lno};
         return $$buf;
     }
@@ -360,36 +360,36 @@ sub getline
     for (;;) {
         # In paragraph mode, discard extra newlines.
         if ($/ eq '' and $$buf =~ s/^(\n+)//) {
-            *$self->{Pos} += length $1;
+            *$self->{pos} += length $1;
         }
         my $pos = index $$buf, $rs;
         if ($pos >= 0) {
-            *$self->{Pos} += $pos+length($rs);
+            *$self->{pos} += $pos+length($rs);
             my $ret = substr $$buf, 0, $pos+length($rs), '';
             unless (length $/) {
                 # paragraph mode, discard extra trailing newlines
-                $$buf =~ s/^(\n+)// and *$self->{Pos} += length $1;
-                while (*$self->{Code} and length $$buf == 0) {
+                $$buf =~ s/^(\n+)// and *$self->{pos} += length $1;
+                while (*$self->{code} and length $$buf == 0) {
                     $self->_doread;
-                    return if *$self->{Err};
-                    $$buf =~ s/^(\n+)// and *$self->{Pos} += length $1;
+                    return if *$self->{err};
+                    $$buf =~ s/^(\n+)// and *$self->{pos} += length $1;
                 }
             }
-            $self->_doread while *$self->{Code} and length $$buf == 0 and not *$self->{Err};
-            if (length $$buf == 0 and not *$self->{Code}) {
-                *$self->{Eof} = 1;
+            $self->_doread while *$self->{code} and length $$buf == 0 and not *$self->{err};
+            if (length $$buf == 0 and not *$self->{code}) {
+                *$self->{eof} = 1;
             }
             $. = ++ *$self->{lno};
             return $ret;
         }
-        if (*$self->{Code}) {
+        if (*$self->{code}) {
             $self->_doread;
-            return if *$self->{Err};
+            return if *$self->{err};
         } else {
             # EOL not in buffer and no more data to come - the last line is missing its EOL.
-            *$self->{Eof} = 1;
-            *$self->{Pos} += length $$buf;
-            *$self->{Buf} = \(my $newbuf = '');
+            *$self->{eof} = 1;
+            *$self->{pos} += length $$buf;
+            *$self->{buf} = \(my $newbuf = '');
             $. = ++ *$self->{lno} if length $$buf;
             return $$buf if length $$buf;
             return;
@@ -402,13 +402,13 @@ sub getlines
     croak "getlines() called in scalar context" unless wantarray;
     my $self = shift;
 
-    *$self->{R} or return $self->_ebadf;
-    return if *$self->{Err} || *$self->{Eof};
+    *$self->{r} or return $self->_ebadf;
+    return if *$self->{err} || *$self->{eof};
 
     # To exactly match Perl's behavior on real files, getlines() should not
     # increment $. if there is no more input, but getline() should. I won't
     # call getline() until I've established that there is more input.
-    my $buf = *$self->{Buf};
+    my $buf = *$self->{buf};
     unless (length $$buf) {
         $self->_doread;
         return unless length $$buf;
@@ -429,19 +429,19 @@ sub read
 {
     my $self = shift;
 
-    *$self->{R} or return $self->_ebadf;
+    *$self->{r} or return $self->_ebadf;
     my $len = $_[1]||0;
 
     croak "Negative length" if $len < 0;
-    return if *$self->{Err};
-    return 0 if *$self->{Eof};
-    my $buf = *$self->{Buf};
+    return if *$self->{err};
+    return 0 if *$self->{eof};
+    my $buf = *$self->{buf};
 
-    1 while *$self->{Code} and $len > length $$buf and $self->_doread;
-    return if *$self->{Err};
+    1 while *$self->{code} and $len > length $$buf and $self->_doread;
+    return if *$self->{err};
     if ($len > length $$buf) {
         $len = length $$buf;
-        *$self->{Eof} = 1 unless $len;
+        *$self->{eof} = 1 unless $len;
     }
 
     if (@_ > 2) { # read offset
@@ -457,7 +457,7 @@ sub read
     else {
         $_[0] = substr($$buf, 0, $len, '');
     }
-    *$self->{Pos} += $len;
+    *$self->{pos} += $len;
     return $len;
 }
 
@@ -519,7 +519,7 @@ sub getpos
     my $self = shift;
 
     $. = *$self->{lno};
-    return *$self->{Pos};
+    return *$self->{pos};
 }
 *tell = \&getpos;
 *pos  = \&getpos;
@@ -544,8 +544,8 @@ sub write
 {
     my $self = shift;
 
-    *$self->{W} or return $self->_ebadf;
-    return if *$self->{Err};
+    *$self->{w} or return $self->_ebadf;
+    return if *$self->{err};
 
     my $slen = length($_[0]);
     my $len = $slen;
@@ -568,32 +568,32 @@ sub write
         }
     }
     return $len if $len == 0;
-    my $ret = *$self->{Code}(substr $_[0], $off, $len);
+    my $ret = *$self->{code}(substr $_[0], $off, $len);
     if (defined $ret and ref $ret eq 'IO::Callback::ErrorMarker') {
-        *$self->{Err} = 1;
+        *$self->{err} = 1;
         return;
     }
-    *$self->{Pos} += $len;
+    *$self->{pos} += $len;
     return $len;
 }
 
 sub error {
     my $self = shift;
 
-    return *$self->{Err};
+    return *$self->{err};
 }
 
 sub clearerr {
     my $self = shift;
 
-    *$self->{Err} = 0;
+    *$self->{err} = 0;
 }
 
 sub _ebadf {
     my $self = shift;
 
     $! = EBADF;
-    *$self->{Err} = -1;
+    *$self->{err} = -1;
     return;
 }
 

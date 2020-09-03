@@ -73,6 +73,6 @@ WriteMakefile(
         },
     },
     clean => {
-        FILES => '*.log *.tmp src/*.tmp src/dst src/dst2',
+        FILES => '*.log *.tmp src/*.tmp src/src src/dst src/dst2',
     },
 );

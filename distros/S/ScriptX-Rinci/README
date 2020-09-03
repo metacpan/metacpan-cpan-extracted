@@ -1,0 +1,43 @@
+NAME
+    ScriptX::Rinci - Run Rinci function
+
+VERSION
+    This document describes version 0.000 of ScriptX::Rinci (from Perl
+    distribution ScriptX-Rinci), released on 2020-09-03.
+
+SYNOPSIS
+     use ScriptX 'Rinci' => {
+         func => 'PACKAGENAME::FUNCNAME',
+     };
+
+DESCRIPTION
+    EARLY, EXPERIMENTAL RELEASE. MOST THINGS ARE NOT IMPLEMENTED YET.
+
+    The goal of this plugin (and other related plugins) is to replace
+    Perinci::CmdLine (this includes Perinci::CmdLine::Classic and
+    Perinci::CmdLine::Lite) with a more modular and flexible framework.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ScriptX-Rinci>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ScriptX-Rinci>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ScriptX-Rinci>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

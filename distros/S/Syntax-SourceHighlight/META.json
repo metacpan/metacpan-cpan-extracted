@@ -1,0 +1,54 @@
+{
+   "abstract" : "Perl Binding to GNU Source Highlight",
+   "author" : [
+      "Thomas Chust <chust@web.de>",
+      "Matt Latusek <matlib@matlibhax.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Syntax-SourceHighlight",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::PkgConfig" : "1.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "matlib@cpan.org",
+         "web" : "https://gitlab.com/Matlib/Syntax-SourceHighlight/-/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/Matlib/Syntax-SourceHighlight.git",
+         "web" : "https://gitlab.com/Matlib/Syntax-SourceHighlight"
+      }
+   },
+   "version" : "v2.1.2",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

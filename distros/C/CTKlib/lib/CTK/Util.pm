@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 260 2019-05-16 19:18:32Z minus $
+package CTK::Util; # $Id: Util.pm 287 2020-08-29 19:38:34Z minus $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Util - CTK Utilities
 
 =head1 VERSION
 
-Version 2.81
+Version 2.82
 
 =head1 SYNOPSIS
 
@@ -282,7 +282,7 @@ Examples:
     # COOKIE (RFC2616 as rfc1123-date)
     $dt = dtf("%w, %DD %MON %YYYY %hh:%mm:%ss %G", time, 1); # Tue, 12 Feb 2013 13:35:04 GMT
 
-For more features please use L<Date::Format> and L<DateTime>
+For more features please use L<Date::Format>, L<DateTime> and L<POSIX/strftime>
 
 Tags: BASE, DATE
 
@@ -656,7 +656,8 @@ Tags: BASE, UTIL
 =head3 read_attributes
 
 Smart rearrangement of parameters to allow named parameter calling.
-We do the rearrangement if the first parameter begins with a -
+We do the rearrangement if the first parameter begins with a "-", but
+since 2.82 it is optional condition
 
     my @args = @_;
     my ($content, $maxcnt, $timeout, $timedie, $base, $login, $password, $host, $table_tmp);
@@ -1208,7 +1209,7 @@ Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2020 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -1237,7 +1238,7 @@ use constant {
 };
 
 use vars qw/$VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS/;
-$VERSION = '2.81';
+$VERSION = '2.82';
 
 use Encode;
 use Time::Local;
@@ -1250,7 +1251,6 @@ use MIME::Lite;
 use Net::FTP;
 use File::Path; # mkpath / rmtree
 use IPC::Open3;
-use List::Util qw/uniq/;
 use Symbol;
 use Cwd;
 
@@ -2186,7 +2186,7 @@ sub which {
         if ($ENV{PATHEXT}) {
             push @pext, split /\s*\;\s*/, lc($ENV{PATHEXT});
         }
-        push @aliases, $cs.$_ for (uniq(@pext));
+        push @aliases, $cs.$_ for (_uniq(@pext));
     }
     my @path = path();
     unshift @path, curdir();
@@ -2275,56 +2275,45 @@ sub isos {__PACKAGE__->ext_isos(@_)}
 # API
 #
 # Smart rearrangement of parameters to allow named parameter calling.
-# See CGI::Util
+# See also CGI::Util
 #
 sub read_attributes {
-    my($order,@param) = @_;
-    return () unless @param;
-
-    if (ref($param[0]) eq 'HASH') {
-    @param = %{$param[0]};
+    my ($schema, @param) = @_;
+    unless ($schema && ref($schema) eq 'ARRAY') {
+        carp("No scheme specified");
+        return ();
+    }
+    my $first = $param[0];
+    my %params;
+    if (ref($first) eq 'HASH') {
+        %params = %$first;
+    } elsif (ref($first) eq 'ARRAY') {
+        %params = (@$first);
+    } elsif (!defined($first)) {
+        return ();
     } else {
-        return @param unless (defined($param[0]) && substr($param[0],0,1) eq '-');
+        %params = @param
     }
 
-    # map parameters into positional indices
-    my ($i,%pos);
-    $i = 0;
-    foreach (@$order) {
-    foreach (ref($_) eq 'ARRAY' ? @$_ : $_) {
-            $pos{lc($_)} = $i;
+    # Map parameters into positional indices
+    my %pos; # alias => name
+    my $i = 0;
+    foreach my $s (@$schema) {
+        my @ks = ref($s) eq 'ARRAY' ? @$s : ($s);
+        foreach my $k (@ks) {
+            $pos{lc($k)} = $i;
         }
-    $i++;
+        $i++;
     }
 
-    my (@result,%leftover);
-    $#result = $#$order;  # preextend
-    while (@param) {
-    my $key = lc(shift(@param));
-    $key =~ s/^\-//;
-        if (exists $pos{$key}) {
-        $result[$pos{$key}] = shift(@param);
-    } else {
-        $leftover{$key} = shift(@param);
+    my @result;
+    $#result = $#$schema;  # Preextend
+    while (my ($k, $v) = each %params) {
+        my $key = lc($k);
+           $key =~ s/^\-//;
+        $result[$pos{$key}] = $v if exists $pos{$key};
     }
-    }
-
-    push (@result,_make_attributes(\%leftover,1)) if %leftover;
-    @result;
-}
-sub _make_attributes {
-    my $attr = shift;
-    return () unless $attr && ref($attr) && ref($attr) eq 'HASH';
-    my $escape = shift || 0;
-    my(@att);
-    foreach (keys %{$attr}) {
-    my($key) = $_;
-        $key=~s/^\-//;
-    ($key="\L$key") =~ tr/_/-/; # parameters are lower case, use dashes
-    my $value = $escape ? $attr->{$_} : $attr->{$_};
-    push(@att,defined($attr->{$_}) ? qq/$key="$value"/ : qq/$key/);
-    }
-    return @att;
+    return @result;
 }
 
 sub _crlf {
@@ -2338,6 +2327,13 @@ sub _crlf {
         :                      "\015\012";
 }
 sub _proxy_crlf {shift}
+sub _uniq {
+    # See List::MoreUtils::PP
+    my %seen = ();
+    my $k;
+    my $seen_undef;
+    grep { defined $_ ? not $seen{$k = $_}++ : not $seen_undef++ } @_;
+}
 
 1;
 

@@ -16,15 +16,15 @@ use_ok 'Bio::Kmer';
 # expected histogram
 my @correctCounts=(
   0,      # histogram count of 0 instances
-  16087,  # histogram count of 1 instance
-  17621,  # histogram count of 2 instances
-  12868,  # histogram count of 3 instances
-  6857,   # histogram count of 4 instances
-  3070,   # histogram count of 5 instances
-  1096,   # histogram count of 6 instances
-  380,    # histogram count of 7 instances
-  105,    # histogram count of 8 instances
-  17,     # histogram count of 9 instances
+  16184,  # histogram count of 1 instance
+  17684,  # histogram count of 2 instances
+  12763,  # histogram count of 3 instances
+  6797,   # histogram count of 4 instances
+  2989,   # histogram count of 5 instances
+  1080,   # histogram count of 6 instances
+  361,    # histogram count of 7 instances
+  103,    # histogram count of 8 instances
+  15,     # histogram count of 9 instances
   6,      # histogram count of 10 instances
 );
 
@@ -36,6 +36,8 @@ my %query=(
   AAAAAAAA => 0,  # not found
 );
 
+# Total number of nucleotides expected in rand.fastq.gz
+my $ntcount = 150000;
 
 # Test pure perl
 subtest "pure perl kmer counting" => sub{
@@ -44,7 +46,7 @@ subtest "pure perl kmer counting" => sub{
     diag $Bio::Kmer::iThreads; # avoid "only used once warning"
   }
 
-  plan tests => 18;
+  plan tests => 19;
 
   my $infile = dirname($0)."/../data/rand.fastq.gz";
   my $kmer=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8,kmercounter=>"perl"});
@@ -61,7 +63,7 @@ subtest "pure perl kmer counting" => sub{
   }
   $kmer->close();
   my $numKmers = scalar(keys(%{ $kmer->kmers() }));
-  is $numKmers, 58107, "Expected 58107 kmers. Found $numKmers kmers.";
+  is $numKmers, 57982, "Expected 57982 kmers. Found $numKmers kmers.";
 
   # Test subsampling: a subsample should have fewer kmers than
   # the full set but more than 0.
@@ -70,9 +72,12 @@ subtest "pure perl kmer counting" => sub{
   my $subsampleKmerHash=$subsampleKmer->kmers();
   my $numSubsampledKmers = scalar(keys(%$subsampleKmerHash));
 
-  note "Found $numSubsampledKmers subsampled kmers vs full count of kmers: $numKmers, of a requested frequency of 0.1";
+  note "Found $numSubsampledKmers subsampled kmers vs full count of kmers: $numKmers, of a requested frequency of 0.1.";
+  note "This subsample probably will be higher than 0.1 because I am just counting unique kmers but the sampling method will sample overall kmers.";
 
   cmp_ok($numSubsampledKmers, '>', 0, "Subsampled kmers are a nonzero count.");
 
   cmp_ok($numSubsampledKmers, '<', $numKmers, "Subsample kmers are than the full count.");
+
+  is($kmer->ntcount(), $ntcount, "total number of bp");
 };

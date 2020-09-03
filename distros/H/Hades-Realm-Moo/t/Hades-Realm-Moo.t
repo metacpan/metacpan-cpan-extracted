@@ -16,19 +16,19 @@ subtest 'new' => sub {
 	ok( $obj = Hades::Realm::Moo->new(), q{$obj = Hades::Realm::Moo->new()} );
 	isa_ok( $obj, 'Hades::Realm::Moo' );
 };
-subtest 'build_as_class' => sub {
-	plan tests => 2;
-	ok( my $obj = Hades::Realm::Moo->new( {} ),
-		q{my $obj = Hades::Realm::Moo->new({})}
-	);
-	can_ok( $obj, 'build_as_class' );
-};
 subtest 'build_as_role' => sub {
 	plan tests => 2;
 	ok( my $obj = Hades::Realm::Moo->new( {} ),
 		q{my $obj = Hades::Realm::Moo->new({})}
 	);
 	can_ok( $obj, 'build_as_role' );
+};
+subtest 'build_as_class' => sub {
+	plan tests => 2;
+	ok( my $obj = Hades::Realm::Moo->new( {} ),
+		q{my $obj = Hades::Realm::Moo->new({})}
+	);
+	can_ok( $obj, 'build_as_class' );
 };
 subtest 'build_has' => sub {
 	plan tests => 4;
@@ -39,8 +39,8 @@ subtest 'build_has' => sub {
 	eval { $obj->build_has( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_has([])} );
-	eval { $obj->build_has('phobos') };
+	eval { $obj->build_has('algea') };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_has('phobos')} );
+		q{$obj->build_has('algea')} );
 };
 done_testing();

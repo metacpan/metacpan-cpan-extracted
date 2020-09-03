@@ -1,0 +1,11 @@
+Revision history for Hades-Realm-Mouse
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02 	2020-08-31
+	- require latest Type::Tiny.
+	- add simple macro test.
+
+0.03 	2020-09-01
+	- Adds builders for attributes

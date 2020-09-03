@@ -3,7 +3,8 @@ use Test::More;
 BEGIN {
         eval {
                 require Moo;
-                Moo->can('is_class');
+                require Types::Standard;
+		Moo->can('is_class');
                 1;
         } or do {
                 print $@;

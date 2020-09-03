@@ -1,7 +1,7 @@
 package App::upf;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.050'; # VERSION
 
 use 5.010001;
 
@@ -20,7 +20,7 @@ App::upf - CLI interface for Unix::Passwd::File
 
 =head1 VERSION
 
-This document describes version 0.04 of App::upf (from Perl distribution App-upf), released on 2015-09-03.
+This document describes version 0.050 of App::upf (from Perl distribution App-upf), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -29,13 +29,6 @@ See L<upf>.
 =head1 DESCRIPTION
 
 This distribution includes L<upf>, a single CLI scripts with subcommands.
-
-=head1 SEE ALSO
-
-L<Unix::Passwd::File>
-
-L<App::UpfUtils>, where each function in Unix::Passwd::File has its own CLI
-script instead of a single CLI program for all the functions like C<upf>.
 
 =head1 HOMEPAGE
 
@@ -53,13 +46,20 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Unix::Passwd::File>
+
+L<App::UpfUtils>, where each function in Unix::Passwd::File has its own CLI
+script instead of a single CLI program for all the functions like C<upf>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

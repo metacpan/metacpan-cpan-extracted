@@ -1,0 +1,122 @@
+#!perl
+
+#use strict;
+#use warnings;
+
+use ScriptX;
+ScriptX->run;
+
+# ABSTRACT: The minimalistic ScriptX-based script that does nothing (demos viewing logs, loading plugins, putting plugin handler at another event)
+# PODNAME: scriptx-eg-noop
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+scriptx-eg-noop - The minimalistic ScriptX-based script that does nothing (demos viewing logs, loading plugins, putting plugin handler at another event)
+
+=head1 VERSION
+
+This document describes version 0.000001 of scriptx-eg-noop (from Perl distribution ScriptX), released on 2020-09-03.
+
+=head1 SYNOPSIS
+
+ % script-eg-noop
+
+=head1 DESCRIPTION
+
+This script does nothing. It loads L<ScriptX> but does not specify any plugins,
+including any plugin that runs code or do interesting stuffs. It then calls
+the C<run()> static method.
+
+To see the logs being produced to the screen, you can use L<Log::ger::Screen>:
+
+ % PERL5OPT=-MLog::ger::Screen TRACE=1 script-eg-noop
+ [scriptx] -> run_event(name=run)
+ [scriptx] <- run_event(name=run)
+
+We can see that C<run()> is executed but no handlers are being executed.
+
+We can load additional plugins using the
+L<SCRIPTX_IMPORT|ScriptX/SCRIPTX_IMPORT> or
+L<SCRIPTX_IMPORT_JSON|ScriptX/SCRIPTX_IMPORT_JSON> environment variable, so we
+do not have to modify the script to add behaviors. Let's load the simplest
+plugin L<ScriptX::Noop> which just logs a message:
+
+ % PERL5OPT=-MLog::ger::Screen TRACE=1 SCRIPTX_IMPORT=-Noop script-eg-noop
+ [scriptx] Reading env variable SCRIPTX_IMPORT ...
+ [scriptx] -> run_event(name=activate_plugin)
+ [scriptx] Running on_success ...
+ [scriptx] Loading module ScriptX::Noop ...
+ [scriptx] <- run_event(name=activate_plugin)
+ [scriptx] -> run_event(name=run)
+ [scriptx] [event run] [1/1] -> handler Noop ...
+ Hello from the Noop plugin
+ [scriptx] [event run] [1/1] <- handler Noop: [200] (success)
+ [scriptx] <- run_event(name=run)
+
+You see that there are two events being run. The first one is C<activate_plugin>
+(to add a chance for another plugin to act when a plugin is loaded, for example
+see L<ScriptX::DisablePlugin>). The second one is C<run>, where the Noop plugin
+registers a handler for.
+
+Let's load another plugin L<ScriptX::Debug::DumpStash>:
+
+ % PERL5OPT=-MLog::ger::Screen TRACE=1 SCRIPTX_IMPORT=-Noop,-Debug::DumpStash script-eg-noop
+ ...
+ [scriptx] -> run_event({name=>"run"})
+ [scriptx] [event before_run] [1/1] -> handler Debug::DumpStash ...
+ { event => "before_run" }
+ [scriptx] [event before_run] [1/1] <- handler Debug::DumpStash: [200,"OK"] (success)
+ [scriptx] [event run] [1/1] -> handler Noop ...
+ Hello from the Noop plugin
+ [scriptx] [event run] [1/1] <- handler Noop: [200,"OK"] (success)
+ [scriptx] <- run_event(name=run)
+
+You see the that Debug::DumpStash plugin registers a handler for C<before_run>
+event and dumps the content of the stash. In ScriptX, you can put a plugin's
+handler at arbitrary event and priority. For example, to dump stash in the
+C<after_run> event instead:
+
+ % PERL5OPT=-MLog::ger::Screen TRACE=1 SCRIPTX_IMPORT=-Noop,-Debug::DumpStash@after_run script-eg-noop
+ [scriptx] -> run_event({name=>"run"})
+ [scriptx] [event run] [1/1] -> handler Noop ...
+ Hello from the Noop plugin
+ [scriptx] [event run] [1/1] <- handler Noop: [200,"OK"] (success)
+ [scriptx] [event after_run] [1/1] -> handler Debug::DumpStash ...
+ { event => "after_run" }
+ [scriptx] [event after_run] [1/1] <- handler Debug::DumpStash: [200,"OK"] (success)
+ [scriptx] <- run_event(name=run)
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/ScriptX>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-ScriptX>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ScriptX>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

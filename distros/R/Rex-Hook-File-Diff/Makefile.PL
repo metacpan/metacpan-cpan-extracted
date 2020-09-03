@@ -17,7 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Rex::Hook::File::Diff",
   "PREREQ_PM" => {
-    "Rex" => "0.044",
+    "English" => 0,
+    "Rex" => "1.012",
     "Rex::Helper::Run" => 0,
     "Rex::Hook" => 0,
     "Text::Diff" => "1.44",
@@ -28,13 +29,13 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "File::Temp" => 0,
     "File::Touch" => "0.08",
-    "Rex::Commands::File" => 0,
+    "Rex::Commands::File" => "1.012",
     "Test2::V0" => "0.000071",
     "Test::File" => "1.443",
     "Test::Output" => "0.03",
     "re" => 0
   },
-  "VERSION" => "v0.2.0",
+  "VERSION" => "v0.3.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,11 +43,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "English" => 0,
   "File::Basename" => 0,
   "File::Temp" => 0,
   "File::Touch" => "0.08",
-  "Rex" => "0.044",
-  "Rex::Commands::File" => 0,
+  "Rex" => "1.012",
+  "Rex::Commands::File" => "1.012",
   "Rex::Helper::Run" => 0,
   "Rex::Hook" => 0,
   "Test2::V0" => "0.000071",

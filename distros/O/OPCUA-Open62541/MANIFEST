@@ -57,6 +57,7 @@ t/perltidyrc
 t/pod.t
 t/server-accesscontrol.t
 t/server-browse.t
+t/server-buildinfo.t
 t/server-client-matrix.t
 t/server-client-variable.t
 t/server-config-default.t

@@ -1,0 +1,36 @@
+Revision history for App-size-dir-diff
+
+    0.3.9 2020-08-31
+
+     - Move revision history into Changes
+	 - Update PREREQ_PM entries to match script dependencies
+
+    0.3.8 2020-08-31
+
+     - Remove Build.PL
+     - Use directory structure lib/App/size/dir/diff.pm 
+
+    0.3.7 2020-08-31
+
+     - Rename script and use conventional package/module name
+     - Quote version string
+
+    0.3.6 2020-08-30
+
+     - Fix indentation
+     - Remove README.pod
+     - Improve CPAN module files
+
+    0.3.5 2020-08-30
+ 
+     - Prompt user for (Y/N) on delete (and do not assume Y)
+     - Improve help and CPAN module files
+
+    0.3.4 2020-08-30
+
+     - Initial release
+
+    $ size_dir_diff -d /usr/src/BPi/device-tree /usr/src/BPi/device-tree.copy
+    Files in /usr/src/BPi/device-tree.copy that differ from files in /usr/src/BPi/device-tree:
+    Files in /usr/src/BPi/device-tree.copy that have a duplicate in /usr/src/BPi/device-tree:
+    /sun7i-a20-bananapi.dtb

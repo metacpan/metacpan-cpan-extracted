@@ -2,18 +2,21 @@ package Hades::Realm::OO;
 use strict;
 use warnings;
 use base qw/Hades/;
-our $VERSION = 0.01;
+our $VERSION = 0.05;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
 	my $self      = $cls->SUPER::new(%args);
-	my %accessors = ( meta => {}, current_class => {}, is_role => {}, );
+	my %accessors = ( current_class => {}, meta => {}, is_role => {}, );
 	for my $accessor ( keys %accessors ) {
+		my $param
+		    = defined $args{$accessor}
+		    ? $args{$accessor}
+		    : $accessors{$accessor}->{default};
 		my $value
-		    = $self->$accessor(
-			defined $args{$accessor}
-			? $args{$accessor}
-			: $accessors{$accessor}->{default} );
+		    = $self->$accessor( $accessors{$accessor}->{builder}
+			? $accessors{$accessor}->{builder}->( $self, $param )
+			: $param );
 		unless ( !$accessors{$accessor}->{required} || defined $value ) {
 			die "$accessor accessor is required";
 		}
@@ -165,10 +168,11 @@ sub build_class_inheritance {
 		$self->is_role(1);
 		return $params[-2];
 	}
-	elsif ( $params[-1] =~ m/^(with|extends)$/ ) {
+	elsif ( $params[-1] =~ m/^(with|extends|parent|base)$/ ) {
+		return 'extends' if $1 =~ m/parent|base/;
 		return $params[-1];
 	}
-	elsif ( $params[-2] =~ m/^(is|with|extends)$/ ) {
+	elsif ( $params[-2] && $params[-2] =~ m/^(with|extends)$/ ) {
 		my ( $mg, $last, $ident ) = splice @params, -3;
 		$mg->$last($ident);
 		return $last;
@@ -237,6 +241,30 @@ sub build_predicate {
 	return wantarray ? @res : $res[0];
 }
 
+sub build_accessor_no_arguments {
+	my ( $self, $mg, $token, $meta ) = @_;
+	if ( ( ref($mg) || "" ) =~ m/^(|HASH|ARRAY|SCALAR|CODE|GLOB)$/ ) {
+		$mg = defined $mg ? $mg : 'undef';
+		die
+		    qq{Object: invalid value $mg for variable \$mg in method build_accessor_no_arguments};
+	}
+	if ( !defined($token) || ( ref($token) || "" ) ne "ARRAY" ) {
+		$token = defined $token ? $token : 'undef';
+		die
+		    qq{ArrayRef: invalid value $token for variable \$token in method build_accessor_no_arguments};
+	}
+	if ( ( ref($meta) || "" ) ne "HASH" ) {
+		$meta = defined $meta ? $meta : 'undef';
+		die
+		    qq{HashRef: invalid value $meta for variable \$meta in method build_accessor_no_arguments};
+	}
+
+	$meta->{ $token->[0] }->{meta} = 'ACCESSOR';
+	$mg->has( $token->[0] );
+	return $meta;
+
+}
+
 sub build_accessor {
 	my ( $self, $mg, $name, $meta ) = @_;
 	if ( ( ref($mg) || "" ) =~ m/^(|HASH|ARRAY|SCALAR|CODE|GLOB)$/ ) {
@@ -257,16 +285,25 @@ sub build_accessor {
 
 	$mg->has($name);
 	$meta->{$name}->{$_} and $mg->$_(
-		  $self->can("build_accessor_${_}")
-		? $self->can("build_accessor_${_}")->( $meta->{$name}->{$_} )
-		: $meta->{$name}->{$_}
+		$self->build_code(
+			$mg,
+			$name,
+			$self->can("build_accessor_${_}")
+			? $self->can("build_accessor_${_}")
+			    ->( $self, $name, $meta->{$name}->{$_} )
+			: $meta->{$name}->{$_}
+		)
 	) for ( @{ $self->build_has_keywords } );
 	$mg->isa(
 		  $self->can("build_accessor_isa")
-		? $self->can("build_accessor_isa")->( $meta->{$name}->{type}->[0] )
+		? $self->can("build_accessor_isa")
+		    ->( $self, $name, $meta->{$name}->{type}->[0] )
 		: $meta->{$name}->{type}->[0]
 	) if !$meta->{$name}->{isa};
 	$mg->clear_tests->test( $self->build_tests( $name, $meta->{$name} ) );
+	$meta->{$name}->{$_}
+	    && $mg->$_( $self->replace_pe_string( $meta->{$name}->{$_}, $name ) )
+	    for qw/pod example/;
 
 }
 
@@ -289,9 +326,14 @@ sub build_modify {
 	}
 
 	$meta->{$name}->{$_}
-	    && $mg->$_($name)->code( delete $meta->{$name}->{$_} )
+	    && $mg->$_($name)
+	    ->code( $self->build_code( $mg, $name, delete $meta->{$name}->{$_} ) )
 	    ->test( $self->build_tests( $name, $meta->{$name} ) )
 	    for qw/before around after/;
+	$meta->{$name}->{$_}
+	    && $mg->$_(
+		$self->replace_pe_string( delete $meta->{$name}->{$_}, $name ) )
+	    for qw/pod example/;
 
 }
 
@@ -308,7 +350,7 @@ sub after_class {
 		    qq{HashRef: invalid value $meta for variable \$meta in method after_class};
 	}
 
-	$self->clear_is_role == 1
+	$self->is_role && $self->clear_is_role
 	    ? $self->build_as_role( $mg, $meta )
 	    : $self->build_as_class( $mg, $meta );
 
@@ -399,7 +441,8 @@ sub build_has_keywords {
 	    = defined $keywords
 	    ? $keywords
 	    : [
-		qw/is isa required default clearer coerce predicate trigger private/];
+		qw/is isa required default clearer coerce predicate trigger private builder/
+	    ];
 	if ( !defined($keywords) || ( ref($keywords) || "" ) ne "ARRAY" ) {
 		$keywords = defined $keywords ? $keywords : 'undef';
 		die
@@ -423,12 +466,12 @@ sub build_has {
 	my $trigger
 	    = $self->SUPER::build_trigger( $name, '$value', $meta->{trigger} );
 	return qq|{
-					my ( \$self, \$value ) = \@_; $private
-					if ( defined \$value ) { $type
-						\$self->{$name} = \$value; $trigger
-					}
-					return \$self->{$name};
-				}|;
+			my ( \$self, \$value ) = \@_; $private
+			if ( defined \$value ) { $type
+				$self->{$name} = \$value; $trigger
+			}
+			return $self->{$name};
+		}|;
 
 }
 
@@ -578,6 +621,92 @@ sub build_after {
 
 }
 
+sub build_accessor_builder {
+	my ( $self, $name, $content ) = @_;
+	if ( !defined($name) || ref $name ) {
+		$name = defined $name ? $name : 'undef';
+		die
+		    qq{Str: invalid value $name for variable \$name in method build_accessor_builder};
+	}
+	if ( !defined($content) || ref $content ) {
+		$content = defined $content ? $content : 'undef';
+		die
+		    qq{Str: invalid value $content for variable \$content in method build_accessor_builder};
+	}
+
+	return (
+		$content =~ m/^(\w+|1)$/
+		? qq|$content|
+		: qq|sub {
+					my (\$self, \$value) = \@_; 
+					$content
+					return \$value;
+				}|
+	);
+
+}
+
+sub build_accessor_coerce {
+	my ( $self, $name, $content ) = @_;
+	if ( !defined($name) || ref $name ) {
+		$name = defined $name ? $name : 'undef';
+		die
+		    qq{Str: invalid value $name for variable \$name in method build_accessor_coerce};
+	}
+	if ( !defined($content) || ref $content ) {
+		$content = defined $content ? $content : 'undef';
+		die
+		    qq{Str: invalid value $content for variable \$content in method build_accessor_coerce};
+	}
+
+	return q|sub { my ($value) = @_;|
+	    . (
+		$content =~ m/^\w+$/
+		? qq|\$value = __PACKAGE__->$content(\$value);|
+		: $content
+	    ) . q|return $value; }|;
+
+}
+
+sub build_accessor_trigger {
+	my ( $self, $name, $content ) = @_;
+	if ( !defined($name) || ref $name ) {
+		$name = defined $name ? $name : 'undef';
+		die
+		    qq{Str: invalid value $name for variable \$name in method build_accessor_trigger};
+	}
+	if ( !defined($content) || ref $content ) {
+		$content = defined $content ? $content : 'undef';
+		die
+		    qq{Str: invalid value $content for variable \$content in method build_accessor_trigger};
+	}
+
+	return q|sub { my ($self, $value) = @_;|
+	    . (
+		$content =~ m/^\w+$/
+		? qq|\$value = \$self->$content(\$value);|
+		: $content
+	    ) . q|return $value; }|;
+
+}
+
+sub build_accessor_default {
+	my ( $self, $name, $content ) = @_;
+	if ( !defined($name) || ref $name ) {
+		$name = defined $name ? $name : 'undef';
+		die
+		    qq{Str: invalid value $name for variable \$name in method build_accessor_default};
+	}
+	if ( !defined($content) || ref $content ) {
+		$content = defined $content ? $content : 'undef';
+		die
+		    qq{Str: invalid value $content for variable \$content in method build_accessor_default};
+	}
+
+	return q|sub {| . $content . q|}|;
+
+}
+
 1;
 
 __END__
@@ -594,9 +723,11 @@ Version 0.01
 
 =head1 SYNOPSIS
 
+Quick summary of what the module does:
+
 	Hades::Realm::Kosmos base Hades::Realm::OO {
-		...
-	}
+                ...
+        }
 
 =head1 SUBROUTINES/METHODS
 
@@ -635,6 +766,12 @@ call build_clearer method.
 =head2 build_predicate
 
 call build_predicate method.
+
+=head2 build_accessor_no_arguments
+
+call build_accessor_no_arguments method. Expects param $mg to be a Object, param $token to be a ArrayRef, param $meta to be a HashRef.
+
+	$obj->build_accessor_no_arguments($mg, $token, $meta)
 
 =head2 build_accessor
 
@@ -756,6 +893,30 @@ call build_after method. Expects param $meta to be a HashRef.
 
 	$obj->build_after($meta)
 
+=head2 build_accessor_builder
+
+call build_accessor_builder method. Expects param $name to be a Str, param $content to be a Str.
+
+	$obj->build_accessor_builder($name, $content)
+
+=head2 build_accessor_coerce
+
+call build_accessor_coerce method. Expects param $name to be a Str, param $content to be a Str.
+
+	$obj->build_accessor_coerce($name, $content)
+
+=head2 build_accessor_trigger
+
+call build_accessor_trigger method. Expects param $name to be a Str, param $content to be a Str.
+
+	$obj->build_accessor_trigger($name, $content)
+
+=head2 build_accessor_default
+
+call build_accessor_default method. Expects param $name to be a Str, param $content to be a Str.
+
+	$obj->build_accessor_default($name, $content)
+
 =head1 ACCESSORS
 
 =head2 current_class
@@ -784,7 +945,7 @@ get or set is_role.
 
 =head1 AUTHOR
 
-AUTHOR, C<< <EMAIL> >>
+LNATION, C<< <email at lnation.org> >>
 
 =head1 BUGS
 
@@ -824,7 +985,7 @@ L<https://metacpan.org/release/Hades-Realm-OO>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by AUTHOR.
+This software is Copyright (c) 2020 by LNATION.
 
 This is free software, licensed under:
 

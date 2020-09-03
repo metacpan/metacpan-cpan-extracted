@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120351",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Bio-Kmer",
    "no_index" : {
@@ -37,7 +37,7 @@
             "Exporter" : "0",
             "File::Basename" : "0",
             "File::Temp" : "0",
-            "File::Which" : "1.23",
+            "File::Which" : "1.21",
             "IO::Uncompress::Gunzip" : "0",
             "Thread::Queue" : "0",
             "perl" : "5.010000",
@@ -59,6 +59,5 @@
          "web" : "https://github.com/lskatz/Bio--Kmer"
       }
    },
-   "version" : 0.26,
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "version" : 0.41
 }

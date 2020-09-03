@@ -11,7 +11,7 @@ use MojoX::Validate::Util;
 
 my($test_count)	= 0;
 my(@data)		=
-(
+(					# Calls check_key_exists().
 	{},				# Fail. Tests 1 .. 6.
 	{x => undef},	# Fail.
 	{x => ''},		# Pass.
@@ -40,7 +40,7 @@ for my $i (0 .. $#data)
 }
 
 @data =
-(
+(								# Calls check_equal_to().
 	{x => '',	y => 'x'},		# Fail. Value can't be empty. Tests 7 .. 10.
 	{x => 'x',	y => 'x'},		# Pass.
 	{x => 'pw',	y => 'wp'},		# Fail.
@@ -60,10 +60,10 @@ for my $i (0 .. $#data)
 }
 
 @data =
-(
+(					# Calls check_required().
 	{},				# Fail. Tests 11 .. 16.
 	{x => undef},	# Fail.
-	{x => ''},		# Fail.
+	{x => ''},		# Pass.
 	{x => '0'},		# Pass.
 	{x => 0},		# Pass.
 	{x => 'x'},		# Pass.
@@ -73,7 +73,7 @@ for my $i (0 .. $#data)
 {
 	$checker	= MojoX::Validate::Util -> new;
 	$params		= $data[$i];
-	$expected	= ($i <= 2) ? 0 : 1;
+	$expected	= ($i <= 1) ? 0 : 1;
 	$infix		= $expected ? '' : 'not ';
 	$message	= (defined($$params{x}) ? "'$$params{x}'" : 'undef') . " is ${infix}a required parameter";
 	$result		= $checker -> check_required($params, 'x') ? 1 : 0;
@@ -82,7 +82,7 @@ for my $i (0 .. $#data)
 }
 
 @data =
-(
+(											# Calls check_url().
 	{homepage => 'localhost'},				# Fail. Tests 17 .. 20.
 	{homepage => 'savage.net.au'},			# Pass.
 	{homepage => 'http://savage.net.au'},	# Pass.

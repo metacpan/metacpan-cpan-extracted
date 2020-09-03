@@ -408,6 +408,56 @@ _const_database_connection_configuration_options_3029000_zero()
 
 #endif
 
+#if SQLITE_VERSION_NUMBER >= 3030000
+
+IV
+_const_database_connection_configuration_options_3030000()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_VIEW = SQLITE_DBCONFIG_ENABLE_VIEW
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3030000_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_VIEW = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3031000
+
+IV
+_const_database_connection_configuration_options_3031000()
+    ALIAS:
+        SQLITE_DBCONFIG_LEGACY_FILE_FORMAT = SQLITE_DBCONFIG_LEGACY_FILE_FORMAT
+        SQLITE_DBCONFIG_TRUSTED_SCHEMA = SQLITE_DBCONFIG_TRUSTED_SCHEMA
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3031000_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_LEGACY_FILE_FORMAT = 1
+        SQLITE_DBCONFIG_TRUSTED_SCHEMA = 2
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
 #if SQLITE_VERSION_NUMBER >= 3006002
 
 IV
@@ -1024,6 +1074,62 @@ _const_extended_result_codes_3025000_zero()
 
 #endif
 
+#if SQLITE_VERSION_NUMBER >= 3031000
+
+IV
+_const_extended_result_codes_3031000()
+    ALIAS:
+        SQLITE_CANTOPEN_SYMLINK = SQLITE_CANTOPEN_SYMLINK
+        SQLITE_CONSTRAINT_PINNED = SQLITE_CONSTRAINT_PINNED
+        SQLITE_OK_SYMLINK = SQLITE_OK_SYMLINK
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_extended_result_codes_3031000_zero()
+    ALIAS:
+        SQLITE_CANTOPEN_SYMLINK = 1
+        SQLITE_CONSTRAINT_PINNED = 2
+        SQLITE_OK_SYMLINK = 3
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3032000
+
+IV
+_const_extended_result_codes_3032000()
+    ALIAS:
+        SQLITE_IOERR_DATA = SQLITE_IOERR_DATA
+        SQLITE_BUSY_TIMEOUT = SQLITE_BUSY_TIMEOUT
+        SQLITE_CORRUPT_INDEX = SQLITE_CORRUPT_INDEX
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_extended_result_codes_3032000_zero()
+    ALIAS:
+        SQLITE_IOERR_DATA = 1
+        SQLITE_BUSY_TIMEOUT = 2
+        SQLITE_CORRUPT_INDEX = 3
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
 IV
 _const_flags_for_file_open_operations()
     ALIAS:
@@ -1134,6 +1240,30 @@ _const_flags_for_file_open_operations_3007013_zero()
 
 #endif
 
+#if SQLITE_VERSION_NUMBER >= 3031000
+
+IV
+_const_flags_for_file_open_operations_3031000()
+    ALIAS:
+        SQLITE_OPEN_NOFOLLOW = SQLITE_OPEN_NOFOLLOW
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_flags_for_file_open_operations_3031000_zero()
+    ALIAS:
+        SQLITE_OPEN_NOFOLLOW = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
 #if SQLITE_VERSION_NUMBER >= 3008003
 
 IV
@@ -1151,6 +1281,56 @@ IV
 _const_function_flags_3008003_zero()
     ALIAS:
         SQLITE_DETERMINISTIC = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3030000
+
+IV
+_const_function_flags_3030000()
+    ALIAS:
+        SQLITE_DIRECTONLY = SQLITE_DIRECTONLY
+        SQLITE_SUBTYPE = SQLITE_SUBTYPE
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_function_flags_3030000_zero()
+    ALIAS:
+        SQLITE_DIRECTONLY = 1
+        SQLITE_SUBTYPE = 2
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3031000
+
+IV
+_const_function_flags_3031000()
+    ALIAS:
+        SQLITE_INNOCUOUS = SQLITE_INNOCUOUS
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_function_flags_3031000_zero()
+    ALIAS:
+        SQLITE_INNOCUOUS = 1
     CODE:
         RETVAL = 0;
     OUTPUT:
@@ -1507,6 +1687,30 @@ IV
 _const__flags_for_file_open_operations_3007013_zero()
     ALIAS:
         OPEN_MEMORY = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3031000
+
+IV
+_const__flags_for_file_open_operations_3031000()
+    ALIAS:
+        OPEN_NOFOLLOW = SQLITE_OPEN_NOFOLLOW
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const__flags_for_file_open_operations_3031000_zero()
+    ALIAS:
+        OPEN_NOFOLLOW = 1
     CODE:
         RETVAL = 0;
     OUTPUT:

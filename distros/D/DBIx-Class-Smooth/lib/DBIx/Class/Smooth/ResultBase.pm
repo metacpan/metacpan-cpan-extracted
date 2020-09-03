@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::ResultBase;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0103';
+our $VERSION = '0.0104';
 
 use parent 'DBIx::Class::Core';
 
@@ -61,15 +61,12 @@ DBIx::Class::Smooth::ResultBase - Short intro
 
 =head1 VERSION
 
-Version 0.0103, released 2020-05-31.
+Version 0.0104, released 2020-08-30.
 
 =head1 SYNOPSIS
 
     # in MyApp::Schema::Result::YourResultClass, instead of inheriting from DBIx::Class::Core
-    use base 'DBIx::Class::Smooth::Result::Base';
-
-    # DBIx::Class::Candy is always nice
-    use DBIx::Class::Candy;
+    use parent 'DBIx::Class::Smooth::Result::Base';
 
     column last_name => {
         data_type => 'varchar',

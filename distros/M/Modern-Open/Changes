@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.11 2020-09-03 00:00:00
+  - fix confess message
+  - support opendir for "\x5C"-ended path on MSWin32
+  - created by INABA Hitoshi
+
 0.10 2020-07-16 00:00:00
   - remove use Symbol
   - ends support for bare handles

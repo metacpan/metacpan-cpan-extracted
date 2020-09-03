@@ -14,7 +14,7 @@ BEGIN {
 			thanatos :t(Map[Str, Int])
 			gaudia :t(Tuple[Str, Int])
 			oneiroi :type(Dict[name => Str, id => Optional[Int], meta => Dict[name => Str, id => Optional[Int], options => ArrayRef[Str, 1, 1]]])
-			geras { if ($_[0]->penthos == $_[0]->nosoi) { return $_[0]->curae; } } 
+			geras { if (£penthos == £nosoi) { return £curae; } } 
 		}
 		Kato::Kosmos parent Kato { 
 			algea :d([{ test => [qw/a b c/] }]) :t(ArrayRef)

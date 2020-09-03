@@ -3,12 +3,12 @@ package Modern::Open;
 #
 # Modern::Open - Autovivification, Autodie, and 3-args open support
 #
-# http://search.cpan.org/dist/Modern-Open/
+# https://metacpan.org/release/Modern-Open
 #
 # Copyright (c) 2014, 2015, 2018, 2019, 2020 INABA Hitoshi <ina@cpan.org>
 ######################################################################
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -21,7 +21,7 @@ sub Modern::Open::confess (@) {
     my $i = 0;
     my @confess = ();
     while (my($package,$filename,$line,$subroutine) = caller($i)) {
-        push @confess, "[$i] $filename($line) $package::$subroutine\n";
+        push @confess, "[$i] $filename($line) ${package}::$subroutine\n";
         $i++;
     }
     print STDERR CORE::reverse @confess;
@@ -109,7 +109,13 @@ sub Modern::Open::opendir (*$) {
         $handle = $_[0] = \do { local *_ };
     }
 
-    my $return = CORE::opendir($handle,$_[1]);
+    my $return;
+    if ($return = CORE::opendir($handle,$_[1])) {
+    }
+    elsif (($^O =~ /MSWin32/) and (-d qq{$_[1].})) {
+        $return = CORE::opendir($handle,qq{$_[1].});
+    }
+
     if ($return or defined wantarray) {
         return $return;
     }
@@ -289,10 +295,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 =item * L<Perl 5.005_03 binaries|http://guest.engelschall.com/~sb/download/win32/> - engelschall.com
 
 =item * L<Welcome to CP5.5.3AN|http://cp5.5.3an.barnyard.co.uk/> - cp5.5.3an.barnyard.co.uk
-
-=item * L<Strict::Perl|http://search.cpan.org/dist/Strict-Perl/> - CPAN
-
-=item * L<japerl|http://search.cpan.org/dist/japerl/> - CPAN
 
 =item * L<ina|http://search.cpan.org/~ina/> - CPAN
 

@@ -1,3 +1,7 @@
+0.7.1 2020-09-02 17:31:58 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - drop config.json and app.cfg.dist from MANIFEST
+
 0.7.0 2020-07-27 10:08:06 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - improve makefile organisation

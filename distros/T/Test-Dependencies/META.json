@@ -45,6 +45,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Module::CoreList" : "5.20200620",
             "Pod::Strip" : "0",
             "perl" : "v5.10.1"
          },
@@ -72,7 +73,7 @@
          "web" : "https://github.com/ehuelsmann/perl-Test-Dependencies"
       }
    },
-   "version" : "0.24",
+   "version" : "0.28",
    "x_contributors" : [
       "Kent Fredric <kentfredric@gmail.com>",
       "Nick Morrott <knowledgejunkie@gmail.com>"

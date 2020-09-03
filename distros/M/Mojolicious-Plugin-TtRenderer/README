@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.60
+    version 1.61
 
 SYNOPSIS
 
@@ -51,7 +51,7 @@ OPTIONS
      
      sub startup {
        my($self) = @_;
-       
+     
        $self->plugin('tt_renderer' => {
          template_options => {
            PRE_CHOMP => 1,
@@ -59,7 +59,7 @@ OPTIONS
            TRIM => 1,
          },
        }
-       
+     
        ...
      }
 
@@ -137,8 +137,8 @@ EXAMPLES
      __DATA__
      
      @@ index.html.tt
-     [% 
-        WRAPPER 'layouts/default.html.tt' 
+     [%
+        WRAPPER 'layouts/default.html.tt'
         title = 'Welcome'
      %]
      <p>Welcome to the Mojolicious real-time web framework!</p>
@@ -230,6 +230,8 @@ AUTHOR
     Dinis Lage
 
     jay mortensen (GMORTEN)
+
+    Matthew Lawrence (MATTLAW)
 
 COPYRIGHT AND LICENSE
 

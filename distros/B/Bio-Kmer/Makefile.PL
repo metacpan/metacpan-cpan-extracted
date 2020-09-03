@@ -17,7 +17,7 @@ WriteMakefile1(
   PREREQ_PM    => {
     'File::Basename' => 0,
     'File::Temp'     => 0,
-    'File::Which'    => '1.23',
+    'File::Which'    => '1.21',
     'Data::Dumper'   => 0,
     'IO::Uncompress::Gunzip' => 0,
     'threads'        => 0,

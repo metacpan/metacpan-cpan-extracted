@@ -1,5 +1,5 @@
 package Neovim::Ext::Window;
-$Neovim::Ext::Window::VERSION = '0.02';
+$Neovim::Ext::Window::VERSION = '0.05';
 use strict;
 use warnings;
 use Carp qw/croak/;
@@ -98,7 +98,7 @@ Neovim::Ext::Window - Neovim Window class
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head2 SYNOPSIS
 

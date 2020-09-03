@@ -82,11 +82,12 @@ for my $tester (' -r -w -d ') {
 for my $tester (' -r -w -f ') {
     for my $testee (
         ['123', 0777, 1 ],
-        ['123', 0177, ($^O =~ /cygwin/) ? 1 : ''],
+        ['123', 0177, ''],
     ) {
         my($content,$mode,$want) = @{$testee};
 
         push @test, sub {
+            return 'SKIP' if $^O =~ /cygwin/;
 
             # make testee file
             my $filename = "$FindBin::Bin/temp/testee";

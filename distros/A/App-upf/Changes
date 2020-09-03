@@ -1,6 +1,10 @@
-Revision history for App-upf
+0.050   2020-04-29  Released-By: PERLANCAR; Urgency: low
 
-0.04    2015-09-03 (PERLANCAR)
+        - [build] Rebuild with updated Unix::Passwd::File to remove dependency
+          to the deprecated Perinci::Sub::ArgEntity::*.
+
+
+0.04    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -9,7 +13,7 @@ Revision history for App-upf
 	  requirement.
 
 
-0.03    2015-03-13 (PERLANCAR)
+0.03    2015-03-13  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -17,13 +21,13 @@ Revision history for App-upf
           Perinci::Sub::ArgEntity::* (for shell completion purposes).
 
 
-0.02    2015-03-06 (PERLANCAR)
+0.02    2015-03-06  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Minor tweaks, rebuild against Unix::Passwd::File 0.15.
 
 
-0.01    2015-03-06 (PERLANCAR)
+0.01    2015-03-06  Released-By: PERLANCAR
 
         - First release.

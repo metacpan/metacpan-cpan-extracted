@@ -2,10 +2,10 @@ package Mojolicious::Plugin::TtRenderer;
 
 use strict;
 use warnings;
-use 5.010001;
+use 5.016;
 
 # ABSTRACT: Template Renderer Plugin for Mojolicious
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.61'; # VERSION
 
 use base 'Mojolicious::Plugin';
 
@@ -38,7 +38,7 @@ Mojolicious::Plugin::TtRenderer - Template Renderer Plugin for Mojolicious
 
 =head1 VERSION
 
-version 1.60
+version 1.61
 
 =head1 SYNOPSIS
 
@@ -52,9 +52,9 @@ L<Mojolicious>
 
 =head1 DESCRIPTION
 
-This plugin is a simple Template Toolkit renderer for L<Mojolicious>. 
-Its defaults are usually reasonable, although for finer grain detail in 
-configuration you may want to use 
+This plugin is a simple Template Toolkit renderer for L<Mojolicious>.
+Its defaults are usually reasonable, although for finer grain detail in
+configuration you may want to use
 L<Mojolicious::Plugin::TtRenderer::Engine> directly.
 
 =for stopwords Bjørn
@@ -69,7 +69,7 @@ These are the options that can be passed in as arguments to this plugin.
 
 =head2 template_options
 
-Configuration hash passed into L<Template>'s constructor, see 
+Configuration hash passed into L<Template>'s constructor, see
 L<Template Toolkit's configuration summary|Template#CONFIGURATION-SUMMARY>
 for details.  Here is an example using the L<Mojolicious::Lite> form:
 
@@ -89,7 +89,7 @@ Here is the same example using the full L<Mojolicious> app form:
  
  sub startup {
    my($self) = @_;
-   
+ 
    $self->plugin('tt_renderer' => {
      template_options => {
        PRE_CHOMP => 1,
@@ -97,7 +97,7 @@ Here is the same example using the full L<Mojolicious> app form:
        TRIM => 1,
      },
    }
-   
+ 
    ...
  }
 
@@ -179,8 +179,8 @@ L<Mojolicious::Lite> example:
  __DATA__
  
  @@ index.html.tt
- [% 
-    WRAPPER 'layouts/default.html.tt' 
+ [%
+    WRAPPER 'layouts/default.html.tt'
     title = 'Welcome'
  %]
  <p>Welcome to the Mojolicious real-time web framework!</p>
@@ -223,14 +223,14 @@ L<Mojolicious> example:
  1;
 
 These are also included with the C<Mojolicious::Plugin::TtRenderer>
-distribution, including the support files required for the full 
+distribution, including the support files required for the full
 L<Mojolicious> app example.
 
 =head1 SEE ALSO
 
-L<Mojolicious::Plugin::TtRenderer::Engine>, 
-L<Mojolicious>, 
-L<Mojolicious::Guides>, 
+L<Mojolicious::Plugin::TtRenderer::Engine>,
+L<Mojolicious>,
+L<Mojolicious::Guides>,
 L<http://mojolicious.org>.
 
 =head1 AUTHOR
@@ -274,6 +274,8 @@ uwisser
 Dinis Lage
 
 jay mortensen (GMORTEN)
+
+Matthew Lawrence (MATTLAW)
 
 =head1 COPYRIGHT AND LICENSE
 

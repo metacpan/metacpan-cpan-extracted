@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::CIDFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.037'; # VERSION
+our $VERSION = '2.038'; # VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Resource::CIDFont::TrueType::FontFile;

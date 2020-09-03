@@ -1,0 +1,122 @@
+lib lib
+tlib t
+author LNATION
+email email@lnation.org
+version 0.03
+Hades::Realm::Import::Export base Hades::Realm::Exporter {
+	abstract { Hades realm for Import::Export }
+	synopsis {
+Quick summary of what the module does:
+
+	Hades->run({
+		eval => 'Kosmos {
+			[curae penthos] :t(Int) :d(2) :p :pr :c :r :i(1, GROUP)
+			geras $nosoi :t(Int) :d(5) :i { if (£penthos == $nosoi) { return £curae; } } 
+		}',
+		realm => 'Import::Export',
+	});
+
+	... generates ...
+
+	package Kosmos;
+	use strict;
+	use warnings;
+	use base qw/Import::Export/;
+	our $VERSION = 0.01;
+	our ( %EX, %ACCESSORS );
+
+	BEGIN {
+		%EX = (
+		       'curae'	=> [ 'EXPORT',    'EXPORT_OK', 'ACCESSORS', 'GROUP' ],
+		       'clear_penthos' => [ 'EXPORT',    'EXPORT_OK', 'CLEARERS' ],
+		       'penthos'       => [ 'EXPORT',    'EXPORT_OK', 'ACCESSORS', 'GROUP' ],
+		       'geras'	=> [ 'EXPORT_OK', 'METHODS' ],
+		       'has_curae'     => [ 'EXPORT',    'EXPORT_OK', 'PREDICATES' ],
+		       'has_penthos'   => [ 'EXPORT',    'EXPORT_OK', 'PREDICATES' ],
+		       'clear_curae'   => [ 'EXPORT',    'EXPORT_OK', 'CLEARERS' ]
+		);
+		%ACCESSORS = ( curae => 2, penthos => 2, );
+	}
+
+	sub curae {
+		my ($value) = @_;
+		my $private_caller = caller();
+		if ( $private_caller ne __PACKAGE__ ) {
+		       die "cannot call private method curae from $private_caller";
+		}
+		if ( defined $value ) {
+		       if ( ref $value || $value !~ m/^[-+\d]\d*$/ ) {
+			      die qq{Int: invalid value $value for accessor curae};
+		       }
+		       $ACCESSORS{curae} = $value;
+		}
+		return $ACCESSORS{curae};
+	}
+
+	sub has_curae {
+		return exists $ACCESSORS{curae};
+	}
+
+	sub clear_curae {
+		delete $ACCESSORS{curae};
+		return 1;
+	}
+
+	sub penthos {
+		my ($value) = @_;
+		my $private_caller = caller();
+		if ( $private_caller ne __PACKAGE__ ) {
+		       die "cannot call private method penthos from $private_caller";
+		}
+		if ( defined $value ) {
+		       if ( ref $value || $value !~ m/^[-+\d]\d*$/ ) {
+			      die qq{Int: invalid value $value for accessor penthos};
+		       }
+		       $ACCESSORS{penthos} = $value;
+		}
+		return $ACCESSORS{penthos};
+	}
+
+	sub has_penthos {
+		return exists $ACCESSORS{penthos};
+	}
+
+	sub clear_penthos {
+		delete $ACCESSORS{penthos};
+		return 1;
+	}
+
+	sub geras {
+		my ($nosoi) = @_;
+		$nosoi = defined $nosoi ? $nosoi : 5;
+		if ( !defined($nosoi) || ref $nosoi || $nosoi !~ m/^[-+\d]\d*$/ ) {
+		       $nosoi = defined $nosoi ? $nosoi : 'undef';
+		       die
+			  qq{Int: invalid value $nosoi for variable \$nosoi in method geras};
+		}
+		if ( penthos() == $nosoi ) { return curae(); }
+	}
+
+	1;
+
+	__END__
+	}
+	build_new :ar {
+		my @res = £$orig(@params, q|%EX|);
+	}
+	build_exporter $begin :t(Str) $mg :t(Object) $export :t(HashRef) $meta :t(HashRef) {
+		my %ex = ();
+		for my $k (keys %{$export}) {
+			push @{$ex{$_}}, $k for (@{$export->{$k}});
+		}
+		my $ex_tags = Module::Generate::_stringify_struct('undefined', \%ex);
+		$ex_tags =~ s/^{/(/;
+		$ex_tags =~ s/}$/);/;
+		$begin = '%EX = ' . $ex_tags
+			. $begin;
+		return $begin;
+	}
+	after_class $mg :t(Object) {
+		$mg->base(q|Import::Export|);
+	}
+}

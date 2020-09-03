@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.252';
+our $VERSION = '2.253';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -90,8 +90,9 @@ sub __init {
     $sf->{i}{f_copy_and_paste}     = catfile $app_dir, 'tmp_file_copy_and_paste.csv';
     $sf->{i}{f_plain}              = catfile $app_dir, 'tmp_file_plain.csv';
     END {
+        no warnings qw( closure );
         unlink $sf->{i}{f_copy_and_paste} if -e $sf->{i}{f_copy_and_paste};
-        unlink $sf->{i}{f_plain}      if -e $sf->{i}{f_plain};
+        unlink $sf->{i}{f_plain}          if -e $sf->{i}{f_plain};
     }
 }
 
@@ -746,7 +747,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.252
+Version 2.253
 
 =head1 DESCRIPTION
 

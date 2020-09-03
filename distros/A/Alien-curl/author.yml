@@ -5,6 +5,8 @@ pod_spelling_system:
   # (regardless of what spell check thinks)
   stopwords:
     - libcurl
+    - Laffan
+    - SLAFFAN
 
 pod_coverage:
   skip: 0

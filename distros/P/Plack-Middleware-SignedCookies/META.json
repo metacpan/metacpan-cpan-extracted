@@ -51,6 +51,6 @@
          "web" : "https://github.com/ap/Plack-Middleware-SignedCookies"
       }
    },
-   "version" : "1.202"
+   "version" : "1.203"
 }
 

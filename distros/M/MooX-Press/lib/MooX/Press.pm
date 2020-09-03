@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.062';
+our $VERSION   = '0.063';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -183,6 +183,9 @@ sub import {
 		
 		%methods = delete($opts{type_library_can})->$_handle_list_add_nulls;
 		$builder->$method_installer($opts{type_library}, \%methods) if keys %methods;
+		
+		no strict 'refs';
+		push @{ $opts{'factory_package'} . '::ISA' }, 'Exporter::Tiny';
 	}
 	
 	for my $pkg (@roles) {
@@ -887,6 +890,7 @@ sub _make_package {
 							die "lolwut?";
 						}
 					}
+					$builder->_make_exportable_factories($fpackage, @method_names);
 				}
 			}
 			eval "sub $qname\::FACTORY { q[$fpackage] }; 1"
@@ -919,6 +923,23 @@ sub _make_package {
 	}
 	
 	return $qname;
+}
+
+sub _make_exportable_factories {
+	my $builder = shift;
+	my ($factory, @methods) = @_;
+	foreach my $method ( @methods ) {
+		eval qq{
+			package ${factory};
+			sub _generate_${method} :method {
+				sub { q[${factory}]->${method}( \@_ ) };
+			}
+			1;
+		} or die "Yikes: $@";
+	}
+	no strict 'refs';
+	push @{ $factory . '::EXPORT_OK' }, @methods;
+	push @{ ${ $factory . '::EXPORT_TAGS' }{'factories'} ||= [] }, @methods;
 }
 
 sub _make_package_generator {
@@ -3206,6 +3227,18 @@ Whole collections of classes and roles now have portable namespaces. The same
 classes and roles could be used with different prefixes in different scripts.
 You could load two different versions of your API in the same script with
 different prefixes. The possibilities are interesting.
+
+Factory methods are also exportable.
+
+  use MyGarden 'new_tree';
+  
+  my $maple = new_tree();  # called as a function, not a method
+
+Exported functions can be renamed (see L<Exporter::Tiny>).
+
+  use MyGarden 'new_tree' => { -as => 'germinate' };
+  
+  my $maple = germinate();
 
 =head2 Why doesn't C<< $object->isa("Leaf") >> work?
 

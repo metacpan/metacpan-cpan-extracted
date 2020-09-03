@@ -1,0 +1,332 @@
+NAME
+    ScriptX - A plugin-based script framework
+
+VERSION
+    This document describes version 0.000001 of ScriptX (from Perl
+    distribution ScriptX), released on 2020-09-03.
+
+SYNOPSIS
+    In your script:
+
+     use ScriptX Rinci => {func => 'MyApp::app'};
+     ScriptX->run;
+
+DESCRIPTION
+    EXPERIMENTAL, EARLY RELEASE.
+
+    For now, see the included example scripts.
+
+  Glossary
+   Event
+    A named point in code when plugins have a chance to do stuffs, by
+    registering a handler for it. In other frameworks, an event sometimes
+    this is called a hook.
+
+   Event handler
+    A coderef that will be called by ScriptX on an event. The event handler
+    will be passed an argument $stash (a hashref) which contains various
+    information (see "Stash"). The event handler is expected to return an
+    enveloped result (see Rinci::function).
+
+   Plugin
+    A Perl module under the "ScriptX::" namespace that supplies additional
+    behavior/functionality. When you activate a plugin, the plugin registers
+    handler(s) to one or more events.
+
+   Priority
+    An attribute of event handler. A number between 0 and 100, where smaller
+    number means higher priority. Handlers for an event are executed in
+    order of descending priority (higher priority first, which means smaller
+    number first).
+
+CLASS METHODS
+  run
+    Usage:
+
+     ScriptX->run;
+
+    This is actually just a shortcut for running the "run" event:
+
+     run_event(name => 'run');
+
+VARIABLES
+  %Handlers
+    This is where event handlers are registered. Keys are event names.
+    Values are arrayrefs containing list of handler records:
+
+     [ [$label, $prio, $handler], ... ]
+
+  %Plugins
+    A hash of activated plugins. Keys are plugin names without the
+    "ScriptX::" prefix (e.g. Exit) and values are plugin instances.
+
+STASH KEYS
+  event
+    The name of current event.
+
+  handlers
+    Reference to the %Handlers package variable, for convenience.
+
+  plugins
+    Reference to the %Plugins package variable, for convenience.
+
+  plugin_name
+    Set for "activate_plugin" event.
+
+  plugin_args
+    Set for "activate_plugin" event.
+
+EVENT HANDLER RETURN STATUS CODES
+    The following are known event handler return status codes. They roughly
+    follow HTTP semantics.
+
+  201
+    This signifies success with exit ("OK, Skip Rest"), meaning the handler
+    instructs "run_event"() to skip moving to the next handler for the event
+    and use this status as the status of the event.
+
+  204
+    This signifies declination ("Decline"), meaning the handler opts to not
+    do anything for the event. "run_event"() will move to the next handler,
+    regardless of the value of "run_all_handlers".
+
+  Other 1xx, 2xx, 3xx
+    Including 200 ("OK"), these also signify success. When
+    "run_all_handlers" is set to true, "run_event"() will move to the next
+    handler. When "run_all_handlers" is set to false, run_event will finish
+    the execution of handlers for the event and use the status as the status
+    of the event.
+
+  4xx, 5xx
+    This signifies failure. When "stop_after_first_handler_failure" is set
+    to true, "run_event"() will use the status as the last status.
+    Otherwise, it will move to the next handler when "run_all_handlers" is
+    set to true.
+
+  601
+    This signifies event cancellation ("Cancel"), meaning the handler
+    instructs "run_event"() to cancel the event.
+
+  602
+    This signifies repeating of event ("Repeat"), meaning the handler
+    instructs "run_event"() to cancel the event.
+
+FUNCTIONS
+    None exported by default, but they are exportable.
+
+  activate_plugin
+    Usage:
+
+     activate_plugin($name [, \%args ]);
+
+    Examples:
+
+     activate_plugin('CLI::Log');
+     activate_plugin('Rinci', {func=>'MyPackage::myfunc'});
+
+    Load plugin named $name (by loading Perl module "ScriptX::$name"),
+    instantiate it with arguments %$args, then call the object method
+    "activate()".
+
+    Note: there is a special plugin "DisablePlugin|ScriptX::DisablePlugin"
+    which can block other plugins from being activated.
+
+  add_handler
+    Usage:
+
+     add_handler($event, $label, $prio, $handler);
+
+    Add handler. Usually called by plugins to add handler to events of their
+    choosing.
+
+  run_event
+    Usage:
+
+     run_event(%args);
+
+    Run an event by calling event handlers.
+
+    If the name of the event (hereby called $name) does not match
+    /^(after|before)_/, first call the "before_$name" event handlers. A
+    handler for "before_$name" event can cancel the $name event by returning
+    601 status, unless "allow_before_handler_to_cancel_event" argument is
+    set to false. When the $name event is cancelled, "run_event"() ends
+    prematurely: no handlers for the $name as well as "after_$name" events
+    are run, no "on_success" and "on_failure" code will also be called.
+
+    Then the $name event handlers are run. A handler for $name event can
+    skip the rest of the handlers by returning status 201, unless
+    "allow_handler_to_skip_rest" argument is set to false.
+
+    A handler for $name event can also repeat the event by returning status
+    602, unless "allow_handler_to_repeat_event" is set to false. When an
+    event is repeated, the first $name event handler is executed again. The
+    "before_$name" handlers are not re-executed.
+
+    When the last $name handler returns success (1xx, 2xx, 3xx status) then
+    the "on_success" code is run; otherwise the "on_failure" code is run.
+
+    After that, the "after_$name" event handlers are run. Unless
+    "allow_after_handler_to_repeat_event" is set to false, the handler for
+    this event can repeat the event by returning 602 status, in which case
+    the routine stops running the "after_$name" handlers and starts running
+    the $name handlers again. The handler which instructs repeat must be
+    careful not to cause an infinite loop.
+
+    Arguments:
+
+    *   name
+
+        Str. Required. Name of the event, for example: "get_args".
+
+    *   req_handler
+
+        Bool. Optional, defaults to 0. When set to true, will die when there
+        is no handler for the event $name.
+
+    *   run_all_handlers
+
+        Bool. Optional, defaults to 1. When set to false, will stop calling
+        event handlers for the $name event after the first successful
+        handler (success is defined as codes 1xx, 2xx, and 3xx). Otherwise,
+        all handlers are run regardless of success status.
+
+    *   allow_before_handler_to_cancel_event
+
+        Bool. Optional, defaults to 1. When set to true, an event handler in
+        the "before_$name" event can cancel the event by returning 601
+        status. When set to false, will die whenever an event handler
+        returns 601.
+
+        When the $name event is called by the "before_$name" event handler,
+
+    *   allow_before_handler_to_skip_rest
+
+        Bool. Optional, defaults to 1. When set to true, an event handler
+        can skip the rest of the event handlers in the "before_$name" event
+        by returning 201 status. When set to false, the next event handler
+        will be called anyway even though an event handler returns 201.
+
+    *   allow_handler_to_repeat_event
+
+        Bool. Optional, defaults to 1. When set to true, an event handler in
+        the $name event can repeat the event by returning 602 status. When
+        set to false, will die whenever an event handler returns 602.
+
+    *   allow_handler_to_skip_rest
+
+        Bool. Optional, defaults to 1. When set to true, an event handler
+        can skip the rest of the event handlers in the $name event by
+        returning 201 status. When set to false, the next event handler will
+        be called anyway even though an event handler returns 201.
+
+    *   allow_after_handler_to_repeat_event
+
+        Bool. Optional, defaults to 1. When set to true, an event handler in
+        the "after_$name" event can repeat the event by returning 602
+        status. When set to false, will die whenever an event handler
+        returns 602.
+
+    *   allow_after_handler_to_skip_rest
+
+        Bool. Optional, defaults to 1. When set to true, an event handler
+        can skip the rest of the event handlers in the "after_$name" event
+        by returning 201 status. When set to false, the next event handler
+        will be called anyway even though an event handler returns 201.
+
+    *   stop_after_first_handler_failure
+
+        Bool. Optional, defaults to 1. When set to true, the first failure
+        status (4xx/5xx) from an event is used as the status of the event
+        and the rest of the handlers will be skipped. Otherwise, will ignore
+        the failure status and move on to the next handler.
+
+    *   on_success
+
+        Coderef. Optional.
+
+        Will be executed after the last executed $name handler returns 2xx
+        code (including 200, 201, 204).
+
+    *   on_failure
+
+        Coderef. Optional.
+
+        Will be executed after the last executed $name handler returns
+        4xx/5xx code.
+
+ENVIRONMENT
+  SCRIPTX_IMPORT
+    String. Additional import, will be added at the first import() before
+    the usual import arguments. Used to add plugins for a running script,
+    e.g. to add debugging plugins. The syntax is:
+
+     -<PLUGIN_NAME0>,<arg1>,<argval1>,...,-<PLUGIN_NAME0>,...
+
+    For example, this:
+
+     use ScriptX
+         'CLI::Log',
+         'Rinci::CLI::Debug::DumpStashAfterGetArgs',
+         Exit => {after => 'after_get_args'};
+
+    should be written as:
+
+     SCRIPTX_IMPORT=-CLI::Log,-Rinci::CLI::Debug::DumpStashAfterGetArgs,-Exit,after,after_get_args
+
+    If your script is:
+
+     use ScriptX Rinci => {func=>'MyPackage::myfunc'};
+
+    then with the injection of the above environment, effectively it will
+    become:
+
+     use ScriptX
+         'CLI::Log',
+         'Rinci::CLI::Debug::DumpStashAfterGetArgs',
+         Exit => {after => 'after_get_args'},
+         Rinci => {func=>'MyPackage::myfunc'};
+
+    Note that PLUGIN_NAME0 is plugin name that can optionally be followed
+    with @EVENT or "@EVENT@PRIO". For example:
+    "Debug::DumpStash@after_run@99" to put the ScriptX::Debug::DumpStash
+    plugin handler in the "after_run" event at priority 99.
+
+  SCRIPTX_IMPORT_JSON
+    String (JSON-encoded array). This is an alternative to "SCRIPTX_IMPORT"
+    and has a lower precedence (will not be evaluated when SCRIPTX_IMPORT is
+    defined). Useful if a plugin accept data structure instead of plain
+    scalars.
+
+    Example:
+
+     SCRIPTX_IMPORT_JSON='["CLI::Log", "Rinci::CLI::Debug::DumpStashAfterGetArgs", "Exit", {"after":"after_get_args"}, "Rinci", {"func":"MyPackage::myfunc"}]'
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ScriptX>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-ScriptX>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ScriptX>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    The various plugins under the "ScriptX::" namespace.
+
+    Older projects: Perinci::CmdLine.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

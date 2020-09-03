@@ -14,6 +14,11 @@ $modules{$_} = $_ for qw(
   Alien::Build
   Alien::Build::MM
   ExtUtils::MakeMaker
+  File::Temp
+  Inline
+  Inline::C
+  Inline::CPP
+  Path::Tiny
   Test2::V0
   Test::Alien
   Test::Alien::Diag

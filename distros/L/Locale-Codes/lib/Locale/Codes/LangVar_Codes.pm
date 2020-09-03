@@ -3,7 +3,7 @@ Locale::Codes::LangVar_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Tue Jun  2 12:18:21 EDT 2020
+#    Generated on: Tue Sep  1 12:57:08 EDT 2020
 
 use strict;
 require 5.006;
@@ -11,9 +11,9 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.64';
+$VERSION='3.65';
 
-$Locale::Codes::Data{'langvar'}{'id'} = '0100';
+$Locale::Codes::Data{'langvar'}{'id'} = '0102';
 
 $Locale::Codes::Data{'langvar'}{'id2names'} = {
    q(0001) => [
@@ -310,33 +310,41 @@ $Locale::Codes::Data{'langvar'}{'id2names'} = {
       q(Belarusian in Taraskievica orthography),
       ],
    q(0090) => [
-      q(Unified Cornish orthography of Revived Cornish),
+      q(Tongyong Pinyin romanization),
       ],
    q(0091) => [
-      q(Unified Cornish Revised orthography of Revived Cornish),
+      q(Tunumiisiut),
+      q(East Greenlandic),
+      q(ÃstgrÃ¸nlandsk),
       ],
    q(0092) => [
-      q(Ulster dialect of Scots),
+      q(Unified Cornish orthography of Revived Cornish),
       ],
    q(0093) => [
-      q(Unifon phonetic alphabet),
+      q(Unified Cornish Revised orthography of Revived Cornish),
       ],
    q(0094) => [
-      q(Vedic Sanskrit),
+      q(Ulster dialect of Scots),
       ],
    q(0095) => [
-      q(Valencian),
+      q(Unifon phonetic alphabet),
       ],
    q(0096) => [
-      q(Vallader idiom of Romansh),
+      q(Vedic Sanskrit),
       ],
    q(0097) => [
-      q(Vivaro-Alpine),
+      q(Valencian),
       ],
    q(0098) => [
-      q(Wade-Giles romanization),
+      q(Vallader idiom of Romansh),
       ],
    q(0099) => [
+      q(Vivaro-Alpine),
+      ],
+   q(0100) => [
+      q(Wade-Giles romanization),
+      ],
+   q(0101) => [
       q(Standard X-system orthographic fallback for spelling Esperanto),
       ],
 };
@@ -457,6 +465,10 @@ $Locale::Codes::Data{'langvar'}{'alias2id'} = {
    q(early modern french) => [
       q(0002),
       q(0),
+      ],
+   q(east greenlandic) => [
+      q(0091),
+      q(1),
       ],
    q(epic sanskrit) => [
       q(0045),
@@ -699,7 +711,7 @@ $Locale::Codes::Data{'langvar'}{'alias2id'} = {
       q(0),
       ],
    q(standard x-system orthographic fallback for spelling esperanto) => [
-      q(0099),
+      q(0101),
       q(0),
       ],
    q(standardized resian orthography) => [
@@ -774,20 +786,28 @@ $Locale::Codes::Data{'langvar'}{'alias2id'} = {
       q(0083),
       q(0),
       ],
+   q(tongyong pinyin romanization) => [
+      q(0090),
+      q(0),
+      ],
    q(traditional german orthography) => [
       q(0003),
       q(0),
       ],
+   q(tunumiisiut) => [
+      q(0091),
+      q(0),
+      ],
    q(ulster dialect of scots) => [
-      q(0092),
+      q(0094),
       q(0),
       ],
    q(unified cornish orthography of revived cornish) => [
-      q(0090),
+      q(0092),
       q(0),
       ],
    q(unified cornish revised orthography of revived cornish) => [
-      q(0091),
+      q(0093),
       q(0),
       ],
    q(unified turkic latin alphabet (historical)) => [
@@ -795,7 +815,7 @@ $Locale::Codes::Data{'langvar'}{'alias2id'} = {
       q(0),
       ],
    q(unifon phonetic alphabet) => [
-      q(0093),
+      q(0095),
       q(0),
       ],
    q(uralic phonetic alphabet) => [
@@ -803,19 +823,19 @@ $Locale::Codes::Data{'langvar'}{'alias2id'} = {
       q(0),
       ],
    q(valencian) => [
-      q(0095),
+      q(0097),
       q(0),
       ],
    q(vallader idiom of romansh) => [
-      q(0096),
+      q(0098),
       q(0),
       ],
    q(vedic sanskrit) => [
-      q(0094),
+      q(0096),
       q(0),
       ],
    q(vivaro-alpine) => [
-      q(0097),
+      q(0099),
       q(0),
       ],
    q(volapuk nuladik) => [
@@ -835,12 +855,16 @@ $Locale::Codes::Data{'langvar'}{'alias2id'} = {
       q(0),
       ],
    q(wade-giles romanization) => [
-      q(0098),
+      q(0100),
       q(0),
       ],
    q(x-sampa transcription) => [
       q(0036),
       q(0),
+      ],
+   q(ÃstgrÃ¸nlandsk) => [
+      q(0091),
+      q(2),
       ],
 };
 
@@ -1202,44 +1226,52 @@ $Locale::Codes::Data{'langvar'}{'code2id'} = {
          q(0089),
          q(0),
          ],
-      q(uccor) => [
+      q(tongyong) => [
          q(0090),
          q(0),
          ],
-      q(ucrcor) => [
+      q(tunumiit) => [
          q(0091),
          q(0),
          ],
-      q(ulster) => [
+      q(uccor) => [
          q(0092),
          q(0),
          ],
-      q(unifon) => [
+      q(ucrcor) => [
          q(0093),
          q(0),
          ],
-      q(vaidika) => [
+      q(ulster) => [
          q(0094),
          q(0),
          ],
-      q(valencia) => [
+      q(unifon) => [
          q(0095),
          q(0),
          ],
-      q(vallader) => [
+      q(vaidika) => [
          q(0096),
          q(0),
          ],
-      q(vivaraup) => [
+      q(valencia) => [
          q(0097),
          q(0),
          ],
-      q(wadegile) => [
+      q(vallader) => [
          q(0098),
          q(0),
          ],
-      q(xsistemo) => [
+      q(vivaraup) => [
          q(0099),
+         q(0),
+         ],
+      q(wadegile) => [
+         q(0100),
+         q(0),
+         ],
+      q(xsistemo) => [
+         q(0101),
          q(0),
          ],
       },
@@ -1336,16 +1368,18 @@ $Locale::Codes::Data{'langvar'}{'id2code'} = {
       q(0087) => q(sursilv),
       q(0088) => q(sutsilv),
       q(0089) => q(tarask),
-      q(0090) => q(uccor),
-      q(0091) => q(ucrcor),
-      q(0092) => q(ulster),
-      q(0093) => q(unifon),
-      q(0094) => q(vaidika),
-      q(0095) => q(valencia),
-      q(0096) => q(vallader),
-      q(0097) => q(vivaraup),
-      q(0098) => q(wadegile),
-      q(0099) => q(xsistemo),
+      q(0090) => q(tongyong),
+      q(0091) => q(tunumiit),
+      q(0092) => q(uccor),
+      q(0093) => q(ucrcor),
+      q(0094) => q(ulster),
+      q(0095) => q(unifon),
+      q(0096) => q(vaidika),
+      q(0097) => q(valencia),
+      q(0098) => q(vallader),
+      q(0099) => q(vivaraup),
+      q(0100) => q(wadegile),
+      q(0101) => q(xsistemo),
       },
 };
 

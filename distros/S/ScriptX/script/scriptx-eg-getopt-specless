@@ -1,0 +1,114 @@
+#!perl
+
+use strict;
+use warnings;
+
+use ScriptX (
+    'Getopt::Specless',
+    'Run',
+);
+
+sub run {
+    my ($self, $stash) = @_;
+
+    my $opts = $stash->{opts};
+    unless ($opts->{name}) {
+        print "Please specify --name!\n";
+        exit 1;
+    }
+    unless ($opts->{gender}) {
+        print "Please specify --gender!\n";
+        exit 1;
+    }
+    unless ($opts->{gender} =~ /\A[mf]\z/i) {
+        print "Invalid value in --gender, please specify m|f!\n";
+        exit 1;
+    }
+
+    print "Hello, ", ($opts->{gender} =~ /m/i ? "Mr." : "Mrs."), " $opts->{name}!\n";
+}
+
+ScriptX->run;
+
+# ABSTRACT: Parse command-line options using simple heuristics (demos debugging by dumping stash)
+# PODNAME: scriptx-eg-getopt-specless
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+scriptx-eg-getopt-specless - Parse command-line options using simple heuristics (demos debugging by dumping stash)
+
+=head1 VERSION
+
+This document describes version 0.000001 of scriptx-eg-getopt-specless (from Perl distribution ScriptX), released on 2020-09-03.
+
+=head1 SYNOPSIS
+
+ % script-eg-getopt-specless
+ Please specify --name!
+
+ % script-eg-getopt-specless --name=Budi
+ Please specify --gender!
+
+ % script-eg-getopt-specless --name=Budi --gender=x
+ Invalid value in --gender, please specify m|f!
+
+ % script-eg-getopt-specless --name=Budi --gender=m
+ Hello, Mr. Budi!
+
+=head1 DESCRIPTION
+
+This script demonstrates the use of L<ScriptX::Getopt::Specless>.
+
+When you encounter a problem, e.g.:
+
+ % script-eg-getopt-specless --name=Budi --gender m
+ Invalid value in --gender, please specify m|f!
+
+you can use the L<ScriptX::Debug::DumpStash>:
+
+ % SCRIPTX_IMPORT=-Debug::DumpStash script-eg-getopt-specless --name=Budi --gender m
+ {
+   argv  => ["f"],                           # {0}
+   event => "before_run",                    # {1}
+   opts  => { gender => 1, name => "Budi" }, # {2}
+ }
+ Invalid value in --gender, please specify m|f!
+
+You notice that the C<gender> option gets the value of C<1> while C<f> is parsed
+as an argument. That's because in specless option parsing, all option with value
+must be specified as --opt=val and not C<<--opt val>>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/ScriptX>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-ScriptX>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ScriptX>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

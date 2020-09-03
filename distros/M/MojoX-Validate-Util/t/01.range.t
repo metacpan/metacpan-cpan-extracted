@@ -13,14 +13,15 @@ my($test_count) = 0;
 
 my(@data) =
 (
-	{height => ''},				# Pass.
-	{height => '1'},			# Fail. No unit.
-	{height => '1cm'},			# Pass.
-	{height => '1 cm'},			# Pass.
-	{height => '1m'},			# Pass.
-	{height	=> '40-70.5cm'},	# Pass.
-	{height	=> '1.5 -2 m'},		# Pass.
-	{height => 'z1'},			# Fail. Not numeric.
+	{height => ''},				# 0: Pass.
+	{height => '1cm'},			# 1: Pass.
+	{height => '1 cm'},			# 2: Pass.
+	{height => '1m'},			# 3: Pass.
+	{height	=> '40-70.5cm'},	# 4: Pass.
+	{height	=> '1.5 -2 m'},		# 5: Pass.
+	{height => '1'},			# 6: Fail. No unit.
+	{height => 'z1'},			# 7: Fail. Not numeric.
+	{height => '1,2m'},			# 8: Fail.
 );
 
 my($checker);
@@ -33,8 +34,8 @@ for my $i (0 .. $#data)
 {
 	$checker	= MojoX::Validate::Util -> new;
 	$params		= $data[$i];
-	$expected	= ( ($i == 1) || ($i == $#data) ) ? 0 : 1;
-	$infix		= $expected ? '' : 'not ';
+	$expected	= ($i <= 5) ? 1 : 0;		# 0 => Fail; 1 => Pass.
+	$infix		= $expected ? '' : 'not ';	# 'not ' => Fail; '' => Pass.
 	$message	= "Height '$$params{height}' is ${infix}a valid height";
 
 	ok($checker -> check_dimension($params, 'height', ['cm', 'm']) == $expected, $message); $test_count++;

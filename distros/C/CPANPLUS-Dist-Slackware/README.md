@@ -27,7 +27,7 @@ make install
 
 Slackware Linux 13.37 and Perl 5.12.3 or better and the sudo command are
 required.  The fakeroot command is highly recommended.  You can download a
-script that builds fakeroot from [SlackBuilds.org](http://slackbuilds.org/).
+script that builds fakeroot from [SlackBuilds.org](https://slackbuilds.org/).
 
 ## SUPPORT AND DOCUMENTATION
 
@@ -49,5 +49,5 @@ Copyright 2012-2020 Andreas Vögele
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-See http://dev.perl.org/licenses/ for more information.
+See https://dev.perl.org/licenses/ for more information.
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99031  Sep 1 2020 Alexander Tsoy
+    - Fix whois server for .mx
+
 2.99030  Aug 7 2020 Chase Venters
     - Fix whois server for .in (India)
 

@@ -6,9 +6,10 @@ use 5.012;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.3.0';
 
-use Rex 0.044 -base;
+use English qw( -no_match_vars );
+use Rex 1.012 -base;
 use Rex::Helper::Run;
 use Rex::Hook;
 use Text::Diff 1.44;
@@ -18,8 +19,11 @@ register_function_hooks { before_change => { file => \&show_diff, }, };
 sub show_diff {
     my ( $original_file, @opts ) = @_;
 
-    my $diff;
-    my $diff_command = can_run('diff');
+    my ( $diff, $diff_command );
+
+    if ( $OSNAME ne 'MSWin32' ) {
+        $diff_command = can_run('diff');
+    }
 
     if ($diff_command) {
         my $command = join q( ), $diff_command, '-u', involved_files($original_file);
@@ -47,32 +51,13 @@ sub show_diff {
 sub involved_files {
     my $file = shift;
 
-    my $temp_file = get_rex_temp_file_path($file);
+    my $temp_file = Rex::Commands::File::get_tmp_file_name($file);
     my $null      = File::Spec->devnull();
 
     if ( !is_file($file) )      { $file      = $null } # creating file
     if ( !is_file($temp_file) ) { $temp_file = $null } # removing file
 
     return ( $file, $temp_file );
-}
-
-sub get_rex_temp_file_path {
-    my $file = shift;
-
-    ## no critic ( CodeLayout RegularExpressions ValuesAndExpressions )
-    # copied verbatim from Rex::Commands::File
-
-    my @splitted_file = split( /[\/\\]/, $file );
-    my $file_name     = ".rex.tmp." . pop(@splitted_file);
-    my $tmp_file_name = (
-        $#splitted_file != -1
-        ? ( join( "/", @splitted_file ) . "/" . $file_name )
-        : $file_name
-    );
-
-    ## use critic
-
-    return $tmp_file_name;
 }
 
 1;
@@ -91,7 +76,7 @@ Rex::Hook::File::Diff - show diff of changes for files managed by Rex
 
 =head1 VERSION
 
-version v0.2.0
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -115,7 +100,7 @@ This module allows L<Rex> to show a diff of changes for the files managed via it
 
 =item L<sed|https://metacpan.org/pod/Rex::Commands::File#sed>
 
-It uses the C<diff> utility if available.
+On non-Windows systems, it uses the C<diff> utility if available.
 
 =back
 

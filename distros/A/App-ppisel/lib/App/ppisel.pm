@@ -1,7 +1,7 @@
 package App::ppisel;
 
-our $DATE = '2019-08-08'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -85,7 +85,7 @@ App::ppisel - Select PPI::Element nodes using CSel syntax
 
 =head1 VERSION
 
-This document describes version 0.003 of App::ppisel (from Perl distribution App-ppisel), released on 2019-08-08.
+This document describes version 0.004 of App::ppisel (from Perl distribution App-ppisel), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -108,7 +108,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<expr> => I<str>
 
-=item * B<file> => I<str> (default: "-")
+=item * B<file> => I<filename> (default: "-")
 
 =item * B<node_actions> => I<array[str]> (default: ["print_as_string"])
 
@@ -132,15 +132,41 @@ attributes to use in a dot-separated syntax, e.g.:
 
 dump:tag.id.class
 
-=back
-
 which will result in a node printed like this:
 
- HTML::Element tag=p id=undef class=undef
+HTML::Element tag=p id=undef class=undef
+
+=back
 
 By default, if no attributes are specified, C<id> is used. If the node class does
 not support the attribute, or if the value of the attribute is undef, then
 C<undef> is shown.
+
+=over
+
+=item * C<eval> will execute Perl code for each matching node. The Perl code will be
+called with arguments: C<($node)>. For convenience, C<$_> is also locally set to
+the matching node. Example in L<htmlsel> you can add this action:
+
+eval:'print $_->tag'
+
+which will print the tag name for each matching L<HTML::Element> node.
+
+=back
+
+=item * B<node_actions_on_descendants> => I<str> (default: "")
+
+Specify how descendants should be actioned upon.
+
+This option sets how node action is performed (See C<node_actions> option).
+
+When set to '' (the default), then only matching nodes are actioned upon.
+
+When set to 'descendants_depth_first', then after each matching node is actioned
+upon by an action, the descendants of the matching node are also actioned, in
+depth-first order. This option is sometimes necessary e.g. when your node's
+C<as_string()> method shows a node's string representation that does not include
+its descendants.
 
 =item * B<select_action> => I<str> (default: "csel")
 
@@ -151,6 +177,7 @@ expression. Note that the root node itself is not included. For more details on
 CSel expression, refer to L<Data::CSel>.
 
 C<root> will return a single node which is the root node.
+
 
 =back
 
@@ -189,7 +216,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,11 @@
-$doc = <<'EOT';
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use HTML::Parser ();
+
+my $doc = <<'EOT';
 
 <!-- This is not where <BODY> starts -->
 <title>foo</title>
@@ -20,14 +27,18 @@ Howdy!
 
 EOT
 
-use HTML::Parser 3;
 
 my $body_offset;
-HTML::Parser->new(start_h => [sub {
-		                return unless shift eq "body";
-				$body_offset = shift;
-				shift->eof;  # tell the parser to stop
-		             }, "tagname,offset,self"])->parse($doc);
+HTML::Parser->new(
+    start_h => [
+        sub {
+            return unless shift eq "body";
+            $body_offset = shift;
+            shift->eof;    # tell the parser to stop
+        },
+        "tagname,offset,self"
+    ]
+)->parse($doc);
 
 die "No <body> found" unless defined $body_offset;
 

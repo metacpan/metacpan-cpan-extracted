@@ -2,7 +2,7 @@ package DTOne::Crypt;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -14,6 +14,9 @@ use Bytes::Random::Secure qw(random_bytes);
 use MIME::Base64;
 use Carp;
 
+use constant PROTOCOL_VERSION       => 2;
+
+# v1 constants
 use constant SCRYPT_ITERATIONS      => 32768;   # 2**15
 use constant SCRYPT_BLOCK_SIZE      => 8;
 use constant SCRYPT_PARALLELISM     => 1;
@@ -32,26 +35,18 @@ sub encrypt_aes256gcm {
         croak "invalid master key length";
     }
 
-    my $iv   = random_bytes(12);
-    my $salt = random_bytes(16);
-    my $key  = scrypt_raw(
-        $master_key,
-        $salt,
-        SCRYPT_ITERATIONS,
-        SCRYPT_BLOCK_SIZE,
-        SCRYPT_PARALLELISM,
-        SCRYPT_DERIVED_KEY_LEN
-    );
-
+    my $iv = random_bytes(12);
     my ($ciphertext, $tag) = gcm_encrypt_authenticate(
         'AES',
-        $key,
+        $master_key,
         $iv,
         undef,
         $plaintext
     );
 
-    return encode_base64(join('', $salt, $iv, $tag, $ciphertext), '');
+    my $composite = encode_base64(join('', $iv, $tag, $ciphertext), '');
+
+    return '$'.join('$', PROTOCOL_VERSION, $composite);
 }
 
 sub decrypt_aes256gcm {
@@ -63,16 +58,29 @@ sub decrypt_aes256gcm {
         croak "invalid master key length";
     }
 
-    $encrypted = decode_base64($encrypted);
-    my ($salt, $iv, $tag, $ciphertext) = unpack('a16 a12 a16 a*', $encrypted);
-    my $key = scrypt_raw(
-        $master_key,
-        $salt,
-        SCRYPT_ITERATIONS,
-        SCRYPT_BLOCK_SIZE,
-        SCRYPT_PARALLELISM,
-        SCRYPT_DERIVED_KEY_LEN
-    );
+    my $key;
+    my $iv;
+    my $tag;
+    my $ciphertext;
+    if (_is_v2_format($encrypted)) {
+        (undef, my $version, $encrypted) = split(/\$/, $encrypted);
+        $encrypted = decode_base64($encrypted);
+
+        ($iv, $tag, $ciphertext) = unpack('a12 a16 a*', $encrypted);
+        $key = $master_key;
+    } else {
+        $encrypted = decode_base64($encrypted);
+        (my $salt, $iv, $tag, $ciphertext) = unpack('a16 a12 a16 a*', $encrypted);
+
+        $key = scrypt_raw(
+            $master_key,
+            $salt,
+            SCRYPT_ITERATIONS,
+            SCRYPT_BLOCK_SIZE,
+            SCRYPT_PARALLELISM,
+            SCRYPT_DERIVED_KEY_LEN
+        );
+    }
 
     return gcm_decrypt_verify(
         'AES',
@@ -82,6 +90,11 @@ sub decrypt_aes256gcm {
         $ciphertext,
         $tag
     );
+}
+
+sub _is_v2_format {
+    my $encrypted = shift or croak "encrypted data required";
+    return substr($encrypted, 0, 1) eq '$';
 }
 
 1;
@@ -115,14 +128,14 @@ individually:
   my $encrypted = encrypt_aes256gcm($plaintext, $master_key);
 
 Encrypt plaintext value using AES-256 GCM to a base64 encoded string containing
-the salt, initialization vector (IV), ciphertext, and tag.
+the initialization vector (IV), ciphertext, and tag.
 
 =head2 decrypt_aes256gcm
 
   my $decrypted = decrypt_aes256gcm($encrypted, $master_key);
 
-Decrypt a composite base64 encoded string containing the salt, IV, ciphertext,
-and tag back to its original plaintext value.
+Decrypt a composite base64 encoded string containing the IV, ciphertext, and tag
+back to its original plaintext value.
 
 =head1 CAVEATS
 
@@ -133,7 +146,7 @@ Master key is expected to be exactly 256 bits in length, encoded in base64.
 =head2 Performance
 
 Random byte generation on Linux might run slow over time unless L<haveged(8)>
-is running. In this scenario, the streaming facility of aes-gcm will be more
+is running. In this scenario, the streaming facility of AES-GCM will be more
 memory efficient.
 
 =head1 AUTHOR

@@ -1,5 +1,9 @@
 Revision history for Perl module Alien-Base-ModuleBuild
 
+1.15      2020-08-28 09:50:28 -0600
+  - Move inline tests from this distro to Acme::Alien::DontPanic
+    and Acme::Alien::DontPanic2 (gh#22)
+
 1.14      2020-02-05 19:08:06 -0700
   - Add use strict and warnings to generated Install/Files.pm
     modules (gh#17)

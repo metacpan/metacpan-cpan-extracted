@@ -17,10 +17,10 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Hades::Realm::OO' => '0.01',
-        'Moo' => '0',
+        'Hades::Realm::OO' => '0.04',
+        'Moo' => '2.000000',
 	'MooX::Private::Attribute' => '0.01',
-    	'Type::Tiny' => '0'
+    	'Type::Tiny' => '1.01000'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Hades-Realm-Moo-*' },

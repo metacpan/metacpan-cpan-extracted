@@ -4,7 +4,7 @@ File::LibMagic - Determine MIME types of data or files using libmagic
 
 # VERSION
 
-version 1.22
+version 1.23
 
 # SYNOPSIS
 

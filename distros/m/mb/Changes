@@ -1,5 +1,12 @@
 Revision history for this software.
 
+0.10  2020-08-30 00:00:00
+  - supports also opendir, not only opendir()
+  - removed "use Symbol;"
+  - fix from \*qq{...} to qq{...}, converting filetest -X qq{...}
+  - avoid syntax error: Can't coerce array into hash at ..., converting regexp /[ABC]{3}/
+  - created by INABA Hitoshi
+
 0.09  2020-08-28 00:00:00
   - supports also lstat, not only lstat()
   - supports also stat, not only stat()

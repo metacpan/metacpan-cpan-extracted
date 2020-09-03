@@ -5,7 +5,7 @@ use base qw(PDF::API2::Content PDF::API2::Resource::XObject::Form);
 use strict;
 use warnings;
 
-our $VERSION = '2.037'; # VERSION
+our $VERSION = '2.038'; # VERSION
 
 use PDF::API2::Basic::PDF::Dict;
 use PDF::API2::Basic::PDF::Utils;

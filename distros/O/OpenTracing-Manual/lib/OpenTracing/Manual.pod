@@ -11,7 +11,7 @@ OpenTracing::Manual - A quick overview about Perl5 and OpenTracing
 
 
 
-The C<OpenTracing> module on CPAN is B<NOT COMPLIANT> with anything remotely to
+The C<OpenTracing> module on CPAN is B<NOT COMPLIANT> with anything remotely like
 L<OpenTracing.IO|https://opentracing.io> or the L<OpenTracing::Interface>.
 
 B<DO NOT USE THE OPENTRACING PACKAGE>
@@ -23,29 +23,29 @@ B<DO NOT USE THE OPENTRACING PACKAGE>
 
 
 This Manual is a quick overview of what is available in Perl related to the
-OpenTracing API related Interface Definition.
+OpenTracing API Interface Definition.
 
 This manual targets three different audiences:
 
 =over
 
-=item Application developers and Devops
+=item Application Developers and Devops
 
-Those that want to add instrumentation and tracing to their appilication or
-micro services.
+Those that want to add instrumentation and tracing to their application or
+microservices.
 
 See L<OpenTracing::Manual::Instrumentation>.
 
 =item Framework or Integration Developers
 
-Those writing integrations for frameworks, such that those can easily extract
-tracing information from incoming request or inject that into outgoing requests.
+Those writing integrations for frameworks, in order to easily extract
+tracing information from incoming requests or inject tracing into outgoing requests.
 
 See L<OpenTracing::Manual::Integration>.
 
-=item Tracing service Implementation providers
+=item Tracing Service Implementation Providers
 
-Those that want to have the Perl Implementation communicate with their tracing
+Those that want to have the Perl implementation communicate with their tracing
 service provider.
 
 See L<OpenTracing::Manual::Implementation>.
@@ -54,7 +54,7 @@ See L<OpenTracing::Manual::Implementation>.
 
 
 
-=head1 INTRODUCTION TO DISTRIBUTED AND OPENTRACING
+=head1 INTRODUCTION TO DISTRIBUTED TRACING AND OPENTRACING
 
 
 
@@ -81,8 +81,8 @@ L<OpenTracing::Interface/SYNOPSIS>
 
 
 
-Included is a list of Perl Modules and those that are on the horizon, see the
-L<OpenTracing::Manual::Ecosystem>.
+Included is a list of available Perl Modules and those that are on the horizon.
+For more, see the L<OpenTracing::Manual::Ecosystem>.
 
 =over
 
@@ -90,34 +90,34 @@ L<OpenTracing::Manual::Ecosystem>.
 
 The specification itself, and related modules.
 
-=item L<OpenTracing::Manual::Ecosystem/"Frameworks and Integrating OpenTracing">.
+=item L<OpenTracing::Manual::Ecosystem/"Integrations and Frameworks">.
 
-Distributed Tracing is all about connecting services and microservices together,
-the following modules will handle the edges of the application and services and
+Distributed tracing is all about connecting services and microservices together.
+These modules will handle the edges of the application and services and
 bootstrap tracer implementations.
 
 =item L<OpenTracing::Manual::Ecosystem/"Instrumenting a Application">.
 
-Once an application is running and the framwork has taken care of most of the
-bootstrapping, the following modules help to can more detailed spans.
+Once an application is running and the framework has taken care of most of the
+bootstrapping, these modules help to manage more detailed spans.
 
 =item L<OpenTracing::Manual::Ecosystem/"Implementations">.
 
-A list of various Implementations that are compliant with the OpenTracing API.
+A list of various implementations that are compliant with the OpenTracing API.
 
 =item L<OpenTracing::Manual::Ecosystem/"Development and Testing">.
 
-Modules that might be of interest when developping integrations or
+Modules that might be of interest when developing integrations or
 implementations.
 
 =item L<OpenTracing::Manual::Ecosystem/"Planned work">.
 
-The following modules will be needed for easier instrumentation of an
+These modules will be needed for easier instrumentation of an
 application or better framework integration and distributed tracing.
 
 =item L<OpenTracing::Manual::Ecosystem/"The Roadmap">.
 
-Since all the work has been done for Peceptyx, no further development will be
+Since all the work has been done for Perceptyx, no further development will be
 done on the following, unless ...
 
 =back
@@ -136,7 +136,7 @@ A role that defines the Tracer interface.
 
 =item L<OpenTracing::Manual::Instrumentation>
 
-For Application developers and Devops.
+For Application Developers and Devops.
 
 =item L<OpenTracing::Manual::Integration>
 

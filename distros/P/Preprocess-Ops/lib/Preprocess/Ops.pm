@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Preprocess::Ops;
-our $VERSION = 20200826;
+our $VERSION = 20200831;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -25,14 +25,13 @@ sub trim($)                                                                     
 
 sub method($)                                                                   #P Check whether a line of C code defines a method, returning (return, name, flags, comment) if it is, else ()
  {my ($line) = @_;                                                              # Line of C code
+  return () if $line =~ m(test.*//T\S);                                         # Tests are never methods
   if ($line =~ m(\Astatic\s*(.*?)(\w+)\s+//(\w*)\s*(.*)\Z))                     # Static function is always a method
    {return ($1, $2, $3, $4)
    }
   if ($line =~ m(\A(.*?)(\w+)\s+//(\w*)\s*(.*)\Z))                              # Static function is always a method
    {my @r = my ($return, $name, $flags, $comment) = ($1, $2, $3, $4);
-    if ($flags and $flags =~ m([C]))                                            # Constructor
-     {return @r
-     }
+    return @r if $flags and $flags =~ m([C]);                                   # Constructor
    }
   ()
   }
@@ -108,6 +107,7 @@ sub c($$$;$)                                                                    
    {my %duplicates; my @duplicates;                                             # Duplication check for first parameter plus short method name
     for my $i(keys @code)                                                       # Index of each line
      {my $line = $code[$i];
+      next if $line =~ m(\A//);                                                 # Ignore comment lines
 
       my ($return, $name, $flags, $comment) = method($line);                    # Parse function return, name, description comment
       if ($name)
@@ -343,94 +343,94 @@ B<Example:>
 
 
     my $I   =     fpd($d, qw(includes));
-  
+
     my $sbc = owf(fpe($d, qw(source base c)), <<'END');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   typedef struct $Node                                                            // Node definition
    {char * key;                                                                   // Key for the node
    } $Node;
-  
+
   $Node new$Node                                                                  //C Create a new node
    (const struct $Node node)                                                      // Input key
    {return node;
    }
-  
+
   static char * key_$Node                                                         // Get the key for a node
    (const $Node n)                                                                // Node to dump
    {return n.key;
    }
-  
+
   static void dump_$Node                                                          // Dump a node
    (const $Node n)                                                                // Node to dump
    {printf("%s
 ", n ▷ key);
    }
-  
+
   $Node n = new$Node(key: "a");                                                   //TnewNode
   assert(!strcmp(n ▷ key, "a"));
         n ▷ dump;                                                                 //Tdump
   END
-  
-  
+
+
     my $sdc = owf(fpe($d, qw(source derived c)), <<'END');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   typedef struct $Node                                                            // Node definition
    {wchar * key;
    } $Node;
-  
-  
+
+
   include base.c new$Node  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-  
+
   include base.c key_$Node  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-  
+
   include base.c dump_$Node  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   END
-  
-  
+
+
     my $bc = fpe($I, qw(base c));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $bh = fpe($I, qw(base h));
-  
+
     my $dc = fpe($I, qw(derived c));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $dh = fpe($I, qw(derived h));
-  
-  
+
+
     my $r = c($sbc, $bc, $bh);                                                    # Preprocess base.c  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-  
+
   # owf($logFile, readFile($bc)); exit;
-  
+
     ok index(scalar(readFile($bc)), <<'END') > -1;                                # Generated base.c  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   typedef struct BaseNode                                                            // Node definition
    {char * key;                                                                   // Key for the node
    } BaseNode;
-  
+
   BaseNode newBaseNode                                                                  //C Create a new node
    (const struct BaseNode node)                                                      // Input key
    {return node;
    }
-  
+
   static char * key_BaseNode                                                         // Get the key for a node
    (const BaseNode n)                                                                // Node to dump
    {return n.key;
    }
-  
+
   static void dump_BaseNode                                                          // Dump a node
    (const BaseNode n)                                                                // Node to dump
    {printf("%s
 ", n.proto->key(n));
    }
-  
+
   BaseNode n = newBaseNode(({struct BaseNode t = {key: "a", proto: &ProtoTypes_BaseNode}; t;}));                                                   //TnewNode
   assert(!strcmp(n.proto->key(n), "a"));
         n.proto->dump(n);                                                                 //Tdump
   END
-  
+
   # owf($logFile, readFile($bh)); exit;
     is_deeply scalar(readFile($bh)), <<END;                                       # Generated base.h
   BaseNode newBaseNode
@@ -447,9 +447,9 @@ B<Example:>
    } const ProtoTypes_BaseNode =
   {dump_BaseNode, key_BaseNode};
   END
-  
-  
-  
+
+
+
     my $R = c($sdc, $dc, $dh);                                                    # Preprocess derived.c  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   # owf($logFile, readFile($dc)); exit;
@@ -476,9 +476,9 @@ B<Example:>
    } const ProtoTypes_DerivedNode =
   {dump_DerivedNode, key_DerivedNode};
   END
-  
+
   # owf($logFile, dump(unbless $r)); exit;
-  
+
     is_deeply $r,
   {
     methods             => {
@@ -517,9 +517,9 @@ B<Example:>
     testsFound          => { dump => 1, newNode => 1 },
     testsNeeded         => { key => 1, newBaseNode => 1 },
   };
-  
+
   # owf($logFile, dump(unbless $R)); exit;
-  
+
     is_deeply $R,
   {
     methods             => {
@@ -558,7 +558,7 @@ B<Example:>
     testsFound          => {},
     testsNeeded         => { dump => 1, key => 1, newDerivedNode => 1 },
   };
-  
+
 
 
 =head2 PreprocessOpsParse Definition

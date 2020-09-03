@@ -1,0 +1,38 @@
+lib lib
+tlib t
+author LNATION
+email email@lnation.org
+version 0.02
+Hades::Macro {
+	abstract { Hades macro base class. }
+	synopsis {
+Quick summary of what the module does:
+
+	Hades::Macro::Kosmos base Hades::Macro {
+		macro :t(ArrayRef) :d([qw/geras/])
+		geras $mg :t(Object) { 
+			return q|...|;
+		}
+	}
+
+	}
+	macro :t(ArrayRef) :d([])
+	alias :t(HashRef[ArrayRef]) :pr
+	meta $meta :t(HashRef) :d({}) {
+		my $cls = ref $self;
+		for my $m (@{ £macro }) {
+			$meta->{$m} = {
+				meta => 'MACRO',
+				code => \&{"${cls}::${m}"},
+			};
+		}
+		if (£has_alias) {
+			for my $key (%{ £alias }) {
+				for my $alias (@{ £alias()->{$key} }) {
+					$meta->{$alias} = $meta->{$key};
+				}
+			}
+		}
+		return $meta;
+	}
+}

@@ -32,3 +32,13 @@ Revision history for Module-Generate
 
 0.20    2020-08-21
 	- Implement a keyword that can be used accross classes.
+
+0.24    2020-08-28
+	- If synopsis is set display only that in the SYNOPSIS pod section.
+	- add class_tests to define additional subtests for a class
+
+0.25    2020-08-29
+	- Order tests by sub index
+
+0.26    2020-09-01
+	- Fix parsing of compile phase blocks

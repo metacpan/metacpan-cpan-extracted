@@ -1,4 +1,15 @@
-0.0907
+0.0909 2020-08-26
+  - remove SPVM::IO::File, SPVM::IO::File::Handle because File I/O is a little complex for SPVM project and has many bugs.
+  - add complex examples
+  - remove no needed module documents
+0.0908 2020-08-20
+  - add complex, complexf to SPVM::Math
+  - move complex function from SPVM::Util to SPVM::Math
+  - remove complex int, long complex functions
+  - remove complex absolute, conjunction functions
+  - Not support Alpine Linux because Alpine Linux tests fail in current SPVM
+  - precompile C source code floating point constant become hex expression
+0.0907 2020-08-16
   - add caddi, caddl, caddf, caddd to SPVM::Util
   - add csubi, csubl, csubf, csubd to SPVM::Util
   - add cmuli, cmull, cmulf, cmuld to SPVM::Util
@@ -6,10 +17,9 @@
   - add cscamuli, cscamull, cscamulf, cscamuld to SPVM::Util
   - add cabsi, cabsl, cabsf, cabsd to SPVM::Util
   - add cconi, cconl, cconf, ccond to SPVM::Util
-
-0.0906
+0.0906 2020-08-10
   - add add,sub,scamul,mul,new_ident,new_zero method to SPVM::Matrix::* class.
-0.0905
+0.0905 2020-08-08
   - remove SPVM::NDArray and related modules because SPVM::NDArray is too big and complex for SPVM Core Modules.
   - add SPVM::Matrix related modules.
 0.0904 2020-07-30

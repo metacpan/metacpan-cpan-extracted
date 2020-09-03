@@ -1,5 +1,5 @@
 package Git::Raw::Remote;
-$Git::Raw::Remote::VERSION = '0.86';
+$Git::Raw::Remote::VERSION = '0.87';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Remote - Git remote class
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 SYNOPSIS
 
@@ -156,7 +156,7 @@ fields for the C<%fetch_opts> hash are:
 
 =item * "callbacks"
 
-See L<C<CALLBACKS>>.
+See L<CALLBACKS/"CALLBACKS">.
 
 =item * "prune"
 
@@ -185,7 +185,7 @@ remote tracking-branches. Valid fields for the C<%push_opts> hash are:
 
 =item * "callbacks"
 
-See L<C<CALLBACKS>>.
+See L<CALLBACKS/"CALLBACKS">.
 
 =item * "custom_headers"
 

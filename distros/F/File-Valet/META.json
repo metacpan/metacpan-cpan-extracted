@@ -1,0 +1,37 @@
+{
+   "abstract" : "File slurping, locking, and finding",
+   "author" : [
+      "TTKCIAR <ttk@ciar.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.048, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-Valet",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0.60",
+            "Test::Most" : "0.30"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.07"
+}
+

@@ -27,22 +27,22 @@ name: FIDO-Raw
 provides:
   FIDO::Raw:
     file: lib/FIDO/Raw.pm
-    version: '0.03'
+    version: '0.05'
   FIDO::Raw::Assert:
     file: lib/FIDO/Raw/Assert.pm
-    version: '0.03'
+    version: '0.05'
   FIDO::Raw::Cred:
     file: lib/FIDO/Raw/Cred.pm
-    version: '0.03'
+    version: '0.05'
   FIDO::Raw::PublicKey::EDDSA:
     file: lib/FIDO/Raw/PublicKey/EDDSA.pm
-    version: '0.03'
+    version: '0.05'
   FIDO::Raw::PublicKey::ES256:
     file: lib/FIDO/Raw/PublicKey/ES256.pm
-    version: '0.03'
+    version: '0.05'
   FIDO::Raw::PublicKey::RS256:
     file: lib/FIDO/Raw/PublicKey/RS256.pm
-    version: '0.03'
+    version: '0.05'
 requires:
   Carp: '0'
   XSLoader: '0'
@@ -52,7 +52,7 @@ requires:
 resources:
   bugtracker: https://github.com/jacquesg/p5-FIDO-Raw/issues
   repository: git://github.com/jacquesg/p5-FIDO-Raw.git
-version: '0.03'
+version: '0.05'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -133,7 +133,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.26.2
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::JACQUESG/Git::NextVersion'
       version: '2.046'
@@ -204,7 +204,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.26.2
+          git_version: 2.28.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -217,11 +217,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.03
+          tag: v0.05
           tag_format: v%V
           tag_message: '%N %v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.26.2
+          git_version: 2.28.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -235,7 +235,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.26.2
+          git_version: 2.28.0
           repo_root: .
       name: '@Author::JACQUESG/Git::Push'
       version: '2.046'

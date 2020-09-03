@@ -1,0 +1,49 @@
+Revision history for Syntax-SourceHighlight
+
+    !   fix missing version numbers in distribution
+    +   meta::cpan and kwalitee enhancements
+
+2.1.1   2020-08-25 22:09
+
+    +   README file
+
+2.1.0   2020-06-16 22:21
+
+    !   fix UTF-8 problems with highlights() and HighlightToken->{matched}
+    +   UTF-8 test: 03-UTF8.t
+    +   README.md for GitLab's project page
+
+2.0.0   2020-06-13 21:50
+
+    !   major perltidy-ing of all source files, split classes into separate
+        files
+    !   let MakeMaker's dist target create all necessary package files
+    +   C++ code rewrite from scratch, remove SWIG files
+    +   POD improvements
+
+1.1.2   2010-03-02 23:18
+
+    !   Makefile.PL fixes
+    +   move building code to SourceHighlightBuild.pm
+
+1.1.1   2010-03-02 23:17
+
+    +   automatic library download
+
+1.1.0   2010-03-31 23:16
+
+    +   HightlightEvent and HighlightToken
+    +   new test: 02-HighlightEvent.t
+
+1.0.2   2010-02-28 23:15
+
+    +   tests: 00-LangMap.t, 01-SourceHighlight.t
+
+1.0.1   2010-02-28 23:14
+
+    !   Makefile.PL improvements
+    +   META.yml
+
+1.0.0   2010-02-28 23:13
+
+    +   initial release

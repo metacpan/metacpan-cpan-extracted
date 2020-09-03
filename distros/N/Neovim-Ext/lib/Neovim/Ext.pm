@@ -1,10 +1,11 @@
 package Neovim::Ext;
-$Neovim::Ext::VERSION = '0.02';
+$Neovim::Ext::VERSION = '0.05';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
 use Carp;
 use Exporter qw/import/;
+use Scalar::Util qw/blessed/;
 use Neovim::Ext::MsgPack::RPC;
 use Neovim::Ext::Common qw/walk/;
 use Neovim::Ext::Buffer;
@@ -18,6 +19,7 @@ use Neovim::Ext::RemoteSequence;
 use Neovim::Ext::Tabpage;
 use Neovim::Ext::Window;
 use Neovim::Ext::Plugin::Host;
+use Neovim::Ext::Tie::Stream;
 
 __PACKAGE__->mk_accessors (qw/session channel_id metadata types api
 	vars vvars options buffers windows tabpages current funcs lua err_cb/);
@@ -45,12 +47,51 @@ sub from_session
 
 sub _setup_logging
 {
-	my ($name) = @_;
+	my ($name, $nvim) = @_;
 
-	if ($ENV{NVIM_PERL_LOG_FILE})
+	if ($name eq 'script')
 	{
-		*SAVESTDERR = *STDERR;
-		open *STDERR, '>', $ENV{NVIM_PERL_LOG_FILE};
+		my $stderr;
+		if ($ENV{NVIM_PERL_LOG_FILE})
+		{
+			open $stderr, '>', $ENV{NVIM_PERL_LOG_FILE};
+		}
+
+		# Redirect STDERR
+		tie (*STDERR => 'Neovim::Ext::Tie::Stream', sub
+			{
+				my ($data) = @_;
+
+				if ($stderr)
+				{
+					print $stderr $data if ($stderr);
+				}
+				else
+				{
+					$data .= "\n" if (substr ($data, -1) ne "\n");
+					$nvim->err_write ($data, async_ => 1);
+				}
+			}
+		);
+
+		# Redirect STDOUT
+		my $buffer;
+		open NEWSTDOUT, '>', \$buffer;
+		select NEWSTDOUT;
+		tie (*NEWSTDOUT => 'Neovim::Ext::Tie::Stream', sub
+			{
+				my ($data) = @_;
+				$data .= "\n" if (substr ($data, -1) ne "\n");
+				$nvim->out_write ($data, async_ => 1);
+			}
+		);
+	}
+	else
+	{
+		if ($ENV{NVIM_PERL_LOG_FILE})
+		{
+			open *STDERR, '>', $ENV{NVIM_PERL_LOG_FILE};
+		}
 	}
 }
 
@@ -67,10 +108,22 @@ sub start_host
 		push @plugins, $plugin;
 	}
 
-	_setup_logging ('rplugin');
-
 	$session //= Neovim::Ext::MsgPack::RPC::stdio_session();
 	my $nvim = from_session ($session);
+
+	if (scalar (@plugins) == 1 && $plugins[0] eq 'ScriptHost.pm')
+	{
+		# Special case: the legacy host
+		my $legacyHostPlugin = $INC{'Neovim/Ext/Plugin/Host.pm'};
+		$legacyHostPlugin =~ s/Host/ScriptHost/g;
+		@plugins = ($legacyHostPlugin);
+
+		_setup_logging ('script', $nvim);
+	}
+	else
+	{
+		_setup_logging ('rplugin', $nvim);
+	}
 
 	my $host = Neovim::Ext::Plugin::Host->new ($nvim);
 	$host->start (keys (%{{ map { $_ => 1 } @plugins }}))
@@ -129,7 +182,16 @@ sub run_loop
 
 	$err_cb //= sub
 	{
-		print STDERR @_;
+		my ($exception) = @_;
+
+		if (ref ($exception) && ref ($exception) eq 'Neovim::Ext::ErrorResponse')
+		{
+			print STDERR $exception->{msg};
+		}
+		else
+		{
+			print STDERR $exception;
+		}
 	};
 
 	$this->err_cb ($err_cb);
@@ -277,6 +339,15 @@ sub list_runtime_paths
 
 
 
+
+sub list_uis
+{
+	my ($this) = @_;
+	return $this->request ('nvim_list_uis');
+}
+
+
+
 sub foreach_rtp
 {
 	my ($this, $cb) = @_;
@@ -354,6 +425,15 @@ sub err_write
 
 
 
+
+sub err_writeln
+{
+	my ($self, $msg, @args) = @_;
+	return $self->request ('nvim_err_writeln', $msg, @args);
+}
+
+
+
 sub quit
 {
 	my ($self, $quit_command) = @_;
@@ -368,7 +448,7 @@ sub _to_nvim
 {
 	my ($this, $obj) = @_;
 
-	if (ref ($obj) && $obj->isa ('Neovim::Ext::Remote'))
+	if (ref ($obj) && blessed ($obj) && $obj->isa ('Neovim::Ext::Remote'))
 	{
 		return $obj->code_data;
 	}
@@ -413,7 +493,7 @@ Neovim::Ext - Perl bindings for neovim
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 DESCRIPTION
 
@@ -453,10 +533,15 @@ Execute a single ex command.
 
 Execute a single ex command and return the output.
 
-=head2 err_write( $msg, @args)
+=head2 err_write( $msg )
 
-Print C<$msg> as an error message. The message is buffered and wont display
-until a linefeed is sent.
+Print C<$msg> as an error message. Does not append a newline and won't be displayed
+if a linefeed is not sent.
+
+=head2 err_writeln( $msg )
+
+Print C<$msg> as an error message. Appends a newline so the buffer is flushed
+and displayed.
 
 =head2 eval( $string, @args )
 
@@ -499,6 +584,10 @@ lowest level input buffer and the call is not deferred.
 =head2 list_runtime_paths( )
 
 Return a list reference of paths contained in the 'runtimepath' option.
+
+=head2 list_uis( )
+
+Gets a list of attached UIs.
 
 =head2 next_message( )
 

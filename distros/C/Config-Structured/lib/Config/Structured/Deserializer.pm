@@ -1,5 +1,5 @@
 package Config::Structured::Deserializer;
-$Config::Structured::Deserializer::VERSION = '2.001';
+$Config::Structured::Deserializer::VERSION = '2.002';
 # ABSTRACT: Deserializes perl structures, JSON or YML data, from strings or files
 
 use strict;
@@ -79,7 +79,7 @@ Config::Structured::Deserializer - Deserializes perl structures, JSON or YML dat
 
 =head1 VERSION
 
-version 2.001
+version 2.002
 
 =head1 AUTHOR
 

@@ -1,3 +1,9 @@
+use strict;
+use warnings;
+
+use HTML::Filter;
+use SelectSaver;
+
 use Test::More tests => 3;
 
 my $HTML = <<EOT;
@@ -19,34 +25,37 @@ my $HTML = <<EOT;
 
 EOT
 
-use HTML::Filter;
-use SelectSaver;
 
 my $tmpfile = "test-$$.htm";
 die "$tmpfile already exists" if -e $tmpfile;
 
-open(HTML, ">$tmpfile") or die "$!";
-
 {
-    my $save = new SelectSaver(HTML);
+    open(my $fh, '>', $tmpfile) or die "$!";
+    my $save = SelectSaver->new($fh);
     HTML::Filter->new->parse($HTML)->eof;
+    close($fh);
 }
-close(HTML);
+{
+    open(my $fh, '<', $tmpfile) or die "$!";
+    local $/;
+    my $FILTERED = <$fh>;
+    close($fh);
 
-open(HTML, $tmpfile) or die "$!";
-local($/) = undef;
-my $FILTERED = <HTML>;
-close(HTML);
-
-#print $FILTERED;
-is($FILTERED, $HTML);
+    #print $FILTERED;
+    is($FILTERED, $HTML);
+}
 
 {
+
     package MyFilter;
-    @ISA=qw(HTML::Filter);
-    sub comment {}
-    sub output { push(@{$_[0]->{fhtml}}, $_[1]) }
+    use strict;
+    use warnings;
+    require HTML::Filter;
+    our @ISA = qw(HTML::Filter);
+    sub comment       { }
+    sub output        { push(@{$_[0]->{fhtml}}, $_[1]) }
     sub filtered_html { join("", @{$_[0]->{fhtml}}) }
+    1;
 }
 
 my $f2 = MyFilter->new->parse_file($tmpfile)->filtered_html;
@@ -56,5 +65,3 @@ unlink($tmpfile) or warn "Can't unlink $tmpfile: $!";
 
 unlike($f2, qr/Foo/);
 like($f2, qr/Bar/);
-
-

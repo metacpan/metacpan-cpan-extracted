@@ -28,17 +28,17 @@ provides:
     file: lib/Mojo/Transaction/HTTP/Role/Resume.pm
   Mojo::UserAgent::Role::Resume:
     file: lib/Mojo/UserAgent/Role/Resume.pm
-    version: v0.0.3
+    version: v0.1.0
 requires:
-  Class::Method::Modifiers: '0'
-  Mojolicious: '0'
-  Role::Tiny: '0'
-  perl: '5.010'
+  Class::Method::Modifiers: '1.05'
+  Mojolicious: '8.00'
+  Role::Tiny: '2.001001'
+  perl: '5.016'
 resources:
   bugtracker: https://gitlab.com/karjala/mojo-useragent-role-resume-for-perl/issues
   homepage: https://gitlab.com/karjala/mojo-useragent-role-resume-for-perl
   repository: git://gitlab.com/karjala/mojo-useragent-role-resume-for-perl.git
-version: v0.0.3
+version: v0.1.0
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

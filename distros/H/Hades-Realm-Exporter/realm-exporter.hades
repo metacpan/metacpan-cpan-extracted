@@ -1,0 +1,344 @@
+lib lib
+tlib t
+author LNATION
+email email@lnation.org
+version 0.03
+Hades::Realm::Exporter base Hades {
+	abstract { Hades realm for Exporter }
+	synopsis {
+Quick summary of what the module does:
+
+	Hades->run({
+		eval => 'Kosmos {
+			[curae penthos] :t(Int) :d(2) :p :pr :c :r :i(1, GROUP)
+			geras $nosoi :t(Int) :d(5) :i { if (penthos() == $nosoi) { return curae; } } 
+		}',
+		realm => 'Exporter',
+	});
+
+	... generates ...
+
+	package Kosmos;
+	use strict;
+	use warnings;
+	use Exporter qw/import/;
+	our $VERSION = 0.01;
+	our ( @EXPORT, @EXPORT_OK, %EXPORT_TAGS, %ACCESSORS );
+
+	BEGIN {
+		@EXPORT = (
+			'curae',       'has_curae', 'clear_curae', 'penthos',
+			'has_penthos', 'clear_penthos'
+		);
+		@EXPORT_OK = (
+			'curae',       'has_curae',     'clear_curae', 'penthos',
+			'has_penthos', 'clear_penthos', 'geras'
+		);
+		%EXPORT_TAGS = (
+			'METHODS'    => ['geras'],
+			'CLEARERS'   => [ 'clear_curae', 'clear_penthos' ],
+			'GROUP'      => [ 'curae', 'penthos' ],
+			'PREDICATES' => [ 'has_curae', 'has_penthos' ],
+			'ACCESSORS'  => [ 'curae', 'penthos' ]
+		);
+		%ACCESSORS = ( curae => 2, penthos => 2, );
+	}
+
+	sub curae {
+		my ($value) = @_;
+		my $private_caller = caller();
+		if ( $private_caller ne __PACKAGE__ ) {
+			die "cannot call private method curae from $private_caller";
+		}
+		if ( defined $value ) {
+			if ( ref $value || $value !~ m/^[-+\d]\d*$/ ) {
+				die qq{Int: invalid value $value for accessor curae};
+			}
+			$ACCESSORS{curae} = $value;
+		}
+		return $ACCESSORS{curae};
+	}
+
+	sub has_curae {
+		return exists $ACCESSORS{curae};
+	}
+
+	sub clear_curae {
+		delete $ACCESSORS{curae};
+		return 1;
+	}
+
+	sub penthos {
+		my ($value) = @_;
+		my $private_caller = caller();
+		if ( $private_caller ne __PACKAGE__ ) {
+			die "cannot call private method penthos from $private_caller";
+		}
+		if ( defined $value ) {
+			if ( ref $value || $value !~ m/^[-+\d]\d*$/ ) {
+				die qq{Int: invalid value $value for accessor penthos};
+			}
+			$ACCESSORS{penthos} = $value;
+		}
+		return $ACCESSORS{penthos};
+	}
+
+	sub has_penthos {
+		return exists $ACCESSORS{penthos};
+	}
+
+	sub clear_penthos {
+		delete $ACCESSORS{penthos};
+		return 1;
+	}
+
+	sub geras {
+		my ($nosoi) = @_;
+		$nosoi = defined $nosoi ? $nosoi : 5;
+		if ( !defined($nosoi) || ref $nosoi || $nosoi !~ m/^[-+\d]\d*$/ ) {
+			$nosoi = defined $nosoi ? $nosoi : 'undef';
+			die
+			    qq{Int: invalid value $nosoi for variable \$nosoi in method geras};
+		}
+		if ( penthos() == $nosoi ) { return curae(); }
+	}
+
+	1;
+
+	__END__
+
+	}
+	export :t(HashRef) :d({})
+	build_self $name :t(Optional[Str]) { 
+		return qq|$name|;
+	}
+	default_export_hash $mg :t(Object) $class :t(HashRef) $export :t(HashRef) :d({}) {
+		if ($class->{CURRENT}->{BASE} || $class->{CURRENT}->{PARENT}) {
+			for my $cls ( @{ $class->{CURRENT}->{BASE} || [] }, @{ $class->{CURRENT}->{PARENT} || [] }) {
+				if (£export->{$cls}) {
+					my %unique;
+					for ( keys %{ £export->{$cls} } ) {
+						push @{$export->{$_}}, map { $unique{$_}++; $_; } @{ £export->{$cls}->{$_} };
+					}
+					for ( keys %unique ) {
+						£build_sub_no_arguments($mg, [ $_, "return ${cls}::$_(\@_)" ], {});
+					}
+				} else { }
+			}
+		}
+		return $export;
+	}
+	build_new $mg :t(Object) $meta :t(HashRef) $our :d(q|@EXPORT, @EXPORT_OK, %EXPORT_TAGS|) {
+		my %class = %Module::Generate::CLASS;
+		my $begin = '';
+		my $export = £default_export_hash($mg, \%class);
+		for (keys %{$meta}) {
+			if ($meta->{$_}->{meta} =~ m/^(ACCESSOR|METHOD)$/) {
+				if ($1 eq 'ACCESSOR') {
+					$begin .= $_  . q| => | . $meta->{$_}->{default} . q|, | if $meta->{$_}->{default};
+				}
+				my $import = $meta->{$_}->{import};
+				my $now = shift @{$import};
+				£build_export_tags($_, "${1}S", $export, $now, $import);
+				£build_export_tags("has_$_", 'PREDICATES', $export, $now, []) if $meta->{$_}->{predicate};
+				£build_export_tags("clear_$_", 'CLEARERS', $export, $now, []) if $meta->{$_}->{clearer};
+			}
+		}
+		£export->{$class{CURRENT}{NAME}} = {%{$export}};
+		$mg->our('(' . $our . ', %ACCESSORS)');
+		$begin = £build_exporter('%ACCESSORS = (' . $begin . ')', $mg, $export, $meta);
+		if ( $class{CURRENT}{BEGIN} ) {
+			( my $code = $class{CURRENT}{BEGIN} ) =~ s/\s*\}\s*$//;
+			$begin = $code . $begin . "\}";
+		}
+		else {  $begin = qq|{ $begin }|; }
+		$class{CURRENT}{BEGIN} = $begin;
+		delete $class{CURRENT}{SUBS}{new};
+	}
+	build_exporter $begin :t(Str) $mg :t(Object) $export :t(HashRef) $meta :t(HashRef) {
+		my $ex = delete $export->{EXPORT};
+		my $ex_ok = delete $export->{EXPORT_OK};
+		my $ex_tags = Module::Generate::_stringify_struct('undefined', $export);
+		$ex_tags =~ s/^{/(/;
+		$ex_tags =~ s/}$/);/;
+		$begin = '@EXPORT = (' . join(', ', map { qq|'$_'| } @{$ex}) . ');'
+			. '@EXPORT_OK = (' . join(', ', map { qq|'$_'| } @{$ex_ok}) . ');'
+			. '%EXPORT_TAGS = ' . $ex_tags
+			. $begin;
+		return $begin;
+	}
+	build_export_tags $name :t(Str) $type :t(Str) $export :t(HashRef) $now :t(Optional[Int]) $import :t(ArrayRef) {
+		push @{ $export->{$type} }, $name;
+		push @{$export->{EXPORT_OK}}, $name;
+		push @{$export->{EXPORT}}, $name if $now;
+		for my $i (@{$import}) {
+			$i =~ s/^\s*|\s*$//;
+			push @{$export->{$i}}, $name;
+		}
+		return $export;
+	}
+	after_class $mg :t(Object) {
+		$mg->use(q|Exporter qw/import/|);
+	}
+	build_sub_or_accessor_attributes :ar {
+		my @res = £$orig(@params);
+		unshift @res, (
+			qr/^(\:import|\:i$)/ => sub {
+				$params[-1]->{$params[-3]}->{import} = [0];
+			},
+			qr/^(\:import|\:i)\(/ => sub {
+				my $value = shift;
+				$value =~ s/(\:import|\:i)\((.*)\)$/$2/sg;
+				$params[-1]->{$params[-3]}->{import} = [ split /,/, $value ];
+			}
+		);
+	}
+	build_accessor_no_arguments $mg $token $meta {
+		$meta->{$token->[0]}->{meta} = 'ACCESSOR';
+		$mg->accessor($token->[0])->code(£build_accessor_code($token->[0], '', '', ''))
+			->clear_tests->test(£build_tests($token->[0], $meta->{$token->[0]}, '', {%Module::Generate::CLASS}))
+			->pod(qq|call $token->[0] accessor function.|)->example(qq|$token->[0](\$value)|);
+		return $meta;
+	}
+	build_accessor_code $name :t(Str) $private :t(Str) $type :t(Str) $trigger :t(Str) {
+		return qq|{
+			my ( \$value ) = \@_; $private
+			if ( defined \$value ) { $type
+				\$ACCESSORS{$name} = \$value; $trigger
+			}
+			return \$ACCESSORS{$name};
+		}|;
+	}
+	build_accessor :ar {
+		my @res = £$orig(@params);
+		$params[0]->clear_tests->test(£build_tests($params[1], $params[2]->{$params[1]}, '', {%Module::Generate::CLASS}));
+		$params[0]->pod(sprintf 
+			q|call %s accessor function. Expects a single param to be of type %s.|,
+			$params[1],
+			$params[2]->{$params[1]}->{type}->[0] || 'Any'
+		) unless $params[2]->{$params[1]}->{pod};
+		$params[0]->example(qq|$params[1]()|) unless $params[2]->{$params[1]}->{example};
+	}
+	build_modify { }
+	build_sub_no_arguments $mg $token $meta {
+		my $name = shift @{$token};
+		$name =~ m/^(begin|unitcheck|check|init|end|new)$/
+			? $mg->$name(join ' ', @{$token})
+			: $mg->sub($name)->code(£build_sub_code('', '', '', join( ' ', @{$token})))
+				->pod(qq|call $name function. Expects no params.|)->example(qq|$name()|);
+		return $meta;
+	}
+	build_sub_code $name :t(Str) $params :t(Str) $subtype :t(Str) $code :t(Str) {
+		$params =~ s/^\s*,\s*//;
+		$params = qq|my ($params) = \@_;| if $params;
+		return qq|{
+			$params $subtype
+			$code;
+		}|;
+	}
+	build_sub :ar {
+		my @res = £$orig(@params);
+		$params[0]->clear_tests->test(£build_tests($params[1], $params[2]->{$params[1]}, '', {%Module::Generate::CLASS}));
+		$params[0]->pod(qq|call $params[1] function. Expects $params[2]->{$params[1]}->{params_explanation}|);
+	}
+	build_clearer $mg :t(Object) $name :t(Str) $meta :t(HashRef) {
+		my %class = %Module::Generate::CLASS;	
+		$mg->sub(qq|clear_$name|)
+		->code(qq|{
+			delete \$ACCESSORS{$name};
+			return 1;
+		}|)
+		->pod(qq|clear $name accessor function.|)
+		->example(qq|clear_$name()|)
+		->clear_tests
+		->test(
+			['ok', qq|$class{CURRENT}{NAME}::clear_$name|],
+			['is', qq|$class{CURRENT}{NAME}::$name|, 'undef']
+		);
+	}
+	build_predicate $mg :t(Object) $name :t(Str) $meta :t(HashRef) {
+		my %class = %Module::Generate::CLASS;	
+		$mg->sub(qq|has_$name|)
+		->code(qq|{
+			return exists \$ACCESSORS{$name};
+		}|)
+		->pod(qq|has_$name accessor function will return trye if $name accessor has a value.|)
+		->example(qq|has_$name()|)
+		->clear_tests
+		->test(
+			($meta->{$name}->{required} || $meta->{$name}->{default} ? (
+				['is', qq|$class{CURRENT}{NAME}::has_$name|, 1],
+			) : (
+				['is', qq|$class{CURRENT}{NAME}::has_$name|, q|''|],
+			)),
+			£build_tests($name, $meta->{$name}, '', \%class),
+			['is', qq|$class{CURRENT}{NAME}::has_$name|, 1],
+		);
+	}
+	build_coerce $name :t(Str) $param :t(Str) $code :t(Optional[Str]) {
+		return defined $code ? $code =~ m/^\w+$/
+			? qq|$param = $code($param);|
+			: $code
+		: q||;
+	}
+	build_trigger $name :t(Str) $param :t(Str) $code :t(Optional[Str]) {
+		return defined $code
+			? $code =~ m/^1$/
+				? qq|_trigger_$name|
+				: $code =~ m/^\w+$/
+					? qq|$code($param);|
+					: $code
+		: q||;
+	}
+	build_tests $name :t(Str) $meta :t(HashRef) $mod :t(Optional[Str]) $class :t(Optional[HashRef]) {
+		my @tests;
+		if ($class) {
+			my $cls = $class->{CURRENT}->{NAME};
+			if ($meta->{meta} eq 'ACCESSOR') {
+				$meta->{private} ? do {
+					push @tests, ['eval', qq|${cls}::${name}()|, 'private method|private attribute'];
+				} : do {
+					push @tests, ['is', qq|${cls}::${name}()|, 'undef'] if !$meta->{required} && !$meta->{default};
+					push @tests, ['eval', qq|${cls}::${name}()|, q|^$|];
+					my (@test_cases) = £build_test_data($meta->{type}->[0] || 'Any', $name);
+					if (scalar @test_cases > 1) {
+						my $valid = shift @test_cases;
+						push @tests, ['deep', qq|${cls}::${name}($valid)|, $valid];
+						unless ($meta->{coerce}) {
+							for (@test_cases) {
+								push @tests, ['eval', qq|${cls}::${name}($_)|, 'invalid|value|type|constraint|greater|atleast' ];
+							}
+						}
+						push @tests, ['deep', qq|${cls}::${name}|, $valid];
+					}
+				};
+			} elsif ($meta->{meta} eq 'METHOD') {
+				 $meta->{private} ? do {
+					push @tests, ['eval', qq|${cls}::${name}()|, 'private method'];
+				 } : $meta->{param} && do {
+					my %test_data = map {
+						$_ => [
+							£build_test_data($meta->{params_map}->{$_}->{type} || 'Any', $name), ($meta->{params_map}->{$_}->{type} || 'Any') !~ m/^(|Optional|Any|Item)/ ? q|undef| : ()
+						]
+					} @{ $meta->{param} };
+					for my $key (@{$meta->{param}}) {
+						for my $ah (splice @{$test_data{$key}}, 1) {
+							push @tests, [
+								'eval',
+								sprintf(
+									q|%s::%s(%s)|,
+									$cls,
+									$name,
+									join ', ', map {$key eq $_ ? $ah : $test_data{$_}->[0]} @{$meta->{param}}
+								),
+								'invalid|value|type|constraint|greater|atleast'
+							];
+						}
+					}
+				}
+			}
+		}
+		push @tests, @{$meta->{test}} if $meta->{test};
+		return @tests;
+	}
+}

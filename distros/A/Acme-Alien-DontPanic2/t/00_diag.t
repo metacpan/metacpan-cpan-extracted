@@ -13,7 +13,12 @@ $modules{$_} = $_ for qw(
   Alien::Base
   Alien::Build
   Alien::Build::MB
+  File::Temp
+  Inline
+  Inline::C
+  Inline::CPP
   Module::Build
+  Path::Tiny
   Test2::V0
   Test::Alien
 );

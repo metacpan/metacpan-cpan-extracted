@@ -1,0 +1,11 @@
+0.000001 2020-09-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to set stash keys 'plugins' and 'handlers', as
+	  documented.
+
+	- [doc] Tweak docs.
+
+
+0.000   2020-09-03  Released-By: PERLANCAR
+
+        - First, early release.

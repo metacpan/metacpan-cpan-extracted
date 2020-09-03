@@ -9,6 +9,7 @@ package Local {
 		prefix          => 'Local',
 		factory_package => 'Local',
 	);
+	use namespace::autoclean;
 	
 	role Role1 {
 		before_apply {

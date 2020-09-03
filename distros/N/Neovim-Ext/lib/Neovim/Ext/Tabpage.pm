@@ -1,5 +1,5 @@
 package Neovim::Ext::Tabpage;
-$Neovim::Ext::Tabpage::VERSION = '0.02';
+$Neovim::Ext::Tabpage::VERSION = '0.05';
 use strict;
 use warnings;
 use Carp qw/croak/;
@@ -19,7 +19,7 @@ Neovim::Ext::Tabpage - Neovim Tabpage class
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 

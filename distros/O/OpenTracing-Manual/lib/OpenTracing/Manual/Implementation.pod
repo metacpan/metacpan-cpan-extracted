@@ -12,12 +12,12 @@ OpenTracing::Manual::Implementation - For Tracing Service Implementations
 
 
 This part of the L<OpenTracing::Manual> will describe how communication with the
-backend is established through some sort of I<Agent>. This manual alsi provides
+backend is established through some sort of I<Agent>. This manual also provides
 information on how to C<extract_context> or C<inject_context> and carriers.
 
 
 
-=head1 TABLE Of CONTENTS
+=head1 TABLE OF CONTENTS
 
 
 
@@ -45,7 +45,7 @@ information on how to C<extract_context> or C<inject_context> and carriers.
 
 
 
-OpenTracing merely descibes the API, see the L<OpenTracing::Interface>
+OpenTracing merely describes the API, see the L<OpenTracing::Interface>
 documentation. It only requires that any implementation has a minimal set of
 methods that have a signature, or defined argument list. It is a deliberate
 choice to have the specification as POD and leaving the implementation to the
@@ -60,9 +60,9 @@ useful tools to help building your own.
 
 =head2 Bootstrapping a Tracer Implementation
 
-Because of directure structure, Perl best practices and more, an implementation
-consists a several files, grouped under a single namespace. However, the API has
-no higher level definition of what an implemetation is, it only speaks of the
+Because of directory structure, Perl best practices and more, an implementation
+consists of several files, grouped under a single namespace. However, the API has
+no higher level definition of what an implementation is, it only speaks of the
 L<Tracer|OpenTracing::Interface::Tracer> being the I<entry point> of the API. It
 only looks more natural to be able to do things like:
 
@@ -73,22 +73,22 @@ Which bootstraps the L<OpenTracing::GlobalTracer>.
 Or be more specific in your own code:
 
     use aliased
-        "OpenTracing::Implementatation::MyServiceProvider",
+        "OpenTracing::Implementation::MyServiceProvider",
         "Implementation" ;
     
     my $tracer = Implementation->bootstrap_tracer( %options );
 
-Although the 'Implementation' could do all sorts of things whith that call, it
+Although the 'Implementation' could do all sorts of things with that call, it
 basically is the same as:
 
     use aliased
-        "OpenTracing::Implementatation::MyServiceProvider::Tracer" ;
+        "OpenTracing::Implementation::MyServiceProvider::Tracer" ;
     
     my $tracer = Tracer->new( %options );
 
 =head2 Writing your own Implementation and using Roles
 
-Since a lot of the responsabilities described in the <OpenTracing::Interface>
+Since a lot of the responsibilities described in the <OpenTracing::Interface>
 are common across all implementations, there is a whole set of L<Moo::Role>s
 files to quickly build your own classes.
 
@@ -102,7 +102,7 @@ files to quickly build your own classes.
     
     1;
 
-Look at L<OpenTracing::Roles> what each of those roles provide.
+Look at L<OpenTracing::Roles> to see what each of those roles provides.
 
 
 
@@ -121,7 +121,8 @@ for example the implementing Tracer's definition of spanID and traceID
 =item Any Baggage Items
 
 These are key:value pairs that cross process-boundaries.
-These may be useful to have some data available for access throughout the trace.
+These may be useful to have some data available for access throughout the trace
+(https://opentracing.io/docs/overview/tags-logs-baggage/#baggage-items).
 
 =back
 
@@ -146,7 +147,7 @@ application level, as they are part of the 'public' API.
     
     1;
 
-As implementor, it's your own responsabillity to send that information back to
+As implementor, it's your own responsibility to send that information back to
 the service provider.
 
 
@@ -154,12 +155,12 @@ the service provider.
 =head2 Sending Span Information to a Service Provider Backend
 
 How information is being send back to a service provider backend is beyond the
-scope of this manual. There are different scenario's to do so. Some may want to
+scope of this manual. There are different scenarios to do so. Some may want to
 collect a larger number of spans and send those straight to the backend. Others
-may have a locally installed agent that will gather spans comming from multiple
+may have a locally installed agent that will gather spans coming from multiple
 threads and send them as a batch to the backend.
 
-Eitherway, as a implementor, you will need to add to the L<Tracer|OpenTracing::
+Either way, as a implementor, you will need to add to the L<Tracer|OpenTracing::
 Interface::Tracer> a I<send> method that will communicate with the outer world.
 
     package OpenTracing::Implementation::MyServiceProvider::Tracer
@@ -185,17 +186,19 @@ a call back added as a C<on_finish> attribute, would transmit the span.
 
 =head2 Propagating Tracer Information between Services
 
-At the boundry or edges of an application, Frameworks use the two methods
+At the boundary or edges of an application, Frameworks use the two methods
 L<< C<inject_context>|OpenTracing::Interface::Tracer/
 "inject_context(-OPENTRACING_CARRIER_FORMAT-=>-$carrier,-$span_context-)" >> and
 L<< C<extract_context>|OpenTracing::Interface::Tracer/
-"extract_context(-OPENTRACING_CARRIER_FORMAT-=>-$carrier-)" >>.
+"extract_context(-OPENTRACING_CARRIER_FORMAT-=>-$carrier-)" >>
+(L<https://opentracing.io/docs/overview/tracers/#propagating-a-trace-with-inject-extract>).
+
 
 It is required that these methods are provided in the implementation. There are
 at least three OpenTracing required formats that need to be support. Only the
 C<OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS> is being described in the manual.
 
-An C<inject_context> might be implememnted like:
+An C<inject_context> might be implemented like:
 
     package OpenTracing::Implementation::MyServiceProvider::Tracer
     
@@ -225,23 +228,23 @@ An C<inject_context> might be implememnted like:
         return $injectors->{$carrier_format}->($carrier, $context)
     }
 
-Where the C<X_YOUR_IMPLEMENTATION_TRACE_ID> is fully provider dependant. The
+Where the C<X_YOUR_IMPLEMENTATION_TRACE_ID> is fully provider dependent. The
 other (micro) service you want to talk may be implemented using a complete
 different technology stack or language. But since (most likely) that service
-will use the same Distributated Tracing Backend, it expects the carrier to hold
+will use the same Distributed Tracing Backend, it expects the carrier to hold
 the trace information in a known format.
 
 
 
 =head2 OpenTracing Roles and Types
 
-The entire L<API|OpenTracing::Interface>is described in POD, it also provides a
+The entire L<API|OpenTracing::Interface> is described in POD, it also provides a
 set of Roles. These roles can optionally be consumed to do all the type-checking
 for parameters, options, and returned results.
 
 It also provides L<OpenTracing::Types>. These duck-type checking types check
 that a object will at least have the methods described in the API.
-A C<isa> check will dictate a subclassing, which is what is deliberatly avoided.
+A C<isa> check will dictate a subclassing, which is what is deliberately avoided.
 
 
 

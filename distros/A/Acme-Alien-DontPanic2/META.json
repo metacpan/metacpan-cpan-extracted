@@ -58,6 +58,11 @@
       },
       "test" : {
          "requires" : {
+            "File::Temp" : "0",
+            "Inline" : "0.56",
+            "Inline::C" : "0",
+            "Inline::CPP" : "0",
+            "Path::Tiny" : "0",
             "Test2::V0" : "0.000060",
             "Test::Alien" : "0.05",
             "perl" : "5.006"
@@ -77,7 +82,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.2900",
+   "version" : "2.2901",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.31",
       "requires" : {

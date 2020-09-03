@@ -25,6 +25,23 @@ my $build = Module::Build->new(
     add_to_cleanup =>
       [qw(MANIFEST.bak cover_db t/data/random_seed t/data/trustdb.gpg)],
 
+    # Add additional package metadata.
+    meta_merge => {
+        'meta-spec' => { version => '2' },
+        resources   => {
+            bugtracker => {
+                mailto => 'bug-PGP-Sign@rt.cpan.org',
+                web => 'https://rt.cpan.org/Dist/Display.html?Name=PGP-Sign',
+            },
+            homepage   => 'https://www.eyrie.org/~eagle/software/pgp-sign',
+            repository => {
+                url  => 'https://github.com/rra/pgp-sign.git',
+                web  => 'https://github.com/rra/pgp-sign',
+                type => 'git',
+            },
+        },
+    },
+
     # Other package relationships.
     configure_requires => { 'Module::Build' => 0.28 },
     requires           => {

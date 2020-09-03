@@ -1,5 +1,14 @@
 Revision history for Webservice-KvKAPI
 
+0.011     2020-09-02 15:52:34Z
+
+    * Make RSIN work around the default
+
+0.010     2020-09-02 13:41:40Z
+
+    * Implement workaround for getting RSIN of non legal entity
+      businesses after a chat with a KvK developer.
+
 0.009     2020-07-28 12:41:12Z
 
     * Add rsin search support to CLI client

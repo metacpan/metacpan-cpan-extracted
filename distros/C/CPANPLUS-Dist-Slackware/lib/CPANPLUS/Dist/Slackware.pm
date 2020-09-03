@@ -3,7 +3,7 @@ package CPANPLUS::Dist::Slackware;
 use strict;
 use warnings;
 
-our $VERSION = '1.028';
+our $VERSION = '1.029';
 
 use base qw(CPANPLUS::Dist::Base);
 
@@ -720,7 +720,7 @@ CPANPLUS::Dist::Slackware - Install Perl distributions on Slackware Linux
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware version 1.028.
+This document describes CPANPLUS::Dist::Slackware version 1.029.
 
 =head1 SYNOPSIS
 
@@ -979,7 +979,7 @@ CPANPLUS::Dist::Build.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-Similar to the build scripts provided by L<http://slackbuilds.org/>,
+Similar to the build scripts provided by L<https://slackbuilds.org/>,
 CPANPLUS::Dist::Slackware respects the following environment variables:
 
 =over 4
@@ -1032,7 +1032,7 @@ C<chown>, C<cp>, C<file>, C<make>, C<strip> and a C compiler.
 
 In order to manage packages as a non-root user, which is highly recommended,
 you must have C<sudo> and, optionally, C<fakeroot>.  You can download a script
-that builds C<fakeroot> from L<http://slackbuilds.org/>.
+that builds C<fakeroot> from L<https://slackbuilds.org/>.
 
 Requires the modules CPANPLUS and Module::Pluggable from CPAN.
 
@@ -1048,7 +1048,7 @@ If available, the modules Parse::CPAN::Meta, Pod::Find and Pod::Simple are used.
 =head1 INCOMPATIBILITIES
 
 Packages created with CPANPLUS::Dist::Slackware may provide the same files as
-packages built with scripts from L<http://slackbuilds.org/> and packages created
+packages built with scripts from L<https://slackbuilds.org/> and packages created
 with C<cpan2tgz>.
 
 =head1 SEE ALSO
@@ -1064,10 +1064,10 @@ Andreas Voegele E<lt>voegelas@cpan.orgE<gt>
 
 Some Perl distributions fail to show interactive prompts if the C<verbose> option
 is not set.  This problem has been reported as bug #47818 and bug #72095 at
-L<http://rt.cpan.org/>.
+L<https://rt.cpan.org/>.
 
 Please report any bugs to C<bug-cpanplus-dist-slackware at rt.cpan.org>, or
-through the web interface at L<http://rt.cpan.org/>.
+through the web interface at L<https://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -1076,6 +1076,6 @@ Copyright 2012-2020 Andreas Voegele
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
-See http://dev.perl.org/licenses/ for more information.
+See https://dev.perl.org/licenses/ for more information.
 
 =cut

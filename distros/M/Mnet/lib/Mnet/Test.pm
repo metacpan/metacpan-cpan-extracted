@@ -87,6 +87,18 @@ INIT {
     #   Mnet::Test::time used for test unixtime, refer to Mnet::Test::time sub
     our ($data, $time) = (undef, 0);
 
+    # autoflush standard output
+    #   so that multi-process syswrite lines are not split
+    $| = 1;
+
+    # init stdout file handle to bypass Mnet::Tee for diff output
+    our $stdout = undef;
+    if ($INC{"Mnet/Tee.pm"}) {
+        $stdout = $Mnet::Tee::stdout;
+    } else {
+        open($stdout, ">&STDOUT") or die "error duping stdout, $!";
+    }
+
     # defined --record option
     Mnet::Opts::Cli::define({
         getopt      => 'record:s',
@@ -241,23 +253,24 @@ sub _diff {
     if ($outputs ne $test_data->{outputs}) {
         eval("require Text::Diff; 1");
         $diff = "Test output is different, need Text::Diff to show more.\n";
-        $diff = Text::Diff::diff(\$outputs, \$test_data->{outputs})
+        $diff = Text::Diff::diff(\$test_data->{outputs}, \$outputs)
             if $INC{"Text/Diff.pm"};
     }
 
     # output detected differences, unless running in --batch mode
+    #   Mnet::Test::test_pause used to keep test diff output out of test data
     if (not $opts->{batch}) {
         my $was_paused = Mnet::Tee::test_paused();
         Mnet::Tee::test_pause();
-        syswrite STDOUT, "\n" . "-" x 79 . "\n";
-        syswrite STDOUT, "diff --test --replay $opts->{replay}";
-        syswrite STDOUT, "\n" . "-" x 79 . "\n\n";
+        syswrite $Mnet::Test::stdout, "\n" . "-" x 79 . "\n";
+        syswrite $Mnet::Test::stdout, "diff --test --replay $opts->{replay}";
+        syswrite $Mnet::Test::stdout, "\n" . "-" x 79 . "\n\n";
         if ($diff) {
-            syswrite STDOUT, $diff;
+            syswrite $Mnet::Test::stdout, $diff;
         } else {
-            syswrite STDOUT, "Test output is identical.\n";
+            syswrite $Mnet::Test::stdout, "Test output is identical.\n";
         }
-        syswrite STDOUT, "\n";
+        syswrite $Mnet::Test::stdout, "\n";
         Mnet::Tee::test_unpause() if not $was_paused;
     }
 
@@ -288,7 +301,7 @@ call. You do not need to call this function unless you are not using
 L<Mnet::Opts::Cli> to parse command line options or if you want to examine
 your own test diff data.
 
-If the test output has changed a fiff will be presented using the L<Text::Diff>
+If the test output has changed a diff will be presented using the L<Text::Diff>
 module.
 
 Refer to the DESCRIPTION section of this document for more information.

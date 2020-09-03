@@ -3,13 +3,16 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.1400';
+our $VERSION = '0.1602';
 
+use Math::Bezier;
 use MIDI::Simple;
 use Music::Duration;
 use Moo;
 use strictures 2;
 use namespace::clean;
+
+use constant TICKS => 96; # Per quarter note
 
 
 sub BUILD {
@@ -37,8 +40,12 @@ has divisions => ( is => 'rw' );
 has click          => ( is => 'ro', default => sub { 'n33' } );
 has bell           => ( is => 'ro', default => sub { 'n34' } );
 has kick           => ( is => 'ro', default => sub { 'n35' } ); # Alt: 36
+has acoustic_bass  => ( is => 'ro', default => sub { 'n35' } );
+has electric_bass  => ( is => 'ro', default => sub { 'n36' } );
 has side_stick     => ( is => 'ro', default => sub { 'n37' } );
 has snare          => ( is => 'ro', default => sub { 'n38' } ); # Alt: 40
+has acoustic_snare => ( is => 'ro', default => sub { 'n38' } );
+has electric_snare => ( is => 'ro', default => sub { 'n40' } );
 has clap           => ( is => 'ro', default => sub { 'n39' } );
 has open_hh        => ( is => 'ro', default => sub { 'n46' } );
 has closed_hh      => ( is => 'ro', default => sub { 'n42' } );
@@ -275,7 +282,7 @@ sub flam {
     my ($self, $spec, $patch) = @_;
     my $x = $MIDI::Simple::Length{$spec};
     my $y = $MIDI::Simple::Length{ $self->sixtyfourth };
-    my $z = sprintf '%0.f', ($x - $y) * 96;
+    my $z = sprintf '%0.f', ($x - $y) * TICKS;
     my $accent = sprintf '%0.f', $self->score->Volume / 2;
     $self->accent_note($accent, $self->sixtyfourth, $patch);
     $self->note('d' . $z, $patch);
@@ -289,6 +296,46 @@ sub roll {
     my $y = $MIDI::Simple::Length{$spec};
     my $z = sprintf '%0.f', $x / $y;
     $self->note($spec, $patch) for 1 .. $z;
+}
+
+
+sub crescendo_roll {
+    my ($self, $span, $length, $spec, $patch) = @_;
+    $patch ||= $self->snare;
+    my ($i, $j, $k) = @$span;
+    my $x = $MIDI::Simple::Length{$length};
+    my $y = $MIDI::Simple::Length{$spec};
+    my $z = sprintf '%0.f', $x / $y;
+    if ($k) {
+        my $bezier = Math::Bezier->new(
+            1, $i,
+            $z, $i,
+            $z, $j,
+        );
+        for (my $n = 0; $n <= 1; $n += (1 / ($z - 1))) {
+            my (undef, $v) = $bezier->point($n);
+            $v = sprintf '%0.f', $v;
+#            warn(__PACKAGE__,' ',__LINE__," $n INC: $v\n");
+            $self->accent_note($v, $spec, $patch);
+        }
+    }
+    else {
+        my $v = sprintf '%0.f', ($j - $i) / ($z - 1);
+#        warn(__PACKAGE__,' ',__LINE__," VALUE: $v\n");
+        for my $n (1 .. $z) {
+            if ($n == $z) {
+                if ($i < $j) {
+                    $i += $j - $i;
+                }
+                elsif ($i > $j) {
+                    $i -= $i - $j;
+                }
+            }
+#            warn(__PACKAGE__,' ',__LINE__," $n INC: $i\n");
+            $self->accent_note($i, $spec, $patch);
+            $i += $v;
+        }
+    }
 }
 
 
@@ -328,7 +375,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.1400
+version 0.1602
 
 =head1 SYNOPSIS
 
@@ -337,6 +384,7 @@ version 0.1400
  my $d = MIDI::Drummer::Tiny->new(
     file      => 'drums.mid',
     bpm       => 100,
+    volume    => 100,
     signature => '5/4',
     bars      => 8,
     kick      => 'n36', # Override default patch
@@ -351,10 +399,11 @@ version 0.1400
 
  $d->rest($d->whole);
 
- $d->flam($d->quarter, $d->snare);
- $d->roll($d->eighth, $d->thirtysecond);
-
  $d->metronome44;  # 4/4 time for the number of bars
+
+ $d->flam($d->quarter, $d->snare);
+ $d->crescendo_roll([50, 127], $d->eighth, $d->thirtysecond);
+ $d->note($d->eighth, $d->crash1);
 
  # Alternate kick and snare
  $d->note($d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare)
@@ -421,11 +470,17 @@ Computed given the B<signature>.
 
 =item ride1, ride2, ride_bell
 
-=item side_stick, snare (alternate = n40), clap
+=item snare, acoustic_snare, electric_snare, side_stick, clap
+
+Where the B<snare> is by default the same as the B<acoustic_snare> but
+can be overridden with the B<electric_snare> (C<'n40'>).
 
 =item hi_tom, hi_mid_tom, low_mid_tom, low_tom, hi_floor_tom, low_floor_tom
 
-=item kick (alternate = n36)
+=item kick, acoustic_bass, electric_bass
+
+Where the B<kick> is by default the same as the B<acoustic_bass> but
+can be overridden with the B<electric_bass> (C<'n36'>).
 
 =item tambourine, cowbell, vibraslap
 
@@ -572,6 +627,27 @@ Add a drum roll to the score, where the B<patch> is played for
 duration B<length> in B<spec> increments.
 
 If not provided the B<snare> is used for the B<patch>.
+
+=head2 crescendo_roll
+
+  $d->crescendo_roll( [$start, $end, $bezier], $length, $spec, $patch );
+
+Add a drum roll to the score, where the B<patch> is played for
+duration B<length> in B<spec> notes, at increasing or decreasing
+volumes from B<start> to B<end>.
+
+If not provided the B<snare> is used for the B<patch>.
+
+If true, the B<bezier> flag will render the crescendo with a curve,
+rather than as a straight line.
+
+     |            *
+     |           *
+ vol |         *
+     |      *
+     |*
+     ---------------
+           time
 
 =head2 set_time_sig
 

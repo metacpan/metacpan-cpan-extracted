@@ -1,4 +1,26 @@
 Revision history for perl-file-valet
+1.07 Tue Sep 01 15:33:19 PDT 2020
+	- Fixed my stupid broken tests in 00-slurp.t (thanks, xenu and Grinnz)
+        - Tests represent binary data with %v02X (thanks, Grinnz)
+        - Pulled :bytes out of rd_f wr_f ap_f because it's a red herring.
+
+1.06 Sat Aug 29 17:45:51 PDT 2020
+        - rd_f, wr_f, ap_f added checks for close() error
+        - rd_f, wr_f, ap_f switched to sysread/syswrite to work around Windows bug
+        - Updated t/00-slurp.t to be more informative on error.
+	- Moved test reqs to [Prereqs / TestRequires] in dist.ini (thanks, Ether)
+	- Added [MetaJSON] to dist.ini (thanks, Ether)
+
+1.05 Sat Aug 29 12:05:01 PDT 2020
+	- Bugfix for slurp for some versions of perl on Windows
+
+1.04 Fri Aug 28 19:04:18 PDT 2020
+	- Bumped perl support from v5.8 to v5.10 so I can use //
+	- Improved find_temp() for Windows environments
+	- Broke out is_windows() into its own function
+	- Added find_home() function
+	- Added unit test for find_home
+
 1.03 Thu Aug 22 13:53:47 PDT 2019
 	- Removed spurious (and ill-behaved) dependency on Errno
 	- Disabled unit tests which fail when run as root

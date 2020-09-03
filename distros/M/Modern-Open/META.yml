@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Modern-Open
-version: 0.10
+version: 0.11
 abstract: Autovivification, Autodie, and 3-args open support
 author:
   - ina <ina@cpan.org>

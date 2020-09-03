@@ -3,7 +3,7 @@ package File::LibMagic::FFI;
 use strict;
 use warnings;
 use 5.008001;
-use FFI::Platypus;
+use FFI::Platypus 1.00;
 use FFI::Platypus::Buffer ();
 use FFI::CheckLib 0.06 ();
 use constant {
@@ -12,10 +12,10 @@ use constant {
 };
 
 # ABSTRACT: Determine MIME types of data or files using libmagic
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
-our $ffi = FFI::Platypus->new;
+our $ffi = FFI::Platypus->new( api => 1 );
 $ffi->lib(FFI::CheckLib::find_lib_or_die( lib => "magic" ));
 $ffi->type(opaque => 'magic_t');
 
@@ -98,7 +98,7 @@ File::LibMagic::FFI - Determine MIME types of data or files using libmagic
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -1,9 +1,9 @@
 package App::podsel;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-14'; # DATE
+our $DATE = '2020-04-29'; # DATE
 our $DIST = 'App-podsel'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -303,7 +303,7 @@ App::podsel - Select Pod::Elemental nodes using CSel syntax
 
 =head1 VERSION
 
-This document describes version 0.007 of App::podsel (from Perl distribution App-podsel), released on 2020-04-14.
+This document describes version 0.008 of App::podsel (from Perl distribution App-podsel), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -326,7 +326,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<expr> => I<str>
 
-=item * B<file> => I<str> (default: "-")
+=item * B<file> => I<filename> (default: "-")
 
 =item * B<node_actions> => I<array[str]> (default: ["print_as_string"])
 

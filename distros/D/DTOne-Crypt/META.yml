@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/atancasis/DTOne-Crypt/issues
   homepage: https://github.com/atancasis/DTOne-Crypt
   repository: https://github.com/atancasis/DTOne-Crypt.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Arnold Tan Casis <arnold.tancasis@dtone.com>'
 x_generated_by_perl: v5.32.0

@@ -5,7 +5,7 @@
       "Joel A Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -77,17 +77,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues"
+         "web" : "https://github.com/PerlAlien/Alien-Base-ModuleBuild/issues"
       },
       "homepage" : "https://metacpan.org/pod/Alien::Base::ModuleBuild",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Perl5-Alien/Alien-Base-ModuleBuild.git",
-         "web" : "https://github.com/Perl5-Alien/Alien-Base-ModuleBuild"
+         "url" : "git://github.com/PerlAlien/Alien-Base-ModuleBuild.git",
+         "web" : "https://github.com/PerlAlien/Alien-Base-ModuleBuild"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_contributors" : [
       "Joel A Berger <joel.a.berger@gmail.com>",
       "Graham Ollis <plicease@cpan.org>",
@@ -108,8 +108,9 @@
       "Petr Pisar (ppisar)",
       "Alberto Sim\u00f5es (ambs)"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "x_generated_by_perl" : "v5.33.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }
 

@@ -123,10 +123,12 @@ int git_indexer_options_init(git_indexer_options *opts, unsigned int version)
 	return 0;
 }
 
+#ifndef GIT_DEPRECATE_HARD
 int git_indexer_init_options(git_indexer_options *opts, unsigned int version)
 {
 	return git_indexer_options_init(opts, version);
 }
+#endif
 
 int git_indexer_new(
 		git_indexer **out,
@@ -425,7 +427,10 @@ static int store_object(git_indexer *idx)
 	pentry = git__calloc(1, sizeof(struct git_pack_entry));
 	GIT_ERROR_CHECK_ALLOC(pentry);
 
-	git_hash_final(&oid, &idx->hash_ctx);
+	if (git_hash_final(&oid, &idx->hash_ctx)) {
+		git__free(pentry);
+		goto on_error;
+	}
 	entry_size = idx->off - entry_start;
 	if (entry_start > UINT31_MAX) {
 		entry->offset = UINT32_MAX;

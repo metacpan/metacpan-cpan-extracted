@@ -8,6 +8,7 @@ use Test::AnyOf;
 use Test::More 0.96;
 
 use File::LibMagic;
+use List::Util qw( first );
 
 # If this is populated then libmagic will use it to find the magic file.
 delete $ENV{MAGIC};
@@ -47,17 +48,15 @@ delete $ENV{MAGIC};
 
 SKIP:
 {
-    my $standard_file = _scrape_file_version();
-
-    note "Found magic file at $standard_file";
+    my $standard_file = _get_magic_file_path();
 
     ## no critic (ValuesAndExpressions::ProhibitFiletest_f)
-    skip "The standard magic file must exist at $standard_file", 1
-        unless -l $standard_file || -f _;
+    skip 'Could not find the standard magic file', 1
+        unless $standard_file;
 
-    my $info = File::LibMagic->new()->info_from_filename($standard_file);
-    skip "The file at $standard_file is not a magic file", 1
-        unless $info && $info->{description} =~ /magic binary file/;
+    skip
+        'Something weird and broken is happening when using the homebrew libmagic in Azure'
+        if $^O eq 'darwin' && $ENV{CI_WORKSPACE_DIRECTORY};
 
     my %custom = (
         'foo.foo' => [
@@ -91,23 +90,39 @@ SKIP:
     );
 }
 
-sub _scrape_file_version {
+sub _get_magic_file_path {
+    my @paths;
     for (`file -v`) {    ## no critic (ProhibitBacktickOperators)
         chomp;
         next unless m/\Amagic file from (.*)/;
 
-        my $magic = $1;
-
-        ## no critic (ValuesAndExpressions::ProhibitFiletest_f)
-        return "$magic.mgc"
-            if $magic !~ m/ [.] mgc \z /smx && -f "$magic.mgc";
-        return $magic
-            if -f $magic;
-
+        # This may contain a colon-separated list.
+        @paths = split /:/, $1;
         last;
     }
 
-    return '/usr/share/file/magic.mgc';
+    push @paths, '/usr/share/file';
+
+    my $magic
+        = first { _is_valid_magic_file($_) } map { ( "$_.mgc", $_ ) } @paths;
+
+    if ($magic) {
+        note "Found magic file at $magic";
+        return $magic;
+    }
+
+    return;
+}
+
+sub _is_valid_magic_file {
+    my $path = shift;
+
+    ## no critic (ValuesAndExpressions::ProhibitFiletest_f)
+    return unless -l $path || -f _;
+
+    my $info = File::LibMagic->new( follow_symlinks => 1 )
+        ->info_from_filename($path);
+    return $info && $info->{description} =~ /magic binary file/;
 }
 
 sub _test_flm {

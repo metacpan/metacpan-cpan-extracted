@@ -86,7 +86,7 @@ INIT {
     if ($INC{"Mnet/Tee.pm"}) {
         $stdout = $Mnet::Tee::stdout;
     } else {
-        open($stdout, ">&STDOUT");
+        open($stdout, ">&STDOUT") or die "error duping stdout, $!";
     }
 
     # define --help cli option

@@ -14,7 +14,7 @@ Alien::Base::ModuleBuild::FAQ - Frequently Asked Questions about Alien::Base::Mo
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 
@@ -532,7 +532,7 @@ L<https://groups.google.com/forum/#!forum/perl5-alien>
 If you have an issue with L<Alien::Base> itself, then please open a support ticket on the
 project's GitHub issue tracker.
 
-L<https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues>
+L<https://github.com/PerlAlien/Alien-Base-ModuleBuild/issues>
 
 =back
 

@@ -18,6 +18,7 @@ Ahad
 Ajé
 Akan
 Alatsinainy
+Alexander
 Altine
 Aneg
 Anwar
@@ -358,6 +359,7 @@ PREEURO
 PY
 Palau
 Palichimo
+Pankoff
 Papua
 Pashto
 PayPal
@@ -577,6 +579,7 @@ ca_FR
 ca_IT
 ccc
 cccc
+ccntrq
 ccp
 ccp_BD
 ccp_IN

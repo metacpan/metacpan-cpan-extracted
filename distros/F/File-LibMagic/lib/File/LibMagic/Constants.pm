@@ -7,7 +7,7 @@ use warnings;
 
 use Exporter qw( import );
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 sub constants {
     return qw(
@@ -50,7 +50,7 @@ File::LibMagic::Constants - Contains a list of libmagic constant names that we u
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =for Pod::Coverage .+
 

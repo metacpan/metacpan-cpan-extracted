@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource';
 use strict;
 use warnings;
 
-our $VERSION = '2.037'; # VERSION
+our $VERSION = '2.038'; # VERSION
 
 use Compress::Zlib;
 use Encode qw(:all);

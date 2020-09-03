@@ -3,7 +3,7 @@ package CPANPLUS::Dist::Slackware::Plugin::Alien::wxWidgets;
 use strict;
 use warnings;
 
-our $VERSION = '1.028';
+our $VERSION = '1.029';
 
 sub available {
     my ( $plugin, $dist ) = @_;
@@ -15,7 +15,7 @@ sub pre_prepare {
     my ( $plugin, $dist ) = @_;
 
     if ( !exists $ENV{AWX_URL} && !exists $ENV{WX_CONFIG} ) {
-        $ENV{AWX_URL} = 'http://prdownloads.sourceforge.net/wxwindows';
+        $ENV{AWX_URL} = 'https://prdownloads.sourceforge.net/wxwindows';
     }
 
     return 1;
@@ -38,7 +38,7 @@ CPANPLUS::Dist::Slackware::Plugin::Alien::wxWidgets - Configure Alien::wxWidgets
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware::Plugin::Alien::wxWidgets version 1.028.
+This document describes CPANPLUS::Dist::Slackware::Plugin::Alien::wxWidgets version 1.029.
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ Returns true if this plugin applies to the given Perl distribution.
 =item B<< $plugin->pre_prepare($dist) >>
 
 If neither C<$ENV{AWX_URL}> nor C<$ENV{WX_CONFIG}> are set, sets
-C<$ENV{AWX_URL}> to C<http://prdownloads.sourceforge.net/wxwindows>, which
+C<$ENV{AWX_URL}> to C<https://prdownloads.sourceforge.net/wxwindows>, which
 causes Alien::wxWidgets to ignore existing wxWidgets installations and build
 its own library.
 
@@ -104,7 +104,7 @@ Andreas Voegele E<lt>voegelas@cpan.orgE<gt>
 =head1 BUGS AND LIMITATIONS
 
 Please report any bugs to C<bug-cpanplus-dist-slackware at rt.cpan.org>, or
-through the web interface at L<http://rt.cpan.org/>.
+through the web interface at L<https://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -113,6 +113,6 @@ Copyright 2012-2020 Andreas Voegele
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
-See http://dev.perl.org/licenses/ for more information.
+See https://dev.perl.org/licenses/ for more information.
 
 =cut

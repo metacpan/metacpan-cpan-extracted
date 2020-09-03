@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -14,28 +14,43 @@
    },
    "name" : "File-LibMagic-FFI",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
-            "FFI::CheckLib" : "0.06",
-            "Module::Build" : "0.28",
+            "ExtUtils::MakeMaker" : "0",
+            "FFI::CheckLib" : "0.11",
             "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "FFI::CheckLib" : "0.06",
-            "FFI::Platypus" : "0.08",
+            "FFI::Platypus" : "1.00",
             "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94",
+            "Test::More" : "0.88",
             "base" : "0",
             "perl" : "5.008001"
          }
@@ -46,13 +61,18 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/File-LibMagic-FFI/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/File-LibMagic-FFI",
+      "homepage" : "https://metacpan.org/pod/File::LibMagic::FFI",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/File-LibMagic-FFI.git",
          "web" : "https://github.com/plicease/File-LibMagic-FFI"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.04"
+   "version" : "0.06",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
 }
 

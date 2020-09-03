@@ -1,5 +1,5 @@
 package OpenTracing::WrapScope;
-our $VERSION = 'v0.106.3';
+our $VERSION = 'v0.106.4';
 use strict;
 use warnings;
 use warnings::register;
@@ -29,15 +29,17 @@ no warnings 'redefine';
 };
 }
 
-my %subs_to_install;
+my %subs_to_install;    # sub => warn about undetected subs toggle
 END {
     foreach my $sub (keys %subs_to_install) {
+        next unless $subs_to_install{$sub};
         warnings::warn "OpenTracing::WrapScope couldn't find sub: $sub";
     }
 }
 
 sub _register_to_install {
-    undef $subs_to_install{$_} foreach @_;
+    my ($subs, $warn_undetected) = @_;
+    $subs_to_install{$_} = $warn_undetected foreach @$subs;
 }
 
 # try to install any available subs whenever we get new code
@@ -56,6 +58,7 @@ sub import {
     shift;    # __PACKAGE__
     my $target_package = caller;
 
+    my $warn_undetected = 1;
     my ($use_env, @subs, @files);
     while (my (undef, $arg) = each @_) {
         if ($arg eq '-env') {
@@ -64,6 +67,9 @@ sub import {
         elsif ($arg eq '-file') {
             my (undef, $next) = each @_ or last;
             push @files, ref $next eq 'ARRAY' ? @$next : $next;
+        }
+        elsif ($arg eq '-quiet') {
+            $warn_undetected = 0;
         }
         else {
             push @subs, _qualify_sub($arg, $target_package);
@@ -74,7 +80,7 @@ sub import {
     }
     push @subs, map { _load_sub_spec($_) } grep { -f } map { glob } uniq @files;
 
-    _register_to_install(@subs);
+    _register_to_install(\@subs, $warn_undetected);
 
     return;
 }

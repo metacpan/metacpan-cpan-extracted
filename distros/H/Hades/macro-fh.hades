@@ -1,0 +1,93 @@
+lib lib
+tlib t
+author LNATION
+email email@lnation.org
+version 0.02
+Hades::Macro::FH base Hades::Macro {
+	abstract { Hades macro helpers for FH }
+	synopsis {
+Quick summary of what the module does:
+
+	Hades->run({
+		eval => q|
+			macro {
+				FH [ alias => { read_file => [qw/rf/], write_file => [qw/wf/] } ]
+			}
+			Kosmos { 
+				geras $file :t(Str) :d('path/to/file.txt') { 
+					€rf('$file');
+					$content = 'limos';
+					€wf('$file', '$content');
+				}
+			}
+		|;
+	});
+
+	... generates ...
+
+	package Kosmos;
+	use strict;
+	use warnings;
+	our $VERSION = 0.01;
+
+	sub new {
+		my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
+		my $self      = bless {}, $cls;
+		my %accessors = ();
+		for my $accessor ( keys %accessors ) {
+			my $value
+			    = $self->$accessor(
+				defined $args{$accessor}
+				? $args{$accessor}
+				: $accessors{$accessor}->{default} );
+			unless ( !$accessors{$accessor}->{required} || defined $value ) {
+				die "$accessor accessor is required";
+			}
+		}
+		return $self;
+	}
+
+	sub geras {
+		my ( $self, $file ) = @_;
+		$file = defined $file ? $file : 'path/to/file.txt';
+		if ( !defined($file) || ref $file ) {
+			$file = defined $file ? $file : 'undef';
+			die qq{Str: invalid value $file for variable \$file in method geras};
+		}
+
+		open my $fh, "<", $file or die "cannot open file for reading: $!";
+		my $content = do { local $/; <$fh> };
+		close $fh;
+		$content = 'limos';
+		open my $wh, ">", $file or die "cannot open file for writing: $!";
+		print $wh $content;
+		close $wh;
+
+	}
+
+	1;
+
+	__END__
+
+	}
+	macro :t(ArrayRef) :d([qw/open_write open_read close_file read_file write_file/])
+	open_write $mg :t(Object) $file :t(Str) $variable :t(Str) :d(\$fh) $error :t(Str) :d(cannot open file for writing) {
+		return qq|open my $variable, ">", $file or die "$error: \$!";|;
+	}
+	open_read $mg :t(Object) $file :t(Str) $variable :t(Str) :d(\$fh) $error :t(Str) :d(cannot open file for reading) {
+		return qq|open my $variable, "<", $file or die "$error: \$!";|;
+	}
+	close_file $mg :t(Object) $file :t(Str) $variable :t(Str) :d(\$fh) {
+		return qq|close $variable|;
+	}
+	read_file $mg :t(Object) $file :t(Str) $variable :t(Str) :d(\$fh) $error :t(Str) :d(cannot open file for reading)  {
+		return qq|open my $variable, "<", $file or die "$error: \$!";|
+			. qq|my \$content = do { local \$/; <$variable> };|
+			. qq|close $variable;|;
+	}
+	write_file $mg :t(Object) $file :t(Str) $content :t(Str) $variable :t(Str) :d(\$wh) $error :t(Str) :d(cannot open file for writing)  {
+		return qq|open my $variable, ">", $file or die "$error: \$!";|
+			. qq|print $variable $content;|
+			. qq|close $variable;|;
+	}
+}

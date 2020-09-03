@@ -1,5 +1,5 @@
 package Neovim::Ext::MsgPack::RPC::EventLoop;
-$Neovim::Ext::MsgPack::RPC::EventLoop::VERSION = '0.02';
+$Neovim::Ext::MsgPack::RPC::EventLoop::VERSION = '0.05';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -226,7 +226,7 @@ sub _on_read_error
 
 	return sub
 	{
-		my ($error) = @_;
+		my (undef, $error) = @_;
 		$loop->stop();
 		die "handle read error: $error\n";
 	};
@@ -374,7 +374,7 @@ Neovim::Ext::MsgPack::RPC::EventLoop - Neovim::Ext::MsgPack::RPC::EventLoop clas
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 

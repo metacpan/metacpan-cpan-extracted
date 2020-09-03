@@ -14351,6 +14351,7 @@ language:
       fgr: Fongoro
       fia: Nobiin
       fie: Fyer
+      fif: Faifi
       fij: Fijian
       fil: Filipino
       fin: Finnish
@@ -18834,7 +18835,6 @@ language:
       tht: Tahltan
       thu: Thuri
       thv: Tahaggart Tamahaq
-      thw: Thudam
       thy: Tha
       thz: Tayart Tamajeq
       tia: Tidikelt Tamazight
@@ -26171,6 +26171,9 @@ language:
       fagani: 
         - faf
         - Fagani
+      faifi: 
+        - fif
+        - Faifi
       faire atta: 
         - azt
         - Faire Atta
@@ -41087,9 +41090,6 @@ language:
       thu lao: 
         - tyl
         - Thu Lao
-      thudam: 
-        - thw
-        - Thudam
       thulung: 
         - tdh
         - Thulung
@@ -46355,6 +46355,8 @@ langvar:
       sursilv: Sursilvan idiom of Romansh
       sutsilv: Sutsilvan idiom of Romansh
       tarask: Belarusian in Taraskievica orthography
+      tongyong: Tongyong Pinyin romanization
+      tunumiit: Tunumiisiut
       uccor: Unified Cornish orthography of Revived Cornish
       ucrcor: Unified Cornish Revised orthography of Revived Cornish
       ulster: Ulster dialect of Scots
@@ -46618,9 +46620,15 @@ langvar:
       the stolvizza dialect of resian: 
         - solba
         - The Stolvizza dialect of Resian
+      tongyong pinyin romanization: 
+        - tongyong
+        - Tongyong Pinyin romanization
       traditional german orthography: 
         - 1901
         - Traditional German orthography
+      tunumiisiut: 
+        - tunumiit
+        - Tunumiisiut
       ulster dialect of scots: 
         - ulster
         - Ulster dialect of Scots

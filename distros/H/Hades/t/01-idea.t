@@ -2,7 +2,7 @@ use Test::More;
 BEGIN {
 	use Hades;
 	Hades->run({
-		eval => 'Kosmos { [penthos curae] :t(Int) :d(2) :p :pr :c :r geras $nosoi :t(Int) :d(5) { if ($self->penthos == $nosoi) { return $self->curae; } } }',
+		eval => 'Kosmos { [penthos curae] :t(Int) :d(2) :p :pr :c :r geras $nosoi :t(Int) :d(5) { if (£penthos == $nosoi) { return £curae; } } }',
 		lib => 't/lib'
 	});
 	use lib 't/lib';

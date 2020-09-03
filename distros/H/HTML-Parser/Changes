@@ -1,6 +1,33 @@
 Change history for HTML-Parser
 
-2020-08-24    3.73
+3.75      2020-08-30
+  * Cleanup the prereqs a bit
+  * Mark HTML::Filter as deprecated as the docs point out
+  * Move Parser.pm into the lib directory with the others. This will help
+    with everything from auto version bumps after releases, to scanning for
+    prerequisites and spelling errors.
+  * Fix a few spelling errors in the POD for HTML::Parser
+  * Clean up the spacing on many examples in HTML::Parser
+
+3.74      2020-08-30
+  * Fix the order of date and version in this change log. (Thanks, haarg)
+  * Convert to Dist::Zilla
+  * Build all prereqs from our cpanfile
+  * Go through all test files and:
+    * perltidy
+    * Use strict/warnings
+    * Get rid of two-arg open
+    * Get rid of BAREWORD filehandles
+    * Fix the eval pattern used
+    * Only use -w where we catch $SIG{__WARN__}
+    * Fix encoding problems
+    * use utf8 where we have unicode in the source
+  * Fix a typo here and there
+  * perltidy all of the example apps in eg/
+  * Add comments explaining the apps in eg/ (GH#13 Thanks, Salvatore Bonaccorso)
+  * Print out UTF-8 encoded data where sensible in eg/
+
+3.73     2020-08-24
   * Cleaned up this changes log.
   * Added a .mailmap file to organize contributions accurately.
   * Ensure all versions are equal and on the current version
@@ -15,7 +42,7 @@ Change history for HTML-Parser
   * Start testing via GitHub Actions/Workflows
   * Protect active parser from being freed (PR 13, RT #115034)
 
-2016-01-19     3.72
+3.72     2016-01-19
   * Avoid more clang casting warnings
   * Remove trailing whitespace
   * Ensure entities expand to utf8 sequences under 'utf8_mode' [RT#99755]
@@ -23,16 +50,16 @@ Change history for HTML-Parser
   * Silence clang warning (Jacques Germishuys)
   * const+static-ing (bulk88)
 
-2013-05-09     3.71
+3.71     2013-05-09
   * Transform ':' in headers to '-' [RT#80524]
 
-2013-03-28     3.70
+3.70     2013-03-28
   * Fix for cross-compiling with Buildroot (François Perrad)
   * Comment typo fix
   * Fix Issue #3 / RT #84144: HTML::Entities::decode_entities() needs
     to call SV_CHECK_THINKFIRST() before checking READONLY flag (Yves Orton)
 
-2011-10-15     3.69
+3.69     2011-10-15
   * Documentation fix; encode_utf8 mixup [RT#71151]
   * Make it clearer that there are 2 (actually 3) options for handing "UTF-8 garbage"
   * Github is the official repo
@@ -41,45 +68,45 @@ Change history for HTML-Parser
   * Aesthetic change: remove extra ; (Jon Jensen)
   * Trim surrounding whitespace from extracted URLs. (Ville Skyttä)
 
-2010-09-01     3.68
+3.68     2010-09-01
   * Declare the encoding of the POD to be utf8
 
-2010-08-17     3.67
+3.67     2010-08-17
   * bleadperl 2154eca7 breaks HTML::Parser 3.66 [RT#60368] (Nicholas Clark)
 
-2010-07-09     3.66
+3.66     2010-07-09
   * Fix entity decoding in utf8_mode for the title header
 
-2010-04-04     3.65
+3.65     2010-04-04
   * Eliminate buggy entities_decode_old
   * Fixed endianness typo [RT#50811] (Salvatore Bonaccorso)
   * Documentation Fixes. (Ville Skyttä)
 
-2009-10-25     3.64
+3.64     2009-10-25
   * Convert files to UTF-8
   * Don't allow decode_entities() to generate illegal Unicode chars
   * Copyright 2009
   * Remove rendundant (repeated) test
   * Make parse_file() method use 3-arg open [RT#49434]
 
-2009-10-22     3.63
+3.63     2009-10-22
   * Take more care to prepare the char range for encode_entities [RT#50170]
   * decode_entities confused by trailing incomplete entity
 
-2009-08-13     3.62
+3.62     2009-08-13
   * Doc patch: Make it clearer what the return value from ->parse is
   * HTTP::Header doc typo fix. (Ville Skyttä)
   * Do not bother tracking style or script, they're ignored. (Ville Skyttä)
   * Bring HTML 5 head elements up to date with WD-html5-20090423. (Ville Skyttä)
   * Improve HeadParser performance. (Ville Skyttä)
 
-2009-06-20     3.61
+3.61     2009-06-20
   * Test that triggers the crash that Chip fixed
   * Complete documented list of literal tags
   * Avoid crash (referenced pend_text instead of skipped_text) (Chip Salzenberg)
   * Reference HTML::LinkExttor [RT#43164] (Antonio Radici)
 
-2009-02-09     3.60
+3.60     2009-02-09
   * Spelling fixes. (Ville Skyttä)
   * Test multi-value headers. (Ville Skyttä)
   * Documentation improvements. (Ville Skyttä)
@@ -89,18 +116,18 @@ Change history for HTML-Parser
   * Suppress warning when encode_entities is called with undef [RT#27567] (Mike South)
   * HTML::Parser doesn't compile with perl 5.8.0. (Zefram)
 
-2008-11-24     3.59
+3.59     2008-11-24
   * Restore perl-5.6 compatibility for HTML::HeadParser.
   * Improved META.yml
 
-2008-11-17     3.58
+3.58     2008-11-17
   * Suppress "Parsing of undecoded UTF-8 will give garbage" warning
      with attr_encoded [RT#29089]
   * HTML::HeadParser:
        - Recognize the Unicode BOM in utf8_mode as well [RT#27522]
        - Avoid ending up with '/' keys attribute in Link headers.
 
-2008-11-16     3.57
+3.57     2008-11-16
   * The <iframe> element content is now parsed in literal mode.
   * Parsing of <script> and <style> content ends on the first end tag
      even when that tag was in a quoted string.  That seems to be the
@@ -108,13 +135,13 @@ Change history for HTML-Parser
   * Implement backquote() attribute as requested by Alex Kapranoff.
   * Test and documentation tweaks from Alex Kapranoff.
 
-2007-01-12     3.56
+3.56     2007-01-12
   * Cloning of parser state for compatibility with threads.
      Fixed by Bo Lindbergh <blgl@hagernas.com>.
   * Don't require whitespace between declaration tokens.
      <http://rt.cpan.org/Ticket/Display.html?id=20864>
 
-2006-07-10     3.55
+3.55     2006-07-10
   * Treat <> at the end of document as text.  Used to be
      reported as a comment.
   * Improved Firefox compatibility for bad HTML:
@@ -123,7 +150,7 @@ Change history for HTML-Parser
       - Unclosed <title> closes at next tag.
   * Make <!a'b> a comment by itself.
 
-2006-04-28     3.54
+3.54     2006-04-28
   * Yaakov Belch discovered yet another issue with <script> parsing.
      Enabling of 'empty_element_tags' got the parser confused
      if it found such a tag for elements that are normally parsed
@@ -131,21 +158,21 @@ Change history for HTML-Parser
      one likely to be found in documents.
      <http://rt.cpan.org//Ticket/Display.html?id=18965>
 
-2006-04-27     3.53
+3.53     2006-04-27
   * When ignore_element was enabled it got confused if the
      corresponding tags did not nest properly; the end tag
      was treated it as if it was a start tag.
      Found and fixed by Yaakov Belch <code@yaakovnet.net>.
      <http://rt.cpan.org/Ticket/Display.html?id=18936>
 
-2006-04-26     3.52
+3.52     2006-04-26
   * Make sure the 'start_document' fires exactly once for
      each document parsed.  For earlier releases it did not
      fire at all for empty documents and could fire multiple
      times if parse was called with empty chunks.
   * Documentation tweaks and typo fixes.
 
-2006-03-22     3.51
+3.51     2006-03-22
   * Named entities outside the Latin-1 range are now only expanded
      when properly terminated with ";".  This makes HTML::Parser
      compatible with Firefox/Konqueror/MSIE when it comes to how these
@@ -156,17 +183,17 @@ Change history for HTML-Parser
   * Fixed some documentation typos spotted by <william@knowmad.com>.
      <http://rt.cpan.org/Ticket/Display.html?id=18062>
 
-2006-02-14     3.50
+3.50     2006-02-14
   * The 3.49 release didn't compile with VC++ because it mixed code
      and declarations.  Fixed by Steve Hay <steve.hay@uk.radan.com>.
 
-2006-02-08     3.49
+3.49     2006-02-08
   * Events could sometimes still fire after a handler has signaled eof.
   * Marked_sections with text ending in square bracket parsed wrong.
      Fix provided by <paul.bijnens@xplanation.com>.
      <http://rt.cpan.org/Ticket/Display.html?id=16749>
 
-2005-12-02     3.48
+3.48     2005-12-02
   * Enabling empty_element_tags by default for HTML::TokeParser
      was a mistake.  Reverted that change.
      <http://rt.cpan.org/Ticket/Display.html?id=16164>
@@ -174,14 +201,14 @@ Change history for HTML-Parser
      skipped text missed the first 3 bytes "<![".
      <http://rt.cpan.org/Ticket/Display.html?id=16207>
 
-2005-11-22     3.47
+3.47     2005-11-22
   * Added empty_element_tags and xml_pic configuration
      options.  These make it possible to enable these XML
      features without enabling the full XML-mode.
   * The empty_element_tags is enabled by default for
      HTML::TokeParser.
 
-2005-10-24     3.46
+3.46     2005-10-24
   * Don't try to treat an literal &nbsp; as space.
      This breaks Unicode parsing.
      <http://rt.cpan.org/Ticket/Display.html?id=15068>
@@ -197,20 +224,20 @@ Change history for HTML-Parser
   * Faster load time with XSLoader (perl-5.6 or better now required).
   * Fixed POD markup errors in some of the modules.
 
-2005-01-06     3.45
+3.45     2005-01-06
   * Fix stack memory leak caused by missing PUTBACK.  Only
      code that used $p->parse(\&cb) form was affected.
      Fix provided by Gurusamy Sarathy <gsar@sophos.com>.
 
-2004-12-28     3.44
+3.44     2004-12-28
   * Fix confusion about nested quotes in <script> and <style> text.
 
-2004-12-06     3.43
+3.43     2004-12-06
   * The SvUTF8 flag was not propagated correctly when replacing
      unterminated entities.
   * Fixed test failure because of missing binmode on Windows.
 
-2004-12-04     3.42
+3.42     2004-12-04
   * Avoid sv_catpvn_utf8_upgrade() as that macro was not
      available in perl-5.8.0.
      Patch by Reed Russell <Russell.Reed@acxiom.com>.
@@ -219,17 +246,17 @@ Change history for HTML-Parser
   * HTML::HeadParser will always push new header values.
      This make sure we never loose old header values.
 
-2004-11-30     3.41
+3.41     2004-11-30
   * Fix unresolved symbol error with perl-5.005.
 
-2004-11-29     3.40
+3.40     2004-11-29
   * Make utf8_mode only available on perl-5.8 or better.  It produced
      garbage with older versions of perl.
   * Emit warning if entities are decoded and something in the first
      chunk looks like hi-bit UTF-8.  Previously this warning was only
      triggered for documents with BOM.
 
-2004-11-23     3.39_92
+3.39_92     2004-11-23
   * More documentation of the Unicode issues.  Moved around HTML::Parser
      documentation a bit.
   * New boolean option; $p->utf8_mode to allow parsing of raw  UTF-8.
@@ -244,7 +271,7 @@ Change history for HTML-Parser
      expand unterminated entities.
   * Simplified Makefile.PL
 
-2004-11-23     3.39_91
+3.39_91     2004-11-23
   * The HTML::HeadParser will skip Unicode BOM.  Previously it
      would consider the <head> section done when it saw the BOM.
   * The parser will look for Unicode BOM and give appropriate
@@ -256,7 +283,7 @@ Change history for HTML-Parser
      consider end element if the corresponding end tag is found
      inside such a string.
 
-2004-11-17     3.39_90
+3.39_90     2004-11-17
   * The <title> element is now parsed in literal mode, which
      means that other tags are not recognized until </title> has
      been seen.
@@ -268,11 +295,11 @@ Change history for HTML-Parser
   * Calculate offsets and lengths in chars for Unicode strings.
   * Fixed link typo in the HTML::TokeParser documentation.
 
-2004-11-11     3.38
+3.38     2004-11-11
   * New boolean option; $p->closing_plaintext
      Contributed by Alex Kapranoff <alex@kapranoff.ru>
 
-2004-11-10     3.37
+3.37     2004-11-10
   * Improved handling of HTML encoded surrogate pairs and illegally
      encoded Unicode; <http://rt.cpan.org/Ticket/Display.html?id=7785>.
      Patch by John Gardiner Myers <jgmyers@proofpoint.com>.
@@ -284,22 +311,22 @@ Change history for HTML-Parser
   * Avoid modification of PVs during parsing of attrspec.
     Another patch by John Gardiner Myers.
 
-2004-04-01     3.36
+3.36     2004-04-01
   * Improved MSIE/Mozilla compatibility.  If the same attribute
      name repeats for a start tag, use the first value instead
      of the last.  Patch by Nick Duffek <html-parser@duffek.com>.
      <http://rt.cpan.org/Ticket/Display.html?id=5472>
 
-2003-12-12     3.35
+3.35     2003-12-12
   * Documentation fixes by Paul Croome <Paul.Croome@softwareag.com>.
   * Removed redundant dSP.
 
-2003-10-27     3.34
+3.34     2003-10-27
   * Fix segfault that happened when the parse callback caused
      the stack to get reallocated.  The original bug report was
      <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=217616>
 
-2003-10-14     3.33
+3.33     2003-10-14
   * Perl 5.005 or better is now required.  For some reason we get
      a test failure with perl-5.004 and I don't really feel like
      debugging that perl any more.  Details about this failure can
@@ -309,7 +336,7 @@ Change history for HTML-Parser
   * The HTML::TokeParser method 'get_text' now expands skipped
      non-phrase-level tags as a single space.
 
-2003-10-10     3.32
+3.32     2003-10-10
   * If the document parsed ended with some kind of unterminated markup,
      then the parser state was not reset properly and this piece of markup
      would show up in the beginning of the next document parsed.
@@ -320,17 +347,17 @@ Change history for HTML-Parser
   * Various documentation tweaks.
   * Included another example program: hdump
 
-2003-08-19     3.31
+3.31     2003-08-19
   * The -DDEBUGGING fix in 3.30 was not really there :-(
 
-2003-08-17     3.30
+3.30     2003-08-17
   * The previous release failed to compile on a -DDEBUGGING perl
      like the one provided by Redhat 9.
   * Got rid of references to perl-5.7.
   * Further fixes to avoid warnings from Visual C.
      Patch by Steve Hay <steve.hay@uk.radan.com>.
 
-2003-08-14     3.29
+3.29     2003-08-14
   * Setting xml_mode now implies strict_names also for end tags.
   * Avoid warning from Visual C.  Patch by <gsar@activestate.com>.
   * 64-bit fix from Doug Larrick <doug@ties.org>
@@ -362,19 +389,19 @@ Change history for HTML-Parser
        - Incomplete tag at eof is reported as a 'comment' instead
          of 'text' unless strict_comment is enabled.
 
-2003-04-16     3.28
+3.28     2003-04-16
   * When 'strict_comment' is off (which it is by default)
      treat anything that matches <!...> a comment.
   * Should now be more efficient on threaded perls.
 
-2003-01-18     3.27
+3.27     2003-01-18
   * Typo fixes to the documentation.
   * HTML::Entities::escape_entities_numeric contributed
      by Sean M. Burke <sburke@cpan.org>.
   * Included one more example program 'hlc' that show
      how to downcase all tags in an HTML file.
 
-2002-03-17     3.26
+3.26     2002-03-17
   * Avoid core dump in some cases where the callback croaks.
      The perl_call_method and perl_call_sv needs G_EVAL flag
      to be safe.
@@ -388,23 +415,23 @@ Change history for HTML-Parser
            Timur I. Bakeyev <timur@gnu.org>
   * Avoid warnings from bleadperl on the uentities test.
 
-2001-05-11     3.25
+3.25     2001-05-11
   * Minor tweaks for build failures on perl5.004_04, perl-5.6.0,
      and for macro clash under Windows.
   * Improved parsing of <plaintext>...  :-)
 
-2001-05-09     3.24
+3.24     2001-05-09
   * $p->parse(CODE)
   * New events: start_document, end_document
   * New argspecs: skipped_text, offset_end
   * The offset/line/column counters was not properly reset
      after eof.
 
-2001-05-01     3.23
+3.23     2001-05-01
   * If the $p->ignore_elements filter did not work as it should if
      handlers for start/end events was not registered.
 
-2001-04-17     3.22
+3.22     2001-04-17
   * The <textarea> element is now parsed in literal mode, i.e. no other tags
      recognized until the </textarea> tag is seen.  Unlike other literal elements,
      the text content is not 'cdata'.
@@ -412,27 +439,27 @@ Change history for HTML-Parser
      &#39; as &apos; is not really an HTML tag, and not recognized by many HTML
      browsers.
 
-2001-04-10     3.21
+3.21     2001-04-10
   * Fix a memory leak which occurred when using filter methods.
   * Avoid a few compiler warnings (DEC C):
         - Trailing comma found in enumerator list
         - "unsigned char" is not compatible with "const char".
   * Doc update.
 
-2001-04-02     3.20
+3.20     2001-04-02
   * Some minor documentation updates.
 
-2001-03-30     3.19_94
+3.19_94     2001-03-30
   * Implemented 'tag', 'line', 'column' argspecs.
   * HTML::PullParser doc update.
      eg/hform is an example of HTML::PullParser usage.
 
-2001-03-27     3.19_93
+3.19_93     2001-03-27
   * Shorten 'report_only_tags' to 'report_tags'.
      I think it reads better.
   * Bleadperl portability fixes.
 
-2001-03-25     3.19_92
+3.19_92     2001-03-25
   * HTML::HeadParser made more efficient by using 'ignore_elements'.
   * HTML::LinkExtor made more efficient by using 'report_only_tags'.
   * HTML::TokeParser generalized into HTML::PullParser.  HTML::PullParser
@@ -441,7 +468,7 @@ Change history for HTML-Parser
      is customisable.  HTML::TokeParser is made into an HTML::PullParser
      subclass.
 
-2001-03-19     3.19_91
+3.19_91     2001-03-19
   * Array references can be passed to the filter methods.  Makes it easier
      to use them as constructor options.
   * Example programs updated to use filters.
@@ -450,7 +477,7 @@ Change history for HTML-Parser
   * The netscape_buggy_comment() method now generates mandatory warning
      about its deprecation.
 
-2001-03-13     3.19_90
+3.19_90     2001-03-13
   * This is an developer only release.  It contains some new
      experimental features.  The interface to these might still change.
   * Implemented filters to reduce the numbers of callbacks generated:
@@ -463,18 +490,18 @@ Change history for HTML-Parser
      flattening.  Only makes a difference when the target is an
      array.
 
-2001-03-09     3.19
+3.19     2001-03-09
   * Avoid the entity2char global.  That should make the module
      more thread safe.   Patch by Gurusamy Sarathy <gsar@ActiveState.com>.
 
-2001-02-24     3.18
+3.18     2001-02-24
   * There was a C++ style comment left in util.c.  Strict C
      compilers do not like that kind of stuff.
 
-2001-02-23     3.17
+3.17     2001-02-23
   * The 3.16 release broke MULTIPLICITY builds.  Fixed.
 
-2001-02-22     3.16
+3.16     2001-02-22
   * The unbroken_text option now works across ignored tags.
   * Fix casting of pointers on some 64 bit platforms.
   * Fix decoding of Unicode entities.  Only optionally available for
@@ -482,7 +509,7 @@ Change history for HTML-Parser
   * Expose internal decode_entities() function at the Perl level.
   * Reindented some code.
 
-2000-12-26     3.15
+3.15     2000-12-26
   * HTML::TokeParser's get_tag() method now takes multiple
      tags to match.  Hopefully the documentation is also a bit clearer.
   * #define PERL_NO_GET_CONTEXT: Should speed up things for thread
@@ -491,49 +518,49 @@ Change history for HTML-Parser
      This avoids warnings on perl-5.004.
   * Unicode entities only triggered for perl-5.7.0 or higher.
 
-2000-12-03     3.14
+3.14     2000-12-03
   * If a handler triggered by flushing text at eof called the
      eof method then infinite recursion occurred.  Fixed.
      Bug discovered by Jonathan Stowe <gellyfish@gellyfish.com>.
   * Allow <!doctype ...> to be parsed as declaration.
 
-2000-09-17     3.13
+3.13     2000-09-17
   * Experimental support for decoding of Unicode entities.
 
-2000-09-14     3.12
+3.12     2000-09-14
   * Some tweaks to get it to compile with "Optimierender Microsoft (R)
      32-Bit C/C++-Compiler, Version 12.00.8168, fuer x86."
      Patch by Matthias Waldorf <matthias.waldorf@zoom.de>.
   * HTML::Entities documentation spelling patch by
      David Dyck <dcd@tc.fluke.com>.
 
-2000-08-22     3.11
+3.11     2000-08-22
   * HTML::LinkExtor and eg/hrefsub now obtain %linkElements from
      the HTML::Tagset module.
 
-2000-06-29     3.10
+3.10     2000-06-29
   * Avoid core dump when stack gets relocated as the result of
     text handler invocation while $p->unbroken_text is enabled.
     Needed to refresh the stack pointer.
 
-2000-06-28     3.09
+3.09     2000-06-28
   * Avoid core dump if somebody clobbers the aliased $self argument of
     a handler.
   * HTML::TokeParser documentation update suggested by
     Paul Makepeace <Paul.Makepeace@realprogrammers.com>.
 
-2000-05-23     3.08
+3.08     2000-05-23
   * Fix core dump for large start tags.
     Bug spotted by Alexander Fraser <green795@hotmail.com>
   * Added yet another example program: eg/hanchors
   * Typo fix by Jamie McCarthy <jamie@mccarthy.org>
 
-2000-03-20     3.07
+3.07     2000-03-20
   * Fix perl5.004 builds (was broken in 3.06)
   * Declaration parsing mode now only triggers for <!DOCTYPE ...> and
      <!ENTITY ...>.  Based on patch by la mouton <kero@3sheep.com>.
 
-2000-03-06     3.06
+3.06     2000-03-06
   * Multi-threading/MULTIPLICITY compilation fix.
      Both Doug MacEachern <dougm@pobox.com> and
      Matthias Urlichs <smurf@noris.net> provided a patch.
@@ -544,23 +571,23 @@ Change history for HTML-Parser
      Patch by James Walden <jamesw@ichips.intel.com>
   * Added eg/htextsub example program.
 
-2000-01-22     3.05
+3.05     2000-01-22
   * Implemented $p->unbroken_text option
   * Don't parse content of certain HTML elements as CDATA when
      xml_mode is enabled.
   * Offset was reported with wrong sign for text at end of chunk.
 
-2000-01-15     3.04
+3.04     2000-01-15
   * Backed out 3.03-patch that checked for legal handler and attribute
     names in the HTML::Parser constructor.
   * Documentation typo fixed by Michael.
 
-2000-01-14     3.03
+3.03     2000-01-14
   * We did not get out of comment mode for comments ending with an
     odd number of "-" before ">".  Patch by la mouton <kero@3sheep.com>
   * Documentation patch by Michael.
 
-1999-12-21     3.02
+3.02     1999-12-21
   * Hide ~-magic IV-pointer to 'struct p_state' behind a reference.
     This allow copying of the internal _hparser_xs_state element, and
     will make HTML-Tree-0.61 work again.
@@ -568,7 +595,7 @@ Change history for HTML-Parser
     only want the initialization part of the constructor.
   * Filled out DIAGNOSTICS section of the HTML::Parser POD.
 
-1999-12-19     3.01
+3.01     1999-12-19
   * Rely on ~-magic instead of a DESTROY method to deallocate
     the internal 'struct p_state'.  This avoid memory leaks
     when people simply wipe of the content of the object hash.
@@ -577,20 +604,21 @@ Change history for HTML-Parser
   * Don't assume any specific order of hash keys in the t/cases.t.
     This test failed with some newer development releases of perl.
 
-1999-12-14     3.00
+3.00     1999-12-14
   * Documentation update (most of it from Michael)
   * Minor patch to eg/hstrip so that it use a "" handler
     instead of &ignore.
   * Test suite patches from Michael
 
-1999-12-13     2.99_96
+2.99_96     1999-12-13
   * Patches from Michael:
     - A handler of "" means that the event will be ignored.
       More efficient than using 'sub {}' as handler.
     - Don't use a perl hash for looking up argspec keywords.
     - Documentation tweaks.
 
-1999-12-09      2.99_95 (this is a 3.00 candidate)
+2.99_95     1999-12-09
+  * (this is a 3.00 candidate)
   * Fixed core dump when "<" was followed by an 8-bit character.
     Spotted and test case provided by Doug MacEachern.  Doug had
     been running HTML-Parser-XS through more that 1 million urls that
@@ -606,7 +634,8 @@ Change history for HTML-Parser
   * Made backslash reserved in literal argspec strings.
   * Added several new test scripts.
 
-1999-12-08     2.99_94 (should almost be a 3.00 candidate)
+2.99_94     1999-12-08
+  * (should almost be a 3.00 candidate)
   * Renamed 'cdata_flag' as 'is_cdata'.
   * Dropped support for wrapping callback handler and argspec
     in an array and passing a reference to $p->handler.  It
@@ -622,14 +651,14 @@ Change history for HTML-Parser
   * Added two more example programs: eg/hstrip and eg/htext.
   * Various minor patches from Michael.
 
-1999-12-07     2.99_93
+2.99_93     1999-12-07
   * Documentation update
   * $p->bool_attr_value renamed as $p->boolean_attribute_value
   * Internal renaming: attrspec --> argspec
   * Introduced internal 'enum argcode' in hparser.c
   * Added eg/hrefsub
 
-1999-12-05     2.99_92
+2.99_92     1999-12-05
   * More documentation patches from Michael
   * Renamed 'token1' as 'token0' as suggested by Michael
   * For artificial end tags we now report 'tokens', but not 'tokenpos'.
@@ -640,12 +669,13 @@ Change history for HTML-Parser
   * Will av_extend() the tokens/tokenspos arrays.
   * New test suite script by Michael: t/attrspec.t
 
-1999-12-04     2.99_91
+2.99_91     1999-12-04
   * Implemented attrspec 'offset'
   * Documentation patch from Michael
   * Some more cleanup/updated TODO
 
-1999-12-03     2.99_90 (first beta for 3.00)
+2.99_90     1999-12-03
+  * (first beta for 3.00)
   * Using "realloc" as a parameter name in grow_tokens created
     problems for some people.  Fix by Paul Schinder <schinder@pobox.com>
   * Patch by Michael that makes array handler destinations really work.
@@ -658,7 +688,7 @@ Change history for HTML-Parser
   * Dropped html_ prefix from internal parser functions.
   * Renamed internal function html_handle() as report_event().
 
-1999-12-02     2.99_17
+2.99_17     1999-12-02
   * HTML::Parser documentation patch from Michael.
   * Fix memory leaks in html_handler()
   * Patch that makes an array legal as handler destination.
@@ -669,13 +699,13 @@ Change history for HTML-Parser
     report an empty origtext.
   * New constructor option: 'api_version'
 
-1999-12-01     2.99_16
+2.99_16     1999-12-01
   * Support "event" in argspec.  It expands to the name of the
     handler (minus "default").
   * Fix core dump for large start tags.  The tokens_grow() routine
     needed an adjustment.  Added test for this; t/largstags.t.
 
-1999-11-30     2.99_15
+2.99_15     1999-11-30
   * Major restructuring/simplification of callback interface based on
     initial work by Michael.  The main news is that you now need to
     tell what arguments you want to be provided to your callbacks.
@@ -686,12 +716,12 @@ Change history for HTML-Parser
     $p->pass_self
     $p->attr_pos
 
-1999-11-26     2.99_14
+2.99_14     1999-11-26
   * Documentation update by Michael A. Chase.
   * Fix for declaration parsing by Michael A. Chase.
   * Workaround for perl5.004_05 bug. Can't return &PL_sv_undef.
 
-1999-11-22     2.99_13
+2.99_13     1999-11-22
   * New Parser.pm POD based on initial work by Michael A. Chase.
     All new features should now be described.
   * $p->callback(start => undef) will not reset the callback.
@@ -699,7 +729,7 @@ Change history for HTML-Parser
     HCTYPE_NOT_SPACE_EQ_SLASH_GT flag was never set.
   * A few more tests.
 
-1999-11-18     2.99_12
+2.99_12     1999-11-18
   * Implemented $p->attr_pos attribute.  This causes attr positions
     within $origtext of the start tag to be reported instead of the
     attribute values.  The positions are reported as 4 numbers; end of
@@ -721,7 +751,7 @@ Change history for HTML-Parser
   * Renamed $p->pass_cbdata to $p->pass_self.
   * Added magic number to the p_state struct.
 
-1999-11-17     2.99_11
+2.99_11     1999-11-17
   * Don't leak $@ modifications from HTML::Parser constructor.
   * Included HTML::Parser POD.
   * Marked sections almost work.  CDATA and RCDATA should work.
@@ -729,12 +759,12 @@ Change history for HTML-Parser
     <xmp>, we did not recognize the end tag unless it was written
     in all lower case.
 
-1999-11-16     2.99_10
+2.99_10     1999-11-16
   * The mkhctype and mkpfunc scripts were using \z inside RE.  This
     did not work for perl5.004.  Replaced them with plain old
     dollar signs.
 
-1999-11-15     2.99_09
+2.99_09     1999-11-15
   * Grammar fixes by Michael A. Chase <mchase@ix.netcom.com>
   * Some more test suite patches for Win32 by Michael A. Chase
     <mchase@ix.netcom.com>
@@ -746,7 +776,7 @@ Change history for HTML-Parser
   * Introduced some tables in "hctype.h" and "pfunc.h".  These
     are built by the corresponding "mk..." script.
 
-1999-11-10     2.99_08
+2.99_08     1999-11-10
   * Make Parser.xs compile on perl5.004_05 too.
   * New callback called 'default'.  This will be called for any
     document text no other callback shows an interest in.
@@ -766,7 +796,7 @@ Change history for HTML-Parser
   * Faster HTML::TokeParser by taking advantage of new
     accum interface.
 
-1999-11-09     2.99_07
+2.99_07     1999-11-09
   * Entities in attribute values are now always expanded.
   * If you set the $p->decode_text_entities to a true value, then
     you don't have to decode the text yourself.
@@ -781,7 +811,7 @@ Change history for HTML-Parser
     attributes.
   * Tweaks to make Parser.xs compile under perl5.004.
 
-1999-11-08     2.99_06
+2.99_06     1999-11-08
   * Internal fast decode_entities().   By using it we are able to make
     the HTML::Entities::decode function 6 times faster than the old one
     implemented in pure Perl.
@@ -795,38 +825,38 @@ Change history for HTML-Parser
     what we believe to be a compiler bug.  Should probably figure out
     which versions of gcc have this bug.
 
-1999-11-05     2.99_05
+2.99_05     1999-11-05
   * The previous release did not even compile.  I forgot to try 'make test'
     before uploading.
 
-1999-11-05     2.99_04
+2.99_04     1999-11-05
   * Generalized <XMP>-support to cover all literal parsing.  Currently
     activated for <script>, <style>, <xmp> and <plaintext>.
 
-1999-11-05     2.99_03
+2.99_03     1999-11-05
   * <XMP>-support.
   * Allow ":" in tag and attribute names
   * Include rest of the HTML::* files from the old HTML::Parser
     package.  This should make testing easier.
 
-1999-11-04     2.99_02
+2.99_02     1999-11-04
   * Implemented keep_case() option.  If this attribute is true, then
     we don't lowercase tag and attribute names.
   * Implemented accum() that takes an array reference.  Tokens are
     pushed onto this array instead of sent to callbacks.
   * Implemented strict_comment().
 
-1999-11-03     2.99_01
+2.99_01     1999-11-03
   * Baseline of XS implementation
 
-1999-11-05     2.25
+2.25     1999-11-05
   * Allow ":" in attribute names as a workaround for Microsoft Excel
     2000 which generates such files.
   * Make deprecate warning if netscape_buggy_comment() method is
     used.  The method is used in strict_comment().
   * Avoid duplication of parse_file() method in HTML::HeadParser.
 
-1999-10-29     2.24
+2.24     1999-10-29
   * $p->parse_file() will not close a handle passed to it any more.
     If passed a filename that can't be opened it will return undef
     instead of raising an exception, and strings like "*STDIN" are not
@@ -836,40 +866,40 @@ Change history for HTML-Parser
   * HTML::TokeParser will parse large inline strings much faster now.
     The string holding the document must not be changed during parsing.
 
-1999-06-09     2.23
+2.23     1999-06-09
   * Documentation updates.
 
-1998-12-18     2.22
+2.22     1998-12-18
   * Protect HTML::HeadParser from evil $SIG{__DIE__} hooks.
 
-1998-11-13     2.21
+2.21     1998-11-13
   * HTML::TokeParser can now parse strings directly and does the
     right thing if you pass it a GLOB.  Based on patch by
     Sami Itkonen <si@iki.fi>.
   * HTML::Parser now allows space before and after "--" in Netscape
     comments.  Patch by Peter Orbaek <poe@daimi.au.dk>.
 
-1998-07-08     2.20
+2.20     1998-07-08
   * Added HTML::TokeParser.  Check it out!
 
-1998-07-07     2.19
+2.19     1998-07-07
   * Don't end a text chunk with space when we try to avoid breaking up
     words.
 
-1998-06-22     2.18
+2.18     1998-06-22
   * HTML::HeadParser->parse_file will now stop parsing when the
     <body> starts as it should.
   * HTML::LinkExtor more easily subclassable by introducing the
     $self->_found_link method.
 
-1998-04-28     2.17
+2.17     1998-04-28
   * Never split words (a sequence of non-space) between two invocations
     of $self->text.  This is just a simplification of the code that tried
     not to break entities.
   * HTML::Parser->parse_file now use smaller chunks as already
     suggested by the HTML::Parser documentation.
 
-1998-04-02     2.16
+2.16     1998-04-02
   * The HTML::Parser could some times break hex entities (like &#xFFFF;)
     in the middle.
   * Removed remaining forced dependencies on libwww-perl modules.  It
@@ -877,5 +907,5 @@ Change history for HTML-Parser
     installed previously.
   * More tests.
 
-1998-04-01     2.14
+2.14     1998-04-01
   * HTML::* modules unbundled from libwww-perl-5.22

@@ -67,243 +67,243 @@
    "provides" : {
       "Git::Raw" : {
          "file" : "lib/Git/Raw.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::AnnotatedCommit" : {
          "file" : "lib/Git/Raw/AnnotatedCommit.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Blame" : {
          "file" : "lib/Git/Raw/Blame.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Blame::Hunk" : {
          "file" : "lib/Git/Raw/Blame/Hunk.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Blob" : {
          "file" : "lib/Git/Raw/Blob.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Branch" : {
          "file" : "lib/Git/Raw/Branch.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Cert" : {
          "file" : "lib/Git/Raw/Cert.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Cert::HostKey" : {
          "file" : "lib/Git/Raw/Cert/HostKey.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Cert::X509" : {
          "file" : "lib/Git/Raw/Cert/X509.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Commit" : {
          "file" : "lib/Git/Raw/Commit.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Config" : {
          "file" : "lib/Git/Raw/Config.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Cred" : {
          "file" : "lib/Git/Raw/Cred.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Diff" : {
          "file" : "lib/Git/Raw/Diff.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Diff::Delta" : {
          "file" : "lib/Git/Raw/Diff/Delta.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Diff::File" : {
          "file" : "lib/Git/Raw/Diff/File.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Diff::Hunk" : {
          "file" : "lib/Git/Raw/Diff/Hunk.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Diff::Stats" : {
          "file" : "lib/Git/Raw/Diff/Stats.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Error" : {
          "file" : "lib/Git/Raw/Error.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Error::Category" : {
          "file" : "lib/Git/Raw/Error/Category.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Filter" : {
          "file" : "lib/Git/Raw/Filter.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Filter::List" : {
          "file" : "lib/Git/Raw/Filter/List.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Filter::Source" : {
          "file" : "lib/Git/Raw/Filter/Source.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Graph" : {
          "file" : "lib/Git/Raw/Graph.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Index" : {
          "file" : "lib/Git/Raw/Index.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Index::Conflict" : {
          "file" : "lib/Git/Raw/Index/Conflict.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Index::Entry" : {
          "file" : "lib/Git/Raw/Index/Entry.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Indexer" : {
          "file" : "lib/Git/Raw/Indexer.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Mempack" : {
          "file" : "lib/Git/Raw/Mempack.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Merge::File::Result" : {
          "file" : "lib/Git/Raw/Merge/File/Result.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Note" : {
          "file" : "lib/Git/Raw/Note.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Object" : {
          "file" : "lib/Git/Raw/Object.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Odb" : {
          "file" : "lib/Git/Raw/Odb.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Odb::Backend" : {
          "file" : "lib/Git/Raw/Odb/Backend.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Odb::Backend::Loose" : {
          "file" : "lib/Git/Raw/Odb/Backend/Loose.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Odb::Backend::OnePack" : {
          "file" : "lib/Git/Raw/Odb/Backend/OnePack.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Odb::Backend::Pack" : {
          "file" : "lib/Git/Raw/Odb/Backend/Pack.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Odb::Object" : {
          "file" : "lib/Git/Raw/Odb/Object.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Packbuilder" : {
          "file" : "lib/Git/Raw/Packbuilder.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Patch" : {
          "file" : "lib/Git/Raw/Patch.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::PathSpec" : {
          "file" : "lib/Git/Raw/PathSpec.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::PathSpec::MatchList" : {
          "file" : "lib/Git/Raw/PathSpec/MatchList.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Rebase" : {
          "file" : "lib/Git/Raw/Rebase.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Rebase::Operation" : {
          "file" : "lib/Git/Raw/Rebase/Operation.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::RefSpec" : {
          "file" : "lib/Git/Raw/RefSpec.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Reference" : {
          "file" : "lib/Git/Raw/Reference.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Reflog" : {
          "file" : "lib/Git/Raw/Reflog.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Reflog::Entry" : {
          "file" : "lib/Git/Raw/Reflog/Entry.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Remote" : {
          "file" : "lib/Git/Raw/Remote.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Repository" : {
          "file" : "lib/Git/Raw/Repository.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Signature" : {
          "file" : "lib/Git/Raw/Signature.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Stash" : {
          "file" : "lib/Git/Raw/Stash.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Stash::Progress" : {
          "file" : "lib/Git/Raw/Stash/Progress.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Submodule" : {
          "file" : "lib/Git/Raw/Submodule.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Tag" : {
          "file" : "lib/Git/Raw/Tag.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::TransferProgress" : {
          "file" : "lib/Git/Raw/TransferProgress.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Tree" : {
          "file" : "lib/Git/Raw/Tree.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Tree::Builder" : {
          "file" : "lib/Git/Raw/Tree/Builder.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Tree::Entry" : {
          "file" : "lib/Git/Raw/Tree/Entry.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Walker" : {
          "file" : "lib/Git/Raw/Walker.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Git::Raw::Worktree" : {
          "file" : "lib/Git/Raw/Worktree.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       }
    },
    "release_status" : "stable",
@@ -318,7 +318,7 @@
          "web" : "https://github.com/jacquesg/p5-Git-Raw"
       }
    },
-   "version" : "0.86",
+   "version" : "0.87",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -419,7 +419,7 @@
                   "version_regexp" : "(?^:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.26.2",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                }
             },
@@ -510,7 +510,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.26.2",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -527,12 +527,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.86",
+                  "tag" : "v0.87",
                   "tag_format" : "v%V",
                   "tag_message" : "%N %v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.26.2",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -552,7 +552,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.26.2",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                }
             },

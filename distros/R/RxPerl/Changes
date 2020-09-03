@@ -1,5 +1,10 @@
 Revision history for Perl extension RxPerl
 
+v0.15.0 2020-09-03T16:55:09Z
+
+    - Wrote documentation
+    - Fixed timer warnings issue with Mojo and IO::Async
+
 v0.14.0 2020-06-10T18:33:29Z
 
     - Support for Mojo::IOLoop, AnyEvent, and IO::Async

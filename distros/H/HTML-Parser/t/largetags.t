@@ -1,26 +1,33 @@
+use strict;
+use warnings;
+
+use HTML::Parser ();
+use Test::More tests => 2;
+
 # Exercise the tokenpos buffer allocation routines by feeding it
 # very large tags.
 
-use Test::More tests => 2;
-
-use strict;
-use HTML::Parser ();
-
 my $p = HTML::Parser->new(api_version => 3);
 
-$p->handler("start" =>
-	    sub {
-		my $tp = shift;
-		#diag int(@$tp), " - ", join(", ", @$tp);
-		is(@$tp, 2 + 26 * 6 * 4);
-	    }, "tokenpos");
+$p->handler(
+    "start" => sub {
+        my $tp = shift;
 
-$p->handler("declaration" =>
-	    sub {
-		my $t = shift;
-		#diag int(@$t), " - @$t";
-		is(@$t, 26 * 6 * 2 + 1);
-	    }, "tokens");
+        #diag int(@$tp), " - ", join(", ", @$tp);
+        is(@$tp, 2 + 26 * 6 * 4);
+    },
+    "tokenpos"
+);
+
+$p->handler(
+    "declaration" => sub {
+        my $t = shift;
+
+        #diag int(@$t), " - @$t";
+        is(@$t, 26 * 6 * 2 + 1);
+    },
+    "tokens"
+);
 
 $p->parse("<a ");
 for ("aa" .. "fz") {
@@ -34,5 +41,3 @@ for ("aa" .. "fz") {
 }
 $p->parse(">");
 $p->eof;
-exit;
-

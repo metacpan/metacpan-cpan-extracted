@@ -1,3 +1,9 @@
+0.008   2020-04-29  Released-By: PERLANCAR; Urgency: low
+
+        - [build] Rebuild with updated App::CSelUtils to remove dependency to
+          the deprecated Perinci::Sub::ArgEntity::*.
+
+
 0.007   2020-04-14  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add -5 as shortcut for '-t Pod5 -t Nester'.

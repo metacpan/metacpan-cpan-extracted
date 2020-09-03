@@ -4,7 +4,7 @@
       "Salvador Fandino <sfandino@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -33,11 +33,16 @@
       "runtime" : {
          "requires" : {
             "Net::SFTP::Foreign" : "1.67",
-            "Net::SSH2" : "0.38"
+            "Net::SSH2" : "0.62"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/salva/p5-Net-SFTP-Foreign-Backend-Net_SSH2/issues"
+      }
+   },
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

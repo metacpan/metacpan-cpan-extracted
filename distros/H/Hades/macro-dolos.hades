@@ -1,0 +1,158 @@
+lib lib
+tlib t
+author LNATION
+email email@lnation.org
+version 0.02
+Hades::Macro::Dolos base Hades::Macro {
+	abstract { Hades macro helpers for Dolos }
+	synopsis {
+Quick summary of what the module does:
+
+	Hades->run({
+		eval => q|
+			macro {
+				Dolos
+			}
+			Kosmos { 
+				psyche $dolos :t(Int) $eros :t(HashRef) $psyche :t(HashRef) {
+					€if(q|$dolos|,q|€if(q{$dolos > 10},q{return $eros;});|,q|€elsif(q{$dolos > 5},q{€merge_hash_refs(q/$eros/, q/$psyche/);});|,
+						q|€else(q{return $psyche;});|);
+					return undef;
+				}
+			}
+		|;
+	});
+
+	}
+	macro :t(ArrayRef) :d([qw/
+		autoload_cb
+		caller
+		clear_unless_keys
+		call_sub
+		call_sub_my
+		delete
+		die_unless_keys
+		else
+		elsif
+		export
+		for
+		foreach
+		for_keys
+		for_key_exists_and_return
+		grep
+		grep_map
+		if
+		map
+		map_grep
+		maybe
+		merge_hash_refs
+		require
+		unless
+		while	
+	/])
+	autoload_cb $mg :t(Object) $cb :t(Str) {
+		return qq|
+			my (\$cls, \$vn) = (ref \$_[0], q{[^:'[:cntrl:]]{0,1024}});
+			our \$AUTOLOAD =~ /^\${cls}::(\$vn)\$/;
+                	die "illegal key name, must be of \$vn form\\n\\\$AUTOLOAD" unless \$1;
+                	return ${cb}(\$1);
+		|;
+	}
+	caller $mg :t(Object) $variable :t(Str) :d(q|$caller|) {
+		return qq|my $variable = caller();|;
+	}
+	clear_unless_keys $mg :t(Object) $variable :t(Str) $hash :t(Str) {
+		return qq|$variable = undef if (! ref $hash \|\| ! scalar keys \%{$hash});|;
+	}
+	call_sub $mg :t(Object) $sub :$(Str) @params {
+		my $p = join ", ", @params;
+		return qq|${sub}($p);|;
+	}
+	call_sub_my $mg :t(Object) $my :t(Str) $sub :$(Str) @params {
+		my $p = join ", ", @params;
+		return qq|my (${my}) = ${sub}($p);|;
+	}
+	delete $mg :t(Object) $hash :t(Str) $key :t(Str) $variable :t(Optional[Str]) $or :t(Optional[Str]) $list :t(Optional[Bool]) {
+		my $code = q||;
+		$code .= qq|$variable = | if $variable;
+		$code .= qq|delete $hash\->{$key}|;
+		$code .= qq| \|\| $or| if $or;
+		$code .= $list ? q|,| : qq|;|;
+		return $code;
+	}
+	die_unless_keys $mg :t(Object) $hash :t(Str) $error :t(Str) :d(hash is empty) {
+		return qq|die "$error" if (! ref $hash \|\| ! scalar keys \%{$hash});|;
+	}
+	else $mg :t(Object) @code {
+		my $c = join "\n", @code;
+		return qq|else { $c }|;
+	}
+	elsif $mg :t(Object) $condition :t(Str) @code {
+		my $c = join "\n", @code;
+		return qq|elsif ($condition) { $c }|;
+	}
+	export $mg :t(Object) $method :t(Str) $code :t(Str) $no_warnings :t(Int) :d(1) $caller :t(Str) :default('$caller') {
+		my $c = $no_warnings 
+			? qq|no strict "refs"; no warnings "redefine";| 
+			: q||;
+		$caller =~ s/\$([^: ]+)/\${$1}/g;
+		$method =~ s/\$([^: ]+)/\${$1}/g;
+		return $c . qq|*{ "${caller}::${method}" } = sub { $code };|;
+	}
+	for $mg :t(Object) $condition :t(Str) @code {
+		my $c = join "\n", @code;
+		return qq|for ($condition) { $c }|;
+	}
+	foreach $mg :t(Object) $condition :t(Str) @code {
+		my $c = join "\n", @code;
+		return qq|foreach ($condition) { $c }|;
+	}
+	for_keys $mg :t(Object) $hash :t(Str) $key :t(Str) :d($key) @code {
+		$hash =~ s/^\$([^\(\{\-\:\ ]+)$/\%{\$$1}/;
+		my $c = join "\n", @code;
+		return qq|for my $key (keys $hash) { $c }|;
+	}
+	for_key_exists_and_return $mg :t(Object) $hash :t(Str) $for :t(Str) {
+		return qq|\$_ && exists ${hash}->{\$_} and return ${hash}->{\$_}
+			for ($for);|;
+	}
+	grep $mg :t(Object) $condition :t(Str) @code {
+		my $c = join "\n", @code;
+		return qq|grep { $c } $condition|;
+	}
+	grep_map $mg :t(Object) $condition :t(Str) $grep_code :t(Str) @map_code  {
+		my $mc = join "\n", @map_code;
+		return qq|map { $mc } grep { $grep_code } $condition|;
+	}
+	if $mg :t(Object) $condition :t(Str) @code {
+		my $c = join "\n", @code;
+		return qq|if ($condition) { $c }|;
+	}
+	map $mg :t(Object) $condition :t(Str) @code {
+		my $c = join "\n", @code;
+		return qq|map { $c } $condition|;
+	}
+	map_grep $mg :t(Object) $condition :t(Str) $grep_code :t(Str) @map_code {
+		my $mc = join "\n", @map_code;
+		return qq|grep { $grep_code } map { $mc } $condition|;
+	}
+	maybe $mg :t(Object) $key :t(Str) $variable :t(Str) {
+		return qq|(defined $variable ? ( $key => $variable ) : ())|;
+	}
+	merge_hash_refs $mg :t(Object) @hashes {
+		my $base = $hashes[0];
+		my $merge = join ', ', map { '%{' . $_ . '}' } @hashes;
+		return qq|$base = { $merge };|;
+	}
+	require $mg :t(Object) $variable :t(Str) {
+		return qq|eval "require ${variable}";|;
+	}
+	unless $mg :t(Object) $condition :t(Str) @code {
+		my $c = join "\n", @code;	
+		return qq|unless ($condition) { $c }|;
+	}
+	while $mg :t(Object) $condition :t(Str) @code {
+		my $c = join "\n", @code;	
+		return qq|while ($condition) { $c }|;
+	}
+}

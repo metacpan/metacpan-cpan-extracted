@@ -4,7 +4,7 @@ use strict;
 
 require HTML::PullParser;
 our @ISA = qw(HTML::PullParser);
-our $VERSION = '3.73';
+our $VERSION = '3.75';
 
 use Carp ();
 use HTML::Entities qw(decode_entities);
@@ -293,7 +293,7 @@ before the first of the specified tags found. For example:
 
    $p->get_text("p", "br");
 
-will return the text up to either a paragraph of linebreak element.
+will return the text up to either a paragraph of line break element.
 
 The text might span tags that should be I<textified>.  This is
 controlled by the $p->{textify} attribute, which is a hash that

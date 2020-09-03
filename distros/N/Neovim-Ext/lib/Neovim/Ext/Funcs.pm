@@ -1,5 +1,5 @@
 package Neovim::Ext::Funcs;
-$Neovim::Ext::Funcs::VERSION = '0.02';
+$Neovim::Ext::Funcs::VERSION = '0.05';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -51,7 +51,7 @@ Neovim::Ext::Funcs - Neovim Funcs class
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head2 SYNOPSIS
 

@@ -28,6 +28,12 @@ use SPVM::Builder::Util;
     warn "SPVM don't support NetBSD 6, 5, 4, 3, 2, 1";
     die "OS unsupported\n";
   }
+
+  # Not support Alpine Linux because Alpine Linux tests fail in current SPVM
+  if ($Config{uname} =~ /alpine/i) {
+    warn "Not support Alpine Linux because Alpine Linux tests fail in current SPVM";
+    die "OS unsupported\n";
+  }
 }
 
 my @defines;
@@ -106,8 +112,6 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::Time');
     $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::Unicode');
     $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::Sort');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::IO::FileHandle');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::IO::File');
     $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::IO::Stdout');
     $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::IO::Stderr');
     

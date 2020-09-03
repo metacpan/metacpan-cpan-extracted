@@ -12,7 +12,7 @@ configure_requires:
   Module::Build: '0.4004'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,10 +38,10 @@ requires:
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues
+  bugtracker: https://github.com/PerlAlien/Alien-Base-ModuleBuild/issues
   homepage: https://metacpan.org/pod/Alien::Base::ModuleBuild
-  repository: git://github.com/Perl5-Alien/Alien-Base-ModuleBuild.git
-version: '1.14'
+  repository: git://github.com/PerlAlien/Alien-Base-ModuleBuild.git
+version: '1.15'
 x_contributors:
   - 'Joel A Berger <joel.a.berger@gmail.com>'
   - 'Graham Ollis <plicease@cpan.org>'
@@ -61,6 +61,7 @@ x_contributors:
   - 'Nicholas Shipp (nshp)'
   - 'Petr Pisar (ppisar)'
   - 'Alberto Simões (ambs)'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.33.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

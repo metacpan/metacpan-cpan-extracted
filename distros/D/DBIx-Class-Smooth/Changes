@@ -1,6 +1,18 @@
 Revision history for DBIx-Class-Smooth
 
-0.0103 2020-05-31 19:15:33 UTC
+0.0104 2020-08-30 14:15:20 UTC
+ [Other Changes]
+ - Tests improved.
+
+ [Documentation]
+ - Improvements to documentation.
+
+ [Stats & Dependency Changes]
+ - 42 files changed, 126 insertions(+), 86 deletions(-)
+ - (dev req) ~ Dist::Zilla 6.012 --> 6.015
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0324 --> 0.0325
+
+0.0103 2020-05-31T19:15:33Z UTC
  [Documentation]
  - Documentation typos in ::ResultBase fixed
 

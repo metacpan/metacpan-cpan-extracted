@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 $VERSION = $VERSION;
 
 # internal use
@@ -20,7 +20,6 @@ $mb::last_s_passed = 0; # last s/// status (1 if s/// passed)
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 } use warnings; local $^W=1;
-use Symbol ();
 
 # set OSNAME
 my $OSNAME = $^O;
@@ -1478,24 +1477,20 @@ sub mb::_lstat {
 
 #---------------------------------------------------------------------
 # opendir() for MSWin32
-sub mb::_opendir (*$) {
-    my $dh;
-    if (defined $_[0]) {
-        $dh = Symbol::qualify_to_ref($_[0], caller());
-    }
-    else {
-        $dh = $_[0] = \do { local *_ };
+sub mb::_opendir {
+    if (not defined $_[0]) {
+        $_[0] = \do { local *_ };
     }
 
     # works on MSWin32 only
     if (($OSNAME !~ /MSWin32/) or ($script_encoding !~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        return CORE::opendir $dh, $_[1];
+        return CORE::opendir $_[0], $_[1];
     }
     elsif (-d $_[1]) {
-        return CORE::opendir $dh, $_[1];
+        return CORE::opendir $_[0], $_[1];
     }
     elsif (-d qq{$_[1].}) {
-        return CORE::opendir $dh, qq{$_[1].};
+        return CORE::opendir $_[0], qq{$_[1].};
     }
     return undef;
 }
@@ -1790,21 +1785,48 @@ sub parse_expr {
     # file test operator on MSWin32
     # "\x2D" [-] HYPHEN-MINUS (U+002D)
 
+    # -X -Y -Z 'file' --> mb::_filetest [qw( -X -Y -Z )], 'file'
+    # -X -Y -Z "file" --> mb::_filetest [qw( -X -Y -Z )], "file"
+    # -X -Y -Z `file` --> mb::_filetest [qw( -X -Y -Z )], `file`
+    # -X -Y -Z $file  --> mb::_filetest [qw( -X -Y -Z )], $file
+    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    #                                           vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv        vvvvvvvvvvvv  vvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( -[ABCMORSTWXbcdefgkloprstuwxz] (?: \s+ -[ABCMORSTWXbcdefgkloprstuwxz] )* ) (?= (?: \( \s* )* (?: ' | " | ` | \$ ) ) /xmsgc) {
+        $parsed .= "mb::_filetest [qw( $1 )], ";
+        $term = 1;
+    }
+
+    # -X -Y -Z m//   --> mb::_filetest [qw( -X -Y -Z )], m//
+    # -X -Y -Z q//   --> mb::_filetest [qw( -X -Y -Z )], q//
+    # -X -Y -Z qq//  --> mb::_filetest [qw( -X -Y -Z )], qq//
+    # -X -Y -Z qr//  --> mb::_filetest [qw( -X -Y -Z )], qr//
+    # -X -Y -Z qw//  --> mb::_filetest [qw( -X -Y -Z )], qw//
+    # -X -Y -Z qx//  --> mb::_filetest [qw( -X -Y -Z )], qx//
+    # -X -Y -Z s///  --> mb::_filetest [qw( -X -Y -Z )], s///
+    # -X -Y -Z tr/// --> mb::_filetest [qw( -X -Y -Z )], tr///
+    # -X -Y -Z y///  --> mb::_filetest [qw( -X -Y -Z )], y///
+    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    #            vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv        vvvvvvvvvvvv  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \s+ )+ ) (?= (?: \( \s* )* (?: m | q | qq | qr | qw | qx | s | tr | y ) \b ) /xmsgc) {
+        $parsed .= "mb::_filetest [qw( $1)], ";
+        $term = 1;
+    }
+
     # -X -Y -Z _    --> mb::_filetest [qw( -X -Y -Z )], \*_
     # -X -Y -Z FILE --> mb::_filetest [qw( -X -Y -Z )], \*FILE
-    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    #            vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \b \s* )+ ) (?= [A-Za-z_][A-Za-z0-9_]* \b ) /xmsgc) {
-        $parsed .= "mb::_filetest [qw( $1 )], ";
+    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    #            vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv    vvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \s+ )+ ) (?= [A-Za-z_][A-Za-z0-9_]* ) /xmsgc) {
+        $parsed .= "mb::_filetest [qw( $1)], ";
         $parsed .= '\\*';
         $term = 1;
     }
 
     # -X -Y -Z ... --> mb::_filetest [qw( -X -Y -Z )], ...
-    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    #            vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \b \s* )+ ) \b /xmsgc) {
-        $parsed .= "mb::_filetest [qw( $1 )], ";
+    #          vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    #            vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( (?: -[ABCMORSTWXbcdefgkloprstuwxz] \s+ )+ ) /xmsgc) {
+        $parsed .= "mb::_filetest [qw( $1)], ";
         $term = 1;
     }
 
@@ -2635,29 +2657,24 @@ sub parse_expr {
         $term = 1;
     }
 
-    # lstat(FILE) --> mb::_lstat(\*FILE)
-    # lstat FILE  --> mb::_lstat \*FILE
-    # stat(FILE)  --> mb::_stat(\*FILE)
-    # stat FILE   --> mb::_stat \*FILE
-    #                              vvvvvvvvvvvvvvvvvvvvv
-    #                                vvvvvvvvvvvv        vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    elsif (/\G ( lstat | stat ) \b ( (?: \s* \( )* \s* ) (?= [A-Za-z_][A-Za-z0-9_]* \b ) /xmsgc) {
+    # lstat(FILE)  --> mb::_lstat(\*FILE)
+    # lstat FILE   --> mb::_lstat \*FILE
+    # opendir(DIR) --> mb::_opendir(\*DIR)
+    # opendir DIR  --> mb::_opendir \*DIR
+    # stat(FILE)   --> mb::_stat(\*FILE)
+    # stat FILE    --> mb::_stat \*FILE
+    #                                        vvvvvvvvvvvvvvvvvvvvv
+    #                                          vvvvvvvvvvvv        vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    elsif (/\G ( lstat | opendir | stat ) \b ( (?: \s* \( )* \s* ) (?= [A-Za-z_][A-Za-z0-9_]* \b ) /xmsgc) {
         $parsed .= "mb::_$1";
         $parsed .= $2;
         $parsed .= '\\*';
         $term = 1;
     }
 
-    # lstat --> mb::_lstat
-    # stat  --> mb::_stat
-    elsif (/\G ( lstat | stat ) \b /xmsgc) {
-        $parsed .= "mb::_$1";
-        $term = 1;
-    }
-
     # function --> mb::subroutine on MSWin32
     # implements run on any systems by transpiling once
-    elsif (/\G ( chdir | opendir | unlink ) \b /xmsgc) {
+    elsif (/\G ( chdir | lstat | opendir | stat | unlink ) \b /xmsgc) {
         $parsed .= "mb::_$1";
         $term = 1;
     }
@@ -3533,7 +3550,7 @@ sub parse_re_as_q_endswith {
 
                 # something wrong happened
                 else {
-        die sprintf(<<END, pos($_), CORE::substr($_,pos($_)));
+                    die sprintf(<<END, pos($_), CORE::substr($_,pos($_)));
 $0(@{[__LINE__]}): something wrong happened in script at pos=%s
 ------------------------------------------------------------------------------
 %s
@@ -3815,7 +3832,7 @@ sub parse_re {
 
             # something wrong happened
             else {
-        die sprintf(<<END, pos($_), CORE::substr($_,pos($_)));
+                die sprintf(<<END, pos($_), CORE::substr($_,pos($_)));
 $0(@{[__LINE__]}): something wrong happened in script at pos=%s
 ------------------------------------------------------------------------------
 %s
@@ -3823,7 +3840,13 @@ $0(@{[__LINE__]}): something wrong happened in script at pos=%s
 END
             }
         }
-        $parsed .= "\@{[mb::_cc(qq[$classmate])]}";
+
+        # quote by (?: ... ) to avoid syntax error: Can't coerce array into hash at ...
+        #
+        # [ABC]{3} --> @{[mb::_cc(qq[ABC])]}{3}     # makes: Can't coerce array into hash at ...
+        # [ABC]{3} --> (?:@{[mb::_cc(qq[ABC])]}){3} # ok
+
+        $parsed .= "(?:\@{[mb::_cc(qq[$classmate])]})";
     }
 
     # /./ or \any
@@ -4787,7 +4810,10 @@ To install this software without make, type the following:
   in your script                             script transpiled by this software
   -----------------------------------------------------------------------------
   chdir                                      mb::_chdir
-  opendir                                    mb::_opendir
+  opendir(DIR,'dir')                         mb::_opendir(\*DIR,'dir')
+  opendir DIR,'dir'                          mb::_opendir \*DIR,'dir'
+  opendir($dh,'dir')                         mb::_opendir($dh,'dir')
+  opendir $dh,'dir'                          mb::_opendir $dh,'dir'
   unlink                                     mb::_unlink
   lstat()                                    mb::_lstat()
   lstat('a')                                 mb::_lstat('a')
@@ -4829,34 +4855,146 @@ To install this software without make, type the following:
   stat FILE                                  mb::_stat \*FILE
   stat _                                     mb::_stat \*_
   stat                                       mb::_stat
-  -A                                         mb::_filetest [qw( -A )], 
-  -B                                         mb::_filetest [qw( -B )], 
-  -C                                         mb::_filetest [qw( -C )], 
-  -M                                         mb::_filetest [qw( -M )], 
-  -O                                         mb::_filetest [qw( -O )], 
-  -R                                         mb::_filetest [qw( -R )], 
-  -S                                         mb::_filetest [qw( -S )], 
-  -T                                         mb::_filetest [qw( -T )], 
-  -W                                         mb::_filetest [qw( -W )], 
-  -X                                         mb::_filetest [qw( -X )], 
-  -b                                         mb::_filetest [qw( -b )], 
-  -c                                         mb::_filetest [qw( -c )], 
-  -d                                         mb::_filetest [qw( -d )], 
-  -e                                         mb::_filetest [qw( -e )], 
-  -f                                         mb::_filetest [qw( -f )], 
-  -g                                         mb::_filetest [qw( -g )], 
-  -k                                         mb::_filetest [qw( -k )], 
-  -l                                         mb::_filetest [qw( -l )], 
-  -o                                         mb::_filetest [qw( -o )], 
-  -p                                         mb::_filetest [qw( -p )], 
-  -r                                         mb::_filetest [qw( -r )], 
-  -s                                         mb::_filetest [qw( -s )], 
-  -t                                         mb::_filetest [qw( -t )], 
-  -u                                         mb::_filetest [qw( -u )], 
-  -w                                         mb::_filetest [qw( -w )], 
-  -x                                         mb::_filetest [qw( -x )], 
-  -z                                         mb::_filetest [qw( -z )], 
-  -r -w -f                                   mb::_filetest [qw( -r -w -f )], 
+  -A $fh                                     mb::_filetest [qw( -A )], $fh
+  -A 'file'                                  mb::_filetest [qw( -A )], 'file'
+  -A FILE                                    mb::_filetest [qw( -A )], \*FILE
+  -A _                                       mb::_filetest [qw( -A )], \*_
+  -A qq{file}                                mb::_filetest [qw( -A )], qq{file}
+  -B $fh                                     mb::_filetest [qw( -B )], $fh
+  -B 'file'                                  mb::_filetest [qw( -B )], 'file'
+  -B FILE                                    mb::_filetest [qw( -B )], \*FILE
+  -B _                                       mb::_filetest [qw( -B )], \*_
+  -B qq{file}                                mb::_filetest [qw( -B )], qq{file}
+  -C $fh                                     mb::_filetest [qw( -C )], $fh
+  -C 'file'                                  mb::_filetest [qw( -C )], 'file'
+  -C FILE                                    mb::_filetest [qw( -C )], \*FILE
+  -C _                                       mb::_filetest [qw( -C )], \*_
+  -C qq{file}                                mb::_filetest [qw( -C )], qq{file}
+  -M $fh                                     mb::_filetest [qw( -M )], $fh
+  -M 'file'                                  mb::_filetest [qw( -M )], 'file'
+  -M FILE                                    mb::_filetest [qw( -M )], \*FILE
+  -M _                                       mb::_filetest [qw( -M )], \*_
+  -M qq{file}                                mb::_filetest [qw( -M )], qq{file}
+  -O $fh                                     mb::_filetest [qw( -O )], $fh
+  -O 'file'                                  mb::_filetest [qw( -O )], 'file'
+  -O FILE                                    mb::_filetest [qw( -O )], \*FILE
+  -O _                                       mb::_filetest [qw( -O )], \*_
+  -O qq{file}                                mb::_filetest [qw( -O )], qq{file}
+  -R $fh                                     mb::_filetest [qw( -R )], $fh
+  -R 'file'                                  mb::_filetest [qw( -R )], 'file'
+  -R FILE                                    mb::_filetest [qw( -R )], \*FILE
+  -R _                                       mb::_filetest [qw( -R )], \*_
+  -R qq{file}                                mb::_filetest [qw( -R )], qq{file}
+  -S $fh                                     mb::_filetest [qw( -S )], $fh
+  -S 'file'                                  mb::_filetest [qw( -S )], 'file'
+  -S FILE                                    mb::_filetest [qw( -S )], \*FILE
+  -S _                                       mb::_filetest [qw( -S )], \*_
+  -S qq{file}                                mb::_filetest [qw( -S )], qq{file}
+  -T $fh                                     mb::_filetest [qw( -T )], $fh
+  -T 'file'                                  mb::_filetest [qw( -T )], 'file'
+  -T FILE                                    mb::_filetest [qw( -T )], \*FILE
+  -T _                                       mb::_filetest [qw( -T )], \*_
+  -T qq{file}                                mb::_filetest [qw( -T )], qq{file}
+  -W $fh                                     mb::_filetest [qw( -W )], $fh
+  -W 'file'                                  mb::_filetest [qw( -W )], 'file'
+  -W FILE                                    mb::_filetest [qw( -W )], \*FILE
+  -W _                                       mb::_filetest [qw( -W )], \*_
+  -W qq{file}                                mb::_filetest [qw( -W )], qq{file}
+  -X $fh                                     mb::_filetest [qw( -X )], $fh
+  -X 'file'                                  mb::_filetest [qw( -X )], 'file'
+  -X FILE                                    mb::_filetest [qw( -X )], \*FILE
+  -X _                                       mb::_filetest [qw( -X )], \*_
+  -X qq{file}                                mb::_filetest [qw( -X )], qq{file}
+  -b $fh                                     mb::_filetest [qw( -b )], $fh
+  -b 'file'                                  mb::_filetest [qw( -b )], 'file'
+  -b FILE                                    mb::_filetest [qw( -b )], \*FILE
+  -b _                                       mb::_filetest [qw( -b )], \*_
+  -b qq{file}                                mb::_filetest [qw( -b )], qq{file}
+  -c $fh                                     mb::_filetest [qw( -c )], $fh
+  -c 'file'                                  mb::_filetest [qw( -c )], 'file'
+  -c FILE                                    mb::_filetest [qw( -c )], \*FILE
+  -c _                                       mb::_filetest [qw( -c )], \*_
+  -c qq{file}                                mb::_filetest [qw( -c )], qq{file}
+  -d $fh                                     mb::_filetest [qw( -d )], $fh
+  -d 'file'                                  mb::_filetest [qw( -d )], 'file'
+  -d FILE                                    mb::_filetest [qw( -d )], \*FILE
+  -d _                                       mb::_filetest [qw( -d )], \*_
+  -d qq{file}                                mb::_filetest [qw( -d )], qq{file}
+  -e $fh                                     mb::_filetest [qw( -e )], $fh
+  -e 'file'                                  mb::_filetest [qw( -e )], 'file'
+  -e FILE                                    mb::_filetest [qw( -e )], \*FILE
+  -e _                                       mb::_filetest [qw( -e )], \*_
+  -e qq{file}                                mb::_filetest [qw( -e )], qq{file}
+  -f $fh                                     mb::_filetest [qw( -f )], $fh
+  -f 'file'                                  mb::_filetest [qw( -f )], 'file'
+  -f FILE                                    mb::_filetest [qw( -f )], \*FILE
+  -f _                                       mb::_filetest [qw( -f )], \*_
+  -f qq{file}                                mb::_filetest [qw( -f )], qq{file}
+  -g $fh                                     mb::_filetest [qw( -g )], $fh
+  -g 'file'                                  mb::_filetest [qw( -g )], 'file'
+  -g FILE                                    mb::_filetest [qw( -g )], \*FILE
+  -g _                                       mb::_filetest [qw( -g )], \*_
+  -g qq{file}                                mb::_filetest [qw( -g )], qq{file}
+  -k $fh                                     mb::_filetest [qw( -k )], $fh
+  -k 'file'                                  mb::_filetest [qw( -k )], 'file'
+  -k FILE                                    mb::_filetest [qw( -k )], \*FILE
+  -k _                                       mb::_filetest [qw( -k )], \*_
+  -k qq{file}                                mb::_filetest [qw( -k )], qq{file}
+  -l $fh                                     mb::_filetest [qw( -l )], $fh
+  -l 'file'                                  mb::_filetest [qw( -l )], 'file'
+  -l FILE                                    mb::_filetest [qw( -l )], \*FILE
+  -l _                                       mb::_filetest [qw( -l )], \*_
+  -l qq{file}                                mb::_filetest [qw( -l )], qq{file}
+  -o $fh                                     mb::_filetest [qw( -o )], $fh
+  -o 'file'                                  mb::_filetest [qw( -o )], 'file'
+  -o FILE                                    mb::_filetest [qw( -o )], \*FILE
+  -o _                                       mb::_filetest [qw( -o )], \*_
+  -o qq{file}                                mb::_filetest [qw( -o )], qq{file}
+  -p $fh                                     mb::_filetest [qw( -p )], $fh
+  -p 'file'                                  mb::_filetest [qw( -p )], 'file'
+  -p FILE                                    mb::_filetest [qw( -p )], \*FILE
+  -p _                                       mb::_filetest [qw( -p )], \*_
+  -p qq{file}                                mb::_filetest [qw( -p )], qq{file}
+  -r $fh                                     mb::_filetest [qw( -r )], $fh
+  -r 'file'                                  mb::_filetest [qw( -r )], 'file'
+  -r -w -f $fh                               mb::_filetest [qw( -r -w -f )], $fh
+  -r -w -f 'file'                            mb::_filetest [qw( -r -w -f )], 'file'
+  -r -w -f FILE                              mb::_filetest [qw( -r -w -f )], \*FILE
+  -r -w -f _                                 mb::_filetest [qw( -r -w -f )], \*_
+  -r -w -f qq{file}                          mb::_filetest [qw( -r -w -f )], qq{file}
+  -r FILE                                    mb::_filetest [qw( -r )], \*FILE
+  -r _                                       mb::_filetest [qw( -r )], \*_
+  -r qq{file}                                mb::_filetest [qw( -r )], qq{file}
+  -s $fh                                     mb::_filetest [qw( -s )], $fh
+  -s 'file'                                  mb::_filetest [qw( -s )], 'file'
+  -s FILE                                    mb::_filetest [qw( -s )], \*FILE
+  -s _                                       mb::_filetest [qw( -s )], \*_
+  -s qq{file}                                mb::_filetest [qw( -s )], qq{file}
+  -t $fh                                     mb::_filetest [qw( -t )], $fh
+  -t 'file'                                  mb::_filetest [qw( -t )], 'file'
+  -t FILE                                    mb::_filetest [qw( -t )], \*FILE
+  -t _                                       mb::_filetest [qw( -t )], \*_
+  -t qq{file}                                mb::_filetest [qw( -t )], qq{file}
+  -u $fh                                     mb::_filetest [qw( -u )], $fh
+  -u 'file'                                  mb::_filetest [qw( -u )], 'file'
+  -u FILE                                    mb::_filetest [qw( -u )], \*FILE
+  -u _                                       mb::_filetest [qw( -u )], \*_
+  -u qq{file}                                mb::_filetest [qw( -u )], qq{file}
+  -w $fh                                     mb::_filetest [qw( -w )], $fh
+  -w 'file'                                  mb::_filetest [qw( -w )], 'file'
+  -w FILE                                    mb::_filetest [qw( -w )], \*FILE
+  -w _                                       mb::_filetest [qw( -w )], \*_
+  -w qq{file}                                mb::_filetest [qw( -w )], qq{file}
+  -x $fh                                     mb::_filetest [qw( -x )], $fh
+  -x 'file'                                  mb::_filetest [qw( -x )], 'file'
+  -x FILE                                    mb::_filetest [qw( -x )], \*FILE
+  -x _                                       mb::_filetest [qw( -x )], \*_
+  -x qq{file}                                mb::_filetest [qw( -x )], qq{file}
+  -z $fh                                     mb::_filetest [qw( -z )], $fh
+  -z 'file'                                  mb::_filetest [qw( -z )], 'file'
+  -z FILE                                    mb::_filetest [qw( -z )], \*FILE
+  -z _                                       mb::_filetest [qw( -z )], \*_
+  -z qq{file}                                mb::_filetest [qw( -z )], qq{file}
   -----------------------------------------------------------------------------
 
   Each elements in strings or regular expressions that are double-quote like are
@@ -4938,35 +5076,35 @@ To install this software without make, type the following:
   qr/\s/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_s]})/ ]}@{[mb::_m_passed()]}}
   qr/\v/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_v]})/ ]}@{[mb::_m_passed()]}}
   qr/\w/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_w]})/ ]}@{[mb::_m_passed()]}}
-  qr/[\b]/                                   qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[\\b])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:alnum:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:alnum:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:alpha:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:alpha:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:ascii:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:ascii:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:blank:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:blank:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:cntrl:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:cntrl:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:digit:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:digit:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:graph:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:graph:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:lower:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:lower:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:print:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:print:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:punct:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:punct:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:space:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:space:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:upper:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:upper:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:word:]]/                             qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:word:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:xdigit:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:xdigit:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^alnum:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^alnum:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^alpha:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^alpha:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^ascii:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^ascii:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^blank:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^blank:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^cntrl:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^cntrl:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^digit:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^digit:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^graph:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^graph:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^lower:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^lower:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^print:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^print:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^punct:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^punct:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^space:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^space:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^upper:]]/                           qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^upper:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^word:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^word:]])]}/ ]}@{[mb::_m_passed()]}}
-  qr/[[:^xdigit:]]/                          qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:^xdigit:]])]}/ ]}@{[mb::_m_passed()]}}
+  qr/[\b]/                                   qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[\\b])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:alnum:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:alnum:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:alpha:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:alpha:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:ascii:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:ascii:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:blank:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:blank:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:cntrl:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:cntrl:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:digit:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:digit:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:graph:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:graph:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:lower:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:lower:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:print:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:print:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:punct:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:punct:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:space:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:space:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:upper:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:upper:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:word:]]/                             qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:word:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:xdigit:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:xdigit:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^alnum:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^alnum:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^alpha:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^alpha:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^ascii:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^ascii:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^blank:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^blank:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^cntrl:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^cntrl:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^digit:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^digit:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^graph:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^graph:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^lower:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^lower:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^print:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^print:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^punct:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^punct:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^space:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^space:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^upper:]]/                           qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^upper:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^word:]]/                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^word:]])]})/ ]}@{[mb::_m_passed()]}}
+  qr/[[:^xdigit:]]/                          qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^xdigit:]])]})/ ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
 =head1 DEPENDENCIES

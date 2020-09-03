@@ -1,5 +1,3 @@
-.github/dependabot.yml
-.github/workflows/build.yaml
 .gitignore
 Build.PL
 Changes

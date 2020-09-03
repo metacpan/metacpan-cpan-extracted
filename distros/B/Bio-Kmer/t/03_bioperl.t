@@ -13,17 +13,16 @@ use_ok 'Bio::Kmer';
 
 # expected histogram
 my @correctCounts=(
-  0,
-  16087,
-  17621,
-  12868,
-  6857,
-  3070,
-  1096,
-  380,
-  105,
-  17,
-# 6,
+  0,      # histogram count of 0 instances
+  16184,  # histogram count of 1 instance
+  17684,  # histogram count of 2 instances
+  12763,  # histogram count of 3 instances
+  6797,   # histogram count of 4 instances
+  2989,   # histogram count of 5 instances
+  1080,   # histogram count of 6 instances
+  361,    # histogram count of 7 instances
+  103,    # histogram count of 8 instances
+  15,     # histogram count of 9 instances
 );
 
 # expected query results

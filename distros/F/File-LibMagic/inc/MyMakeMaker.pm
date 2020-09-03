@@ -23,12 +23,7 @@ override _build_WriteMakefile_args => sub {
         'lib/File/LibMagic/Constants.pm' =>
             '$(INST_LIB)/File/LibMagic/Constants.pm',
     };
-    $args->{LIBS}   = '-lmagic';
-    $args->{INC}    = '-I. -Ic';
-    $args->{XS}     = { 'lib/File/LibMagic.xs' => 'lib/File/LibMagic.c' };
-    $args->{C}      = ['lib/File/LibMagic.c'];
-    $args->{OBJECT} = 'lib/File/LibMagic$(OBJ_EXT)';
-    $args->{LDFROM} = 'LibMagic$(OBJ_EXT)';
+    $args->{LIBS} = '-lmagic';
 
     delete $args->{VERSION};
     $args->{VERSION_FROM} = 'lib/File/LibMagic.pm';
@@ -42,7 +37,7 @@ override _build_WriteMakefile_dump => sub {
     my $dump = super();
     $dump .= <<'EOF';
 $WriteMakefileArgs{DEFINE} = ( $WriteMakefileArgs{DEFINE} || q{} ) . _defines();
-$WriteMakefileArgs{INC}    = join q{ }, _includes(), $WriteMakefileArgs{INC};
+$WriteMakefileArgs{INC}    = join q{ }, _includes();
 $WriteMakefileArgs{LIBS}   = join q{ }, _libs(), $WriteMakefileArgs{LIBS};
 
 EOF

@@ -137,6 +137,8 @@ int fido_dev_close(fido_dev_t *);
 int fido_dev_get_assert(fido_dev_t *, fido_assert_t *, const char *);
 int fido_dev_get_cbor_info(fido_dev_t *, fido_cbor_info_t *);
 int fido_dev_get_retry_count(fido_dev_t *, int *);
+int fido_dev_get_touch_begin(fido_dev_t *);
+int fido_dev_get_touch_status(fido_dev_t *, int *, int);
 int fido_dev_info_manifest(fido_dev_info_t *, size_t, size_t *);
 int fido_dev_make_cred(fido_dev_t *, fido_cred_t *, const char *);
 int fido_dev_open_with_info(fido_dev_t *);
@@ -178,9 +180,14 @@ uint8_t  fido_dev_flags(const fido_dev_t *);
 int16_t  fido_dev_info_vendor(const fido_dev_info_t *);
 int16_t  fido_dev_info_product(const fido_dev_info_t *);
 uint64_t fido_cbor_info_maxmsgsiz(const fido_cbor_info_t *);
+uint64_t fido_cbor_info_maxcredcntlst(const fido_cbor_info_t *);
+uint64_t fido_cbor_info_maxcredidlen(const fido_cbor_info_t *);
 uint64_t fido_cbor_info_fwversion(const fido_cbor_info_t *);
 
+bool fido_dev_has_pin(const fido_dev_t *);
 bool fido_dev_is_fido2(const fido_dev_t *);
+bool fido_dev_supports_pin(const fido_dev_t *);
+bool fido_dev_supports_cred_prot(const fido_dev_t *);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -50,7 +50,7 @@ no_index:
 provides:
   Perl::Dist::Strawberry:
     file: lib/Perl/Dist/Strawberry.pm
-    version: '4.020'
+    version: '4.021'
   Perl::Dist::Strawberry::Step:
     file: lib/Perl/Dist/Strawberry/Step.pm
   Perl::Dist::Strawberry::Step::BinaryToolsAndLibs:
@@ -96,5 +96,5 @@ resources:
   homepage: http://strawberryperl.com/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/StrawberryPerl/Perl-Dist-Strawberry
-version: '4.020'
+version: '4.021'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

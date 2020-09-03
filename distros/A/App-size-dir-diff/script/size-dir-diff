@@ -1,0 +1,123 @@
+#!/usr/bin/perl -w
+
+use strict;
+use File::Find;
+use Storable;
+use Getopt::Std;
+use Data::Dumper;
+
+my %first_hash = ();
+my %second_hash = ();
+my %opts = ();
+my $file = "/tmp/first_hash";
+
+sub search_first {
+	if (-f $_) {
+		my $key = $File::Find::name =~ s/^$ARGV[0]//r;
+		$first_hash{ $key } = -s $_;
+	}
+}
+
+sub search_second {
+	if (-f $_) {
+		my $key = $File::Find::name =~ s/^$ARGV[1]//r;
+		$second_hash{ $key } = -s $_;
+	}
+}
+
+sub print_hashes {
+	print("Files in $ARGV[1] that differ from files in $ARGV[0]:\n");
+	foreach my $key (keys %second_hash) {
+		if (exists($first_hash{ $key }) && ($first_hash{ $key } != $second_hash{ $key })) {
+			print "$key $first_hash{ $key } != $second_hash{ $key }\n";
+			print "Delete $ARGV[1]/$key? (Y/N)";
+			chomp(my $answer = <STDIN>);
+			if (uc($answer) eq 'Y') {
+				system("rm \"$ARGV[1]/$key\"");
+			}
+		}
+	}
+
+	if ($opts{ 'd' }) {
+		print "Files in $ARGV[1] that have a duplicate in $ARGV[0]:\n";
+		foreach my $key (keys %second_hash) {
+			if (exists($first_hash{ $key })) {
+				print "$key\n";
+			}
+		}
+	}
+}
+
+sub print_help {
+	print "\nsize-dir-diff - find differences between two directories\n\n";
+	print "Usage: size-dir-diff [OPTION] PATH1 PATH2\n\n";
+	print "Options:\n";
+	print "\t-d\tprint duplicates\n";
+	print "\t-h\tprints this help\n";
+	exit 0;
+}
+
+getopts('dh', \%opts);
+
+if ($#ARGV ne 1 or $opts{ 'h' }) {
+	print_help();
+}
+
+print "Comparing '$ARGV[1]' to '$ARGV[0]' ..";
+if (-f $file) {
+	%first_hash = %{ retrieve($file) };
+}
+else {
+	find(\&search_first, $ARGV[0]);
+	store(\%first_hash, $file);
+}
+find(\&search_second, $ARGV[1]);
+printf("\t\t\t(file count: [1]: %s [2]: %s)\n", scalar keys %first_hash, scalar keys %second_hash);
+
+print_hashes();
+print "\n";
+
+=head1 NAME
+
+size-dir-diff - find differences between two directories
+
+=head1 VERSION
+
+version 0.3.9
+
+=head1 DESCRIPTION
+
+A script that finds differences between two directories.
+
+Two directories are compared taking the size of each file.
+Files in the second argument are treated as a subset of the first.
+Prompts user if differing files should be deleted.
+
+=head1 SYNOPSIS
+
+	$ size_dir_diff -d /usr/src/BPi/device-tree /usr/src/BPi/device-tree.copy
+	Files in /usr/src/BPi/device-tree.copy that differ from files in /usr/src/BPi/device-tree:
+	Files in /usr/src/BPi/device-tree.copy that have a duplicate in /usr/src/BPi/device-tree:
+	/sun7i-a20-bananapi.dtb
+
+=head1 AUTHOR
+
+Jonas Jensen
+
+=head1 LICENSE
+
+GPL_2
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+	$ cpan App::size::dir::diff
+
+Manual install:
+
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+=cut

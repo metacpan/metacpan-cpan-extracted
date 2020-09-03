@@ -29,7 +29,6 @@ use warnings;
 use strict;
 use Config;
 use Cwd;
-use Digest::MD5;
 use POSIX;
 use Mnet;
 
@@ -62,10 +61,10 @@ and operating system. This is used by Mnet::Opts::Cli and Mnet::Log.
     my $uname = lc($uname[0]." ".$uname[2]);
 
     # note current working directory
-    my $cwd = Cwd::getcwd();
+    my $cwd_path = Cwd::getcwd();
 
     # init output version info string, and sprintf pad string to align outputs
-    my ($info, $spad) = ("", "35s");
+    my ($info, $spad) = ("", "15s");
     $spad = "1s =" if caller eq "Mnet::Log";
 
     # output caller script version if known, no blank line in Mnet::Log --debug
@@ -80,43 +79,13 @@ and operating system. This is used by Mnet::Opts::Cli and Mnet::Log.
     $info .= "\n" if caller ne "Mnet::Log";
 
     # output path information, no blank line in Mnet::Log --debug
-    $info .= sprintf("%-$spad $cwd\n",       "cwd path");
     $info .= sprintf("%-$spad $0\n",         "exec path");
-    $info .= sprintf("%-$spad $mnet_path\n", "Mnet path");
     $info .= sprintf("%-$spad $perl_path\n", "perl path");
-    $info .= "\n" if caller ne "Mnet::Log";
-
-    # append m5d info for executable and all Mnet modules to output string
-    my $script_md5 = _info_md5($0) // "";
-    $info .= sprintf("%-$spad $script_md5\n", "md5 $script_name");
-    foreach my $module (sort keys %INC) {
-        next if $module !~ /^Mnet\//;
-        my $md5 = _info_md5($INC{$module});
-        $module =~ s/\//::/g;
-        $module =~ s/\.pm$//;
-        $info .= sprintf("%-$spad $md5\n", "md5 $module");
-    }
+    $info .= sprintf("%-$spad $mnet_path\n", "Mnet path");
+    $info .= sprintf("%-$spad $cwd_path\n", "cwd path");
 
     # finished Mnet::Version::info, return info string
     return $info;
-}
-
-
-
-sub _info_md5 {
-
-# $md5 = _info_md5($file)
-# purpose: return hex md5 for specified file
-# $md5: hex md5 string, of undef on file errors
-
-    # read file, open it, and return md5, return undef on errors
-    my $file = shift // undef;
-    my $contents = "";
-    open(my $fh, "<", $file) or return undef;
-    $contents .= $_ while <$fh>;
-    close $fh;
-    my $md5 = Digest::MD5::md5_hex($contents);
-    return $md5;
 }
 
 

@@ -1,7 +1,7 @@
 use 5.006; use strict; use warnings;
 
 package Plack::Middleware::SignedCookies;
-$Plack::Middleware::SignedCookies::VERSION = '1.202';
+$Plack::Middleware::SignedCookies::VERSION = '1.203';
 # ABSTRACT: accept only server-minted cookies
 
 use parent 'Plack::Middleware';
@@ -19,13 +19,16 @@ sub call {
 
 	my $secret = $self->secret;
 
-	local $env->{'HTTP_COOKIE'} =
+	my $orig = delete $env->{'HTTP_COOKIE'};
+	$env->{'signedcookies.orig'} = $orig if defined $orig;
+
+	my $cookie =
 		join '; ',
 		grep { s/[ \t]*=[ \t]*/=/; s/[ \t]*([-~A-Za-z0-9]{$length})\z//o and $1 eq _hmac $_, $secret }
 		map  { defined && /\A[ \t]*(.*[^ \t])/s ? split /[ \t]*;[ \t]*/, "$1" : () }
-		$env->{'HTTP_COOKIE'};
+		$orig;
 
-	delete $env->{'HTTP_COOKIE'} if '' eq $env->{'HTTP_COOKIE'};
+	$env->{'HTTP_COOKIE'} = $cookie if '' ne $cookie;
 
 	return Plack::Util::response_cb( $self->app->( $env ), sub {
 		my $do_sign;
@@ -62,7 +65,7 @@ Plack::Middleware::SignedCookies - accept only server-minted cookies
 
 =head1 VERSION
 
-version 1.202
+version 1.203
 
 =head1 SYNOPSIS
 
@@ -79,6 +82,8 @@ version 1.202
 This middleware modifies C<Cookie> headers in the request and C<Set-Cookie> headers in the response.
 It appends a HMAC digest to outgoing cookies and removes and verifies it from incoming cookies.
 It rejects incoming cookies that were sent without a valid digest.
+
+The incoming C<Cookie> header value remains available in the C<signedcookies.orig> key in the PSGI environment.
 
 =head1 CONFIGURATION OPTIONS
 
@@ -141,7 +146,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Aristotle Pagaltzis.
+This software is copyright (c) 2020 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

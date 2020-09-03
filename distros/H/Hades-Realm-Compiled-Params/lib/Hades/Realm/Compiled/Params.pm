@@ -2,7 +2,7 @@ package Hades::Realm::Compiled::Params;
 use strict;
 use warnings;
 use base qw/Hades/;
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -51,7 +51,12 @@ sub build_accessor {
 	$params[2]->{ $params[1] }->{type}->[0] =~ s/\s*\[/[/g
 	    if $params[2]->{ $params[1] }->{type}->[0];
 	$self->push_cpo( $params[1],
-		'[' . ( $params[2]->{ $params[1] }->{type}->[0] || 'Any' ) . ']' );
+		'[' . ( $params[2]->{ $params[1] }->{type}->[0] || 'Any' ) 
+			. ($params[2]->{ $params[1] }->{default} 
+				? ', { default => ' . $params[2]->{ $params[1] }->{default} . '} ]' 
+				: ']'
+			)
+		);
 	my @res = $self->$orig(@params);
 	return wantarray ? @res : $res[0];
 }
@@ -81,7 +86,8 @@ sub build_sub {
 			$params             .= ', ' . $param;
 			my $pm = $meta->{$name}->{params_map}->{$param};
 			$pm->{type} ||= q|Any|;
-			$types              .= $types ? ', ' . $pm->{type} : $pm->{type};
+			my $t = $pm->{type} . ($pm->{default} ? ', { default => ' . $pm->{default} . ' }' : '');
+			$types              .= $types ? ', ' . $t : $t;
 			$params_explanation .= qq|param $param to be a $pm-> { type } |;
 		}
 		my $type = $self->build_type( $name, $types, $types );
@@ -133,7 +139,7 @@ sub after_class {
 		    qq{Object: invalid value $mg for variable \$mg in method after_class};
 	}
 	my $cpo = join ', ', @{ $self->cpo };
-	$mg->use(q|Types::Standard qw/Str Optional HashRef Tuple Map Dict ArrayRef Int Any/|);
+	$mg->use(q|Types::Standard qw/Any Item Bool Str Num Int Ref ScalarRef ArrayRef HashRef CodeRef RegexpRef GlobRef Object Map Tuple Dict Optional/|);
 	$mg->use(q|Compiled::Params::OO|);
 	$mg->our(q|$VALIDATE|);
 	my $code  = qq|\$VALIDATE = Compiled::Params::OO::cpo( $cpo );|;
@@ -156,7 +162,7 @@ Hades::Realm::Compiled::Params - The great new Hades::Realm::Compiled::Params!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -181,9 +187,9 @@ Version 0.01
 
 	BEGIN {
 		$VALIDATE = Compiled::Params::OO::cpo(
-			penthos => [Int],
+			penthos => [ Int, { default => 2 } ],
 			curae   => [Any],
-			geras   => [Int]
+			geras   => [ Int, { default => 2 } ]
 		);
 	}
 
@@ -226,7 +232,7 @@ Version 0.01
 
 	sub has_penthos {
 		my ($self) = @_;
-		return !!$self->{penthos};
+		return exists $self->{penthos};
 	}
 
 	sub curae {

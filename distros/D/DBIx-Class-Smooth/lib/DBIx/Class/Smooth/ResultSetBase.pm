@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::ResultSetBase;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0103';
+our $VERSION = '0.0104';
 
 use parent 'DBIx::Class::ResultSet';
 use List::SomeUtils qw/any/;
@@ -96,7 +96,7 @@ DBIx::Class::Smooth::ResultSetBase - Short intro
 
 =head1 VERSION
 
-Version 0.0103, released 2020-05-31.
+Version 0.0104, released 2020-08-30.
 
 =head1 SOURCE
 

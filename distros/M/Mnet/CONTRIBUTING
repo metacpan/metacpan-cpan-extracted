@@ -38,5 +38,5 @@ The Mnet perl distribution has been created and is maintained by Mike Menza.
 Feedback and bug reports are welcome, feel free to contact Mike via email
 at mmenza@cpan.org with any comments or questions.
 
-Makefile.PL contains notes on how new releases are craated.
+Makefile.PL contains notes on how new releases are created.
 

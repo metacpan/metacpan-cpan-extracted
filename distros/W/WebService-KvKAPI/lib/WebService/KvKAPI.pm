@@ -6,18 +6,17 @@ use Moo;
 # This code has an EUPL license. Please see the LICENSE file in this repo for
 # more information.
 
-our $VERSION = '0.009';
+our $VERSION = '0.011';
 
 use Carp;
 use OpenAPI::Client 0.17;
 use Try::Tiny;
 use Type::Tiny::Class;
-use Types::Standard qw(Str);
+use Types::Standard qw(Str Bool);
 use namespace::autoclean;
+use List::Util qw(any);
 
-my $_type_open_api = Type::Tiny::Class->new(
-    class => "OpenAPI::Client",
-);
+my $_type_open_api = Type::Tiny::Class->new(class => "OpenAPI::Client",);
 
 has api_key => (
     is       => 'ro',
@@ -32,11 +31,15 @@ has client => (
     builder => '_build_open_api_client',
 );
 
-
 has api_host => (
-    is       => 'ro',
-    isa      => Str,
+    is        => 'ro',
+    isa       => Str,
     predicate => 'has_api_host',
+);
+
+has pure_rsin => (
+    is        => 'ro',
+    isa       => Bool,
 );
 
 sub search {
@@ -124,6 +127,50 @@ sub mangle_params {
     }
 }
 
+sub _rsin_workaround {
+    my ($self, $params, $results) = @_;
+
+    # RSIN is a bit of a tricky thing. It is two-fold:
+    # 1) It will only return legal entities and we are actually looking for
+    # actual business locations.
+    #
+    # 2) The problem is that VOF's and/or other coorporations may not be a
+    # legal entity and are not returned by the KvK on the RSIN search while you
+    # expect this to be.
+    #
+    # After a talk with the KvK they have said that they will look into getting
+    # this to work, but we now have some method that does what we expect the
+    # API to do until the KvK applies the fix on their end.
+
+    return $results if $self->pure_rsin;
+    return $results unless defined $params->{rsin};
+    my $rsin = delete $params->{rsin};
+
+    if (@{$results}) {
+        # RSIN results in a legal person entity result, which is not what we are
+        # after. So we apply some logic to only get the results for the KvK number
+        # and merge the old search params with the new one
+        delete $params->{rsin};
+        $params->{kvkNumber} = $results->[0]{kvkNumber};
+        return $self->search(%{$params});
+    }
+    else {
+        $params->{q} = $rsin;
+        $results = $self->search(%{$params});
+        return [ grep { $_->{rsin} == $rsin } @$results ];
+    }
+}
+
+around search => sub {
+    my ($orig, $self, %params) = @_;
+
+    return $self->$orig(%params) if $self->pure_rsin;
+
+    my $results = $self->$orig(%params);
+    return $results unless defined $params{rsin};
+    return $self->_rsin_workaround(\%params, $results);
+};
+
 sub _search {
     my ($self, $params) = @_;
 
@@ -164,7 +211,7 @@ WebService::KvKAPI - Query the Dutch Chamber of Commerence (KvK) API
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 AUTHOR
 

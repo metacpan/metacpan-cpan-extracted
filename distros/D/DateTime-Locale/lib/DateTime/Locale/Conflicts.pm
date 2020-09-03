@@ -16,10 +16,12 @@ use Dist::CheckConflicts
         Dist::CheckConflicts
         Exporter
         File::ShareDir
+        File::Spec
         List::Util
         Params::ValidationCompiler
         Specio::Declare
         Specio::Library::String
+        Storable
         namespace::autoclean
         strict
         warnings

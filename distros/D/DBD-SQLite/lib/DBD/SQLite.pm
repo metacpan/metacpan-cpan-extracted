@@ -5,7 +5,7 @@ use strict;
 use DBI   1.57 ();
 use DynaLoader ();
 
-our $VERSION = '1.64';
+our $VERSION = '1.66';
 our @ISA     = 'DynaLoader';
 
 # sqlite_version cache (set in the XS bootstrap)
@@ -255,7 +255,12 @@ sub ping {
 sub quote {
     my ($self, $value, $data_type) = @_;
     return "NULL" unless defined $value;
-    if ($data_type and $data_type == DBI::SQL_BLOB) {
+    if (defined $data_type and (
+            $data_type == DBI::SQL_BIT ||
+            $data_type == DBI::SQL_BLOB ||
+            $data_type == DBI::SQL_BINARY ||
+            $data_type == DBI::SQL_VARBINARY ||
+            $data_type == DBI::SQL_LONGVARBINARY)) {
         return q(X') . unpack('H*', $value) . q(');
     }
     $value =~ s/'/''/g;
@@ -1068,7 +1073,7 @@ are limited by the typeless nature of the SQLite database.
 =head1 SQLITE VERSION
 
 DBD::SQLite is usually compiled with a bundled SQLite library
-(SQLite version S<3.29.0> as of this release) for consistency.
+(SQLite version S<3.32.3> as of this release) for consistency.
 However, a different version of SQLite may sometimes be used for
 some reasons like security, or some new experimental features.
 
@@ -1921,6 +1926,13 @@ current number of seconds since the epoch:
 After this, it could be used from SQL as:
 
   INSERT INTO mytable ( now() );
+
+The function should return a scalar value, and the value is treated as a text
+(or a number if appropriate) by default. If you do need to specify a type
+of the return value (like BLOB), you can return a reference to an array that
+contains the value and the type, as of 1.65_01.
+
+  $dbh->sqlite_create_function( 'md5', 1, sub { return [md5($_[0]), SQL_BLOB] } );
 
 =head3 REGEXP function
 

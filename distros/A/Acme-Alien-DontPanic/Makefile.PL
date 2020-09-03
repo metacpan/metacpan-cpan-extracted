@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( base strict warnings );
+  } qw( Data::Dumper base strict warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.52"
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Build"        => "2.26",
+    "Alien::Build"        => "2.29",
     "Alien::Build::MM"    => "0.40",
     "ExtUtils::MakeMaker" => "6.52"
   },
@@ -67,24 +67,34 @@ my %WriteMakefileArgs = (
     "lib/Acme/Alien/DontPanic.pm" => "\$(INST_LIB)/Acme/Alien/DontPanic.pm"
   },
   "PREREQ_PM" => {
-    "Alien::Base" => "2.26"
+    "Alien::Base" => "2.29"
   },
   "TEST_REQUIRES" => {
+    "File::Temp"        => 0,
+    "Inline"            => "0.56",
+    "Inline::C"         => 0,
+    "Inline::CPP"       => 0,
+    "Path::Tiny"        => 0,
     "Test2::V0"         => "0.000060",
     "Test::Alien"       => "0.05",
     "Test::Alien::Diag" => 0
   },
-  "VERSION" => "2.2600",
+  "VERSION" => "2.2900",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Alien::Base"         => "2.26",
+  "Alien::Base"         => "2.29",
   "Alien::Build"        => "0.40",
   "Alien::Build::MM"    => "0.40",
   "ExtUtils::MakeMaker" => "6.52",
+  "File::Temp"          => 0,
+  "Inline"              => "0.56",
+  "Inline::C"           => 0,
+  "Inline::CPP"         => 0,
+  "Path::Tiny"          => 0,
   "Test2::V0"           => "0.000060",
   "Test::Alien"         => "0.05",
   "Test::Alien::Diag"   => 0

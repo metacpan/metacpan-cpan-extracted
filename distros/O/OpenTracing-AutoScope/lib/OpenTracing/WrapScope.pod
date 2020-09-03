@@ -113,6 +113,12 @@ filename/glob or multiple ones separated by colons:
   OPENTRACING_WRAPSCOPE_FILE=config/wrap_base.conf:config/wrap_extra.conf
   OPENTRACING_WRAPSCOPE_FILE='config/wrap*.conf'
 
+=head2 -quiet
+
+Normally, if any of the requested subs (either directly or through a file)
+is not found, a warning will be issued at the end of the programs runtime.
+Passing this option will disable that warning.
+
 =head1 FUNCTIONS
 
 =head2 install_wrapped($sub)

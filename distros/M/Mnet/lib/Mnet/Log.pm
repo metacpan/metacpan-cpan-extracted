@@ -168,16 +168,8 @@ BEGIN {
 
 
 
-# init Mnet::Tee stdout debug bypass, and cli options used by this module
+# init cli options used by this module
 INIT {
-
-    # init stdout file handle to bypass Mnet::Tee for debug output
-    our $stdout = undef;
-    if ($INC{"Mnet/Tee.pm"}) {
-        $stdout = $Mnet::Tee::stdout;
-    } else {
-        open($stdout, ">&STDOUT");
-    }
 
     # init --debug option
     Mnet::Opts::Cli::define({

@@ -1,14 +1,25 @@
 ---
 abstract: 'HTML parser class'
 author:
-  - 'Gisle Aas <gisle@activestate.com>'
+  - 'Gisle Aas <gaas@cpan.org>'
 build_requires:
+  Config: '0'
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FileHandle: '0'
+  IO::File: '0'
+  SelectSaver: '0'
+  Test: '0'
   Test::More: '0'
+  URI: '0'
+  perl: '5.008'
+  strict: '0'
+  vars: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+  ExtUtils::MakeMaker: '6.52'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,16 +27,71 @@ meta-spec:
 name: HTML-Parser
 no_index:
   directory:
-    - t
+    - eg
+    - examples
     - inc
-recommends:
-  HTTP::Headers: '0'
+    - share
+    - t
+    - xt
+provides:
+  HTML::Entities:
+    file: lib/HTML/Entities.pm
+    version: '3.75'
+  HTML::Filter:
+    file: lib/HTML/Filter.pm
+    version: '3.75'
+    x_deprecated: 1
+  HTML::HeadParser:
+    file: lib/HTML/HeadParser.pm
+    version: '3.75'
+  HTML::LinkExtor:
+    file: lib/HTML/LinkExtor.pm
+    version: '3.75'
+  HTML::Parser:
+    file: lib/HTML/Parser.pm
+    version: '3.75'
+  HTML::PullParser:
+    file: lib/HTML/PullParser.pm
+    version: '3.75'
+  HTML::TokeParser:
+    file: lib/HTML/TokeParser.pm
+    version: '3.75'
 requires:
-  HTML::Tagset: '3'
+  Carp: '0'
+  Exporter: '0'
+  HTML::Tagset: '0'
+  HTTP::Headers: '0'
+  IO::File: '0'
+  URI: '0'
+  URI::URL: '0'
   XSLoader: '0'
   perl: '5.008'
+  strict: '0'
+  vars: '0'
 resources:
-  MailingList: mailto:libwww@perl.org
-  repository: https://github.com/libwww-perl/HTML-Parser
-version: '3.73'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://github.com/libwww-perl/html-parser/issues
+  homepage: https://github.com/libwww-perl/html-parser
+  repository: https://github.com/libwww-perl/html-parser.git
+version: '3.75'
+x_contributors:
+  - 'Antonio Radici <antonio@dyne.org>'
+  - 'Barbie <barbie@missbarbell.co.uk>'
+  - 'bulk88 <bulk88@hotmail.com>'
+  - 'Chase Whitener <capoeirab@cpan.org>'
+  - 'Chip Salzenberg <chip@pobox.com>'
+  - 'Damyan Ivanov <dmn@debian.org>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'François Perrad <francois.perrad@gadz.org>'
+  - 'Gisle Aas <gisle@aas.no>'
+  - 'Jacques Germishuys <jacquesg@striata.com>'
+  - 'Jon Jensen <jon@endpoint.com>'
+  - 'Mike South <msouth@gmail.com>'
+  - 'Nicholas Clark <nick@ccl4.org>'
+  - 'Nicolas R <nicolas@atoomic.org>'
+  - 'Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>'
+  - 'Ville Skyttä <ville.skytta@iki.fi>'
+  - 'Yves Orton <demerphq@gmail.com>'
+  - 'Zefram <zefram@fysh.org>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

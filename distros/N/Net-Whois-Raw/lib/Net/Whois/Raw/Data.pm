@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99030';
+$Net::Whois::Raw::Data::VERSION = '2.99031';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -559,7 +559,7 @@ our %servers = qw(
     MS               whois.nic.ms
     MU               whois.nic.mu
     MUTUELLE         whois-mutuelle.nic.fr
-    MX               whois.nic.mx
+    MX               whois.mx
     MY               whois.mynic.my
     NA               whois.na-nic.com.na
     NF               whois.nic.nf
@@ -4528,7 +4528,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99030
+version 2.99031
 
 =head1 AUTHOR
 

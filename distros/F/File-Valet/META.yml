@@ -2,20 +2,18 @@
 abstract: 'File slurping, locking, and finding'
 author:
   - 'TTKCIAR <ttk@ciar.org>'
-build_requires: {}
+build_requires:
+  Test::Differences: '0.60'
+  Test::Most: '0.30'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 5.048, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: File-Valet
 requires:
-  Test::Differences: '0.60'
-  Test::Most: '0.30'
-  perl: '5.008000'
-version: '1.03'
-x_generated_by_perl: v5.18.1
-x_serialization_backend: 'YAML::Tiny version 1.63'
+  perl: '5.010000'
+version: '1.07'

@@ -1,5 +1,5 @@
 package File::Valet;
-use 5.008;
+use 5.010;
 use strict;
 use warnings;
 use Config;   # Provides OS-portable means of determining platform type
@@ -11,8 +11,8 @@ use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION);
 BEGIN {
     require Exporter;
     @ISA = qw(Exporter);
-    $VERSION = '1.03';
-    @EXPORT = @EXPORT_OK = qw(rd_f wr_f ap_f find_temp find_bin lockafile unlockafile unlock_all_the_files);
+    $VERSION = '1.07';
+    @EXPORT = @EXPORT_OK = qw(rd_f wr_f ap_f find_home find_temp find_bin lockafile unlockafile unlock_all_the_files);
 }
 
 our $OK     = 'OK'; # one of "OK", "WARNING" or "ERROR", reflecting most recently performed operation
@@ -100,14 +100,17 @@ sub rd_f {
         return undef;
     }
     $! = 0;
-    unless (open($fh, '<:raw', $fn)) {
+    unless (open($fh, '< :raw', $fn)) {
         ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', "cannot open for reading", $!, 0+$!);
         return undef;
     }
+    binmode($fh);
     my $file_size = -s $fn;
-    if ($file_size) {
-        my $n_bytes = read($fh, $buf, $file_size);
-        close($fh);
+    if (defined $file_size && $file_size == 0) {
+        $buf = '';
+    }
+    elsif (defined $file_size) {
+        my $n_bytes = sysread($fh, $buf, $file_size);
         if (!defined($n_bytes)) {
             ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'read failed', $!, 0+$!);
             return undef;
@@ -118,13 +121,17 @@ sub rd_f {
         }
     }
     else {
-        local $/;
-        if (!defined($buf = readline($fh))) {
+        my $res = sysread($fh, $buf, 0xFFFFFFFF);
+        if (!defined $res) {
             ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'read failed', $!, 0+$!);
             return undef;
         }
     }
-    close($fh);
+    my $res = close($fh);
+    unless ($res) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('WARNING', 'close failed', $!, 0+$!);
+        return undef;
+    }
     ($OK, $ERROR, $ERRNO, $ERRNUM) = ('OK', '', '', 0);
     return $buf;
 }
@@ -137,15 +144,21 @@ sub wr_f {
         return undef;
     }
     $! = 0;
-    unless (open($fh, '>:raw', $fn)) {
+    unless (open($fh, '> :raw', $fn)) {
         ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', "cannot open for writing", $!, 0+$!);
         return undef;
     }
-    unless (print $fh $buf) {
+    binmode($fh);
+    my $res = syswrite($fh, $buf);
+    unless (defined $res) {
         ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'write error', $!, 0+$!);
         return undef;
     }
-    close($fh);
+    $res = close($fh);
+    unless ($res) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('WARNING', 'close failed', $!, 0+$!);
+        return undef;
+    }
     ($OK, $ERROR, $ERRNO, $ERRNUM) = ('OK', '', '', 0);
     return 'OK';
 }
@@ -158,24 +171,72 @@ sub ap_f {
         return undef;
     }
     $! = 0;
-    unless (open($fh, '>>:raw', $fn)) {
+    unless (open($fh, '>> :raw', $fn)) {
         ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', "cannot open for appending", $!, 0+$!);
         return undef;
     }
-    unless (print $fh $buf) {
-        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'append error', $!, 0+$!);
+    binmode($fh);
+    my $res = syswrite($fh, $buf);
+    unless (defined $res) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('ERROR', 'write error', $!, 0+$!);
         return undef;
     }
-    close($fh);
+    $res = close($fh);
+    unless ($res) {
+        ($OK, $ERROR, $ERRNO, $ERRNUM) = ('WARNING', 'close failed', $!, 0+$!);
+        return undef;
+    }
     ($OK, $ERROR, $ERRNO, $ERRNUM) = ('OK', '', '', 0);
     return 'OK';
 }
 
+sub detect_windows {
+    return ($^O eq 'MSWin32' || $Config{'osname'} =~ /windows/i || $Config{'osname'} =~ /winserver/i || $Config{'osname'} =~ /microsoft/i) ? 1 : 0;
+}
+
+sub find_home {
+    for my $d (@_) {
+        return $d if (defined $d && -d $d && -w _);
+    }
+
+    my $is_windows = detect_windows;
+    ($OK, $ERROR, $ERRNO, $ERRNUM) = ('OK', '', '', 0);
+
+    my $env_home = $ENV{HOME};
+    return $env_home if (defined $env_home && -d $env_home);
+
+    my $username = $ENV{USER} // $ENV{USERNAME};
+    if ($is_windows) {
+        my $home_drive = $ENV{HOMEDRIVE} // 'C:';
+        my $home_path  = $ENV{HOMEPATH};
+        if (defined $home_path) {
+            $env_home = $home_drive . $home_path;
+        }
+        elsif (defined $username) {
+            $env_home = $home_drive . '\\Users\\' . $username;
+        }
+        return $env_home if (defined $env_home && -d $env_home);
+    } else {
+        my @row = getpwuid($<);
+        if (@row >= 9) {
+          my $home_dir = $row[7];
+          return $home_dir if (defined $home_dir && -d $home_dir);
+        }
+        return '/root' if (-d '/root' && -w '/root');
+    }
+
+    ($OK, $ERROR, $ERRNO, $ERRNUM) = ('WARNING', 'cannot find home directory', $is_windows, 1);
+    return undef;
+}
+
 sub find_temp {
-    my $is_windows = ($^O eq 'MSWin32' || $Config{'osname'} =~ /windows/i || $Config{'osname'} =~ /winserver/i || $Config{'osname'} =~ /microsoft/i);
+    my $is_windows = detect_windows;
     my $dir_sep_tok = '/';
+    my $home_dir = find_home;
 
     push(@_, $ENV{TEMPDIR}) if (defined($ENV{TEMPDIR}));
+    push(@_, $ENV{TEMP})    if (defined($ENV{TEMP}));
+    push(@_, $ENV{TMP})     if (defined($ENV{TMP}));  # set in Windows sometimes
 
     if ($is_windows) {
         $dir_sep_tok = '\\';
@@ -184,13 +245,11 @@ sub find_temp {
         foreach my $vol (qw(C D E F G W X Y Z)) {
             push(@_, "$vol:\\Temp");
         }
-        # zzapp -- should probably check for a CygWin temp directory too
     }
-    else {
-        push(@_, qw (/var/tmp /tmp));
-    }
+    # might be CygWin, so adding these regardless of OS:
+    push(@_, qw (/var/tmp /tmp));
 
-    push(@_, map {join($dir_sep_tok,("$ENV{HOME}",$_))} qw(.tmp .temp tmp temp), $ENV{HOME}) if (defined($ENV{HOME}));
+    push(@_, map {join($dir_sep_tok,("$home_dir",$_))} qw(.tmp .temp tmp temp), $home_dir) if (defined($home_dir));
     push(@_, map {join($dir_sep_tok,("$ENV{PWD}", $_))} qw(.tmp .temp tmp temp), $ENV{PWD} ) if (defined($ENV{PWD} ));
     push(@_, '/dev/shm') unless ($is_windows); # Lowest priority, since this is typically a ramdisk.
     foreach my $d (@_) {
@@ -205,8 +264,9 @@ sub find_temp {
 sub find_bin {
     return find_bin_win32 (@_) if ($Config::Config{osname} =~ /MSWin/);
     my ($bin_name, @bin_dirs) = @_;
+    my $home_dir = find_home;
     push(@bin_dirs, split(/\:/, $ENV{PATH})) if (defined($ENV{PATH}));
-    push(@bin_dirs, "$ENV{HOME}/bin") if (defined($ENV{HOME}));
+    push(@bin_dirs, "$home_dir/bin") if (defined($home_dir));
     push(@bin_dirs, ('/usr/local/sbin', '/usr/local/bin', '/sbin', '/bin', '/usr/sbin', '/usr/bin'));
     my %been_there = ();
     foreach my $d (@bin_dirs) {
@@ -440,6 +500,19 @@ If the specified file does not exist, C<ap_f()> will attempt to create it.
 
 Returns 1 on success, or 0 on any failure, and sets C<$File::Valet::OK>, C<$File::Valet::ERROR>, C<$File::Valet::ERRNO> appropriately.
 
+=item B<find_home>
+
+ my $path = find_home;
+ my $path = find_temp("/var/home", "/tmp/home");
+
+C<find_home()> performs a best-effort search for the effective user's home, returning a path-string or undef if none is found.
+
+If arguments are provided, it will return the first argument for which there is a directory for which the user has write permissions.
+
+if C<$ENV{HOME}> is set, C<find_home()> will check there for a writable directory after checking any arguments.
+
+Some effort has been made to make it cross-platform.
+
 =item B<find_temp>
 
  my $path = find_temp();
@@ -449,7 +522,7 @@ Intended for easy cross-platform programming, C<find_temp()> checks in a number 
 
 If parameters are passed to C<find_temp()>, it will check those locations first.
 
-If C<$ENV{TEMPDIR}> is defined, C<find_temp()> will check that location after checking the locations provided as parameters.
+If C<$ENV{TEMPDIR}>, C<$ENV{TEMP}> or C<$ENV{TMP}> are defined, C<find_temp()> will check those locations after checking the locations provided as parameters.
 
 C<find_temp()> is Windows-savvy enough to check such locations as "C:\Windows\Temp", but might try to open locations on network-mounted drives if it is unable to find a local alternative.
 
@@ -529,6 +602,8 @@ Example:
 These fields may change in future versions of this module.
 
 =item B<FURTHER DEVELOPMENT>
+
+A recursive descent function similar to L<File::Find|https://metacpan.org/pod/File::Find> is planned, since C<File::Find> is pretty horrible and unusable.
 
 The C<lockafile()> implementation goes through considerable effort to avoid race conditions, but there is still a very short danger window where an overridden lock might get double-clobbered.  If a contended lock expires just when two or more other processes call C<lockafile()> on it, it is possible for one process to unlink the lock file, the other process to create a new lock file, and then the first process to overwrite that lock file with its own lock file, leaving both processes under the impression they have acquired the lock.  Future implementations may remedy this.  In the meantime the possibility can be avoided by setting a sufficiently large "nsec" value when acquiring a lock that it will not expire before the owning process is ready to release it.
 

@@ -28,4 +28,4 @@ requires:
 resources:
   bugtracker: https://github.com/ap/Plack-Middleware-SignedCookies/issues
   repository: git://github.com/ap/Plack-Middleware-SignedCookies.git
-version: 1.202
+version: 1.203

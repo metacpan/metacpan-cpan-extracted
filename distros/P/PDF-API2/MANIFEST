@@ -168,6 +168,7 @@ t/resources/1x1.tif
 t/resources/sample-xrefstm-index.pdf
 t/resources/sample-xrefstm.pdf
 t/resources/sample.pdf
+t/resources/test-rgba.png
 t/rt120397.t
 t/rt120450.t
 t/rt126274.t

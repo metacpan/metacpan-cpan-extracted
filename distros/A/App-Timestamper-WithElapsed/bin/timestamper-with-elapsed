@@ -20,7 +20,7 @@ seconds since the last received line.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -35,6 +35,12 @@ Use the time differences from the start of the program instead of absolute
 from-epoch seconds.
 
 [Added at version 0.2.0.]
+
+=head2 --absolute
+
+Display the seconds since the start of the process.
+
+[Added at version 0.4.0.]
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

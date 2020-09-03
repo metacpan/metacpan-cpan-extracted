@@ -1,13 +1,13 @@
-
-use Test::More tests => 4;
-
 use strict;
+use warnings;
+
 use HTML::Parser ();
+use Test::More tests => 4;
 
 my $html = '<A href="foo">text</A>';
 
 my $text = '';
-my $p = HTML::Parser->new(default_h => [sub {$text .= shift;}, 'text']);
+my $p    = HTML::Parser->new(default_h => [sub { $text .= shift; }, 'text']);
 $p->parse($html)->eof;
 is($text, $html);
 

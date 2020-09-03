@@ -11,7 +11,7 @@ Authorization Server
 
 # VERSION
 
-0.25
+0.27
 
 # SYNOPSIS
 

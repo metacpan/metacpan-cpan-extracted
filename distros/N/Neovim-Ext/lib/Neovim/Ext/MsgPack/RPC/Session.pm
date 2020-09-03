@@ -1,5 +1,5 @@
 package Neovim::Ext::MsgPack::RPC::Session;
-$Neovim::Ext::MsgPack::RPC::Session::VERSION = '0.02';
+$Neovim::Ext::MsgPack::RPC::Session::VERSION = '0.05';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -178,8 +178,24 @@ sub _on_request
 {
 	my ($this, $name, $args, $response) = @_;
 
-	my $rv = $this->request_cb->($name, $args);
-	$response->send ($rv);
+	eval
+	{
+		my $rv = $this->request_cb->($name, $args);
+		$response->send ($rv);
+	};
+
+	if ($@)
+	{
+		if (ref ($@) && ref ($@) eq 'Neovim::Ext::ErrorResponse')
+		{
+			my $e = $@;
+			$response->send ($e->{msg}, 1);
+		}
+		else
+		{
+			$response->send ("Unhandled exception: $@", 1);
+		}
+	}
 }
 
 
@@ -230,7 +246,7 @@ Neovim::Ext::MsgPack::RPC::Session - Neovim::Ext::MsgPack::RPC::Session class
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 

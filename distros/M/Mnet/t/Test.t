@@ -74,11 +74,11 @@ Mnet::T::test_perl({
         diff --test --replay
         @@ -1,4 +1,4 @@
         stdout1
-        -stdout3
-        +stdout2
+        -stdout2
+        +stdout3
         stderr1
-        -stderr3
-        +stderr2
+        -stderr2
+        +stderr3
     expect-eof
 });
 

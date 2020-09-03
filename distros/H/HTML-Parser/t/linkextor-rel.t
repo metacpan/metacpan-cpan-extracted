@@ -1,8 +1,10 @@
+use strict;
+use warnings;
+
+use HTML::LinkExtor ();
 use Test::More tests => 4;
 
-require HTML::LinkExtor;
-
-$HTML = <<HTML;
+my $HTML = <<HTML;
 <head>
 <base href="http://www.sn.no/">
 </head>
@@ -14,13 +16,12 @@ HTML
 
 
 # Try the callback interface
-$links = "";
-$p = HTML::LinkExtor->new(
-  sub {
-      my($tag, %links) = @_;
-      #diag "$tag @{[%links]}";
-      $links .= "$tag @{[%links]}\n";
-  });
+my $links = "";
+my $p = HTML::LinkExtor->new(sub {
+    my($tag, %links) = @_;
+    #diag "$tag @{[%links]}";
+    $links .= "$tag @{[%links]}\n";
+});
 
 $p->parse($HTML); $p->eof;
 
@@ -32,5 +33,5 @@ ok($links =~ m|^a href link\.html$|m);
 # no links it it.  This is a test to prove that it works.
 $p = new HTML::LinkExtor;
 $p->parse("this is a document with no links"); $p->eof;
-@a = $p->links;
-is(@a, 0);
+my @links = $p->links;
+is(@links, 0);

@@ -3,7 +3,7 @@ package PDF::API2;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.037'; # VERSION
+our $VERSION = '2.038'; # VERSION
 
 use Carp;
 use Encode qw(:all);
@@ -2061,6 +2061,11 @@ sub image_pnm {
 =item $png = $pdf->image_png($file)
 
 Imports and returns a new PNG image object.  C<$file> may be either a filename or a filehandle.
+
+Note: PNG files that include an alpha (transparency) channel go through a
+relatively slow process of separating the transparency channel into a PDF SMask
+object.  Install PDF::API2::XS or Image::PNG::Libpng to speed this up by an
+order of magnitude.
 
 =cut
 

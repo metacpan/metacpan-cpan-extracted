@@ -4,6 +4,7 @@ use Test::More;
 
 package MyApp {
 	use Zydeco;
+	use namespace::autoclean;
 	
 	abstract class Foo;
 	class Bar {

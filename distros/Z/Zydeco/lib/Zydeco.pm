@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.519';
+our $VERSION   = '0.600';
 
 use Keyword::Simple ();
 use PPR;
@@ -36,6 +36,25 @@ BEGIN {
 		my ($me, $caller) = @_;
 		!!$gather{$me}{$caller};
 	}
+	sub _predeclare {
+		my ($me, $opts, $kind, $pkg, $pkgopts) = @_;
+		# Figure out type name
+		return if $kind =~ /role_generator/;
+		my %opts = (%$opts, %$pkgopts);
+		my $qname = 'MooX::Press'->qualify_name($pkg, $opts{'prefix'}, $opts{'extends'}//$opts{'_stack'}[-1]);
+		
+		if ($kind =~ /class_generator/) {
+			my $typename1 = $opts{'class_type_name'}
+				|| sprintf('%sClass', 'MooX::Press'->type_name($qname, $opts{'prefix'}));
+			my $typename2 = $opts{'instance_type_name'}
+				|| sprintf('%sInstance', 'MooX::Press'->type_name($qname, $opts{'prefix'}));
+			'Zydeco'->_predeclare($opts{'caller'}, $opts{'type_library'}, $typename1, $typename2);
+		}
+		else {
+			my $typename = $opts{'type_name'} || 'MooX::Press'->type_name($qname, $opts{'prefix'});
+			'Zydeco'->_predeclare($opts{'caller'}, $opts{'type_library'}, $typename);
+		}
+	}
 	sub import {
 		my ($me, $action, $caller) = (shift, shift, scalar caller);
 		if ($action eq -gather) {
@@ -50,6 +69,7 @@ BEGIN {
 						}
 					}
 					push @{ $gather{$me}{$caller}{$kind}||=[] }, $pkg, $v;
+					$me->_predeclare( $gather{$me}{$caller}, $kind, $pkg, $v );
 				}
 				else {
 					$gather{$me}{$caller}{$k} = $v;
@@ -998,8 +1018,24 @@ sub _handle_name_list {
 	return @names;
 }
 
+my $_should_optimize = sub {
+	my ($code, $sigvars) = @_;
+	
+	my %allowed = ( '$self' => undef, '$class' => undef, '$_' => undef, '@_' => undef );
+	undef $allowed{$_} for split /\s*,\s*/, $sigvars//'';
+	
+	my @vars = ( $code =~ /[\$\@\%]\w+/g );
+	foreach my $var (@vars) {
+		next if exists $allowed{$var};
+		return 0;
+	}
+	1;
+};
+
 sub _handle_factory_keyword {
 	my ($me, $name, $via, $code, $has_sig, $sig, $attrs) = @_;
+	
+	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $has_sig ? $me->_handle_signature_list($sig) : ();
 	
 	my $optim;
 	for my $attr (@$attrs) {
@@ -1007,8 +1043,8 @@ sub _handle_factory_keyword {
 	}
 	
 	if (defined $code and $code =~ /^=(.+)$/s) {
-		$code  = "{ $1 }";
-		$optim = 1;
+		$code    = "{ $1 }";
+		$optim ||= $_should_optimize->($code, $signature_var_list);
 	}
 	
 	if ($via) {
@@ -1030,7 +1066,6 @@ sub _handle_factory_keyword {
 			!!$optim,
 		);
 	}
-	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 	my $munged_code = sprintf('sub { my($factory,$class,%s)=(shift,shift,@_); %s; do %s }', $signature_var_list, $extra, $code);
 	sprintf(
 		'q[%s]->_factory(%s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
@@ -1048,14 +1083,16 @@ sub _handle_method_keyword {
 	my $me = shift;
 	my ($name, $code, $has_sig, $sig, $attrs) = @_;
 
+	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $has_sig ? $me->_handle_signature_list($sig) : ();
+
 	my $optim;
 	for my $attr (@$attrs) {
 		$optim = 1 if $attr =~ /^:optimize\b/;
 	}
 	
 	if (defined $code and $code =~ /^=(.+)$/s) {
-		$code  = "{ $1 }";
-		$optim = 1;
+		$code    = "{ $1 }";
+		$optim ||= $_should_optimize->($code, $signature_var_list);
 	}
 	
 	my $lex_name;
@@ -1067,7 +1104,6 @@ sub _handle_method_keyword {
 	
 	if (defined $name and not defined $lex_name) {
 		if ($has_sig) {
-			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 			$return = sprintf(
 				'q[%s]->_can(%s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
@@ -1094,7 +1130,6 @@ sub _handle_method_keyword {
 	}
 	else {
 		if ($has_sig) {
-			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 			$return = sprintf(
 				'q[%s]->wrap_coderef({ attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
@@ -1119,7 +1154,7 @@ sub _handle_method_keyword {
 	}
 	
 	if ($lex_name) {
-		return "my $lex_name = $return";
+		return "my $lex_name = $return; &Internals::SvREADONLY(\\$lex_name, 1);";
 	}
 	
 	return $return;
@@ -1128,6 +1163,8 @@ sub _handle_method_keyword {
 sub _handle_multi_keyword {
 	my $me = shift;
 	my ($kind, $name, $code, $has_sig, $sig, $attrs) = @_;
+	
+	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $has_sig ? $me->_handle_signature_list($sig) : ();
 	
 	my $optim;
 	my $extra_code = '';
@@ -1139,12 +1176,11 @@ sub _handle_multi_keyword {
 	}
 	
 	if (defined $code and $code =~ /^=(.+)$/s) {
-		$code  = "{ $1 }";
-		$optim = 1;
+		$code    = "{ $1 }";
+		$optim ||= $_should_optimize->($code, $signature_var_list);
 	}
 	
 	if ($has_sig) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 		return sprintf(
 			'q[%s]->_multi(%s => %s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, %s });',
@@ -1175,14 +1211,16 @@ sub _handle_multi_keyword {
 sub _handle_modifier_keyword {
 	my ($me, $kind, $names, $code, $has_sig, $sig, $attrs) = @_;
 
+	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $has_sig ? $me->_handle_signature_list($sig) : ();
+	
 	my $optim;
 	for my $attr (@$attrs) {
 		$optim = 1 if $attr =~ /^:optimize\b/;
 	}
 	
 	if (defined $code and $code =~ /^=(.+)$/s) {
-		$code  = "{ $1 }";
-		$optim = 1;
+		$code    = "{ $1 }";
+		$optim ||= $_should_optimize->($code, $signature_var_list);
 	}
 	
 	# MooX::Press cannot handle optimizing method modifiers
@@ -1195,7 +1233,6 @@ sub _handle_modifier_keyword {
 		map { /^\{/ ? "scalar(do $_)" : B::perlstring($_) } @names;
 
 	if ($has_sig) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 		my $munged_code;
 		if ($kind eq 'around') {
 			$munged_code = sprintf('sub { my($next,$self,%s)=(shift,shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
@@ -1339,6 +1376,7 @@ sub _handle_has_keyword {
 	my @names = $me->_handle_name_list($names);
 	
 	my @r;
+	my @make_read_only;
 	for my $name (@names) {
 		$name =~ s/^\+\*/+/;
 		$name =~ s/^\*//;
@@ -1353,6 +1391,7 @@ sub _handle_has_keyword {
 				$name,
 				$rawspec,
 			);
+			push @make_read_only, $name;
 		}
 		else {
 			push @r, sprintf(
@@ -1363,6 +1402,15 @@ sub _handle_has_keyword {
 			);
 		}
 	}
+	
+	if (@make_read_only) {
+		push @r, sprintf(
+			'q[%s]->_end(sub { &Internals::SvREADONLY($_, 1) for %s; })',
+			$me,
+			join(q{,}, map("\\$_", @make_read_only)),
+		);
+	}
+	
 	join ";", @r;
 }
 
@@ -1469,6 +1517,33 @@ sub unimport {
 	goto \&Exporter::Tiny::unimport;
 }
 
+sub _predeclare {
+	my ($me, $caller, $types, @names) = @_;
+	
+	for my $name (@names) {
+		my $cached;
+		my $T = sub () {
+			if ( !$cached or $cached->isa('Type::Tiny::_DeclaredType') ) {
+				my $got = $types->can('get_type') && $types->get_type($name);
+				$cached = $got if $got;
+				$cached ||= 'Type::Tiny::_DeclaredType'->new(
+					name    => $name,
+					library => $types,
+				);
+			}
+			$cached;
+		};
+		eval qq{
+			package Zydeco; # allow namespace::autoclean to clean them
+			no warnings 'redefine';
+			*$caller\::$name        = \$T;
+			*$caller\::is_$name     = sub (\$) { \$T->()->check(\@_) };
+			*$caller\::assert_$name = sub (\$) { \$T->()->assert_return(\@_) };
+			1;
+		} or die($@);
+	}
+}
+
 sub import {
 	no warnings 'closure';
 	my ($me, %opts) = (shift, @_);
@@ -1488,14 +1563,7 @@ sub import {
 	#
 	if ($opts{declare}) {
 		my $types = $opts{type_library};
-		for my $name (@{ $opts{declare} }) {
-			eval qq{
-				sub $caller\::$name         ()   { goto \\&$types\::$name }
-				sub $caller\::is_$name      (\$) { goto \\&$types\::is_$name }
-				sub $caller\::assert_$name  (\$) { goto \\&$types\::assert_$name }
-				1;
-			} or die($@);
-		}
+		$me->_predeclare($caller, $types, @{ $opts{declare} });
 	}
 	
 	# Export utility stuff
@@ -1517,7 +1585,7 @@ sub import {
 	my @libs = qw/ Types::Standard Types::Common::Numeric Types::Common::String /;
 	push @libs, $opts{type_library} if $opts{type_library}->isa('Type::Library');
 	for my $library (@libs) {
-		$library->import::into($caller, $_)
+		$library->import::into($caller, { replace => 1 }, $_)
 			for grep $want{$_}, qw( -types -is -assert );
 	}
 	
@@ -2282,7 +2350,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.519';
+#	our $VERSION   = '0.600';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2293,7 +2361,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.519';
+#	our $VERSION   = '0.600';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2306,12 +2374,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.519';
+#	our $VERSION   = '0.600';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.519';
+#	our $VERSION   = '0.600';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2325,7 +2393,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.519';
+#	our $VERSION   = '0.600';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;

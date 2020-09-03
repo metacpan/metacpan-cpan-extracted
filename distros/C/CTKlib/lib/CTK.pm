@@ -1,4 +1,4 @@
-package CTK; # $Id: CTK.pm 273 2020-03-19 17:03:30Z minus $
+package CTK; # $Id: CTK.pm 294 2020-09-02 06:36:52Z minus $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK - Command-line ToolKit library (CTKlib)
 
 =head1 VERSION
 
-Version 2.03
+Version 2.06
 
 =head1 NOTE
 
@@ -498,7 +498,7 @@ Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2020 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -510,7 +510,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/ $VERSION %PLUGIN_ALIAS_MAP %EXPORT_TAGS @EXPORT_OK /;
-$VERSION = '2.03';
+$VERSION = '2.06';
 
 use base qw/Exporter/;
 
@@ -545,6 +545,8 @@ my @exp_variables = qw(
         files           => "CTK::Plugin::File",
         arc             => "CTK::Plugin::Archive",
         compress        => "CTK::Plugin::Archive",
+        ftp             => "CTK::Plugin::FTP",
+        sftp            => "CTK::Plugin::SFTP",
     );
 
 use constant {
@@ -578,7 +580,7 @@ sub new {
         origin      => {%args},
         created     => time(),
         hitime      => gettimeofday() * 1,
-        revision    => q/$Revision: 273 $/,
+        revision    => q/$Revision: 294 $/,
         options     => $options,
         plugins     => {},
 

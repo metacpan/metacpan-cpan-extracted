@@ -10,7 +10,7 @@ our @EXPORT_OK = qw/
     get_timer_subs get_interval_subs
 /;
 
-our $VERSION = "v0.14.0";
+our $VERSION = "v0.15.0";
 
 sub get_subscription_from_subscriber { $_[0]->{_subscription} }
 

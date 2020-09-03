@@ -1,6 +1,8 @@
-use Test::More tests => 3;
+use strict;
+use warnings;
 
-use HTML::PullParser;
+use HTML::PullParser ();
+use Test::More tests => 3;
 
 my $doc = <<'EOT';
 <title>Title</title>
@@ -13,30 +15,32 @@ my $doc = <<'EOT';
 This is a text with a <A HREF="http://www.sol.no" name="l1">link</a>.
 EOT
 
-my $p = HTML::PullParser->new(doc   => $doc,
-			      start => 'event,tagname,@attr',
-                              end   => 'event,tagname',
-			      text  => 'event,dtext',
+my $p = HTML::PullParser->new(
+    doc   => $doc,
+    start => 'event,tagname,@attr',
+    end   => 'event,tagname',
+    text  => 'event,dtext',
 
-                              ignore_elements         => [qw(script style)],
-			      unbroken_text           => 1,
-			      boolean_attribute_value => 1,
-			     );
+    ignore_elements         => [qw(script style)],
+    unbroken_text           => 1,
+    boolean_attribute_value => 1,
+);
 
 my $t = $p->get_token;
 is($t->[0], "start");
 is($t->[1], "title");
 $p->unget_token($t);
 
-my @a;
+my @data;
 while (my $t = $p->get_token) {
     for (@$t) {
-	s/\s/./g;
+        s/\s/./g;
     }
-    push(@a, join("|", @$t));
+    push(@data, join("|", @$t));
 }
 
-my $res = join("\n", @a, "");
+my $res = join("\n", @data, "");
+
 #diag $res;
 is($res, <<'EOT');
 start|title
@@ -52,4 +56,3 @@ text|link
 end|a
 text|..
 EOT
-

@@ -94,12 +94,26 @@ my @library_tests =
 	},
 );
 
+if ($is_linux)
+{
+	push @library_tests,
+	{
+		'lib'     => 'udev',
+		'header'  => 'libudev.h',
+	},
+}
+
 my %library_opts =
 (
 	'ssl' =>
 	{
 		'defines' => '',
 		'libs'    => ' -lcrypto',
+	},
+	'udev' =>
+	{
+		'defines' => '',
+		'libs'    => ' -ludev',
 	},
 );
 
@@ -205,13 +219,12 @@ if ($is_linux && $is_bsd)
 
 if ($is_linux)
 {
-	$def .= ' -DHAVE_SYS_RANDOM_H';
-	$lib .= ' -ludev';
+	$def .= ' -DHAVE_SYS_RANDOM_H -DHAVE_CLOCK_GETTIME';
 }
 
 if ($is_osx)
 {
-	$def .= ' -DHAVE_ARC4RANDOM_BUF -DTLS=__thread';
+	$def .= ' -DHAVE_ARC4RANDOM_BUF -DHAVE_CLOCK_GETTIME -DTLS=__thread';
 	$lddlfags .= ' -framework CoreFoundation -framework Security';
 }
 
@@ -345,13 +358,14 @@ my @fido2srcs = (qw/
 	hid.c
 /);
 
-push @fido2srcs, 'hid_linux.c' if ($is_linux);
+push @fido2srcs, 'hid_linux.c' if ($is_linux && $library_opts{udev}{use});
 push @fido2srcs, 'hid_openbsd.c' if ($is_openbsd);
 push @fido2srcs, 'hid_osx.c' if ($is_osx);
 push @fido2srcs, 'hid_win.c' if ($is_windows);
 
+
 my @hidapisrcs;
-if ($is_bsd && !$is_openbsd && !$is_windows)
+if ($is_bsd && !$is_openbsd && !$is_windows && !$is_osx || ($is_linux && !$library_opts{udev}{use}))
 {
 	push @fido2srcs, 'hid_hidapi.c';
 	push @hidapisrcs, 'deps/hidapi/libusb/hid.c';

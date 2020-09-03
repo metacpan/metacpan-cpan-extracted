@@ -1,10 +1,11 @@
 use strict;
+use warnings;
+
+use HTML::Parser ();
 use Test::More tests => 3;
 
 my $text = "";
-use HTML::Parser ();
-my $p = HTML::Parser->new(default_h => [sub { $text .= shift }, "text"],
-                         );
+my $p    = HTML::Parser->new(default_h => [sub { $text .= shift }, "text"],);
 
 my $html = <<'EOT';
 
@@ -22,7 +23,7 @@ $p->parse($html)->eof;
 is($text, $html);
 
 $text = "";
-$p->handler(start => sub { }, "");
+$p->handler(start       => sub { }, "");
 $p->handler(declaration => sub { }, "");
 $p->parse($html)->eof;
 

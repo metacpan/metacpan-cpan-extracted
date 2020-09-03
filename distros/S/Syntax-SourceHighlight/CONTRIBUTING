@@ -1,0 +1,17 @@
+The master repository for this package is hosted at GitLab at:
+
+    https://gitlab.com/Matlib/Syntax-SourceHighlight
+
+For those not familiar with GitLab:
+
+  • the issue tracker is available at:
+    https://gitlab.com/Matlib/Syntax-SourceHighlight/-/issues
+
+  • commit tree preview:
+    https://gitlab.com/Matlib/Syntax-SourceHighlight/-/network/master
+
+  • if you want to contribute – don't fork the project, there is no need to;
+    just request Developer access to the repository and you can start your own
+    branch which will be merged to dev eventually
+
+E-mail reports are patches are also accepted.

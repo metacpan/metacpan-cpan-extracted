@@ -4,6 +4,7 @@ typedef UA_Boolean *		OPCUA_Open62541_Boolean;
 typedef UA_BrowseDescription *		OPCUA_Open62541_BrowseDescription;
 typedef UA_BrowseNextRequest *		OPCUA_Open62541_BrowseNextRequest;
 typedef UA_BrowseRequest *		OPCUA_Open62541_BrowseRequest;
+typedef UA_BuildInfo *		OPCUA_Open62541_BuildInfo;
 typedef UA_Byte *		OPCUA_Open62541_Byte;
 typedef UA_ByteString *		OPCUA_Open62541_ByteString;
 typedef UA_DataTypeAttributes *		OPCUA_Open62541_DataTypeAttributes;

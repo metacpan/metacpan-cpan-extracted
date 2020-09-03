@@ -63,8 +63,10 @@ License: GPL-1.0+ or Artistic-1.0
 Files: INSTALL
  LICENSE
  Makefile.PL
+ examples/calculator.pl
  examples/mip-087-001.pl
  examples/simple-json-encoder.pl
+ examples/structs.pl
  t/lib/Local/Example/MoreClasses.pl
  t/lib/Local/Example/Roles.pl
 Copyright: Unknown

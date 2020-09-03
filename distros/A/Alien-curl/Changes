@@ -1,5 +1,9 @@
 Revision history for Alien-curl
 
+0.08      2020-09-02 04:52:20 -0600
+  - Install curl-config into /dynamic directory for share install
+    (gh#10, gh#11, gh#13, shawnlaffan++)
+
 0.07      2020-02-19 01:12:12 -0500
   - System install requires SSL, and dynamic libraries.
   - Share install Builds with SSL on all platforms.

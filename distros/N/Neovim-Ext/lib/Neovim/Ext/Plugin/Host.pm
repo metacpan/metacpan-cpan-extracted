@@ -1,5 +1,5 @@
 package Neovim::Ext::Plugin::Host;
-$Neovim::Ext::Plugin::Host::VERSION = '0.02';
+$Neovim::Ext::Plugin::Host::VERSION = '0.05';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -84,6 +84,11 @@ sub _make_rpc_method
 {
 	my ($path, $handler) = @_;
 
+	if ($handler->{type} eq 'rpc_export')
+	{
+		return $handler->{name};
+	}
+
 	my $method = join (':', $path, $handler->{type}, $handler->{name});
 	if ($handler->{options}{pattern})
 	{
@@ -116,6 +121,7 @@ sub _load
 				$module->get_commands(),
 				$module->get_functions(),
 				$module->get_autocmds(),
+				$module->get_rpc_exports(),
 			);
 
 			# Module may not export any handlers
@@ -277,7 +283,7 @@ Neovim::Ext::Plugin::Host - Neovim Plugin::Host class
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 

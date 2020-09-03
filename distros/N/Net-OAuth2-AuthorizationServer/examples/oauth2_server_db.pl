@@ -288,7 +288,7 @@ my $verify_access_token_sub = sub {
       }
     }
 
-    return $rt;
+    return ( $rt, undef, $rt->{scope}, $rt->{user_id} );
   }
   elsif (
     my $at = $c->db->get_collection( 'access_tokens' )->find_one({
@@ -314,7 +314,7 @@ my $verify_access_token_sub = sub {
     }
 
     $c->app->log->debug( "OAuth2::Server: Access token is valid" );
-    return $at;
+    return ( $at, undef, $at->{scope}, $at->{user_id} );
   }
 
   $c->app->log->debug( "OAuth2::Server: Access token does not exist" );

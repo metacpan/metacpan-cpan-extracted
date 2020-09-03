@@ -1,21 +1,20 @@
-#!perl -w
-
 use strict;
-use HTML::Parser;
+use warnings;
 
+use HTML::Parser ();
 use Test::More tests => 4;
 
 my $TEXT = "";
-sub h
-{
-    my($event, $tagname, $text, @attr) = @_;
+
+sub h {
+    my ($event, $tagname, $text, @attr) = @_;
     for ($event, $tagname, $text, @attr) {
         if (defined) {
-	    s/([\n\r\t])/sprintf "\\%03o", ord($1)/ge;
-	}
-	else {
-	    $_ = "<undef>";
-	}
+            s/([\n\r\t])/sprintf "\\%03o", ord($1)/ge;
+        }
+        else {
+            $_ = "<undef>";
+        }
     }
 
     $TEXT .= "[$event,$tagname,$text," . join(":", @attr) . "]\n";

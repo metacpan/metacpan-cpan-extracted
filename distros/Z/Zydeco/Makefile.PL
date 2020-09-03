@@ -31,7 +31,7 @@ my $meta = {
                                                        "Exporter::Tiny" => "1.000000",
                                                        "Import::Into" => 0,
                                                        "Keyword::Simple" => 0.04,
-                                                       "MooX::Press" => 0.062,
+                                                       "MooX::Press" => 0.063,
                                                        "Path::ScanINC" => 0,
                                                        "perl" => "5.014000",
                                                        "PPR" => "0.000023",
@@ -43,8 +43,8 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.519 },
-                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.519 },
+                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => "0.600" },
+                        "Zydeco" => { file => "lib/Zydeco.pm", version => "0.600" },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -58,7 +58,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Zydeco/project",
                       },
-  "version"        => 0.519,
+  "version"        => "0.600",
 };
 
 my %dynamic_config;

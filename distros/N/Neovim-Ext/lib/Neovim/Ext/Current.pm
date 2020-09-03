@@ -1,5 +1,5 @@
 package Neovim::Ext::Current;
-$Neovim::Ext::Current::VERSION = '0.02';
+$Neovim::Ext::Current::VERSION = '0.05';
 use strict;
 use warnings;
 use base qw/Class::Accessor/;
@@ -8,7 +8,7 @@ use Neovim::Ext::RemoteApi;
 use Neovim::Ext::RemoteMap;
 use Neovim::Ext::RemoteSequence;
 
-__PACKAGE__->mk_accessors (qw/session/);
+__PACKAGE__->mk_accessors (qw/session range/);
 
 my %fields;
 
@@ -92,7 +92,7 @@ Neovim::Ext::Current - Neovim Current class
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 

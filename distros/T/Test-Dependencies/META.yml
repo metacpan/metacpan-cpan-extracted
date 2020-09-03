@@ -24,12 +24,13 @@ optional_features:
       CPAN::Meta::Requirements: '2.120920'
       File::Find::Rule::Perl: '0'
 requires:
+  Module::CoreList: '5.20200620'
   Pod::Strip: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/ehuelsmann/perl-Test-Dependencies/issues
   repository: https://github.com/ehuelsmann/perl-Test-Dependencies.git
-version: '0.24'
+version: '0.28'
 x_contributors:
   - 'Kent Fredric <kentfredric@gmail.com>'
   - 'Nick Morrott <knowledgejunkie@gmail.com>'

@@ -14,7 +14,6 @@ lib/CPANPLUS/Dist/Slackware.pm
 lib/CPANPLUS/Dist/Slackware/PackageDescription.pm
 lib/CPANPLUS/Dist/Slackware/Plugin/Alien/wxWidgets.pm
 lib/CPANPLUS/Dist/Slackware/Plugin/Mail/SpamAssassin.pm
-lib/CPANPLUS/Dist/Slackware/Plugin/Net/Pcap.pm
 lib/CPANPLUS/Dist/Slackware/Plugin/Search/Xapian.pm
 lib/CPANPLUS/Dist/Slackware/Util.pm
 perlcritic.rc

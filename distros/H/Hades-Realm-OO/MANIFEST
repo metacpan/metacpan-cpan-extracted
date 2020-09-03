@@ -1,10 +1,10 @@
 Changes
-hades-realm-oo.pl
 ignore.txt
 lib/Hades/Realm/OO.pm
 Makefile.PL
 MANIFEST			This list of files
 README
+realm-oo.hades
 t/00-load.t
 t/Hades-Realm-OO.t
 t/manifest.t

@@ -9,12 +9,13 @@ build_requires:
   File::Spec: '0'
   File::Temp: '0'
   IPC::System::Simple: '0'
-  Storable: '0'
-  Test::Fatal: '0'
+  Path::Tiny: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::Plugin::UTF8: '0'
+  Test2::Require::Module: '0'
+  Test2::V0: '0'
   Test::File::ShareDir::Dist: '0'
-  Test::More: '0.96'
-  Test::Requires: '0'
-  Test::Warnings: '0'
+  Test::More: '1.302015'
   base: '0'
   utf8: '0'
 configure_requires:
@@ -34,31 +35,33 @@ no_index:
 provides:
   DateTime::Locale:
     file: lib/DateTime/Locale.pm
-    version: '1.26'
+    version: '1.28'
   DateTime::Locale::Base:
     file: lib/DateTime/Locale/Base.pm
-    version: '1.26'
+    version: '1.28'
   DateTime::Locale::Catalog:
     file: lib/DateTime/Locale/Catalog.pm
-    version: '1.26'
+    version: '1.28'
   DateTime::Locale::Data:
     file: lib/DateTime/Locale/Data.pm
-    version: '1.26'
+    version: '1.28'
   DateTime::Locale::FromData:
     file: lib/DateTime/Locale/FromData.pm
-    version: '1.26'
+    version: '1.28'
   DateTime::Locale::Util:
     file: lib/DateTime/Locale/Util.pm
-    version: '1.26'
+    version: '1.28'
 requires:
   Carp: '0'
   Dist::CheckConflicts: '0.02'
   Exporter: '0'
   File::ShareDir: '0'
+  File::Spec: '0'
   List::Util: '1.45'
   Params::ValidationCompiler: '0.13'
   Specio::Declare: '0'
   Specio::Library::String: '0'
+  Storable: '0'
   namespace::autoclean: '0.19'
   perl: '5.008004'
   strict: '0'
@@ -68,7 +71,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Locale/issues
   homepage: https://metacpan.org/release/DateTime-Locale
   repository: git://github.com/houseabsolute/DateTime-Locale.git
-version: '1.26'
+version: '1.28'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -212,7 +215,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Prereqs:
           phase: test
           type: requires
-      name: '@DROLSKY/Test::More with subtest'
+      name: '@DROLSKY/Test::More with Test2'
       version: '6.015'
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -973,7 +976,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 24
       name: '@DROLSKY/DROLSKY::RunExtraTests'
-      version: '1.08'
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::Test::CleanNamespaces
       config:
@@ -1049,7 +1052,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@DROLSKY/Test::ReportPrereqs'
-      version: '0.027'
+      version: '0.028'
     -
       class: Dist::Zilla::Plugin::Test::Version
       name: '@DROLSKY/Test::Version'
@@ -1057,7 +1060,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::Contributors
       name: '@DROLSKY/DROLSKY::Contributors'
-      version: '1.08'
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -1192,7 +1195,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::WeaverConfig
       name: '@DROLSKY/DROLSKY::WeaverConfig'
-      version: '1.08'
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -1247,7 +1250,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
-      version: '1.08'
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@DROLSKY/CheckStrictVersion'
@@ -1274,7 +1277,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
-      version: '1.08'
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::EnsureChangesHasContent
       name: '@DROLSKY/EnsureChangesHasContent'
@@ -1290,7 +1293,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::TidyAll
       name: '@DROLSKY/DROLSKY::TidyAll'
-      version: '1.08'
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -1345,7 +1348,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.26
+          tag: v1.28
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -1422,7 +1425,7 @@ x_Dist_Zilla:
           default_jobs: 24
           version: '6.015'
       name: '@DROLSKY/DROLSKY::MakeMaker'
-      version: '1.08'
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
@@ -1508,6 +1511,7 @@ x_authority: cpan:DROLSKY
 x_breaks:
   DateTime::Format::Strptime: '<= 1.1000'
 x_contributors:
+  - 'Alexander Pankoff <ccntrq@screenri.de>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Ryley Breiddal <rbreiddal@presinet.com>'

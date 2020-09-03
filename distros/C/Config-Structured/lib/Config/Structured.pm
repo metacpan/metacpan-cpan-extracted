@@ -1,5 +1,5 @@
 package Config::Structured;
-$Config::Structured::VERSION = '2.001';
+$Config::Structured::VERSION = '2.002';
 # ABSTRACT: Provides generalized and structured configuration value access
 
 use 5.022;
@@ -13,6 +13,7 @@ use Carp;
 use IO::All;
 use List::Util qw(reduce);
 use Data::DPath qw(dpath);
+use Text::Glob qw(match_glob);
 
 use Readonly;
 
@@ -38,7 +39,7 @@ Readonly::Scalar my $CONF_FROM_ENV  => q(env);
 
 # Method names that are needed by Config::Structured and cannot be overridden by config node names
 Readonly::Array my @RESERVED =>
-  qw(get meta BUILD BUILD_DYNAMIC _config _structure _base _add_helper __register_default __register_as);
+  qw(get meta BUILDCARGS BUILD BUILD_DYNAMIC _config _structure _hooks _base _add_helper __register_default __register_as);
 
 #
 # The configuration structure (e.g., $app.conf.def contents)
@@ -56,6 +57,14 @@ has '_structure' => (
   init_arg => undef,
   lazy     => 1,
   default  => sub {Config::Structured::Deserializer->decode(shift->_structure_v)}
+);
+
+has '_hooks' => (
+  is       => 'ro',
+  isa      => 'HashRef[HashRef[CodeRef]]',
+  init_arg => 'hooks',
+  required => 0,
+  default  => sub {{}},
 );
 
 #
@@ -92,6 +101,12 @@ has '_base' => (
 sub _add_helper {
   Mojo::DynamicMethods::register __PACKAGE__, @_;
 }
+
+around BUILDARGS => sub ($orig, $class, @args) {
+  my %args = ref($args[0]) eq 'HASH' ? %{$args[0]} : @args;
+  delete($args{hooks}) unless (defined($args{hooks}));
+  return $class->$orig(%args);
+};
 
 #
 # Dynamically create methods at instantiation time, corresponding to configuration structure's dpaths
@@ -155,15 +170,31 @@ sub BUILD ($self, $args) {
   }
 
   # Closures
+  my $get_node_value = sub ($el, $path) {
+    return node_value($el, dpath($path)->matchr($self->_config)->[0]);
+  };
+
+  my $get_hooks = sub($path) {
+    return map {$self->_hooks->{$_}} grep {match_glob($_, $path) ? $_ : ()} keys(%{$self->_hooks});
+  };
 
   my $make_leaf_generator = sub ($el, $path) {
-    return sub {
-      my $isa = $el->{isa};
-      my $v   = node_value($el, dpath($path)->matchr($self->_config)->[0]);
-      if (defined($v)) {
-        return $v if (typecheck($isa, $v));
+    my $isa = $el->{isa};
+    my $v   = $get_node_value->($el, $path);
+
+    if (defined($v)) {
+      if (typecheck($isa, $v)) {
+        my @hooks = grep {defined} map {$_->{on_access}} $get_hooks->($path);
+        return sub {
+          # access hook
+          foreach (@hooks) {$_->($path, $v)}
+          return $v;
+        }
+      } else {
         carp(pkg_prefix "Value '" . np($v) . "' does not conform to type '$isa' for node $path");
       }
+    }
+    return sub {
       return;
     }
   };
@@ -173,6 +204,7 @@ sub BUILD ($self, $args) {
       return __PACKAGE__->new(
         structure => $self->_structure,
         config    => $self->_config,
+        hooks     => $self->_hooks,
         _base     => $path
       );
     }
@@ -186,12 +218,32 @@ sub BUILD ($self, $args) {
           ;    # if the config node refers to a method already defined on our instance, remove that method
         my $path = concat_path($self->_base, $def);    # construct the new directive path by concatenating with our base
 
-# Detect whether the resulting node is a branch or leaf node (leaf nodes are required to have an "isa" attribute, though we don't (yet) perform type constraint validation)
-# if it's a branch node, return a new Config instance with a new base location, for method chaining (e.g., config->db->pass)
+        # Detect whether the resulting node is a branch or leaf node (leaf nodes are required to have an "isa" attribute)
+        # if it's a branch node, return a new Config instance with a new base location, for method chaining (e.g., config->db->pass)
         $self->_add_helper(
           $def => (is_leaf_node($el->{$def}) ? $make_leaf_generator->($el->{$def}, $path) : $make_branch_generator->($path)));
       }
     }
+  }
+
+  # Run on_load hooks immediately from root node only since we can't assume that non-root nodes will be created immediately
+  if ($self->_base eq $SLASH) {
+    sub ($path, $node) {
+      foreach (keys(%{$node})) {
+        my $p = join($path eq $SLASH ? $EMPTY : $SLASH, $path, $_);    #don't duplicate initial slash in path
+        my $n = $node->{$_};
+        if (is_leaf_node($n)) {
+          my @hooks = grep {defined} map {$_->{on_load}} $get_hooks->($p);
+          if (@hooks) {
+            my $v = $get_node_value->($n, $p);                         #put off resolving the node value until we know we need it
+            foreach (@hooks) {$_->($p, $v)}
+          }
+        } else {
+          __SUB__->($p, $n);                                           #recurse on the new branch node
+        }
+      }
+      }
+      ->($self->_base, $self->_structure);                             #initially call on root of structure
   }
 }
 
@@ -267,9 +319,11 @@ Config::Structured - Provides generalized and structured configuration value acc
 
 =head1 VERSION
 
-version 2.001
+version 2.002
 
 =head1 SYNOPSIS
+
+Basic usage:
 
   use Config::Structured;
 
@@ -279,6 +333,20 @@ version 2.001
   );
 
   say $conf->some->nested->value();
+
+Hooks exammple showing how to ensure config directories exist prior to first 
+use:
+
+  my $conf = Config::Structured->new(
+    ...
+    hooks => {
+      '/paths/*' => {
+        on_load => sub($node,$value) {
+          Mojo::File->new($value)->make_path
+        }
+      }
+    }
+  )
 
 =head1 DESCRIPTION
 
@@ -315,6 +383,12 @@ version 2.001
   case where the structure is read from a file)
 
   =back
+
+  Besides C<structure> and C<config>, L<Config::Structured> also accepts a C<hooks> argument at 
+  initialization time. This argument must be a HashRef whose keys are patterns matching config
+  node paths, and whose values are HashRefs containing C<on_load> and/or C<on_access> keys. These
+  in turn point to CodeRefs which are run when the config value is initially loaded, or every time
+  it is accessed, respectively.
 
 =head1 METHODS
 

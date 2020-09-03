@@ -1,7 +1,7 @@
 package MooseX::MethodAttributes::Inheritable;
 # ABSTRACT: inheritable code attribute introspection
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 #pod =head1 SYNOPSIS
 #pod
@@ -50,7 +50,7 @@ MooseX::MethodAttributes::Inheritable - inheritable code attribute introspection
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHORS
 

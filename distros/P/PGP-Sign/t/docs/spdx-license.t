@@ -68,6 +68,7 @@ my @IGNORE_PATHS = (
     qr{ \A [.] /share/ }xms,                  # Package license should be fine
     qr{ \A [.] /t/data .* /metadata/ }xms,    # Test metadata
     qr{ \A [.] /t/data .* /output/ }xms,      # Test output
+    qr{ \A [.] /t/data .* [.] gpg \z }xms,    # Test GnuPG files
     qr{ \A [.] /t/data .* [.] json \z }xms,   # Test metadata
 );
 ## use critic

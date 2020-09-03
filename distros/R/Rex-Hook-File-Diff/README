@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.2.0
+    version v0.3.0
 
 SYNOPSIS
 
@@ -34,7 +34,7 @@ DESCRIPTION
 
     sed <https://metacpan.org/pod/Rex::Commands::File#sed>
 
-      It uses the diff utility if available.
+      On non-Windows systems, it uses the diff utility if available.
 
 DIAGNOSTICS
 

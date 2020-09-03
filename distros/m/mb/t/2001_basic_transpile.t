@@ -310,144 +310,144 @@ END1
 $a ? 1 : 2
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 60
--A
+-A _
 END1
-mb::_filetest [qw( -A )], 
+mb::_filetest [qw( -A )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 61
--B
+-B _
 END1
-mb::_filetest [qw( -B )], 
+mb::_filetest [qw( -B )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 62
--C
+-C _
 END1
-mb::_filetest [qw( -C )], 
+mb::_filetest [qw( -C )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 63
--M
+-M _
 END1
-mb::_filetest [qw( -M )], 
+mb::_filetest [qw( -M )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 64
--O
+-O _
 END1
-mb::_filetest [qw( -O )], 
+mb::_filetest [qw( -O )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 65
--R
+-R _
 END1
-mb::_filetest [qw( -R )], 
+mb::_filetest [qw( -R )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 66
--S
+-S _
 END1
-mb::_filetest [qw( -S )], 
+mb::_filetest [qw( -S )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 67
--T
+-T _
 END1
-mb::_filetest [qw( -T )], 
+mb::_filetest [qw( -T )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 68
--W
+-W _
 END1
-mb::_filetest [qw( -W )], 
+mb::_filetest [qw( -W )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 69
--X
+-X _
 END1
-mb::_filetest [qw( -X )], 
+mb::_filetest [qw( -X )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 70
--b
+-b _
 END1
-mb::_filetest [qw( -b )], 
+mb::_filetest [qw( -b )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 71
--c
+-c _
 END1
-mb::_filetest [qw( -c )], 
+mb::_filetest [qw( -c )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 72
--d
+-d _
 END1
-mb::_filetest [qw( -d )], 
+mb::_filetest [qw( -d )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 73
--e
+-e _
 END1
-mb::_filetest [qw( -e )], 
+mb::_filetest [qw( -e )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 74
--f
+-f _
 END1
-mb::_filetest [qw( -f )], 
+mb::_filetest [qw( -f )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 75
--g
+-g _
 END1
-mb::_filetest [qw( -g )], 
+mb::_filetest [qw( -g )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 76
--k
+-k _
 END1
-mb::_filetest [qw( -k )], 
+mb::_filetest [qw( -k )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 77
--l
+-l _
 END1
-mb::_filetest [qw( -l )], 
+mb::_filetest [qw( -l )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 78
--o
+-o _
 END1
-mb::_filetest [qw( -o )], 
+mb::_filetest [qw( -o )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 79
--p
+-p _
 END1
-mb::_filetest [qw( -p )], 
+mb::_filetest [qw( -p )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 80
--r
+-r _
 END1
-mb::_filetest [qw( -r )], 
+mb::_filetest [qw( -r )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 81
--s
+-s _
 END1
-mb::_filetest [qw( -s )], 
+mb::_filetest [qw( -s )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 82
--t
+-t _
 END1
-mb::_filetest [qw( -t )], 
+mb::_filetest [qw( -t )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 83
--u
+-u _
 END1
-mb::_filetest [qw( -u )], 
+mb::_filetest [qw( -u )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 84
--w
+-w _
 END1
-mb::_filetest [qw( -w )], 
+mb::_filetest [qw( -w )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 85
--x
+-x _
 END1
-mb::_filetest [qw( -x )], 
+mb::_filetest [qw( -x )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 86
--z
+-z _
 END1
-mb::_filetest [qw( -z )], 
+mb::_filetest [qw( -z )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 87
--A -B -C -M -O -R -S -T -W -X -b -c -d -e -f -g -k -l -o -p -r -s -t -u -w -x -z
+-A -B -C -M -O -R -S -T -W -X -b -c -d -e -f -g -k -l -o -p -r -s -t -u -w -x -z _
 END1
-mb::_filetest [qw( -A -B -C -M -O -R -S -T -W -X -b -c -d -e -f -g -k -l -o -p -r -s -t -u -w -x -z )], 
+mb::_filetest [qw( -A -B -C -M -O -R -S -T -W -X -b -c -d -e -f -g -k -l -o -p -r -s -t -u -w -x -z )], \*_
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 88
 ...

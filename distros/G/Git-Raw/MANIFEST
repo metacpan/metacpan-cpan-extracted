@@ -29,7 +29,9 @@ deps/libgit2/azure-pipelines/docker.yml
 deps/libgit2/azure-pipelines/docker/bionic
 deps/libgit2/azure-pipelines/docker/docurium
 deps/libgit2/azure-pipelines/docker/entrypoint.sh
+deps/libgit2/azure-pipelines/docker/focal
 deps/libgit2/azure-pipelines/docker/xenial
+deps/libgit2/azure-pipelines/getcontainer.sh
 deps/libgit2/azure-pipelines/nightly.yml
 deps/libgit2/azure-pipelines/setup-mingw.sh
 deps/libgit2/azure-pipelines/setup-osx.sh
@@ -549,6 +551,7 @@ deps/libgit2/src/annotated_commit.h
 deps/libgit2/src/apply.c
 deps/libgit2/src/apply.h
 deps/libgit2/src/array.h
+deps/libgit2/src/assert_safe.h
 deps/libgit2/src/attr.c
 deps/libgit2/src/attr.h
 deps/libgit2/src/attr_file.c
@@ -754,6 +757,7 @@ deps/libgit2/src/sortedcache.h
 deps/libgit2/src/stash.c
 deps/libgit2/src/status.c
 deps/libgit2/src/status.h
+deps/libgit2/src/strarray.c
 deps/libgit2/src/stream.h
 deps/libgit2/src/streams/mbedtls.c
 deps/libgit2/src/streams/mbedtls.h

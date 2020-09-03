@@ -1,0 +1,238 @@
+lib lib
+tlib t
+author LNATION
+email email@lnation.org
+version 0.05
+Hades::Realm::OO base Hades {
+	abstract { Hades realm for object orientation }
+	synopsis {
+Quick summary of what the module does:
+
+	Hades::Realm::Kosmos base Hades::Realm::OO {
+                ...
+        }
+	}
+	current_class :t(Str)
+	meta :t(Map[Str, Dict[types => HashRef, attributes => HashRef]])
+	is_role :t(Bool) :c
+	module_generate $mg :t(Object) {
+		$mg->keyword('has',
+			CODE => sub { £build_has(@_) },
+			KEYWORDS => £build_has_keywords,
+			POD_TITLE => 'ATTRIBUTES',
+			POD_POD => 'Get or set $keyword',
+			POD_EXAMPLE => "\$obj->\$keyword;\n\n\t\$obj->\$keyword(\$value)"
+		);
+		$mg->keyword('extends',
+			CODE => sub { £build_extends(@_) },
+			KEYWORDS => £build_extends_keywords,
+			POD_TITLE => 'EXTENDS',
+			POD_POD => 'This class extends the following classes',
+			POD_EXAMPLE => "\$keyword"
+		);
+		$mg->keyword('with',
+			CODE => sub { £build_with(@_) },
+			KEYWORDS => £build_with_keywords,
+			POD_TITLE => 'WITH',
+			POD_POD => 'This class includes the following roles',
+			POD_EXAMPLE => "\$keyword"
+		);
+		$mg->keyword('requires',
+			CODE => sub { £build_requires(@_) },
+			KEYWORDS => £build_requires_keywords,
+			POD_TITLE => 'REQUIRES',
+			POD_POD => 'This class requires:',
+			POD_EXAMPLE => "\$keyword"
+		);
+		$mg->keyword('before',
+			CODE => sub { £build_before(@_) },
+			KEYWORDS => £build_before_keywords,
+			POD_TITLE => 'BEFORE',
+			POD_POD => 'Call $keyword method',
+			POD_EXAMPLE => "\$obj->\$keyword"
+		);
+		$mg->keyword('around',
+			CODE => sub { £build_around(@_) },
+			KEYWORDS => £build_around_keywords,
+			POD_TITLE => 'AROUND',
+			POD_POD => 'Call $keyword method',
+			POD_EXAMPLE => "\$obj->\$keyword"
+		);
+		$mg->keyword('after',
+			CODE => sub { £build_after(@_) },
+			KEYWORDS => £build_after_keywords,
+			POD_TITLE => 'AFTER',
+			POD_POD => 'Call $keyword method',
+			POD_EXAMPLE => "\$obj->\$keyword"
+		);
+	}
+	build_class_inheritance :b {
+		if ($params[-1] =~ m/^(role)$/i) {
+			£is_role(1);
+			return $params[-2];
+		} elsif ($params[-1] =~ m/^(with|extends|parent|base)$/) {
+			return 'extends' if $1 =~ m/parent|base/; 
+			return $params[-1];
+		} elsif ($params[-2] && $params[-2] =~ m/^(with|extends)$/) {
+			my ($mg, $last, $ident) = splice @params, -3;
+			$mg->$last($ident); 
+			return $last;
+		}
+	}
+	build_new $mg :t(Object) $meta :t(HashRef) $types :t(HashRef) :d({}) {
+		my %class = %Module::Generate::CLASS;
+		my %accessors = ();
+		map {
+			my $key = $_;
+			exists $meta->{$key}->{$_} && do { $accessors{$key}->{$_} = $meta->{$key}->{$_} }
+				for (@{£build_has_keywords});
+		} grep { 
+			£unique_types($meta->{$_}->{type}, $types) if $meta->{$_}->{type};
+			$meta->{$_}->{meta} eq 'ACCESSOR'; 
+		} keys %{$meta};
+		my $class_meta = £meta;
+		$class_meta->{$class{CURRENT}{NAME}} = {
+			types => $types,
+			attributes => \%accessors
+		};
+		£meta($class_meta);
+		£current_class($class{CURRENT}{NAME});
+		$class{CURRENT}{SUBS}{new}{NO_CODE} = 1;
+		$class{CURRENT}{SUBS}{new}{TEST} = [£build_tests('new', $meta, 'new', \%class)];
+	}
+	build_clearer :a {
+		$res[0]->no_code(1);
+	}
+	build_predicate :a {
+		$res[0]->no_code(1);
+	}
+	build_accessor_no_arguments $mg :t(Object) $token :t(ArrayRef) $meta :t(HashRef) {
+		$meta->{$token->[0]}->{meta} = 'ACCESSOR';
+		$mg->has($token->[0]);
+		return $meta;
+	}
+	build_accessor $mg :t(Object) $name :t(Str) $meta :t(HashRef) {
+		$mg->has($name);
+		$meta->{$name}->{$_} and $mg->$_(
+			£build_code(
+				$mg,
+				$name, 
+				£can("build_accessor_${_}") 
+					? £can("build_accessor_${_}")->($self, $name, $meta->{$name}->{$_}) 
+					: $meta->{$name}->{$_}
+			)
+		) for (@{£build_has_keywords});
+		$mg->isa(
+			£can("build_accessor_isa") 
+				? £can("build_accessor_isa")->($self, $name, $meta->{$name}->{type}->[0]) 
+				: $meta->{$name}->{type}->[0]
+		) if ! $meta->{$name}->{isa};
+		$mg->clear_tests->test(
+			£build_tests($name, $meta->{$name})
+		);
+		$meta->{$name}->{$_} && $mg->$_(£replace_pe_string($meta->{$name}->{$_}, $name)) for qw/pod example/;
+	}
+	build_modify $mg :t(Object) $name :t(Str) $meta :t(HashRef) {
+		$meta->{$name}->{$_} 
+			&& $mg->$_($name)->code($self->build_code($mg, $name, delete $meta->{$name}->{$_}))->test(£build_tests($name, $meta->{$name})) 
+		for qw/before around after/;
+		$meta->{$name}->{$_} && $mg->$_(£replace_pe_string(delete $meta->{$name}->{$_}, $name)) for qw/pod example/;
+	}
+	after_class $mg :t(Object) $meta :t(HashRef) {
+		£is_role && £clear_is_role ? £build_as_role($mg, $meta) : £build_as_class($mg, $meta);
+	}
+	unique_types $type :t(Str) :co(if (ref $type eq 'ARRAY') { £unique_types($_, $unique) for @{$type}; return }) $unique :t(HashRef) {
+		if ($type =~ s/^([^\[ ]+)\[(.*)\]$/$2/) {
+			my ($t, $v) = ($1, $2);
+			$unique->{$t}++ if ($t =~ m/^\w+$/);
+			$v =~ s/,\s*\d+,\s*\d+$//g;
+			£unique_types($v, $unique);
+		} elsif ($type =~ m/^\s*\w+\s*\=\>\s*/ || $type =~ m/^([^,]+),\s*(.*)$/) {
+			my @matches = split ',', $type;
+			while (@matches) {
+				my ($match) = (shift @matches);
+				if (@matches && $match =~ m/(Map|Tuple|ArrayRef|Dict)\[/) {
+					my $cb = sub {
+						my $copy = shift;
+						1 while ($copy =~ s/\[[^\[\]]+\]//g);
+						return ($copy =~ m/\[|\]/) ? 1 : 0;
+					};
+					1 while ($cb->($match .=  ', ' . shift @matches));
+				}
+				my ($k, $v) = map { my $h = $_; $h =~ s/^\s*|\s*$//g; $h; } $match =~ m/\s+\w*\s*\=\>/ ? split('=>', $match, 2) : $match;
+				£unique_types($v || $k, $unique);
+			}
+		} else {
+			$unique->{$type}++;
+		}
+	}
+	build_as_class $mg :t(Object) $meta :t(HashRef) { return ($mg, $meta) }
+	build_as_role $mg :t(Object) $meta :t(HashRef) { return ($mg, $meta) }
+	build_has_keywords $keywords :t(ArrayRef) :d([qw/is isa required default clearer coerce predicate trigger private builder/]) { return $keywords; }
+	build_has $meta :t(HashRef) { 
+		my $name = $meta->{has};
+		my $private = £SUPER::build_private($name, $meta->{private});
+		my $type = £SUPER::build_coerce($name, '$value', $meta->{coerce}) . £build_type($name, $meta->{type}[0]);
+		my $trigger = £SUPER::build_trigger($name, '$value', $meta->{trigger});
+		return qq|{
+			my ( \$self, \$value ) = \@_; $private
+			if ( defined \$value ) { $type
+				£{$name} = \$value; $trigger
+			}
+			return £{$name};
+		}|;
+	}
+	build_extends_keywords $keywords :t(ArrayRef) :d([]) { return $keywords; }
+	build_extends $meta :t(HashRef) {
+		$meta->{extends} = '"' . $meta->{extends} . '"' if $meta->{extends} !~ m/^["'q]/;
+		return qq(extends $meta->{extends};);
+	}
+	build_with_keywords $keywords :t(ArrayRef) :d([]) { return $keywords; }
+	build_with $meta :t(HashRef) {
+		$meta->{with} = '"' . $meta->{with} . '"' if $meta->{with} !~ m/^["'q]/;
+		return qq(with $meta->{with};);
+	}
+	build_requires_keywords $keywords :t(ArrayRef) :d([]) { return $keywords; }
+	build_requires $meta :t(HashRef) {
+		$meta->{requires} = '"' . $meta->{requires} . '"' if $meta->{requires} !~ m/^["'q]/;
+		return qq(requires $meta->{requires};);
+	}
+	build_before_keywords $keywords :t(ArrayRef) :d([]) { return $keywords; }
+	build_before $meta :t(HashRef) { 
+		return qq(before $meta->{before} => sub { my (\$orig, \$self, \@params) = \@_; $meta->{CODE} };); 
+	}
+	build_around_keywords $keywords :t(ArrayRef) :d([]) { return $keywords; }
+	build_around $meta :t(HashRef) { 
+		return qq(around $meta->{around} => sub { my (\$orig, \$self, \@params) = \@_; $meta->{CODE} };); 
+	}
+	build_after_keywords $keywords :t(ArrayRef) :d([]) { return $keywords; }
+	build_after $meta :t(HashRef) { 
+		return qq(after $meta->{after} => sub { my (\$orig, \@params) = \@_; $meta->{CODE} };); 
+	}
+	build_accessor_builder $name :t(Str) $content :t(Str) {
+		return ($content =~ m/^(\w+|1)$/
+                		? qq|$content|
+                		: qq|sub {
+					my (\$self, \$value) = \@_; 
+					$content
+					return \$value;
+				}|);
+	}
+	build_accessor_coerce $name :t(Str) $content :t(Str) {
+		 return q|sub { my ($value) = @_;| .
+			($content =~ m/^\w+$/
+                		? qq|\$value = __PACKAGE__->$content(\$value);|
+                		: $content)
+			. q|return $value; }|;
+	}
+	build_accessor_trigger $name :t(Str) $content :t(Str) {
+		 return q|sub { my ($self, $value) = @_;| .
+			($content =~ m/^\w+$/
+                		? qq|\$value = \$self->$content(\$value);|
+                		: $content)
+			. q|return $value; }|;
+	}
+	build_accessor_default $name :t(Str) $content :t(Str) {
+		 return q|sub {| . $content . q|}|;
+	}
+}

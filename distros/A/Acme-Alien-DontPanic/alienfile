@@ -29,7 +29,14 @@ share {
     ];
     
     test [ '%{make} check' ];
-  
+
   };
 
 };
+
+meta->after_hook(
+  $_ => sub {
+    my($build) = @_;
+    $build->runtime_prop->{legacy}->{inline_auto_include} = ['libdontpanic.h'];
+  },
+) for qw( gather_share gather_system );

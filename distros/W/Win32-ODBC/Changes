@@ -1,5 +1,11 @@
 Revision history for Perl extension Win32::ODBC.
 
+2020-08-31
+
+        * version 0.036
+        * update pointer variables to work in 64bit as well
+          by Christian Walde
+
 2013-11-28
 
         * version 0.035
@@ -25,7 +31,7 @@ Revision history for Perl extension Win32::ODBC.
 2005-09-18 11:15:17 rurban@x-ray.at
 
 	* ODBC/ODBC.xs: use iodbcinst.h with CYGWIN
-	* ODBC/ODBC.xs (_NT_ODBC_Error): use the correct 
+	* ODBC/ODBC.xs (_NT_ODBC_Error): use the correct
    	  SQLINTEGER, ... types in SQLError and not the wrong from MSVC.
 
 Older changes can be found in the HISTORY.TXT file.

@@ -90,6 +90,7 @@ int git_reference__is_valid_name(const char *refname, unsigned int flags);
 int git_reference__is_branch(const char *ref_name);
 int git_reference__is_remote(const char *ref_name);
 int git_reference__is_tag(const char *ref_name);
+int git_reference__is_note(const char *ref_name);
 const char *git_reference__shorthand(const char *name);
 
 /**
@@ -114,24 +115,6 @@ int git_reference_lookup_resolved(
 	git_repository *repo,
 	const char *name,
 	int max_deref);
-
-/**
- * Read reference from a file.
- *
- * This function will read in the file at `path`. If it is a
- * symref, it will return a new unresolved symbolic reference
- * with the given name pointing to the reference pointed to by
- * the file. If it is not a symbolic reference, it will return
- * the resolved reference.
- *
- * Note that because the refdb is not involved for symbolic references, they
- * won't be owned, hence you should either not make the returned reference
- * 'externally visible', or perform the lookup before returning it to the user.
- */
-int git_reference__read_head(
-	git_reference **out,
-	git_repository *repo,
-	const char *path);
 
 int git_reference__log_signature(git_signature **out, git_repository *repo);
 

@@ -1,9 +1,9 @@
 This archive contains the distribution Test-Dependencies,
-version 0.24:
+version 0.28:
 
   Verify dependencies in META.yml or cpanfile
 
-This software is copyright (c) 2019 by Erik Huelsmann.
+This software is copyright (c) 2020 by Erik Huelsmann.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Neovim::Ext::RemoteSequence;
-$Neovim::Ext::RemoteSequence::VERSION = '0.02';
+$Neovim::Ext::RemoteSequence::VERSION = '0.05';
 use strict;
 use warnings;
 use Class::Accessor;
@@ -26,10 +26,21 @@ sub TIEARRAY
 
 
 
+sub new
+{
+	my $this = shift;
+
+	tie my @array, 'Neovim::Ext::RemoteSequence', @_;
+
+	return \@array;
+}
+
+
+
 sub _fetch
 {
 	my $this = shift;
-	$this->nvim->request ($this->method, @_);
+	return $this->nvim->request ($this->method, @_);
 }
 
 
@@ -50,13 +61,19 @@ sub FETCHSIZE
 
 
 
-sub new
+sub get_bynumber
 {
-	my $this = shift;
+	my ($this, $number) = @_;
 
-	tie my @array, 'Neovim::Ext::RemoteSequence', @_;
+	foreach my $buffer (@{$this->_fetch})
+	{
+		if (tied (@{$buffer})->number == $number)
+		{
+			return $buffer;
+		}
+	}
 
-	return \@array;
+	return undef;
 }
 
 
@@ -66,11 +83,18 @@ Neovim::Ext::RemoteSequence - Neovim RemoteSequence class
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 
 	use Neovim::Ext;
+
+=head1 METHODS
+
+=head2 get_bynumber( $number )
+
+Retrieve the matching window/tab for C<$number>. C<$number>
+is the actual window/tab number, and NOT the index in this list.
 
 =cut
 

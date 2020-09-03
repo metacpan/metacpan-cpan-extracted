@@ -1,6 +1,12 @@
 bin/hades
 Changes
 lib/Hades.pm
+lib/Hades/Macro.pm
+lib/Hades/Macro/Dolos.pm
+lib/Hades/Macro/FH.pm
+macro-dolos.hades
+macro-fh.hades
+macro.hades
 Makefile.PL
 MANIFEST			This list of files
 README
@@ -13,6 +19,13 @@ t/05-realms.t
 t/06-realms-test.t
 t/07-ahh.t
 t/08-types.t
+t/09-pod.t
+t/10-macro.t
+t/11-builder.t
+t/12-dolos.t
+t/Hades-Macro-Dolos.t
+t/Hades-Macro-FH.t
+t/Hades-Macro.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

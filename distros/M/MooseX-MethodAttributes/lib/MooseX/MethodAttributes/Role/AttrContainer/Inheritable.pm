@@ -1,7 +1,7 @@
 package MooseX::MethodAttributes::Role::AttrContainer::Inheritable;
 # ABSTRACT: capture code attributes in the automatically initialized metaclass instance
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 #pod =head1 DESCRIPTION
 #pod
@@ -38,7 +38,7 @@ MooseX::MethodAttributes::Role::AttrContainer::Inheritable - capture code attrib
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 
@@ -55,7 +55,7 @@ There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHORS
 

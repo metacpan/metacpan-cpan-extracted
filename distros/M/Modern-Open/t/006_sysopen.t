@@ -7,6 +7,8 @@ use lib "$FindBin::Bin/../lib";
 use Modern::Open;
 use Fcntl;
 
+close(STDERR);
+
 my $rc = 0;
 
 eval { $rc = sysopen(FILE,$0,O_RDONLY); };

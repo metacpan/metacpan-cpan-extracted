@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-08-08'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +30,7 @@ yamlsel - Select YAML elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.007 of yamlsel (from Perl distribution App-yamlsel), released on 2019-08-08.
+This document describes version 0.008 of yamlsel (from Perl distribution App-yamlsel), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ Can be specified multiple times.
 
 =item B<--expr>=I<s>
 
-=item B<--file>=I<filename>
+=item B<--file>=I<s>
 
 Default value:
 
@@ -85,24 +85,32 @@ Each action can be one of the following:
 * `count` will print the number of matching nodes.
 
 * `print_method` will call on or more of the node object's methods and print the
-result. Example:
+  result. Example:
 
     print_method:as_string
 
 * `dump` will show a indented text representation of the node and its
-descendants. Each line will print information about a single node: its class,
-followed by the value of one or more attributes. You can specify which
-attributes to use in a dot-separated syntax, e.g.:
+  descendants. Each line will print information about a single node: its class,
+  followed by the value of one or more attributes. You can specify which
+  attributes to use in a dot-separated syntax, e.g.:
 
     dump:tag.id.class
 
-which will result in a node printed like this:
+  which will result in a node printed like this:
 
     HTML::Element tag=p id=undef class=undef
 
 By default, if no attributes are specified, `id` is used. If the node class does
 not support the attribute, or if the value of the attribute is undef, then
 `undef` is shown.
+
+* `eval` will execute Perl code for each matching node. The Perl code will be
+  called with arguments: `($node)`. For convenience, `$_` is also locally set to
+  the matching node. Example in <prog:htmlsel> you can add this action:
+
+    eval:'print $_->tag'
+
+  which will print the tag name for each matching <pm:HTML::Element> node.
 
 
 Can be specified multiple times.
@@ -112,6 +120,29 @@ Can be specified multiple times.
 Specify action(s) to perform on matching nodes (JSON-encoded).
 
 See C<--node-action>.
+
+=item B<--node-actions-on-descendants>=I<s>
+
+Specify how descendants should be actioned upon.
+
+Default value:
+
+ ""
+
+Valid values:
+
+ ["","descendants_depth_first"]
+
+This option sets how node action is performed (See `node_actions` option).
+
+When set to '' (the default), then only matching nodes are actioned upon.
+
+When set to 'descendants_depth_first', then after each matching node is actioned
+upon by an action, the descendants of the matching node are also actioned, in
+depth-first order. This option is sometimes necessary e.g. when your node's
+`as_string()` method shows a node's string representation that does not include
+its descendants.
+
 
 =item B<--print>
 
@@ -152,6 +183,12 @@ CSel expression, refer to <pm:Data::CSel>.
 `root` will return a single node which is the root node.
 
 
+=item B<-R>
+
+Shortcut for --node-action-on-descendants=descendants_depth_first.
+
+See C<--node-actions-on-descendants>.
+
 =back
 
 =head2 Output options
@@ -190,6 +227,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -274,7 +315,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

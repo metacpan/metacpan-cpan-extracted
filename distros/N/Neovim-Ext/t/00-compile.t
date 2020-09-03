@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 28 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Neovim/Ext.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'Neovim/Ext/Buffers.pm',
     'Neovim/Ext/Common.pm',
     'Neovim/Ext/Current.pm',
+    'Neovim/Ext/ErrorResponse.pm',
     'Neovim/Ext/Funcs.pm',
     'Neovim/Ext/LuaFuncs.pm',
     'Neovim/Ext/MsgPack/RPC.pm',
@@ -24,11 +25,17 @@ my @module_files = (
     'Neovim/Ext/MsgPack/RPC/Stream.pm',
     'Neovim/Ext/Plugin.pm',
     'Neovim/Ext/Plugin/Host.pm',
+    'Neovim/Ext/Plugin/ScriptHost.pm',
+    'Neovim/Ext/Range.pm',
     'Neovim/Ext/Remote.pm',
     'Neovim/Ext/RemoteApi.pm',
     'Neovim/Ext/RemoteMap.pm',
     'Neovim/Ext/RemoteSequence.pm',
     'Neovim/Ext/Tabpage.pm',
+    'Neovim/Ext/Tie/Stream.pm',
+    'Neovim/Ext/VIMCompat.pm',
+    'Neovim/Ext/VIMCompat/Buffer.pm',
+    'Neovim/Ext/VIMCompat/Window.pm',
     'Neovim/Ext/Window.pm'
 );
 

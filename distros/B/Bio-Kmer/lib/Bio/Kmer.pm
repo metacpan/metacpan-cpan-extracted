@@ -5,7 +5,7 @@
 
 package Bio::Kmer;
 require 5.10.0;
-our $VERSION=0.26;
+our $VERSION=0.41;
 
 use strict;
 use warnings;
@@ -215,6 +215,7 @@ sub new{
     # Values that will be filled in after analysis
     _kmers     =>{},  # hash of kmer=>count
     _hist      =>[],  # histogram. 0th element is counts of kmers occuring no times, 1st is elements occuring exactly once, etc
+    _ntcount   =>0,   # Total number of nucleotides
   };
   # Add in some other temporary files
   #($$self{kmerfileFh},$$self{kmerfile})      = tempfile("KMER.XXXXXX", DIR=>$$self{tempdir}, SUFFIX=>".tsv");
@@ -236,6 +237,54 @@ sub new{
   $self->count; # start off the kmer counting ASAP
 
   return $self;
+}
+
+=pod
+
+=over
+
+=item $kmer->ntcount()
+
+Returns the number of base pairs counted.
+In some cases such as when counting with Jellyfish,
+that number is not calculated; instead the length
+is calculated by the total length of kmers.
+Internally, this number is stored as $kmer->{_ntcount}.
+
+Note: internally runs $kmer->histogram() if
+$kmer->{_ntcount} is not initially found.
+
+  Arguments: None
+  Returns:   integer
+
+=back
+
+=cut
+
+sub ntcount{
+  my($self) = @_;
+
+  # Get the histogram just in case it's needed.
+  # Do not wait until later to get the histogram
+  # because I want to make sure this sub is
+  # streamlined despite which underlying mechanism
+  # is used.
+  my $hist = $self->histogram();
+
+  # If the length was already calculated, return it
+  if($$self{_ntcount}){
+    return $$self{_ntcount};
+  }
+
+  # Approximate the length by just counting
+  # how many unique kmers there are.
+  my $length = 0;
+  $length += $_ for(@$hist);
+  $$self{_ntcount} = $length;
+  if($length < 1){
+    croak "ERROR: could not calculate total length for some reason (internal error)";
+  }
+  return $length;
 }
 
 =pod
@@ -446,6 +495,9 @@ sub countKmersPurePerl{
 
   my @allSeqs;
 
+  # Record the total number of nucleotides
+  my $ntCount = 0;
+
   # Save all seqs to an array, for passing out to individual threads.
   my $fastqFh=$self->openFastq($seqfile);
   my $i=0;
@@ -453,12 +505,16 @@ sub countKmersPurePerl{
   while(<$fastqFh>){ # burn the read ID line
     $i++;
     my $seq=<$fastqFh>;
+    chomp($seq);
     push(@allSeqs, uc($seq));
+    $ntCount += length($seq);
     # Burn the quality score lines
     <$fastqFh>;
     <$fastqFh>;
   }
   close $fastqFh;
+
+  $$self{_ntcount}=$ntCount;
 
   # The number of sequences per thread is divided evenly but cautions
   # toward having one extra sequence per thread in the first threads

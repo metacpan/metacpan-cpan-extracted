@@ -17,7 +17,7 @@ foreach my $func_name (@EXPORT_OK) {
 }
 
 our $loop;
-sub use_ioasync_loop { $loop = $_[1] }
+sub set_loop { $loop = $_[0] }
 
 sub _timer {
     my ($after, $sub) = @_;
@@ -39,7 +39,7 @@ sub _cancel_timer {
 
     defined $timer or return;
 
-    $loop->remove($timer);
+    $timer->remove_from_parent;
 }
 
 sub _interval {
@@ -62,7 +62,7 @@ sub _cancel_interval {
 
     defined $timer or return;
 
-    $loop->remove($timer);
+    $timer->remove_from_parent;
 }
 
 1;

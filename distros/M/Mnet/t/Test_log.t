@@ -7,15 +7,52 @@ use warnings;
 use strict;
 use File::Temp;
 use Mnet::T;
-use Test::More tests => 2;
+use Test::More tests => 3;
 use Text::Diff;
 
 # create temp test/record/replay file
 my ($fh, $file) = File::Temp::tempfile( UNLINK => 1 );
 
-# record with mnet log
+# record with mnet log and quiet
 Mnet::T::test_perl({
-    name    => 'record with mnet log',
+    name    => 'record with mnet log and quiet',
+    perl    => <<'    perl-eof',
+        use warnings;
+        use strict;
+        use Mnet::Log;
+        use Mnet::Log::Test;
+        use Mnet::Opts::Set::Quiet;
+        use Mnet::Test;
+        my $file = shift;
+        my $log = Mnet::Log->new({ record => $file });
+        $log->debug("debug");
+        $log->info("info1");
+        $log->info("info2");
+        $log->warn("warn1");
+        $log->warn("warn2");
+        Mnet::Test::done({ record => $file });
+    perl-eof
+    args    => $file,
+    post    => "cat $file",
+    filter  => 'sed "s/^ *//"',
+    expect  => <<'    expect-eof',
+        WRN - main warn1
+        WRN - main warn2
+        $Mnet::Test::data = {
+        'Mnet::Test' => {
+        'outputs' => 'inf - main info1
+        inf - main info2
+        WRN - main warn1
+        WRN - main warn2
+        '
+        }
+        };
+    expect-eof
+});
+
+# record with mnet log and silent
+Mnet::T::test_perl({
+    name    => 'record with mnet log and silent',
     perl    => <<'    perl-eof',
         use warnings;
         use strict;
@@ -79,11 +116,11 @@ Mnet::T::test_perl({
         diff --test --replay
         @@ -1,4 +1,4 @@
         inf - main info1
-        -inf - main info3
-        +inf - main info2
+        -inf - main info2
+        +inf - main info3
         WRN - main warn1
-        -WRN - main warn3
-        +WRN - main warn2
+        -WRN - main warn2
+        +WRN - main warn3
         --- - Mnet::Log finished, errors
     expect-eof
 });

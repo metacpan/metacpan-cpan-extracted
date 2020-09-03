@@ -37,7 +37,6 @@ lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/source/boot/ind
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/source/class/app/Application.js
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/source/class/app/theme/Theme.js
 lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/source/class/app/__init__.js
-lib/Mojolicious/Command/Author/generate/callbackery_app/frontend/config.json
 lib/Mojolicious/Command/Author/generate/callbackery_app/t/basic.t
 lib/Mojolicious/Command/Author/generate/callbackery_app/cpanfile
 lib/Mojolicious/Command/Author/generate/callbackery_app/lib/App/GuiPlugin/Song.pm
@@ -46,7 +45,7 @@ lib/Mojolicious/Command/Author/generate/callbackery_app/lib/App/Controller/RpcSe
 lib/Mojolicious/Command/Author/generate/callbackery_app/lib/App.pm
 lib/Mojolicious/Command/Author/generate/callbackery_app/bin/source-mode.sh
 lib/Mojolicious/Command/Author/generate/callbackery_app/bin/app.pl
-lib/Mojolicious/Command/Author/generate/callbackery_app/etc/app.cfg.dist
+lib/Mojolicious/Command/Author/generate/callbackery_app/etc/app.dist.yaml
 lib/Mojolicious/Command/Author/generate/callbackery_app/README.md
 lib/Mojolicious/Command/Author/generate/callbackery_app.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

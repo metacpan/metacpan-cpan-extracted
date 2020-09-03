@@ -81,7 +81,7 @@ sub test_perl {
     # append filter to test command, if one was specified
     #   remove leading and trailing blank lines before shell piping
     if ($specs->{filter}) {
-        $specs->{filter} =~ s/(^\s+|\s+$)//g;
+        $specs->{filter} =~ s/(^\s+|\s+$)//mg;
         $command .= "| $specs->{filter}";
     }
 

@@ -23,43 +23,43 @@ name: Google-Ads-GoogleAds-Client
 provides:
   Google::Ads::GoogleAds::BaseEntity:
     file: lib/Google/Ads/GoogleAds/BaseEntity.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::BaseService:
     file: lib/Google/Ads/GoogleAds/BaseService.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Client:
     file: lib/Google/Ads/GoogleAds/Client.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Common::AuthError:
     file: lib/Google/Ads/GoogleAds/Common/AuthError.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Common::AuthHandlerInterface:
     file: lib/Google/Ads/GoogleAds/Common/AuthHandlerInterface.pm
   Google::Ads::GoogleAds::Common::FieldMask:
     file: lib/Google/Ads/GoogleAds/Common/FieldMask.pm
   Google::Ads::GoogleAds::Common::OAuth2ApplicationsHandler:
     file: lib/Google/Ads/GoogleAds/Common/OAuth2ApplicationsHandler.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Common::OAuth2BaseHandler:
     file: lib/Google/Ads/GoogleAds/Common/OAuth2BaseHandler.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Common::OAuthApplicationsHandlerInterface:
     file: lib/Google/Ads/GoogleAds/Common/OAuthApplicationsHandlerInterface.pm
   Google::Ads::GoogleAds::Constants:
     file: lib/Google/Ads/GoogleAds/Constants.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::GoogleAdsException:
     file: lib/Google/Ads/GoogleAds/GoogleAdsException.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Logging::DetailStats:
     file: lib/Google/Ads/GoogleAds/Logging/DetailStats.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Logging::GoogleAdsLogger:
     file: lib/Google/Ads/GoogleAds/Logging/GoogleAdsLogger.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Logging::SummaryStats:
     file: lib/Google/Ads/GoogleAds/Logging/SummaryStats.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::LongRunning::CancelOperationRequest:
     file: lib/Google/Ads/GoogleAds/LongRunning/CancelOperationRequest.pm
   Google::Ads::GoogleAds::LongRunning::DeleteOperationRequest:
@@ -74,25 +74,25 @@ provides:
     file: lib/Google/Ads/GoogleAds/LongRunning/PollOperationRequest.pm
   Google::Ads::GoogleAds::OAuth2ApplicationsHandler:
     file: lib/Google/Ads/GoogleAds/OAuth2ApplicationsHandler.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Utils::FieldMasks:
     file: lib/Google/Ads/GoogleAds/Utils/FieldMasks.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Utils::GoogleAdsHelper:
     file: lib/Google/Ads/GoogleAds/Utils/GoogleAdsHelper.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Utils::MediaUtils:
     file: lib/Google/Ads/GoogleAds/Utils/MediaUtils.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Utils::PartialFailureUtils:
     file: lib/Google/Ads/GoogleAds/Utils/PartialFailureUtils.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Utils::SearchGoogleAdsIterator:
     file: lib/Google/Ads/GoogleAds/Utils/SearchGoogleAdsIterator.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::Utils::SearchStreamHandler:
     file: lib/Google/Ads/GoogleAds/Utils/SearchStreamHandler.pm
-    version: v4.0.0
+    version: v5.0.0
   Google::Ads::GoogleAds::V2::Common::AdImageAsset:
     file: lib/Google/Ads/GoogleAds/V2/Common/AdImageAsset.pm
   Google::Ads::GoogleAds::V2::Common::AdMediaBundleAsset:
@@ -6777,6 +6777,2360 @@ provides:
     file: lib/Google/Ads/GoogleAds/V4/Services/VideoService/GetVideoRequest.pm
   Google::Ads::GoogleAds::V4::Utils::ResourceNames:
     file: lib/Google/Ads/GoogleAds/V4/Utils/ResourceNames.pm
+  Google::Ads::GoogleAds::V5::Common::AdImageAsset:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AdImageAsset.pm
+  Google::Ads::GoogleAds::V5::Common::AdMediaBundleAsset:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AdMediaBundleAsset.pm
+  Google::Ads::GoogleAds::V5::Common::AdScheduleInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AdScheduleInfo.pm
+  Google::Ads::GoogleAds::V5::Common::AdTextAsset:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AdTextAsset.pm
+  Google::Ads::GoogleAds::V5::Common::AdVideoAsset:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AdVideoAsset.pm
+  Google::Ads::GoogleAds::V5::Common::AddressInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AddressInfo.pm
+  Google::Ads::GoogleAds::V5::Common::AffiliateLocationFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AffiliateLocationFeedItem.pm
+  Google::Ads::GoogleAds::V5::Common::AgeRangeInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AgeRangeInfo.pm
+  Google::Ads::GoogleAds::V5::Common::AppAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AppAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::AppEngagementAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AppEngagementAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::AppFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AppFeedItem.pm
+  Google::Ads::GoogleAds::V5::Common::AppPaymentModelInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/AppPaymentModelInfo.pm
+  Google::Ads::GoogleAds::V5::Common::BasicUserListInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/BasicUserListInfo.pm
+  Google::Ads::GoogleAds::V5::Common::BidModifierSimulationPoint:
+    file: lib/Google/Ads/GoogleAds/V5/Common/BidModifierSimulationPoint.pm
+  Google::Ads::GoogleAds::V5::Common::BidModifierSimulationPointList:
+    file: lib/Google/Ads/GoogleAds/V5/Common/BidModifierSimulationPointList.pm
+  Google::Ads::GoogleAds::V5::Common::BookOnGoogleAsset:
+    file: lib/Google/Ads/GoogleAds/V5/Common/BookOnGoogleAsset.pm
+  Google::Ads::GoogleAds::V5::Common::BudgetCampaignAssociationStatus:
+    file: lib/Google/Ads/GoogleAds/V5/Common/BudgetCampaignAssociationStatus.pm
+  Google::Ads::GoogleAds::V5::Common::CallFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CallFeedItem.pm
+  Google::Ads::GoogleAds::V5::Common::CallOnlyAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CallOnlyAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::CalloutFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CalloutFeedItem.pm
+  Google::Ads::GoogleAds::V5::Common::CarrierInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CarrierInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ClickLocation:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ClickLocation.pm
+  Google::Ads::GoogleAds::V5::Common::CombinedRuleUserListInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CombinedRuleUserListInfo.pm
+  Google::Ads::GoogleAds::V5::Common::Commission:
+    file: lib/Google/Ads/GoogleAds/V5/Common/Commission.pm
+  Google::Ads::GoogleAds::V5::Common::ConstantOperand:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ConstantOperand.pm
+  Google::Ads::GoogleAds::V5::Common::ContentLabelInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ContentLabelInfo.pm
+  Google::Ads::GoogleAds::V5::Common::CountryConstraint:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CountryConstraint.pm
+  Google::Ads::GoogleAds::V5::Common::CountryConstraintList:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CountryConstraintList.pm
+  Google::Ads::GoogleAds::V5::Common::CpcBidSimulationPoint:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CpcBidSimulationPoint.pm
+  Google::Ads::GoogleAds::V5::Common::CpcBidSimulationPointList:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CpcBidSimulationPointList.pm
+  Google::Ads::GoogleAds::V5::Common::CpvBidSimulationPoint:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CpvBidSimulationPoint.pm
+  Google::Ads::GoogleAds::V5::Common::CpvBidSimulationPointList:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CpvBidSimulationPointList.pm
+  Google::Ads::GoogleAds::V5::Common::CriterionCategoryAvailability:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CriterionCategoryAvailability.pm
+  Google::Ads::GoogleAds::V5::Common::CriterionCategoryChannelAvailability:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CriterionCategoryChannelAvailability.pm
+  Google::Ads::GoogleAds::V5::Common::CriterionCategoryLocaleAvailability:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CriterionCategoryLocaleAvailability.pm
+  Google::Ads::GoogleAds::V5::Common::CrmBasedUserListInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CrmBasedUserListInfo.pm
+  Google::Ads::GoogleAds::V5::Common::CustomAffinityInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CustomAffinityInfo.pm
+  Google::Ads::GoogleAds::V5::Common::CustomIntentInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CustomIntentInfo.pm
+  Google::Ads::GoogleAds::V5::Common::CustomParameter:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CustomParameter.pm
+  Google::Ads::GoogleAds::V5::Common::CustomerMatchUserListMetadata:
+    file: lib/Google/Ads/GoogleAds/V5/Common/CustomerMatchUserListMetadata.pm
+  Google::Ads::GoogleAds::V5::Common::DateRange:
+    file: lib/Google/Ads/GoogleAds/V5/Common/DateRange.pm
+  Google::Ads::GoogleAds::V5::Common::DateSpecificRuleUserListInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/DateSpecificRuleUserListInfo.pm
+  Google::Ads::GoogleAds::V5::Common::DestinationMismatch:
+    file: lib/Google/Ads/GoogleAds/V5/Common/DestinationMismatch.pm
+  Google::Ads::GoogleAds::V5::Common::DestinationNotWorking:
+    file: lib/Google/Ads/GoogleAds/V5/Common/DestinationNotWorking.pm
+  Google::Ads::GoogleAds::V5::Common::DestinationTextList:
+    file: lib/Google/Ads/GoogleAds/V5/Common/DestinationTextList.pm
+  Google::Ads::GoogleAds::V5::Common::DeviceInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/DeviceInfo.pm
+  Google::Ads::GoogleAds::V5::Common::DisplayCallToAction:
+    file: lib/Google/Ads/GoogleAds/V5/Common/DisplayCallToAction.pm
+  Google::Ads::GoogleAds::V5::Common::DisplayUploadAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/DisplayUploadAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::EnhancedCpc:
+    file: lib/Google/Ads/GoogleAds/V5/Common/EnhancedCpc.pm
+  Google::Ads::GoogleAds::V5::Common::ExpandedDynamicSearchAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ExpandedDynamicSearchAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ExpandedTextAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ExpandedTextAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ExplorerAutoOptimizerSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ExplorerAutoOptimizerSetting.pm
+  Google::Ads::GoogleAds::V5::Common::ExpressionRuleUserListInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ExpressionRuleUserListInfo.pm
+  Google::Ads::GoogleAds::V5::Common::FeedAttributeOperand:
+    file: lib/Google/Ads/GoogleAds/V5/Common/FeedAttributeOperand.pm
+  Google::Ads::GoogleAds::V5::Common::FinalAppUrl:
+    file: lib/Google/Ads/GoogleAds/V5/Common/FinalAppUrl.pm
+  Google::Ads::GoogleAds::V5::Common::FrequencyCapEntry:
+    file: lib/Google/Ads/GoogleAds/V5/Common/FrequencyCapEntry.pm
+  Google::Ads::GoogleAds::V5::Common::FrequencyCapKey:
+    file: lib/Google/Ads/GoogleAds/V5/Common/FrequencyCapKey.pm
+  Google::Ads::GoogleAds::V5::Common::FunctionOperand:
+    file: lib/Google/Ads/GoogleAds/V5/Common/FunctionOperand.pm
+  Google::Ads::GoogleAds::V5::Common::GenderInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/GenderInfo.pm
+  Google::Ads::GoogleAds::V5::Common::GeoPointInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/GeoPointInfo.pm
+  Google::Ads::GoogleAds::V5::Common::GmailAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/GmailAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::GmailTeaser:
+    file: lib/Google/Ads/GoogleAds/V5/Common/GmailTeaser.pm
+  Google::Ads::GoogleAds::V5::Common::HotelAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/HotelAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::HotelAdvanceBookingWindowInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/HotelAdvanceBookingWindowInfo.pm
+  Google::Ads::GoogleAds::V5::Common::HotelCalloutFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Common/HotelCalloutFeedItem.pm
+  Google::Ads::GoogleAds::V5::Common::HotelCheckInDayInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/HotelCheckInDayInfo.pm
+  Google::Ads::GoogleAds::V5::Common::HotelCityInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/HotelCityInfo.pm
+  Google::Ads::GoogleAds::V5::Common::HotelClassInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/HotelClassInfo.pm
+  Google::Ads::GoogleAds::V5::Common::HotelCountryRegionInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/HotelCountryRegionInfo.pm
+  Google::Ads::GoogleAds::V5::Common::HotelDateSelectionTypeInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/HotelDateSelectionTypeInfo.pm
+  Google::Ads::GoogleAds::V5::Common::HotelIdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/HotelIdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::HotelLengthOfStayInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/HotelLengthOfStayInfo.pm
+  Google::Ads::GoogleAds::V5::Common::HotelStateInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/HotelStateInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ImageAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ImageAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ImageAsset:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ImageAsset.pm
+  Google::Ads::GoogleAds::V5::Common::ImageDimension:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ImageDimension.pm
+  Google::Ads::GoogleAds::V5::Common::IncomeRangeInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/IncomeRangeInfo.pm
+  Google::Ads::GoogleAds::V5::Common::InteractionTypeInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/InteractionTypeInfo.pm
+  Google::Ads::GoogleAds::V5::Common::IpBlockInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/IpBlockInfo.pm
+  Google::Ads::GoogleAds::V5::Common::Keyword:
+    file: lib/Google/Ads/GoogleAds/V5/Common/Keyword.pm
+  Google::Ads::GoogleAds::V5::Common::KeywordInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/KeywordInfo.pm
+  Google::Ads::GoogleAds::V5::Common::KeywordPlanHistoricalMetrics:
+    file: lib/Google/Ads/GoogleAds/V5/Common/KeywordPlanHistoricalMetrics.pm
+  Google::Ads::GoogleAds::V5::Common::LanguageInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/LanguageInfo.pm
+  Google::Ads::GoogleAds::V5::Common::LegacyAppInstallAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/LegacyAppInstallAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::LegacyResponsiveDisplayAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/LegacyResponsiveDisplayAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ListingDimensionInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ListingDimensionInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ListingGroupInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ListingGroupInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ListingScopeInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ListingScopeInfo.pm
+  Google::Ads::GoogleAds::V5::Common::LocalAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/LocalAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::LocationFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Common/LocationFeedItem.pm
+  Google::Ads::GoogleAds::V5::Common::LocationGroupInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/LocationGroupInfo.pm
+  Google::Ads::GoogleAds::V5::Common::LocationInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/LocationInfo.pm
+  Google::Ads::GoogleAds::V5::Common::LogicalUserListInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/LogicalUserListInfo.pm
+  Google::Ads::GoogleAds::V5::Common::LogicalUserListOperandInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/LogicalUserListOperandInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ManualCpc:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ManualCpc.pm
+  Google::Ads::GoogleAds::V5::Common::ManualCpm:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ManualCpm.pm
+  Google::Ads::GoogleAds::V5::Common::ManualCpv:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ManualCpv.pm
+  Google::Ads::GoogleAds::V5::Common::MatchingFunction:
+    file: lib/Google/Ads/GoogleAds/V5/Common/MatchingFunction.pm
+  Google::Ads::GoogleAds::V5::Common::MaximizeConversionValue:
+    file: lib/Google/Ads/GoogleAds/V5/Common/MaximizeConversionValue.pm
+  Google::Ads::GoogleAds::V5::Common::MaximizeConversions:
+    file: lib/Google/Ads/GoogleAds/V5/Common/MaximizeConversions.pm
+  Google::Ads::GoogleAds::V5::Common::MediaBundleAsset:
+    file: lib/Google/Ads/GoogleAds/V5/Common/MediaBundleAsset.pm
+  Google::Ads::GoogleAds::V5::Common::Metrics:
+    file: lib/Google/Ads/GoogleAds/V5/Common/Metrics.pm
+  Google::Ads::GoogleAds::V5::Common::MobileAppCategoryInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/MobileAppCategoryInfo.pm
+  Google::Ads::GoogleAds::V5::Common::MobileApplicationInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/MobileApplicationInfo.pm
+  Google::Ads::GoogleAds::V5::Common::MobileDeviceInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/MobileDeviceInfo.pm
+  Google::Ads::GoogleAds::V5::Common::Money:
+    file: lib/Google/Ads/GoogleAds/V5/Common/Money.pm
+  Google::Ads::GoogleAds::V5::Common::MonthlySearchVolume:
+    file: lib/Google/Ads/GoogleAds/V5/Common/MonthlySearchVolume.pm
+  Google::Ads::GoogleAds::V5::Common::OfflineUserAddressInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/OfflineUserAddressInfo.pm
+  Google::Ads::GoogleAds::V5::Common::Operand:
+    file: lib/Google/Ads/GoogleAds/V5/Common/Operand.pm
+  Google::Ads::GoogleAds::V5::Common::OperatingSystemVersionInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/OperatingSystemVersionInfo.pm
+  Google::Ads::GoogleAds::V5::Common::PageOnePromoted:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PageOnePromoted.pm
+  Google::Ads::GoogleAds::V5::Common::ParentalStatusInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ParentalStatusInfo.pm
+  Google::Ads::GoogleAds::V5::Common::PercentCpc:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PercentCpc.pm
+  Google::Ads::GoogleAds::V5::Common::PercentCpcBidSimulationPoint:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PercentCpcBidSimulationPoint.pm
+  Google::Ads::GoogleAds::V5::Common::PercentCpcBidSimulationPointList:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PercentCpcBidSimulationPointList.pm
+  Google::Ads::GoogleAds::V5::Common::PlacementInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PlacementInfo.pm
+  Google::Ads::GoogleAds::V5::Common::PolicyTopicConstraint:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PolicyTopicConstraint.pm
+  Google::Ads::GoogleAds::V5::Common::PolicyTopicEntry:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PolicyTopicEntry.pm
+  Google::Ads::GoogleAds::V5::Common::PolicyTopicEvidence:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PolicyTopicEvidence.pm
+  Google::Ads::GoogleAds::V5::Common::PolicyValidationParameter:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PolicyValidationParameter.pm
+  Google::Ads::GoogleAds::V5::Common::PolicyViolationKey:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PolicyViolationKey.pm
+  Google::Ads::GoogleAds::V5::Common::PreferredContentInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PreferredContentInfo.pm
+  Google::Ads::GoogleAds::V5::Common::PriceFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PriceFeedItem.pm
+  Google::Ads::GoogleAds::V5::Common::PriceOffer:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PriceOffer.pm
+  Google::Ads::GoogleAds::V5::Common::ProductBiddingCategoryInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ProductBiddingCategoryInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ProductBrandInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ProductBrandInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ProductChannelExclusivityInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ProductChannelExclusivityInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ProductChannelInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ProductChannelInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ProductConditionInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ProductConditionInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ProductCustomAttributeInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ProductCustomAttributeInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ProductImage:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ProductImage.pm
+  Google::Ads::GoogleAds::V5::Common::ProductItemIdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ProductItemIdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ProductTypeInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ProductTypeInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ProductVideo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ProductVideo.pm
+  Google::Ads::GoogleAds::V5::Common::PromotionFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Common/PromotionFeedItem.pm
+  Google::Ads::GoogleAds::V5::Common::ProximityInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ProximityInfo.pm
+  Google::Ads::GoogleAds::V5::Common::RealTimeBiddingSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Common/RealTimeBiddingSetting.pm
+  Google::Ads::GoogleAds::V5::Common::RequestContextOperand:
+    file: lib/Google/Ads/GoogleAds/V5/Common/RequestContextOperand.pm
+  Google::Ads::GoogleAds::V5::Common::ResellerConstraint:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ResellerConstraint.pm
+  Google::Ads::GoogleAds::V5::Common::ResponsiveDisplayAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ResponsiveDisplayAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ResponsiveSearchAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ResponsiveSearchAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::RuleBasedUserListInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/RuleBasedUserListInfo.pm
+  Google::Ads::GoogleAds::V5::Common::Segments:
+    file: lib/Google/Ads/GoogleAds/V5/Common/Segments.pm
+  Google::Ads::GoogleAds::V5::Common::ShoppingComparisonListingAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ShoppingComparisonListingAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ShoppingProductAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ShoppingProductAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::ShoppingSmartAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/ShoppingSmartAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::SimilarUserListInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/SimilarUserListInfo.pm
+  Google::Ads::GoogleAds::V5::Common::SitelinkFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Common/SitelinkFeedItem.pm
+  Google::Ads::GoogleAds::V5::Common::StoreAttribute:
+    file: lib/Google/Ads/GoogleAds/V5/Common/StoreAttribute.pm
+  Google::Ads::GoogleAds::V5::Common::StoreSalesMetadata:
+    file: lib/Google/Ads/GoogleAds/V5/Common/StoreSalesMetadata.pm
+  Google::Ads::GoogleAds::V5::Common::StoreSalesThirdPartyMetadata:
+    file: lib/Google/Ads/GoogleAds/V5/Common/StoreSalesThirdPartyMetadata.pm
+  Google::Ads::GoogleAds::V5::Common::StructuredSnippetFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Common/StructuredSnippetFeedItem.pm
+  Google::Ads::GoogleAds::V5::Common::TagSnippet:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TagSnippet.pm
+  Google::Ads::GoogleAds::V5::Common::TargetCpa:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetCpa.pm
+  Google::Ads::GoogleAds::V5::Common::TargetCpaSimulationPoint:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetCpaSimulationPoint.pm
+  Google::Ads::GoogleAds::V5::Common::TargetCpaSimulationPointList:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetCpaSimulationPointList.pm
+  Google::Ads::GoogleAds::V5::Common::TargetCpm:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetCpm.pm
+  Google::Ads::GoogleAds::V5::Common::TargetImpressionShare:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetImpressionShare.pm
+  Google::Ads::GoogleAds::V5::Common::TargetOutrankShare:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetOutrankShare.pm
+  Google::Ads::GoogleAds::V5::Common::TargetRestriction:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetRestriction.pm
+  Google::Ads::GoogleAds::V5::Common::TargetRestrictionOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetRestrictionOperation.pm
+  Google::Ads::GoogleAds::V5::Common::TargetRoas:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetRoas.pm
+  Google::Ads::GoogleAds::V5::Common::TargetRoasSimulationPoint:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetRoasSimulationPoint.pm
+  Google::Ads::GoogleAds::V5::Common::TargetRoasSimulationPointList:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetRoasSimulationPointList.pm
+  Google::Ads::GoogleAds::V5::Common::TargetSpend:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetSpend.pm
+  Google::Ads::GoogleAds::V5::Common::TargetingSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TargetingSetting.pm
+  Google::Ads::GoogleAds::V5::Common::TextAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TextAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::TextAsset:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TextAsset.pm
+  Google::Ads::GoogleAds::V5::Common::TextLabel:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TextLabel.pm
+  Google::Ads::GoogleAds::V5::Common::TextList:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TextList.pm
+  Google::Ads::GoogleAds::V5::Common::TextMessageFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TextMessageFeedItem.pm
+  Google::Ads::GoogleAds::V5::Common::TopicInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TopicInfo.pm
+  Google::Ads::GoogleAds::V5::Common::TransactionAttribute:
+    file: lib/Google/Ads/GoogleAds/V5/Common/TransactionAttribute.pm
+  Google::Ads::GoogleAds::V5::Common::UnknownListingDimensionInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UnknownListingDimensionInfo.pm
+  Google::Ads::GoogleAds::V5::Common::UrlCollection:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UrlCollection.pm
+  Google::Ads::GoogleAds::V5::Common::UserData:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserData.pm
+  Google::Ads::GoogleAds::V5::Common::UserIdentifier:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserIdentifier.pm
+  Google::Ads::GoogleAds::V5::Common::UserInterestInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserInterestInfo.pm
+  Google::Ads::GoogleAds::V5::Common::UserListActionInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserListActionInfo.pm
+  Google::Ads::GoogleAds::V5::Common::UserListDateRuleItemInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserListDateRuleItemInfo.pm
+  Google::Ads::GoogleAds::V5::Common::UserListInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserListInfo.pm
+  Google::Ads::GoogleAds::V5::Common::UserListLogicalRuleInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserListLogicalRuleInfo.pm
+  Google::Ads::GoogleAds::V5::Common::UserListNumberRuleItemInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserListNumberRuleItemInfo.pm
+  Google::Ads::GoogleAds::V5::Common::UserListRuleInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserListRuleInfo.pm
+  Google::Ads::GoogleAds::V5::Common::UserListRuleItemGroupInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserListRuleItemGroupInfo.pm
+  Google::Ads::GoogleAds::V5::Common::UserListRuleItemInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserListRuleItemInfo.pm
+  Google::Ads::GoogleAds::V5::Common::UserListStringRuleItemInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/UserListStringRuleItemInfo.pm
+  Google::Ads::GoogleAds::V5::Common::Value:
+    file: lib/Google/Ads/GoogleAds/V5/Common/Value.pm
+  Google::Ads::GoogleAds::V5::Common::VideoAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/VideoAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::VideoBumperInStreamAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/VideoBumperInStreamAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::VideoNonSkippableInStreamAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/VideoNonSkippableInStreamAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::VideoOutstreamAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/VideoOutstreamAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::VideoResponsiveAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/VideoResponsiveAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::VideoTrueViewDiscoveryAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/VideoTrueViewDiscoveryAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::VideoTrueViewInStreamAdInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/VideoTrueViewInStreamAdInfo.pm
+  Google::Ads::GoogleAds::V5::Common::WebpageConditionInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/WebpageConditionInfo.pm
+  Google::Ads::GoogleAds::V5::Common::WebpageInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/WebpageInfo.pm
+  Google::Ads::GoogleAds::V5::Common::WebsiteList:
+    file: lib/Google/Ads/GoogleAds/V5/Common/WebsiteList.pm
+  Google::Ads::GoogleAds::V5::Common::YouTubeChannelInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/YouTubeChannelInfo.pm
+  Google::Ads::GoogleAds::V5::Common::YouTubeVideoInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Common/YouTubeVideoInfo.pm
+  Google::Ads::GoogleAds::V5::Common::YoutubeVideoAsset:
+    file: lib/Google/Ads/GoogleAds/V5/Common/YoutubeVideoAsset.pm
+  Google::Ads::GoogleAds::V5::Enums::AccessReasonEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AccessReasonEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AccessRoleEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AccessRoleEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AccountBudgetProposalStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AccountBudgetProposalStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AccountBudgetProposalTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AccountBudgetProposalTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AccountBudgetStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AccountBudgetStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AccountLinkStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AccountLinkStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdCustomizerPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdCustomizerPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdGroupAdRotationModeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdGroupAdRotationModeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdGroupAdStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdGroupAdStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdGroupCriterionApprovalStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdGroupCriterionApprovalStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdGroupCriterionStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdGroupCriterionStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdGroupStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdGroupStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdGroupTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdGroupTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdNetworkTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdNetworkTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdServingOptimizationStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdServingOptimizationStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdStrengthEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdStrengthEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdvertisingChannelSubTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdvertisingChannelSubTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AdvertisingChannelTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AdvertisingChannelTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AffiliateLocationFeedRelationshipTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AffiliateLocationFeedRelationshipTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AffiliateLocationPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AffiliateLocationPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AgeRangeTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AgeRangeTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AppCampaignAppStoreEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AppCampaignAppStoreEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AppCampaignBiddingStrategyGoalTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AppCampaignBiddingStrategyGoalTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AppPaymentModelTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AppPaymentModelTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AppPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AppPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AppStoreEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AppStoreEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AppUrlOperatingSystemTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AppUrlOperatingSystemTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AssetFieldTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AssetFieldTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AssetLinkStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AssetLinkStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AssetPerformanceLabelEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AssetPerformanceLabelEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AssetTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AssetTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::AttributionModelEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/AttributionModelEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BatchJobStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BatchJobStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BidModifierSourceEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BidModifierSourceEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BiddingSourceEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BiddingSourceEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BiddingStrategyStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BiddingStrategyStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BiddingStrategyTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BiddingStrategyTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BillingSetupStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BillingSetupStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BrandSafetySuitabilityEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BrandSafetySuitabilityEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BudgetCampaignAssociationStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BudgetCampaignAssociationStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BudgetDeliveryMethodEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BudgetDeliveryMethodEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BudgetPeriodEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BudgetPeriodEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BudgetStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BudgetStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::BudgetTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/BudgetTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CallConversionReportingStateEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CallConversionReportingStateEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CallPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CallPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CalloutPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CalloutPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CampaignCriterionStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CampaignCriterionStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CampaignDraftStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CampaignDraftStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CampaignExperimentStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CampaignExperimentStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CampaignExperimentTrafficSplitTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CampaignExperimentTrafficSplitTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CampaignExperimentTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CampaignExperimentTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CampaignServingStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CampaignServingStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CampaignSharedSetStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CampaignSharedSetStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CampaignStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CampaignStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ChangeStatusOperationEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ChangeStatusOperationEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ChangeStatusResourceTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ChangeStatusResourceTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ClickTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ClickTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ContentLabelTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ContentLabelTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ConversionActionCategoryEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ConversionActionCategoryEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ConversionActionCountingTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ConversionActionCountingTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ConversionActionStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ConversionActionStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ConversionActionTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ConversionActionTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ConversionAdjustmentTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ConversionAdjustmentTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ConversionAttributionEventTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ConversionAttributionEventTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ConversionLagBucketEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ConversionLagBucketEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ConversionOrAdjustmentLagBucketEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ConversionOrAdjustmentLagBucketEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CriterionCategoryChannelAvailabilityModeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CriterionCategoryChannelAvailabilityModeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CriterionCategoryLocaleAvailabilityModeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CriterionCategoryLocaleAvailabilityModeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CriterionSystemServingStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CriterionSystemServingStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CriterionTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CriterionTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CustomInterestMemberTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CustomInterestMemberTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CustomInterestStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CustomInterestStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CustomInterestTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CustomInterestTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CustomPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CustomPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CustomerMatchUploadKeyTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CustomerMatchUploadKeyTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::CustomerPayPerConversionEligibilityFailureReasonEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/CustomerPayPerConversionEligibilityFailureReasonEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::DataDrivenModelStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/DataDrivenModelStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::DayOfWeekEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/DayOfWeekEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::DeviceEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/DeviceEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::DisplayAdFormatSettingEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/DisplayAdFormatSettingEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::DisplayUploadProductTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/DisplayUploadProductTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::DistanceBucketEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/DistanceBucketEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::DsaPageFeedCriterionFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/DsaPageFeedCriterionFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::EducationPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/EducationPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ExtensionSettingDeviceEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ExtensionSettingDeviceEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ExtensionTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ExtensionTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ExternalConversionSourceEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ExternalConversionSourceEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedAttributeTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedAttributeTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedItemQualityApprovalStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedItemQualityApprovalStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedItemQualityDisapprovalReasonEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedItemQualityDisapprovalReasonEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedItemStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedItemStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedItemTargetDeviceEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedItemTargetDeviceEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedItemTargetStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedItemTargetStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedItemTargetTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedItemTargetTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedItemValidationStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedItemValidationStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedLinkStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedLinkStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedMappingCriterionTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedMappingCriterionTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedMappingStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedMappingStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedOriginEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedOriginEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FeedStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FeedStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FlightPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FlightPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FrequencyCapEventTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FrequencyCapEventTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FrequencyCapLevelEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FrequencyCapLevelEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::FrequencyCapTimeUnitEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/FrequencyCapTimeUnitEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::GenderTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/GenderTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::GeoTargetConstantStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/GeoTargetConstantStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::GeoTargetingRestrictionEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/GeoTargetingRestrictionEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::GeoTargetingTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/GeoTargetingTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::GoogleAdsFieldCategoryEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/GoogleAdsFieldCategoryEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::GoogleAdsFieldDataTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/GoogleAdsFieldDataTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::HotelDateSelectionTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/HotelDateSelectionTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::HotelPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/HotelPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::HotelPriceBucketEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/HotelPriceBucketEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::HotelRateTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/HotelRateTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::IncomeRangeTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/IncomeRangeTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::InteractionEventTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/InteractionEventTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::InteractionTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/InteractionTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::InvoiceTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/InvoiceTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::JobPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/JobPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::KeywordMatchTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/KeywordMatchTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::KeywordPlanCompetitionLevelEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/KeywordPlanCompetitionLevelEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::KeywordPlanForecastIntervalEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/KeywordPlanForecastIntervalEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::KeywordPlanNetworkEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/KeywordPlanNetworkEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::LabelStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/LabelStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::LegacyAppInstallAdAppStoreEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/LegacyAppInstallAdAppStoreEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::LinkedAccountTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/LinkedAccountTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ListingGroupTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ListingGroupTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::LocalPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/LocalPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::LocationExtensionTargetingCriterionFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/LocationExtensionTargetingCriterionFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::LocationGroupRadiusUnitsEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/LocationGroupRadiusUnitsEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::LocationPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/LocationPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::LocationSourceTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/LocationSourceTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ManagerLinkStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ManagerLinkStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::MatchingFunctionContextTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/MatchingFunctionContextTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::MatchingFunctionOperatorEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/MatchingFunctionOperatorEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::MediaTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/MediaTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::MerchantCenterLinkStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/MerchantCenterLinkStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::MessagePlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/MessagePlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::MimeTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/MimeTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::MinuteOfHourEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/MinuteOfHourEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::MobileAppVendorEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/MobileAppVendorEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::MobileDeviceTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/MobileDeviceTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::MonthOfYearEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/MonthOfYearEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::NegativeGeoTargetTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/NegativeGeoTargetTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::OfflineUserDataJobFailureReasonEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/OfflineUserDataJobFailureReasonEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::OfflineUserDataJobStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/OfflineUserDataJobStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::OfflineUserDataJobTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/OfflineUserDataJobTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::OperatingSystemVersionOperatorTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/OperatingSystemVersionOperatorTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::OptimizationGoalTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/OptimizationGoalTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PageOnePromotedStrategyGoalEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PageOnePromotedStrategyGoalEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ParentalStatusTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ParentalStatusTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PaymentModeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PaymentModeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PlaceholderTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PlaceholderTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PlacementTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PlacementTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PolicyApprovalStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PolicyApprovalStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PolicyReviewStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PolicyReviewStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PolicyTopicEntryTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PolicyTopicEntryTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PolicyTopicEvidenceDestinationMismatchUrlTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PolicyTopicEvidenceDestinationMismatchUrlTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PolicyTopicEvidenceDestinationNotWorkingDeviceEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PolicyTopicEvidenceDestinationNotWorkingDeviceEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PolicyTopicEvidenceDestinationNotWorkingDnsErrorTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PolicyTopicEvidenceDestinationNotWorkingDnsErrorTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PositiveGeoTargetTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PositiveGeoTargetTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PreferredContentTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PreferredContentTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PriceExtensionPriceQualifierEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PriceExtensionPriceQualifierEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PriceExtensionPriceUnitEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PriceExtensionPriceUnitEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PriceExtensionTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PriceExtensionTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PricePlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PricePlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ProductBiddingCategoryLevelEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ProductBiddingCategoryLevelEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ProductBiddingCategoryStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ProductBiddingCategoryStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ProductChannelEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ProductChannelEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ProductChannelExclusivityEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ProductChannelExclusivityEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ProductConditionEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ProductConditionEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ProductCustomAttributeIndexEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ProductCustomAttributeIndexEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ProductTypeLevelEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ProductTypeLevelEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PromotionExtensionDiscountModifierEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PromotionExtensionDiscountModifierEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PromotionExtensionOccasionEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PromotionExtensionOccasionEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::PromotionPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/PromotionPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ProximityRadiusUnitsEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ProximityRadiusUnitsEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::QualityScoreBucketEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/QualityScoreBucketEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ReachPlanAdLengthEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ReachPlanAdLengthEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ReachPlanAgeRangeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ReachPlanAgeRangeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ReachPlanNetworkEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ReachPlanNetworkEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::RealEstatePlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/RealEstatePlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::RecommendationTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/RecommendationTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ResponseContentTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ResponseContentTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SearchEngineResultsPageTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SearchEngineResultsPageTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SearchTermMatchTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SearchTermMatchTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SearchTermTargetingStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SearchTermTargetingStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::ServedAssetFieldTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/ServedAssetFieldTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SharedSetStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SharedSetStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SharedSetTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SharedSetTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SimulationModificationMethodEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SimulationModificationMethodEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SimulationTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SimulationTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SitelinkPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SitelinkPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SlotEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SlotEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SpendingLimitTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SpendingLimitTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::StructuredSnippetPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/StructuredSnippetPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SummaryRowSettingEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SummaryRowSettingEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::SystemManagedResourceSourceEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/SystemManagedResourceSourceEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::TargetCpaOptInRecommendationGoalEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/TargetCpaOptInRecommendationGoalEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::TargetImpressionShareLocationEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/TargetImpressionShareLocationEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::TargetingDimensionEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/TargetingDimensionEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::TimeTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/TimeTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::TrackingCodePageFormatEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/TrackingCodePageFormatEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::TrackingCodeTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/TrackingCodeTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::TravelPlaceholderFieldEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/TravelPlaceholderFieldEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserInterestTaxonomyTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserInterestTaxonomyTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListAccessStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListAccessStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListClosingReasonEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListClosingReasonEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListCombinedRuleOperatorEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListCombinedRuleOperatorEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListCrmDataSourceTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListCrmDataSourceTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListDateRuleItemOperatorEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListDateRuleItemOperatorEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListLogicalRuleOperatorEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListLogicalRuleOperatorEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListMembershipStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListMembershipStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListNumberRuleItemOperatorEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListNumberRuleItemOperatorEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListPrepopulationStatusEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListPrepopulationStatusEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListRuleTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListRuleTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListSizeRangeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListSizeRangeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListStringRuleItemOperatorEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListStringRuleItemOperatorEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::UserListTypeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/UserListTypeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::VanityPharmaDisplayUrlModeEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/VanityPharmaDisplayUrlModeEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::VanityPharmaTextEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/VanityPharmaTextEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::WebpageConditionOperandEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/WebpageConditionOperandEnum.pm
+  Google::Ads::GoogleAds::V5::Enums::WebpageConditionOperatorEnum:
+    file: lib/Google/Ads/GoogleAds/V5/Enums/WebpageConditionOperatorEnum.pm
+  Google::Ads::GoogleAds::V5::Errors::ErrorCode:
+    file: lib/Google/Ads/GoogleAds/V5/Errors/ErrorCode.pm
+  Google::Ads::GoogleAds::V5::Errors::ErrorDetails:
+    file: lib/Google/Ads/GoogleAds/V5/Errors/ErrorDetails.pm
+  Google::Ads::GoogleAds::V5::Errors::ErrorLocation:
+    file: lib/Google/Ads/GoogleAds/V5/Errors/ErrorLocation.pm
+  Google::Ads::GoogleAds::V5::Errors::FieldPathElement:
+    file: lib/Google/Ads/GoogleAds/V5/Errors/FieldPathElement.pm
+  Google::Ads::GoogleAds::V5::Errors::GoogleAdsError:
+    file: lib/Google/Ads/GoogleAds/V5/Errors/GoogleAdsError.pm
+  Google::Ads::GoogleAds::V5::Errors::GoogleAdsFailure:
+    file: lib/Google/Ads/GoogleAds/V5/Errors/GoogleAdsFailure.pm
+  Google::Ads::GoogleAds::V5::Errors::PolicyFindingDetails:
+    file: lib/Google/Ads/GoogleAds/V5/Errors/PolicyFindingDetails.pm
+  Google::Ads::GoogleAds::V5::Errors::PolicyViolationDetails:
+    file: lib/Google/Ads/GoogleAds/V5/Errors/PolicyViolationDetails.pm
+  Google::Ads::GoogleAds::V5::Errors::QuotaErrorDetails:
+    file: lib/Google/Ads/GoogleAds/V5/Errors/QuotaErrorDetails.pm
+  Google::Ads::GoogleAds::V5::Resources::AccountBudget:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AccountBudget.pm
+  Google::Ads::GoogleAds::V5::Resources::AccountBudgetProposal:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AccountBudgetProposal.pm
+  Google::Ads::GoogleAds::V5::Resources::AccountBudgetSummary:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AccountBudgetSummary.pm
+  Google::Ads::GoogleAds::V5::Resources::AccountLink:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AccountLink.pm
+  Google::Ads::GoogleAds::V5::Resources::Ad:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/Ad.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroup:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroup.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupAd:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupAd.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupAdAssetPolicySummary:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupAdAssetPolicySummary.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupAdAssetView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupAdAssetView.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupAdLabel:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupAdLabel.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupAdPolicySummary:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupAdPolicySummary.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupAudienceView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupAudienceView.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupBidModifier:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupBidModifier.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupCriterion:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupCriterion.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupCriterionLabel:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupCriterionLabel.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupCriterionSimulation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupCriterionSimulation.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupExtensionSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupExtensionSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupFeed:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupFeed.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupLabel:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupLabel.pm
+  Google::Ads::GoogleAds::V5::Resources::AdGroupSimulation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdGroupSimulation.pm
+  Google::Ads::GoogleAds::V5::Resources::AdParameter:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdParameter.pm
+  Google::Ads::GoogleAds::V5::Resources::AdScheduleView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AdScheduleView.pm
+  Google::Ads::GoogleAds::V5::Resources::AffiliateLocationFeedData:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AffiliateLocationFeedData.pm
+  Google::Ads::GoogleAds::V5::Resources::AgeRangeView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AgeRangeView.pm
+  Google::Ads::GoogleAds::V5::Resources::AppCampaignSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AppCampaignSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::Asset:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/Asset.pm
+  Google::Ads::GoogleAds::V5::Resources::AttributeFieldMapping:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AttributeFieldMapping.pm
+  Google::Ads::GoogleAds::V5::Resources::AttributionModelSettings:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/AttributionModelSettings.pm
+  Google::Ads::GoogleAds::V5::Resources::BatchJob:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/BatchJob.pm
+  Google::Ads::GoogleAds::V5::Resources::BatchJobMetadata:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/BatchJobMetadata.pm
+  Google::Ads::GoogleAds::V5::Resources::BiddingStrategy:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/BiddingStrategy.pm
+  Google::Ads::GoogleAds::V5::Resources::BillingSetup:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/BillingSetup.pm
+  Google::Ads::GoogleAds::V5::Resources::CallExtensionRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CallExtensionRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::CallReportingSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CallReportingSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::CalloutExtensionRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CalloutExtensionRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::Campaign:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/Campaign.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignAsset:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignAsset.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignAudienceView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignAudienceView.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignBidModifier:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignBidModifier.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignBudget:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignBudget.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignBudgetRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignBudgetRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignBudgetRecommendationOption:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignBudgetRecommendationOption.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignCriterion:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignCriterion.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignCriterionSimulation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignCriterionSimulation.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignDraft:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignDraft.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignExperiment:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignExperiment.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignExtensionSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignExtensionSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignFeed:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignFeed.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignLabel:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignLabel.pm
+  Google::Ads::GoogleAds::V5::Resources::CampaignSharedSet:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CampaignSharedSet.pm
+  Google::Ads::GoogleAds::V5::Resources::CarrierConstant:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CarrierConstant.pm
+  Google::Ads::GoogleAds::V5::Resources::ChangeStatus:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ChangeStatus.pm
+  Google::Ads::GoogleAds::V5::Resources::ClickView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ClickView.pm
+  Google::Ads::GoogleAds::V5::Resources::ConversionAction:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ConversionAction.pm
+  Google::Ads::GoogleAds::V5::Resources::ConversionTrackingSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ConversionTrackingSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::CurrencyConstant:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CurrencyConstant.pm
+  Google::Ads::GoogleAds::V5::Resources::CustomInterest:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CustomInterest.pm
+  Google::Ads::GoogleAds::V5::Resources::CustomInterestMember:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CustomInterestMember.pm
+  Google::Ads::GoogleAds::V5::Resources::Customer:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/Customer.pm
+  Google::Ads::GoogleAds::V5::Resources::CustomerClient:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CustomerClient.pm
+  Google::Ads::GoogleAds::V5::Resources::CustomerClientLink:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CustomerClientLink.pm
+  Google::Ads::GoogleAds::V5::Resources::CustomerExtensionSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CustomerExtensionSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::CustomerFeed:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CustomerFeed.pm
+  Google::Ads::GoogleAds::V5::Resources::CustomerLabel:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CustomerLabel.pm
+  Google::Ads::GoogleAds::V5::Resources::CustomerManagerLink:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CustomerManagerLink.pm
+  Google::Ads::GoogleAds::V5::Resources::CustomerNegativeCriterion:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/CustomerNegativeCriterion.pm
+  Google::Ads::GoogleAds::V5::Resources::DataPartnerLinkIdentifier:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/DataPartnerLinkIdentifier.pm
+  Google::Ads::GoogleAds::V5::Resources::DetailPlacementView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/DetailPlacementView.pm
+  Google::Ads::GoogleAds::V5::Resources::DisplayKeywordView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/DisplayKeywordView.pm
+  Google::Ads::GoogleAds::V5::Resources::DistanceView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/DistanceView.pm
+  Google::Ads::GoogleAds::V5::Resources::DomainCategory:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/DomainCategory.pm
+  Google::Ads::GoogleAds::V5::Resources::DynamicSearchAdsSearchTermView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/DynamicSearchAdsSearchTermView.pm
+  Google::Ads::GoogleAds::V5::Resources::DynamicSearchAdsSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/DynamicSearchAdsSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::EnhancedCpcOptInRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/EnhancedCpcOptInRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::ExpandedLandingPageView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ExpandedLandingPageView.pm
+  Google::Ads::GoogleAds::V5::Resources::ExtensionFeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ExtensionFeedItem.pm
+  Google::Ads::GoogleAds::V5::Resources::Feed:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/Feed.pm
+  Google::Ads::GoogleAds::V5::Resources::FeedAttribute:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/FeedAttribute.pm
+  Google::Ads::GoogleAds::V5::Resources::FeedAttributeOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/FeedAttributeOperation.pm
+  Google::Ads::GoogleAds::V5::Resources::FeedItem:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/FeedItem.pm
+  Google::Ads::GoogleAds::V5::Resources::FeedItemAttributeValue:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/FeedItemAttributeValue.pm
+  Google::Ads::GoogleAds::V5::Resources::FeedItemPlaceholderPolicyInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/FeedItemPlaceholderPolicyInfo.pm
+  Google::Ads::GoogleAds::V5::Resources::FeedItemTarget:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/FeedItemTarget.pm
+  Google::Ads::GoogleAds::V5::Resources::FeedItemValidationError:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/FeedItemValidationError.pm
+  Google::Ads::GoogleAds::V5::Resources::FeedMapping:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/FeedMapping.pm
+  Google::Ads::GoogleAds::V5::Resources::FeedPlaceholderView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/FeedPlaceholderView.pm
+  Google::Ads::GoogleAds::V5::Resources::FirebaseSettings:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/FirebaseSettings.pm
+  Google::Ads::GoogleAds::V5::Resources::GenderView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/GenderView.pm
+  Google::Ads::GoogleAds::V5::Resources::GeoTargetConstant:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/GeoTargetConstant.pm
+  Google::Ads::GoogleAds::V5::Resources::GeoTargetTypeSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/GeoTargetTypeSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::GeographicView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/GeographicView.pm
+  Google::Ads::GoogleAds::V5::Resources::GoogleAdsField:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/GoogleAdsField.pm
+  Google::Ads::GoogleAds::V5::Resources::GoogleAdsLinkIdentifier:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/GoogleAdsLinkIdentifier.pm
+  Google::Ads::GoogleAds::V5::Resources::GroupPlacementView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/GroupPlacementView.pm
+  Google::Ads::GoogleAds::V5::Resources::HotelGroupView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/HotelGroupView.pm
+  Google::Ads::GoogleAds::V5::Resources::HotelPerformanceView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/HotelPerformanceView.pm
+  Google::Ads::GoogleAds::V5::Resources::HotelSettingInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/HotelSettingInfo.pm
+  Google::Ads::GoogleAds::V5::Resources::IncomeRangeView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/IncomeRangeView.pm
+  Google::Ads::GoogleAds::V5::Resources::Invoice:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/Invoice.pm
+  Google::Ads::GoogleAds::V5::Resources::KeywordMatchTypeRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/KeywordMatchTypeRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::KeywordPlan:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/KeywordPlan.pm
+  Google::Ads::GoogleAds::V5::Resources::KeywordPlanAdGroup:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/KeywordPlanAdGroup.pm
+  Google::Ads::GoogleAds::V5::Resources::KeywordPlanAdGroupKeyword:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/KeywordPlanAdGroupKeyword.pm
+  Google::Ads::GoogleAds::V5::Resources::KeywordPlanCampaign:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/KeywordPlanCampaign.pm
+  Google::Ads::GoogleAds::V5::Resources::KeywordPlanCampaignKeyword:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/KeywordPlanCampaignKeyword.pm
+  Google::Ads::GoogleAds::V5::Resources::KeywordPlanForecastPeriod:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/KeywordPlanForecastPeriod.pm
+  Google::Ads::GoogleAds::V5::Resources::KeywordPlanGeoTarget:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/KeywordPlanGeoTarget.pm
+  Google::Ads::GoogleAds::V5::Resources::KeywordRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/KeywordRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::KeywordView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/KeywordView.pm
+  Google::Ads::GoogleAds::V5::Resources::Label:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/Label.pm
+  Google::Ads::GoogleAds::V5::Resources::LandingPageView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/LandingPageView.pm
+  Google::Ads::GoogleAds::V5::Resources::LanguageConstant:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/LanguageConstant.pm
+  Google::Ads::GoogleAds::V5::Resources::LocalCampaignSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/LocalCampaignSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::LocationView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/LocationView.pm
+  Google::Ads::GoogleAds::V5::Resources::ManagedPlacementView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ManagedPlacementView.pm
+  Google::Ads::GoogleAds::V5::Resources::MaximizeClicksOptInRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/MaximizeClicksOptInRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::MaximizeConversionsOptInRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/MaximizeConversionsOptInRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::MediaAudio:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/MediaAudio.pm
+  Google::Ads::GoogleAds::V5::Resources::MediaBundle:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/MediaBundle.pm
+  Google::Ads::GoogleAds::V5::Resources::MediaFile:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/MediaFile.pm
+  Google::Ads::GoogleAds::V5::Resources::MediaImage:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/MediaImage.pm
+  Google::Ads::GoogleAds::V5::Resources::MediaVideo:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/MediaVideo.pm
+  Google::Ads::GoogleAds::V5::Resources::MerchantCenterLink:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/MerchantCenterLink.pm
+  Google::Ads::GoogleAds::V5::Resources::MobileAppCategoryConstant:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/MobileAppCategoryConstant.pm
+  Google::Ads::GoogleAds::V5::Resources::MobileDeviceConstant:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/MobileDeviceConstant.pm
+  Google::Ads::GoogleAds::V5::Resources::MoveUnusedBudgetRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/MoveUnusedBudgetRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::NetworkSettings:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/NetworkSettings.pm
+  Google::Ads::GoogleAds::V5::Resources::OAuthInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/OAuthInfo.pm
+  Google::Ads::GoogleAds::V5::Resources::OfflineUserDataJob:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/OfflineUserDataJob.pm
+  Google::Ads::GoogleAds::V5::Resources::OperatingSystemVersionConstant:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/OperatingSystemVersionConstant.pm
+  Google::Ads::GoogleAds::V5::Resources::OptimizationGoalSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/OptimizationGoalSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::OptimizeAdRotationRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/OptimizeAdRotationRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::PaidOrganicSearchTermView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/PaidOrganicSearchTermView.pm
+  Google::Ads::GoogleAds::V5::Resources::ParentalStatusView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ParentalStatusView.pm
+  Google::Ads::GoogleAds::V5::Resources::PaymentsAccount:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/PaymentsAccount.pm
+  Google::Ads::GoogleAds::V5::Resources::PaymentsAccountInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/PaymentsAccountInfo.pm
+  Google::Ads::GoogleAds::V5::Resources::PendingAccountBudgetProposal:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/PendingAccountBudgetProposal.pm
+  Google::Ads::GoogleAds::V5::Resources::PlacesLocationFeedData:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/PlacesLocationFeedData.pm
+  Google::Ads::GoogleAds::V5::Resources::PositionEstimates:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/PositionEstimates.pm
+  Google::Ads::GoogleAds::V5::Resources::ProductBiddingCategoryConstant:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ProductBiddingCategoryConstant.pm
+  Google::Ads::GoogleAds::V5::Resources::ProductGroupView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ProductGroupView.pm
+  Google::Ads::GoogleAds::V5::Resources::QualityInfo:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/QualityInfo.pm
+  Google::Ads::GoogleAds::V5::Resources::Recommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/Recommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::RecommendationImpact:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/RecommendationImpact.pm
+  Google::Ads::GoogleAds::V5::Resources::RecommendationMetrics:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/RecommendationMetrics.pm
+  Google::Ads::GoogleAds::V5::Resources::RemarketingAction:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/RemarketingAction.pm
+  Google::Ads::GoogleAds::V5::Resources::RemarketingSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/RemarketingSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::SearchPartnersOptInRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/SearchPartnersOptInRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::SearchTermView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/SearchTermView.pm
+  Google::Ads::GoogleAds::V5::Resources::SelectiveOptimization:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/SelectiveOptimization.pm
+  Google::Ads::GoogleAds::V5::Resources::SharedCriterion:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/SharedCriterion.pm
+  Google::Ads::GoogleAds::V5::Resources::SharedSet:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/SharedSet.pm
+  Google::Ads::GoogleAds::V5::Resources::ShoppingPerformanceView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ShoppingPerformanceView.pm
+  Google::Ads::GoogleAds::V5::Resources::ShoppingSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ShoppingSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::SitelinkExtensionRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/SitelinkExtensionRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::TargetCpaOptInRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/TargetCpaOptInRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::TargetCpaOptInRecommendationOption:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/TargetCpaOptInRecommendationOption.pm
+  Google::Ads::GoogleAds::V5::Resources::TargetRoasOptInRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/TargetRoasOptInRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::TextAdRecommendation:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/TextAdRecommendation.pm
+  Google::Ads::GoogleAds::V5::Resources::ThirdPartyAppAnalyticsLink:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ThirdPartyAppAnalyticsLink.pm
+  Google::Ads::GoogleAds::V5::Resources::ThirdPartyAppAnalyticsLinkIdentifier:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ThirdPartyAppAnalyticsLinkIdentifier.pm
+  Google::Ads::GoogleAds::V5::Resources::ThirdPartyAppAnalyticsSettings:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ThirdPartyAppAnalyticsSettings.pm
+  Google::Ads::GoogleAds::V5::Resources::TopicConstant:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/TopicConstant.pm
+  Google::Ads::GoogleAds::V5::Resources::TopicView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/TopicView.pm
+  Google::Ads::GoogleAds::V5::Resources::TrackingSetting:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/TrackingSetting.pm
+  Google::Ads::GoogleAds::V5::Resources::UserInterest:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/UserInterest.pm
+  Google::Ads::GoogleAds::V5::Resources::UserList:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/UserList.pm
+  Google::Ads::GoogleAds::V5::Resources::UserLocationView:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/UserLocationView.pm
+  Google::Ads::GoogleAds::V5::Resources::ValueSettings:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/ValueSettings.pm
+  Google::Ads::GoogleAds::V5::Resources::VanityPharma:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/VanityPharma.pm
+  Google::Ads::GoogleAds::V5::Resources::Video:
+    file: lib/Google/Ads/GoogleAds/V5/Resources/Video.pm
+  Google::Ads::GoogleAds::V5::Services::AccountBudgetProposalService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountBudgetProposalService.pm
+  Google::Ads::GoogleAds::V5::Services::AccountBudgetProposalService::AccountBudgetProposalOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountBudgetProposalService/AccountBudgetProposalOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AccountBudgetProposalService::GetAccountBudgetProposalRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountBudgetProposalService/GetAccountBudgetProposalRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AccountBudgetProposalService::MutateAccountBudgetProposalRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountBudgetProposalService/MutateAccountBudgetProposalRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AccountBudgetProposalService::MutateAccountBudgetProposalResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountBudgetProposalService/MutateAccountBudgetProposalResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AccountBudgetProposalService::MutateAccountBudgetProposalResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountBudgetProposalService/MutateAccountBudgetProposalResult.pm
+  Google::Ads::GoogleAds::V5::Services::AccountBudgetService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountBudgetService.pm
+  Google::Ads::GoogleAds::V5::Services::AccountBudgetService::GetAccountBudgetRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountBudgetService/GetAccountBudgetRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AccountLinkService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountLinkService.pm
+  Google::Ads::GoogleAds::V5::Services::AccountLinkService::AccountLinkOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountLinkService/AccountLinkOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AccountLinkService::CreateAccountLinkRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountLinkService/CreateAccountLinkRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AccountLinkService::CreateAccountLinkResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountLinkService/CreateAccountLinkResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AccountLinkService::GetAccountLinkRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountLinkService/GetAccountLinkRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AccountLinkService::MutateAccountLinkRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountLinkService/MutateAccountLinkRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AccountLinkService::MutateAccountLinkResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountLinkService/MutateAccountLinkResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AccountLinkService::MutateAccountLinkResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AccountLinkService/MutateAccountLinkResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdAssetViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdAssetViewService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdAssetViewService::GetAdGroupAdAssetViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdAssetViewService/GetAdGroupAdAssetViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdLabelService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdLabelService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdLabelService::AdGroupAdLabelOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdLabelService/AdGroupAdLabelOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdLabelService::GetAdGroupAdLabelRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdLabelService/GetAdGroupAdLabelRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdLabelService::MutateAdGroupAdLabelResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdLabelService/MutateAdGroupAdLabelResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdLabelService::MutateAdGroupAdLabelsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdLabelService/MutateAdGroupAdLabelsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdLabelService::MutateAdGroupAdLabelsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdLabelService/MutateAdGroupAdLabelsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdService::AdGroupAdOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdService/AdGroupAdOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdService::GetAdGroupAdRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdService/GetAdGroupAdRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdService::MutateAdGroupAdResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdService/MutateAdGroupAdResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdService::MutateAdGroupAdsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdService/MutateAdGroupAdsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAdService::MutateAdGroupAdsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAdService/MutateAdGroupAdsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAudienceViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAudienceViewService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupAudienceViewService::GetAdGroupAudienceViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupAudienceViewService/GetAdGroupAudienceViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupBidModifierService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupBidModifierService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupBidModifierService::AdGroupBidModifierOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupBidModifierService/AdGroupBidModifierOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupBidModifierService::GetAdGroupBidModifierRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupBidModifierService/GetAdGroupBidModifierRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupBidModifierService::MutateAdGroupBidModifierResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupBidModifierService/MutateAdGroupBidModifierResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupBidModifierService::MutateAdGroupBidModifiersRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupBidModifierService/MutateAdGroupBidModifiersRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupBidModifierService::MutateAdGroupBidModifiersResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupBidModifierService/MutateAdGroupBidModifiersResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionLabelService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionLabelService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionLabelService::AdGroupCriterionLabelOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionLabelService/AdGroupCriterionLabelOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionLabelService::GetAdGroupCriterionLabelRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionLabelService/GetAdGroupCriterionLabelRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionLabelService::MutateAdGroupCriterionLabelResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionLabelService/MutateAdGroupCriterionLabelResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionLabelService::MutateAdGroupCriterionLabelsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionLabelService/MutateAdGroupCriterionLabelsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionLabelService::MutateAdGroupCriterionLabelsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionLabelService/MutateAdGroupCriterionLabelsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionService::AdGroupCriterionOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionService/AdGroupCriterionOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionService::GetAdGroupCriterionRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionService/GetAdGroupCriterionRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionService::MutateAdGroupCriteriaRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionService/MutateAdGroupCriteriaRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionService::MutateAdGroupCriteriaResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionService/MutateAdGroupCriteriaResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionService::MutateAdGroupCriterionResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionService/MutateAdGroupCriterionResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionSimulationService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionSimulationService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupCriterionSimulationService::GetAdGroupCriterionSimulationRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupCriterionSimulationService/GetAdGroupCriterionSimulationRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupExtensionSettingService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupExtensionSettingService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupExtensionSettingService::AdGroupExtensionSettingOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupExtensionSettingService/AdGroupExtensionSettingOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupExtensionSettingService::GetAdGroupExtensionSettingRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupExtensionSettingService/GetAdGroupExtensionSettingRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupExtensionSettingService::MutateAdGroupExtensionSettingResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupExtensionSettingService/MutateAdGroupExtensionSettingResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupExtensionSettingService::MutateAdGroupExtensionSettingsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupExtensionSettingService/MutateAdGroupExtensionSettingsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupExtensionSettingService::MutateAdGroupExtensionSettingsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupExtensionSettingService/MutateAdGroupExtensionSettingsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupFeedService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupFeedService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupFeedService::AdGroupFeedOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupFeedService/AdGroupFeedOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupFeedService::GetAdGroupFeedRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupFeedService/GetAdGroupFeedRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupFeedService::MutateAdGroupFeedResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupFeedService/MutateAdGroupFeedResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupFeedService::MutateAdGroupFeedsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupFeedService/MutateAdGroupFeedsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupFeedService::MutateAdGroupFeedsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupFeedService/MutateAdGroupFeedsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupLabelService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupLabelService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupLabelService::AdGroupLabelOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupLabelService/AdGroupLabelOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupLabelService::GetAdGroupLabelRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupLabelService/GetAdGroupLabelRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupLabelService::MutateAdGroupLabelResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupLabelService/MutateAdGroupLabelResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupLabelService::MutateAdGroupLabelsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupLabelService/MutateAdGroupLabelsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupLabelService::MutateAdGroupLabelsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupLabelService/MutateAdGroupLabelsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupService::AdGroupOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupService/AdGroupOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupService::GetAdGroupRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupService/GetAdGroupRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupService::MutateAdGroupResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupService/MutateAdGroupResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupService::MutateAdGroupsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupService/MutateAdGroupsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupService::MutateAdGroupsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupService/MutateAdGroupsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupSimulationService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupSimulationService.pm
+  Google::Ads::GoogleAds::V5::Services::AdGroupSimulationService::GetAdGroupSimulationRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdGroupSimulationService/GetAdGroupSimulationRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdParameterService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdParameterService.pm
+  Google::Ads::GoogleAds::V5::Services::AdParameterService::AdParameterOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdParameterService/AdParameterOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AdParameterService::GetAdParameterRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdParameterService/GetAdParameterRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdParameterService::MutateAdParameterResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdParameterService/MutateAdParameterResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdParameterService::MutateAdParametersRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdParameterService/MutateAdParametersRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdParameterService::MutateAdParametersResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdParameterService/MutateAdParametersResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AdScheduleViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdScheduleViewService.pm
+  Google::Ads::GoogleAds::V5::Services::AdScheduleViewService::GetAdScheduleViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdScheduleViewService/GetAdScheduleViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdService.pm
+  Google::Ads::GoogleAds::V5::Services::AdService::AdOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdService/AdOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AdService::GetAdRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdService/GetAdRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdService::MutateAdResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdService/MutateAdResult.pm
+  Google::Ads::GoogleAds::V5::Services::AdService::MutateAdsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdService/MutateAdsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AdService::MutateAdsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AdService/MutateAdsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::AgeRangeViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AgeRangeViewService.pm
+  Google::Ads::GoogleAds::V5::Services::AgeRangeViewService::GetAgeRangeViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AgeRangeViewService/GetAgeRangeViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AssetService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AssetService.pm
+  Google::Ads::GoogleAds::V5::Services::AssetService::AssetOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AssetService/AssetOperation.pm
+  Google::Ads::GoogleAds::V5::Services::AssetService::GetAssetRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AssetService/GetAssetRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AssetService::MutateAssetResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AssetService/MutateAssetResult.pm
+  Google::Ads::GoogleAds::V5::Services::AssetService::MutateAssetsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AssetService/MutateAssetsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::AssetService::MutateAssetsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/AssetService/MutateAssetsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService::AddBatchJobOperationsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService/AddBatchJobOperationsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService::AddBatchJobOperationsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService/AddBatchJobOperationsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService::BatchJobOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService/BatchJobOperation.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService::BatchJobResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService/BatchJobResult.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService::GetBatchJobRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService/GetBatchJobRequest.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService::ListBatchJobResultsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService/ListBatchJobResultsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService::ListBatchJobResultsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService/ListBatchJobResultsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService::MutateBatchJobRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService/MutateBatchJobRequest.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService::MutateBatchJobResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService/MutateBatchJobResponse.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService::MutateBatchJobResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService/MutateBatchJobResult.pm
+  Google::Ads::GoogleAds::V5::Services::BatchJobService::RunBatchJobRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BatchJobService/RunBatchJobRequest.pm
+  Google::Ads::GoogleAds::V5::Services::BiddingStrategyService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BiddingStrategyService.pm
+  Google::Ads::GoogleAds::V5::Services::BiddingStrategyService::BiddingStrategyOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BiddingStrategyService/BiddingStrategyOperation.pm
+  Google::Ads::GoogleAds::V5::Services::BiddingStrategyService::GetBiddingStrategyRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BiddingStrategyService/GetBiddingStrategyRequest.pm
+  Google::Ads::GoogleAds::V5::Services::BiddingStrategyService::MutateBiddingStrategiesRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BiddingStrategyService/MutateBiddingStrategiesRequest.pm
+  Google::Ads::GoogleAds::V5::Services::BiddingStrategyService::MutateBiddingStrategiesResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BiddingStrategyService/MutateBiddingStrategiesResponse.pm
+  Google::Ads::GoogleAds::V5::Services::BiddingStrategyService::MutateBiddingStrategyResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BiddingStrategyService/MutateBiddingStrategyResult.pm
+  Google::Ads::GoogleAds::V5::Services::BillingSetupService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BillingSetupService.pm
+  Google::Ads::GoogleAds::V5::Services::BillingSetupService::BillingSetupOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BillingSetupService/BillingSetupOperation.pm
+  Google::Ads::GoogleAds::V5::Services::BillingSetupService::GetBillingSetupRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BillingSetupService/GetBillingSetupRequest.pm
+  Google::Ads::GoogleAds::V5::Services::BillingSetupService::MutateBillingSetupRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BillingSetupService/MutateBillingSetupRequest.pm
+  Google::Ads::GoogleAds::V5::Services::BillingSetupService::MutateBillingSetupResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BillingSetupService/MutateBillingSetupResponse.pm
+  Google::Ads::GoogleAds::V5::Services::BillingSetupService::MutateBillingSetupResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/BillingSetupService/MutateBillingSetupResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignAssetService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignAssetService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignAssetService::CampaignAssetOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignAssetService/CampaignAssetOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignAssetService::GetCampaignAssetRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignAssetService/GetCampaignAssetRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignAssetService::MutateCampaignAssetResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignAssetService/MutateCampaignAssetResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignAssetService::MutateCampaignAssetsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignAssetService/MutateCampaignAssetsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignAssetService::MutateCampaignAssetsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignAssetService/MutateCampaignAssetsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignAudienceViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignAudienceViewService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignAudienceViewService::GetCampaignAudienceViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignAudienceViewService/GetCampaignAudienceViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBidModifierService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBidModifierService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBidModifierService::CampaignBidModifierOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBidModifierService/CampaignBidModifierOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBidModifierService::GetCampaignBidModifierRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBidModifierService/GetCampaignBidModifierRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBidModifierService::MutateCampaignBidModifierResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBidModifierService/MutateCampaignBidModifierResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBidModifierService::MutateCampaignBidModifiersRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBidModifierService/MutateCampaignBidModifiersRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBidModifierService::MutateCampaignBidModifiersResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBidModifierService/MutateCampaignBidModifiersResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBudgetService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBudgetService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBudgetService::CampaignBudgetOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBudgetService/CampaignBudgetOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBudgetService::GetCampaignBudgetRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBudgetService/GetCampaignBudgetRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBudgetService::MutateCampaignBudgetResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBudgetService/MutateCampaignBudgetResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBudgetService::MutateCampaignBudgetsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBudgetService/MutateCampaignBudgetsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignBudgetService::MutateCampaignBudgetsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignBudgetService/MutateCampaignBudgetsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignCriterionService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignCriterionService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignCriterionService::CampaignCriterionOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignCriterionService/CampaignCriterionOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignCriterionService::GetCampaignCriterionRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignCriterionService/GetCampaignCriterionRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignCriterionService::MutateCampaignCriteriaRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignCriterionService/MutateCampaignCriteriaRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignCriterionService::MutateCampaignCriteriaResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignCriterionService/MutateCampaignCriteriaResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignCriterionService::MutateCampaignCriterionResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignCriterionService/MutateCampaignCriterionResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignCriterionSimulationService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignCriterionSimulationService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignCriterionSimulationService::GetCampaignCriterionSimulationRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignCriterionSimulationService/GetCampaignCriterionSimulationRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignDraftService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignDraftService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignDraftService::CampaignDraftOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignDraftService/CampaignDraftOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignDraftService::GetCampaignDraftRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignDraftService/GetCampaignDraftRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignDraftService::ListCampaignDraftAsyncErrorsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignDraftService/ListCampaignDraftAsyncErrorsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignDraftService::ListCampaignDraftAsyncErrorsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignDraftService/ListCampaignDraftAsyncErrorsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignDraftService::MutateCampaignDraftResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignDraftService/MutateCampaignDraftResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignDraftService::MutateCampaignDraftsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignDraftService/MutateCampaignDraftsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignDraftService::MutateCampaignDraftsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignDraftService/MutateCampaignDraftsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignDraftService::PromoteCampaignDraftRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignDraftService/PromoteCampaignDraftRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::CampaignExperimentOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/CampaignExperimentOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::CreateCampaignExperimentMetadata:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/CreateCampaignExperimentMetadata.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::CreateCampaignExperimentRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/CreateCampaignExperimentRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::EndCampaignExperimentRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/EndCampaignExperimentRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::GetCampaignExperimentRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/GetCampaignExperimentRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::GraduateCampaignExperimentRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/GraduateCampaignExperimentRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::GraduateCampaignExperimentResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/GraduateCampaignExperimentResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::ListCampaignExperimentAsyncErrorsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/ListCampaignExperimentAsyncErrorsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::ListCampaignExperimentAsyncErrorsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/ListCampaignExperimentAsyncErrorsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::MutateCampaignExperimentResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/MutateCampaignExperimentResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::MutateCampaignExperimentsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/MutateCampaignExperimentsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::MutateCampaignExperimentsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/MutateCampaignExperimentsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExperimentService::PromoteCampaignExperimentRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExperimentService/PromoteCampaignExperimentRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExtensionSettingService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExtensionSettingService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExtensionSettingService::CampaignExtensionSettingOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExtensionSettingService/CampaignExtensionSettingOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExtensionSettingService::GetCampaignExtensionSettingRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExtensionSettingService/GetCampaignExtensionSettingRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExtensionSettingService::MutateCampaignExtensionSettingResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExtensionSettingService/MutateCampaignExtensionSettingResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExtensionSettingService::MutateCampaignExtensionSettingsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExtensionSettingService/MutateCampaignExtensionSettingsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignExtensionSettingService::MutateCampaignExtensionSettingsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignExtensionSettingService/MutateCampaignExtensionSettingsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignFeedService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignFeedService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignFeedService::CampaignFeedOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignFeedService/CampaignFeedOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignFeedService::GetCampaignFeedRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignFeedService/GetCampaignFeedRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignFeedService::MutateCampaignFeedResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignFeedService/MutateCampaignFeedResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignFeedService::MutateCampaignFeedsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignFeedService/MutateCampaignFeedsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignFeedService::MutateCampaignFeedsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignFeedService/MutateCampaignFeedsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignLabelService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignLabelService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignLabelService::CampaignLabelOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignLabelService/CampaignLabelOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignLabelService::GetCampaignLabelRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignLabelService/GetCampaignLabelRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignLabelService::MutateCampaignLabelResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignLabelService/MutateCampaignLabelResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignLabelService::MutateCampaignLabelsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignLabelService/MutateCampaignLabelsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignLabelService::MutateCampaignLabelsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignLabelService/MutateCampaignLabelsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignService::CampaignOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignService/CampaignOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignService::GetCampaignRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignService/GetCampaignRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignService::MutateCampaignResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignService/MutateCampaignResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignService::MutateCampaignsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignService/MutateCampaignsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignService::MutateCampaignsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignService/MutateCampaignsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignSharedSetService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignSharedSetService.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignSharedSetService::CampaignSharedSetOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignSharedSetService/CampaignSharedSetOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignSharedSetService::GetCampaignSharedSetRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignSharedSetService/GetCampaignSharedSetRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignSharedSetService::MutateCampaignSharedSetResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignSharedSetService/MutateCampaignSharedSetResult.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignSharedSetService::MutateCampaignSharedSetsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignSharedSetService/MutateCampaignSharedSetsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CampaignSharedSetService::MutateCampaignSharedSetsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CampaignSharedSetService/MutateCampaignSharedSetsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CarrierConstantService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CarrierConstantService.pm
+  Google::Ads::GoogleAds::V5::Services::CarrierConstantService::GetCarrierConstantRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CarrierConstantService/GetCarrierConstantRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ChangeStatusService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ChangeStatusService.pm
+  Google::Ads::GoogleAds::V5::Services::ChangeStatusService::GetChangeStatusRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ChangeStatusService/GetChangeStatusRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ClickViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ClickViewService.pm
+  Google::Ads::GoogleAds::V5::Services::ClickViewService::GetClickViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ClickViewService/GetClickViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionActionService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionActionService.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionActionService::ConversionActionOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionActionService/ConversionActionOperation.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionActionService::GetConversionActionRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionActionService/GetConversionActionRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionActionService::MutateConversionActionResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionActionService/MutateConversionActionResult.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionActionService::MutateConversionActionsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionActionService/MutateConversionActionsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionActionService::MutateConversionActionsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionActionService/MutateConversionActionsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionAdjustmentUploadService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionAdjustmentUploadService.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionAdjustmentUploadService::ConversionAdjustment:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionAdjustmentUploadService/ConversionAdjustment.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionAdjustmentUploadService::ConversionAdjustmentResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionAdjustmentUploadService/ConversionAdjustmentResult.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionAdjustmentUploadService::GclidDateTimePair:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionAdjustmentUploadService/GclidDateTimePair.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionAdjustmentUploadService::RestatementValue:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionAdjustmentUploadService/RestatementValue.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionAdjustmentUploadService::UploadConversionAdjustmentsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionAdjustmentUploadService/UploadConversionAdjustmentsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionAdjustmentUploadService::UploadConversionAdjustmentsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionAdjustmentUploadService/UploadConversionAdjustmentsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionUploadService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionUploadService.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionUploadService::CallConversion:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionUploadService/CallConversion.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionUploadService::CallConversionResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionUploadService/CallConversionResult.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionUploadService::ClickConversion:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionUploadService/ClickConversion.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionUploadService::ClickConversionResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionUploadService/ClickConversionResult.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionUploadService::ExternalAttributionData:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionUploadService/ExternalAttributionData.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionUploadService::UploadCallConversionsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionUploadService/UploadCallConversionsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionUploadService::UploadCallConversionsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionUploadService/UploadCallConversionsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionUploadService::UploadClickConversionsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionUploadService/UploadClickConversionsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ConversionUploadService::UploadClickConversionsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ConversionUploadService/UploadClickConversionsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CurrencyConstantService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CurrencyConstantService.pm
+  Google::Ads::GoogleAds::V5::Services::CurrencyConstantService::GetCurrencyConstantRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CurrencyConstantService/GetCurrencyConstantRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomInterestService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomInterestService.pm
+  Google::Ads::GoogleAds::V5::Services::CustomInterestService::CustomInterestOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomInterestService/CustomInterestOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CustomInterestService::GetCustomInterestRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomInterestService/GetCustomInterestRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomInterestService::MutateCustomInterestResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomInterestService/MutateCustomInterestResult.pm
+  Google::Ads::GoogleAds::V5::Services::CustomInterestService::MutateCustomInterestsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomInterestService/MutateCustomInterestsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomInterestService::MutateCustomInterestsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomInterestService/MutateCustomInterestsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerClientLinkService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerClientLinkService.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerClientLinkService::CustomerClientLinkOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerClientLinkService/CustomerClientLinkOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerClientLinkService::GetCustomerClientLinkRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerClientLinkService/GetCustomerClientLinkRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerClientLinkService::MutateCustomerClientLinkRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerClientLinkService/MutateCustomerClientLinkRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerClientLinkService::MutateCustomerClientLinkResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerClientLinkService/MutateCustomerClientLinkResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerClientLinkService::MutateCustomerClientLinkResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerClientLinkService/MutateCustomerClientLinkResult.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerClientService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerClientService.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerClientService::GetCustomerClientRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerClientService/GetCustomerClientRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerExtensionSettingService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerExtensionSettingService.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerExtensionSettingService::CustomerExtensionSettingOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerExtensionSettingService/CustomerExtensionSettingOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerExtensionSettingService::GetCustomerExtensionSettingRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerExtensionSettingService/GetCustomerExtensionSettingRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerExtensionSettingService::MutateCustomerExtensionSettingResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerExtensionSettingService/MutateCustomerExtensionSettingResult.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerExtensionSettingService::MutateCustomerExtensionSettingsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerExtensionSettingService/MutateCustomerExtensionSettingsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerExtensionSettingService::MutateCustomerExtensionSettingsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerExtensionSettingService/MutateCustomerExtensionSettingsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerFeedService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerFeedService.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerFeedService::CustomerFeedOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerFeedService/CustomerFeedOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerFeedService::GetCustomerFeedRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerFeedService/GetCustomerFeedRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerFeedService::MutateCustomerFeedResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerFeedService/MutateCustomerFeedResult.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerFeedService::MutateCustomerFeedsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerFeedService/MutateCustomerFeedsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerFeedService::MutateCustomerFeedsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerFeedService/MutateCustomerFeedsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerLabelService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerLabelService.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerLabelService::CustomerLabelOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerLabelService/CustomerLabelOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerLabelService::GetCustomerLabelRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerLabelService/GetCustomerLabelRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerLabelService::MutateCustomerLabelResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerLabelService/MutateCustomerLabelResult.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerLabelService::MutateCustomerLabelsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerLabelService/MutateCustomerLabelsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerLabelService::MutateCustomerLabelsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerLabelService/MutateCustomerLabelsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerManagerLinkService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerManagerLinkService.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerManagerLinkService::CustomerManagerLinkOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerManagerLinkService/CustomerManagerLinkOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerManagerLinkService::GetCustomerManagerLinkRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerManagerLinkService/GetCustomerManagerLinkRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerManagerLinkService::MoveManagerLinkRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerManagerLinkService/MoveManagerLinkRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerManagerLinkService::MoveManagerLinkResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerManagerLinkService/MoveManagerLinkResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerManagerLinkService::MutateCustomerManagerLinkRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerManagerLinkService/MutateCustomerManagerLinkRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerManagerLinkService::MutateCustomerManagerLinkResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerManagerLinkService/MutateCustomerManagerLinkResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerManagerLinkService::MutateCustomerManagerLinkResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerManagerLinkService/MutateCustomerManagerLinkResult.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerNegativeCriterionService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerNegativeCriterionService.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerNegativeCriterionService::CustomerNegativeCriterionOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerNegativeCriterionService/CustomerNegativeCriterionOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerNegativeCriterionService::GetCustomerNegativeCriterionRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerNegativeCriterionService/GetCustomerNegativeCriterionRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerNegativeCriterionService::MutateCustomerNegativeCriteriaRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerNegativeCriterionService/MutateCustomerNegativeCriteriaRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerNegativeCriterionService::MutateCustomerNegativeCriteriaResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerNegativeCriterionService/MutateCustomerNegativeCriteriaResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerNegativeCriterionService::MutateCustomerNegativeCriteriaResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerNegativeCriterionService/MutateCustomerNegativeCriteriaResult.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerService.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerService::CreateCustomerClientRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerService/CreateCustomerClientRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerService::CreateCustomerClientResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerService/CreateCustomerClientResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerService::CustomerOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerService/CustomerOperation.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerService::GetCustomerRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerService/GetCustomerRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerService::ListAccessibleCustomersRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerService/ListAccessibleCustomersRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerService::ListAccessibleCustomersResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerService/ListAccessibleCustomersResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerService::MutateCustomerRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerService/MutateCustomerRequest.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerService::MutateCustomerResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerService/MutateCustomerResponse.pm
+  Google::Ads::GoogleAds::V5::Services::CustomerService::MutateCustomerResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/CustomerService/MutateCustomerResult.pm
+  Google::Ads::GoogleAds::V5::Services::DetailPlacementViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/DetailPlacementViewService.pm
+  Google::Ads::GoogleAds::V5::Services::DetailPlacementViewService::GetDetailPlacementViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/DetailPlacementViewService/GetDetailPlacementViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::DisplayKeywordViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/DisplayKeywordViewService.pm
+  Google::Ads::GoogleAds::V5::Services::DisplayKeywordViewService::GetDisplayKeywordViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/DisplayKeywordViewService/GetDisplayKeywordViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::DistanceViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/DistanceViewService.pm
+  Google::Ads::GoogleAds::V5::Services::DistanceViewService::GetDistanceViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/DistanceViewService/GetDistanceViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::DomainCategoryService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/DomainCategoryService.pm
+  Google::Ads::GoogleAds::V5::Services::DomainCategoryService::GetDomainCategoryRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/DomainCategoryService/GetDomainCategoryRequest.pm
+  Google::Ads::GoogleAds::V5::Services::DynamicSearchAdsSearchTermViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/DynamicSearchAdsSearchTermViewService.pm
+  Google::Ads::GoogleAds::V5::Services::DynamicSearchAdsSearchTermViewService::GetDynamicSearchAdsSearchTermViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/DynamicSearchAdsSearchTermViewService/GetDynamicSearchAdsSearchTermViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ExpandedLandingPageViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ExpandedLandingPageViewService.pm
+  Google::Ads::GoogleAds::V5::Services::ExpandedLandingPageViewService::GetExpandedLandingPageViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ExpandedLandingPageViewService/GetExpandedLandingPageViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ExtensionFeedItemService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ExtensionFeedItemService.pm
+  Google::Ads::GoogleAds::V5::Services::ExtensionFeedItemService::ExtensionFeedItemOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ExtensionFeedItemService/ExtensionFeedItemOperation.pm
+  Google::Ads::GoogleAds::V5::Services::ExtensionFeedItemService::GetExtensionFeedItemRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ExtensionFeedItemService/GetExtensionFeedItemRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ExtensionFeedItemService::MutateExtensionFeedItemResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ExtensionFeedItemService/MutateExtensionFeedItemResult.pm
+  Google::Ads::GoogleAds::V5::Services::ExtensionFeedItemService::MutateExtensionFeedItemsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ExtensionFeedItemService/MutateExtensionFeedItemsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ExtensionFeedItemService::MutateExtensionFeedItemsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ExtensionFeedItemService/MutateExtensionFeedItemsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemService.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemService::FeedItemOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemService/FeedItemOperation.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemService::GetFeedItemRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemService/GetFeedItemRequest.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemService::MutateFeedItemResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemService/MutateFeedItemResult.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemService::MutateFeedItemsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemService/MutateFeedItemsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemService::MutateFeedItemsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemService/MutateFeedItemsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemTargetService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemTargetService.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemTargetService::FeedItemTargetOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemTargetService/FeedItemTargetOperation.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemTargetService::GetFeedItemTargetRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemTargetService/GetFeedItemTargetRequest.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemTargetService::MutateFeedItemTargetResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemTargetService/MutateFeedItemTargetResult.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemTargetService::MutateFeedItemTargetsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemTargetService/MutateFeedItemTargetsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::FeedItemTargetService::MutateFeedItemTargetsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedItemTargetService/MutateFeedItemTargetsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::FeedMappingService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedMappingService.pm
+  Google::Ads::GoogleAds::V5::Services::FeedMappingService::FeedMappingOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedMappingService/FeedMappingOperation.pm
+  Google::Ads::GoogleAds::V5::Services::FeedMappingService::GetFeedMappingRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedMappingService/GetFeedMappingRequest.pm
+  Google::Ads::GoogleAds::V5::Services::FeedMappingService::MutateFeedMappingResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedMappingService/MutateFeedMappingResult.pm
+  Google::Ads::GoogleAds::V5::Services::FeedMappingService::MutateFeedMappingsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedMappingService/MutateFeedMappingsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::FeedMappingService::MutateFeedMappingsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedMappingService/MutateFeedMappingsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::FeedPlaceholderViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedPlaceholderViewService.pm
+  Google::Ads::GoogleAds::V5::Services::FeedPlaceholderViewService::GetFeedPlaceholderViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedPlaceholderViewService/GetFeedPlaceholderViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::FeedService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedService.pm
+  Google::Ads::GoogleAds::V5::Services::FeedService::FeedOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedService/FeedOperation.pm
+  Google::Ads::GoogleAds::V5::Services::FeedService::GetFeedRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedService/GetFeedRequest.pm
+  Google::Ads::GoogleAds::V5::Services::FeedService::MutateFeedResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedService/MutateFeedResult.pm
+  Google::Ads::GoogleAds::V5::Services::FeedService::MutateFeedsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedService/MutateFeedsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::FeedService::MutateFeedsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/FeedService/MutateFeedsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::GenderViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GenderViewService.pm
+  Google::Ads::GoogleAds::V5::Services::GenderViewService::GetGenderViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GenderViewService/GetGenderViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::GeoTargetConstantService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GeoTargetConstantService.pm
+  Google::Ads::GoogleAds::V5::Services::GeoTargetConstantService::GeoTargetConstantSuggestion:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GeoTargetConstantService/GeoTargetConstantSuggestion.pm
+  Google::Ads::GoogleAds::V5::Services::GeoTargetConstantService::GeoTargets:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GeoTargetConstantService/GeoTargets.pm
+  Google::Ads::GoogleAds::V5::Services::GeoTargetConstantService::GetGeoTargetConstantRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GeoTargetConstantService/GetGeoTargetConstantRequest.pm
+  Google::Ads::GoogleAds::V5::Services::GeoTargetConstantService::LocationNames:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GeoTargetConstantService/LocationNames.pm
+  Google::Ads::GoogleAds::V5::Services::GeoTargetConstantService::SuggestGeoTargetConstantsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GeoTargetConstantService/SuggestGeoTargetConstantsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::GeoTargetConstantService::SuggestGeoTargetConstantsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GeoTargetConstantService/SuggestGeoTargetConstantsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::GeographicViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GeographicViewService.pm
+  Google::Ads::GoogleAds::V5::Services::GeographicViewService::GetGeographicViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GeographicViewService/GetGeographicViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsFieldService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsFieldService.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsFieldService::GetGoogleAdsFieldRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsFieldService/GetGoogleAdsFieldRequest.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsFieldService::SearchGoogleAdsFieldsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsFieldService/SearchGoogleAdsFieldsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsFieldService::SearchGoogleAdsFieldsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsFieldService/SearchGoogleAdsFieldsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsService.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsService::GoogleAdsRow:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsService/GoogleAdsRow.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsService::MutateGoogleAdsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsService/MutateGoogleAdsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsService::MutateGoogleAdsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsService/MutateGoogleAdsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsService::MutateOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsService/MutateOperation.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsService::MutateOperationResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsService/MutateOperationResponse.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsService::SearchGoogleAdsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsService/SearchGoogleAdsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsService::SearchGoogleAdsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsService/SearchGoogleAdsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsService::SearchGoogleAdsStreamRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsService/SearchGoogleAdsStreamRequest.pm
+  Google::Ads::GoogleAds::V5::Services::GoogleAdsService::SearchGoogleAdsStreamResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GoogleAdsService/SearchGoogleAdsStreamResponse.pm
+  Google::Ads::GoogleAds::V5::Services::GroupPlacementViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GroupPlacementViewService.pm
+  Google::Ads::GoogleAds::V5::Services::GroupPlacementViewService::GetGroupPlacementViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/GroupPlacementViewService/GetGroupPlacementViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::HotelGroupViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/HotelGroupViewService.pm
+  Google::Ads::GoogleAds::V5::Services::HotelGroupViewService::GetHotelGroupViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/HotelGroupViewService/GetHotelGroupViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::HotelPerformanceViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/HotelPerformanceViewService.pm
+  Google::Ads::GoogleAds::V5::Services::HotelPerformanceViewService::GetHotelPerformanceViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/HotelPerformanceViewService/GetHotelPerformanceViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::IncomeRangeViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/IncomeRangeViewService.pm
+  Google::Ads::GoogleAds::V5::Services::IncomeRangeViewService::GetIncomeRangeViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/IncomeRangeViewService/GetIncomeRangeViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::InvoiceService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/InvoiceService.pm
+  Google::Ads::GoogleAds::V5::Services::InvoiceService::ListInvoicesRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/InvoiceService/ListInvoicesRequest.pm
+  Google::Ads::GoogleAds::V5::Services::InvoiceService::ListInvoicesResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/InvoiceService/ListInvoicesResponse.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupKeywordService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupKeywordService.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupKeywordService::GetKeywordPlanAdGroupKeywordRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupKeywordService/GetKeywordPlanAdGroupKeywordRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupKeywordService::KeywordPlanAdGroupKeywordOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupKeywordService/KeywordPlanAdGroupKeywordOperation.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupKeywordService::MutateKeywordPlanAdGroupKeywordResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupKeywordService/MutateKeywordPlanAdGroupKeywordResult.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupKeywordService::MutateKeywordPlanAdGroupKeywordsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupKeywordService/MutateKeywordPlanAdGroupKeywordsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupKeywordService::MutateKeywordPlanAdGroupKeywordsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupKeywordService/MutateKeywordPlanAdGroupKeywordsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupService.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupService::GetKeywordPlanAdGroupRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupService/GetKeywordPlanAdGroupRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupService::KeywordPlanAdGroupOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupService/KeywordPlanAdGroupOperation.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupService::MutateKeywordPlanAdGroupResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupService/MutateKeywordPlanAdGroupResult.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupService::MutateKeywordPlanAdGroupsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupService/MutateKeywordPlanAdGroupsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanAdGroupService::MutateKeywordPlanAdGroupsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanAdGroupService/MutateKeywordPlanAdGroupsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignKeywordService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignKeywordService.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignKeywordService::GetKeywordPlanCampaignKeywordRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignKeywordService/GetKeywordPlanCampaignKeywordRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignKeywordService::KeywordPlanCampaignKeywordOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignKeywordService/KeywordPlanCampaignKeywordOperation.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignKeywordService::MutateKeywordPlanCampaignKeywordResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignKeywordService/MutateKeywordPlanCampaignKeywordResult.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignKeywordService::MutateKeywordPlanCampaignKeywordsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignKeywordService/MutateKeywordPlanCampaignKeywordsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignKeywordService::MutateKeywordPlanCampaignKeywordsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignKeywordService/MutateKeywordPlanCampaignKeywordsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignService.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignService::GetKeywordPlanCampaignRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignService/GetKeywordPlanCampaignRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignService::KeywordPlanCampaignOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignService/KeywordPlanCampaignOperation.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignService::MutateKeywordPlanCampaignResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignService/MutateKeywordPlanCampaignResult.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignService::MutateKeywordPlanCampaignsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignService/MutateKeywordPlanCampaignsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanCampaignService::MutateKeywordPlanCampaignsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanCampaignService/MutateKeywordPlanCampaignsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanIdeaService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanIdeaService.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanIdeaService::GenerateKeywordIdeaResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanIdeaService/GenerateKeywordIdeaResponse.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanIdeaService::GenerateKeywordIdeaResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanIdeaService/GenerateKeywordIdeaResult.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanIdeaService::GenerateKeywordIdeasRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanIdeaService/GenerateKeywordIdeasRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanIdeaService::KeywordAndUrlSeed:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanIdeaService/KeywordAndUrlSeed.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanIdeaService::KeywordSeed:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanIdeaService/KeywordSeed.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanIdeaService::SiteSeed:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanIdeaService/SiteSeed.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanIdeaService::UrlSeed:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanIdeaService/UrlSeed.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::ForecastMetrics:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/ForecastMetrics.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::GenerateForecastCurveRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/GenerateForecastCurveRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::GenerateForecastCurveResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/GenerateForecastCurveResponse.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::GenerateForecastMetricsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/GenerateForecastMetricsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::GenerateForecastMetricsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/GenerateForecastMetricsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::GenerateForecastTimeSeriesRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/GenerateForecastTimeSeriesRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::GenerateForecastTimeSeriesResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/GenerateForecastTimeSeriesResponse.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::GenerateHistoricalMetricsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/GenerateHistoricalMetricsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::GenerateHistoricalMetricsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/GenerateHistoricalMetricsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::GetKeywordPlanRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/GetKeywordPlanRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::KeywordPlanAdGroupForecast:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/KeywordPlanAdGroupForecast.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::KeywordPlanCampaignForecast:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/KeywordPlanCampaignForecast.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::KeywordPlanCampaignForecastCurve:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/KeywordPlanCampaignForecastCurve.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::KeywordPlanKeywordForecast:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/KeywordPlanKeywordForecast.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::KeywordPlanKeywordHistoricalMetrics:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/KeywordPlanKeywordHistoricalMetrics.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::KeywordPlanMaxCpcBidForecast:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/KeywordPlanMaxCpcBidForecast.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::KeywordPlanMaxCpcBidForecastCurve:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/KeywordPlanMaxCpcBidForecastCurve.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::KeywordPlanOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/KeywordPlanOperation.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::KeywordPlanWeeklyForecast:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/KeywordPlanWeeklyForecast.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::KeywordPlanWeeklyTimeSeriesForecast:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/KeywordPlanWeeklyTimeSeriesForecast.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::MutateKeywordPlansRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/MutateKeywordPlansRequest.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::MutateKeywordPlansResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/MutateKeywordPlansResponse.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordPlanService::MutateKeywordPlansResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordPlanService/MutateKeywordPlansResult.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordViewService.pm
+  Google::Ads::GoogleAds::V5::Services::KeywordViewService::GetKeywordViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/KeywordViewService/GetKeywordViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::LabelService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LabelService.pm
+  Google::Ads::GoogleAds::V5::Services::LabelService::GetLabelRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LabelService/GetLabelRequest.pm
+  Google::Ads::GoogleAds::V5::Services::LabelService::LabelOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LabelService/LabelOperation.pm
+  Google::Ads::GoogleAds::V5::Services::LabelService::MutateLabelResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LabelService/MutateLabelResult.pm
+  Google::Ads::GoogleAds::V5::Services::LabelService::MutateLabelsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LabelService/MutateLabelsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::LabelService::MutateLabelsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LabelService/MutateLabelsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::LandingPageViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LandingPageViewService.pm
+  Google::Ads::GoogleAds::V5::Services::LandingPageViewService::GetLandingPageViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LandingPageViewService/GetLandingPageViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::LanguageConstantService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LanguageConstantService.pm
+  Google::Ads::GoogleAds::V5::Services::LanguageConstantService::GetLanguageConstantRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LanguageConstantService/GetLanguageConstantRequest.pm
+  Google::Ads::GoogleAds::V5::Services::LocationViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LocationViewService.pm
+  Google::Ads::GoogleAds::V5::Services::LocationViewService::GetLocationViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/LocationViewService/GetLocationViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ManagedPlacementViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ManagedPlacementViewService.pm
+  Google::Ads::GoogleAds::V5::Services::ManagedPlacementViewService::GetManagedPlacementViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ManagedPlacementViewService/GetManagedPlacementViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::MediaFileService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MediaFileService.pm
+  Google::Ads::GoogleAds::V5::Services::MediaFileService::GetMediaFileRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MediaFileService/GetMediaFileRequest.pm
+  Google::Ads::GoogleAds::V5::Services::MediaFileService::MediaFileOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MediaFileService/MediaFileOperation.pm
+  Google::Ads::GoogleAds::V5::Services::MediaFileService::MutateMediaFileResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MediaFileService/MutateMediaFileResult.pm
+  Google::Ads::GoogleAds::V5::Services::MediaFileService::MutateMediaFilesRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MediaFileService/MutateMediaFilesRequest.pm
+  Google::Ads::GoogleAds::V5::Services::MediaFileService::MutateMediaFilesResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MediaFileService/MutateMediaFilesResponse.pm
+  Google::Ads::GoogleAds::V5::Services::MerchantCenterLinkService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MerchantCenterLinkService.pm
+  Google::Ads::GoogleAds::V5::Services::MerchantCenterLinkService::GetMerchantCenterLinkRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MerchantCenterLinkService/GetMerchantCenterLinkRequest.pm
+  Google::Ads::GoogleAds::V5::Services::MerchantCenterLinkService::ListMerchantCenterLinksRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MerchantCenterLinkService/ListMerchantCenterLinksRequest.pm
+  Google::Ads::GoogleAds::V5::Services::MerchantCenterLinkService::ListMerchantCenterLinksResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MerchantCenterLinkService/ListMerchantCenterLinksResponse.pm
+  Google::Ads::GoogleAds::V5::Services::MerchantCenterLinkService::MerchantCenterLinkOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MerchantCenterLinkService/MerchantCenterLinkOperation.pm
+  Google::Ads::GoogleAds::V5::Services::MerchantCenterLinkService::MutateMerchantCenterLinkRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MerchantCenterLinkService/MutateMerchantCenterLinkRequest.pm
+  Google::Ads::GoogleAds::V5::Services::MerchantCenterLinkService::MutateMerchantCenterLinkResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MerchantCenterLinkService/MutateMerchantCenterLinkResponse.pm
+  Google::Ads::GoogleAds::V5::Services::MerchantCenterLinkService::MutateMerchantCenterLinkResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MerchantCenterLinkService/MutateMerchantCenterLinkResult.pm
+  Google::Ads::GoogleAds::V5::Services::MobileAppCategoryConstantService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MobileAppCategoryConstantService.pm
+  Google::Ads::GoogleAds::V5::Services::MobileAppCategoryConstantService::GetMobileAppCategoryConstantRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MobileAppCategoryConstantService/GetMobileAppCategoryConstantRequest.pm
+  Google::Ads::GoogleAds::V5::Services::MobileDeviceConstantService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MobileDeviceConstantService.pm
+  Google::Ads::GoogleAds::V5::Services::MobileDeviceConstantService::GetMobileDeviceConstantRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/MobileDeviceConstantService/GetMobileDeviceConstantRequest.pm
+  Google::Ads::GoogleAds::V5::Services::OfflineUserDataJobService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/OfflineUserDataJobService.pm
+  Google::Ads::GoogleAds::V5::Services::OfflineUserDataJobService::AddOfflineUserDataJobOperationsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::OfflineUserDataJobService::AddOfflineUserDataJobOperationsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/OfflineUserDataJobService/AddOfflineUserDataJobOperationsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::OfflineUserDataJobService::CreateOfflineUserDataJobRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/OfflineUserDataJobService/CreateOfflineUserDataJobRequest.pm
+  Google::Ads::GoogleAds::V5::Services::OfflineUserDataJobService::CreateOfflineUserDataJobResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/OfflineUserDataJobService/CreateOfflineUserDataJobResponse.pm
+  Google::Ads::GoogleAds::V5::Services::OfflineUserDataJobService::GetOfflineUserDataJobRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/OfflineUserDataJobService/GetOfflineUserDataJobRequest.pm
+  Google::Ads::GoogleAds::V5::Services::OfflineUserDataJobService::OfflineUserDataJobOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/OfflineUserDataJobService/OfflineUserDataJobOperation.pm
+  Google::Ads::GoogleAds::V5::Services::OfflineUserDataJobService::RunOfflineUserDataJobRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/OfflineUserDataJobService/RunOfflineUserDataJobRequest.pm
+  Google::Ads::GoogleAds::V5::Services::OperatingSystemVersionConstantService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/OperatingSystemVersionConstantService.pm
+  Google::Ads::GoogleAds::V5::Services::OperatingSystemVersionConstantService::GetOperatingSystemVersionConstantRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/OperatingSystemVersionConstantService/GetOperatingSystemVersionConstantRequest.pm
+  Google::Ads::GoogleAds::V5::Services::PaidOrganicSearchTermViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/PaidOrganicSearchTermViewService.pm
+  Google::Ads::GoogleAds::V5::Services::PaidOrganicSearchTermViewService::GetPaidOrganicSearchTermViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/PaidOrganicSearchTermViewService/GetPaidOrganicSearchTermViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ParentalStatusViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ParentalStatusViewService.pm
+  Google::Ads::GoogleAds::V5::Services::ParentalStatusViewService::GetParentalStatusViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ParentalStatusViewService/GetParentalStatusViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::PaymentsAccountService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/PaymentsAccountService.pm
+  Google::Ads::GoogleAds::V5::Services::PaymentsAccountService::ListPaymentsAccountsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/PaymentsAccountService/ListPaymentsAccountsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::PaymentsAccountService::ListPaymentsAccountsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/PaymentsAccountService/ListPaymentsAccountsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::ProductBiddingCategoryConstantService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ProductBiddingCategoryConstantService.pm
+  Google::Ads::GoogleAds::V5::Services::ProductBiddingCategoryConstantService::GetProductBiddingCategoryConstantRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ProductBiddingCategoryConstantService/GetProductBiddingCategoryConstantRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ProductGroupViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ProductGroupViewService.pm
+  Google::Ads::GoogleAds::V5::Services::ProductGroupViewService::GetProductGroupViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ProductGroupViewService/GetProductGroupViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::CampaignDuration:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/CampaignDuration.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::Forecast:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/Forecast.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::FrequencyCap:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/FrequencyCap.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::GenerateProductMixIdeasRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/GenerateProductMixIdeasRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::GenerateProductMixIdeasResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/GenerateProductMixIdeasResponse.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::GenerateReachForecastRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/GenerateReachForecastRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::GenerateReachForecastResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/GenerateReachForecastResponse.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::ListPlannableLocationsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/ListPlannableLocationsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::ListPlannableLocationsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/ListPlannableLocationsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::ListPlannableProductsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/ListPlannableProductsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::ListPlannableProductsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/ListPlannableProductsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::OnTargetAudienceMetrics:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/OnTargetAudienceMetrics.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::PlannableLocation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/PlannableLocation.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::PlannableTargeting:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/PlannableTargeting.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::PlannedProduct:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/PlannedProduct.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::Preferences:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/Preferences.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::ProductAllocation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/ProductAllocation.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::ProductMetadata:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/ProductMetadata.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::ReachCurve:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/ReachCurve.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::ReachForecast:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/ReachForecast.pm
+  Google::Ads::GoogleAds::V5::Services::ReachPlanService::Targeting:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ReachPlanService/Targeting.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::ApplyRecommendationOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/ApplyRecommendationOperation.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::ApplyRecommendationRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/ApplyRecommendationRequest.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::ApplyRecommendationResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/ApplyRecommendationResponse.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::ApplyRecommendationResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/ApplyRecommendationResult.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::CallExtensionParameters:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/CallExtensionParameters.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::CalloutExtensionParameters:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/CalloutExtensionParameters.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::CampaignBudgetParameters:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/CampaignBudgetParameters.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::DismissRecommendationOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/DismissRecommendationOperation.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::DismissRecommendationRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/DismissRecommendationRequest.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::DismissRecommendationResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/DismissRecommendationResponse.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::DismissRecommendationResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/DismissRecommendationResult.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::GetRecommendationRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/GetRecommendationRequest.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::KeywordParameters:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/KeywordParameters.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::MoveUnusedBudgetParameters:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/MoveUnusedBudgetParameters.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::SitelinkExtensionParameters:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/SitelinkExtensionParameters.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::TargetCpaOptInParameters:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/TargetCpaOptInParameters.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::TargetRoasOptInParameters:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/TargetRoasOptInParameters.pm
+  Google::Ads::GoogleAds::V5::Services::RecommendationService::TextAdParameters:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RecommendationService/TextAdParameters.pm
+  Google::Ads::GoogleAds::V5::Services::RemarketingActionService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RemarketingActionService.pm
+  Google::Ads::GoogleAds::V5::Services::RemarketingActionService::GetRemarketingActionRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RemarketingActionService/GetRemarketingActionRequest.pm
+  Google::Ads::GoogleAds::V5::Services::RemarketingActionService::MutateRemarketingActionResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RemarketingActionService/MutateRemarketingActionResult.pm
+  Google::Ads::GoogleAds::V5::Services::RemarketingActionService::MutateRemarketingActionsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RemarketingActionService/MutateRemarketingActionsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::RemarketingActionService::MutateRemarketingActionsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RemarketingActionService/MutateRemarketingActionsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::RemarketingActionService::RemarketingActionOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/RemarketingActionService/RemarketingActionOperation.pm
+  Google::Ads::GoogleAds::V5::Services::SearchTermViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SearchTermViewService.pm
+  Google::Ads::GoogleAds::V5::Services::SearchTermViewService::GetSearchTermViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SearchTermViewService/GetSearchTermViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::SharedCriterionService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedCriterionService.pm
+  Google::Ads::GoogleAds::V5::Services::SharedCriterionService::GetSharedCriterionRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedCriterionService/GetSharedCriterionRequest.pm
+  Google::Ads::GoogleAds::V5::Services::SharedCriterionService::MutateSharedCriteriaRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedCriterionService/MutateSharedCriteriaRequest.pm
+  Google::Ads::GoogleAds::V5::Services::SharedCriterionService::MutateSharedCriteriaResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedCriterionService/MutateSharedCriteriaResponse.pm
+  Google::Ads::GoogleAds::V5::Services::SharedCriterionService::MutateSharedCriterionResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedCriterionService/MutateSharedCriterionResult.pm
+  Google::Ads::GoogleAds::V5::Services::SharedCriterionService::SharedCriterionOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedCriterionService/SharedCriterionOperation.pm
+  Google::Ads::GoogleAds::V5::Services::SharedSetService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedSetService.pm
+  Google::Ads::GoogleAds::V5::Services::SharedSetService::GetSharedSetRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedSetService/GetSharedSetRequest.pm
+  Google::Ads::GoogleAds::V5::Services::SharedSetService::MutateSharedSetResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedSetService/MutateSharedSetResult.pm
+  Google::Ads::GoogleAds::V5::Services::SharedSetService::MutateSharedSetsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedSetService/MutateSharedSetsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::SharedSetService::MutateSharedSetsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedSetService/MutateSharedSetsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::SharedSetService::SharedSetOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/SharedSetService/SharedSetOperation.pm
+  Google::Ads::GoogleAds::V5::Services::ShoppingPerformanceViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ShoppingPerformanceViewService.pm
+  Google::Ads::GoogleAds::V5::Services::ShoppingPerformanceViewService::GetShoppingPerformanceViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ShoppingPerformanceViewService/GetShoppingPerformanceViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ThirdPartyAppAnalyticsLinkService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ThirdPartyAppAnalyticsLinkService.pm
+  Google::Ads::GoogleAds::V5::Services::ThirdPartyAppAnalyticsLinkService::GetThirdPartyAppAnalyticsLinkRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ThirdPartyAppAnalyticsLinkService/GetThirdPartyAppAnalyticsLinkRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ThirdPartyAppAnalyticsLinkService::RegenerateShareableLinkIdRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ThirdPartyAppAnalyticsLinkService/RegenerateShareableLinkIdRequest.pm
+  Google::Ads::GoogleAds::V5::Services::ThirdPartyAppAnalyticsLinkService::RegenerateShareableLinkIdResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/ThirdPartyAppAnalyticsLinkService/RegenerateShareableLinkIdResponse.pm
+  Google::Ads::GoogleAds::V5::Services::TopicConstantService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/TopicConstantService.pm
+  Google::Ads::GoogleAds::V5::Services::TopicConstantService::GetTopicConstantRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/TopicConstantService/GetTopicConstantRequest.pm
+  Google::Ads::GoogleAds::V5::Services::TopicViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/TopicViewService.pm
+  Google::Ads::GoogleAds::V5::Services::TopicViewService::GetTopicViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/TopicViewService/GetTopicViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::UserDataService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserDataService.pm
+  Google::Ads::GoogleAds::V5::Services::UserDataService::UploadUserDataRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserDataService/UploadUserDataRequest.pm
+  Google::Ads::GoogleAds::V5::Services::UserDataService::UploadUserDataResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserDataService/UploadUserDataResponse.pm
+  Google::Ads::GoogleAds::V5::Services::UserDataService::UserDataOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserDataService/UserDataOperation.pm
+  Google::Ads::GoogleAds::V5::Services::UserInterestService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserInterestService.pm
+  Google::Ads::GoogleAds::V5::Services::UserInterestService::GetUserInterestRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserInterestService/GetUserInterestRequest.pm
+  Google::Ads::GoogleAds::V5::Services::UserListService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserListService.pm
+  Google::Ads::GoogleAds::V5::Services::UserListService::GetUserListRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserListService/GetUserListRequest.pm
+  Google::Ads::GoogleAds::V5::Services::UserListService::MutateUserListResult:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserListService/MutateUserListResult.pm
+  Google::Ads::GoogleAds::V5::Services::UserListService::MutateUserListsRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserListService/MutateUserListsRequest.pm
+  Google::Ads::GoogleAds::V5::Services::UserListService::MutateUserListsResponse:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserListService/MutateUserListsResponse.pm
+  Google::Ads::GoogleAds::V5::Services::UserListService::UserListOperation:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserListService/UserListOperation.pm
+  Google::Ads::GoogleAds::V5::Services::UserLocationViewService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserLocationViewService.pm
+  Google::Ads::GoogleAds::V5::Services::UserLocationViewService::GetUserLocationViewRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/UserLocationViewService/GetUserLocationViewRequest.pm
+  Google::Ads::GoogleAds::V5::Services::VideoService:
+    file: lib/Google/Ads/GoogleAds/V5/Services/VideoService.pm
+  Google::Ads::GoogleAds::V5::Services::VideoService::GetVideoRequest:
+    file: lib/Google/Ads/GoogleAds/V5/Services/VideoService/GetVideoRequest.pm
+  Google::Ads::GoogleAds::V5::Utils::ResourceNames:
+    file: lib/Google/Ads/GoogleAds/V5/Utils/ResourceNames.pm
 requires:
   Class::Load: '0'
   Class::Std::Fast: '0'
@@ -6816,5 +9170,5 @@ requires:
   perl: v5.24.1
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
-version: v4.0.0
+version: v5.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

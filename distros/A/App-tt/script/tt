@@ -14,6 +14,7 @@ use File::Spec;
 use IO::Handle;
 use JSON::XS ();
 use List::Util 'uniq';
+use Scalar::Util 'blessed';
 use Time::Piece;
 use Time::Seconds;
 
@@ -35,7 +36,8 @@ $SIG{__DIE__} = sub { Carp::confess($_[0]) }
 $ENV{TIMETRACKER_MIN_TIME} ||= 300;
 
 subcommand edit => 'Edit a .trc file' => sub {
-  option str => description => 'Description for an event', alias => 'd';
+  option str => month => 'Mass edit a month';
+  option str => year  => 'Mass edit a year';
 };
 
 subcommand export => 'Export log data as csv' => sub {
@@ -66,57 +68,38 @@ subcommand status => 'Show current status' => sub { };
 sub command_edit {
   my $self = shift;
   return $self->_edit_with_editor($_[0]) if @_ and -f $_[0];    # Edit a given file
-  return $self->_edit_with_editor        if -t STDIN;           # Edit last file
-
-  # Edit all files with code from STDIN
-  my $code = '';
-  $code .= $_ while <STDIN>;
-  $code = "sub {$code}" unless $code =~ /^\s*sub\b/s;
-  $code = eval "use 5.10.1;$code" or die "Could not compile code from STDIN: $@\n";
-
-  my @files;
-  find(
-    {
-      no_chdir => 0,
-      wanted   => sub {
-        return unless /^(\d+)-(\d+)_(.*)\.trc$/;
-        my $trc_file = abs_path $_;
-        local %_ = (date => $1, file => $trc_file, hms => $2, project => $3);
-        my $event = $self->_load($trc_file);
-        push @files, $event->{path};
-        $self->_save($event) if $code and $self->$code($event);
-        unlink $trc_file or die "rm $trc_file: $!" unless $trc_file eq $event->{path};
-      },
-    },
-    $self->_root,
-  );
-
-  return 0;
+  return $self->_mass_edit(@_) if $self->year or $self->month or !-t STDIN;
+  return $self->_edit_with_editor;
 }
 
 sub command_export {
   my $self = shift;
   my $res  = $self->_log(@_);
 
+  my @cols   = split /,/, $ENV{TT_COLUMNS} || 'date,project,hours,rounded,tags,description';
+  my $format = join ',', map {'"%s"'} @cols;
+
   $res->{rounded} = 0;
-  $self->_say('%s,%s,%s,%s,%s,%s', 'date', 'project', 'hours', 'rounded', 'tags', 'description');
+  $self->_say($format, @cols);
 
   for my $event (sort { $a->{start} <=> $b->{start} } @{$res->{log}}) {
-    my $seconds = $event->{seconds};
-    my ($hours, $minutes, $rounded);
-
-    $hours = int($seconds / 3600);
-    $seconds -= $hours * 3600;
-    $minutes = int($seconds / 60);
-    $rounded = $hours + ($minutes >= $ENV{TT_ROUND_UP_AT} ? 1 : 0);
-    $hours += sprintf '%.1f', $minutes / 60;
-    $res->{rounded} += $rounded;
+    $event->{date}  = $event->{start};
+    $event->{hours} = int($event->{seconds} / 3600);
+    $event->{seconds} -= $event->{hours} * 3600;
+    $event->{minutes} = int($event->{seconds} / 60);
+    $event->{rounded} = $event->{hours} + ($event->{minutes} >= $ENV{TT_ROUND_UP_AT} ? 1 : 0);
+    $event->{hours} += sprintf '%.1f', $event->{minutes} / 60;
+    $res->{rounded} += $event->{rounded};
 
     $self->_say(
-      '%s,%s,%s,%s,%s,%s', $event->{start}->ymd,
-      $event->{project}, $hours, $rounded,
-      join(',', grep {$_} map { split /[, ]/ } @{$event->{tags}}),
-      $event->{description} // ''
+      $format,
+      map {
+        my $val = $event->{$_} // '';
+        $val = $val->ymd if blessed $val and $val->can('ymd');
+        $val = join ',', @$val if ref $val eq 'ARRAY';
+        $val =~ s!"!""!g;
+        $val;
+      } @cols
     );
   }
 
@@ -272,10 +255,10 @@ sub _edit_with_editor {
 
   my $fh = File::Temp->new;
   printf $fh "# %s\n", $event->{path};
-  for my $k (qw(project tags start stop user)) {
+  for my $k (qw(project tags description start stop user)) {
     $event->{$k} = join ', ', @{$event->{$k} || []} if $k eq 'tags';
     $event->{$k} = $event->{$k}->datetime if $k eq 'start' or $k eq 'stop' and $event->{$k};
-    printf $fh "%-8s %s\n", "$k:", $event->{$k} // '';
+    printf $fh "%-12s %s\n", "$k:", $event->{$k} // '';
   }
 
   close $fh;
@@ -473,6 +456,55 @@ sub _root {
   };
 
   return $self->{root} = readlink($root) || $root;
+}
+
+sub _mass_edit {
+  my $self = shift;
+
+  $self->year($NOW->year) if $self->month and !$self->year;
+  my $path = $self->_root;
+  $path = File::Spec->catdir($path, $self->year) if $self->year;
+  $path = File::Spec->catdir($path, sprintf '%02s', $self->month) if $self->month;
+
+  my $re = '';
+  $re .= sprintf '(%s)',   $self->year  || '\d{4}';    # (year)     = ($1)
+  $re .= sprintf '(%02s)', $self->month || '\d{2}';    # (month)    = ($2)
+  $re .= '(\d{2})-(\d+)_';                             # (day, hms) = ($3, $4)
+  $re .= sprintf '(%s)', $self->project || '[^.]+';    # (project)  = ($5)
+  $re .= '\.trc';
+
+  # Edit all files with code from STDIN
+  my $code = '';
+  if (!-t STDIN or !($self->year or $self->month)) {
+    $code .= $_ while <STDIN>;
+    $code = "sub {$code}" unless $code =~ /^\s*sub\b/s;
+    $code = eval "use 5.10.1;use strict;use warnings;$code"
+      or die "Could not compile code from STDIN: $@\n";
+  }
+
+  my @found;
+  find(
+    {
+      no_chdir => 0,
+      wanted   => sub {
+        return unless $_ =~ m!^$re$!;
+        my %info = (file => abs_path $_);
+        @info{qw(year month day date hms project)} = ($1, $2, $3, "$1$2$3", $4, $5);
+        push @found, \%info;
+      },
+    },
+    $path,
+  );
+
+  for my $found (sort { $a->{file} cmp $b->{file} } @found) {
+    $self->command_edit($found->{file}), next unless $code;
+    my $event = $self->_load($found->{file});
+    local %_ = %$found;
+    $self->_save($event) if $code and $self->$code($event);
+    unlink $found->{file} or die "rm $found->{file}: $!" unless $found->{file} eq $event->{path};
+  }
+
+  return 0;
 }
 
 sub _save {

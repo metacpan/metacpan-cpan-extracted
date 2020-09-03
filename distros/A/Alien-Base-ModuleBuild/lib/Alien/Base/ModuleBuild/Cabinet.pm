@@ -5,7 +5,7 @@ use warnings;
 use Sort::Versions qw( versioncmp );
 
 # ABSTRACT: Private class
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 sub new {
   my $class = shift;
@@ -59,7 +59,7 @@ Alien::Base::ModuleBuild::Cabinet - Private class
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

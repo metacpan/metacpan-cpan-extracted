@@ -2,7 +2,7 @@ package Mojolicious::Plugin::TtRenderer::Engine;
 
 use warnings;
 use strict;
-use 5.010001;
+use 5.016;
 use base 'Mojo::Base';
 use Carp ();
 use File::Spec ();
@@ -13,7 +13,7 @@ use Scalar::Util 'weaken';
 use POSIX ':errno_h';
 
 # ABSTRACT: Template Toolkit renderer for Mojolicious
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.61'; # VERSION
 
 __PACKAGE__->attr('tt');
 
@@ -94,7 +94,6 @@ sub _render {
     my @params = ({%{$c->stash}, c => $c, h => $helper}, $output, {binmode => ':utf8'});
     my $provider = $self->tt->{SERVICE}->{CONTEXT}->{LOAD_TEMPLATES}->[0];
     $provider->options($options);
-    $provider->ctx($c);
 
     my $ok = do {
         if (defined $inline) {
@@ -143,7 +142,7 @@ sub AUTOLOAD {
     return if $method =~ /^_/;
     return if $method =~ /(?:\:*?)DESTROY$/;
 
-    $method = (split '::' => $method)[-1];
+    $method = (split /::/, $method)[-1];
 
     die qq/Unknown helper: $method/ unless $self->ctx->app->renderer->helpers->{$method};
 
@@ -169,12 +168,10 @@ sub new {
 
     my $self = $class->SUPER::new(%params);
     $self->renderer($renderer);
-    weaken($self->{renderer});
     $self;
 }
 
-sub renderer      { @_ > 1 ? $_[0]->{renderer}      = $_[1] : $_[0]->{renderer} }
-sub ctx           { @_ > 1 ? $_[0]->{ctx}           = $_[1] : $_[0]->{ctx} }
+sub renderer      { @_ > 1 ? weaken($_[0]->{renderer} = $_[1]) : $_[0]->{renderer} }
 sub options       { @_ > 1 ? $_[0]->{options}       = $_[1] : $_[0]->{options} }
 
 sub _template_modified {
@@ -187,11 +184,11 @@ sub _template_content {
     my ($path) = @_;
 
     my $options = delete $self->{options};
-    
+
     # Convert backslashes to forward slashes to make inline templates work on Windows
     $path =~ s/\\/\//g;
     my ($t) = ($path =~ m{templates\/(.*)$});
-    
+
     if (-r $path) {
         return $self->SUPER::_template_content(@_);
     }
@@ -213,7 +210,7 @@ sub _template_content {
         $data = '';
         $error = "$path: not found";
     }
-    wantarray ? ($data, $error, time) : $data;
+    wantarray ? ($data, $error, time) : $data;  ## no critic (Freenode::Wantarray)
 }
 
 1;
@@ -230,7 +227,7 @@ Mojolicious::Plugin::TtRenderer::Engine - Template Toolkit renderer for Mojolici
 
 =head1 VERSION
 
-version 1.60
+version 1.61
 
 =head1 SYNOPSIS
 
@@ -254,7 +251,7 @@ Add the handler:
              ENCODING => 'UTF-8',
          }
      );
-
+ 
      $self->renderer->add_handler( tt => $tt );
  }
 
@@ -267,7 +264,7 @@ See L<Mojolicious::Plugin::TtRenderer> for details on the plugin interface to th
 This module provides an engine for the rendering of L<Template Toolkit|Template> templates
 within a Mojolicious context.  Templates may be, stored on the local file system, provided
 inline by the controller or included in the C<__DATA__> section.  Where possible this modules
-attempts to provide a TT analogue interface to the L<Perlish templates|Mojo::Template> which 
+attempts to provide a TT analogue interface to the L<Perlish templates|Mojo::Template> which
 come with Mojolicious.
 
 =for stopwords Bjørn
@@ -283,7 +280,7 @@ The template file for C<"example/welcome"> would be C<"templates/welcome.html.tt
 When template file is not available rendering from C<__DATA__> is attempted.
 
  __DATA__
-
+ 
  @@ welcome.html.tt
  Welcome, [% user.name %]!
 
@@ -328,9 +325,9 @@ templates. Will default to a temp-dir if not set.
 
 =head1 SEE ALSO
 
-L<Mojolicious::Plugin::TtRenderer>, 
-L<Mojolicious>, 
-L<Mojolicious::Guides>, 
+L<Mojolicious::Plugin::TtRenderer>,
+L<Mojolicious>,
+L<Mojolicious::Guides>,
 L<http://mojolicious.org>.
 
 =head1 AUTHOR
@@ -374,6 +371,8 @@ uwisser
 Dinis Lage
 
 jay mortensen (GMORTEN)
+
+Matthew Lawrence (MATTLAW)
 
 =head1 COPYRIGHT AND LICENSE
 

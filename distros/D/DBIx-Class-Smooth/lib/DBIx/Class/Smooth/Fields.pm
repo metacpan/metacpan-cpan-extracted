@@ -4,9 +4,9 @@ use warnings;
 
 package DBIx::Class::Smooth::Fields;
 
-# ABSTRACT: Short intro
+# ABSTRACT: Specify columns
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0103';
+our $VERSION = '0.0104';
 
 use Carp qw/croak/;
 use List::Util qw/uniq/;
@@ -16,7 +16,6 @@ use Sub::Exporter::Progressive -setup => {
     exports => [qw/
         true
         false
-        Relationship
         ForeignKey
         BitField
         TinyIntField
@@ -52,7 +51,6 @@ use Sub::Exporter::Progressive -setup => {
     /],
     groups => {
         fields => [qw/
-            Relationship
             ForeignKey
             BitField
             TinyIntField
@@ -321,19 +319,82 @@ __END__
 
 =head1 NAME
 
-DBIx::Class::Smooth::Fields - Short intro
+DBIx::Class::Smooth::Fields - Specify columns
 
 =head1 VERSION
 
-Version 0.0103, released 2020-05-31.
+Version 0.0104, released 2020-08-30.
 
 =head1 SYNOPSIS
 
-    use DBIx::Class::Smooth;
+    package Your::Schema::Result::Book;
+
+    use Your::Schema::Result -components => [qw//];
+    use DBIx::Class::Smooth::Fields -all;
+
+    primary id => IntegerField(auto_increment => true);
+    belongs Publisher => ForeignKey();
+        col isbn => VarcharField(size => 13);
+        col title => VarcharField(size => 150);
+        col published_date => DateField();
+        col language => EnumField(indexed => 1, -list => [qw/english french german spanish/]);
 
 =head1 DESCRIPTION
 
-DBIx::Class::Smooth is ...
+DBIx::Class::Smooth::Fields defines an alternative way to specify columns in DBIx::Class result sources. They make most sense when used together with the functions exported by L<Smooth::Helper::Row::Creation>.
+
+These are just functions that return the hashes that you normally use to configure DBIx::Class columns. With a couple of exceptions, they only set C<data_type> and C<is_numeric>.
+
+Any key-value pairs passed will be included in the returned hash. If you need to use other data types, you can use C<NumericalField> or C<NonNumericalField> which only sets C<is_numeric> to the expected value.
+
+=head2 Relational fields
+
+=head3 ForeignKey()
+
+    belongs Publisher => ForeignKey();
+
+This is not a field type at all, but helps define the relationship with another result source. The heavy lifting is done by C<belongs>, but in short there will be a field named C<publisher_id> with the C<size> and C<data_type> of the C<id> field in C<::Publisher>.
+
+=head2 Numerical fields
+
+These will all have C<is_numeric> set to C<1>, in addition to their respective C<data_type>:
+
+    BitField         bit
+    TinyIntField     tinyint
+    SmallIntField    smallint
+    MediumIntField   mediumint
+    IntegerField     integer
+    BigIntField      bigint
+    SerialField      serial
+    BooleanField     boolean
+    DecimalField     decimal
+    FloatField       float
+    DoubleField      double
+
+=head2 Non-numerical fields
+
+These will all have C<is_numeric> set to C<0>, in addition to their respective C<data_type>:
+
+    VarcharField     varchar
+    CharField        char
+    VarbinaryField   varbinary
+    BinaryField      binary
+    TinyTextField    tinytext
+    TextField        text
+    MediumTextField  mediumtext
+    LongTextField    longtext
+    TinyBlobField    tinyblob
+    BlobField        blob
+    MediumBlobField  mediumblob
+    LongBlobField    longblod
+    EnumField        enum
+    DateField        date
+    DateTimeField    datetime
+    TimestampField   timestamp
+    TimeField        time
+    YearField        year
+
+For C<EnumField>, you can do C<EnumField(-list => [qw/one to three/])> instead of C<EnumField(extra => { list => [qw/one two three/] })>.
 
 =head1 SEE ALSO
 
