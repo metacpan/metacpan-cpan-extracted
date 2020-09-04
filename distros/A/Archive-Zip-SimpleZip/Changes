@@ -1,6 +1,8 @@
 CHANGES
 -------
 
+  0.037 3 September 2020
+
   0.036 3 August 2020
 
         * 111const-deflate.t - fix number of tests

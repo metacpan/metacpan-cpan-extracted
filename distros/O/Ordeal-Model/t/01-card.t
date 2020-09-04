@@ -36,7 +36,7 @@ is $card->content_type, 'image/svg+xml',     'card content-type';
 is $data, 'This is group1-03-wtf.svg', 'card data';
 
 SKIP: {
-   skip 'card listing disabled for the moment';
+   skip 'card listing disabled for the moment', 8;
    my @all = $model->get_cards();
    is scalar(@all), 6, 'got all cards';
 

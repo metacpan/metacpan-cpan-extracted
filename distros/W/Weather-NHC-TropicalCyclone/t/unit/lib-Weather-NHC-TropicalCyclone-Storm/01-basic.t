@@ -40,6 +40,44 @@ my $json = <$dh>;
     }
 }
 
+# simulating HTTP::Tiny->mirror
+{
+    no warnings qw/redefine once/;
+
+    local *HTTP::Tiny::get = sub {
+        return { content => $json, status => 200 };
+    };
+
+    my $url;
+    local *HTTP::Tiny::mirror = sub {
+        ( my $self, $url ) = @_;
+        return { success => 1 };
+    };
+
+    my $obj3 = Weather::NHC::TropicalCyclone->new;
+    $obj3->fetch;
+    for my $s ( @{ $obj3->active_storms } ) {
+        ok my $local_file = $s->fetch_best_track, q{set up to download best track ".dat" file looks good via fetch_best_track};
+        my $expected_name = sprintf( qq{b%s.dat}, $s->id );
+        is $local_file, $expected_name, q{expected best track file name returned};
+        is q{foobar.dat}, $s->fetch_best_track(q{foobar.dat}), q{custom local file honored by fetch_best_track};
+        my $types = $s->_fetch_data_types;
+        for my $type ( keys %$types ) {
+            foreach my $field ( @{ $types->{$type} } ) {
+                my $method = qq{fetch_$field};
+                if ( $s->{$field} ) {
+                    ok $s->$method($type), qq{'$method' set up looks good for URL '$type'};
+                }
+                else {
+                    my $name = $s->name;
+                    my $id   = $s->id;
+                    note qq{Skipping '$method' test because test JSON file doesn't contain an entry for $name/$id};
+                }
+            }
+        }
+    }
+}
+
 done_testing;
 
 __END__

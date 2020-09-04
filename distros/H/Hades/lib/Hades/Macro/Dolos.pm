@@ -2,7 +2,7 @@ package Hades::Macro::Dolos;
 use strict;
 use warnings;
 use base qw/Hades::Macro/;
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -82,8 +82,7 @@ sub autoload_cb {
 	return qq|
 			my (\$cls, \$vn) = (ref \$_[0], q{[^:'[:cntrl:]]{0,1024}});
 			our \$AUTOLOAD =~ /^\${cls}::(\$vn)\$/;
-                	die "illegal key name, must be of \$vn form\\n\\\$AUTOLOAD" unless \$1;
-                	return ${cb}(\$1);
+                	return ${cb}(\$1) if \$1; 
 		|;
 
 }
@@ -585,8 +584,8 @@ Quick summary of what the module does:
 			}
 			Kosmos { 
 				psyche $dolos :t(Int) $eros :t(HashRef) $psyche :t(HashRef) {
-					€if(q|$dolos|,q|€if(q{$dolos > 10},q{return $eros;});|,q|€elsif(q{$dolos > 5},q{€merge_hash_refs(q/$eros/, q/$psyche/);});|,
-						q|€else(q{return $psyche;});|);
+					€if($dolos,€if($dolos > 10, return $eros;);, €elsif($dolos > 5, €merge_hash_refs($eros, $psyche););,
+						€else(return $psyche;););
 					return undef;
 				}
 			}

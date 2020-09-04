@@ -16,12 +16,14 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Weather::NHC::TropicalCyclone",
   "PREREQ_PM" => {
+    "HTML::TreeBuilder" => "5.07",
     "HTTP::Status" => "6.25",
     "HTTP::Tiny" => "0.076",
     "JSON::XS" => "4.02",
-    "Object::Tiny" => "1.09"
+    "Object::Tiny" => "1.09",
+    "Validate::Tiny" => "1.6"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/unit/lib-Weather-NHC-TropicalCyclone-Storm/*.t t/unit/lib-Weather-NHC-TropicalCyclone/*.t"
   }
@@ -29,10 +31,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "HTML::TreeBuilder" => "5.07",
   "HTTP::Status" => "6.25",
   "HTTP::Tiny" => "0.076",
   "JSON::XS" => "4.02",
-  "Object::Tiny" => "1.09"
+  "Object::Tiny" => "1.09",
+  "Validate::Tiny" => "1.6"
 );
 
 

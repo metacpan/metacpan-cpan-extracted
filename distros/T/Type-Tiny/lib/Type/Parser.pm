@@ -6,7 +6,7 @@ use warnings;
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.010005';
+our $VERSION   = '1.010006';
 
 $VERSION =~ tr/_//d;
 
@@ -167,6 +167,7 @@ Evaluate: {
 	
 	sub _simplify
 	{
+		no warnings 'recursion';
 		my $type = shift;
 		my $op   = shift;
 		

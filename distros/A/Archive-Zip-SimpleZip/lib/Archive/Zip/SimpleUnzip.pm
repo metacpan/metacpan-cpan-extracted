@@ -19,7 +19,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleUnzipError);
 
-$VERSION = '0.036';
+$VERSION = '0.037';
 $SimpleUnzipError = '';
 
 @ISA    = qw(IO::Uncompress::Unzip Exporter);
@@ -1042,7 +1042,7 @@ Note that the code assume that the zip archive is being read from a seekable fil
 
 =item * Perl Filehandle interface for reading a zip member.
 
-=item * Supports deflate, store, bzip2 and lzma compression.
+=item * Supports deflate, store, bzip2, Zstandard (Zstd), Xz and lzma compression.
 
 =item * Supports Zip64, so can read archves larger than 4Gig and/or have greater than 64K members.
 
@@ -1332,6 +1332,16 @@ Only if the C<IO-Compress-Bzip2> module is available.
 =item lzma (14)
 
 Only if the C<IO-Compress-Lzma> module is available.
+
+=item Xz (95)
+
+To read Xz content, the module C<IO::Uncompress::UnXz> must
+be installed.
+
+=item Zstandard (93)
+
+To read Zstandard content, the module C<IO::Uncompress::UnZstd> must
+be installed.
 
 =back
 

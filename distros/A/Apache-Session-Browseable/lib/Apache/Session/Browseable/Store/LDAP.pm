@@ -3,7 +3,7 @@ package Apache::Session::Browseable::Store::LDAP;
 use strict;
 use Net::LDAP;
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.3.7';
 
 sub new {
     my $class = shift;
@@ -154,10 +154,18 @@ sub ldap {
         push @servers, $server;
     }
 
+    # Compatibility
+    my $caFile = $self->{args}->{ldapCAFile} || $self->{args}->{caFile};
+    my $caPath = $self->{args}->{ldapCAPath} || $self->{args}->{caPath};
+
     # Connect
     my $ldap = Net::LDAP->new(
         \@servers,
         onerror => undef,
+        verify  => $self->{args}->{ldapVerify} || "require",
+        ( $caFile ? ( cafile => $caFile ) : () ),
+        ( $caPath ? ( capath => $caPath ) : () ),
+
         (
             $self->{args}->{ldapRaw} ? ( raw => $self->{args}->{ldapRaw} )
             : ()
@@ -166,13 +174,15 @@ sub ldap {
             $self->{args}->{ldapPort} ? ( port => $self->{args}->{ldapPort} )
             : ()
         ),
-    ) or die( 'Unable to connect to ' . join( ' ', @servers ) );
+    ) or die( 'Unable to connect to ' . join( ' ', @servers ) . ": " . $@ );
 
     # Start TLS if needed
+
     if ($useTls) {
         my %h = split( /[&=]/, $tlsParam );
-        $h{cafile} = $self->{args}->{caFile} if ( $self->{args}->{caFile} );
-        $h{capath} = $self->{args}->{caPath} if ( $self->{args}->{caPath} );
+        $h{verify} ||= ( $self->{args}->{ldapVerify} || "require" );
+        $h{cafile} ||= $caFile if ($caFile);
+        $h{capath} ||= $caPath if ($caPath);
         my $start_tls = $ldap->start_tls(%h);
         if ( $start_tls->code ) {
             $self->logError($start_tls);

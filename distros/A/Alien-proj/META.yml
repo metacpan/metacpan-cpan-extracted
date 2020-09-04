@@ -3,9 +3,10 @@ abstract: 'Alien package for the PROJ library'
 author:
   - 'Shawn Laffan <shawnlaffan@gmail.com>'
 build_requires:
-  Alien::Build: '1.41'
-  Alien::Build::MM: '1.41'
+  Alien::Build: '2.25'
+  Alien::Build::MM: '1.74'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
+  Alien::Build::Plugin::PkgConfig::PPWrapper: '0'
   Alien::MSYS: '0.07'
   Alien::libtiff: '0'
   Alien::sqlite: '1.06'
@@ -25,10 +26,11 @@ build_requires:
   URI: '0'
   URI::Escape: '0'
 configure_requires:
-  Alien::Build: '1.41'
-  Alien::Build::MM: '1.41'
+  Alien::Build: '2.25'
+  Alien::Build::MM: '1.74'
   Alien::Build::Plugin::Build::SearchDep: '0.53'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
+  Alien::Build::Plugin::Prefer::BadVersion: '1.05'
   Alien::MSYS: '0'
   Alien::sqlite: '1.06'
   ExtUtils::MakeMaker: '6.52'
@@ -38,7 +40,7 @@ configure_requires:
   PkgConfig: '0'
   Sort::Versions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -50,14 +52,14 @@ no_index:
     - inc
 requires:
   Alien::Base: '1.41'
-  Alien::Build: '0.25'
+  Alien::Build: '1.74'
   FFI::CheckLib: '0.23'
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-proj/issues/
   repository: https://github.com/shawnlaffan/perl-alien-proj
-version: '1.13'
+version: '1.14'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.23'
+  generated_by: 'Alien::Build::MM version 2.26'
   requires:
     share:
       Alien::MSYS: '0.07'

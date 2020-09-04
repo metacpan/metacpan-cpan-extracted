@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-MockProxyFrontend",
    "prereqs" : {
@@ -29,15 +29,13 @@
             "URI::Split" : "0",
             "parent" : "0",
             "perl" : "5.014",
-            "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
-            "Test::More" : "0.88"
+            "Test::More" : "0",
+            "strict" : "0"
          }
       }
    },
@@ -52,6 +50,6 @@
          "web" : "https://github.com/ap/Plack-Middleware-MockProxyFrontend"
       }
    },
-   "version" : "0.002"
+   "version" : "0.003"
 }
 

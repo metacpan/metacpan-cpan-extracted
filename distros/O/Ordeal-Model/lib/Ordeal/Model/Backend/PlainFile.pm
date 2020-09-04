@@ -5,7 +5,7 @@ package Ordeal::Model::Backend::PlainFile;
 use 5.020;
 use strict;    # redundant, but still useful to document
 use warnings;
-{ our $VERSION = '0.003'; }
+{ our $VERSION = '0.004'; }
 use Mo qw< default >;
 use Path::Tiny;
 use Ouch;

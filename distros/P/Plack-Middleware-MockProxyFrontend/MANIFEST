@@ -6,7 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+cpanfile
 dist.ini
 lib/Plack/Middleware/MockProxyFrontend.pm
-t/00-compile.t
 t/mockproxyfrontend.t

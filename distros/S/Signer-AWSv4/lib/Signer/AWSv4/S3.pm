@@ -14,7 +14,11 @@ package Signer::AWSv4::S3;
 
   has bucket_host => (is => 'ro', isa => Str, init_arg => undef, lazy => 1, default => sub {
     my $self = shift;
-    's3-' . $self->region . '.amazonaws.com';
+    if ($self->region =~m/us-east-1/i) {
+      return 's3.amazonaws.com';
+    } else {
+      return 's3-' . $self->region . '.amazonaws.com';
+    }
   });
 
   has '+unsigned_payload' => (default => 1);

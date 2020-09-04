@@ -9,7 +9,7 @@ package Ordeal::Model::ChaCha20;
 use 5.020;
 use strict;
 use warnings;
-{ our $VERSION = '0.003'; }
+{ our $VERSION = '0.004'; }
 use Ouch;
 use Mo qw< build default >;
 use experimental qw< signatures postderef >;
@@ -72,6 +72,16 @@ sub _int_rand_parameters ($self, $N) {
    # if there is still space in the cache, this pair will be used many
    # times, so we want to reduce the rejection rate
    if (keys($cache->%*) <= CACHE_SIZE) {
+
+      # The average number of rolls needed to get a non-rejected sample
+      # is the inverse of the acceptance probability:
+      #
+      # $P = $rejected_threshold/$M
+      #
+      # This means that, on average, we will need $nbits * 1 / $P bits for
+      # each successful roll. If this goes beyond $nbits + 1, we might just
+      # as well draw one more bit in the first place and get a non-worse
+      # rejection rate.
       while (($nbits * $M / $reject_threshold) > ($nbits + 1)) {
          $nbits++;
          $M *= 2;

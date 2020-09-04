@@ -31,11 +31,11 @@ subtest 'new' => sub {
 		qr/invalid|type|constraint|greater|atleast/,
 		q{$obj = Hades::Macro::FH->new({ macro => {} })}
 	);
-	eval { $obj = Hades::Macro::FH->new( { macro => 'aporia' } ) };
+	eval { $obj = Hades::Macro::FH->new( { macro => 'curae' } ) };
 	like(
 		$@,
 		qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Macro::FH->new({ macro => 'aporia' })}
+		q{$obj = Hades::Macro::FH->new({ macro => 'curae' })}
 	);
 };
 subtest 'macro' => sub {
@@ -48,9 +48,9 @@ subtest 'macro' => sub {
 	eval { $obj->macro( {} ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->macro({})} );
-	eval { $obj->macro('penthos') };
+	eval { $obj->macro('gaudia') };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->macro('penthos')} );
+		q{$obj->macro('gaudia')} );
 	is_deeply( $obj->macro, ['test'], q{$obj->macro} );
 };
 subtest 'open_write' => sub {
@@ -59,53 +59,53 @@ subtest 'open_write' => sub {
 		q{my $obj = Hades::Macro::FH->new({})}
 	);
 	can_ok( $obj, 'open_write' );
-	eval { $obj->open_write( [], 'phobos', 'limos', 'aporia' ) };
+	eval { $obj->open_write( [], 'curae', 'curae', 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_write([], 'phobos', 'limos', 'aporia')}
+		q{$obj->open_write([], 'curae', 'curae', 'aporia')}
 	);
-	eval { $obj->open_write( 'penthos', 'phobos', 'limos', 'aporia' ) };
+	eval { $obj->open_write( 'phobos', 'curae', 'curae', 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_write('penthos', 'phobos', 'limos', 'aporia')}
+		q{$obj->open_write('phobos', 'curae', 'curae', 'aporia')}
 	);
-	eval { $obj->open_write( bless( {}, 'Test' ), [], 'limos', 'aporia' ) };
+	eval { $obj->open_write( bless( {}, 'Test' ), [], 'curae', 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_write(bless({}, 'Test'), [], 'limos', 'aporia')}
+		q{$obj->open_write(bless({}, 'Test'), [], 'curae', 'aporia')}
 	);
-	eval { $obj->open_write( bless( {}, 'Test' ), \1, 'limos', 'aporia' ) };
+	eval { $obj->open_write( bless( {}, 'Test' ), \1, 'curae', 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_write(bless({}, 'Test'), \1, 'limos', 'aporia')}
+		q{$obj->open_write(bless({}, 'Test'), \1, 'curae', 'aporia')}
 	);
-	eval { $obj->open_write( bless( {}, 'Test' ), 'phobos', [], 'aporia' ) };
+	eval { $obj->open_write( bless( {}, 'Test' ), 'curae', [], 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_write(bless({}, 'Test'), 'phobos', [], 'aporia')}
+		q{$obj->open_write(bless({}, 'Test'), 'curae', [], 'aporia')}
 	);
-	eval { $obj->open_write( bless( {}, 'Test' ), 'phobos', \1, 'aporia' ) };
+	eval { $obj->open_write( bless( {}, 'Test' ), 'curae', \1, 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_write(bless({}, 'Test'), 'phobos', \1, 'aporia')}
+		q{$obj->open_write(bless({}, 'Test'), 'curae', \1, 'aporia')}
 	);
-	eval { $obj->open_write( bless( {}, 'Test' ), 'phobos', 'limos', [] ) };
+	eval { $obj->open_write( bless( {}, 'Test' ), 'curae', 'curae', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_write(bless({}, 'Test'), 'phobos', 'limos', [])}
+		q{$obj->open_write(bless({}, 'Test'), 'curae', 'curae', [])}
 	);
-	eval { $obj->open_write( bless( {}, 'Test' ), 'phobos', 'limos', \1 ) };
+	eval { $obj->open_write( bless( {}, 'Test' ), 'curae', 'curae', \1 ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_write(bless({}, 'Test'), 'phobos', 'limos', \1)}
+		q{$obj->open_write(bless({}, 'Test'), 'curae', 'curae', \1)}
 	);
 };
 subtest 'open_read' => sub {
@@ -114,53 +114,53 @@ subtest 'open_read' => sub {
 		q{my $obj = Hades::Macro::FH->new({})}
 	);
 	can_ok( $obj, 'open_read' );
-	eval { $obj->open_read( [], 'geras', 'phobos', 'penthos' ) };
+	eval { $obj->open_read( [], 'thanatos', 'curae', 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_read([], 'geras', 'phobos', 'penthos')}
+		q{$obj->open_read([], 'thanatos', 'curae', 'phobos')}
 	);
-	eval { $obj->open_read( 'algea', 'geras', 'phobos', 'penthos' ) };
+	eval { $obj->open_read( 'algea', 'thanatos', 'curae', 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_read('algea', 'geras', 'phobos', 'penthos')}
+		q{$obj->open_read('algea', 'thanatos', 'curae', 'phobos')}
 	);
-	eval { $obj->open_read( bless( {}, 'Test' ), [], 'phobos', 'penthos' ) };
+	eval { $obj->open_read( bless( {}, 'Test' ), [], 'curae', 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_read(bless({}, 'Test'), [], 'phobos', 'penthos')}
+		q{$obj->open_read(bless({}, 'Test'), [], 'curae', 'phobos')}
 	);
-	eval { $obj->open_read( bless( {}, 'Test' ), \1, 'phobos', 'penthos' ) };
+	eval { $obj->open_read( bless( {}, 'Test' ), \1, 'curae', 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_read(bless({}, 'Test'), \1, 'phobos', 'penthos')}
+		q{$obj->open_read(bless({}, 'Test'), \1, 'curae', 'phobos')}
 	);
-	eval { $obj->open_read( bless( {}, 'Test' ), 'geras', [], 'penthos' ) };
+	eval { $obj->open_read( bless( {}, 'Test' ), 'thanatos', [], 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_read(bless({}, 'Test'), 'geras', [], 'penthos')}
+		q{$obj->open_read(bless({}, 'Test'), 'thanatos', [], 'phobos')}
 	);
-	eval { $obj->open_read( bless( {}, 'Test' ), 'geras', \1, 'penthos' ) };
+	eval { $obj->open_read( bless( {}, 'Test' ), 'thanatos', \1, 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_read(bless({}, 'Test'), 'geras', \1, 'penthos')}
+		q{$obj->open_read(bless({}, 'Test'), 'thanatos', \1, 'phobos')}
 	);
-	eval { $obj->open_read( bless( {}, 'Test' ), 'geras', 'phobos', [] ) };
+	eval { $obj->open_read( bless( {}, 'Test' ), 'thanatos', 'curae', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_read(bless({}, 'Test'), 'geras', 'phobos', [])}
+		q{$obj->open_read(bless({}, 'Test'), 'thanatos', 'curae', [])}
 	);
-	eval { $obj->open_read( bless( {}, 'Test' ), 'geras', 'phobos', \1 ) };
+	eval { $obj->open_read( bless( {}, 'Test' ), 'thanatos', 'curae', \1 ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->open_read(bless({}, 'Test'), 'geras', 'phobos', \1)}
+		q{$obj->open_read(bless({}, 'Test'), 'thanatos', 'curae', \1)}
 	);
 };
 subtest 'close_file' => sub {
@@ -169,41 +169,41 @@ subtest 'close_file' => sub {
 		q{my $obj = Hades::Macro::FH->new({})}
 	);
 	can_ok( $obj, 'close_file' );
-	eval { $obj->close_file( [], 'nosoi', 'hypnos' ) };
+	eval { $obj->close_file( [], 'gaudia', 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->close_file([], 'nosoi', 'hypnos')}
+		q{$obj->close_file([], 'gaudia', 'curae')}
 	);
-	eval { $obj->close_file( 'curae', 'nosoi', 'hypnos' ) };
+	eval { $obj->close_file( 'geras', 'gaudia', 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->close_file('curae', 'nosoi', 'hypnos')}
+		q{$obj->close_file('geras', 'gaudia', 'curae')}
 	);
-	eval { $obj->close_file( bless( {}, 'Test' ), [], 'hypnos' ) };
+	eval { $obj->close_file( bless( {}, 'Test' ), [], 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->close_file(bless({}, 'Test'), [], 'hypnos')}
+		q{$obj->close_file(bless({}, 'Test'), [], 'curae')}
 	);
-	eval { $obj->close_file( bless( {}, 'Test' ), \1, 'hypnos' ) };
+	eval { $obj->close_file( bless( {}, 'Test' ), \1, 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->close_file(bless({}, 'Test'), \1, 'hypnos')}
+		q{$obj->close_file(bless({}, 'Test'), \1, 'curae')}
 	);
-	eval { $obj->close_file( bless( {}, 'Test' ), 'nosoi', [] ) };
+	eval { $obj->close_file( bless( {}, 'Test' ), 'gaudia', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->close_file(bless({}, 'Test'), 'nosoi', [])}
+		q{$obj->close_file(bless({}, 'Test'), 'gaudia', [])}
 	);
-	eval { $obj->close_file( bless( {}, 'Test' ), 'nosoi', \1 ) };
+	eval { $obj->close_file( bless( {}, 'Test' ), 'gaudia', \1 ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->close_file(bless({}, 'Test'), 'nosoi', \1)}
+		q{$obj->close_file(bless({}, 'Test'), 'gaudia', \1)}
 	);
 };
 subtest 'read_file' => sub {
@@ -212,53 +212,53 @@ subtest 'read_file' => sub {
 		q{my $obj = Hades::Macro::FH->new({})}
 	);
 	can_ok( $obj, 'read_file' );
-	eval { $obj->read_file( [], 'limos', 'limos', 'hypnos' ) };
+	eval { $obj->read_file( [], 'penthos', 'hypnos', 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->read_file([], 'limos', 'limos', 'hypnos')}
+		q{$obj->read_file([], 'penthos', 'hypnos', 'limos')}
 	);
-	eval { $obj->read_file( 'limos', 'limos', 'limos', 'hypnos' ) };
+	eval { $obj->read_file( 'aporia', 'penthos', 'hypnos', 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->read_file('limos', 'limos', 'limos', 'hypnos')}
+		q{$obj->read_file('aporia', 'penthos', 'hypnos', 'limos')}
 	);
-	eval { $obj->read_file( bless( {}, 'Test' ), [], 'limos', 'hypnos' ) };
+	eval { $obj->read_file( bless( {}, 'Test' ), [], 'hypnos', 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->read_file(bless({}, 'Test'), [], 'limos', 'hypnos')}
+		q{$obj->read_file(bless({}, 'Test'), [], 'hypnos', 'limos')}
 	);
-	eval { $obj->read_file( bless( {}, 'Test' ), \1, 'limos', 'hypnos' ) };
+	eval { $obj->read_file( bless( {}, 'Test' ), \1, 'hypnos', 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->read_file(bless({}, 'Test'), \1, 'limos', 'hypnos')}
+		q{$obj->read_file(bless({}, 'Test'), \1, 'hypnos', 'limos')}
 	);
-	eval { $obj->read_file( bless( {}, 'Test' ), 'limos', [], 'hypnos' ) };
+	eval { $obj->read_file( bless( {}, 'Test' ), 'penthos', [], 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->read_file(bless({}, 'Test'), 'limos', [], 'hypnos')}
+		q{$obj->read_file(bless({}, 'Test'), 'penthos', [], 'limos')}
 	);
-	eval { $obj->read_file( bless( {}, 'Test' ), 'limos', \1, 'hypnos' ) };
+	eval { $obj->read_file( bless( {}, 'Test' ), 'penthos', \1, 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->read_file(bless({}, 'Test'), 'limos', \1, 'hypnos')}
+		q{$obj->read_file(bless({}, 'Test'), 'penthos', \1, 'limos')}
 	);
-	eval { $obj->read_file( bless( {}, 'Test' ), 'limos', 'limos', [] ) };
+	eval { $obj->read_file( bless( {}, 'Test' ), 'penthos', 'hypnos', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->read_file(bless({}, 'Test'), 'limos', 'limos', [])}
+		q{$obj->read_file(bless({}, 'Test'), 'penthos', 'hypnos', [])}
 	);
-	eval { $obj->read_file( bless( {}, 'Test' ), 'limos', 'limos', \1 ) };
+	eval { $obj->read_file( bless( {}, 'Test' ), 'penthos', 'hypnos', \1 ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->read_file(bless({}, 'Test'), 'limos', 'limos', \1)}
+		q{$obj->read_file(bless({}, 'Test'), 'penthos', 'hypnos', \1)}
 	);
 };
 subtest 'write_file' => sub {
@@ -267,75 +267,71 @@ subtest 'write_file' => sub {
 		q{my $obj = Hades::Macro::FH->new({})}
 	);
 	can_ok( $obj, 'write_file' );
-	eval { $obj->write_file( [], 'gaudia', 'aporia', 'phobos', 'limos' ) };
+	eval { $obj->write_file( [], 'algea', 'algea', 'geras', 'hypnos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->write_file([], 'gaudia', 'aporia', 'phobos', 'limos')}
+		q{$obj->write_file([], 'algea', 'algea', 'geras', 'hypnos')}
 	);
-	eval {
-		$obj->write_file( 'nosoi', 'gaudia', 'aporia', 'phobos', 'limos' );
-	};
+	eval { $obj->write_file( 'phobos', 'algea', 'algea', 'geras', 'hypnos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->write_file('nosoi', 'gaudia', 'aporia', 'phobos', 'limos')}
+		q{$obj->write_file('phobos', 'algea', 'algea', 'geras', 'hypnos')}
 	);
 	eval {
 		$obj->write_file( bless( {}, 'Test' ),
-			[], 'aporia', 'phobos', 'limos' );
+			[], 'algea', 'geras', 'hypnos' );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->write_file(bless({}, 'Test'), [], 'aporia', 'phobos', 'limos')}
+		q{$obj->write_file(bless({}, 'Test'), [], 'algea', 'geras', 'hypnos')}
 	);
 	eval {
 		$obj->write_file( bless( {}, 'Test' ),
-			\1, 'aporia', 'phobos', 'limos' );
+			\1, 'algea', 'geras', 'hypnos' );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->write_file(bless({}, 'Test'), \1, 'aporia', 'phobos', 'limos')}
+		q{$obj->write_file(bless({}, 'Test'), \1, 'algea', 'geras', 'hypnos')}
 	);
 	eval {
 		$obj->write_file( bless( {}, 'Test' ),
-			'gaudia', [], 'phobos', 'limos' );
+			'algea', [], 'geras', 'hypnos' );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->write_file(bless({}, 'Test'), 'gaudia', [], 'phobos', 'limos')}
+		q{$obj->write_file(bless({}, 'Test'), 'algea', [], 'geras', 'hypnos')}
 	);
 	eval {
 		$obj->write_file( bless( {}, 'Test' ),
-			'gaudia', \1, 'phobos', 'limos' );
+			'algea', \1, 'geras', 'hypnos' );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->write_file(bless({}, 'Test'), 'gaudia', \1, 'phobos', 'limos')}
+		q{$obj->write_file(bless({}, 'Test'), 'algea', \1, 'geras', 'hypnos')}
 	);
 	eval {
 		$obj->write_file( bless( {}, 'Test' ),
-			'gaudia', 'aporia', [], 'limos' );
+			'algea', 'algea', [], 'hypnos' );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->write_file(bless({}, 'Test'), 'gaudia', 'aporia', [], 'limos')}
+		q{$obj->write_file(bless({}, 'Test'), 'algea', 'algea', [], 'hypnos')}
 	);
 	eval {
 		$obj->write_file( bless( {}, 'Test' ),
-			'gaudia', 'aporia', \1, 'limos' );
+			'algea', 'algea', \1, 'hypnos' );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->write_file(bless({}, 'Test'), 'gaudia', 'aporia', \1, 'limos')}
+		q{$obj->write_file(bless({}, 'Test'), 'algea', 'algea', \1, 'hypnos')}
 	);
 	eval {
-		$obj->write_file( bless( {}, 'Test' ),
-			'gaudia', 'aporia', 'phobos', [] );
+		$obj->write_file( bless( {}, 'Test' ), 'algea', 'algea', 'geras', [] );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->write_file(bless({}, 'Test'), 'gaudia', 'aporia', 'phobos', [])}
+		q{$obj->write_file(bless({}, 'Test'), 'algea', 'algea', 'geras', [])}
 	);
 	eval {
-		$obj->write_file( bless( {}, 'Test' ),
-			'gaudia', 'aporia', 'phobos', \1 );
+		$obj->write_file( bless( {}, 'Test' ), 'algea', 'algea', 'geras', \1 );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->write_file(bless({}, 'Test'), 'gaudia', 'aporia', 'phobos', \1)}
+		q{$obj->write_file(bless({}, 'Test'), 'algea', 'algea', 'geras', \1)}
 	);
 };
 done_testing();

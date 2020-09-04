@@ -7,6 +7,21 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.010006	2020-09-04
+
+ [ Bug Fixes ]
+ - Eliminate recusion warnings when Type::Parser needs to parse complex
+   types.
+   Fixes RT#121957.
+   Diab Jerius++
+   <https://rt.cpan.org/Ticket/Display.html?id=121957>
+
+ [ Other ]
+ - Better handling of coercions for pre-declared types in Type::Library.
+   The type objects created before the type was properly defined will now
+   lazily attempt to find coercions from the properly defined type once it
+   becomes available.
+
 1.010005	2020-08-26
 
  - Improvements to $AvoidCallbacks support for

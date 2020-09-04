@@ -287,74 +287,104 @@ FLAG-ACCESSOR METHODS
     is available a character at a time, echo is disabled, and all special
     processing of input and output characters is disabled.
 
- getflag_opost
+ getflag_FLAG
 
- setflag_opost
+ setflag_FLAG
 
-       $mode = $term->getflag_opost
+       $mode = $term->getflag_FLAG
     
-       $term->setflag_opost( $mode )
+       $term->setflag_FLAG( $mode )
+
+    Accessors for various control flags. The following methods are defined
+    for specific flags:
+
+  inlcr
+
+    Since version 0.09.
+
+    The INLCR bit of the c_iflag. This translates NL to CR on input.
+
+  igncr
+
+    Since version 0.09.
+
+    The IGNCR bit of the c_iflag. This ignores incoming CR characters.
+
+  icrnl
+
+    Since version 0.09.
+
+    The ICRNL bit of the c_iflag. This translates CR to NL on input, unless
+    IGNCR is also set.
+
+  ignbrk
+
+    Since version 0.09.
+
+    The IGNBRK bit of the c_iflag. This controls whether incoming break
+    conditions are ignored entirely.
+
+  brkint
+
+    Since version 0.09.
+
+    The BRKINT bit of the c_iflag. This controls whether non-ignored
+    incoming break conditions result in a SIGINT signal being delivered to
+    the process. If not, such a condition reads as a nul byte.
+
+  parmrk
+
+    Since version 0.09.
+
+    The PARMRK bit of the c_iflag. This controls how parity errors and
+    break conditions are handled.
+
+  opost
 
     Since version 0.07.
 
-    Accessor for the OPOST bit of the c_oflag. This enables system-specific
+    The OPOST bit of the c_oflag. This enables system-specific
     post-processing on output.
 
- getflag_cread
+  cread
 
- setflag_cread
+    The CREAD bit of the c_cflag. This enables the receiver.
 
-       $mode = $term->getflag_cread
-    
-       $term->setflag_cread( $mode )
+  hupcl
 
-    Accessor for the CREAD bit of the c_cflag. This enables the receiver.
+    The HUPCL bit of the c_cflag. This lowers the modem control lines after
+    the last process closes the device.
 
- getflag_hupcl
+  clocal
 
- setflag_hupcl
+    The CLOCAL bit of the c_cflag. This controls whether local mode is
+    enabled; which if set, ignores modem control lines.
 
-       $mode = $term->getflag_hupcl
-    
-       $term->setflag_hupcl( $mode )
+  icanon
 
-    Accessor for the HUPCL bit of the c_cflag. This lowers the modem
-    control lines after the last process closes the device.
+    The ICANON bit of c_lflag. This is called "canonical" mode and controls
+    whether the terminal's line-editing feature will be used to return a
+    whole line (if true), or if individual bytes from keystrokes will be
+    returned as they are available (if false).
 
- getflag_clocal
+  echo
 
- setflag_clocal
+    The ECHO bit of c_lflag. This controls whether input characters are
+    echoed back to the terminal.
 
-       $mode = $term->getflag_clocal
-    
-       $term->setflag_clocal( $mode )
+ setflags
 
-    Accessor for the CLOCAL bit of the c_cflag. This controls whether local
-    mode is enabled; which if set, ignores modem control lines.
+       $term->setflags( @flags )
 
- getflag_icanon
+    Since version 0.09.
 
- setflag_icanon
+    A convenient wrapper to calling multiple flag setting methods in a
+    sequence.
 
-       $mode = $term->getflag_icanon
-    
-       $term->setflag_icanon( $mode )
+    Each flag is specified by name, in lower case, prefixed by either a +
+    symbol to enable it, or - to disable. For example:
 
-    Accessor for the ICANON bit of c_lflag. This is called "canonical" mode
-    and controls whether the terminal's line-editing feature will be used
-    to return a whole line (if true), or if individual bytes from
-    keystrokes will be returned as they are available (if false).
-
- getflag_echo
-
- setflag_echo
-
-       $mode = $term->getflag_echo
-    
-       $term->setflag_echo( $mode )
-
-    Accessor for the ECHO bit of c_lflag. This controls whether input
-    characters are echoed back to the terminal.
+       $term->setflags( "+igncr", "+opost", "+clocal", "-echo" );
 
 TODO
 

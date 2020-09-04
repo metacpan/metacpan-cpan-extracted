@@ -63,11 +63,11 @@ subtest 'new' => sub {
 		qr/invalid|type|constraint|greater|atleast/,
 		q{$obj = Hades::Macro::Dolos->new({ macro => {} })}
 	);
-	eval { $obj = Hades::Macro::Dolos->new( { macro => 'thanatos' } ) };
+	eval { $obj = Hades::Macro::Dolos->new( { macro => 'limos' } ) };
 	like(
 		$@,
 		qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Macro::Dolos->new({ macro => 'thanatos' })}
+		q{$obj = Hades::Macro::Dolos->new({ macro => 'limos' })}
 	);
 };
 subtest 'macro' => sub {
@@ -80,9 +80,9 @@ subtest 'macro' => sub {
 	eval { $obj->macro( {} ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->macro({})} );
-	eval { $obj->macro('aporia') };
+	eval { $obj->macro('thanatos') };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->macro('aporia')} );
+		q{$obj->macro('thanatos')} );
 	is_deeply( $obj->macro, ['test'], q{$obj->macro} );
 };
 subtest 'autoload_cb' => sub {
@@ -91,17 +91,17 @@ subtest 'autoload_cb' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'autoload_cb' );
-	eval { $obj->autoload_cb( [], 'gaudia' ) };
+	eval { $obj->autoload_cb( [], 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->autoload_cb([], 'gaudia')}
+		q{$obj->autoload_cb([], 'curae')}
 	);
-	eval { $obj->autoload_cb( 'hypnos', 'gaudia' ) };
+	eval { $obj->autoload_cb( 'nosoi', 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->autoload_cb('hypnos', 'gaudia')}
+		q{$obj->autoload_cb('nosoi', 'curae')}
 	);
 	eval { $obj->autoload_cb( bless( {}, 'Test' ), [] ) };
 	like(
@@ -122,17 +122,17 @@ subtest 'caller' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'caller' );
-	eval { $obj->caller( [], 'aporia' ) };
+	eval { $obj->caller( [], 'penthos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->caller([], 'aporia')}
+		q{$obj->caller([], 'penthos')}
 	);
-	eval { $obj->caller( 'aporia', 'aporia' ) };
+	eval { $obj->caller( 'curae', 'penthos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->caller('aporia', 'aporia')}
+		q{$obj->caller('curae', 'penthos')}
 	);
 	eval { $obj->caller( bless( {}, 'Test' ), [] ) };
 	like(
@@ -153,41 +153,41 @@ subtest 'clear_unless_keys' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'clear_unless_keys' );
-	eval { $obj->clear_unless_keys( [], 'gaudia', 'hypnos' ) };
+	eval { $obj->clear_unless_keys( [], 'algea', 'penthos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->clear_unless_keys([], 'gaudia', 'hypnos')}
+		q{$obj->clear_unless_keys([], 'algea', 'penthos')}
 	);
-	eval { $obj->clear_unless_keys( 'penthos', 'gaudia', 'hypnos' ) };
+	eval { $obj->clear_unless_keys( 'nosoi', 'algea', 'penthos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->clear_unless_keys('penthos', 'gaudia', 'hypnos')}
+		q{$obj->clear_unless_keys('nosoi', 'algea', 'penthos')}
 	);
-	eval { $obj->clear_unless_keys( bless( {}, 'Test' ), [], 'hypnos' ) };
+	eval { $obj->clear_unless_keys( bless( {}, 'Test' ), [], 'penthos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->clear_unless_keys(bless({}, 'Test'), [], 'hypnos')}
+		q{$obj->clear_unless_keys(bless({}, 'Test'), [], 'penthos')}
 	);
-	eval { $obj->clear_unless_keys( bless( {}, 'Test' ), \1, 'hypnos' ) };
+	eval { $obj->clear_unless_keys( bless( {}, 'Test' ), \1, 'penthos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->clear_unless_keys(bless({}, 'Test'), \1, 'hypnos')}
+		q{$obj->clear_unless_keys(bless({}, 'Test'), \1, 'penthos')}
 	);
-	eval { $obj->clear_unless_keys( bless( {}, 'Test' ), 'gaudia', [] ) };
+	eval { $obj->clear_unless_keys( bless( {}, 'Test' ), 'algea', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->clear_unless_keys(bless({}, 'Test'), 'gaudia', [])}
+		q{$obj->clear_unless_keys(bless({}, 'Test'), 'algea', [])}
 	);
-	eval { $obj->clear_unless_keys( bless( {}, 'Test' ), 'gaudia', \1 ) };
+	eval { $obj->clear_unless_keys( bless( {}, 'Test' ), 'algea', \1 ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->clear_unless_keys(bless({}, 'Test'), 'gaudia', \1)}
+		q{$obj->clear_unless_keys(bless({}, 'Test'), 'algea', \1)}
 	);
 };
 subtest 'call_sub' => sub {
@@ -196,17 +196,17 @@ subtest 'call_sub' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'call_sub' );
-	eval { $obj->call_sub( [], 'hypnos', 'geras' ) };
+	eval { $obj->call_sub( [], 'curae', 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->call_sub([], 'hypnos', 'geras')}
+		q{$obj->call_sub([], 'curae', 'curae')}
 	);
-	eval { $obj->call_sub( 'limos', 'hypnos', 'geras' ) };
+	eval { $obj->call_sub( 'algea', 'curae', 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->call_sub('limos', 'hypnos', 'geras')}
+		q{$obj->call_sub('algea', 'curae', 'curae')}
 	);
 };
 subtest 'call_sub_my' => sub {
@@ -215,29 +215,29 @@ subtest 'call_sub_my' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'call_sub_my' );
-	eval { $obj->call_sub_my( [], 'curae', 'limos', 'curae' ) };
+	eval { $obj->call_sub_my( [], 'limos', 'geras', 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->call_sub_my([], 'curae', 'limos', 'curae')}
+		q{$obj->call_sub_my([], 'limos', 'geras', 'aporia')}
 	);
-	eval { $obj->call_sub_my( 'penthos', 'curae', 'limos', 'curae' ) };
+	eval { $obj->call_sub_my( 'hypnos', 'limos', 'geras', 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->call_sub_my('penthos', 'curae', 'limos', 'curae')}
+		q{$obj->call_sub_my('hypnos', 'limos', 'geras', 'aporia')}
 	);
-	eval { $obj->call_sub_my( bless( {}, 'Test' ), [], 'limos', 'curae' ) };
+	eval { $obj->call_sub_my( bless( {}, 'Test' ), [], 'geras', 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->call_sub_my(bless({}, 'Test'), [], 'limos', 'curae')}
+		q{$obj->call_sub_my(bless({}, 'Test'), [], 'geras', 'aporia')}
 	);
-	eval { $obj->call_sub_my( bless( {}, 'Test' ), \1, 'limos', 'curae' ) };
+	eval { $obj->call_sub_my( bless( {}, 'Test' ), \1, 'geras', 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->call_sub_my(bless({}, 'Test'), \1, 'limos', 'curae')}
+		q{$obj->call_sub_my(bless({}, 'Test'), \1, 'geras', 'aporia')}
 	);
 };
 subtest 'delete' => sub {
@@ -253,10 +253,10 @@ subtest 'delete' => sub {
 		q{$obj->delete([], 'thanatos', 'gaudia', undef, undef, undef)}
 	);
 	eval {
-		$obj->delete( 'gaudia', 'thanatos', 'gaudia', undef, undef, undef );
+		$obj->delete( 'penthos', 'thanatos', 'gaudia', undef, undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->delete('gaudia', 'thanatos', 'gaudia', undef, undef, undef)}
+		q{$obj->delete('penthos', 'thanatos', 'gaudia', undef, undef, undef)}
 	);
 	eval {
 		$obj->delete( bless( {}, 'Test' ), [], 'gaudia', undef, undef, undef );
@@ -333,41 +333,41 @@ subtest 'die_unless_keys' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'die_unless_keys' );
-	eval { $obj->die_unless_keys( [], 'nosoi', 'hypnos' ) };
+	eval { $obj->die_unless_keys( [], 'aporia', 'thanatos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->die_unless_keys([], 'nosoi', 'hypnos')}
+		q{$obj->die_unless_keys([], 'aporia', 'thanatos')}
 	);
-	eval { $obj->die_unless_keys( 'geras', 'nosoi', 'hypnos' ) };
+	eval { $obj->die_unless_keys( 'gaudia', 'aporia', 'thanatos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->die_unless_keys('geras', 'nosoi', 'hypnos')}
+		q{$obj->die_unless_keys('gaudia', 'aporia', 'thanatos')}
 	);
-	eval { $obj->die_unless_keys( bless( {}, 'Test' ), [], 'hypnos' ) };
+	eval { $obj->die_unless_keys( bless( {}, 'Test' ), [], 'thanatos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->die_unless_keys(bless({}, 'Test'), [], 'hypnos')}
+		q{$obj->die_unless_keys(bless({}, 'Test'), [], 'thanatos')}
 	);
-	eval { $obj->die_unless_keys( bless( {}, 'Test' ), \1, 'hypnos' ) };
+	eval { $obj->die_unless_keys( bless( {}, 'Test' ), \1, 'thanatos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->die_unless_keys(bless({}, 'Test'), \1, 'hypnos')}
+		q{$obj->die_unless_keys(bless({}, 'Test'), \1, 'thanatos')}
 	);
-	eval { $obj->die_unless_keys( bless( {}, 'Test' ), 'nosoi', [] ) };
+	eval { $obj->die_unless_keys( bless( {}, 'Test' ), 'aporia', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->die_unless_keys(bless({}, 'Test'), 'nosoi', [])}
+		q{$obj->die_unless_keys(bless({}, 'Test'), 'aporia', [])}
 	);
-	eval { $obj->die_unless_keys( bless( {}, 'Test' ), 'nosoi', \1 ) };
+	eval { $obj->die_unless_keys( bless( {}, 'Test' ), 'aporia', \1 ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->die_unless_keys(bless({}, 'Test'), 'nosoi', \1)}
+		q{$obj->die_unless_keys(bless({}, 'Test'), 'aporia', \1)}
 	);
 };
 subtest 'else' => sub {
@@ -376,17 +376,17 @@ subtest 'else' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'else' );
-	eval { $obj->else( [], 'limos' ) };
+	eval { $obj->else( [], 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->else([], 'limos')}
+		q{$obj->else([], 'aporia')}
 	);
-	eval { $obj->else( 'aporia', 'limos' ) };
+	eval { $obj->else( 'curae', 'aporia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->else('aporia', 'limos')}
+		q{$obj->else('curae', 'aporia')}
 	);
 };
 subtest 'elsif' => sub {
@@ -395,29 +395,29 @@ subtest 'elsif' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'elsif' );
-	eval { $obj->elsif( [], 'algea', 'thanatos' ) };
+	eval { $obj->elsif( [], 'limos', 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->elsif([], 'algea', 'thanatos')}
+		q{$obj->elsif([], 'limos', 'curae')}
 	);
-	eval { $obj->elsif( 'curae', 'algea', 'thanatos' ) };
+	eval { $obj->elsif( 'thanatos', 'limos', 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->elsif('curae', 'algea', 'thanatos')}
+		q{$obj->elsif('thanatos', 'limos', 'curae')}
 	);
-	eval { $obj->elsif( bless( {}, 'Test' ), [], 'thanatos' ) };
+	eval { $obj->elsif( bless( {}, 'Test' ), [], 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->elsif(bless({}, 'Test'), [], 'thanatos')}
+		q{$obj->elsif(bless({}, 'Test'), [], 'curae')}
 	);
-	eval { $obj->elsif( bless( {}, 'Test' ), \1, 'thanatos' ) };
+	eval { $obj->elsif( bless( {}, 'Test' ), \1, 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->elsif(bless({}, 'Test'), \1, 'thanatos')}
+		q{$obj->elsif(bless({}, 'Test'), \1, 'curae')}
 	);
 };
 subtest 'export' => sub {
@@ -426,68 +426,68 @@ subtest 'export' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'export' );
-	eval { $obj->export( [], 'aporia', 'algea', 10, 'algea' ) };
+	eval { $obj->export( [], 'geras', 'hypnos', 10, 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->export([], 'aporia', 'algea', 10, 'algea')}
+		q{$obj->export([], 'geras', 'hypnos', 10, 'phobos')}
 	);
-	eval { $obj->export( 'algea', 'aporia', 'algea', 10, 'algea' ) };
+	eval { $obj->export( 'curae', 'geras', 'hypnos', 10, 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->export('algea', 'aporia', 'algea', 10, 'algea')}
+		q{$obj->export('curae', 'geras', 'hypnos', 10, 'phobos')}
 	);
-	eval { $obj->export( bless( {}, 'Test' ), [], 'algea', 10, 'algea' ) };
+	eval { $obj->export( bless( {}, 'Test' ), [], 'hypnos', 10, 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->export(bless({}, 'Test'), [], 'algea', 10, 'algea')}
+		q{$obj->export(bless({}, 'Test'), [], 'hypnos', 10, 'phobos')}
 	);
-	eval { $obj->export( bless( {}, 'Test' ), \1, 'algea', 10, 'algea' ) };
+	eval { $obj->export( bless( {}, 'Test' ), \1, 'hypnos', 10, 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->export(bless({}, 'Test'), \1, 'algea', 10, 'algea')}
+		q{$obj->export(bless({}, 'Test'), \1, 'hypnos', 10, 'phobos')}
 	);
-	eval { $obj->export( bless( {}, 'Test' ), 'aporia', [], 10, 'algea' ) };
+	eval { $obj->export( bless( {}, 'Test' ), 'geras', [], 10, 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->export(bless({}, 'Test'), 'aporia', [], 10, 'algea')}
+		q{$obj->export(bless({}, 'Test'), 'geras', [], 10, 'phobos')}
 	);
-	eval { $obj->export( bless( {}, 'Test' ), 'aporia', \1, 10, 'algea' ) };
+	eval { $obj->export( bless( {}, 'Test' ), 'geras', \1, 10, 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->export(bless({}, 'Test'), 'aporia', \1, 10, 'algea')}
+		q{$obj->export(bless({}, 'Test'), 'geras', \1, 10, 'phobos')}
 	);
 	eval {
-		$obj->export( bless( {}, 'Test' ), 'aporia', 'algea', [], 'algea' );
+		$obj->export( bless( {}, 'Test' ), 'geras', 'hypnos', [], 'phobos' );
 	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->export(bless({}, 'Test'), 'aporia', 'algea', [], 'algea')}
+		q{$obj->export(bless({}, 'Test'), 'geras', 'hypnos', [], 'phobos')}
 	);
 	eval {
 		$obj->export( bless( {}, 'Test' ),
-			'aporia', 'algea', 'gaudia', 'algea' );
+			'geras', 'hypnos', 'thanatos', 'phobos' );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->export(bless({}, 'Test'), 'aporia', 'algea', 'gaudia', 'algea')}
+		q{$obj->export(bless({}, 'Test'), 'geras', 'hypnos', 'thanatos', 'phobos')}
 	);
-	eval { $obj->export( bless( {}, 'Test' ), 'aporia', 'algea', 10, [] ) };
+	eval { $obj->export( bless( {}, 'Test' ), 'geras', 'hypnos', 10, [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->export(bless({}, 'Test'), 'aporia', 'algea', 10, [])}
+		q{$obj->export(bless({}, 'Test'), 'geras', 'hypnos', 10, [])}
 	);
-	eval { $obj->export( bless( {}, 'Test' ), 'aporia', 'algea', 10, \1 ) };
+	eval { $obj->export( bless( {}, 'Test' ), 'geras', 'hypnos', 10, \1 ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->export(bless({}, 'Test'), 'aporia', 'algea', 10, \1)}
+		q{$obj->export(bless({}, 'Test'), 'geras', 'hypnos', 10, \1)}
 	);
 };
 subtest 'for' => sub {
@@ -496,29 +496,29 @@ subtest 'for' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'for' );
-	eval { $obj->for( [], 'algea', 'phobos' ) };
+	eval { $obj->for( [], 'thanatos', 'nosoi' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for([], 'algea', 'phobos')}
+		q{$obj->for([], 'thanatos', 'nosoi')}
 	);
-	eval { $obj->for( 'geras', 'algea', 'phobos' ) };
+	eval { $obj->for( 'geras', 'thanatos', 'nosoi' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for('geras', 'algea', 'phobos')}
+		q{$obj->for('geras', 'thanatos', 'nosoi')}
 	);
-	eval { $obj->for( bless( {}, 'Test' ), [], 'phobos' ) };
+	eval { $obj->for( bless( {}, 'Test' ), [], 'nosoi' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for(bless({}, 'Test'), [], 'phobos')}
+		q{$obj->for(bless({}, 'Test'), [], 'nosoi')}
 	);
-	eval { $obj->for( bless( {}, 'Test' ), \1, 'phobos' ) };
+	eval { $obj->for( bless( {}, 'Test' ), \1, 'nosoi' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for(bless({}, 'Test'), \1, 'phobos')}
+		q{$obj->for(bless({}, 'Test'), \1, 'nosoi')}
 	);
 };
 subtest 'foreach' => sub {
@@ -527,29 +527,29 @@ subtest 'foreach' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'foreach' );
-	eval { $obj->foreach( [], 'penthos', 'aporia' ) };
+	eval { $obj->foreach( [], 'geras', 'nosoi' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->foreach([], 'penthos', 'aporia')}
+		q{$obj->foreach([], 'geras', 'nosoi')}
 	);
-	eval { $obj->foreach( 'hypnos', 'penthos', 'aporia' ) };
+	eval { $obj->foreach( 'algea', 'geras', 'nosoi' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->foreach('hypnos', 'penthos', 'aporia')}
+		q{$obj->foreach('algea', 'geras', 'nosoi')}
 	);
-	eval { $obj->foreach( bless( {}, 'Test' ), [], 'aporia' ) };
+	eval { $obj->foreach( bless( {}, 'Test' ), [], 'nosoi' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->foreach(bless({}, 'Test'), [], 'aporia')}
+		q{$obj->foreach(bless({}, 'Test'), [], 'nosoi')}
 	);
-	eval { $obj->foreach( bless( {}, 'Test' ), \1, 'aporia' ) };
+	eval { $obj->foreach( bless( {}, 'Test' ), \1, 'nosoi' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->foreach(bless({}, 'Test'), \1, 'aporia')}
+		q{$obj->foreach(bless({}, 'Test'), \1, 'nosoi')}
 	);
 };
 subtest 'for_keys' => sub {
@@ -558,41 +558,41 @@ subtest 'for_keys' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'for_keys' );
-	eval { $obj->for_keys( [], 'algea', 'thanatos', 'aporia' ) };
+	eval { $obj->for_keys( [], 'phobos', 'algea', 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_keys([], 'algea', 'thanatos', 'aporia')}
+		q{$obj->for_keys([], 'phobos', 'algea', 'limos')}
 	);
-	eval { $obj->for_keys( 'gaudia', 'algea', 'thanatos', 'aporia' ) };
+	eval { $obj->for_keys( 'limos', 'phobos', 'algea', 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_keys('gaudia', 'algea', 'thanatos', 'aporia')}
+		q{$obj->for_keys('limos', 'phobos', 'algea', 'limos')}
 	);
-	eval { $obj->for_keys( bless( {}, 'Test' ), [], 'thanatos', 'aporia' ) };
+	eval { $obj->for_keys( bless( {}, 'Test' ), [], 'algea', 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_keys(bless({}, 'Test'), [], 'thanatos', 'aporia')}
+		q{$obj->for_keys(bless({}, 'Test'), [], 'algea', 'limos')}
 	);
-	eval { $obj->for_keys( bless( {}, 'Test' ), \1, 'thanatos', 'aporia' ) };
+	eval { $obj->for_keys( bless( {}, 'Test' ), \1, 'algea', 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_keys(bless({}, 'Test'), \1, 'thanatos', 'aporia')}
+		q{$obj->for_keys(bless({}, 'Test'), \1, 'algea', 'limos')}
 	);
-	eval { $obj->for_keys( bless( {}, 'Test' ), 'algea', [], 'aporia' ) };
+	eval { $obj->for_keys( bless( {}, 'Test' ), 'phobos', [], 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_keys(bless({}, 'Test'), 'algea', [], 'aporia')}
+		q{$obj->for_keys(bless({}, 'Test'), 'phobos', [], 'limos')}
 	);
-	eval { $obj->for_keys( bless( {}, 'Test' ), 'algea', \1, 'aporia' ) };
+	eval { $obj->for_keys( bless( {}, 'Test' ), 'phobos', \1, 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_keys(bless({}, 'Test'), 'algea', \1, 'aporia')}
+		q{$obj->for_keys(bless({}, 'Test'), 'phobos', \1, 'limos')}
 	);
 };
 subtest 'for_key_exists_and_return' => sub {
@@ -601,49 +601,45 @@ subtest 'for_key_exists_and_return' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'for_key_exists_and_return' );
-	eval { $obj->for_key_exists_and_return( [], 'nosoi', 'phobos' ) };
+	eval { $obj->for_key_exists_and_return( [], 'penthos', 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_key_exists_and_return([], 'nosoi', 'phobos')}
+		q{$obj->for_key_exists_and_return([], 'penthos', 'algea')}
 	);
-	eval { $obj->for_key_exists_and_return( 'geras', 'nosoi', 'phobos' ) };
+	eval { $obj->for_key_exists_and_return( 'aporia', 'penthos', 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_key_exists_and_return('geras', 'nosoi', 'phobos')}
+		q{$obj->for_key_exists_and_return('aporia', 'penthos', 'algea')}
 	);
 	eval {
-		$obj->for_key_exists_and_return( bless( {}, 'Test' ), [], 'phobos' );
+		$obj->for_key_exists_and_return( bless( {}, 'Test' ), [], 'algea' );
 	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_key_exists_and_return(bless({}, 'Test'), [], 'phobos')}
+		q{$obj->for_key_exists_and_return(bless({}, 'Test'), [], 'algea')}
 	);
 	eval {
-		$obj->for_key_exists_and_return( bless( {}, 'Test' ), \1, 'phobos' );
+		$obj->for_key_exists_and_return( bless( {}, 'Test' ), \1, 'algea' );
 	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_key_exists_and_return(bless({}, 'Test'), \1, 'phobos')}
+		q{$obj->for_key_exists_and_return(bless({}, 'Test'), \1, 'algea')}
 	);
 	eval {
-		$obj->for_key_exists_and_return( bless( {}, 'Test' ), 'nosoi', [] );
+		$obj->for_key_exists_and_return( bless( {}, 'Test' ), 'penthos', [] );
 	};
-	like(
-		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_key_exists_and_return(bless({}, 'Test'), 'nosoi', [])}
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+		q{$obj->for_key_exists_and_return(bless({}, 'Test'), 'penthos', [])}
 	);
 	eval {
-		$obj->for_key_exists_and_return( bless( {}, 'Test' ), 'nosoi', \1 );
+		$obj->for_key_exists_and_return( bless( {}, 'Test' ), 'penthos', \1 );
 	};
-	like(
-		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->for_key_exists_and_return(bless({}, 'Test'), 'nosoi', \1)}
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+		q{$obj->for_key_exists_and_return(bless({}, 'Test'), 'penthos', \1)}
 	);
 };
 subtest 'grep' => sub {
@@ -652,29 +648,29 @@ subtest 'grep' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'grep' );
-	eval { $obj->grep( [], 'aporia', 'phobos' ) };
+	eval { $obj->grep( [], 'limos', 'geras' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->grep([], 'aporia', 'phobos')}
+		q{$obj->grep([], 'limos', 'geras')}
 	);
-	eval { $obj->grep( 'curae', 'aporia', 'phobos' ) };
+	eval { $obj->grep( 'penthos', 'limos', 'geras' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->grep('curae', 'aporia', 'phobos')}
+		q{$obj->grep('penthos', 'limos', 'geras')}
 	);
-	eval { $obj->grep( bless( {}, 'Test' ), [], 'phobos' ) };
+	eval { $obj->grep( bless( {}, 'Test' ), [], 'geras' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->grep(bless({}, 'Test'), [], 'phobos')}
+		q{$obj->grep(bless({}, 'Test'), [], 'geras')}
 	);
-	eval { $obj->grep( bless( {}, 'Test' ), \1, 'phobos' ) };
+	eval { $obj->grep( bless( {}, 'Test' ), \1, 'geras' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->grep(bless({}, 'Test'), \1, 'phobos')}
+		q{$obj->grep(bless({}, 'Test'), \1, 'geras')}
 	);
 };
 subtest 'grep_map' => sub {
@@ -683,41 +679,41 @@ subtest 'grep_map' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'grep_map' );
-	eval { $obj->grep_map( [], 'thanatos', 'thanatos', 'curae' ) };
+	eval { $obj->grep_map( [], 'geras', 'thanatos', 'hypnos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->grep_map([], 'thanatos', 'thanatos', 'curae')}
+		q{$obj->grep_map([], 'geras', 'thanatos', 'hypnos')}
 	);
-	eval { $obj->grep_map( 'curae', 'thanatos', 'thanatos', 'curae' ) };
+	eval { $obj->grep_map( 'limos', 'geras', 'thanatos', 'hypnos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->grep_map('curae', 'thanatos', 'thanatos', 'curae')}
+		q{$obj->grep_map('limos', 'geras', 'thanatos', 'hypnos')}
 	);
-	eval { $obj->grep_map( bless( {}, 'Test' ), [], 'thanatos', 'curae' ) };
+	eval { $obj->grep_map( bless( {}, 'Test' ), [], 'thanatos', 'hypnos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->grep_map(bless({}, 'Test'), [], 'thanatos', 'curae')}
+		q{$obj->grep_map(bless({}, 'Test'), [], 'thanatos', 'hypnos')}
 	);
-	eval { $obj->grep_map( bless( {}, 'Test' ), \1, 'thanatos', 'curae' ) };
+	eval { $obj->grep_map( bless( {}, 'Test' ), \1, 'thanatos', 'hypnos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->grep_map(bless({}, 'Test'), \1, 'thanatos', 'curae')}
+		q{$obj->grep_map(bless({}, 'Test'), \1, 'thanatos', 'hypnos')}
 	);
-	eval { $obj->grep_map( bless( {}, 'Test' ), 'thanatos', [], 'curae' ) };
+	eval { $obj->grep_map( bless( {}, 'Test' ), 'geras', [], 'hypnos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->grep_map(bless({}, 'Test'), 'thanatos', [], 'curae')}
+		q{$obj->grep_map(bless({}, 'Test'), 'geras', [], 'hypnos')}
 	);
-	eval { $obj->grep_map( bless( {}, 'Test' ), 'thanatos', \1, 'curae' ) };
+	eval { $obj->grep_map( bless( {}, 'Test' ), 'geras', \1, 'hypnos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->grep_map(bless({}, 'Test'), 'thanatos', \1, 'curae')}
+		q{$obj->grep_map(bless({}, 'Test'), 'geras', \1, 'hypnos')}
 	);
 };
 subtest 'if' => sub {
@@ -726,29 +722,29 @@ subtest 'if' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'if' );
-	eval { $obj->if( [], 'penthos', 'phobos' ) };
+	eval { $obj->if( [], 'gaudia', 'gaudia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->if([], 'penthos', 'phobos')}
+		q{$obj->if([], 'gaudia', 'gaudia')}
 	);
-	eval { $obj->if( 'gaudia', 'penthos', 'phobos' ) };
+	eval { $obj->if( 'nosoi', 'gaudia', 'gaudia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->if('gaudia', 'penthos', 'phobos')}
+		q{$obj->if('nosoi', 'gaudia', 'gaudia')}
 	);
-	eval { $obj->if( bless( {}, 'Test' ), [], 'phobos' ) };
+	eval { $obj->if( bless( {}, 'Test' ), [], 'gaudia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->if(bless({}, 'Test'), [], 'phobos')}
+		q{$obj->if(bless({}, 'Test'), [], 'gaudia')}
 	);
-	eval { $obj->if( bless( {}, 'Test' ), \1, 'phobos' ) };
+	eval { $obj->if( bless( {}, 'Test' ), \1, 'gaudia' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->if(bless({}, 'Test'), \1, 'phobos')}
+		q{$obj->if(bless({}, 'Test'), \1, 'gaudia')}
 	);
 };
 subtest 'map' => sub {
@@ -757,29 +753,29 @@ subtest 'map' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'map' );
-	eval { $obj->map( [], 'hypnos', 'limos' ) };
+	eval { $obj->map( [], 'phobos', 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->map([], 'hypnos', 'limos')}
+		q{$obj->map([], 'phobos', 'algea')}
 	);
-	eval { $obj->map( 'nosoi', 'hypnos', 'limos' ) };
+	eval { $obj->map( 'limos', 'phobos', 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->map('nosoi', 'hypnos', 'limos')}
+		q{$obj->map('limos', 'phobos', 'algea')}
 	);
-	eval { $obj->map( bless( {}, 'Test' ), [], 'limos' ) };
+	eval { $obj->map( bless( {}, 'Test' ), [], 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->map(bless({}, 'Test'), [], 'limos')}
+		q{$obj->map(bless({}, 'Test'), [], 'algea')}
 	);
-	eval { $obj->map( bless( {}, 'Test' ), \1, 'limos' ) };
+	eval { $obj->map( bless( {}, 'Test' ), \1, 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->map(bless({}, 'Test'), \1, 'limos')}
+		q{$obj->map(bless({}, 'Test'), \1, 'algea')}
 	);
 };
 subtest 'map_grep' => sub {
@@ -788,41 +784,41 @@ subtest 'map_grep' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'map_grep' );
-	eval { $obj->map_grep( [], 'hypnos', 'gaudia', 'geras' ) };
+	eval { $obj->map_grep( [], 'curae', 'nosoi', 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->map_grep([], 'hypnos', 'gaudia', 'geras')}
+		q{$obj->map_grep([], 'curae', 'nosoi', 'phobos')}
 	);
-	eval { $obj->map_grep( 'aporia', 'hypnos', 'gaudia', 'geras' ) };
+	eval { $obj->map_grep( 'limos', 'curae', 'nosoi', 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->map_grep('aporia', 'hypnos', 'gaudia', 'geras')}
+		q{$obj->map_grep('limos', 'curae', 'nosoi', 'phobos')}
 	);
-	eval { $obj->map_grep( bless( {}, 'Test' ), [], 'gaudia', 'geras' ) };
+	eval { $obj->map_grep( bless( {}, 'Test' ), [], 'nosoi', 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->map_grep(bless({}, 'Test'), [], 'gaudia', 'geras')}
+		q{$obj->map_grep(bless({}, 'Test'), [], 'nosoi', 'phobos')}
 	);
-	eval { $obj->map_grep( bless( {}, 'Test' ), \1, 'gaudia', 'geras' ) };
+	eval { $obj->map_grep( bless( {}, 'Test' ), \1, 'nosoi', 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->map_grep(bless({}, 'Test'), \1, 'gaudia', 'geras')}
+		q{$obj->map_grep(bless({}, 'Test'), \1, 'nosoi', 'phobos')}
 	);
-	eval { $obj->map_grep( bless( {}, 'Test' ), 'hypnos', [], 'geras' ) };
+	eval { $obj->map_grep( bless( {}, 'Test' ), 'curae', [], 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->map_grep(bless({}, 'Test'), 'hypnos', [], 'geras')}
+		q{$obj->map_grep(bless({}, 'Test'), 'curae', [], 'phobos')}
 	);
-	eval { $obj->map_grep( bless( {}, 'Test' ), 'hypnos', \1, 'geras' ) };
+	eval { $obj->map_grep( bless( {}, 'Test' ), 'curae', \1, 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->map_grep(bless({}, 'Test'), 'hypnos', \1, 'geras')}
+		q{$obj->map_grep(bless({}, 'Test'), 'curae', \1, 'phobos')}
 	);
 };
 subtest 'maybe' => sub {
@@ -831,41 +827,41 @@ subtest 'maybe' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'maybe' );
-	eval { $obj->maybe( [], 'penthos', 'nosoi' ) };
+	eval { $obj->maybe( [], 'limos', 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->maybe([], 'penthos', 'nosoi')}
+		q{$obj->maybe([], 'limos', 'phobos')}
 	);
-	eval { $obj->maybe( 'limos', 'penthos', 'nosoi' ) };
+	eval { $obj->maybe( 'phobos', 'limos', 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->maybe('limos', 'penthos', 'nosoi')}
+		q{$obj->maybe('phobos', 'limos', 'phobos')}
 	);
-	eval { $obj->maybe( bless( {}, 'Test' ), [], 'nosoi' ) };
+	eval { $obj->maybe( bless( {}, 'Test' ), [], 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->maybe(bless({}, 'Test'), [], 'nosoi')}
+		q{$obj->maybe(bless({}, 'Test'), [], 'phobos')}
 	);
-	eval { $obj->maybe( bless( {}, 'Test' ), \1, 'nosoi' ) };
+	eval { $obj->maybe( bless( {}, 'Test' ), \1, 'phobos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->maybe(bless({}, 'Test'), \1, 'nosoi')}
+		q{$obj->maybe(bless({}, 'Test'), \1, 'phobos')}
 	);
-	eval { $obj->maybe( bless( {}, 'Test' ), 'penthos', [] ) };
+	eval { $obj->maybe( bless( {}, 'Test' ), 'limos', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->maybe(bless({}, 'Test'), 'penthos', [])}
+		q{$obj->maybe(bless({}, 'Test'), 'limos', [])}
 	);
-	eval { $obj->maybe( bless( {}, 'Test' ), 'penthos', \1 ) };
+	eval { $obj->maybe( bless( {}, 'Test' ), 'limos', \1 ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->maybe(bless({}, 'Test'), 'penthos', \1)}
+		q{$obj->maybe(bless({}, 'Test'), 'limos', \1)}
 	);
 };
 subtest 'merge_hash_refs' => sub {
@@ -874,17 +870,17 @@ subtest 'merge_hash_refs' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'merge_hash_refs' );
-	eval { $obj->merge_hash_refs( [], 'curae' ) };
+	eval { $obj->merge_hash_refs( [], 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->merge_hash_refs([], 'curae')}
+		q{$obj->merge_hash_refs([], 'limos')}
 	);
-	eval { $obj->merge_hash_refs( 'gaudia', 'curae' ) };
+	eval { $obj->merge_hash_refs( 'phobos', 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->merge_hash_refs('gaudia', 'curae')}
+		q{$obj->merge_hash_refs('phobos', 'limos')}
 	);
 };
 subtest 'require' => sub {
@@ -893,17 +889,17 @@ subtest 'require' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'require' );
-	eval { $obj->require( [], 'hypnos' ) };
+	eval { $obj->require( [], 'geras' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->require([], 'hypnos')}
+		q{$obj->require([], 'geras')}
 	);
-	eval { $obj->require( 'nosoi', 'hypnos' ) };
+	eval { $obj->require( 'geras', 'geras' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->require('nosoi', 'hypnos')}
+		q{$obj->require('geras', 'geras')}
 	);
 	eval { $obj->require( bless( {}, 'Test' ), [] ) };
 	like(
@@ -924,29 +920,29 @@ subtest 'unless' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'unless' );
-	eval { $obj->unless( [], 'algea', 'nosoi' ) };
+	eval { $obj->unless( [], 'algea', 'thanatos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->unless([], 'algea', 'nosoi')}
+		q{$obj->unless([], 'algea', 'thanatos')}
 	);
-	eval { $obj->unless( 'gaudia', 'algea', 'nosoi' ) };
+	eval { $obj->unless( 'curae', 'algea', 'thanatos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->unless('gaudia', 'algea', 'nosoi')}
+		q{$obj->unless('curae', 'algea', 'thanatos')}
 	);
-	eval { $obj->unless( bless( {}, 'Test' ), [], 'nosoi' ) };
+	eval { $obj->unless( bless( {}, 'Test' ), [], 'thanatos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->unless(bless({}, 'Test'), [], 'nosoi')}
+		q{$obj->unless(bless({}, 'Test'), [], 'thanatos')}
 	);
-	eval { $obj->unless( bless( {}, 'Test' ), \1, 'nosoi' ) };
+	eval { $obj->unless( bless( {}, 'Test' ), \1, 'thanatos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->unless(bless({}, 'Test'), \1, 'nosoi')}
+		q{$obj->unless(bless({}, 'Test'), \1, 'thanatos')}
 	);
 };
 subtest 'while' => sub {
@@ -955,29 +951,29 @@ subtest 'while' => sub {
 		q{my $obj = Hades::Macro::Dolos->new({})}
 	);
 	can_ok( $obj, 'while' );
-	eval { $obj->while( [], 'aporia', 'phobos' ) };
+	eval { $obj->while( [], 'algea', 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->while([], 'aporia', 'phobos')}
+		q{$obj->while([], 'algea', 'algea')}
 	);
-	eval { $obj->while( 'thanatos', 'aporia', 'phobos' ) };
+	eval { $obj->while( 'limos', 'algea', 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->while('thanatos', 'aporia', 'phobos')}
+		q{$obj->while('limos', 'algea', 'algea')}
 	);
-	eval { $obj->while( bless( {}, 'Test' ), [], 'phobos' ) };
+	eval { $obj->while( bless( {}, 'Test' ), [], 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->while(bless({}, 'Test'), [], 'phobos')}
+		q{$obj->while(bless({}, 'Test'), [], 'algea')}
 	);
-	eval { $obj->while( bless( {}, 'Test' ), \1, 'phobos' ) };
+	eval { $obj->while( bless( {}, 'Test' ), \1, 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->while(bless({}, 'Test'), \1, 'phobos')}
+		q{$obj->while(bless({}, 'Test'), \1, 'algea')}
 	);
 };
 done_testing();

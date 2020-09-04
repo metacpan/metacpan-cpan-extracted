@@ -1,11 +1,9 @@
 use strict;
 use warnings;
 
-use Test::More 0.88; # for done_testing
+use Test::More tests => 1;
 
 TODO: {
 	local $TODO = 'hell if I know how to test this';
 	fail 'actual tests written';
 }
-
-done_testing;

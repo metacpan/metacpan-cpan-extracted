@@ -6,7 +6,7 @@ use Getopt::Long;
 use Hades;
 
 my %h = ();
-GetOptions (\%h, 'file=s', 'eval=s', 'dist=s', 'lib=s', 'author=s', 'mail=s', 'version=s', 'realm=s');
+GetOptions (\%h, 'file=s', 'eval=s', 'dist=s', 'lib=s', 'author=s', 'mail=s', 'version=s', 'realm=s', 'verbose', 'debug');
 $h{email} = delete $h{mail} if $h{mail};
 if ($h{file}) {
 	if ($h{file} !~ m/\./) {
@@ -79,5 +79,17 @@ The version number of the distribution/module.
 =head3 realm -r
 
 The Hades realm that is used to generate the code
+
+=cut
+
+=head3 verbose -v
+
+Print hades build steps to STDOUT.
+
+=cut
+
+=head3 debug -debug
+
+Step through the hades build.
 
 =cut

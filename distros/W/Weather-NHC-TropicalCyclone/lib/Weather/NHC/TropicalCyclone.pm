@@ -72,7 +72,7 @@ __END__
 
 =head1 NAME
 
-Weather::NHC::TropicalCyclone
+Weather::NHC::TropicalCyclone - Provides a convenient interface to NHC's Tropical Cyclone JSON format.
 
 =head1 SYNOPSIS
 

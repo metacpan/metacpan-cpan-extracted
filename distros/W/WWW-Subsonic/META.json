@@ -81,7 +81,7 @@
          "web" : "https://github.com/reyjrar/WWW-Subsonic"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -389,7 +389,7 @@
                   "version_regexp" : "(?^u:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.24.1 (Apple Git-126)",
+                  "git_version" : "2.24.3 (Apple Git-128)",
                   "repo_root" : "."
                }
             },
@@ -418,7 +418,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.24.1 (Apple Git-126)",
+                  "git_version" : "2.24.3 (Apple Git-128)",
                   "repo_root" : "."
                }
             },
@@ -461,7 +461,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.24.1 (Apple Git-126)",
+                  "git_version" : "2.24.3 (Apple Git-128)",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -478,12 +478,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.009",
+                  "tag" : "v0.010",
                   "tag_format" : "v%v",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.24.1 (Apple Git-126)",
+                  "git_version" : "2.24.3 (Apple Git-128)",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -514,7 +514,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.24.1 (Apple Git-126)",
+                  "git_version" : "2.24.3 (Apple Git-128)",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -534,7 +534,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.24.1 (Apple Git-126)",
+                  "git_version" : "2.24.3 (Apple Git-128)",
                   "repo_root" : "."
                }
             },

@@ -10,7 +10,7 @@ use Apache::Session::Serialize::JSON;
 use Apache::Session::Browseable::_common;
 use Net::LDAP::Util qw(escape_filter_value);
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.3.6';
 our @ISA     = qw(Apache::Session Apache::Session::Browseable::_common);
 
 sub populate {
@@ -181,6 +181,8 @@ Apache::Session::Browseable::LDAP - An implementation of Apache::Session::LDAP
     ldapAttributeId      => 'cn',
     ldapAttributeContent => 'description',
     ldapAttributeIndex   => 'ou',
+    ldapVerify           => 'require',
+    ldapCAFile           => '/etc/ssl/certs/ca-certificates.crt',
   };
 
 =head1 DESCRIPTION

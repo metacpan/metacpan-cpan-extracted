@@ -11,7 +11,7 @@ Ordeal::Model - Manage cards and decks
 
 =head1 VERSION
 
-This document describes Ordeal::Model version 0.003.
+This document describes Ordeal::Model version 0.004.
 
 =begin html
 

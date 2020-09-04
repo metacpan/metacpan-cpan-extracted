@@ -1,5 +1,10 @@
 Revision history for Alien::gdal
 
+1.22 2020-09-04
+    - Share builds:
+      - disable OGDI and mongocxxv3 due to build failures
+      - use Alien::Build::Plugin::PkgConfig::PPWrapper
+
 1.21 20200107
     - Share builds:
       - Update makefile for long lines only on GDAL < 3.1.1,

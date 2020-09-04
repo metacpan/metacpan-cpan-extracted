@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+use v5;
 use strict;
 use warnings;
 
@@ -69,6 +70,18 @@ my $term = IO::Termios->new( $pty->slave );
    select( $rout = $rvec, undef, undef, 0.1 );
    ok( defined $term->sysread( $b, 8192 ), '$term is readable' );
    is_string( $b, "With ICANON\n", '$pty reads remainder of line' );
+}
+
+# setflags wrapper
+{
+   $term->setflags(qw( +echo +cread -icrnl ));
+   ok(  $term->getflag_echo, 'echo set after setflags +echo' );
+   ok(  $term->getflag_cread, 'cread set after setflags +cread' );
+   ok( !$term->getflag_icrnl, 'icrnl set after setflags -icrnl' );
+
+   $term->setflags(qw( -echo +cread +icrnl ));
+   ok( !$term->getflag_echo, 'echo set after setflags -echo' );
+   ok(  $term->getflag_icrnl, 'icrnl set after setflags +icrnl' );
 }
 
 done_testing;

@@ -101,6 +101,10 @@ if ($is_linux)
 		'lib'     => 'udev',
 		'header'  => 'libudev.h',
 	},
+	{
+		'lib'     => 'usb',
+		'header'  => 'libusb.h',
+	};
 }
 
 my %library_opts =
@@ -114,6 +118,11 @@ my %library_opts =
 	{
 		'defines' => '',
 		'libs'    => ' -ludev',
+	},
+	'usb' =>
+	{
+		'defines' => '',
+		'libs'    => ' -lusb',
 	},
 );
 
@@ -365,7 +374,7 @@ push @fido2srcs, 'hid_win.c' if ($is_windows);
 
 
 my @hidapisrcs;
-if ($is_bsd && !$is_openbsd && !$is_windows && !$is_osx || ($is_linux && !$library_opts{udev}{use}))
+if ($is_bsd && !$is_openbsd && !$is_windows && !$is_osx || ($is_linux && !$library_opts{udev}{use} && $library_opts{usb}{use}))
 {
 	push @fido2srcs, 'hid_hidapi.c';
 	push @hidapisrcs, 'deps/hidapi/libusb/hid.c';

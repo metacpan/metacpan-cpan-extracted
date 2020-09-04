@@ -20,7 +20,7 @@ my $signer = Signer::AWSv4::S3->new(
 my $expected_canon_request = 'GET
 /examplebucket/test.txt
 X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN7EXAMPLE%2F20130524%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20130524T000000Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host
-host:s3-us-east-1.amazonaws.com
+host:s3.amazonaws.com
 
 host
 UNSIGNED-PAYLOAD';
@@ -30,15 +30,15 @@ cmp_ok($signer->canonical_request, 'eq', $expected_canon_request);
 my $expected_string_to_sign = 'AWS4-HMAC-SHA256
 20130524T000000Z
 20130524/us-east-1/s3/aws4_request
-3c94fcc618a24e3ce28d4518e02d9354e89ae7ee250bcea196cd84436d010c3a';
+a90abb2891b4f1b1493b9d074672f889072126e1a4881562b0c503d9addd3dff';
 
 cmp_ok($signer->string_to_sign, 'eq', $expected_string_to_sign);
 
-my $signature = '1ad7aad5bf7206f2efaa69aa2b13ae860262b6ae5c3fb895548d235852a303c9';
+my $signature = '733255ef022bec3f2a8701cd61d4b371f3f28c9f193a1f02279211d48d5193d7';
 cmp_ok($signer->signature, 'eq', $signature);
 
 
-my $expected_signed_qstring = 'X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN7EXAMPLE%2F20130524%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20130524T000000Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=1ad7aad5bf7206f2efaa69aa2b13ae860262b6ae5c3fb895548d235852a303c9';
+my $expected_signed_qstring = 'X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN7EXAMPLE%2F20130524%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20130524T000000Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=733255ef022bec3f2a8701cd61d4b371f3f28c9f193a1f02279211d48d5193d7';
 cmp_ok($signer->signed_qstring, 'eq', $expected_signed_qstring);
 
 done_testing;

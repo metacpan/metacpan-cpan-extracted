@@ -1,9 +1,31 @@
 ==================================================
-Changes from 2018-03-31 00:00:00 +0000 to present.
+Changes from 2018-09-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.009 at 2020-03-30 05:14:22 +0000
+version 0.010 at 2020-09-04 04:23:47 +0000
+------------------------------------------
+
+  Change: a1580d086ca8b35d29a5797f1a86035853ecc43c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-09-03 21:20:14 +0000
+
+    New utility: subsonic_starred_m3u.pl
+
+    Created a new utility to generate an M3U based on starred items. I'm using
+    this to create an M3U off my AirSonic starred items that I can copy into
+    the media folder my Sonos uses as it's media library. This gives a bridge
+    from iTunes to Sonos via AirSonic and establishes airsonic as my
+    authoritative music metadata store. 
+
+  Change: cc64ce5f5ff804e4ac518cc5f69b97e82de9e7e7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-03-29 22:15:52 +0000
+
+    Docs updated for 0.009 
+
+------------------------------------------
+version 0.009 at 2020-03-30 05:10:11 +0000
 ------------------------------------------
 
   Change: 070caa77e9b124379e394ebe7d205f4a99647e27
@@ -34,65 +56,6 @@ version 0.008 at 2018-10-25 03:17:43 +0000
     'name' at the arist level of the API. This provides compatibility with
     MadSonic and Subsonic for the subsonic_sync_starred.pl script. 
 
-------------------------------------------
-version 0.007 at 2018-05-24 15:24:04 +0000
-------------------------------------------
-
-  Change: 0a188dca505394acd3624fbfa3265dd9e3c162a1
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-24 08:24:04 +0000
-
-    Remove explicit MinimumPerl setting
-
-    Use the autodetection for the minimum Perl version. This module uses two
-    features of Perl 5.22:
-
-    * The "double diamond" <<>> operator for safely reading from files or
-
-    STDIN
-
-    * The regex '/n' modifier, to disable capture groups via parentheses 
-
-  Change: 904b639bbd70b8162e679c722a87fa68060b64c3
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-24 08:23:04 +0000
-
-    Revert "Remove 5.22+ requirement Double Diamond"
-
-    This reverts commit 1cf1f8d0aec69c9c878f19f40ec20cef8ad86ce4. 
-
-  Change: f284570b17b6cc17cea9975efc74faa1a2cc0603
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-18 15:59:06 +0000
-
-    Version 0.006 Docs 
-
-------------------------------------------
-version 0.006 at 2018-05-18 22:57:23 +0000
-------------------------------------------
-
-  Change: 1cf1f8d0aec69c9c878f19f40ec20cef8ad86ce4
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-18 15:57:23 +0000
-
-    Remove 5.22+ requirement Double Diamond 
-
-  Change: f1e5920b7972331b7ba1adb9adb8cd3893ed4f58
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-04-12 23:26:18 +0000
-
-    Release regenerated README 
-
-------------------------------------------
-version 0.005 at 2018-04-13 04:02:26 +0000
-------------------------------------------
-
-  Change: c745a2cd80b7f5172acec642d0a5ca97a80d79f3
-  Author: JosÃ© JoaquÃ­n Atria <jjatria@gmail.com>
-  Date : 2018-02-26 23:03:31 +0000
-
-    Make default API version match what is documented 
-
 ================================================
-Plus 4 releases after 2018-03-31 00:00:00 +0000.
+Plus 7 releases after 2018-09-05 00:00:00 +0000.
 ================================================

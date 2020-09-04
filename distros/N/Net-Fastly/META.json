@@ -4,7 +4,7 @@
       "- Fastly Inc"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.20",
             "Test::Pod" : "1.41"
          }
       },
@@ -68,8 +68,10 @@
          "web" : "https://github.com/fastly/fastly-perl"
       }
    },
-   "version" : "1.09",
+   "version" : "1.12",
    "x_contributors" : [
+      "andri <andriantoniades@gmail.com>",
+      "Andri Antoniades <andriantoniades@users.noreply.github.com>",
       "Artur Bergman <sky@crucially.net>",
       "Eric Hodel <drbrain@segment7.net>",
       "Gabor Szabo <szabgab@gmail.com>",
@@ -85,6 +87,7 @@
       "Tatsuhiko Miyagawa <miyagawa@gmail.com>",
       "Thom Mahoney <mahoneyt@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239",
+   "x_static_install" : 1
 }
 

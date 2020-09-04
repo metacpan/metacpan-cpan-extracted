@@ -6,6 +6,13 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.064	2020-09-03
+
+ - Added: Class and role generators can generate multimethods.
+ - Added: Role generators can generate before_apply/after_apply hooks.
+ - Refactor how :coerce / :coercion attributes are handled.
+ - Refactor how factory methods are installed.
+
 0.063	2020-09-01
 
  - Added: Factories are now exporters and can export factory methods on

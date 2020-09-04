@@ -19,7 +19,7 @@ require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleZipError);
 
 $SimpleZipError= '';
-$VERSION = "0.036";
+$VERSION = "0.037";
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw( $SimpleZipError ) ;
@@ -1291,12 +1291,12 @@ the encoding you have request exists.
 
 =item C<< Method => $method >>
 
-Controls which compression method is used. At present four compression
-methods are supported, namely, Store (no compression at all), Deflate,
-Bzip2 and Lzma.
+Controls which compression method is used. At present the compression
+methods supported are: Store (no compression at all), Deflate,
+Bzip2, Zstd, Xz and Lzma.
 
-The symbols, ZIP_CM_STORE, ZIP_CM_DEFLATE, ZIP_CM_BZIP2 and ZIP_CM_LZMA are
-used to select the compression method.
+The symbols, ZIP_CM_STORE, ZIP_CM_DEFLATE, ZIP_CM_BZIP2, ZIP_CM_ZSTD, ZIP_CM_XZ and ZIP_CM_LZMA
+are used to select the compression method.
 
 These constants are not imported by default by this module.
 
@@ -1308,9 +1308,17 @@ Note that to create Bzip2 content, the module C<IO::Compress::Bzip2> must
 be installed. A fatal error will be thrown if you attempt to create Bzip2
 content when C<IO::Compress::Bzip2> is not available.
 
-Note that to create Lzma content, the module C<IO::Compress::Lzma> must be
-installed. A fatal error will be thrown if you attempt to create Lzma
+Note that to create Lzma content, the module C<IO::Compress::Lzma> must
+be installed. A fatal error will be thrown if you attempt to create Lzma
 content when C<IO::Compress::Lzma> is not available.
+
+Note that to create Xz content, the module C<IO::Compress::Xz> must
+be installed. A fatal error will be thrown if you attempt to create Xz
+content when C<IO::Compress::Xz> is not available.
+
+Note that to create Zstd content, the module C<IO::Compress::Zstd> must
+be installed. A fatal error will be thrown if you attempt to create Zstd
+content when C<IO::Compress::Zstd> is not available.
 
 The default method is ZIP_CM_DEFLATE for files and ZIP_CM_STORE for
 directories and symbolic links.
@@ -1415,9 +1423,9 @@ The default is 0.
 
 =back
 
-=head2 Lzma Compression Options
+=head2 Lzma & XZ Compression Options
 
-These option are only valid if the C<Method> is ZIP_CM_LZMA. They are
+These option are only valid if the C<Method> is ZIP_CM_LZMA or ZIP_CM_LZMA. They are
 ignored otherwise.
 
 =over 5
@@ -1442,6 +1450,21 @@ Makes LZMA compression a lot slower, but a small compression gain.
 
 Defaults to 0.
 
+
+=back
+
+=head2 Zstd Compression Options
+
+These option are only valid if the C<Method> is ZIP_CM_ZSTD. They are
+ignored otherwise.
+
+=over 5
+
+=item C<< Level => >>
+
+Defines the compression level used.
+
+Default value is 3.
 
 =back
 

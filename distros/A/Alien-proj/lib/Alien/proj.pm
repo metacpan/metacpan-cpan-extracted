@@ -7,7 +7,7 @@ use Env qw ( @PATH @LD_LIBRARY_PATH @DYLD_LIBRARY_PATH );
 use Capture::Tiny qw /:all/;
 use File::Which qw /which/;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 my %also;
 my @alien_bins = (__PACKAGE__->bin_dir);

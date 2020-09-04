@@ -35,6 +35,10 @@ sub op_delay {
             my %timers;
             my $queue;
             my $own_subscriber = {
+                error => sub {
+                    my @value = @_;
+                    $subscriber->{error}->(@value) if defined $subscriber->{error};
+                },
                 map {
                     my $type = $_;
 
@@ -63,7 +67,7 @@ sub op_delay {
                             push @$queue, [$type, \@value];
                         }
                     );
-                } qw/ next error complete /
+                } qw/ next complete /
             };
 
             return [

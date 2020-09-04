@@ -1,13 +1,11 @@
 #!perl
 
-use IO::ReStoreFH;
-
-use IO::Handle;
-
-use Test::More;
-use Test::File::Contents;
-
+use Test2::V0;
 use File::Temp;
+use File::Slurper 'read_text';
+
+use IO::ReStoreFH;
+use IO::Handle;
 
 for my $fh ( \*STDOUT, *STDERR ) {
 
@@ -22,9 +20,8 @@ for my $fh ( \*STDOUT, *STDERR ) {
         $fh->print( "$fh\n" );
     }
 
-    file_contents_eq_or_diff( $tmp->filename, "$fh\n",
-        "redirect $fh to file; implicit close" );
+    is( read_text( $tmp->filename ),
+        "$fh\n", "redirect $fh to file; implicit close" );
 }
-
 
 done_testing;

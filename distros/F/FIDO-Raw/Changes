@@ -1,5 +1,9 @@
 Revision history for FIDO-Raw
 
+0.06      2020-09-03 20:20:38+01:00 Europe/London
+
+ - Detect the presence of libusb prior to trying to use it
+
 0.05      2020-09-03 16:31:38+01:00 Europe/London
 
  - Detect the presence of libudev prior to trying to use it

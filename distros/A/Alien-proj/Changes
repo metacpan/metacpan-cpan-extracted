@@ -1,5 +1,12 @@
 Revision history for Alien::proj
 
+1.14 2020-09-04
+    - share installs
+      - use Alien::Build::Plugin::PkgConfig::PPWrapper
+      - explicitly set $ENV{TIFF_LIBS} to avoid build failures
+      - Avoid proj 7.1.0 under windows due to known build failures
+    - Makefile.PL: Bump minimum Alien::curl version to 0.08
+
 1.13 2020-05-31
     - Disable clean_install option in Makefile.PL due to
       possible timing issues with parallel make deleting

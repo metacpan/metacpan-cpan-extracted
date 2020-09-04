@@ -1,0 +1,121 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Ordeal::Model::Backend::Raw - Cards/decks management via raw data
+
+=head1 SYNOPSIS
+
+   use Ordeal::Model;
+   use Ordeal::Model::Backend::RAw;
+
+   my %data = (...);
+   my $backend = Ordeal::Model::Backend::RAw->new(data => \%data);
+   my $model = Ordeal::Model->new(backend => $backend);
+
+   my $card = $backend->card($card_id); # OR
+      $card = $model->get_card($card_id);
+
+   my $deck = $backend->deck($deck_id); # OR
+      $deck = $model->get_deck($deck_id);
+
+   my @deck_identifiers = $backend->decks();
+
+=head1 DESCRIPTION
+
+This module is a simple backend for L<Ordeal::Model> based on a data
+structure.
+
+The provided data structure is a hash reference with the following
+structure (sketched in YAMLish shape):
+
+   cards:
+      - id: d3-1
+        data: this is face 1
+        content-type: text/plain
+      - id: d3-2
+        data: this is face 2
+        content-type: text/plain
+      - id: d3-3
+        data: this is face 3
+        content-type: text/plain
+   decks:
+      - id: d3
+        cards: [ d3-1 d3-2 d3-3 ]
+      - id: loaded-d3
+        cards: [ d3-1 d3-2 d3-3 d3-3 ]
+
+Cards are provided as an array of hashes; each has an identifier and
+identifiers must be unique (or an exception will be raised). Other
+parameters that are used can be seen in the documentation for
+L<Ordeal::Model::Card>.
+
+Decks are provided as an array of hashes; each has an identifier and
+identifiers must be unique (or an exeption will be raised). A deck must
+also have a C<cards> key pointing to an array with the list of car
+identifiers, in the order they appear in a sorted deck.
+
+=head1 METHODS
+
+=begin implementation
+
+=head2 B<< BUILD >>
+
+Method to I<build> the object, actually it takes the data out and
+fills in all the actual accessors, for later usage.
+
+=end implementation
+
+=head2 B<< card >>
+
+   my $card = $obj->card($id);
+
+get a card by identifier. Returns a L<Ordeal::Model::Card> object.
+
+=head2 B<< deck >>
+
+   my $deck = $obj->deck($id);
+
+get a deck by identifier.
+
+=head2 B<< decks >>
+
+   my $decks = $obj->decks;
+
+Get a list of all available decks (actually, their identifiers).
+
+=head2 B<< new >>
+
+   my $be = Ordeal::Model::Backend::Raw->new(data => \%data);
+
+Create a new instance, based on the provided C<\%data> hash reference.
+
+=head1 BUGS AND LIMITATIONS
+
+The code leverages some experimental Perl features like signatures and
+postderef; for this reason, at least perl 5.20 will be needed.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/Ordeal-Model>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2020 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

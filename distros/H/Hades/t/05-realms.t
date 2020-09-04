@@ -25,10 +25,10 @@ BEGIN {
 					);
 				}
 				build_clearer :a {
-					$res[0]->no_code(1);
+					$params[0]->no_code(1);
 				}
 				build_predicate :a {
-					$res[0]->no_code(1);
+					$params[0]->no_code(1);
 				}
 				after_class $mg :t(Object) {
 					$mg->new->no_code(1);

@@ -5,6 +5,7 @@ Makefile.PL
 App/pl.pm
 pl
 pl.cmd
+pod/examples.pod
 t/atom-weight-1.csv
 t/atom-weight-2.csv
 t/atom-weight-3.csv

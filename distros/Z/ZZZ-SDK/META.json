@@ -1,0 +1,60 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Standard User <stdcrm@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "ZZZ-SDK",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBI" : "1.6",
+            "HTTP::Request" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Handler" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.66"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::Format::ISO8601" : "0.08",
+            "File::Path" : "0",
+            "File::Spec::Functions" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request" : "0",
+            "JSON::Parse" : "0.56",
+            "List::MoreUtils" : "0.33",
+            "MIME::Base64" : "3.13",
+            "Moose" : "2.1202",
+            "Scalar::Util" : "0",
+            "Switch" : "2.17",
+            "Time::HiRes" : "0",
+            "Try::Catch" : "0",
+            "URI::Split" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

@@ -1,5 +1,15 @@
-@  changeset:   129:c85bf9bc6157
+@  changeset:   131:6d06bba9101d
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@blackmesa>
+|  date:        Fri Sep 04 13:43:23 2020 +0200
+|  summary:     Add proper error message on broken persistance files. Bump to version 16
+|
+o  changeset:   130:dd545111c99a
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Sat Aug 08 23:50:41 2020 +0200
+|  summary:     Update Changes file for release
+|
+o  changeset:   129:c85bf9bc6157
 |  user:        Rene Schickbauer <cavac@venera>
 |  date:        Sat Aug 08 23:50:15 2020 +0200
 |  summary:     Add persistanceinterval setting (defaults to 10)

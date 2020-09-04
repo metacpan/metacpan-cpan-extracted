@@ -1,5 +1,16 @@
 Revision history for Perl extension RxPerl
 
+v0.16.0 2020-09-04T13:32:59Z
+
+    - unhandled error events throw an exception
+    - wrote the first point in the guide to create your own operators
+
+v0.15.1 2020-09-04T11:39:54Z
+
+    - rx_from_event and rx_from_event_array now hold weakref to emitter
+    - op_delay now does not delay error events (as in rxjs)
+    - subscribers' next & error methods now accept at most 1 argument
+
 v0.15.0 2020-09-03T16:55:09Z
 
     - Wrote documentation

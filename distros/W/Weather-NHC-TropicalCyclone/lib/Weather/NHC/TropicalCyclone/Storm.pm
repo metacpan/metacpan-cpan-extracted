@@ -8,7 +8,8 @@ use HTTP::Status qw/:constants/;
 use Validate::Tiny    ();
 use HTML::TreeBuilder ();
 
-our $DEFAULT_GRAPHICS_ROOT = q{https://www.nhc.noaa.gov/storm_graphics/};
+our $DEFAULT_GRAPHICS_ROOT = q{https://www.nhc.noaa.gov/storm_graphics};
+our $DEFAULT_BTK_ROOT      = q{https://ftp.nhc.noaa.gov/atcf/btk};
 
 use Object::Tiny
   qw/id binNumber name classification intensity pressure latitude longitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/;
@@ -96,7 +97,7 @@ sub fetch_forecastGraphics {
     $html =~ m/storm_graphics\/(.+)\/refresh/;
     my $prefix = $1;
 
-    my $base = sprintf( qq{%s%s}, $DEFAULT_GRAPHICS_ROOT, $prefix );
+    my $base = sprintf( qq{%s/%s}, $DEFAULT_GRAPHICS_ROOT, $prefix );
     $response = $http->get($base);
 
     $html = $response->{content};
@@ -247,9 +248,9 @@ sub _fetch_data_types {
         kmzFile          => [qw/forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS/],
         zipFile5km       => [qw/windSpeedProbabilitiesGIS/],
         zipFile0p5deg    => [qw/windSpeedProbabilitiesGIS/],
-        kmzFiles34kt     => [qw/windSpeedProbabilitiesGIS/],
-        kmzFiles50kt     => [qw/windSpeedProbabilitiesGIS/],
-        kmzFiles64kt     => [qw/windSpeedProbabilitiesGIS/],
+        kmzFile34kt      => [qw/windSpeedProbabilitiesGIS/],
+        kmzFile50kt      => [qw/windSpeedProbabilitiesGIS/],
+        kmzFile64kt      => [qw/windSpeedProbabilitiesGIS/],
         kmlFile          => [qw/stormSurgeWatchWarningGIS/],
         zipFileTidalMask => [qw/potentialStormSurgeFloodingGIS/],
     };
@@ -292,13 +293,36 @@ sub _get_file {
     return ( $local_file, $self->$resource->{advNum} // q{N/A} );
 }
 
+# auxillary methods to fetch the best track ".dat" file via NHC's FTP over HTTPS
+
+sub fetch_best_track {
+    my ( $self, $local_file ) = @_;
+
+    my $btk_file = sprintf( "b%s.dat", $self->id );
+    my $url = sprintf( "%s/%s.dat", $DEFAULT_BTK_ROOT, $btk_file );
+
+    $local_file //= $btk_file;
+
+    my $http = HTTP::Tiny->new;
+
+    my $response = $http->mirror( $url, $local_file );
+
+    if ( not $response->{success} ) {
+        my $status = $response->{status} // q{Unknown};
+        die qq{Download of $url failed. HTTP status: $status\n};
+    }
+
+    # bestTrackGIS resource doesn't provide "advNum" per specification
+    return $local_file;
+}
+
 1;
 
 __END__
 
 =head1 NAME
 
-Weather::NHC::TropicalCyclone::Storm
+Weather::NHC::TropicalCyclone::Storm - Provides a convenient interface to NHC's Tropical Cyclone JSON format.
 
 =head1 SYNOPSIS
 
@@ -416,10 +440,38 @@ C<mirror> method. See C<perldoc HTTP::Tiny> for more information.
 
 =back
 
+=head2 Auxillary Fetch Methods
+
+=over 3
+
+=item C<fetch_best_track>
+
+Accepts an optional parameter that defines the local file to save this file as.
+
+Attempts to fetch the best track C<.dat> file that. This URL is not provided directly
+by the JSON file, but can be easily derived by using using C<$DEFAULT_BTK_ROOT> and
+composing the filename using the C<id> accessor. This method combines this with a fetch
+over HTTPS (using C<HTTP::Tiny>'s C<mirror> method). 
+
+This method returns just the local file name.
+
+=back
+
 =head1 ENVIRONMENT
 
-Package variable, C<$DEFAULT_GRAPHICS_ROOT>, defines the base URL used to determine
-the list of graphics available for the storm.
+Default ackage variables:
+
+=over 3
+
+=item C<$DEFAULT_GRAPHICS_ROOT>
+
+defines the base URL used to determine the list of graphics available for the storm
+
+=item C<$DEFAULT_BTK_ROOT>
+
+defines the base URL used to fetch the best track C<.dat> file
+
+=back
 
 =head1 COPYRIGHT and LICENSE
 

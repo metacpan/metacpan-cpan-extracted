@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v0.15.0";
+our $VERSION = "v0.16.0";
 
 1;
 __END__
@@ -264,9 +264,9 @@ L<https://rxjs.dev/api/index/class/Subject>
 
 L<https://rxjs.dev/api/index/function/throwError>
 
-    # 0, 1, 2, 3, error: foo
+    # 0, 1, 2, 3, foo, 4, 5, 6, ...
     rx_merge(
-        rx_throw_error('foo')->pipe( op_delay(4.5) ),
+        rx_of('foo')->pipe( op_delay(4.5) ),
         rx_interval(1),
     )->subscribe($subscriber);
 
@@ -482,15 +482,37 @@ L<ReactiveX API|http://reactivex.io/documentation/operators.html> at a few point
 L<Rx* libraries|http://reactivex.io/languages.html>), RxPerl chose to behave like rxjs rather than
 ReactiveX to cater for web developers already familiar with rxjs.
 
+=head1 GUIDE TO CREATING YOUR OWN CREATION & PIPEABLE OPERATORS
+
+=over
+
+=item * If you need the upstream and downstreams subscribers to complete at the same time,
+pass the entire contents of the downstream subscriber object to the upstream subscriber.
+This will pass the _subscription key as well, and that way you will not need to return a
+request to unsubscribe from the upstream, from your observable declaration. Just like C<op_map>
+does with this line, and just returns then with C<return;>:
+
+    my $own_subscriber = { %$subscriber };
+
+=back
+
 =head1 TODO
 
 =over
 
-=item * Unhandled I<error> events ought to throw an exception
-
 =item * Fix the occasional bug
 
-=item * Short guide on how to create a creation or a pipeable operator
+=item * Implement more operators, based on user requests
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Rx Marbles|https://rxmarbles.com/>
+
+=item * L<Ryu module's SEE ALSO section|https://metacpan.org/pod/Ryu#SEE-ALSO>
 
 =back
 

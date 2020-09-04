@@ -146,6 +146,12 @@ Version 15 adds the configuration variable "persistanceinterval" (defaults to 10
 interval in which a persistance file is written. You could lower it for more frequent checkpointing, but more importantly you could
 increase to longer time spans to reduce disk activity.
 
+=head2 VERSION 16
+
+Version 16 Server now croaks with a descriptive message if it encounters an invalid persistance file.
+
+This version does not introduce any incompatible changes.
+
 =head1 AUTHOR
 
 Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>

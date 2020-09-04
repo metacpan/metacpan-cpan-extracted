@@ -86,7 +86,7 @@ sub rx_EMPTY {
     });
 }
 
-# NOTE: rx_from_event and rx_from_event_array keep a hard reference to the
+# NOTE: rx_from_event and rx_from_event_array keep a weak reference to the
 # EventEmitter $object. Should this change? TODO: think about that.
 
 sub rx_from_event {
@@ -94,6 +94,7 @@ sub rx_from_event {
 
     croak 'invalid object type, at rx_from_event' if not $object->isa('Mojo::EventEmitter');
 
+    weaken($object);
     return rx_observable->new(sub {
         my ($subscriber) = @_;
 
@@ -103,7 +104,9 @@ sub rx_from_event {
             $subscriber->{next}->(splice @args, 0, 1) if defined $subscriber->{next};
         };
 
-        get_subscription_from_subscriber($subscriber)->add_dependents(sub { $object->unsubscribe($cb) });
+        get_subscription_from_subscriber($subscriber)->add_dependents(sub {
+            $object->unsubscribe($cb) if defined $object;
+        });
 
         $object->on($event_type, $cb);
 
@@ -114,8 +117,9 @@ sub rx_from_event {
 sub rx_from_event_array {
     my ($object, $event_type) = @_;
 
-    croak 'invalid object type, at rx_from_event' if not $object->isa('Mojo::EventEmitter');
+    croak 'invalid object type, at rx_from_event_array' if not $object->isa('Mojo::EventEmitter');
 
+    weaken($object);
     return rx_observable->new(sub {
         my ($subscriber) = @_;
 
@@ -125,7 +129,9 @@ sub rx_from_event_array {
             $subscriber->{next}->([@args]) if defined $subscriber->{next};
         };
 
-        get_subscription_from_subscriber($subscriber)->add_dependents(sub { $object->unsubscribe($cb) });
+        get_subscription_from_subscriber($subscriber)->add_dependents(sub {
+            $object->unsubscribe($cb) if defined $object;
+        });
 
         $object->on($event_type, $cb);
 

@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.063';
+our $VERSION   = '0.064';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -323,6 +323,7 @@ sub prepare_type_library {
 			$kind    => $target,
 		);
 		$types_hash{$kind}{$target} = $tc_obj;
+		$types_hash{'any'}{$target} = $tc_obj;
 		$me->add_type($tc_obj);
 		Type::Registry->for_class($opts{factory_package})->add_type($tc_obj)
 			if defined $opts{factory_package};
@@ -481,59 +482,15 @@ sub _do_coercions {
 			$coderef = shift @coercions if is_CodeRef $coercions[0];
 			
 			if ($coderef) {
-				$builder->$method_installer($qname, { $method_name => $coderef });
+				$builder->$method_installer(
+					$qname,
+					{ $method_name => sub { local $_ = $_[1]; &$coderef } },
+				);
 			}
 			
 			if ($mytype) {
 				require B;
 				$mytype->coercion->add_type_coercions($type, sprintf('%s->%s($_)', B::perlstring($qname), $method_name));
-			}
-		}
-	}
-	
-	if ($mytype) {
-		require B;
-		
-		if ($opts{'factory'}) {
-			my @methods = $opts{'factory'}->$_handle_list;
-			while (@methods) {
-				my @method_names;
-				push(@method_names, shift @methods)
-					while (@methods and not ref $methods[0]);
-				my $coderef = shift(@methods) || \"new";
-				my $name1   = $method_names[0];
-				if (is_HashRef $coderef) {
-					my %meta = %$coderef;
-					if ( match('coercion', $meta{attributes}) or match('coerce', $meta{attributes}) ) {
-						$builder->croak('Factories used as coercions must take exactly one positional argument')
-							unless is_ArrayRef( $meta{signature} ) && 1==@{$meta{signature}} && !$meta{named};
-						
-						my $type = $opts{'reg'}->lookup( $meta{signature}[0] );
-						
-						$mytype->coercion->add_type_coercions( $type, sprintf('%s->%s($_)', B::perlstring($opts{'factory_package'}), $name1) );
-					}
-				}
-			}
-		}
-		
-		for my $thing (qw/ method multimethod /) {
-			if ($opts{$thing}) {
-				my @methods = $opts{$thing}->$_handle_list;
-				while (@methods) {
-					my $name1   = shift @methods;
-					my $coderef = shift @methods;
-					if (is_HashRef $coderef) {
-						my %meta = %$coderef;
-						if ( match('coercion', $meta{attributes}) or match('coerce', $meta{attributes}) ) {
-							$builder->croak(ucfirst($thing) . ' used as coercion must take exactly one positional argument')
-								unless is_ArrayRef( $meta{signature} ) && 1==@{$meta{signature}} && !$meta{named};
-							
-							my $type = $opts{'reg'}->lookup( $meta{signature}[0] );
-							
-							$mytype->coercion->add_type_coercions( $type, sprintf('%s->%s($_)', B::perlstring($qname), $name1) );
-						}
-					}
-				}
 			}
 		}
 	}
@@ -700,6 +657,10 @@ sub _make_package {
 				&Internals::SvREADONLY(\${"$qname\::$var"}, 1);
 			}
 		}
+		if ( $opts{factory_package} ) {
+			eval "sub $qname\::FACTORY { q[".$opts{factory_package}."] }; 1"
+				or $builder->croak("Couldn't create link back to factory $qname\::FACTORY: $@");
+		}
 	}
 		
 	if (defined $opts{'import'}) {
@@ -860,41 +821,12 @@ sub _make_package {
 		if (defined $opts{'factory_package'}) {
 			my $fpackage = $opts{'factory_package'};
 			if ($opts{'factory'}) {
-				my @methods = $opts{'factory'}->$_handle_list;
-				if ($opts{abstract} and @methods) {
+				if ($opts{abstract} and $opts{'factory'}->$_handle_list) {
 					require Carp;
 					Carp::croak("abstract class $qname cannot have factory");
 				}
-				while (@methods) {
-					my @method_names;
-					push(@method_names, shift @methods)
-						while (@methods and not ref $methods[0]);
-					my $coderef = shift(@methods) || \"new";
-					for my $name (@method_names) {
-						no warnings 'closure';
-						if (is_CodeRef $coderef) {
-							eval "package $fpackage; sub $name :method { splice(\@_, 1, 0, '$qname'); goto \$coderef }; 1"
-								or $builder->croak("Could not create factory $name in $fpackage: $@");
-						}
-						elsif (is_ScalarRef $coderef) {
-							my $target = $$coderef;
-							eval "package $fpackage; sub $name :method { shift; '$qname'->$target\(\@_) }; 1"
-								or $builder->croak("Couldn't create factory $name in $fpackage: $@");
-						}
-						elsif (is_HashRef $coderef) {
-							my %meta = %$coderef;
-							$meta{curry} ||= [$qname];
-							$builder->install_methods($fpackage, { $name => \%meta });
-						}
-						else {
-							die "lolwut?";
-						}
-					}
-					$builder->_make_exportable_factories($fpackage, @method_names);
-				}
+				$builder->install_factories($fpackage, $qname, $opts{'factory'});
 			}
-			eval "sub $qname\::FACTORY { q[$fpackage] }; 1"
-				or $builder->croak("Couldn't create link back to factory $qname\::FACTORY: $@");
 		}
 		
 		if (defined $opts{'subclass'}) {
@@ -925,12 +857,73 @@ sub _make_package {
 	return $qname;
 }
 
+sub install_factories {
+	my ($builder, $fpackage, $qname, $factories) = @_;
+	my $to_type;
+	my @methods = $factories->$_handle_list;
+	while (@methods) {
+		my @method_names;
+		push(@method_names, shift @methods)
+			while (@methods and not ref $methods[0]);
+		my $coderef = shift(@methods) || \1;
+		NAME: for my $name (@method_names) {
+			no warnings 'closure';
+			if (is_CodeRef $coderef) {
+				eval "package $fpackage; sub $name :method { splice(\@_, 1, 0, '$qname'); goto \$coderef }; 1"
+					or $builder->croak("Could not create factory $name in $fpackage: $@");
+			}
+			elsif (is_ScalarRef $coderef) {
+				my $target = $$coderef;
+				if ($target eq 1) {
+					# default factory shouldn't overwrite manually created one
+					next NAME if $fpackage->can($name);
+					$target = 'new';
+				}
+				eval "package $fpackage; sub $name :method { shift; '$qname'->$target\(\@_) }; 1"
+					or $builder->croak("Couldn't create factory $name in $fpackage: $@");
+			}
+			elsif (is_HashRef $coderef) {
+				my %meta = %$coderef;
+				$meta{curry} ||= [$qname];
+				
+				if ( match('coercion', $meta{attributes}) or match('coerce', $meta{attributes}) ) {
+					my @sigtypes = grep !is_HashRef($_), @{$meta{signature}};
+					
+					$to_type ||= $fpackage->type_library->get_type_for_package( any => $qname );
+					
+					$builder->croak('Factories used as coercions must take exactly one positional argument')
+						unless is_ArrayRef( $meta{signature} ) && 1==@sigtypes && !$meta{named};
+					
+					$builder->croak("Too late to add coercion to $to_type")
+						if $to_type->coercion->frozen;
+					
+					my $from_type = 'Type::Registry'->for_class($qname)->lookup( $sigtypes[0] );
+					
+					$to_type->coercion->add_type_coercions(
+						$from_type, sprintf('%s->%s($_)', B::perlstring($fpackage), $name),
+					);
+					
+					my @new_attrs = grep !/^coerc/, @{$meta{attributes}};
+					$meta{attributes} = \@new_attrs;
+				}
+				
+				$builder->install_methods($fpackage, { $name => \%meta });
+			}
+			else {
+				die "lolwut?";
+			}
+		}
+		$builder->_make_exportable_factories($fpackage, @method_names);
+	}
+}
+
 sub _make_exportable_factories {
 	my $builder = shift;
 	my ($factory, @methods) = @_;
 	foreach my $method ( @methods ) {
 		eval qq{
 			package ${factory};
+			no warnings 'redefine';
 			sub _generate_${method} :method {
 				sub { q[${factory}]->${method}( \@_ ) };
 			}
@@ -1003,7 +996,8 @@ sub generate_package {
 	
 	my %opts;
 	for my $key (qw/ extends with has can constant around before after
-		toolkit version authority mutable begin end requires import overload /) {
+		toolkit version authority mutable begin end requires import overload
+		before_apply after_apply multimethod /) {
 		if (exists $local_opts{$key}) {
 			$opts{$key} = delete $local_opts{$key};
 		}
@@ -1372,18 +1366,37 @@ sub install_multimethod {
 	Ref->($method_spec->{signature});
 	CodeRef->($method_spec->{code});
 	
+	my $signature_style = CodeRef->check($method_spec->{signature})
+		? 'code'
+		: ($method_spec->{named} ? 'named' : 'positional');
+	
 	my $new_sig = $builder->_build_method_signature_check(
 		$target,
 		$method_name,
-		CodeRef->check($method_spec->{signature})
-			? 'code'
-			: ($method_spec->{named} ? 'named' : 'positional'),
+		$signature_style,
 		$method_spec->{signature},
 		undef,
 		1,
 	);
 	$method_spec->{signature} = $new_sig;
-	
+
+	if ( match('coercion', $method_spec->{'attributes'}) or match('coerce', $method_spec->{'attributes'}) ) {
+		my $to_type = $target->FACTORY->type_library->get_type_for_package( any => $target );
+		
+		my @sigtypes = grep Scalar::Util::blessed($_), @{$method_spec->{signature}};
+		
+		$builder->croak('Multimethods used as coercions must take exactly one positional argument')
+			unless is_ArrayRef( $method_spec->{signature} ) && 1==@sigtypes && $signature_style eq 'positional';
+		
+		$builder->croak("Too late to add coercion to $to_type")
+			if $to_type->coercion->frozen;
+		
+		my $from_type = 'Type::Registry'->for_class($target)->lookup( $sigtypes[0] );
+		
+		my $code = $method_spec->{code};
+		$to_type->coercion->add_type_coercions( $from_type, sub { $code->($target, $_) } );
+	}
+
 	require Sub::MultiMethod;
 	'Sub::MultiMethod'->install_candidate($target, $method_name, no_dispatcher=>($kind eq 'role'), %$method_spec);
 }
@@ -1477,6 +1490,8 @@ sub install_methods {
 	my ($class, $methods) = @_;
 	my %return;
 	
+	my $to_type;
+	
 	for my $name (sort keys %$methods) {
 		no strict 'refs';
 		my ($code, $signature, $signature_style, $invocant_count, $is_coderef, $caller, $attrs, @curry);
@@ -1561,6 +1576,24 @@ sub install_methods {
 		no warnings 'closure';
 		($return{$name} = eval($subcode))
 			or $builder->croak("Could not create method $name in package $class: $@");
+		
+		if ( match('coercion', $attrs) or match('coerce', $attrs) ) {
+			my @sigtypes = grep !is_HashRef($_), @$signature;
+			
+			$to_type ||= $class->FACTORY->type_library->get_type_for_package( any => $class );
+			
+			$builder->croak('Methods used as coercions must take exactly one positional argument')
+				unless is_ArrayRef( $signature ) && 1==@sigtypes && $signature_style eq 'positional';
+			
+			$builder->croak("Too late to add coercion to $to_type")
+				if $to_type->coercion->frozen;
+			
+			my $from_type = 'Type::Registry'->for_class($class)->lookup( $sigtypes[0] );
+			
+			$to_type->coercion->add_type_coercions(
+				$from_type, sprintf('%s->%s($_)', B::perlstring($class), $name),
+			);
+		}
 	}
 	\%return;
 }

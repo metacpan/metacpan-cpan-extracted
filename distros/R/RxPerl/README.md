@@ -234,9 +234,9 @@ should apply to RxPerl too).
 
     [https://rxjs.dev/api/index/function/throwError](https://rxjs.dev/api/index/function/throwError)
 
-        # 0, 1, 2, 3, error: foo
+        # 0, 1, 2, 3, foo, 4, 5, 6, ...
         rx_merge(
-            rx_throw_error('foo')->pipe( op_delay(4.5) ),
+            rx_of('foo')->pipe( op_delay(4.5) ),
             rx_interval(1),
         )->subscribe($subscriber);
 
@@ -433,11 +433,25 @@ Since the [rxjs implementation](https://rxjs.dev/api/) differs from the
 [Rx\* libraries](http://reactivex.io/languages.html)), RxPerl chose to behave like rxjs rather than
 ReactiveX to cater for web developers already familiar with rxjs.
 
+# GUIDE TO CREATING YOUR OWN CREATION & PIPEABLE OPERATORS
+
+- If you need the upstream and downstreams subscribers to complete at the same time,
+pass the entire contents of the downstream subscriber object to the upstream subscriber.
+This will pass the \_subscription key as well, and that way you will not need to return a
+request to unsubscribe from the upstream, from your observable declaration. Just like `op_map`
+does with this line, and just returns then with `return;`:
+
+        my $own_subscriber = { %$subscriber };
+
 # TODO
 
-- Unhandled _error_ events ought to throw an exception
 - Fix the occasional bug
-- Short guide on how to create a creation or a pipeable operator
+- Implement more operators, based on user requests
+
+# SEE ALSO
+
+- [Rx Marbles](https://rxmarbles.com/)
+- [Ryu module's SEE ALSO section](https://metacpan.org/pod/Ryu#SEE-ALSO)
 
 # LICENSE
 

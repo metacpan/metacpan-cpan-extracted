@@ -15,6 +15,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "WWW-Subsonic",
   "EXE_FILES" => [
     "bin/subsonic_import_ratings.pl",
+    "bin/subsonic_starred_m3u.pl",
     "bin/subsonic_sync_starred.pl"
   ],
   "LICENSE" => "bsd",
@@ -52,7 +53,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }

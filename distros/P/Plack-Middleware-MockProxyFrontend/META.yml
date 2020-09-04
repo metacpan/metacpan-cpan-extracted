@@ -3,9 +3,8 @@ abstract: 'virtualhost-aware PSGI app developer tool'
 author:
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
 build_requires:
-  File::Find: 0
-  File::Temp: 0
-  Test::More: 0.88
+  Test::More: 0
+  strict: 0
 configure_requires:
   ExtUtils::MakeMaker: 0
 dynamic_config: 0
@@ -24,9 +23,8 @@ requires:
   URI::Split: 0
   parent: 0
   perl: 5.014
-  strict: 0
   warnings: 0
 resources:
   bugtracker: https://github.com/ap/Plack-Middleware-MockProxyFrontend/issues
   repository: git://github.com/ap/Plack-Middleware-MockProxyFrontend.git
-version: 0.002
+version: 0.003

@@ -2,7 +2,7 @@ lib lib
 tlib t
 author LNATION
 email email@lnation.org
-version 0.02
+version 0.03
 Hades::Macro::Dolos base Hades::Macro {
 	abstract { Hades macro helpers for Dolos }
 	synopsis {
@@ -15,8 +15,8 @@ Quick summary of what the module does:
 			}
 			Kosmos { 
 				psyche $dolos :t(Int) $eros :t(HashRef) $psyche :t(HashRef) {
-					€if(q|$dolos|,q|€if(q{$dolos > 10},q{return $eros;});|,q|€elsif(q{$dolos > 5},q{€merge_hash_refs(q/$eros/, q/$psyche/);});|,
-						q|€else(q{return $psyche;});|);
+					€if($dolos,€if($dolos > 10, return $eros;);, €elsif($dolos > 5, €merge_hash_refs($eros, $psyche););,
+						€else(return $psyche;););
 					return undef;
 				}
 			}
@@ -54,8 +54,7 @@ Quick summary of what the module does:
 		return qq|
 			my (\$cls, \$vn) = (ref \$_[0], q{[^:'[:cntrl:]]{0,1024}});
 			our \$AUTOLOAD =~ /^\${cls}::(\$vn)\$/;
-                	die "illegal key name, must be of \$vn form\\n\\\$AUTOLOAD" unless \$1;
-                	return ${cb}(\$1);
+                	return ${cb}(\$1) if \$1; 
 		|;
 	}
 	caller $mg :t(Object) $variable :t(Str) :d(q|$caller|) {

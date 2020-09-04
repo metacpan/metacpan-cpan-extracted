@@ -497,8 +497,6 @@ module for reading file files.
 For writing Zip archives, there is a companion module,
 called L<Archive::Zip::SimpleZip>, that can create Zip archives.
 
-B<NOTE> This is alpha quality code, so the interface may change.
-
 =head2 Features
 
 =over 5
@@ -507,7 +505,7 @@ B<NOTE> This is alpha quality code, so the interface may change.
 
 =item * Perl Filehandle interface for reading a zip member.
 
-=item * Supports deflate, store, bzip2 and lzma compression.
+=item * Supports deflate, store, bzip2, Zstandard (Zstd), Xz and lzma compression.
 
 =item * Supports Zip64, so can read archves larger than 4Gig and/or have greater than 64K members.
 
@@ -713,6 +711,16 @@ Only if the C<IO-Compress-Bzip2> module is available.
 =item lzma (14)
 
 Only if the C<IO-Compress-Lzma> module is available.
+
+=item Xz (95)
+
+To read Xz content, the module C<IO::Uncompress::UnXz> must
+be installed.
+
+=item Zstandard (93)
+
+To read Zstandard content, the module C<IO::Uncompress::UnZstd> must
+be installed.
 
 =back
 

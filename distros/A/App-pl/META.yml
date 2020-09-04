@@ -20,5 +20,5 @@ no_index:
 requires:
   perl: '5.010000'
 resources: {}
-version: '0.57'
+version: v0.58.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

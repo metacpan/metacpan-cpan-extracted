@@ -1,5 +1,4 @@
 0001-Enable-shared-build-on-freebsd-10.patch
-Alien-gdal.ppd
 alienfile
 Changes
 lib/Alien/gdal.pm

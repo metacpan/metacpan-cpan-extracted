@@ -1,0 +1,1386 @@
+=head1 NAME
+
+pl - Perl One-Liner Examples
+
+=head1 EXAMPLES
+
+I<To steal ideas from one person is plagiarism.  To steal from many is research. ;-)>
+
+Here's a wide variety of examples, many solving real-life problems.  Often you
+can copy & paste them as-is.  Or you need to make minor changes, e.g. to adapt
+them to your search expression.  Many of these examples started out quite
+small, illustrating the power of pl.  But in order to be generally useful,
+they have been extended to cope with border cases.
+
+Only some of these are original.  Many have been adapted from the various Perl
+one-liner pages on the internet.  This is no attempt to appropriate ownership,
+just to show how things are even easier and more concise with pl.
+
+All examples, if applicable, use the long names and are repeated for short names.  Many examples are followed by their output, indented with C<< > >>.
+
+=head2 Dealing with Files
+
+=over
+
+=item Heads ...
+
+I<People say the back of my head looks really nice -- but I don't see it. :-)>
+
+If you want just I<n>, e.g. 10, lines from the head of each file, use the
+optional number argument to B<-p>, along with B<-r> to reset the count.  The
+program can be empty, but must be present, unless you're reading from stdin:
+
+    pl -rp10 '' file*
+
+If you want the head up to a regexp, use the flip-flop operator, starting with
+line number 1.  Use the print-if-true B<-P> loop option, again with B<-r> to
+reset the count:
+
+    pl -rP '1../last/' file*
+
+You can combine the two, if you want at most I<n> lines, e.g. 10:
+
+    pl -rP10 '1../last/' file*
+
+=item ... or Tails?
+
+I<What has a head, a tail, but no legs?  A penny. :-)>
+
+If you want a bigger number of last lines, you need to stuff them in a list;
+not really worth it.  But if you want just 1 last line from each file, the
+end-of-file B<-e> code (no need to quote, as it has no special characters) can
+C<E(cho)> it for you, capitalized so as to not add another newline (yes, Perl
+is case sensitive):
+
+    pl -e Echo '' file*
+    pl -e E '' file*
+
+If you want the tail from a line-number (e.g. 99) or a regexp, use the
+flip-flop operator, starting with your regexp and going till each end-of-file:
+
+    pl -P '99..eof' file*
+    pl -P '/first/..eof' file*
+
+You can even get head and tail (which in programming logic translates to C<or>),
+if last line of head comes before 1st line of tail (or actually any number of
+such disjoint ranges):
+
+    pl -rP '1../last/ or /first/..eof' file*
+
+=item Remove trailing whitespace in each file
+
+This print-loops (B<-p>) over each file, replacing it (B<-i>) with the
+modified output.  Line ends are stripped on reading and added on printing
+(B<-l>), because they are also whitespace (C<\s>).  At each end of line,
+substitute one or more spaces of any kind (incl. DOS newlines) with nothing:
+
+    pl -pli 's/\s+$//' file*
+
+=item Tabify/Untabify each file
+
+This print-loops (B<-p>) over each file, replacing it (B<-i>) with the
+modified output.  At beginning of line and after each tab, 8 spaces or less
+than 8 followed by a tab are converted to a tab:
+
+    pl -pi '1 while s/(?:^|\t)\K(?: {1,7}\t| {8})/\t/' file*
+
+To go the other way, subtract the tab-preceding length modulo 8, to get the
+number of spaces to replace with:
+
+    pl -pi '1 while s/^([^\t\n]*)\K\t/" " x (8 - length($1) % 8)/e' file*
+
+Fans of half-width tabs make that:
+
+    pl -pi '1 while s/(?:^|\t)\K(?: {1,3}\t| {4})/\t/' file*
+
+    pl -pi '1 while s/^([^\t\n]*)\K\t/" " x (4 - length($1) % 4)/e' file*
+
+=item Print only 1st occurrence of each line
+
+I<Poets create worlds through a minimal of words. -- Kim Hilliker |/|>
+
+This counts repetitions of lines in a hash.  Print only when the expression is
+true (B<-P>), i.e. the count was 0:
+
+    pl -P '!$a{$_}++' file*
+
+If you want this per file, you must empty the hash in the end-of-file B<-e>
+code:
+
+    pl -Pe '%a = ()' '!$a{$_}++' file*
+
+=item Remove Empty Lines
+
+Or, actually the opposite, printing back to the same files (B<-Pi>) all lines
+containing non-whitespace C<\S>:
+
+    pl -Pi '/\S/' file*
+
+=item Move a line further down in each file
+
+Assume we have lines matching "from" followed by lines matching "to".  The
+former shall move after the latter.  This loops over each file, replacing it
+with the modified output.  The flip-flop operator becomes true when matching
+the 1st regexp.  Capture something in there to easily recognize it's the
+first, keep the line in a variable and empty C<$_>.  When C<$1> is again true,
+it must be the last matching line.  Append the keep variable to it.
+
+    pl -pi 'if( /(f)rom/.../(t)o/ ) { if( $1 eq "f" ) { $k = $_; $_ = "" } elsif( $1 ) { $_ .= $k }}' file*
+
+=item Rename a file depending on contents
+
+This reads each file without newlines in a B<-ln> loop.  When it finds the
+C<package> declaration, which gives the logical name of this file, it replaces
+double-colons with slashes.  It renames the file to the result.  The C<last>
+statement then makes this the last line read of the current file, continuing
+with the next file:
+
+    pl -ln 'if( s/^\s*package\s+([^\s;]+).*/$1/ ) { s!::!/!g; rename $ARGV, "$_.pm" or warn "$ARGV -> $_.pm: $!\n"; last }' *.pm
+    pl -ln 'if( s/^\s*package\s+([^\s;]+).*/$1/ ) { s!::!/!g; rename $A, "$_.pm" or warn "$A -> $_.pm: $!\n"; last }' *.pm
+
+This assumes all files are at the root of the destination directories.  If not
+you must add the common part of the target directories before C<$_>.
+
+On Windows this won't quite work, because that locks the file while reading.
+So there you must add C<close ARGV;> (or C<close A;>) before the C<rename>.
+
+For Java, it's a bit more complicated, because the full name is split into a
+C<package> followed by a C<class> or similar statement.  Join them when we
+find the latter:
+
+    pl -n 'if( /^\s*package\s+([^\s;]+)/ ) { $d = $1 =~ tr+.+/+r } elsif( /^\s*(?:(?:public|private|protected|abstract|final)\s+)*(?:class|interface|enum|record)\s+([^\s;]+)/ ) { rename $ARGV, "$d/$1.java" or warn "$ARGV -> $d/$1.java: $!\n"; last }' *.java
+    pl -n 'if( /^\s*package\s+([^\s;]+)/ ) { $d = $1 =~ tr+.+/+r } elsif( /^\s*(?:(?:public|private|protected|abstract|final)\s+)*(?:class|interface|enum|record)\s+([^\s;]+)/ ) { rename $A, "$d/$1.java" or warn "$A -> $d/$1.java: $!\n"; last }' *.java
+
+=item Delete matching files, except last one
+
+If you have many files, which sort chronologically by name, and you want to
+keep only the last one, it can be quite painful to formulate Shell patterns.
+So check on each iteration of the B<-o> loop, if the index C<$ARGIND> (or
+C<$I>) is less than the last, before unlinking (deleting).  If you want to test
+it first, replace C<unlink> with C<e(cho)>:
+
+    pl -o 'unlink if $ARGIND < $#ARGV' file*
+    pl -o 'unlink if $I < $#A' file*
+
+If your resulting list is too long for the Shell, let Perl do it.  Beware that
+the Shell has a clever ordering of files, while Perl does it purely lexically!
+In the B<-B> BEGIN code the result is assigned to C<@A(RGV)>, as though it had
+come from the command line.  This list is then popped (shortened), instead of
+checking each time.  Since the program doesn't contain special characters, you
+don't even need to quote it:
+
+    pl -oB '@ARGV = <file*>; pop' unlink
+    pl -oB '@A = <file*>; pop' unlink
+
+You can exclude files by any other criterion as well:
+
+    pl -oB '@ARGV = grep !/keep-me/, <file*>' unlink
+    pl -oB '@A = grep !/keep-me/, <file*>' unlink
+
+=back
+
+=head2 File statistics
+
+I<42% of statistics are made up! :-)>
+
+=over
+
+=item Count files per suffix
+
+Find and pl both use the B<-0> option to allow funny filenames, including
+newlines.  Sum up encountered suffixes in sort-value-numerically-at-end hash
+C<%N(UMBER)>:
+
+    find -type f -print0 |
+        pl -0ln 'm@[^/.](\.[^/.]*)?$@; ++$NUMBER{$1 // "none"}'
+    find -type f -print0 |
+        pl -0ln 'm@[^/.](\.[^/.]*)?$@; ++$N{$1 // "none"}'
+
+    >          4: .3
+    >          4: .SHs
+    >          4: .act
+    >         ...
+    >         88: .json
+    >        108: .tml
+    >        136: .xml
+    >        224: .yml
+    >        332: .xs
+    >        376: .sh
+    >        412: .ucm
+    >        444: .PL
+    >        512: .c
+    >        640: .h
+    >        696: .txt
+    >        950: .pod
+    >       1392: .pl
+    >       2988: none
+    >       3264: .pm
+    >      10846: .t
+
+=item Count files per directory per suffix
+
+I<There are three types of people: those who can count and those who can't. (-:>
+
+Match to first or last C</> and from last dot following something, i.e. not
+just a dot-file.  Store in sort-by-key-and-stringify-at-end hash C<%R(ESULT)>.
+So count in a nested hash of directory & suffix:
+
+    find -type f -print0 |
+        pl -0ln 'm@^(?:\./)?(.+?)/.*?[^/.](\.[^/.]*)?$@; ++$RESULT{$1}{$2 // "none"}'
+    find -type f -print0 |
+        pl -0ln 'm@^(?:\./)?(.+?)/.*?[^/.](\.[^/.]*)?$@; ++$R{$1}{$2 // "none"}'
+
+    >   perl-5.30.0:  {
+    >     '.1' => 3,
+    >     '.3' => 1,
+    >     '.PL' => 111,
+    >     ...
+    >     '.yml' => 56,
+    >     none => 747
+    >   }
+    >   ...
+    >   perl-5.30.3:  {
+    >     '.1' => 3,
+    >     '.3' => 1,
+    >     '.PL' => 111,
+    >     '.SH' => 9,
+    >     ...'
+    >     '.perl' => 1,
+    >     '.perldb' => 2,
+    >     '.ph' => 1,
+    >     '.pht' => 1,
+    >     '.pkg' => 1,
+    >     '.pl' => 348,
+    >     '.yml' => 56,
+    >     none => 747
+    >   }
+
+    find -type f -print0 |
+        pl -0ln 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@; ++$RESULT{$1}{$2 // "none"}'
+    find -type f -print0 |
+        pl -0ln 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@; ++$R{$1}{$2 // "none"}'
+
+    >   perl-5.30.3:  {
+    >     '.SH' => 8,
+    >     '.act' => 1,
+    >     ...
+    >     '.yml' => 3,
+    >     none => 15
+    >   }
+    >   perl-5.30.3/Cross:  {
+    >     '.new' => 1,
+    >     '.patch' => 2,
+    >     '.sh-arm-linux' => 1,
+    >     '.sh-arm-linux-n770' => 1,
+    >     none => 9
+    >   }
+    >   ...
+    >   perl-5.30.3/lib:  {
+    >     '.pl' => 5,
+    >     '.pm' => 36,
+    >     '.pod' => 2,
+    >     '.t' => 41
+    >   }
+    >   perl-5.30.3/lib/B:  {
+    >     '.pm' => 2,
+    >     '.t' => 3
+    >   }
+    >   perl-5.30.3/lib/Class:  {
+    >     '.pm' => 1,
+    >     '.t' => 1
+    >   }
+    >   perl-5.30.3/lib/Config:  {
+    >     '.pm' => 1,
+    >     '.t' => 1
+    >   }
+    >   ...
+    >   perl-5.30.3/t:  {
+    >     '.pl' => 4,
+    >     '.supp' => 1,
+    >     none => 3
+    >   }
+    >   perl-5.30.3/t/base:  {
+    >     '.t' => 9
+    >   }
+    >   perl-5.30.3/t/benchmark:  {
+    >     '.t' => 1
+    >   }
+    >   ...
+
+This is the same pivoted, grouping by suffix and counting per directory:
+
+    find -type f -print0 |
+        pl -0ln 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@; ++$RESULT{$2 // "none"}{$1}'
+    find -type f -print0 |
+        pl -0ln 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@; ++$R{$2 // "none"}{$1}'
+
+    >   ...
+    >   .pl:  {
+    >     'perl-5.30.3' => 8,
+    >     ...
+    >     'perl-5.30.3/dist/Attribute-Handlers/demo' => 11,
+    >     'perl-5.30.3/dist/Devel-PPPort/devel' => 3,
+    >     'perl-5.30.3/dist/Devel-PPPort/parts' => 2,
+    >     'perl-5.30.3/dist/Devel-PPPort/t' => 1,
+    >     'perl-5.30.3/dist/IO/hints' => 1,
+    >     'perl-5.30.3/dist/Storable/hints' => 4,
+    >     ...
+    >   }
+    >   ...
+    >   .pm:  {
+    >     'perl-5.30.3' => 1,
+    >     'perl-5.30.3/Porting' => 2,
+    >     ...
+    >     'perl-5.30.3/dist/Attribute-Handlers/lib/Attribute' => 1,
+    >     'perl-5.30.3/dist/Carp/lib' => 1,
+    >     'perl-5.30.3/dist/Carp/lib/Carp' => 1,
+    >     'perl-5.30.3/dist/Data-Dumper' => 1,
+    >     'perl-5.30.3/dist/Data-Dumper/t/lib' => 1,
+    >     ...
+    >   }
+    >   ...
+    >   .pod:  {
+    >     'perl-5.30.3/Porting' => 8,
+    >     'perl-5.30.3/cpan/CPAN-Meta/lib/CPAN/Meta/History' => 5,
+    >     'perl-5.30.3/cpan/CPAN/lib/CPAN/API' => 1,
+    >     ...
+    >     'perl-5.30.3/dist/ExtUtils-ParseXS/lib' => 3,
+    >     'perl-5.30.3/dist/ExtUtils-ParseXS/lib/ExtUtils' => 1,
+    >     'perl-5.30.3/dist/Locale-Maketext/lib/Locale' => 1,
+    >     'perl-5.30.3/dist/Locale-Maketext/lib/Locale/Maketext' => 2,
+    >     ...
+    >   }
+    >   ...
+
+This is similar, but stores in sort-by-number-at-end C<%N(UMBER)>.  Therefore
+it sorts by frequency, only secondarily by directory & suffix (pl sorts
+stably):
+
+    find -type f -print0 |
+        pl -0ln 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@; ++$NUMBER{"$1 " . ($2 // "none")}'
+    find -type f -print0 |
+        pl -0ln 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@; ++$N{"$1 " . ($2 // "none")}'
+
+    >          1: perl-5.30.3 .act
+    >          1: perl-5.30.3 .aix
+    >          1: perl-5.30.3 .amiga
+    >          1: perl-5.30.3 .android
+    >          1: perl-5.30.3 .bs2000
+    >          ...
+    >          2: perl-5.30.3/Porting .c
+    >          2: perl-5.30.3/Porting .pm
+    >          ...
+    >        138: perl-5.30.3/cpan/Unicode-Collate/t .t
+    >        149: perl-5.30.3/pod .pod
+    >        206: perl-5.30.3/t/op .t
+
+The function C<N(umber)> can trim C<%N(UMBER)>, to those entries at least the
+argument (default 2):
+
+    find -type f -print0 |
+        pl -0lnE Number 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@; ++$NUMBER{"$1 " . ($2 // "none")}'
+    find -type f -print0 |
+        pl -0lnE N 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@; ++$N{"$1 " . ($2 // "none")}'
+
+    find -type f -print0 |
+        pl -0lnE 'Number 80' 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@; ++$NUMBER{"$1 " . ($2 // "none")}'
+    find -type f -print0 |
+        pl -0lnE 'N 80' 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@; ++$N{"$1 " . ($2 // "none")}'
+
+    >         82: perl-5.30.3/cpan/Math-BigInt/t .t
+    >         82: perl-5.30.3/hints .sh
+    >         84: perl-5.30.3/cpan/IO-Compress/t .t
+    >         87: perl-5.30.3/cpan/Unicode-Collate/Collate/Locale .pl
+    >        103: perl-5.30.3/cpan/Encode/ucm .ucm
+    >        117: perl-5.30.3/ext/XS-APItest/t .t
+    >        137: perl-5.30.3/dist/Devel-PPPort/parts/base none
+    >        137: perl-5.30.3/dist/Devel-PPPort/parts/todo none
+    >        138: perl-5.30.3/cpan/Unicode-Collate/t .t
+    >        149: perl-5.30.3/pod .pod
+    >        206: perl-5.30.3/t/op .t
+
+=item Sum up file-sizes per suffix
+
+This illustrates a simpler approach: rather than the complicated regexps
+above, let Perl split each filename for us.  Find separates output with a dot
+and -F splits on that.  The C<\\> is to escape one backslash from the Shell.
+No matter how many dots the filename contains, 1st element is the size and
+last is the suffix.  Sum it in C<%N(UMBER)>, which gets sorted numerically at
+the end:
+
+    find -type f -printf "%s.%f\0" |
+        pl -0lF\\. '$NUMBER{@FIELD > 2 ? ".$FIELD[-1]" : "none"} += $FIELD[0]'
+    find -type f -printf "%s.%f\0" |
+        pl -0lF\\. '$N{@F > 2 ? ".$F[-1]" : "none"} += $F[0]'
+
+    >          0: .configure
+    >         16: .perldb
+    >         85: .xsh
+    >         90: .inf
+    >        118: .pmc
+    >        138: .plugin
+    >   ...
+    >    7167163: .c
+    >    7638677: .pod
+    >    7794749: .h
+    >    9742749: .ucm
+    >   11124074: .t
+    >   11617824: .pm
+    >   12259742: .txt
+
+=item Count files per date
+
+Incredibly, find has no ready-made ISO date, so specify the 3 parts.  If you
+don't want days, just leave out C<-%Td>.  Sum up encountered dates in
+sort-value-numerically-at-end hash C<%N(UMBER)>:
+
+    find -type f -printf "%TY-%Tm-%Td\n" |
+        pl -ln '++$NUMBER{$_}'
+    find -type f -printf "%TY-%Tm-%Td\n" |
+        pl -ln '++$N{$_}'
+
+    >          1: 2018-07-19
+    >          1: 2019-04-10
+    >          ...
+    >         34: 2020-02-11
+    >         93: 2020-02-29
+    >       2816: 2018-06-27
+    >       3307: 2019-05-11
+    >       6024: 2019-10-21
+    >      12159: 2019-10-24
+
+=item Count files per date with rollup
+
+I<Learn sign language!  It's very handy. :-)>
+
+Rollup means, additionally to the previous case, sum up dates with the same
+prefix.  The trick here is to count both for the actual year, month and day,
+as well as replacing once only the day, once also the month with "__", and
+once also the year with "____".  This sorts after numbers and gives a sum for
+all with the same leading numbers.  Use the sort-by-key-and-stringify-at-end
+hash C<%R(ESULT)>:
+
+    find -type f -printf "%TY-%Tm-%Td\n" |
+        pl -ln 'do { ++$RESULT{$_} } while s/[0-9]+(?=[-_]*$)/"_" x length $&/e'
+    find -type f -printf "%TY-%Tm-%Td\n" |
+        pl -ln 'do { ++$R{$_} } while s/[0-9]+(?=[-_]*$)/"_" x length $&/e'
+
+    >   2018-06-27:  2816
+    >   2018-06-__:  2816
+    >   2018-07-19:  1
+    >   2018-07-__:  1
+    >   2018-__-__:  2817
+    >   2019-04-10:  1
+    >   2019-04-__:  1
+    >   ...
+    >   2019-11-10:  11
+    >   2019-11-25:  6
+    >   2019-11-__:  17
+    >   2019-12-05:  4
+    >   2019-12-__:  4
+    >   2019-__-__:  21581
+    >   ...
+    >   2020-05-14:  33
+    >   2020-05-15:  1
+    >   2020-05-17:  5
+    >   2020-05-29:  4
+    >   2020-05-__:  43
+    >   2020-__-__:  206
+    >   ____-__-__:  24604
+
+=back
+
+=head2 Diff several inputs by a unique key
+
+I<Always remember you're unique, just like everyone else. :-)>
+
+The function C<k(eydiff)> stores the 2nd arg or chomped C<$_> in C<%K(EYDIFF)>
+keyed by 1st arg or C<$1> and the arg counter C<$ARGIND> (or C<$I>).  Its
+sibling C<K(eydiff)> does the same using 1st arg or 0 as an index into C<@F(IELD)>
+for the 1st part of the key.  At the end only the rows differing between files
+are shown.  If you specify B<--color> and have C<Algorithm::Diff> the exact
+difference gets color-highlighted.
+
+=over
+
+=item Diff several csv, tsv or passwd files by 1st field
+
+This assumes no comma in key field and no newline in any field.  Else you need
+a csv-parser package.  B<-F> implies B<-a>, which implies B<-n> (even using
+older than Perl 5.20, which introduced this idea).  B<-F,> splits each line on
+commas, and C<K(eydiff)> by default takes the 1st field as your unique key:
+
+    pl -F, Keydiff *.csv
+    pl -F, K *.csv
+
+    >   1
+    >   	1,H,Hydrogen,1:H & alkali metal,1.008
+    >   	n/a
+    >   	1,H,Hydrogen,1:alkali metal,1
+    >   4
+    >   	4,Be,Beryllium,2:alkaline earth metal,9.012
+    >   	4,Pl,Perlium,2:pl basis,5.32.0
+    >   	n/a
+    >   8
+    >   	8,O,Oxygen,16:O & chalcogen,15.999
+    >   	8,O,Oxygen,16:O & chalcogen,16
+    >   	8,O,Oxygen,16:O and chalcogen,16
+    >   41
+    >   	41,Nb,Niobium,5:no name,92.906
+    >   	n/a
+    >   	41,Nb,Columbium,5:no name,93
+    >   74
+    >   	74,W,Tungsten,6:transition metal,183.84
+    >   	74,W,Wolfram,6:transition metal,183.8
+    >   	n/a
+    >   80
+    >   	80,Hg,Mercury,12:no name,200.592
+    >   	80,Hg,Quicksilver,12:no name,200.6
+    >   	80,Hg,Hydrargyrum,12:no name,201
+    >   110
+    >   	n/a
+    >   	110,Ds,Darmstadtium,10:transition metal,[281]
+    >   	110,Ds,Darmstadtium,10:transition metal,281
+
+This is similar, but removes the key from the stored value, so it doesn't get
+repeated for each file.  Note how C<k(eydiff)> by default uses C<$1> as a key
+for C<$_>.  Additionally, in a B<-B> begin program, show the filenames one per
+line:
+
+    pl -nB 'echo for @ARGV' 'keydiff if s/(.+?),//' *.csv
+    pl -nB 'e for @A' 'k if s/(.+?),//' *.csv
+
+    >   atom-weight-1.csv
+    >   atom-weight-2.csv
+    >   atom-weight-3.csv
+    >   1
+    >   	H,Hydrogen,1:H & alkali metal,1.008
+    >   	n/a
+    >   	H,Hydrogen,1:alkali metal,1
+    >   4
+    >   	Be,Beryllium,2:alkaline earth metal,9.012
+    >   	Pl,Perlium,2:pl basis,5.32.0
+    >   	n/a
+    >   8
+    >   	O,Oxygen,16:O & chalcogen,15.999
+    >   	O,Oxygen,16:O & chalcogen,16
+    >   	O,Oxygen,16:O and chalcogen,16
+    >   41
+    >   	Nb,Niobium,5:no name,92.906
+    >   	n/a
+    >   	Nb,Columbium,5:no name,93
+    >   74
+    >   	W,Tungsten,6:transition metal,183.84
+    >   	W,Wolfram,6:transition metal,183.8
+    >   	n/a
+    >   80
+    >   	Hg,Mercury,12:no name,200.592
+    >   	Hg,Quicksilver,12:no name,200.6
+    >   	Hg,Hydrargyrum,12:no name,201
+    >   110
+    >   	n/a
+    >   	Ds,Darmstadtium,10:transition metal,[281]
+    >   	Ds,Darmstadtium,10:transition metal,281
+
+A variant of csv is tsv, with tab as separator.  Tab is C<\t>, which must be
+escaped from the Shell as C<\\t>:
+
+    pl -F\\t Keydiff *.tsv
+    pl -F\\t K *.tsv
+
+    >   1
+    >   	1	H	Hydrogen	1:H & alkali metal	1.008
+    >   	n/a
+    >   	1	H	Hydrogen	1:alkali metal	1
+    >   4
+    >   	4	Be	Beryllium	2:alkaline earth metal	9.012
+    >   	4	Pl	Perlium	2:pl basis	5.32.0
+    >   	n/a
+    >   8
+    >   	8	O	Oxygen	16:O & chalcogen	15.999
+    >   	8	O	Oxygen	16:O & chalcogen	16
+    >   	8	O	Oxygen	16:O and chalcogen	16
+    >   41
+    >   	41	Nb	Niobium	5:no name	92.906
+    >   	n/a
+    >   	41	Nb	Columbium	5:no name	93
+    >   74
+    >   	74	W	Tungsten	6:transition metal	183.84
+    >   	74	W	Wolfram	6:transition metal	183.8
+    >   	n/a
+    >   80
+    >   	80	Hg	Mercury	12:no name	200.592
+    >   	80	Hg	Quicksilver	12:no name	200.6
+    >   	80	Hg	Hydrargyrum	12:no name	201
+    >   110
+    >   	n/a
+    >   	110	Ds	Darmstadtium	10:transition metal	[281]
+    >   	110	Ds	Darmstadtium	10:transition metal	281
+
+    pl -n 'keydiff if s/(.+?)\t//' *.tsv
+    pl -n 'k if s/(.+?)\t//' *.tsv
+
+    >   1
+    >   	H	Hydrogen	1:H & alkali metal	1.008
+    >   	n/a
+    >   	H	Hydrogen	1:alkali metal	1
+    >   4
+    >   	Be	Beryllium	2:alkaline earth metal	9.012
+    >   	Pl	Perlium	2:pl basis	5.32.0
+    >   	n/a
+    >   8
+    >   	O	Oxygen	16:O & chalcogen	15.999
+    >   	O	Oxygen	16:O & chalcogen	16
+    >   	O	Oxygen	16:O and chalcogen	16
+    >   41
+    >   	Nb	Niobium	5:no name	92.906
+    >   	n/a
+    >   	Nb	Columbium	5:no name	93
+    >   74
+    >   	W	Tungsten	6:transition metal	183.84
+    >   	W	Wolfram	6:transition metal	183.8
+    >   	n/a
+    >   80
+    >   	Hg	Mercury	12:no name	200.592
+    >   	Hg	Quicksilver	12:no name	200.6
+    >   	Hg	Hydrargyrum	12:no name	201
+    >   110
+    >   	n/a
+    >   	Ds	Darmstadtium	10:transition metal	[281]
+    >   	Ds	Darmstadtium	10:transition metal	281
+
+The same, with a colon as separator, if you want to compare passwd files from
+several hosts.  Here we additionally need to ignore commented out lines:
+
+    pl -F: 'Keydiff unless /^#/' /etc/passwd passwd*
+    pl -F: 'K unless /^#/' /etc/passwd passwd*
+
+    pl -n 'keydiff if s/^([^#].*?)://' /etc/passwd passwd*
+    pl -n 'k if s/^([^#].*?)://' /etc/passwd passwd*
+
+=item Diff several zip archives by member name
+
+This uses the same mechanism as the csv example.  Addidionally, through the
+C<p(iped)> block, it reads the output of C<unzip -vql> for each archive.  That
+has an almost fixed format, except with extreme member sizes.  The regexp
+picks up only those lines which refer to files:
+
+    pl -oB 'echo for @ARGV' 'piped { keydiff if s@.{29,}% .{16} [\da-f]{8}\K  (.*[^/])\n@@ } "unzip", "-vql", $_' *.zip
+    pl -oB 'e for @A' 'p { k if s@.{29,}% .{16} [\da-f]{8}\K  (.*[^/])\n@@ } "unzip", "-vql", $_' *.zip
+
+    >   perl-5.30.0.zip
+    >   perl-5.30.1.zip
+    >   perl-5.30.2.zip
+    >   perl-5.30.3.zip
+    >   AUTHORS
+    >   	   48831  Defl:N    22282  54% 2019-05-11 11:50 cc2a1286
+    >   	   48864  Defl:N    22297  54% 2019-10-24 23:27 b793bcc5
+    >   	   48927  Defl:N    22338  54% 2020-02-29 12:55 8cecd35e
+    >   	   48927  Defl:N    22338  54% 2020-02-11 14:31 8cecd35e
+    >   Artistic
+    >   	    6321  Defl:N     2400  62% 2019-05-11 11:50 fa53ec29
+    >   	    6321  Defl:N     2400  62% 2019-10-24 22:17 fa53ec29
+    >   	    6321  Defl:N     2400  62% 2019-10-24 22:17 fa53ec29
+    >   	    6321  Defl:N     2400  62% 2019-10-21 13:20 fa53ec29
+    >   Changes
+    >   	    3168  Defl:N     1273  60% 2018-06-27 13:17 66a9af3e
+    >   	    3111  Defl:N     1246  60% 2019-10-27 10:52 f826c349
+    >   	    3111  Defl:N     1246  60% 2019-10-27 10:52 f826c349
+    >   	    3111  Defl:N     1246  60% 2019-10-28 09:05 f826c349
+    >   ...
+
+Java .jar, .ear & .war files (which are aliases for .zip), after a clean build
+have many class files with the identical crc, but a different date.  This
+excludes the date:
+
+    pl -o 'piped { keydiff $2 if s@.{29,}% \K.{16} ([\da-f]{8})  (.*[^/])\n@$1@ } "unzip", "-vql", $_' *.zip
+    pl -o 'p { k $2 if s@.{29,}% \K.{16} ([\da-f]{8})  (.*[^/])\n@$1@ } "unzip", "-vql", $_' *.zip
+
+    >   AUTHORS
+    >   	   48831  Defl:N    22282  54% cc2a1286
+    >   	   48864  Defl:N    22297  54% b793bcc5
+    >   	   48927  Defl:N    22338  54% 8cecd35e
+    >   	   48927  Defl:N    22338  54% 8cecd35e
+    >   Changes
+    >   	    3168  Defl:N     1273  60% 66a9af3e
+    >   	    3111  Defl:N     1246  60% f826c349
+    >   	    3111  Defl:N     1246  60% f826c349
+    >   	    3111  Defl:N     1246  60% f826c349
+    >   Configure
+    >   	  587687  Defl:N   148890  75% 144c0f25
+    >   	  587687  Defl:N   148890  75% 144c0f25
+    >   	  587825  Defl:N   148954  75% 6761d877
+    >   	  587825  Defl:N   148954  75% 6761d877
+    >   INSTALL
+    >   	  108059  Defl:N    37351  65% 45af5545
+    >   	  108085  Defl:N    37371  65% e5f2f22b
+    >   	  107649  Defl:N    37211  65% 9db83c1e
+    >   	  107649  Defl:N    37211  65% 16726160
+    >   ...
+
+=item Diff several tarballs by member name
+
+This is like the zip example.  Alas tar gives no checksums, so this is less
+reliable.  Exclude directories, by taking only lines not starting with a C<d>.
+Each time a wider owner/group or file size was seen, columns shift right.  So
+reformat the columns, to not show this as a difference:
+
+    pl -oB 'echo for @ARGV' 'piped { keydiff $4 if s!^[^d]\S+ \K(.+?) +(\d+) (.{16}) (.+)!sprintf "%-20s %10d %s", $1, $2, $3!e } "tar", "-tvf", $_' *.tar *.tgz *.txz
+    pl -oB 'e for @A' 'p { k $4 if s!^[^d]\S+ \K(.+?) +(\d+) (.{16}) (.+)!sprintf "%-20s %10d %s", $1, $2, $3!e } "tar", "-tvf", $_' *.tar *.tgz *.txz
+
+    >   perl-5.30.0.txz
+    >   perl-5.30.1.txz
+    >   perl-5.30.2.txz
+    >   perl-5.30.3.txz
+    >   ...
+    >   cpan/Compress-Raw-Bzip2/bzip2-src/decompress.c
+    >   	-r--r--r-- pfeiffer/pfeiffer         20948 2018-06-27 13:17
+    >   	-r--r--r-- pfeiffer/pfeiffer         20948 2019-10-24 22:17
+    >   	-r--r--r-- pfeiffer/pfeiffer         21287 2020-02-29 12:55
+    >   	-r--r--r-- pfeiffer/pfeiffer         21287 2020-02-12 18:41
+    >   cpan/Compress-Raw-Bzip2/bzip2-src/huffman.c
+    >   	-r--r--r-- pfeiffer/pfeiffer          6991 2018-06-27 13:17
+    >   	-r--r--r-- pfeiffer/pfeiffer          6991 2019-10-24 22:17
+    >   	-r--r--r-- pfeiffer/pfeiffer          6986 2020-02-29 12:55
+    >   	-r--r--r-- pfeiffer/pfeiffer          6986 2020-02-12 18:41
+    >   cpan/Compress-Raw-Bzip2/bzip2-src/randtable.c
+    >   	-r--r--r-- pfeiffer/pfeiffer          3866 2018-06-27 13:17
+    >   	-r--r--r-- pfeiffer/pfeiffer          3866 2019-10-24 22:17
+    >   	-r--r--r-- pfeiffer/pfeiffer          3861 2020-02-29 12:55
+    >   	-r--r--r-- pfeiffer/pfeiffer          3861 2020-02-12 18:41
+    >   cpan/Compress-Raw-Bzip2/fallback/constants.h
+    >   	-r--r--r-- pfeiffer/pfeiffer          7238 2018-06-27 13:17
+    >   	-r--r--r-- pfeiffer/pfeiffer          7238 2019-10-24 22:17
+    >   	-r--r--r-- pfeiffer/pfeiffer          7238 2019-10-24 22:17
+    >   	-r--r--r-- pfeiffer/pfeiffer          7238 2019-10-21 13:20
+    >   ...
+
+Same without the date:
+
+    pl -o 'piped { keydiff $3 if s!^[^d]\S+ \K(.+?) +(\d+) .{16} (.+)!sprintf "%-20s %10d", $1, $2!e; } "tar", "-tvf", $_' *.tar *.tgz *.txz
+    pl -o 'p { k $3 if s!^[^d]\S+ \K(.+?) +(\d+) .{16} (.+)!sprintf "%-20s %10d", $1, $2!e; } "tar", "-tvf", $_' *.tar *.tgz *.txz
+
+    >   ...
+    >   cpan/Compress-Raw-Bzip2/bzip2-src/decompress.c
+    >   	-r--r--r-- pfeiffer/pfeiffer         20948
+    >   	-r--r--r-- pfeiffer/pfeiffer         20948
+    >   	-r--r--r-- pfeiffer/pfeiffer         21287
+    >   	-r--r--r-- pfeiffer/pfeiffer         21287
+    >   cpan/Compress-Raw-Bzip2/bzip2-src/huffman.c
+    >   	-r--r--r-- pfeiffer/pfeiffer          6991
+    >   	-r--r--r-- pfeiffer/pfeiffer          6991
+    >   	-r--r--r-- pfeiffer/pfeiffer          6986
+    >   	-r--r--r-- pfeiffer/pfeiffer          6986
+    >   cpan/Compress-Raw-Bzip2/bzip2-src/randtable.c
+    >   	-r--r--r-- pfeiffer/pfeiffer          3866
+    >   	-r--r--r-- pfeiffer/pfeiffer          3866
+    >   	-r--r--r-- pfeiffer/pfeiffer          3861
+    >   	-r--r--r-- pfeiffer/pfeiffer          3861
+    >   cpan/Compress-Raw-Bzip2/lib/Compress/Raw/Bzip2.pm
+    >   	-r--r--r-- pfeiffer/pfeiffer         10783
+    >   	-r--r--r-- pfeiffer/pfeiffer         10783
+    >   	-r--r--r-- pfeiffer/pfeiffer         11009
+    >   	-r--r--r-- pfeiffer/pfeiffer         11009
+    >   ...
+
+Tarballs from the internet have a top directory of F<name-version/>, which
+across versions would make every member have a different key.  So exclude the
+1st path element from the key by matching C<[^/]+/> before the last paren
+group:
+
+    pl -o 'piped { keydiff $4 if s!^[^d]\S+ \K(.+?) +(\d+) (.{16}) [^/]+/(.+)!sprintf "%-20s %10d %s", $1, $2, $3!e } "tar", "-tvf", $_' *.tar *.tgz *.txz
+    pl -o 'p { k $4 if s!^[^d]\S+ \K(.+?) +(\d+) (.{16}) [^/]+/(.+)!sprintf "%-20s %10d %s", $1, $2, $3!e } "tar", "-tvf", $_' *.tar *.tgz *.txz
+
+    >   .dir-locals.el
+    >   	-r--r--r-- sawyer/sawyer               208 2018-06-27 13:17
+    >   	-r--r--r-- Steve/None                  208 2019-10-24 22:17
+    >   	-r--r--r-- Steve/None                  208 2019-10-24 22:17
+    >   	-r--r--r-- Steve/None                  208 2019-10-21 13:20
+    >   .lgtm.yml
+    >   	-r--r--r-- sawyer/sawyer               347 2019-05-11 11:50
+    >   	-r--r--r-- Steve/None                  347 2019-10-24 22:17
+    >   	-r--r--r-- Steve/None                  347 2019-10-24 22:17
+    >   	-r--r--r-- Steve/None                  347 2019-10-21 13:20
+    >   .metaconf-exclusions.txt
+    >   	-r--r--r-- sawyer/sawyer              1317 2019-05-11 11:50
+    >   	-r--r--r-- Steve/None                 1317 2019-10-24 22:17
+    >   	-r--r--r-- Steve/None                 1317 2019-10-24 22:17
+    >   	-r--r--r-- Steve/None                 1317 2019-10-21 13:20
+    >   .travis.yml
+    >   	-r--r--r-- sawyer/sawyer              2203 2019-05-11 11:50
+    >   	-r--r--r-- Steve/None                 2203 2019-10-24 23:27
+    >   	-r--r--r-- Steve/None                 2203 2019-10-24 23:27
+    >   	-r--r--r-- Steve/None                 2203 2019-10-21 13:20
+    >   AUTHORS
+    >   	-r--r--r-- sawyer/sawyer             48831 2019-05-11 11:50
+    >   	-r--r--r-- Steve/None                48864 2019-10-24 23:27
+    >   	-r--r--r-- Steve/None                48927 2020-02-29 12:55
+    >   	-r--r--r-- Steve/None                48927 2020-02-11 14:31
+    >   Artistic
+    >   	-r--r--r-- sawyer/sawyer              6321 2019-05-11 11:50
+    >   	-r--r--r-- Steve/None                 6321 2019-10-24 22:17
+    >   	-r--r--r-- Steve/None                 6321 2019-10-24 22:17
+    >   	-r--r--r-- Steve/None                 6321 2019-10-21 13:20
+    >   Changes
+    >   	-r--r--r-- sawyer/sawyer              3168 2018-06-27 13:17
+    >   	-r--r--r-- Steve/None                 3111 2019-10-27 10:52
+    >   	-r--r--r-- Steve/None                 3111 2019-10-27 10:52
+    >   	-r--r--r-- Steve/None                 3111 2019-10-28 09:05
+    >   ...
+
+Again without the date and owner/group, which can also vary:
+
+    pl -o 'piped { keydiff $2 if s!^[^d]\S+ \K.+? +(\d+) .{16} [^/]+/(.+)!sprintf "%10d", $1!e; } "tar", "-tvf", $_' *.tar *.tgz *.txz
+    pl -o 'p { k $2 if s!^[^d]\S+ \K.+? +(\d+) .{16} [^/]+/(.+)!sprintf "%10d", $1!e; } "tar", "-tvf", $_' *.tar *.tgz *.txz
+
+    >   AUTHORS
+    >   	-r--r--r--      48831
+    >   	-r--r--r--      48864
+    >   	-r--r--r--      48927
+    >   	-r--r--r--      48927
+    >   Changes
+    >   	-r--r--r--       3168
+    >   	-r--r--r--       3111
+    >   	-r--r--r--       3111
+    >   	-r--r--r--       3111
+    >   Configure
+    >   	-r-xr-xr-x     587687
+    >   	-r-xr-xr-x     587687
+    >   	-r-xr-xr-x     587825
+    >   	-r-xr-xr-x     587825
+    >   ...
+
+=item Diff ELF executables by loaded dependencies
+
+You get the idea: you can do this for any command that outputs records with a
+unique key.  This one looks at the required libraries and which file they came
+from.  For a change, loop with B<-O> and C<$A(RGV)> to avoid the previous
+examples' confusion between outer C<$_> which are the cli args, and the inner
+one, which are the read lines:
+
+    pl -O 'piped { keydiff if s/^\t(.+\.so.*) => (.*) \(\w+\)/$2/ } ldd => $ARGV' exe1 exe2 lib*.so
+    pl -O 'p { k if s/^\t(.+\.so.*) => (.*) \(\w+\)/$2/ } ldd => $A' exe1 exe2 lib*.so
+
+It's even more useful if you use just the basename as a key, because version
+numbers may change:
+
+    pl -O 'piped { keydiff $2 if s/^\t((.+)\.so.* => .*) \(\w+\)/$1/ } ldd => $ARGV' exe1 exe2 lib*.so
+    pl -O 'p { k $2 if s/^\t((.+)\.so.* => .*) \(\w+\)/$1/ } ldd => $A' exe1 exe2 lib*.so
+
+=back
+
+=head2 Looking at Perl
+
+I<A pig looking at an electric socket:  "Oh no, who put you into that wall?" :)>
+
+=over
+
+=item VERSION of a File
+
+Print the first line (B<-P1>) where the substitution was successful.  To avoid
+the hassle of protecting them from (sometimes multiple levels of) Shell
+quoting, there are variables for single C<$q(uote)> & double C<$Q(uote)>:
+
+    pl -P1 's/.+\bVERSION\s*=\s*[v$Quote$quote]([0-9.]+).+/$1/' pl
+    pl -P1 's/.+\bVERSION\s*=\s*[v$Q$q]([0-9.]+).+/$1/' pl
+
+    >   0.58.0
+
+For multple files, add the filename, and reset (B<-r>) the B<-P> count for each
+file:
+
+    pl -rP1 's/.+\bVERSION\s*=\s*[v$Quote$quote]([0-9.]+).+/$ARGV: $1/' *.pm
+    pl -rP1 's/.+\bVERSION\s*=\s*[v$Q$q]([0-9.]+).+/$A: $1/' *.pm
+
+=item Only POD or non-POD
+
+You can extract either parts of a Perl file, with these commands.  Note that
+they don't take the empty line before into account.  If you want that, and
+you're sure the files adheres strictly to this convention, use the option
+B<-00P> instead (not exactly as desired, the empty line comes after things,
+but still, before next thing).  If you want only the 1st POD (e.g. NAME &
+SYNOPSIS) use the option B<-P1> or B<-00P1>:
+
+    pl -P '/^=\w/../^=cut/' file*
+
+    pl -P 'not /^=\w/../^=cut/' file*
+
+=item Count Perl Code
+
+This makes C<__DATA__> or C<__END__> the last inspected line of (unlike in
+C<perl -n>!) each file.  It strips any comment (not quite reliably, also
+inside a string).  Then it strips leading whitespace and adds the remaining
+length to print-at-end C<$R(ESULT)>:
+
+    pl -ln 'last if /^__(?:DATA|END)__/; s/(?:^|\s+)#.*//s; s/^\s+//; $result += length' *.pm
+
+If you want the count per file, instead of C<$R(ESULT)> use either
+sort-lexically C<$RESULT{$ARGV}> (or C<$R{$A}>) or sort-numerically
+C<$NUMBER{$ARGV}> (or C<$N{$A}>).
+
+=item Content of a Package
+
+Pl's C<e(cho)> can print any item.  Packages are funny hashes, with two colons
+at the end.  Backslashing the variable passes it as a unit to C<Data::Dumper>,
+which gets loaded on demand in this case.  Otherwise all elements would come
+out just separated by spaces:
+
+    pl 'echo \%List::Util::'
+    pl 'e \%List::Util::'
+
+    >   {
+    >     BEGIN => *List::Util::BEGIN,
+    >     EXPORT => *List::Util::EXPORT,
+    >     EXPORT_OK => *List::Util::EXPORT_OK,
+    >     ISA => *List::Util::ISA,
+    >     REAL_MULTICALL => *List::Util::List::Util,
+    >     VERSION => *List::Util::VERSION,
+    >     XS_VERSION => *List::Util::XS_VERSION,
+    >     '_Pair::' => *{'List::Util::_Pair::'},
+    >     all => *List::Util::all,
+    >     any => *List::Util::any,
+    >     bootstrap => *List::Util::bootstrap,
+    >     first => *List::Util::first,
+    >     head => *List::Util::head,
+    >     import => *List::Util::import,
+    >     max => *List::Util::max,
+    >     maxstr => *List::Util::maxstr,
+    >     min => *List::Util::min,
+    >     minstr => *List::Util::minstr,
+    >     none => *List::Util::none,
+    >     notall => *List::Util::notall,
+    >     pairfirst => *List::Util::pairfirst,
+    >     pairgrep => *List::Util::pairgrep,
+    >     pairkeys => *List::Util::pairkeys,
+    >     pairmap => *List::Util::pairmap,
+    >     pairs => *List::Util::pairs,
+    >     pairvalues => *List::Util::pairvalues,
+    >     product => *List::Util::product,
+    >     reduce => *List::Util::reduce,
+    >     shuffle => *List::Util::shuffle,
+    >     sum => *List::Util::sum,
+    >     sum0 => *List::Util::sum0,
+    >     tail => *List::Util::tail,
+    >     uniq => *List::Util::uniq,
+    >     uniqnum => *List::Util::uniqnum,
+    >     uniqstr => *List::Util::uniqstr,
+    >     unpairs => *List::Util::unpairs
+    >   }
+
+=item Library Loading
+
+Where does perl load from, and what exactly has it loaded?
+
+    pl 'echo \@INC, \%INC'
+    pl 'e \@INC, \%INC'
+
+    >   [
+    >     '/etc/perl',
+    >     '/usr/local/lib/x86_64-linux-gnu/perl/5.30.3',
+    >     '/usr/local/share/perl/5.30.3',
+    >     '/usr/lib/x86_64-linux-gnu/perl5/5.30',
+    >     '/usr/share/perl5',
+    >     '/usr/lib/x86_64-linux-gnu/perl-base',
+    >     '/usr/lib/x86_64-linux-gnu/perl/5.30',
+    >     '/usr/share/perl/5.30',
+    >     '/usr/local/lib/site_perl'
+    >   ] {
+    >     'Carp.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/Carp.pm',
+    >     'Data/Dumper.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.30/Data/Dumper.pm',
+    >     'Exporter.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/Exporter.pm',
+    >     'List/Util.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/List/Util.pm',
+    >     'XSLoader.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/XSLoader.pm',
+    >     'bytes.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/bytes.pm',
+    >     'constant.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/constant.pm',
+    >     'feature.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/feature.pm',
+    >     'overloading.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/overloading.pm',
+    >     'sort.pm' => '/usr/share/perl/5.30/sort.pm',
+    >     'strict.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/strict.pm',
+    >     'warnings.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/warnings.pm',
+    >     'warnings/register.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/warnings/register.pm'
+    >   }
+
+Same, for a different Perl version, e.g. if you have F<perl5.28.1> in your
+path:
+
+    pl -V5.28.1 'echo \@INC, \%INC'
+    pl -V5.28.1 'e \@INC, \%INC'
+
+    >   [
+    >     '/etc/perl',
+    >     '/usr/local/lib/x86_64-linux-gnu/perl/5.28.1',
+    >     '/usr/local/share/perl/5.28.1',
+    >     '/usr/lib/x86_64-linux-gnu/perl5/5.28',
+    >     '/usr/share/perl5',
+    >     '/usr/lib/x86_64-linux-gnu/perl/5.28',
+    >     '/usr/share/perl/5.28',
+    >     '/usr/local/lib/site_perl',
+    >     '/usr/lib/x86_64-linux-gnu/perl-base'
+    >   ] {
+    >     'Carp.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/Carp.pm',
+    >     'Data/Dumper.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/Data/Dumper.pm',
+    >     'Exporter.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/Exporter.pm',
+    >     'List/Util.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/List/Util.pm',
+    >     'XSLoader.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/XSLoader.pm',
+    >     'bytes.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/bytes.pm',
+    >     'constant.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/constant.pm',
+    >     'feature.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/feature.pm',
+    >     'overloading.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/overloading.pm',
+    >     'sort.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/sort.pm',
+    >     'strict.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/strict.pm',
+    >     'warnings.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/warnings.pm',
+    >     'warnings/register.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/warnings/register.pm'
+    >   }
+
+=item Configuration
+
+You get C<%Config::Config> loaded on demand and returned by C<C(onfig)>:
+
+    pl 'echo Config'
+    pl 'e C'
+
+    >   {
+    >     Author => '',
+    >     CONFIG => 'true',
+    >     Date => '',
+    >     Header => '',
+    >     Id => '',
+    >     Locker => '',
+    >     Log => '',
+    >     PATCHLEVEL => '30',
+    >     PERL_API_REVISION => '5',
+    >     PERL_API_SUBVERSION => '0',
+    >     PERL_API_VERSION => '30',
+    >     ...
+    >   }
+
+It returns a hash reference, from which you can lookup an entry:
+
+    pl 'echo Config->{sitelib}'
+    pl 'e C->{sitelib}'
+
+    >   /usr/local/share/perl/5.30.3
+
+You can also return a sub-hash, of only the keys matching any regexps you
+pass:
+
+    pl 'echo Config "random", qr/stream/'
+    pl 'e C "random", qr/stream/'
+
+    >   {
+    >     d_random_r => 'define',
+    >     d_srandom_r => 'define',
+    >     d_stdio_stream_array => undef,
+    >     random_r_proto => 'REENTRANT_PROTO_I_St',
+    >     srandom_r_proto => 'REENTRANT_PROTO_I_TS',
+    >     stdio_stream_array => ''
+    >   }
+
+=back
+
+=head2 Tables
+
+=over
+
+=item ISO paper sizes
+
+I<ISO replaced 8 standards by one.  Now we have 9 standards. :-(>
+
+Uses Perl's lovely list assignment to swap and alternately halve the numbers.
+Because halving happens before echoing, start with double size.  Can't put the
+A into the format string, because 10 is too wide:
+
+    pl '($w, $h) = (1189, 1682); form "%3s  %4dmm x %4dmm", "A$_", ($w, $h) = ($h / 2, $w) for 0..10'
+    pl '($w, $h) = (1189, 1682); f "%3s  %4dmm x %4dmm", "A$_", ($w, $h) = ($h / 2, $w) for 0..10'
+
+    >    A0   841mm x 1189mm
+    >    A1   594mm x  841mm
+    >    A2   420mm x  594mm
+    >    A3   297mm x  420mm
+    >    A4   210mm x  297mm
+    >    A5   148mm x  210mm
+    >    A6   105mm x  148mm
+    >    A7    74mm x  105mm
+    >    A8    52mm x   74mm
+    >    A9    37mm x   52mm
+    >   A10    26mm x   37mm
+
+The table could easily be widened to cover B- & C-formats, by extending each
+list of 2, to a corresponding list of 6, e.g. C<($Aw, $Ah, $Bw, ...)>.  But a
+more algorithmic approach seems better.  This fills C<@A(RGV)> in B<-B>, as
+though it had been given on the command line and prepares a nested list of the
+3 initials specs.  The format is tripled (with cheat spaces at the beginning).
+The main program loops over C<@A(RGV)>, thanks to B<-O>, doing the same as
+above, but on anonymous elements of C<@d>:
+
+    pl -OB '@ARGV = 0..10; @d = (["A", 1189, 1682], ["B", 1414, 2000], ["C", 1297, 1834])' \
+        'form "  %3s  %4dmm x %4dmm"x3, map +("$$_[0]$ARGV", ($$_[1], $$_[2]) = ($$_[2] / 2, $$_[1])), @d'
+    pl -OB '@A = 0..10; @d = (["A", 1189, 1682], ["B", 1414, 2000], ["C", 1297, 1834])' \
+        'f "  %3s  %4dmm x %4dmm"x3, map +("$$_[0]$A", ($$_[1], $$_[2]) = ($$_[2] / 2, $$_[1])), @d'
+
+    >      A0   841mm x 1189mm   B0  1000mm x 1414mm   C0   917mm x 1297mm
+    >      A1   594mm x  841mm   B1   707mm x 1000mm   C1   648mm x  917mm
+    >      A2   420mm x  594mm   B2   500mm x  707mm   C2   458mm x  648mm
+    >      A3   297mm x  420mm   B3   353mm x  500mm   C3   324mm x  458mm
+    >      A4   210mm x  297mm   B4   250mm x  353mm   C4   229mm x  324mm
+    >      A5   148mm x  210mm   B5   176mm x  250mm   C5   162mm x  229mm
+    >      A6   105mm x  148mm   B6   125mm x  176mm   C6   114mm x  162mm
+    >      A7    74mm x  105mm   B7    88mm x  125mm   C7    81mm x  114mm
+    >      A8    52mm x   74mm   B8    62mm x   88mm   C8    57mm x   81mm
+    >      A9    37mm x   52mm   B9    44mm x   62mm   C9    40mm x   57mm
+    >     A10    26mm x   37mm  B10    31mm x   44mm  C10    28mm x   40mm
+
+=item ANSI foreground;background color table
+
+I<If at first you don't succeed, destroy all evidence that you tried! ;-)>
+
+What a table, hardly a one-liner...  You get numbers to fill into C<"\e[FGm">,
+C<"\e[BGm"> or C<"\e[FG;BGm"> to get a color and close it with C<"\e[m">.
+There are twice twice 8 different colors for dim & bright and for foreground &
+background.  Hence the multiplication of escape codes and of values to fill
+them.
+
+This fills C<@A(RGV)> in B<-B>, as though it had been given on the command
+line.  It maps it to the 16fold number format to print the header.  Then the
+main program loops over it with C<$A(RGV)>, thanks to B<-O>, to print the
+body.  All numbers are duplicated with C<(N)x2>, once to go into the escape
+sequence, once to be displayed:
+
+    pl -OB '@ARGV = map +($_, $_+8), 1..8; form "co:  fg;bg"."%5d"x16, @ARGV' \
+        'form "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $ARGV, ($ARGV + ($ARGV > 8 ? 81 : 29))x2, map +(($_)x2, ($_+60)x2), 40..47'
+    pl -OB '@A = map +($_, $_+8), 1..8; f "co:  fg;bg"."%5d"x16, @A' \
+        'f "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $A, ($A + ($A > 8 ? 81 : 29))x2, map +(($_)x2, ($_+60)x2), 40..47'
+
+This does exactly the same, but explicitly loops over lists C<@co & @bg>:
+
+    pl '@co = map +($_, $_+8), 1..8; @bg = map +(($_)x2, ($_+60)x2), 40..47;
+        form "co:  fg;bg"."%5d"x16, @co;
+        form "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $_, ($_ + ($_ > 8 ? 81 : 29))x2, @bg for @co'
+    pl '@co = map +($_, $_+8), 1..8; @bg = map +(($_)x2, ($_+60)x2), 40..47;
+        f "co:  fg;bg"."%5d"x16, @co;
+        f "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $_, ($_ + ($_ > 8 ? 81 : 29))x2, @bg for @co'
+
+=back
+
+=head2 Miscellaneous
+
+=over
+
+=item Triangular Number and Factorial
+
+The triangular number is defined as the sum of all numbers from 1 to I<n>, e.g. 1
+to 5:
+
+    pl 'echo sum 1..5'
+    pl 'e sum 1..5'
+
+    >   15
+
+Factorial is the equivalent for products.  This requires List::Util as of Perl
+5.20 or newer:
+
+    pl 'echo product 1..5'
+    pl 'e product 1..5'
+
+    >   120
+
+=item Big Math
+
+I<2 + 2 = 5 for extremely large values of 2. :-)>
+
+With the C<big*> modules you can do arbitrary precision and fractional math:
+
+    pl -Mbignum 'echo 123456789012345678901234567890 * 123456789012345678901234567890'
+    pl -Mbignum 'e 123456789012345678901234567890 * 123456789012345678901234567890'
+
+    >   15241578753238836750495351562536198787501905199875019052100
+
+    pl -Mbignum 'echo 1.23456789012345678901234567890 * 1.23456789012345678901234567890'
+    pl -Mbignum 'e 1.23456789012345678901234567890 * 1.23456789012345678901234567890'
+
+    >   1.52415787532388367504953515625361987875019051998750190521
+
+    pl -Mbigrat 'echo 1/23456789012345678901234567890 * 1/23456789012345678901234567890'
+    pl -Mbigrat 'e 1/23456789012345678901234567890 * 1/23456789012345678901234567890'
+
+    >   1/550220950769700970248437984536198787501905199875019052100
+
+=item Separate big numbers with commas, ...
+
+Loop and print with line-end (B<-opl>) over remaining args in C<$_>.  If
+reading from stdin or files, instead of arguments, use only B<-pl>.  After a
+decimal dot, insert a comma before each 4th comma-less digit.  Then do the
+same backwards from end or decimal dot:
+
+    pl -opl '1 while s/[,.]\d{3}\K(?=\d)/,/; 1 while s/\d\K(?=\d{3}(?:$|[.,]))/,/' \
+        12345678 123456789 1234567890 1234.5678 3.141 3.14159265358
+
+    >   12,345,678
+    >   123,456,789
+    >   1,234,567,890
+    >   1,234.567,8
+    >   3.141
+    >   3.141,592,653,58
+
+The same for languages with a decimal comma, using either a dot or a space as spacer:
+
+    pl -opl '1 while s/[,.]\d{3}\K(?=\d)/./; 1 while s/\d\K(?=\d{3}(?:$|[.,]))/./' \
+        12345678 12345678 1234567890 1234,5678 3,141 3,141592653589
+
+    >   12.345.678
+    >   12.345.678
+    >   1.234.567.890
+    >   1.234,567.8
+    >   3,141
+    >   3,141.592.653.589
+
+    pl -opl '1 while s/[, ]\d{3}\K(?=\d)/ /; 1 while s/\d\K(?=\d{3}(?:$|[ ,]))/ /' \
+        12345678 12345678 1234567890 1234,5678 3,141 3,141592653589
+
+    >   12 345 678
+    >   12 345 678
+    >   1 234 567 890
+    >   1 234,567 8
+    >   3,141
+    >   3,141 592 653 589
+
+The same for Perl style output with underscores:
+
+    pl -opl '1 while s/[._]\d{3}\K(?=\d)/_/; 1 while s/\d\K(?=\d{3}(?:$|[._]))/_/' \
+        12345678 123456789 1234567890 1234.5678 3.141 3.14159265358
+
+    >   12_345_678
+    >   123_456_789
+    >   1_234_567_890
+    >   1_234.567_8
+    >   3.141
+    >   3.141_592_653_58
+
+=item Generate a random UUID
+
+I<Lottery: a tax on people who are bad at math. :-)>
+
+This gives a hex number with the characteristic pattern of dashes.  The hex
+format takes only the integral parts of the random numbers:
+
+    pl '$x = "%04x"; form "$x$x-$x-$x-$x-$x$x$x", map rand 0x10000, 0..7'
+    pl '$x = "%04x"; f "$x$x-$x-$x-$x-$x$x$x", map rand 0x10000, 0..7'
+
+    >   2511e5aa-aefc-ad66-8568-163adce60f2a
+
+To be RFC 4122 conformant, the 4 version & 2 variant bits need to have
+standard values.  Note that Shell strings can span more than one line:
+
+    pl '@u = map rand 0x10000, 0..7; ($u[3] /= 16) |= 0x4000; ($u[4] /= 4) |= 0x8000;
+        $x = "%04x"; form "$x$x-$x-$x-$x-$x$x$x", @u'
+    pl '@u = map rand 0x10000, 0..7; ($u[3] /= 16) |= 0x4000; ($u[4] /= 4) |= 0x8000;
+        $x = "%04x"; f "$x$x-$x-$x-$x-$x$x$x", @u'
+
+    >   7537e587-72d2-47d2-971e-8db53d0e7f41
+
+=item Generate a random password
+
+I<Why should you trust atoms? They make up everything. :-)>
+
+Use C<say>, which doesn't put spaces between its arguments.  Generate twelve
+random characters between 33 & 127, i.e. printable Ascii characters:
+
+    pl 'say map chr(33 + rand 94), 1..12'
+
+    >   odh&K#cVAtl=
+
+=item DNS lookup
+
+I<What do you call a sheep with no legs?  A cloud. *,=,>
+
+The C<h(osts)> function deals with the nerdy details and outputs as a hosts
+file.  The file is sorted by address type (localhost, link local, private,
+public), version (IPv4, IPv6) and address.  You tack on any number of
+IP-addresses or hostnames, either as Perl arguments or on the command-line via
+C<@A(RGV)>:
+
+    pl 'hosts qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
+    pl 'h qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
+
+    >   127.0.0.1 localhost
+    >   147.75.38.240 cpan.org perl.org
+    >   151.101.14.217 perldoc.perl.org
+    >   2a04:4e42:3::729 perldoc.perl.org
+
+    pl 'hosts @ARGV' perl.org 127.0.0.1 perldoc.perl.org cpan.org
+    pl 'h @A' perl.org 127.0.0.1 perldoc.perl.org cpan.org
+
+If you don't want it to be sorted, call C<h(osts)> for individual addresses:
+
+    pl 'hosts for qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
+    pl 'h for qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
+
+    >   147.75.38.240 perl.org
+    >   127.0.0.1 localhost
+    >   151.101.14.217 perldoc.perl.org
+    >   2a04:4e42:3::729 perldoc.perl.org
+    >   147.75.38.240 cpan.org
+
+    pl -o hosts perl.org 127.0.0.1 perldoc.perl.org cpan.org
+    pl -o h perl.org 127.0.0.1 perldoc.perl.org cpan.org
+
+If your input comes from files, collect it in a list and perform at end (B<-E>):
+
+    pl -lnE 'hosts @list' 'push @list, $_' file*
+    pl -lnE 'h @list' 'push @list, $_' file*
+
+=item Quine
+
+I<I feel more like I do now than I did a while ago. (-:>
+
+A quine is a program that prints itself.  This uses inside knowledge of how
+your program compiles to a function.  The internal pretty-printer decompiles
+it.  Surrounding boilerplate is replaced by C<pl ''>.  Both the long and short
+form are quines.  This requires at least Perl 5.14, which introduced and
+automatically adds C</u>:
+
+    pl 'echo grep({tr/\n / /s; s/.*: \{ /pl $quote/u; s/; \}.*/$quote/u;} pl::pretty(\&pl::prog))'
+    pl 'e grep({tr/\n / /s; s/.*: \{ /pl $q/u; s/; \}.*/$q/u;} pl::pretty(\&pl::prog))'
+
+    >   pl 'echo grep({tr/\n / /s; s/.*: \{ /pl $quote/u; s/; \}.*/$quote/u;} pl::pretty(\&pl::prog))'
+    >   pl 'e grep({tr/\n / /s; s/.*: \{ /pl $q/u; s/; \}.*/$q/u;} pl::pretty(\&pl::prog))'
+
+Even though decompilation rarely comes up as a quine no-go, indirectly the
+above does read its source.  So it might be considered a cheating quine.  To
+placate those who think so, here's a constructive way of doing it, with a
+format string that gets fed to itself:
+
+    pl '$_ = q{$_ = q{%s}; form "pl $quote$_$quote", $_}; form "pl $quote$_$quote", $_'
+    pl '$_ = q{$_ = q{%s}; f "pl $q$_$q", $_}; f "pl $q$_$q", $_'
+
+    >   pl '$_ = q{$_ = q{%s}; form "pl $quote$_$quote", $_}; form "pl $quote$_$quote", $_'
+    >   pl '$_ = q{$_ = q{%s}; f "pl $q$_$q", $_}; f "pl $q$_$q", $_'
+
+The same approach, but without adding C<pl ''>, so this works only in the
+pl-Shell, which you start by calling pl without arguments.  In the spirit of
+L<Code
+Golf|https://codegolf.stackexchange.com/questions/69/golf-you-a-quine-for-great-good#answer-4827>,
+made it very compact.  This is inspired by the shortest Perl quine, which we
+beat by 6 characters in the short form.  That uses C<x2> to duplicate the
+argument to the pre-prototypes C<printf>.  But C<f(orm)> has a prototype.  So
+use the C<&>-syntax to prevent it giving 2 (the length of the list):
+
+    &form(qw(&form(qw(%s)x2))x2)
+    &f(qw(&f(qw(%s)x2))x2)
+
+    >   &form(qw(&form(qw(%s)x2))x2)
+    >   &f(qw(&f(qw(%s)x2))x2)
+
+=item Just another pl hacker,
+
+I<If you can't convince them, confuse them! ;-)>
+
+Just another Perl hacker, adapted.  This obfuscated mock turtle soup
+L<JAPH|https://en.wikipedia.org/wiki/Just_another_Perl_hacker> is left for you
+to figure out:
+
+    pl -plo y' ya-zyOoh, Turtleneck phrase Jar! 'y xguietlbickheqjectnokhd
+
+    >   Just another pl hacker,
+
+=back

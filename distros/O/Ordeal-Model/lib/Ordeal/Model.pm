@@ -5,7 +5,7 @@ package Ordeal::Model;
 use 5.020;
 use strict;
 use warnings;
-{ our $VERSION = '0.003'; }
+{ our $VERSION = '0.004'; }
 
 use English qw< -no_match_vars >;
 use Ouch;

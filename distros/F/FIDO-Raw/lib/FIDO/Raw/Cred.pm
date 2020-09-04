@@ -1,5 +1,5 @@
 package FIDO::Raw::Cred;
-$FIDO::Raw::Cred::VERSION = '0.05';
+$FIDO::Raw::Cred::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ FIDO::Raw::Cred
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

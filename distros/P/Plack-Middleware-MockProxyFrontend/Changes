@@ -1,5 +1,8 @@
 Release history for Plack-Middleware-MockProxyFrontend
 
+0.003 Fri 04 Sep 2020
+	- Correct handling of SSL handshake failures in CONNECT requests
+
 0.002 Tue 04 Aug 2015
 	- Documentation improvements
 	- More specific error messages

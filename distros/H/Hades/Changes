@@ -45,3 +45,8 @@ Revision history for Hades
 	- Adds Hades::Macro::Dolos for some more abstraction.
 	- Adds :no_success_test attribute to skip "valid" tests on attributes that have builders/triggers.
 	- Attempt to fix parsing of macros.
+
+0.18    2020-09-04
+	- Re-write macro parsing
+	- Adds a very basic verbose and debug mode so you can gain some kind of insight when things go wrong.
+	- Adds Hades::Myths and Hades::Myths::Object for handling build_step messages.

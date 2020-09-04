@@ -5,14 +5,14 @@
 
 package IO::Termios;
 
+use v5.10;
 use strict;
 use warnings;
-use 5.010; # //
 use base qw( IO::Handle );
 
 use Carp;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Exporter ();
 
@@ -561,82 +561,101 @@ foreach my $method (qw( setbaud cfmakeraw )) {
    };
 }
 
-=head2 getflag_opost
+=head2 getflag_I<FLAG>
 
-=head2 setflag_opost
+=head2 setflag_I<FLAG>
 
-   $mode = $term->getflag_opost
+   $mode = $term->getflag_FLAG
 
-   $term->setflag_opost( $mode )
+   $term->setflag_FLAG( $mode )
+
+Accessors for various control flags. The following methods are defined for
+specific flags:
+
+=head3 inlcr
+
+I<Since version 0.09.>
+
+The C<INLCR> bit of the C<c_iflag>. This translates NL to CR on input.
+
+=head3 igncr
+
+I<Since version 0.09.>
+
+The C<IGNCR> bit of the C<c_iflag>. This ignores incoming CR characters.
+
+=head3 icrnl
+
+I<Since version 0.09.>
+
+The C<ICRNL> bit of the C<c_iflag>. This translates CR to NL on input, unless
+C<IGNCR> is also set.
+
+=head3 ignbrk
+
+I<Since version 0.09.>
+
+The C<IGNBRK> bit of the C<c_iflag>. This controls whether incoming break
+conditions are ignored entirely.
+
+=head3 brkint
+
+I<Since version 0.09.>
+
+The C<BRKINT> bit of the C<c_iflag>. This controls whether non-ignored
+incoming break conditions result in a C<SIGINT> signal being delivered to the
+process. If not, such a condition reads as a nul byte.
+
+=head3 parmrk
+
+I<Since version 0.09.>
+
+The C<PARMRK> bit of the C<c_iflag>. This controls how parity errors and break
+conditions are handled.
+
+=head3 opost
 
 I<Since version 0.07.>
 
-Accessor for the C<OPOST> bit of the C<c_oflag>. This enables system-specific
+The C<OPOST> bit of the C<c_oflag>. This enables system-specific
 post-processing on output.
 
-=head2 getflag_cread
+=head3 cread
 
-=head2 setflag_cread
+The C<CREAD> bit of the C<c_cflag>. This enables the receiver.
 
-   $mode = $term->getflag_cread
+=head3 hupcl
 
-   $term->setflag_cread( $mode )
+The C<HUPCL> bit of the C<c_cflag>. This lowers the modem control lines after
+the last process closes the device.
 
-Accessor for the C<CREAD> bit of the C<c_cflag>. This enables the receiver.
+=head3 clocal
 
-=head2 getflag_hupcl
+The C<CLOCAL> bit of the C<c_cflag>. This controls whether local mode is
+enabled; which if set, ignores modem control lines.
 
-=head2 setflag_hupcl
+=head3 icanon
 
-   $mode = $term->getflag_hupcl
+The C<ICANON> bit of C<c_lflag>. This is called "canonical" mode and controls
+whether the terminal's line-editing feature will be used to return a whole
+line (if true), or if individual bytes from keystrokes will be returned as
+they are available (if false).
 
-   $term->setflag_hupcl( $mode )
+=head3 echo
 
-Accessor for the C<HUPCL> bit of the C<c_cflag>. This lowers the modem control
-lines after the last process closes the device.
-
-=head2 getflag_clocal
-
-=head2 setflag_clocal
-
-   $mode = $term->getflag_clocal
-
-   $term->setflag_clocal( $mode )
-
-Accessor for the C<CLOCAL> bit of the C<c_cflag>. This controls whether local
-mode is enabled; which if set, ignores modem control lines.
-
-=cut
-
-=head2 getflag_icanon
-
-=head2 setflag_icanon
-
-   $mode = $term->getflag_icanon
-
-   $term->setflag_icanon( $mode )
-
-Accessor for the C<ICANON> bit of C<c_lflag>. This is called "canonical" mode
-and controls whether the terminal's line-editing feature will be used to
-return a whole line (if true), or if individual bytes from keystrokes will be
-returned as they are available (if false).
-
-=cut
-
-=head2 getflag_echo
-
-=head2 setflag_echo
-
-   $mode = $term->getflag_echo
-
-   $term->setflag_echo( $mode )
-
-Accessor for the C<ECHO> bit of C<c_lflag>. This controls whether input
-characters are echoed back to the terminal.
+The C<ECHO> bit of C<c_lflag>. This controls whether input characters are
+echoed back to the terminal.
 
 =cut
 
 my @flags = (
+   # iflag
+   [ inlcr  => qw( INLCR i ) ],
+   [ igncr  => qw( IGNCR i ) ],
+   [ icrnl  => qw( ICRNL i ) ],
+   [ ignbrk => qw( IGNBRK i ) ],
+   [ brkint => qw( BRKINT i ) ],
+   [ parmrk => qw( PARMRK i ) ],
    # oflag
    [ opost  => qw( OPOST o ) ],
    # cflag
@@ -666,6 +685,40 @@ foreach ( @flags ) {
       $attrs->$setmethod( $set );
       $self->setattr( $attrs ) or croak "Cannot setattr - $!";
    };
+}
+
+=head2 setflags
+
+   $term->setflags( @flags )
+
+I<Since version 0.09.>
+
+A convenient wrapper to calling multiple flag setting methods in a sequence.
+
+Each flag is specified by name, in lower case, prefixed by either a C<+>
+symbol to enable it, or C<-> to disable. For example:
+
+   $term->setflags( "+igncr", "+opost", "+clocal", "-echo" );
+
+=cut
+
+sub setflags
+{
+   my $self = shift;
+   my @flags = @_;
+
+   my $attrs = $self->getattr or croak "Cannot getattr - $!";
+
+   foreach my $flag ( @flags ) {
+      my $sense = 1;
+      $sense = 0 if $flag =~ s/^-//;
+      $flag =~ s/^\+//;
+
+      my $method = "setflag_$flag";
+      $attrs->$method( $sense );
+   }
+
+   $self->setattr( $attrs ) or croak "Cannot setattr - $!";
 }
 
 package # hide from CPAN

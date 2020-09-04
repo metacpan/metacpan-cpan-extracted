@@ -4,7 +4,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %common_reqs = (
-    "Alien::Build" => "1.41",
+    "Alien::Build" => "2.25",
     "ExtUtils::MakeMaker" => "6.52",
     "Alien::Build::MM" => "1.41",
     "File::Find::Rule" => 0,
@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "BUILD_REQUIRES" => {
         %common_reqs,
         "File::Find::Rule" => 0,
+        'Alien::Build::Plugin::PkgConfig::PPWrapper' => '0',
     },
     "TEST_REQUIRES" => {
         "Test::Alien" => 0,
@@ -52,13 +53,13 @@ my %WriteMakefileArgs = (
         prereqs => {
             build => {
               suggests => {
-                  'Alien::curl' => 0,
+                  'Alien::curl' => '0.08',
                   'Alien::libtiff' => 0,
               },
             },
             runtime => {
               suggests => {
-                  'Alien::curl' => 0,
+                  'Alien::curl' => '0.08',
                   'Alien::libtiff' => 0,
               },
             },
@@ -69,7 +70,13 @@ my %WriteMakefileArgs = (
 );
 
 use Alien::Build::MM;
-my $abmm = Alien::Build::MM->new ();
+my $abmm = Alien::Build::MM->new (
+  clean_install => 1,
+);
+sub MY::install {
+  $abmm->mm_install(@_);
+}
+
 %WriteMakefileArgs = $abmm->mm_args(%WriteMakefileArgs);
 
 WriteMakefile(%WriteMakefileArgs);

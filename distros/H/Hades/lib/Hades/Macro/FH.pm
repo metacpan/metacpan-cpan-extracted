@@ -2,7 +2,7 @@ package Hades::Macro::FH;
 use strict;
 use warnings;
 use base qw/Hades::Macro/;
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -215,9 +215,9 @@ Quick summary of what the module does:
 			}
 			Kosmos { 
 				geras $file :t(Str) :d('path/to/file.txt') { 
-					€rf('$file');
+					€rf($file);
 					$content = 'limos';
-					€wf('$file', '$content');
+					€wf($file, $content);
 				}
 			}
 		|;

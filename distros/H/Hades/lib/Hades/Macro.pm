@@ -1,12 +1,12 @@
 package Hades::Macro;
 use strict;
 use warnings;
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
 	my $self      = bless {}, $cls;
-	my %accessors = ( macro => { default => [], }, alias => {}, );
+	my %accessors = ( alias => {}, macro => { default => [], }, );
 	for my $accessor ( keys %accessors ) {
 		my $param
 		    = defined $args{$accessor}

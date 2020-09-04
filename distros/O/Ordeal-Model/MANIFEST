@@ -13,6 +13,8 @@ lib/Ordeal/Model.pm
 lib/Ordeal/Model.pod
 lib/Ordeal/Model/Backend/PlainFile.pm
 lib/Ordeal/Model/Backend/PlainFile.pod
+lib/Ordeal/Model/Backend/Raw.pm
+lib/Ordeal/Model/Backend/Raw.pod
 lib/Ordeal/Model/Backend/YAML.pm
 lib/Ordeal/Model/Backend/YAML.pod
 lib/Ordeal/Model/Card.pm
@@ -34,6 +36,7 @@ t/01-card.t
 t/02-deck.t
 t/03-shuffle.t
 t/04-deck-yaml.t
+t/05-raw.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/ordeal-data/cards/group1-01-whatevah.png

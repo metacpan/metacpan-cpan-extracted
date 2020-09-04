@@ -5,7 +5,7 @@ package Signer::AWSv4;
   use Digest::SHA qw//;
   use URI::Escape qw//;
 
-  our $VERSION = '0.04';
+  our $VERSION = '0.05';
 
   has access_key => (is => 'ro', isa => Str, required => 1);
   has secret_key => (is => 'ro', isa => Str, required => 1);

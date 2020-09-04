@@ -28,6 +28,10 @@ BEGIN
     my @OPT = qw(
             IO::Compress::Lzma
             IO::Uncompress::UnLzma
+            IO::Compress::Xz
+            IO::Uncompress::UnXz
+            IO::Compress::Zstd
+            IO::Uncompress::UnZstd
 			);
 
     plan tests => 1 + @NAMES + @OPT + $extra ;
@@ -69,13 +73,19 @@ BEGIN
                     IO::Compress::Zip
                     IO::Compress::Bzip2
                     IO::Compress::Lzma
+                    IO::Compress::Xz
+                    IO::Compress::Zstd
                     IO::Uncompress::Base
                     IO::Uncompress::Unzip
                     IO::Uncompress::Bunzip2
                     IO::Uncompress::UnLzma
+                    IO::Uncompress::UnXz
+                    IO::Uncompress::UnZstd
                     Compress::Raw::Zlib
                     Compress::Raw::Bzip2
                     Compress::Raw::Lzma
+                    Compress::Stream::Zstd
+
                     );
 
     my %have = ();
@@ -107,6 +117,12 @@ BEGIN
     {
         my $ver = eval { Compress::Raw::Lzma::lzma_version_string(); } || "unknown";
         push @results, ["lzma", $ver] ;
+    }
+
+    if ($have{"Compress::Stream::Zstd"})
+    {
+        my $ver = eval { Compress::Stream::Zstd::ZSTD_VERSION_STRING; } || "unknown";
+        push @results, ["Zstandard", $ver] ;
     }
 
     use List::Util qw(max);

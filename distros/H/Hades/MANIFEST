@@ -4,11 +4,14 @@ lib/Hades.pm
 lib/Hades/Macro.pm
 lib/Hades/Macro/Dolos.pm
 lib/Hades/Macro/FH.pm
+lib/Hades/Myths.pm
+lib/Hades/Myths/Object.pm
 macro-dolos.hades
 macro-fh.hades
 macro.hades
 Makefile.PL
 MANIFEST			This list of files
+myths.hades
 README
 t/00-load.t
 t/01-idea.t
@@ -26,6 +29,8 @@ t/12-dolos.t
 t/Hades-Macro-Dolos.t
 t/Hades-Macro-FH.t
 t/Hades-Macro.t
+t/Hades-Myths-Object.t
+t/Hades-Myths.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

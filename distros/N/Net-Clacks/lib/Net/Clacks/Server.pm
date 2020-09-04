@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 15;
+our $VERSION = 16;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -269,9 +269,20 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             my $line = <$ifh>;
             my $timestampline = <$ifh>;
             close $ifh;
+            if(!defined($line) || $line eq '') {
+                croak("Invalid persistance file " . $self->{config}->{persistancefile});
+            }
+
             chomp $line;
-            $line = decode_base64($line);
-            $line = Load($line);
+            my $loadok = 0;
+            eval {
+                $line = decode_base64($line);
+                $line = Load($line);
+                $loadok = 1;
+            };
+            if(!$loadok) {
+                croak("Invalid persistance file " . $self->{config}->{persistancefile});
+            }
             %clackscache = %{$line};
 
             # Mark all data as current
@@ -283,8 +294,15 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             # Do we have timestamp data? (need to check for upgrade compatibility
             if(defined($timestampline) && length($timestampline) > 5) {
                 chomp $timestampline;
-                $timestampline = decode_base64($timestampline);
-                $timestampline = Load($timestampline);
+                $loadok = 0;
+                eval {
+                    $timestampline = decode_base64($timestampline);
+                    $timestampline = Load($timestampline);
+                    $loadok = 1;
+                };
+                if(!$loadok) {
+                    croak("Invalid persistance file " . $self->{config}->{persistancefile});
+                }
                 my %clackstemp = %{$timestampline};
                 foreach my $key (keys %clackscache) {
                     if(defined($clackstemp{$key})) {

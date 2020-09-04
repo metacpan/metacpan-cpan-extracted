@@ -3,19 +3,52 @@ package Hades;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 use Module::Generate;
 use Switch::Again qw/switch/;
+use Hades::Myths { as_keywords => 1 };
 
-our $PARENTHESES;
+our ($PARENTHESES, $PARSE_PARAM_STRING);
 BEGIN {
-	$PARENTHESES = qr{ \( (?: (?> [^()]+ ) | (??{ $PARENTHESES }) )* \) }x;
+	$PARENTHESES = qr{ \( ( (?: (?> [^()]+ ) | (??{ $PARENTHESES }) )* ) \) }x;
+	$PARSE_PARAM_STRING = qr{ (^ (?: (?> [^(),]+ ) | (??{ $PARENTHESES }) )* ) \, }x;
 }
 
 sub new {
 	my ($class, %args) = (shift, scalar @_ == 1 ? %{$_[0]} : @_);
 	$args{macros} = {} if !$args{macros};
+	eval qq|require "Data::Dumper"| if $args{debug};
 	bless \%args, $class;
+}
+
+sub verbose {
+	my ($self, $verbose) = @_;
+	if (defined $verbose) {
+		$self->{verbose} = !!$verbose;
+	}
+	return $self->{verbose};
+}
+
+sub debug {
+	my ($self, $debug) = @_;
+	if (defined $debug) {
+		$self->{debug} = !!$debug;
+	}
+	return $self->{debug};
+}
+
+sub debug_step {
+	my ($self, $message, @debug) = @_;
+	if ($self->debug || $self->verbose) {
+		$self->{debug_step}++;
+		my @caller = caller();
+		print "hades step $self->{debug_step} line $caller[2]: $message\n";
+		if ($self->debug) {
+			print Data::Dumper::Dumper $_ for (@debug);
+			print press_enter_to_continue . "\n";
+			my $ahh = <STDIN>;
+		}
+	}
 }
 
 sub run {
@@ -28,7 +61,9 @@ sub run {
 		eval "require $class";
 	}
 	my $self = $class->new($args);
+	$self->debug_step(sprintf(debug_step_1, $class), $args);
 	$self->can('module_generate') && $self->module_generate($mg, $class);
+	$self->debug_step(sprintf(debug_step_2, $class), $args->{eval});
 	my ($index, $ident, @lines, @line, @innerline, $nested) = (0, '');
 	while ($index <= length $self->{eval}) {
 		my $first_char = $self->index($index++);
@@ -74,13 +109,14 @@ sub run {
 							$ident .= $first_char unless $first_char =~ m/\s/;
 						};
 	}
-
 	if (scalar @lines) {
+		$self->debug_step(sprintf(debug_step_3, scalar @lines), \@lines);
 		my $last_token;
 		for my $class (@lines) {
 			$self->can('before_class') && $self->before_class($mg, $class);
 			my $meta = {};
 			for my $token (@{$self->build_class($mg, $class)}) {
+				$self->debug_step(debug_step_13, $token);
 				! ref $token
 					? do { $last_token = $self->build_class_inheritance($mg, $last_token, $token); }
 					: scalar @{$token} == 1
@@ -96,10 +132,13 @@ sub run {
 			if (scalar keys %{$meta}) {
 				$self->build_new($mg, $meta);
 				$self->can('after_class') && $self->after_class($mg, $meta);
+				$self->debug_step(debug_step_35, $meta);	
 			}
 		}
+		$self->debug_step(debug_step_36);
 	}
 	$self->can('before_generate') && $self->before_generate($mg);
+	$self->debug_step(debug_step_37);
 	$mg->generate;
 	$self->can('after_generate') && $self->after_generate($mg);
 }
@@ -108,13 +147,16 @@ sub build_class {
 	my ($self, $mg, $class) = @_;
 	while ($class->[0] =~ m/^(dist|lib|tlib|realm|author|email|version)$/) {
 		$mg->$1($class->[1]);
+		$self->debug_step(sprintf(debug_step_4, $1, $class->[1]));
 		shift @{$class}, shift @{$class};
 	}
 	if ($class->[0] eq 'macro') {
 		shift @{$class};
+		$self->debug_step(debug_step_5, $class);
 		$self->build_macro($mg, $class);
 		return [];
 	}
+	$self->debug_step(sprintf (debug_step_12, $class->[0]), $class);
 	$mg->class(shift @{$class})->new;
 	return $class;
 }
@@ -122,6 +164,7 @@ sub build_class {
 sub build_new {
 	my ($self, $mg, $meta) = @_;
 	my %class = %Module::Generate::CLASS;
+	$self->debug_step(sprintf (debug_step_33, $class{CURRENT}{NAME}), $meta);
 	my $accessors = q|(|;
 	map {
 		$accessors .= qq|$_ => {|;
@@ -153,19 +196,25 @@ sub build_new {
 	}|;
 	$class{CURRENT}{SUBS}{new}{CODE} = $code;
 	$class{CURRENT}{SUBS}{new}{TEST} = [$self->build_tests('new', $meta, 'new', \%class)];
+	$self->debug_step(sprintf (debug_step_34, $class{CURRENT}{NAME}), $code);
 }
 
 sub build_class_inheritance {
 	my ($self, $mg, $last_token, $token) = @_;
 	($token =~ m/^(parent|base|require|use)$/) ? do {
+		$self->debug_step(sprintf(debug_step_14, $token), sprintf(debug_step_14_b, $token));
 		$last_token = $token;
-	} : $mg->$last_token($token);
+	} : do {
+		$self->debug_step(sprintf(debug_step_15, $last_token, $token));
+		$mg->$last_token($token);
+	};
 	return $last_token;
 }
 
 sub build_accessor_no_arguments {
 	my ($self, $mg, $token, $meta) = @_;
 	$meta->{$token->[0]}->{meta} = 'ACCESSOR';
+	$self->debug_step(sprintf(debug_step_16, $token->[0]), $meta->{$token->[0]});
 	$mg->accessor($token->[0]);
 	return $meta;
 }
@@ -173,6 +222,7 @@ sub build_accessor_no_arguments {
 sub build_sub_no_arguments {
 	my ($self, $mg, $token, $meta) = @_;
 	my $name = shift @{$token};
+	$self->debug_step(sprintf(debug_step_18, $name), $meta->{$name});
 	$name =~ m/^(begin|unitcheck|check|init|end|new)$/
 		? $mg->$name('{' . join( ' ', @{$token}) . '}')
 		: $mg->sub($name)->code($self->build_code($mg, $name, $self->build_sub_code($name, '', '', join ' ', @{$token})))
@@ -183,6 +233,7 @@ sub build_sub_no_arguments {
 sub build_our {
 	my ($self, $mg, $token, $meta) = @_;
 	my $name = shift @{$token};
+	$self->debug_step(debug_step_19, $token);	
 	$mg->$name( '(' . join( ', ', @{$token}) . ')');
 	return $meta;
 }
@@ -194,6 +245,7 @@ sub build_abstract { goto &build_synopsis_or_abstract; }
 sub build_test {
 	my ($self, $mg, $token, $meta) = @_;
 	my ($name, $content) = @{$token};
+	$self->debug_step(sprintf(debug_step_17, $name), $content);
 	$content =~ s/^\{\s*|\s*\}$//g;
 	$mg->class_tests(eval $content);
 	return $meta;
@@ -202,6 +254,7 @@ sub build_test {
 sub build_synopsis_or_abstract {
 	my ($self, $mg, $token, $meta) = @_;
 	my ($name, $content) = @{$token};
+	$self->debug_step(sprintf(debug_step_17, $name), $content);
 	$content =~ s/^\{\s*|\s*\}$//g;
 	$mg->$name($content);
 	return $meta;
@@ -319,14 +372,17 @@ sub build_sub_or_accessor {
 	my ($self, $mg, $token, $meta) = @_;
 	my $name = shift @{$token};
 	if ($name =~ s/^\[(.*)\]$/$1/) {
+		$self->debug_step(debug_step_20, $1);
 		$self->build_sub_or_accessor($mg, [$_, @{$token}], $meta) for split / /, $1;
 		return;
 	}
+	$self->debug_step(sprintf(debug_step_21, $name), $token);
 	$meta->{$name}->{meta} = 'ACCESSOR';
 	my $switch = switch(
 		$self->build_sub_or_accessor_attributes($name, $token, $meta)
 	);
 	$switch->(shift @{$token}) while scalar @{$token};
+	$self->debug_step(sprintf(debug_step_22, $name), $meta->{$name});
 	$meta->{$name}->{meta} eq 'ACCESSOR'
 		? $self->build_accessor($mg, $name, $meta)
 		: $meta->{$name}->{meta} eq 'MODIFY'
@@ -339,6 +395,7 @@ sub build_sub_or_accessor {
 
 sub build_accessor {
 	my ($self, $mg, $name, $meta) = @_;
+	$self->debug_step(sprintf(debug_step_23, $name), $meta->{$name});
 	my $private = $self->build_private($name, $meta->{$name}->{private});
 	my $type = $self->build_coerce($name, '$value', $meta->{$name}->{coerce})
 	. $self->build_type($name, $meta->{$name}->{type}[0]);
@@ -346,6 +403,7 @@ sub build_accessor {
 	my $code = $self->build_code($mg, $name, $self->build_accessor_code($name, $private, $type, $trigger));
 	$mg->accessor($name)->code($code)->clear_tests->test($self->build_tests($name, $meta->{$name}));
 	$meta->{$name}->{$_} && $mg->$_($self->replace_pe_string($meta->{$name}->{$_}, $name)) for qw/pod example/;
+	$self->debug_step(sprintf(debug_step_28, $name), $meta->{$name});
 }
 
 sub build_accessor_code {
@@ -367,12 +425,14 @@ sub replace_pe_string {
 
 sub build_modify {
 	my ($self, $mg, $name, $meta) = @_;
+	$self->debug_step(sprintf(debug_step_29, $name), $meta->{$name});
 	my $before_code = $meta->{$name}->{before} || "";
 	my $around_code = $meta->{$name}->{around} || qq|my \@res = \$self->\$orig(\@params);|;
 	my $after_code = $meta->{$name}->{after} || "";
 	my $code = $self->build_code($mg, $name, $self->build_modify_code($name, $before_code, $around_code, $after_code));
 	$mg->sub($name)->code($code)->pod(qq|call $name method.|)->test($self->build_tests($name, $meta->{$name}));
 	$meta->{$name}->{$_} && $mg->$_($self->replace_pe_string($meta->{$name}->{$_}, $name)) for qw/pod example/;
+	$self->debug_step(sprintf(debug_step_30, $name), $meta->{$name});
 }
 
 sub build_modify_code {
@@ -387,6 +447,7 @@ sub build_modify_code {
 sub build_sub {
 	my ($self, $mg, $name, $meta) = @_;
 	my $code = $meta->{$name}->{code};
+	$self->debug_step(sprintf(debug_step_31, $name), $meta->{$name});
 	my ($params, $subtype, $params_explanation) = ( '', '', '' );
 	$subtype .= $self->build_private($name)
 		if $meta->{$name}->{private};
@@ -425,13 +486,16 @@ sub build_sub {
 		->example($example)
 		->test($self->build_tests($name, $meta->{$name}));
 	$meta->{$name}->{$_} && $mg->$_($self->replace_pe_string($meta->{$name}->{$_}, $name)) for qw/pod example/;
+	$self->debug_step(sprintf(debug_step_32, $name), $meta->{$name});
 }
 
 sub build_code {
 	my ($self, $mg, $name, $code) = @_;
+	$self->debug_step(sprintf(debug_step_38, $name), $code);
 	return unless defined $code;
 	1 while $code =~ s/€(\w+(|$PARENTHESES));/$self->build_macro_code($mg, $1)/ge;
-	$code =~ s/£(\w*(\s|\$|\-|\;|\,|\{|\}|\[|\]|\)|\(|\:))/$self->build_self($1)/eg;
+	$code =~ s/£(\w*(\s|\$|\-|\;|\,|\{|\}|\[|\]|\)|\(|\:))/$self->build_self($1)/eg;	
+	$self->debug_step(sprintf(debug_step_44, $name), $code);
 	return $code;
 }
 
@@ -440,15 +504,44 @@ sub build_self {
 	return qq|\$self->$name|;
 }
 
+sub parse_params {
+	my ($self, $param_string) = @_;
+	my @params;
+	while ($param_string =~ s/$PARSE_PARAM_STRING//g) {
+		push @params, $self->minimise_param_string($1);
+	}
+	push @params, $self->minimise_param_string($param_string);
+	return @params;
+}
+
+sub minimise_param_string {
+	my ($self, $string) = @_;
+	return $string unless length $string;
+	$string =~ s/^\s*\(\s*(.*)\s*\)\s*$/$1/sg;
+	$string =~ s/\s+/ /g;
+	$string =~ s/^\s*|\s*$//g;
+	$string =~ s/^q*(("|'|\||\/))((\\{2})*|(.*?[^\\](\\{2})*))\1$/$3/sg; # back compat
+	$string =~ s/q+(\{|\})((\\[\{\}])*|(.*?[^\\]([\{\}])*))\}/$2/sg; # back compat
+	return undef if $string =~ m/^undef$/;
+	return $string;
+}
+
 sub build_macro_code {
 	my ($self, $mg, $match) = @_;
-	if ($match =~ m/^(.*)($PARENTHESES)$/m) {
+	$self->debug_step(sprintf(debug_step_39, $match));
+	if ($match =~ m/^(.*)$PARENTHESES$/m) {
+		$self->debug_step(sprintf(debug_step_40, $1), $2);
 		return '' unless $self->{macros}->{$1}->{code};
-		my $v =  $self->{macros}->{$1}->{code}->($self, $mg, eval qq|($2)|);
+		$self->debug_step(sprintf(debug_step_41, $1), $self->{macros}->{$1}->{code});
+		my $v =  $self->{macros}->{$1}->{code}->($self, $mg, $self->parse_params($2));
+		$self->debug_step(sprintf(debug_step_42, $1), $v); 
 		return $v;
 	}
 	return '' unless $self->{macros}->{$match}->{code};
-	return $self->{macros}->{$match}->{code}->($self, $mg);
+	$self->debug_step(sprintf(debug_step_43, $match), $self->{macros}->{$match}->{code}); 
+	my $v = $self->{macros}->{$match}->{code}->($self, $mg);
+	$self->debug_step(sprintf(debug_step_42, $match), $v); 
+	return $v;
 }
 
 sub build_sub_code {
@@ -461,6 +554,7 @@ sub build_sub_code {
 
 sub build_clearer {
 	my ($self, $mg, $name, $meta) = @_;
+	$self->debug_step(sprintf(debug_step_47, $name));
 	$mg->sub(qq|clear_$name|)
 		->code($self->build_code($mg, $name, $self->build_clearer_code($name)))
 		->pod(qq|clear $name accessor|)
@@ -470,6 +564,8 @@ sub build_clearer {
 			['ok', qq|\$obj->clear_$name|],
 			['is', qq|\$obj->$name|, 'undef']
 		);
+	$self->debug_step(sprintf(debug_step_48, $name));
+	return ($mg, $name, $meta);
 }
 
 sub build_clearer_code {
@@ -483,6 +579,7 @@ sub build_clearer_code {
 
 sub build_predicate {
 	my ($self, $mg, $name, $meta) = @_;
+	$self->debug_step(sprintf(debug_step_45, $name));
 	$mg->sub(qq|has_$name|)
 		->code($self->build_code($mg, $name, $self->build_predicate_code($name)))
 		->pod(qq|has_$name will return true if $name accessor has a value.|)
@@ -493,6 +590,8 @@ sub build_predicate {
 			$self->build_tests($name, $meta->{$name}, 'success'),
 			['is', qq|\$obj->has_$name|, 1],
 		);
+	$self->debug_step(sprintf(debug_step_46, $name));
+	return ($mg, $name, $meta);
 }
 
 sub build_predicate_code {
@@ -516,30 +615,43 @@ sub build_builder {
 
 sub build_coerce {
 	my ($self, $name, $param, $code) = @_;
-	return defined $code ? $code =~ m/^\w+$/
-		? qq|$param = \$self->$code($param);|
-		: $code
-	: q||;
+	if (defined $code) {
+		$code = $code =~ m/^\w+$/
+			? qq|$param = \$self->$code($param);|
+			: $code;
+		$self->debug_step(sprintf(debug_step_25, $name), $code);
+		return $code;
+	}
+	return q||;
 }
 
 sub build_trigger {
 	my ($self, $name, $param, $code) = @_;
-	return defined $code
-		? $code =~ m/^1$/
+
+	if (defined $code) {
+		$code = $code =~ m/^1$/
 			? qq|\$self->_trigger_$name|
 			: $code =~ m/^\w+$/
 				? qq|\$self->$code($param);|
-				: $code
-	: q||;
+				: $code;
+		$self->debug_step(sprintf(debug_step_27, $name), $code);
+		return $code;
+	}
+	return q||;
 }
 
 sub build_private {
 	my ($self, $name, $private) = @_;
-        return $private ? qq|
+	if ($private) {
+        	$private = qq|
 		my \$private_caller = caller();
 		if (\$private_caller ne __PACKAGE__) {
 			die \"cannot call private method $name from \$private_caller\";
-		}| : q||;
+		}|;
+		$self->debug_step(sprintf(debug_step_24, $name), $private);
+		return $private;
+	} 
+	return q||;
 }
 
 sub build_type {
@@ -768,6 +880,7 @@ sub build_type {
 				return $code;
 			};
 		$code .= $switch->($type);
+		$self->debug_step(sprintf(debug_step_26, $name), $code);
 	}
 	return $code;
 }
@@ -808,22 +921,27 @@ sub build_macro {
 	my ($self, $mg, $class) = @_;
 	my $meta = $self->{macros};
 	for my $macro (@{$class}) {
+		$self->debug_step(debug_step_6, $macro);
 		if ($macro->[-1] !~  m/^{/) {
 			my $include = sprintf "Hades::Macro::%s", shift @{$macro};
+			$self->debug_step(sprintf(debug_step_7, $include), $macro);
 			eval qq|require $include|;
 			die $@ if $@;
 			my $include_meta = $include->new($macro->[0] ? do {
 				$macro->[0] =~ s/^\[|\]$//g;
 				( eval qq|$macro->[0]| );
 			} : ())->meta;
+			$self->debug_step(sprintf(debug_step_8, $include), $include_meta);
 			$meta = {%{$meta}, %{$include_meta}};
 		} else {
 			my $name = shift @{$macro};
+			$self->debug_step(sprintf(debug_step_9, $name), $macro);
 			$meta->{$name}->{meta} = 'MACRO';
 			my $switch = switch(
 				$self->build_macro_attributes($name, $macro, $meta)
 			);
 			$switch->(shift @{$macro}) while scalar @{$macro};
+			$self->debug_step(sprintf(debug_step_10, $name), $meta->{$name});
 			if ($meta->{$name}->{alias}) {
 				for (@{$meta->{$name}->{alias}}) {
 					$meta->{$_} = $meta->{$name};
@@ -831,6 +949,7 @@ sub build_macro {
 			}
 		}
 	}
+	$self->debug_step(debug_step_11, $meta);
 	$self->{macros} = $meta;
 }
 
@@ -1204,7 +1323,7 @@ Hades - Less is more, more is less!
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
@@ -1323,6 +1442,14 @@ Provide a file to read in.
 =item eval
 
 Provide a string to eval.
+
+=item verbose
+
+Set verbose to true, to print build steps to STDOUT.
+
+=item debug
+
+Set debug to true, to step through the build.
 
 =item dist
 
@@ -1931,7 +2058,7 @@ Used in conjunction with Dict and Tuple to specify slots that are optional and m
 
 =head2 Macros
 
-Hades has a concept of macros that allow you to write re-usable code. see L<https://metacpan.org/source/LNATION/Hades-0.17/macro-fh.hades> for an example of how to extend via macros.
+Hades has a concept of macros that allow you to write re-usable code. see L<https://metacpan.org/source/LNATION/Hades-0.18/macro-fh.hades> for an example of how to extend via macros.
 
 	macro {
 		FH [ macro => [qw/read_file write_file/], alias => { read_file => [qw/rf/], write_file => [qw/wf/] } ]

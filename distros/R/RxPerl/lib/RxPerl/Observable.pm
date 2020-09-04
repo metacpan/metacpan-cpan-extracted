@@ -6,6 +6,7 @@ use RxPerl::Subscription;
 use RxPerl::Subscriber;
 
 use Scalar::Util 'reftype';
+use Carp 'croak';
 
 # an observable is something you can subscribe to.
 
@@ -24,7 +25,7 @@ use Scalar::Util 'reftype';
 #   (body)      This method calls the $function that RxPerl::Observable->new received as argument (and that initiates the subscription)
 #   (return)    This method returns a new RxPerl::Subscription object, that contains the "cleanup subref" returned by $function
 
-our $VERSION = "v0.15.0";
+our $VERSION = "v0.16.0";
 
 sub new {
     my ($class, $function) = @_;
@@ -46,6 +47,13 @@ sub subscribe {
     } else {
         @$subscriber{qw/ next error complete /} = @args;
     }
+
+    $subscriber->{error} //= sub {
+        my ($err) = @_;
+
+        # TODO: shouldn't croak immediately, to be like rxjs, but on the next tick
+        croak $err;
+    };
 
     my $subscription = $subscriber->{_subscription} //= RxPerl::Subscription->new;
     $subscriber->{closed_ref} = \$subscription->{closed};

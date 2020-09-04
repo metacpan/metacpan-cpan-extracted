@@ -1,32 +1,13 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2012 Smithsonian Astrophysical Observatory
-#
-# This file is part of IO::ReStoreFH
-#
-# IO::ReStoreFH is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package IO::ReStoreFH;
+
+# ABSTRACT: store/restore file handles
 
 use 5.10.0;
 
 use strict;
 use warnings;
 
-use version 0.77; our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 # In Perl 5.10.1 a use or require of FileHandle or something in the
 # FileHandle hierarchy (like FileHandle::Fmode, below) will cause the
@@ -44,165 +25,157 @@ use version 0.77; our $VERSION = '0.05';
 # So, we explicitly load FileHandle on 5.10.x to avoid these action
 # at a distance problems.
 use if $^V ge v5.10.0 && $^V lt v5.11.0, 'FileHandle';
-use FileHandle::Fmode ':all';
 
-use POSIX qw[ dup dup2 ceil floor ];
-use Symbol;
-use Carp;
-
+use FileHandle::Fmode ();
+use POSIX             ();
 use IO::Handle;
-use Scalar::Util qw[ looks_like_number ];
-use Try::Tiny;
+use Scalar::Util;
+use Try::Tiny ();
 
+sub _croak {
+    require Carp;
+    goto &Carp::croak;
+}
 
 sub new {
+    my $class = shift;
 
-	my $class = shift;
-
-	my $obj = bless { dups => [] }, $class;
-
-	$obj->store( $_ ) for @_;
-
-	return $obj;
-
+    my $obj = bless { dups => [] }, $class;
+    $obj->store( $_ ) for @_;
+    return $obj;
 }
 
 sub store {
+    my ( $self, $fh ) = @_;
 
-	my ( $self, $fh ) = @_;
+    # if $fh is a reference, or a GLOB, it's probably
+    # a filehandle object of somesort
 
-	# if $fh is a reference, or a GLOB, it's probably
-	# a filehandle object of somesort
+    if ( ref( $fh ) || 'GLOB' eq ref( \$fh ) ) {
 
-	if ( ref( $fh ) || 'GLOB' eq ref( \$fh ) ) {
+        # now that we are sure that everything is loaded,
+        # check if it is an open filehandle; this doesn't disambiguate
+        # between objects that aren't filehandles or closed filehandles.
+        _croak( "\$fh is not an open filehandle\n" )
+          unless FileHandle::Fmode::is_FH( $fh );
 
-		# need a glob
-		my $glob = 'GLOB' eq ref( $fh ) ? ${$fh} : undef;
+        # get access mode; open documentation says mode must
+        # match that of original filehandle; do the best we can
+        my $mode
+          = FileHandle::Fmode::is_RO( $fh ) ? '<'
+          : FileHandle::Fmode::is_WO( $fh ) ? '>'
+          : FileHandle::Fmode::is_W( $fh )
+          && FileHandle::Fmode::is_R( $fh ) ? '+<'
+          : undef;
 
-		# now that we are sure that everything is loaded,
-		# check if it is an open filehandle; this doesn't disambiguate
-		# between objects that aren't filehandles or closed filehandles.
-		croak( "\$fh is not an open filehandle\n" )
-		  unless is_FH( $fh );
+        # give up
+        _croak( "inexplicable error: unable to determine mode for \$fh;\n" )
+          if !defined $mode;
 
-		# get access mode; open documentation says mode must
-		# match that of original filehandle; do the best we can
-		my $mode
-		  = is_RO( $fh )                ? '<'
-		  : is_WO( $fh )                ? '>'
-		  : is_W( $fh ) && is_R( $fh )  ? '+<'
-		  :                                undef;
+        $mode .= '>' if FileHandle::Fmode::is_A( $fh );
 
+        # dup the filehandle
+        open my $dup, $mode . '&', $fh
+          or _croak( "error fdopening \$fh: $!\n" );
 
-		# give up
-		croak(
-			"inexplicable error: unable to determine mode for \$fh;\n"
-		) if !defined $mode;
+        push @{ $self->{dups} }, { fh => $fh, mode => $mode, dup => $dup };
+    }
 
-		$mode .= '>' if is_A( $fh );
+    elsif (Scalar::Util::looks_like_number( $fh )
+        && POSIX::ceil( $fh ) == POSIX::floor( $fh ) )
+    {
 
-		# dup the filehandle
-		open my $dup, $mode . '&', $fh
-		  or croak( "error fdopening \$fh: $!\n" );
+        # as the caller specifically used an fd, don't go through Perl's
+        # IO system
+        my $dup = POSIX::dup( $fh )
+          or _croak( "error dup'ing file descriptor $fh: $!\n" );
 
-		push @{ $self->{dups} }, { fh => $fh, mode => $mode, dup => $dup };
+        push @{ $self->{dups} }, { fd => $fh, dup => $dup };
+    }
 
-	}
+    else {
+        _croak(
+            "\$fh must be opened Perl filehandle or object or integer file descriptor\n"
+        );
+    }
 
-	elsif ( looks_like_number( $fh ) && ceil( $fh ) == floor( $fh ) ) {
-
-		# as the caller specifically used an fd, don't go through Perl's
-		# IO system
-		my $dup = dup( $fh )
-		  or croak( "error dup'ing file descriptor $fh: $!\n" );
-
-		push @{ $self->{dups} }, { fd => $fh, dup => $dup };
-	}
-
-	else {
-
-		croak(
-			"\$fh must be opened Perl filehandle or object or integer file descriptor\n"
-		  )
-
-	}
-
-	return;
+    return;
 }
 
 sub restore {
+    my $self = shift;
 
-	my $self = shift;
+    my $dups = $self->{dups};
+    ## no critic (ProhibitAccessOfPrivateData)
+    while ( my $dup = pop @{$dups} ) {
 
-	my $dups = $self->{dups};
-	## no critic (ProhibitAccessOfPrivateData)
-	while ( my $dup = pop @{$dups} ) {
+        if ( exists $dup->{fd} ) {
+            POSIX::dup2( $dup->{dup}, $dup->{fd} )
+              or _croak( "error restoring file descriptor $dup->{fd}: $!\n" );
+            POSIX::close( $dup->{dup} );
+        }
 
-		if ( exists $dup->{fd} ) {
-
-			dup2( $dup->{dup}, $dup->{fd} )
-			  or croak( "error restoring file descriptor $dup->{fd}: $!\n" );
-
-			POSIX::close( $dup->{dup} );
-
-		}
-
-		else {
-
-			open( $dup->{fh}, $dup->{mode} . '&', $dup->{dup} )
-			  or croak( "error restoring file handle $dup->{fh}: $!\n" );
-
-			close( $dup->{dup} );
-
-		}
-
-	}
-
-	return;
+        else {
+            open( $dup->{fh}, $dup->{mode} . '&', $dup->{dup} )
+              or _croak( "error restoring file handle $dup->{fh}: $!\n" );
+            close( $dup->{dup} );
+        }
+    }
+    return;
 }
-
-
 
 sub DESTROY {
-
-	my $self = shift;
-
-	try {
-		$self->restore;
-	}
-	catch { croak $_ };
-
-	return;
+    my $self = shift;
+    Try::Tiny::try { $self->restore }
+    Try::Tiny::catch { _croak $_ };
+    return;
 }
 
+1;
+
+#
+# This file is part of IO-ReStoreFH
+#
+# This software is Copyright (c) 2012 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
 
 =head1 NAME
 
 IO::ReStoreFH - store/restore file handles
 
+=head1 VERSION
+
+version 0.07
 
 =head1 SYNOPSIS
 
-	use IO::ReStoreFH;
+        use IO::ReStoreFH;
 
-	{
-	   my $fhstore = IO::ReStoreFH->new( *STDOUT );
+        {
+           my $fhstore = IO::ReStoreFH->new( *STDOUT );
 
-	   open( STDOUT, '>', 'file' );
-	} # STDOUT will be restored when $fhstore is destroyed
+           open( STDOUT, '>', 'file' );
+        } # STDOUT will be restored when $fhstore is destroyed
 
-	# or, one at-a-time
-	{
-	   my $fhstore = IO::ReStoreFH->new;
-	   $store->store( *STDOUT );
-	   $store->store( $myfh );
+        # or, one at-a-time
+        {
+           my $fhstore = IO::ReStoreFH->new;
+           $store->store( *STDOUT );
+           $store->store( $myfh );
 
-	   open( STDOUT, '>', 'file' );
-	   open( $myfh, '>', 'another file' );
-	} # STDOUT and $myfh will be restored when $fhstore is destroyed
-
-
+           open( STDOUT, '>', 'file' );
+           open( $myfh, '>', 'another file' );
+        } # STDOUT and $myfh will be restored when $fhstore is destroyed
 
 =head1 DESCRIPTION
 
@@ -227,8 +200,8 @@ they are stored.
 
 =item new
 
-	my $fhstore = IO::ReStoreFH->new;
-	my $fhstore = IO::ReStoreFH->new( $fh1, $fh2, $fd, ... );
+        my $fhstore = IO::ReStoreFH->new;
+        my $fhstore = IO::ReStoreFH->new( $fh1, $fh2, $fd, ... );
 
 Create a new object and an optional list of Perl filehandles or
 integer file descriptors.
@@ -238,9 +211,9 @@ when the object is destroyed or the B<restore> method is called.
 
 =item store
 
-	$fhstore->store( $fh );
+        $fhstore->store( $fh );
 
-	$fhstore->store( $fd );
+        $fhstore->store( $fd );
 
 The passed handles and descriptors will be duplicated to be restored
 when the object is destroyed or the B<restore> method is called.
@@ -255,15 +228,7 @@ is destroyed.
 
 =back
 
-
-
 =head1 DIAGNOSTICS
-
-=for author to fill in:
-	List every single error and warning message that the module can
-	generate (even the ones that will "never happen"), with a full
-	explanation of each problem, one or more likely causes, and any
-	suggested remedies.
 
 =over
 
@@ -302,46 +267,32 @@ Attempting to restore the Perl file handle failed for the specified reason.
 
 =back
 
-=head1 CONFIGURATION AND ENVIRONMENT
+=head1 SUPPORT
 
-B<IO::ReStoreFH> requires no configuration files or environment variables.
+=head2 Bugs
 
+Please report any bugs or feature requests to bug-io-restorefh@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=IO-ReStoreFH
 
-=head1 DEPENDENCIES
+=head2 Source
 
-B<L<Try::Tiny>>, B<L<FileHandle::Fmode>>.
+Source is available at
 
-=head1 INCOMPATIBILITIES
+  https://gitlab.com/djerius/io-restorefh
 
-None reported.
+and may be cloned from
 
-
-=head1 BUGS AND LIMITATIONS
-
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-C<bug-io-restorefh@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=IO-ReStoreFH>.
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright (c) 2012 The Smithsonian Astrophysical Observatory
-
-IO::ReStoreFH is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  https://gitlab.com/djerius/io-restorefh.git
 
 =head1 AUTHOR
 
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

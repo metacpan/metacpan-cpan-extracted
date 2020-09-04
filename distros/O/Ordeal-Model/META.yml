@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/polettix/Ordeal-Model/issues
   homepage: https://github.com/polettix/Ordeal-Model
   repository: https://github.com/polettix/Ordeal-Model.git
-version: '0.003'
+version: '0.004'
 x_contributors:
   - 'Flavio Poletti <flavio.poletti@ericsson.com>'
   - 'Flavio Poletti <flavio@polettix.it>'

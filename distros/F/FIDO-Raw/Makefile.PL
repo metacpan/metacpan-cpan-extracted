@@ -89,6 +89,10 @@ if ($is_linux)
 		'lib'     => 'udev',
 		'header'  => 'libudev.h',
 	},
+	{
+		'lib'     => 'usb',
+		'header'  => 'libusb.h',
+	};
 }
 
 my %library_opts =
@@ -102,6 +106,11 @@ my %library_opts =
 	{
 		'defines' => '',
 		'libs'    => ' -ludev',
+	},
+	'usb' =>
+	{
+		'defines' => '',
+		'libs'    => ' -lusb',
 	},
 );
 
@@ -348,7 +357,7 @@ push @fido2srcs, 'hid_osx.c' if ($is_osx);
 push @fido2srcs, 'hid_win.c' if ($is_windows);
 
 my @hidapisrcs;
-if ($is_bsd && !$is_openbsd && !$is_windows && !$is_osx || ($is_linux && !$library_opts{udev}{use}))
+if ($is_bsd && !$is_openbsd && !$is_windows && !$is_osx || ($is_linux && !$library_opts{udev}{use} && $library_opts{usb}{use}))
 {
 	push @fido2srcs, 'hid_hidapi.c';
 	push @hidapisrcs, 'deps/hidapi/libusb/hid.c';
@@ -421,7 +430,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "lib" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
