@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 72abbc47e615b3dad03fb703d752d807217bf8fa6018b6d006ebb5c78d075e4b COPYRIGHT
+SHA256 1e340ac9f67fa737bce8e1cce5eeebb9301a337bcaa86c8776c6c42dca12c795 CREDITS
+SHA256 ea62681414da3a02f65eb3bace77cf99bbf8e922451aa248094546c398735d5d Changes
+SHA256 e2ee3b9dd5e38caf97ecd71a26f5df916f0e39edea2ea1aa6a532ab068a1f645 INSTALL
+SHA256 1fb7395e76eabf94c421912d7d0a4f7fa745d49e1acb76b222c21d605b66bd25 LICENSE
+SHA256 940d5b3ad9ee37e1bfbe815ddc16ae222a5adaac2f1d7b675360d3c2234573eb MANIFEST
+SHA256 3e5e3d4f5af89bdf4001c1df9ee0310f8772f4f679316039393b6c5dbe5aa871 META.json
+SHA256 4ec73801ea96fdf4d25a17d23530a3259a8be8d9cb25a28b656b92886db63f80 META.yml
+SHA256 3eb3ebad523c7b147aaef165e22955e6bf71aa4d1e0aac93401aff7180e24674 Makefile.PL
+SHA256 d6ebfce4f11af9cae4ee54f73c63e60da0e64e1bc1884775ab310cb1ebf3f216 README
+SHA256 037dc58858c9d956800a91e26be264d00518f818892cbf17ca14f4f2423b4029 dist.ini
+SHA256 a52d0898b96dee7bfc14bba8a37d46228b81bced589e6d30826d1fe85d482c2d doap.ttl
+SHA256 934b500c48be79364d3bc7e32b72c8a2d2d7f4a6dfd08ed179cac7b2badec0ed examples/benchmark.pl
+SHA256 32186e7f0be2fdf2ad7f0297b221b782b6a14d50f4b20811d1bab5bfceceaa8f lib/isa.pm
+SHA256 7df8a0428e194cb05554b47ea19d198803f1793d59cf81ca66df5e5fb8481717 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCX1TI+wAKCRDOv4Eoaip9
+OboQAKCtsljgu4iVAOspkPPXBrPI3+X3lQCfSd1k9jUGSv6SRm7ZYF9L4NpIW0o=
+=pV4c
+-----END PGP SIGNATURE-----

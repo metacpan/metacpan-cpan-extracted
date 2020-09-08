@@ -44,7 +44,7 @@ count(2);
 
 # Test that Conf key value is sent
 $res = $client2->jsonResponse('/view/2/portalDisplayOidcConsents');
-ok( $res->{value} eq '$_oidcConnectedRP', 'Key found' )
+ok( $res->{value} eq '$_oidcConsents && $_oidcConsents =~ /\\w+/', 'Key found' )
   or print STDERR Dumper($res);
 count(1);
 

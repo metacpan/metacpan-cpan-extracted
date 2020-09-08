@@ -1,9 +1,9 @@
 <div class="form">
   <div class="input-group mb-3">
     <div class="input-group-prepend">
-      <span class="input-group-text"><i class="fa fa-user"></i> </span>
+      <span class="input-group-text"><label for="openidfield" class="mb-0"><i class="fa fa-user"></i></label></span>
     </div>
-    <input name="openid_identifier" type="text" class="form-control" trplaceholder="enterOpenIDLogin" aria-required="true"/>
+    <input id="openidfield" name="openid_identifier" type="text" class="form-control" trplaceholder="enterOpenIDLogin" aria-required="true"/>
   </div>
 
   <TMPL_INCLUDE NAME="impersonation.tpl">

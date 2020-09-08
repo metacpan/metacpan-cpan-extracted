@@ -1,7 +1,7 @@
 package Mail::DKIM::PrivateKey;
 use strict;
 use warnings;
-our $VERSION = '1.20200824'; # VERSION
+our $VERSION = '1.20200907'; # VERSION
 # ABSTRACT: a private key loaded in memory for DKIM signing
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -132,7 +132,7 @@ Mail::DKIM::PrivateKey - a private key loaded in memory for DKIM signing
 
 =head1 VERSION
 
-version 1.20200824
+version 1.20200907
 
 =head1 SYNOPSIS
 

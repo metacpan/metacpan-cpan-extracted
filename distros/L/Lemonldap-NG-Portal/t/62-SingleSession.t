@@ -201,13 +201,11 @@ ok( $res->[2]->[0] =~ m%<h3 trspan="otherSessions"></h3>%,
   or explain( $res->[2]->[0], 'otherSessions found' );
 ok(
     $res->[2]->[0] =~
-m%<a href="http://auth.example.com/removeOther\?token=\d{10}_\d+" onclick="_go=0" trspan="removeOtherSessions"></a>%,
+m%<a href="http://auth.example.com/removeOther\?token=\w+?" onclick="_go=0" trspan="removeOtherSessions"></a>%,
     'Link found'
 ) or explain( $res->[2]->[0], 'Link found' );
-ok(
-    $res->[2]->[0] =~ m%action="http://test1.example.com/"%,
-    'action found'
-) or explain( $res->[2]->[0], 'action found' );
+ok( $res->[2]->[0] =~ m%action="http://test1.example.com/"%, 'action found' )
+  or explain( $res->[2]->[0], 'action found' );
 count(4);
 
 clean_sessions();

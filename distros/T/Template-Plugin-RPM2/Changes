@@ -1,3 +1,9 @@
+2010-09-07  Dave Cross  <dave@perlhacks.com>
+
+        * Catch up on over decade of tweaks
+
+        * Mostly CI stuff
+
 2009-07-26  Dave Cross  <dave@dave.org.uk>
 
 	* META.yml: Remove unnecessry file.

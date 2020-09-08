@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200606132000;
+our $VERSION = 1.20200904144533;
 
 my $formatters = [
                 {
@@ -184,23 +184,6 @@ my $validators = {
                 'voip' => '70\\d{8}'
               };
 my %areanames = ();
-$areanames{ko}->{822} = "서울";
-$areanames{ko}->{8231} = "경기";
-$areanames{ko}->{8232} = "인천";
-$areanames{ko}->{8233} = "강원";
-$areanames{ko}->{8241} = "충남";
-$areanames{ko}->{8242} = "대전";
-$areanames{ko}->{8243} = "충북";
-$areanames{ko}->{8244} = "세종";
-$areanames{ko}->{8251} = "부산";
-$areanames{ko}->{8252} = "울산";
-$areanames{ko}->{8253} = "대구";
-$areanames{ko}->{8254} = "경북";
-$areanames{ko}->{8255} = "경남";
-$areanames{ko}->{8261} = "전남";
-$areanames{ko}->{8262} = "광주";
-$areanames{ko}->{8263} = "전북";
-$areanames{ko}->{8264} = "제주";
 $areanames{en}->{822} = "Seoul";
 $areanames{en}->{8231} = "Gyeonggi";
 $areanames{en}->{8232} = "Incheon";
@@ -218,6 +201,23 @@ $areanames{en}->{8261} = "Jeonnam";
 $areanames{en}->{8262} = "Gwangju";
 $areanames{en}->{8263} = "Jeonbuk";
 $areanames{en}->{8264} = "Jeju";
+$areanames{ko}->{822} = "서울";
+$areanames{ko}->{8231} = "경기";
+$areanames{ko}->{8232} = "인천";
+$areanames{ko}->{8233} = "강원";
+$areanames{ko}->{8241} = "충남";
+$areanames{ko}->{8242} = "대전";
+$areanames{ko}->{8243} = "충북";
+$areanames{ko}->{8244} = "세종";
+$areanames{ko}->{8251} = "부산";
+$areanames{ko}->{8252} = "울산";
+$areanames{ko}->{8253} = "대구";
+$areanames{ko}->{8254} = "경북";
+$areanames{ko}->{8255} = "경남";
+$areanames{ko}->{8261} = "전남";
+$areanames{ko}->{8262} = "광주";
+$areanames{ko}->{8263} = "전북";
+$areanames{ko}->{8264} = "제주";
 
     sub new {
       my $class = shift;

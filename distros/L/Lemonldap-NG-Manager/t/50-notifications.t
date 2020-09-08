@@ -127,6 +127,33 @@ sub displayTests {
           or print STDERR "Expect JSON, found:\n$res->{notifications}->[0]\n";
         count(3);
     }
+
+    if ( $type eq 'done' ) {
+        $res = &client->jsonResponse( "notifications/$type", 'uid=dwho' );
+        ok(
+            $res->{values}->[0]->{notification} =~
+              /^\d{8}_dwho_VGVzdA==\.done$/,
+            'Reference found'
+        ) or diag Dumper($res);
+        my $internal_ref = $res->{values}->[0]->{notification};
+        my $ref          = $res->{values}->[0]->{reference};
+        $res = &client->jsonResponse( "notifications/$type/$internal_ref",
+            "uid=dwho&reference=$ref" );
+        ok( $res->{done} eq $internal_ref, 'Internal reference found' )
+          or diag Dumper($res);
+        ok( $res = eval { from_json( $res->{notifications}->[0] ) },
+            'Response is JSON' )
+          or print STDERR "Expect JSON, found:\n$res->{notifications}->[0]\n";
+        ok( $res->{reference} eq 'Test', 'reference found' )
+          or diag Dumper($res);
+        ok( $res->{title} eq 'Test', 'title found' )
+          or diag Dumper($res);
+        ok( $res->{date} eq '2099-12-31', 'date found' )
+          or diag Dumper($res);
+        ok( $res->{uid} eq 'dwho', 'uid found' )
+          or diag Dumper($res);
+        count(7);
+    }
 }
 
 # Remove notifications directory

@@ -111,7 +111,7 @@ package Rex::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 require Rex::Exporter;
 use Rex::TaskList;
@@ -1079,7 +1079,9 @@ sub needs {
 }
 
 # register needs in main namespace
-{
+_register_needs_in_main_namespace();
+
+sub _register_needs_in_main_namespace {
   my ($caller_pkg) = caller(1);
 
   if ( !$caller_pkg ) {
@@ -1090,7 +1092,7 @@ sub needs {
     my $ref_to_needs = qualify_to_ref( 'needs', 'main' );
     *{$ref_to_needs} = \&needs;
   }
-};
+}
 
 =head2 include Module::Name
 

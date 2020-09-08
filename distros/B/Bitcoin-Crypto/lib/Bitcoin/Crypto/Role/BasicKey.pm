@@ -1,10 +1,10 @@
 package Bitcoin::Crypto::Role::BasicKey;
 
-use Modern::Perl "2010";
-use Moo::Role;
+use v5.10; use warnings;
 
-use Bitcoin::Crypto::Helpers qw(pad_hex);
+use Bitcoin::Crypto::Helpers qw(pad_hex verify_bytestring);
 use Bitcoin::Crypto::Exception;
+use Moo::Role;
 
 with "Bitcoin::Crypto::Role::Key",
 	"Bitcoin::Crypto::Role::Compressed";
@@ -17,7 +17,9 @@ sub sign_message
 		"cannot sign a message with a public key"
 	) unless $self->_is_private;
 
-	warn("Current implementation of signature generation mechanisms does not produce deterministic result. This is a security flaw that is currently being worked on. Please use with caution.");
+	warn(
+		"Current implementation of signature generation mechanisms does not produce deterministic result. This is a security flaw that is currently being worked on. Please use with caution."
+	);
 
 	$algorithm //= "sha256";
 	return $self->key_instance->sign_message($message, $algorithm);
@@ -26,6 +28,8 @@ sub sign_message
 sub verify_message
 {
 	my ($self, $message, $signature, $algorithm) = @_;
+	verify_bytestring($signature);
+
 	$algorithm //= "sha256";
 	return $self->key_instance->verify_message($signature, $message, $algorithm);
 }
@@ -45,6 +49,7 @@ sub to_hex
 sub from_bytes
 {
 	my ($class, $bytes) = @_;
+	verify_bytestring($bytes);
 
 	return $class->new($bytes);
 }

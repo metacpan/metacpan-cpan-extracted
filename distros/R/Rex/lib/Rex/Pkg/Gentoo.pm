@@ -9,7 +9,7 @@ package Rex::Pkg::Gentoo;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 use Rex::Commands::Run;
 use Rex::Helper::Run;
@@ -86,8 +86,8 @@ sub is_installed {
       "Couldn't find package by category/packagename, trying with packagename only"
     );
     $self->{short} = 1;
-    @pkg_info = grep { $_->{name} eq $pkg } $self->get_installed();
-    @pkg_info = grep { $_->{version} eq $version } @pkg_info
+    @pkg_info      = grep { $_->{name} eq $pkg } $self->get_installed();
+    @pkg_info      = grep { $_->{version} eq $version } @pkg_info
       if defined $version;
   }
 

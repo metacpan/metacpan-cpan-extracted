@@ -19,16 +19,13 @@ WriteMakefile(
 		'Test::Exception' => 0,
 	},
 	PREREQ_PM => {
-		'Modern::Perl' => '>= 1.20181021',
-		'Math::EllipticCurve::Prime' => '>= 0.003',
-		'Math::BigInt' => '>= 1.999816',
-		'Math::BigInt::GMP' => '>= 1.6006',
-		'Moo' => '>= 2.003004',
-		'MooX::Types::MooseLike' => '>= 0.29',
-		'CryptX' => '>= 0.062',
+		'Math::BigInt' => '>= 1.999818',
+		'Moo' => '>= 2.004000',
+		'Type::Tiny' => '>= 1.010001',
+		'CryptX' => '>= 0.068',
 		'Bitcoin::BIP39' => '>= 0.002',
-		'Try::Tiny' => '>= 0.30',
 		'Throwable' => '>= 0.2',
+		'namespace::clean' => '>= 0.27',
 	},
 
 	META_MERGE => {

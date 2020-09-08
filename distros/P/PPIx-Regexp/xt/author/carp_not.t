@@ -17,10 +17,6 @@ foreach my $fn ( sort keys %{ maniread() } ) {
     s< [.] pm \z ><>smx
 	or next;
     s< / ><::>smxg;
-    {
-	'PPIx::Regexp::StringTokenizer'	=> 1,
-    }->{$_}
-	and next;
     push @modules, $_;
 
     local $/ = undef;

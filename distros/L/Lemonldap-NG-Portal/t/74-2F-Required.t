@@ -18,6 +18,7 @@ SKIP: {
                 totp2fSelfRegistration => 1,
                 totp2fActivation       => 1,
                 sfRequired             => 1,
+                tokenUseGlobalStorage  => 1,
             }
         }
     );

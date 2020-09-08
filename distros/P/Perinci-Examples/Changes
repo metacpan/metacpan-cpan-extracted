@@ -1,3 +1,9 @@
+0.820   2020-04-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Replace the usage of deprecated x.schema.entity with more
+	  specific schema.
+
+
 0.819   2019-08-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Add modules:

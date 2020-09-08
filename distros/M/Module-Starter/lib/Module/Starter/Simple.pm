@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Cwd 'cwd';
-use ExtUtils::Command qw( rm_rf mkpath touch );
+use File::Path qw( make_path remove_tree );
 use File::Spec ();
 use Carp qw( carp confess croak );
 use Module::Runtime qw( require_module );
@@ -18,11 +18,11 @@ Module::Starter::Simple - a simple, comprehensive Module::Starter plugin
 
 =head1 VERSION
 
-Version 1.76
+version 1.77
 
 =cut
 
-our $VERSION = '1.76';
+our $VERSION = '1.77';
 
 =head1 SYNOPSIS
 
@@ -177,8 +177,7 @@ sub create_basedir {
              "Use --force if you want to stomp on it.\n"
             ) unless $self->{force};
 
-        local @ARGV = $self->{basedir};
-        rm_rf();
+        remove_tree $self->{basedir};
 
         die "Couldn't delete existing $self->{basedir}: $!\n"
           if -e $self->{basedir};
@@ -187,8 +186,7 @@ sub create_basedir {
     CREATE_IT: {
         $self->progress( "Created $self->{basedir}" );
 
-        local @ARGV = $self->{basedir};
-        mkpath();
+        make_path $self->{basedir};
 
         die "Couldn't create $self->{basedir}: $!\n" unless -d $self->{basedir};
     }
@@ -295,8 +293,7 @@ sub _create_module {
     if ( @dirparts ) {
         my $dir = File::Spec->catdir( @dirparts );
         if ( not -d $dir ) {
-            local @ARGV = $dir;
-            mkpath @ARGV;
+            make_path $dir;
             $self->progress( "Created $dir" );
         }
     }
@@ -331,10 +328,6 @@ sub _reference_links {
       { nickname => 'RT',
         title    => 'CPAN\'s request tracker (report bugs here)',
         link     => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=%s',
-      },
-      { nickname => 'AnnoCPAN',
-        title    => 'Annotated CPAN documentation',
-        link     => 'http://annocpan.org/dist/%s',
       },
       { title    => 'CPAN Ratings',
         link     => 'https://cpanratings.perl.org/d/%s',
@@ -807,7 +800,7 @@ sub t_guts {
     my $warnings = sprintf 'warnings%s;', ($self->{fatalize} ? " FATAL => 'all'" : '');
 
     my $header = <<"EOH";
-#!perl -T
+#!perl
 use $minperl;
 use strict;
 use $warnings
@@ -899,7 +892,7 @@ sub xt_guts {
     my $warnings = sprintf 'warnings%s;', ($self->{fatalize} ? " FATAL => 'all'" : '');
 
     my $header = <<"EOH";
-#!perl -T
+#!perl
 use $minperl;
 use strict;
 use $warnings
@@ -977,8 +970,7 @@ sub _create_t {
     my @dirparts = ( $self->{basedir}, $directory );
     my $tdir = File::Spec->catdir( @dirparts );
     if ( not -d $tdir ) {
-        local @ARGV = $tdir;
-        mkpath();
+        make_path $tdir;
         $self->progress( "Created $tdir" );
     }
 
@@ -1337,6 +1329,8 @@ notified, and then you'll automatically be notified of progress on your bug
 as I make changes.
 
 =head1 AUTHOR
+
+Dan Book, L<< <dbook@cpan.org> >>
 
 Sawyer X, C<< <xsawyerx@cpan.org> >>
 

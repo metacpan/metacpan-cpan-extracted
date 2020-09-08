@@ -75,7 +75,7 @@ if (process.env.WEBPACK_RULE_FOR_SASS) {
     use: [
       MiniCssExtractPlugin.loader,
       {loader: 'css-loader', options: {sourceMap: sourceMap}},
-      {loader: 'sass-loader', options: {includePaths: sassIncludePaths, sourceMap: sourceMap}}
+      {loader: 'sass-loader', options: {sassOptions: {includePaths: sassIncludePaths}, sourceMap: sourceMap}}
     ]
   });
 }

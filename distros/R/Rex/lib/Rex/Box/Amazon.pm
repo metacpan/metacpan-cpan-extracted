@@ -85,7 +85,7 @@ use Rex::Commands -no => [qw/auth/];
 use Rex::Commands::Fs;
 use Rex::Commands::Cloud;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 BEGIN {
   LWP::UserAgent->use;
@@ -153,7 +153,7 @@ sub import_vm {
       name           => $self->{name},
       key            => $self->{options}->{auth_key},
       zone           => $self->{options}->{zone},
-      type           => $self->{type} || "m1.large",
+      type           => $self->{type}           || "m1.large",
       security_group => $self->{security_group} || "default",
       options        => $self->options,
     };

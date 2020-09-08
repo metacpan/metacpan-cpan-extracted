@@ -1,8 +1,8 @@
 <TMPL_IF NAME="SPOOFID">
 <div class="input-group mb-3">
   <div class="input-group-prepend">
-  <span class="input-group-text"><i class="fa fa-user icon-blue"></i> </span>
+  <span class="input-group-text"><label for="spoofIdfield" class="mb-0"><i class="fa fa-user icon-blue"></i></label></span>
   </div>
-  <input name="spoofId" type="text" class="form-control" trplaceholder="spoofId" aria-required="false"/>
+  <input id="spoofIdfield" name="spoofId" type="text" class="form-control" trplaceholder="spoofId" aria-required="false"/>
 </div>
 </TMPL_IF>

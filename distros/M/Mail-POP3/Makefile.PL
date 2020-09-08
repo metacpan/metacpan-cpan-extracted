@@ -10,7 +10,7 @@ WriteMakefile(
   PREREQ_PM => {
     'HTTP::Cookies' => 0,
     'HTML::Form' => 0,
-    'Email::MIME' => 0,
+    'Email::MIME' => '1.949',
     'HTML::FormatText' => 0,
   },
   EXE_FILES => [map "scripts/$_", qw(

@@ -36,7 +36,7 @@ has fileNameSeparator => ( is => 'rw', default => '_' );
 sub get {
     my ( $self, $uid, $ref ) = @_;
     return () unless ($uid);
-    my $ext = $self->extension;
+    my $ext        = $self->extension;
     my $fns        = $self->{fileNameSeparator};
     my $identifier = &getIdentifier( $self, $uid, $ref );
 
@@ -61,7 +61,7 @@ sub get {
 sub getAccepted {
     my ( $self, $uid, $ref ) = @_;
     return () unless ($uid);
-    my $ext = $self->extension;
+    my $ext        = $self->extension;
     my $fns        = $self->{fileNameSeparator};
     my $identifier = &getIdentifier( $self, $uid, $ref );
 

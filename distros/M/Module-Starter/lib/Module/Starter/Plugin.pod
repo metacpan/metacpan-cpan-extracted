@@ -4,6 +4,10 @@
 
 Module::Starter::Plugin -- how Module::Starter plugins work
 
+=head1 VERSION
+
+version 1.77
+
 =head1 DESCRIPTION
 
 This document is a guide to writing plugins for Module::Starter.  Currently, as

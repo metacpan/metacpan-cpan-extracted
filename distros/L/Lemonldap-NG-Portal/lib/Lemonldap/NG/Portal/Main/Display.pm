@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -10,6 +10,8 @@ use Mouse;
 use JSON;
 use URI;
 
+has isPP          => ( is => 'rw' );
+has speChars      => ( is => 'rw' );
 has skinRules     => ( is => 'rw' );
 has requireOldPwd => ( is => 'rw', default => sub { 1 } );
 
@@ -37,6 +39,19 @@ sub displayInit {
         $self->logger->error( "Bad requireOldPwd rule: " . $error );
     }
     $self->requireOldPwd($rule);
+
+    my $speChars = $self->conf->{passwordPolicySpecialChar};
+    $speChars =~ s/\s+/ /g;
+    $speChars =~ s/(?:^\s|\s$)//g;
+    $self->speChars($speChars);
+
+    my $isPP =
+         $self->conf->{passwordPolicyMinSize}
+      || $self->conf->{passwordPolicyMinLower}
+      || $self->conf->{passwordPolicyMinUpper}
+      || $self->conf->{passwordPolicyMinDigit}
+      || $speChars;
+    $self->isPP($isPP);
 }
 
 # Call portal process and set template parameters
@@ -145,12 +160,12 @@ sub display {
             AUTH_ERROR      => $self->error,
             AUTH_ERROR_TYPE => $req->error_type,
             MSG             => $info,
-            URL             => $req->{urldc} || $self->conf->{portal}, # Fix 2158
-            HIDDEN_INPUTS   => $self->buildOutgoingHiddenForm( $req, $method ),
-            ACTIVE_TIMER    => $req->data->{activeTimer},
-            CHOICE_PARAM    => $self->conf->{authChoiceParam},
-            CHOICE_VALUE    => $req->data->{_authChoice},
-            FORM_METHOD     => $method,
+            URL => $req->{urldc} || $self->conf->{portal},    # Fix 2158
+            HIDDEN_INPUTS => $self->buildOutgoingHiddenForm( $req, $method ),
+            ACTIVE_TIMER  => $req->data->{activeTimer},
+            CHOICE_PARAM  => $self->conf->{authChoiceParam},
+            CHOICE_VALUE  => $req->data->{_authChoice},
+            FORM_METHOD   => $method,
             (
                   ( not $req->{urldc} ) ? ( SEND_PARAMS => 1 )
                 : ()
@@ -210,17 +225,7 @@ sub display {
 
     # 2.2 Case : display menu (with error or not)
     elsif ( $req->error == PE_OK ) {
-        my $speChars = $self->conf->{passwordPolicySpecialChar};
-        $speChars =~ s/\s+/ /g;
-        $speChars =~ s/(?:^\s|\s$)//g;
         $skinfile = 'menu';
-
-        my $isPP =
-             $self->conf->{passwordPolicyMinSize}
-          || $self->conf->{passwordPolicyMinLower}
-          || $self->conf->{passwordPolicyMinUpper}
-          || $self->conf->{passwordPolicyMinDigit}
-          || $speChars;
 
         #utf8::decode($auth_user);
         %templateParams = (
@@ -228,20 +233,21 @@ sub display {
             LANGS     => $self->conf->{showLanguages},
             AUTH_USER => $req->{sessionInfo}->{ $self->conf->{portalUserAttr} },
             NEWWINDOW => $self->conf->{portalOpenLinkInNewWindow},
-            LOGOUT_URL          => $self->conf->{portal} . "?logout=1",
-            APPSLIST_ORDER      => $req->{sessionInfo}->{'_appsListOrder'},
-            PING                => $self->conf->{portalPingInterval},
-            REQUIRE_OLDPASSWORD => $self->requireOldPwd->($req, $req->userData),
-            HIDE_OLDPASSWORD    => 0,
-            DISPLAY_PPOLICY     => $self->conf->{portalDisplayPasswordPolicy},
-            PPOLICY_MINSIZE     => $self->conf->{passwordPolicyMinSize},
-            PPOLICY_MINLOWER    => $self->conf->{passwordPolicyMinLower},
-            PPOLICY_MINUPPER    => $self->conf->{passwordPolicyMinUpper},
-            PPOLICY_MINDIGIT    => $self->conf->{passwordPolicyMinDigit},
-            PPOLICY_NOPOLICY    => !$isPP,
-            PPOLICY_ALLOWEDSPECHAR => $speChars,
+            LOGOUT_URL     => $self->conf->{portal} . "?logout=1",
+            APPSLIST_ORDER => $req->{sessionInfo}->{'_appsListOrder'},
+            PING           => $self->conf->{portalPingInterval},
+            REQUIRE_OLDPASSWORD =>
+              $self->requireOldPwd->( $req, $req->userData ),
+            HIDE_OLDPASSWORD => 0,
+            DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy},
+            PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
+            PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
+            PPOLICY_MINUPPER => $self->conf->{passwordPolicyMinUpper},
+            PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
+            PPOLICY_NOPOLICY => !$self->isPP(),
+            PPOLICY_ALLOWEDSPECHAR => $self->speChars(),
             (
-                $speChars
+                $self->speChars()
                 ? ( PPOLICY_MINSPECHAR =>
                       $self->conf->{passwordPolicyMinSpeChar} )
                 : ()
@@ -255,15 +261,20 @@ sub display {
         );
     }
 
-    elsif ( $req->error == PE_RENEWSESSION ) {
+    # when upgrading session, the administrator can configure LLNG
+    # to ask only for 2FA
+    elsif ( $req->error == PE_UPGRADESESSION ) {
         $skinfile       = 'upgradesession';
         %templateParams = (
-            MAIN_LOGO  => $self->conf->{portalMainLogo},
-            LANGS      => $self->conf->{showLanguages},
-            MSG        => 'askToRenew',
-            CONFIRMKEY => $self->stamp,
-            PORTAL     => $self->conf->{portal},
-            URL        => $req->data->{_url},
+            MAIN_LOGO    => $self->conf->{portalMainLogo},
+            LANGS        => $self->conf->{showLanguages},
+            FORMACTION   => '/upgradesession',
+            MSG          => 'askToUpgrade',
+            PORTALBUTTON => 1,
+            BUTTON       => 'upgradeSession',
+            CONFIRMKEY   => $self->stamp,
+            PORTAL       => $self->conf->{portal},
+            URL          => $req->data->{_url},
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -272,13 +283,37 @@ sub display {
         );
     }
 
+    # renew uses the same plugin as upgrade, but first factor is mandatory
+    elsif ( $req->error == PE_RENEWSESSION ) {
+        $skinfile       = 'upgradesession';
+        %templateParams = (
+            MAIN_LOGO    => $self->conf->{portalMainLogo},
+            LANGS        => $self->conf->{showLanguages},
+            FORMACTION   => '/renewsession',
+            MSG          => 'askToRenew',
+            CONFIRMKEY   => $self->stamp,
+            PORTAL       => $self->conf->{portal},
+            PORTALBUTTON => 1,
+            BUTTON       => 'renewSession',
+            URL          => $req->data->{_url},
+            (
+                $req->data->{customScript}
+                ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
+                : ()
+            ),
+        );
+    }
+
+    # Looks a lot like upgradesession, but no portal logo
     elsif ( $req->error == PE_MUSTAUTHN ) {
-        $skinfile       = 'updatesession';
+        $skinfile       = 'upgradesession';
         %templateParams = (
             MAIN_LOGO  => $self->conf->{portalMainLogo},
             LANGS      => $self->conf->{showLanguages},
+            FORMACTION => '/renewsession',
             MSG        => 'PE87',
             CONFIRMKEY => $self->stamp,
+            BUTTON     => 'renewSession',
             PORTAL     => $self->conf->{portal},
             URL        => $req->data->{_url},
             (
@@ -301,6 +336,7 @@ sub display {
             and $req->{error} > PE_OK
             and $req->{error} != PE_FIRSTACCESS
             and $req->{error} != PE_BADCREDENTIALS
+            and $req->{error} != PE_PP_CHANGE_AFTER_RESET
             and $req->{error} != PE_PP_PASSWORD_EXPIRED )
       )
     {
@@ -397,8 +433,7 @@ sub display {
                 CHOICE_PARAM          => $self->conf->{authChoiceParam},
                 CHOICE_VALUE          => $req->data->{_authChoice},
                 OLDPASSWORD           => $self->checkXSSAttack( 'oldpassword',
-                    $req->data->{oldpassword} )
-                ? ""
+                    $req->data->{oldpassword} ) ? ""
                 : $req->data->{oldpassword},
                 HIDE_OLDPASSWORD => $self->conf->{hideOldPassword},
                 DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy},
@@ -406,6 +441,14 @@ sub display {
                 PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
                 PPOLICY_MINUPPER => $self->conf->{passwordPolicyMinUpper},
                 PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
+                PPOLICY_NOPOLICY => !$self->isPP(),
+                PPOLICY_ALLOWEDSPECHAR => $self->speChars(),
+                (
+                    $self->speChars()
+                    ? ( PPOLICY_MINSPECHAR =>
+                          $self->conf->{passwordPolicyMinSpeChar} )
+                    : ()
+                ),
             );
         }
 
@@ -523,19 +566,20 @@ sub buildOutgoingHiddenForm {
     my ( $self, $req, $method ) = @_;
     my @keys = keys %{ $req->{portalHiddenFormValues} };
 
-    # Redirection URL contains query string. Before displaying a form,
-    # we must set the query string parameters as form fields so they can
-    # be preserved #2085
+    if ( lc $method eq 'get' ) {
+        my $uri          = URI->new( $req->{urldc} );
+        my %query_params = $uri->query_form;
 
-    my $uri          = URI->new( $req->{urldc} );
-    my %query_params = $uri->query_form;
-    if (%query_params) {
-        $self->logger->debug(
+        # Redirection URL contains query string. Before displaying a form,
+        # we must set the query string parameters as form fields so they can
+        # be preserved #2085
+        if (%query_params) {
+            $self->logger->debug(
 "urldc contains query parameters, setting them as hidden form values"
-        );
-        $self->clearHiddenFormValue($req);
-        foreach ( keys %query_params ) {
-            $self->setHiddenFormValue( $req, $_, $query_params{$_}, "", 0 );
+            );
+            foreach ( keys %query_params ) {
+                $self->setHiddenFormValue( $req, $_, $query_params{$_}, "", 0 );
+            }
         }
     }
 

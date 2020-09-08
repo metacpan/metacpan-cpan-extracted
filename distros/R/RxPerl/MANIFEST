@@ -18,6 +18,8 @@ lib/RxPerl/Subscription.pm
 lib/RxPerl/Utils.pm
 minil.toml
 t/00_compile.t
+t/from.t
 t/simple.t
+t/start_with.t
 META.yml
 MANIFEST

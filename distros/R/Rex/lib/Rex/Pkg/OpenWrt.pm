@@ -10,7 +10,7 @@ package Rex::Pkg::OpenWrt;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 use Rex::Helper::Run;
 use Rex::Commands::File;

@@ -1,7 +1,7 @@
 package Perinci::Examples::CLI;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.819'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.820'; # VERSION
 
 use 5.010001;
 use strict;
@@ -221,19 +221,18 @@ _
         },
         output => {
             summary => 'Specify output filename',
-            schema => 'str*',
-            "x.schema.entity" => "filename",
+            schema => 'filename*',
             description => <<'_',
 
 This option demonstrates how the option would be displayed in the help/usage.
-Due to the `x.schema.entity` attribute giving hint about what the value is, CLI
-framework can show:
+Due to the `schema` being `filename` instead of just `str`, CLI framework can
+show:
 
-    --output=file
+    --output=filename
 
-instead of the plain and less informative:
+instead of the less informative:
 
-    --output=s
+    --output=str
 
 _
         },
@@ -323,7 +322,7 @@ Perinci::Examples::CLI - Example for CLI help/usage generation
 
 =head1 VERSION
 
-This document describes version 0.819 of Perinci::Examples::CLI (from Perl distribution Perinci-Examples), released on 2019-08-14.
+This document describes version 0.820 of Perinci::Examples::CLI (from Perl distribution Perinci-Examples), released on 2020-04-29.
 
 =head1 DESCRIPTION
 
@@ -470,19 +469,19 @@ Demonstrate a scalar/simple default value.
 
 This demonstrate negation of --is-foo to --isnt-foo.
 
-=item * B<output> => I<str>
+=item * B<output> => I<filename>
 
 Specify output filename.
 
 This option demonstrates how the option would be displayed in the help/usage.
-Due to the C<x.schema.entity> attribute giving hint about what the value is, CLI
-framework can show:
+Due to the C<schema> being C<filename> instead of just C<str>, CLI framework can
+show:
 
- --output=file
+ --output=filename
 
-instead of the plain and less informative:
+instead of the less informative:
 
- --output=s
+ --output=str
 
 =item * B<pass> => I<str>
 
@@ -493,6 +492,7 @@ A required option as well as positional argument.
 =item * B<with_foo> => I<bool>
 
 This demonstrate negation of --with-foo to --without-foo.
+
 
 =back
 
@@ -543,6 +543,7 @@ Another bool option.
 
 A required option as well as positional argument.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -584,7 +585,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

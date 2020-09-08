@@ -144,7 +144,7 @@ ok( $prms{state},         ' state found' );
 count(5);
 
 # Check attributes in ID Token
-my $id_token_decoded = id_token_payload($prms{id_token});
+my $id_token_decoded = id_token_payload( $prms{id_token} );
 ok( $id_token_decoded->{sub} eq "dwho",        'Check sub value' );
 ok( $id_token_decoded->{name} eq "Doctor Who", 'Check name value' );
 count(2);

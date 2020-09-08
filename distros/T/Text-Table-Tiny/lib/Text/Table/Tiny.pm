@@ -1,12 +1,14 @@
 package Text::Table::Tiny;
-$Text::Table::Tiny::VERSION = '1.00';
+$Text::Table::Tiny::VERSION = '1.01';
 use 5.010;
 use strict;
 use warnings;
 use utf8;
 use parent 'Exporter';
-use Carp         qw/ croak /;
-use Ref::Util    qw/ is_arrayref is_ref /;
+use Carp                qw/ croak /;
+use Ref::Util           qw/ is_arrayref is_ref /;
+use String::TtyLength   qw/ tty_length /;
+
 our @EXPORT_OK = qw/ generate_table /;
 
 # Legacy package globals, that can be used to customise the look.
@@ -18,6 +20,17 @@ our $CORNER_MARKER        = '+';
 our $HEADER_ROW_SEPARATOR = '=';
 our $HEADER_CORNER_MARKER = 'O';
 
+my %arguments = (
+    rows => "the rows, including a possible header row, of the table",
+    header_row => "if true, indicates that the first row is a header row",
+    separate_rows => "if true, a separate rule will be drawn between each row",
+    top_and_tail => "if true, miss out top and bottom edges of table",
+    align => "either single alignment, or an array per of alignments per col",
+    style => "styling of table, one of classic, boxrule, or norule",
+    indent => "indent every row of the table a certain number of spaces",
+    compact => "narrow columns (no space either side of content)",
+);
+
 my %charsets = (
     classic => { TLC => '+', TT => '+', TRC => '+', HR => '-', VR => '|', FHR => '=', LT => '+', RT => '+', FLT => 'O', FRT => 'O', HC => '+', FHC => 'O', BLC => '+', BT => '+', BRC => '+' },
     boxrule => { TLC => '┌', TT => '┬', TRC => '┐', HR => '─', VR => '│', FHR => '═', LT => '├', RT => '┤', FLT => '╞', FRT => '╡', HC => '┼', FHC => '╪', BLC => '└', BT => '┴', BRC => '┘' },
@@ -27,6 +40,11 @@ my %charsets = (
 sub generate_table
 {
     my %param   = @_;
+
+    foreach my $arg (keys %param) {
+        croak "unknown argument '$arg'" if not exists $arguments{$arg};
+    }
+
     my $rows    = $param{rows} or croak "you must pass the 'rows' argument!";
     my @rows    = @$rows;
     my @widths  = _calculate_widths($rows);
@@ -78,16 +96,6 @@ sub _top_border
 
     return '' if $param->{top_and_tail};
     return _rule_row($param, $widths, $char->{TLC}, $char->{HR}, $char->{TT}, $char->{TRC});
-
-    return '' if $param->{top_and_tail};
-    my $pad = $param->{compact} ? '' : $char->{HR};
-
-    return $param->{indent}
-           .$char->{TLC}
-           .join($char->{TT}, map { $pad.($char->{HR} x $_).$pad } @$widths)
-           .$char->{TRC}
-           ."\n"
-           ;
 }
 
 sub _bottom_border
@@ -186,13 +194,6 @@ sub _calculate_widths
     return @widths;
 }
 
-sub tty_length
-{
-    my $string = shift;
-    $string =~ s/\e\[[0-9]+(;[0-9]+)?[ABCDEFGHJKSTfmin]//msg;
-    return length($string);
-}
-
 # Back-compat: 'table' is an alias for 'generate_table', but isn't exported
 *table = \&generate_table;
 
@@ -256,6 +257,9 @@ which are passed as a hash.
 The only required argument is B<rows>.
 Where arguments were not supported in the original release,
 the first supporting version is noted.
+
+If you pass an unknown argument,
+C<generate_table> will die with an error message.
 
 =over 4
 

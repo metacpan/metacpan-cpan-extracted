@@ -1,6 +1,8 @@
 {
   "name": "__NAME__",
-  "description": "",
+  "description": "Default mojolicious-plugin-webpack description",
+  "license": "Artistic-2.0",
+  "repository": "https://github.com/jhthorsen/mojolicious-plugin-webpack",
   "version": "__VERSION__",
   "devDependencies": {},
   "dependencies": {}

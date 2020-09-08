@@ -1,10 +1,14 @@
 package Bitcoin::Crypto::Bech32;
 
-use Modern::Perl "2010";
+use v5.10; use warnings;
 use Exporter qw(import);
 
+use Bitcoin::Crypto;
 use Bitcoin::Crypto::Exception;
+use Bitcoin::Crypto::Helpers qw(verify_bytestring);
 use Bitcoin::Crypto::Segwit qw(validate_program);
+
+our $VERSION = Bitcoin::Crypto->VERSION;
 
 our @EXPORT_OK = qw(
 	encode_bech32
@@ -156,7 +160,7 @@ sub decode_base32
 	$bits =~ s/0{$padding}$//;
 
 	Bitcoin::Crypto::Exception::Bech32InputData->raise(
-		"incorrrect padding encoded in bech32"
+		"incorrect padding encoded in bech32"
 	) if length($bits) % 8 != 0 || length($bits) < $length_padded - 4;
 
 	my @data = unpack "(a8)*", $bits;
@@ -170,6 +174,7 @@ sub decode_base32
 sub encode_bech32
 {
 	my ($hrp, $bytes) = @_;
+	verify_bytestring($bytes);
 
 	my $result = encode_base32($bytes);
 	my $checksum = create_checksum($hrp, $result);
@@ -215,26 +220,43 @@ Bitcoin::Crypto::Bech32 - Bitcoin's Bech32 implementation in Perl
 
 	use Bitcoin::Crypto::Bech32 qw(:all);
 
+	# witness version - a number from 0 to 16, packed into a byte
+	my $version = pack "C", $Bitcoin::Crypto::Config::config{witness_version};
+
+	# human readable part of the address - a string
+	my $network_hrp = Bitcoin::Crypto::Network->get->segwit_hrp;
+
+	# handles Bitcoin SegWit adresses
+	my $segwit_address = encode_segwit($network_hrp, $version . $pubkeyhash);
+	my $data_with_version = decode_segwit($segwit_address);
+
+	# handles custom Bech32 encoding
 	my $bech32str = encode_bech32("hello", pack "A*", "world"); # should start with hello1
 	my $bytestr = decode_bech32($bech32str);
-
-	my $segwit_address = encode_segwit($network_hrp, $version . $pubkeyhash);
-	my $data = decode_segwit($segwit_address);
-
 
 =head1 DESCRIPTION
 
 Implementation of Bech32 algorithm (BIP173 compatible)
 
+The module has a couple of layers of encoding, namely:
+
+=over
+
+=item *base32, which handles the alphabet and 5-to-8 transformation (not exported)
+
+=item *bech32, which handles checksums and human-readable (HRP) parts
+
+=item *segwit, which handles segwit program numbering and validation
+
+=back
+
+For Bech32-encoded SegWit addresses, use I<encode_segwit> and I<decode_segwit>.
+For custom uses of Bech32 (not in context of Bitcoin SegWit addresses), use
+I<encode_bech32> and I<decode_bech32>.
+
+B<If in doubt, use *_segwit functions, not *_bech32 functions!>
+
 =head1 FUNCTIONS
-
-=head2 encode_bech32
-
-=head2 decode_bech32
-
-Basic bech32 encoding / decoding.
-Encoding takes two arguments which are a human readable part and a byte string.
-Decoding takes bech32-encoded string.
 
 =head2 encode_segwit
 
@@ -244,6 +266,16 @@ Bech32 encoding / decoding valid for SegWit addresses. Does not validate the hum
 These functions also perform segwit program validation, see L<Bitcoin::Crypto::Segwit>.
 Encoding takes two arguments which are a human readable part and a byte string.
 Decoding takes bech32-encoded string. Returns the entire encoded data along with the segwit program version byte.
+
+=head2 encode_bech32
+
+=head2 decode_bech32
+
+Basic bech32 encoding / decoding.
+Encoding takes two arguments which are a human readable part and a byte string.
+Decoding takes bech32-encoded string.
+
+B<These methods are not meant to work with Bitcoin SegWit addresses, use encode_segwit and decode_segwit for that instead>
 
 =head2 split_bech32
 

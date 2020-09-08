@@ -1,12 +1,45 @@
-DESCRIPTION
+NAME
+    Perinci::Examples::Bin::Classic - Perinci example CLI scripts (using
+    Perinci::CmdLine::Classic)
 
-    This distribution contains example scripts in bin/ which use
+VERSION
+    This document describes version 0.080 of Perinci::Examples::Bin::Classic
+    (from Perl distribution Perinci-Examples-Bin-Classic), released on
+    2020-04-29.
+
+DESCRIPTION
+    This distribution contains example scripts in "bin/" which use
     Perinci::CmdLine::Classic. It was split from Perinci::Examples so the
     latter does not need to depend on Perinci::CmdLine::*.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Examples-Bin-Classic>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Examples-Bin-Classic>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Examples-Bin-
+    Classic>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci::CmdLine::Bin::Any
 
     Perinci::CmdLine::Bin::Lite
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

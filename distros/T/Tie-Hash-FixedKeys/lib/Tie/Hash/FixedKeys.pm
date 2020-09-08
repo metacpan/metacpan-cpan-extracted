@@ -1,4 +1,4 @@
-# $Id: FixedKeys.pm 19 2008-06-30 14:51:47Z dave $
+# $Id$
 
 =head1 NAME
 
@@ -68,13 +68,12 @@ use warnings;
 
 use Tie::Hash;
 use Carp;
-use vars qw(@ISA $VERSION);
 
 use Attribute::Handlers autotie => { "__CALLER__::FixedKeys" => __PACKAGE__ };
 
-@ISA = qw(Tie::StdHash);
+our @ISA = qw(Tie::StdHash);
 
-$VERSION = sprintf "%d", '$Revision: 19 $ ' =~ /(\d+)/;
+our $VERSION = '1.13.0';
 
 =head1 METHODS
 

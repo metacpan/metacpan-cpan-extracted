@@ -9,7 +9,7 @@
         <th trspan="regexps"></th>
         <th trspan="rules"></th>
         <th class="th_rulesAuthnLevel" trspan="rulesAuthnLevel"></th>
-        <th class="th_rulesAuthnLevel" />
+        <th class="th_rulesAuthnLevel"></th>
       </tr>
     </thead>
     <tbody>
@@ -36,8 +36,8 @@
           <input class="form-control" placeholder="default" readonly/>
         </td>
         <td>
-          <span ng-if="s.re!='default'" class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"/>
-          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newRule'})"/>
+          <span ng-if="s.re!='default'" class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"></span>
+          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newRule'})"></span>
         </td>
       </tr>
     </tbody>

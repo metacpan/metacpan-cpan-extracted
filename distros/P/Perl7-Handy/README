@@ -1,0 +1,55 @@
+NAME
+
+  Perl7::Handy - Handy Perl7 scripting environment on Perl5
+
+SYNOPSIS
+
+  use Perl7::Handy;
+
+DESCRIPTION
+
+  Perl7::Handy module provides easy Perl7 scripting environment onto perl
+  5.00503 or later.
+  - gives caller package "use strict;"
+  - gives caller package "use warnings;" (only perl 5.006 or later)
+  - gives caller package "no bareword::filehandles;"
+  - gives caller package "no multidimensional;"
+  - removes ".(dot)" from @INC (CVE-2016-1238: Important unsafe module load path flaw)
+
+SEE ALSO
+
+  Announcing Perl 7 - Jun 24, 2020 by brian d foy
+  https://www.perl.com/article/announcing-perl-7/
+
+  Import pragmas like strict and warnings into callers lexical scope
+  https://www.perlmonks.org/?node_id=887663
+
+  Perl import some modules in all subclasses
+  https://stackoverflow.com/questions/22122390/perl-import-some-modules-in-all-subclasses
+
+  open - Perl Programming Documentation
+  http://perldoc.perl.org/functions/open.html
+
+  Three-arg open() (Migrating to Modern Perl) - Modern Perl Programming
+  http://modernperlbooks.com/mt/2010/04/three-arg-open-migrating-to-modern-perl.html
+
+  perl - open my $fh, "comand |"; # isn't modern - 404 Blog Not Found
+  http://blog.livedoor.jp/dankogai/archives/51176081.html
+
+  13.15. Creating Magic Variables with tie - Perl Cookbook
+  https://docstore.mik.ua/orelly/perl3/cookbook/ch13_16.htm
+
+  13.15. Creating Magic Variables with tie - Perl Cookbook, 2nd Edition
+  https://docstore.mik.ua/orelly/perl4/cook/ch13_16.htm
+
+  CVE-2016-1238 - CVE
+  https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-1238
+
+  CVE-2016-1238: Important unsafe module load path flaw
+  https://www.nntp.perl.org/group/perl.perl5.porters/2016/07/msg238271.html
+
+  ina - CPAN
+  http://search.cpan.org/~ina/
+
+  BackPAN - A Complete History of CPAN
+  http://backpan.perl.org/authors/id/I/IN/INA/

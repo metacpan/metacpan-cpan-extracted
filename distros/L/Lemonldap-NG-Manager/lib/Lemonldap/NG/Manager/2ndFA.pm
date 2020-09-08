@@ -4,7 +4,6 @@ use 5.10.0;
 use utf8;
 use strict;
 use Mouse;
-use MIME::Base64 qw(encode_base64 decode_base64);
 
 use Lemonldap::NG::Common::Session;
 use Lemonldap::NG::Common::Conf::Constants;
@@ -17,7 +16,7 @@ extends 'Lemonldap::NG::Manager::Plugin',
   'Lemonldap::NG::Common::Conf::AccessLib',
   'Lemonldap::NG::Common::Session::REST';
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 #############################
 # I. INITIALIZATION METHODS #

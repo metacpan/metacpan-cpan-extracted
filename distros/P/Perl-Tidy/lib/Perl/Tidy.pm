@@ -110,7 +110,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20200822';
+    $VERSION = '20200907';
 }
 
 sub streamhandle {
@@ -715,6 +715,18 @@ EOM
             || defined( $rOpts->{'output-path'} ) )
         {
             $in_place_modify = 0;
+        }
+    }
+
+    # Turn off assert-tidy and assert-untidy unless we are tidying files
+    if ( $rOpts->{'format'} ne 'tidy' ) {
+        if ( $rOpts->{'assert-tidy'} ) {
+            $rOpts->{'assert-tidy'} = 0;
+            Warn("ignoring --assert-tidy, --format is not 'tidy'\n");
+        }
+        if ( $rOpts->{'assert-untidy'} ) {
+            $rOpts->{'assert-untidy'} = 0;
+            Warn("ignoring --assert-untidy, --format is not 'tidy'\n");
         }
     }
 
@@ -1657,7 +1669,7 @@ EOM
         if (   $in_place_modify
             && $delete_backup
             && -f $ifname
-            && ( $delete_backup > 1 || !$logger_object->{_warning_count} ) )
+            && ( $delete_backup > 1 || !$logger_object->get_warning_count() ) )
         {
 
             # As an added safety precaution, do not delete the source file
@@ -1696,7 +1708,7 @@ EOM
     # errors or warnings will write a line like
     #        '## Please see file testing.t.ERR'
     # to standard output for each file with errors, so the flag will be true,
-    # even only some of the multiple files may have had errors.
+    # even if only some of the multiple files may have had errors.
 
   NORMAL_EXIT:
     my $ret = $Warn_count ? 2 : 0;
@@ -1744,7 +1756,7 @@ sub compare_string_buffers {
     my ( $bufi, $bufo, $is_encoded_data ) = @_;
 
     my $leni = length($bufi);
-    my $leno = length($bufo);
+    my $leno = defined($bufo) ? length($bufo) : 0;
     my $msg =
       "Input  file length is $leni chars\nOutput file length is $leno chars\n";
     return $msg unless $leni && $leno;
@@ -2189,6 +2201,8 @@ sub generate_options {
     $add_option->( 'indent-spaced-block-comments',      'isbc', '!' );
     $add_option->( 'fixed-position-side-comment',       'fpsc', '=i' );
     $add_option->( 'minimum-space-to-comment',          'msc',  '=i' );
+    $add_option->( 'non-indenting-braces',              'nib',  '!' );
+    $add_option->( 'non-indenting-brace-prefix',        'nibp', '=s' );
     $add_option->( 'outdent-long-comments',             'olc',  '!' );
     $add_option->( 'outdent-static-block-comments',     'osbc', '!' );
     $add_option->( 'static-block-comment-prefix',       'sbcp', '=s' );
@@ -2460,6 +2474,7 @@ sub generate_options {
       nodelete-old-whitespace
       nohtml
       nologfile
+      non-indenting-braces
       noquiet
       noshow-options
       nostatic-side-comments

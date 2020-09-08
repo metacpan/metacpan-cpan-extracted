@@ -2,6 +2,7 @@ package Lemonldap::NG::Portal::Password::REST;
 
 use strict;
 use Mouse;
+use JSON;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
   PE_PASSWORD_OK
@@ -10,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 extends 'Lemonldap::NG::Portal::Password::Base',
   'Lemonldap::NG::Portal::Lib::REST';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.9';
 
 sub init {
     my ($self) = @_;
@@ -39,11 +40,15 @@ sub confirm {
 }
 
 sub modifyPassword {
-    my ( $self, $req, $pwd ) = @_;
+    my ( $self, $req, $pwd, $useMail ) = @_;
     my $res = eval {
         $self->restCall(
             $self->conf->{restPwdModifyUrl},
-            { user => $req->user, password => $pwd }
+            {
+                ( $useMail ? 'mail' : 'user' ) => $req->user,
+                useMail  => ( $useMail ? JSON::true : JSON::false ),
+                password => $pwd,
+            }
         );
     };
     if ($@) {

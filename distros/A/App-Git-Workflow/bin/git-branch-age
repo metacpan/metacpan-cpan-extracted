@@ -16,15 +16,15 @@ __DATA__
 
 =head1 NAME
 
-git-branch-grep - grep for branch names
+git-branch-age - age for branch names
 
 =head1 VERSION
 
-This documentation refers to git-branch-grep version 1.0.3
+This documentation refers to git-branch-age version 1.0.3
 
 =head1 SYNOPSIS
 
-   git-branch-grep [--remote|-r|--all|-a] regex
+   git-branch-age [--remote|-r|--all|-a] regex
 
  OPTIONS:
   regex         grep's perl (-P) regular expression
@@ -38,13 +38,69 @@ This documentation refers to git-branch-grep version 1.0.3
      --verbose  Show more detailed option
      --version  Prints the version information
      --help     Prints this help information
-     --man      Prints the full documentation for git-branch-grep
+     --man      Prints the full documentation for git-branch-age
 
 =head1 DESCRIPTION
 
 Short hand for running
 
-C<git branch (-r|-a)? | grep -P 'regex'>
+C<git branch (-r|-a)? | age -P 'regex'>
+
+=head2 Formatting
+
+You can format the output using the following keys:
+
+=over 4
+
+=item *
+
+authordate
+
+=item *
+
+authoremail
+
+=item *
+
+authorname
+
+=item *
+
+body
+
+=item *
+
+HEAD
+
+=item *
+
+objectname
+
+=item *
+
+objecttype
+
+=item *
+
+refname
+
+=item *
+
+short
+
+=item *
+
+subject
+
+=back
+
+The default output is the equivalent of
+
+ --format="%(age)\t%(short)"
+
+and the default verbose output is
+
+ --format="%-(age) %-(authorname) %-(short)"
 
 =head1 SUBROUTINES/METHODS
 

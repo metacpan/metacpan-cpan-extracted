@@ -244,7 +244,6 @@ sub checkFindByConfKey {
     my $res = findByConfKey( $test, $type, $confKey );
     check200( $test, $res );
     my $hits = from_json( $res->[2]->[0] );
-    my $hit;
     my $counter = @{$hits};
     ok(
         $counter eq $expectedHits,
@@ -275,6 +274,9 @@ sub checkFindByProviderId {
     my $gotProviderId;
     if ( $providerIdName eq 'entityId' ) {
         ($gotProviderId) = $result->{metadata} =~ m/entityID=['"](.+?)['"]/i;
+    }
+    elsif ( $providerIdName eq 'serviceUrl' ) {
+      $gotProviderId = $result->{options}->{service};
     }
     else {
         $gotProviderId = $result->{$providerIdName};
@@ -625,6 +627,120 @@ checkDelete( $test, 'saml/sp', 'mySamlSp1' );
 checkDelete( $test, 'saml/sp', 'mySamlSp2' );
 $test = "SamlSp -  Entity should not be found after clean up";
 checkDeleteNotFound( $test, 'saml/sp', 'mySamlSp1' );
+
+my $casApp = {
+    confKey      => 'myCasApp1',
+    exportedVars => {
+        "cn"    => "cn",
+        "uid"   => "uid",
+        "mail"  => "mail"
+    },
+    macros => {
+        given_name => '$firstName',
+    },
+    options => {
+        service       => 'http://mycasapp.example.com',
+        rule          => '$uid eq \'dwho\'',
+        userAttribute => 'uid'
+    }
+};
+
+$test = "CasApp - Add should succeed";
+checkAdd( $test, 'cas/app', $casApp );
+checkGet( $test, 'cas/app', 'myCasApp1', 'options/service', 'http://mycasapp.example.com' );
+checkGet( $test, 'cas/app', 'myCasApp1', 'options/userAttribute', 'uid' );
+checkGet( $test, 'cas/app', 'myCasApp1', 'options/rule', '$uid eq \'dwho\'' );
+
+$test = "CasApp - Add should fail on duplicate confKey";
+checkAddFailsIfExists( $test, 'cas/app', $casApp );
+
+$test = "CasApp - Update should succeed and keep existing values";
+$casApp->{options}->{service}       = 'http://mycasapp.acme.com';
+$casApp->{options}->{userAttribute}   = 'cn';
+delete $casApp->{options}->{rule};
+delete $casApp->{macros};
+delete $casApp->{exportedVars};
+$casApp->{macros}->{given_name} = '$givenName';
+$casApp->{exportedVars}->{cn}   = 'uid';
+checkUpdate( $test, 'cas/app', 'myCasApp1', $casApp );
+checkGet( $test, 'cas/app', 'myCasApp1', 'options/service', 'http://mycasapp.acme.com' );
+checkGet( $test, 'cas/app', 'myCasApp1', 'options/userAttribute', 'cn' );
+checkGet( $test, 'cas/app', 'myCasApp1', 'options/rule', '$uid eq \'dwho\'' );
+checkGet( $test, 'cas/app', 'myCasApp1', 'exportedVars/cn',        'uid' );
+checkGet( $test, 'cas/app', 'myCasApp1', 'exportedVars/uid', 'uid' );
+checkGet( $test, 'cas/app', 'myCasApp1', 'macros/given_name', '$givenName' );
+
+$test = "CasApp - Update should fail on non existing options";
+$casApp->{options}->{playingPossum} = 'elephant';
+checkUpdateWithUnknownAttributes( $test, 'cas/app', 'myCasApp1', $casApp );
+delete $casApp->{options}->{playingPossum};
+
+$test               = "CasApp - Add should fail on non existing options";
+$casApp->{confKey}  = 'myCasApp2';
+$casApp->{options}->{service} = 'http://mycasapp.skynet.com';
+$casApp->{options}->{playingPossum} = 'ElephantInTheRoom';
+checkAddWithUnknownAttributes( $test, 'cas/app', $casApp );
+delete $casApp->{options}->{playingPossum};
+
+$test               = "CasApp - Add should fail because service host already exists";
+$casApp->{options}->{service} = 'http://mycasapp.acme.com/ignoredbyissuer';
+checkAddFailsIfExists( $test, 'cas/app', $casApp );
+
+$test = "CasApp - 2nd add should succeed";
+$casApp->{options}->{service} = 'http://mycasapp.skynet.com';
+checkAdd( $test, 'cas/app', $casApp );
+
+$test = "CasApp - Update should fail if confKey not found";
+$casApp->{confKey} = 'myCasApp3';
+checkUpdateNotFound( $test, 'cas/app', 'myCasApp3', $casApp );
+
+$test                   = "CasApp - Replace should succeed";
+$casApp->{confKey}      = 'myCasApp2';
+checkGet( $test, 'cas/app', 'myCasApp2', 'options/userAttribute', 'cn' );
+$casApp->{options}->{userAttribute}   = 'uid';
+checkReplace( $test, 'cas/app', 'myCasApp2', $casApp );
+checkGet( $test, 'cas/app', 'myCasApp2', 'options/userAttribute', 'uid' );
+
+$test = "CasApp - Replace should fail on non existing or invalid options";
+$casApp->{options}->{playingPossum} = 'elephant';
+checkReplaceWithInvalidAttribute( $test, 'cas/app', 'myCasApp2', $casApp );
+delete $casApp->{options}->{playingPossum};
+$casApp->{options}->{service} = "XXX";
+checkReplaceWithInvalidAttribute( $test, 'cas/app', 'myCasApp2', $casApp );
+
+$test = "CasApp - Replace should fail if confKey not found";
+$casApp->{confKey} = 'myCasApp3';
+checkReplaceNotFound( $test, 'cas/app', 'myCasApp3', $casApp );
+
+$test = "CasApp - FindByConfKey should find 2 hits";
+checkFindByConfKey( $test, 'cas/app', '*', 2 );
+
+$test = "CasApp - FindByConfKey should find 2 hits";
+checkFindByConfKey( $test, 'cas/app', 'myCasApp*', 2 );
+
+$test = "CasApp - FindByConfKey should find 1 hit";
+checkFindByConfKey( $test, 'cas/app', 'myCasApp1', 1 );
+
+$test = "CasApp - FindByConfKey should find 0 hits";
+checkFindByConfKey( $test, 'cas/app', 'myCasApp3', 0 );
+
+$test = "CasApp - FindByConfKey should err on invalid patterns";
+checkFindByConfKeyError( $test, 'cas/app', '' );
+checkFindByConfKeyError( $test, 'cas/app', '$' );
+
+$test = "CasApp - FindByServiceUrl should find one entry";
+checkFindByProviderId( $test, 'cas/app', 'serviceUrl',
+    'http://mycasapp.acme.com' );
+
+$test = "CasApp - FindByServiceUrl should find nothing";
+checkFindByProviderIdNotFound( $test, 'cas/app', 'serviceUrl',
+    'http://mycasapp.corporation.com' );
+
+$test = "CasApp - Clean up";
+checkDelete( $test, 'cas/app', 'myCasApp1' );
+checkDelete( $test, 'cas/app', 'myCasApp2' );
+$test = "CasApp - Entity should not be found after clean up";
+checkDeleteNotFound( $test, 'cas/app', 'myCasApp1' );
 
 # Clean up generated conf files, except for "lmConf-1.json"
 unlink grep { $_ ne "t/conf/lmConf-1.json" } glob "t/conf/lmConf-*.json";

@@ -9,7 +9,7 @@ package Rex::CLI;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 use FindBin;
 use File::Basename qw(basename dirname);
@@ -815,7 +815,7 @@ sub exit_rex {
     my @exit_codes = Rex::TaskList->create()->get_exit_codes();
     for my $exit_code (@exit_codes) {
       $exit_code = $exit_code >> 8 if $exit_code > 255;
-      CORE::exit($exit_code) if $exit_code != 0;
+      CORE::exit($exit_code)       if $exit_code != 0;
     }
   }
 

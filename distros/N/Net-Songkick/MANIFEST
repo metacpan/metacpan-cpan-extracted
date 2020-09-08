@@ -1,12 +1,14 @@
 Build.PL
 lib/Net/Songkick.pm
+lib/Net/Songkick/City.pm
 lib/Net/Songkick/Artist.pm
-lib/Net/Songkick/Country.pm
-lib/Net/Songkick/Event.pm
-lib/Net/Songkick/Location.pm
 lib/Net/Songkick/MetroArea.pm
-lib/Net/Songkick/Performance.pm
 lib/Net/Songkick/Venue.pm
+lib/Net/Songkick/Country.pm
+lib/Net/Songkick/Location.pm
+lib/Net/Songkick/MusicBrainz.pm
+lib/Net/Songkick/Performance.pm
+lib/Net/Songkick/Event.pm
 lib/Net/Songkick/Types.pm
 MANIFEST			This list of files
 README
@@ -16,6 +18,7 @@ t/02-basic.t
 t/03-api-urls.t
 t/04-api-params.t
 t/05-instantiation.t
+t/06-requests.t
 t/pod_coverage.t
 t/pod.t
 META.yml

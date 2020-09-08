@@ -15,8 +15,8 @@
         <td><input class="form-control" ng-model="s.title"/></td>
         <td><input id-"hv-{{s.title}}" class="form-control" ng-model="s.data"/></td>
         <td>
-          <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"/>
-          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newEntry',action:'newHashEntry'})"/>
+          <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"></span>
+          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newEntry',action:'newHashEntry'})"></span>
         </td>
       </tr>
     </tbody>

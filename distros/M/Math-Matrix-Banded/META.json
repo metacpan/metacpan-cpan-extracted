@@ -1,0 +1,58 @@
+{
+   "abstract" : "non-zero entries confined to a diagonal band",
+   "author" : [
+      "Lutz Gehlen <perl@lutzgehlen.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-Matrix-Banded",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Moo" : "2.002005",
+            "Try::Tiny" : "0",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Matrix::Banded" : {
+         "file" : "lib/Math/Matrix/Banded.pm",
+         "version" : "0.004"
+      },
+      "Math::Matrix::Banded::Rectangular" : {
+         "file" : "lib/Math/Matrix/Banded/Rectangular.pm",
+         "version" : "0.004"
+      },
+      "Math::Matrix::Banded::Square" : {
+         "file" : "lib/Math/Matrix/Banded/Square.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

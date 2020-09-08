@@ -1,0 +1,36 @@
+<%args>
+$id => undef
+</%args>
+
+<%init>
+use RT::Extension::TravisCI;
+
+$r->content_type('application/json; charset=utf-8');
+
+if (!$id) {
+   $m->out(JSON({success => 0, error => "Missing ticket ID"}));
+   $m->abort();
+}
+my $Ticket = RT::Ticket->new($session{'CurrentUser'});;
+$Ticket->Load($id);
+if ($Ticket->id != $id) {
+   $m->out(JSON({success => 0, error => "No such ticket"}));
+   $m->abort();
+}
+
+if (!grep { $Ticket->QueueObj->Name eq $_ }@{ RT->Config->Get('TravisCI')->{Queues} || [] }) {
+    $m->out(JSON({success => 0, error => "Ticket is not in a queue configured for TravisCI status"}));
+    $m->abort();
+}
+
+my ($proj, $branch) = RT::Extension::TravisCI::parse_subject_for_project_and_branch($Ticket->Subject);
+
+my $status = RT::Extension::TravisCI::get_status($proj, $branch, $session{'CurrentUser'});
+if ($status->{success}) {
+   my $r = $status->{result};
+   $r->{last_build}->{pretty_build_state} = RT::Extension::TravisCI::pretty_state($r->{last_build}->{state});
+   $r->{title_url} = RT->Config->Get('TravisCI')->{WebURL} . '/' . $r->{repository}->{slug} . '/builds/' . $r->{last_build}->{id};
+}
+$m->out(JSON($status));
+$m->abort();
+</%init>

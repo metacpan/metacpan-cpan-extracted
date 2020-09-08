@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200606131959;
+our $VERSION = 1.20200904144532;
 
 my $formatters = [
                 {
@@ -47,20 +47,20 @@ my $validators = {
               [23]\\d|
               4[04-6]|
               5[57]|
-              6[24]|
+              6[245]|
               7[0135689]|
               8[01346-9]|
               9[0-2]
             )|
             4(?:
-              07|
+              0[78]|
               2[3-59]|
               3[13-689]|
               4[0-68]|
               5[1-35]
             )|
             5(?:
-              0[78]|
+              0[7-9]|
               16|
               4[03-5]|
               5\\d|
@@ -98,20 +98,20 @@ my $validators = {
               [23]\\d|
               4[04-6]|
               5[57]|
-              6[24]|
+              6[245]|
               7[0135689]|
               8[01346-9]|
               9[0-2]
             )|
             4(?:
-              07|
+              0[78]|
               2[3-59]|
               3[13-689]|
               4[0-68]|
               5[1-35]
             )|
             5(?:
-              0[78]|
+              0[7-9]|
               16|
               4[03-5]|
               5\\d|
@@ -185,7 +185,7 @@ $areanames{en}->{5042255} = "El\ Hato";
 $areanames{en}->{5042257} = "Prados\ Universitarios";
 $areanames{en}->{5042290} = "Toncontin";
 $areanames{en}->{5042291} = "Toncontin";
-$areanames{en}->{504240} = "Roatán\,\ Bay\ Islands";
+$areanames{en}->{5042407} = "Roatán\,\ Bay\ Islands";
 $areanames{en}->{5042423} = "La\ Ceiba";
 $areanames{en}->{5042424} = "Sabá";
 $areanames{en}->{5042425} = "Utila\,\ Bay\ Islands";

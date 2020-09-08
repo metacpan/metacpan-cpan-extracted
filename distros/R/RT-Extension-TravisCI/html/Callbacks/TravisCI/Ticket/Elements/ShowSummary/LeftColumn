@@ -1,0 +1,9 @@
+<%args>
+$Ticket
+</%args>
+<%init>
+use RT::Extension::TravisCI;
+return unless grep { $Ticket->QueueObj->Name eq $_ }
+    @{ RT->Config->Get('TravisCI')->{Queues} || [] };
+</%init>
+<& /Elements/TravisCIStatus, Ticket => $Ticket &>

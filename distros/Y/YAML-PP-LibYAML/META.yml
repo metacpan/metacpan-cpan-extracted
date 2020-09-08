@@ -8,12 +8,11 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0.98'
-  blib: '1.01'
   perl: v5.8.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,19 +21,19 @@ name: YAML-PP-LibYAML
 provides:
   YAML::PP::LibYAML:
     file: lib/YAML/PP/LibYAML.pm
-    version: '0.003'
+    version: '0.004'
   YAML::PP::LibYAML::Emitter:
     file: lib/YAML/PP/LibYAML/Emitter.pm
-    version: '0.003'
+    version: '0.004'
   YAML::PP::LibYAML::Parser:
     file: lib/YAML/PP/LibYAML/Parser.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Exporter: '0'
   Scalar::Util: '0'
-  YAML::LibYAML::API: '0.005'
+  YAML::LibYAML::API: '0.011'
   YAML::LibYAML::API::XS: '0'
-  YAML::PP: '0.016'
+  YAML::PP: '0.025'
   YAML::PP::Emitter: '0'
   YAML::PP::Parser: '0'
   YAML::PP::Reader: '0'
@@ -46,6 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/perlpunk/YAML-PP-LibYAML-p5/issues
   repository: https://github.com/perlpunk/YAML-PP-LibYAML-p5
-version: '0.003'
-x_generated_by_perl: v5.24.1
+version: '0.004'
+x_generated_by_perl: v5.30.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

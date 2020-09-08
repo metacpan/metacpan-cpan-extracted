@@ -3,7 +3,7 @@ package List::AllUtils;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use List::Util 1.45      ();
 use List::SomeUtils 0.56 ();
@@ -50,7 +50,7 @@ List::AllUtils - Combines List::Util, List::SomeUtils and List::UtilsBy in one b
 
 =head1 VERSION
 
-version 0.16
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -76,8 +76,8 @@ L<List::Util>, L<List::SomeUtils> and L<List::UtilsBy>.
 =head2 Which One Wins?
 
 Recently, L<List::Util> has started including some of the subs that used to
-only be in L<List::SomeUtils>. Similar, L<List::SomeUtils> has some small
-overlap with L<List::UtilsBy>. C<List::AllUtils> always favors the version
+only be in L<List::SomeUtils>. Similarly, L<List::SomeUtils> has some small
+overlap with L<List::UtilsBy>. C<List::AllUtils> always favors the subroutine
 provided by L<List::Util>, L<List::SomeUtils> or L<List::UtilsBy> in that
 order.
 
@@ -95,6 +95,7 @@ your installed version provides.
 
 The following set of functions all apply a given block of code to a list of
 values.
+
 =head2 reduce
 
     $result = reduce { BLOCK } @list
@@ -349,6 +350,7 @@ Instead, write this using a lexical variable:
     my @items = pairgrep { $a eq $key } @kvlist;
     ...
  }
+
 =head2 pairs
 
     my @pairs = pairs @kvlist;
@@ -510,7 +512,9 @@ C<$b> to elements of the given list. Any modifications of it by the code block
 will be visible to the caller.
 
 See L</KNOWN BUGS> for a known-bug with C<pairmap>, and a workaround.
+
 =head1 OTHER FUNCTIONS
+
 =head2 shuffle
 
     my @values = shuffle @values;
@@ -520,6 +524,7 @@ Returns the values of the input in a random order
     @cards = shuffle 0..51      # 0..51 in a random order
 
 This function is affected by the C<$RAND> variable.
+
 =head2 sample
 
     my @items = sample $count, @values
@@ -600,6 +605,7 @@ compares equal to the empty string but additionally produces a warning if such
 warnings are enabled (C<use warnings 'uninitialized';>). In addition, an
 C<undef> in the returned list is coerced into an empty string, so that the
 entire list of values returned by C<uniqstr> are well-behaved as strings.
+
 =head2 head
 
     my @values = head $size, @list;
@@ -1484,7 +1490,7 @@ C<bug-list-allutils@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=List-AllUtils> or via email to L<bug-list-allutils@rt.cpan.org|mailto:bug-list-allutils@rt.cpan.org>.
+Bugs may be submitted at L<https://github.com/houseabsolute/List-AllUtils/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
@@ -1507,7 +1513,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 
 =head1 AUTHOR
 
@@ -1515,7 +1521,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Dave Jacoby Karen Etheridge Ricardo Signes Yanick Champoux
+=for stopwords Andy Jack Dave Jacoby Karen Etheridge Olaf Alders Ricardo Signes Yanick Champoux
 
 =over 4
 
@@ -1530,6 +1536,10 @@ Dave Jacoby <jacoby.david@gmail.com>
 =item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
 
 =item *
 

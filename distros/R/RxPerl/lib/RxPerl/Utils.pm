@@ -1,6 +1,6 @@
 package RxPerl::Utils;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use Scalar::Util 'weaken';
 
@@ -10,7 +10,7 @@ our @EXPORT_OK = qw/
     get_timer_subs get_interval_subs
 /;
 
-our $VERSION = "v0.16.0";
+our $VERSION = "v0.18.1";
 
 sub get_subscription_from_subscriber { $_[0]->{_subscription} }
 

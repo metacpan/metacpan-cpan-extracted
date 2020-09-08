@@ -73,7 +73,7 @@ sub tree {
                                 {
                                     title => 'passwordManagement',
                                     help =>
-                                      'portalcustom.html#password_management',
+                                      'portalcustom.html#password-management',
                                     form  => 'simpleInputContainer',
                                     nodes => [
                                         'portalRequireOldPassword',
@@ -91,7 +91,7 @@ sub tree {
                                 {
                                     title => 'portalOther',
                                     help =>
-                                      'portalcustom.html#other_parameters',
+                                      'portalcustom.html#other-parameters',
                                     form  => 'simpleInputContainer',
                                     nodes => [
                                         'portalUserAttr',
@@ -121,7 +121,7 @@ sub tree {
                 {
                     title => 'authParams',
                     help =>
-                      'start.html#authentication_users_and_password_databases',
+                      'start.html#authentication-users-and-password-databases',
                     form  => 'authParams',
                     nodes => [
                         'authentication', 'userDB', 'passwordDB', 'registerDB'
@@ -248,10 +248,11 @@ sub tree {
                                     help  => 'authldap.html#connection',
                                     form  => 'simpleInputContainer',
                                     nodes => [
-                                        'ldapServer',      'ldapPort',
-                                        'ldapBase',        'managerDn',
-                                        'managerPassword', 'ldapTimeout',
-                                        'ldapVersion',     'ldapRaw'
+                                        'ldapServer',  'ldapPort',
+                                        'ldapVerify',  'ldapBase',
+                                        'managerDn',   'managerPassword',
+                                        'ldapTimeout', 'ldapVersion',
+                                        'ldapRaw', 'ldapCAFile', 'ldapCAPath',
                                     ]
                                 },
                                 {
@@ -447,7 +448,7 @@ sub tree {
                 },
                 {
                     title => 'issuerParams',
-                    help  => 'start.html#identity_provider',
+                    help  => 'start.html#identity-provider',
                     nodes => [ {
                             title => 'issuerDBSAML',
                             help  => 'idpsaml.html',
@@ -459,7 +460,7 @@ sub tree {
                         },
                         {
                             title => 'issuerDBCAS',
-                            help  => 'idpcas.html#enabling_cas',
+                            help  => 'idpcas.html#enabling-cas',
                             form  => 'simpleInputContainer',
                             nodes => [
                                 'issuerDBCASActivation', 'issuerDBCASPath',
@@ -555,7 +556,7 @@ sub tree {
                         'grantSessionRules',
                         {
                             title => 'sessionStorage',
-                            help  => 'start.html#sessions_database',
+                            help  => 'start.html#sessions-database',
                             nodes => [
                                 'globalStorage',
                                 'globalStorageOptions',
@@ -568,8 +569,8 @@ sub tree {
                             form  => 'simpleInputContainer',
                             nodes => [
                                 'singleSession',  'singleIP',
-                                'singleUserByIP',
-                                'notifyDeleted',  'notifyOther'
+                                'singleUserByIP', 'notifyDeleted',
+                                'notifyOther'
                             ]
                         },
                         {
@@ -584,7 +585,7 @@ sub tree {
                 },
                 {
                     title => 'reloadParams',
-                    help  => 'configlocation.html#configuration_reload',
+                    help  => 'configlocation.html#configuration-reload',
                     nodes => [ 'reloadTimeout', 'compactConf', 'reloadUrls' ]
                 },
                 {
@@ -600,10 +601,11 @@ sub tree {
                             help  => 'portalservers.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'wsdlServer',           'restSessionServer',
-                                'restExportSecretKeys', 'restClockTolerance',
-                                'restConfigServer',     'soapSessionServer',
-                                'soapConfigServer',     'exportedAttr',
+                                'wsdlServer',         'restExportSecretKeys',
+                                'restClockTolerance', 'restSessionServer',
+                                'restConfigServer',   'restAuthServer',
+                                'restPasswordServer', 'soapSessionServer',
+                                'soapConfigServer',   'exportedAttr',
                             ]
                         },
                         {
@@ -629,7 +631,8 @@ sub tree {
                                 'notificationStorageOptions',
                                 {
                                     title => 'serverNotification',
-                                    help  => 'notifications.html#server',
+                                    help =>
+                                      'notifications.html#notification-server',
                                     nodes => [
                                         'notificationServer',
                                         'notificationDefaultCond',
@@ -738,6 +741,7 @@ sub tree {
                             nodes => [
                                 'checkUser',
                                 'checkUserIdRule',
+                                'checkUserUnrestrictedUsersRule',
                                 'checkUserHiddenAttributes',
                                 'checkUserSearchAttributes',
                                 'checkUserDisplayEmptyHeaders',
@@ -752,6 +756,7 @@ sub tree {
                             nodes => [
                                 'impersonationRule',
                                 'impersonationIdRule',
+                                'impersonationUnrestrictedUsersRule',
                                 'impersonationHiddenAttributes',
                                 'impersonationSkipEmptyValues',
                                 'impersonationMergeSSOgroups',
@@ -764,6 +769,7 @@ sub tree {
                             nodes => [
                                 'contextSwitchingRule',
                                 'contextSwitchingIdRule',
+                                'contextSwitchingUnrestrictedUsersRule',
                                 'contextSwitchingStopWithLogout',
                             ]
                         },
@@ -837,6 +843,7 @@ sub tree {
                                 'yubikey2fUrl',
                                 'yubikey2fPublicIDSize',
                                 'yubikey2fUserCanRemoveKey',
+                                'yubikey2fFromSessionAttribute',
                                 'yubikey2fTTL',
                                 'yubikey2fAuthnLevel',
                                 'yubikey2fLabel',
@@ -901,13 +908,14 @@ sub tree {
                                 'sfRemovedNotifMsg',
                             ],
                         },
+                        'sfOnlyUpgrade',
                         'sfManagerRule',
                         'sfRequired',
                     ]
                 },
                 {
                     title => 'advancedParams',
-                    help  => 'start.html#advanced_features',
+                    help  => 'start.html#advanced-features',
                     nodes => [
                         'customFunctions',
                         'multiValuesSeparator',
@@ -935,7 +943,7 @@ sub tree {
                         },
                         {
                             title => 'security',
-                            help => 'security.html#configure_security_settings',
+                            help => 'security.html#configure-security-settings',
                             nodes => [
                                 'userControl',
                                 'browsersDontStorePassword',
@@ -954,7 +962,10 @@ sub tree {
                                     form  => 'simpleInputContainer',
                                     nodes => [
                                         'bruteForceProtection',
+                                        'bruteForceProtectionTempo',
+                                        'bruteForceProtectionMaxFailed',
                                         'bruteForceProtectionIncrementalTempo',
+                                        'bruteForceProtectionLockTimes',
                                     ]
                                 },
                                 'lwpOpts',
@@ -1001,11 +1012,12 @@ sub tree {
                         },
                         {
                             title => 'portalRedirection',
-                            help  => 'redirections.html#portal_redirections',
+                            help  => 'redirections.html#portal-redirections',
                             form  => 'simpleInputContainer',
                             nodes => [
                                 'jsRedirect', 'noAjaxHook',
                                 'skipRenewConfirmation',
+                                'skipUpgradeConfirmation',
                             ]
                         },
                         'nginxCustomHandlers',
@@ -1035,7 +1047,7 @@ sub tree {
                 'samlEntityID',
                 {
                     title => 'samlServiceSecurity',
-                    help  => 'samlservice.html#security_parameters',
+                    help  => 'samlservice.html#security-parameters',
                     nodes => [ {
                             title => 'samlServiceSecuritySig',
                             form  => 'RSAKey',
@@ -1060,7 +1072,7 @@ sub tree {
                 },
                 {
                     title => 'samlNameIDFormatMap',
-                    help  => 'samlservice.html#nameid_formats',
+                    help  => 'samlservice.html#nameid-formats',
                     form  => 'simpleInputContainer',
                     nodes => [
                         'samlNameIDFormatMapEmail',
@@ -1071,7 +1083,7 @@ sub tree {
                 },
                 {
                     title => 'samlAuthnContextMap',
-                    help  => 'samlservice.html#authentication_contexts',
+                    help  => 'samlservice.html#authentication-contexts',
                     form  => 'simpleInputContainer',
                     nodes => [
                         'samlAuthnContextMapPassword',
@@ -1092,7 +1104,7 @@ sub tree {
                 },
                 {
                     title => 'samlSPSSODescriptor',
-                    help  => 'samlservice.html#service_provider',
+                    help  => 'samlservice.html#service-provider',
                     nodes => [
                         'samlSPSSODescriptorAuthnRequestsSigned',
                         'samlSPSSODescriptorWantAssertionsSigned',
@@ -1123,7 +1135,7 @@ sub tree {
                 },
                 {
                     title => 'samlIDPSSODescriptor',
-                    help  => 'samlservice.html#identity_provider',
+                    help  => 'samlservice.html#identity-provider',
                     nodes => [
                         'samlIDPSSODescriptorWantAuthnRequestsSigned',
                         {
@@ -1153,7 +1165,7 @@ sub tree {
                 },
                 {
                     title => 'samlAttributeAuthorityDescriptor',
-                    help  => 'samlservice.html#attribute_authority',
+                    help  => 'samlservice.html#attribute-authority',
                     nodes => [ {
                             title =>
 'samlAttributeAuthorityDescriptorAttributeService',
@@ -1201,7 +1213,7 @@ sub tree {
         'samlSPMetaDataNodes',
         {
             title => 'oidcServiceMetaData',
-            help  => 'openidconnectservice.html#service_configuration',
+            help  => 'openidconnectservice.html#service-configuration',
             nodes => [
                 'oidcServiceMetaDataIssuer',
                 {
@@ -1254,7 +1266,7 @@ sub tree {
         'oidcRPMetaDataNodes',
         {
             title => 'casServiceMetadata',
-            help  => 'idpcas.html#configuring_the_cas_service',
+            help  => 'idpcas.html#configuring-the-cas-service',
             nodes => [
                 'casAttr',
                 'casAccessControlPolicy',

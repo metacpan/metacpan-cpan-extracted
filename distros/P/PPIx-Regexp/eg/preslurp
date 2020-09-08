@@ -14,7 +14,7 @@ use PPIx::Regexp;
 use PPIx::Regexp::Dumper;
 use PPIx::Regexp::Tokenizer;
 
-our $VERSION = '0.073';
+our $VERSION = '0.074';
 
 my %opt = (
     verbose	=> 0,

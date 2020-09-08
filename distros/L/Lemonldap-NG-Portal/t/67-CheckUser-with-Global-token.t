@@ -21,6 +21,11 @@ my $client = LLNG::Manager::Test->new( {
             formTimeout                    => 120,
             checkUserDisplayPersistentInfo => 1,
             checkUserDisplayEmptyValues    => 1,
+            macros                         => {
+                _whatToTrace =>
+                  '$_auth eq "SAML" ? "$_user\@$_idpConfKey" : "$_user"',
+                mail => 'uc $mail',
+            }
         }
     }
 );
@@ -130,10 +135,12 @@ ok( $res->[2]->[0] =~ m%<div class="col">su</div>%, 'Found su' )
   or explain( $res->[2]->[0], 'SSO Groups: su' );
 ok( $res->[2]->[0] =~ m%<td scope="row">uid</td>%, 'Found uid' )
   or explain( $res->[2]->[0], 'Attribute Value uid' );
-ok( $res->[2]->[0] =~ m%<td scope="row">_whatToTrace</td>%,
-    'Found _whatToTrace' )
-  or explain( $res->[2]->[0], 'Macro Key _whatToTrace' );
-count(11);
+ok( $res->[2]->[0] =~ m%<td scope="row">RTYLER\@BADWOLF\.ORG</td>%,
+    'Found uc mail' )
+  or explain( $res->[2]->[0], 'Macro Key uc mail' );
+ok( $res->[2]->[0] =~ m%<td scope="row">uid</td>%, 'Found uid' )
+  or explain( $res->[2]->[0], 'Attribute Value uid' );
+count(12);
 
 $query =~ s/user=dwho/user=msmith/;
 $query =~

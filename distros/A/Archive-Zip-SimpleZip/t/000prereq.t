@@ -121,7 +121,7 @@ BEGIN
 
     if ($have{"Compress::Stream::Zstd"})
     {
-        my $ver = eval { Compress::Stream::Zstd::ZSTD_VERSION_STRING; } || "unknown";
+        my $ver = eval { Compress::Stream::Zstd::ZSTD_VERSION_STRING(); } || "unknown";
         push @results, ["Zstandard", $ver] ;
     }
 

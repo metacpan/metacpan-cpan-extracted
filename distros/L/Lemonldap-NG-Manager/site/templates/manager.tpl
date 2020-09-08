@@ -93,7 +93,7 @@
       </span>
       <!-- Node text with/without translation -->
       <span id="t-{{node.id}}" ng-if="keyWritable(this)" ng-click="displayForm(this)">{{node.title}}</span>
-      <span id="t-{{node.id}}" ng-if="!keyWritable(this)" ng-click="displayForm(this)" trspan="{{node.title}}" />
+      <span id="t-{{node.id}}" ng-if="!keyWritable(this)" ng-click="displayForm(this)" trspan="{{node.title}}"></span>
     </div>
     <!-- Subnodes -->
     <ol ui-tree-nodes="btn btn-sm" ng-model="node.nodes" ng-class="{hidden: collapsed}">
@@ -110,6 +110,7 @@
   <div role="alertdialog" aria-labelledby="ptitle" aria-describedby="ptitle">
     <div class="modal-header">
       <h3 id="ptitle" class="modal-title" trspan="{{elem('message').title}}" />
+      <TMPL_IF NAME="INSTANCE_NAME"><h4><TMPL_VAR NAME="INSTANCE_NAME"></h4></TMPL_IF>
     </div>
     <div class="modal-body">
       <div class="input-group maxw">
@@ -129,8 +130,9 @@
   <div role="alertdialog" aria-labelledby="mtitle" aria-describedby="mbody">
     <div class="modal-header">
       <h3 id="mtitle" class="modal-title" trspan="{{elem('message').title}}" />
+      <TMPL_IF NAME="INSTANCE_NAME"><h4><TMPL_VAR NAME="INSTANCE_NAME"></h4></TMPL_IF>
     </div>
-    <div id="mbody" class="modal-body">
+    <div ng-if="elem('message').items[0] || elem('message').message" id="mbody" class="modal-body">
       <div class="modal-p">{{translateP(elem('message').message)}}</div>
       <ul class="main-modal-ul" ng-model="elem('message').items">
         <li ng-repeat="item in elem('message').items" ng-include="'messageitem.html'"/>
@@ -155,6 +157,7 @@
   <div role="alertdialog" aria-labelledby="pwtitle" aria-describedby="pwtitle">
     <div class="modal-header">
       <h3 id="pwtitle" class="modal-title" trspan="enterPassword" />
+      <TMPL_IF NAME="INSTANCE_NAME"><h4><TMPL_VAR NAME="INSTANCE_NAME"></h4></TMPL_IF>
     </div>
     <div class="modal-body">
       <div class="input-group maxw">
@@ -174,11 +177,12 @@
   <div role="alertdialog" aria-labelledby="stitle" aria-describedby="sbody">
     <div class="modal-header">
       <h3 id="stitle" class="modal-title" trspan="savingConfirmation" />
+      <TMPL_IF NAME="INSTANCE_NAME"><h4><TMPL_VAR NAME="INSTANCE_NAME"></h4></TMPL_IF>
     </div>
     <div id="sbody" class="modal-body">
       <div class="input-group maxw">
-        <label id="slabel" class="input-group-addon" for="longtextinput" trspan="cfgLog"/>
-        <textarea id="longtextinput" rows="5" class="form-control" ng-model="result" aria-describedby="slabel" />
+        <label id="slabel" class="input-group-addon" for="longtextinput" trspan="cfgLog"></label>
+        <textarea id="longtextinput" rows="5" class="form-control" ng-model="result" aria-describedby="slabel"></textarea>
       </div>
     </div>
     <div class="modal-footer">

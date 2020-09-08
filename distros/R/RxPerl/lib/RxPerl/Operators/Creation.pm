@@ -1,6 +1,6 @@
 package RxPerl::Operators::Creation;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use RxPerl::Observable;
 use RxPerl::Subscription;
@@ -8,13 +8,13 @@ use RxPerl::Utils 'get_subscription_from_subscriber', 'get_timer_subs', 'get_int
 use RxPerl::Subject;
 
 use Carp 'croak';
-use Scalar::Util 'weaken';
+use Scalar::Util 'weaken', 'blessed';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
     rx_observable rx_of rx_concat rx_defer rx_EMPTY rx_from_event
     rx_from_event_array rx_interval rx_merge rx_NEVER rx_race
-    rx_subject rx_throw_error rx_timer
+    rx_subject rx_throw_error rx_timer rx_from
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -84,6 +84,40 @@ sub rx_EMPTY {
 
         return;
     });
+}
+
+sub rx_from {
+    my ($thing) = @_;
+
+    if (blessed $thing and $thing->isa('RxPerl::Observable')) {
+        return $thing;
+    }
+
+    elsif (blessed $thing and $thing->can('then')) {
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            $thing->then(
+                sub {
+                    $subscriber->{next}->(splice @_, 0, 1) if defined $subscriber->{next};
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                },
+                sub {
+                    $subscriber->{error}->(splice @_, 0, 1) if defined $subscriber->{error};
+                },
+            );
+
+            return;
+        });
+    }
+
+    elsif (ref $thing eq 'ARRAY' and ! blessed $thing) {
+        return rx_of(@$thing);
+    }
+
+    else {
+        croak "rx_from only accepts arrayrefs, promises, and observables as argument at the moment,";
+    }
 }
 
 # NOTE: rx_from_event and rx_from_event_array keep a weak reference to the

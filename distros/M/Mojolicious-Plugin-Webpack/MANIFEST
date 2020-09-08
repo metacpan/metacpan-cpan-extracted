@@ -1,10 +1,9 @@
+.github/workflows/ci-ubuntu.yml
 Changes
 cpanfile
 example/rollup/assets/App.svelte
 example/rollup/assets/main.js
 example/rollup/lite.pl
-example/rollup/package-lock.json
-example/rollup/package.json
 example/rollup/rollup.config.js
 example/webpack/assets/css/css-example.css
 example/webpack/assets/js/app.js
@@ -12,9 +11,6 @@ example/webpack/assets/js/App.vue
 example/webpack/assets/sass/scss-example.scss
 example/webpack/assets/webpack.custom.js
 example/webpack/lite.pl
-example/webpack/package-lock.json
-example/webpack/package.json
-example/webpack/webpack.config.js
 lib/Mojolicious/Command/Author/webpack.pm
 lib/Mojolicious/Plugin/Webpack.pm
 lib/Mojolicious/Plugin/Webpack/Builder.pm
@@ -48,7 +44,6 @@ t/migrate-from-assetpack.t
 t/migrate-from-assetpack/assets/assetpack.def
 t/migrate-from-assetpack/assets/js/app.js
 t/migrate-from-assetpack/assets/js/include-some-file.js
-t/migrate-from-assetpack/package-lock.json
 t/migrate-from-assetpack/package.json
 t/MyApp.pm
 t/MyApp/Plugin/Helper.pm
@@ -60,10 +55,6 @@ t/public/asset/basic.development.css
 t/public/asset/basic.development.js
 t/public/asset/myapp.1df3519d71cda2667d35.js
 t/public/asset/myapp.658763d47b8fd5499dbf.css
-t/public/asset/myapp.83c8bca1a5ad16e5cf99.js
-t/public/asset/myapp.c809af61534a2c87e89a.css
-t/public/asset/myapp.development.css
-t/public/asset/myapp.development.js
 t/public/asset/subtract.development.js
 t/public/asset/webpack.development.html
 t/public/asset/webpack.markup.html
@@ -74,6 +65,5 @@ t/public/asset/webpack.production.html
 t/public/asset/webpack.register.html
 t/public/no-max-age.txt
 t/register.t
-t/shim.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

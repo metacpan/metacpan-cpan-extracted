@@ -145,11 +145,8 @@ ok(
     ),
     'POST switchcontext'
 );
-ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_OFF">%,
-    'Found trspan="contextSwitching_OFF"' )
-  or explain( $res->[2]->[0], 'trspan="contextSwitching_OFF"' );
+expectRedirection( $res, 'http://auth.example.com/' );
 my $id2 = expectCookie($res);
-
 ok(
     $res = $client->_get(
         '/',
@@ -158,7 +155,8 @@ ok(
     ),
     'Get Menu',
 );
-count(4);
+count(3);
+
 expectAuthenticatedAs( $res, 'dwho' );
 ok( $res->[2]->[0] =~ m%<span trspan="contextSwitching_OFF">%,
     'Found trspan="contextSwitching_OFF"' )
@@ -217,5 +215,4 @@ ok( $res->[2]->[0] =~ /trmsg="47"/, 'Found logout message' );
 count(2);
 
 clean_sessions();
-
 done_testing( count() );

@@ -1,9 +1,12 @@
-use Modern::Perl "2010";
+use v5.10; use warnings;
 use Test::More;
 use Test::Exception;
+use Bitcoin::Crypto;
 use Crypt::Digest::SHA256 qw(sha256);
 
-BEGIN { use_ok('Bitcoin::Crypto::Base58', qw(:all)) };
+BEGIN { use_ok('Bitcoin::Crypto::Base58', qw(:all)) }
+
+is(Bitcoin::Crypto::Base58->VERSION, Bitcoin::Crypto->VERSION);
 
 my @cases = (
 	[
@@ -44,17 +47,20 @@ foreach my $case (@cases) {
 	is($case_packed, decode_base58check($case->[1]), "valid decoding");
 	is($case->[1], encode_base58check($case_packed), "valid encoding");
 
-	my $decoded_with_check = decode_base58_preserve($case->[1]);
+	my $decoded_with_check = decode_base58($case->[1]);
 	is(substr($decoded_with_check, 0, -4), $case_packed, "base58check value unchanged");
-	is(pack("a4", sha256(sha256(substr $decoded_with_check, 0, -4))),
+	is(
+		pack("a4", sha256(sha256(substr $decoded_with_check, 0, -4))),
 		substr($decoded_with_check, -4),
-		"checksum is valid");
+		"checksum is valid"
+	);
 }
 
 foreach my $case (@cases_error) {
 	throws_ok {
 		decode_base58check($case->[0]);
-	} "Bitcoin::Crypto::Exception::" . $case->[1], "invalid data raises an exception";
+	}
+	"Bitcoin::Crypto::Exception::" . $case->[1], "invalid data raises an exception";
 }
 
 done_testing;

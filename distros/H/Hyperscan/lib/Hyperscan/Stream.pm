@@ -1,5 +1,5 @@
 package Hyperscan::Stream;
-$Hyperscan::Stream::VERSION = '0.03';
+$Hyperscan::Stream::VERSION = '0.04';
 # ABSTRACT: stream class
 
 use strict;
@@ -21,7 +21,7 @@ Hyperscan::Stream - stream class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head2 METHODS
 

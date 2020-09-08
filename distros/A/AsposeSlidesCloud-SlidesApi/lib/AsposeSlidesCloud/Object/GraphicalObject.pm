@@ -99,6 +99,8 @@ sub new {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
+	$self->{ type } = 'GraphicalObject';
+	$self->{ shape_type } = 'GraphicalObject';
 	
 	return $self;
 }  

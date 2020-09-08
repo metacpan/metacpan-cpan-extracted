@@ -11,49 +11,21 @@ BEGIN {
 use warnings;
 use strict;
 use Test::More;
-use Config;
-
-our $SIGNALS_AVAILABLE = 0;
+use File::Spec;
+use lib File::Spec->catdir(qw(t lib));
+use Log4perlInternalTest qw(tmpdir need_signals);
 
 BEGIN {
-    no warnings;
-    # Check if this platform supports signals
-    if (length $Config{sig_name} and length $Config{sig_num}) {
-        eval {
-            $SIG{USR1} = sub { $SIGNALS_AVAILABLE = 1 };
-            # From the Config.pm manpage
-            my(%sig_num);
-            my @names = split ' ', $Config{sig_name};
-            @sig_num{@names} = split ' ', $Config{sig_num};
-
-            kill $sig_num{USR1}, $$;
-        };
-        if($@) {
-            $SIGNALS_AVAILABLE = 0;
-        }
-    }
-        
-    if ($SIGNALS_AVAILABLE) {
-        plan tests => 15;
-    }else{
-        plan skip_all => "only on platforms supporting signals";
-    }
+    need_signals();
+    plan tests => 15;
 }
 
 use Log::Log4perl;
 use Log::Log4perl::Appender::TestBuffer;
 use File::Spec;
 
-my $WORK_DIR = "tmp";
-if(-d "t") {
-    $WORK_DIR = File::Spec->catfile(qw(t tmp));
-}
-unless (-e "$WORK_DIR"){
-    mkdir("$WORK_DIR", 0755) || die "can't create $WORK_DIR ($!)";
-}
-
+my $WORK_DIR = tmpdir();
 my $testconf= File::Spec->catfile($WORK_DIR, "test27.conf");
-unlink $testconf if (-e $testconf);
 
 Log::Log4perl::Appender::TestBuffer->reset();
 
@@ -148,5 +120,3 @@ $logger = Log::Log4perl::get_logger('animal.cat');
 $logger->info('warning message to cat, should appear');
 
 like($app1->buffer(), qr/(WARN - warning message, should appear\n){2}INFO - warning message to cat, should appear/, "message output");
-
-unlink $testconf;

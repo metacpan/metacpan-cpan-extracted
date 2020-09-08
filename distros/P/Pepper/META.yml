@@ -1,0 +1,79 @@
+---
+abstract: 'Quick-start kit for learning and creating microservices in Perl.'
+author:
+  - 'Eric Chernoff <eric@weaverstreet.net>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Cpanel::JSON::XS: '4.08'
+  DBD::mysql: '4.050'
+  DBI: '1.643'
+  Date::Format: '2.24'
+  Date::Manip::Date: '6.72'
+  DateTime: '1.50'
+  Devel::CheckBin: '0.04'
+  Encode: '2.88'
+  File::RotateLogs: '0.08'
+  IO::Prompter: '0.004015'
+  Module::Build::Tiny: '0.035'
+  Net::Domain: '3.05'
+  Path::Tiny: '0.108'
+  Plack: '1.0047'
+  Plack::Handler::Gazelle: '0.48'
+  Plack::Middleware::DBIx::DisconnectAll: '0.02'
+  Plack::Middleware::ReverseProxy: '0.15'
+  Plack::Middleware::Timeout: '0.09'
+  Scalar::Util: '1.50'
+  Server::Starter: '0.33'
+  Template: '3.007'
+  Term::ReadKey: '2.38'
+  Try::Tiny: '0.30'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pepper
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Pepper:
+    file: lib/Pepper.pm
+    version: v1.0.2
+  Pepper::Commander:
+    file: lib/Pepper/Commander.pm
+    version: v1.0.2
+  Pepper::DB:
+    file: lib/Pepper/DB.pm
+  Pepper::PlackHandler:
+    file: lib/Pepper/PlackHandler.pm
+    version: v1.0.2
+  Pepper::Templates:
+    file: lib/Pepper/Templates.pm
+    version: v1.0.2
+  Pepper::Utilities:
+    file: lib/Pepper/Utilities.pm
+    version: v1.0.2
+requires:
+  perl: '5.022001'
+resources:
+  bugtracker: https://github.com/ericschernoff/Pepper/issues
+  homepage: https://github.com/ericschernoff/Pepper
+  repository: git://github.com/ericschernoff/Pepper.git
+version: 1.0.2
+x_contributors:
+  - 'Eric Chernoff <eric@pepper.weaverstreet.net>'
+  - 'Eric Chernoff <ericschernoff@gmail.com>'
+  - 'root <root@majestica-dev.weaverstreet.net>'
+  - 'root <root@pepper.weaverstreet.net>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

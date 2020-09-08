@@ -1,5 +1,6 @@
 lib/AsposeSlidesCloud/ApiClient.pm
 lib/AsposeSlidesCloud/ApiInfo.pm
+lib/AsposeSlidesCloud/ClassRegistry.pm
 lib/AsposeSlidesCloud/Configuration.pm
 lib/AsposeSlidesCloud/Object/AddLayoutSlide.pm
 lib/AsposeSlidesCloud/Object/AddMasterSlide.pm
@@ -23,6 +24,7 @@ lib/AsposeSlidesCloud/Object/ColorScheme.pm
 lib/AsposeSlidesCloud/Object/CommonSlideViewProperties.pm
 lib/AsposeSlidesCloud/Object/Connector.pm
 lib/AsposeSlidesCloud/Object/CustomDashPattern.pm
+lib/AsposeSlidesCloud/Object/DataPoint.pm
 lib/AsposeSlidesCloud/Object/DiscUsage.pm
 lib/AsposeSlidesCloud/Object/Document.pm
 lib/AsposeSlidesCloud/Object/DocumentProperties.pm
@@ -154,13 +156,14 @@ lib/AsposeSlidesCloud/Object/UpdateBackground.pm
 lib/AsposeSlidesCloud/Object/UpdateShape.pm
 lib/AsposeSlidesCloud/Object/VideoFrame.pm
 lib/AsposeSlidesCloud/Object/ViewProperties.pm
+lib/AsposeSlidesCloud/Object/WaterfallChartDataPoint.pm
 lib/AsposeSlidesCloud/Object/WaterfallSeries.pm
 lib/AsposeSlidesCloud/Object/XpsExportOptions.pm
 lib/AsposeSlidesCloud/SlidesApi.pm
 LICENSE
 MakeFile.pl
-prove.pl
 MANIFEST			This list of files
+prove.pl
 README.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -9,7 +9,7 @@ our $VERSION = '2.0.0';
 
 sub init {
     my ($self) = @_;
-    $self->addAuthRoute( public => { ':tpl'   => 'run' }, ['GET'] );
+    $self->addAuthRoute( public => { ':tpl' => 'run' }, ['GET'] );
     $self->addUnauthRoute( public => { ':tpl' => 'run' }, ['GET'] );
     return 1;
 }

@@ -7,7 +7,7 @@ use Cwd ();
 use File::Basename ();
 use Sub::Util ();
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 sub THISFILE () { Cwd::abs_path((caller)[1]) }
 sub THISDIR () {
@@ -81,13 +81,25 @@ Path::This - Path to this source file or directory
   use Path::This '$THISDIR';
   use lib "$THISDIR/../lib";
 
-  # using core modules - use constant or BEGIN to resolve __FILE__ at compile time
+  # constant subs can be constant-folded by the parser
+
+  use Path::This 'THISDIR';
+  my $bar_path = THISDIR . '/bar'; # string formed at parse time
+
+  # equivalent values resolved with only core modules
+  # use constant or BEGIN to resolve __FILE__ as early as possible
+
   use Cwd 'abs_path';
   use File::Basename 'dirname';
+
   use constant THISFILE => abs_path __FILE__;
-  use constant THISDIR => dirname abs_path __FILE__;
-  my ($THISFILE, $THISDIR);
+  # or
+  my $THISFILE;
   BEGIN { $THISFILE = abs_path __FILE__ }
+
+  use constant THISDIR => dirname abs_path __FILE__;
+  # or
+  my $THISDIR;
   BEGIN { $THISDIR = dirname abs_path __FILE__ }
 
 =head1 DESCRIPTION
@@ -97,11 +109,15 @@ directory containing that file. Dynamic or constant sub versions can also be
 requested. Paths will be absolute with symlinks resolved.
 
 Note that the package variable or constant sub will be exported to the current
-package globally. If the same package will be used in multiple files, use the
-dynamic sub export so the file path will be calculated when the sub is called.
+package globally. If the same package will be defined across multiple files,
+use the dynamic sub export so the file path will be calculated when the sub is
+called.
 
 For cases where this module cannot be loaded beforehand, the last section of
 the L</"SYNOPSIS"> shows how to perform the same task with core modules.
+
+See L<lib::relative> for the specific case of adding paths to C<@INC> relative
+to the current source file.
 
 =head1 EXPORTS
 
@@ -116,8 +132,8 @@ the L</"SYNOPSIS"> shows how to perform the same task with core modules.
 
 Absolute path to the current source file. Behavior is undefined when called
 without a source file (e.g. from the command line or STDIN). C<$THISFILE> will
-export a package variable, C<&THISFILE> will export a dynamic subroutine, and
-C<THISFILE> will export an inlinable constant.
+export a package variable, C<&THISFILE> will export a dynamic subroutine (C<&>
+not needed to call it), and C<THISFILE> will export an inlinable constant.
 
 =head2 $THISDIR
 
@@ -131,8 +147,8 @@ C<THISFILE> will export an inlinable constant.
 Absolute path to the directory containing the current source file, or the
 current working directory when called without a source file (e.g. from the
 command line or STDIN). C<$THISDIR> will export a package variable, C<&THISDIR>
-will export a dynamic subroutine, and C<THISDIR> will export an inlinable
-constant.
+will export a dynamic subroutine (C<&> not needed to call it), and C<THISDIR>
+will export an inlinable constant.
 
 =head1 BUGS
 

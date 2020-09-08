@@ -10,9 +10,11 @@ WriteMakefile(
     PMLIBDIRS      => ['lib'],
     BUILD_REQUIRES => {
         'Digest::HMAC_SHA1' => 0,
+        'Env'               => 0,
         'IO::Pipe'          => 0,
         'Test::MockObject'  => 0,
         'Test::Pod'         => 0,
+        'Time::Fake'        => 0,
         'Cwd'               => 0,
     },
     META_MERGE => {
@@ -39,7 +41,7 @@ WriteMakefile(
         },
     },
     PREREQ_PM => {
-        'Lemonldap::NG::Common' => '2.0.8',
+        'Lemonldap::NG::Common' => '2.0.9',
         'LWP::UserAgent'        => 0,
         'Mouse'                 => 0,
         'URI'                   => 0,

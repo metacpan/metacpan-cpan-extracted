@@ -2,44 +2,42 @@
 
 use strict;
 use Getopt::Long;
+use Pod::Usage;
 use Lemonldap::NG::Common::Conf;
+use Lemonldap::NG::Common::Conf::Constants qw(
+  DEFAULTCONFBACKEND
+  DEFAULTCONFBACKENDOPTIONS
+);
 
 my %opts;
 my $result = GetOptions( \%opts, 'help|h', 'current|c=s', 'new|n=s', 'latest|l',
-    'force|f' );
+    'overwrite|o', 'force|f' );
 
-if ( $opts{help} or not( $opts{current} and $opts{new} ) ) {
-    print STDERR "
-               ## Lemonldap::NG configuration converter ##
+pod2usage(0) if $opts{help};
 
-Usage: $0 --current=/current/lemonldap-ng.ini --new=/new/lemonldap-ng.ini
+# Previous behavior when setting --current and --new was to always overwrite
+$opts{overwrite} = 1 if ( $opts{current} and $opts{new} );
 
-other parameters:
-    --latest -l
-        convert only last configuration
-    --force -f
-        continue even if an error occurs
-
-";
-    exit 1;
-}
-
-foreach ( $opts{current}, $opts{new} ) {
-    unless ( -e $_ ) {
-        print STDERR "$_ does not exist\n";
-        exit 2;
-    }
-    unless ( -r $_ ) {
-        print STDERR "$_ is not readable\n";
+# If current config not provided, fallback to default config storage
+my $old;
+if ( $opts{current} ) {
+    unless ( -r $opts{current} ) {
+        print STDERR $opts{current} . " is not readable\n";
         exit 3;
     }
-}
 
-my $old = Lemonldap::NG::Common::Conf->new(
-    {
-        confFile => $opts{current},
-    }
-);
+    $old = Lemonldap::NG::Common::Conf->new( {
+            confFile => $opts{current},
+        }
+    );
+}
+else {
+    $old = Lemonldap::NG::Common::Conf->new( {
+            type => DEFAULTCONFBACKEND,
+            DEFAULTCONFBACKENDOPTIONS,
+        }
+    );
+}
 unless ($old) {
     print STDERR
       "Failed to get current conf : $Lemonldap::NG::Common::Conf::msg\n";
@@ -52,15 +50,36 @@ my %newargs = (
     cfgNumFixed => 1,
 );
 
-my $new = Lemonldap::NG::Common::Conf->new(
-    {
-        confFile => $opts{new},
+# If new config not provided, fallback to currently configured backend
+my $new;
+if ( $opts{new} ) {
+    unless ( -r $opts{new} ) {
+        print STDERR $opts{new} . " is not readable\n";
+        exit 3;
     }
-);
+    $new = Lemonldap::NG::Common::Conf->new( {
+            confFile => $opts{new},
+        }
+    );
+}
+else {
+    $new = Lemonldap::NG::Common::Conf->new;
+}
+
 unless ($new) {
     print STDERR
       "Failed to create new conf object : $Lemonldap::NG::Common::Conf::msg\n";
     exit 5;
+}
+
+my $oldtype = $old->{type} =~ s/^Lemonldap::NG::Common::Conf::Backends:://r;
+my $newtype = $new->{type} =~ s/^Lemonldap::NG::Common::Conf::Backends:://r;
+print STDERR "Converting from " . $oldtype . " to " . $newtype . "\n";
+
+if ( $oldtype eq $newtype ) {
+    print STDERR "\nWARNING: "
+      . "converting configuration without changing backend type.\n"
+      . "Make sure you know what you are doing.\n\n";
 }
 
 my @available;
@@ -69,6 +88,20 @@ if ( $opts{latest} ) {
 }
 else {
     @available = $old->available();
+}
+
+my @dstavailable = $new->available();
+
+# Compute intersection of src and dst config numbers
+my %tmp;
+foreach my $e ( @available, @dstavailable ) { $tmp{$e}++ }
+my @isect = grep { $tmp{$_} > 1 } keys %tmp;
+
+if ( @isect and not $opts{overwrite} ) {
+    print STDERR "WARNING: " . @isect
+      . " existing configurations found in destination \n";
+    print STDERR "    use --overwrite to overwrite existing configurations\n";
+    exit 8;
 }
 
 foreach (@available) {
@@ -95,18 +128,37 @@ __END__
 
 =encoding utf8
 
-convertConfig - A tool to convert Lemonldap::NG configuration database.
+convertConfig - A tool to migrate Lemonldap::NG configuration database to a new backend.
 
 =head1 SYNOPSIS
 
-  convertConfig --current=/current/lemonldap-ng.ini --new=/new/lemonldap-ng.ini
+=over 14
 
-  # Convert only the latest config (configuration history is lost)
-  convertConfig  --latest --current=... --new=...
+=item B<convertConfig>
+[B<--help>]
+[B<--current>S< >I</old/lemonldap-ng.ini>]
+[B<--new>S< >I</new/lemonldap-ng.ini>]
+[B<--latest>]
+[B<--overwrite>]
+[B<--force>]
 
-  # Continue even if an error occurs
-  convertConfig  --force -f --current=... --new=...
+=back
 
+=item Convert from default B<File> backend to the currently configured backend
+
+B<convertConfig>
+
+=item Convert only the latest config (configuration history is lost)
+
+B<convertConfig> B<--latest>
+
+=item Specify different INI config files containing old or new backends
+
+B<convertConfig> B<--current>S< >I<config> B<--new>S< >I<config>
+
+=item Continue even if an error occurs
+
+B<convertConfig> B<--force>
 
 =head1 DESCRIPTION
 

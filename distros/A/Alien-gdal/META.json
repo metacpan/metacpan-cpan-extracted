@@ -54,6 +54,7 @@
             "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Build::SearchDep" : "0.53",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
+            "Alien::Build::Plugin::PkgConfig::PPWrapper" : "0",
             "Alien::geos::af" : "1.005",
             "Alien::libtiff" : "0",
             "Alien::patch" : "0",
@@ -92,7 +93,7 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-gdal"
       }
    },
-   "version" : "1.22",
+   "version" : "1.23",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.26",
       "requires" : {

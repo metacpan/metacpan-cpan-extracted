@@ -6,7 +6,7 @@ use warnings;
 package Class::Tiny;
 # ABSTRACT: Minimalist class construction
 
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 
 use Carp ();
 
@@ -115,7 +115,7 @@ sub get_all_attribute_defaults_for {
 package Class::Tiny::Object;
 # ABSTRACT: Base class for classes built with Class::Tiny
 
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 
 my ( %HAS_BUILDARGS, %BUILD_CACHE, %DEMOLISH_CACHE, %ATTR_CACHE );
 
@@ -211,7 +211,7 @@ Class::Tiny - Minimalist class construction
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 SYNOPSIS
 
@@ -466,7 +466,7 @@ Class::Tiny provides a C<DESTROY> method.  If your class or any superclass
 defines a C<DEMOLISH> method, they will be called from the child class to the
 furthest parent class during object destruction.  It is provided a single
 boolean argument indicating whether Perl is in global destruction.  Return
-values and errors are ignored.
+values are ignored.  Errors are caught and rethrown.
 
     sub DEMOLISH {
         my ($self, $global_destruct) = @_;
@@ -561,32 +561,13 @@ Moose offer, this is intended to be a reasonable fallback.
 That said, Class::Tiny offers Moose-like conventions for things like C<BUILD>
 and C<DEMOLISH> for some minimal interoperability and an easier upgrade path.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
-=head1 SUPPORT
-
-=head2 Bugs / Feature Requests
-
-Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/dagolden/Class-Tiny/issues>.
-You will be notified automatically of any progress on your issue.
-
-=head2 Source Code
-
-This is open source software.  The code repository is available for
-public review and contribution under the terms of the license.
-
-L<https://github.com/dagolden/Class-Tiny>
-
-  git clone https://github.com/dagolden/Class-Tiny.git
-
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dagfinn Ilmari Mannsåker David Golden Gelu Lupas Karen Etheridge Olivier Mengué Toby Inkster
+=for stopwords Dagfinn Ilmari Mannsåker David Golden Gelu Lupas Karen Etheridge Matt S Trout Olivier Mengué Toby Inkster
 
 =over 4
 
@@ -605,6 +586,10 @@ Gelu Lupas <gelu@devnull.ro>
 =item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Matt S Trout <mstrout@cpan.org>
 
 =item *
 

@@ -9,3 +9,4 @@ t/pod.t
 t/pod_coverage.t
 t/rss.t
 t/xml/example.rdf
+META.json

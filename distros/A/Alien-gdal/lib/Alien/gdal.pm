@@ -10,7 +10,7 @@ use Capture::Tiny qw /:all/;
 use Path::Tiny qw /path/;
 use Alien::proj;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 my ($have_geos, $have_proj);
 my @have_aliens;

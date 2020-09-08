@@ -7,13 +7,25 @@ use ExtUtils::MakeMaker;
 sub MY::top_targets {
     my $self = shift;
     my $r    = $self->MM::top_targets(@_);
+    my $newtarget;
     if ( my $cf = $ENV{LMNGCONFFILE} ) {
-        $r =~ s/^(all.*)$/$1 my_target/m;
         $cf = quotemeta($cf);
+        $newtarget .= <<"EOT";
+	perl -i -pe 's/^(use constant DEFAULTCONFFILE\\s*=>).*\$\$/\$\$1 "$cf";/' blib/lib/Lemonldap/NG/Common/Conf/Constants.pm
+EOT
+    }
+    if ( my $cf = $ENV{LMNGCONFDIR} ) {
+        $cf = quotemeta($cf);
+        $newtarget .= <<"EOT";
+	perl -i -pe 's/^(\\s*dirName\\s+)=>.*/\$\$1 => "$cf",/' blib/lib/Lemonldap/NG/Common/Conf/Constants.pm
+EOT
+    }
+    if ($newtarget) {
+        $r =~ s/^(all.*)$/$1 fix_defaults/m;
         $r .= <<"EOT";
 
-my_target:
-	perl -i -pe 's/^(use constant DEFAULTCONFFILE\\s*=>).*\$\$/\$\$1 "$cf";/' blib/lib/Lemonldap/NG/Common/Conf/Constants.pm
+fix_defaults:
+$newtarget
 EOT
     }
     return $r;
@@ -93,5 +105,6 @@ WriteMakefile(
         'scripts/convertConfig'    => 'blib/man1/convertConfig.1p',
         'scripts/convertSessions'  => 'blib/man1/convertSessions.1p',
         'scripts/lemonldap-ng-cli' => 'blib/man1/lemonldap-ng-cli.1p',
+        'scripts/lemonldap-ng-sessions' => 'blib/man1/lemonldap-ng-sessions.1p',
     },
 );

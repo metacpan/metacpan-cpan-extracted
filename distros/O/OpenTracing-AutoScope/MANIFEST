@@ -33,6 +33,7 @@ t/WrapScope/files-glob.t
 t/WrapScope/files.t
 t/WrapScope/hierarchy.t
 t/WrapScope/lifespan.t
+t/WrapScope/moose.t
 t/WrapScope/post-declare.t
 t/WrapScope/quiet-mode.t
 t/WrapScope/runtime-load.t
@@ -42,6 +43,7 @@ t/WrapScope/samples/wrapscope1.txt
 t/WrapScope/samples/wrapscope2.txt
 t/WrapScope/tags.t
 t/WrapScope/warnings.t
+t/lib/Line/Storage.pm
 t/guarded-span.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

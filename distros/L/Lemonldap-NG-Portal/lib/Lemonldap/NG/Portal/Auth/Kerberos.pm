@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -142,6 +142,18 @@ sub extractFormInfo {
     }
     $ENV{KRB5_KTNAME} = $self->keytab;
     $self->logger->debug( "Set KRB5_KTNAME env to " . $ENV{KRB5_KTNAME} );
+
+    # NTML tickets are not part of GSSAPI and not recognized by MIT KRB5
+    # since they are a proprietary SSPI mechanism
+    if ( substr( $data, 0, 8 ) eq "NTLMSSP\0" ) {
+        $self->logger->error(
+            'Received ticket is actually a NTLM ticket instead of a Kerberos '
+              . 'ticket, make sure the workstation is correctly configured: '
+              . 'portal in trusted internet zone, clock synchronization, '
+              . 'correct reverse DNS configuration...' );
+        return PE_ERROR;
+    }
+
     my $status = GSSAPI::Context::accept(
         my $server_context,
         GSS_C_NO_CREDENTIAL,

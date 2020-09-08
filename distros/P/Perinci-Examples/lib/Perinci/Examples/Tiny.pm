@@ -1,7 +1,7 @@
 package Perinci::Examples::Tiny;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.819'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.820'; # VERSION
 
 our %SPEC;
 
@@ -173,7 +173,7 @@ Perinci::Examples::Tiny - Small examples
 
 =head1 VERSION
 
-This document describes version 0.819 of Perinci::Examples::Tiny (from Perl distribution Perinci-Examples), released on 2019-08-14.
+This document describes version 0.820 of Perinci::Examples::Tiny (from Perl distribution Perinci-Examples), released on 2020-04-29.
 
 =head1 DESCRIPTION
 
@@ -367,6 +367,7 @@ Argument.
 
 Argument.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -399,6 +400,7 @@ Arguments ('*' denotes required arguments):
 =item * B<number>* => I<int>
 
 Number to test.
+
 
 =back
 
@@ -439,6 +441,7 @@ Array.
 
 Whether to round result to integer.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -474,7 +477,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

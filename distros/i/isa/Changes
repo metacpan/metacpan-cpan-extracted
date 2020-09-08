@@ -1,0 +1,37 @@
+isa
+===
+
+Created:      2020-09-04
+Home page:    <https://metacpan.org/release/isa>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=isa>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+2.001	2020-09-06
+
+ [ Documentation ]
+ - Link to wiki in the pod.
+
+ [ Test Suite ]
+ - Add tests with a class that overrides the `isa` method.
+
+ [ Other ]
+ - Added: If Type::Tiny::XS isn't available but Mouse is; attempt to borrow
+   XS stuff from Mouse.
+ - Check that function names and class names are non-empty strings.
+ - Minor code cleanups.
+ - Removed encrypted recipe for cheese.
+   Sean Burke++
+
+2.000	2020-09-04
+
+ [ Packaging ]
+ - Bump version to supercede a BackPAN-only release called isa-1.01.
+
+0.002	2020-09-04
+
+ [ Documentation ]
+ - Bundle a benchmark script.
+ - Description mentioned `isa` operator being introduced in Perl 5.30; it
+   should have save 5.32.
+
+0.001	2020-09-04	Initial release

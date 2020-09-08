@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent 'PDL';
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Scalar::Util 'looks_like_number';
 use POSIX ();
@@ -22,7 +22,9 @@ use overload '>'  => \&_num_compare_gt,
              '<=' => \&_num_compare_le,
              '==' => \&_num_compare_eq,
              '!=' => \&_num_compare_ne,
-             '""' => \&_stringify;
+             '""' => \&_stringify,
+             '+'  => sub { PDL::plus(@_) },
+             '-'  => sub { PDL::minus(@_) };
 
 my %INC_SECONDS = (
   week   => 60 * 60 * 24 * 7,

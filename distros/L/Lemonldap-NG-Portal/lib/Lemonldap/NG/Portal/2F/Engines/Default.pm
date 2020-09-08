@@ -19,9 +19,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_SENDRESPONSE
   PE_TOKENEXPIRED
+  PE_NO_SECOND_FACTORS
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
@@ -198,7 +199,30 @@ sub run {
     $self->logger->debug("2F checkLogins set") if ($checkLogins);
 
     # Skip 2F unless a module has been registered
-    return PE_OK unless ( @{ $self->sfModules } );
+    unless ( @{ $self->sfModules } ) {
+        if ( $self->conf->{sfOnlyUpgrade} and $req->data->{doingSfUpgrade} ) {
+            $self->logger->error(
+                    "Trying to perform 2FA session upgrade but no "
+                  . "second factor modules are configured" );
+            return PE_ERROR;
+        }
+        else {
+            return PE_OK;
+        }
+    }
+
+    # Skip 2F if authnLevel is already high enough
+    if (
+        $self->conf->{sfOnlyUpgrade}
+        and ( ( $req->pdata->{targetAuthnLevel} || 0 ) <=
+            ( $req->sessionInfo->{authenticationLevel} || 0 ) )
+      )
+    {
+        $self->logger->debug(
+                "Current authentication level satisfied target service,"
+              . " skipping 2FA" );
+        return PE_OK;
+    }
 
     # Remove expired 2F devices
     my $session = $req->sessionInfo;
@@ -296,7 +320,16 @@ sub run {
             return PE_SENDRESPONSE;
         }
         else {
-            return PE_OK;
+            if ( $self->conf->{sfOnlyUpgrade} and $req->data->{doingSfUpgrade} )
+            {
+
+                # cancel redirection to issuer/vhost
+                delete $req->pdata->{_url};
+                return PE_NO_SECOND_FACTORS;
+            }
+            else {
+                return PE_OK;
+            }
         }
     }
 

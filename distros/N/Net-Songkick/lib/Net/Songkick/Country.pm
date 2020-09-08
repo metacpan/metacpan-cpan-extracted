@@ -21,9 +21,12 @@ has displayName => (
     isa => 'Str',
 );
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 =head1 AUTHOR
 
-Dave Cross <dave@mag-sol.com>
+Dave Cross <dave@perlhacks.com>
 
 =head1 SEE ALSO
 
@@ -34,7 +37,7 @@ perl(1), L<http://www.songkick.com/>, L<http://developer.songkick.com/>
 Copyright (C) 2010, Magnum Solutions Ltd.  All Rights Reserved.
 
 This script is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself. 
+under the same terms as Perl itself.
 
 =cut
 

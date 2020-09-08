@@ -2,13 +2,13 @@ package Lemonldap::NG::Handler::Lib::ServiceToken;
 
 use strict;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.9';
 
 sub fetchId {
     my ( $class, $req ) = @_;
     my $token = $req->{env}->{HTTP_X_LLNG_TOKEN};
-    return $class->Lemonldap::NG::Handler::Main::fetchId($req) unless ($token);
-    $class->logger->debug('Found token header');
+    return $class->Lemonldap::NG::Handler::Main::fetchId($req) unless ($token =~ /\w+/);
+    $class->logger->debug("Found token: $token");
 
     # Decrypt token
     my $s = $class->tsv->{cipher}->decrypt($token);
@@ -16,6 +16,8 @@ sub fetchId {
 # Token format:
 # time:_session_id:vhost1:vhost2:serviceHeader1=value1:serviceHeader2=value2,...
     my ( $t, $_session_id, @vhosts ) = split /:/, $s;
+    $class->logger->debug("Found epoch: $t");
+    $class->logger->debug("Found _session_id: $_session_id");
 
     # Looking for service headers
     my $vhost = $class->resolveAlias($req);
@@ -43,6 +45,7 @@ sub fetchId {
             "$vhost not authorized in token (" . join( ', ', @vhosts ) . ')' );
         return 0;
     }
+    $class->logger->debug( 'Found VHosts: ' . join ', ', @vhosts );
 
     # Is token in good interval ?
     my $ttl =

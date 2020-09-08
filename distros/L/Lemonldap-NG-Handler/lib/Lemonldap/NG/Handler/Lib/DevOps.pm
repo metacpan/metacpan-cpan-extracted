@@ -66,7 +66,7 @@ q"I refuse to compile rules.json when useSafeJail isn't activated! Yes I know, I
     $json->{rules} ||= { default => 1 };
     $json->{headers} //= { 'Auth-User' => '$uid' };
     $class->locationRulesInit( undef, { $vhost => $json->{rules} } );
-    $class->headersInit( undef,       { $vhost => $json->{headers} } );
+    $class->headersInit( undef, { $vhost => $json->{headers} } );
     $class->tsv->{lastVhostUpdate}->{$vhost} = time;
     return;
 }

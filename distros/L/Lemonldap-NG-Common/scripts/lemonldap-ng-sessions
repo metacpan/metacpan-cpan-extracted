@@ -1,0 +1,348 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use POSIX;
+
+use Lemonldap::NG::Common::CliSessions;
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+
+our $VERSION = "2.0.9";
+
+# Options
+my $opts = {};
+my $help;
+
+GetOptions(
+    'help|h'       => \$help,
+    'select|s=s@'  => \$opts->{select},
+    'where|w=s'    => \$opts->{where},
+    'backend|b=s'  => \$opts->{backend},
+    'persistent|p' => \$opts->{persistent},
+    'id-only|i'    => \$opts->{idonly},
+) or pod2usage( -exitcode => 1, -verbose => 0 );
+
+pod2usage( -exitcode => 0, -verbose => 2 ) if $help;
+
+eval {
+    POSIX::setgid( scalar( getgrnam('__APACHEGROUP__') ) );
+    POSIX::setuid( scalar( getpwnam('__APACHEUSER__') ) );
+};
+
+my $action = shift @ARGV;
+
+unless ($action) {
+    pod2usage( -exitcode => 1, -verbose => 0 );
+}
+
+if ( $action eq "get" ) {
+    unless ( @ARGV >= 1 ) {
+        pod2usage(
+            -exitval  => 1,
+            -verbose  => 99,
+            -sections => "COMMANDS/Get"
+        );
+    }
+}
+if ( $action eq "delete" ) {
+    unless ( @ARGV >= 1 ) {
+        pod2usage(
+            -exitval  => 1,
+            -verbose  => 99,
+            -sections => "COMMANDS/Delete"
+        );
+    }
+}
+if ( $action eq "delKey" ) {
+    unless ( @ARGV >= 2 ) {
+        pod2usage(
+            -exitval  => 1,
+            -verbose  => 99,
+            -sections => "COMMANDS/Delete Key"
+        );
+    }
+}
+if ( $action eq "setKey" ) {
+    unless ( @ARGV >= 3 ) {
+        pod2usage(
+            -exitval  => 1,
+            -verbose  => 99,
+            -sections => "COMMANDS/Set Key"
+        );
+    }
+}
+
+if ( $action eq "secondfactors" ) {
+    unless ( @ARGV >= 2 ) {
+        pod2usage(
+            -exitval  => 1,
+            -verbose  => 99,
+            -sections => "COMMANDS/Second Factors"
+        );
+    }
+}
+
+if ( $action eq "consents" ) {
+    unless ( @ARGV >= 2 ) {
+        pod2usage(
+            -exitval  => 1,
+            -verbose  => 99,
+            -sections => "COMMANDS/Consents"
+        );
+    }
+}
+
+exit Lemonldap::NG::Common::CliSessions->run( $action, $opts, @ARGV );
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+lemonldap-ng-sessions - Scripting CLI for LemonLDAP::NG sessions
+
+=head1 SYNOPSIS
+
+lemonldap-ng-sessions [<options>] <command> [<arguments> ...]
+
+Commands:
+
+	get		get one or several session from known IDs
+	search		search for sessions
+	delete		delete existing sessions
+	setKey		add/change key in existing session
+	delKey		delete key from existing session
+	secondfactors	manage second factors
+	consents	manage OIDC user consents
+
+Options:
+
+	--help		Show full help
+	--select 	Select which fields to print
+	--backend	Specify session backend
+	--persistent	Search in persistent sessions
+	--where		Set search filter (search only)
+	--id-only	Only return IDs (search only)
+
+
+=head1 COMMANDS
+
+=head2 Get
+
+lemonldap-ng-sessions get <id> [<id> ...]
+
+This command lets you read the content of a session.
+
+You must pass one or several session IDs as parameters.
+
+
+Exemples
+
+	lemonldap-ng-sessions get 9684dd2a6489bf2be2fbdd799a8028e3
+
+	lemonldap-ng-sessions get --persistent dwho
+
+=head2 Search
+
+lemonldap-ng-sessions search [<options>]
+
+This command lets you search for sessions.
+
+It can be used to find the session IDs that other commands need.
+
+You can restrict the search with options. See L</OPTIONS>
+
+Examples
+
+	lemonldap-ng-sessions search
+
+	lemonldap-ng-sessions search --backend persistent
+
+	lemonldap-ng-sessions search --where uid=dwho
+
+	lemonldap-ng-sessions search --where uid=dwho \
+		--id-only
+
+	lemonldap-ng-sessions search --where uid=dwho \
+		 --select authenticationLevel
+
+=head2 Delete
+
+lemonldap-ng-sessions delete <id> [<id> ...]
+
+This command lets you delete a session.
+
+You may give it one or several session IDs to remove.
+
+Exemples:
+	
+	lemonldap-ng-sessions delete 9684dd2a6489bf2be2fbdd799a8028e3
+
+	lemonldap-ng-sessions delete --persistent dwho
+
+=head2 Set Key
+
+lemonldap-ng-sessions setKey <id> <key> <value> [<key> <value> ...]
+
+This command allows you to modify one or several keys from an existing session.
+
+Examples:
+
+	lemonldap-ng-sessions setKey 9684dd2a6489bf2be2fbdd799a8028e3 \
+		authenticationLevel 1
+
+
+=head2 Delete Key
+
+lemonldap-ng-sessions delKey <id> <key> [<key> ...]
+
+This command lets you remove a key from an existing session.
+
+You must specify a session ID, and one of several session keys
+to remove.
+
+Examples:
+	
+	lemonldap-ng-sessions delKey --persistent dwho _oidcConsents
+		
+
+=head2 Second Factors
+
+lemonldap-ng-sessions secondfactors <command> <user> [<id> ... ]
+
+Commands:
+	
+    get <user>
+        show all second factors for a user
+    delete <user> <id> [<id> ...]
+        delete second factors for a user. The ID must match one of the
+        IDs returned by the "show" command.
+    delType <user> <type> [<type> ...]
+        delete all second factors of a given type for a user
+
+=head2 Consents
+
+lemonldap-ng-sessions consents <command> <user> [<id> ... ]
+
+Commands:
+	
+    get <user>
+        show all OIDC consents for a user
+    delete <user> <id> [<id> ...]
+        delete OIDC consents for a user
+
+=head1 OPTIONS
+
+=over
+
+=item B<--select>,B<-s>
+
+Lets you select which fields to output in the JSON result.
+
+This option can be set multiple times
+
+
+=item B<--where>,B<-w>
+
+This option lets you filter your session search according to a filter.
+
+For now, only one filter can be set.
+
+Only exact matches are supported
+
+Examples:
+
+	--search uid=dwho
+	--search _sessionType=OIDC
+
+=item B<--backend>,B<-b>
+
+This option lets you specify which session backend to use.
+
+You only need it when you configured multiple session backends in your
+LemonLDAP::NG installation (for Persistent, SAML, CAS or OIDC sessions)
+
+Examples:
+
+	--backend persistent
+	--backend saml
+	--backend oidc
+	--backend cas
+
+
+=item B<--persistent>,B<-p>
+
+This options is a shortcut for specifying --backend persistent and using
+the UID hash as a session ID
+
+Example:
+
+	lemonldap-ng-sessions --backend persistent \
+		get 5efe8af397fc3577e05b483aca964f1b
+
+is the same as
+
+	lemonldap-ng-sessions get --persistent dwho
+
+
+=item B<--id-only>,B<-i>
+
+This option replace the standard JSON output format with a simpler format of
+one session ID per line.
+
+This allows some intersting combos using xargs. For example, if you want to
+remove all sessions started by "dwho"
+
+	lemonldap-ng-sessions search --where uid=dwho --id-only | \
+		xargs lemonldap-ng-sessions delete
+
+
+
+=back
+
+=head1 SEE ALSO
+
+L<http://lemonldap-ng.org/>
+
+=head1 AUTHORS
+
+=over
+
+=item Maxime Besson, E<lt>maxime.besson@worteks.comE<gt>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+=over
+
+=item Copyright (C) 2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+
+=item Copyright (C) 2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
+
+=back
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

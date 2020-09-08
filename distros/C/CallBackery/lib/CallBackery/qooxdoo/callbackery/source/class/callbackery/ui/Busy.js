@@ -37,7 +37,7 @@ qx.Class.define("callbackery.ui.Busy", {
             show: 'both',
             iconPosition: 'top',
             visibility: 'excluded',
-            zIndex: 10000
+            zIndex: 10000001
         });
         this.getApplicationRoot().add(this,{top:0,bottom:0,left:0,right:0});
         this.__blocker = new qx.ui.core.Blocker(this.getApplicationRoot()).set({
@@ -45,6 +45,7 @@ qx.Class.define("callbackery.ui.Busy", {
             color   : '#fff',
             keepBlockerActive: true
         });
+        this.__blocker.getBlockerElement().setStyle('zIndex',10000000);
     },
     members : {
         __blocker : null,

@@ -51,19 +51,23 @@ DESCRIPTION
 
     Current features include:
 
-      * all commands <https://redis.io/commands> as of 6.0 (May 2020), see
-      https://redis.io/commands for the methods and parameters
+      * all commands <https://redis.io/commands> as of 6.0.7 (August 2020),
+      see https://redis.io/commands for the methods and parameters
 
-      * pub/sub support <https://redis.io/topics/pubsub>, see
-      "Subscriptions"
+      * pub/sub support <https://redis.io/topics/pubsub>, see "METHODS -
+      Subscriptions"
 
-      * pipelining <https://redis.io/topics/pipelining>, see "Pipelining"
+      * pipelining <https://redis.io/topics/pipelining>, see
+      "pipeline_depth"
 
-      * transactions <https://redis.io/topics/transactions>, see
-      "Transactions"
+      * transactions <https://redis.io/topics/transactions>, see "METHODS -
+      Transactions"
 
       * streams <https://redis.io/topics/streams-intro> and consumer
-      groups, see "Streams"
+      groups, via "XADD" in Net::Async::Redis::Commands and related methods
+
+      * client-side caching <https://redis.io/topics/client-side-caching>,
+      see "METHODS - Clientside caching"
 
  Connecting
 
@@ -143,8 +147,12 @@ CONSTANTS
 
  OPENTRACING_ENABLED
 
-    Defaults to true, this can be controlled by the USE_OPENTRACING
-    environment variable.
+    Defaults to false, this can be controlled by the USE_OPENTRACING
+    environment variable. This provides a way to set the default
+    opentracing mode for all Net::Async::Redis instances - you can
+    enable/disable for a specific instance via "configure":
+
+     $redis->configure(opentracing => 1);
 
     When enabled, this will create a span for every Redis request. See
     OpenTracing::Any for details.
@@ -307,6 +315,10 @@ METHODS - Generic
     See https://redis.io/topics/pipelining for more details on this
     concept.
 
+ opentracing
+
+    Indicates whether OpenTracing::Any support is enabled.
+
 METHODS - Deprecated
 
     This are still supported, but no longer recommended.
@@ -336,6 +348,30 @@ METHODS - Internal
     to 1MB.
 
     See "stream_read_len".
+
+ configure
+
+    Applies configuration parameters - currently supports:
+
+      * host
+
+      * port
+
+      * auth
+
+      * database
+
+      * pipeline_depth
+
+      * stream_read_len
+
+      * stream_write_len
+
+      * on_disconnect
+
+      * client_name
+
+      * opentracing
 
 SEE ALSO
 

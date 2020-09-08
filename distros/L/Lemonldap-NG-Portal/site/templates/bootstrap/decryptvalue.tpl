@@ -15,9 +15,9 @@
 
       <div class="input-group mb-3">
         <div class="input-group-prepend">
-          <span class="input-group-text"><i class="fa fa-random icon-blue"></i> </span>
+          <span class="input-group-text"><label for="cipheredValuefield" class="mb-0"><i class="fa fa-random icon-blue"></i></label></span>
         </div>
-        <input name="cipheredValue" type="text" class="form-control" trplaceholder="cipheredValue" autocomplete="off" aria-required="false"/>
+        <input id="cipheredValuefield" name="cipheredValue" type="text" class="form-control" trplaceholder="cipheredValue" autocomplete="off" aria-required="false"/>
       </div>
 
       <button type="submit" class="btn btn-success">

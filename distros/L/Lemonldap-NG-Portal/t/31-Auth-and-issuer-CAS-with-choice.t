@@ -185,13 +185,13 @@ SKIP: {
     # Verify that confirmation is asked
     my ( $host, $url );
     ( $host, $url, $query ) =
-      expectForm( $res, undef, '/upgradesession', 'confirm', 'url' );
+      expectForm( $res, undef, '/renewsession', 'confirm', 'url' );
 
     # Verify that autopost is required (skipRenewConfirmation is set to 1)
     ok( $res->[2]->[0] =~ /autoRenew\.(?:min\.)js/m, ' Get autorenew.js' );
     ok(
         $res = $issuer->_post(
-            '/upgradesession', IO::String->new($query),
+            '/renewsession', IO::String->new($query),
             length => length($query),
             cookie => "lemonldap=$idpId; $pdata",
             accept => 'text/html'
@@ -206,7 +206,7 @@ SKIP: {
     $query .= '&password=dwho';
     ok(
         $res = $issuer->_post(
-            '/upgradesession', IO::String->new($query),
+            '/renewsession', IO::String->new($query),
             length => length($query),
             cookie => "lemonldap=$idpId; $pdata",
             accept => 'text/html'

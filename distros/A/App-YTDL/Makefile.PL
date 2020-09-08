@@ -10,7 +10,6 @@ if ( $^O eq 'MSWin32' ) {
     %prereqs_os_specific = (
         'win32::Console'       => 0,
         'Win32::Console::ANSI' => 0,
-        'Win32::ShellQuote'    => 0,
     );
 }
 
@@ -54,7 +53,7 @@ WriteMakefile(
         'File::Which'               => 0,
         'FindBin'                   => 0,
         'Getopt::Long'              => 0,
-        'IPC::System::Simple'       => 0,
+        'IPC::System::Simple'       => '1.25',
         'JSON'                      => 0,
         'List::MoreUtils'           => 0,
         'Parallel::ForkManager'     => '0.7.6',

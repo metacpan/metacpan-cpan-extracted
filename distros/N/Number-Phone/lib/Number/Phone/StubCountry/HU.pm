@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200606131959;
+our $VERSION = 1.20200904144532;
 
 my $formatters = [
                 {
@@ -47,7 +47,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[2-57-9]',
+                  'leading_digits' => '[2-9]',
                   'national_rule' => '06 $1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
                 }
@@ -87,64 +87,15 @@ my $validators = {
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '(9[01]\\d{6})|(38\\d{7})',
-                'toll_free' => '[48]0\\d{6}',
+                'toll_free' => '
+          (?:
+            [48]0\\d|
+            6802
+          )\\d{5}
+        ',
                 'voip' => '21\\d{7}'
               };
 my %areanames = ();
-$areanames{hu}->{361} = "Budapest";
-$areanames{hu}->{3622} = "Székesfehérvár";
-$areanames{hu}->{3623} = "Biatorbágy";
-$areanames{hu}->{3624} = "Szigetszentmiklós";
-$areanames{hu}->{3625} = "Dunaújváros";
-$areanames{hu}->{3626} = "Szentendre";
-$areanames{hu}->{3627} = "Vác";
-$areanames{hu}->{3628} = "Gödöllő";
-$areanames{hu}->{3629} = "Monor";
-$areanames{hu}->{3632} = "Salgótarján";
-$areanames{hu}->{3633} = "Esztergom";
-$areanames{hu}->{3634} = "Tatabánya";
-$areanames{hu}->{3635} = "Balassagyarmat";
-$areanames{hu}->{3636} = "Eger";
-$areanames{hu}->{3637} = "Gyöngyös";
-$areanames{hu}->{3642} = "Nyíregyháza";
-$areanames{hu}->{3644} = "Mátészalka";
-$areanames{hu}->{3645} = "Kisvárda";
-$areanames{hu}->{3646} = "Miskolc";
-$areanames{hu}->{3647} = "Szerencs";
-$areanames{hu}->{3648} = "Ózd";
-$areanames{hu}->{3649} = "Mezőkövesd";
-$areanames{hu}->{3652} = "Debrecen";
-$areanames{hu}->{3653} = "Cegléd";
-$areanames{hu}->{3654} = "Berettyóújfalu";
-$areanames{hu}->{3656} = "Szolnok";
-$areanames{hu}->{3657} = "Jászberény";
-$areanames{hu}->{3659} = "Karcag";
-$areanames{hu}->{3662} = "Szeged";
-$areanames{hu}->{3663} = "Szentes";
-$areanames{hu}->{3666} = "Békéscsaba";
-$areanames{hu}->{3668} = "Orosháza";
-$areanames{hu}->{3669} = "Mohács";
-$areanames{hu}->{3672} = "Pécs";
-$areanames{hu}->{3673} = "Szigetvár";
-$areanames{hu}->{3674} = "Szekszárd";
-$areanames{hu}->{3675} = "Paks";
-$areanames{hu}->{3676} = "Kecskemét";
-$areanames{hu}->{3677} = "Kiskunhalas";
-$areanames{hu}->{3678} = "Kiskőrös";
-$areanames{hu}->{3679} = "Baja";
-$areanames{hu}->{3682} = "Kaposvár";
-$areanames{hu}->{3683} = "Keszthely";
-$areanames{hu}->{3684} = "Siófok";
-$areanames{hu}->{3685} = "Marcali";
-$areanames{hu}->{3687} = "Tapolca";
-$areanames{hu}->{3688} = "Veszprém";
-$areanames{hu}->{3689} = "Pápa";
-$areanames{hu}->{3692} = "Zalaegerszeg";
-$areanames{hu}->{3693} = "Nagykanizsa";
-$areanames{hu}->{3694} = "Szombathely";
-$areanames{hu}->{3695} = "Sárvár";
-$areanames{hu}->{3696} = "Győr";
-$areanames{hu}->{3699} = "Sopron";
 $areanames{en}->{361} = "Budapest";
 $areanames{en}->{3622} = "Székesfehérvár";
 $areanames{en}->{3623} = "Biatorbágy";
@@ -199,6 +150,60 @@ $areanames{en}->{3694} = "Szombathely";
 $areanames{en}->{3695} = "Sarvar";
 $areanames{en}->{3696} = "Gyor";
 $areanames{en}->{3699} = "Sopron";
+$areanames{hu}->{361} = "Budapest";
+$areanames{hu}->{3622} = "Székesfehérvár";
+$areanames{hu}->{3623} = "Biatorbágy";
+$areanames{hu}->{3624} = "Szigetszentmiklós";
+$areanames{hu}->{3625} = "Dunaújváros";
+$areanames{hu}->{3626} = "Szentendre";
+$areanames{hu}->{3627} = "Vác";
+$areanames{hu}->{3628} = "Gödöllő";
+$areanames{hu}->{3629} = "Monor";
+$areanames{hu}->{3632} = "Salgótarján";
+$areanames{hu}->{3633} = "Esztergom";
+$areanames{hu}->{3634} = "Tatabánya";
+$areanames{hu}->{3635} = "Balassagyarmat";
+$areanames{hu}->{3636} = "Eger";
+$areanames{hu}->{3637} = "Gyöngyös";
+$areanames{hu}->{3642} = "Nyíregyháza";
+$areanames{hu}->{3644} = "Mátészalka";
+$areanames{hu}->{3645} = "Kisvárda";
+$areanames{hu}->{3646} = "Miskolc";
+$areanames{hu}->{3647} = "Szerencs";
+$areanames{hu}->{3648} = "Ózd";
+$areanames{hu}->{3649} = "Mezőkövesd";
+$areanames{hu}->{3652} = "Debrecen";
+$areanames{hu}->{3653} = "Cegléd";
+$areanames{hu}->{3654} = "Berettyóújfalu";
+$areanames{hu}->{3656} = "Szolnok";
+$areanames{hu}->{3657} = "Jászberény";
+$areanames{hu}->{3659} = "Karcag";
+$areanames{hu}->{3662} = "Szeged";
+$areanames{hu}->{3663} = "Szentes";
+$areanames{hu}->{3666} = "Békéscsaba";
+$areanames{hu}->{3668} = "Orosháza";
+$areanames{hu}->{3669} = "Mohács";
+$areanames{hu}->{3672} = "Pécs";
+$areanames{hu}->{3673} = "Szigetvár";
+$areanames{hu}->{3674} = "Szekszárd";
+$areanames{hu}->{3675} = "Paks";
+$areanames{hu}->{3676} = "Kecskemét";
+$areanames{hu}->{3677} = "Kiskunhalas";
+$areanames{hu}->{3678} = "Kiskőrös";
+$areanames{hu}->{3679} = "Baja";
+$areanames{hu}->{3682} = "Kaposvár";
+$areanames{hu}->{3683} = "Keszthely";
+$areanames{hu}->{3684} = "Siófok";
+$areanames{hu}->{3685} = "Marcali";
+$areanames{hu}->{3687} = "Tapolca";
+$areanames{hu}->{3688} = "Veszprém";
+$areanames{hu}->{3689} = "Pápa";
+$areanames{hu}->{3692} = "Zalaegerszeg";
+$areanames{hu}->{3693} = "Nagykanizsa";
+$areanames{hu}->{3694} = "Szombathely";
+$areanames{hu}->{3695} = "Sárvár";
+$areanames{hu}->{3696} = "Győr";
+$areanames{hu}->{3699} = "Sopron";
 
     sub new {
       my $class = shift;

@@ -8,7 +8,7 @@
         <th width="25%" trspan="name"></th>
         <th width="25%" trspan="type"></th>
         <th width="35%" trspan="use"></th>
-        <th />
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -23,14 +23,14 @@
         </td>
         <td>
           <select class="form-control" ng-model="s.data.for">
-            <option value="0" ng-selected="s.data.for==0" trspan="authAndUserdb">
-            <option value="1" ng-selected="s.data.for==1" trspan="authOnly">
-            <option value="2" ng-selected="s.data.for==2" trspan="userdbOnly">
+            <option value="0" ng-selected="s.data.for==0" trspan="authAndUserdb"></option>
+            <option value="1" ng-selected="s.data.for==1" trspan="authOnly"></option>
+            <option value="2" ng-selected="s.data.for==2" trspan="userdbOnly"></option>
           </select>
         </td>
         <td>
-          <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"/>
-          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newCmbMod'})"/>
+          <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"></span>
+          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newCmbMod'})"></span>
         </td>
       </tr>
     </tbody>

@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -265,17 +265,14 @@ sub checkMaintenanceMode {
     return 0;
 }
 
-## @rmethod boolean grant(string uri, string cond)
-# Grant or refuse client using compiled regexp and functions
+## @rmethod int getLevel(string uri, string $vhost)
+# Return required authentication level for this URI
+# default to vhost authentication level
 # @param $uri URI
-# @param $cond optional Function granting access
-# @return True if the user is granted to access to the current URL
-sub grant {
-    my ( $class, $req, $session, $uri, $cond, $vhost ) = @_;
+# @param $vhost vhost name, default to current request
+sub getLevel {
+    my ( $class, $req, $uri, $vhost ) = @_;
     my $level;
-
-    return $cond->( $req, $session ) if ($cond);
-
     $vhost ||= $class->resolveAlias($req);
 
     # Using URL authentification level if exists
@@ -290,13 +287,33 @@ sub grant {
             last;
         }
     }
-    $level
-      ? $class->logger->debug(
-        'Found AuthnLevel=' . $level . ' for "' . "$vhost$uri" . '"' )
-      : $class->logger->debug("No URL authentication level found...");
+    if ($level) {
+        $class->logger->debug(
+            'Found AuthnLevel=' . $level . ' for "' . "$vhost$uri" . '"' );
+        return $level;
+    }
+    else {
+        $class->logger->debug("No URL authentication level found...");
+        return $class->tsv->{authnLevel}->{$vhost};
+    }
+}
+
+## @rmethod boolean grant(string uri, string cond)
+# Grant or refuse client using compiled regexp and functions
+# @param $uri URI
+# @param $cond optional Function granting access
+# @return True if the user is granted to access to the current URL
+sub grant {
+    my ( $class, $req, $session, $uri, $cond, $vhost ) = @_;
+
+    return $cond->( $req, $session ) if ($cond);
+
+    $vhost ||= $class->resolveAlias($req);
+
+    my $level = $class->getLevel( $req, $uri );
 
     # Using VH authentification level if exists
-    if ( $level ||= $class->tsv->{authnLevel}->{$vhost} ) {
+    if ($level) {
         if ( $session->{authenticationLevel} < $level ) {
             $class->logger->debug(
                 "User authentication level = $session->{authenticationLevel}");
@@ -402,7 +419,7 @@ sub hideCookie {
 sub encodeUrl {
     my ( $class, $req, $url ) = @_;
     $url = $class->_buildUrl( $req, $url ) if ( $url !~ m#^https?://# );
-    return encode_base64( $url, '' );
+    return uri_escape( encode_base64( $url, '' ) );
 }
 
 ## @rmethod protected int goToPortal(string url, string arg)
@@ -451,7 +468,7 @@ sub fetchId {
     my $value =
       $lookForHttpCookie
       ? ( $t =~ /${cn}http=([^,; ]+)/o ? $1 : 0 )
-      : ( $t =~ /$cn=([^,; ]+)/o ? $1 : 0 );
+      : ( $t =~ /$cn=([^,; ]+)/o       ? $1 : 0 );
 
     if ( $value && $lookForHttpCookie && $class->tsv->{securedCookie} == 3 ) {
         $value = $class->tsv->{cipher}->decryptHex( $value, "http" );
@@ -620,7 +637,7 @@ sub _isHttps {
             return $class->tsv->{https}->{_};
         }
         else {
-            return ( ( uc( $req->{env}->{HTTPS} ) || "OFF" ) eq "ON" );
+            return ( uc( $req->{env}->{HTTPS} || "OFF" ) eq "ON" );
         }
     }
 }
@@ -730,10 +747,8 @@ sub resolveAlias {
     return $class->tsv->{vhostAlias}->{$vhost}
       if ( $class->tsv->{vhostAlias}->{$vhost} );
     return $vhost if ( $class->tsv->{defaultCondition}->{$vhost} );
-    my $v = $vhost;
-    while ( $v =~ s/[\w\-]+/\*/ ) {
-        return $v if ( $class->tsv->{defaultCondition}->{$v} );
-        $v =~ s/^\*\.*//;
+    foreach ( @{ $class->tsv->{vhostReg} } ) {
+        return $_->[1] if $vhost =~ $_->[0];
     }
     return $vhost;
 }

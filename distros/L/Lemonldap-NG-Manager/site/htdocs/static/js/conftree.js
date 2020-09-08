@@ -49,6 +49,12 @@ function templates(tpl,key) {
             "title" : "casAppMetaDataOptionsUserAttribute"
          },
          {
+            "get" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsAuthnLevel",
+            "id" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsAuthnLevel",
+            "title" : "casAppMetaDataOptionsAuthnLevel",
+            "type" : "int"
+         },
+         {
             "get" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsRule",
             "id" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsRule",
             "title" : "casAppMetaDataOptionsRule"
@@ -61,7 +67,7 @@ function templates(tpl,key) {
    {
       "cnodes" : tpl+"s/"+key+"/"+"casAppMetaDataMacros",
       "default" : [],
-      "help" : "exportedvars.html#extend_variables_using_macros_and_groups",
+      "help" : "exportedvars.html#extend-variables-using-macros-and-groups",
       "id" : tpl+"s/"+key+"/"+"casAppMetaDataMacros",
       "title" : "casAppMetaDataMacros",
       "type" : "keyTextContainer"
@@ -536,6 +542,12 @@ function templates(tpl,key) {
                   "type" : "bool"
                },
                {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnLevel",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAuthnLevel",
+                  "title" : "oidcRPMetaDataOptionsAuthnLevel",
+                  "type" : "int"
+               },
+               {
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRule",
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRule",
                   "title" : "oidcRPMetaDataOptionsRule"
@@ -621,7 +633,7 @@ function templates(tpl,key) {
    {
       "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataMacros",
       "default" : [],
-      "help" : "exportedvars.html#extend_variables_using_macros_and_groups",
+      "help" : "exportedvars.html#extend-variables-using-macros-and-groups",
       "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataMacros",
       "title" : "oidcRPMetaDataMacros",
       "type" : "keyTextContainer"
@@ -656,7 +668,7 @@ function templates(tpl,key) {
    {
       "cnodes" : tpl+"s/"+key+"/"+"samlIDPMetaDataExportedAttributes",
       "default" : [],
-      "help" : "authsaml.html#exported_attributes",
+      "help" : "authsaml.html#exported-attributes",
       "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataExportedAttributes",
       "title" : "samlIDPMetaDataExportedAttributes",
       "type" : "samlAttributeContainer"
@@ -992,7 +1004,7 @@ function templates(tpl,key) {
    {
       "cnodes" : tpl+"s/"+key+"/"+"samlSPMetaDataExportedAttributes",
       "default" : [],
-      "help" : "idpsaml.html#exported_attributes",
+      "help" : "idpsaml.html#exported-attributes",
       "id" : tpl+"s/"+key+"/"+"samlSPMetaDataExportedAttributes",
       "title" : "samlSPMetaDataExportedAttributes",
       "type" : "samlAttributeContainer"
@@ -1154,6 +1166,12 @@ function templates(tpl,key) {
                   "type" : "bool"
                },
                {
+                  "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsAuthnLevel",
+                  "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsAuthnLevel",
+                  "title" : "samlSPMetaDataOptionsAuthnLevel",
+                  "type" : "int"
+               },
+               {
                   "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsRule",
                   "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsRule",
                   "title" : "samlSPMetaDataOptionsRule"
@@ -1171,7 +1189,7 @@ function templates(tpl,key) {
    {
       "cnodes" : tpl+"s/"+key+"/"+"samlSPMetaDataMacros",
       "default" : [],
-      "help" : "exportedvars.html#extend_variables_using_macros_and_groups",
+      "help" : "exportedvars.html#extend-variables-using-macros-and-groups",
       "id" : tpl+"s/"+key+"/"+"samlSPMetaDataMacros",
       "title" : "samlSPMetaDataMacros",
       "type" : "keyTextContainer"

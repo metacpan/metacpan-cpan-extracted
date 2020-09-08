@@ -10,10 +10,8 @@ our @EXPORT_OK = qw( sec_to_time write_json read_json uni_capture uni_system HID
 
 use Fcntl qw( LOCK_EX LOCK_SH SEEK_END );
 
-use IPC::System::Simple qw( capture system EXIT_ANY );
+use IPC::System::Simple qw( capturex systemx EXIT_ANY );
 use JSON                qw();
-
-use if $^O eq 'MSWin32', 'Win32::ShellQuote';
 
 use constant {
     HIDE_CURSOR => "\e[?25l",
@@ -24,23 +22,11 @@ use constant {
 sub uni_capture {
     my ( @cmd ) = @_;
     if ( wantarray ) {
-        my @capture;
-        if ( $^O eq 'MSWin32' ) {
-            @capture = capture( Win32::ShellQuote::quote_native( @cmd ) );
-        }
-        else {
-            @capture = capture( @cmd );
-        }
+        my @capture = capturex( @cmd );
         return @capture;
     }
     else {
-        my $capture;
-        if ( $^O eq 'MSWin32' ) {
-            $capture = capture( Win32::ShellQuote::quote_native( @cmd ) );
-        }
-        else {
-            $capture = capture( @cmd );
-        }
+        my $capture = capturex( @cmd );
         return $capture;
     }
 }
@@ -48,13 +34,7 @@ sub uni_capture {
 
 sub uni_system {
     my ( @cmd ) = @_;
-    my $exit_value;
-    if ( $^O eq 'MSWin32' ) {
-        $exit_value = system( EXIT_ANY, Win32::ShellQuote::quote_native( @cmd ) );
-    }
-    else {
-        $exit_value = system( EXIT_ANY, @cmd );
-    }
+    my $exit_value = systemx( EXIT_ANY, @cmd );
     return $exit_value;
 }
 

@@ -1,5 +1,15 @@
 Revision history for Net-Async-Redis
 
+2.007     2020-09-05 02:08:25+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - applies client_name on connection if configured
+    - opentracing can be controlled by `->configure(opentracing => 1 || 0)`
+
+    Note that OpenTracing support is now *disabled* by default, since it
+    incurs a small (~5%) performance penalty. The USE_OPENTRACING env var
+    is still supported for enabling/disabling globally.
+
 2.006     2020-08-26 10:23:47+08:00 Asia/Kuala_Lumpur
     New features:
 

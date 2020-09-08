@@ -59,6 +59,13 @@ getValues = () ->
 	console.log values
 	values
 
+# Gets a query string parametrer
+# We cannot use URLSearchParam because of IE (#2230)
+getQueryParam = (name) ->
+	match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search)
+	if match then decodeURIComponent(match[1].replace(/\+/g, ' ')) else null
+
+
 # Code from http://snipplr.com/view/29434/
 # ----------------------------------------
 setSelector = "#appslist"
@@ -315,14 +322,10 @@ $(window).on 'load', () ->
 	#  1 - cookie value
 	#  2 - first navigator.languages item that exists in window.availableLanguages
 	#  3 - first value of window.availableLanguages
-	queryString = window.location.search
-	if queryString
-		console.log 'Parsed queryString:', queryString
-		urlParams = new URLSearchParams queryString
-	if urlParams
-		queryLang = urlParams.get('llnglanguage')
+	if window.location.search
+		queryLang = getQueryParam('llnglanguage')
 		console.log 'Get lang from parameter' if queryLang
-		setCookieLang = urlParams.get('setCookieLang')
+		setCookieLang = getQueryParam('setCookieLang')
 		console.log 'Set lang cookie' if setCookieLang == 1
 	if !lang
 		lang = getCookie 'llnglanguage'
@@ -377,6 +380,111 @@ $(window).on 'load', () ->
 		lang = $(this).attr 'title'
 		setCookie 'llnglanguage', lang
 		translatePage lang
+
+	isAlphaNumeric = (chr) ->
+		code = chr.charCodeAt(0)
+		if code > 47 and code < 58 or code > 64 and code < 91 or code > 96 and code < 123
+			return true
+		false
+
+	# Password policy
+	checkpassword = (password) ->
+		result = true
+		if window.datas.ppolicy.minsize > 0
+			if password.length >= window.datas.ppolicy.minsize
+				$('#ppolicy-minsize-feedback').addClass 'fa-check text-success'
+				$('#ppolicy-minsize-feedback').removeClass 'fa-times text-danger'
+			else
+				$('#ppolicy-minsize-feedback').removeClass 'fa-check text-success'
+				$('#ppolicy-minsize-feedback').addClass 'fa-times text-danger'
+				result = false
+		if window.datas.ppolicy.minupper > 0
+			upper = password.match(/[A-Z]/g)
+			if upper and upper.length >= window.datas.ppolicy.minupper
+				$('#ppolicy-minupper-feedback').addClass 'fa-check text-success'
+				$('#ppolicy-minupper-feedback').removeClass 'fa-times text-danger'
+			else
+				$('#ppolicy-minupper-feedback').removeClass 'fa-check text-success'
+				$('#ppolicy-minupper-feedback').addClass 'fa-times text-danger'
+				result = false
+		if window.datas.ppolicy.minlower > 0
+			lower = password.match(/[a-z]/g)
+			if lower and lower.length >= window.datas.ppolicy.minlower
+				$('#ppolicy-minlower-feedback').addClass 'fa-check text-success'
+				$('#ppolicy-minlower-feedback').removeClass 'fa-times text-danger'
+			else
+				$('#ppolicy-minlower-feedback').removeClass 'fa-check text-success'
+				$('#ppolicy-minlower-feedback').addClass 'fa-times text-danger'
+				result = false
+		if window.datas.ppolicy.mindigit > 0
+			digit = password.match(/[0-9]/g)
+			if digit and digit.length >= window.datas.ppolicy.mindigit
+				$('#ppolicy-mindigit-feedback').addClass 'fa-check text-success'
+				$('#ppolicy-mindigit-feedback').removeClass 'fa-times text-danger'
+			else
+				$('#ppolicy-mindigit-feedback').removeClass 'fa-check text-success'
+				$('#ppolicy-mindigit-feedback').addClass 'fa-times text-danger'
+				result = false
+
+		if window.datas.ppolicy.allowedspechar
+			nonwhitespechar = window.datas.ppolicy.allowedspechar.replace(/\s/g, '')
+			hasforbidden = false
+			i = 0
+			len = password.length
+			while i < len
+				if !isAlphaNumeric(password.charAt(i))
+					if nonwhitespechar.indexOf(password.charAt(i)) < 0
+						hasforbidden = true
+				i++
+			if hasforbidden == false
+				$('#ppolicy-allowedspechar-feedback').addClass 'fa-check text-success'
+				$('#ppolicy-allowedspechar-feedback').removeClass 'fa-times text-danger'
+			else
+				$('#ppolicy-allowedspechar-feedback').removeClass 'fa-check text-success'
+				$('#ppolicy-allowedspechar-feedback').addClass 'fa-times text-danger'
+				result = false
+
+		if window.datas.ppolicy.minspechar > 0 and window.datas.ppolicy.allowedspechar
+			numspechar = 0
+			nonwhitespechar = window.datas.ppolicy.allowedspechar.replace(/\s/g, '')
+			i = 0
+			while i < password.length
+				if nonwhitespechar.indexOf(password.charAt(i)) >= 0
+					numspechar++
+				i++
+			if numspechar >= window.datas.ppolicy.minspechar
+				$('#ppolicy-minspechar-feedback').addClass 'fa-check text-success'
+				$('#ppolicy-minspechar-feedback').removeClass 'fa-times text-danger'
+			else
+				$('#ppolicy-minspechar-feedback').removeClass 'fa-check text-success'
+				$('#ppolicy-minspechar-feedback').addClass 'fa-times text-danger'
+				result = false
+		if result
+			$('.ppolicy').removeClass('border-danger').addClass 'border-success'
+			$('#newpassword')[0].setCustomValidity('')
+		else
+			$('.ppolicy').removeClass('border-success').addClass 'border-danger'
+			$('#newpassword')[0].setCustomValidity(translate('PE28'))
+		return
+
+	if window.datas.ppolicy?
+		# Initialize display
+		checkpassword ''
+
+		$('#newpassword').keyup (e) ->
+			checkpassword e.target.value
+			return
+
+	checksamepass = () ->
+		if $('#confirmpassword')[0].value == $('#newpassword')[0].value
+			$('#confirmpassword')[0].setCustomValidity('')
+			return true
+		else
+			$('#confirmpassword')[0].setCustomValidity(translate('PE34'))
+			return false
+
+	$('#newpassword').change checksamepass
+	$('#confirmpassword').change checksamepass
 
 	# Ping if asked
 	if datas['pingInterval'] and datas['pingInterval'] > 0

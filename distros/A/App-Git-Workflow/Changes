@@ -1,5 +1,13 @@
 Revision history for git-workflow-tools
 
+1.1.13   2020-09-06
+        Updating for release of version 1.1.13
+        Updated date (Ivan Wills)
+        Clean without dieing (Ivan Wills)
+        Adding the missing implementation of branch age regex (Ivan Wills)
+        Fixing pod and adding formatting docs (Ivan Wills)
+        Protecting against already deleted branches causing errors (Ivan Wills)
+
 1.1.12   2019-12-17
         Updating for release of version 1.1.12
         Fixing issue with tests that require writable t/ dir (Ivan Wills)

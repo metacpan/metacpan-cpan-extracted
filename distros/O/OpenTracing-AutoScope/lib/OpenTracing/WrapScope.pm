@@ -1,5 +1,5 @@
 package OpenTracing::WrapScope;
-our $VERSION = 'v0.106.4';
+our $VERSION = 'v0.106.5';
 use strict;
 use warnings;
 use warnings::register;
@@ -8,6 +8,7 @@ use Carp qw/croak/;
 use List::Util qw/uniq/;
 use OpenTracing::GlobalTracer;
 use PerlX::Maybe;
+use Scalar::Util qw/blessed/;
 use Sub::Info qw/sub_info/;
 
 {  # transparent caller, stolen from Hook::LexWrap
@@ -94,11 +95,29 @@ sub install_wrapped {
             next;
         }
 
-        no strict 'refs';
-        no warnings 'redefine';
-        *$sub = wrapped(\&$sub);
+        my $wrapped = wrapped(\&$sub);
+
+        my ($class, $method) = split /(?:'|::)(?=\w+\z)/, $sub;
+        if (_is_moose_class($class)) {   # Moose complains about replaced subs
+            if ($class->meta->is_immutable) {
+                warnings::warn "Can't wrap Moose method $sub from an immutable class";
+                next;
+            }
+            $class->meta->add_method($method => $wrapped);
+        }
+        else {
+            no strict 'refs';
+            no warnings 'redefine';
+            *$sub = $wrapped;
+        }
     }
     return;
+}
+
+sub _is_moose_class {
+    my ($class) = @_;
+    my $meta = eval { $class->meta } or return;
+    return blessed $meta && $meta->isa('Moose::Meta::Class');
 }
 
 sub wrapped {

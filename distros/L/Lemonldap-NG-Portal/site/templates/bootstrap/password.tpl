@@ -19,7 +19,7 @@
     <div class="input-group mb-3">
       <input name="user" type="hidden" value="<TMPL_VAR NAME=LOGIN>" />
       <div class="input-group-prepend">
-        <span class="input-group-text"><i class="fa fa-user"></i></span>
+        <span class="input-group-text"><label for="staticUser" class="mb-0"><i class="fa fa-user"></i></label></span>
       </div>
       <input id="staticUser" type="text" readonly class="form-control" value="<TMPL_VAR NAME=LOGIN>" />
     </div>
@@ -32,7 +32,7 @@
       <TMPL_ELSE>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text"><i class="fa fa-lock"></i></span>
+            <span class="input-group-text"><label for="oldpassword" class="mb-0"><i class="fa fa-lock"></i></label></span>
           </div>
           <input id="oldpassword" name="oldpassword" type="password" value="<TMPL_VAR NAME=OLDPASSWORD>" class="form-control" trplaceholder="currentPwd" required aria-required="true">
         </div>
@@ -44,13 +44,13 @@
 
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text"><i class="fa fa-lock"></i></span>
+        <span class="input-group-text"><label for="newpassword" class="mb-0"><i class="fa fa-lock"></i></label></span>
       </div>
       <input id="newpassword" name="newpassword" type="password" class="form-control" trplaceholder="newPassword" required aria-required="true"/>
     </div>
     <div class="form-group input-group">
       <div class="input-group-prepend">
-        <span class="input-group-text"><i class="fa fa-lock"></i></span>
+        <span class="input-group-text"><label for="confirmpassword" class="mb-0"><i class="fa fa-lock"></i></label></span>
       </div>
       <input id="confirmpassword" name="confirmpassword" type="password" class="form-control" trplaceholder="confirmPwd" required aria-required="true"/>
     </div>

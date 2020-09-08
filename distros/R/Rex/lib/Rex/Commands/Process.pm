@@ -31,7 +31,7 @@ package Rex::Commands::Process;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;

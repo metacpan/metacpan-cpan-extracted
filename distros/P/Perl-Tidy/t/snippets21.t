@@ -14,6 +14,11 @@
 #11 git33.git33
 #12 rt133130.def
 #13 rt133130.rt133130
+#14 nib.def
+#15 nib.nib1
+#16 nib.nib2
+#17 scbb-csc.def
+#18 scbb-csc.scbb-csc
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -36,12 +41,17 @@ BEGIN {
 -wls='->' -wrs='->'
 
 ----------
-        'gnu'      => "-gnu",
-        'lop'      => "-nlop",
+        'gnu'  => "-gnu",
+        'lop'  => "-nlop",
+        'nib1' => "-nnib",
+        'nib2' => <<'----------',
+-nib -nibp='#\+\+'
+----------
         'rt133130' => <<'----------',
 # only the method should get a csc:
 -csc -cscl=sub -sal=method
 ----------
+        'scbb-csc'     => "-scbb -csc",
         'sot'          => "-sot -sct",
         'switch_plain' => "-nola",
     };
@@ -105,6 +115,25 @@ $bits =
 lc( $self->mime_attr('content-type')
         || $self->{MIH_DefaultType}
         || 'text/plain' );
+----------
+
+        'nib' => <<'----------',
+{    #<<<
+{    #<<<
+{    #++
+    print "hello world\n";
+}
+}
+}
+
+{    #++
+    {    #++
+        {    #<<<
+        print "hello world\n";
+        }
+    }
+}
+
 ----------
 
         'prune' => <<'----------',
@@ -179,6 +208,42 @@ method sum_radlinks {
         }
     }
 }
+----------
+
+        'scbb-csc' => <<'----------',
+sub perlmod_install_advice
+{
+my(@mod) = @_;
+if ($auto_install_cpan) {
+require AutoInstall::Tk;
+my $r = AutoInstall::Tk::do_autoinstall_tk(@mod);
+if ($r > 0) {
+for my $mod (@mod) {
+warn "Re-require $mod...\n";
+eval "require $mod";
+die __LINE__ . ": $@" if $@;
+}}
+} 
+else {
+my $shell = ($os eq 'win' ? M"Eingabeaufforderung" : M"Shell");
+status_message
+(
+Mfmt(
+(
+@mod > 1
+? "Die fehlenden Perl-Module können aus der %s mit dem Kommando\n"
+: "Das fehlende Perl-Modul kann aus der %s mit dem Kommando\n"
+),
+$shell
+)
+.
+"    perl -MCPAN -e \"install " . join(", ", @mod) . "\"\n" .
+"aus dem Internet geholt und installiert werden.\n",
+"err"
+);
+} 
+} 
+
 ----------
 
         'sot' => <<'----------',
@@ -460,8 +525,8 @@ elsif ( $seen == 2 ) {    # We're the second word to have this
                           # abbreviation, so we can't use it.
     delete $hashref->{$abbrev};
 }
-else {                    # We're the third word to have this
-                          # abbreviation, so skip to the next word.
+else {    # We're the third word to have this
+          # abbreviation, so skip to the next word.
     next WORD;
 }
 #8...........
@@ -558,6 +623,153 @@ method sum_radlinks {
     }
 } ## end sub sum_radlinks
 #13...........
+        },
+
+        'nib.def' => {
+            source => "nib",
+            params => "def",
+            expect => <<'#14...........',
+{    #<<<
+{    #<<<
+{    #++
+    print "hello world\n";
+}
+}
+}
+
+{    #++
+    {    #++
+        {    #<<<
+        print "hello world\n";
+        }
+    }
+}
+
+#14...........
+        },
+
+        'nib.nib1' => {
+            source => "nib",
+            params => "nib1",
+            expect => <<'#15...........',
+{    #<<<
+    {    #<<<
+        {    #++
+            print "hello world\n";
+        }
+    }
+}
+
+{    #++
+    {    #++
+        {    #<<<
+            print "hello world\n";
+        }
+    }
+}
+
+#15...........
+        },
+
+        'nib.nib2' => {
+            source => "nib",
+            params => "nib2",
+            expect => <<'#16...........',
+{    #<<<
+    {    #<<<
+        {    #++
+        print "hello world\n";
+        }
+    }
+}
+
+{    #++
+{    #++
+{    #<<<
+    print "hello world\n";
+}
+}
+}
+
+#16...........
+        },
+
+        'scbb-csc.def' => {
+            source => "scbb-csc",
+            params => "def",
+            expect => <<'#17...........',
+sub perlmod_install_advice {
+    my (@mod) = @_;
+    if ($auto_install_cpan) {
+        require AutoInstall::Tk;
+        my $r = AutoInstall::Tk::do_autoinstall_tk(@mod);
+        if ( $r > 0 ) {
+            for my $mod (@mod) {
+                warn "Re-require $mod...\n";
+                eval "require $mod";
+                die __LINE__ . ": $@" if $@;
+            }
+        }
+    }
+    else {
+        my $shell = ( $os eq 'win' ? M "Eingabeaufforderung" : M "Shell" );
+        status_message(
+            Mfmt(
+                (
+                    @mod > 1
+                    ? "Die fehlenden Perl-Module können aus der %s mit dem Kommando\n"
+                    : "Das fehlende Perl-Modul kann aus der %s mit dem Kommando\n"
+                ),
+                $shell
+              )
+              . "    perl -MCPAN -e \"install "
+              . join( ", ", @mod ) . "\"\n"
+              . "aus dem Internet geholt und installiert werden.\n",
+            "err"
+        );
+    }
+}
+
+#17...........
+        },
+
+        'scbb-csc.scbb-csc' => {
+            source => "scbb-csc",
+            params => "scbb-csc",
+            expect => <<'#18...........',
+sub perlmod_install_advice {
+    my (@mod) = @_;
+    if ($auto_install_cpan) {
+        require AutoInstall::Tk;
+        my $r = AutoInstall::Tk::do_autoinstall_tk(@mod);
+        if ( $r > 0 ) {
+            for my $mod (@mod) {
+                warn "Re-require $mod...\n";
+                eval "require $mod";
+                die __LINE__ . ": $@" if $@;
+            }
+        } ## end if ( $r > 0 )
+    } ## end if ($auto_install_cpan)
+    else {
+        my $shell = ( $os eq 'win' ? M "Eingabeaufforderung" : M "Shell" );
+        status_message(
+            Mfmt(
+                (
+                    @mod > 1
+                    ? "Die fehlenden Perl-Module können aus der %s mit dem Kommando\n"
+                    : "Das fehlende Perl-Modul kann aus der %s mit dem Kommando\n"
+                ),
+                $shell
+              )
+              . "    perl -MCPAN -e \"install "
+              . join( ", ", @mod ) . "\"\n"
+              . "aus dem Internet geholt und installiert werden.\n",
+            "err"
+        );
+    } ## end else [ if ($auto_install_cpan)]
+} ## end sub perlmod_install_advice
+
+#18...........
         },
     };
 

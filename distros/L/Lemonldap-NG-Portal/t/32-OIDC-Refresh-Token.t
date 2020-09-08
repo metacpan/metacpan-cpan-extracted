@@ -119,6 +119,7 @@ ok( $refresh_token, "Got refresh token" );
 ok( $id_token,      "Got ID token" );
 
 my $id_token_payload = id_token_payload($id_token);
+is( $id_token_payload->{sub}, 'french', 'Found sub in ID token' );
 is( $id_token_payload->{name}, 'Frédéric Accents',
     'Found claim in ID token' );
 ok( ( grep { $_ eq "rpid" } @{ $id_token_payload->{aud} } ),
@@ -145,6 +146,7 @@ $res = $op->_post(
 
 $json = expectJSON($res);
 
+ok( $json->{'sub'} eq "french",              'Got User Info' );
 ok( $json->{'name'} eq "Frédéric Accents", 'Got User Info' );
 
 # Skip ahead in time
@@ -189,6 +191,7 @@ ok( $id_token,                       "Got refreshed ID token" );
 ok( !defined $json->{refresh_token}, "Refresh token not present" );
 
 $id_token_payload = id_token_payload($id_token);
+is( $id_token_payload->{sub}, 'french', 'Found sub in ID token' );
 is( $id_token_payload->{name}, 'Frédéric Accents',
     'Found claim in ID token' );
 
@@ -205,6 +208,7 @@ $res = $op->_post(
 
 $json = expectJSON($res);
 
+ok( $json->{'sub'} eq "french",              'Got User Info' );
 ok( $json->{'name'} eq "Frédéric Accents", 'Got User Info' );
 
 # Check failure conditions
@@ -247,4 +251,3 @@ is( $res->[0], 401,
 
 clean_sessions();
 done_testing();
-

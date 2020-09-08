@@ -1,9 +1,9 @@
-use Modern::Perl "2010";
+use v5.10; use warnings;
 use Test::More;
 use Test::Exception;
 use Module::Loaded;
 
-BEGIN { use_ok('Bitcoin::Crypto', qw(:all))};
+BEGIN { use_ok('Bitcoin::Crypto', qw(:all)) }
 
 like(Bitcoin::Crypto->VERSION(), qr/\d+\.\d+/, "version string ok");
 

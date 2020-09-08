@@ -5,7 +5,7 @@ use strict;
 use Exporter 'import';
 use base qw(Exporter);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 # CONSTANTS
 
@@ -23,8 +23,14 @@ use constant HANDLERSECTION  => "handler";
 use constant MANAGERSECTION  => "manager";
 use constant SESSIONSEXPLORERSECTION => "sessionsExplorer";
 use constant APPLYSECTION            => "apply";
+
+# Default configuration backend
+use constant DEFAULTCONFBACKEND => "File";
+use constant DEFAULTCONFBACKENDOPTIONS => (
+    dirName => '/usr/local/lemonldap-ng/data/conf',
+);
 our $hashParameters = qr/^(?:(?:l(?:o(?:ca(?:lSessionStorageOption|tionRule)|goutService)|dapExportedVar|wp(?:Ssl)?Opt)|(?:(?:d(?:emo|bi)|facebook|webID)ExportedVa|exported(?:Heade|Va)|issuerDBGetParamete)r|re(?:moteGlobalStorageOption|st2f(?:Verify|Init)Arg|loadUrl)|g(?:r(?:antSessionRule|oup)|lobalStorageOption)|n(?:otificationStorageOption|ginxCustomHandler)|macro)s|o(?:idc(?:S(?:ervice(?:DynamicRegistrationEx(?:portedVar|traClaim)s|MetaDataAuthnContext)|torageOptions)|RPMetaData(?:(?:Option(?:sExtraClaim)?|ExportedVar|Macro)s|Node)|OPMetaData(?:(?:ExportedVar|Option)s|J(?:SON|WKS)|Node))|penIdExportedVars)|s(?:aml(?:S(?:PMetaData(?:(?:ExportedAttribute|Option|Macro)s|Node|XML)|torageOptions)|IDPMetaData(?:(?:ExportedAttribute|Option)s|Node|XML))|essionDataToRemember|laveExportedVars|fExtra)|c(?:as(?:A(?:ppMetaData(?:(?:ExportedVar|Option|Macro)s|Node)|ttributes)|S(?:rvMetaData(?:(?:ExportedVar|Option)s|Node)|torageOptions))|(?:ustom(?:Plugins|Add)Param|ombModule)s)|p(?:ersistentStorageOptions|o(?:rtalSkinRules|st))|a(?:ut(?:hChoiceMod|oSigninR)ules|pplicationList)|v(?:hostOptions|irtualHost)|S(?:MTPTLSOpts|SLVarIf))$/;
-our $boolKeys = qr/^(?:s(?:aml(?:IDP(?:MetaDataOptions(?:(?:Check(?:S[LS]OMessageSignatur|Audienc|Tim)|IsPassiv)e|A(?:llow(?:LoginFromIDP|ProxiedAuthn)|daptSessionUtime)|Force(?:Authn|UTF8)|StoreSAMLToken|RelayStateURL)|SSODescriptorWantAuthnRequestsSigned)|S(?:P(?:MetaDataOptions(?:(?:CheckS[LS]OMessageSignatur|OneTimeUs)e|EnableIDPInitiatedURL|ForceUTF8)|SSODescriptor(?:WantAssertion|AuthnRequest)sSigned)|erviceUseCertificateInResponse)|DiscoveryProtocol(?:Activation|IsPassive)|CommonDomainCookieActivation|UseQueryStringSpecific|MetadataForceUTF8)|oap(?:Session|Config)Server|t(?:ayConnecte|orePasswor)d|kipRenewConfirmation|fRemovedUseNotif|laveDisplayLogo|howLanguages|slByAjax)|o(?:idc(?:RPMetaDataOptions(?:Allow(?:PasswordGrant|Offline)|Re(?:freshToken|quirePKCE)|LogoutSessionRequired|IDTokenForceClaims|BypassConsent|Public)|ServiceAllow(?:(?:AuthorizationCode|Implicit|Hybrid)Flow|DynamicRegistration)|OPMetaDataOptions(?:(?:CheckJWTSignatur|UseNonc)e|StoreIDToken))|ldNotifFormat)|p(?:ortal(?:Display(?:Re(?:freshMyRights|setPassword|gister)|GeneratePassword|PasswordPolicy)|ErrorOn(?:ExpiredSession|MailNotFound)|(?:CheckLogin|Statu)s|OpenLinkInNewWindow|ForceAuthn|AntiFrame)|roxyUseSoap)|l(?:dap(?:(?:Group(?:DecodeSearchedValu|Recursiv)|UsePasswordResetAttribut)e|(?:AllowResetExpired|Set)Password|ChangePasswordAsUser|PpolicyControl|ITDS)|oginHistoryEnabled)|c(?:a(?:ptcha_(?:register|login|mail)_enabled|sSrvMetaDataOptions(?:Gateway|Renew))|o(?:ntextSwitchingStopWithLogout|mpactConf|rsEnabled)|heck(?:State|User|XSS)|da)|no(?:tif(?:ication(?:Server(?:(?:POS|GE)T|DELETE)?|sExplorer)?|y(?:Deleted|Other))|AjaxHook)|i(?:ssuerDB(?:OpenID(?:Connect)?|SAML|CAS|Get)Activation|mpersonationSkipEmptyValues)|to(?:tp2f(?:UserCan(?:Chang|Remov)eKey|DisplayExistingSecret)|kenUseGlobalStorage)|u(?:se(?:RedirectOn(?:Forbidden|Error)|SafeJail)|2fUserCanRemoveKey|pgradeSession)|br(?:uteForceProtection(?:IncrementalTempo)?|owsersDontStorePassword)|re(?:st(?:(?:Session|Config)Server|ExportSecretKeys)|freshSessions)|(?:mai(?:lOnPasswordChang|ntenanc)|vhostMaintenanc)e|d(?:isablePersistentStorage|biDynamicHashEnabled)|g(?:roupsBeforeMacros|lobalLogoutTimer)|h(?:ideOldPassword|ttpOnly)|yubikey2fUserCanRemoveKey|(?:activeTim|wsdlServ)er|krb(?:RemoveDomain|ByJs))$/;
+our $boolKeys = qr/^(?:s(?:aml(?:IDP(?:MetaDataOptions(?:(?:Check(?:S[LS]OMessageSignatur|Audienc|Tim)|IsPassiv)e|A(?:llow(?:LoginFromIDP|ProxiedAuthn)|daptSessionUtime)|Force(?:Authn|UTF8)|StoreSAMLToken|RelayStateURL)|SSODescriptorWantAuthnRequestsSigned)|S(?:P(?:MetaDataOptions(?:(?:CheckS[LS]OMessageSignatur|OneTimeUs)e|EnableIDPInitiatedURL|ForceUTF8)|SSODescriptor(?:WantAssertion|AuthnRequest)sSigned)|erviceUseCertificateInResponse)|DiscoveryProtocol(?:Activation|IsPassive)|CommonDomainCookieActivation|UseQueryStringSpecific|MetadataForceUTF8)|f(?:RemovedUseNotif|OnlyUpgrade)|kip(?:Upgrade|Renew)Confirmation|oap(?:Session|Config)Server|t(?:ayConnecte|orePasswor)d|laveDisplayLogo|howLanguages|slByAjax)|o(?:idc(?:RPMetaDataOptions(?:Allow(?:PasswordGrant|Offline)|Re(?:freshToken|quirePKCE)|LogoutSessionRequired|IDTokenForceClaims|BypassConsent|Public)|ServiceAllow(?:(?:AuthorizationCode|Implicit|Hybrid)Flow|DynamicRegistration)|OPMetaDataOptions(?:(?:CheckJWTSignatur|UseNonc)e|StoreIDToken))|ldNotifFormat)|p(?:ortal(?:Display(?:Re(?:freshMyRights|setPassword|gister)|GeneratePassword|PasswordPolicy)|ErrorOn(?:ExpiredSession|MailNotFound)|(?:CheckLogin|Statu)s|OpenLinkInNewWindow|ForceAuthn|AntiFrame)|roxyUseSoap)|l(?:dap(?:(?:Group(?:DecodeSearchedValu|Recursiv)|UsePasswordResetAttribut)e|(?:AllowResetExpired|Set)Password|ChangePasswordAsUser|PpolicyControl|ITDS)|oginHistoryEnabled)|c(?:a(?:ptcha_(?:register|login|mail)_enabled|sSrvMetaDataOptions(?:Gateway|Renew))|o(?:ntextSwitchingStopWithLogout|mpactConf|rsEnabled)|heck(?:State|User|XSS)|da)|no(?:tif(?:ication(?:Server(?:(?:POS|GE)T|DELETE)?|sExplorer)?|y(?:Deleted|Other))|AjaxHook)|i(?:ssuerDB(?:OpenID(?:Connect)?|SAML|CAS|Get)Activation|mpersonationSkipEmptyValues)|to(?:tp2f(?:UserCan(?:Chang|Remov)eKey|DisplayExistingSecret)|kenUseGlobalStorage)|u(?:se(?:RedirectOn(?:Forbidden|Error)|SafeJail)|2fUserCanRemoveKey|pgradeSession)|re(?:st(?:(?:Password|Session|Config|Auth)Server|ExportSecretKeys)|freshSessions)|br(?:uteForceProtection(?:IncrementalTempo)?|owsersDontStorePassword)|(?:mai(?:lOnPasswordChang|ntenanc)|vhostMaintenanc)e|d(?:isablePersistentStorage|biDynamicHashEnabled)|g(?:roupsBeforeMacros|lobalLogoutTimer)|h(?:ideOldPassword|ttpOnly)|yubikey2fUserCanRemoveKey|(?:activeTim|wsdlServ)er|krb(?:RemoveDomain|ByJs))$/;
 
 our @sessionTypes = ( 'remoteGlobal', 'global', 'localSession', 'persistent', 'saml', 'oidc', 'cas' );
 
@@ -47,6 +53,8 @@ our %EXPORT_TAGS = (
           MANAGERSECTION
           SESSIONSEXPLORERSECTION
           APPLYSECTION
+          DEFAULTCONFBACKEND
+          DEFAULTCONFBACKENDOPTIONS
           NO
           $hashParameters
           @sessionTypes

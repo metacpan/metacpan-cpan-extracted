@@ -1,5 +1,8 @@
 Changes for PDL-DateTime distribution
 
+0.004   2020/09/05
+        - fix #1 + fix #2 (hangs when PDL::Complex is loaded)
+
 0.003   2017/01/01
         - fix: dt_periodicity
 

@@ -1,6 +1,10 @@
-Revision history for Perinci-Examples-Bin-Any
+0.070   2020-04-29  Released-By: PERLANCAR; Urgency: medium
 
-0.06    2015-09-09 (PERLANCAR)
+        - [build] Rebuild with update Perinci::Examples::CLI to remove
+          dependency to the deprecated Perinci::Sub::ArgEntity::*.
+
+
+0.06    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -9,29 +13,29 @@ Revision history for Perinci-Examples-Bin-Any
 	  requirement.
 
 
-0.05    2014-11-21 (PERLANCAR)
+0.05    2014-11-21  Released-By: PERLANCAR
 
 	- Rename/add scripts: peri-eg-{multi,single}-embedded-any (as well
 	  add the non-embedded version).
 
 
-0.04    2014-11-20 (PERLANCAR)
+0.04    2014-11-20  Released-By: PERLANCAR
 
 	- Add script: peri-eg-demo-cli-opts-any.
 
 
-0.03    2014-10-24 (PERLANCAR)
+0.03    2014-10-24  Released-By: PERLANCAR
 
 	- Add script: peri-eg-gen-random-bytes-any.
 
 	- Rename scripts.
 
 
-0.02     2014-07-18 (SHARYANTO)
+0.02     2014-07-18  Released-By: SHARYANTO
 
          - Add more stuffs to metadata, to test Perinci::CmdLine::Lite.
 
 
-0.01     2014-07-18 (SHARYANTO)
+0.01     2014-07-18  Released-By: SHARYANTO
 
          - First release.

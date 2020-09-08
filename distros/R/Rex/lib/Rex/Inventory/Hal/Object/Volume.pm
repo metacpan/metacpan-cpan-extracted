@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 use Rex::Inventory::Hal::Object;
 use base qw(Rex::Inventory::Hal::Object);

@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::Logger::Syslog;
 use strict;
 use Sys::Syslog qw(:standard);
 
-our $VERSION = '2.0.5';
+our $VERSION = '2.0.9';
 
 sub new {
     my ( $class, $conf, %args ) = @_;
@@ -11,11 +11,13 @@ sub new {
     my $self  = bless {}, $class;
     if ( $args{user} ) {
         $self->{facility} = $conf->{userSyslogFacility} || 'auth';
+        $self->{options}  = $conf->{userSyslogOptions}  || 'cons,pid,ndelay';
     }
     else {
         $self->{facility} = $conf->{syslogFacility} || 'daemon';
+        $self->{options}  = $conf->{syslogOptions}  || 'cons,pid,ndelay';
     }
-    eval { openlog( 'LLNG', 'cons,pid,ndelay', $self->{facility} ) };
+    eval { openlog( 'LLNG', $self->{options}, $self->{facility} ) };
     no warnings 'redefine';
     my $show = 1;
     foreach (qw(error warn notice info debug)) {

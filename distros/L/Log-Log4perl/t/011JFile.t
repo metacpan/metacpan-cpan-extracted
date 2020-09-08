@@ -8,6 +8,8 @@ BEGIN {
 use Log::Log4perl;
 use Test::More;
 use File::Spec;
+use lib File::Spec->catdir(qw(t lib));
+use Log4perlInternalTest qw(tmpdir);
 
 our $LOG_DISPATCH_PRESENT = 0;
 
@@ -21,21 +23,8 @@ BEGIN {
     }
 };
 
-my $WORK_DIR = "tmp";
-if(-d "t") {
-    $WORK_DIR = File::Spec->catfile(qw(t tmp));
-}
-unless (-e "$WORK_DIR"){
-    mkdir("$WORK_DIR", 0755) || die "can't create $WORK_DIR ($!)";
-}
-
-use vars qw(@outfiles $test_logfile); 
-$test_logfile = File::Spec->catfile($WORK_DIR, 'test2.log');
-@outfiles = ($test_logfile);
-foreach my $f (@outfiles){
-    unlink $f if (-e $f);
-}
-
+my $WORK_DIR = tmpdir();
+my $test_logfile = File::Spec->catfile($WORK_DIR, 'test2.log');
 
 my $conf = <<CONF;
 log4j.category.cat1      = INFO, myAppender
@@ -71,7 +60,9 @@ EOL
 }
 is ($result, $expected);
 
-foreach my $f (@outfiles){
-    unlink $f if (-e $f);
-}
+reset_logger();
 
+sub reset_logger {
+  local $Log::Log4perl::Config::CONFIG_INTEGRITY_CHECK = 0; # to close handles and allow temp files to go
+  Log::Log4perl::init(\'');
+}

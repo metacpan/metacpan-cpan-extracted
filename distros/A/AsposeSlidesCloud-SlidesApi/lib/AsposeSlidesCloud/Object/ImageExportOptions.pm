@@ -94,6 +94,7 @@ sub new {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
+	$self->{ format } = 'image';
 	
 	return $self;
 }  
@@ -164,6 +165,13 @@ __PACKAGE__->class_documentation({description => 'Provides options that control 
 }                                 );
 
 __PACKAGE__->method_documentation({
+    'default_regular_font' => {
+    	datatype => 'string',
+    	base_name => 'DefaultRegularFont',
+    	description => 'Setting user password to protect the PDF document. ',
+    	format => '',
+    	read_only => '',
+    		},
     'format' => {
     	datatype => 'string',
     	base_name => 'Format',
@@ -202,6 +210,7 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
+    'default_regular_font' => 'string',
     'format' => 'string',
     'notes_position' => 'string',
     'comments_position' => 'string',
@@ -210,6 +219,7 @@ __PACKAGE__->swagger_types( {
 } );
 
 __PACKAGE__->attribute_map( {
+    'default_regular_font' => 'DefaultRegularFont',
     'format' => 'Format',
     'notes_position' => 'NotesPosition',
     'comments_position' => 'CommentsPosition',

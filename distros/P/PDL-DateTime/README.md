@@ -4,11 +4,11 @@ PDL::DateTime - A piddle for keeping high precision (microsecond) timestamps
 
 # DESCRIPTION
 
-[PDL::DateTime](https://metacpan.org/pod/PDL::DateTime) is a subclass of [PDL](https://metacpan.org/pod/PDL) piddle for storing date-time values (scalar piddles, vectors, matrices or generally ND-piddles):
+[PDL::DateTime](https://metacpan.org/pod/PDL%3A%3ADateTime) is a subclass of [PDL](https://metacpan.org/pod/PDL) piddle for storing date-time values (scalar piddles, vectors, matrices or generally ND-piddles):
 
 - its PDL type is always `LongLong` (64-bit signed integer)
 - **stored values are microseconds** since `1970-01-01T00:00:00.000000Z` (can be both positive or negative)
-- it is still a piddle so you can do all usual PDL arithmetic + [PDL::DateTime](https://metacpan.org/pod/PDL::DateTime) defines some new methods (see below)
+- it is still a piddle so you can do all usual PDL arithmetic + [PDL::DateTime](https://metacpan.org/pod/PDL%3A%3ADateTime) defines some new methods (see below)
 
 # LIMITATIONS
 
@@ -102,7 +102,7 @@ See [https://en.wikipedia.org/wiki/Julian\_day](https://en.wikipedia.org/wiki/Ju
        [ '2017-09-20T15:45', '2017-09-20T16:45', '2017-09-20T17:45' ],
     ]);
 
-Supported formats - see [Time::Moment](https://metacpan.org/pod/Time::Moment#from_string).
+Supported formats - see [Time::Moment](https://metacpan.org/pod/Time%3A%3AMoment#from_string).
 
 ## new\_from\_parts
 
@@ -306,7 +306,7 @@ instead of separately calling `dt_year`, `dt_month` and `dt_day`.
     my $array = $p->dt_unpdl('Time::Moment');
     # returns perl arrayref with Time::Moment objects
 
-See [Time::Moment](https://metacpan.org/pod/Time::Moment#strftime) (which we use for stringification) for supported formats.
+See [Time::Moment](https://metacpan.org/pod/Time%3A%3AMoment#strftime) (which we use for stringification) for supported formats.
 
 ## dt\_at
 
@@ -399,7 +399,7 @@ Combines ["dt\_startpoints"](#dt_startpoints) and ["dt\_endpoints"](#dt_endpoint
     #  [3 7]
     # ]
 
-The piddle returned by this function can be passed to [apply\_slice](https://metacpan.org/pod/PDL::Apply#apply_slice).
+The piddle returned by this function can be passed to [apply\_slice](https://metacpan.org/pod/PDL%3A%3AApply#apply_slice).
 
 ## dt\_nperiods
 

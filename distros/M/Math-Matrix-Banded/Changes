@@ -1,0 +1,20 @@
+Revision history for Math-Matrix-Banded
+
+0.004   ...
+        docu and other preparations for CPAN release
+
+0.003   Fri Sep  4 14:06:09 CEST 2020
+        - Math::Matrix::Banded as interface class for
+          - ::Square
+          - ::Rectangular
+
+0.002   Mon Aug 24 17:32:07 CEST 2020
+        - basic functionality for rectangular matrices
+
+0.001   Sun Aug 16 19:02:34 CEST 2020
+        - set/retrieve
+        - multiply_vector
+        - multiply_matrix
+        - decompose_LU without pivoting
+        - solve_LU
+

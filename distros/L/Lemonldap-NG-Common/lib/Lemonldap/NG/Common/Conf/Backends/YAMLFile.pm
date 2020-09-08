@@ -5,7 +5,7 @@ use Lemonldap::NG::Common::Conf::Constants;    #inherits
 use YAML qw();
 use Encode;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.9';
 our $initDone;
 $YAML::Numify = 1;
 
@@ -41,7 +41,7 @@ sub available {
     closedir D;
     @conf =
       sort { $a <=> $b }
-      map  { /lmConf-(\d+)\.yaml/ ? ( $1 + 0 ) : () } @conf;
+      map { /lmConf-(\d+)\.yaml/ ? ( $1 + 0 ) : () } @conf;
     return @conf;
 }
 

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200606131959;
+our $VERSION = 1.20200904144532;
 
 my $formatters = [
                 {
@@ -54,26 +54,6 @@ my $validators = {
                 'voip' => '40\\d{5}'
               };
 my %areanames = ();
-$areanames{pt}->{245320} = "Bissau";
-$areanames{pt}->{245321} = "Bissau";
-$areanames{pt}->{245322} = "Sta\.\ Luzia";
-$areanames{pt}->{245325} = "Brá";
-$areanames{pt}->{245331} = "Mansôa";
-$areanames{pt}->{245332} = "Bigene\/Bissorã";
-$areanames{pt}->{245334} = "Mansaba";
-$areanames{pt}->{245335} = "Farim";
-$areanames{pt}->{245341} = "Bafatá";
-$areanames{pt}->{245342} = "Bambadinca";
-$areanames{pt}->{245351} = "Gabú";
-$areanames{pt}->{245352} = "Sonaco";
-$areanames{pt}->{245353} = "Pirada";
-$areanames{pt}->{245354} = "Pitche";
-$areanames{pt}->{245370} = "Buba";
-$areanames{pt}->{245391} = "Canchungo";
-$areanames{pt}->{245392} = "Cacheu";
-$areanames{pt}->{245393} = "S\.\ Domingos";
-$areanames{pt}->{245394} = "Bula";
-$areanames{pt}->{245396} = "Ingoré";
 $areanames{en}->{24544320} = "Bissau";
 $areanames{en}->{24544321} = "Bissau";
 $areanames{en}->{24544322} = "St\.\ Luzia";
@@ -95,6 +75,26 @@ $areanames{en}->{24544393} = "S\.\ Domingos";
 $areanames{en}->{24544394} = "Bula";
 $areanames{en}->{24544396} = "Ingoré";
 $areanames{en}->{24544397} = "Bigene";
+$areanames{pt}->{245320} = "Bissau";
+$areanames{pt}->{245321} = "Bissau";
+$areanames{pt}->{245322} = "Sta\.\ Luzia";
+$areanames{pt}->{245325} = "Brá";
+$areanames{pt}->{245331} = "Mansôa";
+$areanames{pt}->{245332} = "Bigene\/Bissorã";
+$areanames{pt}->{245334} = "Mansaba";
+$areanames{pt}->{245335} = "Farim";
+$areanames{pt}->{245341} = "Bafatá";
+$areanames{pt}->{245342} = "Bambadinca";
+$areanames{pt}->{245351} = "Gabú";
+$areanames{pt}->{245352} = "Sonaco";
+$areanames{pt}->{245353} = "Pirada";
+$areanames{pt}->{245354} = "Pitche";
+$areanames{pt}->{245370} = "Buba";
+$areanames{pt}->{245391} = "Canchungo";
+$areanames{pt}->{245392} = "Cacheu";
+$areanames{pt}->{245393} = "S\.\ Domingos";
+$areanames{pt}->{245394} = "Bula";
+$areanames{pt}->{245396} = "Ingoré";
 
     sub new {
       my $class = shift;

@@ -2,7 +2,7 @@ NAME
     Class::Tiny - Minimalist class construction
 
 VERSION
-    version 1.006
+    version 1.008
 
 SYNOPSIS
     In Person.pm:
@@ -230,7 +230,7 @@ USAGE
     defines a "DEMOLISH" method, they will be called from the child class to
     the furthest parent class during object destruction. It is provided a
     single boolean argument indicating whether Perl is in global
-    destruction. Return values and errors are ignored.
+    destruction. Return values are ignored. Errors are caught and rethrown.
 
         sub DEMOLISH {
             my ($self, $global_destruct) = @_;
@@ -320,20 +320,6 @@ RATIONALE
     "BUILD" and "DEMOLISH" for some minimal interoperability and an easier
     upgrade path.
 
-SUPPORT
-  Bugs / Feature Requests
-    Please report any bugs or feature requests through the issue tracker at
-    <https://github.com/dagolden/Class-Tiny/issues>. You will be notified
-    automatically of any progress on your issue.
-
-  Source Code
-    This is open source software. The code repository is available for
-    public review and contribution under the terms of the license.
-
-    <https://github.com/dagolden/Class-Tiny>
-
-      git clone https://github.com/dagolden/Class-Tiny.git
-
 AUTHOR
     David Golden <dagolden@cpan.org>
 
@@ -345,6 +331,8 @@ CONTRIBUTORS
     *   Gelu Lupas <gelu@devnull.ro>
 
     *   Karen Etheridge <ether@cpan.org>
+
+    *   Matt S Trout <mstrout@cpan.org>
 
     *   Olivier Mengué <dolmen@cpan.org>
 

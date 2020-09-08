@@ -50,7 +50,7 @@ package Rex::Shared::Var;
 use strict qw(vars subs);
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 require Exporter;
 use base qw(Exporter);

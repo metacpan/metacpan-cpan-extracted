@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Simple tests => 9;
+use Test::Simple tests => 12;
 
 use Mail::DKIM::ARC::Signer;
 
@@ -82,13 +82,14 @@ $arc->PRINT($sample_email);
 $arc->CLOSE;
 
 ok($arc->result() eq 'sealed', 'result() is sealed');
-my ($as) = $arc->as_strings();
+my ($as, $ams, $aar) = $arc->as_strings();
 ok($as =~ m/\bcv=none\b/, 'AS has cv=none');
+ok($aar =~ m/\Q example.org; none\E/, 'AAR has AR contents');
 
 ## Chain ar, AR header pass
 
 $sample_email = <<END_OF_SAMPLE;
-Authentication-Results: example.org; dkim=none (no signatures); arc=pass (something or other)
+Authentication-Results: example.org;  dkim=none (no signatures);  arc=pass (something or other)
 From: jason <jason\@example.org>
 Subject: hi there
 Comment: what is a comment
@@ -109,13 +110,15 @@ $arc->PRINT($sample_email);
 $arc->CLOSE;
 
 ok($arc->result() eq 'sealed', 'result() is sealed');
-($as) = $arc->as_strings();
+($as, $ams, $aar) = $arc->as_strings();
 ok($as =~ m/\bcv=pass\b/, 'AS has cv=pass');
+ok($aar =~ m/\Q example.org; dkim=none (no signatures);  arc=pass (something or other)\E/,
+   'AAR has AR contents and expected formatting');
 
 ## Chain ar, AR header fail
 
 $sample_email = <<END_OF_SAMPLE;
-Authentication-Results: example.org;
+Authentication-Results: example.org; 
   arc=fail (bad something);
   spf=pass smtp.mailfrom="jason\@example.net";
 From: jason <jason\@example.org>
@@ -138,5 +141,7 @@ $arc->PRINT($sample_email);
 $arc->CLOSE;
 
 ok($arc->result() eq 'sealed', 'result() is sealed');
-($as) = $arc->as_strings();
+($as, $ams, $aar) = $arc->as_strings();
 ok($as =~ m/\bcv=fail\b/, 'AS has cv=fail');
+ok($aar =~ m/\Q example.org;\E\015\012\Q  arc=fail (bad something);\E\015\012\Q  spf=pass smtp.mailfrom=\E/,
+   'AAR has AR contents and expected formatting');

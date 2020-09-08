@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use File::Spec;
-use Test::More tests=>6;
+use Test::More tests=>9;
 
 BEGIN { use_ok( 'MARC::File::USMARC' ); }
 BEGIN { use_ok( 'MARC::Lint' ); }
@@ -53,11 +53,20 @@ FROM_TEXT: {
             6 => '245-02/$1',
             a => "<Title in CJK script>.",
         ],
+        [880, "1", " ",
+            a => "<Jones, John in CJK script>.",
+        ],
+        [880, "1", " ",
+            6 => '500-00/$1',
+            c => "<Note in CJK script>.",
+        ],
     );
-    is( $nfields, 11, "All the fields added OK" );
+    is( $nfields, 13, "All the fields added OK" );
 
     my @expected = (
-#        (undef),
+    q{880: No subfield 6.},
+    q{500: Indicator 1 must be blank but it's "1"},
+    q{500: Subfield _c is not allowed.},
         #q{},
     );
 

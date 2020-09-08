@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 56;
+use Test::More;
 use vars qw($Seed);
 
 # Store the seed so we can repeat the test if we fail
@@ -101,3 +101,5 @@ for my $key (0..5) {
     cmp_ok( abs( ($dist{''} - ($iters * keys(%hash) * 1/4)) / $iters ),
             '<=', $EP );
 }
+
+done_testing();

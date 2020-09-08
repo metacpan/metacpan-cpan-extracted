@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.9';
 
 # PROPERTIES
 
@@ -144,7 +144,7 @@ sub getUser {
         return PE_BADCREDENTIALS;
     }
     unless ( $req->data->{ldapentry} = $mesg->entry(0) ) {
-        $self->userLogger->warn("$req->{user} was not found in LDAP directory");
+        $self->userLogger->warn("$req->{user} was not found in LDAP directory (".$req->address.")");
         eval { $self->p->_authentication->setSecurity($req) };
         return PE_BADCREDENTIALS;
     }

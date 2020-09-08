@@ -35,6 +35,11 @@
 #   * GET /error/<lang>/<errNum>                  : get <errNum> message reference and errors file <lang>.json
 #   Return 'en' error file if no <lang> specified
 #
+# - Endpoints for proxy auth/userdb/password
+#   * POST /proxy/getUser                        : get user attributes (restAuthServer)
+#   * POST /proxy/pwdReset                       : reset password (restPasswordServer)
+#   * POST /proxy/pwdConfirm                     : check password (restAuthServer or restPasswordServer)
+#
 # - Authorizations for connected users (always):
 #   * GET /mysession/?whoami                               : get "my" uid
 #   * GET /mysession/?authorizationfor=<base64-encoded-url>: ask if url is
@@ -53,8 +58,13 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64;
+use Lemonldap::NG::Portal::Main::Constants qw(
+  portalConsts
+  PE_OK
+  PE_PASSWORD_OK
+);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends
   qw (Lemonldap::NG::Portal::Main::Plugin Lemonldap::NG::Portal::Lib::Captcha);
@@ -188,6 +198,33 @@ sub init {
           );
     }
 
+    if ( $self->conf->{restPasswordServer} ) {
+        $self->addUnauthRoute(
+            proxy => {
+                'pwdReset' => 'pwdReset',
+            },
+            ['POST']
+        );
+    }
+
+    if ( $self->conf->{restAuthServer} or $self->conf->{restPasswordServer} ) {
+        $self->addUnauthRoute(
+            proxy => {
+                'pwdConfirm' => 'pwdConfirm',
+            },
+            ['POST']
+        );
+    }
+
+    if ( $self->conf->{restAuthServer} ) {
+        $self->addUnauthRoute(
+            proxy => {
+                'getUser' => 'getUser',
+            },
+            ['POST']
+        );
+    }
+
     # Methods always available
     $self->addAuthRoute(
         mysession => { '*' => 'mysession' },
@@ -223,24 +260,8 @@ sub newSession {
       or return $self->p->sendError( $req, undef, 400 );
     $infos->{_utime} = time();
 
-    my $force = 0;
-    if ( my $s = delete $infos->{__secret} ) {
-        my $t;
-        if ( $t = $self->conf->{cipher}->decrypt($s) ) {
-            if (    $t <= time + $self->conf->{restClockTolerance}
-                and $t > time - $self->conf->{restClockTolerance} )
-            {
-                $force = 1;
-            }
-            else {
-                $self->userLogger->error( 'Clock drift between servers is'
-                      . ' beyond tolerance, force denied.' );
-            }
-        }
-        else {
-            $self->userLogger->error('Bad key, force denied');
-        }
-    }
+    my $secret = delete $infos->{__secret};
+    my $force  = $self->_checkSecret($secret);
 
     if ( $req->param('all') and not $id ) {
         return $self->p->sendError( $req,
@@ -278,14 +299,13 @@ sub newSession {
 
 sub newAuthSession {
     my ( $self, $req, $id ) = @_;
-    my $t;
-    unless ($t = $req->param('secret')
-        and $t = $self->conf->{cipher}->decrypt($t)
-        and $t <= time
-        and $t > time - 30 )
-    {
+
+    # Check secret
+    my $secret = $req->param('secret');
+    unless ( $self->_checkSecret($secret) ) {
         return $self->p->sendError( $req, 'Bad secret', 403 );
     }
+
     $req->{id}    = $id;
     $req->{force} = 1;
     $req->user( $req->param('user') );
@@ -322,24 +342,8 @@ sub updateSession {
       or return $self->p->sendError( $req, undef, 400 );
 
     # Get secret if given
-    my $force = 0;
-    if ( my $s = delete $infos->{__secret} ) {
-        my $t;
-        if ( $t = $self->conf->{cipher}->decrypt($s) ) {
-            if (    $t <= time + $self->conf->{restClockTolerance}
-                and $t > time - $self->conf->{restClockTolerance} )
-            {
-                $force = 1;
-            }
-            else {
-                $self->userLogger->error( 'Clock drift between servers is'
-                      . ' beyond tolerance, force denied.' );
-            }
-        }
-        else {
-            $self->userLogger->error('Bad key, force denied');
-        }
-    }
+    my $secret = delete $infos->{__secret};
+    my $force  = $self->_checkSecret($secret);
 
     # Get session and store info
     my $session = $self->getApacheSession( $mod, $id, $infos, $force )
@@ -592,6 +596,175 @@ sub sendCaptcha {
 
     return $self->p->sendJSONresponse( $req,
         { newtoken => $token, newimage => $image } );
+}
+
+sub pwdReset {
+    my ( $self, $req ) = @_;
+
+    $self->logger->debug("Entering REST pwdReset method");
+
+    unless ( $self->p->_passwordDB ) {
+        $self->logger->error(
+                "No Password module configured on this server, "
+              . "cannot execute password change" );
+        return $self->p->sendJSONresponse( $req, { 'result' => JSON::false } );
+    }
+
+    my $jsonBody = eval { from_json( $req->content ) };
+    if ($@) {
+        $self->logger->error("Received invalid JSON $@");
+        return $self->p->sendError( $req, "Invalid JSON", 400 );
+    }
+
+    my $user     = $jsonBody->{user};
+    my $mail     = $jsonBody->{mail};
+    my $password = $jsonBody->{password};
+
+    unless ( $user or $mail ) {
+        $self->logger->error("Missing user or mail argument");
+        return $self->p->sendError( $req, "Missing user or mail argument",
+            400 );
+    }
+
+    unless ($password) {
+        $self->logger->error("Missing password argument");
+        return $self->p->sendError( $req, "Missing password argument", 400 );
+    }
+
+    my $tmp = $self->conf->{portalRequireOldPassword};
+    $self->conf->{portalRequireOldPassword} = 0;
+    $req->user( $user || $mail );
+    $req->steps( ['getUser'] );
+    my $result = $self->p->process( $req, ( $mail ? ( useMail => 1 ) : () ) );
+    if ($result) {
+        $self->logger->error( "Error while looking up user: $result ("
+              . portalConsts->{$result}
+              . ")" );
+        return $self->p->sendError( $req, "User not found", 400 );
+    }
+    $result =
+      $self->p->_passwordDB->modifyPassword( $req, $password, $mail ? 1 : 0 );
+    $req->{user} = undef;
+    $self->conf->{portalRequireOldPassword} = $tmp;
+
+    if ( $result == PE_PASSWORD_OK or $result == PE_OK ) {
+        return $self->p->sendJSONresponse( $req, { 'result' => JSON::true } );
+    }
+    else {
+        $self->logger->error( "Error while changing user password: $result ("
+              . portalConsts->{$result}
+              . ")" );
+        return $self->p->sendJSONresponse( $req, { 'result' => JSON::false } );
+    }
+
+}
+
+sub pwdConfirm {
+    my ( $self, $req ) = @_;
+
+    $self->logger->debug("Entering REST pwdConfirm method");
+
+    my $jsonBody = eval { from_json( $req->content ) };
+    if ($@) {
+        $self->logger->error("Received invalid JSON $@");
+        return $self->p->sendError( $req, "Invalid JSON", 400 );
+    }
+
+    my $user     = $jsonBody->{user};
+    my $password = $jsonBody->{password};
+
+    unless ( $user and $password ) {
+        $self->logger->error("Missing required arguments");
+        return $self->p->sendError( $req, "Missing arguments user or password",
+            400 );
+    }
+
+    $req->user($user);
+    $req->data->{password} = $password;
+
+    if ( $self->p->_userDB ) {
+        $req->steps( [ 'getUser', 'authenticate' ] );
+        my $result = $self->p->process($req);
+        if ( $result == PE_PASSWORD_OK or $result == PE_OK ) {
+            return $self->p->sendJSONresponse( $req,
+                { 'result' => JSON::true } );
+        }
+        else {
+            $self->logger->error(
+                "Process returned $result (" . portalConsts->{$result} . ")" );
+            return $self->p->sendJSONresponse( $req,
+                { 'result' => JSON::false } );
+        }
+    }
+}
+
+sub getUser {
+    my ( $self, $req ) = @_;
+
+    $self->logger->debug("Entering REST getUser method");
+
+    my $jsonBody = eval { from_json( $req->content ) };
+    if ($@) {
+        $self->logger->error("Received invalid JSON $@");
+        return $self->p->sendError( $req, "Invalid JSON", 400 );
+    }
+
+    my $user = $jsonBody->{user};
+    my $mail = $jsonBody->{mail};
+
+    unless ( $user or $mail ) {
+        $self->logger->error("Missing user or mail argument");
+        return $self->p->sendError( $req, "Missing user or mail argument",
+            400 );
+    }
+
+    $req->user( $user || $mail );
+
+    # Search user in database
+    $req->steps( [
+            'getUser',   'setSessionInfo',
+            'setMacros', 'setGroups',
+            'setLocalGroups'
+        ]
+    );
+    my $error = $self->p->process( $req, ( $mail ? ( useMail => 1 ) : () ) );
+    if ( $error == PE_OK ) {
+        return $self->p->sendJSONresponse(
+            $req,
+            {
+                'result' => JSON::true,
+                'info'   => $req->sessionInfo,
+            }
+        );
+    }
+    else {
+        return $self->p->sendJSONresponse( $req, { 'result' => JSON::false } );
+    }
+}
+
+sub _checkSecret {
+    my ( $self, $secret ) = @_;
+    my $isValid = 0;
+
+    if ($secret) {
+        my $t;
+        if ( $t = $self->conf->{cipher}->decrypt($secret) ) {
+            if (    $t <= time + $self->conf->{restClockTolerance}
+                and $t > time - $self->conf->{restClockTolerance} )
+            {
+                $isValid = 1;
+            }
+            else {
+                $self->logger->error( 'Clock drift between servers is'
+                      . ' beyond tolerance, force denied.' );
+            }
+        }
+        else {
+            $self->logger->error('Bad key, force denied');
+        }
+    }
+    return $isValid;
+
 }
 
 1;

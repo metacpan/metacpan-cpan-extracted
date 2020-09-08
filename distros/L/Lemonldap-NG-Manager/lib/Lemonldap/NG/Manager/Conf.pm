@@ -20,7 +20,7 @@ use feature 'state';
 extends 'Lemonldap::NG::Manager::Plugin',
   'Lemonldap::NG::Common::Conf::RESTServer';
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -159,7 +159,7 @@ sub prx {
 #  - getConfByNum: override SUPER method to be able to use Zero
 #  - newConf()
 #  - newRawConf(): restore a saved conf
-#  - applyConf(): called by the 2 previous to prevent other servers that a new
+#  - applyConf(): called by the 2 previous to inform other servers that a new
 #                 configuration is available
 
 sub getConfByNum {
@@ -229,7 +229,7 @@ sub newConf {
 
     if ( $cfgNum ne $req->params('cfgNum') ) { $parser->confChanged(1); }
 
-    my $res = { result => $parser->check($self) };
+    my $res = { result => $parser->check($self->p) };
 
     # "message" fields: note that words enclosed by "__" (__word__) will be
     # translated
@@ -328,7 +328,7 @@ sub newRawConf {
 }
 
 ## @method private applyConf()
-# Try to prevent other servers declared in `reloadUrls` that a new
+# Try to inform other servers declared in `reloadUrls` that a new
 # configuration is available.
 #
 #@return reload status as boolean
@@ -352,6 +352,7 @@ sub applyConf {
     # Parse apply values
     while ( my ( $host, $request ) = each %reloadUrls ) {
         my $r = HTTP::Request->new( 'GET', "http://$host$request" );
+        $self->logger->debug("Sending reload request to $host");
         if ( $request =~ /^https?:\/\/[^\/]+.*$/ ) {
             my $url       = URI::URL->new($request);
             my $targetUrl = $url->scheme . "://" . $host;

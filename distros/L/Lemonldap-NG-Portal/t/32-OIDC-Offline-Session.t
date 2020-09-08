@@ -41,7 +41,12 @@ my $op = LLNG::Manager::Test->new( {
             oidcServiceAllowImplicitFlow          => 1,
             oidcServiceAllowDynamicRegistration   => 1,
             oidcServiceAllowAuthorizationCodeFlow => 1,
-            oidcRPMetaDataOptions                 => {
+            oidcRPMetaDataMacros => {
+                rp => {
+                    custom_sub => '"custom".$uid',
+                }
+            },
+            oidcRPMetaDataOptions => {
                 rp => {
                     oidcRPMetaDataOptionsDisplayName           => "RP",
                     oidcRPMetaDataOptionsIDTokenExpiration     => 3600,
@@ -49,7 +54,7 @@ my $op = LLNG::Manager::Test->new( {
                     oidcRPMetaDataOptionsAllowOffline          => 1,
                     oidcRPMetaDataOptionsIDTokenSignAlg        => "HS512",
                     oidcRPMetaDataOptionsClientSecret          => "rpsecret",
-                    oidcRPMetaDataOptionsUserIDAttr            => "",
+                    oidcRPMetaDataOptionsUserIDAttr            => "custom_sub",
                     oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                     oidcRPMetaDataOptionsBypassConsent         => 1,
                     oidcRPMetaDataOptionsIDTokenForceClaims    => 1,
@@ -119,12 +124,11 @@ my $id_token      = $json->{id_token};
 ok( $access_token,  "Got access token" );
 ok( $refresh_token, "Got refresh token" );
 ok( $id_token,      "Got ID token" );
-count(3);
 
 my $id_token_payload = id_token_payload($id_token);
 is( $id_token_payload->{name}, 'Frédéric Accents',
     'Found claim in ID token' );
-count(1);
+is( $id_token_payload->{sub}, 'customfrench', 'Found sub in ID token' );
 
 # Get userinfo
 $res = $op->_post(
@@ -140,7 +144,7 @@ $res = $op->_post(
 $json = expectJSON($res);
 
 ok( $json->{'name'} eq "Frédéric Accents", 'Got User Info' );
-count(1);
+ok( $json->{'sub'} eq "customfrench",              'Got User Info' );
 
 $op->logout($idpId);
 
@@ -160,7 +164,6 @@ ok(
     ),
     "Refresh access token (after logout)"
 );
-count(1);
 expectOK($res);
 
 $json         = expectJSON($res);
@@ -170,12 +173,11 @@ $id_token = $json->{id_token};
 ok( $access_token,            "Got refreshed Access token" );
 ok( $id_token,                "Got refreshed ID token" );
 ok( !defined $refresh_token2, "Refresh token not present" );
-count(3);
 
 $id_token_payload = id_token_payload($id_token);
 is( $id_token_payload->{name}, 'Frédéric Accents',
     'Found claim in ID token' );
-count(1);
+is( $id_token_payload->{sub}, 'customfrench', 'Found sub in ID token' );
 
 ## Get userinfo again
 ok(
@@ -191,11 +193,10 @@ ok(
     "Post new access token"
 );
 expectOK($res);
-count(1);
 $json = expectJSON($res);
 
 ok( $json->{name} eq "Frédéric Accents", "Correct user info" );
-count(1);
+ok( $json->{'sub'} eq "customfrench",            'Got User Info' );
 
 # Make sure offline session is still valid long after natural session expiration time
 
@@ -215,7 +216,6 @@ ok(
     ),
     "Refresh access token (in the future)"
 );
-count(1);
 expectOK($res);
 
 $json           = expectJSON($res);
@@ -225,7 +225,6 @@ $id_token       = $json->{id_token};
 ok( $access_token,            "Got refreshed Access token" );
 ok( $id_token,                "Got refreshed ID token" );
 ok( !defined $refresh_token2, "Refresh token not present" );
-count(3);
 
 $id_token_payload = id_token_payload($id_token);
 is( $id_token_payload->{name}, 'Frédéric Accents',
@@ -240,7 +239,6 @@ ok( (
 );
 ok( ( grep { $_ eq "urn:extra2" } @{ $id_token_payload->{aud} } ),
     'Check for additional audiences' );
-count(4);
 
 ## Get userinfo again
 ok(
@@ -256,11 +254,10 @@ ok(
     "Post new access token"
 );
 expectOK($res);
-count(1);
 $json = expectJSON($res);
 
 ok( $json->{name} eq "Frédéric Accents", "Correct user info" );
-count(1);
+ok( $json->{'sub'} eq "customfrench",            'Got User Info' );
 
 ## Test introspection of refreshed token #2171
 my $req = 'client_id=rpid&client_secret=rpsecret&token=' . $access_token;
@@ -273,18 +270,16 @@ ok(
     ),
     "Post new access token"
 );
-count(1);
 $json = expectJSON($res);
 
 is( $json->{active},    1,        'Token is active' );
 is( $json->{client_id}, 'rpid',   'Introspection contains client_id' );
-is( $json->{sub},       'french', 'Introspection contains sub' );
+is( $json->{sub},       'customfrench', 'Introspection contains sub' );
 
 # #2168
 ok( ( grep { $_ eq "!weird:scope.name~" } ( split /\s+/, $json->{scope} ) ),
     "Scope contains weird scope name" );
-count(4);
 
 clean_sessions();
-done_testing( count() );
+done_testing();
 

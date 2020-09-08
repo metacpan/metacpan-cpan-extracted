@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 19;
+my $maintests = 21;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 
@@ -60,7 +60,9 @@ SKIP: {
         'Post SAML request to IdP'
     );
     expectOK($res);
-    my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+    my $pdata     = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+    my $rawCookie = getHeader( $res, 'Set-Cookie' );
+    ok( $rawCookie =~ /;\s*SameSite=None/, 'Found SameSite=None' );
 
     # Try to authenticate with an unauthorized user to IdP
     $s = "user=dwho&password=dwho&$s";
@@ -138,7 +140,9 @@ SKIP: {
 
     # Verify authentication on SP
     expectRedirection( $res, 'http://auth.sp.com' );
-    my $spId = expectCookie($res);
+    my $spId      = expectCookie($res);
+    my $rawCookie = getHeader( $res, 'Set-Cookie' );
+    ok( $rawCookie =~ /;\s*SameSite=None/, 'Found SameSite=None' );
 
     ok( $res = $sp->_get( '/', cookie => "lemonldap=$spId" ), 'Get / on SP' );
     expectOK($res);

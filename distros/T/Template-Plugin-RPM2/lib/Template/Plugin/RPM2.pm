@@ -17,11 +17,11 @@ Template::Plugin::RPM2 - Template Toolkit plugin for RPM2
 
 =head1 VERSION
 
-Version 0.01
+Version 1.3.0
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.3.0';
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ L<RPM2>
 
 =head1 AUTHOR
 
-Dave Cross, C<< <dave@mag-sol.com> >>
+Dave Cross, C<< <dave@perlhacks.com> >>
 
 =head1 BUGS
 
@@ -80,7 +80,7 @@ your bug as I make changes.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2006-9 Magnum Solutions Ltd., all rights reserved.
+Copyright (c) 2006-20 Magnum Solutions Ltd., all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

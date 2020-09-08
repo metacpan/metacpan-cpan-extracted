@@ -847,6 +847,61 @@ terminates a code block .  For example,
 
 The default is not to do this, indicated by B<-nicb>.
 
+
+=item B<-nib>, B<--non-indenting-braces>
+
+Normally, lines of code contained within a pair of block braces receive one
+additional level of indentation.  This flag, which is enabled by default, 
+causes perltidy to look for
+opening block braces which are followed by a special side comment. This special
+side comment is B<#<<<> by default.  If found, the code between this opening brace and its
+corresponding closing brace will not be given the normal extra indentation
+level.  For example:
+
+            { #<<<   a closure to contain lexical vars
+
+            my $var;  # this line does not get one level of indentation
+            ...
+
+            }
+
+            # this line does not 'see' $var;
+
+This can be useful, for example, when combining code from different files.
+Different sections of code can be placed within braces to keep their lexical
+variables from being visible to the end of the file.  To keep the new braces
+from causing all of their contained code to be indented if you run perltidy,
+and possibly introducing new line breaks in long lines, you can mark the
+opening braces with this special side comment.
+
+Only the opening brace needs to be marked, since perltidy knows where the
+closing brace is.  Braces contained within marked braces may also be marked
+as non-indenting.
+
+If your code happens to have some opening braces followed by '#<<<', and you
+don't want this behavior, you can use B<-nnib> to deactivate it.  To make it
+easy to remember, the default string is the same as the string for starting a
+B<format-skipping> section. There is no confusion because in that case it is
+for a block comment rather than a side-comment. 
+
+The special side comment can be changed with the next parameter.
+
+
+=item B<-nibp=s>, B<--non-indenting-brace-prefix=s>
+
+The B<-nibp=string> parameter may be used to change the marker for
+non-indenting braces.  The default is equivalent to -nibp='#<<<'.  The string
+that you enter must begin with a # and should be in quotes as necessary to get
+past the command shell of your system.  This string is the leading text of a
+regex pattern that is constructed by appending pre-pending a '^' and appending
+a'\s', so you must also include backslashes for characters to be taken
+literally rather than as patterns.
+
+For example, to match the side comment '#++', the parameter would be
+  
+  -nibp='#\+\+'
+
+
 =item B<-olq>, B<--outdent-long-quotes>
 
 When B<-olq> is set, lines which is a quoted string longer than the
@@ -1754,9 +1809,12 @@ marker by at least one space.  For example
                 1, 4, 6, 4, 1,);
  #>>>
 
+Format skipping begins when a format skipping comment is seen and continues
+until either a format-skipping end pattern is found or until the end of file. 
+
 The comment markers may be placed at any location that a block comment may
 appear.  If they do not appear to be working, use the -log flag and examine the
-F<.LOG> file.  Use B<-nfs> to disable this feature.
+F<.LOG> file.  Use B<-nfs> to disable this feature.  
 
 This method works for any code. For the specific case of a comma-separated list
 of values, as in this example, another possibility is to insert a blank or
@@ -4054,7 +4112,7 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20200822
+This man page documents perltidy version 20200907
 
 =head1 BUG REPORTS
 

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200606132000;
+our $VERSION = 1.20200904144533;
 
 my $formatters = [
                 {
@@ -136,7 +136,7 @@ my $validators = {
             (?:
               0(?:
                 [1-35]\\d|
-                44
+                4[4-6]
               )|
               (?:
                 [13]\\d|
@@ -146,6 +146,7 @@ my $validators = {
             9(?:
               (?:
                 [0-2]\\d|
+                3[01]|
                 4[45]
               )\\d|
               5[15]0|
@@ -155,7 +156,7 @@ my $validators = {
               )|
               9(?:
                 0[013]|
-                1[0134]|
+                1\\d|
                 21|
                 77|
                 9[6-9]
@@ -186,7 +187,7 @@ my $validators = {
           )
         )',
                 'toll_free' => '',
-                'voip' => '993\\d{7}'
+                'voip' => '993[2-9]\\d{6}'
               };
 my %areanames = ();
 $areanames{en}->{9811} = "Mazandaran";

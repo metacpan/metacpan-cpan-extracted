@@ -23,7 +23,7 @@ our @EXPORT_OK = qw{
     __to_ordinal_en
 };
 
-our $VERSION = '0.073';
+our $VERSION = '0.074';
 
 sub is_ppi_regexp_element {
     my ( $elem ) = @_;

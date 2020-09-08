@@ -6,7 +6,7 @@ use warnings;
 #declare the necessary variables
 use vars qw($VERSION @EXPORT_OK %GeogAreaCodes %ObsoleteGeogAreaCodes %LanguageCodes %ObsoleteLanguageCodes %CountryCodes %ObsoleteCountryCodes %Sources600_651 %ObsoleteSources600_651 %Sources655 %ObsoleteSources655);
 
-$VERSION = '1.37';
+$VERSION = '1.38';
 
 use base qw(Exporter AutoLoader);
 
@@ -75,6 +75,15 @@ If it is here, then 041 would be allowed to have three blank spaces as a valid c
 (though other checks would report the error--spaces at the beginning and ending of a subfield
 and multiple spaces in a field where such a thing is not allowed).
 
+Update Subject source codes with codes from additional Source lists (see L<https://www.loc.gov/standards/sourcelist/subject.html>):
+    Genre/Form Term and Code Source Codes
+    Occupation Term Source Codes
+    Function Term Source Codes
+    Temporal Term Source Codes
+    Name and Title Source Codes 
+    Classification Scheme Source Codes
+    Subject Category Code Source Codes
+	
 =head2 SEE ALSO
 
 L<MARC::Lint>
@@ -93,6 +102,33 @@ The scripts above take the MARC code list ASCII version as input.
 They output tab-separated codes for updating the data below.
 
 =head1 VERSION HISTORY
+
+Version 1.38: Updated September 5, 2020.
+ -Added new sources codes from Technical Notice of September 15, 2017
+ -Added new sources codes from Technical Notice of October 20, 2017
+ -Added new sources codes from Technical Notice of December 01, 2017
+ -Added new sources codes from Technical Notice of January 26, 2018
+ -Added new sources codes from Technical Notice of March 09, 2018
+ -Added new sources codes from Technical Notice of May 25, 2018
+ -Added new sources codes from Technical Notice of July 27, 2018
+ -Added new sources codes from Technical Notice of August 31, 2018
+ -Added new sources codes from Technical Notice of October 12, 2018
+ -Added new sources codes from Technical Notice of October 26, 2018
+ -Added new sources codes from Technical Notice of March 27, 2019
+ -Added new sources codes from Technical Notice of April 19, 2019
+ -Added new sources codes from Technical Notice of May 31, 2019
+ -Added new sources codes from Technical Notice of August 09, 2019
+ -Added new sources codes from Technical Notice of September 13, 2019
+ -Added new sources codes from Technical Notice of October 04, 2019
+ -Added new sources codes from Technical Notice of October 11, 2019
+ -Added new sources codes from Technical Notice of November 1, 2019
+ -Added new sources codes from Technical Notice of November 26, 2019
+ -Added new sources codes from Technical Notice of December 12, 2019
+ -Added new sources codes from Technical Notice of February 21, 2020
+ -Added new sources codes from Technical Notice of March 13, 2020
+ -Added new sources codes from Technical Notice of May 1, 2020
+ -Added new sources codes from Technical Notice of June 26, 2020
+ -Added new sources codes from Technical Notice of July 28, 2020
 
 Version 1.37: Updated August 2, 2017.
 
@@ -350,13 +386,13 @@ Version 1.00 (original version): First release, Dec. 5, 2004. Uploaded to Source
 
 %ObsoleteCountryCodes = map {($_, 1)} (split "\t", ("ai 	air	ac 	ajr	bwr	cn 	cz 	cp 	ln 	cs 	err	gsr	ge 	gn 	hk 	iw 	iu 	jn 	kzr	kgr	lvr	lir	mh 	mvr	nm 	pt 	rur	ry 	xi 	sk 	xxr	sb 	sv 	tar	tt 	tkr	unr	uk 	ui 	us 	uzr	vn 	vs 	wb 	ys 	yu "));
 
-%Sources600_651 = map {($_, 1)} (split "\t", ("aass	aat	abne	aedoml	afo	afset	agrifors	agrovoc	agrovocf	agrovocs	aiatsisl	aiatsisp	aiatsiss	aktp	albt	allars	apaist	armac	asft	ashlnl	asrcrfcd	asrcseo	asrctoa	asth	ated	atg	atla	aucsh	bare	barn	bhb	bella	bet	bhammf	bhashe	bib1814	bibalex	biccbmc	bicssc	bidex	bisacsh	bisacmt	bisacrt	bjornson	blcpss	blmlsh	blnpn	bokbas	bt	btr	cabt	cash	cbk	cck	ccsa	cct	ccte	cctf	cdcng	ceeus	chirosh	cht	ciesiniv	cilla	collett	conorsi	csahssa	csalsct	csapa	csh	csht	cstud	czenas	czmesh	dacs	dbn	dcs	ddcri	ddcrit	ddcut	dissao	dit	dltlt	dltt	drama	dtict	ebfem	eclas	eet	eflch	eks	embiaecid	embne	emnmus	ept	erfemn	ericd	est	eum	eurovocen	eurovocfr	eurovocsl	fast	fes	finmesh	fire	fmesh	fnhl	francis	fssh	galestne	gccst	gcipmedia	gcipplatform	gem	gemet	georeft	gnd	gnis	gst	gtt	hamsun	hapi	hkcan	helecon	henn	hlasstg	hoidokki	hrvmesh	huc	humord	iaat	ibsen	ica	icpsr	idas	idsbb	idszbz	idszbzes	idszbzna	idszbzzg	idszbzzh	idszbzzk	iescs	iest	ilot	ilpt	inist	inspect	ipat	ipsp	isis	itglit	itoamc	itrt	jhpb	jhpk	jlabsh	juho	jupo	jurivoc	kaa	kaba	kao	kassu	kauno	kaunokki	kdm	khib	kito	kitu	kkts	koko	kssbar	kta	kto	ktpt	ktta	kubikat	kula	kulo	kupu	lacnaf	lapponica	larpcal	lcac	lcdgt	lcmpt	lcsh	lcshac	lcstt	lctgm	lemac	lemb	liito	liv	lnmmbr	local	ltcsh	lua	maaq	maotao	mar	masa	mech	mero	mesh	mipfesd	mmm	mpirdes	msc	msh	mtirdes	musa	muso	muzeukc	muzeukn	muzvukci	naf	nal	nalnaf	nasat	nbdbt	nbiemnfag	ncjt	ndlsh	netc	ndllsh	nicem	nimacsc	nlgaf	nlgkk	nlgsh	nlmnaf	no-ubo-mr	noraf	noram	norbok	normesh	noubomn	noubojur	nsbncf	nskps	ntcpsc	ntcsd	ntids	ntissc	nzggn	nznb	odlt	ogst	onet	opms	ordnok	pascal	pepp	peri	pha	pkk	pleiades	pmbok	pmcsg	pmont	pmt	poliscit	popinte	precis	prvt	psychit	puho	quiding	qlsp	qrma	qrmak	qtglit	raam	ram	rasuqam	renib	reo	rero	rerovoc	rma	rpe	rswk	rswkaf	rugeo	rurkp	rvm	rvmgd	samisk	sanb	sao	sbiao	sbt	scbi	scgdst	scisshl	scot	sears	sfit	sgc	sgce	shbe	she	shsples	sigle	sipri	sk	skon	slem	smda	snt	socio	solstad	sosa	spines	ssg	sthus	stw	swd	swemesh	taika	tasmas	taxhs	tbit	tbjvp	tekord	tero	tesa	tesbhaecid	test	tgn	tha	thema	thesoz	thia	tho	thub	tips	tisa	tlka	tlsh	toit	trfarn	trfbmb	trfgr	trfoba	trfzb	trt	trtsa	tsht	tsr	ttka	ttll	tucua	udc	ukslc	ulan	umitrist	unbisn	unbist	unescot	usaidt	valo	vcaadu	vffyl	vmj	waqaf	watrest	wgst	wot	wpicsh	ysa	yso"));
+%Sources600_651 = map {($_, 1)} (split "\t", ("aass	aat	abne	aedoml	afo	afset	agrifors	agrovoc	agrovocf	agrovocs	aiatsisl	aiatsisp	aiatsiss	aktp	albt	allars	apaist	armac	ascl	asft	ashlnl	asrcrfcd	asrcseo	asrctoa	asth	ated	atg	atla	aucsh	ausext	bare	barn	bhb	bella	bet	bhammf	bhashe	bib1814	bibalex	bibbi	biccbmc	bicssc	bidex	bisacsh	bisacmt	bisacrt	bjornson	blcpss	blmlsh	blnpn	bokbas	bt	btr	cabt	cash	cbk	cck	cckthema	ccsa	cct	ccte	cctf	ccucaut	cdcng	ceeus	cerlt	chirosh	cht	ciesiniv	cilla	ckhw	collett	conorsi	csahssa	csalsct	csapa	csh	csht	cstud	czenas	czmesh	dacs	dbcsh	dbn	dcs	ddcri	ddcrit	ddcut	dicgenam	dicgenes	dicgentop	dissao	dit	dltlt	dltt	drama	dtict	dugfr	ebfem	eclas	eet	eflch	eks	embiaecid	embne	embucm	emnmus	ept	erfemn	ericd	est	eum	eurovocen	eurovoces	eurovocfr	eurovocsl	fast	fautor	fes	finaf	finmesh	fire	fmesh	fnhl	francis	fssh	galestne	gbd	gccst	gcipmedia	gcipplatform	gem	gemet	georeft	gnd	gnis	gst	gtt	habibe	habich	habifr	habiit	hamsun	hapi	hkcan	helecon	henn	hlasstg	hoidokki	homoit	hrvmesh	hrvmr	huc	humord	iaat	ibsen	ica	iconauth	icpsr	idas	idsbb	idszbz	idszbzes	idszbzna	idszbzzg	idszbzzh	idszbzzk	iescs	iest	ilot	ilpt	inist	inspect	ipat	ipsp	iptcnc	isis	itglit	itoamc	itrt	jhpb	jhpk	jlabsh	juho	jupo	jurivoc	kaa	kaba	kao	kassu	kauno	kaunokki	kdm	khib	kito	kitu	kkts	koko	kssbar	kta	kto	ktpt	ktta	kubikat	kula	kulo	kupu	labloc	lacnaf	lapponica	larpcal	lcac	lcdgt	lcmpt	lcsh	lcshac	lcstt	lctgm	lemac	lemb	liito	liv	lnmmbr	local	ltcsh	lua	maaq	maotao	mar	masa	mech	mero	mesh	mipfesd	mmm	mpirdes	msc	msh	mtirdes	mts	musa	muso	muzeukc	muzeukn	muzvukci	naf	nal	nalnaf	nasat	nbdbt	nbiemnfag	ncjt	ndlsh	netc	ndllsh	nicem	nimacsc	nlgaf	nlgkk	nlgsh	nlksh	nlmnaf	nmaict	no-ubo-mr	noraf	noram	norbok	normesh	noubomn	noubojur	nsbncf	nskps	nta	ntcpsc	ntcsd	ntids	ntissc	nzggn	nznb	odlt	ogst	onet	opms	ordnok	pascal	pepp	peri	periodo	pha	pkk	pleiades	pmbok	pmcsg	pmont	pmt	poliscit	popinte	pplt	ppluk	precis	prnpdi	prvt	psychit	puho	quiding	qlsp	qrma	qrmak	qtglit	raam	ram	rasuqam	renib	reo	rero	rerovoc	rma	root	rpe	rswk	rswkaf	rugeo	rurkp	rvm	rvmfast	rvmgd	samisk	sanb	sao	sbiao	sbt	scbi	scgdst	scisshl	scot	sears	sfit	sgc	sgce	shbe	she	shsples	sigle	sipri	sk	skbb	skon	slem	smda	snt	socio	solstad	sosa	spines	ssg	stcv	sthus	stw	sucnsaf	swd	swemesh	taika	tasmas	taxhs	tbit	tbjvp	tekord	tept	tero	tesa	tesbhaecid	test	tgn	tha	thema	thesoz	thia	tho	thub	tips	tisa	tlka	tlsh	toit	trfarn	trfbmb	trfdh	trfgr	trfoba	trfzb	trt	trtsa	tshd	tsht	tsr	ttka	ttll	tucua	udc	ukslc	ulan	umitrist	unbisn	unbist	unescot	unicefirc	usaidt	valo	vcaadu	vffyl	vmj	waqaf	watrest	wgst	wot	wpicsh	ysa	yso"));
 
 #The codes cash, lcsh, lcshac, mesh, nal, and rvm are covered by 2nd indicators in 600-655
 #they are only used when indicators are not available
-%ObsoleteSources600_651 = map {($_, 1)} (split "\t", ("cash	lcsh	lcshac	mesh	nal	nobomn	noubojor	reroa	rvm"));
+%ObsoleteSources600_651 = map {($_, 1)} (split "\t", ("bibsent	cash	lcsh	lcshac	mesh	nal	nobomn	noubojor	reroa	rvm"));
 
-%Sources655 = map {($_, 1)} (split "\t", ("aat	afset	aiatsisl	aiatsisp	aiatsiss	aktp	alett	amg	asrcrfcd	asrcseo	asrctoa	asth	aucsh	barn	barngf	bib1814	bibalex	biccbmc	bidex	bgtchm	bisacsh	bisacmt	bisacrt	bjornson	bt	cash	chirosh	cct	cdcng	cjh	collett	conorsi	csht	czenas	dacs	dcs	dct	ddcut	eet	eflch	embne	emnmus	ept	erfemn	ericd	estc	eurovocen	eurovocsl	fast	fbg	fgtpcm	finmesh	fire	ftamc	galestne	gatbeg	gem	gmd	gmgpc	gnd	gsafd	gst	gtlm	hamsun	hapi	hkcan	hoidokki	ica	ilot	isbdcontent	isbdmedia	itglit	itrt	jhpb	jhpk	kkts	lacnaf	lcgft	lcmpt	lcsh	lcshac	lcstt	lctgm	lemac	lobt	local	maaq	mar	marccategory	marcform	marcgt	marcsmd	mech	mesh	migfg	mim	msh	muzeukc	muzeukn	muzeukv	muzvukci	nal	nalnaf	nbdbgf	nbiemnfag	ndlsh	netc	ngl	nimafc	nlgaf	nlgkk	nlgsh	nlmnaf	nmc	no-ubo-mr	noraf	noram	nsbncf	ntids	nzcoh	nzggn	nznb	onet	opms	ordnok	pkk	pmcsg	pmt	proysen	quiding	qlsp	qrmak	qtglit	raam	radfg	rasuqam	rbbin	rbgenr	rbmscv	rbpap	rbpri	rbprov	rbpub	rbtyp	rdabf	rdabs	rdacarrier	rdaco	rdacontent	rdacpc	rdact	rdafnm	rdafs	rdaft	rdagen	rdagrp	rdagw	rdalay	rdamat	rdamedia	rdamt	rdapf	rdapm	rdapo	rdarm	rdarr	rdaspc	rdatc	rdatr	rdavf	reo	rerovoc	reveal	rma	rswk	rswkaf	rugeo	rvm	rvmgf	sao	saogf	scbi	sears	sgc	sgce	sgp	sipri	skon	snt	socio	spines	ssg	stw	swd	swemesh	tbit	thema	tesa	tgfbne	thesoz	tho	thub	toit	tsht	tucua	ukslc	ulan	vgmsgg	vgmsng	vmj	waqaf"));
+%Sources655 = map {($_, 1)} (split "\t", ("aat	aatnor	afset	aiatsisl	aiatsisp	aiatsiss	aktp	alett	amg	asrcrfcd	asrcseo	asrctoa	asth	aucsh	barn	barngf	bib1814	bibalex	biccbmc	bidex	bgtchm	bisacsh	bisacmt	bisacrt	bjornson	bt	cash	cgndb	chirosh	cck	cct	cdcng	cjh	collett	conorsi	csht	czenas	dacs	dcs	dct	ddcut	eet	eflch	embne	emnmus	ept	erfemn	ericd	estc	eurovocen	eurovocsl	fast	fbg	fgtpcm	finmesh	fire	ftamc	galestne	gatbeg	gem	gmd	gmgpc	gnd	gpn	gtmm	gsafd	gst	gtlm	gttg	hamsun	hapi	hkcan	hoidokki	ica	ilot	isbdcontent	isbdmedia	itglit	itrt	jhpb	jhpk	kkts	lacnaf	lcgft	lcmpt	lcsh	lcshac	lcstt	lctgm	lemac	lobt	local	maaq	mar	marccategory	marcform	marcgt	marcsmd	mech	mesh	migfg	mim	msh	muzeukc	muzeukn	muzeukv	muzvukci	nal	nalnaf	nbdbgf	nbiemnfag	ncrbs	ncrcarrier	ncrcontent	ncrcpc	ncrfs	ncrft	ncrmat	ncrmedia	ncrpm	ncrpo	ncrrm	ncrtr	ncrvf	ndlgft	ndlsh	netc	ngl	nimafc	nlgaf	nlgkk	nlgsh	nlmnaf	nmc	no-ubo-mr	noraf	noram	nsbncf	ntids	nzcoh	nzggn	nznb	olacvggt	onet	opms	ordnok	peakbag	pkk	pmcsg	pmt	proysen	quiding	qlsp	qrmak	qtglit	raam	radfg	rasuqam	rbbin	rbgenr	rbmscv	rbpap	rbpri	rbprov	rbpub	rbtyp	rdabf	rdabs	rdacarrier	rdacc	rdaco	rdacontent	rdacpc	rdact	rdafnm	rdafs	rdaft	rdagen	rdagrp	rdagw	rdalay	rdamat	rdamedia	rdamt	rdapf	rdapm	rdapo	rdarm	rdarr	rdaspc	rdatc	rdatr	rdavf	reo	rerovoc	reveal	rma	rswk	rswkaf	rugeo	rvm	rvmgf	sao	saogf	scbi	sears	sgc	sgce	sgp	sipri	skon	snt	socio	spines	ssg	stw	swd	swemesh	tbit	thema	tesa	tgfbne	thesoz	tho	thub	toit	tsht	tsaij	tucua	ukslc	ulan	vgmsgg	vgmsng	vmj	waqaf"));
 
 #The codes cash, lcsh, lcshac, mesh, nal, and rvm are covered by 2nd indicators in 600-655
 #they are only used when indicators are not available
@@ -376,7 +412,7 @@ employers of the various contributors to the code.
 Bryan Baldus
 eijabb@cpan.org
 
-Copyright (c) 2004-2017.
+Copyright (c) 2004-2020.
 
 =cut
 

@@ -153,13 +153,22 @@ sub clean_sessions {
 }
 
 sub count_sessions {
-    my $dir = shift;
-    $dir ||= $tmpDir;
+    my ( $kind, $dir ) = @_;
     my $nbr = 0;
+    $kind ||= 'SSO';
+    $dir  ||= $tmpDir;
 
     opendir D, $dir or die $!;
     foreach ( grep { /^\w{64}$/ } readdir(D) ) {
-        $nbr++;
+        open( my $fh, '<', "$dir/$_" ) or die($!);
+        while (<$fh>) {
+            chomp;
+            if ( $_ =~ /"_session_kind":"$kind"/ ) {
+                $nbr++;
+                last;
+            }
+        }
+        close $fh;
     }
     $nbr;
 }
@@ -582,14 +591,15 @@ our $defaultIni = {
         cache_root  => $tmpDir,
         cache_depth => 0,
     },
-    logLevel             => 'error',
-    cookieName           => 'lemonldap',
-    domain               => 'example.com',
-    templateDir          => 'site/templates',
-    staticPrefix         => '/static',
-    securedCookie        => 0,
-    https                => 0,
-    globalStorageOptions => {
+    logLevel              => 'error',
+    cookieName            => 'lemonldap',
+    domain                => 'example.com',
+    templateDir           => 'site/templates',
+    staticPrefix          => '/static',
+    tokenUseGlobalStorage => 0,
+    securedCookie         => 0,
+    https                 => 0,
+    globalStorageOptions  => {
         Directory     => $tmpDir,
         LockDirectory => "$tmpDir/lock",
         generateModule =>
@@ -659,7 +669,7 @@ has ini => (
         main::ok( $self->{p} = $self->class->new(), 'Portal object' );
         main::count(1);
         unless ( $self->confFailure ) {
-            main::ok( $self->{p}->init($ini), 'Init' );
+            main::ok( $self->{p}->init($ini),           'Init' );
             main::ok( $self->{app} = $self->{p}->run(), 'Portal app' );
             main::count(2);
             no warnings 'redefine';

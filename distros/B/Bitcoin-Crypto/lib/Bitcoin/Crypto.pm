@@ -1,8 +1,8 @@
 package Bitcoin::Crypto;
 
-our $VERSION = "0.993";
+our $VERSION = "0.994";
 
-use Modern::Perl "2010";
+use v5.10; use warnings;
 use Exporter qw(import);
 
 our @EXPORT_OK = qw(btc_extprv btc_prv btc_extpub btc_pub btc_script);
@@ -77,21 +77,21 @@ Bitcoin::Crypto - Bitcoin cryptography in Perl
 
 =head1 DESCRIPTION
 
-Cryptographic package for common Bitcoin-related tasks and key pair management.
+Cryptographic module for common Bitcoin-related tasks and key pair management.
 
 =head1 SCOPE
 
-This package allows you to do basic tasks for Bitcoin such as:
+This module allows you to do basic tasks for Bitcoin such as:
 
 =over 2
 
-=item * creating extended keys and utilising bip32 key derivation
+=item * creating extended keys and utilizing bip32 key derivation
 
 =item * creating private key / public key pairs
 
-=item * creating Bitcoin addresses
+=item * address generation (in legacy, compatibility and segwit formats)
 
-=item * creating signatures for messages
+=item * signature generation and verification
 
 =item * importing / exporting using popular mediums (WIF, mnemonic, hex)
 
@@ -111,7 +111,37 @@ This package won't help you with:
 
 =back
 
-See child modules for more documentation and examples.
+=head1 WHERE TO START?
+
+Documentation and examples in this module assump that you're already familiar with the basics of Bitcoin protocol and assymetric cryptography. If that's not the case, start with wikipedia pages for those topics.
+
+If you like to learn by example, dive right into the examples directory.
+
+There are many things that you may want to achieve with this module. Common topics include:
+
+=over 2
+
+=item * create a keypair for signature or address generation
+
+Start with L<Bitcoin::Crypto::Key::Private> if you already have some data you want to use as a private key entropy (like Bitcoin's WIF format or hex data). If you'd like to generate a key and get a list of words, L<Bitcoin::Crypto::Key::ExtPrivate> is what you want.
+
+=item * generate many keys at once
+
+L<Bitcoin::Crypto::Key::ExtPrivate> will allow you to derive as many keys as you want from a master key (so you won't have to store multiple private key seeds). L<Bitcoin::Crypto::Key::ExtPublic> can be stored in a "hot" storage and used to derive public keys lazily.
+
+=item * work with other cryptocurrencies
+
+You can work with any cryptocurrency as long as it is based on the same fundamentals as Bitcoin. You have to register a network in L<Bitcoin::Crypto::Network> first, with the protocol data valid for your cryptocurrency.
+
+=item * serialize a Bitcoin script
+
+L<Bitcoin::Crypto::Script> will help you build and serialize a script, but not (yet) run it.
+
+=item * work with Bitcoin-related encodings
+
+See L<Bitcoin::Crypto::Base58> and L<Bitcoin::Crypto::Bech32>.
+
+=back
 
 =head1 SHORTCUT FUNCTIONS
 
@@ -141,19 +171,18 @@ Loads L<Bitcoin::Crypto::Script>
 
 Although the module was written with an extra care and appropriate tests are in place asserting compatibility with many Bitcoin standards, due to complexity of the subject some bugs may still be present. In the world of digital money, a single bug may lead to losing funds. I encourage anyone to test the module themselves, review the test cases and use the module with care, espetially in the beta phase. Suggestions for improvements and more edge cases to test will be gladly accepted, but there is no warranty on your funds being manipulated by this module.
 
-=head1 INSTALLATION
+=head1 SPEED
 
-This module requires development GMP package installed on your system. It must be installed before installing other dependencies.
-
-For the best performance during dependencies installation ensure that you have Math::BigInt::GMP package installed. Some of the dependencies can run their test suites orders of magnitude faster with GMP available.
+Since most of the calculations are delegated to the XS (and further to libtomcrypt or GMP) most tasks should be fairly quick to finish, in Perl definition of quick.
+The module have a little bit of startup time because of Moo and Type::Tiny, measured in miliseconds. The biggest runtime bottleneck seem to be the key derivation mechanism, which imports a key once for every derivation path part. Some tasks, like signature generation and verification, should be very fast thanks to libtomcrypt doing all the heavy lifting. All in all, the module should be able to handle any task which does not require brute forcing (like vanity address generation).
 
 =head1 TODO
 
 =over 2
 
-=item * Bitcoin script execution (maybe?)
-
 =item * Better test coverage
+
+=item * Further performance improvements
 
 =back
 

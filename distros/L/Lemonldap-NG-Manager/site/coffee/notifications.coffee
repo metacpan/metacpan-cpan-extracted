@@ -206,26 +206,29 @@ llapp.controller 'NotificationsExplorerCtrl', [ '$scope', '$translator', '$locat
 		$scope.currentScope = scope
 		node = scope.$modelValue
 		notificationId = node.notification
+		query = ''
 		if $scope.type == 'actives'
 			notificationId = "#{node.uid}_#{node.reference}"
-		$http.get("#{scriptname}notifications/#{$scope.type}/#{notificationId}").then (response) ->
+		if $scope.type == 'done'
+			query = "?uid=#{node.uid}&reference=#{node.reference}"
+		$http.get("#{scriptname}notifications/#{$scope.type}/#{notificationId}#{query}").then (response) ->
 			$scope.currentNotification =
 				uid: node.uid
 				reference: node.reference
 				condition: node.condition
-			if $scope.type == 'actives'
-				try 
-					console.log "Try to parse a JSON formated notification..."
-					notif = JSON.parse response.data.notifications
-					$scope.currentNotification.date = $scope.notifDate(notif.date)
-					$scope.currentNotification.text = notif.text
-					$scope.currentNotification.title = notif.title
-					$scope.currentNotification.subtitle = notif.subtitle
-				catch e
-					console.log "Unable to parse JSON"
-					$scope.currentNotification.notifications = response.data.notifications
-			else
+			if $scope.type == 'done'
 				$scope.currentNotification.done = response.data.done
+			try 
+				console.log "Try to parse a JSON formated notification..."
+				notif = JSON.parse response.data.notifications
+				$scope.currentNotification.date = $scope.notifDate(notif.date)
+				$scope.currentNotification.text = notif.text
+				$scope.currentNotification.title = notif.title
+				$scope.currentNotification.subtitle = notif.subtitle
+				$scope.currentNotification.check = notif.check
+			catch e
+				console.log "Unable to parse JSON"
+				$scope.currentNotification.notifications = response.data.notifications	
 			$scope.waiting = false
 		, (resp) ->
 			$scope.waiting = false

@@ -35,7 +35,7 @@ use Binance::API::Request;
 
 use Binance::Exception::Parameter::Required;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 =head1 NAME
 
@@ -578,7 +578,7 @@ sub klines {
 
 =head2 ticker
 
-    $api->klines( symbol => 'ETHBTC', interval => '1M' );
+    $api->ticker( symbol => 'ETHBTC', interval => '1M' );
 
 24 hour price change statistics.
 
@@ -588,12 +588,12 @@ B<PARAMETERS>
 
 =item symbol
 
-[REQUIRED] Symbol, for example C<ETHBTC>.
+[OPTIONAL] Symbol, for example C<ETHBTC>.
 
 =back
 
 B<RETURNS>
-    A HASHref
+    A HASHref or an Array of HASHrefs if no symbol given
 
     {
       "priceChange": "-94.99999800",
@@ -618,14 +618,6 @@ B<RETURNS>
 
 sub ticker {
     my ($self, %params) = @_;
-
-    unless ($params{'symbol'}) {
-        $self->log->error('Parameter "symbol" required');
-        Binance::Exception::Parameter::Required->throw(
-            error => 'Parameter "symbol" required',
-            parameters => ['symbol']
-        );
-    }
 
     my $query = {
         symbol    => $params{'symbol'},

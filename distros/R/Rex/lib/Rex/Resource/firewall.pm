@@ -58,7 +58,7 @@ package Rex::Resource::firewall;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 use Data::Dumper;
 
@@ -79,7 +79,7 @@ resource "firewall", { export => 1 }, sub {
   my $rule_name = resource_name;
 
   my $rule_config = {
-    action => param_lookup("action"),
+    action      => param_lookup("action"),
     ensure      => param_lookup( "ensure",      "present" ),
     proto       => param_lookup( "proto",       undef ),
     source      => param_lookup( "source",      undef ),

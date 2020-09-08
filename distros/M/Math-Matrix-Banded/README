@@ -1,0 +1,47 @@
+Math-Matrix-Banded
+
+A banded matrix (or band matrix or band diagonal matrix) is a matrix
+whose non-zero columns are confined to a diagonal band. Obviously,
+such a structure allows for more efficient storage and computation
+than for a general matrix.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Matrix::Banded
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Matrix-Banded
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Math-Matrix-Banded
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Math-Matrix-Banded
+
+    Search CPAN
+        https://metacpan.org/release/Math-Matrix-Banded
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2020 by Lutz Gehlen.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

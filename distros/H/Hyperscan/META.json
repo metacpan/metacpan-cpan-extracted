@@ -16,7 +16,9 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::Constant" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::PkgConfig" : "0"
          }
       },
       "develop" : {
@@ -49,7 +51,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "0.04",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022001"
@@ -137,6 +139,17 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "AutoPrereqs",
+            "version" : "6.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "configure",
+                  "type" : "requires"
+               }
+            },
+            "name" : "ConfigureRequires",
             "version" : "6.015"
          },
          {

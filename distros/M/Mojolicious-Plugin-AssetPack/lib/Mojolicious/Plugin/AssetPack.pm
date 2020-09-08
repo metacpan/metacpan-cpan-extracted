@@ -1,12 +1,12 @@
 package Mojolicious::Plugin::AssetPack;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use Mojo::Util qw(deprecated trim);
+use Mojo::Util qw(deprecated trim xml_escape);
 use Mojolicious::Plugin::AssetPack::Asset::Null;
 use Mojolicious::Plugin::AssetPack::Store;
 use Mojolicious::Plugin::AssetPack::Util qw(diag has_ro load_module DEBUG);
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 has minify => sub { shift->_app->mode eq 'development' ? 0 : 1 };
 
@@ -33,7 +33,7 @@ sub pipe {
 sub process {
   my ($self, $topic, @input) = @_;
 
-  $self->route unless $self->{route_added}++;
+  $self->route                            unless $self->{route_added}++;
   return $self->_process_from_def($topic) unless @input;
 
   # TODO: The idea with blessed($_) is that maybe the user can pass inn
@@ -187,12 +187,12 @@ sub _render_tags {
   $self->_process($topic => $self->{input}{$topic}) if $self->{lazy};
 
   my $assets = $self->{by_topic}{$topic} ||= $self->_static_asset($topic);
-  my %args = (base_url => $route->pattern->defaults->{base_url} || '', topic => $topic);
+  my %args   = (base_url => $route->pattern->defaults->{base_url} || '', topic => $topic);
   $args{base_url} =~ s!/+$!!;
 
   return Mojo::ByteStream->new(
     join "\n",
-    map { $_->tag_for->($_, $c, \%args, @attrs) }
+    map    { $_->tag_for->($_, $c, \%args, @attrs) }
       grep { !$_->isa('Mojolicious::Plugin::AssetPack::Asset::Null') } @$assets
   );
 }
@@ -213,7 +213,7 @@ sub _serve {
     return $self->store->serve_fallback_for_assets($c, $topic, $assets);
   }
 
-  $c->render(text => "// No such asset '$topic'\n", status => 404);
+  $c->render(text => sprintf("// No such asset '%s'\n", xml_escape $topic), status => 404);
 }
 
 sub _static_asset {
@@ -232,94 +232,27 @@ sub _static_asset {
 
 Mojolicious::Plugin::AssetPack - Compress and convert css, less, sass, javascript and coffeescript files
 
-=head1 VERSION
-
-2.08
-
-=head1 SYNOPSIS
-
-=head2 Application
-
-  use Mojolicious::Lite;
-
-  # Load plugin and pipes in the right order
-  plugin AssetPack => {
-    pipes => [qw(Less Sass Css CoffeeScript Riotjs JavaScript Combine)]
-  };
-
-  # define asset
-  app->asset->process(
-    # virtual name of the asset
-    "app.css" => (
-
-      # source files used to create the asset
-      "sass/bar.scss",
-      "https://github.com/Dogfalo/materialize/blob/master/sass/materialize.scss",
-    )
-  );
-
-=head2 Template
-
-  <html>
-    <head>
-      %= asset "app.css"
-    </head>
-    <body><%= content %></body>
-  </html>
-
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::AssetPack> is L<Mojolicious plugin|Mojolicious::Plugin>
-for processing static assets. The idea is that JavaScript and CSS files should
-be served as one minified file to save bandwidth and roundtrip time to the
-server.
+L<Mojolicious::Plugin::AssetPack> has a very limited feature set, especially
+when it comes to processing JavaScript. It is recommended that you switch to
+L<Mojolicious::Plugin::Webpack> if you want to write modern JavaScript code.
 
-Note that the main author have moved on to using
-L<Mojolicious::Plugin::Webpack> instead, which uses
-L<https://webpack.js.org/> under the hood, but is just as convenient to use as
-this plugin. It is very easy to try out
-L<Mojolicious::Plugin::Webpack>, since it will detect your AssetPack
-based project automatically, and migrate them over to webpack once the plugin
-is loaded.
+=head2 Existing user?
 
-There are many external tools for doing this, but integrating them with
-L<Mojolicious> can be a struggle: You want to serve the source files directly
-while developing, but a minified version in production. This assetpack plugin
-will handle all of that automatically for you.
+It is I<very> simple to migrate from L<Mojolicious::Plugin::AssetPack> to
+L<Mojolicious::Plugin::Webpack>. Just check out the one line change in
+L<Mojolicious::Plugin::Webpack/MIGRATING-FROM-ASSETPACK>.
 
-Your application creates and refers to an asset by its topic (virtual asset
-name).  The process of building actual assets from their components is
-delegated to "pipe objects". Please see
-L<Mojolicious::Plugin::AssetPack::Guides::Tutorial/Pipes> for a complete list.
+=head2 Don't want to switch?
 
-=head1 BREAKING CHANGES
+Your existing code will probably continue to work for a long time, but it will
+get more and more difficult to write I<new> working JavaScript with
+L<Mojolicious::Plugin::AssetPack> as time goes by.
 
-=head2 assetpack.db (v1.47)
+=head2 New user?
 
-C<assetpack.db> no longer track files downloaded from the internet. It will
-mostly "just work", but in some cases version 1.47 might download assets that
-have already been downloaded with AssetPack version 1.46 and earlier.
-
-The goal is to remove C<assetpack.db> completely.
-
-=head1 GUIDES
-
-=over 2
-
-=item * L<Mojolicious::Plugin::AssetPack::Guides::Tutorial>
-
-The tutorial will give an introduction to how AssetPack can be used.
-
-=item * L<Mojolicious::Plugin::AssetPack::Guides::Developing>
-
-The "developing" guide will give insight on how to do effective development with
-AssetPack and more details about the internals in this plugin.
-
-=item * L<Mojolicious::Plugin::AssetPack::Guides::Cookbook>
-
-The cookbook has various receipes on how to cook with AssetPack.
-
-=back
+Look no further. Just jump over to L<Mojolicious::Plugin::Webpack>.
 
 =head1 HELPERS
 
@@ -336,8 +269,6 @@ access the L<Mojolicious::Plugin::AssetPack> instance or as a tag helper.
 The helper name "asset" can be customized by specifying "helper" when
 L<registering|/register> the plugin.
 
-See L<Mojolicious::Plugin::AssetPack::Guides::Tutorial> for more details.
-
 =head1 ATTRIBUTES
 
 =head2 minify
@@ -347,9 +278,6 @@ See L<Mojolicious::Plugin::AssetPack::Guides::Tutorial> for more details.
 
 Set this to true to combine and minify the assets. Defaults to false if
 L<Mojolicious/mode> is "development" and true otherwise.
-
-See L<Mojolicious::Plugin::AssetPack::Guides::Tutorial/Application mode>
-for more details.
 
 =head2 route
 
@@ -363,9 +291,6 @@ to serve the asset.
 
 The default route will be built and added to the L<application|Mojolicious>
 when L</process> is called the first time.
-
-See L<Mojolicious::Plugin::AssetPack::Guides::Cookbook/ASSETS FROM CUSTOM DOMAIN>
-for an example on how to customize this route.
 
 =head2 store
 
@@ -401,9 +326,7 @@ Will return a registered pipe by C<$name> or C<undef> if none could be found.
   $self = $self->process($definition_file);
 
 Used to process assets. A C<$definition_file> can be used to define C<$topic>
-and C<@assets> in a separate file. See
-L<Mojolicious::Plugin::AssetPack::Guides::Tutorial/Process assets> for more
-details.
+and C<@assets> in a separate file.
 
 C<$definition_file> defaults to "assetpack.def".
 
@@ -434,9 +357,6 @@ needed. Example:
 
   $app->plugin(AssetPack => {pipes => [qw(Sass Css Combine)]);
 
-See L<Mojolicious::Plugin::AssetPack::Guides::Tutorial/Pipes> for a complete
-list of available pipes.
-
 =item * proxy
 
 A hash of proxy settings. Set this to C<0> to disable proxy detection.
@@ -452,14 +372,9 @@ See L<Mojo::UserAgent::Proxy/detect> for more information.
 
 L<Mojolicious::Plugin::Webpack>.
 
-L</GUIDES>,
-L<Mojolicious::Plugin::AssetPack::Asset>,
-L<Mojolicious::Plugin::AssetPack::Pipe> and
-L<Mojolicious::Plugin::AssetPack::Store>.
-
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014, Jan Henning Thorsen
+Copyright (C) 2020, Jan Henning Thorsen
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

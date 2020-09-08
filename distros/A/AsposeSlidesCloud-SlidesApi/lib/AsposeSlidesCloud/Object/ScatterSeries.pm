@@ -99,6 +99,7 @@ sub new {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
+	$self->{ data_point_type } = 'Scatter';
 	
 	return $self;
 }  

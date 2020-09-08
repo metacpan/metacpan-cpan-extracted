@@ -256,7 +256,7 @@ JjTJecOOS+88fK8qL1TrYv5rapIdqUI7aQ==
     );
     ok(
         $res->[2]->[0] =~
-qr%<input type="hidden" name="reference1x1" value="RemoveSF-(\d{10})">%,
+qr%<input type="hidden" name="reference1x1" value="RemoveSF-(\d{10})"/>%,
         'Notification reference found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( time() + 115 <= $1 && $1 <= time() + 125, 'Right reference found' )
@@ -284,14 +284,14 @@ qr%<p class="notifText">1 expired second factor\(s\) has/have been removed!</p>%
     );
     ok(
         $res->[2]->[0] =~
-qr%<input type="hidden" name="reference1x1" value="RemoveSF-(\d{10})">%,
+qr%<input type="hidden" name="reference1x1" value="RemoveSF-(\d{10})"/>%,
         'Notification reference found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( time() + 115 <= $1 && $1 <= time() + 125, 'Right reference found' )
       or print STDERR Dumper( $res->[2]->[0] ), time(), " / $1";
     ok(
         $res->[2]->[0] =~
-qr%<input type="hidden" name="reference1x2" value="RemoveSF-(\d{10})">%,
+qr%<input type="hidden" name="reference1x2" value="RemoveSF-(\d{10})"/>%,
         'Notification reference found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( time() + 295 <= $1 && $1 <= time() + 305, 'Right reference found' )

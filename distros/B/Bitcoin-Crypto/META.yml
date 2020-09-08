@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 6.55_03
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,20 +21,17 @@ no_index:
     - inc
 requires:
   Bitcoin::BIP39: '0.002'
-  CryptX: '0.062'
-  Math::BigInt: '1.999816'
-  Math::BigInt::GMP: '1.6006'
-  Math::EllipticCurve::Prime: '0.003'
-  Modern::Perl: '1.20181021'
-  Moo: '2.003004'
-  MooX::Types::MooseLike: '0.29'
+  CryptX: '0.068'
+  Math::BigInt: '1.999818'
+  Moo: '2.004000'
   Throwable: '0.2'
-  Try::Tiny: '0.30'
+  Type::Tiny: '1.010001'
+  namespace::clean: '0.27'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/brtastic/perl-bitcoin-crypto/issues
   homepage: https://metacpan.org/release/Bitcoin-Crypto
   license: https://dev.perl.org/licenses
   repository: https://github.com/brtastic/perl-bitcoin-crypto
-version: '0.993'
+version: '0.994'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

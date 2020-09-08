@@ -55,7 +55,7 @@ expectOK($res);
 my $id = expectCookie($res);
 expectForm( $res, undef, '/notifback', 'reference1x1' );
 
-# Verify that cookie is ciphered (session unvalid)
+# Verify that cookie is ciphered (session invalid)
 ok(
     $res = $client->_get(
         '/', cookie => "lemonldap=$id",
@@ -82,7 +82,7 @@ expectOK($res);
 $id = expectCookie($res);
 expectForm( $res, undef, '/notifback', 'reference1x1' );
 
-# Verify that cookie is ciphered (session unvalid)
+# Verify that cookie is ciphered (session invalid)
 ok(
     $res = $client->_get(
         '/', cookie => "lemonldap=$id",
@@ -186,7 +186,7 @@ ok( $json->{result} == 1, ' Result is 1' )
   or explain( $json, "result => 1" );
 ok(
     $json->{notification} =~
-      m%<input type="hidden" name="reference1x1" value="testref">%,
+      m%<input type="hidden" name="reference1x1" value="testref"/>%,
     ' Hidden input found'
 ) or explain( $json, "Hidden input" );
 ok( $json->{notification} =~ m%<h2 class="notifText">Test title</h2>%,

@@ -16,7 +16,7 @@ use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 use DateTime::Format::HTTP;
 
-our $VERSION  = version->new(1.1.12);
+our $VERSION  = version->new(1.1.13);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option = (
@@ -63,6 +63,7 @@ sub run {
     if ( $option{remote} ) {
         $arg .= ' -r';
     }
+    my $match = @ARGV ? shift @ARGV : '';
 
     my @branches = `git branch $arg --format='$fmt'`;
     my $i = 0;
@@ -82,6 +83,7 @@ sub run {
 
         $last = '';
         $branch = { zip @headings, @cols };
+        next if $match && $branch->{short} !~ /$match/;
         warn 'bad head' if !$branch->{HEAD};
         next if !$branch->{HEAD};
         if ( defined $option{unmerged} ) {
@@ -165,7 +167,7 @@ git-branch-age - grep tags
 
 =head1 VERSION
 
-This documentation refers to git-branch-age version 1.1.12
+This documentation refers to git-branch-age version 1.1.13
 
 =head1 SYNOPSIS
 

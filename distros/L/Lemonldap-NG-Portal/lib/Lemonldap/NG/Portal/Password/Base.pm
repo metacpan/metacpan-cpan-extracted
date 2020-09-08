@@ -42,14 +42,17 @@ sub _modifyPassword {
     return PE_PASSWORD_MISMATCH
       unless ( $req->data->{newpassword} eq $req->param('confirmpassword') );
 
-    my $rule =
-      $self->p->HANDLER->buildSub( $self->p->HANDLER->substitute( $self->conf->{portalRequireOldPassword} ) );
+    my $rule = $self->p->HANDLER->buildSub(
+        $self->p->HANDLER->substitute(
+            $self->conf->{portalRequireOldPassword}
+        )
+    );
     unless ($rule) {
         my $error = $self->p->HANDLER->tsv->{jail}->error || '???';
     }
 
     # Check if portal require old password
-    if ( $rule->($req, $req->userData) or $requireOldPwd ) {
+    if ( $rule->( $req, $req->userData ) or $requireOldPwd ) {
 
         # TODO: verify oldpassword
         unless ( $req->data->{oldpassword} = $req->param('oldpassword') ) {
@@ -157,9 +160,13 @@ sub checkPasswordQuality {
     # Fobidden special characters
     $password =~ s/[\Q$speChars\E\w]//g;
     if ($password) {
-        $self->logger->error(
-            'Password contains ' . length($password) . " forbidden character(s): $password");
-        return length($password) > 1 ? PE_PP_NOT_ALLOWED_CHARACTERS : PE_PP_NOT_ALLOWED_CHARACTER;
+        $self->logger->error( 'Password contains '
+              . length($password)
+              . " forbidden character(s): $password" );
+        return
+          length($password) > 1
+          ? PE_PP_NOT_ALLOWED_CHARACTERS
+          : PE_PP_NOT_ALLOWED_CHARACTER;
     }
 
     return PE_OK;

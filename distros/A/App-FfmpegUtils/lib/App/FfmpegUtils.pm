@@ -1,9 +1,9 @@
 package App::FfmpegUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-04'; # DATE
+our $DATE = '2020-09-05'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,21 +40,23 @@ sub _nearest {
     sprintf("%d", $_[0]/$_[1]) * $_[1];
 }
 
-$SPEC{reencode_video} = {
+$SPEC{reencode_video_with_libx264} = {
     v => 1.1,
-    summary => 'Re-encode video (using ffmpeg and H.264 codec)',
+    summary => 'Re-encode video (using ffmpeg and libx265) to reduce file size with minimal visual quality loss',
+    summary => 'Re-encode video (using ffmpeg and libx264)',
     description => <<'_',
 
-This utility runs ffmpeg to re-encode your video files. It is a wrapper to
-simplify invocation of ffmpeg. It selects the appropriate ffmpeg options for
-you, allows you to specify multiple files, and picks appropriate output
-filenames. It also sports a `--dry-run` option to let you see ffmpeg options to
-be used without actually running ffmpeg.
+This utility runs ffmpeg to re-encode your video files using the libx264 codec.
+It is a wrapper to simplify invocation of ffmpeg. It selects the appropriate
+ffmpeg options for you, allows you to specify multiple files, and picks
+appropriate output filenames. It also sports a `--dry-run` option to let you see
+ffmpeg options to be used without actually running ffmpeg.
 
 This utility is usually used to reduce the file size (and optionally video
-width/height) of videos so they are smaller, while minimizing quality loss. The
-default setting is roughly similar to how Google Photos encodes videos (max
-1080p).
+width/height) of videos so they are smaller, while minimizing quality loss.
+Smartphone-produced videos are often high bitrate (e.g. >10-20Mbit) and not yet
+well compressed, so they make a good input for this utility. The default setting
+is roughly similar to how Google Photos encodes videos (max 1080p).
 
 The default settings are:
 
@@ -86,7 +88,7 @@ _
             schema => ['int*', between=>[0,51]],
         },
         downsize_to => {
-            schema => ['str*', in=>['', '480p', '720p', '1080p']],
+            schema => ['str*', in=>['', '360p', '480p', '720p', '1080p']],
             default => '1080p',
             description => <<'_',
 
@@ -101,6 +103,20 @@ _
                 dont_downsize => {summary=>"Alias for --downsize-to ''", is_flag=>1, code=>sub {$_[0]{downsize_to} = ''}},
                 no_downsize   => {summary=>"Alias for --downsize-to ''", is_flag=>1, code=>sub {$_[0]{downsize_to} = ''}},
             },
+        },
+        preset => {
+            schema => ['str*', in=>[qw/ultrafast superfast veryfast faster fast medium slow slower veryslow/]],
+            default => 'veryslow',
+        },
+        frame_rate => {
+            summary => 'Set frame rate, in fps',
+            schema => 'ufloat*',
+            cmdline_aliases => {r=>{}},
+        },
+        audio_sample_rate => {
+            summary => 'Set audio sample rate, in Hz',
+            schema => 'uint*',
+            cmdline_aliases => {sample_rate=>{}},
         },
     },
     features => {
@@ -130,7 +146,7 @@ _
         },
     ],
 };
-sub reencode_video {
+sub reencode_video_with_libx264 {
     require File::Which;
     require IPC::System::Options;
     require Media::Info;
@@ -170,7 +186,10 @@ sub reencode_video {
       DOWNSIZE: {
             last unless $downsize_to;
             my $ratio;
-            if ($downsize_to eq '480p') {
+            if ($downsize_to eq '360p') {
+                last unless $video_info->{video_shortest_side} > 360;
+                $ratio = $video_info->{video_shortest_side} / 360;
+            } elsif ($downsize_to eq '480p') {
                 last unless $video_info->{video_shortest_side} > 480;
                 $ratio = $video_info->{video_shortest_side} / 480;
             } elsif ($downsize_to eq '720p') {
@@ -195,11 +214,16 @@ sub reencode_video {
         my $ext = $downsized ? ".$downsize_to-crf$crf.mp4" : ".crf$crf.mp4";
         $output_file =~ s/(\.\w{3,4})?\z/($1 eq ".mp4" ? "" : $1) . $ext/e;
 
+        my $audio_is_copy = 1;
+        $audio_is_copy = 0 if defined $args{audio_sample_rate};
+
         push @ffmpeg_args, (
             "-c:v", "libx264",
             "-crf", $crf,
-            "-preset", "veryslow",
-            "-c:a", "copy",
+            "-preset", ($args{preset} // 'veryslow'),
+            (defined $args{frame_rate} ? ("-r", $args{frame_rate}) : ()),
+            "-c:a", ($audio_is_copy ? "copy" : "aac"),
+            (defined $args{audio_sample_rate} ? ("-ar", $args{audio_sample_rate}) : ()),
             $output_file,
         );
 
@@ -236,29 +260,30 @@ App::FfmpegUtils - Utilities related to ffmpeg
 
 =head1 VERSION
 
-This document describes version 0.003 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2020-06-04.
+This document describes version 0.005 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2020-09-05.
 
 =head1 FUNCTIONS
 
 
-=head2 reencode_video
+=head2 reencode_video_with_libx264
 
 Usage:
 
- reencode_video(%args) -> [status, msg, payload, meta]
+ reencode_video_with_libx264(%args) -> [status, msg, payload, meta]
 
-Re-encode video (using ffmpeg and H.264 codec).
+Re-encode video (using ffmpeg and libx264).
 
-This utility runs ffmpeg to re-encode your video files. It is a wrapper to
-simplify invocation of ffmpeg. It selects the appropriate ffmpeg options for
-you, allows you to specify multiple files, and picks appropriate output
-filenames. It also sports a C<--dry-run> option to let you see ffmpeg options to
-be used without actually running ffmpeg.
+This utility runs ffmpeg to re-encode your video files using the libx264 codec.
+It is a wrapper to simplify invocation of ffmpeg. It selects the appropriate
+ffmpeg options for you, allows you to specify multiple files, and picks
+appropriate output filenames. It also sports a C<--dry-run> option to let you see
+ffmpeg options to be used without actually running ffmpeg.
 
 This utility is usually used to reduce the file size (and optionally video
-width/height) of videos so they are smaller, while minimizing quality loss. The
-default setting is roughly similar to how Google Photos encodes videos (max
-1080p).
+width/height) of videos so they are smaller, while minimizing quality loss.
+Smartphone-produced videos are often high bitrate (e.g. >10-20Mbit) and not yet
+well compressed, so they make a good input for this utility. The default setting
+is roughly similar to how Google Photos encodes videos (max 1080p).
 
 The default settings are:
 
@@ -291,6 +316,10 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<audio_sample_rate> => I<uint>
+
+Set audio sample rate, in Hz.
+
 =item * B<crf> => I<int>
 
 =item * B<downsize_to> => I<str> (default: "1080p")
@@ -304,6 +333,12 @@ C<--dont-downsize> on the CLI.
 =item * B<ffmpeg_path> => I<filename>
 
 =item * B<files>* => I<array[filename]>
+
+=item * B<frame_rate> => I<ufloat>
+
+Set frame rate, in fps.
+
+=item * B<preset> => I<str> (default: "veryslow")
 
 
 =back

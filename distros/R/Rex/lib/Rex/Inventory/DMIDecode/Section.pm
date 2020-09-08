@@ -9,7 +9,7 @@ package Rex::Inventory::DMIDecode::Section;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 require Exporter;
 use Symbol;
@@ -78,7 +78,7 @@ sub get_all {
   my $r = ref($self);
 
   my $ref_to_items = qualify_to_ref( 'items', $r );
-  my @items        = @{$ref_to_items};
+  my @items        = @{ *{$ref_to_items} };
 
   my $ret = {};
   for my $itm (@items) {

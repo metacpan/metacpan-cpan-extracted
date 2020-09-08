@@ -3,7 +3,7 @@ package Apache::Session::Browseable::Store::LDAP;
 use strict;
 use Net::LDAP;
 
-our $VERSION = '1.3.7';
+our $VERSION = '1.3.8';
 
 sub new {
     my $class = shift;
@@ -176,8 +176,21 @@ sub ldap {
         ),
     ) or die( 'Unable to connect to ' . join( ' ', @servers ) . ": " . $@ );
 
-    # Start TLS if needed
+    # Check SSL error for old Net::LDAP versions
+    if ( $Net::LDAP::VERSION < '0.64' ) {
 
+        # CentOS7 has a bug in which IO::Socket::SSL will return a broken
+        # socket when certificate validation fails. Net::LDAP does not catch
+        # it, and the process ends up crashing.
+        # As a precaution, make sure the underlying socket is doing fine:
+        if (    $ldap->socket->isa('IO::Socket::SSL')
+            and $ldap->socket->errstr < 0 )
+        {
+            die( "SSL connection error: " . $ldap->socket->errstr );
+        }
+    }
+
+    # Start TLS if needed
     if ($useTls) {
         my %h = split( /[&=]/, $tlsParam );
         $h{verify} ||= ( $self->{args}->{ldapVerify} || "require" );

@@ -145,7 +145,7 @@ sub import {
     }
 
     # Otherwise, gather the necessary tools...
-    use ExtUtils::Command qw( mkpath );
+    use File::Path qw( make_path );
     use File::Spec;
     local $| = 1;
 
@@ -163,8 +163,7 @@ sub import {
         = File::Spec->catdir( $ENV{HOME}, '.module-starter', 'PBP' );
     if ( not -d $template_dir ) {
         print {*STDERR} "Creating $template_dir...";
-        local @ARGV = $template_dir;
-        mkpath;
+        make_path $template_dir;
         print {*STDERR} "done.\n";
     }
 
@@ -172,8 +171,7 @@ sub import {
         = File::Spec->catdir( $ENV{HOME}, '.module-starter', 'PBP', 't' );
     if ( not -d $template_test_dir ) {
         print {*STDERR} "Creating $template_test_dir...";
-        local @ARGV = $template_test_dir;
-        mkpath;
+        make_path $template_test_dir;
         print {*STDERR} "done.\n";
     }
 
@@ -771,14 +769,14 @@ FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
 SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGES.
 _____[ pod-coverage.t ]__________________________________________
-#!perl -T
+#!perl
 
 use Test::More;
 eval "use Test::Pod::Coverage 1.04";
 plan skip_all => "Test::Pod::Coverage 1.04 required for testing POD coverage" if $@;
 all_pod_coverage_ok();
 _____[ pod.t ]___________________________________________________
-#!perl -T
+#!perl
 
 use Test::More;
 eval "use Test::Pod 1.14";

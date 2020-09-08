@@ -19,7 +19,7 @@ sub init { 1 }
 
 sub run {
     my ( $self, $req ) = @_;
-    
+
     if ( $req->param('checkLogins') ) {
         $self->logger->debug('History asked');
         $req->info( (

@@ -35,9 +35,9 @@ LWP::Protocol::PSGI->register(
         );
         ok( ( $res->[0] == 200 or $res->[0] == 400 ), 'Response is 200 or 400' )
           or explain( $res->[0], "200 or 400" );
-        ok( getHeader( $res, 'Content-Type' ) =~ m#^application/xml#,
+        ok( getHeader( $res, 'Content-Type' ) =~ m#^text/xml#,
             'Content is XML' )
-          or explain( $res->[1], 'Content-Type => application/xml' );
+          or explain( $res->[1], 'Content-Type => text/xml' );
         count(4);
         return $res;
     }

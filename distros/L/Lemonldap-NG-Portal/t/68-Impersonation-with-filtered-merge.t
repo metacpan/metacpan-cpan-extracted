@@ -1,6 +1,7 @@
 use Test::More;
 use strict;
 use IO::String;
+use JSON;
 
 BEGIN {
     require 't/test-lib.pm';
@@ -21,6 +22,7 @@ my $client = LLNG::Manager::Test->new( {
             impersonationRule              => 1,
             checkUserDisplayPersistentInfo => 0,
             checkUserDisplayEmptyValues    => 0,
+            checkUserHiddenAttributes      => '',
             impersonationMergeSSOgroups    => 'su; _test_; su_test; sutest',
         }
     }
@@ -139,6 +141,32 @@ ok( $res->[2]->[0] =~ m%<td scope="row">_whatToTrace</td>%,
     'Found _whatToTrace' )
   or explain( $res->[2]->[0], 'Macro Key _whatToTrace' );
 count(15);
+
+ok(
+    $res = $client->_post(
+        '/checkuser',
+        IO::String->new($query),
+        cookie => "lemonldap=$id",
+        length => length($query),
+    ),
+    'POST checkuser'
+);
+count(1);
+
+my $json;
+ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
+  or print STDERR "$@\n" . Dumper($res);
+my @real_hGroups = map { $_->{key} eq 'real_hGroups' ? $_ : () }
+  @{ $json->{ATTRIBUTES} };
+ok( keys %{$real_hGroups[0]->{value}} == 5, 'Right number of real_hGroups found' )
+  or explain( $real_hGroups[0]->{value}, 'Wrong real_hGroups' );
+count(2);
+
+my @hGroups = map { $_->{key} eq 'hGroups' ? $_ : () }
+  @{ $json->{ATTRIBUTES} };
+ok( keys %{$hGroups[0]->{value}} == 4, 'Right number of hGroups found' )
+  or explain( $hGroups[0]->{value}, 'Wrong hGroups' );
+count(1);
 
 $client->logout($id);
 clean_sessions();

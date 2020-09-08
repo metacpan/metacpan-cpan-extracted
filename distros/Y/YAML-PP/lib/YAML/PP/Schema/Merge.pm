@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Merge;
 
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 use YAML::PP::Type::MergeKey;
 
@@ -91,6 +91,9 @@ So the inner API of that is not stable at this point.
 Note that if you enable this schema, a plain scalar `<<` will be seen as
 special anywhere in your document, so if you want a literal `<<`, you have
 to put it in quotes.
+
+Note that the performed merge is not a "deep merge". Only top-level keys are
+merged.
 
 =head1 METHODS
 

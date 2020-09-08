@@ -1,3 +1,7 @@
+0.34.16 2020-09-05 07:53:26 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+  - make sure the blocker overlays popup windows too
+
 0.34.15 2020-08-24 14:10:23 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - mkerror not merror

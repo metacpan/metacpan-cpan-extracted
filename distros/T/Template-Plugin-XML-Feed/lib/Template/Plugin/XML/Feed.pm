@@ -5,7 +5,7 @@ use warnings;
 use base 'Template::Plugin';
 use XML::Feed;
 
-our $VERSION = 0.01;
+our $VERSION = '1.0.0';
 
 sub new {
   my ($class, $context, $filename) = @_;
@@ -80,11 +80,11 @@ for L<Template::Plugin::XML::RSS> by Andy Wardley.
 
 The XML::Feed module, which implements all of the functionality that
 this plugin delegates to, was written by Benjamin Trott and is now maintained
-by Simon Wardley.
+by Dave Cross.
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2009 Magnum Solutions Ltd.  All Rights Reserved.
+Copyright (C) 2009-2020 Magnum Solutions Ltd.  All Rights Reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

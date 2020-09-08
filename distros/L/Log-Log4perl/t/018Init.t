@@ -1,6 +1,6 @@
 #Testing double-init
 
-BEGIN { 
+BEGIN {
     if($ENV{INTERNAL_DEBUG}) {
         require Log::Log4perl::InternalDebug;
         Log::Log4perl::InternalDebug->enable();
@@ -14,25 +14,14 @@ use strict;
 
 use Log::Log4perl;
 use File::Spec;
+use lib File::Spec->catdir(qw(t lib));
+use Log4perlInternalTest qw(tmpdir);
 
-my $WORK_DIR = "tmp";
-if(-d "t") {
-    $WORK_DIR = File::Spec->catfile(qw(t tmp));
-}
-unless (-e "$WORK_DIR"){
-    mkdir("$WORK_DIR", 0755) || die "can't create $WORK_DIR ($!)";
-}
-
-my $testfilea = File::Spec->catfile(qw(t tmp test18a.log));
-unlink $testfilea if (-e $testfilea);
-
-my $testfileb = File::Spec->catfile(qw(t tmp test18b.log));
-unlink $testfileb if (-e $testfileb);
+my $WORK_DIR = tmpdir();
+my $testfilea = File::Spec->catfile($WORK_DIR, qw(test18a.log));
+my $testfileb = File::Spec->catfile($WORK_DIR, qw(test18b.log));
 
 BEGIN {plan tests => 2}
-END { unlink $testfilea;
-      unlink $testfileb;
-    }
 
 ####################################################
 # Double-Init, 2nd time with different log file name
@@ -67,4 +56,11 @@ for my $file ($testfilea, $testfileb) {
     my $content = join '', <FILE>;
     close FILE;
     ok($content, "INFO - Shu-wa-chi!\n");
+}
+
+reset_logger();
+
+sub reset_logger {
+  local $Log::Log4perl::Config::CONFIG_INTEGRITY_CHECK = 0; # to close handles and allow temp files to go
+  Log::Log4perl::init(\'');
 }

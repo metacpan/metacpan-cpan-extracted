@@ -4,12 +4,15 @@ use Lemonldap::NG::Common::Conf;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Manager::Conf::Parser;
 use Lemonldap::NG::Handler::Main::Jail;
+use Lemonldap::NG::Manager::Cli::Lib;
 use Data::Dumper;
 use English qw(-no_match_vars);
 use File::Temp;
 use POSIX qw(setuid setgid);
 use Safe;
 use strict;
+
+my $cli = Lemonldap::NG::Manager::Cli::Lib->new;
 
 eval {
     setgid( ( getgrnam('__APACHEGROUP__') )[2] );
@@ -73,7 +76,7 @@ if (`diff $refFile $editFile`) {
             req     => 1,
         }
     );
-    unless ( $parser->testNewConf(undef) ) {
+    unless ( $parser->testNewConf( $cli->mgr ) ) {
         print STDERR "Configuration seems to have some errors:\n ";
         print STDERR Dumper(
             { errors => $parser->errors, warnings => $parser->warnings } );

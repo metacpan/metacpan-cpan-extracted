@@ -44,7 +44,7 @@ use PPIx::Regexp::Constant qw{
 };
 use PPIx::Regexp::Util qw{ __to_ordinal_en };
 
-our $VERSION = '0.073';
+our $VERSION = '0.074';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };

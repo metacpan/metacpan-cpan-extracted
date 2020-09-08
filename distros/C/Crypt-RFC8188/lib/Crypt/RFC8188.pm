@@ -10,7 +10,7 @@ use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate gcm_decrypt_verify);
 use Exporter qw(import);
 use Crypt::PRNG qw(random_bytes);
 
-our $VERSION = "0.01";
+our $VERSION = "0.03";
 our @EXPORT_OK = qw(ece_encrypt_aes128gcm ece_decrypt_aes128gcm derive_key);
 
 my $MAX_RECORD_SIZE = (2 ** 31) - 1;

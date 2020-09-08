@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,7 +40,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Email::MIME" : "0",
+            "Email::MIME" : "1.949",
             "HTML::Form" : "0",
             "HTML::FormatText" : "0",
             "HTTP::Cookies" : "0"
@@ -60,6 +60,6 @@
          "web" : "https://github.com/mohawk2/Mail-POP3"
       }
    },
-   "version" : "3.10",
+   "version" : "3.11",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -1,6 +1,6 @@
 package RxPerl::Subscriber;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 sub next {
     my $self = shift;

@@ -3,7 +3,7 @@ package YAML::PP::LibYAML::Emitter;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use YAML::LibYAML::API::XS;
 use YAML::PP::Writer;
@@ -14,14 +14,20 @@ use base 'YAML::PP::Emitter';
 sub new {
     my ($class, %args) = @_;
     my $indent = delete $args{indent} || 2;
+    my $width = delete $args{width} || 80;
     my $self = bless {
         indent => $indent,
+        width => $width,
     }, $class;
+    if (keys %args) {
+        die "Unexpected arguments: " . join ', ', sort keys %args;
+    }
     $self->{events} = [];
     return $self;
 }
 sub events { return $_[0]->{events} }
 sub indent { return $_[0]->{indent} }
+sub width { return $_[0]->{width} }
 
 
 sub mapping_start_event {
@@ -87,6 +93,7 @@ sub stream_end_event {
     $writer->init();
     my $options = {
         indent => $self->indent,
+        width => $self->width,
     };
 
     if ($writer->can('open_handle')) {

@@ -88,11 +88,11 @@ SKIP: {
     my $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
     my $tmp;
     ( $host, $tmp, $query ) =
-      expectForm( $res, undef, '/upgradesession', 'confirm' );
+      expectForm( $res, undef, '/renewsession', 'confirm' );
     ok( $res->[2]->[0] =~ /trspan="askToRenew"/, 'Propose to renew session' );
     ok(
         $res = $issuer->_post(
-            '/upgradesession',
+            '/renewsession',
             IO::String->new($query),
             accept => 'text/html',
             length => length($query),
@@ -110,7 +110,7 @@ SKIP: {
     $query .= '&user=dwho&password=dwho';
     ok(
         $res = $issuer->_post(
-            '/upgradesession',
+            '/renewsession',
             IO::String->new($query),
             accept => 'text/html',
             length => length($query),

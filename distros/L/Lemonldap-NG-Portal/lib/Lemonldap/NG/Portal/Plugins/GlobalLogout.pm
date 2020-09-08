@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -139,7 +139,7 @@ sub globalLogout {
                     }
                     else {
                         $self->userLogger->warn(
-                            "GlobalLogout called with an unvalid token");
+                            "GlobalLogout called with an invalid token");
                         $res = PE_TOKENEXPIRED;
                     }
                 }

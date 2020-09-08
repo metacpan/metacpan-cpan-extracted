@@ -66,14 +66,6 @@ for little tangible gain.
 
 =head1 NOTICE
 
-The use of this class to parse non-regexp quote-like strings was an
-experiment that I consider failed. Therefore this use is B<deprecated>
-in favor of L<PPIx::QuoteLike|PPIx::QuoteLike>. As of version 0.058_01,
-the first use of the C<parse> argument to L<new()|/new> resulted in a
-warning. As of version 0.062_01, all uses of the C<parse> argument
-resulted in a warning. As of version 0.068_01, the C<parse> argument
-will become fatal.
-
 The author will attempt to preserve the documented interface, but if the
 interface needs to change to correct some egregiously bad design or
 implementation decision, then it will change.  Any incompatible changes
@@ -102,7 +94,7 @@ Known examples of this include:
 
 =item C<$(> no longer interpolates as of Perl 5.005, per C<perl5005delta>.
 
-Newer Perls seem to parse this as C<qr{$}> (i.e. and end-of-string or
+Newer Perls seem to parse this as C<qr{$}> (i.e. an end-of-string or
 newline assertion) followed by an open parenthesis, and that is what
 C<PPIx::Regexp> does.
 
@@ -194,7 +186,7 @@ use PPIx::Regexp::Util qw{
 use Scalar::Util qw{ refaddr };
 use Text::Tabs ();
 
-our $VERSION = '0.073';
+our $VERSION = '0.074';
 
 =head2 new
 
@@ -271,18 +263,6 @@ specified as a L<PPI::Element|PPI::Element>.
 
 If no location can be determined, the various C<location()> methods will
 return C<undef>.
-
-=item parse parse_type
-
-This option specifies what kind of parse is to be done. Possible values
-are C<'regex'>, C<'string'>, or C<'guess'>. Any value but C<'regex'> is
-experimental.
-
-As it turns out, I consider parsing non-regexp quote-like things with
-this class to be a failed experiment, and the relevant functionality is
-being deprecated and removed in favor of
-L<PPIx::QuoteLike|PPIx::QuoteLike>. See above for details. As of version
-0.068_01, any use of this option throws an exception.
 
 =item postderef Boolean
 

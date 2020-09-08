@@ -22,7 +22,7 @@ for ( my $i = 0 ; $i < @ARGV ; $i++ ) {
 
 $action ||= "help";
 
-if ( $action =~ /^(?:[gs]et|(?:add|del)Key|save|restore|rollback)$/ ) {
+if ( $action =~ /^(?:[gs]et|del|(?:add|del)Key|save|restore|rollback)$/ ) {
     eval { require Lemonldap::NG::Manager::Cli; };
     die "Manager libraries not available, aborting ($@)" if ($@);
     Lemonldap::NG::Manager::Cli->run(@ARGV);
@@ -45,6 +45,7 @@ Available actions:
  - update-cache                  : force configuration cache to be updated
  - get    <keys>                 : get values of parameters
  - set    <key> <value>          : set parameter(s) value(s)
+ - del    <keys>                 : delete parameters
  - addKey <key> <subkey> <value> : add or set a subkey in a parameter
  - delKey <key> <subkey>         : delete subkey of a parameter
  - save                          : export configuration to STDOUT
@@ -58,6 +59,8 @@ Options:
  - safe <0|1>                    : fail in case the requested configuration is invalid
  - force <0|1>                   : allow overwrite of existing config number
  - cfgNum <num>                  : set new configuration number (requires -force 1)
+ - sep <char>                    : separator of hierarchical values (by default: /)
+ - iniFile <file>                : path to an alternate lemonldap-ng.ini file
 
 See Lemonldap::NG::Manager::Cli(3) for more
 };

@@ -74,7 +74,9 @@ expectOK($res);
 count(1);
 
 ok( $res->[2]->[0] =~ m#<cas:sn>Accents</cas:sn>#, "Found macro attribute" );
-count(1);
+ok( $res->[2]->[0] =~ m#<cas:user>customfrench</cas:user>#,
+    "Found cas:user macro value" );
+count(2);
 
 clean_sessions();
 done_testing( count() );
@@ -92,6 +94,7 @@ sub issuer {
                 casAppMetaDataOptions => {
                     sp => {
                         casAppMetaDataOptionsService => 'http://auth.sp.com/',
+                        casAppMetaDataOptionsUserAttribute => 'customname',
                     },
                 },
                 casAppMetaDataExportedVars => {
@@ -105,6 +108,7 @@ sub issuer {
                 casAppMetaDataMacros => {
                     sp => {
                         extracted_sn => '(split(/\s/, $cn))[1]',
+                        customname   => '"custom".$uid',
                     }
                 },
                 casAccessControlPolicy => 'error',

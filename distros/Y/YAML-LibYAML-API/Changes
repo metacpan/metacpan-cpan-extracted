@@ -1,5 +1,13 @@
 Revision history for Perl module YAML::LibYAML::API
 
+0.012 2020-09-08 12:55:03+02:00
+
+    - Remove local/ directory from tarball
+
+0.011 2020-09-07 19:41:56+02:00
+
+    - Pass new option 'width' to libyaml
+
 0.010 2020-08-19 22:39:12+02:00
 
     - Update to libyaml 0.2.5

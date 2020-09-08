@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 ARRAYn
+Alders
 AllUtils
 Andy
 BLOCK's
@@ -27,6 +28,7 @@ KEYFUNC
 KVLIST
 Karen
 List
+Olaf
 PayPal
 Ricardo
 Rolsky
@@ -52,6 +54,7 @@ minmax
 minstr
 natatime
 notall
+olaf
 onlyidx
 onlyres
 onlyval

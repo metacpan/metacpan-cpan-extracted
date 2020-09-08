@@ -1,6 +1,6 @@
 use Module::Build;
 my $build = new Module::Build(module_name => 'Tie::Hash::FixedKeys',
-                              dist_version => '1.12',
+                              dist_version => '1.13.0',
 			      license => 'perl',
 			      requires => {
 					   perl           => '5.6.0',

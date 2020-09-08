@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::Common;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -110,6 +110,20 @@ sub _getRegexpFromPattern {
     $pattern = "^$pattern\$" if ( $pattern =~ /\*/ );
 
     return qr/$pattern/;
+}
+
+sub _getPersistentMod {
+    my ($self) = @_;
+    my $mod = $self->sessionTypes->{persistent};
+    $mod->{options}->{backend} = $mod->{module};
+    return $mod;
+}
+
+sub _getSSOMod {
+    my ($self) = @_;
+    my $mod = $self->sessionTypes->{global};
+    $mod->{options}->{backend} = $mod->{module};
+    return $mod;
 }
 
 1;

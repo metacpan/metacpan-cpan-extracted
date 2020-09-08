@@ -1,6 +1,6 @@
 package Bitcoin::Crypto::Key::Public;
 
-use Modern::Perl "2010";
+use v5.10; use warnings;
 use Moo;
 
 use Bitcoin::Crypto::Script;
@@ -8,6 +8,10 @@ use Bitcoin::Crypto::Base58 qw(encode_base58check);
 use Bitcoin::Crypto::Bech32 qw(encode_segwit);
 use Bitcoin::Crypto::Config;
 use Bitcoin::Crypto::Helpers qw(hash160);
+use Bitcoin::Crypto;
+
+use namespace::clean;
+our $VERSION = Bitcoin::Crypto->VERSION;
 
 with "Bitcoin::Crypto::Role::BasicKey";
 

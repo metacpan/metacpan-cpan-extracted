@@ -137,7 +137,7 @@ SKIP: {
     # Generate TOTP with an external application to validate LLNG TOTP formula
     my $oath = Authen::OATH->new( digits => 8 );
     ok( $code = $oath->totp($key), 'Ext. App Code' );
-    ok( $code == $totp,            'Both TOTP match' )
+    ok( $code == $totp, 'Both TOTP match' )
       or explain( [ $code, $totp ], 'LLNG and Ext. App TOTP mismatch' );
 
     $query =~ s/code=/code=$code/;

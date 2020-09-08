@@ -1,15 +1,17 @@
 package Bitcoin::Crypto::Key::ExtPublic;
 
-use Modern::Perl "2010";
+use v5.10; use warnings;
 use Moo;
 use Crypt::Mac::HMAC qw(hmac);
-use Math::BigInt 1.999816 try => 'GMP';
-use Math::EllipticCurve::Prime;
-use Math::EllipticCurve::Prime::Point;
+use Scalar::Util qw(blessed);
 
 use Bitcoin::Crypto::Config;
-use Bitcoin::Crypto::Helpers qw(ensure_length);
+use Bitcoin::Crypto::Helpers qw(new_bigint ensure_length add_ec_points);
 use Bitcoin::Crypto::Exception;
+use Bitcoin::Crypto;
+
+use namespace::clean;
+our $VERSION = Bitcoin::Crypto->VERSION;
 
 with "Bitcoin::Crypto::Role::ExtendedKey";
 
@@ -25,28 +27,30 @@ sub _derive_key_partial
 
 	# public key data - SEC compressed form
 	my $hmac_data = $self->raw_key("public_compressed");
+
 	# child number - 4 bytes
 	$hmac_data .= ensure_length pack("N", $child_num), 4;
 
 	my $data = hmac("SHA512", $self->chain_code, $hmac_data);
 	my $chain_code = substr $data, 32, 32;
 
-	my $el_curve = Math::EllipticCurve::Prime->from_name($config{curve_name});
-	my $number = Math::BigInt->from_bytes(substr $data, 0, 32);
+	my $n_order = new_bigint(pack "H*", $self->key_instance->curve2hash->{order});
+	my $number = new_bigint(substr $data, 0, 32);
 	Bitcoin::Crypto::Exception::KeyDerive->raise(
 		"key $child_num in sequence was found invalid"
-	) if $number->bge($el_curve->n);
+	) if $number->bge($n_order);
 
 	my $key = $self->_create_key(substr $data, 0, 32);
-	my $point = Math::EllipticCurve::Prime::Point->from_bytes($key->export_key_raw("public"));
-	$point->curve($el_curve);
-	my $point_cpy = $point->copy();
-	my $parent_point = Math::EllipticCurve::Prime::Point->from_bytes($self->raw_key("public"));
-	$parent_point->curve($el_curve);
-	$point->badd($parent_point);
+	my $point = $key->export_key_raw("public");
+	my $parent_point = $self->raw_key("public");
+	$point = add_ec_points($point, $parent_point);
 
-	return __PACKAGE__->new(
-		$point->to_bytes,
+	Bitcoin::Crypto::Exception::KeyDerive->raise(
+		"key $child_num in sequence was found invalid"
+	) unless defined $point;
+
+	return (blessed $self)->new(
+		$point,
 		$chain_code,
 		$child_num,
 		$self->get_fingerprint,
@@ -139,13 +143,13 @@ Returns the key in basic format: L<Bitcoin::Crypto::Key::Public>
 
 	sig: derive_key($self, $path)
 
-Performs extended key deriviation as specified in BIP32 on the current key with $path. Dies on error.
+Performs extended key derivation as specified in BIP32 on the current key with $path. Dies on error.
 
-See BIP32 document for details on deriviation paths and methods.
+See BIP32 document for details on derivation paths and methods.
 
-Note that public keys cannot derive private keys and your deriviation path must start with M (capital m).
+Note that public keys cannot derive private keys and your derivation path must start with M (capital m).
 
-Returns a new extended key instance - result of a deriviation.
+Returns a new extended key instance - result of a derivation.
 
 =head2 get_fingerprint
 

@@ -34,9 +34,9 @@ LWP::Protocol::PSGI->register(
             'Execute request'
         );
         expectOK($res);
-        ok( getHeader( $res, 'Content-Type' ) =~ m#^application/xml#,
+        ok( getHeader( $res, 'Content-Type' ) =~ m#^text/xml#,
             'Content is XML' )
-          or explain( $res->[1], 'Content-Type => application/xml' );
+          or explain( $res->[1], 'Content-Type => text/xml' );
         count(3);
         return $res;
     }

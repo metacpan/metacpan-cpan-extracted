@@ -1,0 +1,244 @@
+#!perl
+# script to provide some basic Backblaze B2 functions on the command line
+# more details in print_help() below
+
+use strict;
+use warnings;
+
+use Backblaze::B2V2Client;
+use Path::Tiny;
+use Cwd;
+
+# i just love use-warnings
+    
+my $dispatch = {
+	'get' => 'download_file',
+	'put' => 'upload_file',
+	'list' => 'list_buckets',
+	'new_bucket' => 'new_bucket',
+	'save_tokens' => 'save_b2_tokens',
+	'help' => 'print_help',
+};
+
+$ARGV[0] ||= 'help';
+
+my $subroutine = $$dispatch{ $ARGV[0] } || 'print_help';
+
+# don't want that first one
+my $done_with_first_arg = shift(@ARGV);
+
+# thank you perl monks
+my $subroutine_reference = \&$subroutine;
+if ($subroutine eq 'save_b2_tokens') {
+	&$subroutine_reference(@ARGV);
+
+} elsif ($subroutine eq 'print_help') {
+	&$subroutine_reference();
+
+} else { # include the tokens
+	&$subroutine_reference(@ARGV);
+}
+
+exit;
+
+### Actual functionality  is below
+
+## the next several subroutines are going to be named such that I am not going to 
+## write a comment above them stating what they do. 
+sub download_file {
+	my (@args) = @_;
+	
+	if (!$args[0] || !$args[1]) {
+		die "Usage: b2_client get BUCKET_NAME FILE_NAME [DESTINATION_DIRECTORY]\n";
+	}
+	
+	# destination directory is optional
+	if (!$args[2]) {
+		$args[2] = getcwd;
+	}
+	
+	# log in and upload the file
+	my $b2client = get_b2_session();
+	$b2client->b2_download_file_by_name(@args);
+	
+	# print error or success
+	if ($b2client->{current_status} ne 'OK') {
+		print get_error_message($b2client);
+	} else {
+		print "Success: $args[1] saved to $args[2]\n";
+	}
+	
+}
+
+sub upload_file {
+	my (@args) = @_;
+	
+	if (!$args[0] || !$args[1]) {
+		die "Usage: b2_client put BUCKET_NAME PATH_TO_FILE\n";
+	}
+	
+	# login in and upload the file
+	my $b2client = get_b2_session();
+	$b2client->b2_upload_file(
+		'bucket_name' => $args[0],
+		'file_location' => $args[1],
+	);
+	
+	# print error or success
+	if ($b2client->{current_status} ne 'OK') {
+		print get_error_message($b2client);
+	} else {
+		print "Success: $args[1] uploaded to bucket $args[0]\n";
+	}	
+	
+}
+
+sub list_buckets {
+	# log in and retrieve the buckets
+	my $b2client = get_b2_session();
+	$b2client->b2_list_buckets();
+	
+	# print error if needed 
+	if ($b2client->{current_status} ne 'OK') {
+		print get_error_message($b2client);
+		return;
+	}
+
+	# simple print-out
+	foreach my $bucket_name (sort keys %{ $b2client->{buckets} }) {
+		print $bucket_name."\n";
+	}
+
+}
+
+sub new_bucket {
+	my (@args) = @_;
+	
+	if (!$args[0]) {
+		die "Usage: b2_client new_bucket NEW_BUCKET_NAME\n";
+	}
+	
+	# log in and create the bucket
+	my $b2client = get_b2_session();
+	$b2client->b2_list_buckets($args[0], 1);
+
+	# print error or success
+	if ($b2client->{current_status} ne 'OK') {
+		print get_error_message($b2client);
+		return;
+	} else {
+		print "Success: New bucket '$args[0]' was created.\n";	
+	}
+	
+}
+
+sub print_help {
+
+print qq{
+b2_client: Simple Backblaze B2 client
+
+This utility can download and upload files from the Backblaze B2 service. It is part of Backblaze::B2V2Client Perl library - https://metacpan.org/pod/Backblaze::B2V2Client
+
+# b2_client save_tokens APPLICATION_KEY_ID APPLICATION_KEY
+
+Both arguments are required. Saves your B2 API key tokens to ~/.b2_tokens . Provision a key under 'App Keys' in the B2 Web UI.  Choose carefully on the privileges you wish to give this app key, bearing in mind that the client can only complete the operations that your app key is authorized to perform.
+
+
+# b2_client get BUCKET_NAME FILE_NAME [DESTINATION_DIRECTORY]
+
+Downloads a file from B2. Required arguments are the name of the bucket containing the file and the name of the file in B2 (not the ID). Optional third argument is a destination directory, defaulting to the current working directory. Be sure you can write to the destination directory.
+
+# b2_client put BUCKET_NAME PATH_TO_FILE
+
+Upload a file to B2. Required arguments are the name of the destination B2 bucket and the path to the file to be uploaded. Best if the file has a standard extension (i.e. .txt, .png, .js, etc.)
+
+# b2_client list
+
+Lists the B2 buckets in your account.
+
+# b2_client new_bucket BUCKET_NAME
+
+Creates a new B2 Bucket with the given name.  Alphanumeric characters only.
+
+# b2_client help
+
+Prints this help screen.
+
+--
+
+Backblaze::B2V2Client and this command are released under the MIT License. Copyright (c) 2020 Eric Chernoff
+
+};
+
+}
+
+# Next two subroutines will retrieve or save their B2 API tokens
+
+sub get_b2_tokens {
+	my ($obfuscated_tokens, $the_tokens, $application_key_id, $application_key);
+	
+	# try to read it in
+	eval {
+		$obfuscated_tokens = path('~/.b2_tokens')->slurp_raw;
+		$the_tokens = pack "h*", $obfuscated_tokens;
+		($application_key_id,$application_key) = split /:::/, $the_tokens;
+	};
+
+	# error out if there was any failure
+	if ($@ || !$application_key_id || !$application_key) {
+		die "ERROR: B2 tokens not available.".
+			"\nPlease use 'b2_client save_tokens APPLICATION_KEY_ID APPLICATION_KEY' to save tokens to your home directory.\n";
+
+	# send out an arrayref
+	} else {
+		return [$application_key_id ,$application_key];
+	}
+}
+
+sub save_b2_tokens {
+	my (@args) = @_;
+	
+	if (!$ARGV[0] || !$ARGV[1]) {
+		die "ERROR: Please provide both the APPLICATION_KEY_ID and APPLICATION_KEY arguments for 'save_tokens'\n";
+	}
+	
+	# test them before saving
+	my $b2client = get_b2_session( [$args[0], $args[1]] );
+	
+	# get_b2_session() will test those for us
+	my $obfuscated_content = unpack "h*", $args[0].':::'.$args[1];
+	my $file_location = '~/.b2_tokens';
+	path($file_location)->spew_raw( $obfuscated_content );
+	chmod 0600, $file_location;	
+	
+	print "B2 API Tokens saved to $file_location\n";
+}
+
+# subroutine to actually log into B2 with their tokens
+sub get_b2_session {
+	my ($tokens) = @_;
+
+	# if no tokens provided, try to load them
+	if (!$$tokens[0]) {
+		$tokens = get_b2_tokens();
+	}
+	
+	# no tokens? prompt them to create
+	die "API tokens needed for get_b2_session()\nPlease run 'b2_client save_tokens'.\n" if !$$tokens[0] || !$$tokens[1];
+
+	# attempt to log in
+	my $b2client = Backblaze::B2V2Client->new($$tokens[0], $$tokens[1]);
+
+	# test them
+	if ($b2client->{current_status} eq 'OK') { # save to proceed
+		return $b2client;
+	} else {
+		die "ERROR: The B2 API keys you provided did not authenticate.  Please verify and try again.\n";
+	}
+}
+
+# reusable snipped to prep the error message
+sub get_error_message {
+	my ($b2client) = @_;
+	return "Error: $b2client->{errors}[-1]{response_code} $b2client->{errors}[-1]{error_message}\n";
+}

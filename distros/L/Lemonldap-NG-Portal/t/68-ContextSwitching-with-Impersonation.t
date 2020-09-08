@@ -98,7 +98,7 @@ ok(
     ),
     'POST switchcontext'
 );
-
+expectRedirection( $res, 'http://auth.example.com/' );
 # Refresh cookie value
 my $id2 = expectCookie($res);
 ok(
@@ -152,7 +152,7 @@ ok(
     ),
     'POST switchcontext'
 );
-
+expectRedirection( $res, 'http://auth.example.com/' );
 # Refresh cookie value
 $id2 = expectCookie($res);
 ok(

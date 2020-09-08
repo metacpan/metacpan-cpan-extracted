@@ -1,7 +1,7 @@
 package Perinci::Examples::ResultNaked;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.819'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.820'; # VERSION
 
 use 5.010001;
 use strict;
@@ -76,7 +76,7 @@ Perinci::Examples::ResultNaked - Demonstrate `result_naked` property
 
 =head1 VERSION
 
-This document describes version 0.819 of Perinci::Examples::ResultNaked (from Perl distribution Perinci-Examples), released on 2019-08-14.
+This document describes version 0.820 of Perinci::Examples::ResultNaked (from Perl distribution Perinci-Examples), released on 2020-04-29.
 
 =head1 DESCRIPTION
 
@@ -116,7 +116,7 @@ Examples:
 
 Result:
 
- [200, "OK", ["arg2", 20, "arg1", "def", "arg3", 0.5]]
+ [200, "OK", ["arg1", "def", "arg3", 0.5, "arg2", 20]]
 
 =back
 
@@ -131,6 +131,7 @@ Arguments ('*' denotes required arguments):
 =item * B<arg2>* => I<int>
 
 =item * B<arg3> => I<float>
+
 
 =back
 
@@ -152,11 +153,11 @@ Examples:
 
 =item * Without the optional arg3:
 
- result_not_naked(arg1 => "abc", arg2 => 10); # -> ["arg2", 10, "arg1", "abc"]
+ result_not_naked(arg1 => "abc", arg2 => 10); # -> ["arg1", "abc", "arg2", 10]
 
 =item * With the optional arg3:
 
- result_not_naked(arg1 => "def", arg2 => 20, arg3 => 0.5); # -> ["arg1", "def", "arg3", 0.5, "arg2", 20]
+ result_not_naked(arg1 => "def", arg2 => 20, arg3 => 0.5); # -> ["arg2", 20, "arg1", "def", "arg3", 0.5]
 
 =back
 
@@ -171,6 +172,7 @@ Arguments ('*' denotes required arguments):
 =item * B<arg2>* => I<int>
 
 =item * B<arg3> => I<float>
+
 
 =back
 
@@ -207,7 +209,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

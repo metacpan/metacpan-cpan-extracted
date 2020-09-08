@@ -1,6 +1,7 @@
 use Test::More;
 use JSON;
 use MIME::Base64;
+use URI::Escape;
 
 require 't/test-psgi-lib.pm';
 
@@ -16,13 +17,13 @@ ok( $res->[0] == 302, 'Code is 302' ) or explain( $res->[0], 302 );
 my %h = @{ $res->[1] };
 ok(
     $h{Location} eq 'http://auth.example.com/?url='
-      . encode_base64( 'http://test1.example.com/', '' ),
+      . uri_escape( encode_base64( 'http://test1.example.com/', '' ) ),
     'Redirection points to portal'
   )
   or explain(
     \%h,
     'Location => http://auth.example.com/?url='
-      . encode_base64( 'http://test1.example.com/', '' )
+      . uri_escape( encode_base64( 'http://test1.example.com/', '' ) )
   );
 count(4);
 
@@ -113,13 +114,14 @@ ok( $res->[0] == 302, 'Code is 302' ) or explain( $res, 302 );
 %h = @{ $res->[1] };
 ok(
     $h{Location} eq 'http://auth.example.com//upgradesession?url='
-      . encode_base64( 'http://test1.example.com/AuthStrong', '' ),
+      . uri_escape(
+        encode_base64( 'http://test1.example.com/AuthStrong', '' ) ),
     'Redirection points to http://test1.example.com/AuthStrong'
   )
   or explain(
     \%h,
     'http://auth.example.com//upgradesession?url='
-      . encode_base64( 'http://test1.example.com/AuthStrong', '' )
+      . uri_escape( encode_base64( 'http://test1.example.com/AuthStrong', '' ) )
   );
 count(3);
 
@@ -159,13 +161,13 @@ ok( $res->[0] == 302, 'Code is 302' ) or explain( $res, 302 );
 %h = @{ $res->[1] };
 ok(
     $h{Location} eq 'http://auth.example.com//upgradesession?url='
-      . encode_base64( 'http://test2.example.com/', '' ),
+      . uri_escape( encode_base64( 'http://test2.example.com/', '' ) ),
     'Redirection points to http://test2.example.com/'
   )
   or explain(
     \%h,
     'http://auth.example.com//upgradesession?url='
-      . encode_base64( 'http://test2.example.com/', '' )
+      . uri_escape( encode_base64( 'http://test2.example.com/', '' ) )
   );
 count(3);
 

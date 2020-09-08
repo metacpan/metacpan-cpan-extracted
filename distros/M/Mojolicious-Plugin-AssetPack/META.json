@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -53,7 +53,7 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-assetpack"
       }
    },
-   "version" : "2.08",
+   "version" : "2.09",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
       "Alexander Rymasheusky",
@@ -61,5 +61,5 @@
       "Per Edin <info@peredin.com>",
       "Viktor Turskyi"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

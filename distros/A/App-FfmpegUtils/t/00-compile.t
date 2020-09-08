@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'script/reencode-video'
+    'script/reencode-video-with-libx264'
 );
 
 # no fake home requested

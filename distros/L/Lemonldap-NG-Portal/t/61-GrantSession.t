@@ -20,6 +20,7 @@ my $client = LLNG::Manager::Test->new( {
                 'Rtyler_Allowed##rule3'        => '$uid eq "rtyler"',
                 '##rule2'                      => '$uid ne "msmith"',
                 '##rule4'                      => '$uid ne "jdoe"',
+                '##bad_rule'                   => '$uid n "jdoe"',
             }
         }
     }
@@ -50,9 +51,10 @@ ok(
     'Auth query'
 );
 count(1);
-ok( $res->[2]->[0] =~ /<span trmsg="5">/,
-    'dwho rejected with PE_BADCREDENTIALS' )
-  or print STDERR Dumper( $res->[2]->[0] );
+ok(
+    $res->[2]->[0] =~ /<span trmsg="5">/,
+    'dwho rejected with PE_BADCREDENTIALS'
+) or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 ok( $res->[2]->[0] =~ m%<span trspan="connect">Connect</span>%,
     'Found connect button' )

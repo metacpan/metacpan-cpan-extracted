@@ -14,7 +14,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::CAS';
@@ -100,6 +100,13 @@ sub storeEnvAndCheckGateway {
 
         if ($app) {
             $req->env->{llng_cas_app} = $app;
+
+            # Store target authentication level in pdata
+            my $targetAuthnLevel = $self->conf->{casAppMetaDataOptions}->{$app}
+              ->{casAppMetaDataOptionsAuthnLevel};
+            $req->pdata->{targetAuthnLevel} = $targetAuthnLevel
+              if $targetAuthnLevel;
+
         }
     }
 
@@ -150,20 +157,6 @@ sub run {
           || $req->param('gateway');
         my $casServiceTicket;
 
-        # Renew
-        if (    $renew
-            and $renew eq 'true'
-            and time - $req->sessionInfo->{_utime} >
-            $self->conf->{portalForceAuthnInterval} )
-        {
-
-            # Authentication must be replayed
-            $self->logger->debug("Authentication renew requested");
-            $self->{updateSession} = 1;
-            $req->env->{QUERY_STRING} =~ s/renew=true/renew=false/;
-            return $self->reAuth($req);
-        }
-
         # If no service defined, exit
         unless ( defined $service ) {
             $self->logger->debug("No service defined in CAS URL");
@@ -177,6 +170,26 @@ sub run {
         my ( $host, $uri ) = ( $1, $2 );
         my $app = $self->casAppList->{$host};
 
+        my $spAuthnLevel =
+          $self->conf->{casAppMetaDataOptions}->{$app}
+          ->{casAppMetaDataOptionsAuthnLevel} || 0;
+
+        # Renew
+        if (    $renew
+            and $renew eq 'true'
+            and time - $req->sessionInfo->{_utime} >
+            $self->conf->{portalForceAuthnInterval} )
+        {
+
+            # Authentication must be replayed
+            $self->logger->debug("Authentication renew requested");
+            $self->{updateSession} = 1;
+            $req->env->{QUERY_STRING} =~ s/renew=true/renew=false/;
+
+            $req->pdata->{targetAuthnLevel} = $spAuthnLevel;
+            return $self->reAuth($req);
+        }
+
         # Check access on the service
         my $casAccessControlPolicy = $self->conf->{casAccessControlPolicy};
 
@@ -188,6 +201,21 @@ sub run {
                 $self->userLogger->error('CAS service not configured');
                 return PE_CAS_SERVICE_NOT_ALLOWED;
             }
+
+            # Check if we have sufficient auth level
+            my $authenticationLevel =
+              $req->{sessionInfo}->{authenticationLevel} || 0;
+            if ( $authenticationLevel < $spAuthnLevel ) {
+                $self->logger->debug(
+                        "Insufficient authentication level for service $app"
+                      . " (has: $authenticationLevel, want: $spAuthnLevel)" );
+
+                # Reauth with sp auth level as target
+                $req->pdata->{targetAuthnLevel} = $spAuthnLevel;
+                return $self->upgradeAuth($req);
+            }
+
+            # Check access rule
             if ( my $rule = $self->spRules->{$app} ) {
                 if ( $rule->( $req, $req->sessionInfo ) ) {
                     $self->logger->debug("CAS service $service access allowed");
@@ -195,7 +223,7 @@ sub run {
                 else {
                     $self->userLogger->warn( 'User '
                           . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-                          . " is not authorized to access to $service" );
+                          . " is not authorized to access to $app" );
 
                     if ( $casAccessControlPolicy =~ /^(error)$/i ) {
                         $self->logger->debug(
@@ -213,9 +241,16 @@ sub run {
             }
         }
 
-        $self->userLogger->notice( 'User '
-              . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-              . " is authorized to access to $service" );
+        if ($app) {
+            $self->userLogger->notice( 'User '
+                  . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+                  . " is authorized to access to $app" );
+        }
+        else {
+            $self->userLogger->notice( 'User '
+                  . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+                  . " is redirected to $service" );
+        }
 
         unless ($casServiceTicket) {
 
@@ -499,17 +534,8 @@ sub validate {
     }
 
     # Get username
-    my $app = $casServiceSession->data->{_casApp};
-    my $username_attribute =
-      (       $app
-          and $self->conf->{casAppMetaDataOptions}->{$app}
-          ->{casAppMetaDataOptionsUserAttribute} )
-      ? $self->conf->{casAppMetaDataOptions}->{$app}
-      ->{casAppMetaDataOptionsUserAttribute}
-      : (    $self->conf->{casAttr}
-          || $self->conf->{whatToTrace} );
-
-    my $username = $localSession->data->{$username_attribute};
+    my $app      = $casServiceSession->data->{_casApp};
+    my $username = $self->getUsernameForApp( $req, $app, $localSession->data );
 
     $self->logger->debug("Get username $username");
 
@@ -778,16 +804,7 @@ sub _validate2 {
     }
 
     # Get username
-    my $username_attribute =
-      (       $app
-          and $self->conf->{casAppMetaDataOptions}->{$app}
-          ->{casAppMetaDataOptionsUserAttribute} )
-      ? $self->conf->{casAppMetaDataOptions}->{$app}
-      ->{casAppMetaDataOptionsUserAttribute}
-      : (    $self->conf->{casAttr}
-          || $self->conf->{whatToTrace} );
-
-    my $username = $localSession->data->{$username_attribute};
+    my $username = $self->getUsernameForApp( $req, $app, $localSession->data );
 
     $self->logger->debug("Get username $username");
 
@@ -823,6 +840,34 @@ sub _validate2 {
     $self->deleteCasSession($casServiceSession);
     return $self->returnCasServiceValidateSuccess( $req, $username,
         $casProxyGrantingTicketIOU, $proxies, $attributes );
+}
+
+# Returns the main attribute (sub) to use for this App
+# It can be a session attribute, or per-App macro
+sub getUsernameForApp {
+    my ( $self, $req, $app, $data ) = @_;
+
+    my $username_attribute =
+      (       $app
+          and $self->conf->{casAppMetaDataOptions}->{$app}
+          ->{casAppMetaDataOptionsUserAttribute} )
+      ? $self->conf->{casAppMetaDataOptions}->{$app}
+      ->{casAppMetaDataOptionsUserAttribute}
+      : (    $self->conf->{casAttr}
+          || $self->conf->{whatToTrace} );
+
+    my $username;
+
+    # If the main attribute is a SP macro, resolve it
+    # else, get it directly from session data
+    if ( $app and $self->spMacros->{$app}->{$username_attribute} ) {
+        $username =
+          $self->spMacros->{$app}->{$username_attribute}->( $req, $data );
+    }
+    else {
+        $username = $data->{$username_attribute};
+    }
+    return $username;
 }
 
 1;

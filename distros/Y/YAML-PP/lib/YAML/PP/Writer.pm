@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Writer;
 
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 sub output { return $_[0]->{output} }
 sub set_output { $_[0]->{output} = $_[1] }

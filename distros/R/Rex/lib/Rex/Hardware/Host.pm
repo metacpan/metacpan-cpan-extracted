@@ -9,7 +9,7 @@ package Rex::Hardware::Host;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 use Rex;
 use Rex::Commands::Run;
@@ -78,8 +78,8 @@ sub get {
       manufacturer => $bios->get_system_information()->get_manufacturer() || "",
       hostname     => $hostname                                           || "",
       domain       => $domain                                             || "",
-      operatingsystem  => $os || "",
-      operating_system => $os || "",
+      operatingsystem          => $os                                     || "",
+      operating_system         => $os                                     || "",
       operatingsystemrelease   => get_operating_system_version(),
       operating_system_release => get_operating_system_version(),
       kernelname               => [ i_run "uname -s" ]->[0],

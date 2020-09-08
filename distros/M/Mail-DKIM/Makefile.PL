@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "YAML::XS" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.20200824",
+  "VERSION" => "1.20200907",
   "test" => {
     "TESTS" => "t/*.t"
   }

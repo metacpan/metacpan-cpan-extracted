@@ -1,7 +1,8 @@
-use Test::More tests => 5;
+use Test::More;
 
-use Tie::Hash::Cannabinol;
-ok(1);
+BEGIN {
+  use_ok('Tie::Hash::Cannabinol');
+}
 
 my %hash : Stoned;
 
@@ -13,3 +14,5 @@ my $v = $hash{$k} for 1 .. 10;
 my $e = exists $hash{$k};
 
 ok(1) for 2 .. 5;
+
+done_testing();

@@ -11,14 +11,14 @@ my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                => 'error',
-            authentication          => 'Demo',
-            userDB                  => 'Same',
-            loginHistoryEnabled     => 0,
-            bruteForceProtection    => 0,
-            requireToken            => 0,
-            restSessionServer       => 1,
-            logoutServices          => { 'mytest' => 'http://auth.example.com/' }
+            logLevel             => 'error',
+            authentication       => 'Demo',
+            userDB               => 'Same',
+            loginHistoryEnabled  => 0,
+            bruteForceProtection => 0,
+            requireToken         => 0,
+            restSessionServer    => 1,
+            logoutServices       => { 'mytest' => 'http://auth.example.com/' }
         }
     }
 );
@@ -50,8 +50,11 @@ ok(
 );
 count(1);
 
-ok( $res->[2]->[0] =~ m%<h3 trspan="logoutFromOtherApp">logoutFromOtherApp</h3>%, 'Found Logout Forward page' )
-  or explain( $res->[2]->[0], "PE_LOGOUT_OK" );
+ok(
+    $res->[2]->[0] =~
+      m%<h3 trspan="logoutFromOtherApp">logoutFromOtherApp</h3>%,
+    'Found Logout Forward page'
+) or explain( $res->[2]->[0], "PE_LOGOUT_OK" );
 count(1);
 $client->logout( $idd[0] );
 

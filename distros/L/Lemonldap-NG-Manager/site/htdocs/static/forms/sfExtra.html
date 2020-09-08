@@ -11,7 +11,7 @@
         <th trspan="logo"></th>
         <th trspan="level"></th>
         <th trspan="rule"></th>
-        <th />
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -49,8 +49,8 @@
         <input class="form-control" ng-model="t[1]" />
       </td>
       <td>
-        <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.data.over,$index)"/>
-        <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newSfOver'})"/>
+        <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.data.over,$index)"></span>
+        <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newSfOver'})"></span>
       </td>
     </tr>
   </table>

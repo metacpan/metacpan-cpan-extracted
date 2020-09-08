@@ -6,7 +6,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib';
 
@@ -710,9 +710,9 @@ sub combModules {
     my $res = [];
     foreach my $mod ( keys %$val ) {
         my $tmp;
-        $tmp->{title}      = $mod;
-        $tmp->{id}         = "combModules/$mod";
-        $tmp->{type}       = 'cmbModule';
+        $tmp->{title} = $mod;
+        $tmp->{id}    = "combModules/$mod";
+        $tmp->{type}  = 'cmbModule';
         $tmp->{data}->{$_} = $val->{$mod}->{$_} foreach (qw(type for));
         my $over = $val->{$mod}->{over} // {};
         $tmp->{data}->{over} = [ map { [ $_, $over->{$_} ] } keys %$over ];
@@ -769,8 +769,8 @@ sub metadata {
         return $self->sendJSONresponse(
             $req,
             $self->currentConf,
-            forceJSON => 1,
-            headers   => [
+            pretty  => 1,
+            headers => [
                 'Content-Disposition' => "Attachment; filename=lmConf-$c.json"
             ],
         );
@@ -786,8 +786,8 @@ sub metadata {
         }
 
         # Find next and previous conf
-        my @a     = $self->confAcc->available;
-        my $id    = -1;
+        my @a  = $self->confAcc->available;
+        my $id = -1;
         my ($ind) = map { $id++; $_ == $res->{cfgNum} ? ($id) : () } @a;
         if ($ind) { $res->{prev} = $a[ $ind - 1 ]; }
         if ( defined $ind and $ind < $#a ) {

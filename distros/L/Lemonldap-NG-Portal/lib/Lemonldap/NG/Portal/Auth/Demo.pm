@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_BADCREDENTIALS);
 
 extends qw(Lemonldap::NG::Portal::Auth::_WebForm);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.9';
 
 # INITIALIZATION
 
@@ -33,6 +33,7 @@ sub authenticate {
     my ( $self, $req ) = @_;
 
     unless ( $req->{user} eq $req->data->{password} ) {
+        $self->userLogger->warn("Bad password for $req->{user}");
         $self->setSecurity($req);
         return PE_BADCREDENTIALS;
     }

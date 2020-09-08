@@ -1,14 +1,15 @@
 package Bitcoin::Crypto::Role::Compressed;
 
-use Modern::Perl "2010";
-use Moo::Role;
-use MooX::Types::MooseLike::Base qw(Bool);
+use v5.10; use warnings;
+use Types::Standard qw(Bool);
 
 use Bitcoin::Crypto::Config;
+use Moo::Role;
 
 has "compressed" => (
 	is => "rw",
 	isa => Bool,
+	coerce => 1,
 	default => $config{compress_public_point},
 	writer => "_set_compressed"
 );

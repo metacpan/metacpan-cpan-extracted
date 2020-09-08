@@ -9,13 +9,14 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 package Lemonldap::NG::Portal::Main;
 
 use strict;
 use URI::Escape;
 use JSON;
+use Lemonldap::NG::Common::Util qw(getPSessionID);
 
 has trOverCache => ( is => 'rw', default => sub { {} } );
 
@@ -89,7 +90,8 @@ sub handler {
     # Save pdata
     if ( $sp or %{ $req->pdata } ) {
         my %v = (
-            name => $self->conf->{cookieName} . 'pdata',
+            name   => $self->conf->{cookieName} . 'pdata',
+            secure => $self->conf->{securedCookie},
             (
                 %{ $req->pdata }
                 ? ( value => uri_escape( JSON::to_json( $req->pdata ) ) )
@@ -179,8 +181,7 @@ sub postAuthenticatedRequest {
 sub refresh {
     my ( $self, $req ) = @_;
     $req->mustRedirect(1);
-    my %data          = %{ $req->userData };
-    my $lastAuthLevel = $req->userData->{authenticationLevel};
+    my %data = %{ $req->userData };
     $self->userLogger->notice(
         'Refresh request for ' . $data{ $self->conf->{whatToTrace} } );
     $req->user( $data{_user} || $data{ $self->conf->{whatToTrace} } );
@@ -194,13 +195,7 @@ sub refresh {
     $req->steps( [
             'getUser',
             @{ $self->betweenAuthAndData },
-            'setAuthSessionInfo',
             'setSessionInfo',
-            sub {
-                $req->sessionInfo->{authenticationLevel} = $lastAuthLevel
-                  ;    # Restore previous authentication level (#2179)
-                return PE_OK;
-            },
             $self->groupsAndMacros,
             'setLocalGroups',
             sub {
@@ -386,7 +381,7 @@ sub autoRedirect {
               )
             {
                 $self->logger->info("Force cleaning pdata");
-                $req->pdata( {} );
+                delete $req->{pdata}->{_url};
             }
             return [ 302, [ Location => $req->{urldc}, $req->spliceHdrs ], [] ];
         }
@@ -471,7 +466,7 @@ sub getPersistentSession {
     return unless ( defined $uid and !$self->conf->{disablePersistentStorage} );
 
     # Compute persistent identifier
-    my $pid = $self->_md5hash($uid);
+    my $pid = getPSessionID($uid);
 
     $info->{_session_uid} = $uid;
 
@@ -536,7 +531,7 @@ sub updatePersistentSession {
 
     if ( $persistentSession->error ) {
         $self->logger->error(
-            "Cannot update persistent session " . $self->_md5hash($uid) );
+            "Cannot update persistent session " . getPSessionID($uid) );
         $self->logger->error( $persistentSession->error );
     }
 }
@@ -630,7 +625,7 @@ sub _deleteSession {
             name    => $self->conf->{cookieName},
             value   => 0,
             domain  => $self->conf->{domain},
-            secure  => 0,
+            secure  => $self->conf->{securedCookie},
             expires => 'Wed, 21 Oct 2015 00:00:00 GMT'
         )
     ) unless ($preserveCookie);
@@ -643,12 +638,6 @@ sub _deleteSession {
     ) if $user;
 
     return $session->error ? 0 : 1;
-}
-
-# Return md5(s)
-sub _md5hash {
-    my ( $self, $s ) = @_;
-    return substr( Digest::MD5::md5_hex($s), 0, 32 );
 }
 
 # Check if an URL's domain name is declared in LL::NG config or is declared as
@@ -796,7 +785,7 @@ sub cookie {
     $h{HttpOnly} //= $self->conf->{httpOnly};
     $h{max_age}  //= $self->conf->{cookieExpiration}
       if ( $self->conf->{cookieExpiration} );
-    $h{SameSite} ||= $self->conf->{sameSite};
+    $h{SameSite} ||= $self->cookieSameSite;
 
     foreach (qw(domain path expires max_age HttpOnly SameSite)) {
         my $f = $_;
@@ -1119,6 +1108,17 @@ sub corsPreflight {
 sub sendJSONresponse {
     my ( $self, $req, $j, %args ) = @_;
     my $res = Lemonldap::NG::Common::PSGI::sendJSONresponse(@_);
+
+    # Handle caching
+    if ( $args{ttl} and $args{ttl} =~ /^\d+$/ ) {
+        push @{ $res->[1] }, 'Cache-Control' => 'public, max-age=' . $args{ttl};
+    }
+    else {
+        push @{ $res->[1] },
+          'Cache-Control' => 'no-cache, no-store, must-revalidate',
+          'Pragma'        => 'no-cache',
+          'Expires'       => '0';
+    }
 
     # If this is a cross-domain request from the portal itself
     # (Ajax SSL to a different VHost)

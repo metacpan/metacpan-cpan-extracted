@@ -23,11 +23,7 @@ my $res;
 
 # Test 'set' command
 @cmd = qw(-yes 1 set notification 1);
-combined_like(
-    sub { llclient->run(@cmd) },
-    qr/Saved under/,
-    '"addKey" OK'
-);
+combined_like( sub { llclient->run(@cmd) }, qr/Saved under/, '"addKey" OK' );
 
 # Test 'get' command
 @cmd = qw(get notification);
@@ -37,11 +33,7 @@ ok( $res =~ /^notification\s+=\s+1$/, '"get notification" OK' )
 
 # Test 'addKey' command
 @cmd = qw(-yes 1 addKey locationRules/test1.example.com ^/reject deny);
-combined_like(
-    sub { llclient->run(@cmd) },
-    qr/Saved under/,
-    '"addKey" OK'
-);
+combined_like( sub { llclient->run(@cmd) }, qr/Saved under/, '"addKey" OK' );
 
 # Test 'delKey' command
 @cmd = qw(-yes 1 delKey locationRules/test1.example.com ^/reject);
@@ -59,11 +51,7 @@ ok( $res =~ m#accept#, '"get key/subkey" OK' )
 
 # Test 'set' command with key/subkey
 @cmd = qw(-yes 1 set locationRules/test1.example.com/default deny);
-combined_like(
-    sub { llclient->run(@cmd) },
-    qr/Saved under/,
-    '"addKey" OK'
-);
+combined_like( sub { llclient->run(@cmd) }, qr/Saved under/, '"addKey" OK' );
 
 # Test 'save' command
 @cmd = qw(-cfgNum 1 save);
@@ -96,8 +84,7 @@ combined_like(
     qr#\bAuthor IP\b#s,
     '"Author IP" OK'
 );
-combined_like( sub { llcommonClient->run(@cmd) },
-    qr#\bLog\b#s, '"Log" OK' );
+combined_like( sub { llcommonClient->run(@cmd) }, qr#\bLog\b#s, '"Log" OK' );
 combined_like( sub { llcommonClient->run(@cmd) },
     qr#\bVersion\b#s, '"Version" OK' );
 

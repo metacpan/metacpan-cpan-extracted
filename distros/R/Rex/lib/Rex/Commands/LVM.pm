@@ -35,7 +35,7 @@ package Rex::Commands::LVM;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);
@@ -211,7 +211,7 @@ sub lvs {
 
 sub pvcreate {
   my ($dev) = @_;
-  my $s = i_run "pvcreate $dev", fail_ok => 1, stderr_to_stdout => 1;
+  my $s     = i_run "pvcreate $dev", fail_ok => 1, stderr_to_stdout => 1;
   if ( $? != 0 ) {
     die("Error creating pv.\n$s\n");
   }

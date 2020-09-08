@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Representer;
 
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 use Scalar::Util qw/ reftype blessed refaddr /;
 
@@ -117,7 +117,7 @@ sub represent_node {
         return [ sequence => $node, %args ];
     }
     elsif ($node->{reftype}) {
-        die "Reftype $node->{reftype} not implemented";
+        die "Cannot handle reftype '$node->{reftype}' (you might want to enable YAML::PP::Schema::Perl)";
     }
     else {
         unless (defined $node->{items}) {

@@ -1,3 +1,9 @@
+0.128		2020-09-04	T. R. Wyant
+    Remove prototypes from testing subroutines defined in t/*.t and
+    inc/My/Module/Test/*.pm. Because this was originally cloned from the
+    Astro-satpass distribution, a general clean-up of testing code was
+    necessary.
+
 0.127		2020-07-11	T. R. Wyant
     Canned status update:
 

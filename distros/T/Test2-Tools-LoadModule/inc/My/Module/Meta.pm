@@ -76,8 +76,9 @@ sub requires {
 	'Getopt::Long'	=> 2.34,	# Comes with Perl 5.8.1
 	'Test2::API'	=> 0,
 	'Test2::Util'	=> 0,
-	strict		=> 0,
-	warnings	=> 0,
+	if		=> 0,		# Comes with Perl 5.8.1
+	strict		=> 0,		# Comes with Perl 5.8.1
+	warnings	=> 0,		# Comes with Perl 5.8.1
 	@extra,
     };
 }

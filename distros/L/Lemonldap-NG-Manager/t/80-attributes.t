@@ -24,10 +24,6 @@ my @notManagedAttributes = (
     'sfEngine', 'available2FSelfRegistration', 'available2F', 'max2FDevices',
     'max2FDevicesNameLength',
 
-    # Brute force attack protection parameters
-    'bruteForceProtectionMaxAge', 'bruteForceProtectionTempo',
-    'bruteForceProtectionMaxFailed',
-
     # Handlers
     'handlerInternalCache', 'handlerServiceTokenTTL',
 
@@ -42,8 +38,8 @@ my @notManagedAttributes = (
     'syslogFacility',   'userLogger',         'logLevel',
 
     # Plugins parameters
-    'notificationsMaxRetrieve',      'persistentSessionAttributes',
-    'bruteForceProtectionLockTimes', 'bruteForceProtectionMaxLockTime',
+    'notificationsMaxRetrieve',   'persistentSessionAttributes',
+    'bruteForceProtectionMaxAge', 'bruteForceProtectionMaxLockTime',
 
     # PSGI/CGI protection (must be set in lemonldap-ng.ini)
     'protection',
@@ -64,8 +60,8 @@ my @notManagedAttributes = (
     'zimbraUrl',
 
     # Other ini-only prms
-    'checkTime',           'status', 'soapProxyUrn',
-    'impersonationPrefix', 'pdataDomain',
+    'checkTime',                 'status', 'soapProxyUrn',
+    'impersonationPrefix',       'pdataDomain',
     'mySessionAuthorizedRWKeys', 'contextSwitchingPrefix'
 );
 

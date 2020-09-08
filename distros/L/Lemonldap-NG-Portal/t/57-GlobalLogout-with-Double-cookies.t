@@ -13,15 +13,15 @@ my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                => 'error',
-            authentication          => 'Demo',
-            userDB                  => 'Same',
-            loginHistoryEnabled     => 0,
-            bruteForceProtection    => 0,
-            requireToken            => 0,
-            securedCookie           => 2,
-            restSessionServer       => 1,
-            globalLogoutRule        => 1,
+            logLevel             => 'error',
+            authentication       => 'Demo',
+            userDB               => 'Same',
+            loginHistoryEnabled  => 0,
+            bruteForceProtection => 0,
+            requireToken         => 0,
+            securedCookie        => 2,
+            restSessionServer    => 1,
+            globalLogoutRule     => 1,
         }
     }
 );
@@ -38,7 +38,7 @@ ok(
 );
 count(1);
 expectCookie($res);
-my $id = expectCookie($res, 'lemonldaphttp');
+my $id = expectCookie( $res, 'lemonldaphttp' );
 expectRedirection( $res, 'http://auth.example.com/' );
 
 ## Second successful connection for "dwho"
@@ -53,7 +53,7 @@ ok(
 );
 count(1);
 expectCookie($res);
-expectCookie($res, 'lemonldaphttp');
+expectCookie( $res, 'lemonldaphttp' );
 expectRedirection( $res, 'http://auth.example.com/' );
 
 ## Third successful connection for 'dwho'
@@ -68,7 +68,7 @@ ok(
 );
 count(1);
 expectCookie($res);
-expectCookie($res, 'lemonldaphttp');
+expectCookie( $res, 'lemonldaphttp' );
 expectRedirection( $res, 'http://auth.example.com/' );
 
 ## Logout request for 'dwho'

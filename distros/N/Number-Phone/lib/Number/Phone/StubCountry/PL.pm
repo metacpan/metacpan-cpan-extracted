@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200606132001;
+our $VERSION = 1.20200904144535;
 
 my $formatters = [
                 {
@@ -94,6 +94,7 @@ my $formatters = [
 
 my $validators = {
                 'fixed_line' => '
+          47\\d{7}|
           (?:
             1[2-8]|
             2[2-69]|
@@ -115,6 +116,7 @@ my $validators = {
           )
         ',
                 'geographic' => '
+          47\\d{7}|
           (?:
             1[2-8]|
             2[2-69]|
@@ -151,55 +153,6 @@ my $validators = {
                 'voip' => '39\\d{7}'
               };
 my %areanames = ();
-$areanames{pl}->{4812} = "Kraków";
-$areanames{pl}->{4813} = "Krosno";
-$areanames{pl}->{4814} = "Tarnów";
-$areanames{pl}->{4815} = "Tarnobrzeg";
-$areanames{pl}->{4816} = "Przemyśl";
-$areanames{pl}->{4817} = "Rzeszów";
-$areanames{pl}->{4818} = "Nowy\ Sącz";
-$areanames{pl}->{4822} = "Warszawa";
-$areanames{pl}->{4823} = "Ciechanów";
-$areanames{pl}->{4824} = "Płock";
-$areanames{pl}->{4825} = "Siedlce";
-$areanames{pl}->{4829} = "Ostrołęka";
-$areanames{pl}->{4832} = "Katowice";
-$areanames{pl}->{4833} = "Bielsko\-Biała";
-$areanames{pl}->{4834} = "Częstochowa";
-$areanames{pl}->{4841} = "Kielce";
-$areanames{pl}->{4842} = "Łódź";
-$areanames{pl}->{4843} = "Sieradz";
-$areanames{pl}->{4844} = "Piotrków\ Trybunalski";
-$areanames{pl}->{4846} = "Skierniewice";
-$areanames{pl}->{4848} = "Radom";
-$areanames{pl}->{4852} = "Bydgoszcz";
-$areanames{pl}->{4854} = "Włocławek";
-$areanames{pl}->{4855} = "Elbląg";
-$areanames{pl}->{4856} = "Toruń";
-$areanames{pl}->{4858} = "Gdańsk";
-$areanames{pl}->{4859} = "Słupsk";
-$areanames{pl}->{4861} = "Poznań";
-$areanames{pl}->{4862} = "Kalisz";
-$areanames{pl}->{4863} = "Konin";
-$areanames{pl}->{4865} = "Leszno";
-$areanames{pl}->{4867} = "Piła";
-$areanames{pl}->{4868} = "Zielona\ Góra";
-$areanames{pl}->{4871} = "Wrocław";
-$areanames{pl}->{4874} = "Wałbrzych";
-$areanames{pl}->{4875} = "Jelenia\ Góra";
-$areanames{pl}->{4876} = "Legnica";
-$areanames{pl}->{4877} = "Opole";
-$areanames{pl}->{4881} = "Lublin";
-$areanames{pl}->{4882} = "Chełm";
-$areanames{pl}->{4883} = "Biała\ Podlaska";
-$areanames{pl}->{4884} = "Zamość";
-$areanames{pl}->{4885} = "Białystok";
-$areanames{pl}->{4886} = "Łomża";
-$areanames{pl}->{4887} = "Suwałki";
-$areanames{pl}->{4889} = "Olsztyn";
-$areanames{pl}->{4891} = "Szczecin";
-$areanames{pl}->{4894} = "Koszalin";
-$areanames{pl}->{4895} = "Gorzów\ Wielkopolski";
 $areanames{en}->{4812} = "Kraków";
 $areanames{en}->{4813} = "Krosno";
 $areanames{en}->{4814} = "Tarnów";
@@ -249,6 +202,55 @@ $areanames{en}->{4889} = "Olsztyn";
 $areanames{en}->{4891} = "Szczecin";
 $areanames{en}->{4894} = "Koszalin";
 $areanames{en}->{4895} = "Gorzów\ Wielkopolski";
+$areanames{pl}->{4812} = "Kraków";
+$areanames{pl}->{4813} = "Krosno";
+$areanames{pl}->{4814} = "Tarnów";
+$areanames{pl}->{4815} = "Tarnobrzeg";
+$areanames{pl}->{4816} = "Przemyśl";
+$areanames{pl}->{4817} = "Rzeszów";
+$areanames{pl}->{4818} = "Nowy\ Sącz";
+$areanames{pl}->{4822} = "Warszawa";
+$areanames{pl}->{4823} = "Ciechanów";
+$areanames{pl}->{4824} = "Płock";
+$areanames{pl}->{4825} = "Siedlce";
+$areanames{pl}->{4829} = "Ostrołęka";
+$areanames{pl}->{4832} = "Katowice";
+$areanames{pl}->{4833} = "Bielsko\-Biała";
+$areanames{pl}->{4834} = "Częstochowa";
+$areanames{pl}->{4841} = "Kielce";
+$areanames{pl}->{4842} = "Łódź";
+$areanames{pl}->{4843} = "Sieradz";
+$areanames{pl}->{4844} = "Piotrków\ Trybunalski";
+$areanames{pl}->{4846} = "Skierniewice";
+$areanames{pl}->{4848} = "Radom";
+$areanames{pl}->{4852} = "Bydgoszcz";
+$areanames{pl}->{4854} = "Włocławek";
+$areanames{pl}->{4855} = "Elbląg";
+$areanames{pl}->{4856} = "Toruń";
+$areanames{pl}->{4858} = "Gdańsk";
+$areanames{pl}->{4859} = "Słupsk";
+$areanames{pl}->{4861} = "Poznań";
+$areanames{pl}->{4862} = "Kalisz";
+$areanames{pl}->{4863} = "Konin";
+$areanames{pl}->{4865} = "Leszno";
+$areanames{pl}->{4867} = "Piła";
+$areanames{pl}->{4868} = "Zielona\ Góra";
+$areanames{pl}->{4871} = "Wrocław";
+$areanames{pl}->{4874} = "Wałbrzych";
+$areanames{pl}->{4875} = "Jelenia\ Góra";
+$areanames{pl}->{4876} = "Legnica";
+$areanames{pl}->{4877} = "Opole";
+$areanames{pl}->{4881} = "Lublin";
+$areanames{pl}->{4882} = "Chełm";
+$areanames{pl}->{4883} = "Biała\ Podlaska";
+$areanames{pl}->{4884} = "Zamość";
+$areanames{pl}->{4885} = "Białystok";
+$areanames{pl}->{4886} = "Łomża";
+$areanames{pl}->{4887} = "Suwałki";
+$areanames{pl}->{4889} = "Olsztyn";
+$areanames{pl}->{4891} = "Szczecin";
+$areanames{pl}->{4894} = "Koszalin";
+$areanames{pl}->{4895} = "Gorzów\ Wielkopolski";
 
     sub new {
       my $class = shift;

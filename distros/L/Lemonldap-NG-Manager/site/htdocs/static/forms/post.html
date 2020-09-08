@@ -26,15 +26,15 @@
     <tr>
       <th colspan="3">
         <span trspan="postedVars"></span>
-        <span ng-if="!currentNode.data.vars.length" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newPostVar'})"/>
+        <span ng-if="!currentNode.data.vars.length" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newPostVar'})"></span>
       </th>
     </tr>
     <tr ng-repeat="v in currentNode.data.vars">
       <td><input class="form-control" ng-model="v[0]"/></td>
       <td><input class="form-control" ng-model="v[1]"/></td>
       <td>
-        <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.data.vars,$index)"/>
-        <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newPostVar'})"/>
+        <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.data.vars,$index)"></span>
+        <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newPostVar'})"></span>
       </td>
     </tr>
   </table>

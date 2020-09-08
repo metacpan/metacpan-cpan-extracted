@@ -1,16 +1,16 @@
 {
    "abstract" : "Perl wrapper for the Songkick API",
    "author" : [
-      "Dave Cross <dave@mag-sol.com>"
+      "Dave Cross <dave@perlhacks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Songkick",
    "prereqs" : {
@@ -26,18 +26,26 @@
             "LWP::UserAgent" : "0",
             "Moose" : "0",
             "URI" : "0",
-            "XML::LibXML" : "0",
             "perl" : "v5.6.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Response" : "0",
+            "Test::LWP::UserAgent" : "0"
          }
       }
    },
    "provides" : {
       "Net::Songkick" : {
          "file" : "lib/Net/Songkick.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.5"
       },
       "Net::Songkick::Artist" : {
          "file" : "lib/Net/Songkick/Artist.pm"
+      },
+      "Net::Songkick::City" : {
+         "file" : "lib/Net/Songkick/City.pm"
       },
       "Net::Songkick::Country" : {
          "file" : "lib/Net/Songkick/Country.pm"
@@ -50,6 +58,9 @@
       },
       "Net::Songkick::MetroArea" : {
          "file" : "lib/Net/Songkick/MetroArea.pm"
+      },
+      "Net::Songkick::MusicBrainz" : {
+         "file" : "lib/Net/Songkick/MusicBrainz.pm"
       },
       "Net::Songkick::Performance" : {
          "file" : "lib/Net/Songkick/Performance.pm"
@@ -70,6 +81,6 @@
          "url" : "https://github.com/davorg/net-songkick"
       }
    },
-   "version" : "v1.0.2",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v1.0.5",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

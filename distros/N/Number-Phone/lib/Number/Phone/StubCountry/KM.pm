@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200606132000;
+our $VERSION = 1.20200904144533;
 
 my $formatters = [
                 {
@@ -43,22 +43,6 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{fr}->{269760} = "Domoni";
-$areanames{fr}->{269761} = "Mutsamudu";
-$areanames{fr}->{269762} = "Mohéli";
-$areanames{fr}->{269763} = "Moroni";
-$areanames{fr}->{269767} = "Mbéni";
-$areanames{fr}->{269768} = "Mitsamiouli";
-$areanames{fr}->{269769} = "Foumbouni";
-$areanames{fr}->{269770} = "Domoni";
-$areanames{fr}->{269771} = "Mutsamudu";
-$areanames{fr}->{269772} = "Mohéli";
-$areanames{fr}->{269773} = "Moroni";
-$areanames{fr}->{269774} = "Moroni";
-$areanames{fr}->{269775} = "Moroni";
-$areanames{fr}->{269777} = "Mbéni";
-$areanames{fr}->{269778} = "Mitsamiouli";
-$areanames{fr}->{269779} = "Foumbouni";
 $areanames{en}->{269760} = "Domoni";
 $areanames{en}->{269761} = "Mutsamudu";
 $areanames{en}->{269762} = "Mohéli";
@@ -75,6 +59,22 @@ $areanames{en}->{269775} = "Moroni";
 $areanames{en}->{269777} = "Mbéni";
 $areanames{en}->{269778} = "Mitsamiouli";
 $areanames{en}->{269779} = "Foumbouni";
+$areanames{fr}->{269760} = "Domoni";
+$areanames{fr}->{269761} = "Mutsamudu";
+$areanames{fr}->{269762} = "Mohéli";
+$areanames{fr}->{269763} = "Moroni";
+$areanames{fr}->{269767} = "Mbéni";
+$areanames{fr}->{269768} = "Mitsamiouli";
+$areanames{fr}->{269769} = "Foumbouni";
+$areanames{fr}->{269770} = "Domoni";
+$areanames{fr}->{269771} = "Mutsamudu";
+$areanames{fr}->{269772} = "Mohéli";
+$areanames{fr}->{269773} = "Moroni";
+$areanames{fr}->{269774} = "Moroni";
+$areanames{fr}->{269775} = "Moroni";
+$areanames{fr}->{269777} = "Mbéni";
+$areanames{fr}->{269778} = "Mitsamiouli";
+$areanames{fr}->{269779} = "Foumbouni";
 
     sub new {
       my $class = shift;

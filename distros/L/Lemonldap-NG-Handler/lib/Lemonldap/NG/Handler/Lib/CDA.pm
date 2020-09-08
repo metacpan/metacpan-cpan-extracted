@@ -2,7 +2,7 @@ package Lemonldap::NG::Handler::Lib::CDA;
 
 use strict;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.9';
 
 sub run {
     my ( $class, $req, $rule, $protection ) = @_;

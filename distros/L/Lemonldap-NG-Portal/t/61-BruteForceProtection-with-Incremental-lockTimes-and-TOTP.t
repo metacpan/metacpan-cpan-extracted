@@ -26,6 +26,7 @@ SKIP: {
                 totp2fSelfRegistration               => 1,
                 totp2fActivation                     => 1,
                 failedLoginNumber                    => 4,
+                bruteForceProtectionMaxFailed        => 0,
             }
         }
     );
@@ -113,9 +114,8 @@ SKIP: {
             accept => 'text/html',
         ),
         'Auth query'
-    );                     
-    ok( $res->[2]->[0] =~ /<span trspan="enterTotpCode">/,
-        'Enter TOTP code' )
+    );
+    ok( $res->[2]->[0] =~ /<span trspan="enterTotpCode">/, 'Enter TOTP code' )
       or print STDERR Dumper( $res->[2]->[0] );
     count(2);
 
@@ -170,8 +170,7 @@ SKIP: {
         ),
         'Auth query'
     );
-    ok( $res->[2]->[0] =~ /<span trspan="enterTotpCode">/,
-        'Enter TOTP code' )
+    ok( $res->[2]->[0] =~ /<span trspan="enterTotpCode">/, 'Enter TOTP code' )
       or print STDERR Dumper( $res->[2]->[0] );
     count(2);
 

@@ -1,16 +1,16 @@
 package Bitcoin::Crypto::Role::Network;
 
-use Modern::Perl "2010";
-use Moo::Role;
-use MooX::Types::MooseLike::Base qw(InstanceOf);
+use v5.10; use warnings;
+use Types::Standard qw(InstanceOf);
 use Scalar::Util qw(blessed);
 
 use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Exception;
+use Moo::Role;
 
 has "network" => (
 	is => "rw",
-	isa => InstanceOf["Bitcoin::Crypto::Network"],
+	isa => InstanceOf ["Bitcoin::Crypto::Network"],
 	default => sub {
 		return Bitcoin::Crypto::Network->get;
 	},

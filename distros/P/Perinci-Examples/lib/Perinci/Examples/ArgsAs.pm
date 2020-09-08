@@ -1,7 +1,7 @@
 package Perinci::Examples::ArgsAs;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.819'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.820'; # VERSION
 
 use 5.010001;
 use strict;
@@ -100,7 +100,7 @@ Perinci::Examples::ArgsAs - Demonstrate various values of `args_as` function met
 
 =head1 VERSION
 
-This document describes version 0.819 of Perinci::Examples::ArgsAs (from Perl distribution Perinci-Examples), released on 2019-08-14.
+This document describes version 0.820 of Perinci::Examples::ArgsAs (from Perl distribution Perinci-Examples), released on 2020-04-29.
 
 =head1 DESCRIPTION
 
@@ -154,6 +154,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$arg3> => I<float>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -203,6 +204,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$arg3> => I<float>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -232,11 +234,11 @@ Examples:
 
 =item * Without the optional arg3:
 
- args_as_hash(arg1 => "abc", arg2 => 10); # -> ["arg1", "abc", "arg2", 10]
+ args_as_hash(arg1 => "abc", arg2 => 10); # -> ["arg2", 10, "arg1", "abc"]
 
 =item * With the optional arg3:
 
- args_as_hash(arg1 => "def", arg2 => 20, arg3 => 0.5); # -> ["arg3", 0.5, "arg2", 20, "arg1", "def"]
+ args_as_hash(arg1 => "def", arg2 => 20, arg3 => 0.5); # -> ["arg3", 0.5, "arg1", "def", "arg2", 20]
 
 =back
 
@@ -251,6 +253,7 @@ Arguments ('*' denotes required arguments):
 =item * B<arg2>* => I<int>
 
 =item * B<arg3> => I<float>
+
 
 =back
 
@@ -305,6 +308,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<arg3> => I<float>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -340,7 +344,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

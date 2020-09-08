@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -28,8 +28,9 @@ sub init {
             $hd->substitute( $self->conf->{grantSessionRules}->{$_} ) );
         unless ($rule) {
             my $error = $hd->tsv->{jail}->error || '???';
-            $self->error("Bad grantSession rule -> $error");
-            return 0;
+            $self->logger->error("Bad grantSession rule -> $error");
+            $self->logger->debug("Skipping GrantSession rule \"$_\"");
+            next;
         }
         $self->rules->{$_} = $rule;
     }

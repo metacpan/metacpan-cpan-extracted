@@ -2,8 +2,8 @@
 
 package Perinci::Examples;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.819'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.820'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1150,7 +1150,7 @@ Perinci::Examples - Various examples of Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.819 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2019-08-14.
+This document describes version 0.820 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2020-04-29.
 
 =head1 DESCRIPTION
 
@@ -1180,7 +1180,7 @@ Usage:
 
  arg_default(%args) -> [status, msg, payload, meta]
 
-Demonstrate argument default value from default and/or schema.
+Demonstrate argument default value from default andE<sol>or schema.
 
 Default value can be specified in the C<default> property of argument
 specification, e.g.:
@@ -1221,6 +1221,7 @@ Default from "default" property as well as schema.
 
 "Default" property overrides default value from schema.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1255,6 +1256,7 @@ Arguments ('*' denotes required arguments):
 =item * B<len>* => I<int> (default: 10)
 
 Array length.
+
 
 =back
 
@@ -1299,6 +1301,7 @@ Minimum level.
 
 Number of log messages to produce.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1333,6 +1336,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<fruit>* => I<str>
+
 
 =back
 
@@ -1372,6 +1376,7 @@ Number of seconds to sleep.
 =item * B<per_second> => I<bool> (default: 0)
 
 Whether to sleep(1) for n times instead of sleep(n).
+
 
 =back
 
@@ -1433,6 +1438,7 @@ Arguments ('*' denotes required arguments):
 
 Error code to return.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1467,6 +1473,7 @@ Arguments ('*' denotes required arguments):
 =item * B<len>* => I<int> (default: 10)
 
 Array length.
+
 
 =back
 
@@ -1503,6 +1510,7 @@ Arguments ('*' denotes required arguments):
 
 Number of pairs.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1537,6 +1545,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<len> => I<int> (default: 1024)
+
 
 =back
 
@@ -1588,6 +1597,7 @@ Arguments ('*' denotes required arguments):
 
 The C<aoaos> and C<aohos> forms are commonly used for table data.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1634,6 +1644,7 @@ First hash (left-hand side).
 
 First hash (right-hand side).
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1668,6 +1679,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<n> => I<any> (default: 5)
+
 
 =back
 
@@ -1710,6 +1722,7 @@ Arguments ('*' denotes required arguments):
 =item * B<arg> => I<any>
 
 Argument.
+
 
 =back
 
@@ -1769,6 +1782,7 @@ Argument.
 
 Argument.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1810,6 +1824,7 @@ Minimum level.
 
 Number of log messages to produce.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1846,6 +1861,7 @@ Arguments ('*' denotes required arguments):
 =item * B<arg> => I<any>
 
 Argument.
+
 
 =back
 
@@ -1904,6 +1920,7 @@ Array.
 
 Whether to round result to integer.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1941,6 +1958,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$a2> => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1977,6 +1995,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$a2> => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2010,6 +2029,7 @@ Arguments ('*' denotes required arguments):
 =item * B<a0> => I<str>
 
 =item * B<a1> => I<str>
+
 
 =back
 
@@ -2072,6 +2092,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<data> => I<buf> (default: "\0\0\0")
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2130,6 +2151,7 @@ Arguments ('*' denotes required arguments):
 =item * B<version> => I<str>
 
 =item * B<yaml> => I<bool>
+
 
 =back
 
@@ -2200,7 +2222,7 @@ Float with just "float" schema defined.
 
 =item * B<f1> => I<float>
 
-Float with xmin/xmax on the schema.
+Float with xminE<sol>xmax on the schema.
 
 A completion library can attempt to provide some possible and incremental
 completion (e.g. if word is currently at one decimal digit like 1.2, it can
@@ -2220,7 +2242,7 @@ Integer with just "int" schema defined.
 
 =item * B<i1> => I<int>
 
-Integer with min/xmax on the schema.
+Integer with minE<sol>xmax on the schema.
 
 A completion library (like L<Perinci::Sub::Complete>) can generate a list of
 completion from the low end to the high end of the range, as long as it is not
@@ -2228,7 +2250,7 @@ too long.
 
 =item * B<i2> => I<int>
 
-Integer with large range min/max on the schema.
+Integer with large range minE<sol>max on the schema.
 
 Unlike in C<i1>, a completion library probably won't generate a number sequence
 for this argument because they are considered too long (1000+ items).
@@ -2261,6 +2283,7 @@ String with completion routine that dies.
 
 Completion should not display error (except perhaps under debugging). It should
 just provide no completion.
+
 
 =back
 
@@ -2301,7 +2324,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -2340,6 +2363,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<a1> => I<str>
 
+
 =back
 
 Return value:  (any)
@@ -2365,6 +2389,7 @@ Arguments ('*' denotes required arguments):
 =item * B<b> => I<str>
 
 =item * B<h1> => I<hash>
+
 
 =back
 
@@ -2405,6 +2430,7 @@ Arguments ('*' denotes required arguments):
 =item * B<arg3> => I<any>
 
 =item * B<arg4> => I<any>
+
 
 =back
 
@@ -2447,7 +2473,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

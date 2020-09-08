@@ -6,7 +6,7 @@ use JSON;
 use Lemonldap::NG::Common::PSGI::Constants;
 use Lemonldap::NG::Common::PSGI::Request;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 our $_json = JSON->new->allow_nonref;
 
@@ -125,7 +125,23 @@ sub sendJSONresponse {
     $args{headers} ||= [ $req->spliceHdrs ];
     my $type = 'application/json; charset=utf-8';
     if ( ref $j ) {
-        eval { $j = $_json->encode($j); };
+        eval {
+            if ( $args{pretty} ) {
+
+                # This avoids changing the settings of the $_json reference
+                $j = to_json(
+                    $j,
+                    {
+                        allow_nonref => 1,
+                        pretty       => 1,
+                        canonical    => 1
+                    }
+                );
+            }
+            else {
+                $j = $_json->encode($j);
+            }
+        };
         return $self->sendError( $req, $@ ) if ($@);
     }
     return [ $args{code}, [ 'Content-Type' => $type, @{ $args{headers} } ],

@@ -1,0 +1,70 @@
+{
+    "name" : "Perl7-Handy",
+    "version" : "0.03",
+    "abstract" : "Handy Perl7 scripting environment on Perl5",
+    "author" : [
+        "ina <ina@cpan.org>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "repository" : {
+            "url" : "https://github.com/ina-cpan/Perl7-Handy"
+        }
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Socket" : "0",
+                "lib" : "0",
+                "perl" : "5.005_03",
+                "strict" : "1.01"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Socket" : "0",
+                "lib" : "0",
+                "perl" : "5.005_03",
+                "strict" : "1.01"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
+                "File::Basename" : "2.6",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "FindBin" : "1.42",
+                "Socket" : "0",
+                "lib" : "0",
+                "perl" : "5.005_03",
+                "strict" : "1.01"
+            }
+        }
+    }
+}

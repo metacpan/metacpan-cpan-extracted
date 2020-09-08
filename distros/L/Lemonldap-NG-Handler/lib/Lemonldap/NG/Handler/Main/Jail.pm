@@ -36,7 +36,7 @@ our @builtCustomFunctions;
 sub build_jail {
     my ( $self, $api, $require, $dontDie ) = @_;
     my $build = 1;
-    
+
     return $self->jail
       if (  $self->jail
         and $self->jail->useSafeJail

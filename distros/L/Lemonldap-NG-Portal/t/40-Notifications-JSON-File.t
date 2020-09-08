@@ -51,7 +51,7 @@ expectOK($res);
 my $id = expectCookie($res);
 expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
 
-# Verify that cookie is ciphered (session unvalid)
+# Verify that cookie is ciphered (session invalid)
 ok(
     $res = $client->_get(
         '/',
@@ -97,7 +97,7 @@ expectOK($res);
 $id = expectCookie($res);
 expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
 
-# Verify that cookie is ciphered (session unvalid)
+# Verify that cookie is ciphered (session invalid)
 ok(
     $res = $client->_get(
         '/',

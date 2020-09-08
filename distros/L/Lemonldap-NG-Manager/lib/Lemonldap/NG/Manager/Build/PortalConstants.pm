@@ -108,7 +108,9 @@ sub portalConstants {
         PE_RESETCERTIFICATE_FORMEMPTY        => 98,
         PE_RESETCERTIFICATE_FIRSTACCESS      => 99,
         PE_PP_NOT_ALLOWED_CHARACTER          => 100,
-        PE_PP_NOT_ALLOWED_CHARACTERS         => 101
+        PE_PP_NOT_ALLOWED_CHARACTERS         => 101,
+        PE_UPGRADESESSION                    => 102,
+        PE_NO_SECOND_FACTORS                 => 103
     };
 }
 

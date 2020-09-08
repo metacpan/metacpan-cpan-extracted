@@ -1,5 +1,9 @@
 Revision history for Alien::proj
 
+1.15 2020-09-05
+    - Add Alien::Build::Plugin::PkgConfig::PPWrapper
+      to more places in Makefile.pl
+
 1.14 2020-09-04
     - share installs
       - use Alien::Build::Plugin::PkgConfig::PPWrapper

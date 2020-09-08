@@ -16,9 +16,10 @@ my $client = LLNG::Manager::Test->new( {
             loginHistoryEnabled                  => 1,
             bruteForceProtection                 => 1,
             bruteForceProtectionIncrementalTempo => 1,
-            failedLoginNumber                    => 4,
+            failedLoginNumber                    => 6,
             bruteForceProtectionMaxLockTime      => 300,
-            bruteForceProtectionLockTimes        => '5 500 bad 20 10 ',
+            bruteForceProtectionLockTimes        => '5 , 500, bad ,20, 10 ',
+            bruteForceProtectionMaxFailed        => 2,
         }
     }
 );
@@ -37,6 +38,36 @@ count(1);
 my $id = expectCookie($res);
 expectRedirection( $res, 'http://auth.example.com/' );
 $client->logout($id);
+
+## First allowed failed login
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=ohwd'),
+        length => 23,
+        accept => 'text/html',
+    ),
+    '1st allowed Bad Auth query'
+);
+ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span>/,
+    'Bad credential' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(2);
+
+## Second allowed failed login
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=ohwd'),
+        length => 23,
+        accept => 'text/html',
+    ),
+    '2nd allowed Bad Auth query'
+);
+ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span>/,
+    'Bad credential' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(2);
 
 ## First failed connection
 ok(

@@ -3,16 +3,16 @@
 <div class="form">
   <div class="input-group mb-3">
     <div class="input-group-prepend">
-      <span class="input-group-text"><i class="fa fa-user"></i> </span>
+      <span class="input-group-text"><label for="userfield" class="mb-0"><i class="fa fa-user"></i></label></span>
     </div>
-    <input name="user" type="text" class="form-control" value="<TMPL_VAR NAME="LOGIN">" trplaceholder="mail" required aria-required="true"/>
+    <input id="userfield" name="user" type="text" class="form-control" value="<TMPL_VAR NAME="LOGIN">" trplaceholder="mail" required aria-required="true"/>
   </div>
 
   <div class="input-group mb-3">
     <div class="input-group-prepend">
-      <span class="input-group-text"><i class="fa fa-lock"></i> </span>
+      <span class="input-group-text"><label for="passwordfield" class="mb-0"><i class="fa fa-lock"></i></label></span>
     </div>
-    <textarea name="password" class="form-control" trplaceholder="Signed text" required aria-required="true"></textarea>
+    <textarea id="passwordfield" name="password" class="form-control" trplaceholder="Signed text" required aria-required="true"></textarea>
   </div>
 
   <TMPL_IF NAME=CAPTCHA_SRC>

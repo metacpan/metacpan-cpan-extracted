@@ -9,7 +9,7 @@ package Rex::Interface::Connection::SSH;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 BEGIN {
   use Rex::Require;
@@ -121,7 +121,7 @@ CON_SSH:
     $self->{auth_ret} = $self->{ssh}->auth(
       'username'   => $user,
       'password'   => $pass,
-      'publickey'  => $public_key || "",
+      'publickey'  => $public_key  || "",
       'privatekey' => $private_key || ""
     );
   }

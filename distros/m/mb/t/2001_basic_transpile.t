@@ -1805,12 +1805,12 @@ END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 341
 do
 END1
-mb::do
+do
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 342
 eval
 END1
-mb::eval
+eval
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 343
 getc
@@ -1845,7 +1845,7 @@ END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 349
 require
 END1
-mb::require
+require
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 350
 reverse

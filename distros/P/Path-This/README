@@ -10,13 +10,25 @@ SYNOPSIS
       use Path::This '$THISDIR';
       use lib "$THISDIR/../lib";
     
-      # using core modules - use constant or BEGIN to resolve __FILE__ at compile time
+      # constant subs can be constant-folded by the parser
+    
+      use Path::This 'THISDIR';
+      my $bar_path = THISDIR . '/bar'; # string formed at parse time
+    
+      # equivalent values resolved with only core modules
+      # use constant or BEGIN to resolve __FILE__ as early as possible
+    
       use Cwd 'abs_path';
       use File::Basename 'dirname';
+    
       use constant THISFILE => abs_path __FILE__;
-      use constant THISDIR => dirname abs_path __FILE__;
-      my ($THISFILE, $THISDIR);
+      # or
+      my $THISFILE;
       BEGIN { $THISFILE = abs_path __FILE__ }
+    
+      use constant THISDIR => dirname abs_path __FILE__;
+      # or
+      my $THISDIR;
       BEGIN { $THISDIR = dirname abs_path __FILE__ }
 
 DESCRIPTION
@@ -27,13 +39,16 @@ DESCRIPTION
     resolved.
 
     Note that the package variable or constant sub will be exported to the
-    current package globally. If the same package will be used in multiple
-    files, use the dynamic sub export so the file path will be calculated
-    when the sub is called.
+    current package globally. If the same package will be defined across
+    multiple files, use the dynamic sub export so the file path will be
+    calculated when the sub is called.
 
     For cases where this module cannot be loaded beforehand, the last
     section of the "SYNOPSIS" shows how to perform the same task with core
     modules.
+
+    See lib::relative for the specific case of adding paths to @INC
+    relative to the current source file.
 
 EXPORTS
 
@@ -49,7 +64,8 @@ EXPORTS
     Absolute path to the current source file. Behavior is undefined when
     called without a source file (e.g. from the command line or STDIN).
     $THISFILE will export a package variable, &THISFILE will export a
-    dynamic subroutine, and THISFILE will export an inlinable constant.
+    dynamic subroutine (& not needed to call it), and THISFILE will export
+    an inlinable constant.
 
  $THISDIR
 
@@ -63,8 +79,8 @@ EXPORTS
     Absolute path to the directory containing the current source file, or
     the current working directory when called without a source file (e.g.
     from the command line or STDIN). $THISDIR will export a package
-    variable, &THISDIR will export a dynamic subroutine, and THISDIR will
-    export an inlinable constant.
+    variable, &THISDIR will export a dynamic subroutine (& not needed to
+    call it), and THISDIR will export an inlinable constant.
 
 BUGS
 

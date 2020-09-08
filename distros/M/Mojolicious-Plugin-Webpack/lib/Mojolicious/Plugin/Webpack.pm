@@ -9,7 +9,7 @@ use Mojo::Util;
 
 use constant LAZY => $ENV{MOJO_WEBPACK_LAZY} ? 1 : 0;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub assets_dir { shift->{assets_dir} }
 sub out_dir    { shift->{out_dir} }
@@ -18,12 +18,6 @@ sub route      { shift->{route} }
 
 sub register {
   my ($self, $app, $config) = @_;
-
-  # If running inside a shim
-  return $app->plugin('Mojolicious::Plugin::Webpack' => $config)
-    unless $ENV{MOJO_WEBPACK_TEST_INTERNAL}
-    or $self->isa('Mojolicious::Plugin::Webpack');
-
   $self->{route} = $app->routes->route('/asset/*name')->via(qw(HEAD GET))->name('webpack.asset');
 
   $self->{$_} = path $config->{$_} for grep { $config->{$_} } qw(assets_dir out_dir);
@@ -73,7 +67,7 @@ sub _build_out_dir {
 
 sub _helper {
   my ($self, $c, $name, @args) = @_;
-  return $self if @_ == 2;
+  return $self                   if @_ == 2;
   return $self->$name($c, @args) if $name =~ m!^\w+$!;
 
   $self->_register_assets if LAZY;    # Lazy read the generated markup
@@ -98,13 +92,13 @@ sub _register_assets {
   my $name_re = qr{(.*)\.\w+\.(css|js)$}i;
 
   $markup->find('link')->each(sub {
-    my $name        = shift->{href} // '';
+    my $name = shift->{href} // '';
     my $file_is_dev = $name =~ m!development! ? 1 : 0;
     $self->{assets}{"$1.$2"} = [stylesheet => {name => $name}] if $is_dev == $file_is_dev and $name =~ $name_re;
   });
 
   $markup->find('script')->each(sub {
-    my $name        = shift->{src} // '';
+    my $name = shift->{src} // '';
     my $file_is_dev = $name =~ m!development! ? 1 : 0;
     $self->{assets}{"$1.$2"} = [javascript => {name => $name}] if $is_dev == $file_is_dev and $name =~ $name_re;
   });
@@ -203,10 +197,53 @@ file like "build-assets.t":
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Webpack> is a L<Mojolicious> plugin to make it easier to
-work with L<https://webpack.js.org/>. This means that this is mostly a
-developer tool. This point is emphasized by installing a "shim" so your
-application does not depend on this plugin at all when running in production.
-See L<Mojolicious::Plugin::Webpack::Builder/PLUGIN SHIM> for more information.
+work with L<https://webpack.js.org/>. This plugin will...
+
+=over 2
+
+=item 1.
+
+Generate a minimal C<package.json> and a Webpack config file. Doing this
+manually is possible, but it can be quite time consuming to figure out all the
+bits and pieces if you are not already familiar with Webpack.
+
+  ./package.json
+  ./webpack.config.js
+
+=item 2.
+
+Generate a C<webpack.custom.js> which is meant to be the end user config file
+where you can override any part of the default config. You are free to modify
+C<webpack.config.js> directly, but doing so will prevent
+L<Mojolicious::Plugin::Webpack> from patching it in the future.
+
+The default C<webpack.custom.js> file will simply define an "entry" which is
+the starting point of your application.
+
+  ./assets/webpack.custom.js
+
+=item 3.
+
+Generate an entry file, which is the starting point of your client side
+application. The entry file can load JavaScript, CSS, SASS, ... as long as the
+appropriate processing plugin is loaded by Webpack.
+
+  ./assets/my_app.js
+
+=item 4.
+
+It can be difficult to know exactly which plugins to use with Webpack. Because
+of this, L<Mojolicious::Plugin::Webpack> has some predefined rules for which
+Nodejs dependencies to fetch and  install. None of the nodejs modules are
+required in production though, so it will only be installed while developing.
+
+=item 5.
+
+While developing, the webpack executable will be started automatically next to
+L<Mojo::Server::Morbo>. Webpack will be started with the appropriate switches
+to watch your source files and re-compile on change.
+
+=back
 
 There is also support for L<https://rollupjs.org/>. See L</Rollup> for more
 information.

@@ -15,6 +15,7 @@ my %common_reqs = (
     "Path::Tiny" => 0,
     "File::Which" => 0,
     ($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
+    "Alien::Build::Plugin::PkgConfig::PPWrapper" => '0',
 );
 
 my %WriteMakefileArgs = (
@@ -29,7 +30,6 @@ my %WriteMakefileArgs = (
     "BUILD_REQUIRES" => {
         %common_reqs,
         "File::Find::Rule" => 0,
-        'Alien::Build::Plugin::PkgConfig::PPWrapper' => '0',
     },
     "TEST_REQUIRES" => {
         "Test::Alien" => 0,

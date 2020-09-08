@@ -6,4 +6,3 @@ t/Apache-Session-LDAP.t
 lib/Apache/Session/LDAP.pm
 lib/Apache/Session/Store/LDAP.pm
 META.yml                                 Module meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

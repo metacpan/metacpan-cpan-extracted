@@ -21,4 +21,9 @@ ok(! defined Ogg::Vorbis::Header::PurePerl->new('not-there.ogg'),
 
 like($warn, qr/does not exist/, 'Correct warning');
 
+ok(defined Ogg::Vorbis::Header::PurePerl->new('t/test.mp3'),
+   'Fail to fail on wrong file type');
+
+like($warn, qr/^This is not an Ogg/, 'Correct warning though');
+
 done_testing();

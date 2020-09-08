@@ -1,13 +1,14 @@
 package Lemonldap::NG::Manager::Conf::Zero;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 sub zeroConf {
-    my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir ) = @_;
+    my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir, $cacheDir ) = @_;
     $domain               ||= 'example.com';
     $sessionDir           ||= '/var/lib/lemonldap-ng/sessions';
     $persistentSessionDir ||= '/var/lib/lemonldap-ng/psessions';
     $notificationDir      ||= '/var/lib/lemonldap-ng/notifications';
+    $cacheDir             ||= '/var/cache/lemonldap-ng/';
     return {
         'timeout'             => 72000,
         'loginHistoryEnabled' => 1,
@@ -187,7 +188,7 @@ sub zeroConf {
             'namespace'          => 'lemonldap-ng-sessions',
             'default_expires_in' => 600,
             'directory_umask'    => '007',
-            'cache_root'         => '/tmp',
+            'cache_root'         => "$cacheDir",
             'cache_depth'        => 3,
         },
     };

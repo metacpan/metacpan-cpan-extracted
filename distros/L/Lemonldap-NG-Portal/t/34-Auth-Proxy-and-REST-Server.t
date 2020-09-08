@@ -126,7 +126,7 @@ my $newId = $res->{session}->{_session_id};
 
 # Verify a key
 ok( $res = $issuer->_get("/sessions/global/$newId/uid"), 'Verify uid' );
-ok( $res->[2]->[0] eq 'zz',                              ' Uid is good' );
+ok( $res->[2]->[0] eq 'zz', ' Uid is good' );
 count(4);
 
 # Update a key
@@ -159,7 +159,7 @@ count(3);
 
 # Verify new key
 ok( $res = $issuer->_get("/sessions/global/$newId/cn"), 'Verify cn' );
-ok( $res->[2]->[0] eq 'CN',                             ' CN is good' );
+ok( $res->[2]->[0] eq 'CN', ' CN is good' );
 count(2);
 
 use_ok('Lemonldap::NG::Common::Apache::Session::REST');

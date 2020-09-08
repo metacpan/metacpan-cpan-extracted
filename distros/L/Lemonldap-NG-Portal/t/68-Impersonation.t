@@ -83,7 +83,7 @@ ok(
 );
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-negative alert"><span trmsg="5">%,
+      m%<div class="message message-negative alert"><span trmsg="5">%,
     ' PE5 found'
 ) or explain( $res->[2]->[0], "PE5 - Forbidden identity" );
 count(2);
@@ -112,7 +112,7 @@ ok(
 );
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-negative alert"><span trmsg="93">%,
+      m%<div class="message message-negative alert"><span trmsg="93">%,
     ' PE93 found'
 ) or explain( $res->[2]->[0], "PE93 - Impersonation service not allowed" );
 count(2);
@@ -329,8 +329,8 @@ count(17);
 my %attributes = map /<td scope="row">(.+)?<\/td>/g, $res->[2]->[0];
 ok( keys %attributes == 34, 'Found 34 attributes' )
   or print STDERR ( keys %attributes < 34 )
-  ? "Missing attributes -> " . scalar keys (%attributes) . "\n"
-  : "Too much attributes -> " . scalar keys (%attributes). "\n";
+  ? "Missing attributes -> " . scalar keys(%attributes) . "\n"
+  : "Too much attributes -> " . scalar keys(%attributes) . "\n";
 ok( $attributes{'_auth'} eq 'Demo', '_auth' )
   or print STDERR Dumper( \%attributes );
 ok( $attributes{'uid'}, 'uid' ) or print STDERR Dumper( \%attributes );

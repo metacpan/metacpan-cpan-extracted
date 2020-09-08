@@ -10,6 +10,7 @@ lib/Lemonldap/NG/Manager/2ndFA.pm
 lib/Lemonldap/NG/Manager/Api.pm
 lib/Lemonldap/NG/Manager/Api/2F.pm
 lib/Lemonldap/NG/Manager/Api/Common.pm
+lib/Lemonldap/NG/Manager/Api/Misc.pm
 lib/Lemonldap/NG/Manager/Api/Providers/OidcRp.pm
 lib/Lemonldap/NG/Manager/Api/Providers/SamlSp.pm
 lib/Lemonldap/NG/Manager/Attributes.pm
@@ -191,6 +192,7 @@ site/htdocs/static/languages/de.json
 site/htdocs/static/languages/en.json
 site/htdocs/static/languages/fr.json
 site/htdocs/static/languages/it.json
+site/htdocs/static/languages/pl.json
 site/htdocs/static/languages/tr.json
 site/htdocs/static/languages/vi.json
 site/htdocs/static/languages/zh.json
@@ -204,6 +206,7 @@ site/htdocs/static/logos/fr.png
 site/htdocs/static/logos/it.png
 site/htdocs/static/logos/llng-icon-32.png
 site/htdocs/static/logos/llng-logo-32.png
+site/htdocs/static/logos/pl.png
 site/htdocs/static/logos/tr.png
 site/htdocs/static/logos/vi.png
 site/htdocs/static/logos/zh.png

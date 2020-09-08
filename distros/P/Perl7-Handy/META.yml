@@ -1,0 +1,27 @@
+--- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+name: Perl7-Handy
+version: 0.03
+abstract: Handy Perl7 scripting environment on Perl5
+author:
+  - ina <ina@cpan.org>
+license: perl
+generated_by: pmake.bat
+requires:
+  ExtUtils::MakeMaker: 5.4302
+  Fcntl: 1.03
+  File::Basename: 2.6
+  File::Copy: 2.02
+  File::Path: 1.0401
+  FindBin: 1.42
+  Socket: 0
+  lib: 0
+  perl: 5.005_03
+  strict: 1.01
+build_requires:
+  Test: 1.122
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ina-cpan/Perl7-Handy

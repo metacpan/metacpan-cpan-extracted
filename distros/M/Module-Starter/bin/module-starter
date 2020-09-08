@@ -1,8 +1,12 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
 module-starter - creates a skeleton module distribution
+
+=head1 VERSION
+
+version 1.77
 
 =cut
 
@@ -10,6 +14,8 @@ use warnings;
 use strict;
 
 use Module::Starter::App;
+
+our $VERSION = '1.77';
 
 Module::Starter::App->run;
 
@@ -51,8 +57,8 @@ Available Licenses:
     perl, artistic, artistic2, mit, mozilla, mozilla2, bsd, freebsd, cc0,
     gpl, lgpl, gpl3, lgpl3, agpl3, apache, qpl
 
-You may also specify any Software::License subclass or CPAN::Meta::Spec license
-string.
+You may also specify any L<Software::License> subclass or
+L<CPAN Meta Spec license string|CPAN::Meta::Spec/license>.
 
 Available Ignore Types:
 
@@ -102,4 +108,3 @@ This format may become more elaborate in the future, but a file of this type
 should remain valid.
 
 =cut
-

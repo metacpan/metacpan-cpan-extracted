@@ -4,9 +4,29 @@
 
 Perl module for interacting with the [Binance API](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.mdl).
 
+### Requirements
+
+* make
+* Net::SSLeay
+
+#### For Debian/Ubuntu users
+
+```
+apt update
+apt install make libssl-dev libnet-ssleay-perl
+```
+
 ### Perl dependencies
 
 See lib/Binance/PerlDependencies.pm
+
+OR
+
+```
+apt install cpanminus
+cd binance-perl-api
+sudo cpanm --installdeps .
+```
 
 ### Installing
 
@@ -38,12 +58,15 @@ sudo cpan JSON
 ## Running the tests
 
 ```
-prove t/*
+prove -r t/
 ```
 
 ## Usage
 
 ```
+use strict;
+use warnings;
+
 use Binance::API;
 
 my $api = Binance::API->new(

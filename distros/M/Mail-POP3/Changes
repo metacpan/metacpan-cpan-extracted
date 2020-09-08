@@ -1,4 +1,5 @@
-Revision history for Mail::POP3
+3.11 2020-09-05
+- Email::MIME format changed in 1.949 so require that
 
 3.10 2019-04-11
  - update metadata - thanks @manwar

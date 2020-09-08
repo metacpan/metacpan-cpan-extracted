@@ -1,30 +1,30 @@
 ---
-name: AudioFile-Info-Ogg-Vorbis-Header-PurePerl
-version: 1.05
+abstract: 'Perl extension to get'
 author:
-  - 'Dave Cross, E<lt>dave@dave.org.ukE<gt>'
-abstract: |-
-  Perl extension to get
-  info from Ogg Vorbis files.
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  AudioFile::Info: 0
-  Ogg::Vorbis::Header::PurePerl: 0
-  YAML: 0
-  perl: 5.6.0
+  - 'Dave Cross, E<lt>dave@perlhacks.comE<gt>'
 build_requires:
-  Module::Build: 0
+  Module::Build: '0'
+configure_requires:
+  Module::Build: '0.42'
 dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AudioFile-Info-Ogg-Vorbis-Header-PurePerl
 provides:
   AudioFile::Info::Build:
     file: lib/AudioFile/Info/Build.pm
-    version: 16
   AudioFile::Info::Ogg::Vorbis::Header::PurePerl:
     file: lib/AudioFile/Info/Ogg/Vorbis/Header/PurePerl.pm
-    version: 17
-generated_by: Module::Build version 0.2808
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: v1.5.2
+requires:
+  AudioFile::Info: '0'
+  Ogg::Vorbis::Header::PurePerl: '0'
+  YAML: '0'
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.5.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

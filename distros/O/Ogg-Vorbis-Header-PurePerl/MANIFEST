@@ -7,6 +7,7 @@ t/01-require.t
 t/02-basic.t
 t/04-files.t
 t/test.ogg
+t/test.mp3
 examples/ogginfo.pl
 LICENSE.GPL
 META.yml                                 Module YAML meta-data (added by MakeMaker)

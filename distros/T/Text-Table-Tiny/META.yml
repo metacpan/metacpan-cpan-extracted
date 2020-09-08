@@ -19,6 +19,7 @@ requires:
   Carp: '0'
   Exporter: '0'
   Ref::Util: '0'
+  String::TtyLength: '0'
   parent: '0'
   perl: '5.010'
   strict: '0'
@@ -28,6 +29,6 @@ resources:
   bugtracker: https://github.com/neilb/Text-Table-Tiny/issues
   homepage: https://github.com/neilb/Text-Table-Tiny
   repository: https://github.com/neilb/Text-Table-Tiny.git
-version: '1.00'
+version: '1.01'
 x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

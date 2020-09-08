@@ -4,7 +4,7 @@ List::AllUtils - Combines List::Util, List::SomeUtils and List::UtilsBy in one b
 
 # VERSION
 
-version 0.16
+version 0.18
 
 # SYNOPSIS
 
@@ -30,8 +30,8 @@ Note that all function documentation has been shamelessly copied from
 ## Which One Wins?
 
 Recently, [List::Util](https://metacpan.org/pod/List%3A%3AUtil) has started including some of the subs that used to
-only be in [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils). Similar, [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) has some small
-overlap with [List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy). `List::AllUtils` always favors the version
+only be in [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils). Similarly, [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) has some small
+overlap with [List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy). `List::AllUtils` always favors the subroutine
 provided by [List::Util](https://metacpan.org/pod/List%3A%3AUtil), [List::SomeUtils](https://metacpan.org/pod/List%3A%3ASomeUtils) or [List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy) in that
 order.
 
@@ -49,7 +49,8 @@ your installed version provides.
 
 The following set of functions all apply a given block of code to a list of
 values.
-&#x3d;head2 reduce
+
+## reduce
 
     $result = reduce { BLOCK } @list
 
@@ -303,9 +304,10 @@ Instead, write this using a lexical variable:
        my @items = pairgrep { $a eq $key } @kvlist;
        ...
     }
-   =head2 pairs
 
-       my @pairs = pairs @kvlist;
+## pairs
+
+    my @pairs = pairs @kvlist;
 
 _Since version 1.29._
 
@@ -464,8 +466,10 @@ As with `map` aliasing `$_` to list elements, `pairmap` aliases `$a` and
 will be visible to the caller.
 
 See ["KNOWN BUGS"](#known-bugs) for a known-bug with `pairmap`, and a workaround.
-&#x3d;head1 OTHER FUNCTIONS
-&#x3d;head2 shuffle
+
+# OTHER FUNCTIONS
+
+## shuffle
 
     my @values = shuffle @values;
 
@@ -474,7 +478,8 @@ Returns the values of the input in a random order
     @cards = shuffle 0..51      # 0..51 in a random order
 
 This function is affected by the `$RAND` variable.
-&#x3d;head2 sample
+
+## sample
 
     my @items = sample $count, @values
 
@@ -554,7 +559,8 @@ compares equal to the empty string but additionally produces a warning if such
 warnings are enabled (`use warnings 'uninitialized';`). In addition, an
 `undef` in the returned list is coerced into an empty string, so that the
 entire list of values returned by `uniqstr` are well-behaved as strings.
-&#x3d;head2 head
+
+## head
 
     my @values = head $size, @list;
 
@@ -1429,7 +1435,7 @@ Please report any bugs or feature requests to
 [http://rt.cpan.org](http://rt.cpan.org).  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-Bugs may be submitted at [http://rt.cpan.org/Public/Dist/Display.html?Name=List-AllUtils](http://rt.cpan.org/Public/Dist/Display.html?Name=List-AllUtils) or via email to [bug-list-allutils@rt.cpan.org](mailto:bug-list-allutils@rt.cpan.org).
+Bugs may be submitted at [https://github.com/houseabsolute/List-AllUtils/issues](https://github.com/houseabsolute/List-AllUtils/issues).
 
 I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
@@ -1452,7 +1458,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHOR
 
@@ -1463,6 +1469,7 @@ Dave Rolsky <autarch@urth.org>
 - Andy Jack <github@veracity.ca>
 - Dave Jacoby <jacoby.david@gmail.com>
 - Karen Etheridge <ether@cpan.org>
+- Olaf Alders <olaf@wundersolutions.com>
 - Ricardo Signes <rjbs@cpan.org>
 - Yanick Champoux <yanick@babyl.dyndns.org>
 

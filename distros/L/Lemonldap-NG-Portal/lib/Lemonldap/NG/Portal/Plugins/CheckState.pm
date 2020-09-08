@@ -37,7 +37,7 @@ sub check {
     if ( $res > 0 ) {
         push @rep, "Bad result before auth: $res";
     }
-    
+
     if ( my $user = $req->param('user') and my $pwd = $req->param('password') )
     {
         $req->user($user);

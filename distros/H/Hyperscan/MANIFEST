@@ -8,6 +8,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
+inc/MakeMaker.pm
 lib/Hyperscan.pm
 lib/Hyperscan/Database.pm
 lib/Hyperscan/Matcher.pm

@@ -21,7 +21,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SLO_ERROR
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 # PROPERTIES
 
@@ -1743,8 +1743,10 @@ sub replayProtection {
                 return 0;
             }
         }
-    } else {
-        $self->logger->warn( "No assertion session found for request ID ".$samlID);
+    }
+    else {
+        $self->logger->warn(
+            "No assertion session found for request ID " . $samlID );
     }
 
     return 0;
@@ -1777,8 +1779,8 @@ sub resolveArtifact {
         }
 
         my $request = HTTP::Request->new( 'POST' => $profile->msg_url );
-        $request->content_type('application/xml');
-        $request->header( Accept => 'application/xml' );
+        $request->content_type('text/xml');
+        $request->header( Accept => 'text/xml' );
         $request->content( $profile->msg_body );
 
         $self->logger->debug(
@@ -1999,8 +2001,8 @@ sub sendSOAPMessage {
     my $response;
 
     my $request = HTTP::Request->new( 'POST' => $endpoint );
-    $request->content_type('application/xml');
-    $request->header( Accept => 'application/xml' );
+    $request->content_type('text/xml');
+    $request->header( Accept => 'text/xml' );
     $request->content($message);
 
     $self->logger->debug("Send SOAP message $message to $endpoint");
@@ -3061,7 +3063,7 @@ sub sendSLOErrorResponse {
             "Could not set empty session in logout object", 500 );
     }
 
-    # Send unvalidated SLO response
+    # Send invalidated SLO response
     return $self->sendLogoutResponseToServiceProvider( $req, $logout, $method );
 }
 
@@ -3086,7 +3088,7 @@ sub sendSLOSoapErrorResponse {
     return [
         200,
         [
-            'Content-Type'   => 'application/xml',
+            'Content-Type'   => 'text/xml',
             'Content-Length' => length($slo_body)
         ],
         [$slo_body]

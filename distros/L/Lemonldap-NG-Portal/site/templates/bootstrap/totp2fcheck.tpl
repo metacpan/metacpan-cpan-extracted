@@ -13,7 +13,7 @@
     <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text"><i class="fa fa-lock"></i> </span>
+        <span class="input-group-text"><label for="extcode" class="mb-0"><i class="fa fa-lock"></i></label></span>
       </div>
       <input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="off" />
     </div>

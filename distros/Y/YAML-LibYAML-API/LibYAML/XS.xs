@@ -134,6 +134,10 @@ emit_string_events(AV *perl_events, HV *options)
             if (val && SvOK(*val) && SvIOK( *val )) {
                 yaml_emitter_set_indent(&emitter, SvIV(*val));
             }
+            val = hv_fetch(options, "width", 5, TRUE);
+            if (val && SvOK(*val) && SvIOK( *val )) {
+                yaml_emitter_set_width(&emitter, SvIV(*val));
+            }
             yaml_emitter_set_output(&emitter, &append_output, (void *) yaml);
             yaml_emitter_set_canonical(&emitter, 0);
             yaml_emitter_set_unicode(&emitter, 0);
@@ -176,6 +180,10 @@ emit_file_events(const char *filename, AV *perl_events, HV *options)
             val = hv_fetch(options, "indent", 6, TRUE);
             if (val && SvOK(*val) && SvIOK( *val )) {
                 yaml_emitter_set_indent(&emitter, SvIV(*val));
+            }
+            val = hv_fetch(options, "width", 5, TRUE);
+            if (val && SvOK(*val) && SvIOK( *val )) {
+                yaml_emitter_set_width(&emitter, SvIV(*val));
             }
             output = fopen(filename, "wb");
             yaml_emitter_set_output_file(&emitter, output);
@@ -224,6 +232,10 @@ emit_filehandle_events(FILE *output, AV *perl_events, HV *options)
             val = hv_fetch(options, "indent", 6, TRUE);
             if (val && SvOK(*val) && SvIOK( *val )) {
                 yaml_emitter_set_indent(&emitter, SvIV(*val));
+            }
+            val = hv_fetch(options, "width", 5, TRUE);
+            if (val && SvOK(*val) && SvIOK( *val )) {
+                yaml_emitter_set_width(&emitter, SvIV(*val));
             }
 
             yaml_emitter_set_output_file(&emitter, output);

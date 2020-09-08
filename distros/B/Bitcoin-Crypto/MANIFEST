@@ -1,6 +1,7 @@
 Changes
 examples/bip44.pl
 examples/networks.pl
+examples/signature_generator.pl
 lib/Bitcoin/Crypto.pm
 lib/Bitcoin/Crypto/Base58.pm
 lib/Bitcoin/Crypto/Bech32.pm
@@ -23,7 +24,7 @@ lib/Bitcoin/Crypto/Types.pm
 lib/Bitcoin/Crypto/Util.pm
 Makefile.PL
 MANIFEST			This list of files
-README.pod
+README.md
 t/Base58.t
 t/Bech32.t
 t/Config.t

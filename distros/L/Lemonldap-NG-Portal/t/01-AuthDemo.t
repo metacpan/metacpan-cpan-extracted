@@ -25,8 +25,7 @@ ok(
     ),
     'Get Menu'
 );
-ok( $res->[2]->[0] =~ /<span trmsg="37">/,
-    'Rejected with PE_BADURL' )
+ok( $res->[2]->[0] =~ /<span trmsg="37">/, 'Rejected with PE_BADURL' )
   or print STDERR Dumper( $res->[2]->[0] );
 ok( $res->[2]->[0] =~ m%<span id="languages"></span>%, ' Language icons found' )
   or print STDERR Dumper( $res->[2]->[0] );
@@ -41,8 +40,7 @@ ok(
     ),
     'Get Menu'
 );
-ok( $res->[2]->[0] =~ /<span trmsg="9">/,
-    'Rejected with PE_FIRSTACCESS' )
+ok( $res->[2]->[0] =~ /<span trmsg="9">/, 'Rejected with PE_FIRSTACCESS' )
   or print STDERR Dumper( $res->[2]->[0] );
 ok( $res->[2]->[0] =~ m%<span id="languages"></span>%, ' Language icons found' )
   or print STDERR Dumper( $res->[2]->[0] );
@@ -73,9 +71,10 @@ ok(
     ),
     'Auth query'
 );
-ok( $res->[2]->[0] =~ /<span trmsg="5">/,
-    'jdoe rejected with PE_BADCREDENTIALS' )
-  or print STDERR Dumper( $res->[2]->[0] );
+ok(
+    $res->[2]->[0] =~ /<span trmsg="5">/,
+    'jdoe rejected with PE_BADCREDENTIALS'
+) or print STDERR Dumper( $res->[2]->[0] );
 ok( $res->[2]->[0] =~ m%<span trspan="connect">Connect</span>%,
     'Found connect button' )
   or print STDERR Dumper( $res->[2]->[0] );
@@ -93,9 +92,10 @@ ok(
     'Auth query'
 );
 count(1);
-ok( $res->[2]->[0] =~ /<span trmsg="5">/,
-    'dwho rejected with PE_BADCREDENTIALS' )
-  or print STDERR Dumper( $res->[2]->[0] );
+ok(
+    $res->[2]->[0] =~ /<span trmsg="5">/,
+    'dwho rejected with PE_BADCREDENTIALS'
+) or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 ok( $res->[2]->[0] =~ m%<span trspan="connect">Connect</span>%,
     'Found connect button' )

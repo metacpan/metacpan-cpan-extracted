@@ -14,7 +14,7 @@ BEGIN {
 
 my $debug = 'error';
 my ( $issuer, $res );
-my $maintests = 6;
+my $maintests = 7;
 
 SKIP: {
     eval "use Lasso";
@@ -67,6 +67,9 @@ SKIP: {
     {
         is( $value->textContent, 'Accents', 'Check Attribute' );
     }
+    foreach my $value ( $xpc->findnodes('//saml:NameID') ) {
+        is( $value->textContent, 'customfrench', 'Check NameID from macro' );
+    }
     clean_sessions();
 }
 
@@ -84,7 +87,8 @@ sub issuer {
                 issuerDBSAMLActivation => 1,
                 samlSPMetaDataMacros   => {
                     'sp.com' => {
-                        extracted_sn => '(split(/\s/, $cn))[1]'
+                        extracted_sn => '(split(/\s/, $cn))[1]',
+                        customnameid => '"custom".$uid',
                     }
                 },
                 samlSPMetaDataOptions => {
@@ -95,6 +99,7 @@ sub issuer {
                         samlSPMetaDataOptionsSignSLOMessage           => 1,
                         samlSPMetaDataOptionsCheckSSOMessageSignature => 1,
                         samlSPMetaDataOptionsCheckSLOMessageSignature => 1,
+                        samlSPMetaDataOptionsNameIDSessionKey => 'customnameid',
                     }
                 },
                 samlSPMetaDataExportedAttributes => {

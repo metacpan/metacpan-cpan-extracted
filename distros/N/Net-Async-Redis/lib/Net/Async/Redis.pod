@@ -66,15 +66,17 @@ Current features include:
 
 =over 4
 
-=item * L<all commands|https://redis.io/commands> as of 6.0 (May 2020), see L<https://redis.io/commands> for the methods and parameters
+=item * L<all commands|https://redis.io/commands> as of 6.0.7 (August 2020), see L<https://redis.io/commands> for the methods and parameters
 
-=item * L<pub/sub support|https://redis.io/topics/pubsub>, see L</Subscriptions>
+=item * L<pub/sub support|https://redis.io/topics/pubsub>, see L</METHODS - Subscriptions>
 
-=item * L<pipelining|https://redis.io/topics/pipelining>, see L</Pipelining>
+=item * L<pipelining|https://redis.io/topics/pipelining>, see L</pipeline_depth>
 
-=item * L<transactions|https://redis.io/topics/transactions>, see L</Transactions>
+=item * L<transactions|https://redis.io/topics/transactions>, see L</METHODS - Transactions>
 
-=item * L<streams|https://redis.io/topics/streams-intro> and consumer groups, see L</Streams>
+=item * L<streams|https://redis.io/topics/streams-intro> and consumer groups, via L<Net::Async::Redis::Commands/XADD> and related methods
+
+=item * L<client-side caching|https://redis.io/topics/client-side-caching>, see L</METHODS - Clientside caching>
 
 =back
 
@@ -155,8 +157,12 @@ Note that this module uses L<Future::AsyncAwait> internally.
 
 =head2 OPENTRACING_ENABLED
 
-Defaults to true, this can be controlled by the C<USE_OPENTRACING>
-environment variable.
+Defaults to false, this can be controlled by the C<USE_OPENTRACING>
+environment variable. This provides a way to set the default opentracing
+mode for all L<Net::Async::Redis> instances - you can enable/disable
+for a specific instance via L</configure>:
+
+ $redis->configure(opentracing => 1);
 
 When enabled, this will create a span for every Redis request. See
 L<OpenTracing::Any> for details.
@@ -314,6 +320,10 @@ Note that this does not apply when in L<transaction|METHODS - Transactions> (C<M
 
 See L<https://redis.io/topics/pipelining> for more details on this concept.
 
+=head2 opentracing
+
+Indicates whether L<OpenTracing::Any> support is enabled.
+
 =head1 METHODS - Deprecated
 
 This are still supported, but no longer recommended.
@@ -342,6 +352,34 @@ value.
 The buffer size when writing to Redis connections, in bytes. Defaults to 1MB.
 
 See L</stream_read_len>.
+
+=head2 configure
+
+Applies configuration parameters - currently supports:
+
+=over 4
+
+=item * C<host>
+
+=item * C<port>
+
+=item * C<auth>
+
+=item * C<database>
+
+=item * C<pipeline_depth>
+
+=item * C<stream_read_len>
+
+=item * C<stream_write_len>
+
+=item * C<on_disconnect>
+
+=item * C<client_name>
+
+=item * C<opentracing>
+
+=back
 
 =head1 SEE ALSO
 

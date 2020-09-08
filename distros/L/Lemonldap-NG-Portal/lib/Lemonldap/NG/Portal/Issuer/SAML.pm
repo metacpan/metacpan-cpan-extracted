@@ -18,7 +18,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_UNAUTHORIZEDPARTNER
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::SAML';
@@ -185,6 +185,13 @@ sub storeEnv {
         $req->env->{llng_saml_sp} = $sp;
         if ( my $spConfKey = $self->spList->{$sp}->{confKey} ) {
             $req->env->{llng_saml_spconfkey} = $spConfKey;
+
+            # Store target authentication level in pdata
+            my $targetAuthnLevel =
+              $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+              ->{samlSPMetaDataOptionsAuthnLevel};
+            $req->pdata->{targetAuthnLevel} = $targetAuthnLevel
+              if $targetAuthnLevel;
         }
     }
     return PE_OK;
@@ -389,18 +396,19 @@ sub run {
             $self->logger->debug("$sp match $spConfKey SP in configuration");
             $req->env->{llng_saml_spconfkey} = $spConfKey;
 
+            # Check access rule
             if ( my $rule = $self->spRules->{$spConfKey} ) {
                 unless ( $rule->( $req, $req->sessionInfo ) ) {
                     $self->userLogger->warn( 'User '
                           . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-                          . " is not authorized to access to $sp" );
+                          . " is not authorized to access to $spConfKey" );
                     return PE_UNAUTHORIZEDPARTNER;
                 }
             }
 
             $self->userLogger->notice( 'User '
                   . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-                  . " is authorized to access to $sp" );
+                  . " is authorized to access to $spConfKey" );
 
             # Do we check signature?
             my $checkSSOMessageSignature =
@@ -450,6 +458,10 @@ sub run {
 
             $self->logger->debug("SSO: authentication request is valid");
 
+            my $spAuthnLevel =
+              $self->conf->{samlSPMetaDataOptions}->{$spConfKey}
+              ->{samlSPMetaDataOptionsAuthnLevel} || 0;
+
             # Get ForceAuthn flag
             my $force_authn;
 
@@ -473,10 +485,11 @@ sub run {
             {
 
                 $self->userLogger->info(
-                    "SAML SP $sp ask to refresh session of "
+                    "SAML SP $spConfKey ask to refresh session of "
                       . $req->sessionInfo->{ $self->conf->{whatToTrace} } );
 
                 # Replay authentication process
+                $req->pdata->{targetAuthnLevel} = $spAuthnLevel;
                 return $self->reAuth($req);
             }
 
@@ -486,9 +499,18 @@ sub run {
                   unless ( $self->checkDestination( $login->request, $url ) );
             }
 
-            # Map authenticationLevel with SAML2 authentication context
+            # Check if we have sufficient auth level
             my $authenticationLevel =
-              $req->{sessionInfo}->{authenticationLevel};
+              $req->{sessionInfo}->{authenticationLevel} || 0;
+            if ( $authenticationLevel < $spAuthnLevel ) {
+                $self->logger->debug(
+                    "Insufficient authentication level for service $spConfKey"
+                      . " (has: $authenticationLevel, want: $spAuthnLevel)" );
+
+                # Reauth with sp auth level as target
+                $req->pdata->{targetAuthnLevel} = $spAuthnLevel;
+                return $self->upgradeAuth($req);
+            }
 
             $authn_context =
               $self->authnLevel2authnContext($authenticationLevel);
@@ -558,7 +580,12 @@ sub run {
             }
 
             my $nameIDContent;
-            if ( defined $req->{sessionInfo}->{$nameIDSessionKey} ) {
+            if ( $self->spMacros->{$sp}->{$nameIDSessionKey} ) {
+                $nameIDContent =
+                  $self->spMacros->{$sp}->{$nameIDSessionKey}
+                  ->( $req, $req->{sessionInfo} );
+            }
+            elsif ( defined $req->{sessionInfo}->{$nameIDSessionKey} ) {
                 $nameIDContent =
                   $self->p->getFirstValue(
                     $req->{sessionInfo}->{$nameIDSessionKey} );
@@ -1054,7 +1081,7 @@ sub artifactServer {
     return [
         200,
         [
-            'Content-Type'   => 'application/xml',
+            'Content-Type'   => 'text/xml',
             'Content-Length' => length($art_response)
         ],
         [$art_response]
@@ -1259,7 +1286,7 @@ sub soapSloServer {
         return [
             200,
             [
-                'Content-Type'   => 'application/xml',
+                'Content-Type'   => 'text/xml',
                 'Content-Length' => length($slo_body)
             ],
             [$slo_body]
@@ -2107,7 +2134,7 @@ sub attributeServer {
     return [
         200,
         [
-            'Content-Type'   => 'application/xml',
+            'Content-Type'   => 'text/xml',
             'Content-Length' => length($att_response)
         ],
         [$att_response]

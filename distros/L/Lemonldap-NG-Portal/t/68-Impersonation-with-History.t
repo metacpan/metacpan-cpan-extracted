@@ -10,16 +10,14 @@ my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                       => 'error',
-            authentication                 => 'Demo',
-            userDB                         => 'Same',
-            loginHistoryEnabled            => 1,
-            brutForceProtection            => 0,
-            portalMainLogo                 => 'common/logos/logo_llng_old.png',
-            requireToken                   => 0,
-            impersonationRule              => 1,
-            checkUserDisplayPersistentInfo => 0,
-            checkUserDisplayEmptyValues    => 0,
+            logLevel            => 'error',
+            authentication      => 'Demo',
+            userDB              => 'Same',
+            loginHistoryEnabled => 1,
+            brutForceProtection => 0,
+            portalMainLogo      => 'common/logos/logo_llng_old.png',
+            requireToken        => 0,
+            impersonationRule   => 1,
         }
     }
 );

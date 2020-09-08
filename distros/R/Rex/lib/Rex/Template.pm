@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use Symbol;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 use Rex::Config;
 use Rex::Logger;
@@ -39,7 +39,7 @@ our $BE_LOCAL = 1;
 sub function {
   my ( $class, $name, $code ) = @_;
 
-  my $ref_to_name = qualify_to_ref( 'name', $class );
+  my $ref_to_name = qualify_to_ref( $name, $class );
   *{$ref_to_name} = $code;
 }
 

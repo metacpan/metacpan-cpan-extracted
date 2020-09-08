@@ -1,2 +1,8 @@
+0.03 2020-09-06
+- more test hardening
+
+0.02 2020-09-05
+- harden against decode failure for better diagnostic
+
 0.01 2020-06-02
 - first version

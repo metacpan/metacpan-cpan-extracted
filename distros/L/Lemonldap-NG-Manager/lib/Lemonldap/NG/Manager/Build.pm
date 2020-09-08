@@ -326,6 +326,12 @@ use constant HANDLERSECTION  => "handler";
 use constant MANAGERSECTION  => "manager";
 use constant SESSIONSEXPLORERSECTION => "sessionsExplorer";
 use constant APPLYSECTION            => "apply";
+
+# Default configuration backend
+use constant DEFAULTCONFBACKEND => "File";
+use constant DEFAULTCONFBACKENDOPTIONS => (
+    dirName => '/usr/local/lemonldap-ng/data/conf',
+);
 $confConstants
 our \@sessionTypes = ( '$sessionTypes' );
 
@@ -348,6 +354,8 @@ our %EXPORT_TAGS = (
           MANAGERSECTION
           SESSIONSEXPLORERSECTION
           APPLYSECTION
+          DEFAULTCONFBACKEND
+          DEFAULTCONFBACKENDOPTIONS
           NO
           \$hashParameters
           \@sessionTypes
@@ -425,7 +433,7 @@ sub buildZeroConf {
     open( F, '>', $self->firstLmConfFile ) or die($!);
     my $tmp = Lemonldap::NG::Manager::Conf::Zero::zeroConf(
         '__DNSDOMAIN__',   '__SESSIONDIR__',
-        '__PSESSIONDIR__', '__NOTIFICATIONDIR__'
+        '__PSESSIONDIR__', '__NOTIFICATIONDIR__', '__CACHEDIR__'
     );
     $tmp->{cfgNum} = 1;
     print F $jsonEnc->encode($tmp);
@@ -570,7 +578,7 @@ sub scanTree {
         # Subnode
         elsif ( ref($leaf) ) {
             $jleaf->{title} = $jleaf->{id} = $leaf->{title};
-            $jleaf->{type}  = $leaf->{form} if ( $leaf->{form} );
+            $jleaf->{type} = $leaf->{form} if ( $leaf->{form} );
             if ( $leaf->{title} =~ /^((?:oidc|saml|cas)Service)MetaData$/ ) {
                 no strict 'refs';
                 my @tmp = $self->scanLeaf( $leaf->{nodes} );

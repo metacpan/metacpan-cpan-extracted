@@ -1,6 +1,6 @@
 package RxPerl::IOAsync;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use RxPerl ':all';
 

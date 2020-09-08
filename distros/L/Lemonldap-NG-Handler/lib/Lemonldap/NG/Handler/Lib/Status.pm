@@ -11,7 +11,7 @@ use IO::Socket::INET;
 
 use Lemonldap::NG::Handler::Lib::StatusConstants qw(portalConsts);
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.9';
 
 our $status   = {};
 our $activity = [];
@@ -260,7 +260,7 @@ sub run {
                 }
             }
             else {
-                print STDERR "Status: Unknown command line : $_";
+                print STDERR "Status: Unknown command line -> $_";
             }
         }
     }

@@ -1,7 +1,7 @@
 package Perinci::Examples::CmdLineSrc;
 
-our $DATE = '2019-08-14'; # DATE
-our $VERSION = '0.819'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.820'; # VERSION
 
 use 5.010;
 use strict;
@@ -225,7 +225,7 @@ Perinci::Examples::CmdLineSrc - Examples for using cmdline_src function property
 
 =head1 VERSION
 
-This document describes version 0.819 of Perinci::Examples::CmdLineSrc (from Perl distribution Perinci-Examples), released on 2019-08-14.
+This document describes version 0.820 of Perinci::Examples::CmdLineSrc (from Perl distribution Perinci-Examples), released on 2020-04-29.
 
 =head1 FUNCTIONS
 
@@ -248,6 +248,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<a2> => I<array>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -269,7 +270,7 @@ Usage:
 
  cmdline_src_invalid_arg_type(%args) -> [status, msg, payload, meta]
 
-This function has non-str/non-array arg with cmdline_src.
+This function has non-strE<sol>non-array arg with cmdline_src.
 
 This function is not exported.
 
@@ -278,6 +279,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<a1> => I<int>
+
 
 =back
 
@@ -300,7 +302,7 @@ Usage:
 
  cmdline_src_multi_stdin(%args) -> [status, msg, payload, meta]
 
-This function has multiple args with cmdline_src stdin/stdin_or_files.
+This function has multiple args with cmdline_src stdinE<sol>stdin_or_files.
 
 This function is not exported.
 
@@ -311,6 +313,7 @@ Arguments ('*' denotes required arguments):
 =item * B<a1> => I<str>
 
 =item * B<a2> => I<str>
+
 
 =back
 
@@ -349,6 +352,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<a3>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -379,6 +383,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<a1> => I<array>
+
 
 =back
 
@@ -413,6 +418,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<a2>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -443,6 +449,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<a1> => I<array[str]>
+
 
 =back
 
@@ -475,6 +482,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<a1> => I<array>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -505,6 +513,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<a1> => I<str>
+
 
 =back
 
@@ -537,6 +546,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<a1> => I<array>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -567,6 +577,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<a1> => I<str>
+
 
 =back
 
@@ -599,6 +610,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<a1> => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -630,6 +642,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<a1> => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -651,7 +664,7 @@ Usage:
 
  test_binary(%args) -> [status, msg, payload, meta]
 
-Accept binary in stdin/file.
+Accept binary in stdinE<sol>file.
 
 This function is like the one in L<Perinci::Examples> but argument is accepted
 via C<stdin_or_files>.
@@ -663,6 +676,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<data> => I<buf> (default: "\0\0\0")
+
 
 =back
 
@@ -699,7 +713,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

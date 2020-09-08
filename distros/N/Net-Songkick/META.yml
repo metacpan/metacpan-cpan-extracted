@@ -1,12 +1,14 @@
 ---
 abstract: 'Perl wrapper for the Songkick API'
 author:
-  - 'Dave Cross <dave@mag-sol.com>'
-build_requires: {}
+  - 'Dave Cross <dave@perlhacks.com>'
+build_requires:
+  HTTP::Response: '0'
+  Test::LWP::UserAgent: '0'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,9 +17,11 @@ name: Net-Songkick
 provides:
   Net::Songkick:
     file: lib/Net/Songkick.pm
-    version: v1.0.2
+    version: v1.0.5
   Net::Songkick::Artist:
     file: lib/Net/Songkick/Artist.pm
+  Net::Songkick::City:
+    file: lib/Net/Songkick/City.pm
   Net::Songkick::Country:
     file: lib/Net/Songkick/Country.pm
   Net::Songkick::Event:
@@ -26,6 +30,8 @@ provides:
     file: lib/Net/Songkick/Location.pm
   Net::Songkick::MetroArea:
     file: lib/Net/Songkick/MetroArea.pm
+  Net::Songkick::MusicBrainz:
+    file: lib/Net/Songkick/MusicBrainz.pm
   Net::Songkick::Performance:
     file: lib/Net/Songkick/Performance.pm
   Net::Songkick::Types:
@@ -38,10 +44,9 @@ requires:
   LWP::UserAgent: '0'
   Moose: '0'
   URI: '0'
-  XML::LibXML: '0'
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/davorg/net-songkick
-version: v1.0.2
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: v1.0.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,34 @@
+---
+abstract: 'non-zero entries confined to a diagonal band'
+author:
+  - 'Lutz Gehlen <perl@lutzgehlen.de>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Matrix-Banded
+provides:
+  Math::Matrix::Banded:
+    file: lib/Math/Matrix/Banded.pm
+    version: '0.004'
+  Math::Matrix::Banded::Rectangular:
+    file: lib/Math/Matrix/Banded/Rectangular.pm
+    version: '0.004'
+  Math::Matrix::Banded::Square:
+    file: lib/Math/Matrix/Banded/Square.pm
+    version: '0.004'
+requires:
+  List::Util: '0'
+  Moo: '2.002005'
+  Try::Tiny: '0'
+  perl: v5.14.0
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: '0.004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

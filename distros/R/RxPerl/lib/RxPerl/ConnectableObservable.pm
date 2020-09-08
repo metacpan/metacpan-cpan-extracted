@@ -1,6 +1,6 @@
 package RxPerl::ConnectableObservable;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use base 'RxPerl::Observable';
 
@@ -8,7 +8,7 @@ use RxPerl::Subscription;
 
 use Scalar::Util 'weaken';
 
-our $VERSION = "v0.16.0";
+our $VERSION = "v0.18.1";
 
 sub new {
     my ($class, $source, $subject_factory) = @_;

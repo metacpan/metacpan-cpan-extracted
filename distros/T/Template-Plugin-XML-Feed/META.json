@@ -1,0 +1,48 @@
+{
+   "abstract" : "Plugin interface to XML::Feed",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Template-Plugin-XML-Feed",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Template" : "0",
+            "XML::Feed" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Template::Plugin::XML::Feed" : {
+         "file" : "lib/Template/Plugin/XML/Feed.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

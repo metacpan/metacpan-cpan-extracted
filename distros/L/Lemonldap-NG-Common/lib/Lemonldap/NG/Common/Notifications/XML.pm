@@ -33,7 +33,7 @@ sub newNotification {
       my $notif ( $xml->documentElement->getElementsByTagName('notification') )
     {
         my @data = ();
-        $notif->{reference} =~ s/_/-/g; # Remove underscores (#2135)
+        $notif->{reference} =~ s/_/-/g;    # Remove underscores (#2135)
 
         # Mandatory information
         foreach (qw(date uid reference)) {

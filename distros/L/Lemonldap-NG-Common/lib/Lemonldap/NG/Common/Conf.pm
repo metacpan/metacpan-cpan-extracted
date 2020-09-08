@@ -27,7 +27,7 @@ use Config::IniFiles;
 #inherits Lemonldap::NG::Common::Conf::Backends::SOAP
 #inherits Lemonldap::NG::Common::Conf::Backends::LDAP
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 our $msg     = '';
 our $iniObj;
 
@@ -87,7 +87,7 @@ sub new {
           unless $self->{type} =~ /^Lemonldap::/;
         eval "require $self->{type}";
         if ($@) {
-            $msg .= "Error: Unknown package $self->{type}.\n";
+            $msg .= "Error: failed to load $self->{type}: \n $@";
             return 0;
         }
         return 0 unless $self->prereq;
@@ -304,7 +304,8 @@ sub getLocalConf {
         $cfg = Config::IniFiles->new( -file => $file, -allowcontinue => 1 );
 
         unless ( defined $cfg ) {
-            $msg .= "Local config Error: " . @Config::IniFiles::errors . "\n";
+            $msg .= "Local config error: "
+              . ( join "\n", @Config::IniFiles::errors ) . "\n";
             return $r;
         }
 
@@ -479,7 +480,7 @@ sub delete {
     my ( $self, $c ) = @_;
     my @a = $self->available();
     if ( grep( /^$c$/, @a ) ) {
-        return $self->_launch( 'delete', $self, $c );
+        return $self->_launch( 'delete', $c );
     }
     else {
         return 0;

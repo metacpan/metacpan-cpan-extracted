@@ -1,27 +1,56 @@
 package Bitcoin::Crypto::Exception;
 
-use Modern::Perl "2010";
-use Moo;
-use Throwable::Error;
+use v5.10; use warnings;
+use parent "Throwable::Error";
 
-extends "Throwable::Error";
+use Bitcoin::Crypto;
+use namespace::clean;
+
+our $VERSION = Bitcoin::Crypto->VERSION;
 
 sub raise
 {
 	shift->throw(@_);
 }
 
+sub trap_into
+{
+	my ($class, $sub) = @_;
+
+	my $ret;
+	my $error = do {
+		local $@;
+		$ret = eval { $sub->() };
+		$@;
+	};
+
+	if ($error) {
+		$class->throw($error);
+	}
+
+	return $ret;
+}
+
 { package Bitcoin::Crypto::Exception::KeySign; use parent "Bitcoin::Crypto::Exception"; }
 { package Bitcoin::Crypto::Exception::KeyCreate; use parent "Bitcoin::Crypto::Exception"; }
 { package Bitcoin::Crypto::Exception::KeyDerive; use parent "Bitcoin::Crypto::Exception"; }
 { package Bitcoin::Crypto::Exception::MnemonicGenerate; use parent "Bitcoin::Crypto::Exception"; }
+{ package Bitcoin::Crypto::Exception::MnemonicCheck; use parent "Bitcoin::Crypto::Exception"; }
 
 { package Bitcoin::Crypto::Exception::Base58InputFormat; use parent "Bitcoin::Crypto::Exception"; }
-{ package Bitcoin::Crypto::Exception::Base58InputChecksum; use parent "Bitcoin::Crypto::Exception"; }
+{
+
+	package Bitcoin::Crypto::Exception::Base58InputChecksum;
+	use parent "Bitcoin::Crypto::Exception";
+}
 
 { package Bitcoin::Crypto::Exception::Bech32InputFormat; use parent "Bitcoin::Crypto::Exception"; }
 { package Bitcoin::Crypto::Exception::Bech32InputData; use parent "Bitcoin::Crypto::Exception"; }
-{ package Bitcoin::Crypto::Exception::Bech32InputChecksum; use parent "Bitcoin::Crypto::Exception"; }
+{
+
+	package Bitcoin::Crypto::Exception::Bech32InputChecksum;
+	use parent "Bitcoin::Crypto::Exception";
+}
 { package Bitcoin::Crypto::Exception::SegwitProgram; use parent "Bitcoin::Crypto::Exception"; }
 { package Bitcoin::Crypto::Exception::ValidationTest; use parent "Bitcoin::Crypto::Exception"; }
 
@@ -72,5 +101,13 @@ Creates a new instance and throws it. If used on an object, throws it right away
 =head2 throw
 
 Same as raise.
+
+=head2 trap_into
+
+	Bitcoin::Crypto::Exception->trap_into(sub {
+		die "something went wrong";
+	});
+
+Executes the subroutine given as the only parameter inside an eval. Any exceptions thrown inside the subroutine will be re-thrown after turning them into objects of the given class.
 
 =cut

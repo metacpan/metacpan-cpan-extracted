@@ -134,6 +134,7 @@ sub cTrees {
                         nodes => [
                             "samlSPMetaDataOptionsEncryptionMode",
                             "samlSPMetaDataOptionsEnableIDPInitiatedURL",
+                            "samlSPMetaDataOptionsAuthnLevel",
                             "samlSPMetaDataOptionsRule",
                         ]
                     }
@@ -221,6 +222,7 @@ sub cTrees {
                             'oidcRPMetaDataOptionsRequirePKCE',
                             'oidcRPMetaDataOptionsAllowOffline',
                             'oidcRPMetaDataOptionsAllowPasswordGrant',
+                            'oidcRPMetaDataOptionsAuthnLevel',
                             'oidcRPMetaDataOptionsRule',
                         ]
                     },
@@ -286,6 +288,7 @@ sub cTrees {
                 nodes => [
                     'casAppMetaDataOptionsService',
                     'casAppMetaDataOptionsUserAttribute',
+                    'casAppMetaDataOptionsAuthnLevel',
                     'casAppMetaDataOptionsRule'
                 ]
             },

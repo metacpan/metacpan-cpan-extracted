@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -17,12 +17,21 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  DBD::CSV: '0.33'
+  DBD::SQLite: '0'
+  DBI: '1.607'
+  Log::Dispatch: '0'
+  Log::Dispatch::FileRotate: '1.10'
+  SQL::Statement: '1.20'
+  XML::DOM: '1.29'
 requires:
-  File::Path: '2.0606'
+  File::Path: '2.07'
   File::Spec: '0.82'
   Test::More: '0.45'
+  perl: '5.006'
 resources:
   MailingList: mailto:log4perl-devel@lists.sourceforge.net
-  repository: http://github.com/mschilli/log4perl
-version: '1.50'
+  bugtracker: https://github.com/mschilli/log4perl/issues
+version: '1.52'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

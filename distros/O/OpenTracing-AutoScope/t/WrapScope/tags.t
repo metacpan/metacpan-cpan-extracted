@@ -4,23 +4,8 @@ use OpenTracing::Implementation qw/Test/;
 
 use OpenTracing::WrapScope qw/test_sub/;
 
-{
-    my %lines;
-
-    sub remember_line {
-        my ($name) = @_;
-        die "$name already taken" if $lines{$name};
-        $lines{$name} = (caller)[2];
-        return;
-    }
-
-    sub recall_line {
-        my ($name) = @_;
-        die "$name not found" if not $lines{$name};
-        return $lines{$name};
-    }
-}
-
+use lib 't/lib';
+use Line::Storage ':ALL';
 
 sub test_sub {} remember_line('source');
 

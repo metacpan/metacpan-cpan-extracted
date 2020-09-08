@@ -1,0 +1,14 @@
+.titlebox.card.travisci-status {
+        border-top: 3px solid #555500;
+
+}
+.travis-status-passed {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.travis-status-errored, .travis-status-failed {
+    color: #dc3545;
+    font-weight: bold;
+}
+

@@ -4,7 +4,7 @@ use strict;
 use vars qw($VERSION);
 use Net::LDAP;
 
-$VERSION = '0.4';
+$VERSION = '0.5';
 
 sub new {
     my $class = shift;
@@ -119,22 +119,45 @@ sub ldap {
         push @servers, $server;
     }
 
+    # Compatibility
+    my $caFile = $self->{args}->{ldapCAFile} || $self->{args}->{caFile};
+    my $caPath = $self->{args}->{ldapCAPath} || $self->{args}->{caPath};
+
     # Connect
     my $ldap = Net::LDAP->new(
         \@servers,
         onerror => undef,
+        verify  => $self->{args}->{ldapVerify} || "require",
+        ( $caFile ? ( cafile => $caFile ) : () ),
+        ( $caPath ? ( capath => $caPath ) : () ),
+
         (
             $self->{args}->{ldapPort}
             ? ( port => $self->{args}->{ldapPort} )
             : ()
         ),
-    ) or die( 'Unable to connect to ' . join( ' ', @servers ) );
+    ) or die( 'Unable to connect to ' . join( ' ', @servers ) . ': ' . $@ );
+
+    # Check SSL error for old Net::LDAP versions
+    if ( $Net::LDAP::VERSION < '0.64' ) {
+
+        # CentOS7 has a bug in which IO::Socket::SSL will return a broken
+        # socket when certificate validation fails. Net::LDAP does not catch
+        # it, and the process ends up crashing.
+        # As a precaution, make sure the underlying socket is doing fine:
+        if (    $ldap->socket->isa('IO::Socket::SSL')
+            and $ldap->socket->errstr < 0 )
+        {
+            die( "SSL connection error: " . $ldap->socket->errstr );
+        }
+    }
 
     # Start TLS if needed
     if ($useTls) {
         my %h = split( /[&=]/, $tlsParam );
-        $h{cafile} = $self->{args}->{caFile} if ( $self->{args}->{caFile} );
-        $h{capath} = $self->{args}->{caPath} if ( $self->{args}->{caPath} );
+        $h{verify} ||= ( $self->{args}->{ldapVerify} || "require" );
+        $h{cafile} ||= $caFile if ($caFile);
+        $h{capath} ||= $caPath if ($caPath);
         my $start_tls = $ldap->start_tls(%h);
         if ( $start_tls->code ) {
             $self->logError($start_tls);

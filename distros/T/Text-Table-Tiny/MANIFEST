@@ -16,3 +16,4 @@ t/05-change-globals.t
 t/06-align.t
 t/07-escape-codes.t
 t/08-style.t
+t/09-unknown-argument.t

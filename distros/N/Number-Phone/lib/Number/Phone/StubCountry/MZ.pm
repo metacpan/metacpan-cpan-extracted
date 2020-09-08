@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200606132000;
+our $VERSION = 1.20200904144534;
 
 my $formatters = [
                 {
@@ -65,17 +65,6 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{pt}->{25821} = "Maputo";
-$areanames{pt}->{25823} = "Beira";
-$areanames{pt}->{25824} = "Quelimane";
-$areanames{pt}->{258251} = "Manica";
-$areanames{pt}->{258252} = "Tete";
-$areanames{pt}->{25826} = "Nampula";
-$areanames{pt}->{258271} = "Lichinga";
-$areanames{pt}->{258272} = "Pemba";
-$areanames{pt}->{258281} = "Chokwé";
-$areanames{pt}->{258282} = "Xai\-Xai";
-$areanames{pt}->{25829} = "Inhambane";
 $areanames{en}->{25821} = "Maputo";
 $areanames{en}->{25823} = "Beira";
 $areanames{en}->{25824} = "Quelimane";
@@ -87,6 +76,17 @@ $areanames{en}->{258272} = "Pemba";
 $areanames{en}->{258281} = "Chokwe";
 $areanames{en}->{258282} = "Xai\-Xai";
 $areanames{en}->{25829} = "Inhambane";
+$areanames{pt}->{25821} = "Maputo";
+$areanames{pt}->{25823} = "Beira";
+$areanames{pt}->{25824} = "Quelimane";
+$areanames{pt}->{258251} = "Manica";
+$areanames{pt}->{258252} = "Tete";
+$areanames{pt}->{25826} = "Nampula";
+$areanames{pt}->{258271} = "Lichinga";
+$areanames{pt}->{258272} = "Pemba";
+$areanames{pt}->{258281} = "Chokwé";
+$areanames{pt}->{258282} = "Xai\-Xai";
+$areanames{pt}->{25829} = "Inhambane";
 
     sub new {
       my $class = shift;

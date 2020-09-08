@@ -1,0 +1,316 @@
+#!perl
+
+# NO_PWP_RINCI
+
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.070'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+our %SPEC;
+
+$SPEC{single} = {
+    v => 1.1,
+    summary => 'A function',
+    description => <<'_',
+
+Just a dummy description. Just a dummy description. Yup, just a dummy
+description. Just a dummy description. Just a dummy description. Yeah, just a
+dummy description. Just a dummy description.
+
+_
+    args => {
+        arg1 => {
+            schema => 'int*',
+            pos => 0,
+            cmdline_aliases => { a=>{} },
+        },
+        arg2 => {
+            schema => 'int*',
+            pos => 1,
+            cmdline_aliases => { b=>{} },
+        },
+        op => {
+            summary => 'Operation to apply to arg1 & arg2',
+            schema  => ['str*', in => [qw/multiply subtract add divide/]],
+            req     => 1,
+            cmdline_aliases => {
+                minus => { schema=>'bool', summary => 'Alias for --op=subtract', code=>sub {$_[0]{op} = 'minus'} },
+            },
+        },
+    },
+};
+sub single {
+    my %args = @_;
+
+    # we need to do validation ourselves because P::C::Lite currently doesn't do
+    # it for us.
+    my $op = $args{op} or return [400, "Please specify op"];
+    $op =~ /\A(multiply|subtract|add|divide)\z/ or return [400, "Invalid op"];
+    my $a1 = $args{arg1}; !defined($a1) || $a1 =~ /\A[+-]?\d+\z/
+        or return [400, "Invalid arg1 (not an integer)"];
+    my $a2 = $args{arg2}; !defined($a2) || $a2 =~ /\A[+-]?\d+\z/
+        or return [400, "Invalid arg1 (not an integer)"];
+
+    if ($op eq 'multiply') {
+        defined($a1) && defined($a2) or return [400, "arg1 & arg2 required"];
+        [200, "OK", $a1 * $a2];
+    } elsif ($op eq 'subtract') {
+        defined($a1) && defined($a2) or return [400, "arg1 & arg2 required"];
+        [200, "OK", $a1 - $a2];
+    } elsif ($op eq 'add') {
+        defined($a1) && defined($a2) or return [400, "arg1 & arg2 required"];
+        [200, "OK", $a1 + $a2];
+    } elsif ($op eq 'divide') {
+        defined($a1) && defined($a2) or return [400, "arg1 & arg2 required"];
+        $a2 == 0 and return [500, "Division by zero"];
+        [200, "OK", $a1 / $a2];
+    }
+}
+
+use Perinci::CmdLine::Any;
+Perinci::CmdLine::Any->new(
+    summary => 'Test a single function (no subcommands) (function embedded in script)',
+    url=>'/main/single',
+)->run;
+
+# ABSTRACT: Test a single function (no subcommands) (function embedded in script)
+# PODNAME: peri-eg-single-embedded-any
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+peri-eg-single-embedded-any - Test a single function (no subcommands) (function embedded in script)
+
+=head1 VERSION
+
+This document describes version 0.070 of peri-eg-single-embedded-any (from Perl distribution Perinci-Examples-Bin-Any), released on 2020-04-29.
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+Just a dummy description. Just a dummy description. Yup, just a dummy
+description. Just a dummy description. Just a dummy description. Yeah, just a
+dummy description. Just a dummy description.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--arg1>=I<s>, B<-a>
+
+=item B<--arg2>=I<s>, B<-b>
+
+=item B<--minus*>
+
+Alias for --op=subtract.
+
+See C<--op>.
+
+=item B<--op>=I<s>*
+
+Operation to apply to arg1 & arg2.
+
+Valid values:
+
+ ["multiply","subtract","add","divide"]
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C peri-eg-single-embedded-any peri-eg-single-embedded-any
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete peri-eg-single-embedded-any 'p/*/`peri-eg-single-embedded-any`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/peri-eg-single-embedded-any.conf>, F<~/peri-eg-single-embedded-any.conf>, or F</etc/peri-eg-single-embedded-any.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ arg1 (see --arg1)
+ arg2 (see --arg2)
+ format (see --format)
+ naked_res (see --naked-res)
+ op (see --op)
+
+=head1 ENVIRONMENT
+
+=head2 PERI_EG_SINGLE_EMBEDDED_ANY_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/peri-eg-single-embedded-any.conf>
+
+F<~/peri-eg-single-embedded-any.conf>
+
+F</etc/peri-eg-single-embedded-any.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Examples-Bin-Any>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Examples-Bin-Any>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Examples-Bin-Any>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2015, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

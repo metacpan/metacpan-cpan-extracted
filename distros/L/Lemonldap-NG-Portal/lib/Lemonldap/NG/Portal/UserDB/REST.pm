@@ -2,6 +2,7 @@ package Lemonldap::NG::Portal::UserDB::REST;
 
 use strict;
 use Mouse;
+use JSON;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
   PE_OK
@@ -10,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Common::Module', 'Lemonldap::NG::Portal::Lib::REST';
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.9';
 
 # INITIALIZATION
 
@@ -31,20 +32,23 @@ sub getUser {
     my ( $self, $req, %args ) = @_;
     my $res;
     $res = eval {
-        $self->restCall( (
-                  $args{useMail}
-                ? $self->conf->{restMailDBUrl} || $self->conf->{restUserDBUrl}
-                : $self->conf->{restUserDBUrl}
-            ),
-            { user => $req->user }
+        $self->restCall(
+            $self->conf->{restUserDBUrl},
+            {
+                ( $args{useMail} ? 'mail' : 'user' ) => $req->user,
+                'useMail' => ( $args{useMail} ? JSON::true : JSON::false ),
+
+            }
         );
     };
     if ($@) {
         $self->logger->error("UserDB REST error: $@");
+        eval { $self->p->_authentication->setSecurity($req) };
         return PE_ERROR;
     }
     unless ( $res->{result} ) {
         $self->userLogger->warn( 'User ' . $req->user . ' not found' );
+        eval { $self->p->_authentication->setSecurity($req) };
         return PE_BADCREDENTIALS;
     }
     $req->data->{restUserDBInfo} = $res->{info} || {};

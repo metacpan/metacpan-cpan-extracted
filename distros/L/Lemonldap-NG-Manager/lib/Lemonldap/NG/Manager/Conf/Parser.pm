@@ -26,7 +26,7 @@ use JSON 'to_json';
 use Lemonldap::NG::Common::Conf::ReConstants;
 use Lemonldap::NG::Manager::Attributes;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Common::Conf::Compact';
 
@@ -148,10 +148,18 @@ sub scanTree {
     $self->newConf->{cfgNum} = $self->req->params('cfgNum');
     $self->newConf->{cfgAuthor} =
       $self->req->userData->{ Lemonldap::NG::Handler::Main->tsv->{whatToTrace}
-          || '_whatToTrace' } // "anonymous";
+          || '_whatToTrace' } // $self->req->env->{REMOTE_USER}
+      // $ENV{REMOTE_USER} // "anonymous";
     $self->newConf->{cfgAuthorIP} = $self->req->address;
-    $self->newConf->{cfgDate}     = time;
-    $self->newConf->{cfgVersion}  = $Lemonldap::NG::Manager::VERSION;
+    $self->newConf->{cfgAuthorIP} .=
+      ' (maybe '
+      . (    $self->req->env->{'X-Real-IP'}
+          || $self->req->env->{HTTP_X_FORWARDED_FOR} )
+      . ')'
+      if $self->req->env->{'X-Real-IP'}
+      or $self->req->env->{HTTP_X_FORWARDED_FOR};
+    $self->newConf->{cfgDate}    = time;
+    $self->newConf->{cfgVersion} = $Lemonldap::NG::Manager::VERSION;
     $self->newConf->{key} ||= join( '',
         map { chr( int( ord( Crypt::URandom::urandom(1) ) * 94 / 256 ) + 33 ) }
           ( 1 .. 16 ) );
@@ -1143,9 +1151,11 @@ sub _unitTest {
                 if ( ref($options) eq "HASH" ) {
 
                     # Recurse on option list,
-                    # FIXME this does check for oidcRPMetaDataOptionsXXX appearing under
-                    # samlSPMetadataOptions
-                    $res = 0 unless $self->_unitTest( $options, $localConf, "$key/$vhost/" );
+                    # FIXME this does check for oidcRPMetaDataOptionsXXX
+                    # appearing under samlSPMetadataOptions
+                    $res = 0
+                      unless $self->_unitTest( $options, $localConf,
+                        "$key/$vhost/" );
                 }
             }
         }

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 use Rex::Inventory::Hal::Object;
 use Rex::Commands::Gather;
@@ -24,7 +24,7 @@ __PACKAGE__->has(
     { key => "block.device", accessor => "dev", },
 
     { key => "storage.size", accessor => "size", overwrite => 1, },
-    { key => "info.product", accessor => "product" },
+    { key => "info.product",                      accessor => "product" },
     { key => [ "storage.vendor", "info.vendor" ], accessor => "vendor" },
     { key => "storage.bus",                       accessor => "bus" },
 

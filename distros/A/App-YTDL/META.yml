@@ -29,7 +29,7 @@ requires:
   File::Which: '0'
   FindBin: '0'
   Getopt::Long: '0'
-  IPC::System::Simple: '0'
+  IPC::System::Simple: '1.25'
   JSON: '0'
   List::MoreUtils: '0'
   Parallel::ForkManager: v0.7.6
@@ -48,5 +48,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-YTDL.git
-version: '0.414'
+version: '0.415'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

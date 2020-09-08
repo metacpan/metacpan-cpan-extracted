@@ -11,15 +11,15 @@ Module::Starter - a simple starter kit for any module
 
 =head1 VERSION
 
-Version 1.76
+version 1.77
 
 =cut
 
-our $VERSION = '1.76';
+our $VERSION = '1.77';
 
 =head1 SYNOPSIS
 
-Nothing in here is meant for public consumption.  Use F<module-starter>
+Nothing in here is meant for public consumption.  Use L<module-starter>
 from the command line.
 
     module-starter --module=Foo::Bar,Foo::Bat \
@@ -112,6 +112,8 @@ sub import {
 
 =head1 AUTHORS
 
+Dan Book, C<< <dbook at cpan.org> >>
+
 Sawyer X, C<< <xsawyerx at cpan.org> >>
 
 Andy Lester, C<< <petdance at cpan.org> >>
@@ -133,10 +135,6 @@ You can also look for information at:
 =item * Source code at GitHub
 
 L<https://github.com/xsawyerx/module-starter>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Module-Starter>
 
 =item * CPAN Ratings
 

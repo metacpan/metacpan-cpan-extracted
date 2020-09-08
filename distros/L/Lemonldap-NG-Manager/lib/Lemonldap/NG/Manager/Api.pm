@@ -10,10 +10,14 @@ extends 'Lemonldap::NG::Manager::Plugin',
   'Lemonldap::NG::Common::Session::REST';
 
 use Lemonldap::NG::Manager::Api::2F;
+use Lemonldap::NG::Manager::Api::Misc;
 use Lemonldap::NG::Manager::Api::Providers::OidcRp;
 use Lemonldap::NG::Manager::Api::Providers::SamlSp;
+use Lemonldap::NG::Manager::Api::Providers::CasApp;
+use Lemonldap::NG::Manager::Api::Menu::Cat;
+use Lemonldap::NG::Manager::Api::Menu::App;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -30,6 +34,7 @@ sub init {
       ->addRoute(
         api => {
             v1 => {
+                status    => 'status',
                 providers => {
                     oidc => {
                         rp => {
@@ -53,6 +58,17 @@ sub init {
                             ':confKey' => 'getSamlSpByConfKey'
                         },
                     },
+                    cas => {
+                        app => {
+                            findByConfKey => {
+                                ':uPattern' => 'findCasAppByConfKey'
+                            },
+                            findByServiceUrl => {
+                                ':uServiceUrl' => 'findCasAppsByServiceUrl'
+                            },
+                            ':confKey' => 'getCasAppByConfKey'
+                        },
+                    },
                 },
                 secondFactor => {
                     ':uid' => {
@@ -63,6 +79,24 @@ sub init {
                             ':type' => 'getSecondFactorsByType'
                         },
                         '*' => 'getSecondFactors'
+                    },
+                },
+                menu => {
+                    cat => {
+                        findByConfKey => {
+                            ':uPattern' => 'findMenuCatByConfKey'
+                        },
+                        ':confKey' => {
+                            '*' => 'getMenuCatByConfKey'
+                        }
+                    },
+                    app => {
+                        ':confKey' => {
+                            findByConfKey => {
+                                ':uPattern' => 'findMenuAppByConfKey'
+                            },
+                            ':appConfKey' => 'getMenuApp'
+                        }
                     },
                 },
             },
@@ -80,6 +114,15 @@ sub init {
                     saml => {
                         sp => 'addSamlSp'
                     },
+                    cas => {
+                        app => 'addCasApp'
+                    },
+                },
+                menu => {
+                    cat => 'addMenuCat',
+                    app => {
+                        ':confKey' => 'addMenuApp'
+                    }
                 },
             },
         },
@@ -96,6 +139,17 @@ sub init {
                     saml => {
                         sp => { ':confKey' => 'replaceSamlSp' }
                     },
+                    cas => {
+                        app => { ':confKey' => 'replaceCasApp' }
+                    },
+                },
+                menu => {
+                    cat => { ':confKey' => 'replaceMenuCat' },
+                    app => {
+                        ':confKey' => {
+                            ':appConfKey' => 'replaceMenuApp'
+                        }
+                    }
                 },
             },
         },
@@ -112,6 +166,17 @@ sub init {
                     saml => {
                         sp => { ':confKey' => 'updateSamlSp' }
                     },
+                    cas => {
+                        app => { ':confKey' => 'updateCasApp' }
+                    },
+                },
+                menu => {
+                    cat => { ':confKey' => 'updateMenuCat' },
+                    app => {
+                        ':confKey' => {
+                            ':appConfKey' => 'updateMenuApp'
+                        }
+                    }
                 },
             },
         },
@@ -128,6 +193,9 @@ sub init {
                     saml => {
                         sp => { ':confKey' => 'deleteSamlSp' }
                     },
+                    cas => {
+                        app => { ':confKey' => 'deleteCasApp' }
+                    },
                 },
                 secondFactor => {
                     ':uid' => {
@@ -139,6 +207,14 @@ sub init {
                         },
                         '*' => 'deleteSecondFactors'
                     },
+                },
+                menu => {
+                    cat => { ':confKey' => 'deleteMenuCat' },
+                    app => {
+                        ':confKey' => {
+                            ':appConfKey' => 'deleteMenuApp'
+                        }
+                    }
                 },
             },
         },

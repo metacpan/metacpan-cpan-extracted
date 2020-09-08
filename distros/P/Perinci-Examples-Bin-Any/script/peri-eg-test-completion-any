@@ -1,0 +1,432 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /Perinci/Examples/test_completion
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-29'; # DATE
+our $DIST = 'Perinci-Examples-Bin-Any'; # DIST
+our $VERSION = '0.070'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::Examples;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/Perinci/Examples/test_completion",
+    program_name => "peri-eg-test-completion-any",
+);
+
+$cmdline->run;
+
+# ABSTRACT: Do nothing, return args
+# PODNAME: peri-eg-test-completion-any
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+peri-eg-test-completion-any - Do nothing, return args
+
+=head1 VERSION
+
+This document describes version 0.070 of peri-eg-test-completion-any (from Perl distribution Perinci-Examples-Bin-Any), released on 2020-04-29.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % peri-eg-test-completion-any [--a2-json=s] [--a2=s+] [--a3-json=s]
+     [--a3=s+] [--arg0-json=s] [--arg0=s] [--config-path=path | -c]
+     [--config-profile=profile | -P] [--f0=s] [--f1=s] [--format=name]
+     [--h1-json=s] [--h1 key=s] [--h2-json=s] [--h2 key=s] [--i0=s]
+     [--i2=s] [--json] [--(no)naked-res] [--no-config | -C] [--no-env]
+     [--page-result[=program]] [--s1=s] [--s1b=s] [--s1c=s] [--s1d=s]
+     [--s2=s] [--s3=s] [i1] [a1] ...
+
+=head1 DESCRIPTION
+
+This function is used to test argument completion.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--a1-json>=I<s>
+
+Array of strings, where the string has "in" schema clause (JSON-encoded).
+
+See C<--a1>.
+
+=item B<--a1>=I<s@>
+
+Array of strings, where the string has "in" schema clause.
+
+Completion library can perhaps complete from the `in` value and remember
+completed items when command-line option is repeated, e.g. in:
+
+    --a1 <tab>
+
+it will complete from any `in` value, but in:
+
+    --a1 apple --a1 <tab>
+
+it can exclude `apple` from the completion candidate.
+
+Currently the completion library <pm:Perinci::Sub::Complete> does not do this
+though. Perhaps there can be an option to toggle this behavior.
+
+
+Can be specified multiple times.
+
+=item B<--a2-json>=I<s>
+
+Array with element_completion routine that generate random letter (JSON-encoded).
+
+See C<--a2>.
+
+=item B<--a2>=I<s@>
+
+Array with element_completion routine that generate random letter.
+
+Can be specified multiple times.
+
+=item B<--a3-json>=I<s>
+
+Array with element_completion routine that dies (JSON-encoded).
+
+See C<--a3>.
+
+=item B<--a3>=I<s@>
+
+Array with element_completion routine that dies.
+
+See also `s3`.
+
+
+Can be specified multiple times.
+
+=item B<--arg0-json>=I<s>
+
+Argument without any schema (JSON-encoded).
+
+See C<--arg0>.
+
+=item B<--arg0>=I<s>
+
+Argument without any schema.
+
+=item B<--f0>=I<s>
+
+Float with just "float" schema defined.
+
+=item B<--f1>=I<s>
+
+Float with xmin/xmax on the schema.
+
+A completion library can attempt to provide some possible and incremental
+completion (e.g. if word is currently at one decimal digit like 1.2, it can
+provide completion of 1.20 .. 1.29).
+
+
+=item B<--h1-json>=I<s>
+
+Hash with "keys" and "allowed_keys" schema clauses and "element_completion" property (JSON-encoded).
+
+See C<--h1>.
+
+=item B<--h1>=I<s>%
+
+Hash with "keys" and "allowed_keys" schema clauses and "element_completion" property.
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--h2-json>=I<s>
+
+Hash with "element_completion" as well as "index_completion" properties (JSON-encoded).
+
+See C<--h2>.
+
+=item B<--h2>=I<s>%
+
+Hash with "element_completion" as well as "index_completion" properties.
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--i0>=I<s>
+
+Integer with just "int" schema defined.
+
+=item B<--i1>=I<s>
+
+Integer with min/xmax on the schema.
+
+A completion library (like <pm:Perinci::Sub::Complete>) can generate a list of
+completion from the low end to the high end of the range, as long as it is not
+too long.
+
+
+=item B<--i2>=I<s>
+
+Integer with large range min/max on the schema.
+
+Unlike in `i1`, a completion library probably won't generate a number sequence
+for this argument because they are considered too long (1000+ items).
+
+
+=item B<--s1>=I<s>
+
+String with possible values in "in" schema clause.
+
+Valid values:
+
+ ["apple","apricot","banana","grape","grapefruit","red date","red grape","green grape"]
+
+=item B<--s1b>=I<s>
+
+String with possible values in "in" schema clause, contains special characters.
+
+Valid values:
+
+ ["space: ","word containing spaces","single-quote: '","double-quote: \"","slash/","back\\slash","tab\t","word:with:colon","dollar \$sign","various parenthesis: [ ] { } ( )","tilde ~","backtick `","caret^","at\@","pound#","percent%","ampersand&","question?","wildcard*","comma,","semicolon;","pipe|","redirection > <","plus+"]
+
+This argument is intended to test how special characters are escaped.
+
+
+=item B<--s1c>=I<s>
+
+String with examples in schema.
+
+Example valid values:
+
+ ["bar",{summary=>"foo",value=>"baz"}]
+
+=item B<--s1d>=I<s>
+
+String with examples in argument spec.
+
+=item B<--s2>=I<s>
+
+String with completion routine that generate random letter.
+
+=item B<--s3>=I<s>
+
+String with completion routine that dies.
+
+Completion should not display error (except perhaps under debugging). It should
+just provide no completion.
+
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C peri-eg-test-completion-any peri-eg-test-completion-any
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete peri-eg-test-completion-any 'p/*/`peri-eg-test-completion-any`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/peri-eg-test-completion-any.conf>, F<~/peri-eg-test-completion-any.conf>, or F</etc/peri-eg-test-completion-any.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ a1 (see --a1)
+ a2 (see --a2)
+ a3 (see --a3)
+ arg0 (see --arg0)
+ f0 (see --f0)
+ f1 (see --f1)
+ format (see --format)
+ h1 (see --h1)
+ h2 (see --h2)
+ i0 (see --i0)
+ i1 (see --i1)
+ i2 (see --i2)
+ naked_res (see --naked-res)
+ s1 (see --s1)
+ s1b (see --s1b)
+ s1c (see --s1c)
+ s1d (see --s1d)
+ s2 (see --s2)
+ s3 (see --s3)
+
+=head1 ENVIRONMENT
+
+=head2 PERI_EG_TEST_COMPLETION_ANY_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/peri-eg-test-completion-any.conf>
+
+F<~/peri-eg-test-completion-any.conf>
+
+F</etc/peri-eg-test-completion-any.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Examples-Bin-Any>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Examples-Bin-Any>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Examples-Bin-Any>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2015, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

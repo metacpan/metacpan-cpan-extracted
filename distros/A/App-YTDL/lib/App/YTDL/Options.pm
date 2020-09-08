@@ -493,7 +493,7 @@ sub _local_readline {
 sub _opt_number_range {
     my ( $set, $opt, $key, $name, $info, $digits ) = @_;
     # Choose_a_number
-    my $choice = choose_a_number( $digits, { cs_label => $name, info => $info } );
+    my $choice = choose_a_number( $digits, { cs_label => $name, info => $info, small_first => 1 } );
     return if ! defined $choice;
     $opt->{$key} = $choice eq '--' ? undef : $choice;
     $set->{change}++;

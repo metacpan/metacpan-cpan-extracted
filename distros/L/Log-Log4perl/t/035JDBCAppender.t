@@ -18,40 +18,17 @@ BEGIN {
 use Test::More;
 
 use Log::Log4perl;
+use lib File::Spec->catdir(qw(t lib));
+use Log4perlInternalTest qw(tmpdir min_version);
 
 BEGIN {
-    use FindBin qw($Bin);
-    use lib "$Bin/lib";
-    require Log4perlInternalTest;
+    min_version(qw( DBI DBD::CSV Log::Dispatch ));
+    plan tests => 14;
 }
 
-BEGIN {
-    my $minversion = \%Log4perlInternalTest::MINVERSION;
-    eval {
-        require DBD::CSV;
-        die if $DBD::CSV::VERSION < $minversion->{ "DBD::CSV" };
-
-	require Log::Dispatch;
-    };
-    if ($@) {
-        plan skip_all => 
-          "only with Log::Dispatch and DBD::CSV $minversion->{'DBD::CSV'}";
-    }else{
-        plan tests => 14;
-    }
-}
-
-END {
-    unlink "t/tmp/$table_name";
-    rmdir "t/tmp";
-}
-
-mkdir "t/tmp" unless -d "t/tmp";
-
+my $WORK_DIR = tmpdir();
 require DBI;
-my $dbh = DBI->connect('DBI:CSV:f_dir=t/tmp','testuser','testpw',{ PrintError => 1 });
-
--e "t/tmp/$table_name" && $dbh->do("DROP TABLE $table_name");
+my $dbh = DBI->connect('DBI:CSV:f_dir='.$WORK_DIR,'testuser','testpw',{ PrintError => 1 });
 
 my $stmt = <<EOL;
     CREATE TABLE $table_name (
@@ -78,7 +55,7 @@ my $config = <<"EOT";
 #log4j.category = WARN, DBAppndr, console
 log4j.category = WARN, DBAppndr
 log4j.appender.DBAppndr             = org.apache.log4j.jdbc.JDBCAppender
-log4j.appender.DBAppndr.URL = jdbc:CSV:testdb://localhost:9999;f_dir=t/tmp
+log4j.appender.DBAppndr.URL = jdbc:CSV:testdb://localhost:9999;f_dir=$WORK_DIR
 log4j.appender.DBAppndr.user  = bobjones
 log4j.appender.DBAppndr.password = 12345
 log4j.appender.DBAppndr.sql = \\

@@ -3,9 +3,9 @@
 use Time::HiRes qw/usleep/;
 
 sub _ldap_cleanup {
-        system 'rm -rf t/testslapd/slapd.d';
-        system 'rm -rf t/testslapd/data';
-        system 'rm -rf t/testslapd/slapd-test.ldif';
+    system 'rm -rf t/testslapd/slapd.d';
+    system 'rm -rf t/testslapd/data';
+    system 'rm -rf t/testslapd/slapd-test.ldif';
 }
 
 my $slapd_bin;

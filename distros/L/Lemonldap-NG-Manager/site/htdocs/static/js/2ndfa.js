@@ -125,9 +125,12 @@
         return $scope.updateTree2('', $scope.data, 0, 0);
       };
       $scope.delete2FA = function(type, epoch) {
-        var item;
-        item = angular.element(".data-" + epoch);
-        item.remove();
+        var e, i, items, len;
+        items = document.querySelectorAll(".data-" + epoch);
+        for (i = 0, len = items.length; i < len; i++) {
+          e = items[i];
+          e.remove();
+        }
         $scope.waiting = true;
         $http['delete'](scriptname + "sfa/" + sessionType + "/" + $scope.currentSession.id + "?type=" + type + "&epoch=" + epoch).then(function(response) {
           return $scope.waiting = false;

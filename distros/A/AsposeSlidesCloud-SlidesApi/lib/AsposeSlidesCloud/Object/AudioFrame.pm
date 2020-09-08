@@ -99,6 +99,8 @@ sub new {
 		my $args_key = $class->attribute_map->{$attribute};
 		$self->$attribute( $args{ $args_key } );
 	}
+	$self->{ type } = 'AudioFrame';
+	$self->{ shape_type } = 'AudioFrame';
 	
 	return $self;
 }  

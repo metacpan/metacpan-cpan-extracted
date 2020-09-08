@@ -8,13 +8,14 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 package Lemonldap::NG::Portal::Main;
 
 use strict;
 use Mouse;
 use Regexp::Assemble;
+use Lemonldap::NG::Common::Util qw(getSameSite);
 
 # PROPERTIES
 
@@ -86,6 +87,9 @@ has csp => ( is => 'rw' );
 
 # Cross-Origine Resource Sharing headers
 has cors => ( is => 'rw' );
+
+# Cookie SameSite value
+has cookieSameSite => ( is => 'rw' );
 
 # INITIALIZATION
 
@@ -267,6 +271,11 @@ sub reloadConf {
         return $self->fail;
     }
     $self->conf->{domain} =~ s/^([^\.])/.$1/;
+
+    # Initialize cookie SameSite value
+    $self->cookieSameSite( getSameSite( $self->conf ) );
+    $self->logger->debug(
+        "Cookies will use SameSite=" . $self->cookieSameSite );
 
     # Load menu
     # ---------

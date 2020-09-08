@@ -1,6 +1,8 @@
-1.02 Sun May  20 22:57:25 UTC 2018
+1.03 Sun Sep  08 14:15:36 UTC 2020
 
-1.01 Sun May  20 22:32:18 UTC 2018
+1.02 Sun May  22 22:57:25 UTC 2018
+
+1.01 Sun May  22 22:32:18 UTC 2018
     - Released version 1.01
     - Fixed failing tests
     - Fixed POD errors

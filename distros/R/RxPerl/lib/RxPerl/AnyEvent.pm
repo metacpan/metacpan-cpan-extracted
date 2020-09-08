@@ -1,6 +1,6 @@
 package RxPerl::AnyEvent;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use RxPerl ':all';
 use RxPerl::Utils 'immortalize', 'decapitate';

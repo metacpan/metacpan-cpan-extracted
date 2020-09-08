@@ -17,7 +17,7 @@
         <!-- LONG TEXT -->
         <td ng-if="n.type=='longtext'">
           <div class="input-group maxw">
-            <textarea rows="2" ng-model="n.data" />
+            <textarea rows="2" ng-model="n.data"></textarea>
           </div>
         </td>
         <!-- INT -->
@@ -71,7 +71,7 @@
             </label>
           </div>
           <div class="panel-body input-group maxw" ng-if="n.data!==0&&n.data!=='0'&&n.data!==1&&n.data!=='1'">
-            <textarea id="boeValue/{{n.title}}" class="form-control" rows="2" ng-model="n.data"/>
+            <textarea id="boeValue/{{n.title}}" class="form-control" rows="2" ng-model="n.data"></textarea>
           </div>
         </td>
         <!-- SELECT -->

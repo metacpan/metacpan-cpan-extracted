@@ -3,7 +3,7 @@ package Apache::Session::LDAP;
 use strict;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.4';
+$VERSION = '0.5';
 @ISA     = qw(Apache::Session);
 
 use Apache::Session;
@@ -44,6 +44,8 @@ Apache::Session::LDAP - An implementation of Apache::Session
     ldapObjectClass      => 'applicationProcess',
     ldapAttributeId      => 'cn',
     ldapAttributeContent => 'description',
+    ldapVerify           => 'require',
+    ldapCAFile           => '/etc/ssl/certs/ca-certificates.crt',
   };
 
 =head1 DESCRIPTION

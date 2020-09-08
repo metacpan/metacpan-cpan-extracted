@@ -1,6 +1,17 @@
 Change Log
 ^^^^^^^^^^
 
+Version 0.10:
+
+- Fixed a bug
+- Added test dependencies to dist.ini
+
+Version 0.06:
+
+- Added fetch methods to Weather::NHC::TropicalCyclone for RSS feeds
+activated during storms in the Atlantic basin, East Pacific basin, and
+Central Pacific basins.
+
 Versions 0.01-0.05:
 
 - initial release

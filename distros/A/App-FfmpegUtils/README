@@ -2,26 +2,29 @@ NAME
     App::FfmpegUtils - Utilities related to ffmpeg
 
 VERSION
-    This document describes version 0.003 of App::FfmpegUtils (from Perl
-    distribution App-FfmpegUtils), released on 2020-06-04.
+    This document describes version 0.005 of App::FfmpegUtils (from Perl
+    distribution App-FfmpegUtils), released on 2020-09-05.
 
 FUNCTIONS
-  reencode_video
+  reencode_video_with_libx264
     Usage:
 
-     reencode_video(%args) -> [status, msg, payload, meta]
+     reencode_video_with_libx264(%args) -> [status, msg, payload, meta]
 
-    Re-encode video (using ffmpeg and H.264 codec).
+    Re-encode video (using ffmpeg and libx264).
 
-    This utility runs ffmpeg to re-encode your video files. It is a wrapper
-    to simplify invocation of ffmpeg. It selects the appropriate ffmpeg
-    options for you, allows you to specify multiple files, and picks
-    appropriate output filenames. It also sports a "--dry-run" option to let
-    you see ffmpeg options to be used without actually running ffmpeg.
+    This utility runs ffmpeg to re-encode your video files using the libx264
+    codec. It is a wrapper to simplify invocation of ffmpeg. It selects the
+    appropriate ffmpeg options for you, allows you to specify multiple
+    files, and picks appropriate output filenames. It also sports a
+    "--dry-run" option to let you see ffmpeg options to be used without
+    actually running ffmpeg.
 
     This utility is usually used to reduce the file size (and optionally
     video width/height) of videos so they are smaller, while minimizing
-    quality loss. The default setting is roughly similar to how Google
+    quality loss. Smartphone-produced videos are often high bitrate (e.g.
+    >10-20Mbit) and not yet well compressed, so they make a good input for
+    this utility. The default setting is roughly similar to how Google
     Photos encodes videos (max 1080p).
 
     The default settings are:
@@ -52,6 +55,10 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   audio_sample_rate => *uint*
+
+        Set audio sample rate, in Hz.
+
     *   crf => *int*
 
     *   downsize_to => *str* (default: "1080p")
@@ -65,6 +72,12 @@ FUNCTIONS
     *   ffmpeg_path => *filename*
 
     *   files* => *array[filename]*
+
+    *   frame_rate => *ufloat*
+
+        Set frame rate, in fps.
+
+    *   preset => *str* (default: "veryslow")
 
     Special arguments:
 

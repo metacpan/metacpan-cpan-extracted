@@ -26,17 +26,18 @@ my $json = <$dh>;
         isa_ok $s, q{Weather::NHC::TropicalCyclone::Storm};
         can_ok $s,
           qw/id binNumber name classification intensity pressure latitude longitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/;
-        ok $s->name, q{found 'id' field};
-        ok $s->name, q{found 'name' field};
-        ok $s->name, q{found 'category' field};
-        ok $s->name, q{found 'pressure' field};
-        ok $s->name, q{found 'intensity' field};
-        ok $s->name, q{found 'latitude' field};
-        ok $s->name, q{found 'longitude' field};
-        ok $s->name, q{found 'movementDir' field};
-        ok $s->name, q{found 'movementSpeed' field};
-        ok $s->name, q{found 'lastUpdate' field};
-        ok $s->name, q{found 'binNumber' field};
+        ok $s->id,             q{found 'id' field};
+        ok $s->name,           q{found 'name' field};
+        ok $s->classification, q{found 'category' field};
+        ok $s->kind,           q{kind of storm based on 'classification' field with 'Human meaningful' entry};
+        ok $s->pressure,       q{found 'pressure' field};
+        ok $s->intensity,      q{found 'intensity' field};
+        ok $s->latitude,       q{found 'latitude' field};
+        ok $s->longitude,      q{found 'longitude' field};
+        ok $s->movementDir,    q{found 'movementDir' field};
+        ok $s->movementSpeed,  q{found 'movementSpeed' field};
+        ok $s->lastUpdate,     q{found 'lastUpdate' field};
+        ok $s->binNumber,      q{found 'binNumber' field};
     }
 }
 
@@ -60,6 +61,7 @@ my $json = <$dh>;
         ok my $local_file = $s->fetch_best_track, q{set up to download best track ".dat" file looks good via fetch_best_track};
         my $expected_name = sprintf( qq{b%s.dat}, $s->id );
         is $local_file, $expected_name, q{expected best track file name returned};
+        like $url, qr/$expected_name/, q{URL looks valid};
         is q{foobar.dat}, $s->fetch_best_track(q{foobar.dat}), q{custom local file honored by fetch_best_track};
         my $types = $s->_fetch_data_types;
         for my $type ( keys %$types ) {

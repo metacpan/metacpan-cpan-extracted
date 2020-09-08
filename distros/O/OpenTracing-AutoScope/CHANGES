@@ -1,6 +1,13 @@
 CHANGE LOG
 ==========
 
+2020-09-07 - v0.106.5
+---------------------
+
+### Fixed
+  - WrapScope now works correctly with Moose
+
+
 
 2020-08-17 - v0.106.4
 ---------------------

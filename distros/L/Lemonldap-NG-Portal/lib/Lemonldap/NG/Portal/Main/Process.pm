@@ -1,6 +1,6 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -138,10 +138,17 @@ sub controlUrl {
         # Unprotected hosts
         my ( $vhost, $appuri ) = $tmp =~ m#^https?://([^/]*)(.*)#;
         $vhost =~ s/:\d+$//;
-        $vhost = 'http://' . $self->HANDLER->resolveAlias($vhost);
+
+        # try to resolve alias
+        my $originalVhost = $self->HANDLER->resolveAlias($vhost);
+        $vhost = 'http://' . $originalVhost;
         $self->logger->debug( "Required URL (param: "
               . ( $req->param('logout') ? 'HTTP Referer' : 'urldc' )
               . " | value: $tmp | alias: $vhost)" );
+
+        # If the target URL has an authLevel set in config, remember it.
+        my $level = $self->HANDLER->getLevel( $req, $appuri, $originalVhost );
+        $req->pdata->{targetAuthnLevel} = $level if $level;
 
         if (    $tmp
             and !$self->isTrustedUrl($tmp)
@@ -312,7 +319,7 @@ sub extractFormInfo {
                 name    => $self->conf->{cookieName},
                 value   => 0,
                 domain  => $self->conf->{domain},
-                secure  => 0,
+                secure  => $self->conf->{securedCookie},
                 expires => 'Wed, 21 Oct 2015 00:00:00 GMT'
             )
         );

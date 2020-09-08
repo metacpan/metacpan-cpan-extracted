@@ -23,32 +23,26 @@ sub from_arguments_to_choices {
     my $chosen = {};
     my @failed_download_list_info;
     my $total = @args;
-    my $arg_count_w = length $total;
     my $arg_count = 0;
     URL: for my $webpage_url ( @args ) {
         $arg_count++;
-        $set->{video_count} = 1;
         print "\r", clline;
-        my $progress = sprintf "%*d|%d -", $arg_count_w, $arg_count, $total;
-        printf "%s GET download info: %s", $progress, $webpage_url;
+        my $progress = sprintf "%d|%d -", $arg_count, $total;
+        printf "%s GET download info: %s ", $progress, $webpage_url;
         my $h_ref;
         if ( ! eval { $h_ref = get_download_info( $set, $opt, $webpage_url, 1 ); 1 } ) {
             push @failed_download_list_info, $webpage_url;
             next URL;
         }
         my ( $ex, $up, $ids ) = extract_data_list( $set, $opt, $data, $h_ref );
-        $ids = [
-            sort { $data->{$ex}{$up}{$a}{video_order} <=> $data->{$ex}{$up}{$b}{video_order} } @$ids
-        ];
         if ( @$ids == 1 ) {
             my $id = $ids->[0];
             push @{$chosen->{$ex}{$up}}, $id;
         }
         else {
-            $set->{video_count} = 1;
             if ( $opt->{entries_with_info} ) {
                 my ( $min, $max ) = minmax( $opt->{entries_with_info}, scalar @$ids );
-                my $message = sprintf "%s GET video data:", ' ' x length $progress;
+                my $message = sprintf "%s GET video data: ", ' ' x length $progress;
                 print "\n" . $message;
                 my $pm = Parallel::ForkManager->new( $opt->{max_processes} );
                 my $c = 1;
@@ -57,7 +51,7 @@ sub from_arguments_to_choices {
                         my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data_structure_reference) = @_;
                         if ( defined $data_structure_reference ) {
                             my ( $id, $single_data ) = @{${$data_structure_reference}};
-                            printf "\r%s %d/%d", $message, $c++, $min;
+                            printf "\r%s%d/%d ", $message, $c++, $min;
                             for my $key ( keys %$single_data ) {
                                 $data->{$ex}{$up}{$id}{$key} = $single_data->{$key};
                             }
@@ -88,7 +82,7 @@ sub from_arguments_to_choices {
                 }
                 $pm->wait_all_children;
             }
-            my $prompt = $data->{$ex}{$up}{$ids->[0]}{uploader} || $webpage_url;
+            my $prompt = $progress . ' ' . $data->{$ex}{$up}{$ids->[0]}{uploader} || $webpage_url;
             my $chosen_ids = choose_videos( $set, $opt, $data, $ex, $up, $ids, $prompt );
             if ( ! defined $chosen_ids ) {
                 next URL;

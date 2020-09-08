@@ -33,6 +33,10 @@ my @url_tests = ({
   method => 'metro_url',
   url    => 'http://api.songkick.com/api/3.0/metro/METRO_ID/calendar',
   desc   => 'Metro',
+}, {
+  method => 'venue_events_url',
+  url    => 'http://api.songkick.com/api/3.0/venues/VENUE_ID/calendar',
+  desc   => 'Venue Events',
 });
 
 my $ns = Net::Songkick->new({ api_key => 'dummy' });

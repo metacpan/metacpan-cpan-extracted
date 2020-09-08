@@ -65,7 +65,7 @@ sub init {
       $hd->buildSub( $hd->substitute( $self->conf->{issuerDBOpenIDRule} ) );
     unless ($rule) {
         my $error = $hd->tsv->{jail}->error || '???';
-        $self->error( "Bad OpenID activation rule -> $error" );
+        $self->error("Bad OpenID activation rule -> $error");
         return 0;
     }
     $self->{rule} = $rule;

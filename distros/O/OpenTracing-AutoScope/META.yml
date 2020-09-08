@@ -31,5 +31,5 @@ requires:
   Scope::Context: '0'
   Sub::Info: '0'
   YAML::XS: '0'
-version: v0.106.4
+version: v0.106.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

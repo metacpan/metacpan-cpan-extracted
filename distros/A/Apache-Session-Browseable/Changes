@@ -1,11 +1,14 @@
 Revision history for Perl extension Apache::Session::Browseable.
 
+1.3.8
+    - Add specific error handling for old versions (#28)
+
 1.3.7
-    - Fix ldap+tls:// regression in 1.3.6
+    - Fix ldap+tls:// regression in 1.3.6 (#27)
 
 1.3.6
-    - Improve logs
-    - Add ldapVerify option for SSL cert validation
+    - Improve logs (#26)
+    - Add ldapVerify option for SSL cert validation (#25)
 
 1.3.5
     - Update cast syntax for vanilla MySQL (#21)

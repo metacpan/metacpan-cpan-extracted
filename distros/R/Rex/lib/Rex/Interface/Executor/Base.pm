@@ -9,7 +9,7 @@ package Rex::Interface::Executor::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 sub new {
   my $that  = shift;

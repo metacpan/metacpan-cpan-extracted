@@ -1,10 +1,13 @@
-use Modern::Perl "2010";
+use v5.10; use warnings;
 use Test::More;
 use Test::Exception;
 use Bitcoin::Crypto::Exception;
+use Bitcoin::Crypto;
 
 # partly tested by Bech32 tests
-BEGIN { use_ok('Bitcoin::Crypto::Segwit', qw(validate_program)) };
+BEGIN { use_ok('Bitcoin::Crypto::Segwit', qw(validate_program)) }
+
+is(Bitcoin::Crypto::Segwit->VERSION, Bitcoin::Crypto->VERSION);
 
 # make warnings critical
 local $SIG{__WARN__} = sub { die shift() . " - warning" };
@@ -15,7 +18,8 @@ my $program = "\x01\x00\xff";
 {
 	throws_ok {
 		validate_program($program);
-	} qr/- warning/, "warning was raised as exception";
+	}
+	qr/- warning/, "warning was raised as exception";
 	my $err = $@;
 
 	note($err);
@@ -37,7 +41,8 @@ $Bitcoin::Crypto::Segwit::validators{1} = sub {
 {
 	throws_ok {
 		validate_program($program);
-	} "Bitcoin::Crypto::Exception::ValidationTest", "exception was raised";
+	}
+	"Bitcoin::Crypto::Exception::ValidationTest", "exception was raised";
 	my $err = $@;
 
 	note($err);

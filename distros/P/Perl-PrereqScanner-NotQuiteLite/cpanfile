@@ -6,6 +6,7 @@ requires 'Module::CPANfile', '1.1004';
 requires 'Module::CoreList', '3.11';
 requires 'Module::Find';
 requires 'Regexp::Trie';
+requires 'URI::cpan';
 requires 'parent';
 requires 'perl', '5.008001';
 suggests 'JSON::PP';

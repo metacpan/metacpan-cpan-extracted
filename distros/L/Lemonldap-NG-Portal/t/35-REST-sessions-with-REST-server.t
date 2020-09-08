@@ -101,8 +101,8 @@ ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
   or print STDERR $@;
 ok( $res->{_session_id} eq $spId, ' Good ID' )
   or explain( $res, "_session_id => $spId" );
-ok( ref $res->{array} eq 'ARRAY', ' Array ref found' )
-  or explain( $res, "array => Ref" );
+ok( $res->{array} =~ /;/, 'Mulivalued attribute found' )
+  or explain( $res, "Multivalued attribute" );
 count(4);
 
 # Session key

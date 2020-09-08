@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
@@ -26,6 +26,7 @@ sub new {
     my $schemas = delete $args{schema} || ['+'];
     my $cyclic_refs = delete $args{cyclic_refs} || 'allow';
     my $indent = delete $args{indent};
+    my $width = delete $args{width};
     my $writer = delete $args{writer};
     my $header = delete $args{header};
     my $footer = delete $args{footer};
@@ -36,6 +37,7 @@ sub new {
     my $parser = delete $args{parser};
     my $emitter = delete $args{emitter} || {
         indent => $indent,
+        width => $width,
         writer => $writer,
     };
     if (keys %args) {
@@ -510,6 +512,11 @@ Options:
 
 Values: C<perl> (currently default), C<JSON::PP>, C<boolean>
 
+Note that when dumping, only the chosen boolean style will be recognized.
+So if you choose C<JSON::PP>, C<boolean> objects will not be recognized
+as booleans and will be dumped as ordinary objects (if you enable the
+Perl schema).
+
 =item schema
 
 Default: C<['Core']>
@@ -538,6 +545,18 @@ Defines what to do when a cyclic reference is detected when loading.
 Default: 2
 
 Use that many spaces for indenting
+
+=item width
+
+Since version 0.025
+
+Default: 80
+
+Maximum columns when dumping.
+
+This is only respected when dumping flow collections right now.
+
+in the future it will be used also for wrapping long strings.
 
 =item header
 

@@ -8,7 +8,7 @@
         <th width="20%" trspan="comments"></th>
         <th width="30%" trspan="rules"></th>
         <th width="50%" trspan="messages"></th>
-        <th />
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -23,8 +23,8 @@
           <input class="form-control" ng-model="s.re" ng-change="changeRuleTitle(s)"/>
         </td>
         <td>
-          <span ng-model="s.title" class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"/>
-          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newGrantRule',action:'newGrantRule'})"/>
+          <span ng-model="s.title" class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"></span>
+          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newGrantRule',action:'newGrantRule'})"></span>
         </td>
       </tr>
     </tbody>

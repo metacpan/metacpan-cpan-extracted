@@ -1,3 +1,9 @@
+Revision history for Perl module YAML::PP::LibYAML
+
+0.004 2020-09-07 22:50:24+02:00
+
+    - Pass option 'width' to YAML::LibYAML::API
+
 0.003 2019-05-28 23:59:10+02:00
 
     - Add option 'indent' to emitter

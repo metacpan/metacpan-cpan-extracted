@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojolicious-Plugin-Webpack
 
+0.13 2020-09-07T10:10:24+0900
+ - Fix "sass-loader" options #4
+ - Removed support for "shim"
+ - Improved documentation
+
 0.12 2019-10-07T07:02:11+0900
  - Renamed every ".dev." file to ".development." #2
 

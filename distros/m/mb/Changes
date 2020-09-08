@@ -1,10 +1,16 @@
 Revision history for this software.
 
+0.11  2020-09-05 00:00:00
+  - INCOMPATIBLE CHANGE: transpiles eval 'string' to eval 'string' (NOT mb::eval 'string')
+  - INCOMPATIBLE CHANGE: transpiles do 'file' to do 'file' (NOT mb::do 'string')
+  - INCOMPATIBLE CHANGE: transpiles require 'file' to require 'file' (NOT mb::require 'string')
+  - created by INABA Hitoshi
+
 0.10  2020-08-30 00:00:00
   - supports also opendir, not only opendir()
   - removed "use Symbol;"
-  - fix from \*qq{...} to qq{...}, converting filetest -X qq{...}
-  - avoid syntax error: Can't coerce array into hash at ..., converting regexp /[ABC]{3}/
+  - fix from \*qq{...} to qq{...}, transpiling filetest -X qq{...}
+  - avoid syntax error: Can't coerce array into hash at ..., transpiling regexp /[ABC]{3}/
   - created by INABA Hitoshi
 
 0.09  2020-08-28 00:00:00

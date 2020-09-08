@@ -5,7 +5,6 @@ my $module = 'AudioFile::Info::Ogg::Vorbis::Header::PurePerl';
 
 my $b = AudioFile::Info::Build->new(
     module_name => $module,
-    dist_version => '1.05',
     license => 'perl',
     requires => {
         perl            => '5.6.0',

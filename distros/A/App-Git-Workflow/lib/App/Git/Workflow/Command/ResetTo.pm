@@ -14,7 +14,7 @@ use Term::ANSIColor qw/colored/;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = version->new(1.1.12);
+our $VERSION  = version->new(1.1.13);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -38,7 +38,7 @@ git-reset-to - Help reset-to many commits
 
 =head1 VERSION
 
-This documentation refers to git-reset-to version 1.1.12
+This documentation refers to git-reset-to version 1.1.13
 
 =head1 SYNOPSIS
 

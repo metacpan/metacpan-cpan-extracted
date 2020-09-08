@@ -9,7 +9,7 @@ use warnings;
 use ExtUtils::Constant qw(WriteConstants);
 
 my @names = qw(
-    HS_HS_HS_MAJOR MINOR PATCH
+    HS_MAJOR HS_MINOR HS_PATCH
 
     HS_FLAG_CASELESS
     HS_FLAG_DOTALL
@@ -49,7 +49,9 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Perl bindings to the Intel hyperscan regular expression library",
   "AUTHOR" => "Mark Sikora <marknsikora\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::Constant" => 0,
+    "ExtUtils::MakeMaker" => 0,
+    "ExtUtils::PkgConfig" => 0
   },
   "DISTNAME" => "Hyperscan",
   "LICENSE" => "perl",
@@ -70,7 +72,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,8 +1,8 @@
 package RxPerl::Operators::Pipeable;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
-use RxPerl::Operators::Creation 'rx_observable', 'rx_subject';
+use RxPerl::Operators::Creation qw/ rx_observable rx_subject rx_concat rx_of /;
 use RxPerl::ConnectableObservable;
 use RxPerl::Utils qw/ get_subscription_from_subscriber get_timer_subs /;
 use RxPerl::Subscription;
@@ -13,7 +13,7 @@ use Scalar::Util 'reftype';
 use Exporter 'import';
 our @EXPORT_OK = qw/
     op_delay op_filter op_map op_map_to op_multicast op_pairwise op_ref_count
-    op_scan op_share op_take op_take_until op_tap
+    op_scan op_share op_start_with op_switch_map op_take op_take_until op_tap
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -281,6 +281,68 @@ sub op_share {
         op_multicast(sub { rx_subject->new }),
         op_ref_count(),
     );
+}
+
+sub op_start_with {
+    my (@values) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_concat(
+            rx_of(@values),
+            $source,
+        );
+    }
+}
+
+sub op_switch_map {
+    my ($observable_factory) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $current_subscription;
+            my $source_complete = 0;
+
+            my $own_subscriber = {
+                next     => sub {
+                    my ($value) = @_;
+
+                    my $new_observable = $observable_factory->($value);
+                    $current_subscription->unsubscribe() if $current_subscription;
+                    my $this_own_subscriber = {
+                        next     => sub {
+                            $subscriber->{next}->(@_) if defined $subscriber->{next};
+                        },
+                        error    => sub {
+                            $subscriber->{error}->(@_) if defined $subscriber->{error};
+                        },
+                        complete => sub {
+                            $subscriber->{complete}->() if $source_complete and defined $subscriber->{complete};
+                        },
+                    };
+
+                    $current_subscription = $new_observable->subscribe($this_own_subscriber);
+                },
+                error    => sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+                complete => sub {
+                    $source_complete = 1;
+                    $subscriber->{complete}->() if defined $subscriber->{complete} and
+                        (not $current_subscription or $current_subscription->{closed});
+                },
+            };
+
+            my $own_subscription = $source->subscribe($own_subscriber);
+
+            return [$own_subscription, \$current_subscription];
+        });
+    }
 }
 
 sub op_take {

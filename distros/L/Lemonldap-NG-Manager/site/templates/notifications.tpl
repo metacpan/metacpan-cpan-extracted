@@ -92,6 +92,10 @@
             <th>{{translate('text')}}</th>
             <td><textarea rows=5 class="form-control">{{currentNotification.text}}</textarea></td>
           </tr>
+          <tr ng-if="currentNotification.check">
+            <th>{{translate('checkboxes')}}</th>
+            <td><textarea rows=1 class="form-control">{{currentNotification.check}}</textarea></td>
+          </tr>
           <tr ng-if="currentNotification.done">
             <th>{{translate('internalReference')}}</th>
             <td>{{currentNotification.done}}</td>

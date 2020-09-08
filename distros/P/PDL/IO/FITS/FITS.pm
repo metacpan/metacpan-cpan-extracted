@@ -118,6 +118,7 @@ Suffix magic:
   @pdls = rfits('file.fits');      # Read primary data and extensions
 
 Tilde expansion:
+
   #expand leading ~ to home directory (using glob())
   $pdl = rfits '~/filename.fits';
 
@@ -1569,6 +1570,7 @@ Suffix magic:
   wfits $pdl, 'filename.fits.Z';  
 
 Tilde expansion:
+
   #expand leading ~ to home directory (using glob())
   wfits $pdl, '~/filename.fits';
 
@@ -1864,9 +1866,9 @@ sub PDL::wfits {
   local $\ = undef;  # fix sf.net bug #3394327 
 
   if(ref $x eq 'HASH') {
-      $x = $opt;
+      $opt = $x;
       $BITPIX = $y;
-  } elsif(ref $y eq 'HASH') {
+  } elsif(ref $y eq 'HASH' || ! defined $y) {
       $BITPIX = $x;
       $opt = $y;
   }

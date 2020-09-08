@@ -194,7 +194,7 @@ sub _requirements {
   my ($self, $prereqs) = @_;
 
   $prereqs ||= $self->{prereqs};
-  my @phases = qw/configure runtime test/;
+  my @phases = qw/configure runtime build test/;
   push @phases, 'develop' if $self->{develop};
   my @types = $self->{suggests} ? qw/requires recommends suggests/ : $self->{recommends} ? qw/requires recommends/ : qw/requires/;
   my @requirements;
@@ -349,21 +349,30 @@ sub _dedupe {
   dedupe_prereqs_and_features($prereqs, \%features);
 }
 
+sub _get_uri {
+  my ($self, $module) = @_;
+  $self->{uri_cache}{$module} ||= $self->__get_uri($module);
+}
+
+sub __get_uri {
+  my ($self, $module) = @_;
+  my $res = $self->{index}->search_packages({ package => $module }) or return;
+  ## ignore (non-dual) core modules
+  return if URI->new($res->{uri})->dist_name eq 'perl';
+  return $res->{uri};
+}
+
 sub _dedupe_indexed_prereqs {
   my ($self, $prereqs) = @_;
 
-  my $index = $self->{index};
+  require URI::cpan;
+
   for my $req ($self->_requirements($prereqs)) {
     my %uri_map;
     for my $module ($req->required_modules) {
       next if $module eq 'perl';
-      my $uri = $self->{uri_cache}{$module} ||= do {
-        my $res = $index->search_packages({ package => $module });
-        $res ? $res->{uri} : undef;
-      };
-      if ($uri) {
-        $uri_map{$uri}{$module} = $req->requirements_for_module($module);
-      }
+      my $uri = $self->_get_uri($module) or next;
+      $uri_map{$uri}{$module} = $req->requirements_for_module($module);
     }
     for my $uri (keys %uri_map) {
       my @modules = keys %{$uri_map{$uri}};
@@ -378,19 +387,33 @@ sub _dedupe_indexed_prereqs {
         next;
       }
 
-      # keep the topmost if none is versioned
-      my %score;
-      for my $module (@modules_without_version) {
-        my $depth = $module =~ s/::/::/g;
-        my $length = length $module;
-        $score{$module} = join ".", ($depth || 0), $length;
-      }
-      my $topmost = (sort {$score{$a} <=> $score{$b} or $a cmp $b} @modules_without_version)[0];
-      for my $module (@modules_without_version) {
-        next if $topmost eq $module;
-        $req->clear_requirement($module);
-        if ($self->{verbose}) {
-          print STDERR "  deduped $module (in favor of $topmost)\n";
+      # Replace with the main module if none is versioned
+      my $dist = URI->new($uri)->dist_name;
+      (my $main_module = $dist) =~ s/-/::/g;
+      if ($self->_get_uri($main_module)) {
+        $req->add_minimum($main_module);
+        for my $module (@modules_without_version) {
+          next if $main_module eq $module;
+          $req->clear_requirement($module);
+          if ($self->{verbose}) {
+            print STDERR "  deduped $module (in favor of $main_module)\n";
+          }
+        }
+      } else {
+        # special case for distributions without a main module
+        my %score;
+        for my $module (@modules_without_version) {
+          my $depth = $module =~ s/::/::/g;
+          my $length = length $module;
+          $score{$module} = join ".", ($depth || 0), $length;
+        }
+        my $topmost = (sort {$score{$a} <=> $score{$b} or $a cmp $b} @modules_without_version)[0];
+        for my $module (@modules_without_version) {
+          next if $topmost eq $module;
+          $req->clear_requirement($module);
+          if ($self->{verbose}) {
+            print STDERR "  deduped $module (in favor of $topmost)\n";
+          }
         }
       }
     }

@@ -1,5 +1,5 @@
 package Hyperscan::Scratch;
-$Hyperscan::Scratch::VERSION = '0.03';
+$Hyperscan::Scratch::VERSION = '0.04';
 # ABSTRACT: scratch class
 
 use strict;
@@ -21,7 +21,7 @@ Hyperscan::Scratch - scratch class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head2 METHODS
 

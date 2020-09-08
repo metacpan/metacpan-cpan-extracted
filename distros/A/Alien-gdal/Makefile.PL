@@ -20,6 +20,7 @@ my %common_reqs = (
     "FFI::CheckLib"   => "0.23",
     #"File::Stat" => 0,
     #($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
+    'Alien::Build::Plugin::PkgConfig::PPWrapper' => '0',
 );
 
 my %WriteMakefileArgs = (
@@ -34,7 +35,6 @@ my %WriteMakefileArgs = (
     },
     "BUILD_REQUIRES" => {
         %common_reqs,
-        'Alien::Build::Plugin::PkgConfig::PPWrapper' => '0',
     },
     "TEST_REQUIRES" => {
         "Test::Alien" => 0,

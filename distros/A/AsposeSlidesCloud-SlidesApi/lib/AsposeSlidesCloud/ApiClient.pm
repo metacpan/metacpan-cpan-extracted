@@ -44,8 +44,8 @@ use Carp;
 use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Log::Any::Adapter ('Stderr');
-
 use AsposeSlidesCloud::ApiInfo;
+use AsposeSlidesCloud::ClassRegistry;
 use AsposeSlidesCloud::Configuration;
 
 sub new {
@@ -73,12 +73,32 @@ sub new {
 # @param string $resourcePath path to method endpoint
 # @param string $method method to call
 # @param array $queryParams parameters to be place in query URL
-# @param array $postData parameters to be placed in POST body
+# @param array $postParams parameters to be placed in POST body
 # @param array $headerParams parameters to be place in request header
+# @param array $body_data data to be place in request body
+# @param array $files files to be posted
 # @return mixed
 sub call_api {
     my $self = shift;
-    my ($resource_path, $method, $query_params, $post_params, $header_params, $body_data, $auth_settings) = @_;
+    my ($resource_path, $method, $query_params, $post_params, $header_params, $body_data, $files) = @_;
+
+    my $had_token = defined $self->{config}{access_token} && $self->{config}{access_token} ne "";
+    my $response = $self->call_api_once($resource_path, $method, $query_params, $post_params, $header_params, $body_data, $files);
+    my $content = sprintf("%s", $response->content);
+    if ($had_token && ($response->code eq 401 || ($response->code eq 400 && index($content, ' Authority') != -1))) {
+        $self->{config}{access_token} = "";
+        $response = $self->call_api_once($resource_path, $method, $query_params, $post_params, $header_params, $body_data, $files);
+        $content = sprintf("%s", $response->content);
+    }
+    unless ($response->is_success) {
+        croak(sprintf "API Exception(%s): %s\n%s", $response->code, $response->message, $content);
+    }
+    return $content;
+}
+
+sub call_api_once {
+    my $self = shift;
+    my ($resource_path, $method, $query_params, $post_params, $header_params, $body_data, $files) = @_;
   
     $self->update_headers($header_params);
   
@@ -89,24 +109,14 @@ sub call_api {
         $_url = ($_url . '?' . eval { URI::Query->new($query_params)->stringify });
     }
 
-    # body data
-    if (defined $body_data) {
-        if (!(ref $body_data eq "HASH") && $body_data->can('to_hash')) {
-            $body_data = $body_data->to_hash;
-        }
-        if (ref $body_data eq "HASH") {
-            $body_data = to_json($body_data); # model to json string
-        }
-    }
-    my $_body_data = %$post_params ? $post_params : $body_data;
+    my $_body_data = %$post_params ? $post_params : $self->get_body_data($header_params, $body_data, $files);
 
     # Make the HTTP request
     my $_request;
     if ($method eq 'POST') {
         # multipart
-        $header_params->{'Content-Type'} = lc $header_params->{'Content-Type'} eq 'multipart/form' ? 
+        $header_params->{'Content-Type'} = lc $header_params->{'Content-Type'} eq 'multipart/form' ?
             'form-data' : $header_params->{'Content-Type'};
-        
         $_request = POST($_url, %$header_params, Content => $_body_data);
   
     }
@@ -140,13 +150,48 @@ sub call_api {
     if ($self->{config}{debug}) {
         $log->debugf("RESPONSE: %s", $_response->as_string);
     }
-
-    unless ($_response->is_success) {
-        croak(sprintf "API Exception(%s): %s\n%s", $_response->code, $_response->message, $_response->content);
-    }
        
-    return $_response->content;
-  
+    return $_response;
+}
+
+# get request body
+# @param array $headerParams parameters to be place in request header
+# @param array $body_data data to be place in request body
+# @param array $files files to be posted
+# @return mixed
+sub get_body_data {
+    my $self = shift;
+    my ($header_params, $body_data, $files) = @_;
+    if (defined $body_data) {
+        if (!(ref $body_data eq "HASH") && $body_data->can('to_hash')) {
+            $body_data = $body_data->to_hash;
+        }
+        if (ref $body_data eq "HASH") {
+            $body_data = to_json($body_data); # model to json string
+        }
+    }
+    if (!defined $files) {
+        return $body_data;
+    }
+    my $_body_data = "";
+    my $boundary = "7d70fb31-0eb9-4846-9ea8-933dfb69d8f1";
+    $header_params->{'Content-Type'} = "multipart/form-data; boundary=${boundary}";
+    $_body_data = $_body_data . "\r\n--${boundary}\r\n";
+    $_body_data = $_body_data . "Content-Disposition: form-data; name=\"data\"\r\n";
+    $_body_data = $_body_data . "Content-Type: text/json\r\n";
+    $_body_data = $_body_data . "\r\n";
+    $_body_data = $_body_data . $body_data;
+    my $fileIndex = 1;
+    foreach (@$files) {
+        $_body_data = $_body_data . "\r\n--${boundary}\r\n";
+        $_body_data = $_body_data . "Content-Disposition: form-data; name=\"file${fileIndex}\";filename=\"null\"\r\n";
+        $_body_data = $_body_data . "Content-Type: application/octet-stream\r\n";
+        $_body_data = $_body_data . "\r\n";
+        $_body_data = $_body_data . $_;
+        $fileIndex++;
+    }
+    $_body_data = $_body_data . "\r\n--${boundary}--\r\n";
+    return $_body_data;
 }
 
 #  Take value and turn it into a string suitable for inclusion in
@@ -266,6 +311,7 @@ sub deserialize
     } elsif (grep /^$class$/, ('string', 'int', 'float', 'bool', 'object', 'File')) {
         return $data;
     } else { # model
+        $class = AsposeSlidesCloud::ClassRegistry->get_class_name($class, $data);
         my $_instance = use_module("AsposeSlidesCloud::Object::$class")->new;
         if (ref $data eq "HASH") {
             return $_instance->from_hash($data);
@@ -306,7 +352,7 @@ sub select_header_content_type
     } elsif ($header[0] eq 'multipart/form-data') {
         return 'application/json';
     } else {
-        return @header[0]
+        return $header[0]
     }
   
 }
@@ -314,13 +360,8 @@ sub select_header_content_type
 # add auth, user agent and other headers
 #  
 # @param array $headerParams header parameters (by ref)
-sub update_params_for_auth {
+sub update_headers {
     my ($self, $header_params) = @_;
-    $header_params->{'X_Aspose_Client'} = 'perl sdk';
-    $header_params->{'X_Aspose_Version'} = AsposeSlidesCloud::ApiInfo::VERSION;
-    if ((defined $self->{config}{timeout}) && $self->{config}{timeout} > 0) {
-        $header_params->{'X_Aspose_Timeout'} = $self->{config}{timeout};
-    }
     my $custom_headers = $self->{config}{custom_headers};
     foreach my $key (keys %$custom_headers) {
         $header_params->{$key} = $self->{config}{custom_headers}{$key};
@@ -331,9 +372,7 @@ sub update_params_for_auth {
 # update header and query param based on authentication setting
 #  
 # @param array $headerParams header parameters (by ref)
-# @param array $queryParams query parameters (by ref)
-# @param array $authSettings array of authentication scheme (e.g ['api_key'])
-sub update_headers {
+sub update_params_for_auth {
     my ($self, $header_params) = @_;
     if (!defined $self->{config}{access_token} || $self->{config}{access_token} eq "") {
         my $_url = $self->{config}{auth_base_url} . "/connect/token";
@@ -344,6 +383,5 @@ sub update_headers {
     }
     $header_params->{'Authorization'} = 'Bearer ' . $self->{config}{access_token};
 }
-
 
 1;

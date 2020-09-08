@@ -23,6 +23,7 @@ is($ogg->info->{'rate'}, 44_100, 'Got rate from hash');
 is($ogg->info('rate'), 44_100, 'Got rate from subroutine');
 ok($ogg->comment_tags, 'Got comment tags');
 is($ogg->comment('artist'), 'maloi', 'Got artist');
+is($ogg->path, 't/test.ogg', 'Got path');
 
 my @artists = $ogg->comment('artist');
 is(@artists, 1, 'Correct number of artists');

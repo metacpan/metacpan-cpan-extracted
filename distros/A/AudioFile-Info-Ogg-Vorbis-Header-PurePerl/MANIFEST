@@ -11,3 +11,4 @@ t/2_write.t
 t/3_pod.t
 t/4_pod_coverage.t
 t/test.ogg
+META.json

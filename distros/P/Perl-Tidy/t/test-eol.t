@@ -129,3 +129,7 @@ Perl::Tidy::perltidy(
 }
 
 ok($output, $expected_output, "output file EOLs (UTF8)");
+
+# Try to delete the tmpfile; 
+# Comment this out if it causes a failure at Appveyor
+if ( -e $output_filename ) { unlink $output_filename }

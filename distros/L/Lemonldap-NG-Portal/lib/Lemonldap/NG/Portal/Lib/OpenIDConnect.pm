@@ -19,7 +19,7 @@ use Mouse;
 
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_REDIRECT);
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.9';
 
 # OpenID Connect standard claims
 use constant PROFILE => [
@@ -28,7 +28,7 @@ use constant PROFILE => [
 ];
 use constant EMAIL => [qw/email email_verified/];
 use constant ADDRESS =>
-  [qw/formatted street_address locality region postal_code/];
+  [qw/formatted street_address locality region postal_code country/];
 use constant PHONE => [qw/phone_number phone_number_verified/];
 
 # PROPERTIES
@@ -1336,11 +1336,7 @@ sub buildUserInfoResponse {
     my ( $self, $req, $scope, $rp, $session ) = @_;
     my $userinfo_response = {};
 
-    my $user_id_attribute =
-      $self->conf->{oidcRPMetaDataOptions}->{$rp}
-      ->{oidcRPMetaDataOptionsUserIDAttr}
-      || $self->conf->{whatToTrace};
-    my $user_id = $session->data->{$user_id_attribute};
+    my $user_id = $self->getUserIDForRP( $req, $rp, $session->data );
 
     $self->logger->debug("Found corresponding user: $user_id");
 
@@ -1368,6 +1364,14 @@ sub buildUserInfoResponse {
                 }
                 else {
                     $session_value = $session->data->{$session_key};
+                }
+
+                # Convert mutli-valued attributes to arrays
+                my $separator = $self->conf->{multiValuesSeparator};
+                if ( $session_value and $session_value =~ /$separator/ ) {
+                    my @session_array =
+                      split( $separator, $session_value );
+                    $session_value = \@session_array;
                 }
 
                 # Address is a JSON object
@@ -1734,6 +1738,30 @@ sub getAudiences {
     push @{$result}, @addAudiences;
 
     return $result;
+}
+
+# Returns the main attribute (sub) to use for this RP
+# It can be a session attribute, or per-RP macro
+sub getUserIDForRP {
+    my ( $self, $req, $rp, $data ) = @_;
+
+    my $user_id_attribute =
+      $self->conf->{oidcRPMetaDataOptions}->{$rp}
+      ->{oidcRPMetaDataOptionsUserIDAttr}
+      || $self->conf->{whatToTrace};
+
+    my $user_id;
+
+    # If the main attribute is a SP macro, resolve it
+    # else, get it directly from session data
+    if ( $self->spMacros->{$rp}->{$user_id_attribute} ) {
+        $user_id =
+          $self->spMacros->{$rp}->{$user_id_attribute}->( $req, $data );
+    }
+    else {
+        $user_id = $data->{$user_id_attribute};
+    }
+    return $user_id;
 }
 
 1;

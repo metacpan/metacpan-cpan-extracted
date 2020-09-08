@@ -1,6 +1,9 @@
 Revision history for App-YTDL
 
 
+0.415   2020-09-05
+        - Win32 OS: fixed quoting issues.
+
 0.414   2020-08-28
         - Manually chosen video resolution 'best': bugfix.
 

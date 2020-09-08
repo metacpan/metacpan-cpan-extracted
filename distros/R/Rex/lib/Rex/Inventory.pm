@@ -9,7 +9,7 @@ package Rex::Inventory;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 use Rex::Inventory::DMIDecode;
 use Rex::Inventory::Hal;
@@ -209,7 +209,7 @@ sub get {
       host => {
         name   => [ run "hostname -s" ]->[0],
         domain => [ run "hostname -d" || qw() ]->[0],
-        kernel => [ run "uname -r" || qw() ]->[0],
+        kernel => [ run "uname -r"    || qw() ]->[0],
       },
     },
     fusion_inventory => $fusion_inventory_xmlref,

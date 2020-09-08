@@ -1,7 +1,7 @@
 package Mail::DKIM::Canonicalization::Base;
 use strict;
 use warnings;
-our $VERSION = '1.20200824'; # VERSION
+our $VERSION = '1.20200907'; # VERSION
 # ABSTRACT: base class for canonicalization methods
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -85,7 +85,7 @@ Mail::DKIM::Canonicalization::Base - base class for canonicalization methods
 
 =head1 VERSION
 
-version 1.20200824
+version 1.20200907
 
 =head1 SYNOPSIS
 

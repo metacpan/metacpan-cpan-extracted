@@ -51,7 +51,7 @@ count(1);
 
 foreach (@ids) {
     ok( $res = $client->_get("/sessions/global/$_"), 'Get session content' );
-    ok( $res->[2]->[0] =~ /"uid":"Dr Who"/,          ' Content is updated' );
+    ok( $res->[2]->[0] =~ /"uid":"Dr Who"/, ' Content is updated' );
     count(2);
 }
 

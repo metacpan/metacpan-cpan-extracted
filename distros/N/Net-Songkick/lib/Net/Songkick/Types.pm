@@ -1,6 +1,6 @@
 =head1 NAME
 
-Net::Songkick::Types - USeful type stuff for Net::Songkick
+Net::Songkick::Types - Useful type stuff for Net::Songkick
 
 =head1 SYNOPSIS
 
@@ -17,18 +17,20 @@ use DateTime::Format::Strptime;
 
 subtype 'Net::Songkick::DateTime',
   as 'DateTime';
-  
+
 coerce 'Net::Songkick::DateTime',
   from 'HashRef',
   via {
-    my $dt = DateTime::Format::Strptime->new(
+    my $dt = ( exists($_->{datetime}) )   ?
+
+      DateTime::Format::Strptime->new(
       pattern => '%Y-%m-%dT%H:%M:%S%z',
-    )->parse_datetime($_->{datetime});
-    if (!$dt) {
-      $dt = DateTime::Format::Strptime->new(
+      )->parse_datetime($_->{datetime})   :
+
+      DateTime::Format::Strptime->new(
         pattern => '%Y-%m-%d',
-      )->parse_datetime($_->{date});
-    }
+      )->parse_datetime($_->{date})      ;
+
     return $dt;
   };
 

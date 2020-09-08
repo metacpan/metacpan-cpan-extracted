@@ -145,7 +145,7 @@ ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
   or print STDERR $@;
 ok( $res->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'cn => Frédéric Accents' );
-ok( ref( $res->{multi} ) eq "ARRAY" and $res->{multi}->[0] =~ /value/ )
+ok( $res->{multi} =~ /value1;value2/ )
   or explain( $res->{multi}, 'Multi valued attribute' );
 count(4);
 

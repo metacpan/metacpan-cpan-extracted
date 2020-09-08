@@ -25,7 +25,7 @@ count(1);
 my ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
 ok(
     $res->[2]->[0] =~
-m%<input name="password" type="password" class="form-control" trplaceholder="password" required aria-required="true"/>%,
+m%<input[^>]*name="password"%,
     'Password: Found password input'
 );
 count(1);

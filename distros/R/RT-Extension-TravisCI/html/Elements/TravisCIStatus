@@ -1,0 +1,14 @@
+<%args>
+$Ticket => undef
+</%args>
+<%init>
+</%init>
+<&|/Widgets/TitleBox,
+    class => "travisci-status",
+    title => loc("Travis CI Status"),
+    title_class => 'inverse',
+&>
+
+<div class="travisci" id="travisci" data-travisci-ticketid="<% $Ticket->id %>">
+</div>
+</&>

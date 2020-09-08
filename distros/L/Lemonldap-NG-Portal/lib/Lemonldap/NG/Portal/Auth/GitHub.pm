@@ -8,7 +8,7 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_REDIRECT);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -51,6 +51,24 @@ has githubUserEndpoint => (
     default => sub {
         $_[0]->conf->{githubUserEndpoint}
           || 'https://api.github.com/user';
+    }
+);
+
+has githubPublicKeysEndpoint => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{githubPublicKeysEndpoint}
+          || 'https://api.github.com/user/keys';
+    }
+);
+
+has githubGPGKeysEndpoint => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{githubGPGKeysEndpoint}
+          || 'https://api.github.com/user/gpg_keys';
     }
 );
 
@@ -119,23 +137,23 @@ sub extractFormInfo {
 
         $self->logger->debug("Get access token $access_token from GitHub");
 
-        # Call People EndPoint URI
+        # Call User EndPoint URI
         $self->logger->debug(
-            "Call GitHub People Endpoint " . $self->githubUserEndpoint );
+            "Call GitHub User Endpoint " . $self->githubUserEndpoint );
 
-        my $people_response = $self->ua->get( $self->githubUserEndpoint,
+        my $user_response = $self->ua->get( $self->githubUserEndpoint,
             "Authorization" => "token $access_token" );
 
-        if ( $people_response->is_error ) {
+        if ( $user_response->is_error ) {
             $self->logger->error(
-                "Bad authorization response: " . $people_response->message );
-            $self->logger->debug( $people_response->content );
+                "Bad authorization response: " . $user_response->message );
+            $self->logger->debug( $user_response->content );
             return PE_ERROR;
         }
 
-        my $user_content = $people_response->decoded_content;
+        my $user_content = $user_response->decoded_content;
 
-        $self->logger->debug("Response from GitHub People API: $user_content");
+        $self->logger->debug("Response from GitHub User API: $user_content");
 
         eval {
             $json_hash = from_json( $user_content, { allow_nonref => 1 } ); };
@@ -148,10 +166,71 @@ sub extractFormInfo {
             $req->data->{githubData}->{$_} = $json_hash->{$_};
         }
 
-        $req->user(
-            $req->data->{githubData}->{ $self->conf->{githubUserField} } );
+        # Fetch SSH keys
+        if ( $self->conf->{githubScope} =~ /public_key/ ) {
+            $self->logger->debug("Scope public_key requested, fetch SSH keys");
 
-        $self->logger->debug( "Good GitHub authentication for " . $req->user );
+            my $public_keys_response = $self->ua->get(
+                $self->githubPublicKeysEndpoint,
+                "Authorization" => "token $access_token"
+            );
+
+            if ( $public_keys_response->is_error ) {
+                $self->logger->error( "Bad authorization response: "
+                      . $public_keys_response->message );
+                $self->logger->debug( $public_keys_response->content );
+                return PE_ERROR;
+            }
+
+            my $public_keys_content = $public_keys_response->decoded_content;
+
+            $self->logger->debug(
+                "Response from GitHub Keys API: $public_keys_content");
+
+            eval {
+                $json_hash =
+                  from_json( $public_keys_content, { allow_nonref => 1 } );
+            };
+            if ($@) {
+                $self->logger->error(
+                    "Unable to decode JSON $public_keys_content");
+                return PE_ERROR;
+            }
+
+            $req->data->{githubData}->{"public_keys"} = $json_hash;
+        }
+
+        # Fetch GPG keys
+        if ( $self->conf->{githubScope} =~ /gpg_key/ ) {
+            $self->logger->debug("Scope gpg_key requested, fetch SSH keys");
+
+            my $gpg_keys_response =
+              $self->ua->get( $self->githubGPGKeysEndpoint,
+                "Authorization" => "token $access_token" );
+
+            if ( $gpg_keys_response->is_error ) {
+                $self->logger->error( "Bad authorization response: "
+                      . $gpg_keys_response->message );
+                $self->logger->debug( $gpg_keys_response->content );
+                return PE_ERROR;
+            }
+
+            my $gpg_keys_content = $gpg_keys_response->decoded_content;
+
+            $self->logger->debug(
+                "Response from GitHub GPG Keys API: $gpg_keys_content");
+
+            eval {
+                $json_hash =
+                  from_json( $gpg_keys_content, { allow_nonref => 1 } );
+            };
+            if ($@) {
+                $self->logger->error("Unable to decode JSON $gpg_keys_content");
+                return PE_ERROR;
+            }
+
+            $req->data->{githubData}->{"gpg_keys"} = $json_hash;
+        }
 
         # Extract state
         if ($state) {
@@ -162,6 +241,11 @@ sub extractFormInfo {
 
             $stateSession->remove;
         }
+
+        $req->user(
+            $req->data->{githubData}->{ $self->conf->{githubUserField} } );
+
+        $self->logger->debug( "Good GitHub authentication for " . $req->user );
 
         return PE_OK;
     }

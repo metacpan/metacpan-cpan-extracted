@@ -25,6 +25,7 @@ use Math::Random::Secure qw(irand);
 use Getopt::Long;
 use Pod::Usage;
 use Log::Any qw($log);
+use Log::Any::Adapter qw(Stdout), log_level => 'info';
 use Test::More;
 
 my %config;
@@ -68,13 +69,19 @@ for my $idx (1..4) {
         # announcement, the payload represents the job ID, and we get
         # the actual details from the job hash.
         $loop->add(
-            my $client = Net::Async::Redis->new
+            my $client = Net::Async::Redis->new(
+                client_name => 'client:' . $client_id,
+            )
         );
         $loop->add(
-            my $subscriber = Net::Async::Redis->new
+            my $subscriber = Net::Async::Redis->new(
+                client_name => 'subscriber:' . $client_id,
+            )
         );
         $loop->add(
-            my $submitter = Net::Async::Redis->new
+            my $submitter = Net::Async::Redis->new(
+                client_name => 'submitter:' . $client_id,
+            )
         );
         my $processed = 0;
         my $start = Time::HiRes::time;
@@ -155,10 +162,14 @@ $log->infof('Total of %d child workers', 0 + @child);
 my $loop = IO::Async::Loop->new;
 
 $loop->add(
-    my $redis = Net::Async::Redis->new
+    my $redis = Net::Async::Redis->new(
+        client_name => 'server',
+    )
 );
 $loop->add(
-    my $handler = Net::Async::Redis->new
+    my $handler = Net::Async::Redis->new(
+        client_name => 'handler',
+    )
 );
 $redis->configure(map { defined $config{$_} ? ($_ => $config{$_}) : () } keys %config);
 

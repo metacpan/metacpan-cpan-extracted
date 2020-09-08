@@ -98,7 +98,8 @@ my $notifs = q%[{
 
 my $content = '{"uid":"dwho"}';
 
-my $client = LLNG::Manager::Test->new( {
+my $client = LLNG::Manager::Test->new(
+    {
         ini => {
             logLevel           => 'error',
             useSafeJail        => 1,
@@ -363,16 +364,17 @@ expectForm( $res, undef, '/notifback', 'reference1x1', 'reference1x2' );
 
 ok(
     $res->[2]->[0] =~
-      m%<input type="hidden" name="reference1x1" value="testref">%,
-    'Checkbox is displayed'
-) or print STDERR Dumper( $res->[2]->[0] );
-ok(
-    $res->[2]->[0] =~ m%<input type="hidden" name="reference1x2" value="ABC1">%,
+      m%<input type="hidden" name="reference1x1" value="testref"/>%,
     'Checkbox is displayed'
 ) or print STDERR Dumper( $res->[2]->[0] );
 ok(
     $res->[2]->[0] =~
-m%<input type="checkbox" name="check1x2x1" id="1x2x1" value="accepted">I agree</label>%,
+      m%<input type="hidden" name="reference1x2" value="ABC1"/>%,
+    'Checkbox is displayed'
+) or print STDERR Dumper( $res->[2]->[0] );
+ok(
+    $res->[2]->[0] =~
+      m%<input type="checkbox" name="check1x2x1" id="1x2x1" value="accepted"/>%,
     'Checkbox is displayed'
 ) or print STDERR Dumper( $res->[2]->[0] );
 my @c = ( $res->[2]->[0] =~ m%<input type="checkbox"%gs );
@@ -416,12 +418,14 @@ expectForm( $res, undef, '/notifback', 'reference1x1' );
 
 ok(
     $res->[2]->[0] =~
-m%<input type="checkbox" name="check1x1x1" id="1x1x1" value="accepted">I agree</label>%,
+      m%<input type="checkbox" name="check1x1x1" id="1x1x1" value="accepted"/>%
+      and m%<label class="form-check-label" for="1x1x1">I agree</label>%,
     'Checkbox is displayed'
 ) or print STDERR Dumper( $res->[2]->[0] );
 ok(
     $res->[2]->[0] =~
-m%<input type="checkbox" name="check1x1x2" id="1x1x2" value="accepted">I am sure</label>%,
+      m%<input type="checkbox" name="check1x1x2" id="1x1x2" value="accepted"/>%
+      and m%<label class="form-check-label" for="1x1x2">I am sure</label>%,
     'Checkbox is displayed'
 ) or print STDERR Dumper( $res->[2]->[0] );
 @c = ( $res->[2]->[0] =~ m%<input type="checkbox"%gs );

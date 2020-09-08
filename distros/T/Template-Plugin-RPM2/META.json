@@ -1,0 +1,51 @@
+{
+   "abstract" : "Template Toolkit plugin for RPM2",
+   "author" : [
+      "Dave Cross <dave@mag-sol.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Template-Plugin-RPM2",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "RPM2" : "0",
+            "Template" : "2",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "RPM2" : "0",
+            "Template" : "2",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Template::Plugin::RPM2" : {
+         "file" : "lib/Template/Plugin/RPM2.pm",
+         "version" : "v1.3.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.3.0",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

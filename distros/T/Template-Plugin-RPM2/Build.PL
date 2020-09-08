@@ -7,6 +7,11 @@ my $builder = Module::Build->new(
     license             => 'perl',
     dist_author         => 'Dave Cross <dave@mag-sol.com>',
     dist_version_from   => 'lib/Template/Plugin/RPM2.pm',
+    build_requires => {
+        'Test::More' => 0,
+        'Template'   => 2.0,
+        'RPM2'       => 0,
+    },
     requires => {
         'Test::More' => 0,
         'Template'   => 2.0,

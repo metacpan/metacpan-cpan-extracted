@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -276,9 +276,23 @@ sub locationRulesInit {
     my ( $class, $conf, $orules ) = @_;
 
     $orules ||= $conf->{locationRules};
+    $class->tsv->{vhostReg} = [];
+    my @lastReg;
 
     foreach my $vhost ( keys %$orules ) {
         my $rules = $orules->{$vhost};
+        if ( $vhost =~ /[\%\*]/ ) {
+            my $expr = join '[^\.]*', map {
+                my $elt = $_;
+                join '.*', map { quotemeta $_ } split /\*/, $elt;
+            } split /\%/, $vhost;
+            if ($expr) {
+                push @{ $class->tsv->{vhostReg} }, [ qr/^$expr$/, $vhost ];
+            }
+            else {
+                push @lastReg, [ qr/.+/, $vhost ];
+            }
+        }
         $class->tsv->{locationCount}->{$vhost}         = 0;
         $class->tsv->{locationCondition}->{$vhost}     = [];
         $class->tsv->{locationProtection}->{$vhost}    = [];
@@ -322,6 +336,16 @@ sub locationRulesInit {
             $class->tsv->{defaultProtection}->{$vhost} = 0;
         }
     }
+    @{ $class->tsv->{vhostReg} } = sort {
+        my $av = $a->[1];
+        my $bv = $b->[1];
+        return 1  if $av =~ /^\*/ and $bv !~ /^\*/;
+        return -1 if $bv =~ /^\*/ and $av !~ /^\*/;
+        return 1  if $av =~ /^\%/ and $bv !~ /^\%/;
+        return -1 if $bv =~ /^\%/ and $av !~ /^\%/;
+        return length($bv) <=> length($av) || $av cmp $bv;
+    } @{ $class->tsv->{vhostReg} } if @{ $class->tsv->{vhostReg} };
+    push @{ $class->tsv->{vhostReg} }, @lastReg if @lastReg;
     return 1;
 }
 
@@ -529,9 +553,8 @@ sub conditionSub {
         eval 'use Apache2::Filter' unless ( $INC{"Apache2/Filter.pm"} );
         return (
             sub {
-
                 my ($req) = @_;
-                $class->localUnlog;
+                $class->localUnlog( $req, @_ );
                 $req->{env}->{'psgi.r'}->add_output_filter(
                     sub {
                         my $r = $_[0]->r;

@@ -4,9 +4,10 @@ use strict;
 use Crypt::URandom;
 use Mouse;
 use Data::Dumper;
+use JSON;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 $Data::Dumper::Useperl = 1;
 
 extends('Lemonldap::NG::Manager::Cli::Lib');
@@ -79,6 +80,43 @@ sub set {
     my $new = Clone::clone( $self->mgr->hLoadedPlugins->{conf}->currentConf );
     foreach my $key ( keys %pairs ) {
         $self->_setKey( $new, $key, $pairs{$key} );
+    }
+    return $self->_save($new);
+}
+
+sub del {
+    my ( $self, @keys ) = @_;
+    die 'del requires at least one key' unless (@keys);
+    my $oldValues = {};
+    foreach my $key (@keys) {
+        my $value = $self->_getKey($key);
+        if ( ref $value eq 'HASH' ) {
+            print STDERR "$key seems to be a hash, delete refused\n";
+            next;
+        }
+        unless ( defined $value ) {
+            print STDERR "$key does not exists, skip it\n";
+            next;
+        }
+        $oldValues->{$key} = $value;
+    }
+    return unless keys %$oldValues;
+    unless ( $self->yes ) {
+        print "Proposed changes:\n";
+        printf "%-25s | %-25s\n", 'Key', 'Old value';
+        foreach ( keys %$oldValues ) {
+            printf "%-25s | %-25s\n", $_, $oldValues->{$_};
+        }
+        print "Confirm (N/y)? ";
+        my $c = <STDIN>;
+        unless ( $c =~ /^y(?:es)?$/ ) {
+            die "Aborting";
+        }
+    }
+    require Clone;
+    my $new = Clone::clone( $self->mgr->hLoadedPlugins->{conf}->currentConf );
+    foreach ( keys %$oldValues ) {
+        delete $new->{$_};
     }
     return $self->_save($new);
 }
@@ -343,14 +381,27 @@ sub _save {
     }
     else {
         $self->logger->error("CLI: Configuration not saved!");
+        printf STDERR "Could not save configuration:";
+        printf STDERR $Lemonldap::NG::Common::Conf::msg;
         printf STDERR "Modifications rejected: %s:\n", $parser->{message}
           if $parser->{message};
-        print STDERR Dumper($parser);
     }
+
+    # Open "en" lang file to get default messages
+    my $langFile = $self->mgr->templateDir . "/languages/en.json";
+    $langFile =~ s/templates/static/;
+    my $langMessages;
+    if ( open my $json, "<", $langFile ) {
+        local $/ = undef;
+        $langMessages = JSON::from_json(<$json>);
+    }
+
+    # Display result
     foreach (qw(errors warnings status)) {
         if ( $parser->{$_} and @{ $parser->{$_} } ) {
             my $s = Dumper( $parser->{$_} );
             $s =~ s/\$VAR1\s*=\s*//;
+            $s =~ s/__(\w+)__/$langMessages->{$1}/ if ( defined $langMessages );
             printf STDERR "%-8s: %s", ucfirst($_), $s;
         }
     }
@@ -382,8 +433,11 @@ sub run {
     }
     $self->cfgNum( $self->lastCfg ) unless ( $self->cfgNum );
     my $action = shift;
-    unless ( $action =~ /^(?:get|set|addKey|delKey|save|restore|rollback)$/ ) {
-        die "Unknown action $action. Only get, set, addKey or delKey allowed";
+    unless (
+        $action =~ /^(?:get|set|del|addKey|delKey|save|restore|rollback)$/ )
+    {
+        die
+"Unknown action $action. Only get, set, del, addKey, delKey, save, restore, rollback allowed";
     }
 
     $self->$action(@_);

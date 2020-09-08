@@ -9,7 +9,7 @@ package Rex::Interface::Shell::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 sub new {
   my $class = shift;
@@ -52,7 +52,7 @@ sub set_sudo_env {
 sub detect {
   my ( $self, $con ) = @_;
 
-  my $shell_class = ref $self || $self;      # $self might be only the classname
+  my $shell_class = ref $self || $self; # $self might be only the classname
   my @parts       = split /::/, $shell_class;
   my $last_part   = lc( $parts[-1] || "" );
 

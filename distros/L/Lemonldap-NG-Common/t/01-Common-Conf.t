@@ -20,7 +20,7 @@ my $confsection = "configuration";
 ok( (
         Lemonldap::NG::Common::Conf->new( type => 'bad' ) == 0
           and $Lemonldap::NG::Common::Conf::msg =~
-          /Error: Unknown package Lemonldap::NG::Common::Conf::Backends::bad\.$/
+          /Error: failed to load Lemonldap::NG::Common::Conf::Backends::bad/
     ),
     'Bad module'
 ) or print STDERR "Msg: $Lemonldap::NG::Common::Conf::msg\n";

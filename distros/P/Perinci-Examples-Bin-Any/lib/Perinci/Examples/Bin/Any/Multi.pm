@@ -1,7 +1,7 @@
 package Perinci::Examples::Bin::Any::Multi;
 
-our $DATE = '2015-09-09'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.070'; # VERSION
 
 use 5.010;
 use strict;
@@ -91,6 +91,7 @@ sub subtract {
     $a1 - $a2;
 }
 
+1;
 # ABSTRACT: Functions to be used by peri-eg-multi-any
 
 __END__
@@ -105,18 +106,24 @@ Perinci::Examples::Bin::Any::Multi - Functions to be used by peri-eg-multi-any
 
 =head1 VERSION
 
-This document describes version 0.06 of Perinci::Examples::Bin::Any::Multi (from Perl distribution Perinci-Examples-Bin-Any), released on 2015-09-09.
+This document describes version 0.070 of Perinci::Examples::Bin::Any::Multi (from Perl distribution Perinci-Examples-Bin-Any), released on 2020-04-29.
 
 =head1 FUNCTIONS
 
 
-=head2 add(%args) -> [status, msg, result, meta]
+=head2 add
+
+Usage:
+
+ add(%args) -> [status, msg, payload, meta]
 
 A function to add to ints.
 
 Just a dummy description. Just a dummy description. Yup, just a dummy
 description. Just a dummy description. Just a dummy description. Yeah, just a
 dummy description. Just a dummy description.
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -125,6 +132,7 @@ Arguments ('*' denotes required arguments):
 =item * B<arg1>* => I<int>
 
 =item * B<arg2>* => I<int>
+
 
 =back
 
@@ -133,18 +141,25 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
-=head2 subtract(%args) -> any
+
+=head2 subtract
+
+Usage:
+
+ subtract(%args) -> any
 
 A function to subtract to ints.
 
 This function also has result_naked and args_as set to array.
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -153,6 +168,7 @@ Arguments ('*' denotes required arguments):
 =item * B<arg1>* => I<int>
 
 =item * B<arg2>* => I<int>
+
 
 =back
 
@@ -180,7 +196,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

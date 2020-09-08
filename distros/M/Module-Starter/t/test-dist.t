@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!perl
 
 use strict;
 use warnings;
@@ -211,7 +211,7 @@ sub parse_file_start {
     
     my $msw_re  = qr{use \Q$minperl;\E\n\Quse strict;\E\n\Quse warnings;\E\n};
     my $mswb_re = $self->{builder} eq 'Module::Install' ? qr{\A$msw_re\Quse inc::$self->{builder};\E\n\n} : qr{\A$msw_re\Quse $self->{builder};\E\n};
-    my $mswt_re = qr{\A\Q#!perl -T\E\n$msw_re\Quse Test::More;\E\n\n};
+    my $mswt_re = qr{\A\Q#!perl\E\n$msw_re\Quse Test::More;\E\n\n};
     
     if ($basefn eq 'README') {
         plan tests => 6;
@@ -683,7 +683,6 @@ EOF
     }
 
     done_testing();
-    return;
 }
 
 package TestParseModuleFile;
@@ -701,7 +700,7 @@ sub parse_module_start {
     my $lc_dist_name = lc($dist_name);
     my $minperl      = $self->{minperl} || 5.006;
     
-    Test::More::plan tests => 19;
+    Test::More::plan tests => 18;
 
     $self->parse(
         qr/\Apackage \Q$perl_name\E;\n\nuse $minperl;\nuse strict;\n\Quse warnings;\E\n\n/ms,
@@ -811,14 +810,6 @@ sub parse_module_start {
 
     $self->parse_paras(
         [
-            { re => q/=item \* AnnoCPAN:[^\n]*/, },
-            "L<http://annocpan.org/dist/$dist_name>",
-        ],
-        "AnnoCPAN",
-    );
-
-    $self->parse_paras(
-        [
             { re => q/=item \* CPAN Ratings[^\n]*/, },
             "L<https://cpanratings.perl.org/d/$dist_name>",
         ],
@@ -870,8 +861,6 @@ sub parse_module_start {
         qq{1; # End of $perl_name},
         "End of module",
     );
-
-    return;
 }
 
 

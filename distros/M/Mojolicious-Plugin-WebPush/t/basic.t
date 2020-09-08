@@ -4,6 +4,7 @@ use Test::More;
 use Mojolicious::Lite;
 use Test::Mojo;
 use Mojo::File qw(curfile);
+use Mojo::JSON qw(true);
 use lib curfile->sibling('lib')->to_string;
 use TestUtils qw(webpush_config $ENDPOINT %userdb);
 
@@ -42,7 +43,7 @@ subtest 'save' => sub {
     ->or(sub { diag explain $t->tx->res->body })
     ;
   $t->post_ok($ENDPOINT, json => $bob_data)
-    ->status_is(200)->json_is({ data => { success => 1 } })
+    ->status_is(200)->json_is({ data => { success => true } })
     ->or(sub { diag explain $t->tx->res->body })
     ;
   is_deeply $userdb{bob}, $bob_data;

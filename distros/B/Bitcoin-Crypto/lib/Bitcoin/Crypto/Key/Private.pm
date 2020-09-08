@@ -1,8 +1,8 @@
 package Bitcoin::Crypto::Key::Private;
 
-use Modern::Perl "2010";
+use v5.10; use warnings;
 use Moo;
-use MooX::Types::MooseLike::Base qw(Str);
+use Types::Standard qw(Str);
 use Crypt::PK::ECC;
 use Bitcoin::BIP39 qw(bip39_mnemonic_to_entropy entropy_to_bip39_mnemonic);
 use List::Util qw(first);
@@ -14,6 +14,10 @@ use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Util qw(validate_wif);
 use Bitcoin::Crypto::Helpers qw(ensure_length);
 use Bitcoin::Crypto::Exception;
+use Bitcoin::Crypto;
+
+use namespace::clean;
+our $VERSION = Bitcoin::Crypto->VERSION;
 
 with "Bitcoin::Crypto::Role::BasicKey";
 
@@ -23,10 +27,13 @@ sub to_wif
 {
 	my ($self) = @_;
 	my $bytes = $self->to_bytes();
+
 	# wif network - 1B
 	my $wifdata = $self->network->wif_byte;
+
 	# key entropy - 32B
 	$wifdata .= ensure_length $bytes, $config{key_max_length};
+
 	# additional byte for compressed key - 1B
 	$wifdata .= $config{wif_compressed_byte} if $self->compressed;
 
@@ -51,7 +58,8 @@ sub from_wif
 	}
 
 	my $wif_network_byte = substr $decoded, 0, 1;
-	my @found_networks = Bitcoin::Crypto::Network->find(sub { shift->wif_byte eq $wif_network_byte });
+	my @found_networks =
+		Bitcoin::Crypto::Network->find(sub { shift->wif_byte eq $wif_network_byte });
 	@found_networks = first { $_ eq $network } @found_networks if defined $network;
 
 	Bitcoin::Crypto::Exception::KeyCreate->raise(

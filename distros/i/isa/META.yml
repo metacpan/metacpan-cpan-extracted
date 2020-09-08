@@ -1,0 +1,42 @@
+---
+abstract: "isn't the isa operator"
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: isa
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  isa:
+    file: lib/isa.pm
+    version: '2.001'
+recommends:
+  Type::Tiny::XS: '0'
+requires:
+  Scalar::Util: '0'
+  perl: '5.006'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/isa/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=isa
+  homepage: https://metacpan.org/release/isa
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-isa.git
+version: '2.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

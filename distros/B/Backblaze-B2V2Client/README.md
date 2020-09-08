@@ -2,10 +2,6 @@
 
 Backblaze::B2V2Client - Client library for the Backblaze B2 Cloud Storage Service V2 API.
 
-# VERSION
-
-1.0 - Initial working version.
-
 # SYNOPSIS
 
         use Backblaze::B2V2Client;
@@ -79,6 +75,21 @@ Key again, so copy it immediately.
 
 Please store the Application Key pair in a secure way, preferably encrypted
 when not in use by your software.
+
+## New: b2\_client Command Line Utility
+
+Backblaze::B2V2Client now includes the 'b2\_client' command line utility to
+easily download or upload files from B2.  Please execute 'b2\_client help'
+for more details, and here are a few examples:
+
+        # download a file to current directory
+        b2_client get MyPictures FamilyPhoto.jpg
+        
+        # download a file to a target directory
+        b2_client get MyPictures FamilyPhoto.jpg /home/ginger/photos
+        
+        # upload a file to B2
+        b2_client put MyPictures /home/ginger/photos/AnotherFamilyPhoto.jpg
 
 ## BackBlaze B2 also has a S3-compatible API
 

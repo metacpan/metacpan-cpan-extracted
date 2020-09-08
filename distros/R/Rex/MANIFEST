@@ -381,6 +381,7 @@ t/commands/iptables.t
 t/commands_file_template.t
 t/config-ssh.t
 t/config.t
+t/config.yml
 t/cron.ex
 t/cron.t
 t/db.t
@@ -394,6 +395,7 @@ t/dmi.t
 t/do_task.t
 t/env.t
 t/file.t
+t/file_hooks.t
 t/fs.t
 t/fs_files.t
 t/group.t
@@ -444,11 +446,13 @@ t/needs.t
 t/net_interface_centos7.t
 t/network_linux.t
 t/no_tty.t
+t/os_dependencies.t
 t/package.t
 t/param_lookup.t
 t/param_lookup_cmdb.t
 t/param_lookup_resource.t
 t/path.t
+t/proc.t
 t/read_buffers.t
 t/report.t
 t/resource.t

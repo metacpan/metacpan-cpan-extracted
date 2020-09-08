@@ -16,8 +16,8 @@ sub test {
     $pfiles ||= "''";
     foreach my $set ( qw( RW RO ) )
     {
-	$path->$method( $set, @$dirs );
-	is_deeply( [ $path->extract( $set )  ], $exp{$set}, "$method ($set): $pfiles" )
+        $path->$method( $set, @$dirs );
+        is_deeply( [ $path->extract( $set )  ], $exp{$set}, "$method ($set): $pfiles" )
     }
 }
 

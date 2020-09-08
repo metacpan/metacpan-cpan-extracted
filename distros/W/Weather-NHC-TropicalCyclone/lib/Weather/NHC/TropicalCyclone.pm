@@ -7,8 +7,12 @@ use HTTP::Status qw/:constants/;
 use JSON::XS                             ();
 use Weather::NHC::TropicalCyclone::Storm ();
 
-our $DEFAULT_URL     = q{https://www.nhc.noaa.gov/CurrentStorms.json};
-our $DEFAULT_TIMEOUT = 10;
+our $VERSION                     = q{0.10};
+our $DEFAULT_URL                 = q{https://www.nhc.noaa.gov/CurrentStorms.json};
+our $DEFAULT_RSS_ATLANTIC        = q{https://www.nhc.noaa.gov/index-at.xml};
+our $DEFAULT_RSS_EAST_PACIFIC    = q{https://www.nhc.noaa.gov/index-ep.xml};
+our $DEFAULT_RSS_CENTRAL_PACIFIC = q{https://www.nhc.noaa.gov/index-cp.xml};
+our $DEFAULT_TIMEOUT             = 10;
 
 # container class for requesting JSON and providing
 # iterator access and meta operations for the storms
@@ -64,6 +68,41 @@ sub active_storms {
     }
 
     return \@storms;
+}
+
+sub fetch_rss_atlantic {
+    my ( $self, $local_file ) = @_;
+    return $self->_fetch_rss( $DEFAULT_RSS_ATLANTIC, $local_file );
+}
+
+sub fetch_rss_east_pacific {
+    my ( $self, $local_file ) = @_;
+    return $self->_fetch_rss( $DEFAULT_RSS_EAST_PACIFIC, $local_file );
+}
+
+sub fetch_rss_central_pacific {
+    my ( $self, $local_file ) = @_;
+    return $self->_fetch_rss( $DEFAULT_RSS_CENTRAL_PACIFIC, $local_file );
+}
+
+sub _fetch_rss {
+    my ( $self, $rss_url, $local_file ) = @_;
+
+    my $http = HTTP::Tiny->new;
+
+    my $response = $http->get($rss_url);
+
+    if ( not $response->{success} ) {
+        my $status = $response->{status} // q{Unknown};
+        die qq{Fetching of $rss_url failed. HTTP status: $status\n};
+    }
+
+    if ($local_file) {
+        open my $fh, q{>}, $local_file or die qq{Error writing RSS file, $local_file: $!\n};
+        print $fh $response->{content};
+    }
+
+    return $response->{content};
 }
 
 1;
@@ -123,6 +162,42 @@ empty (not undef).
 Most of the useful functionality related to this JSON data is available through
 the methods provided by the C<Weather::NHC::TropicalCyclone::Storm> instances
 returned by this method.
+
+=back
+
+=head2 Auxillary RSS Fetch Methods
+
+The following methods are provided to fetch the raw text of some of the RSS feeds
+available at L<https://www.nhc.noaa.gov/aboutrss.shtml>.
+
+   my $nhc         = Weather::NHC::TropicalStorm->new;
+   my $at_rss_text = $nhc->fetch_rss_atlantic; 
+   my $ep_rss_text = $nhc->fetch_rss_east_pacific; 
+   my $cp_rss_text = $nhc->fetch_rss_central_pacific;
+
+Note: This module doesn't provide facilities for converting this RSS into a Perl
+data structure. For this, use a module like L<XML::RSS>.
+
+All methods provide return the text of the RSS. If an optional parameter is passed
+to the call that specifies a local file, the contents retrieved is saved to this
+file.
+
+=over 3
+
+=item C<fetch_rss_atlantic_basin>
+
+Fetches RSS available at L<https://www.nhc.noaa.gov/index-at.xml>. Internally,
+this URL is defined with the package variable, C<$DEFAULT_RSS_ATLANTIC>.
+
+=item C<fetch_rss_east_pacific_basin>
+
+Fetches RSS available at L<https://www.nhc.noaa.gov/index-ep.xml>. Internally,
+this URL is defined with the package variable, C<$DEFAULT_RSS_EAST_PACIFIC>.
+
+=item C<fetch_rss_central_pacific_basin>
+
+Fetches RSS available at L<https://www.nhc.noaa.gov/index-cp.xml>. Internally,
+this URL is defined with the package variable, C<$DEFAULT_RSS_CENTRAL_PACIFIC>.
 
 =back
 

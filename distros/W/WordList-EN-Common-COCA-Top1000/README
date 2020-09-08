@@ -1,0 +1,82 @@
+NAME
+    WordList::EN::Common::COCA::Top1000 - 1000 most common English words,
+    from COCA
+
+VERSION
+    This document describes version 0.001 of
+    WordList::EN::Common::COCA::Top1000 (from Perl distribution
+    WordList-EN-Common-COCA-Top1000), released on 2020-05-21.
+
+SYNOPSIS
+     use WordList::EN::Common::COCA::Top1000;
+
+     my $wl = WordList::EN::Common::COCA::Top1000->new;
+
+     # Pick a (or several) random word(s) from the list
+     my $word = $wl->pick;
+     my @words = $wl->pick(3);
+
+     # Check if a word exists in the list
+     if ($wl->word_exists('foo')) { ... }
+
+     # Call a callback for each word
+     $wl->each_word(sub { my $word = shift; ... });
+
+     # Iterate
+     my $first_word = $wl->first_word;
+     while (defined(my $word = $wl->next_word)) { ... }
+
+     # Get all the words
+     my @all_words = $wl->all_words;
+
+STATISTICS
+     +----------------------------------+-------+
+     | key                              | value |
+     +----------------------------------+-------+
+     | avg_word_len                     | 5.328 |
+     | longest_word_len                 | 14    |
+     | num_words                        | 1000  |
+     | num_words_contain_nonword_chars  | 2     |
+     | num_words_contain_unicode        | 2     |
+     | num_words_contain_whitespace     | 0     |
+     | num_words_contains_nonword_chars | 2     |
+     | num_words_contains_unicode       | 2     |
+     | num_words_contains_whitespace    | 0     |
+     | shortest_word_len                | 1     |
+     +----------------------------------+-------+
+
+    The statistics is available in the %STATS package variable.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-EN-Common-COCA-Top1000>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-EN-Common-COCA-Top1000>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-EN-Common-CO
+    CA-Top1000>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Source:
+    <https://www.espressoenglish.net/1000-most-common-words-in-english/>,
+    which in turn claims to use <http://www.wordfrequency.info> (COCA).
+
+    About COCA:
+    <https://en.wikipedia.org/wiki/Corpus_of_Contemporary_American_English>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

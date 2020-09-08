@@ -1,5 +1,5 @@
 package Hyperscan::Matcher;
-$Hyperscan::Matcher::VERSION = '0.03';
+$Hyperscan::Matcher::VERSION = '0.04';
 # ABSTRACT: high level matcher class
 
 use strict;
@@ -235,7 +235,7 @@ Hyperscan::Matcher - high level matcher class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head2 CONSTRUCTORS
 

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200606132002;
+our $VERSION = 1.20200904144536;
 
 my $formatters = [
                 {
@@ -65,7 +65,7 @@ my $formatters = [
                   'format' => '$1 $2 $3',
                   'leading_digits' => '80',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{6})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{6,7})'
                 }
               ];
 
@@ -135,18 +135,13 @@ my $validators = {
             8[89]8|
             900
           )\\d{7}
-        )|(
-          (?:
-            444|
-            850\\d{3}
-          )\\d{4}
-        )',
+        )|(444\\d{4})',
                 'toll_free' => '
           800\\d{7}(?:
-            \\d{2}
+            \\d{2,3}
           )?
         ',
-                'voip' => ''
+                'voip' => '850\\d{7}'
               };
 my %areanames = ();
 $areanames{en}->{90212} = "Istanbul\ \(Europe\)";

@@ -23,9 +23,9 @@
 
       <div class="input-group mb-3">
         <div class="input-group-prepend">
-          <span class="input-group-text"><i class="fa fa-envelope"></i> </span>
+          <span class="input-group-text"><label for="mailfield" class="mb-0"><i class="fa fa-envelope"></i></label></span>
         </div>
-        <input name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control" trplaceholder="mail" required />
+        <input id="mailfield" name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control" trplaceholder="mail" required />
       </div>
 
       <TMPL_IF NAME=CAPTCHA_SRC>
@@ -34,9 +34,9 @@
         </div>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text"><i class="fa fa-eye"></i> </span>
+            <span class="input-group-text"><label for="captchafield" class="mb-0"><i class="fa fa-eye"></i></label></span>
           </div>
-          <input type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" trplaceholder="captcha" required autocomplete="off" />
+          <input id="captchafield" type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" trplaceholder="captcha" required autocomplete="off" />
         </div>
       </TMPL_IF>
       <TMPL_IF NAME="TOKEN">
@@ -85,9 +85,9 @@
         </div>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text"><i class="fa fa-eye"></i> </span>
+            <span class="input-group-text"><label for="captchafield" class="mb-0"><i class="fa fa-eye"></i></label></span>
           </div>
-          <input type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" trplaceholder="captcha" required autocomplete="off"/>
+          <input id="captchafield" type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" trplaceholder="captcha" required autocomplete="off"/>
         </div>
       </TMPL_IF>
 
@@ -131,9 +131,9 @@
 
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text"><i class="fa fa-upload"></i> </span>
+            <span class="input-group-text"><label for="certiffield" class="mb-0"><i class="fa fa-upload"></i></label></span>
           </div>
-              <input name="certif" type="file" class="form-control" accept=".pem, .crt,application/x-pem-file", trplaceholder="UploadCertificate" required />
+              <input id="certiffield" name="certif" type="file" class="form-control" accept=".pem, .crt,application/x-pem-file", trplaceholder="UploadCertificate" required />
         </div>
 
         <button type="submit" class="btn btn-success">

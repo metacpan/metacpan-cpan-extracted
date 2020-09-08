@@ -1,0 +1,14 @@
+Revision history for this software.
+
+0.03 2020-09-06 00:00:00
+  - SKIP on CPAN: 101_use_strict.t
+  - SKIP on CPAN: 104_no_multidimensional.t
+  - created by INABA Hitoshi
+
+0.02 2020-09-06 00:00:00
+  - fix 101_use_strict.t and 104_no_multidimensional.t
+  - created by INABA Hitoshi
+
+0.01 2020-09-05 00:00:00
+  - original version
+  - created by INABA Hitoshi

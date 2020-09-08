@@ -1,5 +1,5 @@
 package Hyperscan::Util;
-$Hyperscan::Util::VERSION = '0.03';
+$Hyperscan::Util::VERSION = '0.04';
 # ABSTRACT: utility functions for other Hyperscan modules
 
 use strict;
@@ -53,7 +53,7 @@ Hyperscan::Util - utility functions for other Hyperscan modules
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head2 FUNCTIONS
 

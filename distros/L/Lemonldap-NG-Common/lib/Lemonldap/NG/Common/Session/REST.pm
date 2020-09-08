@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 has sessionTypes => ( is => 'rw' );
 
@@ -219,16 +219,11 @@ sub _session {
     my $apacheSession = $self->getApacheSession( $mod, $id )
       or return $self->sendError( $req, undef, 400 );
 
-    my %session   = %{ $apacheSession->data };
+    my %session = %{ $apacheSession->data };
     unless ($raw) {
-        my $separator = $self->separator();
         foreach my $k ( keys %session ) {
             $session{$k} = '**********'
               if ( $self->hAttr =~ /\b$k\b/ );
-            if ( $session{$k} =~ /$separator/ ) {
-                $self->logger->debug("Convert \"$k\" value to array");
-                $session{$k} = [ split /$separator/, $session{$k} ];
-            }
         }
     }
 

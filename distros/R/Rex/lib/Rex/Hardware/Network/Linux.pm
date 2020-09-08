@@ -9,7 +9,7 @@ package Rex::Hardware::Network::Linux;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;
@@ -414,7 +414,7 @@ sub _convert_cidr_prefix {
   my ($cidr_prefix) = @_;
 
   # convert CIDR prefix to dotted decimal notation
-  my $binary_mask         = '1' x $cidr_prefix . '0' x ( 32 - $cidr_prefix );
+  my $binary_mask = '1' x $cidr_prefix . '0' x ( 32 - $cidr_prefix );
   my $dotted_decimal_mask = join '.', unpack 'C4', pack 'B32', $binary_mask;
 
   return $dotted_decimal_mask;

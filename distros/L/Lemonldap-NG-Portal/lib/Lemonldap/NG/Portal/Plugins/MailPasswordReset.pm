@@ -32,7 +32,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_USERNOTFOUND
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
   'Lemonldap::NG::Portal::Lib::SMTP', 'Lemonldap::NG::Portal::Lib::_tokenRule';
@@ -130,7 +130,6 @@ sub _reset {
 
         # Restore pdata if any
         $req->pdata( $mailSession->data->{_pdata} || {} );
-        $mailSession->remove;
         $searchByMail = 0 unless ( $req->{user} =~ /\@/ );
     }
 
@@ -195,7 +194,7 @@ sub _reset {
     );
     if ( my $error = $self->p->process( $req, useMail => $searchByMail ) ) {
         if ( $error == PE_USERNOTFOUND or $error == PE_BADCREDENTIALS ) {
-            $self->userLogger->warn( 'Reset asked for an unvalid user ('
+            $self->userLogger->warn( 'Reset asked for an invalid user ('
                   . $req->param('mail')
                   . ')' );
 
@@ -353,6 +352,8 @@ sub _reset {
         $body =~ s/\$url/$url/g;
         $body =~ s/\$(\w+)/$req->{sessionInfo}->{$1} || ''/ge;
 
+        $self->logger->info("User ".$req->data->{mailAddress}." is trying to reset his/her password");
+
         # Send mail
         unless (
             $self->send_mail(
@@ -407,6 +408,23 @@ sub changePwd {
         $self->userLogger->error(
             'User tries to use another token to change a password');
         return PE_NOTOKEN;
+    }
+
+    # Remove the mail token session if mail token is provided
+    my $mailToken = $req->param('mail_token');
+    if ($mailToken) {
+        $self->logger->debug("Token given for password reset: $mailToken");
+
+        # Check if token is valid
+        my $mailSession =
+          $self->p->getApacheSession( $mailToken, kind => "TOKEN" );
+        unless ($mailSession) {
+            $self->userLogger->warn('Bad reset token');
+            return PE_BADMAILTOKEN;
+        }
+
+        $self->logger->debug("Delete token $mailToken");
+        $mailSession->remove;
     }
 
     # Check if user wants to generate the new password
@@ -529,7 +547,7 @@ sub display {
     $speChars =~ s/\s+/ /g;
     $speChars =~ s/(?:^\s|\s$)//g;
     $self->logger->debug( 'Display called with code: ' . $req->error );
-    
+
     my %tplPrm = (
         SKIN_PATH       => $self->conf->{staticPrefix},
         SKIN            => $self->p->getSkin($req),

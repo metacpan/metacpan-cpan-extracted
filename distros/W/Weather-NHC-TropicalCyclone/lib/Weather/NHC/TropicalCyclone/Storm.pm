@@ -57,7 +57,7 @@ sub new {
 }
 
 # get storm classification "real classification"
-sub classification_full {
+sub kind {
     my $self = shift;
     die qq{'classification' field not set\n} if not $self->classification;
     die qq{Unknown storm classification\n}   if not $CLASSIFICATIONS->{ $self->classification };
@@ -299,7 +299,7 @@ sub fetch_best_track {
     my ( $self, $local_file ) = @_;
 
     my $btk_file = sprintf( "b%s.dat", $self->id );
-    my $url = sprintf( "%s/%s.dat", $DEFAULT_BTK_ROOT, $btk_file );
+    my $url = sprintf( "%s/%s", $DEFAULT_BTK_ROOT, $btk_file );
 
     $local_file //= $btk_file;
 
@@ -322,7 +322,8 @@ __END__
 
 =head1 NAME
 
-Weather::NHC::TropicalCyclone::Storm - Provides a convenient interface to NHC's Tropical Cyclone JSON format.
+Weather::NHC::TropicalCyclone::Storm - Provides a convenient interface to individual storm sections
+delivered inside of the NHC Tropical Cyclone JSON file. 
 
 =head1 SYNOPSIS
 
@@ -423,7 +424,7 @@ Internal method used by all of the fetch methods that downloads files.
 
 =back
 
-=head2 Links Extracted from C<.shtml>
+=head2 Auxillary Methods
 
 =over 3
 
@@ -438,12 +439,6 @@ the graphics is not provided at this time. But give the list of URLs, it's trivi
 to write a loop to download any number of these images using C<HTTP::Tiny>'s
 C<mirror> method. See C<perldoc HTTP::Tiny> for more information.
 
-=back
-
-=head2 Auxillary Fetch Methods
-
-=over 3
-
 =item C<fetch_best_track>
 
 Accepts an optional parameter that defines the local file to save this file as.
@@ -454,6 +449,24 @@ composing the filename using the C<id> accessor. This method combines this with 
 over HTTPS (using C<HTTP::Tiny>'s C<mirror> method). 
 
 This method returns just the local file name.
+
+=item C<kind>
+
+Returns a C<Human meaningful> name for the kind of storm is represented by the
+reference. Based on the specification, the following kinds are returned based
+on the C<classification> value:
+
+   NHC |     Meaningful Kind
+   --- | -------------------------------------
+   TD  | Tropical Depression
+   STD | Subtropical Depression
+   TS  | Tropical Storm
+   HU  | Hurricane
+   STS | Subtropical Storm
+   PTC | Post-tropical Cyclone / Remnants
+   TY  | Typhoon (we don't use this currently)
+   PC  | Potential Tropical Cyclone
+
 
 =back
 

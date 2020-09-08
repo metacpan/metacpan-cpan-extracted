@@ -5,7 +5,7 @@ use Lemonldap::NG::Common::Conf::Constants;    #inherits
 use JSON;
 use Encode;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.9';
 our $initDone;
 
 sub Lemonldap::NG::Common::Conf::_lock {
@@ -40,7 +40,7 @@ sub available {
     closedir D;
     @conf =
       sort { $a <=> $b }
-      map  { /lmConf-(\d+)(?:\.js(?:on))?/ ? ( $1 + 0 ) : () } @conf;
+      map { /^lmConf-(\d+)(?:\.js(?:on))?$/ ? ( $1 + 0 ) : () } @conf;
     return @conf;
 }
 
@@ -87,7 +87,18 @@ sub store {
         return UNKNOWN_ERROR;
     }
     binmode(FILE);
-    my $f = to_json( $fields, { allow_nonref => 1 } );
+    my $json_options = {
+        allow_nonref => 1,
+        (
+            $self->{prettyPrint}
+            ? (
+                pretty    => 1,
+                canonical => 1
+              )
+            : ()
+        )
+    };
+    my $f = to_json( $fields, $json_options );
     print FILE $f;
     close FILE;
     umask($mask);

@@ -37,6 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::DataPoint;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 

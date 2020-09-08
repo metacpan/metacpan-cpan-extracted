@@ -61,7 +61,7 @@ ok(
 );
 ok(
     $res->[2]->[0] =~
-m%<div class="message message-warning alert"><span trmsg="1">%,
+      m%<div class="message message-warning alert"><span trmsg="1">%,
     'Found PE_SESSIONEXPIRED code'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(2);

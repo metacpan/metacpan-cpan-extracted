@@ -1,12 +1,12 @@
 package RxPerl::Subject;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use base 'RxPerl::Observable';
 
 use RxPerl::Utils 'get_subscription_from_subscriber';
 
-our $VERSION = "v0.16.0";
+our $VERSION = "v0.18.1";
 
 sub new {
     my ($class) = @_;

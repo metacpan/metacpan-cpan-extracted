@@ -5,7 +5,7 @@ use strict;
 use Exporter 'import';
 use base qw(Exporter);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 our %EXPORT_TAGS = ( 'all' => [qw($simpleHashKeys $doubleHashKeys $specialNodeKeys $casAppMetaDataNodeKeys $casSrvMetaDataNodeKeys $oidcOPMetaDataNodeKeys $oidcRPMetaDataNodeKeys $samlIDPMetaDataNodeKeys $samlSPMetaDataNodeKeys $virtualHostKeys $specialNodeHash $authParameters $issuerParameters $samlServiceParameters $oidcServiceParameters $casServiceParameters)] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
@@ -24,12 +24,12 @@ our $specialNodeHash = {
 our $doubleHashKeys = 'issuerDBGetParameters';
 our $simpleHashKeys = '(?:(?:l(?:o(?:calSessionStorageOption|goutService)|dapExportedVar|wp(?:Ssl)?Opt)|c(?:as(?:StorageOption|Attribute)|ustom(?:Plugins|Add)Param|ombModule)|re(?:moteGlobalStorageOption|st2f(?:Verify|Init)Arg|loadUrl)|(?:(?:d(?:emo|bi)|facebook|webID)E|e)xportedVar|g(?:r(?:antSessionRule|oup)|lobalStorageOption)|n(?:otificationStorageOption|ginxCustomHandler)|p(?:ersistentStorageOption|ortalSkinRule)|macro)s|o(?:idcS(?:ervice(?:DynamicRegistrationEx(?:portedVar|traClaim)s|MetaDataAuthnContext)|torageOptions)|penIdExportedVars)|s(?:(?:amlStorageOption|laveExportedVar)s|essionDataToRemember|fExtra)|a(?:ut(?:hChoiceMod|oSigninR)ules|pplicationList)|S(?:MTPTLSOpts|SLVarIf))';
 our $specialNodeKeys = '(?:(?:(?:saml(?:ID|S)|oidc[OR])P|cas(?:App|Srv))MetaDataNode|virtualHost)s';
-our $casAppMetaDataNodeKeys = 'casAppMetaData(?:Options(?:UserAttribut|Servic|Rul)e|(?:ExportedVar|Macro)s)';
+our $casAppMetaDataNodeKeys = 'casAppMetaData(?:Options(?:(?:UserAttribut|Servic|Rul)e|AuthnLevel)|(?:ExportedVar|Macro)s)';
 our $casSrvMetaDataNodeKeys = 'casSrvMetaData(?:Options(?:ProxiedServices|DisplayName|SortNumber|Gateway|Renew|Icon|Url)|ExportedVars)';
 our $oidcOPMetaDataNodeKeys = 'oidcOPMetaData(?:Options(?:C(?:lient(?:Secret|ID)|heckJWTSignature|onfigurationURI)|S(?:toreIDToken|ortNumber|cope)|TokenEndpointAuthMethod|(?:JWKSTimeou|Promp)t|I(?:DTokenMaxAge|con)|U(?:iLocales|seNonce)|Display(?:Name)?|AcrValues|MaxAge)|ExportedVars|J(?:SON|WKS))';
-our $oidcRPMetaDataNodeKeys = 'oidcRPMetaData(?:Options(?:A(?:(?:uthorizationCode|ccessToken)Expiration|llow(?:PasswordGrant|Offline)|dditionalAudiences)|I(?:DToken(?:ForceClaims|Expiration|SignAlg)|con)|R(?:e(?:directUris|freshToken|quirePKCE)|ule)|Logout(?:SessionRequired|Type|Url)|P(?:ostLogoutRedirectUris|ublic)|OfflineSessionExpiration|Client(?:Secret|ID)|BypassConsent|DisplayName|ExtraClaims|UserIDAttr)|(?:ExportedVar|Macro)s)';
+our $oidcRPMetaDataNodeKeys = 'oidcRPMetaData(?:Options(?:A(?:uth(?:orizationCodeExpiration|nLevel)|llow(?:PasswordGrant|Offline)|ccessTokenExpiration|dditionalAudiences)|I(?:DToken(?:ForceClaims|Expiration|SignAlg)|con)|R(?:e(?:directUris|freshToken|quirePKCE)|ule)|Logout(?:SessionRequired|Type|Url)|P(?:ostLogoutRedirectUris|ublic)|OfflineSessionExpiration|Client(?:Secret|ID)|BypassConsent|DisplayName|ExtraClaims|UserIDAttr)|(?:ExportedVar|Macro)s)';
 our $samlIDPMetaDataNodeKeys = 'samlIDPMetaData(?:Options(?:(?:Check(?:S[LS]OMessageSignatur|Audienc|Tim)|EncryptionMod|UserAttribut|DisplayNam)e|S(?:ignS[LS]OMessage|toreSAMLToken|[LS]OBinding|ortNumber)|A(?:llow(?:LoginFromIDP|ProxiedAuthn)|daptSessionUtime)|Re(?:questedAuthnContext|solutionRule|layStateURL)|Force(?:Authn|UTF8)|I(?:sPassive|con)|NameIDFormat)|ExportedAttributes|XML)';
-our $samlSPMetaDataNodeKeys = 'samlSPMetaData(?:Options(?:N(?:ameID(?:SessionKey|Format)|otOnOrAfterTimeout)|S(?:essionNotOnOrAfterTimeout|ignS[LS]OMessage)|(?:CheckS[LS]OMessageSignatur|OneTimeUs|Rul)e|En(?:ableIDPInitiatedURL|cryptionMode)|ForceUTF8)|(?:ExportedAttribute|Macro)s|XML)';
+our $samlSPMetaDataNodeKeys = 'samlSPMetaData(?:Options(?:N(?:ameID(?:SessionKey|Format)|otOnOrAfterTimeout)|S(?:essionNotOnOrAfterTimeout|ignS[LS]OMessage)|(?:CheckS[LS]OMessageSignatur|OneTimeUs|Rul)e|En(?:ableIDPInitiatedURL|cryptionMode)|AuthnLevel|ForceUTF8)|(?:ExportedAttribute|Macro)s|XML)';
 our $virtualHostKeys = '(?:vhost(?:A(?:uthnLevel|liases)|(?:Maintenanc|Typ)e|ServiceTokenTTL|Https|Port)|(?:exportedHeader|locationRule)s|post)';
 
 our $authParameters = {
@@ -45,7 +45,7 @@ our $authParameters = {
   githubParams => [qw(githubAuthnLevel githubClientID githubClientSecret githubUserField githubScope)],
   gpgParams => [qw(gpgAuthnLevel gpgDb)],
   kerberosParams => [qw(krbAuthnLevel krbKeytab krbByJs krbRemoveDomain)],
-  ldapParams => [qw(ldapAuthnLevel ldapExportedVars ldapServer ldapPort ldapBase managerDn managerPassword ldapTimeout ldapVersion ldapRaw LDAPFilter AuthLDAPFilter mailLDAPFilter ldapSearchDeref ldapGroupBase ldapGroupObjectClass ldapGroupAttributeName ldapGroupAttributeNameUser ldapGroupAttributeNameSearch ldapGroupDecodeSearchedValue ldapGroupRecursive ldapGroupAttributeNameGroup ldapPpolicyControl ldapSetPassword ldapChangePasswordAsUser ldapPwdEnc ldapUsePasswordResetAttribute ldapPasswordResetAttribute ldapPasswordResetAttributeValue ldapAllowResetExpiredPassword ldapITDS)],
+  ldapParams => [qw(ldapAuthnLevel ldapExportedVars ldapServer ldapPort ldapVerify ldapBase managerDn managerPassword ldapTimeout ldapVersion ldapRaw ldapCAFile ldapCAPath LDAPFilter AuthLDAPFilter mailLDAPFilter ldapSearchDeref ldapGroupBase ldapGroupObjectClass ldapGroupAttributeName ldapGroupAttributeNameUser ldapGroupAttributeNameSearch ldapGroupDecodeSearchedValue ldapGroupRecursive ldapGroupAttributeNameGroup ldapPpolicyControl ldapSetPassword ldapChangePasswordAsUser ldapPwdEnc ldapUsePasswordResetAttribute ldapPasswordResetAttribute ldapPasswordResetAttributeValue ldapAllowResetExpiredPassword ldapITDS)],
   linkedinParams => [qw(linkedInAuthnLevel linkedInClientID linkedInClientSecret linkedInFields linkedInUserField linkedInScope)],
   nullParams => [qw(nullAuthnLevel)],
   oidcParams => [qw(oidcAuthnLevel oidcRPCallbackGetParam oidcRPStateTimeout)],

@@ -92,7 +92,10 @@ sub ldap {
     my $ldap = Net::LDAP->new(
         \@servers,
         onerror => undef,
-        ( $self->{ldapPort} ? ( port => $self->{ldapPort} ) : () ),
+        verify  => ( $self->{ldapVerify} || "require" ),
+        ( $self->{ldapCAFile} ? ( cafile => $self->{ldapCAFile} ) : () ),
+        ( $self->{ldapCAPath} ? ( capath => $self->{ldapCAPath} ) : () ),
+        ( $self->{ldapPort}   ? ( port   => $self->{ldapPort} )   : () ),
         raw => => qr/(?i:^jpegPhoto|;binary)/
     );
 
@@ -100,12 +103,27 @@ sub ldap {
         $Lemonldap::NG::Common::Conf::msg .= "$@\n";
         return;
     }
+    elsif ( $Net::LDAP::VERSION < '0.64' ) {
+
+        # CentOS7 has a bug in which IO::Socket::SSL will return a broken
+        # socket when certificate validation fails. Net::LDAP does not catch
+        # it, and the process ends up crashing.
+        # As a precaution, make sure the underlying socket is doing fine:
+        if (    $ldap->socket->isa('IO::Socket::SSL')
+            and $ldap->socket->errstr < 0 )
+        {
+            $Lemonldap::NG::Common::Conf::msg .=
+              "SSL connection error: " . $ldap->socket->errstr;
+            return;
+        }
+    }
 
     # Start TLS if needed
     if ($useTls) {
         my %h = split( /[&=]/, $tlsParam );
-        $h{cafile} = $self->{caFile} if ( $self->{caFile} );
-        $h{capath} = $self->{caPath} if ( $self->{caPath} );
+        $h{verify} ||= $self->{ldapVerify} || "require";
+        $h{cafile} ||= $self->{ldapCAFile} if ( $self->{ldapCAFile} );
+        $h{capath} ||= $self->{ldapCAPath} if ( $self->{ldapCAPath} );
         my $start_tls = $ldap->start_tls(%h);
         if ( $start_tls->code ) {
             $self->logError($start_tls);

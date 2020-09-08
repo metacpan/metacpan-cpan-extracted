@@ -253,7 +253,8 @@ ok( $res->[2]->[0] =~ m%<td scope="row">dwho</td>%, 'Found dwho' )
   or explain( $res->[2]->[0], 'Macro Value dwho' );
 ok( $res->[2]->[0] =~ m%<td scope="row">array</td>%, 'Found empty macro' )
   or explain( $res->[2]->[0], 'Macro: empty' );
-ok( $res->[2]->[0] =~ m%<td scope="row">real_array</td>%, 'Found empty real_macro' )
+ok( $res->[2]->[0] =~ m%<td scope="row">real_array</td>%,
+    'Found empty real_macro' )
   or explain( $res->[2]->[0], 'Macro: empty real' );
 count(9);
 
@@ -539,7 +540,7 @@ m%<div class="alert alert-warning alert"><div class="text-center"><span trspan="
 ) or explain( $res->[2]->[0], 'PE5 - Unknown identity' );
 count(2);
 
-# Request an unvalid identity
+# Request an invalid identity
 $query =~ s/user=dwho/user=%*'/;
 ok(
     $res = $client->_post(
@@ -555,7 +556,7 @@ ok(
     $res->[2]->[0] =~
 m%<div class="alert alert-warning alert"><div class="text-center"><span trspan="PE5"></span></div></div>%,
     ' PE5 found'
-) or explain( $res->[2]->[0], 'PE5 - Unvalid identity' );
+) or explain( $res->[2]->[0], 'PE5 - invalid identity' );
 count(2);
 
 $client->logout($id);

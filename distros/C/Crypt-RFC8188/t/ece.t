@@ -42,7 +42,11 @@ subtest 'derive_key' => sub {
   for my $case (@DK_CASES) {
     my ($in, $out) = @$case;
     my @args = ($in->[0], map decode_base64url($_), @$in[1..5]);
-    my ($got_key, $got_nonce) = derive_key(@args);
+    my ($got_key, $got_nonce) = eval { derive_key(@args) };
+    if (!is $@, '') {
+      diag explain \@args;
+      next;
+    }
     is $got_key, decode_base64url($out->[0]), 'right key';
     is $got_nonce, decode_base64url($out->[1]), 'right nonce';
   }
@@ -216,7 +220,7 @@ subtest 'test encryption/decryption' => sub {
     my %mode2dh;
     $mode2dh{$_} = maybe_decode_base64url $case->{params}{$_}{dh}
       for qw(encrypt decrypt);
-    my $got_encrypted = ece_encrypt_aes128gcm(
+    my $got_encrypted = eval { ece_encrypt_aes128gcm(
       $input,
       decode_base64url($case->{params}{encrypt}{salt}),
       $mode2keys{encrypt}{key},
@@ -225,18 +229,20 @@ subtest 'test encryption/decryption' => sub {
       $mode2auth_secret{encrypt},
       $case->{keyid},
       $case->{params}{encrypt}{rs} || 4096,
-    );
+    ) };
+    is $@, '';
     is $got_encrypted, $encrypted, "$case->{test} encrypted right" or eval {
       require Text::Diff;
       diag Text::Diff::diff(\join('', map "$_\n", split //, $encrypted), \join('', map "$_\n", split //, $got_encrypted));
     };
-    my $got_input = ece_decrypt_aes128gcm(
+    my $got_input = eval { ece_decrypt_aes128gcm(
       $encrypted,
       $mode2keys{decrypt}{key},
       $mode2keys{decrypt}{private_key},
       $mode2dh{decrypt},
       $mode2auth_secret{decrypt},
-    );
+    ) };
+    is $@, '';
     is $got_input, $input, "$case->{test} decrypted right" or eval {
       require Text::Diff;
       diag Text::Diff::diff(\join('', map "$_\n", split //, $input), \join('', map "$_\n", split //, $got_input));

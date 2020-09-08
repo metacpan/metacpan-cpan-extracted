@@ -1,0 +1,25 @@
+Revision history for Role-RunAlone
+
+Version     Timestamp
+v0.1.0      2020-09-06 23:19:00 PDT
+            Promoted v0.0.0_04.
+
+v0.0.0_04   2020-09-06 23:09:00 PDT
+            Minor tweak to README.
+            Added note to the description that locking the DATA section only
+            works on a single machine.
+            Removed Moo as a runtime dependency, retained for tests.
+            Merged to master and tagged as RC_v0.1.0
+
+v0.0.0_03   2020-09-05 23:09:00 PDT
+            Fixed spelling errors and fine tuned xt/spelling.t
+            Improved SYNOPSIS section.
+
+v0.0.0_02   2020-09-05 14:42:00 PDT
+            Changes to tests for earlier versions of Perl.
+            Modified POD to better apply to new name.
+
+v0.0.0_01   2020-09-04 21:22:00 PDT
+            Brought in MooX::Role::RunAlone v0.0.0_04 as starting point
+            Extended tests with Local::TrapExit.
+

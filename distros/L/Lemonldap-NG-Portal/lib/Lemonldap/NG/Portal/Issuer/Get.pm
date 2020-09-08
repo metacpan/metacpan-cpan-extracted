@@ -7,7 +7,7 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants
   qw(PE_OK PE_BADURL PE_GET_SERVICE_NOT_ALLOWED);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer';
 
@@ -25,7 +25,7 @@ sub init {
       $hd->buildSub( $hd->substitute( $self->conf->{issuerDBGetRule} ) );
     unless ($rule) {
         my $error = $hd->tsv->{jail}->error || '???';
-        $self->error( "Bad GET activation rule -> $error" );
+        $self->error("Bad GET activation rule -> $error");
         return 0;
     }
     $self->{rule} = $rule;
@@ -97,6 +97,9 @@ sub computeGetParams {
             $value =~ s/[\r\n\t]//;
             $getPrms{$param} = $value;
         }
+        $self->userLogger->notice( 'User '
+              . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+              . " is authorized to access to $vhost" );
     }
     else {
         $self->logger->warn("IssuerGet: no configuration");

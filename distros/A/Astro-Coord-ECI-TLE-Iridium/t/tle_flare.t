@@ -93,15 +93,15 @@ is format_flare( $flare[0] ), <<'EOD', 'Flare 1';
 1980/10/13 05:43:26  29.9  48.1   412.9 -0.4 1 am
 EOD
 
-magnitude $tle, $sta, $flare[0]{time},
-    -0.4, 'Compute magnitude at time of flare 1';
+magnitude( $tle, $sta, $flare[0]{time},
+    -0.4, 'Compute magnitude at time of flare 1' );
 
 is format_flare( $flare[1] ), <<'EOD', 'Flare 2';
 1980/10/13 14:58:33  42.8 204.9   393.0 -3.0 1 day
 EOD
 
-magnitude $tle, $sta, $flare[1]{time},
-    -3.0, 'Compute magnitude at time of flare 2';
+magnitude( $tle, $sta, $flare[1]{time},
+    -3.0, 'Compute magnitude at time of flare 2' );
 
 note 'Flares over location specified by station attribute';
 
@@ -125,15 +125,15 @@ is format_flare( $flare[0] ), <<'EOD', 'Flare 1';
 1980/10/13 05:43:26  29.9  48.1   412.9 -0.4 1 am
 EOD
 
-magnitude $tle, $flare[0]{time},
-    -0.4, 'Compute magnitude at time of flare 1';
+magnitude( $tle, $flare[0]{time},
+    -0.4, 'Compute magnitude at time of flare 1' );
 
 is format_flare( $flare[1] ), <<'EOD', 'Flare 2';
 1980/10/13 14:58:33  42.8 204.9   393.0 -3.0 1 day
 EOD
 
-magnitude $tle, $flare[1]{time},
-    -3.0, 'Compute magnitude at time of flare 2';
+magnitude( $tle, $flare[1]{time},
+    -3.0, 'Compute magnitude at time of flare 2' );
 
 done_testing;
 

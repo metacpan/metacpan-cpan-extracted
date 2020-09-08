@@ -20,10 +20,6 @@ eod
 }
 
 foreach ( all_modules() ) {
-    {
-	'PPIx::Regexp::StringTokenizer'	=> 1,
-    }->{$_}
-	and next;
     pod_coverage_ok ( $_, {
 	    also_private => [ qr{^[[:upper:]\d_]+$}, ],
 	    coverage_class => 'Pod::Coverage::CountParents'

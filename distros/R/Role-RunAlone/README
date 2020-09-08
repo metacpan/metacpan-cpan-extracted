@@ -1,0 +1,56 @@
+Role-RunAlone
+
+This Role provides a simple way for a command line script to ensure that
+only a single instance of said script is able to run at one time. This is
+accomplished by trying to obtain an exlusive lock on the sctript's __DATA__
+or __END__ section.
+
+The Role will call C<exit(2)> if neither of those tags are present.
+This behavior can not be disabled and occurs when the Role is composed.
+
+If one of the aforementioned tags are present, a failure to obtain an
+exclusive lock indicates that another instance of the composing script
+is already executing and the Role will call C<exit(1)>. This behavior
+can be modified if desired by means of an environment variable.
+
+Please see the main documentation for a full description.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Role::RunAlone
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Role-RunAlone
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Role-RunAlone
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Role-RunAlone
+
+    Search CPAN
+        https://metacpan.org/release/Role-RunAlone
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2020 by Jim Bacon.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

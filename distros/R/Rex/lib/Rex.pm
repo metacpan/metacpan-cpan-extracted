@@ -51,7 +51,7 @@ package Rex;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 # development version if this variable is not set
 if ( !$Rex::VERSION ) {
@@ -443,7 +443,7 @@ sub connect {
   my ($param) = {@_};
 
   my $server      = $param->{server};
-  my $port        = $param->{port} || 22;
+  my $port        = $param->{port}    || 22;
   my $timeout     = $param->{timeout} || 5;
   my $user        = $param->{"user"};
   my $pass        = $param->{"password"};

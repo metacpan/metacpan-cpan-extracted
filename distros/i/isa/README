@@ -1,0 +1,65 @@
+NAME
+    isa - isn't the isa operator
+
+SYNOPSIS
+      use isa 'HTTP::Tiny';
+  
+      my $obj = MyApp->get_user_agent;
+  
+      if ( isa_HTTP_Tiny $obj ) {
+        my $response = $obj->get( 'https://www.example.com/' );
+        MyApp->do_something( $response );
+      }
+
+DESCRIPTION
+    The new `isa` operator in Perl 5.32 is pretty great, but if you need to
+    support legacy versions of Perl, you can't use it yet. This module gives
+    you isa-like functions you can use in Perl 5.6 and above.
+
+    If you've got Type::Tiny::XS installed, you will probably find that this
+    module is *faster* than the native `isa` operator!
+
+    The functions exported respect inheritance and allow classes to override
+    their `isa` method as you'd expect.
+
+IMPORT
+    You need to list the classes you'll be using on the `use` line.
+
+      use isa 'HTTP::Tiny', 'MyApp::Person';
+
+    This module will replace the "::" bits with underscores, and prefix "isa_"
+    to each name to create functions like `isa_HTTP_Tiny` and
+    `isa_MyApp_Person`.
+
+  Alternative Style
+    If you'd prefer to pick your own names for the imported functions, you can
+    use a hashref in the import:
+
+      use isa {
+        isa_Browser => 'HTTP::Tiny',
+        isa_Person  => 'MyApp::Person',
+      };
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=isa>.
+
+SEE ALSO
+    perlop, Scalar::Util.
+
+    <https://github.com/tobyink/p5-isa/wiki>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2020 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

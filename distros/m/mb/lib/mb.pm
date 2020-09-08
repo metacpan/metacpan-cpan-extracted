@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 $VERSION = $VERSION;
 
 # internal use
@@ -310,8 +310,9 @@ sub mb::do {
             # run as Perl script
             # must use CORE::do to use <DATA>, because CORE::eval cannot do it
             # moreover "goto &CORE::do" doesn't work
-            return CORE::eval sprintf(<<'END', (caller)[0]);
+            return CORE::eval sprintf(<<'END', (caller)[0,2,1]);
 package %s;
+#line %s "%s"
 CORE::do "$prefix_file_oo";
 END
         }
@@ -510,6 +511,7 @@ sub mb::require {
             confess "Perl $_ required--this is only version $], stopped";
         }
         else {
+            undef $@;
             return 1;
         }
     }
@@ -517,12 +519,16 @@ sub mb::require {
     # require expr
     else {
         if (exists $INC{$_}) {
+            undef $@;
             return 1 if $INC{$_};
             confess "Compilation failed in require";
         }
 
         # find expr in @INC
         my $file = $_;
+        if (($file =~ s{::}{/}g) or ($file !~ m{[\./\\]})) {
+            $file .= '.pm';
+        }
         for my $prefix_file ($file, map { "$_/$file" } @INC) {
             if (-f $prefix_file) {
 
@@ -554,8 +560,9 @@ sub mb::require {
                 # run as Perl script
                 # must use CORE::do to use <DATA>, because CORE::eval cannot do it.
                 local $@;
-                my $result = CORE::eval sprintf(<<'END', (caller)[0]);
+                my $result = CORE::eval sprintf(<<'END', (caller)[0,2,1]);
 package %s;
+#line %s "%s"
 CORE::do "$prefix_file_oo";
 END
 
@@ -1952,16 +1959,21 @@ sub parse_expr {
 
     # mb::do   --> mb::do
     # mb::eval --> mb::eval
-    # do       --> mb::do
-    # eval     --> mb::eval
-    elsif (/\G (?: mb:: )? ( do | eval ) \b /xmsgc) {
-        $parsed .= "mb::$1";
+    elsif (/\G ( mb:: (?: do | eval ) ) \b /xmsgc) {
+        $parsed .= $1;
         $term = 1;
     }
 
     # CORE::do   --> CORE::do
     # CORE::eval --> CORE::eval
     elsif (/\G ( CORE:: (?: do | eval ) ) \b /xmsgc) {
+        $parsed .= $1;
+        $term = 1;
+    }
+
+    # do   --> do
+    # eval --> eval
+    elsif (/\G ( do | eval ) \b /xmsgc) {
         $parsed .= $1;
         $term = 1;
     }
@@ -2572,16 +2584,8 @@ sub parse_expr {
         $term = 1;
     }
 
-    # CORE::function, mb::subroutine, function
-    elsif (/\G (?: mb:: )? ( require ) (?= \s+ [0-9] ) /xmsgc) {
-        $parsed .= $1;
-        $term = 1;
-    }
-    elsif (/\G (?: mb:: )? ( require ) \b /xmsgc) {
-        $parsed .= "mb::$1";
-        $term = 1;
-    }
-    elsif (/\G ( CORE::require ) \b /xmsgc) {
+    # CORE::require, mb::require, require
+    elsif (/\G ( (?: CORE:: | mb:: )? require ) /xmsgc) {
         $parsed .= $1;
         $term = 1;
     }
@@ -4200,16 +4204,20 @@ mb - run Perl script in MBCS encoding (not only CJK ;-)
   MBCS subroutines:
     mb::chop(...);
     mb::chr(...);
+    mb::do 'file';
     mb::dosglob(...);
+    mb::eval 'string';
     mb::getc(...);
     mb::index(...);
     mb::index_byte(...);
     mb::length(...);
     mb::ord(...);
+    mb::require 'file';
     mb::reverse(...);
     mb::rindex(...);
     mb::rindex_byte(...);
     mb::substr(...);
+    use mb::PERL Module;
 
   MBCS special variables:
     $mb::PERL
@@ -4401,41 +4409,54 @@ To install this software without make, type the following:
   subroutines will not help you very much. Traditional functions of Perl are
   useful still now in octet-oriented semantics.
 
-  elder <--                     age                     --> younger
-  -----------------------------------------------------------------
-  bare Perl4     JPerl4                                            
-  bare Perl5     JPerl5         use utf8;          mb.pm           
-  bare Perl7                    pragma             modulino        
-  -----------------------------------------------------------------
-  chop           ---            ---                chop            
-  chr            chr            bytes::chr         chr             
-  getc           getc           ---                getc            
-  index          ---            bytes::index       index           
-  lc             lc             ---                lc              
-  lcfirst        lcfirst        ---                lcfirst         
-  length         length         bytes::length      length          
-  ord            ord            bytes::ord         ord             
-  reverse        reverse        ---                reverse         
-  rindex         ---            bytes::rindex      rindex          
-  substr         substr         bytes::substr      substr          
-  uc             uc             ---                uc              
-  ucfirst        ucfirst        ---                ucfirst         
-  ---            chop           chop               mb::chop        
-  ---            index          ---                mb::index_byte  
-  ---            rindex         ---                mb::rindex_byte 
-  ---            ---            chr                mb::chr         
-  ---            ---            getc               mb::getc        
-  ---            ---            index              mb::index       
-  ---            ---            lc                 ---             
-  ---            ---            lcfirst            ---             
-  ---            ---            length             mb::length      
-  ---            ---            ord                mb::ord         
-  ---            ---            reverse            mb::reverse     
-  ---            ---            rindex             mb::rindex      
-  ---            ---            substr             mb::substr      
-  ---            ---            uc                 ---             
-  ---            ---            ucfirst            ---             
-  -----------------------------------------------------------------
+  elder <--                            age                             --> younger
+  --------------------------------------------------------------------------------
+  bare Perl4         JPerl4                                                       
+  bare Perl5         JPerl5             use utf8;          mb.pm                  
+  bare Perl7                            pragma             modulino               
+  --------------------------------------------------------------------------------
+  chop               ---                ---                chop                   
+  chr                chr                bytes::chr         chr                    
+  getc               getc               ---                getc                   
+  index              ---                bytes::index       index                  
+  lc                 lc                 ---                lc                     
+  lcfirst            lcfirst            ---                lcfirst                
+  length             length             bytes::length      length                 
+  ord                ord                bytes::ord         ord                    
+  reverse            reverse            ---                reverse                
+  rindex             ---                bytes::rindex      rindex                 
+  substr             substr             bytes::substr      substr                 
+  uc                 uc                 ---                uc                     
+  ucfirst            ucfirst            ---                ucfirst                
+  ---                chop               chop               mb::chop               
+  ---                ---                chr                mb::chr                
+  ---                ---                getc               mb::getc               
+  ---                index              ---                mb::index_byte         
+  ---                ---                index              mb::index              
+  ---                ---                lc                 ---                    
+  ---                ---                lcfirst            ---                    
+  ---                ---                length             mb::length             
+  ---                ---                ord                mb::ord                
+  ---                ---                reverse            mb::reverse            
+  ---                rindex             ---                mb::rindex_byte        
+  ---                ---                rindex             mb::rindex             
+  ---                ---                substr             mb::substr             
+  ---                ---                uc                 ---                    
+  ---                ---                ucfirst            ---                    
+  --------------------------------------------------------------------------------
+  do 'file'          ---                ---                do 'file'              
+  eval 'string'      ---                ---                eval 'string'          
+  require 'file'     ---                ---                require 'file'         
+  use Module         ---                ---                use Module             
+  ---                do 'file'          do 'file'          mb::do 'file'          
+  ---                eval 'string'      eval 'string'      mb::eval 'string'      
+  ---                require 'file'     require 'file'     mb::require 'file'     
+  ---                use Module         use Module         use mb::PERL Module    
+  $^X                ---                ---                $^X                    
+  ---                $^X                $^X                $mb::PERL              
+  $0                 $0                 $0                 $mb::ORIG_PROGRAM_NAME 
+  ---                ---                ---                $0                     
+  --------------------------------------------------------------------------------
 
   DOS-like glob() as MBCS subroutine
   -----------------------------------------------------------------
@@ -4488,19 +4509,22 @@ To install this software without make, type the following:
   -----------------------------------------------------------------
   chop                      chop
   chr                       chr
+  do 'file'                 do 'file'
+  eval 'string'             eval 'string'
   getc                      getc
   index                     index
   lc                        lc
   lcfirst                   lcfirst
   length                    length
-  no Your::Module;          no Your::Module;
+  no Module                 no Module
   ord                       ord
+  require 'file'            require 'file'
   reverse                   reverse
   rindex                    rindex
   substr                    substr
   uc                        uc
   ucfirst                   ucfirst
-  use Your::Module;         use Your::Module;
+  use Module                use Module
   -----------------------------------------------------------------
 
 =head1 Porting from script in JPerl4, and JPerl5
@@ -4510,12 +4534,13 @@ To install this software without make, type the following:
   JPerl4, JPerl5            mb.pm modulino
   -----------------------------------------------------------------
   chop                      mb::chop
+  do 'file'                 mb::do 'file'
+  eval 'string'             mb::eval 'string'
   index                     mb::index_byte
-  no Your::MBCS::Module;    no mb::PERL Your::MBCS::Module; *1
-  no Your::SBCS::Module;    no          Your::SBCS::Module;
+  no Module                 no mb::PERL Module *1
+  require 'file'            mb::require 'file'
   rindex                    mb::rindex_byte
-  use Your::MBCS::Module;   use mb::PERL Your::MBCS::Module; *1
-  use Your::SBCS::Module;   use          Your::SBCS::Module;
+  use Module                use mb::PERL Module *1
   -----------------------------------------------------------------
   *1 mb::PERL module comes later
 
@@ -4527,21 +4552,22 @@ To install this software without make, type the following:
   -----------------------------------------------------------------
   chop                      mb::chop
   chr                       mb::chr
+  do 'file'                 mb::do 'file'
+  eval 'string'             mb::eval 'string'
   getc                      mb::getc
   index                     mb::index
   lc                        ---
   lcfirst                   ---
   length                    mb::length
-  no Your::MBCS::Module;    no mb::PERL Your::MBCS::Module; *2
-  no Your::SBCS::Module;    no          Your::SBCS::Module;
+  no Module                 no mb::PERL Module *2
   ord                       mb::ord
+  require 'file'            mb::require 'file'
   reverse                   mb::reverse
   rindex                    mb::rindex
   substr                    mb::substr
   uc                        ---
   ucfirst                   ---
-  use Your::MBCS::Module;   use mb::PERL Your::MBCS::Module; *2
-  use Your::SBCS::Module;   use          Your::SBCS::Module;
+  use Module                use mb::PERL Module *2
   -----------------------------------------------------------------
   *2 mb::PERL module comes later, and module must be without utf8 pragma.
 
@@ -4623,20 +4649,26 @@ To install this software without make, type the following:
   in the perl     "`/"    [83] [5c]
   -----------------------------------------
 
-=head1 What converts to what by this software?
+=head1 What transpiles to what by this software?
 
-  This software automatically converts MBCS literal strings in scripts to
+  This software automatically transpiles MBCS literal strings in scripts to
   octet-oriented strings(OO-quotee).
 
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  do "string";                               mb::do "string";
+  do 'file'                                  do 'file'
+  do { block }                               do { block }
+  mb::do 'file'                              mb::do 'file'
   mb::do { block }                           do { block }
-  eval "string";                             mb::eval "string";
+  eval 'string'                              eval 'string'
+  eval { block }                             eval { block }
+  mb::eval 'string'                          mb::eval 'string'
   mb::eval { block }                         eval { block }
-  require                                    mb::require
-  mb::require                                mb::require
+  require 123                                require 123
+  require 'file'                             require 'file'
+  mb::require 123                            mb::require 123
+  mb::require 'file'                         mb::require 'file'
   chop                                       chop
   lc                                         mb::lc
   lcfirst                                    mb::lcfirst
@@ -4801,8 +4833,8 @@ To install this software without make, type the following:
   "${^LAST_MATCH_END}[1]"                    "@{[mb::_LAST_MATCH_END(1)]}"
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  The following conversions are for Microsoft Windows, but will always be
-  converted so that the converted script will work on any system. Even if
+  The transpile-list below is primarily for Microsoft Windows, but it also
+  applies when run on other operating systems to ensure commonality. Even if
   Perl 5.00503, you can stack file test operators, -r -w -f $file works as
   -f $file && -w _ && -r _.
 
@@ -4998,7 +5030,7 @@ To install this software without make, type the following:
   -----------------------------------------------------------------------------
 
   Each elements in strings or regular expressions that are double-quote like are
-  converted as follows.
+  transpiled as follows.
 
   ---------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
@@ -5012,7 +5044,7 @@ To install this software without make, type the following:
   \Q MBCS-quotee \E                          \Q OO-quotee \E
   ---------------------------------------------------------------------------------------------
 
-  Each elements in regular expressions are converted as follows.
+  Each elements in regular expressions are transpiled as follows.
 
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software (on sjis encoding)
@@ -5233,12 +5265,6 @@ Unicode properties (aka codepoint properties) of regexp are not available.
 Also (?[]) in regexp of Perl 5.18 is not available. There is no plans to currently
 support these.
 
-=item * ${^WIN32_SLOPPY_STAT} is ignored
-
-Even if ${^WIN32_SLOPPY_STAT} is set to a true value, file test functions mb::*(),
-mb::lstat(), and mb::stat() on Microsoft Windows open the file for the path which
-has chr(0x5c) at end.
-
 =item * Delimiter of String and Regexp
 
 qq//, q//, qw//, qx//, qr//, m//, s///, tr///, and y/// can't use a wide codepoint
@@ -5258,10 +5284,6 @@ Following \b{...} available starting in v5.22 are not supported.
 =item * format
 
 Function "format" can't handle MBCS codepoints unlike JPerl.
-
-=item * Mac OS 9
-
-Apple Inc. Mac OS 9 not supported. sorry about it.
 
 =back
 

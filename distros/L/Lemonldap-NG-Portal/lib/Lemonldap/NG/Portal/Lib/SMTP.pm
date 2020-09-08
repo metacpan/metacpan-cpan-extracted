@@ -15,7 +15,7 @@ use Email::Date::Format qw(email_date);
 use MIME::Base64;
 use Encode;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.9';
 
 our $transport;
 
@@ -144,7 +144,7 @@ sub gen_password {
 # @return boolean result
 sub send_mail {
     my ( $self, $mail, $subject, $body, $html ) = @_;
-    $self->logger->debug("send_mail called to send \"$subject\" to $mail");
+    $self->logger->info("send_mail called to send \"$subject\" to $mail");
 
     # Encode the body with the given charset
     $body    = encode( $self->charset, decode( 'utf-8', $body ) );

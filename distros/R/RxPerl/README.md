@@ -136,11 +136,20 @@ should apply to RxPerl too).
             rx_of(40, 50, 60),
         )->subscribe($subscriber);
 
+- rx\_from
+
+    [https://rxjs.dev/api/index/function/from](https://rxjs.dev/api/index/function/from)
+
+    Currently, only arrayrefs, promises, and observables are allowed as argument to this function.
+
+        # 10, 20, 30, complete
+        rx_from([10, 20, 30])->subscribe($subscriber);
+
 - rx\_from\_event
 
     [https://rxjs.dev/api/index/function/fromEvent](https://rxjs.dev/api/index/function/fromEvent)
 
-    Currently, only instances of the [Mojo::EventEmitter](https://metacpan.org/pod/Mojo%3A%3AEventEmitter) class are allowed as the first argument of this function.
+    Currently, only instances of the [Mojo::EventEmitter](https://metacpan.org/pod/Mojo%3A%3AEventEmitter) class are allowed as the first argument to this function.
 
         # 4 seconds after Mojolicious hypnotoad is gracefully reloaded, websocket
         # connection will close
@@ -234,10 +243,10 @@ should apply to RxPerl too).
 
     [https://rxjs.dev/api/index/function/throwError](https://rxjs.dev/api/index/function/throwError)
 
-        # 0, 1, 2, 3, foo, 4, 5, 6, ...
-        rx_merge(
-            rx_of('foo')->pipe( op_delay(4.5) ),
-            rx_interval(1),
+        # 0, 1, 2, 3, error: foo
+        rx_concat(
+            rx_interval(1)->pipe( op_take(4) ),
+            rx_throw_error('foo'),
         )->subscribe($subscriber);
 
 - rx\_timer
@@ -264,6 +273,8 @@ too).
 - op\_delay
 
     [https://rxjs.dev/api/operators/delay](https://rxjs.dev/api/operators/delay)
+
+    Works like rxjs's "delay", except the parameter is in seconds instead of ms.
 
         # (pause 10 seconds) 0, 1, 2, 3
         rx_interval(1)->pipe( op_delay(10) )->subscribe($subscriber);
@@ -319,6 +330,39 @@ too).
 - op\_share
 
     [https://rxjs.dev/api/operators/share](https://rxjs.dev/api/operators/share)
+
+        # t0, 0, 0, t1, 1, 1, t2, 2, 2, ...
+        my $o = rx_interval(1)->pipe(
+            op_tap(sub {say 't' . $_[0]}),
+            op_share(),
+        );
+
+        $o->subscribe($subscriber1);
+        $o->subscribe($subscriber2);
+
+- op\_start\_with
+
+    [https://rxjs.dev/api/operators/startWith](https://rxjs.dev/api/operators/startWith)
+
+        # 100, 200, 0, 1, 2, 3, complete
+        rx_of(0, 1, 2, 3)->pipe(
+            op_start_with(100, 200),
+        )->subscribe($subscriber);
+
+- switch\_map
+
+    [https://rxjs.dev/api/operators/switchMap](https://rxjs.dev/api/operators/switchMap)
+
+        # 1, 2, 3, 11, 12, 13, 21, 22, 23, 24, 25, 26, 27, ...
+        my $o = rx_interval(2.5)->pipe( op_take(3) );
+
+        $o->pipe(
+            op_switch_map(sub ($x) {
+                return rx_interval(0.7)->pipe(
+                    op_map(sub ($y) { $x * 10 + $y + 1 }),
+                );
+            }),
+        )->subscribe($subscriber);
 
 - op\_take
 

@@ -17,11 +17,12 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_RENEWSESSION
+  PE_UPGRADESESSION
 );
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 # PROPERTIES
 
@@ -99,7 +100,7 @@ sub _redirect {
         $self->logger->debug(
             'Add ' . $self->ipath . ', ' . $self->ipath . 'Path in keepPdata' );
         push @{ $req->pdata->{keepPdata} }, $self->ipath, $self->ipath . 'Path';
-        $req->{urldc}           = $self->conf->{portal} . '/' . $self->path;
+        $req->{urldc} = $self->conf->{portal} . '/' . $self->path;
         $req->pdata->{_url}     = encode_base64( $req->urldc, '' );
         $req->pdata->{issuerTs} = time;
     }
@@ -152,7 +153,7 @@ sub _forAuthUser {
 
         # In case a confirm form is shown, we need it to POST on the
         # current Path
-        $req->data->{confirmFormAction} = URI->new($req->uri)->path;
+        $req->data->{confirmFormAction} = URI->new( $req->uri )->path;
     }
 
     # Clean pdata: keepPdata has been set, so pdata must be cleaned here
@@ -248,6 +249,19 @@ qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/auto
     push @{ $req->pdata->{keepPdata} }, $self->ipath, $self->ipath . 'Path';
     $req->pdata->{issuerTs} = time;
     return PE_RENEWSESSION;
+}
+
+sub upgradeAuth {
+    my ( $self, $req ) = @_;
+    $req->data->{customScript} =
+qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/autoRenew.min.js"></script>'
+      if ( $self->conf->{skipUpgradeConfirmation} );
+    $req->data->{_url} =
+      encode_base64( $self->conf->{portal} . $req->path_info, '' );
+    $req->pdata->{ $self->ipath } = $self->storeRequest($req);
+    push @{ $req->pdata->{keepPdata} }, $self->ipath, $self->ipath . 'Path';
+    $req->pdata->{issuerTs} = time;
+    return PE_UPGRADESESSION;
 }
 
 1;

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200606132001;
+our $VERSION = 1.20200904144536;
 
 my $formatters = [
                 {
@@ -49,25 +49,6 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{pt}->{2392220} = "Santo\ Amaro";
-$areanames{pt}->{2392221} = "Água\ Grande";
-$areanames{pt}->{2392222} = "Água\ Grande";
-$areanames{pt}->{2392223} = "Água\ Grande";
-$areanames{pt}->{2392224} = "Água\ Grande";
-$areanames{pt}->{2392225} = "Água\ Grande";
-$areanames{pt}->{2392226} = "Água\ Grande";
-$areanames{pt}->{2392227} = "Água\ Grande";
-$areanames{pt}->{2392228} = "Água\ Grande";
-$areanames{pt}->{2392231} = "Guadalupe";
-$areanames{pt}->{2392233} = "Neves\,\ Santa\ Catarina";
-$areanames{pt}->{239224} = "Água\ Grande";
-$areanames{pt}->{2392251} = "Região\ Autonoma\ do\ Príncipe";
-$areanames{pt}->{2392261} = "Angolares\,\ Porto\ Alegre";
-$areanames{pt}->{2392265} = "Santana\,\ Ribeira\ Afonso";
-$areanames{pt}->{2392271} = "Trindade";
-$areanames{pt}->{2392272} = "Madalena";
-$areanames{pt}->{239228} = "Água\ Grande";
-$areanames{pt}->{239229} = "Água\ Grande";
 $areanames{en}->{2392220} = "Santo\ Amaro";
 $areanames{en}->{2392221} = "Água\ Grande";
 $areanames{en}->{2392222} = "Água\ Grande";
@@ -87,6 +68,25 @@ $areanames{en}->{2392271} = "Trindade";
 $areanames{en}->{2392272} = "Madalena";
 $areanames{en}->{239228} = "Água\ Grande";
 $areanames{en}->{239229} = "Água\ Grande";
+$areanames{pt}->{2392220} = "Santo\ Amaro";
+$areanames{pt}->{2392221} = "Água\ Grande";
+$areanames{pt}->{2392222} = "Água\ Grande";
+$areanames{pt}->{2392223} = "Água\ Grande";
+$areanames{pt}->{2392224} = "Água\ Grande";
+$areanames{pt}->{2392225} = "Água\ Grande";
+$areanames{pt}->{2392226} = "Água\ Grande";
+$areanames{pt}->{2392227} = "Água\ Grande";
+$areanames{pt}->{2392228} = "Água\ Grande";
+$areanames{pt}->{2392231} = "Guadalupe";
+$areanames{pt}->{2392233} = "Neves\,\ Santa\ Catarina";
+$areanames{pt}->{239224} = "Água\ Grande";
+$areanames{pt}->{2392251} = "Região\ Autonoma\ do\ Príncipe";
+$areanames{pt}->{2392261} = "Angolares\,\ Porto\ Alegre";
+$areanames{pt}->{2392265} = "Santana\,\ Ribeira\ Afonso";
+$areanames{pt}->{2392271} = "Trindade";
+$areanames{pt}->{2392272} = "Madalena";
+$areanames{pt}->{239228} = "Água\ Grande";
+$areanames{pt}->{239229} = "Água\ Grande";
 
     sub new {
       my $class = shift;

@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 a47dad2feec315276668ec235a85cae429cbbd9f56a61a3ba1cf35e9475dd602 Changes
+SHA256 1fdf0a16acc3959cb5f6cfe19428700cabe2a2021061f9781bece7022e16b318 MANIFEST
+SHA256 dbef84764a216ec055d8b7d19f5e6216d22c1f0a68f0e4c9c60cc38e0e49eb2d META.yml
+SHA256 43ed416e02012e0207692a1213b3fa4e0b90129514f2edaaba0a0bf6a0874181 Makefile.PL
+SHA256 5de322b2e3e066ac0fc9a1a9224ed335c56faf10b499b1941d81e7026024c333 README
+SHA256 00b194ba8a8191b894a9b81aa933a564d038e32b3bfbc2b477ed9f1bccd6b964 etc/TravisCI_Config.pm
+SHA256 dbee44a57c74dba6d809c72e4c266329bdd236791a2730aa38d43854ed9cf519 html/Callbacks/TravisCI/Elements/RT__Ticket/ColumnMap/Once
+SHA256 971f982130a13ae4dc8e3a422e3b2b5e8a57aea472db6a2e3a627760d574930b html/Callbacks/TravisCI/Ticket/Elements/ShowSummary/LeftColumn
+SHA256 381082dde4144b14e22d554a59f5b8c6f7a99c8143ccb9f87fa23c449f86714f html/Elements/TravisCIStatus
+SHA256 5c3d158e16105f06064761fd28a4bec1537112f72235666b08354a74968484bb html/Helpers/TravisCI
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 2c89fa442659e76a8ee28643923c3a928c39ed013ad08fe67049d1df7d4c9fd6 inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 9f50489182b83fb275494764918038d1f176067f32bd59bad7b912cc6d29cacb inc/Module/Install/Substitute.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 d6a27a64137bb4803d69586f3948a2fe938928cdd6fd1cc69852da859e9f04d3 lib/RT/Extension/TravisCI.pm
+SHA256 219b97e63d8055c44c3629cbca9397ae5c3a09c97f1eb1f41205d390e93037ff lib/RT/Extension/TravisCI/Test.pm
+SHA256 fd17e8013bc9ea50965a72adf042ef09915c8e702f2eda8c189b0bbee6650eb8 lib/RT/Extension/TravisCI/Test.pm.in
+SHA256 a9258668be6be912fac0cbfd649e7fa36c943f76215583246811d3d3140ceb19 static/css/travisci.css
+SHA256 5b73c523a7208aefd28ac5239d4d7c3a303249be1ccb8cd1e2672ded16575d3b static/js/travisci.js
+SHA256 2ca88b143daf5a4e879266fcd6b739f75bd5c9ae7463b1b7d17f9bb036adb52f xt/00-get-status.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEExJs3Lyv4ShkBFmAnDfCig/6sgLIFAl9StMwACgkQDfCig/6s
+gLIb0Af/eTofp+Gs21alp5At8N4J34cTbIH/4Pl18ONLmmpZwhhKEp2ucyCQ/024
+VGWkW9cecRMq6ZYXs26VOC9CcCZbr+k0wqKkcW4T8Agk3LoPIUhZf0G0DAHzTnet
+SC5Yo7pMIN7YrDVgXYjYkXlUdglrdZgAXz5P1w5hopb9TLxQFnMxcswcpjbbQpen
+6wAOTK2NW5FhIcLAE+NkvM5x3NTeKRUKVdhrV6BFlMlDn+/jLdhbMo76aPaFZF/5
+PO9wLNt2Apfgg2r3wftJ88lWVRsK+Wm4HHT3s0BgOSRpHjx82iyba2xEX+5NMMXq
+btoG7WGr1MPwgzbHuoXtg+E6zduhZw==
+=CkD4
+-----END PGP SIGNATURE-----

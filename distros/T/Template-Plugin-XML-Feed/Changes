@@ -1,3 +1,9 @@
+2020-09-07  Dave Cross  <dave@perlhacks.com>
+
+        * Hey it's stable, let's call it 1.0.0 at last
+
+        * A few packaging and testing improvements over the last 11 years
+
 2009-02-17  Dave Cross  <dave@angel.mag-sol.com>
 
 	* lib/Template/Plugin/XML/Feed.pm: Fixes to pass pod tests

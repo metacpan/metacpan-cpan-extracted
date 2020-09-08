@@ -1,0 +1,43 @@
+{
+   "abstract" : "Provides a convenient interface to NHC's Tropical Cyclone JSON format.",
+   "author" : [
+      "danx <danx@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.048, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Weather-NHC-TropicalCyclone",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::TreeBuilder" : "0",
+            "HTTP::Status" : "0",
+            "HTTP::Tiny" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON::XS" : "0",
+            "Object::Tiny" : "0",
+            "Validate::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.10"
+}
+

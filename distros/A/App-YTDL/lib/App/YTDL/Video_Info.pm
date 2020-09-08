@@ -59,7 +59,7 @@ sub _prepare_print_info {
     my @keys = qw(title extractor author duration raters avg_rating view_count published description);
     if ( ! exists $data->{$ex}{$up}{$id}{fmt_to_info} ) {
         my $url = $data->{$ex}{$up}{$id}{url};
-        print "\r** GET video data: ...";
+        print "\r** GET video data: ... ";
         my $h_ref;
         if ( eval { $h_ref = get_download_info( $set, $opt, $url, 0 ); 1 } ) {
             my $single_data = extract_data_single( $set, $opt, $h_ref );

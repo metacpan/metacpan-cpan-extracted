@@ -1,0 +1,25 @@
+Build.PL
+Changes
+docker/Dockerfile
+examples/decompose_LU.pl
+examples/transpose.pl
+lib/Math/Matrix/Banded.pm
+lib/Math/Matrix/Banded/Rectangular.pm
+lib/Math/Matrix/Banded/Square.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/000_load.t
+t/005_manifest.t
+t/006_pod.t
+t/007_pod_coverage.t
+t/015_set_retrieve.t
+t/020_multiply.t
+t/025_decompose_LU.t
+t/030_solve_LU.t
+t/400_rect_load.t
+t/415_rect_set_retrieve.t
+t/420_rect_multiply.t
+t/425_rect_transpose.t
+xt/boilerplate.t

@@ -163,7 +163,11 @@ version will be unmodified.
 In order to wrap subroutines in modules utilising L<Exporter>,
 use L<OpenTracing::WrapScope> directly in those modules.
 
+=head2 C<Moose>
 
+Since L<OpenTracing::WrapScope> works by replacing subroutines with modified
+versions, it's not possible to apply to L<Moose> classes which have been made
+immutable.
 
 
 =head1 AUTHOR

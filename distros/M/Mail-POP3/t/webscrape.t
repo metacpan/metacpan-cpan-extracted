@@ -64,7 +64,7 @@ Subject: Perl Developer - Jobserve ref JSPERL DEVELOPER
 Message-ID: 928F11260DD14DF7@jobserve.com
 Date: Fri, 03 Jan 2014 09:33:47 GMT (GMT)
 MIME-Version: 1.0
-Content-Type: text/html; charset="utf-8"
+Content-Type: text/html; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 <h1>Permanent: Perl Developer</h1>

@@ -15,7 +15,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150009'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,10 +32,10 @@ no_index:
 provides:
   Class::Tiny:
     file: lib/Class/Tiny.pm
-    version: '1.006'
+    version: '1.008'
   Class::Tiny::Object:
     file: lib/Class/Tiny.pm
-    version: '1.006'
+    version: '1.008'
 requires:
   Carp: '0'
   perl: '5.006'
@@ -45,13 +45,16 @@ resources:
   bugtracker: https://github.com/dagolden/Class-Tiny/issues
   homepage: https://github.com/dagolden/Class-Tiny
   repository: https://github.com/dagolden/Class-Tiny.git
-version: '1.006'
+version: '1.008'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
   - 'David Golden <xdg@xdg.me>'
   - 'Gelu Lupas <gelu@devnull.ro>'
   - 'Karen Etheridge <ether@cpan.org>'
+  - 'Matt S Trout <mstrout@cpan.org>'
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'Toby Inkster <tobyink@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Apache-2.0

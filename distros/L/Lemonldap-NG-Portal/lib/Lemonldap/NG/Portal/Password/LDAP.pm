@@ -38,13 +38,13 @@ sub modifyPassword {
     unless ($rule) {
         my $error = $self->p->HANDLER->tsv->{jail}->error || '???';
     }
-    if ( $req->userData->{_dn} ) {
-        $dn = $req->userData->{_dn};
+    if ( $req->data->{dn} ) {
+        $dn                 = $req->data->{dn};
         $requireOldPassword = $rule->( $req, $req->userData );
         $self->logger->debug("Get DN from request data: $dn");
     }
     else {
-        $dn = $req->sessionInfo->{_dn};
+        $dn                 = $req->sessionInfo->{_dn};
         $requireOldPassword = $rule->( $req, $req->sessionInfo );
         $self->logger->debug("Get DN from session data: $dn");
     }
@@ -59,7 +59,8 @@ sub modifyPassword {
 
     # Call the modify password method
     my $code =
-      $self->ldap->userModifyPassword( $dn, $pwd, $req->data->{oldpassword}, 0 , $requireOldPassword );
+      $self->ldap->userModifyPassword( $dn, $pwd, $req->data->{oldpassword},
+        0, $requireOldPassword );
 
     unless ( $code == PE_PASSWORD_OK ) {
         return $code;

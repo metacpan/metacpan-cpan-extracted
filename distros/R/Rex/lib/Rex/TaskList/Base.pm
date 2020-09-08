@@ -9,7 +9,7 @@ package Rex::TaskList::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 BEGIN {
   use Rex::Shared::Var;
@@ -199,7 +199,7 @@ sub create_task {
     func                 => $func,
     server               => [@server],
     desc                 => $desc,
-    no_ssh               => ( $options->{"no_ssh"} ? 1 : 0 ),
+    no_ssh               => ( $options->{"no_ssh"}        ? 1 : 0 ),
     hidden               => ( $options->{"dont_register"} ? 1 : 0 ),
     exit_on_connect_fail => (
       exists $options->{exit_on_connect_fail}

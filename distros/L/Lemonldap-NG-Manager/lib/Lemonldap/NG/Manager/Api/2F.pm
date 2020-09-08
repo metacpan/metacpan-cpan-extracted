@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::2F;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -8,9 +8,9 @@ use 5.10.0;
 use utf8;
 use Mouse;
 use JSON;
-use MIME::Base64;
 
 use Lemonldap::NG::Common::Session;
+use Lemonldap::NG::Common::Util qw/genId2F/;
 
 sub getSecondFactors {
     my ( $self, $req ) = @_;
@@ -155,37 +155,17 @@ sub _get2F {
             );
             push @secondFactors,
               {
-                id   => $self->_genId2F($device),
+                id   => genId2F($device),
                 type => $device->{type},
                 name => $device->{name}
               }
               unless ( ( defined $type and $type ne $device->{type} )
-                or ( defined $id and $id ne $self->_genId2F($device) ) );
+                or ( defined $id and $id ne genId2F($device) ) );
         }
     }
     $self->logger->debug(
         "Found " . scalar @secondFactors . " 2F devices for uid $uid." );
     return { res => 'ok', secondFactors => [@secondFactors] };
-}
-
-sub _genId2F {
-    my ( $self, $device ) = @_;
-    return encode_base64( "$device->{epoch}::$device->{type}::$device->{name}",
-        "" );
-}
-
-sub _getPersistentMod {
-    my ($self) = @_;
-    my $mod = $self->sessionTypes->{persistent};
-    $mod->{options}->{backend} = $mod->{module};
-    return $mod;
-}
-
-sub _getSSOMod {
-    my ($self) = @_;
-    my $mod = $self->sessionTypes->{global};
-    $mod->{options}->{backend} = $mod->{module};
-    return $mod;
 }
 
 sub _getSessions2F {
@@ -245,14 +225,13 @@ sub _delete2FFromSessions {
                 if (
                     ( defined $type or defined $id )
                     and (  ( defined $type and $type ne $element->{type} )
-                        or
-                        ( defined $id and $id ne $self->_genId2F($element) ) )
+                        or ( defined $id and $id ne genId2F($element) ) )
                   )
                 {
                     push @keep, $element;
                 }
                 else {
-                    $removed->{ $self->_genId2F($element) } = "removed";
+                    $removed->{ genId2F($element) } = "removed";
                 }
             }
             if ( ( $total - scalar @keep ) > 0 ) {

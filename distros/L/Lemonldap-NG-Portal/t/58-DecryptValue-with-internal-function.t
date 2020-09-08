@@ -128,7 +128,7 @@ count(2);
 ( $host, $url, $query ) =
   expectForm( $res, undef, '/decryptvalue', 'cipheredValue', 'token' );
 
-# Unvalid ciphered value
+# invalid ciphered value
 $query =~ s%cipheredValue=%cipheredValue=test%;
 ok(
     $res = $client->_post(
@@ -138,7 +138,7 @@ ok(
         length => length($query),
         accept => 'text/html',
     ),
-    'POST decryptvalue with unvalid value'
+    'POST decryptvalue with invalid value'
 );
 ok( $res->[2]->[0] =~ m%<span trspan="notAnEncryptedValue">%,
     'Found trspan="notAnEncryptedValue"' )

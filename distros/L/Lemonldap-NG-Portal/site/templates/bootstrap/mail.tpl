@@ -23,9 +23,9 @@
 
       <div class="input-group mb-3">
         <div class="input-group-prepend">
-          <span class="input-group-text"><i class="fa fa-envelope"></i> </span>
+          <span class="input-group-text"><label for="mailfield" class="mb-0"><i class="fa fa-envelope"></i></label></span>
         </div>
-        <input name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control" trplaceholder="mail" required />
+        <input id="mailfield" name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control" trplaceholder="mail" required />
       </div>
 
       <TMPL_IF NAME=CAPTCHA_SRC>
@@ -102,6 +102,7 @@
       <div class="form">
 
         <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
+        <input type="hidden" name="mail_token" value="<TMPL_VAR NAME="MAIL_TOKEN">" />
         <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
         <TMPL_IF NAME="CHOICE_VALUE">
           <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="CHOICE_VALUE">" />
@@ -117,16 +118,16 @@
 
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text"><i class="fa fa-lock"></i> </span>
+            <span class="input-group-text"><label for="newpasswordfield" class="mb-0"><i class="fa fa-lock"></i></label></span>
           </div>
-          <input name="newpassword" type="password" class="form-control" trplaceholder="newPassword" />
+          <input id="newpasswordfield" name="newpassword" type="password" class="form-control" trplaceholder="newPassword" />
         </div>
 
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text"><i class="fa fa-lock"></i> </span>
+            <span class="input-group-text"><label for="confirmpasswordfield" class="mb-0"><i class="fa fa-lock"></i></label></span>
           </div>
-          <input name="confirmpassword" type="password" class="form-control" trplaceholder="confirmPwd" />
+          <input id="confirmpasswordfield" name="confirmpassword" type="password" class="form-control" trplaceholder="confirmPwd" />
         </div>
 
         <TMPL_IF NAME="DISPLAY_GENERATE_PASSWORD">

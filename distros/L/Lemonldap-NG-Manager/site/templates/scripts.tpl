@@ -22,7 +22,6 @@
 <script type="text/JavaScript" src="<TMPL_VAR NAME="SCRIPTNAME">/psgi.js"></script>
 
 <!-- //if:usedebianlibs
-<script type="text/javascript" src="/javascript/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="/javascript/es5-shim/es5-shim.min.js"></script>
 <script type="text/javascript" src="/javascript/angular.js/angular.min.js"></script>
 <script type="text/javascript" src="/javascript/angular.js/angular-aria.min.js"></script>
@@ -33,7 +32,6 @@
 <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/file-saver.js/FileSaver.min.js"></script>
 <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">js/llApp.min.js"></script>
 //elsif:useexternallibs
-<script type="text/javascript" src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
 <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.4.1/es5-shim.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.11/angular.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.11/angular-aria.min.js"></script>
@@ -44,7 +42,6 @@
 <script type="text/javascript" src="https://cdn.rawgit.com/eligrey/FileSaver.js/master/FileSaver.min.js"></script>
 <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">js/llApp.min.js"></script>
 //elsif:jsminified
-<script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/es5-shim/es5-shim.min.js"></script>
 <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular/angular.min.js"></script>
 <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular-aria/angular-aria.min.js"></script>
@@ -55,7 +52,6 @@
 <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/file-saver.js/FileSaver.min.js"></script>
 <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">js/llApp.min.js"></script>
 //else -->
-<script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/jquery/dist/jquery.js"></script>
 <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/es5-shim/es5-shim.js"></script>
 <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular/angular.js"></script>
 <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular-aria/angular-aria.js"></script>

@@ -12,7 +12,7 @@ use Unicode::String qw(utf8);
 use Scalar::Util 'weaken';
 use utf8;
 
-our $VERSION  = '2.0.8';
+our $VERSION  = '2.0.9';
 our $ppLoaded = 0;
 
 BEGIN {
@@ -52,21 +52,37 @@ sub new {
         ( $conf->{ldapTimeout} ? ( timeout => $conf->{ldapTimeout} ) : () ),
         ( $conf->{ldapVersion} ? ( version => $conf->{ldapVersion} ) : () ),
         ( $conf->{ldapRaw}     ? ( raw     => $conf->{ldapRaw} )     : () ),
-        ( $conf->{caFile}      ? ( cafile  => $conf->{caFile} )      : () ),
-        ( $conf->{caPath}      ? ( capath  => $conf->{caPath} )      : () ),
+        ( $conf->{ldapCAFile}  ? ( cafile  => $conf->{ldapCAFile} )  : () ),
+        ( $conf->{ldapCAPath}  ? ( capath  => $conf->{ldapCAPath} )  : () ),
+        ( $conf->{ldapVerify}  ? ( verify  => $conf->{ldapVerify} )  : () ),
     );
     unless ($self) {
         $portal->logger->error($@);
         return 0;
     }
+    elsif ( $Net::LDAP::VERSION < '0.64' ) {
+
+        # CentOS7 has a bug in which IO::Socket::SSL will return a broken
+        # socket when certificate validation fails. Net::LDAP does not catch
+        # it, and the process ends up crashing.
+        # As a precaution, make sure the underlying socket is doing fine:
+        if ( $self->socket->isa('IO::Socket::SSL')
+            and $self->socket->errstr < 0 )
+        {
+            $portal->logger->error(
+                "SSL connection error: " . $self->socket->errstr );
+            return 0;
+        }
+    }
     bless $self, $class;
     if ($useTls) {
         my %h = split( /[&=]/, $tlsParam );
-        $h{cafile} = $conf->{caFile} if ( $conf->{caFile} );
-        $h{capath} = $conf->{caPath} if ( $conf->{caPath} );
+        $h{cafile} ||= $conf->{ldapCAFile} if ( $conf->{ldapCAFile} );
+        $h{capath} ||= $conf->{ldapCAPath} if ( $conf->{ldapCAPath} );
+        $h{verify} ||= $conf->{ldapVerify} if ( $conf->{ldapVerify} );
         my $mesg = $self->start_tls(%h);
         if ( $mesg->code ) {
-            $portal->logger->error('StartTLS failed');
+            $portal->logger->error( 'StartTLS failed: ' . $mesg->error );
             return 0;
         }
     }
@@ -180,7 +196,8 @@ sub userBind {
         # Return direct unless control resonse
         unless ( defined $resp ) {
             if ( $mesg->code == 49 ) {
-                $self->{portal}->userLogger->warn("Bad password");
+                $self->{portal}->userLogger->warn(
+                    "Bad password for $req->{user} (" . $req->address . ")" );
                 return PE_BADCREDENTIALS;
             }
             elsif ( $mesg->code == 0 ) {
@@ -262,7 +279,8 @@ sub userBind {
             $req->data->{ldapError} = $mesg->error;
         }
     }
-    $self->{portal}->userLogger->warn("Bad password for $req->{user}");
+    $self->{portal}->userLogger->warn(
+        "Bad password for $req->{user} (" . $req->address . ")" );
     return PE_BADCREDENTIALS;
 }
 
@@ -679,6 +697,9 @@ sub searchGroups {
 
                 # Launch group search
                 if ($group_value) {
+                    if ( $self->{conf}->{ldapGroupDecodeSearchedValue} ) {
+                        utf8::decode($group_value);
+                    }
 
                     if ( $dupcheck->{$group_value} ) {
                         $self->{portal}->logger->debug(

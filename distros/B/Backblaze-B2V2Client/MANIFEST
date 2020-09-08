@@ -6,6 +6,7 @@ README.md
 cpanfile
 lib/Backblaze/B2V2Client.pm
 minil.toml
+script/b2_client
 t/00_compile.t
 META.yml
 MANIFEST

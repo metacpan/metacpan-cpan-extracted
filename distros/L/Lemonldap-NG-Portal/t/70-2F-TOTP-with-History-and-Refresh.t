@@ -160,7 +160,7 @@ SKIP: {
     );
     expectRedirection( $res, 'http://auth.example.com/' );
 
-    Time::Fake->offset("+20s"); # Go through handler internal cache
+    Time::Fake->offset("+20s");    # Go through handler internal cache
 
     ok(
         $res = $client->_post(

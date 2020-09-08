@@ -21,6 +21,7 @@ h3 {text-align:left;}
 h4 {margin-top:.5em; margin-bottom:.5em;}
 .edition {font-weight:bold; text-align:center}
 </style>
+<script src="//assets.adobedtm.com/dac62e20b491e735c6b56e64c39134d8ee93f9cf/satelliteLib-6b47f831c184878d7338d4683ecf773a17973bb9.js"></script>
 </head>
 <body>
 
@@ -36,7 +37,7 @@ Congress</a> &gt;&gt; <a href="//www.loc.gov/marc/">MARC</a>
 <hr>
 
 <div class="edition">1999 Edition<br>
-Update No. 1 (October 2000) through Update No. 24 (May 2017)</div>
+Update No. 1 (October 2000) through Update No. 30 (May 2020)</div>
 
 <hr>
 
@@ -51,8 +52,7 @@ Data</cite></a>.</p>
 
 <hr>
 
-<pre>
---Leader and Directory--
+<pre>--Leader and Directory--
   LEADER
      Character Positions
      00-04 - Logical record length
@@ -292,6 +292,7 @@ Data</cite></a>.</p>
          u - Unknown
          v - Leather
          w - Parchment
+         x - Not applicable
          y - Other photographic medium
          z - Other
          | - No attempt to code
@@ -304,7 +305,7 @@ Data</cite></a>.</p>
       06 - Production/reproduction details
          a - Photocopy, blueline print
          b - Photocopy
-         c - Pre-production
+         c - Photographic pre-production
          d - Film
          u - Unknown
          z - Other
@@ -1048,6 +1049,7 @@ Data</cite></a>.</p>
       00 - Category of material
          s - Sound recording
       01 - Specific material designation
+         b - Belt
          d - Sound disc
          e - Cylinder
          g - Sound cartridge
@@ -2558,7 +2560,8 @@ Data</cite></a>.</p>
       $b - Geographic classification area code (R)
       $c - Geographic classification subarea code (R)
       $p - Place of event (R)
-      $0 - Record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (R)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -2598,6 +2601,7 @@ Data</cite></a>.</p>
       $y - Ending date (NR)
       $z - Name of extraterrestrial body  (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source  (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -2690,13 +2694,18 @@ Data</cite></a>.</p>
       $d - Language code of sung or spoken text (R)
       $e - Language code of librettos (R)
       $f - Language code of table of contents (R)
-      $g - Language code of accompanying material other than librettos (R)
+      $g - Language code of accompanying material other than librettos and transcripts (R)
       $h - Language code of original and/or intermediate translations of text (R) [REDEFINED]
       $h - Language code of original (R)
-      $j - Language code of subtitles or captions (R)
+      $i - Language code of intertitles (R)
+      $j - Language code of subtitles (R)
       $k - Language code of intermediate translations (R)
       $m - Language code of original accompanying materials other than librettos (R)
       $n - Language code of original libretto (R)
+      $p - Language code of captions (R)
+      $q - Language code of accessible audio (R)
+      $r - Language code of accessible visual language (non-textual) (R)
+      $t - Language code of accompanying transcripts for audiovisual materials (R)
       $2 - Source of code (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -2750,6 +2759,7 @@ Data</cite></a>.</p>
       $b - Local GAC code (R)
       $c - ISO code (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of local code (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -2964,6 +2974,7 @@ Data</cite></a>.</p>
       $b - Item number (NR)
       $d - Supplementary class number (MU) [OBSOLETE]
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3001,6 +3012,7 @@ Data</cite></a>.</p>
       $c - Subject (MP) [OBSOLETE]
       $d - Populated place name (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Code source (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3026,6 +3038,7 @@ Data</cite></a>.</p>
       $a - Classification number (NR)
       $b - Item number (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of call/class number (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3049,6 +3062,7 @@ Data</cite></a>.</p>
       $a - Classification number (R)
       $b - Item number (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $8 - Field link and sequence number (R)
 
 061 - NATIONAL LIBRARY OF MEDICINE COPY STATEMENT (R)
@@ -3082,7 +3096,7 @@ Data</cite></a>.</p>
 070 - NATIONAL AGRICULTURAL LIBRARY CALL NUMBER (R)
    Indicators
       First - Existence in NAL collection
-         # - No information provider
+         # - No information provided
          0 - Item is in NAL
          1 - Item is not in NAL
       Second - Undefined
@@ -3096,6 +3110,7 @@ Data</cite></a>.</p>
       $a - Classification number (R)
       $b - Item number (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $8 - Field link and sequence number (R)
 
 071 - NATIONAL AGRICULTURAL LIBRARY COPY STATEMENT (R)
@@ -3153,6 +3168,7 @@ Data</cite></a>.</p>
       $b - Item number (NR)
       $x - Common auxiliary subdivision (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Edition identifier (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3209,6 +3225,7 @@ Data</cite></a>.</p>
       $b - Item number (NR)
       $q - Assigning agency (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of number (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3233,6 +3250,7 @@ Data</cite></a>.</p>
       $y - Table sequence number for internal subarrangement or add table (R)
       $z - Table identification (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -3250,6 +3268,7 @@ Data</cite></a>.</p>
       $a - Classification number (NR)
       $z - Canceled/invalid classification number (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Number source (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3323,6 +3342,8 @@ Data</cite></a>.</p>
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3351,6 +3372,8 @@ Data</cite></a>.</p>
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3368,7 +3391,7 @@ Data</cite></a>.</p>
       $a - Meeting name or jurisdiction name as entry element (NR)
       $b - Number (BK CF MP MU SE VM MX) [OBSOLETE]
       $c - Location of meeting (R)
-      $d - Date of meeting (NR)
+      $d - Date of meeting or treaty signing (R)
       $e - Subordinate unit (R)
       $f - Date of a work (NR)
       $g - Miscellaneous information (R)
@@ -3381,6 +3404,8 @@ Data</cite></a>.</p>
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3406,9 +3431,11 @@ Data</cite></a>.</p>
       $o - Arranged statement for music (NR)
       $p - Name of part/section of a work (R)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -3501,8 +3528,10 @@ Data</cite></a>.</p>
       $o - Arranged statement for music (NR)
       $p - Name of part/section of a work (R)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -3559,7 +3588,7 @@ Data</cite></a>.</p>
       $o - Arranged statement for music (NR)
       $p - Name of part/section of a work (R)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -3655,6 +3684,21 @@ Data</cite></a>.</p>
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
+      
+251 - VERSION INFORMATION (R)
+   Indicators
+      First - Undefined
+         # - Undefined
+      Second - Undefined
+         # - Undefined
+   Subfield Codes
+      $a - Version (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source (NR)
+      $3 - Materials specified (NR)
+      $6 - Linkage (NR)
+      $8 - Field link and sequence number (R)      
 
 254 - MUSICAL PRESENTATION STATEMENT (NR)
    Indicators
@@ -3704,6 +3748,7 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Country of producing entity (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -3966,7 +4011,7 @@ Data</cite></a>.</p>
       $f - Presentation format (NR)
       $6 - Linkage (NR)
 
-310 - CURRENT PUBLICATION FREQUENCY (NR)
+310 - CURRENT PUBLICATION FREQUENCY (R)
    Indicators
       First - Undefined
          # - Undefined
@@ -3975,6 +4020,9 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Current publication frequency (NR)
       $b - Date of current publication frequency (NR)
+      $0 - Authority record control number or standard number (NR)
+      $1 - Real World Object URI (R)
+      $2 - Source (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
@@ -3998,6 +4046,9 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Former publication frequency (NR)
       $b - Dates of former publication frequency (NR)
+      $0 - Authority record control number or standard number (NR)
+      $1 - Real World Object URI (R)
+      $2 - Source (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 	  
@@ -4011,6 +4062,7 @@ Data</cite></a>.</p>
       $a - Content type term (R)
       $b - Content type code (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -4026,6 +4078,7 @@ Data</cite></a>.</p>
       $a - Media type term (R)
       $b - Media type code (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -4041,6 +4094,7 @@ Data</cite></a>.</p>
       $a - Carrier type term (R)
       $b - Carrier type code (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -4068,6 +4122,26 @@ Data</cite></a>.</p>
       $n - Font size (R)
       $o - Polarity (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI
+      $2 - Source (NR)
+      $3 - Materials specified (NR)
+      $6 - Linkage (NR)
+      $8 - Field link and sequence number (R)
+
+341 - ACCESSIBILITY CONTENT (R)
+   Indicators
+      First - Application
+         # - No information provided
+         0 - Adaptive features to access primary content
+         1 - Adaptive features to access secondary content
+      Second - Undefined
+         # - Undefined
+   Subfield Codes
+      $a - Content access mode (NR)
+      $b - Textual assistive features (R)
+      $c - Visual assistive features (R)
+      $d - Auditory assistive features (R)
+      $e - Tactile assistive features (R)
       $2 - Source (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -4151,6 +4225,7 @@ Data</cite></a>.</p>
       $g - Configuration of playback channels (R)
       $h - Special playback characteristics (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -4166,6 +4241,7 @@ Data</cite></a>.</p>
       $a - Presentation format (R)
       $b - Projection speed (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -4181,6 +4257,7 @@ Data</cite></a>.</p>
       $a - Video format (R)
       $b - Broadcast standard (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -4200,6 +4277,7 @@ Data</cite></a>.</p>
       $e - Regional encoding (R)
       $f - Encoded bitrate (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -4215,6 +4293,7 @@ Data</cite></a>.</p>
       $a - Format of notated music term (R)
       $b - Format of notated music code (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -4416,6 +4495,7 @@ Data</cite></a>.</p>
       $u - Uniform Resource Identifier (R)
       $v - Source of information (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
@@ -4433,7 +4513,9 @@ Data</cite></a>.</p>
       $a - Language code (R)
       $l - Language term (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
+      $3 - Materials specified (NR)
       $6 - Linkage (NR) 
       $8 - Field link and sequence number (R)
 	  
@@ -4445,8 +4527,10 @@ Data</cite></a>.</p>
          # - Undefined 
    Subfield Codes
       $a - Form of work (R)
-      $0 - Record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (NR)
+      $3 - Materials specified (NR)
       $6 - Linkage (NR) 
       $8 - Field link and sequence number (R)
 	  
@@ -4460,8 +4544,10 @@ Data</cite></a>.</p>
       $a - Other distinguishing characteristic (R)
       $u - Uniform Resource Identifier (R)
       $v - Source of information (R)
-      $0 - Record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (NR)
+      $3 - Materials specified (NR)
       $6 - Linkage (NR) 
       $8 - Field link and sequence number (R)
 	  
@@ -4486,7 +4572,8 @@ Data</cite></a>.</p>
       $s - Total number of performers (NR)
       $t - Total number of ensembles (NR)
       $v - Note (R)
-      $0 - Record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR) 
@@ -4505,10 +4592,11 @@ Data</cite></a>.</p>
       $d - Thematic index code (NR)
       $e - Publisher associated with opus number (NR)
       $2 - Source (NR)
+      $3 - Materials secified (NR)
       $6 - Linkage (NR) 
       $8 - Field link and sequence number (R)
 	  
-384 - KEY (NR)
+384 - KEY (R)
    Indicators
       First - Key type
          # - Relationship to original unknown
@@ -4518,6 +4606,7 @@ Data</cite></a>.</p>
          # - Undefined 
    Subfield Codes
       $a - Key (NR)
+      $3 - Materials specified (NR)
       $6 - Linkage (NR) 
       $8 - Field link and sequence number (R)
       
@@ -4533,6 +4622,7 @@ Data</cite></a>.</p>
       $m - Demographic group term (NR)
       $n - Demographic group code (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR) 
@@ -4551,6 +4641,7 @@ Data</cite></a>.</p>
       $m - Demographic group term (NR)
       $n - Demographic group code (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
@@ -4568,6 +4659,7 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Time period of creation term (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR) 
@@ -4801,6 +4893,8 @@ Data</cite></a>.</p>
       $d - Authorized users (R)
       $e - Authorization (R)
       $f - Standardized terminology for access restriction (R)
+      $g - Availability date (R)
+      $q - Supplying agency (R)
       $u - Uniform Resource Identifier (R)
       $2 - Source of term (NR)
       $3 - Materials specified (NR)
@@ -4961,7 +5055,8 @@ Data</cite></a>.</p>
       $d - Date of event (R)
       $o - Other event information (R)
       $p - Place of event (R)
-      $0 - Record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (R)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -5104,6 +5199,20 @@ Data</cite></a>.</p>
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
+532 - ACCESSIBILITY NOTE (R)
+   Indicators
+      First - Display constant controller
+         0 - Accessibility technical details
+         1 - Accessibility features
+         2 - Accessibility deficiencies
+         8 - No display constant generated
+      Second - Undefined
+         # - Undefined
+   Subfield Codes
+      $a - Summary of accessibility (NR)
+      $6 - Linkage (NR)
+      $8 - Field link and sequence number (R)
+
 533 - REPRODUCTION NOTE (R)
    Indicators
       First - Undefined
@@ -5238,7 +5347,11 @@ Data</cite></a>.</p>
       $b - Jurisdiction (NR)
       $c - Authorization (NR)
       $d - Authorized users (NR)
+      $f - Use and reproduction rights (R)
+      $g - Availability date (R)
+      $q - Supplying agency (NR)
       $u - Uniform Resource Identifier (R)
+      $2 - Source of term (NR)
       $3 - Materials specified (NR)
       $5 - Institution to which field applies (NR)
       $6 - Linkage (NR)
@@ -5291,7 +5404,7 @@ Data</cite></a>.</p>
       $n - Note (R)
       $o - Research date (NR)
       $p - Country of publication or creation (R)
-      $q - Assigning agency (NR)
+      $q - Supplying agency (NR)
       $r - Jurisdiction of copyright assessment (NR)
       $s - Source of information (NR)
       $u - Uniform Resource Identifier (R)
@@ -5520,6 +5633,7 @@ Data</cite></a>.</p>
       $a - Methodology note (NR)
       $b - Controlled term (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -5715,7 +5829,7 @@ Data</cite></a>.</p>
       $p - Name of part/section of a work (R)
       $q - Fuller form of name (NR)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $v - Form subdivision (R)
@@ -5723,6 +5837,7 @@ Data</cite></a>.</p>
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
@@ -5760,7 +5875,7 @@ Data</cite></a>.</p>
       $o - Arranged statement for music (NR)
       $p - Name of part/section of a work (R)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $v - Form subdivision (R)
@@ -5768,6 +5883,7 @@ Data</cite></a>.</p>
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
@@ -5793,7 +5909,7 @@ Data</cite></a>.</p>
       $a - Meeting name or jurisdiction name as entry element (NR)
       $b - Number (BK CF MP MU SE VM MX) [OBSOLETE]
       $c - Location of meeting (R)
-      $d - Date of meeting (NR)
+      $d - Date of meeting or treaty signing (R)
       $e - Subordinate unit (R)
       $f - Date of a work (NR)
       $g - Miscellaneous information (R)
@@ -5804,7 +5920,7 @@ Data</cite></a>.</p>
       $n - Number of part/section/meeting (R)
       $p - Name of part/section of a work (R)
       $q - Name of meeting following jurisdiction name entry element (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $v - Form subdivision (R)
@@ -5812,6 +5928,7 @@ Data</cite></a>.</p>
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
@@ -5846,13 +5963,14 @@ Data</cite></a>.</p>
       $o - Arranged statement for music (NR)
       $p - Name of part/section of a work (R)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $v - Form subdivision (R)
       $x - General subdivision (R)
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
@@ -5882,6 +6000,7 @@ Data</cite></a>.</p>
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -5911,6 +6030,7 @@ Data</cite></a>.</p>
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -5944,6 +6064,7 @@ Data</cite></a>.</p>
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
@@ -5973,6 +6094,7 @@ Data</cite></a>.</p>
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
@@ -6029,7 +6151,8 @@ Data</cite></a>.</p>
       $v - Form subdivision (R)
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
-      $0 - Authority record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
@@ -6058,7 +6181,8 @@ Data</cite></a>.</p>
       $x - General subdivision (R)
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
-      $0 - Authority record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (NR)
       $3 - Materials specified (NR)
       $5 - Institution to which field applies (NR)
@@ -6078,7 +6202,8 @@ Data</cite></a>.</p>
       $x - General subdivision (R)
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
-      $0 - Authority record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -6096,7 +6221,8 @@ Data</cite></a>.</p>
       $x - General subdivision (R)
       $y - Chronological subdivision (R)
       $z - Geographic subdivision (R)
-      $0 - Authority record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
@@ -6132,12 +6258,31 @@ Data</cite></a>.</p>
       $f - City subsection (R)
       $g - Other nonjurisdictional geographic region and feature (R)
       $h - Extraterrestrial area (R)
-      $0 - Authority record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR)
       $4 - Relationship (R)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
+688 - SUBJECT ADDED ENTRY--TYPE OF ENTITY UNSPECIFIED (R)
+   Indicators
+      First - Undefined
+         # - Undefined
+      Second - Source of name, title, or term
+         # - No information provided
+         7 - Source specified in subfield $2
+   Subfield Codes
+      $a - Name, title, or term (NR)
+      $e - Relator term (R)
+      $g - Miscellaneous information (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of name, title, or term (NR)
+      $3 - Materials specified (NR)
+      $4 - Relationship (R)
+      $6 - Linkage (NR)
+      $8 - Field link and sequence number (R)
 
 --Added Entry Fields (70X-75X)--
 700 - ADDED ENTRY--PERSONAL NAME (R)
@@ -6173,11 +6318,13 @@ Data</cite></a>.</p>
       $p - Name of part/section of a work (R)
       $q - Fuller form of name (NR)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
       $5 - Institution to which field applies (NR)
@@ -6244,11 +6391,13 @@ Data</cite></a>.</p>
       $o - Arranged statement for music (NR)
       $p - Name of part/section of a work (R)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
       $5 - Institution to which field applies (NR)
@@ -6272,7 +6421,7 @@ Data</cite></a>.</p>
       $a - Meeting name or jurisdiction name as entry element (NR)
       $b - Number (BK CF MP MU SE VM MX) [OBSOLETE]
       $c - Location of meeting (R)
-      $d - Date of meeting (NR)
+      $d - Date of meeting or treaty signing (R)
       $e - Subordinate unit (R)
       $f - Date of a work (NR)
       $g - Miscellaneous information (R)
@@ -6284,11 +6433,13 @@ Data</cite></a>.</p>
       $n - Number of part/section/meeting (R)
       $p - Name of part/section of a work (R)
       $q - Name of meeting following jurisdiction name entry element (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
       $5 - Institution to which field applies (NR)
@@ -6364,11 +6515,14 @@ Data</cite></a>.</p>
       $o - Arranged statement for music (NR)
       $p - Name of part/section of a work (R)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
+      $4 - Relationship (R)
       $5 - Institution to which field applies (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -6403,7 +6557,9 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Geographic name (NR)
       $e - Relator term (R)
-      $0 - Authority record control number (R)
+      $g - Miscellaneous information (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR) 
       $3 - Materials specified (NR)
       $4 - Relationship (R)
@@ -6425,7 +6581,8 @@ Data</cite></a>.</p>
       $f - City subsection (R)
       $g - Other nonjurisdictional geographic region and feature (R)
       $h - Extraterrestrial area (R)
-      $0 - Authority record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of heading or term (NR)
       $4 - Relationship (R)
       $6 - Linkage (NR)
@@ -6442,6 +6599,7 @@ Data</cite></a>.</p>
       $b - Programming language (NR)
       $c - Operating system (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of term (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -6458,7 +6616,8 @@ Data</cite></a>.</p>
       $d - Common or alternative name (R)
       $x - Non-public note (R)
       $z - Public note (R)
-      $0 - Authority record control number (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source of taxonomic identification (NR)
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
@@ -6479,6 +6638,23 @@ Data</cite></a>.</p>
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 
+758 - RESOURCE IDENTIFIER (R)
+   Indicators
+      First - Undefined
+         # - Undefined
+      Second - Undefined
+         # - Undefined
+   Subfield Codes
+      $a - Label (NR)
+      $i - Relationship information (R)
+      $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
+      $3 - Materials specified (NR)
+      $4 - Relationship (R)
+      $5 - Institution to which field applies (NR)
+      $6 - Linkage (NR)
+      $8 - Field link and sequence number (R)
 
 --Linking Entry Fields (76X-78X)--
 760 - MAIN SERIES ENTRY (R)
@@ -6881,11 +7057,14 @@ Data</cite></a>.</p>
       $n - Note (R)
       $o - Other item identifier (R)
       $q - Parallel title (NR) (BK SE) [OBSOLETE]
+      $r - Report number (R)
       $s - Uniform title (NR)
       $t - Title (NR)
+      $u - Standard Technical Report Number (NR)
       $w - Record control number (R)
       $x - International Standard Serial Number (NR)
       $y - CODEN designation (NR)
+      $z - International Standard Book Number (R)
       $4 - Relationship (R)
       $6 - Linkage (NR)
       $7 - Control subfield (NR)
@@ -7089,13 +7268,15 @@ Data</cite></a>.</p>
       $p - Name of part/section of a work (R)
       $q - Fuller form of name (NR)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $v - Volume/sequential designation  (NR)
       $w - Bibliographic record control number (R)
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
       $5 - Institution to which field applies (R)
@@ -7129,13 +7310,15 @@ Data</cite></a>.</p>
       $o - Arranged statement for music (NR)
       $p - Name of part/section of a work (R)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $v - Volume/sequential designation (NR)
       $w - Bibliographic record control number (R)
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
       $5 - Institution to which field applies (R)
@@ -7156,7 +7339,7 @@ Data</cite></a>.</p>
    Subfield Codes
       $a - Meeting name or jurisdiction name as entry element (NR)
       $c - Location of meeting (R)
-      $d - Date of meeting (NR)
+      $d - Date of meeting or treaty signing (R)
       $e - Subordinate unit (R)
       $f - Date of a work (NR)
       $g - Miscellaneous information (R)
@@ -7167,13 +7350,15 @@ Data</cite></a>.</p>
       $n - Number of part/section/meeting (R)
       $p - Name of part/section of a work (R)
       $q - Name of meeting following jurisdiction name entry element (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR)
       $u - Affiliation (NR)
       $v - Volume/sequential designation (NR)
       $w - Bibliographic record control number (R)
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $4 - Relationship (R)
       $5 - Institution to which field applies (R)
@@ -7202,12 +7387,14 @@ Data</cite></a>.</p>
       $o - Arranged statement for music (NR)
       $p - Name of part/section of a work (R)
       $r - Key for music (NR)
-      $s - Version (NR)
+      $s - Version (R)
       $t - Title of a work (NR) 
       $v - Volume/sequential designation (NR)
       $w - Bibliographic record control number (R)
       $x - International Standard Serial Number (NR)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
+      $2 - Source of heading or term (NR)
       $3 - Materials specified (NR)
       $5 - Institution to which field applies (R)
       $6 - Linkage (NR)
@@ -7365,6 +7552,7 @@ Data</cite></a>.</p>
       $2 - Access method (NR)
       $3 - Materials specified (NR)
       $6 - Linkage (NR)
+      $7 - Access status (NR)
       $8 - Field link and sequence number (R)
 
 863 - ENUMERATION AND CHRONOLOGY--BASIC BIBLIOGRAPHIC UNIT (R)
@@ -7416,23 +7604,25 @@ Data</cite></a>.</p>
       $6 - Linkage (NR)
       $8 - Field link and sequence number (R)
 	  
-883 - MACHINE-GENERATED METADATA PROVENANCE (R)
+883 - METADATA PROVENANCE (R)
    Indicators
-      First - Method of machine assignment
+      First - Method of assignment
          # - No information provided/not applicable
          0 - Fully machine-generated
          1 - Partially machine-generated
+         2 - Not machine-generated 
       Second - Undefined
          # - Undefined
    Subfield Codes
-      $a - Generation process (NR)
+      $a - Creation process (NR)
       $c - Confidence value (NR)
-      $d - Generation date (NR)
-      $q - Generation agency (NR)
+      $d - Creation date (NR)
+      $q - Assigning or generating agency (NR)
       $x - Validity end date (NR)
       $u - Uniform Resource Identifier (NR)
       $w - Bibliographic record control number (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $8 - Field link and sequence number (R)
 
 884 - DESCRIPTION CONVERSION INFORMATION (R)
@@ -7463,6 +7653,7 @@ Data</cite></a>.</p>
       $x - Nonpublic note (R)
       $z - Public note (R)
       $0 - Authority record control number or standard number (R)
+      $1 - Real World Object URI (R)
       $2 - Source (NR)
       $5 - Institution to which field applies (NR)
 
@@ -7500,15 +7691,16 @@ Data</cite></a>.</p>
 Congress</a> &gt;&gt; <a href="//www.loc.gov/marc/">MARC</a>
 &gt;&gt; <strong>Bibliographic Field List</strong></div>
 
-(05/17/2017)</td>
-<td align="right"><a href="/cdn-cgi/l/email-protection#c8a6aca5bba788a4a7abe6afa7be">Contact
+(05/27/2020)</td>
+<td align="right"><a href="/cdn-cgi/l/email-protection#7b151f1608143b171418551c140d">Contact
 Us</a></td>
 </tr>
 </table>
 
-<script type='text/javascript' src='/global/s_code.js'>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript" src="/global/s_code.js">
 </script>
-<script type='text/javascript' src='//cdn.loc.gov/js/global/metrics/sc/s_code.js'></script><script>/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/\>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script></body>
+<script>if(window['_satellite']){_satellite.pageBottom();}</script>
+</body>
 </html>
 
 

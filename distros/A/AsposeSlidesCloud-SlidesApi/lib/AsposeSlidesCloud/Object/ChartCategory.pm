@@ -41,6 +41,7 @@ use AsposeSlidesCloud::Object::ChartCategory;
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::LineFormat;
+use AsposeSlidesCloud::Object::OneValueChartDataPoint;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -202,6 +203,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'data_points' => {
+    	datatype => 'ARRAY[OneValueChartDataPoint]',
+    	base_name => 'DataPoints',
+    	description => 'Gets or sets the data points for chart data',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -209,7 +217,8 @@ __PACKAGE__->swagger_types( {
     'value' => 'string',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
-    'line_format' => 'LineFormat'
+    'line_format' => 'LineFormat',
+    'data_points' => 'ARRAY[OneValueChartDataPoint]'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -217,7 +226,8 @@ __PACKAGE__->attribute_map( {
     'value' => 'Value',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
-    'line_format' => 'LineFormat'
+    'line_format' => 'LineFormat',
+    'data_points' => 'DataPoints'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

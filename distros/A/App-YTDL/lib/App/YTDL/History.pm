@@ -24,7 +24,7 @@ sub read_history_files {
 
             # ### ############################################################ ### # remove that after a while
             my @keys = keys %{$set->{sticky}};                                     # added 0.401
-            if ( $keys[0] =~ /^https?:/ ) {
+            if ( @keys && $keys[0] =~ /^https?:/ ) {
                 $set->{sticky} = _old_file_fmt_to_new_file_fmt( $set->{sticky} );
                 write_json( $set->{sticky_file},  $set->{sticky} );
             }
@@ -36,7 +36,7 @@ sub read_history_files {
 
             # ### ############################################################ ### # remove that after a while
             my @keys = keys %{$set->{history}};                                    # added 0.401
-            if ( $keys[0] =~ /^https?:/ ) {
+            if ( @keys && $keys[0] =~ /^https?:/ ) {
                 $set->{history} = _old_file_fmt_to_new_file_fmt( $set->{history} );
                 write_json( $set->{history_file}, $set->{history} );
             }

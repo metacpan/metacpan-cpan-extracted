@@ -7,7 +7,7 @@ require 't/test-lib.pm';
 use lib 't/lib';
 
 my $res;
-my $maintests = 24;
+my $maintests = 36;
 
 SKIP: {
     skip( 'LLNGTESTLDAP is not set', $maintests ) unless ( $ENV{LLNGTESTLDAP} );
@@ -28,6 +28,13 @@ SKIP: {
                 managerPassword => 'lemonldapng',
                 ldapAllowResetExpiredPassword => 1,
                 ldapPpolicyControl            => 1,
+                passwordPolicyMinSize         => 4,
+                passwordPolicyMinLower        => 1,
+                passwordPolicyMinUpper        => 1,
+                passwordPolicyMinDigit        => 1,
+                passwordPolicyMinSpeChar      => 1,
+                passwordPolicySpecialChar     => '@',
+                portalDisplayPasswordPolicy   => 1
             }
         }
     );
@@ -67,10 +74,28 @@ SKIP: {
         my ( $host, $url, $query ) =
           expectForm( $res, '#', undef, 'user', 'oldpassword', 'newpassword',
             'confirmpassword' );
+        ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinSize">%,
+            ' passwordPolicyMinSize' )
+          or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinSize' );
+        ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinLower">%,
+            ' passwordPolicyMinLower' )
+          or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinLower' );
+        ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinUpper">%,
+            ' passwordPolicyMinUpper' )
+          or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinUpper' );
+        ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinDigit">%,
+            ' passwordPolicyMinDigit' )
+          or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinDigit' );
+        ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicyMinSpeChar">%,
+            ' passwordPolicyMinSpeChar' )
+          or print STDERR Dumper( $res->[2]->[0], 'passwordPolicyMinSpeChar' );
+        ok( $res->[2]->[0] =~ m%<span trspan="passwordPolicySpecialChar">%,
+            ' passwordPolicySpecialChar' )
+          or print STDERR Dumper( $res->[2]->[0], 'passwordPolicySpecialChar' );
         ok( $query =~ /user=$user/, "User is $user" )
           or explain( $query, "user=$user" );
         $query =~ s/(oldpassword)=/$1=$user/g;
-        $query =~ s/((?:confirm|new)password)=/$1=newp/g;
+        $query =~ s/((?:confirm|new)password)=/$1=Newp1@/g;
         ok(
             $res = $client->_post(
                 '/', IO::String->new($query),
@@ -82,7 +107,7 @@ SKIP: {
         $match = 'trmsg="' . PE_PASSWORD_OK . '"';
         ok( $res->[2]->[0] =~ /$match/, 'Password is changed' );
 
-        $postString = "user=$user&password=newp";
+        $postString = "user=$user&password=Newp1@";
         ok(
             $res = $client->_post(
                 '/', IO::String->new($postString),
@@ -163,7 +188,7 @@ SKIP: {
     );
     my $id = expectCookie($res);
     $query =
-      'oldpassword=passwordnottooshort&newpassword=test&confirmpassword=test';
+      'oldpassword=passwordnottooshort&newpassword=Te1@&confirmpassword=Te1@';
     ok(
         $res = $client->_post(
             '/',
@@ -189,7 +214,7 @@ SKIP: {
     );
     $id = expectCookie($res);
     $query =
-'oldpassword=passwordnottooshort&newpassword=testmore&confirmpassword=testmore';
+'oldpassword=passwordnottooshort&newpassword=Testmore1@&confirmpassword=Testmore1@';
     ok(
         $res = $client->_post(
             '/',

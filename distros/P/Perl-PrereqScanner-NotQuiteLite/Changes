@@ -1,5 +1,13 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.9913 2020/09/06
+  - Add URI::cpan to cpanfile
+
+0.9912 2020/09/06
+  - Fix not to dedupe core modules needlessly
+  - Use a main module to represent modules that belong to the same distribution
+  - Dedupe build requires as well
+
 0.9911 2020/05/10
   - Remove cached cpanmeta if prereqs are replaced
 

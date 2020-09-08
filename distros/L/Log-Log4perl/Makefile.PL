@@ -1,28 +1,4 @@
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-
-    # That's the minimum.
-use 5.00503;
-
-    # If we're not 5.6.0, there's some corrections we need to make: Use
-    # 'use vars' instead of 'our' variables, get rid of 'use warnings'
-    # and other stuff. The eg/5005it.pl script takes care of it.
-if($] < 5.006) {
-    require "eg/5005it.pl";
-
-    print <<EOT;
-########################################################
-# Hm, you're still using perl 5.005. Although I don't  #
-# condone that, I'll let it slip this time:            #
-# Changing distribution to be backwards compatible ... #
-EOT
-    mk5005("t", "lib");
-    print <<EOT;
-# Done. But do me a favour and upgrade soon.           # 
-########################################################
-EOT
-}
 
 # Check for Time::HiRes;
 eval { require Time::HiRes; };
@@ -33,9 +9,26 @@ if($@) {
 
 my $meta_merge = {
     META_MERGE => {
+        "meta-spec" => { version => 2 },
         resources => {
-            repository  => 'http://github.com/mschilli/log4perl',
+            repository  => 'https://github.com/mschilli/log4perl',
             MailingList => 'mailto:log4perl-devel@lists.sourceforge.net',
+            bugtracker  => {
+                web => 'https://github.com/mschilli/log4perl/issues',
+            },
+        },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Log::Dispatch' => 0,
+                    'DBI' => '1.607',
+                    'DBD::SQLite' => 0,
+                    'DBD::CSV' => '0.33',
+                    'SQL::Statement' => '1.20',
+                    'Log::Dispatch::FileRotate' => '1.10',
+                    'XML::DOM' => '1.29',
+                },
+            },
         },
     }
 };
@@ -45,19 +38,14 @@ WriteMakefile(
     'VERSION_FROM'	=> 'lib/Log/Log4perl.pm', # finds $VERSION
     'PREREQ_PM'		=> { Test::More    => 0.45,
                              File::Spec    => 0.82,
-                             File::Path    => 2.06_06,
+                             File::Path    => 2.07,
                            }, # e.g., Module::Name => 1.1
-    ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM => 'lib/Log/Log4perl.pm', # retrieve abstract from module
-       AUTHOR     => 'Mike Schilli <m@perlmeister.com>') : ()),
-    'LIBS'		=> [''], # e.g., '-lm'
-    'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
-	# Insert -I. if you add *.h files later:
-    'INC'		=> '', # e.g., '-I/usr/include/other'
-	# Un-comment this if you add C files to link with later:
-    # 'OBJECT'		=> '$(O_FILES)', # link all the C files too
+    ABSTRACT_FROM => 'lib/Log/Log4perl.pm', # retrieve abstract from module
+    AUTHOR     => 'Mike Schilli <m@perlmeister.com>',
+    MIN_PERL_VERSION => '5.006',
     'clean'             => {FILES => "*.tar.gz *.ppd pod2htm*"},
     EXE_FILES           => ["eg/l4p-tmpl"],
+    LICENSE => 'perl_5',
     $ExtUtils::MakeMaker::VERSION >= 6.50 ? (%$meta_merge) : (),
     get_man3pods(), 
 );

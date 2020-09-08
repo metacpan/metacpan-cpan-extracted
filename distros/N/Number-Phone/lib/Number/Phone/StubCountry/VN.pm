@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200606132002;
+our $VERSION = 1.20200904144536;
 
 my $formatters = [
                 {
@@ -107,7 +107,10 @@ my $validators = {
         ',
                 'mobile' => '
           (?:
-            52[238]|
+            5(?:
+              2[238]|
+              59
+            )|
             89[689]|
             99[013-9]
           )\\d{6}|
@@ -138,69 +141,6 @@ my $validators = {
                 'voip' => '672\\d{6}'
               };
 my %areanames = ();
-$areanames{vi}->{84203} = "Quảng\ Ninh";
-$areanames{vi}->{84204} = "Bắc\ Giang";
-$areanames{vi}->{84205} = "Lạng\ Sơn";
-$areanames{vi}->{84206} = "Cao\ Bằng";
-$areanames{vi}->{84207} = "Tuyên\ Quang";
-$areanames{vi}->{84208} = "Thái\ Nguyên";
-$areanames{vi}->{84209} = "Tỉnh\ Bắc\ Kạn";
-$areanames{vi}->{84210} = "Phú\ Thọ";
-$areanames{vi}->{84211} = "Vĩnh\ Phúc";
-$areanames{vi}->{84212} = "Sơn\ La";
-$areanames{vi}->{84213} = "Lai\ Châu";
-$areanames{vi}->{84214} = "Lào\ Cai";
-$areanames{vi}->{84215} = "Điện\ Biên";
-$areanames{vi}->{84216} = "Yên\ Bái";
-$areanames{vi}->{84218} = "Hòa\ Bình";
-$areanames{vi}->{84219} = "Hà\ Giang";
-$areanames{vi}->{84220} = "Hải\ Dương";
-$areanames{vi}->{84221} = "Hưng\ Yên";
-$areanames{vi}->{84222} = "Bắc\ Ninh";
-$areanames{vi}->{84225} = "Thành\ phố\ Hải\ Phòng";
-$areanames{vi}->{84226} = "Hà\ Nam";
-$areanames{vi}->{84227} = "Thái\ Bình";
-$areanames{vi}->{84228} = "Nam\ Định";
-$areanames{vi}->{84229} = "Ninh\ Bình";
-$areanames{vi}->{84232} = "Quảng\ Bình";
-$areanames{vi}->{84233} = "Quảng\ Trị";
-$areanames{vi}->{84234} = "Thừa\ Thiên\-Huế";
-$areanames{vi}->{84235} = "Quảng\ Nam";
-$areanames{vi}->{84236} = "TP\ Đà\ Nẵng";
-$areanames{vi}->{84237} = "Thanh\ Hóa";
-$areanames{vi}->{84238} = "Nghệ\ An";
-$areanames{vi}->{84239} = "Hà\ Tĩnh";
-$areanames{vi}->{8424} = "Thủ\ đô\ Hà\ Nội";
-$areanames{vi}->{84251} = "Đồng\ Nai";
-$areanames{vi}->{84252} = "Bình\ Thuận";
-$areanames{vi}->{84254} = "Bà\ Rịa\-Vũng\ Tàu";
-$areanames{vi}->{84255} = "Quảng\ Ngãi";
-$areanames{vi}->{84256} = "Bình\ Định";
-$areanames{vi}->{84257} = "Phú\ Yên";
-$areanames{vi}->{84258} = "Khánh\ Hòa";
-$areanames{vi}->{84259} = "Ninh\ Thuận";
-$areanames{vi}->{84260} = "Kon\ Tum";
-$areanames{vi}->{84261} = "Đăk\ Nông";
-$areanames{vi}->{84262} = "Đăk\ Lăk";
-$areanames{vi}->{84263} = "Lâm\ Đồng";
-$areanames{vi}->{84269} = "Gia\ Lai";
-$areanames{vi}->{84270} = "Vĩnh\ Long";
-$areanames{vi}->{84271} = "Bình\ Phước";
-$areanames{vi}->{84272} = "Long\ An";
-$areanames{vi}->{84273} = "Tiền\ Giang";
-$areanames{vi}->{84274} = "Bình\ Dương";
-$areanames{vi}->{84275} = "Bến\ Tre";
-$areanames{vi}->{84276} = "Tây\ Ninh";
-$areanames{vi}->{84277} = "Đồng\ Tháp";
-$areanames{vi}->{8428} = "Thành\ phố\ Hồ\ Chí\ Minh";
-$areanames{vi}->{84290} = "Cà\ Mau";
-$areanames{vi}->{84291} = "Bạc\ Liêu";
-$areanames{vi}->{84292} = "Thành\ phố\ Cần\ Thơ";
-$areanames{vi}->{84293} = "Hậu\ Giang";
-$areanames{vi}->{84294} = "Trà\ Vinh";
-$areanames{vi}->{84296} = "An\ Giang";
-$areanames{vi}->{84297} = "Kiên\ Giang";
-$areanames{vi}->{84299} = "Sóc\ Trăng";
 $areanames{en}->{84203} = "Quang\ Ninh\ province";
 $areanames{en}->{84204} = "Bac\ Giang\ province";
 $areanames{en}->{84205} = "Lang\ Son\ province";
@@ -264,6 +204,69 @@ $areanames{en}->{84294} = "Tra\ Vinh\ province";
 $areanames{en}->{84296} = "An\ Giang\ province";
 $areanames{en}->{84297} = "Kien\ Giang\ province";
 $areanames{en}->{84299} = "Soc\ Trang\ province";
+$areanames{vi}->{84203} = "Quảng\ Ninh";
+$areanames{vi}->{84204} = "Bắc\ Giang";
+$areanames{vi}->{84205} = "Lạng\ Sơn";
+$areanames{vi}->{84206} = "Cao\ Bằng";
+$areanames{vi}->{84207} = "Tuyên\ Quang";
+$areanames{vi}->{84208} = "Thái\ Nguyên";
+$areanames{vi}->{84209} = "Tỉnh\ Bắc\ Kạn";
+$areanames{vi}->{84210} = "Phú\ Thọ";
+$areanames{vi}->{84211} = "Vĩnh\ Phúc";
+$areanames{vi}->{84212} = "Sơn\ La";
+$areanames{vi}->{84213} = "Lai\ Châu";
+$areanames{vi}->{84214} = "Lào\ Cai";
+$areanames{vi}->{84215} = "Điện\ Biên";
+$areanames{vi}->{84216} = "Yên\ Bái";
+$areanames{vi}->{84218} = "Hòa\ Bình";
+$areanames{vi}->{84219} = "Hà\ Giang";
+$areanames{vi}->{84220} = "Hải\ Dương";
+$areanames{vi}->{84221} = "Hưng\ Yên";
+$areanames{vi}->{84222} = "Bắc\ Ninh";
+$areanames{vi}->{84225} = "Thành\ phố\ Hải\ Phòng";
+$areanames{vi}->{84226} = "Hà\ Nam";
+$areanames{vi}->{84227} = "Thái\ Bình";
+$areanames{vi}->{84228} = "Nam\ Định";
+$areanames{vi}->{84229} = "Ninh\ Bình";
+$areanames{vi}->{84232} = "Quảng\ Bình";
+$areanames{vi}->{84233} = "Quảng\ Trị";
+$areanames{vi}->{84234} = "Thừa\ Thiên\-Huế";
+$areanames{vi}->{84235} = "Quảng\ Nam";
+$areanames{vi}->{84236} = "TP\ Đà\ Nẵng";
+$areanames{vi}->{84237} = "Thanh\ Hóa";
+$areanames{vi}->{84238} = "Nghệ\ An";
+$areanames{vi}->{84239} = "Hà\ Tĩnh";
+$areanames{vi}->{8424} = "Thủ\ đô\ Hà\ Nội";
+$areanames{vi}->{84251} = "Đồng\ Nai";
+$areanames{vi}->{84252} = "Bình\ Thuận";
+$areanames{vi}->{84254} = "Bà\ Rịa\-Vũng\ Tàu";
+$areanames{vi}->{84255} = "Quảng\ Ngãi";
+$areanames{vi}->{84256} = "Bình\ Định";
+$areanames{vi}->{84257} = "Phú\ Yên";
+$areanames{vi}->{84258} = "Khánh\ Hòa";
+$areanames{vi}->{84259} = "Ninh\ Thuận";
+$areanames{vi}->{84260} = "Kon\ Tum";
+$areanames{vi}->{84261} = "Đăk\ Nông";
+$areanames{vi}->{84262} = "Đăk\ Lăk";
+$areanames{vi}->{84263} = "Lâm\ Đồng";
+$areanames{vi}->{84269} = "Gia\ Lai";
+$areanames{vi}->{84270} = "Vĩnh\ Long";
+$areanames{vi}->{84271} = "Bình\ Phước";
+$areanames{vi}->{84272} = "Long\ An";
+$areanames{vi}->{84273} = "Tiền\ Giang";
+$areanames{vi}->{84274} = "Bình\ Dương";
+$areanames{vi}->{84275} = "Bến\ Tre";
+$areanames{vi}->{84276} = "Tây\ Ninh";
+$areanames{vi}->{84277} = "Đồng\ Tháp";
+$areanames{vi}->{8428} = "Thành\ phố\ Hồ\ Chí\ Minh";
+$areanames{vi}->{84290} = "Cà\ Mau";
+$areanames{vi}->{84291} = "Bạc\ Liêu";
+$areanames{vi}->{84292} = "Thành\ phố\ Cần\ Thơ";
+$areanames{vi}->{84293} = "Hậu\ Giang";
+$areanames{vi}->{84294} = "Trà\ Vinh";
+$areanames{vi}->{84296} = "An\ Giang";
+$areanames{vi}->{84297} = "Kiên\ Giang";
+$areanames{vi}->{84299} = "Sóc\ Trăng";
 
     sub new {
       my $class = shift;

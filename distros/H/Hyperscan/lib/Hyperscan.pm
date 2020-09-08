@@ -1,5 +1,5 @@
 package Hyperscan;
-$Hyperscan::VERSION = '0.03';
+$Hyperscan::VERSION = '0.04';
 # ABSTRACT: Perl bindings to the Intel hyperscan regular expression library
 
 use strict;
@@ -26,7 +26,7 @@ Hyperscan - Perl bindings to the Intel hyperscan regular expression library
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head2 SYNOPSIS
 
@@ -57,9 +57,57 @@ most common use cases from a Perl script L<Hyperscan::Matcher>.
 
 Utility function for identifying underlying hyperscan release version.
 
+=head2 CONSTANTS
+
+=over
+
+=item HS_MAJOR
+
+=item HS_MINOR
+
+=item HS_PATCH
+
+=item HS_FLAG_CASELESS
+
+=item HS_FLAG_DOTALL
+
+=item HS_FLAG_MULTILINE
+
+=item HS_FLAG_SINGLEMATCH
+
+=item HS_FLAG_ALLOWEMPTY
+
+=item HS_FLAG_UTF8
+
+=item HS_FLAG_UCP
+
+=item HS_FLAG_PREFILTER
+
+=item HS_FLAG_SOM_LEFTMOST
+
+=item HS_FLAG_COMBINATION
+
+=item HS_FLAG_QUIET
+
+=item HS_MODE_BLOCK
+
+=item HS_MODE_NOSTREAM
+
+=item HS_MODE_STREAM
+
+=item HS_MODE_VECTORED
+
+=item HS_MODE_SOM_HORIZON_LARGE
+
+=item HS_MODE_SOM_HORIZON_MEDIUM
+
+=item HS_MODE_SOM_HORIZON_SMALL
+
+=back
+
 =head2 SEE ALSO
 
-=head3 L<Hyperscan::Databse>
+=head3 L<Hyperscan::Database>
 
 =head3 L<Hyperscan::Matcher>
 

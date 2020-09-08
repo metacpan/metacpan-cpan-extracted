@@ -136,7 +136,7 @@ SKIP: {
     expectOK($res);
     my $id   = expectCookie($res);
     my @refs = ( $res->[2]->[0] =~
-          /<input type="hidden" name="reference[\dx]+" value="(\w+?)">/gs );
+          m#<input type="hidden" name="reference[\dx]+" value="(\w+?)"/>#gs );
     ok( @refs == 2, 'Two notification references found' )
       or print STDERR Dumper( $res->[2]->[0] );
     ok( $refs[0] eq 'testref2', '1st reference found is "testref2"' )
@@ -145,7 +145,7 @@ SKIP: {
       or print STDERR Dumper( $res->[2]->[0] );
     expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
 
-    # Verify that cookie is ciphered (session unvalid)
+    # Verify that cookie is ciphered (session invalid)
     ok(
         $res = $client->_get(
             '/',

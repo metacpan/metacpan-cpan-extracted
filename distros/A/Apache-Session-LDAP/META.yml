@@ -1,23 +1,23 @@
----
-abstract: 'An implementation of Apache::Session'
+--- #YAML:1.0
+name:               Apache-Session-LDAP
+version:            0.2
+abstract:           An implementation of Apache::Session
 author:
-  - 'Xavier Guimard <guimard@>'
-build_requires:
-  ExtUtils::MakeMaker: '0'
+    - Xavier Guimard <x.guimard@free.fr>
+license:            perl
+distribution_type:  module
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
-license: unknown
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
-name: Apache-Session-LDAP
-no_index:
-  directory:
-    - t
-    - inc
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
 requires:
-  Apache::Session: '0'
-  Net::LDAP: '0'
-version: '0.4'
+    Apache::Session:  0
+    Net::LDAP:        0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

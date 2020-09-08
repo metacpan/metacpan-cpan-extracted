@@ -146,7 +146,7 @@ SKIP: {
     expectOK($res);
     ok(
         $res->[2]->[0] =~
-qr%<input type="hidden" name="reference1x1" value="Remov-e-TOTP-(\d{10})">%,
+qr%<input type="hidden" name="reference1x1" value="Remov-e-TOTP-(\d{10})"/>%,
         'Notification reference found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( time() + 295 <= $1 && $1 <= time() + 305, 'Right reference found' )

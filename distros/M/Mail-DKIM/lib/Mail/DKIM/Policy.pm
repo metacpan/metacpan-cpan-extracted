@@ -1,7 +1,7 @@
 package Mail::DKIM::Policy;
 use strict;
 use warnings;
-our $VERSION = '1.20200824'; # VERSION
+our $VERSION = '1.20200907'; # VERSION
 # ABSTRACT: abstract base class for originator "signing" policies
 
 # Copyright 2005-2007 Messiah College.
@@ -162,7 +162,7 @@ Mail::DKIM::Policy - abstract base class for originator "signing" policies
 
 =head1 VERSION
 
-version 1.20200824
+version 1.20200907
 
 =head1 SYNOPSIS
 

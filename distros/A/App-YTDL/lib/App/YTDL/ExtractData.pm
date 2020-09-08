@@ -29,7 +29,6 @@ sub extract_data_list {
             $data->{$ex}{$up}{$id}{uploader_url} = $h_ref->{uploader_url};
             $data->{$ex}{$up}{$id}{uploader} = $h_ref->{uploader};
             $data->{$ex}{$up}{$id}{title} ||= sprintf 'no_title_%s', $id;
-            $data->{$ex}{$up}{$id}{video_order} = $set->{video_count}++;
             push @$ids, $id;
         }
     }
@@ -41,7 +40,6 @@ sub extract_data_list {
             $data->{$ex}{$up}{$id}{$key} = $single_data->{$key};
         }
         $data->{$ex}{$up}{$id}{title} ||= sprintf 'no_title_%s', $id;
-        $data->{$ex}{$up}{$id}{video_order} = $set->{video_count}++;
         $ids = [ $id ];
     }
     return $ex, $up, $ids;
@@ -69,7 +67,6 @@ sub extract_data_single {
     }
     $single_data->{fmt_to_info} = $fmt_to_info;
     _prepare_data( $single_data );
-    $single_data->{video_order} = $set->{video_count}++;
     return $single_data;
 }
 

@@ -1,7 +1,7 @@
 package Mail::DKIM::ARC::Signer;
 use strict;
 use warnings;
-our $VERSION = '1.20200824'; # VERSION
+our $VERSION = '1.20200907'; # VERSION
 # ABSTRACT: generates a DKIM signature for a message
 
 # Copyright 2017 FastMail Pty Ltd.  All Rights Reserved.
@@ -110,7 +110,7 @@ sub finish_header {
     foreach my $header ( @{ $self->{headers} } ) {
         $header =~ s/[\r\n]+$//;
         if ( $header =~ m/^Authentication-Results:/ ) {
-            my ( $arval ) = $header =~ m/^Authentication-Results:[^;]*;\s*(.*)/is;
+            my ( $arval ) = $header =~ m/^Authentication-Results:[^;]*;[\t ]*(.*)/is;
             my $parsed;
 	    eval {
 		$parsed= Mail::AuthenticationResults::Parser->new
@@ -127,11 +127,13 @@ sub finish_header {
               unless "\L$ardom" eq $self->{SrvId};   # make sure it's our domain
 
             $arval =~ s/;?\s*$//;    # ignore trailing semicolon and whitespace
+            # preserve leading fold if there is one, otherwise set one leading space
+            $arval =~ s/^\s*/ / unless ($arval =~ m/^\015\012/);
             if ($ar) {
-                $ar .= "; $arval";
+                $ar .= ";$arval";
             }
             else {
-                $ar = "$ardom; $arval";
+                $ar = "$ardom;$arval";
             }
 
             # get chain value from A-R header
@@ -590,7 +592,7 @@ Mail::DKIM::ARC::Signer - generates a DKIM signature for a message
 
 =head1 VERSION
 
-version 1.20200824
+version 1.20200907
 
 =head1 SYNOPSIS
 

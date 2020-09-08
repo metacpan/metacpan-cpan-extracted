@@ -32,6 +32,18 @@ use Mojolicious;
 END
 }, {use_index => "Mirror"}, { runtime => { requires => { 'Mojolicious' => 0 }}});
 
+test_app('modules under different namespaces that belong to the same distribution without a main module', sub {
+  my $tmpdir = shift;
+
+  test_file("$tmpdir/MyTest.pm", <<'END');
+use LWP::UserAgent;
+END
+
+  test_file("$tmpdir/MyTest2.pm", <<'END');
+use LWP::Simple;
+END
+}, {use_index => "Mirror"}, { runtime => { requires => { 'LWP::Simple' => 0 }}});
+
 test_app('modules under different namespaces (same depth) that belong to the same distribution', sub {
   my $tmpdir = shift;
 
@@ -42,7 +54,7 @@ END
   test_file("$tmpdir/MyTest2.pm", <<'END');
 use Mojolicious::Lite;
 END
-}, {use_index => "Mirror"}, { runtime => { requires => { 'Mojo::Base' => 0 }}});
+}, {use_index => "Mirror"}, { runtime => { requires => { 'Mojolicious' => 0 }}});
 
 test_app('versioned modules', sub {
   my $tmpdir = shift;

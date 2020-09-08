@@ -12,7 +12,7 @@ sub test {
     delete $ENV{PFILES};
     $ENV{PFILES} = $pfiles if defined $pfiles;
 
-    
+
     $pfiles ||= "''";
     Config::PFiles::Path->$method( $set=> @$dirs );
     is( $ENV{PFILES}, $exp, "$method ($set): $pfiles => $ENV{PFILES}" );
@@ -78,4 +78,3 @@ test( 'a;b', remove => RW => [], ';b' );
 
 $ENV{PFILES} = 'a:b;c:d';
 is( Config::PFiles::Path->export, 'a:b;c:d', "export" );
-

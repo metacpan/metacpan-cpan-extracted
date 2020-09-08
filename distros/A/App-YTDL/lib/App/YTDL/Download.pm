@@ -106,7 +106,7 @@ sub download {
         EXTRACTOR_KEY: for my $ex ( sort keys %$data ) {
 
             UPLOADER_ID: for my $up ( sort keys %{$data->{$ex}} ) {
-                if ( ! @{$chosen->{$ex}{$up}} ) {
+                if ( ! exists $chosen->{$ex}{$up} ) { #|| ! @{$chosen->{$ex}{$up}} ) {
                     next;
                 }
                 my @sorted_ids = sort { $data->{$ex}{$up}{$a}{count} <=> $data->{$ex}{$up}{$b}{count} } @{$chosen->{$ex}{$up}};
@@ -163,6 +163,7 @@ sub download {
                                     { info => $info, undef => 'Skip this video', prompt => '', layout => 3 }
                                 );
                                 if ( ! defined $answer ) {
+                                    $download_cmds{$ex}{$up}{$id} = [ sprintf "[%s] %s\n%s\nSkipped: user request\n", $ex, $id, $data->{$ex}{$up}{$id}{title} ];
                                     next VIDEO_ID;
                                 }
                                 else {
@@ -214,7 +215,7 @@ sub download {
         }
         say "";
         my %download_failed;
-        my $count_downloads = 1;
+        my $count_downloads = 0;
         my $total_downloads = 0;
         for my $ex ( keys %download_cmds ) {
             for my $up ( keys %{$download_cmds{$ex}} ) {
@@ -225,9 +226,13 @@ sub download {
         }
         my $attempts = 1;
 
-        for my $ex ( keys %download_cmds ) {
-            for my $up ( keys %{$download_cmds{$ex}} ) {
-                VIDEO_DOWNLOAD: for my $id ( keys %{$download_cmds{$ex}{$up}} ) {
+        for my $ex ( sort keys %download_cmds ) {
+
+            for my $up ( sort keys %{$download_cmds{$ex}} ) {
+                my @sorted_ids = sort { $data->{$ex}{$up}{$a}{count} <=> $data->{$ex}{$up}{$b}{count} } keys %{$download_cmds{$ex}{$up}};
+
+                VIDEO_DOWNLOAD: for my $id ( @sorted_ids ) {
+                    $count_downloads++;
                     my $cmd = $download_cmds{$ex}{$up}{$id};
                     my $retries = sprintf " (%d|%d)", $attempts, $opt->{retries};
                     printf "%d/%d%s\n", $count_downloads, $total_downloads, $attempts > 1 ? $retries : '';
@@ -241,14 +246,11 @@ sub download {
                         if ( $attempts > $opt->{retries} ) {
                             $attempts = 1;
                             push @{$download_failed{$ex}{$up}}, $id;
-                            $count_downloads++;
                             next VIDEO_DOWNLOAD;
                         }
                         sleep $attempts * 3;
+                        $count_downloads--;
                         redo VIDEO_DOWNLOAD;
-                    }
-                    else {
-                        $count_downloads++
                     }
                 }
             }

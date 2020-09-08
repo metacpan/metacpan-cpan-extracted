@@ -46,6 +46,7 @@
             "Module::CoreList" : "3.11",
             "Module::Find" : "0",
             "Regexp::Trie" : "0",
+            "URI::cpan" : "0",
             "parent" : "0",
             "perl" : "5.008001"
          },
@@ -68,6 +69,6 @@
          "url" : "https://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite"
       }
    },
-   "version" : "0.9911",
+   "version" : "0.9913",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

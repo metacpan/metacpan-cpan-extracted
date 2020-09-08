@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -30,9 +30,10 @@ sub perlExpr {
     return $err ? ( -1, "__badExpression__: $err" ) : (1);
 }
 
-my $url = $RE{URI}{HTTP}{ -scheme => "https?" };
-$url =~ s/(?<=[^\\])\$/\\\$/g;
-$url = qr/$url/;
+my $url_re = $RE{URI}{HTTP}{ -scheme => "https?" };
+$url_re =~ s/(?<=[^\\])\$/\\\$/g;
+my $url        = qr/$url_re/;
+my $urlOrEmpty = qr/(?:^$|$url_re)/;
 
 sub types {
     return {
@@ -51,7 +52,7 @@ sub types {
         },
         url => {
             form    => 'text',
-            test    => $url,
+            test    => $urlOrEmpty,
             msgFail => '__badUrl__',
         },
         PerlModule => {
@@ -390,7 +391,7 @@ sub attributes {
         },
         reloadUrls => {
             type          => 'keyTextContainer',
-            help          => 'configlocation.html#configuration_reload',
+            help          => 'configlocation.html#configuration-reload',
             keyTest       => qr/^$Regexp::Common::URI::RFC2396::host(?::\d+)?$/,
             test          => $url,
             msgFail       => '__badUrl__',
@@ -453,6 +454,12 @@ sub attributes {
             test          => sub { return perlExpr(@_) },
             default       => 1,
             documentation => 'checkUser identities rule',
+        },
+        checkUserUnrestrictedUsersRule => {
+            type          => 'text',
+            test          => sub { return perlExpr(@_) },
+            documentation => 'checkUser unrestricted users rule',
+            flags         => 'p',
         },
         checkUserHiddenAttributes => {
             type          => 'text',
@@ -526,6 +533,12 @@ sub attributes {
             documentation => 'Impersonation identities rule',
             flags         => 'p',
         },
+        impersonationUnrestrictedUsersRule => {
+            type          => 'text',
+            test          => sub { return perlExpr(@_) },
+            documentation => 'Impersonation unrestricted users rule',
+            flags         => 'p',
+        },
         impersonationHiddenAttributes => {
             type          => 'text',
             default       => '_2fDevices _loginHistory',
@@ -549,6 +562,12 @@ sub attributes {
             test          => sub { return perlExpr(@_) },
             default       => 1,
             documentation => 'Context switching identities rule',
+            flags         => 'p',
+        },
+        contextSwitchingUnrestrictedUsersRule => {
+            type          => 'text',
+            test          => sub { return perlExpr(@_) },
+            documentation => 'Context switching unrestricted users rule',
             flags         => 'p',
         },
         contextSwitchingStopWithLogout => {
@@ -581,6 +600,12 @@ sub attributes {
             default => 0,
             documentation =>
               'Avoid asking confirmation when an Issuer asks to renew auth',
+        },
+        skipUpgradeConfirmation => {
+            type    => 'bool',
+            default => 0,
+            documentation =>
+              'Avoid asking confirmation during a session upgrade',
         },
         refreshSessions => {
             type          => 'bool',
@@ -659,7 +684,7 @@ sub attributes {
         applicationList => {
             type    => 'catAndAppList',
             keyTest => qr/\w/,
-            help    => 'portalmenu.html#categories_and_applications',
+            help    => 'portalmenu.html#categories-and-applications',
             default => {
                 default => { catname => 'Default category', type => "category" }
             },
@@ -814,7 +839,7 @@ sub attributes {
         },
         bruteForceProtectionLockTimes => {
             type    => 'text',
-            default => '5 15 60 300 600',
+            default => '5, 15, 60, 300, 600',
             documentation =>
               'Incremental lock time values for brute force attack protection',
         },
@@ -1069,7 +1094,7 @@ sub attributes {
         },
         portalDisplayOidcConsents => {
             type          => 'boolOrExpr',
-            default       => '$_oidcConnectedRP',
+            default       => '$_oidcConsents && $_oidcConsents =~ /\w+/',
             documentation => 'Display OIDC consent tab in portal',
         },
         portalDisplayGeneratePassword => {
@@ -1135,11 +1160,12 @@ sub attributes {
         sameSite => {
             type   => 'select',
             select => [
+                { k => '',       v => '' },
                 { k => 'Strict', v => 'Strict' },
                 { k => 'Lax',    v => 'Lax' },
                 { k => 'None',   v => 'None' },
             ],
-            default       => 'None',
+            default       => '',
             documentation => 'Cookie SameSite value',
             flags         => 'hp',
         },
@@ -1271,7 +1297,7 @@ sub attributes {
         groups => {
             type => 'keyTextContainer',
             help =>
-              'exportedvars.html#extend_variables_using_macros_and_groups',
+              'exportedvars.html#extend-variables-using-macros-and-groups',
             test          => sub { return perlExpr(@_) },
             default       => {},
             documentation => 'Groups',
@@ -1279,7 +1305,7 @@ sub attributes {
         macros => {
             type => 'keyTextContainer',
             help =>
-              'exportedvars.html#extend_variables_using_macros_and_groups',
+              'exportedvars.html#extend-variables-using-macros-and-groups',
             keyTest       => qr/^[_a-zA-Z][a-zA-Z0-9_]*$/,
             keyMsgFail    => '__badMacroName__',
             test          => sub { return perlExpr(@_) },
@@ -1316,7 +1342,7 @@ sub attributes {
                 'namespace'          => 'lemonldap-ng-sessions',
                 'default_expires_in' => 600,
                 'directory_umask'    => '007',
-                'cache_root'         => '/tmp',
+                'cache_root'         => '/var/cache/lemonldap-ng',
                 'cache_depth'        => 3,
             },
             documentation => 'Sessions cache module options',
@@ -1424,9 +1450,10 @@ sub attributes {
             documentation => 'Send a mail when password is changed',
         },
         portalRequireOldPassword => {
-            default       => 1,
-            type          => 'boolOrExpr',
-            documentation => 'Rule to require old password to change the password',
+            default => 1,
+            type    => 'boolOrExpr',
+            documentation =>
+              'Rule to require old password to change the password',
         },
         hideOldPassword => {
             default       => 0,
@@ -1956,6 +1983,11 @@ sub attributes {
             default       => 1,
             documentation => 'Authorize users to remove existing Yubikey',
         },
+        yubikey2fFromSessionAttribute => {
+            type => 'text',
+            documentation =>
+              'Provision yubikey from the given session variable',
+        },
         yubikey2fTTL => {
             type          => 'int',
             documentation => 'Yubikey device time to live',
@@ -1993,6 +2025,16 @@ sub attributes {
             default       => 0,
             type          => 'bool',
             documentation => 'Enable REST session server',
+        },
+        restAuthServer => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Enable REST authentication server',
+        },
+        restPasswordServer => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Enable REST password reset server',
         },
         restExportSecretKeys => {
             default => 0,
@@ -2086,16 +2128,16 @@ sub attributes {
                 },
                 msgFail => '__badExpression__',
             },
-            keyTest => qr/^(?:\*\.)?$Regexp::Common::URI::RFC2396::hostname$/,
+            keyTest       => qr/^\S+$/,
             keyMsgFail    => '__badHostname__',
             default       => { default => 'deny', },
             documentation => 'Virtualhost rules',
             flags         => 'h',
         },
         exportedHeaders => {
-            type    => 'keyTextContainer',
-            help    => 'writingrulesand_headers.html#headers',
-            keyTest => qr/^(?:\*\.)?$Regexp::Common::URI::RFC2396::hostname$/,
+            type       => 'keyTextContainer',
+            help       => 'writingrulesand_headers.html#headers',
+            keyTest    => qr/^\S+$/,
             keyMsgFail => '__badHostname__',
             test       => {
                 keyTest    => qr/^(?=[^\-])[\w\-]+(?<=[^-])$/,
@@ -2106,10 +2148,10 @@ sub attributes {
             flags         => 'h',
         },
         post => {
-            type    => 'postContainer',
-            help    => 'formreplay.html',
-            test    => sub { 1 },
-            keyTest => qr/^(?:\*\.)?$Regexp::Common::URI::RFC2396::hostname$/,
+            type          => 'postContainer',
+            help          => 'formreplay.html',
+            test          => sub { 1 },
+            keyTest       => qr/^\S+$/,
             keyMsgFail    => '__badHostname__',
             documentation => 'Virtualhost urls/Data to post',
         },
@@ -2268,6 +2310,10 @@ sub attributes {
             type          => 'text',
             documentation => 'CAS User attribute',
         },
+        casAppMetaDataOptionsAuthnLevel => {
+            type          => 'int',
+            documentation => 'Authentication level requires to access to this CAS application',
+        },
         casAppMetaDataOptionsRule => {
             type          => 'text',
             test          => sub { return perlExpr(@_) },
@@ -2276,7 +2322,7 @@ sub attributes {
         casAppMetaDataMacros => {
             type => 'keyTextContainer',
             help =>
-              'exportedvars.html#extend_variables_using_macros_and_groups',
+              'exportedvars.html#extend-variables-using-macros-and-groups',
             test => {
                 keyTest    => qr/^[_a-zA-Z][a-zA-Z0-9_]*$/,
                 keyMsgFail => '__badMacroName__',
@@ -2291,7 +2337,7 @@ sub attributes {
         casAppMetaDataNodes => {
             type     => 'casAppMetaDataNodeContainer',
             template => 'casAppMetaDataNode',
-            help     => 'idpcas.html#configuring_cas_applications',
+            help     => 'idpcas.html#configuring-cas-applications',
         },
 
         # OpenID Issuer
@@ -2588,7 +2634,7 @@ sub attributes {
         # IDP Keys
         samlIDPMetaDataExportedAttributes => {
             type       => 'samlAttributeContainer',
-            help       => 'authsaml.html#exported_attributes',
+            help       => 'authsaml.html#exported-attributes',
             keyTest    => qr/^[a-zA-Z](?:[a-zA-Z0-9_\-\.]*\w)?$/,
             keyMsgFail => '__badMetadataName__',
             test       => qr/\w/,
@@ -2755,7 +2801,7 @@ sub attributes {
         # SP keys
         samlSPMetaDataExportedAttributes => {
             type       => 'samlAttributeContainer',
-            help       => 'idpsaml.html#exported_attributes',
+            help       => 'idpsaml.html#exported-attributes',
             keyTest    => qr/^[a-zA-Z](?:[a-zA-Z0-9_\-\.]*\w)?$/,
             keyMsgFail => '__badMetadataName__',
             test       => qr/\w/,
@@ -2879,6 +2925,10 @@ sub attributes {
             type    => 'bool',
             default => 1,
         },
+        samlSPMetaDataOptionsAuthnLevel => {
+            type          => 'int',
+            documentation => 'Authentication level requires to access to this SP',
+        },
         samlSPMetaDataOptionsRule => {
             type          => 'text',
             test          => sub { return perlExpr(@_) },
@@ -2887,7 +2937,7 @@ sub attributes {
         samlSPMetaDataMacros => {
             type => 'keyTextContainer',
             help =>
-              'exportedvars.html#extend_variables_using_macros_and_groups',
+              'exportedvars.html#extend-variables-using-macros-and-groups',
             test => {
                 keyTest    => qr/^[_a-zA-Z][a-zA-Z0-9_]*$/,
                 keyMsgFail => '__badMacroName__',
@@ -2974,12 +3024,16 @@ sub attributes {
             help          => 'secondfactor.html',
             documentation => 'Second factor required',
         },
+        sfOnlyUpgrade => {
+            type          => 'bool',
+            help          => 'secondfactor.html',
+            documentation => 'Only trigger second factor on session upgrade',
+        },
         sfManagerRule => {
-            type    => 'boolOrExpr',
-            default => 1,
-            help    => 'secondfactor.html',
-            documentation =>
-              'Rule to display second factor Manager link',
+            type          => 'boolOrExpr',
+            default       => 1,
+            help          => 'secondfactor.html',
+            documentation => 'Rule to display second factor Manager link',
         },
         sfRemovedMsgRule => {
             type    => 'boolOrExpr',
@@ -3085,7 +3139,6 @@ sub attributes {
         },
         ldapPort => {
             type          => 'int',
-            default       => 389,
             documentation => 'LDAP port',
         },
         ldapServer => {
@@ -3217,6 +3270,25 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'bool',
             documentation => 'Support for IBM Tivoli Directory Server',
         },
+        ldapVerify => {
+            type          => 'bool',
+            documentation => 'Whether to validate LDAP certificates',
+            type          => "select",
+            select        => [
+                { k => 'none',     v => 'None' },
+                { k => 'optional', v => 'Optional' },
+                { k => 'require',  v => 'Require' },
+            ],
+            default => 'require',
+        },
+        ldapCAFile => {
+            type          => 'text',
+            documentation => 'Location of the certificate file for LDAP connections',
+        },
+        ldapCAPath => {
+            type          => 'text',
+            documentation => 'Location of the CA directory for LDAP connections',
+        },
 
         # SSL
         SSLAuthnLevel => {
@@ -3328,7 +3400,6 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         restAuthUrl   => { type => 'url' },
         restUserDBUrl => { type => 'url' },
 
-        # TODO: add restMailDBUrl
         restPwdConfirmUrl => { type => 'url' },
         restPwdModifyUrl  => { type => 'url' },
 
@@ -3880,12 +3951,12 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcOPMetaDataNodes => {
             type => 'oidcOPMetaDataNodeContainer',
             help =>
-'authopenidconnect.html#declare_the_openid_connect_provider_in_llng',
+'authopenidconnect.html#declare-the-openid-connect-provider-in-ll-ng',
         },
         oidcRPMetaDataNodes => {
             type => 'oidcRPMetaDataNodeContainer',
             help =>
-              'idpopenidconnect.html#configuration_of_relying_party_in_llng',
+              'idpopenidconnect.html#configuration-of-relying-party-in-ll-ng',
         },
         oidcOPMetaDataOptions => { type => 'subContainer', },
         oidcRPMetaDataOptions => { type => 'subContainer', },
@@ -3970,8 +4041,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcRPMetaDataOptionsIDTokenExpiration => { type => 'int' },
         oidcRPMetaDataOptionsIDTokenForceClaims =>
           { type => 'bool', default => 0 },
-        oidcRPMetaDataOptionsAdditionalAudiences  =>
-          { type => 'text' },
+        oidcRPMetaDataOptionsAdditionalAudiences         => { type => 'text' },
         oidcRPMetaDataOptionsAccessTokenExpiration       => { type => 'int' },
         oidcRPMetaDataOptionsAuthorizationCodeExpiration => { type => 'int' },
         oidcRPMetaDataOptionsOfflineSessionExpiration    => { type => 'int' },
@@ -3995,6 +4065,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type   => 'select',
             select => [
                 { k => 'front', v => 'Front Channel' },
+
                 #TODO #1194
                 # { k => 'back',  v => 'Back Channel' },
             ],
@@ -4032,6 +4103,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 0,
             documentation => 'Issue refresh tokens',
         },
+        oidcRPMetaDataOptionsAuthnLevel => {
+            type          => 'int',
+            documentation => 'Authentication level requires to access to this RP',
+        },
         oidcRPMetaDataOptionsRule => {
             type          => 'text',
             test          => sub { return perlExpr(@_) },
@@ -4040,7 +4115,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcRPMetaDataMacros => {
             type => 'keyTextContainer',
             help =>
-              'exportedvars.html#extend_variables_using_macros_and_groups',
+              'exportedvars.html#extend-variables-using-macros-and-groups',
             test => {
                 keyTest    => qr/^[_a-zA-Z][a-zA-Z0-9_]*$/,
                 keyMsgFail => '__badMacroName__',

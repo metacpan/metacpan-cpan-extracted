@@ -133,7 +133,7 @@ sub run {
 
 sub removeOther {
     my ( $self, $req ) = @_;
-    my $res = PE_OK;
+    my $res   = PE_OK;
     my $count = 0;
     $req->{urldc} = decode_base64( $req->param('url') );
 
@@ -163,7 +163,7 @@ sub removeOther {
                 }
                 else {
                     $self->userLogger->warn(
-                        "SingleSession called with an unvalid token");
+                        "SingleSession called with an invalid token");
                     $res = PE_TOKENEXPIRED;
                 }
             }

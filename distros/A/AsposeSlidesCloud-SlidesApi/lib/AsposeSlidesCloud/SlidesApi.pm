@@ -151,13 +151,16 @@ sub copy_file {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -252,13 +255,16 @@ sub copy_folder {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -326,14 +332,349 @@ sub create_folder {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
+}
+
+#
+# delete_chart_category
+#
+# Delete a category from a chart.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $category_index Category index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'category_index' => {
+        data_type => 'int',
+        description => 'Category index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_chart_category' } = { 
+    	summary => 'Delete a category from a chart.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub delete_chart_category {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_chart_category");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_chart_category");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_chart_category");
+    }
+
+    # verify the required parameter 'category_index' is set
+    unless (exists $args{'category_index'}) {
+      croak("Missing the required parameter 'category_index' when calling delete_chart_category");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/categories/{categoryIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'category_index'}) {
+        my $_base_variable = "{" . "categoryIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'category_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Chart', $response);
+    return $_response_object;
+}
+
+#
+# delete_chart_data_point
+#
+# Delete a data point from a chart series.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $series_index Series index. (required)
+# @param int $point_index Data point index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'series_index' => {
+        data_type => 'int',
+        description => 'Series index.',
+        required => '1',
+    },
+    'point_index' => {
+        data_type => 'int',
+        description => 'Data point index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_chart_data_point' } = { 
+    	summary => 'Delete a data point from a chart series.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub delete_chart_data_point {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_chart_data_point");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_chart_data_point");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_chart_data_point");
+    }
+
+    # verify the required parameter 'series_index' is set
+    unless (exists $args{'series_index'}) {
+      croak("Missing the required parameter 'series_index' when calling delete_chart_data_point");
+    }
+
+    # verify the required parameter 'point_index' is set
+    unless (exists $args{'point_index'}) {
+      croak("Missing the required parameter 'point_index' when calling delete_chart_data_point");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/series/{seriesIndex}/dataPoints/{pointIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'series_index'}) {
+        my $_base_variable = "{" . "seriesIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'series_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'point_index'}) {
+        my $_base_variable = "{" . "pointIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'point_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Chart', $response);
+    return $_response_object;
 }
 
 #
@@ -476,13 +817,16 @@ sub delete_chart_series {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -565,13 +909,16 @@ sub delete_file {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -650,13 +997,16 @@ sub delete_folder {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -764,13 +1114,16 @@ sub delete_notes_slide {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -918,13 +1271,16 @@ sub delete_notes_slide_paragraph {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -1065,13 +1421,16 @@ sub delete_notes_slide_paragraphs {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -1237,13 +1596,16 @@ sub delete_notes_slide_portion {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -1402,13 +1764,16 @@ sub delete_notes_slide_portions {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -1538,13 +1903,16 @@ sub delete_notes_slide_shape {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -1667,13 +2035,16 @@ sub delete_notes_slide_shapes {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -1821,13 +2192,16 @@ sub delete_paragraph {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -1968,13 +2342,16 @@ sub delete_paragraphs {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -2140,13 +2517,16 @@ sub delete_portion {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -2305,13 +2685,16 @@ sub delete_portions {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -2423,13 +2806,16 @@ sub delete_slide_animation {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -2559,13 +2945,16 @@ sub delete_slide_animation_effect {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -2695,13 +3084,16 @@ sub delete_slide_animation_interactive_sequence {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -2849,13 +3241,16 @@ sub delete_slide_animation_interactive_sequence_effect {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -2967,13 +3362,16 @@ sub delete_slide_animation_interactive_sequences {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -3085,13 +3483,16 @@ sub delete_slide_animation_main_sequence {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -3203,13 +3604,16 @@ sub delete_slide_by_index {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -3339,13 +3743,16 @@ sub delete_slide_shape {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -3468,13 +3875,16 @@ sub delete_slide_shapes {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -3622,13 +4032,16 @@ sub delete_slide_subshape {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -3769,13 +4182,16 @@ sub delete_slide_subshapes {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -3880,13 +4296,16 @@ sub delete_slides_clean_slides_list {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -3980,13 +4399,16 @@ sub delete_slides_document_properties {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -4098,13 +4520,16 @@ sub delete_slides_document_property {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -4216,13 +4641,16 @@ sub delete_slides_slide_background {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -4388,13 +4816,16 @@ sub delete_subshape_paragraph {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -4553,13 +4984,16 @@ sub delete_subshape_paragraphs {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -4743,13 +5177,16 @@ sub delete_subshape_portion {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -4926,13 +5363,16 @@ sub delete_subshape_portions {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -5015,13 +5455,16 @@ sub download_file {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -5075,13 +5518,16 @@ sub get_disc_usage {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -5153,13 +5599,16 @@ sub get_file_versions {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -5231,13 +5680,16 @@ sub get_files_list {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -5349,13 +5801,16 @@ sub get_layout_slide {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -5449,13 +5904,16 @@ sub get_layout_slides_list {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -5567,13 +6025,16 @@ sub get_master_slide {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -5667,13 +6128,16 @@ sub get_master_slides_list {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -5785,13 +6249,16 @@ sub get_notes_slide {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -5903,13 +6370,16 @@ sub get_notes_slide_exists {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -6039,13 +6509,16 @@ sub get_notes_slide_shape {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -6193,13 +6666,16 @@ sub get_notes_slide_shape_paragraph {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -6329,13 +6805,16 @@ sub get_notes_slide_shape_paragraphs {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -6501,13 +6980,16 @@ sub get_notes_slide_shape_portion {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -6655,13 +7137,16 @@ sub get_notes_slide_shape_portions {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -6773,13 +7258,16 @@ sub get_notes_slide_shapes {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -6942,13 +7430,16 @@ sub get_notes_slide_with_format {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -7114,13 +7605,16 @@ sub get_paragraph_portion {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -7268,13 +7762,16 @@ sub get_paragraph_portions {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -7397,13 +7894,16 @@ sub get_slide_animation {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -7533,13 +8033,16 @@ sub get_slide_shape {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -7687,13 +8190,16 @@ sub get_slide_shape_paragraph {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -7823,13 +8329,16 @@ sub get_slide_shape_paragraphs {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -7941,13 +8450,16 @@ sub get_slide_shapes {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -8095,13 +8607,16 @@ sub get_slide_subshape {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -8267,13 +8782,16 @@ sub get_slide_subshape_paragraph {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -8421,13 +8939,16 @@ sub get_slide_subshape_paragraphs {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -8557,13 +9078,16 @@ sub get_slide_subshapes {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -8606,13 +9130,16 @@ sub get_slides_api_info {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -8706,13 +9233,16 @@ sub get_slides_document {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -8806,13 +9336,16 @@ sub get_slides_document_properties {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -8924,13 +9457,16 @@ sub get_slides_document_property {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -9042,13 +9578,16 @@ sub get_slides_image_with_default_format {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -9178,13 +9717,16 @@ sub get_slides_image_with_format {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -9278,13 +9820,16 @@ sub get_slides_images {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -9414,13 +9959,16 @@ sub get_slides_placeholder {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -9532,13 +10080,16 @@ sub get_slides_placeholders {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -9643,13 +10194,16 @@ sub get_slides_presentation_text_items {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -9761,13 +10315,16 @@ sub get_slides_slide {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -9879,13 +10436,16 @@ sub get_slides_slide_background {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -9997,13 +10557,16 @@ sub get_slides_slide_comments {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -10115,13 +10678,16 @@ sub get_slides_slide_images {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -10244,13 +10810,16 @@ sub get_slides_slide_text_items {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -10344,13 +10913,16 @@ sub get_slides_slides_list {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -10462,13 +11034,16 @@ sub get_slides_theme {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -10580,13 +11155,16 @@ sub get_slides_theme_color_scheme {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -10698,13 +11276,16 @@ sub get_slides_theme_font_scheme {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -10816,13 +11397,16 @@ sub get_slides_theme_format_scheme {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -10916,13 +11500,16 @@ sub get_slides_view_properties {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -11106,13 +11693,16 @@ sub get_subshape_paragraph_portion {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -11278,13 +11868,16 @@ sub get_subshape_paragraph_portions {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -11394,13 +11987,16 @@ sub move_file {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -11495,13 +12091,16 @@ sub move_folder {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -11580,13 +12179,16 @@ sub object_exists {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -11738,13 +12340,16 @@ sub post_add_new_paragraph {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -11914,13 +12519,16 @@ sub post_add_new_portion {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -12065,13 +12673,16 @@ sub post_add_new_shape {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -12234,13 +12845,16 @@ sub post_add_new_subshape {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -12410,13 +13024,16 @@ sub post_add_new_subshape_paragraph {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -12604,13 +13221,16 @@ sub post_add_new_subshape_portion {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -12733,17 +13353,338 @@ sub post_add_notes_slide {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('NotesSlide', $response);
+    return $_response_object;
+}
+
+#
+# post_chart_category
+#
+# Add a new category to a chart.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param ChartCategory $category Category DTO. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'category' => {
+        data_type => 'ChartCategory',
+        description => 'Category DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_chart_category' } = { 
+    	summary => 'Add a new category to a chart.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub post_chart_category {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_chart_category");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_chart_category");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling post_chart_category");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/categories';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'category'}) {
+        $_body_data = $args{'category'};
+    }
+
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Chart', $response);
+    return $_response_object;
+}
+
+#
+# post_chart_data_point
+#
+# Add a new data point to a chart series.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $series_index Series index. (required)
+# @param DataPoint $data_point Data point DTO. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'series_index' => {
+        data_type => 'int',
+        description => 'Series index.',
+        required => '1',
+    },
+    'data_point' => {
+        data_type => 'DataPoint',
+        description => 'Data point DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_chart_data_point' } = { 
+    	summary => 'Add a new data point to a chart series.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub post_chart_data_point {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_chart_data_point");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_chart_data_point");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling post_chart_data_point");
+    }
+
+    # verify the required parameter 'series_index' is set
+    unless (exists $args{'series_index'}) {
+      croak("Missing the required parameter 'series_index' when calling post_chart_data_point");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/series/{seriesIndex}/dataPoints';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'series_index'}) {
+        my $_base_variable = "{" . "seriesIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'series_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'data_point'}) {
+        $_body_data = $args{'data_point'};
+    }
+
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Chart', $response);
     return $_response_object;
 }
 
@@ -12880,13 +13821,16 @@ sub post_chart_series {
         $_body_data = $args{'series'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -13034,13 +13978,16 @@ sub post_copy_layout_slide_from_source_presentation {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -13199,13 +14146,16 @@ sub post_copy_master_slide_from_source_presentation {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -13288,13 +14238,16 @@ sub post_get_notes_slide {
         $_body_data = $args{'document'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -13377,13 +14330,16 @@ sub post_get_notes_slide_exists {
         $_body_data = $args{'document'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -13517,13 +14473,16 @@ sub post_get_notes_slide_with_format {
         $_body_data = $args{'document'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -13675,13 +14634,16 @@ sub post_notes_slide_add_new_paragraph {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -13851,13 +14813,16 @@ sub post_notes_slide_add_new_portion {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -14002,13 +14967,16 @@ sub post_notes_slide_add_new_shape {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -14211,13 +15179,16 @@ sub post_notes_slide_shape_save_as {
         $_body_data = $args{'options'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -14322,13 +15293,16 @@ sub post_presentation_merge {
         $_body_data = $args{'request'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -14531,13 +15505,16 @@ sub post_shape_save_as {
         $_body_data = $args{'options'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -14660,13 +15637,16 @@ sub post_slide_animation_effect {
         $_body_data = $args{'effect'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -14789,13 +15769,16 @@ sub post_slide_animation_interactive_sequence {
         $_body_data = $args{'sequence'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -14936,13 +15919,16 @@ sub post_slide_animation_interactive_sequence_effect {
         $_body_data = $args{'effect'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -15116,13 +16102,16 @@ sub post_slide_save_as {
         $_body_data = $args{'options'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -15238,13 +16227,16 @@ sub post_slides_add {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -15338,13 +16330,16 @@ sub post_slides_convert {
         $_body_data = $args{'document'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -15498,13 +16493,16 @@ sub post_slides_copy {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -15620,13 +16618,16 @@ sub post_slides_document {
         $_body_data = $args{'data'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -15731,13 +16732,16 @@ sub post_slides_document_from_html {
         $_body_data = $args{'html'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -15864,13 +16868,16 @@ sub post_slides_document_from_source {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -16024,13 +17031,16 @@ sub post_slides_document_from_template {
         $_body_data = $args{'data'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -16084,13 +17094,16 @@ sub post_slides_pipeline {
         $_body_data = $args{'pipeline'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -16227,13 +17240,16 @@ sub post_slides_presentation_replace_text {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -16361,13 +17377,16 @@ sub post_slides_reorder {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -16483,13 +17502,16 @@ sub post_slides_reorder_many {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -16623,13 +17645,16 @@ sub post_slides_save_as {
         $_body_data = $args{'options'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -16734,13 +17759,16 @@ sub post_slides_set_document_properties {
         $_body_data = $args{'properties'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -16895,13 +17923,16 @@ sub post_slides_slide_replace_text {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -17083,13 +18114,16 @@ sub post_slides_split {
         $_body_data = $args{'options'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -17310,17 +18344,374 @@ sub post_subshape_save_as {
         $_body_data = $args{'options'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# put_chart_category
+#
+# Update a chart category.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $category_index Category index. (required)
+# @param ChartCategory $category Category DTO. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'category_index' => {
+        data_type => 'int',
+        description => 'Category index.',
+        required => '1',
+    },
+    'category' => {
+        data_type => 'ChartCategory',
+        description => 'Category DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_chart_category' } = { 
+    	summary => 'Update a chart category.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub put_chart_category {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_chart_category");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling put_chart_category");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling put_chart_category");
+    }
+
+    # verify the required parameter 'category_index' is set
+    unless (exists $args{'category_index'}) {
+      croak("Missing the required parameter 'category_index' when calling put_chart_category");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/categories/{categoryIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'category_index'}) {
+        my $_base_variable = "{" . "categoryIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'category_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'category'}) {
+        $_body_data = $args{'category'};
+    }
+
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Chart', $response);
+    return $_response_object;
+}
+
+#
+# put_chart_data_point
+#
+# Update a data point in a chart series.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $series_index Series index. (required)
+# @param int $point_index Data point index. (required)
+# @param DataPoint $data_point Data point DTO. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'series_index' => {
+        data_type => 'int',
+        description => 'Series index.',
+        required => '1',
+    },
+    'point_index' => {
+        data_type => 'int',
+        description => 'Data point index.',
+        required => '1',
+    },
+    'data_point' => {
+        data_type => 'DataPoint',
+        description => 'Data point DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_chart_data_point' } = { 
+    	summary => 'Update a data point in a chart series.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub put_chart_data_point {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_chart_data_point");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling put_chart_data_point");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling put_chart_data_point");
+    }
+
+    # verify the required parameter 'series_index' is set
+    unless (exists $args{'series_index'}) {
+      croak("Missing the required parameter 'series_index' when calling put_chart_data_point");
+    }
+
+    # verify the required parameter 'point_index' is set
+    unless (exists $args{'point_index'}) {
+      croak("Missing the required parameter 'point_index' when calling put_chart_data_point");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/series/{seriesIndex}/dataPoints/{pointIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'series_index'}) {
+        my $_base_variable = "{" . "seriesIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'series_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'point_index'}) {
+        my $_base_variable = "{" . "pointIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'point_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'data_point'}) {
+        $_body_data = $args{'data_point'};
+    }
+
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Chart', $response);
     return $_response_object;
 }
 
@@ -17475,13 +18866,16 @@ sub put_chart_series {
         $_body_data = $args{'series'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -17604,13 +18998,16 @@ sub put_layout_slide {
         $_body_data = $args{'slide_dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -17829,13 +19226,16 @@ sub put_notes_slide_shape_save_as {
         $_body_data = $args{'options'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -17936,13 +19336,16 @@ sub put_presentation_merge {
         $_body_data = $args{'request'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -18119,13 +19522,16 @@ sub put_set_paragraph_portion_properties {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -18284,13 +19690,16 @@ sub put_set_paragraph_properties {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -18485,13 +19894,16 @@ sub put_set_subshape_paragraph_portion_properties {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -18668,13 +20080,16 @@ sub put_set_subshape_paragraph_properties {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -18893,13 +20308,16 @@ sub put_shape_save_as {
         $_body_data = $args{'options'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -19018,13 +20436,16 @@ sub put_slide_animation {
         $_body_data = $args{'animation'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -19165,13 +20586,16 @@ sub put_slide_animation_effect {
         $_body_data = $args{'effect'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -19330,13 +20754,16 @@ sub put_slide_animation_interactive_sequence_effect {
         $_body_data = $args{'effect'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -19526,13 +20953,16 @@ sub put_slide_save_as {
         $_body_data = $args{'options'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -19669,13 +21099,16 @@ sub put_slide_shape_info {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -19834,13 +21267,16 @@ sub put_slide_subshape_info {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -19950,13 +21386,16 @@ sub put_slides_convert {
         $_body_data = $args{'document'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -20057,13 +21496,16 @@ sub put_slides_document_from_html {
         $_body_data = $args{'html'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -20213,13 +21655,16 @@ sub put_slides_save_as {
         $_body_data = $args{'options'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -20338,13 +21783,16 @@ sub put_slides_set_document_property {
         $_body_data = $args{'property'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -20467,13 +21915,16 @@ sub put_slides_slide {
         $_body_data = $args{'slide_dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -20596,13 +22047,16 @@ sub put_slides_slide_background {
         $_body_data = $args{'background'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -20730,13 +22184,16 @@ sub put_slides_slide_background_color {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -20874,13 +22331,16 @@ sub put_slides_slide_size {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -20985,13 +22445,16 @@ sub put_slides_view_properties {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -21228,13 +22691,16 @@ sub put_subshape_save_as {
         $_body_data = $args{'options'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     return;
 }
 
@@ -21353,13 +22819,16 @@ sub put_update_notes_slide {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -21500,13 +22969,16 @@ sub put_update_notes_slide_shape {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -21665,13 +23137,16 @@ sub put_update_notes_slide_shape_paragraph {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -21848,13 +23323,16 @@ sub put_update_notes_slide_shape_portion {
         $_body_data = $args{'dto'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -21915,13 +23393,16 @@ sub storage_exists {
     }
 
     my $_body_data;
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }
@@ -22009,13 +23490,16 @@ sub upload_file {
         $_body_data = $args{'file'};
     }
 
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
 
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $files);
     if (!$response) {
         return;
     }

@@ -1,10 +1,14 @@
 package Bitcoin::Crypto::Segwit;
 
-use Modern::Perl "2010";
+use v5.10; use warnings;
 use Exporter qw(import);
 
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Config;
+use Bitcoin::Crypto;
+use Bitcoin::Crypto::Helpers qw(verify_bytestring);
+
+our $VERSION = Bitcoin::Crypto->VERSION;
 
 our @EXPORT_OK = qw(
 	validate_program
@@ -36,6 +40,7 @@ sub common_validator
 sub validate_program
 {
 	my ($program) = @_;
+	verify_bytestring($program);
 
 	my $version = unpack "C", $program;
 	Bitcoin::Crypto::Exception::SegwitProgram->raise(
@@ -45,9 +50,10 @@ sub validate_program
 	$program = substr $program, 1;
 	my $validator = $validators{$version};
 	common_validator($program);
-	if (defined $validator && ref $validator eq ref sub{}) {
+	if (defined $validator && ref $validator eq ref sub { }) {
 		$validator->($program);
-	} else {
+	}
+	else {
 		warn("No validator for segwit program version $version is declared");
 	}
 

@@ -23,8 +23,43 @@ sub import {
 }
 
 has ldapServer => (
-    is       => 'ro',
-    required => 1,
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{ldapServer};
+    }
+);
+
+has ldapPort => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{ldapPort};
+    }
+);
+
+has ldapCAFile => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{ldapCAFile};
+    }
+);
+
+has ldapCAPath => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{ldapCAPath};
+    }
+);
+
+has ldapVerify => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        $_[0]->conf->{ldapVerify};
+    }
 );
 
 has ldapConfBase => (
@@ -40,8 +75,7 @@ has ldapBindDN => (
     is      => 'ro',
     lazy    => 1,
     default => sub {
-        $_[0]->p->logger->warn('Warning: "ldapBindDN" parameter is not set');
-        return '';
+        $_[0]->conf->{managerDn};
     }
 );
 
@@ -49,9 +83,7 @@ has ldapBindPassword => (
     is      => 'ro',
     lazy    => 1,
     default => sub {
-        $_[0]
-          ->p->logger->warn('Warning: "ldapBindPassword" parameter is not set');
-        return '';
+        $_[0]->conf->{managerPassword};
     }
 );
 
@@ -439,7 +471,7 @@ sub _ldap {
     my $useTls = 0;
     my $tlsParam;
     my @servers = ();
-    foreach my $server ( split /[\s,]+/, $self->{ldapServer} ) {
+    foreach my $server ( split /[\s,]+/, $self->ldapServer ) {
         if ( $server =~ m{^ldap\+tls://([^/]+)/?\??(.*)$} ) {
             $useTls   = 1;
             $server   = $1;
@@ -455,18 +487,35 @@ sub _ldap {
     my $ldap = Net::LDAP->new(
         \@servers,
         onerror => undef,
-        ( $self->{ldapPort} ? ( port => $self->{ldapPort} ) : () ),
+        ( $self->ldapPort   ? ( port   => $self->ldapPort )   : () ),
+        ( $self->ldapVerify ? ( verify => $self->ldapVerify ) : () ),
+        ( $self->ldapCAFile ? ( cafile => $self->ldapCAFile ) : () ),
+        ( $self->ldapCAPath ? ( capath => $self->ldapCAPath ) : () ),
     );
 
     unless ($ldap) {
+        use Data::Dumper;
         die 'connexion failed: ' . $@;
+    }
+    elsif ( $Net::LDAP::VERSION < '0.64' ) {
+
+        # CentOS7 has a bug in which IO::Socket::SSL will return a broken
+        # socket when certificate validation fails. Net::LDAP does not catch
+        # it, and the process ends up crashing.
+        # As a precaution, make sure the underlying socket is doing fine:
+        if (    $ldap->socket->isa('IO::Socket::SSL')
+            and $ldap->socket->errstr < 0 )
+        {
+            die "SSL connection error: " . $ldap->socket->errstr;
+        }
     }
 
     # Start TLS if needed
     if ($useTls) {
         my %h = split( /[&=]/, $tlsParam );
-        $h{cafile} = $self->{caFile} if ( $self->{caFile} );
-        $h{capath} = $self->{caPath} if ( $self->{caPath} );
+        $h{cafile} ||= $self->ldapCAFile if ( $self->ldapCAFile );
+        $h{capath} ||= $self->ldapCAPath if ( $self->ldapCAPath );
+        $h{verify} ||= $self->ldapVerify if ( $self->ldapVerify );
         my $start_tls = $ldap->start_tls(%h);
         if ( $start_tls->code ) {
             die 'tls failed: ' . $start_tls->error;
@@ -475,7 +524,7 @@ sub _ldap {
 
     # Bind with credentials
     my $bind =
-      $ldap->bind( $self->{ldapBindDN}, password => $self->{ldapBindPassword} );
+      $ldap->bind( $self->ldapBindDN, password => $self->ldapBindPassword );
     if ( $bind->code ) {
         die 'bind failed: ' . $bind->error;
     }

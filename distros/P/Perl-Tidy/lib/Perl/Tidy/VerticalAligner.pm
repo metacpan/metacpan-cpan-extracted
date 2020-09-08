@@ -1,7 +1,7 @@
 package Perl::Tidy::VerticalAligner;
 use strict;
 use warnings;
-our $VERSION = '20200822';
+our $VERSION = '20200907';
 
 use Perl::Tidy::VerticalAligner::Alignment;
 use Perl::Tidy::VerticalAligner::Line;
@@ -342,6 +342,7 @@ sub valign_input {
 
     my $level                     = $rline_hash->{level};
     my $level_end                 = $rline_hash->{level_end};
+    my $level_adj                 = $rline_hash->{level_adj};
     my $indentation               = $rline_hash->{indentation};
     my $is_forced_break           = $rline_hash->{is_forced_break};
     my $outdent_long_lines        = $rline_hash->{outdent_long_lines};
@@ -354,6 +355,7 @@ sub valign_input {
     my $rtokens                   = $rline_hash->{rtokens};
     my $rpatterns                 = $rline_hash->{rpatterns};
     my $rfield_lengths            = $rline_hash->{rfield_lengths};
+    my $terminal_block_type       = $rline_hash->{terminal_block_type};
 
     # number of fields is $jmax
     # number of tokens between fields is $jmax-1
@@ -392,6 +394,12 @@ sub valign_input {
             $self->forget_side_comment();
         }
         $self->[_consecutive_block_comments_] = 0;
+    }
+
+    # Reset side comment location if we are entering a new block from level 0.
+    # This is intended to keep them from drifting too far to the right.
+    if ( $terminal_block_type && $level_adj == 0 && $level_end > $level ) {
+        $self->forget_side_comment();
     }
 
     my $group_level = $self->[_group_level_];
@@ -745,7 +753,7 @@ sub make_side_comment {
     return;
 }
 
-{    # closure for decide_if_list
+{    ## closure for sub decide_if_list
 
     my %is_comma_token;
 
@@ -1491,7 +1499,7 @@ sub _flush_group_lines {
     return;
 }
 
-{    # closure for sub sweep_top_down
+{    ## closure for sub sweep_top_down
 
     my $rall_lines;         # all of the lines
     my $grp_level;          # level of all lines
@@ -1866,7 +1874,7 @@ sub sweep_left_to_right {
     return;
 }
 
-{    # do_left_to_right_sweep
+{    ## closure for sub do_left_to_right_sweep
 
     my %is_good_alignment_token;
 
@@ -2205,7 +2213,7 @@ EOM
     return;
 }
 
-{    # closure for decode_alignment_token
+{    ## closure for sub decode_alignment_token
 
     # This routine is called repeatedly for each token, so it needs to be
     # efficient.  We can speed things up by remembering the inputs and outputs
@@ -2261,7 +2269,7 @@ EOM
     }
 }
 
-{    # closure for delete_unmatched_tokens
+{    ## closure for sub delete_unmatched_tokens
 
     my %is_assignment;
     my %keep_after_deleted_assignment;
@@ -3176,7 +3184,7 @@ sub Dump_tree_groups {
     return;
 }
 
-{    # closure for is_marginal_match
+{    ## closure for sub is_marginal_match
 
     my %is_if_or;
     my %is_assignment;
@@ -3773,7 +3781,7 @@ sub get_output_line_number {
     return $nlines + $file_writer_object->get_output_line_number();
 }
 
-{    # closure for valign_output_step_B
+{    ## closure for sub valign_output_step_B
 
     # These are values for a cache used by valign_output_step_B.
     my $cached_line_text;
@@ -4129,6 +4137,18 @@ sub get_output_line_number {
         my $line        = $leading_string . $str;
         my $line_length = $leading_string_length + $str_length;
 
+        # Safety check: be sure that a line to be cached as a stacked block
+        # brace line ends in the appropriate opening or closing block brace.
+        # This should always be the case if the caller set flags correctly.
+        # Code '3' is for -sobb, code '4' is for -scbb.
+        if ($open_or_close) {
+            if (   $open_or_close == 3 && $line !~ /\{\s*$/
+                || $open_or_close == 4 && $line !~ /\}\s*$/ )
+            {
+                $open_or_close = 0;
+            }
+        }
+
         # write or cache this line
         if ( !$open_or_close || $side_comment_length > 0 ) {
             $self->valign_output_step_C( $line, $leading_space_count, $level );
@@ -4151,7 +4171,7 @@ sub get_output_line_number {
     }
 }
 
-{    # closure for valign_output_step_C
+{    ## closure for sub valign_output_step_C
 
     # Vertical alignment buffer used by valign_output_step_C
     my $valign_buffer_filling;
@@ -4370,7 +4390,7 @@ sub valign_output_step_D {
     return;
 }
 
-{    # begin get_leading_string
+{    ## closure for sub get_leading_string
 
     my @leading_string_cache;
 

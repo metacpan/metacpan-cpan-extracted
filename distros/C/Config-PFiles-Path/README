@@ -1,43 +1,39 @@
 Config::PFiles::Path
---------------------
 
 Config::PFiles::Path manipulates the parameter file path used by IRAF
 "compatible" parameter interfaces (IRAF (of course), CIAO's cxcparam,
-MARX's libpfile, INTEGRAL's PIL).
+MARX's libpfile, INTEGRAL's PIL). The path is composed of two sets of
+directories; the first is both user readable and user writeable, the
+other is only user readable. The path is kept in the PFILES
+environmental variable, and takes the form
 
+  rw1:rw2;ro1:ro2
+
+where directories to the left of the semicolon are user readable and
+writeable and those to the right are readable only.
 
 INSTALLATION
 
-To install this module, run the following commands:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
 
-DEPENDENCIES
+COPYRIGHT AND LICENSE
 
-Runtime:
-    Sub::Uplevel
+This software is Copyright (c) 2007 by Smithsonian Astrophysical
+Observatory.
 
-Build:
-    Test::More
+This is free software, licensed under:
 
-COPYRIGHT AND LICENCE
-
-Copyright (c) 2007 The Smithsonian Astrophysical Observatory
-
-Config-PFiles-Path is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  The GNU General Public License, Version 3, June 2007

@@ -1,0 +1,137 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nfo:   <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/isa/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "Type::Tiny::XS"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=isa>;
+	doap:created         "2020-09-04"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/isa>;
+	doap:homepage        <https://metacpan.org/release/isa>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "isa";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/isa/v_0-001>, <http://purl.org/NET/cpan-uri/dist/isa/v_0-002>, <http://purl.org/NET/cpan-uri/dist/isa/v_2-000>, <http://purl.org/NET/cpan-uri/dist/isa/v_2-001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-isa>;
+	];
+	doap:shortdesc       "isn't the isa operator".
+
+<http://purl.org/NET/cpan-uri/dist/isa/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "isa-0.001"^^xsd:string;
+	dc:issued            "2020-09-04"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/isa-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/isa/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "isa-0.002"^^xsd:string;
+	dc:issued            "2020-09-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Description mentioned `isa` operator being introduced in Perl 5.30; it should have save 5.32.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Bundle a benchmark script.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/isa-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/isa/v_2-000>
+	a                    doap:Version;
+	dc:identifier        "isa-2.000"^^xsd:string;
+	dc:issued            "2020-09-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Bump version to supercede a BackPAN-only release called isa-1.01.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/isa-2.000.tar.gz>;
+	doap:revision        "2.000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/isa/v_2-001>
+	a                    doap:Version;
+	dc:identifier        "isa-2.001"^^xsd:string;
+	dc:issued            "2020-09-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Add tests with a class that overrides the `isa` method.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "If Type::Tiny::XS isn't available but Mouse is; attempt to borrow XS stuff from Mouse.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Minor code cleanups.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Link to wiki in the pod.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Check that function names and class names are non-empty strings.";
+		], [
+			rdfs:label "Removed encrypted recipe for cheese.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/sburke>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/isa-2.001.tar.gz>;
+	doap:revision        "2.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/sburke>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:sburke@cpan.org>;
+	foaf:name            "Sean Burke";
+	foaf:nick            "SBURKE";
+	foaf:page            <https://metacpan.org/author/SBURKE>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "examples/benchmark.pl";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:TextDocument;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "Changes".
+
+[]
+	a                    nfo:FileDataObject, nfo:TextDocument;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "INSTALL".
+

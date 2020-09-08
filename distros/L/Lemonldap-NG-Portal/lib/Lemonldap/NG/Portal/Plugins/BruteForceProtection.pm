@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_WAIT);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -38,9 +38,9 @@ sub init {
     unless ( $self->conf->{failedLoginNumber} >
         $self->conf->{bruteForceProtectionMaxFailed} )
     {
-        $self->logger->error( 'failedLoginNumber('
+        $self->logger->error( 'Number of failed logins history ('
               . $self->conf->{failedLoginNumber}
-              . ') must be higher than bruteForceProtectionMaxFailed('
+              . ') must be higher than allowed failed logins attempt ('
               . $self->conf->{bruteForceProtectionMaxFailed}
               . ')' );
         return 0;
@@ -48,25 +48,39 @@ sub init {
     if ( $self->conf->{bruteForceProtectionIncrementalTempo} ) {
         my $lockTimes = @{ $self->lockTimes } =
           sort { $a <=> $b }
-          map { $_ < $self->conf->{bruteForceProtectionMaxLockTime} ? $_ : () }
+          map {
+            $_ =~ s/\D//;
+            $_ < $self->conf->{bruteForceProtectionMaxLockTime} ? $_ : ()
+          }
           grep { /\d+/ }
-          split /\s+/, $self->conf->{bruteForceProtectionLockTimes};
+          split /\s*,\s*/, $self->conf->{bruteForceProtectionLockTimes};
 
         unless ($lockTimes) {
             @{ $self->lockTimes } = ( 5, 15, 60, 300, 600 );
             $lockTimes = 5;
         }
-        
-        if ( $lockTimes > $self->conf->{failedLoginNumber} ) {
-            $self->logger->warn( 'Number of incremental lock time values ('
-                  . "$lockTimes) is higher than failed logins history ("
+
+        for (
+            my $i = 1 ;
+            $i <= $self->conf->{bruteForceProtectionMaxFailed} ;
+            $i++
+          )
+        {
+            unshift @{ $self->lockTimes }, 0;
+            $lockTimes++;
+        }
+
+        unless ( $lockTimes < $self->conf->{failedLoginNumber} ) {
+            $self->logger->warn( 'Number failed logins history ('
                   . $self->conf->{failedLoginNumber}
-                  . ')' );
+                  . ') must be higher than incremental lock time values plus allowed failed logins attempt ('
+                  . "$lockTimes)" );
             splice @{ $self->lockTimes }, $self->conf->{failedLoginNumber};
             $lockTimes = $self->conf->{failedLoginNumber};
         }
 
-        my $sum = $self->conf->{bruteForceProtectionMaxAge} * ( 1 + $self->conf->{failedLoginNumber} - $lockTimes );
+        my $sum = $self->conf->{bruteForceProtectionMaxAge} *
+          ( 1 + $self->conf->{failedLoginNumber} - $lockTimes );
         $sum += $_ foreach @{ $self->lockTimes };
         $self->maxAge($sum);
     }
@@ -95,9 +109,9 @@ sub run {
         my $delta = $now - $lastFailedLoginEpoch;
         $self->logger->debug(" -> Delta = $delta");
         my $waitingTime = $self->lockTimes->[ $countFailed - 1 ]
-          || $self->conf->{bruteForceProtectionMaxLockTime};
+          // $self->conf->{bruteForceProtectionMaxLockTime};
         $self->logger->debug(" -> Waiting time = $waitingTime");
-        unless ( $delta > $waitingTime ) {
+        if ( $waitingTime && $delta <= $waitingTime ) {
             $self->logger->debug("BruteForceProtection enabled");
             $req->lockTime($waitingTime);
             return PE_WAIT;

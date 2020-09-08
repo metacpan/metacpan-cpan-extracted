@@ -51,5 +51,5 @@ resources:
   X_twitter: https://twitter.com/lemonldapng
   homepage: http://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.8
+version: v2.0.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

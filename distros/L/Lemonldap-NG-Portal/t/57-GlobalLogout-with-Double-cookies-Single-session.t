@@ -13,15 +13,16 @@ my $res;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel                => 'error',
-            authentication          => 'Demo',
-            userDB                  => 'Same',
-            loginHistoryEnabled     => 0,
-            bruteForceProtection    => 0,
-            requireToken            => 0,
-            securedCookie           => 3,
-            restSessionServer       => 1,
-            globalLogoutRule        => 1,
+            logLevel              => 'error',
+            authentication        => 'Demo',
+            userDB                => 'Same',
+            loginHistoryEnabled   => 0,
+            bruteForceProtection  => 0,
+            requireToken          => 0,
+            securedCookie         => 3,
+            restSessionServer     => 1,
+            globalLogoutRule      => 1,
+            tokenUseGlobalStorage => 1,
         }
     }
 );
@@ -38,7 +39,7 @@ ok(
 );
 count(1);
 expectCookie($res);
-my $id = expectCookie($res, 'lemonldaphttp');
+my $id = expectCookie( $res, 'lemonldaphttp' );
 expectRedirection( $res, 'http://auth.example.com/' );
 
 ## Second successful connection for "dwho"
@@ -53,7 +54,7 @@ ok(
 );
 count(1);
 expectCookie($res);
-expectCookie($res, 'lemonldaphttp');
+expectCookie( $res, 'lemonldaphttp' );
 expectRedirection( $res, 'http://auth.example.com/' );
 
 ## Third successful connection for 'dwho'
@@ -68,7 +69,7 @@ ok(
 );
 count(1);
 expectCookie($res);
-expectCookie($res, 'lemonldaphttp');
+expectCookie( $res, 'lemonldaphttp' );
 expectRedirection( $res, 'http://auth.example.com/' );
 
 ## Logout request for 'dwho'
@@ -117,9 +118,12 @@ ok(
 ok( $res->[2]->[0] =~ m%<span trmsg="47"></span>%, 'Found PE_LOGOUT_OK' )
   or explain( $res->[2]->[0], "PE_LOGOUT_OK" );
 my $nbr = count_sessions();
-ok( $nbr == 2, "Two sessions left" )
-  or explain("Number of session(s) found = $nbr\n");
-count(3);
+ok( $nbr == 2, "Two SSO sessions found" )
+  or explain( $nbr, "Two SSO sessions found" );
+$nbr = count_sessions('TOKEN');
+ok( $nbr == 1, "One TOKEN session found" )
+  or explain( $nbr, "One TOKEN session found" );
+count(4);
 
 clean_sessions();
 

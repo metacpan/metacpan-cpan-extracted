@@ -1,13 +1,15 @@
 package Bitcoin::Crypto::Util;
 
-use Modern::Perl "2010";
+use v5.10; use warnings;
 use Exporter qw(import);
 use List::Util qw(first);
-use Try::Tiny;
 use Crypt::PK::ECC;
 
+use Bitcoin::Crypto;
 use Bitcoin::Crypto::Config;
 use Bitcoin::Crypto::Base58 qw(decode_base58check);
+
+our $VERSION = Bitcoin::Crypto->VERSION;
 
 our @EXPORT_OK = qw(
 	validate_wif
@@ -24,7 +26,8 @@ sub validate_wif
 	my $last_byte = substr $byte_wif, -1;
 	if (length $byte_wif == $config{key_max_length} + 2) {
 		return $last_byte eq $config{wif_compressed_byte};
-	} else {
+	}
+	else {
 		return length $byte_wif == $config{key_max_length} + 1;
 	}
 }
@@ -32,13 +35,21 @@ sub validate_wif
 sub get_key_type
 {
 	my ($entropy) = @_;
-	my $key = Crypt::PK::ECC->new;
-	my $ret;
-	try {
-		$key->import_key_raw($entropy, $config{curve_name});
-		$ret = $key->is_private;
-	};
-	return $ret;
+
+	my $curve_size = $config{key_max_length};
+	my $octet = substr $entropy, 0, 1;
+
+	my $has_unc_oc = $octet eq "\x04" || $octet eq "\x06" || $octet eq "\x07";
+	my $is_unc = $has_unc_oc && length $entropy == 2 * $curve_size + 1;
+
+	my $has_com_oc = $octet eq "\x02" || $octet eq "\x03";
+	my $is_com = $has_com_oc && length $entropy == $curve_size + 1;
+
+	return 0
+		if $is_com || $is_unc;
+	return 1
+		if length $entropy <= $curve_size;
+	return;
 }
 
 sub get_path_info
@@ -48,13 +59,16 @@ sub get_path_info
 		my %info;
 		$info{private} = $1 eq "m";
 		if (defined $2 && length $2 > 0) {
-			$info{path} = [map { s#(\d+)'#$1 + $config{max_child_keys}#e; $_ } split "/", substr $2, 1];
-		} else {
+			$info{path} =
+				[map { s#(\d+)'#$1 + $config{max_child_keys}#e; $_ } split "/", substr $2, 1];
+		}
+		else {
 			$info{path} = [];
 		}
 		return undef if first { $_ >= $config{max_child_keys} * 2 } @{$info{path}};
 		return \%info;
-	} else {
+	}
+	else {
 		return undef;
 	}
 }
@@ -91,9 +105,9 @@ Throws an exception if $str is not valid base58.
 
 	my $is_private = get_key_type($bytestr);
 
-Tries to import $bytestr as private key entropy or serialized point.
+Checks if the $bytestr looks like a valid ASN X9.62 format (compressed / uncompressed / hybrid public key or private key entropy up to curve size bits).
 Returns boolean which can be used to determine if the key is private.
-Returns undef if $bytestr cannot be imported as a key.
+Returns undef if $bytestr does not look like a valid key entropy.
 
 =head2 get_path_info
 

@@ -24,9 +24,11 @@
          "requires" : {
             "Cwd" : "0",
             "Digest::HMAC_SHA1" : "0",
+            "Env" : "0",
             "IO::Pipe" : "0",
             "Test::MockObject" : "0",
-            "Test::Pod" : "0"
+            "Test::Pod" : "0",
+            "Time::Fake" : "0"
          }
       },
       "configure" : {
@@ -43,7 +45,7 @@
          },
          "requires" : {
             "LWP::UserAgent" : "0",
-            "Lemonldap::NG::Common" : "v2.0.8",
+            "Lemonldap::NG::Common" : "v2.0.9",
             "Mouse" : "0",
             "URI" : "0"
          }
@@ -58,6 +60,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.8",
+   "version" : "v2.0.9",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -21,7 +21,7 @@ no_index:
 provides:
   Test2::Tools::LoadModule:
     file: lib/Test2/Tools/LoadModule.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Carp: '0'
   Exporter: '5.567'
@@ -30,6 +30,7 @@ requires:
   Getopt::Long: '2.34'
   Test2::API: '0'
   Test2::Util: '0'
+  if: '0'
   perl: '5.008001'
   strict: '0'
   warnings: '0'
@@ -37,5 +38,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Tools-LoadModule
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Test2-Tools-LoadModule.git
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

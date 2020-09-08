@@ -1,3 +1,8 @@
+0.003		2020-09-05	T. R. Wyant
+    Disable feature 'signatures' for Perl >= 5.20 because we're using
+    old-style signatures. This is probably paranoia, brought on by the
+    Perl Porters' talk of changing defaults for Perl 7.
+
 0.002		2020-04-28	T. R. Wyant
     Added all_modules_tried_ok(). This traverses the specified
     directories (default: blib/lib and blib/arch) looking for modules

@@ -1,0 +1,11 @@
+<%args>
+$COLUMN_MAP
+</%args>
+<%init>
+$COLUMN_MAP->{TestStatus} = {
+    title => 'Test status',
+    value => sub {
+        return \(qq{<div class="travisci" data-travisci-ticketid="@{[$_[0]->Id]}"></div>});
+    },
+};
+</%init>

@@ -1,3 +1,12 @@
+1.53    Fri. Sept. 4, 2020
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+
+        - Fixed a bug with 880 fields lacking $6
+        - Updated Lint::DATA section with Updates No. 25-30 (December 2017-May 2020)
+		-Corrected some incorrect DATA to match MARC 21 Bibliographic
+        - Updated MARC::Lint::CodeData with most recent version.
+		
 1.52    Wed. Aug. 2, 2017
 
         [THINGS THAT MAY BREAK YOUR CODE]

@@ -30,6 +30,7 @@ configure_requires:
   Alien::Build::MM: '1.74'
   Alien::Build::Plugin::Build::SearchDep: '0.53'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
+  Alien::Build::Plugin::PkgConfig::PPWrapper: '0'
   Alien::Build::Plugin::Prefer::BadVersion: '1.05'
   Alien::MSYS: '0'
   Alien::sqlite: '1.06'
@@ -57,7 +58,7 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-proj/issues/
   repository: https://github.com/shawnlaffan/perl-alien-proj
-version: '1.14'
+version: '1.15'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.26'
   requires:

@@ -88,6 +88,7 @@ ok(
 
 my $userinfo = JSON::from_json( $res->[2]->[0] );
 is( $userinfo->{family_name}, 'Accents', 'Correct macro value' );
+is( $userinfo->{sub}, 'customfrench', 'Sub macro correctly evaluated' );
 
 clean_sessions();
 done_testing();
@@ -123,6 +124,7 @@ sub op {
                 oidcRPMetaDataMacros                  => {
                     rp => {
                         extract_sn => '(split(/\s/, $cn))[1]',
+                        custom_sub => '"custom".$uid',
                     }
                 },
                 oidcRPMetaDataOptions => {
@@ -133,7 +135,7 @@ sub op {
                         oidcRPMetaDataOptionsIDTokenSignAlg    => "HS512",
                         oidcRPMetaDataOptionsBypassConsent     => 1,
                         oidcRPMetaDataOptionsClientSecret      => "rpsecret",
-                        oidcRPMetaDataOptionsUserIDAttr        => "",
+                        oidcRPMetaDataOptionsUserIDAttr        => "custom_sub",
                         oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                     }
                 },

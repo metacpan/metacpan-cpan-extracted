@@ -22,20 +22,12 @@ DESCRIPTION
   unlike JPerl, "Easy jobs easy" has been lost. (but we have got it again :-D)
 
   In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, UHC)
-  have any DAMEMOJI at second octet in double-byte codepoint. DAMEMOJI are
-  metacharacters. Which octets are DAMEMOJI depends on whether the enclosing
-  delimiter is single quote or double quote. This software escapes DAMEMOJI in
-  your script, generate a new script and run it.
+  have any DAMEMOJI who have metacharacters at second octet. Which characters
+  are DAMEMOJI is depends on whether the enclosing delimiter is single quote or
+  double quote.
 
-  What is better than Sjis software ?
-  1) implemented by single file
-  2) supports many encodings of MBCS by only one software
-  3) easy to change encoding of your scripts
-
-  What is lost from Sjis software ?
-  1) MacOS 9 not suppoted
-  2) codepoint range of regexp or tr/// not supported enough
-  3) uc(), ucfirst(), lc(), lcfirst(), and fc() not supported
+  This software escapes DAMEMOJI in your script, generate a new script and
+  run it.
 
 SUPPORTED PERL VERSIONS
 

@@ -37,6 +37,7 @@
             "Getopt::Long" : "2.34",
             "Test2::API" : "0",
             "Test2::Util" : "0",
+            "if" : "0",
             "perl" : "5.008001",
             "strict" : "0",
             "warnings" : "0"
@@ -46,7 +47,7 @@
    "provides" : {
       "Test2::Tools::LoadModule" : {
          "file" : "lib/Test2/Tools/LoadModule.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -64,6 +65,6 @@
          "web" : "https://github.com/trwyant/perl-Test2-Tools-LoadModule"
       }
    },
-   "version" : "0.002",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

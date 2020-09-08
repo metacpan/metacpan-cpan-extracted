@@ -10,3 +10,4 @@ t/pod.t
 t/test.t
 t/test.rpm
 Makefile.PL
+META.json

@@ -1,36 +1,16 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2007 Smithsonian Astrophysical Observatory
-#
-# This file is part of Config::PFiles::Path
-#
-# Config::PFiles::Path is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package Config::PFiles::Path;
+
+# ABSTRACT: manipulate PFILES path for IRAF Compatible parameter files
 
 use 5.008009;
 
 use strict;
 use warnings;
 
-use Symbol;
-use Carp;
-use Sub::Uplevel;
+use Symbol ();
+use Sub::Uplevel ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use overload '""' => '_export' ;
 
@@ -38,6 +18,20 @@ my %is_mutator
   = map { $_ => 1 } qw( _append _prepend _replace _remove );
 
 our $AUTOLOAD;
+
+
+
+
+
+
+
+
+
+
+sub _croak {
+    require Carp;
+    goto &Carp::croak;
+}
 
 # allow the user to do thing when loading the package
 sub import {
@@ -48,11 +42,11 @@ sub import {
 
     my $method = shift;
 
-    croak( "Can't call method '$method' in this context\n" )
+    _croak( "Can't call method '$method' in this context\n" )
       unless $is_mutator{ "_$method" };
 
     $AUTOLOAD = $method;
-    uplevel 1, \&AUTOLOAD, $package, @_;
+    Sub::Uplevel::uplevel( 1, \&AUTOLOAD, $package, @_ );
 }
 
 sub AUTOLOAD {
@@ -63,18 +57,18 @@ sub AUTOLOAD {
 
     my $imethod = '_' . $method;
 
-    my $subref = *{qualify_to_ref($imethod,__PACKAGE__)}{CODE};
+    my $subref = *{Symbol::qualify_to_ref($imethod,__PACKAGE__)}{CODE};
 
     # make sure it's an existing method
-    croak( qq{Can't locate object method "$method" via package "}, 
-	   __PACKAGE__, q{"} )
+    _croak( qq{Can't locate object method "$method" via package "},
+           __PACKAGE__, q{"} )
       if $method =~ /^_/ || ! defined $subref;
 
 
     # is this an object invocation?
     if ( ref $_[0] && $_[0]->isa(__PACKAGE__) )
     {
-	goto &$imethod;
+        goto &$imethod;
     }
 
     # nope.  create default object based on $ENV{PFILES} and replace
@@ -88,38 +82,38 @@ sub AUTOLOAD {
     # after it has been run
     if ( $is_mutator{$imethod} )
     {
-	# respect calling context
-	my $wantarray = wantarray();
+        # respect calling context
+        my $wantarray = wantarray();
 
-	# void
-	if ( ! defined $wantarray )
-	{
-	    uplevel 1, $subref, @_;
-	    $ENV{PFILES} = $env->_export;
-	    return;
-	}
+        # void
+        if ( ! defined $wantarray )
+        {
+            Sub::Uplevel::uplevel( 1, $subref, @_ );
+            $ENV{PFILES} = $env->_export;
+            return;
+        }
 
-	# list
-	elsif ( $wantarray)
-	{
-	    my @results = uplevel 1, $subref, @_;
-	    $ENV{PFILES} = $env->_export;
-	    return @results;
-	}
+        # list
+        elsif ( $wantarray)
+        {
+            my @results = Sub::Uplevel::uplevel( 1, $subref, @_ );
+            $ENV{PFILES} = $env->_export;
+            return @results;
+        }
 
-	# scalar
-	else
-	{
-	    my $result = uplevel 1, $subref, @_;
-	    $ENV{PFILES} = $env->_export;
-	    return $result;
-	}
+        # scalar
+        else
+        {
+            my $result = Sub::Uplevel::uplevel( 1, $subref, @_ );
+            $ENV{PFILES} = $env->_export;
+            return $result;
+        }
     }
 
     # nope, just execute the method
     else
     {
-	goto &$imethod;
+        goto &$imethod;
     }
 }
 
@@ -145,7 +139,7 @@ sub __init {
                   (?:|;(.*)) # and everything that's after a semicolon (RO)
                   $/x;
 
-    croak( "illegal path: too many semi-colons: $pfiles\n" )
+    _croak( "illegal path: too many semi-colons: $pfiles\n" )
       if defined $dirs{RO} && $dirs{RO} =~ /;/;
 
     # split and store non-empty paths
@@ -161,8 +155,8 @@ sub __check_set {
     my $match;
     unless ( ($match ) = $dir_set =~ /^(RW|RO)$/i )
     {
-	local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-	croak( "illegal value for directory set: $dir_set\n" )
+        local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+        _croak( "illegal value for directory set: $dir_set\n" )
     }
 
     return uc($match);
@@ -217,23 +211,42 @@ sub _export {
     # join together the non-empty directories in the sets;
     my ( $rw, $ro ) =
       map { join( q{:}, grep { $_ ne q{} } @{$self->{$_}} ) }
-	qw( RW RO );
+        qw( RW RO );
 
     # construct a rational path
     return
           $rw eq q{} ? ";$ro"
-	: $ro eq q{} ?   $rw
-	:              "$rw;$ro";
+        : $ro eq q{} ?   $rw
+        :              "$rw;$ro";
 }
+
 
 1;
 
+#
+# This file is part of Config-PFiles-Path
+#
+# This software is Copyright (c) 2007 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory IRAF PFILES PIL cxcparam
+libpfile
 
 =head1 NAME
 
 Config::PFiles::Path - manipulate PFILES path for IRAF Compatible parameter files
 
+=head1 VERSION
+
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -266,7 +279,6 @@ Config::PFiles::Path - manipulate PFILES path for IRAF Compatible parameter file
 
     # work directly on $ENV{PFILES}
     Config::PFiles::Path->append( RO => @dirs );
-
 
 =head1 DESCRIPTION
 
@@ -320,14 +332,12 @@ is required.
 
 =back
 
-
 Object methods don't touch C<$ENV{PFILES}>.  For example,
 
     $env = Config::PFiles::Path->new( $ENV{PFILES} );
     $env->prepend( RW => "$ENV{HOME}/pfiles" );
 
 modifies the path object C<$env>.
-
 
 =head2 Methods
 
@@ -397,39 +407,32 @@ B<Config::PFiles::Path> overloads the "" operator.  When interpolating
 an object in a string it will be replaced with the output of the
 B<export()> method.
 
+=head1 SUPPORT
 
-=head1 BUGS AND LIMITATIONS
+=head2 Bugs
 
+Please report any bugs or feature requests to bug-config-pfiles-path@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-PFiles-Path
 
-No bugs have been reported.
+=head2 Source
 
-Please report any bugs or feature requests to
-C<bug-config-pfiles-path@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-PFiles-Path>.
+Source is available at
 
-=head1 VERSION
+  https://gitlab.com/djerius/config-pfiles-path
 
-Version 0.02
+and may be cloned from
 
-=head1 LICENSE AND COPYRIGHT
-
-Copyright (c) 2007 The Smithsonian Astrophysical Observatory
-
-Config::PFiles::Path is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  https://gitlab.com/djerius/config-pfiles-path.git
 
 =head1 AUTHOR
 
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
 
+=head1 COPYRIGHT AND LICENSE
 
+This software is Copyright (c) 2007 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

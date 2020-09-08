@@ -55,7 +55,7 @@ package Rex::Virtualization::LibVirt;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.1'; # VERSION
+our $VERSION = '1.12.2'; # VERSION
 
 use Rex::Virtualization::Base;
 use base qw(Rex::Virtualization::Base);

@@ -1,5 +1,27 @@
 Revision history for Perl extension RxPerl
 
+v0.18.1 2020-09-08T07:56:05Z
+
+    - fixed bug in op_switch_map
+
+v0.18.0 2020-09-08T07:29:51Z
+
+    - added op_start_with, op_switch_map
+    - fixed errors in POD
+
+v0.17.0 2020-09-06T07:16:41Z
+
+    - added documentation for rx_from
+
+v0.16.2 2020-09-06T05:04:16Z
+
+    - fixed minor bug
+
+v0.16.1 2020-09-06T04:42:39Z
+
+    - removed FATAL warnings
+    - added rx_from (accepts arrays, promises, and observables)
+
 v0.16.0 2020-09-04T13:32:59Z
 
     - unhandled error events throw an exception

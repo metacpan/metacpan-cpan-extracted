@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.9';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 
@@ -35,14 +35,30 @@ sub init {
         return 0;
     }
 
-    # If self registration is enabled and "activation" is just set to
-    # "enabled", replace the rule to detect if user has registered its key
-    if (    $self->conf->{yubikey2fSelfRegistration}
-        and $self->conf->{yubikey2fActivation} eq '1' )
-    {
-        $self->conf->{yubikey2fActivation} =
-          '$_2fDevices && $_2fDevices =~ /"type":\s*"UBK"/s';
+    # Try to be smart about Yubikey 2F activation
+    if ( $self->conf->{yubikey2fActivation} eq '1' ) {
+        my @newrules;
+
+        # If self registration is enabled, detect if user has registered its
+        # key
+        if ( $self->conf->{yubikey2fSelfRegistration} ) {
+            push @newrules, '$_2fDevices && $_2fDevices =~ /"type":\s*"UBK"/s';
+        }
+
+        # If Yubikey looked up from an attribute, test attribute's presence
+        if ( $self->conf->{yubikey2fFromSessionAttribute} ) {
+            my $attr = $self->conf->{yubikey2fFromSessionAttribute};
+            push @newrules, "\$$attr";
+        }
+
+        # Aggregate rules
+        if (@newrules) {
+            my $rule = join( " || ", @newrules );
+            $self->conf->{yubikey2fActivation} = $rule;
+            $self->logger->debug("Yubikey activation rule: $rule");
+        }
     }
+
     unless ($self->conf->{yubikey2fClientID}
         and $self->conf->{yubikey2fSecretKey} )
     {
@@ -52,30 +68,42 @@ sub init {
 
     $self->yubi(
         Auth::Yubikey_WebClient->new( {
-                id    => $self->conf->{yubikey2fClientID},
-                api   => $self->conf->{yubikey2fSecretKey},
-                nonce => $self->conf->{yubikey2fNonce},
-                url   => $self->conf->{yubikey2fUrl}
+                id  => $self->conf->{yubikey2fClientID},
+                api => $self->conf->{yubikey2fSecretKey},
+                (
+                    $self->conf->{yubikey2fNonce}
+                    ? ( nonce => $self->conf->{yubikey2fNonce} )
+                    : ()
+                ),
+                (
+                    $self->conf->{yubikey2fUrl}
+                    ? ( url => $self->conf->{yubikey2fUrl} )
+                    : ()
+                ),
             }
         )
     );
     return $self->SUPER::init();
 }
 
-sub run {
-    my ( $self, $req, $token, $_2fDevices ) = @_;
-
-    my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug("Yubikey checkLogins set") if ($checkLogins);
-
+sub _findYubikey {
+    my ( $self, $req, $sessionInfo ) = @_;
     my $yubikey;
-    if ( $req->{sessionInfo}->{_2fDevices} ) {
+    my $_2fDevices;
+
+    # First, lookup from session attribute
+    if ( $self->conf->{yubikey2fFromSessionAttribute} ) {
+        my $attr = $self->conf->{yubikey2fFromSessionAttribute};
+        $yubikey = $sessionInfo->{$attr};
+    }
+
+    # If we didn't find a key, lookup psession
+    if ( !$yubikey and $sessionInfo->{_2fDevices} ) {
         $self->logger->debug("Loading 2F Devices ...");
 
         # Read existing 2FDevices
         $_2fDevices = eval {
-            from_json( $req->{sessionInfo}->{_2fDevices},
-                { allow_nonref => 1 } );
+            from_json( $sessionInfo->{_2fDevices}, { allow_nonref => 1 } );
         };
         if ($@) {
             $self->logger->error("Bad encoding in _2fDevices: $@");
@@ -87,6 +115,18 @@ sub run {
         $yubikey = $_->{_yubikey}
           foreach grep { $_->{type} eq 'UBK' } @$_2fDevices;
     }
+
+    return $yubikey;
+
+}
+
+sub run {
+    my ( $self, $req, $token, $_2fDevices ) = @_;
+
+    my $checkLogins = $req->param('checkLogins');
+    $self->logger->debug("Yubikey checkLogins set") if ($checkLogins);
+
+    my $yubikey = $self->_findYubikey( $req, $req->sessionInfo );
 
     unless ($yubikey) {
         $self->userLogger->warn( 'User '
@@ -125,18 +165,7 @@ sub verify {
     }
 
     # Verify OTP
-    my $yubikey;
-    my $_2fDevices = eval {
-        $self->logger->debug("Looking for 2F Devices ...");
-        from_json( $session->{_2fDevices}, { allow_nonref => 1 } );
-    };
-    if ($@) {
-        $self->logger->error("Bad encoding in _2fDevices: $@");
-        return PE_ERROR;
-    }
-
-    $self->logger->debug("Reading Yubikey ...");
-    $yubikey = $_->{_yubikey} foreach grep { $_->{type} eq 'UBK' } @$_2fDevices;
+    my $yubikey = $self->_findYubikey( $req, $session );
 
     if (
         index( $yubikey,
@@ -146,6 +175,9 @@ sub verify {
         $self->userLogger->warn('Yubikey not registered');
         return PE_BADOTP;
     }
+
+    $self->logger->debug(
+        "Validating $code of yubikey $yubikey against external API");
     if ( $self->yubi->otp($code) ne 'OK' ) {
         $self->userLogger->warn('Yubikey verification failed');
         return PE_BADOTP;

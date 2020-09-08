@@ -4,10 +4,12 @@ author:
   - 'Andy Lester <andy@petdance.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.94'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,17 +17,37 @@ meta-spec:
 name: Module-Starter
 no_index:
   directory:
-    - t
+    - eg
+    - examples
     - inc
+    - share
+    - t
+    - xt
+provides:
+  Module::Starter:
+    file: lib/Module/Starter.pm
+    version: '1.77'
+  Module::Starter::App:
+    file: lib/Module/Starter/App.pm
+    version: '1.77'
+  Module::Starter::BuilderSet:
+    file: lib/Module/Starter/BuilderSet.pm
+    version: '1.77'
+  Module::Starter::Plugin::Template:
+    file: lib/Module/Starter/Plugin/Template.pm
+    version: '1.77'
+  Module::Starter::Simple:
+    file: lib/Module/Starter/Simple.pm
+    version: '1.77'
 requires:
-  ExtUtils::Command: '0'
+  File::Path: '0'
   File::Spec: '0'
   Getopt::Long: '0'
   Module::Runtime: '0'
   Pod::Usage: '1.21'
   Software::License: '0.103005'
   Test::Harness: '0.21'
-  Test::More: '0'
+  Test::More: '0.94'
   parent: '0'
   perl: '5.006001'
   version: '0.77'
@@ -34,5 +56,33 @@ resources:
   bugtracker: https://github.com/xsawyerx/module-starter/issues
   homepage: https://github.com/xsawyerx/module-starter
   repository: https://github.com/xsawyerx/module-starter.git
-version: '1.76'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.77'
+x_contributors:
+  - 'Brendan Byrd <byrd.b@insightcom.com>'
+  - 'Brian Manning <cpan@xaoc.org>'
+  - 'Chas. J. Owens IV <chas.owens@gmail.com>'
+  - 'cjcollier <cjcollier@bb7b6759-d628-0410-895d-7b6b7dc49dde>'
+  - 'Colin Ewen <colin@draecas.com>'
+  - 'Dan Book <grinnz@gmail.com>'
+  - 'Dan Book <grinnz@grinnz.com>'
+  - 'David Pottage <david@chrestomanci.org>'
+  - 'David.Pottage <d.pottage@cv-library.co.uk>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Diab Jerius <djerius@cpan.org>'
+  - 'Guillermo O. Freschi <kedrot@gmail.com>'
+  - 'hobbestigrou <hobbestigrou@erakis.eu>'
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'MartinMcGrath <mcgrath.martin@gmail.com>'
+  - 'Pedro Figueiredo <pedro.figueiredo@playfish.com>'
+  - 'petdance <petdance@bb7b6759-d628-0410-895d-7b6b7dc49dde>'
+  - 'Richard Poole <richard@2ndQuadrant.com>'
+  - 'rsignes <rsignes@bb7b6759-d628-0410-895d-7b6b7dc49dde>'
+  - 'sawyer <sawyer@dungeon.(none)>'
+  - 'Sawyer X <xsawyerx@cpan.org>'
+  - 'Shlomi Fish <shlomif@iglu.org.il>'
+  - 'xdaveg <xdaveg@bb7b6759-d628-0410-895d-7b6b7dc49dde>'
+  - 'xsawyerx <xsawyerx@bb7b6759-d628-0410-895d-7b6b7dc49dde>'
+x_generated_by_perl: v5.30.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

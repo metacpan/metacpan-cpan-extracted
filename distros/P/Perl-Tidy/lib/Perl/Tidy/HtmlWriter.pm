@@ -7,7 +7,7 @@
 package Perl::Tidy::HtmlWriter;
 use strict;
 use warnings;
-our $VERSION = '20200822';
+our $VERSION = '20200907';
 
 use File::Basename;
 
@@ -534,7 +534,8 @@ sub check_options {
     # check for conflict
     if ( $css_linkname && $rOpts->{'nohtml-style-sheets'} ) {
         $rOpts->{'nohtml-style-sheets'} = 0;
-        warning("You can't specify both -css and -nss; -nss ignored\n");
+        Perl::Tidy::Warn(
+            "You can't specify both -css and -nss; -nss ignored\n");
     }
 
     # write a style sheet file if necessary

@@ -3,17 +3,32 @@ use strict;
 use warnings;
 
 require Exporter;
-our @EXPORT_OK = qw( is_like_windows );
+use File::Temp qw/ tempdir /;
+our @EXPORT_OK = qw(
+  is_like_windows
+  Compare
+  tmpdir
+  min_version
+  need_signals
+);
 our @ISA    = qw( Exporter );
 
 # We don't require any of these modules for testing, but if they're 
 # installed, we require minimal versions.
 
-our %MINVERSION = qw(
+my %MINVERSION = qw(
     DBI            1.607
     DBD::CSV       0.33
     SQL::Statement 1.20
+    DBD::SQLite    0
+    Log::Dispatch  0
 );
+sub min_version {
+    my @missing = grep !eval "use $_ $MINVERSION{$_}; 1", @_;
+    return if !@missing;
+    Test::More::plan(skip_all =>
+        "Skipping as not got: " . join ', ', map "$_ $MINVERSION{$_}", @_);
+}
 
 # check if we're on non-unixy system
 sub is_like_windows {
@@ -24,6 +39,112 @@ sub is_like_windows {
     }
 
     return 0;
+}
+
+sub tmpdir {
+    tempdir( CLEANUP => 1 );
+}
+
+#Lifted this code from Data::Compare by Fabien Tassin fta@sofaraway.org .
+#Using it in the XML tests
+use Carp;
+sub Compare {
+  croak "Usage: Data::Compare::Compare(x, y)\n" unless $#_ == 1;
+  my $x = shift;
+  my $y = shift;
+
+  my $refx = ref $x;
+  my $refy = ref $y;
+
+  unless ($refx || $refy) { # both are scalars
+    return $x eq $y if defined $x && defined $y; # both are defined
+    !(defined $x || defined $y);
+  }
+  elsif ($refx ne $refy) { # not the same type
+    0;
+  }
+  elsif ($x == $y) { # exactly the same reference
+    1;
+  }
+  elsif ($refx eq 'SCALAR') {
+    Compare($$x, $$y);
+  }
+  elsif ($refx eq 'ARRAY') {
+    if ($#$x == $#$y) { # same length
+      my $i = -1;
+      for (@$x) {
+	$i++;
+	return 0 unless Compare($$x[$i], $$y[$i]);
+      }
+      1;
+    }
+    else {
+      0;
+    }
+  }
+  elsif ($refx eq 'HASH') {
+    return 0 unless scalar keys %$x == scalar keys %$y;
+    for (keys %$x) {
+      next unless defined $$x{$_} || defined $$y{$_};
+      return 0 unless defined $$y{$_} && Compare($$x{$_}, $$y{$_});
+    }
+    1;
+  }
+  elsif ($refx eq 'REF') {
+    0;
+  }
+  elsif ($refx eq 'CODE') {
+    1; #changed for log4perl, let's just accept coderefs
+  }
+  elsif ($refx eq 'GLOB') {
+    0;
+  }
+  else { # a package name (object blessed)
+    my ($type) = "$x" =~ m/^$refx=(\S+)\(/o;
+    if ($type eq 'HASH') {
+      my %x = %$x;
+      my %y = %$y;
+      Compare(\%x, \%y);
+    }
+    elsif ($type eq 'ARRAY') {
+      my @x = @$x;
+      my @y = @$y;
+      Compare(\@x, \@y);
+    }
+    elsif ($type eq 'SCALAR') {
+      my $x = $$x;
+      my $y = $$y;
+      Compare($x, $y);
+    }
+    elsif ($type eq 'GLOB') {
+      0;
+    }
+    elsif ($type eq 'CODE') {
+      1; #changed for log4perl, let's just accept coderefs
+    }
+    else {
+      croak "Can't handle $type type.";
+    }
+  }
+}
+
+# Check if this platform supports signals
+sub need_signals {
+    require Config;
+    no warnings;
+    if (length $Config::Config{sig_name} and length $Config::Config{sig_num}) {
+        my $SIGNALS_AVAILABLE;
+        eval {
+            $SIG{USR1} = sub { $SIGNALS_AVAILABLE = 1 };
+            # From the Config.pm manpage
+            my(%sig_num);
+            my @names = split ' ', $Config::Config{sig_name};
+            @sig_num{@names} = split ' ', $Config::Config{sig_num};
+            kill $sig_num{USR1}, $$;
+        };
+        return if !$@ and $SIGNALS_AVAILABLE;
+    }
+    Test::More::plan(skip_all => "only on platforms supporting signals");
 }
 
 1;

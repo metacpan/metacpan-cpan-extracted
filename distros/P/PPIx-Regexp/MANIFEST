@@ -19,7 +19,6 @@ lib/PPIx/Regexp/Lexer.pm
 lib/PPIx/Regexp/Node.pm
 lib/PPIx/Regexp/Node/Range.pm
 lib/PPIx/Regexp/Node/Unknown.pm
-lib/PPIx/Regexp/StringTokenizer.pm
 lib/PPIx/Regexp/Structure.pm
 lib/PPIx/Regexp/Structure/Assertion.pm
 lib/PPIx/Regexp/Structure/Atomic_Script_Run.pm

@@ -15,6 +15,18 @@ my @param_tests = ({
   method => 'user_events_params',
   params => [qw[ artist_id artist_name artists attendance
                  location max_date min_date type venue_id ]],
+}, {
+  method => 'user_gigs_params',
+  params => ['page'],
+}, {
+  method => 'artist_events_params',
+  params => [qw[ min_date max_date page per_page order ]],
+}, {
+  method => 'venue_events_params',
+  params => [qw[ page per_page ]],
+}, {
+  method => 'metro_events_params',
+  params => [qw[ page per_page ]],
 });
 
 foreach my $test (@param_tests) {

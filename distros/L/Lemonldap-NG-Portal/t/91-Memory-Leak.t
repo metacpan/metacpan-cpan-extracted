@@ -32,6 +32,7 @@ TODO: {
     local $TODO = "Not yet fully cleaned";
 
     fail "Unable to really destroy a portal object for now";
+
     # Test with initialization
     #my $p = Lemonldap::NG::Portal::Main->new();
     #$p->init($ini);
@@ -45,6 +46,6 @@ TODO: {
 my $p = Lemonldap::NG::Portal::Main->new();
 $p->init($ini);
 leaks_cmp_ok {
-    $p->reloadConf($p->conf);
+    $p->reloadConf( $p->conf );
 }
 '<', 1;

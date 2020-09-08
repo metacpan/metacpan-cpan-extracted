@@ -26,7 +26,17 @@
  "scriptname":"<TMPL_VAR NAME="SCRIPT_NAME">",
  "activeTimer":<TMPL_VAR NAME="ACTIVE_TIMER" DEFAULT="0">,
  "pingInterval":<TMPL_VAR NAME="PING" DEFAULT="0">,
- "trOver":<TMPL_VAR NAME="TROVER" DEFAULT="[]">
+ "trOver":<TMPL_VAR NAME="TROVER" DEFAULT="[]"><TMPL_IF NAME="DISPLAY_PPOLICY">,
+ "ppolicy": {
+            "display": "<TMPL_VAR NAME="DISPLAY_PPOLICY" DEFAULT="0">",
+            "minsize": "<TMPL_VAR NAME="PPOLICY_MINSIZE" DEFAULT="0">",
+            "minlower": "<TMPL_VAR NAME="PPOLICY_MINLOWER" DEFAULT="0">",
+            "minupper": "<TMPL_VAR NAME="PPOLICY_MINUPPER" DEFAULT="0">",
+            "mindigit": "<TMPL_VAR NAME="PPOLICY_MINDIGIT" DEFAULT="0">",
+            "nopolicy": "<TMPL_VAR NAME="PPOLICY_NOPOLICY" DEFAULT="0">",
+            "allowedspechar": "<TMPL_VAR NAME="PPOLICY_ALLOWEDSPECHAR" ESCAPE="js" DEFAULT="">",
+            "minspechar": "<TMPL_VAR NAME="PPOLICY_MINSPECHAR" DEFAULT="0">"
+            }</TMPL_IF>
  }
  </script>
 
