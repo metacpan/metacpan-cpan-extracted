@@ -4,7 +4,7 @@ use 5.014;
 use warnings;
 use strict;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 use Carp;
 use Ref::Util qw /is_arrayref/;
@@ -94,11 +94,40 @@ sub get_class_count {
 }
 
 sub draw {
-    my ($self, $args) = @_;
+    my ($self) = @_;
 
-    #  inefficient, but why would one want a single draw?
-    #  here for compatibility with SSM::AliasMethod
-    return $self->draw_n_samples (1);
+    my $prng = $self->{prng};
+
+    my $data  = $self->{data}
+      // croak 'it appears setup has not been run yet';
+    my $K    = scalar @$data;
+    my $norm = $self->{sum} // do {$self->_initialise; $self->{sum}};
+
+    my $n = 1;
+    my ($sum_p, $sum_n) = (0, 0);
+
+    foreach my $kk (0..($K-1)) {
+        #  avoid repeated derefs below - unbenchmarked micro-optimisation
+        my $data_kk = $data->[$kk];
+        next if !$data_kk;
+
+        my $prob = $data_kk / ($norm - $sum_p);
+        #  MRMA does not like p>1
+        # so if p>1 then we get 1, otherwise the original value
+        # the int-or approach is ~10% faster than min(1,$prob) when $prob<1
+        my $res = $prng->binomial (
+            int ($prob) || $prob,
+            ($n - $sum_n),
+        );
+
+        return $kk if $res;
+
+        $sum_p += $data_kk;
+        $sum_n += $res;
+    }
+
+    #  we should not get here
+    return;
 }
 
 sub draw_n_samples {
@@ -229,7 +258,7 @@ method.
 =item $object->draw
 
 Draw one sample from the distribution.
-Returns the sampled class number.
+Returns the sampled class number (array index).
 
 =item $object->draw_n_samples ($n)
 

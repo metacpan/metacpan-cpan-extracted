@@ -1,0 +1,25 @@
+# There are two choices which defeat IRV Winner
+# the later choices of the IRV winner determin which
+# is the condorcet winner.
+# Both the redacted and unredacted version are provided
+
+:CHOICES:PLURALITY:LOOP1:LOOP2:LOOP3:IRV
+1:PLURALITY
+2:PLURALITY:LOOP1:LOOP2:LOOP3
+2:PLURALITY:LOOP2:LOOP3:LOOP1
+2:PLURALITY:LOOP3:LOOP1:LOOP2
+1:PLURALITY:LOOP1
+5:PLURALITY:LOOP2
+9:PLURALITY:LOOP3
+9:LOOP1
+5:LOOP1:LOOP2:LOOP3
+5:LOOP1:LOOP3:LOOP2
+1:LOOP1:IRV
+18:LOOP2
+1:LOOP2:IRV
+17:LOOP3
+1:LOOP3:IRV
+9:IRV
+7:IRV
+3:IRV
+2:IRV

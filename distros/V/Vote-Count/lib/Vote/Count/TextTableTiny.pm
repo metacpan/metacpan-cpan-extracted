@@ -2,7 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 package Vote::Count::TextTableTiny;
-$Vote::Count::TextTableTiny::VERSION = '1.07';
+$Vote::Count::TextTableTiny::VERSION = '1.08';
 use parent 'Exporter';
 use List::Util qw();
 use Carp qw/ croak /;

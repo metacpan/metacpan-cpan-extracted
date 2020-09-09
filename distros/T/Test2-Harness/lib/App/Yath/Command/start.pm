@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000024';
+our $VERSION = '1.000026';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -91,6 +91,11 @@ sub run {
     my $stderr = File::Spec->catfile($dir, 'error.log');
     my $stdout = File::Spec->catfile($dir, 'output.log');
 
+    my @prof;
+    if ($settings->runner->nytprof) {
+        push @prof => '-d:NYTProf';
+    }
+
     my $pid = run_cmd(
         stderr => $stderr,
         stdout => $stdout,
@@ -98,7 +103,7 @@ sub run {
         no_set_pgrp => $settings->runner->daemon,
 
         command => [
-            $^X, $settings->harness->script,
+            $^X, @prof, $settings->harness->script,
             (map { "-D$_" } @{$settings->harness->dev_libs}),
             '--no-scan-plugins',    # Do not preload any plugin modules
             runner           => $dir,
@@ -466,6 +471,13 @@ Can also be set with the following environment variables: C<YATH_JOB_COUNT>, C<T
 =item --no-lib
 
 (Default: include if it exists) Include 'lib' in your module path
+
+
+=item --nytprof
+
+=item --no-nytprof
+
+Use Devel::NYTProf on tests. This will set addpid=1 for you. This works with or without fork.
 
 
 =item --post-exit-timeout SECONDS

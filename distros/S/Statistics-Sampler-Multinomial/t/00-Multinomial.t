@@ -3,7 +3,7 @@ use warnings;
 use 5.010;
 use English qw /-no_match_vars/;
 
-use Test::Most tests => 9;
+use Test::Most;
 
 
 use rlib;
@@ -154,5 +154,27 @@ sub test_draw_real_data {
           if $Config{ivsize} == 4;
         is_deeply $draws, $expected_draws, 'got expected draws for iNextPD data';
         is (sum (@$draws), scalar @$probs, 'got expected number of draws for iNextPD ')
+    }
+}
+
+sub test_draw {
+    my $probs = [
+        1, 5, 2, 6
+    ];
+    
+    my $prng   = Math::Random::MT::Auto->new (seed => 2345);
+    my $object = Statistics::Sampler::Multinomial->new (
+        prng => $prng,
+        data => $probs,
+    );
+
+    my $expected_draws = [1, 3, 2, 2, 0];
+    my @draws = map {$object->draw()} (1..5);
+
+    SKIP: {
+        use Config;
+        skip 'prng sequence differs under 32 bit ints', 2
+          if $Config{ivsize} == 4;
+        is_deeply \@draws, $expected_draws, 'got expected draws using draw method';
     }
 }

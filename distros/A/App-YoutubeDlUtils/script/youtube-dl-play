@@ -1,0 +1,134 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-09'; # DATE
+our $DIST = 'App-YoutubeDlUtils'; # DIST
+our $VERSION = '0.005'; # VERSION
+# FRAGMENT id=shcompgen-hint command=_youtube-dl
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+use Log::ger::Screen;
+
+use CLI::Meta::YoutubeDl;
+use Getopt::Long qw(:config gnu_getopt no_ignore_case);
+use IPC::System::Options 'system', -log=>1, -die=>1;
+
+my $opts = $CLI::Meta::YoutubeDl::META->{opts};
+my @opts_for_youtube_dl;
+my @urls;
+Getopt::Long::GetOptions(
+    (map { my $optspec = $_; (my $opt = $optspec) =~ s#[|=].+##; $opt = length($opt) > 1 ? "--$opt" : "-$opt"; ($optspec => sub { push @opts_for_youtube_dl, $opt, ($optspec =~ /=/ ? ($_[1]) : ()) }); } keys %$opts),
+    '<>' => sub { push @urls, $_[0] },
+);
+
+unless (@urls) {
+    die "youtube-dl-play: Please specify one or more URLs\n";
+}
+
+for my $url (@urls) {
+    log_info "youtube-dl-play: Getting output filename for URL '%s' ...", $url;
+    my $filename;
+    system({capture_stdout=>\$filename}, "youtube-dl", @opts_for_youtube_dl, "--get-filename", $url);
+    chomp($filename);
+    system({shell=>1},
+           "youtube-dl", @opts_for_youtube_dl, "-o", "-", $url, \"|",
+           "tee", $filename, \"|",
+           "mpv", "-");
+}
+
+# PODNAME: youtube-dl-play
+# ABSTRACT: Download videos with youtube-dl *and* play them while downloading
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+youtube-dl-play - Download videos with youtube-dl *and* play them while downloading
+
+=head1 VERSION
+
+This document describes version 0.005 of youtube-dl-play (from Perl distribution App-YoutubeDlUtils), released on 2020-09-09.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % youtube-dl-play [OPTS] <URL_OR_VIDEO_ID>...
+
+Example:
+
+ % youtube-dl-play https://www.youtube.com/watch?v=hoKvtNawdS8
+
+=head1 DESCRIPTION
+
+You want to download a video but want to see it while it downloads (and of
+course do not want to download it twice)? This is a wrapper for B<youtube-dl>
+which does the following for each argument:
+
+=over
+
+=item * Run youtube-dl with --get-filename
+
+To get the output filename, first this is executed:
+
+ % youtube-dl [OPTS] --get-filename <URL_OR_VIDEO_ID>
+
+=item * Run youtube-dl that outputs to stdout and pipe it to mpv
+
+ % youtube-dl [OPTS] -o - <URL_OR_VIDEO_ID> | mpv --record-file <OUTPUT_FILENAME> -
+
+=back
+
+Some caveats:
+
+=over
+
+=item * The media-player program C<mpv> as well as the C<tee> utility are required
+
+=item * Each command-line argument must be a video ID or video URL, not a playlist URL
+
+=item * Do not request a format that is unstreamable
+
+For example, C<<-f 135+140>> (merging of video-only 720p MP4 and audio-only AAC stream).
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-YoutubeDlUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-YoutubeDlUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-YoutubeDlUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+Other youtube-dl wrappers in L<App::YoutubeDlUtils> and L<App::YoutubeDlIf>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

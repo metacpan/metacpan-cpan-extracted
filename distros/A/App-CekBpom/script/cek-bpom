@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-02'; # DATE
+our $DATE = '2020-09-09'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,16 +40,16 @@ cek-bpom - Search BPOM products via https://cekbpom.pom.go.id/
 
 =head1 VERSION
 
-This document describes version 0.003 of cek-bpom (from Perl distribution App-CekBpom), released on 2020-09-02.
+This document describes version 0.005 of cek-bpom (from Perl distribution App-CekBpom), released on 2020-09-09.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % cek-bpom [--bentuk-sediaan] [--debug] [--format=name] [--json]
-     [--jumlah-dan-kemasan] [--komposisi] [--log-level=level] [--merk]
-     [--(no)naked-res] [--nama-pendaftar] [--nama-produk]
-     [--nomor-registrasi] [--npwp-pendaftar] [--page-result[=program]]
+     [--jumlah-dan-kemasan] [--komposisi] [--log-level=level] [-m] [--merk]
+     [-n] [--(no)naked-res] [--nama-pendaftar] [--nama-produk]
+     [--nomor-registrasi] [--npwp-pendaftar] [-p] [--page-result[=program]]
      [--quiet] [--search-type=s] [-t=s] [--trace] [--verbose] <query>
 
 =head1 DESCRIPTION
@@ -117,6 +117,8 @@ See C<--search-type>.
 
 =item B<--search-type>=I<s>, B<-t>
 
+Select what field to search against.
+
 Default value:
 
  "nama_produk"
@@ -124,6 +126,24 @@ Default value:
 Valid values:
 
  ["bentuk_sediaan","jumlah_dan_kemasan","komposisi","merk","nama_pendaftar","nama_produk","nomor_registrasi","npwp_pendaftar"]
+
+=item B<-m>
+
+Shortcut for --search-type=merk.
+
+See C<--search-type>.
+
+=item B<-n>
+
+Shortcut for --search-type=nama_produk.
+
+See C<--search-type>.
+
+=item B<-p>
+
+Shortcut for --search-type=nama_pendaftar.
+
+See C<--search-type>.
 
 =back
 

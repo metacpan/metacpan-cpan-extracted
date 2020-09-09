@@ -1,9 +1,9 @@
 package Complete::Getopt::Long;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-16'; # DATE
+our $DATE = '2020-09-09'; # DATE
 our $DIST = 'Complete-Getopt-Long'; # DIST
-our $VERSION = '0.479'; # VERSION
+our $VERSION = '0.480'; # VERSION
 
 use 5.010001;
 use strict;
@@ -367,6 +367,8 @@ sub complete_cli_arg {
         return unless $ospec; # shouldn't happen
         my $specmeta = $ggls_res->[3]{'func.specmeta'};
         my $ospecmeta = $specmeta->{$ospec};
+
+        return $ospecmeta->{summary} if defined $ospecmeta->{summary};
 
         if ($ospecmeta->{is_alias}) {
             my $real_ospecmeta = $specmeta->{ $ospecmeta->{alias_for} };
@@ -771,7 +773,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.479 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2020-04-16.
+This document describes version 0.480 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2020-09-09.
 
 =head1 SYNOPSIS
 

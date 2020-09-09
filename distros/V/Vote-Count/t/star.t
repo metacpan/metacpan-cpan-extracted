@@ -32,19 +32,27 @@ subtest '_best_two find top two for Automatic Runoff' => sub {
     [ 'INNOUT', 'BURGERKING' ],
     'example without tie returned expected choices'
   );
-  is_deeply( [ $tietop->_best_two( $tietop->Score() ) ],
-    [], 'example with 3 way tie returned empty array' );
+  is( scalar( $tietop->_best_two( $tietop->Score() ) ),
+    3, 'example with 3 way  returned 3 element array' );
 };
 
 subtest 'STAR' => sub {
-  is( $tennessee->STAR(), 'NASHVILLE', 'STAR chose NASHVILLE for Tennessee' );
-  is( $fastfood->STAR(),  'INNOUT',    'STAR chose InNOut for fastfood' );
-  is( $tietop->STAR( $tietop->Active() ),
-    0, 'STAR returned 0 when there was a tie' );
-  is( $fastfood->STAR( { 'CARLS' => 1, 'KFC' => 1, 'WIMPY' => 1 } ),
-    'CARLS', 'Changed ActiveSet for fastfood' );
-  is( $fastfood->STAR( { 'QUICK' => 1, 'KFC' => 1, 'WENDYS' => 1 } ),
-    'WENDYS', 'another ActiveSet for fastfood' );
+  is( $tennessee->STAR()->{'winner'}, 'NASHVILLE', 'STAR chose NASHVILLE for Tennessee' );
+  is( $fastfood->STAR()->{'winner'},  'INNOUT',    'STAR chose InNOut for fastfood' );
+  is( $tietop->STAR( $tietop->Active() )->{'tie'} ,
+    1, 'STAR returned true for tie when there was a tie' );
+  is( $tietop->STAR( $tietop->Active() )->{'winner'} ,
+    0, 'STAR returned false for winner when there was a tie' );
+  $fastfood->SetActive( 
+    { 'CARLS' => 1, 'KFC' => 1, 'WIMPY' => 1 });
+  my $result1 = $fastfood->STAR();
+  is( $result1->{'winner'},
+    'CARLS', 'Changed ActiveSet for fastfood, confirmed winner' );
+  my $result2 = $fastfood->STAR( 
+    { 'QUICK' => 1, 'KFC' => 1, 'WENDYS' => 1 } );
+  is( $result2->{'winner'},
+    'WENDYS', 'passed another ActiveSet as argument' );
+  is( $result2->{'tie'}, 0, 'confirm that tie was false');
 };
 
 subtest 'Coverage Fix' => sub {
@@ -78,7 +86,7 @@ my $fixset = Vote::Count::Method::STAR->new(
 } );
 
   # note( Dumper $fixset->BallotSet() );
-  is( $fixset->STAR(), 'B', "B wins" );
+  is( $fixset->STAR()->{'winner'}, 'B', "B wins" );
   $fixset->{'BallotSet'}{'ballots'} = [
         {   'votes' => {
                 'A' => 4,
@@ -94,7 +102,7 @@ my $fixset = Vote::Count::Method::STAR->new(
         },
     ];
     
-  is( $fixset->STAR(), 0, "A Tie" );
+  is( $fixset->STAR()->{'winner'}, 0, "A Tie" );
 };
 
 

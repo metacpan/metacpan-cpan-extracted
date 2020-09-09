@@ -1,9 +1,9 @@
 package App::CekBpom;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-02'; # DATE
+our $DATE = '2020-09-09'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,14 +18,15 @@ our %SPEC;
 my $url_prefix = "https://cekbpom.pom.go.id/index.php";
 
 my %search_types = (
-    nomor_registrasi => 0,
-    nama_produk => 1,
-    merk => 2,
-    jumlah_dan_kemasan => 3,
-    bentuk_sediaan => 4,
-    komposisi => 5,
-    nama_pendaftar => 6,
-    npwp_pendaftar => 7,
+    # name => [number in bpom website's form, shortcut alias if any]
+    nomor_registrasi => [0],
+    nama_produk => [1, 'n'],
+    merk => [2, 'm'],
+    jumlah_dan_kemasan => [3],
+    bentuk_sediaan => [4],
+    komposisi => [5],
+    nama_pendaftar => [6, 'p'],
+    npwp_pendaftar => [7],
 );
 
 $SPEC{cek_bpom} = {
@@ -39,12 +40,22 @@ HTTP client behavior by setting `LWP_USERAGENT_PLUGINS` environment variable.
 _
     args => {
         search_type => {
+            summary => 'Select what field to search against',
             schema => ['str*', in=>[sort keys %search_types]],
             default => 'nama_produk',
             cmdline_aliases => {
                 t=>{},
                 (
-                    map { my $t = $_; ($t => {is_flag=>1, summary=>"Shortcut for --search-type=$_", code=>sub {$_[0]{search_type} = $t} }) } keys %search_types,
+                    map {
+                        my $t = $_;
+                        my @aliases;
+                        push @aliases, ($t => {is_flag=>1, summary=>"Shortcut for --search-type=$t", code=>sub {$_[0]{search_type} = $t} });
+                        my $shortcut = $search_types{$t}[1];
+                        if (defined $shortcut) {
+                            push @aliases, ($shortcut => {is_flag=>1, summary=>"Shortcut for --search-type=$t", code=>sub {$_[0]{search_type} = $t} });
+                        }
+                        @aliases;
+                    } keys %search_types,
                 ),
             },
         },
@@ -67,7 +78,7 @@ sub cek_bpom {
         cookie_jar => $jar,
     );
 
-    my $search_type = $search_types{ $args{search_type} // 'nama_produk' };
+    my $search_type = $search_types{ $args{search_type} // 'nama_produk' }[0];
     unless (defined $search_type) {
         return [400, "Unknown search_type '$args{search_type}'"];
     }
@@ -127,6 +138,8 @@ sub cek_bpom {
     if (@rows < $num_results) {
         # XXX should've been a fatal error
         log_warn "Some results cannot be parsed (only got %d out of %d)", scalar(@rows), $num_results;
+    } else {
+        log_trace "Got $num_results result(s)";
     }
 
     my %resmeta;
@@ -150,7 +163,7 @@ App::CekBpom - Check BPOM products via the command-line (CLI interface for cekbp
 
 =head1 VERSION
 
-This document describes version 0.003 of App::CekBpom (from Perl distribution App-CekBpom), released on 2020-09-02.
+This document describes version 0.005 of App::CekBpom (from Perl distribution App-CekBpom), released on 2020-09-09.
 
 =head1 DESCRIPTION
 
@@ -179,6 +192,8 @@ Arguments ('*' denotes required arguments):
 =item * B<query>* => I<str>
 
 =item * B<search_type> => I<str> (default: "nama_produk")
+
+Select what field to search against.
 
 
 =back

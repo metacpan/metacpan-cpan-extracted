@@ -8,15 +8,104 @@ use Carp;
 use DBIx::Admin::CreateTable;
 use DBIx::Connector;
 
-use Hash::FieldHash ':all';
+use File::HomeDir;
+use File::Spec;
 
-fieldhash my %config      => 'config';
-fieldhash my %connector   => 'connector';
-fieldhash my %creator     => 'creator';
-fieldhash my %engine      => 'engine';
-fieldhash my %time_option => 'time_option';
+use Moo;
 
-our $VERSION = '1.02';
+use Types::Standard qw/HashRef/;
+
+has config =>
+(
+	default		=> sub{return {} },
+	is			=> 'rw',
+	isa			=> HashRef,
+	required	=> 0,
+);
+
+has creator =>
+(
+	default		=> sub{return {} },
+	is			=> 'rw',
+	isa			=> HashRef,
+	required	=> 0,
+);
+
+has engine =>
+(
+	default		=> sub{return {} },
+	is			=> 'rw',
+	isa			=> HashRef,
+	required	=> 0,
+);
+
+has time_option =>
+(
+	default		=> sub{return {} },
+	is			=> 'rw',
+	isa			=> HashRef,
+	required	=> 0,
+);
+
+our $VERSION = '1.04';
+
+# -----------------------------------------------
+
+sub BUILD
+{
+	my($self, $arg)		= @_;
+	my($config)			||= {};
+	$$arg{connector}	= '';
+	$$arg{creator}		= '';
+	$$arg{engine}		= '';
+	$$arg{time_option}	= '';
+	my($module)			= 'Log::Handler::Plugin::DBI';
+	my($module_dir)		= $module;
+	$module_dir			=~ s/::/-/g;
+	my($config_name)	= '.htlocal.logger.conf';
+	my($path)			= File::Spec -> catfile(File::HomeDir -> my_dist_config($module_dir), $config_name);
+
+	$self -> config($config);
+
+	croak "Error: config hashref must be passed to new()\n" if (! $self -> config || (ref $self -> config ne 'HASH') );
+
+	my($attr) = {AutoCommit => $$config{AutoCommit}, RaiseError => $$config{RaiseError} };
+
+	if ( ($$config{dsn} =~ /SQLite/i) && $$config{sqlite_unicode})
+	{
+		$$attr{sqlite_unicode} = 1;
+	}
+
+	$self -> connector
+		(
+		 DBIx::Connector -> new($$config{dsn}, $$config{username}, $$config{password}, $attr)
+		);
+
+	if ($$config{dsn} =~ /SQLite/i)
+	{
+		$self -> connector -> dbh -> do('PRAGMA foreign_keys = ON');
+	}
+
+	$self -> creator
+		(
+		 DBIx::Admin::CreateTable -> new
+		 (
+		  dbh     => $self -> connector -> dbh,
+		  verbose => 0,
+		 )
+		);
+
+	$self -> engine
+		(
+		 $self -> creator -> db_vendor =~ /(?:Mysql)/i ? 'engine=innodb' : ''
+		);
+
+	$self -> time_option
+		(
+		 $self -> creator -> db_vendor =~ /(?:MySQL|Postgres)/i ? '(0) without time zone' : ''
+		);
+
+} # End of BUILD.
 
 # --------------------------------------------------
 
@@ -56,73 +145,6 @@ sub drop_log_table
 	}
 
 } # End of drop_log_table.
-
-# --------------------------------------------------
-
-sub _init
-{
-	my($self, $arg)    = @_;
-	$$arg{config}      ||= '';
-	$$arg{connector}   = '';
-	$$arg{creator}     = '';
-	$$arg{engine}      = '';
-	$$arg{time_option} = '';
-	$self              = from_hash($self, $arg);
-
-	croak "Error: config hashref must be passed to new()\n" if (! $self -> config || (ref $self -> config ne 'HASH') );
-
-	my($config) = $self -> config;
-	my($attr)   = {AutoCommit => $$config{AutoCommit}, RaiseError => $$config{RaiseError} };
-
-	if ( ($$config{dsn} =~ /SQLite/i) && $$config{sqlite_unicode})
-	{
-		$$attr{sqlite_unicode} = 1;
-	}
-
-	$self -> connector
-		(
-		 DBIx::Connector -> new($$config{dsn}, $$config{username}, $$config{password}, $attr)
-		);
-
-	if ($$config{dsn} =~ /SQLite/i)
-	{
-		$self -> connector -> dbh -> do('PRAGMA foreign_keys = ON');
-	}
-
-	$self -> creator
-		(
-		 DBIx::Admin::CreateTable -> new
-		 (
-		  dbh     => $self -> connector -> dbh,
-		  verbose => 0,
-		 )
-		);
-
-	$self -> engine
-		(
-		 $self -> creator -> db_vendor =~ /(?:Mysql)/i ? 'engine=innodb' : ''
-		);
-
-	$self -> time_option
-		(
-		 $self -> creator -> db_vendor =~ /(?:MySQL|Postgres)/i ? '(0) without time zone' : ''
-		);
-
-	return $self;
-
-} # End of _init.
-
-# --------------------------------------------------
-
-sub new
-{
-	my($class, %arg) = @_;
-	my($self)        = bless {}, $class;
-	$self            = $self -> _init(\%arg);
-
-	return $self;
-
-} # End of new.
 
 # -----------------------------------------------
 
@@ -272,45 +294,19 @@ In pseudo-code:
 	timestamp timestamp not null default current_timestamp +
 	(db_vendor =~ /(?:MySQL|Postgres)/i ? '(0) without time zone' : '')
 
-Also, if you're using MySQL, you might want to set the engine=innodb option.
+Also, if you are using MySQL, you might want to set the engine=innodb option.
 
 See scripts/create.table.pl and scripts/drop.table.pl for an easy way to do all this.
 
 =head2 Can this module be used in any module?
 
-Sure, but it's I<not> a plugin like L<Log::Handler::Plugin::DBI> is.
+Sure, but it is I<not> a plugin like L<Log::Handler::Plugin::DBI> is.
 
 =head1 See Also
-
-L<CGI::Application>
-
-The following are all part of this set of distros:
-
-L<CGI::Snapp> - A almost back-compat fork of CGI::Application
-
-=head1 See Also
-
-L<CGI::Application>
-
-The following are all part of this set of distros:
-
-L<CGI::Snapp> - A almost back-compat fork of CGI::Application
-
-L<CGI::Snapp::Demo::One> - A template-free demo of CGI::Snapp using just 1 run mode
-
-L<CGI::Snapp::Demo::Two> - A template-free demo of CGI::Snapp using N run modes
-
-L<CGI::Snapp::Demo::Three> - A template-free demo of CGI::Snapp using the forward() method
-
-L<CGI::Snapp::Demo::Four> - A template-free demo of CGI::Snapp using Log::Handler::Plugin::DBI
-
-L<CGI::Snapp::Demo::Four::Wrapper> - A wrapper around CGI::Snapp::Demo::Four, to simplify using Log::Handler::Plugin::DBI
 
 L<Config::Plugin::Tiny> - A plugin which uses Config::Tiny
 
 L<Config::Plugin::TinyManifold> - A plugin which uses Config::Tiny with 1 of N sections
-
-L<Data::Session> - Persistent session data management
 
 L<Log::Handler::Plugin::DBI> - A plugin for Log::Handler using Log::Hander::Output::DBI
 
@@ -323,11 +319,6 @@ The file CHANGES was converted into Changelog.ini by L<Module::Metadata::Changes
 =head1 Version Numbers
 
 Version numbers < 1.00 represent development versions. From 1.00 up, they are production versions.
-
-=head1 Credits
-
-Please read L<https://metacpan.org/module/CGI::Application::Plugin::Config::Simple#AUTHOR>, since a lot of the ideas for this module were copied from
-L<CGI::Application::Plugin::Config::Simple>.
 
 =head1 Support
 

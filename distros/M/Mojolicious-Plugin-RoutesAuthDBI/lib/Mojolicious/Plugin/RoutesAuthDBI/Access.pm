@@ -88,9 +88,15 @@ sub apply_route {# meth in Plugin
   my @request = grep /\S/, split /\s+/, $r_hash->{request}
     or $self->app->log->debug("Skip route @{[$self->app->dumper($r_hash) =~ s/\s+//gr]}: bad request")
     and return;
-  my $nr = $r->route(pop @request);
-  $nr->via(@request) if @request;
   
+  my $nr;
+  if (@request eq 2 && $request[0] =~ /websocket|ws/i) {
+    $nr = $r->websocket(pop @request);
+  } else {
+    $nr = $r->route(pop @request);
+    $nr->via(@request)
+      if @request;
+  }
   # STEP AUTH не катит! только один over!
   #~ $nr->over(authenticated=>$r_hash->{auth});
   # STEP ACCESS

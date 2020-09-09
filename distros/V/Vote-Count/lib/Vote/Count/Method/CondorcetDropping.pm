@@ -9,13 +9,13 @@ use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
 
-our $VERSION='1.07';
+our $VERSION='1.08';
 
 =head1 NAME
 
 Vote::Count::Method::CondorcetDropping
 
-=head1 VERSION 1.07
+=head1 VERSION 1.08
 
 =cut
 
@@ -40,7 +40,7 @@ This module implements dropping methodologies for resolving a Condorcet Matrix w
 
 =head2 Basic Dropping Methods
 
-Supported Dropping Methods are: Borda Count (with all the attendant weighting issues), Approval, TopCount, and Greatest Loss. 
+Supported Dropping Methods are: 'borda' count (with all the attendant weighting issues), 'approval', 'topcount' ('plurality'), and 'greatestloss'. 
 
 =head2 Option SkipLoserDrop
 

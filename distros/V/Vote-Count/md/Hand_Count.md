@@ -30,9 +30,29 @@ It is easy to create pairings by hand. With a larger field the work to fill out 
 
 If a method only seeks a Condorcet Winner, a significantly smaller number of pairings is needed. A 10 choice election requires 45 pairings, a method that seeks only a Condorcet Winner can find the Condorcet Winner or determine there is none in as little as 9 pairings.
 
-The best known Condorcet Hand Count method is Benham.
+Hand Count Condorcet Methods do not require a full Matrix, only the determination of the Condorcet Winner or that all choices have at least 1 loss. Use the following process for this:
+
+## General Hand Count Condorcet Process
+
+If you count Approval first, you can prefill some of the matrix. Any choice with an Approval lower than the Top Count of the other will lose the pairing.
+
+* Elect a Majority Winner if present.
+
+* Start a sheet for each choice with a Wins and Losses Column. 
+
+* Then starting with the Top Count Leader compare them to the next highest choice (that they haven't already been paired to) and pair them off, recording the result on the sheet.
+
+* Continue pairing the winner to the next choice.
+
+* The next choice will be the highest Top Count that has not yet been in a pair. If all choices have been in a pair, select the highest Top Count choice not yet paired with the current undefeated choice.
+
+* When a Condorcet Winner is found they are the Winner.
+
+* When all choices have a loss there is no Condorcet Winner.
 
 ## Benham Condorcet IRV
+
+This is the best known Condorcet Hand Count method.
 
 Returns the winner as soon as there is a Majority Winner or one of the choices is shown to be a Condorcet Winner. Because it is not necessary to produce a full matrix this method is easier to count than other Pairwise Condorcet Methods.
 
@@ -58,21 +78,11 @@ In so far as Benham will always elect a Condorcet Winner if present it is more c
 
 * Top Count the Ballots
 
-* Elect a Majority Winner
+* A Majority Winner will always also be a Condorcet Winner. Whenever Top Counting the Ballots finds one, elect them.
 
-* Start a sheet for each choice with a Wins and Losses Column. If you also count Approval, for each choice with lower Approval than the Top Count of another choice you can immediately mark the resolutions on the sheets.
+* Determine if there is a Condorcet Winner.
 
-* Then starting with the Top Count Leader compare them to the next highest choice (that they haven't already been paired to) and pair them off, recording the result on the sheets.
-
-* Continue pairing the winner of the contest to the next choice.
-
-* The next choice will be the highest Top Count that has not yet been in a pair. If all choices have been paired, it is the highest Top Count not yet paired with the other choice you have.
-
-* When a Condorcet Winner is found they are the Winner.
-
-* When all choices have a loss there is no Condorcet Winner.
-
-* If no Condorcet Winner is found, then remove the choice with the lowest Top Count. Repeat the search for a Condorcet Winner, now ignoring losses to eliminated choices. If no Condorcet Winner remove the choice with the lowest Top Count, repeating the process until there is a winner.
+* If no Condorcet Winner is found, then remove the choice with the lowest Top Count. Repeat the search for a Condorcet Winner, now ignoring losses to eliminated choices. Repeat until there is a winner.
 
 ## Implementation in Vote::Count
 
@@ -95,6 +105,18 @@ Implemented in [Vote::Count::Method::CondorcetDropping](https://metacpan.org/pod
 The original method specified Random as a Tie Breaker, this has the advantage of making the system fully resolvable, but at the extreme Consistency expense of making it possible to get different results with the same ballots.
 
 Your Election Rules should specify a tiebreaker, the default is Eliminate All; the modified Grand Junction Tie Breaker provides the maximum possible resolvability.
+
+# Condorcet vs IRV
+
+* Determine the IRV Winner. 
+
+* Follow the General Hand Count Condorcet Process, start with the IRV Winner in your first pairing, and prefer the IRV Winner for the next pairing choice. If the IRV race was decided in a final pairing, don't forget to mark it on your sheet.
+
+* If there is no Condorcet Winner or the Condorcet Winner is the IRV Winner, elect the IRV Winner.
+
+* Repeat the Condorcet Process. Treat all ballots with the IRV Winner as the First Choice as ballots only for the IRV Winner. The pairings involving the IRV Winner will be unchanged, but other pairings will need to be rechecked (the approval count will change if you are using it to shortcut). If there is a Condorcet Winner, elect the FIRST Condorcet Winner. 
+
+This method is implemented in [Vote::Count::Method::CondorcetVsIRV](https://metacpan.org/pod/Vote::Count::Method::CondorcetVsIRV) and explained in more detail there.
 
 # Borda
 

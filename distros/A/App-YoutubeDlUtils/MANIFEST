@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/App/YoutubeDlUtils.pm
+script/youtube-dl-play
 script/youtube-dl-playlist
 script/youtube-dl-timestamp
 t/00-compile.t

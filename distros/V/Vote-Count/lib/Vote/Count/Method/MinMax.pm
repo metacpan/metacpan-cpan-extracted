@@ -9,13 +9,13 @@ use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
 
-our $VERSION='1.07';
+our $VERSION='1.08';
 
 =head1 NAME
 
 Vote::Count::Method::MinMax
 
-=head1 VERSION 1.07
+=head1 VERSION 1.08
 
 =cut
 
@@ -42,13 +42,13 @@ MinMax (also known as Minimax and Simpson-Kramer) uses a Pairwise comparison Mat
 
 When the choice being scored loses, the votes for the winner in the pairing are scored. When the choice wins or ties the pairing is scored as 0.
 
-This scoring method meets the Condorcet Winner and Loser Criteria, but not the Smith or Later Harm Criteria.
+This scoring method meets the Condorcet Winner, but not the Smith, Condorcet Loser or Later Harm Criteria.
 
 =head3 Margin ('margin')
 
 When the choice being scored loses, the votes for the winner minus the votes for that choice in the pairing are scored. When the choice wins or ties the pairing is scored as 0.
 
-This scoring method meets the Condorcet Winner and Loser Criteria, but not the Smith or Later Harm Criteria.
+This scoring method meets the Condorcet Winner, but not the Smith, Condorcet Loser or Later Harm Criteria.
 
 =head3 Opposition ('opposition')
 

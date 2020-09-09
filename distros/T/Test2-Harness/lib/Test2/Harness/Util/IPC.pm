@@ -2,7 +2,7 @@ package Test2::Harness::Util::IPC;
 use strict;
 use warnings;
 
-our $VERSION = '1.000024';
+our $VERSION = '1.000026';
 
 use Cwd qw/getcwd/;
 use Config qw/%Config/;
@@ -33,7 +33,7 @@ else {
 }
 
 sub swap_io {
-    my ($fh, $to, $die) = @_;
+    my ($fh, $to, $die, $mode) = @_;
 
     $die ||= sub {
         my @caller = caller;
@@ -52,11 +52,11 @@ sub swap_io {
     $die->("Could not get original fd ($fh)") unless defined $orig_fd;
 
     if (ref($to)) {
-        my $mode = $orig_fd ? '>&' : '<&';
+        $mode //= $orig_fd ? '>&' : '<&';
         open($fh, $mode, $to) or $die->("Could not redirect output: $!");
     }
     else {
-        my $mode = $orig_fd ? '>' : '<';
+        $mode //= $orig_fd ? '>' : '<';
         open($fh, $mode, $to) or $die->("Could not redirect output to '$to': $!");
     }
 

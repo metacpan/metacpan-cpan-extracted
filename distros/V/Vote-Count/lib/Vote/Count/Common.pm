@@ -12,13 +12,13 @@ use Storable 3.15 'dclone';
 
 # ABSTRACT: Role shared by Count and Matrix for common functionality. See Vote::Count Documentation.
 
-our $VERSION='1.07';
+our $VERSION='1.08';
 
 =head1 NAME
 
 Vote::Count::Common
 
-=head1 VERSION 1.07
+=head1 VERSION 1.08
 
 =head1 Synopsis
 

@@ -1,7 +1,9 @@
 package Perinci::Sub::GetArgs::Argv;
 
-our $DATE = '2020-06-16'; # DATE
-our $VERSION = '0.844'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-09'; # DATE
+our $DIST = 'Perinci-Sub-GetArgs-Argv'; # DIST
+our $VERSION = '0.845'; # VERSION
 
 use 5.010001;
 use strict;
@@ -492,6 +494,7 @@ sub _args2opts {
                         $go_spec->{$alospec} = $handler;
                     }
                     $specmeta->{$alospec} = {
+                        (summary   => $alspec->{summary}) x !!defined($alspec->{summary}),
                         alias     => $al,
                         is_alias  => 1,
                         alias_for => $ospec,
@@ -1136,7 +1139,7 @@ Perinci::Sub::GetArgs::Argv - Get subroutine arguments from command line argumen
 
 =head1 VERSION
 
-This document describes version 0.844 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2020-06-16.
+This document describes version 0.845 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2020-09-09.
 
 =head1 SYNOPSIS
 

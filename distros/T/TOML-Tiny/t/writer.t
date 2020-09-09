@@ -32,6 +32,31 @@ subtest strict_arrays => sub{
   };
 };
 
+#-------------------------------------------------------------------------------
+# Adapted from DateTime::Format::RFC3339.
+#-------------------------------------------------------------------------------
+subtest 'rfc3339 datetimes' => sub{
+  my $dt;
+
+  $dt = DateTime->new(year => 2002, month => 7, day => 1, hour => 13, minute => 50, second => 5, time_zone => 'UTC');
+  is TOML::Tiny::Writer::strftime_rfc3339($dt), '2002-07-01T13:50:05Z', 'UTC';
+
+  $dt = DateTime->new(year => 2002, month => 7, day => 1, hour => 13, minute => 50, second => 5, time_zone => 'Europe/London');
+  is TOML::Tiny::Writer::strftime_rfc3339($dt), '2002-07-01T13:50:05+01:00', 'positive offset';
+
+  $dt = DateTime->new(year => 2002, month => 1, day => 1, hour => 13, minute => 50, second => 5, time_zone => 'Europe/London');
+  is TOML::Tiny::Writer::strftime_rfc3339($dt), '2002-01-01T13:50:05+00:00', 'zero offset';
+
+  $dt = DateTime->new(year => 2002, month => 1, day => 1, hour => 13, minute => 50, second => 5, time_zone => 'America/New_York');
+  is TOML::Tiny::Writer::strftime_rfc3339($dt), '2002-01-01T13:50:05-05:00', 'negative offset';
+
+  $dt = DateTime->new(year => 1880, month => 1, day => 1, hour => 0, minute => 0, second => 0, time_zone => 'America/New_York');
+  is TOML::Tiny::Writer::strftime_rfc3339($dt), '1880-01-01T04:56:02Z', 'offset with non-integral minutes';
+
+  $dt = DateTime->new(year => 2002, month => 1, day => 1, hour => 13, minute => 50, second => 5, time_zone => 'floating');
+  is TOML::Tiny::Writer::strftime_rfc3339($dt), '2002-01-01T13:50:05', 'floating time zone';
+};
+
 subtest 'oddballs and regressions' => sub{
   subtest 'strings that look like numbers' => sub{
     my $parser = TOML::Tiny->new(
@@ -61,36 +86,6 @@ is_a_flt   = 4.2
 
     ok !ref($data->{not_a_flt}), 'strings do not inflate as floats';
     ok ref($data->{is_a_flt}) && $data->{is_a_flt}->isa('Math::BigFloat'), 'floats do inflate with inflate_float';
-  };
-
-  subtest 'decode/encode datetime with floating time zone' => sub{
-    my $parser = TOML::Tiny->new(
-      inflate_datetime => sub{
-        my ($dt_string) = @_;
-        # DateTime::Format::RFC3339 will set the resulting DateTime's formatter
-        # to itself. Fallback is the DateTime default, ISO8601, with a possibly
-        # floating time zone.
-        return eval{ DateTime::Format::RFC3339->parse_datetime($dt_string) }
-            || DateTime::Format::ISO8601->parse_datetime($dt_string);
-      },
-    );
-
-    # Parse 2 dates, one with and one without a time zone. Re-encode as TOML
-    # and verify that the resulting datetime values are as expected.
-    my $with_tz_str = '2020-05-04T16:37:02.905408062+01:00';
-    my $no_tz_str   = '1979-05-27T00:32:00.643144312';
-
-    my $data = from_toml( # use default parser, which produces strings for datetimes
-      $parser->encode(
-        $parser->decode(qq{
-with_tz = $with_tz_str
-no_tz   = $no_tz_str
-        })
-      )
-    );
-
-    is $data->{with_tz}, $with_tz_str, 'datetime with time zone reproduced faithfully';
-    is $data->{no_tz}, $no_tz_str, 'datetime without time zone reproduced faithfully';
   };
 };
 

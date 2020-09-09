@@ -12,13 +12,13 @@ use List::Util qw( min max sum );
 use Path::Tiny;
 # use Data::Dumper;
 
-our $VERSION='1.07';
+our $VERSION='1.08';
 
 =head1 NAME
 
 Vote::Count::TieBreaker
 
-=head1 VERSION 1.07
+=head1 VERSION 1.08
 
 =head1 Synopsis
 
@@ -155,7 +155,7 @@ TieBreaker returns a list containing the winner, if the method is 'none' the lis
 
 =head1 Precedence
 
-Since many existing Elections Rules call for Random, and Vote::Count does not accept Random as the result can be different across runs, Precedence allows the Administrators of an election to randomly or arbitrarily determine who will win ties before running Vote::Count.
+Since many existing Elections Rules call for Random, and Vote::Count does not accept Random as the result will be different bewtween runs, Precedence allows the Administrators of an election to randomly or arbitrarily determine who will win ties before running Vote::Count.
 
 The Precedence list takes the choices of the election one per line. Choices defeat any choice lower than them in the list. When Precedence is used an additional attribute must be specified for the Precedence List.
 

@@ -86,7 +86,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-GetArgs-Argv"
       }
    },
-   "version" : "0.844",
+   "version" : "0.845",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

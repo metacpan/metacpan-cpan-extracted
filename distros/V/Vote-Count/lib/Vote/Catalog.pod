@@ -2,7 +2,7 @@
 
 =pod
 
-=head1 VERSION 1.07
+=head1 VERSION 1.08
 
 =head1 NAME
 
@@ -102,6 +102,11 @@ Simple Dropping: L<Vote::Count::Method::CondorcetDropping|https://metacpan.org/p
 SmithSet IRV: L<Vote::Count::Method::CondorcetIRV|https://metacpan.org/pod/Vote::Count::Method::CondorcetIRV>
 
 
+=item *
+
+MinMax (Winning Votes and Margin) L<Vote::Count::Method::MinMax|https://metacpan.org/pod/Vote::Count::Method::MinMax>
+
+
 =back
 
 
@@ -127,11 +132,6 @@ SSD: I<unimplemented>
 =item *
 
 Kemmeny-Young: I<unimplemented>
-
-
-=item *
-
-MinMax (Winning Votes and Margin) L<Vote::Count::Method::MinMax|https://metacpan.org/pod/Vote::Count::Method::MinMax>
 
 
 =back
@@ -178,7 +178,7 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2020 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 

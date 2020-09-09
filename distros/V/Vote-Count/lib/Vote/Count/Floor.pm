@@ -9,13 +9,13 @@ use Moose::Role;
 
 no warnings 'experimental';
 
-our $VERSION='1.07';
+our $VERSION='1.08';
 
 =head1 NAME
 
 Vote::Count::Floor
 
-=head1 VERSION 1.07
+=head1 VERSION 1.08
 
 =cut
 
@@ -88,11 +88,11 @@ In real elections it is common to have choices with very little support, the rig
 
   my $Election = Vote::Count->new( BallotSet => $someballotset );
   my $ChoicesAfterFloor = $Election->ApprovalFloor();
-  $Election->Active( $ChoicesAfterFloor ); # To apply the floor
+  $Election->SetActive( $ChoicesAfterFloor ); # To apply the floor
 
 =head1 The Floor Methods
 
-All Methods in this Module apply a floor rule, log the eliminations and return the set of remaining choices as an Active Set. They do not set the Election's active set, since it is possible that this isn't the desired action.
+All Methods in this Module apply a floor rule, log the eliminations and return the set of remaining choices as an Active Set HashRef. They do not set the Election's active set, as it is possible that a custom step is desired before doing so.
 
 =head2 ApprovalFloor, TopCountFloor
 

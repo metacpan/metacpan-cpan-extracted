@@ -170,7 +170,7 @@ The objective is to have a library that can handle any of the myriad variants th
 
 ## Reading Ballots
 
-The Vote::Count::ReadBallots library provides functionality for reading files from disc. Currently it defines a format for a ballot file and reads that from disk. In the future additional formats may be added. Range Ballots may be in either JSON or YAML formats.
+The [Vote::Count::ReadBallots](https://metacpan.org/pod/Vote::Count::ReadBallots) library provides functionality for reading files from disc. Currently it defines a format for a ballot file and reads that from disk. In the future additional formats may be added. Range Ballots may be in either JSON or YAML formats.
 
 ## Voting Method and Component Modules
 
@@ -296,6 +296,7 @@ Directory of Vote Counting Methods linking to the Vote::Count module for it.
   * [Vote::Count::Method::CondorcetDropping](https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping)
   * [Vote::Count::Method::CondorcetIRV](https://metacpan.org/pod/Vote::Count::Method::CondorcetIRV)
   * [Vote::Count::Method::CondorcetVsIRV](https://metacpan.org/pod/Vote::Count::Method::CondorcetVsIRV)
+  * [Vote::Count::Method::MinMax](https://metacpan.org/pod/Vote::Count::Method::MinMax)  
   * [Vote::Count::Method::STAR](https://metacpan.org/pod/Vote::Count::Method::STAR)
 
 ### Non Object Oriented Components
@@ -317,29 +318,3 @@ Directory of Vote Counting Methods linking to the Vote::Count module for it.
 # Call for Contributions
 
 This project needs contributions from Programmers and Mathematicians. Review and citations from Mathematicians are urgently requested, because in addition to being a Tool-set for implementing vote counting this documentation will for many also be the manual. From coders there is a lot of help that could be given: any well known method could use a write up if it is easy to implement with the toolkit (see Benham) or a code submission if it is not. Currently Tiedeman, SSD, and Kemmeny-Young are unimplemented.
-
-# Advice, Recommendations, Opinion
-
-This section is highly opinionated by the Author of Vote::Count.
-
-If you're looking at all of this wondering "which method I should recommend to my organization to implement Ranked Choice Voting internally?" this is the advice offered by the author of Vote::Count.
-
-*Instant Runoff Voting* is simple, easy to count by hand, Later Harm protected, and is the most widely used method. It has serious consistency issues, especially how poorly it handles common cloning situations.
-
-*Benham Condorcet IRV*, meets the two original Condorcet Criteria, and is countable by hand, but it fails Later Harm.
-
-Benham and IRV are good choices for Hand Count Methods.
-
-*Smith Set IRV* meets all three key criteria for Condorcet Methods and has less Later Harm effect than any other (non-redacting) Condorcet Method. It is simple to understand, but not practical for hand counting.
-
-If you like *Borda* or prefer a *Range Ballot*, my pick is for *STAR*.
-
-STAR is handcountable but requires a Range Ballot. Range methods like STAR have less Later Harm effect than Borda Methods.
-
-*Redacting Condorcet Methods* are the **best** for a conventional Ranked Choice Ballot. If a Condorcet Winner does not create a Later Harm violation they will always be chosen. They can create a gauge of the later harm effect that then allows for the establishment of a Later Harm tolerance. The steps for *Condorcet Vs IRV* are easy to understand but the number of steps qualifies it as somewhat complex. 
-
-## Floor Rules and Tie Breakers
-
-In real world elections it is typical to have a number of choices that recieve very little support. A Floor Rule allows quick elimination of these choices, but don't help when voters rank all choices. STAR is an exception and does not benefit from a Floor Rule. 5% Approval is a good weak Floor, and TCA is a good aggressive one.
-
-Ties are inescapable. Modified Grand Junction has the maximum resolvability, but has a Later Harm effect. For a Later Harm safe Tie Breaker Eliminate All is effective (except at the final step).

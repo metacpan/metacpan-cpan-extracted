@@ -2,7 +2,7 @@ package Test2::Harness::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000024';
+our $VERSION = '1.000026';
 
 use File::Spec();
 
@@ -40,6 +40,8 @@ use Test2::Harness::Util::HashBase(
         <event_timeout <post_exit_timeout
 
         <resources
+
+        <nytprof
     },
     # From Construction
     qw{

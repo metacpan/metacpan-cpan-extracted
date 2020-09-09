@@ -1,5 +1,5 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.09';
+$TOML::Tiny::Writer::VERSION = '0.10';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -7,7 +7,6 @@ use v5.18;
 
 use B qw(svref_2object SVf_IOK SVf_NOK);
 use Data::Dumper;
-use DateTime::Format::RFC3339;
 use TOML::Tiny::Grammar;
 use TOML::Tiny::Util qw(is_strict_array);
 
@@ -114,21 +113,7 @@ sub to_toml {
     }
 
     when (/DateTime/) {
-      # TOML uses RFC3339 for datetimes, but supports a "local datetime"
-      # which excludes the timezone offset. A DateTime with a floating
-      # time zone indicates a TOML local datetime.
-      #
-      # DateTime::Format::RFC3339 requires a time zone, however, and defaults
-      # to +00:00 for floating time zones. To support local datetimes in
-      # output, format the datetime as RFC3339 and strip the timezone
-      # when encountering a floating time zone.
-      my $dt = DateTime::Format::RFC3339->new->format_datetime($data);
-
-      if ($data->time_zone_short_name eq 'floating') {
-        $dt =~ s/\+00:00$//;
-      }
-
-      return $dt;
+      return strftime_rfc3339($data);
     }
 
     when ('Math::BigInt') {
@@ -189,6 +174,52 @@ sub to_toml_string {
   return '"' . $arg . '"';
 }
 
+#-------------------------------------------------------------------------------
+# Adapted from DateTime::Format::RFC3339.
+#-------------------------------------------------------------------------------
+sub strftime_rfc3339 {
+  my ($dt) = @_;
+  my $tz;
+
+  #-----------------------------------------------------------------------------
+  # Calculate the time zone offset for non-UTC time zones.
+  #
+  # TOML uses RFC3339 for datetimes, but supports a "local datetime" which
+  # excludes the timezone offset. A DateTime with a floating time zone
+  # indicates a TOML local datetime.
+  #
+  # DateTime::Format::RFC3339 requires a time zone, however, and defaults to
+  # +00:00 for floating time zones. To support local datetimes in output,
+  # format the datetime as RFC3339 and strip the timezone when encountering a
+  # floating time zone.
+  #-----------------------------------------------------------------------------
+  if ($dt->time_zone_short_name eq 'floating') {
+    $tz = '';
+  } elsif ($dt->time_zone->is_utc) {
+    $tz = 'Z';
+  } else {
+    my $sign = $dt->offset < 0 ? '-' : '+';
+    my $secs = abs $dt->offset;
+
+    my $mins = int($secs / 60);
+    $secs %= 60;
+
+    my $hours = int($mins / 60);
+    $mins %= 60;
+
+    if ($secs) {
+      $dt = $dt->clone;
+      $dt->set_time_zone('UTC');
+      $tz = 'Z';
+    } else {
+      $tz = sprintf '%s%02d:%02d', $sign, $hours, $mins;
+    }
+  }
+
+  my $format = $dt->nanosecond ? '%Y-%m-%dT%H:%M:%S.%9N' : '%Y-%m-%dT%H:%M:%S';
+  return $dt->strftime($format) . $tz;
+}
+
 1;
 
 __END__
@@ -203,7 +234,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 AUTHOR
 

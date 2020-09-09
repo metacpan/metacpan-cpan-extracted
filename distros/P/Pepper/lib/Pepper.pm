@@ -1,6 +1,6 @@
 package Pepper;
 
-$Pepper::VERSION = '1.0.2';
+$Pepper::VERSION = '1.0.3';
 
 use Pepper::DB;
 use Pepper::PlackHandler;
@@ -240,8 +240,9 @@ All of the below commands must be run as root or via 'sudo'.
 
 =back
 
-=head2 Recommended: Install and configure your MySQL/MariaDB database. Create a designated 
-user and database for Pepper. See the Mysql / MariaDB docs for guidance on this task.
+=head2 Recommended: Install and configure your MySQL/MariaDB database. 
+
+Create a designated user and database for Pepper. See the Mysql / MariaDB docs for guidance on this task.
 B<Note:> Use the 'mysql_native_password' plugin when creating your database users, as in:
 
 	create user pepper@'127.0.0.1' identified with mysql_native_password by 'MySecurePassword!';

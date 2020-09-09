@@ -8,13 +8,13 @@ use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
 
-our $VERSION='1.07';
+our $VERSION='1.08';
 
 =head1 NAME
 
 Vote::Count::Method::STAR
 
-=head1 VERSION 1.07
+=head1 VERSION 1.08
 
 =cut
 
@@ -68,6 +68,12 @@ STAR should meet Monotonacity. Adding a non-winning choice will have no impact o
 
 More information is needed to know if Clone handling is good or poor in practice, and whether there is a significant consistency failure of some other type.
 
+=head2 Implementation Notes
+
+Beginning with version 1.08 the STAR() method returns a Hash Ref similar to other Vote::Count Methods. The key 'tie' is true for a tie false otherwise, the key 'winner' contains the winning choice or 0 if there is a tie. When there is a tie an additional key 'tied' contains an Array Ref of the tied choices.
+
+When more than 2 choices are in a tie for the automatic runoff STAR() returns them as a tie.
+
 =cut
 
 no warnings 'experimental';
@@ -99,7 +105,7 @@ sub _best_two ( $I, $scores ) {
     $I->logt( join( ', ', ( sort keys %tied ) ) );
     $I->logd( $scores->RankTable() );
     # $I->logd( Dumper $I );
-    return ();
+    return ( keys %tied );
   }
   return @toptwo;
 }
@@ -108,22 +114,23 @@ sub STAR ( $self, $active = undef ) {
   $active = $self->Active() unless defined $active;
   my $scores = $self->Score($active);
   $self->logv( $scores->RankTable() );
-  my ( $A, $B ) = $self->_best_two($scores);
-  unless ( defined $A ) {
-    return 0;
+  my @best_two = $self->_best_two($scores);
+  if ( scalar( @best_two ) > 2  ) {
+    return { 'tie' => 1, 'winner' => 0, 'tied' => \@best_two };
   }
+  my ( $A, $B ) = @best_two;
   my ( $countA, $countB ) = $self->RangeBallotPair( $A, $B );
   if ( $countA > $countB ) {
     $self->logt("Automatic Runoff Winner: $A [ $A: $countA -- $B: $countB ]");
-    return $A;
+    return { 'tie' => 0, 'winner' => $A };
   }
   elsif ( $countA < $countB ) {
     $self->logt("Automatic Runoff Winner: $B [ $B: $countB -- $A: $countA ]");
-    return $B;
+    return { 'tie' => 0, 'winner' => $B };
   }
   else {
     $self->logt("Automatic Runoff TIE: [ $A: $countA -- $B: $countB ]");
-    return 0;
+    return { 'tie' => 1, 'winner' => 0, 'tied' => [ $A, $B ] };
   }
 }
 

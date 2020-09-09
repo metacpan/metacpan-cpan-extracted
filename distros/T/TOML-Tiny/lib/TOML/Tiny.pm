@@ -1,6 +1,6 @@
 package TOML::Tiny;
 # ABSTRACT: a minimal, pure perl TOML parser and serializer
-$TOML::Tiny::VERSION = '0.09';
+$TOML::Tiny::VERSION = '0.10';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -76,7 +76,7 @@ TOML::Tiny - a minimal, pure perl TOML parser and serializer
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -240,10 +240,10 @@ e.g., C<"1985-04-12T23:20:50.52Z">
 
 =item L<DateTime>
 
-L<DateTime>s are formatted as L<DateTime::Format::RFC3339>, as expected by
-C<TOML>. However, C<TOML> supports the concept of a "local" time zone, which
-strays from C<RFC3339> by allowing a datetime without a time zone offset. This
-is represented in perl by a C<DateTime> with a floating time zone.
+L<DateTime>s are formatted as C<RFC3339>, as expected by C<TOML>. However,
+C<TOML> supports the concept of a "local" time zone, which strays from
+C<RFC3339> by allowing a datetime without a time zone offset. This is
+represented in perl by a C<DateTime> with a B<floating time zone>.
 
 =back
 

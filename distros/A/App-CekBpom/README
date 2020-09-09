@@ -3,8 +3,8 @@ NAME
     for cekbpom.pom.go.id)
 
 VERSION
-    This document describes version 0.003 of App::CekBpom (from Perl
-    distribution App-CekBpom), released on 2020-09-02.
+    This document describes version 0.005 of App::CekBpom (from Perl
+    distribution App-CekBpom), released on 2020-09-09.
 
 DESCRIPTION
     See included script cek-bpom.
@@ -28,6 +28,8 @@ FUNCTIONS
     *   query* => *str*
 
     *   search_type => *str* (default: "nama_produk")
+
+        Select what field to search against.
 
     Returns an enveloped result (an array).
 

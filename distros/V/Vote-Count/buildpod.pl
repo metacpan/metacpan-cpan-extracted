@@ -117,7 +117,7 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2020 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 

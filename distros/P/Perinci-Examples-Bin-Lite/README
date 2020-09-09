@@ -3,9 +3,9 @@ NAME
     Perinci::CmdLine::Lite)
 
 VERSION
-    This document describes version 0.061 of Perinci::Examples::Bin::Lite
+    This document describes version 0.062 of Perinci::Examples::Bin::Lite
     (from Perl distribution Perinci-Examples-Bin-Lite), released on
-    2018-07-16.
+    2020-04-29.
 
 DESCRIPTION
     This distribution contains example scripts in "bin/" which use
@@ -36,7 +36,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2015, 2014 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

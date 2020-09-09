@@ -1,3 +1,9 @@
+0.845   2020-09-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Provide command-line alias summary in func.specmeta (e.g. for tab
+	  completion).
+
+
 0.844   2020-06-16  Released-By: PERLANCAR; Urgency: medium
 
 	- Fix failing tests due to schema changes [RT#132716].

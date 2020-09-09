@@ -24,7 +24,7 @@ my $tennessee = Vote::Count::Method::MinMax->new(
 my $loop1 =  Vote::Count::Method::MinMax->new(
     'BallotSet' => read_ballots('t/data/loop1.txt') );
 
-# useful for debugging 
+# useful for debugging
 sub note_scores ( $minmaxobj, $method ) {
   my $score = $minmaxobj->ScoreMinMax($method );
   note( $minmaxobj->_pairmatrixtable2( $score));
@@ -35,9 +35,9 @@ subtest 'ScoreMinMax winning' => sub {
   # note( Dumper $loop1->ScoreMinMax( 'winning' ) );
   my $A = $tennessee->ScoreMinMax( 'winning' );
   my $L = $loop1->ScoreMinMax( 'winning' );
-  is_deeply( $A->{'NASHVILLE'}{'score'}, [ 0, 0, 0 ], 
+  is_deeply( $A->{'NASHVILLE'}{'score'}, [ 0, 0, 0 ],
   'TN Nashville didnt lose @score is [ 0, 0, 0 ]');
-  is_deeply( $A->{'KNOXVILLE'}{'score'}, [ 83, 68, 0 ], 
+  is_deeply( $A->{'KNOXVILLE'}{'score'}, [ 83, 68, 0 ],
   'TN Knoxville  @score is [ 83, 68, 0 ]');
   for my $othertn ( qw/NASHVILLE KNOXVILLE CHATTANOOGA/) {
     is( $A->{'MEMPHIS'}{$othertn}, 58,
@@ -63,10 +63,10 @@ subtest 'ScoreMinMax winning' => sub {
     'VANILLA'=> 9,
     'PISTACHIO'=> 0
     };
-  is_deeply( $L->{'MINTCHIP'}, $xmintchip, 
+  is_deeply( $L->{'MINTCHIP'}, $xmintchip,
     'loop1 Mintchip 1 loss at 9.');
-  is_deeply( $L->{'CHOCOLATE'}, $xchocolate, 
-    'loop1 Chocolate also 1 loss at 9.');  
+  is_deeply( $L->{'CHOCOLATE'}, $xchocolate,
+    'loop1 Chocolate also 1 loss at 9.');
 }; # 'ScoreMinMax winning'
 
 subtest 'ScoreMinMax margin' => sub {
@@ -74,9 +74,9 @@ subtest 'ScoreMinMax margin' => sub {
   my $A = $tennessee->ScoreMinMax( 'margin' );
   # note( Dumper $A );
   my $L = $loop1->ScoreMinMax( 'margin' );
-  is_deeply( $A->{'NASHVILLE'}{'score'}, [ 0, 0, 0 ], 
+  is_deeply( $A->{'NASHVILLE'}{'score'}, [ 0, 0, 0 ],
   'TN Nashville didnt lose @score is [ 0, 0, 0 ]');
-  is_deeply( $A->{'KNOXVILLE'}{'score'}, [ 66, 36, 0 ], 
+  is_deeply( $A->{'KNOXVILLE'}{'score'}, [ 66, 36, 0 ],
   'TN Knoxville  @score is [  66, 36, 0 ]');
   for my $othertn ( qw/NASHVILLE KNOXVILLE CHATTANOOGA/) {
     is( $A->{'MEMPHIS'}{$othertn}, 16,
@@ -102,10 +102,10 @@ subtest 'ScoreMinMax margin' => sub {
     'VANILLA'=> 5,
     'PISTACHIO'=> 0
     };
-  is_deeply( $L->{'MINTCHIP'}, $xmintchip, 
+  is_deeply( $L->{'MINTCHIP'}, $xmintchip,
     'loop1 Mintchip 1 loss at 2.');
-  is_deeply( $L->{'CHOCOLATE'}, $xchocolate, 
-    'loop1 this time Chocolate 1 loss at 5.');  
+  is_deeply( $L->{'CHOCOLATE'}, $xchocolate,
+    'loop1 this time Chocolate 1 loss at 5.');
 }; # 'ScoreMinMax margin'
 
 
@@ -114,9 +114,9 @@ subtest 'ScoreMinMax opposition' => sub {
   my $A = $tennessee->ScoreMinMax( 'opposition' );
   # note( Dumper $A );
   my $L = $loop1->ScoreMinMax( 'opposition' );
-  is_deeply( $A->{'NASHVILLE'}{'score'}, [ 42, 32, 32 ], 
+  is_deeply( $A->{'NASHVILLE'}{'score'}, [ 42, 32, 32 ],
   'TN Nashville scores [ 42, 32, 32 ]');
-  is_deeply( $A->{'KNOXVILLE'}{'score'}, [ 83, 68, 42 ], 
+  is_deeply( $A->{'KNOXVILLE'}{'score'}, [ 83, 68, 42 ],
   'TN Knoxville  @score is [  83, 68, 42 ]');
   for my $othertn ( qw/NASHVILLE KNOXVILLE CHATTANOOGA/) {
     is( $A->{'MEMPHIS'}{$othertn}, 58,
@@ -142,9 +142,9 @@ subtest 'ScoreMinMax opposition' => sub {
     'VANILLA'=> 9,
     'PISTACHIO'=> 2
     };
-  is_deeply( $L->{'MINTCHIP'}, $xmintchip, 
+  is_deeply( $L->{'MINTCHIP'}, $xmintchip,
     'loop1 Mintchip worst is 9 best is 0.');
-  is_deeply( $L->{'CHOCOLATE'}, $xchocolate, 
+  is_deeply( $L->{'CHOCOLATE'}, $xchocolate,
     'loop1 this time Chocolate worst is also 9 best is 0.');
   is_deeply( $L->{'STRAWBERRY'}{'score'}, [ 13, 11, 11, 2, 2, 1, 1 ],
     "Stawberry score should be [ 13, 11, 11, 2, 2, 1, 1 ], but once there was a bug where it wasnt.");
@@ -157,29 +157,29 @@ subtest 'MinMaxPairingVotesTable' => sub {
   $output =~ m/(.*)\n/;
   my $head = $1;
   note( $head);
-  like( $head, 
-        qr/| Score |/, 
+  like( $head,
+        qr/| Score |/,
         "Score is in first (heading) row of table");
   $output =~ m/(KNOXVILLE.*CHATTANOOGA.*)\n/;
   my $knoxvchtga = $1;
   my $kcmatches = () = $knoxvchtga =~ m/83 /g;
   note( $knoxvchtga);
-  is( $kcmatches, 2, 
+  is( $kcmatches, 2,
     'Two matches for 83 in knoxville loses to chattanooga' );
 };
 
 subtest 'minmax method tennessee' => sub {
   my $tnwins = $tennessee->MinMax( 'winning');
   # note( $tennessee->logv() );
-  is( $tnwins->{'winner'}, 'NASHVILLE', 
+  is( $tnwins->{'winner'}, 'NASHVILLE',
     'Check tennessee with \'winning\' that Nashville is winner');
   my $tnmargin = $tennessee->MinMax( 'margin');
   # note( $tennessee->logv() );
-  is( $tnmargin->{'winner'}, 'NASHVILLE', 
+  is( $tnmargin->{'winner'}, 'NASHVILLE',
     'Check tennessee with \'margin\' that Nashville is winner');
   my $tnopposition = $tennessee->MinMax( 'opposition');
   # note( $tennessee->logv() );
-  is( $tnopposition->{'winner'}, 'NASHVILLE', 
+  is( $tnopposition->{'winner'}, 'NASHVILLE',
     'Check tennessee with \'opposition\' that Nashville is winner');
 };
 
@@ -189,15 +189,15 @@ subtest '"Loop 1 dataset, winning score"' => sub {
   # note_scores( $loop11, 'winning');
   is_deeply(
     $loop11->MinMax('winning'),
-      { 'tie' => 1, 
-        'tied' => [ 'CHOCOLATE', 'MINTCHIP'], 
+      { 'tie' => 1,
+        'tied' => [ 'CHOCOLATE', 'MINTCHIP'],
         'winner' => 0 },
     "Tie with this method."
     );
-  like( $loop11->logv, 
+  like( $loop11->logv,
     qr/Tiebreaker Round 1/,
     'This set goes 1 tiebreaker round');
-  unlike( $loop11->logv, 
+  unlike( $loop11->logv,
     qr/Tiebreaker Round 2/,
     'This set *only* goes 1 tiebreaker round, no 2nd round');
 };
@@ -211,10 +211,10 @@ subtest "Loop 1 dataset, margin score" => sub {
       { 'tie' => 0, 'winner' => 'MINTCHIP' },
     "Immediate Winner with this method."
     );
-  unlike( $loop11->logv, 
+  unlike( $loop11->logv,
     qr/Tiebreaker Round/,
     'No tiebreaker round');
-  like( $loop11->logv, 
+  like( $loop11->logv,
     qr/Winner is MINTCHIP/,
     'log reports Winner');
 };
@@ -228,10 +228,10 @@ subtest "Loop 1 dataset, opposition score" => sub {
       { 'tie' => 0, 'winner' => 'CHOCOLATE' },
     "Winner with this method (2 rounds tiebreaker)."
     );
-  like( $loop11->logv, 
+  like( $loop11->logv,
     qr/Tiebreaker Round 2/,
     'This set goes 2 tiebreaker rounds');
-  unlike( $loop11->logv, 
+  unlike( $loop11->logv,
     qr/Tiebreaker Round 3/,
     'This set *only* goes 2 tiebreaker rounds, no 3rd round');
   # note( $loop11->logv);
@@ -251,6 +251,11 @@ subtest 'setting active to other than the default' => sub {
     $bigscores->{'TOAD'}{'score'},
     [ 149, 122, 108, 21, 3, 3 ],
     'check the scores for one of those choices');
+  my $setnomint = [ qw( CHOCOANTS CHOCOLATE PISTACHIO TOAD VANILLA VOMIT )];
+  $bigger->PairMatrix()->SetActiveFromArrayRef( $setnomint );
+  my $nomint =  $bigger->MinMax( 'opposition' );
+  isnt( $bigger->ScoreMinMax( 'opposition' ), 'MINTCHIP',
+    'removed the winner from the active set a different choice must win');
 };
 
 done_testing();

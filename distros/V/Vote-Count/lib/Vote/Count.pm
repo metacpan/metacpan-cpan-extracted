@@ -17,14 +17,14 @@ use Storable 3.15 'dclone';
 
 no warnings 'experimental';
 
-our $VERSION='1.07';
+our $VERSION='1.08';
 
 =head1 NAME
 
 Vote::Count
 
 
-=head1 VERSION 1.07
+=head1 VERSION 1.08
 
 =cut
 
@@ -350,7 +350,7 @@ The objective is to have a library that can handle any of the myriad variants th
 
 =head2 Reading Ballots
 
-The Vote::Count::ReadBallots library provides functionality for reading files from disc. Currently it defines a format for a ballot file and reads that from disk. In the future additional formats may be added. Range Ballots may be in either JSON or YAML formats.
+The L<Vote::Count::ReadBallots|https://metacpan.org/pod/Vote::Count::ReadBallots> library provides functionality for reading files from disc. Currently it defines a format for a ballot file and reads that from disk. In the future additional formats may be added. Range Ballots may be in either JSON or YAML formats.
 
 
 =head2 Voting Method and Component Modules
@@ -570,6 +570,12 @@ L<Vote::Count::Method::CondorcetVsIRV|https://metacpan.org/pod/Vote::Count::Meth
 
 =item *
 
+L<Vote::Count::Method::MinMax|https://metacpan.org/pod/Vote::Count::Method::MinMax>
+
+
+
+=item *
+
 L<Vote::Count::Method::STAR|https://metacpan.org/pod/Vote::Count::Method::STAR>
 
 
@@ -632,44 +638,9 @@ L<Vote::Count::Start|https://metacpan.org/pod/Vote::Count::Start>
 =back
 
 
-=head1 Support for Older Perl Versions
-
-Vote::Count will drop support for versions of Perl more than 2 years old for failing CPAN testing or CI testing. 
-
-Vote::Count uses Moose. When COR is stable, it is likely that a switch will be made from Moose to COR. At that time, the minimum supported Perl will be the current stable 7.x version.
-
-
 =head1 Call for Contributions
 
 This project needs contributions from Programmers and Mathematicians. Review and citations from Mathematicians are urgently requested, because in addition to being a Tool-set for implementing vote counting this documentation will for many also be the manual. From coders there is a lot of help that could be given: any well known method could use a write up if it is easy to implement with the toolkit (see Benham) or a code submission if it is not. Currently Tiedeman, SSD, and Kemmeny-Young are unimplemented.
-
-
-=head1 Advice, Recommendations, Opinion
-
-This section is highly opinionated by the Author of Vote::Count.
-
-If you're looking at all of this wondering "which method I should recommend to my organization to implement Ranked Choice Voting internally?" this is the advice offered by the author of Vote::Count.
-
-I<Instant Runoff Voting> is simple, easy to count by hand, Later Harm protected, and is the most widely used method. It has serious consistency issues, especially how poorly it handles common cloning situations.
-
-I<Benham Condorcet IRV>, meets the two original Condorcet Criteria, and is countable by hand, but it fails Later Harm.
-
-Benham and IRV are good choices for Hand Count Methods.
-
-I<Smith Set IRV> meets all three key criteria for Condorcet Methods and has less Later Harm effect than any other (non-redacting) Condorcet Method. It is simple to understand, but not practical for hand counting.
-
-If you like I<Borda> or prefer a I<Range Ballot>, my pick is for I<STAR>.
-
-STAR is handcountable but requires a Range Ballot. Range methods like STAR have less Later Harm effect than Borda Methods.
-
-I<Redacting Condorcet Methods> are the B<best> for a conventional Ranked Choice Ballot. If a Condorcet Winner does not create a Later Harm violation they will always be chosen. They can create a gauge of the later harm effect that then allows for the establishment of a Later Harm tolerance. The steps for I<Condorcet Vs IRV> are easy to understand but the number of steps qualifies it as somewhat complex. 
-
-
-=head2 Floor Rules and Tie Breakers
-
-In real world elections it is typical to have a number of choices that recieve very little support. A Floor Rule allows quick elimination of these choices, but don't help when voters rank all choices. STAR is an exception and does not benefit from a Floor Rule. 5% Approval is a good weak Floor, and TCA is a good aggressive one.
-
-Ties are inescapable. Modified Grand Junction has the maximum resolvability, but has a Later Harm effect. For a Later Harm safe Tie Breaker Eliminate All is effective (except at the final step).
 
 =cut
 

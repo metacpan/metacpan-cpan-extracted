@@ -5,6 +5,7 @@ author:
 build_requires:
   Data::Dumper: '0'
   DateTime::Format::ISO8601: '0'
+  DateTime::Format::RFC3339: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   TOML::Parser: '0'
@@ -25,7 +26,6 @@ recommends:
 requires:
   Carp: '0'
   Data::Dumper: '0'
-  DateTime::Format::RFC3339: '0'
   Exporter: '0'
   Math::BigInt: '1.999718'
   perl: '5.018'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/sysread/TOML-Tiny/issues
   homepage: https://github.com/sysread/TOML-Tiny
   repository: https://github.com/sysread/TOML-Tiny.git
-version: '0.09'
+version: '0.10'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,6 +1,6 @@
 package Pepper::DB;
 
-$Pepper::VERSION = '1.0.2';
+$Pepper::VERSION = '1.0.3';
 
 # load needed third-part modules
 use DBI; # tim bounce, where would the world be without you? nowhere.

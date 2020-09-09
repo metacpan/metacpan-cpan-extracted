@@ -1,4 +1,10 @@
-0.061   2018-07-16 (PERLANCAR)
+0.062   2020-04-29  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild with update Perinci::Examples::CLI to remove
+          dependency to the deprecated Perinci::Sub::ArgEntity::*.
+
+
+0.061   2018-07-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,12 +12,12 @@
           command-line options like -C (--no-config) or -P (--config-profile).
 
 
-0.060   2018-07-16 (PERLANCAR)
+0.060   2018-07-16  Released-By: PERLANCAR
 
 	- Add script: peri-eg-hello-lite (for benchmarking).
 
 
-0.05    2015-09-03 (PERLANCAR)
+0.05    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -20,18 +26,18 @@
 	  requirement.
 
 
-0.04    2014-11-20 (PERLANCAR)
+0.04    2014-11-20  Released-By: PERLANCAR
 
         - Add script: peri-eg-demo-cli-opts-lite.
 
 
-0.03    2014-10-30 (PERLANCAR)
+0.03    2014-10-30  Released-By: PERLANCAR
 
 	- Add scripts: peri-eg-{append,read,write}-file-lite (using the
 	  Stream variant).
 
 
-0.02     2014-10-24 (PERLANCAR)
+0.02     2014-10-24  Released-By: PERLANCAR
 
          - No functional changes.
 
@@ -39,6 +45,6 @@
            once.
 
 
-0.01     2014-10-24 (PERLANCAR)
+0.01     2014-10-24  Released-By: PERLANCAR
 
          - First release.

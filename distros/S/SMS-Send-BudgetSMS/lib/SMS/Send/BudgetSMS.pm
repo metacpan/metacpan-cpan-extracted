@@ -8,7 +8,7 @@ use Number::Phone::Normalize;
 
 use base 'SMS::Send::Driver';
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -68,11 +68,11 @@ sub send_sms {
 
 =head1 NAME
 
-SMS::Send::BudgetSMS - SMS::Send driver to send messages via BudgetSMS (ttps://www.budgetsms.net/)
+SMS::Send::BudgetSMS - SMS::Send driver to send messages via BudgetSMS, L<https://www.budgetsms.net/>
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -174,6 +174,7 @@ site near you, or see L<https://metacpan.org/module/SMS::Send::BudgetSMS/>.
 =head1 AUTHOR
 
 Lari Taskula <lari.taskula@hypernova.fi>
+Hypernova Oy, L<https://www.hypernova.fi>
 
 =head1 COPYRIGHT AND LICENSE
 

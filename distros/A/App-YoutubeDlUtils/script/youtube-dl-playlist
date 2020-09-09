@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-13'; # DATE
+our $DATE = '2020-09-09'; # DATE
 our $DIST = 'App-YoutubeDlUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # FRAGMENT id=shcompgen-hint command=_youtube-dl
 
 use 5.010001;
@@ -27,7 +27,7 @@ youtube-dl-playlist - Download a playlist with youtube-dl
 
 =head1 VERSION
 
-This document describes version 0.002 of youtube-dl-playlist (from Perl distribution App-YoutubeDlUtils), released on 2020-08-13.
+This document describes version 0.005 of youtube-dl-playlist (from Perl distribution App-YoutubeDlUtils), released on 2020-09-09.
 
 =head1 SYNOPSIS
 

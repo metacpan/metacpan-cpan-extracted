@@ -1,0 +1,24 @@
+Revision history for Perl extension Log::Handler::Plugin::DBI.
+
+1.04  2020-09-03T17:02:10
+	- Start using Exporter now that I'm running v 5.30.02, since tests started failing.
+	- Remove discussion of Exporter from FAQ.
+	- Reformat the comments in DBI.pm to be less than 100 chars long. This is my standard.
+
+1.03  2019-09-30T11:10:22
+	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Rename CHANGES to Changes
+	- Move t/pod.t to xt/author/pod.t.
+	- Add t/00.versions.t and t/00.versions.tx.
+
+1.02  2012-11-17T10:31:00
+	- Use File::Spec -> catfile('t', 'x.pl') instead of 't/x.pl' in tests and in POD.
+	- Update pre-req to Config::Plugin::Tiny V 1.01, which has the same fix.
+
+1.01  2012-09-18T12:03:00
+	- Remove references to obsolete modules CGI::Snapp::Plugin::(Forward, Redirect) now that their methods
+		forward() and redirect() have been rolled into CGI::Snapp V 1.02.
+
+1.00  2012-03-05T10:00:00
+	  - Original version

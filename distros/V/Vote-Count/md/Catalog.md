@@ -36,6 +36,7 @@ And other Methods which assign scores to choices by their ranking.
 * Benham Condorcet IRV: [HandCount](https://metacpan.org/pod/release/BRAINBUZ/Vote-Count/Hand_Count.pod) methods documentation, implemented by [Vote::Count::Method::CondorcetDropping](https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping)
 * Simple Dropping: [Vote::Count::Method::CondorcetDropping](https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping)
 * SmithSet IRV: [Vote::Count::Method::CondorcetIRV](https://metacpan.org/pod/Vote::Count::Method::CondorcetIRV)
+* MinMax (Winning Votes and Margin) [Vote::Count::Method::MinMax](https://metacpan.org/pod/Vote::Count::Method::MinMax)
 
 ### Complex Condorcet
 
@@ -43,7 +44,6 @@ And other Methods which assign scores to choices by their ranking.
 * Tiedeman: *unimplemented*
 * SSD: *unimplemented*
 * Kemmeny-Young: *unimplemented*
-* MinMax (Winning Votes and Margin) [Vote::Count::Method::MinMax](https://metacpan.org/pod/Vote::Count::Method::MinMax)
 
 ### Redacting Condorcet
 

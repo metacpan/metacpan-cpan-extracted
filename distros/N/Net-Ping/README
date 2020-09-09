@@ -19,6 +19,10 @@ SYNOPSIS
         }
         $p->close();
 
+        $p = Net::Ping->new("icmpv6");
+        $ip = "[fd00:dead:beef::4e]";
+        print "$ip is alive.\n" if $p->ping($ip);
+
         $p = Net::Ping->new("tcp", 2);
         # Try connecting to the www port instead of the echo port
         $p->port_number(scalar(getservbyname("http", "tcp")));
@@ -314,7 +318,7 @@ DESCRIPTION
     $p->ping_icmp([$host, $timeout, $family])
         The "ping" method used with the icmp protocol.
 
-    $p->ping_icmpv6([$host, $timeout, $family]) *NYI*
+    $p->ping_icmpv6([$host, $timeout, $family])
         The "ping" method used with the icmpv6 protocol.
 
     $p->ping_stream([$host, $timeout, $family])
@@ -474,7 +478,7 @@ AUTHORS
         mose@ns.ccsn.edu (Russell Mosemann)
 
 COPYRIGHT
-    Copyright (c) 2017-2018, Reini Urban. All rights reserved.
+    Copyright (c) 2017-2020, Reini Urban. All rights reserved.
 
     Copyright (c) 2016, cPanel Inc. All rights reserved.
 

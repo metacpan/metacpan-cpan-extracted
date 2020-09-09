@@ -48,28 +48,28 @@ no_index:
 provides:
   Pepper:
     file: lib/Pepper.pm
-    version: v1.0.2
+    version: v1.0.3
   Pepper::Commander:
     file: lib/Pepper/Commander.pm
-    version: v1.0.2
+    version: v1.0.3
   Pepper::DB:
     file: lib/Pepper/DB.pm
   Pepper::PlackHandler:
     file: lib/Pepper/PlackHandler.pm
-    version: v1.0.2
+    version: v1.0.3
   Pepper::Templates:
     file: lib/Pepper/Templates.pm
-    version: v1.0.2
+    version: v1.0.3
   Pepper::Utilities:
     file: lib/Pepper/Utilities.pm
-    version: v1.0.2
+    version: v1.0.3
 requires:
   perl: '5.022001'
 resources:
   bugtracker: https://github.com/ericschernoff/Pepper/issues
   homepage: https://github.com/ericschernoff/Pepper
   repository: git://github.com/ericschernoff/Pepper.git
-version: 1.0.2
+version: 1.0.3
 x_contributors:
   - 'Eric Chernoff <eric@pepper.weaverstreet.net>'
   - 'Eric Chernoff <ericschernoff@gmail.com>'

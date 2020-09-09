@@ -1,3 +1,14 @@
+0.005   2020-09-09  Released-By: PERLANCAR; Urgency: low
+
+	- [ux] Log number of results.
+
+
+0.004   2020-09-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add shortcut options: -m for --merk, -n for --nama-produk,
+	  and -p for --nama-pendaftar.
+
+
 0.003   2020-09-02  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Remove occasional extra newline in 'kemasan' field.

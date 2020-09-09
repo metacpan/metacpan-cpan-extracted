@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-07-18'; # DATE
-our $VERSION = '0.121'; # VERSION
+our $DATE = '2020-09-09'; # DATE
+our $VERSION = '0.122'; # VERSION
 
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint completer=1 for=youtube-dl
@@ -11,215 +11,16 @@ use strict;
 use warnings;
 use Log::ger;
 
+use CLI::Meta::YoutubeDl;
 use Getopt::Long::Complete; # just so we can be detected as Getopt::Long script
 use ShellCompleter::Util qw(run_shell_completer_for_getopt_long_app);
 
-my $comp_country_code = sub {
-    require Complete::Country;
-    my %args = @_;
-    Complete::Country::complete_country_code(word=>$args{word});
-};
-
-my $comp_dir = sub {
-    require Complete::File;
-    my %args = @_;
-    Complete::File::complete_file(word=>$args{word}, filter=>'d');
-};
-
-my $comp_exec_file = sub {
-    require Complete::File;
-    my %args = @_;
-    Complete::File::complete_file(word=>$args{word}, filter=>'dx');
-};
-
-my $comp_file = sub {
-    require Complete::File;
-    my %args = @_;
-    Complete::File::complete_file(word=>$args{word});
-};
+my $meta = $CLI::Meta::YoutubeDl::META;
+my $opts = $meta->{opts};
 
 binmode(STDOUT, ":encoding(utf8)");
 run_shell_completer_for_getopt_long_app(
-    # General Options:
-    'help|h' => undef,
-    'version' => undef,
-    'update|U' => undef,
-    'ignore-errors|i' => undef,
-    'abort-on-error' => undef,
-    'dump-user-agent' => undef,
-    'list-extractors' => undef,
-    'extractor-descriptions' => undef,
-    'force-generic-extractor' => undef,
-    'default-search=s' => ["gvsearch2:", "auto", "auto_warning", "error", "fixup_error"],
-    'ignore-config' => undef,
-    'config-location=s' => $comp_file,
-    'flat-playlist' => undef,
-    'mark-watched!' => undef,
-    'no-color' => undef,
-
-    # Network Options:
-    'proxy=s' => undef,
-    'socket-timeout=i' => undef,
-    'source-address=s' => undef,
-    'force-ipv4|4' => undef,
-    'force-ipv6|6' => undef,
-    'geo-verification-proxy=s' => undef,
-    'geo-bypass' => undef,
-    'no-geo-bypass' => undef,
-    'geo-bypass-country=s' => $comp_country_code,
-    'geo-bypass-ip-block=s' => undef,
-
-    # Video Selection:
-    'playlist-start=i' => undef,
-    'playlist-end=i' => undef,
-    'playlist-items=s' => undef, # e.g. 1,2,3,10-13
-    'match-title=s' => undef, # regex or substr
-    'reject-title=s' => undef, # regex or substr
-    'max-downloads=i' => undef,
-    'min-filesize=s' => undef, # number or number with prefix
-    'max-filesize=s' => undef, # number or number with prefix
-    'date=s' => undef,
-    'datebefore=s' => undef,
-    'dateafter=s' => undef,
-    'min-views=i' => undef,
-    'max-views=i' => undef,
-    'match-filter=s' => undef, # e.g. "like_count > 100 & dislike_count <? 50 & description"
-    'no-playlist' => undef,
-    'yes-playlist' => undef,
-    'age-limit=i' => undef,
-    'download-archive=s' => $comp_file,
-    'include-ads' => undef,
-
-    # Download Options:
-    'limit-rate|r=s' => undef, # number with prefix
-    'retries|R=i' => undef,
-    'fragment-retries=i' => undef,
-    'skip-unavailable-fragments' => undef,
-    'abort-on-unavailable-fragment' => undef,
-    'keep-fragments' => undef,
-    'buffer-size=s' => undef, # number or number with prefix
-    'no-resize-buffer' => undef,
-    'http-chunk-size=s' => undef, # e.g. 10485760 or 10M
-    'playlist-reverse' => undef,
-    'playlist-random' => undef,
-    'xattr-set-filesize' => undef,
-    'hls-prefer-native' => undef,
-    'hls-prefer-ffmpeg' => undef,
-    'hls-use-mpegts' => undef,
-    'external-downloader=s' => ["aria2c", "axel", "curl", "httpie", "wget"],
-    'external-downloader-args=s' => undef,
-
-    # Filesystem Options:
-    'batch-file|a=s' => undef,
-    'id' => undef,
-    'output|o=s' => $comp_file,
-    'autonumber-start=i' => undef,
-    '--restrict-filenames' => undef,
-    'no-overwrites|w' => undef,
-    'continue|c' => undef,
-    'no-continue' => undef,
-    'no-part' => undef,
-    'no-mtime' => undef,
-    'write-description' => undef,
-    'write-info-json' => undef,
-    'write-annotations' => undef,
-    'load-info-json=s' => $comp_file,
-    'cookies=s' => $comp_file,
-    'cache-dir=s' => $comp_dir,
-    'no-cache-dir' => undef,
-    'rm-cache-dir' => undef,
-
-    # Thumbnail images:
-    'write-thumbnail' => undef,
-    'write-all-thumbnails' => undef,
-    'list-thumbnails' => undef,
-
-    # Verbosity / Simulation Options:
-    'quiet|q' => undef,
-    'no-warnings' => undef,
-    'simulate|s' => undef,
-    'skip-download' => undef,
-    'get-url|g' => undef,
-    'get-title|e' => undef,
-    'get-id' => undef,
-    'get-thumbnail' => undef,
-    'get-description' => undef,
-    'get-duration' => undef,
-    'get-filename' => undef,
-    'get-format' => undef,
-    'dump-json|j' => undef,
-    'dump-single-json|J' => undef,
-    'print-json' => undef,
-    'newline' => undef,
-    'no-progress' => undef,
-    'console-title' => undef,
-    'verbose|v' => undef,
-    'dump-pages' => undef,
-    'write-pages' => undef,
-    'print-traffic' => undef,
-    'call-home|C' => undef,
-    'no-call-home' => undef,
-
-    # Workarounds:
-    'encoding=s' => undef,
-    'no-check-certificate' => undef,
-    'prefer-insecure' => undef,
-    'user-agent=s' => undef,
-    'referer=s' => undef, # url
-    'add-header=s' => undef, # FIELD:VALUE
-    'bidi-workaround' => undef,
-    'sleep-interval=i' => undef,
-    'max-sleep-interval=i' => undef,
-
-    # Video Format Options:
-    'format|f=s' => [qw/aac m4a mp3 mp4 ogg wav webm/,
-                     qw/best bestvideo bestaudio worst/], # format or format1/format2/format3 (by order of preference)
-    'all-formats' => undef,
-    'prefer-free-formats' => undef,
-    'list-formats|F' => undef,
-    'youtube-skip-dash-manifest' => undef,
-    'merge-output-format=s' => [qw/mkv mp4 ogg webm/],
-
-    # Subtitle Options:
-    'write-sub' => undef,
-    'write-auto-sub' => undef,
-    'all-subs' => undef,
-    'list-subs' => undef,
-    'sub-format=s' => [qw/aas srt best/],
-    'sub-lang=s' => undef, # e.g. 'en,pt'
-
-    # Authentication Options:
-    'username|u=s' => undef,
-    'password|p:s' => undef,
-    'twofactor|2=s' => undef,
-    'netrc|n' => undef,
-    'video-password=s' => undef,
-
-    # Adobe Pass Options:
-    'ap-mso=s' => undef,
-    'ap-username=s' => undef,
-    'ap-password=s' => undef,
-    'ap-list-mso' => undef,
-
-    # Post-processing Options:
-    'extract-audio|x' => undef,
-    'audio-format=s' => ["best", "aac", "flac", "mp3", "m4a", "opus", "vorbis", "wav"],
-    'audio-quality=s' => [0..9], # 0..9 or bitrate
-    'recode-video=s' => [qw/mp4 flv ogg webm mkv avi/],
-    'postprocessor-args=s' => undef,
-    'keep-video|k' => undef,
-    'no-post-overwrites' => undef,
-    'embed-subs' => undef,
-    'embed-thumbnail' => undef,
-    'add-metadata' => undef,
-    'metadata-from-title=s' => undef,
-    'xattrs' => undef,
-    'fixup=s' => [qw/nothing warn detect_or_warn/],
-    'prefer-avconv' => undef,
-    'prefer-ffmpeg' => undef,
-    'ffmpeg-location=s' => $comp_exec_file,
-    'exec=s' => undef,
-    'convert-subs=s' => undef,
+    map { $_ => (defined $opts->{$_} && defined $opts->{$_}{completion} ? $opts->{$_}{completion} : undef) } keys %$opts,
 );
 
 # ABSTRACT: Shell completer for youtube-dl
@@ -237,7 +38,7 @@ _youtube-dl - Shell completer for youtube-dl
 
 =head1 VERSION
 
-This document describes version 0.121 of _youtube-dl (from Perl distribution App-ShellCompleter-YoutubeDl), released on 2019-07-18.
+This document describes version 0.122 of _youtube-dl (from Perl distribution App-ShellCompleter-YoutubeDl), released on 2020-09-09.
 
 =head1 SYNOPSIS
 
@@ -275,7 +76,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

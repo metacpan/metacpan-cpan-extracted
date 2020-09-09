@@ -2,7 +2,7 @@
 
 =pod
 
-=head1 VERSION 1.07
+=head1 VERSION 1.08
 
 =head1 Multi Member
 
@@ -80,7 +80,7 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019-2020 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 

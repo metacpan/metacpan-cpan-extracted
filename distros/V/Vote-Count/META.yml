@@ -7,6 +7,7 @@ build_requires:
   File::Temp: '0'
   Test2::Bundle::More: '0'
   Test2::Tools::Exception: '0'
+  Test2::Tools::Warnings: '0'
   Test2::V0: '0'
   Test::Exception: '0'
   perl: '5.022'
@@ -14,7 +15,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.022'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -48,6 +49,7 @@ resources:
   bugtracker: https://github.com/brainbuz/Vote-Count/issues
   homepage: https://github.com/brainbuz/Vote-Count
   repository: https://github.com/brainbuz/Vote-Count.git
-version: '1.07'
-x_generated_by_perl: v5.28.0
+version: '1.08'
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-only

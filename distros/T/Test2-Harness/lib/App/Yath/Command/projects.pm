@@ -2,7 +2,7 @@ package App::Yath::Command::projects;
 use strict;
 use warnings;
 
-our $VERSION = '1.000024';
+our $VERSION = '1.000026';
 
 use parent 'App::Yath::Command::test';
 use Test2::Harness::Util::HashBase;
@@ -994,6 +994,13 @@ Can also be set with the following environment variables: C<YATH_JOB_COUNT>, C<T
 =item --no-lib
 
 (Default: include if it exists) Include 'lib' in your module path
+
+
+=item --nytprof
+
+=item --no-nytprof
+
+Use Devel::NYTProf on tests. This will set addpid=1 for you. This works with or without fork.
 
 
 =item --post-exit-timeout SECONDS

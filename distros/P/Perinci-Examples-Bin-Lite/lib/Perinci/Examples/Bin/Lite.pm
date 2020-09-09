@@ -1,7 +1,7 @@
 package Perinci::Examples::Bin::Lite;
 
-our $DATE = '2018-07-16'; # DATE
-our $VERSION = '0.061'; # VERSION
+our $DATE = '2020-04-29'; # DATE
+our $VERSION = '0.062'; # VERSION
 
 use 5.010001;
 
@@ -20,7 +20,7 @@ Perinci::Examples::Bin::Lite - Perinci example CLI scripts (using Perinci::CmdLi
 
 =head1 VERSION
 
-This document describes version 0.061 of Perinci::Examples::Bin::Lite (from Perl distribution Perinci-Examples-Bin-Lite), released on 2018-07-16.
+This document describes version 0.062 of Perinci::Examples::Bin::Lite (from Perl distribution Perinci-Examples-Bin-Lite), released on 2020-04-29.
 
 =head1 DESCRIPTION
 
@@ -55,7 +55,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

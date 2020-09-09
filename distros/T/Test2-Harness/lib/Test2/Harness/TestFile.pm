@@ -2,7 +2,7 @@ package Test2::Harness::TestFile;
 use strict;
 use warnings;
 
-our $VERSION = '1.000024';
+our $VERSION = '1.000026';
 
 use Carp qw/croak/;
 
@@ -540,7 +540,7 @@ Key/Value pairs to append to the queue_item() data.
 
 =item $tf->set_category($cat)
 
-This is how you find the category for a file. You canuse C<set_category()> to
+This is how you find the category for a file. You can use C<set_category()> to
 assign/override a category.
 
 =item $dur = $tf->check_duration()

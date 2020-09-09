@@ -1,3 +1,27 @@
+0.005   2020-09-09  Released-By: PERLANCAR; Urgency: medium
+
+        [cli youtube-dl-play]
+
+	- Instead of using mpv's --record-file (or --stream-record, which
+	  my mpv doesn't have BTW), we now save the stream using 'tee'
+	  before feeding it to mpv, so skipping/seeking won't screw the
+	  save file.
+
+
+0.004   2020-09-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	[cli youtube-dl-play]
+
+        - [grammar] Fix grammar in Abstract, add blurb in Description.
+
+
+0.003   2020-09-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: youtube-dl-play.
+
+
 0.002   2020-08-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: youtube-dl-timestamp.

@@ -2,7 +2,7 @@ package App::Yath::Options::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000024';
+our $VERSION = '1.000026';
 
 use Test2::Util qw/IS_WIN32/;
 use Test2::Harness::Util qw/clean_path/;
@@ -121,6 +121,12 @@ option_group {prefix => 'runner', category => "Runner Options"} => sub {
         type => 's',
         default => 0,
         description => "Only do preload if at least N tests are going to be run. In some cases a full preload takes longer than simply running the tests, this lets you specify a minimum number of test jobs that will be run for preload to happen. This has no effect for a persistent runner. The default is 0, and it means always preload."
+    );
+
+    option nytprof => (
+        type => 'b',
+        description => "Use Devel::NYTProf on tests. This will set addpid=1 for you. This works with or without fork.",
+        long_examples => [''],
     );
 
     post \&cover_post_process;
@@ -315,6 +321,13 @@ Can also be set with the following environment variables: C<YATH_JOB_COUNT>, C<T
 =item --no-lib
 
 (Default: include if it exists) Include 'lib' in your module path
+
+
+=item --nytprof
+
+=item --no-nytprof
+
+Use Devel::NYTProf on tests. This will set addpid=1 for you. This works with or without fork.
 
 
 =item --post-exit-timeout SECONDS

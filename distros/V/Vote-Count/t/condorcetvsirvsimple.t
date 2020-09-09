@@ -29,8 +29,11 @@ my $ballots_burlington = read_ballots('t/data/burlington2009.txt');
 my $ballots_evils      = read_ballots('t/data/evils.txt');
 my $ballots_tied       = read_ballots('t/data/ties1.txt');
 my $ballots_cwinner_irvtied    = read_ballots('t/data/ties2.txt');
-my $drops_winner = read_ballots('t/data/irvdropscondorcetwinner.txt');
-my $drops_wrong = read_ballots('t/data/irvdropswrongclone.txt');
+my $ballots_twobeatirv = read_ballots('t/data/twobeatirv.txt');
+my $ballots_redactfixloop = read_ballots('t/data/redactfixloop.txt');
+
+my $ballots_drops_winner = read_ballots('t/data/irvdropscondorcetwinner.txt');
+my $ballots_drops_wrong = read_ballots('t/data/irvdropswrongclone.txt');
 
 subtest 'simple set where irv winner and condorcet match' => sub {
     my $S1 = Vote::Count::Method::CondorcetVsIRV->new(
@@ -82,7 +85,7 @@ subtest 'condorcet winner does not violate later harm (evils)' => sub {
 
 subtest 'irv drops condorcet winner' => sub {
     my $U1 = Vote::Count::Method::CondorcetVsIRV->new(
-        'BallotSet'      => $drops_winner,
+        'BallotSet'      => $ballots_drops_winner,
         'TieBreakMethod' => 'none',
     );
     my $U1run1 = $U1->CondorcetVsIRV( 'smithsetirv' => 0, 'simple' => 1 );
@@ -92,7 +95,7 @@ subtest 'irv drops condorcet winner' => sub {
 
 subtest 'irv drops wrongclone' => sub {
     my $U2 = Vote::Count::Method::CondorcetVsIRV->new(
-        'BallotSet'      => $drops_wrong,
+        'BallotSet'      => $ballots_drops_wrong,
         'TieBreakMethod' => 'none',
     );
     my $U2run1 = $U2->CondorcetVsIRV( 'smithsetirv' => 0, 'simple' => 1 );
@@ -109,6 +112,35 @@ subtest 'condorcet winner does violate later harm (burlington2009)' => sub {
     my $T2run1 = $T2->CondorcetVsIRV( 'smithsetirv' => 0 );
     is( $T2run1->{'winner'}, 'KISS', 'KISS is the winner.' );
     note $T2->logd();
+};
+
+subtest 
+  'Edge Cases where Later votes of IRV winner change Condorcet Winner' 
+  => sub {
+    my $beatby2 = Vote::Count::Method::CondorcetVsIRV->new(
+        'BallotSet'      => $ballots_twobeatirv,
+        'TieBreakMethod' => 'none',
+    );
+    my $fixesloop = Vote::Count::Method::CondorcetVsIRV->new(
+        'BallotSet'      => $ballots_redactfixloop,
+        'TieBreakMethod' => 'none',
+    );
+    {
+    my $todo = todo "this should expose a bug";
+    {
+        my $winb2 = $beatby2->CondorcetVsIRV( 
+            'simple' => 1, 'debug' => 1 );
+        is($winb2->{'winner'}, 
+            'CONDORCET1',
+            "The first Condorcet winner should be the winner not the second.");
+    };
+        my $fixloop = $fixesloop->CondorcetVsIRV( 'simple' => 1);
+        is($fixloop->{'winner'}, 
+            'IRV', 
+            "Because the unredacted ballots did not have a condorcet winner, the IRV winner should win.");
+
+};
+
 };
 
 done_testing();

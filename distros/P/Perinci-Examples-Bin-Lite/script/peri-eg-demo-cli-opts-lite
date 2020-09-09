@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Perinci/Examples/CLI/demo_cli_opts
-# and generated automatically using Perinci::CmdLine::Gen version 0.486
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2018-07-16'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-29'; # DATE
 our $DIST = 'Perinci-Examples-Bin-Lite'; # DIST
-our $VERSION = '0.061'; # VERSION
+our $VERSION = '0.062'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,21 @@ peri-eg-demo-cli-opts-lite - Summary for `demo_cli_opts`
 
 =head1 VERSION
 
-This document describes version 0.061 of peri-eg-demo-cli-opts-lite (from Perl distribution Perinci-Examples-Bin-Lite), released on 2018-07-16.
+This document describes version 0.062 of peri-eg-demo-cli-opts-lite (from Perl distribution Perinci-Examples-Bin-Lite), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % peri-eg-demo-cli-opts-lite [options] <str1> <array1> ...
+ % peri-eg-demo-cli-opts-lite [-F] [-M] [--are-baz] [--arent-baz] [--bool1]
+     [--config-path=path | -c] [--config-profile=profile | -P] [-f]
+     [--female] [--flag1] [--format=name] [--full] [--full2] [--gender=s]
+     [--hash1-json=s] [--hash1=s] [-i=s] [--input-base64=s] [--input=s]
+     [--int1=s] [--int2=s] [--is-bar] [--isnt-bar] [--json] [--male]
+     [--(no)naked-res] [--no-bool1] [--no-config | -C] [--no-env]
+     [--no-full] [--no-full2] [--nobool1] [--nofull] [--nofull2]
+     [--output=s] [-p=s] [--page-result[=program]] [--pass=s] [--wf]
+     [--with-foo] [--without-foo] [-z] <str1> <array1> ...
 
 Examples:
 
@@ -94,13 +103,13 @@ C<*> marks required options.
 
 =item B<--array1-json>=I<s>
 
-Positional, greedy, and plural (JSON-encoded).
+Positional, slurpy, and plural (JSON-encoded).
 
 See C<--array1>.
 
 =item B<--array1>=I<s@>*
 
-Positional, greedy, and singular.
+Positional, slurpy, and singular.
 
 Argument with non-scalar types (like array or hash) can be specified in the CLI
 using `--ARG-json` or `--ARG-yaml`. Arguments with type of array of string can
@@ -179,19 +188,19 @@ Alias for `--gender=M`.
 
 See C<--gender>.
 
-=item B<--output>=I<filename>
+=item B<--output>=I<s>
 
 Specify output filename.
 
 This option demonstrates how the option would be displayed in the help/usage.
-Due to the `x.schema.entity` attribute giving hint about what the value is, CLI
-framework can show:
+Due to the `schema` being `filename` instead of just `str`, CLI framework can
+show:
 
-    --output=file
+    --output=filename
 
-instead of the plain and less informative:
+instead of the less informative:
 
-    --output=s
+    --output=str
 
 
 =item B<--pass>=I<s>, B<-p>
@@ -279,7 +288,7 @@ existence of `summary`.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -357,6 +366,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -481,7 +494,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

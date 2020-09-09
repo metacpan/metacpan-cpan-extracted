@@ -1,9 +1,0 @@
-.DS_Store
-lib/.DS_Store
-Makefile.old
-MYMETA.json
-MYMETA.yml
-Makefile
-blib/
-pm_to_blib
-cover_db

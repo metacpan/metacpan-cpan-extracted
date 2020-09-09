@@ -1,6 +1,10 @@
 Revision history for Statistics-Sampler-Multinomial
 
-0.81 20180915
+0.83 20200909
+  - Modify Statistics::Sampler::Multinomial->draw method
+    to match documentation (and Statistics::Sampler::Multinomial::Alias->draw)
+
+0.82 20180915
   - add license meta, thanks MANWAR
 
 0.81 20180915

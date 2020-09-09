@@ -2,7 +2,7 @@ package App::Yath::Command::runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000024';
+our $VERSION = '1.000026';
 
 use Config qw/%Config/;
 use File::Spec;
@@ -117,6 +117,7 @@ sub generate_run_sub {
     }
     goto::file->import($job->rel_file);
     $class->cleanup_process($job, $stage);
+    DB::enable_profile() if $settings->runner->nytprof;
 }
 
 sub cleanup {
@@ -338,9 +339,9 @@ sub update_io {
         POSIX::_exit(127);
     };
 
-    swap_io(\*STDIN,  $in_fh,  $die);
-    swap_io(\*STDOUT, $out_fh, $die);
-    swap_io(\*STDERR, $err_fh, $die);
+    swap_io(\*STDIN,  $in_fh,  $die, '<&');
+    swap_io(\*STDOUT, $out_fh, $die, '>&');
+    swap_io(\*STDERR, $err_fh, $die, '>&');
 
     return;
 }

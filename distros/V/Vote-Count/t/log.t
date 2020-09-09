@@ -7,6 +7,7 @@ use Test2::V0;
 use Test2::Bundle::More;
 # use Test::Exception;
 use Test2::Tools::Exception qw/dies lives/;
+use Test2::Tools::Warnings qw/warns warning warnings no_warnings/;
 
 use Path::Tiny;
 use File::Temp;
@@ -69,5 +70,15 @@ like( path($debug3mb)->slurp(),
   qr/$now/, "String for Now $now logged to $debug3mb" );
 
 note "Temporary Files are in $tmp and $tmp2";
+
+$VC3->Debug( 1 );
+like(
+    warning { $VC3->logv( 'testing') },
+    qr/testing/,
+    "test that debug flag warned on a testing log event"
+);
+$VC3->Debug( 0 );
+ok( no_warnings { $VC3->logd( 'retesting') }, 
+  "not warning on log after debug flag switched off");
 
 done_testing();

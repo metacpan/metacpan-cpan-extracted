@@ -2,9 +2,9 @@ NAME
     App::ShellCompleter::YoutubeDl - Shell completion for youtube-dl
 
 VERSION
-    This document describes version 0.121 of App::ShellCompleter::YoutubeDl
+    This document describes version 0.122 of App::ShellCompleter::YoutubeDl
     (from Perl distribution App-ShellCompleter-YoutubeDl), released on
-    2019-07-18.
+    2020-09-09.
 
 SYNOPSIS
     See _youtube-dl included in this distribution.
@@ -32,7 +32,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

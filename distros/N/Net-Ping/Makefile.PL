@@ -31,25 +31,36 @@ push @extras,
             # TODO: 26 old issues still open at RT
             # https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Ping
             bugtracker  => 'https://github.com/rurban/Net-Ping/issues',
-            repository  => 'https://github.com/rurban/Net-Ping',
-            license     => 'http://dev.perl.org/licenses/',
+            repository  => {
+                type => 'git',
+                url => 'https://github.com/rurban/Net-Ping.git',
+                web => 'https://github.com/rurban/Net-Ping',
+            },
+            license     => [ 'http://dev.perl.org/licenses/' ],
         },
-        #release_status => 'stable',
+        release_status => 'stable',
   }
   if $EUMM_VER gt '6.46';
 
 WriteMakefile(
-    NAME   => 'Net::Ping',
-    VERSION_FROM  => 'lib/Net/Ping.pm',
-    ABSTRACT_FROM => 'lib/Net/Ping.pm',
-    PREREQ_PM     => {
-        'Socket'      => '2.007',
-        'Test::More'  => 0,
-        'Time::HiRes' => 0,
-    },
-    INSTALLDIRS => ($ENV{PERL_CORE} ? 'perl' : 'site'),
-    clean      => { FILES => 'Net-Ping-*' },
-    @extras
+  NAME   => 'Net::Ping',
+  VERSION_FROM  => 'lib/Net/Ping.pm',
+  ABSTRACT_FROM => 'lib/Net/Ping.pm',
+  PREREQ_PM     => {
+    'Socket'      => '2.007',
+    'Test::More'  => 0,
+    'Time::HiRes' => 0,
+  },
+  TEST_REQUIRES => {
+    'Test::CPAN::Meta'    => '0.12',
+    'Test::Pod'           => '1.22',
+    'Test::Pod::Coverage' => '1.04',
+    'Test::Kwalitee'      => '1.20',
+    'Test::More'          => 0,
+  },
+  INSTALLDIRS => ($ENV{PERL_CORE} ? 'perl' : 'site'),
+  clean      => { FILES => 'Net-Ping-*' },
+  @extras
 );
 
 package MY;

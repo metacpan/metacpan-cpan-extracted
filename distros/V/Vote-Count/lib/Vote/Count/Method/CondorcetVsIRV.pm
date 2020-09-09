@@ -9,17 +9,14 @@ use Moose;
 
 with 'Vote::Count::Log';
 
-# use Exporter::Easy ( EXPORT => [ 'CondorcetVsIRV' ] );
-
-# use Vote::Count;
-# use Vote::Count::Method::CondorcetIRV;
 use Storable 3.15 'dclone';
 use Vote::Count::ReadBallots qw/read_ballots write_ballots/;
 use Vote::Count::Redact qw/RedactSingle RedactPair RedactBullet/;
 use Vote::Count::Method::CondorcetIRV;
 use Try::Tiny;
+use Data::Dumper;
 
-our $VERSION='1.07';
+our $VERSION='1.08';
 
 # no warnings 'uninitialized';
 no warnings qw/experimental/;
@@ -28,7 +25,7 @@ no warnings qw/experimental/;
 
 Vote::Count::Method::CondorcetVsIRV
 
-=head1 VERSION 1.07
+=head1 VERSION 1.08
 
 =cut
 
@@ -56,29 +53,51 @@ Returns a HashRef with a key for winner.
 
 =head1 Method Common Name: Condorcet vs IRV
 
-=head2 Method Summary
+Condorcet vs IRV Methods determine if the Condorcet Winner needed votes from the IRV winner; electing the Condorcet Winner if there was not a later harm violation, electing the IRV winner if there was. If there is no Condorcet Winner the IRV Winner is chosen.
 
-Determine if the Condorcet Winner needed votes from the IRV winner, elect the Condorcet Winner if there was not a later harm violation, elect the IRV winner if there was.
+To determine if there was a violation the ballots of one or more choices are redacted, with later choice on those ballots removed.
 
-The Relaxed Later Harm option will select the Condorcet Winner when their margin of victory over the IRV Winner is greater than the number of later votes they need from the IRV Winner to be a Condorcet Winner.
+With these methods it is also possible to allow a tolerance for Later Harm. 
 
-This is a Redacting Condorcet Method because it uses Ballots which have been redacted for Later Harm effect.
+=head3 Double Redaction
 
-=head2 Method Description
+The Double Redaction method (default) measures the later harm effect between a Condorcet Winner and the IRV Winner. 
 
-The method looks for a Condorcet Winner, if there is none it uses IRV to find the winner. If there is a Condorcet Winner it uses standard IRV to find the IRV winner. When the two winners do not match, it copies the ballots and redacts the later choice from those ballots that indicated both. It then determines if one of the two choices is a Condorcet Winner, if not it determines if one of them would win IRV. If either choice is the winner with redacted ballots, they win. If neither wins, the Condorcet Winner dependended on a Later Harm effect against the IRV winner, and the IRV Winner is elected.
+Considering the Margin of the Condorcet Winner over the IRV Winner and the number of votes needed by the Condorcet Winner from the IRV winner as measures of Preference for the Condorcet Winner and of Later Harm, it is also possible to establish a Later Harm Tolerance Threshold. 
 
-With Relaxed Later Harm, when neither choice wins the redacted ballots, takes the greatest loss by the Condorcet Winner in the redacted matrix and compares it to their margin of victory over the IRV winner. If the victory margin is greater the Condorcet Winner is elected.
+The Relaxed Later Harm option will select the Condorcet Winner when their margin of victory over the IRV Winner is greater than the number of later votes they need from the IRV Winner to be a Condorcet Winner. Although not presently implemented a different ratio or percentage could be used. 
 
-It is optional to use Smith Set IRV for the case where there is no Condorcet Winner and for the redacted confirmation. Unfortunately, when there is a Condorcet Winner Smith Set IRV cannot be used to find the IRV Winner without temporarily dropping the Condorcet Winner, which would prevent them from confirming via IRV.
+Because in most cases where the IRV and Condorcet winners are different there are Later Harm effects, without relaxed this method will almost always confirm the IRV winner. 
 
-The 'simple' option only redacts ballots that are first choice for the IRV winner.
+=head3 Simple (Single Redaction)
+
+This variation only redacts the ballots that choose the IRV Winner as their first choice. This gives the voters confidence that if their first choice wins by the later harm safe method, that their vote will not be used against that choice. 
+
+The simplest form is:
+
+    1. Determine the IRV Winner
+
+    2. Treating the ballots cast with the IRV Winner as their first choice as ballots cast only for the IRV Winner, determine the Condorcet Winner.
+
+    3. Elect the Condorcet Winner, if there is none, elect the IRV Winner.
+
+Unfortunately, this simplest form, in cases where more than one choice defeats the IRV Winner in pairing and later choices of the IRV Winner's ballots determine which becomes the Condorcet Winner, removes the supporters of the IRV Winner from the final decision.
+
+The form implemented by Vote::Count is:
+
+    1. Determine both the IRV and Condorcet Winner. If they are the same, elect that choice. If there is no Condorcet Winner, elect the IRV Winner.
+
+    2. Treating the ballots cast with the IRV Winner as their first choice as ballots cast for only the IRV Winner determine the Condorcet Winner.
+
+    3. If there is a Condorcet Winner, elect the first Condorcet Winner, if there is none, elect the IRV Winner. (The redaction cannot make the IRV Winner a Condorcet Winner if it isn't already one).
 
 =head1 Criteria
 
+The double redaction version is later harm safe if the relaxed option is not used. The simple version later harm protects first choice votes only, it also does not protect the first Condorcet Winner's votes at all. 
+
 =head2 Simplicity
 
-This is a medium complexity method. It builds on simpler methods but has a significant number of steps and branches.
+The simple version does not require Condorcet Loop resolution, and thus can be considered to be on par with Benham for complexity, and like Benham is Hand Countable. The double redaction version is more complex, but is perhaps more valuable as an approach for measuring later harm.
 
 =head2 Later Harm
 
@@ -90,26 +109,17 @@ Using the TCA Floor Rule and or Smith Set IRV add small Later Harm effects.
 
 =head2 Condorcet Criteria
 
-This method only meets Condorcet Loser, when the IRV winner is chosen of the Condorcet Winner, the winner is outside the Smith Set.
-Meets Condorcer Winner, Condorcet Loser, and Smith.
+This method only meets Condorcet Loser, when the IRV winner is chosen instead of the Condorcet Winner, the winner may be outside the Smith Set.
 
 =head2 Consistency
 
-Because this method chooses between the outcomes of two different methods, it inherits the consistency failings of both. It improves clone handling versus IRV, because in cases where the most supported clone loses IRV, it is often a Condorcet Winner. Likely there is overall improvement vs IRV.
-
-=head2 Utility
-
-Condorcet Vs IRV almost always picks the IRV Winner over the Condorcet Winner, on those occasions that it does overturn IRV it should be considered a success.
-
-The ability to allow an optional tolerance for Later Harm is unique and powerful. The importance of Later Harm is the incentive it creates for strategic voting. To obtain sincere ballots in an election that is likely to be close with more than two significant choices, the voters must percieve the risk of not ranking a supported choice to be greater than the later harm risk. The relaxed option creates a reasonable tolerance for later harm. Notably in the Burlington 2009 Mayor Election where disatisfaction with winner resulted in the repeal of IRV, the Later Harm effect was significant and Condorcet Vs IRV confirms the IRV winner, use of Condorcet Vs IRV would have shown why the IRV decision was correct.
-
-The Simple variant is slightly easier to comprehend. It provides a Later Harm balance by only protecting the first choice votes of the IRV winner. It gains the Condorcet advantage over IRV in resolving Cloning groups.
+Because this method chooses between the outcomes of two different methods, it is subject to the consistency failings of both. Given that Cloning is an important consistency issue in real elections, the clone handling should be an improvement over IRV.
 
 =head1 Implementation
 
 Details specific to this implementation.
 
-The Tie Breaker is defaulted to (modified) Grand Junction for resolvability. Any Tie Breaker supported by Vote::Count::TieBreaker may be used, except that 'all' should not be used.
+The Tie Breaker is defaulted to (modified) Grand Junction for resolvability. Any Tie Breaker supported by Vote::Count::TieBreaker may be used, 'all' and 'none' are not recommended.
 
 =head2 Function Name: CondorcetVsIRV
 
@@ -177,12 +187,6 @@ has 'Active' => (
     builder => '_InitialActive',
 );
 
-has 'SimpleCondorcetVsIRV' => (
-  is   => 'ro',
-  isa  => 'Bool',
-  default => 0,
-);
-
 sub _InitialActive ( $I ) { return dclone $I->BallotSet()->{'choices'} }
 
 sub SetActive ( $I, $active ) {
@@ -205,12 +209,12 @@ sub _CVI_IRV ( $I, $active, $smithsetirv ) {
     my $WonIRV    = undef;
     my $irvresult = undef;
     if ($smithsetirv) {
-        # smithirv needs to match irv args.
         $irvresult = $I->SmithSetIRV( $I->TieBreakMethod() );
     }
     else {
         $irvresult = $I->RunIRV( $active, $I->TieBreakMethod() );
     }
+    $I->logd( 'IRV Result: ' . Dumper $irvresult );
     return $irvresult->{'winner'} if $irvresult->{'winner'};
     $I->logt("IRV ended with a Tie.");
     $I->logt(
@@ -256,22 +260,33 @@ sub CreateRedactedElection ( $self, $WonCondorcet, $WonIRV, $simpleflag=0 ) {
       BallotSetType  => 'rcv',
       LogTo          => $self->LogRedactedTo(),
   );
+  $self->logd(
+    'Created Redacted Election.',
+    $self->{'RedactedElection'}->PairMatrix()->PairingVotesTable(),
+    $self->{'RedactedElection'}->PairMatrix()->MatrixTable(),
+    );
 }
 
-#  $I, $active, $smithsetirv
 sub _CVI_RedactRun ( $I, $WonCondorcet, $WonIRV, $active, $options ) {
     my $smithsetirv
-        = defined $options->{'smithsetirv'} ? $options->{'smithsetirv'} : 0;
-    my $relaxed  = defined $options->{'relaxed'} ? $options->{'relaxed'} : 0;
+        = $options->{'smithsetirv'} ? 1 : 0;
+    my $relaxed  = $options->{'relaxed'} ? $options->{'relaxed'} : 0;
+    my $simpleflag  = $options->{'simple'} ? 1 : 0;
     my $E        = $I->Election();
     my $R        = $I->RedactedElection();
     my $ConfirmC = $R->PairMatrix->CondorcetWinner();
     my $ConfirmI = _CVI_IRV( $R, $active, $smithsetirv );
-    if ( $ConfirmC eq $WonCondorcet or $ConfirmC eq $WonIRV ) {
+    if ( $ConfirmC ) {
+      if ( $simpleflag ) {
+        $I->logt("Elected $WonCondorcet, Redacted Ballots had a Condorcet Winner.");
+        $I->logv("The Redacted Condorcet Winner was $ConfirmC.")
+            if ( $ConfirmC ne $WonCondorcet);
+        return $WonCondorcet ;
+      } elsif ( $ConfirmC eq $WonCondorcet or $ConfirmC eq $WonIRV ) {
         $I->logt("Elected $ConfirmC, Redacted Ballots Condorcet Winner.");
         return $ConfirmC;
-    }
-    else {
+        }
+    } else {
         $ConfirmI = _CVI_IRV( $R, $active, $smithsetirv );
         if ( $ConfirmI eq $WonCondorcet or $ConfirmI eq $WonIRV ) {
             $I->logt("Elected $ConfirmI, Redacted Ballots IRV Winner.");

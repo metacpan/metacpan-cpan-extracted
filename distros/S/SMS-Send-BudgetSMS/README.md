@@ -2,11 +2,11 @@
 
 # SMS-Send-BudgetSMS
 
-SMS::Send::BudgetSMS - SMS::Send driver to send messages via BudgetSMS (ttps://www.budgetsms.net/)
+SMS::Send::BudgetSMS - SMS::Send driver to send messages via BudgetSMS, https://www.budgetsms.net/
 
 ## VERSION
 
-version 0.01
+version 0.03
 
 ## SYNOPSIS
 
@@ -102,6 +102,7 @@ site near you, or see https://metacpan.org/module/SMS::Send::BudgetSMS/
 ## AUTHOR
 
 Lari Taskula <lari.taskula@hypernova.fi>
+Hypernova Oy, https://www.hypernova.fi
 
 ## COPYRIGHT AND LICENSE
 

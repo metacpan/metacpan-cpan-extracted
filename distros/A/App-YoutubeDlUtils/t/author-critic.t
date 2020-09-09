@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/YoutubeDlUtils.pm','script/youtube-dl-playlist','script/youtube-dl-timestamp'];
+my $filenames = ['lib/App/YoutubeDlUtils.pm','script/youtube-dl-play','script/youtube-dl-playlist','script/youtube-dl-timestamp'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

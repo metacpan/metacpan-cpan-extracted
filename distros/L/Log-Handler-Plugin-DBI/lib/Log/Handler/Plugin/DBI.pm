@@ -3,16 +3,16 @@ package Log::Handler::Plugin::DBI;
 use strict;
 use warnings;
 
-use Log::Handler::Output::DBI;
-
 use vars qw(@EXPORT @ISA);
 
-@EXPORT = (qw/configure_logger log log_object/);
+@EXPORT = qw/configure_logger log_object log/;
 @ISA    = ('Exporter');
+
+use Log::Handler::Output::DBI;
 
 my($object);
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 # -----------------------------------------------
 
@@ -94,11 +94,13 @@ Then:
 
 	1;
 
-t/config.logger.ini is used in the test file t/test.t, and also ships with the L<CGI::Snapp::Demo::Four> distro.
+t/config.logger.ini is used in the test file t/test.t, and also ships with the
+L<CGI::Snapp::Demo::Four> distro.
 
 =head1 Description
 
-When you 'use' this module (as in the Synopsis), it automatically imports into your class several methods. See L</Methods> for details.
+When you 'use' this module (as in the Synopsis), it automatically imports into your class
+several methods. See L</Methods> for details.
 
 =head1 Distributions
 
@@ -173,9 +175,11 @@ See L<Log::Handler#LOG-LEVELS> and L<Log::Handler::Levels>.
 
 Returns the internal log object, for those cases when you want to pass it to some other class.
 
-See the L<CGI::Snapp::Demo::Four> distro, which contains httpd/cgi-bin/cgi.snapp.demo.four.cgi, which uses L<CGI::Snapp::Demo::Four::Wrapper>.
+See the L<CGI::Snapp::Demo::Four> distro, which contains httpd/cgi-bin/cgi.snapp.demo.four.cgi,
+which uses L<CGI::Snapp::Demo::Four::Wrapper>.
 
-The latter passes this log object to L<CGI::Snapp>'s logger() method, to demonstrate logging a L<CGI> script's method call sequence to a database table.
+The latter passes this log object to L<CGI::Snapp>'s logger() method, to demonstrate logging a
+L<CGI> script's method call sequence to a database table.
 
 =head1 FAQ
 
@@ -197,64 +201,25 @@ See the L<Log::Handler::Plugin::DBI::CreateTable/FAQ>. In pseudo-code:
 	timestamp timestamp not null default current_timestamp +
 	(db_vendor =~ /(?:MySQL|Postgres)/i ? '(0) without time zone' : '')
 
-Also, if you're using MySQL, you might want to set the engine=innodb option.
+Also, if you are using MySQL, you might want to set the engine=innodb option.
 
 See scripts/create.table.pl and scripts/drop.table.pl for an easy way to do all this.
 
 =head2 Can this module be used in any module?
 
-Yes. See t/test.t, which passes undef as the first parameter to each method, because there is no $self available.
+Yes. See t/test.t, which passes undef as the first parameter to each method, because there is no
+$self available.
 
-Alternately, if you 'use' this module within any other module, calling $self -> log() will work.
+Alternately, if you 'use' this module within any other module, calling $self -> log() will
+work.
 
-It's used in L<CGI::Snapp::Demo::Four::Wrapper>, which inherits from L<CGI::Snapp::Demo::Four>, which inherits from L<CGI::Snapp>. So, even though L<CGI::Snapp> has its own
-log() method, the one imported from the current module overrides that one.
+It is used in L<CGI::Snapp::Demo::Four::Wrapper>, which inherits from L<CGI::Snapp::Demo::Four>,
+which inherits from L<CGI::Snapp>.
 
-=head2 Why can't I call $log_object -> info($message) etc as with Log::Handler?
+=head2 Why can I not call $log_object -> info($message) etc as with Log::Handler?
 
-Because it's I<not> true that an object of type L<Log::Handler::Output::DBI> (the underlying object here) 'isa' L<Log::Handler>.
-
-=head2 Why don't you 'use Exporter;'?
-
-It is not needed; it would be for documentation only.
-
-For the record, Exporter V 5.567 ships with Perl 5.8.0. That's what I had in Build.PL and Makefile.PL until I tested the fact I can omit it.
-
-=head1 See Also
-
-L<CGI::Application>
-
-The following are all part of this set of distros:
-
-L<CGI::Snapp> - A almost back-compat fork of CGI::Application
-
-=head1 See Also
-
-L<CGI::Application>
-
-The following are all part of this set of distros:
-
-L<CGI::Snapp> - A almost back-compat fork of CGI::Application
-
-L<CGI::Snapp::Demo::One> - A template-free demo of CGI::Snapp using just 1 run mode
-
-L<CGI::Snapp::Demo::Two> - A template-free demo of CGI::Snapp using N run modes
-
-L<CGI::Snapp::Demo::Three> - A template-free demo of CGI::Snapp using the forward() method
-
-L<CGI::Snapp::Demo::Four> - A template-free demo of CGI::Snapp using Log::Handler::Plugin::DBI
-
-L<CGI::Snapp::Demo::Four::Wrapper> - A wrapper around CGI::Snapp::Demo::Four, to simplify using Log::Handler::Plugin::DBI
-
-L<Config::Plugin::Tiny> - A plugin which uses Config::Tiny
-
-L<Config::Plugin::TinyManifold> - A plugin which uses Config::Tiny with 1 of N sections
-
-L<Data::Session> - Persistent session data management
-
-L<Log::Handler::Plugin::DBI> - A plugin for Log::Handler using Log::Hander::Output::DBI
-
-L<Log::Handler::Plugin::DBI::CreateTable> - A helper for Log::Hander::Output::DBI to create your 'log' table
+Because it is I<not> true that an object of type L<Log::Handler::Output::DBI> (the underlying
+object here) 'isa' L<Log::Handler>.
 
 =head1 Machine-Readable Change Log
 
@@ -264,10 +229,9 @@ The file CHANGES was converted into Changelog.ini by L<Module::Metadata::Changes
 
 Version numbers < 1.00 represent development versions. From 1.00 up, they are production versions.
 
-=head1 Credits
+=head1 Repository
 
-Please read L<https://metacpan.org/module/CGI::Application::Plugin::Config::Simple#AUTHOR>, since a lot of the ideas for this module were copied from
-L<CGI::Application::Plugin::Config::Simple>.
+L<https://github.com/ronsavage/Log-Handler-Plugin-DBI.git>
 
 =head1 Support
 

@@ -1,6 +1,6 @@
 package TOML::Tiny::Tokenizer;
 # ABSTRACT: tokenizer used by TOML::Tiny
-$TOML::Tiny::Tokenizer::VERSION = '0.09';
+$TOML::Tiny::Tokenizer::VERSION = '0.10';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -251,7 +251,7 @@ TOML::Tiny::Tokenizer - tokenizer used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 AUTHOR
 

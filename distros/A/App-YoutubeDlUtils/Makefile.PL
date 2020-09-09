@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-YoutubeDlUtils",
   "EXE_FILES" => [
+    "script/youtube-dl-play",
     "script/youtube-dl-playlist",
     "script/youtube-dl-timestamp"
   ],
@@ -21,7 +22,11 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::YoutubeDlUtils",
   "PREREQ_PM" => {
+    "CLI::Meta::YoutubeDl" => 0,
+    "Getopt::Long" => "2.50",
+    "IPC::System::Options" => "0.335",
     "Log::ger" => "0.037",
+    "Log::ger::Screen" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -31,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,10 +44,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "CLI::Meta::YoutubeDl" => 0,
   "File::Spec" => 0,
+  "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "IPC::System::Options" => "0.335",
   "Log::ger" => "0.037",
+  "Log::ger::Screen" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0
