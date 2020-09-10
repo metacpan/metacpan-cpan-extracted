@@ -3,7 +3,7 @@ package App::YoutubeDlUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-09-09'; # DATE
 our $DIST = 'App-YoutubeDlUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +32,7 @@ App::YoutubeDlUtils - Utilities (mostly wrappers) related to youtube-dl
 
 =head1 VERSION
 
-This document describes version 0.005 of App::YoutubeDlUtils (from Perl distribution App-YoutubeDlUtils), released on 2020-09-09.
+This document describes version 0.007 of App::YoutubeDlUtils (from Perl distribution App-YoutubeDlUtils), released on 2020-09-09.
 
 =head1 HOMEPAGE
 

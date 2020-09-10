@@ -60,5 +60,21 @@ subtest 'rx_from(observable)' => sub {
     is_deeply \@got, [50, 100, 150, '__DONE'], 'got correct values';
 };
 
+subtest 'rx_from(string)' => sub {
+    my @got;
+
+    my $o = rx_from("Hi there");
+
+    my $subscriber = {
+        next     => sub {push @got, shift},
+        error    => sub {push @got, "error:".shift},
+        complete => sub {push @got, '__DONE'},
+    };
+
+    $o->subscribe($subscriber);
+
+    is_deeply \@got, ['H', 'i', ' ', 't', 'h', 'e', 'r', 'e', '__DONE'], 'got correct values';
+};
+
 done_testing();
 

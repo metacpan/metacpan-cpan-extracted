@@ -1,7 +1,7 @@
 package Text::Table::HTML::DataTables;
 
-our $DATE = '2016-12-29'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2020-09-09'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -109,7 +109,7 @@ Text::Table::HTML::DataTables - Generate HTML table with jQuery and DataTables p
 
 =head1 VERSION
 
-This document describes version 0.002 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2016-12-29.
+This document describes version 0.003 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2020-09-09.
 
 =head1 SYNOPSIS
 
@@ -197,7 +197,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

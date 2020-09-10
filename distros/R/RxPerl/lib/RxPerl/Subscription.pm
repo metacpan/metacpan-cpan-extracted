@@ -4,7 +4,7 @@ use warnings;
 
 use Scalar::Util 'blessed', 'reftype', 'weaken';
 
-our $VERSION = "v0.18.1";
+our $VERSION = "v0.21.0";
 
 sub new {
     my ($class) = @_;
@@ -30,7 +30,7 @@ sub _execute_item {
         elsif (defined blessed($item) and $item->isa('RxPerl::Subscription')) {
             $item->unsubscribe unless $item eq $self;
         }
-        elsif (reftype $item eq 'ARRAY') {
+        elsif (reftype $item eq 'ARRAY' and not defined blessed($item)) {
             $self->_execute_item($_) foreach @$item;
         }
         elsif (reftype $item eq 'REF') {

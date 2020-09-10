@@ -16,7 +16,6 @@ WriteMakefile(
         "LWP::UserAgent"           => "5.837",
         "SMS::Send"                => "1.06",
     },
-    PREREQ_FATAL    => 1,
     TEST_REQUIRES   => {
         "Test::More"          => "0.88",
     },

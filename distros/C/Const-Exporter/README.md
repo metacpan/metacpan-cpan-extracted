@@ -4,7 +4,7 @@ Const::Exporter - Declare constants for export.
 
 # VERSION
 
-version v0.4.1
+version v0.4.2
 
 # SYNOPSIS
 
@@ -343,11 +343,11 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # CONTRIBUTOR
 
-B. Estrade <estrabd@gmail.com>
+B. Estrade <estrabd@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2014-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

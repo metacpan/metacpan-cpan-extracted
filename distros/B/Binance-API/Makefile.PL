@@ -36,7 +36,6 @@ WriteMakefile(
     AUTHOR          => 'Lari Taskula <lari@taskula.fi>',
     ABSTRACT        => 'Perl module for interacting with the Binance API.',
     PREREQ_PM       => $Binance::PerlDependencies::required,
-    PREREQ_FATAL    => 1,
     TEST_REQUIRES   => $Binance::PerlDependencies::required_test,
     META_MERGE      => {
         'meta-spec' => { version => 2 },

@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  0.039 9 September 2020
+
+        * Fixes for failing tests
+          https://github.com/pmqs/Archive-Zip-SimpleZip/issues/15
+          1ad172cad899bc8bc0aa31aff1fabcad294a26d8
+
   0.038 7 September 2020
 
         * make test more robust

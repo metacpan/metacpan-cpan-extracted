@@ -45,7 +45,8 @@ static const char * const errors[EEAV_MAX] = {
     "infrastructure TLD"                    /* EEAV_TLD_INFRASTRUCTURE */,
     "sponsored TLD"                         /* EEAV_TLD_SPONSORED */,
     "test TLD"                              /* EEAV_TLD_TEST */,
-    "special TLD"                           /* EEAV_TLD_SPECIAL */
+    "special TLD"                           /* EEAV_TLD_SPECIAL */,
+    "retired TLD"                           /* EEAV_TLD_RETIRED */
 };
 
 

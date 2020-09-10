@@ -131,11 +131,16 @@ B<EAV_TLD_INFRASTRUCTURE> - infrastructure TLDs.
 =item *
 
 B<EAV_TLD_NOT_ASSIGNED> - not assigned TLDs. At IANA website they are listed
-as "Not assigned" in the "Sponsoring Organisation" field.
+as "Not assigned" in the "TLD MANAGER" field.
 
 =item *
 
 B<EAV_TLD_SPONSORED> - sponsored TLDs.
+
+=item *
+
+B<EAV_TLD_RETIRED> - retired TLDs. At IANA website they are listed
+as "Retired" in the "TLD MANAGER" field.
 
 =item *
 

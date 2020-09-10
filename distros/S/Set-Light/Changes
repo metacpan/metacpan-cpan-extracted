@@ -1,5 +1,16 @@
 History Revision for Set-Light:
 
+0.94      2020-09-09 18:54:16+01:00 Europe/London
+  [Documentation]
+  - Cleaned up POD for the constructor.
+
+  - Documented minimum version for the members method.
+
+  - Bumped copyright year.
+
+ [Toolchain]
+  - Add core modules in the prerequisites.
+
 0.93      2019-10-27 11:51:24+00:00 Europe/London
   [Bug Fixes]
   - Use CORE::exists for internal use of exists function.

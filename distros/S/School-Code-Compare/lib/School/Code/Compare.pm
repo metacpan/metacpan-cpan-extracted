@@ -1,6 +1,6 @@
 package School::Code::Compare;
 # ABSTRACT: 'naive' metrics for code similarity
-$School::Code::Compare::VERSION = '0.101';
+$School::Code::Compare::VERSION = '0.104';
 use strict;
 use warnings;
 
@@ -137,7 +137,7 @@ School::Code::Compare - 'naive' metrics for code similarity
 
 =head1 VERSION
 
-version 0.101
+version 0.104
 
 =head1 SYNOPSIS
 
@@ -148,16 +148,16 @@ For documentation of the used libraries, keep on reading.
 This calculates the Levenshtein Difference for two files, if they meet certain criterias:
 
  use School::Code::Compare;
-
- my $comparer   = School::Code::Compare->new()                                      
-                                       ->set_max_relative_difference(2)             
-                                       ->set_min_char_total        (20)             
-                                       ->set_max_relative_distance(0.8);         
-                                                                                    
- my $comparison1 = $comparer->measure('use v5.22; say "Hi"!',               
-                                      'use v5.22; say "Hello";'                     
-                                   );                                           
- print $comparison1->{distance} if $comparison #
+ 
+ my $comparer   = School::Code::Compare->new()
+                                       ->set_max_relative_difference(2)
+                                       ->set_min_char_total        (20)
+                                       ->set_max_relative_distance(0.8);
+ 
+ my $comparison = $comparer->measure('use v5.22; say "Hi"!',
+                                      'use v5.22; say "Hello";'
+                                     );
+ print $comparison->{distance} if $comparison
 
 =head1 FUNCTIONS
 
@@ -180,12 +180,12 @@ Gives back a hash reference with different information:
 
  # (example output from synopsis)
  {
-     'delta_length' => 3,
-     'length1' => 20,
-     'ratio' => 79,
-     'length2' => 23,
      'comment' => 'comparison done',
+     'delta_length' => 3,
      'distance' => 5
+     'length1' => 20,
+     'length2' => 23,
+     'ratio' => 79,
  };
 
 =over 4
@@ -222,7 +222,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Boris Däppen.
+This software is copyright (c) 2020 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

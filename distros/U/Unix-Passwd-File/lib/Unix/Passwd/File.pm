@@ -1,9 +1,11 @@
-package Unix::Passwd::File;
-
 ## no critic (InputOutput::RequireBriefOpen)
 
-our $DATE = '2017-11-06'; # DATE
-our $VERSION = '0.250'; # VERSION
+package Unix::Passwd::File;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-29'; # DATE
+our $DIST = 'Unix-Passwd-File'; # DIST
+our $VERSION = '0.251'; # VERSION
 
 use 5.010001;
 use strict;
@@ -76,9 +78,8 @@ our $re_posint = qr/\A[1-9][0-9]*\z/;
 our %passwd_fields = (
     user => {
         summary => 'User (login) name',
-        schema  => ['str*' => {match => $re_user}],
+        schema  => ['unix::username*' => {match => $re_user}],
         pos     => 0,
-        'x.schema.entity' => 'unix_user',
     },
     pass => {
         summary => 'Password, generally should be "x" which means password is '.
@@ -88,15 +89,13 @@ our %passwd_fields = (
     },
     uid => {
         summary => 'Numeric user ID',
-        schema  => 'int*',
+        schema  => 'unix::uid*',
         pos     => 2,
-        'x.schema.entity' => 'unix_uid',
     },
     gid => {
         summary => 'Numeric primary group ID for this user',
-        schema  => 'int*',
+        schema  => 'unix::gid*',
         pos     => 3,
-        'x.schema.entity' => 'unix_gid',
     },
     gecos => {
         summary => 'Usually, it contains the full username',
@@ -105,14 +104,13 @@ our %passwd_fields = (
     },
     home => {
         summary => 'User\'s home directory',
-        schema  => ['str*' => {match => $re_field}],
+        schema  => ['dirname*' => {match => $re_field}],
         pos     => 5,
     },
     shell => {
         summary => 'User\'s shell',
-        schema  => ['str*' => {match=>qr/\A[^\n:]*\z/}],
+        schema  => ['filename*' => {match=>qr/\A[^\n:]*\z/}],
         pos     => 6,
-        # XXX x.schema.entity => prog (or, filename + x filter)
     },
 );
 our @passwd_field_names;
@@ -124,9 +122,8 @@ for (keys %passwd_fields) {
 our %shadow_fields = (
     user => {
         summary => 'User (login) name',
-        schema  => ['str*' => {match => $re_user}],
+        schema  => ['unix::username*' => {match => $re_user}],
         pos     => 0,
-        'x.schema.entity' => 'unix_user',
     },
     encpass => {
         summary => 'Encrypted password',
@@ -185,9 +182,8 @@ for (keys %shadow_fields) {
 our %group_fields = (
     group => {
         summary => 'Group name',
-        schema  => ['str*' => {match => $re_group}],
+        schema  => ['unix::groupname*' => {match => $re_group}],
         pos     => 0,
-        'x.schema.entity' => 'unix_group',
     },
     pass => {
         summary => 'Password, generally should be "x" which means password is '.
@@ -197,9 +193,8 @@ our %group_fields = (
     },
     gid => {
         summary => 'Numeric group ID',
-        schema  => 'int*',
+        schema  => 'unix::gid*',
         pos     => 2,
-        'x.schema.entity' => 'unix_gid',
     },
     members => {
         summary => 'List of usernames that are members of this group, '.
@@ -217,9 +212,8 @@ for (keys %group_fields) {
 our %gshadow_fields = (
     group => {
         summary => 'Group name',
-        schema  => ['str*' => {match => $re_group}],
+        schema  => ['unix::groupname*' => {match => $re_group}],
         pos     => 0,
-        'x.schema.entity' => 'unix_group',
     },
     encpass => {
         summary => 'Encrypted password',
@@ -577,12 +571,10 @@ _
     args => {
         %common_args,
         user => {
-            schema => 'str*',
-            'x.schema.entity' => 'unix_user',
+            schema => 'unix::username*',
         },
         uid => {
-            schema => 'int*',
-            'x.schema.entity' => 'unix_uid',
+            schema => 'unix::uid*',
         },
         with_field_names => {
             summary => 'If false, don\'t return hash',
@@ -641,12 +633,10 @@ $SPEC{user_exists} = {
     args => {
         %common_args,
         user => {
-            schema => 'str*',
-            'x.schema.entity' => 'unix_user',
+            schema => 'unix::username*',
         },
         uid => {
-            schema => 'int*',
-            'x.schema.entity' => 'unix_uid',
+            schema => 'unix::uid*',
         },
     },
     result_naked => 1,
@@ -736,12 +726,10 @@ _
     args => {
         %common_args,
         group => {
-            schema => 'str*',
-            'x.schema.entity' => 'unix_user',
+            schema => 'unix::username*',
         },
         gid => {
-            schema => 'int*',
-            'x.schema.entity' => 'unix_gid',
+            schema => 'unix::gid*',
         },
         with_field_names => {
             summary => 'If false, don\'t return hash',
@@ -871,12 +859,10 @@ $SPEC{group_exists} = {
     args => {
         %common_args,
         group => {
-            schema => 'str*',
-            'x.schema.entity' => 'unix_group',
+            schema => 'unix::groupname*',
         },
         gid => {
-            schema => 'int*',
-            'x.schema.entity' => 'unix_gid',
+            schema => 'unix::gid*',
         },
     },
     result_naked => 1,
@@ -898,10 +884,9 @@ $SPEC{get_user_groups} = {
     args => {
         %common_args,
         user => {
-            schema => 'str*',
+            schema => 'unix::username*',
             req => 1,
             pos => 0,
-            'x.schema.entity' => 'unix_user',
         },
         detail => {
             summary => 'If true, return all fields instead of just group names',
@@ -973,16 +958,14 @@ $SPEC{is_member} = {
     args => {
         %common_args,
         user => {
-            schema => 'str*',
+            schema => 'unix::username*',
             req => 1,
             pos => 0,
-            'x.schema.entity' => 'unix_user',
         },
         group => {
-            schema => 'str*',
+            schema => 'unix::groupname*',
             req => 1,
             pos => 1,
-            'x.schema.entity' => 'unix_group',
         },
     },
     result_naked => 1,
@@ -1210,20 +1193,18 @@ $SPEC{add_group} = {
         %common_args,
         %write_args,
         group => {
-            schema => 'str*',
+            schema => 'unix::groupname*',
             req => 1,
             pos => 0,
-            #'x.schema.entity' => 'unix_group', # XXX new
         },
         gid => {
             summary => 'Pick a specific new GID',
-            schema => 'int*',
+            schema => 'unix::gid*',
             description => <<'_',
 
 Adding a new group with duplicate GID is allowed.
 
 _
-            #'x.schema.entity' => 'unix_gid', # XXX new
         },
         min_gid => {
             summary => 'Pick a range for new GID',
@@ -1261,15 +1242,14 @@ $SPEC{add_user} = {
         %common_args,
         %write_args,
         user => {
-            schema => 'str*',
+            schema => 'unix::username*',
             req => 1,
             pos => 0,
-            #'x.schema.entity' => 'unix_user', # XXX new
         },
         group => {
             summary => 'Select primary group '.
                 '(default is group with same name as user)',
-            schema => 'str*',
+            schema => 'unix::groupname*',
             description => <<'_',
 
 Normally, a user's primary group with group with the same name as user, which
@@ -1278,7 +1258,6 @@ which must already exist (and in this case, the group with the same name as user
 will not be created).
 
 _
-            'x.schema.entity' => 'unix_group',
         },
         gid => {
             summary => 'Pick a specific GID when creating group',
@@ -1546,16 +1525,14 @@ $SPEC{add_user_to_group} = {
     args => {
         %common_args,
         user => {
-            schema => 'str*',
+            schema => 'unix::username*',
             req => 1,
             pos => 0,
-            'x.schema.entity' => 'unix_user',
         },
         group => {
-            schema => 'str*',
+            schema => 'unix::groupname*',
             req => 1,
             pos => 1,
-            'x.schema.entity' => 'unix_group',
         },
     },
 };
@@ -1587,16 +1564,14 @@ $SPEC{delete_user_from_group} = {
     args => {
         %common_args,
         user => {
-            schema => 'str*',
+            schema => 'unix::username*',
             req => 1,
             pos => 0,
-            'x.schema.entity' => 'unix_user',
         },
         group => {
-            schema => 'str*',
+            schema => 'unix::groupname*',
             req => 1,
             pos => 1,
-            'x.schema.entity' => 'unix_group',
         },
     },
 };
@@ -1644,20 +1619,17 @@ _
     args => {
         %common_args,
         user => {
-            schema => 'str*',
+            schema => 'unix::username*',
             req => 1,
             pos => 0,
-            'x.schema.entity' => 'unix_user',
         },
         add_to => {
             summary => 'List of group names to add the user as member of',
-            schema => [array => {of=>'str*', default=>[]}],
-            'x.schema.element_entity' => 'unix_group',
+            schema => [array => {of=>'unix::groupname*', default=>[]}],
         },
         delete_from => {
             summary => 'List of group names to remove the user as member of',
-            schema => [array => {of=>'str*', default=>[]}],
-            'x.schema.element_entity' => 'unix_group',
+            schema => [array => {of=>'unix::groupname*', default=>[]}],
         },
     },
 };
@@ -1707,14 +1679,13 @@ $SPEC{set_user_groups} = {
     args => {
         %common_args,
         user => {
-            schema => 'str*',
+            schema => 'unix::username*',
             req => 1,
             pos => 0,
-            'x.schema.entity' => 'unix_user',
         },
         groups => {
             summary => 'List of group names that user is member of',
-            schema => [array => {of=>'str*', default=>[]}],
+            schema => [array => {of=>'unix::groupname*', default=>[]}],
             req => 1,
             pos => 1,
             greedy => 1,
@@ -1723,7 +1694,6 @@ $SPEC{set_user_groups} = {
 Aside from this list, user will not belong to any other group.
 
 _
-            'x.schema.element_entity' => 'unix_group',
         },
     },
 };
@@ -1773,10 +1743,9 @@ $SPEC{set_user_password} = {
         %common_args,
         %write_args,
         user => {
-            schema => 'str*',
+            schema => 'unix::username*',
             req => 1,
             pos => 0,
-            'x.schema.entity' => 'unix_user',
         },
         pass => {
             schema => 'str*',
@@ -1894,10 +1863,9 @@ $SPEC{delete_group} = {
         %common_args,
         %write_args,
         group => {
-            schema => 'str*',
+            schema => 'unix::username*',
             req => 1,
             pos => 0,
-            'x.schema.entity' => 'unix_group',
         },
     },
 };
@@ -1912,10 +1880,9 @@ $SPEC{delete_user} = {
         %common_args,
         %write_args,
         user => {
-            schema => 'str*',
+            schema => 'unix::username*',
             req => 1,
             pos => 0,
-            'x.schema.entity' => 'unix_user',
         },
     },
 };
@@ -1938,7 +1905,7 @@ Unix::Passwd::File - Manipulate /etc/{passwd,shadow,group,gshadow} entries
 
 =head1 VERSION
 
-This document describes version 0.250 of Unix::Passwd::File (from Perl distribution Unix-Passwd-File), released on 2017-11-06.
+This document describes version 0.251 of Unix::Passwd::File (from Perl distribution Unix-Passwd-File), released on 2020-04-29.
 
 =head1 SYNOPSIS
 
@@ -2015,7 +1982,7 @@ No caching is done so you should do your own if you need to.
 
 Usage:
 
- add_delete_user_groups(%args) -> [status, msg, result, meta]
+ add_delete_user_groups(%args) -> [status, msg, payload, meta]
 
 Add or delete user from one or several groups.
 
@@ -2039,11 +2006,11 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<add_to> => I<array[str]> (default: [])
+=item * B<add_to> => I<array[unix::groupname]> (default: [])
 
 List of group names to add the user as member of.
 
-=item * B<delete_from> => I<array[str]> (default: [])
+=item * B<delete_from> => I<array[unix::groupname]> (default: [])
 
 List of group names to remove the user as member of.
 
@@ -2051,7 +2018,8 @@ List of group names to remove the user as member of.
 
 Specify location of passwd files.
 
-=item * B<user>* => I<str>
+=item * B<user>* => I<unix::username>
+
 
 =back
 
@@ -2060,18 +2028,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 add_group
 
 Usage:
 
- add_group(%args) -> [status, msg, result, meta]
+ add_group(%args) -> [status, msg, payload, meta]
 
 Add a new group.
 
@@ -2092,13 +2061,13 @@ will not be backed up. Previous backup will be overwritten.
 
 Specify location of passwd files.
 
-=item * B<gid> => I<int>
+=item * B<gid> => I<unix::gid>
 
 Pick a specific new GID.
 
 Adding a new group with duplicate GID is allowed.
 
-=item * B<group>* => I<str>
+=item * B<group>* => I<unix::groupname>
 
 =item * B<max_gid> => I<int> (default: 65535)
 
@@ -2118,6 +2087,7 @@ Pick a range for new GID.
 If a free GID between C<min_gid> and C<max_gid> is not found, error 412 is
 returned.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2125,18 +2095,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 add_user
 
 Usage:
 
- add_user(%args) -> [status, msg, result, meta]
+ add_user(%args) -> [status, msg, payload, meta]
 
 Add a new user.
 
@@ -2175,7 +2146,7 @@ Pick a specific GID when creating group.
 
 Duplicate GID is allowed.
 
-=item * B<group> => I<str>
+=item * B<group> => I<unix::groupname>
 
 Select primary group (default is group with same name as user).
 
@@ -2184,7 +2155,7 @@ will be created if does not already exist. You can pick another group here,
 which must already exist (and in this case, the group with the same name as user
 will not be created).
 
-=item * B<home> => I<str>
+=item * B<home> => I<dirname>
 
 User's home directory.
 
@@ -2234,7 +2205,7 @@ The number of days after a password has expired (see max_pass_age) during which 
 
 The number of days before a password is going to expire (see max_pass_age) during which the user should be warned.
 
-=item * B<shell> => I<str>
+=item * B<shell> => I<filename>
 
 User's shell.
 
@@ -2244,7 +2215,8 @@ Pick a specific new UID.
 
 Adding a new user with duplicate UID is allowed.
 
-=item * B<user>* => I<str>
+=item * B<user>* => I<unix::username>
+
 
 =back
 
@@ -2253,18 +2225,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 add_user_to_group
 
 Usage:
 
- add_user_to_group(%args) -> [status, msg, result, meta]
+ add_user_to_group(%args) -> [status, msg, payload, meta]
 
 Add user to a group.
 
@@ -2278,9 +2251,10 @@ Arguments ('*' denotes required arguments):
 
 Specify location of passwd files.
 
-=item * B<group>* => I<str>
+=item * B<group>* => I<unix::groupname>
 
-=item * B<user>* => I<str>
+=item * B<user>* => I<unix::username>
+
 
 =back
 
@@ -2289,18 +2263,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 delete_group
 
 Usage:
 
- delete_group(%args) -> [status, msg, result, meta]
+ delete_group(%args) -> [status, msg, payload, meta]
 
 Delete a group.
 
@@ -2321,7 +2296,8 @@ will not be backed up. Previous backup will be overwritten.
 
 Specify location of passwd files.
 
-=item * B<group>* => I<str>
+=item * B<group>* => I<unix::username>
+
 
 =back
 
@@ -2330,18 +2306,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 delete_user
 
 Usage:
 
- delete_user(%args) -> [status, msg, result, meta]
+ delete_user(%args) -> [status, msg, payload, meta]
 
 Delete a user.
 
@@ -2362,7 +2339,8 @@ will not be backed up. Previous backup will be overwritten.
 
 Specify location of passwd files.
 
-=item * B<user>* => I<str>
+=item * B<user>* => I<unix::username>
+
 
 =back
 
@@ -2371,18 +2349,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 delete_user_from_group
 
 Usage:
 
- delete_user_from_group(%args) -> [status, msg, result, meta]
+ delete_user_from_group(%args) -> [status, msg, payload, meta]
 
 Delete user from a group.
 
@@ -2396,9 +2375,10 @@ Arguments ('*' denotes required arguments):
 
 Specify location of passwd files.
 
-=item * B<group>* => I<str>
+=item * B<group>* => I<unix::groupname>
 
-=item * B<user>* => I<str>
+=item * B<user>* => I<unix::username>
+
 
 =back
 
@@ -2407,18 +2387,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 get_group
 
 Usage:
 
- get_group(%args) -> [status, msg, result, meta]
+ get_group(%args) -> [status, msg, payload, meta]
 
 Get group details by group name or gid.
 
@@ -2436,9 +2417,9 @@ Arguments ('*' denotes required arguments):
 
 Specify location of passwd files.
 
-=item * B<gid> => I<int>
+=item * B<gid> => I<unix::gid>
 
-=item * B<group> => I<str>
+=item * B<group> => I<unix::username>
 
 =item * B<with_field_names> => I<bool> (default: 1)
 
@@ -2448,6 +2429,7 @@ By default, a hashref is returned containing field names and its values, e.g.
 C<< {group=E<gt>"titin", pass=E<gt>"x", gid=E<gt>500, ...} >>. With C<< with_field_names=E<gt>0 >>, an
 arrayref is returned instead: C<["titin", "x", 500, ...]>.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2455,18 +2437,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 get_max_gid
 
 Usage:
 
- get_max_gid(%args) -> [status, msg, result, meta]
+ get_max_gid(%args) -> [status, msg, payload, meta]
 
 Get maximum GID used.
 
@@ -2480,6 +2463,7 @@ Arguments ('*' denotes required arguments):
 
 Specify location of passwd files.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2487,18 +2471,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 get_max_uid
 
 Usage:
 
- get_max_uid(%args) -> [status, msg, result, meta]
+ get_max_uid(%args) -> [status, msg, payload, meta]
 
 Get maximum UID used.
 
@@ -2512,6 +2497,7 @@ Arguments ('*' denotes required arguments):
 
 Specify location of passwd files.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2519,18 +2505,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 get_user
 
 Usage:
 
- get_user(%args) -> [status, msg, result, meta]
+ get_user(%args) -> [status, msg, payload, meta]
 
 Get user details by username or uid.
 
@@ -2548,9 +2535,9 @@ Arguments ('*' denotes required arguments):
 
 Specify location of passwd files.
 
-=item * B<uid> => I<int>
+=item * B<uid> => I<unix::uid>
 
-=item * B<user> => I<str>
+=item * B<user> => I<unix::username>
 
 =item * B<with_field_names> => I<bool> (default: 1)
 
@@ -2560,6 +2547,7 @@ By default, a hashref is returned containing field names and its values, e.g.
 C<< {user=E<gt>"titin", pass=E<gt>"x", uid=E<gt>500, ...} >>. With C<< with_field_names=E<gt>0 >>, an
 arrayref is returned instead: C<["titin", "x", 500, ...]>.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2567,18 +2555,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 get_user_groups
 
 Usage:
 
- get_user_groups(%args) -> [status, msg, result, meta]
+ get_user_groups(%args) -> [status, msg, payload, meta]
 
 Return groups which the user belongs to.
 
@@ -2596,7 +2585,7 @@ If true, return all fields instead of just group names.
 
 Specify location of passwd files.
 
-=item * B<user>* => I<str>
+=item * B<user>* => I<unix::username>
 
 =item * B<with_field_names> => I<bool> (default: 1)
 
@@ -2607,6 +2596,7 @@ field names and its values, e.g. C<< {group=E<gt>"titin", pass=E<gt>"x", gid=E<g
 With C<< with_field_names=E<gt>0 >>, an arrayref is returned instead: C<["titin", "x",
 500, ...]>.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2614,11 +2604,12 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 group_exists
@@ -2639,13 +2630,15 @@ Arguments ('*' denotes required arguments):
 
 Specify location of passwd files.
 
-=item * B<gid> => I<int>
+=item * B<gid> => I<unix::gid>
 
-=item * B<group> => I<str>
+=item * B<group> => I<unix::groupname>
+
 
 =back
 
 Return value:  (bool)
+
 
 
 =head2 is_member
@@ -2666,20 +2659,22 @@ Arguments ('*' denotes required arguments):
 
 Specify location of passwd files.
 
-=item * B<group>* => I<str>
+=item * B<group>* => I<unix::groupname>
 
-=item * B<user>* => I<str>
+=item * B<user>* => I<unix::username>
+
 
 =back
 
 Return value:  (bool)
 
 
+
 =head2 list_groups
 
 Usage:
 
- list_groups(%args) -> [status, msg, result, meta]
+ list_groups(%args) -> [status, msg, payload, meta]
 
 List Unix groups in group file.
 
@@ -2706,6 +2701,7 @@ field names and its values, e.g. C<< {group=E<gt>"titin", pass=E<gt>"x", gid=E<g
 With C<< with_field_names=E<gt>0 >>, an arrayref is returned instead: C<["titin", "x",
 500, ...]>.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2713,18 +2709,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_users
 
 Usage:
 
- list_users(%args) -> [status, msg, result, meta]
+ list_users(%args) -> [status, msg, payload, meta]
 
 List Unix users in passwd file.
 
@@ -2751,6 +2748,7 @@ field names and its values, e.g. C<< {user=E<gt>"titin", pass=E<gt>"x", uid=E<gt
 With C<< with_field_names=E<gt>0 >>, an arrayref is returned instead: C<["titin", "x",
 500, ...]>.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2758,20 +2756,21 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_users_and_groups
 
 Usage:
 
- list_users_and_groups(%args) -> [status, msg, result, meta]
+ list_users_and_groups(%args) -> [status, msg, payload, meta]
 
-List Unix users and groups in passwd/group files.
+List Unix users and groups in passwdE<sol>group files.
 
 This is basically C<list_users()> and C<list_groups()> combined, so you can get
 both data in a single call. Data is returned in an array. Users list is in the
@@ -2795,6 +2794,7 @@ Specify location of passwd files.
 
 If false, don't return hash for each entry.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2802,18 +2802,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 modify_group
 
 Usage:
 
- modify_group(%args) -> [status, msg, result, meta]
+ modify_group(%args) -> [status, msg, payload, meta]
 
 Modify an existing group.
 
@@ -2845,11 +2846,11 @@ Encrypted password.
 
 Specify location of passwd files.
 
-=item * B<gid> => I<int>
+=item * B<gid> => I<unix::gid>
 
 Numeric group ID.
 
-=item * B<group>* => I<str>
+=item * B<group>* => I<unix::groupname>
 
 Group name.
 
@@ -2861,6 +2862,7 @@ List of usernames that are members of this group, separated by commas.
 
 Password, generally should be "x" which means password is encrypted in gshadow.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -2868,18 +2870,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 modify_user
 
 Usage:
 
- modify_user(%args) -> [status, msg, result, meta]
+ modify_user(%args) -> [status, msg, payload, meta]
 
 Modify an existing user.
 
@@ -2915,11 +2918,11 @@ The date of expiration of the account, expressed as the number of days since Jan
 
 Usually, it contains the full username.
 
-=item * B<gid> => I<int>
+=item * B<gid> => I<unix::gid>
 
 Numeric primary group ID for this user.
 
-=item * B<home> => I<str>
+=item * B<home> => I<dirname>
 
 User's home directory.
 
@@ -2943,17 +2946,18 @@ The number of days after a password has expired (see max_pass_age) during which 
 
 The number of days before a password is going to expire (see max_pass_age) during which the user should be warned.
 
-=item * B<shell> => I<str>
+=item * B<shell> => I<filename>
 
 User's shell.
 
-=item * B<uid> => I<int>
+=item * B<uid> => I<unix::uid>
 
 Numeric user ID.
 
-=item * B<user>* => I<str>
+=item * B<user>* => I<unix::username>
 
 User (login) name.
+
 
 =back
 
@@ -2962,18 +2966,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 set_user_groups
 
 Usage:
 
- set_user_groups(%args) -> [status, msg, result, meta]
+ set_user_groups(%args) -> [status, msg, payload, meta]
 
 Set the groups that a user is member of.
 
@@ -2987,13 +2992,14 @@ Arguments ('*' denotes required arguments):
 
 Specify location of passwd files.
 
-=item * B<groups>* => I<array[str]> (default: [])
+=item * B<groups>* => I<array[unix::groupname]> (default: [])
 
 List of group names that user is member of.
 
 Aside from this list, user will not belong to any other group.
 
-=item * B<user>* => I<str>
+=item * B<user>* => I<unix::username>
+
 
 =back
 
@@ -3002,18 +3008,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 set_user_password
 
 Usage:
 
- set_user_password(%args) -> [status, msg, result, meta]
+ set_user_password(%args) -> [status, msg, payload, meta]
 
 Set user's password.
 
@@ -3036,7 +3043,8 @@ Specify location of passwd files.
 
 =item * B<pass>* => I<str>
 
-=item * B<user>* => I<str>
+=item * B<user>* => I<unix::username>
+
 
 =back
 
@@ -3045,11 +3053,12 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 user_exists
@@ -3070,9 +3079,10 @@ Arguments ('*' denotes required arguments):
 
 Specify location of passwd files.
 
-=item * B<uid> => I<int>
+=item * B<uid> => I<unix::uid>
 
-=item * B<user> => I<str>
+=item * B<user> => I<unix::username>
+
 
 =back
 
@@ -3143,7 +3153,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

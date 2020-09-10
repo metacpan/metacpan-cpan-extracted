@@ -8,7 +8,7 @@ use Number::Phone::Normalize;
 
 use base 'SMS::Send::Driver';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -72,7 +72,7 @@ SMS::Send::BudgetSMS - SMS::Send driver to send messages via BudgetSMS, L<https:
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

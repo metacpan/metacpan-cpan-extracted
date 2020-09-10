@@ -1,0 +1,32 @@
+---
+abstract: 'Perl module for interacting with the Binance API.'
+author:
+  - 'Lari Taskula <lari@taskula.fi>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  Test::Warn: '0.36'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Binance-API
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exception::Class: '1.38'
+  JSON: '2.07'
+  LWP::Protocol::https: '6.04'
+  LWP::UserAgent: '5.837'
+resources:
+  bugtracker: https://github.com/taskula/binance-perl-api/issues
+  homepage: https://github.com/taskula/binance-perl-api
+  repository: https://github.com/taskula/binance-perl-api.git
+version: '1.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

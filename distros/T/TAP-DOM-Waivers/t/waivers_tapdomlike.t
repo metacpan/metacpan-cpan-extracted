@@ -56,7 +56,8 @@ is($tapdom->{affe}{zomtec}{summary}{has_problems}, 1,      "$comment - summary h
 # the actual DOM patching
 my $patched_tapdom = waive($tapdom, $waivers);
 # diag Dumper($patched_tapdom);
-my $tapdom3        = { affe => { zomtec => TAP::DOM->new( tap => $patched_tapdom->{affe}{zomtec}->to_tap ) } };
+my $patched_tap    = $patched_tapdom->{affe}{zomtec}->to_tap;
+my $tapdom3        = { affe => { zomtec => TAP::DOM->new( tap => $patched_tap ) } };
 
 $comment = "waivers for IPv6";
 #

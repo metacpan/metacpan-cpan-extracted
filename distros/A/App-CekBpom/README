@@ -3,7 +3,7 @@ NAME
     for cekbpom.pom.go.id)
 
 VERSION
-    This document describes version 0.005 of App::CekBpom (from Perl
+    This document describes version 0.007 of App::CekBpom (from Perl
     distribution App-CekBpom), released on 2020-09-09.
 
 DESCRIPTION
@@ -17,6 +17,12 @@ FUNCTIONS
 
     Search BPOM products via https://cekbpom.pom.go.id/.
 
+    Examples:
+
+    *   By default search against name (nama_produk) and brand (merk):
+
+         cek_bpom( queries => ["hichew", "hi-chew", "hi chew"]);
+
     Uses LWP::UserAgent::Plugin so you can add retry, caching, or additional
     HTTP client behavior by setting "LWP_USERAGENT_PLUGINS" environment
     variable.
@@ -25,11 +31,21 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   query* => *str*
+    *   queries* => *array[str]*
 
-    *   search_type => *str* (default: "nama_produk")
+    *   search_types => *array[str]*
 
-        Select what field to search against.
+        Select what field(s) to search against.
+
+        By default, if not specified, will search against product name
+        ("nama_produk") and brand ("merk"). If you specify multiple times,
+        it will search against all those types, e.g.:
+
+         --search-type nama_produk --search-type nama_pendaftar
+
+        or:
+
+         --nama-produk --nama-pendaftar
 
     Returns an enveloped result (an array).
 

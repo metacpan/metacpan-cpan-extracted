@@ -1,5 +1,8 @@
 Revision history for Perl module Mail::Pyzor
 
+0.05    Wed  9 Sep 2020
+- Fix syntax for Makefile.PL license declaration.
+
 0.04    Thu 27 Aug 2020
 - Fix now-outdated license declarations in source files.
 

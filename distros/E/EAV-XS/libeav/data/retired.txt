@@ -1,0 +1,10 @@
+#
+# old retired domains
+#
+retired@example.iinet
+retired@example.mtpc
+#
+# non-retired domains must fail
+#
+normal@github.com
+тест@испытание.рф

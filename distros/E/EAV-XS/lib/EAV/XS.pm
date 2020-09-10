@@ -51,7 +51,7 @@ characters without quoted-pairs.
 
 L<RFC 6531|https://tools.ietf.org/html/rfc6531>
 - allows Internationalized Email Addresses encoded in UTF-8.
-See also L<RFC 3629|https://tools.ietf.org/html/rfc3629>).
+See also L<RFC 3629|https://tools.ietf.org/html/rfc3629>.
 The B<RFC 6531> is based on the rules of the B<RFC 5321>.
 
 =back
@@ -116,12 +116,13 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
     TLD_SPONSORED
     TLD_TEST
     TLD_SPECIAL
+    TLD_RETIRED
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = ();
 
-our $VERSION = "0.4.11";
+our $VERSION = "0.5.0";
 
 require XSLoader;
 XSLoader::load('EAV::XS', $VERSION);
@@ -142,6 +143,7 @@ use constant TLD_INFRASTRUCTURE     => 0x00000040;
 use constant TLD_SPONSORED          => 0x00000080;
 use constant TLD_TEST               => 0x00000100;
 use constant TLD_SPECIAL            => 0x00000200;
+use constant TLD_RETIRED            => 0x00000400;
 
 1;
 __END__
@@ -311,6 +313,11 @@ TLD_INFRASTRUCTURE - allow infrastructure TLDs.
 =item *
 
 TLD_SPONSORED - allow sponsored TLDs.
+
+=item *
+
+TLD_RETIRED - allow retired TLDs. On IANA website they are listed
+as "Retired" in the "TLD Manager" field.
 
 =item *
 

@@ -1,16 +1,18 @@
 #!/usr/bin/env perl
-# Autor: Boris Däppen, 2015-2019
+# Autor: Boris Däppen, 2015-2020
 # No guarantee given, use at own risk and will
 
 # PODNAME: compare-code
-# ABSTRACT: find similar pieces of code (file based)
+# ABSTRACT: find files with similar code
 
 use strict;
 use warnings;
-no warnings 'experimental'; # disable warnings from given/when
-use v5.12;
+use v5.14; # we can use 'for/when' but not 'given/when'
 use utf8;
 use feature 'say';
+
+# because 'when' throws experimental warning after perl 5.18
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use File::Slurp;
 use File::Find::Rule;
@@ -321,7 +323,7 @@ say STDERR "\tdone";
 print STDERR "rendering...";
 
 my $format = 'CSV';
-given ($output_format) {
+for ($output_format) {
     $format = 'CSV'  when /^csv/;
     $format = 'HTML' when /^html/;
     $format = 'TAB'  when /^tab/;
@@ -379,11 +381,11 @@ __END__
 
 =head1 NAME
 
-compare-code - find similar pieces of code (file based)
+compare-code - find files with similar code
 
 =head1 VERSION
 
-version 0.101
+version 0.104
 
 =head1 SYNOPSIS
 
@@ -402,9 +404,11 @@ If you are unfamiliar with GNU/Linux you might want to read L<doc::Windows> in t
 
 =head2 Example Usage
 
- compare-code cpp -f list_of_filepaths.txt -o html -p
+ compare-code ./lib -i perl
 
- find path/to/projects -type f -name Cow.java | compare-code java 
+ compare-code -i cpp -f list_of_filepaths.txt -o html -p
+
+ find path/to/projects -type f -name Cow.java | compare-code -i java 
 
 =head2 Options
 
@@ -464,7 +468,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Boris Däppen.
+This software is copyright (c) 2020 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

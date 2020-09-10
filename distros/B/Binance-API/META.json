@@ -1,0 +1,62 @@
+{
+   "abstract" : "Perl module for interacting with the Binance API.",
+   "author" : [
+      "Lari Taskula <lari@taskula.fi>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Binance-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exception::Class" : "1.38",
+            "JSON" : "2.07",
+            "LWP::Protocol::https" : "6.04",
+            "LWP::UserAgent" : "5.837"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warn" : "0.36"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/taskula/binance-perl-api/issues"
+      },
+      "homepage" : "https://github.com/taskula/binance-perl-api",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/taskula/binance-perl-api.git",
+         "web" : "https://github.com/taskula/binance-perl-api"
+      }
+   },
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

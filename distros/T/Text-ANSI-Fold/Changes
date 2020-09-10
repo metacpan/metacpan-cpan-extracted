@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+1.09 2020-09-09T14:13:08Z
+
+    - Update W3C.pm to 2020 version.
+
 1.08 2020-07-13T00:05:27Z
 
     - Width parameter can take negative value and get the all rest.

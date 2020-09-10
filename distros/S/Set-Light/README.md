@@ -4,7 +4,7 @@ Set::Light - (memory efficient) unordered set of strings
 
 # VERSION
 
-version 0.93
+version 0.94
 
 # SYNOPSIS
 
@@ -58,21 +58,15 @@ These use even more memory and/or are slower than an ordinary hash.
 ## new
 
 ```perl
-my $set = Set::Light->new();
+my $set = Set::Light->new( \%opts, @members );
 ```
 
 Creates a new Set::Light object. An optionally passed hash reference can
 contain options.
 
+Any members passed to the constructor will be inserted.
+
 Currently no options are supported.
-
-Note that:
-
-```perl
-my $set = Set::Light->new( qw/for bar baz/);
-```
-
-will create a set with the members "for", "bar" and "baz".
 
 ## insert
 
@@ -162,6 +156,8 @@ my @members = $set->members;
 
 This returns an array of set members in an unsorted array.
 
+This was added in v0.91.
+
 # SEE ALSO
 
 [Set::Object](https://metacpan.org/pod/Set::Object), [Set::Scalar](https://metacpan.org/pod/Set::Scalar).
@@ -191,7 +187,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2004-2008, 2019 by Tels.
+This software is copyright (c) 2004-2008, 2019-2020 by Tels.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

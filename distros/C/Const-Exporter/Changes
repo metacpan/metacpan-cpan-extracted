@@ -1,5 +1,18 @@
 Revision history for Const-Exporter
 
+v0.4.2    2020-09-10 12:52:53+01:00 Europe/London
+  [Documentation]
+  - Added INSTALL file to the distribution.
+
+  - Updated copyright year.
+
+  [Toolchain]
+  - Added keywords to distribution metadata.
+
+  - Tweaks to dist.ini for simplifying build.
+
+  - Include core modules in prerequisites.
+
 v0.4.1    2018-05-08 16:14:23+01:00 Europe/London
   [Bug Fixes]
   - Use local variable for regex capture.
@@ -30,6 +43,8 @@ v0.4.0    2018-05-02 20:42:40+01:00 Europe/London
 
   [Toolchain]
   - Remove core and redundant prerequisites.
+
+  - Update module metadata.
 
 v0.3.1    2018-01-16 23:41:07+00:00 Europe/London
   [Enhancements]

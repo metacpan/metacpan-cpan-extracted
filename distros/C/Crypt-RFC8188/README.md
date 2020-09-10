@@ -53,7 +53,7 @@ A secret key to be exchanged by other means.
 
 ### $private\_key
 
-The private key of a [Crypt::PK::ECC](https://metacpan.org/pod/Crypt::PK::ECC) Prime 256 ECDSA key.
+The private key of a [Crypt::PK::ECC](https://metacpan.org/pod/Crypt%3A%3APK%3A%3AECC) Prime 256 ECDSA key.
 
 ### $dh
 

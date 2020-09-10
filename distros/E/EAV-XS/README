@@ -34,8 +34,8 @@ DESCRIPTION
 
     *   RFC 6531 <https://tools.ietf.org/html/rfc6531> - allows
         Internationalized Email Addresses encoded in UTF-8. See also RFC
-        3629 <https://tools.ietf.org/html/rfc3629>). The RFC 6531 is based
-        on the rules of the RFC 5321.
+        3629 <https://tools.ietf.org/html/rfc3629>. The RFC 6531 is based on
+        the rules of the RFC 5321.
 
     You may change the behavior of the RFC 6531 mode when building the
     module and enable support of the RFC 20
@@ -158,6 +158,9 @@ METHODS
     *   TLD_INFRASTRUCTURE - allow infrastructure TLDs.
 
     *   TLD_SPONSORED - allow sponsored TLDs.
+
+    *   TLD_RETIRED - allow retired TLDs. On IANA website they are listed as
+        "Retired" in the "TLD Manager" field.
 
     *   TLD_TEST - allow test TLDs.
 

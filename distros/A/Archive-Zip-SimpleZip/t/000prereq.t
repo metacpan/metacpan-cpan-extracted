@@ -23,9 +23,13 @@ BEGIN
     my @NAMES = qw(
             IO::Compress::Zip
             IO::Uncompress::Unzip
+            IO::Compress::RawDeflate
+            IO::Uncompress::RawInflate
 			);
 
     my @OPT = qw(
+            IO::Compress::Bzip2
+            IO::Uncompress::Bunzip2
             IO::Compress::Lzma
             IO::Uncompress::UnLzma
             IO::Compress::Xz

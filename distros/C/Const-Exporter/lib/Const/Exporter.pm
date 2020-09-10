@@ -7,7 +7,7 @@ use v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.4.1';
+our $VERSION = 'v0.4.2';
 
 use Carp;
 use Const::Fast;
@@ -242,7 +242,7 @@ Const::Exporter - Declare constants for export.
 
 =head1 VERSION
 
-version v0.4.1
+version v0.4.2
 
 =head1 SYNOPSIS
 
@@ -563,11 +563,11 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =for stopwords B. Estrade
 
-B. Estrade <estrabd@gmail.com>
+B. Estrade <estrabd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2014-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

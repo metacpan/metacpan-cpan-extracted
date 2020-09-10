@@ -22,7 +22,7 @@ use OTRS::OPM::Maker -command;
 use OTRS::OPM::Maker::Utils::OTRS3;
 use OTRS::OPM::Maker::Utils::OTRS4;
 
-our $VERSION = 1.39;
+our $VERSION = 1.41;
 
 sub abstract {
     return "build sopm file based on metadata";
@@ -117,6 +117,7 @@ sub execute {
         '3' => 'OTRS3',
         '4' => 'OTRS4',
         '5' => 'OTRS4',
+        '6' => 'OTRS4',
     );
 
     my ($max) = sort{ $b <=> $a }keys %major_versions;
@@ -255,9 +256,12 @@ sub execute {
     );
     
     my %tables_to_delete;
+    my %own_tables;
+    my @columns_to_delete;
     my %db_actions;
 
     my $table_counter = 0;
+    my $column_counter;
 
     ACTION:
     for my $action ( @{ $json->{database} || [] } ) {
@@ -278,10 +282,21 @@ sub execute {
             if ( $op eq 'TableCreate' ) {
                 my $table = $action->{name};
                 $tables_to_delete{$table} = $table_counter++;
+                $own_tables{$table}       = 1;
             }
             elsif ( $op eq 'TableDrop' ) {
                 my $table = $action->{name};
                 delete $tables_to_delete{$table};
+            }
+
+            if ( $op eq 'ColumnAdd' ) {
+                my $table = $action->{name};
+                if ( !$own_tables{$table} ) {
+                    unshift @columns_to_delete, +{
+                        name    => $table,
+                        columns => [ map { $_->{name} } @{ $action->{columns} || [] } ],
+                    };
+                }
             }
         
             $action->{version} = $version;    
@@ -289,6 +304,10 @@ sub execute {
         }
     }
     
+    for my $columns_delete ( @columns_to_delete ) {
+        push @{ $db_actions{Uninstall} }, _ColumnDrop($columns_delete);
+    }
+
     if ( %tables_to_delete ) {
         for my $table ( sort { $tables_to_delete{$b} <=> $tables_to_delete{$a} }keys %tables_to_delete ) {
             push @{ $db_actions{Uninstall} }, _TableDrop({ name => $table });
@@ -382,6 +401,8 @@ sub _Insert {
     COLUMN:
     for my $column ( @{ $action->{columns} || [] } ) {
         my $value = ref $column->{value} ? join( "\n", @{ $column->{value} } ) : $column->{value};
+	$value //= '';
+
         $string .= sprintf '            <Data Key="%s"%s>%s</Data>' . "\n",
             $column->{name},
             ( $column->{type} ? 
@@ -656,7 +677,7 @@ OTRS::OPM::Maker::Command::sopm - Build .sopm file based on metadata
 
 =head1 VERSION
 
-version 1.39
+version 1.41
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package School::Code::Compare::Charset::NumSignes;
-# ABSTRACT: trim english letters
-$School::Code::Compare::Charset::NumSignes::VERSION = '0.101';
+# ABSTRACT: collapse words and numbers into abstract placeholders
+$School::Code::Compare::Charset::NumSignes::VERSION = '0.104';
 use strict;
 use warnings;
 
@@ -43,11 +43,11 @@ __END__
 
 =head1 NAME
 
-School::Code::Compare::Charset::NumSignes - trim english letters
+School::Code::Compare::Charset::NumSignes - collapse words and numbers into abstract placeholders
 
 =head1 VERSION
 
-version 0.101
+version 0.104
 
 =head1 AUTHOR
 
@@ -55,7 +55,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Boris Däppen.
+This software is copyright (c) 2020 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

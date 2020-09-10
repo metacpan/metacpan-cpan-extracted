@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-09-09'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ cek-bpom - Search BPOM products via https://cekbpom.pom.go.id/
 
 =head1 VERSION
 
-This document describes version 0.005 of cek-bpom (from Perl distribution App-CekBpom), released on 2020-09-09.
+This document describes version 0.007 of cek-bpom (from Perl distribution App-CekBpom), released on 2020-09-09.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,18 @@ Usage:
      [--jumlah-dan-kemasan] [--komposisi] [--log-level=level] [-m] [--merk]
      [-n] [--(no)naked-res] [--nama-pendaftar] [--nama-produk]
      [--nomor-registrasi] [--npwp-pendaftar] [-p] [--page-result[=program]]
-     [--quiet] [--search-type=s] [-t=s] [--trace] [--verbose] <query>
+     [--queries-json=s] [--query=s+] [--quiet] [--search-type=s+]
+     [--search-types-json=s] [-t=s+] [--trace] [--verbose] <query> ...
+
+Examples:
+
+By default search against name (nama_produk) and brand (merk):
+
+ % cek-bpom hichew hi-chew 'hi chew'
+
+Adding --trace will show query details, --format html+datatables is convenient to see/search/sort results in browser:
+
+ % cek-bpom hichew hi-chew 'hi chew' --trace --format html+datatables
 
 =head1 DESCRIPTION
 
@@ -113,19 +124,36 @@ Shortcut for --search-type=npwp_pendaftar.
 
 See C<--search-type>.
 
-=item B<--query>=I<s>*
+=item B<--queries-json>=I<s>
 
-=item B<--search-type>=I<s>, B<-t>
+See C<--query>.
 
-Select what field to search against.
+=item B<--query>=I<s@>*
 
-Default value:
+Can be specified multiple times.
 
- "nama_produk"
+=item B<--search-type>=I<s@>, B<-t>
 
-Valid values:
+Select what field(s) to search against.
 
- ["bentuk_sediaan","jumlah_dan_kemasan","komposisi","merk","nama_pendaftar","nama_produk","nomor_registrasi","npwp_pendaftar"]
+By default, if not specified, will search against product name ("nama_produk")
+and brand ("merk"). If you specify multiple times, it will search against all
+those types, e.g.:
+
+    --search-type nama_produk --search-type nama_pendaftar
+
+or:
+
+    --nama-produk --nama-pendaftar
+
+
+Can be specified multiple times.
+
+=item B<--search-types-json>=I<s>
+
+Select what field(s) to search against (JSON-encoded).
+
+See C<--search-type>.
 
 =item B<-m>
 

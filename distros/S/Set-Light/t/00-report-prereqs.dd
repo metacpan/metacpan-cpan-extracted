@@ -25,7 +25,9 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Array::RefElem' => '0',
-                                      'perl' => '5.006'
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {

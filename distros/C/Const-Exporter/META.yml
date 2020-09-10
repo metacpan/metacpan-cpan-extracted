@@ -13,7 +13,15 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - export
+  - Const::Fast
+  - constants
+  - development
+  - immutable
+  - read-only
+  - tagging
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,21 +30,28 @@ name: Const-Exporter
 provides:
   Const::Exporter:
     file: lib/Const/Exporter.pm
-    version: v0.4.1
+    version: v0.4.2
 recommends:
   Package::Stash::XS: '0'
   Ref::Util::XS: '0'
+  Storable: '0'
 requires:
+  Carp: '0'
   Const::Fast: '0'
+  Exporter: '0'
   List::AllUtils: '0.10'
   Package::Stash: '0'
   Ref::Util: '0'
   perl: v5.10.0
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/Const-Exporter/issues
   repository: git://github.com/robrwo/Const-Exporter.git
-version: v0.4.1
+version: v0.4.2
 x_authority: cpan:RRWO
 x_contributors:
-  - 'B. Estrade <estrabd@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  - 'B. Estrade <estrabd@cpan.org>'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

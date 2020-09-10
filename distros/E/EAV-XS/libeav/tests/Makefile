@@ -56,9 +56,10 @@ check-domain: $(TARGETS) $(PARTIAL_TRT)
 	# =====================================================
 	# domain tests
 	# =====================================================
-	./t-all-tlds-test.bin 11 60 ../data/tld-domains.txt
+	./t-all-tlds-test.bin 11 61 ../data/tld-domains.txt
 	./t-domain-length.bin 4 3 ../data/domain-length.txt
 	./t-dash-domains.bin ../data/xn-dash-domains.txt
+	./t-retired.bin 2 2 ../data/retired.txt
 
 check-lpart: $(TARGETS) $(PARTIAL_TRT)
 	# === localpart tests

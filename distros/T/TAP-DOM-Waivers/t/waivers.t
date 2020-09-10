@@ -78,7 +78,8 @@ is($tapdom->{summary}{has_problems}, 1,      "$comment - summary has_problems");
 
 # the actual DOM patching
 my $patched_tapdom = waive($tapdom, $waivers);
-my $tapdom3        = TAP::DOM->new( tap => $patched_tapdom->to_tap );
+my $patched_tap    = $patched_tapdom->to_tap;
+my $tapdom3        = TAP::DOM->new( tap => $patched_tap );
 
 $comment = "waivers for IPv6";
 #
@@ -106,7 +107,8 @@ is($tapdom->{summary}{has_problems}, 1,      "$comment - summary has_problems");
 
 # DOM patching with metapatch
 my $patched_tapdom_meta = waive($tapdom, $metawaivers);
-my $tapdom3a            = TAP::DOM->new( tap => $patched_tapdom_meta->to_tap );
+my $patched_tap_meta    = $patched_tapdom_meta->to_tap;
+my $tapdom3a            = TAP::DOM->new( tap => $patched_tap_meta );
 
 $comment = "waivers for IPv6 with metapatch";
 #
@@ -122,7 +124,8 @@ is($tapdom3a->{summary}{has_problems}, 0,      "$comment - summary has_problems"
 
 # DOM patching with metapatch and match_description
 my $patched_tapdom_meta_desc = waive($tapdom, $metawaivers_desc);
-my $tapdom3b                 = TAP::DOM->new( tap => $patched_tapdom_meta_desc->to_tap );
+my $patched_tap_meta_desc    = $patched_tapdom_meta_desc->to_tap;
+my $tapdom3b                 = TAP::DOM->new( tap => $patched_tap_meta_desc );
 
 $comment = "waivers for IPv6 with metapatch and match_description";
 #
@@ -141,7 +144,8 @@ is($tapdom3b->{summary}{has_problems}, 0,      "$comment - summary has_problems"
 # ==================================================
 
 waive($tapdom, $waivers, { no_clone => 1 });
-my $tapdom4        = TAP::DOM->new( tap => $tapdom->to_tap );
+my $waived_tap     = $tapdom->to_tap;
+my $tapdom4        = TAP::DOM->new( tap => $waived_tap );
 
 $comment = "original DOM changed in place";
 #

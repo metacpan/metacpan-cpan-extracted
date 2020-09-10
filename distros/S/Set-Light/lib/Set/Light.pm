@@ -9,7 +9,7 @@ use warnings;
 
 use Array::RefElem ();
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 
 # shared undef variable
@@ -104,7 +104,7 @@ Set::Light - (memory efficient) unordered set of strings
 
 =head1 VERSION
 
-version 0.93
+version 0.94
 
 =head1 SYNOPSIS
 
@@ -153,18 +153,14 @@ These use even more memory and/or are slower than an ordinary hash.
 
 =head2 new
 
-  my $set = Set::Light->new();
+  my $set = Set::Light->new( \%opts, @members );
 
 Creates a new Set::Light object. An optionally passed hash reference can
 contain options.
 
+Any members passed to the constructor will be inserted.
+
 Currently no options are supported.
-
-Note that:
-
-  my $set = Set::Light->new( qw/for bar baz/);
-
-will create a set with the members "for", "bar" and "baz".
 
 =head2 insert
 
@@ -238,6 +234,8 @@ This is an alias for L</delete>.
 
 This returns an array of set members in an unsorted array.
 
+This was added in v0.91.
+
 =head1 SEE ALSO
 
 L<Set::Object>, L<Set::Scalar>.
@@ -269,7 +267,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2004-2008, 2019 by Tels.
+This software is copyright (c) 2004-2008, 2019-2020 by Tels.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

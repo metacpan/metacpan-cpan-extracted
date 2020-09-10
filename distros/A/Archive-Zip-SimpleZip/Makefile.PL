@@ -9,11 +9,17 @@ use ExtUtils::MakeMaker 5.16 ;
 
 my $ParentVersion = 2.096 ;
 
-# Check if IO::Compress::Lzna is installed.
-# If it is, add to PREREQ_PM.
+# Check if th eother IO::Compress::* modules are installed.
+# If any are, add to PREREQ_PM.
 my %extra_prereq = ();
 $extra_prereq{'IO::Compress::Lzma'} = $ParentVersion
     if eval { require IO::Compress::Lzma; 1 } ;
+$extra_prereq{'IO::Compress::Bzip2'} = $ParentVersion
+    if eval { require IO::Compress::Bzip2; 1 } ;
+$extra_prereq{'IO::Compress::Xz'} = $ParentVersion
+    if eval { require IO::Compress::Xz; 1 } ;
+$extra_prereq{'IO::Compress::Zstd'} = $ParentVersion
+    if eval { require IO::Compress::Zstd; 1 } ;
 
 WriteMakefile(
     NAME         => 'Archive::Zip::SimpleZip',
@@ -70,13 +76,23 @@ WriteMakefile(
                 prereqs => {
                     runtime => {
                         requires => {
-                            'IO::Compress::Base'   => $ParentVersion,
-                            'IO::Uncompress::Base' => $ParentVersion,
-                            'Perl::OSType'         => 0,
+                            'IO::Compress::Base'        => $ParentVersion,
+                            'IO::Uncompress::Base'      => $ParentVersion,
+                            'IO::Compress::Zip'         => $ParentVersion,
+                            'IO::Uncompress::Unzip'     => $ParentVersion,
+                            'IO::Compress::RawDeflate'  => $ParentVersion,
+                            'IO::Uncompress::RawInflate'=> $ParentVersion,
+                            'Perl::OSType'              => 0,
                         },
                         recommends => {
-                            'IO::Compress::Lzma'     => $ParentVersion,
-                            'IO::Uncompress::UnLzma' => $ParentVersion,
+                            'IO::Compress::Lzma'        => $ParentVersion,
+                            'IO::Uncompress::UnLzma'    => $ParentVersion,
+                            'IO::Compress::Zstd'        => $ParentVersion,
+                            'IO::Uncompress::UnZstd'    => $ParentVersion,
+                            'IO::Compress::Bzip2'       => $ParentVersion,
+                            'IO::Uncompress::Bunzip2'   => $ParentVersion,
+                            'IO::Compress::Xz'          => $ParentVersion,
+                            'IO::Uncompress::UnXz'      => $ParentVersion,
                         },
                     },
                 },

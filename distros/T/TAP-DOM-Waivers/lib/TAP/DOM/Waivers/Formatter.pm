@@ -1,9 +1,7 @@
 package TAP::DOM::Waivers::Formatter;
-BEGIN {
-  $TAP::DOM::Waivers::Formatter::AUTHORITY = 'cpan:SCHWIGON';
-} # better TAP::Formatter::DOM?
+our $AUTHORITY = 'cpan:SCHWIGON'; # better TAP::Formatter::DOM?
 # ABSTRACT: (incomplete) 'prove' plugin support for TAP::DOM::Waivers
-$TAP::DOM::Waivers::Formatter::VERSION = '0.002';
+$TAP::DOM::Waivers::Formatter::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -213,7 +211,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Steffen Schwigon.
+This software is copyright (c) 2020 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

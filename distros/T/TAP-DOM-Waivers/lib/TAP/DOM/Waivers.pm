@@ -1,9 +1,9 @@
 package TAP::DOM::Waivers;
-BEGIN {
-  $TAP::DOM::Waivers::AUTHORITY = 'cpan:SCHWIGON';
-}
+# git description: v0.002-2-gb415836
+
+our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Patching TAP::DOM, usually for test waivers
-$TAP::DOM::Waivers::VERSION = '0.002';
+$TAP::DOM::Waivers::VERSION = '0.003';
 use 5.008;
 use strict;
 use warnings;
@@ -373,7 +373,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Steffen Schwigon.
+This software is copyright (c) 2020 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

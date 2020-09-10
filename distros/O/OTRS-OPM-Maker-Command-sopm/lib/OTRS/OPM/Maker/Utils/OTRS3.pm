@@ -1,5 +1,7 @@
 package OTRS::OPM::Maker::Utils::OTRS3;
 
+# ABSTRACT: Provide helper functions for OTRS <= 3
+
 use strict;
 use warnings;
 
@@ -60,11 +62,17 @@ __END__
 
 =head1 NAME
 
-OTRS::OPM::Maker::Utils::OTRS3
+OTRS::OPM::Maker::Utils::OTRS3 - Provide helper functions for OTRS <= 3
 
 =head1 VERSION
 
-version 1.39
+version 1.41
+
+=head1 METHODS
+
+=head2 packagesetup
+
+=head2 filecheck
 
 =head1 AUTHOR
 

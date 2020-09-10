@@ -22,6 +22,7 @@ libeav/data/localpart-utf8.txt
 libeav/data/pass-email-ascii.txt
 libeav/data/punycode.csv
 libeav/data/raw.csv
+libeav/data/retired.txt
 libeav/data/tld-domains.txt
 libeav/data/xn-dash-domains.txt
 libeav/docs/libeav.3.gz
@@ -96,6 +97,7 @@ libeav/tests/t-822-localpart.c
 libeav/tests/t-eav-all-modes.c
 libeav/tests/t-eav.c
 libeav/tests/t-result.c
+libeav/tests/t-retired.c
 libeav/TODO
 libeav/util/gen_utf8_pass_test.pl
 libeav/util/gentld.pl
@@ -124,6 +126,7 @@ t/15-tld.t
 t/16-get-lpart.t
 t/17-get-domain.t
 t/18-get-domain-type.t
+t/19-retired.t
 t/check-fail.txt
 t/check-pass.txt
 typemap

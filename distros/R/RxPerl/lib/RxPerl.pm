@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v0.18.1";
+our $VERSION = "v0.21.0";
 
 1;
 __END__
@@ -31,7 +31,7 @@ RxPerl - an implementation of Reactive Extensions / rxjs for Perl
     use RxPerl::AnyEvent ':all';
     use AnyEvent;
 
-    sub make_subscriber ($i) {
+    sub make_observer ($i) {
         return {
             next     => sub {say "next #$i: ", $_[0]},
             error    => sub {say "error #$i: ", $_[0]},
@@ -44,7 +44,7 @@ RxPerl - an implementation of Reactive Extensions / rxjs for Perl
         op_take_until( rx_timer(5) ),
     );
 
-    $o->subscribe(make_subscriber(1));
+    $o->subscribe(make_observer(1));
 
     AnyEvent->condvar->recv;
 
@@ -56,7 +56,7 @@ RxPerl - an implementation of Reactive Extensions / rxjs for Perl
     my $loop = IO::Async::Loop->new;
     RxPerl::IOAsync::set_loop($loop);
 
-    sub make_subscriber ($i) {
+    sub make_observer ($i) {
         return {
             next     => sub {say "next #$i: ", $_[0]},
             error    => sub {say "error #$i: ", $_[0]},
@@ -69,7 +69,7 @@ RxPerl - an implementation of Reactive Extensions / rxjs for Perl
         op_take_until( rx_timer(5) ),
     );
 
-    $o->subscribe(make_subscriber(1));
+    $o->subscribe(make_observer(1));
 
     $loop->run;
 
@@ -78,7 +78,7 @@ RxPerl - an implementation of Reactive Extensions / rxjs for Perl
     use RxPerl::Mojo ':all';
     use Mojo::IOLoop;
 
-    sub make_subscriber ($i) {
+    sub make_observer ($i) {
         return {
             next     => sub {say "next #$i: ", $_[0]},
             error    => sub {say "error #$i: ", $_[0]},
@@ -91,7 +91,7 @@ RxPerl - an implementation of Reactive Extensions / rxjs for Perl
         op_take_until( rx_timer(5) ),
     );
 
-    $o->subscribe(make_subscriber(1));
+    $o->subscribe(make_observer(1));
 
     Mojo::IOLoop->start;
 
@@ -104,9 +104,9 @@ Currently 26 of the 100+ operators in rxjs are implemented in this module.
 
 =head1 EXPORTABLE FUNCTIONS
 
-The code samples in this section assume $subscriber has been set to:
+The code samples in this section assume C<$observer> has been set to:
 
-    $subscriber = {
+    $observer = {
         next     => sub {say "next: ", $_[0]},
         error    => sub {say "error: ", $_[0]},
         complete => sub {say "complete"},
@@ -133,7 +133,7 @@ L<https://rxjs.dev/api/index/function/concat>
     rx_concat(
         rx_of(10, 20, 30),
         rx_of(10, 20, 30, 40),
-    )->subscribe($subscsriber);
+    )->subscribe($observer);
 
 =item rx_defer
 
@@ -148,14 +148,14 @@ L<https://rxjs.dev/api/index/function/defer>
         rx_defer(sub {
             return $special_var ? rx_of(10, 20, 30) : rx_of(40, 50, 60)
         })
-    )->subscribe($subscriber);
+    )->subscribe($observer);
 
 =item rx_EMPTY
 
 L<https://rxjs.dev/api/index/const/EMPTY>
 
     # complete
-    rx_EMPTY->subscribe($subscriber);
+    rx_EMPTY->subscribe($observer);
 
     # 10, 20, 30, 40, 50, 60, complete
     rx_concat(
@@ -164,16 +164,16 @@ L<https://rxjs.dev/api/index/const/EMPTY>
         rx_EMPTY,
         rx_EMPTY,
         rx_of(40, 50, 60),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
 
 =item rx_from
 
 L<https://rxjs.dev/api/index/function/from>
 
-Currently, only arrayrefs, promises, and observables are allowed as argument to this function.
+Currently, only arrayrefs, promises, observables, and strings are allowed as argument to this function.
 
     # 10, 20, 30, complete
-    rx_from([10, 20, 30])->subscribe($subscriber);
+    rx_from([10, 20, 30])->subscribe($observer);
 
 =item rx_from_event
 
@@ -187,9 +187,9 @@ Currently, only instances of the L<Mojo::EventEmitter> class are allowed as the 
     sub websocket ($c) {
         rx_from_event($ioloop, 'finish')->pipe(
             op_delay(4),
-        )->subscribe(
+        )->subscribe({
             next => sub { $c->finish },
-        );
+        });
     }
 
 =item rx_from_event_array
@@ -208,7 +208,7 @@ L<https://rxjs.dev/api/index/function/interval>
 Works like rxjs's "interval", except the parameter is in seconds instead of ms.
 
     # 0, 1, 2, ... every 0.7 seconds
-    rx_interval(0.7)->subscribe($subscriber);
+    rx_interval(0.7)->subscribe($observer);
 
 =item rx_merge
 
@@ -218,7 +218,7 @@ L<https://rxjs.dev/api/index/function/merge>
     rx_merge(
         rx_interval(0.7),
         rx_interval(1),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
 
 =item rx_NEVER
 
@@ -229,7 +229,7 @@ L<https://rxjs.dev/api/index/const/NEVER>
         rx_of(10, 20, 30),
         rx_NEVER,
         rx_of(40, 50, 60),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
 
 =item rx_observable
 
@@ -246,7 +246,7 @@ L<https://rxjs.dev/api/index/class/Observable>
 L<https://rxjs.dev/api/index/function/of>
 
     # 10, 20, 30, complete
-    rx_of(10, 20, 30)->subscribe($subscriber);
+    rx_of(10, 20, 30)->subscribe($observer);
 
 =item rx_race
 
@@ -256,14 +256,14 @@ L<https://rxjs.dev/api/index/function/race>
     rx_race(
         rx_interval(1)->pipe( op_map(sub {$_[0] * 100}) ),
         rx_interval(0.7)->pipe( op_map(sub {$_[0] * 10) ),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
 
 =item rx_subject
 
 L<https://rxjs.dev/api/index/class/Subject>
 
     my $subject = rx_subject->new;
-    $subject->subscribe($subscriber);
+    $subject->subscribe($observer);
 
     # elsewhere...
     $subject->next($_) for 1 .. 10;
@@ -277,7 +277,7 @@ L<https://rxjs.dev/api/index/function/throwError>
     rx_concat(
         rx_interval(1)->pipe( op_take(4) ),
         rx_throw_error('foo'),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
 
 =item rx_timer
 
@@ -286,10 +286,10 @@ L<https://rxjs.dev/api/index/function/timer>
 Works like rxjs's "timer", except the parameter is in seconds instead of ms.
 
     # (pause 10 seconds) 0, 1, 2, 3, ... (every 1 second)
-    rx_timer(10, 1)->subscribe($subscriber);
+    rx_timer(10, 1)->subscribe($observer);
 
     # (pause 10 seconds) 0, complete
-    rx_timer(10)->subscriber($subscriber);
+    rx_timer(10)->subscribe($observer);
 
 =back
 
@@ -311,7 +311,16 @@ L<https://rxjs.dev/api/operators/delay>
 Works like rxjs's "delay", except the parameter is in seconds instead of ms.
 
     # (pause 10 seconds) 0, 1, 2, 3
-    rx_interval(1)->pipe( op_delay(10) )->subscribe($subscriber);
+    rx_interval(1)->pipe( op_delay(10) )->subscribe($observer);
+
+=item op_distinct_until_changed
+
+L<https://rxjs.dev/api/operators/distinctUntilChanged>
+
+    # 10, undef, 20, 30, [], []
+    rx_of(10, 10, undef, undef, 20, 20, 20, 30, 30, [], [])->pipe(
+        op_distinct_until_changed(),
+    )->subscribe($observer);
 
 =item op_filter
 
@@ -320,7 +329,16 @@ L<https://rxjs.dev/api/operators/filter>
     # 0, 2, 4, 6, ... (every 1.4 seconds)
     rx_interval(0.7)->pipe(
         op_filter(sub {$_[0] % 2 == 0}),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
+
+=item op_first
+
+L<https://rxjs.dev/api/operators/first>
+
+    # (pause 7 seconds) 6, complete
+    rx_interval(
+        op_first(sub { $_[0] > 5 }),
+    )->subscribe($observer);
 
 =item op_map
 
@@ -329,7 +347,7 @@ L<https://rxjs.dev/api/operators/map>
     # 10, 11, 12, 13, ...
     rx_interval(1)->pipe(
         op_map(sub {$_[0] + 10}),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
 
 =item op_map_to
 
@@ -337,8 +355,24 @@ L<https://rxjs.dev/api/operators/mapTo>
 
     # 123, 123, 123, ... (every 1 second)
     rx_interval(1)->pipe(
-        map_to(123),
-    )->subscribe($subscriber);
+        op_map_to(123),
+    )->subscribe($observer);
+
+=item op_merge_map
+
+L<https://rxjs.dev/api/operators/mergeMap>
+
+    # 11, 21, 31, 12, 22, 32, 13, 23, 33
+    rx_of(10, 20, 30)->pipe(
+        op_merge_map(sub ($x) {
+            return rx_interval(1)->pipe(
+                op_map(sub ($y) {
+                    return $x + $y + 1;
+                }),
+                op_take(3),
+            );
+        }),
+    )->subscribe($observer);
 
 =item op_multicast
 
@@ -361,6 +395,14 @@ L<https://rxjs.dev/api/operators/refCount>
 
 L<https://rxjs.dev/api/operators/scan>
 
+    # 0, 1, 3, 6, 10, ...
+    rx_interval(1)->pipe(
+        op_scan(sub {
+            my ($acc, $item) = @_;
+            return $acc + $item;
+        }, 0),
+    )->subscribe($observer);
+
 =item op_share
 
 L<https://rxjs.dev/api/operators/share>
@@ -371,8 +413,8 @@ L<https://rxjs.dev/api/operators/share>
         op_share(),
     );
 
-    $o->subscribe($subscriber1);
-    $o->subscribe($subscriber2);
+    $o->subscribe($observer1);
+    $o->subscribe($observer2);
 
 =item op_start_with
 
@@ -381,9 +423,9 @@ L<https://rxjs.dev/api/operators/startWith>
     # 100, 200, 0, 1, 2, 3, complete
     rx_of(0, 1, 2, 3)->pipe(
         op_start_with(100, 200),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
 
-=item switch_map
+=item op_switch_map
 
 L<https://rxjs.dev/api/operators/switchMap>
 
@@ -396,7 +438,7 @@ L<https://rxjs.dev/api/operators/switchMap>
                 op_map(sub ($y) { $x * 10 + $y + 1 }),
             );
         }),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
 
 =item op_take
 
@@ -405,7 +447,7 @@ L<https://rxjs.dev/api/operators/take>
     # 0, 1, 2, 3, 4, complete
     rx_interval(1)->pipe(
         op_take(5),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
 
 =item op_take_until
 
@@ -414,7 +456,21 @@ L<https://rxjs.dev/api/operators/takeUntil>
     # 0, 1, 2, 3, 4, complete
     rx_interval(1)->pipe(
         op_take_until( rx_timer(5.5) ),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
+
+=item op_take_while
+
+L<https://rxjs.dev/api/operators/takeWhile>
+
+    # 0, 1, 2, 3, 4, 5, complete
+    rx_interval(1)->pipe(
+        op_take_while(sub { $_[0] <= 5 }),
+    )->subscribe($observer);
+
+    # 0, 1, 2, 3, 4, 5, 6, complete
+    rx_interval(1)->pipe(
+        op_take_while(sub { $_[0] <= 5 }, 1),
+    )->subscribe($observer);
 
 =item op_tap
 
@@ -423,7 +479,7 @@ L<https://rxjs.dev/api/operators/tap>
     # foo0, 0, foo1, 1, foo2, 2, ...
     rx_interval(1)->pipe(
         op_tap(sub {say "foo$_[0]"}),
-    )->subscribe($subscriber);
+    )->subscribe($observer);
 
 =back
 
@@ -484,7 +540,7 @@ Makes the connectable observable start emitting.
 =head1 SUBJECT METHODS
 
 Subjects multicast, and apart from being observables themselves (with their own subscribers), also have L<next, error
-and complete|/"next, error, complete"> methods of their own, so can be used as the subscriber argument to another
+and complete|/"next, error, complete"> methods of their own, so can be used as the observer argument to another
 observable's subscribe method. That observable's events will then be "forwarded" to the subject's own subscribers,
 as if next/error/complete had been called on the subject directly.
 
@@ -526,17 +582,15 @@ L<ReactiveX API|http://reactivex.io/documentation/operators.html> at a few point
 L<Rx* libraries|http://reactivex.io/languages.html>), RxPerl chose to behave like rxjs rather than
 ReactiveX to cater for web developers already familiar with rxjs.
 
-=head1 GUIDE TO CREATING YOUR OWN CREATION & PIPEABLE OPERATORS
+=head1 LEARNING MATERIAL
 
 =over
 
-=item * If you need the upstream and downstreams subscribers to complete at the same time,
-pass the entire contents of the downstream subscriber object to the upstream subscriber.
-This will pass the _subscription key as well, and that way you will not need to return a
-request to unsubscribe from the upstream, from your observable declaration. Just like C<op_map>
-does with this line, and just returns then with C<return;>:
+=item * L<Ultimate RxJS courses|https://ultimatecourses.com/courses/rxjs>
 
-    my $own_subscriber = { %$subscriber };
+=item * L<egghead RxJS courses|https://egghead.io/browse/libraries/rxjs>
+
+=item * L<Rx Marbles|https://rxmarbles.com/>
 
 =back
 
@@ -554,11 +608,13 @@ does with this line, and just returns then with C<return;>:
 
 =over
 
-=item * L<Rx Marbles|https://rxmarbles.com/>
-
-=item * L<Ryu module's SEE ALSO section|https://metacpan.org/pod/Ryu#SEE-ALSO>
+=item * L<Ryu|https://metacpan.org/pod/Ryu>
 
 =back
+
+=head1 NOTIFICATIONS FOR NEW VERSIONS
+
+You can start receiving emails for new releases of this module, at L<https://perlmodules.net>.
 
 =head1 LICENSE
 

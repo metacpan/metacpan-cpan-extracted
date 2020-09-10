@@ -8,12 +8,12 @@ use RxPerl::Utils qw/ get_subscription_from_subscriber get_timer_subs /;
 use RxPerl::Subscription;
 
 use Carp 'croak';
-use Scalar::Util 'reftype';
+use Scalar::Util 'reftype', 'refaddr';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    op_delay op_filter op_map op_map_to op_multicast op_pairwise op_ref_count
-    op_scan op_share op_start_with op_switch_map op_take op_take_until op_tap
+    op_delay op_distinct_until_changed op_filter op_first op_map op_map_to op_merge_map op_multicast
+    op_pairwise op_ref_count op_scan op_share op_start_with op_switch_map op_take op_take_until op_take_while op_tap
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -81,6 +81,36 @@ sub op_delay {
     };
 }
 
+sub op_distinct_until_changed {
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $prev_value;
+            my $have_prev_value = 0;
+
+            my $own_subscriber = {
+                %$subscriber,
+                next => sub {
+                    my @value = @_;
+
+                    if (! $have_prev_value or ! _eqq($prev_value, $value[0])) {
+                        $subscriber->{next}->(@value) if defined $subscriber->{next};
+                        $have_prev_value = 1;
+                        $prev_value = $value[0];
+                    }
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
 sub op_filter {
     my ($filtering_sub) = @_;
 
@@ -104,6 +134,19 @@ sub op_filter {
 
             return;
         });
+    };
+}
+
+sub op_first {
+    my ($condition) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        my @pipes = (op_take(1));
+        unshift @pipes, op_filter($condition) if defined $condition;
+
+        return $source->pipe(@pipes);
     };
 }
 
@@ -145,6 +188,63 @@ sub op_map_to {
             my $own_subscriber = { %$subscriber };
             $own_subscriber->{next} &&= sub {
                 $subscriber->{next}->($mapping_value) if defined $subscriber->{next};
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
+sub op_merge_map {
+    my ($observable_factory) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $subscription = get_subscription_from_subscriber($subscriber);
+
+            my %these_subscriptions;
+            my $own_subscription = RxPerl::Subscription->new;
+
+            $subscription->add_dependents(\%these_subscriptions, $own_subscription);
+
+            my $own_subscriber = {
+                new_subscription => $own_subscription,
+                next     => sub {
+                    my ($value) = @_;
+
+                    my $this_subscription = RxPerl::Subscription->new;
+                    $these_subscriptions{$this_subscription} = $this_subscription;
+
+                    my $this_new_subscriber = {
+                        new_subscription => $this_subscription,
+                        next     => sub {
+                            $subscriber->{next}->(@_) if defined $subscriber->{next};
+                        },
+                        error    => sub {
+                            $subscriber->{error}->(@_) if defined $subscriber->{error};
+                        },
+                        complete => sub {
+                            delete $these_subscriptions{$this_subscription};
+                            $subscriber->{complete}->() if !%these_subscriptions and $own_subscription->{closed}
+                                and defined $subscriber->{complete};
+                        },
+                    };
+
+                    my $this_observable = $observable_factory->($value);
+                    $this_observable->subscribe($this_new_subscriber);
+                },
+                error    => sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+                complete => sub {
+                    $subscriber->{complete}->() if !%these_subscriptions and defined $subscriber->{complete};
+                },
             };
 
             $source->subscribe($own_subscriber);
@@ -305,42 +405,51 @@ sub op_switch_map {
         return rx_observable->new(sub {
             my ($subscriber) = @_;
 
-            my $current_subscription;
-            my $source_complete = 0;
+            my $this_own_subscription;
+            my $own_subscription = RxPerl::Subscription->new;
+
+            get_subscription_from_subscriber($subscriber)->add_dependents(
+                \$this_own_subscription, $own_subscription,
+            );
 
             my $own_subscriber = {
+                new_subscription => $own_subscription,
                 next     => sub {
                     my ($value) = @_;
 
                     my $new_observable = $observable_factory->($value);
-                    $current_subscription->unsubscribe() if $current_subscription;
+                    $this_own_subscription->unsubscribe() if $this_own_subscription;
+                    $this_own_subscription = RxPerl::Subscription->new;
                     my $this_own_subscriber = {
+                        new_subscription => $this_own_subscription,
                         next     => sub {
+                            print "nexting\n";
                             $subscriber->{next}->(@_) if defined $subscriber->{next};
                         },
                         error    => sub {
                             $subscriber->{error}->(@_) if defined $subscriber->{error};
                         },
                         complete => sub {
-                            $subscriber->{complete}->() if $source_complete and defined $subscriber->{complete};
+                            $subscriber->{complete}->() if $own_subscription->{closed}
+                                and defined $subscriber->{complete};
                         },
                     };
 
-                    $current_subscription = $new_observable->subscribe($this_own_subscriber);
+                    $new_observable->subscribe($this_own_subscriber);
                 },
                 error    => sub {
                     $subscriber->{error}->(@_) if defined $subscriber->{error};
                 },
                 complete => sub {
-                    $source_complete = 1;
+                    # $source_complete = 1;
                     $subscriber->{complete}->() if defined $subscriber->{complete} and
-                        (not $current_subscription or $current_subscription->{closed});
+                        (not $this_own_subscription or $this_own_subscription->{closed});
                 },
             };
 
-            my $own_subscription = $source->subscribe($own_subscriber);
+            $source->subscribe($own_subscriber);
 
-            return [$own_subscription, \$current_subscription];
+            return;
         });
     }
 }
@@ -403,6 +512,37 @@ sub op_take_until {
     };
 }
 
+sub op_take_while {
+    my ($cond, $include) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $own_subscriber = {
+                %$subscriber,
+                next => sub {
+                    my ($value) = @_;
+
+                    if (! $cond->($value)) {
+                        $subscriber->{next}->($value) if $include and defined $subscriber->{next};
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                        return;
+                    }
+
+                    $subscriber->{next}->(@_) if defined $subscriber->{next};
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
 sub op_tap {
     my @args = @_;
 
@@ -436,6 +576,15 @@ sub op_tap {
             return;
         });
     };
+}
+
+sub _eqq {
+    my ($x, $y) = @_;
+
+    defined $x or return !defined $y;
+    defined $y or return !!0;
+    ref $x eq ref $y or return !!0;
+    return length(ref $x) ? refaddr $x == refaddr $y : $x eq $y;
 }
 
 1;

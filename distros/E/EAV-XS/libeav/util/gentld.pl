@@ -49,6 +49,7 @@ EOL
         print $fh "    ", $type, ",\n";
     }
     print $fh "    TLD_TYPE_SPECIAL,\n";
+    print $fh "    TLD_TYPE_RETIRED,\n";
     print $fh "    TLD_TYPE_MAX /* tests only */\n";
     print $fh "};\n\n";
 
@@ -91,9 +92,11 @@ sub gen_tld_c(@) {
     while ( my $row = $csv->getline($io) ) {
         exists $tld_types{ $row->[1] }
             or die "$csv_file: unknown TLD type: " . $row->[1];
-        # XXX
-        if ($row->[2] eq 'Not assigned') {
+        my $tld_manager = $row->[2];
+        if ($tld_manager =~ m/^Not assigned/i) {
             $type = "TLD_TYPE_NOT_ASSIGNED";
+        } elsif ($tld_manager =~ m/^Retired/i) {
+            $type = "TLD_TYPE_RETIRED";
         } else {
             $type = $tld_types{ $row->[1] };
         }

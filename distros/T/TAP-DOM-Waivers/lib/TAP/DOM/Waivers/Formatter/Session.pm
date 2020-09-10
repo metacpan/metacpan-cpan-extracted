@@ -1,9 +1,7 @@
 package TAP::DOM::Waivers::Formatter::Session;
-BEGIN {
-  $TAP::DOM::Waivers::Formatter::Session::AUTHORITY = 'cpan:SCHWIGON';
-} # better TAP::Formatter::DOM::Session?
+our $AUTHORITY = 'cpan:SCHWIGON'; # better TAP::Formatter::DOM::Session?
 # ABSTRACT: (incomplete) 'prove' plugin support for TAP::DOM::Waivers
-$TAP::DOM::Waivers::Formatter::Session::VERSION = '0.002';
+$TAP::DOM::Waivers::Formatter::Session::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -124,7 +122,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Steffen Schwigon.
+This software is copyright (c) 2020 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,21 @@
+Binance-API-1.03.tar.gz
+Binance-API-1.03/META.json
+Binance-API-1.03/META.yml
+Changes
+cpanfile
+lib/Binance/API.pm
+lib/Binance/API/Logger.pm
+lib/Binance/API/Request.pm
+lib/Binance/Constants.pm
+lib/Binance/Exception.pm
+lib/Binance/Exception/Parameter/Required.pm
+lib/Binance/PerlDependencies.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/Binance/API.t
+t/Binance/API/Request.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

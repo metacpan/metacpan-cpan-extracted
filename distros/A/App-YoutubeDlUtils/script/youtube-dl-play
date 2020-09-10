@@ -3,7 +3,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-09-09'; # DATE
 our $DIST = 'App-YoutubeDlUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 # FRAGMENT id=shcompgen-hint command=_youtube-dl
 
 use 5.010001;
@@ -54,7 +54,7 @@ youtube-dl-play - Download videos with youtube-dl *and* play them while download
 
 =head1 VERSION
 
-This document describes version 0.005 of youtube-dl-play (from Perl distribution App-YoutubeDlUtils), released on 2020-09-09.
+This document describes version 0.007 of youtube-dl-play (from Perl distribution App-YoutubeDlUtils), released on 2020-09-09.
 
 =head1 SYNOPSIS
 
@@ -62,9 +62,11 @@ Usage:
 
  % youtube-dl-play [OPTS] <URL_OR_VIDEO_ID>...
 
-Example:
+Examples:
 
- % youtube-dl-play https://www.youtube.com/watch?v=hoKvtNawdS8
+ % youtube-dl-play       https://www.youtube.com/watch?v=hoKvtNawdS8
+ % youtube-dl-play -f 18 https://www.youtube.com/watch?v=hoKvtNawdS8 ;# force 360p mp4 format
+ % youtube-dl-play -f 22 https://www.youtube.com/watch?v=hoKvtNawdS8 ;# force 720p mp4 format
 
 =head1 DESCRIPTION
 
@@ -82,7 +84,7 @@ To get the output filename, first this is executed:
 
 =item * Run youtube-dl that outputs to stdout and pipe it to mpv
 
- % youtube-dl [OPTS] -o - <URL_OR_VIDEO_ID> | mpv --record-file <OUTPUT_FILENAME> -
+ % youtube-dl [OPTS] -o - <URL_OR_VIDEO_ID> | tee <OUTPUTFILENAME> | mpv -
 
 =back
 
@@ -94,9 +96,18 @@ Some caveats:
 
 =item * Each command-line argument must be a video ID or video URL, not a playlist URL
 
-=item * Do not request a format that is unstreamable
+=item * You should not request a format that does not stream
 
-For example, C<<-f 135+140>> (merging of video-only 720p MP4 and audio-only AAC stream).
+For example, if you specify C<< -f 135+140 >> (merging of video-only 720p MP4
+and audio-only AAC stream) you will have to wait for C<youtube-dl> to download
+the whole video & audio streams and merge them before getting the video to play.
+
+=item * If you specify multiple URL's, you cannot go forward to the next video or backward to the previous
+
+In mpv you can use ">" or "ENTER" to go to the next video in the playlist, or
+"<" to go backward to the previous. You cannot do this using this script because
+the URLs are streamed individually one-by-one with separate invocation of
+youtube-dl and mpv.
 
 =back
 

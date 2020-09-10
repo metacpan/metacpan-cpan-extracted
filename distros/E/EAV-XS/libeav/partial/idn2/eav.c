@@ -109,6 +109,10 @@ eav_is_email (eav_t *eav, const char *email, size_t length)
         eav->errcode = EEAV_TLD_SPECIAL;
         tld_test = (eav->allow_tld & EAV_TLD_SPECIAL);
         break;
+    case TLD_TYPE_RETIRED:
+        eav->errcode = EEAV_TLD_RETIRED;
+        tld_test = (eav->allow_tld & EAV_TLD_RETIRED);
+        break;
     default:
         /* should not happen */
         abort ();

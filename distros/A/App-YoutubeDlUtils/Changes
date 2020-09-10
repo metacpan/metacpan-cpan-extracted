@@ -1,3 +1,25 @@
+0.007   2020-09-09  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+        [cli youtube-dl-play]
+
+        - [doc] Update doc to reflect 0.005+ (no longer uses mpv --record-file).
+
+	- [doc] Fix POD formatting.
+
+
+0.006   2020-09-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	[cli youtube-dl-play]
+
+        - [doc] Add caveat on not being able to forward/backward file.
+
+	- [doc] Tweak docs, add more examples.
+
+
 0.005   2020-09-09  Released-By: PERLANCAR; Urgency: medium
 
         [cli youtube-dl-play]

@@ -2,7 +2,7 @@ NAME
     App::YoutubeDlUtils - Utilities (mostly wrappers) related to youtube-dl
 
 VERSION
-    This document describes version 0.005 of App::YoutubeDlUtils (from Perl
+    This document describes version 0.007 of App::YoutubeDlUtils (from Perl
     distribution App-YoutubeDlUtils), released on 2020-09-09.
 
 HOMEPAGE

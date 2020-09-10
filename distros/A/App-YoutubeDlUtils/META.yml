@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-YoutubeDlUtils
   homepage: https://metacpan.org/release/App-YoutubeDlUtils
   repository: git://github.com/perlancar/perl-App-YoutubeDlUtils.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

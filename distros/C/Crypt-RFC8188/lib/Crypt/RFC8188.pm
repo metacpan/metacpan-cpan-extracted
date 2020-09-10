@@ -10,7 +10,7 @@ use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate gcm_decrypt_verify);
 use Exporter qw(import);
 use Crypt::PRNG qw(random_bytes);
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 our @EXPORT_OK = qw(ece_encrypt_aes128gcm ece_decrypt_aes128gcm derive_key);
 
 my $MAX_RECORD_SIZE = (2 ** 31) - 1;
@@ -115,10 +115,11 @@ sub ece_decrypt_aes128gcm {
     my $data = gcm_decrypt_verify 'AES', $key_, $iv, '', $ciphertext, $tag;
     die "Decryption error\n" unless defined $data;
     my $last = ($i + $chunk_size) >= $end;
-    $data =~ s/\x00*$//;
+    $data =~ s/\x00*\z//;
     die "all zero record plaintext\n" if !length $data;
-    die "record delimiter != 1\n" if !$last and $data !~ s/\x01$//;
-    die "last record delimiter != 2\n" if $last and $data !~ s/\x02$//;
+    my $last_byte = ord substr $data, -1, 1, '';
+    die "record delimiter($last_byte) != 1\n" if !$last and $last_byte != 1;
+    die "last record delimiter($last_byte) != 2\n" if $last and $last_byte != 2;
     $result .= $data;
     $counter++;
   }

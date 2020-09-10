@@ -1,0 +1,51 @@
+{
+    "name": "Test",
+    "version": "0.0.3",
+    "framework": [
+        "3.0.x"
+    ],
+    "vendor": {
+        "name":  "Perl-Services.de",
+        "url": "http://www.perl-services.de"
+    },
+    "license": "GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007",
+    "description" : {
+        "en": "Test sopm command"
+    },
+    "database" : [
+        {
+            "type": "TableCreate",
+            "version": 0,
+            "name": "opar_test",
+            "columns": [
+                { "name": "id", "required": "true", "auto_increment": "true", "type": "INTEGER", "primary_key": "true" },
+                { "name": "object_id", "required": "true", "type": "INTEGER" },
+                { "name": "object_type", "required": "true", "type": "VARCHAR", "size": 55 }
+            ],
+            "keys" : [
+                {
+                    "name": "system_user",
+                    "references": [
+                        { "local": "object_id", "foreign": "id" }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "ColumnAdd",
+            "version": 0,
+            "name": "opar_test",
+            "columns": [
+                { "name": "object_name", "required": "true", "type": "VARCHAR", "size": 55 }
+            ]
+        },
+        {
+            "type": "ColumnAdd",
+            "version": 0,
+            "name": "customer_user",
+            "columns": [
+                { "name": "object_name", "required": "true", "type": "VARCHAR", "size": 55 }
+            ]
+        }
+    ]
+}

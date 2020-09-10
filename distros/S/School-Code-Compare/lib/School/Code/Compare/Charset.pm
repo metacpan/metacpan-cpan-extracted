@@ -1,13 +1,15 @@
 package School::Code::Compare::Charset;
-# ABSTRACT: trim whitespace, comments and unessential chars
-$School::Code::Compare::Charset::VERSION = '0.101';
+# ABSTRACT: remove whitespace, comments and unessential chars from text
+$School::Code::Compare::Charset::VERSION = '0.104';
 use strict;
 use warnings;
 
-use School::Code::Compare::Charset::NoComments;
-use School::Code::Compare::Charset::NoWhitespace;
 use School::Code::Compare::Charset::NumSignes;
 use School::Code::Compare::Charset::Signes;
+use School::Code::Compare::Charset::NoWhitespace;
+use School::Code::Compare::Charset::NoComments::Hashy;
+use School::Code::Compare::Charset::NoComments::Slashy;
+use School::Code::Compare::Charset::NoComments::XMLy;
 
 sub new {
     my $class = shift;
@@ -41,7 +43,6 @@ sub trim_comments {
     my $self      = shift;
     my $lines_ref = shift;
 
-    my $clean   = School::Code::Compare::Charset::NoComments->new();
     my $cleaned = '';
     my $lang    = $self->{language};
 
@@ -50,7 +51,8 @@ sub trim_comments {
      or $lang eq 'bash'
      or $lang eq 'hashy'
      ) {
-        $cleaned = $clean->hashy ( $lines_ref );
+        $cleaned = School::Code::Compare::Charset::NoComments::Hashy->new()
+                       ->filter ( $lines_ref );
     }
     elsif ($lang eq 'php'
         or $lang eq 'js'
@@ -60,12 +62,14 @@ sub trim_comments {
         or $lang eq 'java'
         or $lang eq 'slashy'
      ) {
-        $cleaned = $clean->slashy ( $lines_ref );
+        $cleaned = School::Code::Compare::Charset::NoComments::Slashy->new()
+                       ->filter ( $lines_ref );
     }
     elsif ($lang eq 'html'
         or $lang eq 'xml'
     ) {
-        $cleaned = $clean->html ( $lines_ref );
+        $cleaned = School::Code::Compare::Charset::NoComments::XMLy->new()
+                       ->filter ( $lines_ref );
     }
     elsif ($lang eq 'txt') {
         $cleaned = $lines_ref; # do nothing
@@ -124,11 +128,11 @@ __END__
 
 =head1 NAME
 
-School::Code::Compare::Charset - trim whitespace, comments and unessential chars
+School::Code::Compare::Charset - remove whitespace, comments and unessential chars from text
 
 =head1 VERSION
 
-version 0.101
+version 0.104
 
 =head1 AUTHOR
 
@@ -136,7 +140,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Boris Däppen.
+This software is copyright (c) 2020 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2020-07-30 00:59:33 */
+/* this file was auto-generated at 2020-09-09 21:00:47 */
 
 
 #ifndef TLD_H
@@ -21,6 +21,7 @@ enum {
     TLD_TYPE_SPONSORED,
     TLD_TYPE_TEST,
     TLD_TYPE_SPECIAL,
+    TLD_TYPE_RETIRED,
     TLD_TYPE_MAX /* tests only */
 };
 

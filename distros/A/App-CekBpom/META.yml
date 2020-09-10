@@ -17,6 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-CekBpom
 requires:
+  Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Exporter: '5.57'
   HTTP::CookieJar::LWP: '0'
@@ -32,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CekBpom
   homepage: https://metacpan.org/release/App-CekBpom
   repository: git://github.com/perlancar/perl-App-CekBpom.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

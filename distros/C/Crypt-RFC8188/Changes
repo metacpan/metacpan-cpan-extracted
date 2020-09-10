@@ -1,3 +1,6 @@
+0.04 2020-09-09
+- more diagnostics on decrypt failure
+
 0.03 2020-09-06
 - more test hardening
 

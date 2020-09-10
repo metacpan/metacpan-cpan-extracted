@@ -65,7 +65,6 @@ sanitize_utf8 (const char *text, size_t length)
     static char sanitized[TEXT_SIZE];
     char buf[32];
 
-
 /* html data contain some unneccessary characters:
  * 1) such characters as '&lrm;' and '&rlm;' broke encoding to punycode;
  * 2) we don't want any '\r', '\n' characters in the output CSV file.
@@ -116,10 +115,13 @@ sanitize_utf8 (const char *text, size_t length)
         }
         else {
             /* it possible that we read everything; does not work always. */
-            /* at p1, length: len - p2 */
+            /* at p1, length: len - p1 */
             SKIP(c1, p1, length - p1);
         }
     }
+
+#undef SKIP
+#undef TEXT_SIZE
 
     assert (c1 == UTF8_END);
     sanitized[pos] = '\0';
@@ -128,3 +130,11 @@ sanitize_utf8 (const char *text, size_t length)
 }
 
 #endif
+
+
+#define remove_crlf(line, read) do { \
+    if ((read) >= 2 && (memcmp((line) + (read) - 2, "\r\n", 2)) == 0) \
+        (line)[(read)-2] = '\0'; \
+    else if ((read) >= 1 && (line)[(read)-1] == '\n') \
+        (line)[(read)-1] = '\0'; \
+} while (0);

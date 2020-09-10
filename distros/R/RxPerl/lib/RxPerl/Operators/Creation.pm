@@ -115,8 +115,13 @@ sub rx_from {
         return rx_of(@$thing);
     }
 
+    elsif (defined $thing and ! length(ref $thing)) {
+        my @letters = split //, $thing;
+        return rx_of(@letters);
+    }
+
     else {
-        croak "rx_from only accepts arrayrefs, promises, and observables as argument at the moment,";
+        croak "rx_from only accepts arrayrefs, promises, observables, and strings as argument at the moment,";
     }
 }
 

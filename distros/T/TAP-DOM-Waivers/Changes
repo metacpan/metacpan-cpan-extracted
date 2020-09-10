@@ -1,5 +1,8 @@
 Revision history for TAP-DOM-Waivers
 
+0.003     2020-09-10
+        - fix tests after TAP::DOM changes
+
 0.002     2015-10-07
         - fix dependency declaration
 

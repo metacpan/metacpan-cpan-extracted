@@ -241,6 +241,10 @@ characters with prohibited character handling.
 
     Command line utility using [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold).
 
+- [Text::ANSI::Fold::Util](https://metacpan.org/pod/Text::ANSI::Fold::Util)
+
+    Collection of utilities using [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) module.
+
 - [App::sdif](https://metacpan.org/pod/App::sdif)
 
     [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) was originally implemented in **sdif** command for

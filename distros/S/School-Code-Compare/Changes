@@ -1,5 +1,18 @@
 Revision history for School-Code-Compare
  
+0.104     2020-09-09 14:42:24+02:00 Europe/Zurich
+ - promote v0.102 und v0.103 trial releases
+ - add author test for Changes file
+
+0.103     2020-09-08 16:41:05+02:00 Europe/Zurich (TRIAL RELEASE)
+ - minor documentation updates and corrections
+ - redesign internal interfaces below School::Code::Compare::Charset
+ - disable experimental::smartmatch warning above Perl v5.18 because 'when'
+
+0.102     2020-08-30 12:34:38+02:00 Europe/Zurich (TRIAL RELEASE)
+ - update examples to current syntax in compare-code documentation
+ - replace 'given' with 'for' and require v5.14
+
 0.101     2019-07-01 14:48:49+02:00 Europe/Zurich
  - move test data from t/ to xt/ to hide it from toolchain
 

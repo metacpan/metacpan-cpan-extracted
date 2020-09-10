@@ -24,14 +24,19 @@ do { my $x = {
        'runtime' => {
                       'recommends' => {
                                         'Package::Stash::XS' => '0',
-                                        'Ref::Util::XS' => '0'
+                                        'Ref::Util::XS' => '0',
+                                        'Storable' => '0'
                                       },
                       'requires' => {
+                                      'Carp' => '0',
                                       'Const::Fast' => '0',
+                                      'Exporter' => '0',
                                       'List::AllUtils' => '0.10',
                                       'Package::Stash' => '0',
                                       'Ref::Util' => '0',
-                                      'perl' => 'v5.10.0'
+                                      'perl' => 'v5.10.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {

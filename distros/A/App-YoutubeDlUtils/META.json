@@ -64,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-App-YoutubeDlUtils"
       }
    },
-   "version" : "0.005",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Preprocess::Ops;
-our $VERSION = 20200902;
+our $VERSION = 202009009;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -15,6 +15,7 @@ use feature qw(say current_sub);
 use utf8;
 
 my $logFile = q(/home/phil/c/z/z/zzz.txt);                                      # Log to this file if present
+binModeAllUtf8;
 
 #D1 Preprocess                                                                  # Preprocess ▷ and ▶ as method dispatch operators.
 
@@ -86,6 +87,39 @@ sub printData($$)                                                               
   qq(fprintf(stderr, "Line $l: $f\\n", $w);\n);
  }
 
+sub duplicateFunction($$$)                                                      #P Duplicate the previous function with the specified changes applied
+ {my ($lineNumber, $inputFile, $code) = @_;                                     # Line number of line being expanded, file containing line being expanded, lines of code
+  if ($$code[$lineNumber] =~ m(\A(duplicate)\s+))                               # Parse duplicate statement: the words after are comma separated lists of regular expressions that change the text of the preceding function
+   {my ($command, @changes) = split /\s+/, $$code[$lineNumber];
+    my @c;
+    for(my $i = $lineNumber - 1; $i >= 0; --$i)                                 # Text of preceding function to duplicate
+     {unshift @c, my $c = $$code[$i];
+      last if $c =~ m(\A\S);
+     }
+    my @r;                                                                      # Resulting code
+    for my $change(@changes)                                                    # Apply changes
+     {my @C;                                                                    # Code after each change
+      for my $c(@c)                                                             # Each change
+       {local $_ = $c;
+        for my $r(split/,/, $change)                                            # Each re in the change
+         {eval $r;
+          confess "Cannot make change: $r in: $change\n$@\n" if $@;
+         }
+        push @C, $_;                                                            # Save accumulated changes
+       }
+
+      my $l = $lineNumber + 1;                                                  # Save duplicate code with accumulated changes
+      push @r, join '', @C;
+      push @r, qq(#line $l "$inputFile"\n);
+     }
+
+    my $r = join '', @r;                                                        # Changed code
+    return $r;
+   }
+
+  confess $$code[$lineNumber]," is not a 'duplicate' command";
+ }
+
 sub includeFile($$$$$)                                                          #P Expand include files so that we can pull in code and structures from other files in the includes folder.
  {my ($lineNumber, $inputFile, $cFile, $hFile, $code) = @_;                     # Line number of line being expanded, file containing line being expanded, output C file, output H file, line of code, hash in which to set the included methods
   if ($code =~ m(\A(include)\s+))                                               # Parse preprocessor statement
@@ -97,12 +131,18 @@ sub includeFile($$$$$)                                                          
     my @code = readFile($file);
 #   my $map  = mapCode($inputFile);
 
+    for(my $i = 0; $i < @code; ++$i)                                            # Expand duplicate commands
+     {if ($code[$i] =~ m(\Aduplicate ))                                         # Duplicate the previous function with changes
+       {$code[$i] = duplicateFunction($i, $inputFile, \@code);
+       }
+     }
+
     my @c;
-    for(my $i = 0; $i < @code; ++$i)                                            # Expand commands in included file
+    for(my $i = 0; $i < @code; ++$i)                                            # Expand exports/include commands in included file
      {my  $c = $code[$i];                                                       # With    trailing comment
       my  $d = $c =~ s(//.*\Z) ()gsr;                                           # Without trailing comment
       if ($c =~ m(\Ainclude))                                                   # Expand include files so that we can pull in code and structures from other files in the includes folder.
-       {&includeFile($i, $file, $cFile, $hFile, $d);
+       {push @c, &includeFile($i, $file, $cFile, $hFile, $d);
        }
       elsif ($c =~ m(\Aexports\s))                                              # Add exports from included package if named in the include list
        {my ($command, $name, @exports) = split m/\s+/, $d;                      # Export command, list name, exports in list
@@ -157,6 +197,9 @@ sub c($$$;$)                                                                    
    {my $c = $code[$i];
     if    ($c =~ m(\A(include)\s+))                                             # Expand include files so that we can pull in code and structures from other files in the includes folder.
      {$code[$i] = includeFile($i, $inputFile, $cFile, $hFile, $c);
+     }
+    elsif ($c =~ m(\Aduplicate ))                                               # Duplicate the previous function with changes
+     {$code[$i] = duplicateFunction($i, $inputFile, \@code);
      }
     elsif ($c =~ m(\A(exports)\s+))                                             # Skip export commands in open source
      {$code[$i] = "\n";
@@ -221,7 +264,11 @@ sub c($$$;$)                                                                    
        }
      }
     if (@duplicates)                                                            # Print duplicates
-     {confess join "\n", "Duplicates:", dump(\@duplicates);
+     {for my $i(keys @code)                                                       # Index of each line
+       {my $line = $code[$i];
+        say STDERR sprintf("%06d  %s\n", $i, $line);
+       }
+      confess join "\n", "Duplicates:", dump(\@duplicates);
      }
     if (1)                                                                      # Locate tests for each method
      {my %m;                                                                    # Methods that need tests
@@ -383,8 +430,50 @@ The prototype vectors are generated by examining all the methods defined in the
 B<c> file.  The prototype vectors are written to the specified B<h> file so
 that they can be included in the B<c> file for use via the ▷ and ▶ operators.
 
-See: L<https://github.com/philiprbrenan/C/blob/master/c/z/xml/xml.c> for a
+See: L<https://github.com/philiprbrenan/C/blob/master/c/z/arenaRedBlackTree/arenaRedBlackTree.c> for a
 working example.
+
+=head2 Preprocessor commands
+
+=head3 duplicate
+
+The B<duplicate> command generates the previous function with the changes
+indicated in the words following the command as in:
+
+  static char * key_$Node                                                       // Get the key for a node
+   (const $Node n)                                                              // Node
+   {return n.key;
+   }
+  duplicate s/key/data/g
+
+which adds the following code to the current output file:
+
+  static char * data_$Node                                                      // Get the data for a node
+   (const $Node n)                                                              // Node
+   {return n.data;
+   }
+
+=head3 exports
+
+The B<exports> command provides a name for or a collection of functions that
+can be B<include>d in generated output files, for instance:
+
+  exports aaa new$Node key_$Node
+
+creates a new set of exports called B<aaa> which contains the two functions
+mentioned. As these names have B<$> in them they will be expanded with the base
+name of the file into which they are being copied.
+
+=head3 include
+
+The B<include> command copies the named function, structures, and exported
+collections from the specified file into the current output file. For instance:
+
+  include ../arenaTree.c :arena !key_$Node data_$Node
+
+reads the relative file B<../arenaTree.c> and copies in all the structures
+mentioned in collection B<arena> except for B<key_$node> as well as copying the
+explicitly mentioned function B<data_$Node>.
 
 =head1 Description
 
@@ -831,6 +920,12 @@ my $startTime = time();
 my $localTest = ((caller(1))[0]//'Preprocess::Ops') eq "Preprocess::Ops";       # Local testing mode
 Test::More->builder->output("/dev/null") if $localTest;                         # Suppress output in local testing mode
 
+sub readCFile($)                                                                # Remove #line number statements from a C file
+ {my ($file) = @_;                                                              # C file name
+  my @l = grep {!/\A#line/ and !/\A\s*\Z/} readFile($file);
+  join '', @l;
+ }
+
 my $d = temporaryFolder;
 
   if (1) {                                                                      #Tc
@@ -839,17 +934,18 @@ my $d = temporaryFolder;
 exports aaa new$Node key_$Node
 
 typedef struct $Node                                                            // Node definition
- {char * key;                                                                   // Key for the node
+ {char * key;                                                                   // Key
  } $Node;
 
 static char * key_$Node                                                         // Get the key for a node
- (const $Node n)                                                                // Node to dump
+ (const $Node n)                                                                // Node
  {return n.key;
  }
+duplicate s/key/data/
 
 static void dump_$Node                                                          // Dump a node
- (const $Node n)                                                                // Node to dump
- {printf("%s\n", n ▷ key);
+ (const $Node n)
+ {printf("%s", n ▷ key);
  }
 
 $Node n = new$Node(key: "a");                                                   //TnewNode
@@ -872,65 +968,81 @@ END
 
   my $r = c($sbc, $bc, $bh);                                                    # Preprocess base.c
 
-# owf($logFile, readFile($bc)); exit;
-  ok index(scalar(readFile($bc)), <<'END') > -1;                                # Generated base.c
+# owf($logFile, readCFile($bc)); exit;
+  is_deeply readCFile($bc), <<'END';                                           # Generated base.c
 typedef struct BaseNode                                                            // Node definition
- {char * key;                                                                   // Key for the node
+ {char * key;                                                                   // Key
  } BaseNode;
-
 static char * key_BaseNode                                                         // Get the key for a node
- (const BaseNode n)                                                                // Node to dump
+ (const BaseNode n)                                                                // Node
  {return n.key;
  }
-
-static void dump_BaseNode                                                          // Dump a node
- (const BaseNode n)                                                                // Node to dump
- {printf("%s\n", n.proto->key(n));
+static char * data_BaseNode                                                         // Get the key for a node
+ (const BaseNode n)                                                                // Node
+ {return n.data;
  }
-
+static void dump_BaseNode                                                          // Dump a node
+ (const BaseNode n)
+ {printf("%s", n.proto->key(n));
+ }
 BaseNode n = newBaseNode(({struct BaseNode t = {key: "a", proto: &ProtoTypes_BaseNode}; t;}));                                                   //TnewNode
 assert(!strcmp(n.proto->key(n), "a"));
       n.proto->dump(n);                                                                 //Tdump
 END
 
-# owf($logFile, readFile($bh)); exit;
-  ok index(scalar(readFile($bh)), <<END) > -1;                                  # Generated base.h
+# owf($logFile, readCFile($bh)); exit;
+  is_deeply readCFile($bh), <<END;                                              # Generated base.h
 static char * key_BaseNode
  (const BaseNode n);
-static void dump_BaseNode
+static char * data_BaseNode
  (const BaseNode n);
+static void dump_BaseNode
+ (const BaseNode n)
+ {printf("%s", n ▷ key);
+ }
+BaseNode n = newBaseNode(key: "a");
+assert(!strcmp(n ▷ key, "a"));
+      n ▷ dump;;
 struct ProtoTypes_BaseNode {
-  void  (*dump)(                                                                // Dump a node
-    const BaseNode n);                                                          // Node to dump
+  char *  (*data)(                                                              // Get the key for a node
+    const BaseNode n);                                                          // Node
   char *  (*key)(                                                               // Get the key for a node
-    const BaseNode n);                                                          // Node to dump
+    const BaseNode n);                                                          // Node
  } const ProtoTypes_BaseNode =
-{dump_BaseNode, key_BaseNode};
+{data_BaseNode, key_BaseNode};
 BaseNode newBaseNode(BaseNode allocator) {return allocator;}
 END
 
   my $R = c($sdc, $dc, $dh);                                                    # Preprocess derived.c
-# owf($logFile, readFile($dc)); exit;
-  ok index(scalar(readFile $dc), <<'END') > -1;
+# owf($logFile, readCFile($dc)); exit;
+  is_deeply readCFile($dc), <<'END';
+typedef struct DerivedNode                                                            // Node definition
+ {wchar * key;
+ } DerivedNode;
+static char * key_DerivedNode                                                         //I Get the key for a node
+ (const DerivedNode n)                                                                // Node
+ {return n.key;
+ }
 static void dump_DerivedNode                                                          //I Dump a node
- (const DerivedNode n)                                                                // Node to dump
- {printf("%s\n", n.proto->key(n));
+ (const DerivedNode n)
+ {printf("%s", n.proto->key(n));
  }
 END
 
-# owf($logFile, readFile($dh)); exit;
-  ok index(scalar(readFile $dh), <<'END') > -1;
+# owf($logFile, readCFile($dh)); exit;
+  is_deeply readCFile($dh), <<'END';
 static char * key_DerivedNode
  (const DerivedNode n);
 static void dump_DerivedNode
- (const DerivedNode n);
+ (const DerivedNode n)
+ {printf("%s", n ▷ key);
+ }
+;
 struct ProtoTypes_DerivedNode {
-  void  (*dump)(                                                                // Dump a node
-    const DerivedNode n);                                                       // Node to dump
   char *  (*key)(                                                               // Get the key for a node
-    const DerivedNode n);                                                       // Node to dump
+    const DerivedNode n);                                                       // Node
  } const ProtoTypes_DerivedNode =
-{dump_DerivedNode, key_DerivedNode};
+{key_DerivedNode};
 DerivedNode newDerivedNode(DerivedNode allocator) {return allocator;}
 END
 
@@ -938,54 +1050,61 @@ END
   is_deeply $r,
 {
   methods             => {
+                           data_BaseNode => {
+                                              comment    => "Get the key for a node",
+                                              flags      => {},
+                                              name       => "data",
+                                              parameters => [["const BaseNode", "n", "Node"]],
+                                              return     => "char * ",
+                                              structure  => "const BaseNode",
+                                            },
                            dump_BaseNode => {
                                               comment    => "Dump a node",
                                               flags      => {},
                                               name       => "dump",
-                                              parameters => [["const BaseNode", "n", "Node to dump"]],
+                                              parameters => [[]],
                                               return     => "void ",
-                                              structure  => "const BaseNode",
+                                              structure  => undef,
                                             },
                            key_BaseNode  => {
                                               comment    => "Get the key for a node",
                                               flags      => {},
                                               name       => "key",
-                                              parameters => [["const BaseNode", "n", "Node to dump"]],
+                                              parameters => [["const BaseNode", "n", "Node"]],
                                               return     => "char * ",
                                               structure  => "const BaseNode",
                                             },
                          },
-  structureParameters => { BaseNode => { dump_BaseNode => 1, key_BaseNode => 1 } },
+  structureParameters => { BaseNode => { data_BaseNode => 1, key_BaseNode => 1 } },
   structures          => {
                            BaseNode => { comment => "Node definition", flags => "", name => "BaseNode" },
                          },
   testsFound          => { dump => 1, newNode => 1 },
-  testsNeeded         => { key => 1 },
+  testsNeeded         => { data => 1, key => 1 },
 };
 
-# owf($logFile, dump(unbless $R)); exit;
-
-  is_deeply $R,
+#  owf($logFile, dump(unbless $R)); exit;
+   is_deeply $R,
 {
   methods             => {
                            dump_DerivedNode => {
                                                  comment    => "Dump a node",
                                                  flags      => { I => 1 },
                                                  name       => "dump",
-                                                 parameters => [["const DerivedNode", "n", "Node to dump"]],
+                                                 parameters => [[]],
                                                  return     => "void ",
-                                                 structure  => "const DerivedNode",
+                                                 structure  => undef,
                                                },
                            key_DerivedNode  => {
                                                  comment    => "Get the key for a node",
                                                  flags      => { I => 1 },
                                                  name       => "key",
-                                                 parameters => [["const DerivedNode", "n", "Node to dump"]],
+                                                 parameters => [["const DerivedNode", "n", "Node"]],
                                                  return     => "char * ",
                                                  structure  => "const DerivedNode",
                                                },
                          },
-  structureParameters => { DerivedNode => { dump_DerivedNode => 1, key_DerivedNode => 1 } },
+  structureParameters => { DerivedNode => { key_DerivedNode => 1 } },
   structures          => {
                            DerivedNode => { comment => "Node definition", flags => "", name => "DerivedNode" },
                          },

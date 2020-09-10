@@ -1,4 +1,10 @@
-0.250   2017-11-06 (PERLANCAR)
+0.251   2020-04-29  Released-By: PERLANCAR; Urgency: low
+
+	- Tweak Rinci metadata: replace deprecated
+	  x.schema.{,element_}entity with more specific schema.
+
+
+0.250   2017-11-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,14 +12,14 @@
 	  [RT#123507].
 
 
-0.24    2017-07-10 (PERLANCAR)
+0.24    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Remove usage of Log::Any.
 
 
-0.23    2016-10-07 (PERLANCAR)
+0.23    2016-10-07  Released-By: PERLANCAR
 
 	- [Experimental] Increase safety/compatibility with other programs that
 	  might write to the passwd files by locking all the
@@ -25,14 +31,14 @@
 	  read-only ones [GH#1].
 
 
-0.22    2015-10-22 (PERLANCAR)
+0.22    2015-10-22  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace File::Flock with the more lightweight File::Flock::Retry.
 
 
-0.21    2015-09-06 (PERLANCAR)
+0.21    2015-09-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -41,21 +47,21 @@
 	  requirement.
 
 
-0.20    2015-07-01 (PERLANCAR)
+0.20    2015-07-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix Rinci metadata (add missing args 'schema's).
 
 
-0.19    2015-07-01 (PERLANCAR)
+0.19    2015-07-01  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Update Rinci metadata (args_groups -> args_rels).
 
 
-0.18    2015-03-13 (PERLANCAR)
+0.18    2015-03-13  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -65,7 +71,7 @@
           circular dependency [RT#102700].
 
 
-0.17    2015-03-10 (PERLANCAR)
+0.17    2015-03-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -73,7 +79,7 @@
 	  'format_options'.
 
 
-0.16    2015-03-07 (PERLANCAR)
+0.16    2015-03-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -81,14 +87,14 @@
           x.schema.{entity,element_entity} for completion.
 
 
-0.15    2015-03-06 (PERLANCAR)
+0.15    2015-03-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Tweak Rinci metadata: add some argument positions, schemas, etc.
 
 
-0.14    2015-03-06 (PERLANCAR)
+0.14    2015-03-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -96,53 +102,53 @@
 	  users/groups.
 
 
-0.13     2015-03-06 (PERLANCAR)
+0.13     2015-03-06  Released-By: PERLANCAR
 
          - No functional changes.
 
          - Some minor tweaks and POD fixes.
 
 
-0.12     2014-05-17 (SHARYANTO)
+0.12     2014-05-17  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Replace File::Slurp with File::Slurp::Tiny.
 
 
-0.11     2014-03-21 (SHARYANTO)
+0.11     2014-03-21  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Add 'use experimental smartmatch' for perl 5.18.
 
 
-0.10     2012-09-06 (SHARYANTO)
+0.10     2012-09-06  Released-By: SHARYANTO
 
          - Use Crypt::Password::Util's crypt() to create encrypted password in a
            more portable way.
 
 
-0.09     2012-09-06 (SHARYANTO)
+0.09     2012-09-06  Released-By: SHARYANTO
 
          - No functional changes.
 
          - In test script, use Crypt::Password::Util's looks_like_crypt() to
-           check encrypted password instead of /^\$6\$/ (implies SSHA512)
+           check encrypted password instead of /^\$6\$/  Released-By: implies SSHA512
            because different OS'es use different crypt types.
 
 
-0.08     2012-09-05 (SHARYANTO)
+0.08     2012-09-05  Released-By: SHARYANTO
 
          - Add function: set_user_groups().
 
 
-0.07     2012-09-05 (SHARYANTO)
+0.07     2012-09-05  Released-By: SHARYANTO
 
          - Add function: add_delete_user_groups().
 
 
-0.06     2012-09-01 (SHARYANTO)
+0.06     2012-09-01  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -151,7 +157,7 @@
          - Allow adding group with non-unique GID.
 
 
-0.05     2012-08-31 (SHARYANTO)
+0.05     2012-08-31  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -160,7 +166,7 @@
          - Add some overview information about the module.
 
 
-0.04     2012-08-31 (SHARYANTO)
+0.04     2012-08-31  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -170,7 +176,7 @@
            'nogroup') must already exist.
 
 
-0.03     2012-08-31 (SHARYANTO)
+0.03     2012-08-31  Released-By: SHARYANTO
 
          - Convert several package-lexical variables into package variables
            (our) to make it accessible from other packages.
@@ -178,7 +184,7 @@
          - Update examples in Synopsis.
 
 
-0.02     2012-08-31 (SHARYANTO)
+0.02     2012-08-31  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
@@ -191,7 +197,7 @@
            get_user_groups().
 
 
-0.01     2012-08-30 (SHARYANTO)
+0.01     2012-08-30  Released-By: SHARYANTO
 
          - First release. I created a new module instead of using
            Passwd::Unix::Alt mainly because of these reasons: 1) got tired of

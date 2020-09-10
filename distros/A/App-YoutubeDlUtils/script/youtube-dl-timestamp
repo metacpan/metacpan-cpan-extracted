@@ -3,7 +3,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-09-09'; # DATE
 our $DIST = 'App-YoutubeDlUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 # FRAGMENT id=shcompgen-hint command=_youtube-dl
 
 use 5.010001;
@@ -27,7 +27,7 @@ youtube-dl-timestamp - Download video with youtube-dl, prefix filename with uplo
 
 =head1 VERSION
 
-This document describes version 0.005 of youtube-dl-timestamp (from Perl distribution App-YoutubeDlUtils), released on 2020-09-09.
+This document describes version 0.007 of youtube-dl-timestamp (from Perl distribution App-YoutubeDlUtils), released on 2020-09-09.
 
 =head1 SYNOPSIS
 

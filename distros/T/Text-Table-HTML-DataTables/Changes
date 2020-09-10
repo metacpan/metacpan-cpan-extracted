@@ -1,12 +1,16 @@
-Revision history for Text-Table-HTML-DataTables
+0.003   2020-09-09  Released-By: PERLANCAR; Urgency: medium
 
-0.002   2016-12-29 (PERLANCAR)
+	- Patch bundled datatables 1.10.13: allow page size of 250, 500, 1000,
+	  2500, 5000 rows.
+
+
+0.002   2016-12-29  Released-By: PERLANCAR
 
 	- Output <html> so that browsers like Opera and Chrome view the
 	  output as HTML even though the filename does not have .html
 	  extension.
 
 
-0.001   2016-12-29 (PERLANCAR)
+0.001   2016-12-29  Released-By: PERLANCAR
 
         - First release.
