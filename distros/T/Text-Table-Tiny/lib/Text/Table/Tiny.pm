@@ -1,13 +1,13 @@
 package Text::Table::Tiny;
-$Text::Table::Tiny::VERSION = '1.01';
+$Text::Table::Tiny::VERSION = '1.02';
 use 5.010;
 use strict;
 use warnings;
 use utf8;
 use parent 'Exporter';
-use Carp                qw/ croak /;
-use Ref::Util           qw/ is_arrayref is_ref /;
-use String::TtyLength   qw/ tty_length /;
+use Carp                    qw/ croak /;
+use Ref::Util         0.202 qw/ is_arrayref /;
+use String::TtyLength 0.02  qw/ tty_width /;
 
 our @EXPORT_OK = qw/ generate_table /;
 
@@ -165,17 +165,17 @@ sub _format_column
     my $pad = $param->{compact} ? '' : ' ';
 
     if ($align eq 'r' || $align eq 'right') {
-        return $pad.' ' x ($width - tty_length($text)).$text.$pad;
+        return $pad.' ' x ($width - tty_width($text)).$text.$pad;
     }
     elsif ($align eq 'c' || $align eq 'center' || $align eq 'centre') {
-        my $total_spaces = $width - tty_length($text);
+        my $total_spaces = $width - tty_width($text);
         my $left_spaces  = int($total_spaces / 2);
         my $right_spaces = $left_spaces;
         $right_spaces++ if $total_spaces % 2 == 1;
         return $pad.(' ' x $left_spaces).$text.(' ' x $right_spaces).$pad;
     }
     else {
-        return $pad.$text.' ' x ($width - tty_length($text)).$pad;
+        return $pad.$text.' ' x ($width - tty_width($text)).$pad;
     }
 }
 
@@ -187,8 +187,11 @@ sub _calculate_widths
         my @columns = @$row;
         for (my $i = 0; $i < @columns; $i++) {
             next unless defined($columns[$i]);
-            $widths[$i] = tty_length($columns[$i]) if !defined($widths[$i])
-                                                   || tty_length($columns[$i]) > $widths[$i];
+
+            my $width = tty_width($columns[$i]);
+
+            $widths[$i] = $width if !defined($widths[$i])
+                                 || $width > $widths[$i];
         }
     }
     return @widths;
@@ -211,7 +214,7 @@ Text::Table::Tiny - generate simple text tables from 2D arrays
 
 =head1 SYNOPSIS
 
- use Text::Table::Tiny 1.00 qw/ generate_table /;
+ use Text::Table::Tiny 1.02 qw/ generate_table /;
 
  my $rows = [
    [qw/ Pokemon     Type     Count /],
@@ -227,6 +230,8 @@ Text::Table::Tiny - generate simple text tables from 2D arrays
 
 This module provides a single function, C<generate_table>, which formats
 a two-dimensional array of data as a text table.
+It handles text that includes ANSI escape codes and wide Unicode characters.
+
 There are a number of options for adjusting the output format,
 but the intention is that the default option is good enough for most uses.
 
@@ -240,14 +245,17 @@ The example shown in the SYNOPSIS generates the following table:
  | Feraligatr | Water   | 5678  |
  +------------+---------+-------+
 
-B<NOTE>: the interface changed with version 0.04, so if you
-use the C<generate_table()> function illustrated above,
-then you need to require at least version 0.04 of this module,
-as shown in the SYNOPSIS.
-
-B<NOTE 2>: some of the options described below were added in version 1.00,
-so your best bet is to require version 1.00,
+Support for wide characters was added in 1.02,
+so if you need that,
+you should specify that as your minimum required version,
 as per the SYNOPSIS.
+
+The interface changed with version 0.04,
+so if you use the C<generate_table()> function illustrated above,
+then you need to require at least version 0.04 of this module.
+
+Some of the options described below were added in version 1.00,
+so your best bet is to require at least version 1.00.
 
 
 =head2 generate_table()

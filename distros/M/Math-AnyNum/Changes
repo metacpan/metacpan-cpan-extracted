@@ -1,5 +1,23 @@
 Revision history for Math-AnyNum
 
+0.35    2020-09-13
+
+        [ADDITIONS]
+
+        - is_rough(n,k)         true if all prime factors p|n are p >= k
+        - smooth_part(n,k)      the largest k-smooth divisor of n
+        - rough_part(n,k)       the largest k-rough divisor of n
+        - make_coprime(n,k)     make n coprime to k by removing factors from n
+        - dirichlet_sum(n,...)  the Dirichlet hyperbola method
+        - ratmod(r,m)           modular rational operation, returning an integer
+
+        [IMPROVEMENTS]
+
+        - Optimizations in `sum(...)` for integer arguments.
+        - Optimizations in `faulhaber_sum(n,k)` for k = 2 and k >= n.
+        - Extended `powmod(b, n, m)` to support rational bases `b`.
+        - Internal code simplifications.
+
 0.34    2020-01-23
 
         - Increased the default value of `r` in `is_prime` from 20 to 23.

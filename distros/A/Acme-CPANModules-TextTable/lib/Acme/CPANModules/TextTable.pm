@@ -1,7 +1,9 @@
 package Acme::CPANModules::TextTable;
 
-our $DATE = '2020-08-10'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-13'; # DATE
+our $DIST = 'Acme-CPANModules-TextTable'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +37,7 @@ our $LIST = {
                     use_box_chars => 0,
                     use_color => 0,
                     columns => $table->[0],
-                    border_style => 'Default::single_ascii',
+                    border_style => 'ASCII::SingleLine',
                 );
                 $t->add_row($table->[$_]) for 1..@$table-1;
                 $t->draw;
@@ -119,7 +121,7 @@ our $LIST = {
                 Text::Table::Tiny::table(rows=>$table, header_row=>1);
             },
             features => {
-                wide_char => 0,
+                wide_char => 1,
                 color => 1,
                 box_char => 1,
             },
@@ -255,7 +257,7 @@ Acme::CPANModules::TextTable - Modules that generate text tables
 
 =head1 VERSION
 
-This document describes version 0.005 of Acme::CPANModules::TextTable (from Perl distribution Acme-CPANModules-TextTable), released on 2020-08-10.
+This document describes version 0.006 of Acme::CPANModules::TextTable (from Perl distribution Acme-CPANModules-TextTable), released on 2020-09-13.
 
 =head1 SYNOPSIS
 
@@ -273,7 +275,7 @@ For more options (dump scenario, list/include/exclude/add participants, list/inc
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Text::ANSITable> 0.501
+L<Text::ANSITable> 0.600
 
 L<Text::ASCIITable> 0.22
 
@@ -283,7 +285,7 @@ L<Text::MarkdownTable> 0.3.1
 
 L<Text::Table> 1.133
 
-L<Text::Table::Tiny> 1.00
+L<Text::Table::Tiny> 1.0101
 
 L<Text::Table::Sprintf> 0.001
 
@@ -417,7 +419,7 @@ L<Text::TabularDisplay>
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.10 >>, OS kernel: I<< Linux version 5.3.0-62-generic >>.
+Run on: perl: I<< v5.30.2 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 19 >>, OS kernel: I<< Linux version 4.15.0-91-generic >>.
 
 Benchmark with default options (C<< bencher --cpanmodules-module TextTable >>):
 
@@ -426,65 +428,65 @@ Benchmark with default options (C<< bencher --cpanmodules-module TextTable >>):
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
  | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
- | Text::ANSITable               |       2.7 |     370   |                 0.00% |             15633.54% |   0.0011  |      20 |
- | Text::ASCIITable              |      11   |      87   |               322.58% |              3623.18% |   0.00034 |      21 |
- | Text::Table::TinyColorWide    |      17   |      60   |               510.11% |              2478.80% |   0.00031 |      21 |
- | Text::FormatTable             |      18   |      56   |               555.23% |              2301.23% |   0.00027 |      20 |
- | Text::Table::TinyWide         |      23   |      44   |               740.72% |              1771.44% |   0.00038 |      20 |
- | Text::TabularDisplay          |      44   |      23   |              1532.02% |               864.05% |   0.00017 |      20 |
- | Text::Table::TinyColor        |      61   |      16   |              2134.53% |               604.11% | 5.9e-05   |      20 |
- | Text::Table::Tiny             |      64   |      16   |              2269.75% |               563.93% | 3.8e-05   |      20 |
- | Text::MarkdownTable           |      89   |      11   |              3179.63% |               379.73% | 5.7e-05   |      20 |
- | Text::Table                   |     100   |       9   |              3820.67% |               301.30% |   0.00011 |      20 |
- | Text::Table::HTML::DataTables |     130   |       7.9 |              4584.70% |               235.85% | 1.5e-05   |      20 |
- | Text::Table::HTML             |     130   |       7.9 |              4587.60% |               235.64% | 1.3e-05   |      20 |
- | Text::Table::CSV              |     240   |       4.2 |              8578.87% |                81.29% | 6.5e-06   |      20 |
- | Text::Table::Org              |     240   |       4.2 |              8704.72% |                78.69% | 1.4e-05   |      20 |
- | Text::Table::Sprintf          |     430   |       2.3 |             15633.54% |                 0.00% | 1.8e-05   |      20 |
+ | Text::ANSITable               |      3.24 |    308    |                 0.00% |             16674.90% |   0.00023 |      20 |
+ | Text::ASCIITable              |     15    |     66    |               369.92% |              3469.74% | 8.3e-05   |      20 |
+ | Text::Table::TinyColorWide    |     22    |     46    |               571.05% |              2399.81% | 4.6e-05   |      20 |
+ | Text::FormatTable             |     23    |     43    |               612.40% |              2254.72% | 5.3e-05   |      20 |
+ | Text::Table::TinyWide         |     31.1  |     32.2  |               858.53% |              1650.07% |   3e-05   |      20 |
+ | Text::Table::Tiny             |     54    |     18.5  |              1566.83% |               906.39% | 1.8e-05   |      20 |
+ | Text::TabularDisplay          |     58    |     17    |              1684.50% |               840.03% | 3.8e-05   |      20 |
+ | Text::Table::TinyColor        |     79    |     13    |              2324.55% |               591.88% | 4.2e-05   |      23 |
+ | Text::MarkdownTable           |    115    |      8.68 |              3455.01% |               371.87% | 4.7e-06   |      20 |
+ | Text::Table                   |    140    |      6.9  |              4358.77% |               276.22% | 1.9e-05   |      21 |
+ | Text::Table::HTML::DataTables |    162    |      6.19 |              4886.46% |               236.41% | 6.1e-06   |      20 |
+ | Text::Table::HTML             |    167    |      6    |              5038.23% |               226.47% |   2e-06   |      20 |
+ | Text::Table::CSV              |    284    |      3.52 |              8671.60% |                91.24% | 1.1e-06   |      20 |
+ | Text::Table::Org              |    297    |      3.37 |              9061.61% |                83.10% | 1.2e-06   |      24 |
+ | Text::Table::Sprintf          |    544    |      1.84 |             16674.90% |                 0.00% | 4.3e-07   |      20 |
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
 
  #table2#
  {dataset=>"long (3x300)"}
- +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
- | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
- +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
- | Text::ANSITable               |        20 |    50     |                 0.00% |             13649.56% |   0.00049 |      20 |
- | Text::ASCIITable              |       120 |     8     |               470.78% |              2308.92% | 2.1e-05   |      20 |
- | Text::FormatTable             |       160 |     6.2   |               639.62% |              1759.00% | 1.1e-05   |      20 |
- | Text::Table::TinyColorWide    |       170 |     6     |               665.05% |              1697.21% | 2.2e-05   |      20 |
- | Text::Table::TinyWide         |       230 |     4.3   |               976.30% |              1177.48% | 2.1e-05   |      20 |
- | Text::TabularDisplay          |       350 |     2.9   |              1495.09% |               761.99% | 1.5e-05   |      20 |
- | Text::MarkdownTable           |       420 |     2.4   |              1806.01% |               621.38% | 2.1e-05   |      20 |
- | Text::Table                   |       510 |     1.9   |              2254.22% |               484.04% | 8.7e-06   |      20 |
- | Text::Table::Tiny             |       550 |     1.8   |              2426.47% |               444.22% | 9.4e-06   |      20 |
- | Text::Table::TinyColor        |       580 |     1.7   |              2579.14% |               413.21% | 1.1e-05   |      20 |
- | Text::Table::HTML::DataTables |       990 |     1     |              4425.78% |               203.81% | 7.6e-06   |      21 |
- | Text::Table::HTML             |      1100 |     0.92  |              4909.46% |               174.47% | 1.3e-06   |      20 |
- | Text::Table::CSV              |      1810 |     0.551 |              8226.13% |                65.14% | 2.7e-07   |      20 |
- | Text::Table::Org              |      1800 |     0.54  |              8350.51% |                62.71% | 1.1e-06   |      21 |
- | Text::Table::Sprintf          |      3000 |     0.3   |             13649.56% |                 0.00% | 6.3e-06   |      21 |
- +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Text::ANSITable               |     29    | 34        |                 0.00% |             13332.77% | 6.5e-05 |      20 |
+ | Text::ASCIITable              |    164    |  6.11     |               460.25% |              2297.63% | 3.4e-06 |      20 |
+ | Text::FormatTable             |    204    |  4.9      |               597.89% |              1824.76% | 3.1e-06 |      20 |
+ | Text::Table::TinyColorWide    |    210    |  4.7      |               627.62% |              1746.14% | 6.5e-06 |      20 |
+ | Text::Table::TinyWide         |    304    |  3.28     |               941.79% |              1189.39% | 2.5e-06 |      20 |
+ | Text::TabularDisplay          |    429    |  2.33     |              1367.74% |               815.20% |   2e-06 |      20 |
+ | Text::Table::Tiny             |    483    |  2.07     |              1553.46% |               712.40% | 6.8e-07 |      21 |
+ | Text::MarkdownTable           |    540    |  1.8      |              1751.92% |               625.34% | 3.3e-06 |      20 |
+ | Text::Table                   |    600    |  1.7      |              1961.60% |               551.57% | 1.2e-05 |      35 |
+ | Text::Table::TinyColor        |    733    |  1.36     |              2407.03% |               435.80% | 1.2e-06 |      26 |
+ | Text::Table::HTML::DataTables |   1290    |  0.773    |              4324.34% |               203.61% |   2e-07 |      22 |
+ | Text::Table::HTML             |   1350    |  0.741    |              4515.31% |               191.05% | 2.7e-07 |      20 |
+ | Text::Table::Org              |   2157.23 |  0.463558 |              7281.87% |                81.97% |   0     |      23 |
+ | Text::Table::CSV              |   2180    |  0.459    |              7347.86% |                80.36% | 2.1e-07 |      20 |
+ | Text::Table::Sprintf          |   3930    |  0.255    |             13332.77% |                 0.00% | 2.1e-07 |      20 |
+ +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
  #table3#
  {dataset=>"small (3x5)"}
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant                   | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | Text::ANSITable               |       980 |    1000   |                 0.00% |              9795.39% | 5.9e-06 |      20 |
- | Text::ASCIITable              |      4800 |     210   |               391.26% |              1914.28% | 6.4e-07 |      20 |
- | Text::FormatTable             |      7000 |     140   |               617.31% |              1279.51% | 2.1e-07 |      21 |
- | Text::Table                   |      7700 |     130   |               682.99% |              1163.79% | 2.4e-07 |      25 |
- | Text::Table::TinyColorWide    |      7800 |     130   |               699.94% |              1137.01% | 2.1e-07 |      21 |
- | Text::Table::TinyWide         |     11000 |      90   |              1030.32% |               775.45% | 1.1e-07 |      20 |
- | Text::MarkdownTable           |     10000 |      90   |              1033.55% |               772.96% | 1.8e-06 |      20 |
- | Text::TabularDisplay          |     15000 |      65   |              1475.59% |               528.04% | 9.2e-08 |      27 |
- | Text::Table::Tiny             |     21000 |      48   |              2018.65% |               367.06% | 6.7e-08 |      20 |
- | Text::Table::HTML::DataTables |     23000 |      44   |              2238.39% |               323.17% | 1.1e-07 |      20 |
- | Text::Table::TinyColor        |     24000 |      42   |              2345.56% |               304.63% | 5.3e-08 |      20 |
- | Text::Table::HTML             |     47500 |      21   |              4742.64% |               104.34% |   2e-08 |      20 |
- | Text::Table::Org              |     56000 |      18   |              5604.92% |                73.45% | 2.7e-08 |      20 |
- | Text::Table::CSV              |     80800 |      12.4 |              8134.77% |                20.17% |   1e-08 |      20 |
- | Text::Table::Sprintf          |     97100 |      10.3 |              9795.39% |                 0.00% | 3.3e-09 |      20 |
+ | Text::ANSITable               |   1110    | 899       |                 0.00% |             10766.79% | 2.7e-07 |      20 |
+ | Text::ASCIITable              |   6200    | 160       |               455.09% |              1857.66% | 3.7e-07 |      20 |
+ | Text::FormatTable             |   8727.25 | 114.584   |               684.62% |              1284.97% |   0     |      22 |
+ | Text::Table                   |   9500    | 100       |               757.80% |              1166.82% |   2e-07 |      22 |
+ | Text::Table::TinyColorWide    |   9750    | 103       |               776.72% |              1139.48% | 5.2e-08 |      21 |
+ | Text::Table::TinyWide         |  14000    |  72       |              1140.93% |               775.70% | 1.1e-07 |      20 |
+ | Text::MarkdownTable           |  15000    |  67       |              1251.11% |               704.29% | 1.9e-07 |      26 |
+ | Text::TabularDisplay          |  18600    |  53.6     |              1576.31% |               548.26% | 2.7e-08 |      20 |
+ | Text::Table::Tiny             |  18776.9  |  53.2569  |              1588.13% |               543.72% |   0     |      20 |
+ | Text::Table::HTML::DataTables |  28000    |  36       |              2419.86% |               331.25% | 1.6e-07 |      39 |
+ | Text::Table::TinyColor        |  29614    |  33.7678  |              2562.43% |               308.15% |   0     |      22 |
+ | Text::Table::HTML             |  58600    |  17.1     |              5165.48% |               106.38% | 5.3e-09 |      32 |
+ | Text::Table::Org              |  67600    |  14.8     |              5979.50% |                78.74% | 5.4e-09 |      30 |
+ | Text::Table::CSV              |  96701.9  |  10.3411  |              8593.95% |                24.99% |   0     |      21 |
+ | Text::Table::Sprintf          | 120870    |   8.27335 |             10766.79% |                 0.00% |   0     |      20 |
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
  #table4#
@@ -492,21 +494,21 @@ Benchmark with default options (C<< bencher --cpanmodules-module TextTable >>):
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant                   | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | Text::ANSITable               |      3800 |    260    |                 0.00% |              7500.38% | 6.6e-07 |      22 |
- | Text::ASCIITable              |     18000 |     57    |               358.01% |              1559.43% | 1.1e-07 |      20 |
- | Text::Table                   |     21000 |     48    |               445.20% |              1294.04% | 1.1e-07 |      20 |
- | Text::MarkdownTable           |     25000 |     40    |               551.77% |              1066.11% | 1.1e-07 |      20 |
- | Text::FormatTable             |     34000 |     29    |               794.08% |               750.08% |   5e-08 |      23 |
- | Text::Table::HTML::DataTables |     38000 |     26    |               887.99% |               669.28% | 5.3e-08 |      20 |
- | Text::Table::TinyColorWide    |     44000 |     23    |              1054.15% |               558.53% | 2.7e-08 |      20 |
- | Text::Table::TinyWide         |     50000 |     20    |              1112.17% |               527.00% | 3.6e-07 |      24 |
- | Text::TabularDisplay          |     62000 |     16    |              1520.67% |               368.97% | 2.7e-08 |      20 |
- | Text::Table::Tiny             |     63000 |     16    |              1546.42% |               361.63% | 3.3e-08 |      20 |
- | Text::Table::TinyColor        |     94000 |     11    |              2352.06% |               209.96% | 1.3e-08 |      20 |
- | Text::Table::Org              |    151000 |      6.61 |              3852.70% |                92.28% | 3.3e-09 |      21 |
- | Text::Table::HTML             |    180000 |      5.6  |              4571.03% |                62.71% | 6.7e-09 |      20 |
- | Text::Table::Sprintf          |    200000 |      4    |              6351.94% |                17.80% | 5.7e-08 |      20 |
- | Text::Table::CSV              |    290000 |      3.4  |              7500.38% |                 0.00% | 6.7e-09 |      20 |
+ | Text::ANSITable               |    3970   | 252       |                 0.00% |              8969.60% | 1.9e-07 |      24 |
+ | Text::ASCIITable              |   22000   |  45       |               457.59% |              1526.57% | 5.3e-08 |      20 |
+ | Text::Table                   |   25000   |  40       |               528.25% |              1343.62% | 6.7e-08 |      20 |
+ | Text::MarkdownTable           |   30000   |  33       |               654.24% |              1102.48% | 5.3e-08 |      20 |
+ | Text::FormatTable             |   43000   |  23       |               978.37% |               741.04% | 2.9e-08 |      27 |
+ | Text::Table::HTML::DataTables |   46000   |  22       |              1058.69% |               682.74% | 5.3e-08 |      20 |
+ | Text::Table::TinyColorWide    |   57672.6 |  17.3393  |              1354.53% |               523.54% |   0     |      20 |
+ | Text::Table::Tiny             |   60000   |  20       |              1378.29% |               513.52% |   2e-07 |      20 |
+ | Text::Table::TinyWide         |   75000   |  13.3     |              1792.00% |               379.37% | 5.1e-09 |      34 |
+ | Text::TabularDisplay          |   75000   |  13       |              1793.80% |               378.91% | 2.7e-08 |      20 |
+ | Text::Table::TinyColor        |  116000   |   8.62    |              2826.12% |               209.95% | 2.8e-09 |      28 |
+ | Text::Table::Org              |  184256   |   5.42722 |              4547.04% |                95.17% |   0     |      20 |
+ | Text::Table::HTML             |  224283   |   4.45865 |              5556.54% |                60.34% |   0     |      20 |
+ | Text::Table::CSV              |  357000   |   2.8     |              8900.47% |                 0.77% | 8.1e-10 |      21 |
+ | Text::Table::Sprintf          |  360000   |   2.78    |              8969.60% |                 0.00% | 8.3e-10 |      20 |
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
  #table5#
@@ -514,21 +516,21 @@ Benchmark with default options (C<< bencher --cpanmodules-module TextTable >>):
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | Text::ANSITable               |       130 |     8     |                 0.00% |             11509.16% | 1.5e-05 |      20 |
- | Text::ASCIITable              |       520 |     1.9   |               315.64% |              2693.06% | 4.1e-06 |      20 |
- | Text::FormatTable             |       720 |     1.4   |               474.77% |              1919.79% |   5e-06 |      20 |
- | Text::Table::TinyColorWide    |       850 |     1.2   |               579.94% |              1607.38% | 3.4e-06 |      20 |
- | Text::Table                   |      1200 |     0.83  |               858.40% |              1111.31% | 2.2e-06 |      20 |
- | Text::Table::TinyWide         |      1200 |     0.81  |               880.96% |              1083.44% | 9.1e-07 |      20 |
- | Text::TabularDisplay          |      2300 |     0.43  |              1757.95% |               524.84% | 6.9e-07 |      20 |
- | Text::Table::Tiny             |      3000 |     0.34  |              2250.85% |               393.83% | 1.1e-06 |      20 |
- | Text::Table::TinyColor        |      3100 |     0.33  |              2342.20% |               375.36% | 4.3e-07 |      20 |
- | Text::MarkdownTable           |      3600 |     0.28  |              2768.12% |               304.77% | 6.9e-07 |      20 |
- | Text::Table::HTML::DataTables |      5700 |     0.18  |              4402.09% |               157.86% | 2.7e-07 |      20 |
- | Text::Table::HTML             |      6620 |     0.151 |              5164.87% |               120.50% | 5.2e-08 |      21 |
- | Text::Table::Org              |      9300 |     0.11  |              7322.71% |                56.40% | 2.1e-07 |      20 |
- | Text::Table::CSV              |     12200 |     0.082 |              9605.19% |                19.62% |   8e-08 |      20 |
- | Text::Table::Sprintf          |     15000 |     0.069 |             11509.16% |                 0.00% | 1.3e-07 |      20 |
+ | Text::ANSITable               |    140    |   7.2     |                 0.00% |             13367.08% | 2.3e-05 |      23 |
+ | Text::ASCIITable              |    647    |   1.55    |               364.09% |              2801.80% | 1.1e-06 |      20 |
+ | Text::FormatTable             |    860    |   1.2     |               515.55% |              2087.80% | 3.8e-06 |      20 |
+ | Text::Table::TinyColorWide    |   1080    |   0.927   |               673.30% |              1641.52% | 2.1e-07 |      20 |
+ | Text::Table                   |   1000    |   0.7     |               862.81% |              1298.73% | 1.5e-05 |      20 |
+ | Text::Table::TinyWide         |   1500    |   0.65    |               998.44% |              1126.02% |   1e-06 |      21 |
+ | Text::Table::Tiny             |   2500    |   0.401   |              1689.78% |               652.44% | 5.2e-08 |      21 |
+ | Text::TabularDisplay          |   2800    |   0.36    |              1878.08% |               580.81% | 3.7e-07 |      20 |
+ | Text::Table::TinyColor        |   3733.57 |   0.26784 |              2577.78% |               402.92% |   0     |      26 |
+ | Text::MarkdownTable           |   4400    |   0.227   |              3056.99% |               326.58% | 2.1e-07 |      20 |
+ | Text::Table::HTML::DataTables |   6900    |   0.14    |              4858.71% |               171.58% | 1.8e-07 |      29 |
+ | Text::Table::HTML             |   8210    |   0.122   |              5788.46% |               128.70% | 4.9e-08 |      24 |
+ | Text::Table::Org              |  11300    |   0.0885  |              8006.26% |                66.13% | 2.5e-08 |      22 |
+ | Text::Table::CSV              |  14600    |   0.0686  |             10347.90% |                28.90% | 2.7e-08 |      20 |
+ | Text::Table::Sprintf          |  18800    |   0.0533  |             13367.08% |                 0.00% | 2.2e-08 |      30 |
  +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
@@ -538,22 +540,22 @@ Benchmark module startup overhead (C<< bencher --cpanmodules-module TextTable --
  +-------------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
  | participant                   | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
  +-------------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
- | Text::ANSITable               |      55   |              46.4 |                 0.00% |               605.95% |   0.00023 |      20 |
- | Text::MarkdownTable           |      43   |              34.4 |                28.89% |               447.69% |   0.00013 |      20 |
- | Text::Table::TinyColorWide    |      33   |              24.4 |                68.74% |               318.38% | 7.3e-05   |      20 |
- | Text::Table::TinyWide         |      32   |              23.4 |                72.30% |               309.72% |   0.00012 |      20 |
- | Text::Table                   |      21.9 |              13.3 |               152.58% |               179.49% |   2e-05   |      20 |
- | Text::ASCIITable              |      18   |               9.4 |               207.79% |               129.36% | 9.1e-05   |      20 |
- | Text::Table::Tiny             |      15   |               6.4 |               267.30% |                92.20% | 4.4e-05   |      23 |
- | Text::FormatTable             |      14   |               5.4 |               287.86% |                82.01% | 2.8e-05   |      20 |
- | Text::Table::TinyColor        |      14   |               5.4 |               309.25% |                72.50% | 3.6e-05   |      21 |
- | Text::Table::HTML             |      10   |               1.4 |               356.93% |                54.50% |   0.00031 |      20 |
- | Text::Table::HTML::DataTables |      10   |               1.4 |               411.84% |                37.92% |   0.00022 |      23 |
- | Text::TabularDisplay          |      10   |               1.4 |               430.28% |                33.13% | 2.8e-05   |      20 |
- | Text::Table::Sprintf          |       9.6 |               1   |               474.16% |                22.95% | 3.4e-05   |      20 |
- | Text::Table::Org              |       9   |               0.4 |               528.40% |                12.34% |   0.00016 |      20 |
- | perl -e1 (baseline)           |       8.6 |               0   |               541.15% |                10.11% |   4e-05   |      21 |
- | Text::Table::CSV              |       7.8 |              -0.8 |               605.95% |                 0.00% | 2.1e-05   |      21 |
+ | Text::ANSITable               |      36   |              30   |                 0.00% |               748.19% |   0.0001  |      20 |
+ | Text::MarkdownTable           |      34   |              28   |                 6.09% |               699.49% | 9.9e-05   |      20 |
+ | Text::Table::TinyColorWide    |      26   |              20   |                39.59% |               507.63% |   0.00018 |      20 |
+ | Text::Table::TinyWide         |      24   |              18   |                49.52% |               467.28% | 9.2e-05   |      20 |
+ | Text::Table                   |      17   |              11   |               107.81% |               308.15% | 9.3e-05   |      24 |
+ | Text::Table::Tiny             |      10   |               4   |               160.32% |               225.82% |   0.00031 |      20 |
+ | Text::ASCIITable              |      10   |               4   |               164.39% |               220.81% |   0.00025 |      20 |
+ | Text::FormatTable             |      10   |               4   |               236.26% |               152.25% |   0.00014 |      20 |
+ | Text::Table::TinyColor        |      10   |               4   |               271.83% |               128.11% |   0.00013 |      20 |
+ | Text::TabularDisplay          |       9   |               3   |               317.88% |               102.97% |   0.00013 |      20 |
+ | Text::Table::HTML             |       8   |               2   |               347.70% |                89.46% |   0.00018 |      20 |
+ | Text::Table::HTML::DataTables |       8   |               2   |               352.66% |                87.38% | 8.8e-05   |      22 |
+ | Text::Table::CSV              |       6.8 |               0.8 |               427.09% |                60.92% | 4.8e-05   |      20 |
+ | Text::Table::Org              |       6   |               0   |               465.76% |                49.92% |   0.00011 |      20 |
+ | perl -e1 (baseline)           |       6   |               0   |               473.15% |                47.99% | 7.8e-05   |      20 |
+ | Text::Table::Sprintf          |       4.3 |              -1.7 |               748.19% |                 0.00% | 2.7e-05   |      20 |
  +-------------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
 
 
@@ -569,7 +571,7 @@ To display as an interactive HTML table on a browser, you can add option C<--for
  | Text::FormatTable             | no           | no        | no            |
  | Text::MarkdownTable           | no           | no        | no            |
  | Text::Table                   | N/A *4)      | no        | no            |
- | Text::Table::Tiny             | yes          | yes       | no            |
+ | Text::Table::Tiny             | yes          | yes       | yes           |
  | Text::Table::Sprintf          | no           | no        | no            |
  | Text::Table::TinyColor        | no           | yes       | no            |
  | Text::Table::TinyColorWide    | no           | yes       | yes           |

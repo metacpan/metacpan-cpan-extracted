@@ -22,4 +22,4 @@ requires:
   JSON::XS: '0'
   Object::Tiny: '0'
   Validate::Tiny: '0'
-version: '0.10'
+version: '0.12'

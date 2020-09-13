@@ -6,7 +6,7 @@ use base 'RxPerl::Observable';
 
 use RxPerl::Utils 'get_subscription_from_subscriber';
 
-our $VERSION = "v0.24.0";
+our $VERSION = "v0.25.1";
 
 sub new {
     my ($class) = @_;

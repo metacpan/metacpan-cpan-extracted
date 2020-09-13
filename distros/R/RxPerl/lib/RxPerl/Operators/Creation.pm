@@ -8,13 +8,13 @@ use RxPerl::Utils 'get_subscription_from_subscriber', 'get_timer_subs', 'get_int
 use RxPerl::Subject;
 
 use Carp 'croak';
-use Scalar::Util 'weaken', 'blessed';
+use Scalar::Util qw/ weaken blessed reftype /;
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
     rx_observable rx_combine_latest rx_concat rx_defer rx_EMPTY rx_from_event
     rx_from_event_array rx_interval rx_merge rx_NEVER rx_of rx_race
-    rx_subject rx_throw_error rx_timer rx_from
+    rx_subject rx_throw_error rx_timer rx_from rx_fork_join
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -130,6 +130,73 @@ sub rx_EMPTY {
         my ($subscriber) = @_;
 
         $subscriber->{complete}->() if defined $subscriber->{complete};
+
+        return;
+    });
+}
+
+sub rx_fork_join {
+    my ($sources) = @_;
+
+    my $arg_is_array = !(blessed $sources) && (reftype $sources eq 'ARRAY');
+    my $arg_is_hash = !(blessed $sources) && (reftype $sources eq 'HASH');
+
+    croak "argument of rx_fork_join needs to be either an arrayref or a hashref"
+        unless $arg_is_array or $arg_is_hash;
+
+    if ($arg_is_array) {
+        my $i = 0;
+        $sources = { map {($i++, $_)} @$sources };
+    }
+
+    return rx_observable->new(sub {
+        my ($subscriber) = @_;
+
+        my $sources = { %$sources };
+        my %last_values;
+        my %own_subscriptions;
+        my @keys = keys %$sources;
+        @keys = sort {$a <=> $b} @keys if $arg_is_array;
+
+        get_subscription_from_subscriber($subscriber)->add_dependents(
+            \%own_subscriptions, sub { undef @keys },
+        );
+
+        if (! @keys) {
+            $subscriber->{complete}->() if defined $subscriber->{complete};
+            return;
+        }
+
+        for (my $i = 0; $i < @keys; $i++) {
+            my $key = $keys[$i];
+            my $source = $sources->{$key};
+            my $own_subscription = RxPerl::Subscription->new;
+            $own_subscriptions{$own_subscription} = $own_subscription;
+            $source->subscribe({
+                new_subscription => $own_subscription,
+                next     => sub {
+                    $last_values{$key} = $_[0];
+                },
+                error    => $subscriber->{error},
+                complete => sub {
+                    if (exists $last_values{$key}) {
+                        if (keys(%last_values) == keys %$sources) {
+                            if ($arg_is_array) {
+                                my @ret;
+                                $ret[$_] = $last_values{$_} foreach keys %last_values;
+                                $subscriber->{next}->(\@ret) if defined $subscriber->{next};
+                            }
+                            else {
+                                $subscriber->{next}->(\%last_values) if defined $subscriber->{next};
+                            }
+                            $subscriber->{complete}->() if defined $subscriber->{complete};
+                        }
+                    } else {
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                    }
+                },
+            });
+        }
 
         return;
     });

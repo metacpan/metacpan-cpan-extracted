@@ -72,7 +72,7 @@ RxPerl - an implementation of Reactive Extensions / rxjs for Perl
 This module is an implementation of [Reactive Extensions](http://reactivex.io/) in Perl. It replicates the
 behavior of [rxjs 6](https://www.npmjs.com/package/rxjs) which is the JavaScript implementation of ReactiveX.
 
-Currently 40 of the 100+ operators in rxjs are implemented in this module.
+Currently 44 of the 100+ operators in rxjs are implemented in this module.
 
 # EXPORTABLE FUNCTIONS
 
@@ -145,6 +145,24 @@ should apply to RxPerl too).
             rx_EMPTY,
             rx_of(40, 50, 60),
         )->subscribe($observer);
+
+- rx\_fork\_join
+
+    [https://rxjs.dev/api/index/function/forkJoin](https://rxjs.dev/api/index/function/forkJoin)
+
+        # [30, 3, 'c']
+        rx_fork_join([
+            rx_of(10, 20, 30),
+            rx_of(1, 2, 3),
+            rx_of('a', 'b', 'c'),
+        ])->subscribe($observer);
+
+        # {x => 30, y => 3, z => 'c'}
+        rx_fork_join({
+            x => rx_of(10, 20, 30),
+            y => rx_of(1, 2, 3),
+            z => rx_of('a', 'b', 'c'),
+        })->subscribe($observer);
 
 - rx\_from
 
@@ -280,6 +298,15 @@ the result of the transformation to the next pipeable operator in the pipe, or r
 The following list is the currently implemented operators, with links to relevant rxjs documentation (which should apply to RxPerl
 too).
 
+- op\_catch\_error
+
+    [https://rxjs.dev/api/operators/catchError](https://rxjs.dev/api/operators/catchError)
+
+        # foo, foo, foo, complete
+        rx_throw_error('foo')->pipe(
+            op_catch_error(sub ($err, $caught) { rx_of($err, $err, $err) }),
+        )->subscribe($observer);
+
 - op\_concat\_map
 
     [https://rxjs.dev/api/operators/concatMap](https://rxjs.dev/api/operators/concatMap)
@@ -294,6 +321,8 @@ too).
 - op\_debounce\_time
 
     [https://rxjs.dev/api/operators/debounceTime](https://rxjs.dev/api/operators/debounceTime)
+
+    Works like rxjs's "debounceTime", except the parameter is in seconds instead of ms.
 
         # 3, complete
         rx_of(1, 2, 3)->pipe(
@@ -371,6 +400,15 @@ too).
         # 0, 2, 4, 6, ... (every 1.4 seconds)
         rx_interval(0.7)->pipe(
             op_filter(sub {$_[0] % 2 == 0}),
+        )->subscribe($observer);
+
+- op\_finalize
+
+    [https://rxjs.dev/api/operators/finalize](https://rxjs.dev/api/operators/finalize)
+
+        # 1, 2, 3, complete, 'hi there'
+        rx_of(1, 2, 3)->pipe(
+            op_finalize(sub {print "hi there\n"}),
         )->subscribe($observer);
 
 - op\_first

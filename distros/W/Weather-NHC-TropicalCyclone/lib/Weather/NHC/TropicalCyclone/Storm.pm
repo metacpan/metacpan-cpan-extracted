@@ -8,13 +8,12 @@ use HTTP::Status qw/:constants/;
 use Validate::Tiny    ();
 use HTML::TreeBuilder ();
 
+# specify accessors
+use Object::Tiny qw/id binNumber name classification intensity pressure latitude longitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/;
+
 our $DEFAULT_GRAPHICS_ROOT = q{https://www.nhc.noaa.gov/storm_graphics};
 our $DEFAULT_BTK_ROOT      = q{https://ftp.nhc.noaa.gov/atcf/btk};
-
-use Object::Tiny
-  qw/id binNumber name classification intensity pressure latitude longitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/;
-
-our $CLASSIFICATIONS = {
+our $CLASSIFICATIONS       = {
     TD  => q{Tropical Depression},
     STD => q{Subtropical Depression},
     TS  => q{Tropical Storm},
@@ -25,35 +24,68 @@ our $CLASSIFICATIONS = {
     PC  => q{Potential Tropical Cyclone},
 };
 
-my $validation_rules = {
-    fields => [qw/id binNumber name classification/],
-    checks => [
-        [qw/id binNumber name classification/] => Validate::Tiny::is_required(),
-        classification                         => sub {
-            my ( $value, $params ) = @_;
-
-            # branch, if true indicates failed validation
-            if ( not grep { /$value/ } ( keys %$CLASSIFICATIONS ) ) {
-                return q{Invalid classification, not defined in NHC specification.};
-            }
-
-            # indicates successful validation
-            return undef;
-        },
-    ],
-};
-
+# constructor
 sub new {
     my ( $pkg, $self ) = @_;
 
     my $v          = Validate::Tiny->new;
-    my $validation = $v->check( $self, $validation_rules );
+    my $validation = $v->check( $self, $pkg->_get_validation_rules );
     if ( not $v->success ) {
         die qq{Field validation errors found creating package instance for: } . join( q{, }, keys %{ $validation->error } ) . qq{\n};
     }
 
-    bless $self, $pkg;
-    return $self;
+    return bless $self, $pkg;
+}
+
+sub _get_validation_rules {
+    my $self = shift;
+    return {
+        fields => [qw/id binNumber name classification/],
+        checks => [
+            [qw/id binNumber name classification/] => Validate::Tiny::is_required(),
+            classification                         => sub {
+                my ( $value, $params ) = @_;
+
+                # branch, if true indicates failed validation
+                if ( not grep { /$value/ } ( keys %$CLASSIFICATIONS ) ) {
+                    return q{Invalid classification, not defined in NHC specification.};
+                }
+
+                # indicates successful validation
+                return undef;
+            },
+        ],
+    };
+}
+
+sub _fetch_text_types {
+    my $self = shift;
+
+    # white list of resources and URL attributes they provide
+    my $types = {
+        text => [qw/publicAdvisory forecastAdvisory forecastDiscussion windSpeedProbabilities/],
+    };
+
+    return $types;
+}
+
+sub _fetch_data_types {
+    my $self = shift;
+
+    # white list of resources and URL attributes they provide
+    my $types = {
+        zipFile          => [qw/forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS potentialStormSurgeFloodingGIS/],
+        kmzFile          => [qw/forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS/],
+        zipFile5km       => [qw/windSpeedProbabilitiesGIS/],
+        zipFile0p5deg    => [qw/windSpeedProbabilitiesGIS/],
+        kmzFile34kt      => [qw/windSpeedProbabilitiesGIS/],
+        kmzFile50kt      => [qw/windSpeedProbabilitiesGIS/],
+        kmzFile64kt      => [qw/windSpeedProbabilitiesGIS/],
+        kmlFile          => [qw/stormSurgeWatchWarningGIS/],
+        zipFileTidalMask => [qw/potentialStormSurgeFloodingGIS/],
+    };
+
+    return $types;
 }
 
 # get storm classification "real classification"
@@ -83,7 +115,7 @@ sub basin {
 # attempts to get base graphics directory, then scrapes
 # the index page for the files and returns an array reference
 # of all image addresses for this storm
-sub fetch_forecastGraphics {
+sub fetch_forecastGraphics_urls {
     my $self = shift;
 
     my $url = $self->forecastGraphics->{url};
@@ -96,6 +128,7 @@ sub fetch_forecastGraphics {
 
     $html =~ m/storm_graphics\/(.+)\/refresh/;
     my $prefix = $1;
+    return [] if not $prefix;
 
     my $base = sprintf( qq{%s/%s}, $DEFAULT_GRAPHICS_ROOT, $prefix );
     $response = $http->get($base);
@@ -106,17 +139,6 @@ sub fetch_forecastGraphics {
     @imgs = map { qq{$base/$_} } @imgs;
 
     return \@imgs;
-}
-
-sub _fetch_text_types {
-    my $self = shift;
-
-    # white list of resources and URL attributes they provide
-    my $types = {
-        text => [qw/publicAdvisory forecastAdvisory forecastDiscussion windSpeedProbabilities/],
-    };
-
-    return $types;
 }
 
 # rolls up requesting url and extracting text inside of the <pre></pre>
@@ -237,25 +259,6 @@ sub fetch_stormSurgeWatchWarningGIS {
 sub fetch_potentialStormSurgeFloodingGIS {
     my ( $self, $type, $local_file ) = @_;
     return $self->_get_file( q{potentialStormSurgeFloodingGIS}, $type, $local_file );
-}
-
-sub _fetch_data_types {
-    my $self = shift;
-
-    # white list of resources and URL attributes they provide
-    my $types = {
-        zipFile          => [qw/forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS potentialStormSurgeFloodingGIS/],
-        kmzFile          => [qw/forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS/],
-        zipFile5km       => [qw/windSpeedProbabilitiesGIS/],
-        zipFile0p5deg    => [qw/windSpeedProbabilitiesGIS/],
-        kmzFile34kt      => [qw/windSpeedProbabilitiesGIS/],
-        kmzFile50kt      => [qw/windSpeedProbabilitiesGIS/],
-        kmzFile64kt      => [qw/windSpeedProbabilitiesGIS/],
-        kmlFile          => [qw/stormSurgeWatchWarningGIS/],
-        zipFileTidalMask => [qw/potentialStormSurgeFloodingGIS/],
-    };
-
-    return $types;
 }
 
 # rolls up requesting file, based on url associated with file key ("url" key is not specified)
@@ -428,7 +431,7 @@ Internal method used by all of the fetch methods that downloads files.
 
 =over 3
 
-=item C<fetch_forecastGraphics>
+=item C<fetch_forecastGraphics_urls>
 
 Uses the URL provided by the C<forecastGraphics> fields to determine the location
 of the base graphics directory. The default index page returned by the web server
@@ -438,6 +441,9 @@ Returns list of graphics URLs as an array reference. A method to download all of
 the graphics is not provided at this time. But give the list of URLs, it's trivial
 to write a loop to download any number of these images using C<HTTP::Tiny>'s
 C<mirror> method. See C<perldoc HTTP::Tiny> for more information.
+
+If the base directory for the image URLs can't be determined, this method returns
+an empty array reference. It is up to the caller to determine that none were returned.
 
 =item C<fetch_best_track>
 

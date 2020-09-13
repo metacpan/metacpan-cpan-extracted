@@ -1,5 +1,9 @@
 Revision history for Perl module YAML::PP::LibYAML
 
+0.005 2020-09-13 14:30:47+02:00
+
+    - Fix 'width' option
+
 0.004 2020-09-07 22:50:24+02:00
 
     - Pass option 'width' to YAML::LibYAML::API

@@ -1,3 +1,9 @@
+0.006   2020-09-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Note that Text::Table::Tiny (1.01_01) can now handle wide
+	  characters.
+
+
 0.005   2020-08-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Note that Text::Table::Tiny (1.00) now can draw using box-drawing

@@ -58,7 +58,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.58';
+our $VERSION  = '8.59';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -781,7 +781,7 @@ its copyright to Sebastian Riedel.
 
 =item
 
-Some of the work on this distribution has been sponsored by L<The Perl Foundation|http://www.perlfoundation.org>.
+Some of the work on this distribution has been sponsored by L<The Perl Foundation|https://www.perlfoundation.org>.
 
 =back
 

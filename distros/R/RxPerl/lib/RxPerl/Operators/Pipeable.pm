@@ -12,9 +12,10 @@ use Scalar::Util 'reftype', 'refaddr';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    op_concat_map op_debounce_time op_delay op_distinct_until_changed op_distinct_until_key_changed op_end_with
-    op_exhaust_map op_filter op_first op_map op_map_to op_merge_map op_multicast op_pairwise op_pluck op_ref_count
-    op_scan op_share op_start_with op_switch_map op_take op_take_until op_take_while op_tap op_with_latest_from
+    op_catch_error op_concat_map op_debounce_time op_delay op_distinct_until_changed op_distinct_until_key_changed
+    op_end_with op_exhaust_map op_filter op_finalize op_first op_map op_map_to op_merge_map op_multicast op_pairwise
+    op_pluck op_ref_count op_scan op_share op_start_with op_switch_map op_take op_take_until op_take_while op_tap
+    op_with_latest_from
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -22,6 +23,54 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 # Two bugs: 1) script doesn't exit upon the subscriber receiving complete, and 2) delaying of(1, 2, 3) often
 # shows fewer than 3 'next' values and not in the right order.
 
+sub _op_catch_error_helper {
+    my ($source, $selector, $subscriber, $dependents, $error) = @_;
+
+    my $new_observable;
+    if (@_ == 4) {
+        $new_observable = $source;
+    } else {
+        eval { $new_observable = $selector->($error, $source) };
+        if (my $e = $@) {
+            $subscriber->{error}->($e) if defined $subscriber->{error};
+            return;
+        }
+    }
+
+    my $own_subscription = RxPerl::Subscription->new;
+    @$dependents = ($own_subscription);
+    my $own_subscriber = {
+        new_subscription => $own_subscription,
+        next     => $subscriber->{next},
+        error    => sub {
+            _op_catch_error_helper($source, $selector, $subscriber, $dependents, $_[0]);
+        },
+        complete => $subscriber->{complete},
+    };
+
+    $new_observable->subscribe($own_subscriber);
+}
+
+sub op_catch_error {
+    my ($selector) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $dependents = [];
+            get_subscription_from_subscriber($subscriber)->add_dependents($dependents);
+
+            _op_catch_error_helper(
+                $source, $selector, $subscriber, $dependents,
+            );
+
+            return;
+        });
+    };
+}
 
 sub _op_concat_map_helper {
     my (
@@ -326,6 +375,34 @@ sub op_filter {
                 } else {
                     $subscriber->{next}->(@_) if $passes and defined $subscriber->{next};
                 }
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
+sub op_finalize {
+    my ($fn) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $own_subscriber = {
+                %$subscriber,
+                error => sub {
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                    $fn->();
+                },
+                complete => sub {
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                    $fn->();
+                },
             };
 
             $source->subscribe($own_subscriber);

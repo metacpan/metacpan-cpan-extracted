@@ -185,7 +185,7 @@ plan tests => 663;
     is(3 / Math::AnyNum->new_c(0),  Math::AnyNum->new_z('3') / Math::AnyNum->new_c(0));
     is(-3 / Math::AnyNum->new_c(0), Math::AnyNum->new_z('-3') / Math::AnyNum->new_c(0));
 
-    is(23 / Math::AnyNum->new_c('3', '4'), '2.76-3.68i');
+    is(23 / Math::AnyNum->new_c('3', '4'),  '2.76-3.68i');
     is(-23 / Math::AnyNum->new_c('3', '4'), '-2.76+3.68i');
 
     is(-13 / Math::AnyNum->new_c('-3', '-4'), '1.56-2.08i');
@@ -602,15 +602,15 @@ plan tests => 663;
     like($c / (7),  qr/^0\.714285714285714285714\d*\z/);
 
     # With common factors
-    is($q / (2),  '1');
-    is($q / (-2), '-1');
+    is($q / (2),          '1');
+    is($q / (-2),         '-1');
     is(($q * 26) / (13),  '4');
     is((26 * $q) / (-13), '-4');
-    is($q / (-2), '-1');
-    is($z / (3),  '1');
-    is($z / (-3), '-1');
-    is(($z * 10) / 5, '6');
-    is((10 * $z) / (-5), '-6');
+    is($q / (-2),         '-1');
+    is($z / (3),          '1');
+    is($z / (-3),         '-1');
+    is(($z * 10) / 5,     '6');
+    is((10 * $z) / (-5),  '-6');
 
     #
     ## Scalar power
@@ -708,9 +708,9 @@ plan tests => 663;
     like($f->log10, qr/^0\.60205999132796239042747\d*\z/);
     like($c->log10, qr/^0\.69897000433601880478626110527\d*\z/);
 
-    is(Math::AnyNum->new(),      '0');
-    is(Math::AnyNum->new(''),    '0');
-    is(Math::AnyNum->new(undef), '0');
+    is(Math::AnyNum->new(),          '0');
+    is(Math::AnyNum->new(''),        '0');
+    is(Math::AnyNum->new(undef),     '0');
     is(Math::AnyNum->new(undef, 10), '0');
     is(Math::AnyNum->new(undef, 36), '0');
 
@@ -793,16 +793,16 @@ plan tests => 663;
     ok($NaN != $zero);
     ok($zero != $NaN);
 
-    ok(not defined($NaN <=> 42));
-    ok(not defined($NaN <=> Math::AnyNum->new_f(42)));
+    ok(not defined($NaN                    <=> 42));
+    ok(not defined($NaN                    <=> Math::AnyNum->new_f(42)));
     ok(not defined(Math::AnyNum->new_f(42) <=> $NaN));
-    ok(not defined(42 <=> $NaN));
+    ok(not defined(42                      <=> $NaN));
 
     my $NaN_NaN = Math::AnyNum->new_c("NaN", "NaN");
     ok(not defined($NaN_NaN <=> 42));
-    ok(not defined(42 <=> $NaN_NaN));
+    ok(not defined(42       <=> $NaN_NaN));
     ok(not defined($NaN_NaN <=> $NaN_NaN));
-    ok(not defined($NaN <=> $NaN_NaN));
+    ok(not defined($NaN     <=> $NaN_NaN));
     ok(not defined($NaN_NaN <=> $NaN));
 
     ok(not $NaN == $NaN);
@@ -864,7 +864,7 @@ plan tests => 663;
 
     my $z = $x + $y * $i;
 
-    is($z + 2, "5+4i");
+    is($z + 2,    "5+4i");
     is($z + (-2), "1+4i");
 }
 
@@ -969,10 +969,10 @@ plan tests => 663;
 }
 
 {
-    is(Math::AnyNum->new_c(3, 4), '3+4i');
-    is(Math::AnyNum->new_c(5),     '5');
-    is(Math::AnyNum->new_c('1e2'), '100');
-    is(Math::AnyNum->new_c('1e2', '1e3'), '100+1000i');
+    is(Math::AnyNum->new_c(3, 4),           '3+4i');
+    is(Math::AnyNum->new_c(5),              '5');
+    is(Math::AnyNum->new_c('1e2'),          '100');
+    is(Math::AnyNum->new_c('1e2', '1e3'),   '100+1000i');
     is(Math::AnyNum->new_c("ff", "ae", 16), '255+174i');
 }
 

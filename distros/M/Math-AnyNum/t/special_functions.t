@@ -46,7 +46,7 @@ like(beta(complex(0.5), complex(0.5)), qr/^3\.1415926535897932384626433\d*\z/);
     $f1 = complex($f1);
     $f2 = complex($f2);
 
-    like(atan2($f1, $f2)->round(-50), qr/^0\.3217505543966421934014046143586613\d*\z/);
+    like(atan2($f1,                       $f2)->round(-50), qr/^0\.3217505543966421934014046143586613\d*\z/);
     like(atan2(Math::AnyNum->new_c(3, 4), Math::AnyNum->new_c(-7, -5)),
          qr/^2\.6255065752238701743392190680509115\d*-0\.1344635740384774986775422855600050869\d*i\z/);
     like(atan2(Math::AnyNum->new_c(-3, -4), Math::AnyNum->new_c(-7, -5)),
@@ -205,12 +205,12 @@ is(root(125, complex(3)), 5);
 is(root(125, rat(3)),     5);
 is(root(125, int(3)),     5);
 
-is(join(' ', polymod(86400 - 1,                60, 60,                    24)), '59 59 23 0');
-is(join(' ', polymod(86400,                    60, 60,                    24)), '0 0 0 1');
-is(join(' ', polymod(Math::AnyNum->new(83400), 42, Math::AnyNum->new(23), 9)),  '30 7 5 9');
-is(join(' ', polymod(Math::AnyNum->new(83400), Math::AnyNum->new(42), 23)), '30 7 86');
-is(join(' ', polymod('33400i', '3+9i', '5+2i')), '-3+i 2+4i 652-39i');
-is(join(' ', polymod(polymod('33400i', '3+9i', '5+2i'))), '-1+5i 690+613i -1-i');
+is(join(' ', polymod(86400 - 1, 60, 60, 24)),                                  '59 59 23 0');
+is(join(' ', polymod(86400, 60, 60, 24)),                                      '0 0 0 1');
+is(join(' ', polymod(Math::AnyNum->new(83400), 42, Math::AnyNum->new(23), 9)), '30 7 5 9');
+is(join(' ', polymod(Math::AnyNum->new(83400), Math::AnyNum->new(42), 23)),    '30 7 86');
+is(join(' ', polymod('33400i', '3+9i', '5+2i')),                               '-3+i 2+4i 652-39i');
+is(join(' ', polymod(polymod('33400i', '3+9i', '5+2i'))),                      '-1+5i 690+613i -1-i');
 
 #<<<
 is(polygonal_root('3599999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999937', Math::AnyNum::ipow(10, 128)), 9);

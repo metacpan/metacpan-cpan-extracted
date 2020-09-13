@@ -17,3 +17,4 @@ t/06-align.t
 t/07-escape-codes.t
 t/08-style.t
 t/09-unknown-argument.t
+t/10-wide-characters.t

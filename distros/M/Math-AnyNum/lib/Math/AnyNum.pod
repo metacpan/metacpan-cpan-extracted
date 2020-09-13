@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =head1 SYNOPSIS
 
@@ -86,6 +86,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     chebyshevU(n,x)           Chebyshev polynomials of the 2nd kind: U_n(x)
     faulhaber_sum(n,k)        sum of powers: 1^k + 2^k + ... + n^k
     geometric_sum(n,r)        geometric sum: r^0 + r^1 + ... + r^n
+    dirichlet_sum(n,f,g,F,G)  Dirichlet hyperbola method
     kronecker(n,k)            Kronecker (Jacobi) symbol
     lcm(@list)                least common multiple
     gcd(@list)                greatest common divisor
@@ -115,8 +116,12 @@ Additionally, each Math::AnyNum object is B<immutable>.
     is_polygonal(n,k)         return 1 if n is a first k-gonal number
     is_polygonal2(n,k)        return 1 if n is a second k-gonal number
     is_coprime(n,k)           return 1 if gcd(n,k) = 1
-    is_smooth(n,k)            return 1 if all prime factors of n are <= k
+    is_rough(n,B)             return 1 if all prime factors of n are >= B
+    is_smooth(n,B)            return 1 if all prime factors of n are <= B
     is_smooth_over_prod(n,k)  return 1 if n is smooth over the primes p|k
+    rough_part(n,B)           largest B-rough divisor of n
+    smooth_part(n,B)          largest B-smooth divisor of n
+    make_coprime(n,k)         largest divisor of n coprime to k
     is_prime(n,r=23)          Miller-Rabin primality test
     primorial(n)              product of primes <= n
     next_prime(n)             next prime > n
@@ -223,6 +228,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     rat(x)              convert x to a rational number
     rat(str)            parse a decimal expansion as an exact fraction
     rat_approx(x)       rational approximation of a real number x
+    ratmod(r,m)         rational modular operation as an integer: r % m
     numerator(r)        numerator of rational number r
     denominator(r)      denominator of rational number r
     nude(r)             numerator and denominator of r
@@ -688,7 +694,7 @@ Example:
 
     conj(x)                                       #=> Float | Complex
 
-Complex conjugate of C<x>. Return C<x> when C<x> is a real number.
+Complex conjugate of C<x>. Returns C<x> when C<x> is a real number.
 
 Example:
 
@@ -1267,6 +1273,34 @@ Example:
 
     geometric_sum(5, 8) = 8^0 + 8^1 + 8^2 + 8^3 + 8^4 + 8^5 = 37449
 
+=head2 dirichlet_sum
+
+    dirichlet_sum(n, \&f, \&g, \&F, \&G)          #=> Int | NaN
+
+Given two arithmetic functions C<f> and C<g>, it computes the following sum in C<O(sqrt(n))> steps:
+
+    Sum_{k=1..n} Sum_{d|k} f(d) * g(k/d)
+
+The C<F> and C<G> functions are the partial sums of C<f> and C<g>, respectively:
+
+    F(n) = Sum_{k=1..n} f(k)
+    G(n) = Sum_{k=1..n} g(k)
+
+However, this method is fast only when C<F(n)> and C<G(n)> can be computed efficiently.
+
+Example:
+
+    # Computes:
+    #   Sum_{k=1..10^9} sigma_2(k) (C.f. A188138)
+
+    dirichlet_sum(
+        10**9,                              # n
+        sub { 1 },                          # f
+        sub { $_[0]**2 },                   # g
+        sub { $_[0] },                      # F(n) = Sum_{k=1..n} f(k)
+        sub { faulhaber_sum($_[0], 2) },    # G(n) = Sum_{k=1..n} g(k)
+    )
+
 =head2 harmonic | harmfrac
 
     harmonic(n)                                   #=> Rat | NaN
@@ -1599,13 +1633,34 @@ See also:
 
     is_coprime(n, k)                              #=> Bool
 
-Returns a true value when C<n> and C<k> are relatively prime to each other. That is, when C<gcd(n, k) == 1>.
+Returns true when C<n> and C<k> are relatively prime to each other. That is, when C<gcd(n, k) == 1>.
+
+=head2 make_coprime
+
+    make_coprime(n, k)                            #=> Int | NaN
+
+Returns the largest divisor of C<n> that is coprime to C<k>.
+
+=head2 is_rough
+
+    is_rough(n, k)                                #=> Bool
+
+Returns true when all the prime factors of C<n> are greater than or equal to C<k>, where C<n> and C<k> are positive integers.
+
+Equivalently, it returns true if the B<smallest> prime factor of C<n> is greater than or equal to C<k>.
+
+Example:
+
+    is_rough(55, 7)    # false  : 55 = 5 * 11, where 5 < 7
+    is_rough(35, 5)    # true   : 35 = 5 * 7
 
 =head2 is_smooth
 
     is_smooth(n, k)                               #=> Bool
 
-Returns a true value when all the prime factors of C<n> are less than or equal to C<k>, where C<n> and C<k> are positive integers.
+Returns true when all the prime factors of C<n> are less than or equal to C<k>, where C<n> and C<k> are positive integers.
+
+Equivalently, it returns true if the B<largest> prime factor of C<n> is less than or equal to C<k>.
 
 Example:
 
@@ -1616,21 +1671,44 @@ Example:
 
     is_smooth_over_prod(n, k)                     #=> Bool
 
-Returns a true value when C<n> is the product of a subset of powers of prime factors of C<k>,
-where C<k> is a square-free integer, whose prime factors represent a set C<A>, such that C<n>
-is said to be smooth over a set C<A> if there exists a factorization of C<n> where the factors
-are powers of elements in C<A>.
+Returns true if C<n> can be expressed as a product of primes dividing C<k>.
+
+Equivalently, it returns true if C<gcd(rad(n), rad(k)) == rad(n)>.
 
 Example:
 
+    is_smooth_over_prod(42, 2*3*7*11)   # true because 42 = 2*3*7
+    is_smooth_over_prod(75, 3*5)        # true because 75 = 3*5*5
     is_smooth_over_prod($n, 3*5*7*11)   # true for odd 11-smooth numbers $n
+
+=head2 smooth_part
+
+    smooth_part(n, k)                             #=> Int | NaN
+
+Returns the largest divisor of C<n> that is C<k>-smooth.
+
+Example:
+
+    smooth_part(3*3*5*7,  5)    # 45 (= 3*3*5)
+    smooth_part(5*7*7*11, 6)    # 5
+
+=head2 rough_part
+
+    rough_part(n, k)                              #=> Int | NaN
+
+Returns the largest divisor of C<n> that is C<k>-rough.
+
+Example:
+
+    rough_part(3*3*5*7,  5)    # 35  (= 5*7)
+    rough_part(5*7*7*11, 6)    # 539 (= 7*7*11)
 
 =head2 is_power
 
     is_power(n)
     is_power(n, k)                                #=> Bool
 
-Return a true value when C<n> is a perfect power of a given integer C<k>.
+Returns true when C<n> is a perfect power of a given integer C<k>.
 
 When C<n> is not an integer, it always returns false. On the other hand, when C<k> is not an integer,
 it will implicitly be truncated to an integer. If C<k> is not positive after truncation, C<0> is returned.
@@ -1649,7 +1727,7 @@ Example:
 
     is_square(n)                                  #=> Bool
 
-Returns a true value when C<n> is a perfect square.
+Returns true when C<n> is a perfect square.
 When C<n> is not an integer, a false value is returned.
 
 =head2 polygonal
@@ -1690,7 +1768,7 @@ Example:
 
     is_polygonal(n, k)                            #=> Bool
 
-Returns a true value when C<n> is a k-gonal number.
+Returns true when C<n> is a k-gonal number.
 
 The values of C<n> and C<k> can be any arbitrary large integers.
 
@@ -1703,7 +1781,7 @@ Example:
 
     is_polygonal2(n, k)                           #=> Bool
 
-Returns a true value when C<n> is a second k-gonal number.
+Returns true when C<n> is a second k-gonal number.
 
 The values of C<n> and C<k> can be any arbitrary large integers.
 
@@ -1898,7 +1976,7 @@ Returns C<x + 1>.
     --$x                                          #=> Any
     $x--                                          #=> Any
 
-Return C<x - 1>.
+Returns C<x - 1>.
 
 =head2 copy
 
@@ -1913,7 +1991,7 @@ Returns a deep-copy of the self-object.
 Returns the population count of the positive integer part of C<x>, which is the number of 1's in
 its binary representation.
 
-Return C<undef> when C<n> cannot be truncated to an integer.
+Returns C<undef> when C<n> cannot be truncated to an integer.
 
 This value is also known as the Hamming weight value.
 
@@ -1927,7 +2005,7 @@ Example:
 
 Returns the Hamming distance (number of bit-positions where the bits differ) between integers C<n> and C<k>.
 
-Return C<undef> when C<n> or C<k> cannot be truncated to an integer.
+Returns C<undef> when C<n> or C<k> cannot be truncated to an integer.
 
 =head2 getbit
 
@@ -1935,7 +2013,7 @@ Return C<undef> when C<n> or C<k> cannot be truncated to an integer.
 
 Returns 1 if bit C<k> of C<n> is set, and 0 if it is not set.
 
-Return C<undef> when C<n> cannot be truncated to an integer or when C<k> is negative.
+Returns C<undef> when C<n> cannot be truncated to an integer or when C<k> is negative.
 
 Example:
 
@@ -1992,19 +2070,19 @@ Returns C<undef> if C<n> cannot be truncated to an integer or if C<k> is negativ
 
     is_int(x)                                     #=> Bool
 
-Returns a true value when C<x> is an integer.
+Returns true when C<x> is an integer.
 
 =head2 is_rat
 
     is_rat(x)                                     #=> Bool
 
-Returns a true value when C<x> is a rational number.
+Returns true when C<x> is a rational number.
 
 =head2 is_real
 
     is_real(x)                                    #=> Bool
 
-Returns a true value when C<x> is a real number (i.e.: when the imaginary part is zero and it holds a real value in the real part).
+Returns true when C<x> is a real number (i.e.: when the imaginary part is zero and it holds a real value in the real part).
 
 Example:
 
@@ -2014,7 +2092,7 @@ Example:
 
 =head2 is_imag
 
-Returns a true value when C<x> is an imaginary number (i.e.: when the real part is zero and it has a non-zero imaginary part).
+Returns true when C<x> is an imaginary number (i.e.: when the real part is zero and it has a non-zero imaginary part).
 
 Example:
 
@@ -2026,7 +2104,7 @@ Example:
 
     is_complex(x)                                 #=> Bool
 
-Returns a true value when C<x> is a complex number (i.e.: when the real part and the imaginary part are non-zero).
+Returns true when C<x> is a complex number (i.e.: when the real part and the imaginary part are non-zero).
 
 Example:
 
@@ -2038,19 +2116,19 @@ Example:
 
     is_even(n)                                    #=> Bool
 
-Returns a true value when C<n> is a real integer divisible by 2.
+Returns true when C<n> is a real integer divisible by 2.
 
 =head2 is_odd
 
     is_odd(n)                                     #=> Bool
 
-Returns a true value when C<n> is a real integer not divisible by 2.
+Returns true when C<n> is a real integer not divisible by 2.
 
 =head2 is_div
 
     is_div(n, k)                                  #=> Bool
 
-Returns a true value when C<n> is exactly divisible by C<k> (i.e.: when the remainder C<n % k> is zero).
+Returns true when C<n> is exactly divisible by C<k> (i.e.: when the remainder C<n % k> is zero).
 
 Also defined for rationals, floats and complex numbers.
 
@@ -2058,7 +2136,7 @@ Also defined for rationals, floats and complex numbers.
 
     is_congruent(n, k, m)                         #=> Bool
 
-Returns a true value when C<n> is congruent to C<k> modulo C<m> (i.e.: when the remainder C<n % m> equals C<k % m>).
+Returns true when C<n> is congruent to C<k> modulo C<m> (i.e.: when the remainder C<n % m> equals C<k % m>).
 
 Also defined for rationals, floats and complex numbers.
 
@@ -2066,49 +2144,49 @@ Also defined for rationals, floats and complex numbers.
 
     is_pos(x)                                     #=> Bool
 
-Returns a true value when C<x> is positive.
+Returns true when C<x> is positive.
 
 =head2 is_neg
 
     is_neg(x)                                     #=> Bool
 
-Returns a true value when C<x> is negative.
+Returns true when C<x> is negative.
 
 =head2 is_zero
 
     is_zero(n)                                    #=> Bool
 
-Returns a true value when C<n> equals 0.
+Returns true when C<n> equals 0.
 
 =head2 is_one
 
     is_one(n)                                     #=> Bool
 
-Returns a true value when C<n> equals 1.
+Returns true when C<n> equals 1.
 
 =head2 is_mone
 
     is_mone(n)                                    #=> Bool
 
-Returns a true value when C<n> equals -1.
+Returns true when C<n> equals -1.
 
 =head2 is_inf
 
     is_inf(x)                                     #=> Bool
 
-Returns a true value when C<x> holds the positive Infinity special value.
+Returns true when C<x> holds the positive Infinity special value.
 
 =head2 is_ninf
 
     is_ninf(x)                                    #=> Bool
 
-Returns a true value when C<x> holds the negative Infinity special value.
+Returns true when C<x> holds the negative Infinity special value.
 
 =head2 is_nan
 
     is_nan(x)                                     #=> Bool
 
-Returns a true value when C<x> holds the Not-a-Number special value.
+Returns true when C<x> holds the Not-a-Number special value.
 
 =head1 * Conversions
 
@@ -2145,7 +2223,21 @@ Example:
     rat_approx(3.14)     = 22/7
     rat_approx(zeta(-5)) = -1/252
 
-Return NaN when C<n> is not a real number.
+Returns NaN when C<n> is not a real number.
+
+=head2 ratmod
+
+    ratmod(r, m)                                  #=> Int | NaN
+
+Given a rational number C<r> and an integer C<m>, it returns C<r % m> computed as an integer.
+
+Example:
+
+    ratmod('43/97', 127) = 79
+
+Equivalent with:
+
+    (numerator($r) * invmod(denominator($r), $m)) % $m
 
 =head2 float
 
@@ -2384,7 +2476,7 @@ Example:
 
     reals(x)                                      #=> (Any, Any)
 
-Return the real and the imaginary part of C<x> as real numbers.
+Returns the real and the imaginary part of C<x> as real numbers.
 
 Example:
 
@@ -2455,25 +2547,25 @@ Inequality check: returns a true value when C<x> and C<y> are not equal.
 
     x > y                                         #=> Bool
 
-Returns a true value when C<x> is greater than C<y>.
+Returns true when C<x> is greater than C<y>.
 
 =head2 ge
 
     x >= y                                        #=> Bool
 
-Returns a true value when C<x> is equal or greater than C<y>.
+Returns true when C<x> is equal or greater than C<y>.
 
 =head2 lt
 
     x < y                                         #=> Bool
 
-Returns a true value when C<x> is less than C<y>.
+Returns true when C<x> is less than C<y>.
 
 =head2 le
 
     x <= y                                        #=> Bool
 
-Returns a true value when C<x> is equal or less than C<y>.
+Returns true when C<x> is equal or less than C<y>.
 
 =head2 cmp
 

@@ -2,7 +2,7 @@ ChangeLog
 MANIFEST
 META.yml
 Makefile.PL
-README
+README.md
 SIGNATURE
 Zlib.pm
 t/basic.t
@@ -14,3 +14,4 @@ t/large.t
 t/tied.t
 t/uncomp1.t
 t/uncomp2.t
+META.json                                Module JSON meta-data (added by MakeMaker)

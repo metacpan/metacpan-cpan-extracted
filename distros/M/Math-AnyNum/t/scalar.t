@@ -69,10 +69,10 @@ my $min_si = Math::AnyNum->new(Math::AnyNum::LONG_MIN);
 my $max_ui_p1 = ($max_ui + 1)->stringify;
 my $min_si_m1 = ($min_si - 1)->stringify;
 
-is($min_si_m1 + Math::AnyNum->one, $min_si);
-is($max_ui_p1 - Math::AnyNum->one, $max_ui);
-is($max_ui_p1 / ($max_ui + 1), 1);
-is($min_si_m1 / ($min_si - 1), 1);
+is($min_si_m1 + Math::AnyNum->one,    $min_si);
+is($max_ui_p1 - Math::AnyNum->one,    $max_ui);
+is($max_ui_p1 / ($max_ui + 1),        1);
+is($min_si_m1 / ($min_si - 1),        1);
 is($min_si - $min_si_m1,              1);
 is($max_ui - $max_ui_p1,              -1);
 is($max_ui - Math::AnyNum::ULONG_MAX, 0);

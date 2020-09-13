@@ -9,17 +9,18 @@ some basic capabilities for configuring the appearance of the tables.
 You can read a nicely formatted version of the documentation for
 this module online:
 
-    https://metacpan.org/pod/Module::Info
+    https://metacpan.org/pod/Text::Table::Tiny
 
 
 You should be able to install this using your usual method for installing
-modules from CPAN. If you don't have one, have a look at:
+modules from CPAN. If you don't have a usual method, have a look at:
 
     http://www.cpan.org/modules/INSTALL.html
 
 
-This software is copyright (c) 2012 by Creighton Higgins.
-It is now being maintained by Neil Bowers <neilb@cpan.org>
+This software is copyright (c) 2020 Neil Bowers.
+The module was first released by Creighton Higgins,
+but was entirely rewritten by Neil for version 1.00.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

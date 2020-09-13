@@ -67133,3 +67133,12 @@ M/MI/MIKEJONES/WebService-Mattermost-0.23.tar.gz
 P/PE/PERLANCAR/WordList-EN-Common-EF-Top3000-0.001.tar.gz
 C/CO/CORION/WWW-Mechanize-PhantomJS-0.24.tar.gz
 T/TI/TINITA/YAML-PP-0.026.tar.gz
+P/PE/PERLANCAR/Acme-CPANModules-TextTable-0.006.tar.gz
+P/PE/PERLANCAR/Text-ANSITable-0.600.tar.gz
+T/TO/TOMHUGHES/IO-Zlib-1.11.tar.gz
+T/TR/TRIZEN/Math-AnyNum-0.35.tar.gz
+S/SR/SRI/Mojolicious-8.59.tar.gz
+K/KA/KARJALA/RxPerl-v0.25.1.tar.gz
+N/NE/NEILB/Text-Table-Tiny-1.02.tar.gz
+D/DA/DANX/Weather-NHC-TropicalCyclone-0.12.tar.gz
+T/TI/TINITA/YAML-PP-LibYAML-0.005.tar.gz

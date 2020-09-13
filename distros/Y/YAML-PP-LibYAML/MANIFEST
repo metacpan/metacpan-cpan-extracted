@@ -6,10 +6,14 @@ META.json
 META.yml
 Makefile.PL
 README
+README.md
 dist.ini
 lib/YAML/PP/LibYAML.pm
 lib/YAML/PP/LibYAML/Emitter.pm
 lib/YAML/PP/LibYAML/Parser.pm
 t/00.compile.t
 t/10.basic.t
+t/11.width.t
 t/data/simple.yaml
+xt/03.spelling.t
+xt/04.pod.t

@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v0.24.0";
+our $VERSION = "v0.25.1";
 
 1;
 __END__
@@ -100,7 +100,7 @@ RxPerl - an implementation of Reactive Extensions / rxjs for Perl
 This module is an implementation of L<Reactive Extensions|http://reactivex.io/> in Perl. It replicates the
 behavior of L<rxjs 6|https://www.npmjs.com/package/rxjs> which is the JavaScript implementation of ReactiveX.
 
-Currently 40 of the 100+ operators in rxjs are implemented in this module.
+Currently 44 of the 100+ operators in rxjs are implemented in this module.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -175,6 +175,24 @@ L<https://rxjs.dev/api/index/const/EMPTY>
         rx_EMPTY,
         rx_of(40, 50, 60),
     )->subscribe($observer);
+
+=item rx_fork_join
+
+L<https://rxjs.dev/api/index/function/forkJoin>
+
+    # [30, 3, 'c']
+    rx_fork_join([
+        rx_of(10, 20, 30),
+        rx_of(1, 2, 3),
+        rx_of('a', 'b', 'c'),
+    ])->subscribe($observer);
+
+    # {x => 30, y => 3, z => 'c'}
+    rx_fork_join({
+        x => rx_of(10, 20, 30),
+        y => rx_of(1, 2, 3),
+        z => rx_of('a', 'b', 'c'),
+    })->subscribe($observer);
 
 =item rx_from
 
@@ -314,6 +332,15 @@ too).
 
 =over
 
+=item op_catch_error
+
+L<https://rxjs.dev/api/operators/catchError>
+
+    # foo, foo, foo, complete
+    rx_throw_error('foo')->pipe(
+        op_catch_error(sub ($err, $caught) { rx_of($err, $err, $err) }),
+    )->subscribe($observer);
+
 =item op_concat_map
 
 L<https://rxjs.dev/api/operators/concatMap>
@@ -328,6 +355,8 @@ L<https://rxjs.dev/api/operators/concatMap>
 =item op_debounce_time
 
 L<https://rxjs.dev/api/operators/debounceTime>
+
+Works like rxjs's "debounceTime", except the parameter is in seconds instead of ms.
 
     # 3, complete
     rx_of(1, 2, 3)->pipe(
@@ -405,6 +434,15 @@ L<https://rxjs.dev/api/operators/filter>
     # 0, 2, 4, 6, ... (every 1.4 seconds)
     rx_interval(0.7)->pipe(
         op_filter(sub {$_[0] % 2 == 0}),
+    )->subscribe($observer);
+
+=item op_finalize
+
+L<https://rxjs.dev/api/operators/finalize>
+
+    # 1, 2, 3, complete, 'hi there'
+    rx_of(1, 2, 3)->pipe(
+        op_finalize(sub {print "hi there\n"}),
     )->subscribe($observer);
 
 =item op_first

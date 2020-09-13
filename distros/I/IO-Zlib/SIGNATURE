@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.55.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,27 +12,37 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 1294902db533689f5bc0e534613a9c20a62f2f03 ChangeLog
-SHA1 f40ead6aa5d4e89ad735b103ffcb6db45b2bf287 MANIFEST
-SHA1 f0d43c487bbbeef6744fa264928f9c0a0d905e8e META.yml
-SHA1 1ad952898701ef89cdfda4be888f1488463add0f Makefile.PL
-SHA1 b3b48f9e136027482f5aa97725d8fd57f2a80a71 README
-SHA1 ec46f8978b3d4db6f28e6c1e404ab6f3439ea00b Zlib.pm
-SHA1 13663459f0fba824818cefedee2100bfadce3dfc t/basic.t
-SHA1 c4cca5764d5cbbf207a648ec7a3ef14de79d0c1e t/external.t
-SHA1 6e4d78228a1d59e21bee5e65d77e006357452777 t/getc.t
-SHA1 003e153c445316d66d16f7d364749afc716b4522 t/getline.t
-SHA1 bc2b5e94a16dd5bf8b08549b20403c319fe0b9be t/import.t
-SHA1 1f09885f1ce1d72c52c28a177f033564d3d77646 t/large.t
-SHA1 521e2db5d19514345339230b4909018bafb677b6 t/tied.t
-SHA1 980956c4e4488ca131f894ea2c8408a3ee670140 t/uncomp1.t
-SHA1 7ca7f549fdee7ae406e123ace0ad9b453418c315 t/uncomp2.t
+SHA256 8b88e97d698e09fffdca6d734c6d2f5b8a7e791916146e3eed2630ffe939d2a9 ChangeLog
+SHA256 c357c59a4d66c3231dc2eea7eb754e6bc60ec7afb5eef8ab8e1a16e13a70ff13 MANIFEST
+SHA256 d7d7e2bdde38c196656f98c7731a2687f4b76ea79ae484baf867fc547bbce4d8 META.json
+SHA256 ae696f0eb2780f1f64983b76db03e8e545dca41ab2dc6db1702dcc67bcebfd1e META.yml
+SHA256 f018722c672e4fa41660f40a54b4355638ec0fb8c93a293938a94b5328fa4a1f Makefile.PL
+SHA256 b2215b0191c2ddb668198325274678ff3596109638d260614b6e4a1a4cd82368 README.md
+SHA256 bbd070027fe350a888b25a0dd5ab66a054f6db42300d3b3629f0a28ae6662e82 Zlib.pm
+SHA256 bbcd2e20a082adda0c7e2294978db1cffd42bf8062c7d27909a83429a0d2cd4b t/basic.t
+SHA256 1cab445bf449911611bb36fa418832f048f7eb032f0306be4a2c20b11c74ad2f t/external.t
+SHA256 cd0a5303ab4d59b9525b72eaf7055a401e013fcb5d5f3deaa518f8c3b0e18764 t/getc.t
+SHA256 462f7e6aa807bc62339794f79a29ee40fa5f8ade0636544fc62202b3b75a5b06 t/getline.t
+SHA256 fd0ef176e07b39c144c83ffe23e1e5bc80f022f9a1bd3f99089281c49f30e732 t/import.t
+SHA256 a63c7c4648a5acc332455d826fbe073e69e0a33327f7d42deb5d3632f13adffd t/large.t
+SHA256 492a5ad18541601870553d9a03ab7a852b1e8efd3f9fe9fb21b672708474db07 t/tied.t
+SHA256 a8007d6e395bc55ea08ce146b69b29c73fb409932c7b6d657b771004e7e59759 t/uncomp1.t
+SHA256 4b11057af0fcaea59e3a3fdae45f544eee79ffb998c77608a9ea7c79d3d0fc73 t/uncomp2.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
 
-iEYEARECAAYFAkpc+XgACgkQsTvgEvrnk5n6OQCeOHQrlvMokT/6l24tAwsRYH2f
-W/oAoKgq40ac+S/VhyG/2L0bSlj5oih5
-=8Kif
+iQIzBAEBCgAdFiEElfb1NKKyvgypfZkvq7Gbqad8TyAFAl9eBTcACgkQq7Gbqad8
+TyD+WRAApURP7spLFSBJCDHkbilSjL0HHKhtzwfeeBM6Gy9+3Oi0ufqoOHUGTqKi
+G6dJg8pjU2ffouzmbrgSnujsB+J38qufWLdcdEy1Jplz+uvS9rzT7jW/30gyj8TF
+2g9mbBitkQsPv3axSVpMt39BCJE/UtKmGimIAnjtrFI/Y2P9nnmH0r/VcHE2rJ8T
+u1eSfvHOOaLZs+OTguxniQwL63huv55Tm+A4u/GSWVRrD+FahLQ/+ew34Q0hb9yl
+gbJc3IUSSgAB6EmseAICOTNTZGLQxghS8FBZ/ywW3Qzen5VFnwZQun8QCKvfJ5eM
+g+YsKJUUMDu/iwFxLil8w0aiD08XwA7VF9lHclFJyZi4bgZwf/D3i/SFsnHoH9tn
+ecMtIuheQkRg50eWWW2LJX1p5zKnxieg/FggyFwiuqxqqzzzdBYryVFJajAS3JB+
+gnysYIjqImh4FyilbOmGaiBLCV+XuLF5OtTrzBtnBRTCRILxYsWy1WRIcc9C6q24
+qH2Im8wbOq41Ey19SJ7tZY/SnmKb0T4VHkzYkt+9OHEB+WCWGr/iBpPQWG7oJXRo
+nYx1qiIbUUFMqY2Rsz++FVDk/1g32xdUnZ7vkgdNx4zYBBGodd4N8+zJQpcXj6Xs
+/gYwjXnVY8dsFDsO4nITkLF5rTIv/u9l4WvuP5THSLavBDliDF0=
+=OkUz
 -----END PGP SIGNATURE-----

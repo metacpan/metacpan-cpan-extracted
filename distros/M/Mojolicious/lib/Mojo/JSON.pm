@@ -65,7 +65,7 @@ sub _decode {
     die "Missing or empty input at offset 0\n" unless length(local $_ = shift);
 
     # UTF-8
-    $_ = decode('UTF-8', $_) unless shift;
+    $_ = decode('UTF-8', $_)           unless shift;
     die "Input is not UTF-8 encoded\n" unless defined;
 
     # Value
@@ -293,7 +293,7 @@ Mojo::JSON - Minimalistic JSON
 =head1 DESCRIPTION
 
 L<Mojo::JSON> is a minimalistic and possibly the fastest pure-Perl implementation of L<RFC
-8259|http://tools.ietf.org/html/rfc8259>.
+8259|https://tools.ietf.org/html/rfc8259>.
 
 It supports normal Perl data types like scalar, array reference, hash reference and will try to call the C<TO_JSON>
 method on blessed references, or stringify them if it doesn't exist. Differentiating between strings and numbers in

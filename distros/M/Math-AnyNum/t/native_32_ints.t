@@ -40,9 +40,9 @@ is($x->mod($i),  '0');
 
 is(($x + 13)->mod($i), '13');
 
-is(join(' ', $x->divmod($i)), "2 0");
-is(($x + 13)->invmod($i), '1321528405');
-is(($x + 13)->powmod(2,  $i),     '169');
+is(join(' ', $x->divmod($i)),     "2 0");
+is(($x + 13)->invmod($i),         '1321528405');
+is(($x + 13)->powmod(2, $i),      '169');
 is(($x + 13)->powmod($i, $x + 1), '3689420365');
 
 ok($x->is_div($i));

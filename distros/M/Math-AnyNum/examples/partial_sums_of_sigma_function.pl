@@ -32,7 +32,7 @@ use warnings;
 
 use lib qw(../lib);
 use experimental qw(signatures);
-use Math::AnyNum qw(isqrt ipow bernoulli faulhaber_sum);
+use Math::AnyNum qw(isqrt idiv ipow bernoulli faulhaber_sum dirichlet_sum);
 
 sub faulhaber_partial_sum_of_sigma($n, $m, $j) {      # using Faulhaber's formula
 
@@ -95,6 +95,15 @@ sub dirichlet_partial_sum_of_sigma ($n, $m, $j) {    # using Dirichlet's hyperbo
     return $total;
 }
 
+sub builtin_dirichlet_sum ($n, $m, $j) {    # using the built-in Dirichlet's hyperbola method
+    dirichlet_sum($n,
+        sub ($k) { ipow($k, $m) },
+        sub ($k) { ipow($k, $m+$j) },
+        sub ($k) { faulhaber_sum($k, $m) },
+        sub ($k) { faulhaber_sum($k, $m+$j) },
+    );
+}
+
 for my $m (0..10) {
 
     my $j = int rand 10;
@@ -103,9 +112,11 @@ for my $m (0..10) {
     my $t1 = faulhaber_partial_sum_of_sigma($n, $m, $j);
     my $t2 = bernoulli_partial_sum_of_sigma($n, $m, $j);
     my $t3 = dirichlet_partial_sum_of_sigma($n, $m, $j);
+    my $t4 = builtin_dirichlet_sum($n, $m, $j);
 
     die "error: $t1 != $t2" if ($t1 != $t2);
     die "error: $t1 != $t3" if ($t1 != $t3);
+    die "error: $t1 != $t4" if ($t1 != $t4);
 
     say "Sum_{k=1..$n} k^$m * sigma_$j(k) = $t2";
 }

@@ -104,7 +104,7 @@ sub _parse {
   unless ($self->{parts}) {
     my $path    = url_unescape delete($self->{path}) // '';
     my $charset = $self->charset;
-    $path = decode($charset, $path) // $path if $charset;
+    $path                   = decode($charset, $path) // $path if $charset;
     $self->{leading_slash}  = $path =~ s!^/!!;
     $self->{trailing_slash} = $path =~ s!/$!!;
     $self->{parts}          = [split '/', $path, -1];
@@ -138,7 +138,7 @@ Mojo::Path - Path
 
 =head1 DESCRIPTION
 
-L<Mojo::Path> is a container for paths used by L<Mojo::URL>, based on L<RFC 3986|http://tools.ietf.org/html/rfc3986>.
+L<Mojo::Path> is a container for paths used by L<Mojo::URL>, based on L<RFC 3986|https://tools.ietf.org/html/rfc3986>.
 
 =head1 ATTRIBUTES
 

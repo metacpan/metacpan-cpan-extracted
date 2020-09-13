@@ -1,27 +1,38 @@
 #!perl
 
-our $DATE = '2018-12-02'; # DATE
-our $VERSION = '0.501'; # VERSION
+our $DATE = '2020-09-13'; # DATE
+our $VERSION = '0.600'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
 
+use Module::Load::Util qw(instantiate_class_with_optional_args);
 use Text::ANSITable;
 
 binmode(STDOUT, ":encoding(utf8)");
 
 my $t = Text::ANSITable->new;
-my $all_ct = $t->list_color_themes(1);
+my @all_ct = $t->list_color_themes;
+my %all_ctobj;
+for my $ctname (@all_ct) {
+    say "D:$ctname";
+    my $info = instantiate_class_with_optional_args({ns_prefix=>"ColorTheme", construct=>0}, $ctname);
+    my $class = $info->{class};
+    my $struct = $class->get_struct;
+    my $args = ($struct->{examples} && @{ $struct->{examples} } ? $struct->{examples}[0]{args} : undef) // {};
+    $all_ctobj{$ctname} = instantiate_class_with_optional_args({}, [$class, $args]);
+}
 
-my $chosen_ct = $ARGV[0] // $t->{color_theme}{name};
+my $chosen_ct = $ARGV[0] // $t->color_theme;
 
 $t->columns(['Name', 'Summary']);
-for my $name (sort keys %$all_ct) {
-    my $ct = $all_ct->{$name};
+for my $name (@all_ct) {
+    my $ctobj = $all_ctobj{$name};
+    my $struct = $ctobj->get_struct;
     my $selected = $chosen_ct eq $name;
 
-    $t->add_row([$name . ($selected ? " (*)" : ""), $ct->{summary}],
+    $t->add_row([$name . ($selected ? " (*)" : ""), $struct->{summary}],
                 {fgcolor=>($selected && $t->use_color ? 'aaaa00' : undef)});
 }
 
@@ -56,7 +67,7 @@ ansitable-list-color-themes - List available color themes for Text::ANSITable
 
 =head1 VERSION
 
-This document describes version 0.501 of ansitable-list-color-themes (from Perl distribution Text-ANSITable), released on 2018-12-02.
+This document describes version 0.600 of ansitable-list-color-themes (from Perl distribution Text-ANSITable), released on 2020-09-13.
 
 =head1 SYNOPSIS
 
@@ -64,53 +75,54 @@ This document describes version 0.501 of ansitable-list-color-themes (from Perl 
 
 Sample output:
 
+ D:GraphicsColorNames
+ D:Harmony::Analogous
+ D:Harmony::Monochromatic
+ D:Lens::Darken
+ D:Lens::Lighten
+ D:Lens::Tint
+ D:NoColor
+ D:Test::Dynamic
+ D:Test::Random
+ D:Test::RandomANSI16
+ D:Test::RandomANSI256
+ D:Test::Static
+ D:Text::ANSITable::Standard::Gradation
+ D:Text::ANSITable::Standard::GradationWhiteBG
+ D:Text::ANSITable::Standard::NoGradation
+ D:Text::ANSITable::Standard::NoGradationWhiteBG
  Tip: you can run me with color theme name as argument to try it out.
- .--------------------------------------------------------------------------------------------.
- | Name                                   Summary                                             |
- |                                                                                            |
- | Default::default_gradation             Default (for terminal with black background)        |
- | Default::default_gradation_whitebg     Default (for terminal with white background)        |
- | Default::default_nogradation           Default (for terminal with black background)        |
- | Default::default_nogradation_whitebg   Default (for terminal with white background)        |
- | Default::no_color (*)                  Special theme that means no color                   |
- | Demo::demo_random                      Show random color according to detected color depth |
- | Demo::demo_random_16                   Show random 16 color                                |
- | Demo::demo_random_24bit                Show random 24bit color                             |
- | Demo::demo_random_256                  Show random 256 color                               |
- | Demo::demo_random_8                    Show random 8 color                                 |
- | Demo::demo_random_border_color         Demoes coderef in item color                        |
- | Duotone::duotone_cyan1                 Duotone cyan 1                                      |
- | Duotone::duotone_green1                Duotone green 1                                     |
- | Duotone::duotone_random                Random duotone on every run                         |
- | Extra::grayscale                       Grayscale                                           |
- | Extra::reverse                         Reverse                                             |
- | Extra::sepia                           Sepia tone                                          |
- | Monotone::monotone_blue                Monotone blue                                       |
- | Monotone::monotone_cyan                Monotone cyan                                       |
- | Monotone::monotone_green               Monotone green                                      |
- | Monotone::monotone_purple              Monotone purple                                     |
- | Monotone::monotone_red                 Monotone red                                        |
- | Monotone::monotone_yellow              Monotone yellow                                     |
- | Tint::tint_black                       Black-tinted (50%)                                  |
- | Tint::tint_blue                        Blue-tinted (50%)                                   |
- | Tint::tint_cyan                        Cyan-tinted (50%)                                   |
- | Tint::tint_green                       Green-tinted (50%)                                  |
- | Tint::tint_magenta                     Magenta-tinted (50%)                                |
- | Tint::tint_orange                      Orange-tinted (50%)                                 |
- | Tint::tint_red                         Red-tinted (50%)                                    |
- | Tint::tint_yellow                      Yellow-tinted (50%)                                 |
- `--------------------------------------------------------------------------------------------'
+ .-------------------------------------------------------------------------------------------------------------.
+ | Name                                            Summary                                                     |
+ |                                                                                                             |
+ | GraphicsColorNames                              Display Graphics::ColorNames::* color scheme as color theme |
+ | Harmony::Analogous                              Create theme with colors equidistant in hue                 |
+ | Harmony::Monochromatic                          Create a monochromatic color theme                          |
+ | Lens::Darken                                    Darken other theme                                          |
+ | Lens::Lighten                                   Lighten other theme                                         |
+ | Lens::Tint                                      Tint other theme                                            |
+ | NoColor (*)                                     An empty color theme that provides no items                 |
+ | Test::Dynamic                                   A dynamic color theme                                       |
+ | Test::Random                                    A color theme which gives random colors                     |
+ | Test::RandomANSI16                              A color theme which gives random 16-color ANSI codes        |
+ | Test::RandomANSI256                             A color theme which gives random 256-color ANSI codes       |
+ | Test::Static                                    A static color theme                                        |
+ | Text::ANSITable::Standard::Gradation            Gradation border (for terminal with black background)       |
+ | Text::ANSITable::Standard::GradationWhiteBG     Gradation (for terminal with white background)              |
+ | Text::ANSITable::Standard::NoGradation          No gradation, for black background                          |
+ | Text::ANSITable::Standard::NoGradationWhiteBG   Default (no gradation, for white background)                |
+ `-------------------------------------------------------------------------------------------------------------'
  Demo table
  .-------------------------------------------------------.
  |  num   percent%          date           bool?   text  |
  |                                                       |
- |    1     40,00%   2018-12-02 19:55:13     Y     hello |
- | -3.3    100,00%   2018-12-02 19:55:13     N     world |
+ |    1     40,00%   2020-09-13 07:38:35     Y     hello |
+ | -3.3    100,00%   2020-09-13 07:38:35     N     world |
  +-------------------------------------------------------+
- |    1     10,00%   2013-05-02 09:26:24     Y     x1    |
- |    2     20,00%   2013-05-02 12:13:04     N     x2    |
- |    3     30,00%   2013-05-02 14:59:44     Y     x3    |
- |    4     40,00%   2013-05-02 17:46:24     N     x4    |
+ |    1     10,00%   2013-05-02 09:26:24     N     x1    |
+ |    2     20,00%   2013-05-02 12:13:04     Y     x2    |
+ |    3     30,00%   2013-05-02 14:59:44     N     x3    |
+ |    4     40,00%   2013-05-02 17:46:24     Y     x4    |
  |    5     50,00%   2013-05-02 20:33:04     N     x5    |
  `-------------------------------------------------------'
 
@@ -136,7 +148,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

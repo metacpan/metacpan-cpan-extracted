@@ -1,7 +1,7 @@
 {
    "abstract" : "generate simple text tables from 2D arrays",
    "author" : [
-      "Creighton Higgins <chiggins@chiggins.com>"
+      "Neil Bowers <neilb@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
@@ -23,8 +23,8 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "Ref::Util" : "0",
-            "String::TtyLength" : "0",
+            "Ref::Util" : "0.202",
+            "String::TtyLength" : "0.02",
             "parent" : "0",
             "perl" : "5.010",
             "strict" : "0",
@@ -52,7 +52,7 @@
          "web" : "https://github.com/neilb/Text-Table-Tiny"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_generated_by_perl" : "v5.28.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

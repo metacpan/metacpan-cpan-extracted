@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 583;
+plan tests => 597;
 
 use Math::AnyNum qw(:misc lngamma ipow10 log);
 use List::Util qw();
@@ -23,7 +23,7 @@ ok(rand(123, 130) >= 123);
 ok(rand(123, 130) < 130);
 
 is(irand(0), 0);
-ok(irand(1) <= 1, 'irand(1) <= 1');
+ok(irand(1) <= 1,      'irand(1) <= 1');
 ok(irand(1, 10) <= 10, 'irand(1, 10) <= 10');
 
 is(irand(10,  10),  10);
@@ -82,7 +82,7 @@ is(min(5, 2), '2');
 is(max(3, 5, 2), 5);
 is(min(3, 1, 2), 1);
 
-is(max('-43/9', '-19/2', '-9', '-3.4', '-3-10i', '-4'), '-3-10i');
+is(max('-43/9', '-19/2', '-9', '-3.4', '-3-10i', '-4'),     '-3-10i');
 is(min('43/9', '-19/2', 42, '-9', '-3.4', '-3-10i', '9.1'), '-19/2');
 
 ok(!defined(max(5, 'NaN', 42)));
@@ -91,8 +91,11 @@ ok(!defined(min(5, 'NaN', 42)));
 is(sum(),  0);
 is(prod(), 1);
 
-is(sum(3, 5, 9, 41), 3 + 5 + 9 + 41);
+is(sum(3, 5, 9, 41),  3 + 5 + 9 + 41);
 is(prod(3, 5, 9, 41), 3 * 5 * 9 * 41);
+
+is(sum(3, 5, "4/3", 9, "17/19", 11, "11/5"),  "9242/285");
+is(prod(3, 5, "4/3", 9, "17/19", 11, "11/5"), "74052/19");
 
 is(float(3.14159),         '3.14159');
 is(float('777/222'),       '3.5');
@@ -278,6 +281,17 @@ is(join(' ', digits(1234, -92)), '');    # not defined for negative bases
 is(join(' ', digits(1234, 1)),   '');    # not defined for bases <= 1
 is(join(' ', digits(1234, 0)),   '');
 
+#is(digits2num([5040, 1234], 10), 1234*10 + 5040);      # currenlty this is not supported
+
+is(digits2num([], -1),           'NaN');
+is(digits2num([1, 2, 3, 4], -1), 'NaN');
+is(digits2num([]),               0);
+is(digits2num([], 100),          0);
+is(digits2num([5, 4, 3, 2, 1]),  12345);
+is(digits2num([45, 23, 1], 100), 12345);
+is(digits2num([digits('996105818874172862495850884533', '81592785159219522212')], '81592785159219522212'),
+    '996105818874172862495850884533');
+
 is(sumdigits(1234, -12), 'NaN');
 is(sumdigits(1234, -75), 'NaN');
 is(sumdigits(1234, 1),   'NaN');
@@ -315,7 +329,7 @@ is(
     113
   );
 
-is(bsearch_le(10**6, sub { exp($_) <=> 1e+9 }), 20);    #=>  20   (exp( 20) <= 1e+9)
+is(bsearch_le(10**6, sub { exp($_) <=> 1e+9 }), 20);             #=>  20   (exp( 20) <= 1e+9)
 is(bsearch_le(-10**6, 10**6, sub { exp($_) <=> 1e-9 }), -21);    #=> -21   (exp(-21) <= 1e-9)
 
 is(bsearch_ge(10**6, sub { exp($_) <=> 1e+9 }), 21);             #=>  21   (exp( 21) >= 1e+9)
@@ -526,7 +540,7 @@ foreach my $t (Math::AnyNum::bernoulli(42),
 is(Math::AnyNum->new(complex("23.34375")->base(2),    10), "10111.01011");
 is(Math::AnyNum->new(complex("1011.11101")->base(10), 2),  "11.90625");
 
-is(Math::AnyNum->new(sqrt(float(2))->base(34), 34), sqrt(float(2)));
+is(Math::AnyNum->new(sqrt(float(2))->base(34),                                      34), sqrt(float(2)));
 is(Math::AnyNum->new((sqrt(float(2)) + sqrt(float(3)) * sqrt(float(-1)))->base(34), 34),
     sqrt(float(2)) + sqrt(float(3)) * sqrt(float(-1)));
 
@@ -545,8 +559,8 @@ is(as_int('-12.5', complex(16)), '-c');
 ok(!defined(as_rat(complex(-1)->sqrt)));
 ok(!defined(as_frac(complex(-1)->sqrt)));
 
-is(as_rat('2/4'), '1/2');
-is(as_rat('42'),  '42');
+is(as_rat('2/4'),   '1/2');
+is(as_rat('42'),    '42');
 is(as_rat(255, 16), "ff");
 
 is(as_frac('123/567'), '41/189');
@@ -567,8 +581,8 @@ is(as_dec(sqrt(float(2)),   3), '1.41');
 is(as_dec(sqrt(rat(2)),     4), '1.414');
 is(as_dec(sqrt(complex(2)), 5), '1.4142');
 
-is(as_dec('0.5'), '0.5');
-is(as_dec('0.5',      10), '0.5');
+is(as_dec('0.5'),          '0.5');
+is(as_dec('0.5', 10),      '0.5');
 is(as_dec(rat('0.5'), 10), '0.5');
 is(as_dec(complex('0.5')), '0.5');
 
@@ -675,9 +689,15 @@ is(rat('1234.000e-5'),        '617/50000');
 is(rat('-3.000e-7'),          '-3/10000000');
 is(rat('-1234.000e-2'),       '-617/50');
 
-is(rat('foo'),  'NaN');
-is(rat('3+4i'), 'NaN');
+is(rat('foo'),                     'NaN');
+is(rat('3+4i'),                    'NaN');
 is(rat(Math::AnyNum->new_c(3, 4)), 'NaN');
+
+is(ratmod(413,              97),           25);
+is(ratmod("43/97",          127),          79);
+is(ratmod("43/97",          $o->new(127)), 79);
+is(ratmod($o->new("43/97"), 127),          79);
+is(ratmod($o->new("43/97"), $o->new(127)), 79);
 
 ok(!(float(0) != '0'));
 ok(!(complex(0) != '0'));
@@ -709,19 +729,19 @@ ok(!(rat(0) == '-1'));
 ok(!(int(0) == '-1'));
 ok(!(complex(0) == '-1'));
 
-is(float(0) <=> '0',   0);
-is(rat(0) <=> '0',     0);
-is(int(0) <=> '0',     0);
+is(float(0)   <=> '0', 0);
+is(rat(0)     <=> '0', 0);
+is(int(0)     <=> '0', 0);
 is(complex(0) <=> '0', 0);
 
-is(float(0) <=> '1',   -1);
-is(rat(0) <=> '1',     -1);
-is(int(0) <=> '1',     -1);
+is(float(0)   <=> '1', -1);
+is(rat(0)     <=> '1', -1);
+is(int(0)     <=> '1', -1);
 is(complex(0) <=> '1', -1);
 
-is(float(0) <=> '-1',   1);
-is(rat(0) <=> '-1',     1);
-is(int(0) <=> '-1',     1);
+is(float(0)   <=> '-1', 1);
+is(rat(0)     <=> '-1', 1);
+is(int(0)     <=> '-1', 1);
 is(complex(0) <=> '-1', 1);
 
 is(complex(3,       4),         '3+4i');

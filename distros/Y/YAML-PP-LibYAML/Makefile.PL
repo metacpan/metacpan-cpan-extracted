@@ -35,9 +35,10 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => "0.98"
+    "Test::More" => "0.98",
+    "YAML::PP::Common" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,6 +56,7 @@ my %FallbackPrereqs = (
   "YAML::LibYAML::API" => "0.011",
   "YAML::LibYAML::API::XS" => 0,
   "YAML::PP" => "0.025",
+  "YAML::PP::Common" => 0,
   "YAML::PP::Emitter" => 0,
   "YAML::PP::Parser" => 0,
   "YAML::PP::Reader" => 0,

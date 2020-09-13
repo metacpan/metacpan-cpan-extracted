@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/tomhughes/IO-Zlib.svg?branch=master)](https://travis-ci.org/tomhughes/IO-Zlib)
+
 This is the IO::Zlib module package for perl5.
 
 This modules provides an IO:: style interface to the Compress::Zlib

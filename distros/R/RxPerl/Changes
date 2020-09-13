@@ -1,5 +1,14 @@
 Revision history for Perl extension RxPerl
 
+v0.25.1 2020-09-13T15:21:13Z
+
+    - fixed ordering of sources in rx_fork_join
+    - fixed documentation
+    
+v0.25.0 2020-09-13T12:59:43Z
+
+    - added op_catch_error, op_finalize, rx_fork_join
+
 v0.24.0 2020-09-12T15:55:26Z
 
     - added op_with_latest_from

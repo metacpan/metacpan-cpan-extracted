@@ -6,12 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'ColorTheme/Text/ANSITable/Standard/Gradation.pm',
+    'ColorTheme/Text/ANSITable/Standard/GradationWhiteBG.pm',
+    'ColorTheme/Text/ANSITable/Standard/NoGradation.pm',
+    'ColorTheme/Text/ANSITable/Standard/NoGradationWhiteBG.pm',
     'Text/ANSITable.pm',
-    'Text/ANSITable/BorderStyle/Default.pm',
-    'Text/ANSITable/ColorTheme/Default.pm',
     'Text/ANSITable/StyleSet/AltRow.pm'
 );
 

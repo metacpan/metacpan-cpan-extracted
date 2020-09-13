@@ -74,8 +74,8 @@ is($c, 1);
 ## ilog / ilog2 / ilog10
 #
 my $f2 = Math::AnyNum->new('9123124124123.42123123');
-is($f2->ilog10,                       '12');
-is(Math::AnyNum->new_z('123')->ilog2, '6');
+is($f2->ilog10,                            '12');
+is(Math::AnyNum->new_z('123')->ilog2,      '6');
 is(Math::AnyNum->new_q('123', '4')->ilog2, '4');
 
 my $f3 = Math::AnyNum->new('9123124124123.42123123');

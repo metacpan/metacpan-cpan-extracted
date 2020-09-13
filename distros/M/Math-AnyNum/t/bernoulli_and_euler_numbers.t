@@ -68,14 +68,14 @@ use Math::AnyNum qw(:overload sum binomial bernoulli bernreal lnbern euler faulh
     my $n = irand(2, 100);
     my $x = irand(2, 100);
 
-    is(sum(map { my $k = $_; binomial($n, $k) * euler($k) / 2**$k * ($x - 1 / 2)**($n - $k) } 0 .. $n), euler($n, $x));
+    is(sum(map { my $k = $_; binomial($n, $k) * euler($k) / 2**$k * ($x - 1 / 2)**($n - $k) } 0 .. $n),   euler($n, $x));
     is(sum(map { my $k = $_; binomial($n, $k) * (-1)**($n - $k) * bernoulli($n - $k) * $x**$k } 0 .. $n), bernoulli($n, $x));
-    is(2**$n * (2**($n + 1) / ($n + 1)) * (bernoulli($n + 1, 3 / 4) - bernoulli($n + 1, 1 / 4)), euler($n));
-    is((bernoulli($x + 1, $n + 1) - bernoulli($x + 1)) / ($x + 1), faulhaber_sum($n, $x));
+    is(2**$n * (2**($n + 1) / ($n + 1)) * (bernoulli($n + 1, 3 / 4) - bernoulli($n + 1, 1 / 4)),          euler($n));
+    is((bernoulli($x + 1, $n + 1) - bernoulli($x + 1)) / ($x + 1),                                      faulhaber_sum($n, $x));
     is(euler($n, $x) + (1 / 2 * sum(map { my $k = $_; binomial($n, $k) * euler($k, $x) } 0 .. $n - 1)), $x**$n);
-    is(sum(map { my $k = $_; binomial($n + 1, $k) * bernoulli($k, $x) } 0 .. $n) / ($n + 1), $x**$n);
-    is(2**($n + 1) / ($n + 1) * (bernoulli($n + 1, ($x + 1) / 2) - bernoulli($n + 1, $x / 2)), euler($n, $x));
-    is(2**$n * euler($n, 1 / 2), euler($n));
+    is(sum(map { my $k = $_; binomial($n + 1, $k) * bernoulli($k, $x) } 0 .. $n) / ($n + 1),            $x**$n);
+    is(2**($n + 1) / ($n + 1) * (bernoulli($n + 1, ($x + 1) / 2) - bernoulli($n + 1, $x / 2)),          euler($n, $x));
+    is(2**$n * euler($n, 1 / 2),                                                                        euler($n));
 }
 
 is(euler(-2), NaN);

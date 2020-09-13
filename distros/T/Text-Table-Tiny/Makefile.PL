@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "generate simple text tables from 2D arrays",
-  "AUTHOR" => "Creighton Higgins <chiggins\@chiggins.com>",
+  "AUTHOR" => "Neil Bowers <neilb\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -19,8 +19,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Exporter" => 0,
-    "Ref::Util" => 0,
-    "String::TtyLength" => 0,
+    "Ref::Util" => "0.202",
+    "String::TtyLength" => "0.02",
     "parent" => 0,
     "strict" => 0,
     "utf8" => 0,
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,8 +41,8 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Exporter" => 0,
-  "Ref::Util" => 0,
-  "String::TtyLength" => 0,
+  "Ref::Util" => "0.202",
+  "String::TtyLength" => "0.02",
   "Test::Fatal" => 0,
   "Test::More" => 0,
   "lib" => 0,

@@ -3,7 +3,7 @@ package YAML::PP::LibYAML;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use base qw/ YAML::PP Exporter /;
 our @EXPORT_OK = qw/ Load Dump LoadFile DumpFile /;
@@ -18,6 +18,7 @@ sub new {
         parser => YAML::PP::LibYAML::Parser->new,
         emitter => YAML::PP::LibYAML::Emitter->new(
             indent => delete $args{indent},
+            width => delete $args{width},
         ),
         %args,
     );
