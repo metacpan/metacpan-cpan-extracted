@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ no_index:
 provides:
   Minilla:
     file: lib/Minilla.pm
-    version: v3.1.10
+    version: v3.1.11
   Minilla::CLI:
     file: lib/Minilla/CLI.pm
   Minilla::CLI::Build:
@@ -169,13 +169,15 @@ resources:
   bugtracker: https://github.com/tokuhirom/Minilla/issues
   homepage: https://github.com/tokuhirom/Minilla
   repository: git://github.com/tokuhirom/Minilla.git
-version: v3.1.10
+version: v3.1.11
 x_authority: cpan:TOKUHIROM
 x_contributors:
   - 'Alex Kapranoff <alex@kapranoff.ru>'
   - 'Alex Kapranoff <kappa@yandex.ru>'
+  - 'Alexander Karelas <karjala@cpan.org>'
   - 'Anirvan Chatterjee <anirvan@users.noreply.github.com>'
   - 'Chris White <chrisw@leehayes.com>'
+  - 'Chris White <cxwembedded@gmail.com>'
   - 'Daisuke Maki <lestrrat+github@gmail.com>'
   - 'Daisuke Murase <typester@cpan.org>'
   - 'Dan Book <grinnz@gmail.com>'
@@ -201,10 +203,10 @@ x_contributors:
   - 'Peter Oliver <git@mavit.org.uk>'
   - 'Pine Mizune <pinemz@gmail.com>'
   - 'Ryo Okamoto <ryo@aquahill.net>'
+  - 'Shohei YOSHIDA <syohex@gmail.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
   - 'Shoichi Kaji <skaji@outlook.com>'
   - 'Songmu <y.songmu@gmail.com>'
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'TAGOMORI Satoshi <tagomoris@gmail.com>'
   - 'Takumi Akiyama <t.akiym@gmail.com>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'

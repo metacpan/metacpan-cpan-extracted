@@ -19,7 +19,7 @@ use File::Spec;
 use IO::File;
 use IPC::Cmd qw(can_run);
 use Test::More;
-use Test::PGP qw(gpg_is_gpg1);
+use Test::PGP qw(gpg_is_gpg1 gpg_is_new_enough);
 
 # Path to GnuPG v1.
 my $PATH;
@@ -33,6 +33,9 @@ BEGIN {
         } else {
             plan skip_all => 'gpg1 binary not available';
         }
+    }
+    if (!gpg_is_new_enough($PATH)) {
+        plan skip_all => 'gpg binary is older than 1.4.20 or 2.1.23';
     }
     plan tests => 7;
     use_ok('PGP::Sign');

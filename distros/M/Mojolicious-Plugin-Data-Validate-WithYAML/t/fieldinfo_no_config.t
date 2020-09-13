@@ -5,10 +5,6 @@ use Mojolicious::Lite;
 use Test::More;
 use Test::Mojo;
 
-use Data::Dumper;
-use File::Basename;
-use File::Spec;
-
 use lib 'lib';
 use lib '../lib';
 
@@ -16,7 +12,7 @@ use_ok 'Mojolicious::Plugin::Data::Validate::WithYAML';
 
 ## Webapp START
 
-my $dir = dirname __FILE__;
+my $dir = app->home->to_string;
 
 plugin('Data::Validate::WithYAML');
 

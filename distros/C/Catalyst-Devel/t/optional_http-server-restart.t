@@ -11,45 +11,40 @@ BEGIN {
     plan skip_all => 'set TEST_HTTP to enable this test' unless $ENV{TEST_HTTP};
 }
 
-use File::Copy qw( copy );
-use File::Path;
-use FindBin;
+use File::Spec::Functions qw(updir catdir);
+use Cwd qw(abs_path);
+use File::Basename qw(dirname);
+use File::Temp qw(tempdir);
+use File::Path qw(rmtree);
 use LWP::Simple;
 use IO::Socket;
-use IPC::Open3;
+use IPC::Open3 qw(open3);
 use Time::HiRes qw/sleep/;
 use Catalyst::Helper;
-eval "use Catalyst::Devel 1.04;";
-
-plan skip_all => 'Catalyst::Devel >= 1.04 required' if $@;
-eval "use File::Copy::Recursive";
-plan skip_all => 'File::Copy::Recursive required' if $@;
+use File::Copy::Recursive qw(dircopy);
 
 plan tests => 35;
 
-my $tmpdir = "$FindBin::Bin/../t/tmp";
+my $helper_lib = abs_path(catdir(dirname($INC{'Catalyst/Helper.pm'}), updir));
 
-# clean up
-rmtree $tmpdir if -d $tmpdir;
+my $tmpdir = tempdir(CLEANUP => 1);
+my $appdir = catdir($tmpdir, 'TestApp');
 
-# create a TestApp and copy the test libs into it
-mkdir $tmpdir;
-chdir $tmpdir;
+mkdir $appdir;
 
 my $helper = Catalyst::Helper->new(
     {
+        dir => $appdir,
         '.newfiles' => 1,
     }
 );
 
 $helper->mk_app('TestApp');
 
-chdir "$FindBin::Bin/..";
-
 copy_test_app();
 
 # remove TestApp's tests
-rmtree 't/tmp/TestApp/t';
+rmtree "$appdir/t";
 
 # spawn the standalone HTTP server
 my $port = 30000 + int rand( 1 + 10000 );
@@ -58,62 +53,55 @@ my ( $pid, $server ) = start_server($port);
 
 # change various files
 my @files = (
-    "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp.pm",
-    "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Foo.pm",
-    "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Root.pm",
+    "$appdir/lib/TestApp.pm",
+    "$appdir/lib/TestApp/Controller/Foo.pm",
+    "$appdir/lib/TestApp/Controller/Root.pm",
 );
 
 # change some files and make sure the server restarts itself
 NON_ERROR_RESTART:
 for ( 1 .. 5 ) {
-    my $index = rand @files;
-    open my $pm, '>>', $files[$index]
-      or die "Unable to open $files[$index] for writing: $!";
-    print $pm "\n";
-    close $pm;
+    SKIP : {
+        my $index = rand @files;
+        open my $pm, '>>', $files[$index]
+            or die "Unable to open $files[$index] for writing: $!";
+        print $pm "\n";
+        close $pm;
 
-    if ( ! look_for_restart() ) {
-    SKIP:
-        {
+        if ( ! look_for_restart() ) {
             skip "Server did not restart, no sense in checking further", 1;
         }
-        next NON_ERROR_RESTART;
-    }
 
-    my $response = get("http://localhost:$port/");
-    like( $response, qr/Welcome to the  world of Catalyst/,
-          'Non-error restart, request OK' );
+        my $response = get("http://localhost:$port/");
+        like( $response, qr/Welcome to the  world of Catalyst/,
+              'Non-error restart, request OK' );
+    }
 }
 
 # add errors to the file and make sure server does die
 DIES_ON_ERROR:
 for ( 1 .. 5 ) {
-    my $index = rand @files;
-    open my $pm, '>>', $files[$index]
-      or die "Unable to open $files[$index] for writing: $!";
-    print $pm "bleh";
-    close $pm;
+    SKIP : {
+        my $index = rand @files;
+        open my $pm, '>>', $files[$index]
+            or die "Unable to open $files[$index] for writing: $!";
+        print $pm "bleh";
+        close $pm;
 
-    if ( ! look_for_death() ) {
-    SKIP:
-        {
+        if ( ! look_for_death() ) {
             skip "Server restarted, no sense in checking further", 2;
         }
-        next DIES_ON_ERROR;
-    }
-    copy_test_app();
 
-    if ( ! look_for_restart() ) {
-    SKIP:
-        {
+        copy_test_app();
+
+        if ( ! look_for_restart() ) {
             skip "Server did not restart, no sense in checking further", 1;
         }
-        next DIES_ON_ERROR;
-    }
 
-    my $response = get("http://localhost:$port/");
-    like( $response, qr/Welcome to the  world of Catalyst/,
-          'Non-error restart after death, request OK' );
+        my $response = get("http://localhost:$port/");
+        like( $response, qr/Welcome to the  world of Catalyst/,
+              'Non-error restart after death, request OK' );
+    }
 }
 
 # multiple restart directories
@@ -134,48 +122,38 @@ $port += 1;
 copy_test_app();
 
 @files = (
-  "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Subdir1/Foo.pm",
-  "$FindBin::Bin/../t/tmp/TestApp/lib/TestApp/Controller/Subdir2/Foo.pm",
+  "$appdir/lib/TestApp/Controller/Subdir1/Foo.pm",
+  "$appdir/lib/TestApp/Controller/Subdir2/Foo.pm",
 );
-
-my $app_root = "$FindBin::Bin/../t/tmp/TestApp";
-my $restartdirs = join ' ', map{
-    "-restartdirectory $app_root/lib/TestApp/Controller/Subdir$_"
-} 1, 2;
 
 ( $pid, $server ) = start_server($port);
 
 MULTI_DIR_RESTART:
 for ( 1 .. 5 ) {
-    my $index = rand @files;
-    open my $pm, '>>', $files[$index]
-      or die "Unable to open $files[$index] for writing: $!";
-    print $pm "\n";
-    close $pm;
+    SKIP : {
+        my $index = rand @files;
+        open my $pm, '>>', $files[$index]
+          or die "Unable to open $files[$index] for writing: $!";
+        print $pm "\n";
+        close $pm;
 
-    if ( ! look_for_restart() ) {
-    SKIP:
-        {
+        if ( ! look_for_restart() ) {
             skip "Server did not restart, no sense in checking further", 1;
         }
-        next MULTI_DIR_RESTART;
-    }
 
-    my $response = get("http://localhost:$port/");
-    like( $response, qr/Welcome to the  world of Catalyst/,
-          'Non-error restart with multiple watched dirs' );
+        my $response = get("http://localhost:$port/");
+        like( $response, qr/Welcome to the  world of Catalyst/,
+              'Non-error restart with multiple watched dirs' );
+    }
 }
 
 kill 9, $pid;
 close $server;
 wait;
 
-rmtree "$FindBin::Bin/../t/tmp" if -d "$FindBin::Bin/../t/tmp";
-
 sub copy_test_app {
-    { no warnings 'once'; $File::Copy::Recursive::RMTrgFil = 1; }
-    copy( 't/lib/TestApp.pm', 't/tmp/TestApp/lib/TestApp.pm' );
-    File::Copy::Recursive::dircopy( 't/lib/TestApp', 't/tmp/TestApp/lib/TestApp' );
+    local $File::Copy::Recursive::RMTrgFil = 1;
+    dircopy( 't/lib/TestApp', "$appdir/lib/TestApp" );
 }
 
 sub start_server {
@@ -184,8 +162,8 @@ sub start_server {
     my $server;
     my $pid = open3(
         undef, $server, undef,
-        $^X,   "-I$FindBin::Bin/../lib",
-        "$FindBin::Bin/../t/tmp/TestApp/script/testapp_server.pl", '--port',
+        $^X,   "-I$helper_lib",
+        "$appdir/script/testapp_server.pl", '--port',
         $port,                                                     '--restart'
     ) or die "Unable to spawn standalone HTTP server: $!";
 
@@ -201,7 +179,7 @@ sub start_server {
         $waited++;
 
         if ( $waited >= 10 ) {
-            BAIL_OUT('Waited 10 seconds for server to start, to no avail');
+            die 'Waited 10 seconds for server to start, to no avail';
         }
     }
 
@@ -230,7 +208,7 @@ sub look_for_restart {
     my $count = 0;
     my $line;
 
-    while ( ( $line || '' ) !~ /can connect/ ) {
+    while ( ( $line || '' ) !~ /Accepting connections/ ) {
         $line = $server->getline;
         sleep 0.1;
         if ( $count++ > 300 ) {

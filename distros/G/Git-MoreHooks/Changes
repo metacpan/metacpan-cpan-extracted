@@ -1,5 +1,8 @@
 Revision history for Git-MoreHooks
 
+0.009     2020-09-12 23:48:14+02:00 Europe/Stockholm
+          Fix typo in server side code.
+
 0.008     2018-10-19 06:45:45+02:00 Europe/Stockholm
 
 0.007     2018-10-14 22:26:09+02:00 Europe/Stockholm

@@ -1,4 +1,4 @@
-1.000 2020-02-05T11:59:31Z
+1.001 2020-09-12T01:56:19Z
 
 	- Remove `parse` method
 	- Add `from_string` method

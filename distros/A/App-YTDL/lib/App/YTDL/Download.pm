@@ -94,6 +94,9 @@ sub download {
     my $total_chosen_videos = 0;
     for my $ex ( keys %$data ) {
         for my $up ( keys %{$data->{$ex}} ) {
+            if ( ! exists $chosen->{$ex}{$up} ) {
+                next;
+            }
             $total_chosen_videos += @{$chosen->{$ex}{$up}};
         }
     }
@@ -106,7 +109,7 @@ sub download {
         EXTRACTOR_KEY: for my $ex ( sort keys %$data ) {
 
             UPLOADER_ID: for my $up ( sort keys %{$data->{$ex}} ) {
-                if ( ! exists $chosen->{$ex}{$up} ) { #|| ! @{$chosen->{$ex}{$up}} ) {
+                if ( ! exists $chosen->{$ex}{$up} ) {
                     next;
                 }
                 my @sorted_ids = sort { $data->{$ex}{$up}{$a}{count} <=> $data->{$ex}{$up}{$b}{count} } @{$chosen->{$ex}{$up}};

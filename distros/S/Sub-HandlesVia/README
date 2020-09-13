@@ -235,6 +235,11 @@ DESCRIPTION
 
     Really, I don't think there's any object system that this won't work for!
 
+    If you supply an arrayref with a getter and setter, it's also possible to
+    supply a third argument which is a coderef or string which will be called
+    as a method if needing to "reset" the value. This can be thought of like a
+    default or builder.
+
     (The `delegations` function can be imported into Moo/Mouse/Moose classes
     too, in which case the `attribute` needs to be the same attribute name you
     passed to `has`. You cannot use a arrayref, coderef, hash key, or array
@@ -288,6 +293,7 @@ DESCRIPTION
                   reduce : SubHV  DataP  Moose  Mouse  
               reductions : SubHV                       
                   remove :                      Mouse  (alias: delete)
+                   reset : SubHV                       
                  reverse : SubHV  DataP                
                   sample : SubHV                       
                      set : SubHV  DataP  Moose  Mouse  
@@ -345,6 +351,7 @@ DESCRIPTION
                 is_empty : SubHV  DataP  Moose  Mouse  
                     keys : SubHV  DataP  Moose  Mouse  
                       kv : SubHV  DataP  Moose  Mouse  
+                   reset : SubHV                       
                      set : SubHV  DataP  Moose  Mouse  
            shallow_clone : SubHV  DataP  Moose         
              sorted_keys : SubHV                Mouse  

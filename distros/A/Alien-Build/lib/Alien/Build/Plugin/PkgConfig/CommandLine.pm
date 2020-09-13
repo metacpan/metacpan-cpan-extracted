@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using the pkg-config command line interface
-our $VERSION = '2.29'; # VERSION
+our $VERSION = '2.32'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -189,7 +189,7 @@ Alien::Build::Plugin::PkgConfig::CommandLine - Probe system and determine librar
 
 =head1 VERSION
 
-version 2.29
+version 2.32
 
 =head1 SYNOPSIS
 

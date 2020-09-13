@@ -7,7 +7,7 @@ package Sub::HandlesVia;
 use Exporter::Shiny qw( delegations );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014';
+our $VERSION   = '0.015';
 
 sub _generate_delegations {
 	my ($me, $name, $args, $globals) = (shift, @_);
@@ -336,6 +336,11 @@ the setter is also passed a value to set.
 Really, I don't think there's any object system that this won't work
 for!
 
+If you supply an arrayref with a getter and setter, it's also
+possible to supply a third argument which is a coderef or string
+which will be called as a method if needing to "reset" the value.
+This can be thought of like a default or builder.
+
 (The C<delegations> function can be imported into Moo/Mouse/Moose classes
 too, in which case the C<attribute> needs to be the same attribute name
 you passed to C<has>. You cannot use a arrayref, coderef, hash key, or
@@ -390,6 +395,7 @@ native traits, and L<MouseX::NativeTraits>.
               reduce : SubHV  DataP  Moose  Mouse  
           reductions : SubHV                       
               remove :                      Mouse  (alias: delete)
+               reset : SubHV                       
              reverse : SubHV  DataP                
               sample : SubHV                       
                  set : SubHV  DataP  Moose  Mouse  
@@ -447,6 +453,7 @@ native traits, and L<MouseX::NativeTraits>.
             is_empty : SubHV  DataP  Moose  Mouse  
                 keys : SubHV  DataP  Moose  Mouse  
                   kv : SubHV  DataP  Moose  Mouse  
+               reset : SubHV                       
                  set : SubHV  DataP  Moose  Mouse  
        shallow_clone : SubHV  DataP  Moose         
          sorted_keys : SubHV                Mouse  

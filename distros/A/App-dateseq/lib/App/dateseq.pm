@@ -1,9 +1,9 @@
 package App::dateseq;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-11-29'; # DATE
+our $DATE = '2020-04-30'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.099'; # VERSION
+our $VERSION = '0.100'; # VERSION
 
 use 5.010001;
 use strict;
@@ -389,7 +389,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.099 of App::dateseq (from Perl distribution App-dateseq), released on 2019-11-29.
+This document describes version 0.100 of App::dateseq (from Perl distribution App-dateseq), released on 2020-04-30.
 
 =head1 FUNCTIONS
 
@@ -490,6 +490,7 @@ will print something like:
 
 End date, if not specified will generate an infinite* stream of dates.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -519,22 +520,13 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head1 SEE ALSO
-
-
-L<durseq>. Produce sequence of date durations.
-
-L<seq>.
-
-L<seq-pl>. Perl variant of seq.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

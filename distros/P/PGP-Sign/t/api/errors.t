@@ -13,13 +13,18 @@ use 5.020;
 use autodie;
 use warnings;
 
+use lib 't/lib';
+
 use IPC::Cmd qw(can_run);
 use Test::More;
+use Test::PGP qw(gpg_is_new_enough);
 
 # Check that GnuPG is available.  If so, load the module and set the plan.
 BEGIN {
     if (!can_run('gpg')) {
         plan skip_all => 'gpg binary not available';
+    } elsif (!gpg_is_new_enough('gpg')) {
+        plan skip_all => 'gpg binary is older than 1.4.20 or 2.1.23';
     } else {
         plan tests => 4;
         use_ok('PGP::Sign');

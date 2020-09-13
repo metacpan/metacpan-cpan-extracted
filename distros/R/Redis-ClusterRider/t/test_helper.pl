@@ -48,6 +48,8 @@ BEGIN {
     client_getname  => 'test',
   );
 
+  our @mock_keys = qw( key1 key2 key3 key4 key5 );
+
   Test::MockObject->fake_module( 'Redis',
     new => sub {
       my $class  = shift;
@@ -68,6 +70,12 @@ BEGIN {
       $mock->mock( 'hget',
         sub {
           die '[hget] LOADING Redis is loading the dataset in memory';
+        }
+      );
+
+      $mock->mock( 'keys',
+        sub {
+          return @mock_keys;
         }
       );
 

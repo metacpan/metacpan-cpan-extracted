@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Handler;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014';
+our $VERSION   = '0.015';
 
 use Class::Tiny (
 	qw(
@@ -324,6 +324,10 @@ sub coderef {
 #	warn join("\n", @{$eval{source}});
 #	for my $key (sort keys %{$eval{environment}}) {
 #		warn ">> $key : ".ref($eval{environment}{$key});
+#		if ( ref($eval{environment}{$key}) eq 'REF' and ref(${$eval{environment}{$key}}) eq 'CODE' ) {
+#			require B::Deparse;
+#			warn B::Deparse->new->coderef2text(${$eval{environment}{$key}});
+#		}
 #	}
 	require Eval::TypeTiny;
 	Eval::TypeTiny::eval_closure(%eval);
@@ -384,7 +388,7 @@ sub _generate_handler {
 package Sub::HandlesVia::Handler::Traditional;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014';
+our $VERSION   = '0.015';
 
 BEGIN { our @ISA = 'Sub::HandlesVia::Handler' };
 
@@ -427,7 +431,7 @@ sub _coderef {
 package Sub::HandlesVia::Handler::CodeRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014';
+our $VERSION   = '0.015';
 
 BEGIN { our @ISA = 'Sub::HandlesVia::Handler' };
 

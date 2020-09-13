@@ -1,11 +1,11 @@
 package Pepper;
 
-$Pepper::VERSION = '1.0.3';
+$Pepper::VERSION = '1.2.1';
 
 use Pepper::DB;
 use Pepper::PlackHandler;
 use Pepper::Utilities;
-use lib '/opt/pepper/lib/';
+use lib $ENV{HOME}.'/pepper/lib';
 
 # try to be a good person
 use strict;
@@ -69,7 +69,7 @@ sub execute_handler {
 	# the endpoint will likely be the plack request URI, but accepting
 	# via an arg allows for script mode
 	
-	# resolve the endpoint / uri to a module under /opt/pepper/lib
+	# resolve the endpoint / uri to a module under $ENV{HOME}/pepper/lib
 	my $endpoint_handler_module = $self->determine_endpoint_module($endpoint);
 	
 	# import that module
@@ -144,11 +144,11 @@ sub AUTOLOAD {
 		return $self->{db}->$called_method(@_);
 		
 	# plack handler function?
-	} elsif ($self->{plack_handler}->can($called_method)) {
+	} elsif ($self->{plack_handler} && $self->{plack_handler}->can($called_method)) {
 		return $self->{plack_handler}->$called_method(@_);
 	
 	} else { # hard fail with an error message
-		my $message = "ERROR: No '$called_method' method defined for ".$self->{config}{name}.' objects.';
+		my $message = "ERROR: No '$called_method' method defined for Pepper.";
 		$self->{utils}->send_response( $message, 1 );
 
 	}
@@ -175,9 +175,10 @@ about Perl and for seasoned users to quickly stand up simple web services.
 
 This is not a framework.  This is a quick-start kit meant to simplify learning and 
 small projects.  The goal is for you to fall in love with Perl and continue your 
-journey on to Mojo, Dancer2, AnyEvent, RxPerl, PDL and all the many terrific 
-Perl libraries.  This is a great community of builders, and there is so 
-much to discover at L<https://metacpan.org> and L<https://perldoc.perl.org/>
+journey on to Mojo, Dancer2, AnyEvent, Rex, RPerl, and all other the many terrific 
+Perl libraries (more than I can list here).  This is a great community of builders, 
+and there is so much to discover at L<https://metacpan.org> 
+and L<https://perldoc.perl.org/>
 
 This kit supports database connections to MySQL 5.7/8 or MariaDB 10.3+. 
 There are many other great options out there, but one database driver
@@ -189,13 +190,13 @@ and use L<DBD:Pg> instead of Pepper::DB.
 
 To configure Pepper:
 
-	# sudo pepper setup
+	# pepper setup
 
 To set up a new web service:
 
 	# pepper set-endpoint /dogs/daisy PepperApps::Dogs::Daisy
 
-A new Perl module is created at /opt/pepper/lib/PepperApps/Dogs/Daisy.pm.
+A new Perl module is created at $ENV{HOME}/pepper/lib/PepperApps/Dogs/Daisy.pm.
 Edit that module to have it perform your actions and return any content you prefer.  
 You will be able to execute the service via http://you.hostname.ext:5000/dogs/daisy
 If you change your code, restart the Plack service via 'pepper restart'
@@ -209,9 +210,20 @@ The $pepper object provides several conveniences for MySQL/MariaDB databases, JS
 parsing, Template Toolkit, file handling and logging.  In Web/Plack mode, 
 $pepper will also include the entire PSGI (CGI) environment.
 
+=head1 BREAKING CHANGE IN VERSION 1.1
+
+From version 1.1, Pepper looks for its workspace directory in your home directory.
+If you installed Pepper prior to 1.1 (9/12/2020), that workspace will be under 
+/opt/pepper. You can work around this via this command 'ln -s /opt/pepper ~/peper', 
+or you can re-run 'pepper setup' and copy/move your custom files from /opt/pepper 
+as needed.
+
 =head1 INSTALLATION / GETTTING STARTED
 
 This kit has been tested with Ubuntu 18.04 & 20.04, CentOS 8, and FeeBSD 12.
+B<Installation on Windows is not supported at this time.>  Pepper should work
+on any modern system capable of running Perl 5.22+ and Plack. I will happily add
+any install notes you can provide for other systems (especially WSL or MacOS).
 
 Ubuntu 18/20 users have a quick-start option:
 
@@ -219,7 +231,7 @@ Ubuntu 18/20 users have a quick-start option:
 
 =head2 Installing the required system packages
 
-All of the below commands must be run as root or via 'sudo'.
+These package-installation commands will need to be run as root or via 'sudo'.
 
 =over 12
 
@@ -229,14 +241,11 @@ All of the below commands must be run as root or via 'sudo'.
 
 =item C<CentOS 8>
 
-	# yum install git perl perldoc perl-devel httpd cc mysql mariadb-connector-c mariadb-devel 
+	# yum install perl perl-utils perl-devel httpd gcc mysql mariadb-connector-c mariadb-devel 
 
-=item C<FreeBSD 12 - A bit trickier>
+=item C<FreeBSD 12>
 
-	# pkg update -f
-	# mkdir /opt
-	# pkg install sudo nano apache24 perl5-5.30.3 git p5-DBD-mysql p5-App-cpanminus p5-Parallel-Prefork
-	# nano -w /usr/local/etc/sudoers --> Add line: YOUR_USERNAME	ALL=(ALL) ALL
+	# pkg update -f && pkg install perl5-5.30.3 git p5-DBD-mysql p5-App-cpanminus p5-Parallel-Prefork
 
 =back
 
@@ -249,22 +258,24 @@ B<Note:> Use the 'mysql_native_password' plugin when creating your database user
 	
 =head2 Install Pepper:  
 
-	# sudo cpanm Pepper
+	# cpanm Pepper
+	- or -
+	# cpan Pepper
 
 It may take several minutes to build and install the dependencies.
 	
 =head2 Set up / configure Pepper:  
 
-	# sudo pepper setup
+	# pepper setup
 
 This will prompt you for the configuration options. Choose carefully, but you can
 safely re-run this command if needed to make changes. This command will create the
-directory under /opt/pepper with the needed sub-directories and templates.
+directory under $ENV{HOME}/pepper with the needed sub-directories and templates.
 Do not provide a 'Default endpoint-handler Perl module' for now. (You can update later.)
 
 =head2 Check out the examples:
 	
-Open up PepperExample.pm and HTMLExample.pm under /opt/pepper/lib/PepperApps 
+Open up PepperExample.pm and HTMLExample.pm under $ENV{HOME}/pepper/lib/PepperApps 
 and read the comments to see how easy it is to code up web endpoints.
 	
 =head2 Start the Plack service:  
@@ -278,7 +289,7 @@ to test your changes:
 
 	# pepper restart
 
-Any errors will be logged to /opt/pepper/log/fatals-YYYY-MM-DD.log (replacing YYYY-MM-DD).
+Any errors will be logged to $ENV{HOME}/pepper/log/fatals-YYYY-MM-DD.log (replacing YYYY-MM-DD).
 In a dev environment, you can auto-restart, please see 'pepper help'
 	
 =head2 Write a small script:
@@ -289,7 +300,7 @@ and just start your script like this:
 	use Pepper;
 	my $pepper = Pepper->new();
 
-The setup command places a simple example script at /opt/pepper/template/system/example_perl_script.pl
+The setup command places a simple example script at $ENV{HOME}/pepper/template/system/example_perl_script.pl
 
 The $pepper object will have all the methods and variables described below.
 
@@ -307,7 +318,7 @@ For example:
 	# pepper set-endpoint /Carrboro/WeaverStreet PepperApps::Carrboro::WeaverStreet
 	
 That will map any request to your /Carrboro/WeaverStreet URI to the 'endpoint_handler'
-subroutine within /opt/pepper/lib/PepperApps/Carrboro/WeaverStreet.pm and a very basic version
+subroutine within $ENV{HOME}/pepper/lib/PepperApps/Carrboro/WeaverStreet.pm and a very basic version
 of that file will be created for you.  Simply edit and test the file to power the endpoint.
 
 If you wish to change the endpoint to another module, just re-issue the command:
@@ -357,13 +368,13 @@ For example:
 	
 The $pepper object has lots of goodies, described in the following sections.  There
 is also a wealth of libraries in L<https://metacpan.org> and you add include your 
-own re-usable packages under /opt/pepper/lib .  For instance, if many of your endpoints
-share some data-crunching routines, you could create /opt/pepper/lib/MyUtils/DataCrunch.pm
+own re-usable packages under $ENV{HOME}/pepper/lib .  For instance, if many of your endpoints
+share some data-crunching routines, you could create $ENV{HOME}/pepper/lib/MyUtils/DataCrunch.pm
 and import it as:  use MyUtils::DataCrunch; .  You can also add subroutines below
 the main endpoint_handler() subroutine.  Pepper is just plain Perl, and the only "rule"
 is that endpoint_handler() needs to return what will be sent to the client.
 
-=head1 WEB / PSGI ENVIRONMENT IN THE $pepper OBJECT
+=head1 WEB / PSGI ENVIRONMENT
 
 When you are building an endpoint handler for a web URI, the $pepper object will
 contain the full PSGI environment (which is the web request), including the 
@@ -440,13 +451,13 @@ The plain request and response Plack objects will be available at $pepper->{plac
 and $pepper->{plack_handler}->{response} respectively.  Please only use these if you absolutely must,
 and please see L<Plack::Request> and L<Plack::Response> before working with these.
 
-=head1 RESPONSE / LOGGING / TEMPLATE METHODS PROVIDED BY THE $pepper OBJECT
+=head1 RESPONSE / LOGGING / TEMPLATE METHODS
 
 =head2 template_process
 
 This is an simple interface to the excellent Template Toolkit, which is great for generating
 HTML and really any kind of text files.  Create your Template Toolkit templates 
-under /opt/pepper/template and please see L<Template> and L<http://www.template-toolkit.org>
+under $ENV{HOME}/pepper/template and please see L<Template> and L<http://www.template-toolkit.org>
 The basic idea is to process a template with the values in a data structure to create the 
 appropriate text output.  
 
@@ -457,8 +468,8 @@ To process a template and have your endpoint handler return the results:
 		'template_vars' => $some_data_structure,
 	});
 
-That expects to find some_template.tt under /opt/pepper/template.  You can add 
-subdirectories under /opt/pepper/template and refer to the files as
+That expects to find some_template.tt under $ENV{HOME}/pepper/template.  You can add 
+subdirectories under $ENV{HOME}/pepper/template and refer to the files as
 'subdirectory_name/template_filename.tt'.
 
 To save the generated text as a file:
@@ -480,7 +491,7 @@ To have the template immediate sent out, such as for a fancy error page:
 	
 =head2 logger
 
-This adds entries to the files under /opt/pepper/log and is useful to log actions or
+This adds entries to the files under $ENV{HOME}/pepper/log and is useful to log actions or
 debugging messages.  You can send a plain text string or a reference to a data structure.
 
 	$pepper->logger('A nice log message','example-log');
@@ -516,12 +527,12 @@ From a web endpoint handler, you may set a cookie like this:
 		'days_to_live' => integer over 0, # optional, default is 10
 	}); 
 
-=head1 DATABASE METHODS PROVIDED BY THE $pepper OBJECT
+=head1 DATABASE METHODS
 
 =head2 Random hints
 
 These method will work if you configured a MySQL or MariaDB connection
-via 'sudo pepper setup' command.  
+via 'pepper setup' command.  
 
 The L<DBI> database handle object is stored in $pepper->{db}->{dbh}.
 
@@ -576,7 +587,7 @@ You now have:
 		},
 	};
 	
-	$results = [
+	$result_keys = [
 		'4','1','2','3'
 	];
 
@@ -597,6 +608,8 @@ Now, results would look like
 		...and so forth...
 	};
 
+B<Note:> sql_hash() does not work with 'select *' queries. The column names must be
+a part of your SELECT statement or provided as the third argument.
 
 =head2 list_select
 
@@ -679,7 +692,7 @@ of the web request, but if you wish to manually commit changes, just call $peppe
 If a request fails before completely, commit() is not called and the changes should be rolled-back.
 (Unless you already called 'commit()' prior to the error.)
 
-=head1 JSON METHODS PROVIDED BY THE $pepper OBJECT
+=head1 JSON METHODS
 
 These methods provide default/basic functions of the excellent L<Cpanel::JSON::XS> library.
 
@@ -716,7 +729,7 @@ Converts Perl data structure to JSON and saves it to a file.
 
 	$pepper->write_json_file('path/to/data_file.json', \%data_structure);
 
-=head1 GENERAL / DATE UTILITY METHODS PROVIDED BY THE $pepper OBJECT
+=head1 GENERAL / DATE UTILITY METHODS
 
 =head2 filer
 
@@ -859,9 +872,10 @@ To retrieve an ISO-formatted timestamp, i.e. 2004-10-04T16:12:00+00:00
 	my $iso_timestamp = $pepper->time_to_date(1096906320,'to_datetime_iso','America/Los_Angeles');
 	# $iso_timestamp is now '2004-10-04T09:12:00+0000' (it displays the UTC value)
 
-=head1 THE /opt/pepper DIRECTORY
+=head1 THE pepper DIRECTORY
 
-After running 'sudo pepper setup', /opt/pepper should contain the following subdirectories:
+After running 'pepper setup', a 'pepper' directory will be created in your home directory,
+aka $ENV{HOME}/pepper.  This should contain the following subdirectories:
 
 =over 12
 
@@ -873,7 +887,7 @@ to use in your endpoints. You may choose to store scripts in here.
 
 =item C<config>
 
-This will contain your main pepper.cfg file, which should only be updated via 'sudo pepper setup'.
+This will contain your main pepper.cfg file, which should only be updated via 'pepper setup'.
 If you do not opt to specify an option for 'url_mappings_database', the pepper_endpoints.json file
 will be stored here as well.  Please store any other custom configurations.
 
@@ -903,18 +917,18 @@ Instead, you should always have a full-featured web server like Apache and
 Nginx as a front-end for Plack, and be sure to use HTTPS / TLS.  The good news is 
 that you only need to configure Apache / Nginx once (in a while).  
 
-A sample pepper_apache.conf file will be saved under /opt/pepper/template/system
-after you run 'sudo pepper setup'. Use this file as a basis for adding a virtual
+A sample pepper_apache.conf file will be saved under $ENV{HOME}/pepper/template/system
+after you run 'pepper setup'. Use this file as a basis for adding a virtual
 host configuration under /etc/apache2/conf-enabled .  Several comments have been
 added with friendly suggestions.  You will want to enable several Apahce modules:
 
 	# a2enmod proxy ssl headers proxy_http rewrite
 
-Nginx is a great web server preferred by many smart people. I prefer Apache 
-because it can use ModSecurity with much less effort.
+Nginx is a fine web server, but I recommend Apache as it can be integrated with
+ModSecurity with much less effort.  
 
 Use Systemd keep Pepper online as a server (like Apache or MySQL).  You will 
-find an example SystemD service/config file at /opt/pepper/template/system/pepper.service .
+find an example SystemD service/config file at $ENV{HOME}/pepper/template/system/pepper.service .
 Customize this to your needs, such as changing the '30' on the 'ExecStart' line 
 to have more/less workers, and follow your OS guides to install as a SystemD service.
 

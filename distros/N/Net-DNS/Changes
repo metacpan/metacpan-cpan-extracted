@@ -1,7 +1,15 @@
-$Id: Changes 1801 2020-08-05 15:49:06Z willem $                       -*-text-*-
+$Id: Changes 1806 2020-09-11 18:48:57Z willem $                       -*-text-*-
 
 
-**** 1.26 Aug, 6, 2020
+**** 1.27 Sep 11, 2020
+
+Fix rt.cpan.org #133203
+
+	Net::DNS::RR::LOC erroneously strips non default values from
+	string representation
+
+
+**** 1.26 Aug 6, 2020
 
 	Add HTTPS/SVCB packages.
 

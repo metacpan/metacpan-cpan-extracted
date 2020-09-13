@@ -27,7 +27,7 @@ BEGIN {
 };
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.013';
 our @ISA       = qw/ Exporter::Tiny /;
 
 fieldhash( our %FIELDS );
@@ -108,9 +108,13 @@ sub install_accessors : method
 				+{%$me},
 			);
 			if ($shv_data) {
+				my @default =
+					ref($me->{default})    ? ( $me->{default} ) :
+					length($me->{builder}) ? ( $me->{builder} ) :
+					();
 				my $callbacks = 'Sub::HandlesVia::Toolkit::Plain'->make_callbacks(
 					$me->{package},
-					[ $me->reader, $me->writer ],
+					[ $me->reader, $me->writer, @default ],
 				);
 				require Sub::HandlesVia::Handler;
 				$me->{handles} = $orig_handles;
@@ -772,20 +776,51 @@ __END__
 
 =head1 NAME
 
-Sub::Accessor::Small - base class used by Lexical::Accessor
+Sub::Accessor::Small - small toolkit for generating getter/setter methods
+
+=head1 SYNOPSIS
+
+  package MyClass;
+  use Sub::Accessor::Small;
+  use Types::Standard qw( Int );
+  
+  sub new {
+    my $class = shift;
+    my $self  = bless \$class, $class;
+    my %args  = @_ == 1 ? %{ $_[0] } : @_;
+    
+    # Simple way to initialize each attribute
+    for my $key ( sort keys %args ) {
+      $self->$key( $args{$key} );
+    }
+    
+    return $self;
+  }
+  
+  'Sub::Accessor::Small'->new(
+    package  => __PACKAGE__,
+    name     => "foo",
+    is       => "rw",
+    isa      => Int,
+  )->install_accessors();
+  
+  package main;
+  
+  my $obj = MyClass->new( foo => 42 );
 
 =head1 DESCRIPTION
 
-Not documented yet.
+This is a small toolkit for generating Moose-like attribute accessors.
+B<< It does not generate a constructor. >>
+
+It stores attribute values inside-out, but it is designed for 
+Sub::Accessor::Small to be subclassed, making it easy to store attributes
+in other ways.
 
 =head1 BUGS
 
 Please report any bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=Lexical-Accessor>.
-
-=head1 SUPPORT
-
-Using this module directly is currently unsupported.
 
 =head1 SEE ALSO
 
@@ -797,7 +832,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017, 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

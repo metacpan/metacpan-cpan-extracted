@@ -1,4 +1,4 @@
-# $Id: 02-IDN.t 1779 2020-05-11 09:11:17Z willem $	-*-perl-*-
+# $Id: 02-IDN.t 1804 2020-09-07 07:57:36Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -13,8 +13,8 @@ use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see UTR#16 3.6]
 	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
 };
 
-use constant LIBIDN  => defined eval 'require Net::LibIDN';
 use constant LIBIDN2 => ref eval 'require Net::LibIDN2; Net::LibIDN2->can("idn2_to_ascii_8")';
+use constant LIBIDN  => LIBIDN2 ? undef : defined eval 'require Net::LibIDN';
 					## ^^^	verbatim from Domain.pm
 
 

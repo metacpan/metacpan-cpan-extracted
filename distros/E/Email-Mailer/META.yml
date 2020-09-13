@@ -28,6 +28,7 @@ requires:
   HTML::FormatText: '0'
   HTML::TreeBuilder: '0'
   IO::All: '0'
+  MIME::Words: '0'
   perl: '5.014'
   strict: '0'
   warnings: '0'
@@ -35,7 +36,7 @@ resources:
   bugtracker: https://github.com/gryphonshafer/Email-Mailer/issues
   homepage: https://github.com/gryphonshafer/Email-Mailer
   repository: https://github.com/gryphonshafer/Email-Mailer.git
-version: '1.11'
+version: '1.12'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

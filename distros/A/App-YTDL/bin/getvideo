@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.415';
+our $VERSION = '0.416';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -137,10 +137,11 @@ if ( ! @ids ) {
     print up( 1 ), cldown;
 }
 
+my $urls_data = {};
 my $data = {};
 
 if ( @ids ) {
-    my $chosen = from_arguments_to_choices( $set, $opt, $data, @ids );
+    my $chosen = from_arguments_to_choices( $set, $opt, $urls_data, $data, @ids );
     print_video_infos( $set, $opt, $data, $chosen );
     download( $set, $opt, $data, $chosen );
     add_uploaders_to_history( $set, $opt, $data ) if $opt->{max_size_history};
@@ -171,7 +172,7 @@ elsif ( ! @ids && ( %{$set->{history}} || %{$set->{sticky}} ) ) {
         if ( $menu->[$idx] eq $uploader ) {
             my @chosen_uploaders = choose_videos_from_saved_uploaders( $set, $opt );
             next if ! @chosen_uploaders;
-            my $chosen = from_arguments_to_choices( $set, $opt, $data, @chosen_uploaders );
+            my $chosen = from_arguments_to_choices( $set, $opt, $urls_data, $data, @chosen_uploaders );
             print_video_infos( $set, $opt, $data, $chosen );
             my $total = download( $set, $opt, $data, $chosen );
             $clear_screen = $total ? 0 : 1;
@@ -202,7 +203,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.415
+Version 0.416
 
 =cut
 

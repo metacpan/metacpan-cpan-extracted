@@ -1,0 +1,9 @@
+BEGIN { -e 'Distar' or system("git clone https://github.com/p5sagit/Distar.git") }
+use lib 'Distar/lib';
+use Distar;
+
+author 'sri - Sebastian Riedel <sri@cpan.org>';
+
+manifest_include share => qr{.*};
+
+1;

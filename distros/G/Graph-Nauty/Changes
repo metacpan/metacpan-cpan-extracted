@@ -1,3 +1,9 @@
+0.3.2 2020-09-10
+
+    - Extended POD documentation to cover vertex and edge colors.
+    - Renamed Graph::Nauty::EdgeNode to Graph::Nauty::EdgeVertex to have
+      a consistent terminology.
+
 0.3.1 2020-08-28
 
     - Added comparison of corresponding vertices to are_isomorphic(), as

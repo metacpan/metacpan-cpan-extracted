@@ -1,5 +1,16 @@
 Revision history for Alien-Build
 
+2.32      2020-09-11 10:42:41 -0600
+  - Production release identical to 2.27_01
+
+2.31_01   2020-09-09 06:26:25 -0600
+  - Diagnostic release
+
+2.30_01   2020-09-08 14:48:12 -0600
+  - Documentation fixes (gh#223, #224, #225, shawnlaffan++)
+  - Use shorter filename paths for test files to keep older versions of tar
+    happy (gh#228, gh#229, gh#230)
+
 2.29      2020-08-10 09:16:59 -0600
   - Move to new GitHub org: https://github.com/PerlAlien
   - Fixed meta which was incorrectly requiring 5.8.1 instead of 5.8.4

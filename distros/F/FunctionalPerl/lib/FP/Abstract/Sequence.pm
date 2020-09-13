@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -69,8 +69,9 @@ use strict; use warnings; use warnings FATAL => 'uninitialized';
 require FP::List; # "use"ing it would create a circular dependency
 use FP::Array_sort qw(on_maybe);
 use FP::Lazy;
-use FP::Ops qw(add mult);
-use FP::Predicates qw(complement);
+use FP::Ops qw(add mult number_cmp);
+use FP::Predicates qw(complement is_even);
+use FP::Div qw(average);
 
 use Chj::NamespaceCleanAbove;
 
@@ -92,6 +93,8 @@ sub FP_Interface__method_names {
      reduce
      reduce_right
      sum
+     mean
+     median
      product
      none
      join
@@ -108,6 +111,7 @@ sub FP_Interface__method_names {
      perhaps_first perhaps_rest
      perhaps_first_and_rest
      map
+     map_with_index
      map_with_islast
      filter
      TODO_filter_with_tail
@@ -138,6 +142,8 @@ sub FP_Interface__method_names {
      list
      stream
      sort
+     sortCompare
+     string
      ),
      # $class->SUPER::FP_Interface__method_names
     )
@@ -306,6 +312,26 @@ sub reduce_right;
 sub sum {
     @_==1 or die "wrong number of arguments";
     $_[0]->reduce(*add)
+}
+
+sub mean {
+    @_==1 or die "wrong number of arguments";
+    my ($s)= @_;
+    # XX imprecise for large numbers of items
+    $s->sum / $s->length
+}
+
+sub median {
+    @_==1 or die "wrong number of arguments";
+    my ($s)= @_;
+    my $sorted= $s->sort(\&number_cmp);
+    my $len= $s->length;
+    my $mid= int($len/2);
+    if (is_even $len) {
+        average($sorted->ref($mid-1), $sorted->ref($mid));
+    } else {
+        $sorted->ref($mid)
+    }
 }
 
 sub product {

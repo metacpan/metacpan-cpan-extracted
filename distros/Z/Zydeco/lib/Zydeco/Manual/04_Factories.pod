@@ -182,10 +182,8 @@ then install factory methods that call those.
     }
   }
 
-Inside C<method> blocks, C<< $factory >> will not be defined, but you
-can use:
-
-  my $factory = $class->FACTORY;
+Inside C<method> blocks, a C<< $factory >> variable is available, which is
+preset to C<< $self->FACTORY >>.
 
 One advantage of using a proxy is that subclasses can inherit the method and
 potentially override it.

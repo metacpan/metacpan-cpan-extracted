@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Plugin to filter known good versions
-our $VERSION = '2.29'; # VERSION
+our $VERSION = '2.32'; # VERSION
 
 
 has '+filter' => sub { Carp::croak("The filter property is required for the Prefer::GoodVersion plugin") };
@@ -76,7 +76,7 @@ Alien::Build::Plugin::Prefer::GoodVersion - Plugin to filter known good versions
 
 =head1 VERSION
 
-version 2.29
+version 2.32
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ Filter any files that match the given version.
  use alienfile;
  plugin 'Prefer::GoodVersion' => '1.2.3';
 
-=item as a array
+=item as an array
 
 Filter all files that match any of the given versions.
 

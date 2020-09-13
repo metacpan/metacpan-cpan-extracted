@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.601';
+our $VERSION   = '0.603';
 
 use Keyword::Simple ();
 use PPR;
@@ -1100,11 +1100,16 @@ sub _handle_method_keyword {
 		$lex_name = $name;
 	}
 	
+	my $inject_vars = 'my $class = ref($self)||$self';
+	if ( $code =~ /\$\s*factory/ ) {
+		$inject_vars .= '; my $factory = $self->FACTORY';
+	}
+	
 	my $return = '';
 	
 	if (defined $name and not defined $lex_name) {
 		if ($has_sig) {
-			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
+			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; %s; do %s }', $signature_var_list, $extra, $inject_vars, $code);
 			$return = sprintf(
 				'q[%s]->_can(%s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 				$me,
@@ -1117,7 +1122,7 @@ sub _handle_method_keyword {
 			);
 		}
 		else {
-			my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
+			my $munged_code = sprintf('sub { my $self = $_[0]; %s; do %s }', $inject_vars, $code);
 			$return = sprintf(
 				'q[%s]->_can(%s, { attributes => %s, caller => __PACKAGE__, code => %s, optimize => %d });',
 				$me,
@@ -1130,7 +1135,7 @@ sub _handle_method_keyword {
 	}
 	else {
 		if ($has_sig) {
-			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
+			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; %s; do %s }', $signature_var_list, $extra, $inject_vars, $code);
 			$return = sprintf(
 				'q[%s]->wrap_coderef({ attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 				'MooX::Press',
@@ -1142,7 +1147,7 @@ sub _handle_method_keyword {
 			);
 		}
 		else {
-			my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
+			my $munged_code = sprintf('sub { my $self = $_[0]; %s; do %s }', $inject_vars, $code);
 			$return = sprintf(
 				'q[%s]->wrap_coderef({ attributes => %s, caller => __PACKAGE__, code => %s, optimize => %d });',
 				'MooX::Press',
@@ -1180,8 +1185,13 @@ sub _handle_multi_keyword {
 		$optim ||= $_should_optimize->($code, $signature_var_list);
 	}
 	
+	my $inject_vars = 'my $class = ref($self)||$self';
+	if ( $code =~ /\$\s*factory/ ) {
+		$inject_vars .= '; my $factory = $self->FACTORY';
+	}
+	
 	if ($has_sig) {
-		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
+		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; %s; do %s }', $signature_var_list, $extra, $inject_vars, $code);
 		return sprintf(
 			'q[%s]->_multi(%s => %s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, %s });',
 			$me,
@@ -1195,7 +1205,7 @@ sub _handle_multi_keyword {
 		);
 	}
 	else {
-		my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
+		my $munged_code = sprintf('sub { my $self = $_[0]; %s; do %s }', $inject_vars, $code);
 		return sprintf(
 			'q[%s]->_multi(%s => %s, { attributes => %s, caller => __PACKAGE__, code => %s, named => 0, signature => sub { @_ }, %s });',
 			$me,
@@ -1223,6 +1233,11 @@ sub _handle_modifier_keyword {
 		$optim ||= $_should_optimize->($code, $signature_var_list);
 	}
 	
+	my $inject_vars = 'my $class = ref($self)||$self';
+	if ( $code =~ /\$\s*factory/ ) {
+		$inject_vars .= '; my $factory = $self->FACTORY';
+	}
+	
 	# MooX::Press cannot handle optimizing method modifiers
 	$optim = 0;
 	
@@ -1235,10 +1250,10 @@ sub _handle_modifier_keyword {
 	if ($has_sig) {
 		my $munged_code;
 		if ($kind eq 'around') {
-			$munged_code = sprintf('sub { my($next,$self,%s)=(shift,shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
+			$munged_code = sprintf('sub { my($next,$self,%s)=(shift,shift,@_); %s; %s; do %s }', $signature_var_list, $extra, $inject_vars, $code);
 		}
 		else {
-			$munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
+			$munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; %s; do %s }', $signature_var_list, $extra, $inject_vars, $code);
 		}
 		sprintf(
 			'q[%s]->_modifier(q(%s), %s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
@@ -1253,7 +1268,7 @@ sub _handle_modifier_keyword {
 		);
 	}
 	elsif ($kind eq 'around') {
-		my $munged_code = sprintf('sub { my ($next, $self) = @_; my $class = ref($self)||$self; do %s }', $code);
+		my $munged_code = sprintf('sub { my ($next, $self) = @_; %s; do %s }', $inject_vars, $code);
 		sprintf(
 			'q[%s]->_modifier(q(%s), %s, { attributes => %s, caller => __PACKAGE__, code => %s, optimize => %d });',
 			$me,
@@ -1265,7 +1280,7 @@ sub _handle_modifier_keyword {
 		);
 	}
 	else {
-		my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
+		my $munged_code = sprintf('sub { my $self = $_[0]; %s; do %s }', $inject_vars, $code);
 		sprintf(
 			'q[%s]->_modifier(q(%s), %s, { attributes => %s, caller => __PACKAGE__, code => %s, optimize => %d });',
 			$me,
@@ -1366,8 +1381,12 @@ sub _handle_has_keyword {
 	
 	$rawspec = '()' if !defined $rawspec;
 	
-	if (defined $default and $default =~ /\$self/) {
-		$rawspec = "lazy => !!1, default => sub { my \$self = \$_[0]; $default }, $rawspec";
+	if (defined $default and $default =~ /\$\s*(?:self|class|factory)/) {
+		my $inject_vars = 'my $class = ref($self)||$self';
+		if ( $default =~ /\$\s*factory/ ) {
+			$inject_vars .= '; my $factory = $self->FACTORY';
+		}
+		$rawspec = "lazy => !!1, default => sub { my \$self = \$_[0]; $inject_vars; $default }, $rawspec";
 	}
 	elsif (defined $default) {
 		$rawspec = "default => sub { $default }, $rawspec";
@@ -2359,8 +2378,18 @@ sub _include {
 	
 	require Path::ScanINC;
 	my @chunks = split /::/, $_[0];
-	$chunks[-1] .= '.pl';
+	$chunks[-1] .= '.zydeco.pm';
 	my $file = Path::ScanINC->new->first_file(@chunks);
+	
+	if (!$file) {
+		my @fallback = @chunks;
+		$fallback[-1] =~ s/\.zydeco\.pm$/.pl/;
+		$file = Path::ScanINC->new->first_file(@fallback);
+		if ($file) {
+			require Carp;
+			Carp::carp("Include .pl deprecated, use .zydeco.pm instead. Loaded: " . join("/", @fallback));
+		}
+	}
 	
 	if (!$file) {
 		require Carp;
@@ -2380,7 +2409,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.601';
+#	our $VERSION   = '0.603';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2391,7 +2420,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.601';
+#	our $VERSION   = '0.603';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2404,12 +2433,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.601';
+#	our $VERSION   = '0.603';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.601';
+#	our $VERSION   = '0.603';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2423,7 +2452,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.601';
+#	our $VERSION   = '0.603';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2984,11 +3013,11 @@ class will not be able to see functions exported into the class.
     include Classes;
   }
   
-  # MpApp/Roles.pl
+  # MyApp/Roles.zydeco.pm
   role Foo;
   role Bar;
   
-  # MyApp/Classes.pl
+  # MyApp/Classes.zydeco.pm
   class Foo::Bar with Foo, Bar;
 
 =head2 C<< Zydeco::PACKAGE_SPEC() >>

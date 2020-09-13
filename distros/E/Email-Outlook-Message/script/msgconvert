@@ -5,13 +5,14 @@
 # Convert .MSG files (made by Outlook (Express)) to multipart MIME messages.
 #
 
+use Email::Address;
 use Email::Outlook::Message;
 use Email::Sender::Transport::Mbox;
 use Getopt::Long;
 use Pod::Usage;
 use File::Basename;
 use vars qw($VERSION);
-$VERSION = "0.904";
+$VERSION = "0.920";
 
 # Setup command line processing.
 my $verbose = '';
@@ -44,7 +45,10 @@ foreach my $file (@ARGV) {
   my $msg = new Email::Outlook::Message($file, $verbose);
   my $mail = $msg->to_email_mime;
   if ($using_mbox) {
-    $transport->send($mail->as_string, { from => $mail->header('From') || '' });
+    my $from;
+    my @from_addr = Email::Address->parse($mail->header('From'));
+    $from = $from_addr[0]->address if @from_addr;
+    $transport->send($mail->as_string, { from => $from || '' });
   } else {
     if (!$using_outfile) {
         my $basename = fileparse($file, qr/\.msg/i);
@@ -131,7 +135,7 @@ Matijs van Zuijlen, C<matijs@matijs.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2002--2014 by Matijs van Zuijlen
+Copyright 2002--2020 by Matijs van Zuijlen
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

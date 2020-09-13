@@ -184,6 +184,9 @@ sub init_repo
   #   The file will have its original line endings in your working directory.
   $git->config( 'core.autocrlf' => 'false' );
 
+  # Ensure the initial branch is called 'master'.
+  path("$git_dir/.git/HEAD")->spew("ref: refs/heads/master\n");
+
   if (@initial_files) {
     # Don't use --force, because only -f works before git 1.5.6
     $git->add(-f => @initial_files);

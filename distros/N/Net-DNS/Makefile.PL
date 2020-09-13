@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1795 2020-07-27 11:00:29Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1802 2020-08-31 13:44:20Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -77,7 +77,7 @@ my @debris = qw(.resolv.conf *.lock);
 use constant USE_GETOPT => defined eval 'use Getopt::Long; 1';
 
 my $help = 0;
-my $IPv6_tests;
+my $IPv6_tests = 1;
 my $online_tests = 2;			##  2 = non-fatal, 1 = on, 0 = off  ##
 
 my @options = (
@@ -126,7 +126,7 @@ EOT
 # Enable tests if we have internet connection	(code lifted from LWP)
 #
 use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1';
-use constant INET_FALLBACK => !USE_SOCKET_IP && eval 'require IO::Socket::INET';
+require IO::Socket::INET unless USE_SOCKET_IP;
 
 if ($online_tests) {
 	my $class = USE_SOCKET_IP ? 'IO::Socket::IP' : 'IO::Socket::INET';
@@ -169,7 +169,6 @@ if ($online_tests) {
 		print "\nActivating Online Tests...\n";
 	}
 
-	$IPv6_tests = 1 unless defined $IPv6_tests;
 	if ( USE_SOCKET_IP && $IPv6_tests ) {
 		print "\nActivating IPv6 Tests...\n";
 		open( ENABLED, '>', $IPv6 ) or die "Can't touch $IPv6 $!";
@@ -256,8 +255,8 @@ sub install {
 ##	from the existing @version in your perl library at
 ##	@installed
 ##
-##	The installation will be rendered ineffective because the
-##	library search finds the existing version before reaching
+##	The installation would be rendered ineffective because the
+##	installed version occurs in the library search path before
 ##	$install_site
 ##
 ##	The generated Makefile supports build and test only.

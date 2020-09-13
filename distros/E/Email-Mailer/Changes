@@ -1,5 +1,9 @@
 Revision history for Email::Mailer
 
+1.12      2020-09-12 14:03:01-07:00 America/Los_Angeles
+        - Added automatic header-ification for: To, From, Subject, Content-Type,
+          and Content-Transfer-Encoding
+
 1.11      2020-09-01 10:55:39-07:00 America/Los_Angeles
         - Fix POD bug containing improper construction
 

@@ -1,4 +1,4 @@
-# PGP::Sign 1.01
+# PGP::Sign 1.03
 
 [![Build
 status](https://github.com/rra/pgp-sign/workflows/build/badge.svg)](https://github.com/rra/pgp-sign/actions)
@@ -48,10 +48,9 @@ backward-compatible with earlier versions of PGP::Sign.
 ## Requirements
 
 Perl 5.20 or later and Module::Build are required to build this module,
-and IPC::Run is required to use it.  Either GnuPG v2 (version 2.1.12 or
-later) or GnuPG v1 is also required.  The implementation of GnuPG can be
-selected at runtime.  It has not been tested with versions of GnuPG older
-than 1.4.23.
+and IPC::Run is required to use it.  Either GnuPG v2 (version 2.1.23 or
+later) or GnuPG v1 (version 1.4.20 or later) is also required.  The
+implementation of GnuPG can be selected at runtime.
 
 PGP::Sign requires the ability to redirect higher-numbered file
 descriptors via IPC::Run, and thus will not work on Windows unless Perl is

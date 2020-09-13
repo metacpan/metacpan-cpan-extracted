@@ -12,14 +12,140 @@ use Scalar::Util 'reftype', 'refaddr';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    op_delay op_distinct_until_changed op_filter op_first op_map op_map_to op_merge_map op_multicast
-    op_pairwise op_ref_count op_scan op_share op_start_with op_switch_map op_take op_take_until op_take_while op_tap
+    op_concat_map op_debounce_time op_delay op_distinct_until_changed op_distinct_until_key_changed op_end_with
+    op_exhaust_map op_filter op_first op_map op_map_to op_merge_map op_multicast op_pairwise op_pluck op_ref_count
+    op_scan op_share op_start_with op_switch_map op_take op_take_until op_take_while op_tap op_with_latest_from
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 # TODO: are these op_delay comments still valid?
 # Two bugs: 1) script doesn't exit upon the subscriber receiving complete, and 2) delaying of(1, 2, 3) often
 # shows fewer than 3 'next' values and not in the right order.
+
+
+sub _op_concat_map_helper {
+    my (
+        $value, $inner_subscriptions, $observable_factory,
+        $subscriber, $queue, $own_subscription
+    ) = @_;
+
+    if (@$inner_subscriptions and ! $inner_subscriptions->[0]{closed}) {
+        push @$queue, $value;
+        return;
+    }
+
+    my $inner_observable = $observable_factory->($value);
+
+    @$inner_subscriptions = (RxPerl::Subscription->new);
+    $inner_observable->subscribe({
+        new_subscription => $inner_subscriptions->[0],
+        next     => $subscriber->{next},
+        error    => $subscriber->{error},
+        complete => sub {
+            @$inner_subscriptions = ();
+            if (@$queue) {
+                my $new_value = shift @$queue;
+                _op_concat_map_helper(
+                    $new_value, $inner_subscriptions, $observable_factory,
+                    $subscriber, $queue, $own_subscription,
+                );
+            } else {
+                if ($own_subscription->{closed}) {
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                }
+            }
+        },
+    });
+}
+
+sub op_concat_map {
+    my ($observable_factory) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my @inner_subscriptions;
+            my @queue;
+
+            my $own_subscription = RxPerl::Subscription->new;
+            my $own_subscriber = {
+                new_subscription => $own_subscription,
+                next             => sub {
+                    my ($value) = @_;
+
+                    _op_concat_map_helper(
+                        $value, \@inner_subscriptions, $observable_factory,
+                        $subscriber, \@queue, $own_subscription
+                    );
+                },
+                error            => $subscriber->{error},
+                complete         => sub {
+                    if (! @inner_subscriptions) {
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                    }
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return ($own_subscription, \@inner_subscriptions);
+        });
+    };
+}
+
+my $_debounce_empty = {};
+
+sub op_debounce_time {
+    my ($due_time) = @_;
+
+    my ($timer_sub, $cancel_timer_sub) = get_timer_subs;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my @value_to_emit;
+            my $id;
+
+            my $own_subscription = RxPerl::Subscription->new;
+            my $own_observer = {
+                new_subscription => $own_subscription,
+                next     => sub {
+                    my @value = @_;
+
+                    @value_to_emit = @value ? @value : $_debounce_empty;
+
+                    $cancel_timer_sub->($id);
+                    $id = $timer_sub->($due_time, sub {
+                        undef @value_to_emit;
+                        $subscriber->{next}->(@value) if defined $subscriber->{next};
+                    });
+                },
+                error    => sub {
+                    $cancel_timer_sub->($id);
+                    $subscriber->{error}->(@_) if defined $subscriber->{error};
+                },
+                complete => sub {
+                    if (@value_to_emit) {
+                        $cancel_timer_sub->($id);
+                        @value_to_emit = () if _eqq($value_to_emit[0], $_debounce_empty);
+                        $subscriber->{next}->(@value_to_emit);
+                    }
+                    $subscriber->{complete}->();
+                },
+            };
+
+            $source->subscribe($own_observer);
+
+            return ($own_subscription, sub { $cancel_timer_sub->($id) });
+        });
+    }
+}
 
 sub op_delay {
     my ($delay) = @_;
@@ -82,6 +208,10 @@ sub op_delay {
 }
 
 sub op_distinct_until_changed {
+    my ($comparison_function) = @_;
+
+    $comparison_function //= \&_eqq;
+
     return sub {
         my ($source) = @_;
 
@@ -96,7 +226,7 @@ sub op_distinct_until_changed {
                 next => sub {
                     my @value = @_;
 
-                    if (! $have_prev_value or ! _eqq($prev_value, $value[0])) {
+                    if (! $have_prev_value or ! $comparison_function->($prev_value, $value[0])) {
                         $subscriber->{next}->(@value) if defined $subscriber->{next};
                         $have_prev_value = 1;
                         $prev_value = $value[0];
@@ -107,6 +237,74 @@ sub op_distinct_until_changed {
             $source->subscribe($own_subscriber);
 
             return;
+        });
+    };
+}
+
+sub op_distinct_until_key_changed {
+    my ($key) = @_;
+
+    return op_distinct_until_changed(sub {
+        $_[0]->{$key} eq $_[1]->{$key};
+    }),
+}
+
+sub op_end_with {
+    my (@values) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_concat(
+            $source,
+            rx_of(@values),
+        );
+    }
+}
+
+sub op_exhaust_map {
+    my ($observable_factory) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $inner_subscription;
+            my $own_subscription = RxPerl::Subscription->new;
+            my $own_observer = {
+                new_subscription => $own_subscription,
+                next             => sub {
+                    my ($value) = @_;
+
+                    if (!$inner_subscription or $inner_subscription->{closed}) {
+                        my $inner_observable = $observable_factory->($value);
+                        $inner_subscription = RxPerl::Subscription->new;
+                        my $inner_observer = {
+                            new_subscription => $inner_subscription,
+                            next             => $subscriber->{next},
+                            error            => $subscriber->{error},
+                            complete         => sub {
+                                if ($own_subscription->{closed}) {
+                                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                                }
+                            },
+                        };
+                        $inner_observable->subscribe($inner_observer);
+                    }
+                },
+                error            => $subscriber->{error},
+                complete         => sub {
+                    if (! $inner_subscription or $inner_subscription->{closed}) {
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                    }
+                },
+            };
+
+            $source->subscribe($own_observer);
+
+            return ($own_subscription, \$inner_subscription);
         });
     };
 }
@@ -298,6 +496,46 @@ sub op_pairwise {
     };
 }
 
+sub op_pluck {
+    my (@keys) = @_;
+
+    croak 'List of properties cannot be empty,' unless @keys;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $own_subscriber = {
+                %$subscriber,
+                next => sub {
+                    my (@value) = @_;
+
+                    if (! @value) {
+                        $subscriber->{next}->() if defined $subscriber->{next};
+                        return;
+                    }
+
+                    my $cursor = $value[0];
+                    foreach my $key (@keys) {
+                        if ((reftype($cursor) // '') eq 'HASH' and exists $cursor->{$key}) {
+                            $cursor = $cursor->{$key};
+                        } else {
+                            $subscriber->{next}->(undef) if defined $subscriber->{next};
+                            return;
+                        }
+                    }
+
+                    $subscriber->{next}->($cursor) if defined $subscriber->{next};
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+        });
+    };
+}
+
 sub op_ref_count {
     return sub {
         my ($source) = @_;
@@ -423,7 +661,6 @@ sub op_switch_map {
                     my $this_own_subscriber = {
                         new_subscription => $this_own_subscription,
                         next     => sub {
-                            print "nexting\n";
                             $subscriber->{next}->(@_) if defined $subscriber->{next};
                         },
                         error    => sub {
@@ -572,6 +809,59 @@ sub op_tap {
             };
 
             $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
+sub op_with_latest_from {
+    my (@other_observables) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my @other_observables = @other_observables;
+            my $i = 0;
+            my %didnt_emit = map {($i++, 1)} @other_observables;
+            my @latest_values;
+            my %other_subscriptions;
+
+            get_subscription_from_subscriber($subscriber)->add_dependents(
+                \%other_subscriptions, sub { undef @other_observables },
+            );
+
+            for (my $i = 0; $i < @other_observables; $i++) {
+                my $j = $i;
+                my $other_observable = $other_observables[$j];
+
+                my $other_subscription = RxPerl::Subscription->new;
+                $other_subscriptions{$other_subscription} = $other_subscription;
+                $other_observable->subscribe({
+                    new_subscription => $other_subscription,
+                    next     => sub {
+                        my ($value) = @_;
+
+                        $latest_values[$j] = $value;
+                        delete $didnt_emit{$j};
+                    },
+                    error    => $subscriber->{error},
+                });
+            }
+
+            $source->subscribe({
+                %$subscriber,
+                next => sub {
+                    my ($value) = @_;
+
+                    if (! %didnt_emit) {
+                        $subscriber->{next}->([$value, @latest_values]) if defined $subscriber->{next};
+                    }
+                },
+            });
 
             return;
         });

@@ -1,7 +1,7 @@
 package Bot::ChatBots::Telegram::LongPoll;
 use strict;
 use warnings;
-{ our $VERSION = '0.012'; }
+{ our $VERSION = '0.014'; }
 
 use Ouch;
 use Try::Tiny;
@@ -9,6 +9,7 @@ use Log::Any qw< $log >;
 use Mojo::IOLoop ();
 use IO::Socket::SSL ();    # just to be sure to complain loudly in case
 use List::Util qw< max >;
+use Data::Dumper;
 
 use Moo;
 use namespace::clean;
@@ -55,13 +56,19 @@ sub class_custom_pairs {
 sub parse_response {
    my ($self, $res, $threshold_id) = @_;
    my $data = $res->json // {};
-   if (!$data->{ok}) { # boolean flag from Telegram API
-      $log->error('getUpdates error: ' .
-         $data->{description} // 'unknown error');
-      return;
-   }
+   return grep { $_->{update_id} >= $threshold_id } @{$data->{result}//[]}
+      if $data->{ok}; # boolean flag from Telegram API
 
-   return grep { $_->{update_id} >= $threshold_id } @{$data->{result}//[]};
+   my $error = $data->{description} // 'unknown error';
+   $log->error('getUpdates error: ' . $error);
+   if ($log->is_trace) {
+      local $Data::Dumper::Indent = 1;
+      for ([json => $data], [res => $res]) {
+         (my $d = Dumper $_->[1]) =~ s{\A.*?=}{$_->[0] =>}mxs;
+         $log->trace($d);
+      }
+   }
+   return;
 }
 
 sub poller {

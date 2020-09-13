@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use Log::Any::Adapter qw< Stderr >;
 use Bot::ChatBots::Telegram::LongPoll;
 
 my $token = shift || $ENV{TOKEN};

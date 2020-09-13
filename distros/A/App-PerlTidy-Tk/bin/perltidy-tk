@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+use FindBin;
+use File::Spec;
+use lib File::Spec->catfile($FindBin::Bin, '..', 'lib');
+use App::PerlTidy::Tk;
+App::PerlTidy::Tk->run;

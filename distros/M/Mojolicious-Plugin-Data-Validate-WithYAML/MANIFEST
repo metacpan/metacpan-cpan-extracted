@@ -15,9 +15,11 @@ t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/conf/finfo.yml
 t/conf/hello.yml
+t/conf/step_test.yml
 t/conf/test.yml
 t/fieldinfo.t
 t/fieldinfo_no_config.t
 t/test.yml
 t/validate.t
 t/validate_config.t
+t/validate_steps.t

@@ -10,18 +10,21 @@ BEGIN {
 use File::Path;
 use FindBin;
 use IO::Socket;
+use Config ();
 
-eval "use FCGI";
-plan skip_all => 'FCGI required' if $@;
+BEGIN {
+    eval "use FCGI";
+    plan skip_all => 'FCGI required' if $@;
 
-eval "use Catalyst::Devel 1.0";
-plan skip_all => 'Catalyst::Devel required' if $@;
+    eval "use File::Copy::Recursive";
+    plan skip_all => 'File::Copy::Recursive required' if $@;
 
-eval "use File::Copy::Recursive";
-plan skip_all => 'File::Copy::Recursive required' if $@;
+    eval "use Test::Harness";
+    plan skip_all => 'Test::Harness required' if $@;
+}
 
-eval "use Test::Harness";
-plan skip_all => 'Test::Harness required' if $@;
+use lib 't/lib';
+use MakeTestApp;
 
 my $lighttpd_bin = $ENV{LIGHTTPD_BIN} || `which lighttpd`;
 chomp $lighttpd_bin;
@@ -29,27 +32,26 @@ chomp $lighttpd_bin;
 plan skip_all => 'Please set LIGHTTPD_BIN to the path to lighttpd'
     unless $lighttpd_bin && -x $lighttpd_bin;
 
+my $fix_scriptname = '';
+if (my ($vmajor, $vminor, $vpatch) = `"$lighttpd_bin" -v` =~ /\b(\d+)\.(\d+)\.(\d+)\b/) {
+    if ($vmajor > 1 || ($vmajor == 1 && ("$vminor.$vpatch" >= 4.23))) {
+        $fix_scriptname = '"fix-root-scriptname" => "enable",';
+    }
+}
+
 plan tests => 1;
 
-# clean up
-rmtree "$FindBin::Bin/../t/tmp" if -d "$FindBin::Bin/../t/tmp";
-
-# create a TestApp and copy the test libs into it
-mkdir "$FindBin::Bin/../t/tmp";
-chdir "$FindBin::Bin/../t/tmp";
-system "$^X -I$FindBin::Bin/../lib $FindBin::Bin/../script/catalyst.pl TestApp";
-chdir "$FindBin::Bin/..";
-File::Copy::Recursive::dircopy( 't/lib', 't/tmp/TestApp/lib' );
-
-# remove TestApp's tests
-rmtree 't/tmp/TestApp/t';
+# this creates t/tmp/TestApp
+make_test_app;
 
 # Create a temporary lighttpd config
 my $docroot = "$FindBin::Bin/../t/tmp";
 my $port    = 8529;
 
 # Clean up docroot path
-$docroot =~ s{/t/..}{};
+$docroot =~ s{/t/\.\.}{};
+
+my $perl5lib = join($Config::Config{path_sep}, "$docroot/../../lib", $ENV{PERL5LIB} || ());
 
 my $conf = <<"END";
 # basic lighttpd config file for testing fcgi+catalyst
@@ -69,7 +71,7 @@ server.port = $port
 
 # catalyst app specific fcgi setup
 fastcgi.server = (
-    "" => (
+    "/" => (
         "FastCgiTest" => (
             "socket"          => "$docroot/test.socket",
             "check-local"     => "disable",
@@ -77,8 +79,9 @@ fastcgi.server = (
             "min-procs"       => 1,
             "max-procs"       => 1,
             "idle-timeout"    => 20,
+            $fix_scriptname
             "bin-environment" => (
-                "PERL5LIB" => "$docroot/../../lib"
+                "PERL5LIB" => "$perl5lib"
             )
         )
     )

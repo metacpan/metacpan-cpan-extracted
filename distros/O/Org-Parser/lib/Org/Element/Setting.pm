@@ -1,7 +1,9 @@
 package Org::Element::Setting;
 
-our $DATE = '2020-04-01'; # DATE
-our $VERSION = '0.551'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-11'; # DATE
+our $DIST = 'Org-Parser'; # DIST
+our $VERSION = '0.552'; # VERSION
 
 use 5.010001;
 use locale;
@@ -100,6 +102,7 @@ XSLT
                     );
 
 has name => (is => 'rw');
+has raw_arg => (is => 'ro');
 has args => (is => 'rw');
 has indent => (is => 'rw');
 
@@ -128,6 +131,7 @@ sub BUILD {
         }
     } elsif ($name eq 'FILETAGS') {
         if ($pass == 1) {
+            no warnings 'once';
             $args->[0] =~ /^$Org::Document::tags_re$/ or
                 die "Invalid argument for FILETAGS: $args->[0]";
             for (split /:/, $args->[0]) {
@@ -192,7 +196,7 @@ Org::Element::Setting - Represent Org in-buffer settings
 
 =head1 VERSION
 
-This document describes version 0.551 of Org::Element::Setting (from Perl distribution Org-Parser), released on 2020-04-01.
+This document describes version 0.552 of Org::Element::Setting (from Perl distribution Org-Parser), released on 2020-09-11.
 
 =head1 DESCRIPTION
 
@@ -205,6 +209,11 @@ Derived from L<Org::Element>.
 =head2 name => STR
 
 Setting name.
+
+=head2 raw_arg => ARRAY
+
+String, read-only (can only be set during instantiation). Setting's raw
+arguments.
 
 =head2 args => ARRAY
 

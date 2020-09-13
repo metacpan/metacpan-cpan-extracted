@@ -150,6 +150,11 @@ identifier (according to field C<update_id>) are greater than, or equal
 to, the C<$threshold_id>. It takes care to check the return values and the
 rest.
 
+If you get C<unknown error> here, chances are there were issues in the
+interaction with the Telegram website. If this is the case, you can
+activate tracing on the logging channel (which depends on what you use as
+a backend for L<Log::Any>, of course).
+
 =head2 B<< poller >>
 
    my $subref = $obj->poller(%args);

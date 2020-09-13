@@ -28,6 +28,9 @@ WriteMakefile(
       repository => 'https://github.com/iph0/Redis-ClusterRider',
       license    => 'http://dev.perl.org/licenses/',
     },
+    x_contributors => [
+      q{Sergei Zhmylev <zhmylove@cpan.org>},
+    ],
   },
   ABSTRACT_FROM => 'lib/Redis/ClusterRider.pm',
   AUTHOR        => 'Eugene Ponizovsky <ponizovsky@gmail.com>',

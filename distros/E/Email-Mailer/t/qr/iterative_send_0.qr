@@ -1,16 +1,16 @@
+Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary=[^\n]+
 From: from@example.com
 Subject: Test Email
 To: person_0@example.com
 Date: [^\n]+
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="?[^"]+"?
-Content-Transfer-Encoding: 7bit
 
 
 --\S+
 Date: [^\n]+
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="?[^"]+"?
+Content-Type: multipart/alternative; boundary=[^\n]+
 Content-Transfer-Encoding: 7bit
 
 

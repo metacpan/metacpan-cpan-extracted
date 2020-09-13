@@ -43,9 +43,8 @@ Tags can be expanded via:
 
     my ($modules, $unused_tags)= FunctionalPerl::expand(qw(:dev :most));
     is $$modules{"FP::Failure"}, 2; # number of times used.
-    use FP::Equal 'is_equal';
-    is_equal $unused_tags,
-             [':all', ':ast', ':csv', ':dbi', ':fix', ':git', ':io', ':path', ':pxml', ':rare', ':trampoline', ':transparentlazy'];
+    is_deeply $unused_tags,
+              [':all', ':ast', ':csv', ':dbi', ':fix', ':git', ':io', ':path', ':pxml', ':rare', ':trampoline', ':transparentlazy'];
 
 =head1 SEE ALSO
 
@@ -134,7 +133,7 @@ package FunctionalPerl;
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
 
-our $VERSION= "0.72.31";
+our $VERSION= "0.72.32";
 
 
 # Export tag to modules and/or other tags; each module will be

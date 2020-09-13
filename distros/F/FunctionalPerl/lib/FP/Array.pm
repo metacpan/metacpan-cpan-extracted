@@ -76,7 +76,7 @@ package FP::Array;
               array_zip2
               array_for_each
               array_map
-              array_map_with_i
+              array_map_with_index
               array_map_with_islast
               array_to_hash_map
               array_filter
@@ -85,6 +85,7 @@ package FP::Array;
               array_fold_right
               array_intersperse
               array_strings_join
+              array_to_string
               array_every
               array_any
               array_sum
@@ -361,7 +362,7 @@ TEST{ array_map sub { $_[0]+1}, [1,2,20] } [ 2,3,21 ];
 TEST{ array_map sub { $_[0]+$_[1]}, [1,2,20], [-1,4] } [ 0,6 ];
 
 # (should one use multi-arg stream_map with stream_iota instead?..)
-sub array_map_with_i {
+sub array_map_with_index {
     @_>1 or croak "wrong number of arguments";
     my $fn=shift;
     my $len= min (map { scalar @$_ } @_);
@@ -372,7 +373,7 @@ sub array_map_with_i {
     \@res
 }
 
-TEST{ array_map_with_i sub {[@_]}, [qw(a b)], [20..40] }
+TEST{ array_map_with_index sub {[@_]}, [qw(a b)], [20..40] }
   [[0,"a",20], [1,"b",21]];
 
 sub array_map_with_islast {
@@ -506,6 +507,15 @@ sub array_strings_join ($$) {
 
 TEST{ array_strings_join [1,2,3], "-" }
   "1-2-3";
+
+sub array_to_string ($) {
+    @_==1 or croak "wrong number of arguments";
+    my ($ary)=@_;
+    join "", @$ary
+}
+
+TEST{ array_to_string [1,2,3] }
+  "123";
 
 
 sub array_every ($$) {

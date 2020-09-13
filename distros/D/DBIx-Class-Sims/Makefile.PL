@@ -17,7 +17,6 @@ perl_version '5.010_001';
 all_from 'lib/DBIx/Class/Sims.pm';
 
 requires 'strictures';
-requires 'Clone::Any';
 requires 'Data::Compare';
 requires 'Data::Printer' => '0.36'; # np() isn't exported before 0.36+
 requires 'Data::Walk';
@@ -40,16 +39,7 @@ test_requires 'Test::DBIx::Class' => '0.01';
 test_requires 'Test::Warn'        => '0.01';
 test_requires 'Test::Trap'        => '0.3.2';
 test_requires 'DBD::SQLite'       => '1.40';
-test_requires 'Test2::Harness'    => '0.001079'; # yath
 test_requires 'Test2::Suite'      => '0.000122'; # improved test tools
-
-# All of the following are needed for Devel::Cover and its optional reports.
-test_requires 'Devel::Cover';
-test_requires 'Template';
-test_requires 'PPI::HTML';
-test_requires 'Perl::Tidy';
-test_requires 'Pod::Coverage::CountParents';
-test_requires 'JSON::MaybeXS';
 
 tests_recursive;
 

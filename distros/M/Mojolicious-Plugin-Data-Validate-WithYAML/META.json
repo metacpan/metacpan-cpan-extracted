@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-Data-Validate-WithYAML",
    "prereqs" : {
@@ -29,42 +29,42 @@
       "runtime" : {
          "requires" : {
             "Data::Validate::WithYAML" : "0.17",
-            "Mojolicious" : "8.0"
+            "Mojolicious" : "8.0",
+            "perl" : "5.008"
          }
       },
       "test" : {
          "requires" : {
-            "File::Copy" : "0",
-            "File::Path" : "0",
-            "FindBin" : "0",
             "Pod::Coverage::TrustPod" : "0",
-            "Test::LongString" : "0.16"
+            "Test::LongString" : "0.16",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Mojolicious::Plugin::Data::Validate::WithYAML" : {
          "file" : "lib/Mojolicious/Plugin/Data/Validate/WithYAML.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML/issues"
+         "web" : "https://github.com/perlservices/Mojolicious-Plugin-Data-Validate-WithYAML/issues"
       },
-      "homepage" : "https://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML",
+      "homepage" : "https://github.com/perlservices/Mojolicious-Plugin-Data-Validate-WithYAML",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML.git",
-         "web" : "http://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML"
+         "url" : "git://github.com/perlservices/Mojolicious-Plugin-Data-Validate-WithYAML.git",
+         "web" : "http://github.com/perlservices/Mojolicious-Plugin-Data-Validate-WithYAML"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

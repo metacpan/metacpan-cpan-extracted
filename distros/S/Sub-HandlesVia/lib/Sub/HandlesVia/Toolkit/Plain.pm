@@ -5,15 +5,17 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Plain;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014';
+our $VERSION   = '0.015';
 
 use Sub::HandlesVia::Toolkit;
 our @ISA = 'Sub::HandlesVia::Toolkit';
 
+use Types::Standard qw( is_CodeRef is_Str );
+
 sub make_callbacks {
 	my ($me, $target, $attr) = (shift, @_);
 	
-	my ($get_slot, $set_slot) = @$attr;
+	my ($get_slot, $set_slot, $default) = @$attr;
 	$set_slot = $get_slot if @$attr < 2;
 	
 	my $captures = {};
@@ -56,6 +58,10 @@ sub make_callbacks {
 		my $method = B::perlstring($set_slot);
 		$set = sub { my $val = shift or die; "\$_[0]->\${\\ $method}($val)" };
 	}
+	
+	if (is_CodeRef $default) {
+		$captures->{'$shv_default_for_reset'} = \$default;
+	}
 
 	my %callbacks = (
 		args => sub {
@@ -91,6 +97,22 @@ sub make_callbacks {
 		coerce         => !!0,
 		env            => $captures,
 		be_strict      => !!1,
+		default_for_reset => sub {
+			my ($handler, $callbacks) = @_ or die;
+			if (!$default) {
+				return $handler->default_for_reset->();
+			}
+			elsif (is_CodeRef $default) {
+				return sprintf('(%s)->$shv_default_for_reset', $callbacks->{self}->());
+			}
+			elsif (is_Str $default) {
+				require B;
+				return sprintf('(%s)->${\ %s }', $callbacks->{self}->(), B::perlstring($default));
+			}
+			else {
+				die 'lolwut?';
+			}
+		},
 	);
 	
 	\%callbacks;

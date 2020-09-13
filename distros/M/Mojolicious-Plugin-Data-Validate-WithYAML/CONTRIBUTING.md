@@ -5,7 +5,7 @@ The distribution is contained in a Git repository, so simply clone the
 repository
 
 ```
-$ git clone git://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML.git
+$ git clone git://github.com/perlservices/Mojolicious-Plugin-Data-Validate-WithYAML.git
 ```
 
 and change into the newly-created directory.

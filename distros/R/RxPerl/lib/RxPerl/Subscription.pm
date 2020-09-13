@@ -4,7 +4,7 @@ use warnings;
 
 use Scalar::Util 'blessed', 'reftype', 'weaken';
 
-our $VERSION = "v0.21.0";
+our $VERSION = "v0.24.0";
 
 sub new {
     my ($class) = @_;

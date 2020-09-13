@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2018-01-30'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-19'; # DATE
+our $DIST = 'App-GitUtils'; # DIST
+our $VERSION = '0.080'; # VERSION
 
 use 5.010;
 use strict;
@@ -14,12 +16,13 @@ my $p = '/App/GitUtils/'; # prefix
 Perinci::CmdLine::Any->new(
     url => $p,
     subcommands => {
-        'info'        => {url => "${p}info"},
-        'run-hook'    => {url => "${p}run_hook"},
-        'rh'          => {url => "${p}run_hook",
-                          summary => 'Alias for run-hook'},
-        'post-commit' => {url => "${p}post_commit"},
-        'pre-commit'  => {url => "${p}pre_commit"},
+        'info'           => {url => "${p}info"},
+        'run-hook'       => {url => "${p}run_hook"},
+        'rh'             => {url => "${p}run_hook",
+                             summary => 'Alias for run-hook'},
+        'post-commit'    => {url => "${p}post_commit"},
+        'pre-commit'     => {url => "${p}pre_commit"},
+        'clone-to-bare'  => {url => "${p}clone_to_bare"},
     },
     default_subcommand => 'info',
     get_subcommand_from_arg => 2,
@@ -40,19 +43,24 @@ gu - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.07 of gu (from Perl distribution App-GitUtils), released on 2018-01-30.
+This document describes version 0.080 of gu (from Perl distribution App-GitUtils), released on 2020-05-19.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % gu info [options]
- % gu post-commit [options]
- % gu pre-commit [options]
- % gu rh [options] <name>
- % gu run-hook [options] <name>
+ % gu clone-to-bare [--cmd=subcommand_name] [--config-path=path | -c] [--config-profile=profile | -P] [--dir=s] [--format=name] [--json] [--(no)naked-res] [--no-config | -C] [--no-env] [--page-result[=program]] [--target-dir=s]
+ % gu info [--cmd=subcommand_name] [--config-path=path | -c] [--config-profile=profile | -P] [--dir=s] [--format=name] [--json] [--(no)naked-res] [--no-config | -C] [--no-env] [--page-result[=program]]
+ % gu post-commit [--cmd=subcommand_name] [--config-path=path | -c] [--config-profile=profile | -P] [--dir=s] [--format=name] [--json] [--(no)naked-res] [--no-config | -C] [--no-env] [--page-result[=program]]
+ % gu pre-commit [--cmd=subcommand_name] [--config-path=path | -c] [--config-profile=profile | -P] [--dir=s] [--format=name] [--json] [--(no)naked-res] [--no-config | -C] [--no-env] [--page-result[=program]]
+ % gu rh [--cmd=subcommand_name] [--config-path=path | -c] [--config-profile=profile | -P] [--dir=s] [--format=name] [--json] [--(no)naked-res] [--no-config | -C] [--no-env] [--page-result[=program]] <name>
+ % gu run-hook [--cmd=subcommand_name] [--config-path=path | -c] [--config-profile=profile | -P] [--dir=s] [--format=name] [--json] [--(no)naked-res] [--no-config | -C] [--no-env] [--page-result[=program]] <name>
 
 =head1 SUBCOMMANDS
+
+=head2 B<clone-to-bare>
+
+Clone repository to a bare repository.
 
 =head2 B<info>
 
@@ -113,13 +121,11 @@ C<*> marks required options.
 
 Select subcommand.
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
@@ -160,13 +166,17 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
 =item B<--no-env>
 
 Do not read environment for default options.
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =item B<--subcommands>
 
@@ -178,9 +188,80 @@ Display program's version and exit.
 
 =back
 
+=head2 Options for subcommand clone-to-bare
+
+=over
+
+=item B<--dir>=I<s>
+
+A directory inside git repo.
+
+If not specified, will assume current directory is inside git repository and
+will search `.git` upwards.
+
+
+=item B<--target-dir>=I<s>
+
+Target repo directory.
+
+If not specified, defaults to `$repodir.bare/`.
+
+
+=back
+
+=head2 Options for subcommand info
+
+=over
+
+=item B<--dir>=I<s>
+
+A directory inside git repo.
+
+If not specified, will assume current directory is inside git repository and
+will search `.git` upwards.
+
+
+=back
+
+=head2 Options for subcommand post-commit
+
+=over
+
+=item B<--dir>=I<s>
+
+A directory inside git repo.
+
+If not specified, will assume current directory is inside git repository and
+will search `.git` upwards.
+
+
+=back
+
+=head2 Options for subcommand pre-commit
+
+=over
+
+=item B<--dir>=I<s>
+
+A directory inside git repo.
+
+If not specified, will assume current directory is inside git repository and
+will search `.git` upwards.
+
+
+=back
+
 =head2 Options for subcommand rh
 
 =over
+
+=item B<--dir>=I<s>
+
+A directory inside git repo.
+
+If not specified, will assume current directory is inside git repository and
+will search `.git` upwards.
+
 
 =item B<--name>=I<s>*
 
@@ -191,6 +272,14 @@ Hook name, e.g. post-commit.
 =head2 Options for subcommand run-hook
 
 =over
+
+=item B<--dir>=I<s>
+
+A directory inside git repo.
+
+If not specified, will assume current directory is inside git repository and
+will search `.git` upwards.
+
 
 =item B<--name>=I<s>*
 
@@ -257,21 +346,31 @@ List of available configuration parameters:
  format (see --format)
  naked_res (see --naked-res)
 
+=head2 Configuration for subcommand clone-to-bare
+
+ dir (see --dir)
+ target_dir (see --target-dir)
+
 =head2 Configuration for subcommand info
 
+ dir (see --dir)
 
 =head2 Configuration for subcommand post-commit
 
+ dir (see --dir)
 
 =head2 Configuration for subcommand pre-commit
 
+ dir (see --dir)
 
 =head2 Configuration for subcommand rh
 
+ dir (see --dir)
  name (see --name)
 
 =head2 Configuration for subcommand run-hook
 
+ dir (see --dir)
  name (see --name)
 
 =head1 ENVIRONMENT
@@ -310,7 +409,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

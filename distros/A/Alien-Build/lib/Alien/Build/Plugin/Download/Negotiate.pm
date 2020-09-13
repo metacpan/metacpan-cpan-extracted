@@ -8,7 +8,7 @@ use Alien::Build::Util qw( _has_ssl );
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '2.29'; # VERSION
+our $VERSION = '2.32'; # VERSION
 
 
 has '+url' => undef;
@@ -195,7 +195,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 2.29
+version 2.32
 
 =head1 SYNOPSIS
 
@@ -302,6 +302,8 @@ Override the detected decoder.
 Returns the fetch plugin and any optional decoders that should be used.
 
 =head1 SEE ALSO
+
+L<Alien::Build::Plugin::Prefer::BadVersion>, L<Alien::Build::Plugin::Prefer::GoodVersion>
 
 L<Alien::Build>, L<alienfile>, L<Alien::Build::MM>, L<Alien>
 

@@ -1,5 +1,14 @@
                       User-Visible PGP::Sign Changes
 
+PGP::Sign 1.03 (2020-09-12)
+
+    Document that GnuPG 2.1.23 or GnuPG 1.4.20 or later is required and
+    skip tests on platforms that do not meet those version requirements.
+    The alternative would be auto-discovery of which command-line flags to
+    use and these version requirements are met by Debian stable (and
+    Debian oldstable with backports), so hopefully this restriction will
+    not cause too much hardship.
+
 PGP::Sign 1.02 (2020-08-29)
 
     On systems where gpg is GnuPG v1, override the path to the gpg binary

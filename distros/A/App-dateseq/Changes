@@ -1,3 +1,9 @@
+0.100   2020-04-30  Released-By: PERLANCAR; Urgency: low
+
+        - [build] Rebuild with updated Perinci::Sub::To::CLIDocData to list all
+          options in CLI usage line.
+
+
 0.099   2019-11-29  Released-By: PERLANCAR; Urgency: high
 
         - Merge two releases 0.098 & 0.098.1.

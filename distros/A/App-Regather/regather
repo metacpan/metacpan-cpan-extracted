@@ -1,0 +1,212 @@
+#!/bin/sh
+#! -*-perl-*-
+eval 'exec perl -x -wS $0 ${1+"$@"}' if 0;
+#
+# -*- mode: cperl; eval: (follow-mode) -*-
+
+use strict;
+use warnings;
+use diagnostics;
+use App::Regather
+
+App::Regather->new->run;
+
+__END__
+
+=head1 NAME
+
+regather - LDAP syncrepl consumer script to perform actions desired on
+syncrepl event.
+
+=head1 SYNOPSIS
+
+regather [-h|--help|-? -F] <-c regather.conf> [ -C section.option=value, ... ]
+
+=head1 DESCRIPTION
+
+I<regather> is a LDAP syncrepl consumer to generate ( B<re-gather> )
+files on LDAP synrepl events or even more, it can perform any action
+you set (like create/delete directories or other).
+
+I<regather> performs all actions through plugins. Plugins currently
+implemented you can know with option I<--plugin-list>
+
+It uses L<Net::LDAP> to do all LDAP related stuff and L<Template> to
+generate files. Config file is processed with L<Config::Parser> (look
+B<CONFIG FILE> section bellow)
+
+As an example, regather can re-write each OpenVPN client config file
+on change done to client LDAP configured data, or re-write CRL file on
+update in LDAP or change sieve script for mail user.
+
+I<regather> is configured via it's configuration file. Each
+configuration option can be set/overidden via CLI options like I<-C
+section.subsection.subsubsection.option=value>
+
+I<regather> connects to LDAP I<ldap.opt.uri> configured and performs
+search with I<ldap.srch.filter> which B<has to provide search result
+for all> configured I<service>s
+
+Search results are used to provide data for plugins.
+
+Module Template(3) is used to write target file, using configured
+I<core.tt_path/service.XXX.tt_file>
+
+Net::DNS(3) is used to nsupdate dyn zones.
+
+=head1 OPERATIONS
+
+On LDAP repl event, consumer receives syncstate, we process these three:
+
+    LDAP_SYNC_ADD
+    LDAP_SYNC_MODIFY
+    LDAP_SYNC_DELETE
+
+on LDAP_SYNC_ADD and LDAP_SYNC_MODIFY we just overwrite all configured
+for the service things (files, directories e.t.c.)
+
+ModRDN event comes as LDAP_SYNC_MODIFY, and since in DN it has the new
+RDN, the only way to know the old one (to delete all resources related
+to it) we need search accesslog DB for the attribute reqNewRDN=new-RDN
+
+LDAP_SYNC_DELETE differs a bit, it can be spawned by deletion of LDAP
+object itself or by deletion of some attribute of the object. So, on that
+event we restore previous state of the object from accesslog DB (which
+is mandatory for our work) and look at the attribute reqType value. 
+
+There are two cases we take care of:
+
+=over 4
+
+=item I<reqType = delete>
+
+this is the deletion of the whole object and we destroy all related
+stuff, configured for that service.
+
+=item I<reqType = modify>
+
+this is (except the case with ModRDN) the deletion of an attribute and
+we need to know whether it was I<ctrl_attr> one (look B<CONFIG FILE>
+section bellow). If it is, then we destroy all related stuff,
+configured in service.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-c | --config>
+
+absolute (or relative to core.altroot directory) path to config file,
+it must be owned by root and must not be group and world
+accessible. (mandatory)
+
+=item B<-f | --foreground>
+
+run in foreground (optional)
+
+=item B<-F | --force>
+
+force re-generation of resources configured regardless existent file mtime and
+LDAP object modifiedTimestamp
+
+=item B<-S | --strict>
+
+exit on serverside LDAP errors (connection, server restart, etc). If
+not set, B<regather> will try connect infinetely. (default: not set)
+
+=item B<--colors>
+
+terminal colors are used in foreground debug output. (optional)
+
+=item B<-C | --cli> section.option = value
+
+CLI equivalent to config file options. (optional, can be multiple)
+
+for example I<core.dryrun=1> (for full list of options available see Regather::Conf(3))
+
+=item B<--config-help>
+
+print config file lexicon (require option I<-c>, set)
+
+=item B<--plugin-list>
+
+available plugins list
+
+=item B<-v>
+
+verbosity (optional, incremental)
+
+=item B<-h | --help>
+
+help page
+
+=item B<--version>
+
+shows version
+
+=back
+
+=head1 EXAMPLES
+
+regather -c /some/regather.conf.config-tiny \
+         -C core.altroot=/tmp/regather-altroot.d \
+         -C core.tt_path=/path/regather.d \
+         --colors -f -Fvvv
+
+this does next:
+    - use separate config file
+    - use alternate-to-config-file-defined directory to place the results to
+    - use alternate-to-config-file-defined directory for templates
+    - use terminal colors in foreground and force re-generation of service files
+
+=head1 FILES
+
+    /usr/local/etc/regather.d/*.tt templates to generate files from
+    /usr/local/etc/regather.conf   config file
+
+    /usr/local/etc/openldap/ldap.conf
+    /etc/ldap.conf
+    /etc/ldap/ldap.conf
+    /etc/openldap/ldap.conf
+
+=head1 CONFIG FILE
+
+config file format is described in L<Regather::Config> documentation.
+
+=head1 SIGNALS
+
+HUP - restart
+
+INT, QUIT, ABRT, TERM - terminate
+
+
+=head1 SEE ALSO
+
+L<Net::LDAP>,
+L<Template>,
+L<Regather::Config>
+
+=head1 AUTHOR
+
+Zeus Panchenko E<lt>zeus@gnu.org.uaE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2019 Zeus Panchenko.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

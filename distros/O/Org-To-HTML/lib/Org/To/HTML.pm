@@ -1,7 +1,9 @@
 package Org::To::HTML;
 
-our $DATE = '2018-10-30'; # DATE
-our $VERSION = '0.231'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-11'; # DATE
+our $DIST = 'Org-To-HTML'; # DIST
+our $VERSION = '0.233'; # VERSION
 
 use 5.010001;
 use strict;
@@ -27,6 +29,7 @@ our @EXPORT_OK = qw(org_to_html);
 has naked => (is => 'rw');
 has html_title => (is => 'rw');
 has css_url => (is => 'rw');
+has inline_images => (is =>  'rw');
 
 our %SPEC;
 $SPEC{org_to_html} = {
@@ -98,6 +101,11 @@ _
         ignore_unknown_settings => {
             schema => 'bool',
         },
+        inline_images => {
+            summary => 'If set to true, will make link to an image filename into an <img> element instead of <a>',
+            schema => 'bool',
+            default => 1,
+        },
     },
 };
 sub org_to_html {
@@ -116,11 +124,12 @@ sub org_to_html {
     }
 
     my $obj = ($args{_class} // __PACKAGE__)->new(
-        include_tags => $args{include_tags},
-        exclude_tags => $args{exclude_tags},
-        css_url      => $args{css_url},
-        naked        => $args{naked},
-        html_title   => $args{html_title} // $args{source_file},
+        include_tags  => $args{include_tags},
+        exclude_tags  => $args{exclude_tags},
+        css_url       => $args{css_url},
+        naked         => $args{naked},
+        html_title    => $args{html_title} // $args{source_file},
+        inline_images => $args{inline_images} // 1,
     );
 
     my $html = $obj->export($doc);
@@ -375,24 +384,58 @@ sub export_timestamp {
 }
 
 sub export_link {
+    require Filename::Image;
+    require URI;
+
     my ($self, $elem) = @_;
 
     my $html = [];
-    push @$html, "<a href=\"";
-    if ($elem->link =~ m!^\w+:!) {
-        # looks like a url
-        push @$html, $elem->link;
+    my $link = $elem->link;
+    my $looks_like_image = Filename::Image::check_image_filename(filename => $link);
+    my $inline_images = $self->inline_images;
+
+    if ($inline_images && $looks_like_image) {
+        # TODO: extract to method e.g. settings
+        my $elem_settings;
+        my $s = $elem;
+        while (1) {
+            $s = $s->prev_sibling;
+            last unless $s && $s->isa("Org::Element::Setting");
+            $elem_settings->{ $s->name } = $s->raw_arg;
+        }
+        #use DD; dd $settings;
+        my $caption = $elem_settings->{CAPTION};
+
+        # TODO: extract to method e.g. settings of Org::Document
+        my $doc_settings;
+        $s = $elem->document->children->[0];
+        while (1) {
+            $s = $s->next_sibling;
+            last unless $s && $s->isa("Org::Element::Setting");
+            $doc_settings->{ $s->name } = $s->raw_arg;
+        }
+        #use DD; dd $settings;
+        my $img_base = $doc_settings->{IMAGE_BASE};
+
+        my $url = defined($img_base) ? URI->new($link)->abs(URI->new($img_base)) : $link;
+
+        push @$html, "<figure>" if defined $caption;
+        push @$html, "<img src=\"";
+        push @$html, "$url";
+        push @$html, "\" />";
+        push @$html, "<figcaption>", encode_entities($caption), "</figcaption>";
+        push @$html, "</figure>" if defined $caption;
     } else {
-        # assume it's an anchor
-        push @$html, "#", __escape_target($elem->link);
+        push @$html, "<a href=\"";
+        push @$html, $link;
+        push @$html, "\">";
+        if ($elem->description) {
+            push @$html, $self->export_elements($elem->description);
+        } else {
+            push @$html, $link;
+        }
+        push @$html, "</a>";
     }
-    push @$html, "\">";
-    if ($elem->description) {
-        push @$html, $self->export_elements($elem->description);
-    } else {
-        push @$html, $elem->link;
-    }
-    push @$html, "</a>";
 
     join "", @$html;
 }
@@ -412,7 +455,7 @@ Org::To::HTML - Export Org document to HTML
 
 =head1 VERSION
 
-This document describes version 0.231 of Org::To::HTML (from Perl distribution Org-To-HTML), released on 2018-10-30.
+This document describes version 0.233 of Org::To::HTML (from Perl distribution Org-To-HTML), released on 2020-09-11.
 
 =head1 SYNOPSIS
 
@@ -501,9 +544,13 @@ Otherwise, trees that do not carry one of these tags will be excluded. If a
 selected tree is a subtree, the heading hierarchy above it will also be selected
 for export, but not the text below those headings.
 
+=item * B<inline_images> => I<bool> (default: 1)
+
+If set to true, will make link to an image filename into an <imgE<gt> element instead of <aE<gt>.
+
 =item * B<naked> => I<bool>
 
-Don't wrap exported HTML with HTML/HEAD/BODY elements.
+Don't wrap exported HTML with HTMLE<sol>HEADE<sol>BODY elements.
 
 =item * B<source_file> => I<str>
 
@@ -518,6 +565,7 @@ Alternatively you can specify Org string directly.
 HTML file to write to.
 
 If not specified, HTML string will be returned.
+
 
 =back
 
@@ -582,7 +630,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

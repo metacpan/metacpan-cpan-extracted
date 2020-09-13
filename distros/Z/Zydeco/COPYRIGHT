@@ -40,6 +40,8 @@ Files: Changes
  t/98geom.t
  t/99anonclass.t
  t/lib/Local/Example.pm
+ t/lib/Local/Example/MoreClasses.zydeco.pm
+ t/lib/Local/Example/Roles.zydeco.pm
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -67,8 +69,6 @@ Files: INSTALL
  examples/mip-087-001.pl
  examples/simple-json-encoder.pl
  examples/structs.pl
- t/lib/Local/Example/MoreClasses.pl
- t/lib/Local/Example/Roles.pl
 Copyright: Unknown
 License: Unknown
 

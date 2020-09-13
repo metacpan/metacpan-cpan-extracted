@@ -4,7 +4,7 @@ use warnings;
 use strict;
 eval "use feature 'evalbytes'";         # Experimental fix for Perl 5.16
 
-our $VERSION = '0.002005';
+our $VERSION = '0.002006';
 
 # Handle Perl 5.18's new-found caution...
 no if $] >= 5.018, warnings => "experimental::smartmatch";
@@ -785,9 +785,6 @@ sub _build_debugging_regex {
             depth          => $depth,
             indent         => $indent,
         );
-
-        use Data::Dumper 'Dumper';
-        warn Dumper { std_info => \%std_info, '%+' => \%+ };
 
         # Record the construct for display...
         $clean_regex .=
@@ -2017,7 +2014,6 @@ sub _build_visualization {
         q{ }, _info_colourer( substr(q{ } x $str_pos . '|' .  $backtrack, 0, $MAX_WIDTH-2) );
     _visualize $data_mode,
         q{ }, q{ } x $match_start, _match_colourer($MATCH_DRAG x ($str_pos-$match_start)), _info_colourer('V');
-        use Data::Dumper 'Dumper';
     $str_src = # Heatmap is already coloured...
                substr($data_mode, -7) eq 'heatmap' ?
                     $str_src
@@ -3420,7 +3416,7 @@ Regexp::Debugger - Visually debug regexes in-place
 
 =head1 VERSION
 
-This document describes Regexp::Debugger version 0.002005
+This document describes Regexp::Debugger version 0.002006
 
 
 =head1 SYNOPSIS

@@ -1,0 +1,66 @@
+0.15 2020-09-12T23:30:28Z
+
+        - Removed more old files
+        - Preparation for release to CPAN
+
+0.13 2020-09-12T23:13:43Z
+
+        - The POD got finaly fixed, needed UTF-8 and a better structure
+
+0.08 2020-09-12T22:31:07Z
+
+
+0.07 2020-09-12T22:23:30Z
+
+	- Porting basic entities to Perl5
+	- Removing most of the old Raku code
+	- Setting up Zydeco as an OO system
+	- Setting up Minilla
+	- Adding missing dependency
+	- Fix gitlab-ci
+	- Updating gitlac-ci for Perl5
+
+0.05 2017-10-22T20:23:32Z
+
+	- Skip MongoDB tests properly if on Gitlab-CI env
+	- Update Gitlab-CI commands
+	- Implement Crudable on more classes
+	- Add the db tests to version control but skip it if not in dev env
+	- Update makefile after files renaming
+	- Tidying the code and write some documentation
+	- Regenerate the README documentation. Fix #4
+	- Remove unnecessary code
+	- Implementation, test and doc of crudable role and is trait. Close #10
+
+0.04 2017-10-18T15:47:57Z
+
+	- Finally a 'is crud' trait prototype that works!
+	- Add a bit of doc and decoration
+	- Remove tests that cannot be run on the integration server because Mongo
+	- Adding a missing dependency https://github.com/nkh/P6-Data-Dump-Tree/issues/39
+	- Test of the Gitlab-CI functionalities.
+	- Here are the Gitlab-CI badges
+
+0.03 2017-10-14T02:21:23Z
+
+	- Working on the CRUD trait.
+	- Makes tests pass with a CrudStr Str type extension and not a trait. See #10
+	- Add build-essential to CI
+	- Update Docker image
+	- Test of a .gitlab-ci.yml for the Raku image
+	- Try many many things about traits
+
+0.02 2017-10-14T00:27:12Z
+
+	- Crudable functionnalities and first DB inserts
+	- Rename the DB class to ODM because it is an Object Document Mapper
+	- Create a very simple generic access for the entities to MongoDB
+	- Tiny Entities changes
+	- Test multi-identities
+
+0.01 2017-10-05T23:28:10Z
+
+	- A basic Art World module.
+	- Starting to model the Art::World and discover Raku object system in the same time
+	- Translation of the Ecosystem text
+	- Add the Art::World Ecosystem text translation

@@ -17,7 +17,7 @@ use warnings;
 use Exporter qw(import);
 use IPC::Cmd qw(run);
 
-our @EXPORT_OK = qw(gpg_is_gpg1 gpg2_is_new_enough);
+our @EXPORT_OK = qw(gpg_is_gpg1 gpg_is_new_enough);
 
 # Test if the gpg binary found first on PATH is actually gpg1.
 #
@@ -30,20 +30,23 @@ sub gpg_is_gpg1 {
     return $output =~ m{ ^ gpg [^\n]* \s 1 [.] }xms;
 }
 
-# Test if the GnuPG v2 binary is new enough to have the flags we expect.
+# Test if the GnuPG binary is new enough to have the flags we expect.
 #
-# $path - Path to the GnuPG v2 binary
+# $path - Path to the GnuPG binary to test
 #
 # Returns: 1 if so, undef if not or on any errors
-sub gpg2_is_new_enough {
+sub gpg_is_new_enough {
     my ($path) = @_;
     my $output;
     if (!run(command => [$path, '--version'], buffer => \$output)) {
         return;
     }
-    if ($output =~ m{ ^ gpg [^\n] * \s (2 [.\d]+) }xms) {
+    if ($output =~ m{ ^ gpg [^\n]* \s (2 [.\d]+) }xms) {
         my $version = $1;
-        return version->parse($version) >= version->parse('2.1.12');
+        return version->parse($version) >= version->parse('2.1.23');
+    } elsif ($output =~ m{ ^ gpg [^\n]* \s (1 [.\d]+) }xms) {
+        my $version = $1;
+        return version->parse($version) >= version->parse('1.4.20');
     } else {
         warn "Cannot determine version of $path\n";
         return;

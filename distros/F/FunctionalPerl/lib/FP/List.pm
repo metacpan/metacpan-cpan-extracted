@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2013-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -127,53 +127,56 @@ or on the L<website|http://functional-perl.org/>.
 
 package FP::List;
 @ISA="Exporter"; require Exporter;
-@EXPORT=qw(cons cons_ is_pair null is_null is_pair_of is_pair_or_null
-           list_of  is_null_or_pair_of null_or_pair_of is_list
-           car cdr first rest
-           car_and_cdr first_and_rest perhaps_first_and_rest
-           list);
-@EXPORT_OK=qw(pair improper_list
-              first_set first_update
-              is_pair_noforce is_null_noforce
-              unsafe_cons unsafe_car unsafe_cdr
-              string_to_list list_length list_reverse list_reverse_with_tail
-              list_to_string list_to_array rlist_to_array
-              list_to_values rlist_to_values
-              write_sexpr
-              array_to_list array_to_list_reverse mixed_flatten
-              list_strings_join list_strings_join_reverse
-              list_filter list_map list_mapn list_map_with_islast
-              list_fold list_fold_right list_to_perlstring
-              unfold unfold_right
-              list_pair_fold_right
-              list_butlast list_drop_while list_rtake_while list_take_while
-              list_rtake_while_and_rest list_take_while_and_rest
-              list_append
-              list_zip2
-              list_alist
-              list_last
-              list_every list_all list_any list_none
-              list_perhaps_find_tail list_perhaps_find
-              list_find_tail list_find
-              is_charlist ldie
-              cddr
-              cdddr
-              cddddr
-              cadr
-              caddr
-              cadddr
-              caddddr
-              c_r
-              list_ref
-              list_perhaps_one
-              list_sort
-              list_drop
-              list_take
-              list_slice
-              list_group
-              circularlist
-              weaklycircularlist
-            );
+@EXPORT=qw(
+    cons cons_ is_pair null is_null is_pair_of is_pair_or_null
+    list_of  is_null_or_pair_of null_or_pair_of is_list
+    car cdr first rest
+    car_and_cdr first_and_rest perhaps_first_and_rest
+    list);
+@EXPORT_OK=qw(
+    pair improper_list
+    first_set first_update
+    is_pair_noforce is_null_noforce
+    unsafe_cons unsafe_car unsafe_cdr
+    string_to_list list_length list_reverse list_reverse_with_tail
+    list_to_string list_to_array rlist_to_array
+    list_to_values rlist_to_values
+    write_sexpr
+    array_to_list array_to_list_reverse mixed_flatten
+    list_strings_join list_strings_join_reverse
+    list_filter list_map list_mapn list_map_with_islast
+    list_map_with_index_ list_map_with_index
+    list_fold list_fold_right list_to_perlstring
+    unfold unfold_right
+    list_pair_fold_right
+    list_butlast list_drop_while list_rtake_while list_take_while
+    list_rtake_while_and_rest list_take_while_and_rest
+    list_append
+    list_zip2
+    list_alist
+    list_last
+    list_every list_all list_any list_none
+    list_perhaps_find_tail list_perhaps_find
+    list_find_tail list_find
+    is_charlist ldie
+    cddr
+    cdddr
+    cddddr
+    cadr
+    caddr
+    cadddr
+    caddddr
+    c_r
+    list_ref
+    list_perhaps_one
+    list_sort
+    list_drop
+    list_take
+    list_slice
+    list_group
+    circularlist
+    weaklycircularlist
+    );
 %EXPORT_TAGS=(all=>[@EXPORT,@EXPORT_OK]);
 
 use strict; use warnings; use warnings FATAL => 'uninitialized';
@@ -997,6 +1000,14 @@ sub list_sort ($;$) {
 
 *FP::List::List::sort= *list_sort;
 
+sub list_sortCompare ($) {
+    @_==1 or die "wrong number of arguments";
+    my ($l)= @_;
+    list_to_purearray($l)->sortCompare
+}
+
+*FP::List::List::sortCompare= *list_sortCompare;
+
 TEST { require FP::Ops;
        list (5,3,8,4)->sort (\&FP::Ops::number_cmp)->array }
   [3,4,5,8];
@@ -1428,6 +1439,35 @@ sub FP::List::List::map {
     my $fn=shift;
     @_ ? list_mapn ($fn, $l, @_) : list_map ($fn, $l)
 }
+
+
+sub list_map_with_index_ {
+    my $i=shift;
+    my $fn=shift;
+    for (@_) {
+        return $_ if is_null $_
+    }
+    cons(&$fn($i,
+              map {car $_} @_),
+         list_map_with_index_ ($i+1,
+                               $fn,
+                               map {cdr $_} @_))
+}
+
+sub list_map_with_index {
+    @_>=2 or die "not enough arguments";
+    list_map_with_index_(0, @_) 
+}
+
+sub FP::List::List::map_with_index {
+    @_>=2 or die "not enough arguments";
+    my $l=shift;
+    my $fn=shift;
+    list_map_with_index($fn, $l, @_)
+}
+
+TEST { list(1,2,20)->map_with_index(sub {[ @_ ]})->array }
+  [ [0,1], [1,2], [2,20] ];
 
 
 sub list_map_with_islast {

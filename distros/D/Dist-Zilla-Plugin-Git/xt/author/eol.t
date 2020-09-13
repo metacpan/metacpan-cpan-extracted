@@ -29,6 +29,7 @@ my @files = (
     't/commit-build.t',
     't/commit-dirtydir.t',
     't/commit-message.t',
+    't/commit-signoff.t',
     't/commit-utf8.t',
     't/commit-ws.t',
     't/commit.t',

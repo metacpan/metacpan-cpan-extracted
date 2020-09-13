@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Bot::ChatBots::Telegram version 0.012.
+    This document describes Bot::ChatBots::Telegram version 0.014.
 
 SYNOPSIS
 
@@ -37,7 +37,32 @@ SYNOPSIS
 DESCRIPTION
 
     This module allows you to to define Bot::ChatBots for Telegram
-    Messenger <https://telegram.org/>.
+    <https://telegram.org/>, a messaging application. For an introduction
+    and tutorial, see Bot::ChatBots::Telegram::Guide::Tutorial.
+
+    Strictly speaking, this module is a Mojolicious plugin that allows you
+    to load and use Bot::ChatBots::Telegram::WebHook (see "SYNOPSIS" for a
+    quick example). On the other hand, the distribution also contains other
+    modules that allow you to interact with Telegram, e.g.
+    Bot::Chatbots::Telegram::LongPoll.
+
+    These modules rely upon Log::Any for emitting logging information; you
+    are encouraged to read that module's documentation for further
+    information. For what we are concerned, you have to remember that all
+    logs will be lost unless you configure Log::Any, e.g. to send messages
+    on standard output you can do this:
+
+       use Log::Any::Adapter qw< Stderr >;
+
+    If using the web hook, then you will probably want to send the logs
+    together with Mojolicious's logs, like this:
+
+       use Mojolicious::Lite;
+       use Log::Any::Adapter;
+       Log::Any::Adapter->set(MojoLog => logger => app->log);
+
+    The configuration above relies on the presence of
+    Log::Any::Adapter::MojoLog.
 
 METHODS
 

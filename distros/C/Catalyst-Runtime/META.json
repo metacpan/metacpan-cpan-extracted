@@ -4,7 +4,7 @@
       "Sebastian Riedel <sri@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,11 +30,6 @@
       },
       "develop" : {
          "requires" : {
-            "Catalyst::Action::REST" : "0",
-            "Catalyst::Devel" : "1.0",
-            "Catalyst::Plugin::ConfigLoader" : "0",
-            "Catalyst::Plugin::Params::Nested" : "0",
-            "CatalystX::LeakChecker" : "0.05",
             "Compress::Zlib" : "0",
             "File::Copy::Recursive" : "0.40",
             "MooseX::Daemonize" : "0",
@@ -46,7 +41,6 @@
             "Test::Pod::Coverage" : "0",
             "Test::Spelling" : "0",
             "Test::TCP" : "2.00",
-            "Test::WWW::Mechanize::Catalyst" : "0.51",
             "Type::Tiny" : "0"
          }
       },
@@ -73,11 +67,10 @@
             "List::Util" : "1.45",
             "MRO::Compat" : "0",
             "Module::Pluggable" : "4.7",
-            "Moose" : "1.03",
+            "Moose" : "2.1400",
             "MooseX::Emulate::Class::Accessor::Fast" : "0.00903",
             "MooseX::Getopt" : "0.48",
             "MooseX::MethodAttributes::Role::AttrContainer::Inheritable" : "0.24",
-            "MooseX::Role::WithOverloading" : "0.09",
             "Path::Class" : "0.09",
             "PerlIO::utf8_strict" : "0",
             "Plack" : "0.9991",
@@ -140,7 +133,7 @@
       "x_IRC" : "irc://irc.perl.org/#catalyst",
       "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst"
    },
-   "version" : "5.90126",
+   "version" : "5.90128",
    "x_authority" : "cpan:MSTROUT",
    "x_breaks" : {
       "Catalyst::Action::REST" : "<= 0.67",
@@ -170,5 +163,5 @@
       "Reaction" : "<= 0.001999",
       "Test::WWW::Mechanize::Catalyst" : "<= 0.53"
    },
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

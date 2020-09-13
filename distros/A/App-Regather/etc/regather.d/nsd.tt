@@ -1,0 +1,32 @@
+[% USE date -%]
+; -*- zone -*-
+$ORIGIN [% zone %]
+;$TTL 3H
+$TTL 300
+@       IN      SOA     ns.[% zone %]. hostmaster.[% zone %]. (
+                        [% date.format(format = '%Y%m%d%H%M%S') %]
+                        10813
+                        3600
+                        604800
+                        38400 )
+
+                A       1.2.3.4
+                NS      ns1.[% zone %].
+                NS      ns2.[% zone %].
+                NS      ns3.[% zone %].
+
+                MX      10 mx1.[% zone %].
+                MX      12 relay1.[% zone %].
+                
+                SPF     "v=spf3 a:mx1.[% zone %] mx -all"
+                TXT     "v=spf1 a:mx1.[% zone %] mx -all"
+                CAA     128 issue "letsencrypt.org"
+                
+ns1             A       1.2.3.1
+ns2             A       1.2.3.2
+ns3             A       1.2.3.3
+ns4             A       1.2.3.4
+
+[% FOREACH row IN rows.pairs -%]
+[% row.value _ '	     A	' _ row.key %]
+[% END -%]

@@ -1,6 +1,6 @@
 package Pepper::PlackHandler;
 
-$Pepper::PlackHandler::VERSION = '1.0.3';
+$Pepper::PlackHandler::VERSION = '1.2.1';
 
 # for being a good person
 use strict;
@@ -58,9 +58,6 @@ sub pack_psgi_variables {
 	}
 
 	# the rest of this is to accept any POST / GET vars
-
-	# space for arrays for fields with multiple values
-	$self->{params}{multi} = {};
 
 	# create a hash of the PSGI params they've sent
 	@vars = $self->{request}->parameters->keys;

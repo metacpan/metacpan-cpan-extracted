@@ -12,12 +12,12 @@ our @EXPORT_OK = qw(
     orbits_are_same
 );
 
-our $VERSION = '0.3.1'; # VERSION
+our $VERSION = '0.3.2'; # VERSION
 
 require XSLoader;
 XSLoader::load('Graph::Nauty', $VERSION);
 
-use Graph::Nauty::EdgeNode;
+use Graph::Nauty::EdgeVertex;
 use Graph::Undirected;
 use Scalar::Util qw(blessed);
 
@@ -25,12 +25,12 @@ sub _cmp
 {
     my( $a, $b, $sub ) = @_;
 
-    if( blessed $a && $a->isa( Graph::Nauty::EdgeNode:: ) &&
-        blessed $b && $b->isa( Graph::Nauty::EdgeNode:: ) ) {
+    if( blessed $a && $a->isa( Graph::Nauty::EdgeVertex:: ) &&
+        blessed $b && $b->isa( Graph::Nauty::EdgeVertex:: ) ) {
         return "$a" cmp "$b";
-    } elsif( blessed $a && $a->isa( Graph::Nauty::EdgeNode:: ) ) {
+    } elsif( blessed $a && $a->isa( Graph::Nauty::EdgeVertex:: ) ) {
         return 1;
-    } elsif( blessed $b && $b->isa( Graph::Nauty::EdgeNode:: ) ) {
+    } elsif( blessed $b && $b->isa( Graph::Nauty::EdgeVertex:: ) ) {
         return -1;
     } else {
         return $sub->( $a ) cmp $sub->( $b );
@@ -49,7 +49,7 @@ sub _nauty_graph
         my $graph_now = Graph::Undirected->new( vertices => [ $graph->vertices ] );
         for my $edge ( $graph->edges ) {
             if( $graph->has_edge_attributes( @$edge ) ) {
-                my $edge_node = Graph::Nauty::EdgeNode->new( $graph->get_edge_attributes( @$edge ) );
+                my $edge_node = Graph::Nauty::EdgeVertex->new( $graph->get_edge_attributes( @$edge ) );
                 $graph_now->add_edge( $edge->[0], $edge_node );
                 $graph_now->add_edge( $edge_node, $edge->[1] );
             } else {
@@ -116,7 +116,7 @@ sub orbits
     my $orbits = [];
     for my $i (@{$statsblk->{lab}}) {
         next if blessed $nauty_graph->{original}[$i] &&
-             $nauty_graph->{original}[$i]->isa( Graph::Nauty::EdgeNode:: );
+             $nauty_graph->{original}[$i]->isa( Graph::Nauty::EdgeVertex:: );
         if( !@$orbits || $statsblk->{orbits}[$i] !=
             $statsblk->{orbits}[$orbits->[-1][0]] ) {
             push @$orbits, [ $i ];
@@ -208,6 +208,25 @@ Currently Graph::Nauty only supports
 L<Graph::Undirected|Graph::Undirected>, that is, it does not handle
 directed graphs. Both colored vertices and edges are accounted for when
 determining equivalence classes.
+
+=head2 Vertex color
+
+As L<Graph|Graph> supports any data types as graph vertices, not much
+can be inferred about them automatically. For now, Graph::Nauty by
+default stringifies every vertex (using Perl C<""> operator) and splits
+them into equivalence classes. If different behavior is needed, a custom
+anonymous subroutine can be passed inside an option hash:
+
+  print orbits( $A, sub { return length $_[0] } );
+
+Subroutine gets a vertex as its 0th parameter, and is expected to return
+a string, or anything stringifiable.
+
+=head2 Edge color
+
+Edge colors are generated from L<Graph|Graph> edge attributes. Complete
+hash of each edge's attributes is stringified (deterministically) and
+used to divide edges into equivalence classes.
 
 =head1 INSTALLING
 

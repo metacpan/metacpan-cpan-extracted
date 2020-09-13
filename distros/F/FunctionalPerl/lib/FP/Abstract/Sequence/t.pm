@@ -166,7 +166,7 @@ TEST { $b->ref(2) }
 
 # XX add more interesting tests
 TEST {
-    my $s= purearray(3,4,4,5,6,8,5,5)->map_with_i(*array)->stream;
+    my $s= purearray(3,4,4,5,6,8,5,5)->map_with_index(*array)->stream;
     my $r= $s->group(on *array_second, *number_eq)->array;
     [$s, $r]
 } [undef,
@@ -201,5 +201,8 @@ TEST { purearray(qw(a b c d e f))->chunks_of(4)->array }
 TEST_EXCEPTION { purearray(qw(a b c d e f))->strictly_chunks_of(4)->array }
     'premature end of input';
 
+
+# XX TODO change most of the tests in this file to test ~all sequences.
+TEST { purearray(qw(a bc d e))->string } 'abcde';
 
 1

@@ -1,6 +1,11 @@
 Change history for Mojolicious::Plugin::Data::Validate::WithYAML
 ================================================================
 
+0.06  2020-09-11 10:05:00
+
+      * added support for steps in yaml files
+      * remove File::Spec, File::Basename dependencies (replaced with Mojo::File)
+
 0.05  2019-01-31 15:51:00
 
       * refactored the helpers

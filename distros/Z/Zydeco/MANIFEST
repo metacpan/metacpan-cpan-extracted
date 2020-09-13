@@ -61,5 +61,5 @@ t/97defaults.t
 t/98geom.t
 t/99anonclass.t
 t/lib/Local/Example.pm
-t/lib/Local/Example/MoreClasses.pl
-t/lib/Local/Example/Roles.pl
+t/lib/Local/Example/MoreClasses.zydeco.pm
+t/lib/Local/Example/Roles.zydeco.pm

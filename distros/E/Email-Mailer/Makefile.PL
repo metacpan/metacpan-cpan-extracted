@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "HTML::FormatText" => 0,
     "HTML::TreeBuilder" => 0,
     "IO::All" => 0,
+    "MIME::Words" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "1.11",
+  "VERSION" => "1.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +54,7 @@ my %FallbackPrereqs = (
   "IO::All" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "MIME::Words" => 0,
   "Test::MockObject" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,

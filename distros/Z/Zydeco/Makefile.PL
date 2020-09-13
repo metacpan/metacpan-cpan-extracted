@@ -43,8 +43,8 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.601 },
-                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.601 },
+                        "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.603 },
+                        "Zydeco" => { file => "lib/Zydeco.pm", version => 0.603 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -58,7 +58,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Zydeco/project",
                       },
-  "version"        => 0.601,
+  "version"        => 0.603,
 };
 
 my %dynamic_config;

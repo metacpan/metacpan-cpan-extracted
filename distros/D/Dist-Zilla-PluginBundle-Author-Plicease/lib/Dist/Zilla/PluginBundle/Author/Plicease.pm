@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.54 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.56 {
 
   use 5.014;
   use Moose;
@@ -39,6 +39,21 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.54 {
   sub configure
   {
     my($self) = @_;
+
+    if($INC{"Archive/Tar/Wrapper.pm"})
+    {
+      # https://github.com/PerlAlien/Alien-Build/issues/228
+      # But honestly?    FUCK HP-UX
+      die "Somehow Archive::Tar::Wrapper was loaded before the plugin bundle.";
+    }
+    else
+    {
+      package
+        Archive::Tar::Wrapper;
+      *new = sub { die "do not use ATW" };
+      $INC{"Archive/Tar/Wrapper.pm"} = __FILE__;
+    }
+
     # undocumented for a reason: sometimes I need to release on
     # a different platform that where I do testing, (eg. MSWin32
     # only modules, where Dist::Zilla is frequently not working
@@ -292,7 +307,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.54
+version 2.56
 
 =head1 SYNOPSIS
 

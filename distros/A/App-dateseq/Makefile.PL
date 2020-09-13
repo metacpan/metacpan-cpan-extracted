@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "DateTime::Duration" => 0,
     "DateTime::Format::Strftimeq" => 0,
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Lite" => "1.820",
+    "Perinci::CmdLine::Lite" => "1.827",
     "Sah::Schema::date::dow_num" => 0,
     "Sah::Schema::date::dow_nums" => 0,
     "Sah::Schema::date::month_num" => 0,
@@ -60,7 +60,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.099",
+  "VERSION" => "0.100",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -95,7 +95,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Lite" => "1.820",
+  "Perinci::CmdLine::Lite" => "1.827",
   "Sah::Schema::date::dow_num" => 0,
   "Sah::Schema::date::dow_nums" => 0,
   "Sah::Schema::date::month_num" => 0,

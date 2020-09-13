@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.29
+    version 2.32
 
 SYNOPSIS
 
@@ -762,7 +762,7 @@ ENVIRONMENT
     ALIEN_BUILD_LOG
 
       The default log class used. See Alien::Build::Log and
-      Alien:Build::Log::Default.
+      Alien::Build::Log::Default.
 
     ALIEN_BUILD_RC
 

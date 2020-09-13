@@ -1,0 +1,10 @@
+
+0.01 2020.09.12
+    Initial release
+
+    Load and display Perl file
+    Run Perl Tidy with default options.
+    Replace the displayed Perl file with the tidyed version.
+    Command line option to load a Perl file.
+    HTML-based About box
+    Menu items.

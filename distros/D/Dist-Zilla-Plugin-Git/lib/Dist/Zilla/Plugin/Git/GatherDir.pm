@@ -9,7 +9,7 @@
 package Dist::Zilla::Plugin::Git::GatherDir;
 # ABSTRACT: Gather all tracked files in a Git working directory
 
-our $VERSION = '2.046';
+our $VERSION = '2.047';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::GatherDir' => { -version => 4.200016 }; # exclude_match
@@ -142,6 +142,11 @@ around dump_config => sub
         blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
+    foreach my $opt (qw(prune_directory follow_symlinks)) {
+      $self->log('WARNING: unused config variable "'.$opt.'"') if exists $config->{+__PACKAGE__}{$opt};
+      delete $config->{+__PACKAGE__}{$opt};
+    }
+
     return $config;
 };
 
@@ -168,7 +173,7 @@ override gather_files => sub {
   $exclude_regex = qr/$exclude_regex|$_/
     for (@{ $self->exclude_match });
 
-  my %is_excluded = map {; $_ => 1 } @{ $self->exclude_filename };
+  my %is_excluded = map +($_ => 1), @{ $self->exclude_filename };
 
   my $prefix = $self->prefix;
 
@@ -181,7 +186,7 @@ override gather_files => sub {
 
     # Exclusion tests
     unless ($self->include_dotfiles) {
-      next if grep { /^\./ } split q{/}, $file->stringify;
+      next if grep /^\./, split q{/}, $file->stringify;
     }
 
     next if $file =~ $exclude_regex;
@@ -238,7 +243,7 @@ Dist::Zilla::Plugin::Git::GatherDir - Gather all tracked files in a Git working 
 
 =head1 VERSION
 
-version 2.046
+version 2.047
 
 =head1 SYNOPSIS
 

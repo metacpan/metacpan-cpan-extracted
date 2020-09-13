@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1794 2020-07-03 13:36:51Z willem $
+# $Id: Base.pm 1802 2020-08-31 13:44:20Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1794 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1802 $)[1];
 
 
 #
@@ -27,6 +27,7 @@ our $VERSION = (qw$LastChangedRevision: 1794 $)[1];
 
 
 use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1';
+require IO::Socket::INET unless USE_SOCKET_IP;
 
 use constant IPv6 => USE_SOCKET_IP;
 

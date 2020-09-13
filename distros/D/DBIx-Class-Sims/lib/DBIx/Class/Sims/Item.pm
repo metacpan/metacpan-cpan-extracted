@@ -11,7 +11,7 @@ use strictures 2;
 use DDP;
 
 use List::PowerSet qw(powerset);
-use Hash::Merge qw( merge );
+use Hash::Merge;
 use Scalar::Util qw( blessed );
 
 use DBIx::Class::Sims::Util qw(
@@ -644,7 +644,8 @@ sub populate_column {
   };
 
   if ( $merge_spec->( $spec ) ) {
-    $spec = merge( $c->sim_spec // {}, $spec );
+    my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
+    $spec = $merger->merge( $c->sim_spec // {}, $spec );
   }
   else {
     $spec //= $c->sim_spec;

@@ -2,8 +2,8 @@ NAME
     App::GitUtils - Day-to-day command-line utilities for git
 
 VERSION
-    This document describes version 0.07 of App::GitUtils (from Perl
-    distribution App-GitUtils), released on 2018-01-30.
+    This document describes version 0.080 of App::GitUtils (from Perl
+    distribution App-GitUtils), released on 2020-05-19.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:
@@ -14,23 +14,65 @@ SYNOPSIS
     more convenient when working with git con the command-line.
 
 FUNCTIONS
-  info
+  clone_to_bare
     Usage:
 
-     info() -> [status, msg, result, meta]
+     clone_to_bare(%args) -> [status, msg, payload, meta]
 
-    Return information about git repository.
+    Clone repository to a bare repository.
 
     This function is not exported.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   dir => *dirname*
+
+        A directory inside git repo.
+
+        If not specified, will assume current directory is inside git
+        repository and will search ".git" upwards.
+
+    *   target_dir => *dirname*
+
+        Target repo directory.
+
+        If not specified, defaults to "$repodir.bare/".
 
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  info
+    Usage:
+
+     info(%args) -> [status, msg, payload, meta]
+
+    Return information about git repository.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dir => *dirname*
+
+        A directory inside git repo.
+
+        If not specified, will assume current directory is inside git
+        repository and will search ".git" upwards.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -39,20 +81,27 @@ FUNCTIONS
   list_hooks
     Usage:
 
-     list_hooks() -> [status, msg, result, meta]
+     list_hooks(%args) -> [status, msg, payload, meta]
 
     List available hooks for the repository.
 
     This function is not exported.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   dir => *dirname*
+
+        A directory inside git repo.
+
+        If not specified, will assume current directory is inside git
+        repository and will search ".git" upwards.
 
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -61,7 +110,7 @@ FUNCTIONS
   post_commit
     Usage:
 
-     post_commit() -> [status, msg, result, meta]
+     post_commit(%args) -> [status, msg, payload, meta]
 
     Run post-commit hook.
 
@@ -73,14 +122,21 @@ FUNCTIONS
 
     This function is not exported.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   dir => *dirname*
+
+        A directory inside git repo.
+
+        If not specified, will assume current directory is inside git
+        repository and will search ".git" upwards.
 
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -89,7 +145,7 @@ FUNCTIONS
   pre_commit
     Usage:
 
-     pre_commit() -> [status, msg, result, meta]
+     pre_commit(%args) -> [status, msg, payload, meta]
 
     Run pre-commit hook.
 
@@ -101,14 +157,21 @@ FUNCTIONS
 
     This function is not exported.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   dir => *dirname*
+
+        A directory inside git repo.
+
+        If not specified, will assume current directory is inside git
+        repository and will search ".git" upwards.
 
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -117,7 +180,7 @@ FUNCTIONS
   run_hook
     Usage:
 
-     run_hook(%args) -> [status, msg, result, meta]
+     run_hook(%args) -> [status, msg, payload, meta]
 
     Run a hook.
 
@@ -131,6 +194,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   dir => *dirname*
+
+        A directory inside git repo.
+
+        If not specified, will assume current directory is inside git
+        repository and will search ".git" upwards.
+
     *   name* => *str*
 
         Hook name, e.g. post-commit.
@@ -140,20 +210,11 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
     Return value: (any)
-
-FAQ
-  What is the purpose of this distribution? Haven't other similar utilities existed?
-    For example, mpath from Module::Path distribution is similar to pmpath
-    in App::PMUtils, and mversion from Module::Version distribution is
-    similar to pmversion from App::PMUtils distribution, and so on.
-
-    True. The main point of these utilities is shell tab completion, to save
-    typing.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -170,34 +231,12 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
-SEE ALSO
-    Below is the list of distributions that provide CLI utilities for
-    various purposes, with the focus on providing shell tab completion
-    feature.
-
-    App::DistUtils, utilities related to Perl distributions.
-
-    App::DzilUtils, utilities related to Dist::Zilla.
-
-    App::GitUtils, utilities related to git.
-
-    App::IODUtils, utilities related to IOD configuration files.
-
-    App::LedgerUtils, utilities related to Ledger CLI files.
-
-    App::PlUtils, utilities related to Perl scripts.
-
-    App::PMUtils, utilities related to Perl modules.
-
-    App::ProgUtils, utilities related to programs.
-
-    App::WeaverUtils, utilities related to Pod::Weaver.
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2015, 2014 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

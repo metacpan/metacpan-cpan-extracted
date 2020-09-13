@@ -38,7 +38,7 @@ use strict; use warnings; use warnings FATAL => 'uninitialized';
 use FP::Optional qw(perhaps_to_maybe);
 use FP::Combinators qw (flip flip2of3 rot3right rot3left);
 use FP::Array ":all";
-use FP::Array_sort "array_sort";
+use FP::Array_sort qw(array_sort array_sortCompare);
 
 sub blessing ($) {
     my ($m)= @_;
@@ -103,6 +103,10 @@ sub stream {
     FP::Stream::array_to_stream ($s)
 }
 
+sub string {
+    @_==1 or die "wrong number of arguments";
+    array_to_string $_[0]
+}
 
 sub is_null {
     @_==1 or die "wrong number of arguments";
@@ -176,7 +180,7 @@ sub FP_Sequence_length {
 *zip2= blessing \&array_zip2;
 *for_each= flip \&array_for_each;
 *map= blessing flip \&array_map;
-*map_with_i= blessing flip \&array_map_with_i;
+*map_with_index= blessing flip \&array_map_with_index;
 *map_with_islast= blessing flip \&array_map_with_islast;
 *filter= blessing flip \&array_filter;
 *zip= blessing \&array_zip;
@@ -191,6 +195,7 @@ sub FP_Sequence_length {
 *hash_group_by= \&array_to_hash_group_by;
 
 *sort= blessing \&array_sort;
+*sortCompare= blessing \&array_sortCompare;
 
 # XX provide them as functions, too? (prefixed with `purearray_`) (to
 # avoid requiring the user to use `the_method` [and perhaps missing

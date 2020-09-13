@@ -1,72 +1,94 @@
 use strict;
-use warnings;
-use lib '.';
-use lib 'inc';
-use inc::Module::Install 0.91;
-use Module::Install::AuthorRequires;
-use Module::Install::AuthorTests;
-use Module::Install::Authority;
+use warnings FATAL => 'all';
+use 5.006;
 
-name     'Catalyst-Devel';
-all_from 'lib/Catalyst/Devel.pm';
-authority 'cpan:MSTROUT';
+my %META = (
+  name => 'Catalyst-Devel',
+  license => 'perl_5',
+  prereqs => {
+    configure => { requires => {
+      'ExtUtils::MakeMaker'     => 0,
+      'File::ShareDir::Install' => 0,
+    } },
+    test => {
+      requires => {
+        'Test::More'  => '0.94',
+        'Test::Fatal' => '0.003',
+      },
+    },
+    runtime => {
+      requires => {
+        'Moose'                                   => 0,
+        'MooseX::Emulate::Class::Accessor::Fast'  => 0,
+        'File::ShareDir'                          => 0,
+        'namespace::clean'                        => 0,
+        'namespace::autoclean'                    => 0,
+        'Catalyst'                                => '5.90001',
+        'Catalyst::Action::RenderView'            => '0.10',
+        'Catalyst::Plugin::Static::Simple'        => '0.28',
+        'Catalyst::Plugin::ConfigLoader'          => '0.30',
+        'Config::General'                         => '2.42',
+        'File::ChangeNotify'                      => '0.07',
+        'File::Copy::Recursive'                   => 0,
+        'Path::Class'                             => '0.09',
+        'Template'                                => '2.14',
+        'Module::Install'                         => '1.02',
+      },
+    },
+    develop => {
+      requires => {
+        'Proc::Background'    => 0,
+        'Test::Pod'           => 0,
+        'Test::Pod::Coverage' => 0,
+      },
+    },
+  },
+  resources => {
+    repository => {
+      url => 'git://git.shadowcat.co.uk/catagits/Catalyst-Devel.git',
+      web => 'http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Devel.git',
+      type => 'git',
+    },
+    x_IRC => 'irc://irc.perl.org/#catalyst',
+    x_MailingList => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst',
+    homepage => 'http://dev.catalyst.perl.org/',
+    bugtracker => {
+      web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Devel',
+      mailto => 'bug-Catalyst-Devel@rt.cpan.org',
+    },
+    license => [ 'http://dev.perl.org/licenses/' ],
+  },
+  no_index => {
+    directory => [ 't', 'xt' ]
+  },
+  x_authority => 'cpan:MSTROUT',
+);
 
-requires 'Moose';
-requires 'MooseX::Emulate::Class::Accessor::Fast';
-requires 'File::ShareDir';
-requires 'namespace::clean';
-requires 'namespace::autoclean';
-requires 'Catalyst'    => '5.90001';
-requires 'Catalyst::Action::RenderView' => '0.10';
-requires 'Catalyst::Plugin::Static::Simple' => '0.28';
-requires 'Catalyst::Plugin::ConfigLoader' => '0.30';
-requires 'Config::General' => '2.42'; # as of 1.07, we use .conf and not .yaml
-requires 'File::ChangeNotify' => '0.07';
-requires 'File::Copy::Recursive';
-requires 'Path::Class' => '0.09';
-requires 'Template'    => '2.14';
-
-if (!$Module::Install::AUTHOR && $^O ne 'MSWin32') {
-    requires 'MooseX::Daemonize'; # Optional in scripts
-    requires 'Starman'; # Optional in scripts
+{
+  package MY;
+  use File::ShareDir::Install qw(install_share postamble);
+  install_share 'share';
 }
 
-# The Catalyst applications this module distribution have a Makefile.PL using
-# Module::Install as well as the Module::Install::Catalyst extension included in
-# this distribution. Therefore we really *depend* on Module::Install to be
-# installed, even though we also use it to build this distribution and include
-# it in its inc/ directory for releases.
-requires 'Module::Install' => '1.02';
-
-author_requires 'IPC::Run3';
-author_requires 'Proc::Background';
-author_requires 'Test::Pod';
-author_requires 'Test::Pod::Coverage';
-
-test_requires 'Test::More' => '0.94';
-test_requires 'Test::Fatal' => '0.003';
-
-install_share 'share';
-
-author_tests 't/author';
+my %MM_ARGS = (
+  PREREQ_PM => {
+    # kill warning from older versions of Class::C3
+    ( ("$]" >= 5.009_005 && eval { require Class::C3 } && !eval { Class::C3->VERSION(0.20) }) ? (
+      'Class::C3' => '0.20',
+    ) : () ),
+  },
+);
 
 if (!$ENV{CATALYST_DEVEL_NO_510_CHECK}) {
-    use Symbol 'gensym';
-    use IPC::Open3;
-    use File::Spec;
-    open my $null, '>', File::Spec->devnull;
-    my $err = gensym;
-    my $pid = open3(gensym, $null, $err, qq{"$^X" -It/lib -MUnknownError -e 1});
-
-    my $unknown_error = 0;
-
-    while (<$err>) {
-        $unknown_error = 1 if /^Unknown error/;
-    }
+    require IPC::Open3;
+    require File::Spec;
+    open my $in, '<', File::Spec->devnull;
+    my $pid = IPC::Open3::open3($in, my $out, undef, $^X, '-It/lib', '-MUnknownError', '-e1');
+    my $output = do { local $/; <$out> };
 
     waitpid $pid, 0;
 
-    if ($unknown_error) {
+    if ($output =~ /^Unknown error/m) {
         warn <<EOE;
 ############################### WARNING #################################
 #                                                                       #
@@ -87,32 +109,55 @@ if (!$ENV{CATALYST_DEVEL_NO_510_CHECK}) {
 #########################################################################
 
 EOE
-        my $ans = prompt('Do you want to continue?', 'no');
+        require ExtUtils::MakeMaker;
+        my $ans = ExtUtils::MakeMaker::prompt('Do you want to continue?', 'no');
         exit 0 unless $ans =~ /^y(es)?\z/i;
     }
 }
 
-# kill warning from older versions of Class::C3
-if ($] >= 5.009_005 && can_use('Class::C3') && !can_use('Class::C3', 0.20)) {
-    requires 'Class::C3' => '0.20';
+
+## BOILERPLATE ###############################################################
+require ExtUtils::MakeMaker;
+(do './maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
+
+# have to do this since old EUMM dev releases miss the eval $VERSION line
+my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;
+my $mymeta        = $eumm_version >= 6.57_02;
+my $mymeta_broken = $mymeta && $eumm_version < 6.57_07;
+
+($MM_ARGS{NAME} = $META{name}) =~ s/-/::/g;
+($MM_ARGS{VERSION_FROM} = "lib/$MM_ARGS{NAME}.pm") =~ s{::}{/}g;
+$META{license} = [ $META{license} ]
+  if $META{license} && !ref $META{license};
+$MM_ARGS{LICENSE} = $META{license}[0]
+  if $META{license} && $eumm_version >= 6.30;
+$MM_ARGS{NO_MYMETA} = 1
+  if $mymeta_broken;
+$MM_ARGS{META_ADD} = { 'meta-spec' => { version => 2 }, %META }
+  unless -f 'META.yml';
+$MM_ARGS{PL_FILES} ||= {};
+$MM_ARGS{NORECURS} = 1
+  if not exists $MM_ARGS{NORECURS};
+
+for (qw(configure build test runtime)) {
+  my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';
+  my $r = $MM_ARGS{$key} = {
+    %{$META{prereqs}{$_}{requires} || {}},
+    %{delete $MM_ARGS{$key} || {}},
+  };
+  defined $r->{$_} or delete $r->{$_} for keys %$r;
 }
 
-auto_install;
+$MM_ARGS{MIN_PERL_VERSION} = delete $MM_ARGS{PREREQ_PM}{perl} || 0;
 
-WriteAll;
+delete $MM_ARGS{MIN_PERL_VERSION}
+  if $eumm_version < 6.47_01;
+$MM_ARGS{BUILD_REQUIRES} = {%{$MM_ARGS{BUILD_REQUIRES}}, %{delete $MM_ARGS{TEST_REQUIRES}}}
+  if $eumm_version < 6.63_03;
+$MM_ARGS{PREREQ_PM} = {%{$MM_ARGS{PREREQ_PM}}, %{delete $MM_ARGS{BUILD_REQUIRES}}}
+  if $eumm_version < 6.55_01;
+delete $MM_ARGS{CONFIGURE_REQUIRES}
+  if $eumm_version < 6.51_03;
 
-if ($Module::Install::AUTHOR) {
-    Meta->{values}{resources} = [
-        [ 'MailingList' => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst' ],
-        [ 'IRC'         => 'irc://irc.perl.org/#catalyst' ],
-        [ 'license',    => 'http://dev.perl.org/licenses/' ],
-        [ 'homepage',   => 'http://dev.catalyst.perl.org/'],
-        [ 'repository', => 'git://git.shadowcat.co.uk/catagits/Catalyst-Devel.git' ],
-    ];
-
-    Meta->{values}{requires} = [ grep {
-        $_->[0] ne 'Class::C3'
-    } @{ Meta->{values}{requires} } ];
-
-    Meta->write;
-}
+ExtUtils::MakeMaker::WriteMakefile(%MM_ARGS);
+## END BOILERPLATE ###########################################################

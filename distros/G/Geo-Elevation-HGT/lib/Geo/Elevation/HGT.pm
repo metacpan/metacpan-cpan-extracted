@@ -6,7 +6,7 @@ use warnings;
 use POSIX ();
 use Carp;
 # set the version for version checking
-our $VERSION     = '0.04';
+our $VERSION     = '0.05';
 # file-private lexicals
 my $grid_size; # .hgt grid size = 3601x3601 for 1-minute DEMs or 1201x1201 for 3-minute DEMs
 my @DEMnames;
@@ -171,10 +171,10 @@ sub _readDEM {
   }
   if ($cache_folder ne "" and -d $cache_folder) {
     unless (-d "$cache_folder/$nslt") {mkdir "$cache_folder/$nslt", 0755}
-    open FILE, '>', "$cache_path" or croak "'$cache_path' error opening: $!";
-    binmode FILE;
-    print FILE $response->{content};
-    close FILE;
+    open my $file_handle, '>', "$cache_path" or croak "'$cache_path' error opening: $!";
+    binmode $file_handle;
+    print $file_handle $response->{content};
+    close $file_handle;
     $status_descr .= "->Saved";
     say STDERR "  Saved DEM cache file '$cache_path'" if $debug;
   }
@@ -216,7 +216,7 @@ Geo::Elevation::HGT - Elevation service with terrain data provided by L<Mapzen a
 
 =head1 Version
 
-Version 0.04
+Version 0.05
 
 =head1 Synopsis
 

@@ -1,0 +1,24 @@
+# -*- sieve -*-
+[% # sieve LDAP objects are served with this schema
+   # https://www.alvestrand.no/objectid/1.3.6.1.4.1.11591.5.html
+   # which is used by UMI project https://github.com/z-eos/umi
+ -%]
+# !!! AUTOMATICALY GENERATED !!!
+#
+# sieve -c .sieve
+# sieve -dT -c .sieve
+#
+# by [% prog %] on [% date %]
+#       target email: [% DN.split(',').0.split('=').1 %]
+# user homeDirectory: [% homeDirectory %]
+#    assigned to uid: [% uid %]
+[% IF descr -%]
+#
+#        description: [% descr.replace('\n', '; ') %]
+#
+[% END -%]
+#
+
+[% mu_sieveOnReceive %]
+
+# End of script

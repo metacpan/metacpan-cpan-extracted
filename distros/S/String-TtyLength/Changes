@@ -1,5 +1,36 @@
 Revision history for Perl module String::TtyLength
 
+0.02 2020-09-12 NEILB
+    - First non-developer release that includes tty_width() function.
+
+0.01_06 2020-09-12 NEILB
+    - Require Unicode::EastAsianWidth version 12.0 or later.
+      Had a bunch of CPAN Testers failures on FreeBSD, but it looks
+      like they're all from the same box, with an old version of
+      Unicode::EastAsianWidth.
+
+0.01_05 2020-09-11 NEILB
+    - Switched from Text::CharWidth to Unicode::EastAsianWidth,
+      as it has more reliable results on CPAN Testers.
+
+0.01_04 2020-09-11 NEILB
+    - Ok, lying to the C library about LANG seems to have been a bad idea :-)
+
+0.01_03 2020-09-11 NEILB
+    - The C function wcswidth() used by Text::CharWidth needs LANG to be set,
+      otherwise you essentially get nonsense back. So now tty_width() checks
+      for that before trying to be smart. Set the test case to default
+      to "en_US.UTF-8", just to see how that works out with CPAN Testers.
+
+0.01_02 2020-09-11 NEILB
+    - Lots of CPAN Testers fails, so put some diagnostics in the tests,
+      as there's one test failing that I really didn't expect.
+
+0.01_01 2020-09-10 NEILB
+    - Added tty_width() which tries to return the number of columns that
+      the string will take up on a terminal.
+    - Renamed the basic.t test file as tty_length.t
+
 0.01 2020-09-06 NEILB
     - First release to CPAN
 

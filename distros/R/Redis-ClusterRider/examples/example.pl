@@ -23,7 +23,7 @@ my $cluster = Redis::ClusterRider->new(
   on_node_error => sub {
     my $err = shift;
     my $hostport = shift;
-    
+
     warn "$hostport: $err\n";
   }
 );

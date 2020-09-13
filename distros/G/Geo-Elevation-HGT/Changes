@@ -1,5 +1,8 @@
 Revision history for Geo-Elevation-HGT
 
+0.05    02 July 2020
+        Version 0.05 - get rid of bareword filehandle
+
 0.04    16 May 2020
         Version 0.04 - add missing 'use POSIX ();'
 

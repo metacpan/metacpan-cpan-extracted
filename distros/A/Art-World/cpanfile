@@ -1,0 +1,5 @@
+requires 'Data::Printer', '== 0.40';
+requires 'Faker', '== 1.03';
+# Only for test
+requires 'Test::Pod', '';
+requires 'Zydeco', '== 0.603';

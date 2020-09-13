@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.4",
    "license" : [
-      "unknown"
+      "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -59,7 +59,7 @@
    "provides" : {
       "JSON::Feed" : {
          "file" : "lib/JSON/Feed.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "JSON::Feed::Types" : {
          "file" : "lib/JSON/Feed/Types.pm"
@@ -76,8 +76,12 @@
          "web" : "https://github.com/gugod/JSON-Feed"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_authority" : "cpan:GUGOD",
+   "x_contributors" : [
+      "Kang-min Liu <gugod@users.noreply.github.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

@@ -1,4 +1,15 @@
-0.231   2018-10-30 (PERLANCAR)
+0.233   2020-09-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe Org document's IMAGE_BASE setting to set base URL for the
+	  image.
+
+
+0.232   2020-09-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: inline_images (image link becomes <img> and not <a>).
+
+
+0.231   2018-10-30  Released-By: PERLANCAR
 
         - [bugfix] Forgot to HTML-escape timestamp which might contain "<" and
           ">" (reported by Harald Jörg).
@@ -16,21 +27,21 @@
         - Avoid running locale-related tests with Perl < 5.014 (Harald Jörg).
 
 
-0.230   2018-05-05 (PERLANCAR)
+0.230   2018-05-05  Released-By: PERLANCAR
 
 	- Produce lowercase tag and attribute names, because believe it or
 	  not WordPress.com will produce double-spaced text for <PRE> but
 	  single-spaced text for <pre>.
 
 
-0.22    2017-07-10 (PERLANCAR)
+0.22    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.21    2016-12-24 (PERLANCAR)
+0.21    2016-12-24  Released-By: PERLANCAR
 
 	- [Bugfix] Avoid linebreak \n when an inline element e.g. link is
 	  at the end of line of text.
@@ -38,32 +49,32 @@
 	- Add hooks: before_export_element, after_export_element.
 
 
-0.20    2016-12-24 (PERLANCAR)
+0.20    2016-12-24  Released-By: PERLANCAR
 
 	- Move CLI script org-to-html to App-OrgUtils to reduce
 	  dependencies of this dist.
 
 
-0.19    2016-11-14 (PERLANCAR)
+0.19    2016-11-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Add a note about using org-mode for 'serious' exporting.
 
 
-0.18    2016-11-14 (PERLANCAR)
+0.18    2016-11-14  Released-By: PERLANCAR
 
 	- Allow org_to_html() to be used by subclass (add internal argument
 	  _class).
 
 
-0.17    2016-11-06 (PERLANCAR)
+0.17    2016-11-06  Released-By: PERLANCAR
 
 	- Set Org document object's ignore_unknown_settings to 1; Replace
 	  File::Slurp::Tiny with File::Slurper.
 
 
-0.16    2015-09-03 (PERLANCAR)
+0.16    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -72,21 +83,21 @@
 	  requirement.
 
 
-0.15    2015-08-18 (PERLANCAR)
+0.15    2015-08-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.14     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.14     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - [build] CLI scripts are now generated automatically using
            Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
            generated script is not as polished as it should be. Stay tuned.
 
 
-0.13    2014-07-22 (SHARYANTO)
+0.13    2014-07-22  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -94,26 +105,26 @@
           Perinci::CmdLine::Any to reduce size of dependencies.
 
 
-0.12    2014-05-17 (SHARYANTO)
+0.12    2014-05-17  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Replace File::Slurp with File::Slurp::Tiny.
 
 
-0.11    2014-01-29 (SHARYANTO)
+0.11    2014-01-29  Released-By: SHARYANTO
 
         - Replace newlines in non-PRE text with space, so resulting HTML is more
           copy-pasteable to web forms (which sometimes interprets newlines as
           <br />).
 
 
-0.10    2014-01-25 (SHARYANTO)
+0.10    2014-01-25  Released-By: SHARYANTO
 
         - Forgot to move _included_children() to superclass Org::To::Base.
 
 
-0.09    2014-01-25 (SHARYANTO)
+0.09    2014-01-25  Released-By: SHARYANTO
 
         - Bugfix: Have not yet loaded String::Escape when logging.
 
@@ -121,19 +132,19 @@
           Org::To::vCard::Addressbook (and other subclasses).
 
 
-0.08    2013-09-11 (SHARYANTO)
+0.08    2013-09-11  Released-By: SHARYANTO
 
         - No functional changes. Add 'use experimental smartmatch' for Perl
           5.18+.
 
 
-0.07    2012-03-22 (SHARYANTO)
+0.07    2012-03-22  Released-By: SHARYANTO
 
         - No functional changes. Replace Sub::Spec::CmdLine with
           Perinci::CmdLine.
 
 
-0.06    2011-08-11 (SHARYANTO)
+0.06    2011-08-11  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -143,7 +154,7 @@
           Org::Element::FixedWidthSection).
 
 
-0.05    2011-08-02 (SHARYANTO)
+0.05    2011-08-02  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -153,21 +164,21 @@
           export_org_to_html to org_to_html.
 
 
-0.04    2011-06-16 (SHARYANTO)
+0.04    2011-06-16  Released-By: SHARYANTO
 
         - No functional changes. Internal changes: split base class
           (Org::Export::Base) and role (Org::Export::Role) to allow for other
           exporter classes.
 
 
-0.03    2011-05-25 (SHARYANTO)
+0.03    2011-05-25  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - Provide OO interface.
 
 
-0.02    2011-05-23 (SHARYANTO)
+0.02    2011-05-23  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -186,6 +197,7 @@
         - Add tests.
 
 
-0.01    2011-03-23 (SHARYANTO)
+0.01    2011-03-23  Released-By: SHARYANTO
 
         - First release.
+

@@ -1,0 +1,22 @@
+Acme-ZydecoTesting-App1
+=======================
+
+Created:      2020-09-12
+Home page:    <https://metacpan.org/release/Acme-ZydecoTesting-App1>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Acme-ZydecoTesting-App1>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2020-09-12
+
+ [ Packaging ]
+ - Fix version numbers in META.json `provides` section.
+
+0.002	2020-09-12
+
+ [ Packaging ]
+ - Include all Zydeco-generated packages in META.json `provides` section.
+
+ [ Other ]
+ - Updated: Rename Classes.pl to Classes.zydeco.pm.
+
+0.001	2020-09-12	Initial release

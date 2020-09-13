@@ -12,12 +12,13 @@ my $build = Module::Build->new (
     'POSIX' => '0',
     # Others - Not versioned
     'Carp' => '0',
+    'Email::Address' => '0',
     'Encode' => '0',
     'Getopt::Long' => '0',
     'IO::String' => '0',
     'Pod::Usage' => '0',
     # Others - Versioned
-    'Email::MIME' => '1.923',
+    'Email::MIME' => '1.949',
     'Email::MIME::ContentType' => '1.014',
     'Email::Sender' => '1.3',
     'Email::Simple' => '2.206',

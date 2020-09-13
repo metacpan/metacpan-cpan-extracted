@@ -21,6 +21,7 @@ package MyApp {
 					class Superhuman;
 					class +Employee {
 						has job_title;
+						method bleh { return $factory }
 					}
 				}
 			}
@@ -59,6 +60,8 @@ isa_ok($superman, $_, "\$superman isa $_") for qw(
 my $worker = MyApp->new_human_employee(name => 'Bob', job_title => 'Uncle');
 
 is($worker->job_title, 'Uncle');
+
+is($worker->bleh, 'MyApp');
 
 isa_ok($worker, $_, "\$superman isa $_") for qw(
 	MyApp::Animal

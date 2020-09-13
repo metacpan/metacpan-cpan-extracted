@@ -18,7 +18,6 @@ Revision history for Regexp-Debugger
       (thanks alierak!)
 
 
-
 0.001002  Sat Jul 21 16:53:23 2012
 
     - Fixed windowing of capture and backtracking graphics
@@ -265,3 +264,9 @@ Revision history for Regexp-Debugger
 
     - Added proper dynamic tracking of /x flag status within regex,
       so that (?x:...) and (?-x:...) blocks are handled correctly.
+
+
+0.002006  Sat Sep 12 08:20:53 2020
+
+    - Removed spurious Data::Dumper debugging statement 
+      (thanks, Tomasz!)

@@ -1,7 +1,7 @@
 package Email::Outlook::Message::AddressInfo;
 =head1 NAME
 
-Email::Outlook::Message::AddressInfo - Handle addres data in .msg files
+Email::Outlook::Message::AddressInfo - Handle address data in .msg files
 
 =head1 DESCRIPTION
 
@@ -30,7 +30,7 @@ Matijs van Zuijlen, C<matijs@matijs.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2002--2014 by Matijs van Zuijlen
+Copyright 2002--2020 by Matijs van Zuijlen
 
 This module is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -38,6 +38,8 @@ it under the same terms as Perl itself.
 =cut
 use strict;
 use warnings;
+use vars qw($VERSION);
+$VERSION = "0.920";
 use Carp;
 use base 'Email::Outlook::Message::Base';
 

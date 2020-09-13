@@ -1,0 +1,31 @@
+NAME
+    Catalyst::Devel - Catalyst Development Tools
+
+DESCRIPTION
+    The "Catalyst-Devel" distribution includes a variety of modules useful
+    for the development of Catalyst applications, but not required to run
+    them. This is intended to make it easier to deploy Catalyst apps. The
+    runtime parts of Catalyst are now known as "Catalyst::Runtime".
+
+    "Catalyst-Devel" includes the Catalyst::Helper system, which
+    autogenerates scripts and tests; Module::Install::Catalyst, a
+    Module::Install extension for Catalyst; and requirements for a variety
+    of development-related modules. The documentation remains with
+    Catalyst::Runtime.
+
+SEE ALSO
+    Catalyst.
+
+AUTHOR
+    Catalyst Contributors, see Catalyst.pm
+
+PROJECT FOUNDER
+    sri: Sebastian Riedel <sri@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2006 - 2009 the Catalyst::Devel "AUTHOR" as listed above.
+
+LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

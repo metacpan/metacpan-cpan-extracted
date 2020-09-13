@@ -10,7 +10,6 @@ inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-lib/DateTime/Event/Random.pm
 lib/DBIx/Class/Sims/Column.pm
 lib/DBIx/Class/Sims/Item.pm
 lib/DBIx/Class/Sims/Random.pm
@@ -25,7 +24,6 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 META.yml
-META.json
 t/add_relationship.t
 t/add_sims.t
 t/before_create.t

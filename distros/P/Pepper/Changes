@@ -1,5 +1,23 @@
 Revision history for Perl extension Pepper
 
+1.2.1 2020-09-12T20:41:39Z
+
+    - Version number change to three-digits to work with PAUSE's version checks.
+
+1.1.1 2020-09-12T20:10:28Z
+
+    - Make sure that the Y/N setup prompts only accept 'Y' or 'N'
+    - Tweaks to AUTOLOAD messages
+
+1.1 2020-09-12T03:25:03Z
+
+    - The 'pepper' workspace now loads in the user's home directory.
+    - Eliminate the need and suggestion to use 'sudo' with Pepper
+    - Improve the prompts for 'pepper setup'.
+    - Improvements to the documentation
+    - Remove requirement for 'rotatelogs' command
+    - Remove hard-coding path for start_server
+
 1.0.3 2020-09-08T16:05:26Z
 
     - Another doc tweak.

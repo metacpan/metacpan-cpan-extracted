@@ -26,9 +26,8 @@ my %META = (
         'namespace::clean'      => '0.23',
         'MooseX::Emulate::Class::Accessor::Fast' => '0.00903',
         'Class::Load'           => '0.12',
-        'Moose'                 => '1.03',
+        'Moose'                 => '2.1400',
         'MooseX::MethodAttributes::Role::AttrContainer::Inheritable' => '0.24',
-        'MooseX::Role::WithOverloading' => '0.09',
         'Carp'                  => '1.25',
         'Class::C3::Adopt::NEXT' => '0.07',
         'CGI::Simple::Cookie'   => '1.109',
@@ -84,10 +83,7 @@ my %META = (
     },
     develop   => {
       requires => {
-        'CatalystX::LeakChecker'  => '0.05',
-        'Catalyst::Devel'         => '1.0', # For http server test
-        'Test::WWW::Mechanize::Catalyst' => '0.51',
-        'Test::TCP'               => '2.00', # ditto, ships Net::EmptyPort
+        'Test::TCP'               => '2.00',
         'File::Copy::Recursive'   => '0.40',
         'Starman'                 => 0,
         'MooseX::Daemonize'       => 0,
@@ -96,10 +92,7 @@ my %META = (
         'Test::Pod::Coverage'     => 0,
         'Test::Spelling'          => 0,
         'Pod::Coverage::TrustPod' => 0,
-        'Catalyst::Plugin::Params::Nested' => 0,
-        'Catalyst::Plugin::ConfigLoader' => 0,
         'Compress::Zlib'          => 0,
-        'Catalyst::Action::REST'  => 0,
         'Type::Tiny'              => 0,
         'Proc::ProcessTable'      => 0,
       },
@@ -168,11 +161,6 @@ my $tests = 't/*.t t/aggregate/*.t';
 my %MM_ARGS = (
   test => { TESTS => $tests },
   EXE_FILES => [ glob 'script/*.pl' ],
-  PREREQ_PM => {
-    (eval { require Moose; Moose->VERSION('2.1300') } ? () : (
-      'MooseX::Role::WithOverloading' => '0.09'
-    )),
-  },
 );
 
 ## BOILERPLATE ###############################################################

@@ -160,6 +160,15 @@ The full list of the Redis commands can be found here: [http://redis.io/commands
     my $list    = $cluster->lrange( 'list', 0, -1 );
     my $counter = $cluster->incr('counter');
 
+## run_command( $command [, @args ] )
+
+The alternative way of command execution is explicit "run_command()" call.
+This approach is the only way if Redis commands contain punctuation,
+such as "GRAPH.QUERY" command of RedisGraph module.
+
+    my $list = $cluster->run_command( 'GRAPH.QUERY', $graph, $cypher_query );
+
+
 # TRANSACTIONS
 
 To perform the transaction you must get the master node by the key using

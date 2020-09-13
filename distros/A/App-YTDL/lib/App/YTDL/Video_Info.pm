@@ -105,7 +105,6 @@ sub _linefolded_print_info {
         if ( $key eq 'description' ) {
             if ( $opt->{max_rows_description} && @folded > $opt->{max_rows_description} ) {
                 splice @folded, $opt->{max_rows_description};
-                #$#folded = $opt->{max_rows_description} - 1;
                 if ( print_columns( $folded[-1] ) > $col_max - 4 ) {
                     $folded[-1] =~ s/(?<=\s)\S+\s*\z//;
                     $folded[-1] .= '...';

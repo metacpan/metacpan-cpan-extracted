@@ -1,3 +1,4 @@
+.yath.rc
 Changes
 lib/Catalyst.pm
 lib/Catalyst/Action.pm
@@ -205,7 +206,7 @@ t/deprecated.t
 t/deprecated_appclass_action_warnings.t
 t/dispatch_on_scheme.t
 t/encoding_set_in_app.t
-t/encoding_set_in_config.t
+t/encoding_set_in_plugin.t
 t/evil_stash.t
 t/execute_exception.t
 t/head_middleware.t
@@ -234,6 +235,7 @@ t/lib/DeprecatedActionsInAppClassTestApp.pm
 t/lib/DeprecatedTestApp.pm
 t/lib/DeprecatedTestApp/C/Root.pm
 t/lib/Guff.pm
+t/lib/MakeTestApp.pm
 t/lib/NullPackage.pm
 t/lib/PluginTestApp.pm
 t/lib/PluginTestApp/Controller/Root.pm
@@ -346,8 +348,6 @@ t/lib/TestApp/View/Dump/Body.pm
 t/lib/TestApp/View/Dump/Env.pm
 t/lib/TestApp/View/Dump/Request.pm
 t/lib/TestApp/View/Dump/Response.pm
-t/lib/TestApp2.pm
-t/lib/TestApp2/Controller/Root.pm
 t/lib/TestAppArgsEmptyParens.pm
 t/lib/TestAppBadlyImmutable.pm
 t/lib/TestAppChainedAbsolutePathPart.pm
@@ -361,9 +361,9 @@ t/lib/TestAppEncoding.pm
 t/lib/TestAppEncoding/Controller/Root.pm
 t/lib/TestAppEncodingSetInApp.pm
 t/lib/TestAppEncodingSetInApp/Controller/Root.pm
-t/lib/TestAppEncodingSetInConfig.pm
-t/lib/TestAppEncodingSetInConfig/Controller/Root.pm
-t/lib/TestAppEncodingSetInConfig/testappencodingsetinconfig.json
+t/lib/TestAppEncodingSetInPlugin.pm
+t/lib/TestAppEncodingSetInPlugin/Controller/Root.pm
+t/lib/TestAppEncodingSetInPlugin/SetEncoding.pm
 t/lib/TestAppIndexDefault.pm
 t/lib/TestAppIndexDefault/Controller/Default.pm
 t/lib/TestAppIndexDefault/Controller/IndexChained.pm
@@ -414,14 +414,15 @@ t/lib/TestMiddleware/share/static/forced.txt
 t/lib/TestMiddleware/share/static/message.txt
 t/lib/TestMiddleware/share/static2/message2.txt
 t/lib/TestMiddleware/share/static3/message3.txt
-t/lib/TestMiddlewareFromConfig.pm
-t/lib/TestMiddlewareFromConfig/Controller/Root.pm
-t/lib/TestMiddlewareFromConfig/Custom.pm
-t/lib/TestMiddlewareFromConfig/share/static/forced.txt
-t/lib/TestMiddlewareFromConfig/share/static/message.txt
-t/lib/TestMiddlewareFromConfig/share/static2/message2.txt
-t/lib/TestMiddlewareFromConfig/share/static3/message3.txt
-t/lib/TestMiddlewareFromConfig/testmiddlewarefromconfig.pl
+t/lib/TestMiddlewareFromPlugin.pm
+t/lib/TestMiddlewareFromPlugin/Controller/Root.pm
+t/lib/TestMiddlewareFromPlugin/Custom.pm
+t/lib/TestMiddlewareFromPlugin/SetMiddleware.pm
+t/lib/TestMiddlewareFromPlugin/share/static/forced.txt
+t/lib/TestMiddlewareFromPlugin/share/static/message.txt
+t/lib/TestMiddlewareFromPlugin/share/static2/message2.txt
+t/lib/TestMiddlewareFromPlugin/share/static3/message3.txt
+t/lib/TestMiddlewareFromPlugin/testmiddlewarefromplugin.pl
 t/lib/TestPath.pm
 t/lib/TestPath/Controller/Four.pm
 t/lib/TestPath/Controller/One.pm
@@ -450,7 +451,7 @@ t/optional_stress.json
 t/optional_stress.t
 t/optional_threads.t
 t/path_action_empty_brackets.t
-t/plack-middleware-config.t
+t/plack-middleware-plugin.t
 t/plack-middleware.t
 t/plugin_new_method_backcompat.t
 t/psgi-log.t
@@ -486,7 +487,6 @@ xt/author/notabs.t
 xt/author/pod.t
 xt/author/podcoverage.t
 xt/author/spelling.t
-xt/author/unicode_plugin_nested_params.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 README                                   README file (added by Distar)

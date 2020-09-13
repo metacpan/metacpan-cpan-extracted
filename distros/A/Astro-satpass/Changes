@@ -1,3 +1,8 @@
+0.116		2020-09-10	T. R. Wyant
+    Remove all mention of subs nutation_*, obliquity, and friends, which
+    were defined in Astro::Coord::ECI::Utils. These were replaced by
+    methods.
+
 0.115		2020-08-19	T. R. Wyant
     Remove prototypes from testing subroutines defined in t/*.t and
     inc/My/Module/Test/*.pm

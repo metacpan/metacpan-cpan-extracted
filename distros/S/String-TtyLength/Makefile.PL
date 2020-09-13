@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "calculate length of string excluding ANSI tty codes",
+  "ABSTRACT" => "length or width of string excluding ANSI tty codes",
   "AUTHOR" => "Neil Bowers <neilb\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,14 +18,16 @@ my %WriteMakefileArgs = (
   "NAME" => "String::TtyLength",
   "PREREQ_PM" => {
     "Exporter" => 0,
+    "Unicode::EastAsianWidth" => "12.0",
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test2::V0" => 0
+    "Test2::V0" => 0,
+    "utf8" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,8 +37,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Exporter" => 0,
   "Test2::V0" => 0,
+  "Unicode::EastAsianWidth" => "12.0",
   "parent" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

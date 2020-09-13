@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Tag;
 # ABSTRACT: Tag the new version
 
-our $VERSION = '2.046';
+our $VERSION = '2.047';
 
 use Moose;
 use MooseX::Has::Sugar;
@@ -66,7 +66,7 @@ around dump_config => sub
     my $config = $self->$orig;
 
     $config->{+__PACKAGE__} = {
-        (map { $_ => $self->$_ } qw(tag_format tag_message changelog branch tag)),
+        (map +($_ => $self->$_), qw(tag_format tag_message changelog branch tag)),
         signed => $self->signed ? 1 : 0,
         blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
@@ -115,7 +115,7 @@ Dist::Zilla::Plugin::Git::Tag - Tag the new version
 
 =head1 VERSION
 
-version 2.046
+version 2.047
 
 =head1 SYNOPSIS
 

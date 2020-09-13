@@ -54,7 +54,7 @@ my %module = (
         # This doesn't work, as we have non-.pm files to copy+install
     },
 
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.010',
 
     'LICENSE'=> 'perl',
 
@@ -69,6 +69,7 @@ my %module = (
     },
 
     PREREQ_PM => {
+                        'Filter::signatures' => 0.16,
                         'Carp' => 0,
                         'Scalar::Util' => 0, # for blessed()
                         'HTTP::Response' => 0,

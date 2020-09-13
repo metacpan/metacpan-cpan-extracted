@@ -10,10 +10,10 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Git; # git description: v2.045-9-g75e375f
+package Dist::Zilla::Plugin::Git; # git description: v2.046-11-g57bbf9f
 # ABSTRACT: Update your git repository after release
 
-our $VERSION = '2.046';
+our $VERSION = '2.047';
 
 1;
 
@@ -29,7 +29,7 @@ Dist::Zilla::Plugin::Git - Update your git repository after release
 
 =head1 VERSION
 
-version 2.046
+version 2.047
 
 =head1 DESCRIPTION
 
@@ -116,7 +116,7 @@ Jerome Quelin
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes Graham Knop David Golden Mike Friedman Chris Weyl Stephen R. Scaffidi Randy Stauner Barr Apocalypse Doherty Nigel Metheringham Olivier Mengué Tatsuhiko Miyagawa Tuomas Jormola Alessandro Ghedini Brian Phillips Steinbrunner Geoffrey Broadwell Harley Pig Jesse Luehrs Brendan Byrd Alexandr Ciornii Matt Follett Michael Schout
+=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes David Golden Graham Knop Mike Friedman Chris Weyl Stephen R. Scaffidi Randy Stauner Barr Apocalypse Doherty Michael Schout Nigel Metheringham Olivier Mengué Sean Whitton Tatsuhiko Miyagawa Tuomas Jormola Alessandro Ghedini Brian Phillips Steinbrunner Geoffrey Broadwell Harley Pig Jesse Luehrs Brendan Byrd Alexandr Ciornii Matt Follett McClimon
 
 =over 4
 
@@ -146,11 +146,11 @@ Ricardo Signes <rjbs@cpan.org>
 
 =item *
 
-Graham Knop <haarg@haarg.org>
+David Golden <dagolden@cpan.org>
 
 =item *
 
-David Golden <dagolden@cpan.org>
+Graham Knop <haarg@haarg.org>
 
 =item *
 
@@ -182,11 +182,19 @@ Mike Doherty <doherty@cs.dal.ca>
 
 =item *
 
+Michael Schout <mschout@gkg.net>
+
+=item *
+
 Nigel Metheringham <nigel.metheringham@dev.intechnology.co.uk>
 
 =item *
 
 Olivier Mengué <dolmen@cpan.org>
+
+=item *
+
+Sean Whitton <spwhitton@spwhitton.name>
 
 =item *
 
@@ -234,7 +242,7 @@ Matt Follett <matt.follett@gmail.com>
 
 =item *
 
-Michael Schout <mschout@gkg.net>
+Michael McClimon <michael@mcclimon.org>
 
 =back
 

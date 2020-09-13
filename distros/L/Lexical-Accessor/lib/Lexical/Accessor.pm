@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Sub::Accessor::Small ();
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.013';
 our @EXPORT    = qw/ lexical_has /;
 our @ISA       = qw/ Sub::Accessor::Small /;
 

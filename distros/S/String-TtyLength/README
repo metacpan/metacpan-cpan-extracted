@@ -1,7 +1,7 @@
 This archive contains the distribution String-TtyLength,
-version 0.01:
+version 0.02:
 
-  calculate length of string excluding ANSI tty codes
+  length or width of string excluding ANSI tty codes
 
 This software is copyright (c) 2020 by Neil Bowers.
 

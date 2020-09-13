@@ -1,9 +1,9 @@
 package Net::DNS::RR::LOC;
 
 #
-# $Id: LOC.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: LOC.pm 1802 2020-08-31 13:44:20Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1802 $)[1];
 
 
 use strict;
@@ -44,9 +44,9 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my ( $altitude, @precision ) = map $self->$_() . 'm', qw(altitude size hp vp);
 	my $precision = join ' ', @precision;
 	for ($precision) {
-		s/\s+10m$//;
-		s/\s+10000m$//;
-		s/\s*1m$//;
+		s/^1m 10000m 10m$//;
+		s/ 10000m 10m$//;
+		s/ 10m$//;
 	}
 	my @rdata = ( $self->latitude, '', $self->longitude, '', $altitude, $precision );
 }

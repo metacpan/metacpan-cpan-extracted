@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.1.10");
+use version; our $VERSION = version->declare("v3.1.11");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -13,7 +13,7 @@ sub auto_install { $AUTO_INSTALL }
 1;
 __END__
 
-=for stopwords MINILLA .mailmap mimick XSUtil travis XSUtil.needs_compiler_cpp XSUtil.generate_xshelper_h XSUtil.cc_warnings DarkPAN minilla untracked UploadToCPAN circleci appveyor codecov gitter metacpan MBTiny kritika
+=for stopwords MINILLA .mailmap mimick XSUtil travis XSUtil.needs_compiler_cpp XSUtil.generate_xshelper_h XSUtil.cc_warnings DarkPAN minilla untracked UploadToCPAN circleci appveyor codecov gitter metacpan MBTiny kritika gitlab-pipeline gitlab-coverage
 
 =encoding utf8
 
@@ -340,7 +340,7 @@ In almost all cases, the default value (false) is correct.
     pause_config = "/path/to/some/.pause"
 
 By setting this value to another PAUSE configuration file (see
-L<cpan_upload/CONFIGURATION> for the details), it is possible to use another
+L<cpan-upload/CONFIGURATION> for the details), it is possible to use another
 PAUSE server (or anything good enough to mimick its upload process) for the
 release step.
 

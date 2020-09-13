@@ -1,9 +1,5 @@
 use strict;
-use Test::More tests => 12;
-
-# make sure the rotatelogs binary is installed so we can rotate the plack logs
-my $rtl_output = `which rotatelogs`;
-like($rtl_output, '/bin/', 'rotatelogs installed') or BAIL_OUT qq{Pepper depends on the 'rotatelogs' from Apache to rotate the Plack logs.};
+use Test::More tests => 11;
 
 # proceed to test the Pepper code
 use_ok $_ for qw(

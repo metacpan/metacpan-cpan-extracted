@@ -49,7 +49,7 @@ Matijs van Zuijlen, C<matijs@matijs.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2002--2014 by Matijs van Zuijlen
+Copyright 2002--2020 by Matijs van Zuijlen
 
 This module is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -59,7 +59,7 @@ use strict;
 use warnings;
 use 5.006;
 use vars qw($VERSION);
-$VERSION = "0.919";
+$VERSION = "0.920";
 
 use Email::Simple;
 use Email::MIME::Creator;
@@ -96,6 +96,16 @@ our $MAP_SUBITEM_FILE = {
   '1042' => "INREPLYTO",       # In reply to Message-Id
   '3007' => 'DATE2ND',         # Creation Time
   '0039' => 'DATE1ST',         # Outlook sent date
+  '3FDE' => 'CODEPAGE',        # Code page for text or html body
+};
+
+# Map codepage numbers to charset names.  Codepages not listed here just get
+# 'CP' prepended, so 1252 -> 'CP1252'.
+our $MAP_CODEPAGE = {
+  20127 => 'US-ASCII',
+  20866 => 'KOI8-R',
+  28591 => 'ISO-8859-1',
+  65001 => 'UTF-8',
 };
 
 #
@@ -191,7 +201,7 @@ sub to_email_mime {
 #
 # Root
 #   Items with properties of the e-mail
-#   Dirs containting adresses
+#   Dirs containing addresses
 #     Items with properties of the address
 #   Dirs containing Attachments
 #     Items with properties of the attachment (including its data)
@@ -367,16 +377,35 @@ sub _clean_part_header {
   return;
 }
 
+sub _body_character_set {
+  my $self = shift;
+  return _codepage_to_charset($self->{CODEPAGE});
+}
+
+sub _codepage_to_charset {
+  my $codepage = shift;
+  if (defined $codepage) {
+    return $MAP_CODEPAGE->{$codepage} || "CP$codepage";
+  }
+  return 'CP1252';
+}
+
 sub _create_mime_plain_body {
   my $self = shift;
+  my $charset = $self->_body_character_set;
+  my $body_str = $self->{BODY_PLAIN};
+  if ($charset ne "UTF-8") {
+    # In this case, the body is a string of octets and needs to be decoded.
+    $body_str = Encode::decode($charset, $body_str);
+  }
   return Email::MIME->create(
     attributes => {
       content_type => "text/plain",
-      charset => "UTF-8",
+      charset => $charset,
       disposition => "inline",
       encoding => "8bit",
     },
-    body => $self->{BODY_PLAIN}
+    body_str => $body_str
   );
 }
 
@@ -385,6 +414,7 @@ sub _create_mime_html_body {
   return Email::MIME->create(
     attributes => {
       content_type => "text/html",
+      charset => $self->_body_character_set,
       disposition => "inline",
       encoding => "8bit",
     },
@@ -461,7 +491,7 @@ sub _copy_header_data {
 
   defined $self->{HEAD} or return;
 
-  # The extra \n is neede for Email::Simple to pick up all headers.
+  # The extra \n is needed for Email::Simple to pick up all headers.
   # This is a change in Email::Simple.
   my $parsed = Email::Simple->new($self->{HEAD} . "\n");
 
@@ -491,7 +521,7 @@ sub _SetHeaderFields {
   # Second preferred option: get it from the SUBMISSION_ID:
   $self->_AddHeaderField($mime, 'Date', $self->_submission_id_date());
 
-  # Most prefered option from the property list
+  # Most preferred option from the property list
   $self->_AddHeaderField($mime, 'Date', $self->{DATE2ND});
   $self->_AddHeaderField($mime, 'Date', $self->{DATE1ST});
 

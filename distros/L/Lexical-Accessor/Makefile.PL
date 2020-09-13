@@ -44,8 +44,8 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Lexical::Accessor"    => { file => "lib/Lexical/Accessor.pm", version => 0.012 },
-                        "Sub::Accessor::Small" => { file => "lib/Sub/Accessor/Small.pm", version => 0.012 },
+                        "Lexical::Accessor"    => { file => "lib/Lexical/Accessor.pm", version => 0.013 },
+                        "Sub::Accessor::Small" => { file => "lib/Sub/Accessor/Small.pm", version => 0.013 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -61,7 +61,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/project",
                       },
-  "version"        => 0.012,
+  "version"        => 0.013,
   "x_contributors" => ["Lukas Atkinson (AMON) <amon\@cpan.org>"],
 };
 

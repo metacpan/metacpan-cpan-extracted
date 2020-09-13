@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/dateseq/dateseq
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2019-11-29'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-30'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.099'; # VERSION
+our $VERSION = '0.100'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,21 @@ dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.099 of dateseq (from Perl distribution App-dateseq), released on 2019-11-29.
+This document describes version 0.100 of dateseq (from Perl distribution App-dateseq), released on 2020-04-30.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % dateseq [options] [from] [to] [increment]
+ % dateseq [--business] [--business6] [--exclude-dow-json=s]
+     [--exclude-dow=s+] [--exclude-month-json=s] [--exclude-month=s+]
+     [-f=s] [--format-class-attrs-json=s] [--format-class-attrs=s]
+     [--format-class=s] [--format=name] [--header=s] [--include-dow-json=s]
+     [--include-dow=s+] [--include-month-json=s] [--include-month=s+]
+     [--json] [--limit=s] [-n=s] [--(no)naked-res] [--no-business]
+     [--no-business6] [--nobusiness] [--nobusiness6]
+     [--page-result[=program]] [-r] [--reverse] [--strftime=s] [from] [to]
+     [increment]
 
 Examples:
 
@@ -63,11 +72,11 @@ Generate dates from 2015-01-01 to 2015-01-31:
 Generate dates from yesterday to 2 weeks from now:
 
  % dateseq yesterday "2 weeks from now"
- 2019-11-28T00:00:00
- 2019-11-29T00:00:00
+ 2020-04-29T00:00:00
+ 2020-04-30T00:00:00
  ... 12 more lines ...
- 2019-12-12T00:00:00
- 2019-12-13T00:00:00
+ 2020-05-13T00:00:00
+ 2020-05-14T00:00:00
 
 Generate dates from 2015-01-31 to 2015-01-01 (reverse):
 
@@ -364,6 +373,10 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =back
 
 =head2 Other options
@@ -444,7 +457,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

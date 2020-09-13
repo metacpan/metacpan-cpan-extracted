@@ -104,6 +104,7 @@ t/53.customtag-alias.t
 t/54.glob.t
 t/55.flow.t
 t/56.force-flow.t
+t/57.dup-keys.t
 t/data/include/circular1.yaml
 t/data/include/circular2.yaml
 t/data/include/include.yaml

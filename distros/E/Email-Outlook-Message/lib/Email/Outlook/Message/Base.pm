@@ -29,7 +29,7 @@ Matijs van Zuijlen, C<matijs@matijs.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2002--2014 by Matijs van Zuijlen
+Copyright 2002--2020 by Matijs van Zuijlen
 
 This module is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -42,6 +42,8 @@ use IO::String;
 use POSIX;
 use Carp;
 use OLE::Storage_Lite;
+use vars qw($VERSION);
+$VERSION = "0.920";
 
 my $DIR_TYPE = 1;
 my $FILE_TYPE = 2;
@@ -168,7 +170,6 @@ our $skipproperties = {
   '3A00' => "Account",
   '3A20' => "Transmittable Display Name",
   '3A40' => "Send Rich Info",
-  '3FDE' => "Internet Code Page", # TODO: Perhaps use this.
   # 'Display table properties'
   '3FF8' => "Creator Name",
   '3FF9' => "Creator EntryId",

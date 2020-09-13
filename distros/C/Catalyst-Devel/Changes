@@ -1,5 +1,13 @@
 This file documents the revision history for Perl extension Catalyst-Devel.
 
+1.42 - 2020-09-11
+        - stop using Module::Install for packaging, improving metadata and
+          fixing Makefile.PL on perl 5.26+.  Generating a Catalyst application
+          still uses Module::Install::Catalyst for now.
+        - fix generated_app.t test on Windows
+        - whitespace and formatting tweaks
+        - various internal test cleanups
+
 1.41 2020-07-27 03:00:00
         - avoid SHILY tar headers
         - fix warnings in Makefile.PL
@@ -44,14 +52,14 @@ This file documents the revision history for Perl extension Catalyst-Devel.
         - Fix tests generated for controllers generated with --mechanize
           to work with newer versions of Test::WWW::Mechanize::Catalyst
         - bump Module::Install dep to 1.02
-        - Removed stderr hiding from 'make catalyst_par' to display errors 
+        - Removed stderr hiding from 'make catalyst_par' to display errors
           from PAR::Packer
 
 1.35 2011-09-05 13:05:00
         - Stop requiring Starman and MooseX::Daemonize on Win32 as they're
           optional components in Catalyst::Runtime and won't install
           on Windows.
-        - Fix test to work on Windows. 
+        - Fix test to work on Windows.
 
 1.34 2011-08-16 09:02:00
         - Bump required version of Catalyst to 5.9

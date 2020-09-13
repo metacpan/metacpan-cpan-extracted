@@ -24,7 +24,7 @@ BEGIN {
           data_type => 'varchar',
           size => 128,
           sim => {
-            values => [qw( apple pear orange banana )],
+            values => [qw( apple pear banana )],
           },
         },
       },
@@ -47,7 +47,7 @@ for (1..100) {
       ],
     },
     expect => {
-      Artist => { id => 1, fruit => match(qr/pear|orange|banana/) },
+      Artist => { id => 1, fruit => match(qr/pear|banana/) },
     },
   };
 
@@ -55,7 +55,7 @@ for (1..100) {
     spec => {
       Artist => [
         {
-          fruit => { value_not => [qw( apple pear orange )] },
+          fruit => { value_not => [qw( apple pear )] },
         },
       ],
     },
@@ -68,7 +68,7 @@ for (1..100) {
     spec => {
       Artist => [
         {
-          fruit => { values_not => [qw( apple pear orange )] },
+          fruit => { values_not => [qw( apple pear )] },
         },
       ],
     },
@@ -81,7 +81,7 @@ for (1..100) {
     spec => {
       Artist => [
         {
-          fruit => { value_not => [qw( apple pear orange banana )] },
+          fruit => { value_not => [qw( apple pear banana )] },
         },
       ],
     },
@@ -100,7 +100,7 @@ for (1..100) {
       ],
     },
     expect => {
-      Artist => { id => 1, fruit => match(qr/pear|orange|banana/) },
+      Artist => { id => 1, fruit => match(qr/pear|banana/) },
     },
   };
 }

@@ -3,15 +3,10 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
-use File::Basename;
-use File::Spec;
 use Mojolicious::Lite;
 
-my $dir = dirname __FILE__;
-
 plugin('Data::Validate::WithYAML' => {
-    conf_path    => File::Spec->catdir( $dir, '..', 't', 'conf' ),
+    conf_path    => app->home->child( '..', 't', 'conf' )->to_string,
     error_prefix => 'TEST_',
 });
 
@@ -21,7 +16,7 @@ sub test {
     my $self = shift;
 
     my %errors = $self->validate( 'hello' );
-    $self->app->log->debug( Dumper \%errors );
+    $self->app->log->debug( $self->dumper( \%errors ) );
     $self->render( json => { test => 1 } );
 };
 

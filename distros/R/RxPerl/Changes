@@ -1,5 +1,41 @@
 Revision history for Perl extension RxPerl
 
+v0.24.0 2020-09-12T15:55:26Z
+
+    - added op_with_latest_from
+    - optimized rx_combine_latest
+    - fixed documentation
+
+v0.23.1 2020-09-12T08:10:09Z
+
+    - fixed two bugs in rx_combine_latest
+
+v0.23.0 2020-09-12T06:43:28Z
+
+    - added op_debounce_time, op_pluck, op_end_with, rx_combine_latest
+
+v0.22.0 2020-09-11T15:35:32Z
+
+    - added op_concat_map, op_exhaust_map
+    - refactored rx_concat
+
+v0.21.4 2020-09-11T08:45:20Z
+
+    - tests depend on a version of Mojolicious that implements Promises
+
+v0.21.3 2020-09-10T17:16:30Z
+
+    - depend on Sub::Util and Test2::V0
+
+v0.21.2 2020-09-10T17:07:35Z
+
+    - removed debugging code
+
+v0.21.1 2020-09-10T14:44:30Z
+
+    - op_distinct_util_changed now accepts an optional comparison function
+    - added op_distinct_until_key_changed
+
 v0.21.0 2020-09-10T13:26:42Z
 
     - added op_first
@@ -44,7 +80,7 @@ v0.16.2 2020-09-06T05:04:16Z
 v0.16.1 2020-09-06T04:42:39Z
 
     - removed FATAL warnings
-    - added rx_from (accepts arrays, promises, and observables)
+    - added rx_from (accepts arrays, promises and observables)
 
 v0.16.0 2020-09-04T13:32:59Z
 
@@ -64,7 +100,7 @@ v0.15.0 2020-09-03T16:55:09Z
 
 v0.14.0 2020-06-10T18:33:29Z
 
-    - Support for Mojo::IOLoop, AnyEvent, and IO::Async
+    - Support for Mojo::IOLoop, AnyEvent and IO::Async
 
 v0.0.1 2020-05-08T22:42:52Z
 

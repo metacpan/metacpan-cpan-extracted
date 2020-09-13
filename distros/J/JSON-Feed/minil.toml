@@ -1,5 +1,6 @@
 name = "JSON-Feed"
 badges = ['travis', 'codecov', 'metacpan']
 authority="cpan:GUGOD"
+license = "unrestricted"
 
 module_maker="ModuleBuildTiny"

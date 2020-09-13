@@ -1,5 +1,11 @@
 Revision history for DBIx::Class::Sims (ordered by revision number).
 
+0.500012 Sep 10 2020 12:00:00 PDT
+    - MANIFEST fix, from removal of DateTime::Event::Random
+    - Removed a handful of un-necessary dependencies
+    - Adjust Hash::Merge usage, so we no longer set the global merge
+      precedence, but instead use a localized Hash::Merge object
+
 0.500011 Jul 08 2020 20:00:00 PDT
    - Fix syntax error existing in 5.10.1
 

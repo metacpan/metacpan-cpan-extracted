@@ -10,7 +10,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
 generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -28,7 +28,7 @@ no_index:
 provides:
   JSON::Feed:
     file: lib/JSON/Feed.pm
-    version: '1.000'
+    version: '1.001'
   JSON::Feed::Types:
     file: lib/JSON/Feed/Types.pm
 requires:
@@ -40,7 +40,10 @@ resources:
   bugtracker: https://github.com/gugod/JSON-Feed/issues
   homepage: https://github.com/gugod/JSON-Feed
   repository: git://github.com/gugod/JSON-Feed.git
-version: '1.000'
+version: '1.001'
 x_authority: cpan:GUGOD
+x_contributors:
+  - 'Kang-min Liu <gugod@users.noreply.github.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

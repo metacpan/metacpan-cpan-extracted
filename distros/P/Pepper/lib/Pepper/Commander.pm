@@ -4,7 +4,7 @@ use 5.022001;
 use strict;
 use warnings;
 
-our $VERSION = "1.0.3";
+our $VERSION = "1.2.1";
 
 # for accepting options
 use IO::Prompter;
@@ -28,6 +28,7 @@ sub new {
 
 	# set up the object with all the options data
 	my $self = bless {
+		'pepper_directory' => $ENV{HOME}.'/pepper',
 		'pepper' => Pepper->new(
 			'skip_db' => 1,
 			'skip_config' => 1,
@@ -58,16 +59,11 @@ sub run {
 	# have to be one of these
 	if (!$args[0] || !$$dispatch{$args[0]}) {
 
-		die "Usage: pepper help|setup|set-endpoint|delete-endpoint|list-endpoints|test-db|test-endpoint|start|stop|restart\n('setup' must be run via sudo/root.)\n";
+		die "Usage: pepper help|setup|set-endpoint|delete-endpoint|list-endpoints|test-db|test-endpoint|start|stop|restart\n";
 		
 	# can not do anything without a config file
 	} elsif ($args[0] ne 'setup' && !(-e $self->{pepper}->{utils}->{config_file})) {
 		die "You must run 'pepper setup' to create a config file.\n";
-	
-	# setup must run as root
-	} elsif ($args[0] eq 'setup' && $> > 0) {
-	
-		die "The 'pepper setup' command must be run via sudo / as root.\n";
 	
 	# otherwise, run it
 	} else {
@@ -88,15 +84,15 @@ pepper: Utility command to configure and control the Pepper environment.
 
 # sudo pepper setup
 
-This is the configuration mode and must be run as root or via sudo. The Pepper 
-workspace will be created under /opt/pepper, unless it already exists.  You will 
-be prompted for the configuration options, and your configuration file will be 
-created or overwritten.
+This is the configuration mode. The Pepper workspace will be created as a 'pepper'
+directory within your home directory, aka $ENV{HOME}/pepper, unless it already exists.  
+You will be prompted for the configuration options, and your configuration file will 
+be created or overwritten.
 
 # pepper test-db
 
 This will perform a basic connection / query test on the database config you provided
-via 'pepper setup'.  Highly recommended to be run after setup.
+via 'pepper setup'.  
 
 # pepper set-endpoint [URI] [PerlModule]
 
@@ -105,7 +101,7 @@ requests.  The first argument is a URI and the second is a target Perl module fo
 handing GET/POST requests to the URI.  If these two arguments are not given, you
 will be prompted for the information.  
 
-If the Perl module does not exist under /opt/pepper/lib, an initial version will be created.
+If the Perl module does not exist under $ENV{HOME}/pepper/lib, an initial version will be created.
 
 # pepper list-endpoints
 
@@ -192,11 +188,11 @@ sub setup_and_configure {
 
 	my ($config_options_map, $config, $subdir_full, $subdir, $map_set, $key);
 
-	if (!(-d '/opt/pepper')) {
-		mkdir ('/opt/pepper');
+	if (! (-d $self->{pepper_directory} ) ) {
+		mkdir ($self->{pepper_directory});
 	}
 	foreach $subdir ('lib','config','psgi','log','template','template/system') {
-		$subdir_full = '/opt/pepper/'.$subdir;
+		$subdir_full = $self->{pepper_directory}.'/'.$subdir;
 		mkdir ($subdir_full) if !(-d $subdir_full);
 	}
 	
@@ -204,15 +200,32 @@ sub setup_and_configure {
 	my $utils = $self->{pepper}->{utils};
 	
 	$config_options_map = [
-		['system_username','System user to own and run this service (required)',$ENV{USER}],
-		['development_server','Is this a development server? (Y or N)','Y'],
-		['use_database','Connect to a MySQL/MariaDB database server? (Y or N)','Y'],
-		['database_server', 'Hostname or IP Address for your MySQL/MariaDB server (required)'],
-		['database_username', 'Username to connect to your MySQL/MariaDB server (required)'],
-		['database_password', 'Password to connect to your MySQL/MariaDB server (required)'],
-		['connect_to_database', 'Default connect-to database','information_schema'],
-		['url_mappings_database', 'Database to store URL/endpoint mappings.  Leave blank for JSON config file.'],
-		['default_endpoint_module', 'Default endpoint-handler Perl module. Leave blank for example module.'],
+		['development_server',
+			qq{
+Is this a development server? 
+If you select 'Y', errors will be piped to the screen and logged.
+Select 'N' for production servers, where errors will be logged but not shown to the user. 
+(Y or N)},'Y'],
+		['use_database',qq{
+Auto-Connect to a MySQL/MariaDB database server? 
+This will make the database/SQL methods available via the \$pepper object. 
+(Y or N)},'Y'],
+		['database_server', "\n".'Hostname or IP Address for your MySQL/MariaDB server (required)'],
+		['database_username', "\n".'Username to connect to your MySQL/MariaDB server (required)'],
+		['database_password', "\n".'Password to connect to your MySQL/MariaDB server (required)'],
+		['connect_to_database', qq{
+Default database for the MySQL/MariaDB connection.},'information_schema'],
+		['url_mappings_database', 
+			qq{
+Database to store URL/endpoint mappings. 
+A 'pepper_endpoints' table will be created and maintained via 'pepper set-endpoint'. 
+This is a faster option for handling requests, but you may leave blank for JSON config file.}],
+		['default_endpoint_module', 
+			qq{
+Default endpoint-handler Perl module.
+This will be used for URI's that have not been configured via 'pepper set-endpoint'.
+Exapme:  PepperApps::NiceEndPoint. Built under $self->{pepper_directory}/lib.
+Leave blank for example module.}],
 	];
 	
 	# does a configuration already exist?
@@ -226,15 +239,12 @@ sub setup_and_configure {
 	
 	# shared method below	
 	$config = $self->prompt_user($config_options_map);
-
-	my ($username,$pass,$uid,$gid) = getpwnam($$config{system_username})
-		or die "Error: System user '$$config{system_username}' does not exist.\n";
 	
 	# calculate the endpoint storage
 	if ($$config{url_mappings_database}) {
 		$$config{url_mappings_table} = $$config{url_mappings_database}.'.pepper_endpoints';
 	} else {
-		$$config{url_mappings_file} = '/opt/pepper/config/pepper_endpoints.json';
+		$$config{url_mappings_file} = $self->{pepper_directory}.'/config/pepper_endpoints.json';
 	}
 
 	# default endpoint handler
@@ -262,7 +272,7 @@ sub setup_and_configure {
 	foreach my $t_file (keys %$template_files) {
 		my $dest_dir = 'template/system'; # everything by the PSGI script goes in 'template'
 			$dest_dir = 'psgi' if $t_file eq 'pepper.psgi';
-		my $dest_file = '/opt/pepper/'.$dest_dir.'/'.$t_file;
+		my $dest_file = $self->{pepper_directory}.'/'.$dest_dir.'/'.$t_file;
 
 		# skip if already in place
 		next if -e $dest_file;
@@ -272,7 +282,7 @@ sub setup_and_configure {
 		my $contents = $pepper_templates->$template_method();
 		
 		# set the username for the SystemD service
-		$contents =~ s/User=root/User=$$config{system_username}/;
+		$contents =~ s/User=root/User=$ENV{USER}/;
 		
 		# now save it out
 		$utils->filer($dest_file,'write',$contents);
@@ -282,19 +292,16 @@ sub setup_and_configure {
 	$self->set_endpoint('default','default',$$config{default_endpoint_module});
 
 	# if the HTML endpoint example isn't already there, add it in
-	my $html_example_handler = '/opt/pepper/lib/PepperApps/HTMLExample.pm';
+	my $html_example_handler = $self->{pepper_directory}.'/lib/PepperApps/HTMLExample.pm';
 	if (!(-e "$html_example_handler")) {
-		mkdir( '/opt/pepper/lib/PepperApps');
+		mkdir( $self->{pepper_directory}.'/lib/PepperApps');
 		$self->set_endpoint('/pepper/html_example','/pepper/html_example','PepperApps::HTMLExample');
 		# make it second, so nothing will be said on first go-round
 		my $html_example_code = $pepper_templates->html_example_endpoint('perl');
 		$utils->filer($html_example_handler,'write',$html_example_code);
 	}
 
-	# the system user owns the directory tree
-	system("chown -R $$config{system_username}:$$config{system_username} /opt/pepper");
-	
-	print "\nConfiguration complete and workspace ready under /opt/pepper\n";
+	print "\nConfiguration complete and workspace ready under $self->{pepper_directory}\n";
 
 }
 
@@ -343,20 +350,22 @@ sub set_endpoint {
 	my (@module_path, $directory_path, $part);
 	(@module_path) = split /\:\:/, $$endpoint_data{endpoint_handler};
 	if ($module_path[1]) {
-		$directory_path = '/opt/pepper/lib';
+		$directory_path = $ENV{HOME}.'/pepper/lib';
 		foreach $part (@module_path) {
 			if ($part ne $module_path[-1]) {
 				$directory_path .= '/'.$part;
 				if (!(-d $directory_path)) {
 					mkdir($directory_path);
-					system("chown -R $utils->{config}{system_username}:$utils->{config}{system_username} $directory_path");		
 				}
 			}
 		}
 	}
 	
+	# for the directory in the endpoint
+	$$endpoint_data{pepper_directory} = $self->{pepper_directory};
+	
 	($module_file = $$endpoint_data{endpoint_handler}) =~ s/\:\:/\//g;
-	$module_file = '/opt/pepper/lib/'.$module_file.'.pm';
+	$module_file = $self->{pepper_directory}.'/lib/'.$module_file.'.pm';
 	if (!(-e $module_file)) { # start the handler
 		$utils->template_process({
 			'template_file' => 'system/endpoint_handler.tt',
@@ -364,8 +373,6 @@ sub set_endpoint {
 			'save_file' => $module_file
 		});	
 		$extra_text = "\n".$module_file." was created.  Please edit to taste\n";
-		
-		system("chown $utils->{config}{system_username}:$utils->{config}{system_username} $module_file");
 		
 	} else {
 		$extra_text = "\n".$module_file." already exists and was left unchanged.\n";
@@ -492,7 +499,7 @@ sub test_endpoint {
 
 	# return the test
 	print "\nTesting $endpoint_uri...\n";
-	my $app = Plack::Util::load_psgi '/opt/pepper/psgi/pepper.psgi';
+	my $app = Plack::Util::load_psgi $self->{pepper_directory}.'/psgi/pepper.psgi';
 	my $test = Plack::Test->create($app);
 	my $res = $test->request(GET $endpoint_uri);
 	
@@ -500,7 +507,7 @@ sub test_endpoint {
 	if ($res->status_line eq '200 OK' ) {
 		print "Success: Endpoint returns 200 OK\n";
 	} else {
-		print "Error: Endpoint returns 500 Internal Server Error.  Check fatal log under /opt/pepper/log\n";
+		print "Error: Endpoint returns 500 Internal Server Error.  Check fatal log under $self->{pepper_directory}/log\n";
 	}
 
 }
@@ -547,6 +554,14 @@ sub prompt_user {
 			$$results{$prompt_key} = prompt $the_prompt, -stdio, -v;
 		}		
 		
+		# Y or N means Y or N
+		if ($$prompt_set[1] =~ /Y or N/) {
+			$$results{$prompt_key} = uc( $$results{$prompt_key} ) ; # might have typed 'y'
+			if ($$results{$prompt_key} !~ /^(Y|N)$/) { # if not exactly right, use the default or just N
+				$$results{$prompt_key} = $$prompt_set[2] || 'N';
+			}
+		}		
+		
 		# accept defaults
 		$$results{$prompt_key} ||= $$prompt_set[2];
 
@@ -559,16 +574,16 @@ sub prompt_user {
 sub plack_controller {
 	my ($self,@args) = @_;
 
-	my $pid_file = '/opt/pepper/log/pepper.pid';
+	my $pid_file = $self->{pepper_directory}.'/log/pepper.pid';
 	
 	my $dev_reload = '';
-		$dev_reload = '-R /opt/pepper/lib' if $args[2];
+		$dev_reload = '-R '.$self->{pepper_directory}.'/lib' if $args[2];
 		
 	if ($args[0] eq 'start') {
 
 		my $max_workers = $args[1] || 10;
 
-		system(qq{/usr/local/bin/start_server --enable-auto-restart --auto-restart-interval=300 --port=5000 --dir=/opt/pepper/psgi --log-file="| rotatelogs /opt/pepper/log/pepper.log 86400" --daemonize --pid-file=$pid_file -- plackup -s Gazelle --max-workers=$max_workers -E deployment $dev_reload pepper.psgi});
+		system(qq{start_server --enable-auto-restart --auto-restart-interval=300 --port=5000 --dir=$self->{pepper_directory}/psgi --log-file=$self->{pepper_directory}/log/pepper.log --daemonize --pid-file=$pid_file -- plackup -s Gazelle --max-workers=$max_workers -E deployment $dev_reload pepper.psgi});
 	
 	} elsif ($args[0] eq 'stop') {
 		
@@ -591,15 +606,14 @@ Pepper::Commander
 =head1 DESCRIPTION / PURPOSE
 
 This package provides all the functionality for the 'pepper' command script, which
-allows you to configure and start/stop the Pepper Plack service.  The 'pepper' 
-command must be run as root or via sudo, and expects at least one argument.
+allows you to configure and start/stop the Pepper Plack service. 
 
 =head2 sudo pepper setup
 
-This is the configuration mode and must be run as root or via sudo. The Pepper 
-workspace will be created under /opt/pepper, unless it already exists.  You will 
-be prompted for the configuration options, and your configuration file will be 
-created or overwritten.
+This is the configuration mode. The Pepper workspace will be created as a 'pepper'
+directory within your home directory, aka $ENV{HOME}/pepper, unless it already exists.  
+You will be prompted for the configuration options, and your configuration file will 
+be created or overwritten.
 
 =head2 pepper test-db
 
@@ -614,7 +628,7 @@ handing GET/POST requests to the URI.  If these two arguments are not given, you
 will be prompted for the information.  Use 'default' for the URI to set a default
 endpoint handler.
 
-If the Perl module does not exist under /opt/pepper/lib, an initial version will be created.
+If the Perl module does not exist under $ENV{HOME}/pepper/lib, an initial version will be created.
 
 =head2 pepper list-endpoints
 

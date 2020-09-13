@@ -1,0 +1,60 @@
+{
+   "abstract" : "regather - LDAP syncrepl consumer script to perform actions desired on syncrepl event",
+   "author" : [
+      "Zeus Panchenko <zeus@gnu.org.ua>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Regather",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::AST" : "1.05",
+            "Config::Parser" : "1.04",
+            "Config::Parser::ldap" : "1.00",
+            "Data::Printer" : "0.38",
+            "File::Temp" : "0.22",
+            "Mail::Send" : "0.80",
+            "Net::DNS" : "1.15",
+            "Net::LDAP" : "0.65",
+            "Sys::Syslog" : "0.29",
+            "Template" : "2.29",
+            "Text::Locus" : "1.01",
+            "perl" : "5.016001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "ssh://git@github.com:z-eos/regather.git",
+         "web" : "https://github.com/z-eos/regather.git"
+      }
+   },
+   "version" : "v0.80.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

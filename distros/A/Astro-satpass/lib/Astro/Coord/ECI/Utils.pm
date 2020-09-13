@@ -8,25 +8,6 @@ Astro::Coord::ECI::Utils - Utility routines for astronomical calculations
  my $now = time ();
  print "The current Julian day is ", julianday ($now);
 
-=head1 DEPRECATION NOTICE
-
-As of release 0.101, subroutines C<equation_of_time()>,
-C<nutation_in_longitude()>, C<nutation_in_obliquity()>, and
-C<obliquity()> are deprecated in favor of
-L<Astro::Coord::ECI|Astro::Coord::ECI> methods C<equation_of_time()>,
-C<nutation_in_longitude()>, C<nutation_in_obliquity()>, and
-C<obliquity()>.
-
-The motivation for this change is to give higher-accuracy classes a way
-to provide higher-accuracy versions of these calculations to the
-L<Astro::Coord::ECI|Astro::Coord::ECI> coordinate-transformation code.
-
-As of version 0.104 these warn on the first use, as will the first
-attempt to call C<equation_of_time()> and C<obliquity()> as a subroutine
-(i.e. with a first argument that looks like a number). As of version
-0.109 all calls will result in a warning. As of version 0.113 all calls
-will be fatal.
-
 =head1 DESCRIPTION
 
 This module was written to provide a home for all the constants and
@@ -142,7 +123,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.115';
+our $VERSION = '0.116';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -296,11 +277,11 @@ my @all_external = ( qw{
 	acos add_magnitudes asin
 	atmospheric_extinction date2epoch date2jd
 	decode_space_track_json_time deg2rad distsq dynamical_delta
-	embodies epoch2datetime equation_of_time find_first_true
+	embodies epoch2datetime find_first_true
 	fold_case format_space_track_json_time intensity_to_magnitude
 	jcent2000 jd2date jd2datetime jday2000 julianday
 	keplers_equation load_module looks_like_number max min mod2pi
-	nutation_in_longitude nutation_in_obliquity obliquity omega
+	omega
 	position_angle
 	rad2deg rad2dms rad2hms tan theta0 thetag vector_cross_product
 	vector_dot_product vector_magnitude vector_unitize __classisa
@@ -314,8 +295,6 @@ our @EXPORT_OK = (
 );
 
 my %deprecated_export = map { $_ => 1 } qw{
-    equation_of_time
-    nutation_in_longitude nutation_in_obliquity obliquity
 };
 
 our %EXPORT_TAGS = (
@@ -691,50 +670,6 @@ sub epoch2datetime {
 	0);
     return strftime ($DATETIMEFORMAT, $sec, $min, $hr, $day, $mon, $yr,
 	$wday, $yd, 0);
-}
-
-
-=item $seconds = equation_of_time ($time);
-
-This subroutine returns the equation of time at the given B<dynamical>
-time.
-
-The algorithm is from W. S. Smart's "Text-Book on Spherical Astronomy",
-as reported in Jean Meeus' "Astronomical Algorithms", 2nd Edition,
-Chapter 28, page 185.
-
-This subroutine is deprecated in favor of the
-L<Astro::Coord::ECI|Astro::Coord::ECI> C<equation_of_time()> method.
-As of version C<0.113> it produces a fatal error.
-
-=cut
-
-sub equation_of_time {
-
-    my $time = shift;
-
-    __subroutine_deprecation();
-
-    my $epsilon = obliquity ($time);
-    my $y = tan($epsilon / 2);
-    $y *= $y;
-
-
-#	The following algorithm is from Meeus, chapter 25, page, 163 ff.
-
-    my $T = jcent2000($time);				# Meeus (25.1)
-    my $L0 = mod2pi(deg2rad((.0003032 * $T + 36000.76983) * $T	# Meeus (25.2)
-	    + 280.46646));
-    my $M = mod2pi(deg2rad(((-.0001537) * $T + 35999.05029)	# Meeus (25.3)
-	    * $T + 357.52911));
-    my $e = (-0.0000001267 * $T - 0.000042037) * $T + 0.016708634;# Meeus (25.4)
-
-    my $E = $y * sin (2 * $L0) - 2 * $e * sin ($M) +
-	4 * $e * $y * sin ($M) * cos (2 * $L0) -
-	$y * $y * .5 * sin (4 * $L0) -
-	1.25 * $e * $e * sin (2 * $M);				# Meeus (28.3)
-
-    return $E * SECSPERDAY / TWOPI;	# The formula gives radians.
 }
 
 
@@ -1130,106 +1065,6 @@ $theta < TWOPI.
 =cut
 
 sub mod2pi {return $_[0] - floor ($_[0] / TWOPI) * TWOPI}
-
-
-=item $delta_psi = nutation_in_longitude ($time)
-
-This subroutine calculates the nutation in longitude (delta psi) for
-the given B<dynamical> time.
-
-The algorithm comes from Jean Meeus' "Astronomical Algorithms", 2nd
-Edition, Chapter 22, pages 143ff. Meeus states that it is good to
-0.5 seconds of arc.
-
-This subroutine is deprecated in favor of the
-L<Astro::Coord::ECI|Astro::Coord::ECI> C<nutation()> method.
-As of version C<0.113> it produces a fatal error.
-
-=cut
-
-sub nutation_in_longitude {
-    my $time = shift;
-
-    __subroutine_deprecation();
-
-    my $T = jcent2000 ($time);	# Meeus (22.1)
-
-    my $omega = mod2pi (deg2rad ((($T / 450000 + .0020708) * $T -
-	    1934.136261) * $T + 125.04452));
-
-    my $L = mod2pi (deg2rad (36000.7698 * $T + 280.4665));
-    my $Lprime = mod2pi (deg2rad (481267.8813 * $T + 218.3165));
-    my $delta_psi = deg2rad ((-17.20 * sin ($omega) - 1.32 * sin (2 * $L)
-	    - 0.23 * sin (2 * $Lprime) + 0.21 * sin (2 * $omega))/3600);
-
-    return $delta_psi;
-}
-
-
-=item $delta_epsilon = nutation_in_obliquity ($time)
-
-This subroutine calculates the nutation in obliquity (delta epsilon)
-for the given B<dynamical> time.
-
-The algorithm comes from Jean Meeus' "Astronomical Algorithms", 2nd
-Edition, Chapter 22, pages 143ff. Meeus states that it is good to
-0.1 seconds of arc.
-
-This subroutine is deprecated in favor of the
-L<Astro::Coord::ECI|Astro::Coord::ECI> C<nutation()> method.
-As of version C<0.113> it produces a fatal error.
-
-=cut
-
-sub nutation_in_obliquity {
-    my $time = shift;
-
-    __subroutine_deprecation();
-
-    my $T = jcent2000 ($time);	# Meeus (22.1)
-
-    my $omega = mod2pi (deg2rad ((($T / 450000 + .0020708) * $T -
-	    1934.136261) * $T + 125.04452));
-
-    my $L = mod2pi (deg2rad (36000.7698 * $T + 280.4665));
-    my $Lprime = mod2pi (deg2rad (481267.8813 * $T + 218.3165));
-    my $delta_epsilon = deg2rad ((9.20 * cos ($omega) + 0.57 * cos (2 * $L) +
-	    0.10 * cos (2 * $Lprime) - 0.09 * cos (2 * $omega))/3600);
-
-    return $delta_epsilon;
-}
-
-
-=item $epsilon = obliquity ($time)
-
-This subroutine calculates the obliquity of the ecliptic in radians at
-the given B<dynamical> time.
-
-The algorithm comes from Jean Meeus' "Astronomical Algorithms", 2nd
-Edition, Chapter 22, pages 143ff. The conversion from universal to
-dynamical time comes from chapter 10, equation 10.2  on page 78.
-
-This subroutine is deprecated in favor of the
-L<Astro::Coord::ECI|Astro::Coord::ECI> C<obliquity()> method.
-As of version C<0.113> it produces a fatal error.
-
-=cut
-
-use constant E0BASE => (21.446 / 60 + 26) / 60 + 23;
-
-sub obliquity {
-    my $time = shift;
-
-    __subroutine_deprecation();
-
-    my $T = jcent2000 ($time);	# Meeus (22.1)
-
-    my $delta_epsilon = nutation_in_obliquity ($time);
-
-    my $epsilon0 = deg2rad (((0.001813 * $T - 0.00059) * $T - 46.8150)
-	    * $T / 3600 + E0BASE);
-    return $epsilon0 + $delta_epsilon;
-}
 
 
 =item $radians = omega ($time);
@@ -1662,20 +1497,6 @@ sub __sprintf {
 
 {
     my %deprecate = (
-	equation_of_time	=> {
-	    level	=> 3,
-	},
-	nutation_in_longitude	=> {
-	    level	=> 3,
-	    method	=> 'nutation',
-	},
-	nutation_in_obliquity	=> {
-	    level	=> 3,
-	    method	=> 'nutation',
-	},
-	obliquity	=> {
-	    level	=> 3,
-	},
     );
 
     sub __subroutine_deprecation {

@@ -1,7 +1,7 @@
 package Org::Element::TimeRange;
 
-our $DATE = '2020-04-01'; # DATE
-our $VERSION = '0.551'; # VERSION
+our $DATE = '2020-09-11'; # DATE
+our $VERSION = '0.552'; # VERSION
 
 use 5.010;
 use locale;
@@ -42,7 +42,7 @@ Org::Element::TimeRange - Represent Org time range (TS1--TS2)
 
 =head1 VERSION
 
-This document describes version 0.551 of Org::Element::TimeRange (from Perl distribution Org-Parser), released on 2020-04-01.
+This document describes version 0.552 of Org::Element::TimeRange (from Perl distribution Org-Parser), released on 2020-09-11.
 
 =head1 DESCRIPTION
 

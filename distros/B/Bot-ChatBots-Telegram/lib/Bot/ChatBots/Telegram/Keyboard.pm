@@ -1,7 +1,7 @@
 package Bot::ChatBots::Telegram::Keyboard;
 use strict;
 use warnings;
-{ our $VERSION = '0.012'; }
+{ our $VERSION = '0.014'; }
 
 use Ouch;
 use Log::Any qw< $log >;

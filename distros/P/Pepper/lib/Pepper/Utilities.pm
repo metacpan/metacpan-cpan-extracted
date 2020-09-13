@@ -1,6 +1,6 @@
 package Pepper::Utilities;
 
-$Pepper::Utilities::VERSION = '1.0.3';
+$Pepper::Utilities::VERSION = '1.2.1';
 
 # for utf8 support with JSON
 use utf8;
@@ -33,7 +33,8 @@ sub new {
 		'request' => $$args{request},
 		'response' => $$args{response},
 		'json_coder' => Cpanel::JSON::XS->new->utf8->allow_nonref->allow_blessed,
-		'config_file' => '/opt/pepper/config/pepper.cfg',
+		'config_file' => $ENV{HOME}.'/pepper/config/pepper.cfg',
+		'pepper_directory' => $ENV{HOME}.'/pepper',
 	}, $class;
 	
 	# read in the system configuration
@@ -175,7 +176,7 @@ sub template_process {
 
 	# default include path
 	if (!$$args{include_path}) {
-		$$args{include_path} = '/opt/pepper/template/';
+		$$args{include_path} = $self->{pepper_directory}.'/template/';
 	} elsif ($$args{include_path} !~ /\/$/) { # make sure of trailing /
 		$$args{include_path} .= '/';
 	}
@@ -255,7 +256,7 @@ sub logger {
 	if ($log_directory && -d $log_directory) { # yes
 		$log_file = $log_directory.'/'.$log_type.'-'.$todays_date.'.log';
 	} else { # nope, take default
-		$log_file = '/opt/pepper/log/'.$log_type.'-'.$todays_date.'.log';
+		$log_file = $self->{pepper_directory}.'/log/'.$log_type.'-'.$todays_date.'.log';
 	}
 
 	# sometimes time() adds a \n

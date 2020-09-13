@@ -444,11 +444,11 @@ KEYWORDS
         include Classes;
       }
   
-      # MpApp/Roles.pl
+      # MyApp/Roles.zydeco.pm
       role Foo;
       role Bar;
   
-      # MyApp/Classes.pl
+      # MyApp/Classes.zydeco.pm
       class Foo::Bar with Foo, Bar;
 
   `Zydeco::PACKAGE_SPEC()`

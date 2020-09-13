@@ -1,8 +1,11 @@
 requires 'perl', '5.010'; # TODO: find the right version
 
+requires 'Sub::Util', '1.41';
+
 on 'test' => sub {
     requires 'Test2::Suite';
-    requires 'Mojolicious'; # TODO: find the right version
+    requires 'Test2::V0';
+    requires 'Mojolicious', '7.49';
     requires 'IO::Async'; # TODO: find the right version
     requires 'AnyEvent'; # TODO: find the right version
 };

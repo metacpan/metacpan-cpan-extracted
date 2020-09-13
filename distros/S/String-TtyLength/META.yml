@@ -1,9 +1,10 @@
 ---
-abstract: 'calculate length of string excluding ANSI tty codes'
+abstract: 'length or width of string excluding ANSI tty codes'
 author:
   - 'Neil Bowers <neilb@cpan.org>'
 build_requires:
   Test2::V0: '0'
+  utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -15,6 +16,7 @@ meta-spec:
 name: String-TtyLength
 requires:
   Exporter: '0'
+  Unicode::EastAsianWidth: '12.0'
   parent: '0'
   perl: '5.006'
   strict: '0'
@@ -23,6 +25,6 @@ resources:
   bugtracker: https://github.com/neilb/String-TtyLength/issues
   homepage: https://github.com/neilb/String-TtyLength
   repository: https://github.com/neilb/String-TtyLength.git
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

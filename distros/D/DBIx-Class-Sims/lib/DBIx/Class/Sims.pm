@@ -5,7 +5,7 @@ use 5.010_001;
 
 use strictures 2;
 
-our $VERSION = '0.500011';
+our $VERSION = '0.500012';
 
 {
   # Do **NOT** import a clone() function into the DBIx::Class::Schema namespace
@@ -37,7 +37,7 @@ use DDP;
 use Data::Walk qw( walk );
 use DateTime;
 use DBIx::Class::TopoSort ();
-use Hash::Merge qw( merge );
+use Hash::Merge;
 use List::Util qw( first );
 use List::MoreUtils qw( natatime );
 use Scalar::Util qw( blessed );
@@ -105,17 +105,16 @@ use DBIx::Class::Sims::Types;
 use DBIx::Class::Sims::Runner;
 use DBIx::Class::Sims::Util qw( normalize_aoh reftype );
 
-Hash::Merge::set_behavior('RIGHT_PRECEDENT');
-
 sub add_sims {
   my $class = shift;
   my ($schema, $source, @remainder) = @_;
 
   my $rsrc = $schema->source($source);
   my $it = natatime(2, @remainder);
+  my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
   while (my ($column, $sim_info) = $it->()) {
     my $col_info = $schema->source($source)->column_info($column) // next;
-    $col_info->{sim} = merge(
+    $col_info->{sim} = $merger->merge(
       $col_info->{sim} // {},
       $sim_info // {},
     );
@@ -265,6 +264,7 @@ sub massage_input {
   my ($schema, $struct) = @_;
 
   my $dtp = $schema->storage->datetime_parser;
+  my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
   walk({
     preprocess => sub {
       # Don't descend into the weeds. Only do the things we care about.
@@ -279,7 +279,7 @@ sub massage_input {
 
         # Expand the dot-naming convention.
         while ( $k =~ /([^.]*)\.(.*)/ ) {
-          $t->{$1} = merge(
+          $t->{$1} = $merger->merge(
             ($t->{$1} // {}),
             { $2 => delete($t->{$k}) },
           );

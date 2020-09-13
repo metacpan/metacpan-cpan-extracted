@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Check;
 # ABSTRACT: Check your git repository before releasing
 
-our $VERSION = '2.046';
+our $VERSION = '2.047';
 
 use Moose;
 use namespace::autoclean 0.09;
@@ -60,7 +60,7 @@ sub _perform_checks {
 
     # fetch current branch
     my ($branch) =
-        map { /^\*\s+(.+)/ ? $1 : () }
+        map /^\*\s+(.+)/ ? $1 : (),
         $git->branch;
 
     # check if some changes are staged for commit
@@ -70,7 +70,7 @@ sub _perform_checks {
 
         my $errmsg =
             "branch $branch has some changes staged for commit:\n" .
-            join "\n", map { "\t$_" } @output;
+            join "\n", map "\t$_", @output;
         $self->$log_method($errmsg);
     }
 
@@ -82,7 +82,7 @@ sub _perform_checks {
 
         my $errmsg =
             "branch $branch has some uncommitted files:\n" .
-            join "\n", map { "\t$_" } @output;
+            join "\n", map "\t$_", @output;
         $self->$log_method($errmsg);
     }
 
@@ -100,7 +100,7 @@ sub _perform_checks {
 
         my $errmsg =
             "branch $branch has some untracked files:\n" .
-                join "\n", map { "\t$_" } @output;
+                join "\n", map "\t$_", @output;
         $self->$log_method($errmsg);
       }
     }
@@ -139,7 +139,7 @@ Dist::Zilla::Plugin::Git::Check - Check your git repository before releasing
 
 =head1 VERSION
 
-version 2.046
+version 2.047
 
 =head1 SYNOPSIS
 

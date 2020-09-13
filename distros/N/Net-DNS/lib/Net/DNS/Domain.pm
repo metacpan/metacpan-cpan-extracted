@@ -1,9 +1,9 @@
 package Net::DNS::Domain;
 
 #
-# $Id: Domain.pm 1784 2020-05-24 19:27:13Z willem $
+# $Id: Domain.pm 1804 2020-09-07 07:57:36Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1784 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1804 $)[1];
 
 
 =head1 NAME
@@ -50,8 +50,8 @@ use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see Unicode TR#16 3.6]
 	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
 };
 
-use constant LIBIDN  => defined eval 'require Net::LibIDN';
 use constant LIBIDN2 => ref eval 'require Net::LibIDN2; Net::LibIDN2->can("idn2_to_ascii_8")';
+use constant LIBIDN  => LIBIDN2 ? undef : defined eval 'require Net::LibIDN';
 
 use constant IDN2FLAG => eval 'Net::LibIDN2::IDN2_NFC_INPUT + Net::LibIDN2::IDN2_NONTRANSITIONAL';
 
@@ -122,7 +122,7 @@ sub new {
 			croak Net::LibIDN2::idn2_strerror($rc) unless $_;
 		}
 
-		if ( !LIBIDN2 && LIBIDN && UTF8 && /[^\000-\177]/ ) {
+		if ( LIBIDN && UTF8 && /[^\000-\177]/ ) {
 			s/\134/\357\277\275/;			# disallow escapes
 			$_ = Net::LibIDN::idn_to_ascii( $_, 'utf-8' );
 			croak 'name contains disallowed character' unless $_;
@@ -205,7 +205,7 @@ sub xname {
 		return $self->{xname} = $u8 ? $utf8->decode($u8) : $name;
 	}
 
-	if ( !LIBIDN2 && LIBIDN && UTF8 && $name =~ /xn--/i ) {
+	if ( LIBIDN && UTF8 && $name =~ /xn--/i ) {
 		my $self = shift;
 		return $self->{xname} if defined $self->{xname};
 		return $self->{xname} = $utf8->decode( Net::LibIDN::idn_to_unicode $name, 'utf-8' );

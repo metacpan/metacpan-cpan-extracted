@@ -9,9 +9,9 @@ use parent 'Mojolicious::Plugin';
 
 use Carp;
 use Data::Validate::WithYAML;
-use File::Spec;
+use Mojo::File qw(path);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -20,11 +20,12 @@ sub register {
     $config->{no_steps}  = 1          if !defined $config->{no_steps};
 
     $app->helper( 'validate' => sub {
-        my ($c, $file) = @_;
+        my ($c, $file, $step) = @_;
 
         my $validator = _validator( $file, $config );
         my %params    = %{ $c->req->params->to_hash };
-        my %errors    = $validator->validate( %params );
+        my @args      = $step ? $step : ();
+        my %errors    = $validator->validate( @args, %params );
 
         my $prefix = exists $config->{error_prefix} ?
             $config->{error_prefix} :
@@ -56,9 +57,7 @@ sub _validator {
         $file      = (split /::/, $caller[3])[-1];
     }
 
-    my $path = File::Spec->rel2abs(
-        File::Spec->catfile( $config->{conf_path}, $file . '.yml' )
-    );
+    my $path = path( $config->{conf_path},  $file . '.yml' )->to_string;
 
     croak "$path does not exist" if !-e $path;
 
@@ -84,7 +83,7 @@ Mojolicious::Plugin::Data::Validate::WithYAML - validate form input with Data::V
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '2.29'; # VERSION
+our $VERSION = '2.32'; # VERSION
 
 
 sub import {
@@ -506,6 +506,7 @@ sub inline_auto_include {
 
 sub Inline {
   my ($class, $language) = @_;
+  return unless defined $language;
   return if $language !~ /^(C|CPP)$/;
   my $config = {
     # INC should arguably be for -I flags only, but
@@ -625,7 +626,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 2.29
+version 2.32
 
 =head1 SYNOPSIS
 
@@ -679,7 +680,7 @@ Or if you are using L<ExtUtils::Depends>:
    $eud->get_makefile_vars
  );
 
-If you are using L<Alien:Base::ModuleBuild> instead of the recommended L<Alien::Build>
+If you are using L<Alien::Base::ModuleBuild> instead of the recommended L<Alien::Build>
 and L<alienfile>, then in your C<MyLibrary::XS> module, you may need something like
 this in your main C<.pm> file IF your library uses dynamic libraries:
 

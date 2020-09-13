@@ -1,5 +1,11 @@
 Revision history for Dist::Zilla::Plugin::Git
 
+2.047     2020-09-12 22:00:12Z
+  - added 'signoff' config option to cause Git::Commit to pass
+    --signoff to git-commit (Sean Whitton, RT#57925, PR#3)
+  - explicitly set the 'master' branch name in tests (Michael McClimon, PR#4)
+  - [Git::GatherDir] now warns on the use of unused [GatherDir] configs
+
 2.046     2019-03-17 01:16:52Z
   - added %V format code for the version number with the leading 'v'
     stripped off, if it exists.

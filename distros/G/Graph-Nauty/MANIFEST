@@ -8,7 +8,7 @@ Nauty.xs
 README
 dist.ini
 lib/Graph/Nauty.pm
-lib/Graph/Nauty/EdgeNode.pm
+lib/Graph/Nauty/EdgeVertex.pm
 ppport.h
 t/01_use.t
 t/02_pentagon.t

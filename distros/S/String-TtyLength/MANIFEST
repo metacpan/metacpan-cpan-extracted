@@ -8,4 +8,5 @@ Makefile.PL
 README
 dist.ini
 lib/String/TtyLength.pm
-t/basic.t
+t/tty_length.t
+t/tty_width.t

@@ -4,7 +4,7 @@ Geo::Elevation::HGT - Elevation service with terrain data provided by [Mapzen an
 
 # Version
 
-Version 0.04
+Version 0.05
 
 # Synopsis
 

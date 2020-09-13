@@ -1,0 +1,87 @@
+{
+   "abstract" : "An Art World simulator game 🎨",
+   "author" : [
+      "Sébastien Feugère <sebastien@feugere.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.11",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Art-World",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Printer" : "== 0.40",
+            "Faker" : "== 1.03",
+            "Test::Pod" : "0",
+            "Zydeco" : "== 0.603",
+            "perl" : "v5.32.0"
+         }
+      }
+   },
+   "provides" : {
+      "Art" : {
+         "file" : "lib/Art.pm"
+      },
+      "Art::Wildlife" : {
+         "file" : "lib/Art/Wildlife.pm"
+      },
+      "Art::World" : {
+         "file" : "lib/Art/World.pm",
+         "version" : "0.15"
+      },
+      "MyApp" : {
+         "file" : "lib/MyApp.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/smonff/art-world/issues"
+      },
+      "homepage" : "https://gitlab.com/smonff/art-world",
+      "repository" : {
+         "url" : "git://gitlab.com/smonff/art-world.git",
+         "web" : "https://gitlab.com/smonff/art-world"
+      }
+   },
+   "version" : "0.15",
+   "x_authority" : "cpan:SMONFF",
+   "x_contributors" : [
+      "Seb Hu-Rillettes <shr@balik.network>",
+      "Sébastien Feugère <smonff@riseup.net>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

@@ -12,37 +12,83 @@ use Scalar::Util 'weaken', 'blessed';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    rx_observable rx_of rx_concat rx_defer rx_EMPTY rx_from_event
-    rx_from_event_array rx_interval rx_merge rx_NEVER rx_race
+    rx_observable rx_combine_latest rx_concat rx_defer rx_EMPTY rx_from_event
+    rx_from_event_array rx_interval rx_merge rx_NEVER rx_of rx_race
     rx_subject rx_throw_error rx_timer rx_from
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 sub rx_observable;
 
-sub _rx_concat_helper {
-    my ($sources, $subscriber, $early_returns) = @_;
+sub rx_combine_latest {
+    my ($sources) = @_;
 
-    @$sources or do {
+    return rx_observable->new(sub {
+        my ($subscriber) = @_;
+
+        my $sources = [@$sources];
+
+        my %own_subscriptions;
+        my $i = 0;
+        my %didnt_emit = map {($i++, 1)} @$sources;
+        my @latest_values;
+        my $num_active = @$sources;
+
+        get_subscription_from_subscriber($subscriber)->add_dependents(
+            \%own_subscriptions, sub { undef @$sources },
+        );
+
+        for (my $i = 0; $i < @$sources; $i++) {
+            my $j = $i;
+            my $source = $sources->[$j];
+            my $own_subscription = RxPerl::Subscription->new;
+            $own_subscriptions{$own_subscription} = $own_subscription;
+            my $own_observer = {
+                new_subscription => $own_subscription,
+                next             => sub {
+                    my ($value) = @_;
+
+                    $latest_values[$j] = $value;
+                    delete $didnt_emit{$j};
+
+                    if (!%didnt_emit) {
+                        $subscriber->{next}->([@latest_values]) if defined $subscriber->{next};
+                    }
+                },
+                error            => $subscriber->{error},
+                complete         => sub {
+                    $num_active--;
+                    if ($num_active == 0) {
+                        $subscriber->{complete}->() if defined $subscriber->{complete};
+                    }
+                },
+            };
+            $source->subscribe($own_observer);
+        }
+
+        return;
+    });
+}
+
+sub _rx_concat_helper {
+    my ($sources, $subscriber, $active) = @_;
+
+    if (! @$sources) {
         $subscriber->{complete}->() if defined $subscriber->{complete};
         return;
-    };
+    }
 
     my $source = shift @$sources;
-
     my $own_subscription = RxPerl::Subscription->new;
-    @$early_returns = ($own_subscription);
-    get_subscription_from_subscriber($subscriber)->add_dependents($early_returns);
-
     my $own_subscriber = {
         new_subscription => $own_subscription,
-        next             => $subscriber->{next},
-        error            => $subscriber->{error},
-        complete         => sub {
-            _rx_concat_helper->($sources, $subscriber, $early_returns);
+        next     => $subscriber->{next},
+        error    => $subscriber->{error},
+        complete => sub {
+            _rx_concat_helper($sources, $subscriber, $active);
         },
     };
-
+    @$active = ($own_subscription);
     $source->subscribe($own_subscriber);
 }
 
@@ -54,9 +100,12 @@ sub rx_concat {
 
         my @sources = @sources;
 
-        my $early_returns = [];
-        get_subscription_from_subscriber($subscriber)->add_dependents($early_returns, sub { @sources = () });
-        _rx_concat_helper(\@sources, $subscriber, $early_returns);
+        my @active;
+        get_subscription_from_subscriber($subscriber)->add_dependents(
+            \@active, sub { undef @sources },
+        );
+
+        _rx_concat_helper(\@sources, $subscriber, \@active);
 
         return;
     });

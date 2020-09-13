@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 use Redis;
 use List::MoreUtils qw( bsearch );
@@ -116,6 +116,13 @@ sub new {
   return $self;
 }
 
+sub run_command {
+  my $self     = shift;
+  my $cmd_name = shift;
+
+  return $self->_route( $cmd_name, [ @_ ] );
+}
+
 sub nodes {
   my $self         = shift;
   my $key          = shift;
@@ -220,8 +227,8 @@ sub _discover_cluster {
     $nodes = [ keys %nodes_pool ];
   }
 
-  $self->_execute( 'cluster_state', [], $nodes );
-  my $slots = $self->_execute( 'cluster_slots', [], $nodes );
+  $self->_run_command( 'cluster_state', [], $nodes );
+  my $slots = $self->_run_command( 'cluster_slots', [], $nodes );
 
   unless ( @{$slots} ) {
     croak 'ERR Returned empty list of slots';
@@ -302,7 +309,7 @@ sub _prepare_slaves {
   foreach my $hostport ( @{$slave_nodes} ) {
     local $@;
 
-    eval { $self->_execute( 'readonly', [], [ $hostport ] ) };
+    eval { $self->_run_command( 'readonly', [], [ $hostport ] ) };
 
     if ($@) {
       warn $@;
@@ -316,7 +323,7 @@ sub _load_commands {
   my $self = shift;
 
   my $nodes = $self->_nodes( undef, $self->{allow_slaves} );
-  my $commands_raw = $self->_execute( 'command', [], $nodes );
+  my $commands_raw = $self->_run_command( 'command', [], $nodes );
 
   my %commands = %PREDEFINED_CMDS;
 
@@ -414,10 +421,10 @@ sub _route {
     croak 'ERR Target node not found. Maybe not all slots are served';
   }
 
-  return $self->_execute( $cmd_name, $args, $nodes );
+  return $self->_run_command( $cmd_name, $args, $nodes );
 }
 
-sub _execute {
+sub _run_command {
   my $self     = shift;
   my $cmd_name = shift;
   my $args     = shift;
@@ -428,6 +435,7 @@ sub _execute {
   my $nodes_num  = scalar @{$nodes};
   my $node_index = int( rand($nodes_num) );
   my $fails_cnt  = 0;
+  my $wantarray  = wantarray;
 
   my $cmd_method
       = $cmd_name eq 'cluster_state'
@@ -439,16 +447,17 @@ sub _execute {
     my $node     = $nodes_pool->{$hostport};
 
     my $reply;
+    my @arr_reply;
     my $err_msg;
 
     {
       local $@;
 
       eval {
-        $reply = $node->$cmd_method( @{$args} );
-
         if ( $cmd_name eq 'cluster_state' ) {
-          $reply = _parse_info($reply);
+          undef $wantarray;
+          my $reply_raw = $node->$cmd_method( @{$args} );
+          $reply = _parse_info($reply_raw);
 
           if ( $reply->{cluster_state} eq 'ok' ) {
             $reply = 1;
@@ -456,6 +465,12 @@ sub _execute {
           else {
             croak 'CLUSTERDOWN The cluster is down';
           }
+        }
+        elsif ( $wantarray ) {
+          @arr_reply = $node->$cmd_method( @{$args} );
+        }
+        else {
+          $reply = $node->$cmd_method( @{$args} );
         }
       };
 
@@ -482,7 +497,7 @@ sub _execute {
           $nodes_pool->{$fwd_hostport} = $self->_new_node( $fwd_hostport );
         }
 
-        return $self->_execute( $cmd_name, $args, [ $fwd_hostport ] );
+        return $self->_run_command( $cmd_name, $args, [ $fwd_hostport ] );
       }
 
       if ( defined $self->{on_node_error} ) {
@@ -500,7 +515,7 @@ sub _execute {
       die $err_msg;
     }
 
-    return $reply;
+    return $wantarray ? @arr_reply : $reply;
   }
 }
 
@@ -729,6 +744,14 @@ The full list of the Redis commands can be found here: L<http://redis.io/command
   my $value   = $cluster->get('foo');
   my $list    = $cluster->lrange( 'list', 0, -1 );
   my $counter = $cluster->incr('counter');
+
+=head2 run_command( $command [, @args ] )
+
+The alternative way of command execution is explicit C<run_command()> call.
+This approach is the only way if Redis commands contain punctuation, such as
+C<GRAPH.QUERY> command of RedisGraph module.
+
+  my $list = $cluster->run_command( 'GRAPH.QUERY', $graph, $cypher_query );
 
 =head1 TRANSACTIONS
 

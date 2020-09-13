@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Array;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.014';
+our $VERSION   = '0.015';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -20,7 +20,7 @@ our @METHODS = qw( count is_empty all elements flatten get pop push shift
 	join print head tail apply pick_random for_each for_each_pair
 	all_true not_all_true min minstr max maxstr sum product
 	reductions sample uniqnum uniqnum_in_place uniqstr uniqstr_in_place
-	pairs pairkeys pairvalues pairgrep pairfirst pairmap );
+	pairs pairkeys pairvalues pairgrep pairfirst pairmap reset );
 
 sub _type_inspector {
 	my ($me, $type) = @_;
@@ -769,6 +769,14 @@ sub pairmap {
 		signature => [CodeRef],
 		usage     => '$coderef',
 		template  => 'List::Util::pairmap { $ARG->($_) } @{$GET}',
+}
+
+sub reset {
+	handler
+		name      => 'Array:reset',
+		args      => 0,
+		template  => '« $DEFAULT »',
+		default_for_reset => sub { '[]' },
 }
 
 1;

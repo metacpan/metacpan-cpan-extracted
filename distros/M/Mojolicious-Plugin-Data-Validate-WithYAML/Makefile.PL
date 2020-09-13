@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,19 +14,18 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mojolicious-Plugin-Data-Validate-WithYAML",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Mojolicious::Plugin::Data::Validate::WithYAML",
   "PREREQ_PM" => {
     "Data::Validate::WithYAML" => "0.17",
     "Mojolicious" => "8.0"
   },
   "TEST_REQUIRES" => {
-    "File::Copy" => 0,
-    "File::Path" => 0,
-    "FindBin" => 0,
     "Pod::Coverage::TrustPod" => 0,
-    "Test::LongString" => "0.16"
+    "Test::LongString" => "0.16",
+    "Test::More" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,12 +34,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Validate::WithYAML" => "0.17",
-  "File::Copy" => 0,
-  "File::Path" => 0,
-  "FindBin" => 0,
   "Mojolicious" => "8.0",
   "Pod::Coverage::TrustPod" => 0,
-  "Test::LongString" => "0.16"
+  "Test::LongString" => "0.16",
+  "Test::More" => 0
 );
 
 

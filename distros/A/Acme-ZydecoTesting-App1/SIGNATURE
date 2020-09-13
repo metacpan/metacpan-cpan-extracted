@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 d2750f1b8b281f8ae25d9eee62be10a3538f3859587bea50a14b5680c50971ba COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 105c942cf558b8dc33e6a9463e633b696e409ca0d7fa76a0dc00f557f2567572 Changes
+SHA256 7edd29927b2a9386996156a6a32e9f6939bf8a92b3104887bc3fba0f6c114499 INSTALL
+SHA256 1fb7395e76eabf94c421912d7d0a4f7fa745d49e1acb76b222c21d605b66bd25 LICENSE
+SHA256 de741ec3b1fca5f34f9d80e86cbae1e58296fb9574a383589d53442d4a367de5 MANIFEST
+SHA256 d40af84e7d60b2156388ff9480663b0650b08c12fb2cdc36778c5e0ac6e54e64 META.json
+SHA256 181595aaebd881009c2fecadf8d98b2200e0bf21c0c65d5da7202f4340810a3a META.yml
+SHA256 7304ef4c35b3a48acd9f3cfe0c8c44909221d4cef84eca35ad41b05a12618ed4 Makefile.PL
+SHA256 699d86b5b2c120fcfcac27a42a4004d4b3aba5fb54a9bf6a1aa64ea652c8b33b README
+SHA256 42622875078f298c62f646b48e94d2e76fc53b300dfa94678e0e3a68244216a5 dist.ini
+SHA256 a025fe3f8882784d4b6e9c197c3e4dc180ef5334a12fd770e9ac1ed03d6d592f doap.ttl
+SHA256 2fbc8f66be50a2dbd5433810ec1bdb0845d6e3a272639f9aee1f9bf88daecaf7 lib/Acme/ZydecoTesting/App1.pm
+SHA256 c9c46e186add57b6932ea57398513282a15512b0f0950690e9f45e58d2c9e18b lib/Acme/ZydecoTesting/App1/Classes.zydeco.pm
+SHA256 64a21841ab6d71d8331c42406b87d74f33a9ecbc3b8aea870f1153bf18c3f40c t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCX11I6wAKCRDOv4Eoaip9
+OchbAJ4yEcRoYmMsww3Osr6fitDWk6SGTACglLSxmpk1zHbgzRpZFpihSHGUFkY=
+=eblc
+-----END PGP SIGNATURE-----
