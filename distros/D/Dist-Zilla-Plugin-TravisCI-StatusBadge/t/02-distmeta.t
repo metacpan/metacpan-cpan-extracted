@@ -28,7 +28,7 @@ describe "TravisCI::StatusBadge" => sub {
                 lives_ok { $tzil->build; };
             };
 
-            it "should contains a badge" => sub {
+            it "should contain a badge" => sub {
                 my $content = eval { $tzil->slurp_file( 'source/README.md' ); };
 
                 like(
@@ -57,7 +57,7 @@ describe "TravisCI::StatusBadge" => sub {
                 lives_ok { $tzil->build; };
             };
 
-            it "should contains a badge" => sub {
+            it "should contain a badge" => sub {
                 my $content = eval { $tzil->slurp_file( 'source/README.md' ); };
 
                 like(
@@ -86,7 +86,7 @@ describe "TravisCI::StatusBadge" => sub {
                 lives_ok { $tzil->build; };
             };
 
-            it "should contains a badge" => sub {
+            it "should contain a badge" => sub {
                 my $content = eval { $tzil->slurp_file( 'source/README.md' ); };
 
                 like(
@@ -117,7 +117,7 @@ describe "TravisCI::StatusBadge" => sub {
                 lives_ok { $tzil->build; };
             };
 
-            it "should contains a badge" => sub {
+            it "should contain a badge" => sub {
                 my $content = eval { $tzil->slurp_file( 'source/README.md' ); };
 
                 like(
@@ -146,7 +146,7 @@ describe "TravisCI::StatusBadge" => sub {
                 lives_ok { $tzil->build; };
             };
 
-            it "should contains a badge" => sub {
+            it "should contain a badge" => sub {
                 my $content = eval { $tzil->slurp_file( 'source/README.md' ); };
 
                 like(
@@ -173,7 +173,7 @@ describe "TravisCI::StatusBadge" => sub {
                 lives_ok { $tzil->build; };
             };
 
-            it "should not contains a badge" => sub {
+            it "should not contain a badge" => sub {
                 my $content = eval { $tzil->slurp_file( 'source/README.md' ); };
 
                 like(
@@ -202,7 +202,7 @@ describe "TravisCI::StatusBadge" => sub {
                 lives_ok { $tzil->build; };
             };
 
-            it "should not contains a badge" => sub {
+            it "should not contain a badge" => sub {
                 my $content = eval { $tzil->slurp_file( 'source/README.md' ); };
 
                 like(

@@ -112,77 +112,64 @@ Example:
 
 =for ref
 
-The function eval returns the interpolating function at a given point. By default
-it will barf if you try to extrapolate, to comply silently if the point to be
-evaluated is out of range pass the option {Extrapolate => 1}
+The function eval returns the interpolating function at a given point.
+It will barf with an "input domain error" if you try to extrapolate.
+
 
 =for usage
 
 Usage:
 
-    $result = $spl->eval($points,$opt);
+    $result = $spl->eval($points);
 
 =for example
 
 Example:
 
     my $res = $spl->eval($x)
-    $res = $spl->eval($x,{Extrapolate => 0}) #same as above
-
-    # silently comply if $x is out of range
-    $res = $spl->eval($x,{Extrapolate => 1})
 
 =head2 deriv()
 
 =for ref
 
 The deriv function returns the derivative of the
-interpolating function at a given point. By default
-it will barf if you try to extrapolate, to comply silently if the point to be
-evaluated is out of range pass the option {Extrapolate => 1}
+interpolating function at a given point.
+It will barf with an "input domain error" if you try to extrapolate.
+
 
 =for usage
 
 Usage:
 
-    $result = $spl->deriv($points,$opt);
+    $result = $spl->deriv($points);
 
 =for example
 
 Example:
 
     my $res = $spl->deriv($x)
-    $res = $spl->deriv($x,{Extrapolate => 0}) #same as above
-
-    # silently comply if $x is out of range
-    $res = $spl->deriv($x,{Extrapolate => 1})
-
 
 =head2 deriv2()
 
 =for ref
 
 The deriv2 function returns the second derivative
-of the interpolating function at a given point. By default
-it will barf if you try to extrapolate, to comply silently if the point to be
-evaluated is out of range pass the option {Extrapolate => 1}
+of the interpolating function at a given point.
+It will barf with an "input domain error" if you try to extrapolate.
+
 
 
 =for usage
 
 Usage:
 
-    $result = $spl->deriv2($points,$opt);
+    $result = $spl->deriv2($points);
 
 =for example
 
 Example:
 
     my $res = $spl->deriv2($x)
-    $res = $spl->deriv2($x,{Extrapolate => 0}) #same as above
-
-    # silently comply if $x is out of range
-    $res = $spl->deriv2($x,{Extrapolate => 1})
 
 =head2 integ()
 
@@ -190,26 +177,20 @@ Example:
 
 The integ function returns the integral
 of the interpolating function between two points.
-By default it will barf if you try to extrapolate,
-to comply silently if one of the integration limits
-is out of range pass the option {Extrapolate => 1}
+It will barf with an "input domain error" if you try to extrapolate.
 
 
 =for usage
 
 Usage:
 
-    $result = $spl->integ($la,$lb,$opt);
+    $result = $spl->integ($la,$lb);
 
 =for example
 
 Example:
 
     my $res = $spl->integ($la,$lb)
-    $res = $spl->integ($x,$y,{Extrapolate => 0}) #same as above
-
-    # silently comply if $la or $lb are out of range
-    $res = $spl->eval($la,$lb,{Extrapolate => 1})
 
 =head1 BUGS
 
@@ -273,17 +254,10 @@ sub init{
 
 sub eval{
   my $opt;
-  if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
-  else{ $opt = {Extrapolate => 0}; }
   my ($obj,$x) = @_;
   my $s_obj = $$obj[0];
   my $a_obj = $$obj[1];
-  if($$opt{Extrapolate} == 0){
-    return eval_meat($x,$$s_obj,$$a_obj);
-  }
-  else{
-    return eval_meat_ext($x,$$s_obj,$$a_obj);
-  }
+  return eval_meat($x,$$s_obj,$$a_obj);
 }
 
 
@@ -294,25 +268,11 @@ sub eval{
 
 
 
-
-*eval_meat_ext = \&PDL::GSL::INTERP::eval_meat_ext;
-
-
-
-
 sub deriv{
-  my $opt;
-  if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
-  else{ $opt = {Extrapolate => 0}; }
   my ($obj,$x) = @_;
   my $s_obj = $$obj[0];
   my $a_obj = $$obj[1];
-  if($$opt{Extrapolate} == 0){
-    return  eval_deriv_meat($x,$$s_obj,$$a_obj);
-  }
-  else{
-    return  eval_deriv_meat_ext($x,$$s_obj,$$a_obj);
-  }
+  return  eval_deriv_meat($x,$$s_obj,$$a_obj);
 }
 
 
@@ -323,25 +283,11 @@ sub deriv{
 
 
 
-
-*eval_deriv_meat_ext = \&PDL::GSL::INTERP::eval_deriv_meat_ext;
-
-
-
-
 sub deriv2{
-  my $opt;
-  if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
-  else{ $opt = {Extrapolate => 0}; }
   my ($obj,$x) = @_;
   my $s_obj = $$obj[0];
   my $a_obj = $$obj[1];
-  if($$opt{Extrapolate} == 0){
-    return  eval_deriv2_meat($x,$$s_obj,$$a_obj);
-  }
-  else{
-    return  eval_deriv2_meat_ext($x,$$s_obj,$$a_obj);
-  }
+  return  eval_deriv2_meat($x,$$s_obj,$$a_obj);
 }
 
 
@@ -352,37 +298,17 @@ sub deriv2{
 
 
 
-
-*eval_deriv2_meat_ext = \&PDL::GSL::INTERP::eval_deriv2_meat_ext;
-
-
-
-
 sub integ{
-  my $opt;
-  if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
-  else{ $opt = {Extrapolate => 0}; }
   my ($obj,$la,$lb) = @_;
   my $s_obj = $$obj[0];
   my $a_obj = $$obj[1];
-  if($$opt{Extrapolate} == 0){
-    return eval_integ_meat($la,$lb,$$s_obj,$$a_obj);
-  }
-  else{
-    return eval_integ_meat_ext($la,$lb,$$s_obj,$$a_obj);
-  }
+  return eval_integ_meat($la,$lb,$$s_obj,$$a_obj);
 }
 
 
 
 
 *eval_integ_meat = \&PDL::GSL::INTERP::eval_integ_meat;
-
-
-
-
-
-*eval_integ_meat_ext = \&PDL::GSL::INTERP::eval_integ_meat_ext;
 
 
 

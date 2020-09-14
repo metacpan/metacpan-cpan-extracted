@@ -1,5 +1,10 @@
 Revision history for Perl module Dist::Zilla::Plugin::TravisCI::StatusBadge.
 
+0.009   Mon Sep 14 17:47:45 2020 +0000
+
+    [ FEATURES ]
+    - support for POD READMEs (gh #6) [Ahmad Fatoum]
+
 0.007   Sun Jul 9 19:16:04 2017 +0000
 
     [ FEATURES ]

@@ -1,7 +1,7 @@
 #!perl
 
 our $DATE = '2020-05-04'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -124,12 +124,12 @@ linespeed - Calculate how fast input lines are coming in
 
 =head1 VERSION
 
-This document describes version 0.002 of linespeed (from Perl distribution App-linespeed), released on 2020-05-04.
+This document describes version 0.003 of linespeed (from Perl distribution App-linespeed), released on 2020-05-04.
 
 =head1 SYNOPSIS
 
  % tail -f some-log | linespeed
- Cur speed: 33.3/s  Avg: 31.6/s_
+ Cur speed:  542.751Ki/s  Avg:  542.751Ki/s  Lines:   928384
 
 =head1 DESCRIPTION
 

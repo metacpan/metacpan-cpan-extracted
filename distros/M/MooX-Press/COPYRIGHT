@@ -9,6 +9,7 @@ Files: Changes
  doap.ttl
  t/14enum.t
  t/15requires.t
+ t/16classgenerators-zylite.t
  t/16classgenerators.t
  t/17rolegenerators.t
  t/18handlesvia.t
@@ -16,19 +17,26 @@ Files: Changes
  t/20moosex.t
  t/21coderef.t
  t/22overload.t
+ t/23roleorder-zylite.t
  t/23roleorder.t
  t/24mm.t
  t/25abstract.t
+ t/26accumulate-zylite.t
  t/26accumulate.t
  t/27rolehooks.t
  t/30bare.t
  t/31lexhas.t
+ t/32multifactory-zylite.t
+ t/32multifactory.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/01basic.t
+ t/02moo-zylite.t
  t/02moo.t
+ t/03moose-zylite.t
  t/03moose.t
+ t/04mouse-zylite.t
  t/04mouse.t
  t/10plusattr.t
  t/11plusclass.t
@@ -50,21 +58,22 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: lib/MooX/Press/Keywords.pm
+ lib/Zydeco/Lite.pm
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: README
  lib/MooX/Press.pm
 Copyright: This software is copyright (c) 2019-2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: lib/MooX/Press/Keywords.pm
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: dist.ini
 Copyright: Copyright 2019 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

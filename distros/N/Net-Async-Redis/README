@@ -44,15 +44,17 @@ DESCRIPTION
 
     This is intended to be a near-complete low-level client module for
     asynchronous Redis support. See Net::Async::Redis::Server for a
-    (limited) Perl server implementation. It is an unofficial Perl port and
-    not endorsed by the Redis server maintainers in any way.
+    (limited) Perl server implementation.
+
+    This is an unofficial Perl port, and not endorsed by the Redis server
+    maintainers in any way.
 
  Supported features
 
     Current features include:
 
-      * all commands <https://redis.io/commands> as of 6.0.7 (August 2020),
-      see https://redis.io/commands for the methods and parameters
+      * all commands <https://redis.io/commands> as of 6.0.7 (September
+      2020), see https://redis.io/commands for the methods and parameters
 
       * pub/sub support <https://redis.io/topics/pubsub>, see "METHODS -
       Subscriptions"
@@ -68,6 +70,10 @@ DESCRIPTION
 
       * client-side caching <https://redis.io/topics/client-side-caching>,
       see "METHODS - Clientside caching"
+
+      * "https://github.com/antirez/RESP3/blob/master/spec.md" in RESP3
+      protocol for Redis 6 and above, allowing pubsub on the same
+      connection as regular commands
 
  Connecting
 
@@ -162,11 +168,106 @@ METHODS
     NOTE: For a full list of the Redis methods supported by this module,
     please see Net::Async::Redis::Commands.
 
+ configure
+
+    Applies configuration parameters - currently supports:
+
+      * host
+
+      * port
+
+      * auth
+
+      * database
+
+      * pipeline_depth
+
+      * stream_read_len
+
+      * stream_write_len
+
+      * on_disconnect
+
+      * client_name
+
+      * opentracing
+
+ host
+
+    Returns the host or IP address for the Redis server.
+
+ port
+
+    Returns the port used for connecting to the Redis server.
+
+ database
+
+    Returns the database index used when connecting to the Redis server.
+
+    See the "select" in Net::Async::Redis::Commands method for details.
+
+ uri
+
+    Returns the Redis endpoint URI instance.
+
+ stream_read_len
+
+    Returns the buffer size when reading from a Redis connection.
+
+    Defaults to 1MB, reduce this if you're dealing with a lot of
+    connections and want to minimise memory usage. Alternatively, if you're
+    reading large amounts of data and spend too much time in needless
+    epoll_wait calls, try a larger value.
+
+ stream_write_len
+
+    Returns the buffer size when writing to Redis connections, in bytes.
+    Defaults to 1MB.
+
+    See "stream_read_len".
+
+ client_name
+
+    Returns the name used for this client when connecting.
+
+METHODS - Connection
+
+ connect
+
+    Connects to the Redis server.
+
+    Will use the "configure"d parameters if available, but as a convenience
+    can be passed additional parameters which will then be applied as if
+    you had called "configure" with those beforehand. This also means that
+    they will be preserved for subsequent "connect" calls.
+
+ connected
+
+    Establishes a connection if needed, otherwise returns an
+    immediately-available Future instance.
+
+ endpoint
+
+    The string describing the remote endpoint.
+
+ local_endpoint
+
+    A string describing the local endpoint, usually host:port.
+
 METHODS - Subscriptions
 
     See https://redis.io/topics/pubsub for more details on this topic.
     There's also more details on the internal implementation in Redis here:
     https://making.pusher.com/redis-pubsub-under-the-hood/.
+
+    NOTE: On Redis versions prior to 6.0, you will need a separate
+    connection for subscriptions; you cannot share a connection for regular
+    requests once any of the "subscribe" or "psubscribe" methods have been
+    called on an existing connection.
+
+    With Redis 6.0, a newer protocol version (RESP3) is used by default,
+    and this is quite happy to support pubsub activity on the same
+    connection as other traffic.
 
  psubscribe
 
@@ -254,6 +355,23 @@ METHODS - Clientside caching
     See https://redis.io/topics/client-side-caching for more details on
     this feature.
 
+ client_side_cache_ready
+
+    Returns a Future representing the client-side cache connection status,
+    if there is one.
+
+ client_side_cache
+
+    Returns the Cache::LRU instance used for the client-side cache.
+
+ is_client_side_cache_enabled
+
+    Returns true if the client-side cache is enabled.
+
+ client_side_cache_size
+
+    Returns the current client-side cache size, as a number of entries.
+
 METHODS - Generic
 
  keys
@@ -266,44 +384,13 @@ METHODS - Generic
     the __keyspace@*__ namespace, setting the configuration required for
     this to start emitting events, and then calls $code with each event.
 
-    Note that this will switch the connection into pubsub mode, so it will
-    no longer be available for any other activity.
+    Note that this will switch the connection into pubsub mode on versions
+    of Redis older than 6.0, so it will no longer be available for any
+    other activity. This limitation does not apply on Redis 6 or above.
+
+    Use * to listen for all keyspace changes.
 
     Resolves to a Ryu::Source instance.
-
- endpoint
-
-    The string describing the remote endpoint.
-
- local_endpoint
-
-    A string describing the local endpoint, usually host:port.
-
- connect
-
-    Connects to the Redis server.
-
-    Will use the "configure"d parameters if available, but as a convenience
-    can be passed additional parameters which will then be applied as if
-    you had called "configure" with those beforehand. This also means that
-    they will be preserved for subsequent "connect" calls.
-
- connected
-
-    Establishes a connection if needed, otherwise returns an
-    immediately-available Future instance.
-
- on_message
-
-    Called for each incoming message.
-
-    Passes off the work to "handle_pubsub_message" or the next queue item,
-    depending on whether we're dealing with subscriptions at the moment.
-
- stream
-
-    Represents the IO::Async::Stream instance for the active Redis
-    connection.
 
  pipeline_depth
 
@@ -325,6 +412,30 @@ METHODS - Deprecated
 
 METHODS - Internal
 
+ on_message
+
+    Called for each incoming message.
+
+    Passes off the work to "handle_pubsub_message" or the next queue item,
+    depending on whether we're dealing with subscriptions at the moment.
+
+ next_in_pipeline
+
+    Attempt to process next pending request when in pipeline mode.
+
+ on_error_message
+
+    Called when there's an error response.
+
+ handle_pubsub_message
+
+    Deal with an incoming pubsub-related message.
+
+ stream
+
+    Represents the IO::Async::Stream instance for the active Redis
+    connection.
+
  notify_close
 
     Called when the socket is closed.
@@ -333,45 +444,26 @@ METHODS - Internal
 
     Generate a label for the given command list.
 
- stream_read_len
+ execute_command
 
-    Defines the buffer size when reading from a Redis connection.
+    Queues or executes the given command.
 
-    Defaults to 1MB, reduce this if you're dealing with a lot of
-    connections and want to minimise memory usage. Alternatively, if you're
-    reading large amounts of data and spend too much time in needless
-    epoll_wait calls, try a larger value.
+ ryu
 
- stream_write_len
+    A Ryu::Async instance for source/sink creation.
 
-    The buffer size when writing to Redis connections, in bytes. Defaults
-    to 1MB.
+ future
 
-    See "stream_read_len".
+    Factory method for creating new Future instances.
 
- configure
+ protocol
 
-    Applies configuration parameters - currently supports:
+    Returns the Net::Async::Redis::Protocol instance used for encoding and
+    decoding messages.
 
-      * host
+ _init
 
-      * port
-
-      * auth
-
-      * database
-
-      * pipeline_depth
-
-      * stream_read_len
-
-      * stream_write_len
-
-      * on_disconnect
-
-      * client_name
-
-      * opentracing
+ _add_to_loop
 
 SEE ALSO
 
@@ -397,6 +489,8 @@ SEE ALSO
 
       * Redis - synchronous (blocking) implementation, handles pub/sub and
       autoreconnect
+
+      * HiRedis::Raw - another hiredis wrapper
 
 AUTHOR
 

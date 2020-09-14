@@ -53,13 +53,16 @@ my %WriteMakefileArgs = (
     'NAME'             => 'Archive::Tar::Wrapper',
     'VERSION'          => $module_version,
     'MIN_PERL_VERSION' => 5.008001,
+    'NO_META'          => 0,
+    'LICENSE'          => 'gpl_3',
     'PREREQ_PM'        => {
         'File::Temp'    => 0,
         'Cwd'           => 0,
         'Log::Log4perl' => 0,
         'IPC::Run'      => 0,
-        'File::Which'   => 0
-    },
+        'File::Which'   => 0,
+        'CPAN::Meta'    => 0
+    }
 );
 
 if ( $ExtUtils::MakeMaker::VERSION >= 6.46 ) {
@@ -112,6 +115,6 @@ if ( $] >= 5.005 ) {
     ];
 }
 
-$WriteMakefileArgs{LICENSE} = 'gpl_3'
-  if ( $ExtUtils::MakeMaker::VERSION >= 6.3002 );
+delete $WriteMakefileArgs{LICENSE} if ( $ExtUtils::MakeMaker::VERSION < 6.31 );
+
 WriteMakefile(%WriteMakefileArgs);

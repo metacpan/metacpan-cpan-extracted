@@ -29,10 +29,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test2::Suite" => "0.000119",
+    "Test2::V0" => "0.000135",
     "Test::More" => 0
   },
-  "VERSION" => "0.001006",
+  "VERSION" => "0.001007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +49,7 @@ my %FallbackPrereqs = (
   "Moo" => "2.003004",
   "MooX::Role::Parameterized" => "0.082",
   "Role::REST::Client" => "0.23",
-  "Test2::Suite" => "0.000119",
+  "Test2::V0" => "0.000135",
   "Test::More" => 0,
   "Type::Tiny" => "1.004002"
 );

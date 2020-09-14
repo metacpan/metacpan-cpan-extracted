@@ -98,37 +98,41 @@ newlines.
 
 Support on Microsoft Windows is limited.
 
-Version below Windows 10 will not be supported for desktops, and for servers from Windows 2012 and above.
+Version below Windows 10 will not be supported for desktops, and for servers
+from Windows 2012 and above.
 
-The GNU `tar.exe` program doesn't work properly with the current interface of `Archive::Tar::Wrapper`.
-You must use the `bsdtar.exe` and make sure it appears first in the `PATH` environment variable than
-the GNU tar (if it is installed). See [http://libarchive.org/](http://libarchive.org/) for details about how to download and
-install `bsdtar.exe`, or go to [http://gnuwin32.sourceforge.net/packages.html](http://gnuwin32.sourceforge.net/packages.html) for a direct download.
+The GNU `tar.exe` program doesn't work properly with the current interface of
+`Archive::Tar::Wrapper`.
+You must use the `bsdtar.exe` and make sure it appears first in the `PATH`
+environment variable than the GNU tar (if it is installed). See
+[http://libarchive.org/](http://libarchive.org/) for details about how to
+download and install `bsdtar.exe`, or go to
+[http://gnuwin32.sourceforge.net/packages.html](http://gnuwin32.sourceforge.net/packages.html)
+for a direct download.
 
-Windows 10 might come already with bsdtar program installed. Check 
-[https://blogs.technet.microsoft.com/virtualization/2017/12/19/tar-and-curl-come-to-windows/](https://blogs.technet.microsoft.com/virtualization/2017/12/19/tar-and-curl-come-to-windows/) for 
-more details.
+Windows 10 might come already with bsdtar program installed. Check
+[https://blogs.technet.microsoft.com/virtualization/2017/12/19/tar-and-curl-come-to-windows/](https://blogs.technet.microsoft.com/virtualization/2017/12/19/tar-and-curl-come-to-windows/)
+for more details.
 
-Having spaces in the path string to the tar program might be an issue too. Although there is some effort
-in terms of workaround it, you best might avoid it completely by installing in a different path than
-`C:\Program Files`.
+Having spaces in the path string to the `tar` program might be an issue too.
+Although there is some effort in terms of workaround it, you best might avoid it
+completely by installing in a different path than `C:\Program Files`.
 
 # LEGALESE
 
 This software is copyright (c) 2005 of Mike Schilli.
 
-Archive-Tar-Wrapper is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option) any
-later version.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-Archive-Tar-Wrapper is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
-Archive-Tar-Wrapper. If not, see http://www.gnu.org/licenses/.
+Archive-Tar-Wrapper. If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).
 
 # AUTHOR
 

@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1::Role::ObjectMethods;
-$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001006';
+$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001007';
 # ABSTRACT: Role for Checkpoint Management API version 1.x method generation
 
 use 5.024;
@@ -126,11 +126,11 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods - Role for Checkpoint Manag
 
 =head1 VERSION
 
-version 0.001006
+version 0.001007
 
 =head1 SYNOPSIS
 
-    package Net::Cisco::FMC::v1;
+    package Net::Checkpoint::Management::v1;
     use Moo;
     use Net::Checkpoint::Management::v1::Role::ObjectMethods;
 

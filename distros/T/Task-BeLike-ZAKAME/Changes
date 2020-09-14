@@ -1,5 +1,10 @@
 Revision history for Perl extension Task-BeLike-ZAKAME
 
+0.22 2020-09-14T04:41:44Z
+
+    - Move less-used modules to suggests (to consider dropping later)
+    - Add Tickit to recommends
+
 0.21 2019-09-16T04:13:08Z
 
     - Add App::FatPacker, IO::Async::SSL, and Ryu::Async to recommends

@@ -66,8 +66,8 @@ SKIP: {
 
         my $resp = $client->nop;
 
-        is $resp->error_text, 'Username/password Incorrect',        'Got correct error description';
-        is $resp->error_code, 'PASSWORD_AUTH_FAILED',               'Got correct error code';
+        is $resp->error_text, 'Login or password is incorrect.',    'Got correct error description';
+        is $resp->error_code, 'USER_AUTHENTICATION_FAILED',         'Got correct error code';
     };
 }
 

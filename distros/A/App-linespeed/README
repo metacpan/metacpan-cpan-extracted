@@ -2,7 +2,7 @@ NAME
     App::linespeed - Calculate how fast input lines are coming in
 
 VERSION
-    This document describes version 0.002 of App::linespeed (from Perl
+    This document describes version 0.003 of App::linespeed (from Perl
     distribution App-linespeed), released on 2020-05-04.
 
 SYNOPSIS

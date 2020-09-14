@@ -4,7 +4,7 @@
       "Zak B. Elep <zakame@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.6",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -43,13 +43,9 @@
       "runtime" : {
          "recommends" : {
             "App::FatPacker" : "0",
-            "App::Nopaste" : "0",
-            "App::rainbarf" : "0",
-            "App::scan_prereqs_cpanfile" : "0",
             "Benchmark::Forking" : "0",
             "CPAN::Audit" : "0",
             "CPAN::Mini::Webserver" : "0",
-            "DB::Pluggable" : "0",
             "DB::Skip" : "0",
             "Devel::Cover" : "0",
             "Devel::MAT" : "0",
@@ -57,13 +53,12 @@
             "IO::Async::SSL" : "0",
             "LWP::Protocol::rsync" : "0",
             "Math::BigInt::Lite" : "0",
-            "Paws" : "0",
             "Perl::Critic" : "0",
             "Perl::Critic::Freenode" : "0",
             "Ryu::Async" : "0",
             "Term::ReadLine::Gnu" : "0",
             "Test2::Suite" : "0",
-            "Web::Query" : "0",
+            "Tickit" : "0",
             "perlsecret" : "0"
          },
          "requires" : {
@@ -98,6 +93,14 @@
             "curry" : "0",
             "indirect" : "0",
             "perl" : "5.014002"
+         },
+         "suggests" : {
+            "App::Nopaste" : "0",
+            "App::rainbarf" : "0",
+            "App::scan_prereqs_cpanfile" : "0",
+            "DB::Pluggable" : "0",
+            "Paws" : "0",
+            "Web::Query" : "0"
          }
       },
       "test" : {
@@ -109,7 +112,7 @@
    "provides" : {
       "Task::BeLike::ZAKAME" : {
          "file" : "lib/Task/BeLike/ZAKAME.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -123,11 +126,11 @@
          "web" : "https://github.com/zakame/Task-BeLike-ZAKAME"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_contributors" : [
       "Zak B. Elep <zak.elep@yoyo.ph>",
       "Zak B. Elep <zakame@zakame.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.05",
    "x_static_install" : 1
 }

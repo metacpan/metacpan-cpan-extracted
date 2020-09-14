@@ -1,7 +1,7 @@
 package App::linespeed;
 
 our $DATE = '2020-05-04'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Calculate how fast input lines are coming in
@@ -18,7 +18,7 @@ App::linespeed - Calculate how fast input lines are coming in
 
 =head1 VERSION
 
-This document describes version 0.002 of App::linespeed (from Perl distribution App-linespeed), released on 2020-05-04.
+This document describes version 0.003 of App::linespeed (from Perl distribution App-linespeed), released on 2020-05-04.
 
 =head1 SYNOPSIS
 

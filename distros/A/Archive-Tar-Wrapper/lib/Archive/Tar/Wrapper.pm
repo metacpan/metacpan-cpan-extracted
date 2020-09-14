@@ -18,7 +18,7 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 my $logger = get_logger();
 
 =pod
@@ -1175,9 +1175,9 @@ iterators. To be fixed.
 
 =item *
 
-If you ask B<Archive::Tar::Wrapper> to add a file to a tarball, it copies it into
-a temporary directory and then calls the system tar to wrap up that directory
-into a tarball.
+If you ask B<Archive::Tar::Wrapper> to add a file to a tarball, it copies it
+into a temporary directory and then calls the system tar to wrap up that
+directory into a tarball.
 
 This approach has limitations when it comes to file permissions: If the file to
 be added belongs to a different user/group, B<Archive::Tar::Wrapper> will adjust
@@ -1203,36 +1203,41 @@ newlines.
 
 Support on Microsoft Windows is limited.
 
-Versions below Windows 10 will not be supported for desktops, and for servers only Windows 2012 and above.
+Versions below Windows 10 will not be supported for desktops, and for servers
+only Windows 2012 and above.
 
-The GNU C<tar.exe> program doesn't work properly with the current interface of B<Archive::Tar::Wrapper>.
+The GNU C<tar.exe> program doesn't work properly with the current interface of
+B<Archive::Tar::Wrapper>.
 
-You must use the C<bsdtar.exe> and make sure it appears first in the C<PATH> environment variable than
-the GNU tar (if it is installed). See L<http://libarchive.org/> for details about how to download and
-install C<bsdtar.exe>, or go to L<http://gnuwin32.sourceforge.net/packages.html> for a direct download.
-Be sure to look for the C<bzip2> program package to install it as well.
+You must use the C<bsdtar.exe> and make sure it appears first in the C<PATH>
+environment variable than the GNU tar (if it is installed). See
+L<http://libarchive.org/> for details about how to download and
+install C<bsdtar.exe>, or go to L<http://gnuwin32.sourceforge.net/packages.html>
+for a direct download. Be sure to look for the C<bzip2> program package to
+install it as well.
 
-Windows 10 might come already with C<bsdtar> program already installed. Please search for that on the appropriate
-page (Microsoft keeps changing the link to keep track of it here).
+Windows 10 might come already with C<bsdtar> program already installed. Please
+search for that on the appropriate page (Microsoft keeps changing the link to
+keep track of it here).
 
-Having spaces in the path string to the tar program might be an issue too. Although there is some effort
-in terms of workaround it, you best might avoid it completely by installing in a different path than
-C<C:\Program Files>. Installing both C<bsdtar> and C<bzip2> in C<C:\GnuWin32> will probably be enough when
-running the installers.
+Having spaces in the path string to the tar program might be an issue too.
+Although there is some effort in terms of workaround it, you best might avoid it
+completely by installing in a different path than C<C:\Program Files>.
+Installing both C<bsdtar> and C<bzip2> in C<C:\GnuWin32> will probably be enough
+when running the installers.
 
 =head1 LEGALESE
 
 This software is copyright (c) 2005 of Mike Schilli.
 
-Archive-Tar-Wrapper is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option) any
-later version.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-Archive-Tar-Wrapper is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 Archive-Tar-Wrapper. If not, see L<http://www.gnu.org/licenses/>.
@@ -1243,7 +1248,7 @@ Archive-Tar-Wrapper. If not, see L<http://www.gnu.org/licenses/>.
 
 =item *
 
-Linux Gazette article from Ben Okopnik, issue 87
+Linux Gazette article from Ben Okopnik, L<issue 87|https://linuxgazette.net/87/okopnik.html>.
 
 =back
 

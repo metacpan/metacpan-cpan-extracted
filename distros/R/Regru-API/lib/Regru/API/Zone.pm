@@ -7,8 +7,8 @@ use warnings;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '0.049'; # VERSION
-our $AUTHORITY = 'cpan:OLEG'; # AUTHORITY
+our $VERSION = '0.051'; # VERSION
+our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
 
 with 'Regru::API::Role::Client';
 
@@ -55,7 +55,7 @@ Regru::API::Zone - REG.API v2 DNS resource records management
 
 =head1 VERSION
 
-version 0.049
+version 0.051
 
 =head1 DESCRIPTION
 

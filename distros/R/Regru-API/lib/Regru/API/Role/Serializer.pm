@@ -9,8 +9,8 @@ use JSON;
 use Carp;
 use namespace::autoclean;
 
-our $VERSION = '0.049'; # VERSION
-our $AUTHORITY = 'cpan:OLEG'; # AUTHORITY
+our $VERSION = '0.051'; # VERSION
+our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
 
 has serializer => (
     is      => 'rw',
@@ -37,7 +37,7 @@ Regru::API::Role::Serializer - something that can (de)serialize
 
 =head1 VERSION
 
-version 0.049
+version 0.051
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
       "Anton Gerasimov <chim@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,11 +38,13 @@
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Meta" : "0",
-            "Test::Kwalitee" : "1.12",
-            "Test::More" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -72,7 +74,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::TravisCI::StatusBadge" : {
          "file" : "lib/Dist/Zilla/Plugin/TravisCI/StatusBadge.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -87,8 +89,10 @@
          "web" : "https://github.com/Wu-Wu/Dist-Zilla-Plugin-TravisCI-StatusBadge"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_authority" : "cpan:CHIM",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0113"
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.23",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

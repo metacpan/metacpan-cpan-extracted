@@ -15,7 +15,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.54'
   File::ShareDir::Install: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -54,6 +54,6 @@ resources:
   bugtracker: https://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Translator
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dbsrgits/sql-translator/
-version: '1.61'
+version: '1.62'
 x_authority: cpan:JROBINSON
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

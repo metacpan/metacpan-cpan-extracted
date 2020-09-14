@@ -57,7 +57,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test2::Suite" : "0.000119",
+            "Test2::V0" : "0.000135",
             "Test::More" : "0"
          }
       }
@@ -70,10 +70,10 @@
          "web" : "https://github.com/abraxxa/Net-Checkpoint-Management-v1"
       }
    },
-   "version" : "0.001006",
+   "version" : "0.001007",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030000"
+         "version" : "5.032000"
       },
       "plugins" : [
          {
@@ -283,11 +283,6 @@
             "version" : "6.015"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::UnusedVars",
-            "name" : "@TestingMania/Test::UnusedVars",
-            "version" : "2.000007"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
             "config" : {
                "Dist::Zilla::Plugin::Test::Kwalitee" : {
@@ -297,16 +292,6 @@
             },
             "name" : "@TestingMania/Test::Kwalitee",
             "version" : "2.12"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Test::Portability",
-            "config" : {
-               "Dist::Zilla::Plugin::Test::Portability" : {
-                  "options" : ""
-               }
-            },
-            "name" : "@TestingMania/Test::Portability",
-            "version" : "2.001000"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::CPAN::Changes",
@@ -319,14 +304,9 @@
             "version" : "0.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::Pod::LinkCheck",
-            "name" : "@TestingMania/Test::Pod::LinkCheck",
-            "version" : "1.004"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
-            "name" : "@TestingMania/PodSyntaxTests",
-            "version" : "6.015"
+            "class" : "Dist::Zilla::Plugin::Test::DistManifest",
+            "name" : "@TestingMania/Test::DistManifest",
+            "version" : "2.000005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::EOL",
@@ -345,11 +325,6 @@
             "version" : "0.19"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
-            "name" : "@TestingMania/PodCoverageTests",
-            "version" : "6.015"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Test::NoTabs",
             "config" : {
                "Dist::Zilla::Plugin::Test::NoTabs" : {
@@ -363,26 +338,6 @@
             },
             "name" : "@TestingMania/Test::NoTabs",
             "version" : "0.15"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Test::Version",
-            "name" : "@TestingMania/Test::Version",
-            "version" : "1.09"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Test::MinimumVersion",
-            "config" : {
-               "Dist::Zilla::Plugin::Test::MinimumVersion" : {
-                  "max_target_perl" : null
-               }
-            },
-            "name" : "@TestingMania/Test::MinimumVersion",
-            "version" : "2.000010"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
-            "name" : "@TestingMania/Test::Perl::Critic",
-            "version" : "3.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -408,9 +363,9 @@
             "version" : "2.058"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::DistManifest",
-            "name" : "@TestingMania/Test::DistManifest",
-            "version" : "2.000005"
+            "class" : "Dist::Zilla::Plugin::MojibakeTests",
+            "name" : "@TestingMania/MojibakeTests",
+            "version" : "0.8"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaTests",
@@ -418,9 +373,34 @@
             "version" : "6.015"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MojibakeTests",
-            "name" : "@TestingMania/MojibakeTests",
-            "version" : "0.8"
+            "class" : "Dist::Zilla::Plugin::Test::Portability",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Portability" : {
+                  "options" : ""
+               }
+            },
+            "name" : "@TestingMania/Test::Portability",
+            "version" : "2.001000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@TestingMania/PodSyntaxTests",
+            "version" : "6.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@TestingMania/PodCoverageTests",
+            "version" : "6.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
+            "name" : "@TestingMania/Test::Perl::Critic",
+            "version" : "3.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Version",
+            "name" : "@TestingMania/Test::Version",
+            "version" : "1.09"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Synopsis",
@@ -428,9 +408,29 @@
             "version" : "2.000007"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Test::UnusedVars",
+            "name" : "@TestingMania/Test::UnusedVars",
+            "version" : "2.000007"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON",
             "name" : "@TestingMania/Test::CPAN::Meta::JSON",
             "version" : "0.004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::MinimumVersion",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::MinimumVersion" : {
+                  "max_target_perl" : null
+               }
+            },
+            "name" : "@TestingMania/Test::MinimumVersion",
+            "version" : "2.000010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Pod::LinkCheck",
+            "name" : "@TestingMania/Test::Pod::LinkCheck",
+            "version" : "1.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -452,14 +452,15 @@
                }
             },
             "name" : "@Git/Check",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "version %v%n%n%c"
+                  "commit_msg" : "version %v%n%n%c",
+                  "signoff" : 0
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -478,7 +479,7 @@
                }
             },
             "name" : "@Git/Commit",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -487,7 +488,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001006",
+                  "tag" : "0.001007",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
@@ -500,7 +501,7 @@
                }
             },
             "name" : "@Git/Tag",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -517,7 +518,7 @@
                }
             },
             "name" : "@Git/Push",
-            "version" : "2.046"
+            "version" : "2.047"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -600,8 +601,8 @@
          "version" : "6.015"
       }
    },
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.23",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

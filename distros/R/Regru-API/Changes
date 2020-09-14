@@ -1,19 +1,37 @@
 Revision history for Perl distribution Regru-API.
 
-0.049   Wed Nov 7 12:13:02 2018 +0000
+0.051   Mon Sep 14 11:42:43 2020 +0000
+
+    [ FIXES ]
+    - returned "add_caa" method
+    - returned "records" param in "add_keys" as optional
+    - tests for "zone/add_caa" method
+
+0.050   Mon Sep 14 08:58:32 2020 +0000
+
+    [ FEATURES ]
+    - removed obsoleted method user/refill_balance
+
+    [ FIXES ]
+    - merge old changes
+    - fix testing
+    - fix travis-ci builds
 
 0.049   Wed Nov  7 12:11:49 2018 +0000
+
     [ FIXES ]
     - release permissions fix
 
 0.048   Fri Oct 26 07:44:03 2018 +0000
+
     [ FEATURES ]
     - added support for CAA resource record in "zone" namespace
 
 0.047   Fri Jul 14 05:26:30  2017 +0000
+
     [ FEATURES ]
     - added new REG.API namespace "dnssec" with DNSSEC related methods
-    
+
     [ FIXES ]
     - fixed test failures (gh #6)
 

@@ -1,0 +1,27 @@
+% layout 'default';
+
+<div class="wrapper">
+
+  %= include 'layouts/parts/header';
+
+  <div class="page">
+    <div class="container">
+      <h2>
+        %= $meta->{title}
+      </h2>
+      %= $meta->{description};
+      <br>
+      <br>
+      <br>
+
+      % for my $photo (@$photos) {
+        <a class="gallery" href="<%= $photo->{large} %>" data-fancybox="group">
+          <img src="<%= $photo->{thumbnail} %>" class="gallery-item-image">
+        <a/>
+      % }
+    </div>
+  </div>
+
+</div>
+
+%= include 'layouts/parts/footer';

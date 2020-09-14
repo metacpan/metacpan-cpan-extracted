@@ -233,7 +233,7 @@ should apply to RxPerl too).
 
     [https://rxjs.dev/api/index/class/Observable](https://rxjs.dev/api/index/class/Observable)
 
-        0.578, 0.234, 0.678, ... (every 1 second)
+        # 0.578, 0.234, 0.678, ... (every 1 second)
         my $o = rx_observable->new(sub ($subscriber) {
             # your code goes here
             Mojo::IOLoop->recurring(1, sub {$subscriber->next(rand())});
@@ -260,6 +260,7 @@ should apply to RxPerl too).
 
     [https://rxjs.dev/api/index/class/Subject](https://rxjs.dev/api/index/class/Subject)
 
+        # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, complete
         my $subject = rx_subject->new;
         $subject->subscribe($observer);
 
@@ -283,11 +284,11 @@ should apply to RxPerl too).
 
     Works like rxjs's "timer", except the parameter is in seconds instead of ms.
 
-        # (pause 10 seconds) 0, 1, 2, 3, ... (every 1 second)
-        rx_timer(10, 1)->subscribe($observer);
-
         # (pause 10 seconds) 0, complete
         rx_timer(10)->subscribe($observer);
+
+        # (pause 10 seconds) 0, 1, 2, 3, ... (every 1 second)
+        rx_timer(10, 1)->subscribe($observer);
 
 ## PIPEABLE OPERATORS
 
@@ -402,6 +403,11 @@ too).
             op_filter(sub {$_[0] % 2 == 0}),
         )->subscribe($observer);
 
+        # 10, 36, 50
+        rx_of(10, 22, 36, 41, 50, 73)->pipe(
+            op_filter(sub ($v, $idx) { $idx % 2 == 0 }),
+        )->subscribe($observer);
+
 - op\_finalize
 
     [https://rxjs.dev/api/operators/finalize](https://rxjs.dev/api/operators/finalize)
@@ -432,6 +438,11 @@ too).
         # 10, 11, 12, 13, ...
         rx_interval(1)->pipe(
             op_map(sub {$_[0] + 10}),
+        )->subscribe($observer);
+
+        # 10-0, 20-1, 30-2, complete
+        rx_of(10, 20, 30)->pipe(
+            op_map(sub ($v, $idx) { "$v-$idx" }),
         )->subscribe($observer);
 
 - op\_map\_to
@@ -490,6 +501,15 @@ too).
 - op\_ref\_count
 
     [https://rxjs.dev/api/operators/refCount](https://rxjs.dev/api/operators/refCount)
+
+- op\_sample\_time
+
+    [https://rxjs.dev/api/operators/sampleTime](https://rxjs.dev/api/operators/sampleTime)
+
+        # 0, 2, 3, 5, 6, 8, ...
+        rx_interval(1)->pipe(
+            op_sample_time(1.6),
+        )->subscribe($observer);
 
 - op\_scan
 
@@ -579,6 +599,18 @@ too).
         # foo0, 0, foo1, 1, foo2, 2, ...
         rx_interval(1)->pipe(
             op_tap(sub {say "foo$_[0]"}),
+        )->subscribe($observer);
+
+- op\_throttle\_time
+
+    [https://rxjs.dev/api/operators/throttleTime](https://rxjs.dev/api/operators/throttleTime)
+
+    At the moment, this function does not accept the configuration options that
+    rxjs's throttleTime accepts. Only the first parameter (duration) is taken into account.
+
+        # 0, 3, 6, 9, 12, ...
+        rx_interval(1)->pipe(
+            op_throttle_time(2.1),
         )->subscribe($observer);
 
 - op\_with\_latest\_from

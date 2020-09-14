@@ -33,13 +33,9 @@ requires 'Version::Next';
 
 recommends 'perlsecret';
 recommends 'App::FatPacker';
-recommends 'App::rainbarf';
-recommends 'App::scan_prereqs_cpanfile';
-recommends 'App::Nopaste';
 recommends 'Benchmark::Forking';
 recommends 'CPAN::Audit';
 recommends 'CPAN::Mini::Webserver';
-recommends 'DB::Pluggable';
 recommends 'DB::Skip';
 recommends 'Devel::Cover';
 recommends 'Devel::MAT';
@@ -47,13 +43,19 @@ recommends 'Devel::Trace';
 recommends 'IO::Async::SSL';
 recommends 'LWP::Protocol::rsync';
 recommends 'Math::BigInt::Lite';
-recommends 'Paws';
 recommends 'Perl::Critic';
 recommends 'Perl::Critic::Freenode';
 recommends 'Ryu::Async';
 recommends 'Term::ReadLine::Gnu';
 recommends 'Test2::Suite';
-recommends 'Web::Query';
+recommends 'Tickit';
+
+suggests 'App::Nopaste';
+suggests 'App::rainbarf';
+suggests 'App::scan_prereqs_cpanfile';
+suggests 'DB::Pluggable';
+suggests 'Paws';
+suggests 'Web::Query';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

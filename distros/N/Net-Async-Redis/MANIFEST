@@ -11,6 +11,7 @@ dist.ini
 examples/consumer-groups-aa-cluster.pl
 examples/consumer-groups-aa.pl
 examples/consumer-groups.pl
+examples/hincr.pl
 examples/incr-ratelimit-aa.pl
 examples/incr-ratelimit.pl
 examples/job-benchmark.pl

@@ -1,10 +1,10 @@
+Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary=[^\n]+
 From: from@example.com
 Subject: Alert Log Message
 To: foo@example.com,bar@example.org
 Date: [^\n]+
 MIME-Version: 1\.0
-Content-Type: multipart/mixed; boundary=[^\n]+
-Content-Transfer-Encoding: 7bit
 
 
 --\S+

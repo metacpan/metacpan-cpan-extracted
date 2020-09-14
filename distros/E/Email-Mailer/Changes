@@ -1,5 +1,8 @@
 Revision history for Email::Mailer
 
+1.13      2020-09-14 08:02:49-07:00 America/Los_Angeles
+        - Use charset from Content-Type header for encode_mimewords()
+
 1.12      2020-09-12 14:03:01-07:00 America/Los_Angeles
         - Added automatic header-ification for: To, From, Subject, Content-Type,
           and Content-Transfer-Encoding

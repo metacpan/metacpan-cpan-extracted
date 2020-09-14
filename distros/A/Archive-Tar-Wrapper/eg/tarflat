@@ -1,8 +1,4 @@
 #!/usr/bin/perl
-###########################################
-# tarflat 
-# 2005, Mike Schilli <cpan@perlmeister.com>
-###########################################
 use strict;
 use warnings;
 use Getopt::Std;
@@ -14,23 +10,22 @@ use vars qw($CVSVERSION);
 
 $CVSVERSION = '$Revision: 1.1 $';
 
-getopts("hv", \my %opts);
+getopts( "hv", \my %opts );
 
 pod2usage() if $opts{h};
 
-if($opts{v}) {
+if ( $opts{v} ) {
     my ($version) = $CVSVERSION =~ /(\d\S+)/;
     die "$0 $version\n";
 }
 
-my($target_dir, @tarfiles) = @ARGV;
+my ( $target_dir, @tarfiles ) = @ARGV;
 
-if(!defined $target_dir or
-   !@tarfiles) {        
+unless ( defined($target_dir) or @tarfiles ) {
     pod2usage("Wrong number of arguments");
 }
 
-if(! -d $target_dir) {
+unless ( -d $target_dir ) {
     my $create = ask "$target_dir doesn't exist. Create it [y]", "y";
     mkd $target_dir if $create =~ /[yY]/;
 }
@@ -43,9 +38,9 @@ for my $tarfile (@tarfiles) {
 
 $arch->list_reset();
 
-while(my $entry = $arch->list_next()) {
-    my($tar_path, $phys_path) = @$entry;
-    if(-f $phys_path) {
+while ( my $entry = $arch->list_next() ) {
+    my ( $tar_path, $phys_path ) = @$entry;
+    if ( -f $phys_path ) {
         cp $phys_path, $target_dir;
     }
 }
@@ -76,23 +71,38 @@ Prints the script version.
 
 =head1 DESCRIPTION
 
-C<tarflat> 
+C<tarflat>
 
 =head1 EXAMPLES
 
-      # Unpack foo.tgz and bar.tgz and store all of their files
-      # (anywhere in the directory hierarchy) in the directory
-      # /tmp/junk.
+  # Unpack foo.tgz and bar.tgz and store all of their files
+  # (anywhere in the directory hierarchy) in the directory
+  # /tmp/junk.
   $ mkdir /tmp/junk
   $ tarflat /tmp/junk foo.tgz bar.tgz
 
 =head1 LEGALESE
 
-Copyright 2005 by Mike Schilli, 
-all rights reserved. This program is free 
-software, you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This software is copyright (c) 2005 of Mike Schilli.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+Archive-Tar-Wrapper. If not, see L<http://www.gnu.org/licenses/>.
 
 =head1 AUTHOR
 
 2005, Mike Schilli <cpan@perlmeister.com>
+
+=head1 MAINTAINER
+
+2018, Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+
+=cut

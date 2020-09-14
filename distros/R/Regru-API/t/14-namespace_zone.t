@@ -14,6 +14,7 @@ subtest 'Generic behaviour' => sub {
         add_alias
         add_aaaa
         add_cname
+        add_caa
         add_mx
         add_ns
         add_txt
@@ -59,7 +60,7 @@ SKIP: {
             plan skip_all => '.';
         }
         else {
-            plan tests => 16;
+            plan tests => 17;
         }
 
         my $resp;
@@ -87,6 +88,16 @@ SKIP: {
             canonical_name  => 'mx10.test.ru',
         );
         ok $resp->is_success,                                   'add_cname() success';
+
+        # /zone/add_caa
+        $resp = $client->add_caa(
+            domains         => [ { dname => 'test.ru' } ],
+            subdomain       => '@',
+            flags           => 0,
+            tag             => 'issue',
+            value           => 'ca.example.com',
+        );
+        ok $resp->is_success,                                   'add_caa() success';
 
         # /zone/add_mx
         $resp = $client->add_mx(

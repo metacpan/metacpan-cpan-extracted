@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1;
-$Net::Checkpoint::Management::v1::VERSION = '0.001006';
+$Net::Checkpoint::Management::v1::VERSION = '0.001007';
 # ABSTRACT: Checkpoint Management API version 1.x client library
 
 use 5.024;
@@ -357,6 +357,66 @@ sub discard($self) {
     return $data;
 }
 
+
+sub verify_policy($self, $policyname) {
+    croak "policy name missing"
+        unless defined $policyname;
+
+    my $res = $self->post('/web_api/v' . $self->api_version .
+        '/verify-policy', {
+            'policy-package' => $policyname,
+        });
+    my $code = $res->code;
+    my $data = $res->data;
+    $self->_error_handler($data)
+        unless $code == 200;
+
+    return $data->{'task-id'};
+}
+
+
+sub install_policy($self, $policyname, $targets, $params) {
+    croak "policy name missing"
+        unless defined $policyname;
+    croak "target(s) missing"
+        unless defined $targets;
+    croak "target(s) must be a single name or uid or a list of names or uids"
+        unless ref $targets eq undef
+            || ref $targets eq 'ARRAY';
+    croak "parameters needs to be a hashref"
+        if defined $params && ref $params ne 'HASH';
+
+    my $res = $self->post('/web_api/v' . $self->api_version .
+        '/install-policy', {
+            $params->%*,
+            'policy-package' => $policyname,
+            targets          => $targets,
+        });
+    my $code = $res->code;
+    my $data = $res->data;
+    $self->_error_handler($data)
+        unless $code == 200;
+
+    return $data->{'task-id'};
+}
+
+
+sub wait_for_task($self, $taskid, $callback) {
+    croak "task-id missing"
+        unless defined $taskid;
+    croak "callback must be a coderef"
+        if defined $callback && ref $callback ne 'CODE';
+
+    my $task;
+    while (($task = $self->get_task({'task-id' => $taskid})->{tasks}[0])
+        && $task->{status} eq 'in progress') {
+        &$callback($task)
+            if defined $callback;
+        sleep 1;
+    }
+    return $task;
+}
+
 1;
 
 __END__
@@ -371,7 +431,7 @@ Net::Checkpoint::Management::v1 - Checkpoint Management API version 1.x client l
 
 =head1 VERSION
 
-version 0.001006
+version 0.001007
 
 =head1 SYNOPSIS
 
@@ -391,7 +451,7 @@ version 0.001006
 =head1 DESCRIPTION
 
 This module is a client library for the Checkpoint Management API version 1.x.
-Currently it is developed and tested against version R80.10.
+Currently it is developed and tested against version R80.40.
 
 =head1 ATTRIBUTES
 
@@ -424,8 +484,33 @@ Returns the task id on success.
 =head2 discard
 
 Discards all previously submitted changes.
-Returns a hashref containing the operation status messange and the number of
+Returns a hashref containing the operation status message and the number of
 discarded changes.
+
+=head2 verify_policy
+
+Verifies the policy of the given package.
+
+Takes a policy name.
+
+Returns the task id on success.
+
+=head2 install_policy
+
+Installs the policy of the given package onto the given target(s).
+
+Takes a policy name, target(s) and an optional hashref of additional
+parameters.
+The target(s) can be a single name or uid or a list of names or uids.
+
+Returns the task id on success.
+
+=head2 wait_for_task
+
+Takes a task id and checks its status every second until it isn't
+'in progress' any more and return the status.
+Takes an optional callback coderef which is called for every check with the
+task as argument.
 
 =head1 AUTHOR
 

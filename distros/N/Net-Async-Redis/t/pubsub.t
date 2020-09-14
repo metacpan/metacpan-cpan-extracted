@@ -38,11 +38,18 @@ isa_ok(my $sub = $subscriber->subscribe('test::somewhere')->get, 'Net::Async::Re
 is(exception {
     $subscriber->ping->get
 }, undef, 'can still ping after subscribe');
-like(exception {
-        note 'start';
-    $subscriber->get('test::random_key')->get;
-        note 'end';
-}, qr/pubsub/, 'but cannot GET while subscribed');
+
+if($subscriber->{protocol_level} eq 'resp2') {
+    like(exception {
+            note 'start';
+        $subscriber->get('test::random_key')->get;
+            note 'end';
+    }, qr/pubsub/, 'but cannot GET while subscribed');
+} else {
+    is(exception {
+        $subscriber->get('test::random_key')->get;
+    }, undef, 'can call GET while subscribed');
+}
 
 $sub->events->each(sub {
     note "Event - " . $_->payload;

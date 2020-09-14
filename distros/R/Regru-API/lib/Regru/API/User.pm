@@ -7,8 +7,8 @@ use warnings;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '0.049'; # VERSION
-our $AUTHORITY = 'cpan:OLEG'; # AUTHORITY
+our $VERSION = '0.051'; # VERSION
+our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
 
 with 'Regru::API::Role::Client';
 
@@ -21,7 +21,6 @@ sub available_methods {[qw(
     create
     get_statistics
     get_balance
-    refill_balance
 )]}
 
 __PACKAGE__->namespace_methods;
@@ -41,7 +40,7 @@ Regru::API::User - REG.API v2 user account management
 
 =head1 VERSION
 
-version 0.049
+version 0.051
 
 =head1 DESCRIPTION
 
@@ -113,21 +112,6 @@ Answer will contains a set of fields like amount of available funds, amount of a
 will be shown amount of available credit additionally.
 
 More info at L<Account management: get_balance|https://www.reg.com/support/help/api2#user_get_balance>.
-
-=head2 refill_balance
-
-Tops up an user account balance with Webmoney or Yandex.Money. Scope: B<clients>. Typical usage:
-
-    $resp = $client->user->refill_balance(
-        pay_type    => 'WM',            # Webmoney
-        wmid        => 291400771678,    # Webmoney ID
-        currency    => 'USD',
-        amount      => '19.95',
-    );
-
-Answer will contains an invoice ID and other payment details or error otherwise.
-
-More info at L<Account management: refill_balance|https://www.reg.com/support/help/api2#user_refill_balance>.
 
 =head1 SEE ALSO
 

@@ -2,7 +2,7 @@ package RxPerl::Operators::Pipeable;
 use strict;
 use warnings;
 
-use RxPerl::Operators::Creation qw/ rx_observable rx_subject rx_concat rx_of /;
+use RxPerl::Operators::Creation qw/ rx_observable rx_subject rx_concat rx_of rx_interval /;
 use RxPerl::ConnectableObservable;
 use RxPerl::Utils qw/ get_subscription_from_subscriber get_timer_subs /;
 use RxPerl::Subscription;
@@ -14,8 +14,8 @@ use Exporter 'import';
 our @EXPORT_OK = qw/
     op_catch_error op_concat_map op_debounce_time op_delay op_distinct_until_changed op_distinct_until_key_changed
     op_end_with op_exhaust_map op_filter op_finalize op_first op_map op_map_to op_merge_map op_multicast op_pairwise
-    op_pluck op_ref_count op_scan op_share op_start_with op_switch_map op_take op_take_until op_take_while op_tap
-    op_with_latest_from
+    op_pluck op_ref_count op_sample_time op_scan op_share op_start_with op_switch_map op_take op_take_until
+    op_take_while op_tap op_throttle_time op_with_latest_from
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -368,8 +368,10 @@ sub op_filter {
             my ($subscriber) = @_;
 
             my $own_subscriber = { %$subscriber };
+            my $idx = 0;
             $own_subscriber->{next} &&= sub {
-                my $passes = eval { $filtering_sub->(@_) };
+                my ($value) = @_;
+                my $passes = eval { $filtering_sub->($value, $idx++) };
                 if (my $error = $@) {
                     $subscriber->{error}->($error);
                 } else {
@@ -435,8 +437,10 @@ sub op_map {
             my ($subscriber) = @_;
 
             my $own_subscriber = { %$subscriber };
+            my $idx = 0;
             $own_subscriber->{next} &&= sub {
-                my $result = eval { $mapping_sub->(@_) };
+                my ($value) = @_;
+                my $result = eval { $mapping_sub->($value, $idx++) };
                 if (my $error = $@) {
                     $subscriber->{error}->($error) if defined $subscriber->{error};
                 } else {
@@ -647,6 +651,40 @@ sub op_ref_count {
             }
 
             return;
+        });
+    };
+}
+
+sub op_sample_time {
+    my ($period) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my @last_value;
+            my $emitted = 0;
+
+            my $n_s = rx_interval($period)->subscribe(sub {
+                if ($emitted) {
+                    $emitted = 0;
+                    $subscriber->{next}->(@last_value) if defined $subscriber->{next};
+                }
+            });
+
+            get_subscription_from_subscriber($subscriber)->add_dependents($n_s);
+
+            $source->subscribe({
+                %$subscriber,
+                next => sub {
+                    my @value = @_;
+
+                    @last_value = @value;
+                    $emitted = 1;
+                },
+            });
         });
     };
 }
@@ -883,6 +921,48 @@ sub op_tap {
                         $subscriber->{$key}->(@_) if defined $subscriber->{$key};
                     });
                 } keys %own_keys
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
+}
+
+sub op_throttle_time {
+    my ($duration) = @_;
+
+    my ($timer_sub, $cancel_timer_sub) = get_timer_subs;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $silent_mode = 0;
+            my $silence_timer_id;
+
+            get_subscription_from_subscriber($subscriber)->add_dependents(
+                sub { $cancel_timer_sub->($silence_timer_id) if defined $silence_timer_id }
+            );
+
+            my $own_subscriber = {
+                %$subscriber,
+                next => sub {
+                    my @value = @_;
+
+                    if (! $silent_mode) {
+                        $silent_mode = 1;
+                        $silence_timer_id = $timer_sub->($duration, sub {
+                            undef $silence_timer_id;
+                            $silent_mode = 0;
+                        });
+
+                        $subscriber->{next}->(@value) if defined $subscriber->{next};
+                    }
+                },
             };
 
             $source->subscribe($own_subscriber);

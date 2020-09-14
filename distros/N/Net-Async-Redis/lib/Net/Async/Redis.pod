@@ -57,7 +57,8 @@ L<https://redis.io/commands>
 
 This is intended to be a near-complete low-level client module for asynchronous Redis
 support. See L<Net::Async::Redis::Server> for a (limited) Perl server implementation.
-It is an unofficial Perl port and not endorsed by the Redis server maintainers in any
+
+This is an unofficial Perl port, and not endorsed by the Redis server maintainers in any
 way.
 
 =head2 Supported features
@@ -66,7 +67,7 @@ Current features include:
 
 =over 4
 
-=item * L<all commands|https://redis.io/commands> as of 6.0.7 (August 2020), see L<https://redis.io/commands> for the methods and parameters
+=item * L<all commands|https://redis.io/commands> as of 6.0.7 (September 2020), see L<https://redis.io/commands> for the methods and parameters
 
 =item * L<pub/sub support|https://redis.io/topics/pubsub>, see L</METHODS - Subscriptions>
 
@@ -77,6 +78,8 @@ Current features include:
 =item * L<streams|https://redis.io/topics/streams-intro> and consumer groups, via L<Net::Async::Redis::Commands/XADD> and related methods
 
 =item * L<client-side caching|https://redis.io/topics/client-side-caching>, see L</METHODS - Clientside caching>
+
+=item * L<RESP3/https://github.com/antirez/RESP3/blob/master/spec.md> protocol for Redis 6 and above, allowing pubsub on the same connection as regular commands
 
 =back
 
@@ -172,11 +175,109 @@ L<OpenTracing::Any> for details.
 B<NOTE>: For a full list of the Redis methods supported by this module,
 please see L<Net::Async::Redis::Commands>.
 
+=head2 configure
+
+Applies configuration parameters - currently supports:
+
+=over 4
+
+=item * C<host>
+
+=item * C<port>
+
+=item * C<auth>
+
+=item * C<database>
+
+=item * C<pipeline_depth>
+
+=item * C<stream_read_len>
+
+=item * C<stream_write_len>
+
+=item * C<on_disconnect>
+
+=item * C<client_name>
+
+=item * C<opentracing>
+
+=back
+
+=head2 host
+
+Returns the host or IP address for the Redis server.
+
+=head2 port
+
+Returns the port used for connecting to the Redis server.
+
+=head2 database
+
+Returns the database index used when connecting to the Redis server.
+
+See the L<Net::Async::Redis::Commands/select> method for details.
+
+=head2 uri
+
+Returns the Redis endpoint L<URI> instance.
+
+=head2 stream_read_len
+
+Returns the buffer size when reading from a Redis connection.
+
+Defaults to 1MB, reduce this if you're dealing with a lot of connections and
+want to minimise memory usage. Alternatively, if you're reading large amounts
+of data and spend too much time in needless C<epoll_wait> calls, try a larger
+value.
+
+=head2 stream_write_len
+
+Returns the buffer size when writing to Redis connections, in bytes. Defaults to 1MB.
+
+See L</stream_read_len>.
+
+=head2 client_name
+
+Returns the name used for this client when connecting.
+
+=head1 METHODS - Connection
+
+=head2 connect
+
+Connects to the Redis server.
+
+Will use the L</configure>d parameters if available, but as a convenience
+can be passed additional parameters which will then be applied as if you
+had called L</configure> with those beforehand. This also means that they
+will be preserved for subsequent L</connect> calls.
+
+=head2 connected
+
+Establishes a connection if needed, otherwise returns an immediately-available
+L<Future> instance.
+
+=head2 endpoint
+
+The string describing the remote endpoint.
+
+=head2 local_endpoint
+
+A string describing the local endpoint, usually C<host:port>.
+
 =head1 METHODS - Subscriptions
 
 See L<https://redis.io/topics/pubsub> for more details on this topic.
 There's also more details on the internal implementation in Redis here:
 L<https://making.pusher.com/redis-pubsub-under-the-hood/>.
+
+B<NOTE>: On Redis versions prior to 6.0, you will need a I<separate> connection
+for subscriptions; you cannot share a connection for regular requests once
+any of the L</subscribe> or L</psubscribe> methods have been called on an
+existing connection.
+
+With Redis 6.0, a newer protocol version (RESP3) is used by default, and
+this is quite happy to support pubsub activity on the same connection
+as other traffic.
 
 =head2 psubscribe
 
@@ -260,6 +361,23 @@ L<Net::Async::Redis::Commands/get> requests.
 
 See L<https://redis.io/topics/client-side-caching> for more details on this feature.
 
+=head2 client_side_cache_ready
+
+Returns a L<Future> representing the client-side cache connection status,
+if there is one.
+
+=head2 client_side_cache
+
+Returns the L<Cache::LRU> instance used for the client-side cache.
+
+=head2 is_client_side_cache_enabled
+
+Returns true if the client-side cache is enabled.
+
+=head2 client_side_cache_size
+
+Returns the current client-side cache size, as a number of entries.
+
 =head1 METHODS - Generic
 
 =head2 keys
@@ -273,43 +391,13 @@ on the C<__keyspace@*__> namespace, setting the configuration required
 for this to start emitting events, and then calls C<$code> with each
 event.
 
-Note that this will switch the connection into pubsub mode, so it will
-no longer be available for any other activity.
+Note that this will switch the connection into pubsub mode on versions
+of Redis older than 6.0, so it will no longer be available for any
+other activity. This limitation does not apply on Redis 6 or above.
+
+Use C<*> to listen for all keyspace changes.
 
 Resolves to a L<Ryu::Source> instance.
-
-=head2 endpoint
-
-The string describing the remote endpoint.
-
-=head2 local_endpoint
-
-A string describing the local endpoint, usually C<host:port>.
-
-=head2 connect
-
-Connects to the Redis server.
-
-Will use the L</configure>d parameters if available, but as a convenience
-can be passed additional parameters which will then be applied as if you
-had called L</configure> with those beforehand. This also means that they
-will be preserved for subsequent L</connect> calls.
-
-=head2 connected
-
-Establishes a connection if needed, otherwise returns an immediately-available
-L<Future> instance.
-
-=head2 on_message
-
-Called for each incoming message.
-
-Passes off the work to L</handle_pubsub_message> or the next queue
-item, depending on whether we're dealing with subscriptions at the moment.
-
-=head2 stream
-
-Represents the L<IO::Async::Stream> instance for the active Redis connection.
 
 =head2 pipeline_depth
 
@@ -330,6 +418,29 @@ This are still supported, but no longer recommended.
 
 =head1 METHODS - Internal
 
+=head2 on_message
+
+Called for each incoming message.
+
+Passes off the work to L</handle_pubsub_message> or the next queue
+item, depending on whether we're dealing with subscriptions at the moment.
+
+=head2 next_in_pipeline
+
+Attempt to process next pending request when in pipeline mode.
+
+=head2 on_error_message
+
+Called when there's an error response.
+
+=head2 handle_pubsub_message
+
+Deal with an incoming pubsub-related message.
+
+=head2 stream
+
+Represents the L<IO::Async::Stream> instance for the active Redis connection.
+
 =head2 notify_close
 
 Called when the socket is closed.
@@ -338,48 +449,26 @@ Called when the socket is closed.
 
 Generate a label for the given command list.
 
-=head2 stream_read_len
+=head2 execute_command
 
-Defines the buffer size when reading from a Redis connection.
+Queues or executes the given command.
 
-Defaults to 1MB, reduce this if you're dealing with a lot of connections and
-want to minimise memory usage. Alternatively, if you're reading large amounts
-of data and spend too much time in needless C<epoll_wait> calls, try a larger
-value.
+=head2 ryu
 
-=head2 stream_write_len
+A L<Ryu::Async> instance for source/sink creation.
 
-The buffer size when writing to Redis connections, in bytes. Defaults to 1MB.
+=head2 future
 
-See L</stream_read_len>.
+Factory method for creating new L<Future> instances.
 
-=head2 configure
+=head2 protocol
 
-Applies configuration parameters - currently supports:
+Returns the L<Net::Async::Redis::Protocol> instance used for
+encoding and decoding messages.
 
-=over 4
+=head2 _init
 
-=item * C<host>
-
-=item * C<port>
-
-=item * C<auth>
-
-=item * C<database>
-
-=item * C<pipeline_depth>
-
-=item * C<stream_read_len>
-
-=item * C<stream_write_len>
-
-=item * C<on_disconnect>
-
-=item * C<client_name>
-
-=item * C<opentracing>
-
-=back
+=head2 _add_to_loop
 
 =head1 SEE ALSO
 
@@ -402,6 +491,8 @@ have been new versions released since then
 pipelining and can handle newer commands via C<< ->command >>.
 
 =item * L<Redis> - synchronous (blocking) implementation, handles pub/sub and autoreconnect
+
+=item * L<HiRedis::Raw> - another C<hiredis> wrapper
 
 =back
 

@@ -24,7 +24,7 @@ describe "TravisCI::StatusBadge" => sub {
 
     describe "for README.mkdn" => sub {
         before all => sub {
-            $tzil = t::lib::Builder->tzil_for( 'README.mkdn', $config );
+            $tzil = t::lib::Builder->tzil_for( 'README.mkdn', 'markdown', $config );
 
             $tzil->expects( 'distmeta' )
                 ->returns( spoof_distmeta( 'Wu-Wu-x' ) )
@@ -35,7 +35,7 @@ describe "TravisCI::StatusBadge" => sub {
             lives_ok { $tzil->build; };
         };
 
-        it "should contains a badge" => sub {
+        it "should contain a badge" => sub {
             my $content = eval { $tzil->slurp_file( 'source/README.mkdn' ); };
 
             like(
@@ -47,7 +47,7 @@ describe "TravisCI::StatusBadge" => sub {
 
     describe "for README.markdown" => sub {
         before all => sub {
-            $tzil = t::lib::Builder->tzil_for( 'README.markdown', $config );
+            $tzil = t::lib::Builder->tzil_for( 'README.markdown', 'markdown', $config );
 
             $tzil->expects( 'distmeta' )
                 ->returns( spoof_distmeta( 'Wu-Wu-y' ) )
@@ -58,7 +58,7 @@ describe "TravisCI::StatusBadge" => sub {
             lives_ok { $tzil->build; };
         };
 
-        it "should contains a badge" => sub {
+        it "should contain a badge" => sub {
             my $content = eval { $tzil->slurp_file( 'source/README.markdown' ); };
 
             like(
@@ -70,7 +70,7 @@ describe "TravisCI::StatusBadge" => sub {
 
     describe "for README.md" => sub {
         before all => sub {
-            $tzil = t::lib::Builder->tzil_for( 'README.md', $config );
+            $tzil = t::lib::Builder->tzil_for( 'README.md', 'markdown', $config );
 
             $tzil->expects( 'distmeta' )
                 ->returns( spoof_distmeta( 'Wu-Wu-z' ) )
@@ -81,7 +81,7 @@ describe "TravisCI::StatusBadge" => sub {
             lives_ok { $tzil->build; };
         };
 
-        it "should contains a badge" => sub {
+        it "should contain a badge" => sub {
             my $content = eval { $tzil->slurp_file( 'source/README.md' ); };
 
             like(
@@ -93,7 +93,7 @@ describe "TravisCI::StatusBadge" => sub {
 
     describe "for Readme.mkdn" => sub {
         before all => sub {
-            $tzil = t::lib::Builder->tzil_for( 'Readme.mkdn', $config );
+            $tzil = t::lib::Builder->tzil_for( 'Readme.mkdn', 'markdown', $config );
 
             $tzil->expects( 'distmeta' )
                 ->returns( spoof_distmeta( 'Wu-Wu-a' ) )
@@ -104,7 +104,7 @@ describe "TravisCI::StatusBadge" => sub {
             lives_ok { $tzil->build; };
         };
 
-        it "should contains a badge" => sub {
+        it "should contain a badge" => sub {
             my $content = eval { $tzil->slurp_file( 'source/Readme.mkdn' ); };
 
             like(
@@ -116,7 +116,7 @@ describe "TravisCI::StatusBadge" => sub {
 
     describe "for Readme.markdown" => sub {
         before all => sub {
-            $tzil = t::lib::Builder->tzil_for( 'Readme.markdown', $config );
+            $tzil = t::lib::Builder->tzil_for( 'Readme.markdown', 'markdown', $config );
 
             $tzil->expects( 'distmeta' )
                 ->returns( spoof_distmeta( 'Wu-Wu-b' ) )
@@ -127,7 +127,7 @@ describe "TravisCI::StatusBadge" => sub {
             lives_ok { $tzil->build; };
         };
 
-        it "should contains a badge" => sub {
+        it "should contain a badge" => sub {
             my $content = eval { $tzil->slurp_file( 'source/Readme.markdown' ); };
 
             like(
@@ -139,7 +139,7 @@ describe "TravisCI::StatusBadge" => sub {
 
     describe "for Readme.md" => sub {
         before all => sub {
-            $tzil = t::lib::Builder->tzil_for( 'Readme.md', $config );
+            $tzil = t::lib::Builder->tzil_for( 'Readme.md', 'markdown', $config );
 
             $tzil->expects( 'distmeta' )
                 ->returns( spoof_distmeta( 'Wu-Wu-c' ) )
@@ -150,7 +150,7 @@ describe "TravisCI::StatusBadge" => sub {
             lives_ok { $tzil->build; };
         };
 
-        it "should contains a badge" => sub {
+        it "should contain a badge" => sub {
             my $content = eval { $tzil->slurp_file( 'source/Readme.md' ); };
 
             like(
@@ -162,7 +162,7 @@ describe "TravisCI::StatusBadge" => sub {
 
     describe "for README1.md" => sub {
         before all => sub {
-            $tzil = t::lib::Builder->tzil_for( 'README1.md', $config );
+            $tzil = t::lib::Builder->tzil_for( 'README1.md', 'markdown', $config );
 
             $tzil->expects( 'distmeta' )
                 ->returns( spoof_distmeta( 'Wu-Wu-d' ) )
@@ -173,7 +173,7 @@ describe "TravisCI::StatusBadge" => sub {
             lives_ok { $tzil->build; };
         };
 
-        it "should not contains a badge" => sub {
+        it "should not contain a badge" => sub {
             my $content = eval { $tzil->slurp_file( 'source/README1.md' ); };
 
             like(
@@ -183,9 +183,55 @@ describe "TravisCI::StatusBadge" => sub {
         };
     };
 
+    describe "for README.pod" => sub {
+        before all => sub {
+            $tzil = t::lib::Builder->tzil_for( 'README.pod', 'pod', $config );
+
+            $tzil->expects( 'distmeta' )
+                ->returns( spoof_distmeta( 'Wu-Wu-c' ) )
+                ->at_least( 1 );
+        };
+
+        it "should build dist" => sub {
+            lives_ok { $tzil->build; };
+        };
+
+        it "should contain a badge" => sub {
+            my $content = eval { $tzil->slurp_file( 'source/README.pod' ); };
+
+            like(
+                $content,
+                qr{\Q<img alt="Build Status" src="https://travis-ci.org/Wu-Wu-c/p5-Foo-Bar.png?branch=master"\E},
+            );
+        };
+    };
+
+    describe "for README1.pod" => sub {
+        before all => sub {
+            $tzil = t::lib::Builder->tzil_for( 'README1.pod', 'pod', $config );
+
+            $tzil->expects( 'distmeta' )
+                ->returns( spoof_distmeta( 'Wu-Wu-d' ) )
+                ->at_least( 1 );
+        };
+
+        it "should build dist" => sub {
+            lives_ok { $tzil->build; };
+        };
+
+        it "should not contain a badge" => sub {
+            my $content = eval { $tzil->slurp_file( 'source/README1.pod' ); };
+
+            like(
+                $content,
+                qr{[^\Q<img alt="Build Status"\E]},
+            );
+        };
+    };
+
     describe "for README.mdx" => sub {
         before all => sub {
-            $tzil = t::lib::Builder->tzil_for( 'README.mdx', $config );
+            $tzil = t::lib::Builder->tzil_for( 'README.mdx', 'markdown', $config );
 
             $tzil->expects( 'distmeta' )
                 ->returns( spoof_distmeta( 'Wu-Wu-e' ) )
@@ -196,7 +242,7 @@ describe "TravisCI::StatusBadge" => sub {
             lives_ok { $tzil->build; };
         };
 
-        it "should not contains a badge" => sub {
+        it "should not contain a badge" => sub {
             my $content = eval { $tzil->slurp_file( 'source/README.mdx' ); };
 
             like(

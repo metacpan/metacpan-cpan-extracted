@@ -1,4 +1,9 @@
-Revision history for Net-Checkpoint-Management-v1: 0.001006
+Revision history for Net-Checkpoint-Management-v1: 0.001007
+
+0.001007  2020-09-14 12:30:08+02:00 Europe/Vienna
+    - add install_policy method
+    - add verify_policy method
+    - add wait_for_task method
 
 0.001006  2020-07-21 10:19:37+02:00 Europe/Vienna
     - add group methods

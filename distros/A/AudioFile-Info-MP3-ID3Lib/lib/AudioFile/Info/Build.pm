@@ -50,14 +50,14 @@ sub ACTION_install {
 
   # if no default set and this plugin has a score, or if this plugin
   # score higher than the existing default, then set default
-  if (! exists $config->{default}{mp3} and $mp3
-     or $mp3 and $mp3 >= $config->{default}{mp3}{score}) {
+  if ($mp3 and (not exists $config->{default}{mp3}
+     or $mp3 >= $config->{default}{mp3}{score})) {
     $config->{default}{mp3} = { name => $pkg, score => $mp3 };
     warn "AudioFile::Info - Default mp3 handler is now $pkg\n";
   }
 
-  if (! exists $config->{default}{ogg} and $ogg
-     or $ogg and $ogg >= $config->{default}{ogg}{score}) {
+  if ($ogg and (not exists $config->{default}{ogg}
+     or $ogg >= $config->{default}{ogg}{score})) {
     $config->{default}{ogg} = { name => $pkg, score => $ogg };
     warn "AudioFile::Info - Default ogg handler is now $pkg\n";
   }

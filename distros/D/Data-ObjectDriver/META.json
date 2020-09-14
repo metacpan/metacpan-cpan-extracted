@@ -4,9 +4,9 @@
       "-2006"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
-      "artistic_2"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -70,7 +70,7 @@
    "provides" : {
       "Data::ObjectDriver" : {
          "file" : "lib/Data/ObjectDriver.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Data::ObjectDriver::BaseObject" : {
          "file" : "lib/Data/ObjectDriver/BaseObject.pm"
@@ -159,7 +159,7 @@
          "web" : "https://github.com/sixapart/data-objectdriver"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_authority" : "cpan:SIXAPART",
    "x_contributors" : [
       "Adam Thomason <athomason@sixapart.com>",

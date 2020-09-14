@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.7.3';
+our $VERSION = '1.7.4';
 
 use MP3::ID3Lib;
 
@@ -38,8 +38,8 @@ sub AUTOLOAD {
     my $found;
     for (@{$_[0]->{obj}->frames}) {
       if($_->code eq $data{$sub}) {
-	$found = 1;
-	$_->set($attr);
+      $found = 1;
+      $_->set($attr);
         last;
       }
     }
@@ -84,6 +84,6 @@ Dave Cross, E<lt>dave@dave.org.ukE<gt>
 Copyright 2003 by Dave Cross
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =cut

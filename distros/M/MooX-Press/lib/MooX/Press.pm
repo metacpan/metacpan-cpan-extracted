@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.064';
+our $VERSION   = '0.065';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -33,6 +33,8 @@ my @delete_keys = qw(
 	type_library_can
 	factory_package_can
 	abstract
+	multimethod
+	multifactory
 );
 
 my $_handle_list = sub {
@@ -188,6 +190,9 @@ sub import {
 		push @{ $opts{'factory_package'} . '::ISA' }, 'Exporter::Tiny';
 	}
 	
+	my %modifiers;
+	$opts{$_} && ($modifiers{$_} = delete $opts{$_}) for qw/ before after around /;
+	
 	for my $pkg (@roles) {
 		$builder->do_coercions_for_role($pkg->[0], %opts, reg => $reg, %{$pkg->[1]});
 	}
@@ -206,6 +211,23 @@ sub import {
 	}
 	for my $pkg (@classes) {
 		$builder->make_class($pkg->[0], _parent_opts => \%opts, _roles => \@roles, %opts, %{$pkg->[1]});
+	}
+	
+	if (keys %modifiers) {
+		%opts = ( %opts, %modifiers );
+		for my $modifier (qw(before after around)) {
+			if (defined $opts{$modifier}) {
+				my @methods   = $opts{$modifier}->$_handle_list;
+				while (@methods) {
+					my @method_names;
+					push(@method_names, shift @methods)
+						while (@methods and not ref $methods[0]);
+					my $coderef = $builder->_prepare_method_modifier($opts{'factory_package'}, $modifier, \@method_names, shift(@methods));
+					require Class::Method::Modifiers;
+					Class::Method::Modifiers::install_modifier( $opts{'factory_package'}, $modifier, @method_names, $coderef );
+				}
+			}
+		}
 	}
 	
 	%_cached_moo_helper = ();  # cleanups
@@ -723,6 +745,16 @@ sub _make_package {
 		while (@mm) {
 			my ($method_name, $method_spec) = splice(@mm, 0, 2);
 			$builder->install_multimethod($qname, $opts{is_role}?'role':'class', $method_name, $method_spec);
+		}
+	}
+	
+	if (defined $opts{multifactory}) {
+		my @mm = $opts{multifactory}->$_handle_list_add_nulls;
+		while (@mm) {
+			my ($method_name, $method_spec) = splice(@mm, 0, 2);
+			my $old_coderef = $method_spec->{code} or die;
+			my $new_coderef = sub { splice(@_, 1, 0, "$qname"); goto $old_coderef };
+			$builder->install_multimethod($opts{factory_package}, 'class', $method_name, { %$method_spec, code => $new_coderef });
 		}
 	}
 	
@@ -2255,6 +2287,32 @@ L<Sub::MultiMethod>.
     ],
   );
 
+=item C<< multifactory >> I<< (ArrayRef) >>
+
+Similar to C<multimethod> but the methods are created in the factory
+package.
+
+  package MyApp;
+  use MooX::Press (
+    class => [
+      'Foo' => {
+         multifactory => [
+           'new_foo' => {
+             signature => [ 'HashRef' ],
+             code      => sub { my ($factory, $class, $hash)  = @_; ... },
+           },
+           'new_foo' => {
+             signature => [ 'ArrayRef' ],
+             code      => sub { my ($factory, $class, $array) = @_; ... },
+           },
+         ],
+       },
+    ],
+  );
+  
+  my $obj1 = 'MyApp'->new_foo( {} );
+  my $obj2 = 'MyApp'->new_foo( [] );
+
 =item C<< constant >> I<< (HashRef[Item]) >>
 
 A hashref of scalar constants to define in the package.
@@ -3469,7 +3527,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>.
 
 =head1 SEE ALSO
 
-L<Zydeco>.
+L<Zydeco::Lite>, L<Zydeco>.
 
 L<Moo>, L<MooX::Struct>, L<Types::Standard>.
 

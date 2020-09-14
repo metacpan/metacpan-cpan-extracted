@@ -1,10 +1,17 @@
 Revision history for Perl extension RxPerl
 
+v0.26.0 2020-09-14T16:59:24Z
+
+    - added op_throttle_time and op_sample_time
+    - op_map & op_filter now also pass $index to their sub
+    - fixed documentation
+    - fixed module's dependencies a bit
+
 v0.25.1 2020-09-13T15:21:13Z
 
     - fixed ordering of sources in rx_fork_join
     - fixed documentation
-    
+
 v0.25.0 2020-09-13T12:59:43Z
 
     - added op_catch_error, op_finalize, rx_fork_join
@@ -21,11 +28,11 @@ v0.23.1 2020-09-12T08:10:09Z
 
 v0.23.0 2020-09-12T06:43:28Z
 
-    - added op_debounce_time, op_pluck, op_end_with, rx_combine_latest
+    - added op_debounce_time, op_pluck, op_end_with and rx_combine_latest
 
 v0.22.0 2020-09-11T15:35:32Z
 
-    - added op_concat_map, op_exhaust_map
+    - added op_concat_map and op_exhaust_map
     - refactored rx_concat
 
 v0.21.4 2020-09-11T08:45:20Z
@@ -47,8 +54,7 @@ v0.21.1 2020-09-10T14:44:30Z
 
 v0.21.0 2020-09-10T13:26:42Z
 
-    - added op_first
-    - added op_take_while
+    - added op_first and op_take_while
     - added links to egghead.io & ultimate courses
 
 v0.20.0 2020-09-10T10:10:30Z
@@ -75,7 +81,7 @@ v0.18.1 2020-09-08T07:56:05Z
 
 v0.18.0 2020-09-08T07:29:51Z
 
-    - added op_start_with, op_switch_map
+    - added op_start_with and op_switch_map
     - fixed errors in POD
 
 v0.17.0 2020-09-06T07:16:41Z

@@ -1,3 +1,11 @@
+2020-09-14  Dave Cross <dave@perlhack.com>
+
+  * Catch up on four years of commits
+
+  * Some CI improvements
+
+  * Some perlcritic suggestions
+
 2016-12-08  Dave Cross <dave@dave.org.uk>
 
   * lib/AudioFile/Info/MP3/ID3Lib.pm: Bump version for another upload attempt

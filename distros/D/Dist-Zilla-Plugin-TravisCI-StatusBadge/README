@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.007
+    version 0.009
 
 SYNOPSIS
 
@@ -23,7 +23,7 @@ SYNOPSIS
 DESCRIPTION
 
     Injects the Travis CI Build status badge before the VERSION header into
-    any form of README.md file.
+    any form of README.[md|pod] file.
 
     Traget readme might be pointed via option "readme" or guessed by
     module.
@@ -42,12 +42,17 @@ OPTIONS
 
     The name of file to inject build status badge. No default value but
     there is some logic to guess target filename. File can be named as
-    README or Readme and has the one of following extensions: md, mkdn or
-    markdown.
+    README or Readme and has the one of following extensions: md, mkdn,
+    markdown or pod.
 
     In case of some name passed via this option, it will be used only if
     the target file exists otherwise will be checked default variations and
     used first found.
+
+ format
+
+    Either pod or markdown. Optional. When unspecified, format is pod if
+    readme has a .pod file extension and markdown otherwise.
 
  user
 
@@ -74,15 +79,26 @@ OPTIONS
 
 SEE ALSO
 
-    https://travis-ci.org
+    Please see those modules/websites for more information related to this
+    module.
 
-    Dist::Zilla::Plugin::ReadmeAnyFromPod
+      * https://travis-ci.org
 
-    Dist::Zilla::Plugin::GithubMeta
+      * Dist::Zilla::Plugin::ReadmeAnyFromPod
 
-    Dist::Zilla::Role::AfterBuild
+      * Dist::Zilla::Plugin::GithubMeta
 
-    Dist::Zilla
+      * Dist::Zilla::Role::AfterBuild
+
+      * Dist::Zilla
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/Wu-Wu/Dist-Zilla-Plugin-TravisCI-StatusBadge/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 AUTHOR
 

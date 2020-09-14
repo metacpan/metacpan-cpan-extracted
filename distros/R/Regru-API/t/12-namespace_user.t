@@ -12,7 +12,6 @@ subtest 'Generic behaviour' => sub {
         create
         get_statistics
         get_balance
-        refill_balance
     );
 
     my $client = t::lib::NamespaceClient->user;
@@ -47,7 +46,7 @@ SKIP: {
             plan skip_all => '.';
         }
         else {
-            plan tests => 10;
+            plan tests => 8;
         }
 
         my $resp;
@@ -65,25 +64,6 @@ SKIP: {
 
         $resp = $client->get_balance(currency => 'UAH');
         is $resp->get('currency'), 'UAH',                       'get_balance() UAH currency okay';
-
-        # /user/refill_balance
-        my $refill_balance_answer = {
-            currency => 'RUR',
-            payment => 100,
-            pay_type => 'WM',
-            wm_invid => 12345678,
-            total_payment => 100,
-            wmid => 123456789012,
-        };
-
-        $resp = $client->refill_balance(
-            pay_type => 'WM',
-            wmid     => 123456789012,
-            currency => 'RUR',
-            amount   => 100
-        );
-        ok $resp->is_success,                                   'refill_balance() success';
-        is_deeply $resp->answer, $refill_balance_answer,        'refill_balance() answer as expected';
 
         # /user/create
         $resp = $client->create(
@@ -106,11 +86,11 @@ SKIP: {
         $client->username(undef);
         $client->password(undef);
 
-        my $resp = $client->refill_balance;
+        my $resp = $client->get_balance;
 
-        ok !$resp->is_success,                                        'Request success';
-        is $resp->error_text, 'No authorization mechanism selected',  'Got correct error_text';
-        is $resp->error_code, 'NO_AUTH',                              'Got correct error_code';
+        ok !$resp->is_success,                                          'Request success';
+        is $resp->error_text, 'No authorization mechanism selected',    'Got correct error_text';
+        is $resp->error_code, 'NO_AUTH',                                'Got correct error_code';
     };
 }
 
