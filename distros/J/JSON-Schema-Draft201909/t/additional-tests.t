@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More;
@@ -26,7 +27,8 @@ $accepter->acceptance(
     my $result = $js->evaluate($instance_data, $schema);
     my $result_short = $js_short_circuit->evaluate($instance_data, $schema);
 
-    note $encoder->encode($result);
+    note 'result: ', $encoder->encode($result);
+    note 'short-circuited result: ', $encoder->encode($result_short) if $result xor $result_short;
 
     die 'results inconsistent between short_circuit = false and true'
       if ($result xor $result_short)

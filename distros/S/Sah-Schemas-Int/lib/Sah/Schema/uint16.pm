@@ -1,9 +1,9 @@
 package Sah::Schema::uint16;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Int'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 our $schema = [int => {
     summary => '16-bit unsigned integer',
@@ -12,6 +12,8 @@ our $schema = [int => {
     examples => [
         {data=>0 , valid=>1},
         {data=>-1, valid=>0},
+        {data=>2**16-1, valid=>1},
+        {data=>2**16, valid=>0},
     ],
 }, {}];
 
@@ -30,7 +32,7 @@ Sah::Schema::uint16 - 16-bit unsigned integer
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::uint16 (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::uint16 (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -98,6 +100,10 @@ Sample data:
  0  # valid
 
  -1  # INVALID
+
+ 65535  # valid
+
+ 65536  # INVALID
 
 =head1 HOMEPAGE
 

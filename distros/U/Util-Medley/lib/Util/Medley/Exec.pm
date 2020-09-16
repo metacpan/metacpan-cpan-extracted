@@ -1,5 +1,5 @@
 package Util::Medley::Exec;
-$Util::Medley::Exec::VERSION = '0.037';
+$Util::Medley::Exec::VERSION = '0.041';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -8,11 +8,13 @@ use Data::Printer alias => 'pdump';
 use Util::Medley::Crypt;
 use Util::Medley::Number;
 use Util::Medley::Module::Overview;
+use Util::Medley::YAML;
 use Text::ASCIITable;
 use Text::Table;
 
-with 'Util::Medley::Roles::Attributes::String',
-  'Util::Medley::Roles::Attributes::List';
+with 
+    'Util::Medley::Roles::Attributes::String',
+    'Util::Medley::Roles::Attributes::List';
 
 =head1 NAME
 
@@ -20,7 +22,7 @@ Util::Medley::Exec - proxy for cmdline to libs
 
 =head1 VERSION
 
-version 0.037
+version 0.041
 
 =cut
 
@@ -113,6 +115,13 @@ method decryptStr (Str :$str!,
 
 	my $crypt = Util::Medley::Crypt->new;
 	say $crypt->decryptStr(%a);
+}
+
+method yamlBeautifyFile (Str :$file!,
+                         Int :$sortDepth = 0) {
+
+	my $yaml = Util::Medley::YAML->new;
+	$yaml->yamlBeautifyFile(path => $file, sortDepth => $sortDepth);
 }
 
 ###############################################################

@@ -1,3 +1,20 @@
+# Licensed to Elasticsearch B.V. under one or more contributor
+# license agreements. See the NOTICE file distributed with
+# this work for additional information regarding copyright
+# ownership. Elasticsearch B.V. licenses this file to you under
+# the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
 package Search::Elasticsearch;
 
 use Moo 2.001000 ();
@@ -5,10 +22,10 @@ use Moo 2.001000 ();
 use Search::Elasticsearch::Util qw(parse_params load_plugin);
 use namespace::clean;
 
-our $VERSION = '6.81';
+our $VERSION = '7.30';
 
 my %Default_Plugins = (
-    client      => [ 'Search::Elasticsearch::Client',       '6_0::Direct' ],
+    client      => [ 'Search::Elasticsearch::Client',       '7_0::Direct' ],
     cxn_factory => [ 'Search::Elasticsearch::Cxn::Factory', '' ],
     cxn_pool    => [ 'Search::Elasticsearch::CxnPool',      'Static' ],
     logger      => [ 'Search::Elasticsearch::Logger',       'LogAny' ],
@@ -62,7 +79,7 @@ Search::Elasticsearch - The official client for Elasticsearch
 
 =head1 VERSION
 
-version 6.81
+version 7.30
 
 =head1 SYNOPSIS
 
@@ -141,10 +158,10 @@ on L<elastic.co|http://www.elastic.co>.
 
 =head1 PREVIOUS VERSIONS OF ELASTICSEARCH
 
-This version of the client supports the Elasticsearch 5.0 branch,
+This version of the client supports the Elasticsearch 7.0 branch,
 which is not backwards compatible with earlier branches.
 
-If you need to talk to a version of Elasticsearch before 5.0.0, please
+If you need to talk to a version of Elasticsearch before 7.0.0, please
 install one of the following packages:
 
 =over
@@ -212,8 +229,8 @@ Good defaults
 =item *
 
 Helper utilities for more complex operations, such as
-L<bulk indexing|Search::Elasticsearch::Client::6_0::Bulk>, and
-L<scrolled searches|Search::Elasticsearch::Client::6_0::Scroll>
+L<bulk indexing|Search::Elasticsearch::Client::7_0::Bulk>, and
+L<scrolled searches|Search::Elasticsearch::Client::7_0::Scroll>
 
 =item *
 
@@ -412,11 +429,11 @@ methods that can be called to execute requests, such as
 C<search()>, C<index()> or C<delete()>. The client parses the user's
 requests and passes them to the L</transport> class to be executed.
 
-The default version of the client is C<6_0::Direct>, which can
+The default version of the client is C<7_0::Direct>, which can
 be explicitly specified as follows:
 
     $e = Search::Elasticsearch->new(
-        client => '6_0::Direct'
+        client => '7_0::Direct'
     );
 
 =head2 C<transport>
@@ -439,8 +456,6 @@ See:
 =over
 
 =item * L<Search::Elasticsearch::Cxn::HTTPTiny> (default)
-
-=item * L<Search::Elasticsearch::Cxn::Hijk>
 
 =item * L<Search::Elasticsearch::Cxn::LWP>
 
@@ -559,7 +574,7 @@ DATA YOU WANT TO KEEP!>
 You can change the Cxn class which is used by setting the C<ES_CXN>
 environment variable:
 
-    ES_CXN=Hijk ES=localhost:9200 make test
+    ES_CXN=NetCurl ES=localhost:9200 make test
 
 =head1 AUTHOR
 

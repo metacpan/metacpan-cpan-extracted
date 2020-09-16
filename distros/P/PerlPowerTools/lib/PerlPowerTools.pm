@@ -1,6 +1,6 @@
 package PerlPowerTools;
 
-our $VERSION = '1.017';
+our $VERSION = '1.020';
 
 1;
 
@@ -137,8 +137,6 @@ setting C<INSTALL_BASE> when you run F<Makefile.PL>.
 =item mail - implementation of Berkeley mail(1)
 
 =item pmake - a perl 'make' replacement
-
-=item man - format and display the on-line manual page
 
 =item maze - generate a maze problem
 

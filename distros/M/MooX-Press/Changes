@@ -6,6 +6,24 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.067	2020-09-15
+
+ - Added: MooX::Press::make_absolute_package_name() function.
+ - Treat leading `main::` like leading `::`.
+
+0.066	2020-09-15
+
+ [ Bug Fixes ]
+ - Ensure Moose/Mouse classes are mutable before attempting to add
+   attributes to them.
+
+ [ Test Suite ]
+ - Fix for Perl 5.8.
+
+ [ Other ]
+ - Refactor code for run-time modification of packages, moving code from
+   Zydeco::Lite to MooX::Press so it can be shared with Zydeco.
+
 0.065	2020-09-14
 
  - Added: Brand new Zydeco::Lite module.

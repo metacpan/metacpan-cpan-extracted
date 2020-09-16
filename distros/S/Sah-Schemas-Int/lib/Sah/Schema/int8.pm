@@ -1,9 +1,9 @@
 package Sah::Schema::int8;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Int'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 our $schema = [int => {
     summary => '8-bit signed integer',
@@ -11,6 +11,9 @@ our $schema = [int => {
     max     => +2**7-1,
     examples => [
         {data=>0, valid=>1},
+        {data=>-127, valid=>1},
+        {data=>-128, valid=>1},
+        {data=>-129, valid=>0},
         {data=>127, valid=>1},
         {data=>128, valid=>0},
         {data=>255, valid=>0},
@@ -32,7 +35,7 @@ Sah::Schema::int8 - 8-bit signed integer
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::int8 (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::int8 (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -98,6 +101,12 @@ L<Perinci::CmdLine> to create a CLI:
 Sample data:
 
  0  # valid
+
+ -127  # valid
+
+ -128  # valid
+
+ -129  # INVALID
 
  127  # valid
 

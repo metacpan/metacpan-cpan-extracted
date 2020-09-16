@@ -358,7 +358,8 @@ is_deeply(
 { note "health_check_response";
     my $mw = Plack::Middleware::HealthCheck->new(
         health_check => HealthCheck->new );
-    my @content_type = ( content_type => 'application/json; charset=utf-8' );
+    my @content_type
+        = ( 'Content-Type' => 'application/json; charset=utf-8' );
 
     is_deeply $mw->health_check_response,
         [ 503, [@content_type], [qq({})] ],
@@ -379,7 +380,8 @@ is_deeply(
 { note "health_check_response with \$req can be pretty";
     my $mw = Plack::Middleware::HealthCheck->new(
         health_check => HealthCheck->new );
-    my @content_type = ( content_type => 'application/json; charset=utf-8' );
+    my @content_type
+        = ( 'Content-Type' => 'application/json; charset=utf-8' );
 
     my $req = Plack::Request->new({});
 

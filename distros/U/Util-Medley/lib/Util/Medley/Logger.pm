@@ -1,5 +1,5 @@
 package Util::Medley::Logger;
-$Util::Medley::Logger::VERSION = '0.037';
+$Util::Medley::Logger::VERSION = '0.041';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -14,7 +14,6 @@ use Fcntl ":flock";
 use File::Path 'make_path';
 use File::Basename;
 
-
 with 'Util::Medley::Roles::Attributes::DateTime';
 with 'Util::Medley::Roles::Attributes::String';
 
@@ -24,7 +23,7 @@ Util::Medley::Logger - Yet another class for logging.
 
 =head1 VERSION
 
-version 0.037
+version 0.041
 
 =cut
 
@@ -865,7 +864,7 @@ method _getLogLevel () {
 
 method _isLogLevelValid (Str $level) {
 
-	if ( $self->_logLevelMap->{$level} ) {
+    if ( defined $self->_logLevelMap->{$level} ) {
 		return 1;
 	}
 

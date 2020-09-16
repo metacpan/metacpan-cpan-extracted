@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.1602';
+our $VERSION = '0.1605';
 
 use Math::Bezier;
 use MIDI::Simple;
@@ -111,15 +111,15 @@ has triplet_sixteenth             => (is => 'ro', default => sub { 'tsn' });
 has dotted_sixteenth              => (is => 'ro', default => sub { 'dsn' });
 has double_dotted_sixteenth       => (is => 'ro', default => sub { 'ddsn' });
 has thirtysecond                  => (is => 'ro', default => sub { 'yn' });
-has triplet_thirtysecond          => (is => 'ro', default => sub { 'dyn' });
+has triplet_thirtysecond          => (is => 'ro', default => sub { 'tyn' });
 has dotted_thirtysecond           => (is => 'ro', default => sub { 'dyn' });
 has double_dotted_thirtysecond    => (is => 'ro', default => sub { 'ddyn' });
 has sixtyfourth                   => (is => 'ro', default => sub { 'xn' });
-has triplet_sixtyfourth           => (is => 'ro', default => sub { 'dxn' });
+has triplet_sixtyfourth           => (is => 'ro', default => sub { 'txn' });
 has dotted_sixtyfourth            => (is => 'ro', default => sub { 'dxn' });
 has double_dotted_sixtyfourth     => (is => 'ro', default => sub { 'ddxn' });
 has onetwentyeighth               => (is => 'ro', default => sub { 'on' });
-has triplet_onetwentyeighth       => (is => 'ro', default => sub { 'don' });
+has triplet_onetwentyeighth       => (is => 'ro', default => sub { 'ton' });
 has dotted_onetwentyeighth        => (is => 'ro', default => sub { 'don' });
 has double_dotted_onetwentyeighth => (is => 'ro', default => sub { 'ddon' });
 
@@ -221,13 +221,10 @@ sub metronome58 {
     my $bars = shift || $self->bars;
     for my $n (1 .. $bars) {
         $self->note($self->eighth, $self->closed_hh, $self->kick);
-        $self->note($self->sixteenth, $self->closed_hh);
-        $self->note($self->sixteenth, $self->kick);
+        $self->note($self->eighth, $self->closed_hh);
         $self->note($self->eighth, $self->closed_hh, $self->snare);
-        $self->note($self->sixteenth, $self->closed_hh);
-        $self->note($self->sixteenth, $self->snare);
-        $self->note($self->sixteenth, $self->closed_hh);
-        $self->note($self->sixteenth, $self->kick);
+        $self->note($self->eighth, $self->closed_hh);
+        $self->note($self->eighth, $self->closed_hh);
     }
 }
 
@@ -269,8 +266,7 @@ sub metronome78 {
         $self->note($self->eighth, $self->closed_hh, $self->kick);
         $self->note($self->eighth, $self->closed_hh);
         $self->note($self->eighth, $self->closed_hh);
-        $self->note($self->sixteenth, $self->closed_hh, $self->kick);
-        $self->note($self->sixteenth, $self->kick);
+        $self->note($self->eighth, $self->closed_hh, $self->kick);
         $self->note($self->eighth, $self->closed_hh, $self->snare);
         $self->note($self->eighth, $self->closed_hh);
         $self->note($self->eighth, $self->closed_hh);
@@ -280,6 +276,7 @@ sub metronome78 {
 
 sub flam {
     my ($self, $spec, $patch) = @_;
+    $patch ||= $self->snare;
     my $x = $MIDI::Simple::Length{$spec};
     my $y = $MIDI::Simple::Length{ $self->sixtyfourth };
     my $z = sprintf '%0.f', ($x - $y) * TICKS;
@@ -375,7 +372,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.1602
+version 0.1605
 
 =head1 SYNOPSIS
 
@@ -402,7 +399,7 @@ version 0.1602
  $d->metronome44;  # 4/4 time for the number of bars
 
  $d->flam($d->quarter, $d->snare);
- $d->crescendo_roll([50, 127], $d->eighth, $d->thirtysecond);
+ $d->crescendo_roll([50, 127, 1], $d->eighth, $d->thirtysecond);
  $d->note($d->eighth, $d->crash1);
 
  # Alternate kick and snare
@@ -614,13 +611,17 @@ Add a 7/8 beat to the score.
 
 =head2 flam
 
+  $d->flam($spec);
   $d->flam( $spec, $patch );
 
-Add a flam to the score, where a ghosted gracenote is played before
-the primary note.
+Add a "flam" to the score, where a ghosted 64th gracenote is played
+before the primary note.
+
+If not provided the B<snare> is used for the B<patch>.
 
 =head2 roll
 
+  $d->roll( $length, $spec );
   $d->roll( $length, $spec, $patch );
 
 Add a drum roll to the score, where the B<patch> is played for
@@ -630,6 +631,7 @@ If not provided the B<snare> is used for the B<patch>.
 
 =head2 crescendo_roll
 
+  $d->crescendo_roll( [$start, $end, $bezier], $length, $spec );
   $d->crescendo_roll( [$start, $end, $bezier], $length, $spec, $patch );
 
 Add a drum roll to the score, where the B<patch> is played for
@@ -658,18 +660,20 @@ C<time_signature> values based on the given string.
 
 =head2 write
 
-Output the score to the default F<*.mid> file or one given to the
-constuctor.
+Output the score as a MIDI file with the module L</file> setting as
+the file name.
 
 =head1 SEE ALSO
 
-The F<eg/*> programs in this distribution and
-F<eg/drum-fills-advanced> in the L<Music::Duration::Partition>
-distribution
+The metronome method sources in this module, the F<eg/*> programs in
+this distribution, and also F<eg/drum-fills-advanced> in the
+L<Music::Duration::Partition> distribution
 
-L<Moo>
+L<Math::Bezier>
 
 L<MIDI::Simple>
+
+L<Moo>
 
 L<Music::Duration>
 

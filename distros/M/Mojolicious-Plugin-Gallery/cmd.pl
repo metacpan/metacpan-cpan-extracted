@@ -11,9 +11,6 @@ unshift @{app->commands->namespaces}, 'Command';
 
 plugin Config => { file => 'main.conf' };
 
-# NOTE: workaround
-my %config = %{app->config};
-
 app->config(\%config);
 
 app->start;

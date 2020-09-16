@@ -44,7 +44,8 @@ my @files = (
     't/lib/es_async_auth.pl',
     't/lib/es_async_fork.pl',
     't/lib/es_sync.pl',
-    't/lib/index_test_data.pl'
+    't/lib/index_test_data.pl',
+    't/lib/index_test_data_7.pl'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

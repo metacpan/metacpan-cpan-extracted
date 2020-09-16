@@ -89,7 +89,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Draft201909",
-      "dist_version" => "0.012",
+      "dist_version" => "0.013",
       "license" => "perl",
       "module_name" => "JSON::Schema::Draft201909",
       "recursive_test_files" => 1,
@@ -117,6 +117,7 @@ EOW
         "overload" => 0,
         "perl" => "5.016",
         "strict" => 0,
+        "strictures" => 2,
         "warnings" => 0
       },
       "share_dir" => {

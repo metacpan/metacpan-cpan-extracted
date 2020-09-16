@@ -1,9 +1,9 @@
 package Sah::SchemaR::even;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.074'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.075'; # VERSION
 
-our $rschema = ["int",[{div_by=>2,examples=>[{data=>0,valid=>1},{data=>2,valid=>1},{data=>1,valid=>0}],summary=>"Even number"}],["int"]];
+our $rschema = ["int",[{div_by=>2,examples=>[{data=>0,valid=>1},{data=>2,valid=>1},{data=>1,valid=>0},{data=>-1,valid=>0},{data=>-2,valid=>1}],summary=>"Even number"}],["int"]];
 
 1;
 # ABSTRACT: Even number
@@ -20,7 +20,7 @@ Sah::SchemaR::even - Even number
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::SchemaR::even (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::SchemaR::even (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

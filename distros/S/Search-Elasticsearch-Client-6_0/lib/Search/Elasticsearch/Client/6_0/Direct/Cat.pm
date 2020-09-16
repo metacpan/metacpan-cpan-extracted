@@ -1,5 +1,9 @@
+# Licensed to Elasticsearch B.V under one or more agreements.
+# Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+# See the LICENSE file in the project root for more information
+
 package Search::Elasticsearch::Client::6_0::Direct::Cat;
-$Search::Elasticsearch::Client::6_0::Direct::Cat::VERSION = '6.81';
+$Search::Elasticsearch::Client::6_0::Direct::Cat::VERSION = '7.30';
 use Moo;
 with 'Search::Elasticsearch::Client::6_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -42,7 +46,7 @@ Search::Elasticsearch::Client::6_0::Direct::Cat - A client for running cat debug
 
 =head1 VERSION
 
-version 6.81
+version 7.30
 
 =head1 DESCRIPTION
 

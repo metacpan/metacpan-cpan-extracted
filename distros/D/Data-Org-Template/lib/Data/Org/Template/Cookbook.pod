@@ -1,0 +1,340 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Org::Template::Cookbook - Simple recipes for my flavor of templates
+
+=head1 DESCRIPTION
+
+I have no memory whatsoever for syntactic detail, which is a significant handicap for a programmer. As a result, I rely on cookbooks, notes, and code snippets to
+do the most trivial of things - I can only whip out code quickly when it's entirely non-trivial, like tossing closures around.
+
+This set of examples is therefore really more for my own use than yours, but I hope you find it useful as well.
+
+=head1 BASIC TEMPLATING
+
+=head2 Hello, world
+
+The most fundamental programming task, as we all know, is to greet the entire human race. Here's how you'd do that using a DOTemplate - and of course by changing the
+input data you can greet anybody you like.
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new ("Hello, [[name]]!");
+    print $t->text({name => 'world'});
+
+So far, this is no different from any other template engine - we have a field delimited by some kind of special brackets, and the field names a data item in a hashref.
+This is just how you set it all up.
+
+=head2 Multiline templates
+
+What I normally do for multiline templates (which is the majority of templates) is this:
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new (<<'EOF');
+    Hello to:
+    [[name]]
+    EOF
+    
+    print $t->text({name => 'world'});
+
+=head2 I don't like those [[brackets]]
+
+You can also easily use a different type of bracket.
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new ("Hello, {name}!", '{}');
+    print $t->text({name => 'world'});
+
+=head1 DATA GETTING
+
+So far we've just passed a single hashref to the template when we express it, but we can get fancier than that.
+
+=head2 Register a data getter
+
+You can register a data getter ahead of time so text retrieval will always produce an updated value.
+
+    use Data::Org::Template;
+
+    my $data = {name => 'world'};
+
+    my $t = Data::Org::Template->new ("Hello, {name}!", '{}');
+    $t->data_getter ($data);
+    
+    print $t->text; # --> Hello, world!
+    
+    $data->{name} = 'Bob';
+    print $t->text; # --> Hello, Bob!
+
+=head2 Getting data from multiple sources
+
+All the getters we've used so far have had a single source - one hashref holding values. But in reality, a getter can accept a list of sources.
+The getter will consult each source in turn until it gets a defined value.
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new ("First [[x]] then [[y]]");
+    my $data = {x => 'xval'};
+    $t->data_getter($data, {y=>'yval'});
+    
+    print $t->text; # --> First xval then yval
+    
+    $data->{yval} = 'not yval';
+    print $t->text; # --> First xval then not yval
+
+Notice that the value for C<y> in the first hash now shadows the value in the second hash.
+
+=head2 Special cases in multiple-source retrieval
+
+There are two special cases that can come in handy. The first is that if there is a "source" in the list that is a scalar value, then it can be retrieved with the
+special field name of "." - a period.
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new ("Value: [[.]]");
+    
+    print $t->text ('value'); # --> Value: value
+    
+The second comes into play when a data source list is passed to a template that already has a registered data getter. The getter is only consulted for values if
+the special source "*" has been included in the list passed to expression. That explanation isn't all that clear, but the code probably makes it obvious:
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new ("First [[x]] then [[y]]");
+    my $data = {x => 'xval'};
+    $t->data_getter($data);
+    
+    print $t->text ({y => 'yval'});      # --> First  then yval
+    print $t->text ({y => 'yval'}, '*'); # --> First xval then yval
+    print $t->text ({y => 'yval', x => 'not xval'}, '*'); # --> First not xval then yval
+    print $t->text ('*', {y => 'yval', x => 'not xval'}); # --> First xval then yval
+    
+The sources are still consulted in the order they're provided, so in the final print statement the template's own getter returns a value for C<x> before the value
+passed in for expression.
+
+=head2 Magic values
+
+Any value returned by a data getter can also be a coderef (a closure) - if so, it is executed to get the final value. (If the return value is still a coderef, it
+will be executed again. And again. Try not to shoot yourself in the foot with a self-returning coderef, obviously.) This is a kind of neat way to embed a template
+in another template - just make the embedded template's expression a magic value in the data for the second template.
+
+    use Data::Org::Template;
+
+    my $data = {name => 'world'};
+    $t = Data::Org::Template->new("Hello, [[name]]!");
+    $t->data_getter ($data);
+
+    my $t2 = Data::Org::Template->new ("Current greeting: '[[greeting]]'");
+    $t2->data_getter ({greeting => sub { $t->text }});
+
+    print $t2->text();  # --> Current greeting: 'Hello, world!'
+    $data->{name} = 'Bob';
+    print $t2->text();  # --> Current greeting: 'Hello, Bob!'
+
+Personally, I think that's pretty darn cool.
+
+=head2 Indentation preservation
+
+One feature I actually wrote this library to provide is preservation of indentation when multi-lined values are inserted into a template.
+
+    use Data::Org::Template;
+
+    my $text = <<'EOF';
+    This is a text
+    that consists
+    of multiple lines.
+    EOF
+    
+    my $t = Data::Org::Template->new (<<'EOF');
+    This is the value: [[text]]
+    And this is the line after it.
+    EOF
+    
+    print $t->text({text => $text});
+    # This is the value: This is a text
+    #                    that consists
+    #                    of multiple lines.
+    # And this is the line after it.
+    
+My original impetus for this idea was years ago, when I was dabbling with literate programming and realized that it I<didn't work> for Python because it was
+such a pain to insert values that needed their indentation preserved properly.
+
+=head1 FORMATTING VALUES
+
+=head2 HTML-encoding values
+
+There's actually an optional step in between retrieving a value from the getter and incorporating it into the template expression, and that's formatting.
+A really common formatter is HTML encoding, which substitutes HTML entities for the special values &, <, and >. This is so common it's the only formatter
+I've already implemented standard in the module, and this is how you use it:
+
+    use Data::Org::Template;
+
+    $t = Data::Org::Template->new("<i>[[string|html]]</i>");
+    print $t->text({string => '<x>'}); # --> <i>&lt;x&gt;</i>
+    
+Anything after a vertical bar is a formatter, and you can run the value through an arbitrary number of formatters. Spaces around the bar are ignored.
+The formatter specification can also include spaces and some punctuation; the initial alphanumeric string identifies the formatter for lookup, but the
+whole string is passed to the formatter factory to parameterize the formatter instance. (This part isn't well-tested, so it might break if you actually
+use it; I just like leaving doors open for later use if the need arises.)
+
+=head2 Registering your own formatter
+
+Since the formatter represents arbitrary code that can modify the value as it comes from the data source, there are lots of things you can do with it,
+but since I haven't anticipated all possible (or even obvious) needs, you can also register your own formatters. The formatter factory is created when
+the data getter is created, so to do a custom formatter, you'll want something like this:
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new("Hello, [[name | myfmt]]!");
+    my $getter = $t->data_getter ({});
+    $getter->formatter->register ('myfmt', sub { sub { return '...' . $_[0] . '...' } } );
+
+    print $t->text ({name => "Bob"}); # --> Hello, ...Bob...!
+    
+=head1 FANCY STUFF
+
+Up to this point, all we've done is get values and put them into vanilla templates. We can also use section directives to direct entire sections of the
+template; three are defined (but of course you can register your own - if you want to read the code; eventually, if the need arises, I'll work out how
+it works, fix any bugs I find, and document it here, but today is not that day). The three available are C<[[.if]]>, C<[[.with]]>, and C<[[.list]]>.
+All section directives are terminated with C<[[..]]> and they can have subsection directives of the form C<[[..else]]>.
+
+=head2 Conditional templates with .if
+
+The .if directive is probably the most obvious to use. It checks a value, and includes its content if the value is true. If it contains an C<[[..else]]>
+subsection, that will be displayed if the value is false. Easy, right?
+
+    use Data::Org::Template;
+
+    my $data = {flag => 1};
+    my $t = Data::Org::Template->new("Current value: [[.if flag]]yes[[..else]]no[[..]]");
+
+    print $t->text; # --> Current value: yes
+    $data->{flag} = 0;
+    print $t->text; # --> Current value: no
+    
+If directives appear on their own line in a multi-line template, then the line end is considered part of the directive when replacing.
+
+    use Data::Org::Template;
+
+    my $data = {flag => 1};
+    my $t = Data::Org::Template->new(<<'EOF');
+    Current value:
+      [[.if flag]]
+      yes
+      [[..else]]
+      no
+      [[..]]
+    EOF
+
+    print $t->text ({flag => 0});
+    # Current value:
+    #   no
+
+(This is because I spent too much time agonizing over early template engines that would leave all kinds of blank lines everywhere in the output.)
+
+=head2 Embedding hashrefs with .with
+
+If one of your values is a hashref, you can define a subtemplate that accesses I<its> values (and so on recursively) using the C<.with> directive. If there's
+a chance that there is no such hashref, an C<[[..else]]> subsection can be included.
+
+    use Data::Org::Template;
+
+    my $data = {x => {name => 'world'}};
+    my $t = Data::Org::Template->new(<<'EOF');
+    [[.with x]]
+    Hello, [[name]]!
+    [[..]]
+    EOF
+
+    print $t->text ({flag => 0}); # --> Hello, world!
+
+=head2 List templates with .list
+
+And if one of your values is an arrayref, you can repeat a section of the template for each item in the list. There are a lot of moving parts in a list template;
+I tried to cover all the use cases I've run into myself. The main section of the list is expressed for each of its items and assumes that the item is a hashref.
+(If the item is just a scalar, of course, it can be accessed with the special name C<.>.)
+
+If there is an C<[[..alt]]> subsection, it is expressed in the calling data context between rows.
+
+If there is an C<[[..else]]> subsection, it is expressed if the arrayref contains no items.
+
+If the list is in an arrayref, not an iterator (see below for iterators), the default value getter also provides special values C<.count> and C<.total> for the
+current item's number and the total number of items in the list. This doesn't apply to iterators, because we don't know the total number of rows an iterator will
+return and you can build your own counting variable for your input iterator if you need one.
+
+    use Data::Org::Template;
+
+    $t = Data::Org::Template->new (<<EOF);
+    People:
+    [[.list people]]
+    - [[name]]
+    [[..else]]
+    (none listed)
+    [[..]]
+    EOF
+
+    print $t->text({'people' => [{name => 'Bob'}, {name => 'Sam'}]});
+    # People:
+    # - Bob
+    # - Sam
+
+    print $t->text();
+    # People:
+    # (none listed)
+
+=head1 COOKING WITH ITERATORS
+
+This template engine was specifically written to work with my L<Iterator::Records> module. An itrecs is a factory for L<Iterator::Simple> iterators that return
+a series of arrayrefs, each arrayref being a field. The names of the fields are also defined in advance. In the upcoming version, a type descriptor will also be
+definable for each column, but that won't really affect template expression (I suppose we could have a formatter, something like "|by_type" or something).
+
+The really convenient thing about itrecs is that they are a swappable way to represent query results - from SQLite, from the filesystem, from walks of arbitrary
+data trees, whatever - and this template engine gives us a simple way of turning that into human-readable text.
+
+=head2 Turning an SQLite query into an HTML table
+
+This is a ubiquitous use case.
+
+    use Iterator::Records;
+    use Data::Org::Template;
+   
+    my $db = Iterator::Records::db->open ("mydb.sqlt");
+    # Assume a table like this:
+    # create table people (
+    #   first text,
+    #   last  text
+    # );
+    
+    $t = Data::Org::Template->new (<<EOF);
+    <table>
+    <tr><th>First name</th><th>Last name</th></tr>
+    [[.list .]]
+    <tr><td>[[first|html]]</td><td>[[last|html]]</td></tr>
+    [[..else]]
+    <tr><td colspan="2">No records found.</td></tr>
+    [[..]]
+    </table>
+    EOF
+
+    $t->text($db->select ("select first, last from people")->iter);
+    
+Simple. Easy to remember. You could write a generic table displayer that would read the iterator's field list and use the actual field names
+as column headers; eventually I'm going to write that as part of a general SQL-to-HTML toolset.
+
+=head1 YOUR TURN
+
+That's all the recipes I'm going to write at the moment. I've already spent more time on writing this cookbook than I really intended. A couple of the examples aren't tested
+all that well, so if I use them in something and it turns out they were wrong, I'll update. If I<you> use this module, and have some convenient use cases you'd like to see
+here, by all means get in touch.
+
+
+=for comment
+ Things that might be nice to put into this cookbook later:
+ - Building templates directly (handing it the token stream)
+ - Reading the template as a stream
+ - Adding your own transducers
+

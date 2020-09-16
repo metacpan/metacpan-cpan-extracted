@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.603';
+our $VERSION   = '0.605';
 
 use Keyword::Simple ();
 use PPR;
@@ -1186,12 +1186,17 @@ sub _handle_multi_keyword {
 	}
 	
 	my $inject_vars = 'my $class = ref($self)||$self';
-	if ( $code =~ /\$\s*factory/ ) {
-		$inject_vars .= '; my $factory = $self->FACTORY';
-	}
 	
 	if ($has_sig) {
-		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; %s; do %s }', $signature_var_list, $extra, $inject_vars, $code);
+		my $munged_code = sprintf(
+			$kind eq 'factory'
+				? 'sub { my($factory,$self,%s)=(shift,shift,@_); %s; %s; do %s }'
+				: 'sub { my($self,%s)=(shift,@_); %s; %s; do %s }',
+			$signature_var_list,
+			$extra,
+			$inject_vars,
+			$code,
+		);
 		return sprintf(
 			'q[%s]->_multi(%s => %s, { attributes => %s, caller => __PACKAGE__, code => %s, named => %d, signature => %s, %s });',
 			$me,
@@ -1205,7 +1210,13 @@ sub _handle_multi_keyword {
 		);
 	}
 	else {
-		my $munged_code = sprintf('sub { my $self = $_[0]; %s; do %s }', $inject_vars, $code);
+		my $munged_code = sprintf(
+			$kind eq 'factory'
+				? 'sub { my $factory = $_[0]; my $self = $_[1]; %s; do %s }'
+				: 'sub { my $self = $_[0]; %s; do %s }',
+			$inject_vars,
+			$code,
+		);
 		return sprintf(
 			'q[%s]->_multi(%s => %s, { attributes => %s, caller => __PACKAGE__, code => %s, named => 0, signature => sub { @_ }, %s });',
 			$me,
@@ -2013,35 +2024,56 @@ sub _package_callback {
 	return $TARGET;
 }
 
-# `version` keyword
-#
-sub version {
-	if (is_HashRef $TARGET) {
-		$TARGET->{version} = shift;
+sub _define_or_patch (&;$) {
+	my ($do, $fallback) = @_;
+	
+	my $is_patching = 0;
+	if ( is_HashRef $TARGET ) {
+		$_ = $TARGET;
+	}
+	elsif ( is_Str $TARGET or is_Str $fallback ) {
+		$_ = {};
+		$is_patching = 1;
+	}
+	else {
 		return;
 	}
 	
-	if (is_Str $TARGET) {
-		no strict 'refs';
-		${"$TARGET\::VERSION"} = shift;
+	$do->();
+	
+	if ( $is_patching ) {
+		my %got = 'MooX::Press'->patch_package( $TARGET||$fallback, %$_ );
+		return if keys %got;
 	}
 	
+	return 1;
+}
+
+sub _define_do_not_patch (&) {
+	my $do = shift;
+	if ( is_HashRef $TARGET ) {
+		$_ = $TARGET;
+	}
+	else {
+		return 0;
+	}
+	$do->();
+	return 1;
+}
+
+# `version` keyword
+#
+sub version {
+	my $ver = shift;
+	_define_or_patch { $_->{version} = $ver } or
 	__PACKAGE__->_syntax_error('version declaration', 'Not supported outside class or role');
 }
 
 # `authority` keyword
 #
 sub authority {
-	if (is_HashRef $TARGET) {
-		$TARGET->{authority} = shift;
-		return;
-	}
-	
-	if (is_Str $TARGET) {
-		no strict 'refs';
-		${"$TARGET\::AUTHORITY"} = shift;
-	}
-	
+	my $auth = shift;
+	_define_or_patch { $_->{authority} = $auth } or
 	__PACKAGE__->_syntax_error('authority declaration', 'Not supported outside class or role');
 }
 
@@ -2056,18 +2088,7 @@ sub overload {
 		@args = @{+shift};
 	}
 	
-	if (is_HashRef $TARGET) {
-		push @{ $TARGET->{overload} ||= [] }, @args;
-		return;
-	}
-	
-	require Role::Hooks;
-	if (is_Str $TARGET and not 'Role::Hooks'->is_role($TARGET)) {
-		require overload;
-		overload->import::into($TARGET, @args);
-		return;
-	}
-	
+	_define_or_patch { push @{$_->{overload}||=[]}, @args } or
 	__PACKAGE__->_syntax_error('overload declaration', 'Not supported outside class');
 }
 
@@ -2090,38 +2111,23 @@ sub _has {
 	my $me = shift;
 	my ($attr, %spec) = @_;
 	
-	if (is_HashRef $TARGET) {
-		$TARGET->{has}{$attr} = \%spec;
-		return;
-	}
-
-	if (is_Str $TARGET) {
-		'MooX::Press'->install_attributes($TARGET, { $attr => \%spec });
-		return;
-	}
-
+	_define_or_patch { $_->{has}{$attr} = \%spec } or
 	$me->_syntax_error('attribute declaration', 'Not supported outside class or role');
 }
 
 sub _extends {
 	my $me = shift;
+	my @classes = @_;
 	
-	if (is_HashRef $TARGET) {
-		@{ $TARGET->{extends}||=[] } = @_;
-		return;
-	}
-	
+	_define_do_not_patch { @{ $_->{extends}||=[] } = @classes } or
 	$me->_syntax_error('extends declaration', 'Not supported outside class');
 }
 
 sub _type_name {
 	my $me = shift;
+	my ($name) = @_;
 	
-	if (is_HashRef $TARGET) {
-		$TARGET->{type_name} = shift;
-		return;
-	}
-	
+	_define_do_not_patch { $_->{type_name} = $name } or
 	$me->_syntax_error('extends declaration', 'Not supported outside class or role');
 }
 
@@ -2129,16 +2135,14 @@ sub _begin {
 	my $me = shift;
 	my ($coderef) = @_;
 	
-	if (is_HashRef $TARGET) {
+	_define_do_not_patch {
 		my $wrapped_coderef = sub {
 			local $TARGET = $_[0];
 			local $EVENT  = 'begin';
 			&$coderef;
 		};
-		push @{$TARGET->{begin}||=[]}, $wrapped_coderef;
-		return;
-	}
-	
+		push @{$_->{begin}||=[]}, $wrapped_coderef;
+	} or
 	$me->_syntax_error('begin hook', 'Not supported outside class or role (use import option instead)');
 }
 
@@ -2146,16 +2150,14 @@ sub _end {
 	my $me = shift;
 	my ($coderef) = @_;
 	
-	if (is_HashRef $TARGET) {
+	_define_do_not_patch {
 		my $wrapped_coderef = sub {
 			local $TARGET = $_[0];
 			local $EVENT  = 'end';
 			&$coderef;
 		};
-		push @{$TARGET->{end}||=[]}, $wrapped_coderef;
-		return;
-	}
-	
+		push @{$_->{end}||=[]}, $wrapped_coderef;
+	} or
 	$me->_syntax_error('end hook', 'Not supported outside class or role (use import option instead)');
 }
 
@@ -2163,16 +2165,15 @@ sub _before_apply {
 	my $me = shift;
 	my ($coderef) = @_;
 	
-	if (is_HashRef $TARGET) {
+	_define_do_not_patch {
 		my $wrapped_coderef = sub {
 			local $TARGET = $_[1];
 			local $EVENT  = 'before_apply';
 			&$coderef;
 		};
-		push @{$TARGET->{before_apply}||=[]}, $wrapped_coderef;
+		push @{$_->{before_apply}||=[]}, $wrapped_coderef;
 		return;
-	}
-	
+	} or
 	$me->_syntax_error('before_apply hook', 'Not supported outside role');
 }
 
@@ -2180,49 +2181,39 @@ sub _after_apply {
 	my $me = shift;
 	my ($coderef) = @_;
 	
-	if (is_HashRef $TARGET) {
+	_define_do_not_patch {
 		my $wrapped_coderef = sub {
 			local $TARGET = $_[1];
 			local $EVENT  = 'after_apply';
 			&$coderef;
 		};
-		push @{$TARGET->{after_apply}||=[]}, $wrapped_coderef;
+		push @{$_->{after_apply}||=[]}, $wrapped_coderef;
 		return;
-	}
-	
+	} or
 	$me->_syntax_error('after_apply hook', 'Not supported outside role');
 }
 
 sub _interface {
 	my $me = shift;
+	my ($arg) = @_;
 	
-	if (is_HashRef $TARGET) {
-		$TARGET->{interface} = shift;
-		return;
-	}
-	
+	_define_do_not_patch { $_->{interface} = $arg } or
 	$me->_syntax_error('interface callback', 'Not supported outside role');
 }
 
 sub _abstract {
 	my $me = shift;
+	my ($arg) = @_;
 	
-	if (is_HashRef $TARGET) {
-		$TARGET->{abstract} = shift;
-		return;
-	}
-	
-	$me->_syntax_error('interface callback', 'Not supported outside role');
+	_define_do_not_patch { $_->{abstract} = $arg } or
+	$me->_syntax_error('abstract callback', 'Not supported outside class');
 }
 
 sub _with {
 	my $me = shift;
+	my @roles = @_;
 	
-	if (is_HashRef $TARGET) {
-		push @{ $TARGET->{with}||=[] }, @_;
-		return;
-	}
-	
+	_define_or_patch { push @{ $_->{with}||=[] }, @roles } or
 	$me->_syntax_error('with declaration', 'Not supported outside class or role');
 }
 
@@ -2230,102 +2221,49 @@ sub _toolkit {
 	my $me = shift;
 	my ($toolkit, @imports) = @_;
 	
-	if (is_HashRef $TARGET) {
-		$TARGET->{toolkit} = $toolkit;
-		push @{ $TARGET->{import}||=[] }, @imports if @imports;
-		return;
-	}
-	
+	_define_do_not_patch {
+		$_->{toolkit} = $toolkit;
+		push @{ $_->{import}||=[] }, @imports if @imports;
+	} or
 	$me->_syntax_error('toolkit declaration', 'Not supported outside class or role (use import option instead)');
 }
 
 sub _requires {
 	my $me = shift;
+	my @names = @_;
 	
-	if (is_HashRef $TARGET) {
-		push @{ $TARGET->{requires}||=[] }, @_;
-		return;
-	}
-	
+	_define_do_not_patch { push @{ $_->{requires}||=[] }, @names } or
 	$me->_syntax_error('requires declaration', 'Not supported outside role');
 }
 
 sub _coerce {
 	my $me = shift;
+	my @args = @_;
 	
-	my $soft_target = $TARGET || caller;
-	
-	if (is_HashRef $TARGET) {
-		push @{ $TARGET->{coerce}||=[] }, @_;
-		return;
-	}
-	elsif (is_Str $soft_target
-	and $soft_target->can('new')
-	and $soft_target->can('FACTORY')) {
-		# the things I do for love
-		if ( is_CodeRef $_[2] ) {
-			my $code = $_[2];
-			'MooX::Press'->install_methods(
-				$soft_target,
-				{ $_[1] => sub { local $_ = $_[1]; &$code } },
-			)
-		}
-		my $to_type   = $soft_target->FACTORY->type_library->get_type_for_package( any => $soft_target );
-		my $from_type = 'Type::Registry'->for_class($soft_target)->lookup($_[0]);
-		$to_type->coercion->add_type_coercions(
-			$from_type,
-			sprintf('%s->%s($_)', B::perlstring($soft_target), $_[1]),
-		);
-	}
-	else {
-		$me->_syntax_error('coercion declaration', 'Not supported outside class');
-	}
+	_define_or_patch { push @{$_->{coerce}||=[]}, @args } or
+	$me->_syntax_error('coercion declaration', 'Not supported outside class');
 }
 
 sub _factory {
 	my $me = shift;
+	my @args = @_;
 	
-	my $soft_target = $TARGET || caller;
-	
-	if (is_HashRef $TARGET) {
-		push @{ $TARGET->{factory}||=[] }, @_;
-		return;
-	}
-	elsif (is_Str $soft_target
-	and $soft_target->can('new')
-	and $soft_target->can('FACTORY')
-	and 'MooX::Press'->can('install_factories')) {
-		'MooX::Press'->install_factories( $soft_target->FACTORY, $soft_target, [@_] );
-	}
-	else {
-		$me->_syntax_error('factory method declaration', 'Not supported outside class');
-	}
+	_define_or_patch { push @{$_->{factory}||=[]}, @args } scalar(caller) or
+	$me->_syntax_error('factory method declaration', 'Not supported outside class');
 }
 
 sub _constant {
 	my $me = shift;
 	my ($name, $value) = @_;
 	
-	if (is_HashRef $TARGET) {
-		$TARGET->{constant}{$name} = $value;
-		return;
-	}
-	
-	my $target = $TARGET || caller;
-	'MooX::Press'->install_constants($target, { $name => $value });
+	_define_or_patch { $_->{constant}{$name} = $value } scalar(caller) or die;
 }
 
 sub _can {
 	my $me = shift;
 	my ($name, $code) = @_;
 	
-	if (is_HashRef $TARGET) {
-		$TARGET->{can}{$name} = $code;
-		return;
-	}
-	
-	my $target = $TARGET || caller;
-	'MooX::Press'->install_methods($target, { $name => $code })
+	_define_or_patch { $_->{can}{$name} = $code } scalar(caller) or die;
 }
 
 sub _multi {
@@ -2333,43 +2271,18 @@ sub _multi {
 	my ($kind, $name, $spec) = @_;
 	
 	if ($kind eq 'factory') {
-		my $proxy_name = "__multi_factory_$name";
-		
-		if (is_HashRef $TARGET) {
-			$TARGET->{factory} ||= [];
-			push @{$TARGET->{factory}}, $name => \$proxy_name unless grep { $_ eq $name } @{$TARGET->{factory}};
-			push @{ $TARGET->{multimethod} ||= [] }, $proxy_name => $spec;
-			return;
-		}
-		
+		_define_or_patch { push @{$_->{multifactory}||=[]}, $name, $spec } or
 		$me->_syntax_error('multi factory method declaration', 'Not supported outside class');
 	}
-	
 	else {
-		if (is_HashRef $TARGET) {
-			push @{ $TARGET->{multimethod} ||= [] }, $name => $spec;
-			return;
-		}
-		
-		my $target = $TARGET || caller;
-		'MooX::Press'->install_multimethod($target, 'class', $name, $spec);
+		_define_or_patch { push @{$_->{multimethod}||=[]}, $name, $spec } scalar(caller);
 	}
 }
 
 sub _modifier {
 	my $me = shift;
 	my ($kind, @args) = @_;
-	
-	if (is_HashRef $TARGET) {
-		push @{ $TARGET->{$kind} ||= [] }, @args;
-		return;
-	}
-	
-	my $target = $TARGET || caller;
-	my $codelike = pop @args;
-	my $coderef  = 'MooX::Press'->_prepare_method_modifier($target, $kind, \@args, $codelike);
-	require Class::Method::Modifiers;
-	Class::Method::Modifiers::install_modifier($target, $kind, @args, $coderef);
+	_define_or_patch { push @{$_->{$kind}||=[]}, @args } scalar(caller);
 }
 
 sub _include {
@@ -2409,7 +2322,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.603';
+#	our $VERSION   = '0.605';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2420,7 +2333,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.603';
+#	our $VERSION   = '0.605';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2433,12 +2346,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.603';
+#	our $VERSION   = '0.605';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.603';
+#	our $VERSION   = '0.605';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2452,7 +2365,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.603';
+#	our $VERSION   = '0.605';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2481,7 +2394,7 @@ sub anonymous_package {
 	
 	require MooX::Press;
 	my $method = "make_$kind";
-	MooX::Press->$method("::$qname", %opts, %$package_dfn);
+	MooX::Press->$method(MooX::Press::make_absolute_package_name($qname), %opts, %$package_dfn);
 	
 	require Module::Runtime;
 	$INC{Module::Runtime::module_notional_filename($qname)} = __FILE__;
@@ -2496,7 +2409,7 @@ sub anonymous_generator {
 	
 	require MooX::Press;
 	my $method = "make_$kind\_generator";
-	MooX::Press->$method("::$qname", %opts, generator => $callback);
+	MooX::Press->$method(MooX::Press::make_absolute_package_name($qname), %opts, generator => $callback);
 	
 	require Module::Runtime;
 	$INC{Module::Runtime::module_notional_filename($qname)} = __FILE__;
@@ -2616,6 +2529,9 @@ Syntactic sugar as sweet as pecan pie
 =back
 
 L<Zydeco::Manual> is probably the best place to start.
+
+If Zydeco is too slow or has too many dependencies for you, check out
+L<Zydeco::Lite>.
 
 =head1 KEYWORDS
 
@@ -3155,9 +3071,11 @@ L<Zydeco::Manual>.
 Zydeco website:
 L<http://zydeco.toby.ink/>.
 
-Less magic version:
+Less magic versions:
+L<Zydeco::Lite>,
 L<MooX::Press>.
-(Zydeco is just a wrapper around MooX::Press, providing a nicer syntax.)
+(Zydeco is just a wrapper around MooX::Press, providing a nicer syntax.
+Zydeco::Lite is an alternative wrapper, using less magic.)
 
 Important underlying technologies:
 L<Moo>, L<Type::Tiny::Manual>, L<Sub::HandlesVia>, L<Sub::MultiMethod>,

@@ -1,10 +1,21 @@
 
-0.01 2020.09.12
-    Initial release
+0.02 2020.09.14
+    - Set default character size to 12.
+    - Allow to zoom in and zoom out using the menu and using keyboard shortcuts.
+    - Add missing dependency: Tk::HyperText.
+    - Add new dependency: Browser::Open.
+    - Bind Ctlr-q to exit the application.
+    - Add several new range options.
+    - Add Autotidy menu option.
+    - Add option to save the PerlTidy config file.
+    - Add CONTRIBUTING.md, primarily to make MetaCPAN happy.
 
-    Load and display Perl file
-    Run Perl Tidy with default options.
-    Replace the displayed Perl file with the tidyed version.
-    Command line option to load a Perl file.
-    HTML-based About box
-    Menu items.
+0.01 2020.09.12
+    - Initial release
+
+    - Load and display Perl file
+    - Run Perl Tidy with default options.
+    - Replace the displayed Perl file with the tidyed version.
+    - Command line option to load a Perl file.
+    - HTML-based About box
+    - Menu items.

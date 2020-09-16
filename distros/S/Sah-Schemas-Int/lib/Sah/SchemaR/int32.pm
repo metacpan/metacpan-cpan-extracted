@@ -1,9 +1,9 @@
 package Sah::SchemaR::int32;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.074'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.075'; # VERSION
 
-our $rschema = ["int",[{examples=>[{data=>0,valid=>1},{data=>2147483648,valid=>0}],max=>2147483647,min=>-2147483648,summary=>"32-bit signed integer"}],["int"]];
+our $rschema = ["int",[{examples=>[{data=>0,valid=>1},{data=>-2147483648,valid=>1},{data=>-2147483649,valid=>0},{data=>2147483647,valid=>1},{data=>2147483648,valid=>0}],max=>2147483647,min=>-2147483648,summary=>"32-bit signed integer"}],["int"]];
 
 1;
 # ABSTRACT: 32-bit signed integer
@@ -20,7 +20,7 @@ Sah::SchemaR::int32 - 32-bit signed integer
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::SchemaR::int32 (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::SchemaR::int32 (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

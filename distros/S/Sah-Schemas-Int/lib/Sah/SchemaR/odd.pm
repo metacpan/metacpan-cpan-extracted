@@ -1,9 +1,9 @@
 package Sah::SchemaR::odd;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.074'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.075'; # VERSION
 
-our $rschema = ["int",[{div_by=>2,"div_by.op"=>"not",examples=>[{data=>1,valid=>1},{data=>-3,valid=>1},{data=>2,valid=>0}],summary=>"Odd number"}],["int"]];
+our $rschema = ["int",[{div_by=>2,"div_by.op"=>"not",examples=>[{data=>1,valid=>1},{data=>-3,valid=>1},{data=>-2,valid=>0},{data=>2,valid=>0},{data=>3,valid=>1}],summary=>"Odd number"}],["int"]];
 
 1;
 # ABSTRACT: Odd number
@@ -20,7 +20,7 @@ Sah::SchemaR::odd - Odd number
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::SchemaR::odd (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::SchemaR::odd (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

@@ -1,9 +1,9 @@
 package Sah::SchemaR::negeven;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.074'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.075'; # VERSION
 
-our $rschema = ["int",[{examples=>[{data=>-1,valid=>1},{data=>0,valid=>0}],max=>-1,summary=>"Negative integer (-1, -2, ...)"},{div_by=>2,examples=>[{data=>-2,valid=>1},{data=>-1,valid=>0}],summary=>"Negative even number"}],["negint","int"]];
+our $rschema = ["int",[{examples=>[{data=>-1,valid=>1},{data=>0,valid=>0}],max=>-1,summary=>"Negative integer (-1, -2, ...)"},{div_by=>2,examples=>[{data=>-2,valid=>1},{data=>-1,valid=>0},{data=>0,valid=>0}],summary=>"Negative even number"}],["negint","int"]];
 
 1;
 # ABSTRACT: Negative even number
@@ -20,7 +20,7 @@ Sah::SchemaR::negeven - Negative even number
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::SchemaR::negeven (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::SchemaR::negeven (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

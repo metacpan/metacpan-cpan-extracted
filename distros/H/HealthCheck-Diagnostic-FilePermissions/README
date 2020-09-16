@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version v1.4.7
+    version v1.4.8
 
 SYNOPSIS
 
@@ -22,11 +22,11 @@ SYNOPSIS
         );
         $d->check( permissions => 0777 );
     
-        # Check that the app has access to the file(s).
-        $d->check( access => 'x' );    # App can execute files.
-        $d->check( access => 'rw' );   # App can read and write files.
-        $d->check( access => 'r!wx' ); # App can read, not write and execute files.
-        $d->check( access => {         # App can read files.
+        # Check that it has access to the file(s).
+        $d->check( access => 'x' );    # Can execute files.
+        $d->check( access => 'rw' );   # Can read and write files.
+        $d->check( access => 'r!wx' ); # Can read, not write and execute files.
+        $d->check( access => {         # Can read files.
             read => 1,
         } );
     
@@ -79,22 +79,22 @@ ATTRIBUTES
 
     Any access permissions that are not defined are just ignored.
 
-        # Expect that the app can read, write, and execute the file(s).
+        # Expect that it can read, write, and execute the file(s).
         access => 'rwx'
         access => { r    => 1, w     => 1, x       => 1 }
         access => { read => 1, write => 1, execute => 1 },
     
-        # Expect that the app cannot read, write, or execute the file(s).
+        # Expect that it cannot read, write, or execute the file(s).
         access => '!rwx'
         access => { r    => 0, w     => 0, x       => 0 }
         access => { read => 0, write => 0, execute => 0 }
     
-        # Expect that the app can read but not write, nor execute the file(s).
+        # Expect that it can read but not write, nor execute the file(s).
         access => 'r!wx'
         access => { r    => 1, w     => 0, x       => 0 }
         access => { read => 1, write => 0, execute => 0 }
     
-        # Expect that the app can read, but ignore other access permissions.
+        # Expect that it can read, but ignore other access permissions.
         access => 'r'
         access => { r    => 1 }
         access => { read => 1 }
@@ -120,6 +120,14 @@ ATTRIBUTES
     The group name of the file (or files).
 
         group => 'developers'
+
+ collapse_single_result
+
+    The default for "collapse_single_result" in HealthCheck::Diagnostic is
+    changed to be truthy.
+
+    This only has an effect if checking a single attribute of a single
+    file.
 
 DEPENDENCIES
 

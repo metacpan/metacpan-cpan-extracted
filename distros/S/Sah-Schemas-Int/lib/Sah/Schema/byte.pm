@@ -1,17 +1,12 @@
 package Sah::Schema::byte;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Int'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 our $schema = ['uint8', {
     summary => 'Same as uint8',
-    examples => [
-        {data=>0  , valid=>1},
-        {data=>255, valid=>1},
-        {data=>256, valid=>0},
-    ],
 }, {}];
 
 1;
@@ -29,7 +24,7 @@ Sah::Schema::byte - Same as uint8
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::byte (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::byte (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -91,14 +86,6 @@ L<Perinci::CmdLine> to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
-
-Sample data:
-
- 0  # valid
-
- 255  # valid
-
- 256  # INVALID
 
 =head1 HOMEPAGE
 

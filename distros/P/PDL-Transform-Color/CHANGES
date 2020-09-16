@@ -1,3 +1,9 @@
+1.004 2020-09-15
+- re-release after deletion
+- fix so works under Devel::Cover
+- changes to 'extra'
+- tweak intensity in the 'extra' map
+
 v1.003
 	- fix typo in Makefile.PL
 

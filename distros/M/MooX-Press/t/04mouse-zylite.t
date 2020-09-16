@@ -147,33 +147,30 @@ is($animal_array_t->display_name, 'ArrayRef[Creature]');
 
 my $xyz;
 
-BEGIN {
-	app 'Local::Dummy3' => sub {
-		toolkit 'Mouse';
-		role 'Doubler' => sub {
-			around [ 'm1', 'm2' ] => sub {
-				my ( $orig, $self, @args ) = (shift, shift, @_);
-				return 2 * $self->$orig( @args );
-			};
-			before 'm1' => sub { ++$xyz };
+app 'Local::Dummy3' => sub {
+	toolkit 'Mouse';
+	role 'Doubler' => sub {
+		around [ 'm1', 'm2' ] => sub {
+			my ( $orig, $self, @args ) = (shift, shift, @_);
+			return 2 * $self->$orig( @args );
 		};
-		role 'Adder' => sub {
-			around 'm2' => sub {
-				my ( $orig, $self, @args ) = ( shift, shift, @_ );
-				return 1 + $self->$orig( @args );
-			};
-		};
-		class 'Base' => sub {
-			method 'm1' => sub {  42 };
-			method 'm2' => sub { 666 };
-			class 'With::Doubler' => sub { with 'Doubler'          };
-			class 'With::Adder'   => sub { with 'Adder'            };
-			class 'With::Both1'   => sub { with 'Adder', 'Doubler' };
-			class 'With::Both2'   => sub { with 'Doubler', 'Adder' };
+		before 'm1' => sub { ++$xyz };
+	};
+	role 'Adder' => sub {
+		around 'm2' => sub {
+			my ( $orig, $self, @args ) = ( shift, shift, @_ );
+			return 1 + $self->$orig( @args );
 		};
 	};
+	class 'Base' => sub {
+		method 'm1' => sub {  42 };
+		method 'm2' => sub { 666 };
+		class 'With::Doubler' => sub { with 'Doubler'          };
+		class 'With::Adder'   => sub { with 'Adder'            };
+		class 'With::Both1'   => sub { with 'Adder', 'Doubler' };
+		class 'With::Both2'   => sub { with 'Doubler', 'Adder' };
+	};
 };
-
 
 my @expected = (
 	[ 'new_base'                => 42, 666 ],

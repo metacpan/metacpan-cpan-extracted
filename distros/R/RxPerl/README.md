@@ -299,6 +299,18 @@ the result of the transformation to the next pipeable operator in the pipe, or r
 The following list is the currently implemented operators, with links to relevant rxjs documentation (which should apply to RxPerl
 too).
 
+- op\_audit\_time
+
+    [https://rxjs.dev/api/operators/auditTime](https://rxjs.dev/api/operators/auditTime)
+
+        # 30, complete
+        rx_concat(
+            rx_of(10, 20, 30),
+            rx_EMPTY->pipe( op_delay(5) ),
+        )->pipe(
+            op_audit_time(1),
+        )->subscribe($observer);
+
 - op\_catch\_error
 
     [https://rxjs.dev/api/operators/catchError](https://rxjs.dev/api/operators/catchError)

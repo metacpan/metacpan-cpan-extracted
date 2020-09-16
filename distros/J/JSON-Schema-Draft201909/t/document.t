@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
@@ -35,7 +36,7 @@ subtest 'boolean document' => sub {
       )
     },
     qr/canonical_uri cannot contain a fragment/,
-    'boolean schema with invalid canonical_uri',
+    'boolean schema with invalid canonical_uri (fragment)',
   );
 
   cmp_deeply(
@@ -390,6 +391,79 @@ subtest 'JSON pointer and URI escaping' => sub {
       ),
     ),
     'properly escaped special characters in JSON pointers and URIs',
+  );
+};
+
+subtest 'resource collisions' => sub {
+  like(
+    exception {
+      JSON::Schema::Draft201909::Document->new(
+        canonical_uri => Mojo::URL->new('https://foo.com/x/y/z'),
+        schema => {
+          allOf => [
+            { '$id' => '/x/y/z' },
+            { '$id' => '/a/b/c' },
+          ],
+        },
+      );
+    },
+    qr{\Quri "https://foo.com/x/y/z" conflicts with an existing schema resource\E},
+    'detected collision between document\'s initial uri and a subschema\'s uri',
+  );
+
+  like(
+    exception {
+      JSON::Schema::Draft201909::Document->new(
+        canonical_uri => Mojo::URL->new('https://foo.com'),
+        schema => {
+          allOf => [
+            { '$id' => '/x/y/z' },
+            { '$id' => '/x/y/z' },
+          ],
+        },
+      );
+    },
+    qr{\Quri "https://foo.com/x/y/z" conflicts with an existing schema resource\E},
+    'detected collision between two subschema uris in a document',
+  );
+
+  TODO: {
+    local $TODO = 'we need a more sophisticated traverser to detect non-schemas';
+    is(
+      exception {
+        JSON::Schema::Draft201909::Document->new(
+          canonical_uri => Mojo::URL->new('https://foo.com/x/y/z'),
+          schema => {
+            examples => [
+              { '$id' => '/x/y/z' },
+              { '$id' => 'https://foo.com/x/y/z' },
+            ],
+            default => {
+              allOf => [
+                { '$id' => '/x/y/z' },
+                { '$id' => 'https://foo.com/x/y/z' },
+              ],
+            },
+          },
+        );
+      },
+      undef,
+      'ignored "duplicate" uris embedded in non-schemas',
+    );
+  }
+
+  cmp_deeply(
+    JSON::Schema::Draft201909::Document->new(
+      canonical_uri => Mojo::URL->new('https://foo.com/x/y/z'),
+      schema => {
+        '$id' => 'https://bar.com',
+        '$anchor' => 'hello',
+      },
+    )->{canonical_uri_index},
+    {
+      '' => str('https://bar.com'),
+    },
+    'the correct canonical uri is indexed in the inverted index',
   );
 };
 

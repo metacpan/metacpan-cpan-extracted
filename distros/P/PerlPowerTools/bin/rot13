@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+=begin metadata
+
+Name: rot13
+Description: Rotate the Latin letters by 13 positions
+Author: Mark Rosetta (@marked on GitHub)
+Contributor: brian d foy, bdfoy@cpan.org
+License: artistic2
+
+=end metadata
+
+=cut
+
+while ( <> ) {
+  tr/A-Za-z/N-ZA-Mn-za-m/;
+  print;
+};

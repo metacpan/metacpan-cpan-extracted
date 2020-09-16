@@ -1,6 +1,10 @@
 Changelog for Plack-Middleware-HealthCheck
 
-v0.0.4 2020-07-09T14:43:08
+v0.0.5 2020-09-14T17:57:29
+ - Update README (Andrew Hewus Fresh)
+ - Fix content_type header spelling (Andrew Hewus Fresh)
+
+v0.0.4 2020-07-09T14:42:28
  - Update README (Maria Cioffi)
  - Tidy new code (Andrew Hewus Fresh)
  - Fixing runtime logic to work with empty arg (Maria Cioffi)

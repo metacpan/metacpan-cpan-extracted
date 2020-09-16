@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -27,7 +27,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "HealthCheck::Diagnostic" : "0",
+            "HealthCheck::Diagnostic" : "v1.6.0",
             "parent" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -51,7 +51,7 @@
    "provides" : {
       "HealthCheck::Diagnostic::FilePermissions" : {
          "file" : "lib/HealthCheck/Diagnostic/FilePermissions.pm",
-         "version" : "v1.4.7"
+         "version" : "v1.4.8"
       }
    },
    "release_status" : "stable",
@@ -65,9 +65,9 @@
          "web" : "https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-FilePermissions"
       }
    },
-   "version" : "v1.4.7",
-   "x_generated_by_perl" : "v5.18.2",
-   "x_serialization_backend" : "JSON::XS version 3.04",
+   "version" : "v1.4.8",
+   "x_generated_by_perl" : "v5.30.3",
+   "x_serialization_backend" : "JSON::XS version 4.02",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }

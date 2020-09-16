@@ -112,6 +112,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "overload" => 0,
     "strict" => 0,
+    "strictures" => 2,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -129,7 +130,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -170,6 +171,7 @@ my %FallbackPrereqs = (
   "open" => 0,
   "overload" => 0,
   "strict" => 0,
+  "strictures" => 2,
   "utf8" => 0,
   "warnings" => 0
 );

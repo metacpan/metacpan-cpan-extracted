@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Int - Sah schemas for various integers
 
 VERSION
-    This document describes version 0.074 of Sah::Schemas::Int (from Perl
-    distribution Sah-Schemas-Int), released on 2020-05-08.
+    This document describes version 0.075 of Sah::Schemas::Int (from Perl
+    distribution Sah-Schemas-Int), released on 2020-05-21.
 
 SAH SCHEMAS
     *   byte
@@ -16,7 +16,7 @@ SAH SCHEMAS
 
     *   int128
 
-        32-bit signed integer.
+        128-bit signed integer.
 
     *   int16
 

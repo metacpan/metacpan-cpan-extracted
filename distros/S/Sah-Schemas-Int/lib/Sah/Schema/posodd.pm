@@ -1,9 +1,9 @@
 package Sah::Schema::posodd;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Int'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 our $schema = ['posint', {
     summary => 'Positive odd number',
@@ -11,6 +11,7 @@ our $schema = ['posint', {
     'div_by.op' => 'not',
     examples => [
         {data=>1, valid=>1},
+        {data=>-1, valid=>0},
         {data=>0, valid=>0},
         {data=>2, valid=>0},
     ],
@@ -31,7 +32,7 @@ Sah::Schema::posodd - Positive odd number
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::posodd (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::posodd (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -97,6 +98,8 @@ L<Perinci::CmdLine> to create a CLI:
 Sample data:
 
  1  # valid
+
+ -1  # INVALID
 
  0  # INVALID
 

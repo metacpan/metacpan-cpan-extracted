@@ -1,5 +1,5 @@
 package Util::Medley::File;
-$Util::Medley::File::VERSION = '0.037';
+$Util::Medley::File::VERSION = '0.041';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -24,7 +24,7 @@ Util::Medley::File - utility file methods
 
 =head1 VERSION
 
-version 0.037
+version 0.041
 
 =cut
 
@@ -686,6 +686,63 @@ multi method parsePath (Str $path) {
 	return ( $dir, $utilname, $suffix );
 }
 
+=head2 read
+
+Just a pass-through to File::Slurp::read_file().
+
+=over
+
+=item usage:
+
+ $contents = $util->read($file, [0|1]);
+ @contents = $util->read($file, [0|1]);
+ 
+ $contents = $util->read(path => $file, trim => [0|1]);
+ @contents = $util->read(path => $file, trim => [0|1]);
+
+=item args:
+
+=over
+
+=item path [Str]
+
+File to read.
+
+=item trim [Bool]
+
+Trim newlines.  Default 0.
+
+=back
+
+=back
+
+=cut
+
+multi method read (Str  :$path,
+                   Bool :$trim = 0) {
+
+    if (wantarray) {
+        my @in;
+        foreach my $line (File::Slurp::read_file($path) ){
+            chomp $line if $trim;
+            push @in, $line;    
+        }
+            
+        return @in;
+    }
+    else {
+        my $in = File::Slurp::read_file($path);     
+        chomp $in if $trim;
+        return $in;
+    }
+}
+
+multi method read (Str  $path, 
+                   Bool $trim = 0) {
+
+    return $self->read(path => $path, trim => $trim);
+}
+
 
 =head2 rmdir
 
@@ -726,7 +783,7 @@ multi method rmdir (Str $dir) {
 	}
 }
 
-=head2 slurp
+=head2 slurp (deprecated)
 
 Just a pass-through to File::Slurp::read_file().
 
@@ -761,6 +818,8 @@ Trim newlines.  Default 0.
 multi method slurp (Str  :$path,
 					Bool :$trim = 0) {
 
+    $self->Logger->deprecated('slurp', 'read');
+    
 	if (wantarray) {
 		my @in;
 		foreach my $line (File::Slurp::read_file($path) ){
@@ -936,6 +995,65 @@ multi method which (Str $exe) {
 
 	return $self->which(exe => $exe);	
 }
+
+=head2 write
+
+Just a pass-through to File::Slurp::write_file().
+
+=over
+
+=item usage:
+
+ $util->write($file, $content, [ {opts} ]);
+ 
+ $util->write(path => $file, content => $content, [ opts => {} ]);
+
+=item args:
+
+=over
+
+=item path [Str]
+
+File to write.
+
+=item content [Str|ArrayRef]
+
+File content.
+
+=item opts [HashRef]
+
+Additional opts to pass to write_file.
+
+=back
+
+=back
+
+=cut
+
+multi method write (Str           :$path!,
+                    Str|ArrayRef  :$content!,
+                    HashRef       :$opts) {
+
+    my @a;
+    push @a, $path;
+    push @a, $opts if keys %$opts; 
+    push @a, $content;
+     
+    File::Slurp::write_file(@a);
+}
+
+multi method write (Str           $path!, 
+                    Str|ArrayRef  $content!,
+                    HashRef       $opts?) {
+
+    my %a;
+    $a{path} = $path;
+    $a{content} = $content;
+    $a{opts} = $opts if $opts;
+                        	
+    return $self->write(%a);
+}
+
 
 ######################################################################
 

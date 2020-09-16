@@ -1,9 +1,9 @@
 package Sah::Schema::negeven;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Int'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 our $schema = ['negint', {
     summary => 'Negative even number',
@@ -11,6 +11,7 @@ our $schema = ['negint', {
     examples => [
         {data=>-2, valid=>1},
         {data=>-1, valid=>0},
+        {data=>0, valid=>0},
     ],
 }, {}];
 
@@ -29,7 +30,7 @@ Sah::Schema::negeven - Negative even number
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::negeven (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::negeven (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -97,6 +98,8 @@ Sample data:
  -2  # valid
 
  -1  # INVALID
+
+ 0  # INVALID
 
 =head1 HOMEPAGE
 

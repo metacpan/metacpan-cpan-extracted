@@ -1,10 +1,12 @@
 bin/perltidy-tk
 Changes
+CONTRIBUTING.md
 lib/App/PerlTidy/Tk.pm
 Makefile.PL
 MANIFEST
 MYMETA.json
 MYMETA.yml
 t/00-test.t
+t/99-changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

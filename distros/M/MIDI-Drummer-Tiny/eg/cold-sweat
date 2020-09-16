@@ -24,7 +24,7 @@ for my $n (1 .. $d->bars) {
     $d->accent_note($accent, $d->sixteenth, $d->snare);
     $d->note($d->eighth, $d->open_hh, $d->kick);
 
-    $d->note($d->eighth, $d->closed_hh);
+    $d->note($d->eighth, $d->pedal_hh);
     $d->note($d->eighth, $d->closed_hh, $d->snare);
 
     #

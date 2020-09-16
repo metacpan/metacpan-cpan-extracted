@@ -1,5 +1,14 @@
 Revision history for ExtUtils-Install
 
+2.18
+
+- Add descriptions for 3 tests lacking them
+- Removed bundled Test::More from t/lib
+- 'use strict' added to all files where missing
+- 'use vars' replaced with 'our'
+- Properly scope all variables
+- Minimal supported perl version is now v5.6.0
+
 2.16
 
 - Use File::Spec->catfile to compose filenames

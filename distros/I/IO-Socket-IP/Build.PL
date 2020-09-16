@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -9,12 +10,13 @@ my $build = Module::Build->new(
       'IO::Socket' => 0,
       'Socket' => '1.97',
    },
-   build_requires => {
+   test_requires => {
       'Test::More' => '0.88', # done_testing
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
+   },
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
 );

@@ -1,5 +1,8 @@
 Revision history for Test::MockModule
 
+v0.174.0
+- cf65e7c Fix typo in pod - nima
+
 v0.173.0
 - 4dacd82 Add warning when 'unmock' called without arguments - Matthew Hughes
 - b20dc7c import warns when using unknown argument - Nicolas R

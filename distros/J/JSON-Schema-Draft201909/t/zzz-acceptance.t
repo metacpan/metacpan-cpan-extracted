@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More;
@@ -47,14 +48,14 @@ $accepter->acceptance(
     my $result = $js->evaluate($instance_data, $schema);
     my $result_short = $js_short_circuit->evaluate($instance_data, $schema);
 
-    note $encoder->encode($result);
-    note $encoder->encode($result_short) if $result xor $result_short;
+    note 'result: ', $encoder->encode($result);
+    note 'short-circuited result: ', $encoder->encode($result_short) if $result xor $result_short;
 
     die 'results inconsistent between short_circuit = false and true'
       if ($result xor $result_short)
         and not grep $_->error =~ /but short_circuit is enabled/, $result_short->errors;
 
-    # if any errors contain an exception, propage at that upwards as an exception so we can be sure
+    # if any errors contain an exception, propagate that upwards as an exception so we can be sure
     # to count that as a failure.
     # (This might change if tests are added that are expected to produce exceptions.)
     if (my ($e) = grep $_->error =~ /^EXCEPTION/, $result->errors) {
@@ -83,9 +84,6 @@ $accepter->acceptance(
           optional/format/idn-email.json
         ) ) : (),
       ] },
-    # TODO: see JSON-Schema-Test-Suite #424
-    { file => 'refRemote.json', group_description => 'base URI change - change folder' },
-
     # various edge cases that are difficult to accomodate
     { file => 'optional/format/date-time.json', group_description => 'validation of date-time strings',
       test_description => 'case-insensitive T and Z' },
@@ -137,7 +135,8 @@ $accepter->acceptance(
 # 2020-06-09  0.999  Looks like you failed 165 tests of 1055.
 # 2020-06-10  0.999  Looks like you failed 104 tests of 1055.
 # 2020-07-07  0.999  Looks like you failed 31 tests of 1055.
-# 2020-08-11  1.000  Looks like you failed 46 tests of 1210.
+# 2020-08-13  1.000  Looks like you failed 44 tests of 1210.
+# 2020-08-14  1.000  Looks like you failed 42 tests of 1210.
 
 
 END {
@@ -198,7 +197,7 @@ __END__
 # properties.json                               20     0
 # propertyNames.json                            10     0
 # ref.json                                      32     0
-# refRemote.json                                13     2
+# refRemote.json                                15     0
 # required.json                                  9     0
 # type.json                                     80     0
 # unevaluatedItems.json                         33     0

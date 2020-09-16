@@ -143,7 +143,7 @@ Returns namespace URI registered with C<<<<<< $prefix >>>>>>. If C<<<<<< $prefix
 
   $xpc->registerVarLookupFunc($callback, $data)
 
-Registers variable lookup function C<<<<<< $prefix >>>>>>. The registered function is executed by the XPath engine each time an XPath
+Registers variable lookup function C<<<<<< $callback >>>>>>. The registered function is executed by the XPath engine each time an XPath
 variable is evaluated. It takes three arguments: C<<<<<< $data >>>>>>, variable name, and variable ns-URI and must return one value: a number or
 string or any C<<<<<< XML::LibXML:: >>>>>> object that can be a result of findnodes: Boolean, Literal, Number, Node (e.g.
 Document, Element, etc.), or NodeList. For convenience, simple (non-blessed)
@@ -362,7 +362,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0205
+2.0206
 
 =head1 COPYRIGHT
 

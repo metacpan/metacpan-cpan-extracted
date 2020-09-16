@@ -69,6 +69,7 @@ my %WriteMakefileArgs = (
     "Time::ParseDate" => 0,
     "Time::localtime" => 0,
     "Try::Tiny" => 0,
+    "YAML" => 0,
     "constant" => 0,
     "diagnostics" => 0,
     "namespace::autoclean" => 0,
@@ -80,7 +81,7 @@ my %WriteMakefileArgs = (
     "File::RandomGenerator" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.037",
+  "VERSION" => "0.041",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -132,6 +133,7 @@ my %FallbackPrereqs = (
   "Time::ParseDate" => 0,
   "Time::localtime" => 0,
   "Try::Tiny" => 0,
+  "YAML" => 0,
   "constant" => 0,
   "diagnostics" => 0,
   "namespace::autoclean" => 0,

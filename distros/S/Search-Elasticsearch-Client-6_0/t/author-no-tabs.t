@@ -48,7 +48,6 @@ my @files = (
     't/Client_6_0/15_conflict.t',
     't/Client_6_0/20_fork_httptiny.t',
     't/Client_6_0/21_fork_lwp.t',
-    't/Client_6_0/22_fork_hijk.t',
     't/Client_6_0/23_fork_netcurl.t',
     't/Client_6_0/30_bulk_add_action.t',
     't/Client_6_0/31_bulk_helpers.t',
@@ -69,7 +68,8 @@ my @files = (
     't/lib/es_sync.pl',
     't/lib/es_sync_auth.pl',
     't/lib/es_sync_fork.pl',
-    't/lib/index_test_data.pl'
+    't/lib/index_test_data.pl',
+    't/lib/index_test_data_7.pl'
 );
 
 notabs_ok($_) foreach @files;

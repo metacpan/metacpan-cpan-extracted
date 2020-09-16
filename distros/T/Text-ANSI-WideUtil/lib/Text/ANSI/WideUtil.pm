@@ -1,7 +1,9 @@
 package Text::ANSI::WideUtil;
 
-our $DATE = '2016-03-11'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-19'; # DATE
+our $DIST = 'Text-ANSI-WideUtil'; # DIST
+our $VERSION = '0.230'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -18,6 +20,7 @@ our @EXPORT_OK = qw(
                        ta_mbswidth_height
                        ta_mbtrunc
                        ta_mbwrap
+                       ta_trunc
                );
 
 use Text::ANSI::BaseUtil ();
@@ -40,7 +43,7 @@ Text::ANSI::WideUtil - Routines for text containing ANSI color codes (wide-chara
 
 =head1 VERSION
 
-This document describes version 0.22 of Text::ANSI::WideUtil (from Perl distribution Text-ANSI-WideUtil), released on 2016-03-11.
+This document describes version 0.230 of Text::ANSI::WideUtil (from Perl distribution Text-ANSI-WideUtil), released on 2020-05-19.
 
 =head1 SYNOPSIS
 
@@ -82,6 +85,8 @@ This module contains the wide-character variant (C<ta_mb*()>) for some functions
 in L<Text::ANSI::Util>. It is split so only this module requires
 L<Text::WideChar::Util> and Text::ANSI::Util can be kept slim.
 
+=for Pod::Coverage ^(ta_trunc)$
+
 =head1 FUNCTIONS
 
 =head2 ta_mbpad($text, $width[, $which[, $padchar[, $truncate]]]) => STR
@@ -117,7 +122,7 @@ Like C<ta_wrap()>, but it uses C<ta_mbswidth()> to determine visual width
 instead of C<ta_length()>.
 
 Performance: ~300/s on my Core i5 1.7GHz laptop for a ~1KB of text (with zero to
-moderate amount of color codes). As a comparison, L<Text::WideChar::Util>'s
+moderate amount of color codes). As a comparison, Text::WideChar::Util's
 mbwrap() can do about 650/s.
 
 =head2 ta_mbsubstr($text, $pos, $len[ , $replacement ]) => STR
@@ -129,9 +134,8 @@ width, not number of characters.
 
 =head2 How do I truncate string based on number of characters instead of columns?
 
-You can simply use C<ta_trunc()> from L<Text::ANSI::Util> even on text
-containing wide characters. C<ta_trunc()> uses Perl's C<length()> which works on
-a per-character basis.
+You can simply use C<ta_trunc()> even on text containing wide characters.
+ta_trunc() uses Perl's length() which works on a per-character basis.
 
 =head1 HOMEPAGE
 
@@ -151,13 +155,13 @@ feature.
 
 =head1 SEE ALSO
 
-L<Text::ANSI::Util>
-
-L<Text::WideChar::Util>
-
-L<Term::ANSIColor>
+L<Text::ANSI::Util>, L<Text::WideChar::Util>, L<Text::NonWideChar::Util>,
+L<Text::Wrap>
 
 L<http://en.wikipedia.org/wiki/ANSI_escape_code>
+
+CLI's that use functions from this module include: L<dux> from L<App::dux>
+(C<dux wrap>, C<dux lpad>, C<dux rpad>).
 
 =head1 AUTHOR
 
@@ -165,7 +169,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

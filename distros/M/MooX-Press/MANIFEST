@@ -48,3 +48,4 @@ t/30bare.t
 t/31lexhas.t
 t/32multifactory-zylite.t
 t/32multifactory.t
+t/88patchpackage.t

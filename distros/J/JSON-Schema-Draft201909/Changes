@@ -1,5 +1,10 @@
 Revision history for JSON-Schema-Draft201909
 
+0.013     2020-09-15 19:14:53Z
+          - detect more cases of resource identifier collisions
+          - fix resolution of relative $ids
+          - new "terse" output format
+
 0.012     2020-08-13 20:23:21Z
           - now using unicode semantics for pattern matching
 

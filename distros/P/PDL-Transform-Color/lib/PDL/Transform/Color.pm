@@ -337,7 +337,7 @@ package PDL::Transform::Color;
 use PDL::Core ':Internal';  # load "topdl" (internal routine)
 
 @ISA = ( 'Exporter', 'PDL::Transform' );
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 $VERSION = eval $VERSION;
 
 BEGIN {
@@ -473,6 +473,7 @@ sub t_gamma {
 	if($opt->{gamma} != 1) {
 	    $out *= ($in->abs + ($in==0)) ** (1.0/$opt->{gamma} - 1);
 	}
+	$out;
     };
 	
     $me;
@@ -948,7 +949,11 @@ our $pc_tab = {
 		      doc=>"full color wheel red-yellow-green-blue-violet-red" },
 
     ryg     => { type=>'hsv', subs=> [ sub{ (0.5*($_[0]-0.333/2))%1 }, sub{0.8+0.2*$_[0]}, sub{$_[0]} ],
-		    doc=>"A quasi-sepiatone (R/Y) with green highlights",phot=>1, igamma=>0.7 },
+		 doc=>"A quasi-sepiatone (R/Y) with green highlights",phot=>1, igamma=>0.7 },
+
+    extra   => { type=>'hsv', subs=>[ sub{ (0.85*($_[0]**0.75-0.333/2))%1}, sub{0.8+0.2*$_[0]-0.8*$_[0]**6}, 
+				      sub { 1 - exp(-$_[0]/0.15) - 0.08 }],
+	          doc=>"Extra-broad photometric; also try -c1 etc.",phot=>1,igamma=>0.55 },
 
     voy     => { type=>'rgb', subs=> [ sub{pdl(1)*$_[0]}, sub{$_[0]**2*$_[0]}, sub{(1-$_[0])**4 * $_[0]}],
                     doc=>"A colorblind-friendly map with lots of contrast", phot=>1, igamma=>0.7},

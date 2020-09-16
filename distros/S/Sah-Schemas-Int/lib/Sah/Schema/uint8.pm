@@ -1,9 +1,9 @@
 package Sah::Schema::uint8;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Int'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 our $schema = [int => {
     summary => '8-bit unsigned integer',
@@ -12,6 +12,9 @@ our $schema = [int => {
     examples => [
         {data=> 0, valid=>1},
         {data=>-1, valid=>0},
+        {data=>1, valid=>1},
+        {data=>255, valid=>1},
+        {data=>256, valid=>0},
     ],
 }, {}];
 
@@ -30,7 +33,7 @@ Sah::Schema::uint8 - 8-bit unsigned integer
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::uint8 (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::uint8 (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -98,6 +101,12 @@ Sample data:
  0  # valid
 
  -1  # INVALID
+
+ 1  # valid
+
+ 255  # valid
+
+ 256  # INVALID
 
 =head1 HOMEPAGE
 

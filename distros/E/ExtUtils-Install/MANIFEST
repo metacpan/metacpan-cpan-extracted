@@ -14,10 +14,6 @@ t/Installed.t
 t/InstallWithMM.t
 t/lib/MakeMaker/Test/Setup/BFD.pm
 t/lib/MakeMaker/Test/Utils.pm
-t/lib/Test/Builder.pm
-t/lib/Test/Builder/Module.pm
-t/lib/Test/More.pm
-t/lib/Test/Simple.pm
 t/lib/TieOut.pm
 t/Packlist.t
 t/pod-coverage.t

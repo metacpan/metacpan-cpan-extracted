@@ -76,6 +76,9 @@ DESCRIPTION
 
     Zydeco::Manual is probably the best place to start.
 
+    If Zydeco is too slow or has too many dependencies for you, check out
+    Zydeco::Lite.
+
 KEYWORDS
   `class`
       class MyClass;
@@ -557,8 +560,9 @@ SEE ALSO
 
     Zydeco website: <http://zydeco.toby.ink/>.
 
-    Less magic version: MooX::Press. (Zydeco is just a wrapper around
-    MooX::Press, providing a nicer syntax.)
+    Less magic versions: Zydeco::Lite, MooX::Press. (Zydeco is just a wrapper
+    around MooX::Press, providing a nicer syntax. Zydeco::Lite is an
+    alternative wrapper, using less magic.)
 
     Important underlying technologies: Moo, Type::Tiny::Manual,
     Sub::HandlesVia, Sub::MultiMethod, Lexical::Accessor,

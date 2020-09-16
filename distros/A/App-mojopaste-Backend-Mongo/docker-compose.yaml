@@ -1,0 +1,16 @@
+version: '3'
+services:
+  mojopaste:
+    image: mojopaste_mongo
+    build: .
+    ports:
+      - "5555:8080"
+    volumes:
+      - ./lib:/app-mojopaste-master/lib
+    environment:
+      PASTE_BACKEND: Mongo
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - ./dbdata:/data/db

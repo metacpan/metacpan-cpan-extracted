@@ -1,9 +1,26 @@
+# Licensed to Elasticsearch B.V. under one or more contributor
+# license agreements. See the NOTICE file distributed with
+# this work for additional information regarding copyright
+# ownership. Elasticsearch B.V. licenses this file to you under
+# the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
 package Search::Elasticsearch::Cxn::HTTPTiny;
-$Search::Elasticsearch::Cxn::HTTPTiny::VERSION = '6.81';
+$Search::Elasticsearch::Cxn::HTTPTiny::VERSION = '7.30';
 use Moo;
 with 'Search::Elasticsearch::Role::Cxn', 'Search::Elasticsearch::Role::Is_Sync';
 
-use HTTP::Tiny 0.043 ();
+use HTTP::Tiny 0.076 ();
 use namespace::clean;
 
 my $Cxn_Error = qr/ Connection.(?:timed.out|re(?:set|fused))
@@ -85,7 +102,7 @@ Search::Elasticsearch::Cxn::HTTPTiny - A Cxn implementation which uses HTTP::Tin
 
 =head1 VERSION
 
-version 6.81
+version 7.30
 
 =head1 DESCRIPTION
 
@@ -248,8 +265,6 @@ From L<Search::Elasticsearch::Role::Cxn>
 =over
 
 =item * L<Search::Elasticsearch::Role::Cxn>
-
-=item * L<Search::Elasticsearch::Cxn::Hijk>
 
 =item * L<Search::Elasticsearch::Cxn::LWP>
 

@@ -1,5 +1,11 @@
 Revision history for Crypt::SMIME
 
+0.27    Tue Sep 15 11:02:21 JST 2020
+        - Removed "t/dependencies.t". The behavior of
+          Test::Dependencies has changed in 0.28, and it's no longer
+          useful for us:
+          https://rt.cpan.org/Public/Bug/Display.html?id=133309
+
 0.26    Mon Aug  3 15:40:04 JST 2020
         - sign(), signonly(), encrypt(), check(), decrypt() no longer
           truncate inputs on a NUL character, Patch by Brian Safford

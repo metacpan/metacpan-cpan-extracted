@@ -1,7 +1,7 @@
 package Sah::SchemaR::uint64;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.074'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.075'; # VERSION
 
 our $rschema = ["int",[{examples=>[{data=>0,valid=>1},{data=>-1,valid=>0}],max=>1.84467440737096e+19,min=>0,summary=>"64-bit unsigned integer"}],["int"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::uint64 - 64-bit unsigned integer
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::SchemaR::uint64 (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::SchemaR::uint64 (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

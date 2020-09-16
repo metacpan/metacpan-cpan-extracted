@@ -33,10 +33,10 @@ DESCRIPTION
 
 REPLACING IO::Socket DEFAULT BEHAVIOUR
 
-    By placing -register in the import list, IO::Socket uses IO::Socket::IP
-    rather than IO::Socket::INET as the class that handles PF_INET.
-    IO::Socket will also use IO::Socket::IP rather than IO::Socket::INET6
-    to handle PF_INET6, provided that the AF_INET6 constant is available.
+    By placing -register in the import list to IO::Socket::IP, it will
+    register itself with IO::Socket as the class that handles PF_INET. It
+    will also ask to handle PF_INET6 as well, provided that constant is
+    available.
 
     Changing IO::Socket's default behaviour means that calling the
     IO::Socket constructor with either PF_INET or PF_INET6 as the Domain
@@ -58,7 +58,9 @@ REPLACING IO::Socket DEFAULT BEHAVIOUR
 
 CONSTRUCTORS
 
- $sock = IO::Socket::IP->new( %args )
+ new
+
+       $sock = IO::Socket::IP->new( %args )
 
     Creates a new IO::Socket::IP object, containing a newly created socket
     handle according to the named arguments passed. The recognised
@@ -249,7 +251,9 @@ CONSTRUCTORS
     message; this may be from $! or it may be some other string; not every
     failure necessarily has an associated errno value.
 
- $sock = IO::Socket::IP->new( $peeraddr )
+ new (one arg)
+
+       $sock = IO::Socket::IP->new( $peeraddr )
 
     As a special case, if the constructor is passed a single argument (as
     opposed to an even-sized list of key/value pairs), it is taken to be
@@ -262,7 +266,9 @@ METHODS
     As well as the following methods, this class inherits all the methods
     in IO::Socket and IO::Handle.
 
- ( $host, $service ) = $sock->sockhost_service( $numeric )
+ sockhost_service
+
+       ( $host, $service ) = $sock->sockhost_service( $numeric )
 
     Returns the hostname and service name of the local address (that is,
     the socket address given by the sockname method).
@@ -275,28 +281,40 @@ METHODS
     required, this method is preferable to the following wrappers, because
     it will call getnameinfo(3) only once.
 
- $addr = $sock->sockhost
+ sockhost
+
+       $addr = $sock->sockhost
 
     Return the numeric form of the local address as a textual
     representation
 
- $port = $sock->sockport
+ sockport
+
+       $port = $sock->sockport
 
     Return the numeric form of the local port number
 
- $host = $sock->sockhostname
+ sockhostname
+
+       $host = $sock->sockhostname
 
     Return the resolved name of the local address
 
- $service = $sock->sockservice
+ sockservice
+
+       $service = $sock->sockservice
 
     Return the resolved name of the local port number
 
- $addr = $sock->sockaddr
+ sockaddr
+
+       $addr = $sock->sockaddr
 
     Return the local address as a binary octet string
 
- ( $host, $service ) = $sock->peerhost_service( $numeric )
+ peerhost_service
+
+       ( $host, $service ) = $sock->peerhost_service( $numeric )
 
     Returns the hostname and service name of the peer address (that is, the
     socket address given by the peername method), similar to the
@@ -307,27 +325,39 @@ METHODS
     required, this method is preferable to the following wrappers, because
     it will call getnameinfo(3) only once.
 
- $addr = $sock->peerhost
+ peerhost
+
+       $addr = $sock->peerhost
 
     Return the numeric form of the peer address as a textual representation
 
- $port = $sock->peerport
+ peerport
+
+       $port = $sock->peerport
 
     Return the numeric form of the peer port number
 
- $host = $sock->peerhostname
+ peerhostname
+
+       $host = $sock->peerhostname
 
     Return the resolved name of the peer address
 
- $service = $sock->peerservice
+ peerservice
+
+       $service = $sock->peerservice
 
     Return the resolved name of the peer port number
 
- $addr = $peer->peeraddr
+ peeraddr
+
+       $addr = $peer->peeraddr
 
     Return the peer address as a binary octet string
 
- $inet = $sock->as_inet
+ as_inet
+
+       $inet = $sock->as_inet
 
     Returns a new IO::Socket::INET instance wrapping the same filehandle.
     This may be useful in cases where it is required, for
@@ -440,7 +470,9 @@ PeerHost AND LocalHost PARSING
     ...Service or ...Port argument is also defined, the one parsed from the
     ...Host argument will take precedence and the other will be ignored.
 
- ( $host, $port ) = IO::Socket::IP->split_addr( $addr )
+ split_addr
+
+       ( $host, $port ) = IO::Socket::IP->split_addr( $addr )
 
     Utility method that provides the parsing functionality described above.
     Returns a 2-element list, containing either the split hostname and port
@@ -459,7 +491,9 @@ PeerHost AND LocalHost PARSING
      IO::Socket::IP->split_addr( "something.else" )
                                   # ( "something.else", undef )
 
- $addr = IO::Socket::IP->join_addr( $host, $port )
+ join_addr
+
+       $addr = IO::Socket::IP->join_addr( $host, $port )
 
     Utility method that performs the reverse of split_addr, returning a
     string formed by joining the specified host address and port number.

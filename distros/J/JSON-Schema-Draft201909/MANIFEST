@@ -43,6 +43,7 @@ t/additional-tests/not-an-id.json
 t/additional-tests/recursiveRef.json
 t/additional-tests/ref-and-id.json
 t/additional-tests/ref.json
+t/additional-tests/short-circuit.json
 t/additional-tests/unicode.json
 t/annotations.t
 t/booleans.t
@@ -55,6 +56,7 @@ t/find-identifiers.t
 t/formats.t
 t/lib/Helper.pm
 t/max_traversal_depth.t
+t/output_format.t
 t/pattern.t
 t/ref.t
 t/type.t

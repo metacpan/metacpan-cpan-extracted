@@ -1,0 +1,20 @@
+---
+abstract: 'a simple iterator for arrayref record sources'
+author:
+  - 'Michael Roberts <michael@cpan.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Iterator-Records
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/Vivtek/Iterator-Records.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

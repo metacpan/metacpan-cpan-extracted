@@ -1,12 +1,12 @@
 package Sah::SchemaR::int128;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.074'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.075'; # VERSION
 
-our $rschema = ["int",[{examples=>[{data=>0,valid=>1},{data=>1.1,valid=>0}],max=>1.70141183460469e+38,min=>-1.70141183460469e+38,summary=>"32-bit signed integer"}],["int"]];
+our $rschema = ["int",[{examples=>[{data=>0,valid=>1},{data=>1.1,valid=>0},{data=>1,valid=>1}],max=>1.70141183460469e+38,min=>-1.70141183460469e+38,summary=>"128-bit signed integer"}],["int"]];
 
 1;
-# ABSTRACT: 32-bit signed integer
+# ABSTRACT: 128-bit signed integer
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::int128 - 32-bit signed integer
+Sah::SchemaR::int128 - 128-bit signed integer
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::SchemaR::int128 (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::SchemaR::int128 (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

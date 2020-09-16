@@ -6,14 +6,22 @@ WriteMakefile(
     NAME         => 'App::PerlTidy::Tk',
     AUTHOR       => q{Gabor Szabo <szabgab@cpan.org>},
     VERSION_FROM => 'lib/App/PerlTidy/Tk.pm',
-    ABSTRACT     => 'Tk based GUI to experiment with PerlTidy configuration options',
+    ABSTRACT_FROM => 'lib/App/PerlTidy/Tk.pm',
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002
         ? ( 'LICENSE' => 'perl' )
         : () ),
     PL_FILES  => {},
     PREREQ_PM => {
-        'Tk'         => 0,
-        'Perl::Tidy' => 0
+        'Browser::Open' => 0,
+        'Cpanel::JSON::XS' => 0,
+        'File::HomeDir' => 0,
+        'Path::Tiny'    => 0,
+        'Perl::Tidy'    => 0,
+        'Tk'            => 0,
+        'Tk::HyperText' => 0,
+
+        'Test::More'          => 0,
+        'Test::CPAN::Changes' => 0,
     },
     EXE_FILES => ['bin/perltidy-tk'],
     META_MERGE    => {

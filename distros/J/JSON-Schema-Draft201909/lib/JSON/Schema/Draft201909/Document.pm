@@ -4,20 +4,21 @@ package JSON::Schema::Draft201909::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
 use Mojo::URL;
 use Carp 'croak';
-use JSON::MaybeXS 1.004001 'is_bool';
 use Ref::Util 0.100 qw(is_plain_arrayref is_plain_hashref);
 use List::Util 1.29 'pairs';
 use Safe::Isa;
 use Moo;
+use strictures 2;
 use MooX::TypeTiny;
 use MooX::HandlesVia;
-use Types::Standard qw(InstanceOf HashRef Str Dict HasMethods);
+use Types::Standard qw(InstanceOf HashRef Str Dict);
 use namespace::clean;
 
 extends 'Mojo::JSON::Pointer';
@@ -54,25 +55,43 @@ has resource_index => (
   default => sub { {} },
 );
 
+has canonical_uri_index => (
+  is => 'bare',
+  isa => HashRef[InstanceOf['Mojo::URL']],
+  handles_via => 'Hash',
+  handles => {
+    _add_canonical_uri => 'set',
+    _path_to_canonical_uri => 'get',
+  },
+  init_arg => undef,
+  lazy => 1,
+  default => sub { {} },
+);
+
 # for internal use only
-has serialized_schema => (
+has _serialized_schema => (
   is => 'rw',
   isa => Str,
   init_arg => undef,
 );
 
-before _add_resources => sub {
+around _add_resources => sub {
+  my $orig = shift;
   my $self = shift;
   foreach my $pair (pairs @_) {
     my ($key, $value) = @$pair;
     if (my $existing = $self->_get_resource($key)) {
-      croak 'a schema resource is already indexed with uri "'.$key.'"'
+      croak 'uri "'.$key.'" conflicts with an existing schema resource'
         if $existing->{path} ne $value->{path}
           or $existing->{canonical_uri} ne $value->{canonical_uri};
     }
 
-    croak sprintf('canonical_uri cannot contain a plain-name fragment (%s)', $value->{canonical_uri})
+    # this will never happen, if we parsed $id correctly
+    croak sprintf('a resource canonical uri cannot contain a plain-name fragment (%s)', $value->{canonical_uri})
       if ($value->{canonical_uri}->fragment // '') =~ m{^[^/]};
+
+    $self->$orig($key, $value);
+    $self->_add_canonical_uri($value->{path}, $value->{canonical_uri});
   }
 };
 
@@ -87,23 +106,23 @@ sub BUILD {
 
   my $original_uri = $self->canonical_uri->clone;
   my $schema = $self->schema;
-  my %identifiers = _traverse_for_identifiers($schema, '', $original_uri->clone);
+  my @identifiers = _traverse_for_identifiers($schema, '', $original_uri->clone);
 
   if (is_plain_hashref($self->schema) and my $id = $self->get('/$id')) {
     $self->_set_canonical_uri(Mojo::URL->new($id)) if $id ne $self->canonical_uri;
   }
 
   # make sure the root schema is always indexed against *something*.
-  $identifiers{$original_uri} = { path => '', canonical_uri => $self->canonical_uri }
+  $self->_add_resources($original_uri => { path => '', canonical_uri => $self->canonical_uri })
     if (not "$original_uri" and $original_uri eq $self->canonical_uri)
-      or ("$original_uri" and not exists $identifiers{$original_uri});
+      or "$original_uri";
 
-  $self->_add_resources(%identifiers);
+  $self->_add_resources(@identifiers);
 }
 
 sub _traverse_for_identifiers {
   my ($data, $path, $canonical_uri) = @_;
-  my %identifiers;
+  my @identifiers;
   if (is_plain_arrayref($data)) {
     return map
       __SUB__->($data->[$_], jsonp($path, $_),
@@ -114,19 +133,19 @@ sub _traverse_for_identifiers {
     if (exists $data->{'$id'} and JSON::Schema::Draft201909->_is_type('string', $data->{'$id'})) {
       my $uri = Mojo::URL->new($data->{'$id'});
       if (not length $uri->fragment) {
-        $canonical_uri = $uri->is_abs ? $uri : $uri->base($canonical_uri)->to_abs;
+        $canonical_uri = $uri->is_abs ? $uri : $uri->to_abs($canonical_uri);
         $canonical_uri->fragment(undef);
-        $identifiers{$canonical_uri} = { path => $path, canonical_uri => $canonical_uri->clone };
+        push @identifiers, $canonical_uri => { path => $path, canonical_uri => $canonical_uri->clone };
       }
     }
     if (exists $data->{'$anchor'} and JSON::Schema::Draft201909->_is_type('string', $data->{'$anchor'})
         and $data->{'$anchor'} =~ /^[A-Za-z][A-Za-z0-9_:.-]+$/) {
-      my $uri = Mojo::URL->new->base($canonical_uri)->to_abs->fragment($data->{'$anchor'});
-      $identifiers{$uri} = { path => $path, canonical_uri => $canonical_uri->clone };
+      my $uri = Mojo::URL->new->to_abs($canonical_uri)->fragment($data->{'$anchor'});
+      push @identifiers, $uri => { path => $path, canonical_uri => $canonical_uri->clone };
     }
 
     return
-      %identifiers,
+      @identifiers,
       map
         __SUB__->($data->{$_}, jsonp($path, $_),
           $canonical_uri->clone->fragment(jsonp($canonical_uri->fragment, $_))),
@@ -158,7 +177,7 @@ JSON::Schema::Draft201909::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -189,12 +208,17 @@ can be considered the canonical URI for the document as a whole.
 
 =head2 resource_index
 
-An index of URIs to subschemas (json path to reach the location, and the canonical uri of that
+An index of URIs to subschemas (json path to reach the location, and the canonical URI of that
 location) for all identifiable subschemas found in the document. An entry for URI C<''> is added
 only when no other suitable identifier can be found for the root schema.
 
 This attribute should only be used by L<JSON::Schema::Draft201909> and not intended for use
 externally (you should use the public accessors in L<JSON::Schema::Draft201909> instead).
+
+=head2 canonical_uri_index
+
+An index of json paths (from the document root) to canonical URIs. This is the inversion of
+L</resource_index> and is constructed as that is built up.
 
 =head1 METHODS
 

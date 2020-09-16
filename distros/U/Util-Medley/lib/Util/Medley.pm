@@ -1,5 +1,5 @@
 package Util::Medley;
-$Util::Medley::VERSION = '0.037';
+$Util::Medley::VERSION = '0.041';
 use Modern::Perl;
 use Moose;
 
@@ -21,7 +21,7 @@ Util::Medley - A collection of commonly used utilities.
 
 =head1 VERSION
 
-version 0.037
+version 0.041
 
 =head1 SYNOPSIS
 

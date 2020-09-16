@@ -5,7 +5,7 @@ use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.173.0';
+$VERSION = '0.174.0';
 
 our $STRICT_MODE;
 
@@ -487,7 +487,7 @@ one hardcoded argument pass to a function.
 			# only alter calls with path set to "/a/b/c/d"
 			return $mock->original("get_path_for")->("/my/custom/path");
 		} else { # preserve the original arguments
-			return $mock->original("get_path_for")->(@_);
+			return $mock->original("get_path_for")->($path, @_);
 		}
 	});
 

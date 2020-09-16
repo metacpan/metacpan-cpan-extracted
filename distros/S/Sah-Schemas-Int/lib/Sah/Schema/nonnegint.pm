@@ -1,9 +1,9 @@
 package Sah::Schema::nonnegint;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Int'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 our $schema = [int => {
     summary   => 'Non-negative integer (0, 1, 2, ...) [DEPRECATED]',
@@ -37,7 +37,7 @@ Sah::Schema::nonnegint - Non-negative integer (0, 1, 2, ...) [DEPRECATED]
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::nonnegint (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::nonnegint (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl
 
+v0.27.0 2020-09-15T04:38:54Z
+
+    - added op_audit_time
+
 v0.26.0 2020-09-14T16:59:24Z
 
     - added op_throttle_time and op_sample_time

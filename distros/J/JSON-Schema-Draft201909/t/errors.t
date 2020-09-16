@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
@@ -932,12 +933,12 @@ subtest 'sorted property names' => sub {
         {
           instanceLocation => '/bar',
           keywordLocation => '/properties/bar',
-          error => 'subschema is false',
+          error => 'property not permitted',
         },
         {
           instanceLocation => '/foo',
           keywordLocation => '/properties/foo',
-          error => 'subschema is false',
+          error => 'property not permitted',
         },
         {
           instanceLocation => '',
@@ -957,7 +958,7 @@ subtest 'sorted property names' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/additionalProperties',
-          error => 'not all properties are valid',
+          error => 'not all additional properties are valid',
         },
       ],
     },

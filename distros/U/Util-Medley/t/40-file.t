@@ -20,20 +20,52 @@ test_findDirs();
 test_findFiles();
 test_touch();
 test_slurp();
+test_read();
+test_write();
 
 done_testing;
 
 ###################################################
 
+sub test_read {
+
+	my @in = $File->read('t/garbage.txt');
+	ok(@in);
+	ok( $in[2] eq "three\n" );
+
+	@in = $File->read( 't/garbage.txt', 1 );
+	ok(@in);
+	ok( $in[2] eq 'three' );
+}
+
+sub test_write {
+
+	my $path = 't/writetest.txt';
+	$File->unlink($path) if -f $path;
+
+	eval { $File->write( $path, 'bogusdata' ); };
+	ok( !$@ );
+	ok( -f $path );
+
+	eval { $File->write( $path, 'bogusdata', { no_clobber => 1 } ); };
+	ok($@);
+
+	eval { $File->write( $path, 'bogusdata',
+			{ no_clobber => 0 } ); };
+	ok( !$@ );
+
+	$File->unlink($path);
+}
+
 sub test_slurp {
-	
+
 	my @in = $File->slurp('t/garbage.txt');
 	ok(@in);
-	ok($in[2] eq "three\n");
-	
-	@in = $File->slurp('t/garbage.txt', 1);
+	ok( $in[2] eq "three\n" );
+
+	@in = $File->slurp( 't/garbage.txt', 1 );
 	ok(@in);
-	ok($in[2] eq 'three');
+	ok( $in[2] eq 'three' );
 }
 
 sub test_chdir {
@@ -124,9 +156,10 @@ sub test_findFiles {
 	ok( scalar @find == 6 );
 
 	$File->touch("$tmpdir/blah.txt");
-	@find = $File->findFiles( dir => $tmpdir, maxDepth => 2, extension => 'txt' );
+	@find =
+	  $File->findFiles( dir => $tmpdir, maxDepth => 2, extension => 'txt' );
 	ok( scalar @find == 1 );
-	
+
 	$File->rmdir($tmpdir);
 }
 
@@ -157,13 +190,13 @@ sub test_find {
 sub test_touch {
 
 	$File->touch('foobar.txt');
-	ok(-f 'foobar.txt');
+	ok( -f 'foobar.txt' );
 	$File->unlink('foobar.txt');
 }
 
 sub test_which {
-	
-	my $path =$File->which('echo');
+
+	my $path = $File->which('echo');
 	ok($path);
 }
 

@@ -3,7 +3,7 @@ NAME
     libcurl via Net::Curl
 
 VERSION
-    version 6.81
+    version 7.30
 
 DESCRIPTION
     Provides an HTTP Cxn class based on Net::Curl. The "NetCurl" Cxn class
@@ -159,8 +159,6 @@ METHODS
 
 SEE ALSO
     *   Search::Elasticsearch::Role::Cxn
-
-    *   Search::Elasticsearch::Cxn::Hijk
 
     *   Search::Elasticsearch::Cxn::LWP
 

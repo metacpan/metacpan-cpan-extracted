@@ -1,9 +1,9 @@
 package Sah::Schema::int32;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Int'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 our $schema = [int => {
     summary => '32-bit signed integer',
@@ -11,6 +11,9 @@ our $schema = [int => {
     max     => +2**31-1,
     examples => [
         {data=>0, valid=>1},
+        {data=>-2**31, valid=>1},
+        {data=>-2**31-1, valid=>0},
+        {data=>2**31-1, valid=>1},
         {data=>2**31, valid=>0},
     ],
 }, {}];
@@ -30,7 +33,7 @@ Sah::Schema::int32 - 32-bit signed integer
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::int32 (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::int32 (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -96,6 +99,12 @@ L<Perinci::CmdLine> to create a CLI:
 Sample data:
 
  0  # valid
+
+ -2147483648  # valid
+
+ -2147483649  # INVALID
+
+ 2147483647  # valid
 
  2147483648  # INVALID
 

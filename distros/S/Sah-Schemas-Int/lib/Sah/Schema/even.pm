@@ -1,7 +1,7 @@
 package Sah::Schema::even;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.074'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.075'; # VERSION
 
 our $schema = ['int', {
     summary => 'Even number',
@@ -10,6 +10,8 @@ our $schema = ['int', {
         {data=>0, valid=>1},
         {data=>2, valid=>1},
         {data=>1, valid=>0},
+        {data=>-1, valid=>0},
+        {data=>-2, valid=>1},
     ],
 }, {}];
 
@@ -28,7 +30,7 @@ Sah::Schema::even - Even number
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::even (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::even (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -98,6 +100,10 @@ Sample data:
  2  # valid
 
  1  # INVALID
+
+ -1  # INVALID
+
+ -2  # valid
 
 =head1 HOMEPAGE
 

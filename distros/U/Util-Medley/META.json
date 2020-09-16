@@ -69,6 +69,7 @@
             "Time::ParseDate" : "0",
             "Time::localtime" : "0",
             "Try::Tiny" : "0",
+            "YAML" : "0",
             "constant" : "0",
             "diagnostics" : "0",
             "namespace::autoclean" : "0",
@@ -86,7 +87,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.037",
+   "version" : "0.041",
    "x_generated_by_perl" : "v5.16.3",
    "x_serialization_backend" : "JSON::XS version 4.02"
 }

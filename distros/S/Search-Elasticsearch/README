@@ -2,7 +2,7 @@ NAME
     Search::Elasticsearch - The official client for Elasticsearch
 
 VERSION
-    version 6.81
+    version 7.30
 
 SYNOPSIS
         use Search::Elasticsearch;
@@ -78,10 +78,10 @@ DESCRIPTION
     <http://www.elastic.co>.
 
 PREVIOUS VERSIONS OF ELASTICSEARCH
-    This version of the client supports the Elasticsearch 5.0 branch, which
+    This version of the client supports the Elasticsearch 7.0 branch, which
     is not backwards compatible with earlier branches.
 
-    If you need to talk to a version of Elasticsearch before 5.0.0, please
+    If you need to talk to a version of Elasticsearch before 7.0.0, please
     install one of the following packages:
 
     *   Search::Elasticsearch::Client::2_0
@@ -301,11 +301,11 @@ MODULES
     "delete()". The client parses the user's requests and passes them to the
     "transport" class to be executed.
 
-    The default version of the client is "6_0::Direct", which can be
+    The default version of the client is "7_0::Direct", which can be
     explicitly specified as follows:
 
         $e = Search::Elasticsearch->new(
-            client => '6_0::Direct'
+            client => '7_0::Direct'
         );
 
   "transport"
@@ -319,8 +319,6 @@ MODULES
     The class which handles raw requests to Elasticsearch nodes. See:
 
     *   Search::Elasticsearch::Cxn::HTTPTiny (default)
-
-    *   Search::Elasticsearch::Cxn::Hijk
 
     *   Search::Elasticsearch::Cxn::LWP
 
@@ -410,7 +408,7 @@ TEST SUITE
     You can change the Cxn class which is used by setting the "ES_CXN"
     environment variable:
 
-        ES_CXN=Hijk ES=localhost:9200 make test
+        ES_CXN=NetCurl ES=localhost:9200 make test
 
 AUTHOR
     Enrico Zimuel <enrico.zimuel@elastic.co>

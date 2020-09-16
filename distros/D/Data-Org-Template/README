@@ -1,0 +1,24 @@
+Data-Org-Template
+
+Data::Org::Template is a template engine. I know what you're thinking.
+There are probably more template engines in the world than there are
+programmers - but this one does some things I specifically need, so
+I wrote it loosely based on JSON Template by Andy Chu (which was always
+my favorite template framework from a philosophical standpoint).
+
+The two features it has that set it apart from other template engines
+are, first, that inserted multiline values retain the indentation of the
+field where they were inserted (this makes literate programming much
+easier), and second, it plays well with iterators - both as input,
+when an Iterator::Records is passed to a list template, and as output,
+so that a list template can be expressed from an iterator into a
+file without having to buffer the entire textual output in memory.
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2020 Michael Roberts
+
+This module is licensed under the Artistic License.
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+

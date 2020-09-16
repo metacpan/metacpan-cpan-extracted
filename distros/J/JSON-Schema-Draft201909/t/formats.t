@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
@@ -11,10 +12,10 @@ use Test::Fatal;
 use JSON::Schema::Draft201909;
 
 subtest 'no validation' => sub {
-  my $js = JSON::Schema::Draft201909->new(collect_annotations => 1, validate_formats => 0);
   cmp_deeply(
-    $js->evaluate('abc', { format => 'uuid' })->TO_JSON,
-    {
+    JSON::Schema::Draft201909->new(collect_annotations => 1, validate_formats => 0)
+      ->evaluate('abc', { format => 'uuid' })->TO_JSON,
+    my $result = {
       valid => bool(1),
       annotations => [
         {
@@ -24,7 +25,14 @@ subtest 'no validation' => sub {
         },
       ],
     },
-    'validate_format=0 disables format assertion behaviour; annotation is still produced',
+    'validate_formats=0 disables format assertion behaviour; annotation is still produced',
+  );
+
+  cmp_deeply(
+    JSON::Schema::Draft201909->new(collect_annotations => 1, validate_formats => 1)
+      ->evaluate('abc', { format => 'uuid' }, { validate_formats => 0 })->TO_JSON,
+    $result,
+    'format validation can be turned off in evaluate()',
   );
 };
 
@@ -66,7 +74,7 @@ subtest 'simple validation' => sub {
 
   cmp_deeply(
     $js->evaluate('123', { format => 'uuid' })->TO_JSON,
-    {
+    my $result = {
       valid => bool(0),
       errors => [
         {
@@ -78,9 +86,22 @@ subtest 'simple validation' => sub {
     },
     'simple failure',
   );
+
+  $js = JSON::Schema::Draft201909->new(collect_annotations => 1);
+  ok(!$js->validate_formats, 'format_validation defaults to false');
+  cmp_deeply(
+    $js->evaluate('123', { format => 'uuid' }, { validate_formats => 1 })->TO_JSON,
+    $result,
+    'format validation can be turned on in evaluate()',
+  );
+
+  ok(!$js->validate_formats, '...but the value is still false on the object');
 };
 
 subtest 'unknown format attribute' => sub {
+  # see https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.7.2.3
+  # "An implementation MUST NOT fail validation or cease processing due to an unknown format
+  # attribute."
   my $js = JSON::Schema::Draft201909->new(collect_annotations => 1, validate_formats => 1);
   cmp_deeply(
     $js->evaluate('hello', { format => 'whargarbl' })->TO_JSON,

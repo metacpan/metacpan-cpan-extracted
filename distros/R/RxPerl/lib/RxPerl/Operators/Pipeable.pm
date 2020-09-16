@@ -12,16 +12,49 @@ use Scalar::Util 'reftype', 'refaddr';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    op_catch_error op_concat_map op_debounce_time op_delay op_distinct_until_changed op_distinct_until_key_changed
-    op_end_with op_exhaust_map op_filter op_finalize op_first op_map op_map_to op_merge_map op_multicast op_pairwise
-    op_pluck op_ref_count op_sample_time op_scan op_share op_start_with op_switch_map op_take op_take_until
-    op_take_while op_tap op_throttle_time op_with_latest_from
+    op_audit_time op_catch_error op_concat_map op_debounce_time op_delay op_distinct_until_changed
+    op_distinct_until_key_changed op_end_with op_exhaust_map op_filter op_finalize op_first op_map op_map_to
+    op_merge_map op_multicast op_pairwise op_pluck op_ref_count op_sample_time op_scan op_share op_start_with
+    op_switch_map op_take op_take_until op_take_while op_tap op_throttle_time op_with_latest_from
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-# TODO: are these op_delay comments still valid?
-# Two bugs: 1) script doesn't exit upon the subscriber receiving complete, and 2) delaying of(1, 2, 3) often
-# shows fewer than 3 'next' values and not in the right order.
+sub op_audit_time {
+    my ($duration) = @_;
+
+    my ($timer_sub, $cancel_timer_sub) = get_timer_subs;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $id;
+            my $in_audit = 0;
+            my @last_value;
+
+            get_subscription_from_subscriber($subscriber)->add_dependents(
+                sub { $cancel_timer_sub->($id) },
+            );
+
+            $source->subscribe({
+                %$subscriber,
+                next => sub {
+                    @last_value = @_;
+
+                    if (! $in_audit) {
+                        $in_audit = 1;
+                        $id = $timer_sub->($duration, sub {
+                            $in_audit = 0;
+                            $subscriber->{next}->(@last_value) if defined $subscriber->{next};
+                        });
+                    }
+                },
+            });
+        });
+    };
+}
 
 sub _op_catch_error_helper {
     my ($source, $selector, $subscriber, $dependents, $error) = @_;

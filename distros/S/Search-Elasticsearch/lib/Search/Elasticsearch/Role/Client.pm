@@ -1,5 +1,9 @@
+# Licensed to Elasticsearch B.V under one or more agreements.
+# Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+# See the LICENSE file in the project root for more information
+
 package Search::Elasticsearch::Role::Client;
-$Search::Elasticsearch::Role::Client::VERSION = '6.81';
+$Search::Elasticsearch::Role::Client::VERSION = '7.30';
 use Moo::Role;
 use namespace::clean;
 
@@ -28,7 +32,7 @@ Search::Elasticsearch::Role::Client - Provides common functionality for Client i
 
 =head1 VERSION
 
-version 6.81
+version 7.30
 
 =head1 DESCRIPTION
 

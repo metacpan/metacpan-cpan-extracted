@@ -1,7 +1,7 @@
 package Sah::SchemaR::nonnegint;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.074'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.075'; # VERSION
 
 our $rschema = ["int",[{description=>"\nThis schema is DEPRECATED. Please use the new name `uint`.\n\nSee also `posint` for integers that start from 1.\n\n",examples=>[{data=>0,valid=>1},{data=>1,valid=>1},{data=>-1,valid=>0}],min=>0,summary=>"Non-negative integer (0, 1, 2, ...) [DEPRECATED]"}],["int"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::nonnegint - Non-negative integer (0, 1, 2, ...) [DEPRECATED]
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::SchemaR::nonnegint (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::SchemaR::nonnegint (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

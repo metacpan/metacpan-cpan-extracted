@@ -124,7 +124,7 @@ DESCRIPTION
         is `main`, then the prefix defaults to undef.)
 
         You can bypass the prefix for a specific class or a specific role
-        using a leading double colon, like "::Animal".
+        using a leading double colon, like "::Animal" (or "main::Animal").
 
     `factory_package` *(Str|Undef)*
         A package name to install methods like the `new_cat` and `new_cow`

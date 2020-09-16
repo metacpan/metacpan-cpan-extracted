@@ -1,5 +1,9 @@
+# Licensed to Elasticsearch B.V under one or more agreements.
+# Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+# See the LICENSE file in the project root for more information
+
 package Search::Elasticsearch::Role::Transport;
-$Search::Elasticsearch::Role::Transport::VERSION = '6.81';
+$Search::Elasticsearch::Role::Transport::VERSION = '7.30';
 use Moo::Role;
 
 requires qw(perform_request);
@@ -72,7 +76,7 @@ Search::Elasticsearch::Role::Transport - Transport role providing interface betw
 
 =head1 VERSION
 
-version 6.81
+version 7.30
 
 =head1 AUTHOR
 

@@ -1,9 +1,9 @@
 package Sah::Schema::posint;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Int'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 our $schema = [int => {
     summary   => 'Positive integer (1, 2, ...)',
@@ -36,7 +36,7 @@ Sah::Schema::posint - Positive integer (1, 2, ...)
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::posint (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::posint (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 

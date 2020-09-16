@@ -17,7 +17,7 @@ my $result = HealthCheck::Diagnostic::FilePermissions->check(
 );
 is $result->{status}, 'CRITICAL',
     'Can use HealthCheck as a class.';
-is $result->{info}, qq{App must have permission to execute '$filename'},
+is $result->{info}, qq{Must have permission to execute '$filename'},
     'Info message is correct.';
 
 # Check that we can use HealthCheck with initialized values too.
@@ -28,29 +28,47 @@ my $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
 $result = $diagnostic->check;
 is $result->{status}, 'CRITICAL',
     'Can use HealthCheck with instance values too.';
-is $result->{info}, qq{App must have permission to execute '$filename'},
+is $result->{info}, qq{Must have permission to execute '$filename'},
     'Info message is correct.';
 
 # Check that `check` parameters override the initialized parameters.
 $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
-    files  => [ $filename ],
-    access => '!rwx',
+    id                     => 'custom_id',
+    label                  => 'Custom Label',
+    collapse_single_result => 0,
+    files                  => [$filename],
+    access                 => '!rwx',
 );
 $result = $diagnostic->check;
 is $result->{status}, 'CRITICAL',
     'Test that the original instance check is invalid.';
-is $result->{info},
-    qq{App must not have permission to read and write '$filename'},
-    'Info message is correct.';
+eq_or_diff $result, {
+    id      => 'custom_id',
+    label   => 'Custom Label',
+    status  => 'CRITICAL',
+    info    => qq{Must not have permission to read and write '$filename'},
+    results => [ {
+        status => 'CRITICAL',
+        info =>
+            qq{Must not have permission to read and write '$filename'},
+    } ],
+}, 'Result is as expected.';
 $result = $diagnostic->check(
-    files  => [ $filename2 ],
+    id     => 'overridden_id',     # TODO?
+    label  => 'Overridden Label',  # TODO?
+    files  => [$filename2],
     access => 'rw',
 );
-is $result->{status}, 'OK',
-    'Test that we can override the instance values.';
-is $result->{info},
-    qq{App has correct access for '$filename2'},
-    'Info message is correct.';
+eq_or_diff $result, {
+    id      => 'custom_id',
+    label   => 'Custom Label',
+    status  => 'OK',
+    info    => qq{Permissions are correct for '$filename2'},
+    results => [ {
+        status => 'OK',
+        info   => qq{Have correct access for '$filename2'},
+    } ],
+}, 'Test that we can override some instance values.';
 
 # Create a method that returns the info and status after running the
 # check. If it failed, then this just returns the error.
@@ -107,236 +125,242 @@ eq_or_diff( $run_check_or_error->(
     'OK', qq{Permissions are correct for '$filename' and '$filename2'},
 ], 'Pass when sending in a sub for the file list.' );
 
+SKIP: {
+     skip "chmod, getpwuid, or getgrgid not supported"
+        if $^O eq 'MSWin32';
 
-# Check for permissions on the file.
-chmod( 0755, $filename );
-$diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
-    files       => [ $filename ],
-    permissions => '493', # 0755 in decimal
-);
-eq_or_diff( $run_check_or_error->( $diagnostic ), [
-    'OK', qq{Permissions are 0755 for '$filename'},
-], 'Pass when given the right file permissions.' );
-chmod( 0700, $filename );
-eq_or_diff( $run_check_or_error->( $diagnostic ), [
-    'CRITICAL',
-    qq{Permissions should be 0755 but are 0700 for '$filename'},
-], 'Do not pass when the permissions are incorrect for a file.' );
-
-# Check for permissions when we have multiple files.
-chmod( 0644, $filename );
-chmod( 0644, $filename2 );
-$diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
-    files       => [ $filename, $filename2 ],
-    permissions => 0644,
-);
-eq_or_diff( $run_check_or_error->( $diagnostic ), [
-    'OK', qq{Permissions are correct for '$filename' and '$filename2'},
-], 'Pass when the files have the same permission.' );
-chmod( 0700, $filename2 );
-eq_or_diff( $run_check_or_error->( $diagnostic ), [
-    'CRITICAL',
-    qq{Permissions should be 0644 but are 0700 for '$filename2'},
-], 'Do not pass when one of the files has different permissions.' );
-
-# Check for the right result when looking for permissions and one of the
-# files doesn't exist.
-$diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
-    files       => [ $filename, 'doesnt_exist' ],
-    permissions => 0644,
-);
-eq_or_diff( $run_check_or_error->( $diagnostic ), [
-    'CRITICAL', qq{'doesnt_exist' does not exist},
-], 'Do not pass when checking permissions and one file doesn\'t exist.' );
-
-# Make sure the app can access a file correctly.
-my %access = (
-    full_name_hash  => { read => 1, write => 1, execute => 1 },
-    short_name_hash => { r    => 1, w     => 1, x       => 1 },
-    string          => 'rwx',
-);
-foreach ( keys %access ) {
-    chmod( 0777, $filename );
+    # Check for permissions on the file.
+    chmod( 0755, $filename );
     $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
-        files  => [ $filename ],
-        access => $access{$_},
+        files       => [ $filename ],
+        permissions => '493', # 0755 in decimal
     );
     eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'OK', qq{App has correct access for '$filename'},
-    ], "$_: Pass when the app needs to rwx and can rwx." );
-    chmod( 0000, $filename );
-    eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'CRITICAL',
-        qq{App must have permission to execute, read, and write '$filename'},
-    ], "$_: Fail when the app needs to rwx and cannot rwx." );
-}
-%access = (
-    full_name_hash  => { read => 1, write => 1, execute => 0 },
-    short_name_hash => { r    => 1, w     => 1, x       => 0 },
-    string          => 'rw!x',
-);
-foreach ( keys %access ) {
-    chmod( 0666, $filename );
-    $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
-        files  => [ $filename ],
-        access => $access{$_},
-    );
-    eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'OK', qq{App has correct access for '$filename'},
-    ], "$_: Pass when the app should only rw and can rw." );
-    chmod( 0444, $filename );
-    eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'CRITICAL', qq{App must have permission to write '$filename'},
-    ], "$_: Fail when the app should only rw but can only r." );
-    chmod( 0000, $filename );
-    eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'CRITICAL',
-        qq{App must have permission to read and write '$filename'},
-    ], "$_: Fail when the app should only rw and cannot rw." );
-}
-%access = (
-    full_name_hash   => { r    => 0, w     => 0, x       => 0 },
-    short_name_hash  => { read => 0, write => 0, execute => 0 },
-    string           => '!rwx',
-);
-foreach ( keys %access ) {
-    chmod( 0000, $filename );
-    $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
-        files  => [ $filename ],
-        access => $access{$_},
-    );
-    eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'OK', qq{App has correct access for '$filename'},
-    ], "$_: Pass when the app should not rwx and cannot rwx." );
-    chmod( 0444, $filename );
-    eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'CRITICAL', qq{App must not have permission to read '$filename'},
-    ], "$_: Fail when the app should not rwx and can r." );
-    chmod( 0666, $filename );
-    eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'CRITICAL',
-        qq{App must not have permission to read and write '$filename'},
-    ], "$_: Fail when the app should not rwx and can rw." );
-    chmod( 0777, $filename );
-    eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'CRITICAL',
-        "App must not have permission to execute, read, ".
-        "and write '$filename'",
-    ], 'Fail when the app should not rwx and can rwx.' );
-}
-
-# Make sure that the access permissions work for multiple files.
-chmod( 0777, $filename );
-chmod( 0777, $filename2 );
-$diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
-    files  => [ $filename, $filename2 ],
-    access => 'rwx',
-);
-eq_or_diff( $run_check_or_error->( $diagnostic ), [
-    'OK', qq{Permissions are correct for '$filename' and '$filename2'},
-], 'Pass when the access permissions are correct for both files.' );
-chmod( 0666, $filename2 );
-eq_or_diff( $run_check_or_error->( $diagnostic ), [
-    'CRITICAL', qq{App must have permission to execute '$filename2'},
-], 'Fail when the access permissions are incorrect for one file.' );
-chmod( 0444, $filename );
-eq_or_diff( $run_check_or_error->( $diagnostic ), [
-    'CRITICAL',
-    "App must have permission to execute and write '$filename'; App ".
-    "must have permission to execute '$filename2'",
-], 'Fail when the access permissions are incorrect for both files.' );
-
-# Try pairing the access permissions tests with other checks.
-chmod( 0777, $filename );
-$diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
-    files       => [ $filename, 'doesnt_exist' ],
-    permissions => 0777,
-    access      => 'rwx',
-);
-eq_or_diff( $run_check_or_error->( $diagnostic ), [
-    'CRITICAL', qq{'doesnt_exist' does not exist},
-], 'Fail when permissions pass but another file does not exist.' );
-chmod( 0666, $filename );
-eq_or_diff( $run_check_or_error->( $diagnostic ), [
-    'CRITICAL',
-    "App must have permission to execute '$filename'; Permissions ".
-    "should be 0777 but are 0666 for '$filename'; 'doesnt_exist' ".
-    "does not exist",
-], 'Fail when permissions fail and another file does not exist.' );
-
-# Check that we can ignore the results of some access permissions.
-%access = (
-    full_name_hash  => { write => 1 },
-    short_name_hash => { w     => 1 },
-    string          => 'w',
-);
-foreach ( keys %access ) {
-    chmod( 0600, $filename );
-    $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
-        files  => $filename,
-        access => $access{$_},
-    );
-    eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'OK', qq{App has correct access for '$filename'},
-    ], "$_: Pass when the app should w and can rw." );
-    chmod( 0000, $filename );
-    eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'CRITICAL', qq{App must have permission to write '$filename'},
-    ], "$_: Fail when the app should w and cannot rwx." );
-}
-%access = (
-    full_name_hash  => { execute => 0 },
-    short_name_hash => { x       => 0 },
-    string          => '!x',
-);
-foreach ( keys %access ) {
-    chmod( 0200, $filename );
-    $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
-        files  => [ $filename ],
-        access => $access{$_},
-    );
-    eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'OK', qq{App has correct access for '$filename'},
-    ], "$_: Pass when the app should not x and can w." );
+        'OK', qq{Permissions are 0755 for '$filename'},
+    ], 'Pass when given the right file permissions.' );
     chmod( 0700, $filename );
     eq_or_diff( $run_check_or_error->( $diagnostic ), [
-        'CRITICAL', qq{App must not have permission to execute '$filename'},
-    ], "$_: Fail when app should not x and can rwx." );
+        'CRITICAL',
+        qq{Permissions should be 0755 but are 0700 for '$filename'},
+    ], 'Do not pass when the permissions are incorrect for a file.' );
+
+    # Check for permissions when we have multiple files.
+    chmod( 0644, $filename );
+    chmod( 0644, $filename2 );
+    $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
+        files       => [ $filename, $filename2 ],
+        permissions => 0644,
+    );
+    eq_or_diff( $run_check_or_error->( $diagnostic ), [
+        'OK', qq{Permissions are correct for '$filename' and '$filename2'},
+    ], 'Pass when the files have the same permission.' );
+    chmod( 0700, $filename2 );
+    eq_or_diff( $run_check_or_error->( $diagnostic ), [
+        'CRITICAL',
+        qq{Permissions should be 0644 but are 0700 for '$filename2'},
+    ], 'Do not pass when one of the files has different permissions.' );
+
+    # Check for the right result when looking for permissions and one of the
+    # files doesn't exist.
+    $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
+        files       => [ $filename, 'doesnt_exist' ],
+        permissions => 0644,
+    );
+    eq_or_diff( $run_check_or_error->( $diagnostic ), [
+        'CRITICAL', qq{'doesnt_exist' does not exist},
+    ], 'Do not pass when checking permissions and one file doesn\'t exist.' );
+
+    # Make sure it can access a file correctly.
+    my %access = (
+        full_name_hash  => { read => 1, write => 1, execute => 1 },
+        short_name_hash => { r    => 1, w     => 1, x       => 1 },
+        string          => 'rwx',
+    );
+    foreach ( keys %access ) {
+        chmod( 0777, $filename );
+        $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
+            files  => [ $filename ],
+            access => $access{$_},
+        );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'OK', qq{Have correct access for '$filename'},
+        ], "$_: Pass when it needs to rwx and can rwx." );
+        chmod( 0000, $filename );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'CRITICAL',
+            qq{Must have permission to execute, read, and write '$filename'},
+        ], "$_: Fail when it needs to rwx and cannot rwx." );
+    }
+    %access = (
+        full_name_hash  => { read => 1, write => 1, execute => 0 },
+        short_name_hash => { r    => 1, w     => 1, x       => 0 },
+        string          => 'rw!x',
+    );
+    foreach ( keys %access ) {
+        chmod( 0666, $filename );
+        $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
+            files  => [ $filename ],
+            access => $access{$_},
+        );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'OK', qq{Have correct access for '$filename'},
+        ], "$_: Pass when it should only rw and can rw." );
+        chmod( 0444, $filename );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'CRITICAL', qq{Must have permission to write '$filename'},
+        ], "$_: Fail when it should only rw but can only r." );
+        chmod( 0000, $filename );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'CRITICAL',
+            qq{Must have permission to read and write '$filename'},
+        ], "$_: Fail when it should only rw and cannot rw." );
+    }
+    %access = (
+        full_name_hash   => { r    => 0, w     => 0, x       => 0 },
+        short_name_hash  => { read => 0, write => 0, execute => 0 },
+        string           => '!rwx',
+    );
+    foreach ( keys %access ) {
+        chmod( 0000, $filename );
+        $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
+            files  => [ $filename ],
+            access => $access{$_},
+        );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'OK', qq{Have correct access for '$filename'},
+        ], "$_: Pass when it should not rwx and cannot rwx." );
+        chmod( 0444, $filename );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'CRITICAL', qq{Must not have permission to read '$filename'},
+        ], "$_: Fail when it should not rwx and can r." );
+        chmod( 0666, $filename );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'CRITICAL',
+            qq{Must not have permission to read and write '$filename'},
+        ], "$_: Fail when it should not rwx and can rw." );
+        chmod( 0777, $filename );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'CRITICAL',
+            "Must not have permission to execute, read, ".
+            "and write '$filename'",
+        ], 'Fail when it should not rwx and can rwx.' );
+    }
+
+    # Make sure that the access permissions work for multiple files.
+    chmod( 0777, $filename );
+    chmod( 0777, $filename2 );
+    $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
+        files  => [ $filename, $filename2 ],
+        access => 'rwx',
+    );
+    eq_or_diff( $run_check_or_error->( $diagnostic ), [
+        'OK', qq{Permissions are correct for '$filename' and '$filename2'},
+    ], 'Pass when the access permissions are correct for both files.' );
+    chmod( 0666, $filename2 );
+    eq_or_diff( $run_check_or_error->( $diagnostic ), [
+        'CRITICAL', qq{Must have permission to execute '$filename2'},
+    ], 'Fail when the access permissions are incorrect for one file.' );
+    chmod( 0444, $filename );
+    eq_or_diff( $run_check_or_error->( $diagnostic ), [
+        'CRITICAL',
+        "Must have permission to execute and write '$filename'; ".
+        "Must have permission to execute '$filename2'",
+    ], 'Fail when the access permissions are incorrect for both files.' );
+
+    # Try pairing the access permissions tests with other checks.
+    chmod( 0777, $filename );
+    $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
+        files       => [ $filename, 'doesnt_exist' ],
+        permissions => 0777,
+        access      => 'rwx',
+    );
+    eq_or_diff( $run_check_or_error->( $diagnostic ), [
+        'CRITICAL', qq{'doesnt_exist' does not exist},
+    ], 'Fail when permissions pass but another file does not exist.' );
+    chmod( 0666, $filename );
+    eq_or_diff( $run_check_or_error->( $diagnostic ), [
+        'CRITICAL',
+        "Must have permission to execute '$filename'; Permissions ".
+        "should be 0777 but are 0666 for '$filename'; 'doesnt_exist' ".
+        "does not exist",
+    ], 'Fail when permissions fail and another file does not exist.' );
+
+    # Check that we can ignore the results of some access permissions.
+    %access = (
+        full_name_hash  => { write => 1 },
+        short_name_hash => { w     => 1 },
+        string          => 'w',
+    );
+    foreach ( keys %access ) {
+        chmod( 0600, $filename );
+        $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
+            files  => $filename,
+            access => $access{$_},
+        );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'OK', qq{Have correct access for '$filename'},
+        ], "$_: Pass when it should w and can rw." );
+        chmod( 0000, $filename );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'CRITICAL', qq{Must have permission to write '$filename'},
+        ], "$_: Fail when it should w and cannot rwx." );
+    }
+    %access = (
+        full_name_hash  => { execute => 0 },
+        short_name_hash => { x       => 0 },
+        string          => '!x',
+    );
+    foreach ( keys %access ) {
+        chmod( 0200, $filename );
+        $diagnostic = HealthCheck::Diagnostic::FilePermissions->new(
+            files  => [ $filename ],
+            access => $access{$_},
+        );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'OK', qq{Have correct access for '$filename'},
+        ], "$_: Pass when it should not x and can w." );
+        chmod( 0700, $filename );
+        eq_or_diff( $run_check_or_error->( $diagnostic ), [
+            'CRITICAL',
+            qq{Must not have permission to execute '$filename'},
+        ], "$_: Fail when it should not x and can rwx." );
+    }
+
+    # Test that it dies when we pass invalid access parameters.
+    my %f = ( files => $filename );
+    like $run_check_or_error->( %f, access => { write => 1, faker => 1 } ),
+        qr/Invalid access parameter: faker/,
+        'Fail when an access parameter hash is invalid.';
+    like $run_check_or_error->( %f, access => 'wrx!e' ),
+        qr/Invalid access parameter: e/,
+        'Fail when an access parameter string is invalid.';
+
+    # Test that we check for the group and owner correctly.
+    my $owner = getpwuid( ( stat $filename )[4] );
+    my $group = getgrgid( ( stat $filename )[5] );
+    eq_or_diff( $run_check_or_error->( %f, owner => $owner ), [
+        'OK', qq{Owner is $owner for '$filename'},
+    ], 'Pass when the owner is correct.' );
+    eq_or_diff( $run_check_or_error->( %f, group => $group ), [
+        'OK', qq{Group is $group for '$filename'},
+    ], 'Pass when the group is correct.' );
+    eq_or_diff(
+        $run_check_or_error->( %f, owner => $owner, group => $group ), [
+        'OK', qq{Permissions are correct for '$filename'},
+    ], 'Pass when the owner and group are correct.' );
+    eq_or_diff( $run_check_or_error->( %f, owner => 'fake-owner' ), [
+        'CRITICAL',
+        qq{Owner should be fake-owner but is $owner for '$filename'},
+    ], 'Fail when the owner is incorrect.' );
+    eq_or_diff( $run_check_or_error->( %f, group => 'fake-group' ), [
+        'CRITICAL',
+        qq{Group should be fake-group but is $group for '$filename'},
+    ], 'Fail when the group is incorrect.' );
+    eq_or_diff( $run_check_or_error->( %f, group => 'fg', owner => 'fo' ), [
+        'CRITICAL',
+        "Owner should be fo but is $owner for '$filename'; Group should ".
+        "be fg but is $group for '$filename'",
+    ], 'Fail when the owner and group are incorrect.' );
 }
-
-# Test that it dies when we pass invalid access parameters.
-my %f = ( files => $filename );
-like $run_check_or_error->( %f, access => { write => 1, faker => 1 } ),
-    qr/Invalid access parameter: faker/,
-    'Fail when an access parameter hash is invalid.';
-like $run_check_or_error->( %f, access => 'wrx!e' ),
-    qr/Invalid access parameter: e/,
-    'Fail when an access parameter string is invalid.';
-
-# Test that we check for the group and owner correctly.
-my $owner = getpwuid( ( stat $filename )[4] );
-my $group = getgrgid( ( stat $filename )[5] );
-eq_or_diff( $run_check_or_error->( %f, owner => $owner ), [
-    'OK', qq{Owner is $owner for '$filename'},
-], 'Pass when the owner is correct.' );
-eq_or_diff( $run_check_or_error->( %f, group => $group ), [
-    'OK', qq{Group is $group for '$filename'},
-], 'Pass when the group is correct.' );
-eq_or_diff( $run_check_or_error->( %f, owner => $owner, group => $group ), [
-    'OK', qq{Permissions are correct for '$filename'},
-], 'Pass when the owner and group are correct.' );
-eq_or_diff( $run_check_or_error->( %f, owner => 'fake-owner' ), [
-    'CRITICAL',
-    qq{Owner should be fake-owner but is $owner for '$filename'},
-], 'Fail when the owner is incorrect.' );
-eq_or_diff( $run_check_or_error->( %f, group => 'fake-group' ), [
-    'CRITICAL',
-    qq{Group should be fake-group but is $group for '$filename'},
-], 'Fail when the group is incorrect.' );
-eq_or_diff( $run_check_or_error->( %f, group => 'fg', owner => 'fo' ), [
-    'CRITICAL',
-    "Owner should be fo but is $owner for '$filename'; Group should ".
-    "be fg but is $group for '$filename'",
-], 'Fail when the owner and group are incorrect.' );
 
 done_testing;

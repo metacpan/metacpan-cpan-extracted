@@ -5,7 +5,7 @@ use warnings;
 package Zydeco::Lite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.065';
+our $VERSION   = '0.067';
 
 use MooX::Press ();
 use Types::Standard qw( -types -is );
@@ -89,7 +89,7 @@ sub app {
 		%{ $THIS{APP_SPEC} },
 	);
 	
-	return "::$package" if $is_anon;
+	return MooX::Press::make_absolute_package_name($package) if $is_anon;
 	return;
 }
 
@@ -116,8 +116,13 @@ sub class {
 		else {
 			my $method = $args{is_role} ? 'make_role_generator' : 'make_class_generator';
 			$package   = _anon_package_name();
-			'MooX::Press'->$method( "::$package", %{ $THIS{APP_SPEC} or {} }, %args, generator => $gen );
-			return "::$package";
+			'MooX::Press'->$method(
+				MooX::Press::make_absolute_package_name($package),
+				%{ $THIS{APP_SPEC} or {} },
+				%args,
+				generator => $gen,
+			);
+			return MooX::Press::make_absolute_package_name($package);
 		}
 	}
 	
@@ -129,11 +134,7 @@ sub class {
 
 	my $class_spec = do {
 		local $THIS{CLASS} = $package;
-		local $THIS{CLASS_SPEC} = {
-			abstract  => $args{abstract},
-			interface => $args{interface},
-			is_role   => $args{is_role},
-		};
+		local $THIS{CLASS_SPEC} = { %args };
 		$definition->();
 		delete $THIS{CLASS_SPEC}{is_role};
 		$THIS{CLASS_SPEC};
@@ -143,8 +144,12 @@ sub class {
 	if ( ! $package ) {
 		my $method = $args{is_role} ? 'make_role' : 'make_class';
 		$package   = _anon_package_name();
-		'MooX::Press'->$method( "::$package", %{ $THIS{APP_SPEC} or {} }, %$class_spec );
-		return "::$package";
+		'MooX::Press'->$method(
+			MooX::Press::make_absolute_package_name($package),
+			%{ $THIS{APP_SPEC} or {} },
+			%$class_spec,
+		);
+		return MooX::Press::make_absolute_package_name($package);
 	}
 	# Nested class
 	elsif ( $THIS{CLASS_SPEC} ) {
@@ -505,45 +510,18 @@ sub coerce {
 }
 
 sub _handle_hook {
-	use Data::Dumper;
 	my $package = $THIS{CLASS};
 	my %spec    = %{ $THIS{CLASS_SPEC} };
-	my $kind    = Role::Hooks->is_role($package) ? 'role' : 'class';
 	
-	if ( my $methods = delete $spec{can} ) {
-		'MooX::Press'->install_methods( $package, $methods );
-	}
+	my %remains = 'MooX::Press'->patch_package(
+		$package,
+		%spec,
+	);
+	confess( 'bad stuff in %s hook', $THIS{HOOK} )
+		if keys %remains;
 	
-	if ( my $multimethods = delete $spec{multimethod} ) {
-		my @mm = @$multimethods;
-		while ( my ( $name, $code ) = splice( @mm, 0, 2 ) ) {
-			'MooX::Press'->install_multimethod( $package, $kind, $name, $code );
-		}
-	}
-	
-	if ( my $constants = delete $spec{constant} ) {
-		'MooX::Press'->install_constants( $package, $constants );
-	}
-
-	if ( my $atts = delete $spec{has} ) {
-		'MooX::Press'->install_attributes( $package, $atts );
-	}
-	
-	for my $modifier ( qw/ before after around / ) {
-		my @mm = @{ delete $spec{$modifier} or [] } or next;
-		while ( my ( $name, $code ) = splice( @mm, 0, 2 ) ) {
-			my $real_coderef = 'MooX::Press'->_prepare_method_modifier( $package, $modifier, $name, $code );
-			require Class::Method::Modifiers;
-			Class::Method::Modifiers::install_modifier( $package, $modifier, @$name, $real_coderef );
-		}
-	}
-	
-	#TODO: coerce
-	#TODO: with
-	#TODO: factory
-	
-	confess( 'bad stuff in %s hook', $THIS{HOOK} ) if keys %spec;
 	return;
+
 }
 
 sub begin (&) {

@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Gallery;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::File 'path';
@@ -23,6 +23,7 @@ sub register {
     die 'meta is undef' unless $meta_source;
     my $meta = Load $meta_source->slurp;
     next unless $meta->{show};
+
     my $gallery_name = $gallery->basename;
     my $gallery_path = $gallery->to_string;
     my $photos_path  = sprintf '%s/large', $gallery->to_string;
@@ -50,7 +51,7 @@ sub register {
     my $c = $app->build_controller;
     $app->routes->get($gallery_url)->to(cb => sub {
       my $c = shift;
-      $c->render(template => 'gallery/item',
+      $c->render(template => 'gallery_item',
         page_title   => $meta->{title},
         photos       => $photo_items,
         meta         => $meta,
@@ -66,7 +67,7 @@ sub register {
 
   $app->routes->get('/gallery')->to(cb => sub {
     my $c = shift;
-    $c->render(template => 'gallery/list',
+    $c->render(template => 'gallery_list',
       page_title   => 'Somoe Photos',
       galleries    => $galleries,
     );
@@ -81,7 +82,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Gallery - Simple phot gallery for Mojolicious
+Mojolicious::Plugin::Gallery - Simple photo gallery for Mojolicious
 
 =head1 SYNOPSIS
 
@@ -89,13 +90,64 @@ Mojolicious::Plugin::Gallery - Simple phot gallery for Mojolicious
 
 =head1 DESCRIPTION
 
-Mojolicious::Plugin::Gallery is if you want simple gallery
+Mojolicious::Plugin::Gallery use if you want to create simple gallery
 
-Your steps
-- Make dir in public/gallery
-- Run ./cmd.pl resize
-- Update info in public/gallery/<your album>/meta.yml
-- Restart your app
+Exampler content main.conf
+
+  {
+    gallery => {
+      main_path => 'public/gallery',
+      sizes => {
+        thumbnail => {
+          width   => 412,
+          height  => 412,
+          crop    => 1,
+          quality => 85
+        },
+        medium => {
+          width   => 800,
+          height  => 550,
+          crop    => 0,
+          quality => 90
+        },
+        large => {
+          width   => 1200,
+          height  => 800,
+          crop    => 0,
+          quality => 90
+        }
+      }
+    },
+  }
+
+
+example app.pl
+
+  #!/usr/bin/env perl
+
+  use lib 'lib';
+  use Mojolicious::Lite;
+
+  app->plugin(Config => { file => 'main.conf' });
+
+  app->plugin('Gallery');
+
+  get '/' => sub {
+    my $c = shift;
+
+    $c->render(text => '<a href="/gallery">Gallery</a>');
+  };
+
+  app->start;
+
+Also you can find example app on https://github.com/sklukin/Mojolicious-Plugin-Gallery
+
+Your steps for create new photo gallery
+
+  - Make dir in public/gallery
+  - Run ./cmd.pl resize
+  - Update info in public/gallery/<your album>/meta.yml
+  - Restart your app
 
 =head1 AUTHOR
 

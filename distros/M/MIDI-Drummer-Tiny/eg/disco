@@ -20,7 +20,7 @@ for my $n ( 0 .. $d->bars - 1 ) {
             $d->note( $d->eighth, $d->closed_hh, $d->kick );
             $d->note( $d->eighth, $d->closed_hh );
             $d->note( $d->eighth, $d->open_hh,   $d->kick, $d->snare );
-            $d->note( $d->eighth, $d->closed_hh );
+            $d->note( $d->eighth, $d->pedal_hh );
         }
     }
     else {
@@ -28,7 +28,7 @@ for my $n ( 0 .. $d->bars - 1 ) {
         $d->note( $d->sixteenth, $d->closed_hh );
         $d->note( $d->sixteenth, $d->closed_hh );
         $d->note( $d->sixteenth, $d->open_hh );
-        $d->note( $d->sixteenth, $d->closed_hh, $d->kick, $d->snare );
+        $d->note( $d->sixteenth, $d->pedal_hh, $d->kick, $d->snare );
         $d->note( $d->sixteenth, $d->closed_hh );
         $d->note( $d->sixteenth, $d->closed_hh );
         $d->note( $d->sixteenth, $d->closed_hh );

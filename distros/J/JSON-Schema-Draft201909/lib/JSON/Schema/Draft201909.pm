@@ -1,26 +1,27 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.011-8-g62d7177
+package JSON::Schema::Draft201909; # git description: v0.012-25-gc769be7
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
 use JSON::MaybeXS 1.004001 'is_bool';
 use Syntax::Keyword::Try 0.11;
 use Carp qw(croak carp);
 use List::Util 1.55 qw(any pairs first uniqint uniqstr max);
 use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref is_plain_coderef);
-use Mojo::JSON::Pointer;
 use Mojo::URL;
 use Safe::Isa;
 use Path::Tiny;
 use Storable 'dclone';
 use File::ShareDir 'dist_dir';
 use Moo;
+use strictures 2;
 use MooX::TypeTiny 0.002002;
 use MooX::HandlesVia;
 use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef);
@@ -34,7 +35,7 @@ use constant { true => JSON::PP::true, false => JSON::PP::false };
 
 has output_format => (
   is => 'ro',
-  isa => Enum[qw(flag basic detailed verbose)],
+  isa => Enum(JSON::Schema::Draft201909::Result->OUTPUT_FORMATS),
   default => 'basic',
 );
 
@@ -99,21 +100,21 @@ sub add_schema {
 
   if (not @_) {
     # TODO: resolve $uri against $self->base_uri
-    my ($schema, $canonical_uri) = $self->_fetch_schema_from_uri($uri);
+    my ($schema, $canonical_uri, $document, $document_path) = $self->_fetch_schema_from_uri($uri);
     return if not defined $schema or not defined wantarray;
-    return $self->_get_resource($canonical_uri->fragment(undef))->{document};
+    return $document;
   }
 
   my $document = $_[0]->$_isa('JSON::Schema::Draft201909::Document') ? shift
     : JSON::Schema::Draft201909::Document->new(schema => shift, $uri ? (canonical_uri => $uri) : ());
 
   if (not grep $_->{document} == $document, $self->_resource_values) {
-    my $schema_content = $document->serialized_schema
-      // $document->serialized_schema($self->_json_decoder->encode($document->schema));
+    my $schema_content = $document->_serialized_schema
+      // $document->_serialized_schema($self->_json_decoder->encode($document->schema));
 
     if (my $existing_doc = first {
-          my $existing_content = $_->serialized_schema
-            // $_->serialized_schema($self->_json_decoder->encode($_->schema));
+          my $existing_content = $_->_serialized_schema
+            // $_->_serialized_schema($self->_json_decoder->encode($_->schema));
           $existing_content eq $schema_content
         } uniqint map $_->{document}, $self->_resource_values) {
       # we already have this schema content in another document object.
@@ -168,10 +169,13 @@ sub evaluate {
   my $state = {
     short_circuit => $config_override->{short_circuit} // $self->short_circuit,
     collect_annotations => $config_override->{collect_annotations} // $self->collect_annotations,
+    validate_formats => $config_override->{validate_formats} // $self->validate_formats,
     depth => 0,
     data_path => '',
     traversed_schema_path => '',        # the accumulated path up to the last $ref traversal
     canonical_schema_uri => $base_uri,  # the canonical path of the last traversed $ref
+    document => 'SEE BELOW',            # the ::Document object containing this schema
+    document_path => 'SEE BELOW',       # the *initial* path within the document of this schema
     schema_path => '',                  # the rest of the path, since the last traversed $ref
     errors => [],
     annotations => [],
@@ -180,20 +184,22 @@ sub evaluate {
 
   my $result;
   try {
-    my ($schema, $canonical_uri);
+    my ($schema, $canonical_uri, $document, $document_path);
 
     if (not is_ref($schema_reference) or $schema_reference->$_isa('Mojo::URL')) {
       # TODO: resolve $uri against base_uri
-      ($schema, $canonical_uri) = $self->_fetch_schema_from_uri($schema_reference);
+      ($schema, $canonical_uri, $document, $document_path) = $self->_fetch_schema_from_uri($schema_reference);
     }
     else {
-      my $document = $self->add_schema($schema_reference);
+      $document = $self->add_schema($schema_reference);
       ($schema, $canonical_uri) = map $document->$_, qw(schema canonical_uri);
+      $document_path = '';
     }
 
     abort($state, 'unable to find resource %s', $schema_reference) if not defined $schema;
 
-    $state->{canonical_schema_uri} = $canonical_uri;
+    @$state{qw(canonical_schema_uri document document_path)} = ($canonical_uri, $document, $document_path);
+
     $result = $self->_eval($data, $schema, $state);
   }
   catch {
@@ -238,7 +244,7 @@ sub _eval {
     if $state->{depth}++ > $self->max_traversal_depth;
 
   abort($state, 'infinite loop detected (same location evaluated twice)')
-    if $state->{seen}{$state->{data_path}}{$state->{canonical_schema_uri}.$state->{schema_path}}++;
+    if $state->{seen}{$state->{data_path}}{$state->{canonical_schema_uri}.(length($state->{schema_path}) ? '#'.$state->{schema_path} : '')}++;
 
   my $schema_type = $self->_get_type($schema);
   return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
@@ -288,17 +294,19 @@ sub _eval_keyword_id {
 
   assert_keyword_type($state, $schema, 'string');
 
-  my $uri = Mojo::URL->new($schema->{'$id'});
-  $uri = $uri->base($state->{canonical_schema_uri})->to_abs if not $uri->is_abs;
   abort($state, '$id value "%s" cannot have a non-empty fragment', $schema->{'$id'})
-    if length $uri->fragment;
+    if length Mojo::URL->new($schema->{'$id'})->fragment;
 
-  $uri->fragment(undef);
-  $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
-  $state->{canonical_schema_uri} = $uri;
-  $state->{schema_path} = '';
+  if (my $canonical_uri = $state->{document}->_path_to_canonical_uri($state->{document_path}.$state->{schema_path})) {
+    $state->{canonical_schema_uri} = $canonical_uri->clone;
+    $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
+    $state->{document_path} = $state->{document_path}.$state->{schema_path};
+    $state->{schema_path} = '';
+    return 1;
+  }
 
-  return 1;
+  # this should never happen, if the pre-evaluation traversal was performed correctly
+  abort($state, 'failed to resolve $id to canonical uri');
 }
 
 sub _eval_keyword_schema {
@@ -349,15 +357,16 @@ sub _eval_keyword_ref {
 
   assert_keyword_type($state, $schema, 'string');
 
-  my $uri = Mojo::URL->new($schema->{'$ref'});
-  $uri = $uri->base($state->{canonical_schema_uri})->to_abs if not $uri->is_abs;
-  my ($subschema, $canonical_uri) = $self->_fetch_schema_from_uri($uri);
+  my $uri = Mojo::URL->new($schema->{'$ref'})->to_abs($state->{canonical_schema_uri});
+  my ($subschema, $canonical_uri, $document, $document_path) = $self->_fetch_schema_from_uri($uri);
   abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
 
   return $self->_eval($data, $subschema,
     +{ %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$ref',
       canonical_schema_uri => $canonical_uri, # note: maybe not canonical yet until $id is processed
+      document => $document,
+      document_path => $document_path,
       schema_path => '',
     });
 }
@@ -367,21 +376,18 @@ sub _eval_keyword_recursiveRef {
 
   assert_keyword_type($state, $schema, 'string');
 
-  my $target_uri = Mojo::URL->new($schema->{'$recursiveRef'});
-  $target_uri = $target_uri->base($state->{canonical_schema_uri})->to_abs if not $target_uri->is_abs;
-  my ($subschema, $canonical_uri) = $self->_fetch_schema_from_uri($target_uri);
+  my $target_uri = Mojo::URL->new($schema->{'$recursiveRef'})->to_abs($state->{canonical_schema_uri});
+  my ($subschema, $canonical_uri, $document, $document_path) = $self->_fetch_schema_from_uri($target_uri);
   abort($state, 'unable to find resource %s', $target_uri) if not defined $subschema;
 
   if ($self->_is_type('boolean', $subschema->{'$recursiveAnchor'})
       and $subschema->{'$recursiveAnchor'}) {
-    my $uri = Mojo::URL->new($schema->{'$recursiveRef'});
     my $base = $state->{recursive_anchor_uri} // $state->{canonical_schema_uri};
-    $uri = $uri->base($base)->to_abs if not $uri->is_abs;
-
     abort($state, 'cannot resolve a $recursiveRef with a non-empty fragment against a $recursiveAnchor location with a canonical URI containing a fragment')
       if $schema->{'$recursiveRef'} ne '#' and length $base->fragment;
 
-    ($subschema, $canonical_uri) = $self->_fetch_schema_from_uri($uri);
+    my $uri = Mojo::URL->new($schema->{'$recursiveRef'})->to_abs($base);
+    ($subschema, $canonical_uri, $document, $document_path) = $self->_fetch_schema_from_uri($uri);
     abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
   }
 
@@ -389,6 +395,8 @@ sub _eval_keyword_recursiveRef {
     +{ %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$recursiveRef',
       canonical_schema_uri => $canonical_uri, # note: maybe not canonical yet until $id is processed
+      document => $document,
+      document_path => $document_path,
       schema_path => '',
     });
 }
@@ -810,8 +818,8 @@ sub _eval_keyword_items {
   my $valid = 1;
   foreach my $idx (0 .. $#{$data}) {
     last if $idx > $#{$schema->{items}};
-
     $last_index = $idx;
+
     my @annotations = @orig_annotations;
     if ($self->_eval($data->[$idx], $schema->{items}[$idx],
         +{ %$state, annotations => \@annotations,
@@ -830,7 +838,7 @@ sub _eval_keyword_items {
     A($state, $last_index);
   }
   else {
-    E($state, 'a subschema is not valid');
+    E($state, 'subschema is not valid against all items');
   }
 
   return $valid if not exists $schema->{additionalItems} or $last_index == $#{$data};
@@ -838,19 +846,26 @@ sub _eval_keyword_items {
   @orig_annotations = @{$state->{annotations}};
 
   foreach my $idx ($last_index+1 .. $#{$data}) {
-    my @annotations = @orig_annotations;
-    if ($self->_eval($data->[$idx], $schema->{additionalItems},
-        +{ %$state, data_path => $state->{data_path}.'/'.$idx,
-        schema_path => $state->{schema_path}.'/additionalitems', annotations => \@annotations })) {
-      push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
-      next;
+    if ($self->_is_type('boolean', $schema->{additionalItems})) {
+      next if $schema->{additionalItems};
+      $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx },
+          'additional item not permitted');
     }
+    else {
+      my @annotations = @orig_annotations;
+      if ($self->_eval($data->[$idx], $schema->{additionalItems},
+          +{ %$state, data_path => $state->{data_path}.'/'.$idx,
+          schema_path => $state->{schema_path}.'/additionalitems', annotations => \@annotations })) {
+        push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
+        next;
+      }
 
-    $valid = 0;
+      $valid = 0;
+    }
     last if $state->{short_circuit};
   }
 
-  return E($state, 'subschema is not valid') if not $valid;
+  return E($state, 'subschema is not valid against all additional items') if not $valid;
   push @{$state->{annotations}}, @new_annotations;
   return A($state, true);
 }
@@ -882,20 +897,27 @@ sub _eval_keyword_unevaluatedItems {
   my @orig_annotations = @{$state->{annotations}};
   my @new_annotations;
   foreach my $idx ($last_index+1 .. $#{$data}) {
-    my @annotations = @orig_annotations;
-    if ($self->_eval($data->[$idx], $schema->{unevaluatedItems},
-        +{ %$state, annotations => \@annotations,
-          data_path => $state->{data_path}.'/'.$idx,
-          schema_path => $state->{schema_path}.'/unevaluatedItems' })) {
-      push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
-      next;
+    if ($self->_is_type('boolean', $schema->{unevaluatedItems})) {
+      next if $schema->{unevaluatedItems};
+      $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx },
+          'additional item not permitted')
     }
+    else {
+      my @annotations = @orig_annotations;
+      if ($self->_eval($data->[$idx], $schema->{unevaluatedItems},
+          +{ %$state, annotations => \@annotations,
+            data_path => $state->{data_path}.'/'.$idx,
+            schema_path => $state->{schema_path}.'/unevaluatedItems' })) {
+        push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
+        next;
+      }
 
-    $valid = 0;
+      $valid = 0;
+    }
     last if $state->{short_circuit};
   }
 
-  return E($state, 'subschema is not valid') if not $valid;
+  return E($state, 'subschema is not valid against all additional items') if not $valid;
   push @{$state->{annotations}}, @new_annotations;
   return A($state, true);
 }
@@ -971,17 +993,30 @@ sub _eval_keyword_properties {
   my (@valid_properties, @new_annotations);
   foreach my $property (sort keys %{$schema->{properties}}) {
     next if not exists $data->{$property};
-    my @annotations = @orig_annotations;
-    if ($self->_eval($data->{$property}, $schema->{properties}{$property},
-        +{ %$state, annotations => \@annotations,
-          data_path => jsonp($state->{data_path}, $property),
-          schema_path => jsonp($state->{schema_path}, 'properties', $property) })) {
-      push @valid_properties, $property;
-      push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
-      next;
-    }
 
-    $valid = 0;
+    if ($self->_is_type('boolean', $schema->{properties}{$property})) {
+      if ($schema->{properties}{$property}) {
+        push @valid_properties, $property;
+        next;
+      }
+
+      $valid = E({ %$state, data_path => jsonp($state->{data_path}, $property),
+          _schema_path_rest => jsonp($state->{schema_path}, 'properties', $property) },
+        'property not permitted');
+    }
+    else {
+      my @annotations = @orig_annotations;
+      if ($self->_eval($data->{$property}, $schema->{properties}{$property},
+          +{ %$state, annotations => \@annotations,
+            data_path => jsonp($state->{data_path}, $property),
+            schema_path => jsonp($state->{schema_path}, 'properties', $property) })) {
+        push @valid_properties, $property;
+        push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
+        next;
+      }
+
+      $valid = 0;
+    }
     last if $state->{short_circuit};
   }
 
@@ -1010,17 +1045,29 @@ sub _eval_keyword_patternProperties {
       $@);
     };
     foreach my $property (sort @matched_properties) {
-      my @annotations = @orig_annotations;
-      if ($self->_eval($data->{$property}, $schema->{patternProperties}{$property_pattern},
-          +{ %$state, annotations => \@annotations,
-            data_path => jsonp($state->{data_path}, $property),
-            schema_path => jsonp($state->{schema_path}, 'patternProperties', $property_pattern) })) {
-        push @valid_properties, $property;
-        push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
-        next;
-      }
+      if ($self->_is_type('boolean', $schema->{patternProperties}{$property_pattern})) {
+        if ($schema->{patternProperties}{$property_pattern}) {
+          push @valid_properties, $property;
+          next;
+        }
 
-      $valid = 0;
+        $valid = E({ %$state, data_path => jsonp($state->{data_path}, $property),
+            _schema_path_rest => jsonp($state->{schema_path}, 'patternProperties', $property_pattern) },
+          'property not permitted');
+      }
+      else {
+        my @annotations = @orig_annotations;
+        if ($self->_eval($data->{$property}, $schema->{patternProperties}{$property_pattern},
+            +{ %$state, annotations => \@annotations,
+              data_path => jsonp($state->{data_path}, $property),
+              schema_path => jsonp($state->{schema_path}, 'patternProperties', $property_pattern) })) {
+          push @valid_properties, $property;
+          push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
+          next;
+        }
+
+        $valid = 0;
+      }
       last if $state->{short_circuit};
     }
   }
@@ -1068,7 +1115,7 @@ sub _eval_keyword_additionalProperties {
     last if $state->{short_circuit};
   }
 
-  return E($state, 'not all properties are valid') if not $valid;
+  return E($state, 'not all additional properties are valid') if not $valid;
   push @{$state->{annotations}}, @new_annotations;
   return @valid_properties ? A($state, \@valid_properties) : 1;
 }
@@ -1121,7 +1168,7 @@ sub _eval_keyword_unevaluatedProperties {
     last if $state->{short_circuit};
   }
 
-  return E($state, 'not all properties are valid') if not $valid;
+  return E($state, 'not all additional properties are valid') if not $valid;
   push @{$state->{annotations}}, @new_annotations;
   return @valid_properties ? A($state, \@valid_properties) : 1;
 }
@@ -1187,6 +1234,7 @@ has _format_validations => (
       @o == 4 && (grep /^[0-9]{1,3}$/, @o) == 4 && (grep $_ < 256, @o) == 4;
     };
     # https://tools.ietf.org/html/rfc3339#appendix-A with some additions for the 2000 version
+    # as defined in https://en.wikipedia.org/wiki/ISO_8601#Durations
     my $duration_re = do {
       my $num = qr{[0-9]+(?:[.,][0-9]+)?};
       my $second = qr{${num}S};
@@ -1257,7 +1305,7 @@ sub _eval_keyword_format {
 
   assert_keyword_type($state, $schema, 'string');
 
-  if ($self->validate_formats and my $spec = $self->_get_format_validation($schema->{format})) {
+  if ($state->{validate_formats} and my $spec = $self->_get_format_validation($schema->{format})) {
     return E($state, 'not a%s %s', $schema->{format} =~ /^[aeio]/ ? 'n' : '', $schema->{format})
       if $self->_is_type($spec->{type}, $data) and not $spec->{sub}->($data);
   }
@@ -1495,10 +1543,8 @@ around _add_resources => sub {
     croak sprintf('canonical_uri cannot contain a plain-name fragment (%s)', $value->{canonical_uri})
       if ($fragment // '') =~ m{^[^/]};
 
-    push @resources, $key => $value;
+    $self->$orig($key, $value);
   }
-
-  $self->$orig(@resources) if @resources;
 };
 
 use constant CACHED_METASCHEMAS => {
@@ -1544,7 +1590,9 @@ sub _get_or_load_resource {
   return;
 };
 
-# returns a schema (which may not be at a document root), and the canonical uri for that schema.
+# returns a schema (which may not be at a document root), the canonical uri for that schema,
+# the JSON::Schema::Draft201909::Document object that holds that schema, and the path relative
+# to the document root for this schema.
 # creates a Document and adds it to the resource index, if not already present.
 sub _fetch_schema_from_uri {
   my ($self, $uri) = @_;
@@ -1552,23 +1600,25 @@ sub _fetch_schema_from_uri {
   $uri = Mojo::URL->new($uri) if not is_ref($uri);
   my $fragment = $uri->fragment;
 
-  my ($subschema, $canonical_uri);
+  my ($subschema, $canonical_uri, $document, $document_path);
   if (not length($fragment) or $fragment =~ m{^/}) {
     my $base = $uri->clone->fragment(undef);
     if (my $resource = $self->_get_or_load_resource($base)) {
-      $subschema = $resource->{document}->get($resource->{path}.($fragment//''));
+      $subschema = $resource->{document}->get($document_path = $resource->{path}.($fragment//''));
       undef $fragment if not length $fragment;
       $canonical_uri = $resource->{canonical_uri}->clone->fragment($fragment);
+      $document = $resource->{document};
     }
   }
   else {
     if (my $resource = $self->_get_resource($uri)) {
-      $subschema = $resource->{document}->get($resource->{path});
+      $subschema = $resource->{document}->get($document_path = $resource->{path});
       $canonical_uri = $resource->{canonical_uri}->clone; # this is *not* the anchor-containing URI
+      $document = $resource->{document};
     }
   }
 
-  return defined $subschema ? ($subschema, $canonical_uri) : ();
+  return defined $subschema ? ($subschema, $canonical_uri, $document, $document_path) : ();
 }
 
 has _json_decoder => (
@@ -1673,7 +1723,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -1696,7 +1746,7 @@ version of the specification.
 
 =head2 output_format
 
-One of: C<flag>, C<basic>, C<detailed>, C<verbose>. Defaults to C<basic>. Passed to
+One of: C<flag>, C<basic>, C<detailed>, C<verbose>, C<terse>. Defaults to C<basic>. Passed to
 L<JSON::Schema::Draft201909::Result/output_format>.
 
 =head2 short_circuit
@@ -1769,7 +1819,8 @@ or a URI string indicating the location where such a schema is located.
 =back
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
-L</short_circuit> and/or L</collect_annotations> setting for just this evaluation call.
+L</short_circuit>, L</collect_annotations> and/or L</validate_formats> settings for just this
+evaluation call.
 
 The result is a L<JSON::Schema::Draft201909::Result> object, which can also be used as a boolean.
 
@@ -1803,7 +1854,8 @@ or a URI string indicating the location where such a schema is located.
 =back
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
-L</short_circuit> and/or L</collect_annotations> setting for just this evaluation call.
+L</short_circuit>, L</collect_annotations> and/or L</validate_formats> settings for just this
+evaluation call.
 
 The result is a L<JSON::Schema::Draft201909::Result> object, which can also be used as a boolean.
 
@@ -1821,6 +1873,9 @@ provided (and if not, C<''> will be used if no other identifier can be found wit
 You B<MUST> call C<add_schema> for any external resources that a schema may reference via C<$ref>
 before calling L</evaluate>, other than the standard metaschemas which are loaded from a local cache
 as needed.
+
+Returns the L<JSON::Schema::Draft201909::Document> that contains the added schema, or C<undef>
+if the resource could not be found.
 
 =head2 get
 
@@ -1850,7 +1905,7 @@ For more information, see L<Cpanel::JSON::XS/MAPPING>.
 
 By default, formats are treated only as annotations, not assertions. When L</validate_format> is
 true, strings are also checked against the format as specified in the schema. At present the
-following formats are supported (use of any other formats than these will evaluate as true):
+following formats are supported (use of any other formats than these will always evaluate as true):
 
 =over 4
 
@@ -1935,7 +1990,7 @@ C<date-time>, C<date>, and C<time> require L<Time::Moment>
 
 =item *
 
-C<email> and C<idn-email> require L<Email::Address::XS> version 1.01
+C<email> and C<idn-email> require L<Email::Address::XS> version 1.01 (or higher)
 
 =item *
 
@@ -1969,7 +2024,7 @@ loading schema documents from a local web application (e.g. L<Mojolicious>)
 
 =item *
 
-multiple output formats (L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>)
+additional output formats beyond C<flag>, C<basic> and C<terse> (L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>)
 
 =item *
 

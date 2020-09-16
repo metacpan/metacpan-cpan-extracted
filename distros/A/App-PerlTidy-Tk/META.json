@@ -32,8 +32,15 @@
       },
       "runtime" : {
          "requires" : {
+            "Browser::Open" : "0",
+            "Cpanel::JSON::XS" : "0",
+            "File::HomeDir" : "0",
+            "Path::Tiny" : "0",
             "Perl::Tidy" : "0",
-            "Tk" : "0"
+            "Test::CPAN::Changes" : "0",
+            "Test::More" : "0",
+            "Tk" : "0",
+            "Tk::HyperText" : "0"
          }
       }
    },
@@ -49,6 +56,6 @@
          "web" : "https://github.com/szabgab/App-PerlTidy-Tk.com"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
@@ -315,7 +316,7 @@ subtest 'nested $ids' => sub {
   my $js = JSON::Schema::Draft201909->new(short_circuit => 0);
   my $schema = {
     '$id' => '/foo/bar/baz.json',
-    '$ref' => '/foo/bar/baz.json#/properties/alpha',  # not the canonical URI for this location
+    '$ref' => '/foo/bar/baz.json#/properties/alpha',  # not the canonical URI for that location
     properties => {
       alpha => my $alpha = {
         '$id' => 'alpha.json',
@@ -359,7 +360,7 @@ subtest 'nested $ids' => sub {
           instanceLocation => '',
           keywordLocation => '/$ref/additionalProperties',
           absoluteKeywordLocation => '/foo/bar/alpha.json#/additionalProperties',
-          error => 'not all properties are valid',
+          error => 'not all additional properties are valid',
         },
         {
           instanceLocation => '/alpha/beta/gamma',
@@ -485,6 +486,86 @@ subtest 'multiple documents, each using canonical_uri = ""' => sub {
       },
     },
     'resources in second schema are indexed; all resources from first schema are removed',
+  );
+};
+
+subtest 'resource collisions' => sub {
+  my $js = JSON::Schema::Draft201909->new;
+  $js->add_schema({ '$id' => 'https://foo.com/x/y/z' });
+
+  cmp_deeply(
+    $js->evaluate(1, { '$id' => 'https://foo.com', anyOf => [ { '$id' => '/x/y/z' } ] })->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '',
+          error => re(qr{^EXCEPTION: uri "https://foo.com/x/y/z" conflicts with an existing schema resource}),
+        }
+      ],
+    },
+    'detected collision between a document\'s initial uri and a document\'s subschema\'s uri',
+  );
+
+  $js = JSON::Schema::Draft201909->new;
+  $js->add_schema({
+    '$id' => 'https://foo.com',
+    anyOf => [ { '$id' => '/x/y/z' } ],
+  });
+
+  cmp_deeply(
+    $js->evaluate(1, { allOf => [ { '$id' => 'https://foo.com/x/y/z' } ] })->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '',
+          error => re(qr{^EXCEPTION: uri "https://foo.com/x/y/z" conflicts with an existing schema resource}),
+        }
+      ],
+    },
+    'detected collision between two document subschema uris',
+  );
+};
+
+subtest 'relative uri in $id' => sub {
+  cmp_deeply(
+    JSON::Schema::Draft201909->new->evaluate(
+      1,
+      {
+        '$id' => 'foo/bar/baz.json',
+        type => 'object',
+      },
+    )->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/type',
+          absoluteKeywordLocation => 'foo/bar/baz.json#/type',
+          error => 'wrong type (expected object)',
+        },
+      ],
+    },
+    'root schema location is correctly identified',
+  );
+
+  cmp_deeply(
+    JSON::Schema::Draft201909->new->evaluate(
+      [ 1, [ 2, 3 ] ],
+      {
+        '$id' => 'foo/bar/baz.json',
+        type => [ 'integer', 'array' ],
+        items => { '$ref' => '#' },
+      },
+    )->TO_JSON,
+    {
+      valid => true,
+    },
+    'properly able to traverse a recursive schema using a relative $id',
   );
 };
 

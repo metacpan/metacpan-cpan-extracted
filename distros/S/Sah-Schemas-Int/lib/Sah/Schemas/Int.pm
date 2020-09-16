@@ -1,7 +1,7 @@
 package Sah::Schemas::Int;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.074'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.075'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas for various integers
@@ -18,7 +18,7 @@ Sah::Schemas::Int - Sah schemas for various integers
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schemas::Int (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schemas::Int (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SAH SCHEMAS
 
@@ -34,7 +34,7 @@ Even number.
 
 =item * L<int128|Sah::Schema::int128>
 
-32-bit signed integer.
+128-bit signed integer.
 
 =item * L<int16|Sah::Schema::int16>
 

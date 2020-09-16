@@ -39,6 +39,7 @@ lib/Util/Medley/Roles/Attributes/XML.pm
 lib/Util/Medley/Spawn.pm
 lib/Util/Medley/String.pm
 lib/Util/Medley/XML.pm
+lib/Util/Medley/YAML.pm
 share/cli-driver.yml
 t/10-cache.t
 t/10-crypt.t

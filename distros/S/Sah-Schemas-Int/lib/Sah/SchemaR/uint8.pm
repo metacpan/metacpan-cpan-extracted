@@ -1,9 +1,9 @@
 package Sah::SchemaR::uint8;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.074'; # VERSION
+our $DATE = '2020-05-21'; # DATE
+our $VERSION = '0.075'; # VERSION
 
-our $rschema = ["int",[{examples=>[{data=>0,valid=>1},{data=>-1,valid=>0}],max=>255,min=>0,summary=>"8-bit unsigned integer"}],["int"]];
+our $rschema = ["int",[{examples=>[{data=>0,valid=>1},{data=>-1,valid=>0},{data=>1,valid=>1},{data=>255,valid=>1},{data=>256,valid=>0}],max=>255,min=>0,summary=>"8-bit unsigned integer"}],["int"]];
 
 1;
 # ABSTRACT: 8-bit unsigned integer
@@ -20,7 +20,7 @@ Sah::SchemaR::uint8 - 8-bit unsigned integer
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::SchemaR::uint8 (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::SchemaR::uint8 (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 DESCRIPTION
 

@@ -15,7 +15,6 @@ t/02-smime.more.t
 t/03-chained-certs.t
 t/04-taint.t
 t/boilerplate.t
-t/dependencies.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

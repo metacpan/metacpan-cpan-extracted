@@ -19,7 +19,7 @@ for my $n (1 .. $d->bars) {
     $d->rest($d->triplet_eighth);
     $d->note($d->triplet_eighth, $d->open_hh, $d->kick);
 
-    $d->note($d->triplet_eighth, $d->closed_hh);
+    $d->note($d->triplet_eighth, $d->pedal_hh);
     $d->accent_note($min, $d->triplet_eighth, $d->snare);
     $d->note($d->triplet_eighth, $d->closed_hh, $d->kick);
 

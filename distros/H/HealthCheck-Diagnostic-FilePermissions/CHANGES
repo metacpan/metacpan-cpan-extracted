@@ -1,110 +1,90 @@
-==================================================
-Changes from 2019-03-31 00:00:00 +0000 to present.
-==================================================
+Changelog for HealthCheck-Diagnostic-FilePermissions
 
--------------------------------------------
-version v1.4.6 at 2020-03-30 22:01:33 +0000
--------------------------------------------
+v1.4.8 2020-09-14T19:11:16
+ - Update README (Andrew Hewus Fresh)
+ - lib/HealthCheck/Diagnostic/FilePermissions.pm edited online with
+   Bitbucket (Mitch McCracken)
+ - Remove all references of app (Brandon Messineo)
+ - Stop referring to "App" in info and docs (Andrew Hewus Fresh)
+ - Test for overriding collapse_single_result (Andrew Hewus Fresh)
+ - Collapse single result by default (Andrew Hewus Fresh)
+ - Revert "Fix test failures" (Andrew Hewus Fresh)
+ - Fix test failures (Brandon Messineo)
+ - Skip some tests on Windows (Brandon Messineo)
+ - Indent tests (Brandon Messineo)
 
-  Change: 599098247722b2efc340c37148b0b2c0c3a4feaa
-  Author: Brandon Messineo <brandon.messineo@grantstreet.com>
-  Date : 2020-03-30 18:01:33 +0000
+v1.4.7 2020-03-30T22:01:33
+ - No changes found
 
-    Update README 
+v1.4.6 2020-03-30T22:01:33
+ - No changes found
 
-  Change: 192ccce862875a7484876c939ec8ee09d1734f8a
-  Author: Brandon Messineo <brandon.messineo@grantstreet.com>
-  Date : 2020-03-26 15:10:40 +0000
+v1.4.5 2020-03-30T22:01:33
+ - No changes found
 
-    Do not chmod sticky bits and fix #1
+v1.4.4 2020-03-30T22:01:33
+ - No changes found
 
-    Because that can only be set by a super user in some operating
-    systems. 
+v1.4.3 2020-03-30T22:01:33
+ - Update README (Brandon Messineo)
+ - Do not chmod sticky bits and fix #1 (Brandon Messineo)
 
--------------------------------------------
-version v1.4.2 at 2020-03-25 18:42:05 +0000
--------------------------------------------
+v1.4.2 2020-03-25T18:42:05
+ - Improve documentation examples (Andrew Hewus Fresh)
+ - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
 
-  Change: 6f456bc5da147a0095c1470394ea1bbd6d9c57fd
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-03-24 14:36:42 +0000
+v1.4.1 2020-01-21T15:16:24
+ - SM-2137: Add .proverc (Jon Dyer)
 
-    Improve documentation examples
+v1.4.0.2 2019-11-07T20:30:35
+ - Merge remote-tracking branch 'origin/stage' into prod (Brandon Messineo)
+ - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
+ - Merge remote-tracking branch 'origin/master' into test (Brandon
+   Messineo)
 
-    Make it clearer that you pass in a single option and less like you
-    should be passing the same parameter multiple times. 
+v1.4.0.1 2019-10-18T18:33:43
+ - Create distribution files (Andrew Hewus Fresh)
+ - Remove gitc metadata (Andrew Hewus Fresh)
+ - Convert to Bitbucket workflow (Andrew Hewus Fresh)
 
-  Change: dc2d8ed0241578e0571e8ecfe1a16a87fa8c2a0a
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-03-23 14:32:17 +0000
+v1.4.0.0 2019-05-24T17:35:14
+ - Allow checking of file mode bits (Andrew Fresh)
+ - Drop the leading zero on output message (Brandon Messineo)
 
-    Convert to Dist::Zilla::PluginBundle::Author::GSG 
+v1.3.0 2019-05-24T17:36:27
+ - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
 
--------------------------------------------
-version v1.4.1 at 2020-01-21 15:16:24 +0000
--------------------------------------------
+v1.3.0.0 2019-05-23T13:39:03
+ - Merge remote-tracking branch 'origin/stage' into prod (Brandon Messineo)
+ - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
+ - Merge remote-tracking branch 'origin/master' into test (Brandon
+   Messineo)
+ - Use single-quotes in info message (Brandon Messineo)
 
-  Change: 7326e1ad4083a5bd9305a1a84815a9e040292656
-  Author: Jon Dyer <jdyer@grantstreet.com>
-  Date : 2020-01-21 09:56:26 +0000
+v1.2.0 2019-05-23T13:38:20
+ - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
 
-    SM-2137: Add .proverc 
+v1.2.0.0 2018-10-17T14:42:17
+ - Merge remote-tracking branch 'origin/stage' into prod (Brandon Messineo)
+ - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
+ - Merge remote-tracking branch 'origin/master' into test (Brandon
+   Messineo)
+ - Ignore HealthCheck files (Brandon Messineo)
 
----------------------------------------------
-version v1.4.0.1 at 2019-10-18 18:33:43 +0000
----------------------------------------------
+v1.1.0 2018-10-17T14:42:02
+ - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
 
-  Change: 37a7cab13c792ec8616a413a1ff1a793ef82495a
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 14:33:43 +0000
+v1.1.0.0 2018-10-17T14:36:12
+ - No changes found
 
-    Create distribution files 
+v1.0.0 2018-10-17T14:35:47
+ - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
 
-  Change: fd1f054fdafff3e9decf845864634f12f090e3a1
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 14:22:44 +0000
+v0.0.1 2018-10-17T14:40:33
+ - No changes found
 
-    Convert to Bitbucket workflow 
-
-  Change: 23a1ea25107ebeddd28aa6396c5ad73e8c661574
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 14:22:44 +0000
-
-    Remove gitc metadata 
-
----------------------------------------------
-version v1.4.0.0 at 2019-05-24 17:35:14 +0000
----------------------------------------------
-
-  Change: e82bbb0a135580c6ac40c0d2b1fb4eb3fb3ae268
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-05-24 12:15:44 +0000
-
-    Allow checking of file mode bits
-
-    Plus tests that we spot them and display them 
-
-  Change: 7983013a65b22c5904a3c2aa74597599be4e2503
-  Author: Brandon Messineo <brandon.messineo@grantstreet.com>
-  Date : 2019-05-24 10:13:23 +0000
-
-    Drop the leading zero on output message
-
-    Because it can be confusing :). 
-
------------------------------------------------------------------------
-dist/version v0.0.0.1804_01/master/SM-1804 at 2019-05-22 22:39:21 +0000
------------------------------------------------------------------------
-
-  Change: 5c364576230a12c1444a9420bb15566e57d38ede
-  Author: Brandon Messineo <brandon.messineo@grantstreet.com>
-  Date : 2019-05-22 16:34:02 +0000
-
-    Use single-quotes in info message
-
-    Because JSON will not have to escape the double-quotes when rendering
-    the text. 
-
-=================================================
-Plus 10 releases after 2019-03-31 00:00:00 +0000.
-=================================================
+v0.0.0 2019-05-24T17:35:14
+ - Allow checking of file mode bits (Andrew Fresh)
+ - Drop the leading zero on output message (Brandon Messineo)
+ - Merge remote-tracking branch 'origin/master' into test (Brandon
+   Messineo)

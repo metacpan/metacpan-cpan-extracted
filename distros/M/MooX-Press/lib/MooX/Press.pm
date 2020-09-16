@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.065';
+our $VERSION   = '0.067';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -14,6 +14,11 @@ use Import::Into;
 use match::simple qw(match);
 use Module::Runtime qw(use_module);
 use namespace::autoclean;
+
+sub make_absolute_package_name {
+	my $p = shift;
+	$] lt '5.018' ? "main::$p" : "::$p";
+}
 
 # Options not to carry up into subclasses;
 # mostly because subclasses inherit behaviour anyway.
@@ -137,7 +142,9 @@ sub import {
 	for my $pkg (@roles) {
 		$pkg->[1] = { $pkg->[1]->$_handle_list };
 		# qualify names in role list early
-		$pkg->[0] = '::' . $builder->qualify_name($pkg->[0], exists($pkg->[1]{prefix})?$pkg->[1]{prefix}:$opts{prefix});
+		$pkg->[0] = make_absolute_package_name(
+			$builder->qualify_name($pkg->[0], exists($pkg->[1]{prefix})?$pkg->[1]{prefix}:$opts{prefix})
+		);
 		$builder->munge_role_options($pkg->[1], \%opts);
 	}
 	for my $pkg (@classes) {
@@ -214,20 +221,7 @@ sub import {
 	}
 	
 	if (keys %modifiers) {
-		%opts = ( %opts, %modifiers );
-		for my $modifier (qw(before after around)) {
-			if (defined $opts{$modifier}) {
-				my @methods   = $opts{$modifier}->$_handle_list;
-				while (@methods) {
-					my @method_names;
-					push(@method_names, shift @methods)
-						while (@methods and not ref $methods[0]);
-					my $coderef = $builder->_prepare_method_modifier($opts{'factory_package'}, $modifier, \@method_names, shift(@methods));
-					require Class::Method::Modifiers;
-					Class::Method::Modifiers::install_modifier( $opts{'factory_package'}, $modifier, @method_names, $coderef );
-				}
-			}
-		}
+		$builder->patch_package( $opts{'factory_package'}, %modifiers );
 	}
 	
 	%_cached_moo_helper = ();  # cleanups
@@ -299,7 +293,7 @@ sub qualify_name {
 		$name  = substr $name, 1;
 	}
 	$name = join("::", '', $parent->$_handle_list, $1) if (defined $parent and $name =~ /^\+(.+)/);
-	return $sigil.$1 if $name =~ /^::(.+)$/;
+	return $sigil.$2 if $name =~ /^(main)?::(.+)$/;
 	$prefix ? $sigil.join("::", $prefix, $name) : $sigil.$name;
 }
 
@@ -455,7 +449,7 @@ sub _make_type {
 			my ($sc_name, $sc_opts) = splice @subclasses, 0, 2;
 			my %opts_clone = %opts;
 			delete $opts_clone{$_} for @delete_keys;
-			$builder->make_type_for_class($sc_name, %opts_clone, extends => "::$qname", $sc_opts->$_handle_list);
+			$builder->make_type_for_class($sc_name, %opts_clone, extends => make_absolute_package_name($qname), $sc_opts->$_handle_list);
 		}
 	}
 }
@@ -523,7 +517,7 @@ sub _do_coercions {
 			my ($sc_name, $sc_opts) = splice @subclasses, 0, 2;
 			my %opts_clone = %opts;
 			delete $opts_clone{$_} for @delete_keys;
-			$builder->do_coercions_for_class($sc_name, %opts_clone, extends => "::$qname", $sc_opts->$_handle_list);
+			$builder->do_coercions_for_class($sc_name, %opts_clone, extends => make_absolute_package_name($qname), $sc_opts->$_handle_list);
 		}
 	}
 }
@@ -603,7 +597,7 @@ sub _expand_isa {
 		if (@raw > 1 and ref($raw[1])) {
 			my $gen  = $builder->qualify_name(shift(@raw), $pfx);
 			my @args = shift(@raw)->$_handle_list;
-			push @isa, sprintf('::%s', $gen->generate_package(@args));
+			push @isa, make_absolute_package_name($gen->generate_package(@args));
 			$changed++;
 		}
 		else {
@@ -625,7 +619,7 @@ sub _make_package {
 	
 	$builder->_mark_package_as_loaded(($opts{is_role} ? 'role' : 'class') => $qname, \%opts);
 	
-	if (!exists $opts{factory}) {
+	if (!exists $opts{factory} and !exists $opts{multifactory}) {
 		$opts{factory} = $opts{abstract} ? undef : sprintf('new_%s', lc $tn);
 	}
 	
@@ -748,16 +742,6 @@ sub _make_package {
 		}
 	}
 	
-	if (defined $opts{multifactory}) {
-		my @mm = $opts{multifactory}->$_handle_list_add_nulls;
-		while (@mm) {
-			my ($method_name, $method_spec) = splice(@mm, 0, 2);
-			my $old_coderef = $method_spec->{code} or die;
-			my $new_coderef = sub { splice(@_, 1, 0, "$qname"); goto $old_coderef };
-			$builder->install_multimethod($opts{factory_package}, 'class', $method_name, { %$method_spec, code => $new_coderef });
-		}
-	}
-	
 	if (defined $opts{with}) {
 		my @roles = $opts{with}->$_handle_list;
 		if (@roles) {
@@ -774,9 +758,9 @@ sub _make_package {
 					no strict 'refs';
 					no warnings 'once';
 					if ( $role_qname !~ /\?$/ and not ${"$role_qname\::BUILT"} ) {
-						my ($role_dfn) = grep { $_->[0] eq "::$role_qname" } @{$opts{_roles}};
+						my ($role_dfn) = grep { $_->[0] eq make_absolute_package_name($role_qname) } @{$opts{_roles}};
 						$builder->make_role(
-							"::$role_qname",
+							make_absolute_package_name($role_qname),
 							_parent_opts => $opts{_parent_opts},
 							_roles       => $opts{_roles},
 							%{ $opts{_parent_opts} },
@@ -795,6 +779,26 @@ sub _make_package {
 		my $installer = "require_methods_" . lc $toolkit;
 		my %requires  = $opts{requires}->$_handle_list_add_nulls;
 		$builder->$installer($qname, \%requires) if keys %requires;
+	}
+		
+	if (defined $opts{'factory_package'}) {
+		my $fpackage = $opts{'factory_package'};
+		if ($opts{'factory'}) {
+			if ($opts{abstract} and $opts{'factory'}->$_handle_list) {
+				require Carp;
+				Carp::croak("abstract class $qname cannot have factory");
+			}
+			$builder->install_factories($fpackage, $qname, $opts{'factory'});
+		}
+		if ($opts{multifactory}) {
+			my @mm = $opts{multifactory}->$_handle_list_add_nulls;
+			while (@mm) {
+				my ($method_name, $method_spec) = splice(@mm, 0, 2);
+				my $old_coderef = $method_spec->{code} or die;
+				my $new_coderef = sub { splice(@_, 1, 0, "$qname"); goto $old_coderef };
+				$builder->install_multimethod($fpackage, 'class', $method_name, { %$method_spec, code => $new_coderef });
+			}
+		}
 	}
 
 	for my $modifier (qw(before after around)) {
@@ -849,25 +853,14 @@ sub _make_package {
 				},
 			});
 		}
-		
-		if (defined $opts{'factory_package'}) {
-			my $fpackage = $opts{'factory_package'};
-			if ($opts{'factory'}) {
-				if ($opts{abstract} and $opts{'factory'}->$_handle_list) {
-					require Carp;
-					Carp::croak("abstract class $qname cannot have factory");
-				}
-				$builder->install_factories($fpackage, $qname, $opts{'factory'});
-			}
-		}
-		
+				
 		if (defined $opts{'subclass'}) {
 			my @subclasses = $opts{'subclass'}->$_handle_list_add_nulls;
 			while (@subclasses) {
 				my ($sc_name, $sc_opts) = splice @subclasses, 0, 2;
 				my %opts_clone = %opts;
 				delete $opts_clone{$_} for @delete_keys;
-				$builder->make_class($sc_name, %opts_clone, extends => "::$qname", $sc_opts->$_handle_list);
+				$builder->make_class($sc_name, %opts_clone, extends => make_absolute_package_name($qname), $sc_opts->$_handle_list);
 			}
 		}
 	}
@@ -887,6 +880,131 @@ sub _make_package {
 	}
 	
 	return $qname;
+}
+
+sub patch_package {
+	my ( $me, $package, %spec ) = ( shift, @_ );
+	
+	my $kind = ( $spec{is_role} or do { require Role::Hooks; 'Role::Hooks'->is_role($package) } )
+		? 'role'
+		: 'class';
+	delete $spec{is_role};
+	my $fp = $package->can('FACTORY')
+		? $package->FACTORY
+		: do { no strict 'refs'; ${"$package\::FACTORY"} };
+	my $prefix  = do { no strict 'refs'; ${"$package\::PREFIX"}  || $fp   };
+	my $toolkit = do { no strict 'refs'; ${"$package\::TOOLKIT"} || 'Moo' };
+	
+	if ( my $version = delete $spec{version} ) {
+		no strict 'refs';
+		${"$package\::VERSION"} = $version;
+	}
+	
+	if ( my $auth = delete $spec{authority} ) {
+		no strict 'refs';
+		${"$package\::AUTHORITY"} = $auth;
+	}
+	
+	if ( $kind eq 'class' and my $overload = delete $spec{overload} ) {
+		require overload;
+		require Import::Into;
+		'overload'->import::into( $package, $overload->$_handle_list );
+	}
+	
+	if ( my @coercions = @ { delete $spec{coerce} or [] } ) {
+		my $to_type = $fp->type_library->get_type_for_package( any => $package );
+		while ( @coercions ) {
+			my $from_type  = 'Type::Registry'->for_class( $package )->lookup( shift @coercions );
+			my $via_method = shift @coercions;
+			if ( is_CodeRef $coercions[0] or is_HashRef $coercions[0] ) {
+				my $coderef = shift @coercions;
+				'MooX::Press'->install_methods( $package, { $via_method => sub { local $_ = $_[1]; &$coderef } } );
+			}
+			$to_type->coercion->add_type_coercions(
+				$from_type,
+				sprintf( '%s->%s($_)', B::perlstring($package), $via_method ),
+			);
+		}
+	}
+	
+	if ( my $methods = delete $spec{can} ) {
+		'MooX::Press'->install_methods( $package, $methods );
+	}
+	
+	if ( my $constants = delete $spec{constant} ) {
+		'MooX::Press'->install_constants( $package, $constants );
+	}
+	
+	if ( my $atts = delete $spec{has} ) {
+		'MooX::Press'->install_attributes( $package, $atts );
+	}
+	
+	if ( my $multimethods = delete $spec{multimethod} ) {
+		my @mm = $multimethods->$_handle_list_add_nulls;
+		while ( my ( $name, $code ) = splice( @mm, 0, 2 ) ) {
+			'MooX::Press'->install_multimethod( $package, $kind, $name, $code );
+		}
+	}
+	
+	if (defined $spec{with}) {
+		my @roles = $spec{with}->$_handle_list;
+		if (@roles) {
+			my @processed;
+			while (@roles) {
+				if (@roles > 1 and ref($roles[1])) {
+					my $gen  = $me->qualify_name(shift(@roles), $prefix);
+					my @args = shift(@roles)->$_handle_list;
+					push @processed, $gen->generate_package(@args);
+				}
+				else {
+					my $role_qname = $me->qualify_name(shift(@roles), $prefix);
+					push @processed, $role_qname;
+				}
+			}
+			my $installer = "apply_roles_" . lc $toolkit;
+			$me->$installer($package, $kind, \@processed);
+		}
+	}
+	
+	if ( $kind eq 'class' ) {
+		
+		if ( $fp and my $factory = delete $spec{factory} ) {
+			'MooX::Press'->install_factories( $fp, $package, $factory );
+		}
+		
+		if ( $fp and my $factory = delete $spec{multifactory} ) {
+			my @mm = $factory->$_handle_list_add_nulls;
+			while (@mm) {
+				my ($method_name, $method_spec) = splice(@mm, 0, 2);
+				my $old_coderef = $method_spec->{code} or die;
+				my $new_coderef = sub { splice(@_, 1, 0, "$package"); goto $old_coderef };
+				$me->install_multimethod( $fp , 'class', $method_name, { %$method_spec, code => $new_coderef });
+			}
+		}
+		
+		#TODO: subclass???
+	}
+	
+	for my $modifier ( qw/ before after around / ) {
+		my @mm = delete($spec{$modifier})->$_handle_list or next;
+		require Class::Method::Modifiers;
+		my @names;
+		while ( @mm ) {
+			if ( is_ArrayRef $mm[0] ) {
+				push @names, @{ shift @mm };
+			}
+			elsif ( is_Str $mm[0] ) {
+				push @names, shift @mm;
+			}
+			else {
+				my $coderef = 'MooX::Press'->_prepare_method_modifier( $package, $modifier, [@names], shift(@mm) );
+				Class::Method::Modifiers::install_modifier( $package, $modifier, @names, $coderef );
+				@names = ();
+			}
+		}
+	}
+	
+	return %spec;
 }
 
 sub install_factories {
@@ -1057,10 +1175,10 @@ sub generate_package {
 	}
 	
 	if ($kind eq 'role') {
-		return $builder->make_role("::$qname", %$global_opts, %opts);
+		return $builder->make_role(make_absolute_package_name($qname), %$global_opts, %opts);
 	}
 	else {
-		return $builder->make_class("::$qname", %$global_opts, %opts);
+		return $builder->make_class(make_absolute_package_name($qname), %$global_opts, %opts);
 	}
 }
 
@@ -1146,6 +1264,16 @@ sub install_attributes {
 	my $installer = 'make_attribute_' . lc $toolkit;
 	
 	my @attrs = $has->$_handle_list_add_nulls;
+	
+	my $make_immutable = 0;
+	my $meta =
+		( $toolkit eq 'Moose' ) ? Moose::Util::find_meta( $qname ) :
+		( $toolkit eq 'Mouse' ) ? Mouse::Util::find_meta( $qname ) :
+		undef;
+	if ( $meta and $meta->is_immutable ) {
+		$meta->make_mutable;
+		$make_immutable = 1;
+	}
 	
 	while (@attrs) {
 		my ($attrname, $attrspec) = splice @attrs, 0, 2;
@@ -1271,6 +1399,9 @@ sub install_attributes {
 			$builder->_post_attribute($qname, $attrname, \%spec, $lex) if $lex;
 		}
 	}
+	
+	$meta->make_immutable if $make_immutable;
+	return;
 }
 
 sub _pre_attribute {
@@ -1441,7 +1572,7 @@ sub install_multimethod {
 			if ($role =~ /\?$/) {
 				$role =~ s/\?$//;
 				eval "require $role; 1" or do {
-					$builder->make_role("::$role", %$opts, toolkit => $tk);
+					$builder->make_role(make_absolute_package_name($role), %$opts, toolkit => $tk);
 				};
 			}
 			$role;
@@ -1991,7 +2122,7 @@ then pass an explicit C<< prefix => undef >> option. (If the caller is
 C<main>, then the prefix defaults to undef.)
 
 You can bypass the prefix for a specific class or a specific role using a
-leading double colon, like "::Animal".
+leading double colon, like "::Animal" (or "main::Animal").
 
 =item C<< factory_package >> I<< (Str|Undef) >>
 

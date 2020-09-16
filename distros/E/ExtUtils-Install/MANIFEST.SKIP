@@ -15,6 +15,7 @@ make_from_core.sh
 \bMakeMaker-\d
 \bpm_to_blib\.ts$
 \bpm_to_blib$
+\bMYMETA.*$
 \.gz$
 \bblibdirs\.ts$         # 6.18 through 6.25 generated this
 \bMYMETA.*$

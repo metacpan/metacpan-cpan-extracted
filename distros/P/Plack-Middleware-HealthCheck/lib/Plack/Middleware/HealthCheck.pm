@@ -2,7 +2,7 @@ package Plack::Middleware::HealthCheck;
 
 # ABSTRACT: A health check endpoint for your Plack app
 use version;
-our $VERSION = 'v0.0.4'; # VERSION
+our $VERSION = 'v0.0.5'; # VERSION
 
 use 5.010;
 use strict;
@@ -120,7 +120,7 @@ sub health_check_response {
         if $req and exists $req->query_parameters->{pretty};
     return [
         ( $result->{status} || '' ) eq 'OK' ? 200 : 503,
-        [ content_type => 'application/json; charset=utf-8' ],
+        [ 'Content-Type' => 'application/json; charset=utf-8' ],
         [ $json->encode($result) ] ];
 }
 
@@ -138,7 +138,7 @@ Plack::Middleware::HealthCheck - A health check endpoint for your Plack app
 
 =head1 VERSION
 
-version v0.0.4
+version v0.0.5
 
 =head1 SYNOPSIS
 

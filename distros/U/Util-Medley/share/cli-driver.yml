@@ -103,3 +103,18 @@ decrypt-str:
           s: str 
       optional:
         k: key 
+        
+yaml-beautify-file:
+  class:
+    name: Util::Medley::Exec
+    attr:
+      optional:
+  method:
+    name: yamlBeautifyFile
+    args:
+      required:
+        hard: 
+          f: file
+      optional:
+        sort-depth: sortDepth 
+        

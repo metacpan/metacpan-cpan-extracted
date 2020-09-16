@@ -4,7 +4,7 @@ requires 'warnings';
 
 requires 'Carp';
 
-requires 'HealthCheck::Diagnostic';
+requires 'HealthCheck::Diagnostic', 'v1.6';
 
 on test => sub {
     requires 'File::Temp';

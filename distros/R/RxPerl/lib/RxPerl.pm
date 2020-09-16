@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v0.26.0";
+our $VERSION = "v0.27.0";
 
 1;
 __END__
@@ -332,6 +332,18 @@ The following list is the currently implemented operators, with links to relevan
 too).
 
 =over
+
+=item op_audit_time
+
+L<https://rxjs.dev/api/operators/auditTime>
+
+    # 30, complete
+    rx_concat(
+        rx_of(10, 20, 30),
+        rx_EMPTY->pipe( op_delay(5) ),
+    )->pipe(
+        op_audit_time(1),
+    )->subscribe($observer);
 
 =item op_catch_error
 

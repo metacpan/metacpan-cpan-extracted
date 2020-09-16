@@ -1,23 +1,27 @@
 package Sah::Schema::int128;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Int'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 our $schema = [int => {
-    summary => '32-bit signed integer',
+    summary => '128-bit signed integer',
     min     => -2**127,
     max     => +2**127-1,
     examples => [
         {data=>0  , valid=>1},
         {data=>1.1, valid=>0},
-        # XXX test out-of-range ints
+        {data=>1, valid=>1},
+        #{data=>2**127-1, valid=>1},
+        #{data=>2**127, valid=>0},
+        #{data=>-2**127, valid=>1},
+        #{data=>-2**127-1, valid=>0},
     ],
 }, {}];
 
 1;
-# ABSTRACT: 32-bit signed integer
+# ABSTRACT: 128-bit signed integer
 
 __END__
 
@@ -27,11 +31,11 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::int128 - 32-bit signed integer
+Sah::Schema::int128 - 128-bit signed integer
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::int128 (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::int128 (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -99,6 +103,8 @@ Sample data:
  0  # valid
 
  1.1  # INVALID
+
+ 1  # valid
 
 =head1 HOMEPAGE
 

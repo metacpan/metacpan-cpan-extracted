@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
@@ -199,7 +200,7 @@ subtest '$recursiveRef without nesting' => sub {
           instanceLocation => '/foo',
           keywordLocation => '/anyOf/1/additionalProperties/$recursiveRef/anyOf/1/additionalProperties',
           absoluteKeywordLocation => 'http://localhost:4242#/anyOf/1/additionalProperties',
-          error => 'not all properties are valid',
+          error => 'not all additional properties are valid',
         },
         {
           instanceLocation => '/foo',
@@ -211,7 +212,7 @@ subtest '$recursiveRef without nesting' => sub {
           instanceLocation => '',
           keywordLocation => '/anyOf/1/additionalProperties',
           absoluteKeywordLocation => 'http://localhost:4242#/anyOf/1/additionalProperties',
-          error => 'not all properties are valid',
+          error => 'not all additional properties are valid',
         },
         {
           instanceLocation => '',
@@ -247,7 +248,7 @@ subtest '$recursiveRef without $recursiveAnchor' => sub {
           instanceLocation => '/foo',
           keywordLocation => '/properties/foo/$recursiveRef/additionalProperties',
           absoluteKeywordLocation => '#/additionalProperties',
-          error => 'not all properties are valid',
+          error => 'not all additional properties are valid',
         },
         {
           instanceLocation => '',
@@ -387,7 +388,7 @@ subtest '$recursiveAnchor and $recursiveRef - standard usecases' => sub {
           instanceLocation => '',
           keywordLocation => '/$ref/anyOf/1/additionalProperties',
           absoluteKeywordLocation => '#/$defs/base/anyOf/1/additionalProperties',
-          error => 'not all properties are valid',
+          error => 'not all additional properties are valid',
         },
         {
           instanceLocation => '',
@@ -479,7 +480,7 @@ subtest '$recursiveRef without $recursiveAnchor' => sub {
           instanceLocation => '',
           keywordLocation => '/anyOf/1/additionalProperties',
           absoluteKeywordLocation => 'strings_only#/anyOf/1/additionalProperties',
-          error => 'not all properties are valid',
+          error => 'not all additional properties are valid',
         },
         {
           instanceLocation => '',
@@ -574,7 +575,7 @@ subtest '$recursiveAnchor in our dynamic scope, but not in the target schema' =>
           instanceLocation => '',
           keywordLocation => '/anyOf/1/additionalProperties',
           absoluteKeywordLocation => 'base#/anyOf/1/additionalProperties',
-          error => 'not all properties are valid',
+          error => 'not all additional properties are valid',
         },
         {
           instanceLocation => '',
@@ -629,7 +630,7 @@ subtest '$recursiveAnchor in our dynamic scope, but not in the target schema' =>
           instanceLocation => '/foo',
           keywordLocation => '/anyOf/1/additionalProperties/anyOf/1/additionalProperties',
           absoluteKeywordLocation => 'inner#/anyOf/1/additionalProperties',
-          error => 'not all properties are valid',
+          error => 'not all additional properties are valid',
         },
         {
           instanceLocation => '/foo',
@@ -641,7 +642,7 @@ subtest '$recursiveAnchor in our dynamic scope, but not in the target schema' =>
           instanceLocation => '',
           keywordLocation => '/anyOf/1/additionalProperties',
           absoluteKeywordLocation => 'base#/anyOf/1/additionalProperties',
-          error => 'not all properties are valid',
+          error => 'not all additional properties are valid',
         },
         {
           instanceLocation => '',

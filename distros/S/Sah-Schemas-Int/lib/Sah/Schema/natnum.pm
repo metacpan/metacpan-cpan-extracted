@@ -1,7 +1,9 @@
 package Sah::Schema::natnum;
 
-our $DATE = '2020-05-08'; # DATE
-our $VERSION = '0.074'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-21'; # DATE
+our $DIST = 'Sah-Schemas-Int'; # DIST
+our $VERSION = '0.075'; # VERSION
 
 our $schema = ['posint', {
     summary => 'Same as posint',
@@ -12,11 +14,6 @@ ISO 80000-2 begin the natural numbers with 0. But in this definition, natural
 numbers start with 1. For integers that start at 0, see `uint`.
 
 _
-    examples => [
-        {data=>1, valid=>1},
-        {data=>2, valid=>1},
-        {data=>0, valid=>0},
-    ],
 }, {}];
 
 1;
@@ -34,7 +31,7 @@ Sah::Schema::natnum - Same as posint
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::natnum (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::natnum (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -96,14 +93,6 @@ L<Perinci::CmdLine> to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
-
-Sample data:
-
- 1  # valid
-
- 2  # valid
-
- 0  # INVALID
 
 =head1 DESCRIPTION
 

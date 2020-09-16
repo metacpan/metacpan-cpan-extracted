@@ -1,21 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.48;
-use 5.006;
-
-sub parseversion
-{
-    my $version;
-    open GP, 'lib/PDL/Transform/Color.pm' or die "Couldn't open Color.pm";
-    for(<GP>){
-        if(m/our \$VERSION = \'([\d\.\_]+b?)\'/) {$version = $1;}
-        last if($version);
-    }
-    die "Couldn't parse version from Color.pm" unless($version);
-    close GP;
-    return $version;
-}
-
+use ExtUtils::MakeMaker;
 
 sub MY::libscan {
     package MY;
@@ -43,7 +28,7 @@ FOO
 WriteMakefile(
     NAME                      => 'PDL::Transform::Color',
     AUTHOR                    => 'Craig DeForest <craig@deforest.org>',
-    VERSION                   => parseversion(),
+    VERSION_FROM              => 'lib/PDL/Transform/Color.pm',
     ABSTRACT_FROM             => 'lib/PDL/Transform/Color.pm',
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002
         ? ('LICENSE'          => 'perl')
@@ -96,4 +81,3 @@ if(exists $ARGV[0] && $ARGV[0] eq 'README.pod')
         if (/^=/../^=cut/) { print README; }
     }
 }
-

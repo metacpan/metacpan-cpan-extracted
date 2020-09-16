@@ -1,9 +1,9 @@
 package Sah::Schema::odd;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-05-21'; # DATE
 our $DIST = 'Sah-Schemas-Int'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.075'; # VERSION
 
 our $schema = ['int', {
     summary => 'Odd number',
@@ -12,7 +12,9 @@ our $schema = ['int', {
     examples => [
         {data=> 1, valid=>1},
         {data=>-3, valid=>1},
+        {data=>-2, valid=>0},
         {data=> 2, valid=>0},
+        {data=> 3, valid=>1},
     ],
 }, {}];
 
@@ -31,7 +33,7 @@ Sah::Schema::odd - Odd number
 
 =head1 VERSION
 
-This document describes version 0.074 of Sah::Schema::odd (from Perl distribution Sah-Schemas-Int), released on 2020-05-08.
+This document describes version 0.075 of Sah::Schema::odd (from Perl distribution Sah-Schemas-Int), released on 2020-05-21.
 
 =head1 SYNOPSIS
 
@@ -100,7 +102,11 @@ Sample data:
 
  -3  # valid
 
+ -2  # INVALID
+
  2  # INVALID
+
+ 3  # valid
 
 =head1 HOMEPAGE
 

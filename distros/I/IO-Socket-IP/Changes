@@ -1,8 +1,23 @@
 Revision history for IO-Socket-IP
 
+0.41    2020-09-15 16:59
+        [CHANGES]
+         * Updated to `=head2 barename` documentation style
+
+        [BUGFIXES]
+         * Remember to declare configure_requires Module::Build
+
+0.40    2020-09-15 16:41
+        [CHANGES]
+         * Don't ship a Makefile.PL
+         * Updated docs about `-register` option
+
+        [BUGFIXES]
+         * Ensure safety under default-strict (RT133322)
+
 0.39    2017/03/06 16:40:30
         [BUGFIXES]
-         * Handle EOPNOTSUPP in resposne of efforts to disable V6ONLY
+         * Handle EOPNOTSUPP in response of efforts to disable V6ONLY
            (RT119780) (thanks XENU)
 
 0.38    2016/08/02 18:33:50

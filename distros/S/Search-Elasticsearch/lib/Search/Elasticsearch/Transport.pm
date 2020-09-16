@@ -1,5 +1,9 @@
+# Licensed to Elasticsearch B.V under one or more agreements.
+# Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
+# See the LICENSE file in the project root for more information
+
 package Search::Elasticsearch::Transport;
-$Search::Elasticsearch::Transport::VERSION = '6.81';
+$Search::Elasticsearch::Transport::VERSION = '7.30';
 use Moo;
 
 use URI();
@@ -72,7 +76,7 @@ Search::Elasticsearch::Transport - Provides interface between the client class a
 
 =head1 VERSION
 
-version 6.81
+version 7.30
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,16 @@
 Revision history for MIDI-Drummer
 
+0.1605 2020-09-15 17:33:07
+    - Improve documentation.
+    - Simplify the ->metronome78 beat.
+
+0.1604 2020-09-15 09:47:54
+    - Fix the defaults for triplet 32nd, 64th, 128th durations.
+
+0.1603 2020-09-15 09:01:25
+    - Fix hi-hat patches in the eg/ programs.
+    - Simplify the 5/8 metronome beat.
+
 0.1602 2020-09-02 10:11:27
     - Improve documentation slightly again.
 

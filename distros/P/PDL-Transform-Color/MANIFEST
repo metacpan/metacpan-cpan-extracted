@@ -1,0 +1,11 @@
+CHANGES
+lib/PDL/Transform/Color.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.pod
+t/color.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
