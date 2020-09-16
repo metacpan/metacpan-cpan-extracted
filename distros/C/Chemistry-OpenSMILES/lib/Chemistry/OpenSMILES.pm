@@ -5,7 +5,7 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader
-our $VERSION = '0.2.1'; # VERSION
+our $VERSION = '0.3.0'; # VERSION
 
 1;
 
@@ -35,14 +35,11 @@ Chemistry::OpenSMILES - OpenSMILES format reader
 
 Chemistry::OpenSMILES provides support for SMILES chemical identifiers
 conforming to OpenSMILES v1.0 specification
-(E<lt>http://opensmiles.org/opensmiles.htmlE<gt>).
+(L<http://opensmiles.org/opensmiles.html>).
 
 Chemistry::OpenSMILES::Parser reads in SMILES strings and returns them
 parsed to arrays of L<Graph::Undirected|Graph::Undirected> objects. Each
-atom is represented by a hash. The parser does not have any chemical
-inference heuristics, thus it plainly returns properties which it gets
-from the SMILES descriptor. That means numbers of implicit hydrogens and
-standard aromaticity representation are left for the user to derive.
+atom is represented by a hash.
 
 =head2 Molecular graph
 
@@ -66,8 +63,8 @@ references:
     }
 
 Except for C<symbol>, C<class> and C<number>, all keys of hash are
-optional. Per OpenSMIILES specification, default value for C<class> is
-0.
+optional. Per OpenSMIILES specification, default values for C<hcount>
+and C<class> are 0.
 
 =head3 Bonds
 
@@ -94,6 +91,10 @@ structure, where ring bonds follow branch descriptions.
 
 Whitespace is not supported yet. SMILES descriptors must be cleaned of
 it before attempting reading with Chemistry::OpenSMILES::Parser.
+
+The derivation of implicit hydrogen counts for aromatic atoms is not
+unambiguously defined in the OpenSMILES specification. Thus only
+aromatic carbon is accounted for as if having valence of 3.
 
 =head1 SEE ALSO
 

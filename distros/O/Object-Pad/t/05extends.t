@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -44,6 +44,20 @@ EOPERL
       'extends insufficient version fails' );
    like( $@, qr/^Animal version 2.34 required--this is only version 1.23 /,
       'message from insufficient version' );
+}
+
+# Extend before base class is sealed (RT133190)
+{
+   class BaseClass {
+      has $_aslot;
+
+      class SubClass extends BaseClass {
+         method one { 1 }
+      }
+   }
+
+   pass( 'Did not SEGV while compiling inner derived class' );
+   is( SubClass->new->one, 1, 'Inner derived subclass instances can be constructed' );
 }
 
 done_testing;

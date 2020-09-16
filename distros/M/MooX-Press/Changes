@@ -6,6 +6,23 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.068	2020-09-16
+
+ [ Bug Fixes ]
+ - MooX::press now strips leading `main::` when generating type constraint
+   names.
+
+ [ Documentation ]
+ - Better documentation of `coerce` in Zydeco::Lite.
+ - Document importing functions from Zydeco::Lite.
+
+ [ Other ]
+ - MooX::Press now forbids roles from having a multifactory. (They could
+   already not have factories, so this was an inconsistency.)
+ - Zydeco::Lite's before_apply and after_apply now get passed 'role' or
+   'class' as an argument indicating what kind of package the role is being
+   applied to.
+
 0.067	2020-09-15
 
  - Added: MooX::Press::make_absolute_package_name() function.

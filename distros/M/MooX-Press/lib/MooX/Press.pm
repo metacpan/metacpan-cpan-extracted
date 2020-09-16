@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.067';
+our $VERSION   = '0.068';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -305,6 +305,7 @@ sub type_name {
 	if (length $prefix and lc substr($name, 0, length $prefix) eq lc $prefix) {
 		$stub = substr($name, 2 + length $prefix);
 	}
+	$stub =~ s/^(main)?::// while $stub =~ /^(main)?::/;
 	$stub =~ s/::/_/g;
 	$stub;
 }
@@ -536,7 +537,7 @@ sub make_role {
 		}
 	}
 
-	for my $key (qw/ abstract extends subclass factory overload /) {
+	for my $key (qw/ abstract extends subclass factory overload multifactory /) {
 		if ($opts{$key}) {
 			require Carp;
 			my $qname = $builder->qualify_name($name, $opts{prefix});

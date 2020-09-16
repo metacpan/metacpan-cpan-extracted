@@ -54,7 +54,7 @@ plan tests => 3 * scalar keys %cases;
 
 for my $case (sort keys %cases) {
     my $parser = Chemistry::OpenSMILES::Parser->new;
-    my @graphs = $parser->parse( $case );
+    my @graphs = $parser->parse( $case, { raw => 1 } );
 
     is( scalar @graphs, @{$cases{$case}} == 3 ? $cases{$case}->[0] : 1 );
 

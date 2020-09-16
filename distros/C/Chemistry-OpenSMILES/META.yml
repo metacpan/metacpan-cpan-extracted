@@ -3,7 +3,6 @@ abstract: 'OpenSMILES format reader'
 author:
   - 'Andrius Merkys <merkys@cpan.org>'
 build_requires:
-  List::Util: '0'
   Module::Build: '0.28'
   Module::Build::Parse::Yapp: v0.1.2
   Test::More: '0'
@@ -19,11 +18,12 @@ meta-spec:
 name: Chemistry-OpenSMILES
 requires:
   Graph::Undirected: '0'
+  List::Util: '0'
   Parse::Yapp: '0'
   perl: '5.0100'
 resources:
   bugtracker: https://github.com/merkys/chemistry-opensmiles/issues
   homepage: http://search.cpan.org/dist/
   repository: git://github.com/merkys/chemistry-opensmiles.git
-version: 0.2.1
+version: 0.3.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

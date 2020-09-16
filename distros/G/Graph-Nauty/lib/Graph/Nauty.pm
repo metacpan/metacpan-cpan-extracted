@@ -8,11 +8,12 @@ our @ISA = qw( Exporter );
 our @EXPORT_OK = qw(
     are_isomorphic
     automorphism_group_size
+    canonical_order
     orbits
     orbits_are_same
 );
 
-our $VERSION = '0.3.2'; # VERSION
+our $VERSION = '0.3.3'; # VERSION
 
 require XSLoader;
 XSLoader::load('Graph::Nauty', $VERSION);
@@ -27,7 +28,7 @@ sub _cmp
 
     if( blessed $a && $a->isa( Graph::Nauty::EdgeVertex:: ) &&
         blessed $b && $b->isa( Graph::Nauty::EdgeVertex:: ) ) {
-        return "$a" cmp "$b";
+        return $a->color cmp $b->color;
     } elsif( blessed $a && $a->isa( Graph::Nauty::EdgeVertex:: ) ) {
         return 1;
     } elsif( blessed $b && $b->isa( Graph::Nauty::EdgeVertex:: ) ) {
@@ -49,9 +50,9 @@ sub _nauty_graph
         my $graph_now = Graph::Undirected->new( vertices => [ $graph->vertices ] );
         for my $edge ( $graph->edges ) {
             if( $graph->has_edge_attributes( @$edge ) ) {
-                my $edge_node = Graph::Nauty::EdgeVertex->new( $graph->get_edge_attributes( @$edge ) );
-                $graph_now->add_edge( $edge->[0], $edge_node );
-                $graph_now->add_edge( $edge_node, $edge->[1] );
+                my $edge_vertex = Graph::Nauty::EdgeVertex->new( $graph->get_edge_attributes( @$edge ) );
+                $graph_now->add_edge( $edge->[0], $edge_vertex );
+                $graph_now->add_edge( $edge_vertex, $edge->[1] );
             } else {
                 $graph_now->add_edge( @$edge );
             }
@@ -153,6 +154,20 @@ sub are_isomorphic
     return aresame_sg( $statsblk1->{canon}, $statsblk2->{canon} );
 }
 
+sub canonical_order
+{
+    my( $graph, $color_sub, $order_sub ) = @_;
+
+    my( $nauty_graph, $labels, $breaks ) =
+        _nauty_graph( $graph, $color_sub, $order_sub );
+    my $statsblk = sparsenauty( $nauty_graph, $labels, $breaks,
+                                { getcanon => 1 } );
+
+    return grep { !blessed $_ || !$_->isa( Graph::Nauty::EdgeVertex:: ) }
+                map { $nauty_graph->{original}[$_] }
+                    @{$statsblk->{lab}};
+}
+
 sub orbits_are_same
 {
     my( $graph1, $graph2, $color_sub ) = @_;
@@ -181,7 +196,12 @@ Graph::Nauty - Perl bindings for nauty
 
 =head1 SYNOPSIS
 
-  use Graph::Nauty qw( are_isomorphic automorphism_group_size orbits );
+  use Graph::Nauty qw(
+      are_isomorphic
+      automorphism_group_size
+      canonical_order
+      orbits
+  );
   use Graph::Undirected;
 
   my $A = Graph::Undirected->new;
@@ -197,6 +217,9 @@ Graph::Nauty - Perl bindings for nauty
 
   # Check whether two graphs are isomorphs:
   print are_isomorphic( $A, $B );
+
+  # Get canonical order of vertices:
+  print canonical_order( $A );
 
 =head1 DESCRIPTION
 
@@ -221,6 +244,15 @@ anonymous subroutine can be passed inside an option hash:
 
 Subroutine gets a vertex as its 0th parameter, and is expected to return
 a string, or anything stringifiable.
+
+In subroutines where the order of returned vertices is important, a
+second anonymous subroutine can be passed to order vertices inside each
+of the equivalence classes:
+
+  print orbits( $A, sub { return length $_[0] }, sub { return "$_[0]" } );
+
+If an ordering subroutine is not given, stringification (Perl C<"">
+operator) is used by default.
 
 =head2 Edge color
 

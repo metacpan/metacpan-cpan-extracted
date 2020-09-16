@@ -3,17 +3,19 @@ package Graph::Nauty::EdgeVertex;
 use strict;
 use warnings;
 
-our $VERSION = '0.3.2'; # VERSION
+our $VERSION = '0.3.3'; # VERSION
 
 use Data::Dumper;
 
 $Data::Dumper::Sortkeys = 1;
 
-use overload '""' => sub { return Dumper $_[0]->{attributes} };
-
 sub new {
     my( $class, $attributes ) = @_;
     return bless { attributes => $attributes }, $class;
 };
+
+sub color {
+    return Dumper $_[0]->{attributes};
+}
 
 1;

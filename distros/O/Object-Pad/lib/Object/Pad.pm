@@ -5,10 +5,10 @@
 
 package Object::Pad;
 
-use strict;
+use v5.14;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Carp;
 
@@ -221,8 +221,18 @@ implements the role.
       requires METHOD;
    }
 
-Currently, a role cannot provide instance slots, though it is hoped that a
-later version of this module will provide these.
+A role can provide instance slots. These are visible to any C<BUILD> blocks or
+methods provided by that role.
+
+I<Since version 0.33.>
+
+   role Name {
+      has $slot;
+
+      BUILD { $slot = "a value" }
+
+      method slot { return $slot }
+   }
 
 =head2 has
 
@@ -233,16 +243,17 @@ later version of this module will provide these.
 
    has $var :ATTR ATTR...;
 
-Declares that the instances of the class have a member field of the given
-name. This member field (called a "slot") will be accessible as a lexical
-variable within any C<method> declarations in the class.
+Declares that the instances of the class or role have a member field of the
+given name. This member field (called a "slot") will be accessible as a
+lexical variable within any C<method> declarations in the class.
 
 Array and hash members are permitted and behave as expected; you do not need
 to store references to anonymous arrays or hashes.
 
-Member fields are private to a class. They are not visible to users of the
-class, nor to subclasses. In order to provide access to them a class may wish
-to use L</method> to create an accessor.
+Member fields are private to a class or role. They are not visible to users of
+the class, nor to subclasses, nor to any class that a role is applied to. In
+order to provide access to them a class may wish to use L</method> to create
+an accessor.
 
 A scalar slot may provide a expression that gives an initialisation value,
 which will be assigned into the slot of every instance during the constructor

@@ -44,19 +44,19 @@
    "provides" : {
       "Object::Pad" : {
          "file" : "lib/Object/Pad.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Object::Pad::MOP::Class" : {
          "file" : "lib/Object/Pad/MOP/Class.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Object::Pad::MOP::Method" : {
          "file" : "lib/Object/Pad/MOP/Method.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Object::Pad::MOP::Slot" : {
          "file" : "lib/Object/Pad/MOP/Slot.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       }
    },
    "release_status" : "stable",
@@ -65,6 +65,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

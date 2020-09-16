@@ -67192,3 +67192,7 @@ G/GF/GFRANKS/Test-MockModule-v0.174.0.tar.gz
 P/PE/PERLANCAR/Text-ANSI-WideUtil-0.230.tar.gz
 G/GR/GRAVATTJ/Util-Medley-0.041.tar.gz
 S/SH/SHLOMIF/XML-LibXML-2.0206.tar.gz
+M/ME/MERKYS/Chemistry-OpenSMILES-0.3.0.tar.gz
+M/ME/MERKYS/Graph-Nauty-0.3.3.tar.gz
+T/TO/TOBYINK/MooX-Press-0.068.tar.gz
+P/PE/PEVANS/Object-Pad-0.33.tar.gz

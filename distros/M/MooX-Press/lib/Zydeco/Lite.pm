@@ -5,7 +5,7 @@ use warnings;
 package Zydeco::Lite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.067';
+our $VERSION   = '0.068';
 
 use MooX::Press ();
 use Types::Standard qw( -types -is );
@@ -564,11 +564,13 @@ sub before_apply (&) {
 	
 	is_CodeRef( my $coderef = shift ) or confess('expected coderef');
 	
+	require Role::Hooks;
 	push @{ $THIS{CLASS_SPEC}{before_apply} ||= [] }, sub {
 		local $THIS{CLASS}      = $_[1];
 		local $THIS{CLASS_SPEC} = {};
 		local $THIS{HOOK}       = 'before_apply';
-		$coderef->(@_);
+		my $kind = 'Role::Hooks'->is_role($_[1]) ? 'role' : 'class';
+		$coderef->(@_, $kind);
 		return _handle_hook(@_);
 	};
 	
@@ -581,11 +583,13 @@ sub after_apply (&) {
 	
 	is_CodeRef( my $coderef = shift ) or confess('expected coderef');
 	
+	require Role::Hooks;
 	push @{ $THIS{CLASS_SPEC}{after_apply} ||= [] }, sub {
 		local $THIS{CLASS}      = $_[1];
 		local $THIS{CLASS_SPEC} = {};
 		local $THIS{HOOK}       = 'after_apply';
-		$coderef->(@_);
+		my $kind = 'Role::Hooks'->is_role($_[1]) ? 'role' : 'class';
+		$coderef->(@_, $kind);
 		return _handle_hook(@_);
 	};
 	
@@ -957,12 +961,12 @@ Hooks for roles:
   };
 
   before_apply {
-    my ( $role, $target ) = ( shift, shift );
+    my ( $role, $target, $targetkind ) = ( shift, @_ );
     # Code that runs before a role is applied to a package
   };
 
   after_apply {
-    my ( $role, $target ) = ( shift, shift );
+    my ( $role, $target, $targetkind ) = ( shift, @_ );
     # Code that runs after a role is applied to a package
   };
 
@@ -1119,7 +1123,11 @@ Exceptions:
    Optional[List]     @imports,
  );
  
- # TODO: coerce
+ coerce(
+   Object|Str         $type,
+   Str                $via,
+   Optional[CodeRef]  $definition,
+ );
  
  overload(
    Hash               %args,
@@ -1148,14 +1156,27 @@ Exceptions:
  };
  
  before_apply {
-   ( $role, $target ) = @_;
+   ( $role, $target, $targetkind ) = @_;
    ...;
  };
  
  after_apply {
-   ( $role, $target ) = @_;
+   ( $role, $target, $targetkind ) = @_;
    ...;
  };
+
+=head2 Import
+
+Zydeco::Lite uses L<Exporter::Tiny>, so you can choose which keywords
+to import, rename them, etc.
+
+  use Zydeco::Lite { -prefix => 'zy_' };
+  
+  my $app = zy_app {
+    zy_class 'Foo' => sub {};
+  };
+  
+  my $obj = $app->new_foo();
 
 =head1 BUGS
 

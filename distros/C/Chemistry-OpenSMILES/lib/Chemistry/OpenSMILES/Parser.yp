@@ -6,6 +6,29 @@ use warnings;
 use 5.0100;
 
 use Graph::Undirected;
+use List::Util qw(sum);
+
+my %normal_valence = (
+    B  => [ 3 ],
+    C  => [ 4 ],
+    N  => [ 3, 5 ],
+    O  => [ 2 ],
+    P  => [ 3, 5 ],
+    S  => [ 2, 4, 6 ],
+    F  => [ 1 ],
+    Cl => [ 1 ],
+    Br => [ 1 ],
+    I  => [ 1 ],
+
+    c  => [ 3 ],
+);
+
+my %bond_order = (
+    '-' => 1,
+    '=' => 2,
+    '#' => 3,
+    '$' => 4,
+);
 
 %}
 
@@ -179,6 +202,8 @@ sub _Lexer
         if( $atom->{hcount} ) {
             $atom->{hcount} =~ s/^H//;
             $atom->{hcount} = $atom->{hcount} ? int $atom->{hcount} : 1;
+        } else {
+            $atom->{hcount} = 0;
         }
 
         if( $atom->{isotope} ) {
@@ -192,7 +217,7 @@ sub _Lexer
     }
 
     # Bracketless atoms
-    if( $self->YYData->{INPUT} =~ s/^(Br|Cl|[BCINOPSFbcnops])// ) {
+    if( $self->YYData->{INPUT} =~ s/^(Br|Cl|[BCINOPSFbcnops*])// ) {
         my $atom = { symbol => $1,
                      class  => 0,
                      number => $self->{USER}{ATOMNO} };
@@ -242,7 +267,19 @@ sub parse
             delete $atom->{graph};
             delete $atom->{index};
             if( !$options->{raw} ) {
-                next unless exists $atom->{hcount};
+                if( !exists $atom->{hcount} ) {
+                    next if !exists $normal_valence{$atom->{symbol}};
+                    my $degree = sum map { exists $bond_order{$_} ? $bond_order{$_} : 1 }
+                                     map { $graph->has_edge_attribute( $atom, $_, 'bond' )
+                                            ? $graph->get_edge_attribute( $atom, $_, 'bond' )
+                                            : '-' }
+                                         $graph->neighbours( $atom );
+                    $degree = 0 unless $degree;
+                    my( $valence ) = grep { $degree <= $_ }
+                                          @{$normal_valence{$atom->{symbol}}};
+                    next if !defined $valence;
+                    $atom->{hcount} = $valence - $degree;
+                }
                 for (1..$atom->{hcount}) {
                     $graph->add_edge( $atom,
                                       { symbol => 'H',
@@ -319,7 +356,7 @@ sub _sprint_atom
     return '[' . (exists $atom->{isotope}   ? $atom->{isotope}   : '') .
                  $atom->{symbol} .
                  (exists $atom->{chirality} ? $atom->{chirality} : '') .
-                 (exists $atom->{hcount}    ? 'H' . $atom->{hcount} : '') .
+                 ($atom->{hcount} ? 'H' . $atom->{hcount} : '') .
                  (exists $atom->{charge}    ? $atom->{charge}    : '') .
                  (exists $atom->{class} && $atom->{class}
                     ? ':' . $atom->{class} : '') .

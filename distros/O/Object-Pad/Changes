@@ -1,5 +1,17 @@
 Revision history for Object-Pad
 
+0.33    2020-09-16
+        [CHANGES]
+         * Roles can now have data slots
+         * `use v5.14` in all files
+
+        [BUGFIXES]
+         * pp_sv() needs to EXTEND() before PUSH()
+         * Avoid SEGV if ->begin_class is called without PL_parser set
+           (RT133258)
+         * Defer sealing of derived classes until their base class is sealed
+           (RT133190)
+
 0.32    2020-08-19
         [CHANGES]
          * Initial attempt at roles, which can compose new methods into

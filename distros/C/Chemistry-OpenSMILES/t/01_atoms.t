@@ -6,7 +6,7 @@ use Chemistry::OpenSMILES::Parser;
 use Test::More;
 
 my @cases = qw(
-    C       N      Cl
+    C       N      Cl     *
     [U]     [Pb]   [He]   [*]
     [CH4]   [ClH]  [ClH1]
     [Cl-]   [OH1-] [OH-1] [Cu+2] [Cu++]

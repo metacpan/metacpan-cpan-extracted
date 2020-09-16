@@ -307,9 +307,11 @@ struct ClassMeta {
   SV *name;
   HV *stash;
   ClassMeta *supermeta;
-  AV *implements;      /* each elem is a raw pointer directly to a ClassMeta whose type == METATYPE_ROLE */
+  AV *pending_submeta; /* NULL, or AV containing raw ClassMeta pointers to subclasses pending seal */
+  AV *roles;           /* each elem is a raw pointer directly to a RoleEmbedding whose type == METATYPE_ROLE */
   bool sealed;
-  SLOTOFFSET offset;   /* first slot index of this partial within its instance */
+  SLOTOFFSET start_slotix; /* first slot index of this partial within its instance */
+  SLOTOFFSET next_slotix;  /* 1 + final slot index of this partial within its instance; includes slots in roles */
   AV *slots;           /* each elem is a raw pointer directly to a SlotMeta */
   AV *methods;         /* each elem is a raw pointer directly to a MethodMeta */
   AV *requiremethods;  /* each elem is an SVt_PV giving a name */
@@ -329,10 +331,12 @@ struct ClassMeta {
 };
 
 /* Metadata about the embedding of a role into a class */
-struct RoleEmbedding {
-  /* TODO: also store the role slot offset */
+typedef struct {
+  SV *embeddingsv;
+  struct ClassMeta *rolemeta;
   struct ClassMeta *classmeta;
-};
+  PADOFFSET offset;
+} RoleEmbedding;
 
 /* Special pad indexes within `method` CVs */
 enum {
@@ -342,6 +346,17 @@ enum {
   /* for role methods */
   PADIX_EMBEDDING = 3,
 };
+
+#define embed_cv(cv, embedding)  S_embed_cv(aTHX_ cv, embedding)
+static CV *S_embed_cv(pTHX_ CV *cv, RoleEmbedding *embedding)
+{
+  CV *embedded_cv = cv_clone(cv);
+
+  PAD *pad1 = PadlistARRAY(CvPADLIST(embedded_cv))[1];
+  PadARRAY(pad1)[PADIX_EMBEDDING] = SvREFCNT_inc(embedding->embeddingsv);
+
+  return embedded_cv;
+}
 
 /* Empty MGVTBL simply for locating instance slots AV */
 static MGVTBL vtbl_slotsav = {};
@@ -388,6 +403,7 @@ static SV *S_obj_get_slotsav(pTHX_ SV *self, U8 repr, bool create)
         mPUSHs(newSVsv(self));
         PUTBACK;
 
+        assert(classmeta->initslots);
         call_sv((SV *)classmeta->initslots, G_VOID);
 
         PUTBACK;
@@ -446,17 +462,23 @@ static OP *pp_methstart(pTHX)
     croak("Cannot invoke method on a non-instance");
 
   HV *classstash;
+  SLOTOFFSET offset;
+  RoleEmbedding *embedding = NULL;
 
   if(is_role) {
     /* Embedding info is stored in pad1; PAD_SVl() will look at CvDEPTH. We'll
      * have to grab it manually */
     PAD *pad1 = PadlistARRAY(CvPADLIST(find_runcv(0)))[1];
-    struct RoleEmbedding *embedding = (struct RoleEmbedding *)SvPVX(PadARRAY(pad1)[PADIX_EMBEDDING]);
+    embedding = (RoleEmbedding *)SvPVX(PadARRAY(pad1)[PADIX_EMBEDDING]);
+
+    assert(embedding);
 
     classstash = embedding->classmeta->stash;
+    offset     = embedding->offset;
   }
   else {
     classstash = CvSTASH(find_runcv(0));
+    offset     = 0;
   }
 
   const char *stashname = HvNAME(classstash);
@@ -470,8 +492,19 @@ static OP *pp_methstart(pTHX)
   SV *slotsav;
 
   if(is_role) {
-    /* TODO: roles don't have slot storage yet */
-    slotsav = (SV *)newAV();
+    SV *instancedata = get_obj_slotsav(self, embedding->classmeta->repr, create);
+
+    if(create) {
+      slotsav = instancedata;
+      SvREFCNT_inc(slotsav);
+    }
+    else {
+      slotsav = (SV *)newAV();
+      /* MASSIVE CHEAT */
+      AvARRAY(slotsav) = AvARRAY(instancedata) + offset;
+      AvFILLp(slotsav) = AvFILLp(instancedata) - offset;
+      AvREAL_off(slotsav);
+    }
   }
   else {
     /* op_private contains the repr type so we can extract slots */
@@ -552,6 +585,7 @@ static OP *pp_slotpad(pTHX)
 static OP *pp_sv(pTHX)
 {
   dSP;
+  EXTEND(SP, 1);
   PUSHs(cSVOP->op_sv);
   PUTBACK;
   return PL_op->op_next;
@@ -603,11 +637,16 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
    */
 
   pad_add_self_slots();
+
+  if(meta->type == METATYPE_ROLE) {
+    PADOFFSET padix = pad_add_name_pvs("$(embedding)", 0, NULL, NULL);
+    if(padix != PADIX_EMBEDDING)
+      croak("ARGH: Expected that padix[$(embedding)] = 3");
+  }
+
   intro_my();
 
   U8 repr = meta->repr;
-  if(repr == REPR_AUTOSELECT && !meta->foreign_new)
-    repr = REPR_NATIVE;
 
   ops = op_append_list(OP_LINESEQ, ops,
     newMETHSTARTOP(OPf_MOD |
@@ -617,8 +656,11 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
   /* TODO: Icky horrible implementation; if our slotoffset > 0 then
    * we must be a subclass
    */
-  if(meta->offset) {
+  if(meta->start_slotix) {
     struct ClassMeta *supermeta = meta->supermeta;
+
+    assert(supermeta->sealed);
+    assert(supermeta->initslots);
 
     CopLINE_set(PL_curcop, __LINE__);
 
@@ -637,8 +679,8 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
   }
 
   /* TODO: If in some sort of debug mode: insert equivalent of
-   *   if((av_count(self)) != offset)
-   *     croak("ARGH: Expected self to have %d slots by now\n", offset);
+   *   if((av_count(self)) != start_slotix)
+   *     croak("ARGH: Expected self to have %d slots by now\n", start_slotix);
    */
 
   AV *slots = meta->slots;
@@ -699,6 +741,31 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
        * provide one all the same. */
       itemops->op_targ = pad_alloc(itemops->op_type, SVs_PADTMP);
     }
+  }
+
+  AV *roles = meta->roles;
+  I32 nroles = av_count(roles);
+
+  for(i = 0; i < nroles; i++) {
+    RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
+    ClassMeta *rolemeta = embedding->rolemeta;
+
+    assert(rolemeta->sealed);
+    assert(rolemeta->initslots);
+
+    CopLINE_set(PL_curcop, __LINE__);
+
+    ops = op_append_list(OP_LINESEQ, ops,
+      newSTATEOP(0, NULL, NULL));
+
+    OP *op = NULL;
+    op = op_append_list(OP_LIST, op,
+      newPADxVOP(OP_PADSV, PADIX_SELF, 0, 0));
+    op = op_append_list(OP_LIST, op,
+      newSVOP(OP_CONST, 0, (SV *)embed_cv(rolemeta->initslots, embedding)));
+
+    ops = op_append_list(OP_LINESEQ, ops,
+      op_convert_list(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED, op));
   }
 
   SvREFCNT_inc(PL_compcv);
@@ -842,6 +909,7 @@ static XS(injected_constructor)
         PUSHs(*svp);
       PUTBACK;
 
+      assert(meta->foreign_new);
       call_sv((SV *)meta->foreign_new, G_SCALAR);
       SPAGAIN;
 
@@ -903,6 +971,7 @@ static XS(injected_constructor)
     PUSHs(self);
     PUTBACK;
 
+    assert(meta->initslots);
     call_sv((SV *)meta->initslots, G_VOID);
 
     LEAVE;
@@ -952,6 +1021,7 @@ static XS(injected_constructor)
         PUSHs(argsvs[argi]);
       PUTBACK;
 
+      assert(buildblock);
       call_sv((SV *)buildblock, G_VOID);
 
       FREETMPS;
@@ -976,24 +1046,39 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
   meta->type = type;
   meta->name = SvREFCNT_inc(name);
 
+  HV *stash = meta->stash = gv_stashsv(name, GV_ADD);
+
   meta->sealed = false;
-  meta->offset = 0;
+  meta->start_slotix = 0;
   meta->slots   = newAV();
   meta->methods = newAV();
   meta->requiremethods = newAV();
   meta->repr   = REPR_AUTOSELECT;
   meta->foreign_new = NULL;
   meta->supermeta = NULL;
-  meta->implements = newAV();
+  meta->pending_submeta = NULL;
+  meta->roles = newAV();
   meta->buildblocks = NULL;
   meta->initslots = NULL;
+
+  if(!PL_parser) {
+    /* We need to generate just enough of a PL_parser to keep newSTATEOP()
+     * happy, otherwise it will SIGSEGV (RT133258)
+     */
+    SAVEVPTR(PL_parser);
+    Newxz(PL_parser, 1, yy_parser);
+    SAVEFREEPV(PL_parser);
+
+    PL_parser->copline = NOLINE;
+#if HAVE_PERL_VERSION(5, 20, 0)
+    PL_parser->preambling = NOLINE;
+#endif
+  }
 
   meta->tmpcop = (COP *)newSTATEOP(0, NULL, NULL);
   CopFILE_set(meta->tmpcop, __FILE__);
 
   meta->methodscope = NULL;
-
-  HV *stash = meta->stash = gv_stashsv(name, GV_ADD);
 
   AV *isa;
   {
@@ -1015,7 +1100,7 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
 
     if(supermeta) {
       /* A subclass of an Object::Pad class */
-      meta->offset = supermeta->offset + av_count(supermeta->slots);
+      meta->start_slotix = supermeta->next_slotix;
       meta->repr = supermeta->repr;
       meta->foreign_new = supermeta->foreign_new;
     }
@@ -1034,6 +1119,11 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
     /* A base class */
     av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
   }
+
+  if(meta->repr == REPR_AUTOSELECT && !meta->foreign_new)
+    meta->repr = REPR_NATIVE;
+
+  meta->next_slotix = meta->start_slotix;
 
   {
     /* Inject the constructor */
@@ -1158,10 +1248,11 @@ static SlotMeta *S_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
 
   slotmeta->name = SvREFCNT_inc(slotname);
   slotmeta->class = meta;
-  slotmeta->slotix = meta->offset + av_count(slots);
+  slotmeta->slotix = meta->next_slotix;
   slotmeta->defaultsv = newSV(0);
 
   av_push(slots, (SV *)slotmeta);
+  meta->next_slotix++;
 
   return slotmeta;
 }
@@ -1177,9 +1268,10 @@ static void S_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
 
 static bool mop_class_implements_role(ClassMeta *classmeta, ClassMeta *rolemeta)
 {
-  U32 i, n = av_count(classmeta->implements);
+  U32 i, n = av_count(classmeta->roles);
+  RoleEmbedding **arr = (RoleEmbedding **)AvARRAY(classmeta->roles);
   for(i = 0; i < n; i++)
-    if((ClassMeta *)AvARRAY(classmeta->implements)[i] == rolemeta)
+    if(arr[i]->rolemeta == rolemeta)
       return true;
 
   if(classmeta->supermeta && mop_class_implements_role(classmeta->supermeta, rolemeta))
@@ -1201,26 +1293,24 @@ static void S_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *role
   if(mop_class_implements_role(classmeta, rolemeta))
     return;
 
-  av_push(classmeta->implements, (SV *)rolemeta);
-
   HV *srcstash = rolemeta->stash;
   HV *dststash = classmeta->stash;
 
-  SV *embeddingsv = newSV(sizeof(struct RoleEmbedding));
-  struct RoleEmbedding *embedding = (struct RoleEmbedding *)SvPVX(embeddingsv);
+  SV *embeddingsv = newSV(sizeof(RoleEmbedding));
+  RoleEmbedding *embedding = (RoleEmbedding *)SvPVX(embeddingsv);
 
-  SAVEFREESV(embeddingsv);
+  embedding->embeddingsv = embeddingsv;
+  embedding->rolemeta    = rolemeta;
+  embedding->classmeta   = classmeta;
+  embedding->offset      = -1;
 
-  embedding->classmeta = classmeta;
+  av_push(classmeta->roles, (SV *)embedding);
 
   U32 nbuilds = rolemeta->buildblocks ? av_count(rolemeta->buildblocks) : 0;
   for(i = 0; i < nbuilds; i++) {
     CV *buildblock = (CV *)AvARRAY(rolemeta->buildblocks)[i];
 
-    CV *embedded_buildblock = cv_clone(buildblock);
-
-    PAD *pad1 = PadlistARRAY(CvPADLIST(embedded_buildblock))[1];
-    PadARRAY(pad1)[PADIX_EMBEDDING] = SvREFCNT_inc(embeddingsv);
+    CV *embedded_buildblock = embed_cv(buildblock, embedding);
 
     if(!classmeta->buildblocks)
       classmeta->buildblocks = newAV();
@@ -1251,12 +1341,7 @@ static void S_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *role
       croak("Method '%" SVf "' clashes with the one provided by role %" SVf,
         SVfARG(mname), SVfARG(rolemeta->name));
 
-    CV *embedded_cv = cv_clone(GvCV((GV *)HeVAL(he)));
-
-    PAD *pad1 = PadlistARRAY(CvPADLIST(embedded_cv))[1];
-    PadARRAY(pad1)[PADIX_EMBEDDING] = SvREFCNT_inc(embeddingsv);
-
-    GvCV_set(*gvp, embedded_cv);
+    GvCV_set(*gvp, embed_cv(GvCV((GV *)HeVAL(he)), embedding));
   }
 
   nmethods = av_count(rolemeta->requiremethods);
@@ -1265,25 +1350,31 @@ static void S_mop_class_compose_role(pTHX_ ClassMeta *classmeta, ClassMeta *role
   }
 }
 
-#define mop_class_apply_role(class, role)  S_mop_class_apply_role(aTHX_ class, role)
-static void S_mop_class_apply_role(pTHX_ ClassMeta *classmeta, ClassMeta *rolemeta)
+#define mop_class_apply_role(embedding)  S_mop_class_apply_role(aTHX_ embedding)
+static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
 {
+  ClassMeta *classmeta = embedding->classmeta;
+  ClassMeta *rolemeta  = embedding->rolemeta;
+
   if(classmeta->type != METATYPE_CLASS)
     croak("Can only apply to a class");
   if(rolemeta->type != METATYPE_ROLE)
     croak("Can only apply a role to a class");
+
+  embedding->offset = classmeta->next_slotix;
+
+  classmeta->next_slotix += av_count(rolemeta->slots);
 
   /* TODO: Run an APPLY block if the role has one */
 }
 
 static void S_apply_roles(pTHX_ ClassMeta *dst, ClassMeta *src)
 {
-  U32 nroles = av_count(src->implements);
+  U32 nroles = av_count(src->roles);
+  RoleEmbedding **arr = (RoleEmbedding **)AvARRAY(src->roles);
   U32 i;
   for(i = 0; i < nroles; i++) {
-    ClassMeta *srcrole = (ClassMeta *)AvARRAY(src->implements)[i];
-
-    mop_class_apply_role(dst, srcrole);
+    mop_class_apply_role(arr[i]);
 
     /* TODO: Consider how we recurse into roles */
   }
@@ -1292,6 +1383,16 @@ static void S_apply_roles(pTHX_ ClassMeta *dst, ClassMeta *src)
 #define mop_class_seal(meta)  S_mop_class_seal(aTHX_ meta)
 static void S_mop_class_seal(pTHX_ ClassMeta *meta)
 {
+  if(meta->supermeta && !meta->supermeta->sealed) {
+    /* Must defer sealing until superclass is sealed first
+     * (RT133190)
+     */
+    if(!meta->supermeta->pending_submeta)
+      meta->supermeta->pending_submeta = newAV();
+    av_push(meta->supermeta->pending_submeta, (SV *)meta);
+    return;
+  }
+
   S_apply_roles(aTHX_ meta, meta);
 
   if(meta->type == METATYPE_CLASS) {
@@ -1312,6 +1413,20 @@ static void S_mop_class_seal(pTHX_ ClassMeta *meta)
   S_generate_initslots_method(aTHX_ meta);
 
   meta->sealed = true;
+
+  if(meta->pending_submeta) {
+    int i;
+    SV **arr = AvARRAY(meta->pending_submeta);
+    for(i = 0; i < av_count(meta->pending_submeta); i++) {
+      ClassMeta *submeta = (ClassMeta *)arr[i];
+      arr[i] = &PL_sv_undef;
+
+      mop_class_seal(submeta);
+    }
+
+    SvREFCNT_dec(meta->pending_submeta);
+    meta->pending_submeta = NULL;
+  }
 }
 
 static XS(xsub_mop_class_seal)
@@ -1369,10 +1484,6 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
 
   ClassMeta *classmeta = slotmeta->class;
 
-  U8 repr = classmeta->repr;
-  if(repr == REPR_AUTOSELECT && !classmeta->foreign_new)
-    repr = REPR_NATIVE;
-
   I32 floor_ix = start_subparse(FALSE, 0);
   SAVEFREESV(PL_compcv);
 
@@ -1387,7 +1498,7 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
     newSTATEOP(0, NULL, NULL));
   ops = op_append_list(OP_LINESEQ, ops,
     newMETHSTARTOP(0 |
-      (classmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0), repr));
+      (classmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0), classmeta->repr));
 
   ops = op_append_list(OP_LINESEQ, ops,
     make_argcheck_ops((type == ACCESSOR_WRITER) ? 1 : 0, 0, 0));
@@ -1653,9 +1764,6 @@ static int keyword_has(pTHX_ OP **op_ptr)
   if(!have_compclassmeta)
     croak("Cannot 'has' outside of 'class'");
 
-  if(compclassmeta->type == METATYPE_ROLE)
-    croak("Currently a role may not define slots");
-
   lex_read_space(0);
   SV *name = lex_scan_lexvar();
   if(!name)
@@ -1869,16 +1977,11 @@ static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void 
 static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   enum PhaserType type = PTR2UV(hookdata);
-  SLOTOFFSET offset = compclassmeta->offset;
   PADNAMELIST *slotnames = PadlistNAMES(CvPADLIST(compclassmeta->methodscope));
   I32 nslots = av_count(compclassmeta->slots);
   PADNAME **snames = PadnamelistARRAY(slotnames);
   PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
   OP *slotops = NULL;
-
-  U8 repr = compclassmeta->repr;
-  if(repr == REPR_AUTOSELECT && !compclassmeta->foreign_new)
-    repr = REPR_NATIVE;
 
   {
     ENTER;
@@ -1911,11 +2014,13 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
     newSTATEOP(0, NULL, NULL));
   slotops = op_append_list(OP_LINESEQ, slotops,
     newMETHSTARTOP(0 |
-      (compclassmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0), repr));
+      (compclassmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0), compclassmeta->repr));
 
   int i;
   for(i = 0; i < nslots; i++) {
+    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(compclassmeta->slots)[i];
     PADNAME *slotname = snames[i + 1];
+
     if(!slotname
 #if HAVE_PERL_VERSION(5, 22, 0)
       /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
@@ -1926,12 +2031,12 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
       )
         continue;
 
-    const char *pv = PadnamePV(slotname);
-    SLOTOFFSET slotix = offset + i;
+    const char *pv = SvPVX(slotmeta->name);
+    SLOTOFFSET slotix = slotmeta->slotix;
     PADOFFSET padix = pv ? pad_findmy_pv(pv, 0) : 0;
 
     U8 private = 0;
-    switch(PadnamePV(slotname)[0]) {
+    switch(pv[0]) {
       case '$': private = OPpSLOTPAD_SV; break;
       case '@': private = OPpSLOTPAD_AV; break;
       case '%': private = OPpSLOTPAD_HV; break;
@@ -2136,11 +2241,24 @@ static int dumppackage_class(pTHX_ const SV *sv)
   ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV((SV *)sv));
 
   ret += DMD_ANNOTATE_SV(sv, meta->name, "the Object::Pad class name");
-  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->methodscope, "the Object::Pad temporary method scope");
+  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->stash, "the Object::Pad stash");
+  if(meta->pending_submeta)
+    ret += DMD_ANNOTATE_SV(sv, (SV *)meta->pending_submeta, "the Object::Pad pending submeta AV");
+  if(meta->roles)
+    ret += DMD_ANNOTATE_SV(sv, (SV *)meta->roles, "the Object::Pad roles AV");
 
   I32 i;
   for(i = 0; i < av_count(meta->slots); i++)
     ret += dump_slotmeta(aTHX_ sv, (SlotMeta *)AvARRAY(meta->slots)[i]);
+
+  if(meta->foreign_new)
+    ret += DMD_ANNOTATE_SV(sv, (SV *)meta->foreign_new, "the Object::Pad foreign superclass constructor CV");
+
+  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->initslots, "the Object::Pad initslots CV");
+
+  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->buildblocks, "the Object::Pad BUILD blocks AV");
+
+  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->methodscope, "the Object::Pad temporary method scope");
 
   return ret;
 }
@@ -2237,9 +2355,10 @@ roles(self)
 
     /* TODO Consider recursion */
     U32 i;
-    for(i = 0; i < av_count(meta->implements); i++) {
+    RoleEmbedding **arr = (RoleEmbedding **)AvARRAY(meta->roles);
+    for(i = 0; i < av_count(meta->roles); i++) {
       SV *sv = sv_newmortal();
-      sv_setref_uv(sv, "Object::Pad::MOP::Class", PTR2UV(AvARRAY(meta->implements)[i]));
+      sv_setref_uv(sv, "Object::Pad::MOP::Class", PTR2UV(arr[i]->rolemeta));
       XPUSHs(sv);
       count++;
     }
@@ -2427,10 +2546,7 @@ value(self, obj)
     if(!stashname || !sv_derived_from(obj, stashname))
       croak("Cannot fetch slot value from a non-derived instance");
 
-    U8 repr = meta->class->repr;
-    if(repr == REPR_AUTOSELECT && !meta->class->foreign_new)
-      repr = REPR_NATIVE;
-    AV *slotsav = (AV *)get_obj_slotsav(obj, repr, true);
+    AV *slotsav = (AV *)get_obj_slotsav(obj, meta->class->repr, true);
 
     if(meta->slotix > av_top_index(slotsav))
       croak("ARGH: instance does not have a slot at index %ld", (long int)meta->slotix);
