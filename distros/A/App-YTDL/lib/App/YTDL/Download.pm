@@ -147,7 +147,8 @@ sub download {
                     my @cmd = @{$set->{youtube_dl}};
                     if ( $qty eq 'manually' ) {
                         if ( ! $fmt_str ) {
-                            my $title = "\n" . $count_of_total . ' "' . $data->{$ex}{$up}{$id}{title} . '"';
+                            ( my $duration = $data->{$ex}{$up}{$id}{duration} ) =~ s/^[^1-9]+//;
+                            my $title = "\n" . $count_of_total . ' "' . $data->{$ex}{$up}{$id}{title} . '" (' . $duration . ')';
                             @fmt_data = _choose_fmts( $data, $ex, $up, $id, $title );
                             if ( ! @fmt_data ) {
                                 $download_cmds{$ex}{$up}{$id} = [ sprintf "[%s] %s\n%s\nSkipped: user request\n", $ex, $id, $data->{$ex}{$up}{$id}{title} ];

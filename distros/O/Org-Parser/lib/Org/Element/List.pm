@@ -1,7 +1,7 @@
 package Org::Element::List;
 
-our $DATE = '2020-09-11'; # DATE
-our $VERSION = '0.552'; # VERSION
+our $DATE = '2020-09-17'; # DATE
+our $VERSION = '0.553'; # VERSION
 
 use 5.010;
 use locale;
@@ -36,7 +36,7 @@ Org::Element::List - Represent Org list
 
 =head1 VERSION
 
-This document describes version 0.552 of Org::Element::List (from Perl distribution Org-Parser), released on 2020-09-11.
+This document describes version 0.553 of Org::Element::List (from Perl distribution Org-Parser), released on 2020-09-17.
 
 =head1 DESCRIPTION
 

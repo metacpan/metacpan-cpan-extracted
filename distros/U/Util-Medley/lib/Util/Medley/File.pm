@@ -1,5 +1,5 @@
 package Util::Medley::File;
-$Util::Medley::File::VERSION = '0.041';
+$Util::Medley::File::VERSION = '0.043';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -24,7 +24,7 @@ Util::Medley::File - utility file methods
 
 =head1 VERSION
 
-version 0.041
+version 0.043
 
 =cut
 

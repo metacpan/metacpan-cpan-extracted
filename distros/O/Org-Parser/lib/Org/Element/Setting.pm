@@ -1,9 +1,9 @@
 package Org::Element::Setting;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-11'; # DATE
+our $DATE = '2020-09-17'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.552'; # VERSION
+our $VERSION = '0.553'; # VERSION
 
 use 5.010001;
 use locale;
@@ -196,7 +196,7 @@ Org::Element::Setting - Represent Org in-buffer settings
 
 =head1 VERSION
 
-This document describes version 0.552 of Org::Element::Setting (from Perl distribution Org-Parser), released on 2020-09-11.
+This document describes version 0.553 of Org::Element::Setting (from Perl distribution Org-Parser), released on 2020-09-17.
 
 =head1 DESCRIPTION
 

@@ -1,21 +1,19 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Menu;
+use v5.26;
+use Object::Pad 0.25;
 
-use strict;
-use warnings;
-use feature qw( switch );
+package Tickit::Widget::Menu 0.12;
+class Tickit::Widget::Menu
+# Much of this code actually lives in a class called T:W:Menu::base, which is
+# the base class used by T:W:Menu and T:W:MenuBar
+   extends Tickit::Widget::Menu::base;
 
 use Tickit::Window 0.49; # hierarchy changes are asynchronous
 
-our $VERSION = '0.11';
-
-# Much of this code actually lives in a class called T:W:Menu::base, which is
-# the base class used by T:W:Menu and T:W:MenuBar
-use base qw( Tickit::Widget::Menu::base );
 use Tickit::Widget::Menu::Item;
 use Tickit::Style;
 
@@ -31,23 +29,23 @@ C<Tickit::Widget::Menu> - display a menu of choices
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::Menu;
+   use Tickit;
+   use Tickit::Widget::Menu;
 
- my $tickit = Tickit->new;
+   my $tickit = Tickit->new;
 
- my $menu = Tickit::Widget::Menu->new(
-    items => [
-       Tickit::Widget::Menu::Item->new(
-          name => "Exit",
-          on_activate => sub { $tickit->stop }
-       ),
-    ],
- );
+   my $menu = Tickit::Widget::Menu->new(
+      items => [
+         Tickit::Widget::Menu::Item->new(
+            name => "Exit",
+            on_activate => sub { $tickit->stop }
+         ),
+      ],
+   );
 
- $menu->popup( $tickit->rootwin, 5, 5 );
+   $menu->popup( $tickit->rootwin, 5, 5 );
 
- $tickit->run;
+   $tickit->run;
 
 =head1 DESCRIPTION
 
@@ -113,7 +111,9 @@ use constant WIDGET_PEN_FROM_STYLE => 1;
 
 =head1 CONSTRUCTOR
 
-=head2 $menu = Tickit::Widget::Menu->new( %args )
+=head2 new
+
+   $menu = Tickit::Widget::Menu->new( %args )
 
 Constructs a new C<Tickit::Widget::Menu> object.
 
@@ -134,7 +134,9 @@ to the C<push_item> method after construction.
 
 =back
 
-=head2 $separator = Tickit::Window::Menu->separator
+=head2 separator
+
+   $separator = Tickit::Window::Menu->separator
 
 Returns a special menu item which draws a separation line between its
 neighbours.
@@ -145,27 +147,31 @@ neighbours.
 
 =cut
 
-sub lines
+method lines ()
 {
-   my $self = shift;
    return 2 + $self->items;
 }
 
-sub cols
+method cols ()
 {
-   my $self = shift;
    return 4 + max( map { $self->_itemwidth( $_ ) } 0 .. $self->items-1 );
 }
 
-=head2 $name = $menu->name
+=head2 name
+
+   $name = $menu->name
 
 Returns the string name for the menu.
 
-=head2 @items = $menu->items
+=head2 items
+
+   @items = $menu->items
 
 Returns the list of items currently stored.
 
-=head2 $menu->push_item( $item )
+=head2 push_item
+
+   $menu->push_item( $item )
 
 Adds another item.
 
@@ -175,7 +181,9 @@ submenu), or the special separator value.
 
 =cut
 
-=head2 $menu->highlight_item( $idx )
+=head2 highlight_item
+
+   $menu->highlight_item( $idx )
 
 Gives the selection highlight to the item at the given index. This may be
 called before the menu is actually displayed in order to pre-select the
@@ -183,7 +191,9 @@ highlight initially.
 
 =cut
 
-=head2 $menu->popup( $win, $line, $col )
+=head2 popup
+
+   $menu->popup( $win, $line, $col )
 
 Makes the menu appear at the given position relative to the given window. Note
 that as C<< $win->make_popup >> is called, the menu is always displayed in a
@@ -192,33 +202,30 @@ the origin for the given line and column position.
 
 =cut
 
-sub popup
+method popup ( $parentwin, $line, $col )
 {
-   my $self = shift;
-   my ( $parentwin, $line, $col ) = @_;
-
    my $win = $parentwin->make_popup( $line, $col, $self->lines, $self->cols );
    $self->set_window( $win );
    $win->show;
 }
 
-=head2 $menu->dismiss
+=head2 dismiss
+
+   $menu->dismiss
 
 Hides a menu previously displayed using C<popup>.
 
 =cut
 
-sub set_supermenu
+has $_supermenu;
+
+method set_supermenu ( $supermenu )
 {
-   my $self = shift;
-   ( $self->{supermenu} ) = @_;
+   $_supermenu = $supermenu;
 }
 
-sub pos2item
+method pos2item ( $line, $col )
 {
-   my $self = shift;
-   my ( $line, $col ) = @_;
-
    $line > 0 or return ();
    $line--;
 
@@ -232,21 +239,16 @@ sub pos2item
    return ( $items[$line], $line, $col );
 }
 
-sub redraw_item
+method redraw_item ( $idx )
 {
-   my $self = shift;
-   my ( $idx ) = @_;
    $self->window->expose( Tickit::Rect->new(
       top => $idx + 1, lines => 1,
       left => 0, cols => $self->window->cols,
    ) );
 }
 
-sub render_to_rb
+method render_to_rb ( $rb, $rect )
 {
-   my $self = shift;
-   my ( $rb, $rect ) = @_;
-
    my $lines = $self->window->lines;
    my $cols  = $self->window->cols;
 
@@ -257,7 +259,7 @@ sub render_to_rb
 
    foreach my $line ( $rect->linerange( 1, $lines-2 ) ) {
       my $idx = $line - 1;
-      my $item = $self->{items}[$idx];
+      my $item = $self->item( $idx );
 
       if( $item == separator ) {
          $rb->hline_at( $line, 0, $cols-1, LINE_SINGLE );
@@ -271,7 +273,7 @@ sub render_to_rb
             $rb->erase_at( $line, $cols-2, 1 );
          }
 
-         my $pen = defined $self->{active_idx} && $idx == $self->{active_idx}
+         my $pen = defined $self->_active_idx && $idx == $self->_active_idx
                      ? $self->get_style_pen( "highlight" ) : undef;
 
          $rb->savepen;
@@ -286,29 +288,30 @@ sub render_to_rb
    }
 }
 
-sub popup_item
+method popup_item ( $idx )
 {
-   my $self = shift;
-   my ( $idx ) = @_;
-
-   my $item = $self->{items}[$idx];
+   my $item = $self->item( $idx );
 
    $item->popup( $self->window, $idx + 1, $self->window->cols );
 }
 
-sub activated
-{
-   my $self = shift;
-   $self->dismiss;
+has $_on_activated;
 
-   $self->{supermenu}->activated if $self->{supermenu};
-   $self->{on_activated}->() if $self->{on_activated};
+method set_on_activated ( $on_activated )
+{
+   $_on_activated = $on_activated;
 }
 
-sub dismiss
+method activated ()
 {
-   my $self = shift;
+   $self->dismiss;
 
+   $_supermenu->activated if $_supermenu;
+   $_on_activated->() if $_on_activated;
+}
+
+method dismiss ()
+{
    if( $self->window ) {
       $self->window->hide;
       $self->set_window( undef );
@@ -317,19 +320,14 @@ sub dismiss
    $self->SUPER::dismiss;
 }
 
-sub on_key
+method on_key ( $ )
 {
-   my $self = shift;
-
    # Eat keys if there's no supermenu to pass them to
-   return !$self->{supermenu};
+   return !$_supermenu;
 }
 
-sub on_mouse_item
+method on_mouse_item ( $args, $item, $item_idx, $item_col )
 {
-   my $self = shift;
-   my ( $args, $item, $item_idx, $item_col ) = @_;
-
    # Separators do not react to mouse
    return 1 if $item == separator;
 
@@ -338,7 +336,7 @@ sub on_mouse_item
       $self->expand_item( $item_idx );
    }
    elsif( $event eq "release" ) {
-      if( defined $self->{active_idx} and $self->{active_idx} == $item_idx ) {
+      if( defined $self->_active_idx and $self->_active_idx == $item_idx ) {
          $self->activate_item( $item_idx );
       }
    }

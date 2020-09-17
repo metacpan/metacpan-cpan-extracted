@@ -6146,7 +6146,7 @@ initial_value(seq, low, high=0)
 #ifndef AT_LEAST_DB_4_3
 	    softCrash("$seq->initial_value needs Berkeley DB 4.3.x or better") ;
 #else
-        RETVAL = seq->seq->initial_value(seq->seq, (db_seq_t)(high << 32 + low));
+        RETVAL = seq->seq->initial_value(seq->seq, (db_seq_t)(((I64TYPE)high << 32) + low));
 #endif
     OUTPUT:
         RETVAL

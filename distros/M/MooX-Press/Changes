@@ -6,6 +6,21 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.070	2020-09-17
+
+ [ Bug Fixes ]
+ - Generator packages if called with leading :: should strip it before
+   continuing.
+
+0.069	2020-09-17
+
+ [ Documentation ]
+ - Documentation of scoping in Zydeco::Lite.
+
+ [ Other ]
+ - Allow many keywords to appear outside an app in Zydeco::Lite.
+ - MooX::Press->patch_package now supports `extends`.
+
 0.068	2020-09-16
 
  [ Bug Fixes ]

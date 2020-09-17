@@ -1,0 +1,48 @@
+{
+  "levels": {
+    "1": {
+      "goal": 42,
+      "someshit": [ 0, 1, 2 ]
+    },
+    "2": {
+      "someshit": [ 0, 1, 2 ]
+    },
+    "3": {
+      "goal": { "test": 23 },
+      "someshit": [ 0, 1, 2 ]
+    }
+  },
+  "test_arr": [
+    {
+      "goal": 42,
+      "asdf": 111
+    },
+    {
+      "agasdfg": "asdd"
+    },
+    {
+      "goal": "fgd"
+    }
+  ],
+  "levels_long": {
+    "1": {
+      "nesty": {
+        "goal": 42,
+        "someshit": [ 0, 1, 2 ]
+      }
+    },
+    "2": {
+      "nesty": {
+        "someshit": [ 0, 1, 2 ]
+      }
+    },
+    "3": {
+      "nesty": {
+        "goal": {
+          "test": 23
+        },
+        "someshit": [ 0, 1, 2 ]
+      }
+    }
+  }
+}

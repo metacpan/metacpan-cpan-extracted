@@ -10,7 +10,7 @@ my %DOM_SEL = (
   ':desc'      => ['meta[property="og:description"]', 'meta[name="twitter:description"]', 'meta[name="description"]'],
   ':image'     => ['meta[property="og:image"]',       'meta[property="og:image:url"]',    'meta[name="twitter:image"]'],
   ':site_name' => ['meta[property="og:site_name"]',   'meta[property="twitter:site"]'],
-  ':title'     => ['meta[property="og:title"]',       'meta[name="twitter:title"]',       'title'],
+  ':title' => ['meta[property="og:title"]', 'meta[name="twitter:title"]', 'title'],
 );
 
 my @JSON_ATTRS = (
@@ -33,15 +33,15 @@ has provider_name => sub {
   return $name =~ /([^\.]+)\.(\w+)$/ ? ucfirst $1 : $name;
 };
 
-has provider_url => sub { $_[0]->url->host ? $_[0]->url->clone->path('/') : undef };
-has template     => sub { [__PACKAGE__, sprintf '%s.html.ep', $_[0]->type] };
+has provider_url     => sub { $_[0]->url->host ? $_[0]->url->clone->path('/') : undef };
+has template         => sub { [__PACKAGE__, sprintf '%s.html.ep', $_[0]->type] };
 has thumbnail_height => undef;
 has thumbnail_url    => undef;
 has thumbnail_width  => undef;
 has title            => undef;
 has type             => 'link';
-has ua               => undef;                                                # Mojo::UserAgent object
-has url              => sub { Mojo::URL->new };                               # Mojo::URL
+has ua               => undef;                                                             # Mojo::UserAgent object
+has url              => sub { Mojo::URL->new };                                            # Mojo::URL
 has version          => '1.0';
 has width            => sub { $_[0]->type =~ /^photo|video$/ ? 0 : undef };
 
@@ -338,7 +338,8 @@ __DATA__
 </div>
 @@ photo.html.ep
 <div class="le-<%= $l->type %> le-provider-<%= lc $l->provider_name %>">
-  <img src="<%= $l->url %>" alt="<%= $l->title %>">
+  % my $thumbnail_url = $l->thumbnail_url || $l->url;
+  <img src="<%= $thumbnail_url %>" alt="<%= $l->title %>">
 </div>
 @@ rich.html.ep
 % if ($l->title) {

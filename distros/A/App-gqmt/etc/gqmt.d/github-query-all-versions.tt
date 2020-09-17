@@ -1,9 +1,9 @@
 query { repository(name: "[% repo %]", owner: "[% user %]") {
-  packages(first: [% num %] names: ["[% pkg %]"]) {
+  packages(first: [% pkg_num %] names: ["[% pkg_name %]"]) {
       nodes {
         id
         name
-        versions(last: [% num %][% cursor %]) {
+        versions(last: [% vers_num %][% cursor %]) {
           nodes {
             id
             version

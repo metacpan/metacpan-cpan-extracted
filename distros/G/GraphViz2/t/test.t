@@ -37,7 +37,8 @@ for my $key (sort keys %script)
 	@stderr				= grep{! /Insecure (?:\$ENV\{PATH}|dependency)/} split(/\n/, $stderr);
 	$stderr				= '' if ($#stderr < 0);
 
-	ok(length($stderr) == 0, "$script{$key} runs without error");
+	ok(length($stderr) == 0, "$script{$key} runs without error")
+            or diag $stderr;
 }
 
 done_testing($count);

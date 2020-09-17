@@ -8,4 +8,6 @@ lib/Net/Z3950/PQF/Node.pm
 t/1-node.t
 t/2-parser.t
 t/3-simpleserver.t
-META.yml                                 Module meta-data (added by MakeMaker)
+t/4-classnamemap.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

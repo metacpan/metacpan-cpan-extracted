@@ -1,6 +1,14 @@
-$Id: Changes,v 1.10 2007/10/05 12:13:23 mike Exp $
-
 Revision history for Perl extension Net::Z3950::PQF.
+
+1.0  Wed Sep 16 23:33:28 BST 2020
+	- Debian packaging: use "make debian" to create new
+	  "debian/output" directory containing .deb package file,
+	  changes file, etc.
+	- Add facility to emit a parse-tree using non-standard classes
+	  by passing a classname-map into the parser constructor.
+	- Fix typo in class-name generated for
+	  SimplerServer-compatible node trees: AndNot for AndNote.
+	- Switch version-control from CVS to git.
 
 0.04  Fri Oct  5 13:13:20 BST 2007
 	- Add new toSimpleServer() method to Net::Z3950::PQF::Node,

@@ -1,9 +1,46 @@
 ==================================================
-Changes from 2018-06-09 00:00:00 +0000 to present.
+Changes from 2018-09-17 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 7.7 at 2020-06-08 15:37:15 +0000
+version 7.8 at 2020-09-16 18:12:43 +0000
+----------------------------------------
+
+  Change: 7dbb50ff27914898417120f617def09279f8adc0
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-09-16 11:12:23 +0000
+
+    Better handling of percentages
+
+    For `--top` queries, be consistent about handling of the number of decimal
+    places. Default to showing 3 digits to the right of the decimal, but allow
+    a user to override it with `--precision`.
+
+    Show the percentages in the summary when using `--days` greater than 1.
+
+    Update the documentation. 
+
+  Change: e55ca5e32f64bc10c1def43c4766b93fe1430679
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-09-04 13:00:37 +0000
+
+    Add percentages to es-search.pl aggs
+
+    Whenever an aggregation is used, output the percentage from 0-1 with the
+    doc count. Additionally, in sub aggs, calculate the percentage of the
+    parent bucket. 
+
+  Change: 27a31a79da70aef08ec04586b9496160f2127007
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-06-08 09:52:42 +0000
+
+    Remove the HOME paths from the lookup
+
+    In the previous release, I added a check for the HOME environment variable,
+    but I neglected to remove the originals from the search path. 
+
+----------------------------------------
+version 7.7 at 2020-06-08 15:34:40 +0000
 ----------------------------------------
 
   Change: 5cbe34afdc85b490d2938aa9e37a39f9b34ae6d6
@@ -694,244 +731,6 @@ version 6.1 at 2018-09-18 03:10:27 +0000
 
     Update to using GitHub::Meta and rearrange Pod::Weaver configs 
 
-----------------------------------------
-version 6.0 at 2018-07-28 00:45:25 +0000
-----------------------------------------
-
-  Change: e58dcf2f190a1db3e1e10f8799b67c7f9a8abcc4
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-27 17:45:25 +0000
-
-    Fix a bug in conditional checks for index age when no date is found in the
-    index name 
-
-  Change: f6e05fcf90fa575f5e5b5ccafb0bf94667ef9bd5
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-23 14:31:41 +0000
-
-    New es_local_index_meta() function to allow looking up the timestamp field
-    in es-search.pl much easier and more straight-forward. 
-
-----------------------------------------
-version 5.9 at 2018-07-21 01:10:38 +0000
-----------------------------------------
-
-  Change: 9b00c64735a21b74223fddcde44fff74772efd17
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-20 18:10:38 +0000
-
-    Bumping Release to 5.9 
-
-  Change: 415c84da87571aa488a0f246d423e24fbf446e00
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-18 17:58:55 +0000
-
-    Fix another uninitialized error in the code 
-
-----------------------------------------
-version 5.8 at 2018-07-16 19:14:45 +0000
-----------------------------------------
-
-  Change: 3f276cdc5e5b8a1fc6215275b8b3c24e3d8ef066
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-16 12:14:45 +0000
-
-    Docs update for 5.8 release 
-
-  Change: 12336ccb1ee03eaa294af46a1340af3cbb47f4c1
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-16 11:45:58 +0000
-
-    Fix a warning and improve output
-
-    * Fix a "use of uninitialized" warning for when an index is missing a
-
-    date string but matches the base pattern * Fix logic bug that meant
-    '--delete --delete-days 1' was a noop because
-
-    of using '<' instead of '<=' 
-
-  Change: e3b0899af37835e7e9d372788c31339cc3cf8f01
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-16 11:43:38 +0000
-
-    Bubble up errors so we know why we failed 
-
-  Change: 9a07d69d5a7571d58951682c3d190083cf0a84df
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-16 11:25:16 +0000
-
-    Show shards breakdown by primary and replica 
-
-----------------------------------------
-version 5.7 at 2018-07-06 05:34:05 +0000
-----------------------------------------
-
-  Change: e90729b13bb4fc45d68e9711ac139c8f8ab1dad8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-05 22:34:05 +0000
-
-    Documentation Updates for 5.7 release 
-
-  Change: 7498a4ccea72cd4cc8860316bf3aa175e278c158
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-05 22:23:55 +0000
-
-    Add support for statistical aggregations via --with 
-
-  Change: 8a86345e449b355257358de7f81414d278442a38
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-05 22:05:43 +0000
-
-    Fix joins when using "NOT" for negations 
-
-  Change: 4e103a8feb362f9b5722736c3fdda66d9f36819a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-05 20:20:40 +0000
-
-    Fixup broken query strings without joining keywords
-
-    This addresses the most used case where a query_string is missing the
-    keyword 'AND' in the token joining. This also makes it easier to produce
-    longer queries with less thinking. 
-
-  Change: 1b43ea3120ae6ff51bc9f0d7c04e46f05499e7bb
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-02 23:13:54 +0000
-
-    Fix documentation for the ::Ranges plugin 
-
-  Change: c7cb7c238a01c235823161c7d4455afe00665870
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-02 22:58:21 +0000
-
-    Add a --filter option to es-search.pl
-
-    Make use of the newly exposed 'filter' context from ::QueryString and add
-    positive matches as either 'must' (query context) or 'filter' (filter
-    context). 
-
-  Change: 498af1d1759cf2788a06526a847d331e81e028d6
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-02 22:55:00 +0000
-
-    Allow toggling the context between 'query' and 'filter'
-
-    By overriding the ::QueryString context, it's possible to toggle between
-    collecting the positive matches as 'filter' elements instead of 'must'.
-    This allows the use of unscored queries which may improve performance for
-    some queries dramatically. 
-
-  Change: 601bb7eea49cc3a8dbe0c9579c6a0b94e5675824
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-02 22:53:07 +0000
-
-    Early return for ::QueryString:: plugins
-
-    Both the ::Nested and ::Ranges plugins would emit uninitialized warnings
-    when run due to forgetting to check if the token matched the plugin. 
-
-  Change: 67342d859955cc6f4ca4b6a75363beb08f7af1d8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-02 21:41:22 +0000
-
-    Fix parameter specification in the library too 
-
-  Change: 1039688ce0316e52f73f3ff57ec7b2ddedf0636b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-02 21:36:26 +0000
-
-    Fix the parameter specifications and remove unsupported script 
-
-  Change: 60aaa2dc1ea4ad19f0d5837a3620e9f98029196e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-02 21:21:54 +0000
-
-    Add ::QueryString::Ranges
-
-    Translates queries with field:<,<=,>,>-= to equivalent range queries 
-
-  Change: ca4e73f856bd9f48818e3fd2a7b959998dee8047
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-02 08:58:05 +0000
-
-    Fix --base in es-search.pl, make --index less policey.
-
-    * --base was broken as es-search.pl is looking for open indices.
-
-    Prepend the wildcard to the '/_stats/docs' request. * Don't validate the
-    --index parameter, instead pass it through. This
-
-    gives the user the power to create their own index strings 
-
-  Change: a880e6ff664b99e64da8d18589f66bc51f1e089c
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-07-02 08:58:05 +0000
-
-    Replace es-storage-data.pl with es-storage-overview.pl 
-
-  Change: 7bb0c293fd3f433183002c75be6a7e0e6e0f53fc
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-06-18 20:49:18 +0000
-
-    Remove size parameter if set to zero.
-
-    For statistical aggregations, the size parameter is invalid. This is a
-    shortcut to remove the parameter from the sub aggregation. 
-
-  Change: 1e6372612b5e86627f6df2703c8a49e344bd129d
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-06-08 16:13:52 +0000
-
-    Fix failing tests 
-
-  Change: 3053cd3ee7c1f30138f5fe2f51b6e77dc6639bba
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-10 21:40:51 +0000
-
-    Make the fast things fast
-
-    * Reorder the --bases for es-search.pl to skip index meta checks. * Use
-    es_indices(check_date => 0) instead of _all => 1 to skip closed
-
-    indices. * Make es_index_bases() simpler, i.e.:
-
-    Old behavior:
-
-    (a, a-b, a-b-c, b-c, c) = es_index_bases('a-b-c');
-
-    New behavior:
-
-    (a, a-b, a-b-c) = es_index_bases('a-b-c');
-
-    * Use _stats/docs to resolve all index names as indexes without explicit
-
-    aliases don't show up in all versions of ElasticSearch. 
-
-  Change: ce08b1c0cc3c9432780612d13dd1214dc60be04e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-10 21:06:34 +0000
-
-    New script: es-storage-overview.pl
-
-    Implements the simplest possible overview of storage. Does not provide node
-    or index data, but gives a high level overview. 
-
-  Change: 3837060be0e0145b2e23987da6fab11af9d54a4e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-10 20:29:24 +0000
-
-    es-search.pl - more concise output
-
-    When we encounter a record that is an array, but is holding only 1 item,
-    derefernce and extract the single value. 
-
-  Change: b2473b3b412444a8148dfd96b0a07eb0dc466054
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-04-30 19:57:37 +0000
-
-    Made es_request() errors fatal and sped up index lookup 
-
 =================================================
-Plus 63 releases after 2018-06-09 00:00:00 +0000.
+Plus 67 releases after 2018-09-17 00:00:00 +0000.
 =================================================

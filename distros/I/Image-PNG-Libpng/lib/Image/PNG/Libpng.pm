@@ -91,6 +91,7 @@ get_internals
 copy_png
 image_data_diff
 png_compare
+split_alpha
 /;
 
 our %EXPORT_TAGS = (
@@ -98,7 +99,7 @@ our %EXPORT_TAGS = (
 );
 
 require XSLoader;
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 XSLoader::load('Image::PNG::Libpng', $VERSION);
 

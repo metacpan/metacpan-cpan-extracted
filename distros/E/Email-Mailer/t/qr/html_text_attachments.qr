@@ -1,47 +1,31 @@
-Content-Transfer-Encoding: 7bit
-Content-Type: multipart/mixed; boundary=[^\n]+
-From: from@example.com
-Subject: Test Email
-To: to@example.com
-Date: [^\n]+
-MIME-Version: 1\.0
+(?:[\w\-]+:[ ]*[^\n]+\n)+
+
 
 
 --\S+
-Date: [^\n]+
-MIME-Version: 1\.0
-Content-Type: multipart/alternative; boundary=[^\n]+
-Content-Transfer-Encoding: 7bit
+(?:[\w\-]+:[ ]*[^\n]+\n)+
+
 
 
 --\S+
-Date: [^\n]+
-MIME-Version: 1\.0
-Content-Type: text/plain
+(?:[\w\-]+:[ ]*[^\n]+\n)+
 
 This is a simple text-only email\.
 --\S+
-Date: [^\n]+
-MIME-Version: 1\.0
-[^:]+: [^\n]+
-[^:]+: [^\n]+
+(?:[\w\-]+:[ ]*[^\n]+\n)+
 
 <p>This is a generic message for <b>testing purposes only</b>\.</p>=
 
 --\S+
 
 --\S+
-Date: [^\n]+
-MIME-Version: 1\.0
-.*
+(?:[\w\-]+:[ ]*[^\n]+\n)+
 
 GIF89a=01=00=01=00=80=00=00=FF=FF=FF=00=00=00!=F9=04=00=00=00=00=00,=00=00=
 =00=00=01=00=01=00=00=02=02D=01=00;=
 
 --\S+
-Date: [^\n]+
-MIME-Version: 1\.0
-.*
+(?:[\w\-]+:[ ]*[^\n]+\n)+
 
 GIF89a=01=00=01=00=80=00=00=FF=FF=FF=00=00=00!=F9=04=00=00=00=00=00,=00=00=
 =00=00=01=00=01=00=00=02=02D=01=00;=

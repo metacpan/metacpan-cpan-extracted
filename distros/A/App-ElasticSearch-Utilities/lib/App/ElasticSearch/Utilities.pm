@@ -4,15 +4,13 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '7.7'; # VERSION
+our $VERSION = '7.8'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
 our @_CONFIGS = (
     '/etc/es-utils.yaml',
     '/etc/es-utils.yml',
-    "$ENV{HOME}/.es-utils.yaml",
-    "$ENV{HOME}/.es-utils.yml",
 );
 if( $ENV{HOME} ) {
     push @_CONFIGS, map { "$ENV{HOME}/.es-utils.$_" } qw( yaml yml );
@@ -886,7 +884,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 7.7
+version 7.8
 
 =head1 SYNOPSIS
 

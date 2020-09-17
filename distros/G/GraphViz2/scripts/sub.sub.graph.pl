@@ -30,7 +30,7 @@ my($graph) = GraphViz2 -> new
 	(
 	 edge   => {color => 'grey'},
 	 global => {directed => 1},
-	 graph  => {label => 'Adult', rankdir => 'TB'},
+	 graph  => {label => 'sub.sub.graph.pl', rankdir => 'TB'},
 	 logger => $logger,
 	 node   => {shape => 'oval'},
 	);

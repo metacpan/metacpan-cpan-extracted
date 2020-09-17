@@ -6,6 +6,15 @@ use Test::More;
 use Iterator::Records;
 use Data::Dumper;
 
+eval "use DBI;";
+if ($@) {
+   plan skip_all => "DBI is required for database integration; skipping tests";
+} else {
+   eval "use DBD::SQLite;";
+   if ($@) {
+      plan skip_all => "SQLite is used to test database integration; skipping tests";
+   } else {
+
 my $i;
 
 my $dbh = Iterator::Records::db->open(); # open an in-memory SQLite database
@@ -68,4 +77,7 @@ is ($dbh->get ("select bar from test_table where foo=?", 'd'), '2', 'check first
 
 
 done_testing();
+
+   }
+}
 

@@ -8,10 +8,11 @@ lib/LinkEmbedder.pm
 lib/LinkEmbedder/Link.pm
 lib/LinkEmbedder/Link/AppearIn.pm
 lib/LinkEmbedder/Link/Basic.pm
-lib/LinkEmbedder/Link/Fpaste.pm
+lib/LinkEmbedder/Link/Dropbox.pm
 lib/LinkEmbedder/Link/Github.pm
 lib/LinkEmbedder/Link/Google.pm
 lib/LinkEmbedder/Link/Imgur.pm
+lib/LinkEmbedder/Link/Instagram.pm
 lib/LinkEmbedder/Link/Ix.pm
 lib/LinkEmbedder/Link/Metacpan.pm
 lib/LinkEmbedder/Link/NHL.pm
@@ -30,7 +31,8 @@ t/00-basic.t
 t/appearin.t
 t/basic.t
 t/bitbucket.t
-t/fpaste.t
+t/centos-paste.t
+t/dropbox.t
 t/gist.t
 t/github.t
 t/google.t

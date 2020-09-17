@@ -1,5 +1,8 @@
 Revision history for Pg-Explain
 
+1.03    2020/09/17
+        - Fix bug in parsing json/yaml/xml plans that contained Function Scans
+
 1.02    2020/07/27
         - Fix bug with preserving whitespace in anonymized queries
 

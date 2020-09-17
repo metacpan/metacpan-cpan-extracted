@@ -1,3 +1,11 @@
+0.009   2020-09-17  Released-By: PERLANCAR; Urgency: medium
+
+        [ENHANCEMENTS]
+
+        - Support heading mode instead of document mode, where each heading of
+          certain level is regarded as a separate blog post.
+
+
 0.008   2019-12-26  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Rebuild to update Sah coercion rule module names.

@@ -12,7 +12,6 @@ my %WriteMakefileArgs = (
   BUILD_REQUIRES => {}
 ,
   TEST_REQUIRES  => {
-  'Test::Deep' => '1.00',
   'Test::More' => '1.00'
 }
 ,

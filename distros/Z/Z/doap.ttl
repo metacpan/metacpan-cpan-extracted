@@ -1,0 +1,62 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Z/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "indirect"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Path::Tiny 0.101"^^doap-deps:CpanId ], [
+		doap-deps:on "match::simple 0.010"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Syntax::Keyword::Try 0.018"^^doap-deps:CpanId;
+	], [ doap-deps:on "Try::Tiny 0.30"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.008008"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "Zydeco::Lite 0.068"^^doap-deps:CpanId ], [
+		doap-deps:on "Types::Standard 1.010000"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Types::Common::String"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Types::Common::Numeric"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Object::Adhoc 0.003"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Z>;
+	doap:created         "2020-09-16"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Z>;
+	doap:homepage        <https://metacpan.org/release/Z>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Z";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Z/v_0-001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-z>;
+	];
+	doap:shortdesc       "collection of modules for rapid app development".
+
+<http://purl.org/NET/cpan-uri/dist/Z/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Z-0.001"^^xsd:string;
+	dc:issued            "2020-09-16"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Z-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

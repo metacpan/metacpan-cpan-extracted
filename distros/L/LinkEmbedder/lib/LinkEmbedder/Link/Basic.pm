@@ -1,6 +1,7 @@
 package LinkEmbedder::Link::Basic;
 use Mojo::Base 'LinkEmbedder::Link';
 
+use Mojo::JSON;
 use Mojo::Util 'trim';
 
 my $PHOTO_RE = qr!\.(?:jpg|png|gif)\b!i;
@@ -22,6 +23,9 @@ sub _learn_from_dom {
 
   $self->SUPER::_learn_from_dom($dom);
 
+  $tmp = $dom->at('script[type="application/ld+json"]');
+  $self->_learn_from_json_schema($tmp->text) if $tmp;
+
   # Bitbucket hack
   $tmp = $dom->at('div.codehilite');
   if ($tmp) {
@@ -31,6 +35,13 @@ sub _learn_from_dom {
 
   # Mojopaste, Perlbot and other pages with <pre> tags
   $tmp = $dom->at('pre#paste') || $dom->at('pre.paste') || $dom->at('body > pre') || $dom->at('body > div > pre');
+  if ($tmp and !@{$tmp->children}) {
+    $self->{paste} = $tmp->text;
+    $self->template->[1] = 'paste.html.ep';
+  }
+
+  # centos paste
+  $tmp = $dom->at('textarea#code');
   if ($tmp and !@{$tmp->children}) {
     $self->{paste} = $tmp->text;
     $self->template->[1] = 'paste.html.ep';
@@ -49,6 +60,17 @@ sub _learn_from_dom {
   }
 
   return $self;
+}
+
+sub _learn_from_json_schema {
+  my ($self, $json) = @_;
+  eval { $json = Mojo::JSON::from_json($json) } unless ref $json eq 'HASH';
+  return                                        unless ref $json eq 'HASH';
+
+  my $author = ref $json->{author} eq 'ARRAY' ? $json->{author}[0] : $json->{author};
+  $self->author_name($author->{name})      if ref $author eq 'HASH' and $author->{name};
+  $self->description($json->{description}) if $json->{description};
+  $self->title($json->{headline})          if $json->{headline};
 }
 
 1;

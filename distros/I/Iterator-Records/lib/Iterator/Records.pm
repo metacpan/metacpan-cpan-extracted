@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 use Iterator::Simple;
-use Data::Dumper;
+#use Data::Dumper;
 
 =head1 NAME
 
@@ -13,11 +13,11 @@ Iterator::Records - a simple iterator for arrayref record sources
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -666,11 +666,20 @@ sub table_lparms {
 }
 
 package Iterator::Records::db;
-use DBI;
 use Iterator::Simple;
 use Carp;
-use vars qw(@ISA);
-@ISA = qw(DBI::db);
+
+our $dbi_ok = 1;
+our $sqlite_ok = 0;
+eval "use DBI;";
+$dbi_ok = 0 if $@;
+if ($dbi_ok) {
+   use vars qw(@ISA);
+   @ISA = qw(DBI::db);
+   
+   eval "use DBD::SQLite;";
+   $sqlite_ok = 1 unless $@;
+}
 
 =head2 open ([filename])
 
@@ -679,6 +688,8 @@ The C<open> method opens an SQLite database file. Opens an in-memory file if no 
 =cut
 
 sub open {
+    croak "DBI is not installed" unless $dbi_ok;
+    croak "SQLite is not installed" unless $sqlite_ok;
     my $class = shift;
     my $file = shift || ':memory:';
     my $dbh = DBI->connect('dbi:SQLite:dbname=' . $file);
@@ -687,6 +698,7 @@ sub open {
 }
 
 sub open_dbh {
+   croak "DBI is not installed" unless $dbi_ok;
    my $class = shift;
    my $dbh = shift;
    bless ($dbh, $class);

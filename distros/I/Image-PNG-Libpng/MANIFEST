@@ -16,7 +16,6 @@ Libpng.xs
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-memory-test.pl
 my-xs.h
 perl-libpng.c
 README
@@ -217,6 +216,9 @@ t/saru-fs8.png
 t/sBIT.t
 t/sCAL.t
 t/set-text.t
+t/split-alpha.t
+t/split-alpha/basi4a08-alpha.bin
+t/split-alpha/basi4a08-data.bin
 t/sPLT.t
 t/supports.t
 t/tantei-san.png
@@ -225,6 +227,5 @@ t/tIME.t
 t/tRNS.t
 t/user-limits.t
 typemap
-unt/unknown-chunk.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -7,6 +7,20 @@ Home page:    <https://metacpan.org/release/Zydeco>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.608	2020-09-17
+
+ - Fix parsing whitespace around lists of parameterized role parameters.
+
+0.607	2020-09-17
+
+ - Make even more use of MooX::Press::make_absolute_package_name().
+
+0.606	2020-09-15
+
+ [ Bug Fixes ]
+ - Fixes for parsing `extends` and `with` outside of `class`/`role` blocks.
+   <https://github.com/tobyink/p5-zydeco/issues/5>
+
 0.605	2020-09-15
 
  - Make use of MooX::Press::make_absolute_package_name().

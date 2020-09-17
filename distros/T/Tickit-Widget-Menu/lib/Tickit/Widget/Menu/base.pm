@@ -1,17 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Menu::base;
+use v5.26;
+use Object::Pad 0.25;
 
-use strict;
-use warnings;
-use feature qw( switch );
-
-use base qw( Tickit::Widget Tickit::Widget::Menu::itembase );
-
-our $VERSION = '0.11';
+package Tickit::Widget::Menu::base 0.12;
+class Tickit::Widget::Menu::base
+   extends Tickit::Widget
+   implements Tickit::Widget::Menu::itembase;
 
 use Carp;
 
@@ -19,82 +17,73 @@ use Tickit::Utils qw( textwidth );
 
 use constant separator => [];
 
-sub new
+#   foreach my $method (qw( pos2item on_mouse_item redraw_item popup_item activated )) {
+#      $class->can( $method ) or 
+#         croak "$class cannot ->$method - do you subclass and implement it?";
+#   }
+
+has @_items;
+has @_itemwidths;
+
+has $_active_idx; # index of keyboard-selected highlight
+
+BUILD ( %args )
 {
-   my $class = shift;
-   my %args = @_;
-
-   foreach my $method (qw( pos2item on_mouse_item redraw_item popup_item activated )) {
-      $class->can( $method ) or 
-         croak "$class cannot ->$method - do you subclass and implement it?";
-   }
-   my $self = $class->SUPER::new( %args );
-   $self->_init_itembase( %args );
-
-   $self->{items} = [];
-   $self->{itemwidths} = [];
-
-   $self->{active_idx} = undef; # index of keyboard-selected highlight
-
    if( $args{items} ) {
       $self->push_item( $_ ) for @{ $args{items} };
    }
-
-   return $self;
 }
 
-sub items
+method _active_idx ()
 {
-   my $self = shift;
-   return @{ $self->{items} };
+   return $_active_idx;
 }
 
-sub _itemwidth
+method items ()
 {
-   my $self = shift;
-   my ( $idx ) = @_;
-   return $self->{itemwidths}[$idx];
+   return @_items;
 }
 
-sub push_item
+method item ( $idx )
 {
-   my $self = shift;
-   my ( $item ) = @_;
-
-   push @{ $self->{items} }, $item;
-   push @{ $self->{itemwidths} }, $item == separator ? 0 : textwidth $item->name;
+   return $_items[$idx];
 }
 
-sub highlight_item
+method _itemwidth ( $idx )
 {
-   my $self = shift;
-   my ( $idx ) = @_;
+   return $_itemwidths[$idx];
+}
 
-   return if defined $self->{active_idx} and $idx == $self->{active_idx};
+method push_item ( $item )
+{
+   push @_items, $item;
+   push @_itemwidths, $item == separator ? 0 : textwidth $item->name;
+}
+
+method highlight_item ( $idx )
+{
+   return if defined $_active_idx and $idx == $_active_idx;
 
    my $have_window = defined $self->window;
 
-   if( defined( my $old_idx = $self->{active_idx} ) ) {
-      undef $self->{active_idx};
-      my $old_item = $self->{items}[$old_idx];
+   if( defined( my $old_idx = $_active_idx ) ) {
+      undef $_active_idx;
+      my $old_item = $_items[$old_idx];
       if( $old_item->isa( "Tickit::Widget::Menu" ) ) {
          $old_item->dismiss;
       }
       $self->redraw_item( $old_idx ) if $have_window;
    }
 
-   $self->{active_idx} = $idx;
+   $_active_idx = $idx;
    $self->redraw_item( $idx ) if $have_window;
 }
 
-sub expand_item
+method expand_item ( $idx )
 {
-   my $self = shift;
-   my ( $idx ) = @_;
-
    $self->highlight_item( $idx );
 
-   my $item = $self->{items}[$idx];
+   my $item = $_items[$idx];
    if( $item->isa( "Tickit::Widget::Menu" ) ) {
       $self->popup_item( $idx );
       $item->set_supermenu( $self );
@@ -102,12 +91,9 @@ sub expand_item
    # else don't bother expanding non-menus
 }
 
-sub activate_item
+method activate_item ( $idx )
 {
-   my $self = shift;
-   my ( $idx ) = @_;
-
-   my $item = $self->{items}[$idx];
+   my $item = $_items[$idx];
    if( $item->isa( "Tickit::Widget::Menu" ) ) {
       $self->expand_item( $idx );
    }
@@ -117,91 +103,70 @@ sub activate_item
    }
 }
 
-sub set_on_activated
+method dismiss ()
 {
-   my $self = shift;
-   ( $self->{on_activated} ) = @_;
-}
-
-sub dismiss
-{
-   my $self = shift;
-
-   if( defined $self->{active_idx} ) {
-      my $item = $self->{items}[$self->{active_idx}];
+   if( defined $_active_idx ) {
+      my $item = $_items[$_active_idx];
       $item->dismiss if $item->isa( "Tickit::Widget::Menu" );
    }
 
-   undef $self->{active_idx};
+   undef $_active_idx;
 }
 
-sub key_highlight_next
+method key_highlight_next ( $ )
 {
-   my $self = shift;
-
-   my $items = $self->{items};
-   my $idx = $self->{active_idx};
+   my $idx = $_active_idx;
 
    if( defined $idx ) {
-      $idx++, $idx %= @$items;
+      $idx++, $idx %= @_items;
    }
    else {
       $idx = 0;
    }
 
-   $idx++, $idx %= @$items while $items->[$idx] == separator;
+   $idx++, $idx %= @_items while $_items[$idx] == separator;
 
    $self->highlight_item( $idx );
 
    return 1;
 }
 
-sub key_highlight_prev
+method key_highlight_prev ( $ )
 {
-   my $self = shift;
-
-   my $items = $self->{items};
-   my $idx = $self->{active_idx};
+   my $idx = $_active_idx;
 
    if( defined $idx ) {
-      $idx--, $idx %= @$items;
+      $idx--, $idx %= @_items;
    }
    else {
-      $idx = $#$items;
+      $idx = $#_items;
    }
 
-   $idx--, $idx %= @$items while $items->[$idx] == separator;
+   $idx--, $idx %= @_items while $_items[$idx] == separator;
 
    $self->highlight_item( $idx );
 
    return 1;
 }
 
-sub key_dismiss
+method key_dismiss ( $ )
 {
-   my $self = shift;
-
    $self->dismiss;
 
    return 1;
 }
 
-sub key_activate
+method key_activate ( $ )
 {
-   my $self = shift;
-
-   if( defined( my $idx = $self->{active_idx} ) ) {
+   if( defined( my $idx = $_active_idx ) ) {
       $self->activate_item( $idx );
    }
 
    return 1;
 }
 
-sub on_mouse
+method on_mouse ( $args )
 {
-   my $self = shift;
-   my ( $args ) = @_;
-
    my $line = $args->line;
    my $col  = $args->col;
 

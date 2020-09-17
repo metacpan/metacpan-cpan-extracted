@@ -22,7 +22,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-EN-Common-EF-Top1000
   homepage: https://metacpan.org/release/WordList-EN-Common-EF-Top1000
   repository: git://github.com/perlancar/perl-WordList-EN-Common-EF-Top1000.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

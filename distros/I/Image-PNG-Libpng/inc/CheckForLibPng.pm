@@ -5,6 +5,13 @@
 #  \____|_| |_|\___|\___|_|\_\ |_|  \___/|_|    |_|_|_.__/| .__/|_| |_|\__, |
 #                                                         |_|          |___/ 
 #
+# This file lives in ~/projects/check4libpng/lib and should be copied
+# from there.
+#
+# 0.03 2018-09-16
+#
+# - Use $Config{cc} to get the C compiler
+#
 # 0.02 2017-07-01
 #
 # - Remove "Template" stuff
@@ -25,10 +32,10 @@ use utf8;
 use FindBin '$Bin';
 use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-# This uses $Config{ldflags} and $Config{ccflags} when it tries to
-# compile a small program which links against libpng.
+# This uses $Config{cc}, $Config{ldflags} and $Config{ccflags} to try
+# to compile a small program which links against libpng.
 
 use Config qw/%Config/;
 
@@ -36,13 +43,15 @@ use Config qw/%Config/;
 # to point to your libpng library's location and the location of the
 # directory containing the file "png.h".
 
-my $png_lib_dir;
-my $png_include_dir;
+my $png_lib_dir; # = /usr/local/lib , etc.
+my $png_include_dir; # = /usr/local/include, etc.
 
 # The following variable switches on printing of non-error messages
 
 #my $verbose = 1;
 my $verbose;
+
+# Debugging messages
 
 sub msg
 {
@@ -51,6 +60,8 @@ sub msg
 	printf ("%s:%d: @_.\n", $file, $line);
     }
 }
+
+# Find an executable program called $program in $ENV{PATH}.
 
 sub find_program
 {
@@ -75,6 +86,11 @@ sub find_program
     }
     return $found;
 }
+
+# Look for libpng. If found, return value is a hash ref containing
+# keys "libs" and "inc" for the library directory and the include file
+# directory of libpng. If not found, return value is the undefined
+# value.
 
 sub check_for_libpng
 {

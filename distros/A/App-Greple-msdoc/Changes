@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-msdoc
 
+1.03 2020-09-16T19:10:06Z
+
+    - Sort PowerPoint pages.
+
 1.02 2018-07-09T16:46:59Z
 
     - Add --separator option, default ' ' for .xlsx document.

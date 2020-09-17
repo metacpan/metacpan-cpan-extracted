@@ -12,7 +12,7 @@ sub _learn_from_dom {
   $self->description($img->{title}) if $img->{title};
   $self->height(0)->width(0)->type('photo');
   $self->title($img->{alt} || $img->{title}) if $img->{alt} or $img->{title};
-  $self->url(Mojo::URL->new($img->{src}));
+  $self->thumbnail_url($img->{src});
 }
 
 1;

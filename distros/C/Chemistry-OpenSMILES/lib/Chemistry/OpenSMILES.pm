@@ -5,7 +5,7 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader
-our $VERSION = '0.3.0'; # VERSION
+our $VERSION = '0.3.1'; # VERSION
 
 1;
 

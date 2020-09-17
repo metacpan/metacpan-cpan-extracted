@@ -1,18 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::MenuBar;
+use v5.26;
+use Object::Pad 0.25;
 
-use strict;
-use warnings;
-use feature qw( switch );
+package Tickit::Widget::MenuBar 0.12;
+class Tickit::Widget::MenuBar
+   extends Tickit::Widget::Menu::base;
 
-use base qw( Tickit::Widget::Menu::base );
 use Tickit::Style;
-
-our $VERSION = '0.11';
 
 use Carp;
 
@@ -28,26 +26,26 @@ C<Tickit::Widget::MenuBar> - display a menu horizontally
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::Menu;
- use Tickit::Widget::Menu::Item;
- use Tickit::Widget::MenuBar;
- use Tickit::Widget::VBox;
+   use Tickit;
+   use Tickit::Widget::Menu;
+   use Tickit::Widget::Menu::Item;
+   use Tickit::Widget::MenuBar;
+   use Tickit::Widget::VBox;
 
- my $tickit = Tickit->new;
+   my $tickit = Tickit->new;
 
- my $vbox = Tickit::Widget::VBox->new;
- $tickit->set_root_widget( $vbox );
+   my $vbox = Tickit::Widget::VBox->new;
+   $tickit->set_root_widget( $vbox );
 
- $vbox->add( Tickit::Widget::MenuBar->new(
-    items => [
-       ...
-    ]
- );
+   $vbox->add( Tickit::Widget::MenuBar->new(
+      items => [
+         ...
+      ]
+   );
 
- $vbox->add( ... );
+   $vbox->add( ... );
 
- $tickit->run;
+   $tickit->run;
 
 =head1 DESCRIPTION
 
@@ -116,22 +114,20 @@ style_definition base =>
 use constant KEYPRESSES_FROM_STYLE => 1;
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
-sub lines
+has @_itempos;
+
+method lines ()
 {
    return 1;
 }
 
-sub cols
+method cols ()
 {
-   my $self = shift;
    return sum( map { $self->_itemwidth( $_ ) } 0 .. $self->items-1 ) + 2 * ( $self->items - 1 );
 }
 
-sub push_item
+method push_item ( $item )
 {
-   my $self = shift;
-   my ( $item ) = @_;
-
    if( $item == separator and grep { $_ == separator } $self->items ) {
       croak "Cannot have more than one separator in a MenuBar";
    }
@@ -139,21 +135,19 @@ sub push_item
    $self->SUPER::push_item( $item );
 }
 
-sub reshape
+method reshape ()
 {
-   my $self = shift;
+   @_itempos = ();
 
-   $self->{itempos} = \my @pos;
-
-   my $items = $self->{items};
+   my @items = $self->items;
    my $col = 0;
    my $separator_at;
-   foreach my $idx ( 0 .. $#$items ) {
-      $separator_at = $idx, next if $items->[$idx] == separator;
+   foreach my $idx ( 0 .. $#items ) {
+      $separator_at = $idx, next if $items[$idx] == separator;
 
-      $pos[$idx] = [ $col, undef ];
+      $_itempos[$idx] = [ $col, undef ];
       $col += $self->_itemwidth( $idx );
-      $pos[$idx][1] = $col;
+      $_itempos[$idx][1] = $col;
       $col += 2;
    }
 
@@ -161,50 +155,41 @@ sub reshape
       $col -= 2; # undo
       my $spare = $self->window->cols - $col;
 
-      $pos[$_][0] += $spare, $pos[$_][1] += $spare for $separator_at+1 .. $#$items;
+      $_itempos[$_][0] += $spare, $_itempos[$_][1] += $spare for $separator_at+1 .. $#items;
    }
 }
 
-sub pos2item
+method pos2item ( $line, $col )
 {
-   my $self = shift;
-   my ( $line, $col ) = @_;
-
    $line == 0 or return ();
 
-   my $items = $self->{items};
-   my $pos   = $self->{itempos};
+   my @items = $self->items;
 
-   foreach my $idx ( 0 .. $#$items ) {
-      next if !defined $pos->[$idx]; # separator
-      last if     $col < $pos->[$idx][0];
-      next unless $col < $pos->[$idx][1];
+   foreach my $idx ( 0 .. $#items ) {
+      next if !defined $_itempos[$idx]; # separator
+      last if     $col < $_itempos[$idx][0];
+      next unless $col < $_itempos[$idx][1];
 
-      $col -= $pos->[$idx][0];
+      $col -= $_itempos[$idx][0];
 
       return () if $col < 0;
-      return ( $items->[$idx], $idx, $col );
+      return ( $items[$idx], $idx, $col );
    }
 
    return ();
 }
 
-sub redraw_item
+method redraw_item ( $idx )
 {
-   my $self = shift;
-   my ( $idx ) = @_;
    $self->window->expose( Tickit::Rect->new(
       top => 0, lines => 1,
-      left  => $self->{itempos}[$idx][0],
-      right => $self->{itempos}[$idx][1],
+      left  => $_itempos[$idx][0],
+      right => $_itempos[$idx][1],
    ) );
 }
 
-sub render_to_rb
+method render_to_rb ( $rb, $rect )
 {
-   my $self = shift;
-   my ( $rb, $rect ) = @_;
-
    if( $rect->top == 0 ) {
       $rb->goto( 0, 0 );
 
@@ -213,13 +198,13 @@ sub render_to_rb
          my $item = $items[$idx];
          next if $item == separator;
 
-         my ( $left, $right ) = @{ $self->{itempos}[$idx] };
+         my ( $left, $right ) = @{ $_itempos[$idx] };
          last if $left > $rect->right;
          next if $right < $rect->left;
 
          $rb->erase_to( $left );
 
-         my $pen = defined $self->{active_idx} && $idx == $self->{active_idx}
+         my $pen = defined $self->_active_idx && $idx == $self->_active_idx
                      ? $self->get_style_pen( "highlight" ) : undef;
 
          $rb->savepen;
@@ -238,78 +223,65 @@ sub render_to_rb
    }
 }
 
-sub popup_item
+method popup_item ( $idx )
 {
-   my $self = shift;
-   my ( $idx ) = @_;
+   my $item = $self->item( $idx );
 
-   my $items = $self->{items};
+   my $col = $_itempos[$idx][0];
 
-   my $col = $self->{itempos}[$idx][0];
-
-   my $rightmost = $self->window->cols - $items->[$idx]->cols;
+   my $rightmost = $self->window->cols - $item->cols;
    $col = $rightmost if $col > $rightmost;
 
-   $items->[$idx]->popup( $self->window, 1, $col );
+   $item->popup( $self->window, 1, $col );
 }
 
-sub activated
+method activated ()
 {
-   my $self = shift;
    $self->dismiss;
 }
 
-sub dismiss
+method dismiss ()
 {
-   my $self = shift;
    $self->SUPER::dismiss;
 
    # Still have a window after ->dismiss
    $self->redraw;
 }
 
-sub on_key
+method on_key ( $ )
 {
-   my $self = shift;
-
    # Always eat all the keys as there's never anything higher to pass them to
    return 1;
 }
 
 # MenuBar always expands on highlight
-sub key_highlight_next
+method key_highlight_next ( $ )
 {
-   my $self = shift;
-   $self->SUPER::key_highlight_next;
-   $self->expand_item( $self->{active_idx} );
+   $self->SUPER::key_highlight_next( @_ );
+   $self->expand_item( $self->_active_idx );
 }
 
-sub key_highlight_prev
+method key_highlight_prev ( $ )
 {
-   my $self = shift;
    $self->SUPER::key_highlight_prev;
-   $self->expand_item( $self->{active_idx} );
+   $self->expand_item( $self->_active_idx );
 }
 
-sub key_highlight_first
+method key_highlight_first ( $ )
 {
-   my $self = shift;
-   defined $self->{active_idx} or $self->expand_item( 0 );
+   defined $self->_active_idx or $self->expand_item( 0 );
    return 1;
 }
 
-sub on_mouse_item
+method on_mouse_item ( $args, $item, $item_idx, $item_col )
 {
-   my $self = shift;
-   my ( $args, $item, $item_idx, $item_col ) = @_;
-
    # We only ever care about button 1
    return unless $args->button == 1;
 
    my $event = $args->type;
    if( $event eq "press" ) {
       # A second click on an active item deactivates
-      if( defined $self->{active_idx} and $item_idx == $self->{active_idx} ) {
+      if( defined $self->_active_idx and $item_idx == $self->_active_idx ) {
          $self->dismiss;
       }
       else {

@@ -9,7 +9,7 @@ BEGIN {
     use_ok 'Test::WWW::WebKit2';
 }
 
-my $sel = Test::WWW::WebKit2->new();
+my $sel = Test::WWW::WebKit2->new(xvfb => 1);
 ok($sel->init);
 
 $sel->open_ok("$Bin/test/attribute.html");

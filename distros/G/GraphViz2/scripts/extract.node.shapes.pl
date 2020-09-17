@@ -12,7 +12,7 @@ my($file_name) = File::Spec -> catfile('data', 'node.shapes.html');
 
 if (! -e $file_name)
 {
-	my($page_name) = 'http://www.graphviz.org/content/node-shapes';
+	my($page_name) = 'http://www.graphviz.org/doc/info/shapes.html';
 	my($client)    = HTTP::Tiny -> new -> get($page_name);
 
 	if ($$client{success})

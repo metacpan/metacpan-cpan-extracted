@@ -52,7 +52,7 @@
          "web" : "https://github.com/merkys/chemistry-opensmiles"
       }
    },
-   "version" : "0.3.0",
+   "version" : "0.3.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

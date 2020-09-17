@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Email::MIME" => "1.940",
     "Email::MIME::CreateHTML" => 0,
+    "Email::MessageID" => 0,
     "Email::Sender::Simple" => 0,
     "HTML::FormatText" => 0,
     "HTML::TreeBuilder" => 0,
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "1.13",
+  "VERSION" => "1.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Email::MIME" => "1.940",
   "Email::MIME::CreateHTML" => 0,
+  "Email::MessageID" => 0,
   "Email::Sender::Simple" => 0,
   "File::Basename" => 0,
   "File::Spec" => 0,

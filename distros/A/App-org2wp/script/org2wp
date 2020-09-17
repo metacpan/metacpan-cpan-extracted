@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/org2wp/org2wp
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
-our $DATE = '2019-12-26'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-17'; # DATE
 our $DIST = 'App-org2wp'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +23,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Publish Org document to WordPress as blog post
+# ABSTRACT: Publish Org document (or heading) to WordPress as blog post
 # PODNAME: org2wp
 
 __END__
@@ -33,17 +34,23 @@ __END__
 
 =head1 NAME
 
-org2wp - Publish Org document to WordPress as blog post
+org2wp - Publish Org document (or heading) to WordPress as blog post
 
 =head1 VERSION
 
-This document describes version 0.008 of org2wp (from Perl distribution App-org2wp), released on 2019-12-26.
+This document describes version 0.009 of org2wp (from Perl distribution App-org2wp), released on 2020-09-17.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % org2wp [options] <filename>
+ % org2wp [--comment-status=s] [--config-path=path | -c]
+     [--config-profile=profile | -P] [--debug] [--dry-run] [--extra-attr
+     key=s] [--extra-attrs-json=s] [--format=name] [--json] [-l=s]
+     [--log-level=level] [--(no)naked-res] [--no-config | -C] [--no-env]
+     [--no-publish] [--nopublish] [--page-result[=program]] [--password=s]
+     [--post-heading-level=s] [--proxy=s] [--publish] [--quiet]
+     [--schedule=s] [--trace] [--username=s] [--verbose] <filename>
 
 =head1 DESCRIPTION
 
@@ -74,7 +81,11 @@ sections, e.g.:
 and specify which profile you want using command-line option e.g.
 C<--config-profile blog1>.
 
-To create a blog post, write your Org document (e.g. in C<post1.org>) using this
+=head3 Document mode
+
+You can use the whole Org document file as a blog post (document mode) or a
+single heading as a blog post (heading mode). The default is document mode. To
+create a blog post, write your Org document (e.g. in C<post1.org>) using this
 format:
 
  #+TITLE: Blog post title
@@ -92,11 +103,14 @@ this will create a draft post. To publish directly:
 
  % org2wp --publish post1.org
 
-Note that this will also modify your Org file and insert this line at the top:
+Note that this will also modify your Org file and insert this setting line at
+the top:
 
  #+POSTID: 1234
+ #+POSTTIME: [2020-09-16 Wed 11:51]
 
-where 1234 is the post ID retrieved from the server when creating the post.
+where 1234 is the post ID retrieved from the server when creating the post, and
+post time will be set to the current local time.
 
 After the post is created, you can update using the same command:
 
@@ -113,6 +127,41 @@ To set more attributes:
 Another example, to schedule a post in the future:
 
  % org2wp post1.org --schedule 20301225T00:00:00
+
+=head3 Heading mode
+
+In heading mode, each heading will become a separate blog post. To enable this
+mode, specify C<--post-heading-level> (C<-l>) to 1 (or 2, or 3, ...). This will
+cause a level-1 (or 2, or 3, ...) heading to be assumed as an individual blog
+post. For example, suppose you have C<blog.org> with this content:
+
+ * Post A                  :tag1:tag2:tag3:
+ :PROPERTIES:
+ :CATEGORY: cat1, cat2, cat3
+ :END:
+ 
+ Some text...
+ 
+ ** a heading of post A
+ more text ...
+ ** another heading of post A
+ even more text ...
+ 
+ * Post B                  :tag2:tag4:
+ Some text ...
+
+with this command:
+
+ % org2wp blog.org -l 1
+
+there will be two blog posts to be posted because there are two level-1
+headings: C<Post A> and C<Post B>. Post A contains level-2 headings which will
+become headings of the blog post. Headline tags will become blog post tags, and
+to specify categories you use the property C<CATEGORY> in the C<PROPERTIES>
+drawer.
+
+If, for example, you specify C<-l 2> instead of C<-l 1> then the level-2 headings
+will become blog posts.
 
 =head1 OPTIONS
 
@@ -149,6 +198,16 @@ See C<--extra-attr>.
 =item B<--filename>=I<s>*, B<-f>
 
 Path to Org document to publish.
+
+=item B<--post-heading-level>=I<s>, B<-l>
+
+Specify which heading level to be regarded as an individula blog post.
+
+If specified, this will enable *heading mode* instead of the default *document
+mode*. In the document mode, the whole Org document file is regarded as a single
+blog post. In the *heading mode*, a heading of certain level will be regarded as
+a single blog post.
+
 
 =item B<--publish>
 
@@ -261,6 +320,10 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =back
 
 =head2 Other options
@@ -353,6 +416,7 @@ List of available configuration parameters:
  log_level (see --log-level)
  naked_res (see --naked-res)
  password (see --password)
+ post_heading_level (see --post-heading-level)
  proxy (see --proxy)
  publish (see --publish)
  schedule (see --schedule)
@@ -402,7 +466,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

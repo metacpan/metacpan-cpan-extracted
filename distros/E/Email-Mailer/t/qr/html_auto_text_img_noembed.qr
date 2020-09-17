@@ -1,23 +1,14 @@
-Content-Transfer-Encoding: 7bit
-Content-Type: multipart/mixed; boundary=[^\n]+
-From: from@example.com
-Subject: Test Email
-To: to@example.com
-Date: [^\n]+
-MIME-Version: 1\.0
+(?:[\w\-]+:[ ]*[^\n]+\n)+
+
 
 
 --\S+
-Date: [^\n]+
-MIME-Version: 1\.0
-Content-Type: multipart/alternative; boundary=[^\n]+
-Content-Transfer-Encoding: 7bit
+(?:[\w\-]+:[ ]*[^\n]+\n)+
+
 
 
 --\S+
-Date: [^\n]+
-MIME-Version: 1\.0
-Content-Type: text/plain
+(?:[\w\-]+:[ ]*[^\n]+\n)+
 
 This is a generic message for testing purposes only with regard to some stuff and things:
 
@@ -29,10 +20,8 @@ This is a generic message for testing purposes only with regard to some stuff an
 
 
 --\S+
-Date: [^\n]+
-MIME-Version: 1\.0
-[^:]+: [^\n]+
-[^:]+: [^\n]+
+(?:[\w\-]+:[ ]*[^\n]+\n)+
+
 
 
                 <p>

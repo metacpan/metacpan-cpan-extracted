@@ -1,0 +1,22 @@
+<explain xmlns="http://www.postgresql.org/2009/explain">
+  <Query>
+    <Plan>
+      <Node-Type>Function Scan</Node-Type>
+      <Parallel-Aware>false</Parallel-Aware>
+      <Function-Name>generate_series</Function-Name>
+      <Alias>i</Alias>
+      <Startup-Cost>0.00</Startup-Cost>
+      <Total-Cost>0.10</Total-Cost>
+      <Plan-Rows>10</Plan-Rows>
+      <Plan-Width>4</Plan-Width>
+      <Actual-Startup-Time>0.024</Actual-Startup-Time>
+      <Actual-Total-Time>0.027</Actual-Total-Time>
+      <Actual-Rows>10</Actual-Rows>
+      <Actual-Loops>1</Actual-Loops>
+    </Plan>
+    <Planning-Time>0.108</Planning-Time>
+    <Triggers>
+    </Triggers>
+    <Execution-Time>0.156</Execution-Time>
+  </Query>
+</explain>

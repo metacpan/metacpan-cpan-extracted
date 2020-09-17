@@ -142,7 +142,7 @@ has valid_attributes =>
 	required => 0,
 );
 
-our $VERSION = '2.47';
+our $VERSION = '2.48';
 
 # -----------------------------------------------
 
@@ -1057,7 +1057,7 @@ An undirected graph is a collection of nodes optionally linked together with edg
 
 A directed graph is the same, except that the edges have a direction, normally indicated by an arrow head.
 
-A quick inspection of L<Graphviz|http://www.graphviz.org/>'s L<gallery|http://www.graphviz.org/Gallery.php> will show better than words
+A quick inspection of L<Graphviz|http://www.graphviz.org/>'s L<gallery|http://www.graphviz.org/gallery/> will show better than words
 just how good L<Graphviz|http://www.graphviz.org/> is, and will reinforce the point that humans are very visual creatures.
 
 =head1 Distributions
@@ -1070,7 +1070,7 @@ for help on unpacking and installing distros.
 =head1 Installation
 
 Of course you need to install AT&T's Graphviz before using this module.
-See L<http://www.graphviz.org/Download.php>.
+See L<http://www.graphviz.org/download/>.
 
 You are strongly advised to download the stable version of Graphviz, because the
 development snapshots (click on 'Source code'), are sometimes non-functional.
@@ -1191,7 +1191,7 @@ Mrecords have nice, rounded corners, whereas plain old records have square corne
 
 The default is 'Mrecord'.
 
-See L<Record shapes|http://www.graphviz.org/content/node-shapes#record> for details.
+See L<Record shapes|http://www.graphviz.org/doc/info/shapes.html#record> for details.
 
 =item o strict => $Boolean
 
@@ -1223,7 +1223,7 @@ See scripts/rank.sub.graph.[12].pl for sample code.
 
 Possible values for $string are: max, min, same, sink and source.
 
-See the L<Graphviz 'rank' docs|http://www.graphviz.org/content/attrs#drank> for details.
+See the L<Graphviz 'rank' docs|http://www.graphviz.org/doc/info/attrs.html#d:rank> for details.
 
 =back
 
@@ -1379,7 +1379,7 @@ For sample code, see scripts/sub.graph.frames.pl.
 
 =back
 
-Also, check L<the pencolor docs|http://www.graphviz.org/content/attrs#dpencolor> for how the color of the frame is
+Also, check L<the pencolor docs|http://www.graphviz.org/doc/info/attrs.html#d:pencolor> for how the color of the frame is
 chosen by cascading thru a set of options.
 
 I've posted an email to the L<Graphviz|http://www.graphviz.org/> mailing list suggesting a new option, framecolor, so deal with
@@ -1526,8 +1526,10 @@ attributes in this call means such nodes are created with the default set of att
 be what you want. To avoid this, you have to call add_node(...) yourself, with the appropriate attributes,
 before calling add_edge(...).
 
-%hash is any edge attributes accepted as L<Graphviz attributes|http://www.graphviz.org/content/attrs>. These are validated in exactly
-the same way as the edge parameters in the calls to default_edge(%hash), new(edge => {}) and push_subgraph(edge => {}).
+%hash is any edge attributes accepted as
+L<Graphviz attributes|https://www.graphviz.org/doc/info/attrs.html>.
+These are validated in exactly the same way as the edge parameters in the calls to
+default_edge(%hash), new(edge => {}) and push_subgraph(edge => {}).
 
 =head2 add_node(name => $node_name, [%hash])
 
@@ -1541,8 +1543,10 @@ If you want anonymous nodes, see scripts/anonymous.pl in L<GraphViz2/Scripts Shi
 
 Here, [] indicates an optional parameter.
 
-%hash is any node attributes accepted as L<Graphviz attributes|http://www.graphviz.org/content/attrs>. These are validated in exactly
-the same way as the node parameters in the calls to default_node(%hash), new(node => {}) and push_subgraph(node => {}).
+%hash is any node attributes accepted as
+L<Graphviz attributes|https://www.graphviz.org/doc/info/attrs.html>.
+These are validated in exactly the same way as the node parameters in the calls to
+default_node(%hash), new(node => {}) and push_subgraph(node => {}).
 
 The attribute name 'label' may point to a string or an arrayref.
 
@@ -1610,7 +1614,7 @@ See scripts/html.labels.*.pl and scripts/record.*.pl for sample code.
 
 See also the FAQ topic L</How labels interact with ports>.
 
-For more details on this complex topic, see L<Records|http://www.graphviz.org/content/node-shapes#record> and L<Ports|http://www.graphviz.org/content/attrs#kportPos>.
+For more details on this complex topic, see L<Records|http://www.graphviz.org/doc/info/shapes.html#record> and L<Ports|http://www.graphviz.org/doc/info/attrs.html#k:portPos>.
 
 =head2 default_edge(%hash)
 
@@ -1618,8 +1622,10 @@ Sets defaults attributes for edges added subsequently.
 
 Returns $self to allow method chaining.
 
-%hash is any edge attributes accepted as L<Graphviz attributes|http://www.graphviz.org/content/attrs>. These are validated in exactly
-the same way as the edge parameters in the calls to new(edge => {}) and push_subgraph(edge => {}).
+%hash is any edge attributes accepted as
+L<Graphviz attributes|https://www.graphviz.org/doc/info/attrs.html>.
+These are validated in exactly the same way as the edge parameters in the calls to new(edge => {})
+and push_subgraph(edge => {}).
 
 =head2 default_graph(%hash)
 
@@ -1627,8 +1633,10 @@ Sets defaults attributes for the graph.
 
 Returns $self to allow method chaining.
 
-%hash is any graph attributes accepted as L<Graphviz attributes|http://www.graphviz.org/content/attrs>. These are validated in exactly
-the same way as the graph parameter in the calls to new(graph => {}) and push_subgraph(graph => {}).
+%hash is any graph attributes accepted as
+L<Graphviz attributes|https://www.graphviz.org/doc/info/attrs.html>.
+These are validated in exactly the same way as the graph parameter in the calls to new(graph => {})
+and push_subgraph(graph => {}).
 
 =head2 default_node(%hash)
 
@@ -1636,8 +1644,10 @@ Sets defaults attributes for nodes added subsequently.
 
 Returns $self to allow method chaining.
 
-%hash is any node attributes accepted as L<Graphviz attributes|http://www.graphviz.org/content/attrs>. These are validated in exactly
-the same way as the node parameters in the calls to new(node => {}) and push_subgraph(node => {}).
+%hash is any node attributes accepted as
+L<Graphviz attributes|https://www.graphviz.org/doc/info/attrs.html>.
+These are validated in exactly the same way as the node parameters in the calls to new(node => {})
+and push_subgraph(node => {}).
 
 =head2 default_subgraph(%hash)
 
@@ -1645,8 +1655,10 @@ Sets defaults attributes for clusters and subgraphs.
 
 Returns $self to allow method chaining.
 
-%hash is any cluster or subgraph attribute accepted as L<Graphviz attributes|http://www.graphviz.org/content/attrs>. These are validated in exactly
-the same way as the subgraph parameter in the calls to new(subgraph => {}) and push_subgraph(subgraph => {}).
+%hash is any cluster or subgraph attribute accepted as
+L<Graphviz attributes|https://www.graphviz.org/doc/info/attrs.html>.
+These are validated in exactly the same way as the subgraph parameter in the calls to
+new(subgraph => {}) and push_subgraph(subgraph => {}).
 
 =head2 dot_input()
 
@@ -1798,24 +1810,31 @@ So, without $name, 'subgraph {' is written to the output stream.
 
 With $name, 'subgraph "$name" {' is written to the output stream.
 
-Note that subgraph names beginning with 'cluster' L<are special to Graphviz|http://www.graphviz.org/content/attrs#dclusterrank>.
+Note that subgraph names beginning with 'cluster' L<are special to Graphviz|http://www.graphviz.org/doc/info/attrs.html#d:clusterrank>.
 
 See scripts/rank.sub.graph.[1234].pl for the effect of various values for $name.
 
-edge => {...} is any edge attributes accepted as L<Graphviz attributes|http://www.graphviz.org/content/attrs>. These are validated in exactly
-the same way as the edge parameters in the calls to default_edge(%hash), new(edge => {}) and push_subgraph(edge => {}).
+edge => {...} is any edge attributes accepted as
+L<Graphviz attributes|https://www.graphviz.org/doc/info/attrs.html>.
+These are validated in exactly the same way as the edge parameters in the calls to
+default_edge(%hash), new(edge => {}) and push_subgraph(edge => {}).
 
-graph => {...} is any graph attributes accepted as L<Graphviz attributes|http://www.graphviz.org/content/attrs>. These are validated in exactly
-the same way as the graph parameters in the calls to default_graph(%hash), new(graph => {}) and push_subgraph(graph => {}).
+graph => {...} is any graph attributes accepted as
+L<Graphviz attributes|https://www.graphviz.org/doc/info/attrs.html>.
+These are validated in exactly the same way as the graph parameters in the calls to
+default_graph(%hash), new(graph => {}) and push_subgraph(graph => {}).
 
-node => {...} is any node attributes accepted as L<Graphviz attributes|http://www.graphviz.org/content/attrs>. These are validated in exactly
-the same way as the node parameters in the calls to default_node(%hash), new(node => {}) and push_subgraph(node => {}).
+node => {...} is any node attributes accepted as
+L<Graphviz attributes|https://www.graphviz.org/doc/info/attrs.html>.
+These are validated in exactly the same way as the node parameters in the calls to
+default_node(%hash), new(node => {}) and push_subgraph(node => {}).
 
 subgraph => {..} is for setting attributes applicable to clusters and subgraphs.
 
 Currently the only subgraph attribute is C<rank>, but clusters have many attributes available.
 
-See the second column of the L<Graphviz attribute docs|http://www.graphviz.org/content/attrs> for details.
+See the second column of the
+L<Graphviz attribute docs|https://www.graphviz.org/doc/info/attrs.html> for details.
 
 A typical usage would be push_subgraph(subgraph => {rank => 'same'}) so that all nodes mentioned within the subgraph
 are constrained to be horizontally aligned.
@@ -1916,13 +1935,14 @@ GraphViz2 targets V 2.34.0 of L<Graphviz|http://www.graphviz.org/>.
 
 This affects the list of available attributes per graph item (node, edge, cluster, etc) available.
 
-See the second column of the L<Graphviz attribute docs|http://www.graphviz.org/content/attrs> for details.
+See the second column of the
+L<Graphviz attribute docs|https://www.graphviz.org/doc/info/attrs.html> for details.
 
 See the next item for a discussion of the list of output formats.
 
 =head2 Where does the list of valid output formats come from?
 
-Up to V 2.23, it came from downloading and parsing http://www.graphviz.org/content/output-formats. This was done
+Up to V 2.23, it came from downloading and parsing https://www.graphviz.org/doc/info/output.html. This was done
 by scripts/extract.output.formats.pl.
 
 Starting with V 2.24 it comes from parsing the output of 'dot -T?'. The problems avoided, and advantages, of this are:
@@ -1958,7 +1978,7 @@ Even better, use a more meaningful name for your graph...
 
 The keywords are: node, edge, graph, digraph, subgraph and strict. Compass points are not keywords.
 
-See L<keywords|http://www.graphviz.org/content/dot-language> in the discussion of the syntax of DOT
+See L<keywords|https://www.graphviz.org/doc/info/lang.html> in the discussion of the syntax of DOT
 for details.
 
 =head2 How do I include utf8 characters in labels?
@@ -1994,7 +2014,7 @@ Also, the code, and 'dot', both accept newlines embedded within such labels.
 
 Together, these allow HTML labels to be formatted nicely in the calling code.
 
-See L<the Graphviz docs|https://graphviz.gitlab.io/_pages/doc/info/shapes.html#record> for their discussion on whitespace.
+See L<the Graphviz docs|https://www.graphviz.org/doc/info/shapes.html#record> for their discussion on whitespace.
 
 =head2 I'm having trouble with special characters in node names and labels
 
@@ -2249,22 +2269,22 @@ See also parse.isa.pl below.
 
 =head2 scripts/extract.arrow.shapes.pl
 
-Downloads the arrow shapes from L<Graphviz's Arrow Shapes|http://www.graphviz.org/content/arrow-shapes> and outputs them to ./data/arrow.shapes.html.
+Downloads the arrow shapes from L<Graphviz's Arrow Shapes|https://www.graphviz.org/doc/info/arrows.html> and outputs them to ./data/arrow.shapes.html.
 Then it extracts the reserved words into ./data/arrow.shapes.dat.
 
 =head2 scripts/extract.attributes.pl
 
-Downloads the attributes from L<Graphviz's Attributes|http://www.graphviz.org/content/attrs> and outputs them to ./data/attributes.html.
+Downloads the attributes from L<Graphviz's Attributes|http://www.graphviz.org/doc/info/attrs.html> and outputs them to ./data/attributes.html.
 Then it extracts the reserved words into ./data/attributes.dat.
 
 =head2 scripts/extract.node.shapes.pl
 
-Downloads the node shapes from L<Graphviz's Node Shapes|http://www.graphviz.org/content/node-shapes> and outputs them to ./data/node.shapes.html.
+Downloads the node shapes from L<Graphviz's Node Shapes|http://www.graphviz.org/doc/info/shapes.html> and outputs them to ./data/node.shapes.html.
 Then it extracts the reserved words into ./data/node.shapes.dat.
 
 =head2 scripts/extract.output.formats.pl
 
-Downloads the output formats from L<Graphviz's Output Formats|http://www.graphviz.org/content/output-formats> and outputs them to ./data/output.formats.html.
+Downloads the output formats from L<Graphviz's Output Formats|https://www.graphviz.org/doc/info/output.html> and outputs them to ./data/output.formats.html.
 Then it extracts the reserved words into ./data/output.formats.dat.
 
 =head2 find.config.pl
@@ -2493,7 +2513,7 @@ and use the command:
 
 	dot -Tsvg x.gv > x.svg
 
-See L<the Graphviz docs|http://www.graphviz.org/content/attrs#kescString> for escString, where they write 'l to mean \l, for some reason.
+See L<the Graphviz docs|http://www.graphviz.org/doc/info/attrs.html#k:escString> for escString, where they write 'l to mean \l, for some reason.
 
 =head2 scripts/rank.sub.graph.1.pl
 

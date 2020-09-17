@@ -5,15 +5,16 @@ use 5.014;
 use strict;
 use warnings;
 
-use HTML::FormatText;
-use HTML::TreeBuilder;
-use IO::All 'io';
+use Email::MessageID;
 use Email::MIME 1.940;
 use Email::MIME::CreateHTML;
 use Email::Sender::Simple 'sendmail';
+use HTML::FormatText;
+use HTML::TreeBuilder;
+use IO::All 'io';
 use MIME::Words 'encode_mimewords';
 
-our $VERSION = '1.13'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 sub new {
     my $self = shift;
@@ -69,6 +70,8 @@ sub send {
             $mail->{$key} = encode_mimewords( $mail->{$key}, Charset => $charset )
                 if ( $key and defined $mail->{$key} and $mail->{$key} =~ /[^[:ascii:]]/ );
         }
+
+        $mail->{'Message-Id'} //= Email::MessageID->new->in_brackets;
 
         # create a headers hashref (delete things from a data copy that known to not be headers)
         my $headers = [
@@ -158,7 +161,7 @@ Email::Mailer - Multi-purpose emailer for HTML, auto-text, attachments, and temp
 
 =head1 VERSION
 
-version 1.13
+version 1.15
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Email-Mailer.svg)](https://travis-ci.org/gryphonshafer/Email-Mailer)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Email-Mailer/badge.png)](https://coveralls.io/r/gryphonshafer/Email-Mailer)

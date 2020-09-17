@@ -1,46 +1,26 @@
 package LinkEmbedder::Link::Twitter;
 use Mojo::Base 'LinkEmbedder::Link';
 
-use Mojo::Util 'trim';
+use Mojo::Util;
 
-has lang => 'en';
-has provider_url => sub { Mojo::URL->new('https://twitter.com') };
+has provider_name => 'Twitter';
+has provider_url  => sub { Mojo::URL->new('https://twitter.com') };
 
-sub _learn_from_dom {
-  my ($self, $dom) = @_;
+sub learn_p {
+  my $self = shift;
+  my $path = $self->url->path;
+  return $self->SUPER::learn_p(@_) unless @$path >= 3 and $path->[1] eq 'status';
 
-  $self->SUPER::_learn_from_dom($dom);
-
-  my $name = $self->title || '';
-  if ($name =~ s! on twitter$!!i) {
-    $self->url->path->trailing_slash(0);
-    my $url = $self->url->clone;
-    @{$url->path} = ($url->path->[0]);
-    $self->author_name($name);
-    $self->author_url($url);
-    $self->cache_age(3153600000);
-    $self->template([__PACKAGE__, 'rich.html.ep']);
-  }
-
-  if (!$self->thumbnail_url and my $e = $dom->at('.ProfileAvatar-image[src]')) {
-    $self->author_name(trim($e->{alt} || ''));
-    $self->author_url($self->url);
-    $self->thumbnail_url($e->{src});
-  }
+  $self->author_name($path->[0]);
+  $self->author_url($self->provider_url->clone->path("/$path->[0]"));
+  $self->template([__PACKAGE__, 'twitframe.html.ep']);
+  $self->url($self->provider_url->clone->path("/$path->[0]/status/$path->[2]"));
+  $self->type('rich');
+  return Mojo::Promise->resolve($self);
 }
 
 1;
 
 __DATA__
-@@ rich.html.ep
-<blockquote class="twitter-tweet le-card le-provider-twitter" data-cards="hidden">
-  <h3><%= $l->title %></h3>
-  <p lang="<%= $l->lang %>" dir="ltr" class="le-description"><%= $l->description %></p>
-  <div class="le-meta">
-    <span class="le-author-link"><a href="<%= $l->author_url || $l->url %>"><%= $l->author_name %></a></span>
-    <span class="le-goto-link"><a href="<%= $l->url %>">@<%= $l->url->path->[0] %></a></span>
-  </div>
-</div>
-</blockquote>
-@@ helper.html.ep
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+@@ twitframe.html.ep
+<iframe class="le-rich le-provider-twitter" width="430" height="220" style="border:0;width:100%" frameborder="0" src="https://twitframe.com/show?url=<%== Mojo::Util::url_escape($l->url) %>"></iframe>

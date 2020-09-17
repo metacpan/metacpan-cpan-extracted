@@ -263,7 +263,7 @@ sub parse
 
     my @graphs = grep { defined } @{$self->{USER}{GRAPHS}};
     for my $graph (@graphs) {
-        for my $atom ($graph->vertices) {
+        for my $atom (sort { $a->{number} <=> $b->{number} } $graph->vertices) {
             delete $atom->{graph};
             delete $atom->{index};
             if( !$options->{raw} ) {

@@ -30,7 +30,7 @@ None by default.
 use 5.10.0;
 use Moose;
 
-extends 'WWW::WebKit2' => { -version => 0.1 };
+extends 'WWW::WebKit2' => { -version => 0.12 };
 
 use Glib qw(TRUE FALSE);
 use Time::HiRes qw(time usleep);
@@ -42,7 +42,7 @@ has 'debug' => (
     default => 0,
 );
 
-our $VERSION = '0.1';
+our $VERSION = '0.11';
 
 sub shout {
     my ($self, $error) = @_;
@@ -92,11 +92,23 @@ sub select_ok {
 }
 
 sub click_ok {
-    my ($self, $locator) = @_;
+    my ($self, $locator, $wait) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    my $retval = ok(eval { $self->click($locator) }, "click_ok($locator)")
+    my $retval = ok(eval { $self->click($locator, $wait) }, "click_ok($locator)")
         or $self->shout($@);
+
+    return $retval;
+}
+
+sub click_and_wait_ok {
+    my ($self, $locator, $timeout) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $retval = ok(
+        eval { $self->click_and_wait($locator, $timeout) },
+        "click_and_wait_ok($locator)"
+    ) or $self->shout($@);
 
     return $retval;
 }
@@ -162,6 +174,20 @@ sub wait_for_pending_requests_ok {
         or $self->shout($@);
 
     return $retval;
+}
+
+sub prepare_async_page_load_ok {
+    my ($self, $variable_name) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    $self->prepare_async_page_load($variable_name);
+}
+
+sub wait_for_async_page_load_ok {
+    my ($self, $timeout, $variable_name) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    $self->wait_for_async_page_load($timeout, $variable_name);
 }
 
 sub is_element_present_ok {

@@ -1,9 +1,7 @@
 use strict;
 use warnings;
 
-use Tickit::Async;
-
-use IO::Async::Timer::Periodic;
+use Tickit;
 
 use Tickit::Widget::VBox;
 
@@ -16,23 +14,23 @@ use Tickit::Widget::Scroller::Item::RichText;
 
 use String::Tagged;
 
-my $loop = IO::Async::Loop->new;
-my $tickit = Tickit::Async->new;
-$loop->add( $tickit );
+my $tickit = Tickit->new;
 
 my $scroller;
 
 my $counter = 51;
 my $colour = "white";
-$loop->add( my $timer = IO::Async::Timer::Periodic->new(
-   interval => 0.5,
-   on_tick => sub {
-      my $str = String::Tagged->new( "Line of content number $counter for testing menu" );
-      $str->apply_tag( 0, -1, fg => $colour );
-      $scroller->push( Tickit::Widget::Scroller::Item::RichText->new( $str ) );
-      $counter++;
-   }
-) );
+my $timerid;
+sub tick
+{
+   my $str = String::Tagged->new( "Line of content number $counter for testing menu" );
+   $str->apply_tag( 0, -1, fg => $colour );
+   $scroller->push( Tickit::Widget::Scroller::Item::RichText->new( $str ) );
+   $scroller->scroll_to_bottom;
+   $counter++;
+
+   $timerid = $tickit->watch_timer_after( 0.5, \&tick )
+}
 
 my @colours = qw( white red green blue );
 
@@ -40,8 +38,8 @@ my $menubar = Tickit::Widget::MenuBar->new(
    items => [
       Tickit::Widget::Menu->new( name => "Demo",
          items => [
-            Tickit::Widget::Menu::Item->new( name => "Start timer", on_activate => sub { $timer->start } ),
-            Tickit::Widget::Menu::Item->new( name => "Stop timer",  on_activate => sub { $timer->stop  } ),
+            Tickit::Widget::Menu::Item->new( name => "Start timer", on_activate => sub { tick() } ),
+            Tickit::Widget::Menu::Item->new( name => "Stop timer",  on_activate => sub { $tickit->watch_cancel( $timerid ); } ),
             Tickit::Widget::Menu->separator,
             Tickit::Widget::Menu::Item->new( name => "Exit", on_activate => sub { $tickit->stop } ),
          ],

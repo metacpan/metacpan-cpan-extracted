@@ -45,3 +45,4 @@
 ^MYMETA\.json$
 
 ^GraphViz2-.*
+\.swp$

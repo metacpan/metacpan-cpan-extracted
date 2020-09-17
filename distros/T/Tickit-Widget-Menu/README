@@ -4,23 +4,23 @@ NAME
 
 SYNOPSIS
 
-     use Tickit;
-     use Tickit::Widget::Menu;
+       use Tickit;
+       use Tickit::Widget::Menu;
     
-     my $tickit = Tickit->new;
+       my $tickit = Tickit->new;
     
-     my $menu = Tickit::Widget::Menu->new(
-        items => [
-           Tickit::Widget::Menu::Item->new(
-              name => "Exit",
-              on_activate => sub { $tickit->stop }
-           ),
-        ],
-     );
+       my $menu = Tickit::Widget::Menu->new(
+          items => [
+             Tickit::Widget::Menu::Item->new(
+                name => "Exit",
+                on_activate => sub { $tickit->stop }
+             ),
+          ],
+       );
     
-     $menu->popup( $tickit->rootwin, 5, 5 );
+       $menu->popup( $tickit->rootwin, 5, 5 );
     
-     $tickit->run;
+       $tickit->run;
 
 DESCRIPTION
 
@@ -61,7 +61,9 @@ STYLE
 
 CONSTRUCTOR
 
- $menu = Tickit::Widget::Menu->new( %args )
+ new
+
+       $menu = Tickit::Widget::Menu->new( %args )
 
     Constructs a new Tickit::Widget::Menu object.
 
@@ -78,22 +80,30 @@ CONSTRUCTOR
       or Tickit::Widget::Menu objects to add to the menu. Equivalent to
       passing each to the push_item method after construction.
 
- $separator = Tickit::Window::Menu->separator
+ separator
+
+       $separator = Tickit::Window::Menu->separator
 
     Returns a special menu item which draws a separation line between its
     neighbours.
 
 METHODS
 
- $name = $menu->name
+ name
+
+       $name = $menu->name
 
     Returns the string name for the menu.
 
- @items = $menu->items
+ items
+
+       @items = $menu->items
 
     Returns the list of items currently stored.
 
- $menu->push_item( $item )
+ push_item
+
+       $menu->push_item( $item )
 
     Adds another item.
 
@@ -101,13 +111,17 @@ METHODS
     constructor, another Tickit::Widget::Menu item itself (to create a
     submenu), or the special separator value.
 
- $menu->highlight_item( $idx )
+ highlight_item
+
+       $menu->highlight_item( $idx )
 
     Gives the selection highlight to the item at the given index. This may
     be called before the menu is actually displayed in order to pre-select
     the highlight initially.
 
- $menu->popup( $win, $line, $col )
+ popup
+
+       $menu->popup( $win, $line, $col )
 
     Makes the menu appear at the given position relative to the given
     window. Note that as $win->make_popup is called, the menu is always
@@ -115,7 +129,9 @@ METHODS
     window is used simply as the origin for the given line and column
     position.
 
- $menu->dismiss
+ dismiss
+
+       $menu->dismiss
 
     Hides a menu previously displayed using popup.
 

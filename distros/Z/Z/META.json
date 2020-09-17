@@ -1,0 +1,88 @@
+{
+   "abstract" : "collection of modules for rapid app development",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Z",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "indirect" : "0",
+            "perl" : "5.014000"
+         },
+         "requires" : {
+            "Import::Into" : "0",
+            "Module::Runtime" : "0",
+            "Object::Adhoc" : "0.003",
+            "Path::Tiny" : "0.101",
+            "Syntax::Keyword::Try" : "0.018",
+            "Try::Tiny" : "0.30",
+            "Types::Common::Numeric" : "0",
+            "Types::Common::String" : "0",
+            "Types::Standard" : "1.010000",
+            "Zydeco::Lite" : "0.068",
+            "match::simple" : "0.010",
+            "perl" : "5.008008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Z" : {
+         "file" : "lib/Z.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Z"
+      },
+      "homepage" : "https://metacpan.org/release/Z",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-z.git",
+         "web" : "https://github.com/tobyink/p5-z"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Z/project"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

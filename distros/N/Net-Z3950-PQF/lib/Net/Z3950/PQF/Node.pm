@@ -302,7 +302,7 @@ package Net::Z3950::PQF::NotNode;
 our @ISA = qw(Net::Z3950::PQF::BooleanNode);
 
 sub _op { "not" }
-sub _ssclass { "Net::Z3950::RPN::AndNote" }
+sub _ssclass { "Net::Z3950::RPN::AndNot" }
 
 
 

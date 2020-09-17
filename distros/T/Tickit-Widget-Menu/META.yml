@@ -6,9 +6,9 @@ build_requires:
   Test::More: '0.88'
   Tickit::Window: '0.57'
 configure_requires:
-  Module::Build: '0'
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,27 +17,28 @@ name: Tickit-Widget-Menu
 provides:
   Tickit::Widget::Menu:
     file: lib/Tickit/Widget/Menu.pm
-    version: '0.11'
+    version: '0.12'
   Tickit::Widget::Menu::Item:
     file: lib/Tickit/Widget/Menu/Item.pm
-    version: '0.11'
+    version: '0.12'
   Tickit::Widget::Menu::base:
     file: lib/Tickit/Widget/Menu/base.pm
-    version: '0.11'
+    version: '0.12'
   Tickit::Widget::Menu::itembase:
     file: lib/Tickit/Widget/Menu/itembase.pm
-    version: '0.11'
+    version: '0.12'
   Tickit::Widget::MenuBar:
     file: lib/Tickit/Widget/MenuBar.pm
-    version: '0.11'
+    version: '0.12'
 requires:
+  Object::Pad: '0.33'
   Tickit::RenderBuffer: '0.43'
   Tickit::Test: '0'
   Tickit::Widget: '0.36'
   Tickit::Window: '0.49'
-  perl: '5.010'
+  perl: '5.026'
 resources:
   IRC: irc://irc.freenode.net/#tickit
   license: http://dev.perl.org/licenses/
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

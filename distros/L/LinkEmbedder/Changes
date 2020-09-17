@@ -1,5 +1,16 @@
 Revision history for perl distribution LinkEmbedder
 
+1.13 2020-09-17T13:08:51+0900
+ - Fix parsing imgur links #17
+ - Fix parsing metacpan.org links
+ - Fix parsing pastebini.com links
+ - Fix parsing xkcd.com links
+ - Add support for Instagram photos inside iframe #15
+ - Add support for rendering GitHub source code #16
+ - Add support for extracting "application/ld+json" information
+ - Add support for paste.centos.org (replaced fedoraproject paste)
+ - Changed to use twitframe.com to embed twitter posts
+
 1.12 2020-03-24T12:12:10+0900
  - Add support for reading X-Provider-Name from headers
  - Will serve plain text as a paste

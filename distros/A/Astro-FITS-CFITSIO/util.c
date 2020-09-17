@@ -450,6 +450,9 @@ void pack_element(SV* work, SV** arg, int datatype) {
   unsigned long ulscalar;
   long lscalar;
   LONGLONG llscalar;
+#ifdef TULONGLONG
+  ULONGLONG ullscalar;
+#endif
   float fscalar;
   double dscalar;
 
@@ -508,6 +511,12 @@ void pack_element(SV* work, SV** arg, int datatype) {
       llscalar = arg ? SvIV(*arg) : 0;
       sv_catpvn(work, (char *) &llscalar, size);
       break;
+#ifdef TULONGLONG
+    case TULONGLONG:
+      ullscalar = arg ? SvIV(*arg) : 0;
+      sv_catpvn(work, (char *) &ullscalar, size);
+      break;
+#endif
     case TCOMPLEX:
       size /= 2;
     case TFLOAT:
@@ -722,6 +731,10 @@ void unpackScalar(SV * arg, void * var, int datatype) {
     sv_setiv(arg,(IV)(*(long *)var)); break;
   case TLONGLONG:
     sv_setiv(arg,(IV)(*(LONGLONG *)var)); break;
+#ifdef TULONGLONG
+  case TULONGLONG:
+    sv_setiv(arg,(IV)(*(ULONGLONG *)var)); break;
+#endif
   case TFLOAT:
     sv_setnv(arg,(double)(*(float *)var)); break;
   case TDOUBLE:
@@ -759,6 +772,9 @@ void unpack1D (SV* arg, void* var, LONGLONG n, int datatype, int perlyunpack)
   unsigned long * ulvar;
   long * lvar;
   LONGLONG * llvar;
+#ifdef TULONGLONG
+  ULONGLONG * ullvar;
+#endif
   float * fvar;
   double * dvar;
   SV *tmp_sv[2];
@@ -835,6 +851,13 @@ void unpack1D (SV* arg, void* var, LONGLONG n, int datatype, int perlyunpack)
     for(i=0; i<m; i++)
       av_store(array, i, newSViv( (IV)llvar[i] ));
     break;
+#ifdef TULONGLONG
+  case TULONGLONG:
+    ullvar = (ULONGLONG *) var;
+    for(i=0; i<m; i++)
+      av_store(array, i, newSViv( (IV)ullvar[i] ));
+    break;
+#endif
   case TFLOAT:
     fvar = (float *) var;
     for(i=0; i<m; i++)
@@ -958,6 +981,10 @@ int sizeof_datatype(int datatype) {
     return sizeof(long);
   case TLONGLONG:
     return sizeof(LONGLONG);
+#ifdef TULONGLONG
+  case TULONGLONG:
+    return sizeof(ULONGLONG);
+#endif
   case TFLOAT:
     return sizeof(float);
   case TDOUBLE:

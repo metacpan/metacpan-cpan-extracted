@@ -1,11 +1,11 @@
                                 BerkeleyDB
 
-                               Version 0.63
+                               Version 0.64
 
-                              21sth July 2019
-                              
+                             17th August 2020
 
-     Copyright (c) 1997-2019 Paul Marquess. All rights reserved. This
+
+     Copyright (c) 1997-2020 Paul Marquess. All rights reserved. This
       program is free software; you can redistribute it and/or modify
                   it under the same terms as Perl itself.
 
@@ -39,7 +39,7 @@ installed on your system:
 
     * Berkeley DB Version 2.6.4 or greater
 
-      The official web site for Berkeley DB is 
+      The official web site for Berkeley DB is
 
         http://www.oracle.com/technology/products/berkeley-db/db/index.html
 
@@ -138,7 +138,7 @@ Options:
 The error above will occur if there is a copy of the Berkeley DB 1.x
 file db.h on your system.
 
-This error will happen when 
+This error will happen when
 
   1. you only have Berkeley DB version 1 on your system.
      Solution: get & install a newer version of Berkeley DB.
@@ -168,7 +168,7 @@ This symptom can imply:
               to point to the directories where libdb.a and db.h are
               installed.
 
-Undefined Symbol: txn_stat 
+Undefined Symbol: txn_stat
 --------------------------
 
 BerkeleyDB seems to have built correctly, but you get an error like this
@@ -197,21 +197,21 @@ Solution: Setting the LIB & INCLUDE variables in config.in to point to the
           problem is to either delete or temporarily rename the copies
           of db.h and libdb.a that you don't want BerkeleyDB to use.
 
-Undefined Symbol: db_appinit 
+Undefined Symbol: db_appinit
 ----------------------------
 
 BerkeleyDB seems to have built correctly, but you get an error like this
 when you run the test harness:
 
   $ make test
-  PERL_DL_NONLAZY=1 /home/paul/perl/install/bin/perl5.00561 -Iblib/arch 
-  -Iblib/lib -I/home/paul/perl/install/5.005_61/lib/5.00561/i586-linux 
-  -I/home/paul/perl/install/5.005_61/lib/5.00561 -e 'use Test::Harness 
+  PERL_DL_NONLAZY=1 /home/paul/perl/install/bin/perl5.00561 -Iblib/arch
+  -Iblib/lib -I/home/paul/perl/install/5.005_61/lib/5.00561/i586-linux
+  -I/home/paul/perl/install/5.005_61/lib/5.00561 -e 'use Test::Harness
   qw(&runtests $verbose); $verbose=0; runtests @ARGV;' t/*.t
-  t/btree.............Can't load 'blib/arch/auto/BerkeleyDB/BerkeleyDB.so' for 
-  module BerkeleyDB: blib/arch/auto/BerkeleyDB/BerkeleyDB.so: 
-  undefined symbol: db_appinit 
-  at /home/paul/perl/install/5.005_61/lib/5.00561/i586-linux/DynaLoader.pm 
+  t/btree.............Can't load 'blib/arch/auto/BerkeleyDB/BerkeleyDB.so' for
+  module BerkeleyDB: blib/arch/auto/BerkeleyDB/BerkeleyDB.so:
+  undefined symbol: db_appinit
+  at /home/paul/perl/install/5.005_61/lib/5.00561/i586-linux/DynaLoader.pm
   ...
 
 
@@ -219,7 +219,7 @@ This error usually happens when you have both version 2 and version
 3 of Berkeley DB installed on your system and BerkeleyDB attempts
 to build using the db.h for Berkeley DB version 2 and the version 3
 library. Unfortunately the two versions aren't compatible with each
-other. 
+other.
 
 Solution: Setting the LIB & INCLUDE variables in config.in to point to the
           correct directories can sometimes be enough to fix this
@@ -233,22 +233,22 @@ Undefined Symbol: db_create
 BerkeleyDB seems to have built correctly, but you get an error like this
 when you run the test harness:
 
-  $ make test   
-  PERL_DL_NONLAZY=1 /home/paul/perl/install/bin/perl5.00561 -Iblib/arch 
-  -Iblib/lib -I/home/paul/perl/install/5.005_61/lib/5.00561/i586-linux 
-  -I/home/paul/perl/install/5.005_61/lib/5.00561 -e 'use Test::Harness 
+  $ make test
+  PERL_DL_NONLAZY=1 /home/paul/perl/install/bin/perl5.00561 -Iblib/arch
+  -Iblib/lib -I/home/paul/perl/install/5.005_61/lib/5.00561/i586-linux
+  -I/home/paul/perl/install/5.005_61/lib/5.00561 -e 'use Test::Harness
   qw(&runtests $verbose); $verbose=0; runtests @ARGV;' t/*.t
-  t/btree.............Can't load 'blib/arch/auto/BerkeleyDB/BerkeleyDB.so' for 
-  module BerkeleyDB: blib/arch/auto/BerkeleyDB/BerkeleyDB.so: 
-  undefined symbol: db_create 
-  at /home/paul/perl/install/5.005_61/lib/5.00561/i586-linux/DynaLoader.pm 
+  t/btree.............Can't load 'blib/arch/auto/BerkeleyDB/BerkeleyDB.so' for
+  module BerkeleyDB: blib/arch/auto/BerkeleyDB/BerkeleyDB.so:
+  undefined symbol: db_create
+  at /home/paul/perl/install/5.005_61/lib/5.00561/i586-linux/DynaLoader.pm
   ...
 
 This error usually happens when you have both version 2 and version
 3 of Berkeley DB installed on your system and BerkeleyDB attempts
 to build using the db.h for Berkeley DB version 3 and the version 2
 library. Unfortunately the two versions aren't compatible with each
-other. 
+other.
 
 Solution: Setting the LIB & INCLUDE variables in config.in to point to the
           correct directories can sometimes be enough to fix this
@@ -274,10 +274,10 @@ when you run the test harness:
   BEGIN failed--compilation aborted at t/btree.t line 25.
   dubious
         Test returned status 255 (wstat 65280, 0xff00)
-  ...	
+  ...
 
 Another variation on the theme of having two versions of Berkeley DB on
-your system. 
+your system.
 
 Solution: Setting the LIB & INCLUDE variables in config.in to point to the
           correct directories can sometimes be enough to fix this
@@ -367,22 +367,22 @@ like this when you run the test harness:
 
 
 t/btree........NOK 178Can't call method "txn_begin" on an undefined value at t/btree.t line 637.
-t/btree........dubious                                                       
+t/btree........dubious
         Test returned status 11 (wstat 2816, 0xb00)
 DIED. FAILED tests 28, 178-244
         Failed 68/244 tests, 72.13% okay
 t/db-3.0.......NOK 2Can't call method "set_mutexlocks" on an undefined value at t/db-3.0.t line 39.
-t/db-3.0.......dubious                                                       
+t/db-3.0.......dubious
         Test returned status 11 (wstat 2816, 0xb00)
 DIED. FAILED tests 2-14
         Failed 13/14 tests, 7.14% okay
-t/db-3.1.......ok                                                            
+t/db-3.1.......ok
 t/db-3.2.......NOK 5Can't call method "set_flags" on an undefined value at t/db-3.2.t line 62.
-t/db-3.2.......dubious                                                       
+t/db-3.2.......dubious
         Test returned status 11 (wstat 2816, 0xb00)
 DIED. FAILED tests 3, 5-6
         Failed 3/6 tests, 50.00% okay
-t/db-3.3.......ok                  
+t/db-3.3.......ok
 
 This pattern of errors happens if you have built the module in a directory
 that is network mounted (e.g. NFS ar AFS).
@@ -599,7 +599,7 @@ via the config.in file. Make sure both values point to the same version:
 FEEDBACK
 --------
 
-General feedback/questions/bug reports can be sent to 
+General feedback/questions/bug reports can be sent to
 https://github.com/pmqs/BerkeleyDB/issues (preferred) or
 https://rt.cpan.org/Public/Dist/Display.html?Name=BerkeleyDB
 
@@ -613,7 +613,7 @@ To help me help you, I need of the following information:
 
  1. The version of Perl and the operating system name and version you
     are running. The complete output from running "perl -V" will tell
-    me all I need to know.  
+    me all I need to know.
     If your perl does not understand the "-V" option is too old.
     BerkeleyDB needs Perl version 5.004_04 or better.
 
@@ -670,4 +670,3 @@ CHANGES
 See the Changes file.
 
 Paul Marquess <pmqs@cpan.org>
-

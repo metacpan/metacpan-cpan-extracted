@@ -1,4 +1,6 @@
-.cvsignore
-CVS
+.git
+.gitignore
 releases
-t/CVS
+build-stamp
+install-stamp
+debian

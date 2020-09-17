@@ -26,40 +26,93 @@ binmode STDOUT, ":utf8";
 for my $file (@ARGV) {
     my $png;
     if (-f $file) {
-	$png = read_png_file ($file);
-    }
-    else {
-	if ($webok && is_web_uri ($file)) {
-	    print "Getting '$file' from web.\n";
-	    my $png_data = get ($file);
-	    if ($png_data) {
-		$png = read_from_scalar ($png_data);
-	    }
-	    else {
-		warn "Could not download '$file', skipping.\n";
-	    }
-	}
-	else {
-	    warn "Cannot find a file called '$file', skipping.\n";
+	eval {
+	    $png = read_png_file ($file);
+	};
+	if ($@) {
+	    warn "Could not read '$file': $@";
 	    next;
 	}
     }
-
-    my $ihdr = $png->get_IHDR ();
-    for my $k (sort keys %$ihdr) {
-	if ($k eq 'color_type') {
-	    print "$k: ", color_type_name ($ihdr->{$k}), "\n";
+    else {
+	if ($webok) {
+	    if (is_web_uri ($file)) {
+		print "Getting '$file' from web.\n";
+		my $png_data = get ($file);
+		if ($png_data) {
+		    $png = read_from_scalar ($png_data);
+		}
+		else {
+		    warn "Could not download '$file', skipping.\n";
+		}
+	    }
+	    else {
+		warn "Cannot find a file called '$file', skipping.\n";
+		next;
+	    }
 	}
 	else {
-	    print "$k: $ihdr->{$k}\n";
+	    warn "Modules needed to read from web not installed";
 	}
+    }
+
+    print "Contents of '$file':\n\n";
+    my $ihdr = $png->get_IHDR ();
+    for my $k (sort keys %$ihdr) {
+	# Display key
+	my $dk = $k;
+	$dk = ucfirst ($dk);
+	$dk =~ s/_/ /g;
+	print "$dk: ";
+	if ($k eq 'color_type') {
+	    print color_type_name ($ihdr->{$k});
+	}
+	elsif ($k eq 'interlace_method') {
+	    # Interlace method
+	    my $im = $ihdr->{$k};
+	    # Displayed interlace method
+	    my $dim = 'Unknown';
+	    if ($im == 0) {
+		$dim = 'None';
+	    }
+	    elsif ($im == 1) {
+		$dim = 'ADAM7';
+	    }
+	    print $dim;
+	}
+	else {
+	    print $ihdr->{$k};
+	}
+	print "\n";
     }
     my $valid = $png->get_valid ();
     for my $key (sort keys %$valid) {
 	if ($valid->{$key}) {
-	    print "Valid $key chunk.\n";
-	    if ($key ne 'IDAT' && $key ne 'tIME') {
+	    print "Valid $key chunk";
+	    if ($key eq 'IDAT' || $key eq 'tIME') {
+		print ".\n";
+
+	    }
+	    elsif ($key eq 'PLTE') {
+		my $plte = $png->get_chunk ($key);
+		printf " containing %d colours as follows (CSS format):\n",
+		       scalar (@$plte);
+		for my $rgb (@$plte) {
+		    printf "#%02X%02X%02X ", $rgb->{red},
+			    $rgb->{green}, $rgb->{blue};
+		}
+		print "\n";
+	    }
+	    elsif ($key eq 'tRNS') {
+		my $trns = $png->get_chunk ($key);
+		printf " containing %d values as follows:\n",
+		       scalar (@$trns);
+		my $dtrns = join ", ", @$trns;
+		print "$dtrns\n";
+	    }
+	    else {
 		my $value = $png->get_chunk ($key);
+		print " as follows:\n";
 		print Dumper ($value);
 	    }
 	}
@@ -90,6 +143,7 @@ for my $file (@ARGV) {
 	    print "$k: $time->{$k}\n";
 	}
     }
+    print "\n";
 }
 
 __END__

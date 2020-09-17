@@ -1,7 +1,18 @@
 
+1.854 16 September 2020
+
+   * Prefer direct notation over indirect (#4)
+     fae7c3898579fab1a45b52d2c1d9c19370b21c84
+
+   * Make hint/BS snippets strict compliant.
+     fb503ef27fae2cdce84d1c341e4991917da3bea6
+
+   * trim whitespace
+     6d8428d6f038992e3abbc5a2c7cf17b6d4a75382
+
 1.853 5 January 2020
 
-   * Memory leak if ParseOpenInfo calls croak_and_free  
+   * Memory leak if ParseOpenInfo calls croak_and_free
      https://github.com/pmqs/DB_File/issues/3
      9e2c8d6c3a35acb71358f440c93defa3d8339420
 
@@ -142,7 +153,7 @@
    * make realclean: removing all files
      RT #68214
 
-   * Documented the issue where the error below 
+   * Documented the issue where the error below
 
         BDB0588 At least one secondary cursor must be specified to DB->join
 
@@ -186,12 +197,12 @@
 1.822 12 March 2011
 
    * Link rot
-     [rt.cpan.org #68739] 
+     [rt.cpan.org #68739]
 
 1.822 12 March 2011
 
    * Keep DB_File's warnings in sync with perl's
-     [rt.cpan.org #66339] 
+     [rt.cpan.org #66339]
 
 1.821 10 January 2011
 
@@ -209,7 +220,7 @@
 
 1.818 21 January 2009
 
-   * Updated Makefile.PL for Strawberry Perl. 
+   * Updated Makefile.PL for Strawberry Perl.
      Patch suggested by David Golden.
 
    * Remove IRIX notes from README. The page referenced doesn't exist
@@ -283,7 +294,7 @@
 
    * Merged core patch 22741
 
-   * Fixed core bug 30237. 
+   * Fixed core bug 30237.
      Using substr to pass parameters to the low-level Berkeley DB interface
      causes problems with Perl 5.8.1 or better.
      typemap fix supplied by Marcus Holland-Moritz.
@@ -310,7 +321,7 @@
 
    * merged core patch 17844 - missing dTHX declarations.
 
-   * merged core patch 17838 
+   * merged core patch 17838
 
 1.805 1st September 2002
 
@@ -319,7 +330,7 @@
    * Tightened up the test harness to test that calls to untie don't generate
      the "untie attempted while %d inner references still exist" warning.
 
-   * added code to guard against calling the callbacks (compare,hash & prefix) 
+   * added code to guard against calling the callbacks (compare,hash & prefix)
      recursively.
 
    * passing undef for the flags and/or mode when opening a database could cause
@@ -354,7 +365,7 @@
    * Fixed typo in Makefile.PL
 
    * Added "clean" attribute to Makefile.PL
- 
+
 1.800 23rd November 2001
 
    * use pport.h for perl backward compatibility code.
@@ -382,7 +393,7 @@
    * the test in Makefile.PL for AIX used -plthreads. Should have been
      -lpthreads
 
-   * merged Core patches 
+   * merged Core patches
         10372, 10335, 10372, 10534, 10549, 10643, 11051, 11194, 11432
 
    * added documentation patch regarding duplicate keys from Andrew Johnson
@@ -401,7 +412,7 @@
      recno databases.
 
    * Modified Makefile.PL to only enable the warnings pragma if using perl
-     5.6.1 or better.    
+     5.6.1 or better.
 
 1.76 15th January 2001
 
@@ -441,7 +452,7 @@
 
    * Added note about building under Linux. Included patches.
 
-   * Included Perl core patch 8068 -- fix for bug 20001013.009 
+   * Included Perl core patch 8068 -- fix for bug 20001013.009
      When run with warnings enabled "$hash{XX} = undef " produced an
      "Uninitialized value" warning. This has been fixed.
 
@@ -487,10 +498,10 @@
    * Fixed the R_SETCURSOR bug introduced in 1.68
 
    * Added a new Perl variable $DB_File::db_ver
-   
+
 1.68 22nd July 1999
 
-   * Merged changes from 5.005_58 
+   * Merged changes from 5.005_58
 
    * Fixed a bug in R_IBEFORE & R_IAFTER processing in Berkeley DB
      2 databases.
@@ -744,4 +755,3 @@
 0.1
 
     First Release.
-

@@ -3,13 +3,13 @@ abstract: 'Bitcoin cryptography in Perl'
 author:
   - 'Bartosz Jarzyna <brtastic.dev@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.55_03
+  ExtUtils::MakeMaker: '0'
   Test::Exception: '0'
   Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 6.55_03
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,17 +21,16 @@ no_index:
     - inc
 requires:
   Bitcoin::BIP39: '0.002'
-  CryptX: '0.068'
-  Math::BigInt: '1.999818'
-  Moo: '2.004000'
+  CryptX: '0.062'
+  Math::BigInt: '1.999808'
+  Moo: '2.003004'
   Throwable: '0.2'
-  Type::Tiny: '1.010001'
+  Type::Tiny: '1.004000'
   namespace::clean: '0.27'
-  perl: '5.010'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/brtastic/perl-bitcoin-crypto/issues
   homepage: https://metacpan.org/release/Bitcoin-Crypto
   license: https://dev.perl.org/licenses
   repository: https://github.com/brtastic/perl-bitcoin-crypto
-version: '0.994'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.995'

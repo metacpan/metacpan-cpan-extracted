@@ -56,7 +56,7 @@ sub print_video_infos {
 
 sub _prepare_print_info {
     my ( $set, $opt, $data, $ex, $up, $id ) = @_;
-    my @keys = qw(title extractor author duration raters avg_rating view_count published description);
+    my @keys = qw(title author duration raters avg_rating view_count published id_extractor description);
     if ( ! exists $data->{$ex}{$up}{$id}{fmt_to_info} ) {
         my $url = $data->{$ex}{$up}{$id}{url};
         print "\r** GET video data: ... ";
@@ -71,9 +71,10 @@ sub _prepare_print_info {
             $data->{$ex}{$up}{$id}{description} = $set->{failed_fetching_data};
         }
     }
-    $data->{$ex}{$up}{$id}{published}  = $data->{$ex}{$up}{$id}{upload_date}    if defined $data->{$ex}{$up}{$id}{upload_date};
-    $data->{$ex}{$up}{$id}{author}     = $data->{$ex}{$up}{$id}{uploader}       if defined $data->{$ex}{$up}{$id}{uploader};
-    $data->{$ex}{$up}{$id}{avg_rating} = $data->{$ex}{$up}{$id}{average_rating} if defined $data->{$ex}{$up}{$id}{average_rating};
+    $data->{$ex}{$up}{$id}{published}    = $data->{$ex}{$up}{$id}{upload_date}           if defined $data->{$ex}{$up}{$id}{upload_date};
+    $data->{$ex}{$up}{$id}{author}       = $data->{$ex}{$up}{$id}{uploader}              if defined $data->{$ex}{$up}{$id}{uploader};
+    $data->{$ex}{$up}{$id}{avg_rating}   = $data->{$ex}{$up}{$id}{average_rating}        if defined $data->{$ex}{$up}{$id}{average_rating};
+    $data->{$ex}{$up}{$id}{id_extractor} = $id . ' ' . $data->{$ex}{$up}{$id}{extractor} if defined $data->{$ex}{$up}{$id}{extractor};
     for my $key ( @keys ) {
         next if ! $data->{$ex}{$up}{$id}{$key};
         $data->{$ex}{$up}{$id}{$key} =~ s/\R/ /g;

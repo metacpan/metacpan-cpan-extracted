@@ -2,7 +2,7 @@
 package BerkeleyDB;
 
 
-#     Copyright (c) 1997-2019 Paul Marquess. All rights reserved.
+#     Copyright (c) 1997-2020 Paul Marquess. All rights reserved.
 #     This program is free software; you can redistribute it and/or
 #     modify it under the same terms as Perl itself.
 #
@@ -17,14 +17,14 @@ use Carp;
 use vars qw($VERSION @ISA @EXPORT $AUTOLOAD
 		$use_XSLoader);
 
-$VERSION = '0.63';
+$VERSION = '0.64';
 
 require Exporter;
 
 BEGIN {
     $use_XSLoader = 1 ;
     { local $SIG{__DIE__} ; eval { require XSLoader } ; }
- 
+
     if ($@) {
         $use_XSLoader = 0 ;
         require DynaLoader;
@@ -727,13 +727,13 @@ sub AUTOLOAD {
     no strict 'refs';
     *{$AUTOLOAD} = sub { $val };
     goto &{$AUTOLOAD};
-}         
+}
 
 #bootstrap BerkeleyDB $VERSION;
 if ($use_XSLoader)
   { XSLoader::load("BerkeleyDB", $VERSION)}
 else
-  { bootstrap BerkeleyDB $VERSION }  
+  { bootstrap BerkeleyDB $VERSION }
 
 # Preloaded methods go here.
 
@@ -773,7 +773,7 @@ sub ParseParameters($@)
         else
 	  { push (@Bad, $key) }
     }
-    
+
     if (@Bad) {
         my ($bad) = join(", ", @Bad) ;
         croak "unknown key value(s) $bad" ;
@@ -834,7 +834,7 @@ sub env_remove
 	    push @BerkeleyDB::a, "$k\t$v" ;
 	}
 
-        $got->{"Config"} = pack("p*", @BerkeleyDB::a, undef) 
+        $got->{"Config"} = pack("p*", @BerkeleyDB::a, undef)
 	    if @BerkeleyDB::a ;
     }
 
@@ -973,7 +973,7 @@ sub new
                     BlobDir	=> undef,
 					}, @_) ;
 
-    my $errfile  = $got->{ErrFile} ;				
+    my $errfile  = $got->{ErrFile} ;
     if (defined $got->{ErrFile}) {
 	if (!isaFilehandle($got->{ErrFile})) {
 	    my $handle = new IO::File ">$got->{ErrFile}"
@@ -983,7 +983,7 @@ sub new
     }
 
     if (defined $got->{MsgFile}) {
-        my $msgfile  = $got->{MsgFile} ;				
+        my $msgfile  = $got->{MsgFile} ;
 	if (!isaFilehandle($msgfile)) {
 	    my $handle = new IO::File ">$msgfile"
 		or croak "Cannot open file $msgfile: $!\n" ;
@@ -1001,14 +1001,14 @@ sub new
 	my $k = "" ; my $v = "" ;
 	while (($k, $v) = each %config) {
 	    if ($BerkeleyDB::db_version >= 3.1 && ! $valid_config_keys{$k} ){
-	        $BerkeleyDB::Error = "illegal name-value pair: $k $v\n" ; 
+	        $BerkeleyDB::Error = "illegal name-value pair: $k $v\n" ;
                 croak $BerkeleyDB::Error ;
 	    }
 	    push @BerkeleyDB::a, "$k\t$v" ;
 	    $got->{$k} = $v;
 	}
 
-        $got->{"Config"} = pack("p*", @BerkeleyDB::a, undef) 
+        $got->{"Config"} = pack("p*", @BerkeleyDB::a, undef)
 	    if @BerkeleyDB::a ;
     }
 
@@ -1027,8 +1027,8 @@ sub new
 #	    elsif ($k eq 'DB_TEMP_DIR' || $k eq 'DB_TMP_DIR')
 #	      { $obj->set_tmp_dir($v) }
 #	    else {
-#	      $BerkeleyDB::Error = "illegal name-value pair: $k $v\n" ; 
-#              croak $BerkeleyDB::Error 
+#	      $BerkeleyDB::Error = "illegal name-value pair: $k $v\n" ;
+#              croak $BerkeleyDB::Error
 #            }
 #	}
 #    }
@@ -1132,7 +1132,7 @@ sub new
     if ($addr) {
         $obj = bless [$addr] , $self ;
 	push @{ $obj }, $got->{Env} if $got->{Env} ;
-        $obj->Txn($got->{Txn}) 
+        $obj->Txn($got->{Txn})
             if $got->{Txn} ;
     }
     return $obj ;
@@ -1140,7 +1140,7 @@ sub new
 
 *TIEHASH = \&new ;
 
- 
+
 package BerkeleyDB::Btree ;
 
 use vars qw(@ISA) ;
@@ -1199,10 +1199,10 @@ sub new
 #            if $got->{set_bt_compress} !~ /ARRAY/ ||
 #               @{ $got->{set_bt_compress} } != 2;
 #
-#        $got->{"_btcompress1"} =  $got->{set_bt_compress}[0] 
+#        $got->{"_btcompress1"} =  $got->{set_bt_compress}[0]
 #            if defined $got->{set_bt_compress}[0];
 #
-#        $got->{"_btcompress2"} =  $got->{set_bt_compress}[1] 
+#        $got->{"_btcompress2"} =  $got->{set_bt_compress}[1]
 #            if defined $got->{set_bt_compress}[1];
 #    }
 
@@ -1213,7 +1213,7 @@ sub new
     if ($addr) {
         $obj = bless [$addr] , $self ;
 	push @{ $obj }, $got->{Env} if $got->{Env} ;
-        $obj->Txn($got->{Txn}) 
+        $obj->Txn($got->{Txn})
             if $got->{Txn} ;
     }
     return $obj ;
@@ -1272,10 +1272,10 @@ sub new
 #            if $got->{HeapSize} !~ /ARRAY/ ||
 #               @{ $got->{set_bt_compress} } != 2;
 #
-#        $got->{"HeapSize"} =  $got->{HeapSize}[0] 
+#        $got->{"HeapSize"} =  $got->{HeapSize}[0]
 #            if defined $got->{HeapSize}[0];
 #
-#        $got->{"HeapSize"} =  $got->{HeapSize}[1] 
+#        $got->{"HeapSize"} =  $got->{HeapSize}[1]
 #            if defined $got->{HeapSize}[1];
 #    }
 
@@ -1286,7 +1286,7 @@ sub new
     if ($addr) {
         $obj = bless [$addr] , $self ;
 	push @{ $obj }, $got->{Env} if $got->{Env} ;
-        $obj->Txn($got->{Txn}) 
+        $obj->Txn($got->{Txn})
             if $got->{Txn} ;
     }
     return $obj ;
@@ -1355,9 +1355,9 @@ sub new
     if ($addr) {
         $obj = bless [$addr] , $self ;
 	push @{ $obj }, $got->{Env} if $got->{Env} ;
-        $obj->Txn($got->{Txn}) 
+        $obj->Txn($got->{Txn})
             if $got->{Txn} ;
-    }	
+    }
     return $obj ;
 }
 
@@ -1421,7 +1421,7 @@ sub new
 	push @{ $obj }, $got->{Env} if $got->{Env} ;
         $obj->Txn($got->{Txn})
             if $got->{Txn} ;
-    }	
+    }
     return $obj ;
 }
 
@@ -1434,12 +1434,12 @@ sub UNSHIFT
 }
 
 ## package BerkeleyDB::Text ;
-## 
+##
 ## use vars qw(@ISA) ;
 ## @ISA = qw( BerkeleyDB::Common BerkeleyDB::_tiedArray ) ;
 ## use UNIVERSAL ;
 ## use Carp ;
-## 
+##
 ## sub new
 ## {
 ##     my $self = shift ;
@@ -1457,30 +1457,30 @@ sub UNSHIFT
 ## 			Env		=> undef,
 ## 			#Tie 		=> undef,
 ## 			Txn		=> undef,
-## 
+##
 ## 			# Recno specific
 ## 			Delim		=> undef,
 ## 			Len		=> undef,
 ## 			Pad		=> undef,
 ## 			Btree 		=> undef,
 ## 		      }, @_) ;
-## 
+##
 ##     croak("Env not of type BerkeleyDB::Env")
 ## 	if defined $got->{Env} and ! isa($got->{Env},'BerkeleyDB::Env');
-## 
+##
 ##     croak("Txn not of type BerkeleyDB::Txn")
 ## 	if defined $got->{Txn} and ! isa($got->{Txn},'BerkeleyDB::Txn');
-## 
+##
 ##     croak("-Tie needs a reference to an array")
 ## 	if defined $got->{Tie} and $got->{Tie} !~ /ARRAY/ ;
-## 
+##
 ##     # rearange for recno
 ##     $got->{Source} = $got->{Filename} if defined $got->{Filename} ;
 ##     delete $got->{Filename} ;
 ##     $got->{Fname} = $got->{Btree} if defined $got->{Btree} ;
 ##     return BerkeleyDB::Recno::_db_open_recno($self, $got);
 ## }
-## 
+##
 ## *BerkeleyDB::Text::TIEARRAY = \&BerkeleyDB::Text::new ;
 ## *BerkeleyDB::Text::db_stat = \&BerkeleyDB::Btree::db_stat ;
 
@@ -1531,7 +1531,7 @@ sub new
 	push @{ $obj }, $got->{Env} if $got->{Env} ;
         $obj->Txn($got->{Txn})
             if $got->{Txn} ;
-    }	
+    }
     return $obj ;
 }
 
@@ -1540,14 +1540,14 @@ package BerkeleyDB::_tiedHash ;
 
 use Carp ;
 
-#sub TIEHASH  
-#{ 
+#sub TIEHASH
+#{
 #    my $self = shift ;
 #    my $db_object = shift ;
 #
 #print "Tiehash REF=[$self] [" . (ref $self) . "]\n" ;
 #
-#    return bless { Obj => $db_object}, $self ; 
+#    return bless { Obj => $db_object}, $self ;
 #}
 
 sub Tie
@@ -1562,22 +1562,22 @@ sub Tie
     #print "Tie method REF=[$self] [" . (ref $self) . "]\n" ;
 
     croak("usage \$x->Tie \\%hash\n") unless @_ ;
-    my $ref  = shift ; 
+    my $ref  = shift ;
 
     croak("Tie needs a reference to a hash")
 	if defined $ref and $ref !~ /HASH/ ;
 
-    #tie %{ $ref }, ref($self), $self ; 
-    tie %{ $ref }, "BerkeleyDB::_tiedHash", $self ; 
+    #tie %{ $ref }, ref($self), $self ;
+    tie %{ $ref }, "BerkeleyDB::_tiedHash", $self ;
     return undef ;
 }
 
- 
-sub TIEHASH  
-{ 
+
+sub TIEHASH
+{
     my $self = shift ;
     my $db_object = shift ;
-    #return bless $db_object, 'BerkeleyDB::Common' ; 
+    #return bless $db_object, 'BerkeleyDB::Common' ;
     return $db_object ;
 }
 
@@ -1620,7 +1620,7 @@ sub CLEAR_old
     my $self = shift ;
     my ($key, $value) = (0, 0) ;
     my $cursor = $self->_db_write_cursor() ;
-    while ($cursor->c_get($key, $value, BerkeleyDB::DB_PREV()) == 0) 
+    while ($cursor->c_get($key, $value, BerkeleyDB::DB_PREV()) == 0)
 	{ $cursor->c_del() }
 }
 
@@ -1655,32 +1655,32 @@ sub Tie
     #print "Tie method REF=[$self] [" . (ref $self) . "]\n" ;
 
     croak("usage \$x->Tie \\%hash\n") unless @_ ;
-    my $ref  = shift ; 
+    my $ref  = shift ;
 
     croak("Tie needs a reference to an array")
 	if defined $ref and $ref !~ /ARRAY/ ;
 
-    #tie %{ $ref }, ref($self), $self ; 
-    tie @{ $ref }, "BerkeleyDB::_tiedArray", $self ; 
+    #tie %{ $ref }, ref($self), $self ;
+    tie @{ $ref }, "BerkeleyDB::_tiedArray", $self ;
     return undef ;
 }
 
- 
-#sub TIEARRAY  
-#{ 
+
+#sub TIEARRAY
+#{
 #    my $self = shift ;
 #    my $db_object = shift ;
 #
 #print "Tiearray REF=[$self] [" . (ref $self) . "]\n" ;
 #
-#    return bless { Obj => $db_object}, $self ; 
+#    return bless { Obj => $db_object}, $self ;
 #}
 
-sub TIEARRAY  
-{ 
+sub TIEARRAY
+{
     my $self = shift ;
     my $db_object = shift ;
-    #return bless $db_object, 'BerkeleyDB::Common' ; 
+    #return bless $db_object, 'BerkeleyDB::Common' ;
     return $db_object ;
 }
 
@@ -1881,7 +1881,7 @@ sub get_dup
 {
     croak "Usage: \$db->get_dup(key [,flag])\n"
         unless @_ == 2 or @_ == 3 ;
- 
+
     my $db        = shift ;
     my $key       = shift ;
     my $flag	  = shift ;
@@ -1893,7 +1893,7 @@ sub get_dup
     my $counter   = 0 ;
     my $status    = 0 ;
     my $cursor    = $db->db_cursor() ;
- 
+
     # iterate through the database until either EOF ($status == 0)
     # or a different key is encountered ($key ne $origkey).
     for ($status = $cursor->c_get($key, $value, BerkeleyDB::DB_SET()) ;
@@ -1908,9 +1908,9 @@ sub get_dup
 	}
         else
             { ++ $counter }
-     
+
     }
- 
+
     return ($wantarray ? ($flag ? %values : @values) : $counter) ;
 }
 
@@ -2079,7 +2079,7 @@ sub BerkeleyDB::Common::cds_lock
     my $db = shift ;
 
     # fatal error if database not opened in CDS mode
-    croak("CDS not enabled for this database\n") 
+    croak("CDS not enabled for this database\n")
         if ! $db->cds_enabled();
 
     if ( ! defined $Object{"$db"})
@@ -2098,7 +2098,7 @@ sub cds_unlock
     my $self = shift ;
     my $db = $self->[0] ;
 
-    if ($self->[1]) 
+    if ($self->[1])
     {
         $self->[1] = 0 ;
         -- $Count{"$db"} if $Count{"$db"} > 0 ;
@@ -2119,7 +2119,7 @@ sub cds_unlock
 sub DESTROY
 {
     my $self = shift ;
-    $self->cds_unlock() ;	
+    $self->cds_unlock() ;
 }
 
 package BerkeleyDB::Term ;
@@ -2137,6 +2137,3 @@ package BerkeleyDB ;
 
 1;
 __END__
-
-
-

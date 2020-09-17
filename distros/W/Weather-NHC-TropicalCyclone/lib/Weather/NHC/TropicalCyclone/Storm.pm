@@ -9,7 +9,8 @@ use Validate::Tiny    ();
 use HTML::TreeBuilder ();
 
 # specify accessors
-use Object::Tiny qw/id binNumber name classification intensity pressure latitude longitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/;
+use Object::Tiny
+  qw/id binNumber name classification intensity pressure latitude longitude latitude_numberic movementDir movementSpeed lastUpdate publicAdvisory forecastAdvisory windSpeedProbabilities forecastDiscussion forecastGraphics forecastTrack windWatchesWarnings trackCone initialWindExtent forecastWindRadiiGIS bestTrackGIS earliestArrivalTimeTSWindsGIS mostLikelyTimeTSWindsGIS windSpeedProbabilitiesGIS kmzFile34kt kmzFile50kt kmzFile64kt stormSurgeWatchWarningGIS potentialStormSurgeFloodingGIS/;
 
 our $DEFAULT_GRAPHICS_ROOT = q{https://www.nhc.noaa.gov/storm_graphics};
 our $DEFAULT_BTK_ROOT      = q{https://ftp.nhc.noaa.gov/atcf/btk};
@@ -181,6 +182,25 @@ sub fetch_publicAdvisory {
 sub fetch_forecastAdvisory {
     my ( $self, $local_file ) = @_;
     return $self->_get_text( q{forecastAdvisory}, $local_file );
+}
+
+# in this case, the $local_file is the file to which the ATCF data is saved,
+# the forecast advisory is only handled as text; ATCF is returned as an arrary
+# ref
+sub fetch_forecastAdvisory_as_atcf {
+    my ( $self, $local_file ) = @_;
+    my ( $text, $advNum, $_ignore ) = $self->_get_text(q{forecastAdvisory});
+    require Weather::NHC::TropicalCyclone::ForecastAdvisory;
+
+    my $fst_ref   = Weather::NHC::TropicalCyclone::ForecastAdvisory->new( input_text => $text, output_file => $local_file );
+    my $atcf_text = $fst_ref->extract_atcf;
+
+    # save file if $local_file is passed
+    if ($local_file) {
+        $fst_ref->save_atcf;
+    }
+
+    return ( $fst_ref->as_atcf, $advNum, $local_file );
 }
 
 # optionally provide a local file name to save fetched file to
@@ -430,6 +450,27 @@ Internal method used by all of the fetch methods that downloads files.
 =head2 Auxillary Methods
 
 =over 3
+
+=item C<fetch_forecastAdvisory_as_atcf>
+
+An optional parameter may be passed that designates a file in which to save the
+forecast advisory in ATCF format. Returns a list, item 1 is the array reference
+containing the ATCF data; if the optional file name was passed, the same value
+is passed. If no local file name is passed, this value with be undef.
+
+   # to get $atcf_ref without saving to a file
+   my ($atcf_ref, $advNum_atcf, $saved_file) = $storm->fetch_forecastAdvisory_as_atcf($file);
+
+   # to save ATCF format to a file
+   my $file = q{my.fst};
+   my ($atcf_ref, $advNum_atcf, $saved_file) = $storm->fetch_forecastAdvisory_as_atcf($file);
+
+Fetches the forecast advisory, converts the forecast advisory into ATCF format,
+then returns an array reference containing each full ATCF record as an element
+in the array reference.
+
+This method internally uses <fetch_forecastAdvisory> without an intermediate file
+save, the uses methods provided by the provide module, C<Weather::NHC::TropicalCyclone::ForecastAdvisory>.
 
 =item C<fetch_forecastGraphics_urls>
 

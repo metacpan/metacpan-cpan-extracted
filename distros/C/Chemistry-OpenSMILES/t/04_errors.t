@@ -14,6 +14,11 @@ my %cases = (
     'CCC1'    => 't/04_errors.t: unclosed ring bond(s) detected: 1.',
     'C2%12'   => 't/04_errors.t: unclosed ring bond(s) detected: 2, 12.',
     'C=1CC$1' => 't/04_errors.t: ring bond types for ring bond 1 do not match.',
+    'C((C))O' => 't/04_errors.t: syntax error at position 3: \'C))O\'.',
+    '(O)'     => 't/04_errors.t: syntax error at position 1: \'O)\'.',
+    '(O)C'    => 't/04_errors.t: syntax error at position 1: \'O)C\'.',
+    '.CC'     => 't/04_errors.t: syntax error at position 1: \'CC\'.',
+    'CC.'     => 't/04_errors.t: syntax error at position 4.',
 );
 
 plan tests => scalar keys %cases;

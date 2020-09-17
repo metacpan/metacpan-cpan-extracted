@@ -1,5 +1,12 @@
 Revision history for Tickit-Widget-Menu
 
+0.12    2020-09-16
+        [CHANGES]
+         * Use Object::Pad
+         * Use perl 5.26+ signatures
+         * Update docs to `=head2 barename` style
+         * Avoid using `Tickit::Async` in examples
+
 0.11    2017/02/15 15:10:17
         [CHANGES]
          * No longer need to use ->tickit->later for geometry changes, since

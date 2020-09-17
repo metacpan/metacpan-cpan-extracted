@@ -1,19 +1,13 @@
 use Mojo::Base -strict;
-use Test::Deep;
 use Test::More;
 use LinkEmbedder;
 
 plan skip_all => 'TEST_ONLINE=1'         unless $ENV{TEST_ONLINE};
 plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
 
-my $embedder = LinkEmbedder->new;
-
-my $link;
-$embedder->get_p('http://ix.io/fpW')->then(sub { $link = shift })->wait;
-isa_ok($link, 'LinkEmbedder::Link::Ix');
-cmp_deeply(
-  $link->TO_JSON,
-  {
+LinkEmbedder->new->test_ok(
+  'http://ix.io/fpW' => {
+    isa           => 'LinkEmbedder::Link::Ix',
     cache_age     => 0,
     html          => paste_html(),
     provider_name => 'Ix',
@@ -21,9 +15,8 @@ cmp_deeply(
     type          => 'rich',
     url           => 'http://ix.io/fpW',
     version       => '1.0',
-  },
-  'http://ix.io/fpW',
-) or note $link->_dump;
+  }
+);
 
 done_testing;
 

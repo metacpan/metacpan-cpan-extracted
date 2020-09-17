@@ -1,7 +1,3 @@
-From: from@example.com
-Subject: Alert Log Message
-To: foo@example.com,bar@example.org
-Date: [^\n]+
-MIME-Version: 1.0
+(?:[\w\-]+:[ ]*[^\n]+\n)+
 
 This is to alert you something happened.

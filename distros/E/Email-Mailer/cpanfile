@@ -3,6 +3,7 @@
 
 requires "Email::MIME" => "1.940";
 requires "Email::MIME::CreateHTML" => "0";
+requires "Email::MessageID" => "0";
 requires "Email::Sender::Simple" => "0";
 requires "HTML::FormatText" => "0";
 requires "HTML::TreeBuilder" => "0";

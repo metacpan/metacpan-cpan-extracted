@@ -160,12 +160,15 @@ Anonymous roles are possible.
 Consuming anonymous roles is a little tricky.
 
   class Cow {
-    with {"::$Milkable"};
+    with {$Milkable};
   }
 
-The braces mean that the role should be evaluated as a block. The leading
-"::" is required because you don't want the prefix to be added to the role
-name.
+The braces mean that the role should be evaluated as a block. Whenever a
+class or role name isn't a bareword, it needs wrapping in braces. This is
+similar to:
+
+  print STDOUT "foo";
+  print { $myobj->get_filehandle() } "foo";
 
 The equivalent of C<isa> for roles is C<does>.
 
@@ -241,7 +244,7 @@ It is possible to both inherit and consume at the same time:
 Extending anonymous classes is much like consuming anonymous roles.
 
   class Piglet {
-    extends { "::" . "Pig" };
+    extends {$Pig};
   }
 
 Multiple inheritance is supported though it is often considered bad

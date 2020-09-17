@@ -1,35 +1,26 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Menu::itembase;
+use v5.26;
+use Object::Pad 0.33;
 
-use strict;
-use warnings;
+package Tickit::Widget::Menu::itembase 0.12;
+role Tickit::Widget::Menu::itembase;
 
-our $VERSION = '0.11';
+has $_name;
 
-sub _init_itembase
+BUILD ( %args )
 {
-   my $self = shift;
-   my %args = @_;
-
-   $self->{name} = $args{name};
+   $_name = $args{name};
 }
 
-sub name
-{
-   my $self = shift;
-   return $self->{name};
-}
+method name () { $_name }
 
-sub render_label
+method render_label ( $rb, $cols, $menu )
 {
-   my $self = shift;
-   my ( $rb, $cols, $menu ) = @_;
-
-   $rb->text( $self->name );
+   $rb->text( $_name );
 }
 
 0x55AA;

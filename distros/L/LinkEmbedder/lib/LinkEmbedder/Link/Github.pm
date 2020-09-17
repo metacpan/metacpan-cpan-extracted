@@ -8,7 +8,7 @@ has provider_url  => sub { Mojo::URL->new('https://github.com') };
 
 sub learn_p {
   my $self = shift;
-  return $self->url =~ m!gist\.github\.com/(.+)! ? $self->_learn_from_gist($1) : $self->SUPER::learn_p;
+  return $self->url =~ m!gist\.github\.com/(.+)! ? $self->_learn_from_gist_p($1) : $self->SUPER::learn_p;
 }
 
 sub _learn_from_dom {
@@ -25,25 +25,49 @@ sub _learn_from_dom {
     $self->title($e);
   }
 
-  # Pages with a readme file
-  my $skip = $self->title;
-  $skip =~ s!\S+:\s+(\w)!$1!;    # remove "username/repo:"
-  for my $e ($dom->find('#readme p')->each) {
-    my $text = $e->all_text || '';
-    next unless $text =~ /\w/;
-    next unless index($text, $skip) == -1;
-    $self->description($text);
-    last;
+  # Pages with readme
+  $e = $dom->find('#readme p');
+  $self->_learn_from_readme($e) if $e;
+
+  # Pages with source code
+  $e = $dom->find('table.highlight');
+  $self->_learn_from_code($e->first) if $e->size == 1;
+}
+
+sub _learn_from_code {
+  my ($self, $e) = @_;
+  my @code;
+
+  for my $line ($e->find('.blob-code')->each) {
+    push @code, $line->all_text;
+  }
+
+  if (@code) {
+    $self->{paste} = join '', map {"$_\n"} @code;
+    $self->template->[1] = 'paste.html.ep';
   }
 }
 
-sub _learn_from_gist {
+sub _learn_from_gist_p {
   my ($self, $gist_id) = @_;
   my @gist_id = split '/', $gist_id;
 
   $gist_id = $gist_id[1] if @gist_id >= 2;
   my $gist_url = Mojo::URL->new(sprintf 'https://api.github.com/gists/%s', $gist_id);
   return $self->_get_p($gist_url)->then(sub { $self->_parse_gist(shift) });
+}
+
+sub _learn_from_readme {
+  my ($self, $p) = @_;
+  my $skip = $self->title;
+
+  for my $e ($p->each) {
+    my $text = $e->all_text || '';
+    next unless $text =~ /\w/ and $text =~ /\.\s*$/;
+    next unless index($text, $skip) == -1;
+    $self->description($text);
+    last;
+  }
 }
 
 sub _parse_gist {

@@ -1,6 +1,9 @@
 Revision history for App-YTDL
 
 
+0.417   2020-09-17
+        - Update info output.
+
 0.416   2020-09-12
         - Let the user begin to select videos from lists only after the information of all video lists has been downloaded.
 

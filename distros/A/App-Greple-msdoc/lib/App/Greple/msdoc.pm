@@ -4,7 +4,7 @@ msdoc - Greple module for access MS office docx/pptx/xlsx documents
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -65,13 +65,6 @@ Set indentation string.  Default is C<| >.
 
 cpanm App::Greple::msdoc
 
-=head1 LICENSE
-
-Copyright (C) Kazumasa Utashiro.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
 =head1 SEE ALSO
 
 L<https://github.com/kaz-utashiro/greple-msdoc>
@@ -80,17 +73,25 @@ L<https://github.com/kaz-utashiro/greple-msdoc>
 
 Kazumasa Utashiro
 
+=head1 LICENSE
+
+Copyright 2018-2020 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
 =cut
 
 package App::Greple::msdoc;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use strict;
 use warnings;
 use v5.14;
 use Carp;
 use utf8;
+use Encode;
 
 use Exporter 'import';
 our @EXPORT      = ();
@@ -229,6 +230,24 @@ sub __extract {
     open STDIN, "<", \$stdin || die "open: $!";
 }
 
+sub extract_pptx {
+    my %arg = @_;
+    my $file = delete $arg{&FILELABEL} or die;
+    my $pid = open(STDIN, '-|') // croak "process fork failed: $!";
+    binmode STDIN, ':encoding(utf8)';
+    if ($pid == 0) {
+	my @slides = do {
+	    map  { $_->[0] }
+	    sort { $a->[1] <=> $b->[1] }
+	    map  { m{(ppt/slides/slide(\d+)\.xml)} ? [ $1, $2 ] : () }
+	    `unzip -l \"$file\" ppt/slides/slide*.xml`;
+	};
+	print decode 'utf8', join '', map { `unzip -p \"$file\" $_` } @slides;
+	exit;
+    }
+    $pid;
+}
+
 1;
 
 __DATA__
@@ -248,7 +267,7 @@ help	--text		ignore
 
 option default \
 	--if '/\.docx$/:unzip -p /dev/stdin word/document.xml' \
-	--if '/\.pptx$/:unzip -p /dev/stdin ppt/slides/*.xml' \
+	--if '/\.pptx$/:&__PACKAGE__::extract_pptx' \
 	--if '/\.xlsx$/:unzip -p /dev/stdin xl/sharedStrings.xml' \
 	--if '/\.(docx|pptx|xlsx)$/:&__PACKAGE__::extract'
 
@@ -268,9 +287,6 @@ builtin indent-mark=s $indent_mark
 ##
 ## --dump
 ##
-option --dump \
-	-Mcolors --cm x --bright --face +D \
-	--le &sub{} --need 0 --all \
-	--epilogue 'sub{exit(0)}'
+option --dump --le &sub{} --need 0 --all --epilogue 'sub{exit(0)}'
 
 #  LocalWords:  msdoc Greple greple Mmsdoc docx ppt xml pptx xlsx xl

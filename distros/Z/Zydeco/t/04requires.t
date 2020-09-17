@@ -43,7 +43,7 @@ package MyApp2 {
 		requires xyzzy(Int $x);
 	}};
 	$Class = do { class {
-		with {"::$Role"};
+		with {$Role};
 		method xyzzy { return $_[1] }
 	}};
 }

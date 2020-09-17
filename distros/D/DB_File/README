@@ -1,8 +1,8 @@
                                   DB_File
 
-                               Version 1.853
+                               Version 1.854
 
-                               5 January 2020
+                              16 September 2020
 
      Copyright (c) 1995-2020 Paul Marquess. All rights reserved. This
       program is free software; you can redistribute it and/or modify
@@ -46,7 +46,7 @@ your system:
 
     * Berkeley DB.
 
-      The official web site for Berkeley DB is 
+      The official web site for Berkeley DB is
 
         http://www.oracle.com/technology/products/berkeley-db/db/index.html
 
@@ -101,7 +101,7 @@ INSTALLATION
 UPDATES
 =======
 
-The most recent version of DB_File is always available at 
+The most recent version of DB_File is always available at
 
     http://www.cpan.org/modules/by-module/DB_File/
 
@@ -242,14 +242,14 @@ To date thus issue has only been reported on Windows. If you encounter this
 issue on another platform, please report the issue. See the FEEDBACK
 section for details.
 
-This issue boils down to the size of the C type time_t. 
+This issue boils down to the size of the C type time_t.
 
 The typical reason for getting this error is when running a 32-bit Perl
 (which will use a 32-bit time_t) along with a 32-bit Berkeley DB library.
 The key point is how Berkeley DB has been built. If it has been built with
 a newish version of Visual C++, time_t will default to 64-bit, even when
 the rest of the library has been built 32-bit. This means that Perl thinks
-time_t is 32-bit, but Berkeley DB thinks it is 64-bit. 
+time_t is 32-bit, but Berkeley DB thinks it is 64-bit.
 
 More details of how the size of time_t in Windows is shown below (taken
 from http://msdn.microsoft.com/en-us/library/w4ddyt9h.aspx)
@@ -268,7 +268,7 @@ Berkeley DB. Unfortunately one of those data structures includes a time_t.
 This is the root case for this issue. When you build DB_File, it assumes
 time_t is 32-bit, but the Berkeley DB library is expecting it to be 64-bit.
 
-Solution: 
+Solution:
 
 There are a few options available.
 
@@ -295,7 +295,7 @@ MacOS Notes
 You are running MacOS 10.13 (or possibly later), and the test DB_File test harness file
 db-hash.t fails like this
 
-    t/db-btree.t .. ok       
+    t/db-btree.t .. ok
     t/db-hash.t ... Use of uninitialized value $value in string eq at t/db-hash.t line 224.
     Use of uninitialized value $values[0] in string eq at t/db-hash.t line 224.
     Use of uninitialized value $value in lc at t/db-hash.t line 224.
@@ -325,9 +325,9 @@ db-hash.t fails like this
     t/db-hash.t ... 1/166 Use of uninitialized value $h{"Fred"} in string eq at t/db-hash.t line 572.
     Use of uninitialized value $v in concatenation (.) or string at t/db-hash.t line 748.
     t/db-hash.t ... Dubious, test returned 25 (wstat 6400, 0x1900)
-    Failed 76/166 subtests 
-    t/db-recno.t .. ok       
-    t/pod.t ....... ok   
+    Failed 76/166 subtests
+    t/db-recno.t .. ok
+    t/pod.t ....... ok
 
 
 It appears that MacOS 10.13 has a copy of BerkeleyDB version 1 included in
@@ -357,7 +357,7 @@ Alternatively, set the two envornment variables DB_FILE_LIB and DB_FILE_INCLUDE
 as follows
 
     export DB_FILE_LIB=/opt/local/lib/db48
-    export DB_FILE_INCLUDE=/opt/local/include/db48 
+    export DB_FILE_INCLUDE=/opt/local/include/db48
 
 Now rebuild DB_File from scratch.
 
@@ -606,7 +606,7 @@ xlC compiler.
     ld: 0711-345 Use the -bloadmap or -bnoquiet option to obtain more information.
     make: 1254-004 The error code from the last command is 8.
 
-Editing Makefile.PL, and changing the line 
+Editing Makefile.PL, and changing the line
 
     $LIBS .= " -lpthread" if $^O eq 'aix' ;
 
@@ -620,7 +620,7 @@ fixed the problem.
 FEEDBACK
 ========
 
-General feedback/questions/bug reports can be sent to 
+General feedback/questions/bug reports can be sent to
 https://github.com/pmqs/DB_File/issues (preferred) or
 https://rt.cpan.org/Public/Dist/Display.html?Name=DB_File
 
@@ -630,13 +630,13 @@ Alternatively, email me at pmqs@cpan.org.
 How to report a problem with DB_File.
 -------------------------------------
 
-When reporting any problem, I need the information requested below. 
+When reporting any problem, I need the information requested below.
 
  1. The *complete* output from running this
 
         perl -V
 
-    Do not edit the output in any way. 
+    Do not edit the output in any way.
     Note, I want you to run "perl -V" and NOT "perl -v".
 
     If your perl does not understand the "-V" option it is too
@@ -649,7 +649,7 @@ When reporting any problem, I need the information requested below.
        perl -e 'use DB_File; print qq{DB_File ver $DB_File::VERSION\n}'
 
     If you are running windows use this
-    
+
        perl -e "use DB_File; print qq{DB_File ver $DB_File::VERSION\n}"
 
     If you haven't installed DB_File then search DB_File.pm for a line
@@ -674,7 +674,7 @@ When reporting any problem, I need the information requested below.
 
        perl -e "use DB_File; print qq{Built with Berkeley DB ver $DB_File::db_ver\n}"
        perl -e "use DB_File; print qq{Running Berkeley DB ver $DB_File::db_version\n}"
-    
+
  4. A copy the file config.in from the DB_File main source directory.
 
  5. A listing of directories where Berkeley DB is installed.
@@ -690,7 +690,7 @@ When reporting any problem, I need the information requested below.
 
         [edit config.in, if necessary]
         perl Makefile.PL
-        make 
+        make
         make test TEST_VERBOSE=1
 
  7. Now the difficult one. If you think you have found a bug in DB_File

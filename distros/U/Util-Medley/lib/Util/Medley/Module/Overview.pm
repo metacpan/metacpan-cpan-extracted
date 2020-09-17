@@ -1,15 +1,17 @@
 package Util::Medley::Module::Overview;
-$Util::Medley::Module::Overview::VERSION = '0.041';
+$Util::Medley::Module::Overview::VERSION = '0.043';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
-use Kavorka '-all';
+use Kavorka 'method';
 use Data::Printer alias => 'pdump';
 use Module::Overview;
 use constant;
 use Module::Load;
 
-with 'Util::Medley::Roles::Attributes::List';
+with
+  'Util::Medley::Roles::Attributes::List',
+  'Util::Medley::Roles::Attributes::String';
 
 =head1 NAME
 
@@ -17,7 +19,7 @@ Util::Medley::Module::Overview
 
 =head1 VERSION
 
-version 0.041
+version 0.043
 
 =cut
 
@@ -530,7 +532,14 @@ method _isConstant (Str $pkg!,
 	$method =~ s/\(\)//;    # remove parens;
 	my $fullName = sprintf '%s::%s', $pkg, $method;
 
-	return $constant::declared{$fullName};
+	if ( $constant::declared{$fullName} ) {
+		return 1;
+	}
+	elsif ( $self->String->isUpper($method) ) {
+		return 1;
+	}
+
+	return 0;
 }
 
 method _scrubParens (Str $value) {
@@ -564,7 +573,7 @@ method _buildMyConstants {
 	my @constants;
 
 	foreach my $name ( @{ $self->_getMyMethodsAndAttributes } ) {
-
+		
 		if ( $self->_isConstant( $self->moduleName, $name ) ) {
 			push @constants, $self->_scrubParens($name);
 		}
@@ -735,6 +744,7 @@ method _buildMyMethodsAndAttributes {
 	my @mine;
 	foreach my $aref (@parsed) {
 		my ( $name, $from ) = @$aref;
+
 		if ( !$from ) {
 			my $module = $self->_isImportedSub($name);
 			if ( !$module ) {

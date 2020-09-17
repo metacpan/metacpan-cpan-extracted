@@ -1,12 +1,9 @@
 use Mojo::Base -strict;
-use Test::Deep;
 use Test::More;
 use LinkEmbedder;
 
 plan skip_all => 'TEST_ONLINE=1'         unless $ENV{TEST_ONLINE};
 plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
-
-my $embedder = LinkEmbedder->new;
 
 my @urls = (
   'https://paste.opensuse.org/2931429',
@@ -15,23 +12,19 @@ my @urls = (
 );
 
 for my $url (@urls) {
-  my $link;
-  $embedder->get_p($url)->then(sub { $link = shift })->wait;
-  isa_ok($link, 'LinkEmbedder::Link::OpenSUSE');
-  cmp_deeply(
-    $link->TO_JSON,
-    {
+  LinkEmbedder->new->test_ok(
+    $url => {
+      isa           => 'LinkEmbedder::Link::OpenSUSE',
       cache_age     => 0,
-      html          => re(qr{<pre>\$testing = &quot;some stuff&quot;;</pre>}),
+      html          => qr{<pre>\$testing = &quot;some stuff&quot;;</pre>},
       provider_name => 'openSUSE',
       provider_url  => 'https://paste.opensuse.org/',
       title         => 'Paste 2931429',
       type          => 'rich',
       url           => $url,
       version       => '1.0',
-    },
-    "$url"
-  ) or note $link->_dump;
+    }
+  );
 }
 
 done_testing;

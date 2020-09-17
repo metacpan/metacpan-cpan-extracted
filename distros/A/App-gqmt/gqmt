@@ -7,308 +7,9 @@ eval 'exec perl -x -wS $0 ${1+"$@"}' if 0;
 
 use strict;
 use warnings;
-use diagnostics;
+use App::gqmt;
 
-use Data::Printer caller_info => 1, print_escapes => 1, output => 'stdout', class => { expand => 2 };
-use Getopt::Long  qw(:config no_ignore_case gnu_getopt auto_help auto_version);
-use Pod::Usage    qw(pod2usage);
-use File::Basename;
-use LWP::UserAgent;
-use JSON;
-use Time::Piece;
-
-my  @PROGARG = ($0, @ARGV);
-my  $PROGNAM = fileparse($0);
-our $VERSION = '0.8';
-
-my $caller_message = "Printing in line __LINE__ of __FILENAME__; ";
-
-my $pkg = {
-	   alpine    => 1,
-	   api       => 1,
-	   app       => 1,
-	   scheduler => 1,
-	  };
-
-my $re =  {
-	   alpine    => '^(?:docker-base-layer|develop|release|master|v[0-9]+\.[0-9]+\.[0-9]+)$',
-	   api       => '^(?:docker-base-layer|develop|release|master|v[0-9]+\.[0-9]+\.[0-9]+)$',
-	   app       => '^(?:docker-base-layer|develop|qa|release|master|v[0-9]+\.[0-9]+\.[0-9]+)$',
-	   scheduler => '^(?:docker-base-layer|develop|release|master|v[0-9]+\.[0-9]+\.[0-9]+)$',
-	  };
-
-my ( $age, $d, $delete, $dry_run, $package, $repo, $rows_number, $single_iteration, $token, $url, $user, $v );
-
-our $colored;
-
-my $getopt_result =
-  GetOptions (
-	      'a|age=i'             => \$age,
-	      'U|url=s'             => \$url,
-	      'u|user=s'            => \$user,
-	      'T|token=s'           => \$token,
-	      'R|repository=s'      => \$repo,
-	      'P|package=s'         => \$package,
-	      'n|dry-run'           => \$dry_run,
-	      'N|rows-number=i'     => \$rows_number,
-	      'C|colored'           => \$colored,
-	      'D|delete'            => \$delete,
-	      's|single-iteration'  => \$single_iteration,
-	      'v|package-version=s' => \$v,
-
-	      'h|help'          => sub { pod2usage(-exitval => 0, -verbose => 2); exit 0 },
-	      'd|debug+'      => \$d,
-	      'V|version'       => sub { print "$PROGNAM, version $VERSION\n"; exit 0 },
-    );
-
-pod2usage(-exitval => 0, -verbose => 2, -msg => "\nERROR: repository owner not provided, option -u\n\n")
-  if ! $user;
-
-pod2usage(-exitval => 2, -verbose => 2, -msg => "\nERROR: repository name is not provided, option -R\n\n" )
-  if ! $repo;
-
-pod2usage(-exitval => 2, -verbose => 2, -msg => "\nERROR: package name not provided, option -P\n\n")
-  if ! $package;
-
-pod2usage(-exitval => 2, -verbose => 2, -msg => "\nERROR: not supported package\n\n")
-  if $package && ! exists $pkg->{$package};
-
-pod2usage(-exitval => 2, -verbose => 2, -msg => "\nERROR: requested rows number should be 1..100\n\n")
-  if $rows_number && ( $rows_number < 1 || $rows_number > 100 );
-
-# pod2usage(-exitval => 0, -verbose => 2, -msg => "\nERROR: -v is mandatory when -D and -s are used together\n\n")
-#   if $delete && $single_iteration && ! $v;
-
-$url         = 'https://api.github.com/graphql' if ! $url;
-$rows_number = 100                              if ! $rows_number;
-$age         = 60*60*24*14                      if ! $age;
-
-my $versions = [];
-
-my $lwp = LWP::UserAgent->new( agent   => "$PROGNAM/$VERSION ", timeout => 120, );
-my $req = HTTP::Request->new( 'POST', $url, [ 'Authorization' => 'bearer ' . $token ] );
-my $jso = JSON->new->allow_nonref;
-
-my $to_delete;
-if ( ! $v ) {
-  my $res = get_versions ({
-			   lwp => $lwp,
-			   req => $req,
-			   jso => $jso,
-			   usr => $user,
-			   pkg => $package,
-			   num => $rows_number,
-			   rep => $repo,,
-			   res => $versions,
-			   dbg => $d,
-			   sit => $single_iteration
-			  });
-
-  my $t_now = localtime;
-  my $t_ver;
-  # my $i = 0;
-  foreach ( @{$versions} ) {
-    next if $_->{version} =~ /$re->{$package}/;
-
-    if ( defined $_->{files}->{nodes}->[0]->{updatedAt} ) {
-      $t_ver = Time::Piece->strptime( $_->{files}->{nodes}->[0]->{updatedAt},
-				      "%Y-%m-%dT%H:%M:%SZ" );
-
-      next if ($t_ver->epoch + $age ) >= $t_now->epoch;
-    }
-
-    # $to_delete->{ defined $_->{files}->{nodes}->[0]->{updatedAt} ?
-    # 		$_->{files}->{nodes}->[0]->{updatedAt} : sprintf('NODATE_%04d', $i++) } = $_->{version};
-
-    $to_delete->{ $_->{id} } = { version => $_->{version},
-				 ts      => $_->{files}->{nodes}->[0]->{updatedAt} };
-  }
-} else {
-  $to_delete->{ $v } = { version => 'STUB VERSION',
-			 ts      => 'STUB TS' };
-}
-
-if ( $delete && defined $to_delete ) {
-  del_versions ({
-		 lwp => $lwp,
-		 req => $req,
-		 jso => $jso,
-		 del => $to_delete,
-		 dbg => $d,
-		 dry => $dry_run
-		});
-
-} else {
-  print "nothing to delete\n";
-}
-
-
-######################################################################
-
-sub del_versions {
-  my $args = shift;
-  my $arg  = {
-	      lwp => $args->{lwp},        # LWP::UserAgent
-	      req => $args->{req},	  # HTTP::Request
-	      jso => $args->{jso},	  # JSON
-	      del => $args->{del} // [],  # IDs to delete array
-	      dbg => $args->{dbg} // 0,	  # verbose
-	      dry => $args->{dry}         # dry run
-	     };
-
-  $arg->{req}->header(Accept => 'application/vnd.github.package-deletes-preview+json');
-
-  my $query;
-
-  foreach ( keys( %{$arg->{del}} ) ) {
-    $query = sprintf('mutation { deletePackageVersion(input:{packageVersionId:"%s"}) { success }}', $_);
-
-    p ( $query, colored => $colored ) if $arg->{dbg} > 1 || $arg->{dry};
-    next if $arg->{dry};
-
-    # my $json = $arg->{jso}->encode( { query => $query } );
-
-    $arg->{req}->content( $arg->{jso}->encode({ query => $query }) );
-
-    my $res = $arg->{lwp}->request($arg->{req});
-
-    if ( ! $res->is_success ) {
-      my $res_cont  = $arg->{jso}->decode( $res->content );
-      my $res_error = sprintf("--- ERROR ---\n\n%s\n\nMessage: %s\n    doc: %s\n\n",
-			      $res->status_line,
-			      $res_cont->{message},
-			      $res_cont->{documentation_url} );
-      print $res_error;
-      exit 1;
-    }
-
-    my $reply = $arg->{jso}->decode( $res->decoded_content );
-
-    if ( exists $reply->{errors} ) {
-      unshift @{$reply->{errors}}, "--- ERROR ---";
-      p ( $reply->{errors}, colored => $colored );
-      exit 1;
-    }
-
-    p ( $reply, colored => $colored );
-    print "package of version ID: $_, has been successfully deleted\n" if $arg->{dbg} > 0;
-
-  }
-
-}
-
-
-sub get_versions {
-  my $args = shift;
-  my $arg  = {
-	      lwp => $args->{lwp},        # LWP::UserAgent
-	      req => $args->{req},	  # HTTP::Request
-	      jso => $args->{jso},	  # JSON
-	      usr => $args->{usr},	  # user
-	      pkg => $args->{pkg},	  # package
-	      num => $args->{num} // 100, # number of rows to request
-	      rep => $args->{rep},	  # repository
-	      res => $args->{res},	  # result
-	      sit => $args->{sit} // 0,   # single run
-	      dbg => $args->{dbg} // 0,	  # verbose
-	      inf => $args->{inf} // {    # pageInfo
-				      startCursor     => undef,
-				      endCursor       => undef,
-				      hasNextPage     => -1,
-				      hasPreviousPage => -1
-				     }
-	     };
-
-  my $query =
-    {
-     query => sprintf('query { repository(name: "%s", owner: "%s") {
-                               packages(first: %d names: ["%s"]) {
-                                   nodes {
-                                     id
-                                     name
-                                     versions(last: %d%s) {
-                                       nodes {
-                                         id
-                                         version
-                                         files(first:1, orderBy: {direction: DESC, field: CREATED_AT}) {
-                                           totalCount
-                                           nodes {
-                                             updatedAt
-                                           }
-                                         }
-                                       }
-                                       pageInfo {
-                                         endCursor
-                                         hasNextPage
-                                         hasPreviousPage
-                                         startCursor
-                                       }
-                                     }
-                                   }
-                                 }
-                               }
-                             }',
-		      $arg->{rep},
-		      $arg->{usr},
-		      $arg->{num},
-		      $arg->{pkg},
-		      $arg->{num},
-		      $arg->{inf}->{hasPreviousPage} == 1 ? sprintf(', before: "%s"', $arg->{inf}->{startCursor}) : '' )
-    };
-
-  p ( $query, colored => $colored ) if $arg->{dbg} > 1;
-
-  my $json = $arg->{jso}->encode( $query );
-
-  $arg->{req}->content( $json );
-
-  my $res   = $arg->{lwp}->request($arg->{req});
-
-  if ( ! $res->is_success ) {
-    my $res_cont  = $arg->{jso}->decode( $res->content );
-    my $res_error = sprintf("--- ERROR ---\n\n%s\n\nMessage: %s\n    doc: %s\n\n",
-			    $res->status_line,
-			    $res_cont->{message},
-			    $res_cont->{documentation_url} );
-    print $res_error;
-    exit 1;
-  }
-
-  my $reply = $arg->{jso}->decode( $res->decoded_content );
-
-  if ( exists $reply->{errors} ) {
-    unshift @{$reply->{errors}}, "--- ERROR ---";
-    p ( $reply->{errors}, colored => $colored );
-    exit 1;
-  }
-
-  push @{$arg->{res}}, @{$reply->{data}->{repository}->{packages}->{nodes}->[0]->{versions}->{nodes}};
-
-  p ( $reply, colored => $colored ) if $arg->{dbg} > 2;
-
-  return 1 if $arg->{inf}->{hasPreviousPage} == 0 || $arg->{sit} == 1;
-
-  my $pageInfo = $reply->{data}->{repository}->{packages}->{nodes}->[0]->{versions}->{pageInfo};
-  get_versions ({
-		 lwp => $arg->{lwp},
-		 req => $arg->{req},
-		 jso => $arg->{jso},
-		 usr => $arg->{usr},
-		 pkg => $arg->{pkg},
-		 num => $arg->{num},
-		 rep => $arg->{rep},
-		 res => $arg->{res},
-		 dbg => $arg->{dbg},
-		 inf => {
-			 startCursor     => $pageInfo->{startCursor},
-			 endCursor       => $pageInfo->{endCursor},
-			 hasNextPage     => $arg->{jso}->decode( $pageInfo->{hasNextPage} ),
-			 hasPreviousPage => $arg->{jso}->decode( $pageInfo->{hasPreviousPage} ),
-			}
-		});
-
-  return 0;
-}
+App::gqmt->new->run;
 
 __END__
 
@@ -318,7 +19,7 @@ gqmt - Graphql Query Mutation Tool
 
 =head1 SYNOPSIS
 
-gqmt [-h] <-u USER -R REPO -T TOKEN -P PACKAGE> REST OF OPTIONS
+gqmt [-h] <-u USER -R REPO -T TOKEN -P PACKAGE -t query.tt> REST OF OPTIONS
 
 =head1 DESCRIPTION
 
@@ -342,6 +43,26 @@ user name of repository owner
 =item B<-R | --repository> I<STRING>
 
 name of the repository to manipulate images of
+
+=item B<-t | --query-template> I<STRING>
+
+path to query template (see B<TEMPLATES> bellow). Template is injected with these variables:
+
+=over
+
+repo     : repository name
+
+user     : user name
+
+pkg_num  : first num element of packages list
+
+pkg_name : package name
+
+vers_num : first num elements from the version files
+
+cursor   : pagination object
+
+=back
 
 =item B<-T | --token> I<STRING>
 
@@ -368,7 +89,7 @@ scheduler
 =back
 
 =item B<-N | --rows-number> I<INTEGER>
-	      
+
 number of rows for reply pagination, max 100 (default 100)
 
 =item B<-C | --colored>
@@ -410,6 +131,42 @@ help message
 gqmt < -u user-name -R repo-name -P pkg-name -T xxxxxxxxxxxxxxxxxx >
 
 =back
+
+=head1 TEMPLATES
+
+Templates are .tt files. Please refer to B<Template::Toolkit> documentation.
+
+See examples in distribution directory I<etc>
+
+Example of query template:
+
+    query { repository(name: "[% repo %]", owner: "[% user %]") {
+      packages(first: [% pkg_num %] names: ["[% pkg_name %]"]) {
+          nodes {
+            id
+            name
+            versions(last: [% vers_num %][% cursor %]) {
+              nodes {
+                id
+                version
+                files(first:1, orderBy: {direction: DESC, field: CREATED_AT}) {
+                  totalCount
+                  nodes {
+                    updatedAt
+                  }
+                }
+              }
+              pageInfo {
+                endCursor
+                hasNextPage
+                hasPreviousPage
+                startCursor
+              }
+            }
+          }
+        }
+      }
+    }
 
 =head1 SEE ALSO
 

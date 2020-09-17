@@ -45,11 +45,20 @@ package MyApp {
 		}
 		class Invertebrate;
 	}
+	
+	class Rabbit extends Mammal with Cute?, Bouncy?;
+	
+	role Environment ( Str $env ) {
+		method environment { return $env }
+	}
+	
+	class Eagle extends Bird with Environment('sky'), EagleEyed?;
+	class Gull extends Bird with Environment('cliffs'), Annoying?;
 }
 
 my $superman = MyApp->new_superhuman(name => 'Kal El');
 
-isa_ok($superman, $_, "\$superman isa $_") for qw(
+isa_ok($superman, $_, "\$superman") for qw(
 	MyApp::Animal
 	MyApp::Mammal
 	MyApp::Primate
@@ -63,12 +72,25 @@ is($worker->job_title, 'Uncle');
 
 is($worker->bleh, 'MyApp');
 
-isa_ok($worker, $_, "\$superman isa $_") for qw(
+isa_ok($worker, $_, "\$worker") for qw(
 	MyApp::Animal
 	MyApp::Mammal
 	MyApp::Primate
 	Human
 	Human::Employee
 );
+
+my $bugs = MyApp->new_rabbit;
+
+isa_ok($bugs, $_, "\$bugs") for qw(
+	MyApp::Animal
+	MyApp::Mammal
+	MyApp::Rabbit
+);
+
+my $hawkeye = MyApp->new_eagle;
+is( $hawkeye->environment, 'sky' );
+ok( $hawkeye->does('MyApp::EagleEyed') );
+ok( ! $hawkeye->does('MyApp::Environment') );
 
 done_testing;

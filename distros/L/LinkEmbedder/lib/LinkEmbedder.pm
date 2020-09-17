@@ -11,7 +11,7 @@ use constant TLS => eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -21,28 +21,28 @@ has ua => sub { Mojo::UserAgent->new->max_redirects(3); };
 
 has url_to_link => sub {
   return {
-    'default'                 => 'LinkEmbedder::Link::Basic',
-    'git.io'                  => 'LinkEmbedder::Link::Github',
-    'github.com'              => 'LinkEmbedder::Link::Github',
-    'google'                  => 'LinkEmbedder::Link::Google',
-    'goo.gl'                  => 'LinkEmbedder::Link::Google',
-    'imgur.com'               => 'LinkEmbedder::Link::Imgur',
-    'ix.io'                   => 'LinkEmbedder::Link::Ix',
-    'instagram.com'           => 'LinkEmbedder::Link::oEmbed',
-    'metacpan.org'            => 'LinkEmbedder::Link::Metacpan',
-    'nhl.com'                 => 'LinkEmbedder::Link::NHL',
-    'paste.fedoraproject.org' => 'LinkEmbedder::Link::Fpaste',
-    'paste.opensuse.org'      => 'LinkEmbedder::Link::OpenSUSE',
-    'paste.scsys.co.uk'       => 'LinkEmbedder::Link::Shadowcat',
-    'pastebin.com'            => 'LinkEmbedder::Link::Pastebin',
-    'spotify'                 => 'LinkEmbedder::Link::Spotify',
-    'ted.com'                 => 'LinkEmbedder::Link::oEmbed',
-    'travis-ci.org'           => 'LinkEmbedder::Link::Travis',
-    'twitter.com'             => 'LinkEmbedder::Link::Twitter',
-    'vimeo.com'               => 'LinkEmbedder::Link::oEmbed',
-    'xkcd.com'                => 'LinkEmbedder::Link::Xkcd',
-    'whereby.com'             => 'LinkEmbedder::Link::AppearIn',
-    'youtube.com'             => 'LinkEmbedder::Link::oEmbed',
+    'default'            => 'LinkEmbedder::Link::Basic',
+    'dropbox.com'        => 'LinkEmbedder::Link::Dropbox',
+    'git.io'             => 'LinkEmbedder::Link::Github',
+    'github.com'         => 'LinkEmbedder::Link::Github',
+    'google'             => 'LinkEmbedder::Link::Google',
+    'goo.gl'             => 'LinkEmbedder::Link::Google',
+    'imgur.com'          => 'LinkEmbedder::Link::Imgur',
+    'instagram.com'      => 'LinkEmbedder::Link::Instagram',
+    'ix.io'              => 'LinkEmbedder::Link::Ix',
+    'metacpan.org'       => 'LinkEmbedder::Link::Metacpan',
+    'nhl.com'            => 'LinkEmbedder::Link::NHL',
+    'paste.opensuse.org' => 'LinkEmbedder::Link::OpenSUSE',
+    'paste.scsys.co.uk'  => 'LinkEmbedder::Link::Shadowcat',
+    'pastebin.com'       => 'LinkEmbedder::Link::Pastebin',
+    'spotify'            => 'LinkEmbedder::Link::Spotify',
+    'ted.com'            => 'LinkEmbedder::Link::oEmbed',
+    'travis-ci.org'      => 'LinkEmbedder::Link::Travis',
+    'twitter.com'        => 'LinkEmbedder::Link::Twitter',
+    'vimeo.com'          => 'LinkEmbedder::Link::oEmbed',
+    'xkcd.com'           => 'LinkEmbedder::Link::Xkcd',
+    'whereby.com'        => 'LinkEmbedder::Link::AppearIn',
+    'youtube.com'        => 'LinkEmbedder::Link::oEmbed',
   };
 };
 
@@ -112,6 +112,37 @@ sub serve {
   return $self;
 }
 
+# This should probably be in a different test-module, but keeping it here for now
+sub test_ok {
+  my ($self, $url, $expect) = @_;
+
+  my $subtest = sub {
+    my $link = shift;
+    my $json = $link->TO_JSON;
+    Test::More::isa_ok($link, $expect->{isa}) if $expect->{isa};
+
+    for my $key (sort keys %$expect) {
+      next if $key eq 'isa';
+      for my $exp (ref $expect->{$key} eq 'ARRAY' ? @{$expect->{$key}} : ($expect->{$key})) {
+        my $test_name = ref $exp eq 'Regexp' ? 'like' : 'is';
+        Test::More->can($test_name)->($json->{$key}, $exp, $key);
+      }
+    }
+  };
+
+  my $ok;
+  $self->get_p($url)->then(
+    sub {
+      my $link = shift;
+      $ok = Test::More::subtest($link->url, sub { $subtest->($link) });
+      Test::More::diag(Test::More::explain($link->TO_JSON)) unless $ok;
+    },
+    sub { Test::More::diag(shift) }
+  )->wait;
+
+  return $ok;
+}
+
 sub _host_in_hash {
   my ($host, $hash) = @_;
   return $hash->{$host} if $hash->{$host};
@@ -132,7 +163,7 @@ sub _invalid_input {
 sub _load {
   $@ = load_class $_[0];
   warn "[LinkEmbedder] load $_[0]: @{[$@ || 'Success']}\n" if DEBUG;
-  die $@ if ref $@;
+  die $@                                                   if ref $@;
   return $@ ? 0 : 1;
 }
 
@@ -171,6 +202,8 @@ Go to L<https://thorsen.pm/linkembedder> to see a demo of how it works.
 These web pages are currently supported:
 
 =over 2
+
+=item * L<https://dropbox.com/>
 
 =item * L<https://imgur.com/>
 

@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.605';
+our $VERSION   = '0.608';
 
 use Keyword::Simple ();
 use PPR;
@@ -315,7 +315,7 @@ our $GRAMMAR = qr{
 				(?&PerlBlock) | (?&PerlQualifiedIdentifier)
 			)
 			(?:
-				(?:\s*\?) | (?: (?&PerlOWS)(?&PerlList))
+				(?:\s*\?) | (?: (?&PerlOWS) [(] (?&PerlOWS) (?&PerlList) (?&PerlOWS) [)] )
 			)?
 			(?:
 				(?&PerlOWS)
@@ -325,19 +325,19 @@ our $GRAMMAR = qr{
 					(?&PerlBlock) | (?&PerlQualifiedIdentifier)
 				)
 				(?:
-					(?:\s*\?) | (?: (?&PerlOWS)(?&PerlList))
+					(?:\s*\?) | (?: (?&PerlOWS) [(] (?&PerlOWS) (?&PerlList) (?&PerlOWS) [)] )
 				)?
 			)*
 		)#</MxpRoleList>
 		
 		(?<MxpCompactRoleList>
-		
+			
 			(?&PerlOWS)
 			(?:
 				(?&PerlQualifiedIdentifier)
 			)
 			(?:
-				(?:\s*\?) | (?: (?&PerlOWS)(?&PerlList))
+				(?:\s*\?) | (?: (?&PerlOWS) [(] (?&PerlOWS) (?&PerlList) (?&PerlOWS) [)] )
 			)?
 			(?:
 				(?&PerlOWS)
@@ -347,7 +347,7 @@ our $GRAMMAR = qr{
 					(?&PerlQualifiedIdentifier)
 				)
 				(?:
-					(?:\s*\?) | (?: (?&PerlOWS)(?&PerlList))
+					(?:\s*\?) | (?: (?&PerlOWS) [(] (?&PerlOWS) (?&PerlList) (?&PerlOWS) [)] )
 				)?
 			)*
 		)#</MxpCompactRoleList>
@@ -973,7 +973,7 @@ sub _handle_role_list {
 			$suffix = '?';
 			$rolelist =~ s/^\?\s*//xs;
 		}
-		elsif ($rolelist =~ /^((?&PerlList)) $GRAMMAR/xso) {
+		elsif ($rolelist =~ /^((?&PerlOWS)(?&PerlList)(?&PerlOWS)) $GRAMMAR/xso) {
 			$role_params = $1;
 			$rolelist =~ s/^\Q$role_params//xs;
 			$rolelist =~ s/^\s+//xs;
@@ -1333,7 +1333,7 @@ sub _handle_package_keyword {
 	if ($name and $has_sig) {
 		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $code);
-		sprintf(
+		return sprintf(
 			'use Zydeco::_Gather -parent => %s; use Zydeco::_Gather -gather, %s => { code => %s, named => %d, signature => %s }; use Zydeco::_Gather -unparent;',
 			B::perlstring("$plus$name"),
 			B::perlstring("$kind\_generator:$plus$name"),
@@ -1345,7 +1345,7 @@ sub _handle_package_keyword {
 	elsif ($has_sig) {
 		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $code);
-		sprintf(
+		return sprintf(
 			'q[%s]->anonymous_generator(%s => { code => %s, named => %d, signature => %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
 			$me,
 			$kind,
@@ -1359,7 +1359,7 @@ sub _handle_package_keyword {
 		);
 	}
 	elsif ($name) {
-		$code
+		return $code
 			? sprintf(
 				'use Zydeco::_Gather -parent => %s; use Zydeco::_Gather -gather, %s => q[%s]->_package_callback(sub %s); use Zydeco::_Gather -unparent;',
 				B::perlstring("$plus$name"),
@@ -1374,7 +1374,7 @@ sub _handle_package_keyword {
 	}
 	else {
 		$code ||= '{}';
-		sprintf(
+		return sprintf(
 			'q[%s]->anonymous_package(%s => sub { do %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
 			$me,
 			$kind,
@@ -1640,6 +1640,11 @@ sub import {
 	Keyword::Simple::define class => sub {
 		my $ref = shift;
 		
+#		my $re = _fetch_re('MxpCompactRoleList', anchor => 'start');
+#		my @r  = "Foo with Bar" =~ /($re)/;
+#		use Data::Dumper;
+#		die Dumper($r[0], $re);
+
 		$$ref =~ _fetch_re('MxpClassSyntax', anchor => 'start') or $me->_syntax_error(
 			'class declaration',
 			'class <name> (<signature>) { <block> }',
@@ -2322,7 +2327,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.605';
+#	our $VERSION   = '0.608';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2333,7 +2338,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.605';
+#	our $VERSION   = '0.608';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2346,12 +2351,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.605';
+#	our $VERSION   = '0.608';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.605';
+#	our $VERSION   = '0.608';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2365,7 +2370,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.605';
+#	our $VERSION   = '0.608';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2399,7 +2404,7 @@ sub anonymous_package {
 	require Module::Runtime;
 	$INC{Module::Runtime::module_notional_filename($qname)} = __FILE__;
 	#return bless(\$qname, "Zydeco::Anonymous::".ucfirst($kind));
-	return $qname;
+	return MooX::Press::make_absolute_package_name($qname);
 }
 
 sub anonymous_generator {
@@ -2414,7 +2419,7 @@ sub anonymous_generator {
 	require Module::Runtime;
 	$INC{Module::Runtime::module_notional_filename($qname)} = __FILE__;
 	#return bless(\$qname, "Zydeco::Anonymous::Parameterizable".ucfirst($kind));
-	return $qname;
+	return MooX::Press::make_absolute_package_name($qname);
 }
 
 1;

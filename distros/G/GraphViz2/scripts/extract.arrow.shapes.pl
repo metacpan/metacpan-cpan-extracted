@@ -12,7 +12,7 @@ my($file_name) = File::Spec -> catfile('data', 'arrow.shapes.html');
 
 if (! -e $file_name)
 {
-	my($page_name) = 'http://www.graphviz.org/content/arrow-shapes';
+	my($page_name) = 'https://www.graphviz.org/doc/info/arrows.html';
 	my($client)    = HTTP::Tiny -> new -> get($page_name);
 
 	if ($$client{success})

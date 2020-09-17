@@ -9,7 +9,7 @@ use base 'Log::Dispatch::Email';
 
 use Email::Mailer 1.09;
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 sub _params {
     my %params = @_;
@@ -69,7 +69,7 @@ Log::Dispatch::Email::Mailer - Log::Dispatch::Email subclass that sends mail usi
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Log-Dispatch-Email-Mailer.svg)](https://travis-ci.org/gryphonshafer/Log-Dispatch-Email-Mailer)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Log-Dispatch-Email-Mailer/badge.png)](https://coveralls.io/r/gryphonshafer/Log-Dispatch-Email-Mailer)

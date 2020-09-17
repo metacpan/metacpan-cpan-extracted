@@ -2,8 +2,8 @@ NAME
     Org::Parser - Parse Org documents
 
 VERSION
-    This document describes version 0.552 of Org::Parser (from Perl
-    distribution Org-Parser), released on 2020-09-11.
+    This document describes version 0.553 of Org::Parser (from Perl
+    distribution Org-Parser), released on 2020-09-17.
 
 SYNOPSIS
      use 5.010;

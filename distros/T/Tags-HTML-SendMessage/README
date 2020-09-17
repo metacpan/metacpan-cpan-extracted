@@ -1,0 +1,158 @@
+NAME
+    Tags::HTML::SendMessage - Tags helper for send message form.
+
+SYNOPSIS
+     use Tags::HTML::SendMessage;
+
+     my $obj = Tags::HTML::SendMessage->new(%params);
+     $obj->process;
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::SendMessage->new(%params);
+
+    Constructor.
+
+    *       "css"
+
+            'CSS::Struct::Output' object for process_css processing.
+
+            Default value is undef.
+
+    *       "lang"
+
+            Hash with language information for output. Keys are: 'title',
+            'name-and-surname', 'email', 'subject', 'your-message' and
+            'send'.
+
+            Default value is reference to hash with these value: 'title' =>
+            'Leave us a message', 'name-and-surname' => 'Name and surname',
+            'email' => 'Email', 'subject' => 'Subject of you question',
+            'your-message' => 'Your message', 'send' => 'Send question',
+
+    *       "tags"
+
+            'Tags::Output' object.
+
+            It's required.
+
+            Default value is undef.
+
+  "process"
+     $obj->process;
+
+    Process Tags structure for output.
+
+    Returns undef.
+
+ERRORS
+     new():
+             Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+             Parameter 'tags' must be a 'Tags::Output::*' class.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::Page::Begin;
+     use Tags::HTML::Page::End;
+     use Tags::HTML::SendMessage;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $tags = Tags::Output::Indent->new(
+             'preserved' => ['style'],
+             'xml' => 1,
+             'no_simple' => ['textarea'],
+     );
+     my $begin = Tags::HTML::Page::Begin->new(
+             'generator' => 'Tags::HTML::SendMessage EXAMPLE1',
+             'tags' => $tags,
+     );
+     my $send_message = Tags::HTML::SendMessage->new(
+             'tags' => $tags,
+     );
+     my $end = Tags::HTML::Page::End->new(
+             'tags' => $tags,
+     );
+
+     # Process page
+     $begin->process;
+     $send_message->process;
+     $end->process;
+
+     # Print out.
+     print $tags->flush;
+
+     # Output:
+     # <!DOCTYPE html>
+     # <html>
+     #   <head>
+     #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+     #     <meta charset="UTF-8" />
+     #     <meta name="generator" content="Tags::HTML::SendMessage EXAMPLE1" />
+     #     <title>
+     #       Page title
+     #     </title>
+     #   </head>
+     #   <body>
+     #     <div id="send-message">
+     #       <form action="">
+     #         <fieldset>
+     #           <legend>
+     #             Leave us a message
+     #           </legend>
+     #           <label for="name-and-surname">
+     #             Name and surname:
+     #           </label>
+     #           <br />
+     #           <input id="name-and-surname" name="name-and-surname" size="30" />
+     #           <br />
+     #           <label for="email">
+     #             Email:
+     #           </label>
+     #           <br />
+     #           <input id="email" name="email" size="30" />
+     #           <br />
+     #           <label for="subject">
+     #             Subject of you question:
+     #           </label>
+     #           <br />
+     #           <input id="subject" name="subject" size="72" />
+     #           <br />
+     #           <label for="your-message">
+     #             Your message:
+     #           </label>
+     #           <br />
+     #           <textarea id="your-message" name="your-message" cols="75" rows="10">
+     #           </textarea>
+     #           <br />
+     #           <input type="submit" value="Send question" />
+     #         </fieldset>
+     #       </form>
+     #     </div>
+     #   </body>
+     # </html>
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-SendMessage>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2020
+
+    BSD 2-Clause License
+
+VERSION
+    0.09
+

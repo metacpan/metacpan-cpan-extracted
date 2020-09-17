@@ -1,0 +1,3 @@
+Function Scan on generate_series i  (cost=0.00..0.10 rows=10 width=4) (actual time=0.033..0.038 rows=10 loops=1)
+Planning Time: 0.169 ms
+Execution Time: 0.207 ms

@@ -3,3 +3,5 @@ Revision history for Iterator::Records
 0.01    2018-03-14
         Initial version
 
+0.02    2020-09-16
+        Skip DBI-specific testing when DBI/SQLite is not installed.

@@ -1,15 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Widget::Menu::Item;
+use v5.26;
+use Object::Pad 0.25;
 
-use strict;
-use warnings;
-use base qw( Tickit::Widget::Menu::itembase );
-
-our $VERSION = '0.11';
+package Tickit::Widget::Menu::Item 0.12;
+class Tickit::Widget::Menu::Item
+   implements Tickit::Widget::Menu::itembase;
 
 use Tickit::Utils qw( textwidth );
 
@@ -28,7 +27,9 @@ callback to invoke when the menu option is clicked on.
 
 =cut
 
-=head2 $item = Tickit::Widget::Menu::Item->new( %args )
+=head2 new
+
+   $item = Tickit::Widget::Menu::Item->new( %args )
 
 Constructs a new C<Tickit::Widget::Menu::Item> object.
 
@@ -48,24 +49,16 @@ Callback to invoke when the menu item is clicked on.
 
 =cut
 
-sub new
+has $_on_activate;
+
+BUILD ( %args )
 {
-   my $class = shift;
-   my %args = @_;
-
-   my $self = bless {
-      on_activate => $args{on_activate},
-   }, $class;
-   $self->_init_itembase( %args );
-
-   return $self;
+   $_on_activate = $args{on_activate};
 }
 
-sub activate
+method activate ()
 {
-   my $self = shift;
-
-   $self->{on_activate}->( $self ) if $self->{on_activate};
+   $_on_activate->( $self ) if $_on_activate;
 }
 
 =head1 AUTHOR

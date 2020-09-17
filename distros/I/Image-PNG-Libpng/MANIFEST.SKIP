@@ -19,3 +19,5 @@ MYMETA\..*
 makeitfile$
 doc/.*
 ^pm_to_blib$
+^memory-test\.pl$
+^unt/unknown-chunk\.t$

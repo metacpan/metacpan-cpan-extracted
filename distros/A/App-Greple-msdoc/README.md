@@ -4,7 +4,7 @@ msdoc - Greple module for access MS office docx/pptx/xlsx documents
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # SYNOPSIS
 
@@ -61,13 +61,6 @@ _.xlsx_ file, and double newlines for _.docx_ file.  Use
 
 cpanm App::Greple::msdoc
 
-# LICENSE
-
-Copyright (C) Kazumasa Utashiro.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
 # SEE ALSO
 
 [https://github.com/kaz-utashiro/greple-msdoc](https://github.com/kaz-utashiro/greple-msdoc)
@@ -75,3 +68,10 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 Kazumasa Utashiro
+
+# LICENSE
+
+Copyright 2018-2020 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

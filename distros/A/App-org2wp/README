@@ -1,9 +1,10 @@
 NAME
-    App::org2wp - Publish Org document to WordPress as blog post
+    App::org2wp - Publish Org document (or heading) to WordPress as blog
+    post
 
 VERSION
-    This document describes version 0.008 of App::org2wp (from Perl
-    distribution App-org2wp), released on 2019-12-26.
+    This document describes version 0.009 of App::org2wp (from Perl
+    distribution App-org2wp), released on 2020-09-17.
 
 FUNCTIONS
   org2wp
@@ -11,7 +12,7 @@ FUNCTIONS
 
      org2wp(%args) -> [status, msg, payload, meta]
 
-    Publish Org document to WordPress as blog post.
+    Publish Org document (or heading) to WordPress as blog post.
 
     This is originally a quick hack because I couldn't make
     L<https://github.com/punchagan/org2blog> on my Emacs installation to
@@ -40,8 +41,11 @@ FUNCTIONS
     and specify which profile you want using command-line option e.g.
     "--config-profile blog1".
 
-    To create a blog post, write your Org document (e.g. in "post1.org")
-    using this format:
+   Document mode
+    You can use the whole Org document file as a blog post (document mode)
+    or a single heading as a blog post (heading mode). The default is
+    document mode. To create a blog post, write your Org document (e.g. in
+    "post1.org") using this format:
 
      #+TITLE: Blog post title
      #+CATEGORY: cat1, cat2
@@ -58,13 +62,14 @@ FUNCTIONS
 
      % org2wp --publish post1.org
 
-    Note that this will also modify your Org file and insert this line at
-    the top:
+    Note that this will also modify your Org file and insert this setting
+    line at the top:
 
      #+POSTID: 1234
+     #+POSTTIME: [2020-09-16 Wed 11:51]
 
     where 1234 is the post ID retrieved from the server when creating the
-    post.
+    post, and post time will be set to the current local time.
 
     After the post is created, you can update using the same command:
 
@@ -81,6 +86,41 @@ FUNCTIONS
     Another example, to schedule a post in the future:
 
      % org2wp post1.org --schedule 20301225T00:00:00
+
+   Heading mode
+    In heading mode, each heading will become a separate blog post. To
+    enable this mode, specify "--post-heading-level" ("-l") to 1 (or 2, or
+    3, ...). This will cause a level-1 (or 2, or 3, ...) heading to be
+    assumed as an individual blog post. For example, suppose you have
+    "blog.org" with this content:
+
+     * Post A                  :tag1:tag2:tag3:
+     :PROPERTIES:
+     :CATEGORY: cat1, cat2, cat3
+     :END:
+ 
+     Some text...
+ 
+     ** a heading of post A
+     more text ...
+     ** another heading of post A
+     even more text ...
+ 
+     * Post B                  :tag2:tag4:
+     Some text ...
+
+    with this command:
+
+     % org2wp blog.org -l 1
+
+    there will be two blog posts to be posted because there are two level-1
+    headings: "Post A" and "Post B". Post A contains level-2 headings which
+    will become headings of the blog post. Headline tags will become blog
+    post tags, and to specify categories you use the property "CATEGORY" in
+    the "PROPERTIES" drawer.
+
+    If, for example, you specify "-l 2" instead of "-l 1" then the level-2
+    headings will become blog posts.
 
     This function is not exported.
 
@@ -101,6 +141,16 @@ FUNCTIONS
         Path to Org document to publish.
 
     *   password* => *str*
+
+    *   post_heading_level => *posint*
+
+        Specify which heading level to be regarded as an individula blog
+        post.
+
+        If specified, this will enable *heading mode* instead of the default
+        *document mode*. In the document mode, the whole Org document file
+        is regarded as a single blog post. In the *heading mode*, a heading
+        of certain level will be regarded as a single blog post.
 
     *   proxy* => *str*
 
@@ -155,18 +205,12 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
-SEE ALSO
-    pod2wp.
-
-    html2wp.
-
-    wp-xmlrpc.
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

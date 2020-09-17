@@ -318,6 +318,15 @@ t/55-planning-time.d/old-yaml.expect
 t/55-planning-time.d/old-yaml.plan
 t/55-planning-time.t
 t/56-anonymize-query.t
+t/57-function-scans.d/plan.alias.json
+t/57-function-scans.d/plan.alias.text
+t/57-function-scans.d/plan.alias.xml
+t/57-function-scans.d/plan.alias.yaml
+t/57-function-scans.d/plan.plain.json
+t/57-function-scans.d/plan.plain.text
+t/57-function-scans.d/plan.plain.xml
+t/57-function-scans.d/plan.plain.yaml
+t/57-function-scans.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

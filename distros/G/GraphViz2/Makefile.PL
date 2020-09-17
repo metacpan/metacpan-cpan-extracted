@@ -50,26 +50,12 @@ is_dot_installed();
 
 my(%params) =
 (
-	($] ge '5.005') ?
-	(
-		AUTHOR   => 'Ron Savage (ron@savage.net.au)',
-		ABSTRACT => "A wrapper for AT&T's Graphviz",
-	) : (),
-	clean =>
-	{
-		FILES => 'blib/* Makefile MANIFEST GraphViz2-*'
-	},
-	dist =>
-	{
-		COMPRESS => 'gzip',
-		SUFFIX   => 'gz'
-	},
-	DISTNAME			=> 'GraphViz2',
+	AUTHOR   => 'Ron Savage (ron@savage.net.au)',
+	ABSTRACT => "A wrapper for AT&T's Graphviz",
 	MIN_PERL_VERSION	=> 5.010001,
 	NAME				=> 'GraphViz2',
 	PL_FILES			=> {},
-	PREREQ_PM			=>
-	{
+	PREREQ_PM			=> {
 		'Algorithm::Dependency'					=> 1.110,
 		'Algorithm::Dependency::Source::HoA'	=> 1.110,
 		'Capture::Tiny'							=> 0.36,
@@ -112,39 +98,27 @@ my(%params) =
 		'XML::Bare'								=> 0,
 		'XML::Tiny'								=> 2.06,
 	},
-	TEST_REQUIRES =>
-	{
+	TEST_REQUIRES => {
 		'Test::More'	=> 1.001002,
 		'Test::Pod'		=> 1.48,
 	},
 	VERSION_FROM => 'lib/GraphViz2.pm',
-);
-
-if ( ($ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/) && ($ExtUtils::MakeMaker::VERSION > 6.30) )
-{
-	$params{LICENSE} = 'perl';
-}
-
-if ($ExtUtils::MakeMaker::VERSION ge '6.46')
-{
-	$params{META_MERGE} =
-	{
-		'meta-spec' =>
-		{
+	LICENSE => 'perl',
+	META_MERGE => {
+		'meta-spec' => {
 			version => 2,
 		},
-		resources   =>
-		{
-			bugtracker	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=GraphViz2',
+		resources   => {
+			dynamic_config => 0,
+			bugtracker	=> { web => 'https://github.com/ronsavage/GraphViz2/issues' },
 			license		=> 'http://dev.perl.org/licenses/',
-			repository	=>
-			{
+			repository	=> {
 				type	=> 'git',
 				url		=> 'https://github.com/ronsavage/GraphViz2.git',
 				web		=> 'https://github.com/ronsavage/GraphViz2',
 			},
 		},
-	};
-}
+	},
+);
 
 WriteMakefile(%params);

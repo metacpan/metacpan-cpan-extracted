@@ -1,6 +1,7 @@
 
 TYPEMAP
 LONGLONG         T_IV
+ULONGLONG        T_UV
 cmp *            T_COMPLEXP
 dblcmp *         T_DBLCOMPLEXP
 fitsfile *	 T_PTROBJ_fitsfile
@@ -15,6 +16,7 @@ short *          T_SHORTP
 int *            T_INTP
 long *           T_LONGP
 LONGLONG  *      T_LONGLONGP
+ULONGLONG  *     T_ULONGLONGP
 float *          T_FLOATP
 double *         T_DOUBLEP
 char **          T_STRINGP
@@ -52,6 +54,8 @@ T_LONGP
 	$var = ($type)packND($arg,TLONG)
 T_LONGLONGP
 	$var = ($type)packND($arg,TLONGLONG)
+T_ULONGLONGP
+	$var = ($type)packND($arg,TULONGLONG)
 T_FLOATP
 	$var = ($type)packND($arg,TFLOAT)
 T_DOUBLEP

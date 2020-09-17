@@ -1,3 +1,10 @@
+0.002   2020-05-22  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention WordList::EN::Common::EF::Top1000.
+
+
 0.001   2020-05-21  Released-By: PERLANCAR
 
         - First release.

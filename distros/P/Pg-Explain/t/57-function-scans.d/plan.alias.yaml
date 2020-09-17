@@ -1,0 +1,16 @@
+- Plan: 
+    Node Type: "Function Scan"
+    Parallel Aware: false
+    Function Name: "generate_series"
+    Alias: "i"
+    Startup Cost: 0.00
+    Total Cost: 0.10
+    Plan Rows: 10
+    Plan Width: 4
+    Actual Startup Time: 0.019
+    Actual Total Time: 0.022
+    Actual Rows: 10
+    Actual Loops: 1
+  Planning Time: 0.107
+  Triggers: 
+  Execution Time: 0.151

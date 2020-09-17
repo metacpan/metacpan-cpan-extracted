@@ -28,6 +28,7 @@ Go to [https://thorsen.pm/linkembedder](https://thorsen.pm/linkembedder) to see 
 
 These web pages are currently supported:
 
+- [https://dropbox.com/](https://dropbox.com/)
 - [https://imgur.com/](https://imgur.com/)
 - [https://instagram.com/](https://instagram.com/)
 

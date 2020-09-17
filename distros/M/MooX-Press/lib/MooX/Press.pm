@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.068';
+our $VERSION   = '0.070';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -186,8 +186,10 @@ sub import {
 		my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
 		
 		%methods = delete($opts{factory_package_can})->$_handle_list_add_nulls;
-		$methods{qualify} ||= sub { $builder->qualify($_[1], $opts{'prefix'}) }
-			unless exists &{$opts{'factory_package'}.'::qualify'};
+		if ( my $p = $opts{'prefix'} ) {
+			$methods{qualify} ||= sub { $builder->qualify($_[1], $p) }
+				unless exists &{$opts{'factory_package'}.'::qualify'};
+		}
 		$builder->$method_installer($opts{'factory_package'}, \%methods) if keys %methods;
 		
 		%methods = delete($opts{type_library_can})->$_handle_list_add_nulls;
@@ -905,7 +907,15 @@ sub patch_package {
 		no strict 'refs';
 		${"$package\::AUTHORITY"} = $auth;
 	}
-	
+
+	if ( $kind eq 'class' and my $extends = delete $spec{extends} ) {
+		my @isa    = $me->_expand_isa( $prefix, $extends );
+		if (@isa) {
+			my $method = "extend_class_" . lc $toolkit;
+			$me->$method( $package, \@isa );
+		}
+	}
+
 	if ( $kind eq 'class' and my $overload = delete $spec{overload} ) {
 		require overload;
 		require Import::Into;
@@ -1144,6 +1154,8 @@ sub generate_package {
 	my $generator_package = shift;
 	my $global_opts       = shift;
 	my %local_opts        = ( @_ == 1 ? $_[0] : \@_ )->$_handle_list;
+	
+	$generator_package =~ s/^(main)?::// while $generator_package =~ /^(main)?::/;
 	
 	my %opts;
 	for my $key (qw/ extends with has can constant around before after
@@ -1582,7 +1594,7 @@ sub install_multimethod {
 	
 	my $_maybe_do_multimethods = sub {
 		my $tk = 'Sub::MultiMethod';
-		if ($INC{'Sub/MultiMethod.pm'} and $tk->can('copy_package_candidates')) {
+		if ($tk->can('copy_package_candidates')) {
 			my ($target, $kind, @sources) = @_;
 			$tk->copy_package_candidates(@sources => $target);
 			$tk->install_missing_dispatchers($target) unless $kind eq 'role';
@@ -1596,7 +1608,7 @@ sub install_multimethod {
 		my $helper = $builder->_get_moo_helper($class, 'with');
 		my @roles = $builder->$_process_roles($roles, 'Moo', $opts);
 		$helper->(@roles);
-		$class->$_maybe_do_multimethods($kind, @roles);
+		$class->$_maybe_do_multimethods($kind, @roles) if $INC{'Sub/MultiMethod.pm'};
 	}
 
 	sub apply_roles_moose {
@@ -1605,7 +1617,7 @@ sub install_multimethod {
 		require Moose::Util;
 		my @roles = $builder->$_process_roles($roles, 'Moose', $opts);
 		Moose::Util::ensure_all_roles($class, @roles);
-		$class->$_maybe_do_multimethods($kind, @roles);
+		$class->$_maybe_do_multimethods($kind, @roles) if $INC{'Sub/MultiMethod.pm'};
 	}
 
 	sub apply_roles_mouse {
@@ -1615,7 +1627,7 @@ sub install_multimethod {
 		my @roles = $builder->$_process_roles($roles, 'Mouse', $opts);
 		# this can double-apply roles? :(
 		Mouse::Util::apply_all_roles($class, @roles);
-		$class->$_maybe_do_multimethods($kind, @roles);
+		$class->$_maybe_do_multimethods($kind, @roles) if $INC{'Sub/MultiMethod.pm'};
 	}
 }
 

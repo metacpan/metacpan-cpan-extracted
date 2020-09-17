@@ -1,14 +1,14 @@
 package WordList::EN::Common::EF::Top1000;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-21'; # DATE
+our $DATE = '2020-05-22'; # DATE
 our $DIST = 'WordList-EN-Common-EF-Top1000'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("avg_word_len",5.522,"num_words_contains_unicode",0,"num_words_contains_whitespace",0,"num_words_contain_nonword_chars",1,"num_words",1000,"longest_word_len",14,"shortest_word_len",1,"num_words_contains_nonword_chars",1,"num_words_contain_unicode",0,"num_words_contain_whitespace",0); # STATS
+our %STATS = ("longest_word_len",14,"num_words_contains_nonword_chars",1,"num_words_contain_whitespace",0,"num_words_contain_nonword_chars",1,"num_words_contains_unicode",0,"avg_word_len",5.522,"shortest_word_len",1,"num_words_contain_unicode",0,"num_words",1000,"num_words_contains_whitespace",0); # STATS
 
 1;
 # ABSTRACT: 1000 most common English words, from EF
@@ -23,7 +23,7 @@ WordList::EN::Common::EF::Top1000 - 1000 most common English words, from EF
 
 =head1 VERSION
 
-This document describes version 0.001 of WordList::EN::Common::EF::Top1000 (from Perl distribution WordList-EN-Common-EF-Top1000), released on 2020-05-21.
+This document describes version 0.002 of WordList::EN::Common::EF::Top1000 (from Perl distribution WordList-EN-Common-EF-Top1000), released on 2020-05-22.
 
 =head1 SYNOPSIS
 
@@ -47,6 +47,10 @@ This document describes version 0.001 of WordList::EN::Common::EF::Top1000 (from
 
  # Get all the words
  my @all_words = $wl->all_words;
+
+=head1 DESCRIPTION
+
+Source: L<https://www.ef.com/wwen/english-resources/english-vocabulary/top-1000-words/>
 
 =head1 STATISTICS
 
@@ -85,7 +89,7 @@ feature.
 
 =head1 SEE ALSO
 
-Source: L<https://www.ef.com/wwen/english-resources/english-vocabulary/top-1000-words/>
+L<WordList::EN::Common::EF::Top3000>
 
 =head1 AUTHOR
 

@@ -1,7 +1,9 @@
 package Org::Element::Drawer;
 
-our $DATE = '2020-09-11'; # DATE
-our $VERSION = '0.552'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-17'; # DATE
+our $DIST = 'Org-Parser'; # DIST
+our $VERSION = '0.553'; # VERSION
 
 use 5.010;
 use locale;
@@ -30,8 +32,7 @@ sub _parse_properties {
     $self->properties({}) unless $self->properties;
     while ($raw_content =~ /^[ \t]*:(\w+):[ \t]+
                             ($Org::Document::args_re)[ \t]*(?:\R|\z)/mxg) {
-        my $args = Org::Document::__parse_args($2);
-        $self->properties->{$1} = @$args == 1 ? $args->[0] : $args;
+        $self->properties->{$1} = $2;
     }
 }
 
@@ -58,11 +59,27 @@ Org::Element::Drawer - Represent Org drawer
 
 =head1 VERSION
 
-This document describes version 0.552 of Org::Element::Drawer (from Perl distribution Org-Parser), released on 2020-09-11.
+This document describes version 0.553 of Org::Element::Drawer (from Perl distribution Org-Parser), released on 2020-09-17.
 
 =head1 DESCRIPTION
 
 Derived from L<Org::Element>.
+
+Example of a drawer in an Org document:
+
+ * A heading
+ :SOMEDRAWER:
+ some text
+ more text ...
+ :END:
+
+A special drawer named C<PROPERTIES> is used to store a list of properties:
+
+ * A heading
+ :PROPERTIES:
+ :Title:   the title
+ :Publisher:   the publisher
+ :END:
 
 =for Pod::Coverage BUILD as_string
 
@@ -74,7 +91,13 @@ Drawer name.
 
 =head2 properties => HASH
 
-Collected properties in the drawer.
+Collected properties in the drawer. In the example properties drawer above,
+C<properties()> will result in:
+
+ {
+   Title => "the title",
+   Publisher => "the publisher",
+ }
 
 =head1 METHODS
 

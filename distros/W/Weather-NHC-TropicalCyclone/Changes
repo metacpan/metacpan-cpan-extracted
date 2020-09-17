@@ -1,6 +1,15 @@
 Change Log
 ^^^^^^^^^^
 
+Version 0.14
+
+Non-functional bump, added dependency to meta information for pkg
+
+Version 0.13:
+
+Added support for converting the forecast advisory into the ATCF
+formatted forecast data format/file
+
 Version 0.12:
 
 Renamed fetch_forecastGraphics fetch_forecastGraphics_url in the

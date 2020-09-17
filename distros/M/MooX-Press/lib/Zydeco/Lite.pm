@@ -5,7 +5,7 @@ use warnings;
 package Zydeco::Lite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.068';
+our $VERSION   = '0.070';
 
 use MooX::Press ();
 use Types::Standard qw( -types -is );
@@ -34,13 +34,13 @@ our %THIS;
 
 sub _shift_type ($\@) {
 	my ( $type, $ref ) = @_;
-	return shift @$ref if $type->check( $ref->[0] );
+	return shift @$ref if @$ref && $type->check( $ref->[0] );
 	return undef;
 }
 
 sub _pop_type ($\@) {
 	my ( $type, $ref ) = @_;
-	return pop @$ref if $type->check( $ref->[-1] );
+	return pop @$ref if @$ref && $type->check( $ref->[-1] );
 	return undef;
 }
 
@@ -70,9 +70,11 @@ sub app {
 		$package = _anon_package_name();
 	}
 	
+	my $caller = caller;
+	
 	local $THIS{APP}      = $package;
 	local $THIS{APP_SPEC} = {
-		caller          => caller,
+		caller          => $caller,
 		factory_package => $package,
 		prefix          => $package,
 		toolkit         => 'Moo',
@@ -94,8 +96,20 @@ sub app {
 }
 
 sub class {
-	$THIS{APP_SPEC}
-		or confess("`class` used outside an app definition");
+	my $finalize = undef;
+	if ( not $THIS{APP_SPEC} ) {
+		my $caller = caller;
+		$THIS{APP_SPEC} = {
+			caller  => $caller,
+			toolkit => 'Moo',
+		};
+		$finalize = sub {
+			'MooX::Press'->import(
+				%{ $THIS{APP_SPEC} },
+			);
+			$THIS{APP_SPEC} = undef;
+		};
+	}
 	
 	my $definition = _pop_type( CodeRef, @_ ) || sub { 1 };
 	my $package    = ( @_ % 2 ) ? _shift_type( Str, @_ ) : undef;
@@ -111,6 +125,7 @@ sub class {
 				$package,
 			);
 			$THIS{APP_SPEC}{$key} = $gen;
+			$finalize->() if $finalize;
 			return;
 		}
 		else {
@@ -167,6 +182,7 @@ sub class {
 		$THIS{APP_SPEC}{$key} = $class_spec;
 	}
 	
+	$finalize->() if $finalize;
 	return;
 }
 
@@ -246,7 +262,7 @@ sub _method {
 	
 	if ( defined $sig ) {
 		$args{signature} = $sig;
-		$args{named}     = 0 unless exists $args{named};
+		$args{named}     = false unless exists $args{named};
 	}
 	
 	$next->( $subname, \%args );
@@ -257,27 +273,48 @@ sub method {
 	my ( $target, $key ) = $THIS{CLASS_SPEC}
 		? ( $THIS{CLASS_SPEC}, 'can' )
 		: ( $THIS{APP_SPEC},   'factory_package_can' );
-	$target or confess("`method` used outside an app, class, or role definition");
+	my $next;
 	
-	unshift @_, sub {
-		my ( $subname, $args ) = @_;
-		( $target->{$key} ||= {} )->{$subname} = $args;
-	};
+	if ( $target ) {
+		$next = sub {
+			my ( $subname, $args ) = @_;
+			( $target->{$key} ||= {} )->{$subname} = $args;
+		};
+	}
+	else {
+		my $caller = caller;
+		$next = sub {
+			my ( $subname, $args ) = @_;
+			'MooX::Press'->patch_package( $caller, can => { $subname => $args } );
+		};
+	}
+	
+	unshift @_, $next;
 	goto \&_method;
 }
 
 sub multi_method {
-	my $target = $THIS{CLASS_SPEC} || $THIS{APP_SPEC}
-		or confess("`multi_method` used outside an app, class, or role definition");
-	
 	my $subname = is_Str($_[0])
 		? $_[0]
 		: confess('anonymous multi factories not supported');
+	my $target = $THIS{CLASS_SPEC} || $THIS{APP_SPEC};
+	my $next;
 	
-	unshift @_, sub {
-		my ( $subname, $args ) = @_;
-		push @{ $target->{multimethod} ||= [] }, $subname, $args;
-	};
+	if ( $target ) {
+		$next = sub {
+			my ( $subname, $args ) = @_;
+			push @{ $target->{multimethod} ||= [] }, $subname, $args;
+		};
+	}
+	else {
+		my $caller = shift;
+		$next = sub {
+			my ( $subname, $args ) = @_;
+			'MooX::Press'->patch_package( $caller, multimethod => { $subname => $args } );
+		};
+	}
+	
+	unshift @_, $next;
 	goto \&_method;
 }
 
@@ -341,7 +378,7 @@ sub _modifier {
 	
 	if ( defined $sig ) {
 		$args{signature} = $sig;
-		$args{named}     = 0 unless exists $args{named};
+		$args{named}     = false unless exists $args{named};
 	}
 	
 	my @keys = keys %args;
@@ -350,10 +387,17 @@ sub _modifier {
 	}
 	
 	my $target = $THIS{CLASS_SPEC} || $THIS{APP_SPEC};
-	push @{ $target->{$modifier_type} ||= [] }, (
-		ref($subname) ? @$subname : $subname,
-		$definition,
-	);
+	
+	if ( $target ) {
+		push @{ $target->{$modifier_type} ||= [] }, (
+			ref($subname) ? @$subname : $subname,
+			$definition,
+		);
+	}
+	else {
+		my $caller = caller;
+		'MooX::Press'->patch_package( $caller, $modifier_type => { $subname => $definition } );
+	}
 	
 	return;
 }
@@ -408,15 +452,21 @@ sub has {
 }
 
 sub constant {
-	$THIS{CLASS_SPEC}
-		or confess("`constant` used outside a class or role definition");
-	
 	my $names = _shift_type( ArrayRef|Str, @_ )
 		or confess("constants cannot be anonymous");
 	my $value  = shift;
 	
 	$names = [ $names ] unless is_ArrayRef $names;
-	( $THIS{CLASS_SPEC}{constant} ||= {} )->{$_} = $value for @$names;
+	
+	if ( $THIS{CLASS_SPEC} ) {
+		( $THIS{CLASS_SPEC}{constant} ||= {} )->{$_} = $value for @$names;
+	}
+	else {
+		my $caller = caller;
+		my %constants;
+		$constants{$_} = $value for @$names;
+		'MooX::Press'->patch_package( $caller, constant => \%constants );
+	}
 	
 	return;
 }
@@ -668,6 +718,13 @@ Anonymous apps:
   my $app = app sub {
     # definition
   };
+
+As of Zydeco::Lite 0.69, classes and roles no longer need to be defined
+within an C<< app >> block, but bundling them into an app block has the
+advantage that the app is able to define all its classes and roles
+together, cross-referencing them, and setting them up in a sensible order.
+(Which becomes important if you define a role after defining a class that
+consumes it.)
 
 =head3 Classes, Roles, Interfaces, and Abstract Classes
 
@@ -984,18 +1041,27 @@ Exceptions:
 
 =head2 Formal Syntax
 
+Scope B<ANY> means the keyword can appear anywhere where Zydeco::Lite
+is in scope. Scope B<CLASS> means that the keyword may appear only within
+class or abstract class definition blocks. Scope B<ROLE> means that the
+keyword may appear only in role/interface definition blocks. Scope B<APP>
+means that the keyword may appear only within an app definition block.
+
+ # Scope: ANY
  app(
    Optional[Str]      $name,
    Hash               %args,
    Optional[CodeRef]  $definition,
  );
  
+ # Scope: ANY
  class(
    Optional[Str]      $name,
    Hash               %args,
    Optional[CodeRef]  $definition,
  );
  
+ # Scope: ANY
  class generator(
    Optional[Str]      $name,
    Optional[ArrayRef] $signature,
@@ -1003,12 +1069,14 @@ Exceptions:
    Optional[CodeRef]  $definition,
  );
  
+ # Scope: ANY
  role(
    Optional[Str]      $name,
    Hash               %args,
    Optional[CodeRef]  $definition,
  );
  
+ # Scope: ANY
  role generator(
    Optional[Str]      $name,
    Optional[ArrayRef] $signature,
@@ -1016,12 +1084,14 @@ Exceptions:
    Optional[CodeRef]  $definition,
  );
  
+ # Scope: ANY
  interface(
    Optional[Str]      $name,
    Hash               %args,
    Optional[CodeRef]  $definition,
  );
  
+ # Scope: ANY
  interface generator(
    Optional[Str]      $name,
    Optional[ArrayRef] $signature,
@@ -1029,12 +1099,14 @@ Exceptions:
    Optional[CodeRef]  $definition,
  );
  
+ # Scope: ANY
  abstract_class(
    Optional[Str]      $name,
    Hash               %args,
    Optional[CodeRef]  $definition,
  );
  
+ # Scope: ANY
  abstract_class generator(
    Optional[Str]      $name,
    Optional[ArrayRef] $signature,
@@ -1042,14 +1114,17 @@ Exceptions:
    Optional[CodeRef]  $definition,
  );
  
+ # Scope: CLASS
  extends(
    List[Str|ArrayRef] @parents,
  );
  
+ # Scope: CLASS or ROLE
  with(
    List[Str|ArrayRef] @parents,
  );
  
+ # Scope: ANY
  method(
    Optional[Str]      $name,
    Optional[ArrayRef] $signature,
@@ -1057,6 +1132,7 @@ Exceptions:
    CodeRef            $definition,
  );
  
+ # Scope: CLASS
  factory(
    Str|ArrayRef       $names,
    Optional[ArrayRef] $signature,
@@ -1064,11 +1140,13 @@ Exceptions:
    CodeRef|ScalarRef  $definition_or_via,
  );
  
+ # Scope: ANY
  constant(
    Str                $name,
    Any                $value,
  );
  
+ # Scope: ANY
  multi_method(
    Str                $name,
    ArrayRef           $signature,
@@ -1076,6 +1154,7 @@ Exceptions:
    CodeRef            $definition,
  );
  
+ # Scope: CLASS
  multi_factory(
    Str                $name,
    ArrayRef           $signature,
@@ -1083,6 +1162,7 @@ Exceptions:
    CodeRef            $definition,
  );
  
+ # Scope: ANY
  before(
    Str|ArrayRef       $names,
    Optional[ArrayRef] $signature,
@@ -1090,6 +1170,7 @@ Exceptions:
    CodeRef            $definition,
  );
  
+ # Scope: ANY
  after(
    Str|ArrayRef       $names,
    Optional[ArrayRef] $signature,
@@ -1097,6 +1178,7 @@ Exceptions:
    CodeRef            $definition,
  );
  
+ # Scope: ANY
  around(
    Str|ArrayRef       $names,
    Optional[ArrayRef] $signature,
@@ -1104,65 +1186,109 @@ Exceptions:
    CodeRef            $definition,
  );
  
+ # Scope: CLASS or ROLE
  has(
    Str|ArrayRef       $names,
    Hash               %spec,
  );
  
+ # Scope: ROLE
  requires(
    List[Str]          @names,
  );
  
+ # Scope: ANY
  confess(
    Str                $template,
    List               @args,
  );
  
+ # Scope: APP or CLASS or ROLE
  toolkit(
    Str                $toolkit,
    Optional[List]     @imports,
  );
  
+ # Scope: CLASS or ROLE
  coerce(
    Object|Str         $type,
    Str                $via,
    Optional[CodeRef]  $definition,
  );
  
+ # Scope: CLASS
  overload(
    Hash               %args,
  );
  
+ # Scope: APP or CLASS or ROLE
  version(
    Str                $version,
  );
  
+ # Scope: APP or CLASS or ROLE
  authority(
    Str                $authority,
  );
  
+ # Scope: CLASS or ROLE
  type_name(
    Str                $name,
  );
  
+ # Scope: CLASS or ROLE
  begin {
    ( $package ) = @_;
    ...;
  };
  
+ # Scope: CLASS or ROLE
  end {
    ( $package ) = @_;
    ...;
  };
  
+ # Scope: ROLE
  before_apply {
    ( $role, $target, $targetkind ) = @_;
    ...;
  };
  
+ # Scope: ROLE
  after_apply {
    ( $role, $target, $targetkind ) = @_;
    ...;
+ };
+
+Scopes are dynamic rather than lexical. So although C<extends> can only appear
+in a B<CLASS>, this will work:
+
+ use Zydeco::Lite;
+ 
+ class "Base";
+ 
+ sub foo { extends "Base" }
+ 
+ class "Derived" => sub { foo() };
+
+Keywords used within a C<before_apply> or C<after_apply> block execute in the
+scope of the package they're being applied to. They run too late for
+C<type_name> to work, but most other keywords will work okay. In the following
+example, Derived will be a child class of Base.
+
+ use Zydeco::Lite;
+ 
+ class "Base";
+ 
+ role "ChildOfBase" => sub {
+   after_apply {
+     my ( $role, $target, $kind ) = @_;
+     extends "Base" if $kind eq "class";
+   };
+ };
+ 
+ class "Derived" => sub {
+   with "ChildOfBase";
  };
 
 =head2 Import

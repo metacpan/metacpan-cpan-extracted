@@ -1,4 +1,3 @@
-use lib 'lib';
 use Mojo::Base -strict;
 use Test::More;
 use LinkEmbedder;
@@ -6,26 +5,22 @@ use LinkEmbedder;
 plan skip_all => 'TEST_ONLINE=1'         unless $ENV{TEST_ONLINE};
 plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
 
-my $embedder = LinkEmbedder->new;
-my $link;
-$embedder->get_p('https://xkcd.com/927')->then(sub { $link = shift })->wait;
-isa_ok($link, 'LinkEmbedder::Link::Xkcd');
-is_deeply $link->TO_JSON,
-  {
-  cache_age     => 0,
-  height        => 0,
-  html          => photo_html(),
-  provider_name => 'Xkcd',
-  provider_url  => 'https://xkcd.com',
-  thumbnail_url => 'https://imgs.xkcd.com/comics/',
-  title         => 'Standards',
-  type          => 'photo',
-  url           => '//imgs.xkcd.com/comics/standards.png',
-  version       => '1.0',
-  width         => 0,
-  },
-  'json for xkcd.com'
-  or note $link->_dump;
+LinkEmbedder->new->test_ok(
+  'https://xkcd.com/927' => {
+    isa           => 'LinkEmbedder::Link::Xkcd',
+    cache_age     => 0,
+    height        => 0,
+    html          => photo_html(),
+    provider_name => 'Xkcd',
+    provider_url  => 'https://xkcd.com',
+    thumbnail_url => '//imgs.xkcd.com/comics/standards.png',
+    title         => 'Standards',
+    type          => 'photo',
+    url           => 'https://xkcd.com/927',
+    version       => '1.0',
+    width         => 0,
+  }
+);
 
 done_testing;
 

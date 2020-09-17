@@ -5,87 +5,62 @@ use LinkEmbedder;
 plan skip_all => 'TEST_ONLINE=1'         unless $ENV{TEST_ONLINE};
 plan skip_all => 'cpanm IO::Socket::SSL' unless LinkEmbedder::TLS;
 
-my $embedder = LinkEmbedder->new;
-my $link;
+LinkEmbedder->new->test_ok(
+  'https://www.fortunecowsay.com/' => {
+    isa  => 'LinkEmbedder::Link::Basic',
+    html => qr{div class="le-paste le-provider-fortunecowsay le-rich".*pre.*\|\|-+w\s*\|}s,
+  }
+);
 
-$embedder->get_p('https://www.fortunecowsay.com/')->then(sub { $link = shift })->wait;
-is ref($link), 'LinkEmbedder::Link::Basic', 'LinkEmbedder::Link::Basic';
-my $html = Mojo::DOM->new($link->TO_JSON->{html});
-ok $html->at('div.le-paste.le-provider-fortunecowsay.le-rich'), 'fortunecowsay wrapper';
-like $html->at('pre')->text, qr{\|\|-+w\s*\|}, 'the cow has legs';
+LinkEmbedder->new->test_ok(
+  'https://catoverflow.com/cats/r4cIt4z.gif' => {
+    isa           => 'LinkEmbedder::Link::Basic',
+    cache_age     => 0,
+    height        => 0,
+    html          => catoverflow_html(),
+    provider_name => 'Catoverflow',
+    provider_url  => 'https://catoverflow.com/',
+    title         => 'r4cIt4z.gif',
+    type          => 'photo',
+    url           => 'https://catoverflow.com/cats/r4cIt4z.gif',
+    version       => '1.0',
+    width         => 0,
+  }
+);
 
-$embedder->get_p('https://catoverflow.com/cats/r4cIt4z.gif')->then(sub { $link = shift })->wait;
-is ref($link), 'LinkEmbedder::Link::Basic', 'LinkEmbedder::Link::Basic';
-is_deeply $link->TO_JSON,
-  {
-  cache_age     => 0,
-  height        => 0,
-  html          => catoverflow_html(),
-  provider_name => 'Catoverflow',
-  provider_url  => 'https://catoverflow.com/',
-  title         => 'r4cIt4z.gif',
-  type          => 'photo',
-  url           => 'https://catoverflow.com/cats/r4cIt4z.gif',
-  version       => '1.0',
-  width         => 0,
-  },
-  'json for catoverflow.com';
+LinkEmbedder->new->test_ok(
+  'https://thorsen.pm/blog/' => {
+    cache_age     => 0,
+    html          => thorsen_html(),
+    provider_name => 'Thorsen',
+    title         => 'My blog - thorsen.pm',
+    type          => 'rich',
+    url           => 'https://thorsen.pm/blog/',
+    provider_url  => 'https://thorsen.pm/',
+    thumbnail_url => 'https://www.thorsen.pm/editor/wp-content/uploads/2019/03/jhthorsen-face-1300.jpg',
+    version       => '1.0'
+  }
+);
 
-$embedder->get_p('https://thorsen.pm/blog/')->then(sub { $link = shift })->wait;
-is ref($link), 'LinkEmbedder::Link::Basic', 'LinkEmbedder::Link::Basic';
-is_deeply $link->TO_JSON,
-  {
-  cache_age     => 0,
-  html          => thorsen_html(),
-  provider_name => 'Thorsen',
-  title         => 'My blog - thorsen.pm',
-  type          => 'rich',
-  url           => 'https://thorsen.pm/blog/',
-  provider_url  => 'https://thorsen.pm/',
-  thumbnail_url => 'https://www.thorsen.pm/editor/wp-content/uploads/2019/03/jhthorsen-face-1300.jpg',
-  version       => '1.0'
-  },
-  'json for thorsen.pm';
-
-$embedder->get_p(
-  'https://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html')
-  ->then(sub { $link = shift })->wait;
-is ref($link), 'LinkEmbedder::Link::Basic', 'LinkEmbedder::Link::Basic';
-is_deeply $link->TO_JSON,
-  {
-  author_name      => 'Per Kristian Bjørkeng',
-  author_url       => 'mailto:per.kristian.bjorkeng@aftenposten.no',
-  cache_age        => 0,
-  html             => aftenposten_html(),
-  provider_name    => 'Aftenposten',
-  provider_url     => 'https://www.aftenposten.no/',
-  thumbnail_height => 810,
-  thumbnail_url    => 'https://ap.mnocdn.no/images/ae53dc79-22e3-41da-b64b-16ec78f42a1a?fit=crop&q=80&w=1440',
-  thumbnail_width  => 1440,
-  title            => 'Google har skapt kunstig intelligens som trener seg selv',
-  type             => 'rich',
-  url     => 'https://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html',
-  version => '1.0'
-  },
-  'json for aftenposten';
+LinkEmbedder->new->test_ok(
+  'https://www.aftenposten.no/kultur/i/lo5X7/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker' => {
+    isa              => 'LinkEmbedder::Link::Basic',
+    author_name      => qr{Per Kristian},
+    cache_age        => 0,
+    html             => qr{class="le-card le-image-card le-rich le-provider-aftenposten".*Google har}s,
+    provider_name    => 'Aftenposten',
+    provider_url     => 'https://www.aftenposten.no/',
+    thumbnail_height => 1047,
+    thumbnail_url    => qr{https:},
+    thumbnail_width  => 2000,
+    title            => 'Google har skapt kunstig intelligens som trener seg selv',
+    type             => 'rich',
+    url     => 'https://www.aftenposten.no/kultur/i/lo5X7/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker',
+    version => '1.0'
+  }
+);
 
 done_testing;
-
-sub aftenposten_html {
-  return <<'HERE';
-<div class="le-card le-image-card le-rich le-provider-aftenposten">
-    <a href="https://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html" class="le-thumbnail">
-      <img src="https://ap.mnocdn.no/images/ae53dc79-22e3-41da-b64b-16ec78f42a1a?fit=crop&amp;q=80&amp;w=1440" alt="Per Kristian Bjørkeng">
-    </a>
-  <h3>Google har skapt kunstig intelligens som trener seg selv</h3>
-  <p class="le-description">– Vi tror det vil komme kunstig intelligens på nivå med mennesker før eller siden, men det er veldig vanskelig å si om det blir 10 eller 50 år til, sier forsker.</p>
-  <div class="le-meta">
-    <span class="le-author-link"><a href="mailto:per.kristian.bjorkeng@aftenposten.no">Per Kristian Bjørkeng</a></span>
-    <span class="le-goto-link"><a href="https://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html"><span>https://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html</span></a></span>
-  </div>
-</div>
-HERE
-}
 
 sub catoverflow_html {
   return <<'HERE';

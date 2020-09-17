@@ -139,7 +139,7 @@ es-apply-settings.pl - Run to apply a JSON list of settings to indexes matching 
 
 =head1 VERSION
 
-version 7.7
+version 7.8
 
 =head1 SYNOPSIS
 

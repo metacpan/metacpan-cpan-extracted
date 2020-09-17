@@ -79,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-Org-Parser"
       }
    },
-   "version" : "0.552",
+   "version" : "0.553",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

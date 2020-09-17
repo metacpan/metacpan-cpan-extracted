@@ -1,5 +1,5 @@
 package Image::PNG::Const;
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -1300,7 +1300,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
--2018
+-2020
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

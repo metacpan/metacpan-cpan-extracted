@@ -6,17 +6,17 @@ if (($ENV{HARNESS_PERL_SWITCHES} || '') =~ /Devel::Cover/) {
 }
 if (!eval 'use Test::Pod; 1') {
   *Test::Pod::pod_file_ok = sub {
-    SKIP: { skip "pod_file_ok(@_) (Test::Pod is required)", 1 }
+  SKIP: { skip "pod_file_ok(@_) (Test::Pod is required)", 1 }
   };
 }
 if (!eval 'use Test::Pod::Coverage; 1') {
   *Test::Pod::Coverage::pod_coverage_ok = sub {
-    SKIP: { skip "pod_coverage_ok(@_) (Test::Pod::Coverage is required)", 1 }
+  SKIP: { skip "pod_coverage_ok(@_) (Test::Pod::Coverage is required)", 1 }
   };
 }
 if (!eval 'use Test::CPAN::Changes; 1') {
   *Test::CPAN::Changes::changes_file_ok = sub {
-    SKIP: { skip "changes_ok(@_) (Test::CPAN::Changes is required)", 4 }
+  SKIP: { skip "changes_ok(@_) (Test::CPAN::Changes is required)", 4 }
   };
 }
 
@@ -33,7 +33,7 @@ for my $file (@files) {
   Test::Pod::pod_file_ok($file);
 }
 
-Test::Pod::Coverage::pod_coverage_ok('LinkEmbedder',       {also_private => [qr/^[A-Z_]+$/],});
-Test::Pod::Coverage::pod_coverage_ok('LinkEmbedder::Link', {also_private => [qr/^[A-Z_]+$/],});
+Test::Pod::Coverage::pod_coverage_ok('LinkEmbedder',       {also_private => [qr/^[A-Z_]+$/, 'test_ok']});
+Test::Pod::Coverage::pod_coverage_ok('LinkEmbedder::Link', {also_private => [qr/^[A-Z_]+$/]});
 
 Test::CPAN::Changes::changes_file_ok();

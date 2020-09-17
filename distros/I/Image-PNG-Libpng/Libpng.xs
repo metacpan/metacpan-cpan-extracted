@@ -725,3 +725,11 @@ CODE:
 	png_set_crc_action (Png->png, crit_action, ancil_action);
 
 #endif /* 0 */
+
+SV *
+perl_png_split_alpha (Png)
+	Image::PNG::Libpng Png;
+CODE:
+	RETVAL = perl_png_split_alpha (Png);
+OUTPUT:
+	RETVAL

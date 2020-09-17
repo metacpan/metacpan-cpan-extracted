@@ -1,5 +1,12 @@
 Revision history for Email::Mailer
 
+1.15      2020-09-16 11:39:54-07:00 America/Los_Angeles
+        - Improve tests to work when Message-Id header contains line break
+
+1.14      2020-09-16 10:28:24-07:00 America/Los_Angeles
+        - Add Message-Id header if not defined
+        - Improve tests to better handle headers
+
 1.13      2020-09-14 08:02:49-07:00 America/Los_Angeles
         - Use charset from Content-Type header for encode_mimewords()
 

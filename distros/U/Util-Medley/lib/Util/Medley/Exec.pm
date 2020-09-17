@@ -1,5 +1,5 @@
 package Util::Medley::Exec;
-$Util::Medley::Exec::VERSION = '0.041';
+$Util::Medley::Exec::VERSION = '0.043';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -13,6 +13,7 @@ use Text::ASCIITable;
 use Text::Table;
 
 with 
+    'Util::Medley::Roles::Attributes::Logger',
     'Util::Medley::Roles::Attributes::String',
     'Util::Medley::Roles::Attributes::List';
 
@@ -22,7 +23,7 @@ Util::Medley::Exec - proxy for cmdline to libs
 
 =head1 VERSION
 
-version 0.041
+version 0.043
 
 =cut
 

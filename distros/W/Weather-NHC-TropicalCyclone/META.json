@@ -4,7 +4,7 @@
       "danx <danx@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.048, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,6 +21,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Date::Calc" : "0",
+            "File::Temp" : "0",
             "HTML::TreeBuilder" : "0",
             "HTTP::Status" : "0",
             "HTTP::Tiny" : "0",
@@ -32,12 +34,16 @@
       },
       "test" : {
          "requires" : {
+            "File::Temp" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.12"
+   "version" : "0.14",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.23",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Publish Org document to WordPress as blog post",
+   "abstract" : "Publish Org document (or heading) to WordPress as blog post",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -40,14 +40,22 @@
             "Data::Sah::Compiler::perl::TH::bool" : "0",
             "Data::Sah::Compiler::perl::TH::date" : "0",
             "Data::Sah::Compiler::perl::TH::hash" : "0",
+            "Data::Sah::Compiler::perl::TH::int" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
+            "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" : "0",
+            "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" : "0",
             "File::Slurper" : "0",
-            "Log::ger" : "0.027",
+            "Log::ger" : "0.037",
+            "Org::Element::Drawer" : "0",
+            "Org::Element::Text" : "0",
+            "Org::Parser" : "0.553",
             "Org::To::HTML::WordPress" : "0",
             "POSIX" : "0",
             "Perinci::CmdLine::Any" : "0",
-            "Perinci::CmdLine::Lite" : "1.820",
+            "Perinci::CmdLine::Lite" : "1.827",
+            "Perinci::Object" : "0.310",
             "Sah::Schema::filename" : "0",
+            "Sah::Schema::posint" : "0",
             "XMLRPC::Lite" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -75,7 +83,7 @@
          "web" : "https://github.com/perlancar/perl-App-org2wp"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -84,7 +92,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript org2wp",
-            "version" : "0.421"
+            "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -168,11 +176,6 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
-            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.012"
@@ -180,7 +183,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.599"
+            "version" : "0.600"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -236,7 +239,7 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
@@ -405,7 +408,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.07"
+                        "version" : "0.082"
                      }
                   ]
                }
@@ -426,7 +429,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
@@ -436,7 +439,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
             "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
-            "version" : "0.250"
+            "version" : "0.251"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",
@@ -471,12 +474,14 @@
             "config" : {
                "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
                   "finder" : [
-                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                     ":ExecFiles",
+                     ":InstallModules",
+                     ":TestFiles"
                   ]
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.003"
+            "version" : "3.001.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

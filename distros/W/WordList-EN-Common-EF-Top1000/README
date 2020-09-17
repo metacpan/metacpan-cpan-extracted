@@ -3,9 +3,9 @@ NAME
     EF
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     WordList::EN::Common::EF::Top1000 (from Perl distribution
-    WordList-EN-Common-EF-Top1000), released on 2020-05-21.
+    WordList-EN-Common-EF-Top1000), released on 2020-05-22.
 
 SYNOPSIS
      use WordList::EN::Common::EF::Top1000;
@@ -28,6 +28,11 @@ SYNOPSIS
 
      # Get all the words
      my @all_words = $wl->all_words;
+
+DESCRIPTION
+    Source:
+    <https://www.ef.com/wwen/english-resources/english-vocabulary/top-1000-w
+    ords/>
 
 STATISTICS
      +----------------------------------+-------+
@@ -64,9 +69,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Source:
-    <https://www.ef.com/wwen/english-resources/english-vocabulary/top-1000-w
-    ords/>
+    WordList::EN::Common::EF::Top3000
 
 AUTHOR
     perlancar <perlancar@cpan.org>
