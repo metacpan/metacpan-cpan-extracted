@@ -131,7 +131,10 @@ sub execute {
     #use Data::Dumper;warn Dumper $dbh->{mock_last_insert_ids};
 
     if ( $dbh->{Statement} =~ /^\s*?insert(?:\s+ignore)?\s+into\s+(\S+)/i ) {
-        if ( $dbh->{mock_last_insert_ids}
+        if ( $tracker->{last_insert_id} ) {
+            $dbh->{mock_last_insert_id} = $tracker->{last_insert_id};
+
+        } elsif ( $dbh->{mock_last_insert_ids}
             && exists $dbh->{mock_last_insert_ids}{$1} )
         {
             $dbh->{mock_last_insert_id} = $dbh->{mock_last_insert_ids}{$1}++;
@@ -296,6 +299,11 @@ sub fetchall_hashref {
     }
 
     return $rethash;
+}
+
+sub last_insert_id {
+    my ( $sth, @params ) = @_;
+    return $sth->{Database}->last_insert_id( @params );
 }
 
 sub finish {

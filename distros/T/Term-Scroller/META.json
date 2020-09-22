@@ -36,10 +36,15 @@
    "provides" : {
       "Term::Scroller" : {
          "file" : "lib/Term/Scroller.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       }
    },
    "release_status" : "stable",
-   "version" : "1.0",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/camtauxe/term-scroller.git"
+      }
+   },
+   "version" : "1.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

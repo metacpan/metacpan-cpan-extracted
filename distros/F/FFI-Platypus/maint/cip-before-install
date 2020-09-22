@@ -6,8 +6,6 @@ cip sudo apt-get update
 cip sudo apt-get install libffi-dev
 cip exec cpanm -n version
 
-cip exec cpanm -n Math::LongDouble
-
 if [ "$CIP_TAG" == "5.30-debug" ]; then
   cip exec cpanm -n Test::LeakTrace
 fi

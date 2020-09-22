@@ -530,11 +530,12 @@ DISTRIBUTIONS
       Type::Tiny::Enum 0.030
       match::simple 0
       perl 5.008001
-  MooX-Press-0.064
-    pathname: T/TO/TOBYINK/MooX-Press-0.064.tar.gz
+  MooX-Press-0.069
+    pathname: T/TO/TOBYINK/MooX-Press-0.069.tar.gz
     provides:
-      MooX::Press 0.064
-      MooX::Press::Keywords 0.064
+      MooX::Press 0.069
+      MooX::Press::Keywords 0.069
+      Zydeco::Lite 0.069
     requirements:
       Exporter::Tiny 1.000000
       ExtUtils::MakeMaker 6.17
@@ -830,11 +831,11 @@ DISTRIBUTIONS
       base 0
       lib 0
       perl 5.008
-  Zydeco-0.603
-    pathname: T/TO/TOBYINK/Zydeco-0.603.tar.gz
+  Zydeco-0.605
+    pathname: T/TO/TOBYINK/Zydeco-0.605.tar.gz
     provides:
-      MooX::Pression 0.603
-      Zydeco 0.603
+      MooX::Pression 0.605
+      Zydeco 0.605
     requirements:
       B::Hooks::EndOfScope 0.24
       Devel::StrictMode 0
@@ -842,7 +843,7 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 6.17
       Import::Into 0
       Keyword::Simple 0.04
-      MooX::Press 0.064
+      MooX::Press 0.067
       PPR 0.000023
       Path::ScanINC 0
       Syntax::Keyword::Try 0.11

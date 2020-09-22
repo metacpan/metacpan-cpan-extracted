@@ -34,6 +34,7 @@ requires:
   Sah::Schema::firefox::local_profile_name: '0'
   Sah::Schema::sortsub::spec: '0'
   Sort::Sub: '0.120'
+  URI::Escape: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -41,11 +42,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FirefoxMultiAccountContainersUtils
   homepage: https://metacpan.org/release/App-FirefoxMultiAccountContainersUtils
   repository: git://github.com/perlancar/perl-App-FirefoxMultiAccountContainersUtils.git
-version: '0.007'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript firefox-container'
+      version: '0.422'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript firefox-mua-list-containers'
@@ -62,6 +67,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
       version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -133,7 +142,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.600'
+      version: '0.602'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -145,7 +154,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.060'
+      version: '0.062'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -186,9 +195,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.014'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -326,7 +335,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.144'
+      version: '0.145'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

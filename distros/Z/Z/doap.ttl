@@ -13,20 +13,22 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:runtime-recommendation [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "indirect"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "Path::Tiny 0.101"^^doap-deps:CpanId ], [
+	doap-deps:runtime-recommendation [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "indirect"^^doap-deps:CpanId ], [ doap-deps:on "JSON::MaybeXS"^^doap-deps:CpanId ], [ doap-deps:on "PerlX::Maybe::XS"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [
+		doap-deps:on "Object::Adhoc 0.004"^^doap-deps:CpanId;
+	], [ doap-deps:on "Path::Tiny 0.101"^^doap-deps:CpanId ], [
 		doap-deps:on "match::simple 0.010"^^doap-deps:CpanId;
-	], [
+	], [ doap-deps:on "List::Util 1.54"^^doap-deps:CpanId ], [
 		doap-deps:on "Syntax::Keyword::Try 0.018"^^doap-deps:CpanId;
-	], [ doap-deps:on "Try::Tiny 0.30"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.008008"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "Zydeco::Lite 0.068"^^doap-deps:CpanId ], [
+	], [ doap-deps:on "Try::Tiny 0.30"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::autoclean"^^doap-deps:CpanId;
+	], [ doap-deps:on "perl 5.008008"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "Zydeco::Lite 0.073"^^doap-deps:CpanId ], [
 		doap-deps:on "Types::Standard 1.010000"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Types::Common::String"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Types::Common::Numeric"^^doap-deps:CpanId;
-	], [
-		doap-deps:on "Object::Adhoc 0.003"^^doap-deps:CpanId;
-	];
+	], [ doap-deps:on "Types::Path::Tiny"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Z>;
 	doap:created         "2020-09-16"^^xsd:date;
@@ -37,7 +39,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Z";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Z/v_0-001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Z/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Z/v_0-005>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-z>;
@@ -52,6 +54,65 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Z-0.001.tar.gz>;
 	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Z/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Z-0.002"^^xsd:string;
+	dc:issued            "2019-09-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add Types::Path::Tiny dependency.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Z-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Z/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Z-0.003"^^xsd:string;
+	dc:issued            "2019-09-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Allow additional functions to be requested in import.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Z-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Z/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Z-0.004"^^xsd:string;
+	dc:issued            "2019-09-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "encode_json and decode_json functions.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Bundle angular-sizes.pl.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Z-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Z/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Z-0.005"^^xsd:string;
+	dc:issued            "2019-09-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Eliminate an uninitialized warning.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Z-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -2,17 +2,28 @@ NAME
     Acme::CPANModules::OneLetter - One-letter CPAN modules
 
 VERSION
-    This document describes version 0.002 of Acme::CPANModules::OneLetter
+    This document describes version 0.003 of Acme::CPANModules::OneLetter
     (from Perl distribution Acme-CPANModules-OneLetter), released on
-    2020-02-18.
+    2020-09-21.
 
 DESCRIPTION
-    One-letter CPAN modules.
-
     Just a list of one-letter modules on CPAN.
+
+    To produce this list, you can also use lcpan:
+
+     % lcpan mods -l -x --or C<perl -E'say for "A".."Z","a".."z","_"'>
+
+    For CPAN author, What one-letter name can I use that's available?
+    (Requires setop and cpanmodules CLIs.)
+
+     % setop --diff <(perl -E'say for "A".."Z","a".."z","_"') <(cpanmodules ls-entries OneLetter)
 
 INCLUDED MODULES
     *   B
+
+    *   D
+
+    *   H
 
     *   K
 
@@ -24,9 +35,13 @@ INCLUDED MODULES
 
     *   P
 
+    *   T
+
     *   U
 
     *   V
+
+    *   Z
 
     *   c
 

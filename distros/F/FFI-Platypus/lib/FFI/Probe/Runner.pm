@@ -2,11 +2,12 @@ package FFI::Probe::Runner;
 
 use strict;
 use warnings;
+use 5.008004;
 use Capture::Tiny qw( capture );
 use FFI::Probe::Runner::Result;
 
 # ABSTRACT: Probe runner for FFI
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub new
@@ -84,7 +85,7 @@ FFI::Probe::Runner - Probe runner for FFI
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

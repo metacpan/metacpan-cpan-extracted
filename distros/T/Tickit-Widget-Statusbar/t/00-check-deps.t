@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::CheckDeps 0.012
+# this test was generated with Dist::Zilla::Plugin::Test::CheckDeps 0.014
 
 use Test::More 0.94;
 use Test::CheckDeps 0.010;

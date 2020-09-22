@@ -1,3 +1,12 @@
+0.003   2020-09-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Add D, H, T, Z.
+
+	- [doc] Add recipe: how to check for available one-letter module names.
+
+	- [doc] Add recipe: how to reproduce using lcpan.
+
+
 0.002   2020-02-18  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

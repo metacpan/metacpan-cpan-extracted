@@ -1,0 +1,45 @@
+# $Id: results.nzd,v 1.3 2002-11-28 08:44:43 mike Exp $
+#
+# results.nzd - an Net::Z39.50::DBIServer configuration for RESULTs.
+# So far as possible, this is the same as the configuration as Steve
+# Richardson has built at UMIST.  The main difference is that he's
+# using MySQL and I'm using PostgreSQL.
+
+datasource = "DBI:Pg:dbname=resultsdb"
+#username = "steve"
+#password = "E7Xv7"
+database "results" {
+    table = "resources"
+    auxiliary "resource_type" with "resource_type.rt_id = resources.type"
+    auxiliary "resource_format" with "resource_format.rf_id = resources.format"
+    search attrset bib1 {
+	access 4 = "rtitle"
+	access 12 = "resource_id"
+	access 1003 = "author"
+	access 1100 = "rdescription"	### What is this access point?
+#	access 21 = "subject"		### Won't work: it's a link field
+	access 1016 = "author,rtitle"
+    }
+    data format xml {
+	record = "dc-record"
+	#attrs = "xmlns='http://dublincore.org/ns'"	### Not needed!
+	field "title" = "rtitle"
+	field "creator" = "author"
+	field "subject" = "keywords"	### should be a many-to-many link
+	field "description" = "rdescription"
+	field "publisher" = "rorganisation"
+	field "contributor" = "submitted_by"
+	field "date" = "date"
+	field "type" = "resource_type.type"
+	field "format" = "resource_format.format"
+	field "identifier" = "url"
+	#field "source" = ""		# not represented in DB
+	field "language" = "*en"
+	#field "relation" = ""		# not represented in DB
+	#field "coverage" = ""		# not represented in DB
+	field "rights" = "*All rights reserved"
+
+	### Not yet implemented, but will be nice when it is :-)
+	#transform = "simple2oai.xslt"
+    }
+}

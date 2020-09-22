@@ -15,11 +15,14 @@ lib/RxPerl/Operators/Pipeable.pm
 lib/RxPerl/Subject.pm
 lib/RxPerl/Subscriber.pm
 lib/RxPerl/Subscription.pm
+lib/RxPerl/SyncTimers.pm
+lib/RxPerl/Test.pm
 lib/RxPerl/Utils.pm
 minil.toml
 t/00_compile.t
 t/distinct_until_changed.t
 t/from.t
+t/new.t
 t/pluck.t
 t/simple.t
 t/start_with.t

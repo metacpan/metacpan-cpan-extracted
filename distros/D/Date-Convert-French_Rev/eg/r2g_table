@@ -1,20 +1,22 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
-#     Example of Date::Convert::French_Rev script to create a French Revolutionary
-#     to Gregorian conversion table.
-#     Copyright (C) 2001-2003, 2013, 2015 Jean Forget
+#     Example of Date::Convert::French_Rev script:
+#     print a few tables for an easy conversion of date from French Revolutionary to Gregorian
+#     Copyright (C) 2001-2003, 2013, 2015, 2020 Jean Forget
 #
 #     See the license in the embedded documentation below.
 #
 
+use utf8;
 use strict;
+use warnings;
 use Getopt::Long;
 use Date::Convert::French_Rev;
 use FindBin;
 use constant DEBUG => 0;
 
-my ($columns, $lang, $last, $example, $table_workaround) 
+my ($columns, $lang, $last, $example, $table_workaround)
  = (       9,  'en',    400,    80218, 0);
 
 GetOptions('columns=i'        => \$columns
@@ -25,6 +27,8 @@ GetOptions('columns=i'        => \$columns
 die "At least 5 colmuns" if $columns < 5;
 die "The number of columns must be a multiple of 4 plus 1 (e.g. 5, 9 or 13)"
   unless $columns % 4 == 1;
+
+binmode STDOUT, ':utf8';
 
 --$columns; # because actually we do not want to be bothered with the heading column
 
@@ -40,7 +44,7 @@ my @parts = ('b', 'e');
 # This specific day is
 #      b => 1 Vendémiaire => ?? September
 #      e => 1 Germinal    => ?? March
-# We partially store the reverse : for each part or year and each G day number,
+# We partially store the reverse : for each part of year and each Grg day number,
 # which year can be taken as an sample.
 my @day_of_yearpart;
 my %year_of_partday;
@@ -62,7 +66,7 @@ if (DEBUG)
 
 # The tables do not contain the Sep-Mar day number, but a letter, which is easier
 # to remember. So to each part - day number combination, we assign a letter.
-# The ordering part then year is more pleasing than the other when reading 
+# The ordering part then year is more pleasing than the other when reading
 # the final charts.
 my $next_letter = 'a';
 my %letter_of_partday  = ();
@@ -88,7 +92,7 @@ if (DEBUG)
 
 # The year -> 2-letter word function is periodic, except for a few glitches
 # each time the Gregorian or F-R century changes. So, years are grouped
-# by four, eight, twelve or more each group is identified by a 8-, 16- or 
+# by four, eight, twelve or more each group is identified by a 8-, 16- or
 # 24-letter word. Interval are built so if two years n and n+4 (or n+8,
 # or n+12) have the same formulas, they may belong to the same interval.
 # If the formulas are different, the interval ends and a new interval
@@ -101,29 +105,32 @@ build_intervals();
 
 if (DEBUG)
   {
-    print "$_ $end_of_interval{$_} $line_for_interval{$_}\n" 
+    print "$_ $end_of_interval{$_} $line_for_interval{$_}\n"
        foreach (sort { $a <=> $b } keys %line_for_interval);
   }
 
 # Some language-dependant variables are set in the "done" files.
 # Therefore, they cannot be "my" variables, they must be global.
-# I don't use "our", because it would break in older versions.
 
-my $ref_labels;
-if ($lang eq 'fr')
-  { $ref_labels = do "$FindBin::Bin/labels_fr" }
-else
-  { $ref_labels = do "$FindBin::Bin/labels_en" }
-my %labels = %$ref_labels;
-my @fr_month = qw (Vendémiaire Brumaire Frimaire Nivôse   Pluviôse  Ventôse 
+our %labels;
+if ($lang eq 'fr') {
+  do "$FindBin::Bin/labels_fr";
+}
+else {
+  do "$FindBin::Bin/labels_en";
+}
+
+my @fr_month = qw (Vendémiaire Brumaire Frimaire Nivôse   Pluviôse  Ventôse
                    Germinal    Floréal  Prairial Messidor Thermidor Fructidor);
-push @fr_month, "Sans-Culottides<br>$labels{add_days}";
+push @fr_month, "Sans-Culottides<br />$labels{add_days}";
 
+html_0($labels{titler2g});
 html_1($labels{title1});
 html_2($_) foreach (@parts);
 print "<table><tr><td>\n" if $table_workaround;
 usage($example);
 print "</td></tr></table>\n" if $table_workaround;
+print "</body>\n</html>\n";
 
 #
 # Gives the letter for a year and a part
@@ -137,8 +144,8 @@ sub day_of_yearpart {
 
   # computed version
   my $month = $part eq 'b' ? 1 : 7;
-  my $date =  new Date::Convert::French_Rev $year, $month, 1;
-  convert Date::Convert::Gregorian $date;
+  my $date = Date::Convert::French_Rev->new($year, $month, 1);
+  Date::Convert::Gregorian->convert($date);
   my $day = $date->day();
   # if no sample year yet, remember this one
   $year_of_partday{$part}{$day} = $year unless $year_of_partday{$part}{$day};
@@ -189,18 +196,31 @@ sub formulas {
   my ($year, $month) = @_;
   my @formulas = ();
   my @month = qw(Sep Oct Nov Dec Jan Feb Mar Apr May Jun Jul Aug Sep);
-  my $date = new Date::Convert::French_Rev $year, $month, 1;
-  convert Date::Convert::Gregorian $date;
+  my $date = Date::Convert::French_Rev->new($year, $month, 1);
+  Date::Convert::Gregorian->convert($date);
   my $offset = $date->day() - 1;
   push @formulas, "+$offset $labels{month3}[$date->month() - 1]";
   if ($month < 13)
     {
-      $date = new Date::Convert::French_Rev $year, $month, 30;
-      convert Date::Convert::Gregorian $date;
+      $date = Date::Convert::French_Rev->new($year, $month, 30);
+      Date::Convert::Gregorian->convert($date);
       $offset = 30 - $date->day();
       push @formulas, "-$offset $labels{month3}[$date->month() - 1]";
     }
   @formulas;
+}
+
+sub html_0 {
+  my ($title) = @_;
+  print <<"EOF";
+<html>
+<head>
+<title>$title</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h1>$title</h1>
+EOF
 }
 
 sub html_1 {
@@ -209,9 +229,10 @@ sub html_1 {
   foreach my $n1 (0 .. $columns - 1)
     {
       printf "<td>%2d", $n1;
-      for(my $n0 = $n1 + $columns; $n0 <= 99; $n0 += $columns) 
-        { printf "<br>%2d", $n0 % 100 }
-      print "<br>&nbsp;" if $n1 > 99 % $columns; # better aligned numbers
+      for(my $n0 = $n1 + $columns; $n0 <= 99; $n0 += $columns) {
+        printf "<br />%2d", $n0 % 100;
+      }
+      print "<br />&nbsp;" if $n1 > 99 % $columns; # better aligned numbers
       print "</td>\n";
     }
   print "</tr>\n";
@@ -256,7 +277,7 @@ sub html_2header {
   my @letters = sort values %{$letter_of_partday{$part}};
   print "<tr align='center'><th>"
       , join('</th><th>', "$labels{year_ttl} + $offset", @letters)
-      , "</th></tr>\n"; 
+      , "</th></tr>\n";
 }
 
 sub html_two_formulas {
@@ -267,7 +288,7 @@ sub html_two_formulas {
     {
       my $year = $year_of_partday{$part}{$_};
       my @formulas = formulas($year, $month);
-      print "<td>$formulas[0]<br>$formulas[1]</td>\n";
+      print "<td>$formulas[0]<br />$formulas[1]</td>\n";
     }
   print "</tr>\n";
 }
@@ -298,9 +319,9 @@ sub usage {
     }
 
   # First example
-  my $date = new Date::Convert::French_Rev $y, $m, $d;
+  my $date = Date::Convert::French_Rev->new($y, $m, $d);
   my $title_date = $date->date_string("%d %B %EY");
-  convert Date::Convert::Gregorian $date;
+  Date::Convert::Gregorian->convert($date);
   my $y2       = sprintf "%02d", $y % 100;
   my $part     = $m <= 6 ? 'b' : 'e';
   my $offset   = $part eq 'e' ? 1792 : 1791;
@@ -325,9 +346,9 @@ sub usage {
 
   # Second example: Ventôse
   # $m = 6;
-  $date = new Date::Convert::French_Rev $y, 6, $d;
+  $date = Date::Convert::French_Rev->new($y, 6, $d);
   $title_date = $date->date_string("%d %B %EY");
-  convert Date::Convert::Gregorian $date;
+  Date::Convert::Gregorian->convert($date);
   @formulas   = formulas($y, 6);
   my $bletter = letter_of_yearpart($y, 'b');
   my $eletter = letter_of_yearpart($y, 'e');
@@ -359,10 +380,10 @@ r2g_table [--columns=I<nb>] [--example=I<date>] [--lang=I<language>] [--table-wo
 =head1 DESCRIPTION
 
 This program prints three tables, plus a small text showing how to use
-these tables.  The output  uses the HTML  format. When printed  from a
-table-aware web  browser, these tables  allow a computer-less  user to
-convert dates from the  French Revolutionary calendar to the Gregorian
-calendar.
+these tables.  The output  uses UTF-8 encoding  and HTML  format. When
+printed  from  a  table-aware  web   browser,  these  tables  allow  a
+computer-less  user to  convert  dates from  the French  Revolutionary
+calendar to the Gregorian calendar.
 
 =head1 OPTIONS
 
@@ -407,12 +428,14 @@ French
 
 =item table-workaround
 
-I have noticed that when one of the web browsers I use renders tables,
-it has  problems with  plain text following  the tables, and  it might
-skip a few  plain text lines. In the present case,  the first lines of
-the  instructions for  use  disappear.  The  workaround  I have  found
-consists in  building a  table around the  instructions for  use. This
-option triggers this workaround.
+Kept for historical reasons.
+
+Many years ago,  around 2001 or 2002,  I had noticed that  when my web
+browser rendered and  printed tables, it had problems  with plain text
+following the tables, and it would skip a few plain text lines. In the
+present  case, the  first  lines  of the  instructions  for use  would
+disappear. The  workaround I had  found consisted in building  a table
+around the instructions for use. This option triggers this workaround.
 
 =back
 
@@ -422,14 +445,15 @@ Jean Forget <JFORGET@cpan.org>
 
 =head1 LICENSE
 
-Copyright (c)  2001, 2002, 2003,  2013, 2015 Jean Forget.   All rights
-reserved.  This program is free software.  You can distribute, modify,
-and otherwise mangle F<r2g_table> under the same terms as Perl 5.16.3:
-GNU Public License version 1 or later and Perl Artistic License
+Copyright  (c) 2001,  2002, 2003,  2013, 2015,  2020 Jean  Forget. All
+rights reserved.  This program is  free software. You  can distribute,
+modify, and otherwise mangle F<r2g_table> under the same terms as Perl
+5.16.3:  GNU Public  License  version  1 or  later  and Perl  Artistic
+License
 
 You can  find the text  of the licenses  in the F<LICENSE> file  or at
-L<http://www.perlfoundation.org/artistic_license_1_0> and
-L<http://www.gnu.org/licenses/gpl-1.0.html>.
+L<https://dev.perl.org/licenses/artistic.html>
+and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 
 Here is the summary of GPL:
 
@@ -444,8 +468,7 @@ MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
 General Public License for more details.
 
 You  should have received  a copy  of the  GNU General  Public License
-along  with  this  program;  if   not,  write  to  the  Free  Software
-Foundation, Inc.,  59 Temple Place, Suite 330,  Boston, MA 02111-1307,
-USA.
+along with  this program; if not,  see <https://www.gnu.org/licenses/>
+or write to the Free Software Foundation, Inc., L<https://www.fsf.org>.
 
 =cut

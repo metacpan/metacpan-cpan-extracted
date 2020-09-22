@@ -1,15 +1,14 @@
 package Tickit::Widget::Statusbar::WidgetList;
-$Tickit::Widget::Statusbar::WidgetList::VERSION = '0.004';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
 
 Tickit::Widget::Statusbar::WidgetList
-
-=head1 VERSION
-
-version 0.004
 
 =head1 SYNOPSIS
 
@@ -36,3 +35,4 @@ Tom Molesworth <cpan@perlsite.co.uk>
 =head1 LICENSE
 
 Copyright Tom Molesworth 2011-2015. Licensed under the same terms as Perl itself.
+

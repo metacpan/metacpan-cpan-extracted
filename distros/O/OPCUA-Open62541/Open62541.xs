@@ -3225,6 +3225,134 @@ UA_ServerConfig_setMaxSessionTimeout(config, maxSessionTimeout);
     CODE:
 	config->svc_serverconfig->maxSessionTimeout = maxSessionTimeout;
 
+# Operation Limits
+
+UA_UInt32
+UA_ServerConfig_getMaxNodesPerRead(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = config->svc_serverconfig->maxNodesPerRead;
+    OUTPUT:
+	RETVAL
+
+void
+UA_ServerConfig_setMaxNodesPerRead(config, maxNodesPerRead)
+	OPCUA_Open62541_ServerConfig	config
+	UA_UInt32			maxNodesPerRead
+    CODE:
+	config->svc_serverconfig->maxNodesPerRead = maxNodesPerRead;
+
+UA_UInt32
+UA_ServerConfig_getMaxNodesPerWrite(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = config->svc_serverconfig->maxNodesPerWrite;
+    OUTPUT:
+	RETVAL
+
+void
+UA_ServerConfig_setMaxNodesPerWrite(config, maxNodesPerWrite)
+	OPCUA_Open62541_ServerConfig	config
+	UA_UInt32			maxNodesPerWrite
+    CODE:
+	config->svc_serverconfig->maxNodesPerWrite = maxNodesPerWrite;
+
+UA_UInt32
+UA_ServerConfig_getMaxNodesPerMethodCall(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = config->svc_serverconfig->maxNodesPerMethodCall;
+    OUTPUT:
+	RETVAL
+
+void
+UA_ServerConfig_setMaxNodesPerMethodCall(config, maxNodesPerMethodCall)
+	OPCUA_Open62541_ServerConfig	config
+	UA_UInt32			maxNodesPerMethodCall
+    CODE:
+	config->svc_serverconfig->maxNodesPerMethodCall = maxNodesPerMethodCall;
+
+UA_UInt32
+UA_ServerConfig_getMaxNodesPerBrowse(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = config->svc_serverconfig->maxNodesPerBrowse;
+    OUTPUT:
+	RETVAL
+
+void
+UA_ServerConfig_setMaxNodesPerBrowse(config, maxNodesPerBrowse)
+	OPCUA_Open62541_ServerConfig	config
+	UA_UInt32			maxNodesPerBrowse
+    CODE:
+	config->svc_serverconfig->maxNodesPerBrowse = maxNodesPerBrowse;
+
+UA_UInt32
+UA_ServerConfig_getMaxNodesPerRegisterNodes(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = config->svc_serverconfig->maxNodesPerRegisterNodes;
+    OUTPUT:
+	RETVAL
+
+void
+UA_ServerConfig_setMaxNodesPerRegisterNodes(config, maxNodesPerRegisterNodes)
+	OPCUA_Open62541_ServerConfig	config
+	UA_UInt32			maxNodesPerRegisterNodes
+    CODE:
+	config->svc_serverconfig->maxNodesPerRegisterNodes =
+	    maxNodesPerRegisterNodes;
+
+UA_UInt32
+UA_ServerConfig_getMaxNodesPerTranslateBrowsePathsToNodeIds(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = config->svc_serverconfig->maxNodesPerTranslateBrowsePathsToNodeIds;
+    OUTPUT:
+	RETVAL
+
+void
+UA_ServerConfig_setMaxNodesPerTranslateBrowsePathsToNodeIds(config, \
+    maxNodesPerTranslateBrowsePathsToNodeIds)
+	OPCUA_Open62541_ServerConfig	config
+	UA_UInt32			maxNodesPerTranslateBrowsePathsToNodeIds
+    CODE:
+	config->svc_serverconfig->maxNodesPerTranslateBrowsePathsToNodeIds =
+	    maxNodesPerTranslateBrowsePathsToNodeIds;
+
+UA_UInt32
+UA_ServerConfig_getMaxNodesPerNodeManagement(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = config->svc_serverconfig->maxNodesPerNodeManagement;
+    OUTPUT:
+	RETVAL
+
+void
+UA_ServerConfig_setMaxNodesPerNodeManagement(config, maxNodesPerNodeManagement)
+	OPCUA_Open62541_ServerConfig	config
+	UA_UInt32			maxNodesPerNodeManagement
+    CODE:
+	config->svc_serverconfig->maxNodesPerNodeManagement =
+	    maxNodesPerNodeManagement;
+
+UA_UInt32
+UA_ServerConfig_getMaxMonitoredItemsPerCall(config)
+	OPCUA_Open62541_ServerConfig	config
+    CODE:
+	RETVAL = config->svc_serverconfig->maxMonitoredItemsPerCall;
+    OUTPUT:
+	RETVAL
+
+void
+UA_ServerConfig_setMaxMonitoredItemsPerCall(config, maxMonitoredItemsPerCall)
+	OPCUA_Open62541_ServerConfig	config
+	UA_UInt32			maxMonitoredItemsPerCall
+    CODE:
+	config->svc_serverconfig->maxMonitoredItemsPerCall =
+	    maxMonitoredItemsPerCall;
+
+
 # AccessControl plugin callbacks
 
 void

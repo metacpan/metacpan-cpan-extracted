@@ -6,7 +6,8 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0'
+  Test::More: '0.98'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -18,12 +19,15 @@ meta-spec:
 name: WordListBase-MetaSyntactic
 requires:
   Acme::MetaSyntactic: '0'
+  Acme::MetaSyntactic::MultiList: '0'
+  WordListRole::WordList: '0'
+  parent: '0'
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WordListBase-MetaSyntactic
   homepage: https://metacpan.org/release/WordListBase-MetaSyntactic
   repository: git://github.com/perlancar/perl-WordListBase-MetaSyntactic.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -374,12 +378,16 @@ x_Dist_Zilla:
       name: Prereqs
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::Extras
+      name: 'lint_prereqs / assume-provided'
+      version: '0.03'
+    -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: recommends
-      name: DevelopRecommends
+          phase: test
+          type: requires
+      name: TestRequires
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode

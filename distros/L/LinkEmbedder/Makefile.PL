@@ -3,7 +3,7 @@ use utf8;
 use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   NAME           => 'LinkEmbedder',
-  AUTHOR         => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
+  AUTHOR         => 'Joel Berger <joel.a.berger@gmail.com>',
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/LinkEmbedder.pm',
   VERSION_FROM   => 'lib/LinkEmbedder.pm',

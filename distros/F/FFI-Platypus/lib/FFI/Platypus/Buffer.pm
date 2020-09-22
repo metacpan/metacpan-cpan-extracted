@@ -2,6 +2,7 @@ package FFI::Platypus::Buffer;
 
 use strict;
 use warnings;
+use 5.008004;
 use FFI::Platypus;
 use base qw( Exporter );
 
@@ -9,7 +10,7 @@ our @EXPORT = qw( scalar_to_buffer buffer_to_scalar );
 our @EXPORT_OK = qw ( scalar_to_pointer grow set_used_length window );
 
 # ABSTRACT: Convert scalars to C buffers
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 use constant _incantation =>
@@ -49,7 +50,7 @@ FFI::Platypus::Buffer - Convert scalars to C buffers
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

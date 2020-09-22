@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1;
-$Net::Checkpoint::Management::v1::VERSION = '0.001007';
+$Net::Checkpoint::Management::v1::VERSION = '0.001008';
 # ABSTRACT: Checkpoint Management API version 1.x client library
 
 use 5.024;
@@ -375,13 +375,13 @@ sub verify_policy($self, $policyname) {
 }
 
 
-sub install_policy($self, $policyname, $targets, $params) {
+sub install_policy($self, $policyname, $targets, $params={}) {
     croak "policy name missing"
         unless defined $policyname;
     croak "target(s) missing"
         unless defined $targets;
     croak "target(s) must be a single name or uid or a list of names or uids"
-        unless ref $targets eq undef
+        unless ref $targets eq ''
             || ref $targets eq 'ARRAY';
     croak "parameters needs to be a hashref"
         if defined $params && ref $params ne 'HASH';
@@ -431,7 +431,7 @@ Net::Checkpoint::Management::v1 - Checkpoint Management API version 1.x client l
 
 =head1 VERSION
 
-version 0.001007
+version 0.001008
 
 =head1 SYNOPSIS
 

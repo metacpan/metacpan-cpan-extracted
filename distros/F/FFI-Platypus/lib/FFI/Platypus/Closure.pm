@@ -2,6 +2,7 @@ package FFI::Platypus::Closure;
 
 use strict;
 use warnings;
+use 5.008004;
 use FFI::Platypus;
 use Scalar::Util qw( refaddr);
 use Carp qw( croak );
@@ -11,7 +12,7 @@ use overload '&{}' => sub {
 }, bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Platypus closure object
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub new
@@ -66,7 +67,7 @@ sub unstick
 
 package FFI::Platypus::ClosureData;
 
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 1;
 
@@ -82,7 +83,7 @@ FFI::Platypus::Closure - Platypus closure object
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

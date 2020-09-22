@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2019 A S Lewis
+# Copyright (C) 2011-2020 A S Lewis
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, either version 3 of the
@@ -194,6 +194,20 @@
             # Hash of labels waiting to be drawn, in the form
             #   $queueLabelHash{label_number} = blessed_reference_to_label_object
             queueLabelHash              => {},
+
+            # When obscured rooms are enabled, exits are only drawn for rooms near the current room,
+            #   or for selected rooms (and selected exits), and for rooms whose rooms flags match
+            #   those in GA::Client->constRoomNoObscuredHash (e.g. 'main_route')
+            # When obscured rooms are enabled, this hash is reset by a call to
+            #   GA::Win::Map->compileNoObscuredRooms. The hash contains any rooms which are due to
+            #   be drawn, and which should not be obscured
+            # Hash in the form
+            #   $noObscuredRoomHash{model_number} = undef
+            noObscuredRoomHash          => {},
+            # When $self->noObscuredRoomHash, any rooms that are being removed from the hash are
+            #   stored in this IV. The calling code uses this IV to destroy the room's exit canvas
+            #   objects, if required
+            reObscuredRoomHash          => {},
         };
 
         # Bless the object into existence
@@ -706,7 +720,7 @@
 
     # Delete canvas objects
 
-    sub deleteDrawnRoom {           # modded, changed ->destroy to ->move
+    sub deleteDrawnRoom {
 
         # Called by various functions
         # Checks whether a room model object (GA::ModelObj::Room) has been drawn for this region. If
@@ -1472,6 +1486,11 @@
         { my $self = shift; return %{$self->{queueRoomInfoHash}}; }
     sub queueLabelHash
         { my $self = shift; return %{$self->{queueLabelHash}}; }
+
+    sub noObscuredRoomHash
+        { my $self = shift; return %{$self->{noObscuredRoomHash}}; }
+    sub reObscuredRoomHash
+        { my $self = shift; return %{$self->{reObscuredRoomHash}}; }
 }
 
 { package Games::Axmud::Obj::ParchmentLevel;

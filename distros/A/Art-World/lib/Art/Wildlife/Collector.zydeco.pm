@@ -1,4 +1,4 @@
-class Collector with Buyer {
+class Collector with Active, Buyer {
     has money! ( type => Num );
     # Actually an ArrayRef of Artworks
     has collection (

@@ -1,0 +1,37 @@
+Years ago, I used to keep a spreadsheet of every book I read (yes,
+yes, I know that's pathetic.)  Shortly before I gave it up in favour
+of a life, I exported that spreadsheet from "sc" into CSV format --
+that's the utterly trivial Comma Separated Values format.
+
+The file called "books" in this directory is that exported CSV file,
+totally un-retouched.  I created a small but perfectly formed zSQLgate
+configuration file, "csv.nzd", to go with it; and the result is that
+you can now search that database via Z39.50.  From the root directory
+of the zSQLgate distribution (../..), start the server like this:
+
+	$ zSQLgate examples/csv/csv.nzd
+	[...]
+
+And away you go with your favourite client:
+
+	$ yaz-client tcp:@:9999
+	Z> base books
+	Z> find @attr 1=4 @attr 5=1 The
+	Number of hits: 156
+	Z> format xml
+	Z> show 1+10
+	<book>
+	 <BookAuthor>Sue Townsend</BookAuthor>
+	 <FinishReading>29/9/93</FinishReading>
+	 <StartReading>27/9/93</StartReading>
+	 <BookTitle>The Secret Diary of Adrian Mole [3+]</BookTitle>
+	 <WidthInCm>      1.20</WidthInCm>
+	</book>
+	<book>
+	 <BookAuthor>Sue Townsend</BookAuthor>
+	 <FinishReading>11/10/93</FinishReading>
+	 <StartReading>27/9/93</StartReading>
+	 <BookTitle>The Queen and I</BookTitle>
+	 <WidthInCm>      2.00</WidthInCm>
+	</book>
+	...

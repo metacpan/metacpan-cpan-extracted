@@ -1,10 +1,9 @@
-# $Id: test_manifest 1903 2006-09-26 21:21:40Z comdog $
 #env.t
 load.t
 pod.t
 pod_coverage.t
 test_or_live.t
-#prereq.t
 address_verification.t
 zip_code_lookup.t
 city_state_lookup.t
+track_confirm.t

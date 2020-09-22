@@ -37,8 +37,9 @@
     * [7.5.3 Adding hooks](#7.5.3)
     * [7.5.4 Editing hooks](#7.5.4)
     * [7.5.5 Hook attributes](#7.5.5)
-    * [7.5.6 Using hook data](#7.5.5)
-    * [7.5.7 Redirect mode](#7.5.6)
+    * [7.5.6 Using hook data](#7.5.6)
+    * [7.5.7 Redirect mode](#7.5.7)
+    * [7.5.8 Custom hook events](#7.5.8)
 * [7.6 Active and inactive interfaces](#7.6)
 
 ---
@@ -518,7 +519,9 @@ There are also a set of keycodes for the keypad (the keys, normally on the right
 
 The keycodes 'full_stop' and 'kp_full_stop' represent the full stop/period keys. Axmud supports a number of alternatives to the standard keycodes, including 'period'. (Type **;listkeycodealternative** for a list of alternative keycodes.)
 
-Keycodes can be combined when two or more keys are pressed together. For example, SHIFT + F1 corresponds to the keycode string "shift f1" (a string containing two words separated by a single space character).
+Keycodes can be combined when two or more keys are pressed together. For example, CTRL + F1 corresponds to the keycode string "ctrl f1" (a string containing two words separated by a single space character).
+
+Note that, for technical reasons, Axmud cannot use SHIFT or ALT-GR in macros (although ALT + SHIFT + some other key is acceptable). Therefore, if you try to add a macro that fires when you press SHIFT + F1, it won't work.
 
 ###<a name="7.3.2">7.3.2 Adding macros</a>
 
@@ -766,6 +769,16 @@ Astute readers might now be asking themselves why there isn't an easier way to c
 In fact, there are several possible methods, including the clever use of aliases. But a much easier way is to use Axmud's *redirect mode*.
 
         ;help redirectmode
+
+###<a name="7.5.8">7.5.8 Custom hook events</a>
+
+Some users might want to create their own hook events. This is possible, though of limited use, since the only way to 'fire' the hook is with the **;simulatehook** command. A custom hook event has no hook data.
+
+Custom hook events must begin with an underline character, followed by an alphanumeric character, for example **_myevent**.
+
+To create a custom hook event, you can just create a hook responding to that event, for example
+
+        ;addhook -s _myevent -p ;about
 
 ##<a name="7.6">7.6 Active and inactive interfaces</a>
 

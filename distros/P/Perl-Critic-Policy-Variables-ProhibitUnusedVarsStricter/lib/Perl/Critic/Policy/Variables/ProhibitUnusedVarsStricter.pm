@@ -21,7 +21,7 @@ use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.107';
+our $VERSION = '0.108';
 
 #-----------------------------------------------------------------------------
 
@@ -1346,6 +1346,61 @@ by any operator. The latter means that something like
  my $bar = ( state $foo = compute_foo() ) + 42;
 
 will be accepted.
+
+
+=head1 AVOIDING UNUSED VARIABLES
+
+There are situations in Perl where eliminating unused variables is
+less straightforward than simply deleting them:
+
+=head2 List Assignments
+
+This situation typically (I believe) comes up when your code gets handed
+a list, and is not interested in all values in the list. You could, of
+course, assign the whole thing to an array and then cherry-pick the
+array, but there are less-obvious solutions that avoid the extra
+assignment.
+
+For the purpose of this discussion, I will assume code which calls the
+C<localtime()> built-in, but is only interested in day, month, and year.
+The cut-and-paste implementation (direct from C<perldoc -f localtime>,
+or L<https://perldoc.pl/functions/localtime> if you prefer) is:
+
+    #     0    1    2     3     4    5     6     7     8
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
+        localtime();
+
+Now, you can trivially eliminate the variables after C<$year>, but that
+still leaves
+
+    #     0    1    2     3     4    5
+    my ($sec,$min,$hour,$mday,$mon,$year) = localtime();
+
+with C<$sec>, C<$min>, and C<$hour> assigned-to but unused. There are
+two ways I know of to eliminate these:
+
+=head3 Assign to C<undef>
+
+On the left-hand side of a list assignment, C<undef> causes the
+corresponding right-hand value to be ignored. This makes our example
+look like
+
+    #     0     1     2     3     4    5
+    my (undef,undef,undef,$mday,$mon,$year) = localtime();
+
+=head2 Slice the Right-Hand Side
+
+The unwanted values can also be eliminated by slicing the right-hand
+side of the assignment. This looks like
+
+    #     3     4    5
+    my ($mday,$mon,$year) = ( localtime() )[ 3 .. 5 ];
+
+or, if you prefer,
+
+    #     3     4    5
+    my ($mday,$mon,$year) = ( localtime() )[ 3, 4, 5 ];
+
 
 =head1 AUTHOR
 

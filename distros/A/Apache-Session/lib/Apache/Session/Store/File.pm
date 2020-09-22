@@ -150,7 +150,7 @@ Apache::Session::Store::File - Store persistent data on the filesystem
 
  use Apache::Session::Store::File;
 
- my $store = new Apache::Session::Store::File;
+ my $store = Apache::Session::Store::File->new;
 
  $store->insert($ref);
  $store->update($ref);

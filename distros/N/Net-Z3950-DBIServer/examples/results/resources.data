@@ -1,0 +1,7 @@
+# $Id: resources.data,v 1.2 2002-11-28 08:44:43 mike Exp $
+# Field names	### Probably not correct DC, certainly in the wrong order
+resource_id,rtitle,author,submitted_by,rorganisation,rdescription,date,type,format,url
+# Data
+1,Z39.50 - The Empire Strikes Back,Mike Taylor,Sebastian Hammer,,A heartfelt personal rant comparing Z39.50's strengths with SOAP's weaknesses,2000-12-06,1,1,http://www.miketaylor.org.uk/tech/esb.html
+2,A Gentle Introduction to CQL,Mike Taylor,,2,A tutorial building from simple CQL queries to complex ones,2002-10-18,2,1,http://www.zing.z3950.org/cql/intro.html
+3,Mike Taylor - a long overdue biography,Andrew Morton,,4,A made-up work of fiction which exists only so I can test the "any" access point,2002-11-14,3,5,

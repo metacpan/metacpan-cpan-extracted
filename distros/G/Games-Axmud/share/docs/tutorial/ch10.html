@@ -1,9 +1,16 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!doctype html>
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<meta name="generator" content="ReText 7.0.1">
+<style type="text/css">
+td, th { border: 1px solid #c3c3c3; padding: 0 3px 0 3px; }
+table { border-collapse: collapse; }
+img { max-width: 100%; }
+</style>
+<meta name="generator" content="ReText 7.1.0">
 <title>ch10</title>
+<style type="text/css">
+</style>
 </head>
 <body>
 <p><a href="ch09.html">Previous</a> <a href="index.html">Index</a> <a href="ch11.html">Next</a></p>
@@ -35,7 +42,7 @@
     PRINT " line."
 </code></pre>
 <p>The third statement doesn't end with a semicolon, so the next PRINT statement - whenever it occurs - will use a new line.</p>
-<p>You can use semicolons to join strings together.</p>
+<p>In a PRINT statement, you can use semicolons to join strings together.</p>
 <pre><code>    LET word1$ = "Hello"
     LET word2$ = "world"
     PRINT word1$ ; word2$
@@ -46,15 +53,28 @@
 <p>...because you forgot to add a space character between the words:</p>
 <pre><code>    PRINT word1$ ; " " ; word2$
 </code></pre>
-<p>Closely related to the semicolon is the comma ( , ) character which works a bit like your TAB key. You can use it to display data in columns.</p>
+<p>When you are PRINTing numbers, you don't need to add any space characters. </p>
+<pre><code>    LET first = 10
+    LET second = 15
+    PRINT 10 ; 15
+</code></pre>
+<p>This time you will see the output:</p>
+<pre><code>    10  15
+</code></pre>
+<p>In a PRINT statement, Axbasic adds a space character before and after every numeric value. For negative numbers, however, a space is not added before the minus sign.</p>
+<p>Closely related to the semicolon is the comma ( , ) character which works a bit like your TAB key. You can use it to display data in columns of 14 characters.</p>
 <pre><code>    LET val1 = 10
     LET val2 = 20
-    LET val3 = 50
+    LET val3 = -30
     PRINT "Column 1" , "Column 2" , "Column 3"
     PRINT val1 , val2 , val3
     END
 </code></pre>
-<p>Older dialects of BASIC added a space character directly after PRINTing a numeric value. Axbasic doesn't do this unless forced window mode is in operation - see <a href="ch19.html">Section 19</a>.</p>
+<p>If you want a more direct way of displaying columns, you can use the pseudo-function TAB (). (We call it a pseudo-function because it doesn't return a value, and it can only be used in PRINT statements).</p>
+<p>TAB () moves an imaginary cursor to the column you specify. The first column is number 1. In the example above, you could replace the PRINT statement with this one, without changing the output.</p>
+<pre><code>    PRINT val1 ; TAB (15) ; val2 ; TAB (29) ; val3
+</code></pre>
+<p>If you specify a value to the left of the imaginary cursor, everything after the TAB () will be printed on a new line.</p>
 <h2><a name="10.2">10.2 Special features of INPUT</a></h2>
 <p>In <a href="ch05.html#5.11">Section 5.11</a> you saw some code like this:</p>
 <pre><code>    PRINT "What is your name?"
@@ -335,5 +355,6 @@
 <p>The related <strong>Testpat ()</strong> function returns a numerical value, if that's more convenient: 1 for a valid pattern, 0 for an invalid pattern.</p>
 <hr>
 <p><a href="ch09.html">Previous</a> <a href="index.html">Index</a> <a href="ch11.html">Next</a></p>
+
 </body>
 </html>

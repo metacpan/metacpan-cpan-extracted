@@ -4,14 +4,10 @@ Axmud Quick Help
       you might have used, so you should read this (very) short document, which
       discusses its most important features.
 
-   For help with installation, see the INSTALL file (or read the Guide). Axmud
-      is known to work on MS Windows and Linux. It might be possible to install
-      it on other systems, such as MacOS and *BSD, but the authors have not been
-      able to confirm this yet.
-
-Axmud is known to work on MS Windows, Linux and *BSD. It might be possible to
-install it on other systems such as MacOS, but the authors have not been able to
-confirm this yet.
+   For help with installation, see the README.rst file (or read the Guide).
+      Axmud is known to work on MS Windows, Linux and *BSD. It might be possible
+      to install it on MacOS, but the authors have not been able to confirm this
+      yet.
 
    To start Axmud, run the axmud.pl file. Users with a visual impairment can run
       the baxmud.pl file instead, which turns on screenreader support and turns

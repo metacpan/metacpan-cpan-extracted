@@ -1,9 +1,20 @@
 Revision history for App-size-dir-diff
 
+    0.4.1 2020-09-19
+
+     - Add description of /tmp/first_hash file-to-memory copy behavior
+     - Add option -n, Print files that do not exist in the first path
+     - Add brackets + number indicating for which path the file count is
+
+    0.4.0 2020-09-19
+
+     - Add option -e, Prompt user if duplicate files should be deleted
+       NOTE: ENTER-key can be held down to delete many files at once
+
     0.3.9 2020-08-31
 
      - Move revision history into Changes
-	 - Update PREREQ_PM entries to match script dependencies
+     - Update PREREQ_PM entries to match script dependencies
 
     0.3.8 2020-08-31
 

@@ -5,10 +5,9 @@ use strict;
 
 use Attribute::Handlers;
 
-use namespace::clean ();
-use B::Hooks::EndOfScope;
-use Sub::Identify qw(:all);
-
+use namespace::clean     qw();
+use B::Hooks::EndOfScope qw(on_scope_end);
+use Sub::Identify        qw(get_code_info);
 
 =head1 NAME
 
@@ -16,11 +15,11 @@ Sub::Private - Private subroutines and methods
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -37,14 +36,11 @@ our $VERSION = '0.01';
 
 =cut
 
-sub UNIVERSAL::Private :ATTR(CODE,BEGIN,CHECK) {
+sub UNIVERSAL::Private :ATTR(CODE,BEGIN) {
     my ($package, $symbol, $referent, $attr, $data) = @_;
 
     on_scope_end {
-        namespace::clean->clean_subroutines(
-            stash_name( $referent ), 
-            sub_name(   $referent )
-        );
+        namespace::clean->clean_subroutines( get_code_info( $referent ) );
     }
 }
 
@@ -58,12 +54,15 @@ attribut you get truly private methods.
 
 Peter Makholm, C<< <peter at makholm.net> >>
 
+=head1 MAINTAINER
+
+Nigel Horne, C<< <njh@bandman.co.uk> >>
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-sub-private at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sub-Private>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
 
 =head1 SEE ALSO
 
@@ -108,7 +107,6 @@ Copyright 2009 Peter Makholm, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
 
 =cut
 

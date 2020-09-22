@@ -36,7 +36,7 @@ my $secondary = redis('secondary connection');
 
 use Future::AsyncAwait;
 (async sub {
-    # await $main->client_side_connection;
+    await $main->client_side_connection;
     await $main->client_side_cache_ready;
     my $f = $main->get('some_key');
     ok(!($f->is_ready), '->get returns pending future');

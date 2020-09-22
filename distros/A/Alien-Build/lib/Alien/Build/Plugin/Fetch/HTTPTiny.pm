@@ -9,7 +9,7 @@ use Alien::Build::Util qw( _ssl_reqs );
 use Carp ();
 
 # ABSTRACT: Plugin for fetching files using HTTP::Tiny
-our $VERSION = '2.32'; # VERSION
+our $VERSION = '2.33'; # VERSION
 
 
 has '+url' => '';
@@ -128,7 +128,7 @@ Alien::Build::Plugin::Fetch::HTTPTiny - Plugin for fetching files using HTTP::Ti
 
 =head1 VERSION
 
-version 2.32
+version 2.33
 
 =head1 SYNOPSIS
 

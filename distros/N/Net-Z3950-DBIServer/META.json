@@ -1,0 +1,42 @@
+{
+   "abstract" : "Gateway between Z39.50 and the RDBMS of your choice",
+   "author" : [
+      "Mike Taylor <mike@miketaylor.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Z3950-DBIServer",
+   "no_index" : {
+      "namespace" : [
+         "Net::Z3950::RPN"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.2",
+            "MARC::Record" : "1.38",
+            "Net::Z3950::SimpleServer" : "1.03"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.07"
+}

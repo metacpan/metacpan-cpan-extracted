@@ -1,5 +1,11 @@
 requires 'Data::Printer', '== 0.40';
 requires 'Faker', '== 1.03';
-# Only for test
-requires 'Test::Pod', '';
-requires 'Zydeco', '== 0.603';
+requires 'Zydeco', '== 0.605';
+
+on 'test' => sub {
+    requires 'Test::Pod', '== 1.52';
+};
+
+on 'develop' => sub {
+  recommends 'Devel::NYTProf';
+};

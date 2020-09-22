@@ -1,11 +1,16 @@
 package WordListBase::MetaSyntactic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-22'; # DATE
+our $DATE = '2020-05-23'; # DATE
 our $DIST = 'WordListBase-MetaSyntactic'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use strict 'subs', 'vars';
+
+# IFUNBUILT
+# use Role::Tiny::With;
+# with 'WordListRole::WordList';
+# END IFUNBUILT
 
 sub new {
     my $package = shift;
@@ -92,16 +97,17 @@ WordListBase::MetaSyntactic - Base class for WordList::MetaSyntactic::*
 
 =head1 VERSION
 
-This document describes version 0.005 of WordListBase::MetaSyntactic (from Perl distribution WordListBase-MetaSyntactic), released on 2020-05-22.
+This document describes version 0.007 of WordListBase::MetaSyntactic (from Perl distribution WordListBase-MetaSyntactic), released on 2020-05-23.
 
 =head1 SYNOPSIS
 
-Use one of the C<WordList::MetaSyntactic::*> modules.
+Normally you would use one of the C<WordList::MetaSyntactic::*> modules instead
+of this one.
 
 =head1 DESCRIPTION
 
 Base class for C<WordList::MetaSyntactic::*> modules.
-<WordList::MetaSyntactic::*> are wordlist modules that get their wordlist from
+C<WordList::MetaSyntactic::*> are wordlist modules that get their wordlist from
 corresponding C<Acme::MetaSyntactic::*> modules.
 
 =for Pod::Coverage ^(.+)$

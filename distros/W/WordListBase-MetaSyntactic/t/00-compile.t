@@ -6,9 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Acme/MetaSyntactic/test_wlb_meta.pm',
+    'WordList/MetaSyntactic/test_wlb_meta.pm',
     'WordListBase/MetaSyntactic.pm'
 );
 

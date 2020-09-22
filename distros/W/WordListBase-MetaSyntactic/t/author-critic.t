@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/WordListBase/MetaSyntactic.pm'];
+my $filenames = ['lib/Acme/MetaSyntactic/test_wlb_meta.pm','lib/WordList/MetaSyntactic/test_wlb_meta.pm','lib/WordListBase/MetaSyntactic.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

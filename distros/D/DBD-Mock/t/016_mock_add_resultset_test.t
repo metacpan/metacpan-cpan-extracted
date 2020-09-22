@@ -317,4 +317,55 @@ $dbh->{mock_add_resultset} = {
     $sth->finish();
 }
 
+$dbh->{mock_start_insert_id} = [ 'y', 4 ];
+
+$dbh->{mock_add_resultset} = {
+    sql => 'INSERT INTO y ( x ) VALUES ( ? )',
+    callback => sub {
+        my @bound_params = @_;
+
+        my %result = (
+            fields => [],
+            rows => []
+        );
+
+        return %result;
+    },
+};
+
+{
+    my $sth = $dbh->prepare( 'INSERT INTO y ( x ) VALUES ( ? )' );
+
+    $sth->execute( 'test' );
+
+    is( $dbh->last_insert_id( (undef) x 4 ), 4, "last_insert_id should return the next Id value after an insert as our callback doesn't override it")
+}
+
+
+$dbh->{mock_add_resultset} = {
+    sql => 'INSERT INTO y ( x ) VALUES ( ? )',
+    callback => sub {
+        my @bound_params = @_;
+
+        my %result = (
+            fields => [],
+            rows => [],
+            last_insert_id => 99,
+        );
+
+        return %result;
+    },
+};
+
+{
+    my $sth = $dbh->prepare( 'INSERT INTO y ( x ) VALUES ( ? )' );
+
+    $sth->execute( 'test' );
+
+    is( $dbh->last_insert_id( (undef) x 4 ), 99, "last_insert_id should return the id the callback has provided");
+
+    is( $dbh->{mock_last_insert_ids}{y}, 5, "If we provide a last_insert_id value then the one stored against the table shouldn't be updated");
+}
+
+
 done_testing();

@@ -222,7 +222,7 @@ package Mojolicious::Plugin::InputValidation;
 use Mojo::Base 'Mojolicious::Plugin';
 no strict 'subs';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Mojo::Util 'monkey_patch';
 

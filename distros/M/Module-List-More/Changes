@@ -1,0 +1,102 @@
+0.004009  2020-09-22  Released-By: PERLANCAR; Urgency: medium
+
+	  - [bugfix][regression] Do not force loading optional dep
+	    String::Wildcard::Bash in test (RT#133379).
+
+	  - [doc] Tiny grammar tweak.
+
+
+0.004008  2020-09-21  Released-By: PERLANCAR; Urgency: low
+
+	  - No functional changes.
+
+	  - [doc] Fix doc.
+
+
+0.004007  2020-09-21  Released-By: PERLANCAR; Urgency: medium
+
+	  - Recognize option: return_version.
+
+	  - Further improve result compatibility with Module::List.
+
+	  - [doc] Add example result in Synopsis.
+
+
+0.004006  2020-09-21  Released-By: PERLANCAR; Urgency: medium
+
+          - Rename module from PERLANCAR::Module::List to Module::List::More.
+            Improve compatibility of result structure with Module::List.
+
+          - Recognize option: return_library_path.
+
+
+0.004005  2019-09-12  Released-By: PERLANCAR; Urgency: medium
+
+	  - [doc] Mention Module::List::Tiny, Module::List::Wildcard.
+
+	  - Add import() to be able to be imported like Module:List &
+	    Module::List::Tiny.
+
+
+0.004004  2019-07-27  Released-By: PERLANCAR; Urgency: medium
+
+	  - [bugfix] Fix wildcard matching which cut digging down early in
+	    the case of patterns like '*::Foo'.
+
+          - [test] Add test suite.
+
+
+0.004003  2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	  - [dist] Make String::Wildcard::Bash an optional
+	    (runtime-recommends) dependency.
+
+
+0.004002  2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	  - Support wildcard option.
+
+
+0.004001  2019-07-25  Released-By: PERLANCAR; Urgency: low
+
+          - No functional changes.
+
+	  - [doc] Module::List 0.004 now also has return_path option, so we no
+            longer list it as a difference between us and Module::List.
+
+          - [fmt] Reformat with 4-space indent, just like Module::List 0.004
+            now.
+
+
+0.003005 2016-03-17  Released-By: PERLANCAR
+
+	- [Bugfix] Make module work under perl < 5.10.
+
+
+0.003004 2016-03-15  Released-By: PERLANCAR
+
+	- Introduce 'all' option.
+
+	- [Bugfix] Didn't return path when return_path=>1 and list_pod=>1 &
+	  use_pod_dir=>1.
+
+	- Support 5.006 back.
+
+
+0.003003 2016-01-21  Released-By: PERLANCAR
+
+         - [Bugfix] Don't assign to result multiple times, overriding the first
+           path found (when 'return_path' is true).
+
+         - Bump minimum perl version to 5.10.1 because defined-or is so
+           convenient. UPDATE: has been reverted in 0.003004.
+
+
+0.003002 2016-01-20  Released-By: PERLANCAR
+
+         - Introduce 'return_path' option.
+
+
+0.003001 2015-08-11  Released-By: PERLANCAR
+
+         - First release.

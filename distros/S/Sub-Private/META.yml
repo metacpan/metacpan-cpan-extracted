@@ -1,26 +1,30 @@
 ---
-name: Sub-Private
-version: 0.01
+abstract: 'Private subroutines and methods'
 author:
-  - 'Peter Makholm <peter@makholm.net>'
-abstract: Private subroutines and methods
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/pmakholm/sub-private-perl/tree/master
-requires:
-  Attribute::Handlers: 0
-  B::Hooks::EndOfScope: 0
-  Sub::Identify: 0
-  namespace::clean: 0
+  - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
-  Test::More: 0
-  Test::NoWarnings: 0
+  Test::More: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sub-Private
 provides:
   Sub::Private:
     file: lib/Sub/Private.pm
-    version: 0.01
-generated_by: Module::Build version 0.33
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+    version: '0.02'
+requires:
+  Attribute::Handlers: '0'
+  B::Hooks::EndOfScope: '0'
+  Sub::Identify: '0'
+  namespace::clean: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/nigelhorne/sub-private-perl/tree/master
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

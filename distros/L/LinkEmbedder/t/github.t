@@ -25,6 +25,14 @@ LinkEmbedder->new->test_ok(
 );
 
 LinkEmbedder->new->test_ok(
+  'https://github.com/jhthorsen/linkembedder/blob/4e0307a369651758839677a4c453f6988c933ad0/Changes#L14-L16' =>
+    {html => qr{<pre>1\.12 2020-03-24T12:12:10.*text as a paste\s+</pre>}s});
+
+LinkEmbedder->new->test_ok(
+  'https://github.com/jhthorsen/linkembedder/blob/4e0307a369651758839677a4c453f6988c933ad0/Changes#L16' =>
+    {html => qr{<pre>\s-\sWill serve plain text as a paste.*placeholder_url\s+</pre>}s});
+
+LinkEmbedder->new->test_ok(
   'https://git.io/aKhMuA' => {
     isa => 'LinkEmbedder::Link::Github',
     %expected,

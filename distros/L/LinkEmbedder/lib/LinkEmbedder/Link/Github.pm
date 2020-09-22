@@ -38,7 +38,19 @@ sub _learn_from_code {
   my ($self, $e) = @_;
   my @code;
 
-  for my $line ($e->find('.blob-code')->each) {
+  my $selector = '';
+
+  # Handle line number possibly with range
+  my $fragment = $self->url->fragment;
+  if ($fragment =~ /L(\d+)(?:-L(\d+))?/) {
+    my $from = $1;
+    my $to = $2 // $from + 10;
+    $selector .= '.blob-num:is(' . join(', ', map { qq([data-line-number="$_"]) } $from .. $to) . ') + ';
+  }
+
+  $selector .= '.blob-code';
+
+  for my $line ($e->find($selector)->each) {
     push @code, $line->all_text;
   }
 

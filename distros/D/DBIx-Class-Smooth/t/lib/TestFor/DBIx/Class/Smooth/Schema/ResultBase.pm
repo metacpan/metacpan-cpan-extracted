@@ -10,12 +10,14 @@ use experimental qw/postderef signatures/;
 
 __PACKAGE__->load_components(qw/
     Helper::Row::RelationshipDWIM
-    Smooth::Helper::Row::Creation
+    Smooth::Helper::Row::Definition
     Smooth::Helper::Row::JoinTable
 /);
 
 sub db {
     return shift->result_source->schema;
 }
+
+sub default_result_namespace { 'TestFor::DBIx::Class::Smooth::Schema::Result' }
 
 1;

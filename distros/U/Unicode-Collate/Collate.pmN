@@ -17,7 +17,7 @@ use File::Spec;
 
 no warnings 'utf8';
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 our $PACKAGE = __PACKAGE__;
 
 my @Path = qw(Unicode Collate);
@@ -107,6 +107,7 @@ use constant CJK_UidF52   =>  0x9FCB; # Unicode 5.2
 use constant CJK_UidF61   =>  0x9FCC; # Unicode 6.1
 use constant CJK_UidF80   =>  0x9FD5; # Unicode 8.0
 use constant CJK_UidF100  =>  0x9FEA; # Unicode 10.0
+use constant CJK_UidF110  =>  0x9FEF; # Unicode 11.0
 
 use constant CJK_ExtAIni  =>  0x3400; # Unicode 3.0
 use constant CJK_ExtAFin  =>  0x4DB5; # Unicode 3.0
@@ -128,6 +129,8 @@ my %CompatUI = map +($_ => 1), (
 
 use constant TangIdeoIni  => 0x17000; # Unicode 9.0
 use constant TangIdeoFin  => 0x187EC; # Unicode 9.0
+use constant TangIdeo110  => 0x187F1; # Unicode 11.0
+use constant TangIdeo120  => 0x187F7; # Unicode 12.0
 use constant TangCompIni  => 0x18800; # Unicode 9.0
 use constant TangCompFin  => 0x18AF2; # Unicode 9.0
 use constant NushuIni     => 0x1B170; # Unicode 10.0
@@ -142,9 +145,9 @@ my $DefaultRearrange = [ 0x0E40..0x0E44, 0x0EC0..0x0EC4 ];
 my $HighestVCE = pack(VCE_TEMPLATE, 0, 0xFFFE, 0x20, 0x5, 0xFFFF);
 my $minimalVCE = pack(VCE_TEMPLATE, 0,      1, 0x20, 0x5, 0xFFFE);
 
-sub UCA_Version { '36' }
+sub UCA_Version { '41' }
 
-sub Base_Unicode_Version { '10.0.0' }
+sub Base_Unicode_Version { '12.1.0' }
 
 ######
 
@@ -245,6 +248,9 @@ my %DerivCode = (
    32 => \&_derivCE_32,
    34 => \&_derivCE_34,
    36 => \&_derivCE_36,
+   38 => \&_derivCE_38,
+   40 => \&_derivCE_40,
+   41 => \&_derivCE_40, # 41 == 40
 );
 
 sub checkCollator {
@@ -901,6 +907,58 @@ sub sort {
 }
 
 ### begin PP only ##
+sub _derivCE_40 {
+    my $u = shift;
+    my $tang = (TangIdeoIni <= $u && $u <= TangIdeo120 ||
+		TangCompIni <= $u && $u <= TangCompFin);
+    my $nush = (NushuIni <= $u && $u <= NushuFin);
+    my $base = ($tang)
+		? 0xFB00 : # Tangut
+	       ($nush)
+		? 0xFB01 : # Nushu
+	       (CJK_UidIni  <= $u && $u <= CJK_UidF110 || $CompatUI{$u})
+		? 0xFB40 : # CJK
+	       (CJK_ExtAIni <= $u && $u <= CJK_ExtAFin ||
+		CJK_ExtBIni <= $u && $u <= CJK_ExtBFin ||
+		CJK_ExtCIni <= $u && $u <= CJK_ExtCFin ||
+		CJK_ExtDIni <= $u && $u <= CJK_ExtDFin ||
+		CJK_ExtEIni <= $u && $u <= CJK_ExtEFin ||
+		CJK_ExtFIni <= $u && $u <= CJK_ExtFFin)
+		? 0xFB80  # CJK ext.
+		: 0xFBC0; # others
+    my $aaaa = $tang || $nush ? $base : $base + ($u >> 15);
+    my $bbbb = ($tang ? ($u - TangIdeoIni) :
+		$nush ? ($u - NushuIni) : ($u & 0x7FFF)) | 0x8000;
+    return pack(VCE_TEMPLATE, NON_VAR, $aaaa, Min2Wt, Min3Wt, $u),
+	   pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u);
+}
+
+sub _derivCE_38 {
+    my $u = shift;
+    my $tang = (TangIdeoIni <= $u && $u <= TangIdeo110 ||
+		TangCompIni <= $u && $u <= TangCompFin);
+    my $nush = (NushuIni <= $u && $u <= NushuFin);
+    my $base = ($tang)
+		? 0xFB00 : # Tangut
+	       ($nush)
+		? 0xFB01 : # Nushu
+	       (CJK_UidIni  <= $u && $u <= CJK_UidF110 || $CompatUI{$u})
+		? 0xFB40 : # CJK
+	       (CJK_ExtAIni <= $u && $u <= CJK_ExtAFin ||
+		CJK_ExtBIni <= $u && $u <= CJK_ExtBFin ||
+		CJK_ExtCIni <= $u && $u <= CJK_ExtCFin ||
+		CJK_ExtDIni <= $u && $u <= CJK_ExtDFin ||
+		CJK_ExtEIni <= $u && $u <= CJK_ExtEFin ||
+		CJK_ExtFIni <= $u && $u <= CJK_ExtFFin)
+		? 0xFB80  # CJK ext.
+		: 0xFBC0; # others
+    my $aaaa = $tang || $nush ? $base : $base + ($u >> 15);
+    my $bbbb = ($tang ? ($u - TangIdeoIni) :
+		$nush ? ($u - NushuIni) : ($u & 0x7FFF)) | 0x8000;
+    return pack(VCE_TEMPLATE, NON_VAR, $aaaa, Min2Wt, Min3Wt, $u),
+	   pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u);
+}
+
 sub _derivCE_36 {
     my $u = shift;
     my $tang = (TangIdeoIni <= $u && $u <= TangIdeoFin ||
@@ -1071,6 +1129,7 @@ sub _isUIdeo {
     # $uca_vers = 0 for _uideoCE_8()
     my ($u, $uca_vers) = @_;
     return((CJK_UidIni <= $u && (
+	    $uca_vers >= 38 ? ($u <= CJK_UidF110) :
 	    $uca_vers >= 36 ? ($u <= CJK_UidF100) :
 	    $uca_vers >= 32 ? ($u <= CJK_UidF80) :
 	    $uca_vers >= 24 ? ($u <= CJK_UidF61) :
@@ -1473,7 +1532,7 @@ If the revision (previously "tracking version") number of UCA is given,
 behavior of that revision is emulated on collating.
 If omitted, the return value of C<UCA_Version()> is used.
 
-The following revisions are supported.  The default is 36.
+The following revisions are supported.  The default is 41.
 
      UCA       Unicode Standard         DUCET (@version)
    -------------------------------------------------------
@@ -1492,6 +1551,9 @@ The following revisions are supported.  The default is 36.
      32             8.0.0               8.0.0 (8.0.0)
      34             9.0.0               9.0.0 (9.0.0)
      36            10.0.0              10.0.0(10.0.0)
+     38            11.0.0              11.0.0(11.0.0)
+     40            12.0.0              12.0.0(12.0.0)
+     41            12.1.0              12.1.0(12.1.0)
 
 * See below for C<long_contraction> with C<UCA_Version> 22 and 24.
 
@@ -1833,13 +1895,14 @@ those in the CJK Unified Ideographs Extension A etc.
     U+4E00..U+9FCC if UCA_Version is 24 to 30.
     U+4E00..U+9FD5 if UCA_Version is 32 or 34.
     U+4E00..U+9FEA if UCA_Version is 36.
+    U+4E00..U+9FEF if UCA_Version is 38 or later.
 
     In the CJK Unified Ideographs Extension blocks:
     Ext.A (U+3400..U+4DB5) and Ext.B (U+20000..U+2A6D6) in any UCA_Version.
     Ext.C (U+2A700..U+2B734) if UCA_Version is 20 or later.
     Ext.D (U+2B740..U+2B81D) if UCA_Version is 22 or later.
     Ext.E (U+2B820..U+2CEA1) if UCA_Version is 32 or later.
-    Ext.F (U+2CEB0..U+2EBE0) if UCA_Version is 36.
+    Ext.F (U+2CEB0..U+2EBE0) if UCA_Version is 36 or later.
 
 Through C<overrideCJK>, ordering of CJK unified ideographs (including
 extensions) can be overridden.
@@ -2461,15 +2524,15 @@ B<Unicode::Normalize is required to try The Conformance Test.>
 =head1 AUTHOR, COPYRIGHT AND LICENSE
 
 The Unicode::Collate module for perl was written by SADAHIRO Tomoyuki,
-<SADAHIRO@cpan.org>. This module is Copyright(C) 2001-2018,
+<SADAHIRO@cpan.org>. This module is Copyright(C) 2001-2020,
 SADAHIRO Tomoyuki. Japan. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 The file Unicode/Collate/allkeys.txt was copied verbatim
-from L<http://www.unicode.org/Public/UCA/9.0.0/allkeys.txt>.
-For this file, Copyright (c) 2016 Unicode, Inc.; distributed
+from L<http://www.unicode.org/Public/UCA/12.1.0/allkeys.txt>.
+For this file, Copyright (c) 2019 Unicode, Inc.; distributed
 under the Terms of Use in L<http://www.unicode.org/terms_of_use.html>
 
 =head1 SEE ALSO

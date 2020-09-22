@@ -15,10 +15,12 @@
 * [15.7 Selecting exits](#15.7)
 * [15.8 Simple and complex exits](#15.8)
     * [15.8.1 Drawing regions without exits](#15.8.1)
+    * [15.8.2 Obscured exits](#15.8.2)
 * [15.9 One-way exits](#15.9)
 * [15.10 Connecting rooms](#15.10)
 * [15.11 Moving rooms and labels](#15.11)
     * [15.11.1 Dragging exits](#15.11.1)
+    * [15.11.2 Exit lengths](#15.11.2)
 * [15.12 Bent exits](#15.12)
 * [15.13 Up and down](#15.13)
 * [15.14 Non-primary directions](#15.14)
@@ -244,9 +246,11 @@ Now, look what happens if we go west, twice:
 
 ###<a name="15.8.1">15.8.1 Drawing regions without exits</a>
 
-Some regions might have a thousand or more rooms, with perhaps ten of thousands of exits. Maps like these cannot be drawn instantaneously; in fact, on some slower computers, the drawing process might take a few seconds.
+Some regions might have many thousands of rooms, with perhaps tens of thousands of exits. 
 
-Besides drawing simple and complex exits, you can also opt to draw no exits at all.
+Axmud has been highly optimised to make the map-drawing process as efficient as possible. However, there are inherent technical and physical limitations beyond the authors' control, so very large maps cannot be drawn instantaneously. In fact, on older computers, the drawing process might take some minutes.
+
+Besides drawing simple and complex exits, you can also opt to draw no exits at all. Doing so will *drastically* reduce the drawing time for extremely large maps.
 
 * In the automapper menu, click **View > Exits (all regions) > Use region exit settings**
     * You can now set each region's settings individually
@@ -260,6 +264,34 @@ Besides drawing simple and complex exits, you can also opt to draw no exits at a
 * If that's still not comfortable, you can opt to fill in the whole box by clicking **View > Draw current room > Draw filled-in room**
 
 There is an alternative method for drawing so-called wilderness rooms - see [Section 15.24](#15.24).
+
+###<a name="15.8.2">15.8.2 Obscured exits</a>
+
+For very large maps, you can choose to draw a few important exits, and not to draw the rest. This is a 'best of both worlds' option - the drawing time is still short, but you can now see where you are going.
+
+In this situation, rooms whose exits which are *not* obscured are:
+
+* The current room, and any nearby rooms
+* Any selected rooms
+* Rooms with certain room flags (see [Section 5.21](#5.21)) - rooms on routes, rooms marked as dangerous, rooms at the centre of the world, and rooms containing portals or signposts
+
+To enable obscured exits:
+
+* In the automapper menu, click **View > Exits (all regions) > Use region exit settings**
+* Select a region that has many rooms
+* Click **View > Exits (current region) > Obscure unimportant exits**
+
+The meaning or 'rooms near the current room' is any room that's immediately adjacent. You can increase the number of affected rooms, if you like. For example, you can draw exits for all rooms in a 5x5 area, with the current room in the middle: 
+
+* Click **View > Exits (current region) > Set obscure radius...**
+* In the new window, enter a radius of 3
+* Click **OK** to apply the setting
+
+For a 1x1 area - containing only the current room - set a radius of 1.
+
+As your character moves around, exits which *used to* be near the current room will still be visible. Most users will want to change that setting, too.
+
+* Click **View > Exits (current region) > Auto re-draw obscured exits**
 
 ##<a name="15.9">15.9 One-way exits</a>
 
@@ -350,6 +382,22 @@ You can connect rooms together by dragging the exit onto its destination room.
 * Turn on drag mode, or hold down the ALT-GR key
 * Drag the exit while holding down your left mouse button
 * When the exit is above the destination room, release your left mouse button
+
+###<a name="15.11.2">15.11.2 Exit lengths</a>
+
+As your character explores the world, new rooms are normally placed adjacent to each other. If you need to, you can change the default length of an exit. 
+
+Actually, there are two settings you can change: A horizontal length, and a vertical length.
+
+![Longer exit lengths](img/ch15/exit_lengths.png)
+
+* Click **Exits > Exit lengths > Set horizontal length...**
+* Click **Exits > Exit lengths > Set vertical length...**
+* To reset both lengths back to normal, click **Exits > Exit lengths > Reset exit lengths**
+
+You can also use the equivalent toolbuttons.
+
+![Exit length toolbuttons](img/ch15/exit_lengths_buttons.png)
 
 ##<a name="15.12">15.12 Bent exits</a>
 

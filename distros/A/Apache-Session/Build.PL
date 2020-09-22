@@ -2,25 +2,6 @@ use strict;
 use Module::Build;
 #created by eumm-migrate.pl
 
-print << 'EOT';
-
-*** REQUEST ***
-Please use Test::Reporter to report test results - it's the only way to measure
-popularity of distribution.
-
-Or you can add it to stack (means that you use it) on Ohloh: https://www.ohloh.net/p/Apache-Session
-
-EOT
-
-if ($]<5.006) {
-  print << 'EOT1';
-If you really use perl older than 5.6 - write to alexchorny[AT]gmail.com
-and tell me what version do you use, and why.
-EOT1
-  Module::Build->prompt('continue','y');
-}
-
-
 my $build = Module::Build->new(
   'dist_abstract' => 'A persistence framework for session data',
   'license' => 'perl',

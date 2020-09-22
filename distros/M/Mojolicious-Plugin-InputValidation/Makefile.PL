@@ -23,7 +23,7 @@ WriteMakefile(
     META_MERGE => {
         no_index => {
             package => [qw(
-                IV_DATETIME IV_OBJECT IV_ARRAY IV_INT IV_FLOAT IV_WORD IV_ANY
+                IV_BOOL IV_DATETIME IV_OBJECT IV_ARRAY IV_INT IV_FLOAT IV_WORD IV_ANY
             )],
         },
     },

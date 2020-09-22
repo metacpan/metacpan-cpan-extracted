@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.51 2020-09-19
+
+ - Fix interaction between headings and indexes
+
 1.50 2020-07-30
 
  - Support file inclusion from a list (searched in a list of explicit

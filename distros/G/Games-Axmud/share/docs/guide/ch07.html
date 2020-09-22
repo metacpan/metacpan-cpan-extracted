@@ -1,9 +1,16 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!doctype html>
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<meta name="generator" content="ReText 7.0.1">
+<style type="text/css">
+td, th { border: 1px solid #c3c3c3; padding: 0 3px 0 3px; }
+table { border-collapse: collapse; }
+img { max-width: 100%; }
+</style>
+<meta name="generator" content="ReText 7.1.0">
 <title>ch07</title>
+<style type="text/css">
+</style>
 </head>
 <body>
 <p><a href="ch06.html">Previous</a> <a href="index.html">Index</a> <a href="ch08.html">Next</a></p>
@@ -50,8 +57,9 @@
 <li><a href="#7.5.3">7.5.3 Adding hooks</a></li>
 <li><a href="#7.5.4">7.5.4 Editing hooks</a></li>
 <li><a href="#7.5.5">7.5.5 Hook attributes</a></li>
-<li><a href="#7.5.5">7.5.6 Using hook data</a></li>
-<li><a href="#7.5.6">7.5.7 Redirect mode</a></li>
+<li><a href="#7.5.6">7.5.6 Using hook data</a></li>
+<li><a href="#7.5.7">7.5.7 Redirect mode</a></li>
+<li><a href="#7.5.8">7.5.8 Custom hook events</a></li>
 </ul>
 </li>
 <li><a href="#7.6">7.6 Active and inactive interfaces</a></li>
@@ -437,7 +445,8 @@
     kp_add kp_subtract kp_multiply kp_divide kp_enter kp_full_stop
 </code></pre>
 <p>The keycodes 'full_stop' and 'kp_full_stop' represent the full stop/period keys. Axmud supports a number of alternatives to the standard keycodes, including 'period'. (Type <strong>;listkeycodealternative</strong> for a list of alternative keycodes.)</p>
-<p>Keycodes can be combined when two or more keys are pressed together. For example, SHIFT + F1 corresponds to the keycode string "shift f1" (a string containing two words separated by a single space character).</p>
+<p>Keycodes can be combined when two or more keys are pressed together. For example, CTRL + F1 corresponds to the keycode string "ctrl f1" (a string containing two words separated by a single space character).</p>
+<p>Note that, for technical reasons, Axmud cannot use SHIFT or ALT-GR in macros (although ALT + SHIFT + some other key is acceptable). Therefore, if you try to add a macro that fires when you press SHIFT + F1, it won't work.</p>
 <h3><a name="7.3.2">7.3.2 Adding macros</a></h3>
 <ul>
 <li>From the main window menu, click <strong>Edit &gt; World macros</strong></li>
@@ -610,6 +619,12 @@
 <p>In fact, there are several possible methods, including the clever use of aliases. But a much easier way is to use Axmud's <em>redirect mode</em>.</p>
 <pre><code>    ;help redirectmode
 </code></pre>
+<h3><a name="7.5.8">7.5.8 Custom hook events</a></h3>
+<p>Some users might want to create their own hook events. This is possible, though of limited use, since the only way to 'fire' the hook is with the <strong>;simulatehook</strong> command. A custom hook event has no hook data.</p>
+<p>Custom hook events must begin with an underline character, followed by an alphanumeric character, for example <strong>_myevent</strong>.</p>
+<p>To create a custom hook event, you can just create a hook responding to that event, for example</p>
+<pre><code>    ;addhook -s _myevent -p ;about
+</code></pre>
 <h2><a name="7.6">7.6 Active and inactive interfaces</a></h2>
 <p>As explained in detail in <a href="ch05.html">Section 5</a>, Axmud interfaces (trigger, aliases, macros, timers and hooks) are either <em>active</em> or <em>inactive</em>.</p>
 <p>You can create several triggers called <strong>mytrigger</strong>, each belonging to a different profile, but only one of them is active (actually in use). The others are inactive.</p>
@@ -627,5 +642,6 @@
 <p>However, if you modify the copy (the active interface), <em>no changes are made to the original</em> (the inactive interface). Any changes are therefore <em>temporary</em> and will disappear at the end of the session.</p>
 <hr>
 <p><a href="ch06.html">Previous</a> <a href="index.html">Index</a> <a href="ch08.html">Next</a></p>
+
 </body>
 </html>

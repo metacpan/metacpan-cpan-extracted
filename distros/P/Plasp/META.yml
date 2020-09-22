@@ -1,0 +1,112 @@
+---
+abstract: PerlScript/ASP
+author:
+  - 'Steven Leung < sleung@cpan.org >'
+build_requires:
+  Class::MOP: '0'
+  DateTime: '0'
+  HTTP::Cookies: '6.08'
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  Plack::Util: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Text::Lorem: '0'
+  parent: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plasp
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plasp:
+    file: lib/Plasp.pm
+    version: '1.02'
+  Plasp::App:
+    file: lib/Plasp/App.pm
+  Plasp::Application:
+    file: lib/Plasp/Application.pm
+  Plasp::Compiler:
+    file: lib/Plasp/Compiler.pm
+  Plasp::Exception:
+    file: lib/Plasp/Exception.pm
+  Plasp::Exception::Code:
+    file: lib/Plasp/Exception/Code.pm
+  Plasp::Exception::End:
+    file: lib/Plasp/Exception/End.pm
+  Plasp::Exception::NotFound:
+    file: lib/Plasp/Exception/NotFound.pm
+  Plasp::Exception::Redirect:
+    file: lib/Plasp/Exception/Redirect.pm
+  Plasp::GlobalASA:
+    file: lib/Plasp/GlobalASA.pm
+  Plasp::Log:
+    file: lib/Plasp/Log.pm
+  Plasp::Parser:
+    file: lib/Plasp/Parser.pm
+  Plasp::Request:
+    file: lib/Plasp/Request.pm
+  Plasp::Response:
+    file: lib/Plasp/Response.pm
+  Plasp::Server:
+    file: lib/Plasp/Server.pm
+  Plasp::Session:
+    file: lib/Plasp/Session.pm
+  Plasp::State:
+    file: lib/Plasp/State.pm
+  Plasp::State::Application:
+    file: lib/Plasp/State/Application.pm
+  Plasp::State::Session:
+    file: lib/Plasp/State/Session.pm
+requires:
+  CGI::Simple::Cookie: '1.25'
+  Devel::StackTrace: '2.04'
+  Digest::MD5: '2.55'
+  Encode: '3.07'
+  File::LibMagic: '1.23'
+  File::MMagic: '1.30'
+  File::Slurp: '9999.32'
+  File::Temp: '0.2309'
+  HTML::Entities: '3.75'
+  HTML::FillInForm::ForceUTF8: '0.03'
+  HTTP::Date: '6.05'
+  List::Util: '1.55'
+  Module::Runtime: '0.016'
+  Moo: '2.004000'
+  Moo::Role: '0'
+  Net::SMTP: '3.11'
+  Path::Tiny: '0.114'
+  Plack::Request: '1.0047'
+  Role::Tiny: '2.001004'
+  Scalar::Util: '1.55'
+  Sub::HandlesVia: '0.015'
+  Try::Catch: v1.1.0
+  Type::Tiny: '1.010006'
+  Types::Path::Tiny: '0.006'
+  Types::Standard: '0'
+  URI: '1.76'
+  URI::Escape: '0'
+  namespace::clean: '0.27'
+resources:
+  bugtracker: https://github.com/stvleung/Plasp/issues
+  homepage: https://github.com/stvleung/Plasp
+  repository: git://github.com/stvleung/Plasp.git
+version: '1.02'
+x_contributors:
+  - 'Steven Leung <sleung@turnitin.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

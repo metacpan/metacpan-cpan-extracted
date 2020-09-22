@@ -2,7 +2,7 @@ package FFI::Build::File::Base;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use Carp ();
 use FFI::Temp;
 use File::Basename ();
@@ -10,7 +10,7 @@ use FFI::Build::Platform;
 use overload '""' => sub { $_[0]->path }, bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Base class for File::Build files
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub new
@@ -158,7 +158,7 @@ FFI::Build::File::Base - Base class for File::Build files
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

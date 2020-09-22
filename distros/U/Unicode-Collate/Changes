@@ -1,5 +1,11 @@
 Revision history for Perl module Unicode::Collate.
 
+1.28  Tue Sep 22 22:14:48 2020
+    - DUCET is updated (for Unicode 12.1.0) as Collate/allkeys.txt.
+    - The default UCA_Version is 41.
+    - UCA_Version 38 & 40 (for Unicode 11.0.0 & 12.0.0) are also supported.
+    - [rt.cpan.org #133311] Make Makefile.PL strict
+
 1.27  Wed Jan  2 19:42:56 2019
     - DUCET is updated (for Unicode 10.0.0) as Collate/allkeys.txt.
     - The default UCA_Version is 36.

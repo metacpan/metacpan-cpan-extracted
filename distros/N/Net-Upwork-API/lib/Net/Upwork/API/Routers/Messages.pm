@@ -196,6 +196,24 @@ sub send_message_to_room {
     return $self->client()->post("/messages/v3/" . $company . "/rooms/" . $room_id . '/stories', %params);
 }
 
+=item send_message_to_rooms
+
+    Send a message to a batch of rooms
+
+B<Return value>
+
+    JSON response as a string
+
+=cut
+
+sub send_message_to_rooms {
+    my $self = shift;
+    my $company = shift;
+    my %params = @_;
+
+    return $self->client()->post("/messages/v3/" . $company . '/stories/batch', %params);
+}
+
 =item update_room_settings
 
     Update a room settings

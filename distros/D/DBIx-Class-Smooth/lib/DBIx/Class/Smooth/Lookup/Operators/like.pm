@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Lookup::Operators::like;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 
 use parent 'DBIx::Class::Smooth::Lookup::Util';
 use experimental qw/signatures postderef/;
@@ -14,7 +14,7 @@ use experimental qw/signatures postderef/;
 sub smooth__lookup__like($self, $column_name, $value, @rest) {
     $self->smooth__lookup_util__ensure_value_is_scalar('like', $value);
 
-    return { left_hand_prefix => 'BINARY', sql_operator => 'LIKE', value => $value };
+    return { left_hand_prefix => 'BINARY', sql_operator => 'LIKE', value => "%$value%" };
 }
 
 1;
@@ -31,7 +31,7 @@ DBIx::Class::Smooth::Lookup::Operators::like - Short intro
 
 =head1 VERSION
 
-Version 0.0104, released 2020-08-30.
+Version 0.0105, released 2020-09-20.
 
 =head1 SOURCE
 

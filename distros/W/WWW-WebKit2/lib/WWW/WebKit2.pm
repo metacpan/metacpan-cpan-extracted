@@ -55,7 +55,7 @@ use XSLoader;
 use English '-no_match_vars';
 use POSIX qw<F_SETFD F_GETFD FD_CLOEXEC>;
 
-our $VERSION = '0.111';
+our $VERSION = '0.121';
 
 use constant DOM_TYPE_ELEMENT => 1;
 use constant ORDERED_NODE_SNAPSHOT_TYPE => 7;
@@ -383,13 +383,13 @@ sub pending {
 sub process_events {
     my ($self) = @_;
 
-    Gtk3::main_iteration while Gtk3::events_pending;
+    Gtk3::main_iteration_do(0) while Gtk3::events_pending;
 }
 
 sub process_page_load {
     my ($self) = @_;
 
-    Gtk3::main_iteration while Gtk3::events_pending or $self->is_loading;
+    Gtk3::main_iteration_do(0) while Gtk3::events_pending or $self->is_loading;
 }
 
 sub is_loading {

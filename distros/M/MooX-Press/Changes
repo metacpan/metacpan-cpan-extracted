@@ -6,6 +6,42 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.075	2020-09-19
+
+ [ Bug Fixes ]
+ - Prevent type library from complaining about type constraints for 'tag'
+   roles being added multiple times.
+
+0.074	2020-09-18
+
+ [ Documentation ]
+ - Add Zydeco::Lite extended example.
+ - Update Zydeco::Lite formal syntax.
+
+ [ Packaging ]
+ - Dynamically calculate dependency list during build process.
+
+ [ Other ]
+ - MooX::Press will load MooseX::NonMoose when it's needed.
+ - MooX::Press will load MouseX::Foreign when it's needed.
+ - MooX::Press will load UNIVERSAL::DOES on Perl older than v5.10.
+ - Zydeco::Lite allows apps, classes, roles, abstract classes, and
+   interfaces to take a scalar reference as their name, like methods can.
+
+0.073	2020-09-18
+
+ - MooX::Press now creates type constraints for 'tag' roles.
+
+0.072	2020-09-17
+
+ - Added: Zydeco::Lite now supports anonymous methods.
+
+0.071	2020-09-17
+
+ [ Bug Fixes ]
+ - Fix occasional errors figuring out the type name for classes named with
+   a leading + sign.
+
 0.070	2020-09-17
 
  [ Bug Fixes ]

@@ -1,6 +1,6 @@
 package App::optex::tc;
 
-use strict;
+use v5.14;
 use warnings;
 
 use App::optex::textconv;

@@ -886,6 +886,8 @@ The strings specified below return the following kinds of value in a peek/poke o
          Use GMCP MUD protocol (GA::Client->useGmcpFlag)
     F protocol.mtts
          Use MTTS MUD protocol (GA::Client->useMttsFlag)
+    F protocol.mnes
+         Use MTTS MUD protocol (GA::Client->useMnesFlag)
     F protocol.mcp
          Use MCP MUD protocol (GA::Client->useMcpFlag)
 

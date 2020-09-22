@@ -9,7 +9,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '3.000';
+our $VERSION = '3.001';
 
 =head1 NAME
 
@@ -289,7 +289,6 @@ sub configure {
         delete $self->{client_side_cache};
         if($self->loop) {
             $self->remove_child(delete $self->{client_side_connection}) if $self->{client_side_connection};
-            $self->client_side_connection->retain;
         }
     }
     my $uri = $self->{uri} = URI->new($self->{uri}) unless ref $self->uri;
@@ -644,6 +643,12 @@ async sub client_side_connection {
     my ($self) = @_;
     return if $self->{client_side_connection};
 
+    if($self->{protocol_level} eq 'resp3') {
+        $self->{client_side_cache_ready} = Future->done;
+        Scalar::Util::weaken($self->{client_side_connection} = $self);
+        return;
+    }
+
     my $f = $self->{client_side_cache_ready} = $self->loop->new_future;
     $self->{client_side_connection} = my $redis = ref($self)->new(
         host => $self->host,
@@ -822,14 +827,15 @@ sub on_message {
 
     $log->tracef('Incoming message: %s, pending = %s', $data, join ',', map { $_->[0] } $self->{pending}->@*) if $log->is_trace;
 
-    if(ref($data) eq 'ARRAY') {
-        if($self->{protocol_level} ne 'resp2') {
-            return $self->handle_pubsub_message(@$data) if $data->[0] =~ /^p?message$/;
-        } elsif(exists $self->{pubsub} and exists $SUBSCRIPTION_COMMANDS{uc $data->[0]}) {
-            return $self->handle_pubsub_message(@$data);
-        }
+    if($self->{protocol_level} eq 'resp2' and exists $self->{pubsub} and exists $SUBSCRIPTION_COMMANDS{uc $data->[0]}) {
+        return $self->handle_pubsub_message(@$data);
     }
 
+    return $self->complete_message($data);
+}
+
+sub complete_message {
+    my ($self, $data) = @_;
     my $next = shift @{$self->{pending}} or die "No pending handler";
     $self->next_in_pipeline if @{$self->{awaiting_pipeline}};
     return if $next->[1]->is_cancelled;
@@ -837,10 +843,7 @@ sub on_message {
     # This shouldn't happen, preferably
     $log->errorf("our [%s] entry is ready, original was [%s]??", $data, $next->[0]) if $next->[1]->is_ready;
     $next->[1]->done($data);
-
-    if(ref $data eq 'ARRAY' and $data->[0] =~ /subscribe/) {
-        return $self->handle_pubsub_response(@$data);
-    }
+    return;
 }
 
 =head2 next_in_pipeline
@@ -877,6 +880,8 @@ sub on_error_message {
 
     my $next = shift @{$self->{pending}} or die "No pending handler";
     $next->[1]->fail($data);
+    $self->next_in_pipeline if @{$self->{awaiting_pipeline}};
+    return;
 }
 
 =head2 handle_pubsub_message
@@ -951,6 +956,8 @@ sub handle_pubsub_response {
     } else {
         $log->warnf('have unknown pubsub message type %s with channel %s payload %s', $type, $channel, $payload);
     }
+
+    return $self->complete_message([ $type, @details ]) unless $self->{protocol_level} eq 'resp2';
 }
 
 =head2 stream
@@ -1135,7 +1142,7 @@ sub _init {
 sub _add_to_loop {
     my ($self, $loop) = @_;
     delete $self->{client_side_connection};
-    $self->client_side_connection->retain if $self->client_side_cache_size;
+    # $self->client_side_connection->retain if $self->client_side_cache_size;
 }
 
 1;

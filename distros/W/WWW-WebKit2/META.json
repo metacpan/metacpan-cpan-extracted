@@ -6,7 +6,7 @@
       "Philipp A. Lehner <pl@atikon.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,9 +40,14 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "DateTime" : "0",
+            "Encode" : "0",
+            "File::Path" : "0",
+            "File::Slurper" : "0",
             "Glib" : "0",
             "Gtk3" : "0",
             "Gtk3::WebKit2" : "0.011",
+            "JSON" : "0",
             "Moose" : "0",
             "Time::HiRes" : "0",
             "X11::Xlib" : "0"
@@ -50,6 +55,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.111",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.121",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

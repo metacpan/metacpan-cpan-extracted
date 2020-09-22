@@ -1202,6 +1202,29 @@ great caution (if at all).
     property to be undef in this situation then set the
     `$DBD::Mock::DefaultFieldsToUndef` flag to `1`.
 
+    If you're mocking an INSERT statement with a callback and you want to
+    explicitly set the database's `last_insert_id` value then you can use the
+    `last_insert_id` key in the result set.  If you don't specify a
+    `last_insert_id` then the standard `DBD::Mock` logic for generating an value
+    for the last inserted item will be followed.  This will allow you to mock
+    MySQL/MariaDB INSERT queries that use `ON DUPLICATE KEY UPDATE` logic to set
+    the `last_insert_id`.
+
+        $dbh->{mock_add_resultset} = {
+            sql => 'INSERT INTO y ( x ) VALUES ( ? ) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID( id )',
+            callback => sub {
+                my @bound_params = @_;
+
+                my %result = (
+                    fields => [],
+                    rows => [],
+                    last_insert_id => 99,
+                );
+
+                return %result;
+            },
+        };
+
 # BUGS
 
 - Odd `$dbh` attribute behavior

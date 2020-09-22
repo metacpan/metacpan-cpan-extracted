@@ -12,7 +12,8 @@ scroller - view a command's output in a scrolling window
 =head1 SYNOPSIS
 
 scroller [-h|--help] [-s|--size SIZE] [-c|--color COLOR] 
-         [--on-exit keep|error|print] [-w|--window WINDOWSPEC]
+         [-t|--tab-width WIDTH] [--on-exit keep|error|print]
+         [-w|--window WINDOWSPEC]
          COMMAND ARGS..
 
 See the manpage I<scroller(1)> for more details.
@@ -70,6 +71,12 @@ sequence B<without> the initial escape character (e.g. "[34m" for blue text).
 If this is set, any escape sequences within the command's actual output will
 be ignored. Without it, color-setting escape sequences in the output are passed
 through.
+
+=item * I<-t>, I<--tab-width> B<WIDTH>
+
+Set the width of tabs (in characters) when viewed in the viewport. 
+For consistent printing, tabs are replaced with this number of spaces.
+Defaults to 4.
 
 =item * I<--on-exit> B<keep|error|print>
 
@@ -175,7 +182,7 @@ my %default_windows = (
 );
 
 # Parse options
-my ($width, $height, $style, $onexit, $windowspec);
+my ($width, $height, $style, $tabwidth, $onexit, $windowspec);
 decode_argv();
 my $success = GetOptions(
     's|size=s'  => sub {
@@ -192,6 +199,14 @@ my $success = GetOptions(
             die "Invalid escape sequence for color."
         }
         $style = $val;
+    },
+
+    't|tab-width=s' => sub {
+        my ($name, $val) = @_;
+        unless ( $val =~ m/^\d+$/) {
+            die "Invalid value for tab-width. Must be a positive integer";
+        }
+        $tabwidth = $val;
     },
 
     'on-exit=s' => sub {
@@ -240,6 +255,7 @@ my $scroller = Term::Scroller->new(
     height      => $height,
     width       => $width,
     style       => defined $style ? "\033$style" : undef,
+    tabwidth    => $tabwidth,
     window      => $windowspec,
     hide        => (not defined $onexit) || ($onexit ne 'keep'),
 
@@ -255,12 +271,29 @@ close $passthru if openhandle($passthru);
 # the command's output between our stdout/stderr and the scroller.
 # (in this case, the scroller will be connected directly to /dev/tty)
 
-my ($comm_out, $comm_err) = map -t $_ ? $scroller : tee_fh($_), *STDOUT, *STDERR;
+my %comm_out = (src => *STDOUT);
+my %comm_err = (src => *STDERR);
+for (\%comm_out, \%comm_err) {
+    if (-t $_->{src}) {
+        $_->{fh}  = $scroller;
+        $_->{pid} = $scroller_pid;
+    } else {
+        my ($tee, $teepid) = tee_fh( $_->{src} );
+        $_->{fh}  = $tee;
+        $_->{pid} = $teepid;
+    }
+}
+
+# Create a pty that tee's input between the scroller and the
+# given filehandle. Retruns an array with the pty filehandle
+# and the pid of the forked process.
 sub tee_fh {
-    my $out = shift;
+    my $out    = shift;
     my $pty = IO::Pty->new;
     defined(my $pid = fork)     or die "unable to fork: $!";
-    return $pty if $pid;        # return pty in parent
+    if ($pid) { # return pty in parent
+        return wantarray ? ($pty, $pid) : $pty;
+    }
 
     # Child
     close $pty;
@@ -276,24 +309,32 @@ sub tee_fh {
 defined(my $comm_pid = fork)     or die "unable to fork: $!";
 if ($comm_pid == 0) {
     # Child
-    open STDOUT, '>&', $comm_out;
-    open STDERR, '>&', $comm_err;
+    open STDOUT, '>&', $comm_out{fh};
+    open STDERR, '>&', $comm_err{fh};
 
-    close $comm_out;
-    close $comm_err;
-    close $scroll_out;
-
-    #exit;
     exec @command;
 }
 
-close $comm_out;
-close $comm_err;
-
-# Reap children procs
-waitpid($scroller_pid,  0);
-waitpid($comm_pid,      0);
+# Reap Children
+waitpid($comm_pid, 0);
 my $exitcode = $?;
+
+# If the command's stdout or stderr were redirected to the intermediate
+# pty, send an EOF to that pty and wait for it to close.
+if ($comm_out{pid} != $scroller_pid) {
+    my $fh = $comm_out{fh};
+    print $fh "\04";
+    waitpid($comm_out{pid}, 0);
+    close $comm_out{fh};
+}
+if ($comm_err{pid} != $scroller_pid) {
+    my $fh = $comm_err{fh};
+    print $fh "\04";
+    waitpid($comm_err{pid}, 0);
+    close $comm_err{fh};
+}
+
+$scroller->end();
 
 # Print output if 'print' or 'error' was specifed for the on-exit action.
 if (defined $passthru) {

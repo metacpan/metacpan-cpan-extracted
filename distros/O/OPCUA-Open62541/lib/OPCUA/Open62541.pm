@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -54,13 +54,13 @@ and methods.
 
 =item $variant = OPCUA::Open62541::Variant->new()
 
-=item $variant->isEmpty()
+=item $boolean = $variant->isEmpty()
 
-=item $variant->isScalar()
+=item $boolean = $variant->isScalar()
 
-=item $variant->hasScalarType($data_type)
+=item $boolean = $variant->hasScalarType($data_type)
 
-=item $variant->hasArrayType($data_type)
+=item $boolean = $variant->hasArrayType($data_type)
 
 =item $variant->setScalar($p, $data_type)
 
@@ -80,7 +80,7 @@ and methods.
 
 =item $status_code = $server->run($server, $running)
 
-$running should be TRUE at statup.
+$running should be TRUE at startup.
 When set to FALSE during method invocation, the server stops
 magically.
 
@@ -90,9 +90,79 @@ magically.
 
 =item $status_code = $server->run_shutdown($server)
 
-=item $status_code = $server->readValue(\%nodeId, \$outValue)
+=item \%dataValue = $server->read(\%item, $timestamps)
 
-=item $status_code = $server->writeValue(\%nodeId, $value)
+=item $status_code = $server->readAccessLevel(\%nodeId, \$outByte)
+
+=item $status_code = $server->readArrayDimensions(\%nodeId, \$outVariant)
+
+=item $status_code = $server->readBrowseName(\%nodeId, \$outQualifiedName)
+
+=item $status_code = $server->readContainsNoLoops(\%nodeId, \$outBoolean)
+
+=item $status_code = $server->readDataType(\%nodeId, \$outDataType)
+
+=item $status_code = $server->readDescription(\%nodeId, \$outLocalizedText)
+
+=item $status_code = $server->readDisplayName(\%nodeId, \$outLocalizedText)
+
+=item $status_code = $server->readEventNotifier(\%nodeId, \$outByte)
+
+=item $status_code = $server->readExecutable(\%nodeId, \$outBoolean)
+
+=item $status_code = $server->readHistorizing(\%nodeId, \$outBoolean)
+
+=item $status_code = $server->readInverseName(\%nodeId, \$outLocalizedText)
+
+=item $status_code = $server->readIsAbstract(\%nodeId, \$outBoolean)
+
+=item $status_code = $server->readMinimumSamplingInterval(\%nodeId, \$outDouble)
+
+=item $status_code = $server->readNodeClass(\%nodeId, \$outNodeClass)
+
+=item $status_code = $server->readNodeId(\%nodeId, \$outNodeId)
+
+=item $status_code = $server->readObjectProperty(\%nodeId, \%propertyName, \$outVariant)
+
+=item $status_code = $server->readSymmetric(\%nodeId, \$outBoolean)
+
+=item $status_code = $server->readValue(\%nodeId, \$outVariant)
+
+=item $status_code = $server->readValueRank(\%nodeId, \$outInt32)
+
+=item $status_code = $server->readWriteMask(\%nodeId, \$outUInt32)
+
+=item $status_code = $server->write(\%value)
+
+=item $status_code = $server->writeAccessLevel(\%nodeId, $newByte)
+
+=item $status_code = $server->writeArrayDimensions(\%nodeId, \%newVariant)
+
+=item $status_code = $server->writeDataType(\%nodeId, $newDataType)
+
+=item $status_code = $server->writeDescription(\%nodeId, \%newLocalizedText)
+
+=item $status_code = $server->writeDisplayName(\%nodeId, \%newLocalizedText)
+
+=item $status_code = $server->writeEventNotifier(\%nodeId, $newByte)
+
+=item $status_code = $server->writeExecutable(\%nodeId, $newBoolean)
+
+=item $status_code = $server->writeHistorizing(\%nodeId, $newBoolean)
+
+=item $status_code = $server->writeInverseName(\%nodeId, \%newLocalizedText)
+
+=item $status_code = $server->writeIsAbstract(\%nodeId, $newBoolean)
+
+=item $status_code = $server->writeMinimumSamplingInterval(\%nodeId, $newDouble)
+
+=item $status_code = $server->writeObjectProperty(\%nodeId, \%propertyName, \%newVariant)
+
+=item $status_code = $server->writeValue(\%nodeId, \%newVariant)
+
+=item $status_code = $server->writeValueRank(\%nodeId, $newInt32)
+
+=item $status_code = $server->writeWriteMask(\%nodeId, $newUInt32)
 
 =item \%browseResult = $server->browse($maxReferences, \%browseDescription)
 
@@ -156,6 +226,52 @@ in the callback.
 =item $logger = $server_config->getLogger()
 
 =item $buildinfo = $server_config->getBuildInfo()
+
+=item $server_config->setBuildInfo(\%buildInfo)
+
+=item $limit = $server_config->getMaxSecureChannels()
+
+=item $server_config->setMaxSecureChannels($maxSecureChannels)
+
+=item $limit = $server_config->getMaxSessions()
+
+=item $server_config->setMaxSessions($maxSessions)
+
+=item $limit = $server_config->getMaxSessionTimeout()
+
+=item $server_config->setMaxSessionTimeout($maxSessionTimeout)
+
+=item $limit = $server_config->getMaxNodesPerRead()
+
+=item $server_config->setMaxNodesPerRead($maxNodesPerRead)
+
+=item $limit = $server_config->getMaxNodesPerWrite()
+
+=item $server_config->setMaxNodesPerWrite($maxNodesPerWrite)
+
+=item $limit = $server_config->getMaxNodesPerMethodCall()
+
+=item $server_config->setMaxNodesPerMethodCall($maxNodesPerMethodCall)
+
+=item $limit = $server_config->getMaxNodesPerBrowse()
+
+=item $server_config->setMaxNodesPerBrowse($maxNodesPerBrowse)
+
+=item $limit = $server_config->getMaxNodesPerRegisterNodes()
+
+=item $server_config->setMaxNodesPerRegisterNodes($maxNodesPerRegisterNodes)
+
+=item $limit = $server_config->getMaxNodesPerTranslateBrowsePathsToNodeIds()
+
+=item $server_config->setMaxNodesPerTranslateBrowsePathsToNodeIds($maxNodesPerTranslateBrowsePathsToNodeIds)
+
+=item $limit = $server_config->getMaxNodesPerNodeManagement()
+
+=item $server_config->setMaxNodesPerNodeManagement($maxNodesPerNodeManagement)
+
+=item $limit = $server_config->getMaxMonitoredItemsPerCall()
+
+=item $server_config->setMaxMonitoredItemsPerCall($maxMonitoredItemsPerCall)
 
 =item $server_config->setUserRightsMaskReadonly($readonly)
 
@@ -256,23 +372,275 @@ run_iterate() or open62541 may try to operate on a non existent socket.
 
 =back
 
-=item $response = $client->Service_browse(\%request)
-
-=item $status_code = $client->readDisplayNameAttribute(\%nodeId, \$outDisplayName)
-
-=item $status_code = $client->readDescriptionAttribute(\%nodeId, \$outDescription)
-
-=item $status_code = $client->readValueAttribute(\%nodeId, \$outValue)
-
-=item $status_code = $client->readDataTypeAttribute(\%nodeId, \$outDataType)
-
-=item $status_code = $client->readValueAttribute_async(\%nodeId, \&callback, $data, \$reqId)
+=item $status_code = $client->sendAsyncBrowseNextRequest(\%request, \&callback, $data, \$reqId)
 
 =over 8
 
-=item $callback = sub { my ($client, $userdata, $requestId, \%var) = @_ }
+=item $callback = sub { my ($client, $userdata, $requestId, \%response) = @_ }
 
 =back
+
+=item $response = $client->Service_browse(\%request)
+
+=item $status_code = $client->readAccessLevelAttribute(\%nodeId, \$outByte)
+
+=item $status_code = $client->readBrowseNameAttribute(\%nodeId, \$outQualifiedName)
+
+=item $status_code = $client->readContainsNoLoopsAttribute(\%nodeId, \$outBoolean)
+
+=item $status_code = $client->readDataTypeAttribute(\%nodeId, \$outDataType)
+
+=item $status_code = $client->readDescriptionAttribute(\%nodeId, \$outLocalizedText)
+
+=item $status_code = $client->readDisplayNameAttribute(\%nodeId, \$outLocalizedText)
+
+=item $status_code = $client->readEventNotifierAttribute(\%nodeId, \$outByte)
+
+=item $status_code = $client->readExecutableAttribute(\%nodeId, \$outBoolean)
+
+=item $status_code = $client->readHistorizingAttribute(\%nodeId, \$outBoolean)
+
+=item $status_code = $client->readInverseNameAttribute(\%nodeId, \$outLocalizedText)
+
+=item $status_code = $client->readIsAbstractAttribute(\%nodeId, \$outBoolean)
+
+=item $status_code = $client->readMinimumSamplingIntervalAttribute(\%nodeId, \$outDouble)
+
+=item $status_code = $client->readNodeClassAttribute(\%nodeId, \$outNodeClass)
+
+=item $status_code = $client->readNodeIdAttribute(\%nodeId, \$outNodeId)
+
+=item $status_code = $client->readSymmetricAttribute(\%nodeId, \$outBoolean)
+
+=item $status_code = $client->readUserAccessLevelAttribute(\%nodeId, \$outByte)
+
+=item $status_code = $client->readUserExecutableAttribute(\%nodeId, \$outBoolean)
+
+=item $status_code = $client->readUserWriteMaskAttribute(\%nodeId, \$outUInt32)
+
+=item $status_code = $client->readValueAttribute(\%nodeId, \$outVariant)
+
+=item $status_code = $client->readValueRankAttribute(\%nodeId, \$outInt32)
+
+=item $status_code = $client->readWriteMaskAttribute(\%nodeId, \$outUInt32)
+
+=item $status_code = $client->sendAsyncReadRequest(\%request, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, \%response) = @_ }
+
+=back
+
+=item $status_code = $client->readAccessLevelAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $byte) = @_ }
+
+=back
+
+=item $status_code = $client->readBrowseNameAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, \%qualifiedName) = @_ }
+
+=back
+
+=item $status_code = $client->readContainsNoLoopsAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $boolean) = @_ }
+
+=back
+
+=item $status_code = $client->readDataTypeAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $dataType) = @_ }
+
+=back
+
+=item $status_code = $client->readDescriptionAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, \%localizedText) = @_ }
+
+=back
+
+=item $status_code = $client->readDisplayNameAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, \%localizedText) = @_ }
+
+=back
+
+=item $status_code = $client->readEventNotifierAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $byte) = @_ }
+
+=back
+
+=item $status_code = $client->readExecutableAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $boolean) = @_ }
+
+=back
+
+=item $status_code = $client->readHistorizingAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $boolean) = @_ }
+
+=back
+
+=item $status_code = $client->readInverseNameAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, \%localizedText) = @_ }
+
+=back
+
+=item $status_code = $client->readIsAbstractAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $boolean) = @_ }
+
+=back
+
+=item $status_code = $client->readMinimumSamplingIntervalAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $double) = @_ }
+
+=back
+
+=item $status_code = $client->readNodeClassAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $nodeClass) = @_ }
+
+=back
+
+=item $status_code = $client->readNodeIdAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, \%nodeId) = @_ }
+
+=back
+
+=item $status_code = $client->readSymmetricAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $boolean) = @_ }
+
+=back
+
+=item $status_code = $client->readUserAccessLevelAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $byte) = @_ }
+
+=back
+
+=item $status_code = $client->readUserExecutableAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $boolean) = @_ }
+
+=back
+
+=item $status_code = $client->readUserWriteMaskAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $uint32) = @_ }
+
+=back
+
+=item $status_code = $client->readValueAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, \%variant) = @_ }
+
+=back
+
+=item $status_code = $client->readValueRankAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $int32) = @_ }
+
+=back
+
+=item $status_code = $client->readWriteMaskAttribute_async(\%nodeId, \&callback, \$data, \$reqId)
+
+=over 8
+
+=item $callback = sub { my ($client, $userdata, $requestId, $uint32) = @_ }
+
+=back
+
+=item $status_code = $client->writeAccessLevelAttribute(\%nodeId, $newByte)
+
+=item $status_code = $client->writeBrowseNameAttribute(\%nodeId, \%newQualifiedName)
+
+=item $status_code = $client->writeContainsNoLoopsAttribute(\%nodeId, $outBoolean)
+
+=item $status_code = $client->writeDataTypeAttribute(\%nodeId, $newDataType)
+
+=item $status_code = $client->writeDescriptionAttribute(\%nodeId, \%newLocalizedText)
+
+=item $status_code = $client->writeDisplayNameAttribute(\%nodeId, \%newLocalizedText)
+
+=item $status_code = $client->writeEventNotifierAttribute(\%nodeId, $newByte)
+
+=item $status_code = $client->writeExecutableAttribute(\%nodeId, $newBoolean)
+
+=item $status_code = $client->writeHistorizingAttribute(\%nodeId, $newBoolean)
+
+=item $status_code = $client->writeInverseNameAttribute(\%nodeId, \%newLocalizedText)
+
+=item $status_code = $client->writeIsAbstractAttribute(\%nodeId, $newBoolean)
+
+=item $status_code = $client->writeMinimumSamplingIntervalAttribute(\%nodeId, $newDouble)
+
+=item $status_code = $client->writeNodeClassAttribute(\%nodeId, $newNodeClass)
+
+=item $status_code = $client->writeNodeIdAttribute(\%nodeId, \%newNodeId)
+
+=item $status_code = $client->writeSymmetricAttribute(\%nodeId, $newBoolean)
+
+=item $status_code = $client->writeUserAccessLevelAttribute(\%nodeId, $newByte)
+
+=item $status_code = $client->writeUserExecutableAttribute(\%nodeId, $newBoolean)
+
+=item $status_code = $client->writeUserWriteMaskAttribute(\%nodeId, $newUInt32)
+
+=item $status_code = $client->writeValueAttribute(\%nodeId, \%newVariant)
+
+=item $status_code = $client->writeValueRankAttribute(\%nodeId, $newInt32)
+
+=item $status_code = $client->writeWriteMaskAttribute(\%nodeId, $newUInt32)
 
 =back
 

@@ -25,7 +25,7 @@ The C<Test::Text::Sentence> module contains the function split_sentences, which
 splits text into its constituent sentences, based on a fairly approximate
 regex. If you set the locale before calling it, it will deal correctly with
 locale dependant capitalization to identify sentence boundaries. Certain well
-know exceptions, such as abreviations, may cause incorrect segmentations.
+know exceptions, such as abbreviations, may cause incorrect segmentations.
 
 =head1 FUNCTIONS
 

@@ -1,0 +1,198 @@
+<opacRecord>
+  <bibliographicRecord>
+    <record
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+        xmlns="http://www.loc.gov/MARC21/slim">
+    
+      <leader>02150cam a22004211  4500</leader>
+      <controlfield tag="001">253760</controlfield>
+      <controlfield tag="003">OCoLC</controlfield>
+      <controlfield tag="005">20180428064307.1</controlfield>
+      <controlfield tag="008">720301s1961    njum     b   a000 0 eng  </controlfield>
+      <datafield tag="010" ind1=" " ind2=" ">
+        <subfield code="a">61008220</subfield>
+      </datafield>
+      <datafield tag="015" ind1=" " ind2=" ">
+        <subfield code="a">GB6116089</subfield>
+        <subfield code="2">bnb</subfield>
+      </datafield>
+      <datafield tag="016" ind1="7" ind2=" ">
+        <subfield code="a">000365281</subfield>
+        <subfield code="2">Uk</subfield>
+      </datafield>
+      <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="a">(OCoLC)00253760</subfield>
+      </datafield>
+      <datafield tag="040" ind1=" " ind2=" ">
+        <subfield code="a">DLC</subfield>
+        <subfield code="b">eng</subfield>
+        <subfield code="c">DLC</subfield>
+        <subfield code="d">WSU</subfield>
+        <subfield code="d">SER</subfield>
+        <subfield code="d">UKM</subfield>
+        <subfield code="d">NLGGC</subfield>
+        <subfield code="d">STF</subfield>
+        <subfield code="d">TSU</subfield>
+        <subfield code="d">NIALS</subfield>
+        <subfield code="d">UKMGB</subfield>
+        <subfield code="d">EUM</subfield>
+        <subfield code="d">NCA</subfield>
+        <subfield code="d">OCLCQ</subfield>
+        <subfield code="d">OCLCO</subfield>
+        <subfield code="d">OCLCF</subfield>
+        <subfield code="d">IOT</subfield>
+        <subfield code="d">OCLCQ</subfield>
+        <subfield code="d">OCLCO</subfield>
+        <subfield code="d">NLC</subfield>
+        <subfield code="d">DHA</subfield>
+        <subfield code="d">OCLCQ</subfield>
+        <subfield code="d">LUE</subfield>
+        <subfield code="d">OCLCQ</subfield>
+        <subfield code="d">OCLCO</subfield>
+      </datafield>
+      <datafield tag="042" ind1=" " ind2=" ">
+        <subfield code="a">premarc</subfield>
+      </datafield>
+      <datafield tag="049" ind1=" " ind2=" ">
+        <subfield code="a">SCLL</subfield>
+      </datafield>
+      <datafield tag="050" ind1=" " ind2=" ">
+        <subfield code="a">HM15</subfield>
+        <subfield code="b">.B55</subfield>
+      </datafield>
+      <datafield tag="050" ind1="0" ind2="0">
+        <subfield code="a">HM15</subfield>
+        <subfield code="b">.B55</subfield>
+      </datafield>
+      <datafield tag="082" ind1="0" ind2=" ">
+        <subfield code="a">301</subfield>
+      </datafield>
+      <datafield tag="090" ind1=" " ind2=" ">
+        <subfield code="a">HM585</subfield>
+        <subfield code="b">.B55 1961</subfield>
+      </datafield>
+      <datafield tag="100" ind1="1" ind2=" ">
+        <subfield code="a">Black, Max,</subfield>
+        <subfield code="d">1909-1988,</subfield>
+        <subfield code="e">editor.</subfield>
+      </datafield>
+      <datafield tag="245" ind1="1" ind2="4">
+        <subfield code="a">The social theories of Talcott Parsons;</subfield>
+        <subfield code="b">a critical examination.</subfield>
+      </datafield>
+      <datafield tag="260" ind1=" " ind2=" ">
+        <subfield code="a">Englewood Cliffs, N.J.,</subfield>
+        <subfield code="b">Prentice-Hall,</subfield>
+        <subfield code="c">1961.</subfield>
+      </datafield>
+      <datafield tag="300" ind1=" " ind2=" ">
+        <subfield code="a">x, 363 pages</subfield>
+        <subfield code="b">diagrams</subfield>
+        <subfield code="c">22 cm</subfield>
+      </datafield>
+      <datafield tag="336" ind1=" " ind2=" ">
+        <subfield code="a">text</subfield>
+        <subfield code="b">txt</subfield>
+        <subfield code="2">rdacontent</subfield>
+      </datafield>
+      <datafield tag="337" ind1=" " ind2=" ">
+        <subfield code="a">unmediated</subfield>
+        <subfield code="b">n</subfield>
+        <subfield code="2">rdamedia</subfield>
+      </datafield>
+      <datafield tag="338" ind1=" " ind2=" ">
+        <subfield code="a">volume</subfield>
+        <subfield code="b">nc</subfield>
+        <subfield code="2">rdacarrier</subfield>
+      </datafield>
+      <datafield tag="500" ind1=" " ind2=" ">
+        <subfield code="a">Elaborated versions of studies originally prepared for seven public seminars held during the academic year, 1958-59.</subfield>
+      </datafield>
+      <datafield tag="504" ind1=" " ind2=" ">
+        <subfield code="a">Includes bibliographical references.</subfield>
+      </datafield>
+      <datafield tag="505" ind1="0" ind2=" ">
+        <subfield code="a">Parsons' sociological theory / Edward C. Devereux, Jr. -- The Sociological theory of Talcott Parsons / Robin M. Williams, Jr. -- The Functional imperatives / Chandler Morse -- The Parsonian theory of personality / Alfred L. Baldwin -- Parsons' theory of identification / Urie Bronfenbrenner -- Parson's theory of organizations / Henry A. Landsberger -- Parsons' theory appied to organization / William Foote Whyte -- Some questions about Parsons' theories / Max Black -- Sociology and ideology / Andrew Hacker -- The Point of view of the author / Talcott Parsons.</subfield>
+      </datafield>
+      <datafield tag="600" ind1="1" ind2="0">
+        <subfield code="a">Parsons, Talcott,</subfield>
+        <subfield code="d">1902-1979.</subfield>
+      </datafield>
+      <datafield tag="650" ind1=" " ind2="0">
+        <subfield code="a">Sociology.</subfield>
+      </datafield>
+      <datafield tag="776" ind1="0" ind2="8">
+        <subfield code="i">Online version:</subfield>
+        <subfield code="a">Black, Max, 1909-</subfield>
+        <subfield code="t">Social theories of Talcott Parsons.</subfield>
+        <subfield code="d">Englewood Cliffs, N.J., Prentice-Hall, 1961</subfield>
+        <subfield code="w">(OCoLC)613171028</subfield>
+      </datafield>
+      <datafield tag="907" ind1=" " ind2=" ">
+        <subfield code="a">.b11071060</subfield>
+        <subfield code="b">900727</subfield>
+        <subfield code="c">191001</subfield>
+      </datafield>
+      <datafield tag="998" ind1=" " ind2=" ">
+        <subfield code="a">beat</subfield>
+        <subfield code="b">900727</subfield>
+        <subfield code="c">m</subfield>
+        <subfield code="d">a</subfield>
+        <subfield code="e">-</subfield>
+        <subfield code="f">eng</subfield>
+        <subfield code="g">nju</subfield>
+        <subfield code="h">4</subfield>
+      </datafield>
+      <datafield tag="913" ind1=" " ind2=" ">
+        <subfield code="a">-</subfield>
+      </datafield>
+      <datafield tag="994" ind1=" " ind2=" ">
+        <subfield code="a">92</subfield>
+        <subfield code="b">SCL</subfield>
+      </datafield>
+      <datafield tag="945" ind1=" " ind2=" ">
+        <subfield code="g">1</subfield>
+        <subfield code="i">0114401072667</subfield>
+        <subfield code="j">0</subfield>
+        <subfield code="l">beat </subfield>
+        <subfield code="o">-</subfield>
+        <subfield code="p">$0.00</subfield>
+        <subfield code="s">-</subfield>
+        <subfield code="t">0</subfield>
+        <subfield code="u">3</subfield>
+        <subfield code="v">0</subfield>
+        <subfield code="w">0</subfield>
+        <subfield code="x">0</subfield>
+        <subfield code="y">.i11072660</subfield>
+        <subfield code="z">900727</subfield>
+      </datafield>
+      <datafield tag="999" ind1="f" ind2="f">
+        <subfield code="i">97279b7c-a41b-11ea-8d99-9ee25e224816</subfield>
+        <subfield code="s">7f9b9cec-a420-11ea-925d-f5e35e224816</subfield>
+      </datafield>
+    </record>
+  </bibliographicRecord>
+  <holdings>
+    <holding>
+      <typeOfRecord>c</typeOfRecord>
+      <encodingLevel>1</encodingLevel>
+      <receiptAcqStatus>1</receiptAcqStatus>
+      <generalRetention> </generalRetention>
+      <completeness>n</completeness>
+      <dateOfReport>   a00</dateOfReport>
+      <nucCode>Simmons University</nucCode>
+      <localLocation>Main Campus</localLocation>
+      <shelvingLocation>Simmons University Library</shelvingLocation>
+      <callNumber>HM585 .B55 1961</callNumber>
+      <circulations>
+        <circulation>
+          <availableNow value="1" />
+          <itemId>i1107266</itemId>
+          <renewable value="" />
+          <onHold value="" />
+        </circulation>
+      </circulations>
+    </holding>
+  </holdings>
+</opacRecord>

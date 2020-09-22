@@ -6,7 +6,7 @@ build_requires:
   Capture::Tiny: '0'
   ExtUtils::CBuilder: '0'
   Test::More: '0.98'
-  perl: '5.008001'
+  perl: '5.008004'
 configure_requires:
   Capture::Tiny: '0'
   ExtUtils::MakeMaker: '7.12'
@@ -14,7 +14,7 @@ configure_requires:
   IPC::Cmd: '0'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,13 +31,13 @@ requires:
   JSON::PP: '0'
   List::Util: '1.45'
   constant: '1.32'
-  perl: '5.008001'
+  perl: '5.008004'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/PerlFFI/FFI-Platypus/issues
   homepage: https://metacpan.org/pod/FFI::Platypus
   repository: git://github.com/PerlFFI/FFI-Platypus.git
-version: '1.31'
+version: '1.32'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'

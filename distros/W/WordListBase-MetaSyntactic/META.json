@@ -30,6 +30,9 @@
       "runtime" : {
          "requires" : {
             "Acme::MetaSyntactic" : "0",
+            "Acme::MetaSyntactic::MultiList" : "0",
+            "WordListRole::WordList" : "0",
+            "parent" : "0",
             "strict" : "0"
          }
       },
@@ -38,7 +41,8 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.98",
+            "warnings" : "0"
          }
       }
    },
@@ -54,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-WordListBase-MetaSyntactic"
       }
    },
-   "version" : "0.005",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -502,14 +506,19 @@
             "version" : "6.012"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Extras",
+            "name" : "lint_prereqs / assume-provided",
+            "version" : "0.03"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Prereqs",
             "config" : {
                "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "develop",
-                  "type" : "recommends"
+                  "phase" : "test",
+                  "type" : "requires"
                }
             },
-            "name" : "DevelopRecommends",
+            "name" : "TestRequires",
             "version" : "6.012"
          },
          {

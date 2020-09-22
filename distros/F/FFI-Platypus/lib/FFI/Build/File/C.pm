@@ -2,7 +2,7 @@ package FFI::Build::File::C;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use base qw( FFI::Build::File::Base );
 use constant default_suffix => '.c';
 use constant default_encoding => ':utf8';
@@ -11,7 +11,7 @@ use File::Path ();
 use FFI::Build::File::Object;
 
 # ABSTRACT: Class to track C source file in FFI::Build
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub accept_suffix
@@ -186,7 +186,7 @@ FFI::Build::File::C - Class to track C source file in FFI::Build
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

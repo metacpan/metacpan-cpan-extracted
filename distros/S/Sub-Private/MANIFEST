@@ -10,3 +10,4 @@ t/pod.t
 examples/Foo.pm
 examples/private-test.pl
 META.yml
+META.json

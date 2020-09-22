@@ -2,11 +2,12 @@ package FFI::Platypus::Declare;
 
 use strict;
 use warnings;
+use 5.008004;
 use Carp ();
 use FFI::Platypus;
 
 # ABSTRACT: Declarative interface to FFI::Platypus
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 our $ffi    = {};
@@ -174,7 +175,7 @@ FFI::Platypus::Declare - Declarative interface to FFI::Platypus
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

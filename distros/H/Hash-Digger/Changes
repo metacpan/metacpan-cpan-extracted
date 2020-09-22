@@ -1,5 +1,12 @@
 Revision history for Hash-Digger
 
+0.0.3    2020-09-17T23:26:02
+         Make it compatible with perl 5.8 (don't use //)
+         perltidy code
+
+0.0.2    2020-09-17T17:08:02
+         Change diggable so that returns Truthy if the last element
+         exists and its value is undef.
+
 0.0.1    2020-09-15T22:29:22
          Initial version.
-

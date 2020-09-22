@@ -1,0 +1,310 @@
+#!/usr/bin/perl -w
+
+# $Id: zSQLgate,v 1.17 2009-03-05 17:51:14 mike Exp $
+
+use Net::Z3950::DBIServer;
+use strict;
+
+# This argument handling is clumsy, but it's hard to do this clearly
+# in a way that doesn't interfere with the YAZ command-line argument
+# parsing.
+my $noop = 0;
+if (@ARGV && $ARGV[0] eq "-n") {
+    shift();
+    $noop = 1;
+}
+
+my $configFile = shift();
+if (!defined $configFile) {
+    print STDERR "Usage: $0 <configFile> [<YAZ-options>]\n";
+    exit 1;
+}
+
+my $handle = new Net::Z3950::DBIServer($configFile, $noop)
+    or die "$0: can't create DBIServer";
+$handle->launch_server("zSQLgate", @ARGV);
+# Yes, that really is it!
+
+
+=head1 NAME
+
+zSQLgate - Generic Z39.50-to-Relational Database gateway server
+
+
+=head1 SYNOPSIS
+
+zSQLgate
+[
+C<-n>
+]
+I<configFile>
+[
+I<YAZ-options>
+...
+]
+
+=head1 DESCRIPTION
+
+C<zSQLgate>
+provides an Z39.50 interface to your relational databases.
+That is, it provides a generic gateway between the Z39.50 Information
+Retrieval protocol and pretty much any relational database you
+care to mention.
+
+Please be aware the C<zSQLgate> is I<not> Free Software (although the
+licence is fairly permissive).  See L<Net::Z3950::DBIServer::LICENCE>
+for details.
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item -n
+
+No-op mode: zSQLgate parses its configuration, accepts queries and
+generates logs, but does not attempt to connect to the back-end
+database or do any searching or retrieval.  This can be useful for
+debugging a configuration that you don't locally have access to the
+back-end database for.  If that sounds to you like a dumb situation to
+be in then I could tell you some scary stories.
+
+=back
+
+
+=head1 DOCUMENTATION ROADMAP
+
+=head2 Configuring and Using zSQLgate
+
+The documents in this section are of general interest to anyone using
+C<zSQLgate>.  Everyone should read the licence; also the introduction,
+to understand what C<zSQLgate> is, and what it can and can't do.  The
+next steps would normally be the installation guide and then the
+tutorial.
+
+=over 4
+
+=item *
+
+L<Net::Z3950::DBIServer::LICENCE>
+- B<READ THIS FIRST>
+
+Z<>
+
+=item *
+
+L<Net::Z3950::DBIServer::Intro>
+
+I<An Introduction to C<zSQLgate>>
+is a gentle walk through what C<zSQLgate> is, why it's useful, who
+might need it, where it's headed and the terms under which it is
+available.
+
+Z<>
+
+=item *
+
+L<Net::Z3950::DBIServer::Install>
+
+I<The C<zSQLgate> Installation Guide>
+provides a certain amount of hand-holding for people trying to install
+C<zSQLgate> and its prerequisites.  It attempts to address some of the
+more common problems that may be encountered.
+
+Z<>
+
+=item *
+
+L<Net::Z3950::DBIServer::Tutorial>
+B<[not finished]>
+
+I<The C<zSQLgate> Tutorial>
+explains, with extensive examples, how to
+build C<zSQLgate> configurations for both simple and complex
+relational databases, conforming to a variety of Z39.50 profiles and
+using a selection of RDBMSs.
+
+Z<>
+
+=back
+
+Those wishing for more technical detail than those documents provide
+should proceed to the invocation manual and the configuration-file
+specification; although for most purposes, the tutorial should provide
+enough information on these subjects.
+
+=over 4
+
+=item *
+
+L<Net::Z3950::DBIServer::Run>
+
+I<Invoking the C<zSQLgate> Server>
+describes in detail the command-line options available for controlling
+the behaviour of the C<zSQLgate> server.
+
+Z<>
+
+=item *
+
+L<Net::Z3950::DBIServer::Spec>
+B<[not finished]>
+
+I<The C<zSQLgate> Configuration File Format>
+is a rigorous and definitive description of the format of the
+configuration files which drive C<zSQLgate>, and the semantics implied
+by the various configuration elements.
+
+Z<>
+
+=back
+
+
+=head2 API Documentation
+
+These documents describe the internal programming interfaces to the
+various modules that make up the guts of C<zSQLgate>.  They are
+probably of interest only to developers wishing to work on C<zSQLgate>
+internals.  (I wrote them primarily for my own benefit.)
+
+=over 4
+
+=item *
+
+L<Net::Z3950::DBIServer>
+is the Perl module which forms the guts of the gateway.
+
+This is the top-level module of C<zSQLgate>: it calls freely into
+those described hereafter.  With the possible exception of the
+C<Exception> module, its unlikely that any of them will have any life
+of their own away from from C<Net::Z3950::DBIServer>.
+
+Z<>
+
+=item *
+
+L<Net::Z3950::DBIServer::Config>
+provides the routine that parses the configuration files which drive
+the C<zSQLgate> server.  It also provides a few trivial access
+functions for elements of the C<Config> structure and its
+sub-structures.  These are not individually documented, as the code is
+utterly trivial.  Really.  Read it, you'll agree.
+
+Z<>
+
+=item *
+
+L<Net::Z3950::DBIServer::ResultSet>
+represents a result set in the process of being evaluated, caching
+some of the records returned from the RDBMS back-end, and discarding
+them when it thinks they've outlived their usefulness.
+
+Z<>
+
+=item *
+
+L<Net::Z3950::DBIServer::GRS1>
+provides a single routine, C<format()>, to build a set of
+fieldname=value pairs into a string containing an GRS1 record.
+
+Z<>
+
+=item *
+
+L<Net::Z3950::DBIServer::XML>
+provides a single routine, C<format()>, to build a set of
+fieldname=value pairs into a string containing an XML record.
+
+Z<>
+
+=item *
+
+L<Net::Z3950::DBIServer::MARC>
+provides a single routine, C<format()>, to build a set of
+fieldname=value pairs into a string containing a MARC record.
+
+Z<>
+
+=item *
+
+L<Net::Z3950::DBIServer::Exception>
+represents a Bib-1 diagnostic to be returned to the client.  They are
+designed to be thrown as exceptions by the low-level code, then picked
+up and transformed into diagnostic structures higher up.
+
+=back
+
+
+=head1 AUTHOR
+
+Mike Taylor E<lt>mike@miketaylor.org.ukE<gt>
+
+First version Saturday 2nd February 2002.
+
+=head1 SEE ALSO
+
+Apart from the documents included in this distribution, which are all
+described above, you may find useful information from the following
+sources:
+
+=over 4
+
+=item *
+
+The C<zSQLgate> web site is at
+http://sql.z3950.org/
+The documents referenced from here are all on that site, so you can
+find them there if for some reason they were not included in your
+C<zSQLgate> distribution.  You can also download newer versions, find
+out about support contracts and the mailing list, etc.
+
+Z<>
+
+=item *
+
+C<Net::Z3950>
+is another Perl module by the same author as this one; but whereas
+C<DBIServer> is for building servers, C<Net::Z3950> is for building
+Z39.50 clients.  It does not share any code with this module, but
+addresses similar issues.  You can download it from CPAN or from its
+own site,
+http://perl.z3950.org/
+
+Z<>
+
+=item *
+
+C<Net::Z3950::SimpleServer>
+is Index Data's fine generic Z39.50 server module.  The C<DBIServer>
+module is built on top of this: it provides code which talks to a
+relational database, and waits for C<SimpleServer> to call it.  If
+you're successfully running C<zSQLgate> then you must already have
+C<SimpleServer> installed, but if not you can find it on CPAN or at
+http://www.indexdata.com/simpleserver/
+
+Z<>
+
+=item *
+
+Index Data's YAZ (Yet Another Z39.50) toolkit forms the basis of the
+SimpleServer module, which is essentially a re-casting of YAZ's
+backend server interface from C into Perl.  YAZ is an excellent piece
+of software, freely available at
+http://www.indexdata.com/yaz/
+
+Z<>
+
+=item *
+
+C<DBI>
+is the DataBase Independent layer for Perl - the standard way of
+accessing pretty much any relational database system you care to
+mention, in a uniform way.  That's what C<zSQLgate>'s callbacks are
+using.  You can find it on CPAN at
+http://www.cpan.org/
+
+Z<>
+
+=back
+
+=cut

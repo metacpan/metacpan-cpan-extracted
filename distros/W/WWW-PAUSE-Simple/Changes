@@ -1,3 +1,16 @@
+0.449   2020-09-21  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix typo in note on only cleaning up dev releases.
+
+
+0.448   2020-09-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Support listing & cleaning up newest dev/nondev releases via the
+	  include_dev, include_nondev arguments.
+
+
 0.447   2020-02-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Produce access log (currently only for upload, delete, undelete).

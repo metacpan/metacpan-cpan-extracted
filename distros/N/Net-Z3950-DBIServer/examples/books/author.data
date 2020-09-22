@@ -1,0 +1,9 @@
+# $Header: /home/mike/cvs/mike/zSQLgate/examples/books/author.data,v 1.2 2008-05-16 15:48:27 mike Exp $
+# Field names
+id, name, country_id
+# Data
+1,Douglas Adams,1
+2,Stephen Notley,3
+3,Dave Barry,2
+4,Bob Bakker,0
+5,Marcel Proust,4

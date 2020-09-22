@@ -1,6 +1,13 @@
 -*- encoding: utf-8; indent-tabs-mode: nil -*-
 Revision history for Perl extension Date::Convert::French_Rev.
 
+0.09  Primidi 1st Vendémiaire CCXXIX, jour du raisin, new year's day (Tuesday 22 September 2020)
+        - fix a few typos in the feasts names (thank you Gérald)
+        - add a few entries in the "SEE ALSO" chapter (thank you Gérald)
+        - tidy up the documentation, for example replacing http:// by https:// whenever possible
+        - start a deprecation process for the %L strftime specifier
+        - check the scripts in the eg subdirectory
+
 0.08  Tridi 23 Thermidor CCXXIII, jour de la lentille (Monday 2015-08-10,
       which, according to the Gregorian calendar, is the 223rd anniversary
       of the storming of the Tuileries palace)
@@ -32,26 +39,26 @@ Revision history for Perl extension Date::Convert::French_Rev.
         called Primidi etc. The bug in the module is fixed.
 
 0.04  Tridi 13 Fructidor CCX, jour de l'épine-vinette (Friday 2002-08-30)
-	- reorganise the directory structure along Matt Sergeant's tips
+        - reorganise the directory structure along Matt Sergeant's tips
         - include the 4000-modulus rule for leap years (according to emacs-21.2)
-        - reorganise the absolute -> FR conversion
-	- rephrase the README file
-	- add the  prerequisite for Date::Convert  in Makefile.PL (the
-	use statement and the @ISA array are not sufficient)
+        - reorganise the absolute → FR conversion
+        - rephrase the README file
+        - add the  prerequisite for Date::Convert  in Makefile.PL (the
+        use statement and the @ISA array are not sufficient)
         - add a few examples in the eg/ subdirectory
-	- fix a few bugs: $_ was squashed by date_string, the month value
-	was not checked
-	- compatibility with diagnostics-1.2
+        - fix a few bugs: $_ was squashed by date_string, the month value
+        was not checked
+        - compatibility with diagnostics-1.2
 
 0.03  Décadi 20 Thermidor CCIX, jour de l'écluse (Tuesday 2001-08-07)
         - rewrite the Changes file, with proper dates
         - it seems that the 4th additional day should rather be "jour
-	de l'opinion"
-	- reformat the code
+        de l'opinion"
+        - reformat the code
 
 0.02  Nonidi 19 Prairial CCIX, jour du tilleul (Thursday 2001-06-07)
         - add the prerequisite for Roman.pm in Makefile.PL
         - extend the "SEE ALSO" section
 
 0.01  Quartidi 4 Prairial CCIX, jour de l'angélique (Wednesday 2001-05-23)
-	- original version; created by h2xs 1.19
+        - original version; created by h2xs 1.19

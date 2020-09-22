@@ -1,10 +1,10 @@
 {
    "abstract" : "A simple-to-use XML module, for parsing and creating XML documents",
    "author" : [
-      "Alexander Karelas <karjala@karjala.org>"
+      "Alexander Karelas <karjala@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -13,10 +13,31 @@
       "version" : "2"
    },
    "name" : "XML-MyXML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
@@ -25,27 +46,24 @@
             "Encode" : "0",
             "Exporter" : "0",
             "Scalar::Util" : "0",
-            "perl" : "5.008",
-            "strict" : "0",
-            "utf8" : "0",
-            "warnings" : "0"
+            "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
             "File::Temp" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.47"
          }
       }
    },
    "provides" : {
       "XML::MyXML" : {
          "file" : "lib/XML/MyXML.pm",
-         "version" : "1.02"
+         "version" : "1.05"
       },
       "XML::MyXML::Object" : {
          "file" : "lib/XML/MyXML.pm",
-         "version" : "1.02"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -55,12 +73,15 @@
       },
       "homepage" : "https://github.com/akarelas/xml-myxml",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/akarelas/xml-myxml.git",
+         "url" : "git://github.com/akarelas/xml-myxml.git",
          "web" : "https://github.com/akarelas/xml-myxml"
       }
    },
-   "version" : "1.02",
-   "x_serialization_backend" : "JSON::XS version 2.34"
+   "version" : "1.05",
+   "x_authority" : "cpan:KARJALA",
+   "x_contributors" : [
+      "Alexander Karelas <alex.karelas@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
 }
-

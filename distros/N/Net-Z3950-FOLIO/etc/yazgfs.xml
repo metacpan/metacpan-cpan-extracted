@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<yazgfs>
+  <listen id="tcp9997">tcp:@:9997</listen>
+  <server id="main" listenref="tcp9997">
+    <retrievalinfo>
+      <retrieval syntax="usmarc" />
+      <retrieval syntax="xml" />
+      <retrieval syntax="opac">
+        <backend syntax="xml" name="opac" />
+      </retrieval>
+    </retrievalinfo>
+  </server>
+</yazgfs>

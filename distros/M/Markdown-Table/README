@@ -1,0 +1,143 @@
+NAME
+
+    Markdown::Table - Create and parse tables in Markdown
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+    To generate a table
+
+        use Markdown::Table;
+    
+        my $table   = Markdown::Table->new;
+        my @columns = qw(Id Name Role);
+        $table->set_cols( @columns );
+    
+        my @data = (
+            [ 1, 'John Smith', 'Testrole' ],
+            [ 2, 'Jane Smith', 'Admin' ],
+        );
+    
+        $table->add_rows( @data );
+    
+        print $table->get_table;
+
+    To get tables from an existing Markdown document
+
+        use Markdown::Table;
+    
+        my $markdown = q~
+        This table shows all employees and their role.
+    
+        | Id | Name | Role |
+        +---+---+---+
+        | 1 | John Smith | Testrole |
+        | 2 | Jane Smith | Admin |
+        ~;
+    
+        my @tables = Markdown::Table->parse(
+            $markdown,
+        );
+    
+        print $tables[0]->get_table;
+
+ATTRIBUTES
+
+    These are read-only attributes
+
+      * cols
+
+      * rows
+
+METHODS
+
+ new
+
+    Create a new object
+
+        use Markdown::Table;
+    
+        my @columns = qw(Id Name Role);
+        my @data = (
+            [ 1, 'John Smith', 'Testrole' ],
+            [ 2, 'Jane Smith', 'Admin' ],
+        );
+    
+    
+        my $table = Markdown::Table->new(
+            cols => \@columns,
+            rows => \@data,
+        );
+    
+        # or
+    
+        my $table = Markdown::Table->new;
+        $table->set_cols( @columns );
+        $table->add_rows( @data );
+
+ set_cols
+
+    Set the columns of the table
+
+        my @columns = qw(Id Name Role);
+        $table->set_cols( @columns );
+
+ add_rows
+
+    Add a row to the table
+
+        my @data = (
+            [ 1, 'John Smith', 'Testrole' ],
+            [ 2, 'Jane Smith', 'Admin' ],
+        );
+        $table->add_rows( @data );
+
+ get_table
+
+    Get the table in markdown format
+
+        my $md_table = $table->get_table
+
+ parse
+
+    Parses the Markdown document and creates a Markdown::Table object for
+    each table found in the document.
+
+        use Markdown::Table;
+    
+        my $markdown = q~
+        This table shows all employees and their role.
+    
+        | Id | Name | Role |
+        +---+---+---+
+        | 1 | John Smith | Testrole |
+        | 2 | Jane Smith | Admin |
+        ~;
+    
+        my @tables = Markdown::Table->parse(
+            $markdown,
+        );
+    
+        print $tables[0]->get_table;
+
+SEE ALSO
+
+    If you just want to generate tables for Markdown documents, you can use
+    Text::ASCIITable. This is the module, Markdown::Table uses for table
+    generation, too.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2020 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

@@ -1,7 +1,9 @@
 package Acme::CPANModules::OneLetter;
 
-our $DATE = '2020-02-18'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-21'; # DATE
+our $DIST = 'Acme-CPANModules-OneLetter'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => 'One-letter CPAN modules',
@@ -9,16 +11,29 @@ our $LIST = {
 
 Just a list of one-letter modules on CPAN.
 
+To produce this list, you can also use <prog:lcpan>:
+
+    % lcpan mods -l -x --or `perl -E'say for "A".."Z","a".."z","_"'`
+
+For CPAN author, What one-letter name can I use that's available? (Requires
+<prog:setop> and <prog:cpanmodules> CLIs.)
+
+    % setop --diff <(perl -E'say for "A".."Z","a".."z","_"') <(cpanmodules ls-entries OneLetter)
+
 _
     entries => [
         {module=>'B'},
+        {module=>'D'},
+        {module=>'H'},
         {module=>'K'},
         {module=>'L'},
         {module=>'M'},
         {module=>'O'},
         {module=>'P'},
+        {module=>'T'},
         {module=>'U'},
         {module=>'V'},
+        {module=>'Z'},
         {module=>'c'},
     ],
 };
@@ -38,19 +53,30 @@ Acme::CPANModules::OneLetter - One-letter CPAN modules
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::OneLetter (from Perl distribution Acme-CPANModules-OneLetter), released on 2020-02-18.
+This document describes version 0.003 of Acme::CPANModules::OneLetter (from Perl distribution Acme-CPANModules-OneLetter), released on 2020-09-21.
 
 =head1 DESCRIPTION
 
-One-letter CPAN modules.
-
 Just a list of one-letter modules on CPAN.
+
+To produce this list, you can also use L<lcpan>:
+
+ % lcpan mods -l -x --or C<perl -E'say for "A".."Z","a".."z","_"'>
+
+For CPAN author, What one-letter name can I use that's available? (Requires
+L<setop> and L<cpanmodules> CLIs.)
+
+ % setop --diff <(perl -E'say for "A".."Z","a".."z","_"') <(cpanmodules ls-entries OneLetter)
 
 =head1 INCLUDED MODULES
 
 =over
 
 =item * L<B>
+
+=item * L<D>
+
+=item * L<H>
 
 =item * L<K>
 
@@ -62,9 +88,13 @@ Just a list of one-letter modules on CPAN.
 
 =item * L<P>
 
+=item * L<T>
+
 =item * L<U>
 
 =item * L<V>
+
+=item * L<Z>
 
 =item * L<c>
 

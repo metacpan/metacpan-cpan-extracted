@@ -33,6 +33,9 @@ sub acquire_read_lock  {
             $self->{dbh} = $session->{args}->{LockHandle};
         }
         else {
+            if (!$session->{args}->{LockDataSource}) {
+                die "LockDataSource not provided for Apache::Session::Lock::MySQL";
+            }
             $self->{dbh} = DBI->connect(
                 $session->{args}->{LockDataSource},
                 $session->{args}->{LockUserName},

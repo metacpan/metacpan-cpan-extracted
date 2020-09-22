@@ -14,7 +14,7 @@ Alien::Build::Plugin::Build - Build Alien::Build plugins
 
 =head1 VERSION
 
-version 2.32
+version 2.33
 
 =head1 SYNOPSIS
 

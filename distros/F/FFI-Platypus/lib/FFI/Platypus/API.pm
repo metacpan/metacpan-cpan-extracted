@@ -2,13 +2,14 @@ package FFI::Platypus::API;
 
 use strict;
 use warnings;
+use 5.008004;
 use FFI::Platypus;
 use base qw( Exporter );
 
 our @EXPORT = grep /^arguments_/, keys %FFI::Platypus::API::;
 
 # ABSTRACT: Platypus arguments and return value API for custom types
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 1;
@@ -25,7 +26,7 @@ FFI::Platypus::API - Platypus arguments and return value API for custom types
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

@@ -23,6 +23,11 @@ my $builder = Module::Build->new(
         'Encode::Locale'    => '1.05'
     },
     add_to_cleanup     => [ 'Term-Scroller-*' ],
+    meta_merge  => {
+        resources => {
+            repository => 'https://github.com/camtauxe/term-scroller.git'
+        }
+    }
 );
 
 $builder->create_build_script();

@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2019 A S Lewis
+# Copyright (C) 2011-2020 A S Lewis
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, either version 3 of the
@@ -463,6 +463,7 @@
             #   parchment object being drawn
             drawRegionmap               => undef,
             drawParchment               => undef,
+            drawScheme                  => undef,
             # $self->drawCycleExitHash contains a list of exits drawn during a single drawing cycle.
             #   Before drawing an exit, we can check whether it has a twin exit (which occupies the
             #   same space) and, if so, we don't need to draw it a second time - thus each exit-twin
@@ -500,6 +501,21 @@
             #   checkeable directions (i.e. when $self->worldModelObj->roomInteriorMode is set to
             #   'checked_count')
             preCountCheckedHash         => {},
+            # When obscured rooms are enabled, exits are only drawn for rooms near the current room,
+            #   or for selected rooms (and selected exits), and for rooms whose rooms flags match
+            #   those in GA::Client->constRoomNoObscuredHash (e.g. 'main_route')
+            # When obscured rooms are enabled, these hashes are emptied and then re-compiled by a
+            #   call to ->doDraw, or (in anticipation of several calls to ->doQuickDraw), by
+            #   ->preparePreDraw or ->redrawRegions
+            # This hash contains any rooms which are due to be drawn, which should not be obscured.
+            #   Hash in the form
+            #       $noObscuredRoomHash{model_number} = undef
+            noObscuredRoomHash          => {},
+            # This hash contains any rooms which have been drawn un-obscured, but which are to be
+            #   drawn re-obscured
+            #   Hash in the form
+            #       $reObscuredRoomHash{model_number} = undef
+            reObscuredRoomHash          => {},
 
             # What happens when the user clicks on the map
             #   'default' - normal operation. Any selected objects are unselected
@@ -854,6 +870,9 @@
             # When dragging an exit bend, the exit drawing mode (corresponds to
             #   GA::Obj::WorldModel->drawExitMode)
             dragExitDrawMode            => undef,
+            # When dragging an exit bend, the draw ornaments flag (corresponds to
+            #   GA:Obj::WorldModel->drawOrnamentsFlag
+            dragExitOrnamentsFlag       => undef,
 
             # IVs used during a selection box operation
             # Flag set to TRUE when a selection box operation starts, but before the box has
@@ -1622,6 +1641,10 @@
         $self->ivEmpty('selectedRoomTagHash');
         $self->ivEmpty('selectedRoomGuildHash');
         $self->ivEmpty('selectedLabelHash');
+
+        # Reset drawing cycle IVs
+        $self->tidyUpDraw();
+        $self->ivEmpty('drawCycleExitHash');
 
         # Reset other IVs to their default values
         $self->reset_freeClickMode();
@@ -3445,7 +3468,56 @@
 
             $subMenu_allExits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_drawOrnaments = Gtk3::CheckMenuItem->new('Draw exit _ornaments');
+            my $item_obscuredExits = Gtk3::CheckMenuItem->new('_Obscure unimportant exits');
+            $item_obscuredExits->set_active($self->worldModelObj->obscuredExitFlag);
+            $item_obscuredExits->signal_connect('toggled' => sub {
+
+                if (! $self->ignoreMenuUpdateFlag) {
+
+                    $self->worldModelObj->toggleFlag(
+                        'obscuredExitFlag',
+                        $item_obscuredExits->get_active(),
+                        TRUE,      # Do call $self->redrawRegions
+                        'obscured_exits',
+                        'icon_obscured_exits',
+                    );
+                }
+            });
+            $subMenu_allExits->append($item_obscuredExits);
+            # (Never desensitised)
+            $self->ivAdd('menuToolItemHash', 'obscured_exits', $item_obscuredExits);
+
+            my $item_autoRedraw = Gtk3::CheckMenuItem->new('_Auto-redraw obscured exits');
+            $item_autoRedraw->set_active($self->worldModelObj->obscuredExitRedrawFlag);
+            $item_autoRedraw->signal_connect('toggled' => sub {
+
+                if (! $self->ignoreMenuUpdateFlag) {
+
+                    $self->worldModelObj->toggleFlag(
+                        'obscuredExitRedrawFlag',
+                        $item_autoRedraw->get_active(),
+                        TRUE,      # Do call $self->redrawRegions
+                        'auto_redraw_obscured',
+                        'icon_auto_redraw_obscured',
+                    );
+                }
+            });
+            $subMenu_allExits->append($item_autoRedraw);
+            # (Never desensitised)
+            $self->ivAdd('menuToolItemHash', 'auto_redraw_obscured', $item_autoRedraw);
+
+            my $item_obscuredExitRadius = Gtk3::MenuItem->new('Set obscure _radius...');
+            $item_obscuredExitRadius->signal_connect('activate' => sub {
+
+                $self->obscuredRadiusCallback();
+            });
+            $subMenu_allExits->append($item_obscuredExitRadius);
+            # (Never desensitised)
+            $self->ivAdd('menuToolItemHash', 'obscured_exit_radius', $item_obscuredExitRadius);
+
+            $subMenu_allExits->append(Gtk3::SeparatorMenuItem->new()); # Separator
+
+            my $item_drawOrnaments = Gtk3::CheckMenuItem->new('Draw exit orna_ments');
             $item_drawOrnaments->set_active($self->worldModelObj->drawOrnamentsFlag);
             $item_drawOrnaments->signal_connect('toggled' => sub {
 
@@ -3532,6 +3604,71 @@
             $subMenu_regionExits->append($item_radio23);
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'region_draw_complex_exits', $item_radio23);
+
+            $subMenu_regionExits->append(Gtk3::SeparatorMenuItem->new());   # Separator
+
+            my $item_obscuredExitsRegion = Gtk3::CheckMenuItem->new('_Obscure unimportant exits');
+            if ($self->currentRegionmap) {
+
+                $item_obscuredExitsRegion->set_active($self->currentRegionmap->obscuredExitFlag);
+            }
+            $item_obscuredExitsRegion->signal_connect('toggled' => sub {
+
+                if (! $self->ignoreMenuUpdateFlag) {
+
+                    $self->worldModelObj->toggleObscuredExitFlag($self->currentRegionmap);
+                }
+            });
+            $subMenu_regionExits->append($item_obscuredExitsRegion);
+            # (Never desensitised)
+            $self->ivAdd('menuToolItemHash', 'obscured_exits_region', $item_obscuredExitsRegion);
+
+            my $item_autoRedrawRegion = Gtk3::CheckMenuItem->new('_Auto-redraw obscured exits');
+            if ($self->currentRegionmap) {
+
+                $item_autoRedrawRegion->set_active($self->currentRegionmap->obscuredExitRedrawFlag);
+            }
+            $item_autoRedrawRegion->signal_connect('toggled' => sub {
+
+                if (! $self->ignoreMenuUpdateFlag) {
+
+                    $self->worldModelObj->toggleObscuredExitRedrawFlag($self->currentRegionmap);
+                }
+            });
+            $subMenu_regionExits->append($item_autoRedrawRegion);
+            # (Never desensitised)
+            $self->ivAdd('menuToolItemHash', 'auto_redraw_obscured_region', $item_autoRedrawRegion);
+
+            my $item_obscuredExitRadiusRegion = Gtk3::MenuItem->new('Set obscure _radius...');
+            $item_obscuredExitRadiusRegion->signal_connect('activate' => sub {
+
+                $self->obscuredRadiusCallback($self->currentRegionmap);
+            });
+            $subMenu_regionExits->append($item_obscuredExitRadiusRegion);
+            # (Never desensitised)
+            $self->ivAdd(
+                'menuToolItemHash',
+                'obscured_exit_radius_region',
+                $item_obscuredExitRadiusRegion,
+            );
+
+            $subMenu_regionExits->append(Gtk3::SeparatorMenuItem->new());   # Separator
+
+            my $item_drawOrnamentsRegion = Gtk3::CheckMenuItem->new('Draw exit orna_ments');
+            if ($self->currentRegionmap) {
+
+                $item_drawOrnamentsRegion->set_active($self->currentRegionmap->drawOrnamentsFlag);
+            }
+            $item_drawOrnamentsRegion->signal_connect('toggled' => sub {
+
+                if (! $self->ignoreMenuUpdateFlag) {
+
+                    $self->worldModelObj->toggleDrawOrnamentsFlag($self->currentRegionmap);
+                }
+            });
+            $subMenu_regionExits->append($item_drawOrnamentsRegion);
+            # (Never desensitised)
+            $self->ivAdd('menuToolItemHash', 'draw_ornaments_region', $item_drawOrnamentsRegion);
 
         my $item_regionExits = Gtk3::MenuItem->new('Exits (_current region)');
         $item_regionExits->set_submenu($subMenu_regionExits);
@@ -5446,55 +5583,6 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'edit_regionmap', $item_editRegionmap);
 
-            # 'Recalculate paths' submenu
-            my $subMenu_recalculatePaths = Gtk3::Menu->new();
-
-            my $item_recalculateInCurrentRegion = Gtk3::MenuItem->new('In _current region');
-            $item_recalculateInCurrentRegion->signal_connect('activate' => sub {
-
-                $self->recalculatePathsCallback('current');
-            });
-            $subMenu_recalculatePaths->append($item_recalculateInCurrentRegion);
-            # (Requires $self->currentRegionmap and a non-empty
-            #   self->currentRegionmap->gridRoomHash)
-            $self->ivAdd(
-                'menuToolItemHash',
-                'recalculate_in_region',
-                $item_recalculateInCurrentRegion,
-            );
-
-            my $item_recalculateSelectRegion = Gtk3::MenuItem->new('In _region...');
-            $item_recalculateSelectRegion->signal_connect('activate' => sub {
-
-                $self->recalculatePathsCallback('select');
-            });
-            $subMenu_recalculatePaths->append($item_recalculateSelectRegion);
-
-            my $item_recalculateAllRegions = Gtk3::MenuItem->new('In _all regions');
-            $item_recalculateAllRegions->signal_connect('activate' => sub {
-
-                $self->recalculatePathsCallback('all');
-            });
-            $subMenu_recalculatePaths->append($item_recalculateAllRegions);
-
-            $subMenu_recalculatePaths->append(Gtk3::SeparatorMenuItem->new());    # Separator
-
-            my $item_recalculateFromExit = Gtk3::MenuItem->new('For selected _exit');
-            $item_recalculateFromExit->signal_connect('activate' => sub {
-
-                $self->recalculatePathsCallback('exit');
-            });
-            $subMenu_recalculatePaths->append($item_recalculateFromExit);
-            # (Requires $self->currentRegionmap and a $self->selectedExit which is a super-region
-            #   exit)
-            $self->ivAdd('menuToolItemHash', 'recalculate_from_exit', $item_recalculateFromExit);
-
-        my $item_recalculatePaths = Gtk3::MenuItem->new('Re_calculate region paths');
-        $item_recalculatePaths->set_submenu($subMenu_recalculatePaths);
-        $column_regions->append($item_recalculatePaths);
-        # (Requires $self->currentRegionmap)
-        $self->ivAdd('menuToolItemHash', 'recalculate_paths', $item_recalculatePaths);
-
         $column_regions->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
             # 'Region list' submenu
@@ -5659,35 +5747,156 @@
         $item_preDrawRegion->set_submenu($subMenu_preDrawRegion);
         $column_regions->append($item_preDrawRegion);
 
-            # 'Screenshots' submenu
-            my $subMenu_screenshots = Gtk3::Menu->new();
+        $column_regions->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_visibleScreenshot = Gtk3::MenuItem->new('_Visible map');
-            $item_visibleScreenshot->signal_connect('activate' => sub {
+            # 'Colour schemes' submenu
+            my $subMenu_regionScheme = Gtk3::Menu->new();
 
-                $self->regionScreenshotCallback('visible');
+            my $item_addScheme = Gtk3::MenuItem->new('_Add new colour scheme...');
+            $item_addScheme->signal_connect('activate' => sub {
+
+                $self->addRegionSchemeCallback();
             });
-            $subMenu_screenshots->append($item_visibleScreenshot);
+            $subMenu_regionScheme->append($item_addScheme);
 
-            my $item_occupiedScreenshot = Gtk3::MenuItem->new('_Occupied portion');
-            $item_occupiedScreenshot->signal_connect('activate' => sub {
+            my $item_editScheme = Gtk3::MenuItem->new('_Edit colour scheme...');
+            $item_editScheme->signal_connect('activate' => sub {
 
-                $self->regionScreenshotCallback('occupied');
+                $self->doRegionSchemeCallback('edit');
             });
-            $subMenu_screenshots->append($item_occupiedScreenshot);
+            $subMenu_regionScheme->append($item_editScheme);
 
-            my $item_wholeScreenshot = Gtk3::MenuItem->new('_Whole region');
-            $item_wholeScreenshot->signal_connect('activate' => sub {
+            my $item_renameScheme = Gtk3::MenuItem->new('_Rename colour scheme...');
+            $item_renameScheme->signal_connect('activate' => sub {
 
-                $self->regionScreenshotCallback('whole');
+                $self->doRegionSchemeCallback('rename');
             });
-            $subMenu_screenshots->append($item_wholeScreenshot);
+            $subMenu_regionScheme->append($item_renameScheme);
 
-        my $item_screenshots = Gtk3::MenuItem->new('Take _screenshot');
-        $item_screenshots->set_submenu($subMenu_screenshots);
-        $column_regions->append($item_screenshots);
+            my $item_deleteScheme = Gtk3::MenuItem->new('_Delete colour scheme...');
+            $item_deleteScheme->signal_connect('activate' => sub {
+
+                $self->doRegionSchemeCallback('delete');
+            });
+            $subMenu_regionScheme->append($item_deleteScheme);
+
+            $subMenu_regionScheme->append(Gtk3::SeparatorMenuItem->new());  # Separator
+
+                # 'This region' sub-submenu
+                my $subSubMenu_thisRegionScheme = Gtk3::Menu->new();
+
+                my $item_attachScheme = Gtk3::MenuItem->new('_Attach colour scheme...');
+                $item_attachScheme->signal_connect('activate' => sub {
+
+                    $self->attachRegionSchemeCallback();
+                });
+                $subSubMenu_thisRegionScheme->append($item_attachScheme);
+                # (Requires $self->currentRegionmap and at least one non-default region colour
+                #   schemes)
+                $self->ivAdd('menuToolItemHash', 'attach_region_scheme', $item_attachScheme);
+
+                my $item_detachScheme = Gtk3::MenuItem->new('_Detach colour scheme');
+                $item_detachScheme->signal_connect('activate' => sub {
+
+                    $self->detachRegionSchemeCallback();
+                });
+                $subSubMenu_thisRegionScheme->append($item_detachScheme);
+                # (Requires $self->currentRegionmap with a defined ->regionScheme IV)
+                $self->ivAdd('menuToolItemHash', 'detach_region_scheme', $item_detachScheme);
+
+                $subSubMenu_thisRegionScheme->append(Gtk3::SeparatorMenuItem->new());  # Separator
+
+                my $item_editThisScheme = Gtk3::MenuItem->new('_Edit colour scheme...');
+                $item_editThisScheme->signal_connect('activate' => sub {
+
+                    $self->doRegionSchemeCallback('edit', $self->currentRegionmap);
+                });
+                $subSubMenu_thisRegionScheme->append($item_editThisScheme);
+
+            my $item_thisRegionScheme = Gtk3::MenuItem->new('_Current region');
+            $item_thisRegionScheme->set_submenu($subSubMenu_thisRegionScheme);
+            $subMenu_regionScheme->append($item_thisRegionScheme);
+            # (Requires $self->currentRegionmap)
+            $self->ivAdd('menuToolItemHash', 'this_region_scheme', $item_thisRegionScheme);
+
+        my $item_colourScheme = Gtk3::MenuItem->new('Colour sc_hemes');
+        $item_colourScheme->set_submenu($subMenu_regionScheme);
+        $column_regions->append($item_colourScheme);
+
+            # 'Background colours' submenu
+            my $subMenu_bgColours = Gtk3::Menu->new();
+
+            my $item_removeBGAll = Gtk3::MenuItem->new('_Remove colour...');
+            $item_removeBGAll->signal_connect('activate' => sub {
+
+                $self->removeBGColourCallback();
+            });
+            $subMenu_bgColours->append($item_removeBGAll);
+
+            my $item_removeBGColour = Gtk3::MenuItem->new('Remove _all colours');
+            $item_removeBGColour->signal_connect('activate' => sub {
+
+                $self->removeBGAllCallback();
+            });
+            $subMenu_bgColours->append($item_removeBGColour);
+
+        my $item_bgColours = Gtk3::MenuItem->new('_Background colours');
+        $item_bgColours->set_submenu($subMenu_bgColours);
+        $column_regions->append($item_bgColours);
+        # (Requires $self->currentRegionmap whose ->gridColourBlockHash and/or ->gridColourObjHash
+        #   is not empty)
+        $self->ivAdd('menuToolItemHash', 'empty_bg_colours', $item_bgColours);
+
+        $column_regions->append(Gtk3::SeparatorMenuItem->new());    # Separator
+
+            # 'Recalculate paths' submenu
+            my $subMenu_recalculatePaths = Gtk3::Menu->new();
+
+            my $item_recalculateInCurrentRegion = Gtk3::MenuItem->new('In _current region');
+            $item_recalculateInCurrentRegion->signal_connect('activate' => sub {
+
+                $self->recalculatePathsCallback('current');
+            });
+            $subMenu_recalculatePaths->append($item_recalculateInCurrentRegion);
+            # (Requires $self->currentRegionmap and a non-empty
+            #   self->currentRegionmap->gridRoomHash)
+            $self->ivAdd(
+                'menuToolItemHash',
+                'recalculate_in_region',
+                $item_recalculateInCurrentRegion,
+            );
+
+            my $item_recalculateSelectRegion = Gtk3::MenuItem->new('In _region...');
+            $item_recalculateSelectRegion->signal_connect('activate' => sub {
+
+                $self->recalculatePathsCallback('select');
+            });
+            $subMenu_recalculatePaths->append($item_recalculateSelectRegion);
+
+            my $item_recalculateAllRegions = Gtk3::MenuItem->new('In _all regions');
+            $item_recalculateAllRegions->signal_connect('activate' => sub {
+
+                $self->recalculatePathsCallback('all');
+            });
+            $subMenu_recalculatePaths->append($item_recalculateAllRegions);
+
+            $subMenu_recalculatePaths->append(Gtk3::SeparatorMenuItem->new());    # Separator
+
+            my $item_recalculateFromExit = Gtk3::MenuItem->new('For selected _exit');
+            $item_recalculateFromExit->signal_connect('activate' => sub {
+
+                $self->recalculatePathsCallback('exit');
+            });
+            $subMenu_recalculatePaths->append($item_recalculateFromExit);
+            # (Requires $self->currentRegionmap and a $self->selectedExit which is a super-region
+            #   exit)
+            $self->ivAdd('menuToolItemHash', 'recalculate_from_exit', $item_recalculateFromExit);
+
+        my $item_recalculatePaths = Gtk3::MenuItem->new('Re_calculate region paths');
+        $item_recalculatePaths->set_submenu($subMenu_recalculatePaths);
+        $column_regions->append($item_recalculatePaths);
         # (Requires $self->currentRegionmap)
-        $self->ivAdd('menuToolItemHash', 'screenshots', $item_screenshots);
+        $self->ivAdd('menuToolItemHash', 'recalculate_paths', $item_recalculatePaths);
 
             # 'Locate current room' submenu
             my $subMenu_locateCurrentRoom = Gtk3::Menu->new();
@@ -5721,31 +5930,37 @@
         $item_locateCurrentRoom->set_submenu($subMenu_locateCurrentRoom);
         $column_regions->append($item_locateCurrentRoom);
 
+            # 'Screenshots' submenu
+            my $subMenu_screenshots = Gtk3::Menu->new();
+
+            my $item_visibleScreenshot = Gtk3::MenuItem->new('_Visible map');
+            $item_visibleScreenshot->signal_connect('activate' => sub {
+
+                $self->regionScreenshotCallback('visible');
+            });
+            $subMenu_screenshots->append($item_visibleScreenshot);
+
+            my $item_occupiedScreenshot = Gtk3::MenuItem->new('_Occupied portion');
+            $item_occupiedScreenshot->signal_connect('activate' => sub {
+
+                $self->regionScreenshotCallback('occupied');
+            });
+            $subMenu_screenshots->append($item_occupiedScreenshot);
+
+            my $item_wholeScreenshot = Gtk3::MenuItem->new('_Whole region');
+            $item_wholeScreenshot->signal_connect('activate' => sub {
+
+                $self->regionScreenshotCallback('whole');
+            });
+            $subMenu_screenshots->append($item_wholeScreenshot);
+
+        my $item_screenshots = Gtk3::MenuItem->new('Take _screenshot');
+        $item_screenshots->set_submenu($subMenu_screenshots);
+        $column_regions->append($item_screenshots);
+        # (Requires $self->currentRegionmap)
+        $self->ivAdd('menuToolItemHash', 'screenshots', $item_screenshots);
+
         $column_regions->append(Gtk3::SeparatorMenuItem->new());    # Separator
-
-            # 'Background colours' submenu
-            my $subMenu_bgColours = Gtk3::Menu->new();
-
-            my $item_removeBGAll = Gtk3::MenuItem->new('_Remove colour...');
-            $item_removeBGAll->signal_connect('activate' => sub {
-
-                $self->removeBGColourCallback();
-            });
-            $subMenu_bgColours->append($item_removeBGAll);
-
-            my $item_removeBGColour = Gtk3::MenuItem->new('Remove _all colours');
-            $item_removeBGColour->signal_connect('activate' => sub {
-
-                $self->removeBGAllCallback();
-            });
-            $subMenu_bgColours->append($item_removeBGColour);
-
-        my $item_bgColours = Gtk3::MenuItem->new('_Background colours');
-        $item_bgColours->set_submenu($subMenu_bgColours);
-        $column_regions->append($item_bgColours);
-        # (Requires $self->currentRegionmap whose ->gridColourBlockHash and/or ->gridColourObjHash
-        #   is not empty)
-        $self->ivAdd('menuToolItemHash', 'empty_bg_colours', $item_bgColours);
 
         my $item_emptyRegion = Gtk3::MenuItem->new('E_mpty region');
         $item_emptyRegion->signal_connect('activate' => sub {
@@ -5755,8 +5970,6 @@
         $column_regions->append($item_emptyRegion);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'empty_region', $item_emptyRegion);
-
-        $column_regions->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
         my $item_deleteRegion = Gtk3::ImageMenuItem->new('_Delete region');
         my $img_deleteRegion = Gtk3::Image->new_from_stock('gtk-delete', 'menu');
@@ -7420,7 +7633,7 @@
             });
             $subMenu_exitLengths->append($item_resetLength);
 
-        my $item_exitLengths = Gtk3::MenuItem->new('Exit _lengths...');
+        my $item_exitLengths = Gtk3::MenuItem->new('Exit _lengths');
         $item_exitLengths->set_submenu($subMenu_exitLengths);
         $column_exits->append($item_exitLengths);
         # (Requires $self->currentRegionmap)
@@ -10356,6 +10569,70 @@
         # (Never desensitised)
         $self->ivAdd('menuToolItemHash', 'icon_draw_complex_exits', $radioButton_drawComplexExits);
 
+        # Toggle button for 'obscure unimportant exits'
+        my $toggleButton_obscuredExits = Gtk3::ToggleToolButton->new();
+        $toggleButton_obscuredExits->set_active($self->worldModelObj->obscuredExitFlag);
+        $toggleButton_obscuredExits->set_icon_widget(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_obscured_exits.png'),
+        );
+        $toggleButton_obscuredExits->set_label('Obscure unimportant exits');
+        $toggleButton_obscuredExits->set_tooltip_text('Obscure unimportant exits');
+        $toggleButton_obscuredExits->signal_connect('toggled' => sub {
+
+            if (! $self->ignoreMenuUpdateFlag) {
+
+                $self->worldModelObj->toggleFlag(
+                    'obscuredExitFlag',
+                    $toggleButton_obscuredExits->get_active(),
+                    TRUE,      # Do call $self->redrawRegions
+                    'obscured_exits',
+                    'icon_obscured_exits',
+                );
+            }
+        });
+        push (@buttonList, $toggleButton_obscuredExits);
+        # (Never desensitised)
+        $self->ivAdd('menuToolItemHash', 'icon_obscured_exits', $toggleButton_obscuredExits);
+
+        # Toggle button for 'auto-redraw obscured exits'
+        my $toggleButton_autoRedraw = Gtk3::ToggleToolButton->new();
+        $toggleButton_autoRedraw->set_active($self->worldModelObj->obscuredExitRedrawFlag);
+        $toggleButton_autoRedraw->set_icon_widget(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_auto_redraw.png'),
+        );
+        $toggleButton_autoRedraw->set_label('Auto-redraw obscured exits');
+        $toggleButton_autoRedraw->set_tooltip_text('Auto-redraw obscured exits');
+        $toggleButton_autoRedraw->signal_connect('toggled' => sub {
+
+            if (! $self->ignoreMenuUpdateFlag) {
+
+                $self->worldModelObj->toggleFlag(
+                    'obscuredExitRedrawFlag',
+                    $toggleButton_autoRedraw->get_active(),
+                    TRUE,      # Do call $self->redrawRegions
+                    'auto_redraw_obscured',
+                    'icon_auto_redraw_obscured',
+                );
+            }
+        });
+        push (@buttonList, $toggleButton_autoRedraw);
+        # (Never desensitised)
+        $self->ivAdd('menuToolItemHash', 'icon_auto_redraw_obscured', $toggleButton_autoRedraw);
+
+        # Toolbutton for 'obscure exits in radius'
+        my $toolButton_obscuredRadius = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_obscured_radius.png'),
+            'Obscure exits in radius',
+        );
+        $toolButton_obscuredRadius->set_tooltip_text('Obscure exits in radius');
+        $toolButton_obscuredRadius->signal_connect('clicked' => sub {
+
+            $self->obscuredRadiusCallback();
+        });
+        push (@buttonList, $toolButton_obscuredRadius);
+        # (Never desensitised)
+        $self->ivAdd('menuToolItemHash', 'icon_obscured_radius', $toolButton_obscuredRadius);
+
 #        # Separator
 #        my $separator = Gtk3::SeparatorToolItem->new();
 #        push (@buttonList, $separator);
@@ -10366,18 +10643,34 @@
         }
 
         # Toolbutton for 'horizontal exit length'
-        my $toolButton_exitLengths = Gtk3::ToolButton->new(
-            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_exit_lengths.png'),
+        my $toolButton_horizontalLengths = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR
+                . '/icons/map/icon_horizontal_lengths.png'),
             'Horizontal exit length',
         );
-        $toolButton_exitLengths->set_tooltip_text('Exit lengths');
-        $toolButton_exitLengths->signal_connect('clicked' => sub {
+        $toolButton_horizontalLengths->set_tooltip_text('Horizontal exit length');
+        $toolButton_horizontalLengths->signal_connect('clicked' => sub {
 
             $self->setExitLengthCallback('horizontal');
         });
-        push (@buttonList, $toolButton_exitLengths);
+        push (@buttonList, $toolButton_horizontalLengths);
         # (Requires $self->currentRegionmap)
-        $self->ivAdd('menuToolItemHash', 'icon_exit_lengths', $toolButton_exitLengths);
+        $self->ivAdd('menuToolItemHash', 'icon_horizontal_lengths', $toolButton_horizontalLengths);
+
+        # Toolbutton for 'vertical exit length'
+        my $toolButton_verticalLengths = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR
+                . '/icons/map/icon_vertical_lengths.png'),
+            'Vertical exit length',
+        );
+        $toolButton_verticalLengths->set_tooltip_text('Vertical exit length');
+        $toolButton_verticalLengths->signal_connect('clicked' => sub {
+
+            $self->setExitLengthCallback('vertical');
+        });
+        push (@buttonList, $toolButton_verticalLengths);
+        # (Requires $self->currentRegionmap)
+        $self->ivAdd('menuToolItemHash', 'icon_vertical_lengths', $toolButton_verticalLengths);
 
 #        # Separator
 #        my $separator2 = Gtk3::SeparatorToolItem->new();
@@ -13499,7 +13792,6 @@
             'recalculate_paths',
             'exit_tags',
             'exit_options',
-            'exit_lengths', 'icon_exit_lengths',
             'empty_region',
             'delete_region',
             'add_room',
@@ -13533,6 +13825,8 @@
             'centre_map_sub',
             'move_up_level', 'icon_move_up_level',
             'move_down_level', 'icon_move_down_level',
+            'this_region_scheme',
+            'exit_lengths', 'icon_horizontal_lengths', 'icon_vertical_lengths',
         );
 
         if ($self->currentRegionmap) {
@@ -14352,6 +14646,28 @@
         );
 
         if ($self->worldModelObj->preferBGColourList) {
+            push (@sensitiseList, @list);
+        } else {
+            push (@desensitiseList, @list);
+        }
+
+        # Menu items that require a current regionmap and at least one non-default colour scheme
+        @list = (
+            'attach_region_scheme',
+        );
+
+        if ($self->currentRegionmap && $self->worldModelObj->ivPairs('regionSchemeHash') > 1) {
+            push (@sensitiseList, @list);
+        } else {
+            push (@desensitiseList, @list);
+        }
+
+        # Menu items that require a current regionmap with a non-default region scheme attached
+        @list = (
+            'detach_region_scheme',
+        );
+
+        if ($self->currentRegionmap && defined $self->currentRegionmap->regionScheme) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -15946,7 +16262,7 @@
 
         # Local variables
         my (
-            $mode,
+            $exitMode, $obscuredFlag, $ornamentsFlag,
             @canvasObjList, @fakeRoomList,
         );
 
@@ -15972,12 +16288,26 @@
         $xPos = int($xPos);
         $yPos = int($yPos);
 
-        # For dragged rooms/exits, we need a $mode value the same as would be used during a draw
-        #   cycle
+        # For dragged rooms/exits, we need an $exitMode value the same as would be used during a
+        #   draw cycle
         if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
-            $mode = $self->currentRegionmap->drawExitMode;
+            $exitMode = $self->currentRegionmap->drawExitMode;
         } else {
-            $mode = $self->worldModelObj->drawExitMode;
+            $exitMode = $self->worldModelObj->drawExitMode;
+        }
+
+        # We also need values for $obscuredFlag and $ornamentsFlag, the same as would be used during
+        #   a draw cycle
+        if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+            $obscuredFlag = $self->currentRegionmap->obscuredExitFlag;
+        } else {
+            $obscuredFlag = $self->worldModelObj->obscuredExitFlag;
+        }
+
+        if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+            $ornamentsFlag = $self->currentRegionmap->drawOrnamentsFlag;
+        } else {
+            $ornamentsFlag = $self->worldModelObj->drawOrnamentsFlag;
         }
 
         if ($type eq 'room') {
@@ -16004,7 +16334,12 @@
             #   $self->stopDrag
             $self->ivPoke('drawRegionmap', $self->currentRegionmap);
             $self->ivPoke('drawParchment', $self->currentParchment);
-            $self->prepareDraw($mode);
+            $self->ivPoke(
+                'drawScheme',
+                $self->worldModelObj->getRegionScheme($self->currentRegionmap),
+            );
+
+            $self->prepareDraw($exitMode);
 
             # If multiple rooms/labels are selected, they are all dragged alongside $canvasObj (as
             #   long as they're in the same region as $roomObj)
@@ -16020,7 +16355,7 @@
                     # (NB Calling $self->drawRoom here, instead of calling ->markObjs then ->doDraw
                     #   as usual, is allowed. Because of the TRUE argument, ->drawRoom is expecting
                     #   a call from this function)
-                    $self->drawRoom($roomObj, $mode, TRUE);
+                    $self->drawRoom($roomObj, $exitMode, $obscuredFlag, $ornamentsFlag, TRUE);
 
                     $listRef = $self->currentParchment->getDrawnRoom($roomObj);
                     $thisCanvasObj = $$listRef[0];
@@ -16086,7 +16421,12 @@
             #   $self->stopDrag
             $self->ivPoke('drawRegionmap', $self->currentRegionmap);
             $self->ivPoke('drawParchment', $self->currentParchment);
-            $self->prepareDraw($mode);
+            $self->ivPoke(
+                'drawScheme',
+                $self->worldModelObj->getRegionScheme($self->currentRegionmap),
+            );
+
+            $self->prepareDraw($exitMode);
 
             # See if the click was near a bend
             $bendNum = $self->findExitBend($modelObj, $xPos, $yPos);
@@ -16103,11 +16443,8 @@
                     $modelObj->ivIndex('bendOffsetList', ($bendIndex + 1)),
                 );
 
-                if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
-                    $self->ivPoke('dragExitDrawMode', $self->currentRegionmap->drawExitMode);
-                } else {
-                    $self->ivPoke('dragExitDrawMode', $self->worldModelObj->drawExitMode);
-                }
+                $self->ivPoke('dragExitDrawMode', $exitMode);
+                $self->ivPoke('dragExitOrnamentsFlag', $ornamentsFlag);
 
                 # If there's a twin exit, set IVs for the corresponding bend in the twin
                 if ($twinExitObj) {
@@ -16309,6 +16646,7 @@
                     $self->worldModelObj->ivShow('modelHash', $self->dragModelObj->parent),
                     $self->dragModelObj,
                     $self->dragExitDrawMode,
+                    $self->dragExitOrnamentsFlag,
                     $twinExitObj,
                 );
 
@@ -16643,6 +16981,7 @@
         $self->ivUndef('dragBendTwinInitXPos');
         $self->ivUndef('dragBendTwinInitYPos');
         $self->ivUndef('dragExitDrawMode');
+        $self->ivUndef('dragExitOrnamentsFlag');
 
         # Also reset the drawing cycle IVs set by $self->startDrag
         $self->tidyUpDraw();
@@ -16768,8 +17107,8 @@
                 'width' => $x2 - $x1 + 1,
                 'height' => $y2 - $y1 + 1,
 #                'line-width' => 2,
-                'stroke-color' => $self->worldModelObj->selectBoxColour,
-#                'fill-color' => $self->worldModelObj->selectBoxColour,
+                'stroke-color' => $self->drawScheme->selectBoxColour,
+#                'fill-color' => $self->drawScheme->selectBoxColour,
             );
 
             # Move it above everything else
@@ -17268,8 +17607,8 @@
 
         # Local variables
         my (
-            $level, $coord, $xBlocks1, $yBlocks1, $xBlocks2, $yBlocks2, $mode, $borderX1, $borderY1,
-            $borderX2, $borderY2,
+            $level, $coord, $xBlocks1, $yBlocks1, $xBlocks2, $yBlocks2, $exitMode, $borderX1,
+            $borderY1, $borderX2, $borderY2,
             @selectList,
             %roomHash,
         );
@@ -17293,13 +17632,13 @@
 
         # Get the position of a room's border drawn within its gridblock
         if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
-            $mode = $self->currentRegionmap->drawExitMode;
+            $exitMode = $self->currentRegionmap->drawExitMode;
         } else {
-            $mode = $self->worldModelObj->drawExitMode;
+            $exitMode = $self->worldModelObj->drawExitMode;
         }
 
         # The coordinates of the pixel at the top-left corner of the room box
-        if ($mode eq 'no_exit') {
+        if ($exitMode eq 'no_exit') {
 
             # Draw exit mode 'no_exit': The room takes up the whole gridblock
             $borderX1 = 0;
@@ -20565,6 +20904,305 @@
             # Make sure the current region is highlighted
             $self->treeViewSelectLine($self->currentRegionmap->name);
         }
+
+        return 1;
+    }
+
+    sub addRegionSchemeCallback {
+
+        # Called by $self->enableRegionsColumn
+        # Attach a new region scheme
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments, if the standard callback check fails or if the region
+        #       scheme can't be added
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my $choice;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper(
+                $self->_objClass . '->attachRegionSchemeCallback',
+                @_,
+            );
+        }
+
+        # (No standard callback check)
+
+        # Prompt the user for the name of the new colour scheme
+        $choice = $self->showEntryDialogue(
+            'Add region colour scheme',
+            'Enter a name for the new colour scheme (max 16 chars)',
+            16,              # Maximum characters
+        );
+
+        if (defined $choice) {
+
+            if ($self->worldModelObj->ivExists('regionSchemeHash', $choice)) {
+
+                $self->showMsgDialogue(
+                    'Add region colour scheme',
+                    'error',
+                    'There is already a region colour scheme called \'' . $choice . '\'',
+                    'ok',
+                );
+
+            } else {
+
+                $self->worldModelObj->addRegionScheme($self->session, $choice);
+
+                $self->showMsgDialogue(
+                    'Add region colour scheme',
+                    'info',
+                    'Added the region colour scheme \'' . $choice . '\'',
+                    'ok',
+                );
+
+                return 1;
+            }
+        }
+
+        return undef;
+    }
+
+    sub doRegionSchemeCallback {
+
+        # Called by $self->enableRegionsColumn
+        # Edits, renames or deletes a region scheme
+        #
+        # Expected arguments
+        #   $type           - 'edit' to edit a region scheme, 'rename' to rename it, or 'delete' to
+        #                       delete it
+        # Optional arguments
+        #   $regionmapObj   - If specified, manipulate the region scheme attached to this regionmap.
+        #                       Otherwise, prompt the user for a region scheme
+        #
+        # Return values
+        #   'undef' on improper arguments, if the standard callback check fails or if the region
+        #       scheme can't be manipulated
+        #   1 otherwise
+
+        my ($self, $type, $regionmapObj, $check) = @_;
+
+        # Local variables
+        my (
+            $choice, $choice2,
+            @list, @sortedList,
+        );
+
+        # Check for improper arguments
+        if (
+            ! defined $type || ($type ne 'edit' && $type ne 'rename' && $type ne 'delete')
+            || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper(
+                $self->_objClass . '->doRegionSchemeCallback',
+                @_,
+            );
+        }
+
+        # (No standard callback check)
+
+        if (! $regionmapObj) {
+
+            # Prompt the user for an existing colour scheme. Remove 'default' if renaming/deleting
+            foreach my $name ($self->worldModelObj->ivKeys('regionSchemeHash')) {
+
+                if ($type eq 'edit' || $name ne 'default') {
+
+                    push (@list, $name);
+                }
+            }
+
+            @sortedList = sort {lc($a) cmp lc($b)} (@list);
+
+            $choice = $self->showComboDialogue(
+                ucfirst($type) . ' region colour scheme',
+                'Select the colour scheme to ' . $type,
+                \@sortedList,
+            );
+
+        } else {
+
+            if (! defined $regionmapObj->regionScheme) {
+                $choice = 'default';
+            } else {
+                $choice = $regionmapObj->regionScheme;
+            }
+        }
+
+        if (defined $choice) {
+
+            if ($type eq 'edit') {
+
+                # Open up an 'edit' window to edit the object
+                $self->createFreeWin(
+                    'Games::Axmud::EditWin::RegionScheme',
+                    $self,
+                    $self->session,
+                    'Edit region colour scheme \'' . $choice . '\'',
+                    $self->worldModelObj->ivShow('regionSchemeHash', $choice),
+                    FALSE,                          # Not temporary
+                );
+
+                return 1;
+
+            } elsif ($type eq 'rename') {
+
+                # Prompt the user for the new name
+                $choice2 = $self->showEntryDialogue(
+                    'Rename region colour scheme',
+                    'Enter a new name for the colour scheme (max 16 chars)',
+                    16,              # Maximum characters
+                );
+
+                if (
+                    defined $choice2
+                    && $self->worldModelObj->renameRegionScheme($self->session, $choice, $choice2)
+                ) {
+                    $self->showMsgDialogue(
+                        ucfirst($type) . ' region colour scheme',
+                        'info',
+                        'Renamed \'' . $choice . '\' to \'' . $choice2 . '\'',
+                        'ok',
+                    );
+
+                    return 1;
+                }
+
+            } else {
+
+                # Delete the region scheme, and redraw regions in affected automapper windows
+                $self->worldModelObj->deleteRegionScheme(TRUE, $choice);
+
+                $self->showMsgDialogue(
+                    ucfirst($type) . ' region colour scheme',
+                    'info',
+                    'Deleted \'' . $choice . '\'',
+                    'ok',
+                );
+            }
+        }
+
+        return undef;
+    }
+
+    sub attachRegionSchemeCallback {
+
+        # Called by $self->enableRegionsColumn
+        # Attach a region scheme to the current regionmap
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments, if the standard callback check fails or if the region
+        #       scheme can't be attached
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my (
+            $choice,
+            @list, @sortedList,
+        );
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper(
+                $self->_objClass . '->attachRegionSchemeCallback',
+                @_,
+            );
+        }
+
+        # Standard callback check
+        if (! $self->currentRegionmap || $self->worldModelObj->ivPairs('regionSchemeHash') < 2) {
+
+            return undef;
+        }
+
+        # Prompt the user for a colour scheme to attach. Don't show the currently attached colour
+        #   scheme (if any)
+        foreach my $schemeObj ($self->worldModelObj->ivValues('regionSchemeHash')) {
+
+            if (
+                (
+                    ! defined $self->currentRegionmap->regionScheme
+                    && $schemeObj ne $self->worldModelObj->defaultSchemeObj
+                ) || (
+                    defined $self->currentRegionmap->regionScheme
+                    && $self->currentRegionmap->regionScheme ne $schemeObj->name
+                )
+            ) {
+                push (@list, $schemeObj->name);
+            }
+        }
+
+        @sortedList = sort {lc($a) cmp lc($b)} (@list);
+
+        $choice = $self->showComboDialogue(
+            'Attach region colour scheme',
+            'Select the colour scheme to attach to \'' . $self->currentRegionmap->name . '\'',
+            \@sortedList,
+        );
+
+        if ($choice) {
+
+            $self->worldModelObj->attachRegionScheme(
+                TRUE,       # Update automapper windows
+                $choice,
+                $self->currentRegionmap->name,
+            );
+        }
+
+        return 1;
+    }
+
+    sub detachRegionSchemeCallback {
+
+        # Called by $self->enableRegionsColumn
+        # Detaches a region scheme from the current regionmap
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments, if the standard callback check fails or if the region
+        #       scheme can't be detached
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper(
+                $self->_objClass . '->detachRegionSchemeCallback',
+                @_,
+            );
+        }
+
+        # Standard callback check
+        if (! $self->currentRegionmap || ! defined $self->currentRegionmap->regionScheme) {
+
+            return undef;
+        }
+
+        # Detach the region scheme
+        $self->worldModelObj->detachRegionScheme(
+            TRUE,       # Update automapper windows
+            $self->currentRegionmap->name,
+        );
 
         return 1;
     }
@@ -26983,6 +27621,89 @@
         return 1;
     }
 
+    sub obscuredRadiusCallback {
+
+        # Called by $self->enableViewColumn
+        # Sets the radius of the area in which rooms have their exits drawn, when
+        #   GA::Obj::WorldModel->obscuredExitFlag or GA::Obj::Regionmap->obscuredExitFlag is set
+        #   (the current room is at the centre of the area)
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Optional arguments
+        #   $regionmapObj   - If specified, updates the regionmap IV. If not specified, updates the
+        #                       world model IV
+        #
+        # Return values
+        #   'undef' on improper arguments, if the standard callback check fails, if there's an error
+        #       prompting the user to choose an exit or if the user cancels that prompt
+        #   1 otherwise
+
+        my ($self, $regionmapObj, $check) = @_;
+
+        # Local variables
+        my ($title, $msg, $radius);
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper(
+                $self->_objClass . '->obscuredRadiusCallback',
+                @_,
+            );
+        }
+
+        # (No standard callback checks for this function)
+
+        $title = 'Set obscure exit radius';
+
+        $msg = 'Set the size of the unobscured area around the current room (1-'
+            . $self->worldModelObj->maxObscuredExitRadius . ', currently set to ';
+
+        if ($regionmapObj) {
+
+            $title .= ' (' . $regionmapObj->name . ')';
+            $msg .= $regionmapObj->obscuredExitRadius . ')',
+
+        } else {
+
+            $msg .= $self->worldModelObj->obscuredExitRadius . ')',
+        }
+
+        # Prompt the user for a radius
+        $radius = $self->showEntryDialogue($title, $msg);
+
+        if ($radius) {
+
+            # Check that $radius is a valid integer, in the permitted range
+            if (
+                ! ($radius =~ /\D/)
+                && $radius > 1
+                && $radius <= $self->worldModelObj->maxObscuredExitRadius
+            ) {
+                if ($regionmapObj) {
+                    $regionmapObj->ivPoke('obscuredExitRadius', $radius);
+                } else {
+                    $self->worldModelObj->set_obscuredExitRadius($radius);
+                }
+
+            } else {
+
+                # Show an explanatory message
+                $self->showMsgDialogue(
+                    $title,
+                    'error',
+                    'Invalid value for radius - must be an integer between 1 and '
+                    . $self->worldModelObj->maxObscuredExitRadius,
+                    'ok',
+                );
+            }
+        }
+
+        return 1;
+    }
+
     sub hiddenExitCallback {
 
         # Called by $self->enableExitsColumn
@@ -30047,7 +30768,7 @@
                 'Games::Axmud::EditWin::MapLabelStyle',
                 $self,
                 $self->session,
-                'Edit label style \'' . $styleObj->name . '\'',
+                'Edit map label style \'' . $styleObj->name . '\'',
                 $styleObj,
                 FALSE,                  # Not temporary
             );
@@ -30107,7 +30828,7 @@
                 'Games::Axmud::EditWin::MapLabelStyle',
                 $self,
                 $self->session,
-                'Edit label style \'' . $styleObj->name . '\'',
+                'Edit map label style \'' . $styleObj->name . '\'',
                 $styleObj,
                 FALSE,                  # Not temporary
             );
@@ -31672,11 +32393,22 @@
 
             push (@sortedList, sort {$regionHash{$b} <=> $regionHash{$a}} (keys %regionHash));
 
+            # If obscuring exits is enabled, compile a hash of rooms whose exits should be drawn -
+            #   rooms near the current room, selected rooms (and any selected exits), and rooms
+            #   whose room flags match those in GA::Client->constRoomNoObscuredHash (e.g.
+            #   'main_route')
+            # This hash is cummulatively populated by successive calls to ->compileNoObscuredRooms
+            #   below
+            $self->ivEmpty('noObscuredRoomHash');
+            # This hash is intentionally left empty (we don't need to selectively destroy exit
+            #   canvas objects, if the whole region is being redrawn)
+            $self->ivEmpty('reObscuredRoomHash');
+
             # Now set up pre-drawing of all the regions in @sortedList
             foreach my $name (@sortedList) {
 
                 my (
-                    $regionmapObj, $parchmentObj,
+                    $regionmapObj, $parchmentObj, $exitMode, $obscuredFlag,
                     %occupyHash,
                 );
 
@@ -31719,6 +32451,37 @@
 
                     $occupyHash{$mapLabelObj->level} = undef;
                     $parchmentObj->ivAdd('queueLabelHash', $mapLabelObj->number, $mapLabelObj);
+                }
+
+                # Decide how exits are drawn. GA::Obj::WorldModel->drawExitMode is one of the values
+                #   'ask_regionmap', 'no_exit', 'simple_exit' and 'complex_exit'. The regionmap's
+                #   ->drawExitMode is any of these values except 'ask_regionmap'
+                if ($self->drawRegionmap && $self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+                    $exitMode = $self->drawRegionmap->drawExitMode;
+                } else {
+                    $exitMode = $self->worldModelObj->drawExitMode;
+                }
+
+                # Decide whether some exits should be obscured, or not
+                if ($self->drawRegionmap && $self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+                    $obscuredFlag = $self->drawRegionmap->obscuredExitFlag;
+                } else {
+                    $obscuredFlag = $self->worldModelObj->obscuredExitFlag;
+                }
+
+                # Get obscured rooms (if any) for this region, and add them to the main hash. The
+                #   TRUE argument means that rooms will be drawn via calls to ->doQuickDraw
+                $self->compileNoObscuredRooms(
+                    $parchmentObj,
+                    $exitMode,
+                    $obscuredFlag,
+                    FALSE,          # Don't mark previously unobscured rooms to be redrawn
+                    TRUE,           # The caller is this function, not $self->doDraw
+                );
+
+                foreach my $key ($parchmentObj->ivKeys('noObscuredRoomHash')) {
+
+                    $self->ivAdd('noObscuredRoomHash', $key, undef);
                 }
 
                 # Create a canvas widget at level 0, even if there are no rooms/labels at that
@@ -31795,7 +32558,7 @@
         $self->canvasScroller->add($canvasWidget);
 
         # Draw the background canvas object (default colour: white), encompassing the whole map
-        $colour = $self->worldModelObj->noBackgroundColour;
+        $colour = $self->worldModelObj->defaultNoBackgroundColour;
 
         my $canvasObj = GooCanvas2::CanvasRect->new(
             'parent' => $canvasWidget->get_root_item(),
@@ -31844,7 +32607,7 @@
         my ($self, $regionmapObj, $parchmentObj, $level, $check) = @_;
 
         # Local variables
-        my ($canvasWidget, $colour, $levelObj);
+        my ($canvasWidget, $schemeObj, $colour, $levelObj);
 
         # Check for improper arguments
         if (
@@ -31896,7 +32659,8 @@
         });
 
         # Draw the background canvas object (default colour: cream), encompassing the whole map
-        $colour = $self->worldModelObj->backgroundColour;
+        $schemeObj = $self->worldModelObj->getRegionScheme($regionmapObj);
+        $colour = $schemeObj->backgroundColour;
         my $canvasObj = GooCanvas2::CanvasRect->new(
             'parent' => $canvasWidget->get_root_item(),
             x => 0,
@@ -32131,10 +32895,19 @@
             }
         }
 
+        # If obscuring exits is enabled, compile a hash of rooms whose exits should be drawn - rooms
+        #   near the current room, selected rooms (and any selected exits), and rooms whose room
+        #   flags match those in GA::Client->constRoomNoObscuredHash (e.g. 'main_route')
+        # The hash is cummulatively populated by successive calls to ->compileNoObscuredRooms below
+        $self->ivEmpty('noObscuredRoomHash');
+        # This hash is intentionally left empty (we don't need to selectively destroy exit
+        #   canvas objects, if the whole region is being redrawn)
+        $self->ivEmpty('reObscuredRoomHash');
+
         # Deal with each parchment object in turn
         foreach my $thisParchmentObj (@parchmentList) {
 
-            my $thisRegionmapObj;
+            my ($thisRegionmapObj, $exitMode, $obscuredFlag);
 
             # Get the corresponding regionmap object
             $thisRegionmapObj
@@ -32265,6 +33038,37 @@
 
                     $thisParchmentObj->ivAdd('queueLabelHash', $mapLabelObj->number, $mapLabelObj);
                 }
+            }
+
+            # Decide how exits are drawn. GA::Obj::WorldModel->drawExitMode is one of the values
+            #   'ask_regionmap', 'no_exit', 'simple_exit' and 'complex_exit'. The regionmap's
+            #   ->drawExitMode is any of these values except 'ask_regionmap'
+            if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+                $exitMode = $thisRegionmapObj->drawExitMode;
+            } else {
+                $exitMode = $self->worldModelObj->drawExitMode;
+            }
+
+            # Decide whether some exits should be obscured, or not
+            if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+                $obscuredFlag = $thisRegionmapObj->obscuredExitFlag;
+            } else {
+                $obscuredFlag = $self->worldModelObj->obscuredExitFlag;
+            }
+
+            # Get obscured rooms (if any) for this region, and add them to the main hash. The TRUE
+            #   argument means that rooms will be drawn via calls to ->doQuickDraw
+            $self->compileNoObscuredRooms(
+                $thisParchmentObj,
+                $exitMode,
+                $obscuredFlag,
+                FALSE,          # Don't mark previously unobscured rooms to be redrawn
+                TRUE,           # The caller is this function, not $self->doDraw
+            );
+
+            foreach my $key ($thisParchmentObj->ivKeys('noObscuredRoomHash')) {
+
+                $self->ivAdd('noObscuredRoomHash', $key, undef);
             }
 
             # Draw coloured squares and rectangles on the background map
@@ -33199,7 +34003,8 @@
         OUTER: foreach my $parchmentObj (@parchmentList) {
 
             my (
-                $regionmapObj, $roomCount, $exitCount, $index, $mode,
+                $regionmapObj, $roomCount, $exitCount, $index, $exitMode, $obscuredFlag,
+                $redrawFlag, $ornamentsFlag,
                 %markedRoomHash, %markedRoomTagHash, %markedRoomGuildHash, %markedExitHash,
                 %markedExitTagHash, %markedLabelHash,
             );
@@ -33221,6 +34026,48 @@
                     next OUTER;
                 }
             }
+
+            # Decide how exits are drawn. GA::Obj::WorldModel->drawExitMode is one of the values
+            #   'ask_regionmap', 'no_exit', 'simple_exit' and 'complex_exit'. The regionmap's
+            #   ->drawExitMode is any of these values except 'ask_regionmap'
+            if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+                $exitMode = $regionmapObj->drawExitMode;
+            } else {
+                $exitMode = $self->worldModelObj->drawExitMode;
+            }
+
+            # Decide whether some exits should be obscured, or not
+            if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+                $obscuredFlag = $regionmapObj->obscuredExitFlag;
+            } else {
+                $obscuredFlag = $self->worldModelObj->obscuredExitFlag;
+            }
+
+            # Decide whether unobscured rooms should be redrawn without their exits, when they
+            #   are re-obscured (if not, the exits remain visible, which might be what the user
+            #   wants)
+            if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+                $redrawFlag = $regionmapObj->obscuredExitRedrawFlag;
+            } else {
+                $redrawFlag = $self->worldModelObj->obscuredExitRedrawFlag;
+            }
+
+            # Decide whether exit ornaments should be drawn, or not
+            if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+                $ornamentsFlag = $regionmapObj->drawOrnamentsFlag;
+            } else {
+                $ornamentsFlag = $self->worldModelObj->drawOrnamentsFlag;
+            }
+
+            # If obscuring exits is enabled, compile a hash of rooms whose exits should be drawn -
+            #   rooms near the current room, selected rooms (and any selected exits), and rooms
+            #   whose room flags match those in GA::Client->constRoomNoObscuredHash (e.g.
+            #   'main_route')
+            # The TRUE argument means to mark any rooms which were previously unobscured, but which
+            #   are now obscured, to be redrawn
+            $self->compileNoObscuredRooms($parchmentObj, $exitMode, $obscuredFlag, $redrawFlag);
+            $self->ivPoke('noObscuredRoomHash', $parchmentObj->noObscuredRoomHash);
+            $self->ivPoke('reObscuredRoomHash', $parchmentObj->reObscuredRoomHash);
 
             # For speed, import the parchment object's hashes of objects marked to be drawn
             #   drawn
@@ -33268,19 +34115,12 @@
             #   parchment objects being drawn
             $self->ivPoke('drawParchment', $parchmentObj);
             $self->ivPoke('drawRegionmap', $regionmapObj);
-
-            # Decide how exits are drawn. GA::Obj::WorldModel->drawExitMode is one of the values
-            #   'ask_regionmap', 'no_exit', 'simple_exit' and 'complex_exit'. The regionmap's
-            #   ->drawExitMode is any of these values except 'ask_regionmap'
-            if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
-                $mode = $self->drawRegionmap->drawExitMode;
-            } else {
-                $mode = $self->worldModelObj->drawExitMode;
-            }
+            # And also the colours for that regionmap
+            $self->ivPoke('drawScheme', $self->worldModelObj->getRegionScheme($regionmapObj));
 
             # Optimise the drawing process by doing many of the size and position calculations in
             #   advance
-            $self->prepareDraw($mode);
+            $self->prepareDraw($exitMode);
 
             # Now we can do some drawing
 
@@ -33289,7 +34129,7 @@
 
                 my $roomObj = $markedRoomHash{$number};
 
-                $self->drawRoom($roomObj, $mode);
+                $self->drawRoom($roomObj, $exitMode, $obscuredFlag, $ornamentsFlag);
 
                 # We don't need to draw the room tag and room guild (if any) for this room a second
                 #   time, so we can delete the equivalent entries in those hashes
@@ -33311,11 +34151,11 @@
             }
 
             # Draw exits and exit tags (except in mode 'no_exit')
-            if ($mode ne 'no_exit') {
+            if ($exitMode ne 'no_exit') {
 
                 foreach my $exitObj (values %markedExitHash) {
 
-                    $self->drawExit($exitObj, $mode);
+                    $self->drawExit($exitObj, $exitMode, $ornamentsFlag);
                 }
 
                 foreach my $exitObj (values %markedExitTagHash) {
@@ -33370,7 +34210,10 @@
         my ($self, $parchmentObj, $limitFlag, $check) = @_;
 
         # Local variables
-        my ($mode, $checkTime, $stopFlag, $wmObj, $count, $checkCount);
+        my (
+            $exitMode, $obscuredFlag, $ornamentsFlag, $checkTime, $stopFlag, $wmObj, $count,
+            $checkCount,
+        );
 
         # Check for improper arguments
         if (! defined $parchmentObj || defined $check) {
@@ -33406,14 +34249,30 @@
             'drawRegionmap',
             $self->worldModelObj->ivShow('regionmapHash', $parchmentObj->name),
         );
+        # And also the colours for that regionmap
+        $self->ivPoke('drawScheme', $self->worldModelObj->getRegionScheme($self->drawRegionmap));
 
         # Decide how exits are drawn. GA::Obj::WorldModel->drawExitMode is one of the values
         #   'ask_regionmap', 'no_exit', 'simple_exit' and 'complex_exit'. The regionmap's
         #   ->drawExitMode is any of these values except 'ask_regionmap'
         if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
-            $mode = $self->drawRegionmap->drawExitMode;
+            $exitMode = $self->drawRegionmap->drawExitMode;
         } else {
-            $mode = $self->worldModelObj->drawExitMode;
+            $exitMode = $self->worldModelObj->drawExitMode;
+        }
+
+        # Decide whether some exits should be obscured, or not
+        if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+            $obscuredFlag = $self->drawRegionmap->obscuredExitFlag;
+        } else {
+            $obscuredFlag = $self->worldModelObj->obscuredExitFlag;
+        }
+
+        # Decide whether exit ornaments should be drawn, or not
+        if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+            $ornamentsFlag = $self->drawRegionmap->drawOrnamentsFlag;
+        } else {
+            $ornamentsFlag = $self->worldModelObj->drawOrnamentsFlag;
         }
 
         # Set the time at which this function should stop drawing, and return control to the
@@ -33440,7 +34299,7 @@
 
         # Optimise the drawing process by doing many of the size and position calculations in
         #   advance
-        $self->prepareDraw($mode);
+        $self->prepareDraw($exitMode);
 
         # Import the world model object (for speed)
         $wmObj = $self->worldModelObj;
@@ -33474,8 +34333,8 @@
                 # Draw the room echoes (if allowed)
                 if ($wmObj->drawRoomEchoFlag) {
 
-                    $self->drawRoomEcho($roomObj, $mode, 1);
-                    $self->drawRoomEcho($roomObj, $mode, -1);
+                    $self->drawRoomEcho($roomObj, $exitMode, 1);
+                    $self->drawRoomEcho($roomObj, $exitMode, -1);
 
                     $count++;
                 }
@@ -33519,7 +34378,7 @@
 
                 # Draw the room's border and interior
                 $self->drawRoomBox(
-                    $mode,
+                    $exitMode,
                     $roomObj,
                     $self->borderCornerXPosPixels
                         + ($roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels),
@@ -33695,10 +34554,15 @@
 
                 my ($canvasWidget, $xPos, $yPos);
 
-                # (Check the room still exists)
+                # (Check the room still exists, and that it is not obscured, meaning that its exits
+                #   are not drawn)
                 $parchmentObj->ivDelete('queueRoomExitHash', $roomObj->number);
-                if (! $wmObj->ivExists('modelHash', $roomObj->number)) {
-
+                if (
+                    ! $wmObj->ivExists('modelHash', $roomObj->number)
+                    || (
+                        $obscuredFlag && ! $self->ivExists('noObscuredRoomHash', $roomObj->number)
+                    )
+                ) {
                     next OUTER;
                 }
 
@@ -33716,10 +34580,10 @@
                         my $exitObj = $self->worldModelObj->ivShow('exitModelHash', $number);
                         if ($exitObj) {
 
-                            # Draw the exit. In $mode 'no_exit', we only draw exits whose ->mapDir
-                            #   is 'up' or 'down'
+                            # Draw the exit. In $exitMode 'no_exit', we only draw exits whose
+                            #   ->mapDir is 'up' or 'down'
                             if (
-                                $mode ne 'no_exit'
+                                $exitMode ne 'no_exit'
                                 || (
                                     $exitObj->mapDir
                                     && ($exitObj->mapDir eq 'up' || $exitObj->mapDir eq 'down')
@@ -33727,7 +34591,8 @@
                             ) {
                                 $self->drawExit(
                                     $exitObj,
-                                    $mode,
+                                    $exitMode,
+                                    $ornamentsFlag,
                                     $canvasWidget,
                                     $roomObj,
                                 );
@@ -33737,7 +34602,7 @@
                 }
 
                 # Draw checked directions (if allowed)
-                if ($self->worldModelObj->drawCheckedDirsFlag && $mode ne 'no_exit') {
+                if ($self->worldModelObj->drawCheckedDirsFlag && $exitMode ne 'no_exit') {
 
                     my @newObjList;
 
@@ -33836,7 +34701,7 @@
                         if ($exitObj) {
 
                             # Draw the exit tag, if any, but not in mode 'no_exit'
-                            if ($mode ne 'no_exit' && $exitObj->exitTag) {
+                            if ($exitMode ne 'no_exit' && $exitObj->exitTag) {
 
                                 $self->drawExitTag(
                                     $exitObj,
@@ -33966,24 +34831,24 @@
         #   advance
         #
         # Expected arguments
-        #   $mode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #   $exitMode   - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
         #                   $self->drawRegionmap; set to 'no_exit', 'simple_exit' or 'complex_exit'
         #
         # Return values
         #   'undef' on improper arguments
         #   1 otherwise
 
-        my ($self, $mode, $check) = @_;
+        my ($self, $exitMode, $check) = @_;
 
         # Check for improper arguments
-        if (! defined $mode || defined $check) {
+        if (! defined $exitMode || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->prepareDraw', @_);
         }
 
         # Decide on the size of the area in which room interior text is drawn - half the width of a
         #   room, less some extra pixels so the text doesn't touch the edge of the room
-        if ($mode eq 'no_exit') {
+        if ($exitMode eq 'no_exit') {
 
             $self->ivPoke('drawRoomTextWidth', $self->drawRegionmap->blockWidthPixels);
             $self->ivPoke('drawRoomTextHeight', $self->drawRegionmap->blockHeightPixels);
@@ -34005,8 +34870,8 @@
 
         # Work out the position of each kind of exit in the sixteen cardinal directions, as if they
         #   were to be drawn at the top-left gridblock
-        $self->preDrawPositions($mode);
-        $self->preDrawExits($mode);
+        $self->preDrawPositions($exitMode);
+        $self->preDrawExits($exitMode);
 
         # Quickly compile a hash of (custom) primary directions that should be counted, if
         #   $self->worldModelObj->roomInteriorMode is set to 'checked_count'
@@ -34016,10 +34881,230 @@
         return 1;
     }
 
+    sub compileNoObscuredRooms {
+
+        # Called by $self->preparePreDraw, ->redrawRegions and ->doDraw for each parchment object
+        #   (GA::Obj::Parchment) for which canvas objects will be drawn
+        # If obscuring exits is enabled, compile a hash of rooms whose exits should be drawn - rooms
+        #   near the current room, selected rooms (and any selected exits), and rooms whose room
+        #   flags match those in GA::Client->constRoomNoObscuredHash (e.g. 'main_route')
+        # The hash is stored in the specified parchment object's ->noObscuredRoomHash IV, from which
+        #   the calling code can retrieve it
+        #
+        # Optionally compares the new contents of a parchment object's ->noObscuredRoomHash with its
+        #   previous contents (generated by the previous call to this function). Any rooms that were
+        #   added to the hash in the previous call, but not in this call, can be marked to be
+        #   redrawn (e.g. when GA::Obj::WorldModel->obscuredExitRedrawFlag is set)
+        #
+        # Expected arguments
+        #   $parchmentObj       - The GA::Obj::Parchment currently being drawn
+        #   $exitMode           - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #                           $self->drawRegionmap; set to 'no_exit', 'simple_exit' or
+        #                           'complex_exit'
+        #   $obscuredFlag       - Matches the ->obscuredExitFlag IV in GA::Obj::WorldModel or
+        #                           $self->drawRegionmap
+        #   $redrawFlag         - TRUE if items which, at the end of this function are no longer in
+        #                           GA::Obj::Parchment->noObscuredRoomHash should be marked to be
+        #                           redrawn; FALSE otherwise
+        #
+        # Optional arguments
+        #   $quickFlag          - TRUE if drawing is to be done via successive calls to
+        #                           $self->doQuickDraw; FALSE if this function has been called
+        #                           directly by $self->doDraw
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $parchmentObj, $exitMode, $obscuredFlag, $redrawFlag, $quickFlag, $check) = @_;
+
+        # Local variables
+        my (
+            $wmObj, $regionmapObj, $currentRoomObj, $radius,
+            %roomHash, %removedHash,
+        );
+
+        # Check for improper arguments
+        if (
+            ! defined $parchmentObj || ! defined $exitMode || ! defined $obscuredFlag
+            || ! defined $redrawFlag || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->compileNoObscuredRooms', @_);
+        }
+
+        # Import some IVs (for convenience)
+        $wmObj = $self->worldModelObj;
+        $regionmapObj = $wmObj->ivShow('regionmapHash', $parchmentObj->name);
+        $currentRoomObj = $self->mapObj->currentRoom;
+
+        if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+            $radius = $regionmapObj->obscuredExitRadius;
+        } else {
+            $radius = $wmObj->obscuredExitRadius;
+        }
+
+        # If the flag is disabled, or if no exits are being drawn at all, then obscured exits are
+        #   not required
+        if ($obscuredFlag && $exitMode ne 'no_exit') {
+
+            # If there is a current room, and if that room is in the regionmap being drawn by the
+            #   calling function, add it to the hash
+            if ($currentRoomObj && $currentRoomObj->parent == $regionmapObj->number) {
+
+                # If the specified obscuration radius is greater than one, add any rooms near the
+                #   current room (and on the same level), including the current room itself
+                if ($radius > 1) {
+
+                    for (
+                        my $x = ($currentRoomObj->xPosBlocks - $radius + 1);
+                        $x <= ($currentRoomObj->xPosBlocks + $radius - 1);
+                        $x++
+                    ) {
+                        for (
+                            my $y = ($currentRoomObj->yPosBlocks - $radius + 1);
+                            $y <= ($currentRoomObj->yPosBlocks + $radius - 1);
+                            $y++
+                        ) {
+                            my ($key, $otherRoomNum);
+
+                            # The regionmap stores rooms in a hash, using a key in form 'x_y_z'
+                            $key = $x . '_' . $y . '_' . $currentRoomObj->zPosBlocks;
+
+                            if ($regionmapObj->ivExists('gridRoomHash', $key)) {
+
+                                $otherRoomNum = $regionmapObj->ivShow('gridRoomHash', $key);
+                                $roomHash{$otherRoomNum} = undef;
+
+                                # This room should also be marked to be drawn, if it is not already
+                                #   (otherwise, when a new current room is set, exits for the
+                                #   surrounding rooms aren't drawn)
+                                if (! $quickFlag) {
+
+                                    $parchmentObj->ivAdd(
+                                        'markedRoomHash',
+                                        $otherRoomNum,
+                                        $self->worldModelObj->ivShow(
+                                            'modelHash',
+                                            $otherRoomNum,
+                                        ),
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            # Add any selected rooms (and, for any selected exits, the parent rooms)
+            if ($self->selectedRoom) {
+
+                $roomHash{$self->selectedRoom->number} = undef;
+
+            } else {
+
+                foreach my $selectedRoomNum ($self->ivKeys('selectedRoomHash')) {
+
+                    $roomHash{$selectedRoomNum} = undef;
+                }
+            }
+
+            if ($self->selectedExit) {
+
+                $roomHash{$self->selectedExit->parent} = undef;
+
+            } else {
+
+                foreach my $selectedExitObj ($self->ivValues('selectedExitHash')) {
+
+                    $roomHash{$selectedExitObj->parent} = undef;
+                }
+            }
+
+            # Examine rooms that are due to be drawn. Any which have one of the room flags specified
+            #   by GA::Client->constRoomNoObscuredHash can be drawn with its exits
+            if (! $quickFlag) {
+
+                # We only need to check rooms marked to be drawn
+                OUTER: foreach my $otherRoomObj ($parchmentObj->ivValues('markedRoomHash')) {
+
+                    foreach my $roomFlag ($otherRoomObj->ivKeys('roomFlagHash')) {
+
+                        if ($axmud::CLIENT->ivExists('constRoomNoObscuredHash', $roomFlag)) {
+
+                            $roomHash{$otherRoomObj->number} = undef;
+                            next OUTER;
+                        }
+                    }
+                }
+
+            } else {
+
+                # A whole region is marked to be redrawn, so need to check every room inside it
+                OUTER: foreach my $otherRoomNum ($regionmapObj->ivValues('gridRoomHash')) {
+
+                    my $otherRoomObj = $wmObj->ivShow('modelHash', $otherRoomNum);
+
+                    foreach my $roomFlag ($otherRoomObj->ivKeys('roomFlagHash')) {
+
+                        if ($axmud::CLIENT->ivExists('constRoomNoObscuredHash', $roomFlag)) {
+
+                            $roomHash{$otherRoomObj->number} = undef;
+                            next OUTER;
+                        }
+                    }
+                }
+            }
+        }
+
+        # All done. Rooms which were in GA::Obj::Parchment->noObscuredRoomHash, but which are about
+        #   to be removed (because they're not in %roomHash), can be marked to be redrawn without
+        #   exits
+        if ($redrawFlag) {
+
+            OUTER: foreach my $otherRoomNum ($parchmentObj->ivKeys('noObscuredRoomHash')) {
+
+                if (! exists $roomHash{$otherRoomNum}) {
+
+                    my $roomObj = $wmObj->ivShow('modelHash', $otherRoomNum);
+
+                    # Check the room isn't selected, and doesn't have one of the room flags
+                    #   specified by GA::Client->constRoomNoObscuredHash
+                    if (
+                        ($self->selectedRoom && $self->selectedRoom eq $roomObj)
+                        || $self->ivExists('selectedRoomHash', $roomObj->number)
+                    ) {
+                        next OUTER;
+                    }
+
+                    foreach my $key ($roomObj->roomFlagHash) {
+
+                        if ($axmud::CLIENT->ivExists('constRoomNoObscuredHash', $key)) {
+
+                            next OUTER;
+                        }
+                    }
+
+                    # This room can be marked to be redrawn
+                    $parchmentObj->ivAdd('markedRoomHash', $otherRoomNum, $roomObj);
+
+                    # We'll also add this room to an IV, so that the room's exit canvas objects can
+                    #   be destroyed when GA::Win::Map->drawRoom is called
+                    $removedHash{$otherRoomNum} = undef;
+                }
+            }
+        }
+
+        # Now update the IVs, which can be retrieved by the calling code
+        $parchmentObj->ivPoke('noObscuredRoomHash', %roomHash);
+        $parchmentObj->ivPoke('reObscuredRoomHash', %removedHash);
+
+        return 1;
+    }
+
     sub tidyUpDraw {
 
         # Called by $self->doDraw/->doQuickDraw at the end of a drawing cycle (also called, outside
-        #   of a drawing cycle, by $self->stopDrag)
+        #   of a drawing cycle, by $self->stopDrag). Also called by $self->winReset
         # Resets all drawing cycle IVs
         #
         # Expected arguments
@@ -34041,6 +35126,7 @@
 
         $self->ivUndef('drawRegionmap');
         $self->ivUndef('drawParchment');
+        $self->ivUndef('drawScheme');
         $self->ivUndef('drawRoomTextSize');
         $self->ivUndef('drawRoomTextWidth');
         $self->ivUndef('drawRoomTextHeight');
@@ -34072,14 +35158,14 @@
         #   takes to draw objects in the gridblock
         #
         # Expected arguments
-        #   $mode   - Matches the ->drawExitMode IV in GA::Obj::WorldModel or $self->drawRegionmap;
-        #               set to 'no_exit', 'simple_exit' or 'complex_exit'
+        #   $exitMode   - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #                   $self->drawRegionmap; set to 'no_exit', 'simple_exit' or 'complex_exit'
         #
         # Return values
         #   'undef' on improper arguments
         #   1 otherwise
 
-        my ($self, $mode, $check) = @_;
+        my ($self, $exitMode, $check) = @_;
 
         # Local variables
         my (
@@ -34088,7 +35174,7 @@
         );
 
         # Check for improper arguments
-        if (! defined $mode || defined $check) {
+        if (! defined $exitMode || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->preDrawPositions', @_);
         }
@@ -34103,7 +35189,7 @@
         );
 
         # Find the coordinates of the pixel at the top-left corner of the room's border
-        if ($mode eq 'no_exit') {
+        if ($exitMode eq 'no_exit') {
 
             # Draw exit mode 'no_exit': The room takes up the whole gridblock
             ($borderCornerXPosPixels, $borderCornerYPosPixels) = (0, 0);
@@ -34139,14 +35225,14 @@
         #   values as IVs. This cuts down on the time it takes to draw objects in the gridblock
         #
         # Expected arguments
-        #   $mode   - Matches the ->drawExitMode IV in GA::Obj::WorldModel or $self->drawRegionmap;
-        #               set to 'no_exit', 'simple_exit' or 'complex_exit'
+        #   $exitMode   - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #                   $self->drawRegionmap; set to 'no_exit', 'simple_exit' or 'complex_exit'
         #
         # Return values
         #   'undef' on improper arguments
         #   1 otherwise
 
-        my ($self, $mode, $check) = @_;
+        my ($self, $exitMode, $check) = @_;
 
         # Local variables
         my (
@@ -34155,7 +35241,7 @@
         );
 
         # Check for improper arguments
-        if (! defined $mode || defined $check) {
+        if (! defined $exitMode || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->preDrawExits', @_);
         }
@@ -34233,7 +35319,7 @@
                 $self->drawRegionmap,
             );
 
-            if ($mode eq 'complex_exit') {
+            if ($exitMode eq 'complex_exit') {
 
                 # Complex exits - find the coordinates of the pixel near (but not at) the edge of
                 #   the gridblock, which is intersected by the cardinal exit
@@ -34269,7 +35355,7 @@
             ];
         }
 
-        # Pre-draw uncertain exits (drawn the same way, regardless of the value of $mode)
+        # Pre-draw uncertain exits (drawn the same way, regardless of the value of $exitMode)
         foreach my $key (keys %vectorHash) {
 
             my (
@@ -34314,7 +35400,7 @@
         }
 
         # Pre-draw long exits (used by 1-way and 2-way exits; drawn the same way, regardless of the
-        #   value of $mode)
+        #   value of $exitMode)
         foreach my $key (keys %vectorHash) {
 
             my (
@@ -34380,7 +35466,7 @@
         }
 
         # Pre-draw square exits (used by unallocated, impassable, broken and region exits; drawn the
-        #   same way, regardless of the value of $mode)
+        #   same way, regardless of the value of $exitMode)
         foreach my $key (keys %vectorHash) {
 
             my (
@@ -34564,19 +35650,24 @@
         #   ->xPosBlocks, ->yPosBlocks and ->zPosBlocks IVs
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the GA::ModelObj::Room to draw
-        #   $mode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
-        #                   $self->drawRegionmap; set to 'no_exit', 'simple_exit' or 'complex_exit'
+        #   $roomObj        - Blessed reference of the GA::ModelObj::Room to draw
+        #   $exitMode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap; set to 'no_exit', 'simple_exit' or
+        #                       'complex_exit'
+        #   $obscuredFlag   - Matches the ->obscuredExitFlag IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap
+        #   $ornamentsFlag  - Matches the ->drawOrnamentsFlag IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap
         #
         # Optional arguments
-        #   $dragFlag   - Set to TRUE when called by $self->startDrag in which case we don't draw
-        #                   extra markings like interior text or an emphasised border
+        #   $dragFlag       - Set to TRUE when called by $self->startDrag in which case we don't
+        #                       draw extra markings like interior text or an emphasised border
         #
         # Return values
         #   'undef' on improper arguments or if the room can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $mode, $dragFlag, $check) = @_;
+        my ($self, $roomObj, $exitMode, $obscuredFlag, $ornamentsFlag, $dragFlag, $check) = @_;
 
         # Local variables
         my (
@@ -34585,8 +35676,10 @@
         );
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $mode || defined $check) {
-
+        if (
+            ! defined $roomObj || ! defined $exitMode || ! defined $obscuredFlag
+            || ! defined $ornamentsFlag || defined $check
+        ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoom', @_);
         }
 
@@ -34617,12 +35710,30 @@
         $self->deleteCanvasObj('room', $roomObj, $self->drawRegionmap, $self->drawParchment);
         # Also destroy the canvas objects for any checked directions
         $self->deleteCanvasObj('checked_dir', $roomObj, $self->drawRegionmap, $self->drawParchment);
+        # For any rooms that were unobscured, and have been marked to be redrawn because they are
+        #   now re-obscured, we need to destroy the canvas objects for its exits
+        if ($self->ivExists('reObscuredRoomHash', $roomObj->number)) {
+
+           foreach my $number ($roomObj->ivValues('exitNumHash')) {
+
+                my $exitObj = $self->worldModelObj->ivShow('exitModelHash', $number);
+                if ($exitObj) {
+
+                    $self->deleteCanvasObj(
+                        'exit',
+                        $exitObj,
+                        $self->drawRegionmap,
+                        $self->drawParchment,
+                    );
+                }
+           }
+        }
 
         # Draw a room echo on the level immediately below and above the room's level (if allowed)
         if (! $dragFlag && $self->worldModelObj->drawRoomEchoFlag) {
 
-            $self->drawRoomEcho($roomObj, $mode, 1);
-            $self->drawRoomEcho($roomObj, $mode, -1);
+            $self->drawRoomEcho($roomObj, $exitMode, 1);
+            $self->drawRoomEcho($roomObj, $exitMode, -1);
         }
 
         # Get the position of $roomObj's gridblock
@@ -34631,7 +35742,7 @@
 
         # Draw the room's border and interior
         $self->drawRoomBox(
-            $mode,
+            $exitMode,
             $roomObj,
             $self->borderCornerXPosPixels + $xPos,
             $self->borderCornerYPosPixels + $yPos,
@@ -34640,8 +35751,10 @@
         );
 
         # Check each exit, compiling various counts. If we're allowed to, draw the exits, too
-        if ($roomObj->exitNumHash) {
-
+        if (
+            $roomObj->exitNumHash
+            && (! $obscuredFlag || $self->ivExists('noObscuredRoomHash', $roomObj->number))
+        ) {
             $unallocatedCount = 0;
             $unallocatableCount = 0;
             $shadowCount = 0;
@@ -34686,10 +35799,10 @@
                         }
                     }
 
-                    # Draw the exit. In $mode 'no_exit', we only draw exits whose ->mapDir is 'up'
-                    #   or 'down'
+                    # Draw the exit. In $exitMode 'no_exit', we only draw exits whose ->mapDir is
+                    #   'up' or 'down'
                     if (
-                        $mode ne 'no_exit'
+                        $exitMode ne 'no_exit'
                         || (
                             $exitObj->mapDir
                             && ($exitObj->mapDir eq 'up' || $exitObj->mapDir eq 'down')
@@ -34697,14 +35810,15 @@
                     ) {
                         $self->drawExit(
                             $exitObj,
-                            $mode,
+                            $exitMode,
+                            $ornamentsFlag,
                             $canvasWidget,
                             $roomObj,
                         );
                     }
 
                     # Draw the exit tag, if any, but not in mode 'no_exit'
-                    if ($mode ne 'no_exit' && $exitObj->exitTag) {
+                    if ($exitMode ne 'no_exit' && $exitObj->exitTag) {
 
                         $self->drawExitTag(
                             $exitObj,
@@ -34716,7 +35830,7 @@
             }
 
             # Also draw checked directions, if allowed
-            if ($self->worldModelObj->drawCheckedDirsFlag && $mode ne 'no_exit') {
+            if ($self->worldModelObj->drawCheckedDirsFlag && $exitMode ne 'no_exit') {
 
                 my @newObjList;
 
@@ -34801,9 +35915,11 @@
         #
         # Expected arguments
         #   $exitObj        - Blessed reference of the GA::Obj::Exit to draw
-        #   $mode           - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #   $exitMode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
         #                       $self->drawRegionmap; set to 'no_exit', 'simple_exit' or
         #                       'complex_exit'
+        #   $ornamentsFlag  - Matches the ->drawOrnamentsFlag IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap
         #
         # Optional arguments
         #   $canvasWidget, $roomObj
@@ -34815,14 +35931,15 @@
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $exitObj, $mode, $canvasWidget, $roomObj, $check) = @_;
+        my ($self, $exitObj, $exitMode, $ornamentsFlag, $canvasWidget, $roomObj, $check) = @_;
 
         # Local variables
         my $twinExitObj;
 
         # Check for improper arguments
-        if (! defined $exitObj || ! defined $mode || defined $check) {
-
+        if (
+            ! defined $exitObj || ! defined $exitMode || ! defined $ornamentsFlag || defined $check
+        ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawExit', @_);
         }
 
@@ -34897,7 +36014,7 @@
                         || $twinExitObj->exitOrnament eq 'mystery'
                     )
                 )
-            ) && $self->worldModelObj->drawOrnamentsFlag
+            ) && $ornamentsFlag
         ) {
             # It's an impassable or mystery exit. The impassable/mystery ornament and the exit are
             #   drawn together by this one function
@@ -34907,8 +36024,18 @@
 
             # It's a broken exit
             if ($exitObj->bentFlag) {
-                $self->drawBentExit($roomObj, $exitObj, $mode, $twinExitObj, $canvasWidget);
+
+                $self->drawBentExit(
+                    $roomObj,
+                    $exitObj,
+                    $exitMode,
+                    $ornamentsFlag,
+                    $twinExitObj,
+                    $canvasWidget,
+                );
+
             } else {
+
                 $self->drawBrokenExit($roomObj, $exitObj, $canvasWidget);
             }
 
@@ -34929,7 +36056,7 @@
             if ($exitObj->twinExit) {
 
                 # If it's a two-way exit (we can come back in the opposite direction)
-                $self->drawTwoWayExit($roomObj, $exitObj, $canvasWidget, $mode);
+                $self->drawTwoWayExit($roomObj, $exitObj, $exitMode, $ornamentsFlag, $canvasWidget);
 
             } elsif ($exitObj->retraceFlag) {
 
@@ -34939,7 +36066,7 @@
             } elsif ($exitObj->oneWayFlag) {
 
                 # It's a one-way exit
-                $self->drawOneWayExit($roomObj, $exitObj, $canvasWidget);
+                $self->drawOneWayExit($roomObj, $exitObj, $ornamentsFlag, $canvasWidget);
 
             } elsif ($exitObj->randomType ne 'none') {
 
@@ -34950,7 +36077,7 @@
 
                 # It's an uncertain exit - we know we can go 'north' from A to B, but we don't yet
                 #   know if we can go 'south' from B to A
-                $self->drawUncertainExit($roomObj, $exitObj, $canvasWidget);
+                $self->drawUncertainExit($roomObj, $exitObj, $ornamentsFlag, $canvasWidget);
             }
 
         } elsif ($exitObj->randomType ne 'none') {
@@ -34962,7 +36089,7 @@
 
             # We don't know where this exit is going. Draw an incomplete exit (almost to
             #   the edge of the room's gridblock)
-            $self->drawIncompleteExit($roomObj, $exitObj, $canvasWidget);
+            $self->drawIncompleteExit($roomObj, $exitObj, $ornamentsFlag, $canvasWidget);
         }
 
         # Record the fact that we've drawn this exit, so that we don't draw it (or its twin) again
@@ -34989,7 +36116,7 @@
         $self->drawRegionmap->storeExit($exitObj);
 
         # Draw the exit tag, if any, but not in mode 'no_exit'
-        if ($mode ne 'no_exit' && $exitObj->exitTag) {
+        if ($exitMode ne 'no_exit' && $exitObj->exitTag) {
 
             $self->drawExitTag($exitObj, $canvasWidget, $roomObj);
         }
@@ -35394,7 +36521,7 @@
             ($self->selectedLabel && $self->selectedLabel eq $labelObj)
             || $self->ivExists('selectedLabelHash', $labelObj->id)
         ) {
-            $colour = $self->worldModelObj->selectMapLabelColour;
+            $colour = $self->drawScheme->selectMapLabelColour;
         } else {
             $colour = $useObj->textColour;
         }
@@ -35537,7 +36664,7 @@
         #   and an interior (and some graffiti, if this room has been tagged with graffiti)
         #
         # Expected arguments
-        #   $mode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #   $exitMode   - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
         #                   $self->drawRegionmap; set to 'no_exit', 'simple_exit' or 'complex_exit'
         #   $roomObj    - Blessed reference of the GA::ModelObj::Room being drawn
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
@@ -35556,8 +36683,8 @@
         #   1 otherwise
 
         my (
-            $self, $mode, $roomObj, $borderCornerXPosPixels, $borderCornerYPosPixels, $canvasWidget,
-            $dragFlag, $check,
+            $self, $exitMode, $roomObj, $borderCornerXPosPixels, $borderCornerYPosPixels,
+            $canvasWidget, $dragFlag, $check,
         ) = @_;
 
         # Local variables
@@ -35570,7 +36697,7 @@
 
         # Check for improper arguments
         if (
-            ! defined $mode || ! defined $roomObj || ! defined $borderCornerXPosPixels
+            ! defined $exitMode || ! defined $roomObj || ! defined $borderCornerXPosPixels
             || ! defined $borderCornerYPosPixels || defined $check
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoomBox', @_);
@@ -35583,7 +36710,7 @@
         }
 
         # In draw exit mode 'no_exit' (draw no exits), the room takes up the whole gridblock
-        if ($mode eq 'no_exit') {
+        if ($exitMode eq 'no_exit') {
 
             $roomWidth = $self->drawRegionmap->blockWidthPixels;
             $roomHeight = $self->drawRegionmap->blockWidthPixels;
@@ -35605,7 +36732,7 @@
 
             # (Instead of changing the border colour, fill in the room interior)
             $roomColour = $borderColour;
-            $borderColour = $self->worldModelObj->borderColour;
+            $borderColour = $self->drawScheme->borderColour;
 
         } else {
 
@@ -35639,7 +36766,7 @@
         if (! $dragFlag) {
 
             # Grafitti and wilderness markings don't change colour along with the room border
-            $origColour = $self->worldModelObj->borderColour;
+            $origColour = $self->drawScheme->borderColour;
 
             # If the room has been tagged with graffiti, draw a big X
             if ($self->graffitiModeFlag && $self->ivExists('graffitiHash', $roomObj->number)) {
@@ -35708,7 +36835,7 @@
                     if ($self->mapObj->ivNumber('currentMatchList') == 1) {
                         $strokeColour = $origColour;
                     } else {
-                        $strokeColour = $self->worldModelObj->currentBorderColour;
+                        $strokeColour = $self->drawScheme->currentBorderColour;
                     }
 
                     $newObj4 = GooCanvas2::CanvasRect->new(
@@ -35800,7 +36927,7 @@
         my ($self, $roomObj, $check) = @_;
 
         # Local variables
-        my ($canvasWidget, $mode, $roomWidth, $roomHeight, $newObj, $levelObj);
+        my ($canvasWidget, $exitMode, $roomWidth, $roomHeight, $newObj, $levelObj);
 
         # Check for improper arguments
         if (! defined $roomObj || defined $check) {
@@ -35826,13 +36953,13 @@
 
         # Get the draw exit mode in operation, which determines the size of the rooms drawn
         if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
-            $mode = $self->currentRegionmap->drawExitMode;
+            $exitMode = $self->currentRegionmap->drawExitMode;
         } else {
-            $mode = $self->worldModelObj->drawExitMode;
+            $exitMode = $self->worldModelObj->drawExitMode;
         }
 
         # In draw exit mode 'no_exit' (draw no exits), the room takes up the whole gridblock
-        if ($mode eq 'no_exit') {
+        if ($exitMode eq 'no_exit') {
 
             $roomWidth = $self->drawRegionmap->blockWidthPixels;
             $roomHeight = $self->drawRegionmap->blockWidthPixels;
@@ -35856,8 +36983,8 @@
             'width' => $roomWidth - 2,
             'height' => $roomHeight - 2,
 #            'line-width' => 2,
-            'stroke-color' => $self->worldModelObj->borderColour,
-            'fill-color' => $self->worldModelObj->backgroundColour,
+            'stroke-color' => $self->drawScheme->borderColour,
+            'fill-color' => $self->drawScheme->backgroundColour,
         );
 
         # Set the canvas object's position in the canvas drawing stack (using same priority as room
@@ -35943,13 +37070,13 @@
         # Set the colours to use
         if ($echoMode == 1) {
 
-            $outlineColour = $self->worldModelObj->roomAboveColour;
-            $fillColour = $self->worldModelObj->backgroundColour;
+            $outlineColour = $self->drawScheme->roomAboveColour;
+            $fillColour = $self->drawScheme->backgroundColour;
 
         } else {
 
-            $outlineColour = $self->worldModelObj->roomBelowColour;
-            $fillColour = $self->worldModelObj->roomBelowColour;
+            $outlineColour = $self->drawScheme->roomBelowColour;
+            $fillColour = $self->drawScheme->roomBelowColour;
         }
 
         # Draw the room echo
@@ -36423,7 +37550,7 @@
             'use-markup' => TRUE,
             'text' => $markup,
             'width' => -1,
-            'fill-color' => $self->worldModelObj->roomTextColour,
+            'fill-color' => $self->drawScheme->roomTextColour,
         );
 
         # Set the object's position in the canvas drawing stack
@@ -36942,20 +38069,24 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $ornamentsFlag  - Matches the ->drawOrnamentsFlag IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap
         #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
+        my ($self, $roomObj, $exitObj, $ornamentsFlag, $canvasWidget, $check) = @_;
 
         # Local variables
         my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj, $levelObj);
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
-
+        if (
+            ! defined $roomObj || ! defined $exitObj || ! defined $ornamentsFlag
+            || ! defined $canvasWidget || defined $check
+        ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawIncompleteExit', @_);
         }
 
@@ -37012,7 +38143,7 @@
             $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
 
             # Draw ornaments for this exit, if there are any (and if allowed)
-            if ($exitObj->exitOrnament ne 'none' && $self->worldModelObj->drawOrnamentsFlag) {
+            if ($exitObj->exitOrnament ne 'none' && $ornamentsFlag) {
 
                 $self->drawExitOrnaments(
                     $exitObj,
@@ -37041,20 +38172,24 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $ornamentsFlag  - Matches the ->drawOrnamentsFlag IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap
         #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
+        my ($self, $roomObj, $exitObj, $ornamentsFlag, $canvasWidget, $check) = @_;
 
         # Local variables
         my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj, $levelObj);
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
-
+        if (
+            ! defined $roomObj || ! defined $exitObj || ! defined $ornamentsFlag
+            || ! defined $canvasWidget || defined $check
+        ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawUncertainExit', @_);
         }
 
@@ -37111,7 +38246,7 @@
             $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
 
             # Draw ornaments for this exit, if there are any (and if allowed)
-            if ($exitObj->exitOrnament ne 'none' && $self->worldModelObj->drawOrnamentsFlag) {
+            if ($exitObj->exitOrnament ne 'none' && $ornamentsFlag) {
 
                 $self->drawExitOrnaments(
                     $exitObj,
@@ -37138,13 +38273,15 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $ornamentsFlag  - Matches the ->drawOrnamentsFlag IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap
         #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
+        my ($self, $roomObj, $exitObj, $ornamentsFlag, $canvasWidget, $check) = @_;
 
         # Local variables
         my (
@@ -37154,8 +38291,10 @@
         );
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
-
+        if (
+            ! defined $roomObj || ! defined $exitObj || ! defined $ornamentsFlag
+            || ! defined $canvasWidget || defined $check
+        ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawOneWayExit', @_);
         }
 
@@ -37302,7 +38441,7 @@
             $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
 
             # Draw ornaments for this exit and/or the twin exit, if there are any (and if allowed)
-            if ($self->worldModelObj->drawOrnamentsFlag) {
+            if ($ornamentsFlag) {
 
                 if ($exitObj->twinExit) {
 
@@ -37339,15 +38478,17 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
-        #   $mode           - Mathces the ->drawExitMode IV in GA::Obj::WorldModel or
+        #   $exitMode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
         #                       $self->drawRegionmap; set to 'simple_exit' or 'complex_exit'
+        #   $ornamentsFlag  - Matches the ->drawOrnamentsFlag IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $canvasWidget, $mode, $check) = @_;
+        my ($self, $roomObj, $exitObj, $exitMode, $ornamentsFlag, $canvasWidget, $check) = @_;
 
         # Local variables
         my (
@@ -37357,8 +38498,8 @@
 
         # Check for improper arguments
         if (
-            ! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || ! defined $mode
-            || defined $check
+            ! defined $roomObj || ! defined $exitObj || ! defined $exitMode
+            || ! defined $ornamentsFlag || ! defined $canvasWidget || defined $check
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawTwoWayExit', @_);
         }
@@ -37399,7 +38540,7 @@
             $destXPos = $destRoomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
             $destYPos = $destRoomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
-            if ($mode eq 'complex_exit') {
+            if ($exitMode eq 'complex_exit') {
 
                 # (Complex exits) For diagonal two-way exits, we have a small problem
                 # We need to increase the length of each of the two lines by two pixels, to
@@ -37513,7 +38654,7 @@
             }
 
             # Draw ornaments for this exit and/or the twin exit, if there are any (and if allowed)
-            if ($self->worldModelObj->drawOrnamentsFlag) {
+            if ($ornamentsFlag) {
 
                 if ($exitObj->twinExit) {
 
@@ -37850,7 +38991,7 @@
         $posnListRef = $self->ivShow('preDrawnSquareExitHash', $dir);
 
         # Get the colour for checked directions
-        $colour = $self->worldModelObj->checkedDirColour;
+        $colour = $self->drawScheme->checkedDirColour;
 
         # Draw the canvas object
         $newObj = GooCanvas2::CanvasRect->new(
@@ -37890,8 +39031,10 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $mode           - Mathces the ->drawExitMode IV in GA::Obj::WorldModel or
+        #   $exitMode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
         #                       $self->drawRegionmap; set to 'simple_exit' or 'complex_exit'
+        #   $ornamentsFlag  - Matches the ->drawOrnamentsFlag IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap
         #
         # Optional arguments
         #   $twinExitObj    - The exit's twin (if it has one - must be specified, if so; set to
@@ -37902,7 +39045,10 @@
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $mode, $twinExitObj, $canvasWidget, $check) = @_;
+        my (
+            $self, $roomObj, $exitObj, $exitMode, $ornamentsFlag, $twinExitObj, $canvasWidget,
+            $check
+        ) = @_;
 
         # Local variables
         my (
@@ -37913,8 +39059,10 @@
         );
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || ! defined $mode || defined $check) {
-
+        if (
+            ! defined $roomObj || ! defined $exitObj || ! defined $exitMode
+            || ! defined $ornamentsFlag || defined $check
+        ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawBentExit', @_);
         }
 
@@ -37931,12 +39079,12 @@
         $destRoomObj = $self->worldModelObj->ivShow('modelHash', $exitObj->destRoom);
         if ($exitObj->oneWayFlag && $destRoomObj->ivExists('exitNumHash', $exitObj->oneWayDir)) {
 
-            return $self->drawOneWayExit($roomObj, $exitObj, $canvasWidget);
+            return $self->drawOneWayExit($roomObj, $exitObj, $ornamentsFlag, $canvasWidget);
 
         # For uncertain exits, draw the exit as a normal uncertain exit
         } elsif (! $exitObj->oneWayFlag && ! $twinExitObj) {
 
-            return $self->drawUncertainExit($roomObj, $exitObj, $canvasWidget);
+            return $self->drawUncertainExit($roomObj, $exitObj, $ornamentsFlag, $canvasWidget);
         }
 
         # Fetch the equivalent primary direction (the direction in which the exit is drawn on the
@@ -38032,7 +39180,7 @@
                 ($destYPos + $$posnListRef2[1]),
             );
 
-            if ($twinExitObj && $mode eq 'complex_exit') {
+            if ($twinExitObj && $exitMode eq 'complex_exit') {
 
                 # Draw a two-way bent exit in complex exits mode (only)
 
@@ -38247,7 +39395,7 @@
             $self->drawParchment->addDrawnExit($roomObj, $exitObj, \@canvasObjList);
 
             # Draw ornaments for this exit and/or the twin exit, if there are any (and if allowed)
-            if ($self->worldModelObj->drawOrnamentsFlag) {
+            if ($ornamentsFlag) {
 
                 if (
                     $exitObj->exitOrnament ne 'none'
@@ -38335,8 +39483,8 @@
             'parent' => $canvasWidget->get_root_item(),
             'data' => $points,
 #            'line-width' => 2,
-            'stroke-color' => $self->worldModelObj->dragExitColour,
-#            'fill-color' => $self->worldModelObj->dragExitColour,
+            'stroke-color' => $self->drawScheme->dragExitColour,
+#            'fill-color' => $self->drawScheme->dragExitColour,
         );
 
         # Set the object's position in the canvas drawing stack
@@ -38561,7 +39709,7 @@
             $colour = $self->getExitColour($exitObj);
 
             # Some types of random exits are filled in
-            if ($colour ne $self->worldModelObj->exitColour) {
+            if ($colour ne $self->drawScheme->exitColour) {
 
                 # Exit is probably selected; use that colour rather than a random exit colour
                 $outlineColour = $fillColour = $colour;
@@ -38574,19 +39722,19 @@
             } elsif ($exitObj->randomType eq 'any_region') {
 
                 # Default - red circle
-                $outlineColour = $fillColour = $self->worldModelObj->randomExitColour;
+                $outlineColour = $fillColour = $self->drawScheme->randomExitColour;
 
             } elsif ($exitObj->randomType eq 'temp_region') {
 
                 # Default - black circle with transparent centre
                 $outlineColour = $colour;
-                $fillColour = $self->worldModelObj->backgroundColour;
+                $fillColour = $self->drawScheme->backgroundColour;
 
             } else {
 
                 # Default for 'room_list' - red circle with transparent centre
-                $outlineColour = $self->worldModelObj->randomExitColour;
-                $fillColour = $self->worldModelObj->backgroundColour;
+                $outlineColour = $self->drawScheme->randomExitColour;
+                $fillColour = $self->drawScheme->backgroundColour;
             }
 
             # Draw the canvas object
@@ -40170,7 +41318,7 @@
             $axmud::CLIENT->writeImproper($self->_objClass . '->getBorderColour', @_);
 
             # Return the default colour
-            return ($self->worldModelObj->borderColour, 'single');
+            return ($self->worldModelObj->defaultBorderColour, 'single');
         }
 
         # Decide which colour to use
@@ -40180,14 +41328,14 @@
 
                 # Twin paired current room
                 return (
-                    $self->worldModelObj->selectExitTwinColour,
+                    $self->drawScheme->selectExitTwinColour,
                     $self->worldModelObj->currentRoomMode,
                 );
 
             } else {
 
                 # Twin paired (not current) room
-                return ($self->worldModelObj->selectExitTwinColour, 'single');
+                return ($self->drawScheme->selectExitTwinColour, 'single');
             }
 
         } elsif (
@@ -40202,7 +41350,7 @@
             ) {
                 # Last known room is selected
                 return (
-                    $self->worldModelObj->lostSelectBorderColour,
+                    $self->drawScheme->lostSelectBorderColour,
                     $self->worldModelObj->currentRoomMode,
                 );
 
@@ -40210,7 +41358,7 @@
 
                 # Last known room is not selected
                 return (
-                    $self->worldModelObj->lostBorderColour,
+                    $self->drawScheme->lostBorderColour,
                     $self->worldModelObj->currentRoomMode,
                 );
             }
@@ -40227,7 +41375,7 @@
             ) {
                 # Ghost room is selected
                 return (
-                    $self->worldModelObj->ghostSelectBorderColour,
+                    $self->drawScheme->ghostSelectBorderColour,
                     $self->worldModelObj->currentRoomMode,
                 );
 
@@ -40235,7 +41383,7 @@
 
                 # Ghost room is not selected
                 return (
-                    $self->worldModelObj->ghostBorderColour,
+                    $self->drawScheme->ghostBorderColour,
                     $self->worldModelObj->currentRoomMode,
                 );
             }
@@ -40249,14 +41397,14 @@
 
                 # Current and selected room
                 return (
-                    $self->worldModelObj->currentSelectBorderColour,
+                    $self->drawScheme->currentSelectBorderColour,
                     $self->worldModelObj->currentRoomMode,
                 );
 
             } else {
 
                 # Selected (but not current) room
-                return ($self->worldModelObj->selectBorderColour, 'single');
+                return ($self->drawScheme->selectBorderColour, 'single');
             }
 
         } elsif ($self->mapObj->currentRoom && $roomObj eq $self->mapObj->currentRoom) {
@@ -40265,7 +41413,7 @@
 
                 # Current room in 'wait' mode
                 return (
-                    $self->worldModelObj->currentWaitBorderColour,
+                    $self->drawScheme->currentWaitBorderColour,
                     $self->worldModelObj->currentRoomMode,
                 );
 
@@ -40273,7 +41421,7 @@
 
                 # Current room in 'follow' mode
                 return (
-                    $self->worldModelObj->currentFollowBorderColour,
+                    $self->drawScheme->currentFollowBorderColour,
                     $self->worldModelObj->currentRoomMode,
                 );
 
@@ -40281,7 +41429,7 @@
 
                 # Current room in 'update' mode
                 return (
-                    $self->worldModelObj->currentBorderColour,
+                    $self->drawScheme->currentBorderColour,
                     $self->worldModelObj->currentRoomMode,
                 );
             }
@@ -40289,7 +41437,7 @@
         } else {
 
             # Default border colour
-            return ($self->worldModelObj->borderColour, 'single');
+            return ($self->drawScheme->borderColour, 'single');
         }
     }
 
@@ -40318,7 +41466,7 @@
 
             $axmud::CLIENT->writeImproper($self->_objClass . '->getRoomColour', @_);
             # Return the default colour
-            return $self->worldModelObj->roomColour;
+            return $self->worldModelObj->defaultRoomColour;
         }
 
         # Sort the room's room flags by priority
@@ -40355,7 +41503,7 @@
         } else {
 
             # Room has no flags set - use the default colour
-            return $self->worldModelObj->roomColour;
+            return $self->drawScheme->roomColour;
         }
     }
 
@@ -40377,7 +41525,7 @@
 
             $axmud::CLIENT->writeImproper($self->_objClass . '->getRoomTagColour', @_);
             # Return the default colour
-            return $self->worldModelObj->roomTagColour;
+            return $self->worldModelObj->defaultRoomTagColour;
         }
 
         # Decide which colour to use
@@ -40386,12 +41534,12 @@
             || $self->ivExists('selectedRoomTagHash', $roomObj->number)
         ) {
             # Selected room tag
-            return $self->worldModelObj->selectRoomTagColour;
+            return $self->drawScheme->selectRoomTagColour;
 
         } else {
 
             # Default room tag colour
-            return $self->worldModelObj->roomTagColour;
+            return $self->drawScheme->roomTagColour;
         }
     }
 
@@ -40414,7 +41562,7 @@
 
             $axmud::CLIENT->writeImproper($self->_objClass . '->getRoomGuildColour', @_);
             # Return the default colour
-            return $self->worldModelObj->roomGuildColour;
+            return $self->worldModelObj->defaultRoomGuildColour;
         }
 
         # Decide which colour to use
@@ -40423,12 +41571,12 @@
             || $self->ivExists('selectedRoomGuildHash', $roomObj->number)
         ) {
             # Selected room guild
-            return $self->worldModelObj->selectRoomGuildColour;
+            return $self->drawScheme->selectRoomGuildColour;
 
         } else {
 
             # Default room guild colour
-            return $self->worldModelObj->roomGuildColour;
+            return $self->drawScheme->roomGuildColour;
         }
     }
 
@@ -40453,7 +41601,7 @@
 
             $axmud::CLIENT->writeImproper($self->_objClass . '->getExitColour', @_);
             # Return the default colour
-            return $self->worldModelObj->exitColour;
+            return $self->worldModelObj->defaultExitColour;
         }
 
         # Get the exit's twin, if there is one
@@ -40466,7 +41614,7 @@
         if ($self->pairedTwinExit && $exitObj eq $self->pairedTwinExit) {
 
             # Twin paired room
-            return $self->worldModelObj->selectExitTwinColour;
+            return $self->drawScheme->selectExitTwinColour;
 
         } elsif (
             (
@@ -40492,7 +41640,7 @@
             )
         ) {
             # Selected exit (or the exit's twin is selected, so draw it as if it were selected too)
-            return $self->worldModelObj->selectExitColour;
+            return $self->drawScheme->selectExitColour;
 
         } elsif (
             $self->selectedExit && $exitObj ne $self->selectedExit
@@ -40501,20 +41649,20 @@
         ) {
             # $exitObj is a shadow exit of the selected exit. Draw it in a slightly different colour
             #   to a selected exit (default is orange)
-            return $self->worldModelObj->selectExitShadowColour;
+            return $self->drawScheme->selectExitShadowColour;
 
         } elsif ($exitObj->exitOrnament eq 'impass') {
 
-            return $self->worldModelObj->impassableExitColour;
+            return $self->drawScheme->impassableExitColour;
 
         } elsif ($exitObj->exitOrnament eq 'mystery') {
 
-            return $self->worldModelObj->mysteryExitColour;
+            return $self->drawScheme->mysteryExitColour;
 
         } else {
 
             # Default exit colour
-            return $self->worldModelObj->exitColour;
+            return $self->drawScheme->exitColour;
         }
     }
 
@@ -40539,7 +41687,7 @@
 
             $axmud::CLIENT->writeImproper($self->_objClass . '->getExitTagColour', @_);
             # Return the default colour
-            return $self->worldModelObj->exitTagColour;
+            return $self->worldModelObj->defaultExitTagColour;
         }
 
         # Get the exit's twin, if there is one
@@ -40554,12 +41702,12 @@
             || $self->ivExists('selectedExitTagHash', $exitObj->number)
         ) {
             # Selected exit tag
-            return $self->worldModelObj->selectExitTagColour;
+            return $self->drawScheme->selectExitTagColour;
 
         } else {
 
             # Default exit tag colour
-            return $self->worldModelObj->exitTagColour;
+            return $self->drawScheme->exitTagColour;
         }
     }
 
@@ -41711,7 +42859,7 @@
         # Local variables
         my (
             $parentRoomObj, $existDestRoomObj, $xBlocks, $yBlocks, $destRoomNum, $destRoomObj,
-            $mode, $startX, $startY, $stopX, $stopY,
+            $exitMode, $startX, $startY, $stopX, $stopY,
         );
 
         # Check for improper arguments
@@ -41760,13 +42908,13 @@
         # Get the current exit drawing mode. GA::Obj::WorldModel->drawExitMode is one of the values
         #   'ask_regionmap', 'no_exit', 'simple_exit' and 'complex_exit'
         if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
-            $mode = $self->currentRegionmap->drawExitMode;
+            $exitMode = $self->currentRegionmap->drawExitMode;
         } else {
-            $mode = $self->worldModelObj->drawExitMode;
+            $exitMode = $self->worldModelObj->drawExitMode;
         }
 
         # Find the coordinates of the pixel at the top-left corner of the room's border
-        if ($mode eq 'no_exit') {
+        if ($exitMode eq 'no_exit') {
 
             # Draw exit mode 'no_exit': The room takes up the whole gridblock
             ($startX, $startY) = (0, 0);
@@ -41785,7 +42933,7 @@
         }
 
         # Find the coordinates of the pixel at the bottom-right of the room's border
-        if ($mode eq 'no_exit') {
+        if ($exitMode eq 'no_exit') {
 
             # Delete 2 pixels to allow a 1-pixel border on each side of the room box; otherwise,
             #   the room's borders touch and will look like double-width lines
@@ -41861,7 +43009,7 @@
 
         # Local variables
         my (
-            $mapDir, $mode, $roomObj, $xPos, $yPos, $posnListRef, $destRoomObj, $destXPos,
+            $mapDir, $exitMode, $roomObj, $xPos, $yPos, $posnListRef, $destRoomObj, $destXPos,
             $destYPos, $oppDir, $oppPosnListRef, $resultType, $bendSize,
             @emptyList, @returnList, @offsetList,
         );
@@ -41885,9 +43033,9 @@
         #   'ask_regionmap', 'no_exit', 'simple_exit' and 'complex_exit'. The regionmap's
         #   ->drawExitMode is any of those values except 'ask_regionmap'
         if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
-            $mode = $self->currentRegionmap->drawExitMode;
+            $exitMode = $self->currentRegionmap->drawExitMode;
         } else {
-            $mode = $self->worldModelObj->drawExitMode;
+            $exitMode = $self->worldModelObj->drawExitMode;
         }
 
         # Get the exit's parent room
@@ -41897,8 +43045,8 @@
         $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
 
         # Get the coordinates of this exit, if it were drawn as an uncertain exit (to make sure the
-        #   coordinates are correct for this $mode, call ->preDrawExits)
-        $self->preDrawExits($mode);
+        #   coordinates are correct for this $exitMode, call ->preDrawExits)
+        $self->preDrawExits($exitMode);
         $posnListRef = $self->ivShow('preDrawnUncertainExitHash', $mapDir);
 
         push (@returnList,
@@ -44015,7 +45163,7 @@
             # Create a textview using the system's preferred colours and fonts
             $scroller = Gtk3::ScrolledWindow->new(undef, undef);
             $vBox2->pack_start($scroller, FALSE, FALSE, 5);
-            $scroller->set_shadow_type('etched-out');
+            $scroller->set_shadow_type($axmud::CLIENT->constShadowType);
             $scroller->set_policy('automatic', 'automatic');
             $scroller->set_size_request(200, 75);
 
@@ -47121,6 +48269,8 @@
         { $_[0]->{drawRegionmap} }
     sub drawParchment
         { $_[0]->{drawParchment} }
+    sub drawScheme
+        { $_[0]->{drawScheme} }
     sub drawCycleExitHash
         { my $self = shift; return %{$self->{drawCycleExitHash}}; }
     sub drawRoomTextSize
@@ -47153,6 +48303,10 @@
         { my $self = shift; return %{$self->{preDrawnSquareExitHash}}; }
     sub preCountCheckedHash
         { my $self = shift; return %{$self->{preCountCheckedHash}}; }
+    sub noObscuredRoomHash
+        { my $self = shift; return %{$self->{noObscuredRoomHash}}; }
+    sub reObscuredRoomHash
+        { my $self = shift; return %{$self->{reObscuredRoomHash}}; }
 
     sub freeClickMode
         { $_[0]->{freeClickMode} }
@@ -47257,6 +48411,8 @@
         { $_[0]->{dragBendTwinInitYPos} }
     sub dragExitDrawMode
         { $_[0]->{dragExitDrawMode} }
+    sub dragExitOrnamentsFlag
+        { $_[0]->{dragExitOrnamentsFlag} }
 
     sub selectBoxFlag
         { $_[0]->{selectBoxFlag} }

@@ -1,7 +1,7 @@
 requires 'parent', 0;
 requires 'List::Util', '>= 1.29';
-requires 'Tickit', '>= 0.63';
-requires 'Tickit::Widget', 0;
+requires 'Tickit', '>= 0.71';
+requires 'Tickit::Widget', '>= 0.54';
 requires 'Tickit::Widget::Menu', 0;
 requires 'Variable::Disposition', 0;
 requires 'Tickit::WidgetRole::Movable', '>= 0.003';

@@ -1,0 +1,32 @@
+---
+abstract: 'Create and parse tables in Markdown'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires:
+  Pod::Coverage::TrustPod: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Markdown-Table
+provides:
+  Markdown::Table:
+    file: lib/Markdown/Table.pm
+    version: '0.02'
+requires:
+  Moo: '2.0'
+  Text::ASCIITable: '0.22'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/perlservices/Markdown-Table/issues
+  homepage: https://github.com/perlservices/Markdown-Table
+  repository: git://github.com/perlservices/Markdown-Table.git
+version: '0.02'
+x_contributors:
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

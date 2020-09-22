@@ -1,96 +1,99 @@
 Revision history for PGObject-Util-DBAdmin
 
+1.1.0   2020-09-21
+      * Add optional parameter to 'list_dbs' and 'server_version'
+
 1.0.3   2019-09-29
-        Run 'verify_helpers' test only in AUTHOR_TESTING mode as it
+      * Run 'verify_helpers' test only in AUTHOR_TESTING mode as it
         requires the Pg client applications to be installed on testers
         (including cpantesters, which don't all have those)
 
 1.0.2   2019-09-20
-        Fix the MANIFEST listing non-existing files
+      * Fix the MANIFEST listing non-existing files
 
 1.0.1   2019-07-09
-        Fix: the 'verify_helpers' API bleeds output through to the
+      * Fix: the 'verify_helpers' API bleeds output through to the
         STDERR and STDOUT streams.
 
 1.0.0   2019-07-08
-        Extend API with 'verify_helpers' class method to allow users to
+      * Extend API with 'verify_helpers' class method to allow users to
         assert whether the module can successfully run its helpers or not
 
 0.131.0 2019-07-06
-        Sanitize the environment before shelling out to external programs,
+      * Sanitize the environment before shelling out to external programs,
         because (a) that's the secure thing to do and (b) it breaks the
         called programs if the environment contains debugging settings
 
 0.130.1 2018-06-05
-        Correct typos in documentation
+      * Correct typos in documentation
 
 0.130.0 2018-04-21
-        Backups use pg_dump and pg_dumpall `-f` option, not stdout capture
-        Document effect of localizing filehandles on output capture
-        Add `compress` parameter to backup() method
-        Set DB_TESTING=1 to run file tests as they require postgreSQL utilities
-        In Makefile.PL, correctly classify test deps as TEST_REQUIRES
+      * Backups use pg_dump and pg_dumpall `-f` option, not stdout capture
+      * Document effect of localizing filehandles on output capture
+      * Add `compress` parameter to backup() method
+      * Set DB_TESTING=1 to run file tests as they require postgreSQL utilities
+      * In Makefile.PL, correctly classify test deps as TEST_REQUIRES
 
 0.120.0 2018-03-27
-        Documentation fixes
-        Don't use shell to execute external commands, blocks command injection
-        Trap shell errors running external commands
-        Test exit code after running external commands
-        Don't attempt to parse stderr from external commands for errors
-        External command stdout/stderr available via object property
-        Default to temporary directory provided by File::Temp
-        Respect method parameters if defined (previously only if true)
-        Add further tests, including Perl::Critic
-        Create backup output files with umask 0600
-        Delete incomplete backup files after error
-        Raise exceptions with croak/carp rather than die/warn
+      * Documentation fixes
+      * Don't use shell to execute external commands, blocks command injection
+      * Trap shell errors running external commands
+      * Test exit code after running external commands
+      * Don't attempt to parse stderr from external commands for errors
+      * External command stdout/stderr available via object property
+      * Default to temporary directory provided by File::Temp
+      * Respect method parameters if defined (previously only if true)
+      * Add further tests, including Perl::Critic
+      * Create backup output files with umask 0600
+      * Delete incomplete backup files after error
+      * Raise exceptions with croak/carp rather than die/warn
         external psql command now run with `--set=ON_ERROR_STOP=on`
         external pg_restore command now run with `--exit-on-error`
-        Bump minimum perl version to 5.10
+      * Bump minimum perl version to 5.10
 
 0.110.0 2017-11-21
-        Correctly invoke 'pg_dump' (it doesn't recognise a '-d' option)
-        Remove tabs from sources
-        Fix #6: 'host' and 'port' arguments not used in 'connect()'
+      * Correctly invoke 'pg_dump' (it doesn't recognise a '-d' option)
+      * Remove tabs from sources
+      * Fix #6: 'host' and 'port' arguments not used in 'connect()'
 
 0.100.0 2016-12-17
-        Publish 0.10 as 0.100; CPAN considers 0.09 equal to 0.090, which is
+      * Publish 0.10 as 0.100; CPAN considers 0.09 equal to 0.090, which is
         higher than 0.10.0 (which is 0.010_000)
 
 0.10.0  2016-12-17
-        Removed MYMETA.* (rt.cpan.org#109062)
-        Correct spelling errors reported by Robert James Clay (jame@rocasa.us)
-        Correct copyright years (rt.cpan.org#117202 and #10)
+      * Removed MYMETA.* (rt.cpan.org#109062)
+      * Correct spelling errors reported by Robert James Clay (jame@rocasa.us)
+      * Correct copyright years (rt.cpan.org#117202 and #10)
 
 0.09    2016-07-18
-        Fixed handling of &'s in db names
+      * Fixed handling of &'s in db names
 
 0.08    2016-02-11
-        Added ability to pass connection parameters to connect()
+      * Added ability to pass connection parameters to connect()
 
 0.07    2015-07-16
-        Fixed handling of connection when connection fails
+      * Fixed handling of connection when connection fails
 
 0.06    2014-09-18
-        Fixed support for remote hosts.
+      * Fixed support for remote hosts.
 
 0.05    2014-09-14
-        Added backup of globals
+      * Added backup of globals
 
 0.04    2014-09-14
-        Additional tests
-        Fixing packaging bugs
-        Adding server_version api
+      * Additional tests
+      * Fixing packaging bugs
+      * Adding server_version api
 
 0.03    2014-09-13
-        Better handling of auth environment variables so they don't always clobber
-        Fixes to exception handling
-        More tests
+      * Better handling of auth environment variables so they don't always clobber
+      * Fixes to exception handling
+      * More tests
 
 0.02    2014-09-12
-        Better error handling of external programs, using Tiny::Capture to 
+      * Better error handling of external programs, using Tiny::Capture to
         process external stderr
 
 0.01    2014-09-11
-        First version, released on an unsuspecting world.
+      * First version, released on an unsuspecting world.
 

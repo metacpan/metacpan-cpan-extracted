@@ -1,10 +1,7 @@
 Changes
 lib/API/INSEE/Sirene.pm
-Makefile
 Makefile.PL
 MANIFEST			This list of files
-MYMETA.json
-MYMETA.yml
 README
 t/API-INSEE-Sirene.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

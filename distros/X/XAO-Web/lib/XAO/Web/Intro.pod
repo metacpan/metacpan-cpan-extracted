@@ -130,14 +130,13 @@ the name because your site does not yet have any specific templates,
 objects or configuration. We will get back to customizing your site
 later.
 
-Now let us look into the URL - it does not look good, does it? It
-includes cgi-bin, site name and generally looks ugly, we agree. The way
-to deal with it currently is to use mod_rewrite to hide that into Apache
-configuration. We are working on the real mod_perl module that will
-not require mod_rewrite, you should expect it with the next release of
-XAO::Web.
+The URL above looks bad and it exposes internal components -
+cgi-bin, site name, etc. In production it is typically better to use
+mod_perl or PSGI handlers to deal with that (see L<Apache::XAO> and
+L<Plack::App::XAO>).
 
-Here is how to configure Apache with mod_rewrite in the meantime:
+In development an easy way to make the URL prettier (and matching
+production) is by using Apache's mod_rewrite module. Here is how:
 
  <VirtualHost 10.0.0.1:80>
   ServerName   test.company.com
@@ -161,30 +160,6 @@ That leaves everything in /images/ to be processed by the web server
 in the usual way and maps everything else to XAO::Web handler. Restart
 Apache and try going to just http://test.company.com/ now -- you should
 see the same default page as before.
-
-And finally, here is an example of mod_perl configuration, you should
-use it for production grade sites. The only difference is in <Directory>
-block.
-
- <VirtualHost 10.0.0.1:80>
-  ServerName   test.company.com
-  ServerAlias  test.company.com
- 
-  <Directory /opt/xao/handlers>
-   Options ExecCGI
-   SetHandler perl-script
-   PerlHandler Apache::Registry
-   PerlSendHeader Off
-  </Directory>
-
-  RewriteEngine on
-  RewriteRule   ^/images/(.*)$  \
-                /opt/xao/projects/mysite/images/$1  \
-                [L]
-  RewriteRule   ^/(.*)$  \
-                /opt/xao/handlers/xao-apache.pl/mysite/$1  \
-                [L]
- </VirtualHost>
 
 That is it, if you got so far your installation of XAO::Web works fine
 and you can move on to actually building a custom web site.

@@ -2,8 +2,8 @@
 # vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 #
  BEGIN {
-    unless ($ENV{TEST_AUTHOR}) {
-        print qq{1..0 # SKIP these tests only run with TEST_AUTHOR set\n};
+    unless ($ENV{AUTHOR_TESTING}) {
+        print qq{1..0 # SKIP these tests only run with AUTHOR_TESTING set\n};
         exit
     }
 }

@@ -1,0 +1,15 @@
+#!/usr/bin/perl -w
+
+use lib '../blib/lib';
+use Net::Z3950::DBIServer::Config;
+use strict;
+
+my $file = $ARGV[0]
+    or die "no configuration file specified";
+my $cfg = new Net::Z3950::DBIServer::Config($file)
+    or die "$0: can't parse config file '$file'";
+
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+print Dumper($cfg);

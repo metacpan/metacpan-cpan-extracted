@@ -1,12 +1,10 @@
 package App::optex::textconv;
 
-use 5.014;
-use strict;
+our $VERSION = '0.10';
+
+use v5.14;
 use warnings;
-
 use Encode;
-
-our $VERSION = "0.08";
 
 =encoding utf-8
 
@@ -16,7 +14,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.08
+Version 0.10
 
 =head1 SYNOPSIS
 
@@ -80,16 +78,16 @@ L<https://github.com/kaz-utashiro/optex-textconv>
 
 L<https://qiita.com/kaz-utashiro/items/23fd825bd325240592c2>
 
-=head1 LICENSE
-
-Copyright (C) Kazumasa Utashiro.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
 =head1 AUTHOR
 
 Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright 2019-2020 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
@@ -185,7 +183,7 @@ sub textconv {
 		}
 	    };
 	    use App::optex::Tmpfile;
-	    my $tmp = $persist[@persist] = new App::optex::Tmpfile;
+	    my $tmp = $persist[@persist] = App::optex::Tmpfile->new;
 	    my $data = do {
 		no strict 'refs';
 		use charnames ':full';

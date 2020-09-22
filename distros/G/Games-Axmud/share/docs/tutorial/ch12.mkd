@@ -7,7 +7,7 @@
 ####Table of Contents
 
 * [12.1 Introduction to interfaces](#12.1)
-* [12.2 WAITTRIG](#12.2)
+* [12.2 WAITTRIG, WAITALIAS, WAITMACRO, WAITTIMER and WAITHOOK](#12.2)
 * [12.3 ADDTRIG](#12.3)
 * [12.4 ADDALIAS, ADDMACRO, ADDTIMER and ADDHOOK](#12.4)
 * [12.5 DELTRIG, DELALIAS, DELMACRO, DELTIMER and DELHOOK](#12.5)
@@ -20,7 +20,7 @@
 * [12.12 Skipping notifications](#12.12)
 * [12.13 DELIFACE](#12.13)
 * [12.14 Starting a new script with SETTRIG](#12.14)
-* [12.15 Future plans](#12.15)
+* [12.15 SETALIAS, SETMACRO, SETTIMER and SETHOOK](#12.15)
 
 ---
 
@@ -38,7 +38,7 @@ Interfaces have a *stimulus* and a *response*. In other words, when something ha
 
 The [Axmud Guide](../guide/index.html) discusses interfaces in detail. In this Section we'll discuss how scripts can interact with their own interfaces.
 
-##<a name="12.2">12.2 WAITTRIG</a>
+##<a name="12.2">12.2 WAITTRIG, WAITALIAS, WAITMACRO, WAITTIMER and WAITHOOK</a>
 
 In [Section 4](ch04.html) we introduced the WAITTRIG statement, which creates a temporary trigger. The trigger waits for the world to send a line matching a certain pattern, in this case a line containing the word **opens**.
 
@@ -52,7 +52,12 @@ In [Section 4](ch04.html) we also discussed using a timeout. In this example, if
 
         WAITTRIG "opens", 60
 
-By the way, there is no WAITALIAS statement, and there are no WAITMACRO, WAITTIMER or WAITHOOK statements. There are better ways of handling those types of interface.
+If you want to, you can use the WAITALIAS, WAITMACRO, WAITTIMER and WAITHOOK statements. They all behave in exactly the same way as WAITTRIG. 
+
+        WAITMACRO "f1"
+        WAITMACRO "f1", 60
+
+In practice, there are usually better ways of doing things. In the case of WAITTIMER, it would be a lot simpler to use a SLEEP statement.
 
 ##<a name="12.3">12.3 ADDTRIG</a>
 
@@ -90,6 +95,18 @@ ADDALIAS, ADDMACRO and so on behave in the same was as ADDTRIG, and use the same
         ADDHOOK "lose_focus", "sleep"
 
 In each case, the interface is deleted automatically when the script stops running.
+
+Be very careful that you don't create an alias like this, with the same word in both the stimulus and response:
+
+        ADDALIAS "treasure", "get treasure"
+
+This alias fires when you type **treasure**, and sends a world command **get treasure**. Which makes the alias fire again, sending another world command **get treasure**, and before you know it you'll have an infinite loop.
+
+The safest way to use ADDALIAS is to add a ^ character at the beginning, and a $ character at the end, so that the alias only fires when you type that word (any nothing else):
+
+        ADDALIAS "^treasure$", "get treasure"
+
+(See the [Axmud Guide](../guide/index.html) for more information about special characters in patterns.)
 
 ##<a name="12.5">12.5 DELTRIG, DELALIAS, DELMACRO, DELTIMER and DELHOOK</a>
 
@@ -145,7 +162,7 @@ By the way, the **Showprofile$ ()** function returns the name of the profile cur
 
 ##<a name="12.7">12.7 Interfaces and main loops</a>
 
-So far, the interfaces we've created don't really interact with script in any meaningful way.
+So far, the interfaces we've created don't really interact with scripts in any meaningful way.
 
 In some respects, BASIC is a poor choice of language for interacting with interfaces. In many scripting languages, a script does nothing until one of its subroutines or functions is actually called.
 
@@ -170,7 +187,7 @@ The trigger is created with a SETTRIG statement.
 
         SETTRIG "treasure"
 
-We use a SETTRIG statement because, when the trigger fires, Axmud sends an *interface notification* to the script. The notification contains information about the fired trigger.
+We use a SETTRIG statement rather than an ADDTRIG statement because, when the trigger fires, Axmud sends an *interface notification* to the script. The notification contains information about the fired trigger.
 
 When the script receives an interface notification, nothing happens immediately; the notification is just stored. If the same trigger fires ten times, then ten separate notifications are stored in the order they're received.
 
@@ -218,12 +235,14 @@ Here is the complete script. Once per main loop, the earliest remaining notifica
             ! Retrieve the first notification...
             IF Ifacecount () > 0 THEN
                 IF Ifacename$ () = treasure_trigger$ THEN
+
+                    ! The trigger fired, so send some world commands
                     CALL GetStuff
+                    ! Discard the notification, ready for the next main loop
+                    NEXTIFACE
+
                 END IF
             END IF
-
-            ! ...and discard it, ready for the next main loop
-            NEXTIFACE
 
         LOOP
 
@@ -240,8 +259,8 @@ Actually, if no notifications have been received, **Ifacename$ ()** returns an e
         WHILE 1
             IF Ifacename$ () = treasure_trigger$ THEN
                 CALL GetStuff
+                NEXTIFACE
             END IF
-            NEXTIFACE
         LOOP
 
 ##<a name="12.10">12.10 Advanced notifications</a>
@@ -271,6 +290,8 @@ Triggers test a pattern against a line of text. The **Ifacestrings ()** function
 The contents of those substrings can be retrieved using the **Ifaceshift$ ()** and **Ifacepop$ ()** functions. Both of those functions *remove* the matching substring from the notification, so you can use them several times until there are no more substrings left. **Ifaceshift$ ()** removes the first matching substring, and **Ifacepop$ ()** removes the last matching substring.
 
 Another way to retrieve the substrings is with the **Ifaceselect$ ()**. Get the first substring with **Ifaceselect$ (1)**, the second with **Ifaceselect$ (2)** and so on. Unlike **Ifaceshift$ ()** and **Ifacepop$ ()**, nothing is removed. If the specified substring doesn't exist, the function returns an empty string. 
+
+A shortcut for retrieving the first substring is with **Ifacedata$ ()**, which behaves exactly in the same way as **Ifaceselect (1)**.
 
 A special case is when you use alternatives with substrings. For example, you might create a trigger than matches any of the following lines:
 
@@ -348,9 +369,41 @@ However, SETTRIG has a second purpose: it can be used to run a different Axbasic
 
 The new script is not run as a task. The original Axbasic script does not receive an interface notification.
 
-##<a name="12.15">12.15 Future plans</a>
+##<a name="12.15">12.15 SETALIAS, SETMACRO, SETTIMER and SETHOOK</a>
 
-At the time of writing, there are no SETALIAS, SETMACRO, SETTIMER or SETHOOK statements.
+We've described interface notifications in some detail, but only in relation to triggers.
+
+Interface notifications can also be generated by aliases, macros, timers and hooks. The way this works is very similar to the way that triggers work, but there are some important differences. This section describes those differences.
+
+SETALIAS, SETMACRO, SETTIMER and SETHOOK behave exactly like SETTRIG. You can use them to create an interface. When the interface fires, the Axbasic script receives a notification, which the script can retrieve when it's ready.
+
+SETALIAS requies a pattern which matches a world command. SETMACRO requires a keycode string. SETTIMER requires an interval (in seconds), or a clock time. SETHOOK requires a hook event. If you're not sure what any of these mean, consult the [Axmud Guide](../guide/index.html).
+
+        SETALIAS "^kill orc$"
+        SETMACRO "ctrl f1"
+        SETTIMER 180
+        SETHOOK "receive_text"
+
+The same statements can be used to launch another Axbasic script.
+
+        SETALIAS "^kill orc$", "check_equipment"
+        SETMACRO "ctrl f1", "cross_bridge"
+        SETTIMER 180, "drink_potion"
+        SETHOOK "receive_text", "play_alarm"
+
+**Ifacetype ()** will return one of the strings **"trigger"**, **"alias"**, **"macro"**, **"timer"** or **"hook"**, as appropriate.
+
+The return value of **Ifacetext ()** depends on the type of interface. For triggers, it returns the line of text received from the world (possibly after being modified by various rewriter triggers). For aliases, it returns the world command. For macros, it returns the keycode string. For timers, it returns the approximate time at which the timer fired (an epoch time, in seconds; actually the time recorded by the session). For hooks, it returns the hook event.
+
+Both SETTRIG and SETALIAS try to match a pattern against some text. If any substrings are generated, the functions described above can be used to retrieve those substrings.
+
+SETHOOK creates a hook that generates zero, one or two additional items of data, depending on which hook event occurs. This additional data can be retrieved in exactly the same way as trigger substrings are retrieved. For example, you could use **Ifacestrings ()** to see how many items of data were generated, or **Ifacedata$ ()** to retrieve the first one. 
+
+A macro doesn't generate any additional data, so after a SETMACRO statement, **Ifacestrings ()** always returns **0** and **Ifacedata$ ()** always returns an empty string.
+
+SETTIMER creates a timer that generates one additional of data. 
+
+Some timers have a clock time as a stimulus. This clock time can be in the form "HH:MM", which causes the timer to fire once a day. It can also be in the form "99:MM", which causes the timer to fire once an hour, at MM minutes past each hour. If the timer stimulus is a clock time, then **Ifacedata ()** returns it (as a string). Otherwise, it returns the time at which the timer was due to fire (which will be equal to, or slightly earlier than, the time at which the timer actually fired, which is the value returned by **Ifacetext ()** ).
 
 ---
 

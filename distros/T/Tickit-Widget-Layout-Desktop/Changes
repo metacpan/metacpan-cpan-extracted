@@ -1,6 +1,14 @@
 Revision history for Tickit-Widget-Layout-Desktop
 
-0.010     2017-06-25 03:05:32+08:00 Asia/Kuala_Lumpur
+0.012     2020-09-20 12:52:50+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - handle cases where panel has no dimensions specified
+    - update for latest Tickit::Widget and Tickit releases
+
+0.011     2017-06-25 03:05:32+08:00 Asia/Kuala_Lumpur
     No new features.
 
     Deprecation fixes:

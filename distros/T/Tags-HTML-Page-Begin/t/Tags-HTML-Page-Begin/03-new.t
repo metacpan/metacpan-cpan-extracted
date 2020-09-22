@@ -6,7 +6,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Page::Begin;
 use Tags::Output::Raw;
-use Test::More 'tests' => 10;
+use Test::More 'tests' => 14;
 use Test::NoWarnings;
 
 # Test.
@@ -115,5 +115,62 @@ is(
 	$EVAL_ERROR,
 	"Parameter 'script_js_src' must be a array.\n",
 	"Parameter 'script_js_src' is string.",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Page::Begin->new(
+		'favicon' => 'foo.bmp',
+		'tags' => Tags::Output::Raw->new,
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'favicon' contain bad image type.\n",
+	"Parameter 'favicon' contain bad image type.",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Page::Begin->new(
+		'css_src' => 'foo',
+		'tags' => Tags::Output::Raw->new,
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'css_src' must be a array.\n",
+	"Parameter 'css_src' is string.",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Page::Begin->new(
+		'css_src' => ['foo'],
+		'tags' => Tags::Output::Raw->new,
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'css_src' must be a array of hash structures.\n",
+	"Parameter 'css_src' is array of strings.",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Page::Begin->new(
+		'css_src' => [{'foo' => 'bar'}],
+		'tags' => Tags::Output::Raw->new,
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'css_src' must be a array of hash structures with 'media' ".
+		"and 'link' keys.\n",
+	"Parameter 'css_src' is array of hashes with bad key.",
 );
 clean();

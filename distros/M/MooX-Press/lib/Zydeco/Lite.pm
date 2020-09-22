@@ -5,7 +5,7 @@ use warnings;
 package Zydeco::Lite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.070';
+our $VERSION   = '0.075';
 
 use MooX::Press ();
 use Types::Standard qw( -types -is );
@@ -51,6 +51,20 @@ sub _pop_type ($\@) {
 	}
 }
 
+sub _return_anon {
+	my ( $kind, $nameref, $value ) = @_;
+	
+	return $value if is_Undef $nameref;
+	
+	if ( not is_Undef $$nameref ) {
+		confess( '%s name expected to be string or reference to empty scalar variable', $kind );
+	}
+	
+	$$nameref = $value;
+	&Internals::SvREADONLY($nameref, 1);
+	return;
+}
+
 sub true  () { !!1 }
 sub false () { !!0 }
 
@@ -61,11 +75,15 @@ sub confess {
 
 sub app {
 	my $definition = _pop_type( CodeRef, @_ );
-	my $package    = _shift_type( Str, @_ );
+	my $name       = _shift_type( Str|ScalarRef, @_ );
 	my %args       = @_;
 	
+	my $package;
 	my $is_anon;
-	if ( ! $package ) {
+	if ( is_Str $name ) {
+		$package = $name;
+	}
+	else {
 		$is_anon = true;
 		$package = _anon_package_name();
 	}
@@ -91,7 +109,10 @@ sub app {
 		%{ $THIS{APP_SPEC} },
 	);
 	
-	return MooX::Press::make_absolute_package_name($package) if $is_anon;
+	if ( $is_anon ) {
+		@_ = ( app => $name, MooX::Press::make_absolute_package_name($package) );
+		goto \&_return_anon;
+	}
 	return;
 }
 
@@ -112,43 +133,51 @@ sub class {
 	}
 	
 	my $definition = _pop_type( CodeRef, @_ ) || sub { 1 };
-	my $package    = ( @_ % 2 ) ? _shift_type( Str, @_ ) : undef;
+	my $name       = ( @_ % 2 ) ? _shift_type( Str|ScalarRef, @_ ) : undef;
 	my %args       = @_;
 
+	my $kind =
+		$args{interface}   ? 'interface' :
+		$args{abstract}    ? 'abstract class' :
+		$args{is_role}     ? 'role' :
+		'class';
+	
 	if ( delete $args{is_generator} ) {
 		my $gen = _wrap_generator( @_, $definition );
 		
-		if ( $package ) {
+		if ( is_Str $name ) {
 			my $key = sprintf(
 				'%s:%s',
 				$args{is_role} ? 'role_generator' : 'class_generator',
-				$package,
+				$name,
 			);
 			$THIS{APP_SPEC}{$key} = $gen;
 			$finalize->() if $finalize;
 			return;
 		}
 		else {
-			my $method = $args{is_role} ? 'make_role_generator' : 'make_class_generator';
-			$package   = _anon_package_name();
+			my $method  = $args{is_role} ? 'make_role_generator' : 'make_class_generator';
+			my $package = _anon_package_name();
 			'MooX::Press'->$method(
 				MooX::Press::make_absolute_package_name($package),
 				%{ $THIS{APP_SPEC} or {} },
 				%args,
 				generator => $gen,
 			);
-			return MooX::Press::make_absolute_package_name($package);
+			
+			@_ = ( "$kind generator", $name, MooX::Press::make_absolute_package_name($package) );
+			goto \&_return_anon;
 		}
 	}
 	
 	my $key = sprintf(
 		'%s:%s',
 		$args{is_role} ? 'role' : 'class',
-		$package || '',
+		is_Str($name) ? $name : '',
 	);
-
+	
 	my $class_spec = do {
-		local $THIS{CLASS} = $package;
+		local $THIS{CLASS} = is_Str($name) ? $name : undef;
 		local $THIS{CLASS_SPEC} = { %args };
 		$definition->();
 		delete $THIS{CLASS_SPEC}{is_role};
@@ -156,15 +185,16 @@ sub class {
 	};
 	
 	# Anonymous package
-	if ( ! $package ) {
-		my $method = $args{is_role} ? 'make_role' : 'make_class';
-		$package   = _anon_package_name();
+	if ( ! is_Str $name ) {
+		my $method  = $args{is_role} ? 'make_role' : 'make_class';
+		my $package = _anon_package_name();
 		'MooX::Press'->$method(
 			MooX::Press::make_absolute_package_name($package),
 			%{ $THIS{APP_SPEC} or {} },
 			%$class_spec,
 		);
-		return MooX::Press::make_absolute_package_name($package);
+		@_ = ( $kind, $name, MooX::Press::make_absolute_package_name($package) );
+		goto \&_return_anon;
 	}
 	# Nested class
 	elsif ( $THIS{CLASS_SPEC} ) {
@@ -175,7 +205,7 @@ sub class {
 		$THIS{CLASS_SPEC}{is_generator}
 			and confess('cannot subclass class generators');
 		
-		push @{ $THIS{CLASS_SPEC}{subclass} ||= [] }, $package, $class_spec;
+		push @{ $THIS{CLASS_SPEC}{subclass} ||= [] }, $name, $class_spec;
 	}
 	# Otherwise
 	else {
@@ -233,7 +263,7 @@ sub _wrap_generator {
 
 sub generator {
 	my $definition = _pop_type( CodeRef, @_ ) || sub { 1 };
-	my $package    = _shift_type( Str, @_ );
+	my $package    = _shift_type( Str|ScalarRef, @_ );
 	my $sig        = _shift_type( Ref, @_ );
 	my %args       = @_;
 	
@@ -250,15 +280,33 @@ sub _method {
 	my $next        = shift;
 	my $definition  = _pop_type( CodeRef, @_ )
 		or confess('methods must have a body');
-	my $subname     = _shift_type( Str, @_ );
+	my $subname     = _shift_type( Str|ScalarRef, @_ );
 	my $sig         = _shift_type( Ref, @_ );
 	my %args        = @_;
 	
-	if ( ! defined $subname ) {
-		return confess('anonymous methods not supported yet');
+	if ( is_ScalarRef $subname or is_Undef $subname ) {
+		my $coderef;
+		
+		if ( $sig or keys %args ) {
+			if ( defined $sig ) {
+				$args{caller}    = caller;
+				$args{code}      = $definition;
+				$args{signature} = $sig;
+				$args{named}     = false unless exists $args{named};
+				
+				$coderef = 'MooX::Press'->wrap_coderef( \%args );
+			}
+		}
+		else {
+			$coderef = $definition;
+		}
+		
+		@_ = ( method => $subname, $coderef );
+		goto &_return_anon;
 	}
 	
-	$args{code} = $definition;
+	$args{code}   = $definition;
+	$args{caller} = caller;
 	
 	if ( defined $sig ) {
 		$args{signature} = $sig;
@@ -718,6 +766,10 @@ Anonymous apps:
   my $app = app sub {
     # definition
   };
+  
+  app \(my $app) => sub {
+    # definition
+  };
 
 As of Zydeco::Lite 0.69, classes and roles no longer need to be defined
 within an C<< app >> block, but bundling them into an app block has the
@@ -742,6 +794,12 @@ Anonymous classes:
   
   my $obj = $class->new();
 
+  class \(my $class) => sub {
+    # definition
+  };
+  
+  my $obj = $class->new();
+
 Class generators:
 
   class generator "MyGen" => sub {
@@ -760,6 +818,14 @@ Class generators:
 Anonymous class generators:
 
   my $gen = class generator sub {
+    my ( $gen, @args ) = ( shift, @_ );
+    # definition
+  };
+  
+  my $class = $gen->generate_package( @args );
+  my $obj   = $class->new();
+
+  class generator \(my $gen) => sub {
     my ( $gen, @args ) = ( shift, @_ );
     # definition
   };
@@ -908,6 +974,20 @@ Methods with named signatures:
     ...;
   };
 
+Anonymous methods:
+
+  my $mymeth = method sub {
+    my ( $self, @args ) = ( shift, @_ );
+    ...;
+  }
+
+  method \(my $mymeth) => sub {
+    my ( $self, @args ) = ( shift, @_ );
+    ...;
+  }
+
+Anonymous methods may have signatures.
+
 Required methods in roles:
 
   requires "method1", "method2";
@@ -1049,214 +1129,214 @@ means that the keyword may appear only within an app definition block.
 
  # Scope: ANY
  app(
-   Optional[Str]      $name,
-   Hash               %args,
-   Optional[CodeRef]  $definition,
+   Optional[Str|ScalarRef]  $name,
+   Hash                     %args,
+   Optional[CodeRef]        $definition,
  );
  
  # Scope: ANY
  class(
-   Optional[Str]      $name,
-   Hash               %args,
-   Optional[CodeRef]  $definition,
+   Optional[Str|ScalarRef]  $name,
+   Hash                     %args,
+   Optional[CodeRef]        $definition,
  );
  
  # Scope: ANY
  class generator(
-   Optional[Str]      $name,
-   Optional[ArrayRef] $signature,
-   Hash               %args,
-   Optional[CodeRef]  $definition,
+   Optional[Str|ScalarRef]  $name,
+   Optional[ArrayRef]       $signature,
+   Hash                     %args,
+   Optional[CodeRef]        $definition,
  );
  
  # Scope: ANY
  role(
-   Optional[Str]      $name,
-   Hash               %args,
-   Optional[CodeRef]  $definition,
+   Optional[Str|ScalarRef]  $name,
+   Hash                     %args,
+   Optional[CodeRef]        $definition,
  );
  
  # Scope: ANY
  role generator(
-   Optional[Str]      $name,
-   Optional[ArrayRef] $signature,
-   Hash               %args,
-   Optional[CodeRef]  $definition,
+   Optional[Str|ScalarRef]  $name,
+   Optional[ArrayRef]       $signature,
+   Hash                     %args,
+   Optional[CodeRef]        $definition,
  );
  
  # Scope: ANY
  interface(
-   Optional[Str]      $name,
-   Hash               %args,
-   Optional[CodeRef]  $definition,
+   Optional[Str|ScalarRef]  $name,
+   Hash                     %args,
+   Optional[CodeRef]        $definition,
  );
  
  # Scope: ANY
  interface generator(
-   Optional[Str]      $name,
-   Optional[ArrayRef] $signature,
-   Hash               %args,
-   Optional[CodeRef]  $definition,
+   Optional[Str|ScalarRef]  $name,
+   Optional[ArrayRef]       $signature,
+   Hash                     %args,
+   Optional[CodeRef]        $definition,
  );
  
  # Scope: ANY
  abstract_class(
-   Optional[Str]      $name,
-   Hash               %args,
-   Optional[CodeRef]  $definition,
+   Optional[Str|ScalarRef]  $name,
+   Hash                     %args,
+   Optional[CodeRef]        $definition,
  );
  
  # Scope: ANY
  abstract_class generator(
-   Optional[Str]      $name,
-   Optional[ArrayRef] $signature,
-   Hash               %args,
-   Optional[CodeRef]  $definition,
+   Optional[Str|ScalarRef]  $name,
+   Optional[ArrayRef]       $signature,
+   Hash                     %args,
+   Optional[CodeRef]        $definition,
  );
  
  # Scope: CLASS
  extends(
-   List[Str|ArrayRef] @parents,
+   List[Str|ArrayRef]       @parents,
  );
  
  # Scope: CLASS or ROLE
  with(
-   List[Str|ArrayRef] @parents,
+   List[Str|ArrayRef]       @parents,
  );
  
  # Scope: ANY
  method(
-   Optional[Str]      $name,
-   Optional[ArrayRef] $signature,
-   Hash               %args,
-   CodeRef            $definition,
+   Optional[Str|ScalarRef]  $name,
+   Optional[ArrayRef]       $signature,
+   Hash                     %args,
+   CodeRef                  $body,
  );
  
  # Scope: CLASS
  factory(
-   Str|ArrayRef       $names,
-   Optional[ArrayRef] $signature,
-   Hash               %args,
-   CodeRef|ScalarRef  $definition_or_via,
+   Str|ArrayRef             $names,
+   Optional[ArrayRef]       $signature,
+   Hash                     %args,
+   CodeRef|ScalarRef        $body_or_via,
  );
  
  # Scope: ANY
  constant(
-   Str                $name,
-   Any                $value,
+   Str|ArrayRef             $names,
+   Any                      $value,
  );
  
  # Scope: ANY
  multi_method(
-   Str                $name,
-   ArrayRef           $signature,
-   Hash               %args,
-   CodeRef            $definition,
+   Str                      $name,
+   ArrayRef                 $signature,
+   Hash                     %args,
+   CodeRef                  $body,
  );
  
  # Scope: CLASS
  multi_factory(
-   Str                $name,
-   ArrayRef           $signature,
-   Hash               %args,
-   CodeRef            $definition,
+   Str                      $name,
+   ArrayRef                 $signature,
+   Hash                     %args,
+   CodeRef                  $body,
  );
  
  # Scope: ANY
  before(
-   Str|ArrayRef       $names,
-   Optional[ArrayRef] $signature,
-   Hash               %args,
-   CodeRef            $definition,
+   Str|ArrayRef             $names,
+   Optional[ArrayRef]       $signature,
+   Hash                     %args,
+   CodeRef                  $body,
  );
  
  # Scope: ANY
  after(
-   Str|ArrayRef       $names,
-   Optional[ArrayRef] $signature,
-   Hash               %args,
-   CodeRef            $definition,
+   Str|ArrayRef             $names,
+   Optional[ArrayRef]       $signature,
+   Hash                     %args,
+   CodeRef                  $body,
  );
  
  # Scope: ANY
  around(
-   Str|ArrayRef       $names,
-   Optional[ArrayRef] $signature,
-   Hash               %args,
-   CodeRef            $definition,
+   Str|ArrayRef             $names,
+   Optional[ArrayRef]       $signature,
+   Hash                     %args,
+   CodeRef                  $body,
  );
  
  # Scope: CLASS or ROLE
  has(
-   Str|ArrayRef       $names,
-   Hash               %spec,
+   Str|ArrayRef             $names,
+   Hash|HashRef|ArrayRef    %spec,
  );
  
  # Scope: ROLE
  requires(
-   List[Str]          @names,
+   List[Str]                @names,
  );
  
  # Scope: ANY
  confess(
-   Str                $template,
-   List               @args,
+   Str                      $template,
+   List                     @args,
  );
  
  # Scope: APP or CLASS or ROLE
  toolkit(
-   Str                $toolkit,
-   Optional[List]     @imports,
+   Str                      $toolkit,
+   Optional[List]           @imports,
  );
  
  # Scope: CLASS or ROLE
  coerce(
-   Object|Str         $type,
-   Str                $via,
-   Optional[CodeRef]  $definition,
+   Object|Str               $type,
+   Str                      $via,
+   Optional[CodeRef]        $definition,
  );
  
  # Scope: CLASS
  overload(
-   Hash               %args,
+   Hash                     %args,
  );
  
  # Scope: APP or CLASS or ROLE
  version(
-   Str                $version,
+   Str                      $version,
  );
  
  # Scope: APP or CLASS or ROLE
  authority(
-   Str                $authority,
+   Str                      $authority,
  );
  
  # Scope: CLASS or ROLE
  type_name(
-   Str                $name,
+   Str                      $name,
  );
  
  # Scope: CLASS or ROLE
  begin {
-   ( $package ) = @_;
+   my ( $package ) = @_;
    ...;
  };
  
  # Scope: CLASS or ROLE
  end {
-   ( $package ) = @_;
+   my ( $package ) = @_;
    ...;
  };
  
  # Scope: ROLE
  before_apply {
-   ( $role, $target, $targetkind ) = @_;
+   my ( $role, $target, $targetkind ) = @_;
    ...;
  };
  
  # Scope: ROLE
  after_apply {
-   ( $role, $target, $targetkind ) = @_;
+   my ( $role, $target, $targetkind ) = @_;
    ...;
  };
 
@@ -1303,6 +1383,74 @@ to import, rename them, etc.
   };
   
   my $obj = $app->new_foo();
+
+=head1 EXAMPLE
+
+   package Zoo;
+   use strict;
+   use warnings;
+   use Zydeco::Lite;
+   
+   my $app = __PACKAGE__;
+   
+   app $app => sub {
+      
+      class 'Park' => sub {
+         
+         has 'name' => (
+            type        => 'Str',
+         );
+         
+         has 'animals' => (
+            type        => 'ArrayRef',
+            default     => sub { [] },
+            handles_via => 'Array',
+            handles     => [
+               'add_animal' => 'push',
+               'list_animals' => 'all',
+            ],
+         );
+         
+         method 'print_animals' => [] => sub {
+            my ( $self ) = ( shift );
+            for my $animal ( $self->list_animals ) {
+               $animal->print_animal;
+            }
+         };
+      };
+      
+      role generator 'Animal' => [ 'Str' ] => sub {
+         my ( $gen, $species ) = ( shift, @_ );
+         
+         has 'name' => ( type => 'Str', required => true );
+         
+         method 'print_animal' => [] => sub {
+            my ( $self ) = ( shift );
+            printf( "%s (%s)\n", $self->name, $species );
+         };
+      };
+      
+      class 'Lion' => sub {
+         with 'Animal' => [ 'Panthera leo' ];
+      };
+      
+      class 'Tiger' => sub {
+         with 'Animal' => [ 'Panthera tigris' ];
+      };
+      
+      class 'Bear' => sub {
+         with 'Animal' => [ 'Ursus arctos' ];
+      };
+   };
+   
+   my $zoo = $app->new_park( name => "Oz Zoo" );
+   $zoo->add_animal( $app->new_lion( name => "Simba" ) );
+   $zoo->add_animal( $app->new_lion( name => "Aslan" ) );
+   $zoo->add_animal( $app->new_tiger( name => "Tigger" ) );
+   $zoo->add_animal( $app->new_tiger( name => "Shere Khan" ) );
+   $zoo->add_animal( $app->new_bear( name => "Paddington" ) );
+   $zoo->add_animal( $app->new_bear( name => "Yogi" ) );
+   $zoo->print_animals; # oh my!
 
 =head1 BUGS
 

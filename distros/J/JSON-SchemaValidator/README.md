@@ -31,6 +31,16 @@ JSON::SchemaValidator - JSON Schema Validator
 
     http://github.com/vti/json-schemavalidator
 
+## Testing
+
+This distribution contains specification tests, that can run as following:
+
+    # Run specific draft
+    JSON_SCHEMA_SPEC='draft=draft4' prove t/spec.t
+
+    # Run specific suite
+    JSON_SCHEMA_SPEC='draft=draft4!suite=minProperties' prove t/spec.t
+
 # CREDITS
 
 # AUTHOR

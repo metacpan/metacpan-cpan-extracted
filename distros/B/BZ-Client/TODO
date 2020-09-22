@@ -1,7 +1,0 @@
-Bring all the objects together (like Search::Elasticsearch) - do this in 5.0
-
-testing
- - User.pm tests, need to test create() & update(). Needs something other than landfill.bugzilla.org
- - have travis set up bugzilla and run admin function tests? docker is doable
- - have travis testing run with NO_NETWORK_TESTING
- - have tests for everything 5.0 can do, just against landfill.bugzilla.org for now

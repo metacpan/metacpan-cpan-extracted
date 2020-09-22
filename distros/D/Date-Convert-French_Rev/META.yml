@@ -3,16 +3,16 @@ abstract: 'Date conversions using the French Revolutionary calendar'
 author:
   - 'Jean Forget <JFORGET@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
-  Test::Exception: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Date-Convert-French_Rev
 no_index:
   directory:
@@ -21,11 +21,12 @@ no_index:
 provides:
   Date::Convert::French_Rev:
     file: lib/Date/Convert/French_Rev.pm
-    version: 0.08
+    version: '0.09'
 requires:
-  Date::Convert: 0.16
-  Roman: 0
-  perl: 5.008008
+  Date::Convert: '0.16'
+  Roman: '0'
+  perl: '5.008008'
 resources:
   repository: https://github.com/jforget/Date-Convert-French_Rev.git
-version: 0.08
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

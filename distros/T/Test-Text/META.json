@@ -4,7 +4,7 @@
       "JJ Merelo <jj@merelo.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -49,6 +49,6 @@
          "web" : "https://github.com/JJ/Test-Text"
       }
    },
-   "version" : "0.6.1",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.6.3",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

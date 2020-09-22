@@ -1,6 +1,6 @@
 package App::size::dir::diff;
 
-our $VERSION = "0.3.9";
+our $VERSION = "0.4.1";
 
 =head1 NAME
 

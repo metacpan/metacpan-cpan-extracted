@@ -3,7 +3,7 @@ package JSON::SchemaValidator;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use B        ();
 use Storable ();
@@ -470,7 +470,13 @@ sub _validate_object {
 
     if (exists $schema->{properties}) {
         foreach my $key (keys %{$schema->{properties}}) {
-            push @required, $key if $schema->{properties}->{$key}->{required};
+
+            # Required only if a boolean, otherwise it's a list of required properties
+            if (exists $schema->{properties}->{$key}->{required}
+                && _is_boolean($schema->{properties}->{$key}->{required}))
+            {
+                push @required, $key;
+            }
         }
     }
 
@@ -1089,6 +1095,16 @@ L<JSON::SchemaValidator> is a JSON schema validator.
 =head2 Repository
 
     http://github.com/vti/json-schemavalidator
+
+=head2 Testing
+
+This distribution contains specification tests, that can run as following:
+
+    # Run specific draft
+    JSON_SCHEMA_SPEC='draft=draft4' prove t/spec.t
+
+    # Run specific suite
+    JSON_SCHEMA_SPEC='draft=draft4!suite=minProperties' prove t/spec.t
 
 =head1 CREDITS
 

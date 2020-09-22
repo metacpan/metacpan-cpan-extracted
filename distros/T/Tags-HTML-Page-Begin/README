@@ -25,11 +25,35 @@ METHODS
 
             Default value is undef.
 
+    *       "base_href"
+
+            Base link (<base href="https://skim.cz" />.
+
+            Default value is undef.
+
+    *       "base_target"
+
+            Base target. It's used in if 'base_href' parameter exists.
+
+            Default value is undef.
+
     *       "css"
 
             'CSS::Struct::Output' object for process_css processing.
 
             Default value is undef.
+
+    *       "css_src"
+
+            List of CSS link structures.
+
+             Structure is something like:
+             {
+               'link' => '/foo.css',
+               'media' => 'screen',
+             }
+
+            Default value is [].
 
     *       "charset"
 
@@ -48,6 +72,13 @@ METHODS
             Document doctype string.
 
             Default value is '<!DOCTYPE html>'.
+
+    *       "favicon"
+
+            Favorite icon image link. Supported images are 'ICO', 'PNG',
+            'GIF', 'SVG' and 'JPG' files.
+
+            Default value is undef.
 
     *       "generator"
 
@@ -72,6 +103,12 @@ METHODS
     *       "refresh"
 
             Page refresh time in seconds.
+
+            Default value is undef.
+
+    *       "robots"
+
+            Robots meta.
 
             Default value is undef.
 
@@ -111,6 +148,9 @@ METHODS
 ERRORS
      new():
              Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+             Parameter 'css_src' must be a array.
+             Parameter 'css_src' must be a array of hash structures.
+             Parameter 'css_src' must be a array of hash structures with 'media' and 'link' keys.
              Parameter 'script_js' must be a array.
              Parameter 'script_js_src' must be a array.
              Parameter 'tags' must be a 'Tags::Output::*' class.
@@ -184,7 +224,7 @@ EXAMPLE1
      # </html>
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, Readonly.
+    Class::Utils, Error::Pure, List::MoreUtils, Readonly.
 
 SEE ALSO
     Tags::HTML::Page::End
@@ -204,5 +244,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.07
+    0.09
 

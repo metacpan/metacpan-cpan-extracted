@@ -1,10 +1,8 @@
 use strict;
 use warnings;
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
 use Hash::Digger qw(dig diggable exhume);
-use Test::More tests => 19;
+use Test::More tests => 23;
 use Test::Exception;
 
 my $hash;
@@ -57,4 +55,15 @@ is_deeply($hash, $org_hash, 'no autovivification');
 
 ok diggable($hash, qw(foo bar1 bar2))
 ,'checks diggable path';
+is_deeply($hash, $org_hash, 'no autovivification');
+
+$hash->{foo}{bar11}{bar22}{bar33}{bar44} = undef;
+$org_hash->{foo}{bar11}{bar22}{bar33}{bar44} = undef;
+
+ok diggable($hash, qw(foo bar11 bar22 bar33 bar44))
+,'diggable returns Truthy if value exists and is equal to undef';
+is_deeply($hash, $org_hash, 'no autovivification');
+
+is dig($hash, qw(foo bar11 bar22 bar33 bar44)), undef
+,'last element is undef, but it exists';
 is_deeply($hash, $org_hash, 'no autovivification');

@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx-FixtureLoader
 
+0.20 2020-09-18T15:24:58Z
+    - Even if the fixture is empty, it issues delete properly when the delete option is specified (chibapse++)
+
 0.12 2015-04-12T14:47:07Z
     - support TSV files
 

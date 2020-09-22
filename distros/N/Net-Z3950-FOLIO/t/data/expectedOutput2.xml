@@ -1,0 +1,24 @@
+    <holding>
+      <typeOfRecord>c</typeOfRecord>
+      <encodingLevel>5</encodingLevel>
+      <format>cr</format>
+      <receiptAcqStatus>6</receiptAcqStatus>
+      <generalRetention>2</generalRetention>
+      <completeness>6</completeness>
+      <dateOfReport>678901</dateOfReport>
+      <nucCode>Simmons University</nucCode>
+      <localLocation>Main Campus</localLocation>
+      <shelvingLocation>Simmons University Library</shelvingLocation>
+      <callNumber>G1046.C3&lt;L56&gt;2009eb</callNumber>
+      <reproductionNote>May be freely copied</reproductionNote>
+      <termsUseRepro>$3Bituminous Coal Division and National Bituminous Coal Commission Records$a&quot;No information obtained from a producer disclosing cost of production or sales realization shall be made public without the consent of the producer from whom the same shall have been obtained&quot;;$c50 Stat.88.</termsUseRepro>
+      <circulations>
+        <circulation>
+          <availableNow value="1" />
+          <itemId>i2036897</itemId>
+          <renewable value="" />
+          <onHold value="" />
+          <enumAndChron>3 March</enumAndChron>
+        </circulation>
+      </circulations>
+    </holding>

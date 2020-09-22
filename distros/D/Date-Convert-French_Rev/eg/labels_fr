@@ -1,14 +1,14 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     French speaking labels for g2r_table, r2g_table and prt_cal
-#     Copyright (C) 2001, 2002, 2003, 2013, 2015 Jean Forget
+#     Copyright (C) 2001, 2002, 2003, 2013, 2015, 2020 Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
 #
 #     You can find the text of the licenses in the F<LICENSE> file or at
-#     L<http://www.perlfoundation.org/artistic_license_1_0>
-#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#     L<https://dev.perl.org/licenses/artistic.html>
+#     and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 #
 #     Here is the summary of GPL:
 #
@@ -24,22 +24,28 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software Foundation,
-#     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#     Inc., <https://www.fsf.org/>.
 #
 #
 # Le hachage des libellés
 #
+use utf8;
+use strict;
+use warnings;
+
 my %labels =
 (  calendar  => 'Calendrier'
  , month3    => [ qw(jan fév mars avr mai juin juil août sep oct nov déc) ]
  , week1     => [ qw(L M M J V S D) ]
  , add_days  => 'Jours complémentaires'
- , month     => [ qw(Janvier Février Mars Avril Mai Juin Juillet Août Septembre 
+ , month     => [ qw(Janvier Février Mars Avril Mai Juin Juillet Août Septembre
                  Octobre Novembre Décembre) ]
  , title1    => "Lettres pour une année"
  , title2    => { b => "Début d'année", m => "Milieu d'année", e => "Fin d'année" }
  , title3    => "Nom des mois et des jours"
  , year_ttl  => "Année"
+ , titleg2r  => "Conversion de dates du calendrier grégorien vers le calendrier républicain"
+ , titler2g  => "Conversion de dates du calendrier républicain vers le calendrier grégorien"
 );
 
 #
@@ -56,16 +62,16 @@ $labels{format} = sub {
 #
 $labels{usage1} =  <<'EOT';
 <h3>Comment convertir $gr_date</h3>
-<p>Regardez d'abord la première table. L'année grégorienne 
-<strong>$y</strong> 
+<p>Regardez d'abord la première table. L'année grégorienne
+<strong>$y</strong>
 se trouve dans l'intervalle
-<em>$begint&nbsp;-&nbsp;$end_of_interval{$begint}</em> 
-et elle se termine par les deux chiffres 
+<em>$begint&nbsp;-&nbsp;$end_of_interval{$begint}</em>
+et elle se termine par les deux chiffres
 <strong>$y2</strong>.
 Dans la ligne et la colonne correspondantes, la case contient les trois lettres
 <em>$word</em>.
-<p>Regardez ensuite les trois tables suivantes. 
-<strong>$labels{month}[$m-1]</strong> 
+<p>Regardez ensuite les trois tables suivantes.
+<strong>$labels{month}[$m-1]</strong>
 apparaît dans la table
 <em>$labels{title2}{$part}</em>
 qui comporte en en-tête la mention
@@ -73,25 +79,25 @@ qui comporte en en-tête la mention
 Vous pouvez donc en déduire tout de suite l'année républicaine, qui est
 <strong>$ryear</strong>.
 Parmi ces trois lettres
-<em>$word</em>, 
-la lettre 
-<em>$letter</em> 
+<em>$word</em>,
+la lettre
+<em>$letter</em>
 est celle qui apparaît dans la même table. La case correspondante contient les deux formules&nbsp;:
-<em>@formulas</em>. 
+<em>@formulas</em>.
 Choisissez celle qui convertit le jour
 <strong>$d</strong>
 en un nombre de 1 à 30. C'est-à-dire, jusqu'à
 <strong>$limit $labels{month}[$m - 1]</strong>
 inclus, utilisez la première formule
-<em>$formulas[0]</em>, 
+<em>$formulas[0]</em>,
 et ultérieurement, utilisez la deuxième formule
 <em>$formulas[1]</em>.
 Dans le cas présent, le numéro du jour grégorien est
-<strong>$d</strong>, 
+<strong>$d</strong>,
 donc vous appliquez la formule
-<em>$formula</em>, 
+<em>$formula</em>,
 et vous obtenez
-<strong>$abridged</strong>. 
+<strong>$abridged</strong>.
 Il ne reste plus qu'à extraire le nom du jour et le nom du mois de la dernière table, ce qui donne
 <strong>$rev_date</strong>.
 EOT
@@ -109,76 +115,76 @@ et dans la table
 <em>$labels{title2}{e}</em>.
 La première donne deux formules pour le jour&nbsp;:
 <em>$formulas[0]</em>
-et 
-<em>$formulas[1]</em>, 
+et
+<em>$formulas[1]</em>,
 (colonne
-<em>$mletter</em>), 
+<em>$mletter</em>),
 ainsi que
 <em>$labels{year_ttl}&nbsp;-&nbsp;1792</em>
 pour l'année. L'autre donne
 <em>$formulas[2]</em>
-pour le jour 
+pour le jour
 (colonne
-<em>$eletter</em>), 
-et 
+<em>$eletter</em>),
+et
 <em>$labels{year_ttl}&nbsp;-&nbsp;1791</em>
 pour l'année.
 <p>Essayez d'abord la dernière formule
 <em>$formulas[2]</em>,
 puis la précédente
-<em>$formulas[1]</em>, 
+<em>$formulas[1]</em>,
 et enfin la première
-<em>$formulas[0]</em>, 
+<em>$formulas[0]</em>,
 jusqu'à obtenir un résultat supérieur ou égal à 1.
 <p>Dans le cas de
-<strong>$d $labels{month}[8] $y</strong>, 
+<strong>$d $labels{month}[8] $y</strong>,
 il faut appliquer
 <em>$formula</em>,
 ainsi que la formule correspondante pour l'année
 <em>$labels{year_ttl}&nbsp;-&nbsp;$offset</em>,
 ce qui donne
-<strong>$abridged</strong>, 
+<strong>$abridged</strong>,
 ou mieux,
 <strong>$rev_date</strong>.
 EOT
 
 #
-# Mode d'emploi pour la conversion du calendrier révolutionnaire 
+# Mode d'emploi pour la conversion du calendrier révolutionnaire
 # vers le calendrier grégorien.
 #
 $labels{usage3} = <<'EOT';
 <h3>Comment convertir $title_date</h3>
 <p>Commencez par la première table. L'année du calendrier révolutionnaire,
-<strong>$y</strong> 
+<strong>$y</strong>
 se trouve dans l'intervalle
-<em>$begint&nbsp;-&nbsp;$end_of_interval{$begint}</em> 
+<em>$begint&nbsp;-&nbsp;$end_of_interval{$begint}</em>
 et ses deux derniers chiffres sont
-<em>$y2</em>. 
+<em>$y2</em>.
 Dans la ligne et la colonne correspondantes, vous trouvez les deux lettres
-<em>$word</em>. 
+<em>$word</em>.
 <p>Et maintenant, reportez-vous aux deux autres tables. Le mois
-<strong>$fr_month[$m-1]</strong> 
+<strong>$fr_month[$m-1]</strong>
 figure dans la table
 <em>$labels{title2}{$part}</em>.
 Des deux lettres
-<em>$word</em>, 
+<em>$word</em>,
 c'est
-<em>$letter</em> 
+<em>$letter</em>
 qui apparaît dans cette table. La case correspondante comporte deux formules&nbsp;:
-<em>@formulas</em>. 
+<em>@formulas</em>.
 Choisissez celle qui vous permet de convertir le numéro de jour
 <strong>$d</strong>
-et d'obtenir une valeur compatible avec le mois grégorien résultant. 
+et d'obtenir une valeur compatible avec le mois grégorien résultant.
 C'est-à-dire, jusqu'au
-<strong>$limit $fr_month[$m - 1]</strong>, 
+<strong>$limit $fr_month[$m - 1]</strong>,
 inclus, utilisez la première formule
-<em>$formulas[0]</em>, 
+<em>$formulas[0]</em>,
 et ensuite, utilisez l'autre formule
 <em>$formulas[1]</em>.
 Dans le cas présent, le numéro du jour républicain est
-<strong>$d</strong>, 
-donc vous utilisez la formule 
-<em>$formula</em>, 
+<strong>$d</strong>,
+donc vous utilisez la formule
+<em>$formula</em>,
 ce qui donne
 <strong>$gr_date</strong>.
 EOT
@@ -193,7 +199,7 @@ la case se scinde en deux, car il y a deux formules pour l'année,
 <em>$labels{year_ttl}&nbsp;+&nbsp;1791</em>
 et
 <em>$labels{year_ttl}&nbsp;+&nbsp;1792</em>.
-<p><strong>$fr_month[5]</strong> 
+<p><strong>$fr_month[5]</strong>
 se trouve dans les deux tables. Pour
 <strong>$fr_month[5] $y</strong>,
 dans la colonne
@@ -207,22 +213,24 @@ vous obtenez la formule
 À part cela, tout le reste est identique. C'est-à-dire, jusqu'au
 <strong>$limit $fr_month[5]</strong>
 inclus, utilisez la première formule
-<em>$formulas[0]</em>, 
+<em>$formulas[0]</em>,
 et ensuite, utilisez la formule
 <em>$formulas[1]</em>.
 Par exemple, si vous voulez convertir
-<strong>$title_date</strong>, 
+<strong>$title_date</strong>,
 étant donné que le numéro du jour républicain est
-<strong>$d</strong>, 
+<strong>$d</strong>,
 vous devrez utiliser la formule
-<em>$formula</em>, 
+<em>$formula</em>,
 et vous obtiendrez
 <strong>$gr_date</strong>.
 EOT
 
-\%labels;
+%main::labels = %labels;
 
 __END__
+
+=encoding utf8
 
 =head1 NOM
 
@@ -244,11 +252,11 @@ B<prt_cal> imprime le calendrier républicain pour l'année transmise en
 paramètre. Vous  pouvez demander  le calendrier pour  n'importe quelle
 année après la proclamation de la Première République, vous n'êtes pas
 limités à la  période pendant laquelle le calendrier  a réellement été
-utilisé.  Par exemple, vous pouvez demander le calendrier pour l'année
-210,  ce qui correspond  dans le  calendrier grégorien  à fin  2001 et
-début  2002.   La sortie  obtenue  est  un  fichier HTML.  Le  fichier
-comporte de brèves indications permettant de trouver la correspondance
-avec le calendrier grégorien.
+utilisé. Par exemple, vous pouvez  demander le calendrier pour l'année
+210, ce  qui correspond  dans le  calendrier grégorien  à fin  2001 et
+début 2002.  La sortie obtenue est  un fichier HTML codé  en UTF-8. Le
+fichier  comporte  de  brèves  indications permettant  de  trouver  la
+correspondance avec le calendrier grégorien.
 
 =head1 OPTIONS DE C<prt_cal>
 
@@ -281,12 +289,14 @@ d'afficher une quelconque photo d'un autre genre...
 
 Vous pouvez essayer
 
-  http://images.google.com/images?hl=en&lr=&ie=ISO-8859-1&output=search&q=kitten+basket
-  http://images.google.com/images?hl=en&lr=&ie=ISO-8859-1&output=search&q=mountains
+  https://images.google.com/images?hl=en&lr=&ie=ISO-8859-1&output=search&q=kitten+basket
+  https://images.google.com/images?hl=en&lr=&ie=ISO-8859-1&output=search&q=mountains
 
 Mais surtout pas
 
-  http://images.google.com/images?q=Delacroix+libert%C3%A9+guidant+peuple&hl=en&lr=&ie=UTF-8&output=search
+  https://images.google.com/images?q=Delacroix+libert%C3%A9+guidant+peuple&hl=en&lr=&ie=UTF-8&output=search
+
+=back
 
 =head1 PARAMÈTRE DE C<prt_cal>
 
@@ -346,7 +356,7 @@ Français
 =item columns
 
 Nombre de colonnes  à utiliser pour la première  table. Ce nombre doit
-être un  multuple de 4, plus  1 : 5, 9,  13 ou 17.  Compte  tenu de la
+être un  multiple de 4, plus  1 : 5, 9,  13 ou 17.  Compte  tenu de la
 quasi-périodicité des jours bissextiles,  les années sont groupées par
 4 dans la première table.  Il faut une colonne supplémentaire pour les
 titres  de  ligne.   Notez  que  vous  pouvez  spécifier  des  nombres
@@ -363,11 +373,14 @@ exprimée dans le calendrier républicain.
 
 =item table-workaround
 
-J'ai remarqué  que l'un des navigateurs  web que j'utilise a  du mal à
-mettre en forme un texte  comportant des tables puis à l'imprimer.  Il
-lui arrive d'oublier quelques lignes suivant la table.  J'ai trouvé un
-moyen  de contournement,  qui consiste  à englober  le texte  dans une
-table. Cette option active cette bidouille.
+Conservé pour des raisons historiques
+
+Au début de l'écriture de cette  distribution, dans les années 2001 et
+2002, j'avais  remarqué que l'un  des navigateurs web  que j'utilisais
+avait du mal à  mettre en forme un texte comportant  des tables puis à
+l'imprimer.  Il  lui arrivait  d'oublier  quelques  lignes suivant  la
+table.  J'avais trouvé  un moyen  de contournement,  qui consistait  à
+englober le texte dans une table. Cette option active cette bidouille.
 
 =back
 

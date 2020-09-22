@@ -1,7 +1,7 @@
 package Bencher::Formatter::RenderAsTextTable;
 
-our $DATE = '2020-08-16'; # DATE
-our $VERSION = '1.051'; # VERSION
+our $DATE = '2020-09-21'; # DATE
+our $VERSION = '1.052'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,7 +41,7 @@ Bencher::Formatter::RenderAsTextTable - Scale time to make it convenient
 
 =head1 VERSION
 
-This document describes version 1.051 of Bencher::Formatter::RenderAsTextTable (from Perl distribution Bencher-Backend), released on 2020-08-16.
+This document describes version 1.052 of Bencher::Formatter::RenderAsTextTable (from Perl distribution Bencher-Backend), released on 2020-09-21.
 
 =for Pod::Coverage .*
 

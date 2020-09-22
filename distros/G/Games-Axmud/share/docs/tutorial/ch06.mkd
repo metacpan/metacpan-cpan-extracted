@@ -171,6 +171,8 @@ In other words, if the user types "Frodo", the script below won't PRINT anything
 
         END
 
+By the way, ELSE IF can also be typed as ELSEIF. Both spellings work in exactly the same way.
+
 ##<a name="6.7">6.7 Line formatting</a>
 
 In Axbasic scripts, you can add as much empty space as you like at the beginning of the line, and you can use as many empty lines as you like, too.

@@ -1,53 +1,60 @@
-requires "DateTime::Format::ISO8601" => "0";
-requires "DateTime::Format::Strptime" => "0";
-requires "DateTime::TimeZone" => "0";
-requires "Encode" => "0";
-requires "File::Basename" => "0";
-requires "File::Spec" => "0";
-requires "HTTP::CookieJar" => "0";
-requires "HTTP::Tiny" => "0";
-requires "MIME::Base64" => "0";
-requires "URI" => "0";
-requires "XML::Parser" => "0";
-requires "XML::Writer" => "0";
-requires "parent" => "0";
-requires "perl" => "v5.8.0";
-requires "strict" => "0";
-requires "warnings" => "0";
+requires "perl", "5.8.0";
+requires "strict";
+requires "warnings";
+requires "parent";
 
-on 'build' => sub {
-  requires "Module::Build" => "0.28";
+requires "XML::Parser";
+requires "XML::Writer";
+requires "HTTP::CookieJar";
+requires "HTTP::Tiny";
+requires "File::Basename";
+requires "File::Spec";
+requires "Encode";
+requires "URI";
+requires "DateTime::TimeZone";
+requires "DateTime::Format::Strptime";
+requires "DateTime::Format::ISO8601";
+requires "MIME::Base64";
+
+on test => sub {
+    requires "IO::Socket::SSL";
+    requires "Test::More";
+    requires "Test::RequiresInternet";
+    requires "DateTime";
+    requires "Text::Password::Pronounceable";
+    requires "Data::Dumper";
+    requires "Clone";
 };
 
-on 'test' => sub {
-  requires "Clone" => "0";
-  requires "Data::Dumper" => "0";
-  requires "DateTime" => "0";
-  requires "ExtUtils::MakeMaker" => "0";
-  requires "File::Spec" => "0";
-  requires "IO::Socket::SSL" => "0";
-  requires "Test::More" => "0";
-  requires "Test::RequiresInternet" => "0";
-  requires "Text::Password::Pronounceable" => "0";
-};
+on develop => sub {
+    requires "Dist::Zilla::PluginBundle::Basic";
 
-on 'test' => sub {
-  recommends "CPAN::Meta" => "2.120900";
-};
-
-on 'configure' => sub {
-  requires "ExtUtils::MakeMaker" => "0";
-  requires "Module::Build" => "0.28";
-};
-
-on 'develop' => sub {
-  requires "Test::CPAN::Meta" => "0";
-  requires "Test::EOF" => "0";
-  requires "Test::EOL" => "0";
-  requires "Test::Kwalitee" => "1.21";
-  requires "Test::More" => "0.88";
-  requires "Test::NoBreakpoints" => "0.15";
-  requires "Test::NoTabs" => "0";
-  requires "Test::Pod" => "1.41";
-  requires "Test::Portability::Files" => "0";
+    requires "Dist::Zilla::Plugin::Prereqs::FromCPANfile";
+    requires "Dist::Zilla::Plugin::GithubMeta";
+    requires "Dist::Zilla::Plugin::MetaJSON";
+    requires "Dist::Zilla::Plugin::MetaTests";
+    requires "Dist::Zilla::Plugin::ModuleBuild";
+    requires "Dist::Zilla::Plugin::TravisYML";
+    requires "Dist::Zilla::Plugin::Covenant";
+    requires "Dist::Zilla::Plugin::DOAP";
+    requires "Dist::Zilla::Plugin::Test::Perl::Critic";
+    requires "Dist::Zilla::Plugin::Test::Kwalitee";
+    requires "Dist::Zilla::Plugin::Test::EOF";
+    requires "Dist::Zilla::Plugin::Test::EOL";
+    requires "Dist::Zilla::Plugin::Test::NoTabs";
+    requires "Dist::Zilla::Plugin::Test::Portability";
+    requires "Dist::Zilla::Plugin::Test::ReportPrereqs";
+    requires "Dist::Zilla::Plugin::Test::NoBreakpoints";
+    requires "Dist::Zilla::Plugin::Test::UnusedVars";
+    requires "Dist::Zilla::Plugin::PodSyntaxTests";
+    requires "Dist::Zilla::Plugin::RunExtraTests";
+    requires "Dist::Zilla::Plugin::PkgVersion";
+    requires "Dist::Zilla::Plugin::PodWeaver";
+    requires "Dist::Zilla::Plugin::Git::Remote::Check";
+    requires "Dist::Zilla::Plugin::Git::Check";
+    requires "Dist::Zilla::Plugin::Git::Commit";
+    requires "Dist::Zilla::Plugin::Git::Tag";
+    requires "Dist::Zilla::Plugin::PruneCruft";
+    requires "Dist::Zilla::Plugin::Clean";
+    requires "Dist::Zilla::Plugin::Prereqs";
 };

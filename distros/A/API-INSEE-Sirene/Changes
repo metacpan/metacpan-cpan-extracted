@@ -1,5 +1,8 @@
 Revision history for Perl extension API::INSEE::Sirene.
 
+3.506
+        - Fixed badly named variables
+
 3.505
         - Updated documentation
         - Fixed errors in documentation from the previous version
@@ -11,7 +14,7 @@ Revision history for Perl extension API::INSEE::Sirene.
         - Updated documentation
 
 3.503
-        - Decreased $HARD_MAX_RESULTS value from 10000 to 1000 according to new the specifications applicable from 2019-10-01
+        - Decreased $HARD_MAX_RESULTS value from 10000 to 1000 according to the new specifications applicable from 2019-10-01
         - Updated documentation
 
 3.502

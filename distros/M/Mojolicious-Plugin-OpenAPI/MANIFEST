@@ -57,6 +57,7 @@ t/v2-discriminator.t
 t/v2-file.t
 t/v2-formats.t
 t/v2-headers.t
+t/v2-id-prop.t
 t/v2-readonly.t
 t/v2-tutorial.t
 t/v2-validate-schema.t
@@ -71,5 +72,6 @@ t/v3-style-array.t
 t/v3-style-object.t
 t/v3-tutorial.t
 t/v3-valid_file_refs.t
+t/v3-writeonly.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

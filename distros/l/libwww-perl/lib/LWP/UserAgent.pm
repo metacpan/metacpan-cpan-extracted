@@ -15,7 +15,7 @@ use LWP::Protocol ();
 use Scalar::Util qw(blessed);
 use Try::Tiny qw(try catch);
 
-our $VERSION = '6.47';
+our $VERSION = '6.48';
 
 sub new
 {
@@ -318,7 +318,8 @@ sub request {
     if (   $code == HTTP::Status::RC_MOVED_PERMANENTLY
         or $code == HTTP::Status::RC_FOUND
         or $code == HTTP::Status::RC_SEE_OTHER
-        or $code == HTTP::Status::RC_TEMPORARY_REDIRECT)
+        or $code == HTTP::Status::RC_TEMPORARY_REDIRECT
+        or $code == HTTP::Status::RC_PERMANENT_REDIRECT)
     {
         my $referral = $request->clone;
 

@@ -1,0 +1,11 @@
+/*
+ * style.css -- HTML style-sheet for Net::Z3950::DBIServer documentation
+ * $Id: style.css,v 1.4 2007-03-02 11:23:57 mike Exp $
+ */
+body { color: black; background: white }
+h1 { color: #c0e0c0; background: #80a0c0;
+	padding: 5px 10px; border: 1px transparent; margin-top: 20px }
+h2,h3,h4,h5,h6 { color: #80a0c0 }
+h1,h2,h3,h4,h5,h6 { font-family: Verdana, "Sans Serif", Sans }
+.warning { color: #ff0000; background: #ffff80 }
+pre { background: #ffffc0; margin: 0em 2em; padding: 0.5em 0em }

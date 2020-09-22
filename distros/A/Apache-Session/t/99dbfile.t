@@ -12,6 +12,8 @@ my $package = 'Apache::Session::DB_File';
 
 plan tests => 8;
 
+diag "DB_File version ".DB_File->VERSION();
+
 use_ok $package;
 
 my $origdir = getcwd;

@@ -2,7 +2,7 @@ package FFI::Build::MM;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use Carp ();
 use FFI::Build;
 use JSON::PP ();
@@ -13,7 +13,7 @@ use File::Copy ();
 use ExtUtils::MakeMaker 7.12;
 
 # ABSTRACT: FFI::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub new
@@ -308,7 +308,7 @@ FFI::Build::MM - FFI::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

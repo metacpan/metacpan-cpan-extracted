@@ -1,7 +1,8 @@
 use strict;
 use warnings;
+
 package WWW::Spotify;
-$WWW::Spotify::VERSION = '0.009';
+our $VERSION = '0.010';
 use Moo 2.002004;
 
 use Data::Dumper;
@@ -95,6 +96,12 @@ has 'current_client_credentials' => (
     is      => 'rw',
     isa     => Str,
     default => ''
+);
+
+has 'force_client_auth' => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0
 );
 
 has uri_hostname => (
@@ -395,7 +402,8 @@ sub send_get_request {
     local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
     my $mech = $self->_mech;
 
-    if ( $attributes->{client_auth_required} ) {
+    if (   $attributes->{client_auth_required}
+        || $self->force_client_auth() != 0 ) {
 
         if ( $self->current_access_token() eq '' ) {
             warn "Needed to get access token\n" if $self->debug();
@@ -496,7 +504,7 @@ sub get_client_credentials {
         return $self->current_access_token();
     }
     if ( $self->oauth_client_id() eq '' ) {
-        die 'need to set the client oauth parameters\n';
+        die "need to set the client oauth parameters\n";
     }
 
     my $grant_type = 'client_credentials';
@@ -547,12 +555,9 @@ sub get_access_token {
     my $scope      = shift;
 
     my @scopes = (
-        'playlist-modify',
-        'playlist-modify-private',
-        'playlist-read-private',
-        'streaming',
-        'user-read-private',
-        'user-read-email'
+        'playlist-modify',       'playlist-modify-private',
+        'playlist-read-private', 'streaming',
+        'user-read-private',     'user-read-email'
     );
 
     if ($scope) {
@@ -662,7 +667,7 @@ sub get {
 sub build_url_base {
 
     # first the uri type
-    my $self = shift;
+    my $self      = shift;
     my $call_type = shift || $self->call_type();
 
     my $url = $self->uri_scheme();
@@ -849,16 +854,27 @@ sub search {
     my $type   = shift;
     my $extras = shift;
 
-    return $self->send_get_request(
-        {
-            method => 'search',
-            q      => $q,
-            type   => $type,
-            extras => $extras
+    # looks like search now requires auth
+    # we will force authentication but need to
+    # reset this to the previous value since not
+    # all requests require auth
+    my $old_force_client_auth = $self->force_client_auth();
+    $self->force_client_auth(1);
 
-        }
-    );
+    my $params = {
+        method => 'search',
+        q      => $q,
+        type   => $type,
+        extras => $extras
 
+    };
+
+    my $response = $self->send_get_request($params);
+
+    # reset auth to what it was before to avoid overly chatty
+    # requests
+    $self->force_client_auth($old_force_client_auth);
+    return $response;
 }
 
 sub track {
@@ -970,7 +986,7 @@ WWW::Spotify - Spotify Web API Wrapper
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -1072,6 +1088,18 @@ something like this:
     my $ua = WWW::Mechanize->new( ua => $ua );
 
 =head1 METHODS
+
+=head2 auto_json_decode
+
+When true results will be returned as JSON instead of a perl data structure
+
+    $spotify->auto_json_decode(1);
+
+=head2 auto_xml_decode
+
+When true results will be returned as JSON instead of a perl data structure
+
+    $spotify->auto_xml_decode(1);
 
 =head2 get
 
@@ -1206,6 +1234,14 @@ requires OAuth
 
     $spotify->browse_new_releases
 
+=head2 force_client_auth
+
+Boolean
+
+will pass authentication (OAuth) on all requests when set
+
+    $spotify->force_client_auth(1);
+
 =head2 user
 
 equivalent to /user
@@ -1238,7 +1274,7 @@ Aaron Johnson <aaronjjohnson@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014-2017 by Aaron Johnson.
+This software is copyright (c) 2014 by Aaron Johnson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

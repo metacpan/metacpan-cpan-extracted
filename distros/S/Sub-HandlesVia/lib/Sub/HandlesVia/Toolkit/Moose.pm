@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Moose;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015';
+our $VERSION   = '0.016';
 
 use Sub::HandlesVia::Toolkit;
 our @ISA = 'Sub::HandlesVia::Toolkit';
@@ -165,7 +165,7 @@ sub make_callbacks {
 package Sub::HandlesVia::Toolkit::Moose::PackageTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015';
+our $VERSION   = '0.016';
 
 use Role::Tiny;
 
@@ -203,7 +203,7 @@ around add_attribute => sub {
 package Sub::HandlesVia::Toolkit::Moose::RoleTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015';
+our $VERSION   = '0.016';
 
 use Role::Tiny;
 

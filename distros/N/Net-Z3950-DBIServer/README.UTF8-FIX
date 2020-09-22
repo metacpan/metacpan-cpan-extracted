@@ -1,0 +1,324 @@
+                                                                                                                                                                                                                                                               
+Delivered-To: sauropoda@gmail.com
+Received: by 10.100.252.16 with SMTP id z16cs63664anh;
+        Tue, 20 Dec 2011 17:15:45 -0800 (PST)
+Received: by 10.14.51.136 with SMTP id b8mr1789849eec.65.1324430143856;
+        Tue, 20 Dec 2011 17:15:43 -0800 (PST)
+Return-Path: <mike@lists.indexdata.dk>
+Received: from kebab.indexdata.dk (kebab.indexdata.com. [78.47.209.209])
+        by mx.google.com with ESMTPS id n12si2646859eef.88.2011.12.20.17.15.43
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Tue, 20 Dec 2011 17:15:43 -0800 (PST)
+Received-SPF: neutral (google.com: 78.47.209.209 is neither permitted nor denied by best guess record for domain of mike@lists.indexdata.dk) client-ip=78.47.209.209;
+Authentication-Results: mx.google.com; spf=neutral (google.com: 78.47.209.209 is neither permitted nor denied by best guess record for domain of mike@lists.indexdata.dk) smtp.mail=mike@lists.indexdata.dk; dkim=pass header.i=@ukr.net
+Received: from mike by kebab.indexdata.dk with local (Exim 4.69)
+	(envelope-from <mike@lists.indexdata.dk>)
+	id 1RdAmU-0003HS-BN
+	for sauropoda@gmail.com; Wed, 21 Dec 2011 02:15:42 +0100
+Received: from ffe16.ukr.net ([195.214.192.51])
+	by kebab.indexdata.dk with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.69)
+	(envelope-from <sendel@ukr.net>)
+	id 1RdAmO-0003HC-Mr
+	for mike@indexdata.com; Wed, 21 Dec 2011 02:15:42 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=ukr.net; s=ffe;
+	h=Date:Message-Id:From:To:References:In-Reply-To:Subject:Content-Type:Content-Transfer-Encoding:MIME-Version; bh=LWNBIB7XEQDTyoupTsS8Wyzm9/7Em4JAqU/kTNfDbtE=;
+	b=R/zn9i43vxdO4W/Eehcdx9qtZ6tPPH8/0MAjmTrqMEF8yIAdNhf4faHh1ZOD6ngAkJ0MxDwrIUw5wSE0d09QRNX+CLQT2xyFRUDcAMJilmCMysMhyQKzi5xil9CIjvx3WvOUWLuPTKBJvfFpggRLjfTAM2kDpGvYu8ZLlOP1fWw=;
+Received: from mail by ffe16.ukr.net with local ID 1RdAmJ-0000Eh-Hy
+	for mike@indexdata.com; Wed, 21 Dec 2011 03:15:31 +0200
+MIME-Version: 1.0
+Content-Transfer-Encoding: binary
+Content-Type: multipart/alternative; boundary="_----------=_1324430131990324"
+In-Reply-To: <CACnMvBbdHNMwAhOsPRjtmSY3ZYSoYKmDGfnsq6k+gQ=PJzfzqw@mail.gmail.com>
+References: <CACnMvBbdHNMwAhOsPRjtmSY3ZYSoYKmDGfnsq6k+gQ=PJzfzqw@mail.gmail.com>
+ 	 <CACnMvBbVoE58KPJ+o=GUvPee9WKu7YYhEfSzQ7NyVOnSh3nShw@mail.gmail.com> <77750.1324427016.15259758259483377664@ffe16.ukr.net>
+ 	 <26175.1324424434.17165909531854962688@ffe1.ukr.net>
+To: "Mike Taylor" <mike@indexdata.com>
+From: "Presich Oleksandr" <sendel@ukr.net>
+X-Mailer: freemail.ukr.net 4.0
+X-Originating-Ip: [89.252.23.58]
+Message-Id: <99032.1324430131.3977309154687057920@ffe16.ukr.net>
+X-Browser: Mozilla/5.0 (Windows NT 5.1) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7
+Date: Wed, 21 Dec 2011 03:15:31 +0200
+X-Spam-Checker-Version: SpamAssassin 3.2.5 (2008-06-10) on kebab.indexdata.dk
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.1 required=3.5 tests=BAYES_00,DNS_FROM_RFC_DSN,
+	HTML_MESSAGE,SPF_PASS autolearn=disabled version=3.2.5
+Subject: Re: [zSQLgate] Broken cyrillic symbols
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Mail-From: mike@lists.indexdata.dk
+X-SA-Exim-Scanned: No (on kebab.indexdata.dk); SAEximRunCond expanded to false
+
+This is a multi-part message in MIME format.
+
+--_----------=_1324430131990324
+MIME-Version: 1.0
+Content-Disposition: inline
+Content-Length: 3313
+Content-Transfer-Encoding: binary
+Content-Type: text/plain; charset="windows-1251"
+
+
+
+
+I've found the solution on this issue. Look into comments on this page: 
+http://dev.mysql.com/doc/refman/5.0/en/charset-general.html
+I've just tested it and adding one of these lines has resolved the
+encoding problem:  - $dbh->do("SET character_set_results='utf8'");  - my
+$dbh = DBI->connect($dsn, $user, $pass, {mysql_enable_utf8 => 1});  - $dbh->prepare("SET
+NAMES 'utf8'")->execute();
+So, the problem is with Perl - MySQL communication through DBD:MySQL.
+I'm not sure for now if this is universal one and if it is needed to add
+to the major version.
+
+Anyway thanks for your responses and of course for the whole module.
+>
+
+
+> I guess I would start at the bottom of the stack and work up.  So:
+
+1. Does your terminal print the characters correctly when fed them directly?
+2. Does MySQL's own command-line client print the chars correctly?
+3. Can you write a very simple Perl program using DBD::mysql that
+fetches this data and properly prints it?
+4a. If not, are you at least getting back the correct sequence of
+octets?  So, is the problem with Perl's interpretation of those octets
+as UTF-8?
+4b. If your program works, what is zSQLgate doing differently?
+
+I hope this is enough to be at least slightly helpful.  Best of luck
+as you track this down -- do let me know how it turns out.
+
+-- Mike.
+
+
+
+2011/12/21 Presich Oleksandr <sendel@ukr.net>:
+> Hi Mike,
+> thanks for the quick response on that but unfortunately I'm not ready to
+> spent funds on consultancy.
+>
+> So, for now i'm looking for any advise what and where could i dig to find
+> out the reason of broken symbols.
+>
+>
+>
+> Hi, Presich.  I'll be happy to look into this for you if you wish, but
+> because I am not using non-ASCII characters in zSQLgate myself this
+> would be work I wouldn't otherwise undertake, which would mean I'd
+> have to do it on a consultancy basis.  Do you have any funds that
+> could be used for this?
+>
+> -- Mike.
+>
+>
+>
+> 2011/12/20 Presich Oleksandr <sendel@ukr.net>:
+>> Hi all,
+>> i'm trying to follow the zSQLgate Tutorial but can't read cyrillic symbols
+>> from mysql database.
+>>
+>> MySQL default character set is utf8, text is saved in utf8_general_ci
+>> collation but here is what i receive on the client:
+>>
+>> Listing 1: client
+>>
+>> Z> [presich@test ~]$ yaz-client @:3950
+>> Connecting...OK.
+>> Sent initrequest.
+>> Connection accepted by v3 target.
+>> ID     : 169/81
+>> Name   : Net::Z3950::DBIServer/GFS/YAZ
+>> Version: 4.2.17 ffca367b18062164e077f24b2563f219e5c4ad02
+>> Options: search present triggerResourceCtrl namedResultSets
+>> Elapsed: 0.034328
+>> Z> base mydb
+>> Z> find @attr 1=12 @attr 2=3 29
+>> Sent searchRequest.
+>> Received SearchResponse.
+>> Search was a success.
+>> Number of hits: 1, setno 1
+>> records returned: 0
+>> Elapsed: 0.004471
+>> Z> format xml
+>> Z> show 1
+>> Sent presentRequest (1+1).
+>> Records: 1
+>> []Record type: XML
+>> <catalog_product_entity_text>
+>>  <authorId>29</authorId>
+>>  <authorName>??????? SDF</authorName>
+>> </catalog_product_entity_text>
+>> nextResultSetPosition = 2
+>> Elapsed: 0.001676
+>>
+>> Please advise where and what else can I check that can broke the encoding.
+>>
+>> Thanks.
+>>
+>> _______________________________________________
+>> zSQLgate mailing list
+>> zSQLgate@lists.indexdata.dk>> http://lists.indexdata.dk/cgi-bin/mailman/listinfo/zsqlgate>>
+>
+
+
+--_----------=_1324430131990324
+Content-Disposition: inline
+Content-Length: 5279
+Content-Transfer-Encoding: binary
+Content-Type: text/html; charset="windows-1251"
+
+<html>
+<body>
+
+
+  
+
+
+
+  I've found the solution on this issue. Look into comments on this page:&#160; <a href="http://dev.mysql.com/doc/refman/5.0/en/charset-general.html">http://dev.mysql.com/doc/refman/5.0/en/charset-general.html</a>
+
+  <div>
+    <br>
+
+    <div>
+      I've just tested it and adding one of these lines has resolved the encoding problem:
+    </div>
+
+    <div>
+      &#160;-&#160;<span style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; line-height: 23px; text-align: -webkit-auto;">$dbh-&gt;do("SET character_set_results='utf8'");</span>
+    </div>
+
+    <div>
+      <span style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; line-height: 23px; text-align: -webkit-auto;">&#160;-&#160;</span><span style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; line-height: 23px; text-align: -webkit-auto;">my $dbh = DBI-&gt;connect($dsn, $user, $pass, {mysql_enable_utf8 =&gt; 1});</span>
+    </div>
+
+    <div>
+      <span style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; line-height: 23px; text-align: -webkit-auto;">&#160;-&#160;</span><span style="font-family: Helvetica, Arial, sans-serif; font-size: 13px; line-height: 23px; text-align: -webkit-auto;">$dbh-&gt;prepare("SET NAMES 'utf8'")-&gt;execute();</span>
+    </div>
+
+    <div>
+      <br>
+
+      <div>
+        So, the problem is with Perl - MySQL communication through DBD:MySQL.
+      </div>
+
+      <div>
+        <br>
+      </div>
+
+      <div>
+        I'm not sure for now if this is universal one and if it is needed to add to the major version.<br>
+
+        <div>
+          <br>
+        </div>
+
+        <div>
+          Anyway thanks for your responses and of course for the whole module.<br>
+
+          <blockquote class="ukr_editor_quotation" style="border-left: 1px solid rgb(204, 204, 204); margin: 0px 0px 0px 0.8ex; padding-left: 1ex;">
+            <pre>
+<br>I guess I would start at the bottom of the stack and work up.  So:
+
+1. Does your terminal print the characters correctly when fed them directly?
+2. Does MySQL's own command-line client print the chars correctly?
+3. Can you write a very simple Perl program using DBD::mysql that
+fetches this data and properly prints it?
+4a. If not, are you at least getting back the correct sequence of
+octets?  So, is the problem with Perl's interpretation of those octets
+as UTF-8?
+4b. If your program works, what is zSQLgate doing differently?
+
+I hope this is enough to be at least slightly helpful.  Best of luck
+as you track this down -- do let me know how it turns out.
+
+-- Mike.
+
+
+
+2011/12/21 Presich Oleksandr &lt;<a href="mailto:sendel@ukr.net">sendel@ukr.net</a>&gt;:
+&gt; Hi Mike,
+&gt; thanks for the quick response on that but unfortunately I'm not ready to
+&gt; spent funds on consultancy.
+&gt;
+&gt; So, for now i'm looking for any advise what and where could i dig to find
+&gt; out the reason of broken symbols.
+&gt;
+&gt;
+&gt;
+&gt; Hi, Presich.  I'll be happy to look into this for you if you wish, but
+&gt; because I am not using non-ASCII characters in zSQLgate myself this
+&gt; would be work I wouldn't otherwise undertake, which would mean I'd
+&gt; have to do it on a consultancy basis.  Do you have any funds that
+&gt; could be used for this?
+&gt;
+&gt; -- Mike.
+&gt;
+&gt;
+&gt;
+&gt; 2011/12/20 Presich Oleksandr &lt;<a href="mailto:sendel@ukr.net">sendel@ukr.net</a>&gt;:
+&gt;&gt; Hi all,
+&gt;&gt; i'm trying to follow the zSQLgate Tutorial but can't read cyrillic symbols
+&gt;&gt; from mysql database.
+&gt;&gt;
+&gt;&gt; MySQL default character set is utf8, text is saved in utf8_general_ci
+&gt;&gt; collation but here is what i receive on the client:
+&gt;&gt;
+&gt;&gt; Listing 1: client
+&gt;&gt;
+&gt;&gt; Z&gt; [presich@test ~]$ yaz-client @:3950
+&gt;&gt; Connecting...OK.
+&gt;&gt; Sent initrequest.
+&gt;&gt; Connection accepted by v3 target.
+&gt;&gt; ID     : 169/81
+&gt;&gt; Name   : Net::Z3950::DBIServer/GFS/YAZ
+&gt;&gt; Version: 4.2.17 ffca367b18062164e077f24b2563f219e5c4ad02
+&gt;&gt; Options: search present triggerResourceCtrl namedResultSets
+&gt;&gt; Elapsed: 0.034328
+&gt;&gt; Z&gt; base mydb
+&gt;&gt; Z&gt; find @attr 1=12 @attr 2=3 29
+&gt;&gt; Sent searchRequest.
+&gt;&gt; Received SearchResponse.
+&gt;&gt; Search was a success.
+&gt;&gt; Number of hits: 1, setno 1
+&gt;&gt; records returned: 0
+&gt;&gt; Elapsed: 0.004471
+&gt;&gt; Z&gt; format xml
+&gt;&gt; Z&gt; show 1
+&gt;&gt; Sent presentRequest (1+1).
+&gt;&gt; Records: 1
+&gt;&gt; []Record type: XML
+&gt;&gt; &lt;catalog_product_entity_text&gt;
+&gt;&gt;  &lt;authorId&gt;29&lt;/authorId&gt;
+&gt;&gt;  &lt;authorName&gt;??????? SDF&lt;/authorName&gt;
+&gt;&gt; &lt;/catalog_product_entity_text&gt;
+&gt;&gt; nextResultSetPosition = 2
+&gt;&gt; Elapsed: 0.001676
+&gt;&gt;
+&gt;&gt; Please advise where and what else can I check that can broke the encoding.
+&gt;&gt;
+&gt;&gt; Thanks.
+&gt;&gt;
+&gt;&gt; _______________________________________________
+&gt;&gt; zSQLgate mailing list
+&gt;&gt; <a href="mailto:zSQLgate@lists.indexdata.dk">zSQLgate@lists.indexdata.dk</a>
+&gt;&gt; <a href="http://lists.indexdata.dk/cgi-bin/mailman/listinfo/zsqlgate">http://lists.indexdata.dk/cgi-bin/mailman/listinfo/zsqlgate</a>
+&gt;&gt;
+&gt;
+
+</pre>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+</body>
+</html>
+--_----------=_1324430131990324--
+
+

@@ -1,6 +1,18 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 88febab5e2a7b1a1b1ae8f31dd3fd8817a9e7ddf
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Sep 9 16:15:38 2020 -0700
+
+    README update
+
+commit 26e3d50176a1362bb5760858f5e2ccd367a219a8
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon Aug 31 14:29:48 2020 -0700
+
+    Minor POD update, linked to Apache::XAO and Plack modules
+
 commit 550acb723c1b9fb4976518fc67c2eae7867cde1d
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Wed Aug 26 16:15:47 2020 -0700
@@ -67,16 +79,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Wed Nov 20 12:50:27 2019 -0800
 
     1.78 Allowed for removing of headers set earlier
-
-commit 066d0aec4dd9e4e6a440769f6541ea98b1a2b316
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Sat Apr 27 07:19:35 2019 -0700
-
-    Minor man page edits
-
-commit 85c422a105dcebe891844cd0f13ba1cad907fdfe
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Apr 26 16:10:25 2019 -0700
-
-    1.77 Added max_age and headers options for maptodir
 

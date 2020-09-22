@@ -37,6 +37,8 @@ prereqs:
     requires:
       - DateTime
       - Module::Load
+      - Test::DBIx::Class
+      - Test::mysqld
 
 plugins:
   - +config: Author::CSSON

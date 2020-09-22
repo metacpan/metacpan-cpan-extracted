@@ -5,7 +5,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::XMLRPC::Handler;
-$BZ::Client::XMLRPC::Handler::VERSION = '4.4002';
+$BZ::Client::XMLRPC::Handler::VERSION = '4.4003';
 sub new {
     my $class = shift;
     my $self = { @_ };
@@ -87,7 +87,7 @@ BZ::Client::XMLRPC::Handler - Abstract event handler for parsing an XML-RPC resp
 
 =head1 VERSION
 
-version 4.4002
+version 4.4003
 
 =head1 AUTHORS
 
@@ -105,7 +105,7 @@ Jochen Wiedmann <jochen.wiedmann@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dean Hamstad.
+This software is copyright (c) 2020 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

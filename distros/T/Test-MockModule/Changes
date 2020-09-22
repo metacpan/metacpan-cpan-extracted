@@ -1,5 +1,8 @@
 Revision history for Test::MockModule
 
+v0.175.0
+- 964aa2a Ignore CI files and whitesource - Nicolas R
+
 v0.174.0
 - cf65e7c Fix typo in pod - nima
 

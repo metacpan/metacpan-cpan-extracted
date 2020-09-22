@@ -7,6 +7,12 @@ Home page:    <https://metacpan.org/release/Zydeco>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.609	2020-09-19
+
+ [ Packaging ]
+ - Require latest MooX::Press as 0.073 and 0.074 have buggy handling of
+   type constraints for tag roles.
+
 0.608	2020-09-17
 
  - Fix parsing whitespace around lists of parameterized role parameters.

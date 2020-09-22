@@ -2,8 +2,8 @@ NAME
     WWW::PAUSE::Simple - An API for PAUSE
 
 VERSION
-    This document describes version 0.447 of WWW::PAUSE::Simple (from Perl
-    distribution WWW-PAUSE-Simple), released on 2020-02-18.
+    This document describes version 0.449 of WWW::PAUSE::Simple (from Perl
+    distribution WWW-PAUSE-Simple), released on 2020-09-21.
 
 SYNOPSIS
 DESCRIPTION
@@ -82,13 +82,13 @@ FUNCTIONS
 
     Delete older versions of distributions.
 
-    Developer releases will not be deleted.
+    Currently does not look for releases in subdirectories.
 
-    To delete developer releases, you can use "delete_files" (rm), e.g. from
-    the command line:
+    By default does not include developer (trial) releases. To include that,
+    use "--include-dev".
 
-     % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases
-     % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore
+    To only cleanup developer releases, you can use "--include-dev" and
+    "--exclude-nondev".
 
     This function is not exported by default, but exportable.
 
@@ -99,6 +99,14 @@ FUNCTIONS
     *   detail => *bool*
 
         Whether to return detailed records.
+
+    *   include_dev => *bool* (default: 0)
+
+        Whether to include cleaning up non-dev releases.
+
+    *   include_nondev => *bool* (default: 1)
+
+        Whether to include cleaning up non-dev releases.
 
     *   num_keep => *int* (default: 1)
 
@@ -168,6 +176,10 @@ FUNCTIONS
 
         Whether to return detailed records.
 
+    *   include_dev => *bool*
+
+    *   include_nondev => *bool* (default: 1)
+
     *   newest => *bool*
 
         Only show newest non-dev version.
@@ -176,7 +188,7 @@ FUNCTIONS
 
     *   newest_n => *int*
 
-        Only show this number of newest non-dev versions.
+        Only show this number of newest versions.
 
         Dev versions will be skipped.
 

@@ -1,4 +1,10 @@
 Revision history for Term-Scroller
 
+1.1     17 Sep, 2020
+        Add tab-width option
+        Fix garbled output when input has tab characters
+        Fix STDERR of command not appearing in viewport in some cases.
+1.01    17 Sep, 2020
+        Documentation Improvements
 1.0     31 Aug, 2020
         Initial Version

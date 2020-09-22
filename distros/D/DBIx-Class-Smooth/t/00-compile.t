@@ -17,7 +17,7 @@ my @module_files = (
     'DBIx/Class/Smooth/Helper/ResultSet/Shortcut/Join.pm',
     'DBIx/Class/Smooth/Helper/ResultSet/Shortcut/OrderByCollation.pm',
     'DBIx/Class/Smooth/Helper/ResultSet/Shortcut/RemoveColumns.pm',
-    'DBIx/Class/Smooth/Helper/Row/Creation.pm',
+    'DBIx/Class/Smooth/Helper/Row/Definition.pm',
     'DBIx/Class/Smooth/Helper/Row/JoinTable.pm',
     'DBIx/Class/Smooth/Helper/Util.pm',
     'DBIx/Class/Smooth/Lookup/DateTime.pm',

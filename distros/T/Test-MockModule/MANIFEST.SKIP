@@ -7,9 +7,16 @@
 ,v$
 \B\.svn\b
 \B\.git\b
+\B\.github\b
 \B\.gitignore\b
 \b_darcs\b
 \B\.cvsignore$
+
+# ignore ci files
+^ci\b
+
+# ignore whitesource
+\B\.whitesource
 
 # Avoid VMS specific MakeMaker generated files
 \bDescrip.MMS$

@@ -1,12 +1,15 @@
-use v5.32;
+use v5.16;
 use utf8;
 package Art::World;
-
 
 # use Art::Agent;
 #has Art::Agent::Artist @.artists;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
+
+use Zydeco;
+
+class Playground {};
 
 1;
 
@@ -14,16 +17,29 @@ our $VERSION = '0.15';
 
 =head1 NAME
 
-Art::World - An Art World simulator game 🎨
+Art::World - Agents interactions modeling  🎨
 
 =head1 SYNOPSIS
 
   use Art::World;
 
+=head1 OBJECTIVES
+
+
+Art::World is an attempt to model and simulate a system describing the interactions and influences between the various I<agents> of the art world.
+
+If a correct API is reached, we'll try to build a "game of art" frontend.
+
 =head1 DESCRIPTION
 
-Art::World is an attempt to model an art world simulation system. If a
-correct API is reached, we'll try to build a "game of art" frontend.
+=begin html
+
+<p>
+  <img alt="Some illustrations sticked on a wall" src="https://gitlab.com/smonff/art-world/-/raw/master/spec/schema_v2.png"
+    width="600px">
+</p>
+
+=end html
 
 =over
 
@@ -33,7 +49,7 @@ correct API is reached, we'll try to build a "game of art" frontend.
 
 =item 03 Idea comes from discourse (given about project)
 
-=item 04 Idea come when there is no time left
+=item 04 Idea comes when there is no time left
 
 =item 05 Ideas constitue the project
 
@@ -61,9 +77,9 @@ correct API is reached, we'll try to build a "game of art" frontend.
 
 =item 13 File is made of discourse
 
-=item 14 File archive ideas, that makes possible to forget them
+=item 14 File archives ideas, making possible to forget them
 
-=item 15 File generate a project
+=item 15 File generates a project
 
 =back
 
@@ -71,7 +87,7 @@ correct API is reached, we'll try to build a "game of art" frontend.
 
 =item 16 Discourse steers ideas
 
-=item 17 Discourse analyze process
+=item 17 Discourse analyzes process
 
 =item 18 Discourse talks about the file
 
@@ -83,9 +99,9 @@ correct API is reached, we'll try to build a "game of art" frontend.
 
 =over
 
-=item 21 From time to time, ideas appears
+=item 21 From time to time, ideas appear
 
-=item 22 Time needed to apply the process
+=item 22 Time is needed to apply the process
 
 =item 23 Time is suspended into file, process is off there
 
@@ -113,10 +129,77 @@ correct API is reached, we'll try to build a "game of art" frontend.
 
 This is a long term continuation of an art project started circa 2006.
 
+In 2005, I got a metal box and colored carton cards and called this I<Le
+Fichier>. It was basically a database of artworks ideas. I was trashing all
+ideas I could have of serious or weird potential artworks. It was inspired
+either by Roland Barthes, who was actually working with those kind of cards,
+Georges Perec, who was exploring I<potentialities>, and Édouard Levé I<Oeuvres>,
+a huge catalog of potential artworks (he later commited suicide after describing
+his own I<Suicide> in a book).
+
+2006 I initiated a FileMaker database of artworks to put the old style carton
+cards in computer form. I had no idea what I was doing at this time, being an
+art school student, at this time, programming was not massively taught as a fine art (unfortunately).
+
+In 2008 I benefited of an artist residency in an agricultural college with a
+creation grant of 10 000€. I wanted to keep working on my I<Art World and Creative
+Processes schemas> projects initiated during art school. It didn't go very well
+because the Plastic Art I<State Inspector> didn't like what I was
+doing with her money and strongly advised to change orientation. In my opinion, it
+was a perfect thing that the instutition itself would exhibit it's own workings. In the end, there was an exhibition, but she didn't
+come to the opening.
+
+Anyway, I ended up interviewing many I<Agents> of the college, and went
+especially well with some natural sciences teacher. He recommended a manual were
+I found some schemas that I made some I<detournement>: I used the geology
+science as a metaphor of art world. I used geology terms and language to
+describe social interactions that were not described in the art sociology field.
+
+=begin html
+
+<p>
+  <img alt="Pencil schema with mountains" src="https://gitlab.com/smonff/art-world/-/raw/master/spec/schema_v4.png"
+    width="600px">
+</p>
+
+=end html
+
+The residency ended up with L<the redaction of a rather precise documentation|https://files.balik.network/art/schema_v4_presentation.pdf> (maybe my first specification).
+
+Then I almost got beaten by a fellow artist who was participating in a collective
+exhibition mostly for the money and not for the fun. I guess he felt a bit provoked by my situationist theory.
+
+In 2008, I finally decided to start a training to learn programming and design a proper database and system for I<managing a virtual Art
+World>. I became a web developer, but I totally forgot the ulterior motive.
+
+Sometimes I thought about it:
+
+=over
+
+=item 2013 Perl try
+
+I bootstrapped a Perl module with 5 abstract empty classes and then let it sleep on Github
+
+=item 2017 Raku try
+
+I restarted my project while getting into Raku
+(it was still Perl6 at this time), but learning Raku was too much effort and I
+abandonned again.
+
+Ten years later I am still on it. This project is L<following me in my
+dreams|https://smonff.gitlab.io/art-school-story/>. I'll give it another try.
+
+=back
+
 =head1 AUTHOR
 
-Sébastien Feugère <sebastien@feugere.net>
-Seb. Hu-Rillettes <shr@balik.network>
+=over
+
+=item Sébastien Feugère <sebastien@feugere.net>
+
+=item Seb. Hu-Rillettes <shr@balik.network>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

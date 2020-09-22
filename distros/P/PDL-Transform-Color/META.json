@@ -51,6 +51,6 @@
          "url" : "git://github.com/drzowie/PDL-Transform-Color.git"
       }
    },
-   "version" : "1.004",
+   "version" : "1.005",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

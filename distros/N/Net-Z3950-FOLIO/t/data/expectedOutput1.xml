@@ -1,0 +1,25 @@
+    <holding>
+      <typeOfRecord>c</typeOfRecord>
+      <encodingLevel>5</encodingLevel>
+      <format>cr</format>
+      <receiptAcqStatus>6</receiptAcqStatus>
+      <generalRetention>2</generalRetention>
+      <completeness>6</completeness>
+      <dateOfReport>678901</dateOfReport>
+      <callNumber>G1046.C3 .L56 2009eb</callNumber>
+      <shelvingData>The Amazing Adventures of Captain Gladys &quot;Stoat&quot; Pamphlet and Her Intrepid Spaniel Stig Among the Giant Pygmies of Beccles</shelvingData>
+      <copyNumber>3</copyNumber>
+      <publicNote>All Cretans are liars</publicNote>
+      <termsUseRepro>$3Bituminous Coal Division and National Bituminous Coal Commission Records$a&quot;No information obtained from a producer disclosing cost of production or sales realization shall be made public without the consent of the producer from whom the same shall have been obtained&quot;;$c50 Stat.88.</termsUseRepro>
+      <circulations>
+        <circulation>
+          <availableNow value="0" />
+          <restrictions>Missing</restrictions>
+          <itemId>item12345</itemId>
+          <renewable value="" />
+          <onHold value="" />
+          <enumAndChron>42</enumAndChron>
+          <temporaryLocation>Simmons University/Main Campus/Simmons &amp; Wentworth Library/Online</temporaryLocation>
+        </circulation>
+      </circulations>
+    </holding>

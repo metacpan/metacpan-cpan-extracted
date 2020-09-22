@@ -1,0 +1,79 @@
+I know how to configure the YAZ GFS so that when my server delivers a MARCXML record, it gets translated into actual MARC (i.e. ISO2709). I believe there is a similar facility for converting some kind of XML into OPAC records, but I can't find the documentation for that. Does it exist?
+
+Adam Dickmeiss [12:42 PM]
+
+<retrieval syntax="opac"/>
+       <retrieval name="opac" syntax="xml">
+         <backend name="F" syntax="opac">
+           <marc inputcharset="marc-8" inputformat="marc" outputformat="marcxml"/>
+         </backend>
+       </retrieval>
+
+Your inputcharset is probably "utf-8" for Perl
+YAZ GFS will convert OPAC XML to OPAC. with this.
+
+Bad paste.. I'll try again
+
+<retrieval syntax="opac">
+ <backend name="opac" syntax="xml"/>
+</retrieval>
+
+So you see it asks for element-set=opac and syntax=XML.. So you're supposed to return XML. (edited) 
+
+Mike Taylor [12:53 PM]
+OK. And what is the XML format that I must return?
+
+Adam Dickmeiss [12:53 PM]
+opacxml.xsd in yaz/etc
+See example in test/test_record_conv.c  - function tst_convert3 (edited) 
+
+--
+
+From `yaz/etc/yazgfs.xml`
+
+      <retrieval syntax="xml" name="OP1">
+        <backend syntax="opac" name="F">
+          <marc inputformat="marc" outputformat="marcxml"
+                inputcharset="marc-8" outputcharset="utf-8"/>
+        </backend>
+      </retrieval>
+      <retrieval syntax="opac" name="OP2">
+        <backend syntax="opac" name="F">
+          <marc inputformat="marc" outputformat="marcxml"
+                inputcharset="marc-8" outputcharset="utf-8"/>
+        </backend>
+      </retrieval>
+
+--
+
+Approaches to making OPAC records available:
+
+1. We can provide the raw XML of the instance+holdings+items (IHI)
+records to a `folio2opac.xsl` stylesheet. This would transform the
+holdings and item information into the YAZ XML format and pass control
+to the existing `folio2marcxml.xsl` stylesheet to make the
+bibliographic part of the record. YAZ should take care of transforming
+this XML OPAC+MARC format in to Z39.50 OPAC records.
+
+But that doesn't work when we're getting MARC records from SRS. In
+this case we need:
+
+2. We get back search results from mod-graphql in the IHI format, and
+use the instance IDs from these results to obtain corresponding MARC
+records from SRS. These records come back in a JSON encoding of
+MARC. We need to transform those records into MARCXML, and return both
+wrapped IHI and MARCXML information within simple wrapper records from
+SimpleServer. These will them be transformed into YAZ's OPAC+MARC
+format by means of an `ihi2opac.xsl` stylesheet that passes the
+MARCXML part straight through. Then the YAZ GDS takes care of the
+rest.
+
+But do we even need XSLT, in that case? Why not just:
+
+3. Get back search results from mod-graphql in the IHI format, and
+use the instance IDs from these results to obtain corresponding MARC
+records from SRS. Transform those SRS JSON records into MARCXML, and
+right there in Perl code generate the YAZ OPAC format from the IHI
+records. Wrap the bibliographic and OPAC parts in the aggregate that
+YAZ wants, and return it. No XSLT.
+

@@ -1,3 +1,41 @@
+0.16 2020-09-18T20:14:16Z
+
+
+        - Renaming Buyable to Collectionable
+        - Added is_for_sale() / is_sold() to Collectionable
+        - Adding belongs_to() method on Collectionable role
+        - Moved Test::Pod to test only dependencies
+        - Modularizing tests
+        - Fixing documentation typos
+
+0.15_05 2020-09-16T22:05:25Z
+
+        - An Abstract Work class
+        - Reintroducing the Behavior namespace for roles
+        - Adding more documentation about the 2007 residency
+        - Fixing bugs with the build tools
+
+0.15_04 2020-09-13T20:20:55Z
+
+        - Working on Artwork class
+        - Writing the story of the project in the documentation
+        - Fixing some pod formatting
+        - More tests
+
+0.15_03 2020-09-13T12:22:15Z
+
+        - This is not a game but only a modelisation
+        - Adding a picture of the general specifications in documentation
+
+0.15_02 2020-09-13T10:08:16Z
+
+        - The Agent class is now isolated
+        - The Artist class is now isolated
+        - Active role for very insipred agents
+        - Art::World got a Playground
+        - If Artists have > 1 collector, they are not underground anymore
+        - Minimum Perl version 5.16, not 5.32
+
 0.15 2020-09-12T23:30:28Z
 
         - Removed more old files

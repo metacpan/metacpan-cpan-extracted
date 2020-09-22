@@ -288,6 +288,8 @@ Here's a summary of the most important buttons.
 
 ![Help icon](img/ch04/icon_help.png) Opens a window which displays various help files
 
+![Quit icon](img/ch04/icon_quit.png) Terminates the current connection, or closes the client if there are no sessions open
+
 ![Broom icon](img/ch04/icon_broom.png) Clears the command entry box. If commands are being sent to the world, one character at a time, clicking this button tells Axmud that you're about to start typing a new world command
 
 ![Add icon](img/ch04/icon_add.png) Axmud provides three entry boxes. The main one, which is always visible, is where you type commands. The other two are optional; you can make one or both of them appear if you keep clicking this button.

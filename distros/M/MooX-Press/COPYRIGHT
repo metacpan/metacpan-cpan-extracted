@@ -28,6 +28,7 @@ Files: Changes
  t/31lexhas.t
  t/32multifactory-zylite.t
  t/32multifactory.t
+ t/70tagrole.t
  t/87weirdscopes.t
  t/88patchpackage.t
  t/89anonrolefun.t
@@ -50,6 +51,7 @@ License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
  LICENSE
+ Makefile.PL
  examples/HTTP-Tiny-Objects/get.pl
  examples/HTTP-Tiny-Objects/lib/HTTP/Tiny/Objects.pm
 Copyright: Unknown
@@ -61,18 +63,14 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: README
- lib/MooX/Press.pm
-Copyright: This software is copyright (c) 2019-2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: lib/MooX/Press/Keywords.pm
  lib/Zydeco/Lite.pm
 Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
+Files: README
+ lib/MooX/Press.pm
+Copyright: This software is copyright (c) 2019-2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini

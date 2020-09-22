@@ -1,9 +1,9 @@
 package Bencher::Backend;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-16'; # DATE
+our $DATE = '2020-09-21'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.051'; # VERSION
+our $VERSION = '1.052'; # VERSION
 
 use 5.010001;
 use strict;
@@ -919,12 +919,6 @@ sub _gen_items {
         require ExtUtils::MakeMaker;
         require Module::Path::More;
 
-        return [412, "There are no modules to search multiple versions of"]
-            unless @modules;
-
-        return [412, "Module '$pargs->{multimodver}' is not among modules to benchmark"]
-            unless grep {$pargs->{multimodver} eq $_} @modules;
-
         local @INC = @INC;
         if ($pargs->{include_path} && @{ $pargs->{include_path} }) {
             unshift @INC, $_ for reverse @{ $pargs->{include_path} };
@@ -1080,13 +1074,6 @@ sub _gen_items {
                     }
                 };
             };
-        }
-
-        # don't permute module versions if participant doesn't involve said
-        # module
-        if ($pargs->{multimodver} && defined($h->{modver}) &&
-                $pargs->{multimodver} ne ($p->{module} // '')) {
-            $h->{modver} = '';
         }
 
       ITER_ARGS:
@@ -1317,9 +1304,9 @@ sub _gen_items {
             }
 
             # skip duplicate items
-            my $key = dmp [map { $item->{$_} }
+            my $key = dmp {map { $_ => $item->{$_} }
                                grep { !/^_/ }
-                               sort keys %$item];
+                               sort keys %$item};
             log_trace("item key=%s", $key);
             if ($item_mems{$key}++) {
                 log_trace("Duplicate key, skipped item, recycling seq number %d", $item_seq);
@@ -3747,6 +3734,17 @@ sub bencher {
 
                 my $participant = _find_record_by_seq($participants, $it->{_permute}{participant});
 
+                # scenario was from a dump (_code removed). we reconstruct code
+                # from _code_str
+                if (!$it->{_code}) {
+                    if (defined $it->{_code_str}) {
+                        $it->{_code} = eval $it->{_code_str};
+                        die "Can't compile _code_str '$it->{_code_str}': $@" if $@;
+                    } else {
+                        die "BUG: Item doesn't have _code or _code_str";
+                    }
+                }
+
                 eval {
                     my $result_is_list = $participant->{result_is_list} // 0;
                     if ($capture_stdout && $capture_stderr) {
@@ -4063,6 +4061,11 @@ sub bencher {
                         next unless !length($it->{modver}) ||
                             $it->{modver} eq $modver;
                         next if $item_mems{$it->{seq}}++; # avoid duplicate item
+                        if (defined $it->{_code_str}) {
+                            delete $it->{_code}; # we'll be using _code_str
+                        } else {
+                            die "BUG: Can't dump scenario: no _code_str"; # shouldn't happen
+                        }
                         push @{$sc->{items}}, $it;
                     }
                     #use DD; dd {perl=>$perl, modver=>$modver, items=>$sc->{items}};
@@ -4334,7 +4337,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.051 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2020-08-16.
+This document describes version 1.052 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2020-09-21.
 
 =head1 FUNCTIONS
 
@@ -4873,7 +4876,7 @@ Return value:  (any)
 
 Usage:
 
- format_result( [ \%optional_named_args ] , $envres, $formatters, $options) -> [status, msg, payload, meta]
+ format_result($envres, $formatters, $options, $exclude_formatters) -> [status, msg, payload, meta]
 
 Format bencher result.
 
@@ -4887,7 +4890,7 @@ Arguments ('*' denotes required arguments):
 
 Enveloped result from bencher.
 
-=item * B<exclude_formatters> => I<any>
+=item * B<$exclude_formatters> => I<any>
 
 Exclude Formatters specification.
 

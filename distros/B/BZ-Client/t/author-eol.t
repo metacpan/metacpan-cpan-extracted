@@ -1,7 +1,7 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    print "1..0 # SKIP these tests are for testing by the author\n";
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
     exit
   }
 }
@@ -49,17 +49,7 @@ my @files = (
     't/500group.t',
     't/600product.t',
     't/700user.t',
-    't/author-critic.t',
-    't/author-eof.t',
-    't/author-eol.t',
-    't/author-no-breakpoints.t',
-    't/author-no-tabs.t',
-    't/author-pod-syntax.t',
-    't/author-portability.t',
     't/lib/BZ/Client/Test.pm',
-    't/release-distmeta.t',
-    't/release-kwalitee.t',
-    't/release-unused-vars.t',
     't/servers.cfg',
     't/write-config.pl'
 );

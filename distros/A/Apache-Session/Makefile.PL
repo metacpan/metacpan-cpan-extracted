@@ -5,22 +5,6 @@ use 5.005; #VERSION_FROM in Makefile.PL
 
 use ExtUtils::MakeMaker;
 
-print << 'EOT';
-
-*** REQUEST ***
-Please use Test::Reporter to report test results - it's the only way to measure
-popularity of distribution.
-
-EOT
-
-if ($]<5.006) {
-  print << 'EOT1';
-If you really use perl older than 5.6 - write to alexchorny[AT]gmail.com
-and tell me what version do you use, and why.
-EOT1
-  prompt('continue','y');
-}
-
 WriteMakefile1(
     NAME         => "Apache::Session",
     VERSION_FROM => "lib/Apache/Session.pm",

@@ -108,7 +108,8 @@ sub _build_scrubber {
 
 around 'clean_html' => sub {
   my $orig = shift;
-  my ($self, $html) = @_;
+  my $self = shift;
+  my ($html) = @_;
   $html = $self->$orig($html);
   my $scrubbed = $self->scrubber->scrub($html);
   return $scrubbed;
@@ -116,7 +117,7 @@ around 'clean_html' => sub {
 
 =head1 AUTHOR
 
-Dave Cross, <dave@mag-sol.com>
+Dave Cross, <dave@perlhacks.com>
 
 =head1 COPYRIGHT AND LICENSE
 

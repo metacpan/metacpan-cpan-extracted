@@ -1,9 +1,16 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!doctype html>
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<meta name="generator" content="ReText 7.0.1">
+<style type="text/css">
+td, th { border: 1px solid #c3c3c3; padding: 0 3px 0 3px; }
+table { border-collapse: collapse; }
+img { max-width: 100%; }
+</style>
+<meta name="generator" content="ReText 7.1.0">
 <title>ch15</title>
+<style type="text/css">
+</style>
 </head>
 <body>
 <p><a href="ch14.html">Previous</a> <a href="index.html">Index</a> <a href="ch16.html">Next</a></p>
@@ -20,12 +27,14 @@
 <li><a href="#15.7">15.7 Selecting exits</a></li>
 <li><a href="#15.8">15.8 Simple and complex exits</a><ul>
 <li><a href="#15.8.1">15.8.1 Drawing regions without exits</a></li>
+<li><a href="#15.8.2">15.8.2 Obscured exits</a></li>
 </ul>
 </li>
 <li><a href="#15.9">15.9 One-way exits</a></li>
 <li><a href="#15.10">15.10 Connecting rooms</a></li>
 <li><a href="#15.11">15.11 Moving rooms and labels</a><ul>
 <li><a href="#15.11.1">15.11.1 Dragging exits</a></li>
+<li><a href="#15.11.2">15.11.2 Exit lengths</a></li>
 </ul>
 </li>
 <li><a href="#15.12">15.12 Bent exits</a></li>
@@ -221,8 +230,9 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>You can easily switch between simple and complex exits. Switching styles has no effect on the map itself; the only thing that changes is the way the map is drawn</li>
 </ul>
 <h3><a name="15.8.1">15.8.1 Drawing regions without exits</a></h3>
-<p>Some regions might have a thousand or more rooms, with perhaps ten of thousands of exits. Maps like these cannot be drawn instantaneously; in fact, on some slower computers, the drawing process might take a few seconds.</p>
-<p>Besides drawing simple and complex exits, you can also opt to draw no exits at all.</p>
+<p>Some regions might have many thousands of rooms, with perhaps tens of thousands of exits. </p>
+<p>Axmud has been highly optimised to make the map-drawing process as efficient as possible. However, there are inherent technical and physical limitations beyond the authors' control, so very large maps cannot be drawn instantaneously. In fact, on older computers, the drawing process might take some minutes.</p>
+<p>Besides drawing simple and complex exits, you can also opt to draw no exits at all. Doing so will <em>drastically</em> reduce the drawing time for extremely large maps.</p>
 <ul>
 <li>In the automapper menu, click <strong>View &gt; Exits (all regions) &gt; Use region exit settings</strong><ul>
 <li>You can now set each region's settings individually</li>
@@ -238,6 +248,31 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>If that's still not comfortable, you can opt to fill in the whole box by clicking <strong>View &gt; Draw current room &gt; Draw filled-in room</strong></li>
 </ul>
 <p>There is an alternative method for drawing so-called wilderness rooms - see <a href="#15.24">Section 15.24</a>.</p>
+<h3><a name="15.8.2">15.8.2 Obscured exits</a></h3>
+<p>For very large maps, you can choose to draw a few important exits, and not to draw the rest. This is a 'best of both worlds' option - the drawing time is still short, but you can now see where you are going.</p>
+<p>In this situation, rooms whose exits which are <em>not</em> obscured are:</p>
+<ul>
+<li>The current room, and any nearby rooms</li>
+<li>Any selected rooms</li>
+<li>Rooms with certain room flags (see <a href="#5.21">Section 5.21</a>) - rooms on routes, rooms marked as dangerous, rooms at the centre of the world, and rooms containing portals or signposts</li>
+</ul>
+<p>To enable obscured exits:</p>
+<ul>
+<li>In the automapper menu, click <strong>View &gt; Exits (all regions) &gt; Use region exit settings</strong></li>
+<li>Select a region that has many rooms</li>
+<li>Click <strong>View &gt; Exits (current region) &gt; Obscure unimportant exits</strong></li>
+</ul>
+<p>The meaning or 'rooms near the current room' is any room that's immediately adjacent. You can increase the number of affected rooms, if you like. For example, you can draw exits for all rooms in a 5x5 area, with the current room in the middle: </p>
+<ul>
+<li>Click <strong>View &gt; Exits (current region) &gt; Set obscure radius...</strong></li>
+<li>In the new window, enter a radius of 3</li>
+<li>Click <strong>OK</strong> to apply the setting</li>
+</ul>
+<p>For a 1x1 area - containing only the current room - set a radius of 1.</p>
+<p>As your character moves around, exits which <em>used to</em> be near the current room will still be visible. Most users will want to change that setting, too.</p>
+<ul>
+<li>Click <strong>View &gt; Exits (current region) &gt; Auto re-draw obscured exits</strong></li>
+</ul>
 <h2><a name="15.9">15.9 One-way exits</a></h2>
 <p><img alt="One way exit" src="img/ch15/one_way_exit.png"></p>
 <p>Here we can see a one-way exit. The arrow tells us that we can travel east from the selected (blue) room to the current (red) room, but that we can't travel west to get back to where we started.</p>
@@ -325,6 +360,17 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>Drag the exit while holding down your left mouse button</li>
 <li>When the exit is above the destination room, release your left mouse button</li>
 </ul>
+<h3><a name="15.11.2">15.11.2 Exit lengths</a></h3>
+<p>As your character explores the world, new rooms are normally placed adjacent to each other. If you need to, you can change the default length of an exit. </p>
+<p>Actually, there are two settings you can change: A horizontal length, and a vertical length.</p>
+<p><img alt="Longer exit lengths" src="img/ch15/exit_lengths.png"></p>
+<ul>
+<li>Click <strong>Exits &gt; Exit lengths &gt; Set horizontal length...</strong></li>
+<li>Click <strong>Exits &gt; Exit lengths &gt; Set vertical length...</strong></li>
+<li>To reset both lengths back to normal, click <strong>Exits &gt; Exit lengths &gt; Reset exit lengths</strong></li>
+</ul>
+<p>You can also use the equivalent toolbuttons.</p>
+<p><img alt="Exit length toolbuttons" src="img/ch15/exit_lengths_buttons.png"></p>
 <h2><a name="15.12">15.12 Bent exits</a></h2>
 <p>While moving rooms around the map, you'll already have noticed that exits are able to bend.</p>
 <p><img alt="Bent exit" src="img/ch15/bent_exit_1.png"></p>
@@ -1301,5 +1347,6 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>That's all you need to do. The Locator task and the automapper will take care of everything for you.</p>
 <hr>
 <p><a href="ch14.html">Previous</a> <a href="index.html">Index</a> <a href="ch16.html">Next</a></p>
+
 </body>
 </html>

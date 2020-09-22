@@ -22,7 +22,7 @@ sub clear_cookies {
         $clear_result = $manager->clear_finish($result);
     }, undef);
 
-    Gtk3::main_iteration while Gtk3::events_pending or not $done;
+    Gtk3::main_iteration_do(0) while Gtk3::events_pending or not $done;
 
     return $clear_result;
 }

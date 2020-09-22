@@ -37,7 +37,8 @@ has 'cache'=> (
 
 around 'fetch_page' => sub {
   my $orig = shift;
-  my ($self, $url) = @_;
+  my $self = shift;
+  my ($url) = @_;
   return URI::Fetch->fetch(
     $url,
     UserAgent     => $self->ua,
@@ -48,7 +49,7 @@ around 'fetch_page' => sub {
 
 =head1 AUTHOR
 
-Dave Cross, <dave@mag-sol.com>
+Dave Cross, <dave@perlhacks.com>
 
 =head1 COPYRIGHT AND LICENSE
 

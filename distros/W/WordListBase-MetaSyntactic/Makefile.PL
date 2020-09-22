@@ -17,15 +17,19 @@ my %WriteMakefileArgs = (
   "NAME" => "WordListBase::MetaSyntactic",
   "PREREQ_PM" => {
     "Acme::MetaSyntactic" => 0,
+    "Acme::MetaSyntactic::MultiList" => 0,
+    "WordListRole::WordList" => 0,
+    "parent" => 0,
     "strict" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0
+    "Test::More" => "0.98",
+    "warnings" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,11 +38,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Acme::MetaSyntactic" => 0,
+  "Acme::MetaSyntactic::MultiList" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Test::More" => 0,
-  "strict" => 0
+  "Test::More" => "0.98",
+  "WordListRole::WordList" => 0,
+  "parent" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

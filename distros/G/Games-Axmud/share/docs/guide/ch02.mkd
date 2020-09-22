@@ -129,6 +129,12 @@ From this point, installation is standard.
     dmake install
     axmud.pl
 
+###<a name="2.2.3">2.2.3 Using Festival on MS Windows</a>
+
+Axmud cannot use the Festival text-to-speech engine without patching the [Perl IPC::Run module](https://metacpan.org/pod/IPC::Run>). Instructions for doing this can be found in the Axmud source code, in the file **../axmud/nsis/axmud_installer.nsi**.
+
+The MS Windows installer already contains a patched version of IPC::Run.
+
 ##<a name="2.3">2.3 Installation on Linux</a>
 
 There are three methods of installation on Linux - install using the .deb package, install using the .rpm package or install manually using the source code.

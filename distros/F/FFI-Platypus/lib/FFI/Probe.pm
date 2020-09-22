@@ -2,6 +2,7 @@ package FFI::Probe;
 
 use strict;
 use warnings;
+use 5.008004;
 use File::Basename qw( dirname );
 use Data::Dumper ();
 use FFI::Probe::Runner;
@@ -11,7 +12,7 @@ use Capture::Tiny qw( capture_merged capture );
 use FFI::Temp;
 
 # ABSTRACT: System detection and probing for FFI extensions.
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub new
@@ -512,7 +513,7 @@ FFI::Probe - System detection and probing for FFI extensions.
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

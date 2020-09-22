@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use File::Basename ();
 
 # ABSTRACT: Plugin to extract links from HTML
-our $VERSION = '2.32'; # VERSION
+our $VERSION = '2.33'; # VERSION
 
 
 sub init
@@ -73,7 +73,7 @@ Alien::Build::Plugin::Decode::HTML - Plugin to extract links from HTML
 
 =head1 VERSION
 
-version 2.32
+version 2.33
 
 =head1 SYNOPSIS
 

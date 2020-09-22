@@ -16,7 +16,7 @@ my $dir = File::Temp->newdir();
 
 # logging should be off by default
 my $webkit = WWW::WebKit2->new(
-    xvfb     => 0,
+    xvfb     => 1,
     log_path => "$dir/logs"
 );
 

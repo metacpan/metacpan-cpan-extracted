@@ -1,0 +1,39 @@
+#title Test
+#lang it
+
+BEGIN
+
+** Una commemorazione di Bresci | Capitolo settimo <br> Una commemorazione di Bresci
+; :c123: \markboth{Armando Borghi}{Una xxcommemorazione di Bresci}
+
+; Umberto Primo
+Il 29 luglio 1906, ricorrendo la uccisione di Umberto, dato che i giornali borghesi commemorarono il loro re, noi dell’“Aurora” commemorammo Bresci con un articolo «XXIX Luglio». Secondo la legge, bisognava portare alla censura le bozze del giornale, prima di stamparlo, per dar tempo al censore di ordinare il sequestro. Come era prevedibilissimo, l’articolo fu imbiancato. Ma noi avevamo anticipato tiratura e spedizione. Il cavallo era fuggito dalla stalla quando vennero a chiudere le porte.
+
+          * * * * *
+
+Prova
+
+; Umberto Secondo
+Il 29 luglio 1906, ricorrendo la uccisione di Umberto, dato che i giornali borghesi commemorarono il loro re, noi dell’“Aurora” commemorammo Bresci con un articolo «XXIX Luglio». Secondo la legge, bisognava portare alla censura le bozze del giornale, prima di stamparlo, per dar tempo al censore di ordinare il sequestro. Come era prevedibilissimo, l’articolo fu imbiancato. Ma noi avevamo anticipato tiratura e spedizione. Il cavallo era fuggito dalla stalla quando vennero a chiudere le porte.
+
+          * * * * *
+
+; :c123: \markboth{Armando Borghi}{Una commemorazionexx di Bresci}
+
+          * * * * *
+
+Test
+
+          * * * * *
+
+Test
+
+<comment>
+INDEX nomi: INDICE DEI NOMI
+Bresci: Bresci Gaetano
+Borghi: Armando Borghi
+Umberto Primo: Umberto I
+Umberto Secondo: Umberto II
+</comment>
+
+END

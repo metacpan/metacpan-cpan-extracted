@@ -1,0 +1,43 @@
+---
+abstract: "the Module to find dependencies for files you've selected"
+author:
+  - 'Yuki Yoshida(L<worthmine|https://github.com/worthmine>)'
+build_requires:
+  Test::More: '1.302181'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-findeps
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::findeps:
+    file: lib/App/findeps.pm
+    version: '0.03'
+requires:
+  FastGlob: '1.5'
+  List::Util: '1.55'
+  perl: '5.012001'
+resources:
+  bugtracker: https://github.com/worthmine/App-findeps/issues
+  homepage: https://github.com/worthmine/App-findeps
+  repository: git://github.com/worthmine/App-findeps.git
+version: '0.03'
+x_authority: cpan:WORTHMINE
+x_contributors:
+  - 'worthmine <worthmine@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

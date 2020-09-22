@@ -1,0 +1,13 @@
+datasource = "DBI:mysql:dbname=books"
+database "artists" {
+    table = "author"
+    search attrset bib1 {
+	access 12 = "id"
+	access 1 = "name"
+    }
+    data format xml {
+	record = "author"
+	field "authorId" = "id"
+	field "authorName" = "name"
+    }
+}

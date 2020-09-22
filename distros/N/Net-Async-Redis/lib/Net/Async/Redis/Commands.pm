@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.000'; # VERSION
+our $VERSION = '3.001'; # VERSION
 
 =head1 NAME
 
@@ -589,6 +589,8 @@ Authenticate to the server.
 
 =over 4
 
+=item * [username]
+
 =item * password
 
 =back
@@ -1051,6 +1053,8 @@ Atomically transfer a key from a Redis instance to another one.
 =item * [REPLACE]
 
 =item * [AUTH password]
+
+=item * [AUTH2 username password]
 
 =item * [KEYS key [key ...]]
 

@@ -3,14 +3,16 @@ NAME
     Multi-Account Containers add-on
 
 VERSION
-    This document describes version 0.007 of
+    This document describes version 0.010 of
     App::FirefoxMultiAccountContainersUtils (from Perl distribution
-    App-FirefoxMultiAccountContainersUtils), released on 2020-06-04.
+    App-FirefoxMultiAccountContainersUtils), released on 2020-09-21.
 
 SYNOPSIS
 DESCRIPTION
     This distribution includes several utilities related to Firefox
     multi-account containers addon:
+
+    *   firefox-container
 
     *   firefox-mua-list-containers
 
@@ -23,6 +25,62 @@ DESCRIPTION
     />.
 
 FUNCTIONS
+  firefox_container
+    Usage:
+
+     firefox_container(%args) -> [status, msg, payload, meta]
+
+    CLI to open URL in a new Firefox tab, in a specific multi-account
+    container.
+
+    Examples:
+
+    *   Open two URLs in a container called "mycontainer":
+
+         firefox_container(
+             container => "mycontainer",
+           urls => ["www.example.com", "www.example.com/url2"]
+         );
+
+    *   If URL is not specified, will open a blank tab:
+
+         firefox_container( container => "mycontainer");
+
+    This utility opens a new firefox tab in a specific multi-account
+    container. This requires the Firefox Multi-Account Container, as well as
+    another container called "Open external links in a container",
+    <https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/>.
+
+    The way it works, because add-on currently does not have hooks to the
+    CLI, is via a custom protocol handler. For example, if you want to open
+    C<http://www.example.com/> in a container called "mycontainer", you ask
+    Firefox to open this URL:
+
+     ext+container:name=mycontainer&url=http://www.example.com/
+
+    Ref: <https://github.com/mozilla/multi-account-containers/issues/365>
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   container* => *str*
+
+    *   profile => *firefox::local_profile_name*
+
+    *   urls => *array[str]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   firefox_mua_list_containers
     Usage:
 
@@ -173,8 +231,22 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    "Firefox Multi-Account Containers" add-on,
+    <https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers
+    />
+
+    "Open external links in a container" add-on,
+    <https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/>
+    (repo at <https://github.com/honsiorovskyi/open-url-in-container/>). The
+    add-on also comes with a bash launcher script:
+    <https://github.com/honsiorovskyi/open-url-in-container/blob/master/bin/
+    launcher.sh>. This "firefox-container" Perl script is a slightly
+    enhanced version of that launcher script.
+
     Some other CLI utilities related to Firefox: App::FirefoxUtils,
     App::DumpFirefoxHistory.
+
+    open-browser.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

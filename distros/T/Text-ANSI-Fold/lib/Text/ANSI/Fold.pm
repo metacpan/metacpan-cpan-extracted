@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "1.09";
+our $VERSION = "1.10";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -99,7 +99,7 @@ sub new {
 use Text::ANSI::Fold::Japanese::W3C qw(%prohibition);
 
 sub chars_to_regex {
-    my $chars = shift;
+    my $chars = join '', @_;
     my($c, @s);
     for ($chars =~ /\X/g) {
 	if (length == 1) {
@@ -118,10 +118,10 @@ sub chars_to_regex {
 
 my %prohibition_re = do {
     head => do {
-	my $re = chars_to_regex $prohibition{head};
+	my $re = chars_to_regex @prohibition{qw(head postfix)};
 	qr/(?: $re | \p{Space_Separator} )/x;
     },
-    end  => chars_to_regex $prohibition{end},
+    end  => chars_to_regex @prohibition{qw(end prefix)},
 };
 
 sub configure {

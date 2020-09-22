@@ -1,0 +1,40 @@
+{
+   "abstract" : "Client for using the purpleair.com air quality sensor API",
+   "author" : [
+      "TTKCIAR <ttk@ciar.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.048, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Weather-PurpleAir-API",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Valet" : "1.07",
+            "JSON::MaybeXS" : "1.004000",
+            "String::Similarity" : "1.04",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0.60",
+            "Test::Most" : "0.30"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05"
+}
+

@@ -6,7 +6,7 @@ DBIx::FixtureLoader - Loading fixtures and inserting to your database
 
     use DBI;
     use DBIx::FixtureLoader;
-    
+
     my $dbh = DBI->connect(...);
     my $loader = DBIx::FixtureLoader->new(dbh => $dbh);
     $loader->load_fixture('item.csv');
@@ -46,7 +46,7 @@ DELETE all data from table before inserting or not.
 
 ### `csv_option (HashRef, Default: +{})`
 
-Specifying [Text::CSV](https://metacpan.org/pod/Text::CSV)'s option. `binary` and `blank_is_undef`
+Specifying [Text::CSV](https://metacpan.org/pod/Text%3A%3ACSV)'s option. `binary` and `blank_is_undef`
 are automatically set.
 
 ### `skip_null_column (Bool, Default: false)`

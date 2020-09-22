@@ -1,0 +1,87 @@
+$Id: README,v 1.9 2008-05-02 15:31:01 mike Exp $
+
+*** NOTE THAT THIS IS NOT FREE OR OPEN SOURCE SOFTWARE ***
+Sorry about that.  See DBIServer/LICENCE.pm for details.
+
+
+What are zSQLgate and Net::Z3950::DBIServer?
+--------------------------------------------
+
+zSQLgate is a Z39.50 server which has an RDBMS at its back end -- that
+is, it's a gateway between Z39.50 and the relational database of your
+choice.  The Perl module Net::Z3950::DBIServer provides guts of the
+gateway.  Both the zSQLgate program and the Net::Z3950::DBIServer
+module are included in this distribution.
+
+The Z39.50 information retrieval protocol (now ratified as
+international standard ISO 23950) is a mature and powerful protocol
+used in application domains as diverse as bibliographic information,
+geo-spatial mapping, museums and other cultural heritage information,
+and structured vocabulary navigation.
+
+Relational databases are a revolting relic of the 1950s, but we do
+seem to be stuck with them :-)
+
+If you have a project built on Oracle, Sybase, PostgreSQL, MySQL or
+any of a seemingly infinite number of alternatives, then this module
+is probably the quickest and easiest way to build a Z39.50 interface
+to it.
+
+
+Building and Installation
+-------------------------
+
+There are several prerequisites to building the Net::Z3950 module:
+some providing the Z39.50 front-end, and some the SQL back-end.
+
+     *	You'll need the Net::Z3950::SimpleServer module, version 0.04
+	or later.  You can get it from
+	http://indexdata.com/simpleserver/
+
+     *	SimpleServer itself requires Index Data's YAZ toolkit, a set
+	of C routines for manipulating, sending and receiving the
+	Z39.50 data structures.  I've been using version 1.8.  You can
+	find it at http://indexdata.com/yaz/
+
+     *	You'll need the DBI module (the DataBase Independent layer)
+	which is inexplicably not part of the standard Perl
+	distribution, but is on CPAN.
+
+     *	And with that, you'll need the DBD module that provides the
+	driver for the particular RDBMS you're using -- for example,
+	DBD::Pg if you're using PostgreSQL.  The driver modules are
+	all on CPAN.
+
+     *	In order to generate MARC records in responses, you'll need
+	the MARC::Record module.
+
+After installing any prerequisites, you know the drill:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+See examples/books/README for a small example application.
+
+
+Support
+-------
+
+The first thing to do is join the zSQLgate mailing list at
+http://www.indexdata.com/mailman/listinfo/zsqlgate, and discuss in
+that forum any problems you may encounter.  I read this list, so I
+will see your messages; but you may get better help from others who
+have run into similar difficulties.
+
+For those who require it, it's possible to buy professional, support
+for this module, with well-defined support levels and response times.
+See http://sql.z3950.org/zsqlgate/support/contract.html, or email me
+for details.
+
+
+Author
+------
+
+Mike Taylor <mike@sql.z3950.org>
+	http://www.miketaylor.org.uk/

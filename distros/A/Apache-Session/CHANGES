@@ -3,6 +3,9 @@ If you use perl older than 5.6 - write to alexchorny[AT]gmail.com
 and tell me what version do you use, why and will you need newer versions
 of Apache::Session.
 
+1.94  2020-09-19
+  - better error if LockDataSource is missing in Apache::Session::Lock::MySQL
+
 1.93  2014-04-12
   - even more test fixes
 

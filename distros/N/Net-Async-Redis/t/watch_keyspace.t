@@ -19,9 +19,11 @@ $loop->add(my $sub = Net::Async::Redis->new);
 Future->needs_all(
     $redis->connect(
         host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
+        port => $ENV{NET_ASYNC_REDIS_PORT} // '6379',
     ),
     $sub->connect(
         host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
+        port => $ENV{NET_ASYNC_REDIS_PORT} // '6379',
     )
 )->get;
 

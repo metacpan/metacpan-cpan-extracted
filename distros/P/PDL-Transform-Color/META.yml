@@ -27,5 +27,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Transform-Color
   homepage: http://github.com/drzowie/PDL-Transform-Color
   repository: git://github.com/drzowie/PDL-Transform-Color.git
-version: '1.004'
+version: '1.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

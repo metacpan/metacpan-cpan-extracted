@@ -1,5 +1,18 @@
 Revision history for XML-MyXML
 
+1.05 2020-09-17T19:28:42Z
+
+    - (bugfix) added version number to XML::MyXML::Object
+
+1.04 2020-09-17T19:00:12Z
+
+    - improved documentation of 'xml_to_simple'
+
+1.03 2020-09-17T18:24:01Z
+
+    - packaging this distro with Minilla from now on
+    - raised dep on perl to 5.008001
+
 1.02    2018-06-12
         - Add mention of perlmodules.net
 

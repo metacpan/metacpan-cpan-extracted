@@ -173,6 +173,8 @@ If you PEEK a hash property, you'll still get an array. The array will be in the
 
 PEEK cannot be used to import the object itself, or to import a list/hash property into an Axbasic variable. The same rule applies to all the PEEK operations described below.
 
+Axbasic arrays have a maximum size of 1,000,000 values. If a *peek* operation exceeds this maximum, the excess values are not added to the array (and no error message is generated). 
+
 ##<a name="16.6">16.6 Undefined values</a>
 
 Perl uses a special *undefined* value. If you try to retrieve such a value using, for example, a PEEK statement, it's retrieved as the string **"<<undef\>\>"**.

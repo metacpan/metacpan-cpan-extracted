@@ -1,0 +1,67 @@
+{
+   "abstract" : "Create and parse tables in Markdown",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Markdown-Table",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "2.0",
+            "Text::ASCIITable" : "0.22",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Markdown::Table" : {
+         "file" : "lib/Markdown/Table.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perlservices/Markdown-Table/issues"
+      },
+      "homepage" : "https://github.com/perlservices/Markdown-Table",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perlservices/Markdown-Table.git",
+         "web" : "http://github.com/perlservices/Markdown-Table"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+}
+

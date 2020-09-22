@@ -1,0 +1,47 @@
+$Id: README,v 1.5 2008-03-14 15:48:08 mike Exp $
+
+This directory is not strictly an example zSQLgate configuration, but
+an example of how to get zSQLgate to talk to Oracle.  It contains
+various notes on various aspects of Oracle lore, including some
+specific to particular installations.
+
+
+Connecting Oracle's own command-line client
+-------------------------------------------
+
+It seems that the ORACLE_HOME and ORACLE_SID environment variables
+must be set in order for the basic command-line SQL client to work.
+For example, on Index Data's installation:
+
+	mike@test:~$ :mike@test:~$ ORACLE_SID=test ORACLE_HOME=/home/oracle/app/oracle/product/9.2.0 strace -o /tmp/xx /home/oracle/app/oracle/product/9.2.0/bin/sqlplus
+	SQL*Plus: Release 9.2.0.1.0 - Production on Wed Oct 3 12:53:08 2007
+
+	Copyright (c) 1982, 2002, Oracle Corporation.  All rights reserved.
+
+	Enter user-name: mike
+	Enter password: ********
+
+	Connected to:
+	Oracle9i Enterprise Edition Release 9.2.0.1.0 - Production
+	With the Partitioning, OLAP and Oracle Data Mining options
+	JServer Release 9.2.0.1.0 - Production
+
+	SQL> 
+
+Other important environment variable settings are described at:
+	http://twiki.indexdata.dk/cgi-bin/twiki/view/ID/WebSearch?search=Oracle
+
+
+Building and testing DBD::Oracle on test.indexdata.com
+------------------------------------------------------
+
+$ cd /home/mike/download/DBD-Oracle-1.19/
+$ ORACLE_HOME=/home/oracle/app/oracle/product/9.2.0 perl Makefile.PL PREFIX=/home/mike/universe OPTIMIZE="-O0 -g"
+$ make
+$ ORACLE_HOME=/home/oracle/app/oracle/product/9.2.0 ORACLE_SID=test ORACLE_USERID=mike/mike3636 make test
+
+This does not pass all tests, but passes enough that we can see it's
+basically working.  Failures are to do with LOB support (Large
+OBject?), and skips to do with funny character sets.
+
+

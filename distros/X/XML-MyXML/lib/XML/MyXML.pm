@@ -1,18 +1,85 @@
 package XML::MyXML;
-# ABSTRACT: A simple-to-use XML module, for parsing and creating XML documents
-$XML::MyXML::VERSION = '1.02';
+
+use 5.008001;
 use strict;
 use warnings;
+
+use Encode;
 use Carp;
 use Scalar::Util qw/ weaken /;
+
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(tidy_xml object_to_xml xml_to_object simple_to_xml xml_to_simple check_xml xml_escape);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
-use Encode;
+
+our $VERSION = "1.05";
 
 my $DEFAULT_INDENTSTRING = ' ' x 4;
 
+=encoding utf-8
+
+=head1 NAME
+
+XML::MyXML - A simple-to-use XML module, for parsing and creating XML documents
+
+=head1 SYNOPSIS
+
+    use XML::MyXML qw(tidy_xml xml_to_object);
+    use XML::MyXML qw(:all);
+
+    my $xml = "<item><name>Table</name><price><usd>10.00</usd><eur>8.50</eur></price></item>";
+    print tidy_xml($xml);
+
+    my $obj = xml_to_object($xml);
+    print "Price in Euros = " . $obj->path('price/eur')->text;
+
+    $obj->simplify is hashref { item => { name => 'Table', price => { usd => '10.00', eur => '8.50' } } }
+    $obj->simplify({ internal => 1 }) is hashref { name => 'Table', price => { usd => '10.00', eur => '8.50' } }
+
+=head1 EXPORTABLE
+
+xml_escape, tidy_xml, xml_to_object, object_to_xml, simple_to_xml, xml_to_simple, check_xml
+
+=head1 FEATURES & LIMITATIONS
+
+This module can parse XML comments, CDATA sections, XML entities (the standard five and numeric ones) and simple non-recursive C<< <!ENTITY> >>s
+
+It will ignore (won't parse) C<< <!DOCTYPE...> >>, C<< <?...?> >> and other C<< <!...> >> special markup
+
+All strings (XML documents, attribute names, values, etc) produced by this module or passed as parameters to its functions, are strings that contain characters, rather than bytes/octets. Unless you use the C<bytes> function flag (see below), in which case the XML documents (and just the XML documents) will be byte/octet strings.
+
+XML documents to be parsed may not contain the C<< > >> character unencoded in attribute values
+
+=head1 OPTIONAL FUNCTION FLAGS
+
+Some functions and methods in this module accept optional flags, listed under each function in the documentation. They are optional, default to zero unless stated otherwise, and can be used as follows: S<C<< function_name( $param1, { flag1 => 1, flag2 => 1 } ) >>>. This is what each flag does:
+
+C<strip> : the function will strip initial and ending whitespace from all text values returned
+
+C<file> : the function will expect the path to a file containing an XML document to parse, instead of an XML string
+
+C<complete> : the function's XML output will include an XML declaration (C<< <?xml ... ?>  >>) in the beginning
+
+C<internal> : the function will only return the contents of an element in a hashref instead of the element itself (see L</SYNOPSIS> for example)
+
+C<tidy> : the function will return tidy XML
+
+C<indentstring> : when producing tidy XML, this denotes the string with which child elements will be indented (Default is a string of 4 spaces)
+
+C<save> : the function (apart from doing what it's supposed to do) will also save its XML output in a file whose path is denoted by this flag
+
+C<strip_ns> : strip the namespaces (characters up to and including ':') from the tags
+
+C<xslt> : will add a <?xml-stylesheet?> link in the XML that's being output, of type 'text/xsl', pointing to the filename or URL denoted by this flag
+
+C<arrayref> : the function will create a simple arrayref instead of a simple hashref (which will preserve order and elements with duplicate tags)
+
+C<bytes> : the XML document string which is parsed and/or produced by this function, should contain bytes/octets rather than characters
+
+=head1 FUNCTIONS
+
+=cut
 
 sub _encode {
     my $string = shift;
@@ -30,6 +97,11 @@ sub _encode {
     return $string;
 }
 
+=head2 xml_escape($string)
+
+Returns the same string, but with the C<< < >>, C<< > >>, C<< & >>, C<< " >> and C<< ' >> characters replaced by their XML entities (e.g. C<< &amp; >>).
+
+=cut
 
 sub xml_escape {
     my ($string) = @_;
@@ -84,6 +156,13 @@ sub _strip_ns {
     return defined $string ? ($string =~ /\A(?:.+\:)?(.*)\z/s)[0] : $string;
 }
 
+=head2 tidy_xml($raw_xml)
+
+Returns the XML string in a tidy format (with tabs & newlines)
+
+Optional flags: C<file>, C<complete>, C<indentstring>, C<save>, C<bytes>
+
+=cut
 
 
 sub tidy_xml {
@@ -98,6 +177,13 @@ sub tidy_xml {
 }
 
 
+=head2 xml_to_object($raw_xml)
+
+Creates an 'XML::MyXML::Object' object from the raw XML provided
+
+Optional flags: C<file>, C<bytes>
+
+=cut
 
 sub xml_to_object {
     my $xml = shift;
@@ -242,6 +328,13 @@ sub _objectarray_to_xml {
     return $xml;
 }
 
+=head2 object_to_xml($object)
+
+Creates an XML string from the 'XML::MyXML::Object' object provided
+
+Optional flags: C<complete>, C<tidy>, C<indentstring>, C<save>, C<bytes>
+
+=cut
 
 sub object_to_xml {
     my $object = shift;
@@ -291,6 +384,156 @@ sub _tidy_object {
 }
 
 
+=head2 simple_to_xml($simple_array_ref)
+
+Produces a raw XML string from either an array reference, a hash reference or a mixed structure such as these examples:
+
+    { thing => { name => 'John', location => { city => 'New York', country => 'U.S.A.' } } }
+    # <thing><name>John</name><location><country>U.S.A.</country><city>New York</city></location></thing>
+
+    [ thing => [ name => 'John', location => [ city => 'New York', country => 'U.S.A.' ] ] ]
+    # <thing><name>John</name><location><country>U.S.A.</country><city>New York</city></location></thing>
+
+    { thing => { name => 'John', location => [ city => 'New York', city => 'Boston', country => 'U.S.A.' ] } }
+    # <thing><name>John</name><location><city>New York</city><city>Boston</city><country>U.S.A.</country></location></thing>
+
+Here's a mini-tutorial on how to use this function, in which you'll also see how to set attributes.
+
+The simplest invocations are these:
+
+    simple_to_xml({target => undef})
+    # <target/>
+
+    simple_to_xml({target => 123})
+    # <target>123</target>
+
+Every set of sibling elements (such as the document itself, which is a single top-level element, or a pack of
+5 elements all children to the same parent element) is represented in the $simple_array_ref parameter as
+key-value pairs inside either a hashref or an arrayref (you can choose which).
+
+Keys represent tags+attributes of the sibling elements, whereas values represent the contents of those elements.
+
+Eg:
+
+    [
+        first => 'John',
+        last => 'Doe,'
+    ]
+
+...and...
+
+    {
+        first => 'John',
+        last => 'Doe',
+    }
+
+both translate to:
+
+    <first>John</first><last>Doe</last>
+
+A value can either be undef (to denote an empty element), or a string (to denote a string), or another
+hashref/arrayref to denote a set of children elements, like this:
+
+    {
+        person => {
+            name => {
+                first => 'John',
+                last => 'Doe'
+            }
+        }
+    }
+
+...becomes:
+
+    <person>
+        <name>
+            <first>John</first>
+            <last>Doe</last>
+        </name>
+    </person>
+
+
+The only difference between using an arrayref or using a hashref, is that arrayrefs preserve the
+order of the elements, and allow repetition of identical tags. So a person with many addresses, should choose to
+represent its list of addresses under an arrayref, like this:
+
+    {
+        person => [
+            name => {
+                first => 'John',
+                last => 'Doe',
+            },
+            address => {
+                country => 'Malta',
+            },
+            address => {
+                country => 'Indonesia',
+            },
+            address => {
+                country => 'China',
+            }
+        ]
+    }
+
+...which becomes:
+
+    <person>
+        <name>
+            <last>Doe</last>
+            <first>John</first>
+        </name>
+        <address>
+            <country>Malta</country>
+        </address>
+        <address>
+            <country>Indonesia</country>
+        </address>
+        <address>
+            <country>China</country>
+        </address>
+    </person>
+
+Finally, to set attributes to your elements (eg id="12") you need to replace the key with either
+a string containing attributes as well (eg: C<'address id="12"'>), or replace it with a reference, as the many
+items in the examples below:
+
+    {thing => [
+        'item id="1"' => 'chair',
+        [item => {id => 2}] => 'table',
+        [item => [id => 3]] => 'door',
+        [item => id => 4] => 'sofa',
+        {item => {id => 5}} => 'bed',
+        {item => [id => 6]} => 'shirt',
+        [item => {id => 7, other => 8}, [more => 9, also => 10, but_not => undef]] => 'towel'
+    ]}
+
+...which becomes:
+
+    <thing>
+        <item id="1">chair</item>
+        <item id="2">table</item>
+        <item id="3">door</item>
+        <item id="4">sofa</item>
+        <item id="5">bed</item>
+        <item id="6">shirt</item>
+        <item id="7" other="8" more="9" also="10">towel</item>
+    </thing>
+
+As you see, attributes may be represented in a great variety of ways, so you don't need to remember
+the "correct" one.
+
+Of course if the "simple structure" is a hashref, the key cannot be a reference (because hash keys are always
+strings), so if you want attributes on your elements, you either need the enclosing structure to be an
+arrayref as in the example above, to allow keys to be refs which contain the attributes, or you need to
+represent the key (=tag+attrs) as a string, like this (also in the previous example): C<'item id="1"'>
+
+This concludes the mini-tutorial of the simple_to_xml function.
+
+All the strings in C<$simple_array_ref> need to contain characters, rather than bytes/octets. The C<bytes> optional flag only affects the produced XML string.
+
+Optional flags: C<complete>, C<tidy>, C<indentstring>, C<save>, C<xslt>, C<bytes>
+
+=cut
 
 sub simple_to_xml {
     my $arref = shift;
@@ -404,6 +647,23 @@ sub _hashref_to_xml {
     return $xml;
 }
 
+=head2 xml_to_simple($raw_xml)
+
+Produces a very simple hash object from the raw XML string provided. An example hash object created thusly is this:
+S<C<< { thing => { name => 'John', location => { city => 'New York', country => 'U.S.A.' } } } >>>
+
+B<WARNING:> This function only works on very simple XML strings, i.e. children of an element may not consist of both
+text and elements (child elements will be discarded in that case). Also attributes in tags are ignored.
+
+Since the object created is a hashref (unless used with the C<arrayref> optional flag), duplicate keys will be
+discarded.
+
+All strings contained in the output simple structure will always contain characters rather than octets/bytes,
+regardless of the C<bytes> optional flag.
+
+Optional flags: C<internal>, C<strip>, C<file>, C<strip_ns>, C<arrayref>, C<bytes>
+
+=cut
 
 sub xml_to_simple {
     my $xml = shift;
@@ -484,6 +744,13 @@ sub _objectarray_to_simple_arrayref {
 }
 
 
+=head2 check_xml($raw_xml)
+
+Returns true if the $raw_xml string is valid XML (valid enough to be used by this module), and false otherwise.
+
+Optional flags: C<file>, C<bytes>
+
+=cut
 
 sub check_xml {
     my $xml = shift;
@@ -496,11 +763,16 @@ sub check_xml {
 
 
 package XML::MyXML::Object;
-$XML::MyXML::Object::VERSION = '1.02';
-use Carp;
+
 use Encode;
+use Carp;
 use Scalar::Util qw/ weaken /;
 
+our $VERSION = "1.05";
+
+=head1 OBJECT METHODS
+
+=cut
 
 sub new {
     my $class = shift;
@@ -558,456 +830,6 @@ sub children {
     return @results;
 }
 
-
-sub path {
-    my $self = shift;
-    my $path = shift;
-
-    my @path;
-    my $orig_path = $path;
-    my $start_root = $path =~ m!\A/!;
-    $path = "/" . $path     unless $start_root;
-    while (length $path) {
-        my $success = $path =~ s!\A/((?:[^/\[]*)?(?:\[[^\]=]+(?:=(?:\"[^"]*\"|[^"\]]*))?\])*)!!;
-        my $seg = $1;
-        if ($success) {
-            push @path, $seg;
-        } else {
-            croak "Invalid XML path: $orig_path";
-        }
-    }
-
-    my @result = ($self);
-    if ($start_root) {
-        $self->cmp_element(shift @path)     or return;
-    }
-    for (my $i = 0; $i <= $#path; $i++) {
-        @result = map $_->children( $path[$i] ), @result;
-        @result     or return;
-    }
-    return wantarray ? @result : $result[0];
-}
-
-
-sub text {
-    my $self = shift;
-    my $flags = (@_ and ref $_[-1]) ? pop() : {};
-    my $set_value = @_ ? defined $_[0] ? shift() : '' : undef;
-
-    if (! defined $set_value) {
-        my $value = '';
-        if ($self->{content}) {
-            foreach my $child (@{ $self->{content} }) {
-                $value .= $child->value($flags);
-            }
-        }
-        if ($self->{value}) {
-            my $temp_value = $self->{value};
-            if ($flags->{strip}) { $temp_value = XML::MyXML::_strip($temp_value); }
-            $value .= $temp_value;
-        }
-        return $value;
-    } else {
-        if (length $set_value) {
-            my $entry = { value => $set_value, parent => $self };
-            weaken( $entry->{parent} );
-            bless $entry, 'XML::MyXML::Object';
-            $self->{content} = [ $entry ];
-        } else {
-            $self->{content} = [];
-        }
-    }
-}
-
-*value = \&text;
-
-
-sub inner_xml {
-    my $self = shift;
-    my $flags = (@_ and ref $_[-1]) ? pop() : {};
-    my $set_xml = @_ ? defined $_[0] ? shift() : '' : undef;
-
-    if (! defined $set_xml) {
-        my $xml = $self->to_xml($flags);
-        $xml =~ s/\A\<.*?\>//s;
-        $xml =~ s/\<\/[^\>]*\>\z//s;
-        return $xml;
-    } else {
-        my $xml = "<div>$set_xml</div>";
-        my $obj = XML::MyXML::xml_to_object($xml, $flags);
-        $self->{content} = [];
-        foreach my $child (@{ $obj->{content} || [] }) {
-            $child->{parent} = $self;
-            weaken( $child->{parent} );
-            push @{ $self->{content} }, $child;
-        }
-    }
-}
-
-
-sub attr {
-    my $self = shift;
-    my $attrname = shift;
-    my ($set_to, $must_set, $flags);
-    if (@_) {
-        my $next = shift;
-        if (! ref $next) {
-            $set_to = $next;
-            $must_set = 1;
-            $flags = shift;
-        } else {
-            $flags = $next;
-        }
-    }
-    $flags ||= {};
-
-    if (defined $attrname) {
-        if ($must_set) {
-            if (defined ($set_to)) {
-                $self->{attrs}{$attrname} = $set_to;
-                return $set_to;
-            } else {
-                delete $self->{attrs}{$attrname};
-                return;
-            }
-        } else {
-            my $attrvalue = $self->{attrs}->{$attrname};
-            return $attrvalue;
-        }
-    } else {
-        return %{$self->{attrs}};
-    }
-}
-
-
-sub tag {
-    my $self = shift;
-    my $flags = shift || {};
-
-    my $tag = $self->{element};
-    if (defined $tag) {
-        $tag =~ s/\A.*\://  if $flags->{strip_ns};
-        return $tag;
-    } else {
-        return undef;
-    }
-}
-
-
-sub parent {
-    my $self = shift;
-
-    return $self->{parent};
-}
-
-
-sub simplify {
-    my $self = shift;
-    my $flags = shift || {};
-
-    my $simple = XML::MyXML::_objectarray_to_simple([$self], $flags);
-    if (! $flags->{internal}) {
-        return $simple;
-    } else {
-        if (ref $simple eq 'HASH') {
-            return (values %$simple)[0];
-        } elsif (ref $simple eq 'ARRAY') {
-            return $simple->[1];
-        }
-    }
-}
-
-
-sub to_xml {
-    my $self = shift;
-    my $flags = shift || {};
-
-    my $decl = $flags->{complete} ? '<?xml version="1.1" encoding="UTF-8" standalone="yes" ?>'."\n" : '';
-    my $xml = XML::MyXML::_objectarray_to_xml([$self]);
-    if ($flags->{tidy}) { $xml = XML::MyXML::tidy_xml($xml, { %$flags, bytes => 0, complete => 0, save => undef }); }
-    $xml = $decl . $xml;
-    if (defined $flags->{save}) {
-        open my $fh, '>', $flags->{save} or croak "Error: Couldn't open file '$flags->{save}' for writing: $!";
-        binmode $fh, ':encoding(UTF-8)';
-        print $fh $xml;
-        close $fh;
-    }
-    $xml = encode_utf8($xml)    if $flags->{bytes};
-    return $xml;
-}
-
-
-sub to_tidy_xml {
-    my $self = shift;
-    my $flags = shift || {};
-
-    return $self->to_xml({ %$flags, tidy => 1 });
-}
-
-
-
-
-
-1; # End of XML::MyXML
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-XML::MyXML - A simple-to-use XML module, for parsing and creating XML documents
-
-=head1 VERSION
-
-version 1.02
-
-=head1 SYNOPSIS
-
-    use XML::MyXML qw(tidy_xml xml_to_object);
-    use XML::MyXML qw(:all);
-
-    my $xml = "<item><name>Table</name><price><usd>10.00</usd><eur>8.50</eur></price></item>";
-    print tidy_xml($xml);
-
-    my $obj = xml_to_object($xml);
-    print "Price in Euros = " . $obj->path('price/eur')->text;
-
-    $obj->simplify is hashref { item => { name => 'Table', price => { usd => '10.00', eur => '8.50' } } }
-    $obj->simplify({ internal => 1 }) is hashref { name => 'Table', price => { usd => '10.00', eur => '8.50' } }
-
-=head1 EXPORTABLE
-
-xml_escape, tidy_xml, xml_to_object, object_to_xml, simple_to_xml, xml_to_simple, check_xml
-
-=head1 FEATURES & LIMITATIONS
-
-This module can parse XML comments, CDATA sections, XML entities (the standard five and numeric ones) and simple non-recursive C<< <!ENTITY> >>s
-
-It will ignore (won't parse) C<< <!DOCTYPE...> >>, C<< <?...?> >> and other C<< <!...> >> special markup
-
-All strings (XML documents, attribute names, values, etc) produced by this module or passed as parameters to its functions, are strings that contain characters, rather than bytes/octets. Unless you use the C<bytes> function flag (see below), in which case the XML documents (and just the XML documents) will be byte/octet strings.
-
-XML documents to be parsed may not contain the C<< > >> character unencoded in attribute values
-
-=head1 OPTIONAL FUNCTION FLAGS
-
-Some functions and methods in this module accept optional flags, listed under each function in the documentation. They are optional, default to zero unless stated otherwise, and can be used as follows: S<C<< function_name( $param1, { flag1 => 1, flag2 => 1 } ) >>>. This is what each flag does:
-
-C<strip> : the function will strip initial and ending whitespace from all text values returned
-
-C<file> : the function will expect the path to a file containing an XML document to parse, instead of an XML string
-
-C<complete> : the function's XML output will include an XML declaration (C<< <?xml ... ?>  >>) in the beginning
-
-C<internal> : the function will only return the contents of an element in a hashref instead of the element itself (see L</SYNOPSIS> for example)
-
-C<tidy> : the function will return tidy XML
-
-C<indentstring> : when producing tidy XML, this denotes the string with which child elements will be indented (Default is a string of 4 spaces)
-
-C<save> : the function (apart from doing what it's supposed to do) will also save its XML output in a file whose path is denoted by this flag
-
-C<strip_ns> : strip the namespaces (characters up to and including ':') from the tags
-
-C<xslt> : will add a <?xml-stylesheet?> link in the XML that's being output, of type 'text/xsl', pointing to the filename or URL denoted by this flag
-
-C<arrayref> : the function will create a simple arrayref instead of a simple hashref (which will preserve order and elements with duplicate tags)
-
-C<bytes> : the XML document string which is parsed and/or produced by this function, should contain bytes/octets rather than characters
-
-=head1 FUNCTIONS
-
-=head2 xml_escape($string)
-
-Returns the same string, but with the C<< < >>, C<< > >>, C<< & >>, C<< " >> and C<< ' >> characters replaced by their XML entities (e.g. C<< &amp; >>).
-
-=head2 tidy_xml($raw_xml)
-
-Returns the XML string in a tidy format (with tabs & newlines)
-
-Optional flags: C<file>, C<complete>, C<indentstring>, C<save>, C<bytes>
-
-=head2 xml_to_object($raw_xml)
-
-Creates an 'XML::MyXML::Object' object from the raw XML provided
-
-Optional flags: C<file>, C<bytes>
-
-=head2 object_to_xml($object)
-
-Creates an XML string from the 'XML::MyXML::Object' object provided
-
-Optional flags: C<complete>, C<tidy>, C<indentstring>, C<save>, C<bytes>
-
-=head2 simple_to_xml($simple_array_ref)
-
-Produces a raw XML string from either an array reference, a hash reference or a mixed structure such as these examples:
-
-    { thing => { name => 'John', location => { city => 'New York', country => 'U.S.A.' } } }
-    # <thing><name>John</name><location><country>U.S.A.</country><city>New York</city></location></thing>
-
-    [ thing => [ name => 'John', location => [ city => 'New York', country => 'U.S.A.' ] ] ]
-    # <thing><name>John</name><location><country>U.S.A.</country><city>New York</city></location></thing>
-
-    { thing => { name => 'John', location => [ city => 'New York', city => 'Boston', country => 'U.S.A.' ] } }
-    # <thing><name>John</name><location><city>New York</city><city>Boston</city><country>U.S.A.</country></location></thing>
-
-Here's a mini-tutorial on how to use this function, in which you'll also see how to set attributes.
-
-The simplest invocations are these:
-
-    simple_to_xml({target => undef})
-    # <target/>
-
-    simple_to_xml({target => 123})
-    # <target>123</target>
-
-Every set of sibling elements (such as the document itself, which is a single top-level element, or a pack of
-5 elements all children to the same parent element) is represented in the $simple_array_ref parameter as
-key-value pairs inside either a hashref or an arrayref (you can choose which).
-
-Keys represent tags+attributes of the sibling elements, whereas values represent the contents of those elements.
-
-Eg:
-
-    [
-        first => 'John',
-        last => 'Doe,'
-    ]
-
-...and...
-
-    {
-        first => 'John',
-        last => 'Doe',
-    }
-
-both translate to:
-
-    <first>John</first><last>Doe</last>
-
-A value can either be undef (to denote an empty element), or a string (to denote a string), or another
-hashref/arrayref to denote a set of children elements, like this:
-
-    {
-        person => {
-            name => {
-                first => 'John',
-                last => 'Doe'
-            }
-        }
-    }
-
-...becomes:
-
-    <person>
-        <name>
-            <first>John</first>
-            <last>Doe</last>
-        </name>
-    </person>
-
-The only difference between using an arrayref or using a hashref, is that arrayrefs preserve the
-order of the elements, and allow repetition of identical tags. So a person with many addresses, should choose to
-represent its list of addresses under an arrayref, like this:
-
-    {
-        person => [
-            name => {
-                first => 'John',
-                last => 'Doe',
-            },
-            address => {
-                country => 'Malta',
-            },
-            address => {
-                country => 'Indonesia',
-            },
-            address => {
-                country => 'China',
-            }
-        ]
-    }
-
-...which becomes:
-
-    <person>
-        <name>
-            <last>Doe</last>
-            <first>John</first>
-        </name>
-        <address>
-            <country>Malta</country>
-        </address>
-        <address>
-            <country>Indonesia</country>
-        </address>
-        <address>
-            <country>China</country>
-        </address>
-    </person>
-
-Finally, to set attributes to your elements (eg id="12") you need to replace the key with either
-a string containing attributes as well (eg: 'address id="12"'), or replace it with a reference, as the many
-items in the examples below:
-
-    {thing => [
-        'item id="1"' => 'chair',
-        [item => {id => 2}] => 'table',
-        [item => [id => 3]] => 'door',
-        [item => id => 4] => 'sofa',
-        {item => {id => 5}} => 'bed',
-        {item => [id => 6]} => 'shirt',
-        [item => {id => 7, other => 8}, [more => 9, also => 10, but_not => undef]] => 'towel'
-    ]}
-
-...which becomes:
-
-    <thing>
-        <item id="1">chair</item>
-        <item id="2">table</item>
-        <item id="3">door</item>
-        <item id="4">sofa</item>
-        <item id="5">bed</item>
-        <item id="6">shirt</item>
-        <item id="7" other="8" more="9" also="10">towel</item>
-    </thing>
-
-As you see, attributes may be represented in a great variety of ways, so you don't need to remember
-the "correct" one.
-
-Of course if the "simple structure" is a hashref, the key cannot be a reference (because hash keys are always
-strings), so if you want attributes on your elements, you either need the enclosing structure to be an
-arrayref as in the example above, to allow keys to be refs which contain the attributes, or you need to
-represent the key (=tag+attrs) as a string, like this (also in the previous example): 'item id="1"'
-
-This concludes the mini-tutorial of the simple_to_xml function.
-
-All the strings in C<$simple_array_ref> need to contain characters, rather than bytes/octets. The C<bytes> optional flag only affects the produced XML string.
-
-Optional flags: C<complete>, C<tidy>, C<indentstring>, C<save>, C<xslt>, C<bytes>
-
-=head2 xml_to_simple($raw_xml)
-
-Produces a very simple hash object from the raw XML string provided. An example hash object created thusly is this: S<C<< { thing => { name => 'John', location => { city => 'New York', country => 'U.S.A.' } } } >>>
-
-Since the object created is a hashref, duplicate keys will be discarded. WARNING: This function only works on very simple XML strings, i.e. children of an element may not consist of both text and elements (child elements will be discarded in that case)
-
-All strings contained in the output simple structure, will always contain characters rather than octets/bytes, regardless of the C<bytes> optional flag.
-
-Optional flags: C<internal>, C<strip>, C<file>, C<strip_ns>, C<arrayref>, C<bytes>
-
-=head2 check_xml($raw_xml)
-
-Returns true if the $raw_xml string is valid XML (valid enough to be used by this module), and false otherwise.
-
-Optional flags: C<file>, C<bytes>
-
-=head1 OBJECT METHODS
-
 =head2 $obj->path("subtag1/subsubtag2[attr1=val1][attr2]/.../subsubsubtagX")
 
 Returns the element specified by the path as an XML::MyXML::Object object. When there are more than one tags with the specified name in the last step of the path, it will return all of them as an array. In scalar context will only return the first one. Simple CSS3-style attribute selectors are allowed in the path next to the tagnames, for example: C<< p[class=big] >> will only return C<< <p> >> elements that contain an attribute called "class" with a value of "big". p[class] on the other hand will return p elements having a "class" attribute, but that attribute can have any value. It's possible to surround attribute values with quotes, like so: C<< input[name="foo[]"] >>
@@ -1064,17 +886,106 @@ If you wish to describe the root element in the path as well, prepend it in the 
 
 Optional flags: none
 
+=cut
+
+sub path {
+    my $self = shift;
+    my $path = shift;
+
+    my @path;
+    my $orig_path = $path;
+    my $start_root = $path =~ m!\A/!;
+    $path = "/" . $path     unless $start_root;
+    while (length $path) {
+        my $success = $path =~ s!\A/((?:[^/\[]*)?(?:\[[^\]=]+(?:=(?:\"[^"]*\"|[^"\]]*))?\])*)!!;
+        my $seg = $1;
+        if ($success) {
+            push @path, $seg;
+        } else {
+            croak "Invalid XML path: $orig_path";
+        }
+    }
+
+    my @result = ($self);
+    if ($start_root) {
+        $self->cmp_element(shift @path)     or return;
+    }
+    for (my $i = 0; $i <= $#path; $i++) {
+        @result = map $_->children( $path[$i] ), @result;
+        @result     or return;
+    }
+    return wantarray ? @result : $result[0];
+}
+
 =head2 $obj->text([set_value]), also known as $obj->value([set_value])
 
 If provided a set_value, will delete all contents of $obj and will place C<set_value> as its text contents. Otherwise will return the text contents of this object, and of its descendants, in a single string.
 
 Optional flags: C<strip>
 
+=cut
+
+sub text {
+    my $self = shift;
+    my $flags = (@_ and ref $_[-1]) ? pop() : {};
+    my $set_value = @_ ? defined $_[0] ? shift() : '' : undef;
+
+    if (! defined $set_value) {
+        my $value = '';
+        if ($self->{content}) {
+            foreach my $child (@{ $self->{content} }) {
+                $value .= $child->value($flags);
+            }
+        }
+        if ($self->{value}) {
+            my $temp_value = $self->{value};
+            if ($flags->{strip}) { $temp_value = XML::MyXML::_strip($temp_value); }
+            $value .= $temp_value;
+        }
+        return $value;
+    } else {
+        if (length $set_value) {
+            my $entry = { value => $set_value, parent => $self };
+            weaken( $entry->{parent} );
+            bless $entry, 'XML::MyXML::Object';
+            $self->{content} = [ $entry ];
+        } else {
+            $self->{content} = [];
+        }
+    }
+}
+
+*value = \&text;
+
 =head2 $obj->inner_xml([xml_string])
 
 Gets or sets the inner XML of the $obj node, depending on whether C<xml_string> is provided.
 
 Optional flags: C<bytes>
+
+=cut
+
+sub inner_xml {
+    my $self = shift;
+    my $flags = (@_ and ref $_[-1]) ? pop() : {};
+    my $set_xml = @_ ? defined $_[0] ? shift() : '' : undef;
+
+    if (! defined $set_xml) {
+        my $xml = $self->to_xml($flags);
+        $xml =~ s/\A\<.*?\>//s;
+        $xml =~ s/\<\/[^\>]*\>\z//s;
+        return $xml;
+    } else {
+        my $xml = "<div>$set_xml</div>";
+        my $obj = XML::MyXML::xml_to_object($xml, $flags);
+        $self->{content} = [];
+        foreach my $child (@{ $obj->{content} || [] }) {
+            $child->{parent} = $self;
+            weaken( $child->{parent} );
+            push @{ $self->{content} }, $child;
+        }
+    }
+}
 
 =head2 $obj->attr('attrname' [, 'attrvalue'])
 
@@ -1084,6 +995,42 @@ Input parameters and output are all in character strings, rather than octets/byt
 
 Optional flags: none
 
+=cut
+
+sub attr {
+    my $self = shift;
+    my $attrname = shift;
+    my ($set_to, $must_set, $flags);
+    if (@_) {
+        my $next = shift;
+        if (! ref $next) {
+            $set_to = $next;
+            $must_set = 1;
+            $flags = shift;
+        } else {
+            $flags = $next;
+        }
+    }
+    $flags ||= {};
+
+    if (defined $attrname) {
+        if ($must_set) {
+            if (defined ($set_to)) {
+                $self->{attrs}{$attrname} = $set_to;
+                return $set_to;
+            } else {
+                delete $self->{attrs}{$attrname};
+                return;
+            }
+        } else {
+            my $attrvalue = $self->{attrs}->{$attrname};
+            return $attrvalue;
+        }
+    } else {
+        return %{$self->{attrs}};
+    }
+}
+
 =head2 $obj->tag
 
 Returns the tag of the $obj element. E.g. if $obj represents an <rss:item> element, C<< $obj->tag >> will return the string 'rss:item'.
@@ -1091,11 +1038,34 @@ Returns undef if $obj doesn't represent a tag.
 
 Optional flags: C<strip_ns>
 
+=cut
+
+sub tag {
+    my $self = shift;
+    my $flags = shift || {};
+
+    my $tag = $self->{element};
+    if (defined $tag) {
+        $tag =~ s/\A.*\://  if $flags->{strip_ns};
+        return $tag;
+    } else {
+        return undef;
+    }
+}
+
 =head2 $obj->parent
 
 Returns the XML::MyXML::Object element that is the parent of $obj in the document. Returns undef if $obj doesn't have a parent.
 
 Optional flags: none
+
+=cut
+
+sub parent {
+    my $self = shift;
+
+    return $self->{parent};
+}
 
 =head2 $obj->simplify
 
@@ -1103,17 +1073,66 @@ Returns a very simple hashref, like the one returned with C<&XML::MyXML::xml_to_
 
 Optional flags: C<internal>, C<strip>, C<strip_ns>, C<arrayref>
 
+=cut
+
+sub simplify {
+    my $self = shift;
+    my $flags = shift || {};
+
+    my $simple = XML::MyXML::_objectarray_to_simple([$self], $flags);
+    if (! $flags->{internal}) {
+        return $simple;
+    } else {
+        if (ref $simple eq 'HASH') {
+            return (values %$simple)[0];
+        } elsif (ref $simple eq 'ARRAY') {
+            return $simple->[1];
+        }
+    }
+}
+
 =head2 $obj->to_xml
 
 Returns the XML string of the object, just like calling C<object_to_xml( $obj )>
 
 Optional flags: C<complete>, C<tidy>, C<indentstring>, C<save>, C<bytes>
 
+=cut
+
+sub to_xml {
+    my $self = shift;
+    my $flags = shift || {};
+
+    my $decl = $flags->{complete} ? '<?xml version="1.1" encoding="UTF-8" standalone="yes" ?>'."\n" : '';
+    my $xml = XML::MyXML::_objectarray_to_xml([$self]);
+    if ($flags->{tidy}) { $xml = XML::MyXML::tidy_xml($xml, { %$flags, bytes => 0, complete => 0, save => undef }); }
+    $xml = $decl . $xml;
+    if (defined $flags->{save}) {
+        open my $fh, '>', $flags->{save} or croak "Error: Couldn't open file '$flags->{save}' for writing: $!";
+        binmode $fh, ':encoding(UTF-8)';
+        print $fh $xml;
+        close $fh;
+    }
+    $xml = encode_utf8($xml)    if $flags->{bytes};
+    return $xml;
+}
+
 =head2 $obj->to_tidy_xml
 
 Returns the XML string of the object in tidy form, just like calling C<tidy_xml( object_to_xml( $obj ) )>
 
 Optional flags: C<complete>, C<indentstring>, C<save>, C<bytes>
+
+=cut
+
+sub to_tidy_xml {
+    my $self = shift;
+    my $flags = shift || {};
+
+    return $self->to_xml({ %$flags, tidy => 1 });
+}
+
+
 
 =head1 BUGS
 
@@ -1125,15 +1144,19 @@ your bug as I make changes.
 You can get notified of new versions of this module for free, by email or RSS,
 at L<https://www.perlmodules.net/viewfeed/distro/XML-MyXML>
 
+=head1 LICENSE
+
+Copyright (C) Alexander Karelas.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
 =head1 AUTHOR
 
-Alexander Karelas <karjala@karjala.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2016 by Alexander Karelas.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+Alexander Karelas E<lt>karjala@cpan.orgE<gt>
 
 =cut
+
+
+1; # End of XML::MyXML
+

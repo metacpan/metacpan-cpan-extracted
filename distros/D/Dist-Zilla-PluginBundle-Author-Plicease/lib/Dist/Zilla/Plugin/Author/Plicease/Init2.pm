@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.56 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.57 {
 
   use 5.014;
   use Moose;
@@ -385,7 +385,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.56
+version 2.57
 
 =head1 DESCRIPTION
 
@@ -715,6 +715,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
       - uses: actions/checkout@v2
 
       - name: Prepare for cache

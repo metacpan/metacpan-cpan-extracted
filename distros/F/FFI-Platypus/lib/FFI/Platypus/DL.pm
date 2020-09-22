@@ -2,7 +2,7 @@ package FFI::Platypus::DL;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use base qw( Exporter );
 
 require FFI::Platypus;
@@ -10,7 +10,7 @@ our @EXPORT = qw( dlopen dlerror dlsym dlclose );
 push @EXPORT, grep /RTLD_/, keys %FFI::Platypus::DL::;
 
 # ABSTRACT: Slightly non-portable interface to libdl
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 1;
@@ -27,7 +27,7 @@ FFI::Platypus::DL - Slightly non-portable interface to libdl
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

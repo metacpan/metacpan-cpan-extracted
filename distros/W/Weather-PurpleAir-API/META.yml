@@ -1,0 +1,22 @@
+---
+abstract: 'Client for using the purpleair.com air quality sensor API'
+author:
+  - 'TTKCIAR <ttk@ciar.org>'
+build_requires:
+  Test::Differences: '0.60'
+  Test::Most: '0.30'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.048, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Weather-PurpleAir-API
+requires:
+  File::Valet: '1.07'
+  JSON::MaybeXS: '1.004000'
+  String::Similarity: '1.04'
+  perl: '5.010000'
+version: '0.05'

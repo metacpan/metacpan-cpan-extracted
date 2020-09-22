@@ -7,7 +7,8 @@ use utf8;
 
 use parent qw(Tickit::ContainerWidget);
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
 
@@ -21,7 +22,6 @@ Tickit::Widget::Layout::Desktop - provides a holder for "desktop-like" widget be
  use Tickit;
  use Tickit::Widget::Placegrid;
  use Tickit::Widget::Layout::Desktop;
- 
  my $tickit = Tickit->new;
  my $desktop = Tickit::Widget::Layout::Desktop->new;
  $tickit->later(sub {
@@ -103,8 +103,8 @@ floating windows on top of this widget.
 =cut
 
 sub render_to_rb {
-	my ($self, $rb, $rect) = @_;
-	$rb->eraserect($rect);
+    my ($self, $rb, $rect) = @_;
+    $rb->eraserect($rect);
 }
 
 sub children { @{shift->{widgets}} }
@@ -127,32 +127,32 @@ to check for intersections so we don't waste time drawing unrelated areas
 =cut
 
 sub overlay {
-	my ($self, $rb, $rect, $exclude) = @_;
-	my $target = $exclude->window->rect;
+    my ($self, $rb, $rect, $exclude) = @_;
+    my $target = $exclude->window->rect;
 
-	# TODO change this when proper accessors are available
-	my %win_map = map {
-		refaddr($_->window) => $_
-	} @{$self->{widgets}};
-	delete $win_map{refaddr($exclude->window)};
+    # TODO change this when proper accessors are available
+    my %win_map = map {
+        refaddr($_->window) => $_
+    } @{$self->{widgets}};
+    delete $win_map{refaddr($exclude->window)};
 
-	# Each child widget, from back to front
-	CHILD:
-	foreach my $child (reverse grep defined, map $win_map{refaddr($_)}, $self->window->subwindows) {
-		next CHILD unless my $w = $child->window;
-		next CHILD unless $w->rect->intersects($target);
+    # Each child widget, from back to front
+    CHILD:
+    foreach my $child (reverse grep defined, map $win_map{refaddr($_)}, $self->window->subwindows) {
+        next CHILD unless my $w = $child->window;
+        next CHILD unless $w->rect->intersects($target);
 
-		# Clear out anything that would be under this window,
-		# so we don't draw lines that are obscured by upper
-		# layers
-		$rb->eraserect(
-			$w->rect
-		);
+        # Clear out anything that would be under this window,
+        # so we don't draw lines that are obscured by upper
+        # layers
+        $rb->eraserect(
+            $w->rect
+        );
 
-		# Let the child window render itself to the given
-		# context, since it knows more about styles than we do
-		$child->render_frame($rb, $target);
-	}
+        # Let the child window render itself to the given
+        # context, since it knows more about styles than we do
+        $child->render_frame($rb, $target);
+    }
 }
 
 =head2 window_gained
@@ -162,12 +162,12 @@ Records our initial window geometry when the L<Tickit::Window> is first attached
 =cut
 
 sub window_gained {
-	my $self = shift;
-	my ($win) = @_;
-	$self->{geometry} = {
-		map { $_ => $win->$_ } qw(top left lines cols)
-	};
-	$self->SUPER::window_gained(@_);
+    my $self = shift;
+    my ($win) = @_;
+    $self->{geometry} = {
+        map { $_ => $win->$_ } qw(top left lines cols)
+    };
+    $self->SUPER::window_gained(@_);
 
 }
 
@@ -194,136 +194,140 @@ Takes the following named parameters:
 =cut
 
 sub create_panel {
-	my $self = shift;
-	my %args = @_;
-	my $win = $self->window or return;
+    my $self = shift;
+    my %args = @_;
+    my $win = $self->window or return;
 
-	# Normalise percentages
-	$args{$_} = $self->horizontal($win, $args{$_}) for grep exists $args{$_}, qw(left right cols);
-	$args{$_} = $self->vertical($win, $args{$_})   for grep exists $args{$_}, qw(top bottom lines);
+    # Normalise percentages
+    $args{$_} = $self->horizontal($win, $args{$_}) for grep exists $args{$_}, qw(left right cols);
+    $args{$_} = $self->vertical($win, $args{$_})   for grep exists $args{$_}, qw(top bottom lines);
 
-	$args{bottom} = $win->lines - $args{bottom} if exists $args{bottom};
-	$args{right} = $win->cols - $args{right} if exists $args{right};
+    $args{bottom} = $win->lines - $args{bottom} if exists $args{bottom};
+    $args{right} = $win->cols - $args{right} if exists $args{right};
 
-	# Extrapolate coördinates to ensure we have top+lines
-	$args{top}   //= delete($args{bottom}) - $args{lines};
-	$args{lines} //= delete($args{bottom}) - $args{top};
+    if(defined(my $bottom = delete $args{bottom})) {
+        # Extrapolate coördinates to ensure we have top+lines
+        $args{top}   //= $bottom - $args{lines} if exists $args{lines};
+        $args{lines} //= $bottom - $args{top} if exists $args{top};
+    }
 
-	# Extrapolate coördinates to ensure we have left+cols
-	$args{left}  //= delete($args{right}) - $args{cols};
-	$args{cols}  //= delete($args{right}) - $args{left};
+    if(defined(my $right = delete $args{right})) {
+        # Extrapolate coördinates to ensure we have left+cols
+        $args{left}  //= $right - $args{cols} if exists $args{cols};
+        $args{cols}  //= $right - $args{left} if exists $args{left};
+    }
 
-	$args{top} //= 2;
-	$args{left} //= 2;
-	$args{lines} ||= 10;
-	$args{cols} ||= 10;
+    $args{top} //= 2;
+    $args{left} //= 2;
+    $args{lines} ||= 10;
+    $args{cols} ||= 10;
 
-	my $float = $win->make_float(
-		$args{top},
-		$args{left},
-		$args{lines},
-		$args{cols},
-	);
-	$float->cursor_at(0,0);
+    my $float = $win->make_float(
+        $args{top},
+        $args{left},
+        $args{lines},
+        $args{cols},
+    );
+    $float->cursor_at(0,0);
 
-	my $w = ($args{subclass} || 'Tickit::Widget::Layout::Desktop::Window')->new(
-		container => $self,
-	);
-	$w->label($args{label} // 'window');
-	$w->set_window($float);
-	push @{$self->{widgets}}, $w;
+    my $w = ($args{subclass} || 'Tickit::Widget::Layout::Desktop::Window')->new(
+        container => $self,
+    );
+    $w->label($args{label} // 'window');
+    $w->set_window($float);
+    push @{$self->{widgets}}, $w;
 
-	# Need to redraw our window if position or size change
-	$self->{extents}{refaddr $float} = $float->rect->translate(0,0);
-	$float->bind_event(geomchange => $self->curry::weak::float_geom_changed($w));
-	$w
+    # Need to redraw our window if position or size change
+    $self->{extents}{refaddr $float} = $float->rect->translate(0,0);
+    $float->bind_event(geomchange => $self->curry::weak::float_geom_changed($w));
+    $w
 }
 
 sub horizontal {
-	my ($self, $win, $v) = @_;
-	$v = $1 * $win->cols if $v =~ /(-?\d+(?:\.\d*)?)%/;
-	$v
+    my ($self, $win, $v) = @_;
+    $v = $1 * $win->cols if $v =~ /(-?\d+(?:\.\d*)?)%/;
+    $v
 }
 
 sub vertical {
-	my ($self, $win, $v) = @_;
-	$v = $1 * $win->lines if $v =~ /(-?\d+(?:\.\d*)?)%/;
-	$v
+    my ($self, $win, $v) = @_;
+    $v = $1 * $win->lines if $v =~ /(-?\d+(?:\.\d*)?)%/;
+    $v
 }
 
 sub show_control {
-	my ($self, $panel, @items) = @_;
-	my $win = $self->window or return;
-	my $panel_win = $panel->window;
+    my ($self, $panel, @items) = @_;
+    my $win = $self->window or return;
+    my $panel_win = $panel->window;
 
-	my $menu;
-	my @menu_items = pairmap {
-		{ # https://rt.cpan.org/Ticket/Display.html?id=95409
-			my $code = $b;
-			Tickit::Widget::Menu::Item->new(
-				name => $a,
-				on_activate => sub {
-					$menu->dismiss;
-					$win->tickit->later(sub {
-						$code->();
-						dispose $menu;
-					});
-				}
-			)
-		}
-	} @items;
+    my $menu;
+    my @menu_items = pairmap {
+        { # https://rt.cpan.org/Ticket/Display.html?id=95409
+            my $code = $b;
+            Tickit::Widget::Menu::Item->new(
+                name => $a,
+                on_activate => sub {
+                    $menu->dismiss;
+                    $win->tickit->later(sub {
+                        $code->();
+                        dispose $menu;
+                    });
+                }
+            )
+        }
+    } @items;
 
-	$menu = Tickit::Widget::Menu->new(
-		items => \@menu_items,
-	);
-	$menu->popup(
-		$panel_win,
-		1,
-		1
-	);
+    $menu = Tickit::Widget::Menu->new(
+        items => \@menu_items,
+    );
+    $menu->popup(
+        $panel_win,
+        1,
+        1
+    );
 }
 
 sub float_geom_changed {
-	my $self = shift;
-	my $w = shift;
-	my $win = $self->window or return;
-	my $float = $w->window or return;
+    my $self = shift;
+    my $w = shift;
+    my $win = $self->window or return;
+    my $float = $w->window or return;
 
-	my $old = $self->{extents}{refaddr $float};
-	my $new = $float->rect;
+    my $old = $self->{extents}{refaddr $float};
+    my $new = $float->rect;
 
-	# Any time a panel moves or changes size, we'll potentially need
-	# to trigger expose events on the desktop background and any
-	# sibling windows.
-	# Start by working out what part of our current desktop
-	# has just been uncovered, and fire expose events at our top-level
-	# window for this area (for a move, it'll typically be up to two rectangles)
-	my $rs = Tickit::RectSet->new;
-	$rs->add($old);
-	$rs->add($new);
+    # Any time a panel moves or changes size, we'll potentially need
+    # to trigger expose events on the desktop background and any
+    # sibling windows.
+    # Start by working out what part of our current desktop
+    # has just been uncovered, and fire expose events at our top-level
+    # window for this area (for a move, it'll typically be up to two rectangles)
+    my $rs = Tickit::RectSet->new;
+    $rs->add($old);
+    $rs->add($new);
 
-	# We have moved. This means we may be able to scroll. However! It's not quite that
-	# simple. Our move event may cause other panels to move as well, and a move is
-	# likely to involve frame redraw as well. See Tickit::Widgget::ScrollBox for more
-	# details on the scroll_with_children method.
-	if(0 && ($old->left != $new->left || $old->top != $new->top)) {
-		my @opt = (
-			-($new->top - $old->top),
-			-($new->left - $old->left),
-		);
-		Tickit::Debug->log("Wx", "scrollrect: %s => %s", $float->scroll_with_children(
-			@opt
-		), join(',',@opt));
-	}
+    # We have moved. This means we may be able to scroll. However! It's not quite that
+    # simple. Our move event may cause other panels to move as well, and a move is
+    # likely to involve frame redraw as well. See Tickit::Widgget::ScrollBox for more
+    # details on the scroll_with_children method.
+    if(0 && ($old->left != $new->left || $old->top != $new->top)) {
+        my @opt = (
+            -($new->top - $old->top),
+            -($new->left - $old->left),
+        );
+        Tickit::Debug->log("Wx", "scrollrect: %s => %s", $float->scroll_with_children(
+            @opt
+        ), join(',',@opt));
+    }
 
-	# Trigger expose events for the area we used to be in, and the new location.
-	$win->expose($_) for $rs->rects;
+    # Trigger expose events for the area we used to be in, and the new location.
+    $win->expose($_) for $rs->rects;
 
-	# Now stash the current extents for this child window so we know what's changed next time.
-	$self->{extents}{refaddr $float} = $w->window->rect->translate(0,0);
+    # Now stash the current extents for this child window so we know what's changed next time.
+    $self->{extents}{refaddr $float} = $w->window->rect->translate(0,0);
 
-	# Also pass on the event, so the child widget knows what's going on
-	$w->reshape(@_);
+    # Also pass on the event, so the child widget knows what's going on
+    $w->reshape(@_);
 }
 
 =head1 API METHODS
@@ -341,11 +345,11 @@ Returns $self.
 =cut
 
 sub make_active {
-	my $self = shift;
-	my $child = shift;
-	$_->mark_inactive for grep $_->is_active, @{$self->{widgets}};
-	$child->window->raise_to_front;
-	$child->mark_active;
+    my $self = shift;
+    my $child = shift;
+    $_->mark_inactive for grep $_->is_active, @{$self->{widgets}};
+    $child->window->raise_to_front;
+    $child->mark_active;
 }
 
 =head2 weld
@@ -386,14 +390,14 @@ Returns C< $self > for chaining.
 =cut
 
 sub weld {
-	my ($self, $src_edge, $src_widget, $dst_edge, $dst_widget) = @_;
-	my ($src) = grep { refaddr($src_widget) == refaddr($_->child) } @{$self->{widgets}}
-		or die "src not found";
-	my ($dst) = grep { refaddr($dst_widget) == refaddr($_->child) } @{$self->{widgets}}
-		or die "dst not found";
-	push @{$src->{linked_widgets}{$src_edge}}, $dst_edge => $dst;
-	push @{$dst->{linked_widgets}{$dst_edge}}, $src_edge => $src;
-	$self;
+    my ($self, $src_edge, $src_widget, $dst_edge, $dst_widget) = @_;
+    my ($src) = grep { refaddr($src_widget) == refaddr($_->child) } @{$self->{widgets}}
+        or die "src not found";
+    my ($dst) = grep { refaddr($dst_widget) == refaddr($_->child) } @{$self->{widgets}}
+        or die "dst not found";
+    push @{$src->{linked_widgets}{$src_edge}}, $dst_edge => $dst;
+    push @{$dst->{linked_widgets}{$dst_edge}}, $src_edge => $src;
+    $self;
 }
 
 =head2 reshape
@@ -409,48 +413,48 @@ Returns $self.
 =cut
 
 sub reshape {
-	my $self = shift;
-	my $win = $self->window or return;
+    my $self = shift;
+    my $win = $self->window or return;
 
-	my @directions = qw(top left lines cols);
+    my @directions = qw(top left lines cols);
 
-	my $lines_ratio = $self->{geometry}{lines} ? $win->lines / $self->{geometry}{lines} : 1;
-	my $cols_ratio = $self->{geometry}{cols} ? $win->cols / $self->{geometry}{cols} : 1;
+    my $lines_ratio = $self->{geometry}{lines} ? $win->lines / $self->{geometry}{lines} : 1;
+    my $cols_ratio = $self->{geometry}{cols} ? $win->cols / $self->{geometry}{cols} : 1;
 
-	# First, get all the sizes across all widgets
-	foreach my $w (@{$self->{widgets}}) {
-		my $subwin = $w->window or next;
-		$w->window->change_geometry(
-			(map int,
-				$subwin->top * $lines_ratio,
-				$subwin->left * $cols_ratio),
-			(map int($_) || 1,
-				$subwin->lines * $lines_ratio,
-				$subwin->cols * $cols_ratio)
-		);
-	}
-	$self->{geometry} = { map { $_ => $win->$_ } @directions };
+    # First, get all the sizes across all widgets
+    foreach my $w (@{$self->{widgets}}) {
+        my $subwin = $w->window or next;
+        $w->window->change_geometry(
+            (map int,
+                $subwin->top * $lines_ratio,
+                $subwin->left * $cols_ratio),
+            (map int($_) || 1,
+                $subwin->lines * $lines_ratio,
+                $subwin->cols * $cols_ratio)
+        );
+    }
+    $self->{geometry} = { map { $_ => $win->$_ } @directions };
 
 # This will probably end up using Layout::Relative.
-#	my %buckets = map { $_ => [] } @directions;
-#	foreach my $w (@{$self->{widgets}}) {
-#		push @{$buckets{$_}}, { base => $w->window->$_, expand => 1 } for @directions;
-#	}
+#   my %buckets = map { $_ => [] } @directions;
+#   foreach my $w (@{$self->{widgets}}) {
+#       push @{$buckets{$_}}, { base => $w->window->$_, expand => 1 } for @directions;
+#   }
 #
-#	# Now recalculate the distribution
-#	distribute($win->lines, @{$buckets{top}});
-#	distribute($win->lines, @{$buckets{lines}});
-#	distribute($win->cols, @{$buckets{left}});
-#	distribute($win->cols, @{$buckets{cols}});
-#	use Data::Dumper;
-#	warn Dumper(\%buckets);
+#   # Now recalculate the distribution
+#   distribute($win->lines, @{$buckets{top}});
+#   distribute($win->lines, @{$buckets{lines}});
+#   distribute($win->cols, @{$buckets{left}});
+#   distribute($win->cols, @{$buckets{cols}});
+#   use Data::Dumper;
+#   warn Dumper(\%buckets);
 #
-#	# Then we apply the new sizes back to the widgets
-#	foreach my $w (@{$self->{widgets}}) {
-#		$w->window->change_geometry(
-#			map { (shift @{$buckets{$_}})->{value} } @directions,
-#		)
-#	}
+#   # Then we apply the new sizes back to the widgets
+#   foreach my $w (@{$self->{widgets}}) {
+#       $w->window->change_geometry(
+#           map { (shift @{$buckets{$_}})->{value} } @directions,
+#       )
+#   }
 }
 
 =head2 cascade
@@ -460,16 +464,16 @@ Arrange all the windows in a cascade (first at 1,1, second at 2,2, etc.).
 =cut
 
 sub cascade {
-	my $self = shift;
-	my @windows = reverse $self->window->subwindows;
-	my $x = 0;
-	my $y = 0;
-	my $lines = $self->window->lines - @windows;
-	$lines = 6 if $lines < 6;
-	my $cols = $self->window->cols - @windows;
-	$cols = 6 if $cols < 6;
-	$_->change_geometry($y++, $x++, $lines, $cols) for @windows;
-	$self
+    my $self = shift;
+    my @windows = reverse $self->window->subwindows;
+    my $x = 0;
+    my $y = 0;
+    my $lines = $self->window->lines - @windows;
+    $lines = 6 if $lines < 6;
+    my $cols = $self->window->cols - @windows;
+    $cols = 6 if $cols < 6;
+    $_->change_geometry($y++, $x++, $lines, $cols) for @windows;
+    $self
 }
 
 =head2 tile
@@ -484,45 +488,45 @@ Returns $self.
 =cut
 
 sub tile {
-	my $self = shift;
-	my %args = @_;
-	my $win = $self->window or return;
-	my @windows = reverse @{$win->{child_windows}};
+    my $self = shift;
+    my %args = @_;
+    my $win = $self->window or return;
+    my @windows = reverse @{$win->{child_windows}};
 
-	# Try to end up with something vaguely square. Probably a bad
-	# choice but it seems tolerable for the moment.
-	my $side = int(sqrt 0+@windows) || 1;
+    # Try to end up with something vaguely square. Probably a bad
+    # choice but it seems tolerable for the moment.
+    my $side = int(sqrt 0+@windows) || 1;
 
-	# Find the tallest window in each grid row for distribution
-	my @lines;
-	{
-		my @rows = @windows;
-		while(@rows) {
-			my @batch = splice @rows, 0, $side;
-			push @lines, +{ expand => 1, base => max map $_->lines, @batch };
-		}
-		distribute($win->lines, @lines);
-		if($args{overlap}) { # haxx
-			++$_->{value} for @lines;
-			--$lines[-1]{value};
-		}
-	}
+    # Find the tallest window in each grid row for distribution
+    my @lines;
+    {
+        my @rows = @windows;
+        while(@rows) {
+            my @batch = splice @rows, 0, $side;
+            push @lines, +{ expand => 1, base => max map $_->lines, @batch };
+        }
+        distribute($win->lines, @lines);
+        if($args{overlap}) { # haxx
+            ++$_->{value} for @lines;
+            --$lines[-1]{value};
+        }
+    }
 
-	# Now step through all the windows, handling one row at a time
-	while(@windows) {
-		my @batch = splice @windows, 0, $side;
-		my $l = shift @lines;
-		my @cols  = map +{ base => $_->cols, expand => 1}, @batch;
-		distribute($win->cols, @cols);
-		if($args{overlap}) { # haxx
-			++$_->{value} for @cols;
-			--$cols[-1]{value};
-		}
-		foreach my $w (@batch) {
-			my $c = shift @cols;
-			$w->change_geometry($l->{start}, $c->{start}, $l->{value}, $c->{value});
-		}
-	}
+    # Now step through all the windows, handling one row at a time
+    while(@windows) {
+        my @batch = splice @windows, 0, $side;
+        my $l = shift @lines;
+        my @cols  = map +{ base => $_->cols, expand => 1}, @batch;
+        distribute($win->cols, @cols);
+        if($args{overlap}) { # haxx
+            ++$_->{value} for @cols;
+            --$cols[-1]{value};
+        }
+        foreach my $w (@batch) {
+            my $c = shift @cols;
+            $w->change_geometry($l->{start}, $c->{start}, $l->{value}, $c->{value});
+        }
+    }
 }
 
 =head2 close_all
@@ -532,26 +536,26 @@ Close all the windows.
 =cut
 
 sub close_all {
-	my $self = shift;
-	$_->close for reverse $self->window->subwindows;
+    my $self = shift;
+    $_->close for reverse $self->window->subwindows;
 }
 
 sub close_panel {
-	my ($self, $panel) = @_;
-	my $rect = $panel->window->rect;
-	my $addr = refaddr($panel);
-	List::UtilsBy::extract_by { refaddr($_) == $addr }@{ $self->{widgets} };
-	$panel->window->close;
-	my $win = $self->window;
-	$win->tickit->later(sub {
-		$win->expose($rect);
-	})
+    my ($self, $panel) = @_;
+    my $rect = $panel->window->rect;
+    my $addr = refaddr($panel);
+    List::UtilsBy::extract_by { refaddr($_) == $addr }@{ $self->{widgets} };
+    $panel->window->close;
+    my $win = $self->window;
+    $win->tickit->later(sub {
+        $win->expose($rect);
+    })
 }
 
 # Tickit::Widget
 sub focus_next {
-	my ($self) = shift;
-	$self->SUPER::focus_next(@_)
+    my ($self) = shift;
+    $self->SUPER::focus_next(@_)
 }
 
 1;
@@ -572,5 +576,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
 

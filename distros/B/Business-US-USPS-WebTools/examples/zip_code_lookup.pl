@@ -16,39 +16,36 @@ my $hash = $verifier->lookup_zipcode(
 	FirmName => '',
 	Address1 => $address1,
 	Address2 => $address2,
-	City     => $city,  
+	City     => $city,
 	State    => $state,
 	Zip5     => $zip5,
 	Zip4     => '',
 	);
 
-if( $verifier->is_error )
-	{
+if( $verifier->is_error ) {
 	warn "Oops!\n";
 	print $verifier->response;
 	print "\n";
 	}
-else
-	{
+else {
 	print <<"HERE";
 $hash->{FirmName}
 $hash->{Address1}
 $hash->{Address2}
-$hash->{City}   
-$hash->{State}  
-$hash->{Zip5}   
-$hash->{Zip4}  
+$hash->{City}
+$hash->{State}
+$hash->{Zip5}
+$hash->{Zip4}
 HERE
 	}
 
-sub prompt
-	{
+sub prompt {
 	my $prompt = shift;
-	
+
 	print "$prompt > ";
-	
+
 	my $line = <STDIN>;
 	chomp( $line );
-	
+
 	$line;
 	}

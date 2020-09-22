@@ -4,34 +4,34 @@ Hash::Digger - Access nested hash structures without vivification
 
 # VERSION
 
-Version 0.0.1
+Version 0.0.3
 
 # SYNOPSIS
 
 Allows accessing hash structures without triggering autovivification.
 
     my %hash;
-    
+
     $hash{'foo'}{'bar'} = 'baz';
-    
+
     diggable \%hash, 'foo', 'bar';
     # Truthy
-    
+
     diggable \%hash, 'xxx', 'yyy';
     # Falsey
-    
+
     dig \%hash, 'foo', 'bar';
     # 'baz'
-    
+
     dig \%hash, 'foo', 'bar', 'xxx';
     # undef
-    
+
     exhume 'some default', \%hash, 'foo', 'bar';
     # 'baz'
-    
+
     exhume 'some default', \%hash, 'foo', 'xxx';
     # 'some default'
-    
+
     # Hash structure has not changed:
     use Data::Dumper;
     Dumper \%hash;
@@ -49,7 +49,7 @@ dig, diggable, exhume
 
 ## diggable
 
-Check if given path is diggable on the hash.
+Check if given path is diggable on the hash (\`exists\` equivalent)
 
 ## dig
 

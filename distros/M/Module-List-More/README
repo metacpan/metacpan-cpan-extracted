@@ -1,0 +1,156 @@
+NAME
+    Module::List::More - Module::List, with more options
+
+VERSION
+    This document describes version 0.004009 of Module::List::More (from
+    Perl distribution Module-List-More), released on 2020-09-22.
+
+SYNOPSIS
+    Use like you would Module::List, e.g.:
+
+     use Module::List::More qw(list_modules);
+
+     $id_modules = list_modules("Data::ID::", { list_modules=>1, return_path=>1, return_library_path=>1, return_version=>1});
+     # Sample result:
+     # {
+     #   'Data::ID::One' => {
+     #     module_path=>"/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Data/ID/One.pm",
+     #     library_path=>"/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2",
+     #     module_version=>'0.01',
+     #   },
+     #   'Data::ID::Two' => {
+     #     module_path=>"/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Data/ID/Two.pm",
+     #     library_path=>"/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2",
+     #     module_version=>'0.02',
+     #   },
+     # }
+
+     {
+       local @INC = ('lib', @INC);
+       $id_modules = list_modules("Data::ID::", { list_modules=>1, all=>1, return_path=>1, return_version=>1});
+     }
+     # Sample result:
+     # {
+     #   'Data::ID::One' => {
+     #     module_path=>["lib/Data/ID/One.pm", "/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Data/ID/One.pm"],
+     #     module_version=>[undef, '0.01'],
+     #   },
+     #   'Data::ID::Two' => {
+     #     module_path=>["/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Data/ID/Two.pm"],
+     #     module_version=>['0.02'],
+     #   },
+     # }
+
+DESCRIPTION
+    This module is like Module::List, except for the following differences:
+
+    *   lower startup overhead (with some caveats)
+
+        It avoids using Exporter and implements its own import(). It avoids
+        IO::Dir, Carp, File::Spec, with the goal of saving a few
+        milliseconds (a casual test on my PC results in 11ms vs 39ms).
+
+        Path separator is hard-coded as "/".
+
+    *   Recognize "all" option
+
+        If set to true and "return_path" is also set to true, will return
+        all found paths for each module instead of just the first found one.
+        The values of result will be an arrayref containing all found paths.
+
+    *   Recognize "return_library_path" option
+
+        If set to true, will return a "library_path" result key, which is
+        the associated @INC entry that produces the result.
+
+    *   Recognize "return_version" option
+
+        If set to true, will parse module source file with
+        ExtUtils::MakeMaker's "parse_version" and return the result in
+        "module_version" key. If version cannot be detected, a proper
+        undefined value "undef" (instead of the string 'undef') is returned.
+
+    *   Recognize "wildcard" option
+
+        This boolean option can be set to true to recognize wildcard pattern
+        in prefix. Wildcard patterns such as jokers ("?", "*", "**"),
+        classes ("[a-z]"), as well as braces ("{One,Two}") are supported.
+        "**" implies recursive listing.
+
+        Examples:
+
+         list_modules("Module::P*", {wildcard=>1, list_modules=>1});
+
+        results in something like:
+
+         {
+             "Module::Patch"             => undef,
+             "Module::Path"              => undef,
+             "Module::Pluggable"         => undef,
+         }
+
+        while:
+
+         list_modules("Module::P**", {wildcard=>1, list_modules=>1});
+
+        results in something like:
+
+         {
+             "Module::Patch"             => undef,
+             "Module::Path"              => undef,
+             "Module::Path::More"        => undef,
+             "Module::Pluggable"         => undef,
+             "Module::Pluggable::Object" => undef,
+         }
+
+        while:
+
+         list_modules("Module::**le", {wildcard=>1, list_modules=>1});
+
+        results in something like:
+
+         {
+             "Module::Depakable"                => undef,
+             "Module::Install::Admin::Bundle"   => undef,
+             "Module::Install::Admin::Makefile" => undef,
+             "Module::Install::Bundle"          => undef,
+             "Module::Install::Makefile"        => undef,
+             "Module::Pluggable"                => undef,
+         }
+
+HISTORY
+    This module began its life as PERLANCAR::Module::List, my personal
+    experimental fork of Module::List. The experiment has also produced
+    other forks like Module::List::Tiny, Module::List::Wildcard.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-List-More>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-List-More>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-List-More>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Module::List
+
+    Module::List::Tiny
+
+    Module::List::Wildcard
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

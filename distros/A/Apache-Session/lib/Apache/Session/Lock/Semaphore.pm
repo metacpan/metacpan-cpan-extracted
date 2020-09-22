@@ -197,7 +197,7 @@ Apache::Session::Lock::Semaphore - Provides mutual exclusion through semaphores
 
  use Apache::Session::Lock::Semaphore;
 
- my $locker = new Apache::Session::Lock::Semaphore;
+ my $locker = Apache::Session::Lock::Semaphore->new;
  die "no semaphores" unless $locker;
 
  $locker->acquire_read_lock($ref);

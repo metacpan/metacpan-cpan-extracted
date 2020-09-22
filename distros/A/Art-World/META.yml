@@ -1,8 +1,9 @@
 ---
-abstract: 'An Art World simulator game 🎨'
+abstract: 'Agents interactions modeling  🎨'
 author:
-  - 'Sébastien Feugère <sebastien@feugere.net>'
-build_requires: {}
+  - =over
+build_requires:
+  Test::Pod: '== 1.52'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -29,20 +30,17 @@ provides:
     file: lib/Art/Wildlife.pm
   Art::World:
     file: lib/Art/World.pm
-    version: '0.15'
-  MyApp:
-    file: lib/MyApp.pm
+    version: '0.16'
 requires:
   Data::Printer: '== 0.40'
   Faker: '== 1.03'
-  Test::Pod: '0'
-  Zydeco: '== 0.603'
-  perl: v5.32.0
+  Zydeco: '== 0.605'
+  perl: v5.16.0
 resources:
   bugtracker: https://gitlab.com/smonff/art-world/issues
   homepage: https://gitlab.com/smonff/art-world
   repository: git://gitlab.com/smonff/art-world.git
-version: '0.15'
+version: '0.16'
 x_authority: cpan:SMONFF
 x_contributors:
   - 'Seb Hu-Rillettes <shr@balik.network>'

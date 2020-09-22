@@ -303,6 +303,8 @@ too).
 
     [https://rxjs.dev/api/operators/auditTime](https://rxjs.dev/api/operators/auditTime)
 
+    Works like rxjs's "auditTime", except the parameter is in seconds instead of ms.
+
         # 30, complete
         rx_concat(
             rx_of(10, 20, 30),
@@ -518,6 +520,8 @@ too).
 
     [https://rxjs.dev/api/operators/sampleTime](https://rxjs.dev/api/operators/sampleTime)
 
+    Works like rxjs's "sampleTime", except the parameter is in seconds instead of ms.
+
         # 0, 2, 3, 5, 6, 8, ...
         rx_interval(1)->pipe(
             op_sample_time(1.6),
@@ -617,8 +621,10 @@ too).
 
     [https://rxjs.dev/api/operators/throttleTime](https://rxjs.dev/api/operators/throttleTime)
 
-    At the moment, this function does not accept the configuration options that
-    rxjs's throttleTime accepts. Only the first parameter (duration) is taken into account.
+    Works like rxjs's "throttleTime", except the parameter is in seconds instead of ms.
+
+    At the moment, this function only accepts `duration` as parameter, not the configuration options that
+    rxjs's throttleTime accepts.
 
         # 0, 3, 6, 9, 12, ...
         rx_interval(1)->pipe(

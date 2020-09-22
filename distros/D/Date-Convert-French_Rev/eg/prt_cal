@@ -2,10 +2,11 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Example of Date::Convert::French_Rev script to print a French Revolutionary calendar
-#     Copyright (C) 2001-2003, 2013, 2015 Jean Forget
+#     Copyright (C) 2001-2003, 2013, 2015, 2020 Jean Forget
 #
 #     See the license in the embedded documentation below.
 #
+use utf8;
 use strict;
 use warnings;
 use FindBin;
@@ -20,19 +21,21 @@ GetOptions('lang=s' => \$lang, 'kitten=s' => \$pict);
 #
 # I18N
 #
-my $ref_labels;
-if ($lang eq 'fr')
-  { $ref_labels = do "$FindBin::Bin/labels_fr" }
-else
-  { $ref_labels = do "$FindBin::Bin/labels_en" }
-my %labels = %$ref_labels;
+our %labels;
+if ($lang eq 'fr') {
+  do "$FindBin::Bin/labels_fr";
+}
+else {
+  do "$FindBin::Bin/labels_en";
+}
+
+binmode STDOUT, ':utf8';
 
 my $annee;
-foreach $annee (@ARGV)
-  {
-    warn "Invalid year", next if $annee <= 0;
-    prt_cal ($annee);
-  }
+foreach $annee (@ARGV) {
+  warn "Invalid year", next if $annee <= 0;
+  prt_cal ($annee);
+}
 
 
 sub prt_cal {
@@ -67,11 +70,10 @@ EOT
 
   # Building the first six months
   my $row = '';
-  foreach my $m (1..6)
-    {
-      my $cell = join '<br>', map { one_day($year, $m, $_) } (1..30);
-      $row .= "<td><pre><br>$cell</pre></td>\n";
-    }
+  foreach my $m (1..6) {
+    my $cell = join '<br />', map { one_day($year, $m, $_) } (1..30);
+    $row .= "<td><pre><br>$cell</pre></td>\n";
+  }
 
   # Printing the first six months and the headers for the last six months
   print <<"EOT";
@@ -88,21 +90,21 @@ EOT
 
   # Building the "-al" and "-idor" months
   $row = "";
-  foreach my $m (7..12)
-    {
-      my $cell = join '<br>', map { one_day($year, $m, $_) } (1..30);
-      $row .= "<td><pre><br>$cell</pre></td>\n";
-    }
+  foreach my $m (7..12) {
+    my $cell = join '<br />', map { one_day($year, $m, $_) } (1..30);
+    $row .= "<td><pre><br>$cell</pre></td>\n";
+  }
   print "<tr align='center'>$row</tr>\n";
-  
+
   # Additional days.
   # By the way, how many additional days? 5 (normal year) or 6 (leap year)?
   my $last = 5;
-  $last = 6 if is_leap Date::Convert::French_Rev $year;
+  $last = 6 if Date::Convert::French_Rev->is_leap($year);
   # The additional days are printed in an horizontal row, one per cell
   $row = "";
-  foreach my $rd (1 .. $last)
-    { $row .= "<td><pre><br>" . one_day($year, 13, $rd) . "</pre></td>\n" }
+  foreach my $rd (1 .. $last) {
+    $row .= "<td><pre><br>" . one_day($year, 13, $rd) . "</pre></td>\n";
+  }
   print <<"EOT";
 <tr align='center'><td colspan='6'>$labels{add_days}</td></tr>
 <tr align='center'>$row</tr>
@@ -113,8 +115,8 @@ EOT
 sub one_day {
   my ($ry, $rm, $rd) = @_; # Revolutionary year, month and day
   my ($gd, $wd);           # Gregorian day number and weekday letter
-  my $day = new Date::Convert::French_Rev($ry, $rm, $rd);
-  convert Date::Convert::Gregorian $day;
+  my $day = Date::Convert::French_Rev->new($ry, $rm, $rd);
+  Date::Convert::Gregorian->convert($day);
   $gd = $day->day();
   $wd = $labels{week1}[$day->absol() % 7];
   sprintf "%2d (%s %2d)", $rd, $wd, $gd;
@@ -176,20 +178,20 @@ pictures involving scantily clad ladies.
 
 You can try
 
-  http://images.google.com/images?hl=en&lr=&ie=ISO-8859-1&output=search&q=kitten+basket
-  http://images.google.com/images?hl=en&lr=&ie=ISO-8859-1&output=search&q=mountains
+  https://images.google.com/images?hl=en&lr=&ie=ISO-8859-1&output=search&q=kitten+basket
+  https://images.google.com/images?hl=en&lr=&ie=ISO-8859-1&output=search&q=mountains
 
 but do not even think about
 
-  http://images.google.com/images?q=Delacroix+libert%C3%A9+guidant+peuple&hl=en&lr=&ie=UTF-8&output=search
+  https://images.google.com/images?q=Delacroix+libert%C3%A9+guidant+peuple&hl=en&lr=&ie=UTF-8&output=search
 
 =back
 
 =head1 PARAMETERS
 
-There is a single parameter, the year, according to the French
-Revolutionary calendar. This parameter is numeric
-(Roman number not permitted).
+There  is  a single  parameter,  the  year,  according to  the  French
+Revolutionary calendar.  This parameter  is numeric (Roman  number not
+permitted).
 
 =head1 KNOWN BUGS
 
@@ -203,14 +205,15 @@ Jean Forget <JFORGET@cpan.org>
 
 =head1 LICENSE
 
-Copyright (c)  2001, 2002, 2003,  2013, 2015 Jean Forget.   All rights
-reserved.  This program is free software.  You can distribute, modify,
-and otherwise mangle  F<prt_cal> under the same terms  as Perl 5.16.3:
-GNU Public License version 1 or later and Perl Artistic License
+Copyright  (c) 2001,  2002, 2003,  2013, 2015,  2020 Jean  Forget. All
+rights reserved.  This program is  free software. You  can distribute,
+modify, and otherwise  mangle F<prt_cal> under the same  terms as Perl
+5.16.3:  GNU Public  License  version  1 or  later  and Perl  Artistic
+License
 
 You can  find the text  of the licenses  in the F<LICENSE> file  or at
-L<http://www.perlfoundation.org/artistic_license_1_0> and
-L<http://www.gnu.org/licenses/gpl-1.0.html>.
+L<https://dev.perl.org/licenses/artistic.html>
+and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 
 Here is the summary of GPL:
 
@@ -225,8 +228,7 @@ MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
 General Public License for more details.
 
 You  should have received  a copy  of the  GNU General  Public License
-along  with  this  program;  if   not,  write  to  the  Free  Software
-Foundation, Inc.,  59 Temple Place, Suite 330,  Boston, MA 02111-1307,
-USA.
+along with  this program; if not,  see <https://www.gnu.org/licenses/>
+or write to the Free Software Foundation, Inc., L<https://www.fsf.org>.
 
 =cut

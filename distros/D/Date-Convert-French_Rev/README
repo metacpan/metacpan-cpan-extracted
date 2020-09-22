@@ -2,23 +2,6 @@ Date::Convert::French_Rev - Jean Forget <JFORGET@cpan.org>
 
 Date conversion using the French Revolutionary calendar.
 
-WHY A NEW VERSION AFTER TEN YEARS?
-
-I  released the  last version  of this  module (0.05)  the same  day I
-released DateTime::Calendar::FrenchRevolutionary  version 0.01. It was
-intended to be the final version of Date::Convert::French_Rev.  So why
-do I release another version ten years later?
-
-Between  2003 and  2013, the  world has  moved on  and CPAN  has moved
-on.  In  2003, UTF-8  was  a promising  technic,  but  not yet  widely
-used. In  2013, UTF-8 *is*  widely used. In  2003, there was a  set of
-CPAN  best  practices:  test   scripts  in  t/*.t  for  example.  Some
-recommanded practices appeared later: META.yml for example. And CPANTS
-was  created  to  provide   a  static  code  analysis  checking  these
-recommanded practices. So  this new version is also  meant to catch up
-with these  recommanded practices. In  other words, I play  the CPANTS
-game and I try to improve my rating by updating this module.
-
 PRESENTATION
 
 This   module  is   a  add-on   to  Mordechai   Abzug's  Date::Convert
@@ -33,16 +16,36 @@ This module allows you to pretty-print French Revolutionary dates.
 You can use this module even if you do not have Perl on your computer.
 See the alternate install procedure below.
 
-REQUIREMENTS
+WHY A NEW VERSION AFTER TEN YEARS?
+
+I released the supposedly last version  of this module (0.05) the same
+day I  released DateTime::Calendar::FrenchRevolutionary  version 0.01.
+It was intended to be  the final version of Date::Convert::French_Rev.
+So why did I release version 0.06 ten years later?
+
+Between  2003 and  2013, the  world has  moved on  and CPAN  has moved
+on.  In  2003, UTF-8  was  a promising  technic,  but  not yet  widely
+used. In  2013, UTF-8 *is*  widely used. In  2003, there was a  set of
+CPAN  best  practices:  test   scripts  in  t/*.t  for  example.  Some
+recommended practices appeared later: META.yml for example. And CPANTS
+was  created  to  provide   a  static  code  analysis  checking  these
+recommended practices. So  this new version is also  meant to catch up
+with these  recommended practices. In  other words, I play  the CPANTS
+game and I try to improve my rating by updating this module.
+
+PREREQUISITES
 
 Roman, by Alexandr Ciornii (CHORNY)
 Date::Convert, by Mordechai Abzug (MORTY)
+
+Optionally
 Test::Exception, by Adrian Howard (ADIE)
+Test::Warnings, by Karen Etheridge (ETHER)
 
 INSTALL
 
-First intall Test::Exception,  Roman.pm and Date::Convert.pm, and then
-install the normal way:
+First  intall  Roman.pm and  Date::Convert.pm,  and  then install  the
+normal way:
 
 perl Makefile.PL
 make
@@ -75,7 +78,7 @@ French-speaker, ending in "fr.html") with the HTML browser.
 That's all!
 
 
-Copyright (c) 2001-2003, 2013,  2015 Jean Forget. All rights reserved.
-This  program  is free  software.   You  can  distribute, modify,  and
-otherwise  mangle Date::Convert::French_Rev  under the  same  terms as
+Copyright  (c) 2001-2003,  2013, 2015,  2020 Jean  Forget. All  rights
+reserved. This program  is free software. You  can distribute, modify,
+and otherwise mangle Date::Convert::French_Rev under the same terms as
 perl.

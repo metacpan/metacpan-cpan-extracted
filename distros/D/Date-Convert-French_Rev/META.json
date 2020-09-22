@@ -4,7 +4,7 @@
       "Jean Forget <JFORGET@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -38,15 +39,16 @@
          }
       },
       "test" : {
-         "requires" : {
-            "Test::Exception" : "0"
+         "recommends" : {
+            "Test::Exception" : "0",
+            "Test::Warnings" : "0"
          }
       }
    },
    "provides" : {
       "Date::Convert::French_Rev" : {
          "file" : "lib/Date/Convert/French_Rev.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -57,5 +59,6 @@
          "web" : "https://github.com/jforget/Date-Convert-French_Rev"
       }
    },
-   "version" : "0.08"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

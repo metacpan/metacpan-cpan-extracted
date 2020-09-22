@@ -20,7 +20,7 @@ sub run_javascript {
         $js_result = $self->get_javascript_result($result, $raw, $javascript_string);
     }, undef);
 
-    Gtk3::main_iteration while Gtk3::events_pending or not $done;
+    Gtk3::main_iteration_do(0) while Gtk3::events_pending or not $done;
 
     return $js_result;
 }

@@ -25,9 +25,9 @@ my $end = Tags::HTML::Page::End->new(
 # Process page
 $css->put(
        ['s', 'div'],
-['d', 'color', 'red'],
-['d', 'background-color', 'black'],
-['e'],
+       ['d', 'color', 'red'],
+       ['d', 'background-color', 'black'],
+       ['e'],
 );
 $begin->process;
 $tags->put(

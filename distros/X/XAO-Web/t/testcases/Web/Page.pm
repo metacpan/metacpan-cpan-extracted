@@ -723,6 +723,8 @@ sub test_unicode_transparency {
     use utf8;
     binmode STDERR, ':utf8';
 
+    my $byte2122=Encode::encode('utf8',"\x{2122}");
+
     # By default, mainly for backwards compatibility, the template
     # engine operates on bytes, not characters. Thus we expect bytes
     # back even when we supply unicode.
@@ -854,17 +856,22 @@ sub test_unicode_transparency {
         },
         c15c => {
             template    => qq(<%Page template='&#8482;'%>),
-            expect      => Encode::encode_utf8('™'),
+            expect      => $byte2122,
         },
         #
         d1a => {
-            template    => qq(<script><%MyAction datamode='test-alt' arg='Foo\x{2122}' format='json-embed'%></script>),
-            expect      => qr/Foo\x{2122}/,
+            objname     => 'Web::MyAction',
+            args        => { datamode => 'test-alt', format => 'json-embed', arg => qq(Foo\x{2122}) },
+            expect      => qr/Foo$byte2122/,
         },
         d1b => {
             charmode    => 1,
             template    => qq(<script><%MyAction datamode='test-alt' arg='Foo\x{2122}' format='json-embed'%></script>),
             expect      => qr/Foo\x{2122}/,
+        },
+        d1c => {
+            template    => qq(<script><%MyAction datamode='test-alt' arg='</script><script>alert(1);' format='json-embed'%></script>),
+            expect      => qr/\\u003c\/script\\u003e\\u003cscript\\u003ealert/,
         },
         #
         e1 => {
@@ -928,7 +935,7 @@ sub test_unicode_transparency {
 
         $self->siteconfig->put('/xao/page/character_mode' => $test->{'charmode'});
 
-        my $page=XAO::Objects->new(objname => 'Web::Page');
+        my $page=XAO::Objects->new(objname => $test->{'objname'} || 'Web::Page');
 
         my $template=$test->{'template'};
         my $got=$page->expand({template => $template},$test->{'args'});
@@ -950,7 +957,7 @@ sub test_unicode_transparency {
         }
 
         if(ref $expect eq 'Regexp') {
-            $self->assert($got =~ $expect,
+            $self->assert($got =~ $expect ? 1 : 0,
                 "Test $tname - expected to match '$expect', got '$got'");
         }
         else {
@@ -976,7 +983,7 @@ sub test_expand {
         '<$TEST/f$>'    => '\'&quot;!@#$%^&amp;*()_-=[]\\&lt;&gt;? ',
         '<$TEST/q$>'    => '\'%22!@%23$%25^%26*()_-%3d[]\\%3c%3e%3f%20',
         '<$TEST/u$>'    => '\'%22!@%23$%25^%26*()_-%3d[]\\%3c%3e%3f%20',
-        '<$TEST/j$>'    => '\\u0027\\"!@#$%^&*()_-=[]\\\\<>? ',
+        '<$TEST/j$>'    => '\\u0027\\"!@#$%^&*()_-=[]\\\\\\u003c\\u003e? ',
     );
     foreach my $template (keys %ttt) {
         my $got=$page->expand(template => $template,

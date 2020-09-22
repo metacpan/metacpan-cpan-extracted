@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Flatten::DateTime;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 
 use parent qw/
     DBIx::Class::Helper::ResultSet::DateMethods1
@@ -33,7 +33,7 @@ DBIx::Class::Smooth::Flatten::DateTime - Short intro
 
 =head1 VERSION
 
-Version 0.0104, released 2020-08-30.
+Version 0.0105, released 2020-09-20.
 
 =head1 SOURCE
 

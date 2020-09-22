@@ -4,7 +4,6 @@ use warnings;
 use Tickit;
 use Tickit::Widget::Placegrid;
 use Tickit::Widget::Layout::Desktop;
-
 my $tickit = Tickit->new;
 my $desktop = Tickit::Widget::Layout::Desktop->new;
 $tickit->later(sub {

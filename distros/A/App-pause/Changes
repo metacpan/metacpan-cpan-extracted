@@ -1,3 +1,16 @@
+0.655   2020-09-18  Released-By: PERLANCAR: Urgency: high
+
+        - Derp, forgot to rebuild the CLI.
+
+
+0.654   2020-09-18  Released-By: PERLANCAR; Urgency: medium; Broken: yes
+
+	- [build] Rebuild with WWW::PAUSE::Simple 0.448 to support cleaning
+	  up dev releases.
+
+        - UPDATE: this release is broken.
+
+
 0.653   2020-02-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Write access log file (currently hard-coded path in

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>BZ-Client</name>
+  <shortdesc>A client for the Bugzilla web services API.</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Dean Hamstead</foaf:name>
+      <foaf:mbox rdf:resource="mailto:dean@bytefoundry.com.au" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Jochen Wiedmann</foaf:name>
+      <foaf:mbox rdf:resource="mailto:jochen.wiedmann@gmail.com" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Andrew Hewus Fresh</foaf:name>
+      <foaf:mbox rdf:resource="mailto:andrew@afresh1.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Dean Hamstead</foaf:name>
+      <foaf:mbox rdf:resource="mailto:dean@fragfest.com.au" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Jochen Wiedmann</foaf:name>
+      <foaf:mbox rdf:resource="mailto:jwied@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="https://github.com/djzort/BZ-Client" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/djzort/BZ-Client" />
+      <location rdf:resource="https://github.com/djzort/BZ-Client.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

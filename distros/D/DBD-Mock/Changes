@@ -1,5 +1,12 @@
 Revision history for Perl extension DBD::Mock.
 
+1.57 2020-09-18T06:57:48Z
+    - Fixed bug rt133358 t/016_mock_add_resultset_test.t fails (with older DBI)
+
+1.56 2020-09-17T14:35:10Z
+    - The DBD::st module now supports the last_insert_id method
+    - Result sets with callbacks can now specify a last_insert_id
+
 1.55 2019-12-30T14:20:00Z
     - Fixed bug rt131264 t/033_table_info.t fails (with older DBI)
 

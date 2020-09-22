@@ -418,9 +418,15 @@ Escapes text to look the same in JavaScript.
  ' ->> \u0027
  " ->> \"
  \ ->> \\
+ < ->> \u003c
+ > ->> \u003e
 
 Single quote is escaped into a hex code because that is acceptable in
 both Javascript and JSON strings, whereas \' is not valid in JSON.
+
+Angle brackets are escaped because otherwise a value of </script> inside
+a field would close the outer script tag even though it's encountered in
+the middle of a literal.
 
 =cut
 
@@ -429,7 +435,7 @@ sub t2hj ($) {
     $text=~s/\\/\\\\/sg;
     $text=~s/'/\\u0027/sg;
     $text=~s/"/\\"/sg;
-    $text=~s/([\x00-\x1f])/'\\u'.sprintf('%04x',ord($1))/esg;
+    $text=~s/([\x00-\x1f<>])/'\\u'.sprintf('%04x',ord($1))/esg;
     return $text;
 }
 

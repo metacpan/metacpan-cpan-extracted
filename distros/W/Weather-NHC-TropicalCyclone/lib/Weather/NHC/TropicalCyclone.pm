@@ -7,7 +7,7 @@ use HTTP::Status qw/:constants/;
 use JSON::XS                             ();
 use Weather::NHC::TropicalCyclone::Storm ();
 
-our $VERSION                     = q{0.14};
+our $VERSION                     = q{0.16};
 our $DEFAULT_URL                 = q{https://www.nhc.noaa.gov/CurrentStorms.json};
 our $DEFAULT_RSS_ATLANTIC        = q{https://www.nhc.noaa.gov/index-at.xml};
 our $DEFAULT_RSS_EAST_PACIFIC    = q{https://www.nhc.noaa.gov/index-ep.xml};
@@ -21,7 +21,8 @@ our $DEFAULT_TIMEOUT             = 10;
 sub new {
     my $pkg  = shift;
     my $self = {
-        _obj => undef,
+        _obj    => undef,
+        _storms => {},
     };
     return bless $self, $pkg;
 }
@@ -53,20 +54,45 @@ sub fetch {
 
     $self->{_obj} = $ref;
 
+    # reset and update storms cache
+    $self->_update_storm_cache;
+
     return $self;
 }
 
 sub active_storms {
     my $self = shift;
+    return [ values %{ $self->{_storms} } ];
+}
 
-    my @storms = ();
+# there is no checking, if the storm is not in the cache,
+# an undefined value is returned
+sub get_storm_by_id {
+    my ( $self, $want_id ) = @_;
+    return $self->{_storms}->{$want_id};
+}
 
+# returns storm Ids
+sub get_storm_ids {
+    my $self = shift;
+    return [ keys %{ $self->{_storms} } ];
+}
+
+sub _update_storm_cache {
+    my $self = shift;
+
+    # purge cache
+    $self->{_storms} = {};
+
+  REBUILD_STORMS_CACHE:
     for my $storm ( @{ $self->{_obj}->{activeStorms} } ) {
-        my $s = Weather::NHC::TropicalCyclone::Storm->new($storm);
-        push @storms, $s;
+        my $s        = Weather::NHC::TropicalCyclone::Storm->new($storm);
+        my $storm_id = $s->id;
+
+        # key storm by id (e.g., al182020, etc)
+        $self->{_storms}->{$storm_id} = $s;
     }
 
-    return \@storms;
 }
 
 sub fetch_rss_atlantic {
@@ -162,6 +188,22 @@ Most of the useful functionality related to this JSON data is available through
 the methods provided by the C<Weather::NHC::TropicalCyclone::Storm> instances
 returned by this method.
 
+=item C<get_storm_ids>
+
+There are no parameters for this method.
+
+Returns a list of storm ids (e.g., ep082019) that are listed in the  storm cache.
+
+=item C<get_storm_by_id>
+
+This methods requires a single parameter, and it should be of the form of a storm
+id, e.g., 'al202020', 'cp062006', etc. If the storm exists in the cache, it returns
+an instance of C<Weather::NHC::TropicalCyclone::Storm>. If there is no matching
+storm id, then it returns undef.
+
+Provides a constant time look up of storms stored in the internal storm cache that
+is updated whenever C<fetch> is called.
+
 =back
 
 =head2 Auxillary RSS Fetch Methods
@@ -197,6 +239,19 @@ this URL is defined with the package variable, C<$DEFAULT_RSS_EAST_PACIFIC>.
 
 Fetches RSS available at L<https://www.nhc.noaa.gov/index-cp.xml>. Internally,
 this URL is defined with the package variable, C<$DEFAULT_RSS_CENTRAL_PACIFIC>.
+
+=back
+
+=head2 Internal Methods
+
+=over 3
+
+=item C<_update_storm_cache>
+
+This methods is used by C<fetch> to update the internal cache when a new JSON
+file is processed. The internal cache facilitates constant time look up of storms
+using the C<get_storm_by_id>. This internal cache is also the source of the storm
+ids returned by C<get_storm_ids>.
 
 =back
 

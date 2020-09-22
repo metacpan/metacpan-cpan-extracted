@@ -1,0 +1,41 @@
+CONTRIBUTING
+
+    Thank you for considering contributing to App::Reorder::TSV.
+
+    The source is hosted on GitHub:
+
+      https://github.com/iansealy/perl-App-Reorder-TSV
+
+    If you find a bug or have a feature request then please file an
+    issue:
+
+      https://github.com/iansealy/perl-App-Reorder-TSV/issues
+
+    If you have cpanm installed then you can satisfy dependencies like
+    this:
+
+      cpanm --installdeps --with-develop .
+
+    You can run tests directly using the prove tool:
+
+      prove -l
+
+    The distribution is managed with Dist::Zilla, so many of the usual
+    files you might expect are not in the repository but are generated
+    at release time. Some generated files are kept in the repository as
+    a convenience (e.g. Makefile.PL, META.json and META.yml).
+
+    If you have Dist::Zilla installed then you can install any required
+    plugins like this:
+
+      dzil authordeps --missing | cpanm
+
+    And, if you haven't already, you can satisfy dependencies like
+    this:
+
+      dzil listdeps --missing --develop | cpanm
+
+    Some useful dzil commands include:
+
+      dzil test
+      dzil build

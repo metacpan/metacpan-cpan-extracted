@@ -1,9 +1,16 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!doctype html>
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<meta name="generator" content="ReText 7.0.1">
+<style type="text/css">
+td, th { border: 1px solid #c3c3c3; padding: 0 3px 0 3px; }
+table { border-collapse: collapse; }
+img { max-width: 100%; }
+</style>
+<meta name="generator" content="ReText 7.1.0">
 <title>ch16</title>
+<style type="text/css">
+</style>
 </head>
 <body>
 <p><a href="ch15.html">Previous</a> <a href="index.html">Index</a> <a href="ch17.html">Next</a></p>
@@ -147,6 +154,7 @@
 <pre><code>    PEEK ARRAY items$ = "world.current.currencyHash"
 </code></pre>
 <p>PEEK cannot be used to import the object itself, or to import a list/hash property into an Axbasic variable. The same rule applies to all the PEEK operations described below.</p>
+<p>Axbasic arrays have a maximum size of 1,000,000 values. If a <em>peek</em> operation exceeds this maximum, the excess values are not added to the array (and no error message is generated). </p>
 <h2><a name="16.6">16.6 Undefined values</a></h2>
 <p>Perl uses a special <em>undefined</em> value. If you try to retrieve such a value using, for example, a PEEK statement, it's retrieved as the string <strong>"&lt;&lt;undef>>"</strong>.</p>
 <p>If you retrieve the undefined value into a numeric variable, it's retrieved as the value <strong>0</strong>.</p>
@@ -314,5 +322,6 @@
 <p>If necessary, you can change the contents of <strong>privateHash</strong> manually (open the profile's edit window, and click on the <strong>Private</strong> tab).</p>
 <hr>
 <p><a href="ch15.html">Previous</a> <a href="index.html">Index</a> <a href="ch17.html">Next</a></p>
+
 </body>
 </html>

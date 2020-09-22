@@ -40,7 +40,7 @@
    "provides" : {
       "Net::Upwork::API" : {
          "file" : "lib/Net/Upwork/API.pm",
-         "version" : "v2.1.1"
+         "version" : "v2.1.2"
       },
       "Net::Upwork::API::Client" : {
          "file" : "lib/Net/Upwork/API/Client.pm"
@@ -152,6 +152,6 @@
          "url" : "https://github.com/upwork/perl-upwork-oauth2.git"
       }
    },
-   "version" : "v2.1.1",
+   "version" : "v2.1.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

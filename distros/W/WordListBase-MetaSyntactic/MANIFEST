@@ -7,8 +7,11 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/Acme/MetaSyntactic/test_wlb_meta.pm
+lib/WordList/MetaSyntactic/test_wlb_meta.pm
 lib/WordListBase/MetaSyntactic.pm
 t/00-compile.t
+t/01-basic.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

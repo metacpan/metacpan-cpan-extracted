@@ -12,10 +12,8 @@ eg/labels_fr
 eg/prt_cal
 eg/r2g_table
 eg/today
-eg/result/cal211_en.html
-eg/result/cal211_fr.html
-eg/result/cal222_en.html
-eg/result/cal222_fr.html
+eg/result/cal229_en.html
+eg/result/cal229_fr.html
 eg/result/g2r_en.html
 eg/result/g2r_fr.html
 eg/result/r2g_en.html
@@ -32,5 +30,6 @@ t/50_format.t
 t/72_utf8.t
 t/80_neg.t
 t/90_checks.t
+t/92_deprecating_percentL.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -337,7 +337,7 @@ package PDL::Transform::Color;
 use PDL::Core ':Internal';  # load "topdl" (internal routine)
 
 @ISA = ( 'Exporter', 'PDL::Transform' );
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 $VERSION = eval $VERSION;
 
 BEGIN {
@@ -2090,7 +2090,8 @@ sub t_shift_rgb {
 	$to_gamma   = $me->{params}->{to_rgb}->{gamma};
     } else {
 	$from_gamma = $me->{params}->{gamma};
-	$to_gamma   = $me->{params}->{ogamma} // $me->{params}->{gamma};
+	$to_gamma   = $me->{params}->{ogamma};
+	$to_gamma   = $me->{params}->{gamma} if !defined $to_gamma;
     }
 
     my $out = 

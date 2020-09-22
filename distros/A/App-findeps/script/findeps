@@ -1,0 +1,185 @@
+#!/usr/bin/env perl
+
+use 5.012_005;
+my $pVer = version->parse('5.012_005');
+
+use strict;
+use warnings;
+use feature qw(say);
+
+our $VERSION = "0.03";
+use List::Util qw(first);
+use FastGlob qw(glob);
+use Getopt::Long;
+use version 0.77;
+
+use lib 'lib';
+use App::findeps;
+
+my $usage = <<"EOL";
+Usage: $0 [ -s ] [ -L yourlib ] FILE | cpanm
+  -u | --upgradeAll : set it if you want to upgrade your dependencies
+  -L | --myLib      : defaults to 'lib'
+
+EOL
+
+GetOptions(
+    "u|upgradeAll"   => \$App::findeps::Upgrade,
+    "L|myLib=s"      => \$App::findeps::myLib,
+    "m|makeCpanfile" => \$App::findeps::toCpanfile,
+) or die $usage;
+
+die $usage unless @ARGV;
+
+makeCpanfile(@ARGV) if $App::findeps::toCpanfile;
+
+my @list = scan(@ARGV);
+
+die "Ready to run @ARGV\n" unless @list;
+
+say $_ for @list;
+
+exit;
+
+sub scan {
+    my @files = @_;
+    @files = map { /::/ ? _getPath($_) : $_ } @files;
+    my $map  = App::findeps::scan( files => \@files );
+    my @list = ();
+    foreach my $key ( sort keys %$map ) {
+        next if $key =~ /\.pl$/;
+        my $version = $map->{$key};
+        my $name    = _name($key);
+        my $dist    = $name;
+        $dist .= "~$version" if length $version;
+        push @list, $dist;
+    }
+    return @list;
+}
+
+sub makeCpanfile {
+    die 'Too many Arguments' if @_ > 1;
+    my $file = shift;
+    my $name = _name($file);
+    $file = _getPath($name) if $file =~ /::/;
+    my @list = scan($file);
+    my ( @require, @test_require );
+    push @require, make_line($_) for @list;
+
+    for my $test ( scan( &glob('t/*.t') ) ) {
+        push @test_require, make_line($test) unless first { $test =~ /^$_/ } @list, $name;
+    }
+    local $" = "";
+    print <<"EOL";
+requires 'perl', '$pVer';
+
+@require
+EOL
+    local $" = "    ";
+    print <<"EOL" if @test_require;
+on 'test' => sub {
+    @test_require};
+EOL
+    exit;
+}
+
+sub make_line {
+    my ( $name, $version ) = split '~', shift;
+    my $res = qx"corelist $name";
+    $version = $version ? ", '$version'" : '';
+    $res =~ /5.(\d+)/;
+    return "requires '$name'$version;\n"
+        if $res =~ /$name was not in CORE/
+        or $1 and version->parse($1) > $pVer;
+    return;
+}
+
+sub _getPath {
+    local $_ = shift;
+    s!::!/!g;
+    "lib/$_.pm";
+}
+
+sub _name {
+    my $str = shift;
+    $str =~ s!/!::!g;
+    $str =~ s!^lib::!!;
+    $str =~ s!.pm$!!i;
+    $str =~ s!^auto::(.+)::.*!$1!;
+    return $str;
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+findeps - A simple command-line tool that makes ready to run Perl script on any environment
+
+=head1 SYNOPSIS
+
+ $ findeps your_product.pl | cpanm
+ $ findeps Plack.psgi | cpanm
+ $ findeps index.cgi | cpanm
+ $ findeps t/00_compile.t | cpanm
+ 
+ #On directory of the modules you made
+ $ findeps Your::Module | cpanm
+
+Now you're ready to run the product you've made with many modules
+without installing them every single time
+
+=head1 DESCRIPTION
+
+C<findeps> is a command line tool that resolves dependencies from too many Perl modules
+
+=over
+
+=item -u --upgradeAll OPTION
+
+ $ findeps -u index.cgi | cpanm
+
+tries to upgrade modules you've already installed to the newest
+
+=item -L --myLib OPTION
+
+ $ findeps -L=modules Plack.psgi | cpanm
+
+If you have a local directory named 'modules' not to be 'lib',
+you can choose it and the modules in there are ignored
+because you've already holden them.
+
+=back
+
+L<scandeps.pl> requires you to have L<CPANPLUS>, but this requires just only L<cpanm>.
+
+=head1 DANGEROUS OPTION
+
+  $ findeps --makeCpanfile Some::Module >| cpanfile
+
+It may be useful when you build a new module with L<Minilla>
+but B<NOT recommended> yet
+
+=head1 SEE ALSO
+
+=over
+
+=item L<cpanm>
+
+=item L<scandeps.pl>
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) worthmine.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Yuki Yoshida(L<worthmine|https://github.com/worthmine>)
+
+=cut

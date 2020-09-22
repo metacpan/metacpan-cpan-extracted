@@ -1,12 +1,16 @@
 package App::GoogleSearchUtils;
 
-our $DATE = '2018-01-13'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-22'; # DATE
+our $DIST = 'App-GoogleSearchUtils'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+use Perinci::Object 'envresmulti';
 
 our %SPEC;
 
@@ -14,10 +18,13 @@ $SPEC{google_search} = {
     v => 1.1,
     summary => 'Open google search page in browser',
     args => {
-        query => {
-            schema => 'str*',
+        queries => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'query',
+            schema => ['array*', of=>'str*'],
             req => 1,
             pos => 0,
+            slurpy => 1,
         },
         num => {
             summary => 'Number of results per page',
@@ -25,6 +32,36 @@ $SPEC{google_search} = {
             default => 100,
         },
     },
+    examples => [
+        {
+            summary => 'Open a single query, show 100 results',
+            src => '[[prog]] "a query" -n 100',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Open several queries',
+            src => '[[prog]] "query one" query2 "query number three"',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Use a custom browser',
+            src => 'BROWSER=lynx [[prog]] "a query"',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Use with firefox-container',
+            src => 'BROWSER="firefox-container mycontainer" [[prog]] "query one" query2',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
 };
 sub google_search {
     require Browser::Open;
@@ -32,15 +69,19 @@ sub google_search {
 
     my %args = @_;
     # XXX schema
-    my $query = $args{query} or return [400, "Please specify query"];
     my $num = $args{num} + 0;
 
-    my $url = "https://www.google.com/search?num=$num&q=".
-        URI::Escape::uri_escape($query);
-
-    my $res = Browser::Open::open_browser($url);
-
-    $res ? [500, "Failed"] : [200, "OK"];
+    my $envres = envresmulti();
+    my $i = -1;
+    for my $query (@{ $args{queries} }) {
+        $i++;
+        my $url = "https://www.google.com/search?num=$num&q=".
+            URI::Escape::uri_escape($query);
+        my $res = Browser::Open::open_browser($url);
+        $envres->add_result(
+            ($res ? (500, "Failed") : (200, "OK")), {item_id=>$i});
+    }
+    $envres->as_struct;
 }
 
 1;
@@ -58,7 +99,7 @@ App::GoogleSearchUtils - CLI utilites related to google searching
 
 =head1 VERSION
 
-This document describes version 0.001 of App::GoogleSearchUtils (from Perl distribution App-GoogleSearchUtils), released on 2018-01-13.
+This document describes version 0.002 of App::GoogleSearchUtils (from Perl distribution App-GoogleSearchUtils), released on 2020-09-22.
 
 =head1 SYNOPSIS
 
@@ -77,7 +118,7 @@ This distribution provides the following utilities:
 
 Usage:
 
- google_search(%args) -> [status, msg, result, meta]
+ google_search(%args) -> [status, msg, payload, meta]
 
 Open google search page in browser.
 
@@ -91,7 +132,8 @@ Arguments ('*' denotes required arguments):
 
 Number of results per page.
 
-=item * B<query>* => I<str>
+=item * B<queries>* => I<array[str]>
+
 
 =back
 
@@ -100,7 +142,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -128,7 +170,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@ package App::Yath::Options::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000026';
+our $VERSION = '1.000027';
 
 use Test2::Util qw/IS_WIN32/;
 use Test2::Harness::Util qw/clean_path/;
@@ -142,16 +142,6 @@ option_group {prefix => 'runner', category => "Runner Options"} => sub {
         },
     );
 
-    option dbi_profiling => (
-        type => 'b',
-        description => "Use Test2::Plugin::DBIProfile to collect database profiling data",
-    );
-
-    option cover_files => (
-        type => 'b',
-        description => "Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)",
-    );
-
     option switch => (
         field        => 'switches',
         short        => 'S',
@@ -188,18 +178,6 @@ sub cover_post_process {
 
     if ($ENV{T2_DEVEL_COVER} && !$settings->runner->cover) {
         $settings->runner->field(cover => $ENV{T2_DEVEL_COVER} eq '1' ? $ENV{T2_DEVEL_COVER} : $DEFAULT_COVER_ARGS);
-    }
-
-    if ($settings->runner->cover_files) {
-        eval { require Test2::Plugin::Cover; 1 } or die "Could not enable file coverage, could not load 'Test2::Plugin::Cover': $@";
-        push @{$settings->run->load_import->{'@'}} => 'Test2::Plugin::Cover';
-        $settings->run->load_import->{'Test2::Plugin::Cover'} = [];
-    }
-
-    if ($settings->runner->dbi_profiling) {
-        eval { require Test2::Plugin::DBIProfile; 1 } or die "Could not enable DBI profiling, could not load 'Test2::Plugin::DBIProfile': $@";
-        push @{$settings->run->load_import->{'@'}} => 'Test2::Plugin::DBIProfile';
-        $settings->run->load_import->{'Test2::Plugin::DBIProfile'} = [];
     }
 
     return unless $settings->runner->cover;
@@ -255,20 +233,6 @@ This is where command line options for the runner are defined.
 =item --no-cover
 
 Use Devel::Cover to calculate test coverage. This disables forking. If no args are specified the following are used: -silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl
-
-
-=item --cover-files
-
-=item --no-cover-files
-
-Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
-
-
-=item --dbi-profiling
-
-=item --no-dbi-profiling
-
-Use Test2::Plugin::DBIProfile to collect database profiling data
 
 
 =item --event-timeout SECONDS

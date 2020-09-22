@@ -342,7 +342,7 @@ PERLIO_FUNCS_DECL(PerlIO_utf8_strict) = {
 	PerlIOBase_fileno,
 	PerlIOBuf_dup,
 	PerlIOBuf_read,
-	PerlIOBuf_unread,
+	PerlIOBase_unread,
 	PerlIOBuf_write,
 	PerlIOBuf_seek,
 	PerlIOBuf_tell,
@@ -365,5 +365,5 @@ MODULE = PerlIO::utf8_strict
 PROTOTYPES: DISABLE
 
 BOOT:
-	PerlIO_define_layer(aTHX_ &PerlIO_utf8_strict);
+	PerlIO_define_layer(aTHX_ (PerlIO_funcs*)&PerlIO_utf8_strict);
 

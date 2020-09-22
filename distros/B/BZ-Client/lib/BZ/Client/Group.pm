@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::Group;
-$BZ::Client::Group::VERSION = '4.4002';
+$BZ::Client::Group::VERSION = '4.4003';
 
 use parent qw( BZ::Client::API );
 
@@ -44,7 +44,7 @@ BZ::Client::Group - The API for creating, changing, and getting info on Groups
 
 =head1 VERSION
 
-version 4.4002
+version 4.4003
 
 =head1 SYNOPSIS
 
@@ -379,7 +379,7 @@ Jochen Wiedmann <jochen.wiedmann@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dean Hamstad.
+This software is copyright (c) 2020 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

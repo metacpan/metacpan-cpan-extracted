@@ -4,7 +4,7 @@ WWW::YouTube::Download - WWW::YouTube::Download - Very simple YouTube video down
 
 # VERSION
 
-version 0.63
+version 0.64
 
 # SYNOPSIS
 
@@ -175,6 +175,21 @@ scraping a video's webpage and does not use YT's /get\_video\_info URL space.
 - **get\_fmt($video\_id)**
 - **get\_fmt\_list($video\_id)**
 - **get\_suffix($video\_id)**
+- **playlist($id,$ref)**
+
+    Fetches a playlist and returns a ref to an array of hashes, where each hash
+    represents a video from the playlist with youtube id, runtime in seconds
+    and title. On playlists with many videos, the method iteratively downloads
+    pages until the playlist is complete.
+
+    Optionally accepts a second argument, a hashref of options. Currently, you
+    can pass a "limit" value to stop downloading of subsequent pages on larger
+    playlists after x-amount of fetches (a limit of fetches, not playlist items).
+    For example, pass 1 to only download the first page of videos from a playlist
+    in order to "skim" the "tip" of new videos in a playlist. YouTube currently
+    returns 100 videos at max per page.
+
+    This method is used by the _youtube-playlists.pl_ script.
 
 # CONTRIBUTORS
 

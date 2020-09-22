@@ -4,7 +4,7 @@ use warnings;
 
 package HTTP::CookieJar;
 # ABSTRACT: A minimalist HTTP user agent cookie jar
-our $VERSION = '0.008';
+our $VERSION = '0.010';
 
 use Carp       ();
 use HTTP::Date ();
@@ -67,7 +67,12 @@ sub add {
     # set timestamps and normalize expires
     my $now = $parse->{creation_time} = $parse->{last_access_time} = time;
     if ( exists $parse->{'max-age'} ) {
-        $parse->{expires} = $now + delete $parse->{'max-age'};
+        # "If delta-seconds is less than or equal to zero (0), let expiry-time
+        # be the earliest representable date and time."
+        $parse->{expires} = $parse->{'max-age'} <= 0
+            ? 0
+            : $now + $parse->{'max-age'};
+        delete $parse->{'max-age'};
     }
     # update creation time from old cookie, if exists
     if ( my $old = $self->{store}{$domain}{$path}{$name} ) {
@@ -383,7 +388,7 @@ HTTP::CookieJar - A minimalist HTTP user agent cookie jar
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -593,32 +598,13 @@ L<Mojo::UserAgent::CookieJar>
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
-=head1 SUPPORT
-
-=head2 Bugs / Feature Requests
-
-Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/dagolden/HTTP-CookieJar/issues>.
-You will be notified automatically of any progress on your issue.
-
-=head2 Source Code
-
-This is open source software.  The code repository is available for
-public review and contribution under the terms of the license.
-
-L<https://github.com/dagolden/HTTP-CookieJar>
-
-  git clone https://github.com/dagolden/HTTP-CookieJar.git
-
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dan Book David Golden
+=for stopwords Dan Book David Golden jvolkening
 
 =over 4
 
@@ -629,6 +615,10 @@ Dan Book <grinnz@grinnz.com>
 =item *
 
 David Golden <xdg@xdg.me>
+
+=item *
+
+jvolkening <jdv@base2bio.com>
 
 =back
 

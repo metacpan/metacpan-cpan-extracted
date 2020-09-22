@@ -37,6 +37,7 @@
             "Data::Sah::Coerce::perl::To_date::From_obj::datetime" : "0",
             "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" : "0",
             "Data::Sah::Coerce::perl::To_date::From_str::iso8601" : "0",
+            "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
             "Data::Sah::Compiler::perl::TH::date" : "0",
             "Data::Sah::Compiler::perl::TH::hash" : "0",
@@ -83,7 +84,7 @@
          "web" : "https://github.com/perlancar/perl-App-org2wp"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

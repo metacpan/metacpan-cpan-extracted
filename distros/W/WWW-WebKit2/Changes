@@ -9,3 +9,12 @@ Addition of proxy settings via webkit network proxy
 
 0.111 Tue July 28 16:10:00 CET 2020
 Change to how page loading is checked in fire events.
+
+0.12 Wed Sep 16 11:20:00 CET 2020
+- Remove potential TOCTOU race condition caused usage of Gtk3::main_iteration
+- helper event listener in fire_event now cleans itself up
+- remove "intelligent" wait handling in click and implement click_and_wait instead.
+  Let the user handle the waiting.
+
+0.121 Tue Sep 22 17:20:00 CET 2020
+- Add new mouse method that does drag and drop using XTest mouse movement

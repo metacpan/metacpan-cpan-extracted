@@ -1,5 +1,10 @@
 Revision history for Perl extension RxPerl
 
+v0.27.1 2020-09-19T12:17:37Z
+
+    - introduce ability to write tests using marble diagrams
+    - fixed documentation
+
 v0.27.0 2020-09-15T04:38:54Z
 
     - added op_audit_time

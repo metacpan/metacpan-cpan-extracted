@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-17'; # DATE
+our $DATE = '2020-09-18'; # DATE
 our $DIST = 'App-org2wp'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,19 +38,22 @@ org2wp - Publish Org document (or heading) to WordPress as blog post
 
 =head1 VERSION
 
-This document describes version 0.009 of org2wp (from Perl distribution App-org2wp), released on 2020-09-17.
+This document describes version 0.010 of org2wp (from Perl distribution App-org2wp), released on 2020-09-18.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % org2wp [--comment-status=s] [--config-path=path | -c]
-     [--config-profile=profile | -P] [--debug] [--dry-run] [--extra-attr
-     key=s] [--extra-attrs-json=s] [--format=name] [--json] [-l=s]
-     [--log-level=level] [--(no)naked-res] [--no-config | -C] [--no-env]
-     [--no-publish] [--nopublish] [--page-result[=program]] [--password=s]
-     [--post-heading-level=s] [--proxy=s] [--publish] [--quiet]
-     [--schedule=s] [--trace] [--username=s] [--verbose] <filename>
+     [--config-profile=profile | -P] [--debug] [--dry-run]
+     [--exclude-heading-tag=s+] [--exclude-heading-tags-json=s]
+     [--extra-attr key=s] [--extra-attrs-json=s] [--format=name]
+     [--include-heading-tag=s+] [--include-heading-tags-json=s] [--json]
+     [-l=s] [--log-level=level] [--(no)naked-res] [--no-config | -C]
+     [--no-env] [--no-publish] [--nopublish] [--page-result[=program]]
+     [--password=s] [--post-heading-level=s] [--post-password=s]
+     [--proxy=s] [--publish] [--quiet] [--schedule=s] [--trace]
+     [--username=s] [--verbose] <filename>
 
 =head1 DESCRIPTION
 
@@ -163,6 +166,9 @@ drawer.
 If, for example, you specify C<-l 2> instead of C<-l 1> then the level-2 headings
 will become blog posts.
 
+In heading mode, you can use several options to select only certain headlines
+which contain (or don't contain) specified tags.
+
 =head1 OPTIONS
 
 C<*> marks required options.
@@ -199,15 +205,9 @@ See C<--extra-attr>.
 
 Path to Org document to publish.
 
-=item B<--post-heading-level>=I<s>, B<-l>
+=item B<--post-password>=I<s>
 
-Specify which heading level to be regarded as an individula blog post.
-
-If specified, this will enable *heading mode* instead of the default *document
-mode*. In the document mode, the whole Org document file is regarded as a single
-blog post. In the *heading mode*, a heading of certain level will be regarded as
-a single blog post.
-
+Set password for posts.
 
 =item B<--publish>
 
@@ -254,6 +254,46 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+=back
+
+=head2 Heading mode options
+
+=over
+
+=item B<--exclude-heading-tag>=I<s@>
+
+Exclude heading that has any of the specified tag(s).
+
+Can be specified multiple times.
+
+=item B<--exclude-heading-tags-json>=I<s>
+
+Exclude heading that has any of the specified tag(s) (JSON-encoded).
+
+See C<--exclude-heading-tag>.
+
+=item B<--include-heading-tag>=I<s@>
+
+Only include heading that has all specified tag(s).
+
+Can be specified multiple times.
+
+=item B<--include-heading-tags-json>=I<s>
+
+Only include heading that has all specified tag(s) (JSON-encoded).
+
+See C<--include-heading-tag>.
+
+=item B<--post-heading-level>=I<s>, B<-l>
+
+Specify which heading level to be regarded as an individula blog post.
+
+If specified, this will enable *heading mode* instead of the default *document
+mode*. In the document mode, the whole Org document file is regarded as a single
+blog post. In the *heading mode*, a heading of certain level will be regarded as
+a single blog post.
+
 
 =back
 
@@ -410,13 +450,16 @@ Finally, you can filter a section by environment variable using the filter C<env
 List of available configuration parameters:
 
  comment_status (see --comment-status)
+ exclude_heading_tags (see --exclude-heading-tag)
  extra_attrs (see --extra-attr)
  filename (see --filename)
  format (see --format)
+ include_heading_tags (see --include-heading-tag)
  log_level (see --log-level)
  naked_res (see --naked-res)
  password (see --password)
  post_heading_level (see --post-heading-level)
+ post_password (see --post-password)
  proxy (see --proxy)
  publish (see --publish)
  schedule (see --schedule)

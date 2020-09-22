@@ -1,0 +1,25 @@
+$Id: universe,v 1.1 2007-10-05 12:58:40 mike Exp $
+
+The directory /home/mike/universe on the Index Data host "test"
+contains a "universe" of built and installed software in a single
+root-filesystem surrogate, i.e. without polluting the main area.
+
+To build configure-based C packages such as YAZ and Zebra:
+$ ./configure --prefix=/home/mike/universe
+
+To build Perl packages such as SimpleServer and DBD::Oracle:
+$ perl Makefile.PL PREFIX=/home/mike/universe
+
+To run from this area:
+$ export PATH=/home/mike/universe/bin:$PATH
+$ export LD_LIBRARY_PATH=/home/mike/universe/lib:$LD_LIBRARY_PATH
+$ export PERL5LIB=/home/mike/universe/lib/perl:PERL5LIB
+
+Additional environment is needed by Oracle:
+$ export ORACLE_HOME=/home/oracle/app/oracle/product/9.2.0
+$ export ORACLE_SID=test
+$ export ORACLE_USERID=mike/********
+
+So, putting it all together, to build simpleserver for example:
+$ PATH=/home/mike/universe/bin:$PATH LD_LIBRARY_PATH=/home/mike/universe/lib:$LD_LIBRARY_PATH perl Makefile.PL PREFIX=/home/mike/universe
+

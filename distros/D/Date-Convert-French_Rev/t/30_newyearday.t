@@ -1,14 +1,14 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Test script for Date::Convert::French_Rev
-#     Copyright (C) 2001, 2002, 2003, 2013, 2015 Jean Forget
+#     Copyright © 2001, 2002, 2003, 2013, 2015, 2020 Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
 #
 #     You can find the text of the licenses in the F<LICENSE> file or at
-#     L<http://www.perlfoundation.org/artistic_license_1_0>
-#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#     L<https://dev.perl.org/licenses/artistic.html>
+#     and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 #
 #     Here is the summary of GPL:
 #
@@ -24,7 +24,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software Foundation,
-#     Inc., <http://www.fsf.org/>.
+#     Inc., <https://www.fsf.org/>.
 #
 use Test::More;
 use Date::Convert::French_Rev;
@@ -38,7 +38,7 @@ sub r2g {
 }
 
 
-@tests = (["1792 Sep 22",   1,  1,  1], 
+@tests = (["1792 Sep 22",   1,  1,  1],
           ["1793 Sep 21",   1, 13,  5],
           ["1793 Sep 22",   2,  1,  1],
           ["1794 Sep 21",   2, 13,  5],

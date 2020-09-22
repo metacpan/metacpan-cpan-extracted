@@ -207,6 +207,34 @@ my @cases = (
             },
         },
     },
+    # check that Max-Age supercedes Expires and that Max-Age <= 0 forces
+    # expiration
+    {
+        label   => "max-age supercedes expires",
+        request => "http://example.com/",
+        cookies => [
+            "lang=en-us; Max-Age=100; Expires=Thu, 1 Jan 1970 00:00:00 GMT",
+            "SID=0000000000000000; Expires=Thu, 3 Jan 4841 00:00:00 GMT",
+            "SID=31d4d96e407aad42; Max-Age=0; Expires=Thu, 3 Jan 4841 00:00:00 GMT",
+            "FOO=0000000000000000; Max-Age=-100; Expires=Thu, 3 Jan 4841 00:00:00 GMT",
+        ],
+        store   => {
+            'example.com' => {
+                '/' => {
+                    lang => {
+                        name             => "lang",
+                        value            => "en-us",
+                        expires          => ignore(),
+                        creation_time    => ignore(),
+                        last_access_time => ignore(),
+                        domain           => "example.com",
+                        hostonly         => 1,
+                        path             => "/",
+                    },
+                },
+            },
+        },
+    },
 );
 
 for my $c (@cases) {

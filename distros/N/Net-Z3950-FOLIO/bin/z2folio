@@ -1,0 +1,124 @@
+#!/usr/bin/perl -w
+
+# z2folio -- Z39.50 server for FOLIO bibliographic data.
+# Copyright (C) 2018 The Open Library Foundation
+#
+# Run like this:
+#	perl -I../lib ./z2folio -c ../etc/config.json -- -f ../etc/yazgfs.xml
+#
+# For a simple regression-test, use:
+#	perl -I../lib ./z2folio -c ../etc/config.json -- -1 -f ../etc/yazgfs.xml & (sleep 1; ( echo "find mineral"; echo "format sutrs"; echo "show 1") | yaz-client localhost:9998/gils )
+
+use Getopt::Std;
+use Net::Z3950::FOLIO;
+
+use strict;
+use warnings;
+
+my %opts;
+if (!getopts("c:", \%opts)) {
+    print STDERR "Usage: $0 [-c <config-file>] [-- YAZ-options]\n";
+    exit 1;
+}
+
+my $service = new Net::Z3950::FOLIO($opts{c});
+$service->launch_server('z2folio', @ARGV);
+
+
+=head1 NAME
+
+z2folio - Z39.50 server for FOLIO bibliographic data
+
+=head1 SYNOPSIS
+
+C<z2folio>
+[
+C<-c>
+I<configFile>
+]
+[
+C<-->
+I<YAZ-options>
+]
+[
+I<listener-address>
+...
+]
+
+=head1 DESCRIPTION
+
+C<z2folio> provides a Z39.50 server for bibliographic data in the
+FOLIO ILS.  Because it relies on the C<Net::Z3950::SimpleServer>
+modules for the server functionality, because this module is based on
+the YAZ toolkit, and because YAZ transparently handles all three
+standard IR protocols (ANSI/NISO Z39.50, SRU and SRW), it can function
+as a support all three of these protocols.
+
+The following command-line options govern how it functions:
+
+=over 4
+
+=item C<-c configFile>
+
+Specifies that the named I<configFile> should be used to configure the
+functionality of the server: if this option is not specified, then the
+file C<config.json> in the working directory is used.  The format of
+the configuration file is described separately in
+C<Net::Z3950::FOLIO::Config>, and a sample configuration file,
+C<config.json>, is supplied in the C<etc> directory of the
+distribution.
+
+=item C<-->
+
+Indicates the end of C<z2folio>-specific options.  This is
+required if YAZ options are to be specified, so that C<z2folio>
+doesn't try to interpret them itself.
+
+=item I<YAZ-options>
+
+Command-line arguments subsequent to the C<--> option are interpreted
+by the YAZ backend server as described at
+https://software.indexdata.com/yaz/doc/server.invocation.html
+
+These options provide the means to control many aspects of the
+gateway's functioning: for example, whether the server forks a new
+process for each client or runs a single process using C<select()>;
+how (if at all) to interpret incoming SRU requests; whether and how to
+log protocol packets for debugging.
+
+=item I<listener-address>
+
+One or more YAZ-style listener addresses may be specified, and the
+server will accept connections on those addresses: for example,
+C<@:9998>, C<unix:/tmp/somesocket> or C<ssl:myhost.com:210>.  If
+no explicit listener addresses are provided, the server listens on
+port 9999.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item The C<Net::Z3950::FOLIO> module provides all the functionality for this program.
+
+=item C<Net::Z3950::FOLIO::Config> describes the configuration-file format.
+
+=item The C<Net::Z3950::SimpleServer> handles the Z39.50 service.
+
+=back
+
+=head1 AUTHOR
+
+Mike Taylor, E<lt>mike@indexdata.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 The Open Library Foundation
+
+This software is distributed under the terms of the Apache License,
+Version 2.0. See the file "LICENSE" for more information.
+
+=cut
+    
+

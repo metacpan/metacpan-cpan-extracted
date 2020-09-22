@@ -11,9 +11,9 @@ use Text::Hunspell;
 use Test::Text::Sentence qw(split_sentences);
 use v5.22;
 
-use version; our $VERSION = qv('0.6.1'); # Works with UTF8 and includes Text::Sentence
+use version; our $VERSION = qv('0.6.3'); # Works with UTF8 and includes Text::Sentence
 
-use base 'Test::Builder::Module'; # Included in Test::Simple
+use parent 'Test::Builder::Module'; # Included in Test::Simple
 
 my $CLASS = __PACKAGE__;
 our @EXPORT= 'just_check';
@@ -49,18 +49,16 @@ sub new {
 				   );
   croak "Couldn't create speller: $1" if !$speller;
   $self->{'_speller'} = $speller;
-  $speller->add_dic("$dir/words.dic"); #word.dic should be in the text directory
+  $speller->add_dic("$dir/words.dic"); # word.dic should be in the text directory
   return $self;
 }
 
 sub dir {
-    my $self = shift;
-    return $self->{'_dir'};
+    return shift->{'_dir'};
 }
 
 sub files {
-  my $self = shift;
-  return $self->{'_files'};
+  return shift->{'_files'};
 }
 
 sub check {
@@ -86,6 +84,7 @@ sub check {
     my $different_words = scalar keys %vocabulary;
     $tb->cmp_ok(  $different_words, ">", 1, "We have $different_words different words");
   }
+
 }
 
 sub _strip_urls {
@@ -107,9 +106,13 @@ sub just_check {
     my $dir = shift || croak "Need a directory with text" ;
     my $data_dir = shift || croak "No default spelling data directory\n";
     my $language = shift || "en_US"; # Defaults to English
+    my $call_done_testing = shift // 1; # Defaults to 1
     my $tesxt = Test::Text->new($dir, $data_dir, $language, @_);
-    $tesxt->check();
-    $tesxt->done_testing;
+    my $tb= $CLASS->builder;
+    $tb->subtest( "Testing $dir" => sub {
+      $tesxt->check();
+    });
+    $tb->done_testing() if $call_done_testing;
 }
 
 sub done_testing {

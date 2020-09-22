@@ -36,6 +36,11 @@ WriteMakefile(
         'Time::HiRes'       => 0,
         'X11::Xlib'         => 0,
         Carp                => 0,
+        DateTime            => 0,
+        'File::Slurper'     => 0,
+        'File::Path'        => 0,
+        Encode              => 0,
+        JSON                => 0,
     },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/WWW/WebKit2.pm', # retrieve abstract from module

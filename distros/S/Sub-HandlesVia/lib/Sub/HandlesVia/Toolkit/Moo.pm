@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Moo;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015';
+our $VERSION   = '0.016';
 
 use Sub::HandlesVia::Toolkit;
 our @ISA = 'Sub::HandlesVia::Toolkit';
@@ -25,11 +25,12 @@ sub install_has_wrapper {
 	my ($target) = @_;
 
 	my ($installer, $orig);
-	if ($INC{'Moo/Role.pm'} && Moo::Role->is_role($target)) {
+	if ($INC{'Moo/Role.pm'} && 'Moo::Role'->is_role($target)) {
 		$installer = 'Moo::Role::_install_tracked';
 		$orig = $Moo::Role::INFO{$target}{exports}{has};
 	}
 	else {
+		require Moo;
 		$installer = 'Moo::_install_tracked';
 		$orig = $Moo::MAKERS{$target}{exports}{has} || $Moo::MAKERS{$target}{non_methods}{has};
 	}
@@ -90,14 +91,14 @@ sub make_callbacks {
 		($attrname) = @$attrname;
 	}
 	
-	my $ctor_maker = Moo->_constructor_maker_for($target);
+	my $ctor_maker = $INC{'Moo.pm'} && 'Moo'->_constructor_maker_for($target);
 	
 	if (!$ctor_maker) {
 		return $me->_make_callbacks_role($target, $attrname);
 	}
 	
 	my $spec = $ctor_maker->all_attribute_specs->{$attrname};
-	my $maker = Moo->_accessor_maker_for($target);
+	my $maker = 'Moo'->_accessor_maker_for($target);
 
 	my $type   = $spec->{isa} ? Types::TypeTiny::to_TypeTiny($spec->{isa}) : undef;
 	my $coerce = exists($spec->{coerce}) ? $spec->{coerce} : 0;

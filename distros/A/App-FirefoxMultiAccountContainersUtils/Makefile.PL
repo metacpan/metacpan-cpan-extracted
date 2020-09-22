@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-FirefoxMultiAccountContainersUtils",
   "EXE_FILES" => [
+    "script/firefox-container",
     "script/firefox-mua-list-containers",
     "script/firefox-mua-modify-containers",
     "script/firefox-mua-sort-containers"
@@ -39,6 +40,7 @@ my %WriteMakefileArgs = (
     "Sah::Schema::firefox::local_profile_name" => 0,
     "Sah::Schema::sortsub::spec" => 0,
     "Sort::Sub" => "0.120",
+    "URI::Escape" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -48,7 +50,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -77,6 +79,7 @@ my %FallbackPrereqs = (
   "Sah::Schema::sortsub::spec" => 0,
   "Sort::Sub" => "0.120",
   "Test::More" => 0,
+  "URI::Escape" => 0,
   "strict" => 0,
   "warnings" => 0
 );

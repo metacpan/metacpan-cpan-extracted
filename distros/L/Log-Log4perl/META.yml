@@ -33,5 +33,5 @@ requires:
 resources:
   MailingList: mailto:log4perl-devel@lists.sourceforge.net
   bugtracker: https://github.com/mschilli/log4perl/issues
-version: '1.52'
+version: '1.53'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

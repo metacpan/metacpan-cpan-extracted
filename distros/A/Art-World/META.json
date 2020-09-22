@@ -1,7 +1,7 @@
 {
-   "abstract" : "An Art World simulator game 🎨",
+   "abstract" : "Agents interactions modeling  🎨",
    "author" : [
-      "Sébastien Feugère <sebastien@feugere.net>"
+      "=over"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.11",
@@ -32,6 +32,9 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "Devel::NYTProf" : "0"
+         },
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
@@ -44,9 +47,13 @@
          "requires" : {
             "Data::Printer" : "== 0.40",
             "Faker" : "== 1.03",
-            "Test::Pod" : "0",
-            "Zydeco" : "== 0.603",
-            "perl" : "v5.32.0"
+            "Zydeco" : "== 0.605",
+            "perl" : "v5.16.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "== 1.52"
          }
       }
    },
@@ -59,10 +66,7 @@
       },
       "Art::World" : {
          "file" : "lib/Art/World.pm",
-         "version" : "0.15"
-      },
-      "MyApp" : {
-         "file" : "lib/MyApp.pm"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -76,7 +80,7 @@
          "web" : "https://gitlab.com/smonff/art-world"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_authority" : "cpan:SMONFF",
    "x_contributors" : [
       "Seb Hu-Rillettes <shr@balik.network>",

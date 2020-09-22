@@ -3,7 +3,7 @@ package Net::Async::Redis::Protocol;
 use strict;
 use warnings;
 
-our $VERSION = '3.000'; # VERSION
+our $VERSION = '3.001'; # VERSION
 
 =head1 NAME
 
@@ -192,6 +192,7 @@ sub item {
 
         # Skip attributes entirely for now
         return if $active->{type} eq 'attribute';
+        return $self->item_pubsub($data) if $active->{type} eq 'push';
     }
 }
 
@@ -203,7 +204,7 @@ sub item_error {
 
 sub item_pubsub {
     my ($self, $item) = @_;
-    $self->{pubsub}->($item) if $self->{pubsub};
+    $self->{pubsub}->(@$item) if $self->{pubsub};
     $self
 }
 

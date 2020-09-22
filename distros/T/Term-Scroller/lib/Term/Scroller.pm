@@ -6,7 +6,7 @@ use warnings;
 
 use feature 'unicode_strings';
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 =head1 NAME
 
@@ -41,7 +41,6 @@ see L<scroller>.
 
 =cut
 
-use Exporter;
 use IO::Handle;
 
 use Carp;
@@ -52,22 +51,21 @@ use List::Util qw(any);
 use IO::Pty;
 use Term::ReadKey qw(GetTerminalSize);
 
-our @ISA = qw(Exporter IO::Pty);
-our @EXPORT = qw(scroller);
+our @ISA = qw(IO::Pty);
 
 =head1 Methods
 
 =head2 new
 
-(Exported by default) B<scroller> returns a new scroller instance. The scroller
-is a filehandle (actually an instance of L<IO::Pty>) where anything written to 
+Returns a new scroller instance. The scroller is a filehandle 
+(actually an instance of L<IO::Pty>) where anything written to 
 it is displayed in the scrolling window. The scroller will sanitize any
 cursor-related ANSI escape sequences so text that expects them to work might
 look garbled, but at least it should be very difficult to escape or break the
 window. color-related ANSI sequences are left untouched though so colored
 text will still work inside the window.
 
-I<Don't forget to close the filehandle when you're done with it!>
+I<Don't forget to call the 'end' method when you're done with it!>
 
 The arguments to B<scroller> are interpreted as a hash and can contain the
 following options:
@@ -88,6 +86,12 @@ Integer representing the maximum width (in columns) of the viewport. Input lines
 will truncated at this width, not including ANSI escape sequences.
 (B<Default>: the width of the connected terminal, or 80 if the width
 couldn't be determined for some reason).
+
+=item * B<tabwidth>
+
+Integer representing the width of tabs (in characters) when viewed in the
+viewport. For consistent printing, tabs are replaced with this number of
+spaces. (B<Default>: 4)
 
 =item * B<style>
 
@@ -139,6 +143,7 @@ sub new {
     my %params = @_;
     my $buf_height  = $params{height}       // 10;
     my $buf_width   = $params{width}        // (GetTerminalSize)[0]    // 80;
+    my $tab_width   = $params{tabwidth}     // 4;
     my $style       = $params{style};
     my $windowspec  = $params{window};
     my $outfh       = $params{out}          // qualify_to_ref(select);
@@ -165,6 +170,8 @@ sub new {
 
     my @buf;
     my $slave = $pty->slave;
+
+    my $tab = " "x$tab_width;
 
     # Parse window
     my $line_end   = "";
@@ -205,6 +212,7 @@ sub new {
         }
 
         chomp $line;
+        $line =~ s/\t/$tab/g;
         my $to_print = "";
 
         if (defined $style) {

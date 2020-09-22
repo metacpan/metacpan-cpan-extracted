@@ -1,0 +1,264 @@
+$Id: Changes,v 1.72 2009-04-03 22:43:07 mike Exp $
+
+Revision history for Perl extension Net::Z3950::DBIServer.
+See the bottom of this file for a list of things still to do.
+
+1.07  Sat Sep 19 12:07:57 BST 2020
+	- Escape open-curly-brackets in regular expressions. This is
+	  necessary in order to run on recent version of Perl due to
+	  the idiotic decision to make a backwards-incompatible change
+	  in Perl5.26. Thanks to Wayne Schneider for the patch.
+
+1.06  Did not exist
+
+1.05  Sat Jun 14 03:01:44 BST 2014
+	- Revert to using implicit join unless explicitly requested to
+	  do so.  New per-database configuration-file directive
+	  join="outer" will cause left outer joins to be used, as was
+	  the default in 1.03.
+	- Access-point specifiers may take an "uppercase" modifier as
+	  well as or instead of "fulltext".  When present, terms used
+	  in searches against that access point are mapped to
+	  upper-case.  This can be used to simulate case-blind
+	  searching in dumb RDBMSs such as Oracle that don't support
+	  it out of the box, so long as that database schema includes
+	  an all-uppercase version of the field to be searched.
+	- Better quoting of search terms in the generated SQL, so that
+	  embedded apostrophes don't break things.
+	- Only apply defaultattrs when no attributes are explicitly
+	  provided.
+	- Add "-n" command-line option (and corresponding DBIServer
+	  constructor) to invoke no-op mode, in which the backend
+	  database is never connected to, and dummy responses are
+	  provided.
+	- Hashes in the configuration file do not introduce comments
+	  if immediately preceded by a backslash, but become simple
+	  slashes.  This provides a means of embedded hashes in
+	  strings.
+	- Add fulltext support for Oracle, using CONTAINS.
+	- NOTE INCOMPATIBLE CHANGE: fulltext searching is now used
+	  only when attribute 3=3 (position=any position in field) is
+	  supplied.
+	- Add make-pdf.sh to generate zSQLgate-manual.pdf
+	- New configuraton-file directive: "option NAME = VALUE", can
+	  be used so set for example "option "mysql_enable_utf8" = 1"
+
+1.04  [UNKOWN DATE]
+	- Unknown features -- probably a subset of those listed for
+	  v1.05.
+
+1.03  Fri May 16 17:44:49 BST 2008
+	- Books example expanded to use three-level inner join, using
+	  correct configuration syntax with each auxiliary table
+	  specified separately.
+	- Restructure directories.
+
+1.02  Fri May  2 17:23:49 BST 2008
+	- Use left joins for auxiliary tables, so that missing values
+	  in the auxiliary tables don't prevent data in the main table
+	  from being visible.
+	- Example database in examples/books/book.data extended to
+	  include books with unknown authors.
+
+1.01  Tue Oct  9 11:23:21 EDT 2007
+	- Include sample script for System-V init, in examples/init-script
+	- Add Oracle version of books example, and notes on working
+	  against an Oracle back-end.
+
+1.00  Fri Mar 16 15:39:44 GMT 2007
+	- Support for SRU and SRW, largely due to changes in the
+	  underlying YAZ and SimpleServer code.
+	- XML record-specifications may now indicate what schema they
+	  conform to, and this information is returned in SRU/SRW
+	  responses.
+	- Requests to present records from a non-existent result-set
+	  no longer cause a null indirection.
+	- Use correct diagnostic (114) for unsupported Use attribute.
+	- Support for new attribute-set names "USMARC", "BIB-2" and
+	  "ZeeRex".
+	- Recognise the name "XD-1" for the cross-domain attribute
+	  set, as YAZ does.  (Also still recognises "XD", which is
+	  probably more correct.)
+	- More work on the tutorial, DBIServer/Tutorial.pm
+	- Changes to "examples/books/books.nzd" to illustrate the new
+	  tutorial material.
+	- Slightly less noisy logging.
+	- Note that MARC::Record is now a prerequisite.
+	- Require version 1.03 of SimpleServer, which in turn requires
+	  version 2.1.24 of YAZ, which correctly propagates SRU/W
+	  error addinfo.
+	- Change colour-scheme of generated documentation.
+
+0.11  Mon Apr 11 19:50:31 BST 2005
+	- Fix a bug in release 0.10 that prevented repeated fields
+	  from working: each such field would occur the specified
+	  number of times in each generated record, but the value
+	  would be the same for each instance.
+	- Many documentation improvements.
+	- The example configuration "examples/books/books.nzd" now
+	  exercises nearly all the server functionality.
+
+0.10  Mon Apr 11 11:03:18 BST 2005
+	- Support for full-text searching, using MySQL syntax.  (This
+	  WILL NOT WORK on most other back-end databases).  It is
+	  configured by access-point specifications of the form:
+		access <number> = fulltext "field,field..."
+	- Fields in generated records now appear in the order that
+	  they are specified in the configuration file rather than
+	  alphabetically sorted.
+	- Repeated fields may now be included.
+	- When generating MARC records, a repeated subfield within an
+	  already created field now causes a new (repeated) field to
+	  be started.
+	- Presentation of SUTRS records may now by configured by means
+	  of a "format sutrs" section in the data section of a
+	  database's configuration, similar to the "format xml"
+	  section.  If this is absent, then the server falls back to
+	  presenting the old-style default SUTRS record containing all
+	  fields in alphabetical order.
+	- Compound field-specifications no longer need _begin_ with
+	  "%" in order to be recognised: merely _containing_ "%" is
+	  sufficient.
+	- Compound fields now behave properly if they consist of
+	  multiple lines (i.e. contain embedded newlines).
+	  Previously, the embedded text-constants came out in the
+	  wrong order.
+	- Fields (both simple, and embedded within a compound field
+	  specification) may now be prefixed with a "?", meaning that
+	  they are not required to be non-null; if they are null, then
+	  they are omitted, (along with the immediately preceding
+	  constant string in the case of embedded fields).
+	- Tab characters (represented by "\t") are now supported in
+	  strings, as well as newlines ("\n").
+	- Strings in the configuration file may be concatenated using
+	  "+", which allows long strings to be broken across lines.
+	- The configuration file is now automatically reloaded if it
+	  has changed, just before any search or retrieve request is
+	  handled.
+
+0.09  Mon Feb 14 16:34:46 2005
+	- Database-names are now recognised case-insensitively, as
+	  specified in section 3.2.2.1.2 of the Z39.50 standard.
+
+0.08  Wed Dec 15 22:54:30 GMT 2004
+	- Support for MARC record syntax.
+	- Now tested with MySQL.  Support for MySQL in examples/books.
+	- Slightly clearer implementationVersion returned to server.
+	- Add new "defaultattrs" clause to the "search" part of the
+	  per-database configuration, allowing (for example) a default
+	  access-point to be specified.
+	- Finish "Z39.50 CAPABILITIES" documentation in DBIServer/Intro.pm
+
+0.07  Tue Dec 10 17:07:53 2002
+	- Support for XSLT transformation of returned XML records:
+	  this allows the relatively simple records that are generated
+	  by "vanilla zSQLgate" to be translated into complex formats
+	  such as OAI.
+	- Make exception handlers robust against non-object
+	  exceptions.  (They were supposed to be like that already,
+	  but a typo defeated that robustness.)
+
+0.06  Thu Nov 28 10:46:00 2002
+	- Add a new per-database clause to the configuration-file
+	  grammar, RESTRICTION = STRING, where the string contains an
+	  SQL condition restricting the records that may be found: for
+	  example --
+		restriction = "id != 3 and id != 42"
+	- Bring examples/results in line with the real RESULTs
+	  database: this involves renaming databases, tables and
+	  fields, and consequently a few files, but no radical
+	  changes.
+
+0.05  Fri Nov 15 14:59:10 2002
+	- Massage the SELECT-statement generator not to prepend
+	  ``<table>.'' to column names in simple configuration where
+	  there are no auxiliary tables.  This is because DBD::CSV's
+	  SQL parser doesn't recognise ``<table>.<column>'', which
+	  was preventing examples/csv from working.
+	- Add a new XML record-format directive, ``attrs = "string"''
+	  to the .nzd file format: it specifies a set of attributes
+	  (e.g. namespaces) to be attached to the opening tag of the
+	  record.
+	- Add a new example database and configuration, "results",
+	  based on the RESULTs project and having broadly similar
+	  data structures.  (See http://www.results.ac.uk/)
+	- An XML data specification which begins with an asterisk is
+	  now used as constant data, included in every generated
+	  record (with the asterisk stripped!):
+		data format xml {
+		    field "rights" = "*All rights reserved"
+		}
+	- Add support for "any" access points: the columnName string
+	  on the right hand side of an accessSpec may now be a
+	  comma-separated list of columns in which searches are to be
+	  performed:
+		search attrset bib1 {
+		    access 1016 = "author,rtitle"
+		}
+
+0.04  Fri Nov  8 16:11:13 2002
+	- Add support for GRS-1 (NOT FULLY WORKING)
+	- Add new configuration-file syntax at the top level:
+		userName = "<name>"
+		passWord = "<pw>"
+	  to specify a username and password to use with
+	  DBI->connect().
+
+0.03  Tue Apr 23 16:28:35 2002
+	- Added new config-file syntax
+		field "fieldName" = "columnName"
+	  equivalent to the old (and now deprecated)
+		column "columnName" = "fieldName"
+	  The new form is preferred since it is amenable to other,
+	  more complex RHSs enabling us to specify link-fields etc.
+	- Change XML record generation to be driven by the list of
+	  fieldnames, not that of columnnames.
+	- Add ability to search across multiple tables: this allows
+	  "link fields" to be resolved, as in fetching the name of
+	  book's author by following the book record's "author_id"
+	  record to a separate author record carrying the name.
+	- Create new "examples" subdirectory.
+	- Replace old "music" example with similar examples/books.
+	- Move "reading" example to examples/csv.
+	- Various tweaks to documentation.
+
+0.02  Fri Mar  8 12:43:46 2002
+	- Enable configuration files to specify attribute sets by name
+	  (e.g. BIB1) as well as by OID (1.2.840.10003.3.1)
+	- Improve diagnostics from configuration-file parser: filename
+	  and line number are now specified on all errors.
+	- Modify the ResultSet module to notice when its using the CSV
+	  driver and count records by hand rather than trying SELECT
+	  COUNT(), which is not supported by that driver.
+	- Tweaked the configuration file lexer to recognise "\n" in
+	  strings as a literal newline (entirely so that we can
+	  specify a rational end-of-line protocol in our DBD::CSV
+	  invocation.)
+	- Fix the XML record renderer to use the specified tag-names:
+	  was previously using the table names!
+	- Added the zSQLgate Installation Guide (the POD documentation
+	  from the Net::Z3950::DBIServer::Install module.
+	- Added the "music" example directory, using DBD::CSV.
+	- Various tweaks to documentation.
+
+0.01  Tue Mar  5 17:11:51 2002
+	- original version; created by h2xs 1.19
+
+--
+
+### Still to do (see also DBIServer/Spec.pm, "FUTURE DIRECTIONS")
+	- ### document compound fields
+	- Finish tutorial in DBIServer/Tutorial.pm
+	- Fix GRS-1 record-syntax support to return an actual GRS-1
+	  record rather than an ASCII rendering of one.  (This
+	  requires changing SimpleServer to handle such records.)
+	- Allow XML field names to be unquoted in config file.
+	- Support for CCL query syntax.
+	- Support case-insensitive searching.
+	- Fix so that multiple link-field values don't generate excess
+	  records.
+	- Fix so that fetch doesn't keep reading past the end of the
+	  searchlist if for some reason it's shorter than we thought
+	  it was going to be, and notices if there are spares.
+	- Support X-to-many linking (that is, repeated output fields).
+

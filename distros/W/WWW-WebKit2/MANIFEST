@@ -18,6 +18,7 @@ README
 README.md
 t/01load.t
 t/drag_and_drop.t
+t/drag_and_drop_mouse.t
 t/events.t
 t/inspector.t
 t/keyboard.t

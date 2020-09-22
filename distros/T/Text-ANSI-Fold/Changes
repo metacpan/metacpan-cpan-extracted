@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+1.10 2020-09-19T04:56:59Z
+
+    - Add prefix/postfix characters to prohibition rule.
+
 1.09 2020-09-09T14:13:08Z
 
     - Update W3C.pm to 2020 version.

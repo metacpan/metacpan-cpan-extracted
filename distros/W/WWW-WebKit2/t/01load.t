@@ -11,7 +11,9 @@ use URI;
 
 use_ok 'WWW::WebKit2';
 
-my $sel = WWW::WebKit2->new(xvfb => 1);
+my $timeout = 1000;
+
+my $sel= WWW::WebKit2->new(xvfb => 1);
 eval { $sel->init; };
 if ($@ and $@ =~ /\ACould not start Xvfb/) {
     $sel = WWW::WebKit2->new();
@@ -62,17 +64,17 @@ is($sel->eval_js('document.getElementById("foo").firstChild.data'), 'bar', 'js e
 $sel->refresh;
 $sel->open("$Bin/test/type.html");
 $sel->type('id=foo', 'bar');
-ok($sel->click('id=submitter'), 'clicked on submitter');
+ok($sel->click_and_wait('id=submitter', $timeout), 'clicked on submitter');
 
 ok($sel->view->get_uri, 'got uri');
 $sel->open("$Bin/test/type.html");
 
 ok($sel->type_keys('id=foo', 'bar'), 'typed bar');
-ok($sel->click('id=submitter'), 'clicked on another submitter');
+ok($sel->click_and_wait('id=submitter', $timeout), 'clicked on another submitter');
 
 $sel->open("$Bin/test/type.html");
 $sel->type_keys('id=foo', '1,5 Bar');
-$sel->click('id=submitter');
+$sel->click_and_wait('id=submitter', $timeout);
 
 $sel->open("$Bin/test/select.html");
 $sel->select('id=test', 'value=1');

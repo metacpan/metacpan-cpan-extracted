@@ -1,9 +1,9 @@
 package App::FirefoxMultiAccountContainersUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-04'; # DATE
+our $DATE = '2020-09-21'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -35,6 +35,12 @@ our %arg0_profile = (
     },
 );
 
+our %argopt_profile = (
+    profile => {
+        schema => 'firefox::local_profile_name*',
+    },
+);
+
 sub _get_containers_json {
     require App::FirefoxUtils;
     require File::Copy;
@@ -46,14 +52,16 @@ sub _get_containers_json {
 
     my $res;
 
-    $res = App::FirefoxUtils::firefox_is_running();
-    return [500, "Can't check if Firefox is running: $res->[0] - $res->[1]"]
-        unless $res->[0] == 200;
-    if ($args->{-dry_run}) {
-        log_info "[DRY-RUN] Note that Firefox is still running, ".
-            "you should stop Firefox first when actually sorting containers";
-    } else {
-        return [412, "Please stop Firefox first"] if $res->[2];
+    if ($do_backup) {
+        $res = App::FirefoxUtils::firefox_is_running();
+        return [500, "Can't check if Firefox is running: $res->[0] - $res->[1]"]
+            unless $res->[0] == 200;
+        if ($args->{-dry_run}) {
+            log_info "[DRY-RUN] Note that Firefox is still running, ".
+                "you should stop Firefox first when actually sorting containers";
+        } else {
+            return [412, "Please stop Firefox first"] if $res->[2];
+        }
     }
 
     $res = Firefox::Util::Profile::list_firefox_profiles(detail=>1);
@@ -85,6 +93,32 @@ sub _get_containers_json {
     my $json = JSON::MaybeXS::decode_json(File::Slurper::read_text($path));
 
     [200, "OK", {path=>$path, content=>$json}];
+}
+
+sub _complete_container {
+    require Firefox::Util::Profile;
+
+    my %args = @_;
+
+    # XXX if firefox profile is already specified, only list containers for that
+    # profile.
+    my $res = Firefox::Util::Profile::list_firefox_profiles();
+    $res->[0] == 200 or return {message => "Can't list Firefox profiles: $res->[0] - $res->[1]"};
+
+    my %containers;
+    for my $profile (@{ $res->[2] }) {
+        my $cres = firefox_mua_list_containers(profile => $profile);
+        $cres->[0] == 200 or next;
+        for (@{ $cres->[2] }) {
+            next unless $_->{public};
+            next unless $_->{name};
+            $containers{ $_->{name} }++;
+        }
+    }
+    Complete::Util::complete_hash_key(
+        word => $args{word},
+        hash => \%containers,
+    );
 }
 
 $SPEC{firefox_mua_list_containers} = {
@@ -255,6 +289,82 @@ sub firefox_mua_sort_containers {
     [200];
 }
 
+$SPEC{firefox_container} = {
+    v => 1.1,
+    summary => "CLI to open URL in a new Firefox tab, in a specific multi-account container",
+    description => <<'_',
+
+This utility opens a new firefox tab in a specific multi-account container. This
+requires the Firefox Multi-Account Container, as well as another container
+called "Open external links in a container",
+<https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/>.
+
+The way it works, because add-on currently does not have hooks to the CLI, is
+via a custom protocol handler. For example, if you want to open
+`http://www.example.com/` in a container called `mycontainer`, you ask Firefox
+to open this URL:
+
+    ext+container:name=mycontainer&url=http://www.example.com/
+
+Ref: <https://github.com/mozilla/multi-account-containers/issues/365>
+
+_
+    args => {
+        %argopt_profile,
+        container => {
+            schema => 'str*',
+            completion => \&_complete_container,
+            req => 1,
+            pos => 0,
+        },
+        urls => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'url',
+            schema => ['array*', of=>'str*'],
+            pos => 1,
+            slurpy => 1,
+        },
+    },
+    features => {
+    },
+    examples => [
+        {
+            summary => 'Open two URLs in a container called "mycontainer"',
+            argv => [qw|mycontainer www.example.com www.example.com/url2|],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'If URL is not specified, will open a blank tab',
+            argv => [qw|mycontainer|],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
+    links => [
+        {url=>'prog:open-browser'},
+    ],
+};
+sub firefox_container {
+    require URI::Escape;
+
+    my %args = @_;
+    my $container = $args{container};
+
+    my @urls;
+    for my $url0 (@{ $args{urls} || ["about:blank"] }) {
+        my $url = "ext+container:";
+        $url .= "name=" . URI::Escape::uri_escape($container);
+        $url .= "&url=" . URI::Escape::uri_escape($url0);
+        push @urls, $url;
+    }
+
+    my @cmd = ("firefox", @urls);
+    log_trace "Executing %s ...", \@cmd;
+    exec @cmd;
+    #[200]; # won't be reached
+}
+
 1;
 # ABSTRACT: Utilities related to Firefox Multi-Account Containers add-on
 
@@ -270,7 +380,7 @@ App::FirefoxMultiAccountContainersUtils - Utilities related to Firefox Multi-Acc
 
 =head1 VERSION
 
-This document describes version 0.007 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2020-06-04.
+This document describes version 0.010 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2020-09-21.
 
 =head1 SYNOPSIS
 
@@ -280,6 +390,8 @@ This distribution includes several utilities related to Firefox multi-account
 containers addon:
 
 =over
+
+=item * L<firefox-container>
 
 =item * L<firefox-mua-list-containers>
 
@@ -293,6 +405,73 @@ containers addon:
 About the add-on: L<https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/>.
 
 =head1 FUNCTIONS
+
+
+=head2 firefox_container
+
+Usage:
+
+ firefox_container(%args) -> [status, msg, payload, meta]
+
+CLI to open URL in a new Firefox tab, in a specific multi-account container.
+
+Examples:
+
+=over
+
+=item * Open two URLs in a container called "mycontainer":
+
+ firefox_container(
+     container => "mycontainer",
+   urls => ["www.example.com", "www.example.com/url2"]
+ );
+
+=item * If URL is not specified, will open a blank tab:
+
+ firefox_container( container => "mycontainer");
+
+=back
+
+This utility opens a new firefox tab in a specific multi-account container. This
+requires the Firefox Multi-Account Container, as well as another container
+called "Open external links in a container",
+L<https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/>.
+
+The way it works, because add-on currently does not have hooks to the CLI, is
+via a custom protocol handler. For example, if you want to open
+CL<http://www.example.com/> in a container called C<mycontainer>, you ask Firefox
+to open this URL:
+
+ ext+container:name=mycontainer&url=http://www.example.com/
+
+Ref: L<https://github.com/mozilla/multi-account-containers/issues/365>
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<container>* => I<str>
+
+=item * B<profile> => I<firefox::local_profile_name>
+
+=item * B<urls> => I<array[str]>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 
 
 =head2 firefox_mua_list_containers
@@ -478,8 +657,22 @@ feature.
 
 =head1 SEE ALSO
 
+"Firefox Multi-Account Containers" add-on,
+L<https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/>
+
+"Open external links in a container" add-on,
+L<https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/> (repo
+at L<https://github.com/honsiorovskyi/open-url-in-container/>). The add-on also
+comes with a bash launcher script:
+L<https://github.com/honsiorovskyi/open-url-in-container/blob/master/bin/launcher.sh>.
+This C<firefox-container> Perl script is a slightly enhanced version of that
+launcher script.
+
 Some other CLI utilities related to Firefox: L<App::FirefoxUtils>,
 L<App::DumpFirefoxHistory>.
+
+
+L<open-browser>.
 
 =head1 AUTHOR
 

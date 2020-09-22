@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/App/FirefoxMultiAccountContainersUtils.pm
+script/firefox-container
 script/firefox-mua-list-containers
 script/firefox-mua-modify-containers
 script/firefox-mua-sort-containers

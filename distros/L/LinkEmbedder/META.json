@@ -1,7 +1,7 @@
 {
    "abstract" : "Embed / expand oEmbed resources and other URL / links",
    "author" : [
-      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+      "Joel Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
@@ -51,7 +51,7 @@
          "web" : "https://github.com/jhthorsen/linkembedder"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_contributors" : [
       "Jan Henning Thorsen"
    ],

@@ -57,7 +57,7 @@
    "provides" : {
       "Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter" : {
          "file" : "lib/Perl/Critic/Policy/Variables/ProhibitUnusedVarsStricter.pm",
-         "version" : "0.107"
+         "version" : "0.108"
       }
    },
    "release_status" : "stable",
@@ -74,6 +74,6 @@
          "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter"
       }
    },
-   "version" : "0.107",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.108",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

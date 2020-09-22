@@ -1,9 +1,9 @@
 package App::org2wp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-17'; # DATE
+our $DATE = '2020-09-18'; # DATE
 our $DIST = 'App-org2wp'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -135,6 +135,8 @@ drawer.
 If, for example, you specify `-l 2` instead of `-l 1` then the level-2 headings
 will become blog posts.
 
+In heading mode, you can use several options to select only certain headlines
+which contain (or don't contain) specified tags.
 
 _
     args => {
@@ -179,6 +181,21 @@ blog post. In the *heading mode*, a heading of certain level will be regarded as
 a single blog post.
 
 _
+            tags => ['category:heading-mode'],
+        },
+        include_heading_tags => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'include_heading_tag',
+            summary => 'Only include heading that has all specified tag(s)',
+            schema => ['array*', of=>'str*'],
+            tags => ['category:heading-mode'],
+        },
+        exclude_heading_tags => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'exclude_heading_tag',
+            summary => 'Exclude heading that has any of the specified tag(s)',
+            schema => ['array*', of=>'str*'],
+            tags => ['category:heading-mode'],
         },
 
         publish => {
@@ -202,6 +219,10 @@ regular ISO8601 format. Also note that time is in your chosen local timezone
 setting.
 
 _
+        },
+        post_password => {
+            summary => 'Set password for posts',
+            schema => 'str*',
         },
         comment_status => {
             summary => 'Whether to allow comments (open) or not (closed)',
@@ -262,14 +283,15 @@ sub org2wp {
         if ($mode eq 'heading') {
             require Org::Parser;
             my $org_parser = Org::Parser->new;
-            my $org_doc   = $org_parser->parse($file_content);
+            my $org_doc   = $org_parser->parse($file_content, {ignore_unknown_settings=>1});
 
-            @posts_headlines = $org_doc->find(
+            my @posts_headlines0 = $org_doc->find(
                 sub {
                     my $el = shift;
                     $el->isa("Org::Element::Headline") && $el->level == $post_heading_level;
                 });
-            for my $headline (@posts_headlines) {
+            for my $headline (@posts_headlines0) {
+                push @posts_headlines, $headline;
                 push @posts_srcs, $headline->children_as_string;
                 push @posts_titles, $headline->title->as_string;
 
@@ -286,11 +308,46 @@ sub org2wp {
                 push @posts_tags, [$headline->get_tags];
 
                 push @posts_cats, [split /\s*,\s*/, ($properties->{CATEGORY} // $properties->{CATEGORIES} // '')];
-                log_trace "Found blog post in heading, title=%s, ID=%d, tags=%s, cats=%s",
-                    $posts_titles[-1],
-                    $posts_ids[-1],
-                    $posts_tags[-1],
-                    $posts_cats[-1];
+
+                my $exclude_reason;
+              FILTER_POST: {
+                    my $post_tags = $posts_tags[-1];
+                    if (defined $args{include_heading_tags} && @{ $args{include_heading_tags} }) {
+                        for my $tag (@{ $args{include_heading_tags} }) {
+                            unless (grep { $_ eq $tag } @$post_tags) {
+                                $exclude_reason = "Does not contain tag '$tag' (specified in include_heading_tags)";
+                                last FILTER_POST;
+                            }
+                        }
+                    }
+                    if (defined $args{exclude_heading_tags} && @{ $args{exclude_heading_tags} }) {
+                        for my $tag (@{ $args{exclude_heading_tags} }) {
+                            if (grep { $_ eq $tag } @$post_tags) {
+                                $exclude_reason = "Contains tag '$tag' (specified in exclude_heading_tags)";
+                                last FILTER_POST;
+                            }
+                        }
+                    }
+                } # FILTER_POST
+
+                if ($exclude_reason) {
+                    pop @posts_headlines;
+                    pop @posts_srcs;
+                    log_info "Excluded blog post in heading, title=%s, ID=%d, tags=%s, cats=%s (reason=%s)",
+                        pop(@posts_titles),
+                        pop(@posts_ids),
+                        pop(@posts_tags),
+                        pop(@posts_cats),
+                        $exclude_reason;
+                } else {
+                    log_info "Found blog post[%d] in heading, title=%s, ID=%d, tags=%s, cats=%s",
+                        scalar(@posts_srcs),
+                        $posts_titles[-1],
+                        $posts_ids[-1],
+                        $posts_tags[-1],
+                        $posts_cats[-1];
+                }
+
             }
         } else {
             push @posts_srcs, $file_content;
@@ -463,6 +520,7 @@ sub org2wp {
                 (post_date => $schedule) x !!(defined $schedule),
                 post_title => $post_title,
                 post_content => $post_html,
+                (post_password => $args{post_password}) x !!(defined $args{post_password}),
                 terms => {
                     category => [map {$cat_ids->{$_}} @$post_cats],
                     post_tag => [map {$tag_ids->{$_}} @$post_tags],
@@ -478,6 +536,7 @@ sub org2wp {
                 (post_date => $schedule) x !!(defined $schedule),
                 post_title => $post_title,
                 post_content => $post_html,
+                (post_password => $args{post_password}) x !!(defined $args{post_password}),
                 terms => {
                     category => [map {$cat_ids->{$_}} @$post_cats],
                     post_tag => [map {$tag_ids->{$_}} @$post_tags],
@@ -494,7 +553,7 @@ sub org2wp {
             next L5_CREATE_OR_EDIT_POSTS;
         }
 
-        log_info("[api] Creating/editing post ...");
+        log_info("[api] Creating/editing post[$post_idx] ...");
         log_trace("[api] xmlrpc method=%s, args=%s", $meth, \@xmlrpc_args);
         $call = XMLRPC::Lite->proxy($args{proxy})->call($meth, @xmlrpc_args);
         return [$call->fault->{faultCode}, "Can't create/edit post: ".$call->fault->{faultString}]
@@ -561,8 +620,8 @@ sub org2wp {
             $do_update_file++;
 
             log_info("Inserting/updating #+POSTTIME ...", $filename);
-            s/^#\+POSTTIME:.*/#+POSTTIME: $posts_times[0]/m or
-                s/^/#+POSTTIME: $posts_times[0]\n/;
+            $file_content =~ s/^#\+POSTTIME:.*/#+POSTTIME: $posts_times[0]/m or
+                $file_content =~ s/^/#+POSTTIME: $posts_times[0]\n/;
 
             my $post_id = $posts_ids[0];
             unless ($post_id) {
@@ -603,7 +662,7 @@ App::org2wp - Publish Org document (or heading) to WordPress as blog post
 
 =head1 VERSION
 
-This document describes version 0.009 of App::org2wp (from Perl distribution App-org2wp), released on 2020-09-17.
+This document describes version 0.010 of App::org2wp (from Perl distribution App-org2wp), released on 2020-09-18.
 
 =head1 FUNCTIONS
 
@@ -725,6 +784,9 @@ drawer.
 If, for example, you specify C<-l 2> instead of C<-l 1> then the level-2 headings
 will become blog posts.
 
+In heading mode, you can use several options to select only certain headlines
+which contain (or don't contain) specified tags.
+
 This function is not exported.
 
 This function supports dry-run operation.
@@ -738,6 +800,10 @@ Arguments ('*' denotes required arguments):
 
 Whether to allow comments (open) or not (closed).
 
+=item * B<exclude_heading_tags> => I<array[str]>
+
+Exclude heading that has any of the specified tag(s).
+
 =item * B<extra_attrs> => I<hash>
 
 Set extra post attributes, e.g. ping_status, post_format, etc.
@@ -745,6 +811,10 @@ Set extra post attributes, e.g. ping_status, post_format, etc.
 =item * B<filename>* => I<filename>
 
 Path to Org document to publish.
+
+=item * B<include_heading_tags> => I<array[str]>
+
+Only include heading that has all specified tag(s).
 
 =item * B<password>* => I<str>
 
@@ -756,6 +826,10 @@ If specified, this will enable I<heading mode> instead of the default I<document
 mode>. In the document mode, the whole Org document file is regarded as a single
 blog post. In the I<heading mode>, a heading of certain level will be regarded as
 a single blog post.
+
+=item * B<post_password> => I<str>
+
+Set password for posts.
 
 =item * B<proxy>* => I<str>
 

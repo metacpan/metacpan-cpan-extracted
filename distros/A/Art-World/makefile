@@ -1,6 +1,12 @@
 dependencies-install:
 	carton install
 
+build:
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
 test-v:
 	carton exec -- prove -vl
 

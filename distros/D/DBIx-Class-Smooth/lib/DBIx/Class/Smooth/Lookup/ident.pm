@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Lookup::ident;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 
 use parent 'DBIx::Class::Smooth::Lookup::Util';
 use Carp qw/confess/;
@@ -14,6 +14,8 @@ use experimental qw/signatures postderef/;
 
 sub smooth__lookup__ident($self, $column, $value, @rest) {
     $self->smooth__lookup_util__ensure_value_is_scalar('ident', $value);
+
+    return { operator => '-ident', value => $self->result_source->storage->sql_maker->_quote($value) };
 
     my($possible_relation, $possible_column) = split /\./, $value;
     $possible_relation = undef if $possible_relation eq 'me';
@@ -28,7 +30,7 @@ sub smooth__lookup__ident($self, $column, $value, @rest) {
             }
         }
         else {
-            confess "<ident> got '$value', relation '$possible_relation' does not exist in the current result source";
+            confess "<ident> got '$value', relation '$possible_relation' does not exist in the current result source (@{[ $self->result_class ]})";
         }
     }
     else {
@@ -37,7 +39,7 @@ sub smooth__lookup__ident($self, $column, $value, @rest) {
             $value = $self->current_source_alias . ".$possible_column";
         }
         else {
-            confess "<ident> got '$value', column '$possible_column' does not exist in the current result source"
+            confess "<ident> got '$value', column '$possible_column' does not exist in the current result source (@{[ $self->result_class ]})";
         }
     }
 
@@ -58,7 +60,7 @@ DBIx::Class::Smooth::Lookup::ident - Short intro
 
 =head1 VERSION
 
-Version 0.0104, released 2020-08-30.
+Version 0.0105, released 2020-09-20.
 
 =head1 SOURCE
 

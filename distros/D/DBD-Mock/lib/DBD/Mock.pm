@@ -30,7 +30,7 @@ sub import {
       if ( @_ && lc( $_[0] ) eq "pool" );
 }
 
-our $VERSION = '1.55';
+our $VERSION = '1.57';
 
 our $drh    = undef;    # will hold driver handle
 our $err    = 0;        # will hold any error codes
@@ -1397,6 +1397,30 @@ statement has actually been executed. This is to make sure that C<DBD::Mock>
 stays compatible with previous versions. If you need the C<NUM_OF_FIELDS>
 property to be undef in this situation then set the
 C<$DBD::Mock::DefaultFieldsToUndef> flag to C<1>.
+
+If you're mocking an INSERT statement with a callback and you want to
+explicitly set the database's C<last_insert_id> value then you can use the
+C<last_insert_id> key in the result set.  If you don't specify a
+C<last_insert_id> then the standard C<DBD::Mock> logic for generating an value
+for the last inserted item will be followed.  This will allow you to mock
+MySQL/MariaDB INSERT queries that use C<ON DUPLICATE KEY UPDATE> logic to set
+the C<last_insert_id>.
+
+
+    $dbh->{mock_add_resultset} = {
+        sql => 'INSERT INTO y ( x ) VALUES ( ? ) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID( id )',
+        callback => sub {
+            my @bound_params = @_;
+
+            my %result = (
+                fields => [],
+                rows => [],
+                last_insert_id => 99,
+            );
+
+            return %result;
+        },
+    };
 
 
 =back

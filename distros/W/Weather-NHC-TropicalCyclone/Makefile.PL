@@ -28,10 +28,11 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Temp" => 0,
+    "Net::Ping" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t t/unit/lib-Weather-NHC-TropicalCyclone-ForecastAdvisory/*.t t/unit/lib-Weather-NHC-TropicalCyclone-Storm/*.t t/unit/lib-Weather-NHC-TropicalCyclone/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "HTTP::Tiny" => 0,
   "IO::Socket::SSL" => 0,
   "JSON::XS" => 0,
+  "Net::Ping" => 0,
   "Object::Tiny" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,

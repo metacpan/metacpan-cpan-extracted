@@ -2,6 +2,7 @@ package FFI::Platypus::Record;
 
 use strict;
 use warnings;
+use 5.008004;
 use Carp qw( croak );
 use FFI::Platypus;
 use base qw( Exporter );
@@ -10,7 +11,7 @@ use constant 1.32 ();
 our @EXPORT = qw( record_layout record_layout_1 );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub record_layout_1
@@ -199,7 +200,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

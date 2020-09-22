@@ -53,7 +53,7 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-openapi"
       }
    },
-   "version" : "3.35",
+   "version" : "3.36",
    "x_contributors" : [
       "Henrik Andersen",
       "Ilya Rassadin",

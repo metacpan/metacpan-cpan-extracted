@@ -4,10 +4,10 @@ author:
   - 'Andrew Maltsev, https://ejelta.com/xao/'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  XAO::Base: '1.27'
+  XAO::Base: '1.28'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
-  XAO::Base: '1.27'
+  XAO::Base: '1.28'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: artistic
@@ -40,10 +40,10 @@ requires:
   Text::FormatTable: '0.01'
   Time::HiRes: '1.9719'
   Unicode::Normalize: '1.18'
-  XAO::Base: '1.27'
+  XAO::Base: '1.28'
   XAO::FS: '1.21'
   perl: '5.010001'
 resources:
   repository: git://github.com/amaltsev/XAO-Web.git
-version: '1.83'
+version: '1.84'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

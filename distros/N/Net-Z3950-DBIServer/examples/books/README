@@ -1,0 +1,57 @@
+$Id: README,v 1.7 2006-03-09 16:35:09 mike Exp $
+
+This directory contains files to create and populate a simple database
+of books and authors, together with a selection of zSQLgate
+configuration files that may be used with the resulting database.
+See the zSQLgate tutorial for more details:
+	Net::Z3950::DBIServer::Tutorial
+
+In a nutshell: create the database using the RDBMS of your choice with
+(for example):
+
+	$ cd postgres  <--- or any other supported subdirectory
+	$ ./create-database.sh
+	$ make clean
+	$ cd ..
+
+Then start the server with:
+
+	$ zSQLgate books.nzd
+	[...]
+
+And then in another window:
+
+	$ yaz-client @:9999
+	Z> base works
+	Z> find @attr 1=4 @attr 5=3 Coffee
+	Number of hits: 1
+	Z> format xml
+	Z> show 1+2
+	[]Record type: XML
+	<book>
+	 <authorId>1</authorId>
+	 <authorName>Douglas Adams</authorName>
+	 <bookId>9</bookId>
+	 <bookName>The Meaning of Liff</bookName>
+	 <bookNotes>with John Lloyd</bookNotes>
+	 <bookYear>1983</bookYear>
+	</book>
+	[]Record type: XML
+	<book>
+	 <authorId>1</authorId>
+	 <authorName>Douglas Adams</authorName>
+	 <bookId>10</bookId>
+	 <bookName>The Deeper Meaning of Liff</bookName>
+	 <bookNotes>with John Lloyd</bookNotes>
+	 <bookYear>1990</bookYear>
+	</book>
+
+Or if you want to support SRU/W, start the server with:
+
+	$ zSQLgate books.nzd -f yazserver.xml
+	[...]
+
+And then use URLs such as:
+
+http://localhost:8023/works?version=1.1&operation=searchRetrieve&query=title=guys&maximumRecords=1
+

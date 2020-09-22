@@ -36,8 +36,9 @@ An L<XML::OPML::SimpleGen> object to generate the XML for the OPML file
 has 'opml_generator' => (
   is         => 'rw',
   isa        => 'Maybe[XML::OPML::SimpleGen]',
-  lazy_build => 1,
-  predicate => 'has_opml'
+  builder    => '_build_opml_generator',
+  predicate  => 'has_opml',
+  required   => 1,
 );
 
 sub _build_opml_generator {
@@ -48,7 +49,7 @@ sub _build_opml_generator {
   if ($@) {
     carp 'You need to install XML::OPML::SimpleGen to enable OPML ' .
           'support';
-    $self->opml(undef);
+    $self->opml_file(undef);
     return;
   }
 
@@ -69,7 +70,7 @@ Where to save the OPML feed when it has been created
 
 =cut
 
-has 'opml' => (
+has 'opml_file' => (
   isa       => 'Maybe[Str]',
   is        => 'rw',
 );
@@ -78,18 +79,20 @@ has 'opml' => (
 
 =head2 update_opml
 
-Updates the OPML file of all contributers to this planet. If the L<opml>
+Updates the OPML file of all contributers to this planet. If the L<opml_file>
 attribute does not have a value, this method does nothing, otherwise it inserts
 each author into the OPML file and saves it to disk.
 
 =cut
 
 sub update_opml {
-  my ($self, $feeds) = @_;
-
-  return unless $self->has_opml;
+  my $self = shift;
+  my ($feeds) = @_;
 
   foreach my $f (@$feeds) {
+
+    return unless $self->opml_file and $self->has_opml;
+
     $self->opml_generator->insert_outline(
       title   => $f->title,
       text    => $f->title,
@@ -109,12 +112,13 @@ Save the OPML file, by default to disk.
 
 sub save_opml {
   my $self = shift;
-  $self->opml_generator->save($self->opml);
+  $self->opml_generator->save($self->opml_file);
 }
 
 around 'fetch_feeds' => sub {
   my $orig = shift;
-  my ($self, $feeds) = @_;
+  my $self = shift;
+  my ($feeds) = @_;
   $feeds = $self->$orig($feeds);
   $self->update_opml($feeds) if $self->has_opml;
   return $feeds;
@@ -122,7 +126,7 @@ around 'fetch_feeds' => sub {
 
 =head1 AUTHOR
 
-Dave Cross, <dave@mag-sol.com>
+Dave Cross, <dave@perlhacks.com>
 
 =head1 COPYRIGHT AND LICENSE
 

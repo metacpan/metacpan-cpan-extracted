@@ -25,7 +25,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-openapi/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-openapi
   repository: https://github.com/jhthorsen/mojolicious-plugin-openapi.git
-version: '3.35'
+version: '3.36'
 x_contributors:
   - 'Henrik Andersen'
   - 'Ilya Rassadin'

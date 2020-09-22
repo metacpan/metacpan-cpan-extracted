@@ -133,7 +133,7 @@ my %WriteMakefileArgs = (
     "Test2::API" => "1.302096",
     "Test2::V0"  => "0.000060"
   },
-  "VERSION" => "2.32",
+  "VERSION" => "2.33",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -155,20 +155,20 @@ my %FallbackPrereqs = (
   "Text::ParseWords"    => "3.26"
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.038
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
 if ( !do { require File::Which; ( $ENV{PKG_CONFIG} && File::Which::which( $ENV{PKG_CONFIG} ) ) || File::Which::which('pkgconf') || File::Which::which('pkg-config') } ) {
   requires( 'PkgConfig' => '0.14026' );    # for static cflags support
 }
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.038
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
 if ( do { use Config; ( $^O eq 'solaris' && $Config{ptrsize} == 8 ) || $^O eq 'MSWin32' } ) {
   requires( 'PkgConfig' => '0.14026' );    # for using the wrong libraries support
 }
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.038
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
 $WriteMakefileArgs{clean} = { FILES => ".tmp" };
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.038
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
 if ( do { use Config; $^O eq 'MSWin32' && $Config{ccname} eq 'cl' } ) {
   requires( 'Win32::Vcpkg' => '0.04' );
 }
@@ -184,7 +184,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.038
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
 sub _add_prereq {
   my ( $mm_key, $module, $version_or_range ) = @_;
   $version_or_range ||= 0;

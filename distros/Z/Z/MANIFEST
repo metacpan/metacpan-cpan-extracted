@@ -11,5 +11,6 @@ README
 SIGNATURE
 dist.ini
 doap.ttl
+examples/angular-sizes.pl
 lib/Z.pm
 t/01basic.t

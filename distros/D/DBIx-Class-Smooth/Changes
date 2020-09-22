@@ -1,6 +1,27 @@
 Revision history for DBIx-Class-Smooth
 
-0.0104 2020-08-30 14:15:20 UTC
+0.0105 2020-09-20 15:02:50 UTC
+ [Breaking Changes]
+ - Renamed ::Helper::Row::Creation to ::Helper::Row::Definition
+
+ [Enhancements]
+ - Add ability to transverse beyond one relationship
+   (->filter(firstrel__secondrel__thirdrel__property=...))
+
+ [Testing]
+ - Started using Test::DBIx::Class
+ - Improved various tests
+
+ [Bug Fixes]
+ - Fixed ident lookup
+ - Fixed like operator
+
+ [Stats & Dependency Changes]
+ - 47 files changed, 228 insertions(+), 64 deletions(-)
+ - (test req) + Test::DBIx::Class (any)
+ - (test req) + Test::mysqld (any)
+
+0.0104 2020-08-30T14:15:20Z UTC
  [Other Changes]
  - Tests improved.
 

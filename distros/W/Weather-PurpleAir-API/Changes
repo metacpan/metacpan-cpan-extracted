@@ -1,0 +1,26 @@
+0.05 - Sun Sep 20 18:20:50 2020
+  * Fixed documentation.
+  * dist.ini: Added missing prereq for JSON::MaybeXS
+
+0.04 - Sun Sep 20 17:55:58 2020
+  * Excised erroneous archive/ subdirectory :-P
+
+0.03 - Sun Sep 20 17:44:12 2020
+  * added official USA EPA guidelines for calculating AQI (PDF document)
+  * added graphic depicting of PM2.5 to AQI correlation
+  * modified:   lib/Weather/PurpleAir/API.pm:  Implemented conformant concentration_to_epa function
+
+0.02 - Sun Sep 20 11:35:05 2020
+  * Major refactor to make unit tests easier to write
+  * Allow multiple sensors per report
+  * Use current or ten-minute average concentration
+  * Convert from raw concentration to EPA AQI metric (per PurpleAir map)
+  * Pull all results from a sensor and show either each individually or their average
+  * Provide a best guess from pruned average of multiple sensors
+  * Only print results when asked (eg, when invoked from app vs using the module programmatically)
+  * Wrote a unit test (needs a lot more)
+  * Wrote some documentation
+  * More features implemented
+
+0.01 - Fri Sep 18 23:01:18 2020
+  * Initialized repo from ~/bin/aqi throwaway script, split into module + wrapper app.

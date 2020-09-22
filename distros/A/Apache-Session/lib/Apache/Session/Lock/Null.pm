@@ -43,7 +43,7 @@ Apache::Session::Lock::Null - Does not actually provides mutual exclusion
 
  use Apache::Session::Lock::Null;
 
- my $locker = new Apache::Session::Lock::Null;
+ my $locker = Apache::Session::Lock::Null->new;
 
  $locker->acquire_read_lock($ref);
  $locker->acquire_write_lock($ref);

@@ -264,6 +264,9 @@ DESCRIPTION
 
         Multiple inheritance is supported.
 
+        If you are using Moose to extend a non-Moose class, MooseX::NonMoose
+        will load automatically. (This also happens with MouseX::Foreign.)
+
     `with` *(ArrayRef[Str])*
         Roles for this class to consume.
 

@@ -1,5 +1,15 @@
 Revision history for HTTP-CookieJar
 
+0.010     2020-09-20 11:28:49-04:00 America/New_York
+
+    - No changes from 0.009
+
+0.009     2020-09-17 22:39:16-04:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Fixed handling of edge case where Max-Age == 0
+
 0.008     2015-11-06 22:48:19-05:00 America/New_York
 
     [PREREQS]

@@ -1,3 +1,17 @@
+0.007   2020-05-23  Released-By: PERLANCAR; Urgency: medium
+
+	- [test] Add tests.
+
+	- Only apply WordListRole::WordList role when testing unbuilt, to be
+          more lightweight.
+
+
+0.006   2020-05-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Apply WordListRole::WordList role to check that all required
+	  methods are supplied.
+
+
 0.005   2020-05-22  Released-By: PERLANCAR; Urgency: medium
 
 	- [incompatible change] Change object storage from array to the

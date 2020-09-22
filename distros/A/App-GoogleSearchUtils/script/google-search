@@ -1,11 +1,12 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/GoogleSearchUtils/google_search
-# and generated automatically using Perinci::CmdLine::Gen version 0.483
+# Note: This script is a CLI for Riap function /App/GoogleSearchUtils/google_search
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
-our $DATE = '2018-01-13'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-22'; # DATE
 our $DIST = 'App-GoogleSearchUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,10 +14,12 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/GoogleSearchUtils/google_search",
     program_name => "google-search",
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Open google search page in browser
 # PODNAME: google-search
@@ -33,13 +36,34 @@ google-search - Open google search page in browser
 
 =head1 VERSION
 
-This document describes version 0.001 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2018-01-13.
+This document describes version 0.002 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2020-09-22.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % google-search [options] <query>
+ % google-search [--config-path=path | -c] [--config-profile=profile | -P]
+     [--format=name] [--json] [--(no)naked-res] [--no-config | -C]
+     [--no-env] [--num=s] [--page-result[=program]] [--queries-json=s]
+     [--query=s+] <query> ...
+
+Examples:
+
+Open a single query, show 100 results:
+
+ % google-search "a query" -n 100
+
+Open several queries:
+
+ % google-search "query one" query2 "query number three"
+
+Use a custom browser:
+
+ % BROWSER=lynx google-search "a query"
+
+Use with firefox-container:
+
+ % BROWSER="firefox-container mycontainer" google-search "query one" query2
 
 =head1 OPTIONS
 
@@ -57,7 +81,13 @@ Default value:
 
  100
 
-=item B<--query>=I<s>*
+=item B<--queries-json>=I<s>
+
+See C<--query>.
+
+=item B<--query>=I<s@>*
+
+Can be specified multiple times.
 
 =back
 
@@ -65,17 +95,15 @@ Default value:
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -127,6 +155,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -199,7 +231,7 @@ List of available configuration parameters:
  format (see --format)
  naked_res (see --naked-res)
  num (see --num)
- query (see --query)
+ queries (see --query)
 
 =head1 ENVIRONMENT
 
@@ -237,7 +269,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

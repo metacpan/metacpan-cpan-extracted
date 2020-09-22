@@ -165,6 +165,7 @@ sub test_t2hj {
         q(C:\\Foo - John's "Files") => q(C:\\\\Foo - John\\u0027s \\"Files\\"),
         qq(Two\nTabbed\tLines)      => q(Two\\u000aTabbed\\u0009Lines),
         qq(smiley - \x{263a})       => qq(smiley - \x{263a}),
+        qq(<script>)                => qq(\\u003cscript\\u003e),
     );
     foreach my $t (keys %matrix) {
         my $j=t2hj($t);

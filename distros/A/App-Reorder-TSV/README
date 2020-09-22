@@ -1,0 +1,37 @@
+NAME
+
+    App::Reorder::TSV - Reorder columns of TSV file by template
+
+DESCRIPTION
+
+    reorder-tsv is a script (and module) for reordering the columns of
+    a tab-separated value (TSV) file according to the columns of a
+    template TSV file.
+
+EXAMPLES
+
+    reorder-tsv --tsv in.tsv --template template.tsv > out.tsv
+
+    reorder-tsv --tsv in.tsv.gz --template template.tsv | gzip -c > out.tsv.gz
+
+SOURCE
+
+    The source is hosted on GitHub:
+
+      https://github.com/iansealy/perl-App-Reorder-TSV
+
+    If you find a bug or have a feature request then file an issue:
+
+      https://github.com/iansealy/perl-App-Reorder-TSV/issues
+
+AUTHOR
+
+    Ian Sealy <cpan@iansealy.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2020 by Ian Sealy.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 3, June 2007

@@ -1,3 +1,9 @@
+0.010   2020-09-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Add options: --post-password, --include-heading-tag,
+          --exclude-heading-tag.
+
+
 0.009   2020-09-17  Released-By: PERLANCAR; Urgency: medium
 
         [ENHANCEMENTS]

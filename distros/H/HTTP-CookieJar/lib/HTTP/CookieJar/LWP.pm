@@ -4,7 +4,7 @@ use warnings;
 
 package HTTP::CookieJar::LWP;
 # ABSTRACT: LWP adapter for HTTP::CookieJar
-our $VERSION = '0.008';
+our $VERSION = '0.010';
 
 use parent 'HTTP::CookieJar';
 
@@ -88,7 +88,7 @@ HTTP::CookieJar::LWP - LWP adapter for HTTP::CookieJar
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 

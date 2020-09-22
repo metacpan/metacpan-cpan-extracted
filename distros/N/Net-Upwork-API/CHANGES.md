@@ -1,3 +1,6 @@
+## 2.1.1
+* Add Room Messages API
+
 ## 2.1.0
 * Add Specialties API
 * Add Skills V2 API

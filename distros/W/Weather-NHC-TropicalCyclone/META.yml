@@ -4,6 +4,7 @@ author:
   - 'danx <danx@cpan.org>'
 build_requires:
   File::Temp: '0'
+  Net::Ping: '0'
   Test::Exception: '0'
   Test::More: '0'
 configure_requires:
@@ -15,6 +16,16 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Weather-NHC-TropicalCyclone
+provides:
+  Weather::NHC::TropicalCyclone:
+    file: lib/Weather/NHC/TropicalCyclone.pm
+    version: '0.16'
+  Weather::NHC::TropicalCyclone::ForecastAdvisory:
+    file: lib/Weather/NHC/TropicalCyclone/ForecastAdvisory.pm
+    version: '0.16'
+  Weather::NHC::TropicalCyclone::Storm:
+    file: lib/Weather/NHC/TropicalCyclone/Storm.pm
+    version: '0.16'
 requires:
   Date::Calc: '0'
   File::Temp: '0'
@@ -25,7 +36,7 @@ requires:
   JSON::XS: '0'
   Object::Tiny: '0'
   Validate::Tiny: '0'
-version: '0.14'
+version: '0.16'
 x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

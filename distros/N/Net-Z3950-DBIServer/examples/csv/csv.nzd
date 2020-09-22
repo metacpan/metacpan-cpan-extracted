@@ -1,0 +1,28 @@
+# $Id: csv.nzd,v 1.4 2002-11-14 22:18:22 mike Exp $
+#
+# Note the newline specification in the datasource line: without this,
+# DBD::CSV stupidly insists on CRLF-delimited lines.  Ugh.  Also note
+# that the location of this directory, relative to the zSQLgate
+# distribution's root directory, is specified so that we can run this
+# configuration from the root directory.
+
+datasource = "DBI:CSV:f_dir=examples/csv;csv_eol=\n"
+username = "mike"
+password = "th1515A51llyPa55w0rd"
+
+database "books" {
+    table = "books"
+    search attrset bib1 {
+	access 1 = "Author"
+	access 4 = "Title"
+	access 32 = "Start" # BIB-1 "date of acquireadingsition" is close enough
+    }
+    data format xml {
+	record = "book"
+	field "BookAuthor" = "Author"
+	field "BookTitle" = "Title"
+	field "StartReading" = "Start"
+	field "FinishReading" = "Finish"
+	field "WidthInCm" = "Width"
+    }
+}

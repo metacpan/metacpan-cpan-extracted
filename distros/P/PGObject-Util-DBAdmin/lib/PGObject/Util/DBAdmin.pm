@@ -19,11 +19,11 @@ PGObject
 
 =head1 VERSION
 
-version 1.0.3
+version 1.1.0
 
 =cut
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.1.0';
 
 
 =head1 SYNOPSIS
@@ -380,16 +380,22 @@ sub connect {
     return $dbh;
 }
 
-=head2 server_version
+=head2 server_version([$dbname])
 
 Returns a version string (like 9.1.4) for PostgreSQL. Croaks on error.
+
+When a database name is specified, uses that database to connect to,
+using the credentials specified in the instance.
+
+If no database name is specified, 'template1' is used.
 
 =cut
 
 sub server_version {
     my $self = shift @_;
+    my $dbname = (shift @_) || 'template1';
     my $version =
-           __PACKAGE__->new($self->export, (dbname => 'template1')
+           __PACKAGE__->new($self->export, (dbname => $dbname)
                            )->connect->selectrow_array('SELECT version()');
     my ($retval) = $version =~ /(\d+\.\d+\.\d+)/
         or croak 'failed to extract version string';
@@ -397,17 +403,23 @@ sub server_version {
 }
 
 
-=head2 list_dbs
+=head2 list_dbs([$dbname])
 
 Returns a list of db names.
+
+When a database name is specified, uses that database to connect to,
+using the credentials specified in the instance.
+
+If no database name is specified, 'template1' is used.
 
 =cut
 
 sub list_dbs {
     my $self = shift;
+    my $dbname = (shift @_) || 'template1';
 
     return map { $_->[0] }
-           @{ __PACKAGE__->new($self->export, (dbname => 'template1')
+           @{ __PACKAGE__->new($self->export, (dbname => $dbname)
            )->connect->selectall_arrayref(
                  'SELECT datname from pg_database order by datname'
            ) };
@@ -747,7 +759,7 @@ L<http://search.cpan.org/dist/PGObject-Util-DBAdmin/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2019 Chris Travers.
+Copyright 2014-2020 Chris Travers.
 
 This program is distributed under the (Revised) BSD License:
 L<http://www.opensource.org/licenses/BSD-3-Clause>

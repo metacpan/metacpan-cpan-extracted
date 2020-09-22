@@ -2,11 +2,12 @@ package FFI::Platypus::TypeParser;
 
 use strict;
 use warnings;
+use 5.008004;
 use List::Util 1.45 qw( uniqstr );
 use Carp qw( croak );
 
 # ABSTRACT: FFI Type Parser
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 # The TypeParser and Type classes are used internally ONLY and
@@ -111,7 +112,7 @@ FFI::Platypus::TypeParser - FFI Type Parser
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,21 @@
 https://github.com/amaltsev/XAO-Base
 ------------------------------------
 
+commit 1718ae377d748b008dec266862c0293236bf52aa
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Thu Sep 17 19:55:49 2020 -0700
+
+    v1.28: t2hj() now encodes <> characters
+    
+    They are not safe to include literally in HTML code, might lead to JS
+    injection with </script> in data literals.
+
+commit ed8ef14ec8bf623b896e0ff0322e1271c31a3b19
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon Jun 29 23:27:40 2020 -0700
+
+    Version bump for CPAN manifest fix
+
 commit e9da86356bc2c2f330024f0ca4f67b89e21a06da
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Mon Jun 29 23:24:01 2020 -0700
@@ -55,23 +70,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Wed Feb 27 15:55:31 2019 -0800
 
     1.25 Fixed fround() for 7.42/0.8 edge case
-
-commit 073bcc869e05ff5d9e7f5c266ad7bb1d8ac02eb0
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Thu Jan 17 18:48:51 2019 -0800
-
-    1.24 Changed to Devel::Size in Cache::Memory
-    
-    The old code was slow and underestimated the size 10 times or
-    more. Using Devel::Size is optional, defaulting to a slightly updated
-    old code if it's not found.
-
-commit 45a91ea05f5975402eb321b28d35c4ad91c43765
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Oct 24 20:09:34 2018 -0700
-
-    1.23 'include' argiment to XAO::Objects::load()
-    
-    Allowing to refer to library projects from Config.pm and other
-    situations when site configuration is not available yet.
 

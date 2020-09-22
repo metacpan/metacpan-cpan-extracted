@@ -4,7 +4,7 @@ WWW::Spotify - Spotify Web API Wrapper
 
 # VERSION
 
-version 0.009
+version 0.010
 
 # SYNOPSIS
 
@@ -92,7 +92,7 @@ of the screen as you mouse over an element.
 
 ## ua
 
-You may provide your own [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize) object to the constructor.  You may
+You may provide your own [WWW::Mechanize](https://metacpan.org/pod/WWW%3A%3AMechanize) object to the constructor.  You may
 want to set autocheck off.  To get extra debugging information, you can do
 something like this:
 
@@ -106,6 +106,18 @@ something like this:
     my $ua = WWW::Mechanize->new( ua => $ua );
 
 # METHODS
+
+## auto\_json\_decode
+
+When true results will be returned as JSON instead of a perl data structure
+
+    $spotify->auto_json_decode(1);
+
+## auto\_xml\_decode
+
+When true results will be returned as JSON instead of a perl data structure
+
+    $spotify->auto_xml_decode(1);
 
 ## get
 
@@ -240,6 +252,14 @@ requires OAuth
 
     $spotify->browse_new_releases
 
+## force\_client\_auth
+
+Boolean
+
+will pass authentication (OAuth) on all requests when set
+
+    $spotify->force_client_auth(1);
+
 ## user
 
 equivalent to /user
@@ -272,7 +292,7 @@ Aaron Johnson <aaronjjohnson@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014-2017 by Aaron Johnson.
+This software is copyright (c) 2014 by Aaron Johnson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

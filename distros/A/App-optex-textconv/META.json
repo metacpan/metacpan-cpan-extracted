@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.8",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -43,8 +43,9 @@
       "runtime" : {
          "requires" : {
             "App::optex" : "v0.3.0",
+            "Archive::Zip" : "1.37",
             "List::Util" : "1.45",
-            "perl" : "5.014"
+            "perl" : "v5.14.0"
          }
       },
       "test" : {
@@ -59,24 +60,21 @@
       },
       "App::optex::textconv" : {
          "file" : "lib/App/optex/textconv.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "App::optex::textconv::Converter" : {
          "file" : "lib/App/optex/textconv/Converter.pm"
-      },
-      "App::optex::textconv::Zip" : {
-         "file" : "lib/App/optex/textconv/Zip.pm"
       },
       "App::optex::textconv::default" : {
          "file" : "lib/App/optex/textconv/default.pm"
       },
       "App::optex::textconv::msdoc" : {
          "file" : "lib/App/optex/textconv/msdoc.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "App::optex::textconv::pdf" : {
          "file" : "lib/App/optex/textconv/pdf.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -90,10 +88,11 @@
          "web" : "https://github.com/kaz-utashiro/optex-textconv"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
-      "Kaz Utashiro <kaz@utashiro.com>"
+      "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

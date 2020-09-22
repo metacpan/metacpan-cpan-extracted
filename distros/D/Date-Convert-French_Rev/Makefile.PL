@@ -1,13 +1,13 @@
 #
 #     Configuration script for Date::Convert::French_Rev
-#     Copyright (C) 2001, 2002, 2003, 2013, 2015 Jean Forget
+#     Copyright © 2001, 2002, 2003, 2013, 2015, 2020 Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
 #
 #     You can find the text of the licenses in the F<LICENSE> file or at
-#     L<http://www.perlfoundation.org/artistic_license_1_0>
-#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#     L<https://dev.perl.org/licenses/artistic.html>
+#     and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 #
 #     Here is the summary of GPL:
 #
@@ -23,7 +23,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software Foundation,
-#     Inc., <http://www.fsf.org/>.
+#     Inc., <https://www.fsf.org/>.
 #
 use ExtUtils::MakeMaker;
 
@@ -32,7 +32,7 @@ WriteMakefile(
    ,  'VERSION_FROM' => 'lib/Date/Convert/French_Rev.pm'
    ,  'PREREQ_PM'    => {   Roman => 0
                           , Date::Convert   => '0.16'
-                          , Test::Exception => 0 }
+                        }
    ,  'ABSTRACT'     => 'Date conversions using the French Revolutionary calendar'
    ,  'AUTHOR'       => 'Jean Forget <JFORGET@cpan.org>'
    ,  'LICENSE'      => 'perl'
@@ -61,15 +61,16 @@ WriteMakefile(
              }
           },
           'test' => {
-             'requires' => {
-                'Test::Exception' => '0',
+             'recommends' => {
+                  'Test::Exception' => '0'
+                , 'Test::Warnings'  => '0'
              }
           },
        },
        provides       => {
            'Date::Convert::French_Rev' => {
                 file => 'lib/Date/Convert/French_Rev.pm',
-                version => '0.08',
+                version => '0.09',
            },
        },
        resources => {

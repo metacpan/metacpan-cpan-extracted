@@ -14,7 +14,7 @@ our @EXPORT_OK = qw/ &getEstablishmentsByCriteria &getLegalUnitsByCriteria &getL
 
 my $API_VERSION = 3;
 # API version . API revision + package revision
-our $VERSION = 3.505;
+our $VERSION = 3.506;
 
 my $EMPTY = q{};
 my $API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V$API_VERSION";
@@ -46,7 +46,7 @@ my $historized_fields = [
     )
 ];
 
-my $usefull_fields_unite_legale = [
+my $useful_fields_unite_legale = [
 
     qw(
         siren
@@ -60,7 +60,7 @@ my $usefull_fields_unite_legale = [
     )
 ];
 
-my $usefull_fields_etablissement = [
+my $useful_fields_etablissement = [
 
     qw(
         siren siret
@@ -71,7 +71,7 @@ my $usefull_fields_etablissement = [
     )
 ];
 
-my $usefull_fields_alias = {
+my $useful_fields_aliases = {
 
     'nicSiege'                        => 'nicSiegeUniteLegale',
     'nom'                             => 'denominationUniteLegale',
@@ -94,7 +94,7 @@ sub initUserAgent {
 
     $user_agent->agent("Perl API::INSEE::Sirene V$VERSION");
     $user_agent->timeout($timeout);
-    $proxy ? $user_agent->proxy(['https', 'http'], $proxy) : $user_agent->env_proxy;
+    $proxy ? $user_agent->proxy([ 'https', 'http' ], $proxy) : $user_agent->env_proxy;
 
     my ($err, $token) = getToken();
     croak "Unable to get token.\n$token" if ($err);
@@ -112,7 +112,7 @@ sub getUserAgentInitialized {
 sub getToken {
 
     my $url = 'https://api.insee.fr/token?grant_type=client_credentials';
-    my $header = ['Authorization' => "Basic $CLIENT_AUTH"];
+    my $header = [ 'Authorization' => "Basic $CLIENT_AUTH" ];
 
     my $request = HTTP::Request->new('POST', $url, $header);
     my $response = $user_agent->request($request);
@@ -142,11 +142,11 @@ sub _checkResponse {
     my $error_message = decode_json($response->content);
     if (!$flag && ($error_message->{'fault'}->{'message'} =~ qr{Invalid Credentials})) {
 
-        # we can't call initUserAgent here because of getUserAgentInitialized
-        my ($err, $token) = getToken();
-        croak "Unable to get token.\n$token" if ($err);
+        # Trying to reinitialize the user agent with the new token
+        $user_agent = undef;
+        initUserAgent();
 
-        $user_agent->default_header('Authorization' => "Bearer $token");
+        # Resend request with the new token, only once, set flag to not retrying any more
         return _checkResponse($endpoint, $parameters, 1);
     }
 
@@ -172,7 +172,7 @@ sub _buildQuery {
 
     foreach my $key (keys %$criteria) {
 
-        my $field_name = exists $usefull_fields_alias->{$key} ? $usefull_fields_alias->{$key} : $key;
+        my $field_name = exists $useful_fields_aliases->{$key} ? $useful_fields_aliases->{$key} : $key;
         my @words = split /[ ?'\/-]/, $criteria->{$key};
 
         foreach my $word (@words) {
@@ -202,17 +202,16 @@ sub _buildFields {
 
     if (ref $fields eq 'ARRAY') {
 
-        map { $_ = $usefull_fields_alias->{$_} if (exists $usefull_fields_alias->{$_}); } @{$fields};
+        map { $_ = $useful_fields_aliases->{$_} if (exists $useful_fields_aliases->{$_}); } @{$fields};
         return join ',', @{$fields};
     }
     else {
 
-        $fields = $usefull_fields_alias->{$fields} if (exists $usefull_fields_alias->{$fields});
+        $fields = $useful_fields_aliases->{$fields} if (exists $useful_fields_aliases->{$fields});
         return $fields eq 'all' ? $EMPTY : $fields;
     }
 }
 
-# use smartmatch instead of _isInArray ?
 # 1 = true, 0 = false
 sub _isInArray {
 
@@ -232,7 +231,7 @@ sub getLegalUnitBySIREN {
 
     return (1, "Invalid SIREN $siren -> Must be a 9 digits number") if ($siren !~ m/\d{9}/);
 
-    my $parameters = _buildParameters($usefull_fields_unite_legale, 0, $fields);
+    my $parameters = _buildParameters($useful_fields_unite_legale, 0, $fields);
     initUserAgent() if (not defined $user_agent);
 
     return _checkResponse("siren/$siren", $parameters);
@@ -244,7 +243,7 @@ sub getEstablishmentBySIRET {
 
     return (1, "Invalid SIRET $siret -> Must be a 14 digits number") if ($siret !~ m/\d{14}/);
 
-    my $parameters = _buildParameters($usefull_fields_etablissement, 0, $fields);
+    my $parameters = _buildParameters($useful_fields_etablissement, 0, $fields);
     initUserAgent() if (not defined $user_agent);
 
     return _checkResponse("siret/$siret", $parameters);
@@ -256,7 +255,7 @@ sub getEstablishmentsBySIREN {
 
     return (1, "Invalid SIREN $siren -> Must be a 9 digits number.") if ($siren !~ m/\d{9}/);
 
-    my $parameters = _buildParameters($usefull_fields_etablissement, 0, $fields, {siren => $siren});
+    my $parameters = _buildParameters($useful_fields_etablissement, 0, $fields, {siren => $siren});
     initUserAgent() if (not defined $user_agent);
 
     return _checkResponse('siret', $parameters);
@@ -266,7 +265,7 @@ sub getLegalUnitsByCriteria {
 
     my ($criteria, $fields) = @_;
 
-    my $parameters = _buildParameters($usefull_fields_unite_legale, 1, $fields, $criteria);
+    my $parameters = _buildParameters($useful_fields_unite_legale, 1, $fields, $criteria);
     initUserAgent() if (not defined $user_agent);
 
     return _checkResponse('siren', $parameters);
@@ -276,7 +275,7 @@ sub getEstablishmentsByCriteria {
 
     my ($criteria, $fields) = @_;
 
-    my $parameters = _buildParameters($usefull_fields_etablissement, 0, $fields, $criteria);
+    my $parameters = _buildParameters($useful_fields_etablissement, 0, $fields, $criteria);
     initUserAgent() if (not defined $user_agent);
 
     return _checkResponse('siret', $parameters);
@@ -286,7 +285,7 @@ sub getLegalUnitsByName {
 
     my ($nom, $fields) = @_;
 
-    my $parameters = _buildParameters($usefull_fields_unite_legale, 1, $fields, {denominationUniteLegale => $nom});
+    my $parameters = _buildParameters($useful_fields_unite_legale, 1, $fields, {denominationUniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
     return _checkResponse('siren', $parameters);
@@ -296,7 +295,7 @@ sub getEstablishmentsByName {
 
     my ($nom, $fields) = @_;
 
-    my $parameters = _buildParameters($usefull_fields_etablissement, 0, $fields, {denominationUniteLegale => $nom});
+    my $parameters = _buildParameters($useful_fields_etablissement, 0, $fields, {denominationUniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
     return _checkResponse('siret', $parameters);
@@ -306,7 +305,7 @@ sub getLegalUnitsByUsualName {
 
     my ($nom, $fields) = @_;
 
-    my $parameters = _buildParameters($usefull_fields_unite_legale, 1, $fields, {denominationUsuelle1UniteLegale => $nom});
+    my $parameters = _buildParameters($useful_fields_unite_legale, 1, $fields, {denominationUsuelle1UniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
     return _checkResponse('siren', $parameters);
@@ -316,7 +315,7 @@ sub getEstablishmentsByUsualName {
 
     my ($nom, $fields) = @_;
 
-    my $parameters = _buildParameters($usefull_fields_etablissement, 0, $fields, {denominationUsuelle1UniteLegale => $nom});
+    my $parameters = _buildParameters($useful_fields_etablissement, 0, $fields, {denominationUsuelle1UniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
     return _checkResponse('siret', $parameters);
@@ -337,7 +336,7 @@ API::INSEE::Sirene - An interface for the Sirene API of INSEE
 
 =head1 VERSION
 
-Version 3.505
+Version 3.506
 
 =head1 SYNOPSIS
 
@@ -422,7 +421,7 @@ L<< POSIX::strftime|https://metacpan.org/pod/POSIX#strftime >>
 
 =back
 
-This module makes use of the LWP library to send http requests and JSON library to decode JSON when getting the token. Also, this module gives you responses in JSON format so you may need the JSON library.
+This module makes use of the LWP library to send HTTP requests and JSON library to decode JSON when getting the token. Also, this module gives you responses in JSON format so you may need this library to decode responses.
 
 =head1 EXPORT
 
@@ -442,7 +441,7 @@ These following functions are exported by default:
 
 =back
 
-These folowing functions are available by manual import:
+These following functions are available by manual import:
 
 =over 4
 
@@ -577,7 +576,7 @@ B<Note:> Criteria are concatened with an AND in query search. A criteria is a co
 
 In the B<getLegalUnitsByName>, B<getEstablishmentsByName>, B<getLegalUnitsByUsualName> and B<getEstablishmentsByUsualName> functions, you must give a string:
 
-    my $response_json = getLegalUnitsByName("EnterpriseName");
+    my $response_json = getLegalUnitsByName('EnterpriseName');
 
 B<Note:> You can enter a part or the complete name of an enterprise.
 
@@ -600,7 +599,7 @@ When you don't specify fields like this:
 
   my $response_json = getLegalUnitBySIREN(123456789);
 
-The module will not return to you all fields by default because there are too many. Instead, it returns a selection of fields that are most likely of interest to you. (see C<$usefull_fields_unite_legale> and C<$usefull_fields_etablissement> in code to find out which ones)
+The module will not return to you all fields by default because there are too many. Instead, it returns a selection of fields that are most likely of interest to you. (see C<$useful_fields_unite_legale> and C<$useful_fields_etablissement> in code to find out which ones)
 
 If you want all fields, you have to specify it explicitly by passing the 'all' parameter.
 
@@ -619,11 +618,13 @@ The getUserAgentInitialized function may launch a croak when the getToken intern
     eval { my $user_agent = getUserAgentInitialized() };
     print $@ if ($@);
 
+Moreover, it is possible that your request fail because of the token has expired, in this case, try to recall the function before throw an error (the module will reinitialize the user agent with the new token after he failed to send a request).
+
 =head2 ALIAS
 
 Some fields have an alias to be more user-friendly, here is the list of available aliases:
 
-  my %usefull_fields_alias = (
+  my %useful_fields_aliases = (
     'nicSiege'                       => 'nicSiegeUniteLegale',
     'nom'                            => 'denominationUniteLegale',
     'dateCreation'                   => 'dateCreationUniteLegale',
@@ -631,9 +632,9 @@ Some fields have an alias to be more user-friendly, here is the list of availabl
     'categorieJuridique'             => 'categorieJuridiqueUniteLegale',
     'nomenclatureActivitePrincipale' => 'nomenclatureActivitePrincipaleUniteLegale',
     'activitePrincipale'             => 'activitePrincipaleUniteLegale',
-    'numvoie'                        => 'numeroVoieEtablissement',
-    'typevoie'                       => 'typeVoieEtablissement',
-    'nomvoie'                        => 'libelleVoieEtablissement',
+    'numVoie'                        => 'numeroVoieEtablissement',
+    'typeVoie'                       => 'typeVoieEtablissement',
+    'nomVoie'                        => 'libelleVoieEtablissement',
     'codePostal'                     => 'codePostalEtablissement',
     'nomCommune'                     => 'libelleCommuneEtablissement'
   );

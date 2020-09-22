@@ -24,8 +24,8 @@ use Apache::Session::Serialize::Storable;
 sub populate {
     my $self = shift;
 
-    $self->{object_store} = new Apache::Session::Store::MySQL $self;
-    $self->{lock_manager} = new Apache::Session::Lock::Null $self;
+    $self->{object_store} = Apache::Session::Store::MySQL->new($self);
+    $self->{lock_manager} = Apache::Session::Lock::Null->new($self);
     $self->{generate}     = \&Apache::Session::Generate::MD5::generate;
     $self->{validate}     = \&Apache::Session::Generate::MD5::validate;
     $self->{serialize}    = \&Apache::Session::Serialize::Storable::serialize;

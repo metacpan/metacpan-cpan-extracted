@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.070';
+our $VERSION   = '0.075';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -18,6 +18,10 @@ use namespace::autoclean;
 sub make_absolute_package_name {
 	my $p = shift;
 	$] lt '5.018' ? "main::$p" : "::$p";
+}
+
+if ( $] lt '5.010' ) {
+	require UNIVERSAL::DOES;
 }
 
 # Options not to carry up into subclasses;
@@ -302,6 +306,7 @@ sub qualify_name {
 sub type_name {
 	shift;
 	my ($name, $prefix) = @_;
+	$name =~ s/^(main)?::// while $name =~ /^(main)?::/;
 	$prefix = '' unless defined $prefix;
 	my $stub = $name;
 	if (length $prefix and lc substr($name, 0, length $prefix) eq lc $prefix) {
@@ -335,6 +340,7 @@ sub prepare_type_library {
 	my $adder = sub {
 		my $me = shift;
 		my ($name, $kind, $target, $coercions) = @_;
+		return if $types_hash{$kind}{$target};
 		my $tc_class = 'Type::Tiny::' . ucfirst($kind);
 		my $tc_obj   = $tc_class->new(
 			name     => $name,
@@ -437,6 +443,7 @@ sub _make_type {
 	my $qname = $builder->qualify_name($name, $opts{prefix}, $opts{extends});
 	
 	my $type_name = $opts{'type_name'} || $builder->type_name($qname, $opts{'prefix'});
+	
 	if ($opts{'type_library'}->can('_mooxpress_add_type')) {
 		$opts{'type_library'}->_mooxpress_add_type(
 			$type_name,
@@ -445,7 +452,17 @@ sub _make_type {
 			!!$opts{coerce},
 		);
 	}
-	
+
+	if (defined $opts{'with'}) {
+		my @tag_roles = grep /\?$/, $opts{'with'}->$_handle_list;
+		for my $role (@tag_roles) {
+			$role =~ s/\?$//;
+			my %opts_clone = %opts;
+			delete $opts_clone{$_} for @delete_keys;
+			$builder->make_type_for_role($role, %opts_clone);
+		}
+	}
+
 	if (defined $opts{'subclass'} and not $opts{'is_role'}) {
 		my @subclasses = $opts{'subclass'}->$_handle_list_add_nulls;
 		while (@subclasses) {
@@ -1523,6 +1540,14 @@ sub extend_class_moo {
 sub extend_class_moose {
 	my $builder = shift;
 	my ($class, $isa) = @_;
+	
+	PARENT: for my $parent ( @$isa ) {
+		next PARENT if $parent->isa('Moose::Object');
+		next PARENT if $parent->isa('Moo::Object');
+		use_module("MooseX::NonMoose")->import::into($class);
+		last PARENT;
+	}
+	
 	require Moose::Util;
 	(Moose::Util::find_meta($class) or $class->meta)->superclasses(@$isa);
 }
@@ -1530,6 +1555,13 @@ sub extend_class_moose {
 sub extend_class_mouse {
 	my $builder = shift;
 	my ($class, $isa) = @_;
+	
+	PARENT: for my $parent ( @$isa ) {
+		next PARENT if $parent->isa('Mouse::Object');
+		use_module("MouseX::NonMoose")->import::into($class);
+		last PARENT;
+	}
+	
 	require Mouse::Util;
 	(Mouse::Util::find_meta($class) or $class->meta)->superclasses(@$isa);
 }
@@ -2288,6 +2320,9 @@ The prefix is automatically added. Include a leading "::" if you
 don't want the prefix to be added.
 
 Multiple inheritance is supported.
+
+If you are using Moose to extend a non-Moose class, MooseX::NonMoose
+will load automatically. (This also happens with MouseX::Foreign.)
 
 =item C<< with >> I<< (ArrayRef[Str]) >>
 

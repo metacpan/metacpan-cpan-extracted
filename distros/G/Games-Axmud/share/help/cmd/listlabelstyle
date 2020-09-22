@@ -11,4 +11,4 @@ lls / listlabelstyle          Lists map label styles
       This command displays a list of map label styles and their attributes.
  
    User commands:
-      lls / liststyle / listlabelstyles
+      lls / liststyle / listlabelstyle

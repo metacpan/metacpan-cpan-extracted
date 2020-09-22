@@ -33,8 +33,6 @@ my %WriteMakefileArgs = (
     "Term::ANSIColor" => 0,
     "Time::HiRes" => 0,
     "URI" => 0,
-    "URI::QueryParam" => 0,
-    "XML::TreePP" => 0,
     "constant" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -45,7 +43,7 @@ my %WriteMakefileArgs = (
     "Mock::Quick" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.63",
+  "VERSION" => "0.64",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,8 +67,6 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Time::HiRes" => 0,
   "URI" => 0,
-  "URI::QueryParam" => 0,
-  "XML::TreePP" => 0,
   "constant" => 0,
   "strict" => 0,
   "warnings" => 0

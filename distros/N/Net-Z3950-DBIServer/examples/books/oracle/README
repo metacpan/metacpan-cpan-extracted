@@ -1,0 +1,18 @@
+$Id: README,v 1.3 2007-10-06 10:44:38 mike Exp $
+
+Because this is Oracle, everything is different.
+
+You will need to set various environment variables before you start,
+and then to supply the username and password as arguments to
+create-database.sh.  Here is a version that works on Index Data's test
+machine:
+
+$ export PATH=/home/oracle/app/oracle/product/9.2.0/bin:$PATH
+$ export ORACLE_HOME=/home/oracle/app/oracle/product/9.2.0
+$ export ORACLE_SID=test
+$ ./create-database.sh mike ********
+$ make clean
+$ cd ..
+$ export PERL5LIB=/home/mike/universe/lib/perl:PERL5LIB
+$ export LD_LIBRARY_PATH=/home/mike/universe/lib:$LD_LIBRARY_PATH
+$ ../../zSQLgate -I../.. books.nzd

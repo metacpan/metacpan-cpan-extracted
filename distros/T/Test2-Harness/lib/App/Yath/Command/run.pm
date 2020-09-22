@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000026';
+our $VERSION = '1.000027';
 
 use App::Yath::Options;
 
@@ -823,6 +823,20 @@ Add a custom text snippet to email/slack notifications
 =item --no-author-testing
 
 This will set the AUTHOR_TESTING environment to true
+
+
+=item --cover-files
+
+=item --no-cover-files
+
+Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
+
+
+=item --dbi-profiling
+
+=item --no-dbi-profiling
+
+Use Test2::Plugin::DBIProfile to collect database profiling data
 
 
 =item --env-var VAR=VAL

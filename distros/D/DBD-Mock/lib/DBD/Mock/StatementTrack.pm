@@ -141,6 +141,10 @@ sub mark_executed {
         if (ref $recordSet{rows} eq "ARRAY") {
             $self->{return_data} = $recordSet{rows};
         }
+
+        if (defined $recordSet{last_insert_id}) {
+            $self->{last_insert_id} = $recordSet{last_insert_id};
+        }
     }
 }
 

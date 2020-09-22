@@ -178,7 +178,7 @@ Apache::Session::Lock::File - Provides mutual exclusion using flock
 
  use Apache::Session::Lock::File;
 
- my $locker = new Apache::Session::Lock::File;
+ my $locker = Apache::Session::Lock::File->new;
 
  $locker->acquire_read_lock($ref);
  $locker->acquire_write_lock($ref);
@@ -218,7 +218,7 @@ method is provided for implementing that policy.  You can use the C<clean>
 method of this module to remove files unmodified in the last $age seconds.
 Example:
 
- my $l = new Apache::Session::Lock::File;
+ my $l = Apache::Session::Lock::File->new;
  $l->clean('/var/lock/sessions', 3600) #remove files older than 1 hour
 
 =head2 acquire_read_lock

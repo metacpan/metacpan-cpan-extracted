@@ -1,3 +1,23 @@
+0.010   2020-09-21  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention the 'Open external links in a container' as well as
+	  link to the bash launcher script.
+
+
+0.009   2020-09-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] [cli firefox-container] If URL is not specified, open a
+	  blank tab in that container.
+
+
+0.008   2020-09-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: firefox-container (open new firefox tab in a specified
+	  container).
+
+
 0.007   2020-06-04  Released-By: PERLANCAR; Urgency: low
 
 	- Use schema firefox::local_profile_name instead of

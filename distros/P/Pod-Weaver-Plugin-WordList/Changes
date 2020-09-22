@@ -1,3 +1,16 @@
+0.063   2020-09-15  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.062 & 0.062.1.
+
+
+0.062.1  2020-09-14  Released-By: PERLANCAR; Urgency: medium; Status: Cancelled
+
+	- Rename generated POD section Statistics -> WordList Statistics.
+
+        - UPDATE 2020-09-15: rename release 0.062 -> 0.062.1 (duplicate). Cancel
+          release.
+
+
 0.062   2020-08-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Render WordList Parameters section.

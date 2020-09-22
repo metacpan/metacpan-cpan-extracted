@@ -20,25 +20,33 @@ my $meta = {
                         configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                         develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                         runtime   => {
-                                       recommends => { indirect => 0, perl => "5.014000" },
+                                       recommends => {
+                                                       "indirect" => 0,
+                                                       "JSON::MaybeXS" => 0,
+                                                       "perl" => "5.014000",
+                                                       "PerlX::Maybe::XS" => 0,
+                                                     },
                                        requires   => {
                                                        "Import::Into"           => 0,
+                                                       "List::Util"             => 1.54,
                                                        "match::simple"          => "0.010",
                                                        "Module::Runtime"        => 0,
-                                                       "Object::Adhoc"          => 0.003,
+                                                       "namespace::autoclean"   => 0,
+                                                       "Object::Adhoc"          => 0.004,
                                                        "Path::Tiny"             => 0.101,
                                                        "perl"                   => 5.008008,
                                                        "Syntax::Keyword::Try"   => 0.018,
                                                        "Try::Tiny"              => "0.30",
                                                        "Types::Common::Numeric" => 0,
                                                        "Types::Common::String"  => 0,
+                                                       "Types::Path::Tiny"      => 0,
                                                        "Types::Standard"        => "1.010000",
-                                                       "Zydeco::Lite"           => 0.068,
+                                                       "Zydeco::Lite"           => 0.073,
                                                      },
                                      },
                         test      => { requires => { "Test::More" => 0.96 } },
                       },
-  "provides"       => { Z => { file => "lib/Z.pm", version => 0.001 } },
+  "provides"       => { Z => { file => "lib/Z.pm", version => 0.005 } },
   "release_status" => "stable",
   "resources"      => {
                         bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Z" },
@@ -51,7 +59,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Z/project",
                       },
-  "version"        => 0.001,
+  "version"        => 0.005,
 };
 
 my %dynamic_config;
@@ -65,6 +73,9 @@ if ( $] lt '5.010' ) {
 	$meta->{prereqs}{runtime}{requires}{'Perl6::Say'}      = '0.06';
 }
 
+if ( ! eval 'use JSON::MaybeXS 1.003000 ();' ) {
+	$meta->{prereqs}{runtime}{requires}{'JSON::PP'} = '2.0';
+}
 
 };
 

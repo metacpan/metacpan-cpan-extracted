@@ -27,19 +27,18 @@ SYNOPSIS
 DESCRIPTION
     Just a shortcut for loading a bunch of modules that allow you to quickly
     code Perl stuff. I've tried to avoid too many domain-specific modules like
-    HTTP::Tiny, JSON, etc. The modules chosen should be broadly useful for a
-    wide variety of tasks.
+    HTTP::Tiny, etc. The modules chosen should be broadly useful for a wide
+    variety of tasks.
 
   Perl Version Compatibility
-    Z has a compatibility mode where it will use Try::Tiny instead of
-    Syntax::Keyword::Try. Bear in mind that these are not 100% compatible with
-    each other.
+    By default, Z requires Perl v5.14, but it has a compatibility mode where
+    for Perl v5.8.8 and above.
 
-    It will also load Perl6::Say as a fallback for the `say` built-in. And
-    will not provide `state`.
-
-    It will also load UNIVERSAL::DOES if there's no built-in UNIVERSAL::DOES
-    method.
+    It will use Try::Tiny instead of Syntax::Keyword::Try. (Bear in mind that
+    these are not 100% compatible with each other.) It will also load
+    Perl6::Say as a fallback for the `say` built-in. And it will not provide
+    `state`. It will also load UNIVERSAL::DOES if there's no built-in
+    UNIVERSAL::DOES method.
 
     You can specify whether you want the modern modules or the compatibility
     modules:
@@ -57,6 +56,32 @@ DESCRIPTION
      # Prints a warning and uses compatible modules on Perl 5.8.8+.
 
     The default is `-modern`.
+
+  Additional Functions
+    There are a whole bunch of other useful functions that Z *could* make
+    available, but it's hard to know the best place to draw the line. So other
+    functions are available on request:
+
+     use Z qw( weaken unweaken isweak );
+ 
+     use Z -compat, qw( pairmap pairgrep );
+ 
+     # Rename functions...
+     use Z qw( pairmap:pmap pairgrep:pgrep );
+
+    (The things listed in the "SYNOPSIS" are always imported and don't support
+    the renaming feature.)
+
+    The additional functions available are: everything from Scalar::Util,
+    everything from List::Util, everything from Sub::Util, everything from
+    Carp (wrapped versions with `sprintf` functionality, except `confess`
+    which is part of the standard set of functions already), `Dumper` from
+    Data::Dumper, `maybe` and `provided` from PerlX::Maybe, and `encode_json`
+    and `decode_json` from JSON::MaybeXS or JSON::PP (depending which is
+    installed).
+
+    If you specify a compatibility mode (like `-modern`), this must be first
+    in the import list.
 
 BUGS
     Please report any bugs to <http://rt.cpan.org/Dist/Display.html?Queue=Z>.

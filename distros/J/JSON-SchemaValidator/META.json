@@ -50,7 +50,7 @@
    "provides" : {
       "JSON::SchemaValidator" : {
          "file" : "lib/JSON/SchemaValidator.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "JSON::SchemaValidator::Pointer" : {
          "file" : "lib/JSON/SchemaValidator/Pointer.pm"
@@ -70,7 +70,7 @@
          "web" : "https://github.com/vti/json-schemavalidator"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_contributors" : [
       "vti <viacheslav.t@gmail.com>"
    ],

@@ -25,6 +25,5 @@ if ( !-e $text_dir ) {
 
 diag "Using $text_dir for text";
 
-just_check( $text_dir, $dict_dir); # procedural interface, exported by default
-
-
+just_check( $text_dir, $dict_dir, "en_US", 0); # don't call done_testing;
+just_check( $text_dir, $dict_dir, "en_US", 1); # call done_testing;

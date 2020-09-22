@@ -1,17 +1,16 @@
 package Tickit::Widget::Statusbar::Clock;
-$Tickit::Widget::Statusbar::Clock::VERSION = '0.004';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(Tickit::Widget);
 
 =head1 NAME
 
 Tickit::Widget::Statusbar::Clock - a simple clock implementation
-
-=head1 VERSION
-
-version 0.004
 
 =head1 DESCRIPTION
 
@@ -32,11 +31,11 @@ sub cols { 8 }
 sub lines { 1 }
 
 sub render_to_rb {
-	my $self = shift;
-	my $rb = shift;
+    my $self = shift;
+    my $rb = shift;
 
-	$rb->goto(0, 0);
-	$rb->text(strftime $self->time_format, localtime);
+    $rb->goto(0, 0);
+    $rb->text(strftime $self->time_format, localtime);
 }
 
 =head2 window_gained
@@ -48,20 +47,20 @@ Returns $self.
 =cut
 
 sub window_gained {
-	my $self = shift;
-	$self->SUPER::window_gained(@_);
-	$self->update;
+    my $self = shift;
+    $self->SUPER::window_gained(@_);
+    $self->update;
 }
 
 sub update {
-	my $self = shift;
-	return unless my $win = $self->window;
-	my $now = Time::HiRes::time;
-	$self->redraw;
-	$win->tickit->timer(
-		after => (1.001 - ($now - floor($now))),
-		$self->curry::update
-	);
+    my $self = shift;
+    return unless my $win = $self->window;
+    my $now = Time::HiRes::time;
+    $self->redraw;
+    $win->tickit->timer(
+        after => (1.001 - ($now - floor($now))),
+        $self->curry::update
+    );
 }
 
 =head2 time_format

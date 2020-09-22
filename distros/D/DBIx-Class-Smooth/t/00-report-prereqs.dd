@@ -117,7 +117,9 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Module::Load' => '0.26',
-                                   'Test::More' => '0.96'
+                                   'Test::DBIx::Class' => '0',
+                                   'Test::More' => '0.96',
+                                   'Test::mysqld' => '0'
                                  }
                  }
      };

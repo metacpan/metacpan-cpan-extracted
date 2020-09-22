@@ -81,6 +81,7 @@ Fowler
 Frank
 Froehlich
 Galeev
+Galen
 Gavin
 Gerhard
 Gertjan
@@ -108,6 +109,7 @@ Hoblitt
 Hoesel
 Horsfall
 Hukins
+Huntington
 Hwa
 INOUE
 Ian
@@ -327,6 +329,7 @@ faz
 file
 freeerider
 ftp
+galen
 gerhard
 getprint
 getstore

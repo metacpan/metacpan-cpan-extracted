@@ -1,0 +1,13 @@
+[X] Take a list of sensor IDs and try to figure out what's most true,
+[X] Pull stats from both sensors when a node has two
+[X] Write some documentation
+[ ] Write more documentation
+[ ] Write more unit tests
+[ ] save some state and perform time averaging, perhaps throw out dramatic changes and reuse last known value
+
+[ ] Pull down and cache the all-sensors blob
+[ ] ++ find sensors by name
+[ ] ++ find sensors nearest a latitude/longitude, or near another sensor
+
+[X] figure out what the metric is, exactly, on the PurpleAir webpage map because it isn't in the api's json blob
+[X] ++ improve conversion -- it's the US EPA PM2.5 metric on the map vs raw concentration from the API.

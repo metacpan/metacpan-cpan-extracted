@@ -2,45 +2,9 @@ package Art::Wildlife {
 
     use Zydeco;
 
-    include Buyer;
+    include Behavior::Buyer;
+    include Agent;
 
-    class Agent {
-        has id!         ( type => Int );
-        has name!       ( type => Str, required => 1 );
-        has reputation ( type => Int );
-
-        class Artist {
-
-            has artworks   ( type => ArrayRef );
-            has collectors ( type => ArrayRef );
-            has collected  ( type => Bool, default => false );
-
-            method create {
-                say $self->name . " create !";
-            }
-
-            method have_idea {
-                say $self->name . ' have shitty idea' if true;
-            }
-
-            method has_collectors {
-                # if self.collectors.elems > 0 {
-                # $!collected = True;
-                # } else {
-                # $!collected = False;
-                # }
-            }
-
-            # method new ($id, $name, @artworks, @collectors) {
-            #     self.bless(:$id, :$name, :@artworks, :@collectors);
-            # }
-        }
-
-        include Collector;
-
-
-
-    }
 }
 
 1;
@@ -49,8 +13,7 @@ package Art::Wildlife {
 # does Art::Behavior::Crudable;
 # has relations
 
-
-=begin pod
+=encoding UTF-8
 
 =head1 NAME
 
@@ -58,20 +21,64 @@ Agent - Activist of the Art World
 
 =head1 SYNOPSIS
 
-use Agent;
+  use Art::Wildlife;
+
+  my $agent = Art::Wildlife->new_agent( name => $f->person_name );
+
+  $agent->participate;    # ==>  "That's interesting"
 
 =head1 DESCRIPTION
 
-Agent a generic entity that can be any activist of Art World
+A generic entity that can be any activist of the L<Art::World>. Provides all
+kind of C<Agents> classes and roles.
 
-=head1 AUTHOR
+=head1 ENTITIES DESCRIPTIONS
 
-Seb. Hu-Rillettes <shr@balik.network>
+=head2 ROLES
+
+=head3 C<Active>
+
+Provide a C<participate> method.
+
+=head3 C<Buyer>
+
+Provide a C<aquire> method requiring some C<money>.
+
+=head2 CLASSES
+
+=head3 C<Artist>
+
+The artist got a lot sof wonderful powers:
+
+=over
+
+=item C<create>
+
+=item C<have_idea> all day long
+
+In the beginning of their carreer they are usually underground, but this can
+change in time.
+
+  $artist->is_underground if not $artist->has_collectors;
+
+=back
+
+
+
+=head1 AUTHORS
+
+=over
+
+=item Seb. Hu-Rillettes <shr@balik.network>
+
+=item Sébastien Feugère <sebastien@feugere.net>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2017 Seb. Hu-Rillettes
+Copyright 2017-2020 Seb. Hu-Rillettes and contributors
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 
-=end pod
+=cut

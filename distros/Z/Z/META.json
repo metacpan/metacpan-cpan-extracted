@@ -37,21 +37,26 @@
       },
       "runtime" : {
          "recommends" : {
+            "JSON::MaybeXS" : "0",
+            "PerlX::Maybe::XS" : "0",
             "indirect" : "0",
             "perl" : "5.014000"
          },
          "requires" : {
             "Import::Into" : "0",
+            "List::Util" : "1.54",
             "Module::Runtime" : "0",
-            "Object::Adhoc" : "0.003",
+            "Object::Adhoc" : "0.004",
             "Path::Tiny" : "0.101",
             "Syntax::Keyword::Try" : "0.018",
             "Try::Tiny" : "0.30",
             "Types::Common::Numeric" : "0",
             "Types::Common::String" : "0",
+            "Types::Path::Tiny" : "0",
             "Types::Standard" : "1.010000",
-            "Zydeco::Lite" : "0.068",
+            "Zydeco::Lite" : "0.073",
             "match::simple" : "0.010",
+            "namespace::autoclean" : "0",
             "perl" : "5.008008"
          }
       },
@@ -64,7 +69,7 @@
    "provides" : {
       "Z" : {
          "file" : "lib/Z.pm",
-         "version" : "0.001"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -83,6 +88,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Z/project"
    },
-   "version" : "0.001",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

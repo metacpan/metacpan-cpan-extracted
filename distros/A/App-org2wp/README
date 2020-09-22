@@ -3,8 +3,8 @@ NAME
     post
 
 VERSION
-    This document describes version 0.009 of App::org2wp (from Perl
-    distribution App-org2wp), released on 2020-09-17.
+    This document describes version 0.010 of App::org2wp (from Perl
+    distribution App-org2wp), released on 2020-09-18.
 
 FUNCTIONS
   org2wp
@@ -122,6 +122,9 @@ FUNCTIONS
     If, for example, you specify "-l 2" instead of "-l 1" then the level-2
     headings will become blog posts.
 
+    In heading mode, you can use several options to select only certain
+    headlines which contain (or don't contain) specified tags.
+
     This function is not exported.
 
     This function supports dry-run operation.
@@ -132,6 +135,10 @@ FUNCTIONS
 
         Whether to allow comments (open) or not (closed).
 
+    *   exclude_heading_tags => *array[str]*
+
+        Exclude heading that has any of the specified tag(s).
+
     *   extra_attrs => *hash*
 
         Set extra post attributes, e.g. ping_status, post_format, etc.
@@ -139,6 +146,10 @@ FUNCTIONS
     *   filename* => *filename*
 
         Path to Org document to publish.
+
+    *   include_heading_tags => *array[str]*
+
+        Only include heading that has all specified tag(s).
 
     *   password* => *str*
 
@@ -151,6 +162,10 @@ FUNCTIONS
         *document mode*. In the document mode, the whole Org document file
         is regarded as a single blog post. In the *heading mode*, a heading
         of certain level will be regarded as a single blog post.
+
+    *   post_password => *str*
+
+        Set password for posts.
 
     *   proxy* => *str*
 

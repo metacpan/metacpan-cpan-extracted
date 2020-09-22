@@ -87,7 +87,7 @@ sub uncheck {
 }
 
 sub click {
-    my ($self, $locator) = @_;
+    my ($self, $locator, $wait) = @_;
 
     my $element = $self->resolve_locator($locator);
 
@@ -99,23 +99,26 @@ sub click {
     if ($tag eq 'input' and ($type eq 'checkbox' or $type eq 'radio')) {
         $element->property_search('click()');
     }
-    elsif (($tag eq 'input' and ($type eq 'submit' or $type eq 'image'))
-        or $tag eq 'submit'
-        or ($tag eq 'button' and $type eq 'submit')) {
-
-        $element->property_search('click()');
-        $self->wait_for_condition(sub {
-            $self->load_status eq 'started'
-        }, 100);
-    }
     else {
         $element->fire_event('click');
     }
 
+    if ($wait) {
+        $self->wait_for_condition(sub {
+            $self->is_loading;
+        }, $wait);
+    }
 
     $self->process_page_load;
 
     return 1;
+}
+
+sub click_and_wait {
+    my ($self, $locator, $timeout) = @_;
+
+    $timeout //= $self->default_timeout;
+    return $self->click($locator, $timeout);
 }
 
 sub left_click {
@@ -320,6 +323,60 @@ sub native_drag_and_drop_to_object {
     $self->run_javascript($js_string);
 
     $self->process_page_load;
+}
+
+=head3 mouse_input_drag_and_drop_to_object($source_locator, $target_locator, $options)
+
+Drag source element and drop it into target element.
+This method is similar to native_drag_and_drop_to_object but will do the action using X11libs XTest input simulation methods
+
+=cut
+
+
+sub mouse_input_drag_and_drop_to_object {
+    my ($self, $source_locator, $target_locator, $options) =@_;
+
+    croak "did not find element $source_locator" unless $self->resolve_locator($source_locator)->get_length;
+    croak "did not find element $target_locator" unless $self->resolve_locator($target_locator)->get_length;
+
+    my $steps = $options->{steps} // 5;
+    my $step_delay = $options->{step_delay} // 150; #ms
+    $self->event_send_delay($options->{event_send_delay}) if $options->{event_send_delay};
+
+    my ($x, $y) = $self->get_center_screen_position($source_locator);
+    $self->check_window_bounds($x, $y, "source '$source_locator'");
+
+    $self->pause($step_delay);
+    $self->move_mouse_abs($x, $y);
+    $self->pause($step_delay);
+    $self->press_mouse_button(1);
+    $self->pause($step_delay);
+
+    my ($target_x, $target_y) = $self->get_center_screen_position($target_locator);
+    $self->check_window_bounds($target_x, $target_y, "target '$target_locator'");
+
+    foreach (0 .. $steps -1) {
+        my $delta_x = $target_x - $x;
+        my $delta_y = $target_y - $y;
+        my $step_x = int($delta_x / ($steps - $_));
+        my $step_y = int($delta_y / ($steps - $_));
+
+        $self->move_mouse_abs($x += $step_x, $y += $step_y);
+        $self->pause($step_delay);
+    }
+
+    # "move" mouse again to cause a dragover event on the target
+    # otherwise a drop may not work
+    $self->move_mouse_abs($x, $y);
+    $self->pause($step_delay);
+
+    $self->release_mouse_button(1);
+    $self->pause($step_delay);
+    $self->move_mouse_abs($x, $y);
+    $self->pause($step_delay);
+    $self->pause(300);
+
+    return $self;
 }
 
 1;

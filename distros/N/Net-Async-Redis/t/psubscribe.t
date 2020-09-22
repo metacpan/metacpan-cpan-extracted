@@ -23,9 +23,11 @@ $loop->add(my $subscriber = Net::Async::Redis->new);
 Future->needs_all(
     $publisher->connect(
         host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
+        port => $ENV{NET_ASYNC_REDIS_PORT} // '6379',
     ),
     $subscriber->connect(
         host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
+        port => $ENV{NET_ASYNC_REDIS_PORT} // '6379',
     )
 )->get;
 

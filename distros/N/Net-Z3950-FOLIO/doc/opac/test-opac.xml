@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<opacRecord>
+  <bibliographicRecord>
+    <record xmlns="http://www.loc.gov/MARC21/slim">
+      <leader>00077nam a22000498a 4500</leader>
+      <controlfield tag="001">   11224466 </controlfield>
+      <datafield tag="010" ind1=" " ind2=" ">
+        <subfield code="a">k&#xF6;benhavn</subfield>
+      </datafield>
+    </record>
+  </bibliographicRecord>
+  <holdings>
+    <holding>
+      <typeOfRecord>u</typeOfRecord>
+      <encodingLevel>U</encodingLevel>
+      <receiptAcqStatus>0</receiptAcqStatus>
+      <dateOfReport>000000</dateOfReport>
+      <nucCode>s-FM/GC</nucCode>
+      <localLocation>Main or Science/Business Reading Rms - STORED OFFSITE</localLocation>
+      <callNumber>MLCM 89/00602 (N)</callNumber>
+      <shelvingData>FT MEADE</shelvingData>
+      <copyNumber>Copy 1</copyNumber>
+      <volumes>
+        <volume>
+          <enumeration>1</enumeration>
+          <chronology>2</chronology>
+          <enumAndChron>3</enumAndChron>
+        </volume>
+        <volume>
+          <enumeration>1</enumeration>
+          <chronology>2</chronology>
+          <enumAndChron>3</enumAndChron>
+        </volume>
+      </volumes>
+      <circulations>
+        <circulation>
+          <availableNow value="1"/>
+          <availabilityDate>20130129</availabilityDate>
+          <itemId>1226176</itemId>
+          <renewable value="0"/>
+          <onHold value="0"/>
+        </circulation>
+      </circulations>
+    </holding>
+  </holdings>
+</opacRecord>

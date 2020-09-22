@@ -25,7 +25,7 @@ use Carp 'croak';
 #   (body)      This method calls the $function that RxPerl::Observable->new received as argument (and that initiates the subscription)
 #   (return)    This method returns a new RxPerl::Subscription object, that contains the "cleanup subref" returned by $function
 
-our $VERSION = "v0.27.0";
+our $VERSION = "v0.27.1";
 
 sub new {
     my ($class, $function) = @_;

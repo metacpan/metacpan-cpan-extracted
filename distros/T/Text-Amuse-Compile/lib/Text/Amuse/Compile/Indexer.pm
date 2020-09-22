@@ -164,7 +164,7 @@ sub interpolate_indexes {
     foreach my $p (@paragraphs) {
         # we index the inline comments as well, so we can index
         # what we want, where we want.
-        if ($p =~ m/^%/) {
+        if ($p =~ m/^%/m) {
             my @prepend;
             while ($p =~ m/($re)/g) {
                 push @prepend, $add_index->($1);
@@ -173,7 +173,7 @@ sub interpolate_indexes {
                 $p = join("\n", @prepend) . "\n" . $p;
             }
         }
-        elsif ($p =~ m/^\\(part|chapter|section|subsection|subsubsection)/) {
+        elsif ($p =~ m/^\\(mark|part|chapter|section|subsection|subsubsection)/m) {
             my @append;
             while ($p =~ m/($re)/g) {
                 push @append, $add_index->($1);

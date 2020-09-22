@@ -41,9 +41,11 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Module::Load" => "0.26",
-    "Test::More" => "0.96"
+    "Test::DBIx::Class" => 0,
+    "Test::More" => "0.96",
+    "Test::mysqld" => 0
   },
-  "VERSION" => "0.0104",
+  "VERSION" => "0.0105",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,7 +72,9 @@ my %FallbackPrereqs = (
   "String::CamelCase" => "0.02",
   "Sub::Exporter::Progressive" => 0,
   "Syntax::Keyword::Try" => 0,
+  "Test::DBIx::Class" => 0,
   "Test::More" => "0.96",
+  "Test::mysqld" => 0,
   "boolean" => 0,
   "experimental" => 0,
   "parent" => 0

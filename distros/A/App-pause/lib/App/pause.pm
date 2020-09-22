@@ -1,8 +1,8 @@
 package App::pause;
 
-our $DATE = '2020-02-18'; # DATE
+our $DATE = '2020-09-18'; # DATE
 our $DIST = 'App-pause'; # DIST
-our $VERSION = '0.653'; # VERSION
+our $VERSION = '0.655'; # VERSION
 
 our %cli_attrs = do {
     my $p = '/WWW/PAUSE/Simple/';
@@ -44,7 +44,7 @@ App::pause - A CLI for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.653 of App::pause (from Perl distribution App-pause), released on 2020-02-18.
+This document describes version 0.655 of App::pause (from Perl distribution App-pause), released on 2020-09-18.
 
 =head1 DESCRIPTION
 
@@ -78,7 +78,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

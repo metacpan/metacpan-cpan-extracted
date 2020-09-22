@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Lookup::DateTime::day;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 
 use parent 'DBIx::Class::Smooth::Lookup::DateTime::datepart';
 use experimental qw/signatures postderef/;
@@ -29,7 +29,7 @@ DBIx::Class::Smooth::Lookup::DateTime::day - Short intro
 
 =head1 VERSION
 
-Version 0.0104, released 2020-08-30.
+Version 0.0105, released 2020-09-20.
 
 =head1 SOURCE
 

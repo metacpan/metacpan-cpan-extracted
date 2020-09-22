@@ -2,12 +2,13 @@ package FFI::Temp;
 
 use strict;
 use warnings;
+use 5.008004;
 use Carp qw( croak );
 use File::Spec;
 use File::Temp qw( tempdir );
 
 # ABSTRACT: Temp Dir support for FFI::Platypus
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 # problem with vanilla File::Temp is that is often uses
@@ -79,7 +80,7 @@ FFI::Temp - Temp Dir support for FFI::Platypus
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 DESCRIPTION
 

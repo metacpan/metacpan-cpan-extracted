@@ -8,9 +8,10 @@ build_requires:
 configure_requires:
   CPAN::Meta: '0'
   CPAN::Meta::Prereqs: '0'
-  Module::Build: '0.38'
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +30,7 @@ no_index:
 provides:
   DBIx::FixtureLoader:
     file: lib/DBIx/FixtureLoader.pm
-    version: '0.12'
+    version: '0.20'
 requires:
   DBI: '0'
   DBIx::TransactionManager: '0'
@@ -44,7 +45,10 @@ resources:
   bugtracker: https://github.com/Songmu/p5-DBIx-FixtureLoader/issues
   homepage: https://github.com/Songmu/p5-DBIx-FixtureLoader
   repository: git://github.com/Songmu/p5-DBIx-FixtureLoader.git
-version: '0.12'
+version: '0.20'
 x_contributors:
-  - 'taiyoh <sun.basix@gmail.com>'
   - 'Motonobu Ichimura <ichimuram@intellilink.co.jp>'
+  - 'chibapse <tall.toothpick.102248@gmail.com>'
+  - 'taiyoh <sun.basix@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

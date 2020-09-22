@@ -6,9 +6,9 @@ package DBIx::Class::Smooth::FilterItem;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 
-use Carp qw/croak confess/;
+use Carp qw/carp croak confess/;
 use Safe::Isa qw/$_isa/;
 use Scalar::Util qw/blessed/;
 use Moo;
@@ -97,17 +97,24 @@ sub parse($self) {
     if($self->get_part(0) =~ m/\./) {
         $self->column_name($self->shift_parts);
     }
-    # Otherwise we make it into an ordinary column name
+    # Column name without result source, specify the result source
     elsif($self->resultset->result_source->has_column($self->get_part(0))) {
         $self->column_name(sprintf '%s.%s', $self->resultset->current_source_alias, $self->shift_parts);
     }
     else {
         my $possible_relation = $self->get_part(0);
         my $possible_column = $self->get_part(1);
+        my $drn = $self->resultset->result_class->default_result_namespace;
 
         my $has_relationship = $self->resultset->result_source->has_relationship($possible_relation);
 
-        if($has_relationship && defined $possible_column && $self->resultset->result_source->relationship_info($possible_relation)->{'class'}->has_column($possible_column)) {
+        if($has_relationship && $self->resultset->result_source->relationship_info($possible_relation)->{'class'}->has_relationship($possible_column)) {
+            my $swith_to_resultset = $self->resultset->result_source->relationship_info($possible_relation)->{'class'} =~ s/^(?:$drn):://r =~ s/::/_/rg;
+            $self->resultset($self->resultset->result_source->schema->$swith_to_resultset);
+            $self->shift_parts;
+            $self->parse;
+        }
+        elsif($has_relationship && defined $possible_column && $self->resultset->result_source->relationship_info($possible_relation)->{'class'}->has_column($possible_column)) {
             if($self->value->$_isa('DBIx::Class::Row')) {
                 confess "Don't pass a row object to a column";
             }
@@ -119,7 +126,7 @@ sub parse($self) {
             $self->shift_parts;
         }
         else {
-            confess "Has no relation <$possible_relation> or that has no column <$possible_column>";
+            confess $self->resultset->result_class . " has no relation <$possible_relation> or that has no column <$possible_column>";
         }
     }
 
@@ -227,7 +234,7 @@ DBIx::Class::Smooth::FilterItem - Short intro
 
 =head1 VERSION
 
-Version 0.0104, released 2020-08-30.
+Version 0.0105, released 2020-09-20.
 
 =head1 SOURCE
 

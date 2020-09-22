@@ -42,4 +42,12 @@ $m->load_fixture('t/data/zero.csv', update => 1);
 $result = $dbh->selectrow_arrayref('SELECT COUNT(*) FROM zero ORDER BY id;');
 is $result->[0], 0;
 
+$dbh->do(q{INSERT INTO zero VALUES (101,"Ninja Star");});
+$result = $dbh->selectrow_arrayref('SELECT COUNT(*) FROM zero ORDER BY id;');
+is $result->[0], 1;
+
+$m->load_fixture('t/data/zero.csv', update => 1, delete => 1, bulk_insert => 1);
+$result = $dbh->selectrow_arrayref('SELECT COUNT(*) FROM zero ORDER BY id;');
+is $result->[0], 0;
+
 done_testing;

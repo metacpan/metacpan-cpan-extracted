@@ -4,6 +4,15 @@ View the output of a command inside a scrolling window in your terminal.
 
 ## Installation
 
+**Install from [CPAN](https://metacpan.org/pod/Term::Scroller)**
+```sh
+cpanm Term::Scroller
+```
+
+**Install from repo**
+
+(Requires [IO::Pty](https://metacpan.org/pod/IO::Pty), [Term::ReadKey](https://metacpan.org/pod/Term::ReadKey) and [Encode::Locale](https://metacpan.org/pod/Encode::Locale))
+
 ```sh
 perl Build.PL
 ./Build
@@ -14,7 +23,7 @@ perl Build.PL
 ## Usage
 
 ```
-scroller [-h|--help] \[-s|--size SIZE\] [-c|--color COLOR] 
+scroller [-h|--help] [-s|--size SIZE] [-c|--color COLOR] [-t|--tab-width WIDTH]
          [--on-exit keep|error|print] [-w|--window WINDOWSPEC]
          COMMAND ARGS..
 ```
@@ -66,6 +75,12 @@ scroller mycommand | myothercommand
     If this is set, any escape sequences within the command's actual output will
     be ignored. Without it, color-setting escape sequences in the output are passed
     through.
+
+- _-t_, _--tab-width_ **WIDTH**
+
+    Set the width of tabs (in characters) when viewed in the viewport. 
+    For consistent printing, tabs are replaced with this number of spaces.
+    Defaults to 4.
 
 - _--on-exit_ **keep|error|print**
 
@@ -141,6 +156,29 @@ be displayed correctly)
 - **pipe-ascii**: '      | '
 
         |your text here
+
+## The Term::Scroller Module
+
+Installing this also provides the Perl Module `Term::Scroller` for a
+programmatic interface to the scrolling feature. It provides a filehandle
+where any text written to it appears in the scrolling window.
+
+```perl
+use Term::Scroller;
+
+# Default options
+my $scroll = Term::Scroller->new();
+print $scroll "blah blah blah\n" for (1..100);
+# You should always call the end() method when you're done
+$scroll->end();
+
+# Some more options (limited window size, with a border)
+$scroll = scroller(width => 40, height => 5, window => '-#-#-#-#');
+print $scroll "beee daah booo\n" for (1..100);
+$scroll->end();
+```
+
+See the module's [documentation](https://metacpan.org/pod/Term::Scroller) for more details.
 
 # LICENSE AND COPYRIGHT
 

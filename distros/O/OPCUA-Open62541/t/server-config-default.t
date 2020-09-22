@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use OPCUA::Open62541;
 
-use Test::More tests => 29;
+use Test::More tests => 69;
 use Test::Deep;
 use Test::Exception;
 use Test::LeakTrace;
@@ -70,3 +70,92 @@ ok(my $maxsecurechannels = $config->getMaxSecureChannels(),
     "max secure channels get");
 no_leaks_ok { $config->getMaxSecureChannels() } "max secure channels leak";
 is($maxsecurechannels, 23, "max secure channels");
+
+# operation limits
+
+lives_ok { $config->setMaxNodesPerRead(10001) }
+    "custom max nodes per read";
+no_leaks_ok { $config->setMaxNodesPerRead(10001) }
+    "custom max nodes per read leak";
+
+ok(my $maxnodesperread = $config->getMaxNodesPerRead(),
+    "max nodes per read get");
+no_leaks_ok { $config->getMaxNodesPerRead() } "max nodes per read leak";
+is($maxnodesperread, 10001, "max max nodes per read");
+
+lives_ok { $config->setMaxNodesPerWrite(10002) }
+    "custom max nodes per write";
+no_leaks_ok { $config->setMaxNodesPerWrite(10002) }
+    "custom max nodes per write leak";
+
+ok(my $maxnodesperwrite = $config->getMaxNodesPerWrite(),
+    "max nodes per write get");
+no_leaks_ok { $config->getMaxNodesPerWrite() } "max nodes per write leak";
+is($maxnodesperwrite, 10002, "max max nodes per write");
+
+lives_ok { $config->setMaxNodesPerMethodCall(10003) }
+    "custom max nodes per method call";
+no_leaks_ok { $config->setMaxNodesPerMethodCall(10003) }
+    "custom max nodes per method call leak";
+
+ok(my $maxnodespermethodcall = $config->getMaxNodesPerMethodCall(),
+    "max nodes per method call get");
+no_leaks_ok { $config->getMaxNodesPerMethodCall() }
+    "max nodes per method call leak";
+is($maxnodespermethodcall, 10003, "max max nodes per method call");
+
+lives_ok { $config->setMaxNodesPerBrowse(10004) }
+    "custom max nodes per browse";
+no_leaks_ok { $config->setMaxNodesPerBrowse(10004) }
+    "custom max nodes per browse leak";
+
+ok(my $maxnodesperbrowse = $config->getMaxNodesPerBrowse(),
+    "max nodes per browse get");
+no_leaks_ok { $config->getMaxNodesPerBrowse() } "max nodes per browse leak";
+is($maxnodesperbrowse, 10004, "max max nodes per browse");
+
+lives_ok { $config->setMaxNodesPerRegisterNodes(10005) }
+    "custom max nodes per RegisterNodes";
+no_leaks_ok { $config->setMaxNodesPerRegisterNodes(10005) }
+    "custom max nodes per RegisterNodes leak";
+
+ok(my $maxnodesperregisternodes = $config->getMaxNodesPerRegisterNodes(),
+    "max nodes per RegisterNodes get");
+no_leaks_ok { $config->getMaxNodesPerRegisterNodes() }
+    "max nodes per RegisterNodes leak";
+is($maxnodesperregisternodes, 10005, "max max nodes per RegisterNodes");
+
+lives_ok { $config->setMaxNodesPerTranslateBrowsePathsToNodeIds(10006) }
+    "custom max nodes per TranslateBrowsePathsToNodeIds";
+no_leaks_ok { $config->setMaxNodesPerTranslateBrowsePathsToNodeIds(10006) }
+    "custom max nodes per TranslateBrowsePathsToNodeIds leak";
+
+ok(my $maxnodespertranslatebrowsepathstonodeids =
+    $config->getMaxNodesPerTranslateBrowsePathsToNodeIds(),
+    "max nodes per TranslateBrowsePathsToNodeIds get");
+no_leaks_ok { $config->getMaxNodesPerTranslateBrowsePathsToNodeIds() }
+    "max nodes per TranslateBrowsePathsToNodeIds leak";
+is($maxnodespertranslatebrowsepathstonodeids, 10006,
+    "max max nodes per TranslateBrowsePathsToNodeIds");
+
+lives_ok { $config->setMaxNodesPerNodeManagement(10007) }
+    "custom max nodes per node management";
+no_leaks_ok { $config->setMaxNodesPerNodeManagement(10007) }
+    "custom max nodes per node management leak";
+
+ok(my $maxnodespernodemanagement = $config->getMaxNodesPerNodeManagement(),
+    "max nodes per node management get");
+no_leaks_ok { $config->getMaxNodesPerNodeManagement() }
+    "max nodes per node management leak";
+is($maxnodespernodemanagement, 10007, "max max nodes per node management");
+
+lives_ok { $config->setMaxMonitoredItemsPerCall(10008) }
+    "custom max monitored items per call";
+no_leaks_ok { $config->setMaxMonitoredItemsPerCall(10008) }
+    "custom max monitored items per call";
+
+ok(my $maxmonitoreditemspercall = $config->getMaxMonitoredItemsPerCall(),
+    "max monitored items per call get");
+no_leaks_ok { $config->getMaxMonitoredItemsPerCall() }
+    "max monitored items per call leak";
+is($maxmonitoreditemspercall, 10008, "max max monitored items per call");

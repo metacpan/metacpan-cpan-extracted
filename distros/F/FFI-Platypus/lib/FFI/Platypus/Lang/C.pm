@@ -2,9 +2,10 @@ package FFI::Platypus::Lang::C;
 
 use strict;
 use warnings;
+use 5.008004;
 
 # ABSTRACT: Documentation and tools for using Platypus with the C programming language
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub native_type_map
@@ -27,7 +28,7 @@ FFI::Platypus::Lang::C - Documentation and tools for using Platypus with the C p
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

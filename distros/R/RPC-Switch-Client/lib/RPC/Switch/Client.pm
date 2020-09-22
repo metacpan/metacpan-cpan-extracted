@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -276,13 +276,14 @@ sub call_nb {
 		croak 'reqauth should be a hashref' unless ref $reqauth eq 'HASH';
 	}
 
+	my $req = {
+		rescb => $rescb,
+	};
+
 	if ($timeout > 0) {
-		$self->ioloop->timer($timeout => sub {
+		$req->{tmr} = $self->ioloop->timer($timeout => sub {
+			my $rescb = delete $req->{rescb} or return;
 			$rescb->(RES_TIMEOUT, "timed out after $timeout seconds");
-			$self->{cb_used}->{refaddr($rescb)} = 1
-				if defined $self->{cb_used}->{refaddr($rescb)};
-				# waiting for result notification after RES_WAIT
-			$rescb = undef;
 		});
 	}
 
@@ -307,6 +308,7 @@ sub call_nb {
 				$rescb->(RES_ERROR, "$e->{message} ($e->{code})") if $rescb;
 				return;
 			}
+			my ($rescb, $tmr) = @{$req}{qw(rescb tmr)};
 			return unless $rescb; # $rescb is undef if a timeout happeded
 			my ($status, $outargs) = @{$r->{result}};
 			if ($status eq RES_WAIT) {
@@ -321,18 +323,20 @@ sub call_nb {
 				# the channel disappears
 				# outargs should contain waitid
 				# autovivification ftw?
-				$self->{channels}->{$vci}->{$outargs} = $rescb;
-				$self->{cb_used}->{refaddr($rescb)} = 0;
+				$self->{channels}->{$vci}->{$outargs} = $req;
 				$waitcb->($status, $outargs) if $waitcb;
 			} else {
 				$outargs = encode_json($outargs) if $self->{json} and ref $outargs;
 				$rescb->($status, $outargs);
+				$self->ioloop->remove($tmr) if $tmr;
 			}
 		}
 	)->catch(sub {
 		my ($err) = @_;
 		$self->log->error("Something went wrong in call_nb: $err");
+		my ($rescb, $tmr) = @{$req}{qw(rescb tmr)};
 		$rescb->(RES_ERROR, $err);
+		$self->ioloop->remove($tmr) if $tmr;
 		return @_;
 	});
 }
@@ -380,9 +384,11 @@ sub rpc_result {
 	return unless $id;
 	my $vci = $r->{rpcswitch}->{vci};
 	return unless $vci;
-	my $rescb = delete $self->{channels}->{$vci}->{$id};
+	my $req = delete $self->{channels}->{$vci}->{$id};
+	return unless $req;
+	my ($rescb, $tmr) = @{$req}{qw(rescb tmr)};
 	return unless $rescb;
-	return if delete $self->{cb_used}->{refaddr($rescb)}; # cb already called
+	$self->ioloop->remove($tmr) if $tmr;
 	$outargs = encode_json($outargs) if $self->{json} and ref $outargs;
 	$rescb->($status, $outargs);
 	return;
@@ -395,8 +401,10 @@ sub rpc_channel_gone {
 	return unless $ch;
 	my $wl = delete $self->{channels}->{$ch};
 	return unless $wl;
-	for my $rescb (values %$wl) {
-		$rescb->(RES_ERROR, 'channel gone');
+	for (values %$wl) {
+		my ($rescb, $tmr) = @{$_}{qw(rescb tmr)};
+		$self->ioloop->remove($tmr) if $tmr;
+		$rescb->(RES_ERROR, 'channel gone') if $rescb;
 	}
 	return;
 }

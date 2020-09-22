@@ -233,14 +233,14 @@ A direction like **"north"** can be abbreviated to **"n"** using the **Abbrevdir
 REVPATH (a statement, not a function) takes an array of movement commands, and reverses them, transforming **north northwest up east** into **west down southeast south**. Here's an example.
 
         DATA "north", "northwest", "up", "east"
-        DIM myarray$ (4)
+        DIM stuff$ (4)
         FOR a = 1 TO 4
-            READ myarray$ (a)
+            READ stuff$ (a)
         NEXT a
 
-        REVPATH myarray$
+        REVPATH stuff$
         FOR a = 1 TO 4
-            PRINT myarray$ (a)
+            PRINT stuff$ (a)
         NEXT a
 
 If a room's description is different during daylight and at night, Axmud can store both descriptions. You can use the **Setlight ()** function to set Axmud's current *light status*, and you can use the **Getlight$ ()** function to retrieve it.

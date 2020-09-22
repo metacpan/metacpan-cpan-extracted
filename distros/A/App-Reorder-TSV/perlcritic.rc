@@ -1,0 +1,5 @@
+severity = 1
+exclude = RequirePodSections RequireVersionVar
+
+[Documentation::PodSpelling]
+stop_words_file = pod-stop-words.txt

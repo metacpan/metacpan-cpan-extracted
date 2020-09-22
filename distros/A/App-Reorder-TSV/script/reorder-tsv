@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+
+# PODNAME: reorder-tsv
+# ABSTRACT: Reorder columns of TSV file by template
+
+## Author         : iansealy
+## Maintainer     : iansealy
+## Created        : 2020-09-11
+## Last commit by : $Author$
+## Last modified  : $Date$
+## Revision       : $Revision$
+## Repository URL : $HeadURL$
+
+use strictures 2;
+use autodie;
+use Carp;
+use Getopt::Long;
+use Pod::Usage;
+
+use App::Reorder::TSV qw( reorder );
+
+# Default options
+my $tsv_file;
+my $template_file;
+my ( $help, $man );
+
+# Get and check command line options
+get_and_check_options();
+
+reorder( { tsv => $tsv_file, template => $template_file } );
+
+# Get and check command line options
+sub get_and_check_options {
+
+    # Get options
+    GetOptions(
+        'tsv=s'      => \$tsv_file,
+        'template=s' => \$template_file,
+        'help'       => \$help,
+        'man'        => \$man,
+    ) or pod2usage(2);
+
+    # Documentation
+    if ($help) {
+        pod2usage(1);
+    }
+    elsif ($man) {
+        pod2usage( -verbose => 2 );
+    }
+
+    return;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+reorder-tsv - Reorder columns of TSV file by template
+
+=head1 VERSION
+
+version 0.1.1
+
+=head1 DESCRIPTION
+
+A script for reordering the columns of a tab-separated value (TSV) file
+according to the columns of a template TSV file.
+
+The input TSV file can be of any length, but the first line must be a
+header line. The template TSV file should just contain one header line
+containing the column names. Any other lines will be ignored.
+
+If the template TSV file contains column names that don't appear in the
+input TSV file then these columns will be blank in the output.
+
+If the input TSV file contains column names that don't appear in the
+template TSV file then these columns will be discarded.
+
+=head1 USAGE
+
+    reorder-tsv
+        [--tsv file]
+        [--template file]
+        [--help]
+        [--man]
+
+=head1 EXAMPLES
+
+reorder-tsv --tsv in.tsv --template template.tsv > out.tsv
+
+reorder-tsv --tsv in.tsv.gz --template template.tsv | gzip -c > out.tsv.gz
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--tsv FILE>
+
+Input TSV file, with header plus data. The file can optionally be
+compressed with gzip.
+
+=item B<--template FILE>
+
+Template TSV file, with header only.
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=item B<--man>
+
+Print this script's manual page and exit.
+
+=back
+
+=head1 AUTHOR
+
+Ian Sealy <cpan@iansealy.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Ian Sealy <cpan@iansealy.com>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

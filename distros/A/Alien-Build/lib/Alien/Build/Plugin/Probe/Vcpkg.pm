@@ -6,7 +6,7 @@ use 5.008004;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Probe for system libraries using Vcpkg
-our $VERSION = '2.32'; # VERSION
+our $VERSION = '2.33'; # VERSION
 
 
 has '+name';
@@ -107,7 +107,7 @@ Alien::Build::Plugin::Probe::Vcpkg - Probe for system libraries using Vcpkg
 
 =head1 VERSION
 
-version 2.32
+version 2.33
 
 =head1 SYNOPSIS
 

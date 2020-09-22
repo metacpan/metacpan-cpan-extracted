@@ -61,7 +61,7 @@ my %WriteMakefileArgs = (
     "HTTP::Request" => 6,
     "HTTP::Request::Common" => 6,
     "HTTP::Response" => 6,
-    "HTTP::Status" => 6,
+    "HTTP::Status" => "6.07",
     "IO::Select" => 0,
     "IO::Socket" => 0,
     "LWP::MediaTypes" => 6,
@@ -86,7 +86,7 @@ my %WriteMakefileArgs = (
     "Test::Needs" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "6.47",
+  "VERSION" => "6.48",
   "test" => {
     "TESTS" => "t/*.t t/base/*.t t/base/protocols/*.t t/leak/*.t t/local/*.t t/robot/*.t"
   }
@@ -114,7 +114,7 @@ my %FallbackPrereqs = (
   "HTTP::Request" => 6,
   "HTTP::Request::Common" => 6,
   "HTTP::Response" => 6,
-  "HTTP::Status" => 6,
+  "HTTP::Status" => "6.07",
   "IO::Select" => 0,
   "IO::Socket" => 0,
   "LWP::MediaTypes" => 6,

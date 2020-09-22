@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Perl Date::Convert extension to convert dates from/to the French Revolutionary calendar
-#     Copyright (C) 2001-2003, 2013, 2015 Jean Forget
+#     Copyright (C) 2001-2003, 2013, 2015, 2020 Jean Forget
 #
 #     See the license in the embedded documentation below.
 #
@@ -20,9 +20,9 @@ require Exporter;
 @ISA = qw(Date::Convert Exporter);
 # Do not export methods, therefore export nothing
 @EXPORT = qw(
-        
+
 );
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 use constant REV_BEGINNING => 2375840; # 1 Vendémiaire I in the Revolutionary calendar
 my @MONTHS_SHORT  = qw ( Vnd Bru Fri Niv Plu Vnt Ger Flo Pra Mes The Fru S-C);
@@ -40,7 +40,7 @@ my @DECADE_DAYS_SHORT = qw ( Déc Pri Duo Tri Qua Qui Sex Sep Oct Non);
 
 # When initializing an array with lists within lists, it means one of two things:
 # Either it is a newbie who does not know how to make multi-dimensional arrays,
-# Or it is a (at least mildly) experienced Perl-coder who, for some reason, 
+# Or it is a (at least mildly) experienced Perl-coder who, for some reason,
 # wants to initialize a flat array with the concatenation of lists.
 # I am a (at least mildly) experienced programmer who wants to use qw() and yet insert
 # comments in some places.
@@ -48,10 +48,10 @@ my @DAYS = (
 # Vendémiaire
         qw(
        0raisin           0safran           1châtaigne        1colchique        0cheval
-       1balsamine        1carotte          2amarante         0panais           1cuve
+       1balsamine        1carotte          2amaranthe        0panais           1cuve
        1pomme_de_terre   2immortelle       0potiron          0réséda           2âne
-       1belle_de_nuit    1citrouille       0sarrasin         0tournesol        0pressoir
-       0chanvre          1pêche            0navet            2amaryllis        0bœuf
+       1belle-de-nuit    1citrouille       0sarrasin         0tournesol        0pressoir
+       0chanvre          1pêche            0navet            2amarillis        0bœuf
        2aubergine        0piment           1tomate           2orge             0tonneau
         ),
 # Brumaire
@@ -61,7 +61,7 @@ my @DAYS = (
        0salsifis         1macre            0topinambour      2endive           0dindon
        0chervis          0cresson          1dentelaire       1grenade          1herse
        1bacchante        2azerole          1garance          2orange           0faisan
-       1pistache         0macjon           0coing            0cormier          0rouleau
+       1pistache         0macjonc          0coing            0cormier          0rouleau
         ),
 # Frimaire
         qw(
@@ -84,7 +84,7 @@ my @DAYS = (
 # Pluviôse
         qw(
        1lauréole         1mousse           0fragon           0perce-neige      0taureau
-       0laurier-thym     2amadouvier       0mézéréon         0peuplier         1cognée
+       0laurier-thym     2amadouvier       0mézéréon         0peuplier         1coignée
        2ellébore         0brocoli          0laurier          2avelinier        1vache
        0buis             0lichen           2if               1pulmonaire       1serpette
        0thlaspi          0thymelé          0chiendent        1traînasse        0lièvre
@@ -93,9 +93,9 @@ my @DAYS = (
 # Ventôse
         qw(
        0tussilage        0cornouiller      0violier          0troène           0bouc
-       2asaret           2alaterne         1violette         0marsault         1bêche
+       2asaret           2alaterne         1violette         0marceau          1bêche
        0narcisse         2orme             1fumeterre        0vélar            1chèvre
-       2épinard          0doronic          0mouron           0cerfeuil         0cordeau
+       3épinards         0doronic          0mouron           0cerfeuil         0cordeau
        1mandragore       0persil           0cochléaria       1pâquerette       0thon
        0pissenlit        1sylvie           0capillaire       0frêne            0plantoir
         ),
@@ -111,19 +111,19 @@ my @DAYS = (
 # Floréal
         qw(
        1rose             0chêne            1fougère          2aubépine         0rossignol
-       2ancolie          0muguet           0champignon       1jacinthe         0rateau
+       2ancolie          0muguet           0champignon       1hyacinthe        0râteau
        1rhubarbe         0sainfoin         0bâton-d'or       0chamérisier      0ver_à_soie
        1consoude         1pimprenelle      1corbeille-d'or   2arroche          0sarcloir
-       0statice          1fritillaire      1bourrache        1valériane        1carpe
+       0staticé          1fritillaire      1bourrache        1valériane        1carpe
        0fusain           1civette          1buglosse         0sénevé           1houlette
         ),
 # Prairial
         qw(
-       1luzerne          2hémérocalle      0trèfle           2angélique        0canard
-       1mélisse          0fromental        0martagon         0serpolet         1faux
+       1luzerne          2hémérocale       0trèfle           2angélique        0canard
+       1mélisse          0fromental        0martagon         0serpolet         1faulx
        1fraise           1bétoine          0pois             2acacia           1caille
        2œillet           0sureau           0pavot            0tilleul          1fourche
-       0barbeau          1camomille        0chèvrefeuille    0caille-lait      1tanche
+       0barbeau          1camomille        0chèvre-feuille   0caille-lait      1tanche
        0jasmin           1verveine         0thym             1pivoine          0chariot
         ),
 # Messidor
@@ -132,26 +132,26 @@ my @DAYS = (
        0romarin          0concombre        2échalotte        2absinthe         1faucille
        1coriandre        2artichaut        1giroflée         1lavande          0chamois
        0tabac            1groseille        1gesse            1cerise           0parc
-       1menthe           0cumin            0haricot          2orcanète         1pintade
+       1menthe           0cumin            3haricots         2orcanète         1pintade
        1sauge            2ail              1vesce            0blé              1chalémie
         ),
 # Thermidor
         qw(
-       2épautre          0bouillon-blanc   0melon            2ivraie           0bélier
-       1prèle            2armoise          0carthame         1mûre             2arrosoir
+       2épeautre         0bouillon-blanc   0melon            2ivraie           0bélier
+       1prêle            2armoise          0carthame         1mûre             2arrosoir
        0panis            0salicor          2abricot          0basilic          1brebis
        1guimauve         0lin              2amande           1gentiane         2écluse
-       1carline          0câprier          1lentille         2aunée            1loutre
+       1carline          0caprier          1lentille         2aunée            1loutre
        1myrte            0colza            0lupin            0coton            0moulin
         ),
 # Fructidor
         qw(
-       1prune            0millet           0lycoperdon       2escourgeon       0saumon
+       1prune            0millet           0lycoperde        2escourgeon       0saumon
        1tubéreuse        0sucrion          2apocyn           1réglisse         2échelle
        1pastèque         0fenouil          2épine-vinette    1noix             1truite
        0citron           1cardère          0nerprun          0tagette          1hotte
        2églantier        1noisette         0houblon          0sorgho           2écrevisse
-       1bagarade         1verge-d'or       0maïs             0marron           0panier
+       1bigarade         1verge-d'or       0maïs             0marron           0panier
         ),
 # Jours complémentaires
         qw(
@@ -503,13 +503,25 @@ The following field descriptors are recognized:
 
 2-digit year - 00 to 99
 
-=item %Y, %G, %L
+=item %Y, %G
 
 year  - 0001  to  9999. There  is  no difference  between these  three
 variants. This is because in the Revolutionary calendar, the beginning
 of a year  is always aligned with the beginning of  a décade, while in
 the Gregorian calendar, the beginning of a year is usually not aligned
 with the beginning of a week.
+
+=item %L
+
+This is  a third specifier  for the year. The  problem is that  I have
+forgotten why I  have implemented this specifier. There  are plenty of
+strftime-like libraries  visible on the  Internet, none of them  has a
+C<%L> specifier for the year. So where does it come from?
+
+I will deprecate  this speficier in the next module  releases. For the
+next two years,  it will function as previously. In  the release after
+this 2-year  delay, the  C<%L> specifier will  produce a  warning. And
+after another 2-year delay it will be removed.
 
 =item %EY, %Ey
 
@@ -654,10 +666,14 @@ I  have checked the  manpage for  C<date(1)> in  two flavors  of Unix:
 Linux and AIX. In the best case, the extended field descriptors C<%Ex>
 and C<%Oy> are poorly documented, but usually they are not documented.
 
-The C<Test::Exception>  module is required for the  build process, not
-for  the   regular  use  of   C<Date::Convert::French_Rev>.  But  with
-C<ExtUtils::MakeMaker>,   I   do   not   know  how   to   generate   a
-C<build_requires> entry in F<META.yml>.
+The C<Test::Exception>  and C<Test::Warning> modules are  required for
+the    build    process,    not     for    the    regular    use    of
+C<Date::Convert::French_Rev>.
+
+You should  not use the  C<%L> strftime  specifier. For the  moment it
+prints the  year, but in some  next release, about in  Vendémiaire 231
+(that is, September 2022) it will produce a warning. And after another
+two years it will be removed.
 
 =head1 HISTORICAL NOTES
 
@@ -698,15 +714,49 @@ Jean Forget <JFORGET@cpan.org>
 
 based on Mordechai T. Abzug's work <morty@umbc.edu>
 
+with thanks to  Gérald Sédrati-Dinet (GIBUS at cpan dot  org), for his
+thorough documentation research.
+
 =head1 SEE ALSO
 
-=head2 Software
+=head2 Perl Software
 
-date(1), perl(1), L<Date::Convert>
+perl(1), L<Date::Convert>
 
-calendar/cal-french.el in emacs or xemacs
+L<DateTime>
 
-L<DateTime> and L<DateTime::Calendar::FrenchRevolutionary>
+L<DateTime::Calendar::FrenchRevolutionary>
+or L<https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary>
+
+L<Date::Converter>
+
+=head2 Other Software
+
+date(1)
+
+CALENDRICA 4.0 -- Common Lisp, which can be download in the "Resources" section of
+L<https://www.cambridge.org/us/academic/subjects/computer-science/computing-general-interest/calendrical-calculations-ultimate-edition-4th-edition?format=PB&isbn=9781107683167>
+
+F<calendar/cal-french.el>  in emacs-21.2  or later  or xemacs  21.1.8,
+forked in L<https://github.com/jforget/emacs-lisp-cal-french>
+
+C<Date::Calendar::FrenchRevolutionary> for Raku at L<https://modules.raku.org/dist/Date::Calendar::FrenchRevolutionary:cpan:JFORGET>
+or L<https://github.com/jforget/raku-Date-Calendar-FrenchRevolutionary>
+
+L<https://www.gnu.org/software/apl/Bits_and_Pieces/calfr.apl.html> or L<https://github.com/jforget/apl-calendar-french>
+
+L<https://www.hpcalc.org/details/7309> or L<https://github.com/jforget/hp48-hp50-French-Revolutionary-calendar>
+
+L<https://github.com/jforget/hp41-calfr>
+
+French Calendar for Android at
+L<https://f-droid.org/packages/ca.rmen.android.frenchcalendar/>
+or L<https://github.com/caarmen/FRCAndroidWidget>
+and L<https://github.com/caarmen/french-revolutionary-calendar>
+
+Thermidor for Android at L<https://github.com/jhbadger/Thermidor-Android>
+
+A Ruby program at L<https://github.com/jhbadger/FrenchRevCal-ruby>
 
 =head2 books
 
@@ -722,24 +772,80 @@ The French Revolution, Thomas Carlyle, Oxford University Press
 
 L<http://www.faqs.org/faqs/calendars/faq/part3/>
 
-L<http://h2g2.com/approved_entry/A2903636>
+L<https://h2g2.com/approved_entry/A2903636>
 
-L<http://en.wikipedia.org/wiki/French_Republican_Calendar>
+L<https://www.allhotelscalifornia.com/kokogiakcom/frc/default.asp>
 
-L<http://prairial.free.fr/calendrier/calendrier.php?lien=sommairefr>
+L<https://en.wikipedia.org/wiki/French_Republican_Calendar>
+
+L<https://fr.wikipedia.org/wiki/Calendrier_républicain>
+
+L<http://prairial.free.fr/index.php?lien=cal_sommaireFR>
 (in French)
+
+L<https://archive.org/details/decretdelaconven00fran_40>
+
+"Décret  du  4 frimaire,  an  II  (24  novembre  1793) sur  l'ère,  le
+commencement et l'organisation de l'année et sur les noms des jours et
+des mois"
+
+L<https://archive.org/details/decretdelaconven00fran_41>
+
+Same text, with a slightly different typography.
+
+L<https://purl.stanford.edu/dx068ky1531>
+
+"Archives parlementaires  de 1789 à  1860: recueil complet  des débats
+législatifs & politiques  des Chambres françaises", J.  Madival and E.
+Laurent, et. al.,  eds, Librairie administrative de  P. Dupont, Paris,
+1912.
+
+Starting with  page 6,  this document  includes the  same text  as the
+previous links, with  a much improved typography.  Especially, all the
+"long s"  letters have been replaced  by short s. Also  interesting is
+the text  following the  decree, page 21  and following:  "Annuaire ou
+calendrier pour la seconde année de la République française, annexe du
+décret  du  4  frimaire,  an  II (24  novembre  1793)  sur  l'ère,  le
+commencement et l'organisation de l'année et sur les noms des jours et
+des mois". In the remarks above, it is refered as [Annexe].
+
+L<https://gallica.bnf.fr/ark:/12148/bpt6k48746z>
+
+[Fabre] "Rapport fait à la Convention nationale dans la séance du 3 du
+second mois de la seconde année  de la République française, au nom de
+la   Commission    chargée   de   la   confection    du   calendrier",
+Philippe-François-Nazaire  Fabre  d'Églantine,  Imprimerie  nationale,
+Paris, 1793
+
+L<https://gallica.bnf.fr/ark:/12148/bpt6k49016b>
+
+[Annuaire] "Annuaire  du cultivateur,  pour la  troisième année  de la
+République  : présenté  le  30 pluviôse  de l'an  II  à la  Convention
+nationale, qui en  a décrété l'impression et l'envoi,  pour servir aux
+écoles  de la  République",  Gilbert Romme,  Imprimerie nationale  des
+lois, Paris, 1794-1795
+
+L<https://gallica.bnf.fr/ark:/12148/bpt6k43978x>
+
+"Calendrier militaire,  ou tableau  sommaire des  victoires remportées
+par les  Armées de  la République française,  depuis sa  fondation (22
+septembre 1792),  jusqu'au 9  floréal an  7, époque  de la  rupture du
+Congrès de Rastadt et de la reprise des hostilités" Moutardier, Paris,
+An  VIII de  la République  française.  The source  of the  C<on_date>
+method.
+
 
 =head1 LICENSE
 
-Copyright (c)  2001, 2002, 2003,  2013, 2015 Jean Forget.   All rights
-reserved.  This program is free software.  You can distribute, modify,
-and otherwise mangle Date::Convert::French_Rev under the same terms as
-Perl 5.16.3: GNU  Public License version 1 or  later and Perl Artistic
-License
+Copyright  (c) 2001,  2002, 2003,  2013, 2015,  2020 Jean  Forget. All
+rights reserved.  This program is  free software. You  can distribute,
+modify, and otherwise mangle  Date::Convert::French_Rev under the same
+terms as Perl  5.16.3: GNU Public License version 1  or later and Perl
+Artistic License
 
 You can  find the text  of the licenses  in the F<LICENSE> file  or at
-L<http://www.perlfoundation.org/artistic_license_1_0> and
-L<http://www.gnu.org/licenses/gpl-1.0.html>.
+L<https://dev.perl.org/licenses/artistic.html>
+and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 
 Here is the summary of GPL:
 
@@ -754,7 +860,7 @@ MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
 General Public License for more details.
 
 You  should have received  a copy  of the  GNU General  Public License
-along  with  this  program;  if   not,  write  to  the  Free  Software
-Foundation, Inc., <http://www.fsf.org/>.
+along with  this program; if not,  see <https://www.gnu.org/licenses/>
+or write to the Free Software Foundation, Inc., L<https://www.fsf.org>.
 
 =cut

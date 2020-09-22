@@ -5,6 +5,7 @@ use warnings;
 
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
+use List::MoreUtils qw(none);
 use Readonly;
 
 # Constants.
@@ -12,7 +13,7 @@ Readonly::Hash my %LANG => (
 	'title' => 'Page title',
 );
 
-our $VERSION = 0.07;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -27,8 +28,15 @@ sub new {
 	# Author.
 	$self->{'author'} = undef;
 
+	# Base element.
+	$self->{'base_href'} = undef;
+	$self->{'base_target'} = undef;
+
 	# 'CSS::Struct' object.
 	$self->{'css'} = undef;
+
+	# CSS links.
+	$self->{'css_src'} = [];
 
 	# Charset.
 	$self->{'charset'} = 'UTF-8';
@@ -38,6 +46,9 @@ sub new {
 
 	# Doctype.
 	$self->{'doctype'} = '<!DOCTYPE html>';
+
+	# Favicon.
+	$self->{'favicon'} = undef;
 
 	# Generator.
 	$self->{'generator'} = 'Perl module: '.__PACKAGE__.', Version: '.$VERSION;
@@ -50,6 +61,12 @@ sub new {
 
 	# Refresh.
 	$self->{'refresh'} = undef;
+
+	# Robots.
+	$self->{'robots'} = undef;
+
+	# RSS
+	$self->{'rss'} = undef;
 
 	# Script js code.
 	$self->{'script_js'} = [];
@@ -76,6 +93,22 @@ sub new {
 		err "Parameter 'css' must be a 'CSS::Struct::Output::*' class.";
 	}
 
+	# Check for 'css_src' array.
+	if (ref $self->{'css_src'} ne 'ARRAY') {
+		err "Parameter 'css_src' must be a array.";
+	}
+	foreach my $css_src_hr (@{$self->{'css_src'}}) {
+		if (ref $css_src_hr ne 'HASH') {
+			err "Parameter 'css_src' must be a array of hash structures.";
+		}
+		foreach my $key (keys %{$css_src_hr}) {
+			if (none { $key eq $_ } qw(link media)) {
+				err "Parameter 'css_src' must be a array of hash ".
+					"structures with 'media' and 'link' keys."
+			}
+		}
+	}
+
 	# Check for 'script_js' array.
 	if (ref $self->{'script_js'} ne 'ARRAY') {
 		err "Parameter 'script_js' must be a array.";
@@ -84,6 +117,11 @@ sub new {
 	# Check for 'script_js_src' array.
 	if (ref $self->{'script_js_src'} ne 'ARRAY') {
 		err "Parameter 'script_js_src' must be a array.";
+	}
+
+	# Check for favicon.
+	if (defined $self->{'favicon'} && $self->{'favicon'} !~ m/\.(ico|png|jpg|gif|svg)$/ms) {
+		err "Parameter 'favicon' contain bad image type.";
 	}
 
 	# Object.
@@ -96,7 +134,7 @@ sub process {
 
 	my $css;
 	if ($self->{'css'}) {
-		$css = $self->{'css'}->flush."\n";
+		$css = $self->{'css'}->flush(1)."\n";
 	}
 
 	# Begin of page.
@@ -111,6 +149,16 @@ sub process {
 		['a', 'content', 'text/html; charset=UTF-8'],
 		['e', 'meta'],
 	);
+	if (defined $self->{'base_href'}) {
+		$self->{'tags'}->put(
+			['b', 'base'],
+			['a', 'href', $self->{'base_href'}],
+			defined $self->{'base_target'} ? (
+				['a', 'target', $self->{'base_target'}],
+			) : (),
+			['e', 'base'],
+		);
+	}
 	if (defined $self->{'charset'}) {
 		$self->{'tags'}->put(
 			['b', 'meta'],
@@ -123,6 +171,7 @@ sub process {
 	$self->_meta('description');
 	$self->_meta('generator');
 	$self->_meta('keywords');
+	$self->_meta('robots');
 	$self->_meta('viewport');
 	if (defined $self->{'refresh'}) {
 		$self->{'tags'}->put(
@@ -132,6 +181,8 @@ sub process {
 			['e', 'meta'],
 		);
 	}
+
+	$self->_favicon;
 
 	if (@{$self->{'script_js'}}) {
 		foreach my $script_js (@{$self->{'script_js'}}) {
@@ -167,9 +218,68 @@ sub process {
 				['e', 'style'],
 			) : (),
 		),
+	);
+	if (@{$self->{'css_src'}}) {
+		foreach my $css_src_hr (@{$self->{'css_src'}}) {
+			$self->{'tags'}->put(
+				['b', 'link'],
+				['a', 'rel', 'stylesheet'],
+				['a', 'href', $css_src_hr->{'link'}],
+				$css_src_hr->{'media'} ? (
+					['a', 'media', $css_src_hr->{'media'}],
+				) : (),
+				['a', 'type', 'text/css'],
+				['e', 'link'],
+			);
+		}
+	}
 
+	if (defined $self->{'rss'}) {
+		$self->{'tags'}->put(
+			['b', 'link'],
+			['a', 'rel', 'alternate'],
+			['a', 'type', 'application/rss+xml'],
+			['a', 'title', 'RSS'],
+			['a', 'href', $self->{'rss'}],
+			['e', 'link'],
+		);
+	}
+
+	$self->{'tags'}->put(
 		['e', 'head'],
 		['b', 'body'],
+	);
+
+	return;
+}
+
+sub _favicon {
+	my $self = shift;
+
+	if (! defined $self->{'favicon'}) {
+		return;
+	}
+
+	my ($suffix) = $self->{'favicon'} =~ m/\.(ico|png|jpg|gif|svg)$/ms;
+	my $image_type;
+	if ($suffix eq 'ico') {
+		$image_type = 'image/vnd.microsoft.icon';
+	} elsif ($suffix eq 'png') {
+		$image_type = 'image/png';
+	} elsif ($suffix eq 'svg') {
+		$image_type = 'image/svg+xml';
+	} elsif ($suffix eq 'gif') {
+		$image_type = 'image/gif';
+	} else {
+		$image_type = 'image/jpeg';
+	}
+
+	$self->{'tags'}->put(
+		['b', 'link'],
+		['a', 'rel', 'icon'],
+		['a', 'href', $self->{'favicon'}],
+		['a', 'type', $image_type],
+		['e', 'link'],
 	);
 
 	return;
@@ -233,11 +343,36 @@ Author name.
 
 Default value is undef.
 
+=item * C<base_href>
+
+Base link (<base href="https://skim.cz" />.
+
+Default value is undef.
+
+=item * C<base_target>
+
+Base target.
+It's used in if 'base_href' parameter exists.
+
+Default value is undef.
+
 =item * C<css>
 
 'CSS::Struct::Output' object for L<process_css> processing.
 
 Default value is undef.
+
+=item * C<css_src>
+
+List of CSS link structures.
+
+ Structure is something like:
+ {
+   'link' => '/foo.css',
+   'media' => 'screen',
+ }
+
+Default value is [].
 
 =item * C<charset>
 
@@ -256,6 +391,13 @@ Default value is undef.
 Document doctype string.
 
 Default value is '<!DOCTYPE html>'.
+
+=item * C<favicon>
+
+Favorite icon image link.
+Supported images are 'ICO', 'PNG', 'GIF', 'SVG' and 'JPG' files.
+
+Default value is undef.
 
 =item * C<generator>
 
@@ -280,6 +422,18 @@ Default value is reference to hash with these value:
 =item * C<refresh>
 
 Page refresh time in seconds.
+
+Default value is undef.
+
+=item * C<robots>
+
+Robots meta.
+
+Default value is undef.
+
+=item * C<rss>
+
+RSS link.
 
 Default value is undef.
 
@@ -323,6 +477,9 @@ Returns undef.
 
  new():
          Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+         Parameter 'css_src' must be a array.
+         Parameter 'css_src' must be a array of hash structures.
+         Parameter 'css_src' must be a array of hash structures with 'media' and 'link' keys.
          Parameter 'script_js' must be a array.
          Parameter 'script_js_src' must be a array.
          Parameter 'tags' must be a 'Tags::Output::*' class.
@@ -356,9 +513,9 @@ Returns undef.
  # Process page
  $css->put(
         ['s', 'div'],
-	['d', 'color', 'red'],
-	['d', 'background-color', 'black'],
-	['e'],
+        ['d', 'color', 'red'],
+        ['d', 'background-color', 'black'],
+        ['e'],
  );
  $begin->process;
  $tags->put(
@@ -400,6 +557,7 @@ Returns undef.
 
 L<Class::Utils>,
 L<Error::Pure>,
+L<List::MoreUtils>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -430,6 +588,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.09
 
 =cut

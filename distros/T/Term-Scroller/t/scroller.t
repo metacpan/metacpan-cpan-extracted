@@ -40,23 +40,23 @@ sub get_scroller_output {
 my %test1 = ( in => <<"ENDIN", out => <<"ENDOUT");
 Hey there!
 
-How are ya? This is a
-very simple test.
+\tHow are ya? This is a
+\tvery simple test.
 ENDIN
 Hey there!\033[K
 \033[0m\033[1;FHey there!\033[K
 \033[K
 \033[0m\033[2;FHey there!\033[K
 \033[K
-How are ya? This is a\033[K
+  How are ya? This is a\033[K
 \033[0m\033[3;FHey there!\033[K
 \033[K
-How are ya? This is a\033[K
-very simple test.\033[K
+  How are ya? This is a\033[K
+  very simple test.\033[K
 \033[0m
 ENDOUT
 
-do_test(\%test1);
+do_test(\%test1, tabwidth => 2);
 
 my %test2 = ( in => <<"ENDIN", out => <<"ENDOUT");
 \033[1;31mWARNING:\033[0m This text runs long and also has colors in it!!

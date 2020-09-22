@@ -2,11 +2,12 @@ package FFI::Platypus::Type::StringPointer;
 
 use strict;
 use warnings;
+use 5.008004;
 use FFI::Platypus;
 use Scalar::Util qw( readonly );
 
 # ABSTRACT: Convert a pointer to a string and back
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 use constant _incantation =>
@@ -75,7 +76,7 @@ FFI::Platypus::Type::StringPointer - Convert a pointer to a string and back
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

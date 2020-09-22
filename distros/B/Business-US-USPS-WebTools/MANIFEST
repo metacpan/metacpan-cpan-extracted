@@ -1,22 +1,28 @@
 Changes
+CONTRIBUTING.md
 examples/address_standardization.pl
-examples/README
+examples/track.pl
 examples/zip_code_lookup.pl
-lib/AddressStandardization.pm
-lib/CityStateLookup.pm
-lib/WebTools.pm
-lib/ZipCodeLookup.pm
+INSTALL.SKIP
+lib/Business/US/USPS/WebTools.pm
+lib/Business/US/USPS/WebTools/AddressStandardization.pm
+lib/Business/US/USPS/WebTools/CityStateLookup.pm
+lib/Business/US/USPS/WebTools/TrackConfirm.pm
+lib/Business/US/USPS/WebTools/ZipCodeLookup.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-README
+MANIFEST.SKIP
+README.pod
 t/address_verification.t
 t/city_state_lookup.t
 t/load.t
 t/pod.t
 t/pod_coverage.t
-t/prereq.t
 t/test_manifest
 t/test_or_live.t
+t/track_confirm.t
 t/zip_code_lookup.t
-META.yml                                 Module meta-data (added by MakeMaker)
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

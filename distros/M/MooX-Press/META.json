@@ -3,7 +3,7 @@
    "author" : [
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
@@ -36,6 +36,10 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Moose" : "2.12",
+            "MooseX::NonMoose" : "0"
+         },
          "requires" : {
             "Exporter::Tiny" : "1.000000",
             "Import::Into" : "0",
@@ -49,32 +53,40 @@
             "Type::Tiny" : "1.010000",
             "namespace::autoclean" : "0",
             "perl" : "5.008008"
+         },
+         "suggests" : {
+            "Mouse" : "0",
+            "MouseX::NonMoose" : "0"
          }
       },
       "test" : {
          "recommends" : {
             "Moose" : "2.12",
-            "Mouse" : "0"
+            "MooseX::NonMoose" : "0"
          },
          "requires" : {
             "Test::Fatal" : "0",
             "Test::More" : "0.96",
             "Test::Requires" : "0"
+         },
+         "suggests" : {
+            "Mouse" : "0",
+            "MouseX::NonMoose" : "0"
          }
       }
    },
    "provides" : {
       "MooX::Press" : {
          "file" : "lib/MooX/Press.pm",
-         "version" : "0.070"
+         "version" : "0.075"
       },
       "MooX::Press::Keywords" : {
          "file" : "lib/MooX/Press/Keywords.pm",
-         "version" : "0.070"
+         "version" : "0.075"
       },
       "Zydeco::Lite" : {
          "file" : "lib/Zydeco/Lite.pm",
-         "version" : "0.070"
+         "version" : "0.075"
       }
    },
    "release_status" : "stable",
@@ -93,7 +105,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-Press/project"
    },
-   "version" : "0.070",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
-   "x_static_install" : 1
+   "version" : "0.075",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

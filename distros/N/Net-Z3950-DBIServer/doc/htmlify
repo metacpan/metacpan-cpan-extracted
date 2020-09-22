@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# HTMLify -- trivial wrapper to pod2html making output acceptable.
+# $Header: /home/mike/cvs/mike/zSQLgate/doc/htmlify,v 1.7 2005-04-21 08:57:30 mike Exp $
+#
+#   ###	When I have time, I'd like to hack this up so that it plucks
+#	out the text associated with the NAME section, uses that as
+#	the <TITLE> and <H1>, and maps all the other <Hx>s to
+#	<Hx+1>s.
+#
+#   ###	Also, if we can possibly get pod2html to shut up mapping every
+#	"x" reference to "the x manpage", we should do so.
+
+echo '<?xml version="1.0" encoding="ISO-8859-1"?>'
+pod2html --htmlroot=/docs ${@+"$@"} |
+	sed 's@^</head>$@<link rel="stylesheet" type="text/css" href="style.css"\/>&@; s/<hr \/>//'

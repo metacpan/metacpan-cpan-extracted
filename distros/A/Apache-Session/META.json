@@ -4,7 +4,7 @@
       "Casey West <casey[at]geeknest.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.131490",
+   "generated_by" : "Module::Build version 0.4211",
    "keywords" : [
       "CGI",
       "session",
@@ -40,7 +40,7 @@
    "provides" : {
       "Apache::Session" : {
          "file" : "lib/Apache/Session.pm",
-         "version" : "1.93"
+         "version" : "1.94"
       },
       "Apache::Session::DB_File" : {
          "file" : "lib/Apache/Session/DB_File.pm",
@@ -168,5 +168,6 @@
          "url" : "http://github.com/chorny/Apache-Session"
       }
    },
-   "version" : "1.93"
+   "version" : "1.94",
+   "x_serialization_backend" : "JSON version 2.90"
 }

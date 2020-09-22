@@ -62,6 +62,7 @@ t/includes/file.conf
 t/includes/file.muse
 t/includes/main-2.muse
 t/includes/main.muse
+t/indexes-2.t
 t/indexes.t
 t/langs.t
 t/leaks.t
@@ -126,6 +127,8 @@ t/testfile/epub-meta.muse
 t/testfile/for-epub.muse
 t/testfile/for-multipar-footnotes.muse
 t/testfile/html-title.muse
+t/testfile/index-mark.expected
+t/testfile/index-mark.muse
 t/testfile/index-me-1.expected
 t/testfile/index-me-1.muse
 t/testfile/index-me-2.muse

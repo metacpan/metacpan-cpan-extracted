@@ -1,0 +1,8 @@
+# $Id: country.data,v 1.1 2008-05-16 15:48:13 mike Exp $
+# Field names
+id, name
+# Data
+1,England
+2,USA
+3,Canada
+4,France

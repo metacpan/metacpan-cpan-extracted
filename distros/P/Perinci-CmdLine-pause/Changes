@@ -1,4 +1,7 @@
-Revision history for Perinci-CmdLine-pause
+0.310   2020-09-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Switch to Log::ger.
+
 
 0.30    2015-09-03 (PERLANCAR)
 

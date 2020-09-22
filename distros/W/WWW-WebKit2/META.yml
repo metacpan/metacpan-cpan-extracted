@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::PkgConfig: '0'
   Glib::MakeHelper: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,11 +26,16 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  DateTime: '0'
+  Encode: '0'
+  File::Path: '0'
+  File::Slurper: '0'
   Glib: '0'
   Gtk3: '0'
   Gtk3::WebKit2: '0.011'
+  JSON: '0'
   Moose: '0'
   Time::HiRes: '0'
   X11::Xlib: '0'
-version: '0.111'
+version: '0.121'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

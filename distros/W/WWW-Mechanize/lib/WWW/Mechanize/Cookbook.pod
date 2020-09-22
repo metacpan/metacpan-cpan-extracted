@@ -13,7 +13,7 @@ WWW::Mechanize::Cookbook - Recipes for using WWW::Mechanize
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 INTRODUCTION
 

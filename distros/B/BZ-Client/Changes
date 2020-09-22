@@ -1,5 +1,11 @@
 Revision history for Perl extension BZ::Client.
 
+4.4003 Tuesday September 21 22:02 2020
+    - dist.ini changes
+    - Dropped TODO file, moved to GH issues
+    - Updated Travis testing
+    - No functional changes
+
 4.4002 Friday May 25 07:53 2017
     - Major enhancements to BZ::Client::Bug::Attachment's add() method
     - If you just provide a file_name, add() will try to slurp the file (silently failing)

@@ -1,0 +1,23 @@
+---
+abstract: 'Gateway between Z39.50 and the RDBMS of your choice'
+author:
+  - 'Mike Taylor <mike@miketaylor.org.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Z3950-DBIServer
+no_index:
+  namespace:
+    - Net::Z3950::RPN
+requires:
+  DBI: 1.2
+  MARC::Record: 1.38
+  Net::Z3950::SimpleServer: 1.03
+version: 1.07

@@ -1,4 +1,8 @@
-Revision history for Net-Checkpoint-Management-v1: 0.001007
+Revision history for Net-Checkpoint-Management-v1: 0.001008
+
+0.001008  2020-09-22 18:00:28+02:00 Europe/Vienna
+    - fix 'Use of uninitialized value in string eq' warning
+    - fix optional parameters of install_policy to be really optional
 
 0.001007  2020-09-14 12:30:08+02:00 Europe/Vienna
     - add install_policy method

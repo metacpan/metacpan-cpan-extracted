@@ -7,7 +7,7 @@ Objective
 ---
 
 A module for testing and doing other kind of metrics on regular text, as in books or
-novels, or, forthat matter, manuals. 
+novels, or, for that matter, manuals. 
 
 We're not there yet, but for the time being it is a pretty
 good spelling checker that can be used *on the cloud* in continuous
@@ -29,7 +29,7 @@ progress by telling you how many words you have written so far and in
 total, which is an intended side effect of counting the number of
 tests == number of words. 
 
-how can I use it?
+how can I use it in a CI pipeline?
 ---
 
 1. Save the files you want to be tested to a single directory called,

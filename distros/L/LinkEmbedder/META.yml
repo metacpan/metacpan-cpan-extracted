@@ -1,7 +1,7 @@
 ---
 abstract: 'Embed / expand oEmbed resources and other URL / links'
 author:
-  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+  - 'Joel Berger <joel.a.berger@gmail.com>'
 build_requires:
   Test::More: '1.00'
 configure_requires:
@@ -23,7 +23,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/linkembedder/issues
   homepage: https://github.com/jhthorsen/linkembedder
   repository: https://github.com/jhthorsen/linkembedder.git
-version: '1.13'
+version: '1.14'
 x_contributors:
   - 'Jan Henning Thorsen'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF8"?>
+<!-- $Id: yazserver.xml,v 1.1 2006-03-08 10:36:03 mike Exp $ -->
+<!-- this file configures the frontend YAZ server -->
+<!-- see: http://www.indexdata.com/yaz/doc/server.vhosts.tkl -->
+<yazgfs>
+  <listen id="public">tcp:@:8023</listen>
+  <server id="alvis" listenref="public">
+    <directory>./</directory>
+    <cql2rpn>pqf.properties</cql2rpn>
+    <explain xmlns="http://explain.z3950.org/dtd/2.0/">
+      <serverInfo>
+        <host>localhost</host>
+        <port>8023</port>
+        <database>works</database>
+      </serverInfo>
+    </explain>
+  </server>
+</yazgfs>

@@ -6,16 +6,16 @@ package DBIx::Class::Smooth::Lookup::DateTime::datepart;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 
 use parent 'DBIx::Class::Smooth::Lookup::Util';
 use Carp qw/carp confess/;
 use experimental qw/signatures postderef/;
 
 sub smooth__lookup__datepart($self, $column_name, $value, $params, @rest) {
-    $self->smooth__lookup_util__ensure_param_count('substring', $params, { at_least => 1, at_most => 1, regex => qr/^[a-z_]+$/i });
-
     my $datepart = $params->[0];
+    $self->smooth__lookup_util__ensure_param_count($datepart, $params, { at_least => 1, at_most => 1, regex => qr/^[a-z_]+$/i });
+
 
     local $SIG{'__WARN__'} = sub ($message) {
         if($message =~ m{uninitialized value within %part_map}) {
@@ -47,7 +47,7 @@ DBIx::Class::Smooth::Lookup::DateTime::datepart - Short intro
 
 =head1 VERSION
 
-Version 0.0104, released 2020-08-30.
+Version 0.0105, released 2020-09-20.
 
 =head1 SOURCE
 

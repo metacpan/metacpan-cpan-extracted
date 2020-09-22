@@ -14,6 +14,7 @@
 * [7.6 FOR loops](#7.6)
 * [7.7 Using STEP](#7.7)
 * [7.8 Nested loops](#7.8)
+* [7.9 FOR EACH loops](#7.9)
 
 ---
 
@@ -280,6 +281,10 @@ Loops can contain other loops. If you want to list the coordinates of all the sq
         END
 
 A FOR loop can go inside a WHILE loop, and a DO loop can go inside a FOR loop. In fact, any such combination of loops is allowed. If you use your TAB key properly, you'll find it easier to keep track of which line belongs to which loop.
+
+##<a name="7.9">7.9 FOR EACH loops</a>
+
+There is a second type of FOR loop which we'll discuss when we [get to arrays](ch09.html).
 
 ---
 

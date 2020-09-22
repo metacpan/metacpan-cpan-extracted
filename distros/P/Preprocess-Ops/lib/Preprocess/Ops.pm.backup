@@ -1,11 +1,11 @@
 #!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib
 #-------------------------------------------------------------------------------
-# Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
+# Preprocess ◁, ▷ and ▶ as operators in ANSI-C.
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2020
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Preprocess::Ops;
-our $VERSION = 202009010;
+our $VERSION = 202009019;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -15,9 +15,8 @@ use feature qw(say current_sub);
 use utf8;
 
 my $logFile = q(/home/phil/c/z/z/zzz.txt);                                      # Log to this file if present
-binModeAllUtf8;
 
-#D1 Preprocess                                                                  # Preprocess ▷ and ▶ as method dispatch operators.
+#D1 Preprocess                                                                  # Preprocess ◁, ▷ and ▶ as operators.
 
 sub trim($)                                                                     #P Remove trailing white space and comment
  {my ($s) = @_;                                                                 # String
@@ -182,6 +181,7 @@ sub c($$$;$)                                                                    
  {my ($inputFile, $cFile, $hFile, $column) = @_;                                # Input file, C output file, H output file, optional start column for comments (80)
 
   my $baseFile      = fn $inputFile;                                            # The base name of the file
+  my($shortBaseFile)= split /_/, $baseFile;                                     # Base name of the file preceding first underscore
   my $packageName   = ucfirst $baseFile;                                        # The package name which is used to replace $
   my $commentColumn = ($column // 80) - 1;                                      # Column in which to start comments
 
@@ -214,6 +214,7 @@ sub c($$$;$)                                                                    
   for my $c(@code)                                                              # Replace $ with package name.
    {$c =~ s(\$\$) ($baseFile)gs;                                                # $$ is base file name with first char lower cased
     $c =~ s(\$)   ($packageName)gs;                                             # $  is base file name with first character uppercased
+    $c =~ s(\@)   (${shortBaseFile}_)gs;                                        # @ is  translated to short base file name followed by underscore to support Gnome naming conventions
    }
 
   if (1)                                                                        # Parse source code
@@ -267,7 +268,7 @@ sub c($$$;$)                                                                    
        }
      }
     if (@duplicates)                                                            # Print duplicates
-     {for my $i(keys @code)                                                       # Index of each line
+     {for my $i(keys @code)                                                     # Index of each line
        {my $line = $code[$i];
         say STDERR sprintf("%06d  %s\n", $i, $line);
        }
@@ -337,16 +338,19 @@ END
 
   if (1)                                                                        # Preprocess input C file
    {for my $c(@code)                                                            # Source code lines
-     {$c =~ s{new\s*(\w+\s*)\(([^:)]*:[^)]*)\)}                                 # Constructor with named arguments in parenthesis based on: https://gcc.gnu.org/onlinedocs/gcc-10.2.0/gcc/Designated-Inits.html#Designated-Inits
+     {$c =~ s{([a-z0-9\$_>.*-]+)\s*◀\s*(.*?);}       {typeof($2) $1 = $2;}gis;  # Variable creation
+      $c =~ s{([a-z0-9\$_>.*-]+)\s*◁\s*(.*?);} {const typeof($2) $1 = $2;}gis;  # Constant creation
+
+      $c =~ s{new\s*(\w+\s*)\(([^:)]*:[^)]*)\)}                                 # Constructor with named arguments in parenthesis based on: https://gcc.gnu.org/onlinedocs/gcc-10.2.0/gcc/Designated-Inits.html#Designated-Inits
              {new$1(({struct $1 t = {$2, proto: &ProtoTypes_$1}; t;}))}gs;
 
       $c =~ s{new\s*(\w+\s*)(\(\))?([,;])}                                      # Constructor followed by [,;] calls for default constructor.
              {new$1(({struct $1 t = {proto: &ProtoTypes_$1};   t;}))$3}gs;
 
-      $c =~ s{([a-z0-9\$_>.-]+)\s*▶\s*(\w+)\s*\(} {$1->proto->$2($1, }gis;                   # Method call with arguments
-      $c =~ s{([a-z0-9\$_>.-]+)\s*▶\s*(\w+)}      {$1->proto->$2($1)}gis;                    # Method call with no arguments
-      $c =~ s{([a-z0-9\$_>.-]+)\s*▷\s*(\w+)\s*\(} {$1.proto->$2($1, }gis;                    # Method call with arguments
-      $c =~ s{([a-z0-9\$_>.-]+)\s*▷\s*(\w+)}      {$1.proto->$2($1)}gis;                     # Method call with no arguments
+      $c =~ s{([a-z0-9\$_>.*-]+)\s*▶\s*(\w+)\s*\(} {$1->proto->$2($1, }gis;     # Method call with arguments
+      $c =~ s{([a-z0-9\$_>.*-]+)\s*▶\s*(\w+)}      {$1->proto->$2($1)}gis;      # Method call with no arguments
+      $c =~ s{([a-z0-9\$_>.*-]+)\s*▷\s*(\w+)\s*\(} {$1.proto->$2($1, }gis;      # Method call with arguments
+      $c =~ s{([a-z0-9\$_>.*-]+)\s*▷\s*(\w+)}      {$1.proto->$2($1)}gis;       # Method call with no arguments
 
       $c =~ s( +\Z) ()gs;                                                       # Remove trailing spaces at line ends
      }
@@ -384,34 +388,73 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 =head1 Name
 
-Preprocess::Ops - Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
+Preprocess::Ops - Preprocess ◁,  ▷ and ▶ as operators in ANSI-C.
 
 =head1 Synopsis
 
-Preprocess ▷ and ▶ as method dispatch operators in ANSI-C by translating:
+=head2 Method dispatch operators: ▷ and ▶
+
+Preprocess ▷ and ▶ as method dispatch by translating:
+
+  p = node ▷ key("a");
+
+to:
+
+  p = node . proto->key(node, "a");
+
+and:
 
   p = node ▶ key("a");
 
 to:
 
-  p = node->proto->key(node, "a");
+  p = node -> proto->key(node, "a");
 
-and:
+=head2 Constant and variable creation operators: ◁ and ◀
 
-  p = tree ▷ root;
+Preprocess instances of ◁ as a constant creation operator:
 
-to:
+  c ◁ sfc("cba");
 
-  p = tree.proto->root(tree);
+to get:
 
-Occurrences of the B<$> character are replaced by the base name of
-the containing file with the first letter capitalized, so that
+  const typeof(sfc("cba")) c = sfc("cba");
+
+Preprocess instances of ◀ as a variable creation operator:
+
+  d ◀ sfc("cba");
+
+to get:
+
+  typeof(sfc("cba")) c = sfc("cba");
+
+which, in effect, produces:
+
+  const char c = sfc("cba");
+        char d = sfc("cba");
+
+in the context of:
+
+ char sfc(char *s) {return *s;}
+
+ int main(void) {
+   c ◁ sfc("cba");
+   d ◀ sfc("cba");
+   assert(c == 'c');
+ }
+
+=head2 File name substitution
+
+Occurrences of the B<$> character are replaced by the base name of the file
+containing the source with the first letter capitalized, so that:
 
   typedef struct $Node $Node;
 
 in a file called B<tree.c> becomes:
 
   typedef struct TreeNode TreeNode;
+
+=head2 new operator
 
 Occurrences of:
 
@@ -430,8 +473,8 @@ are replaced by:
   newXXX(({struct XXX t = {a:1, proto: &ProtoTypes_$1}; t;}))
 
 The prototype vectors are generated by examining all the methods defined in the
-B<c> file.  The prototype vectors are written to the specified B<h> file so
-that they can be included in the B<c> file for use via the ▷ and ▶ operators.
+B<c> file.  The prototype vectors are written to the specified B<h> file which
+should be included in the B<c> file for use via the ▷ and ▶ operators.
 
 See: L<https://github.com/philiprbrenan/C/blob/master/c/z/arenaRedBlackTree/arenaRedBlackTree.c> for a
 working example.
@@ -480,10 +523,10 @@ explicitly mentioned function B<data_$Node>.
 
 =head1 Description
 
-Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.
+Preprocess ◁,  ▷ and ▶ as operators in ANSI-C.
 
 
-Version 202009010.
+Version 202009019.
 
 
 The following sections describe the methods in each functional area of this
@@ -493,14 +536,7 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 =head1 Preprocess
 
-Preprocess ▷ and ▶ as method dispatch operators.
-
-=head2 mapCode($file)
-
-Find the structures and methods defined in a file
-
-     Parameter  Description
-  1  $file      Input file
+Preprocess ◁, ▷ and ▶ as operators.
 
 =head2 printData($lineNumber, $line)
 
@@ -855,6 +891,13 @@ Check whether a line of C code defines a structure, returning (name, flags, comm
 
      Parameter  Description
   1  $line      Line of C code
+
+=head2 mapCode($file)
+
+Find the structures and methods defined in a file
+
+     Parameter  Description
+  1  $file      Input file
 
 =head2 duplicateFunction($lineNumber, $inputFile, $code)
 

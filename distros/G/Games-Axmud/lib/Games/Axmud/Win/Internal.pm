@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2019 A S Lewis
+# Copyright (C) 2011-2020 A S Lewis
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, either version 3 of the
@@ -1152,6 +1152,22 @@
 
             # Get this window's entry strip object (if any)
             $stripObj = $self->ivShow('firstStripHash', 'Games::Axmud::Strip::Entry');
+
+            # In blind mode, and if this is a 'main' window, hijack the cursor keys and the escape
+            #   key for navigating the text-to-speech buffer
+            if (
+                (
+                    ($axmud::BLIND_MODE_FLAG && $axmud::CLIENT->ttsHijackFlag)
+                    || (! $axmud::BLIND_MODE_FLAG && $axmud::CLIENT->ttsForceHijackFlag)
+                )
+                && $self->visibleSession
+                && $axmud::CLIENT->ivExists('ttsHijackKeycodeHash', $string)
+            ) {
+                return $self->visibleSession->pseudoCmd(
+                    $axmud::CLIENT->ivShow('ttsHijackKeycodeHash', $string),
+                    $self->pseudoCmdMode,
+                );
+            }
 
             # Check that direct keys are enabled, if this is a 'main' window
             if ($self->visibleSession) {
@@ -2499,7 +2515,7 @@
 
         # Local variables
         my (
-            $stripObj, $openFlag,
+            $stripObj, $openFlag, $setupFlag,
             @list, @sensitiseList, @desensitiseList,
         );
 
@@ -2529,6 +2545,27 @@
             $openFlag = TRUE;
         }
 
+        # Test whether the setup wizwin is open (in which case, almost everything is desensitised)
+        OUTER: foreach my $winObj ($axmud::CLIENT->desktopObj->ivValues('freeWinHash')) {
+
+            if ($winObj->isa('Games::Axmud::WizWin::Setup')) {
+
+                $setupFlag = TRUE;
+
+                # In addition, the following menu items are desensitised
+                push (@desensitiseList,
+                    # 'World' column
+                    'connect', 'stop_client',
+                    # 'Edit' column
+                    'test_pattern',
+                    # 'Help' column
+                    'help', 'about', 'credits', 'license',
+                );
+
+                last OUTER;
+            }
+        }
+
         # Menu bar items that require a 'main' window with a visible session
         @list = (
             # 'World' column
@@ -2546,7 +2583,7 @@
             'load_plugin', 'show_plugin',
         );
 
-        if ($self->visibleSession) {
+        if (! $setupFlag && $self->visibleSession) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2577,6 +2614,7 @@
             # 'Interfaces' column
             'active_interfaces',
             'show_triggers', 'show_aliases', 'show_macros', 'show_timers', 'show_hooks',
+                'show_cmds', 'show_routes',
             # 'Tasks' column
             'freeze_tasks', 'chat_task',
             'run_locator_wiz_2',
@@ -2593,7 +2631,7 @@
             'run_script', 'run_script_task',
         );
 
-        if ($openFlag) {
+        if (! $setupFlag && $openFlag) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2609,7 +2647,7 @@
                 'guild_cmds', 'guild_routes',
         );
 
-        if ($openFlag && $self->visibleSession->currentGuild) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->currentGuild) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2625,7 +2663,7 @@
                 'race_cmds', 'race_routes',
         );
 
-        if ($openFlag && $self->visibleSession->currentRace) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->currentRace) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2641,7 +2679,7 @@
                 'char_cmds', 'char_routes',
         );
 
-        if ($openFlag && $self->visibleSession->currentChar) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->currentChar) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2654,7 +2692,7 @@
             'save_file',
         );
 
-        if ($openFlag && ! $stripObj->saveAllSessionsFlag) {
+        if (! $setupFlag && $openFlag && ! $stripObj->saveAllSessionsFlag) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2667,7 +2705,7 @@
             'start_stop_recording',
         );
 
-        if ($openFlag && ! $self->visibleSession->recordingPausedFlag) {
+        if (! $setupFlag && $openFlag && ! $self->visibleSession->recordingPausedFlag) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2680,7 +2718,7 @@
             'pause_recording',
         );
 
-        if ($openFlag && $self->visibleSession->recordingFlag) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->recordingFlag) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2693,7 +2731,7 @@
             'edit_advance_task',
         );
 
-        if ($openFlag && $self->visibleSession->advanceTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->advanceTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2706,7 +2744,7 @@
             'edit_connections_task',
         );
 
-        if ($openFlag && $self->visibleSession->connectionsTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->connectionsTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2719,7 +2757,7 @@
             'edit_attack_task',
         );
 
-        if ($openFlag && $self->visibleSession->attackTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->attackTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2732,7 +2770,7 @@
             'edit_chat_task',
         );
 
-        if ($openFlag && $self->visibleSession->chatTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->chatTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2745,7 +2783,7 @@
             'channels_task',
         );
 
-        if ($openFlag && $self->visibleSession->channelsTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->channelsTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2758,7 +2796,7 @@
             'compass_task',
         );
 
-        if ($openFlag && $self->visibleSession->compassTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->compassTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2771,7 +2809,7 @@
             'divert_task',
         );
 
-        if ($openFlag && $self->visibleSession->divertTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->divertTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2784,7 +2822,7 @@
             'inventory_task',
         );
 
-        if ($openFlag && $self->visibleSession->inventoryTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->inventoryTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2797,7 +2835,7 @@
             'locator_task',
         );
 
-        if ($openFlag && $self->visibleSession->locatorTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->locatorTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2810,7 +2848,7 @@
             'raw_token_task',
         );
 
-        if ($openFlag && $self->visibleSession->rawTokenTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->rawTokenTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2823,7 +2861,7 @@
             'status_task',
         );
 
-        if ($openFlag && $self->visibleSession->statusTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->statusTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2836,7 +2874,7 @@
             'edit_system_task',
         );
 
-        if ($openFlag && $self->visibleSession->systemTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->systemTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2849,7 +2887,7 @@
             'watch_task',
         );
 
-        if ($openFlag && $self->visibleSession->watchTask) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->watchTask) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2865,7 +2903,7 @@
             'recording_delete_line', 'recording_delete_multi', 'recording_delete_last',
         );
 
-        if ($openFlag && $self->visibleSession->recordingFlag) {
+        if (! $setupFlag && $openFlag && $self->visibleSession->recordingFlag) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2879,7 +2917,8 @@
         );
 
         if (
-            $openFlag
+            ! $setupFlag
+            && $openFlag
             && ($self->visibleSession->recordingFlag || $self->visibleSession->recordingList)
         ) {
             push (@sensitiseList, @list);
@@ -2893,7 +2932,7 @@
             'go_website',
         );
 
-        if ($axmud::CLIENT->browserCmd) {
+        if (! $setupFlag && $axmud::CLIENT->browserCmd) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -2912,7 +2951,7 @@
             $widget = $stripObj->ivShow('pluginMenuItemHash', $plugin);
             $pluginObj = $axmud::CLIENT->ivShow('pluginHash', $plugin);
 
-            if ($self->visibleSession && $pluginObj->enabledFlag) {
+            if (! $setupFlag && $self->visibleSession && $pluginObj->enabledFlag) {
                 $widget->set_sensitive(TRUE);
             } else {
                 $widget->set_sensitive(FALSE);
@@ -2955,6 +2994,20 @@
 
             # Nothing to sensitise/desensitise
             return undef;
+        }
+
+        # Test whether the setup wizwin is open (in which case, everything is desensitised)
+        OUTER: foreach my $winObj ($axmud::CLIENT->desktopObj->ivValues('freeWinHash')) {
+
+            if ($winObj->isa('Games::Axmud::WizWin::Setup')) {
+
+                foreach my $widget ($stripObj->toolbarWidgetList) {
+
+                    $widget->set_sensitive(FALSE);
+                }
+
+                return 1;
+            }
         }
 
         # Toolbar buttons that require a 'main' window with a visible session

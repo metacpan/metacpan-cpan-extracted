@@ -1,4 +1,4 @@
-# This file was auto-generated from iller.yaml by Dist::Iller on 2020-08-29 11:26:35 UTC.
+# This file was auto-generated from iller.yaml by Dist::Iller on 2020-09-12 15:18:34 UTC.
 
 on runtime => sub {
     requires 'Carp' => '1.38';
@@ -26,7 +26,9 @@ on test => sub {
     requires 'IO::Handle' => '0';
     requires 'IPC::Open3' => '0';
     requires 'Module::Load' => '0.26';
+    requires 'Test::DBIx::Class' => '0';
     requires 'Test::More' => '0.96';
+    requires 'Test::mysqld' => '0';
 };
 on test => sub {
     recommends 'CPAN::Meta' => '2.120900';

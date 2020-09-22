@@ -7,7 +7,7 @@ build_requires:
   Test::Exception: 0.15
   Test::More: 0.47
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.131490'
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150005'
 keywords:
   - CGI
   - session
@@ -20,7 +20,7 @@ name: Apache-Session
 provides:
   Apache::Session:
     file: lib/Apache/Session.pm
-    version: 1.93
+    version: 1.94
   Apache::Session::DB_File:
     file: lib/Apache/Session/DB_File.pm
     version: 1.01
@@ -118,4 +118,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/chorny/Apache-Session
-version: 1.93
+version: 1.94
+x_serialization_backend: YAML version 1.23

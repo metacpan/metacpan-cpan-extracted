@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-HandlesVia>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.016	2020-09-20
+
+ [ Bug Fixes ]
+ - Fix load order issue where handles_via is used in a Moo::Role when
+   Moo.pm isn't loaded yet.
+
 0.015	2020-09-12
 
  - Added: `reset` method for Array.

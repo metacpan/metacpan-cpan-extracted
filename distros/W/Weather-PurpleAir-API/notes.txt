@@ -1,0 +1,38 @@
+https://community.home-assistant.io/t/purpleair-air-quality-sensor/146588
+{% macro calcAQI(Cp, Ih, Il, BPh, BPl) -%}
+        {{ (((Ih - Il)/(BPh - BPl)) * (Cp - BPl) + Il)|round }}
+      {%- endmacro %}
+      {% if (value_json["results"][0]["PM2_5Value"]|float) > 1000 %}
+        invalid
+      {% elif (value_json["results"][0]["PM2_5Value"]|float) > 350.5 %}
+        {{ calcAQI((value_json["results"][0]["PM2_5Value"]|float), 500.0, 401.0, 500.0, 350.5) }}
+      {% elif (value_json["results"][0]["PM2_5Value"]|float) > 250.5 %}
+        {{ calcAQI((value_json["results"][0]["PM2_5Value"]|float), 400.0, 301.0, 350.4, 250.5) }}
+      {% elif (value_json["results"][0]["PM2_5Value"]|float) > 150.5 %}
+        {{ calcAQI((value_json["results"][0]["PM2_5Value"]|float), 300.0, 201.0, 250.4, 150.5) }}
+      {% elif (value_json["results"][0]["PM2_5Value"]|float) > 55.5 %}
+        {{ calcAQI((value_json["results"][0]["PM2_5Value"]|float), 200.0, 151.0, 150.4, 55.5) }}
+      {% elif (value_json["results"][0]["PM2_5Value"]|float) > 35.5 %}
+        {{ calcAQI((value_json["results"][0]["PM2_5Value"]|float), 150.0, 101.0, 55.4, 35.5) }}
+      {% elif (value_json["results"][0]["PM2_5Value"]|float) > 12.1 %}
+        {{ calcAQI((value_json["results"][0]["PM2_5Value"]|float), 100.0, 51.0, 35.4, 12.1) }}
+      {% elif (value_json["results"][0]["PM2_5Value"]|float) >= 0.0 %}
+        {{ calcAQI((value_json["results"][0]["PM2_5Value"]|float), 50.0, 0.0, 12.0, 0.0) }}
+      {% else %}
+        invalid
+      {% endif %}
+
+
+macro calcAQI(Cp, Ih, Il, BPh, BPl)
+  {{ (((Ih - Il)/(BPh - BPl)) * (Cp - BPl) + Il)|round }}
+
+  if (pm25) > 1000 
+    invalid
+  elif (pm25) > 350.5  calcAQI(pm25, 500.0, 401.0, 500.0, 350.5) 
+  elif (pm25) > 250.5  calcAQI(pm25, 400.0, 301.0, 350.4, 250.5) 
+  elif (pm25) > 150.5  calcAQI(pm25, 300.0, 201.0, 250.4, 150.5) 
+  elif (pm25) > 55.5   calcAQI(pm25, 200.0, 151.0, 150.4,  55.5) 
+  elif (pm25) > 35.5   calcAQI(pm25, 150.0, 101.0,  55.4,  35.5) 
+  elif (pm25) > 12.1   calcAQI(pm25, 100.0,  51.0,  35.4,  12.1) 
+  elif (pm25) >= 0.0   calcAQI(pm25,  50.0,   0.0,  12.0,   0.0) 
+  else invalid

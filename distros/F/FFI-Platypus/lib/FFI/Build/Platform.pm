@@ -2,7 +2,7 @@ package FFI::Build::Platform;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use Carp ();
 use Text::ParseWords ();
 use FFI::Temp;
@@ -11,7 +11,7 @@ use File::Spec;
 use FFI::Platypus::ShareConfig;
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub new
@@ -194,7 +194,7 @@ sub shellwords
 {
   my $self = _self(shift);
 
-  my $win = !!$self->osname eq 'MSWin32';
+  my $win = !!($self->osname eq 'MSWin32');
 
   grep { defined $_ } map {
     ref $_
@@ -421,7 +421,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

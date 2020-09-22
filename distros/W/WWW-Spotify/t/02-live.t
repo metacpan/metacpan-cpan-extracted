@@ -60,6 +60,16 @@ SKIP: {
         'result string for browse_new_releases contains the word total'
     );
 
+    # force client auth
+    $result = $obj->search(
+        'tania bowra', 'artist',
+        { limit => 15, offset => 0 }
+    );
+
+    ok(
+        $result =~ //,
+        'result string for search contains the word total'
+    );
 }
 
 done_testing();

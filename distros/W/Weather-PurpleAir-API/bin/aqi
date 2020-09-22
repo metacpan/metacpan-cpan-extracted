@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+# Copyright (C) 2017-2020 Bill Moyer
+# Available for unlimited distribution and use.
+# The copyright is just so someone else cannot claim ownership and sue me for use of my own code.
+
+use strict;
+use warnings;
+use v5.10;  # provides "say" and "state"
+
+use lib "./lib";
+use Weather::PurpleAir::API;
+
+my @DOCS;
+my %OPT = (v => 1);
+foreach my $arg (@ARGV) {
+    if    ($arg =~ /^\-+(.+?)\=(.*)/) { $OPT{$1} = $2; }
+    elsif ($arg =~ /^\-+(v+)$/      ) { $OPT{v}  = length($1) + 1; }
+    elsif ($arg =~ /^\-+q$/         ) { $OPT{v}  = 0;  }
+    elsif ($arg =~ /^\-+quiet$/     ) { $OPT{v}  = 0;  }
+    elsif ($arg =~ /^\-+(.+)/       ) { $OPT{$1} = -1; }
+    else { push (@DOCS, $arg); }
+}
+
+exit(main(\@DOCS, \%OPT));
+
+sub main {
+    my ($docs_ar, $opt_hr) = @_;
+
+    if (opt('h') || opt('help')) {
+      usage();
+      return 0;
+    }
+
+    if (opt('version')) {
+      print "Weather::PurpleAir::API v$Weather::PurpleAir::API::VERSION\n";
+      return 0;
+    }
+
+    my $api_or = Weather::PurpleAir::API->new(%$opt_hr);
+    my $hr = $api_or->report();
+
+    return defined $hr ? 1 : 0;
+}
+
+sub opt {
+    my ($name, $default_value, $alt_hr) = @_;
+    $alt_hr //= {};
+    return $OPT{$name} // $alt_hr->{$name} // $default_value;
+}
+
+sub usage {
+  print "usage: $0 --sensor=<id>[,<id>,...] [options]\n",
+        "  --api_url=<URL>  set API url (default https://www.purpleair.com/json?show=)\n",
+        "  --average        display averages per sensor rather than every value\n",
+        "  -g               provide gestalt guess of net AQI\n",
+        "  -i               round outputs to nearest whole integers\n",
+        "  --no_errors      squelch error notifications to stderr\n",
+        "  --no_warnings    squelch warning notifications to stderr\n",
+        "  --now            report current AQI instead of ten-minute average\n",
+        "  --prune-threshold=<fraction>\n",
+        "                   set threshold for pruning additional outliers with -g\n",
+        "                   (default 0.1 (10%))\n",
+        "  --raw            report raw concentration numbers, not EPA PM2.5 AQI\n",
+        "  --sensor=<IDS>   numeric IDs of sensors to query (default 25407)\n",
+        "  --stash-path=<DIRECTORY>\n",
+        "                   save fetched JSON blobs to given directory\n",
+        "\n",
+        "See documentation for Weather::PurpleAir::API for details on these options.\n",
+        "\n",
+        "Some example sensors and their IDs:\n\n",
+        "   22961   City Of Santa Rosa Laguna Treatment Plant\n";
+        "   25407   Gravenstein School\n",
+        "   26363   Geek Orchard\n",
+        "   38887   Litchfield\n";
+}
+
+=head1 USAGE
+
+    $ aqi --sensor=<id>[,<id>,...] [options]
+
+=head1 OPTIONS
+
+  --api_url=<URL>  set API url (default https://www.purpleair.com/json?show=)
+  --average        display averages per sensor rather than every value
+  -g               provide gestalt guess of net AQI
+  -i               round displayed numbers to their nearest integer values
+  --no_errors      squelch error notifications to stderr
+  --no_warnings    squelch warning notifications to stderr
+  --now            report current AQI instead of ten-minute average
+  --prune-threshold=<fraction>
+                   set threshold for pruning additional outliers with -g
+                   (default 0.1 (10%))
+  --raw            report raw concentration numbers, not EPA PM2.5 AQI
+  --sensor=<IDS>   numeric IDs of sensors to query (default 25407)
+  --stash-path=<DIRECTORY>
+                   save fetched JSON blobs to given directory",
+
+See documentation for L<Weather::PurpleAir::API> for details on these options.
+
+=head1 OUTPUT
+
+Report is one line per sensor, each line consisting of tab-separated sensor 
+name and PM2.5 values (or their average with --average).
+
+=head1 ABOUT GUESS
+
+The gestalt guess (-g option) is reported with sensor name "GUESSING".
+
+The first value provided is the average of sensor readings.  It will 
+discount outliers if enough sensor readings were provided.
+
+The second value is the standard deviation of the guess.  Higher implies 
+lower confidence (more skew between the average and the actual values).
+
+The guess output is not influenced by the --average option.
+
+=head1 ABOUT RELIABILITY
+
+The sensor readings are not always reliable.  A car starting or a person
+smoking near the sensor can produce a false high reading.  Right now the
+workaround is to specify multiple sensors and use the -g option.  Future 
+releases will provide alternative remedies.
+
+=head1 EXAMPLES
+
+    $ aqi --sensor=22961,25407,26363,38887 -g
+
+    City Of Santa Rosa Laguna Treatment Plant       97.4506528040242        97.2762981784708
+    Gravenstein School      105.746724675409        104.535337039851
+    Geek Orchard    110.119707305832        105.034255297563
+    Litchfield      101.627723408978        104.651888137621
+    GUESSING        104.140418315465        4.14926751407653
+
+    $ bin/aqi --sensor=22961,38887 -g -i
+
+    City Of Santa Rosa Laguna Treatment Plant       109     108
+    Litchfield      109     121
+    GUESSING        109     6
+
+    $ aqi --sensor=22961,38887 --average
+
+    City Of Santa Rosa Laguna Treatment Plant       98.5790284968979
+    Litchfield      103.551331508591
+
+=cut
+

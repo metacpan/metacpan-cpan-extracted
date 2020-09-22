@@ -2,10 +2,11 @@ package FFI::Platypus::Record::TieArray;
 
 use strict;
 use warnings;
+use 5.008004;
 use Carp qw( croak );
 
 # ABSTRACT: Tied array interface for record array members
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub TIEARRAY
@@ -62,7 +63,7 @@ FFI::Platypus::Record::TieArray - Tied array interface for record array members
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

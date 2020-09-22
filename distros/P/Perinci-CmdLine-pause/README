@@ -1,9 +1,40 @@
-DESCRIPTION
+NAME
+    Perinci::CmdLine::pause - Perinci::CmdLine::Lite subclass for pause
 
+VERSION
+    This document describes version 0.310 of Perinci::CmdLine::pause (from
+    Perl distribution Perinci-CmdLine-pause), released on 2020-09-18.
+
+DESCRIPTION
     This class adds a hook_after_read_config_file to read CPAN::Uploader's
-    config file in ~/.pause. Encrypted .pause is not supported.
+    config file in "~/.pause". Encrypted ".pause" is not supported.
 
     This module is distributed separately from App::pause because we want
     pause to be fatpacked and depends only on a few other modules
     (LWP::UserAgent and LWP::Protocol::https).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-CmdLine-pause>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-CmdLine-pause>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-pause
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

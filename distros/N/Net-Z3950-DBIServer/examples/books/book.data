@@ -1,0 +1,42 @@
+# $Id: book.data,v 1.4 2008-05-16 15:48:37 mike Exp $
+# Field names
+id,author_id,name,year,notes
+# Data
+1,1,The Hitch Hiker's Guide to the Galaxy,1979,
+2,1,The Restaurant at the End of the Universe,1980,
+3,1,Life the Universe and Everything,1982,
+4,1,So Long and Thanks for all the Fish,1984,
+5,1,Mostly Harmless,1992,
+6,1,Dirk Gently's Holistic Detective Agency,1987,
+7,1,The Long Dark Teatime of the Soul,1988,
+8,1,Last Chance to See,1990,with Mark Carwardine
+9,1,The Meaning of Liff,1983,with John Lloyd
+10,1,The Deeper Meaning of Liff,1990,with John Lloyd
+11,2,In Defence of Fascism,1997,
+12,2,Coffee With Sinistar,1999,
+13,2,Everybody vs. Bob the Angry Flower,2001,
+14,3,The Taming of the Screw,1983,
+15,3,Babies and Other Hazards of Sex,1984,
+16,3,Stay Fit and Healthy Until You're Dead,1985,
+17,3,Claw Your Way to the Top,1986,
+18,3,Bad Habits,1985,
+19,3,Dave Barry's Guide to Marriage and/or Sex,1987,
+20,3,Homes and Other Black Holes,1988,
+21,3,Dave Barry's Greatest Hits,1988,### date is a guess
+22,3,Dave Barry Slept Here,1989,
+23,3,Dave Barry Turns 40,1990,
+24,3,Dave Barry Talks Back,1991,
+25,3,Dave Barry's Only Travel Guide You'll Ever Need,1991,
+26,3,Dave Barry Does Japan,1992,
+27,3,Dave Barry Is Not Making This Up,1993,### date is a guess,
+28,3,Dave Barry's Gift Guide to End All Gift Guides,1994,### date is a guess,
+29,3,Dave Barry's Complete Guide to Guys,1995,### date is a guess,
+30,3,Dave Barry in Cyberspace,1996,
+31,3,Dave Barry's Book of Bad Songs,1997,
+32,3,Dave Barry Is from Mars and Venus,1997,
+33,3,Dave Barry Turns 50,1998,
+34,3,Big Trouble,1999,
+35,3,Dave Barry Is Not Taking This Sitting Down,2000,### date is a guess
+36,0,Pride and Prejudice,1831
+37,4,The Dinosaur Heresies,1987
+38,5,À la Recherche du Temps Perdu,1871

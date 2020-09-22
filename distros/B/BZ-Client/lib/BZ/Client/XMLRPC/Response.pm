@@ -6,7 +6,7 @@ use strict;
 use warnings 'all';
 
 package BZ::Client::XMLRPC::Response;
-$BZ::Client::XMLRPC::Response::VERSION = '4.4002';
+$BZ::Client::XMLRPC::Response::VERSION = '4.4003';
 use parent qw( BZ::Client::XMLRPC::Handler );
 use BZ::Client::XMLRPC::Value;
 use BZ::Client::Exception;
@@ -110,7 +110,7 @@ BZ::Client::XMLRPC::Response - Event handler for parsing an XML-RPC response.
 
 =head1 VERSION
 
-version 4.4002
+version 4.4003
 
 =head1 AUTHORS
 
@@ -128,7 +128,7 @@ Jochen Wiedmann <jochen.wiedmann@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dean Hamstad.
+This software is copyright (c) 2020 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,51 @@
+#! /bin/sh
+
+# $Id: init-script,v 1.2 2007-08-14 23:32:46 mike Exp $
+#
+# This is a startup/shutdown script for zSQLgate, suitable for use in
+# a SysV-style init directory such as /etc/init.d (on Debian systems)
+# and /etc/rc.d/init.d (on Red Hat systems), like this:
+#
+#	cd /etc/init.d/
+#	sudo cp .../zSQLgate/examples/init-script zSQLgate
+#	sudo vi zSQLgate # customise
+#	cd ../rc2.d
+#	sudo ln -s ../init.d/zSQLgate S99zSQLgate
+#	cd
+#	sudo /etc/init.d/zSQLgate start
+#
+# You may need to tweak it to suit your system's paths.
+
+
+# zSQLgate may be in /usr/local/bin, hence this slight lax path
+PATH=/bin:/usr/bin:/usr/local/bin/
+logfile=/var/log/zSQLgate
+pidfile=/var/run/zSQLgate.pid
+
+case "$1" in
+  start)
+	if [ -f $pidfile ]; then
+		echo "zSQLgate seems to be already running"
+		exit 1
+	fi
+	echo "Starting zSQLgate"
+	( zSQLgate /home/radmin/ifvd/etc/ifvd.nzd < /dev/null >>$logfile 2>&1 &
+	  echo $! > $pidfile
+	)
+	;;
+  stop)
+	if [ ! -f $pidfile ]; then
+		echo "zSQLgate does not seem to be running"
+		exit 1
+	fi
+	echo "Stopping zSQLgate"
+	kill `cat $pidfile`
+	rm $pidfile
+	;;
+  restart)
+	$0 stop && $0 start
+	;;
+  *)
+	echo "Usage: $0 start|stop|restart" >&2
+        ;;
+esac

@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
     "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,
     "Data::Sah::Coerce::perl::To_date::From_str::iso8601" => 0,
+    "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::date" => 0,
     "Data::Sah::Compiler::perl::TH::hash" => 0,
@@ -53,7 +54,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,6 +66,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
   "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,
   "Data::Sah::Coerce::perl::To_date::From_str::iso8601" => 0,
+  "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::date" => 0,
   "Data::Sah::Compiler::perl::TH::hash" => 0,

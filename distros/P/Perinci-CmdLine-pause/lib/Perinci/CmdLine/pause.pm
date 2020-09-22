@@ -1,12 +1,14 @@
 package Perinci::CmdLine::pause;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.30'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-18'; # DATE
+our $DIST = 'Perinci-CmdLine-pause'; # DIST
+our $VERSION = '0.310'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use parent qw(Perinci::CmdLine::Lite);
 
@@ -22,7 +24,7 @@ sub hook_after_read_config_file {
     return unless -f $path;
 
     open my($fh), "<", $path or die [500, "Can't read $path: $!"];
-    $log->tracef("[pericmd-pause] Reading %s ...", $path);
+    log_trace("[pericmd-pause] Reading %s ...", $path);
     $r->{read_config_files} = [$path];
     while (<$fh>) {
         if (/^user\s+(.+)/) { $r->{config}{GLOBAL}{username} = $1 }
@@ -45,7 +47,7 @@ Perinci::CmdLine::pause - Perinci::CmdLine::Lite subclass for pause
 
 =head1 VERSION
 
-This document describes version 0.30 of Perinci::CmdLine::pause (from Perl distribution Perinci-CmdLine-pause), released on 2015-09-03.
+This document describes version 0.310 of Perinci::CmdLine::pause (from Perl distribution Perinci-CmdLine-pause), released on 2020-09-18.
 
 =head1 DESCRIPTION
 
@@ -78,7 +80,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

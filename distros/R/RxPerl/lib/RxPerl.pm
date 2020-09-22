@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v0.27.0";
+our $VERSION = "v0.27.1";
 
 1;
 __END__
@@ -337,6 +337,8 @@ too).
 
 L<https://rxjs.dev/api/operators/auditTime>
 
+Works like rxjs's "auditTime", except the parameter is in seconds instead of ms.
+
     # 30, complete
     rx_concat(
         rx_of(10, 20, 30),
@@ -552,6 +554,8 @@ L<https://rxjs.dev/api/operators/refCount>
 
 L<https://rxjs.dev/api/operators/sampleTime>
 
+Works like rxjs's "sampleTime", except the parameter is in seconds instead of ms.
+
     # 0, 2, 3, 5, 6, 8, ...
     rx_interval(1)->pipe(
         op_sample_time(1.6),
@@ -651,8 +655,10 @@ L<https://rxjs.dev/api/operators/tap>
 
 L<https://rxjs.dev/api/operators/throttleTime>
 
-At the moment, this function does not accept the configuration options that
-rxjs's throttleTime accepts. Only the first parameter (duration) is taken into account.
+Works like rxjs's "throttleTime", except the parameter is in seconds instead of ms.
+
+At the moment, this function only accepts C<duration> as parameter, not the configuration options that
+rxjs's throttleTime accepts.
 
     # 0, 3, 6, 9, 12, ...
     rx_interval(1)->pipe(

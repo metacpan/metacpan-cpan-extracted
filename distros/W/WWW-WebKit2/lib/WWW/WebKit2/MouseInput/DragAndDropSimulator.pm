@@ -1,6 +1,5 @@
 package WWW::WebKit2::MouseInput::DragAndDropSimulator;
 
-use common::sense;
 use Moose;
 
 has javascript_string => (

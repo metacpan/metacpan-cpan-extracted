@@ -2,13 +2,14 @@ package FFI::Probe::Runner::Builder;
 
 use strict;
 use warnings;
+use 5.008004;
 use Config;
 use Capture::Tiny qw( capture_merged );
 use Text::ParseWords ();
 use FFI::Build::Platform;
 
 # ABSTRACT: Probe runner builder for FFI
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub new
@@ -250,7 +251,7 @@ FFI::Probe::Runner::Builder - Probe runner builder for FFI
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

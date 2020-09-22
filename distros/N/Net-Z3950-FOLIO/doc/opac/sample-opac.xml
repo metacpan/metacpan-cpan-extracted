@@ -1,0 +1,45 @@
+<opacRecord>
+  <bibliographicRecord />
+  <holdings>
+    <holding>
+      <typeOfRecord>xxx</typeOfRecord>
+      <encodingLevel>xxx</encodingLevel>
+      <format>xxx</format>
+      <receiptAcqStatus>xxx</receiptAcqStatus>
+      <generalRetention>xxx</generalRetention>
+      <completeness>xxx</completeness>
+      <dateOfReport>xxx</dateOfReport>
+      <nucCode>xxx</nucCode>
+      <localLocation>xxx</localLocation>
+      <shelvingLocation>xxx</shelvingLocation>
+      <callNumber>xxx</callNumber>
+      <shelvingData>xxx</shelvingData>
+      <copyNumber>xxx</copyNumber>
+      <publicNote>xxx</publicNote>
+      <reproductionNote>xxx</reproductionNote>
+      <termsUseRepro>xxx</termsUseRepro>
+      <enumAndChron>xxx</enumAndChron>
+      <volumes>
+        <volume>
+	  <enumeration>xxx</enumeration>
+	  <chronology>xxx</chronology>
+	  <enumAndChron>xxx</enumAndChron>
+        </volume>
+      </volumes>
+      <circulations>
+        <circulation>
+	  <availableNow value="xxx" />
+	  <availabilityDate>xxx</availabilityDate>
+	  <availableThru>xxx</availableThru>
+	  <restrictions>xxx</restrictions>
+	  <itemId>xxx</itemId>
+	  <renewable value="xxx" />
+	  <onHold value="xxx" />
+	  <enumAndChron>xxx</enumAndChron>
+	  <midspine>xxx</midspine>
+	  <temporaryLocation>xxx</temporaryLocation>
+        </circulation>
+      </circulations>
+    </holding>
+  </holdings>
+</opacRecord>

@@ -2,13 +2,13 @@ package FFI::Platypus;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use Carp qw( croak );
 use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -583,7 +583,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for perl distribution LinkEmbedder
 
+1.14 2020-09-21T08:47:37+0900
+ - Select github line ranges when specified
+   Contributor: Joel Berger
+
 1.13 2020-09-17T13:08:51+0900
  - Fix parsing imgur links #17
  - Fix parsing metacpan.org links

@@ -316,7 +316,16 @@ sub display_data ($@) {
         # are then encoded into bytes of the page final encoding.
         # JSON's to_json() call is exactly that, character output.
         #
-        $self->textout(to_json($data));
+        my $json=to_json($data);
+
+        # The data is typically embedded in a <script>...</script> set
+        # of tags, so if the content of a data field has </script> then
+        # that would close the outer script tag allowing that content to
+        # execute in the page context. Bad bad bad.
+        #
+        $json =~ s/([<>])/'\\u' . sprintf('%04x',ord($1))/esg;
+
+        $self->textout($json);
     }
     elsif($format eq 'xml' || $format eq 'xml-embed') {
         my $xml_sub=$self->get_mode_sub('xml',$args->{'xmlmode'} || $args->{'mode'},$args->{'mode'});

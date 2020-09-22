@@ -15,7 +15,7 @@
 
 ##<a name="1.1">1.1 Axbasic</a>
 
-[Axmud](http://axmud.sourceforget.io) is a [MUD client](https://en.wikipedia.org/wiki/MUD_client) written in Perl 5 / Gtk2.
+[Axmud](http://axmud.sourceforget.io) is a [MUD client](https://en.wikipedia.org/wiki/MUD_client) written in Perl 5 / Gtk3.
 
 Axbasic is the built-in scripting language used by Axmud. It's suitable for most scripting purposes, from the simple to the complex.
 

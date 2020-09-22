@@ -35,7 +35,7 @@ Each PRINT statement displays text on a brand new line. If you want successive P
 
 The third statement doesn't end with a semicolon, so the next PRINT statement - whenever it occurs - will use a new line.
 
-You can use semicolons to join strings together.
+In a PRINT statement, you can use semicolons to join strings together.
 
         LET word1$ = "Hello"
         LET word2$ = "world"
@@ -49,16 +49,34 @@ That will produce the following output:
 
         PRINT word1$ ; " " ; word2$
 
-Closely related to the semicolon is the comma ( , ) character which works a bit like your TAB key. You can use it to display data in columns.
+When you are PRINTing numbers, you don't need to add any space characters. 
+        
+        LET first = 10
+        LET second = 15
+        PRINT 10 ; 15
+
+This time you will see the output:
+
+        10  15
+
+In a PRINT statement, Axbasic adds a space character before and after every numeric value. For negative numbers, however, a space is not added before the minus sign.
+
+Closely related to the semicolon is the comma ( , ) character which works a bit like your TAB key. You can use it to display data in columns of 14 characters.
 
         LET val1 = 10
         LET val2 = 20
-        LET val3 = 50
+        LET val3 = -30
         PRINT "Column 1" , "Column 2" , "Column 3"
         PRINT val1 , val2 , val3
         END
 
-Older dialects of BASIC added a space character directly after PRINTing a numeric value. Axbasic doesn't do this unless forced window mode is in operation - see [Section 19](ch19.html).
+If you want a more direct way of displaying columns, you can use the pseudo-function TAB (). (We call it a pseudo-function because it doesn't return a value, and it can only be used in PRINT statements).
+
+TAB () moves an imaginary cursor to the column you specify. The first column is number 1. In the example above, you could replace the PRINT statement with this one, without changing the output.
+
+        PRINT val1 ; TAB (15) ; val2 ; TAB (29) ; val3
+
+If you specify a value to the left of the imaginary cursor, everything after the TAB () will be printed on a new line.
 
 ##<a name="10.2">10.2 Special features of INPUT</a>
 

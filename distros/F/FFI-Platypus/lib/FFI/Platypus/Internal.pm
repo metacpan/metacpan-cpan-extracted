@@ -2,7 +2,7 @@ package FFI::Platypus::Internal;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use FFI::Platypus;
 use base qw( Exporter );
 
@@ -12,7 +12,7 @@ _init();
 our @EXPORT = grep /^FFI_PL/, keys %FFI::Platypus::Internal::;
 
 # ABSTRACT: For internal use only
-our $VERSION = '1.31'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 1;
@@ -29,7 +29,7 @@ FFI::Platypus::Internal - For internal use only
 
 =head1 VERSION
 
-version 1.31
+version 1.32
 
 =head1 SYNOPSIS
 

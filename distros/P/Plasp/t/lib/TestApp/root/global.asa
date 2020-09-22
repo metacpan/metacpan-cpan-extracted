@@ -1,0 +1,13 @@
+use strict;
+
+sub Application_OnStart {
+    $Application->{start_time} = time;
+}
+
+sub Script_OnStart {
+    $Session->{request_count}++;
+}
+
+sub Session_OnStart {
+    $Session->{start_time} = time;
+}

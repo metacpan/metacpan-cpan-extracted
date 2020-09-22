@@ -1,3 +1,12 @@
+2020-09-21  jmerelo  <jmerelo@princess-carolyn>
+
+	* lib/Test/Text.pm: Changes again so that it can be called with or without calling done_testing.
+
+2020-09-21  jmerelo  <jmerelo@jjmerelo-System-Product-Name>
+
+	* lib/Test/Text.pm: New version eliminates done_testing from the check; this will break a few things, I'm afraid... 
+	Adde optional done_testing with a 4th argument to just_check. It's on by default, can be turned off.
+
 2019-10-31  Juan J. merelo  <jmerelo@penny>
 
 	* lib/Test/Text.pm: Latest version includes Text::Sentence (taken from HTML::Summary) to avoid installation of all dependencies in that module.
