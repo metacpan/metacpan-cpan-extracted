@@ -1,23 +1,30 @@
-0.010   2019-04-14 (PERLANCAR)
+0.011   2020-10-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add versioning_scheme() method in Role::Versioning::Scheme. This will
+	  make it easy for consumer class users to know which versioning scheme
+	  the class follows.
+
+
+0.010   2019-04-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Perl: Show bumping dev part in Synopsis.
 
 
-0.009   2019-04-14 (PERLANCAR)
+0.009   2019-04-14  Released-By: PERLANCAR
 
 	- Perl: Support bumping dev part.
 
 
-0.008   2018-11-18 (PERLANCAR)
+0.008   2018-11-18  Released-By: PERLANCAR
 
 	- Forgot to add $DATE and $VERSION to Role::Versioning::Scheme.
 
 	- Fix Abstract.
 
 
-0.007   2018-10-11 (PERLANCAR)
+0.007   2018-10-11  Released-By: PERLANCAR
 
 	- Add parse_version().
 
@@ -28,7 +35,7 @@
         - [doc][bugfix] Fix/update examples in Synopses.
 
 
-0.006   2018-10-11 (PERLANCAR)
+0.006   2018-10-11  Released-By: PERLANCAR
 
 	- Add Versioning::Scheme::Perl.
 
@@ -36,30 +43,30 @@
           bump_version().
 
 
-0.005   2018-10-11 (PERLANCAR)
+0.005   2018-10-11  Released-By: PERLANCAR
 
 	- Add Versioning::Scheme::Semantic.
 
 	- Monotonic: Follow the 1.2 version of monotonic versioning manifesto.
 
 
-0.004   2018-10-11 (PERLANCAR)
+0.004   2018-10-11  Released-By: PERLANCAR
 
 	- Add Versioning::Scheme::Monotonic.
 
 
-0.003   2018-10-05 (PERLANCAR)
+0.003   2018-10-05  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to make Versioning::Scheme::Dotted a Role::Tiny
 	  role.
 
 
-0.002   2018-10-05 (PERLANCAR)
+0.002   2018-10-05  Released-By: PERLANCAR
 
 	- [Incompatible change] Rename methods (add _version) so the
 	  Versioning::Scheme::* become more suitable to be mixed in.
 
 
-0.001   2018-10-04 (PERLANCAR)
+0.001   2018-10-04  Released-By: PERLANCAR
 
 	- First release.

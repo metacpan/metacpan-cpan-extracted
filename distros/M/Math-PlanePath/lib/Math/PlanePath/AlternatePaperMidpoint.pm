@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -18,6 +18,9 @@
 
 # math-image --path=AlternatePaperMidpoint,arms=8 --all --output=numbers_dash
 # math-image --path=AlternatePaperMidpoint --lines --scale=20
+#
+# A334576 ~/OEIS/a334576.gp.txt
+# Remy Sigrist, building vector of coordinates by segment expansion
 
 
 package Math::PlanePath::AlternatePaperMidpoint;
@@ -27,7 +30,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -575,6 +578,8 @@ L<http://oeis.org/A016116> (etc)
 
 =back
 
+    A334576     X coordinate
+    A334577     Y coordinate
     A016116     X/2 at N=2^k, being X/2=2^floor(k/2)
 
 =head1 SEE ALSO
@@ -592,7 +597,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

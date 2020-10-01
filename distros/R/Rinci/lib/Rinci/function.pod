@@ -22,7 +22,7 @@ Rinci::function - Metadata for your functions/methods
 
 =head1 VERSION
 
-This document describes version 1.1.93 of Rinci::function (from Perl distribution Rinci), released on 2019-07-19.
+This document describes version 1.1.95 of Rinci::function (from Perl distribution Rinci), released on 2020-10-01.
 
 =head1 INTRODUCTION
 
@@ -35,10 +35,12 @@ have not already done so.
 
 =head1 SPECIFICATION
 
-B<Result envelope>. Function should return an enveloped result to express error
-code/message as well as actual result. The envelope can be produced by the
-function itself, or added by a wrapper tool. Result envelope is modeled after
-HTTP or L<PSGI> response; it is an array in the following format:
+=head2 Enveloped result
+
+Function should return an enveloped result to express error code/message as well
+as actual result. The envelope can be produced by the function itself, or added
+by a wrapper tool. Result envelope is modeled after HTTP or L<PSGI> response; it
+is an array in the following format:
 
  [STATUS*, MESSAGE, RESULT, META]
 
@@ -64,23 +66,28 @@ actual result. It can also be easily converted to HTTP response message. And it
 can also contain extra data, useful for things like the transaction protocol
 (explained in L<Rinci::Transaction>).
 
-B<Special arguments>. Special arguments are some known arguments that start with
-dash (C<->) and serve special purposes. You need not specify them in the C<args>
-metadata property. Examples of special arguments include C<-dry_run>,
-C<-tx_action>, C<-action>, C<-confirm/*>, C<-arg_part_start>, C<-arg_part_len>,
-C<-res_part_start>, C<-res_part_len>. They will be explained in other related
-sections/documents.
+=head2 Special arguments
 
-B<Functions vs methods>. Since in many programming languages (like Perl 5,
-Python, Ruby, PHP) static functions are not that differentiated from methods,
-functions and methods share the same Rinci spec. But there are certain
-properties that can be used to declare if a function is (also) a method or not.
-See C<is_func>, C<is_meth>, C<is_class_meth> properties below for details.
+Special arguments are some known arguments that start with dash (C<->) and serve
+special purposes. You need not specify them in the C<args> metadata property.
+Examples of special arguments include C<-dry_run>, C<-tx_action>, C<-action>,
+C<-confirm/*>, C<-arg_part_start>, C<-arg_part_len>, C<-res_part_start>,
+C<-res_part_len>. They will be explained in other related sections/documents.
 
-B<Multiple dispatch>. This specification also does not (yet) have any
-recommendation on how to best handle functions in languages that support
-multiple dispatch, like Perl 6: whether we should create multiple metadata or
-just one. It is more up to the tool and what you want to do with the metadata.
+=head2 Functions vs methods
+
+Since in many programming languages (like Perl 5, Python, Ruby, PHP) static
+functions are not that differentiated from methods, functions and methods share
+the same Rinci spec. But there are certain properties that can be used to
+declare if a function is (also) a method or not. See C<is_func>, C<is_meth>,
+C<is_class_meth> properties below for details.
+
+=head2 Multiple dispatch
+
+This specification also does not (yet) have any recommendation on how to best
+handle functions in languages that support multiple dispatch, like Perl 6:
+whether we should create multiple metadata or just one. It is more up to the
+tool and what you want to do with the metadata.
 
 =head2 Envelope status codes
 
@@ -89,7 +96,7 @@ the suggestion on which codes to use (or avoid). An asterisk (C<*>) marks which
 codes are not defined in HTTP specification and introduced by this
 specification.
 
-=over 4
+=over
 
 =item * 1xx code
 
@@ -1062,6 +1069,14 @@ Int. Status from envelope. If unspecified, assumed to be 200.
 
 Any. Expected result.
 
+=item * env_result
+
+Array. Expected enveloped result.
+
+=item * naked_result
+
+Any. Expected naked result (payload).
+
 =item * summary (function example property)
 
 From DefHash. A one-line summary of the example You should describe, in one
@@ -1551,7 +1566,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

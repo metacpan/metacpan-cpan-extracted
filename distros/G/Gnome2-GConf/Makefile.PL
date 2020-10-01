@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/Gnome2-GConf/Makefile.PL,v 1.20 2007/09/29 13:09:26 kaffeetisch Exp $
+# $Id$
 #
 
 use 5.008;
@@ -29,6 +29,8 @@ unless (eval "use ExtUtils::Depends '$build_reqs{'perl-ExtUtils-Depends'}';"
            . "1") {
    warn "$@\n";
    WriteMakefile(
+         # don't clobber the existing META.yml
+         NO_META      => 1,
          PREREQ_FATAL => 1,
          PREREQ_PM    => {
             'Glib'                => $build_reqs{'perl-Glib'},
@@ -86,6 +88,8 @@ WriteMakefile(
     PREREQ_PM     => {}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM => 'GConf.pm', # retrieve abstract from module
     XSPROTOARG    => '-noprototypes',
+    # don't clobber the existing META.yml
+    NO_META       => 1,
     MAN3PODS	  => \%pod_files,
     $gconf->get_makefile_vars,
 );

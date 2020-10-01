@@ -6,6 +6,7 @@ MANIFEST.skip
 Makefile.PL
 README.md
 bin/z2folio
+doc/capabilities.md
 doc/from-pod/Makefile
 doc/from-pod/Net-Z3950-FOLIO-Config.md
 doc/from-pod/Net-Z3950-FOLIO.md
@@ -19,6 +20,7 @@ doc/opac/sample-opac.xml
 doc/opac/supporting-opac-records.txt
 doc/opac/test-opac.xml
 doc/opac/z3950-opac-record-syntax.asn1
+doc/release-procedure.md
 doc/srs/using-srs.md
 etc/config.json
 etc/folio2marcxml.xsl
@@ -30,7 +32,8 @@ lib/Net/Z3950/FOLIO/Config.pod
 lib/Net/Z3950/FOLIO/OPACXMLRecord.pm
 lib/Net/Z3950/FOLIO/ResultSet.pm
 t/01-pqf-to-cql.t
-t/02-folio-to-opac.t
+t/02-sortspec.t
+t/03-folio-to-opac.t
 t/data/expectedOutput1.xml
 t/data/expectedOutput2.xml
 t/data/input1.json

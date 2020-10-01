@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -45,8 +45,22 @@ my %seen_filename;
 
 foreach my $elem
   (
-   ['knight-temporary.png',
-    'math-image --path=KnightSpiral --lines --scale=20 --size=420 --figure=point'],
+   ['peano-diagonals-small.png',
+    'math-image --path=PeanoDiagonals --lines --scale=3 --size=32'],
+   ['peano-diagonals-big.png',
+    'math-image --path=PeanoDiagonals --lines --scale=12 --size=192'],
+   ['peano-diagonals-rounded-big.png',
+    'math-image --path=PeanoDiagonals --values=Lines,lines_type=rounded,midpoint_offset=0.4 --figure=point --scale=15 --size=192'],
+
+   ['peano-small.png',
+    'math-image --path=PeanoCurve --lines --scale=3 --size=32'],
+   ['peano-big.png',
+    'math-image --path=PeanoCurve --lines --scale=7 --size=192'],
+   ['peano-radix7-big.png',
+    'math-image --path=PeanoCurve,radix=7 --values=Lines --scale=5 --size=192'],
+
+   # ['knight-temporary.png',
+   #  'math-image --path=KnightSpiral --lines --scale=20 --size=420 --figure=point'],
 
    ['knight-small.png',
     'math-image --path=KnightSpiral --lines --scale=7 --size=32'],
@@ -561,14 +575,6 @@ foreach my $elem
     'math-image --path=CubicBase --lines --scale=18 --size=200'],
    ['cubicbase-radix5-big.png',
     'math-image --path=CubicBase,radix=5 --lines --scale=18 --size=200'],
-
-
-   ['peano-small.png',
-    'math-image --path=PeanoCurve --lines --scale=3 --size=32'],
-   ['peano-big.png',
-    'math-image --path=PeanoCurve --lines --scale=7 --size=192'],
-   ['peano-radix7-big.png',
-    'math-image --path=PeanoCurve,radix=7 --values=Lines --scale=5 --size=192'],
 
 
    ['gray-code-small.png',

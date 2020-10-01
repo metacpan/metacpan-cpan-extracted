@@ -14,6 +14,7 @@ package Spreadsheet::Read;
  my $book  = ReadData ("test.ods");
  my $book  = ReadData ("test.xls");
  my $book  = ReadData ("test.xlsx");
+ my $book  = ReadData ("test.xlsm");
  my $book  = ReadData ($fh, parser => "xls");
 
  Spreadsheet::Read::add ($book, "sheet.csv");
@@ -36,7 +37,7 @@ use 5.8.1;
 use strict;
 use warnings;
 
-our $VERSION = "0.81";
+our $VERSION = "0.82";
 sub  Version { $VERSION }
 
 use Carp;
@@ -53,7 +54,9 @@ my @parsers = (
     [ csv  => "Text::CSV_XS",				"0.71"		],
     [ csv  => "Text::CSV_PP",				"1.17"		],
     [ csv  => "Text::CSV",				"1.17"		],
+    [ ods  => "Spreadsheet::ParseODS",			"0.25"		],
     [ ods  => "Spreadsheet::ReadSXC",			"0.20"		],
+    [ sxc  => "Spreadsheet::ParseODS",			"0.25"		],
     [ sxc  => "Spreadsheet::ReadSXC",			"0.20"		],
     [ xls  => "Spreadsheet::ParseExcel",		"0.34"		],
     [ xlsx => "Spreadsheet::ParseXLSX",			"0.24"		],
@@ -109,6 +112,8 @@ $can{sc} = __PACKAGE__;	# SquirelCalc is built-in
 
 defined $Spreadsheet::ParseExcel::VERSION && $Spreadsheet::ParseExcel::VERSION < 0.61 and
     *Spreadsheet::ParseExcel::Workbook::get_active_sheet = sub { undef; };
+defined $Spreadsheet::ParseODS::VERSION   && $Spreadsheet::ParseODS::VERSION   < 0.25 and
+    *Spreadsheet::ParseODS::Workbook::get_active_sheet   = sub { undef; };
 
 my $debug = 0;
 my %def_opts = (
@@ -125,6 +130,7 @@ my %def_opts = (
     sep     => undef,
     quote   => undef,
     label   => undef,
+    merge   => 0,
     );
 my @def_attr = (
     type    => "text",
@@ -156,18 +162,22 @@ sub _dump {
     else {
 	print STDERR Data::Dumper->Dump ([$ref], [$label]);
 	}
+    my @c = caller (1);
+    print STDERR "<<- $c[1]:$c[2]|$c[3]\n";
     } # _dump
 
 sub _parser {
     my $type = shift		or  return "";
     $type = lc $type;
+    my $ods = $can{ods} ? "ods" : "sxc";
     # Aliases and fullnames
     $type eq "excel"		and return "xls";
     $type eq "excel2007"	and return "xlsx";
-    $type eq "oo"		and return "sxc";
-    $type eq "ods"		and return "sxc";
-    $type eq "openoffice"	and return "sxc";
-    $type eq "libreoffice"	and return "sxc";
+    $type eq "xlsm"		and return "xlsx";
+    $type eq "oo"		and return $ods;
+#   $type eq "sxc"		and return $ods;
+    $type eq "openoffice"	and return $ods;
+    $type eq "libreoffice"	and return $ods;
     $type eq "perl"		and return "prl";
     $type eq "squirelcalc"	and return "sc";
     return exists $can{$type} ? $type : "";
@@ -368,8 +378,8 @@ sub _clipsheets {
 			($ss->{cell}[$col][$row], $ss->{cell}[$row][$col]) =
 			($ss->{cell}[$row][$col], $ss->{cell}[$col][$row]);
 		    $opt->{cells} and
-		        ($ss->{cr2cell ($col, $row)}, $ss->{cr2cell ($row, $col)}) =
-		        ($ss->{cr2cell ($row, $col)}, $ss->{cr2cell ($col, $row)});
+			($ss->{cr2cell ($col, $row)}, $ss->{cr2cell ($row, $col)}) =
+			($ss->{cr2cell ($row, $col)}, $ss->{cr2cell ($col, $row)});
 		    }
 		}
 	    ($ss->{maxcol}, $ss->{maxrow}) = ($ss->{maxrow}, $ss->{maxcol});
@@ -415,8 +425,9 @@ sub ReadData {
     exists $opt{clip}	or $opt{clip}	= $opt{cells};
     exists $opt{strip}	or $opt{strip}	= $def_opts{strip};
     exists $opt{dtfmt}	or $opt{dtfmt}	= $def_opts{dtfmt};
+    exists $opt{merge}	or $opt{merge}	= $def_opts{merge};
 
-    # $debug = $opt{debug} // 0;
+    # $debug = $opt{debug} || 0;
     $debug = defined $opt{debug} ? $opt{debug} : $def_opts{debug};
     $debug > 4 and _dump (Options => \%opt);
 
@@ -584,27 +595,47 @@ sub ReadData {
 	    $io_txt = 0;
 	    $_parser = _parser ($opt{parser} = "xlsx");
 	    }
-	elsif (!$io_ref && $txt =~ m/\.xlsx?$/i) {
+	elsif ( # /usr/share/misc/magic
+		$txt =~ m{\APK\003\004.{9,30}\Qmimetypeapplication/vnd.oasis.opendocument.spreadsheet}
+		) {
+	    $can{ods} or croak "ODS parser not installed";
+	    my $tmpfile;
+	    if ($can{ios}) { # Do not use a temp file if IO::Scalar is available
+		$tmpfile = \$txt;
+		}
+	    else {
+		$tmpfile = File::Temp->new (SUFFIX => ".ods", UNLINK => 1);
+		binmode $tmpfile;
+		print   $tmpfile $txt;
+		close   $tmpfile;
+		}
+	    open $io_ref, "<", $tmpfile or do { $@ = $!; return };
+	    $io_txt = 0;
+	    $_parser = _parser ($opt{parser} = "ods");
+	    }
+	elsif (!$io_ref && $txt =~ m/\.xls[xm]?$/i) {
 	    $@ = "Cannot open $txt as file";
 	    return;
 	    }
 	}
-    if ($opt{parser} ? $_parser =~ m/^xlsx?$/
-		     : ($io_fil && $txt =~ m/\.(xlsx?)$/i && ($_parser = $1))) {
-	my $parse_type = $_parser =~ m/x$/i ? "XLSX" : "XLS";
+    if ($opt{parser} ? $_parser =~ m/^(?:xlsx?)$/
+		     : ($io_fil && $txt =~ m/\.(xls[xm]?)$/i &&
+		      ($_parser = _parser ($1)))) {
+	my $parse_type = $_parser =~ m/x$/i  ? "XLSX" : "XLS";
 	my $parser = $can{lc $parse_type} or
 	    croak "Parser for $parse_type is not installed";
+	#$debug and print STDERR __FILE__, "#", __LINE__, " | $_parser | $parser | $parse_type\n";
 	$debug and print STDERR "Opening $parse_type ", $io_ref ? "<REF>" : $txt,
 	    " using $parser-", $can{lc $parse_type}->VERSION, "\n";
 	$opt{passwd} and $parser_opts{Password} = $opt{passwd};
 	my $oBook = eval {
 	    $io_ref
-	      ? $parse_type eq "XLSX"
+		? $parse_type eq "XLSX"
 		? $can{xlsx} =~ m/::XLSX$/
 		? $parser->new ($io_ref)
 		: $parser->new (%parser_opts)->parse ($io_ref)
 		: $parser->new (%parser_opts)->Parse ($io_ref)
-	      : $parse_type eq "XLSX"
+		: $parse_type eq "XLSX"
 		? $can{xlsx} =~ m/::XLSX$/
 		? $parser->new ($txt)
 		: $parser->new (%parser_opts)->parse ($txt)
@@ -626,11 +657,11 @@ sub ReadData {
 	# CellHandler    Font           _previous_info
 
 	my @data = ( {
-	    type	=> lc $parse_type,
+	    type	=>      lc $parse_type,
 	    parser	=> $can{lc $parse_type},
 	    version	=> $can{lc $parse_type}->VERSION,
 	    parsers	=> [{
-		type	=> lc $parse_type,
+		type	=>      lc $parse_type,
 		parser	=> $can{lc $parse_type},
 		version	=> $can{lc $parse_type}->VERSION,
 		}],
@@ -638,7 +669,6 @@ sub ReadData {
 	    sheets	=> $oBook->{SheetCount} || 0,
 	    sheet	=> {},
 	    } );
-	# $debug and $data[0]{_parser} = $oBook;
 	# Overrule the default date format strings
 	my %def_fmt = (
 	    0x0E	=> lc $opt{dtfmt},	# m-d-yy
@@ -653,12 +683,68 @@ sub ReadData {
 		: Spreadsheet::ParseExcel::FmtDefault->new
 	    :     Spreadsheet::ParseExcel::FmtDefault->new;
 
+	$debug > 20 and _dump ("oBook before conversion", $oBook);
+	if ($parse_type eq "ODS" and !exists $oBook->{SheetCount}) {
+	    my $styles = delete $oBook->{_styles};
+	    my $sheets = delete $oBook->{_sheets};
+	    if ($sheets && ref $sheets eq "ARRAY") {
+		$styles = ($styles || {})->{styles} || {};
+		$data[0]{sheets} = $oBook->{SheetCount} = scalar @{$sheets};
+		$oBook->{Worksheet} = [];
+		*S::R::Sheet::get_merged_areas = sub { [] };
+		my $x = 0;
+		foreach my $sh (@{$sheets}) {
+		    push @{$oBook->{Worksheet}} => bless {
+			Name		=> $sh->{label},
+			Cells		=> [],
+			MinRow		=> $sh->{col_min},
+			MaxRow		=> $sh->{row_max},
+			MinCol		=> $sh->{col_min},
+			MaxCol		=> $sh->{row_max},
+			RowHidden	=> $sh->{hidden_rows},
+			ColHidden	=> $sh->{hidden_cols},
+			_SheetNo	=> $x++,
+			} => "S::R::Sheet";
+		    # header_cols
+		    # header_rows
+		    # print_areas
+		    # sheet_hidden
+		    # tab_color
+		    *S::R::Cell::Value     = sub { $_[0]{Raw} };
+		    *S::R::Cell::is_merged = sub { 0 };
+		    my $r = 0;
+		    foreach my $row (@{$sh->{data}}) {
+			$#$row > $oBook->{Worksheet}[-1]{MaxCol} and
+				 $oBook->{Worksheet}[-1]{MaxCol} = $#$row;
+			$oBook->{Worksheet}[-1]{Cells}[$r++] = [ map { bless {
+			    Code	=> undef,
+			    Format	=> $_->{format},
+			    Formula	=> $_->{formula},
+			    Hidden	=> undef,
+			    Merged	=> undef,
+			    # use || instead of // for now
+			    # even though it is undesirable
+			    Type	=> $_->{type}  || "",
+			    Val		=> $_->{value} || $_->{unformatted},
+			    Raw		=> $_->{unformatted} || $_->{value},
+			    _Style	=> $styles->{$_->{style} || ""}
+					|| $_->{style},
+			    # hyperlink
+			    } => "S::R::Cell" } @{$row} ];
+			}
+		    --$r > $oBook->{Worksheet}[-1]{MaxRow} and
+			   $oBook->{Worksheet}[-1]{MaxRow} = $r;
+		    }
+		}
+	    }
+
 	$debug and print STDERR "\t$data[0]{sheets} sheets\n";
 	my $active_sheet = $oBook->get_active_sheet
 			|| $oBook->{ActiveSheet}
 			|| $oBook->{SelectedSheet};
 	my $current_sheet = 0;
 	foreach my $oWkS (@{$oBook->{Worksheet}}) {
+	    $debug > 8 and _dump ("oWkS", $oWkS);
 	    $current_sheet++;
 	    $opt{clip} and !defined $oWkS->{Cells} and next; # Skip empty sheets
 	    my %sheet = (
@@ -755,6 +841,8 @@ sub ReadData {
 			       ? $oBook->{FormatStr}{$FmT->{FmtIdx}}
 			       : undef;
 			    }
+			lc  $oWkC->{Type} eq "float" and
+			    $oWkC->{Type} =  "Numeric";
 			if ($oWkC->{Type} eq "Numeric") {
 			    # Fixed in 0.33 and up
 			    # see Spreadsheet/ParseExcel/FmtDefault.pm
@@ -781,12 +869,13 @@ sub ReadData {
 			       ? $oBook->{FormatStr}{$FmT->{FmtIdx}}
 			       : undef;
 			    $fmi and $fmi =~ s/\\//g;
+			    my $merged = (defined $oWkC->{Merged} ? $oWkC->{Merged} : $oWkC->is_merged) || 0;
 			    $sheet{attr}[$c + 1][$r + 1] = {
 				@def_attr,
 
 				type    => lc $oWkC->{Type},
 				enc     => $oWkC->{Code},
-				merged  => (defined $oWkC->{Merged} ? $oWkC->{Merged} : $oWkC->is_merged) || 0,
+				merged  => $merged,
 				hidden  => ($hiddenRows->[$r] || $hiddenCols->[$c] ? 1 :
 					    defined $oWkC->{Hidden} ? $oWkC->{Hidden} : $FmT->{Hidden})   || 0,
 				locked  => $FmT->{Lock}     || 0,
@@ -807,6 +896,17 @@ sub ReadData {
 				formula => $oWkC->{Formula},
 				};
 			    #_dump "cell", $sheet{attr}[$c + 1][$r + 1];
+			    if ($opt{merge} && $merged and
+				    my $p_cell = Spreadsheet::Read::Sheet::merged_from (\%sheet, $c + 1, $r + 1)) {
+				warn $p_cell;
+				$sheet{attr}[$c + 1][$r + 1]{merged} = $p_cell;
+				if ($cell ne $p_cell) {
+				    my ($C, $R) = cell2cr ($p_cell);
+				    $sheet{cell}[$c + 1][$r + 1] =
+					$sheet{cell}[$C][$R];
+				    $sheet{$cell} = $sheet{$p_cell};
+				    }
+				}
 			    }
 			}
 		    }
@@ -816,6 +916,173 @@ sub ReadData {
 		}
 	    push @data, { %sheet };
 #	    $data[0]{sheets}++;
+	    if ($sheet{label} eq "-- unlabeled --") {
+		$sheet{label} = "";
+		}
+	    else {
+		$data[0]{sheet}{$sheet{label}} = $#data;
+		}
+	    }
+	return _clipsheets \%opt, [ @data ];
+	}
+    if ($opt{parser} ? $_parser =~ m/^(ods)$/
+		     : ($io_fil && $txt =~ m/(ods)$/i &&
+		      ($_parser = _parser ($1)))
+	     and ($can{$_parser} || "") !~ m/sxc/i) {
+	my $parse_type = "ODS";
+	my $parser = $can{lc $parse_type} or
+	    croak "Parser for $parse_type is not installed";
+	#$debug and print STDERR __FILE__, "#", __LINE__, " | $_parser | $parser | $parse_type\n";
+	$debug and print STDERR "Opening $parse_type ", $io_ref ? "<REF>" : $txt,
+	    " using $parser-", $can{lc $parse_type}->VERSION, "\n";
+	$opt{passwd} and $parser_opts{Password} = $opt{passwd};
+	my $oBook = eval {
+	    $io_ref
+		? $parser->new (readonly => 1, %parser_opts)->parse ($io_ref)
+		: $parser->new (readonly => 1, %parser_opts)->parse ($txt)
+	    };
+	unless ($oBook) {
+	    # cleanup will fail on folders with spaces.
+	    (my $msg = $@) =~ s/ at \S+ line \d+.*//s;
+	    croak "$parse_type parser cannot parse data: $msg";
+	    }
+	$debug > 8 and _dump (oBook => $oBook);
+
+	my @data = ( {
+	    type	=>      lc $parse_type,
+	    parser	=> $can{lc $parse_type},
+	    version	=> $can{lc $parse_type}->VERSION,
+	    parsers	=> [{
+		type	=>      lc $parse_type,
+		parser	=> $can{lc $parse_type},
+		version	=> $can{lc $parse_type}->VERSION,
+		}],
+	    error	=> undef,
+	    sheets	=> scalar $oBook->worksheets,
+	    sheet	=> {},
+	    } );
+	# $debug and $data[0]{_parser} = $oBook;
+
+	$debug and print STDERR "\t$data[0]{sheets} sheets\n";
+	my $active_sheet = $oBook->get_active_sheet;
+	my $current_sheet = 0;
+	foreach my $oWkS ($oBook->worksheets) {
+	    $current_sheet++;
+	    $opt{clip} && $oWkS->row_max < $oWkS->row_min
+		       && $oWkS->col_max < $oWkS->col_min and next; # Skip empty sheets
+	    my %sheet = (
+		parser	=> 0,
+		label	=> $oWkS->label,
+		maxrow	=> $oWkS->row_max+1,
+		maxcol	=> $oWkS->col_max+1,
+		cell	=> [],
+		attr	=> [],
+		merged  => [],
+		active	=> 0,
+		);
+	    # $debug and $sheet{_parser} = $oWkS;
+	    defined $sheet{label} or $sheet{label} = "-- unlabeled --";
+	    $sheet{merged} = [
+		map  {  $_->[0] }
+		sort {  $a->[1] cmp $b->[1] }
+		map  {[ $_, pack "NNNN", @$_          ]}
+		map  {[ map { $_ + 1 } @{$_}[1,0,3,2] ]}
+		@{$oWkS->get_merged_areas || []}];
+	    my $sheet_idx = 1 + @data;
+	    $debug and print STDERR "\tSheet $sheet_idx '$sheet{label}' $sheet{maxrow} x $sheet{maxcol}\n";
+	    if (defined $active_sheet) {
+		my $sheet_no = $current_sheet - 1;
+		$sheet_no eq $active_sheet and $sheet{active} = 1;
+		}
+	    my $hiddenRows = $oWkS->hidden_rows || [];
+	    my $hiddenCols = $oWkS->hidden_cols || [];
+	    if ($opt{clip}) {
+		my ($mr, $mc) = (-1, -1);
+		foreach my $r ($oWkS->row_min .. $sheet{maxrow}-1) {
+		    foreach my $c ($oWkS->col_min .. $sheet{maxcol}-1) {
+			my $oWkC = $oWkS->get_cell($r, $c) or next;
+			defined (my $val = $oWkC->value) or next;
+			$val eq "" and next;
+			$r > $mr and $mr = $r;
+			$c > $mc and $mc = $c;
+			}
+		    }
+		($sheet{maxrow}, $sheet{maxcol}) = ($mr + 1, $mc + 1);
+		}
+	    foreach my $r ($oWkS->row_min .. $sheet{maxrow}) {
+		foreach my $c ($oWkS->col_min .. $sheet{maxcol}) {
+		    my $oWkC = $oWkS->get_cell($r, $c) or next;
+		    my $val = $oWkC->unformatted;
+		    #if (defined $val and my $enc = $oWkC->{Code}) {
+		    #    $enc eq "ucs2" and $val = decode ("utf-16be", $val);
+		    #    }
+		    my $cell = cr2cell ($c + 1, $r + 1);
+		    $opt{rc} and $sheet{cell}[$c + 1][$r + 1] = $val;	# Original
+
+		    my $fmt;
+		    my $styleName = $oWkC->style;
+		    my $FmT;
+		    if ($styleName && defined (my $s = $oBook->_styles->{$styleName})) {
+			$fmt = $s;
+			}
+
+		    defined $fmt and $fmt =~ s/\\//g;
+		    $opt{cells} and	# Formatted value
+			$sheet{$cell} = defined $val ? $oWkC->value : undef;
+		    if ($opt{attr}) {
+			my $FnT = $FmT ? $FmT->{font_face} : undef;
+			my $fmi;
+			#my $fmi = $FmT ? $FmT->{FmtIdx}
+			#   ? $oBook->{FormatStr}{$FmT->{FmtIdx}}
+			#   : undef;
+			#$fmi and $fmi =~ s/\\//g;
+			my $type = $oWkC->type || '';
+			$type eq "float" and $type = "numeric";
+
+			my $merged = $oWkC->is_merged || 0;
+			$sheet{attr}[$c + 1][$r + 1] = {
+			    @def_attr,
+
+			    type    => $type,
+#			    enc     => $oWkC->{Code},
+			    merged  => $merged,
+			    hidden  => ($hiddenRows->[$r] || $hiddenCols->[$c] ? 1 :
+					$oWkC->is_hidden ? $oWkC->is_hidden : undef)   || 0,
+#			    locked  => $FmT->{Lock}     || 0,
+			    format  => $fmi,
+#			    halign  => [ undef, qw( left center right
+#					 fill justify ), undef,
+#					 "equal_space" ]->[$FmT->{AlignH}],
+#			    valign  => [ qw( top center bottom justify
+#					 equal_space )]->[$FmT->{AlignV}],
+#			    wrap    => $FmT->{Wrap},
+#			    font    => $FnT->{Name},
+#			    size    => $FnT->{Height},
+#			    bold    => $FnT->{Bold},
+#			    italic  => $FnT->{Italic},
+#			    uline   => $FnT->{Underline},
+#			    fgcolor => _xls_color ($FnT->{Color}),
+#			    bgcolor => _xls_fill  (@{$FmT->{Fill}}),
+			    formula => $oWkC->formula,
+			    };
+			#_dump "cell", $sheet{attr}[$c + 1][$r + 1];
+			if ($opt{merge} && $merged and
+				my $p_cell = Spreadsheet::Read::Sheet::merged_from(\%sheet, $c + 1, $r + 1)) {
+			    $sheet{attr}[$c + 1][$r + 1]{merged} = $p_cell;
+			    if ($cell ne $p_cell) {
+				my ($C, $R) = cell2cr ($p_cell);
+				$sheet{cell}[$c + 1][$r + 1] =
+				    $sheet{cell}[$C][$R];
+				$sheet{$cell} = $sheet{$p_cell};
+				}
+			    }
+			}
+		    }
+		}
+	    for (@{$sheet{cell}}) {
+		defined or $_ = [];
+		}
+	    push @data, { %sheet };
 	    if ($sheet{label} eq "-- unlabeled --") {
 		$sheet{label} = "";
 		}
@@ -893,19 +1160,26 @@ sub ReadData {
     if ($opt{parser} ? _parser ($opt{parser}) eq "sxc"
 		     : ($txt =~ m/^<\?xml/ or -f $txt)) {
 	$can{sxc} or croak "Spreadsheet::ReadSXC not installed";
-	ref $txt and
-	    croak ("Sorry, references as input are not (yet) supported by Spreadsheet::ReadSXC");
+
+	ref $txt && $can{sxc}->VERSION <= 0.23 and
+	    croak ("Sorry, references as input are not supported by Spreadsheet::ReadSXC before 0.23");
 
 	my $using = "using $can{sxc}-" . $can{sxc}->VERSION;
 	my $sxc_options = { %parser_opts, OrderBySheet => 1 }; # New interface 0.20 and up
 	my $sxc;
 	   if ($txt =~ m/\.(sxc|ods)$/i) {
 	    $debug and print STDERR "Opening \U$1\E $txt $using\n";
-	    $sxc = Spreadsheet::ReadSXC::read_sxc      ($txt, $sxc_options)	or  return;
+	    $debug and print STDERR __FILE__, "#", __LINE__, "\n";
+	    $sxc = Spreadsheet::ReadSXC::read_sxc      ($txt, $sxc_options) or return;
+	    }
+	# treat all refs as a filehandle
+	elsif (ref $txt) {
+	    $debug and print STDERR "Opening SXC filehandle\n";
+	    $sxc = Spreadsheet::ReadSXC::read_sxc_fh   ($txt, $sxc_options) or return;
 	    }
 	elsif ($txt =~ m/\.xml$/i) {
 	    $debug and print STDERR "Opening XML $txt $using\n";
-	    $sxc = Spreadsheet::ReadSXC::read_xml_file ($txt, $sxc_options)	or  return;
+	    $sxc = Spreadsheet::ReadSXC::read_xml_file ($txt, $sxc_options) or return;
 	    }
 	# need to test on pattern to prevent stat warning
 	# on filename with newline
@@ -941,7 +1215,7 @@ sub ReadData {
 		    } keys %$sxc
 		: @{$sxc};
 	    foreach my $sheet (@sheets) {
-		my @sheet = @{$sheet->{data}};
+		my @sheet = @{$sheet->{data} || []};
 		my %sheet = (
 		    parser => 0,
 		    label  => $sheet->{label},
@@ -1137,6 +1411,25 @@ sub rows {
 	} 1..$sheet->{maxrow};
     } # rows
 
+sub merged_from {
+    my ($sheet, @id, $col, $row) = @_;
+    my $ma = $sheet->{merged} or return;
+    if (@id == 2 && $id[0] =~ m/^[0-9]+$/ && $id[1] =~ m/^[0-9]+$/) {
+	($col, $row) = @id;
+	}
+    elsif (@id && $id[0] && exists $sheet->{$id[0]}) {
+	($col, $row) = cell2cr ($id[0]);
+	}
+    defined $row && $row > 0 && $row <= $sheet->{maxrow} or return;
+    defined $col && $col > 0 && $col <= $sheet->{maxcol} or return;
+    foreach my $range (@{$ma}) {
+	my ($ctl, $rtl, $cbr, $rbr) = @{$range};
+	$col >= $ctl && $col <= $cbr or next;
+	$row >= $rtl && $row <= $rbr or next;
+	return cr2cell ($ctl, $rtl);
+	}
+    } # cell
+
 1;
 
 __END__
@@ -1156,7 +1449,7 @@ L<Spreadsheet::XLSX|https://metacpan.org/release/Spreadsheet-XLSX> (stronly
 discouraged).
 
 For CSV this module uses L<Text::CSV_XS|https://metacpan.org/release/Text-CSV_XS>
-or L<Text::CSV_PP|https://metacpan.org/release/Text-CSV_PP>.
+or L<Text::CSV_PP|https://metacpan.org/release/Text-CSV>.
 
 For SquirrelCalc there is a very simplistic built-in parser
 
@@ -1168,14 +1461,14 @@ The data is returned as an array reference:
       # Entry 0 is the overall control hash
       { sheets  => 2,
         sheet   => {
-          "Sheet 1"  => 1,
-          "Sheet 2"  => 2,
+          "Sheet 1" => 1,
+          "Sheet 2" => 2,
           },
         parsers => [ {
-            type    => "xls",
-            parser  => "Spreadsheet::ParseExcel",
-            version => 0.59,
-            }],
+          type      => "xls",
+          parser    => "Spreadsheet::ParseExcel",
+          version   => 0.59,
+          }],
         error   => undef,
         },
       # Entry 1 is the first sheet
@@ -1290,7 +1583,7 @@ described above.
 
 Processing Excel data from a stream or content is supported through a
 L<File::Temp|https://metacpan.org/release/File-Temp> temporary file or
-L<IO::Scalar|https://metacpan.org/release/IO-Scalar> when available.
+L<IO::Scalar|https://metacpan.org/release/IO-stringy> when available.
 
 L<Spreadsheet::ReadSXC|https://metacpan.org/release/Spreadsheet-ReadSXC>
 does preserve sheet order as of version 0.20.
@@ -1393,6 +1686,13 @@ store/replace/change the date field separator in already stored formats
 if you change your locale settings. So the above mentioned default can
 be either "C<m-d-yy>" OR "C<m/d/yy>" depending on what that specific
 character happened to be at the time the user saved the file.
+
+=item merge
+
+Copy content to all cells in merged areas.
+
+If supported, this will copy formatted and unformatted values from the
+top-left cell of a merged area to all other cells in the area.
 
 =item debug
 
@@ -1664,6 +1964,21 @@ Convert C<{cell}>'s C<[column][row]> to a C<[row][column]> list.
 Note that the indexes in the returned list are 0-based, where the
 index in the C<{cell}> entry is 1-based.
 
+=head3 merged_from
+
+ my $top_left = $sheet->merged_from ("C2");
+ my $top_left = $sheet->merged_from (3, 2);
+
+If the parser supports merged areas, this method will return the label of the
+top-left cell in the merged area the requested cell is part of.
+
+If the requested ID is valid and withing the sheet cell range, but not part of
+a merged area, it will return C<"">.
+
+If the ID is not valid or out of range, it returns C<undef>.
+
+See L<Merged cells|/merged> for more details.
+
 =head3 label
 
  my $label = $sheet->label;
@@ -1687,7 +2002,7 @@ In case of CSV parsing, L<C<ReadData>|/ReadData> will use the first line of
 the file to auto-detect the separation character if the first argument is a
 file and both C<sep> and C<quote> are not passed as attributes.
 L<Text::CSV_XS|https://metacpan.org/release/Text-CSV_XS> (or
-L<Text::CSV_PP|https://metacpan.org/release/Text-CSV_PP>) is able to
+L<Text::CSV_PP|https://metacpan.org/release/Text-CSV>) is able to
 automatically detect and use C<\r> line endings.
 
 CSV can parse streams too, but be sure to pass C<sep> and/or C<quote> if
@@ -1697,7 +2012,7 @@ When an error is found in the CSV, it is automatically reported (to STDERR).
 The structure will store the error in C<< $ss->[0]{error} >> as anonymous
 list returned by
 L<C<< $csv->error_diag >>|https://metacpan.org/pod/Text::CSV_XS#error_diag>.
-See L<Text::CSV_XS|https://metacpan.org/pod/Text-CSV_XS> for documentation.
+See L<Text::CSV_XS|https://metacpan.org/pod/Text::CSV_XS> for documentation.
 
  my $ss = ReadData ("bad.csv");
  $ss->[0]{error} and say $ss->[0]{error}[1];
@@ -1742,7 +2057,7 @@ effort is made to analyze and store field attributes like this:
 	  hidden  => 0,
 	  locked  => 0,
 	  enc     => "utf-8",
-	  }, ]
+	  }, ],
 	[ undef, undef, undef, undef, undef, {
 	  type    => "text",
 	  fgcolor => "#e2e2e2",
@@ -1760,7 +2075,8 @@ effort is made to analyze and store field attributes like this:
 	  hidden  => 0,
 	  locked  => 0,
 	  enc     => "iso8859-1",
-	  }, ]
+	  }, ],
+	],
       merged => [],
       A1     => 1,
       B5     => "Nugget",
@@ -1802,8 +2118,8 @@ The documentation of merged areas in
 L<Spreadsheet::ParseExcel|https://metacpan.org/release/Spreadsheet-ParseExcel> and
 L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX> can
 be found in
-L<Spreadsheet::ParseExcel::Worksheet|https://metacpan.org/release/Spreadsheet-ParseExcel-Worksheet>
-and L<Spreadsheet::ParseExcel::Cell|https://metacpan.org/release/Spreadsheet-ParseExcel-Cell>.
+L<Spreadsheet::ParseExcel::Worksheet|https://metacpan.org/pod/Spreadsheet::ParseExcel::Worksheet>
+and L<Spreadsheet::ParseExcel::Cell|https://metacpan.org/pod/Spreadsheet::ParseExcel::Cell>.
 
 None of basic L<Spreadsheet::XLSX|https://metacpan.org/release/Spreadsheet-XLSX>,
 L<Spreadsheet::ParseExcel|https://metacpan.org/release/Spreadsheet-ParseExcel>, and
@@ -1835,6 +2151,11 @@ given example, that would be:
     [ 2, 1, 3, 2 ], # B1-C2
     ];
 
+To find the label of the top-left cell in a merged area, use the
+L<C<merged_from>|/merged_from> method.
+
+ $ss->merged_from ("C2"); # will return "B1"
+
 When the attributes are also enabled, there is some merge information
 copied directly from the cell information, but again, that stems from
 code analysis and not from documentation:
@@ -1843,7 +2164,7 @@ code analysis and not from documentation:
  foreach my $row (1 .. $ss->{maxrow}) {
      foreach my $col (1 .. $ss->{maxcol}) {
          my $cell = cr2cell ($col, $row);
-         printf "%s %-3s %d  ", $cell, $ss->{$cell},
+         printf "%s %-3s %s  ", $cell, $ss->{$cell},
              $ss->{attr}[$col][$row]{merged};
          }
      print "\n";
@@ -1857,8 +2178,43 @@ In this example, there is no way to see if C<B2> is merged to C<A2> or
 to C<B1> without analyzing all surrounding cells. This could as well
 mean C<A2:A3>, C<B1:C1>, C<B2:C2>, as C<A2:A3>, C<B1:B2>, C<C1:C2>, as
 C<A2:A3>, C<B1:C2>.
+
 Use the L<C<merged>|/merged> entry described above to find out what
-fields are merged to what other fields.
+fields are merged to what other fields or use C<merge>:
+
+ my $ss = ReadData ("merged.xlsx", attr => 1, merge => 1)->[1];
+ foreach my $row (1 .. $ss->{maxrow}) {
+     foreach my $col (1 .. $ss->{maxcol}) {
+         my $cell = cr2cell ($col, $row);
+         printf "%s %-3s %s  ", $cell, $ss->{$cell},
+             $ss->{attr}[$col][$row]{merged};
+         }
+     print "\n";
+     }
+
+ A1     0   B1 foo B1  C1 foo B1
+ A2 bar A2  B2 foo B1  C2 foo B1
+ A3 bar A2  B3 urg 0   C3 orc 0
+
+=head2 Streams from web-resources
+
+If you want to stream a web-resource, and the underlying parser supports it,
+you could use a helper function like this (thanks Corion):
+
+ use HTTP::Tiny;
+ use Spreadsheet::Read;
+
+ # Fetch data and return a filehandle to that data
+ sub fh_from_url {
+     my $url = shift;
+     my $ua  = HTTP::Tiny->new;
+     my $res = $ua->get ($url);
+     open my $fh, "<", \$res->{content};
+     return $fh
+     } # fh_from_url
+
+ my $fh = fh_from_url ("http://example.com/example.csv");
+ my $sheet = Spreadsheet::Read->new ($fh, parser => "csv");
 
 =head1 TOOLS
 
@@ -2066,11 +2422,11 @@ match what F<CONTRIBUTING.md> describes.
 =item Text::CSV_XS, Text::CSV_PP
 
 See L<Text::CSV_XS|https://metacpan.org/release/Text-CSV_XS> ,
-L<Text::CSV_PP|https://metacpan.org/release/Text-CSV_PP> , and
+L<Text::CSV_PP|https://metacpan.org/release/Text-CSV> , and
 L<Text::CSV|https://metacpan.org/release/Text-CSV> documentation.
 
 L<Text::CSV|https://metacpan.org/release/Text-CSV> is a wrapper over Text::CSV_XS (the fast XS version) and/or
-L<Text::CSV_PP|https://metacpan.org/release/Text-CSV_PP> (the pure perl version).
+L<Text::CSV_PP|https://metacpan.org/release/Text-CSV> (the pure perl version).
 
 =item Spreadsheet::ParseExcel
 
@@ -2094,6 +2450,12 @@ documentation.
 This module is dead and deprecated. It is B<buggy and unmaintained>.  I<Please>
 use L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX>
 instead.
+
+=item Spreadsheet::ParseODS
+
+L<Spreadsheet::ParseODS|https://metacpan.org/release/Spreadsheet-ParseODS> is a
+parser for OpenOffice/LibreOffice (.sxc and .ods) spreadsheet files. It is the
+successor of  L<Spreadsheet::ReadSXC|https://metacpan.org/release/Spreadsheet-ReadSXC>.
 
 =item Spreadsheet::ReadSXC
 
@@ -2126,9 +2488,9 @@ interface.
 
 =item xls2csv
 
-L<xls2csv|https://metacpan.org/release/xls2csv> offers an alternative for my
-C<xlscat -c>, in the xls2csv tool, but this tool focuses on character encoding
-transparency, and requires some other modules.
+L<xls2csv|https://github.com/Tux/Spreadsheet-Read/blob/master/examples/xls2csv>
+offers an alternative for my C<xlscat -c>, in the xls2csv tool, but this tool
+focuses on character encoding transparency, and requires some other modules.
 
 =back
 
@@ -2138,7 +2500,7 @@ H.Merijn Brand, <h.m.brand@xs4all.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2019 H.Merijn Brand
+Copyright (C) 2005-2020 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

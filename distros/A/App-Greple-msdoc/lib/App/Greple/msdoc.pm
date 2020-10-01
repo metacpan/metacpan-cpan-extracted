@@ -4,7 +4,7 @@ msdoc - Greple module for access MS office docx/pptx/xlsx documents
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ these data and replaces the search target.
 By default, text part from XML data is extracted.  This process is
 done by very simple method and may include redundant information.
 
-Strings are simply connected into paragrap for I<.docx> and I<.pptx>
+Strings are simply connected into paragraph for I<.docx> and I<.pptx>
 document.  For I<.xlsx> document, single space is inserted between
 them.  Use B<--separator> option to change this behavior.
 
@@ -69,6 +69,8 @@ cpanm App::Greple::msdoc
 
 L<https://github.com/kaz-utashiro/greple-msdoc>
 
+L<https://github.com/kaz-utashiro/optex-textconv>
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
@@ -84,7 +86,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::msdoc;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use strict;
 use warnings;
@@ -106,37 +108,6 @@ our $opt_space = undef;
 our $opt_separator = undef;
 our $opt_type;
 our $default_format = 'text';
-
-sub extract_text {
-    my %arg = @_;
-    my $file = delete $arg{&FILELABEL} or die;
-    my($suffix) = $file =~ /\.(\w+)$/;
-    my $type = $opt_type || $suffix;
-
-    $opt_space     //= ($type eq 'docx') ? 2 : 1;
-    $opt_separator //= ($type eq 'xlsx') ? " " : "";
-
-    my $xml_re = qr/<\?xml\b[^>]*\?>\s*/;
-    return unless /$xml_re/;
-
-    my @xml = grep { length } split /$xml_re/;
-    my @text = map { _xml2text($_) } @xml;
-    $_ = join "\n", @text;
-}
-sub _xml2text {
-    local $_ = shift;
-    my @p;
-    while (m{<(?<tag>[apw]:p|si)\b[^>]*>(?<para>.*?)</\g{tag}>}sg) {
-	my $p = $+{para};
-	my @s;
-	while ($p =~ m{<(?<tag>(?:[apw]:)?t)\b[^>]*>(?<text>[^<]*?)</\g{tag}>}sg) {
-	    push @s, $+{text} if $+{text} ne '';
-	}
-	@s or next;
-	push @p, join($opt_separator, @s) . ("\n" x $opt_space);
-    }
-    join '', @p;
-}
 
 sub separate_xml {
     s{ (?<=>) ([^<]*) }{ $1 ? "\n$1\n" : "\n" }gex;
@@ -185,67 +156,45 @@ sub indent_xml {
     }gex;
 }
 
-sub extract {
+use Archive::Zip;
+use App::optex::textconv::msdoc;
+*to_text  = \&App::optex::textconv::msdoc::to_text;
+*get_list = \&App::optex::textconv::msdoc::get_list;
+
+my %formatter = (
+    'indent-xml'   => \&indent_xml,
+    'separate-xml' => \&separate_xml,
+    );
+
+sub extract_content {
     my %arg = @_;
+    my $file = $arg{&FILELABEL} or die;
+    my $type = ($file =~ /\.(docx|xlsx|pptx)$/)[0] or die;
     my $pid = open(STDIN, '-|') // croak "process fork failed: $!";
     binmode STDIN, ':encoding(utf8)';
-    if ($pid == 0) {
-	local $_ = do { local $/; <STDIN> };
-	my $format = $arg{format} // $default_format;
-	my $sub = do {
-	    if    ($format eq 'text')         { \&extract_text }
-	    elsif ($format eq 'indent-xml')   { \&indent_xml   }
-	    elsif ($format eq 'separate-xml') { \&separate_xml }
-	    else  { undef }
-	};
-	my @arg = $arg{&FILELABEL} ? (&FILELABEL => $arg{&FILELABEL}) : ();
-	$sub->(@arg) if $sub;
-	print $_;
-	exit;
+    if ($pid) {
+	return $pid;
     }
-    $pid;
-}
-
-##
-## This is better implementation using in-memory file.
-## Works fine for first file, but does not work for the rest.
-## Hope to be solved.
-##
-sub __extract {
-    my %arg = @_;
-    my $stdin = do { local $/; <STDIN> };
     my $format = $arg{format} // $default_format;
-    my $sub = do {
-	if    ($format eq 'text')         { \&extract_text }
-	elsif ($format eq 'indent-xml')   { \&indent_xml   }
-	elsif ($format eq 'separate-xml') { \&separate_xml }
-	else  { undef }
-    };
-    if ($sub) {
-	my @arg = $arg{&FILELABEL} ? (&FILELABEL => $arg{&FILELABEL}) : ();
-	for ($stdin) { $sub->(@arg) }
-    }
-
-    close STDIN;
-    open STDIN, "<", \$stdin || die "open: $!";
-}
-
-sub extract_pptx {
-    my %arg = @_;
-    my $file = delete $arg{&FILELABEL} or die;
-    my $pid = open(STDIN, '-|') // croak "process fork failed: $!";
-    binmode STDIN, ':encoding(utf8)';
-    if ($pid == 0) {
-	my @slides = do {
-	    map  { $_->[0] }
-	    sort { $a->[1] <=> $b->[1] }
-	    map  { m{(ppt/slides/slide(\d+)\.xml)} ? [ $1, $2 ] : () }
-	    `unzip -l \"$file\" ppt/slides/slide*.xml`;
-	};
-	print decode 'utf8', join '', map { `unzip -p \"$file\" $_` } @slides;
+    if ($format eq 'text') {
+	print decode 'utf8', to_text($file);
+	exit;
+    } elsif ($format =~ /xml$/) {
+	my $zip = Archive::Zip->new($file);
+	my @xml;
+	for my $entry (get_list($zip, $type)) {
+	    my $member = $zip->memberNamed($entry) or next;
+	    my $xml = $member->contents or next;
+	    push @xml, $xml;
+	}
+	my $xml = decode 'utf8', join "\n", @xml;
+	if (my $sub = $formatter{$format}) {
+	    $sub->(&FILELABEL => $file) for $xml;
+	}
+	print $xml;
 	exit;
     }
-    $pid;
+    die;
 }
 
 1;
@@ -266,10 +215,7 @@ option	--text		$<move(0,0)>
 help	--text		ignore
 
 option default \
-	--if '/\.docx$/:unzip -p /dev/stdin word/document.xml' \
-	--if '/\.pptx$/:&__PACKAGE__::extract_pptx' \
-	--if '/\.xlsx$/:unzip -p /dev/stdin xl/sharedStrings.xml' \
-	--if '/\.(docx|pptx|xlsx)$/:&__PACKAGE__::extract'
+	--if '/\.(docx|pptx|xlsx)$/:&__PACKAGE__::extract_content'
 
 builtin space=i $opt_space
 builtin separator=s $opt_separator

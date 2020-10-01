@@ -1,6 +1,7 @@
 package Search::InvertedIndex::AutoLoader;
 
-# $RCSfile: AutoLoader.pm,v $ $Revision: 1.2 $ $Date: 1999/06/15 22:31:07 $ $Author: snowhare $
+use strict;
+use warnings;
 
 =head1 NAME
 
@@ -15,13 +16,11 @@ use Search::InvertedIndex::AutoLoader;
 Sets up the autoloader to load the modules in the Search::InvertedIndex
 system on demand.
 
-=head1 CHANGES
-
-1.01 Added Search::InvertedIndex::DB::Mysql to the list of autoloaded modules
-
 =cut
 
-$VERSION = "1.01";
+use vars qw($AUTOLOAD $VERSION);
+
+$VERSION = "1.17";
 
 my $_autoloaded_functions = {};
 
@@ -37,6 +36,8 @@ my (@packageslist) =(
 
 my ($autoloader) =<<'EOF';
 package ----packagename----;
+use vars qw($AUTOLOAD);
+
 sub AUTOLOAD {
 	return if ($AUTOLOAD =~ m/::(END|DESTROY)$/o);
     if (exists $_autoloaded_functions->{$AUTOLOAD}) {
@@ -66,13 +67,12 @@ if ($@ ne '') {
 
 =head1 COPYRIGHT
 
-Copyright 1999, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and 
-FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
-This software may be copied or redistributed under the same terms as Perl itelf.
+Copyright 1999-2020, Jerilyn Franz and FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>).
+All Rights Reserved.
 
 =head1 AUTHOR
 
-Benjamin Franz
+Jerilyn Franz
 
 =head1 TODO
 

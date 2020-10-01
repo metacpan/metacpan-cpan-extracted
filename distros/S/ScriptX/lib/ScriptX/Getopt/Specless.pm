@@ -1,9 +1,14 @@
 package ScriptX::Getopt::Specless;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-01'; # DATE
+our $DIST = 'ScriptX'; # DIST
+our $VERSION = '0.000004'; # VERSION
+
 use strict;
 use warnings;
 
-use parent 'ScriptX::Base';
+use parent 'ScriptX_Base';
 
 sub meta {
     return {
@@ -79,7 +84,7 @@ ScriptX::Getopt::Specless - Parse command-line options in a simple, spec-less wa
 
 =head1 VERSION
 
-This document describes version 0.000001 of ScriptX::Getopt::Specless (from Perl distribution ScriptX), released on 2020-09-03.
+This document describes version 0.000004 of ScriptX::Getopt::Specless (from Perl distribution ScriptX), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
@@ -102,7 +107,7 @@ On the command-line:
 This is an alternative to L<ScriptX::Getopt::Long> if you don't want to use
 L<Getopt::Long>.
 
-=head1 CONFIGURATION
+=head1 SCRIPTX PLUGIN CONFIGURATION
 
 =head1 HOMEPAGE
 

@@ -32,9 +32,9 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.20",
   "test" => {
-    "TESTS" => "t/*.t t/unit/lib-Weather-NHC-TropicalCyclone-ForecastAdvisory/*.t t/unit/lib-Weather-NHC-TropicalCyclone-Storm/*.t t/unit/lib-Weather-NHC-TropicalCyclone/*.t"
+    "TESTS" => "t/*.t t/unit/lib-Weather-NHC-TropicalCyclone-ForecastAdvisory/*.t t/unit/lib-Weather-NHC-TropicalCyclone-Storm/*.t t/unit/lib-Weather-NHC-TropicalCyclone-StormHistory/*.t t/unit/lib-Weather-NHC-TropicalCyclone/*.t"
   }
 );
 

@@ -14,6 +14,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-ScriptXUtils",
   "EXE_FILES" => [
+    "script/detect-scriptx-script",
+    "script/dump-scriptx-script",
     "script/list-scriptx-plugins"
   ],
   "LICENSE" => "perl",
@@ -22,13 +24,16 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
+    "Data::Sah::Compiler::perl::TH::buf" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Module::List::Tiny" => 0,
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Lite" => "1.820",
-    "Perinci::Sub::Gen::AccessTable" => "0.581",
+    "Perinci::CmdLine::Lite" => "1.827",
+    "Perinci::Sub::Gen::AccessTable" => "0.583",
     "Perinci::Sub::Property::result::table" => 0,
+    "ScriptX_Util" => 0,
+    "ScriptX_Util::Dump" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -38,7 +43,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +53,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
+  "Data::Sah::Compiler::perl::TH::buf" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,
@@ -55,9 +61,11 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Module::List::Tiny" => 0,
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Lite" => "1.820",
-  "Perinci::Sub::Gen::AccessTable" => "0.581",
+  "Perinci::CmdLine::Lite" => "1.827",
+  "Perinci::Sub::Gen::AccessTable" => "0.583",
   "Perinci::Sub::Property::result::table" => 0,
+  "ScriptX_Util" => 0,
+  "ScriptX_Util::Dump" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

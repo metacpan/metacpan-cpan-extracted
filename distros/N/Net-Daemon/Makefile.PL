@@ -1,42 +1,29 @@
-# -*- perl -*-
-#
-# $Id: Makefile.PL,v 1.2 1999/08/12 14:28:53 joe Exp $
-#
+use strict;
+use warnings;
 
 use ExtUtils::MakeMaker;
 
 my %opts = (
-    'NAME'	=> 'Net::Daemon',
-    'VERSION_FROM' => 'lib/Net/Daemon.pm', # finds $VERSION
-    'dist' => { 'DIST_DEFAULT' => q[all tardist],
-	        'COMPRESS' => q[gzip -9vf],
-	        'SUFFIX' => q[.gz]
-	    },
-    'realclean' => { 'FILES' => 't/config ndtest.prt' }
+    'NAME'          => 'Net::Daemon',
+    'ABSTRACT_FROM' => 'lib/Net/Daemon.pm',
+    'AUTHOR'        => 'Jochen Wiedmann <joe@ispsoft.de>',
+    'VERSION_FROM'  => 'lib/Net/Daemon.pm',                  # finds $VERSION
+    'PREREQ_PM'     => {
+        'Sys::Syslog' => '0.29',
+    },
+    'dist' => {
+        'DIST_DEFAULT' => q[all tardist],
+        'COMPRESS'     => q[gzip -9vf],
+        'SUFFIX'       => q[.gz]
+    },
+    'realclean' => { 'FILES' => 't/config ndtest.prt' },
+    'META_MERGE' => {
+        'resources' => {
+            license    => 'http://dev.perl.org/licenses/',
+            bugtracker => 'https://github.com/toddr/Net-Daemon/issues',
+            repository => 'https://github.com/toddr/Net-Daemon',
+        },
+    },
 );
 
-if ($ExtUtils::MakeMaker::VERSION >= 5.43) {
-    $opts{ABSTRACT_FROM} = 'lib/Net/Daemon.pm';
-    $opts{AUTHOR} = 'Jochen Wiedmann (joe@ispsoft.de)';
-}
-
 WriteMakefile(%opts);
-
-
-package MY;
-
-sub libscan {
-    my ($self, $path) = @_;
-    ($path =~ /\~$/) ? undef : $path;
-}
-
-sub postamble {
-    qq{
-
-pm_to_blib: README
-
-README: lib/Net/Daemon.pm
-\tpod2text lib/Net/Daemon.pm >README
-
-}
-}

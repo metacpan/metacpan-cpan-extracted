@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -33,7 +33,7 @@ use Math::PlanePath::DragonCurve;
 # VERSION
 
 {
-  my $want_version = 127;
+  my $want_version = 128;
   ok ($Math::PlanePath::DragonCurve::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::DragonCurve->VERSION,  $want_version,
@@ -64,7 +64,7 @@ use Math::PlanePath::DragonCurve;
 {
   my $path = Math::PlanePath::DragonCurve->new;
   { my @dxdy = $path->n_to_dxdy(-1);
-    ok (scalar(@dxdy), 0);
+    ok (scalar(@dxdy), 0, 'no dxdy at n=-1');
   }
   { my @dxdy = $path->n_to_dxdy(0);
     ok (scalar(@dxdy), 2);
@@ -72,6 +72,7 @@ use Math::PlanePath::DragonCurve;
     ok ($dxdy[1], 0);
   }
 }
+
 
 #----------------------------------------------------------------------------
 # _UNDOCUMENTED__n_to_turn_LSR()
@@ -84,6 +85,7 @@ use Math::PlanePath::DragonCurve;
   ok ($path->_UNDOCUMENTED__n_to_turn_LSR(2), 1);
   ok ($path->_UNDOCUMENTED__n_to_turn_LSR(3), -1);
 }
+
 
 #------------------------------------------------------------------------------
 # level_to_n_range()
@@ -323,4 +325,5 @@ foreach my $arms (1 .. 4) {
   }
 }
 
+#------------------------------------------------------------------------------
 exit 0;

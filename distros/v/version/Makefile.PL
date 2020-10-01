@@ -52,7 +52,7 @@ sub write_makefile
         'base'                  => 0,
     );
 
-    WriteMakefile( VERSION         => '0.9927',
+    WriteMakefile( VERSION         => '0.9928',
                    NAME            => 'version',
                    LICENSE         => 'perl',
                    MIN_PERL_VERSION=> 5.006002,

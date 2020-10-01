@@ -1,3 +1,10 @@
+  1.06 2020.09.27     - Fix repository path errors in Build.PL
+
+  1.05 2020.09.26     - Permissions fix for build tools (Build.PL / Makefile.PL)
+
+  1.04 2020.09.26     - Maintainer update. Relicensed under the MIT License.
+                        Minor tweaks to build process. Added meta_merge
+                        information for GitHub. Added 'use warnings'.
  
   1.03 2008.07.22     - Updated for ModPerl2 compatibility
 

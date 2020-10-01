@@ -1,11 +1,15 @@
---- #YAML:1.0
-name:                Gnome2-GConf
-version:             1.044
-abstract:            Perl wrappers for the GConf configuration engine.
-license:             ~
-generated_by:        ExtUtils::MakeMaker version 6.36
-distribution_type:   module
-requires:     
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Gnome2-GConf
+version:      1.046
+version_from: GConf.pm
+installdirs:  site
+requires:
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01
+configure_requires:
+  ExtUtils::Depends: '0.2'
+  ExtUtils::MakeMaker: '0'
+  ExtUtils::PkgConfig: '1.03'
+  Glib: '1.120'

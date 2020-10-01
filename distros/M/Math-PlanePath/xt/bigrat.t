@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -38,7 +38,7 @@ BEGIN { MyTestHelpers::nowarnings(); }
 # use Smart::Comments '###';
 
 
-my $test_count = (tests => 482)[1];
+my $test_count = (tests => 484)[1];
 plan tests => $test_count;
 
 if (! eval { require Math::BigRat; 1 }) {
@@ -598,6 +598,7 @@ my @modules = (
                # 'CornerReplicate',    # not defined yet
                'DigitGroups',
                'PeanoCurve',
+               'PeanoDiagonals',
                'ZOrderCurve',
                
                'HIndexing',

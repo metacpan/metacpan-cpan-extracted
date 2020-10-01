@@ -167,7 +167,7 @@ sub unpack_windows_time {
 
     # adjust the UNIX epoch time to the local OS's epoch time
     # (see perlport's Time and Date section)
-    my $epoch_offset = timegm(0, 0, 0, 1, 0, 70);
+    my $epoch_offset = timegm(0, 0, 0, 1, 0, 1970);
     $epoch_time += $epoch_offset;
 
     if ($epoch_time < 0 || $epoch_time > 0x7fffffff) {

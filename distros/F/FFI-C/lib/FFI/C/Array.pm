@@ -9,7 +9,7 @@ use overload
   fallback => 1;
 
 # ABSTRACT: Array instance for FFI
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub get
@@ -88,7 +88,7 @@ FFI::C::Array - Array instance for FFI
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -189,6 +189,10 @@ Returns a Perl array reference tied to the C array.
 =item L<FFI::C::ArrayDef>
 
 =item L<FFI::C::Def>
+
+=item L<FFI::C::File>
+
+=item L<FFI::C::PosixFile>
 
 =item L<FFI::C::Struct>
 

@@ -1,9 +1,11 @@
 Changes
+CONTRIBUTING.md
 lib/Nice/Try.pm
 LICENSE
 Makefile.PL
 MANIFEST
 README
+t/001_load.t
 t/002_try_catch.t
 t/003_try_finally.t
 t/004_try_catch_finally.t
@@ -14,7 +16,10 @@ t/008_finally_die.t
 t/009_localise.t
 t/010_catch_bug.t
 t/011_exception.t
-t/011_pod.t
-t/012_pod.t
+t/012_consecutive.t
+t/013_pod.t
+t/014_eof.t
+t/015_eot.t
+t/016_kwalitee.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

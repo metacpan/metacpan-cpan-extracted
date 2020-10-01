@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use 5.010;
+use YAML::Tidy;
+use YAML::Tidy::Config;
+use Getopt::Long::Descriptive;
+use Encode;
+
+my ($opt, $usage) = describe_options(
+    'yamltidy %o file(s)',
+    [ 'config-file|c=s' => 'Config file' ],
+    [ 'config-data|d=s' => 'Configuration as a string' ],
+    [ 'inplace|i' => 'Edit file inplace' ],
+    [ 'debug' => 'Debugging output' ],
+    [ 'partial' => 'Input is only a part of a YAML file' ],
+    [ 'indent=i' => 'Override indentation spaces from config' ],
+    [],
+    [ 'help|h', "print usage message and exit", { shortcircuit => 1 } ],
+    [ 'version', "Print version information", { shortcircuit => 1 } ],
+);
+print($usage->text), exit if $opt->help;
+my @versions = (
+    YAML::Tidy->VERSION, YAML::PP->VERSION,
+    YAML::LibYAML::API->VERSION,
+    YAML::LibYAML::API::XS::libyaml_version
+);
+if ($opt->version) {
+    printf <<'EOM', @versions;
+yamltidy:           %s
+YAML::PP:           %s
+YAML::LibYAML::API: %s
+libyaml:            %s
+EOM
+    exit;
+}
+
+my ($file) = @ARGV;
+unless (defined $file) {
+    print $usage->text;
+    exit;
+}
+my $yaml;
+if ($file eq '-') {
+    $yaml = decode_utf8 do { local $/; <STDIN> };
+}
+else {
+    open my $fh, '<:encoding(UTF-8)', $file or die $!;
+    $yaml = do { local $/; <$fh> };
+    close $fh;
+}
+
+my $cfg = YAML::Tidy::Config->new(
+    configfile => $opt->config_file,
+    configdata => $opt->config_data,
+    indentspaces => $opt->indent,
+);
+my $yt = YAML::Tidy->new(
+    cfg => $cfg,
+    partial => $opt->partial,
+);
+if ($opt->debug) {
+    say "# Before:";
+    print encode_utf8 $yt->highlight($yaml);
+}
+
+my $out = $yt->tidy($yaml);
+
+if ($opt->inplace) {
+    open my $fh, '>:encoding(UTF-8)', $file or die $!;
+    print $fh $out;
+    close $fh;
+}
+else {
+    if ($opt->debug) {
+    }
+    else {
+        print encode_utf8 $out;
+    }
+}
+if ($opt->debug) {
+    say "# After:";
+    print encode_utf8 $yt->highlight($out);
+}

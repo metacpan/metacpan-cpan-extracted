@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2015 Kevin Ryde
+# Copyright 2012, 2013, 2015, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -143,7 +143,7 @@ foreach my $path_name (@path_names) {
   my %checked_anums = map {$_=>1} @checked_anums;
 
   foreach my $anum (str_duplicates(@pod_anums)) {
-    diag "Math::PlanePath::$path_name duplicate pod $anum";
+    diag "Math::PlanePath::$path_name $anum duplicated within POD";
   }
   @pod_anums = List::MoreUtils::uniq(@pod_anums);
 
@@ -151,7 +151,7 @@ foreach my $path_name (@path_names) {
     next if $anum eq 'A000012'; # all ones
     next if $anum eq 'A000027'; # 1,2,3 naturals
     next if $anum eq 'A005408'; # odd 2n+1
-    diag "Math::PlanePath::$path_name duplicate check $anum";
+    diag "Math::PlanePath::$path_name $anum checked and also catalogued";
   }
   @checked_anums = List::MoreUtils::uniq(@checked_anums);
   diag "";
@@ -159,7 +159,7 @@ foreach my $path_name (@path_names) {
   foreach my $anum (@pod_anums) {
     next if $anum eq 'A191689'; # CCurve fractal dimension
     if (! exists $checked_anums{$anum}) {
-      diag "Math::PlanePath::$path_name pod anum $anum not checked";
+      diag "Math::PlanePath::$path_name $anum in POD, not checked";
     }
   }
 
@@ -173,7 +173,7 @@ foreach my $path_name (@path_names) {
     next if $anum eq 'A059841'; # 1,0 reps
     next if $anum eq 'A165211'; # 0,1,0,1, 1,0,1,0, repeating
     if (! exists $pod_anums{$anum}) {
-      diag "Math::PlanePath::$path_name checked anum $anum not in pod";
+      diag "Math::PlanePath::$path_name $anum checked, not in POD";
     }
   }
 }

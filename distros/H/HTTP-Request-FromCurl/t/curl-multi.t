@@ -9,6 +9,9 @@ use TestCurlIdentity 'run_curl_tests', '$server';
 
 my @tests = (
     { cmd => [ '--verbose', '-s', '$url', '$url?foo=bar', ] },
+    { cmd => [ '--verbose', '-s', '$url', '--junk-session-cookies', '$url?foo=bar', ] },
+    { cmd => [ '--verbose', '-s', '$url', '--next', '$url?foo=bar', ] },
+    { cmd => [ '--verbose', '-s', '$url', '-:', '$url?foo=bar', ] },
     { cmd => [ '--verbose', '-s', '$url?foo={bar,baz}', ] },
     { cmd => [ '--verbose', '-s', '-g', '$url', '$url?foo={bar,baz}', ] },
     { cmd => [ '--verbose', '-s', '--globoff', '$url', '$url?foo={bar,baz}', ] },

@@ -25,6 +25,8 @@ Sets up the autoloader to load the modules in the Lingua::Stem system on demand.
 
 =head1 CHANGES
 
+ 2.31 2020.09.26 - Fix for Latin1/UTF8 issue in documentation
+
  2.30 2020.06.20 - Version renumber for module consistency
 
  1.03 2004.07.25 - Added 'Lingua::Stem::Ru'
@@ -45,7 +47,7 @@ use warnings;
 
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = "2.30";
+$VERSION = "2.31";
 
 my $_autoloaded_functions = {};
 

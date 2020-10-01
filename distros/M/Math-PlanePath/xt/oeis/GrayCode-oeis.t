@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 
 use Test;
-plan tests => 37;
+plan tests => 42;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -34,6 +34,191 @@ use Math::PlanePath::Base::Digits
   'digit_split_lowtohigh', 'digit_join_lowtohigh';
 use Math::PlanePath::Diagonals;
 use Math::NumSeq::PlanePathTurn;
+
+# GP-DEFINE  read("my-oeis.gp");
+
+
+#------------------------------------------------------------------------------
+# Helpers
+
+# GP-Test  my(want=50*10^6);  /* more stack */  \
+# GP-Test  if(default(parisizemax)<want, default(parisizemax,want)); 1
+
+sub to_Gray_reflected {
+  my ($n,$radix) = @_;
+  my $digits = [ digit_split_lowtohigh($n,$radix) ];
+  Math::PlanePath::GrayCode::_digits_to_gray_reflected($digits,$radix);
+  return digit_join_lowtohigh($digits,$radix);
+}
+
+sub from_Gray_reflected {
+  my ($n,$radix) = @_;
+  my $digits = [ digit_split_lowtohigh($n,$radix) ];
+  Math::PlanePath::GrayCode::_digits_from_gray_reflected($digits,$radix);
+  return digit_join_lowtohigh($digits,$radix);
+}
+
+
+#------------------------------------------------------------------------------
+# A309952 -- X coordinate, Ts
+
+MyOEIS::compare_values
+  (anum => 'A309952',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::GrayCode->new (apply_type => 'Ts');
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A064706 - binary reflected Gray twice
+#
+# (n XOR n>>1) XOR (n XOR n>>1) >> 1
+# = n XOR n>>1 XOR n>>1 XOR n>>2
+# = n XOR n>>2
+
+MyOEIS::compare_values
+  (anum => 'A064706',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       push @got, to_Gray_reflected(to_Gray_reflected($n,2),2);
+     }
+     return \@got;
+   });
+
+# A064707 - binary reflected UnGray twice
+MyOEIS::compare_values
+  (anum => 'A064707',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       push @got, from_Gray_reflected(from_Gray_reflected($n,2),2);
+     }
+     return \@got;
+   });
+
+# GP-DEFINE  \\ A003188
+# GP-DEFINE  binary_reflected_Gray(n) = bitxor(n,n>>1);
+#
+# GP-DEFINE  \\ A006068
+# GP-DEFINE  binary_reflected_UnGray(g) = {
+# GP-DEFINE    my(v=binary(g),r=0);
+# GP-DEFINE    for(i=2,#v,  \\ high to low
+# GP-DEFINE        v[i] = bitxor(v[i],v[i-1]));
+# GP-DEFINE    fromdigits(v,2);
+# GP-DEFINE  }
+# my(v=OEIS_samples("A006068")); vector(#v,n,n--; binary_reflected_UnGray(n)) == v  \\ OFFSET=0
+# my(g=OEIS_bfile_gf("A006068")); g==Polrev(vector(poldegree(g)+1,n,n--;binary_reflected_UnGray(n)))
+# poldegree(OEIS_bfile_gf("A006068"))
+#
+# GP-DEFINE  \\ double binary Gray
+# GP-DEFINE  A064706(n) = binary_reflected_Gray(binary_reflected_Gray(n));
+# my(v=OEIS_samples("A064706")); vector(#v,n,n--; A064706(n)) == v  \\ OFFSET=0
+# my(g=OEIS_bfile_gf("A064706")); g==Polrev(vector(poldegree(g)+1,n,n--;A064706(n)))
+# poldegree(OEIS_bfile_gf("A064706"))
+
+# GP-DEFINE  \\ double binary UnGray
+# GP-DEFINE  A064707(n) = {
+# GP-DEFINE    my(v=binary(n));
+# GP-DEFINE    for(i=3,#v,v[i]=bitxor(v[i],v[i-2]));
+# GP-DEFINE    fromdigits(v,2);
+# GP-DEFINE  }
+# my(v=OEIS_samples("A064707")); vector(#v,n,n--; A064707(n)) == v  \\ OFFSET=0
+# my(g=OEIS_bfile_gf("A064707")); g==Polrev(vector(poldegree(g)+1,n,n--;A064707(n)))
+# poldegree(OEIS_bfile_gf("A064707"))
+# GP-Test  vector(2^14,n,n--; A064707(A064706(n))) == \
+# GP-Test  vector(2^14,n,n--; n)
+# GP-Test  vector(2^14,n,n--; A064706(A064707(n))) == \
+# GP-Test  vector(2^14,n,n--; n)
+#
+# GP-Test  /* by shifts like Jorg and Paul D. Hanna in UnGray A006068 */ \
+# GP-Test  /* bit lengths of ops 1 + 2 + ... + 2^log(nlen) */ \
+# GP-Test  /* so linear in nlen rounded up to next power of 2 */ \
+# GP-Test  vector(2^14,n,n--; A064707(n)) == \
+# GP-Test  vector(2^14,n,n--; \
+# GP-Test         my(s=1,ns); while(ns=n>>(s<<=1), n=bitxor(n,ns)); n)
+#
+# GP-DEFINE  extract_even_bits(n) = fromdigits(digits(n,4)%2,2);
+# GP-DEFINE  extract_odd_bits(n) = fromdigits(digits(n,4)>>1,2);
+# GP-DEFINE  spread_even_bits(n) = fromdigits(digits(n,2),4);
+# GP-DEFINE  spread_odd_bits(n) = fromdigits(digits(n,2)<<1,4);
+
+# GP-Test  /* double binary Gray as applied to evens and odds separately */ \
+# GP-Test  /* per Antti Karttunen formula in A064706 */ \
+# GP-Test  vector(2^14,n,n--; A064707(n)) == \
+# GP-Test  vector(2^14,n,n--; \
+# GP-Test    my(e=extract_even_bits(n)); \
+# GP-Test    my(o=extract_odd_bits(n)); \
+# GP-Test    e=binary_reflected_UnGray(e); \
+# GP-Test    o=binary_reflected_UnGray(o); \
+# GP-Test    spread_even_bits(e) + spread_odd_bits(o))
+
+
+#------------------------------------------------------------------------------
+# A098488 - decimal modular Gray
+
+MyOEIS::compare_values
+  (anum => 'A098488',
+   func => sub {
+     my ($count) = @_;
+     my $radix = 10;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my $digits = [ digit_split_lowtohigh($n,$radix) ];
+       Math::PlanePath::GrayCode::_digits_to_gray_modular($digits,$radix);
+       push @got, digit_join_lowtohigh($digits,$radix);
+     }
+     return \@got;
+   });
+
+# A226134 - decimal modular UnGray
+MyOEIS::compare_values
+  (anum => 'A226134',
+   func => sub {
+     my ($count) = @_;
+     my $radix = 10;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my $digits = [ digit_split_lowtohigh($n,$radix) ];
+       Math::PlanePath::GrayCode::_digits_from_gray_modular($digits,$radix);
+       push @got, digit_join_lowtohigh($digits,$radix);
+     }
+     return \@got;
+   });
+
+# GP-DEFINE  A098488(n) = my(v=digits(n)); forstep(i=#v,2,-1, v[i]=(v[i]-v[i-1])%10); fromdigits(v);
+#
+# GP-Test  /* Martin Cohn, example 4 Gray column */ \
+# GP-Test  my(want=[6764,6765,6766,6767,6768,6769,6760, \
+# GP-Test           6860,6861,6862,6863,6864,6865], \
+# GP-Test     lo=6393, hi=6405); \
+# GP-Test  for(n=lo,hi, my(i=n-lo+1); \
+# GP-Test    A098488(n) == want[i] || error()); \
+# GP-Test  1
+# GP-Test  /* Martin Cohn, example 4 matrix, for any 4-digit number */ \
+# GP-Test  my(m=[1,9,0,0; 0,1,9,0; 0,0,1,9; 0,0,0,1]); \
+# GP-Test  forvec(v=vector(4,i, [0,9]), \
+# GP-Test    A098488(fromdigits(v)) == fromdigits((v*m)%10) || error(v*m)); \
+# GP-Test  1
+
+# GP-DEFINE  to_Gray(n,base) = {
+# GP-DEFINE    my(v=digits(n,base));
+# GP-DEFINE    forstep(i=#v,2,-1, v[i]=(v[i]-v[i-1])%base);
+# GP-DEFINE    fromdigits(v,base);
+# GP-DEFINE  }
+# GP-Test  vector(10^5,n,n--; A098488(n)) == \
+# GP-Test  vector(10^5,n,n--; to_Gray(n,10))
+
+# vector(10^5,n,n--; to_Gray(n,10))
 
 
 #------------------------------------------------------------------------------
@@ -195,10 +380,10 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A006068 -- ungray, inverse Gray TsT X,Y -> ZOrder N
+# A006068 -- UnGray, inverse Gray TsT X,Y -> ZOrder N
 #                          and ZOrder X,Y -> Gray FsF
 MyOEIS::compare_values
-  (anum => 'A006068',
+  (anum => q{A006068},
    func => sub {
      my ($count) = @_;
      require Math::PlanePath::ZOrderCurve;
@@ -213,9 +398,9 @@ MyOEIS::compare_values
      return \@got;
    });
 
-# A006068 -- ungray, ZOrder X,Y -> Gray FsT N
+# A006068 -- UnGray, ZOrder X,Y -> Gray FsT N
 MyOEIS::compare_values
-  (anum => 'A006068',
+  (anum => q{A006068},
    func => sub {
      my ($count) = @_;
      require Math::PlanePath::ZOrderCurve;
@@ -555,19 +740,16 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A003188 - binary gray reflected
+# A003188 - binary reflected Gray
 # modular and reflected same in binary
 
 MyOEIS::compare_values
   (anum => 'A003188',
    func => sub {
      my ($count) = @_;
-     my $radix = 2;
      my @got;
      for (my $n = 0; @got < $count; $n++) {
-       my $digits = [ digit_split_lowtohigh($n,$radix) ];
-       Math::PlanePath::GrayCode::_digits_to_gray_reflected($digits,$radix);
-       push @got, digit_join_lowtohigh($digits,$radix);
+       push @got, to_Gray_reflected($n,2);
      }
      return \@got;
    });
@@ -586,7 +768,7 @@ MyOEIS::compare_values
      return \@got;
    });
 
-# A014550 - binary gray reflected, in binary
+# A014550 - binary Gray reflected, in binary
 MyOEIS::compare_values
   (anum => 'A014550',
    func => sub {
@@ -615,9 +797,9 @@ MyOEIS::compare_values
      return \@got;
    });
 
-# A006068 - binary gray reflected inverse
+# A006068 - binary Gray reflected inverse
 MyOEIS::compare_values
-  (anum => 'A006068',
+  (anum => q{A006068},
    func => sub {
      my ($count) = @_;
      my $radix = 2;
@@ -631,7 +813,7 @@ MyOEIS::compare_values
    });
 
 MyOEIS::compare_values
-  (anum => 'A006068',
+  (anum => q{A006068},
    func => sub {
      my ($count) = @_;
      my $radix = 2;
@@ -644,8 +826,42 @@ MyOEIS::compare_values
      return \@got;
    });
 
+# binary reflected Gray code increments
+# lowest 1-bit of N, and negate if bit above it is a 1
+MyOEIS::compare_values
+  (anum => 'A055975',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 1; @got < $count; $n++) {
+       push @got, to_Gray_reflected($n,2) - to_Gray_reflected($n-1,2);
+     }
+     return \@got;
+   });
+
+# A119972 - signed n according as binary reflected Gray code increment negative
+# dragon curve turn(n) * n
+MyOEIS::compare_values
+  (anum => 'A119972',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 1; @got < $count; $n++) {
+       push @got,
+         to_Gray_reflected($n,2) > to_Gray_reflected($n-1,2)
+         ? $n : -$n;
+     }
+     return \@got;
+   });
+
+# A119974 - insert 0s into A119972 ...
+# https://oeis.org/A119974/table
+#
+# A220466 - something bit wise crossreffed from increments A055975 ...
+
+
 #------------------------------------------------------------------------------
-# A105530 - ternary gray modular
+# A105530 - ternary Gray modular
 
 MyOEIS::compare_values
   (anum => 'A105530',
@@ -661,7 +877,7 @@ MyOEIS::compare_values
      return \@got;
    });
 
-# A105529 - ternary gray modular inverse
+# A105529 - ternary Gray modular inverse
 MyOEIS::compare_values
   (anum => 'A105529',
    func => sub {
@@ -676,8 +892,21 @@ MyOEIS::compare_values
      return \@got;
    });
 
+# GP-DEFINE  A105530(n) = my(v=digits(n,3)); forstep(i=#v,2,-1, v[i]=(v[i]-v[i-1])%3); fromdigits(v,3);
+# my(v=OEIS_samples("A105530")); vector(#v,n,n--; A105530(n)) == v  \\ OFFSET=0
+# my(g=OEIS_bfile_gf("A105530")); g==Polrev(vector(poldegree(g)+1,n,n--;A105530(n)))
+# poldegree(OEIS_bfile_gf("A105530"))
+# GP-Test  vector(3^5,n,n--; A105530(n)) == \
+# GP-Test  vector(3^5,n,n--; to_Gray(n,3))
+
+# vector(20,n, to_Gray(n,4))
+# vector(20,n, to_Gray(n,5))
+# not in OEIS: 1, 2, 3, 7, 4, 5, 6, 10, 11, 8, 9, 13, 14, 15, 12, 28, 29, 30, 31, 19
+# not in OEIS: 1, 2, 3, 4, 9, 5, 6, 7, 8, 13, 14, 10, 11, 12, 17, 18, 19, 15, 16, 21
+
+
 #------------------------------------------------------------------------------
-# A128173 - ternary gray reflected
+# A128173 - ternary Gray reflected
 # odd radix to and from are the same
 
 MyOEIS::compare_values
@@ -709,7 +938,7 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A003100 - decimal gray reflected
+# A003100 - decimal Gray reflected
 
 MyOEIS::compare_values
   (anum => 'A003100',
@@ -725,7 +954,7 @@ MyOEIS::compare_values
      return \@got;
    });
 
-# A174025 - decimal gray reflected inverse
+# A174025 - decimal Gray reflected inverse
 MyOEIS::compare_values
   (anum => 'A174025',
    func => sub {
@@ -735,23 +964,6 @@ MyOEIS::compare_values
      for (my $n = 0; @got < $count; $n++) {
        my $digits = [ digit_split_lowtohigh($n,$radix) ];
        Math::PlanePath::GrayCode::_digits_from_gray_reflected($digits,$radix);
-       push @got, digit_join_lowtohigh($digits,$radix);
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A098488 - decimal gray modular
-
-MyOEIS::compare_values
-  (anum => 'A098488',
-   func => sub {
-     my ($count) = @_;
-     my $radix = 10;
-     my @got;
-     for (my $n = 0; @got < $count; $n++) {
-       my $digits = [ digit_split_lowtohigh($n,$radix) ];
-       Math::PlanePath::GrayCode::_digits_to_gray_modular($digits,$radix);
        push @got, digit_join_lowtohigh($digits,$radix);
      }
      return \@got;

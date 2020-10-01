@@ -2,7 +2,6 @@ use strict;
 use Test::More tests => 2;
 use File::Basename 'dirname';
 use Spreadsheet::ReadSXC;
-use XML::Parser;
 use Data::Dumper;
 
 my $d = dirname($0);

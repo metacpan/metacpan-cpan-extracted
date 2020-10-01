@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.82';
+$Geo::Address::Formatter::VERSION = '1.83';
 use strict;
 use warnings;
 use feature qw(say);
@@ -171,6 +171,7 @@ sub format_address {
     # do we have the minimal components for an address?
     # or should we instead use the fallback template?
     if (!$self->_minimal_components($rh_components)){
+        #say STDERR "using fallback";
         if (defined($rh_config->{fallback_template})){
             $template_text = $rh_config->{fallback_template};
         }
@@ -186,8 +187,8 @@ sub format_address {
     $self->_add_state_code($rh_components);    
     $self->_add_county_code($rh_components);
     
-    #say "after adding codes";
-    #say Dumper $rh_components;
+    #say STDERR "after adding codes";
+    #say STDERR Dumper $rh_components;
 
     # add the attention, but only if needed
     my $ra_unknown = $self->_find_unknown_components($rh_components);
@@ -206,9 +207,17 @@ sub format_address {
     }
     my $compiled_template = $THT_CACHE{$template_text};
 
+    #say STDERR "before _render_template";
+    #say STDERR Dumper $rh_components;
+    #say STDERR "template: ";
+    #say STDERR Dumper $compiled_template;
+
     # render it
     my $text;
     $text = $self->_render_template($compiled_template, $rh_components);
+
+    #say STDERR "text after _render_template $text";
+
     $text = $self->_postformat($text,$rh_config->{postformat_replace});
     $text = $self->_clean($text);
 
@@ -223,6 +232,7 @@ sub format_address {
 sub _postformat {
     my $self      = shift;
     my $text      = shift;
+    #say STDERR "_postformat $text";
     my $raa_rules = shift;
     my $text_orig = $text; # keep a copy
 
@@ -233,7 +243,9 @@ sub _postformat {
     foreach my $piece (@before_pieces){
         $piece =~s/^\s+//g;
         $seen{$piece}++;
-        next if ($seen{$piece} > 1);
+        if (lc($piece) ne 'new york'){
+            next if ($seen{$piece} > 1);
+        }
         push(@after_pieces,$piece);
     }
     $text = join(', ', @after_pieces);
@@ -629,8 +641,10 @@ sub _clean {
         foreach my $w (@before_words){
             $w =~s/^\h+//g;
             $w =~s/\h+$//g;
-            $seen_words{$w}++;
-            next if ($seen_words{$w} > 1);
+            if (lc($w) ne 'new york'){
+                $seen_words{$w}++;
+            }
+            next if ((defined($seen_words{$w})) && ($seen_words{$w} > 1));
             push(@after_words,$w);
         }
         $line = join(', ', @after_words);
@@ -660,7 +674,7 @@ sub _render_template {
     };
 
     my $output = $thtemplate->render($context);
-    #warn "in _render pre _clean $output";
+    # say STDERR "in _render pre _clean $output";
     $output = $self->_clean($output);
 
     # is it empty?
@@ -702,7 +716,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.82
+version 1.83
 
 =head1 SYNOPSIS
 

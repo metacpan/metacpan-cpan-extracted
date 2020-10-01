@@ -1,5 +1,11 @@
 Revision history for Perl module Mac::PropertyList
 
+1.501 2020-09-30T04:50:46Z
+	* Added create_plist_from_string()
+	* Merged Tom Wyant's code to handle CF$UID types
+	* A few more things emit warnings if they don't get the right type
+	* $XML_{head,foot} are now subroutines
+
 1.413 2018-03-22T18:51:07Z
 	* Update to Artistic License 2.0
 

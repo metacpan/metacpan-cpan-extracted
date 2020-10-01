@@ -39,7 +39,7 @@ TODO:
 
     ## OK, we really hope people have -lm around
     ok(!$ac_1->check_lib("m", "foobar"), "foobar() not in -lm");
-    ok($ac_1->check_lib("m", "atan"),    "atan() in -lm");
+    ok($ac_1->check_lib("m",  "atan"),   "atan() in -lm");
 
     my ($where_atan, $ac_2);
     ok($ac_2       = Config::AutoConf->new(logfile => "config4.log"), "Instantiating Config::AutoConf for search_libs() tests");

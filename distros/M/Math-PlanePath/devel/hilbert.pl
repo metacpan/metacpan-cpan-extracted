@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2014, 2015, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014, 2015, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,12 +19,126 @@
 
 use 5.010;
 use strict;
-use List::Util 'min','max';
+use FindBin;
+use List::Util 'min','max','sum';
 use Math::PlanePath::HilbertCurve;
 use Math::PlanePath::Base::Digits
-  'digit_split_lowtohigh';
+  'digit_split_lowtohigh',
+  'digit_join_lowtohigh';
 
-use Smart::Comments;
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
+
+{
+  # E.H. Moore Cycle of Hilbert Curves
+  # 2*4^k - 1
+  # area inside half less 1
+
+  unshift @INC, "$FindBin::Bin/../../dragon/tools";
+  require MyPlanar;
+  my $path = Math::PlanePath::HilbertCurve->new;
+  my @values;
+  foreach my $k (0 .. 9) {
+    my ($n_lo,$n_hi) = $path->level_to_n_range($k);
+    ### $n_hi
+    my $y_end = 2**$k;
+    my $points = [ map {[$path->n_to_xy($_)]} $n_lo .. $n_hi ];
+    if ($k % 2 == 0) {
+      ### transpose ...
+      $points = MyPlanar::points_transpose($points);
+    }
+    ### points: $points
+    $points->[-1]->[0] == 0 or die;
+    $points->[-1]->[1] == $y_end-1 or die;
+    ### p0: $points->[0]
+    ### p0x: $points->[0]->[0]
+    my $neg = MyPlanar::points_xyscale($points, -1,1);
+    $neg = MyPlanar::points_move($neg, -1,0);
+    @$neg = reverse @$neg;
+    ### neg: $neg
+    $points = [ @$points,
+                @{MyPlanar::points_move($points, 0, $y_end)},
+                @{MyPlanar::points_move($neg,    0, $y_end)},
+                @$neg ];
+    ### $points
+    my $A = MyPlanar::points_to_area($points);
+    print "$A,";
+    push @values, $A;
+  }
+  print "\n";
+  require Math::OEIS::Grep;
+  Math::OEIS::Grep->search(array => \@values, verbose=>1);
+  exit 0;
+}
+
+{
+  # Thue-Morse Constant fixed point of Hilbert Curve
+  #
+  # GP-DEFINE  ThueMorse(n) = hammingweight(n)%2;
+  # vector(6,k, fromdigits(vector(2^k,n,ThueMorse(n)),2))
+  # not in OEIS: 3, 13, 211, 54061, 3542953171, 15216868001456509741
+  #
+  # vector(6,k, fromdigits(vector(2^k-1,n,ThueMorse(n)),2))
+  # 1, 6, 105, 27030, 1771476585, 7608434000728254870
+  # A048707 numerators of convergents
+  #
+  # vector(12,len, fromdigits(vector(len,n,ThueMorse(n)),2))
+  # 1, 3, 6, 13, 26, 52, 105, 211, 422, 844, 1689, 3378
+  # A019300 terms as binary
+  #
+  # even number of bits
+  # vector(10,len, fromdigits(vector(2*len,n,ThueMorse(n)),2))
+  # not in OEIS: 3, 13, 52, 211, 844, 3378, 13515, 54061, 216244, 864978
+  #
+  # multiple of 4 number of bits
+  # vector(8,len, fromdigits(vector(4*len,n,ThueMorse(n)),2))
+  # not in OEIS: 13, 211, 3378, 54061, 864978, 13839660, 221434573, 3542953171
+
+  {
+    my $k = 8;
+    my $len = 2*$k-1;
+    print ThueMorseConstant_len($len) / 2.0**$len,"\n";
+  }
+
+  my $path = Math::PlanePath::HilbertCurve->new;
+  foreach my $k (0 .. 12) {
+    # my $k = 1<<$k;
+    my $n = ThueMorseConstant_len(2*$k-1);
+    my ($x,$y) = $path->n_to_xy($n);
+    if ($k % 2 == 1) {
+      ($x,$y) = ($y,$x);
+    }
+    printf "%-24b %-12b %-12b\n", $n, $x, $y;
+
+    # even terms
+    # printf "%-24b\n",
+    #   digit_join_lowtohigh([map {ThueMorse(2*$_)} reverse 1 .. $k], 2);
+  }
+  exit 0;
+
+  sub ThueMorseConstant_len {
+    my ($len) = @_;
+    return digit_join_lowtohigh([map {ThueMorse($_)} reverse 1 .. $len], 2);
+  }
+  sub ThueMorse {
+    my ($n) = @_;
+    sum(0,digit_split_lowtohigh($n,2)) % 2;
+  }
+
+  sub Paper_len {
+    my ($len) = @_;
+    return digit_join_lowtohigh([map {Paper($_)} reverse 1 .. $len], 2);
+  }
+  sub Paper {
+    my ($n) = @_;
+    for (;;) {
+      die if $n==0;
+      if ($n&1) { return 1 - (($n>>1)&1); }
+      $n >>= 1;
+    }
+  }
+}
 
 {
   # HilbertSides axis count

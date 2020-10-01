@@ -37,7 +37,7 @@ my %module = (
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.008', # we want/need a special binmode form
+    MIN_PERL_VERSION => '5.010', # we want/need a special binmode form, and "state"
 
     'LICENSE'=> 'perl',
 
@@ -48,9 +48,16 @@ my %module = (
 
     PREREQ_PM => {
         'Carp'               => 0,
+        'PerlX::Maybe'       => 0,
+        'Filter::signatures' => '0.16',
         'Archive::Zip'       => '1.34', # for seekable streams, verified thanks to Backpan
         'PerlIO::gzip'       => 0,
-        'XML::Parser'        => 0,
+        'XML::Twig'          => 0,
+        'XML::XPath'         => 0,
+        'XML::XPathEngine'   => 0,
+        'XML::Twig::XPath'   => 0,
+        'Storable'           => 0,
+        'Moo'                => 2,
     },
     TEST_REQUIRES => {
         'Test::More'     => 0,

@@ -23,6 +23,8 @@ pod_spelling_system:
     - WASI
     - TOML
     - interruptable
+    - gc
+    - finalizers
 
 pod_coverage:
   skip: 0

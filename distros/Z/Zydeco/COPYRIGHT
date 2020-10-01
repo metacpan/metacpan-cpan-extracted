@@ -67,6 +67,7 @@ Files: INSTALL
  Makefile.PL
  examples/calculator.pl
  examples/mip-087-001.pl
+ examples/moose-metaclass.pl
  examples/simple-json-encoder.pl
  examples/structs.pl
 Copyright: Unknown

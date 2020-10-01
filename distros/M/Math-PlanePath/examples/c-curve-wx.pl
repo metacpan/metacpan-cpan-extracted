@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -63,7 +63,7 @@ use Wx::Event;
 # use Smart::Comments;
 
 
-our $VERSION = 127;
+our $VERSION = 128;
 
 my $level = 5;
 my $scale = 1;

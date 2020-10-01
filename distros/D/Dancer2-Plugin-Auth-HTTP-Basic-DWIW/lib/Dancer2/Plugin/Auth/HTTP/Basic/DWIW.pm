@@ -3,7 +3,7 @@ use warnings;
 
 package Dancer2::Plugin::Auth::HTTP::Basic::DWIW;
 # ABSTRACT: HTTP Basic authentication plugin for Dancer2 that does what I want.
-$Dancer2::Plugin::Auth::HTTP::Basic::DWIW::VERSION = '0.08';
+$Dancer2::Plugin::Auth::HTTP::Basic::DWIW::VERSION = '0.0801';
 use MIME::Base64;
 use Dancer2::Plugin;
 
@@ -107,7 +107,7 @@ Dancer2::Plugin::Auth::HTTP::Basic::DWIW - HTTP Basic authentication plugin for 
 
 =head1 VERSION
 
-version 0.08
+version 0.0801
 
 =head1 SYNOPSIS
 

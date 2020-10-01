@@ -6,6 +6,7 @@ use vars qw( $VERSION @EXPORT_OK );
 
 use Encode              ();
 use Mac::PropertyList   ();
+use Math::BigInt;
 use Exporter          qw(import);
 
 =encoding utf8
@@ -18,8 +19,8 @@ Mac::PropertyList::WriteBinary - pack data into a Mac "binary property list"
 
     use Mac::PropertyList::WriteBinary;
 
-    my $data = new Mac::PropertyList::dict({ ... => ... });
-    my $buf = Mac::PropertyList::WriteBinary::as_string($data);
+    my $data = Mac::PropertyList::dict->new( { ... => ... } );
+    my $buf  = Mac::PropertyList::WriteBinary::as_string($data);
 
 =head1 DESCRIPTION
 
@@ -406,6 +407,17 @@ sub _as_bplist_fragment {
     }
 }
 
+package Mac::PropertyList::uid;
+
+use constant tagUID => Mac::PropertyList::WriteBinary->tagUID;
+
+sub _as_bplist_fragment {
+    my( $value ) = $_[0]->value;
+
+    # TODO what about UIDs longer than 16 bytes? Or are there none?
+    return pack 'CH*', tagUID + length( $value ) / 2 - 1, $value;
+}
+
 package Mac::PropertyList::string;
 
 sub _as_bplist_fragment {
@@ -442,7 +454,9 @@ sub _as_bplist_fragment { return "\x08"; }
 
 Wim Lewis, C<< <wiml@cpan.org> >>
 
-Copyright © 2012-2014 Wim Lewis.  All rights reserved.
+Copyright © 2012-2014 Wim Lewis. All rights reserved.
+
+Tom Wyant added support for UID types.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::VERSION = '0.91';
+$Shared::Examples::Net::Amazon::S3::VERSION = '0.94';
 use strict;
 use warnings;
 
@@ -349,6 +349,7 @@ sub expect_operation_bucket_acl_set {
 
     Hash::Util::lock_keys %params,
         qw[ with_bucket ],
+		qw[ with_acl ],
         qw[ with_acl_xml ],
         qw[ with_acl_short ],
         _keys_operation,
@@ -365,6 +366,7 @@ sub expect_operation_bucket_create {
     Hash::Util::lock_keys %params,
         qw[ with_bucket ],
         qw[ with_acl ],
+        qw[ with_acl_short ],
         qw[ with_region ],
         _keys_operation,
         ;
@@ -438,6 +440,7 @@ sub expect_operation_object_acl_set {
     Hash::Util::lock_keys %params,
         qw[ with_bucket ],
         qw[ with_key ],
+        qw[ with_acl ],
         qw[ with_acl_xml ],
         qw[ with_acl_short ],
         _keys_operation,
@@ -464,6 +467,8 @@ sub expect_operation_object_create {
         qw[ with_expires ],
         qw[ with_storage_class  ],
         qw[ with_user_metadata ],
+		qw[ with_acl ],
+		qw[ with_acl_short ],
 
         _keys_operation,
         ;
@@ -514,6 +519,64 @@ sub expect_operation_object_head {
     _expect_operation $title, %params, -operation => 'operation_object_head';
 }
 
+sub expect_operation_bucket_tags_add {
+    my ($title, %params) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    Hash::Util::lock_keys %params,
+        qw[ with_bucket ],
+        qw[ with_tags ],
+        _keys_operation,
+        ;
+
+    _expect_operation $title, %params, -operation => 'operation_bucket_tags_add';
+}
+
+sub expect_operation_object_tags_add {
+    my ($title, %params) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    Hash::Util::lock_keys %params,
+        qw[ with_bucket ],
+        qw[ with_key ],
+        qw[ with_tags ],
+        qw[ with_version_id ],
+        _keys_operation,
+        ;
+
+    _expect_operation $title, %params, -operation => 'operation_object_tags_add';
+}
+
+sub expect_operation_bucket_tags_delete {
+    my ($title, %params) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    Hash::Util::lock_keys %params,
+        qw[ with_bucket ],
+        _keys_operation,
+        ;
+
+    _expect_operation $title, %params, -operation => 'operation_bucket_tags_delete';
+}
+
+sub expect_operation_object_tags_delete {
+    my ($title, %params) = @_;
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    Hash::Util::lock_keys %params,
+        qw[ with_bucket ],
+        qw[ with_key ],
+        qw[ with_version_id ],
+        _keys_operation,
+        ;
+
+    _expect_operation $title, %params, -operation => 'operation_object_tags_delete';
+}
+
 1;
 
 __END__
@@ -528,15 +591,15 @@ Shared::Examples::Net::Amazon::S3 - used for testing and as example
 
 =head1 VERSION
 
-version 0.91
+version 0.94
 
 =head1 AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-01'; # DATE
+our $DATE = '2020-07-21'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Acme-CPANModules'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -103,7 +103,7 @@ sub munge_file {
         return;
     }
 
-    my $abstract = $self->_get_abstract_from_list_summary($file->name, $file->content);
+    $self->log_debug(["Processing %s ...", $file->name]);
 
     my $pkg = do {
         my $pkg = $file->name;
@@ -112,45 +112,54 @@ sub munge_file {
         $pkg =~ s!/!::!g;
         $pkg;
     };
-    my $list;
-    {
-        no strict 'refs';
-        $list = ${"$pkg\::LIST"};
+
+    if ($pkg =~ /\AAcme::CPANModules::/) {
+
+        my $abstract = $self->_get_abstract_from_list_summary($file->name, $file->content);
+
+        my $list;
+        {
+            no strict 'refs';
+            $list = ${"$pkg\::LIST"};
+        }
+
+      CHECK_LIST: {
+            $self->log_fatal("List does not have 'entries' property")
+                unless $list->{entries};
+            $self->log_fatal("List does not have any entries")
+                unless @{ $list->{entries} };
+        } # CHECK_LIST
+
+      ADD_X_MENTIONS_PREREQS:
+        {
+            my @mods;
+            for my $entry (@{ $list->{entries} }) {
+                push @mods, $entry->{module};
+                for (@{ $entry->{alternate_modules} || [] }) {
+                    push @mods, $_;
+                }
+                for (@{ $entry->{related_modules} || [] }) {
+                    push @mods, $_;
+                }
+            }
+            for my $mod (@mods) {
+                $self->zilla->register_prereqs(
+                    {phase=>'x_mentions', type=>'x_mentions'}, $mod, 0);
+            }
+        } # ADD_X_MENTIONS_PREREQS
+
+      SET_ABSTRACT:
+        {
+            last unless $abstract;
+            $content =~ s{^#\s*ABSTRACT:.*}{# ABSTRACT: $abstract}m
+                or die "Can't insert abstract for " . $file->name;
+            $self->log(["inserting abstract for %s (%s)", $file->name, $abstract]);
+            $file->content($content);
+        } # SET_ABSTRACT
+
+    } else {
     }
 
-  CHECK_LIST: {
-        $self->log_fatal("List does not have 'entries' property")
-            unless $list->{entries};
-        $self->log_fatal("List does not have any entries")
-            unless @{ $list->{entries} };
-    } # CHECK_LIST
-
-  ADD_X_MENTIONS_PREREQS:
-    {
-        my @mods;
-        for my $entry (@{ $list->{entries} }) {
-            push @mods, $entry->{module};
-            for (@{ $entry->{alternate_modules} || [] }) {
-                push @mods, $_;
-            }
-            for (@{ $entry->{related_modules} || [] }) {
-                push @mods, $_;
-            }
-        }
-        for my $mod (@mods) {
-            $self->zilla->register_prereqs(
-                {phase=>'x_mentions', type=>'x_mentions'}, $mod, 0);
-        }
-    } # ADD_X_MENTIONS_PREREQS
-
-  SET_ABSTRACT:
-    {
-        last unless $abstract;
-        $content =~ s{^#\s*ABSTRACT:.*}{# ABSTRACT: $abstract}m
-            or die "Can't insert abstract for " . $file->name;
-        $self->log(["inserting abstract for %s (%s)", $file->name, $abstract]);
-        $file->content($content);
-    } # SET_ABSTRACT
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -169,7 +178,7 @@ Dist::Zilla::Plugin::Acme::CPANModules - Plugin to use when building Acme::CPANM
 
 =head1 VERSION
 
-This document describes version 0.002 of Dist::Zilla::Plugin::Acme::CPANModules (from Perl distribution Dist-Zilla-Plugin-Acme-CPANModules), released on 2020-03-01.
+This document describes version 0.003 of Dist::Zilla::Plugin::Acme::CPANModules (from Perl distribution Dist-Zilla-Plugin-Acme-CPANModules), released on 2020-07-21.
 
 =head1 SYNOPSIS
 
@@ -180,7 +189,9 @@ In F<dist.ini>:
 =head1 DESCRIPTION
 
 This plugin is to be used when building C<Acme::CPANModules::*> distribution. It
-currently does the following:
+currently does the following.
+
+For each F<Acme/CPANModules/*.pm> file:
 
 =over
 
@@ -189,6 +200,12 @@ currently does the following:
 =item * Fill the Abstract from list's summary
 
 =item * Add prereq to the mentioned modules (phase=x_mentions, relationship=x_mentions)
+
+=back
+
+For each F<Acme/CPANModulesBundle/*.pm> file:
+
+=over
 
 =back
 

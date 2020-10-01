@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ScriptXUtils/list_scriptx_plugins
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
-our $DATE = '2019-12-25'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-01'; # DATE
 our $DIST = 'App-ScriptXUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,30 @@ list-scriptx-plugins - List locally installed ScriptX plugins
 
 =head1 VERSION
 
-This document describes version 0.001 of list-scriptx-plugins (from Perl distribution App-ScriptXUtils), released on 2019-12-25.
+This document describes version 0.002 of list-scriptx-plugins (from Perl distribution App-ScriptXUtils), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-scriptx-plugins [options] [query]
+ % list-scriptx-plugins [--detail] [--dist-contains=s] [--dist-in-json=s]
+     [--dist-in=s+] [--dist-is=s] [--dist-isnt=s] [--dist-max=s]
+     [--dist-min=s] [--dist-not-contains=s] [--dist-not-in-json=s]
+     [--dist-not-in=s+] [--dist-xmax=s] [--dist-xmin=s] [--dist=s]
+     [--exclude-field=s+] [--exclude-fields-json=s] [--field=s+]
+     [--fields-json=s] [--format=name] [--json] [-l] [--(no)naked-res]
+     [--no-detail] [--no-random] [--nodetail] [--norandom]
+     [--page-result[=program]] [--plugin-contains=s] [--plugin-in-json=s]
+     [--plugin-in=s+] [--plugin-is=s] [--plugin-isnt=s] [--plugin-max=s]
+     [--plugin-min=s] [--plugin-not-contains=s] [--plugin-not-in-json=s]
+     [--plugin-not-in=s+] [--plugin-xmax=s] [--plugin-xmin=s] [--plugin=s]
+     [--random] [--result-limit=s] [--result-start=s] [--sort-json=s]
+     [--sort=s+] [--summary-contains=s] [--summary-in-json=s]
+     [--summary-in=s+] [--summary-is=s] [--summary-isnt=s]
+     [--summary-max=s] [--summary-min=s] [--summary-not-contains=s]
+     [--summary-not-in-json=s] [--summary-not-in=s+] [--summary-xmax=s]
+     [--summary-xmin=s] [--summary=s] [--with-field-names]
+     [--without-field-names] [query]
 
 =head1 DESCRIPTION
 
@@ -63,6 +81,18 @@ Return array of full records instead of just ID fields.
 
 By default, only the key (ID) field is returned per result entry.
 
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
 
 =item B<--field>=I<s@>
 
@@ -358,6 +388,10 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =back
 
 =head2 Paging options
@@ -448,7 +482,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

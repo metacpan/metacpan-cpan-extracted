@@ -8,7 +8,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
 use namespace::clean;
 use Data::Section -setup;
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
 sub configure {
 	my $self = shift;
@@ -307,8 +307,8 @@ App::cpanminus first, using the fatpacked `cpanm` script via curl or wget:
     $ curl -L https://cpanmin.us | perl - --installdeps --with-develop .
     $ wget -qO - https://cpanmin.us | perl - --installdeps --with-develop .
 
-Otherwise, look for either a `cpanfile` or `META.json` file for a list of
-dependencies to satisfy.
+Otherwise, look for either a `cpanfile`, `prereqs.json`/`prereqs.yml`, or
+`META.json` file for a list of dependencies to satisfy.
 
 ## Running tests
 

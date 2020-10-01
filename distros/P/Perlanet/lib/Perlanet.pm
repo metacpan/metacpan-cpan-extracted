@@ -15,10 +15,12 @@ use Try::Tiny;
 use URI::Fetch;
 use XML::Feed;
 
+use Perlanet::Types;
+
 use vars qw{$VERSION};
 
 BEGIN {
-  $VERSION = '2.0.1';
+  $VERSION = '2.0.4';
 }
 
 with 'MooseX::Traits';
@@ -42,13 +44,27 @@ sub _build_ua {
   return $ua;
 }
 
-has 'cutoff' => (
-  isa     => 'DateTime',
-  is      => 'ro',
-  default => sub {
-    DateTime->now + DateTime::Duration->new(weeks => 1);
-  }
+has 'cutoff_duration' => (
+  isa     => 'Perlanet::DateTime::Duration',
+  is      => 'rw',
+  lazy_build => 1,
+  coerce  => 1,
 );
+
+sub _build_cutoff_duration {
+  return { years => 1_000 };
+}
+
+has 'cutoff' => (
+  isa     => 'Perlanet::DateTime',
+  is      => 'ro',
+  lazy_build => 1,
+  coerce  => 1,
+);
+
+sub _build_cutoff {
+  return DateTime->now - shift->cutoff_duration;
+}
 
 has 'entries' => (
   isa => 'Int',
@@ -230,8 +246,12 @@ sub select_entries {
 
     @entries = @{ $self->sort_entries(\@entries) };
 
-    if ($self->entries_per_feed and @entries > $self->entries_per_feed) {
-      $#entries = $self->entries_per_feed - 1;
+    my $number_of_entries =
+      defined $feed->max_entries ? $feed->max_entries 
+                                 : $self->entries_per_feed;
+
+    if ($number_of_entries and @entries > $number_of_entries) {
+      $#entries = $number_of_entries - 1;
     }
 
     push @feed_entries,
@@ -272,7 +292,7 @@ sub sort_entries {
 
   if ($self->entry_sort_order eq 'modified') {
     @entries = grep {
-      ($_->modified || $_->issued || $day_zero) < $self->cutoff
+      ($_->modified || $_->issued || $day_zero) > $self->cutoff
     } sort {
       ($b->modified || $b->issued || $day_zero)
           <=>
@@ -280,7 +300,7 @@ sub sort_entries {
     } @$entries;
   } elsif ($self->entry_sort_order eq 'issued') {
     @entries = grep {
-      ($_->issued || $_->modified || $day_zero) < $self->cutoff
+      ($_->issued || $_->modified || $day_zero) > $self->cutoff
     } sort {
       ($b->issued || $b->modified || $day_zero)
           <=>

@@ -1,19 +1,42 @@
 ---
-name: Unicode-MapUTF8
-version: 1.11
+abstract: 'Conversions to and from arbitrary character sets and UTF8'
 author:
-  - Benjamin Franz <snowhare@nihongo.org>
-abstract: Conversions to and from arbitrary character sets and UTF8
-license: perl
-requires:
-  Carp: 0
-  File::Copy: 0
-  Jcode: 0
-  Unicode::Map: 0
-  Unicode::Map8: 0
-  Unicode::String: 0
+  - 'Jerilyn Franz <cpan@jerilyn.info>'
+build_requires:
+  Carp: '0'
+  File::Copy: '0'
+  Jcode: '0'
+  Unicode::Map: '0'
+  Unicode::Map8: '0'
+  Unicode::String: '0'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unicode-MapUTF8
 provides:
   Unicode::MapUTF8:
     file: lib/Unicode/MapUTF8.pm
-    version: 1.11
-generated_by: Module::Build version 0.261
+    version: '1.14'
+requires:
+  Carp: '0'
+  File::Copy: '0'
+  Jcode: '0'
+  Unicode::Map: '0'
+  Unicode::Map8: '0'
+  Unicode::String: '0'
+  perl: '5.006'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/JerilynFranz/perl-Unicode-MapUTF8/issues
+  homepage: https://github.com/JerilynFranz/perl-Unicode-MapUTF8
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://github.com/JerilynFranz/perl-Unicode-MapUTF8.git
+version: '1.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -18,7 +18,12 @@ meta-spec:
 name: App-GoogleSearchUtils
 requires:
   Browser::Open: '0'
+  Data::Sah::Coerce::perl::To_duration::From_float::seconds: '0'
+  Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration: '0'
+  Data::Sah::Coerce::perl::To_duration::From_str::human: '0'
+  Data::Sah::Coerce::perl::To_duration::From_str::iso8601: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
+  Data::Sah::Compiler::perl::TH::duration: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Log::ger: '0.037'
@@ -34,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GoogleSearchUtils
   homepage: https://metacpan.org/release/App-GoogleSearchUtils
   repository: git://github.com/perlancar/perl-App-GoogleSearchUtils.git
-version: '0.002'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -47,6 +52,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
       version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -118,7 +127,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.600'
+      version: '0.602'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -171,9 +180,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'

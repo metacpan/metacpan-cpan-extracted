@@ -1,3 +1,8 @@
+0.18 2020-09-30
+    * Add support for --data-raw, --data-ascii, --data-binary, --data-urlencode
+    * --data now strips newlines and linefeeds, as does curl
+    * Filter::signatures prerequisite is now 0.16
+
 0.17 2020-04-13
     * Test suite changes to fix Redhat test failures
     * No code changes, no need to upgrade

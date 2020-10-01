@@ -449,8 +449,8 @@ sub fetchrow_hashref {
 	# $query .= ' ORDER BY entry LIMIT 1';
 	$query .= ' LIMIT 1';
 	if($self->{'logger'}) {
-		my @call_details = caller(0);
 		if(defined($query_args[0])) {
+			my @call_details = caller(0);
 			$self->{'logger'}->debug("fetchrow_hashref $query: ", join(', ', @query_args),
 				' called from ', $call_details[2] . ' of ' . $call_details[1]);
 		} else {

@@ -1,0 +1,23 @@
+{
+  'Adult' => {
+    'attributes' => {}
+  },
+  'Adult::Child1' => {
+    'attributes' => {}
+  },
+  'Adult::Child2' => {
+    'attributes' => {}
+  },
+  'Adult::Child::Grandchild' => {
+    'attributes' => {}
+  },
+  'GoldenDelicious' => {
+    'attributes' => {}
+  },
+  'GrannySmith' => {
+    'attributes' => {}
+  },
+  'HybridVariety' => {
+    'attributes' => {}
+  }
+}

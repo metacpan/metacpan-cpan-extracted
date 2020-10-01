@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -30,7 +30,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -1421,20 +1421,24 @@ L<http://oeis.org/A014577> (etc)
 
 =back
 
+    A332383   X coordinate
+    A332384   Y coordinate
+
     A038189   turn, 0=left,1=right, bit above lowest 1, extra 0
-    A089013     same, but initial extra 1
+    A089013   turn, 0=left,1=right, bit above lowest 1, extra 1
     A082410   turn, 1=left,0=right, reversing complement, extra 0
     A099545   turn, 1=left,3=right, as [odd part n] mod 4
                 so turn by 90 degrees * 1 or 3
     A034947   turn, 1=left,-1=right, Jacobi (-1/n)
     A112347   turn, 1=left,-1=right, Kronecker (-1/n), extra 0
     A121238   turn, 1=left,-1=right, -1^(n + some partitions) extra 1
+    A119972   turn, n=left,-n=right
     A014577   next turn, 1=left,0=right
     A014707   next turn, 0=left,1=right
     A014709   next turn, 1=left,2=right
     A014710   next turn, 2=left,1=right
-    A143347   paperfolding constant, 0=left,1=right in binary
     A090678   1=same turn as previous, 0=different
+    A143347   paperfolding constant, bits 0=left,1=right in decimal
 
 These numerous turn sequences differ only in having left or right
 represented as 0, 1, -1, etc, and possibly "extra" initial 0 or 1 at n=0
@@ -1463,13 +1467,18 @@ turn" forms begin at n=0 for turn at N=1 and so are the turn at N=n+1.
     A091067   N positions of the right turns, being odd part form 4K+3
     A255068   N positions where next turn right
     A060833   N positions where previous turn right
+    A106837   N positions of consecutive turns R,R
+    A106838   N positions of consecutive turns R,R,R
+    A106840   N positions of consecutive turns L,L
+    A106841   N positions of consecutive turns L,L,L
+
     A106836   N steps between right turns
     A088742   N steps between left turns
     A255070   num right turns 1 to N
     A236840   2* num right turns 1 to N
     A003460   turns N=1 to N=2^n-1 packed as bits 1=left,0=right
                 low to high, then written in octal
-    A126937   points numbered like SquareSpiral (start N=0 and flip Y)
+    A126937   coordinates coded by SquareSpiral (start N=0 and flip Y)
 
     A038503   num segments East  in level k
     A038504   num segments North in level k
@@ -1524,7 +1533,7 @@ power sum,
 
 Jeffrey Shallit, "Simple Continued Fractions for Some Irrational Numbers",
 Journal of Number Theory, volume 11, 1979, pages 209-217.
-L<http://www.cs.uwaterloo.ca/~shallit/papers.html>
+L<http://www.cs.uwaterloo.ca/~shallit/papers.html>,
 L<http://www.cs.uwaterloo.ca/~shallit/Papers/scf.ps>
 
 (And which appears in Knuth "Art of Computer Programming", volume 2, section
@@ -1552,6 +1561,35 @@ C<PlanePath> code for this starting at C<$i=0> would be
       my ($x, $y) = $dragon->n_to_xy ($i);
       my $A126937_of_i = $square->xy_to_n ($x, -$y);
 
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for the dragon curve as a graph include
+
+=over
+
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655> etc
+
+=back
+
+    19655     level=0 (1-segment path)
+    32234     level=1 (2-segment path)
+    286       level=2 (4-segment path)
+    414       level=3 (8-segment path)
+    33739     level=4
+    33741     level=5
+    33743     level=6
+    33745     level=7
+    33747     level=8
+
+And for just a blob (the biggest 2-connected component in its level)
+
+    674       level=4 (4-cycle single unit square)
+    25223     level=5
+    33749     level=6
+    33751     level=7
+    33753     level=8
+    34163     level=9
+
 =head1 SEE ALSO
 
 L<Math::PlanePath>,
@@ -1577,7 +1615,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

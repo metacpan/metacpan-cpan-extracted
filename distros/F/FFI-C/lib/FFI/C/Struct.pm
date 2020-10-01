@@ -7,7 +7,7 @@ use FFI::C::FFI ();
 use Ref::Util qw( is_ref is_plain_arrayref );
 
 # ABSTRACT: Structured data instance for FFI
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub AUTOLOAD
@@ -186,7 +186,7 @@ FFI::C::Struct - Structured data instance for FFI
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -245,6 +245,10 @@ Creates a new instance of the C<struct>.
 =item L<FFI::C::ArrayDef>
 
 =item L<FFI::C::Def>
+
+=item L<FFI::C::File>
+
+=item L<FFI::C::PosixFile>
 
 =item L<FFI::C::Struct>
 

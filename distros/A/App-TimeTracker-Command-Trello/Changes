@@ -1,5 +1,10 @@
 Revision history for App::TimeTracker::Command::Trello
 
+1.007   2020-09-29T15:14:59
+    - new format for branch name: idShort_name
+    - keep spaces in name
+
+
 1.006	2019-04-09T22:08:51
    - fiddle with @_ during BUILDARGS
 

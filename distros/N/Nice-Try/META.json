@@ -50,6 +50,15 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.1.4",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/NoAuth/Bugs.html?Dist=Nice-Try"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://git.deguest.jp/jack/Nice-Try"
+      }
+   },
+   "version" : "v0.1.5",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

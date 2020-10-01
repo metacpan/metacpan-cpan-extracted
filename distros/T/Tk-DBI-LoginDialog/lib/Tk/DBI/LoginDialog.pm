@@ -84,7 +84,7 @@ use constant S_WHATAMI => "Tk::DBI::LoginDialog";
 
 
 # --- package globals ---
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 
 # --- package locals ---
@@ -863,7 +863,7 @@ __END__
 
 =head1 VERSION
 
-Build V1.006
+Build V1.007
 
 =head1 AUTHOR
 

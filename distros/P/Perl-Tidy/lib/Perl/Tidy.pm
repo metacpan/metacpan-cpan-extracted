@@ -83,9 +83,6 @@ use vars qw{
   $VERSION
   @ISA
   @EXPORT
-  $missing_file_spec
-  $fh_stderr
-  $Warn_count
 };
 
 @ISA    = qw( Exporter );
@@ -110,7 +107,31 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20200907';
+    $VERSION = '20201001';
+}
+
+sub DESTROY {
+
+    # required to avoid call to AUTOLOAD in some versions of perl
+}
+
+sub AUTOLOAD {
+
+    # Catch any undefined sub calls so that we are sure to get
+    # some diagnostic information.  This sub should never be called
+    # except for a programming error.
+    our $AUTOLOAD;
+    return if ( $AUTOLOAD eq 'DESTROY' );
+    my ( $pkg, $fname, $lno ) = caller();
+    print STDERR <<EOM;
+======================================================================
+Unexpected call to Autoload looking for sub $AUTOLOAD
+Called from package: '$pkg'  
+Called from File '$fname'  at line '$lno'
+This error is probably due to a recent programming change
+======================================================================
+EOM
+    exit 1;
 }
 
 sub streamhandle {
@@ -281,39 +302,44 @@ sub find_input_line_ending {
     return $ending;
 }
 
-sub catfile {
+{    ## begin closure for sub catfile
 
-    # concatenate a path and file basename
-    # returns undef in case of error
-
-    my @parts = @_;
+    my $missing_file_spec;
 
     BEGIN {
         eval { require File::Spec };
         $missing_file_spec = $@;
     }
 
-    # use File::Spec if we can
-    unless ($missing_file_spec) {
-        return File::Spec->catfile(@parts);
+    sub catfile {
+
+        # concatenate a path and file basename
+        # returns undef in case of error
+
+        my @parts = @_;
+
+        # use File::Spec if we can
+        unless ($missing_file_spec) {
+            return File::Spec->catfile(@parts);
+        }
+
+        # Perl 5.004 systems may not have File::Spec so we'll make
+        # a simple try.  We assume File::Basename is available.
+        # return if not successful.
+        my $name      = pop @parts;
+        my $path      = join '/', @parts;
+        my $test_file = $path . $name;
+        my ( $test_name, $test_path ) = fileparse($test_file);
+        return $test_file if ( $test_name eq $name );
+        return            if ( $^O eq 'VMS' );
+
+        # this should work at least for Windows and Unix:
+        $test_file = $path . '/' . $name;
+        ( $test_name, $test_path ) = fileparse($test_file);
+        return $test_file if ( $test_name eq $name );
+        return;
     }
-
-    # Perl 5.004 systems may not have File::Spec so we'll make
-    # a simple try.  We assume File::Basename is available.
-    # return if not successful.
-    my $name      = pop @parts;
-    my $path      = join '/', @parts;
-    my $test_file = $path . $name;
-    my ( $test_name, $test_path ) = fileparse($test_file);
-    return $test_file if ( $test_name eq $name );
-    return            if ( $^O eq 'VMS' );
-
-    # this should work at least for Windows and Unix:
-    $test_file = $path . '/' . $name;
-    ( $test_name, $test_path ) = fileparse($test_file);
-    return $test_file if ( $test_name eq $name );
-    return;
-}
+} ## end closure for sub catfile
 
 # Here is a map of the flow of data from the input source to the output
 # line sink:
@@ -349,6 +375,12 @@ sub catfile {
 # The Logger package, not shown, records significant events and warning
 # messages.  It writes a .LOG file, which may be saved with a
 # '-log' or a '-g' flag.
+
+{ #<<<
+
+my $Warn_count;
+my $fh_stderr;
+sub Warn { my $msg = shift; $fh_stderr->print($msg); $Warn_count++; return }
 
 sub perltidy {
 
@@ -440,8 +472,6 @@ EOM
     else {
         $fh_stderr = *STDERR;
     }
-
-    sub Warn { my $msg = shift; $fh_stderr->print($msg); $Warn_count++; return }
 
     sub Exit {
         my $flag = shift;
@@ -848,8 +878,7 @@ EOM
                     if ( $input_file =~ /^\'(.+)\'$/ ) { $input_file = $1 }
                     if ( $input_file =~ /^\"(.+)\"$/ ) { $input_file = $1 }
                     my $pattern = fileglob_to_re($input_file);
-                    ##eval "/$pattern/";
-                    if ( !$@ && opendir( DIR, './' ) ) {
+                    if ( opendir( DIR, './' ) ) {
                         my @files =
                           grep { /$pattern/ && !-d $_ } readdir(DIR);
                         closedir(DIR);
@@ -1716,7 +1745,8 @@ EOM
 
   ERROR_EXIT:
     return 1;
-}    # end of main program perltidy
+} ## end of main program perltidy
+} ## end of closure for sub perltidy
 
 sub line_diff {
 
@@ -2252,6 +2282,12 @@ sub generate_options {
     $add_option->( 'keep-interior-semicolons',                'kis',   '!' );
     $add_option->( 'one-line-block-semicolons',               'olbs',  '=i' );
     $add_option->( 'one-line-block-nesting',                  'olbn',  '=i' );
+    $add_option->( 'break-before-hash-brace',                 'bbhb',  '=i' );
+    $add_option->( 'break-before-hash-brace-and-indent',      'bbhbi', '=i' );
+    $add_option->( 'break-before-square-bracket',             'bbsb',  '=i' );
+    $add_option->( 'break-before-square-bracket-and-indent',  'bbsbi', '=i' );
+    $add_option->( 'break-before-paren',                      'bbp',   '=i' );
+    $add_option->( 'break-before-paren-and-indent',           'bbpi',  '=i' );
 
     ########################################
     $category = 6;    # Controlling list formatting
@@ -2438,6 +2474,12 @@ sub generate_options {
       break-at-old-ternary-breakpoints
       break-at-old-attribute-breakpoints
       break-at-old-keyword-breakpoints
+      break-before-hash-brace=0
+      break-before-hash-brace-and-indent=0
+      break-before-square-bracket=0
+      break-before-square-bracket-and-indent=0
+      break-before-paren=0
+      break-before-paren-and-indent=0
       comma-arrow-breakpoints=5
       nocheck-syntax
       character-encoding=guess
@@ -2521,10 +2563,10 @@ sub generate_options {
     #---------------------------------------------------------------
     %expansion = (
         %expansion,
-        'freeze-newlines'   => [qw(noadd-newlines nodelete-old-newlines)],
-        'fnl'               => [qw(freeze-newlines)],
-        'freeze-whitespace' => [qw(noadd-whitespace nodelete-old-whitespace)],
-        'fws'               => [qw(freeze-whitespace)],
+        'freeze-newlines'    => [qw(noadd-newlines nodelete-old-newlines)],
+        'fnl'                => [qw(freeze-newlines)],
+        'freeze-whitespace'  => [qw(noadd-whitespace nodelete-old-whitespace)],
+        'fws'                => [qw(freeze-whitespace)],
         'freeze-blank-lines' =>
           [qw(maximum-consecutive-blank-lines=0 keep-old-blank-lines=2)],
         'fbl'                => [qw(freeze-blank-lines)],
@@ -2532,16 +2574,16 @@ sub generate_options {
         'outdent-long-lines' => [qw(outdent-long-quotes outdent-long-comments)],
         'nooutdent-long-lines' =>
           [qw(nooutdent-long-quotes nooutdent-long-comments)],
-        'noll' => [qw(nooutdent-long-lines)],
-        'io'   => [qw(indent-only)],
+        'noll'                => [qw(nooutdent-long-lines)],
+        'io'                  => [qw(indent-only)],
         'delete-all-comments' =>
           [qw(delete-block-comments delete-side-comments delete-pod)],
         'nodelete-all-comments' =>
           [qw(nodelete-block-comments nodelete-side-comments nodelete-pod)],
-        'dac'  => [qw(delete-all-comments)],
-        'ndac' => [qw(nodelete-all-comments)],
-        'gnu'  => [qw(gnu-style)],
-        'pbp'  => [qw(perl-best-practices)],
+        'dac'              => [qw(delete-all-comments)],
+        'ndac'             => [qw(nodelete-all-comments)],
+        'gnu'              => [qw(gnu-style)],
+        'pbp'              => [qw(perl-best-practices)],
         'tee-all-comments' =>
           [qw(tee-block-comments tee-side-comments tee-pod)],
         'notee-all-comments' =>
@@ -2621,7 +2663,7 @@ sub generate_options {
         'nostack-opening-tokens' => [qw(nsop nsohb nsosb)],
 
         'sct'                    => [qw(scp schb scsb)],
-        'stack-closing-tokens'   => => [qw(scp schb scsb)],
+        'stack-closing-tokens'   => [qw(scp schb scsb)],
         'nsct'                   => [qw(nscp nschb nscsb)],
         'nostack-closing-tokens' => [qw(nscp nschb nscsb)],
 
@@ -4264,7 +4306,11 @@ sub process_this_file {
         $formatter->write_line($line);
     }
     my $severe_error = $tokenizer->report_tokenization_errors();
-    eval { $formatter->finish_formatting($severe_error) };
+
+    # user-defined formatters are possible, and may not have a
+    # sub 'finish_formatting', so we have to check
+    $formatter->finish_formatting($severe_error)
+      if $formatter->can('finish_formatting');
 
     return;
 }

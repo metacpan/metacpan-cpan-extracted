@@ -65,3 +65,7 @@ hacks\b
 Mac-\.*
 \.swp$
 \.patch$
+\.github/
+MANIFEST\s\d
+CHANGES\s\d
+

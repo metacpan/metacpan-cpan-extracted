@@ -1,0 +1,113 @@
+{
+  '0' => {
+    'attributes' => {
+      'color' => 'green',
+      'label' => '%$person',
+      'shape' => 'doubleoctagon'
+    }
+  },
+  '0_0_0_0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> Murrumbeena',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_0_0_1_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> 3163',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> locality|<port2> postcode',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> %$city',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_1_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> Australia',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_2_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> Victoria',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> city|<port2> country|<port3> state',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> %$address',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> Ron',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_1_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> Savage',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> given_name|<port2> surname',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> %$name',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> address|<port2> name',
+      'shape' => 'Mrecord'
+    }
+  }
+}

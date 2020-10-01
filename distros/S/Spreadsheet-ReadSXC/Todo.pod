@@ -1,0 +1,27 @@
+=head1 TO DO
+
+Steps to implement with/for L<Spreadsheet::Read>
+
+=over 4
+
+=item 1
+
+Do not strip whitespace of cell contents,
+
+It currently gets me ', but xlsx returns an empty field. It is up to you to decide what you want
+
+And a field with just a single ' should return an empty field, but I would accept a single quote too
+
+a field can hold a single space as valid content. I don't think you should strip trailing spaces by default
+
+=item 2
+
+Support for cell attributes: background color, text color,
+
+=item 3
+
+the rest
+
+=back
+
+=cut

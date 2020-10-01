@@ -12,7 +12,7 @@ use constant is_table => 1;
 use constant kind => 'table';
 
 # ABSTRACT: Wasmtime table class
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 $ffi_prefix = 'wasm_table_';
@@ -59,7 +59,7 @@ Wasm::Wasmtime::Table - Wasmtime table class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

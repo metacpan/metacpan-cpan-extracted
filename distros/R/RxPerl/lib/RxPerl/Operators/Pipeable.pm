@@ -14,8 +14,9 @@ use Exporter 'import';
 our @EXPORT_OK = qw/
     op_audit_time op_catch_error op_concat_map op_debounce_time op_delay op_distinct_until_changed
     op_distinct_until_key_changed op_end_with op_exhaust_map op_filter op_finalize op_first op_map op_map_to
-    op_merge_map op_multicast op_pairwise op_pluck op_ref_count op_sample_time op_scan op_share op_start_with
-    op_switch_map op_take op_take_until op_take_while op_tap op_throttle_time op_with_latest_from
+    op_merge_map op_multicast op_pairwise op_pluck op_ref_count op_repeat op_retry op_sample_time op_scan
+    op_share op_skip op_start_with op_switch_map op_take op_take_until op_take_while op_tap op_throttle_time
+    op_with_latest_from
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -688,6 +689,114 @@ sub op_ref_count {
     };
 }
 
+sub _op_repeat_helper {
+    my ($subscriber, $source, $count_ref, $own_subscription_ref) = @_;
+
+    my $own_subscription = RxPerl::Subscription->new;
+    $$own_subscription_ref = $own_subscription;
+    my $own_subscriber = {
+        new_subscription => $own_subscription,
+        next     => $subscriber->{next},
+        error    => $subscriber->{error},
+        complete => sub {
+            if (--$$count_ref) {
+                _op_repeat_helper(
+                    $subscriber, $source, $count_ref, $own_subscription_ref,
+                );
+            } else {
+                $subscriber->{complete}->() if defined $subscriber->{complete};
+            }
+        },
+    };
+
+    $source->subscribe($own_subscriber);
+}
+
+sub op_repeat {
+    my ($count) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $count = $count;
+
+            $count = -1 if ! defined $count;
+            if ($count == 0) {
+                $subscriber->{complete}->() if defined $subscriber->{complete};
+                return;
+            }
+
+            my $own_subscription;
+            my $own_subscription_ref = \$own_subscription;
+
+            get_subscription_from_subscriber($subscriber)->add_dependents(
+                $own_subscription_ref,
+            );
+
+            _op_repeat_helper(
+                $subscriber, $source, \$count, $own_subscription_ref,
+            );
+
+            return;
+        });
+    };
+}
+
+sub _op_retry_helper {
+    my ($subscriber, $source, $count_ref, $own_subscription_ref) = @_;
+
+    my $own_subscription = RxPerl::Subscription->new;
+    $$own_subscription_ref = $own_subscription;
+    my $own_subscriber = {
+        new_subscription => $own_subscription,
+        next     => $subscriber->{next},
+        error    => sub {
+            if ($$count_ref--) {
+                _op_retry_helper(
+                    $subscriber, $source, $count_ref, $own_subscription_ref,
+                );
+            } else {
+                $subscriber->{error}->(@_) if defined $subscriber->{error};
+            }
+        },
+        complete => $subscriber->{complete},
+    };
+
+    $source->subscribe($own_subscriber);
+}
+
+sub op_retry {
+    my ($count) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $count = $count;
+
+            $count = -1 if ! defined $count;
+
+            my $own_subscription;
+            my $own_subscription_ref = \$own_subscription;
+
+            get_subscription_from_subscriber($subscriber)->add_dependents(
+                $own_subscription_ref,
+            );
+
+            _op_retry_helper(
+                $subscriber, $source, \$count, $own_subscription_ref,
+            );
+
+            return;
+        });
+    };
+}
+
 sub op_sample_time {
     my ($period) = @_;
 
@@ -767,6 +876,35 @@ sub op_share {
         op_multicast(sub { rx_subject->new }),
         op_ref_count(),
     );
+}
+
+sub op_skip {
+    my ($count) = @_;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my $count = int $count;
+
+            my $own_subscriber;
+            $own_subscriber = $subscriber if $count <= 0;
+            $own_subscriber //= {
+                %$subscriber,
+                next => sub {
+                    if ($count-- <= 0) {
+                        $subscriber->{next}->(@_) if defined $subscriber->{next};
+                    }
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
+        });
+    };
 }
 
 sub op_start_with {

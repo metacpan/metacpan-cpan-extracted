@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # Use local libraries
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw( MIDI-Drummer-Tiny Music-Duration-Partition );
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Drummer-Tiny Music-Duration-Partition);
 
 use Data::Dumper::Compact 'ddc';
 use MIDI::Drummer::Tiny;
@@ -11,6 +11,15 @@ use Music::Duration::Partition;
 
 my $max = shift || 8;   # Loop boundary
 my $bpm = shift || 100; # Beats per minute
+
+my @fills = (
+    \&fill_1,
+    \&fill_2,
+    \&fill_3,
+    \&fill_4,
+    \&fill_5,
+    \&fill_6,
+);
 
 # Instantiate a drummer!
 my $d = MIDI::Drummer::Tiny->new(
@@ -60,26 +69,8 @@ sub beat {
 
         # Play the fill motif
         for my $i (0 .. $#$motif) {
-            if ($n % 6 == 1) {
-                $patch = fill_1($i);
-            }
-            elsif ($n % 6 == 2) {
-                $patch = fill_4($i);
-            }
-            elsif ($n % 6 == 3) {
-                $patch = fill_2($i);
-            }
-            elsif ($n % 6 == 4) {
-                $patch = fill_5($i);
-            }
-            elsif ($n % 6 == 5) {
-                $patch = fill_3($i);
-            }
-            elsif ($n % 6 == 0) {
-                $patch = fill_6($i);
-            }
-
-            # Add the motif-patch note to the score
+            my $fill = @fills[ int rand @fills ];
+            my $patch = $fill->($i);
             $d->note($motif->[$i], $patch);
         }
     }

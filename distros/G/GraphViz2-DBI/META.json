@@ -1,0 +1,71 @@
+{
+   "abstract" : "Use GraphViz2 to visualize a database schema",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GraphViz2-DBI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.48"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Admin::TableInfo" : "3.00",
+            "GraphViz2" : "2.48",
+            "Lingua::EN::PluralToSingular" : "0.14",
+            "Moo" : "2.001001",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "1.66",
+            "Test::More" : "1.001002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_dynamic_config" : 0,
+      "bugtracker" : {
+         "web" : "https://github.com/graphviz-perl/GraphViz2-DBI/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/graphviz-perl/GraphViz2-DBI.git",
+         "web" : "https://github.com/graphviz-perl/GraphViz2-DBI"
+      }
+   },
+   "version" : "2.49",
+   "x_serialization_backend" : "JSON::PP version 4.00"
+}

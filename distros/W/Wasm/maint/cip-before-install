@@ -7,7 +7,7 @@ cip sudo apt-get install libffi-dev
 cip exec cpanm -n PeekPoke::FFI Carp::Assert
 
 if [ ! -z "$ALIEN_WASMTIME_VERSION" ]; then
-  cip exec env ALIEN_WASMTIME_VERSION=$ALIEN_WASMTIME_VERSION cpanm -n --reinstall Alien::wasmtime
+  cip exec env ALIEN_WASMTIME_VERSION=$ALIEN_WASMTIME_VERSION cpanm -n --reinstall Alien::wasmtime@0.14
 else
   echo "no ALIEN_WASMTIME_VERSION set"
 fi

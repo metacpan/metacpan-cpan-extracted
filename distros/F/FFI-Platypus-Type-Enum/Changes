@@ -1,5 +1,9 @@
 Revision history for FFI-Platypus-Type-Enum},
 
+0.04      2020-09-27 05:21:25 -0600
+  - Add value aliases (gh#6)
+  - Fix confusing typos in documentation related to rev (gh#8, gh#10)
+
 0.03      2020-05-12 09:26:39 -0600
   - Fixed unclear documentation. (gh#3)
   - Type is included in the \@map list now (gh#3)

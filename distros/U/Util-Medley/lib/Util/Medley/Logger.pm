@@ -1,5 +1,5 @@
 package Util::Medley::Logger;
-$Util::Medley::Logger::VERSION = '0.043';
+$Util::Medley::Logger::VERSION = '0.044';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -23,7 +23,7 @@ Util::Medley::Logger - Yet another class for logging.
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =cut
 

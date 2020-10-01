@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2015, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2015, 2018, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,6 +32,90 @@ my $peano  = Math::PlanePath::PeanoCurve->new;
 
 use Math::PlanePath::Diagonals;
 use Math::PlanePath::ZOrderCurve;
+
+# GP-DEFINE  read("my-oeis.gp");
+# GP-DEFINE  to_ternary(n) = fromdigits(digits(n,3));
+# GP-DEFINE  to_base9(n) = fromdigits(digits(n,9));
+
+
+#------------------------------------------------------------------------------
+# A163332 -- permutation Peano N at points in Z-Order radix=3 sequence
+
+MyOEIS::compare_values
+  (anum => 'A163332',
+   func => sub {
+     my ($count) = @_;
+     my $zorder = Math::PlanePath::ZOrderCurve->new (radix => 3);
+     my @got;
+     for (my $n = $zorder->n_start; @got < $count; $n++) {
+       my ($x,$y) = $zorder->n_to_xy ($n);
+       push @got, $peano->xy_to_n ($x,$y);
+     }
+     return \@got;
+   });
+
+MyOEIS::compare_values
+  (anum => q{A163332},
+   func => sub {
+     my ($count) = @_;
+     my $zorder = Math::PlanePath::ZOrderCurve->new (radix => 3);
+     my @got;
+     for (my $n = $peano->n_start; @got < $count; $n++) {
+       my ($x,$y) = $peano->n_to_xy ($n);   # other way around
+       push @got, $zorder->xy_to_n ($x,$y);
+     }
+     return \@got;
+   });
+
+# GP-DEFINE  A163332(n) = {
+# GP-DEFINE    my(v=digits(n,3),k=Mod([0,0],2));
+# GP-DEFINE    for(i=1,#v, if(k[1],v[i]=2-v[i]); k[2]+=v[i]; k=Vecrev(k));
+# GP-DEFINE    fromdigits(v,3);
+# GP-DEFINE  }
+# my(v=OEIS_samples("A163332")); vector(#v,n,n--; A163332(n)) == v  \\ OFFSET=0
+# my(g=OEIS_bfile_gf("A163332")); \
+#   g==Polrev(vector(poldegree(g)+1,n,n--;A163332(n)))
+# poldegree(OEIS_bfile_gf("A163332"))
+
+# GP-DEFINE  A163332_by_pos(n) = {
+# GP-DEFINE    my(v=digits(n,3),k=Mod([0,0],2),p=1);
+# GP-DEFINE    for(i=1,#v, if(k[p],v[i]=2-v[i]); p=3-p; k[p]+=v[i]);
+# GP-DEFINE    fromdigits(v,3);
+# GP-DEFINE  }
+# GP-Test  vector(3^6,n,n--; A163332_by_pos(n)) == \
+# GP-Test  vector(3^6,n,n--; A163332(n))
+
+# GP-DEFINE  A163332_by_vars(n) = {
+# GP-DEFINE    my(v=digits(n,3),x=Mod(0,2),y=x);
+# GP-DEFINE    for(i=1,#v, if(x,v[i]=2-v[i]); [x,y]=[y+v[i],x]);
+# GP-DEFINE    fromdigits(v,3);
+# GP-DEFINE  }
+# GP-Test  vector(3^6,n,n--; A163332_by_vars(n)) == \
+# GP-Test  vector(3^6,n,n--; A163332(n))
+
+# GP-DEFINE  A163332_by_passes(n) = {
+# GP-DEFINE    my(v=digits(n,3));
+# GP-DEFINE    for(p=2,3, my(s=Mod(0,2));
+# GP-DEFINE       forstep(i=p,#v,2, s+=v[i-1]; if(s,v[i]=2-v[i])));
+# GP-DEFINE    fromdigits(v,3);
+# GP-DEFINE  }
+# GP-Test  vector(3^7,n,n--; A163332_by_passes(n)) == \
+# GP-Test  vector(3^7,n,n--; A163332(n))
+
+# GP-DEFINE  \\         none     opp    this    both
+# GP-DEFINE  \\           1      4      7       10
+# GP-DEFINE  { my(table =[1,7,1, 7,1,7, 4,10,4, 10,4,10]);
+# GP-DEFINE  A163332_by_table(n) = 
+# GP-DEFINE    my(v=digits(n,3),s=1);
+# GP-DEFINE    for(i=1,#v, if(s>=7,v[i]=2-v[i]); s=table[s+v[i]]);
+# GP-DEFINE      \\ print("i="i" s="s" digit "v[i]);
+# GP-DEFINE    fromdigits(v,3);
+# GP-DEFINE  }
+# GP-Test  vector(3^7,n,n--; A163332_by_table(n)) == \
+# GP-Test  vector(3^7,n,n--; A163332(n))
+#  A163332_by_table(39)
+#  A163332(39)
+# for(n=0,3^4, if(A163332_by_table(n) != A163332(n), print(n)));
 
 
 #------------------------------------------------------------------------------
@@ -157,7 +241,7 @@ MyOEIS::compare_values
 
 #------------------------------------------------------------------------------
 # A163342 -- diagonal sums
-# no b-file as of Jan 2011
+# no b-file as of Jan 2020
 MyOEIS::compare_values
   (anum => 'A163342',
    func => sub {
@@ -237,7 +321,8 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A145204 -- N+1 of positions of verticals
+# A145204 -- N+1 of positions of vertical steps, dx=0
+
 MyOEIS::compare_values
   (anum => 'A145204',
    func => sub {
@@ -251,6 +336,7 @@ MyOEIS::compare_values
      }
      return \@got;
    });
+
 
 #------------------------------------------------------------------------------
 # A014578 -- abs(dX), 1=horizontal 0=vertical, extra initial 0
@@ -383,33 +469,67 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A163332 -- Peano N at points in Z-Order radix=3 sequence
+# A163480 - N on X axis (in Math::NumSeq::PlanePathN)
+# A163481 - N on Y axis (in Math::NumSeq::PlanePathN)
 
-MyOEIS::compare_values
-  (anum => 'A163332',
-   func => sub {
-     my ($count) = @_;
-     my $zorder = Math::PlanePath::ZOrderCurve->new (radix => 3);
-     my @got;
-     for (my $n = $zorder->n_start; @got < $count; $n++) {
-       my ($x,$y) = $zorder->n_to_xy ($n);
-       push @got, $peano->xy_to_n ($x,$y);
-     }
-     return \@got;
-   });
+# Peano coordinates A163528, A163529
+# Z-order coordinates A163325, A163326
 
-MyOEIS::compare_values
-  (anum => q{A163332},
-   func => sub {
-     my ($count) = @_;
-     my $zorder = Math::PlanePath::ZOrderCurve->new (radix => 3);
-     my @got;
-     for (my $n = $peano->n_start; @got < $count; $n++) {
-       my ($x,$y) = $peano->n_to_xy ($n);   # other way around
-       push @got, $zorder->xy_to_n ($x,$y);
-     }
-     return \@got;
-   });
+# GP-DEFINE  \\ my code in A163325
+# GP-DEFINE  ZorderX(n) = fromdigits(digits(n,9)%3, 3);
+# GP-DEFINE  \\ my code in A163326
+# GP-DEFINE  ZorderY(n) = fromdigits(digits(n,9)\3, 3);
+#
+# GP-DEFINE  ZorderXYtoN(x,y) = {
+# GP-DEFINE    x=digits(x,3);
+# GP-DEFINE    y=digits(y,3);
+# GP-DEFINE    if(#x<#y, x=concat(vector(#y-#x),x));
+# GP-DEFINE    if(#y<#x, y=concat(vector(#x-#y),y));
+# GP-DEFINE    fromdigits(x+3*y,9);
+# GP-DEFINE  }
+# GP-Test  vector(9^5,n,n--; ZorderXYtoN(ZorderX(n),ZorderY(n))) == \
+# GP-Test  vector(9^5,n,n--; n)
+#
+# GP-DEFINE  \\ ternary odd positions are 0, so base 9 digits 0,1,2 only
+# GP-DEFINE  A037314(n) = fromdigits(digits(n,3),9);
+# GP-Test  my(v=OEIS_samples("A037314"));  /* OFFSET=0 */ \
+# GP-Test    vector(#v,n,n--; A037314(n)) == v
+# GP-Test  vector(3^5,n,n--; A037314(n)) == \
+# GP-Test  vector(3^5,n,n--; ZorderXYtoN(n,0))
+#
+# GP-DEFINE  A208665(n) = 3*fromdigits(digits(n,3),9);
+# GP-Test  my(v=OEIS_samples("A208665"));  /* OFFSET=1 */ \
+# GP-Test    vector(#v,n, A208665(n)) == v
+# GP-Test  vector(3^5,n,n--; A208665(n)) == \
+# GP-Test  vector(3^5,n,n--; ZorderXYtoN(0,n))
+
+# GP-DEFINE  \\ Peano X -> N, on X axis
+# GP-DEFINE  A163480(n) = A163332(A037314(n));
+# GP-Test  my(v=OEIS_samples("A163480"));  /* OFFSET=0 */ \
+# GP-Test    vector(#v,n,n--; A163480(n)) == v
+#
+# GP-DEFINE  A163480_compact(n) = {
+# GP-DEFINE    my(v=digits(n,3),k=Mod(0,2));
+# GP-DEFINE    for(i=1,#v, if(k,v[i]+=6); k+=v[i]);
+# GP-DEFINE    fromdigits(v,9);
+# GP-DEFINE  }
+# GP-Test  to_ternary(A163480(3))         == 120
+# GP-Test  to_ternary(A163480_compact(3)) == 120
+# GP-Test  vector(3^6,n,n--; A163480(n)) == \
+# GP-Test  vector(3^6,n,n--; A163480_compact(n))
+
+# GP-DEFINE  \\ Peano Y -> N, on Y axis
+# GP-DEFINE  A163481(n) = A163332(A208665(n));
+# GP-Test  my(v=OEIS_samples("A163481"));  /* OFFSET=0 */ \
+# GP-Test    vector(#v,n,n--; A163481(n)) == v
+#
+# GP-DEFINE  A163481_compact(n) = {
+# GP-DEFINE    my(v=digits(n,3),k=Mod(0,2));
+# GP-DEFINE    for(i=1,#v, k+=v[i]; v[i]=3*v[i]+if(k,2));
+# GP-DEFINE    fromdigits(v,9);
+# GP-DEFINE  }
+# GP-Test  vector(3^6,n,n--; A163481(n)) == \
+# GP-Test  vector(3^6,n,n--; A163481_compact(n))
 
 
 #------------------------------------------------------------------------------

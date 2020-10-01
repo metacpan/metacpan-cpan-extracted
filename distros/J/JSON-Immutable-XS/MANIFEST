@@ -1,4 +1,3 @@
-.vscode/perl-lang/home/v.melnichenko/JSON-Immutable-XS/lib/JSON/Immutable/XS.pm
 Changes
 external/rapidjson/allocators.h
 external/rapidjson/document.h
@@ -35,8 +34,6 @@ external/rapidjson/schema.h
 external/rapidjson/stream.h
 external/rapidjson/stringbuffer.h
 external/rapidjson/writer.h
-JSON-Immutable-XS.pod
-JSON-Immutable-XS.xs
 lib/JSON/Immutable/XS.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -50,5 +47,7 @@ t/01-use.t
 t/02-slice.t
 t/var/dict/slice.json
 t/var/dict/test.json
+XS.pod
+XS.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

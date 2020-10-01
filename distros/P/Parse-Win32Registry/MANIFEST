@@ -80,3 +80,4 @@ t/winnt_key_tests.rf
 t/winnt_security_tests.rf
 t/winnt_value_tests.rf
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

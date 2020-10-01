@@ -877,19 +877,21 @@ copy. You may dereference the data with the $$string_ref notation.
 sub TrapInclude {
     my ( $self, $include, @args ) = @_;
 
-    my $saved = $self->Output;
-    $self->Clear;
-
-    no warnings 'redefine';
-    local *Plasp::Response::Flush = sub { };
+    # In order to "trap" the include, gotta setup local variables so that
+    # anthing overwritten under this scope will automatically get restored
+    # after this function. local is a real neat feature of Perl.
+    local $self->{Output} = '';
     local $self->{BinaryRef} = \( $self->{Output} );
+    local $self->{_content_writer} = undef
+
+    # Not sure why, but if I set this to zero in one line, it ends up warning
+    # of modification of a readonly value
+    local $self->{_flushed_offset};
+    $self->_flushed_offset( 0 );
 
     $self->Include( $include, @args );
-    my $trapped = $self->Output;
 
-    $self->Output( $saved );
-
-    return \$trapped;
+    return \( $self->{Output} );
 }
 
 =item $Response->Write($data)

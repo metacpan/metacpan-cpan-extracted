@@ -3,12 +3,14 @@ abstract: 'Functions For Astromical Calendars'
 author:
   - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
 build_requires:
+  JSON: '0'
   Test::Exception: '0'
+  Test::Requires: '0'
 configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.16'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +29,7 @@ no_index:
 provides:
   DateTime::Astro:
     file: lib/DateTime/Astro.pm
-    version: '1.03'
+    version: '1.04'
   DateTime::Event::SolarTerm:
     file: lib/DateTime/Event/SolarTerm.pm
 requires:
@@ -35,13 +37,15 @@ requires:
   DateTime::Set: '0'
   Exporter: '5.57'
 resources:
-  bugtracker: https://github.com/lestrrat/DateTime-Astro/issues
-  homepage: https://github.com/lestrrat/DateTime-Astro
-  repository: git://github.com/lestrrat/DateTime-Astro.git
-version: '1.03'
+  bugtracker: https://github.com/lestrrat-p5/DateTime-Astro/issues
+  homepage: https://github.com/lestrrat-p5/DateTime-Astro
+  repository: git://github.com/lestrrat-p5/DateTime-Astro.git
+version: '1.04'
 x_contributors:
-  - 'jonasbn <jonasbn@logicLAB.dk>'
-  - 'nric62 <uluparello@gmail.com>'
-  - 'jonasbn <jonasbn@gmail.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
-  - 'Daisuke Maki <lestrrat+github@gmail.com>'
+  - 'jonasbn <jonasbn@gmail.com>'
+  - 'jonasbn <jonasbn@logicLAB.dk>'
+  - 'lestrrat <lestrrat+github@gmail.com>'
+  - 'nric62 <uluparello@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

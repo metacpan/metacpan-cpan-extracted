@@ -1,9 +1,10 @@
 #!perl
 
 use Test2::V0;
-use File::Slurper 'read_text';
 use POSIX ();
 use File::Temp;
+use Test::Lib;
+use My::Test;
 
 use IO::ReStoreFH;
 

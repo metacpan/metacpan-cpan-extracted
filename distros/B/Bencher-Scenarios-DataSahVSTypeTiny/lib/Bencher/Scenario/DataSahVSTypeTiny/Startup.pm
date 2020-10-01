@@ -1,7 +1,9 @@
 package Bencher::Scenario::DataSahVSTypeTiny::Startup;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-01'; # DATE
+our $DIST = 'Bencher-Scenarios-DataSahVSTypeTiny'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark startup',
@@ -48,7 +50,7 @@ Bencher::Scenario::DataSahVSTypeTiny::Startup - Benchmark startup
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenario::DataSahVSTypeTiny::Startup (from Perl distribution Bencher-Scenarios-DataSahVSTypeTiny), released on 2017-01-25.
+This document describes version 0.003 of Bencher::Scenario::DataSahVSTypeTiny::Startup (from Perl distribution Bencher-Scenarios-DataSahVSTypeTiny), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
@@ -98,20 +100,20 @@ Generate validator (Int) with Type::Tiny.
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.10 >>, OS kernel: I<< Linux version 5.3.0-64-generic >>.
 
 Benchmark with default options (C<< bencher -m DataSahVSTypeTiny::Startup >>):
 
  #table1#
- +-------------+-----------+-----------+------------+---------+---------+
- | participant | rate (/s) | time (ms) | vs_slowest |  errors | samples |
- +-------------+-----------+-----------+------------+---------+---------+
- | genv_dsah   |        18 |      55   |        1   | 9.7e-05 |      20 |
- | genv_tt     |        28 |      36   |        1.5 | 9.3e-05 |      22 |
- | load_tt     |        56 |      18   |        3   | 8.1e-05 |      21 |
- | load_dsah   |        86 |      12   |        4.7 | 6.5e-05 |      20 |
- | perl        |       180 |       5.4 |       10   | 2.8e-05 |      20 |
- +-------------+-----------+-----------+------------+---------+---------+
+ +-------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +-------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | genv_dsah   |      14.4 |      69.6 |                 0.00% |               576.26% | 5.4e-05 |      21 |
+ | genv_tt     |      20   |      50   |                38.53% |               388.19% | 6.6e-05 |      21 |
+ | load_tt     |      39   |      26   |               170.66% |               149.85% | 3.5e-05 |      20 |
+ | load_dsah   |      60   |      17   |               319.92% |                61.05% | 5.4e-05 |      20 |
+ | perl        |      97   |      10   |               576.26% |                 0.00% | 6.3e-05 |      20 |
+ +-------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -138,7 +140,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

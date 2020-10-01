@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request;
-$Net::Amazon::S3::Request::VERSION = '0.91';
+$Net::Amazon::S3::Request::VERSION = '0.94';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Moose::Util::TypeConstraints;
@@ -7,12 +7,13 @@ use Regexp::Common qw /net/;
 
 # ABSTRACT: Base class for request objects
 
-enum 'AclShort' =>
-    # Current list at https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
-    [ qw(private public-read public-read-write aws-exec-read authenticated-read bucket-owner-read bucket-owner-full-control log-delivery-write ) ];
+use Net::Amazon::S3::Constraint::ACL::Canned;
 
 enum 'LocationConstraint' => [
     # https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+	# https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateBucket.html#API_CreateBucket_RequestSyntax
+	'af-south-1',
+	'ap-east-1',
     'ap-northeast-1',
     'ap-northeast-2',
     'ap-northeast-3',
@@ -22,14 +23,19 @@ enum 'LocationConstraint' => [
     'ca-central-1',
     'cn-north-1',
     'cn-northwest-1',
+	'EU',
     'eu-central-1',
     'eu-north-1',
+    'eu-south-1',
     'eu-west-1',
     'eu-west-2',
     'eu-west-3',
+    'me-south-1',
     'sa-east-1',
     'us-east-1',
     'us-east-2',
+	'us-gov-east-1',
+	'us-gov-west-1',
     'us-west-1',
     'us-west-2',
 ];
@@ -186,7 +192,7 @@ Net::Amazon::S3::Request - Base class for request objects
 
 =head1 VERSION
 
-version 0.91
+version 0.94
 
 =head1 SYNOPSIS
 
@@ -199,11 +205,11 @@ classes.
 
 =head1 AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

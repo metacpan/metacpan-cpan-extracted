@@ -228,6 +228,7 @@ t/ignor.t
 t/illegal.t
 t/illegalp.t
 t/index.t
+t/khitan.t
 t/loc_af.t	test Unicode::Collate::Locale
 t/loc_ar.t	test Unicode::Collate::Locale
 t/loc_as.t	test Unicode::Collate::Locale

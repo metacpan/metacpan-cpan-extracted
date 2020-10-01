@@ -1,15 +1,46 @@
 package Net::Amazon::S3::Client;
-$Net::Amazon::S3::Client::VERSION = '0.91';
+$Net::Amazon::S3::Client::VERSION = '0.94';
 use Moose 0.85;
-use HTTP::Status qw(is_error status_message);
+use HTTP::Status qw(status_message);
 use MooseX::StrictConstructor 0.16;
 use Moose::Util::TypeConstraints;
+
+use Net::Amazon::S3::Error::Handler::Confess;
 
 # ABSTRACT: An easy-to-use Amazon S3 client
 
 type 'Etag' => where { $_ =~ /^[a-z0-9]{32}(?:-\d+)?$/ };
 
 has 's3' => ( is => 'ro', isa => 'Net::Amazon::S3', required => 1 );
+
+has error_handler_class => (
+    is => 'ro',
+    lazy => 1,
+    default => 'Net::Amazon::S3::Error::Handler::Confess',
+);
+
+has error_handler => (
+    is => 'ro',
+    lazy => 1,
+    default => sub { $_[0]->error_handler_class->new (s3 => $_[0]->s3) },
+);
+
+around BUILDARGS => sub {
+	my ($orig, $class) = (shift, shift);
+	my $args = $class->$orig (@_);
+
+	unless (exists $args->{s3}) {
+		my $error_handler_class = delete $args->{error_handler_class};
+		my $error_handler       = delete $args->{error_handler};
+		$args = {
+			(error_handler_class => $error_handler_class) x!! defined $error_handler_class,
+			(error_handler       => $error_handler      ) x!! defined $error_handler,
+			s3 => Net::Amazon::S3->new ($args),
+		}
+	}
+
+	$args;
+};
 
 __PACKAGE__->meta->make_immutable;
 
@@ -19,31 +50,24 @@ sub buckets {
     my $self = shift;
     my $s3   = $self->s3;
 
-    my $http_request
-        = Net::Amazon::S3::Request::ListAllMyBuckets->new( s3 => $s3 )
-        ->http_request;
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Buckets::List',
+    );
 
-    my $xpc = $self->_send_request_xpc($http_request);
+    return unless $response->is_success;
 
-    my $owner_id
-        = $xpc->findvalue('/s3:ListAllMyBucketsResult/s3:Owner/s3:ID');
-    my $owner_display_name = $xpc->findvalue(
-        '/s3:ListAllMyBucketsResult/s3:Owner/s3:DisplayName');
+    my $owner_id = $response->owner_id;
+    my $owner_display_name = $response->owner_displayname;
 
     my @buckets;
-    foreach my $node (
-        $xpc->findnodes('/s3:ListAllMyBucketsResult/s3:Buckets/s3:Bucket') )
-    {
-        push @buckets,
-            $self->bucket_class->new(
-            {   client => $self,
-                name   => $xpc->findvalue( './s3:Name', $node ),
-                creation_date =>
-                    $xpc->findvalue( './s3:CreationDate', $node ),
-                owner_id           => $owner_id,
-                owner_display_name => $owner_display_name,
-            }
-            );
+    foreach my $bucket ($response->buckets) {
+        push @buckets, $self->bucket_class->new (
+			client             => $self,
+			name               => $bucket->{name},
+			creation_date      => $bucket->{creation_date},
+			owner_id           => $owner_id,
+			owner_display_name => $owner_display_name,
+		);
 
     }
     return @buckets;
@@ -56,10 +80,7 @@ sub create_bucket {
         client => $self,
         name   => $conf{name},
     );
-    $bucket->_create(
-        acl_short           => $conf{acl_short},
-        location_constraint => $conf{location_constraint},
-    );
+    $bucket->_create(%conf);
     return $bucket;
 }
 
@@ -74,47 +95,32 @@ sub bucket {
 sub _send_request_raw {
     my ( $self, $http_request, $filename ) = @_;
 
-    return $self->s3->ua->request( $http_request, $filename );
+	$http_request = $http_request->http_request
+		if $http_request->$Safe::Isa::_isa ('Net::Amazon::S3::Request');
+
+	return Net::Amazon::S3::Response->new (
+		http_response => scalar $self->s3->ua->request( $http_request, $filename ),
+	);
 }
 
-sub _send_request {
-    my ( $self, $http_request, $filename ) = @_;
 
-    my $http_response = $self->_send_request_raw( $http_request, $filename );
+sub _perform_operation {
+	my ($self, $operation, %params) = @_;
 
-    my $content      = $http_response->content;
-    my $content_type = $http_response->content_type;
-    my $code         = $http_response->code;
+	my $error_handler = delete $params{error_handler};
+	$error_handler = $self->error_handler unless defined $error_handler;
 
-    if ( is_error($code) ) {
-        if ( $content_type eq 'application/xml' ) {
-            my $xpc = $self->s3->_xpc_of_content ($content);
+    my $request_class  = $operation . '::Request';
+    my $response_class = $operation . '::Response';
+    my $filename       = delete $params{filename};
 
-            if ( $xpc->findnodes('/Error') ) {
-                my $code    = $xpc->findvalue('/Error/Code');
-                my $message = $xpc->findvalue('/Error/Message');
-                confess("$code: $message");
-            } else {
-                confess status_message($code);
-            }
-        } else {
-            confess status_message($code);
-        }
-    }
-    return $http_response;
-}
+    my $request  = $request_class->new (s3 => $self->s3, %params);
+    my $response = $self->_send_request_raw ($request->http_request, $filename);
+    $response    = $response_class->new (http_response => $response->http_response);
 
-sub _send_request_content {
-    my ( $self, $http_request, $filename ) = @_;
-    my $http_response = $self->_send_request( $http_request, $filename );
-    return $http_response->content;
-}
+    $error_handler->handle_error ($response);
 
-sub _send_request_xpc {
-    my ( $self, $http_request, $filename ) = @_;
-    my $http_response = $self->_send_request( $http_request, $filename );
-
-    return $self->s3->_xpc_of_content( $http_response->content );
+    return $response;
 }
 
 1;
@@ -131,35 +137,39 @@ Net::Amazon::S3::Client - An easy-to-use Amazon S3 client
 
 =head1 VERSION
 
-version 0.91
+version 0.94
 
 =head1 SYNOPSIS
 
-  my $s3 = Net::Amazon::S3->new(
-    aws_access_key_id     => $aws_access_key_id,
-    aws_secret_access_key => $aws_secret_access_key,
-    retry                 => 1,
-  );
-  my $client = Net::Amazon::S3::Client->new( s3 => $s3 );
+	# Build Client instance
+	my $client = Net::Amazon::S3::Client->new (
+		# accepts all Net::Amazon::S3's arguments
+		aws_access_key_id     => $aws_access_key_id,
+		aws_secret_access_key => $aws_secret_access_key,
+		retry                 => 1,
+	);
 
-  # list all my buckets
-  # returns a list of L<Net::Amazon::S3::Client::Bucket> objects
-  my @buckets = $client->buckets;
-  foreach my $bucket (@buckets) {
-    print $bucket->name . "\n";
-  }
+	# or reuse an existing S3 connection
+	my $client = Net::Amazon::S3::Client->new (s3 => $s3);
 
-  # create a new bucket
-  # returns a L<Net::Amazon::S3::Client::Bucket> object
-  my $bucket = $client->create_bucket(
-    name                => $bucket_name,
-    acl_short           => 'private',
-    location_constraint => 'us-east-1',
-  );
+	# list all my buckets
+	# returns a list of L<Net::Amazon::S3::Client::Bucket> objects
+	my @buckets = $client->buckets;
+	foreach my $bucket (@buckets) {
+		print $bucket->name . "\n";
+	}
 
-  # or use an existing bucket
-  # returns a L<Net::Amazon::S3::Client::Bucket> object
-  my $bucket = $client->bucket( name => $bucket_name );
+	# create a new bucket
+	# returns a L<Net::Amazon::S3::Client::Bucket> object
+	my $bucket = $client->create_bucket(
+		name                => $bucket_name,
+		acl_short           => 'private',
+		location_constraint => 'us-east-1',
+	);
+
+	# or use an existing bucket
+	# returns a L<Net::Amazon::S3::Client::Bucket> object
+	my $bucket = $client->bucket( name => $bucket_name );
 
 =head1 DESCRIPTION
 
@@ -177,9 +187,67 @@ to S3 and check the resultant ETag.
 WARNING: This is an early release of the Client classes, the APIs
 may change.
 
+=head2 _perform_operation
+
+Refer L<Net::Amazon::S3/_perform_operation
+
+Method supports additional parameters
+
+=over
+
+=item filename
+
+Filename callback (see L<LWP::UserAgent> for details) (optional)
+
+=back
+
 =for test_synopsis no strict 'vars'
 
+=head1 CONSTRUCTOR
+
+=over
+
+=item s3
+
+L<< Net::Amazon::S3 >> instance
+
+=item error_handler_class
+
+Error handler class name (package name), see L<< Net::Amazon::S3::Error::Handler >>
+for more. Overrides one available in C<s3>.
+
+Default: L<< Net::Amazon::S3::Error::Handler::Confess >>
+
+=item error_handler
+
+Instance of error handler class.
+
 =head1 METHODS
+
+=head2 new
+
+L<Net::Amazon::S3::Client> can be constructed two ways.
+
+Historically it wraps S3 API instance
+
+	use Net::Amazon::S3::Client;
+
+	my $client = Net::Amazon::S3::Client->new (
+		s3 => .... # Net::Amazon::S3 instance
+	);
+
+=head2 new (since v0.92)
+
+Since v0.92 explicit creation of S3 API instance is no longer necessary.
+L<Net::Amazon::S3::Client>'s constructor accepts same parameters as L<Net::Amazon::S3>
+
+	use Net::Amazon::S3::Client v0.92;
+
+	my $client = Net::Amazon::S3::Client->new (
+		aws_access_key_id     => ...,
+		aws_secret_access_key => ...,
+		...,
+	);
 
 =head2 buckets
 
@@ -214,11 +282,11 @@ may change.
 
 =head1 AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

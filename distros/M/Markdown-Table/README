@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
 
@@ -33,7 +33,7 @@ SYNOPSIS
         This table shows all employees and their role.
     
         | Id | Name | Role |
-        +---+---+---+
+        |---|---|---|
         | 1 | John Smith | Testrole |
         | 2 | Jane Smith | Admin |
         ~;

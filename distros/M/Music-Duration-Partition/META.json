@@ -73,7 +73,7 @@
          "web" : "https://github.com/ology/Music-Duration-Partition"
       }
    },
-   "version" : "0.0514",
+   "version" : "0.0515",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

@@ -62,7 +62,8 @@ my $dbh = db_connect($cfg, 'EDTK_DBI_STATS',
 ################################################################################
 
 my $sql = "SELECT ED_REFIDDOC, ED_SOURCE, ED_IDLDOC, ED_SEQDOC, ED_DTEDTION, ED_NOMDEST"
-		. " FROM EDTK_INDEX ";
+		. " FROM " . $cfg->{'EDTK_DBI_OUTMNGR'};
+#		. " FROM EDTK_INDEX ";
 my $where;
 my @values;
 push (@values, $key1);
@@ -81,7 +82,8 @@ if 	($type eq 'idldoc') {
 
 	} elsif (defined $key2 && $key2 > 0 && $key1!~/\%$/){ # key2 est le numéro de page
 	#} elsif (defined $key2 && $key2 > 0 ){
-		$where .="  AND ED_SEQDOC  = (SELECT ED_SEQDOC FROM EDTK_INDEX WHERE ED_IDLDOC = ? AND ED_IDSEQPG = ? )";
+		$where .="  AND ED_SEQDOC  = (SELECT ED_SEQDOC FROM " . $cfg->{'EDTK_DBI_OUTMNGR'} . " WHERE ED_IDLDOC = ? AND ED_IDSEQPG = ? )";
+#		$where .="  AND ED_SEQDOC  = (SELECT ED_SEQDOC FROM EDTK_INDEX WHERE ED_IDLDOC = ? AND ED_IDSEQPG = ? )";
 		push (@values, $key1, $key2);
 		$sequence = $key2;
 	}
@@ -121,7 +123,8 @@ if 		($key!~/^y$/i) {
 ReadMode ('restore');
 
 
-my 	$updt = "UPDATE EDTK_INDEX SET ED_DTLOT = ?, ED_SEQLOT = ?, ED_DTPOSTE = ?, ED_STATUS = ? ";
+my 	$updt = "UPDATE " . $cfg->{'EDTK_DBI_OUTMNGR'} . " SET ED_DTLOT = ?, ED_SEQLOT = ?, ED_DTPOSTE = ?, ED_STATUS = ? ";
+#my 	$updt = "UPDATE EDTK_INDEX SET ED_DTLOT = ?, ED_SEQLOT = ?, ED_DTPOSTE = ?, ED_STATUS = ? ";
 	$sth = $dbh->prepare($updt.$where);
 
 if ($event!~/^RESET$/i && $event!~/^STOP$/i) {

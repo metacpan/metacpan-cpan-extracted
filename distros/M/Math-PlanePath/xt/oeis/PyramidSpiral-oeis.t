@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2018, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -25,7 +25,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 4;
+plan tests => 6;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -33,6 +33,72 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::PyramidSpiral;
+use Math::NumSeq::PlanePathTurn;
+
+
+
+#------------------------------------------------------------------------------
+# A329116 - X coordinate
+
+MyOEIS::compare_values
+  (anum => 'A329116',  # OFFSET=0
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my $path = Math::PlanePath::PyramidSpiral->new (n_start => 0);
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+     }
+     return \@got;
+   });
+
+# A329972 - Y coordinate
+MyOEIS::compare_values
+  (anum => 'A329972',  # OFFSET=0
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my $path = Math::PlanePath::PyramidSpiral->new (n_start => 0);
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
+
+# A053615 -- abs(X) distance to pronic
+MyOEIS::compare_values
+  (anum => 'A053615',  # OFFSET=0
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::PyramidSpiral->new (n_start => 0);
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x, $y) = $path->n_to_xy ($n);
+       push @got, abs($x);
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A080037 -- N positions not straight ahead
+# not in OEIS: 13,17,26,31,37,50,57,65,82,91,101,122,133,145,170
+
+# MyOEIS::compare_values
+#   (anum => 'A999999',
+#    func => sub {
+#      my ($count) = @_;
+#      my @got;
+#      my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'PyramidSpiral',
+#                                                  turn_type => 'Straight');
+#      while (@got < $count) {
+#        my ($i,$value) = $seq->next;
+#        if (! $value) { push @got, $i; }
+#      }
+#      return \@got;
+#    });
 
 
 #------------------------------------------------------------------------------
@@ -78,21 +144,6 @@ MyOEIS::compare_values
      return \@got;
    });
 
-#------------------------------------------------------------------------------
-# A053615 -- distance to pronic is abs(X)
-
-MyOEIS::compare_values
-  (anum => 'A053615',
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::PyramidSpiral->new;
-     my @got;
-     for (my $n = $path->n_start; @got < $count; $n++) {
-       my ($x, $y) = $path->n_to_xy ($n);
-       push @got, abs($x);
-     }
-     return \@got;
-   });
 
 #------------------------------------------------------------------------------
 # A214250 -- sum of 8 neighbours N

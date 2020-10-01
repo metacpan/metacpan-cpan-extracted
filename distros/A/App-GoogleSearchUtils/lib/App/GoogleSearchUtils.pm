@@ -1,9 +1,9 @@
 package App::GoogleSearchUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-22'; # DATE
+our $DATE = '2020-10-01'; # DATE
 our $DIST = 'App-GoogleSearchUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,6 +25,18 @@ $SPEC{google_search} = {
             req => 1,
             pos => 0,
             slurpy => 1,
+        },
+        delay => {
+            summary => 'Delay between opening each query',
+            schema => 'duration*',
+        },
+        prepend => {
+            summary => 'String to add at the beginning of each query',
+            schema => 'str*',
+        },
+        append => {
+            summary => 'String to add at the end of each query',
+            schema => 'str*',
         },
         num => {
             summary => 'Number of results per page',
@@ -73,8 +85,18 @@ sub google_search {
 
     my $envres = envresmulti();
     my $i = -1;
-    for my $query (@{ $args{queries} }) {
+    for my $query0 (@{ $args{queries} }) {
         $i++;
+        if ($i > 0 && $args{delay}) {
+            log_trace "Sleeping %s second(s) ...", $args{delay};
+            sleep $args{delay};
+        }
+        my $query = join(
+            "",
+            defined($args{prepend}) ? $args{prepend} : "",
+            $query0,
+            defined($args{append}) ? $args{append} : "",
+        );
         my $url = "https://www.google.com/search?num=$num&q=".
             URI::Escape::uri_escape($query);
         my $res = Browser::Open::open_browser($url);
@@ -99,7 +121,7 @@ App::GoogleSearchUtils - CLI utilites related to google searching
 
 =head1 VERSION
 
-This document describes version 0.002 of App::GoogleSearchUtils (from Perl distribution App-GoogleSearchUtils), released on 2020-09-22.
+This document describes version 0.004 of App::GoogleSearchUtils (from Perl distribution App-GoogleSearchUtils), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
@@ -128,9 +150,21 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<append> => I<str>
+
+String to add at the end of each query.
+
+=item * B<delay> => I<duration>
+
+Delay between opening each query.
+
 =item * B<num> => I<posint> (default: 100)
 
 Number of results per page.
+
+=item * B<prepend> => I<str>
+
+String to add at the beginning of each query.
 
 =item * B<queries>* => I<array[str]>
 

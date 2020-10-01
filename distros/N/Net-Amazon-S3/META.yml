@@ -1,12 +1,12 @@
 ---
 abstract: 'Use the Amazon S3 - Simple Storage Service'
 author:
-  - 'Leo Lapworth <llap@cpan.org>'
+  - 'Branislav Zahradník <barney@cpan.org>'
 build_requires:
   File::Temp: '0'
   FindBin: '0'
+  HTTP::Request: '0'
   LWP::Simple: '0'
-  Moose::Meta::Class: '0'
   Test::Deep: v0.111.0
   Test::Exception: '0'
   Test::MockTime: '0'
@@ -47,6 +47,7 @@ requires:
   MIME::Base64: '0'
   MIME::Types: '0'
   Moose: '0.85'
+  Moose::Meta::Class: '0'
   Moose::Object: '0'
   Moose::Role: '0'
   Moose::Util: '0'
@@ -72,6 +73,7 @@ requires:
   URI::QueryParam: '0'
   XML::LibXML: '0'
   XML::LibXML::XPathContext: '0'
+  constant: '0'
   namespace::clean: '0'
   parent: '0'
   sort: '0'
@@ -80,7 +82,7 @@ requires:
 resources:
   bugtracker: https://github.com/rustyconover/net-amazon-s3/issues
   repository: https://github.com/rustyconover/net-amazon-s3
-version: '0.91'
+version: '0.94'
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'
   - 'Ali Anari <ali@anari.me>'
@@ -127,6 +129,6 @@ x_contributors:
   - 'Tom Hukins <tom@eborcom.com>'
   - 'toritori0318 <toritori0318@gmail.com>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

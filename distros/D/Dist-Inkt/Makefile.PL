@@ -7,7 +7,7 @@ my $meta = {
   "abstract"           => "yet another distribution builder",
   "author"             => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config"     => 0,
-  "generated_by"       => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+  "generated_by"       => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"           => ["CPAN", "Distribution", "Package", "Perl", "Release"],
   "license"            => ["perl_5"],
   "meta-spec"          => {
@@ -45,28 +45,28 @@ my $meta = {
                             test => { requires => { "Test::More" => 0.96 } },
                           },
   "provides"           => {
-                            "Dist::Inkt"                              => { file => "lib/Dist/Inkt.pm", version => 0.024 },
-                            "Dist::Inkt::Profile::Simple"             => { file => "lib/Dist/Inkt/Profile/Simple.pm", version => 0.024 },
-                            "Dist::Inkt::Role::CopyFiles"             => { file => "lib/Dist/Inkt/Role/CopyFiles.pm", version => 0.024 },
+                            "Dist::Inkt"                              => { file => "lib/Dist/Inkt.pm", version => 0.025 },
+                            "Dist::Inkt::Profile::Simple"             => { file => "lib/Dist/Inkt/Profile/Simple.pm", version => 0.025 },
+                            "Dist::Inkt::Role::CopyFiles"             => { file => "lib/Dist/Inkt/Role/CopyFiles.pm", version => 0.025 },
                             "Dist::Inkt::Role::CopyStandardDocuments" => {
                                                                            file => "lib/Dist/Inkt/Role/CopyStandardDocuments.pm",
-                                                                           version => 0.024,
+                                                                           version => 0.025,
                                                                          },
-                            "Dist::Inkt::Role::CPANfile"              => { file => "lib/Dist/Inkt/Role/CPANfile.pm", version => 0.024 },
-                            "Dist::Inkt::Role::MetaProvides"          => { file => "lib/Dist/Inkt/Role/MetaProvides.pm", version => 0.024 },
+                            "Dist::Inkt::Role::CPANfile"              => { file => "lib/Dist/Inkt/Role/CPANfile.pm", version => 0.025 },
+                            "Dist::Inkt::Role::MetaProvides"          => { file => "lib/Dist/Inkt/Role/MetaProvides.pm", version => 0.025 },
                             "Dist::Inkt::Role::MetaProvidesScripts"   => {
                                                                            file => "lib/Dist/Inkt/Role/MetaProvidesScripts.pm",
-                                                                           version => 0.024,
+                                                                           version => 0.025,
                                                                          },
-                            "Dist::Inkt::Role::SignDistribution"      => { file => "lib/Dist/Inkt/Role/SignDistribution.pm", version => 0.024 },
-                            "Dist::Inkt::Role::StaticInstall"         => { file => "lib/Dist/Inkt/Role/StaticInstall.pm", version => 0.024 },
-                            "Dist::Inkt::Role::WriteDOAPLite"         => { file => "lib/Dist/Inkt/Role/WriteDOAPLite.pm", version => 0.024 },
-                            "Dist::Inkt::Role::WriteINSTALL"          => { file => "lib/Dist/Inkt/Role/WriteINSTALL.pm", version => 0.024 },
-                            "Dist::Inkt::Role::WriteLICENSE"          => { file => "lib/Dist/Inkt/Role/WriteLICENSE.pm", version => 0.024 },
-                            "Dist::Inkt::Role::WriteMakefilePL"       => { file => "lib/Dist/Inkt/Role/WriteMakefilePL.pm", version => 0.024 },
-                            "Dist::Inkt::Role::WriteMetaJSON"         => { file => "lib/Dist/Inkt/Role/WriteMetaJSON.pm", version => 0.024 },
-                            "Dist::Inkt::Role::WriteMetaYML"          => { file => "lib/Dist/Inkt/Role/WriteMetaYML.pm", version => 0.024 },
-                            "Dist::Inkt::Role::WriteREADME"           => { file => "lib/Dist/Inkt/Role/WriteREADME.pm", version => 0.024 },
+                            "Dist::Inkt::Role::SignDistribution"      => { file => "lib/Dist/Inkt/Role/SignDistribution.pm", version => 0.025 },
+                            "Dist::Inkt::Role::StaticInstall"         => { file => "lib/Dist/Inkt/Role/StaticInstall.pm", version => 0.025 },
+                            "Dist::Inkt::Role::WriteDOAPLite"         => { file => "lib/Dist/Inkt/Role/WriteDOAPLite.pm", version => 0.025 },
+                            "Dist::Inkt::Role::WriteINSTALL"          => { file => "lib/Dist/Inkt/Role/WriteINSTALL.pm", version => 0.025 },
+                            "Dist::Inkt::Role::WriteLICENSE"          => { file => "lib/Dist/Inkt/Role/WriteLICENSE.pm", version => 0.025 },
+                            "Dist::Inkt::Role::WriteMakefilePL"       => { file => "lib/Dist/Inkt/Role/WriteMakefilePL.pm", version => 0.025 },
+                            "Dist::Inkt::Role::WriteMetaJSON"         => { file => "lib/Dist/Inkt/Role/WriteMetaJSON.pm", version => 0.025 },
+                            "Dist::Inkt::Role::WriteMetaYML"          => { file => "lib/Dist/Inkt/Role/WriteMetaYML.pm", version => 0.025 },
+                            "Dist::Inkt::Role::WriteREADME"           => { file => "lib/Dist/Inkt/Role/WriteREADME.pm", version => 0.025 },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -81,7 +81,7 @@ my $meta = {
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/Dist-Inkt/project",
                             x_wiki       => "https://github.com/tobyink/p5-dist-inkt/wiki",
                           },
-  "version"            => 0.024,
+  "version"            => 0.025,
   "x_help_wanted"      => ["documenter", "tester"],
   "x_provides_scripts" => {
                             "distinkt-dist"      => { file => "script/distinkt-dist" },
@@ -161,28 +161,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

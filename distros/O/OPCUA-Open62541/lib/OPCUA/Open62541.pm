@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;

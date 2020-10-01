@@ -1,3 +1,16 @@
+1.1.95  2020-10-01  Released-By: PERLANCAR; Urgency: low
+
+	- No spec changes.
+
+	- POD formatting tweak so 'Enveloped result' heading can be linked.
+
+
+1.1.94  2020-09-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Introduce function example's env_result and naked_result
+	  properties.
+
+
 1.1.93  2019-07-19  Released-By: PERLANCAR; Urgency: low
 
 	- No spec changes.
@@ -431,7 +444,7 @@
            after all the options have been processed).
 
 
-1.1.43   2013-12-25 (SHARYANTO) - Ho ho ho!
+1.1.43   2013-12-25  Released-By: SHARYANTO; Note: Ho ho ho!
 
          - function: Add argument spec's 'cmdline_on_getopt' and
            'cmdline_on_getarg'. UPDATE in 1.1.44: 'cmdline_on_getarg' removed.
@@ -458,7 +471,7 @@
          - result: Add properties 'func.*'.
 
 
-1.1.39   2013-10-15 (SHARYANTO) - with the smell of burning goat meat in the house!
+1.1.39   2013-10-15  Released-By: SHARYANTO; Note: with the smell of burning goat meat in the house!
 
          - function: examples: Introduce 'src' and 'src_plang' so that more
            general examples can be specified.

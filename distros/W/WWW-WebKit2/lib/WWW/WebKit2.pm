@@ -28,7 +28,7 @@ None by default.
 
 =cut
 
-use 5.10.0;
+use 5.18.0;
 use Moose;
 
 with 'WWW::WebKit2::Cookies';
@@ -55,7 +55,7 @@ use XSLoader;
 use English '-no_match_vars';
 use POSIX qw<F_SETFD F_GETFD FD_CLOEXEC>;
 
-our $VERSION = '0.121';
+our $VERSION = '0.124';
 
 use constant DOM_TYPE_ELEMENT => 1;
 use constant ORDERED_NODE_SNAPSHOT_TYPE => 7;
@@ -263,6 +263,11 @@ has 'log_path' => (
     default => '/tmp/webkit2_log/',
 );
 
+has 'active_navigation_action' => (
+    is      => 'rw',
+    default => 0,
+);
+
 =head2 METHODS
 
 =head3 init
@@ -343,6 +348,22 @@ sub init_webkit {
         $self->load_status($load_event);
     });
 
+    $self->view->signal_connect('decide-policy' => sub {
+        my ($view, $decision, $type) = @_;
+        if ($type eq 'navigation-action') {
+            my $action = $decision->get_navigation_action;
+            die "Already running a navigation action to " .
+                $self->active_navigation_action
+                . " when requested "
+                . $action->get_navigation_type . ' ' . $action->get_request->get_uri
+                if $self->active_navigation_action and not $action->is_redirect;
+            $self->active_navigation_action($action->get_request->get_uri)
+                if ($self->view->get_uri =~ s/#.*//r) ne ($action->get_request->get_uri =~ s/#.*//r);
+        }
+        $decision->use;
+        return 0;
+    });
+
     $self->enable_file_access_from_file_urls;
     $self->enable_hardware_acceleration;
 
@@ -389,7 +410,7 @@ sub process_events {
 sub process_page_load {
     my ($self) = @_;
 
-    Gtk3::main_iteration_do(0) while Gtk3::events_pending or $self->is_loading;
+    Gtk3::main_iteration_do(0) while Gtk3::events_pending or $self->is_loading or $self->active_navigation_action;
 }
 
 sub is_loading {
@@ -409,14 +430,17 @@ sub handle_form_submission {
 sub handle_resource_request {
     my ($self, $view, $resource, $request) = @_;
 
+    my $uri = $request->get_uri;
     $self->pending_requests->{"$request"}++;
 
     $resource->signal_connect('finished' => sub {
+        $self->active_navigation_action('') if $uri eq $self->active_navigation_action;
         delete $self->pending_requests->{"$request"};
     });
     $resource->signal_connect('failed' => sub {
         # If someone decides not to wait_for_pending_requests, this signal is received
         # during global destruction with $self being undefined.
+        $self->active_navigation_action('') if $uri eq $self->active_navigation_action;
         delete $self->pending_requests->{"$request"} if defined $self;
     });
 }

@@ -1,6 +1,6 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
@@ -396,7 +396,6 @@ sub exit_status {
 }
 
 sub restart {
-  $_[0]->{_status} = undef;
   $_[0]->is_running ? $_[0]->stop->start : $_[0]->start;
 }
 sub is_running { $_[0]->process_id ? kill 0 => $_[0]->process_id : 0; }
@@ -473,6 +472,7 @@ sub start {
     : ();
 
   $self->session->enable_subreaper if $self->subreaper;
+  $self->_status(undef);
 
   if ($self->code) {
     $self->_fork($self->code, @args);
@@ -535,6 +535,7 @@ sub stop {
       $timeout -= $sleep_time;
     }
   }
+  return $self->_shutdown if defined $self->_status;
 
   sleep $self->kill_sleeptime if $self->kill_sleeptime;
 
@@ -546,13 +547,13 @@ sub stop {
     $self->send_signal($self->_default_blocking_signal, $pid);
     $ret = waitpid($pid, 0);
     $self->_status($?) if $ret == $pid || $ret == -1;
+    return $self->_shutdown;
   }
   else {
     $self->_diag("Could not kill process id: $pid") if DEBUG;
     $self->_new_err('Could not kill process');
   }
-
-  return $self->_shutdown;
+  return $self;
 }
 
 sub _shutdown {

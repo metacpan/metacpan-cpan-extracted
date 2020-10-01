@@ -1,81 +1,28 @@
 package Parallel::ForkManager::Segmented;
-$Parallel::ForkManager::Segmented::VERSION = '0.6.0';
+$Parallel::ForkManager::Segmented::VERSION = '0.10.0';
 use strict;
 use warnings;
 use 5.014;
 
+use Parallel::ForkManager::Segmented::Base v0.4.0 ();
+use parent 'Parallel::ForkManager::Segmented::Base';
+
 use Parallel::ForkManager ();
-
-sub new
-{
-    my $class = shift;
-
-    my $self = bless {}, $class;
-
-    $self->_init(@_);
-
-    return $self;
-}
-
-sub _init
-{
-    my ( $self, $args ) = @_;
-
-    return;
-}
 
 sub run
 {
     my ( $self, $args ) = @_;
 
-    my $WITH_PM   = !$args->{disable_fork};
-    my $items     = $args->{items};
-    my $stream_cb = $args->{stream_cb};
-    my $cb        = $args->{process_item};
-    my $batch_cb  = $args->{process_batch};
+    my $processed = $self->process_args($args);
+    return if not $processed;
+    my ( $WITH_PM, $batch_cb, $batch_size, $nproc, $stream_cb, ) =
+        @{$processed}{qw/ WITH_PM batch_cb batch_size nproc stream_cb  /};
 
-    if ( $stream_cb && $items )
-    {
-        die "Do not specify both stream_cb and items!";
-    }
-    if ( $batch_cb && $cb )
-    {
-        die "Do not specify both process_item and process_batch!";
-    }
-    $batch_cb //= sub {
-        foreach my $item ( @{ shift() } )
-        {
-            $cb->($item);
-        }
-        return;
-    };
-    my $nproc      = $args->{nproc};
-    my $batch_size = $args->{batch_size};
-
-    # Return prematurely on empty input to avoid calling $ch with undef()
-    # at least once.
-    if ($items)
-    {
-        if ( not @$items )
-        {
-            return;
-        }
-        $stream_cb = sub {
-            my ($args) = @_;
-            my $size = $args->{size};
-
-            return +{ items =>
-                    scalar( @$items ? [ splice @$items, 0, $size ] : undef() ),
-            };
-        };
-    }
+    return $self->serial_run($processed) if not $WITH_PM;
 
     my $pm;
 
-    if ($WITH_PM)
-    {
-        $pm = Parallel::ForkManager->new($nproc);
-    }
+    $pm = Parallel::ForkManager->new($nproc);
     my $batch = $stream_cb->( { size => 1 } )->{items};
     return if not defined $batch;
     $batch_cb->($batch);
@@ -83,25 +30,16 @@ ITEMS:
     while (
         defined( $batch = $stream_cb->( { size => $batch_size } )->{items} ) )
     {
-        if ($WITH_PM)
-        {
-            my $pid = $pm->start;
+        my $pid = $pm->start;
 
-            if ($pid)
-            {
-                next ITEMS;
-            }
+        if ($pid)
+        {
+            next ITEMS;
         }
         $batch_cb->($batch);
-        if ($WITH_PM)
-        {
-            $pm->finish;    # Terminates the child process
-        }
+        $pm->finish;    # Terminates the child process
     }
-    if ($WITH_PM)
-    {
-        $pm->wait_all_children;
-    }
+    $pm->wait_all_children;
     return;
 }
 
@@ -120,7 +58,7 @@ segments of items.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.10.0
 
 =head1 SYNOPSIS
 
@@ -157,6 +95,10 @@ is done in order to hopefully reduce the forking/exiting overhead.
 =head2 my $obj = Parallel::ForkManager::Segmented->new;
 
 Initializes a new object.
+
+=head2 my \%ret = $obj->process_args(+{ %ARGS })
+
+TBD.
 
 =head2 $obj->run(+{ %ARGS });
 

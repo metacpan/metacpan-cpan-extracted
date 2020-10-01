@@ -1,6 +1,6 @@
 package ScriptX::Getopt::Long;
 
-use parent 'ScriptX::Base';
+use parent 'ScriptX_Base';
 
 sub meta {
     return {
@@ -11,6 +11,11 @@ sub meta {
                 schema => 'array*',
                 req => 1,
             },
+            abort_on_failure => {
+                summary => 'Whether to abort script execution on GetOptions() failure',
+                schema => 'bool*',
+                default => 1,
+            },
         },
     };
 }
@@ -18,10 +23,12 @@ sub meta {
 sub before_run {
     my ($self, $stash) = @_;
 
+    my $abort_on_failure = $self->{abort_on_failure} // 1;
+
     require Getopt::Long;
     Getopt::Long::Configure("gnu_getopt", "no_ignore_case");
     my $res = Getopt::Long::GetOptions(@{ $self->{spec} });
-    $res ? [200] : [500, "GetOptions failed"];
+    $res ? [200] : [$abort_on_failure ? 601 : 500, "GetOptions failed"];
 }
 
 1;
@@ -39,7 +46,7 @@ ScriptX::Getopt::Long - Parse command-line options using Getop::Long
 
 =head1 VERSION
 
-This document describes version 0.000001 of ScriptX::Getopt::Long (from Perl distribution ScriptX), released on 2020-09-03.
+This document describes version 0.000004 of ScriptX::Getopt::Long (from Perl distribution ScriptX), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
@@ -58,7 +65,11 @@ This plugin basically just configures L<Getopt::Long>:
 
 then pass the spec to C<GetOptions()>.
 
-=head1 CONFIGURATION
+=head1 SCRIPTX PLUGIN CONFIGURATION
+
+=head2 abort_on_failure
+
+Bool. Optional. Whether to abort script execution on GetOptions() failure.
 
 =head2 spec
 

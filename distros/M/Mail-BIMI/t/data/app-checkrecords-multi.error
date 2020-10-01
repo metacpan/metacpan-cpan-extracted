@@ -1,0 +1,8 @@
+Error: Multiple Records specified
+Usage: 05-cmd.t <command> [-?h] [long options...]
+	-? -h --help  show help
+
+05-cmd.t checkrecord [long options...] <RECORD>
+	--profile STR  SVG Profile to validate against
+	               (SVG_1.2_BIMI|SVG_1.2_PS|Tiny-1.2)
+	--domain STR   Optional domain

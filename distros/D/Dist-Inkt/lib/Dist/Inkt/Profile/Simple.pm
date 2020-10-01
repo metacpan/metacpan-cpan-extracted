@@ -1,7 +1,7 @@
 package Dist::Inkt::Profile::Simple;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.024';
+our $VERSION   = '0.025';
 
 use Moose;
 use Types::Standard qw( ArrayRef Str );

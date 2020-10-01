@@ -1,8 +1,8 @@
 package Search::InvertedIndex::DB::DB_File_SplitHash;
 
-# $RCSfile: DB_File_SplitHash.pm,v $ $Revision: 1.5 $ $Date: 1999/10/20 16:51:00 $ $Author: snowhare $
-
 use strict;
+use warnings;
+
 use Carp;
 use Fcntl qw (:flock);
 use DB_File;
@@ -12,7 +12,7 @@ use Tie::DB_File::SplitHash;
 use vars qw (@ISA $VERSION);
 
 @ISA     = qw(Class::NamedParms);
-$VERSION = "1.07";
+$VERSION = "1.17";
 
 # Used to catch attempts to open the same db 
 # to multiple objects simultaneously and to
@@ -75,22 +75,6 @@ used by the Search::InvertedIndex module:
  status  - Returns open and lock status messages. 
 
  DESTROY - Used to dispose of the database object
-
-=head1 CHANGES
-
- 1.00 1999.06.16 - Initial release.
-
- 1.01 1999.06.17 - Bug fix to 'close' method. Failed to clear the filehandle used for locking.
-
- 1.02 1999.06.18 - Major bugfix to locking system and performance tweaking
-
- 1.03 1999.07.01 - Documentation corrections.
-
- 1.04 1999.10.20 - Removed use of 'use attr' for portability improvement
-
- 1.06 2000.01.25 - Bugfix (added 'use Tie::DB_File::SplitHash;' to initialization)
-
- 1.07 2000.03.23 - Bugfix for disposal when database was never actually opened 
 
 =head2 Public API
 
@@ -711,13 +695,12 @@ sub _open_multi_map {
 
 =head1 COPYRIGHT
 
-Copyright 1999, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and 
-FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
-This software may be copied or redistributed under the same terms as Perl itelf.
+Copyright 1999-2020, Jerilyn Franz and FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>).
+All Rights Reserved.
 
 =head1 AUTHOR
 
-Benjamin Franz
+Jerilyn Franz
 
 =head1 TODO
 

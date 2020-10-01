@@ -2,14 +2,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
-use Test::Deep;
-use Test::Warnings qw[ :no_end_test had_no_warnings ];
+use FindBin;
 
-use Shared::Examples::Net::Amazon::S3::Client (
-    qw[ with_response_fixture ],
-    qw[ expect_client_object_create ],
-);
+BEGIN { require "$FindBin::Bin/test-helper-s3-client.pl" }
+
+plan tests => 11;
+
+use Shared::Examples::Net::Amazon::S3::Client qw[ expect_client_object_create ];
 
 expect_client_object_create 'create object from scalar value' => (
     with_bucket             => 'some-bucket',
@@ -26,7 +25,83 @@ expect_client_object_create 'create object from scalar value' => (
     },
 );
 
-expect_client_object_create 'create object from scalar value' => (
+expect_client_object_create 'create object with deprecated acl_short' => (
+    with_bucket             => 'some-bucket',
+    with_key                => 'some-key',
+    with_value              => 'some value',
+    with_response_headers   => { etag => '5946210c9e93ae37891dfe96c3e39614' },
+	with_acl_short          => 'private',
+
+    expect_data             => '',
+    expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/some-key' },
+    expect_request_content  => 'some value',
+    expect_request_headers  => {
+        content_length => 10,
+        content_md5 => 'WUYhDJ6TrjeJHf6Ww+OWFA==',
+        expires => undef,
+		x_amz_acl => 'private',
+    },
+);
+
+expect_client_object_create 'create object with canned acl' => (
+    with_bucket             => 'some-bucket',
+    with_key                => 'some-key',
+    with_value              => 'some value',
+    with_response_headers   => { etag => '5946210c9e93ae37891dfe96c3e39614' },
+	with_acl                => Net::Amazon::S3::ACL::Canned->PRIVATE,
+
+    expect_data             => '',
+    expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/some-key' },
+    expect_request_content  => 'some value',
+    expect_request_headers  => {
+        content_length => 10,
+        content_md5 => 'WUYhDJ6TrjeJHf6Ww+OWFA==',
+        expires => undef,
+		x_amz_acl => 'private',
+    },
+);
+
+expect_client_object_create 'create object with canned acl coercion' => (
+    with_bucket             => 'some-bucket',
+    with_key                => 'some-key',
+    with_value              => 'some value',
+    with_response_headers   => { etag => '5946210c9e93ae37891dfe96c3e39614' },
+	with_acl                => 'private',
+
+    expect_data             => '',
+    expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/some-key' },
+    expect_request_content  => 'some value',
+    expect_request_headers  => {
+        content_length => 10,
+        content_md5 => 'WUYhDJ6TrjeJHf6Ww+OWFA==',
+        expires => undef,
+		x_amz_acl => 'private',
+    },
+);
+
+expect_client_object_create 'create object with explicit acl' => (
+    with_bucket             => 'some-bucket',
+    with_key                => 'some-key',
+    with_value              => 'some value',
+    with_response_headers   => { etag => '5946210c9e93ae37891dfe96c3e39614' },
+    with_acl        => Net::Amazon::S3::ACL::Set->new
+		->grant_read (id => '123', id => '234')
+		->grant_write (id => '345')
+		,
+
+    expect_data             => '',
+    expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/some-key' },
+    expect_request_content  => 'some value',
+    expect_request_headers  => {
+        content_length => 10,
+        content_md5 => 'WUYhDJ6TrjeJHf6Ww+OWFA==',
+        expires => undef,
+		x_amz_grant_read  => 'id="123", id="234"',
+		x_amz_grant_write => 'id="345"',
+    },
+);
+
+expect_client_object_create 'create object with server side encryption' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
     with_value              => 'some value',
@@ -79,7 +154,7 @@ expect_client_object_create 'create object with headers recognized by Client::Bu
     },
 );
 
-expect_client_object_create 'error access denied' => (
+expect_client_object_create 'S3 error - Access Denied' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
     with_value              => 'some value',
@@ -88,7 +163,7 @@ expect_client_object_create 'error access denied' => (
     throws                  => qr/^AccessDenied: Access denied error message/,
 );
 
-expect_client_object_create 'error no such bucket' => (
+expect_client_object_create 'S3 error - No Such Bucket' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
     with_value              => 'some value',
@@ -98,4 +173,15 @@ expect_client_object_create 'error no such bucket' => (
     throws                  => qr/^NoSuchBucket: No such bucket error message/,
 );
 
+expect_client_object_create 'HTTP error - 400 Bad Request' => (
+    with_bucket             => 'some-bucket',
+    with_key                => 'some-key',
+    with_value              => 'some value',
+    with_response_fixture ('error::http_bad_request'),
+    expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/some-key' },
+    throws                  => qr/^400: Bad Request/,
+);
+
 had_no_warnings;
+
+done_testing;

@@ -1,8 +1,8 @@
--[![Linux Build Status](https://travis-ci.org/nigelhorne/Geo-Coder-Free.svg?branch=master)](https://travis-ci.org/nigelhorne/Geo-Coder-Free)
--[![Windows Build status](https://ci.appveyor.com/api/projects/status/8nk00o0rietskf29/branch/master?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-free-4onbr/branch/master)
--[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-Free/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-Free?branch=master)
--[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/4097424524111879/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/4097424524111879/heads/master/)
--[![CPAN](https://img.shields.io/cpan/v/Geo-Coder-Free.svg)](http://search.cpan.org/~nhorne/Geo-Coder-Free/)
+[![Linux Build Status](https://travis-ci.org/nigelhorne/Geo-Coder-Free.svg?branch=master)](https://travis-ci.org/nigelhorne/Geo-Coder-Free)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/8nk00o0rietskf29/branch/master?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-free-4onbr/branch/master)
+[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-Free/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-Free?branch=master)
+[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/4097424524111879/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/4097424524111879/heads/master/)
+[![CPAN](https://img.shields.io/cpan/v/Geo-Coder-Free.svg)](http://search.cpan.org/~nhorne/Geo-Coder-Free/)
 
 # NAME
 
@@ -10,7 +10,7 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 # VERSION
 
-Version 0.24
+Version 0.25
 
 # SYNOPSIS
 
@@ -32,7 +32,7 @@ Version 0.24
 # DESCRIPTION
 
 Geo::Coder::Free provides an interface to free databases by acting as a front-end to
-Geo::Coder::Free::MaxMind and Geo::Coder::Free::OpenAddresses.
+[Geo::Coder::Free::MaxMind](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AMaxMind) and [Geo::Coder::Free::OpenAddresses](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AOpenAddresses).
 
 The cgi-bin directory contains a simple DIY Geo-Coding website.
 
@@ -93,7 +93,7 @@ You can also run this module from the command line:
 
 # AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne, `<njh@bandsman.co.uk>`
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

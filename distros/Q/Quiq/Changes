@@ -1,3 +1,13 @@
+1.188 2020-09-28
+================
+
+[Quiq::Database::Connection]
+* stmt() - Alias gen() hinzugefügt
+* select() - Option -sql hinzugefügt
+
+[Quiq::Gd::Component::Graph]
+* drawCross() - reimplementiert
+
 1.187 2020-08-18
 ================
 

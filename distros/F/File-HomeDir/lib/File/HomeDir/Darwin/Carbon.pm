@@ -19,7 +19,7 @@ use base "File::HomeDir::Darwin";
 
 BEGIN
 {
-    $VERSION = '1.004';
+    $VERSION = '1.006';
 
     # Load early if in a forking environment and we have
     # prefork, or at run-time if not.
@@ -195,3 +195,11 @@ L<File::HomeDir::Darwin>.
 =item * Some better way for users_* ?
 
 =back
+
+=head1 COPYRIGHT
+
+Copyright 2009 - 2011 Adam Kennedy.
+
+Copyright 2017 - 2020 Jens Rehsack
+
+=cut

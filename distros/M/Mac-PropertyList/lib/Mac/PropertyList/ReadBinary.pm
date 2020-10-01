@@ -13,7 +13,7 @@ use MIME::Base64      qw(decode_base64);
 use POSIX             qw(SEEK_END SEEK_SET);
 use XML::Entities     ();
 
-$VERSION = '1.413';
+$VERSION = '1.501';
 
 __PACKAGE__->_run( @ARGV ) unless caller;
 
@@ -298,6 +298,18 @@ my $type_readers = {
 		return Mac::PropertyList::ustring->new( $buffer );
 		},
 
+	8 => sub { # UIDs
+		my( $self, $length ) = @_;
+
+		my $byte_length = $length + 1;
+
+		read $self->_fh, ( my $buffer ), $byte_length;
+
+		my $value = unpack 'H*', $buffer;
+
+		return Mac::PropertyList::uid->new( $value );
+		},
+
 	a => sub { # array
 		my( $self, $elements ) = @_;
 
@@ -390,9 +402,11 @@ This project is in Github:
 
 brian d foy, C<< <bdfoy@cpan.org> >>
 
+Tom Wyant added support for UID types.
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2020, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

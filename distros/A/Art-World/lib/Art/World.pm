@@ -1,17 +1,241 @@
 use v5.16;
+use strict;
+use warnings;
 use utf8;
-package Art::World;
 
-# use Art::Agent;
-#has Art::Agent::Artist @.artists;
+package Art::World {
 
-our $VERSION = '0.16';
+  our $VERSION = '0.17';
 
-use Zydeco;
+  use Zydeco version => $VERSION, authority => 'cpan:SMONFF';
 
-class Playground {};
+  role Active {
+    method participate {
+      say "That's interesting";
+    }
+  }
+
+
+  role Buyer {
+    requires money;
+    method acquire ( Num $price ) {
+      say "I bought !";
+    }
+
+    method sale ( Num $price ) {
+      say "I sold !";
+    }
+  }
+
+
+  role Collectionable {
+    # Should be an object of type Agent
+    has owner;
+    has value ( is => rw );
+    has status (
+      enum     => ['for_sale', 'sold'],
+      handles  => 1,
+      default  => 'for_sale'
+    );
+    method belongs_to {
+      return $self->owner;
+    }
+  }
+
+  role Concept {
+    # Here should exist all the possible interractions of Concept entities
+    method idea_of_project {}
+    method idea_file {}
+    # etc.
+  }
+
+  role Space {
+    has space;
+  }
+
+  role Exhibit {
+    has public;
+    has exhibition ( type => ArrayRef );
+    has artist ( type => ArrayRef );
+    has artwork ( type => ArrayRef );
+
+    method display {
+      say "Shoooow";
+    }
+  }
+
+  role Market {
+    #has money;
+    has price;
+  }
+
+  role Showable {
+    #requires exhibition;
+    method exhibit {
+      say "Show";
+    }
+  }
+
+  role Underground {
+    method experiment {
+      say "Underground";
+    }
+  }
+
+  class Abstraction with Concept {
+    has idea!, process, file!, discourse, time, project;
+  }
+
+  class Event {
+    has place;
+    has datetime;
+    # "guests"
+    has participants;
+    class Opening {
+      has treat;
+      has smalltalk;
+    };
+    class Sex;
+  }
+
+  class Playground {
+
+    class Collective;
+    class Magazine {
+      has reader;
+    };
+
+
+    class Place with Space {
+      class Institution {
+        class School {
+          has student;
+          has teachers;
+        }
+
+        class Gallery with Exhibit, Buyer {
+
+          has artwork (  type => ArrayRef );
+          has artist (  type => ArrayRef );
+          has event ( type => ArrayRef );
+          has owner;
+          has money;
+
+          # Should be moved to an Opening role
+          method serve {
+            say "What would you drink?";
+          }
+        }
+
+        class Museum with Exhibit;
+
+      }
+      class Squat with Underground;
+      class Workshop;
+    }
+    class Website;
+  }
+
+  class Wildlife {
+
+    class Agent with Active {
+      # Should be required but will be moved to the Crudable area
+      has id         ( type => Int );
+      has name!       ( type => Str );
+      has reputation ( type => Int );
+
+      class Artist {
+
+        has artworks   ( type => ArrayRef );
+        has collectors ( type => ArrayRef, default => sub { [] } );
+        has collected  ( type => Bool, default => false, is => rw );
+        has status (
+          enum => [ 'underground', 'homogenic' ],
+          handles => 1,
+          default => sub {
+            my $self = shift;
+            $self->has_collectors ? 'homogenic' : 'underground' });
+
+        method create {
+          say $self->name . " create !";
+        }
+
+        method have_idea {
+          say $self->name . ' have shitty idea' if true;
+        }
+
+        # factory underground_artist does underground
+
+        method has_collectors {
+          if ( scalar @{ $self->collectors }  > 1 ) {
+            $self->collected( true );
+          }
+        }
+
+        # method new ($id, $name, @artworks, @collectors) {
+        #     self.bless(:$id, :$name, :@artworks, :@collectors);
+        # }
+      }
+
+
+      class Collector with Active, Buyer {
+        has money! ( type => Num );
+        # Actually an ArrayRef of Artworks
+        has collection (
+          type    => ArrayRef[Any, 0, 100],
+          default => sub { [] }
+        ) ;
+      }
+
+      class Critic;
+
+      class Curator;
+
+      class Public {
+        method visit {
+          say "I visited";
+        }
+      }
+    }
+
+
+    #use Art::Behavior::Crudable;
+    # does Art::Behavior::Crudable;
+    # has relations
+
+  }
+
+  class Work {
+
+    has creation_date;
+    has creator (
+      is => ro,
+      # ArrayRed of Artists
+      type => ArrayRef[ Object ]
+    );
+
+    class Article;
+
+    class Artwork with Showable, Collectionable  {
+
+      has creation_date;
+      has creator (
+        is => ro,
+        # Should be ArrayRed of Artists
+        type => ArrayRef[ Object ]
+      );
+      has material;
+      has size;
+    }
+
+    class Book;
+
+    class Exhibition;
+  }
+}
 
 1;
+__END__
 
 =encoding UTF-8
 
@@ -23,188 +247,170 @@ Art::World - Agents interactions modeling  🎨
 
   use Art::World;
 
-=head1 OBJECTIVES
-
-
-Art::World is an attempt to model and simulate a system describing the interactions and influences between the various I<agents> of the art world.
-
-If a correct API is reached, we'll try to build a "game of art" frontend.
+  my $artwork = Art->new_artwork(
+    creator => [ $artist, $another_artist ]  ,
+    value => 100,
+    owner => $f->person_name );
 
 =head1 DESCRIPTION
 
-=begin html
+C<Art::World> is an attempt to model and simulate a system describing the
+interactions and influences between the various I<agents> of the art world.
 
-<p>
-  <img alt="Some illustrations sticked on a wall" src="https://gitlab.com/smonff/art-world/-/raw/master/spec/schema_v2.png"
-    width="600px">
-</p>
+More informations about the purposes and aims of this project can be found in
+it's L<manual|Art::World::Manual>. Especially, the
+L<history|Art::World::Manual/"HISTORY"> and the
+L<objectives|Art::World::Manual/"OBJECTIVES"> section could be very handy to
+understand how this is an artwork using programming.
 
-=end html
+=head1 ROLES
 
-=over
+=head2 Active
 
-=item 01 Idea is the first step of process
+Provide a C<participate> method.
 
-=item 02 Idea is inserted in the file (through process)
+=head2 Buyer
 
-=item 03 Idea comes from discourse (given about project)
+Provide a C<aquire> method requiring some C<money>. All this behavior and
+attributes are encapsulated in the C<Buyer> role because there is no such thing
+as somebody in the art world that buy but doesn't sale.
 
-=item 04 Idea comes when there is no time left
+=head2 Collectionable
 
-=item 05 Ideas constitue the project
+If it's collectionable, it can go to a C<Collector> collection or in a C<Museum>.
 
-=back
+=head2 Concept
 
-=over
+=head2 Exhibit
 
-=item 06 Process allows ideas to evolve
+Role for L<C<Places>|Art::World/"Place"> that display some  L<C<Artworks>|Art::World/"Artwork">.
 
-=item 07 Process allows to fill the file (with ideas + discourse)
+=head2 Market
 
-=item 08 Process allows to generate some discourse
+It is all about offer and demand. Involve a price but should involve more money
+I guess.
 
-=item 09 Process allows to save time
+=head2 Showable
 
-=item 10 Process allows to set up the project
+Only an object that does the C<Showable> role can be exhibited. An object should
+be exhibited only if it reached the C<Showable> stage.
 
-=back
+=head1 CLASSES
 
-=over
+=head2 Agent
 
-=item 11 File is made of ideas
+They are the activists of the Art World, well known as the I<wildlife>.
 
-=item 12 File is filled and emptied with the process
+  my $agent = Art::World->new_agent( name => $f->person_name );
 
-=item 13 File is made of discourse
+  $agent->participate;    # ==>  "That's interesting"
 
-=item 14 File archives ideas, making possible to forget them
+A generic entity that can be any activist of the C<Art::World>. Provides all
+kind of C<Agent> classes and roles.
 
-=item 15 File generates a project
+=head2 Art
 
-=back
+Will be what you decide it to be depending on how you combine all the entities.
 
-=over
+=head2 Article
 
-=item 16 Discourse steers ideas
+Something in a C<Magazine> of C<Website> about C<Art>, C<Exhibitions>, etc.
 
-=item 17 Discourse analyzes process
+=head2 Artwork
 
-=item 18 Discourse talks about the file
+The base thing producted by artists. Artwork is subclass of
+L<C<Work>Art::World::Work> that have a C<Showable> and C<Collectionable> role.
 
-=item 19 Discourse allows to link various stages of the projet
 
-=item 20 Discourse is a constituent of the project
+=head2 Artist
 
-=back
-
-=over
-
-=item 21 From time to time, ideas appear
-
-=item 22 Time is needed to apply the process
-
-=item 23 Time is suspended into file, process is off there
-
-=item 24 Discourse's time (reading time)
-
-=item 25 Various times contained in project give it's shape
-
-=back
+The artist got a lots of wonderful powers:
 
 =over
 
-=item 26 Project is updated by new ideas
+=item C<create>
 
-=item 27 Project is constantly updated by the process
+=item C<have_idea> all day long
 
-=item 28 Project is set up when file is updated
+In the beginning of their carreer they are usually underground, but this can
+change in time.
 
-=item 29 Project and discourse are inseparable
-
-=item 30 Project is what takes the longuest time to set up
-
-=back
-
-=head1 HISTORY
-
-This is a long term continuation of an art project started circa 2006.
-
-In 2005, I got a metal box and colored carton cards and called this I<Le
-Fichier>. It was basically a database of artworks ideas. I was trashing all
-ideas I could have of serious or weird potential artworks. It was inspired
-either by Roland Barthes, who was actually working with those kind of cards,
-Georges Perec, who was exploring I<potentialities>, and Édouard Levé I<Oeuvres>,
-a huge catalog of potential artworks (he later commited suicide after describing
-his own I<Suicide> in a book).
-
-2006 I initiated a FileMaker database of artworks to put the old style carton
-cards in computer form. I had no idea what I was doing at this time, being an
-art school student, at this time, programming was not massively taught as a fine art (unfortunately).
-
-In 2008 I benefited of an artist residency in an agricultural college with a
-creation grant of 10 000€. I wanted to keep working on my I<Art World and Creative
-Processes schemas> projects initiated during art school. It didn't go very well
-because the Plastic Art I<State Inspector> didn't like what I was
-doing with her money and strongly advised to change orientation. In my opinion, it
-was a perfect thing that the instutition itself would exhibit it's own workings. In the end, there was an exhibition, but she didn't
-come to the opening.
-
-Anyway, I ended up interviewing many I<Agents> of the college, and went
-especially well with some natural sciences teacher. He recommended a manual were
-I found some schemas that I made some I<detournement>: I used the geology
-science as a metaphor of art world. I used geology terms and language to
-describe social interactions that were not described in the art sociology field.
-
-=begin html
-
-<p>
-  <img alt="Pencil schema with mountains" src="https://gitlab.com/smonff/art-world/-/raw/master/spec/schema_v4.png"
-    width="600px">
-</p>
-
-=end html
-
-The residency ended up with L<the redaction of a rather precise documentation|https://files.balik.network/art/schema_v4_presentation.pdf> (maybe my first specification).
-
-Then I almost got beaten by a fellow artist who was participating in a collective
-exhibition mostly for the money and not for the fun. I guess he felt a bit provoked by my situationist theory.
-
-In 2008, I finally decided to start a training to learn programming and design a proper database and system for I<managing a virtual Art
-World>. I became a web developer, but I totally forgot the ulterior motive.
-
-Sometimes I thought about it:
-
-=over
-
-=item 2013 Perl try
-
-I bootstrapped a Perl module with 5 abstract empty classes and then let it sleep on Github
-
-=item 2017 Raku try
-
-I restarted my project while getting into Raku
-(it was still Perl6 at this time), but learning Raku was too much effort and I
-abandonned again.
-
-Ten years later I am still on it. This project is L<following me in my
-dreams|https://smonff.gitlab.io/art-school-story/>. I'll give it another try.
+  $artist->is_underground if not $artist->has_collectors;
 
 =back
+
+=head2 Book
+
+Where a lot of theory is written by C<Critics>
+
+=head2 Collector
+
+=head2 Collective
+
+They do stuff together. You know, art is not about lonely C<Artists> in their C<Workshop>.
+
+=head2 Critic
+
+=head2 Curator
+
+=head2 Event
+
+=head2 Exhibition
+
+=head2 Gallery
+
+Just another kind of L<C<Place>|Art::World/"Place">, mostly commercial.
+
+Since it implements the L<C<Buyer>|Art::World/"Buyer"> role, a gallery can both
+C<acquire()> and C<sell()>.
+
+=head2 Institution
+
+A C<Place> that came out of the C<Underground>.
+
+=head2 Magazine
+
+=head2 Museum
+
+Yet another kind of C<Place>, an institution with a lot of L<C<Artworks>|Art::World/"Artwork"> in the basement.
+
+=head2 Opening
+
+=head2 Place
+
+=head2 Playground
+
+A generic space where C<Art::World> C<Agents> can do all kind of weird things.
+
+=head2 Public
+
+=head2 School
+
+=head2 Sex
+
+=head2 Squat
+
+=head2 Website
+
+=head2 Work
+
+There are not only C<Artworks>. All C<Agent>s produce various kind of work or
+help consuming or implementing C<Art>.
+
+=head2 Workshop
+
+A specific kind of L<C<Playground>|Art::World/"Playground"> where you can build things tranquilly.
 
 =head1 AUTHOR
 
-=over
+Seb. Hu-Rillettes <shr@balik.network>
 
-=item Sébastien Feugère <sebastien@feugere.net>
+=head1 CONTRIBUTORS
 
-=item Seb. Hu-Rillettes <shr@balik.network>
-
-=back
+Sébastien Feugère <sebastien@feugere.net>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2006-2020 Seb. Hu-Rillettes
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
-
-=cut

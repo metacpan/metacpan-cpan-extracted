@@ -1,0 +1,42 @@
+---
+abstract: 'IO::Async adapter for RxPerl'
+author:
+  - 'KARJALA <karjala@cpan.org>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RxPerl-IOAsync
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  RxPerl::IOAsync:
+    file: lib/RxPerl/IOAsync.pm
+    version: v6.0.0
+requires:
+  IO::Async: '0'
+  RxPerl: v0.28.0
+  Sub::Util: '1.41'
+  perl: '5.010'
+resources:
+  bugtracker: https://gitlab.com/karjala/rxperl-ioasync-for-perl/issues
+  homepage: https://gitlab.com/karjala/rxperl-ioasync-for-perl
+  repository: git://gitlab.com/karjala/rxperl-ioasync-for-perl.git
+version: v6.0.0
+x_authority: cpan:KARJALA
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

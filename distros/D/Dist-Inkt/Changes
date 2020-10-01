@@ -7,6 +7,11 @@ Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt>
 Wiki:         <https://github.com/tobyink/p5-dist-inkt/wiki>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.025	2020-09-29
+
+ - Selectively include FixMakefile stuff in Makefile.PL only for
+   distributions that need it.
+
 0.024	2017-05-05
 
  - Added: Support x_static_install.

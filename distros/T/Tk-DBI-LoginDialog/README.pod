@@ -276,7 +276,7 @@ version number.
 
 =head1 VERSION
 
-Build V1.006
+Build V1.007
 
 =head1 AUTHOR
 

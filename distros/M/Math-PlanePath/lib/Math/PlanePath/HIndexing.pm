@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -59,7 +59,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
@@ -80,7 +80,7 @@ use constant n_start => 0;
 use constant class_x_negative => 0;
 use constant class_y_negative => 0;
 use constant diffxy_maximum => 0; # upper octant X<=Y so X-Y<=0
-use constant _UNDOCUMENTED__dxdy_list_at_n => 9;
+use constant 1.02 _UNDOCUMENTED__dxdy_list_at_n => 9;
 
 
 #------------------------------------------------------------------------------
@@ -664,6 +664,8 @@ L<http://oeis.org/A097110> (etc)
 
 =back
 
+    A334235    X coordinate
+    A334236    Y coordinate
     A097110    Y at N=2^k, being successively 2^j-1, 2^j
 
     A060867    area of level
@@ -681,7 +683,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

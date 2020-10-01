@@ -67,7 +67,21 @@ use Acme::PM::Berlin::Meetings;
 {
     my $now = DateTime->new(day => 25, month => 8, year => 2020, hour => 19, time_zone => 'Europe/Berlin');
     my $dt = Acme::PM::Berlin::Meetings::next_meeting_dt($now);
-    is $dt, '2020-09-30T19:00:00';
+    # is $dt, '2020-09-30T19:00:00'; --- another exception
+    is $dt, '2020-09-23T18:00:00';
+}
+
+# Exception Sep 2020
+{
+    my $now = DateTime->new(day => 22, month => 9, year => 2020, hour => 21, time_zone => 'Europe/Berlin');
+    my $dt = Acme::PM::Berlin::Meetings::next_meeting_dt($now);
+    is $dt, '2020-09-23T18:00:00';
+}
+
+{
+    my $now = DateTime->new(day => 24, month => 9, year => 2020, hour => 21, time_zone => 'Europe/Berlin');
+    my $dt = Acme::PM::Berlin::Meetings::next_meeting_dt($now);
+    is $dt, '2020-10-28T19:00:00';
 }
 
 __END__

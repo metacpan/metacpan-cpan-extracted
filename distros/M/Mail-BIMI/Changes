@@ -1,3 +1,20 @@
+2.20200930.1 2020-09-30 UTC
+  - Add cacheing for remote calls
+  - Class to model a retrieved indicator
+  - Add SVG download and verification against spec
+  - BREAKING CHANGE: location and authority are now singular
+  - Consistent error reporting
+  - Improved pragmas class
+  - System wide options
+  - Added SVG Profiles
+  - Retrieval and verification of VMC
+  - Extract Indicator from VMC
+  - Command line helper app
+  - Added evidence ptypes
+  - Added BIMI-Indicator header
+  - Add DMARC policy strength requirement
+  - General cleanups
+
 1.20200226 2020-02-26 UTC
   - Update README
 

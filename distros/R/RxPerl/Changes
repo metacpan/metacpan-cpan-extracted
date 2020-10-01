@@ -1,5 +1,23 @@
 Revision history for Perl extension RxPerl
 
+v6.0.1 2020-09-28T06:03:10Z
+
+    - added rx_repeat, rx_retry and rx_skip
+    - added error symbol to marble tests (#)
+
+v6.0.0 2020-09-24T17:18:32Z
+
+    - no changes, release v6.0
+
+v0.28.4 2020-09-24T14:39:23Z
+
+    - fixed documentation
+
+v0.28.0 2020-09-22T18:59:20Z
+
+    - removed the three adapter modules from this distribution
+    - more marble tests
+
 v0.27.1 2020-09-19T12:17:37Z
 
     - introduce ability to write tests using marble diagrams

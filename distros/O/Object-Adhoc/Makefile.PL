@@ -26,7 +26,7 @@ my $meta = {
                           test      => { requires => { "Test::More" => 0.96 } },
                         },
   "provides"         => {
-                          "Object::Adhoc" => { file => "lib/Object/Adhoc.pm", version => 0.004 },
+                          "Object::Adhoc" => { file => "lib/Object/Adhoc.pm", version => 0.005 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -42,7 +42,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Object-Adhoc/project",
                         },
-  "version"          => 0.004,
+  "version"          => 0.005,
   "x_static_install" => 1,
 };
 

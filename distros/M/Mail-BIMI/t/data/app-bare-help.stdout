@@ -1,0 +1,13 @@
+05-cmd.t <command> [-?h] [long options...]
+	-? -h --help  show help
+
+Available commands:
+
+     commands: list the application's commands
+         help: display a command's help screen
+
+  checkdomain: Validate the BIMI assertion record for a given domain
+  checkrecord: Validate a given BIMI assertion record
+     checksvg: Check an SVG for validation
+     checkvmc: Check an VMC for validation
+

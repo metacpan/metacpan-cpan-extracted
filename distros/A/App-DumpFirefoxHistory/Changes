@@ -1,3 +1,10 @@
+0.008   2020-05-24  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention App::FirefoxMultiAccountContainersUtils.
+
+
 0.007   2020-04-19  Released-By: PERLANCAR; Urgency: low
 
 	- [ux] Tweak --profiles to support comma-separated values.

@@ -8,7 +8,7 @@ subtest 'default positive enum' => sub {
   $ffi->load_custom_type('::Enum','enum1',
     'one',
     'two',
-    ['four',4],
+    ['four',4, alias => ['abc','xyz']],
     'five',
   );
 
@@ -20,6 +20,8 @@ subtest 'default positive enum' => sub {
   is(dies { $ffi->cast('enum1', 'enum', 'three') }, match qr/illegal enum value three/);
   is(dies { $ffi->cast('enum1', 'enum', 3) }, match qr/illegal enum value 3/);
   is($ffi->cast('enum1', 'enum', 'four'),4);
+  is($ffi->cast('enum1', 'enum', 'abc'),4);
+  is($ffi->cast('enum1', 'enum', 'xyz'),4);
   is($ffi->cast('enum1', 'enum', 'five'),5);
 
   is($ffi->cast('enum', 'enum1', 0), 'one');
@@ -37,13 +39,13 @@ subtest 'maps' => sub {
   $ffi->load_custom_type('::Enum','enum1', { maps => \@maps },
     'one',
     'two',
-    ['four',4],
+    ['four',4, alias => ['abc','xyz']],
     'five',
     ['repeat', 4],
   );
 
   is(\@maps, [
-    { one => 0,   two => 1,   four => 4,   five => 5,  repeat => 4 },
+    { one => 0,   two => 1,   four => 4,   five => 5,  repeat => 4, abc => 4, xyz => 4 },
     { 0 => 'one', 1 => 'two', 4 => 'four', 5 => 'five' },
     'enum',
   ]);
@@ -141,10 +143,18 @@ subtest 'make constants' => sub {
   $ffi->load_custom_type('::Enum', 'enum1', { package => 'Foo1' },
     'one',
     'two',
+    ['three',3, alias => [ 'xyz', 'abc' ]],
+    ['next', alias => ['foo','bar']],
   );
 
   is(Foo1::ONE(), 0);
   is(Foo1::TWO(), 1);
+  is(Foo1::THREE(), 3);
+  is(Foo1::XYZ(), 3);
+  is(Foo1::ABC(), 3);
+  is(Foo1::NEXT(), 4);
+  is(Foo1::FOO(), 4);
+  is(Foo1::BAR(), 4);
 };
 
 subtest 'make constants with prefix' => sub {
@@ -175,6 +185,11 @@ subtest 'define errors' => sub {
   is(
     dies { $ffi->load_custom_type('::Enum','enum1', 'one','one') },
     match qr/one declared twice/,
+  );
+
+  is(
+    dies { $ffi->load_custom_type('::Enum','enum1', [ 'foo' => undef, bar => 'roger', baz => 1 ]) },
+    match qr/unrecognized options: bar baz/,
   );
 };
 

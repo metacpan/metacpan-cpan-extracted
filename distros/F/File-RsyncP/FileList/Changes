@@ -1,5 +1,9 @@
 Revision history for Perl module File::RsyncP::FileList.
 
+0.76 Mon Sep 14 14:20:41 PDT 2020
+
+  - no changes.
+
 0.74 Sat Jan 17 16:50:43 PST 2015
 
   - updated FileList/config.guess FileList/config.sub with more recent

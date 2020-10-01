@@ -6,7 +6,7 @@ use Wasm::Wasmtime::Trap;
 use 5.008004;
 
 # ABSTRACT: Wasm trap class
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 sub new
@@ -31,7 +31,7 @@ Wasm::Trap - Wasm trap class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

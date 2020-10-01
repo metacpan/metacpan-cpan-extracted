@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -34,7 +34,7 @@ use Carp 'croak';
 use List::Util 'sum';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem = \&Math::PlanePath::_divrem;
@@ -839,7 +839,7 @@ sub n_to_level {
 1;
 __END__
 
-=for stopwords eg Ryde Math-PlanePath Ulam Warburton Ndepth OEIS ie
+=for stopwords eg Ryde Math-PlanePath Ulam Warburton Ndepth OEIS ie Octant octant
 
 =head1 NAME
 
@@ -1080,7 +1080,7 @@ Option C<parts =E<gt> '1'> confines the pattern to the first quadrant,
 X axis N=1,2,4,6,10,etc is the first of each row X=depth.  Y axis
 N=1,3,5,9,11,etc is the last similarly Y=depth.
 
-In this arrangement horizontal arms have even N and vertical arms have
+In this arrangement, horizontal arms have even, N and vertical arms have
 odd N.  For example the vertical at X=8 N=30,33,37,etc has N odd from N=33
 up and when it turns to horizontal at N=42 or N=56 it switches to N even.
 The children of N=66 are not shown but the verticals from there are N=79
@@ -1131,7 +1131,7 @@ the plane 0E<lt>=YE<lt>=X.
         +-------------------------------------------------
          X=0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
 
-In this arrangement N=1,2,3,4,6,7,etc on the X axis is the first N of each
+In this arrangement, N=1,2,3,4,6,7,etc on the X axis is the first N of each
 row (C<tree_depth_to_n()>).
 
 =head2 Upper Octant
@@ -1159,12 +1159,12 @@ Option C<parts =E<gt> 'octant_up'> confines the pattern to the upper octant
         +--------------------------
           X=0 1  2  3  4  5  6  7
 
-In this arrangement N=1,2,3,5,6,8,etc on the Y axis the last N of each row
+In this arrangement, N=1,2,3,5,6,8,etc on the Y axis the last N of each row
 (C<tree_depth_to_n_end()>).
 
 =head2 N Start
 
-The default is to number points starting N=1 as shown above.  An optional
+The default is to number points starting N=1 as shown above.  Option
 C<n_start> can give a different start, in the same pattern.  For example to
 start at 0,
 
@@ -1277,13 +1277,17 @@ Sequences as
 
 =over
 
-L<http://oeis.org/A147582> (etc)
+L<http://oeis.org/A147562> (etc)
 
 =back
 
     parts=4
       A147562   total cells to depth, being tree_depth_to_n() n_start=0
       A147582   added cells at depth
+      A264039   off cells >=2 neighbours ("poisoned")
+      A260490     increment
+      A264768   off cells, 4 neighbours ("surrounded")
+      A264769     increment
 
     parts=2
       A183060   total cells to depth=n in half plane
@@ -1317,7 +1321,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

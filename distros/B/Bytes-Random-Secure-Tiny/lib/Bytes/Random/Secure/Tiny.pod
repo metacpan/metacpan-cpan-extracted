@@ -9,7 +9,7 @@ cryptographically-secure random bytes.
 
     use Bytes::Random::Secure::Tiny;
 
-    my $rng = Bytes::Random::Secure->new; # Seed with 256 bits.
+    my $rng = Bytes::Random::Secure::Tiny->new; # Seed with 256 bits.
 
     my $bytes  = $rng->bytes(32);              # A string of 32 random bytes.
     my $long   = $rng->irand;                  # 32-bit random unsigned int.
@@ -158,7 +158,7 @@ C<< 0 <= x <= 2**32-1 >>.
 
     my $aref_shuffled = $random->shuffle($aref);
 
-Shuffles the contents of a reference to an array in sitiu, and returns
+Shuffles the contents of a reference to an array in situ, and returns
 the same reference.
 
 L<List::Util>, which ships with Perl, includes C<shuffle> function. But that

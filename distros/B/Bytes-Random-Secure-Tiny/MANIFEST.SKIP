@@ -1,11 +1,7 @@
 # Version control files and dirs.
-\bRCS\b
-\bCVS\b
-,v$
-\B\.svn\b
-^.git/\b
-^.gitignore$
-^.perltidyrc
+^\.git/\b
+^\.gitignore$
+^\.perltidyrc
 
 # Makemaker generated files and dirs.
 ^MANIFEST\.

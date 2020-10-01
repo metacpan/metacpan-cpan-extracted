@@ -1,9 +1,9 @@
 package ScriptX;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-03'; # DATE
+our $DATE = '2020-10-01'; # DATE
 our $DIST = 'ScriptX'; # DIST
-our $VERSION = '0.000001'; # VERSION
+our $VERSION = '0.000004'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -11,11 +11,11 @@ our $VERSION = '0.000001'; # VERSION
 # END IFUNBUILT
 use Log::ger;
 
-our %Plugins;
-our %Handlers;
+our @Plugin_Instances;
+our %Handlers; # key=event name, val=[ [$label, $prio, $handler, $epoch], ... ]
 
 my $Stash = {
-    plugins => \%Plugins,
+    plugin_instances => \@Plugin_Instances,
     handlers => \%Handlers,
 };
 
@@ -177,6 +177,7 @@ sub run {
     );
 }
 
+my $handler_seq = 0;
 sub add_handler {
     my ($event, $label, $prio, $handler) = @_;
 
@@ -185,7 +186,8 @@ sub add_handler {
 
     # keep sorted
     splice @{ $Handlers{$event} }, 0, scalar(@{ $Handlers{$event} }),
-        (sort { $a->[1] <=> $b->[1] } @{ $Handlers{$event} }, [$label, $prio, $handler]);
+        (sort { $a->[1] <=> $b->[1] || $a->[3] <=> $b->[3] } @{ $Handlers{$event} },
+         [$label, $prio, $handler, $handler_seq++]);
 }
 
 sub activate_plugin {
@@ -314,7 +316,7 @@ ScriptX - A plugin-based script framework
 
 =head1 VERSION
 
-This document describes version 0.000001 of ScriptX (from Perl distribution ScriptX), released on 2020-09-03.
+This document describes version 0.000004 of ScriptX (from Perl distribution ScriptX), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
@@ -379,32 +381,31 @@ arrayrefs containing list of handler records:
 
  [ [$label, $prio, $handler], ... ]
 
-=head2 %Plugins
+=head2 @Plugin_Instances
 
-A hash of activated plugins. Keys are plugin names without the C<ScriptX::>
-prefix (e.g. L<Exit|ScriptX::Exit>) and values are plugin instances.
+An array of activated plugin instances. For reference only.
 
 =head1 STASH KEYS
 
 =head2 event
 
-The name of current event.
+Str. The name of current event.
 
 =head2 handlers
 
-Reference to the L<%Handlers> package variable, for convenience.
+Array. Reference to the L<%Handlers> package variable, for convenience.
 
-=head2 plugins
+=head2 plugin_instances
 
-Reference to the L<%Plugins> package variable, for convenience.
+Array. Reference to the L<@Plugin_Instances> package variable, for convenience.
 
 =head2 plugin_name
 
-Set for C<activate_plugin> event.
+Str. Current plugin name. Set for C<activate_plugin> event.
 
 =head2 plugin_args
 
-Set for C<activate_plugin> event.
+Hash. Arguments hashref to instantiate plugin. Set for C<activate_plugin> event.
 
 =head1 EVENT HANDLER RETURN STATUS CODES
 
@@ -444,7 +445,7 @@ L</run_event>() to cancel the event.
 =head2 602
 
 This signifies repeating of event ("Repeat"), meaning the handler instructs
-L</run_event>() to cancel the event.
+L</run_event>() to repeat the event.
 
 =head1 FUNCTIONS
 

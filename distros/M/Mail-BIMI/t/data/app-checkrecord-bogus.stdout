@@ -1,0 +1,20 @@
+BIMI domain checker
+
+Requested:
+[33m  Domain    [37m: [36m-none-[0m
+[33m  Record    [37m: [36mv=bimi1;l=http://bogus[0m
+
+Record Returned: [91m⚠[0m
+[33m  Record    : v=bimi1;l=http://bogus[0m
+[33m  Version   [37m: [36mbimi1[0m
+[33m  Domain    [37m: [36m-none-[0m
+[33m  Selector  [37m: [36mdefault[0m
+[33m  Authority [37m: [36m-none-[0m
+[33m  Location  [37m: [36mhttp://bogus[0m
+[33m  Is Valid  [37m: [91mNo[0m
+Errors:
+[91m  INVALID_TRANSPORT_L [37m: [36mInvalid transport in location[0m
+
+An authenticated email with this record would receive the following BIMI results:
+
+Authentication-Results: authservid.example.com; bimi=fail (Invalid transport in location)

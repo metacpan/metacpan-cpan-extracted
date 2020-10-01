@@ -6,7 +6,7 @@ use FFI::Platypus 1.24;
 use base qw( Exporter );
 
 # ABSTRACT: Private module for FFI::C
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 our @EXPORT_OK = qw( malloc free memset memcpy_addr );
@@ -48,7 +48,7 @@ FFI::C::FFI - Private module for FFI::C
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -69,6 +69,10 @@ This module is private for L<FFI::C>
 =item L<FFI::C::ArrayDef>
 
 =item L<FFI::C::Def>
+
+=item L<FFI::C::File>
+
+=item L<FFI::C::PosixFile>
 
 =item L<FFI::C::Struct>
 

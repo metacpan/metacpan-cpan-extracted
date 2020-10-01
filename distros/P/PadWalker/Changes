@@ -189,3 +189,10 @@ of time. Sorry about that.
 2.3  Fri 10 Nov 2017 18:26:29 GMT
     - Make tests work with -Ddefault_inc_excludes_dot
       https://rt.cpan.org/Public/Bug/Display.html?id=120421
+
+2.4  Sat 26 Sep 2020 18:39:17 BST
+    - Names of utf8 lexical vars not reported correctly
+      https://rt.cpan.org/Ticket/Display.html?id=133424
+
+2.5  Sun 27 Sep 2020 13:22:11 BST
+    - Make 2.4 compatible with older perl.

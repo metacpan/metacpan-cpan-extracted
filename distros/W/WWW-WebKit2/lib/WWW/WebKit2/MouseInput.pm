@@ -28,21 +28,33 @@ sub select {
     my $set_select =
         $select->prepare_element .
         'var options = element.options;
+        var found = 0;
         for (var i = 0; i < options.length; i++) {
-            if (options[i].value === ' . "'$option_value'" . ' ) {
+            if (options[i].value === ' . "'$option_value'" . qq/ ) {
+                element.selectedIndex = i;
                 options[i].selected = true;
+                found = 1;
                 break;
             }
         }
-    ';
+        if (!found)
+            throw 'Did not find value "$option_value" for select $select';
+        window.event_fired = "initialized";
+        element.addEventListener("change", function(e) {
+           window.event_fired = "fired";
+        }, { once: true });
+        var event = new Event("change", { "bubbles": true, "cancelable": true });
+        element.dispatchEvent(event);
+    /;
 
     $self->run_javascript($set_select);
-
     $self->wait_for_condition(sub {
-        return $select->get_value eq $option_value;
+        my $event_fired = $self->run_javascript("return window.event_fired");
+        # event_fired will be undef if the event triggered a page load
+        return 1 if (not $event_fired or $event_fired eq "fired");
+        return 0;
     });
 
-    $select->fire_event('change');
 
     $self->process_page_load;
 
@@ -228,7 +240,7 @@ sub fire_mouse_event {
             $shift_down
         );
 
-        element.dispatchEvent(clickEvent);";
+        return element.dispatchEvent(clickEvent);";
 
     $self->run_javascript($mouse_up_script);
 
@@ -317,7 +329,7 @@ sub native_drag_and_drop_to_object {
         $source_element
         $target_element
         DndSimulator.simulate(source, target);
-        1;
+        return 1;
     };
 
     $self->run_javascript($js_string);

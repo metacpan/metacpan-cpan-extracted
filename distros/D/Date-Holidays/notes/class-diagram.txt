@@ -1,0 +1,11 @@
++----------------+
+| Date-Holidays  |
++----------------+
+| _inner_object  |
+| _inner_class   |
+| _countrycode   |
++----------------+
+| new()          |
+| is_holiday()   |
+| holidays()     |
++----------------+

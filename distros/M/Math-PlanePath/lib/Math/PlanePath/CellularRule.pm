@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -40,7 +40,7 @@ use strict;
 use Carp 'croak';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -1163,7 +1163,7 @@ sub _UNDOCUMENTED__rule_to_mirror {
   use strict;
   use Carp 'croak';
   use vars '$VERSION', '@ISA';
-  $VERSION = 127;
+  $VERSION = 128;
   use Math::PlanePath;
   @ISA = ('Math::PlanePath');
 
@@ -1362,7 +1362,7 @@ sub _UNDOCUMENTED__rule_to_mirror {
   package Math::PlanePath::CellularRule::OddSolid;
   use strict;
   use vars '$VERSION', '@ISA';
-  $VERSION = 127;
+  $VERSION = 128;
   use Math::PlanePath;
   @ISA = ('Math::PlanePath');
 
@@ -1449,7 +1449,7 @@ sub _UNDOCUMENTED__rule_to_mirror {
   use strict;
   use Carp 'croak';
   use vars '$VERSION', '@ISA';
-  $VERSION = 127;
+  $VERSION = 128;
   use Math::PlanePath;
   @ISA = ('Math::PlanePath');
   *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
@@ -1691,7 +1691,7 @@ sub _UNDOCUMENTED__rule_to_mirror {
   use strict;
   use Carp 'croak';
   use vars '$VERSION', '@ISA';
-  $VERSION = 127;
+  $VERSION = 128;
   use Math::PlanePath;
   @ISA = ('Math::PlanePath');
   *_divrem = \&Math::PlanePath::_divrem;
@@ -1938,7 +1938,7 @@ __END__
 
 
 
-=for stopwords Ryde Math-PlanePath PlanePath ie Xmax-Xmin superclass eg OEIS
+=for stopwords Ryde Math-PlanePath PlanePath ie Xmax-Xmin superclass eg OEIS MathWorld
 
 =head1 NAME
 
@@ -1952,7 +1952,7 @@ Math::PlanePath::CellularRule -- cellular automaton points of binary rule
 
 =head1 DESCRIPTION
 
-X<Wolfram, Stephen>This is the patterns of Stephen Wolfram's bit-rule based
+X<Wolfram, Stephen>This is the patterns of Stephen Wolfram's bit-rule
 cellular automatons
 
 =over
@@ -1992,9 +1992,9 @@ diagonally below produce a new cell,
     |  A  |  |  B  |  |  C  |     row Y
     +-----+  +-----+  +-----+
 
-There's 8 possible combinations of ABC being each 0 or 1.  Each such
-combination can become 0 or 1 in the "new" cell.  Those 0 or 1 for "new" is
-encoded as 8 bits to make a rule number 0 to 255,
+There's 8 combinations of ABC being each 0 or 1.  Each such combination can
+become 0 or 1 in the "new" cell.  Those 0 or 1 for "new" is encoded as 8
+bits to make a rule number 0 to 255,
 
     ABC cells below     new cell bit from rule
 
@@ -2012,9 +2012,9 @@ turn on and off alternately in odd and even rows.  In both cases only the
 pyramid portion part -YE<lt>=XE<lt>=Y is considered for the N points but the
 infinite cells to the sides are included in the calculation.
 
-The full set of patterns can be seen at the Math World page above, or can be
-printed with the F<examples/cellular-rules.pl> program.  The patterns range
-from simple to complex.  For some the N=1 cell doesn't grow at all such as
+The full set of patterns can be seen at the MathWorld page above, or can be
+printed with the F<examples/cellular-rules.pl> here.  The patterns range
+from simple to complex.  For some, the N=1 cell doesn't grow at all such as
 rule 0 or rule 8.  Some grow to mere straight lines such as rule 2 or
 rule 5.  Others make columns or patterns with "quadratic" style stepping of
 1 or 2 rows, or self-similar replications such as the Sierpinski triangle of
@@ -2025,7 +2025,7 @@ For some rules there's specific PlanePath code which this class dispatches
 to, such as C<CellularRule54>, C<CellularRule57>, C<CellularRule190> or
 C<SierpinskiTriangle> (with C<n_start=1>).
 
-For rules without specific code the current implementation is not
+For rules without specific code, the current implementation is not
 particularly efficient as it builds and holds onto the bit pattern for all
 rows through to the highest N or X,Y used.  There's no doubt better ways to
 iterate an automaton, but this module offers the patterns in PlanePath
@@ -2123,7 +2123,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

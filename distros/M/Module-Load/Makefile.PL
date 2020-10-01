@@ -1,5 +1,6 @@
 use ExtUtils::MakeMaker;
 use strict;
+use warnings;
 
 WriteMakefile1(
     LICENSE => 'perl',

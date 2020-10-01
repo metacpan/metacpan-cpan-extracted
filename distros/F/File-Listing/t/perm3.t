@@ -3,6 +3,7 @@
 # Test file mode strings from Solaris /usr/xpg4/bin/ls.
 
 use strict;
+use warnings;
 use Test::More;
 plan tests => 4096;
 

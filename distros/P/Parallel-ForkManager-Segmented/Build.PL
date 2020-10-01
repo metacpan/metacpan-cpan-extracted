@@ -18,12 +18,14 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Parallel-ForkManager-Segmented",
-  "dist_version" => "0.6.0",
+  "dist_version" => "0.10.0",
   "license" => "mit",
   "module_name" => "Parallel::ForkManager::Segmented",
   "recursive_test_files" => 1,
   "requires" => {
     "Parallel::ForkManager" => 0,
+    "Parallel::ForkManager::Segmented::Base" => "v0.4.0",
+    "parent" => 0,
     "perl" => "5.014",
     "strict" => 0,
     "warnings" => 0

@@ -22,13 +22,13 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::NumSeq::OEIS::Catalogue::Plugin;
 @ISA = ('Math::NumSeq::OEIS::Catalogue::Plugin');
 
 ## no critic (CodeLayout::RequireTrailingCommaAtNewline)
 
-# total 253 A-numbers in 4 modules
+# total 287 A-numbers in 4 modules
 
 use constant info_arrayref =>
 [
@@ -53,6 +53,16 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A336336',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'SquareSpiral',
+      'coordinate_type',
+      'RSquared'
+    ]
+  },
+  {
     'anum' => 'A180714',
     'class' => 'Math::NumSeq::PlanePathCoord',
     'parameters' => [
@@ -60,6 +70,26 @@ use constant info_arrayref =>
       'SquareSpiral,n_start=0',
       'coordinate_type',
       'Sum'
+    ]
+  },
+  {
+    'anum' => 'A329116',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'PyramidSpiral,n_start=0',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A329972',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'PyramidSpiral,n_start=0',
+      'coordinate_type',
+      'Y'
     ]
   },
   {
@@ -78,6 +108,106 @@ use constant info_arrayref =>
     'parameters' => [
       'planepath',
       'DiamondSpiral,n_start=0'
+    ]
+  },
+  {
+    'anum' => 'A305258',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'DiamondSpiral,n_start=0',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A328818',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'HexSpiral,n_start=0',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A307012',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'HexSpiral,n_start=0',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A321768',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'PythagoreanTree',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A321769',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'PythagoreanTree',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A321770',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'PythagoreanTree,coordinates=AC',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A321782',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'PythagoreanTree,coordinates=PQ',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A321783',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'PythagoreanTree,coordinates=PQ',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A321784',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'PythagoreanTree,coordinates=PQ',
+      'coordinate_type',
+      'Sum'
+    ]
+  },
+  {
+    'anum' => 'A321785',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'PythagoreanTree,coordinates=PQ',
+      'coordinate_type',
+      'DiffXY'
     ]
   },
   {
@@ -319,6 +449,26 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A292373',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'ZOrderCurve',
+      'coordinate_type',
+      'BitAnd'
+    ]
+  },
+  {
+    'anum' => 'A309952',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'ZOrderCurve',
+      'coordinate_type',
+      'BitXor'
+    ]
+  },
+  {
     'anum' => 'A163325',
     'class' => 'Math::NumSeq::PlanePathCoord',
     'parameters' => [
@@ -345,9 +495,7 @@ use constant info_arrayref =>
       'planepath',
       'ZOrderCurve,radix=10',
       'coordinate_type',
-      'Sum',
-      'i_start',
-      1
+      'Sum'
     ]
   },
   {
@@ -372,6 +520,136 @@ use constant info_arrayref =>
       'AbsDiff',
       'i_start',
       10
+    ]
+  },
+  {
+    'anum' => 'A334486',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'Flowsnake',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A332246',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'QuadricCurve',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A332247',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'QuadricCurve',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A334483',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'SierpinskiArrowhead,align=diagonal',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A334484',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'SierpinskiArrowhead,align=diagonal',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A334235',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'HIndexing',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A334236',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'HIndexing',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A332383',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'DragonCurve',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A332384',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'DragonCurve',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A334576',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'AlternatePaperMidpoint',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A334577',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'AlternatePaperMidpoint',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A332251',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'CCurve',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A332252',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'CCurve',
+      'coordinate_type',
+      'Y'
     ]
   },
   {
@@ -632,6 +910,26 @@ use constant info_arrayref =>
       'Diagonals,n_start=0',
       'coordinate_type',
       'ExperimentalHammingDist'
+    ]
+  },
+  {
+    'anum' => 'A319572',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'DiagonalsAlternating,n_start=0',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A319573',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'DiagonalsAlternating,n_start=0',
+      'coordinate_type',
+      'Y'
     ]
   },
   {
@@ -932,6 +1230,36 @@ use constant info_arrayref =>
       'DivisibleColumns,divisor_type=proper,n_start=2',
       'coordinate_type',
       'DiffXY'
+    ]
+  },
+  {
+    'anum' => 'A316657',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'QuintetReplicate',
+      'coordinate_type',
+      'X'
+    ]
+  },
+  {
+    'anum' => 'A316658',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'QuintetReplicate',
+      'coordinate_type',
+      'Y'
+    ]
+  },
+  {
+    'anum' => 'A316707',
+    'class' => 'Math::NumSeq::PlanePathCoord',
+    'parameters' => [
+      'planepath',
+      'QuintetReplicate',
+      'coordinate_type',
+      'RSquared'
     ]
   },
   {
@@ -1977,9 +2305,7 @@ use constant info_arrayref =>
     'class' => 'Math::NumSeq::PlanePathN',
     'parameters' => [
       'planepath',
-      'ZOrderCurve,radix=3',
-      'i_start',
-      1
+      'ZOrderCurve,radix=3'
     ]
   },
   {
@@ -2366,6 +2692,16 @@ use constant info_arrayref =>
     'parameters' => [
       'planepath',
       'KochCurve'
+    ]
+  },
+  {
+    'anum' => 'A309873',
+    'class' => 'Math::NumSeq::PlanePathTurn',
+    'parameters' => [
+      'planepath',
+      'KochCurve',
+      'turn_type',
+      'LSR'
     ]
   },
   {

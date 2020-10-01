@@ -15,7 +15,7 @@ Text::VisualPrintf - printf family functions to handle Non-ASCII characters
 
 # VERSION
 
-Version 3.02
+Version 3.07
 
 # DESCRIPTION
 
@@ -39,6 +39,13 @@ space.
     Take a look at an experimental `Text::VisualPrintf::IO` if you want
     to work with FILEHANDLE and printf.
 
+# VARIABLES
+
+- $VISUAL\_WIDTH
+
+    Hold a function pointer to calculate visual width of given string.
+    Default function is `Text::VisualWidth::PP::width`.
+
 # IMPLEMENTATION NOTES
 
 Strings in the LIST which contains wide-width character are replaced
@@ -55,13 +62,15 @@ one.
 
 [https://github.com/kaz-utashiro/Text-VisualPrintf](https://github.com/kaz-utashiro/Text-VisualPrintf)
 
+[Text::ANSI::Printf](https://metacpan.org/pod/Text::ANSI::Printf)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright (C) 2011-2020 Kazumasa Utashiro.
+Copyright 2011-2020 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -16,11 +16,6 @@
 # with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Hlawka, angles of point N is
-# phi(n) = sum k=1 to n of arcsin 1/sqrt(k+1)
-# is equidistributed mod 2pi
-
-
 package Math::PlanePath::TheodorusSpiral;
 use 5.004;
 use strict;
@@ -29,7 +24,7 @@ use Math::Libm 'hypot';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -211,6 +206,31 @@ use Math::PlanePath::SacksSpiral;
 1;
 __END__
 
+
+# cf:
+
+# Detlef Gronau "The Spiral of Theodorus", AMM, 111(3), March 2004,
+# http://www.uni-graz.at/~gronau/monthly230-237.pdf
+
+# Philip J. Davis, book "Spirals: From Theodorus to Chaos", published
+# A. K. Peters, 1993, pages 7-11, 37-43.
+
+# K. J. Heuvers, D.S. Moak, B.Boursaw, "The Functional Equation of the
+# Square Root Spiral", Functional Equations and Inequalities,
+# ed. T. M. Rassias, Kluwer 2000, pages 111-117, MR1792078 (2001k:39033)
+
+# David Brink, "The Spiral of Theodorus and Sums of Zeta-values at the
+# Half-integers", American Mathematical Monthly, Vol. 119, No. 9 (November
+# 2012),
+# pp. 779-786. http://www.jstor.org/stable/10.4169/amer.math.monthly.119.09.779
+
+# A226317 constant of theodorus in decimal
+
+# Hlawka, angles of point N is
+# phi(n) = sum k=1 to n of arcsin 1/sqrt(k+1)
+# is equidistributed mod 2pi
+
+
 =for stopwords Theodorus Ryde Math-PlanePath Archimedean Nhi Nlo arctan xlo,ylo xhi,yhi rlo Nlo Nhi Nhi-Nlo RSquared ceil OEIS xlo xhi
 
 =head1 NAME
@@ -352,7 +372,7 @@ Return string "circle".
 =head2 N to RSquared
 
 For integer N the spiral has radius R=sqrt(N) and the square is simply
-RSquared=R^2=N.  For fractional N the point is on a straight line at right
+RSquared=R^2=N.  For fractional N, the point is on a straight line at right
 angles to the integer position, so
 
     R = hypot(sqrt(Ninteger), Nfrac)
@@ -370,13 +390,13 @@ consider is
 
 A simple search is made through those N's seeking which, if any, covers X,Y.
 The number of N's searched is Nhi-Nlo = 2*R+1 which is about 1/3 of a loop
-around the spiral (2*R/2*pi*R ~= 1/3).  Actually 0.51 is used to guard
+around the spiral (2*R/2*pi*R ~= 1/3).  Actually 0.51 is used so as to guard
 against floating point round-off, which is then about 4*.51 = 2.04*R many
 points.
 
 The angle of the X,Y position determines which part of the spiral is
 intersected, but using that doesn't seem particularly easy.  The angle for a
-given N is an arctan sum and there doesn't seem to be a good closed-form or
+given N is an arctan sum and don't currently have a good closed-form or
 converging series to invert, or apply some Newton's method, or whatever.
 
 =head2 Rectangle to N Range
@@ -432,6 +452,7 @@ L<http://oeis.org/A072895> (etc)
     A137515    N-1 just below X axis
                  counting num points for n revolutions
     A172164    loop length increases
+    A164102    2*pi^2
 
 =head1 SEE ALSO
 
@@ -446,7 +467,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Math-PlanePath.
 
@@ -464,21 +485,3 @@ You should have received a copy of the GNU General Public License along with
 Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-
-
-# Detlef Gronau "The Spiral of Theodorus", AMM, 111(3), March 2004,
-# http://www.uni-graz.at/~gronau/monthly230-237.pdf
-
-# Philip J. Davis, book "Spirals: From Theodorus to Chaos", published
-# A. K. Peters, 1993, pages 7-11, 37-43.
-
-# K. J. Heuvers, D.S. Moak, B.Boursaw, "The Functional Equation of the
-# Square Root Spiral", Functional Equations and Inequalities,
-# ed. T. M. Rassias, Kluwer 2000, pages 111-117, MR1792078 (2001k:39033)
-
-# David Brink, "The Spiral of Theodorus and Sums of Zeta-values at the
-# Half-integers", American Mathematical Monthly, Vol. 119, No. 9 (November
-# 2012),
-# pp. 779-786. http://www.jstor.org/stable/10.4169/amer.math.monthly.119.09.779
-
-# A226317 constant of theodorus in decimal

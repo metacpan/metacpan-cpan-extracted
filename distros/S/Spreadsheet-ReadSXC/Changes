@@ -1,5 +1,40 @@
 Revision history for Perl extension Spreadsheet::ReadSXC.
 
+0.29  2020-09-30
+    * Make the test for the error message on non-existing files more lax.
+      This addresses RT #133432
+
+0.28  2020-09-29
+    * Require Filter::signatures 0.16 to fix Perl versions below 5.20
+    * No upgrade necessary if things already work for you
+
+0.27  2020-09-28
+    * Defang resource intensive test
+    * Eliminate "undef" warning when trying to get the active sheet of a
+      workbook that does not define an active sheet (GH #3)
+
+0.26  2020-09-28
+    * This needs minimum Perl version 5.010
+    * When reading a sheet in readonly mode, more aggressively reuse cell
+      objects for repeated cells
+    * Construct a cell once, and if it is repeated, clone it if not in readonly
+      mode.
+      These two changes speed up the parsing of some sheets with many repeated
+      cells vastly.
+    * Properly handle ODS files without a settings.xml (GH#2)
+
+0.25  2020-09-27
+    This release has major changes and will be promoted to 1.0 if there are
+    no major breaks.
+
+    * Added (proper) parsing of ODS files
+    * Added support for formats
+    * Added support for hidden cells, merged cells
+    * Split up parsing and classes into separate files
+    * Spreadsheet::ReadSXC now uses Spreadsheet::ParseODS
+    * Added ->is_sheet_hidden(), ->get_print_areas, ->get_hyperlink()
+      ->is_col_hidden(), ->tab_color(), ->table_styles(), ->filename(),
+
 0.24  2019-10-08
     - Fix parsing the text of cells that only contain "0"
       These were returned as undef, instead of 0 unless the StandardCurrency

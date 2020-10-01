@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -43,7 +43,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 
 # inherit: new(), rect_to_n_range(), arms_count(), n_start(),
 #          parameter_info_array(), xy_is_visited()
@@ -497,7 +497,7 @@ __END__
     #      \ /
 
 
-=for stopwords eg Ryde flowsnake Gosper ie Fukuda Shimizu Nakamura Math-PlanePath Ns zdigit tdigit
+=for stopwords eg Ryde flowsnake Gosper ie Fukuda Shimizu Nakamura Math-PlanePath Ns zdigit tdigit OEIS
 
 =head1 NAME
 
@@ -902,6 +902,9 @@ L<http://oeis.org/A261180> (etc)
 
 =back
 
+    A334485   (X-Y)/2 diagonal coordinate
+    A334486   Y coordinate
+
     A261180   direction 0 to 5
     A261185   direction mod 2
     A229214   direction 1,2,3,-1,-2,-3 spiralling clockwise
@@ -937,7 +940,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

@@ -1,3 +1,7 @@
+0.36    Tue Sep 29 11:55:01 BST 2020
+* Fixed E<gt> in POD (https://github.com/jib/module-load/pull/6)
+* Make Module-Load strict compliant (https://github.com/jib/module-load/pull/7)
+
 0.34    Sun Feb 10 13:56:54 GMT 2019
 * Added SEE ALSO section to documentation. RT#100575
 * Unreachable code cleanup (https://github.com/jib/cpanplus-devel/pull/15)

@@ -15,6 +15,10 @@
 #define CvISXSUB(sv) CvXSUB(sv)
 #endif
 
+#ifndef PadnameUTF8
+#  define PadnameUTF8(pn) FALSE
+#endif
+
 /* For development testing */
 #ifdef PADWALKER_DEBUGGING
 # define debug_print(x) printf x
@@ -269,7 +273,7 @@ pads_into_hash(pTHX_ PADNAMELIST* pad_namelist, PAD* pad_vallist, HV* my_hash,
                 if (!val_sv) val_sv = &PL_sv_undef;
               }
 
-              hv_store((is_our ? our_hash : my_hash), name_str, name_len,
+              hv_store((is_our ? our_hash : my_hash), name_str, PadnameUTF8(name_sv) ? -name_len : name_len,
                        (val_sv ? newRV_inc(val_sv) : &PL_sv_undef), 0);
             }
           }

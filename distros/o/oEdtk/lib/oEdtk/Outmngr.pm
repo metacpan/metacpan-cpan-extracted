@@ -15,7 +15,7 @@ use DBI;
 # use Sys::Hostname;
 
 use Exporter;
-our $VERSION	= 0.8024;		# release number : Y.YSSS -> Year, Sequence 
+our $VERSION	= 1.5051;		# release number : Y.YSSS -> Year, Sequence 
 our @ISA		= qw(Exporter);
 our @EXPORT_OK	= qw(
 			omgr_check_acquit
@@ -391,52 +391,52 @@ sub _omgr_insert($$$$$) {
 		}
 
 		my $entry = {
-			ED_REFIDDOC	=> $data[0],
+			ED_REFIDDOC		=> $data[0],
 			ED_IDLDOC		=> $idldoc,
-			ED_IDSEQPG	=> $data[2],
+			ED_IDSEQPG		=> $data[2],
 			ED_SEQDOC		=> $data[3],
 			ED_CPDEST		=> $data[4],
-			ED_VILLDEST	=> $data[5],
+			ED_VILLDEST		=> $data[5],
 			ED_IDDEST		=> $data[6],
-			ED_NOMDEST	=> $data[7],
+			ED_NOMDEST		=> $data[7],
 			ED_IDEMET		=> $data[8],
-			ED_DTEDTION	=> $data[9],
-			ED_TYPPROD	=> $data[10],
-			ED_PORTADR	=> $doc->{'ED_PORTADR'}, # vérifier qu'on peut le gérer comme ED_TYPPROD
+			ED_DTEDTION		=> $data[9],
+			ED_TYPPROD		=> $data[10],
+			ED_PORTADR		=> $doc->{'ED_PORTADR'}, # vérifier qu'on peut le gérer comme ED_TYPPROD
 			ED_ADRLN1		=> $data[12],
-			ED_CLEGED1	=> $data[13],
+			ED_CLEGED1		=> $data[13],
 			ED_ADRLN2		=> $data[14],
-			ED_CLEGED2	=> $data[15],
+			ED_CLEGED2		=> $data[15],
 			ED_ADRLN3		=> $data[16],
-			ED_CLEGED3	=> $data[17],
+			ED_CLEGED3		=> $data[17],
 			ED_ADRLN4		=> $data[18],
-			ED_CLEGED4	=> $data[19],
+			ED_CLEGED4		=> $data[19],
 			ED_ADRLN5		=> $data[20],
-			ED_CORP		=> $data[21],
+			ED_CORP			=> $data[21],
 			ED_DOCLIB		=> $data[22],
 			ED_REFIMP		=> $data[23],
 			ED_ADRLN6		=> $data[24],
 			ED_SOURCE		=> $data[25],
 			ED_OWNER		=> $data[26],
-			ED_HOST		=> $data[27],
+			ED_HOST			=> $data[27],
 			ED_IDIDX		=> $data[28],
 			ED_CATDOC		=> $data[29] || $doc->{'ED_CATDOC'},
-			ED_CODRUPT	=> $data[30],
-			ED_SEQPGDOC	=> $seqpgdoc,
+			ED_CODRUPT		=> $data[30],
+			ED_SEQPGDOC		=> $seqpgdoc,
 			ED_POIDSUNIT	=> $first ? $p1->{'ED_POIDSUNIT'} : $ps->{'ED_POIDSUNIT'},
 			ED_NBENC		=> scalar @needed,				# ceci est un hack incompatible avec le regroupement de plis 
 			ED_ENCPDS		=> $encpds,					# ceci est un hack incompatible avec le regroupement de plis
 			ED_BAC_INSERT	=> $first ? $p1->{'ED_BAC_INSERT'} : $ps->{'ED_BAC_INSERT'},
 			ED_TYPED		=> $doc->{'ED_TYPED'},
 			ED_MODEDI		=> $doc->{'ED_MODEDI'},
-			ED_FORMATP	=> $doc->{'ED_FORMATP'},
-			ED_PGORIEN	=> $doc->{'ED_PGORIEN'},
-#			ED_FORMDEF	=> $doc->{'ED_FORMDEF'},
-#			ED_PAGEDEF	=> $doc->{'ED_PAGEDEF'},
+			ED_FORMATP		=> $doc->{'ED_FORMATP'},
+			ED_PGORIEN		=> $doc->{'ED_PGORIEN'},
+#			ED_FORMDEF		=> $doc->{'ED_FORMDEF'},
+#			ED_PAGEDEF		=> $doc->{'ED_PAGEDEF'},
 #			ED_FORMS		=> $doc->{'ED_FORMS'},
 			#ED_IDPLI		=>
-			ED_NBDOCPLI	=> 1,		# XXX Sera différent de 1 quand on fera du regroupement
-			ED_NUMPGPLI	=> $numpgpli,
+			ED_NBDOCPLI		=> 1,		# XXX Sera différent de 1 quand on fera du regroupement
+			ED_NUMPGPLI		=> $numpgpli,
 			ED_LISTEREFENC	=> $listerefenc,
 			ED_TYPOBJ		=> 'I'		# XXX Il nous manque des données pour ce champ
 		};
@@ -927,11 +927,11 @@ sub omgr_export(%) {
 					$file = "$name.job";
 					warn "INFO : Creating job ticket file \"$file\"\n";
 					my @jobfields = (
-						['ED_PRIORITE',	$lot->{'ED_PRIORITE'}],
-						['ED_REFIDDOC',	$lot->{'ED_REFIDDOC'}],
+						['ED_PRIORITE',		$lot->{'ED_PRIORITE'}],
+						['ED_REFIDDOC',		$lot->{'ED_REFIDDOC'}],
 						['ED_IDLOT',		$idlot],
 						['ED_SEQLOT',		$seqlot],
-						['ED_CORP',		$gvals->{'ED_CORP'}],
+						['ED_CORP',			$gvals->{'ED_CORP'}],
 						['ED_GROUPBY',		$lot->{'ED_GROUPBY'}],
 						['ED_CPDEST',		$lot->{'ED_CPDEST'}],
 						['ED_REFENC',		$lot->{'ED_REFENC'}],
@@ -941,21 +941,21 @@ sub omgr_export(%) {
 						['ED_DESIGNATION',	$fil->{'ED_DESIGNATION'}],
 						['ED_MODEDI',		$fil->{'ED_MODEDI'}],
 						['ED_TYPED',		$fil->{'ED_TYPED'}],
-						['ED_NBBACPRN',	$fil->{'ED_NBBACPRN'}],
+						['ED_NBBACPRN',		$fil->{'ED_NBBACPRN'}],
 						['ED_MINFEUIL_L',	$fil->{'ED_MINFEUIL_L'}],
 						['ED_MAXFEUIL_L',	$fil->{'ED_MAXFEUIL_L'}],
-						['ED_FEUILPLI',	$fil->{'ED_FEUILPLI'}],
+						['ED_FEUILPLI',		$fil->{'ED_FEUILPLI'}],
 						['ED_MINPLIS',		$fil->{'ED_MINPLIS'}],
 						['ED_MAXPLIS',		$fil->{'ED_MAXPLIS'}],
 						['ED_POIDS_PLI',	$fil->{'ED_POIDS_PLI'}],
 						['ED_REF_ENV',		$fil->{'ED_REF_ENV'}],
-						['ED_FORMFLUX',	$fil->{'ED_FORMFLUX'}],
-						['ED_POSTCOMP',	$fil->{'ED_POSTCOMP'}],
+						['ED_FORMFLUX',		$fil->{'ED_FORMFLUX'}],
+						['ED_POSTCOMP',		$fil->{'ED_POSTCOMP'}],
 						['ED_NBFACESLOT',	$nbfaceslot],
 						['ED_NBFEUILLOT',	$nbfeuillot],
 						['ED_NBPLISLOT',	$selplis],
 						['ED_FORMATP',		$gvals->{'ED_FORMATP'}],
-						['ED_CONSIGNE',	$lot->{'ED_CONSIGNE'}],
+						['ED_CONSIGNE',		$lot->{'ED_CONSIGNE'}],
 						['ED_LISTEREFENC',	$gvals->{'ED_LISTEREFENC'} 	|| ""],
 						['ED_LISTEREFIMP',	join(', ', @refimps) 		|| ""], # si je mets ce champs en dernier, je plante latex...
 						['ED_DTLOT',		$dtlot]
@@ -1135,9 +1135,9 @@ sub omgr_stats($$$$) {
 	}	
 	$sql .="COUNT (DISTINCT ED_IDLDOC||TO_CHAR(ED_SEQDOC,'FM0000000')), ";	# NB PLIS # ne tient pas compte des éventuels regroupement à revoir : (DISTINCT TO_CHAR(ED_SEQLOT,'FM0000000')||TO_CHAR(ED_IDPLI,'FM0000000')) 
 	$sql .="COUNT (DISTINCT ED_IDLDOC||TO_CHAR(ED_SEQDOC,'FM0000000')), ";	# NB DOCS
-	$sql .="SUM(ED_NBFPLI), "; 										# NB FEUILLES
-	$sql .="SUM(ED_NBPGDOC), ";										# NB FACES IMPRIMEES
-	$sql .="CASE ED_MODEDI WHEN 'R' THEN 1 ELSE 2 END * SUM(ED_NBFPLI) ";		# NB FACES
+	$sql .="SUM(ED_NBFPLI), "; 												# NB FEUILLES
+	$sql .="SUM(ED_NBPGDOC), ";												# NB FACES IMPRIMEES
+	$sql .="CASE ED_MODEDI WHEN 'R' THEN 1 ELSE 2 END * SUM(ED_NBFPLI) ";	# NB FACES
 
 	if ($typeRqt !~/idlot/i) { 
 		$sql .=", ED_MODEDI ";

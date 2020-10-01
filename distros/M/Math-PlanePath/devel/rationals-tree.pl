@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2017, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -34,7 +34,23 @@ $|=1;
 use Smart::Comments;
 
 
-
+{
+  # lamplighter A154435
+  require Math::NumSeq::OEIS::File;
+  my $lamp = Math::NumSeq::OEIS::File->new(anum=>'A154435');
+  {
+    my $n = 0b100010010;
+    my $l = $lamp->ith($n);
+    printf "%3d   %b\n", $n, $n;
+    printf "=     %b = %d\n\n", $l, $l;
+  }
+  foreach my $n (64 .. 127) {
+    my $l = $lamp->ith($n);
+    printf "%3d   %b\n", $n, $n;
+    printf "=     %b = %d\n\n", $l, $l;
+  }
+  exit 0;
+}
 {
   # permutations in N row
 
@@ -151,22 +167,7 @@ use Smart::Comments;
   }
   exit 0;
 }
-{
-  # lamplighter A154435
-  require Math::NumSeq::OEIS::File;
-  my $lamp = Math::NumSeq::OEIS::File->new(anum=>'A154435');
-  {
-    my $n = 0b1000001000;
-    my $l = $lamp->ith($n);
-    printf "%d    %b = %d\n", $n, $l, $l;
-  }
-  foreach my $n (64 .. 127) {
-    my $l = $lamp->ith($n);
-    printf "%3d   %b\n", $n, $n;
-    printf "=     %b = %d\n", $l, $l;
-  }
-  exit 0;
-}
+
 {
   # X,Y list  cf pythag odd,even
   require Math::PlanePath::RationalsTree;

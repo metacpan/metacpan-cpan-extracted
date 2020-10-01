@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,7 +23,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
@@ -230,7 +230,7 @@ sub n_to_level {
 1;
 __END__
 
-=for stopwords Guiseppe Terdragon terdragon eg Sur une courbe qui remplit toute aire Mathematische Annalen Ryde OEIS ie Math-PlanePath versa Online Radix radix Jorg Arndt Hexdragon hexdragon
+=for stopwords Terdragon terdragon eg Sur une courbe qui remplit toute aire Mathematische Annalen Ryde OEIS ie Math-PlanePath versa Online Radix radix Jorg Arndt Hexdragon hexdragon
 
 =head1 NAME
 
@@ -399,7 +399,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

@@ -10,7 +10,7 @@
 
 =for HTML <a href="https://github.com/briandfoy/mac-propertylist/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Mac-PropertyList.svg" /></a>
 
-=for HTML <a href="http://www.metacpan.org/module/Mac::PropertyList"><img src="https://img.shields.io/cpan/v/Mac-PropertyList.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/Mac::PropertyList"><img src="https://img.shields.io/cpan/v/Mac-PropertyList.svg" /></A>
 
 =head1 The Mac::PropertyList module
 
@@ -25,7 +25,7 @@ to read one again for any Perl module.
 
 To read about L<Mac::PropertyList>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|http://perldoc.perl.org/perldoc.html>:
+with L<perldoc|https://perldoc.perl.orgperldoc.html>:
 
 	% perldoc lib/Mac/PropertyList.pm
 
@@ -34,17 +34,8 @@ name instead of the file location:
 
 	% perldoc Mac::PropertyList
 
-You can read the documentation and inspect the meta data on one of the
-CPAN web interfaces, such as L<CPAN Search|http://search.cpan.org/dist/Mac-PropertyList> or
-L<MetaCPAN|http://www.metacpan.org/module/Mac::PropertyList>:
-
-=over 4
-
-=item *	L<http://search.cpan.org/dist/Mac-PropertyList>
-
-=item *	L<http://www.metacpan.org/module/Mac::PropertyList>
-
-=back
+You can read the documentation and inspect the meta data at
+L<MetaCPAN|https://metacpan.org/pod/Mac::PropertyList>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's

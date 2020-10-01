@@ -1,5 +1,8 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.026 2020-09-30
+    - Fix memory leak in server add node methods.
+
 0.025 2020-09-17
     - Add missing functions documentation.
     - Implement server config methods:

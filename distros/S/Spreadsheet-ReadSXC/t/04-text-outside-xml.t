@@ -10,7 +10,7 @@ my $xml_file = "$d/text-outside-cell.xml";
 
 my $sheet;
 my $ok = eval {
-    $sheet = Spreadsheet::ReadSXC::read_xml_file($xml_file);
+    $sheet = Spreadsheet::ReadSXC::read_xml_file($xml_file, { StrictErrors => 1 });
     1;
 };
 my $err = $@;

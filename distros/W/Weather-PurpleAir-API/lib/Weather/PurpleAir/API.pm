@@ -12,7 +12,7 @@ use HTTP::Tiny;
 use Time::HiRes;
 use String::Similarity qw(similarity);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # Litchfield  38887 38888   City of Santa Rosa Laguna Treatment Plant 22961 22962    Geek Orchard 26363 26364
 
@@ -124,23 +124,23 @@ All options have hopefully-sane defaults:
 
 =over 4
 
-=item C<api_url> = string
+=item C<api_url> =E<gt> string
 
 Override the URL at which the API is queried.  Useful for testing, or if you have your own server.
 
 Default is "https://www.purpleair.com/json?show=", to which the sensor ID is appended by the C<sensor_url> method.
 
-=item C<average> = 0 or 1
+=item C<average> =E<gt> 0 or 1
 
 Averages AQI metrics from a node's sensors instead of returning the AQI metrics from each sensor in a node.
 
 Default is 0 (do not average).
 
-=item C<d> = 0 or 1
+=item C<d> =E<gt> 0 or 1
 
 Activate debugging logic, which will print horribly confusing things to STDOUT.  Default is 0 (off).
 
-=item C<g> = 0 or 1
+=item C<g> =E<gt> 0 or 1
 
 Indicate that reports should include a "GUESSING" entry, providing a pruned average of all results from all sensors. In future releases it might incorporate other heuristics (like using older cached values when bad metrics are detected).
 
@@ -151,33 +151,33 @@ should have in the guessed metric.
 
 For example:
 
-    { GUESSING =E<gt> [123.45, 1.09]}  # AQI is 123.45, with high confidence
-    { GUESSING =E<gt> [123.45, 10.3]}  # AQI is 123.45, with somewhat less confidence
-    { GUESSING =E<gt> [123.45, 67.5]}  # AQI is 123.45, with very low confidence!
+    { GUESSING => [123.45, 1.09] }  # AQI is 123.45, with high confidence
+    { GUESSING => [123.45, 10.3] }  # AQI is 123.45, with somewhat less confidence
+    { GUESSING => [123.45, 67.5] }  # AQI is 123.45, with very low confidence!
 
 Default is 0 (do not guess).
 
-=item C<http_or> = HTTP::Tiny object
+=item C<http_or> =E<gt> HTTP::Tiny object
 
 Provide the C<HTTP::Tiny> instance used to query the API.  This is useful when you need to customize the query timeout, set a user agent string or specify an https proxy.
 
 Default is undef (an C<HTTP::Tiny> object will be instantiated internally).
 
-=item C<no_errors> = 0 or 1
+=item C<no_errors> =E<gt> 0 or 1
 
 Set this to suppress writing error messages to stderr.  Default is 0 (errors will be displayed).
 
-=item C<no_warnings> = 0 or 1
+=item C<no_warnings> =E<gt> 0 or 1
 
 Set this to suppress writing warning messages to stderr.  Default is 0 (warnings will be displayed).
 
-=item C<now> = 0 or 1
+=item C<now> =E<gt> 0 or 1
 
 Normally reports will use the ten-minute average AQI from each sensor.  Specify C<now> to use the current AQI instead.
 
 Default is 0 (report will use ten-minute average AQI metrics).
 
-=item C<prune_threshold> = fraction between 0 and 1
+=item C<prune_threshold> =E<gt> fraction between 0 and 1
 
 When the C<g> (GUESSING) option is set, the guessing heuristic may prune more then one high and one low outlier 
 from the sensor data, if doing so will leave sufficient data left over for meaningful averaging.  The prune 
@@ -190,13 +190,13 @@ which are 81 or higher might also be pruned.  If C<prune_threshold> = 0.05 (5%) 
 
 Default is 0.1 (10%).
 
-=item C<q> = 0 or 1
+=item C<q> =E<gt> 0 or 1
 
 "C<q>" is for "quiet".  Setting this is equivalent to setting C<no_errors> and C<no_warnings>.
 
 Default is 0.
 
-=item C<raw> = 0 or 1
+=item C<raw> =E<gt> 0 or 1
 
 When set, C<report> will not convert the API's raw concentration numbers to USA EPA PM2.5 AQI scores (the 
 metric displayed on the Purple Air website map).  Part-per-million concentrations of 2.5 micrometer diameter 
@@ -204,11 +204,11 @@ particles will be provided instead.
 
 Default is 0 (concentrations will be converted to USA EPA PM2.5 AQI scores).
 
-=item C<sensor> = ID-number
+=item C<sensor> =E<gt> ID-number
 
-=item C<sensor> = [ID-number, ID-number, ...]
+=item C<sensor> =E<gt> [ID-number, ID-number, ...]
 
-=item C<sensor> = "ID-number ID-number ..."
+=item C<sensor> =E<gt> "ID-number ID-number ..."
 
 Normally sensor IDs are passed to the C<report> method, but a default sensor or sensors can also be given 
 to C<new> at object instantiation time.
@@ -233,7 +233,7 @@ Some example sensors and their IDs:
 
 The default is 25407 (Gravenstein School, in Sonoma County, California)
 
-=item C<stash_path> = path string
+=item C<stash_path> =E<gt> path string
 
 When a C<stash_path> is provided, C<report> will store a copy of each sensor's JSON blob in the 
 specified directory, under the name C<aqi.$sensor_id.json>.
@@ -243,7 +243,7 @@ For example, if C<stash_path> = "/tmp" and C<sensor> = 25407, the JSON blob will
 
 The default is undef (not set, will not stash).
 
-=item C<v> = 0 or 1
+=item C<v> =E<gt> 0 or 1
 
 "C<v>" is for verbosity.  When set, the reported-upon sensors (and gestalt guess, when C<g> parameter is 
 set) will be printed to stdout.  This is normally set by the C<bin/aqi> utility.

@@ -1,0 +1,50 @@
+---
+abstract: 'Type constraint for any typed subroutine.'
+author:
+  - 'ybrliiu <raian@reeshome.org>'
+build_requires:
+  Test2::Suite: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-TypedCodeRef
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Types::TypedCodeRef:
+    file: lib/Types/TypedCodeRef.pm
+    version: '0.02'
+  Types::TypedCodeRef::Factory:
+    file: lib/Types/TypedCodeRef/Factory.pm
+requires:
+  Carp: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  Sub::Meta: '0'
+  Sub::WrapInType: '0.03'
+  Type::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/ybrliiu/p5-Types-TypedCodeRef/issues
+  homepage: https://github.com/ybrliiu/p5-Types-TypedCodeRef
+  repository: git://github.com/ybrliiu/p5-Types-TypedCodeRef.git
+version: '0.02'
+x_contributors:
+  - 'kusuda <kusuda@mfac.jp>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -50,7 +50,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
@@ -456,27 +456,27 @@ replicated.
 This pattern arises from representing a complex number in "base" i*sqrt(r).
 For an integer X,Y,
 
-    b = i*sqrt(r)
-    a[i] = 0 to r-1 digits
+    base b = i*sqrt(r)
+    a[j] = digit 0 to r-1
 
-    X+Y*i*sqrt(r) = a[k]*b^k + ... + a[2]*b^2 + a[1]*b + a[0]
+    X + Y*i*sqrt(r) = a[k]*b^k + ... + a[2]*b^2 + a[1]*b + a[0]
 
-and N is the a[i] digits in base r
+and N is the a[j] digits in base r
 
     N = a[k]*r^k + ... + a[2]*r^2 + a[1]*r + a[0]
 
-X<Knuth, Donald>The factor sqrt(r) makes the generated Y an integer.  For
-actual use as a number base that factor can be omitted and instead
-fractional digits a[-1]*r^-1 etc used to reach smaller Y values, as for
-example in Knuth's "quater-imaginary" system of base 2*i, being i*sqrt(4),
-with digits 0,1,2,3.  (Knuth Seminumerical Algorithms section 4.1 and CACM
-1960 pp245-247.)
+X<quater-imaginary>The sum has imaginary part with a factor sqrt(r).
+Dividing that out gives an integer Y.  For actual use as a number base, that
+factor can be omitted and instead fractional digits a[-1]*r^-1 etc used to
+reach smaller Y values, as for example in Knuth's "quater-imaginary" system
+of base 2*i, being i*sqrt(4), with digits 0,1,2,3.  (Knuth Seminumerical
+Algorithms section 4.1 and CACM 1960 pp245-247.)
 
 The powers of i in the base give the replication direction, so i^0=1 right,
 i^1=i up, i^2=-1 right, i^3=-i down, etc.  The power of sqrt(r) then spreads
-the replication in the respective direction.  It takes two steps to repeat
-horizontally and sqrt(r)^2=r hence the doubling of 1x1 to the right, 2x2 to
-the left, 4x4 to the right, etc, and similarly vertically.
+the replication in the respective direction.  Two steps repeat horizontally
+and sqrt(r)^2=r hence the doubling of 1x1 to the right, 2x2 to the left, 4x4
+to the right, etc, and similarly vertically.
 
 =head2 Negabinary
 
@@ -497,9 +497,9 @@ as 6,7,4,5 which the same order with 4 added to each.  Then the resulting
 block of eight repeats to the left similarly, in the same order with 8 added
 to each.
 
-The C<ImaginaryBase> takes the indexes NX and NY of these negabinary forms
-and forms N by interleaving the digits (bits) of NX and NY.  That
-interleaving is in the style of the C<ZOrderCurve>.
+C<ImaginaryBase> takes the indexes NX and NY of these negabinary forms and
+forms N by interleaving the digits (bits) of NX and NY.  That interleaving
+is in the style of the C<ZOrderCurve>.
 
     zX,zY = ZOrderCurve n_to_xy(N)
     X = to_negabinary(zX)
@@ -507,7 +507,7 @@ interleaving is in the style of the C<ZOrderCurve>.
     X,Y equals ImaginaryBase n_to_xy(N)
 
 The C<ZOrderCurve> replicates blocks alternately right and up, whereas for
-C<ImaginaryBase> here it's right,up,left,down repeating.
+C<ImaginaryBase> here it's right,up,left,down, and so on repeating.
 
 =head2 Radix
 
@@ -642,7 +642,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

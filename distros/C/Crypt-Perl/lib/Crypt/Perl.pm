@@ -3,7 +3,7 @@ package Crypt::Perl;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 =encoding utf-8
 
@@ -42,7 +42,7 @@ a broad variety of extensions
 
 =back
 
-=head1 SUPPORTED PUBLIC KEY ENCRYPTION ALGORITHMS
+=head1 SUPPORTED PUBLIC KEY ALGORITHMS
 
 =over
 
@@ -56,23 +56,31 @@ a broad variety of extensions
 
 =head1 SECURITY
 
-Given the number of original tests in this distribution, I am B<reasonably>
-confident that this code is as secure as the random number generation in
-L<Bytes::Random::Secure::Tiny> can allow. The tests verify the logic here
-against OpenSSL, on which millions of applications rely every day.
+Random number generation here comes from L<Bytes::Random::Secure::Tiny>.
+See that module’s documentation for details of its reliability.
 
-That said: B<NO GUARANTEES!!!> The tests here are original, but the
-production logic is ported from elsewhere. There has been no formal security
-review. L<I found at least one security flaw|https://github.com/kjur/jsrsasign/issues/221>
-in one of the source libraries; there may be more.
+An extensive test suite is included that compares against
+L<OpenSSL|https://openssl.org> and
+L<LibTomCrypt|https://www.libtom.net/LibTomCrypt/> (i.e., L<CryptX>),
+when available.
 
-For this reason it is best to restrict use of this library to internal systems.
-Public-facing interfaces should prefer more “visible” cryptographic libraries
-like the ones mentioned elsewhere here.
+That said: B<NO GUARANTEES!!!> It’s best to restrict use of this library
+to contexts where more “visible” cryptography libraries like the ones
+mentioned elsewhere here are unavailable.
 
-Of course, L<OpenSSL has not been trouble-free, either!|https://www.openssl.org/news/vulnerabilities.html>
+And of course, L<OpenSSL has not been trouble-free, either …|https://www.openssl.org/news/vulnerabilities.html>
 
 Caveat emptor.
+
+=head1 HISTORICAL VULNERABILITIES
+
+=over
+
+=item * L<CVE-2020-13895|https://nvd.nist.gov/vuln/detail/CVE-2020-13895>
+
+=item * L<CVE-2020-17478|https://nvd.nist.gov/vuln/detail/CVE-2020-17478>
+
+=back
 
 =head1 SPEED
 
@@ -80,9 +88,9 @@ RSA key generation is slow—too slow, probably, unless you have
 L<Math::BigInt::GMP> or L<Math::BigInt::Pari> (either of which requires XS).
 It’s one application where pure-Perl cryptography just doesn’t seem
 feasible. :-( Everything else, though, including all ECDSA and Ed25519
-operations, should be fine.
+operations, should be fine even in pure Perl.
 
-Note that this distribution’s test suite is pretty slow without an
+Note that this distribution’s test suite is also pretty slow without an
 XS backend.
 
 =head1 TODO
@@ -111,6 +119,9 @@ without which the Internet would be a very, very different reality from
 what we know!
 
 The Ed25519 logic is ported from L<forge.js|https://github.com/digitalbazaar/forge/blob/master/lib/ed25519.js>.
+
+Deterministic ECDSA logic derived in part from
+L<python-ecdsa|https://github.com/ecdsa/python-ecdsa>.
 
 Other parts are ported from L<LibTomCrypt|http://www.libtom.net>.
 

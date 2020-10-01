@@ -1,0 +1,11 @@
+^dev
+^yts/.git
+^cover_db
+^local
+^dev.sh
+^nytprof
+^nytprof.out
+^gh-pages
+^utils/generated
+^html/
+^Makefile.dev

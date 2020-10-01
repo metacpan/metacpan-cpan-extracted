@@ -1,0 +1,38 @@
+Revision history for Perl extension Math::Int64.
+
+0.009     2020-09-28 13:18:49 BST
+    - Minor documentation tweak
+    - Updated paths_list to just returns paths
+
+0.008     2020-09-28 12:51:23 BST
+    - Reverted code base to version 6 due to breaking recursion in 0.007
+
+0.007     2020-09-26 05:29:29 BST
+    - Tidied up duplicated code into its own function
+
+0.006     2020-09-26 05:17:40 BST
+    - Removed pointless utf8/open dragged in from template
+    - Made the type match for booleans a case insensitive regex
+    - Added in basis for extract function
+    - Updated dist.ini to remove unrequired bump-version confi
+    - Updated use statements to remove unrequired feature call for 'say'
+
+0.005     2020-09-26 04:32:30 BST
+    - Added in alternative depth calculation
+
+0.004     2020-09-26 04:17:46 BST
+    - Updated documentation and added in paths_list function
+    - Added link to the github to the POD
+
+0.003     2020-09-26 03:15:37 BST
+
+    - Still did not upload to pause, retrying again, my apologies but this is a pre 1.00 peice of software :)
+
+0.002     2020-09-26 03:07:28 BST
+
+    - Checking release process via dist release (accidentally did it twice whoops)
+
+0.001     2020-09-26 03:06:59 BST
+
+    - Created basic POD documentation
+    - Began configuring DZIL

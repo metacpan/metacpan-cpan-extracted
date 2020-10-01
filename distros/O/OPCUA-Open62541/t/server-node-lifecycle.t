@@ -6,7 +6,7 @@ use OPCUA::Open62541::Test::Server;
 use Test::More;
 BEGIN {
     if (OPCUA::Open62541::Server->can('setAdminSessionContext')) {
-	plan tests => OPCUA::Open62541::Test::Server::planning_nofork() + 105;
+	plan tests => OPCUA::Open62541::Test::Server::planning_nofork() + 121;
     } else {
 	plan skip_all => "No UA_Server_setAdminSessionContext in open62541";
     }
@@ -31,8 +31,26 @@ sub addNodeStatus {
 	$_[0], $_[1]);
 }
 
+sub addNodeParentInvalid {
+    my %parent = %{$nodes{some_variable_0}{parentNodeId}};
+    $parent{NodeId_identifier} = -1;
+    return $server->{server}->addVariableNode(
+	$nodes{some_variable_0}{nodeId},
+	\%parent,
+	$nodes{some_variable_0}{referenceTypeId},
+	$nodes{some_variable_0}{browseName},
+	$nodes{some_variable_0}{typeDefinition},
+	$nodes{some_variable_0}{attributes},
+	$_[0], $_[1]);
+}
+
 sub addNodeGood {
     is(addNodeStatus(@_), STATUSCODE_GOOD, "add node");
+}
+
+sub addNodeBad {
+    is(addNodeParentInvalid(@_), STATUSCODE_BADPARENTNODEIDINVALID,
+	"add node fail");
 }
 
 sub deleteNodeStatus {
@@ -228,7 +246,7 @@ no_leaks_ok {
     addNodeStatus();
 } "destructor called leak";
 
-# set node context in add noce
+# set node context in add node
 
 my $context = "hello";
 $server->{config}->setGlobalNodeLifecycle({
@@ -249,6 +267,7 @@ is($context, "world", "constructor node context out");
 deleteNodeGood();
 is($context, "bye", "destructor node context out");
 
+undef $context;
 no_leaks_ok {
     $context = "hello";
     $server->{config}->setGlobalNodeLifecycle({
@@ -265,6 +284,124 @@ no_leaks_ok {
     addNodeStatus(\$context);
     deleteNodeStatus();
 } "node context leak";
+
+# fail to set node context in add node
+
+$context = "hello";
+$server->{config}->setGlobalNodeLifecycle({
+    GlobalNodeLifecycle_constructor => sub {
+	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	fail("fail constructor node context in");
+	$$$nctx = "world";
+	return STATUSCODE_GOOD;
+    },
+    GlobalNodeLifecycle_destructor => sub {
+	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	fail("fail destructor node context in");
+	$$nctx = "bye";
+    },
+});
+addNodeBad(\$context);
+is($context, "hello", "constructor node fail context out");
+
+undef $context;
+no_leaks_ok {
+    $context = "hello";
+    $server->{config}->setGlobalNodeLifecycle({
+	GlobalNodeLifecycle_constructor => sub {
+	    my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	    $$$nctx = "world";
+	    return STATUSCODE_GOOD;
+	},
+	GlobalNodeLifecycle_destructor => sub {
+	    my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	    $$nctx = "bye";
+	},
+    });
+    addNodeParentInvalid(\$context);
+} "node fail context leak";
+
+# set out node in add node
+
+my $outnode;
+my $node;
+$server->{config}->setGlobalNodeLifecycle({
+    GlobalNodeLifecycle_constructor => sub {
+	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	is($$$nctx, undef, "constructor node context undef");
+	$node =  $nid;
+	return STATUSCODE_GOOD;
+    },
+    GlobalNodeLifecycle_destructor => sub {
+	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	is($$nctx, undef, "destructor node context undef");
+	$node =  $nid;
+    },
+});
+addNodeGood(undef, \$outnode);
+is(ref($outnode), 'HASH', "out node hash");
+like($outnode->{NodeId_identifierType}, qr/^\d+$/, "out node id numeric");
+is_deeply($outnode, $node, "constructor out node");
+undef $node;
+deleteNodeGood();
+is_deeply($outnode, $node, "destructor out node");
+
+undef $outnode;
+undef $node;
+no_leaks_ok {
+    $server->{config}->setGlobalNodeLifecycle({
+	GlobalNodeLifecycle_constructor => sub {
+	    my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	    $node =  $nid;
+	    return STATUSCODE_GOOD;
+	},
+	GlobalNodeLifecycle_destructor => sub {
+	    my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	    $node =  $nid;
+	},
+    });
+    addNodeStatus(undef, \$outnode);
+    undef $node;
+    deleteNodeStatus();
+} "out node leak";
+
+# fail set out node in add node
+
+undef $outnode;
+undef $node;
+$server->{config}->setGlobalNodeLifecycle({
+    GlobalNodeLifecycle_constructor => sub {
+	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	fail("fail constructor out node context undef");
+	$node =  $nid;
+	return STATUSCODE_GOOD;
+    },
+    GlobalNodeLifecycle_destructor => sub {
+	my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	fail("fail destructor out node context undef");
+	$node =  $nid;
+    },
+});
+addNodeBad(undef, \$outnode);
+is($outnode, undef, "out node fail");
+is($node, undef, "constructor out node fail");
+
+undef $outnode;
+undef $node;
+no_leaks_ok {
+    $server->{config}->setGlobalNodeLifecycle({
+	GlobalNodeLifecycle_constructor => sub {
+	    my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	    $node =  $nid;
+	    return STATUSCODE_GOOD;
+	},
+	GlobalNodeLifecycle_destructor => sub {
+	    my ($srv, $sid, $sctx, $nid, $nctx) = @_;
+	    $node =  $nid;
+	},
+    });
+    addNodeParentInvalid(undef, \$outnode);
+} "out node leak";
 
 # set node context in constructor
 

@@ -12,9 +12,8 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the 
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
- * Boston, MA  02111-1307  USA.
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include "gconfperl.h"
@@ -105,6 +104,10 @@ BOOT:
 	                                 gconfperl_client_error_marshal);
 	gperl_signal_set_marshaller_for (GCONF_TYPE_CLIENT, "error",
 					 gconfperl_client_error_marshal);
+
+=for object Gnome2::GConf::Client client module for GConf
+
+=cut
 
 =for position DESCRIPTION
 

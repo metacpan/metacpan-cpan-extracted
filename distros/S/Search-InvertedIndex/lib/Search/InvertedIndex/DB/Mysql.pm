@@ -1,14 +1,16 @@
 package Search::InvertedIndex::DB::Mysql;
-# $RCSfile: Mysql.pm,v $ $Revision: 1.2 $ $Date: 2000/11/29 18:36:03 $ $Author: snowhare $
+
+use strict;
+use warnings;
+
 use DBI;
 use Carp;
 use Class::NamedParms;
 use Class::ParmList;
 use vars qw (@ISA $VERSION);
-use strict;
 
 @ISA     = qw(Class::NamedParms);
-$VERSION = "1.01";
+$VERSION = "1.17";
 
 # This is supposed to keep the same database table
 # from being opened more than once. But I'm not sure
@@ -88,18 +90,10 @@ obviously recommended.
 
 =back
 
-=head1 CHANGES
-
- 1.00 2000.11.28 - First version.
-
-=head1 COPYRIGHT
-
-This software may be copied or redistributed under the same terms as Perl itelf.
-
 =head1 AUTHOR
 
 Michael Cramer <cramer@webkist.com>, based on
-Search::InvertedIndex::DB::DB_File_SplitHash by Benjamin Franz.
+Search::InvertedIndex::DB::DB_File_SplitHash by Jerilyn Franz.
 
 =head1 NOTES
 

@@ -1,10 +1,12 @@
+[![Actions Status](https://github.com/juliodcs/Hash-Digger/workflows/tests/badge.svg)](https://github.com/juliodcs/Hash-Digger/actions)
+
 # NAME
 
 Hash::Digger - Access nested hash structures without vivification
 
 # VERSION
 
-Version 0.0.3
+Version 0.0.5
 
 # SYNOPSIS
 

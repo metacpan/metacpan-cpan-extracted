@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem = \&Math::PlanePath::_divrem;
@@ -673,12 +673,16 @@ L<http://oeis.org/A003480> (etc)
 
 =back
 
-    A003480    -X and -Y coordinate first point of each ring
-               likewise A020727
-    A007052    X,Y coordinate of axis crossing,
-               and also maximum height of a side
-    A072261    N on Y negative axis (half way along first side)
-    A206374    N on South-East diagonal (end of first side)
+    A003480   -X and -Y coordinate first point of each ring
+              likewise A020727
+    A007052   X,Y coordinate of axis crossing,
+              and also maximum height of a side
+    A072261   N on Y negative axis (half way along first side)
+    A206374   N on South-East diagonal (end of first side)
+
+    Also:
+      A332204   X coordinate across one side
+      A332205   Y coordinate across one side
 
 =head1 SEE ALSO
 
@@ -691,7 +695,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

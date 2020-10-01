@@ -1,9 +1,18 @@
 Revision history for Bytes::Random::Secure::Tiny
 
+1.011 2020-09-25
+  - Add version number tests.
+  - Move author tests to xt/
+  - Eliminate dependency on Test::CheckManifest: Module is broken and author seems unlikely to fix it.
+
+1.010 2020-09-25
+  - Version numbers consistency.
+
+1.009 2020-09-24
+  - Fixed a spelling error and SYNOPSIS error in POD (Patches received via GitHub PRs).
+
 1.008 2015-07-08
   - Shuffle handles empty arrayrefs more gracefully.
-  - Removed EGD support; use Bytes::Random::Secure if you need such
-    advanced support.
 
 1.007 2015-07-07
   - Added a shuffle method.

@@ -12,7 +12,7 @@ use base "File::HomeDir::Unix";
 
 BEGIN
 {
-    $VERSION = '1.004';
+    $VERSION = '1.006';
 }
 
 #####################################################################
@@ -142,5 +142,11 @@ always be used via L<File::HomeDir>.
   $pics    = File::HomeDir->my_pictures;  # /Users/mylogin/Pictures
   $videos  = File::HomeDir->my_videos;    # /Users/mylogin/Movies
   $data    = File::HomeDir->my_data;      # /Users/mylogin/Library/Application Support
+
+=head1 COPYRIGHT
+
+Copyright 2009 - 2011 Adam Kennedy.
+
+Copyright 2017 - 2020 Jens Rehsack
 
 =cut

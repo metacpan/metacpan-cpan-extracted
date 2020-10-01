@@ -21,7 +21,7 @@
   "holdingsItems": [
     {
       "accessionNumber": null,
-      "barcode": "",
+      "barcode": "9876543210",
       "chronology": "March",
       "copyNumber": "1",
       "descriptionOfPieces": null,

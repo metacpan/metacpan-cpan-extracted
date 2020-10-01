@@ -1,0 +1,12 @@
+Revision history for Perl module YAML::Tidy
+
+0.002 2020-09-29 18:25:51+02:00
+
+    - Improve finding of node start and end
+    - Fix dependencies
+    - Add more tests
+    - Add more docs
+
+0.001 2020-09-26 01:32:32+02:00
+
+    - First Release

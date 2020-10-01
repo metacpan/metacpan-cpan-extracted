@@ -1,0 +1,29 @@
+---
+abstract: "Queries Rundeck's REST API"
+author:
+  - 'Xavier Humbert <xavier.humbert@ac-nancy-metz.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RundeckAPI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '2.77'
+  HTTP::Cookies: '5.833'
+  JSON: '2.15'
+  LWP::UserAgent: '5.833'
+  REST::Client: '272'
+  Scalar::Util: '1.27'
+version: v1.2.6
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

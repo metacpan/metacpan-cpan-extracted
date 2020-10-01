@@ -1,4 +1,10 @@
 Revision history for Text-WrapAsUtf8
 
-v0.0.1      2017-09-11
+0.0.2       2020-09-22
+
+    - Rebuild for new weaver.ini, dist.ini, docs, etc.
+        - Thanks to Aleena
+
+0.0.1       2017-09-11
+
     - First version, released on an unsuspecting world

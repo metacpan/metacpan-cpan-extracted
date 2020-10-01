@@ -1,5 +1,8 @@
 Revision history for Business-Fixflo
 
+0.39     2020-09-25
+        - Add InvoiceRecipient to Business::Fixflo::Issue
+
 0.38     2020-07-06
         - Add PropertyManager to Business::Fixflo::Property
         - Add AssignedTeam to Business::Fixflo::Property

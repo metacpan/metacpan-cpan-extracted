@@ -34,7 +34,12 @@
       "runtime" : {
          "requires" : {
             "Browser::Open" : "0",
+            "Data::Sah::Coerce::perl::To_duration::From_float::seconds" : "0",
+            "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" : "0",
+            "Data::Sah::Coerce::perl::To_duration::From_str::human" : "0",
+            "Data::Sah::Coerce::perl::To_duration::From_str::iso8601" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
+            "Data::Sah::Compiler::perl::TH::duration" : "0",
             "Data::Sah::Compiler::perl::TH::int" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
             "Log::ger" : "0.037",
@@ -69,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-App-GoogleSearchUtils"
       }
    },
-   "version" : "0.002",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -84,6 +89,11 @@
             "class" : "Dist::Zilla::Plugin::InsertExecsList",
             "name" : "InsertExecsList",
             "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -174,7 +184,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.602"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -243,9 +253,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",

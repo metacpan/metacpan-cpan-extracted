@@ -6,7 +6,7 @@ require Exporter;
 use Lingua::Stem::AutoLoader;
 
 BEGIN {
-    $Lingua::Stem::VERSION     = '2.30';
+    $Lingua::Stem::VERSION     = '2.31';
     @Lingua::Stem::ISA         = qw (Exporter);
     @Lingua::Stem::EXPORT      = ();
     @Lingua::Stem::EXPORT_OK   = qw (stem stem_in_place clear_stem_cache stem_caching add_exceptions delete_exceptions get_exceptions set_locale get_locale);

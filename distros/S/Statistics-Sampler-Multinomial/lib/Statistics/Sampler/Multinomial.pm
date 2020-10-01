@@ -4,7 +4,7 @@ use 5.014;
 use warnings;
 use strict;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 use Carp;
 use Ref::Util qw /is_arrayref/;
@@ -167,6 +167,42 @@ sub draw_n_samples {
     return \@draws;
 }
 
+
+sub draw_with_mask {
+    my ($self, $mask) = @_;
+    
+    croak 'mask argument is not an array ref'
+      if !is_arrayref $mask;
+    
+    if (!defined $self->{sum}) {
+        $self->_initialise;
+    }
+
+    #  now we mask
+    my @deleted = delete local @{$self->{data}}[@$mask];
+    local $self->{sum} = $self->{sum} - sum @deleted;
+    
+    $self->draw ();
+}
+
+#  lots of code duplication going on here
+sub draw_n_samples_with_mask {
+    my ($self, $n, $mask) = @_;
+    
+    croak 'mask argument is not an array ref'
+      if !is_arrayref $mask;
+    
+    if (!defined $self->{sum}) {
+        $self->_initialise;
+    }
+
+    #  now we mask
+    my @deleted = delete local @{$self->{data}}[@$mask];
+    local $self->{sum} = $self->{sum} - sum @deleted;
+    
+    $self->draw_n_samples ($n);
+}
+
 #  Cuckoo package to act as a method wrapper
 #  to use the perl PRNG stream by default.
 # currently croaks because we have no binomial method
@@ -209,6 +245,11 @@ using the conditional binomial method.
     #  returns an array ref that might look something like
     #  [3,3,0,2,0]
     
+    $object->draw_with_mask([1,2]);
+    $object->draw_n_samples_with_mask([1,2]);
+    #  locally set data at positions 1 and 2 to zero
+    #  so they will have zero probability of being returned
+
     # to specify your own PRNG object, in this case the Mersenne Twister
     my $mrma = Math::Random::MT::Auto->new;
     my $object = Statistics::Sampler::Multinomial->new(
@@ -266,6 +307,15 @@ Returns an array ref of $n samples across the K classes,
 where K is the length of the data array passed in to the call to new.
 e.g. for $n=3 and the K=5 example from above,
 one could get (0,1,2,0,0).
+
+=item $object->draw_with_mask ($aref)
+=item $object->draw_n_samples_with_mask ($n, $aref)
+
+These locally mask out a subset of classes by setting
+their probabilities to false.  In many cases this will
+(should) be faster than generating a new object with
+the subset excluded, especially if that new object is
+then discarded.  
 
 =item $object->get_class_count
 

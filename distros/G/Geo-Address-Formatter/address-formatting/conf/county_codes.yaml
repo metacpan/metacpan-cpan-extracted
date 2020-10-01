@@ -1,3 +1,46 @@
+BE:
+    BRU:
+      default: Bruxelles-Capitale
+      alt_de: Brüssel-Hauptstadt
+      alt_en: Brussels-Capital
+      alt_nl: Brussel-Hoofdstad
+    VAN:
+      default: Antwerpen
+      alt_en: Antwerp
+      alt_fr: Anvers
+    VBR:
+      default: Vlaams Brabant
+      alt_en: Flemish Brabant
+      alt_fr: Brabant flamand
+    VLI:
+      default: Limburg
+      alt_fr: Limbourg
+    VOV:
+      default: Oost-Vlaanderen
+      alt_en: East Flanders
+      alt_fr: Flandre orientale
+    VWV:
+      default: West-Vlaanderen
+      alt_en: West Flanders
+      alt_fr: Flandre-Occidentale
+    WBR:
+      default: Brabant wallon
+      alt_en: Walloon Brabant
+      alt_nl: Waals-Brabant
+    WHT:
+      default: Hainaut
+      alt_nl: Henegouwen
+    WLG:
+      default: Liège
+      alt_de: Lüttich
+      alt_nl: Luik
+    WLX:
+      default: Luxembourg
+      alt_de: Luxemburg
+      alt_nl: Luxemburg
+    WNA:
+      default: Namur
+      alt_nl: Namen
 ES:
     A: Alicante
     AB: Albacete
@@ -310,7 +353,7 @@ IT:
     AN: Ancona
     AO: Aosta
     AP: Ascoli Piceno
-    AQ: L\'Aquila
+    AQ: L'Aquila
     AR: Arezzo
     AT: Asti
     AV: Avellino
@@ -323,12 +366,15 @@ IT:
     BR: Brindisi
     BS: Brescia
     BT: Barletta-Andria-Trani
-    BZ: Bolzano
+    BZ:
+      default: Bolzano - Bozen
+      alt_de: Südtirol
+      alt_en: South Tyrol
+      alt_it: Bolzano
     CA: Cagliari
     CB: Campobasso
     CE: Caserta
     CH: Chieti
-    CI: Carbonia-Iglesias
     CL: Caltanissetta
     CN: Cuneo
     CO: Como
@@ -344,7 +390,6 @@ IT:
     FM: Fermo
     FR: Frosinone
     GE: Genova
-    GO: Gorizia
     GR: Grosseto
     IM: Imperia
     IS: Isernia
@@ -355,7 +400,9 @@ IT:
     LO: Lodi
     LT: Latina
     LU: Lucca
-    MB: Monza e della Brianza
+    MB:
+      default: Monza e della Brianza
+      alt_en: Monza and Brianza
     MC: Macerata
     ME: Messina
     MI: Milano
@@ -375,7 +422,6 @@ IT:
     PE: Pescara
     PG: Perugia
     PI: Pisa
-    PN: Pordenone
     PO: Prato
     PR: Parma
     PT: Pistoia
@@ -387,7 +433,7 @@ IT:
     RE: Reggio Emilia
     RG: Ragusa
     RI: Rieti
-    RM: Roma
+    RM: Roma Capitale
     RN: Rimini
     RO: Rovigo
     SA: Salerno
@@ -399,19 +445,362 @@ IT:
     SV: Savona
     TA: Taranto
     TE: Teramo
-    TN: Trento
-    TO: Torino
+    TN: Provincia di Trento
+    TO: Provincia di Torino
     TP: Trapani
     TR: Terni
-    TS: Trieste
     TV: Treviso
-    UD: Udine
     VA: Varese
     VB: Verbano-Cusio-Ossola
     VC: Vercelli
     VE: Venezia
     VI: Vicenza
     VR: Verona
-    VS: Medio Campidano
     VT: Viterbo
     VV: Vibo Valentia
+LU:
+    CA:
+      default: Canton Capellen
+      alt_de: Kanton Kapellen
+    CL:
+      default: Canton Clervaux
+      alt_de: Kanton Clerf
+    DI:
+      default: Canton Diekirch
+      alt_de: Kanton Diekirch
+    EC:
+      default: Canton Echternach
+      alt_de: Kanton Echternach
+    ES:
+      default: Canton Esch-sur-Alzette
+      alt_de: Kanton Esch an der Alzette
+    GR:
+      default: Canton Grevenmacher
+      alt_de: Kanton Grevenmacher
+    LU:
+      default: Canton Luxembourg
+      alt_de: Kanton Luxemburg
+    ME:
+      default: Canton Mersch
+      alt_de: Kanton Mersch
+    RD:
+      default: Canton Redange
+      alt_de: Kanton Redingen
+    RM:
+      default: Canton Remich
+      alt_de: Kanton Remich
+    VD:
+      default: Canton Vianden
+      alt_de: Kanton Vianden
+    WI:
+      default: Canton Wiltz
+      alt_de: Kanton Wiltz
+PT:
+    ABF: Albufeira
+    ABL: Albergaria-a-Velha
+    ABT: Abrantes
+    ACB: Alcobaça
+    ACH: Alcochete
+    ACN: Alcanena
+    ACT: Alcoutim
+    ADL: Alandroal
+    ADV: Almodôvar
+    AFE: Alfândega da Fé
+    AGB: Aguiar da Beira
+    AGD: Águeda
+    AGH: Angra do Heroísmo
+    AGN: Arganil
+    AJT: Aljustrel
+    AJZ: Aljezur
+    ALD: Almeida
+    ALJ: Alijó
+    ALM: Almada
+    ALQ: Alenquer
+    ALR: Almeirim
+    ALT: Alter do Chão
+    AMD: Amadora
+    AMM: Armamar
+    AMR: Amares
+    AMT: Amarante
+    AND: Anadia
+    ANS: Ansião
+    APC: Alpiarça
+    ARC: Arouca
+    ARL: Arraiolos
+    ARR: Arronches
+    ARV: Arruda dos Vinhos
+    ASL: Alcácer do Sal
+    AVR: Aveiro
+    AVS: Avis
+    AVT: Alvito
+    AVV: Arcos de Valdevez
+    AVZ: Alvaiázere
+    AZB: Azambuja
+    BAO: Baião
+    BBR: Bombarral
+    BCL: Barcelos
+    BGC: Bragança
+    BJA: Beja
+    BMT: Belmonte
+    BNV: Benavente
+    BRB: Borba
+    BRC: Barrancos
+    BRG: Braga
+    BRR: Barreiro
+    BTC: Boticas
+    BTL: Batalha
+    CBC: Cabeceiras de Basto
+    CBR: Coimbra
+    CBT: Celorico de Basto
+    CCH: Coruche
+    CDN: Condeixa-a-Nova
+    CDR: Castro Daire
+    CDV: Cadaval
+    CHM: Chamusca
+    CHT: Calheta
+    CHV: Chaves
+    CLB: Celorico da Beira
+    CLD: Caldas da Rainha
+    CLT: Calheta
+    CML: Câmara de Lobos
+    CMN: Caminha
+    CMR: Campo Maior
+    CNF: Cinfães
+    CNT: Cantanhede
+    CPR: Castanheira de Pera
+    CPV: Castelo de Paiva
+    CRS: Carregal do Sal
+    CRT: Crato
+    CRV: Corvo
+    CRZ: Carrazeda de Ansiães
+    CSC: Cascais
+    CTB: Castelo Branco
+    CTC: Constância
+    CTM: Castro Marim
+    CTX: Cartaxo
+    CUB: Cuba
+    CVD: Castelo de Vide
+    CVL: Covilhã
+    CVR: Castro Verde
+    ELV: Elvas
+    ENT: Entroncamento
+    EPS: Esposende
+    ESP: Espinho
+    ETR: Estarreja
+    ETZ: Estremoz
+    EVR: Évora
+    FAF: Fafe
+    FAG: Fornos de Algodres
+    FAL: Ferreira do Alentejo
+    FAR: Faro
+    FCR: Figueira de Castelo Rodrigo
+    FEC: Freixo de Espada à Cinta
+    FIG: Figueira da Foz
+    FLG: Felgueiras
+    FND: Fundão
+    FTR: Fronteira
+    FUN: Funchal
+    FVN: Figueiró dos Vinhos
+    FZZ: Ferreira do Zêzere
+    GAV: Gavião
+    GDL: Grândola
+    GDM: Gondomar
+    GLG: Golegã
+    GMR: Guimarães
+    GOI: Góis
+    GRD: Guarda
+    GVA: Gouveia
+    HRT: Horta
+    IDN: Idanha-a-Nova
+    ILH: Ílhavo
+    LAG: Lagoa
+    LGA: Lagoa
+    LGF: Lajes das Flores
+    LGP: Lajes do Pico
+    LGS: Lagos
+    LLE: Loulé
+    LMG: Lamego
+    LNH: Lourinhã
+    LRA: Leiria
+    LRS: Loures
+    LSA: Lousã
+    LSB: Lisboa
+    LSD: Lousada
+    MAC: Mação
+    MAD: Madalena
+    MAI: Maia
+    MBR: Moimenta da Beira
+    MCH: Machico
+    MCN: Marco de Canaveses
+    MCQ: Monchique
+    MCV: Miranda do Corvo
+    MDA: Mêda
+    MDB: Mondim de Basto
+    MDC: Macedo de Cavaleiros
+    MDL: Mirandela
+    MDR: Miranda do Douro
+    MFR: Mafra
+    MFT: Monforte
+    MGD: Mogadouro
+    MGL: Mangualde
+    MGR: Marinha Grande
+    MIR: Mira
+    MLD: Mealhada
+    MLG: Melgaço
+    MMN: Montemor-o-Novo
+    MMV: Montemor-o-Velho
+    MNC: Monção
+    MOR: Mora
+    MOU: Mourão
+    MRA: Moura
+    MRS: Murtosa
+    MRT: Mortágua
+    MRV: Marvão
+    MSF: Mesão Frio
+    MTA: Moita
+    MTG: Manteigas
+    MTJ: Montijo
+    MTL: Mértola
+    MTR: Montalegre
+    MTS: Matosinhos
+    MUR: Murça
+    NIS: Nisa
+    NLS: Nelas
+    NRD: Nordeste
+    NZR: Nazaré
+    OAZ: Oliveira de Azeméis
+    OBD: Óbidos
+    OBR: Oliveira do Bairro
+    ODM: Odemira
+    ODV: Odivelas
+    OER: Oeiras
+    OFR: Oliveira de Frades
+    OHP: Oliveira do Hospital
+    OLH: Olhão
+    OLR: Oleiros
+    ORQ: Ourique
+    OVR: Ovar
+    PBL: Pombal
+    PCR: Paredes de Coura
+    PCT: Penalva do Castelo
+    PCV: Penacova
+    PDL: Ponta Delgada
+    PFR: Paços de Ferreira
+    PGR: Pedrógão Grande
+    PLM: Palmela
+    PMS: Porto de Mós
+    PMZ: Porto Moniz
+    PNC: Penamacor
+    PND: Penedono
+    PNF: Penafiel
+    PNH: Pinhel
+    PNI: Peniche
+    PNL: Penela
+    PNV: Proença-a-Nova
+    PPS: Pampilhosa da Serra
+    PRD: Paredes
+    PRG: Peso da Régua
+    PRL: Portel
+    PRS: Vila Nova de Poiares
+    PRT: Porto
+    PSR: Ponte de Sor
+    PST: Porto Santo
+    PTB: Ponte da Barca
+    PTG: Portalegre
+    PTL: Ponte de Lima
+    PTM: Portimão
+    PTS: Ponta do Sol
+    PVC: Povoação
+    PVL: Póvoa de Lanhoso
+    PVZ: Póvoa de Varzim
+    RBR: Ribeira Brava
+    RDD: Redondo
+    RGR: Ribeira Grande
+    RMR: Rio Maior
+    RMZ: Reguengos de Monsaraz
+    RPN: Ribeira de Pena
+    RSD: Resende
+    SAT: Sátão
+    SBA: São Brás de Alportel
+    SBG: Sabugal
+    SBR: Sabrosa
+    SCD: Santa Comba Dão
+    SCF: Santa Cruz das Flores
+    SCG: Santa Cruz da Graciosa
+    SCR: Santa Cruz
+    SEI: Seia
+    SJM: São João da Madeira
+    SJP: São João da Pesqueira
+    SLV: Silves
+    SMA: Sobral de Monte Agraço
+    SMG: Salvaterra de Magos
+    SMP: Santa Marta de Penaguião
+    SNS: Sines
+    SNT: Sintra
+    SPS: São Pedro do Sul
+    SRD: Sardoal
+    SRE: Soure
+    SRN: Sernancelhe
+    SRP: São Roque do Pico
+    SRT: Sertã
+    SSB: Sesimbra
+    SSL: Sousel
+    STB: Setúbal
+    STC: Santiago do Cacém
+    STN: Santana
+    STR: Santarém
+    STS: Santo Tirso
+    SVC: São Vicente
+    SVV: Sever do Vouga
+    SXL: Seixal
+    TBC: Tabuaço
+    TBR: Terras de Bouro
+    TBU: Tábua
+    TCS: Trancoso
+    TMC: Torre de Moncorvo
+    TMR: Tomar
+    TND: Tondela
+    TNV: Torres Novas
+    TRC: Tarouca
+    TRF: Trofa
+    TVD: Torres Vedras
+    TVR: Tavira
+    VBP: Vila do Bispo
+    VCD: Vila do Conde
+    VCT: Viana do Castelo
+    VDG: Vidigueira
+    VFC: Vila Franca do Campo
+    VFL: Vila Flor
+    VFR: Santa Maria da Feira
+    VFX: Vila Franca de Xira
+    VGS: Vagos
+    VIS: Viseu
+    VIZ: Vizela
+    VLC: Vale de Cambra
+    VLF: Vila Nova de Foz Coa
+    VLG: Valongo
+    VLN: Valença
+    VLP: Valpaços
+    VLR: Vila de Rei
+    VLS: Velas
+    VMS: Vimioso
+    VNB: Vila Nova da Barquinha
+    VNC: Vila Nova de Cerveira
+    VND: Vendas Novas
+    VNF: Vila Nova de Famalicão
+    VNG: Vila Nova de Gaia
+    VNH: Vinhais
+    VNO: Ourém
+    VNP: Vila Nova de Paiva
+    VNT: Viana do Alentejo
+    VPA: Vila Pouca de Aguiar
+    VPT: Vila do Porto
+    VPV: Praia da Vitória
+    VRL: Vila Real
+    VRM: Vieira do Minho
+    VRS: Vila Real de Santo António
+    VVC: Vila Viçosa
+    VVD: Vila Verde
+    VVR: Vila Velha de Ródão
+    VZL: Vouzela
+

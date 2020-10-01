@@ -1,26 +1,39 @@
-1.1.90.0  2019-05-24 (PERLANCAR)
+1.1.94.0  2020-09-23  Released-By: PERLANCAR; Urgency: medium
+
+	  - Adjust to Rinci 1.1.94 (recognize function example's
+	    naked_result & env_result properties).
+
+
+1.1.90.1  2020-05-27  Released-By: PERLANCAR; Urgency: low
+
+	  - No functional changes.
+
+	  - Add minimal examples (tests).
+
+
+1.1.90.0  2019-05-24  Released-By: PERLANCAR
 
 	  - Update to Rinci 1.1.90 (resmeta's schema).
 
 
-1.1.88.0  2019-04-15 (PERLANCAR)
+1.1.88.0  2019-04-15  Released-By: PERLANCAR
 
           - Update to Rinci 1.1.88 (function argument spec's 'slurpy' property
             which replaces 'greedy').
 
 
-1.1.87.0  2018-11-29 (PERLANCAR)
+1.1.87.0  2018-11-29  Released-By: PERLANCAR
 
 	  - Update to Rinci 1.1.87 (function argument 'examples' property).
 
 
-1.1.82.3   2018-01-14 (PERLANCAR)
+1.1.82.3   2018-01-14  Released-By: PERLANCAR
 
            - [build] Rebuild with updated DZP:Sah::Schemas to add prereqs to
              Perinci::Sub::XCompletion::* modules.
 
 
-1.1.82.2  2016-12-10 (PERLANCAR)
+1.1.82.2  2016-12-10  Released-By: PERLANCAR
 
           - No functional changes.
 
@@ -28,12 +41,12 @@
             fix typos [RT#119466].
 
 
-1.1.82.1  2016-12-10 (PERLANCAR)
+1.1.82.1  2016-12-10  Released-By: PERLANCAR
 
           - Update to Sah 1.1.82 (introduced argument spec's 'index_completion'
             property).
 
 
-1.1.80.1  2016-07-25 (PERLANCAR)
+1.1.80.1  2016-07-25  Released-By: PERLANCAR
 
           - First release, split from Rinci.

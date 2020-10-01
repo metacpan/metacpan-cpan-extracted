@@ -1,5 +1,5 @@
 package Net::Amazon::S3::HTTPRequest;
-$Net::Amazon::S3::HTTPRequest::VERSION = '0.91';
+$Net::Amazon::S3::HTTPRequest::VERSION = '0.94';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use HTTP::Date;
@@ -88,7 +88,10 @@ sub _build_request {
     my $http_headers = $self->_merge_meta( $headers, $metadata );
     my $uri          = $self->request_uri;
 
-    return HTTP::Request->new( $method, $uri, $http_headers, $content );
+    my $http_request = HTTP::Request->new( $method, $uri, $http_headers, $content );
+	$http_request->content_length (0) unless $http_request->content_length;
+
+	return $http_request;
 }
 
 sub http_request {
@@ -141,7 +144,7 @@ Net::Amazon::S3::HTTPRequest - Create a signed HTTP::Request
 
 =head1 VERSION
 
-version 0.91
+version 0.94
 
 =head1 SYNOPSIS
 
@@ -173,11 +176,11 @@ URI.
 
 =head1 AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

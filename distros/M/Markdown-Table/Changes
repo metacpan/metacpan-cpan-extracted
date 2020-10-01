@@ -1,6 +1,14 @@
 Release history for Markdown::Table
 ===================================
 
+0.03  2020-09-29 17:53:00
+
+  * fix example in synopsis (thanks to Shawn who submitted a bug report by email)
+
+0.02  2020-09-17 10:01:00
+
+  * just another upload
+
 0.01  2020-09-17 09:30:00
 
   * initial release

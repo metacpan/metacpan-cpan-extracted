@@ -31,9 +31,9 @@
          "requires" : {
             "Perinci::Examples" : "0.819",
             "Perinci::Result::Format::Lite" : "0.277",
-            "Perinci::Sub::GetArgs::Argv" : "0.842",
-            "ScriptX" : "0",
-            "ScriptX::Base" : "0",
+            "Perinci::Sub::GetArgs::Argv" : "0.845",
+            "ScriptX" : "0.000004",
+            "ScriptX_Base" : "0",
             "parent" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -60,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-ScriptX-Rinci"
       }
    },
-   "version" : "0.000",
+   "version" : "0.000001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -69,6 +69,11 @@
          {
             "class" : "Dist::Zilla::Plugin::ScriptX",
             "name" : "ScriptX",
+            "version" : "0.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
             "version" : "0.001"
          },
          {
@@ -160,7 +165,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.602"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -229,9 +234,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
@@ -390,7 +395,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::ScriptX",
                         "name" : "-ScriptX",
-                        "version" : "0.002"
+                        "version" : "0.003"
                      }
                   ]
                }

@@ -32,13 +32,12 @@ use Test::More;
 use lib 't';
 use tester;
 
-my $ot = tester->new;
-$ot->tests(20);
+my $ot = tester->new('Tk::DBI::LoginDialog');
+$ot->planned(20);
 
 
 # ---- module ----
-my $c_this = 'Tk::DBI::LoginDialog';
-require_ok($c_this);
+require_ok($ot->this);
 
 
 # ---- globals ----
@@ -50,7 +49,7 @@ my $top = $ot->top;
 # ---- create ----
 my $ld = $top->LoginDialog;
 
-isa_ok($ld, $c_this, "new object");
+isa_ok($ld, $ot->this, "new object");
 
 
 # ---- show version ----

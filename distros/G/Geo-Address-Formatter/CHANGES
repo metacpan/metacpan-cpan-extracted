@@ -1,5 +1,10 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.83   2020-09-27
+       - basic tests for _postformat method
+       - hack for now to not deduplicate "new york, new york"
+       - newest address-formatting templates
+
 1.82   2020-05-19
        - support for determining correct state_code or county_code
          in multiple languages

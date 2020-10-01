@@ -10,6 +10,7 @@ README
 dist.ini
 inc/Test/Run/Builder.pm
 lib/Parallel/ForkManager/Segmented.pm
+scripts/tag-release.pl
 t/00-compile.t
 t/avoid-callback-on-empty-input.t
 t/system-test--process-batch.t

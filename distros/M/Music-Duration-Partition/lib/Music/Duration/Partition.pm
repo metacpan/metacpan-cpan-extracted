@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0514';
+our $VERSION = '0.0515';
 
 use Moo;
 use strictures 2;
@@ -152,7 +152,7 @@ Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0514
+version 0.0515
 
 =head1 SYNOPSIS
 
@@ -161,36 +161,43 @@ version 0.0514
   use Music::Scales;
 
   my $mdp = Music::Duration::Partition->new(
-    size    => 8,
-    pool    => [qw/ qn en sn /],
-    weights => [ 0.2, 0.3, 0.5 ], # Optional
+    size => 8, # 2 measures in 4/4 time
+    pool => [qw(hn dqn qn en)],
   );
 
-  $mdp->pool_select( sub { ... } ); # Optional
+  $mdp->pool_select(sub { ... }); # Optional
 
   my $motif = $mdp->motif;
 
-  my @scale = get_scale_MIDI( 'C', 4, 'major' );
+  my @scale = get_scale_MIDI('C', 4, 'major');
 
   my $score = MIDI::Simple->new_score;
 
-  for my $n ( 0 .. 31 ) { # 4 loops over the motif
-    $score->n( $motif->[$n % @$motif], $scale[int rand @scale] );
+  for my $n (0 .. 31) { # 4 loops over the motif
+    $score->n($motif->[$n % @$motif], $scale[int rand @scale]);
   }
 
   $score->write_score('motif.mid');
 
-  # The size and pool may also be made of MIDI durations
+  # The pool may also be made of MIDI durations
   $mdp = Music::Duration::Partition->new(
-    size => 100,
-    pool => [qw/ d50 d25 /],
+    size    => 100,
+    pool    => [qw(d50 d25)],
+    weights => [0.7, 0.3], # Optional
   );
 
 =head1 DESCRIPTION
 
-C<Music::Duration::Partition> partitions a musical duration into
-rhythmic phrases, given by the B<size>, into smaller durations drawn
-from the B<pool> of possibly weighted durations.
+A C<Music::Duration::Partition> divides a musical duration given by
+B<size>, into rhythmic phrases of smaller durations drawn from the
+B<pool>.
+
+For example, to generate a measure in C<5/4> time, set B<size> equal
+to C<5> and set the B<pool> to an array-reference of L<MIDI::Simple>
+durations whose lengths are less than or equal to C<5> quarter notes.
+
+To generate a measure in C<5/8> time, set B<size> equal to C<2.5>
+(meaning 5 eighth notes).
 
 =head1 ATTRIBUTES
 

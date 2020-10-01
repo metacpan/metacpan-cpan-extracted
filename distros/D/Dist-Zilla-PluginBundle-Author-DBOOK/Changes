@@ -1,3 +1,6 @@
+v1.0.4    2020-09-26 20:38:58 EDT
+  - Update generated CONTRIBUTING.md to reference prereqs files
+
 v1.0.3    2020-06-29 00:10:25 EDT
   - Require [PrereqsFile] version 0.003
 

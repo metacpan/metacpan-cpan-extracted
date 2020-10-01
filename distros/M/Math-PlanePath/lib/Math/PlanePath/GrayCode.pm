@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -27,7 +27,7 @@ use Carp 'croak';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -348,7 +348,6 @@ use constant 1.02 _noop_modular   => undef;
 sub _digits_to_gray_reflected {
   my ($aref, $radix) = @_;
   ### _digits_to_gray(): $aref
-
   $radix -= 1;
   my $reverse = 0;
   foreach my $digit (reverse @$aref) {  # high to low
@@ -361,17 +360,16 @@ sub _digits_to_gray_reflected {
 # $aref->[0] low digit
 sub _digits_to_gray_modular {
   my ($aref, $radix) = @_;
-
-  my $offset = 0;
+  my $prev = 0;
   foreach my $digit (reverse @$aref) {  # high to low
-    $offset += ($digit = ($digit - $offset) % $radix); # mutate $aref->[i]
+    ($digit,$prev) = (($digit - $prev) % $radix,   # mutate $aref->[i]
+                      $digit);
   }
 }
 
 # $aref->[0] low digit
 sub _digits_from_gray_reflected {
   my ($aref, $radix) = @_;
-
   $radix -= 1;                   # radix-1
   my $reverse = 0;
   foreach my $digit (reverse @$aref) {  # high to low
@@ -405,7 +403,7 @@ use Math::PlanePath::ZOrderCurve;
 1;
 __END__
 
-=for stopwords Ryde Math-PlanePath eg Radix radix ie Christos Faloutsos Fs FsT sF pre TsF Peano radices Peano's xk yk OEIS PlanePath undoubled pre-determined
+=for stopwords Ryde Math-PlanePath eg Radix radix ie Christos Faloutsos Fs FsT sF pre TsF Peano radices Peano's xk yk OEIS PlanePath undoubled pre-determined TSE DOI
 
 =head1 NAME
 
@@ -420,8 +418,7 @@ Math::PlanePath::GrayCode -- Gray code coordinates
 
 =head1 DESCRIPTION
 
-X<Gray code>This is a mapping of N to X,Y using Gray
-codes.
+X<Gray code>This path is a mapping of N to X,Y using Gray codes.
 
       7  |  63-62 57-56 39-38 33-32
          |      |  |        |  |
@@ -464,8 +461,8 @@ base 4.
 
 =head2 Radix
 
-The default is binary.  The C<radix =E<gt> $r> option can select another
-radix.  This is used for both the Gray code and the digit splitting.  For
+The default is binary.  Option C<radix =E<gt> $r> can select another radix.
+This radix is used for both the Gray code and the digit splitting.  For
 example C<radix =E<gt> 4>,
 
     radix => 4
@@ -565,8 +562,7 @@ effect is little Z parts in various orientations.
 
 =head2 Gray Type
 
-The C<gray_type> option selects what type of Gray code is used.  The choices
-are
+The C<gray_type> option selects the type of Gray code.  The choices are
 
     "reflected"     increment to radix-1 then decrement (default)
     "modular"       increment to radix-1 then cycle back to 0
@@ -593,17 +589,17 @@ For example in decimal,
       19           10           18
 
 Notice on reaching "19" the reflected type runs the least significant digit
-downwards from 9 to 0, which is a reverse or reflection of the preceding 0
+back down from 9 to 0, which is a reverse or reflection of the preceding 0
 to 9 upwards.  The modular form instead continues to increment that least
 significant digit, wrapping around from 9 to 0.
 
-In binary the modular and reflected forms are the same (see L</Equivalent
+In binary, the modular and reflected forms are the same (see L</Equivalent
 Combinations> below).
 
 There's various other systematic ways to make a Gray code changing a single
 digit successively.  But many ways are implicitly based on a pre-determined
-fixed number of bits or digits, which doesn't suit an unlimited path as
-given here.
+fixed number of bits or digits, which doesn't suit an unlimited path like
+here.
 
 =head2 Equivalent Combinations
 
@@ -619,7 +615,7 @@ Some option combinations are equivalent,
 
     radix>2 even, reflected    TsF==Fs, Ts==FsT
 
-In radix=2 binary the "modular" and "reflected" Gray codes are the same
+In radix=2 binary, the "modular" and "reflected" Gray codes are the same
 because there's only digits 0 and 1 so going forward or backward is the
 same.
 
@@ -631,15 +627,15 @@ unchanged like 021.
 
     integer      Gray
               "reflected"       (written in ternary)
-      000       000
-      001       001
-      002       002
-      010       012
-      011       011
-      012       010
-      020       020
-      021       021
-      022       022
+      000        000
+      001        001
+      002        002
+      010        012
+      011        011
+      012        010
+      020        020
+      021        021
+      022        022
 
 For even radix and reflected Gray code, "TsF" is equivalent to "Fs", and
 also "Ts" equivalent to "FsT".  This arises from the way the reversing
@@ -658,9 +654,9 @@ The net effect for distinct paths is
 
 =head2 Peano Curve
 
-In C<radix =E<gt> 3> and other odd radices the "reflected" Gray type gives
-the Peano curve (see L<Math::PlanePath::PeanoCurve>).  The "reflected"
-encoding is equivalent to Peano's "xk" and "yk" complementing.
+In C<radix =E<gt> 3> and other odd radices, the "reflected" Gray type gives
+the Peano curve (see L<Math::PlanePath::PeanoCurve>).  This is since the
+"reflected" encoding is equivalent to Peano's "xk" and "yk" complementing.
 
 =cut
 
@@ -765,11 +761,14 @@ L<http://oeis.org/A163233> (etc)
       A036554    (N+1)/2 of positions of Right turns
                    being n with odd number of low 0 bits
 
-The turn sequence goes in pairs, so N=1 and N=2 left then N=3 and N=4
+TsF turn sequence goes in pairs, so N=1 and N=2 left then N=3 and N=4
 reverse.  A039963 includes that repetition, A035263 is just one copy of each
 and so is the turn at each pair N=2k and N=2k+1.  There's many sequences
 like A065882 which when taken mod2 equal the "count low 0-bits odd/even"
 which is the same undoubled turn sequence.
+
+    apply_type="Ts", radix=2
+      A309952    X coordinate (XOR bit pairs)
 
     apply_type="sF", radix=2
       A163233    N values by diagonals, same axis start
@@ -794,7 +793,8 @@ Gray code conversions themselves (not directly offered by the PlanePath code
 here) are variously
 
     A003188  binary
-    A014550  binary with values written in binary
+    A014550  binary written in binary
+    A055975    increments
     A006068    inverse, Gray->integer
     A128173  ternary reflected (its own inverse)
     A105530  ternary modular
@@ -802,6 +802,7 @@ here) are variously
     A003100  decimal reflected
     A174025    inverse, Gray->integer
     A098488  decimal modular
+    A226134    inverse, Gray->integer
 
 =head1 SEE ALSO
 
@@ -816,7 +817,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

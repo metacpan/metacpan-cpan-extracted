@@ -32,13 +32,12 @@ use Test::More;
 use lib 't';
 use tester;
 
-my $ot = tester->new;
-$ot->tests(308);
+my $ot = tester->new('Tk::DBI::LoginDialog');
+$ot->planned(308);
 
 
 # ---- module ----
-my $c_this = 'Tk::DBI::LoginDialog';
-require_ok($c_this);
+require_ok($ot->this);
 
 
 # ---- globals ----
@@ -50,7 +49,7 @@ my $top = $ot->top;
 # ---- create ----
 my %field = (dsn => "val_0", username => "val_1", password => "val_2");
 my $ld0 = $top->LoginDialog(%field);
-isa_ok($ld0, $c_this, "new with parms");
+isa_ok($ld0, $ot->this, "new with parms");
 
 
 # ---- destroy some subwidgets ----
@@ -68,7 +67,7 @@ for (keys %field, "error") {
 }
 
 my $ld1 = $top->LoginDialog;
-isa_ok($ld1, $c_this, "new no parms");
+isa_ok($ld1, $ot->this, "new no parms");
 
 
 # ---- test properties of dialog ----

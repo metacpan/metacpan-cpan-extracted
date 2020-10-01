@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2016, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 3;
+plan tests => 5;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,6 +29,42 @@ use MyOEIS;
 
 use Math::PlanePath::Flowsnake;
 my $path = Math::PlanePath::Flowsnake->new;
+
+
+#------------------------------------------------------------------------------
+# A334485 -- X coordinate
+# A334486 -- X coordinate
+#
+#     Y  60 deg
+#   ^ 
+#  /
+# ----> X
+
+MyOEIS::compare_values
+  (anum => 'A334485',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, ($x-$y)/2;
+     }
+     return \@got;
+   });
+
+# ~/OEIS/b334486.txt
+# A334486 -- Y coordinate
+MyOEIS::compare_values
+  (anum => 'A334486',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
@@ -60,7 +96,7 @@ my $path = Math::PlanePath::Flowsnake->new;
 #   *---*              
 #     0, 1, 3, 2, 0, 0, 5, 0, 1
 {
-  my %dxdy_to_dirpn3 = ('2,0' => 0,     #      2   1
+  my %dxdy_to_dir6 = ('2,0' => 0,     #      2   1
                         '1,1' => 1,     #       \ /
                         '-1,1' => 2,    #   3 ---*--- 0
                         '-2,0' => 3,    #       / \
@@ -73,7 +109,7 @@ my $path = Math::PlanePath::Flowsnake->new;
          my @got;
          for (my $n = $path->n_start; @got < $count; $n++) {
            my ($dx,$dy) = $path->n_to_dxdy($n);
-           my $dir = $dxdy_to_dirpn3{"$dx,$dy"};
+           my $dir = $dxdy_to_dir6{"$dx,$dy"};
            die if ! defined $dir;
            push @got, $dir;
          }
@@ -88,7 +124,7 @@ my $path = Math::PlanePath::Flowsnake->new;
          my @got;
          for (my $n = $path->n_start; @got < $count; $n++) {
            my ($dx,$dy) = $path->n_to_dxdy($n);
-           my $dir = $dxdy_to_dirpn3{"$dx,$dy"};
+           my $dir = $dxdy_to_dir6{"$dx,$dy"};
            die if ! defined $dir;
            push @got, $dir % 2;
          }

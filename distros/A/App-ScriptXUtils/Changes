@@ -1,3 +1,8 @@
+0.002   2020-10-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLIs: detect-scriptx-script, dump-scriptx-script.
+
+
 0.001   2019-12-25  Released-By: PERLANCAR
 
         - First release.

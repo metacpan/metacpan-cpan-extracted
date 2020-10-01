@@ -25,8 +25,8 @@ my $meta = {
                         test => { requires => { "Test::More" => 0.92 } },
                       },
   "provides"       => {
-                        "Type::Tiny::XS"       => { file => "lib/Type/Tiny/XS.pm", version => 0.021 },
-                        "Type::Tiny::XS::Util" => { file => "lib/Type/Tiny/XS/Util.pm", version => 0.021 },
+                        "Type::Tiny::XS"       => { file => "lib/Type/Tiny/XS.pm", version => 0.022 },
+                        "Type::Tiny::XS::Util" => { file => "lib/Type/Tiny/XS/Util.pm", version => 0.022 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -42,7 +42,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/project",
                       },
-  "version"        => 0.021,
+  "version"        => 0.022,
   "x_contributors" => [
                         "Graham Knop (HAARG) <haarg\@cpan.org>",
                         "Tomasz Konojacki (XENU) <xenu\@cpan.org>",

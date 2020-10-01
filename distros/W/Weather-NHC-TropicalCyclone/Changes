@@ -1,6 +1,31 @@
 Change Log
 ^^^^^^^^^^
 
+Verzion 0.20
+
+POD fix
+
+Version 0.19
+
+Test fix only, replorted via RT.
+
+Version 0.18
+
+Added:
+
+Weather::NHC::TropicalCyclone::StormTable::get_latest_table - initial
+support for updating the table with what's hosted at NHC.
+
+Weather::NHC::TropicalCyclone::StormTable::get_storm_numbers - get
+list of storm numbers given year, basin.
+
+See POD for more information.
+
+Version 0.17
+
+Added support for NHC storm.history table via the new module,
+Weather::NHC::TropicalCyclone::StormTable.
+
 Version 0.15
 
 Added internal cache for storm and methods to provide constant time

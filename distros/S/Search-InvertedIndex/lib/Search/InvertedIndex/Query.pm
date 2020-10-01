@@ -1,15 +1,15 @@
 package Search::InvertedIndex::Query;
 
-# $RCSfile: Query.pm,v $ $Revision: 1.7 $ $Date: 1999/10/20 16:35:45 $ $Author: snowhare $
-
 use strict;
+use warnings;
+
 use Carp;
 use Class::NamedParms;
 use Class::ParmList;
 use vars qw (@ISA $VERSION);
 
 @ISA     = qw (Class::NamedParms);
-$VERSION = '1.01';
+$VERSION = '1.17';
 
 =head1 NAME
 
@@ -21,10 +21,6 @@ Search::InvertedIndex::Query - A query for an inverted index search.
 
 Provides methods for setting up a search query to be performed 
 by the search engine.
-
-=head1 CHANGES
-
- 1.01 1999.06.30 - Documentation updates
 
 =head2 Public API
 
@@ -109,13 +105,12 @@ sub new {
 
 =head1 COPYRIGHT
 
-Copyright 1999, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and 
-FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
-This software may be copied or redistributed under the same terms as Perl itelf.
+Copyright 1999-2020, Jerilyn Franz and FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>).
+All Rights Reserved.
 
 =head1 AUTHOR
 
-Benjamin Franz
+Jerilyn Franz
 
 =head1 TODO
 

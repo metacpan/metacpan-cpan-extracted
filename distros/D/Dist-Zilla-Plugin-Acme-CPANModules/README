@@ -3,9 +3,9 @@ NAME
     Acme::CPANModules::* distribution
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Dist::Zilla::Plugin::Acme::CPANModules (from Perl distribution
-    Dist-Zilla-Plugin-Acme-CPANModules), released on 2020-03-01.
+    Dist-Zilla-Plugin-Acme-CPANModules), released on 2020-07-21.
 
 SYNOPSIS
     In dist.ini:
@@ -14,7 +14,9 @@ SYNOPSIS
 
 DESCRIPTION
     This plugin is to be used when building "Acme::CPANModules::*"
-    distribution. It currently does the following:
+    distribution. It currently does the following.
+
+    For each Acme/CPANModules/*.pm file:
 
     *   Abort the build if there are no entries in $LIST
 
@@ -22,6 +24,8 @@ DESCRIPTION
 
     *   Add prereq to the mentioned modules (phase=x_mentions,
         relationship=x_mentions)
+
+    For each Acme/CPANModulesBundle/*.pm file:
 
 HOMEPAGE
     Please visit the project's homepage at

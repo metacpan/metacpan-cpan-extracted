@@ -10,6 +10,9 @@ use File::Slurper qw(read_text);
 use lib "$Bin/../../Gtk3-WebKit2/lib";
 use URI;
 
+#Running tests as root will sometimes spawn an X11 that cannot be closed automatically and leave the test hanging
+plan skip_all => 'Tests run as root may hang due to X11 server not closing.' unless $>;
+
 use_ok 'WWW::WebKit2';
 
 my $webkit = WWW::WebKit2->new(xvfb => 1);
@@ -30,12 +33,12 @@ ok(1, 'opened');
 eval {
     $webkit->eval_js(<<"JS");
        var foo = function() {};
-       foo.bar = function() {};
+       retun foo.bar = function() {};
 JS
 };
 like $@, qr/Unexpected return value/, 'eval_js dies with more useful error message';
 
-my $js = $webkit->run_javascript('document.title');
+my $js = $webkit->run_javascript('return document.title');
 is($js, 'test', 'document.title is test');
 
 my $html_source = $webkit->get_html_source();
@@ -52,7 +55,7 @@ is($text, "Testlink", "get_text works");
 
 my $evaluated_js = $webkit->eval_js(
     'document.body.style.height = "400px";
-    document.body.offsetHeight'
+    return document.body.offsetHeight'
 );
 ok($evaluated_js == 400, "we can calculated with returned value");
 is($evaluated_js, 400, "eval_js works");

@@ -1,3 +1,11 @@
+0.003   2020-07-21  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Only process Acme::CPANModules::* module files, not e.g.
+	  Acme::CPANModulesBundle::* files (for now).
+
+	- Add debug logging statement.
+
+
 0.002   2020-03-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Abort the build if there are no entries in $LIST.

@@ -25,6 +25,7 @@ my $meta = {
                                                        "JSON::MaybeXS" => 0,
                                                        "perl" => "5.014000",
                                                        "PerlX::Maybe::XS" => 0,
+                                                       "Type::Tiny::XS" => 0.021,
                                                      },
                                        requires   => {
                                                        "Import::Into"           => 0,
@@ -37,6 +38,7 @@ my $meta = {
                                                        "perl"                   => 5.008008,
                                                        "Syntax::Keyword::Try"   => 0.018,
                                                        "Try::Tiny"              => "0.30",
+                                                       "Type::Tie"              => 0,
                                                        "Types::Common::Numeric" => 0,
                                                        "Types::Common::String"  => 0,
                                                        "Types::Path::Tiny"      => 0,
@@ -46,7 +48,7 @@ my $meta = {
                                      },
                         test      => { requires => { "Test::More" => 0.96 } },
                       },
-  "provides"       => { Z => { file => "lib/Z.pm", version => 0.005 } },
+  "provides"       => { Z => { file => "lib/Z.pm", version => 0.007 } },
   "release_status" => "stable",
   "resources"      => {
                         bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Z" },
@@ -59,7 +61,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Z/project",
                       },
-  "version"        => 0.005,
+  "version"        => 0.007,
 };
 
 my %dynamic_config;

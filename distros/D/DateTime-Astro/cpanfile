@@ -8,9 +8,6 @@ on configure => sub {
 
 on test => sub {
     requires 'Test::Exception';
-};
-
-on develop => sub {
     requires 'Test::Requires';
     requires 'JSON';
 };

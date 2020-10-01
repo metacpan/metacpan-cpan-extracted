@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,7 +23,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 @ISA = ('Math::PlanePath');
@@ -45,13 +45,13 @@ use constant dx_maximum => 1;
 use constant dy_minimum => -1;
 use constant dy_maximum => 1;
 
-use constant _UNDOCUMENTED__dxdy_list => (1,0,   # E    four plus
-                           0,1,   # N    NW and SE
-                           -1,1,  # NW
-                           -1,0,  # W
-                           0,-1,  # S
-                           1,-1,  # SE
-                          );
+use constant 1.02 _UNDOCUMENTED__dxdy_list => (1,0,   # E    four plus
+                                               0,1,   # N    NW and SE
+                                               -1,1,  # NW
+                                               -1,0,  # W
+                                               0,-1,  # S
+                                               1,-1,  # SE
+                                              );
 *x_negative_at_n = \&Math::PlanePath::HexSpiral::x_negative_at_n;
 *y_negative_at_n
   = \&Math::PlanePath::HexSpiral::y_negative_at_n;
@@ -433,7 +433,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

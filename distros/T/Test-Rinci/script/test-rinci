@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-06-13'; # DATE
-our $VERSION = '0.154'; # VERSION
+our $DATE = '2020-09-23'; # DATE
+our $VERSION = '0.155'; # VERSION
 
 use 5.010;
 use strict;
@@ -48,7 +48,7 @@ test-rinci - Test Rinci metadata in all dist's modules
 
 =head1 VERSION
 
-This document describes version 0.154 of test-rinci (from Perl distribution Test-Rinci), released on 2020-06-13.
+This document describes version 0.155 of test-rinci (from Perl distribution Test-Rinci), released on 2020-09-23.
 
 =head1 SYNOPSIS
 

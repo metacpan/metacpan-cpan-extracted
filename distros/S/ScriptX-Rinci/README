@@ -2,8 +2,8 @@ NAME
     ScriptX::Rinci - Run Rinci function
 
 VERSION
-    This document describes version 0.000 of ScriptX::Rinci (from Perl
-    distribution ScriptX-Rinci), released on 2020-09-03.
+    This document describes version 0.000001 of ScriptX::Rinci (from Perl
+    distribution ScriptX-Rinci), released on 2020-10-01.
 
 SYNOPSIS
      use ScriptX 'Rinci' => {

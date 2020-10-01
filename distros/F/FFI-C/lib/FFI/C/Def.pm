@@ -12,7 +12,7 @@ use Sub::Util ();
 our @CARP_NOT = qw( FFI::C );
 
 # ABSTRACT: Data definition for FFI
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub new
@@ -325,7 +325,7 @@ FFI::C::Def - Data definition for FFI
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -496,6 +496,10 @@ Creates an instance of the def.
 =item L<FFI::C::ArrayDef>
 
 =item L<FFI::C::Def>
+
+=item L<FFI::C::File>
+
+=item L<FFI::C::PosixFile>
 
 =item L<FFI::C::Struct>
 

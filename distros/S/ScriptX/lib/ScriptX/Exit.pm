@@ -3,9 +3,9 @@
 package ScriptX::Exit;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-03'; # DATE
+our $DATE = '2020-10-01'; # DATE
 our $DIST = 'ScriptX'; # DIST
-our $VERSION = '0.000001'; # VERSION
+our $VERSION = '0.000004'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -13,7 +13,7 @@ our $VERSION = '0.000001'; # VERSION
 # END IFUNBUILT
 use Log::ger;
 
-use parent 'ScriptX::Base';
+use parent 'ScriptX_Base';
 require ScriptX;
 
 sub meta {
@@ -89,7 +89,7 @@ ScriptX::Exit - exit() early
 
 =head1 VERSION
 
-This document describes version 0.000001 of ScriptX::Exit (from Perl distribution ScriptX), released on 2020-09-03.
+This document describes version 0.000004 of ScriptX::Exit (from Perl distribution ScriptX), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ This document describes version 0.000001 of ScriptX::Exit (from Perl distributio
 
 =head1 DESCRIPTION
 
-=head1 CONFIGURATION
+=head1 SCRIPTX PLUGIN CONFIGURATION
 
 =head2 after
 

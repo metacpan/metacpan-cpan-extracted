@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -33,7 +33,7 @@ use Carp 'croak';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_sqrtint = \&Math::PlanePath::_sqrtint;
@@ -464,7 +464,7 @@ sub rect_to_n_range {
 1;
 __END__
 
-=for stopwords pronic PlanePath Ryde Math-PlanePath ie Pentagonals onwards factorizations OEIS
+=for stopwords pronic PlanePath Ryde Math-PlanePath ie Pentagonals onwards OEIS factorizations factorize generalized
 
 =head1 NAME
 
@@ -482,11 +482,11 @@ This path arranges points in successively wider rows going upwards so as to
 form an upside-down pyramid.  The default step is 2, ie. each row 2 wider
 than the preceding, an extra point at the left and the right,
 
-    17  18  19  20  21  22  23  24  25         4
-        10  11  12  13  14  15  16             3
-             5   6   7   8   9                 2
-                 2   3   4                     1
-                     1                   <-  Y=0
+    17  18  19  20  21  22  23  24  25       4
+        10  11  12  13  14  15  16           3     step => 2
+             5   6   7   8   9               2
+                 2   3   4                   1
+                     1                  <- Y=0
 
     -4  -3  -2  -1  X=0  1   2   3   4 ...
 
@@ -507,46 +507,43 @@ to make wider pyramids.  For example step 4
 
 makes each row 2 wider on each side successively
 
-   29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45        4
-         16 17 18 19 20 21 22 23 24 25 26 27 28              3
-                7  8  9 10 11 12 13 14 15                    2
-                      2  3  4  5  6                          1
-                            1                          <-  Y=0
+   29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45      4
+         16 17 18 19 20 21 22 23 24 25 26 27 28            3
+                7  8  9 10 11 12 13 14 15                  2
+                      2  3  4  5  6                        1
+                            1                        <-  Y=0
 
          -6 -5 -4 -3 -2 -1 X=0 1  2  3  4  5  6 ...
 
 If the step is an odd number then the extra is at the right, so step 3 gives
 
-    13  14  15  16  17  18  19  20  21  22        3
-         6   7   8   9  10  11  12                2
-             2   3   4   5                        1
-                 1                          <-  Y=0
+    13  14  15  16  17  18  19  20  21  22       3
+         6   7   8   9  10  11  12               2
+             2   3   4   5                       1
+                 1                         <-  Y=0
 
     -3  -2  -1  X=0  1   2   3   4 ...
 
 Or step 1 goes solely to the right.  This is equivalent to the Diagonals
 path, but columns shifted up to make horizontal rows.
 
-    step => 1
-
-    11  12  13  14  15                4
-     7   8   9  10                    3
-     4   5   6                        2
-     2   3                            1
-     1                          <-  Y=0
+    11  12  13  14  15         4
+     7   8   9  10             3       step => 1
+     4   5   6                 2
+     2   3                     1
+     1                   <-  Y=0
 
     X=0  1   2   3   4 ...
 
 Step 0 means simply a vertical, each row 1 wide and not increasing.  This is
-unlikely to be much use.  The Rows path with C<width> 1 does this too.
+consistent but unlikely to be much use.  The Rows path with C<width> 1 does
+this too.
 
-    step => 0
-
-     5        4
-     4        3
-     3        2
-     2        1
-     1    <-y=0
+     5         4
+     4         3     step => 0
+     3         2
+     2         1
+     1    <- Y=0
 
     X=0
 
@@ -615,10 +612,10 @@ example to start at 0,
 
     n_start => 0
 
-    16 17 18 19 20 21 22 23 24        4 
-        9 10 11 12 13 14 15           3 
-           4  5  6  7  8              2 
-              1  2  3                 1 
+    16 17 18 19 20 21 22 23 24        4
+        9 10 11 12 13 14 15           3
+           4  5  6  7  8              2
+              1  2  3                 1
                  0                <- Y=0
     --------------------------
     -4 -3 -2 -1 X=0 1  2  3  4
@@ -871,7 +868,7 @@ L<http://oeis.org/A023531> (etc)
       A053615    abs(X-Y), runs k..0..k
     step=2, align=left, n_start=0
       A005563    N on Y axis, Y*(Y+2)
-    
+
     step=3
       A180447    Y coordinate, n appears 3n+1 times
       A104249    N on Y axis, Y*(3Y+1)/2+1
@@ -926,7 +923,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

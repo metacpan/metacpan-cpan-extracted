@@ -32,13 +32,12 @@ use Test::More;
 use lib 't';
 use tester;
 
-my $ot = tester->new;
-$ot->tests(21);
+my $ot = tester->new('Tk::DBI::LoginDialog');
+$ot->planned(21);
 
 
 # ---- module ----
-my $c_this = 'Tk::DBI::LoginDialog';
-require_ok($c_this);
+require_ok($ot->this);
 
 
 # ---- constants ----
@@ -54,7 +53,7 @@ my $top = $ot->top;
 # ---- create ----
 my $tld = $top->LoginDialog;
 
-isa_ok($tld, $c_this,	"new object");
+isa_ok($tld, $ot->this,	"new object");
 
 isnt("", $tld->driver,	"default dsn_label");
 

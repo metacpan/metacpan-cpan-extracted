@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -22,7 +22,7 @@ use 5.004;
 use strict;
 use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 17;
+plan tests => 19;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -44,6 +44,35 @@ sub right_boundary {
 }
 use Memoize;
 Memoize::memoize('right_boundary');
+
+
+#------------------------------------------------------------------------------
+# A332251 -- X coordinate
+
+MyOEIS::compare_values
+  (anum => 'A332251',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+     }
+     return \@got;
+   });
+
+# A332252 -- Y coordinate
+MyOEIS::compare_values
+  (anum => 'A332252',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
@@ -245,7 +274,7 @@ foreach my $elem ([0, 'A038503', 0],
 
 MyOEIS::compare_values
   (anum => 'A000120',
-   fixup => sub {
+   fixup => sub {         # mangle to mod 4
      my ($bvalues) = @_;
      @$bvalues = map {$_ % 4} @$bvalues;
    },
@@ -267,7 +296,7 @@ MyOEIS::compare_values
 
 MyOEIS::compare_values
   (anum => 'A007814',
-   fixup => sub {
+   fixup => sub {           # mangle to mod 4
      my ($bvalues) = @_;
      @$bvalues = map {$_ % 4} @$bvalues;
    },

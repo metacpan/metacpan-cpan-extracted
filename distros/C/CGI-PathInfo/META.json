@@ -1,0 +1,62 @@
+{
+   "abstract" : "A lightweight CGI processing package for using CGI PATH_INFO as if it were GET method form parameters",
+   "author" : [
+      "Jerilyn Franz <cpan@jerilyn.info>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-PathInfo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTML::Entities" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTML::Entities" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CGI::PathInfo" : {
+         "file" : "lib/CGI/PathInfo.pm",
+         "version" : "1.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JerilynFranz/perl-CGI-PathInfo/issues"
+      },
+      "homepage" : "https://github.com/JerilynFranz/perl-CGI-PathInfo",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JerilynFranz/perl-CGI-PathInfo.git",
+         "web" : "https://github.com/JerilynFranz/perl-CGI-PathInfo"
+      }
+   },
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

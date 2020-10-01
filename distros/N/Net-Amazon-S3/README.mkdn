@@ -4,7 +4,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 # VERSION
 
-version 0.91
+version 0.94
 
 # SYNOPSIS
 
@@ -109,7 +109,7 @@ stored in values. Values are referenced by keys, and keys are stored
 in buckets. Bucket names are global.
 
 Note: This is the legacy interface, please check out
-[Net::Amazon::S3::Client](https://metacpan.org/pod/Net::Amazon::S3::Client) instead.
+[Net::Amazon::S3::Client](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AClient) instead.
 
 Development of this code happens here: https://github.com/rustyconover/net-amazon-s3
 
@@ -125,12 +125,12 @@ Create a new S3 client object. Takes some arguments:
 
     See one of available implementations for more
 
-    - [Net::Amazon::S3::Authorization::Basic](https://metacpan.org/pod/Net::Amazon::S3::Authorization::Basic)
-    - [Net::Amazon::S3::Authorization::IAM](https://metacpan.org/pod/Net::Amazon::S3::Authorization::IAM)
+    - [Net::Amazon::S3::Authorization::Basic](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AAuthorization%3A%3ABasic)
+    - [Net::Amazon::S3::Authorization::IAM](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AAuthorization%3A%3AIAM)
 
 - vendor
 
-    Instance of [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net::Amazon::S3::Vendor) holding vendor specific deviations.
+    Instance of [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AVendor) holding vendor specific deviations.
 
     S3 became widely used object storage protocol with many vendors providing
     different feature sets and different compatibility level.
@@ -141,8 +141,8 @@ Create a new S3 client object. Takes some arguments:
     may rise in feature it's better to hold vendor specification in dedicated
     classes. This also allows users to build their own fine-tuned vendor classes.
 
-    - [Net::Amazon::S3::Vendor::Amazon](https://metacpan.org/pod/Net::Amazon::S3::Vendor::Amazon)
-    - [Net::Amazon::S3::Vendor::Generic](https://metacpan.org/pod/Net::Amazon::S3::Vendor::Generic)
+    - [Net::Amazon::S3::Vendor::Amazon](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AVendor%3A%3AAmazon)
+    - [Net::Amazon::S3::Vendor::Generic](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AVendor%3A%3AGeneric)
 
 - aws\_access\_key\_id
 
@@ -197,7 +197,7 @@ Create a new S3 client object. Takes some arguments:
 
     To use SSL-encrypted connections, LWP::Protocol::https is required.
 
-    See [#vendor](https://metacpan.org/pod/#vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net::Amazon::S3::Vendor).
+    See [#vendor](https://metacpan.org/pod/%23vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AVendor).
 
 - keep\_alive\_cache\_size
 
@@ -221,7 +221,7 @@ Create a new S3 client object. Takes some arguments:
     The S3 host endpoint to use. Defaults to 's3.amazonaws.com'. This allows
     you to connect to any S3-compatible host.
 
-    See [#vendor](https://metacpan.org/pod/#vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net::Amazon::S3::Vendor).
+    See [#vendor](https://metacpan.org/pod/%23vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AVendor).
 
 - use\_virtual\_host
 
@@ -232,7 +232,7 @@ Create a new S3 client object. Takes some arguments:
     buckets not located in the US-Standard region (such as EU, Asia Pacific or South America).
     See [http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html](http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html) for the pros and cons.
 
-    See [#vendor](https://metacpan.org/pod/#vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net::Amazon::S3::Vendor).
+    See [#vendor](https://metacpan.org/pod/%23vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AVendor).
 
 - authorization\_method
 
@@ -240,18 +240,29 @@ Create a new S3 client object. Takes some arguments:
 
     Authorization implementation package name.
 
-    This library provides [Net::Amazon::S3::Signature::V2](https://metacpan.org/pod/Net::Amazon::S3::Signature::V2) and [Net::Amazon::S3::Signature::V4](https://metacpan.org/pod/Net::Amazon::S3::Signature::V4)
+    This library provides [Net::Amazon::S3::Signature::V2](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3ASignature%3A%3AV2) and [Net::Amazon::S3::Signature::V4](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3ASignature%3A%3AV4)
 
     Default is Signature 4 if host is `s3.amazonaws.com`, Signature 2 otherwise
 
-    See [#vendor](https://metacpan.org/pod/#vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net::Amazon::S3::Vendor).
+    See [#vendor](https://metacpan.org/pod/%23vendor) and [Net::Amazon::S3::Vendor](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AVendor).
+
+- error\_handler\_class
+
+    Error handler class name (package name), see [Net::Amazon::S3::Error::Handler](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AError%3A%3AHandler)
+    for more.
+
+    Default: [Net::Amazon::S3::Error::Handler::Legacy](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AError%3A%3AHandler%3A%3ALegacy)
+
+- error\_handler
+
+    Instance of error handler class.
 
 ### Notes
 
-When using [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3) in child processes using fork (such as in
-combination with the excellent [Parallel::ForkManager](https://metacpan.org/pod/Parallel::ForkManager)) you should create the
+When using [Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3) in child processes using fork (such as in
+combination with the excellent [Parallel::ForkManager](https://metacpan.org/pod/Parallel%3A%3AForkManager)) you should create the
 S3 object in each child, use a fresh LWP::UserAgent in each child, or disable
-the [LWP::ConnCache](https://metacpan.org/pod/LWP::ConnCache) in the parent:
+the [LWP::ConnCache](https://metacpan.org/pod/LWP%3A%3AConnCache) in the parent:
 
     $s3->ua( LWP::UserAgent->new( 
         keep_alive => 0, requests_redirectable => [qw'GET HEAD DELETE PUT POST'] );
@@ -268,11 +279,23 @@ Takes a hashref:
 
     The name of the bucket you want to add
 
-- acl\_short (optional)
+- acl
 
-    See the set\_acl subroutine for documentation on the acl\_short options
+            acl => 'private'
 
-- location\_constraint (option)
+            acl => Net::Amazon::S3::ACL::Canned->PRIVATE
+
+            acl => Net::Amazon::S3::ACL::Set
+                    ->grant_read (email => 'foo@bar.baz')
+
+    Set ACL for newly created bucket. Refer [Net::Amazon::S3::ACL](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AACL).
+
+- acl\_short (optional; deprecated)
+
+    Deprecated. Use `acl` now.
+
+- region (optional)
+- location\_constraint (optional)
 
     Sets the location constraint of the new bucket. If left unspecified, the
     default S3 datacenter location will be used. Otherwise, you can set it
@@ -288,7 +311,7 @@ Returns an (unverified) bucket object from an account. Does no network access.
 
 ## delete\_bucket
 
-Takes either a [Net::Amazon::S3::Bucket](https://metacpan.org/pod/Net::Amazon::S3::Bucket) object or a hashref containing
+Takes either a [Net::Amazon::S3::Bucket](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3ABucket) object or a hashref containing
 
 - bucket
 
@@ -442,6 +465,21 @@ DEPRECATED. DO NOT USE
 
 DEPRECATED. DO NOT USE
 
+## \_perform\_operation
+
+    my $response = $s3->_perform_operation ('Operation' => (
+        # ... operation request parameters
+    ));
+
+Internal operation implementation method, takes request construction parameters,
+performs necessary HTTP requests(s) and returns Response instance.
+
+Method takes same named parameters as realted Request class.
+
+Method provides available contextual parameters by default (eg s3, bucket)
+
+Method invokes contextual error handler.
+
 # LICENSE
 
 This module contains code modified from Amazon that contains the
@@ -486,15 +524,15 @@ Pedro Figueiredo <me@pedrofigueiredo.org> - since 0.54
 
 # SEE ALSO
 
-[Net::Amazon::S3::Bucket](https://metacpan.org/pod/Net::Amazon::S3::Bucket)
+[Net::Amazon::S3::Bucket](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3ABucket)
 
 # AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

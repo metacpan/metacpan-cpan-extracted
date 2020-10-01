@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -30,7 +30,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -114,112 +114,107 @@ sub new {
   return $self;
 }
 
+{
+  #                        <------
+  #  state=0   /|        +----+----+
+  #  (dir=0)  / |        |\ 1||<--/
+  #          /2 |        |^\ || 0/
+  #         /-->|        || \v| /
+  #        +----+        ||3 \|/
+  #       /|\ 3||        +----+
+  #      / |^\ ||        |<--/   state=4
+  #     / 0|| \v|        | 2/    (dir=2)
+  #    /-->||1 \|        | /
+  #   +----+----+        |/
+  #    -------->
+  #
+  #   |\    state=8      +----+----+   state=12
+  # ^ |^\   (dir=1)       \ 1||<--/| |  (dir=3)
+  # | || \                 \ || 0/ | |
+  # | ||3 \                 \v| /2 | |
+  # | +----+                 \|/-->| |
+  # | |<--/|\                 +----+ |
+  # | | 2/ |^\                 \ 3|| |
+  # | | /0 || \                 \ || |
+  # | |/-->||1 \                 \v| v
+  #   +----+----+                 \|
 
-# state=0  /|         +----+----+
-#         / |         |\ 1||<--/
-#        /2 |         |^\ || 0/
-#       /-->|         || \v| /
-#      +----+         ||3 \|/
-#     /|\ 3||         +----+
-#    / |^\ ||         |<--/   state=4
-#   / 0|| \v|         | 2/
-#  /-->||1 \|         | /
-# +----+----+         |/
-#
-# |\  state=8         +----+----+  state=12
-# |^\                  \ 1||<--/|
-# || \                  \ || 0/ |
-# ||3 \                  \v| /2 |
-# +----+                  \|/-->|
-# |<--/|\                  +----+
-# | 2/ |^\                  \ 3||
-# | /0 || \                  \ ||
-# |/-->||1 \                  \v|
-# +----+----+                  \|
+  my @next_state = (0,  8, 0, 12,   # forward
+                    4, 12, 4,  8,   # forward NW
+                    0,  8, 4,  8,   # reverse
+                    4, 12, 0, 12,   # reverse NE
+                   );
+  my @digit_to_x = (0,1,1,1,
+                    1,0,0,0,
+                    0,1,0,0,
+                    1,0,1,1,
+                   );
+  my @digit_to_y = (0,0,1,0,
+                    1,1,0,1,
+                    0,0,0,1,
+                    1,1,1,0,
+                   );
 
-my @next_state = (0,  8, 0, 12,   # forward
-                  4, 12, 4,  8,   # forward NW
-                  0,  8, 4,  8,   # reverse
-                  4, 12, 0, 12,   # reverse NE
-                 );
-my @digit_to_x = (0,1,1,1,
-                  1,0,0,0,
-                  0,1,0,0,
-                  1,0,1,1,
-                 );
-my @digit_to_y = (0,0,1,0,
-                  1,1,0,1,
-                  0,0,0,1,
-                  1,1,1,0,
-                 );
+  # state_to_dx[S] == state_to_x[S+3] - state_to_x[S+0]
+  my @state_to_dx = (1, -1, 0, 0);
+  my @state_to_dy = (0, 0, 1, -1);
 
-# state_to_dx[S] == state_to_x[S+3] - state_to_x[S+0]
-my @state_to_dx = (1, undef,undef,undef,
-                   -1, undef,undef,undef,
-                   0, undef,undef,undef,
-                   0, undef,undef,undef,
-                  );
-my @state_to_dy = (0, undef,undef,undef,
-                   0, undef,undef,undef,
-                   1, undef,undef,undef,
-                   -1, undef,undef,undef,
-                  );
+  sub n_to_xy {
+    my ($self, $n) = @_;
+    ### AlternatePaper n_to_xy(): $n
 
-sub n_to_xy {
-  my ($self, $n) = @_;
-  ### AlternatePaper n_to_xy(): $n
+    if ($n < 0) { return; }
+    if (is_infinite($n)) { return ($n, $n); }
 
-  if ($n < 0) { return; }
-  if (is_infinite($n)) { return ($n, $n); }
+    my $int = int($n);  # integer part
+    $n -= $int;         # fraction part
+    ### $int
+    ### $n
 
-  my $int = int($n);  # integer part
-  $n -= $int;         # fraction part
-  ### $int
-  ### $n
+    my $zero = ($int * 0);  # inherit bignum 0
+    my $arm = _divrem_mutate ($int, $self->{'arms'});
 
-  my $zero = ($int * 0);  # inherit bignum 0
-  my $arm = _divrem_mutate ($int, $self->{'arms'});
+    ### $arm
+    ### $int
 
-  ### $arm
-  ### $int
+    my @digits = digit_split_lowtohigh($int,4);
+    my $state = 0;
+    my (@xbits,@ybits); # bits low to high (like @digits)
 
-  my @digits = digit_split_lowtohigh($int,4);
-  my $state = 0;
-  my (@xbits,@ybits); # bits low to high (like @digits)
+    foreach my $i (reverse 0 .. $#digits) {  # high to low
+      $state += $digits[$i];
+      $xbits[$i] = $digit_to_x[$state];
+      $ybits[$i] = $digit_to_y[$state];
+      $state = $next_state[$state];
+    }
+    my $x = digit_join_lowtohigh(\@xbits,2,$zero);
+    my $y = digit_join_lowtohigh(\@ybits,2,$zero);
 
-  foreach my $i (reverse 0 .. $#digits) {  # high to low
-    $state += $digits[$i];
-    $xbits[$i] = $digit_to_x[$state];
-    $ybits[$i] = $digit_to_y[$state];
-    $state = $next_state[$state];
+    # X+1,Y+1 for final state=4 or state=12
+    $x += $digit_to_x[$state];
+    $y += $digit_to_y[$state];
+
+    ### final: "xy=$x,$y state=$state"
+
+    # apply possible fraction part of $n in direction of $state
+    $x = $n * $state_to_dx[$state >>= 2] + $x;
+    $y = $n * $state_to_dy[$state] + $y;
+
+    # rotate,transpose for arm number
+    if ($arm & 1) {
+      ($x,$y) = ($y,$x);   # transpose
+    }
+    if ($arm & 2) {
+      ($x,$y) = (-$y,$x+1);  # rotate +90 and shift origin to X=0,Y=1
+    }
+    if ($arm & 4) {
+      $x = -1 - $x;      # rotate +180 and shift origin to X=-1,Y=1
+      $y = 1 - $y;
+    }
+
+    ### rotated return: "$x,$y"
+    return ($x,$y);
   }
-  my $x = digit_join_lowtohigh(\@xbits,2,$zero);
-  my $y = digit_join_lowtohigh(\@ybits,2,$zero);
-
-  # X+1,Y+1 for final state=4 or state=12
-  $x += $digit_to_x[$state];
-  $y += $digit_to_y[$state];
-
-  ### final: "xy=$x,$y state=$state"
-
-  # apply possible fraction part of $n in direction of $state
-  $x = $n * $state_to_dx[$state] + $x;
-  $y = $n * $state_to_dy[$state] + $y;
-
-  # rotate,transpose for arm number
-  if ($arm & 1) {
-    ($x,$y) = ($y,$x);   # transpose
-  }
-  if ($arm & 2) {
-    ($x,$y) = (-$y,$x+1);  # rotate +90 and shift origin to X=0,Y=1
-  }
-  if ($arm & 4) {
-    $x = -1 - $x;      # rotate +180 and shift origin to X=-1,Y=1
-    $y = 1 - $y;
-  }
-
-  ### rotated return: "$x,$y"
-  return ($x,$y);
 }
 
 #                                                      8
@@ -474,6 +469,8 @@ sub n_to_dxdy {
   my ($self, $n) = @_;
   ### n_to_dxdy(): $n
 
+  if ($n < 0) { return; }
+  if (is_infinite($n)) { return ($n,$n); }
   my $int = int($n);
   $n -= $int;  # $n fraction part
   ### $int
@@ -879,168 +876,7 @@ __END__
 
 #------------------------------------------------------------------------------
 
-
-# Old code with explicit rotation etc rather than state table.
-#
-# my @dir4_to_dx = (1,0,-1,0);
-# my @dir4_to_dy = (0,1,0,-1);
-#
-# my @arm_to_x = (0,0, 0,0, -1,-1, -1,-1);
-# my @arm_to_y = (0,0, 1,1,   1,1,  0,0);
-#
-# sub XXn_to_xy {
-#   my ($self, $n) = @_;
-#   ### AlternatePaper n_to_xy(): $n
-#
-#   if ($n < 0) { return; }
-#   if (is_infinite($n)) { return ($n, $n); }
-#
-#   my $frac;
-#   {
-#     my $int = int($n);
-#     $frac = $n - $int;  # inherit possible BigFloat
-#     $n = $int;          # BigFloat int() gives BigInt, use that
-#   }
-#   ### $frac
-#
-#   my $zero = ($n * 0);  # inherit bignum 0
-#
-#   my $arm = _divrem_mutate ($n, $self->{'arms'});
-#
-#   my @bits = bit_split_lowtohigh($n);
-#   if (scalar(@bits) & 1) {
-#     push @bits, 0;  # extra high to make even
-#   }
-#
-#   my @sx;
-#   my @sy;
-#   {
-#     my $sy = $zero;   # inherit BigInt
-#     my $sx = $sy + 1; # inherit BigInt
-#     ### $sx
-#     ### $sy
-#
-#     foreach (1 .. scalar(@bits)/2) {
-#       push @sx, $sx;
-#       push @sy, $sy;
-#
-#       # (sx,sy) + rot+90(sx,sy)
-#       ($sx,$sy) = ($sx - $sy,
-#                    $sy + $sx);
-#
-#       push @sx, $sx;
-#       push @sy, $sy;
-#
-#       # (sx,sy) + rot-90(sx,sy)
-#       ($sx,$sy) = ($sx + $sy,
-#                    $sy - $sx);
-#     }
-#   }
-#
-#   ### @bits
-#   ### @sx
-#   ### @sy
-#   ### assert: scalar(@sx) == scalar(@bits)
-#
-#   my $rot = int($arm/2);  # arm to initial rotation
-#   my $rev = 0;
-#   my $x = $zero;
-#   my $y = $zero;
-#   while (@bits) {
-#     {
-#       my $bit = pop @bits;   # high to low
-#       my $sx = pop @sx;
-#       my $sy = pop @sy;
-#       ### at: "$x,$y  $bit   side $sx,$sy"
-#       ### $rot
-#
-#       if ($rot & 2) {
-#         ($sx,$sy) = (-$sx,-$sy);
-#       }
-#       if ($rot & 1) {
-#         ($sx,$sy) = (-$sy,$sx);
-#       }
-#
-#       if ($rev) {
-#         if ($bit) {
-#           $x -= $sy;
-#           $y += $sx;
-#           ### rev add to: "$x,$y next is still rev"
-#         } else {
-#           $rot ++;
-#           $rev = 0;
-#         }
-#       } else {
-#         if ($bit) {
-#           $rot ++;
-#           $x += $sx;
-#           $y += $sy;
-#           $rev = 1;
-#           ### add to: "$x,$y next is rev"
-#         }
-#       }
-#     }
-#
-#     @bits || last;
-#
-#     {
-#       my $bit = pop @bits;
-#       my $sx = pop @sx;
-#       my $sy = pop @sy;
-#       ### at: "$x,$y  $bit   side $sx,$sy"
-#       ### $rot
-#
-#       if ($rot & 2) {
-#         ($sx,$sy) = (-$sx,-$sy);
-#       }
-#       if ($rot & 1) {
-#         ($sx,$sy) = (-$sy,$sx);
-#       }
-#
-#       if ($rev) {
-#         if ($bit) {
-#           $x += $sy;
-#           $y -= $sx;
-#           ### rev add to: "$x,$y next is still rev"
-#         } else {
-#           $rot --;
-#           $rev = 0;
-#         }
-#       } else {
-#         if ($bit) {
-#           $rot --;
-#           $x += $sx;
-#           $y += $sy;
-#           $rev = 1;
-#           ### add to: "$x,$y next is rev"
-#         }
-#       }
-#     }
-#   }
-#
-#   ### $rot
-#   ### $rev
-#
-#   if ($rev) {
-#     $rot += 2;
-#     ### rev change rot to: $rot
-#   }
-#
-#   if ($arm & 1) {
-#     ($x,$y) = ($y,$x);  # odd arms transpose
-#   }
-#
-#   $rot &= 3;
-#   $x = $frac * $dir4_to_dx[$rot] + $x + $arm_to_x[$arm];
-#   $y = $frac * $dir4_to_dy[$rot] + $y + $arm_to_y[$arm];
-#
-#   ### final: "$x,$y"
-#   return ($x,$y);
-# }
-
-
-
-=for :stopwords eg Ryde Math-PlanePath Nlevel et al vertices doublings OEIS Online DragonCurve ZOrderCurve 0xAA..AA Golay-Rudin-Shapiro Rudin-Shapiro dX dY dX,dY GRS dSum undoubled MendE<232>s Tenenbaum des Courbes Papiers de ie ceil
+=for :stopwords eg Ryde Math-PlanePath Nlevel et al vertices doublings OEIS Online DragonCurve ZOrderCurve 0xAA..AA Golay-Rudin-Shapiro Rudin-Shapiro dX dY dX,dY GRS dSum undoubled MendE<232>s Tenenbaum des Courbes Papiers de ie ceil paperfolding
 
 =head1 NAME
 
@@ -1583,13 +1419,19 @@ include
 
 =over
 
-=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27008>
-
-=item level=4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27010>
-
-=item level=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27012>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655> etc
 
 =back
+
+    19655     level=0 (1-segment path)
+    32234     level=1 (2-segment path)
+    286       level=2 (4-segment path)
+    27008     level=3
+    27010     level=4
+    27012     level=5
+    33778     level=6
+    33780     level=7
+    33782     level=8
 
 =head1 SEE ALSO
 
@@ -1615,7 +1457,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

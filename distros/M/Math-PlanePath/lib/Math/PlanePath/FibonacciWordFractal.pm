@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -16,9 +16,6 @@
 # with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# http://alexis.monnerot-dumaine.neuf.fr/articles/fibonacci%20fractal.pdf
-# [gone]
-#
 # math-image --path=FibonacciWordFractal --output=numbers_dash
 
 
@@ -27,7 +24,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -94,7 +91,7 @@ sub n_to_xy {
     my ($x,$y);
     my $m = (($level+$moffset) % 6);
     if ($m == 1) {
-      $x = $yend[-2];     # T
+      $x = $yend[-2];     # T  (transpose)
       $y = $xend[-2];
     } elsif ($m == 2) {
       $x = $yend[-2];     # -90
@@ -419,16 +416,24 @@ Math::PlanePath::FibonacciWordFractal -- turns by Fibonacci word bits
 
 =head1 DESCRIPTION
 
-X<Monnerot-Dumaine, Alexis>X<Fibonacci Word>This is an integer version of
-the Fibonacci word fractal
+X<Fibonacci Word>This is an integer version of the Fibonacci word fractal
 
 =over
 
-Alexis Monnerot-Dumaine, "The Fibonacci Word Fractal", February 2009.
-L<http://hal.archives-ouvertes.fr/hal-00367972_v1/>
-L<http://hal.archives-ouvertes.fr/docs/00/36/79/72/PDF/The_Fibonacci_word_fractal.pdf>
+Alexis Monnerot-Dumaine, "The Fibonacci Word Fractal", March 2009.
+L<https://hal.archives-ouvertes.fr/hal-00367972/>
 
 =back
+
+=cut
+
+# Author's copy:
+# http://alexis.monnerot-dumaine.neuf.fr/
+# http://alexis.monnerot-dumaine.neuf.fr/articles/fibonacci%20fractal.pdf
+# http://web.archive.org/web/2id_/http://alexis.monnerot-dumaine.neuf.fr/articles/fibonacci%20fractal.pdf
+# [gone]
+
+=pod
 
 It makes turns controlled by the "Fibonacci word" sequence, sometimes called
 the "golden string".
@@ -547,13 +552,17 @@ L<http://oeis.org/A156596> (etc)
 
 =back
 
-    A156596  - turn sequence, 0=straight,1=right,2=left
-    A171587  - abs(dX), so 1=horizontal,0=vertical
+    A332298   X coordinate, starting at n=1
+    A332299   Y-1 coordinate, starting at n=1
+    A156596   turn sequence, 0=straight,1=right,2=left
+    A143668   turn sequence, 0=right,1=straight,2=left
+    A171587   abs(dX), so 1=horizontal,0=vertical
+    A265318   N at locations by diagonals
 
-    A003849  - Fibonacci word with values 0,1
-    A005614  - Fibonacci word with values 1,0
-    A003842  - Fibonacci word with values 1,2
-    A014675  - Fibonacci word with values 2,1
+    A003849   Fibonacci word with values 0,1
+    A005614   Fibonacci word with values 1,0
+    A003842   Fibonacci word with values 1,2
+    A014675   Fibonacci word with values 2,1
 
 =head1 SEE ALSO
 
@@ -569,7 +578,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

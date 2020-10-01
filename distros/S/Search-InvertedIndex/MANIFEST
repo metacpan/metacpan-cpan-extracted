@@ -1,7 +1,9 @@
 MANIFEST
+Build.PL
 Makefile.PL
+LICENSE
 README
-CHANGES
+Changes
 lib/Search/InvertedIndex.pm
 lib/Search/InvertedIndex/AutoLoader.pm
 lib/Search/InvertedIndex/DB/DB_File_SplitHash.pm
@@ -13,3 +15,4 @@ lib/Search/InvertedIndex/Update.pm
 t/base.t
 t/mysql.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json

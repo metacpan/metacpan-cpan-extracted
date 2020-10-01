@@ -4,7 +4,7 @@ use strict;
 use warnings;
 no warnings;
 
-use vars qw($ERROR $XML_head $XML_foot $VERSION @EXPORT_OK %EXPORT_TAGS);
+use vars qw($ERROR $VERSION @EXPORT_OK %EXPORT_TAGS);
 use Carp qw(croak carp);
 use Data::Dumper;
 use XML::Entities;
@@ -18,13 +18,14 @@ use Exporter qw(import);
 	plist_as_string
 	create_from_hash
 	create_from_array
+	create_from_string
 	);
 
 %EXPORT_TAGS = (
 	'all' => \@EXPORT_OK,
 	);
 
-$VERSION = '1.413';
+$VERSION = '1.501';
 
 =encoding utf8
 
@@ -112,6 +113,7 @@ There are several types of objects:
 	Mac::PropertyList::data
 	Mac::PropertyList::real
 	Mac::PropertyList::integer
+	Mac::PropertyList::uid
 	Mac::PropertyList::date
 	Mac::PropertyList::array
 	Mac::PropertyList::dict
@@ -153,16 +155,6 @@ information or blessed objects.
 
 my $Debug = $ENV{PLIST_DEBUG} || 0;
 
-$XML_head =<<"XML";
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-XML
-
-$XML_foot =<<"XML";
-</plist>
-XML
-
 my %Readers = (
 	"dict"    => \&read_dict,
 	"string"  => \&read_string,
@@ -185,6 +177,8 @@ will be imported unless you ask for it.
 	use Mac::PropertyList qw( parse_plist );
 
 	use Mac::PropertyList qw( :all );
+
+=head2 Things that parse
 
 =over 4
 
@@ -288,9 +282,12 @@ Returns a string representing the hash in the plist format.
 sub create_from_hash {
 	my $hash  = shift;
 
-	return unless UNIVERSAL::isa( $hash, 'HASH' );
+	unless( ref $hash eq ref {} ) {
+		carp "create_from_hash did not get an hash reference";
+		return;
+		}
 
-	my $string = "$XML_head" . Mac::PropertyList::dict->write_open . "\n";
+	my $string = XML_head() . Mac::PropertyList::dict->write_open . "\n";
 
 	foreach my $key ( keys %$hash ) {
 		next if ref $hash->{$key};
@@ -305,7 +302,7 @@ sub create_from_hash {
 		$string .= $bit;
 		}
 
-	$string .= Mac::PropertyList::dict->write_close . "\n$XML_foot";
+	$string .= Mac::PropertyList::dict->write_close . "\n" . XML_foot();
 
 	return $string;
 	}
@@ -324,9 +321,12 @@ Returns a string representing the array in the plist format.
 sub create_from_array {
 	my $array  = shift;
 
-	return unless UNIVERSAL::isa( $array, 'ARRAY' );
+	unless( ref $array eq ref [] ) {
+		carp "create_from_array did not get an array reference";
+		return;
+		}
 
-	my $string = "$XML_head" . Mac::PropertyList::array->write_open . "\n";
+	my $string = XML_head() . Mac::PropertyList::array->write_open . "\n";
 
 	foreach my $element ( @$array ) {
 		my $value = Mac::PropertyList::string->new( $element );
@@ -337,9 +337,50 @@ sub create_from_array {
 		$string .= $bit;
 		}
 
-	$string .= Mac::PropertyList::array->write_close . "\n$XML_foot";
+	$string .= Mac::PropertyList::array->write_close . "\n" . XML_foot();
 
 	return $string;
+	}
+
+=item create_from_string( STRING )
+
+Returns a string representing the string in the plist format.
+
+=cut
+
+sub create_from_string {
+	my $string  = shift;
+
+	unless( ! ref $string ) {
+		carp "create_from_string did not get a string";
+		return;
+		}
+
+	return
+		XML_head() .
+		Mac::PropertyList::string->new( $string )->write .
+		"\n" . XML_foot();
+	}
+
+=item create_from
+
+Dispatches to either C<create_from_array>, C<create_from_hash>, or
+C<create_from_string> based on the argument. If none of those fit,
+this C<croak>s.
+
+=cut
+
+sub create_from {
+	my $thingy  = shift;
+
+	return do {
+		if(      ref $thingy eq ref [] ) { &create_from_array  }
+		elsif(   ref $thingy eq ref {} ) { &create_from_hash   }
+		elsif( ! ref $thingy eq ref {} ) { &create_from_string }
+		else {
+			croak "Did not recognize argument! Must be a string, or reference to a hash or array";
+			}
+		};
 	}
 
 =item read_string
@@ -439,7 +480,13 @@ sub read_dict {
 		}
 
 	$source->put_line( $_ );
-	return Mac::PropertyList::dict->new( \%hash );
+	if ( 1 == keys %hash && exists $hash{'CF$UID'} ) {
+	    # This is how plutil represents a UID in XML.
+	    return Mac::PropertyList::uid->integer( $hash{'CF$UID'}->value );
+	    }
+	else {
+	    return Mac::PropertyList::dict->new( \%hash );
+	    }
 	}
 
 =item read_array
@@ -474,6 +521,38 @@ sub read_data {
 	return Mac::PropertyList::data->new( $string );
 	}
 
+=back
+
+=head2 Things that write
+
+=over 4
+
+=item XML_head
+
+Returns a string that represents the start of the PList XML.
+
+=cut
+
+sub XML_head () {
+	<<"XML";
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+XML
+	}
+
+=item XML_foot
+
+Returns a string that represents the end of the PList XML.
+
+=cut
+
+sub XML_foot () {
+	<<"XML";
+</plist>
+XML
+	}
+
 =item plist_as_string
 
 Return the plist data structure as XML in the Mac Property List format.
@@ -483,11 +562,11 @@ Return the plist data structure as XML in the Mac Property List format.
 sub plist_as_string {
 	my $object = CORE::shift;
 
-	my $string = $XML_head;
+	my $string = XML_head();
 
 	$string .= $object->write . "\n";
 
-	$string .= $XML_foot;
+	$string .= XML_foot();
 
 	return $string;
 	}
@@ -501,6 +580,10 @@ is really just C<as_perl>.
 =cut
 
 sub plist_as_perl { $_[0]->as_perl }
+
+=back
+
+=cut
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 package Mac::PropertyList::Source;
@@ -782,6 +865,74 @@ package Mac::PropertyList::integer;
 use base qw(Mac::PropertyList::Scalar);
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+package Mac::PropertyList::uid;
+use base qw(Mac::PropertyList::Scalar);
+
+# The following is conservative, since the actual largest unsigned
+# integer is ~0, which is 0xFFFFFFFFFFFFFFFF on many (most?) modern
+# Perls; but it is consistent with Mac::PropertyList::ReadBinary.
+# This is really just future-proofing though, since it appears from
+# CFBinaryPList.c that a UID is carried as a hard-coded uint32_t.
+use constant LONGEST_HEX_REPRESENTABLE_AS_NATIVE => 8;	# 4 bytes
+
+# Instantiate with hex string. The string will be padded on the left
+# with zero if its length is odd. It is this string which will be
+# returned by value(). Presence of a non-hex character causes an
+# exception. We default the argument to '00'.
+sub new {
+	my ( $class, $value ) = @_;
+	$value = '00' unless defined $value;
+	Carp::croak( 'uid->new() argument must be hexadecimal' )
+		if $value =~ m/ [[:^xdigit:]] /smx;
+	substr $value, 0, 0, '0'
+		if length( $value ) % 2;
+	return $class->SUPER::new( $value );
+	}
+
+# Without argument, this is an accessor returning the value as an unsigned
+# integer, either a native Perl value or a Math::BigInt as needed.
+# With argument, this is a mutator setting the value to the hex
+# representation of the argument, which must be an unsigned integer,
+# either native Perl of Math::BigInt object. If called as static method
+# instantiates a new object.
+sub integer {
+	my ( $self, $integer ) = @_;
+	if ( @_ < 2 ) {
+		my $value = $self->value();
+		return length( $value ) > LONGEST_HEX_REPRESENTABLE_AS_NATIVE ?
+			Math::BigInt->from_hex( $value ) :
+			hex $value;
+		}
+	else {
+		Carp::croak( 'uid->integer() argument must be unsigned' )
+			if $integer < 0;
+		my $value = ref $integer ?
+			$integer->to_hex() :
+			sprintf '%x', $integer;
+		if ( ref $self ) {
+			substr $value, 0, 0, '0'
+				if length( $value ) % 2;
+			${ $self } = $value;
+			}
+		else {
+			$self = $self->new( $value );
+			}
+		return $self;
+		}
+	}
+
+# This is how plutil represents a UID in XML.
+sub write {
+	my $self = shift;
+	my $dict = Mac::PropertyList::dict->new( {
+			'CF$UID' => Mac::PropertyList::integer->new(
+				$self->integer ),
+			}
+		);
+	return $dict->write();
+	}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 package Mac::PropertyList::string;
 use base qw(Mac::PropertyList::Scalar);
 
@@ -833,8 +984,6 @@ package Mac::PropertyList::false;
 use base qw(Mac::PropertyList::Boolean);
 
 
-=back
-
 =head1 SOURCE AVAILABILITY
 
 This project is in Github:
@@ -867,9 +1016,11 @@ all the plist junk and just play with the data.
 
 brian d foy, C<< <bdfoy@cpan.org> >>
 
+Tom Wyant added support for UID types.
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2020, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

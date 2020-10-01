@@ -1,0 +1,14 @@
+<person>
+  <name>
+	<given_name>Ron</given_name>
+	<surname>Savage</surname>
+  </name>
+  <address>
+	<country>Australia</country>
+	<state>Victoria</state>
+	<city>
+	  <locality>Murrumbeena</locality>
+	  <postcode>3163</postcode>
+	</city>
+  </address>
+</person>

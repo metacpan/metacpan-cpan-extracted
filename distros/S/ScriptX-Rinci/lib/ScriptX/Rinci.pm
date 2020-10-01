@@ -1,7 +1,12 @@
 package ScriptX::Rinci;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-01'; # DATE
+our $DIST = 'ScriptX-Rinci'; # DIST
+our $VERSION = '0.000001'; # VERSION
+
 use strict 'subs', 'vars';
-use parent 'ScriptX::Base';
+use parent 'ScriptX_Base';
 require ScriptX;
 
 sub meta {
@@ -78,7 +83,7 @@ ScriptX::Rinci - Run Rinci function
 
 =head1 VERSION
 
-This document describes version 0.000 of ScriptX::Rinci (from Perl distribution ScriptX-Rinci), released on 2020-09-03.
+This document describes version 0.000001 of ScriptX::Rinci (from Perl distribution ScriptX-Rinci), released on 2020-10-01.
 
 =head1 SYNOPSIS
 

@@ -6,18 +6,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'ScriptX.pm',
-    'ScriptX/Base.pm',
     'ScriptX/Debug/DumpStash.pm',
     'ScriptX/DisablePlugin.pm',
     'ScriptX/Exit.pm',
     'ScriptX/Getopt/Long.pm',
     'ScriptX/Getopt/Specless.pm',
+    'ScriptX/ModifyPlugin.pm',
     'ScriptX/Noop.pm',
-    'ScriptX/Run.pm'
+    'ScriptX/Run.pm',
+    'ScriptX_Base.pm'
 );
 
 my @scripts = (

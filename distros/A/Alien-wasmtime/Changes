@@ -1,5 +1,8 @@
 Revision history for Alien-wasmtime},
 
+0.14      2020-10-01 04:52:19 -0600
+  - Bump to version 0.20.0 (gh#17)
+
 0.12      2020-07-19 05:33:16 -0600
   - Bump to version 0.19.0 (gh#16)
 

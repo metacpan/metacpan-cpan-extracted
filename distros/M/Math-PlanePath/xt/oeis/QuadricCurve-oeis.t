@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013, 2018, 2019 Kevin Ryde
+# Copyright 2013, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 1;
+plan tests => 3;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,17 +29,46 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::QuadricCurve;
+my $path = Math::PlanePath::QuadricCurve->new;
 
 
 #------------------------------------------------------------------------------
-# A133851 -- Y at N=2^k is 2^(k/4) when k=0mod4, starting 
+# A332246 -- X coordinate
+# A332247 -- Y coordinate
+
+MyOEIS::compare_values
+  (anum => 'A332246',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+     }
+     return \@got;
+   });
+
+MyOEIS::compare_values
+  (anum => 'A332247',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A133851 -- Y at N=2^k is 2^(k/4) when k=0mod4, starting
 
 MyOEIS::compare_values
   (anum => 'A133851',
    max_count => 1000,
    func => sub {
      my ($count) = @_;
-     my $path = Math::PlanePath::QuadricCurve->new;
      my @got;
      for (my $n = Math::BigInt->new(2); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);

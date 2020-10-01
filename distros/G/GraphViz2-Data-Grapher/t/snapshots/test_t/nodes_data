@@ -1,0 +1,174 @@
+{
+  '$REF2' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'red',
+      'shape' => 'oval'
+    }
+  },
+  '&CODE1' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'red',
+      'shape' => 'oval'
+    }
+  },
+  '&CODE3' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'red',
+      'shape' => 'oval'
+    }
+  },
+  '0' => {
+    'attributes' => {
+      'color' => 'green',
+      'label' => '%$s',
+      'shape' => 'doubleoctagon'
+    }
+  },
+  '0_0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> %$a',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_1_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> $bbbbbb',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_2_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> $c123',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_3_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> Object: d',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> a|<port2> bbbbbb|<port3> c123|<port4> d',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> %$A',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_0_0_0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> %$a',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_0_0_0_0_1_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> $b',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_0_0_0_0_2_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> 42',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_0_0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> a|<port2> b|<port3> c',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> %$a',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> a',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> %$b',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> b',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> %$C',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_2_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> element_1|<port2> element_2|<port3> element_3',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_2_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> @$els',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> A|<port2> C|<port3> els',
+      'shape' => 'Mrecord'
+    }
+  }
+}

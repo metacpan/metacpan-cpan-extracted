@@ -1,0 +1,4 @@
+---
+alpine_version: 3.12.0
+bind_version: 9.16.7
+bind_src_sha512sum: 176c84657e8a7b10a7ca93c939ca6a7fcdefb22f9200c3f01be59bcd8990dee27b8dc0970299225bcbe0f1aa8f49a67c80c4a9853895ffbcd685adb9674e7768

@@ -1,11 +1,14 @@
 requires 'Data::Printer', '== 0.40';
 requires 'Faker', '== 1.03';
-requires 'Zydeco', '== 0.605';
+requires 'Zydeco', '== 0.611';
+# It's supposed to accelerate some stuff
+# https://typetiny.toby.ink/Optimization.html
+requires 'Type::Tiny::XS', '== 0.022';
 
 on 'test' => sub {
     requires 'Test::Pod', '== 1.52';
 };
 
 on 'develop' => sub {
-  recommends 'Devel::NYTProf';
+  recommends 'Devel::NYTProf', '== 6.06';
 };

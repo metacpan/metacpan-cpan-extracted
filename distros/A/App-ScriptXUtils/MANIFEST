@@ -8,6 +8,8 @@ Makefile.PL
 README
 dist.ini
 lib/App/ScriptXUtils.pm
+script/detect-scriptx-script
+script/dump-scriptx-script
 script/list-scriptx-plugins
 t/00-compile.t
 t/author-critic.t

@@ -102,6 +102,7 @@ t/load-file.t
 t/load-from-app.t
 t/load-http.t
 t/load-json.t
+t/load-yaml-pp.t
 t/load-yaml.t
 t/more-bundle.t
 t/random-errors.t

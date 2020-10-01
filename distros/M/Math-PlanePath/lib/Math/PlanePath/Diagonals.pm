@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,7 +28,7 @@ use Carp 'croak';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -448,6 +448,7 @@ noted above.
 #   = [ (X+Y)*(X+Y+1) + 2X ]/2 + Nstart
 #   = [ X^2 + XY + X + XY + Y^2 + Y + 2X ]/2 + Nstart
 #   = [ X^2 + 3X + 2XY + Y + Y^2 ]/2 + Nstart
+# GP-Test  my(d='x+'y); d*(d+1)/2 + 'x == (('x+'y)^2 + 3*'x + 'y)/2
 
 =pod
 
@@ -457,6 +458,10 @@ suggests something parabolic but is still the straight line diagonals.
         X^2 + 3X + 2XY + Y + Y^2
     N = ------------------------ + Nstart
                    2
+
+        (X+Y)^2 + 3X + Y
+      = ---------------- + Nstart       (using one square)
+                2
 
 =head2 N to X,Y
 
@@ -469,19 +474,38 @@ For example N=12 is d=floor((sqrt(8*12+1)-1)/2)=4 as that N falls in the
 fifth diagonal.  Then the offset from the Y axis NY=d*(d-1)/2 is the X
 position,
 
-    X = N - d*(d-1)/2
-    Y = d - X
+    X = N - d*(d+1)/2
+    Y = X - d
 
-In the code fractional N is handled by imagining each diagonal beginning 0.5
-back from the Y axis.  That's handled by adding 0.5 into the sqrt, which is
-+4 onto the 8*N.
+In the code, fractional N is handled by imagining each diagonal beginning
+0.5 back from the Y axis.  That's handled by adding 0.5 into the sqrt, which
+is +4 onto the 8*N.
 
     d = floor( (sqrt(8*N+5) - 1)/2 )
     # N>=-0.5
 
 The X and Y formulas are unchanged, since N=d*(d-1)/2 is still the Y axis.
-But each diagonal d begins up to 0.5 before that and therefor X extends back
-to -0.5.
+But each diagonal d begins up to 0.5 before that and therefore X extends
+back to -0.5.
+
+=cut
+
+# GP-DEFINE  \\ diagonal length
+# GP-DEFINE  d(n) = floor( (sqrt(8*n+1) - 1)/2 );
+# GP-Test  vector(16,n,n--; d(n)) == \
+# GP-Test    [0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5]
+# GP-DEFINE  X(n) = my(d=d(n)); n - d*(d+1)/2;
+# GP-DEFINE  Y(n) = my(d=d(n)); d - X(n);
+# GP-Test  vector(16,n,n--; X(n)) == \
+# GP-Test    [0, 0, 1, 0, 1, 2, 0, 1, 2, 3, 0, 1, 2, 3, 4, 0]
+# GP-Test  vector(16,n,n--; Y(n)) == \
+# GP-Test    [0, 1, 0, 2, 1, 0, 3, 2, 1, 0, 4, 3, 2, 1, 0, 5]
+# GP-Test  my(l=List([])); \
+# GP-Test  for(d=0,3, for(x=0,d, my(y=d-x); x+y==d || error(); \
+# GP-Test     listput(l,[x,y]))); \
+# GP-Test  vector(#l,n,n--; [X(n),Y(n)]) == Vec(l)
+
+=pod
 
 =head2 Rectangle to N Range
 
@@ -593,7 +617,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

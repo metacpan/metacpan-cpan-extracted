@@ -15,11 +15,11 @@
         <circulation>
           <availableNow value="0" />
           <restrictions>Missing</restrictions>
-          <itemId>item12345</itemId>
+          <itemId>01234567890</itemId>
           <renewable value="" />
           <onHold value="" />
           <enumAndChron>42</enumAndChron>
-          <temporaryLocation>Simmons University/Main Campus/Simmons &amp; Wentworth Library/Online</temporaryLocation>
+          <temporaryLocation>Online Library Resources</temporaryLocation>
         </circulation>
       </circulations>
     </holding>

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Vendor::Amazon;
-$Net::Amazon::S3::Vendor::Amazon::VERSION = '0.91';
+$Net::Amazon::S3::Vendor::Amazon::VERSION = '0.94';
 use Moose 0.85;
 
 # ABSTRACT: Amazon AWS specific behaviour
@@ -36,7 +36,7 @@ Net::Amazon::S3::Vendor::Amazon - Amazon AWS specific behaviour
 
 =head1 VERSION
 
-version 0.91
+version 0.94
 
 =head1 SYNOPSIS
 
@@ -56,11 +56,11 @@ Guess bucket region implementation uses bucket's HEAD region request.
 
 =head1 AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

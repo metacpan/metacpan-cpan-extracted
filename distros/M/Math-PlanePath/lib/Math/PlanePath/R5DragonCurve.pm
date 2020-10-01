@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -24,7 +24,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -305,8 +305,8 @@ sub rect_to_n_range {
           return undef;
         }
         last;
-        return 1;
-        return ($state == 2);
+        # return 1;
+        # return ($state == 2);
       }
       my $digit = 4 - _divrem_mutate($n,5);  # low to high
       $state = $table[$state][$digit] || return 0;
@@ -391,8 +391,7 @@ a square grid and with 5 segments instead of 3.
        ^      ^      ^      ^      ^      ^      ^      ^      ^
       -7     -6     -5     -4     -3     -2     -1     X=0     1
 
-X<Arndt, Jorg>The name "R5" is by Jorg Arndt.  The base figure is an "S"
-shape
+The name "R5" is by Jorg Arndt.  The base figure is an "S" shape
 
     4----5
     |
@@ -711,11 +710,14 @@ House of Graphs entries for the R5 dragon curve as a graph include
 
 =over
 
-=item level=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=25149>
-
-=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=25147>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655> etc
 
 =back
+
+    19655     level=0 (1-segment path)
+    568       level=1 (5-segment path)
+    25149     level=2
+    25147     level=3
 
 =head1 SEE ALSO
 
@@ -729,7 +731,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

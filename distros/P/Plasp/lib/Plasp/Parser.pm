@@ -271,15 +271,14 @@ sub _parse_xml_subs {
                     # Place the script inside a sub for compilation later
                     $text = join( ' ',
                         '&{sub {',
-                        'my $saved = $Response->Output;',
-                        '$Response->Clear;',
+                        'local $Response->{Output} = "";',
                         'local $Response->{BinaryRef} = \( $Response->{Output} );',
-                        'local *Plasp::Response::Flush = sub {};',
+                        'local $Response->{_content_writer} = undef;',
+                        'local $Response->{_flushed_offset};',
+                        '$Response->_flushed_offset( 0 );',
                         $$sub_scriptref,
                         ';',
-                        'my $trapped = $Response->Output;',
-                        '$Response->Output( $saved );',
-                        '$trapped;',
+                        '$Response->{Output};',
                         '} }'
                     );
                 } else {

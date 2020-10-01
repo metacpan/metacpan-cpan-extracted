@@ -2,8 +2,9 @@
 use 5.20.0;
 use strict;
 use warnings FATAL => 'all';
+BEGIN { $ENV{MAIL_BIMI_CACHE_BACKEND} = 'Null' };
 use lib 't';
-use Mail::BIMI::Pragmas;
+use Mail::BIMI::Prelude;
 use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Record;
@@ -28,21 +29,23 @@ $bimi->selector( 'foobar' );
 my $record = $bimi->record;
 
 is_deeply(
-    [ $record->is_valid, $record->error ],
-    [ 0, ['DNS query error'] ],
+    [ $record->is_valid, $record->error_codes ],
+    [ 0, ['DNS_ERROR'] ],
     'Test record validates'
 );
 
 my $expected_data = {};
 
-is_deeply( $record->record, $expected_data, 'Parsed data' );
+is_deeply( $record->record_hashref, $expected_data, 'Parsed data' );
 
-my $expected_url_list = [];
-is_deeply( $record->locations->location, $expected_url_list, 'URL list' );
+my $expected_url = undef;
+is_deeply( $record->location->uri, $expected_url, 'URL' );
 
 my $result = $bimi->result;
 my $auth_results = $result->get_authentication_results;
-my $expected_result = 'bimi=none (DNS query error)';
+my $expected_result = 'bimi=temperror (DNS query error)';
 is( $auth_results, $expected_result, 'Auth results correcct' );
+
+is_deeply( $result->headers, {}, 'Headers' );
 
 done_testing;

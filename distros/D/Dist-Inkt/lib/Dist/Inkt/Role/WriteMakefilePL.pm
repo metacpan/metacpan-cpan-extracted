@@ -1,7 +1,7 @@
 package Dist::Inkt::Role::WriteMakefilePL;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.024';
+our $VERSION   = '0.025';
 
 use Moose::Role;
 use Types::Standard -types;
@@ -70,6 +70,19 @@ sub _build_needs_optional_features_code
 	!! %{ $self->metadata->{optional_features} || {} };
 }
 
+has needs_fix_makefile_code => (
+	is      => 'ro',
+	isa     => Bool,
+	lazy    => 1,
+	builder => '_build_needs_fix_makefile_code',
+);
+
+sub _build_needs_fix_makefile_code
+{
+	my $self = shift;
+	!! $self->sourcefile('inc')->is_dir;
+}
+
 after PopulateMetadata => sub {
 	my $self = shift;
 	$self->metadata->{prereqs}{configure}{requires}{'ExtUtils::MakeMaker'} = '6.17'
@@ -108,8 +121,8 @@ sub Build_MakefilePL
 	};
 
 	$self->rights_for_generated_files->{'Makefile.PL'} ||= [
-		'Copyright 2013 Toby Inkster.',
-		"Software::License::Perl_5"->new({ holder => 'Toby Inkster', year => '2013' }),
+		'Copyright 2020 Toby Inkster.',
+		"Software::License::Perl_5"->new({ holder => 'Toby Inkster', year => '2020' }),
 	] if !$dynamic_config;
 
 	my $share = '';
@@ -122,6 +135,7 @@ sub Build_MakefilePL
 	
 	my $conflict_check    = $self->needs_conflict_check_code    ? $self->conflict_check_code    : '';
 	my $optional_features = $self->needs_optional_features_code ? $self->optional_features_code : '';
+	my $fix_makefile      = $self->needs_fix_makefile_code      ? $self->fix_makefile_code : '';
 	my $tests             = join(q[ ], map "$_\*.t", @{ $self->directories_containing_tests });
 	
 	my $makefile = do { local $/ = <DATA> };
@@ -131,6 +145,7 @@ sub Build_MakefilePL
 	$makefile =~ s/%%%DYNAMIC_CONFIG%%%/$dynamic_config/;
 	$makefile =~ s/%%%CONFLICT_CHECK%%%/$conflict_check/;
 	$makefile =~ s/%%%OPTIONAL_FEATURES%%%/$optional_features/;
+	$makefile =~ s/%%%FIX_MAKEFILE%%%/$fix_makefile/;
 	$file->spew_utf8($makefile);
 }
 
@@ -208,6 +223,35 @@ else
 
 MM_INSTALL_FEATURES
 }
+CODE
+}
+
+sub fix_makefile_code
+{
+	<<'CODE'
+
+sub FixMakefile
+{
+	return unless -d 'inc';
+	my $file = shift;
+	
+	local *MAKEFILE;
+	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
+	my $makefile = do { local $/; <MAKEFILE> };
+	close MAKEFILE or die $!;
+	
+	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
+	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
+	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
+	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
+	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
+	
+	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
+	print MAKEFILE $makefile or die $!;
+	close MAKEFILE or die $!;
+}
+
+FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
 CODE
 }
 
@@ -292,28 +336,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 %%%SHARE%%%
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+%%%FIX_MAKEFILE%%%
 exit(0);
 

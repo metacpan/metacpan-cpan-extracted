@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Bucket;
-$Net::Amazon::S3::Bucket::VERSION = '0.91';
+$Net::Amazon::S3::Bucket::VERSION = '0.94';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Carp;
@@ -36,30 +36,28 @@ sub add_key {
         $conf->{'Content-Length'} ||= length $value;
     }
 
-    my $acl_short;
-    if ( $conf->{acl_short} ) {
-        $acl_short = $conf->{acl_short};
-        delete $conf->{acl_short};
-    }
+    my $acl;
+	$acl = delete $conf->{acl_short} if exists $conf->{acl_short};
+	$acl = delete $conf->{acl}       if exists $conf->{acl};
 
     my $encryption = delete $conf->{encryption};
+    my %headers = %$conf;
 
-    my $http_request = Net::Amazon::S3::Request::PutObject->new(
-        s3        => $self->account,
-        bucket    => $self->bucket,
+    # we may get a 307 redirect; ask server to signal 100 Continue
+    # before reading the content from CODE reference (_content_sub)
+    $headers{expect} = '100-continue' if ref $value;
+
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Add',
+
         key       => $key,
         value     => $value,
-        acl_short => $acl_short,
-        (encryption => $encryption) x!! defined $encryption,
-        headers   => $conf,
-    )->http_request;
+        (acl      => $acl) x!! defined $acl,
+        ((encryption => $encryption) x!! defined $encryption),
+        headers   => \%headers,
+    );
 
-    if ( ref($value) ) {
-        # we may get a 307 redirect; ask server to signal 100 Continue
-        # before reading the content from CODE reference (_content_sub)
-        $http_request->header('Expect' => '100-continue');
-    }
-    return $self->account->_send_request_expect_nothing($http_request);
+    return $response->is_success;
 }
 
 
@@ -78,35 +76,27 @@ sub copy_key {
             $acl_short = $conf->{acl_short};
             delete $conf->{acl_short};
         }
-        $conf->{'x-amz-metadata-directive'} ||= 'REPLACE';
+        $conf->{Net::Amazon::S3::Constants->HEADER_METADATA_DIRECTIVE} ||= 'REPLACE';
     } else {
         $conf = {};
     }
 
-    $conf->{'x-amz-copy-source'} = $source;
+    $conf->{Net::Amazon::S3::Constants->HEADER_COPY_SOURCE} = $source;
 
     my $encryption = delete $conf->{encryption};
 
     my $acct    = $self->account;
-    my $http_request = Net::Amazon::S3::Request::PutObject->new(
-        s3        => $self->account,
-        bucket    => $self->bucket,
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Add',
+
         key       => $key,
         value     => '',
         acl_short => $acl_short,
         (encryption => $encryption) x!! defined $encryption,
         headers   => $conf,
-    )->http_request;
+    );
 
-    my $response = $acct->_do_http( $http_request );
-    my $xpc      = $acct->_xpc_of_content( $response->content );
-
-    if ( !$response->is_success || !$xpc || $xpc->findnodes("//Error") ) {
-        $acct->_remember_errors( $response->content );
-        return 0;
-    }
-
-    return 1;
+    return unless $response->is_success;
 }
 
 
@@ -127,14 +117,14 @@ sub head_key {
 sub query_string_authentication_uri {
     my ( $self, $key, $expires_at ) = @_;
 
-    my $request = Net::Amazon::S3::Request::GetObject->new(
+    my $request = Net::Amazon::S3::Operation::Object::Fetch::Request->new (
         s3     => $self->account,
         bucket => $self,
         key    => $key,
         method => 'GET',
     );
 
-    return $request->query_string_authentication_uri( $expires_at );
+    return $request->query_string_authentication_uri ($expires_at);
 }
 
 
@@ -143,30 +133,20 @@ sub get_key {
     $filename = $$filename if ref $filename;
     my $acct = $self->account;
 
-    my $http_request = Net::Amazon::S3::Request::GetObject->new(
-        s3     => $acct,
-        bucket => $self->bucket,
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Fetch',
+		filename => $filename,
+
         key    => $key,
         method => $method || 'GET',
-    )->http_request;
+    );
 
-    my $response = $acct->_do_http( $http_request, $filename );
-
-    if ( $response->code == 404 ) {
-        return undef;
-    }
-
-    $acct->_croak_if_response_error($response);
-
-    my $etag = $response->header('ETag');
-    if ($etag) {
-        $etag =~ s/^"//;
-        $etag =~ s/"$//;
-    }
+    return unless $response->is_success;
+    my $etag = $response->etag;
 
     my $return;
-    foreach my $header ( $response->headers->header_field_names ) {
-        $return->{ lc $header } = $response->header($header);
+    foreach my $header ($response->headers->header_field_names) {
+        $return->{ lc $header } = $response->header ($header);
     }
     $return->{content_length} = $response->content_length || 0;
     $return->{content_type}   = $response->content_type;
@@ -195,22 +175,16 @@ sub delete_multi_object {
     # rather than only objects.
     my $last_result;
     while (scalar(@objects) > 0) {
-        my $http_request = Net::Amazon::S3::Request::DeleteMultiObject->new(
-            s3      => $self->account,
-            bucket  => $self,
-            keys    => [map {
-                if (ref($_)) {
-                    $_->key
-                } else {
-                    $_
-                }
-            } splice @objects, 0, ((scalar(@objects) > 1000) ? 1000 : scalar(@objects))]
-        )->http_request;
+        my $response = $self->_perform_operation (
+            'Net::Amazon::S3::Operation::Objects::Delete',
 
-        my $xpc = $self->account->_send_request($http_request);
+            keys    => [
+				map { ref ($_) ? $_->key : $_ }
+				splice @objects, 0, ((scalar(@objects) > 1000) ? 1000 : scalar(@objects))
+			]
+        );
 
-        return undef
-            unless $xpc && !$self->account->_remember_errors($xpc);
+        return unless $response->is_success;
     }
 
     return 1;
@@ -220,13 +194,13 @@ sub delete_key {
     my ( $self, $key ) = @_;
     croak 'must specify key' unless defined $key && length $key;
 
-    my $http_request = Net::Amazon::S3::Request::DeleteObject->new(
-        s3     => $self->account,
-        bucket => $self->bucket,
-        key    => $key,
-    )->http_request;
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Delete',
 
-    return $self->account->_send_request_expect_nothing($http_request);
+        key    => $key,
+    );
+
+    return $response->is_success;
 }
 
 
@@ -254,32 +228,23 @@ sub list_all {
 
 
 sub get_acl {
-    my ( $self, $key ) = @_;
-    my $account = $self->account;
+    my ($self, $key) = @_;
 
-    my $http_request;
+    my $response;
     if ($key) {
-        $http_request = Net::Amazon::S3::Request::GetObjectAccessControl->new(
-            s3     => $account,
-            bucket => $self->bucket,
+        $response = $self->_perform_operation (
+            'Net::Amazon::S3::Operation::Object::Acl::Fetch',
+
             key    => $key,
-        )->http_request;
+        );
     } else {
-        $http_request = Net::Amazon::S3::Request::GetBucketAccessControl->new(
-            s3     => $account,
-            bucket => $self->bucket,
-        )->http_request;
+        $response = $self->_perform_operation (
+            'Net::Amazon::S3::Operation::Bucket::Acl::Fetch',
+        );
     }
 
-    my $response = $account->_do_http($http_request);
-
-    if ( $response->code == 404 ) {
-        return undef;
-    }
-
-    $account->_croak_if_response_error($response);
-
-    return $response->content;
+	return unless $response->is_success;
+	return $response->content;
 }
 
 
@@ -287,51 +252,41 @@ sub set_acl {
     my ( $self, $conf ) = @_;
     $conf ||= {};
 
+    my $response;
     my $key = $conf->{key};
-    my $http_request;
     if ($key) {
-        $http_request = Net::Amazon::S3::Request::SetObjectAccessControl->new(
-            s3        => $self->account,
-            bucket    => $self->bucket,
-            key       => $key,
-            acl_short => $conf->{acl_short},
-            acl_xml   => $conf->{acl_xml},
-        )->http_request;
-    } else {
-        $http_request = Net::Amazon::S3::Request::SetBucketAccessControl->new(
-            s3     => $self->account,
-            bucket => $self->bucket,
+        $response = $self->_perform_operation (
+            'Net::Amazon::S3::Operation::Object::Acl::Set',
 
-            acl_short => $conf->{acl_short},
-            acl_xml   => $conf->{acl_xml},
-        )->http_request;
+            key       => $key,
+            (acl       => $conf->{acl})       x!! defined $conf->{acl},
+            (acl_short => $conf->{acl_short}) x!! defined $conf->{acl_short},
+            (acl_xml   => $conf->{acl_xml})   x!! defined $conf->{acl_xml},
+        );
+    } else {
+        $response = $self->_perform_operation (
+            'Net::Amazon::S3::Operation::Bucket::Acl::Set',
+
+            (acl       => $conf->{acl})       x!! defined $conf->{acl},
+            (acl_short => $conf->{acl_short}) x!! defined $conf->{acl_short},
+            (acl_xml   => $conf->{acl_xml})   x!! defined $conf->{acl_xml},
+        );
     }
 
-    return $self->account->_send_request_expect_nothing($http_request);
-
+    return unless $response->is_success;
+    return 1;
 }
 
 
 sub get_location_constraint {
     my ($self) = @_;
 
-    my $http_request = Net::Amazon::S3::Request::GetBucketLocationConstraint->new(
-        s3     => $self->account,
-        bucket => $self->bucket,
-    )->http_request;
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Bucket::Location',
+    );
 
-    my $xpc = $self->account->_send_request($http_request);
-    return undef unless $xpc && !$self->account->_remember_errors($xpc);
-
-    my $lc = $xpc->findvalue("//s3:LocationConstraint");
-
-    # S3 documentation: https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
-    # When the bucket's region is US East (N. Virginia),
-    # Amazon S3 returns an empty string for the bucket's region
-    if ( defined $lc && $lc eq '' ) {
-        $lc = 'us-east-1';
-    }
-    return $lc;
+    return unless $response->is_success;
+    return $response->location;
 }
 
 # proxy up the err requests
@@ -341,6 +296,51 @@ sub err { $_[0]->account->err }
 
 
 sub errstr { $_[0]->account->errstr }
+
+
+sub add_tags {
+    my ($self, $conf) = @_;
+
+    my $response;
+    if (exists $conf->{key}) {
+        $response = $self->_perform_operation (
+            'Net::Amazon::S3::Operation::Object::Tags::Add',
+
+            tags   => $conf->{tags},
+            key    => $conf->{key},
+            (version_id => $conf->{version_id}) x!! defined $conf->{version_id},
+        );
+    } else {
+        $response = $self->_perform_operation (
+            'Net::Amazon::S3::Operation::Bucket::Tags::Add',
+
+            tags   => $conf->{tags},
+        );
+    }
+
+    return $response->is_success;
+}
+
+
+sub delete_tags {
+    my ($self, $conf) = @_;
+
+    my $response;
+    if (exists $conf->{key}) {
+        $response = $self->_perform_operation (
+            'Net::Amazon::S3::Operation::Object::Tags::Delete',
+
+            key    => $conf->{key},
+            (version_id => $conf->{version_id}) x!! defined $conf->{version_id},
+        );
+    } else {
+        $response = $self->_perform_operation (
+            'Net::Amazon::S3::Operation::Bucket::Tags::Delete',
+        );
+    }
+
+    return $response->is_success;
+}
 
 sub _content_sub {
     my $filename  = shift;
@@ -409,8 +409,8 @@ sub _head_region {
 
         $self->account->ua->requests_redirectable( $requests_redirectable );
 
-        return $response->header ('x-amz-bucket-region')
-            if $response->header ('x-amz-bucket-region');
+        return $response->header (Net::Amazon::S3::Constants->HEADER_BUCKET_REGION)
+            if $response->header (Net::Amazon::S3::Constants->HEADER_BUCKET_REGION);
 
         print STDERR "Invalid bucket head response; $request_uri\n";
         print STDERR $response->as_string;
@@ -419,6 +419,15 @@ sub _head_region {
     }
 
     die "Cannot determine bucket region; bucket=${\ $self->bucket }";
+}
+
+sub _perform_operation {
+    my ($self, $operation, %params) = @_;
+
+    $self->account->_perform_operation ($operation => (
+        bucket => $self,
+        %params,
+    ));
 }
 
 1;
@@ -435,7 +444,7 @@ Net::Amazon::S3::Bucket - convenience object for working with Amazon S3 buckets
 
 =head1 VERSION
 
-version 0.91
+version 0.94
 
 =head1 SYNOPSIS
 
@@ -517,7 +526,19 @@ Takes three positional parameters:
 
 =item configuration
 
-A hash of configuration data for this key. (See synopsis);
+A hash of configuration data for this key.
+
+=over
+
+=item acl
+
+=item encryption
+
+=item any additional HTTP header
+
+=back
+
+See L<Net::Amazon::S3::Operation::Object::Add::Request> for details
 
 =back
 
@@ -712,17 +733,87 @@ The S3 error code for the last error the object ran into
 
 A human readable error string for the last error the object ran into
 
+=head2 add_tags
+
+	# Add tags for a bucket
+	$s3->add_tags ({
+		bucket => 'bucket-name',
+		tags   => { tag1 => 'value-1', tag2 => 'value-2' },
+	});
+
+	# Add tags for an object
+	$s3->add_tags ({
+		bucket => 'bucket-name',
+		key    => 'key',
+		tags   => { tag1 => 'value-1', tag2 => 'value-2' },
+	});
+
+Takes configuration parameters
+
+=over
+
+=item key (optional, scalar)
+
+If key is specified, add tag(s) to object, otherwise on bucket.
+
+=item tags (mandatory, hashref)
+
+Set specified tags and their respective values.
+
+=item version_id (optional)
+
+Is specified (in conjunction with C<key>) add tag(s) to versioned object.
+
+=back
+
+Returns C<true> on success.
+
+Returns C<false> and sets C<err>/C<errstr> otherwise.
+
+=head2 add_tags
+
+	# Add tags for a bucket
+	$s3->add_tags ({
+		bucket => 'bucket-name',
+		tags   => { tag1 => 'value-1', tag2 => 'value-2' },
+	});
+
+	# Add tags for an object
+	$s3->add_tags ({
+		bucket => 'bucket-name',
+		key    => 'key',
+		tags   => { tag1 => 'value-1', tag2 => 'value-2' },
+	});
+
+Takes configuration parameters
+
+=over
+
+=item key (optional, scalar)
+
+If key is specified, add tag(s) to object, otherwise on bucket.
+
+=item version_id (optional)
+
+Is specified (in conjunction with C<key>) add tag(s) to versioned object.
+
+=back
+
+Returns C<true> on success.
+
+Returns C<false> and sets C<err>/C<errstr> otherwise.
+
 =head1 SEE ALSO
 
 L<Net::Amazon::S3>
 
 =head1 AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,6 +4,7 @@ pod_coverage.t
 import.t
 scalar.t
 container.t
+string.t
 array.t
 dict.t
 get_filehandle.t

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -24,7 +24,7 @@ use strict;
 *min = \&Math::PlanePath::_min;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -355,7 +355,7 @@ same length), but skewed to the left to fit on a square grid,
     -2 -1 X=0 1  2  3  4  5
 
 The properties are the same as the spread-out C<TriangleSpiral>.  The
-triangle numbers fall on straight lines as the do in the C<TriangleSpiral>
+triangle numbers fall on straight lines as they do in the C<TriangleSpiral>
 but the skew means the top corner goes up at an angle to the vertical and
 the left and right downwards are different angles plotted (but are symmetric
 by N count).
@@ -612,7 +612,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

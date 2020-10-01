@@ -18,3 +18,14 @@ Change to how page loading is checked in fire events.
 
 0.121 Tue Sep 22 17:20:00 CET 2020
 - Add new mouse method that does drag and drop using XTest mouse movement
+
+0.122 Mon Sep 28 18:50:00 CET 2020
+- Tests will skip when run as root due to root not being able to remove the X11 session created for the tests
+- Additional waiting before opening new pages, this is to help stop issues with ajax requests coming through after navigating to a new page
+
+0.123 Tue Sep 29 18:01:00 CET 2020
+- Use Webkit2 decide-policy signal to make sure we do not navigate away from pages too quickly
+- Injected JS for navigation is through anonymous functions to reduce the amount of global variables
+
+0.124 Thu Oct 1 08:16:00 CET 2020
+- error correction for tests when run as root. Use ok in wrong position

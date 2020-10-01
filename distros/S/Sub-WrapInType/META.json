@@ -1,0 +1,84 @@
+{
+   "abstract" : "Wrap the subroutine to validate the argument type and return type.",
+   "author" : [
+      "mp0liiu <mpoliiu@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.9",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sub-WrapInType",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::InsideOut" : "0",
+            "Exporter" : "0",
+            "Hash::Util" : "0",
+            "Scalar::Util" : "0",
+            "Type::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Suite" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Sub::WrapInType" : {
+         "file" : "lib/Sub/WrapInType.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ybrliiu/p5-Sub-WrapInType/issues"
+      },
+      "homepage" : "https://github.com/ybrliiu/p5-Sub-WrapInType",
+      "repository" : {
+         "url" : "git://github.com/ybrliiu/p5-Sub-WrapInType.git",
+         "web" : "https://github.com/ybrliiu/p5-Sub-WrapInType"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "ybrliiu <raian@reeshome.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

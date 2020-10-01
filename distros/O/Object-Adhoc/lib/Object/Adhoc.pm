@@ -5,7 +5,7 @@ use warnings;
 package Object::Adhoc;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 use Digest::MD5 qw( md5_hex );
 use Exporter::Shiny qw( object make_class );
@@ -255,7 +255,55 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Object-Adhoc>.
 
 =head1 SEE ALSO
 
-L<Object::Anon>, L<Object::Result>.
+=head2 Comparison with Similar Modules
+
+Object::Adhoc -
+requires Exporter::Tiny and uses Class::XSAccessor if installed;
+read-only accessors;
+predicate methods;
+no recursion;
+no overloading;
+dies on unknown keys.
+
+L<Object::Anon>
+only core dependencies;
+read-only accessors;
+no predicate methods;
+recuses into nested hashrefs and arrayrefs;
+treats coderef values as methods and supports overloading;
+dies on unknown keys.
+
+L<Hash::Objectify> -
+requires Class::XSAccessor;
+read-write accessors;
+no predicate methods;
+no recursion;
+no overloading;
+dies on unknown keys (or returns undef in lax mode).
+
+L<Hash::AsObject> -
+only core dependencies;
+read-write accessors (uses AUTOLOAD, potentially slow);
+no predicate methods;
+recurses into nested hashrefs;
+no overloading;
+returns undef for unknown keys.
+
+Of the four, Object::Adhoc has the fastest accessors, and
+Hash::Objectify has the fastest constructors. Object::Anon is
+the slowest.
+
+I'd recommend Object::Adhoc if you want read-only accessors,
+or Hash::Objectify if you want read-write accessors. Use
+Object::Anon only if you need the additional features it supports
+for overloading, custom methods, and recursive application to
+nested data structures.
+
+=head2 Not Quite So Similar Modules
+
+L<Object::Result> -
+fairly different idea, but can be used for similar purposes.
+Requires Perl 5.14, Keyword::Simple, PPI, and Method::Signatures.
 
 =head1 AUTHOR
 

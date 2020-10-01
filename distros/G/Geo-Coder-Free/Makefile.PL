@@ -44,6 +44,22 @@ my %urls = (
 );
 
 # unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
+if(eval { require HTTP::Cache::Transparent; }) {
+	HTTP::Cache::Transparent->import();
+	my $cachedir;
+	if(my $e = $ENV{'CACHEDIR'}) {
+		$cachedir = File::Spec->catfile($e, 'http-cache-transparent');
+	} else {
+		$cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
+	}
+
+	HTTP::Cache::Transparent::init({
+		BasePath => $cachedir,
+		# Verbose => $opts{'v'} ? 1 : 0,
+		NoUpdate => 60 * 60 * 24,
+		MaxAge => 30 * 24
+	}) || die "$0: $cachedir: $!";
+}
 
 foreach my $url(keys %urls) {
 	my $file = $urls{$url};
@@ -51,42 +67,16 @@ foreach my $url(keys %urls) {
 		# Don't bother downloading if the file is less than a week old
 		next if(-M $file < 7);
 	}
-	if(eval { require HTTP::Cache::Transparent; }) {
-		HTTP::Cache::Transparent->import();
-		my $cachedir;
-		if(my $e = $ENV{'CACHEDIR'}) {
-			$cachedir = File::Spec->catfile($e, 'http-cache-transparent');
-		} else {
-			$cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
-		}
 
-		HTTP::Cache::Transparent::init({
-			BasePath => $cachedir,
-			# Verbose => $opts{'v'} ? 1 : 0,
-			NoUpdate => 60 * 60 * 24,
-			MaxAge => 30 * 24
-		}) || die "$0: $cachedir: $!";
-	}
-
-	my $download = 0;
-	if(-r $file) {
-		if((-M $file) > 1) {
-			$download = 1;
-		}
+	print "Downloading $url\n";
+	my $ff = File::Fetch->new(uri => $url);
+	if(my $path = $ff->fetch($url)) {
+		print "Moving $path to $file\n";
+		rename $path, $file or die "$file: $!";
+	} elsif(my $err = $ff->error(1)) {
+		die "$url: $err";
 	} else {
-		$download = 1;
-	}
-	if($download) {
-		print "Downloading $url\n";
-		my $ff = File::Fetch->new(uri => $url);
-		if(my $path = $ff->fetch($url)) {
-			print "Moving $path to $file\n";
-			rename $path, $file or die "$file: $!";
-		} elsif(my $err = $ff->error(1)) {
-			die "$url: $err";
-		} else {
-			die "There was a problem downloading $url";
-		}
+		die "There was a problem downloading $url";
 	}
 }
 
@@ -119,9 +109,15 @@ my $test_requires = {
 };
 
 if($ENV{'AUTHOR_TESTING'}) {
-	$test_requires->{'IPC::System::Simple'} = 0;
+	$test_requires->{'CGI::ACL'} = 0;
+	$test_requires->{'FCGI'} = 0;
 	$test_requires->{'FCGI::Buffer'} = 0;
+	$test_requires->{'HTML::SocialMedia'} = 0;
+	$test_requires->{'Log::Any::Adapter::Log4perl'} = 0;
 	$test_requires->{'Log::WarnDie'} = 0;
+	$test_requires->{'IPC::System::Simple'} = 0;
+	$test_requires->{'Template::Plugin::EnvHash'} = 0;
+	$test_requires->{'Test::Pod::LinkCheck'} = 0;
 }
 
 WriteMakefile(

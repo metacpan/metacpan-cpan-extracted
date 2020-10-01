@@ -1,9 +1,9 @@
 package Sah::SchemaR::isbn;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2020-05-27'; # DATE
+our $VERSION = '0.008'; # VERSION
 
-our $rschema = ["str",[{description=>"\nNondigits [^0-9Xx] will be removed during coercion.\n\nChecksum digit must be valid.\n\n",match=>"\\A(?:[0-9]{13}|[0-9]{9}[0-9Xx])\\z",summary=>"ISBN 10 or ISBN 13 number","x.perl.coerce_rules"=>["From_str::to_isbn"]}],["str"]];
+our $rschema = ["str",[{description=>"\nNondigits [^0-9Xx] will be removed during coercion.\n\nChecksum digit must be valid.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"0545010225",value=>"0-545-01022-5"},{valid=>1,validated_value=>9781566199094,value=>"978-1-56619-909-4"},{summary=>"Fail check digit",valid=>0,value=>"978-1-56619-909-5"},{summary=>"Too long",valid=>0,value=>"978-1-56619-909-45"}],match=>"\\A(?:[0-9]{13}|[0-9]{9}[0-9Xx])\\z",summary=>"ISBN 10 or ISBN 13 number","x.perl.coerce_rules"=>["From_str::to_isbn"]}],["str"]];
 
 1;
 # ABSTRACT: ISBN 10 or ISBN 13 number
@@ -20,7 +20,7 @@ Sah::SchemaR::isbn - ISBN 10 or ISBN 13 number
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::SchemaR::isbn (from Perl distribution Sah-Schemas-ISBN), released on 2019-11-29.
+This document describes version 0.008 of Sah::SchemaR::isbn (from Perl distribution Sah-Schemas-ISBN), released on 2020-05-27.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

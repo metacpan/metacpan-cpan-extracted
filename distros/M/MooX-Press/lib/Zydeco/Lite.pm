@@ -5,7 +5,7 @@ use warnings;
 package Zydeco::Lite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.075';
+our $VERSION   = '0.079';
 
 use MooX::Press ();
 use Types::Standard qw( -types -is );
@@ -63,6 +63,31 @@ sub _return_anon {
 	$$nameref = $value;
 	&Internals::SvREADONLY($nameref, 1);
 	return;
+}
+
+sub _make_definition_context {
+	my ( $level, $coderef ) = @_;
+	
+	$level = 1 unless defined $level;
+	my ( $pkg, $file, $line ) = caller( $level );
+	
+	if ( defined $coderef ) {
+		require B;
+		my $b = B::svref_2object($coderef);
+		return {
+			'package'  => $pkg,
+			'file'     => $b->FILE || $b->START->file || $file,
+			'line'     => $b->START->line || $line,
+			'via'      => __PACKAGE__,
+		};
+	}
+	
+	return {
+		'package'  => $pkg,
+		'file'     => $file,
+		'line'     => $line,
+		'via'      => __PACKAGE__,
+	};
 }
 
 sub true  () { !!1 }
@@ -132,9 +157,12 @@ sub class {
 		};
 	}
 	
-	my $definition = _pop_type( CodeRef, @_ ) || sub { 1 };
+	my $dummy_dfn  = false;
+	my $definition = _pop_type( CodeRef, @_ ) || do { $dummy_dfn = true; sub { 1 } };
 	my $name       = ( @_ % 2 ) ? _shift_type( Str|ScalarRef, @_ ) : undef;
 	my %args       = @_;
+	
+	$args{definition_context} ||= _make_definition_context(1, $dummy_dfn ? () : $definition);
 
 	my $kind =
 		$args{interface}   ? 'interface' :
@@ -289,6 +317,7 @@ sub _method {
 		
 		if ( $sig or keys %args ) {
 			if ( defined $sig ) {
+				$args{definition_context} = _make_definition_context(1, $definition);
 				$args{caller}    = caller;
 				$args{code}      = $definition;
 				$args{signature} = $sig;
@@ -305,8 +334,9 @@ sub _method {
 		goto &_return_anon;
 	}
 	
-	$args{code}   = $definition;
+	$args{definition_context} = _make_definition_context(1, $definition);
 	$args{caller} = caller;
+	$args{code}   = $definition;
 	
 	if ( defined $sig ) {
 		$args{signature} = $sig;
@@ -492,6 +522,13 @@ sub has {
 	my $names = _shift_type( ArrayRef|ScalarRef|Str, @_ )
 		or confess("attributes cannot be anonymous");
 	my $spec  = @_ == 1 ? $_[0] : { @_ };
+	
+	if ( is_ArrayRef $spec ) {
+		unshift @$spec, definition_context => _make_definition_context(1);
+	}
+	elsif ( is_HashRef $spec ) {
+		$spec->{definition_context} ||= _make_definition_context(1);
+	}
 	
 	$names = [ $names ] unless is_ArrayRef $names;
 	push @{ $THIS{CLASS_SPEC}{has} ||= [] }, ( $_, $spec ) for @$names;

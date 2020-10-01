@@ -5,6 +5,14 @@ require 5.008001;
 use ExtUtils::MakeMaker;
 use File::Copy;
 
+if ($ENV{PERLBREW_HOME} and $ENV{PERLBREW_HOME} eq "/home/njh/.perlbrew") {
+     warn "Your smokers have been blocked because of consistent failures that\n";
+     warn " are all caused by the smoking setup and not by module errors.  If\n";
+     warn " you have fixed that all, please inform the authors, so this block\n";
+     warn " can be lifted again.\n";
+     exit 0;
+     }
+
 sub link_or_copy {
     my ($source, $dest) = @_;
 
@@ -41,7 +49,7 @@ my %wm = (
 	"Data::Dumper"			=> 0,
 	"File::Temp"			=> 0.22,
 	"IO::Scalar"			=> 0,	# Optional
-
+	"List::Util"			=> 0,
 
 	# For testing
 	"Test::More"			=> 0.88,
@@ -107,6 +115,10 @@ sub postamble {
 		    $(TEST_FILES) 3>valgrind.log
 		    );
     my @pc = -f ".perlcriticrc" ? ("\tperlcritic -1 Read.pm") : ();
+    $] >= 5.010 && -d "xt" && ($ENV{AUTOMATED_TESTING} || 0) != 1 and push @pc,
+	'',
+	'test::',
+	'	-@env TEST_FILES="xt/*.t" make -e test_dynamic';
     join "\n" =>
 	'cover test_cover:',
 	'	ccache -C',
@@ -133,6 +145,17 @@ sub postamble {
 	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
+	'',
+	'doc docs:		doc/Spreadsheet-Read.md doc/Spreadsheet-Read.html doc/Spreadsheet-Read.man',
+	'	-@rm -f pod2html.tmp',
+	'doc/Spreadsheet-Read.md:		Read.pm',
+	'	pod2markdown  < $? > $@',
+	'doc/Spreadsheet-Read.html:		Read.pm',
+	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
+	'doc/Spreadsheet-Read.3:		Read.pm',
+	'	pod2man       < $? > $@',
+	'doc/Spreadsheet-Read.man:	doc/Spreadsheet-Read.3',
+	'	nroff -mandoc < $? > $@',
 	@pc,
 	'';
     } # postamble

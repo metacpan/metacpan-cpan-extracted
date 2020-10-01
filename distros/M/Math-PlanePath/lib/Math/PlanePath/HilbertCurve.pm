@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -16,9 +16,6 @@
 # with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# http://www.cut-the-knot.org/do_you_know/hilbert.shtml
-#     Java applet
-#
 # http://www.woollythoughts.com/afghans/peano.html
 #     Knitting
 #
@@ -30,6 +27,9 @@
 #
 # http://www.davidsalomon.name/DC2advertis/AppendC.pdf
 #
+# http://www.cut-the-knot.org/do_you_know/hilbert.shtml
+#     Java applet
+#
 
 package Math::PlanePath::HilbertCurve;
 use 5.004;
@@ -38,7 +38,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -259,7 +259,7 @@ sub n_to_level {
 1;
 __END__
 
-=for :stopwords Ryde Math-PlanePath PlanePaths OEIS ZOrderCurve ZOrder Peano Gosper's HAKMEM Jorg Arndt's bitwise bignums fxtbook Ueber stetige Abbildung einer Linie auf ein FlE<228>chenstE<252>ck Mathematische Annalen DOI ascii lookup Arndt PlanePath ie Sergey Kitaev Toufik Mansour Automata Combinatorics Preprint
+=for :stopwords Ryde Math-PlanePath PlanePaths OEIS ZOrderCurve ZOrder Peano Gosper's HAKMEM Jorg Arndt's bitwise bignums fxtbook Ueber stetige Abbildung einer Linie auf ein FlE<228>chenstE<252>ck Mathematische Annalen DOI ascii lookup Arndt PlanePath ie Sergey Kitaev Toufik Mansour Automata Combinatorics Preprint localized
 
 =head1 NAME
 
@@ -273,9 +273,27 @@ Math::PlanePath::HilbertCurve -- 2x2 self-similar quadrant traversal
 
 =head1 DESCRIPTION
 
-X<Hilbert, David>This path is an integer version of the curve described by
-David Hilbert in 1891 for filling a unit square.  It traverses a quadrant of
-the plane one step at a time in a self-similar 2x2 pattern,
+This path is an integer version of the curve described by David Hilbert in
+1891 for filling a unit square.  It traverses a quadrant of the plane one
+step at a time in a self-similar 2x2 pattern,
+
+=over
+
+David Hilbert, "Ueber die stetige Abbildung einer Linie auf ein
+FlE<228>chenstE<252>ck", Mathematische Annalen, volume 38, number 3, 1891,
+pages 459-460, DOI 10.1007/BF01199431.
+
+=back
+
+=cut
+
+# Someone's copy:
+# https://www.maths.ed.ac.uk/~v1ranick/papers/hilbert.pdf
+#
+# Someone's copy existed in the past:
+# http://notendur.hi.is/oddur/hilbert/gcs-wrapper-1.pdf
+
+=pod
 
            ...
         |   |
@@ -336,9 +354,9 @@ and 2 in base 4, or equivalently have even-numbered bits 0, like x0y0...z0.
 
 The Hilbert curve is fairly well localized in the sense that a small
 rectangle (or other shape) is usually a small range of N.  This property is
-used in some database systems to store X,Y coordinates with the Hilbert
-curve N as an index.  A search through an 2-D region is then usually a
-fairly modest linear search through N values.  C<rect_to_n_range()> gives
+used in some database systems to store X,Y coordinates using the resulting
+Hilbert curve N as an index.  A search through a 2-D region is then usually
+a fairly modest linear search through N values.  C<rect_to_n_range()> gives
 exact N range for a rectangle, or see L<Rectangle to N Range> below for
 calculating on any shape.
 
@@ -418,16 +436,18 @@ each of the "3" sub-parts there's also inverted forms
 Working N from high to low with a state variable can record whether there's
 a transpose, an invert, or both, being four states altogether.  A bit pair
 0,1,2,3 from N then gives a bit each of X,Y according to the configuration
-and a new state which is the orientation of that sub-part.  William Gosper's
-HAKMEM item 115 has this with tables for the state and X,Y bits,
+and a new state which is the orientation of that sub-part.  Bill Gosper's
+HAKMEM item 115 has this with either bit operations or a table for the state
+and X,Y bits,
 
 =over
 
+L<https://dspace.mit.edu/handle/1721.1/6086>,
 L<http://www.inwap.com/pdp10/hbaker/hakmem/topology.html#item115>
 
 =back
 
-X<Arndt, Jorg>X<fxtbook>And C++ code based on that in Jorg Arndt's book,
+X<fxtbook>And C++ code based on that in Jorg Arndt's book,
 
 =over
 
@@ -547,7 +567,7 @@ The number of segments in each direction is calculated in
 Sergey Kitaev, Toufik Mansour and Patrice SE<233>E<233>bold, "Generating the
 Peano Curve and Counting Occurrences of Some Patterns", Journal of Automata,
 Languages and Combinatorics, volume 9, number 4, 2004, pages 439-455.
-L<https://personal.cis.strath.ac.uk/sergey.kitaev/publications.html>
+L<https://personal.cis.strath.ac.uk/sergey.kitaev/publications.html>,
 L<https://personal.cis.strath.ac.uk/sergey.kitaev/index_files/Papers/peano.ps>
 
 (Preprint as Sergey Kitaev and Toufik Mansour, "The Peano Curve and Counting
@@ -583,10 +603,10 @@ successive expansion levels.
 
     total segments d(1,k)+d(2,k)+d(3,k)+d(4,k) = 4^k - 1
 
-The form in the path here keeps the first segment direction fixed.  This
-means a transpose 1E<lt>-E<gt>2 and 3E<lt>-E<gt>4 in odd levels.  The result
-is to take the alternate d values as follows.  For k=0 there is a single
-point N=0 so no line segments at all and so c(dir,0)=0.
+The path form here keeps the first segment direction fixed.  This means a
+transpose 1E<lt>-E<gt>2 and 3E<lt>-E<gt>4 in odd levels.  The result is to
+take the alternate d values as follows.  For k=0 there is a single point N=0
+so no line segments at all and so c(dir,0)=0.
 
     first 4^k-1 segments
 
@@ -656,12 +676,12 @@ each bit-pair of N becomes a bit of X and a bit of Y,
     3 = 11    0   1     <- difference 1 bit
 
 So the Hamming distance for N=0to3 is 1 at N=1 and N=3.  As higher levels
-these the X,Y bits may be transposed (swapped) or rotated by 180 or both.
+these X,Y bits may be transposed (swapped) or rotated by 180 or both.
 A transpose swapping XE<lt>-E<gt>Y doesn't change the bit difference.
 A rotate by 180 is a flip 0E<lt>-E<gt>1 of the bit in each X and Y, so that
 doesn't change the bit difference either.
 
-On that basis the Hamming distance X,Y is the number of base4 digits of N
+On that basis, the Hamming distance X,Y is the number of base4 digits of N
 which are 01 or 11.  If bit positions are counted from 0 for the least
 significant bit then
 
@@ -739,7 +759,7 @@ sequence being the N of the Hilbert curve at those positions.
     A163361    A163357 + 1, numbering the Hilbert N's from N=1
     A163362      inverse
     A163363    A163355 + 1, numbering the Hilbert N's from N=1
-    A163364     inverse
+    A163364      inverse
 
 These sequences are permutations of the integers since all X,Y positions of
 the first quadrant are covered by each path (Hilbert, ZOrder, Peano).  The
@@ -787,19 +807,13 @@ L<Math::PlanePath::KochCurve>
 L<Math::Curve::Hilbert>,
 L<Algorithm::SpatialIndex::Strategy::QuadTree>
 
-David Hilbert, "Ueber die stetige Abbildung einer Line auf ein
-FlE<228>chenstE<252>ck", Mathematische Annalen, volume 38, number 3,
-p459-460, DOI 10.1007/BF01199431.
-L<http://www.springerlink.com/content/v1u6427kk33k8j56/> Z<>
-L<http://notendur.hi.is/oddur/hilbert/gcs-wrapper-1.pdf>
-
 =head1 HOME PAGE
 
 L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

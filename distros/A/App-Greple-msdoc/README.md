@@ -4,7 +4,7 @@ msdoc - Greple module for access MS office docx/pptx/xlsx documents
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # SYNOPSIS
 
@@ -23,7 +23,7 @@ these data and replaces the search target.
 By default, text part from XML data is extracted.  This process is
 done by very simple method and may include redundant information.
 
-Strings are simply connected into paragrap for _.docx_ and _.pptx_
+Strings are simply connected into paragraph for _.docx_ and _.pptx_
 document.  For _.xlsx_ document, single space is inserted between
 them.  Use **--separator** option to change this behavior.
 
@@ -64,6 +64,8 @@ cpanm App::Greple::msdoc
 # SEE ALSO
 
 [https://github.com/kaz-utashiro/greple-msdoc](https://github.com/kaz-utashiro/greple-msdoc)
+
+[https://github.com/kaz-utashiro/optex-textconv](https://github.com/kaz-utashiro/optex-textconv)
 
 # AUTHOR
 

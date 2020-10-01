@@ -35,13 +35,8 @@ OPENADDR: {
 
 				$location = $geo_coder->geocode('Indianapolis, Indiana, USA');
 				ok(defined($location));
-				if($ENV{'WHOSONFIRST_HOME'}) {
-					cmp_deeply($location,
-						methods('lat' => num(39.72, 1e-2), 'long' => num(-86.28, 1e-2)));
-				} else {
-					cmp_deeply($location,
-						methods('lat' => num(39.77, 1e-2), 'long' => num(-86.15, 1e-2)));
-				}
+				cmp_deeply($location,
+					methods('lat' => num(39.72, 1e-2), 'long' => num(-86.28, 1e-2)));
 
 				# $location = $geo_coder->geocode(location => '9235 Main St, Richibucto, New Brunswick, Canada');
 				# delta_ok($location->{latt}, 46.67);
@@ -61,12 +56,12 @@ OPENADDR: {
 					methods('lat' => num(28.61, 1e-2), 'long' => num(-82.21, 1e-2)));
 
 				# This place does exist, but isn't in Openaddresses
-				my $ogeocoder = new_ok('Geo::Coder::Free::OpenAddresses' => [ openaddr => $ENV{'OPENADDR_HOME'} ]);
+				my $o_geo_coder = new_ok('Geo::Coder::Free::OpenAddresses' => [ openaddr => $ENV{'OPENADDR_HOME'} ]);
 				TODO: {
 					local $TODO = "Not in the database";
 
 					eval {
-						$location = $ogeocoder->geocode('105 S. West Street, Spencer, Owen, Indiana, USA');
+						$location = $o_geo_coder->geocode('105 S. West Street, Spencer, Owen, Indiana, USA');
 						ok(defined($location));
 					};
 				}
@@ -75,18 +70,17 @@ OPENADDR: {
 				cmp_deeply($location,
 					methods('lat' => num(39.05, 1e-2), 'long' => num(-87.04, 1e-2)));
 
-				$location = $ogeocoder->geocode('Boswell, Somerset, Pennsylvania, USA');
-				ok(defined($location));
-
-
-				$location = $geo_coder->geocode({location => 'Harrison Mills, British Columbia, Canada'});
+				$location = $o_geo_coder->geocode('Boswell, Somerset, Pennsylvania, USA');
 				ok(defined($location));
 
 				$location = $geo_coder->geocode({location => 'Westmorland, New Brunswick, Canada'});
 				ok(defined($location));
 
+				$location = $geo_coder->geocode({location => 'Harrison Mills, British Columbia, Canada'});
+				ok(defined($location));
+
 				# Clay township isn't in Openaddresses
-				$location = $ogeocoder->geocode(location => 'Clay City, Owen, Indiana, USA');
+				$location = $o_geo_coder->geocode(location => 'Clay City, Owen, Indiana, USA');
 				ok(defined($location));
 
 				$location = $geo_coder->geocode(location => 'Edmonton, Alberta, Canada');
@@ -162,7 +156,7 @@ OPENADDR: {
 				$location = $geo_coder->geocode('At sea or abroad');
 				ok(!defined($location));
 
-				$location = $ogeocoder->geocode('Vessels, Misc Ships At sea or abroad, England');
+				$location = $o_geo_coder->geocode('Vessels, Misc Ships At sea or abroad, England');
 				# ok((!defined($location)) || ($location eq ''));
 				ok(!defined($location));
 
@@ -176,7 +170,7 @@ OPENADDR: {
 
 				$location = $geo_coder->geocode({ location => 'Saint Louis, Missouri, USA' });
 				cmp_deeply($location,
-					methods('lat' => num(38.63, 1e-2), 'long' => num(-90.25, 1e-2)));
+					methods('lat' => num(38.63, 1e-2), 'long' => num(-90.2, 1e-1)));
 
 				$location = $geo_coder->geocode('716 Yates Street, Victoria, British Columbia, Canada');
 				cmp_deeply($location,
@@ -202,6 +196,7 @@ OPENADDR: {
 				$location = $geo_coder->geocode('Minnis Terrace, Dover, Kent, England');
 				ok(defined($location));
 				ok(ref($location) eq 'Geo::Location::Point');
+
 			} else {
 				diag('Author tests not required for installation');
 				skip('Author tests not required for installation', 50);

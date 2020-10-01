@@ -1,6 +1,11 @@
 use Test2::V0;
 use File::Temp;
-use File::Slurper 'read_text';
+use File::Slurper;
+
+sub read_text {
+    my ( $filename ) = shift;
+    File::Slurper::read_text( $filename, undef, 'auto' );
+}
 
 sub test_wfh {
     my ( $desc, $mode, $sub ) = @_;

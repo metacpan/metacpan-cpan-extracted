@@ -27,7 +27,7 @@
             "Test::Pod::Coverage" : "1.08"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.90"
+            "Rinci" : "v1.1.94"
          }
       },
       "runtime" : {
@@ -37,7 +37,7 @@
             "File::Spec" : "0",
             "Getopt::Long" : "2.50",
             "Perinci::Access::Perl" : "0.87",
-            "Perinci::Sub::GetArgs::Argv" : "0.842",
+            "Perinci::Sub::GetArgs::Argv" : "0.845",
             "Test::Builder" : "0",
             "Test::More" : "0.98",
             "experimental" : "0",
@@ -67,12 +67,17 @@
          "web" : "https://github.com/perlancar/perl-Test-Rinci"
       }
    },
-   "version" : "0.154",
+   "version" : "0.155",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Filter/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
             "config" : {
@@ -162,7 +167,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Filter/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.602"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -231,9 +236,9 @@
             "version" : "6.014"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Filter/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Filter/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",

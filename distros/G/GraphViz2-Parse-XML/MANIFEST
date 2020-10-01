@@ -1,0 +1,15 @@
+.travis.yml
+Changes
+lib/GraphViz2/Parse/XML.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+scripts/parse.xml.pp.pl
+t/sample.xml
+t/test.t
+xt/author/pod.t
+xt/manifest.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

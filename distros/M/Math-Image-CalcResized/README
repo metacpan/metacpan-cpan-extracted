@@ -1,0 +1,364 @@
+NAME
+    Math::Image::CalcResized - Calculate dimensions of image/video resized
+    by ImageMagick-like geometry specification
+
+VERSION
+    This document describes version 0.003 of Math::Image::CalcResized (from
+    Perl distribution Math-Image-CalcResized), released on 2020-09-23.
+
+FUNCTIONS
+  calc_image_resized_size
+    Usage:
+
+     calc_image_resized_size(%args) -> [status, msg, payload, meta]
+
+    Given size of an image (in WxH, e.g. "2592x1944") and ImageMagick-like
+    resize instruction (e.g. "1024p>"), calculate new resized image.
+
+    Examples:
+
+    *   Example #1:
+
+         calc_image_resized_size(size => "2592x1944", resize => ""); # -> "2592x1944"
+
+    *   Example #2:
+
+         calc_image_resized_size(size => "2592x1944", resize => "20%"); # -> "518x388"
+
+    *   Example #3:
+
+         calc_image_resized_size(size => "2592x1944", resize => "20%x40%"); # -> "518x777"
+
+    *   Example #4:
+
+         calc_image_resized_size(size => "2592x1944", resize => "20x40%"); # -> "518x777"
+
+    *   Example #5:
+
+         calc_image_resized_size(size => "2592x1944", resize => 1024); # -> "1024x768"
+
+    *   Example #6:
+
+         calc_image_resized_size(size => "2592x1944", resize => "1024>"); # -> "1024x768"
+
+    *   Example #7:
+
+         calc_image_resized_size(size => "2592x1944", resize => "10240>"); # -> "2592x1944"
+
+    *   Example #8:
+
+         calc_image_resized_size(size => "2592x1944", resize => "1024^"); # -> "2592x1944"
+
+    *   Example #9:
+
+         calc_image_resized_size(size => "2592x1944", resize => "10240^"); # -> "10240x7680"
+
+    *   Example #10:
+
+         calc_image_resized_size(size => "2592x1944", resize => "x1024"); # -> "1365x1024"
+
+    *   Example #11:
+
+         calc_image_resized_size(size => "2592x1944", resize => "x768>"); # -> "1024x768"
+
+    *   Example #12:
+
+         calc_image_resized_size(size => "2592x1944", resize => "x7680>"); # -> "2592x1944"
+
+    *   Example #13:
+
+         calc_image_resized_size(size => "2592x1944", resize => "x768^"); # -> "2592x1944"
+
+    *   Example #14:
+
+         calc_image_resized_size(size => "2592x1944", resize => "x7680^"); # -> "10240x7680"
+
+    *   Example #15:
+
+         calc_image_resized_size(size => "2592x1944", resize => "20000x10000"); # -> "2592x1944"
+
+    *   Example #16:
+
+         calc_image_resized_size(size => "2592x1944", resize => "20000x1000"); # -> "1333x1000"
+
+    *   Example #17:
+
+         calc_image_resized_size(size => "2592x1944", resize => "100x200"); # -> "100x75"
+
+    *   Example #18:
+
+         calc_image_resized_size(size => "2592x1944", resize => "100x100"); # -> "100x75"
+
+    *   Example #19:
+
+         calc_image_resized_size(size => "2592x1944", resize => "10000x5000^"); # -> "10000x7500"
+
+    *   Example #20:
+
+         calc_image_resized_size(size => "2592x1944", resize => "5000x10000^"); # -> "13333x10000"
+
+    *   Example #21:
+
+         calc_image_resized_size(size => "2592x1944", resize => "100x100^"); # -> "2592x1944"
+
+    *   Example #22:
+
+         calc_image_resized_size(size => "2592x1944", resize => "100x100!"); # -> "100x100"
+
+    *   Example #23:
+
+         calc_image_resized_size(size => "2592x1944", resize => "10000x5000>"); # -> "2592x1944"
+
+    *   Example #24:
+
+         calc_image_resized_size(size => "2592x1944", resize => "5000x10000>"); # -> "2592x1944"
+
+    *   Example #25:
+
+         calc_image_resized_size(size => "2592x1944", resize => "3000x1000>"); # -> "2592x1944"
+
+    *   Example #26:
+
+         calc_image_resized_size(size => "2592x1944", resize => "2000x1000>"); # -> "1333x1000"
+
+    *   Example #27:
+
+         calc_image_resized_size(size => "2592x1944", resize => "100x100>"); # -> "100x75"
+
+    *   Example #28:
+
+         calc_image_resized_size(size => "2592x1944", resize => "10000x5000<"); # -> "10000x7500"
+
+    *   Example #29:
+
+         calc_image_resized_size(size => "2592x1944", resize => "5000x10000<"); # -> "13333x10000"
+
+    *   Example #30:
+
+         calc_image_resized_size(size => "2592x1944", resize => "3000x1000<"); # -> "2592x1944"
+
+    *   Example #31:
+
+         calc_image_resized_size(size => "2592x1944", resize => "2000x1000<"); # -> "2592x1944"
+
+    *   Example #32:
+
+         calc_image_resized_size(size => "2592x1944", resize => "100x100<"); # -> "2592x1944"
+
+    *   Example #33:
+
+         calc_image_resized_size(size => "2592x1944", resize => "1024^>"); # -> "1365x1024"
+
+    *   Example #34:
+
+         calc_image_resized_size(size => "2592x1944", resize => "10240^>"); # -> "2592x1944"
+
+    *   Example #35:
+
+         calc_image_resized_size(size => "2592x1944", resize => "1024^<"); # -> "2592x1944"
+
+    *   Example #36:
+
+         calc_image_resized_size(size => "2592x1944", resize => "10240^<"); # -> "13653x10240"
+
+    *   Example #37:
+
+         calc_image_resized_size(size => "2592x1944", resize => "^1024>"); # -> "1024x768"
+
+    *   Example #38:
+
+         calc_image_resized_size(size => "2592x1944", resize => "^10240>"); # -> "2592x1944"
+
+    *   Example #39:
+
+         calc_image_resized_size(size => "2592x1944", resize => "^1024<"); # -> "2592x1944"
+
+    *   Example #40:
+
+         calc_image_resized_size(size => "2592x1944", resize => "^10240<"); # -> "10240x7680"
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   resize* => *str*
+
+        Resize instruction, follows ImageMagick format.
+
+        Resize instruction can be given in several formats:
+
+         Syntax                     Meaning
+         -------------------------- ----------------------------------------------------------------
+         ""                         No resizing.
+ 
+         SCALE"%"                   Height and width both scaled by specified percentage.
+         SCALEX"%x"SCALEY"%"        Height and width individually scaled by specified percentages. (Only one % symbol needed.)
+ 
+         WIDTH                      Width given, height automagically selected to preserve aspect ratio.
+         WIDTH">"                   Shrink width if larger, height automagically selected to preserve aspect ratio.
+         WIDTH"^"                   Enlarge width if smaller, height automagically selected to preserve aspect ratio.
+ 
+         "x"HEIGHT                  Height given, width automagically selected to preserve aspect ratio.
+         "x"HEIGHT">"               Shrink height if larger, width automagically selected to preserve aspect ratio.
+         "x"HEIGHT"^"               Enlarge height if smaller, width automagically selected to preserve aspect ratio.
+ 
+         WIDTH"x"HEIGHT             Maximum values of height and width given, aspect ratio preserved.
+         WIDTH"x"HEIGHT"^"          Minimum values of height and width given, aspect ratio preserved.
+         WIDTH"x"HEIGHT"!"          Width and height emphatically given, original aspect ratio ignored.
+         WIDTH"x"HEIGHT">"          Shrinks an image with dimension(s) larger than the corresponding width and/or height argument(s).
+         WIDTH"x"HEIGHT"<"          Shrinks an image with dimension(s) larger than the corresponding width and/or height argument(s).
+ 
+         NUMBER"^>"                 Shrink shortest side if larger than number, aspect ratio preserved.
+         NUMBER"^<"                 Enlarge shortest side if larger than number, aspect ratio preserved.
+         "^"NUMBER">"               Shrink longer side if larger than number, aspect ratio preserved.
+         "^"NUMBER"<"               Enlarge longer side if larger than number, aspect ratio preserved.
+
+        Currently unsupported:
+
+         AREA"@"                    Resize image to have specified area in pixels. Aspect ratio is preserved.
+         X":"Y                      Here x and y denotes an aspect ratio (e.g. 3:2 = 1.5).
+
+        Ref:
+        <http://www.imagemagick.org/script/command-line-processing.php#geome
+        try>
+
+    *   size* => *str*
+
+        Image/video size, in <width>x<height> format, e.g. 2592x1944.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  image_resize_notation_to_human
+    Usage:
+
+     image_resize_notation_to_human(%args) -> [status, msg, payload, meta]
+
+    Translate ImageMagick-like resize notation (e.g. "720^>") to
+    human-friendly text (e.g. "shrink shortest side to 720px").
+
+    Examples:
+
+    *   Example #1:
+
+         image_resize_notation_to_human(resize => ""); # -> "no resizing"
+
+    *   Example #2:
+
+         image_resize_notation_to_human(resize => "50%"); # -> "scale to 50%"
+
+    *   Example #3:
+
+         image_resize_notation_to_human(resize => "50%x50%"); # -> "scale width to 50%, height to 50%"
+
+    *   Example #4:
+
+         image_resize_notation_to_human(resize => 720); # -> "set width to 720px"
+
+    *   Example #5:
+
+         image_resize_notation_to_human(resize => "720>"); # -> "shrink width to 720px"
+
+    *   Example #6:
+
+         image_resize_notation_to_human(resize => "720^"); # -> "enlarge width to 720px"
+
+    *   Example #7:
+
+         image_resize_notation_to_human(resize => "x720"); # -> "set height to 720px"
+
+    *   Example #8:
+
+         image_resize_notation_to_human(resize => "x720>"); # -> "shrink height to 720px"
+
+    *   Example #9:
+
+         image_resize_notation_to_human(resize => "x720^"); # -> "enlarge height to 720px"
+
+    *   Example #10:
+
+         image_resize_notation_to_human(resize => "640x480"); # -> "fit image inside 640x480"
+
+    *   Example #11:
+
+         image_resize_notation_to_human(resize => "640x480^"); # -> "fit image to fit 640x480 inside it"
+
+    *   Example #12:
+
+         image_resize_notation_to_human(resize => "640x480>"); # -> "shrink image to fit inside 640x480"
+
+    *   Example #13:
+
+         image_resize_notation_to_human(resize => "640x480<"); # -> "enlarge image to fit 640x480 inside it"
+
+    *   Example #14:
+
+         image_resize_notation_to_human(resize => "640x480!"); # -> "set dimension to 640x480"
+
+    *   Example #15:
+
+         image_resize_notation_to_human(resize => "720^>"); # -> "shrink shortest side to 720px"
+
+    *   Example #16:
+
+         image_resize_notation_to_human(resize => "720^<"); # -> "enlarge shortest side to 720px"
+
+    *   Example #17:
+
+         image_resize_notation_to_human(resize => "^720>"); # -> "shrink longest side to 720px"
+
+    *   Example #18:
+
+         image_resize_notation_to_human(resize => "^720<"); # -> "enlarge longest side to 720px"
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   resize* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Math-Image-CalcResized>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Math-Image-CalcResized>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Image-CalcResize
+    d>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

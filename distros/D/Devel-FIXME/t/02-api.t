@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 34;
+use Test::Most tests => 31;
 use Test::NoWarnings;
 
 my @orig = @INC;
@@ -14,9 +14,7 @@ require_ok("Devel::FIXME");
 
 is_deeply(\@INC, \@orig, "\@INC isn't yet changed");
 
-
 my (@shouts,@readfiles);
-
 
 {
 	package Devel::FIXME::Test;
@@ -61,7 +59,7 @@ is_deeply([ map { $_->[1] } @readfiles ], [], "did not read all of \%INC a secon
 
 	package foo;
 
-	use Test::More;
+	use Test::Most;
 	
 	ok(!$::{SHOUT}, "SHOUT has not yet been imported");
 	Devel::FIXME->import(qw/SHOUT/);
@@ -76,15 +74,18 @@ is_deeply([ map { $_->[1] } @readfiles ], [], "did not read all of \%INC a secon
 	is(\&CONT, \&Devel::FIXME::CONT, "CONT was imported");
 }
 
+@shouts = ();
+
 Devel::FIXME::Test->FIXME("foo");
+@shouts = grep { $_->[0]{file} eq __FILE__ } @shouts; # generates one from AutoLoader
 is_deeply(\@shouts, [ [ Devel::FIXME::Test->new({
-		text => "foo",
-		file => __FILE__,
-		line => __LINE__ - 4,
-		package => __PACKAGE__,
-		script => $0,
-		time => $shouts[0][0]{time},
-	}) ] ], "->FIXME('foo') object is shouted");
+	text => "foo",
+	file => __FILE__,
+	line => __LINE__ - 5,
+	package => __PACKAGE__,
+	script => $0,
+	time => $shouts[0][0]{time},
+}) ] ], "->FIXME('foo') object is shouted");
 
 @shouts = ();
 
@@ -198,11 +199,6 @@ is_deeply(\@shouts, [ [ Devel::FIXME::Test->new({
 
 }
 
-require_ok("Text::Soundex"); # just a random core module
-
-is_deeply(\@shouts, [ ], "require issued no FIXMEs");
-is_deeply([ $readfiles[-1][1] ], [ $INC{'Text/Soundex.pm'} ], "Text::Soundex was read by require hook");
-
 @shouts = ();
 
 my $called;
@@ -248,4 +244,3 @@ is_deeply(\@shouts, [ [ Devel::FIXME::Test->new(
 		script => $0,
 		time => $shouts[0][0]{time},
 	) ] ], "FIXME object is shouted, due to default fall back");
-

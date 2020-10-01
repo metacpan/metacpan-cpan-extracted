@@ -1,0 +1,43 @@
+---
+abstract: 'Fuzzy finder for Perl statements'
+author:
+  - 'utgwkk <utagawakiki@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-PerlFuzzyTokenFinder
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::PerlFuzzyTokenFinder:
+    file: lib/App/PerlFuzzyTokenFinder.pm
+    version: '0.02'
+  App::PerlFuzzyTokenFinder::CLI:
+    file: lib/App/PerlFuzzyTokenFinder/CLI.pm
+  App::PerlFuzzyTokenFinder::MatchedPosition:
+    file: lib/App/PerlFuzzyTokenFinder/MatchedPosition.pm
+requires:
+  PPI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/utgwkk/App-PerlFuzzyTokenFinder/issues
+  homepage: https://github.com/utgwkk/App-PerlFuzzyTokenFinder
+  repository: git://github.com/utgwkk/App-PerlFuzzyTokenFinder.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

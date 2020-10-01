@@ -1,12 +1,13 @@
 package Net::Amazon::S3::Signature::V4;
 # ABSTRACT: V4 signatures
-$Net::Amazon::S3::Signature::V4::VERSION = '0.91';
+$Net::Amazon::S3::Signature::V4::VERSION = '0.94';
 use Moose;
 
 use Net::Amazon::S3::Signature::V4Implementation;
 use Digest::SHA;
 use Ref::Util;
 
+use Net::Amazon::S3::Constants;
 use Net::Amazon::S3::Signature::V2;
 
 use namespace::clean;
@@ -20,7 +21,7 @@ sub enforce_use_virtual_host {
 sub redirect_handler {
     my ($self, $http_request, $response, $ua, $h) = @_;
 
-    my $region = $response->header('x-amz-bucket-region') or return;
+    my $region = $response->header(Net::Amazon::S3::Constants->HEADER_BUCKET_REGION) or return;
 
     # change the bucket region in request
     my $request = $response->request;
@@ -28,7 +29,7 @@ sub redirect_handler {
 
     # sign the request again
     $request->headers->remove_header('Authorization');
-    $request->headers->remove_header('x-amz-date');
+    $request->headers->remove_header(Net::Amazon::S3::Constants->HEADER_DATE);
     $http_request->_sign_request( $request, $region );
 
     return $request;
@@ -101,15 +102,15 @@ Net::Amazon::S3::Signature::V4 - V4 signatures
 
 =head1 VERSION
 
-version 0.91
+version 0.94
 
 =head1 AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

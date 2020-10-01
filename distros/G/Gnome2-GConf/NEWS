@@ -1,3 +1,20 @@
+Overview of changes since 1.045
+===============================
+
+* Makefile.PL: added 'NO_META => 1' to prevent clobbering META.yml
+
+Overview of changes since 1.044
+===============================
+
+* Added 'doap' file with a lowercased filename for use by GNOME GitLab
+* xs/GConfSchema.xs: applied patch from Debian project; closes RT#95015
+* xs/GConf2.xs,xs/GConfClient.xs: Applied docpatch from Debian project; closes
+  RT#95014
+* META.yml: added 'configure_requires' key, this fixes automated installs via
+  cpanminus (RT#129419)
+* xs/GConf2.xs: fixed grammar error (extra 'that')
+* Updated FSF address in all files that have it
+
 Overview of changes since 1.043
 ===============================
 

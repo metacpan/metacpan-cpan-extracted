@@ -1,8 +1,8 @@
 package App::DumpFirefoxHistory;
 
-our $DATE = '2020-04-19'; # DATE
+our $DATE = '2020-05-24'; # DATE
 our $DIST = 'App-DumpFirefoxHistory'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -161,7 +161,7 @@ App::DumpFirefoxHistory - Dump Firefox history
 
 =head1 VERSION
 
-This document describes version 0.007 of App::DumpFirefoxHistory (from Perl distribution App-DumpFirefoxHistory), released on 2020-04-19.
+This document describes version 0.008 of App::DumpFirefoxHistory (from Perl distribution App-DumpFirefoxHistory), released on 2020-05-24.
 
 =head1 SYNOPSIS
 
@@ -238,7 +238,8 @@ feature.
 
 L<App::DumpChromeHistory>, L<App::DumpOperaHistory>
 
-L<App::FirefoxUtils>
+Other utilities for Firefox: L<App::FirefoxUtils>,
+L<App::FirefoxMultiAccountContainersUtils>.
 
 =head1 AUTHOR
 

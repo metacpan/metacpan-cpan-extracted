@@ -21,36 +21,14 @@
 package Perl::Tidy::Tokenizer;
 use strict;
 use warnings;
-our $VERSION = '20200907';
+our $VERSION = '20201001';
 
 use Perl::Tidy::LineBuffer;
-
-BEGIN {
-
-    # Caution: these debug flags produce a lot of output
-    # They should all be 0 except when debugging small scripts
-
-    use constant TOKENIZER_DEBUG_FLAG_EXPECT   => 0;
-    use constant TOKENIZER_DEBUG_FLAG_NSCAN    => 0;
-    use constant TOKENIZER_DEBUG_FLAG_QUOTE    => 0;
-    use constant TOKENIZER_DEBUG_FLAG_SCAN_ID  => 0;
-    use constant TOKENIZER_DEBUG_FLAG_TOKENIZE => 0;
-
-    my $debug_warning = sub {
-        print STDOUT "TOKENIZER_DEBUGGING with key $_[0]\n";
-    };
-
-    TOKENIZER_DEBUG_FLAG_EXPECT   && $debug_warning->('EXPECT');
-    TOKENIZER_DEBUG_FLAG_NSCAN    && $debug_warning->('NSCAN');
-    TOKENIZER_DEBUG_FLAG_QUOTE    && $debug_warning->('QUOTE');
-    TOKENIZER_DEBUG_FLAG_SCAN_ID  && $debug_warning->('SCAN_ID');
-    TOKENIZER_DEBUG_FLAG_TOKENIZE && $debug_warning->('TOKENIZE');
-
-}
-
 use Carp;
 
 # PACKAGE VARIABLES for processing an entire FILE.
+# These must be package variables because most may get localized during
+# processing.  Most are initialized in sub prepare_for_a_new_file.
 use vars qw{
   $tokenizer_self
 
@@ -201,6 +179,25 @@ sub DESTROY {
     my $self = shift;
     $self->_decrement_count();
     return;
+}
+
+sub AUTOLOAD {
+
+    # Catch any undefined sub calls so that we are sure to get
+    # some diagnostic information.  This sub should never be called
+    # except for a programming error.
+    our $AUTOLOAD;
+    return if ( $AUTOLOAD eq 'DESTROY' );
+    my ( $pkg, $fname, $lno ) = caller();
+    print STDERR <<EOM;
+======================================================================
+Unexpected call to Autoload looking for sub $AUTOLOAD
+Called from package: '$pkg'  
+Called from File '$fname'  at line '$lno'
+This error is probably due to a recent programming change
+======================================================================
+EOM
+    exit 1;
 }
 
 sub check_options {
@@ -771,7 +768,7 @@ sub get_line {
         # Note that the _in_data and _in_end flags remain set
         # so that we return to that state after seeing the
         # end of a pod section
-        if ( $input_line =~ /^=(?!cut)/ ) {
+        if ( $input_line =~ /^=(\w+)\b/ && $1 ne 'cut' ) {
             $line_of_tokens->{_line_type} = 'POD_START';
             write_logfile_entry("Entering POD section\n");
             $tokenizer_self->[_in_pod_] = 1;
@@ -790,7 +787,7 @@ sub get_line {
         # Note that the _in_data and _in_end flags remain set
         # so that we return to that state after seeing the
         # end of a pod section
-        if ( $input_line =~ /^=(?!cut)/ ) {
+        if ( $input_line =~ /^=(\w+)\b/ && $1 ne 'cut' ) {
             $line_of_tokens->{_line_type} = 'POD_START';
             write_logfile_entry("Entering POD section\n");
             $tokenizer_self->[_in_pod_] = 1;
@@ -817,7 +814,7 @@ sub get_line {
             }
 
             if (
-                ( $input_line_number > 1 )
+                $input_line_number > 1
 
                 # leave any hash bang in a BEGIN block alone
                 # i.e. see 'debugger-duck_type.t'
@@ -825,7 +822,22 @@ sub get_line {
                        $last_nonblank_block_type
                     && $last_nonblank_block_type eq 'BEGIN'
                 )
-                && ( !$tokenizer_self->[_look_for_hash_bang_] )
+                && !$tokenizer_self->[_look_for_hash_bang_]
+
+                # Try to avoid giving a false alarm at a simple comment.
+                # These look like valid hash-bang lines:
+
+                #!/usr/bin/perl -w
+                #!   /usr/bin/perl -w
+                #!c:\perl\bin\perl.exe
+
+                # These are comments:
+                #! I love perl
+                #!  sunos does not yet provide a /usr/bin/perl
+
+                # Comments typically have multiple spaces, which suggests
+                # the filter
+                && $input_line =~ /^\#\!(\s+)?(\S+)?perl/
               )
             {
 
@@ -905,7 +917,7 @@ sub get_line {
             }
             else {
                 $line_of_tokens->{_line_type} = 'POD_START';
-                complain(
+                warning(
 "=cut starts a pod section .. this can fool pod utilities.\n"
                 );
                 write_logfile_entry("Entering POD section\n");
@@ -2121,12 +2133,15 @@ sub prepare_for_a_new_file {
                   find_angle_operator_termination( $input_line, $i, $rtoken_map,
                     $expecting, $max_token_index );
 
-                if ( $type eq '<' && $expecting == TERM ) {
-                    error_if_expecting_TERM();
-                    interrupt_logfile();
-                    warning("Unterminated <> operator?\n");
-                    resume_logfile();
-                }
+                ##  This message is not very helpful and quite confusing if the above
+                ##  routine decided not to write a message with the line number.
+                ##  if ( $type eq '<' && $expecting == TERM ) {
+                ##      error_if_expecting_TERM();
+                ##      interrupt_logfile();
+                ##      warning("Unterminated <> operator?\n");
+                ##      resume_logfile();
+                ##  }
+
             }
             else {
             }
@@ -2402,9 +2417,12 @@ sub prepare_for_a_new_file {
             scan_bare_identifier();
         },
         '<<' => sub {    # maybe a here-doc?
-            return
-              unless ( $i < $max_token_index )
-              ;          # here-doc not possible if end of line
+
+##      This check removed because it could be a deprecated here-doc with
+##      no specified target.  See example in log 16 Sep 2020.
+##            return
+##              unless ( $i < $max_token_index )
+##              ;          # here-doc not possible if end of line
 
             if ( $expecting != OPERATOR ) {
                 my ( $found_target, $here_doc_target, $here_quote_character,
@@ -2423,6 +2441,10 @@ sub prepare_for_a_new_file {
                     if ( length($here_doc_target) > 80 ) {
                         my $truncated = substr( $here_doc_target, 0, 80 );
                         complain("Long here-target: '$truncated' ...\n");
+                    }
+                    elsif ( !$here_doc_target ) {
+                        warning('Use of bare << to mean <<"" is deprecated\n')
+                          unless ($here_quote_character);
                     }
                     elsif ( $here_doc_target !~ /^[A-Z_]\w+$/ ) {
                         complain(
@@ -2630,6 +2652,8 @@ sub prepare_for_a_new_file {
         'qw' => 1,
         'qx' => 1,
     );
+
+    use constant DEBUG_TOKENIZE => 0;
 
     sub tokenize_this_line {
 
@@ -3111,7 +3135,7 @@ EOM
             $next_tok  = $rtokens->[ $i + 1 ];
             $next_type = $rtoken_type->[ $i + 1 ];
 
-            TOKENIZER_DEBUG_FLAG_TOKENIZE && do {
+            DEBUG_TOKENIZE && do {
                 local $" = ')(';
                 my @debug_list = (
                     $last_nonblank_token,      $tok,
@@ -4368,6 +4392,7 @@ sub operator_expected {
     # $statement_type
 
     my ( $prev_type, $tok, $next_type ) = @_;
+    use constant DEBUG_EXPECT => 0;
 
     my $op_expected = UNKNOWN;
 
@@ -4389,30 +4414,40 @@ sub operator_expected {
             $op_expected = UNKNOWN;
         }
 
+        # The 'weird parsing rules' of next section do not work for '<' and '?'
+        # It is best to mark them as unknown.  Test case:
+        #  print $fh <DATA>;
+        elsif ( $tok =~ /^[\<\?]$/ ) {
+            $op_expected = UNKNOWN;
+        }
+
         # For possible file handle like "$a", Perl uses weird parsing rules.
         # For example:
         # print $a/2,"/hi";   - division
         # print $a / 2,"/hi"; - division
         # print $a/ 2,"/hi";  - division
         # print $a /2,"/hi";  - pattern (and error)!
-        elsif ( ( $prev_type eq 'b' ) && ( $next_type ne 'b' ) ) {
+        # Some examples where this logic works okay, for '&','*','+':
+        #    print $fh &xsi_protos(@mods);
+        #    my $x = new $CompressClass *FH;
+        #    print $OUT +( $count % 15 ? ", " : "\n\t" );
+        elsif ($prev_type eq 'b'
+            && $next_type ne 'b' )
+        {
             $op_expected = TERM;
         }
 
-        # Note when an operation is being done where a
-        # filehandle might be expected, since a change in whitespace
-        # could change the interpretation of the statement.
-        else {
-            if ( $tok =~ /^([x\/\+\-\*\%\&\.\?\<]|\>\>)$/ ) {
+        # Note that '?' and '<' have been moved above
+        # ( $tok =~ /^([x\/\+\-\*\%\&\.\?\<]|\>\>)$/ ) {
+        elsif ( $tok =~ /^([x\/\+\-\*\%\&\.]|\>\>)$/ ) {
 
-               # Do not complain in 'use' statements, which have special syntax.
-               # For example, from RT#130344:
-               #   use lib $FindBin::Bin . '/lib';
-                if ( $statement_type ne 'use' ) {
-                    complain("operator in print statement not recommended\n");
-                }
-                $op_expected = OPERATOR;
+            # Do not complain in 'use' statements, which have special syntax.
+            # For example, from RT#130344:
+            #   use lib $FindBin::Bin . '/lib';
+            if ( $statement_type ne 'use' ) {
+                complain("operator in print statement not recommended\n");
             }
+            $op_expected = OPERATOR;
         }
     }
 
@@ -4573,7 +4608,7 @@ sub operator_expected {
         );
     }
 
-    TOKENIZER_DEBUG_FLAG_EXPECT && do {
+    DEBUG_EXPECT && do {
         print STDOUT
 "EXPECT: returns $op_expected for last type $last_nonblank_type token $last_nonblank_token\n";
     };
@@ -5704,6 +5739,7 @@ sub scan_id_do {
     my ( $input_line, $i, $tok, $rtokens, $rtoken_map, $id_scan_state,
         $max_token_index )
       = @_;
+    use constant DEBUG_NSCAN => 0;
     my $type = '';
     my ( $i_beg, $pos_beg );
 
@@ -5789,7 +5825,7 @@ sub scan_id_do {
         report_definite_bug();
     }
 
-    TOKENIZER_DEBUG_FLAG_NSCAN && do {
+    DEBUG_NSCAN && do {
         print STDOUT
           "NSCAN: returns i=$i, tok=$tok, type=$type, state=$id_scan_state\n";
     };
@@ -5926,6 +5962,7 @@ sub scan_identifier_do {
     my ( $i, $id_scan_state, $identifier, $rtokens, $max_token_index,
         $expecting, $container_type )
       = @_;
+    use constant DEBUG_SCAN_ID => 0;
     my $i_begin   = $i;
     my $type      = '';
     my $tok_begin = $rtokens->[$i_begin];
@@ -5935,7 +5972,7 @@ sub scan_identifier_do {
     my $tok                 = $tok_begin;
     my $message             = "";
 
-    my $in_prototype_or_signature = $container_type =~ /^sub/;
+    my $in_prototype_or_signature = $container_type =~ /^sub\b/;
 
     # these flags will be used to help figure out the type:
     my $saw_alpha = ( $tok =~ /^\w/ );
@@ -6352,6 +6389,10 @@ sub scan_identifier_do {
     if ( $id_scan_state =~ /^[A\:\(\)]/ ) {
         $id_scan_state = '';
     }
+
+    # The deprecated variable $# does not combine with anything on the next line
+    if ( $identifier eq '$#' ) { $id_scan_state = '' }
+
     if ( $i < 0 ) { $i = 0 }
 
     unless ($type) {
@@ -6401,7 +6442,7 @@ sub scan_identifier_do {
         $i   = $i_begin;
     }
 
-    TOKENIZER_DEBUG_FLAG_SCAN_ID && do {
+    DEBUG_SCAN_ID && do {
         my ( $a, $b, $c ) = caller;
         print STDOUT
 "SCANID: called from $a $b $c with tok, i, state, identifier =$tok_begin, $i_begin, $id_scan_state_begin, $identifier_begin\n";
@@ -7237,7 +7278,7 @@ sub follow_quoted_string {
     my $i             = $i_beg - 1;
     my $quoted_string = "";
 
-    TOKENIZER_DEBUG_FLAG_QUOTE && do {
+    0 && do {
         print STDOUT
 "QUOTE entering with quote_pos = $quote_pos i=$i beginning_tok =$beginning_tok\n";
     };
@@ -7336,7 +7377,9 @@ sub follow_quoted_string {
                 }
             }
             else {
-                $quoted_string .= substr( $tok, $old_pos );
+                if ( $old_pos <= length($tok) ) {
+                    $quoted_string .= substr( $tok, $old_pos );
+                }
             }
         }
     }
@@ -7934,6 +7977,7 @@ BEGIN {
       when
       err
       say
+      isa
 
       catch
     );

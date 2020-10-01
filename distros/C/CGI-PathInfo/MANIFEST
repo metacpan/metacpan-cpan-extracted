@@ -1,10 +1,9 @@
-Artistic_License.txt
 Changes
-GPL_License.txt
 LICENSE
 MANIFEST
 Makefile.PL
 Build.PL
+META.json
 META.yml
 README
 lib/CGI/PathInfo.pm

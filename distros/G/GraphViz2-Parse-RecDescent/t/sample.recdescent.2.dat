@@ -1,0 +1,49 @@
+<autotree>
+
+gr_taskfile: gr_block(s) /^\Z/ { $return = $item[1] }
+
+gr_block: gr_defineblock  { $return = $item[1] }
+	| gr_taskblock { $return = $item[1] }
+        | <error>
+
+gr_defineblock: gr_globalfields
+
+gr_globalfields: 'global' gr_fielddeclarations
+
+gr_taskblock: gr_taskname '{' <commit> gr_localfields(?) gr_out gr_in(?) gr_do(s) '}'
+	    | <error>
+
+gr_localfields: 'fields' gr_fielddeclarations
+
+gr_out: 'out' '{' gr_ofilespec(s) '}'
+
+gr_in: 'in' '{' gr_ifilespec(s) '}'
+
+gr_do: 'do' gr_interpreter gr_code
+
+gr_ofilespec: gr_fileid '{' gr_quotedstring gr_identifier(s?) '}'
+	    | <error>
+
+gr_ifilespec: gr_fileid '{' gr_quotedstring gr_identifier(s?) '}'
+	    | <error>
+
+gr_quotedstring: '"' <commit> /[^"]+/ '"' { $return = $item[3]; }
+               | "'" <commit> /[^']+/ "'" { $return = $item[3]; }
+
+gr_fielddeclarations: '{' gr_fielddec(s /;/) gr_code(?) '}'
+
+gr_fielddec: gr_fieldname gr_regexstring(?)
+
+gr_code: '%{' /.+ (?! %} | }% )/ ( '%}' | '}%' ) { $return = $item[2]; }
+
+gr_regexstring: '/' <commit> /[^\/]+/ '/' { $return = $item[3]; }
+	      | 'm[' <commit> /[^]]+/ "]" { $return = $item[3]; }
+              | 'm(' <commit> /[^)]+/ ")" { $return = $item[3]; }
+              | 'm<' <commit> /[^?]+/ ">" { $return = $item[3]; }
+
+gr_taskname:    gr_identifier { $return = $item[1]; }
+gr_fileid:      gr_identifier { $return = $item[1]; }
+gr_fieldname:   gr_identifier { $return = $item[1]; }
+gr_interpreter: gr_identifier { $return = $item[1]; }
+
+gr_identifier: /[A-Za-z_]\w*/ { $return = $item[1]; }

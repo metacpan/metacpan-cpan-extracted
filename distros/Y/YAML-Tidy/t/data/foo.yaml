@@ -1,0 +1,14 @@
+---
+a: &inner
+ b: |
+    literal
+ d:
+     e: f
+indicator: |3
+     indented
+   line
+sameline: |
+    a
+nextline:
+   |
+    b

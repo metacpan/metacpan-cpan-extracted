@@ -1,5 +1,24 @@
 # Perltidy Change Log
 
+## 2020 10 01
+
+    - Robustness of perltidy has been significantly improved.  Updating is recommended. Continual 
+      automated testing runs began about 1 Sep 2020 and numerous issues have been found and fixed. 
+      Many involve references to uninitialized variables when perltidy is fed random text and random
+      control parameters. A complete list is given in the file 
+
+           https://github.com/perltidy/perltidy/blob/master/local-docs/BugLog.pod
+
+    - Added the token '->' to the list of alignment tokens, as suggested in git
+      #39, so that it can be vertically aligned if a space is placed before them with -wls='->'.
+
+    - Added parameters -bbhb=n (--break-before-hash-brace=n), -bbsb=n (--break-before-square-bracket=n),
+      and -bbp=n (--break-before-paren=n) suggested in git #38.  These provide control over the
+      opening container token of a multiple-line list.  Related new parameters -bbhbi=n, -bbsbi=n, -bbpi=n
+      control indentation of these tokens.
+
+    - Added keyword 'isa'.
+
 ## 2020 09 07
 
     - Fixed bug git #37, an error when the combination -scbb -csc was used.

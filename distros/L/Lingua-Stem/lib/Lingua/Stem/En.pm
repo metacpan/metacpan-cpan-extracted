@@ -64,6 +64,8 @@ support for the British -ise suffix.
 
  2020.06.20 - 2.30 Version renumber for module consistency.
 
+ 2020.09.26 - 2.31 Fix for Latin1/UTF8 issue in documentation
+
 =cut
 
 #######################################################################
@@ -76,7 +78,7 @@ require Exporter;
 use Carp;
 use vars qw (@ISA @EXPORT_OK @EXPORT %EXPORT_TAGS $VERSION);
 BEGIN {
-    $VERSION     = "2.30";
+    $VERSION     = "2.31";
     @ISA         = qw (Exporter);
     @EXPORT      = ();
     @EXPORT_OK   = qw (stem clear_stem_cache stem_caching);

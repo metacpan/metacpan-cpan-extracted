@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::Most tests => 5;
 use Test::Warn;
 use Test::Exception;
 
@@ -15,7 +15,7 @@ use lib 't/lib';
 
 throws_ok {
 	require Devel::FIXME::Test::Error;
-} qr{syntax error at t/lib/Devel/FIXME/Test/Error.pm line 6, near "if this is "\nCompilation failed in require at @{[ __FILE__ ]} line @{[ __LINE__ -1 ]}}, "syntax errors propegate ordinarily";
+} qr{Devel/FIXME/Test/Error\.pm line 6.*at @{[ __FILE__ ]} line @{[ __LINE__ -1 ]}}s, "syntax errors propegate ordinarily";
 
 throws_ok {
 	Devel::FIXME->new(qw/uneven number of elements in argument list/);
@@ -39,23 +39,3 @@ SKIP: {
 
 	chmod 0644, "t/lib/cant_read";
 }
-
-unshift @INC, "t/lib/empty";
-
-warning_is {
-	require Text::Soundex;
-} { carped => "FIXME's magic sub is no longer first in \@INC at " . __FILE__ . " line " . __LINE__ }, "\@INC sub not first, instead scalar";
-
-my $called;
-$INC[0] = sub { $called = 1 };
-
-warning_is {
-	require Class::ISA;
-} { carped => "FIXME's magic sub is no longer first in \@INC at " . __FILE__ . " line " . __LINE__ }, "\@INC sub not first, instead other sub";
-
-ok($called, "other sub was called");
-
-throws_ok {
-	Devel::FIXME->import(text => 'foo');
-} qr/"text" is not exported by the Devel::FIXME module/, "importing a KVP list breaks";
-

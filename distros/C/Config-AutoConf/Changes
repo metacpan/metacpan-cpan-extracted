@@ -1,5 +1,13 @@
 Revision history for Config-AutoConf
 
+0.319	2020-09-29
+	- add optional extra_link_flags to search_libs
+	- fix check_prog to not find directories (RT#132993), thanks
+	  RJBS for reporting
+	- include .perltidyrc to allow CPAN distribution downloaders
+	  creating sane patches
+	- tooling improvements
+
 0.318	2020-01-02
 	- use File::Slurper instead of File::Slurp::Tiny
 	- use cached pkg_config_prog, when available

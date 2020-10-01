@@ -1,0 +1,27 @@
+language: perl
+sudo: true
+addons:
+  apt:
+    packages:
+    - graphviz
+matrix:
+  include:
+    # start the first coverage early so that it starts before everything else
+    - perl: "5.30"
+      env: COVERAGE=1
+    - perl: "5.10"
+    - perl: "5.12"
+    - perl: "5.14"
+    - perl: "5.20"
+before_install:
+  - eval $(curl https://travis-perl.github.io/init) --auto
+
+branches:
+  except:
+    - /^wip\//
+    - /^blocked/
+notifications:
+  irc:
+    channels:
+      - "irc.perl.org#graphql-perl"
+    skip_join: true

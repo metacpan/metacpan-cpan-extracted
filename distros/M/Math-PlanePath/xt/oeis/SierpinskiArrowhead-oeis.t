@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2018, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,9 +26,21 @@ use lib 't','xt';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
-use MyOEIS;
-use Math::PlanePath::SierpinskiCurve;
+use Math::PlanePath::SierpinskiArrowhead;
 use Math::NumSeq::PlanePathTurn;
+use MyOEIS;
+
+
+#------------------------------------------------------------------------------
+# A334483 -- X coordinate of "diagonal"
+# A334484 -- Y coordinate of "diagonal"
+# catalogued
+
+# my(g=OEIS_bfile_gf("A334483")); x(n) = polcoeff(g,n);
+# my(g=OEIS_bfile_gf("A334484")); y(n) = polcoeff(g,n);
+# plothraw(vector(3^5,n,n--; x(n)), \
+#          vector(3^5,n,n--; y(n)), 1+8+16+32)
+#
 
 
 #------------------------------------------------------------------------------

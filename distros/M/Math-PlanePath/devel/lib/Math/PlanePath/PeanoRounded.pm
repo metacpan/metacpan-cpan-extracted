@@ -4,7 +4,7 @@
 
 
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -34,7 +34,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
@@ -357,7 +357,7 @@ sub rect_to_n_range {
 1;
 __END__
 
-=for stopwords Guiseppe Peano Peano's eg Sur une courbe qui remplit toute aire Mathematische Annalen Ryde OEIS ZOrderCurve ie PeanoCurve Math-PlanePath versa Online Radix radix HilbertCurve
+=for stopwords Giuseppe Peano Peano's eg Sur une courbe qui remplit toute aire Mathematische Annalen Ryde OEIS ZOrderCurve ie PeanoCurve Math-PlanePath versa Online Radix radix HilbertCurve
 
 =head1 NAME
 
@@ -498,7 +498,7 @@ L<Math::PlanePath>,
 L<Math::PlanePath::PeanoCurve>,
 L<Math::PlanePath::DragonRounded>
 
-Guiseppe Peano, "Sur une courbe, qui remplit toute une aire plane",
+Giuseppe Peano, "Sur Une Courbe, Qui Remplit Toute Une Aire Plane",
 Mathematische Annalen, volume 36, number 1, 1890, p157-160
 
 =over
@@ -514,7 +514,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

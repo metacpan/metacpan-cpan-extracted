@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -50,6 +50,42 @@ my @modules = (
                # elsewhere and are skipped if not available to test
 
                # module list begin
+
+               'PeanoDiagonals',
+               'PeanoDiagonals,radix=2',
+               'PeanoDiagonals,radix=4',
+               'PeanoDiagonals,radix=5',
+               'PeanoDiagonals,radix=17',
+
+               'PeanoCurve',
+               'PeanoCurve,radix=2',
+               'PeanoCurve,radix=4',
+               'PeanoCurve,radix=5',
+               'PeanoCurve,radix=17',
+
+               'Columns',
+               'Columns,height=1',
+               'Columns,height=2',
+               'Columns,n_start=0',
+               'Columns,height=37,n_start=0',
+               'Columns,height=37,n_start=123',
+               'Rows',
+               'Rows,width=1',
+               'Rows,width=2',
+               'Rows,n_start=0',
+               'Rows,width=37,n_start=0',
+               'Rows,width=37,n_start=123',
+
+               'AlternatePaper',
+               'AlternatePaper,arms=2',
+               'AlternatePaper,arms=3',
+               'AlternatePaper,arms=4',
+               'AlternatePaper,arms=5',
+               'AlternatePaper,arms=6',
+               'AlternatePaper,arms=7',
+               'AlternatePaper,arms=8',
+
+               'CCurve',
 
                'AlternateTerdragon',
                'AlternateTerdragon,arms=2',
@@ -208,25 +244,6 @@ my @modules = (
                'HexSpiralSkewed,wider=4',
                'HexSpiralSkewed,wider=5',
                'HexSpiralSkewed,wider=37',
-
-               'Columns',
-               'Columns,height=1',
-               'Columns,height=2',
-               'Columns,n_start=0',
-               'Columns,height=37,n_start=0',
-               'Columns,height=37,n_start=123',
-               'Rows',
-               'Rows,width=1',
-               'Rows,width=2',
-               'Rows,n_start=0',
-               'Rows,width=37,n_start=0',
-               'Rows,width=37,n_start=123',
-
-               'PeanoCurve',
-               'PeanoCurve,radix=2',
-               'PeanoCurve,radix=4',
-               'PeanoCurve,radix=5',
-               'PeanoCurve,radix=17',
 
                'PixelRings',
 
@@ -410,8 +427,6 @@ my @modules = (
                'KochPeaks',
                'KochSnowflakes',
 
-               'CCurve',
-
                'SierpinskiCurve',
                'SierpinskiCurve,arms=2',
                'SierpinskiCurve,arms=3',
@@ -488,15 +503,6 @@ my @modules = (
                'FlowsnakeCentres',
                'FlowsnakeCentres,arms=2',
                'FlowsnakeCentres,arms=3',
-
-               'AlternatePaper',
-               'AlternatePaper,arms=2',
-               'AlternatePaper,arms=3',
-               'AlternatePaper,arms=4',
-               'AlternatePaper,arms=5',
-               'AlternatePaper,arms=6',
-               'AlternatePaper,arms=7',
-               'AlternatePaper,arms=8',
 
                'CellularRule,rule=18',  # Sierpinski
                'CellularRule,rule=18,n_start=0',
@@ -886,7 +892,7 @@ BEGIN {
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 127;
+my $want_version = 128;
 
 ok ($Math::PlanePath::VERSION, $want_version, 'VERSION variable');
 ok (Math::PlanePath->VERSION,  $want_version, 'VERSION class method');
@@ -944,14 +950,21 @@ my %xy_maximum_duplication =
    'Math::PlanePath::R5DragonCurve' => 2,
    'Math::PlanePath::CCurve' => 9999,
    'Math::PlanePath::AlternatePaper' => 2,
+   'AlternatePaper,arms=4' => 3,
+   'AlternatePaper,arms=5' => 3,
+   'AlternatePaper,arms=6' => 3,
+   'AlternatePaper,arms=7' => 3,
+   'AlternatePaper,arms=8' => 3,
    'Math::PlanePath::AlternateTerdragon' => 3,
    'Math::PlanePath::TerdragonCurve' => 3,
    'Math::PlanePath::KochSnowflakes' => 2,
    'Math::PlanePath::QuadricIslands' => 2,
+   'Math::PlanePath::PeanoDiagonals' => 2,
   );
 my %xy_maximum_duplication_at_origin =
   ('Math::PlanePath::DragonCurve' => 4,
    'Math::PlanePath::AlternateTerdragon' => 6,
+   'AlternatePaper,arms=8' => 3,
    'Math::PlanePath::TerdragonCurve' => 6,
    'Math::PlanePath::R5DragonCurve' => 4,
   );
@@ -1005,6 +1018,7 @@ my %rect_before_n_start = ('Math::PlanePath::Rows' => 1,
 my %non_linear_frac = (
                        'Math::PlanePath::SacksSpiral' => 1,
                        'Math::PlanePath::VogelFloret' => 1,
+                       'Math::PlanePath::PeanoDiagonals' => 1,
                       );
 
 
@@ -1033,6 +1047,9 @@ sub pos_infinity_maybe {
 }
 sub neg_infinity_maybe {
   return (defined $neg_infinity ? $neg_infinity : ());
+}
+sub nan_maybe {
+  return (defined $nan ? $nan : ());
 }
 
 sub dbl_max {
@@ -1135,7 +1152,14 @@ sub pythagorean_diag {
     ### $class
     eval "require $class" or die;
     
-    my $xy_maximum_duplication = $xy_maximum_duplication{$class} || 0;
+    my $xy_maximum_duplication 
+      = $xy_maximum_duplication{$mod}
+      // $xy_maximum_duplication{$class} 
+      // 1;
+    my $xy_maximum_duplication_at_origin
+      = $xy_maximum_duplication_at_origin{$mod}
+      // $xy_maximum_duplication_at_origin{$class} 
+      // $xy_maximum_duplication;
     
     #
     # MyTestHelpers::diag ($mod);
@@ -1796,8 +1820,8 @@ sub pythagorean_diag {
                    : sprintf('%.3f,%.3f', $x,$y));
       if ($count_n_to_xy{$xystr}++ > $xy_maximum_duplication) {
         unless ($x == 0 && $y == 0
-                && $count_n_to_xy{$xystr} <= $xy_maximum_duplication_at_origin{$class}) {
-          &$report ("n_to_xy($n) duplicate$count_n_to_xy{$xystr} xy=$xystr prev n=$saw_n_to_xy{$xystr}");
+                && $count_n_to_xy{$xystr} <= $xy_maximum_duplication_at_origin) {
+          &$report ("n_to_xy($n) duplicate$count_n_to_xy{$xystr} xy=$xystr prev n=$saw_n_to_xy{$xystr}   (should be max duplication $xy_maximum_duplication)");
         }
       }
       $saw_n_to_xy{$xystr} = $n;
@@ -1839,18 +1863,24 @@ sub pythagorean_diag {
         if ($LSR > 0)  {
           $turn_any_left 
             or &$report ("turn_any_left() false but left at N=$n");
-          if (! defined $got_turn_any_left_at_n) { $got_turn_any_left_at_n = $n; }
+          if (! defined $got_turn_any_left_at_n) {
+            $got_turn_any_left_at_n = $n;
+          }
         }
         if (! $LSR) {
           $turn_any_straight 
             or &$report ("turn_any_straight() false but straight at N=$n");
-          if (! defined $got_turn_any_straight_at_n) { $got_turn_any_straight_at_n = $n; }
+          if (! defined $got_turn_any_straight_at_n) {
+            $got_turn_any_straight_at_n = $n; 
+          }
           # print "straight at N=$n_of_turn   dxdy $prev_dx,$prev_dy then $dx,$dy\n";
         }
         if ($LSR < 0)  {
           $turn_any_right 
             or &$report ("turn_any_right() false but right at N=$n");
-          if (! defined $got_turn_any_right_at_n) { $got_turn_any_right_at_n = $n; }
+          if (! defined $got_turn_any_right_at_n) {
+            $got_turn_any_right_at_n = $n; 
+          }
         }
       }
       $prev_dx[$arm] = $dx;
@@ -1901,6 +1931,35 @@ sub pythagorean_diag {
       }
     }
     
+    #--------------------------------------------------------------------------
+    ### xy_to_n_list() ...
+    
+    foreach my $x (-2 .. 5) {
+      foreach my $y (-2 .. 5) {
+        my @n_list = $path->xy_to_n_list($x,$y);
+        my $this_max_duplication = $xy_maximum_duplication;
+        my $this_max_duplication_type = 'xy_maximum_duplication';
+        if (! defined $this_max_duplication) {
+          $this_max_duplication = 1;
+          $this_max_duplication_type = 'default';
+        }
+        if ($x==0 && $y==0 && defined $xy_maximum_duplication_at_origin) {
+          $this_max_duplication = $xy_maximum_duplication_at_origin;
+          $this_max_duplication_type = 'xy_maximum_duplication_at_origin';
+        }
+
+        my $got_length = scalar(@n_list);
+        unless ($got_length <= $this_max_duplication) {
+          &$report ("xy_to_n_list() x=$y,y=$y list length $got_length more than $this_max_duplication_type = $this_max_duplication");
+        }     
+        foreach my $i (0 .. $#n_list) {
+          if (! defined $n_list[$i]) {
+            &$report ("xy_to_n_list() x=$y,y=$y contains undef");
+          }
+        }
+      }
+    }
+
     #--------------------------------------------------------------------------
     # turn_any_left(), turn_any_straight(), turn_any_right()
 
@@ -1956,8 +2015,9 @@ sub pythagorean_diag {
       if ($path->can($method)) {
         if (defined(my $n = $path->$method)) {
           my $got_LSR = $path->_UNDOCUMENTED__n_to_turn_LSR($n);
-          $got_LSR == $want_LSR
-            or &$report ("$method()=$n at that N got LSR=$got_LSR want $want_LSR");
+          unless ($got_LSR == $want_LSR) {
+            &$report ("$method()=$n at that N got LSR=$got_LSR want $want_LSR");
+          }
           if (defined $seen_at_n) {
             $n == $seen_at_n
               or &$report ("$method()=$n but saw first at N=$seen_at_n");
@@ -2055,6 +2115,28 @@ sub pythagorean_diag {
         if (abs($n_to_radius - $xy_to_radius) > 0.0000001) {
           &$report ("n_to_radius() at n=$n,x=$x,y=$y got $n_to_radius whereas x^2+y^2=$xy_to_radius");
         }
+      }
+    }
+    
+    #--------------------------------------------------------------------------
+    ### _UNDOCUMENTED__n_to_turn_LSR() ...
+    
+    if ($path->can('_UNDOCUMENTED__n_to_turn_LSR')
+        && ! (# nasty hack to allow Rows and Columns going before n_start
+              $class->isa('Math::PlanePath::Rows')
+              || $class->isa('Math::PlanePath::Columns'))) {
+      foreach my $n ($n_start-1) {
+        my $got = $path->_UNDOCUMENTED__n_to_turn_LSR($n);
+        if (defined $got) {
+          my ($x,$y) = $path->n_to_xy($n);
+          &$report ("_UNDOCUMENTED__n_to_turn_LSR() at n=$n want undef got $got");
+        }
+      }
+      # no infinite loop on N=infinity etc, but don't care about the value
+      foreach my $n (pos_infinity_maybe(),
+                     neg_infinity_maybe(),
+                     nan_maybe()) {
+        $path->_UNDOCUMENTED__n_to_turn_LSR($n);
       }
     }
     

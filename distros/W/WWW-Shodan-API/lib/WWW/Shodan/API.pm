@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use Carp;
 use JSON;
@@ -51,11 +51,18 @@ sub _json {
 sub _request {
     my ($self, $endpoint) = @_;
     my $response = $self->_ua->get(BASE_URL . $endpoint);
-    if ( $response->is_success ) {
-        return $self->_json->decode( $response->decoded_content );
+    my $data;
+    eval {
+        $data = $self->_json->decode( $response->decoded_content );
+    };
+    if ( $response->is_success && $data ) {
+        return $data;
     }
     else {
-        croak $response->status_line;
+        croak sprintf "%s - %s",
+            $response->status_line,
+            ($data && $data->{error}) ? $data->{error} : 'API provided no error message',
+
     }
 }
 
@@ -245,7 +252,7 @@ WWW::Shodan::API - Interface for the Shodan Computer Search Engine API
 
 =head1 VERSION
 
-Version 0.012
+Version 0.013
 
 =cut
 

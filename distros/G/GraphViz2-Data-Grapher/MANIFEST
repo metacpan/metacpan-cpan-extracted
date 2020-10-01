@@ -1,0 +1,24 @@
+.travis.yml
+Changes
+lib/GraphViz2/Data/Grapher.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+scripts/parse.data.pl
+scripts/parse.html.pl
+scripts/parse.xml.bare.pl
+t/sample.html
+t/sample.xml
+t/snapshots/test_t/edges_data
+t/snapshots/test_t/edges_html
+t/snapshots/test_t/edges_xml
+t/snapshots/test_t/nodes_data
+t/snapshots/test_t/nodes_html
+t/snapshots/test_t/nodes_xml
+t/test.t
+xt/author/pod.t
+xt/manifest.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

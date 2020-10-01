@@ -1,0 +1,70 @@
+{
+   "abstract" : "Conversions to and from arbitrary character sets and UTF8",
+   "author" : [
+      "Jerilyn Franz <cpan@jerilyn.info>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Unicode-MapUTF8",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Copy" : "0",
+            "Jcode" : "0",
+            "Unicode::Map" : "0",
+            "Unicode::Map8" : "0",
+            "Unicode::String" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Copy" : "0",
+            "Jcode" : "0",
+            "Unicode::Map" : "0",
+            "Unicode::Map8" : "0",
+            "Unicode::String" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Unicode::MapUTF8" : {
+         "file" : "lib/Unicode/MapUTF8.pm",
+         "version" : "1.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JerilynFranz/perl-Unicode-MapUTF8/issues"
+      },
+      "homepage" : "https://github.com/JerilynFranz/perl-Unicode-MapUTF8",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JerilynFranz/perl-Unicode-MapUTF8.git",
+         "web" : "https://github.com/JerilynFranz/perl-Unicode-MapUTF8"
+      }
+   },
+   "version" : "1.14",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

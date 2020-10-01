@@ -51,8 +51,13 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org> forked all this from
     Mouse::Util::TypeConstraints.
 
+    ArrayLike, HashLike, CodeLike, and StringLike constraints based on code by
+    ikegami on StackOverflow.
+
+    <https://stackoverflow.com/a/64019481/1990570>.
+
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2014 by Toby Inkster.
+    This software is copyright (c) 2014, 2018-2020 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

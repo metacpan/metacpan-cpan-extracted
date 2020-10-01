@@ -21,14 +21,16 @@ my %WriteMakefileArgs = (
   "NAME" => "Weather::PurpleAir::API",
   "PREREQ_PM" => {
     "File::Valet" => "1.07",
-    "JSON::MaybeXS" => "1.004000",
-    "String::Similarity" => "1.04"
+    "HTTP::Tiny" => "0.043",
+    "JSON::MaybeXS" => "1.003005",
+    "String::Similarity" => "1.04",
+    "Time::HiRes" => "1.9721"
   },
   "TEST_REQUIRES" => {
     "Test::Differences" => "0.60",
     "Test::Most" => "0.30"
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,10 +39,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Valet" => "1.07",
-  "JSON::MaybeXS" => "1.004000",
+  "HTTP::Tiny" => "0.043",
+  "JSON::MaybeXS" => "1.003005",
   "String::Similarity" => "1.04",
   "Test::Differences" => "0.60",
-  "Test::Most" => "0.30"
+  "Test::Most" => "0.30",
+  "Time::HiRes" => "1.9721"
 );
 
 

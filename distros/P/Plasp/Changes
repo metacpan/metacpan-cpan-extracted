@@ -1,7 +1,10 @@
 Revision history for Plasp
 
-
-1.02    Sat Sep 19 00:19:25 2020 -0400
+1.03    Tue Sep 22 11:08:24 2020 -0400
+        - Don't redefine $Response->Flush
+        - Instead, use local variables to "trap" output
+        - Carelessly forgot /etc/magic in File::LibMagic
+1.02    Sat Sep 19 00:20:14 2020 -0400
         - Don't explicitly specify magic file, since not location in BSD
         - Test requires HTTP::Cookies >= 6.03
 1.01    Fri Sep 18 10:19:06 2020 -0400

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -87,6 +87,129 @@ sub zorder_is_3cycle {
   return ($p3 == $n);
 }
 
+
+#------------------------------------------------------------------------------
+# A059253 - X coordinate (catalogued)
+
+# Gosper HAKMEM 115.
+# GP-DEFINE  table = {[[[0,0], [0,0], [0,0], [1,0]],
+# GP-DEFINE            [[0,0], [0,1], [0,1], [0,0]],
+# GP-DEFINE            [[0,0], [1,0], [1,1], [0,0]],
+# GP-DEFINE            [[0,0], [1,1], [1,0], [0,1]],
+# GP-DEFINE            
+# GP-DEFINE            [[0,1], [0,0], [1,1], [1,1]],
+# GP-DEFINE            [[0,1], [0,1], [0,1], [0,1]],
+# GP-DEFINE            [[0,1], [1,0], [0,0], [0,1]],
+# GP-DEFINE            [[0,1], [1,1], [1,0], [0,0]],
+# GP-DEFINE            
+# GP-DEFINE            [[1,0], [0,0], [0,0], [0,0]],
+# GP-DEFINE            [[1,0], [0,1], [1,0], [1,0]],
+# GP-DEFINE            [[1,0], [1,0], [1,1], [1,0]],
+# GP-DEFINE            [[1,0], [1,1], [0,1], [1,1]],
+# GP-DEFINE            
+# GP-DEFINE            [[1,1], [0,0], [1,1], [0,1]],
+# GP-DEFINE            [[1,1], [0,1], [1,0], [1,1]],
+# GP-DEFINE            [[1,1], [1,0], [0,0], [1,1]],
+# GP-DEFINE            [[1,1], [1,1], [0,1], [1,0]]]};
+# GP-DEFINE  table_lookup(cc,ab) = {
+# GP-DEFINE    for(i=1,#table,
+# GP-DEFINE      if(table[i][1]==cc && table[i][2]==ab, return(table[i])));
+# GP-DEFINE    error();
+# GP-DEFINE  }
+# GP-DEFINE  Hilbert_xy(n) = {
+# GP-DEFINE    my(cc=[0,0], v=digits(n,4));
+# GP-DEFINE    if(#v%2==1,v=concat(0,v));
+# GP-DEFINE    my(x=vector(#v), y=vector(#v));
+# GP-DEFINE    for(i=1,#v,
+# GP-DEFINE      my(ab=[bittest(v[i],1),bittest(v[i],0)],
+# GP-DEFINE         row=table_lookup(cc,ab));
+# GP-DEFINE      cc=row[4];
+# GP-DEFINE      x[i]=row[3][1];
+# GP-DEFINE      y[i]=row[3][2]);
+# GP-DEFINE    [fromdigits(x,2), fromdigits(y,2)];
+# GP-DEFINE  }
+# vector(20,n, Hilbert_xy(n)[1])
+
+# my(g=OEIS_bfile_gf("A059253")); \
+#   g==Polrev(vector(poldegree(g)+1,n,n--; Hilbert_xy(n)[1]))
+# poldegree(OEIS_bfile_gf("A059253"))
+
+# my(g=OEIS_bfile_gf("A059252")); \
+#   g==Polrev(vector(poldegree(g)+1,n,n--; Hilbert_xy(n)[2]))
+# poldegree(OEIS_bfile_gf("A059252"))
+
+# my(g=OEIS_bfile_gf("A059253")); x(n) = polcoeff(g,n);
+# my(g=OEIS_bfile_gf("A059252")); y(n) = polcoeff(g,n);
+
+# plothraw(vector(4^3+6,n,n--; Hilbert_xy(n)[1]), \
+#          vector(4^3+6,n,n--; Hilbert_xy(n)[2]), 1+8+16+32)
+
+# GP-DEFINE  Hilbert_S(n) = {
+# GP-DEFINE    my(c=[0,0], v=digits(n,4));
+# GP-DEFINE    if(#v%2==1,v=concat(0,v));
+# GP-DEFINE    my(x=vector(#v), y=vector(#v));
+# GP-DEFINE    for(i=1,#v,
+# GP-DEFINE      my(a=bittest(v[i],1), b=bittest(v[i],0));
+# GP-DEFINE      x[i] = bitxor(a, c[(!b) + 1]);
+# GP-DEFINE      y[i] = bitxor(x[i], b);
+# GP-DEFINE      c = [ bitxor(c[1], (!a) && (!b)),
+# GP-DEFINE            bitxor(c[2], a && b) ]);
+# GP-DEFINE    [fromdigits(x,2), fromdigits(y,2)];
+# GP-DEFINE  }
+# GP-Test  vector(4^7,n,n--; Hilbert_xy(n)) == \
+# GP-Test  vector(4^7,n,n--; Hilbert_S(n))
+
+# my(g=OEIS_bfile_gf("A059253")); \
+#   g==Polrev(vector(poldegree(g)+1,n,n--; Hilbert_S(n)[1]))
+# poldegree(OEIS_bfile_gf("A059253"))
+
+# my(g=OEIS_bfile_gf("A059252")); \
+#   g==Polrev(vector(poldegree(g)+1,n,n--; Hilbert_S(n)[2]))
+# poldegree(OEIS_bfile_gf("A059252"))
+
+#---------
+# GP-DEFINE  Hilbert_dxdy(n) = Hilbert_xy(n+1) - Hilbert_xy(n);
+#
+# but A163538, A163539 start with a 0,0
+# my(g=OEIS_bfile_gf("A163538")); \
+#   g==x*Polrev(vector(poldegree(g)+1,n,n--; Hilbert_dxdy(n)[1]))
+# poldegree(OEIS_bfile_gf("A163538"))
+#
+# my(g=OEIS_bfile_gf("A163539")); \
+#   g==x*Polrev(vector(poldegree(g)+1,n,n--; Hilbert_dxdy(n)[2]))
+# poldegree(OEIS_bfile_gf("A163539"))
+
+#---------
+# dSum, dDiff
+# vector(50,n, vecsum(Hilbert_dxdy(n)))
+# not in OEIS: 1,-1,1,1,1,-1,1,1,1,-1,-1,-1,-1,1,1,1,1,-1,1,1,1,-1,1,1,1,-1,-1
+# not A011601 Legendre(n,89) middle match
+
+# my(v=OEIS_samples("A011601")); v[1]==0 || error(); v=v[^1]; \
+#   v - vector(#v,n, vecsum(Hilbert_dxdy(n)))
+
+# vector(30,n, my(v=Hilbert_dxdy(n)); v[2]-v[1])
+# not in OEIS: 1,-1,1,1,1,-1,1,1,1,-1,-1,-1,-1,1,1,1,1,-1,1,1,1,-1,1,1,1,-1,-1
+# not A011601 Legendre(n,89) middle match
+
+#---------
+# dir
+# 
+# GP-DEFINE  \\ Jorg's fxtbook hilbert_dir() form  0123 = ESNW
+# GP-DEFINE  Hilbert_dir_0231(n) = {
+# GP-DEFINE    my(d=Hilbert_dxdy(n+1));
+# GP-DEFINE    if(d[1]==0, if(d[2]==1, 2, \\ up
+# GP-DEFINE                   d[2]==-1,1, \\ down
+# GP-DEFINE                   error()),
+# GP-DEFINE       d[2]==0, if(d[1]==1, 0, \\ right
+# GP-DEFINE                   d[1]==-1,3, \\ left
+# GP-DEFINE                   error()),
+# GP-DEFINE       error());
+# GP-DEFINE  }
+# vector(20,n, Hilbert_dir_0231(n))
+# not in OEIS: 3, 2, 2, 0, 1, 0, 2, 0, 1, 1, 3, 1, 0, 0, 2, 0, 1, 0, 0, 2
+
+
 #------------------------------------------------------------------------------
 # A163541 -- absolute direction transpose 0=east, 1=south, 2=west, 3=north
 
@@ -155,7 +278,7 @@ foreach my $elem ([0, 'A083885', 0],
 # A147600 - num fixed points in 4^k blocks
 
 MyOEIS::compare_values
-  (anum => 'A147600',
+  (anum => q{A147600},  # not shown in POD
    max_count => 8,
    func => sub {
      my ($bvalues_count) = @_;
@@ -246,11 +369,11 @@ MyOEIS::compare_values
      my @got;
      for (my $n = 0; @got < $count; $n++) {
        my @nbits = bit_split_lowtohigh($n);
-       my $count = 0;
+       my $total = 0;
        for (my $i = 0; $i <= $#nbits; $i+=2) {
-         $count += $nbits[$i];
+         $total += $nbits[$i];
        }
-       push @got, $count;
+       push @got, $total;
      }
      return \@got;
    });

@@ -6,12 +6,13 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.187';
+our $VERSION = '1.188';
 
+use Quiq::Math;
 use Quiq::Json;
 use Quiq::JavaScript;
-use Quiq::JQuery::Function;
 use Quiq::Html::Table::Simple;
+use Quiq::JQuery::Function;
 use Quiq::Html::Widget::CheckBox;
 use Quiq::Html::Widget::SelectMenu;
 use Quiq::Html::Widget::Button;
@@ -164,7 +165,7 @@ Die Instantiierung eines Parameters:
 
   push @par,Quiq::PlotlyJs::XY::Diagram->new(
       title => $par_name,
-      unit => Encode::decode('utf-8',$par->par_unit),
+      yTitle => Encode::decode('utf-8',$par->par_unit),
       color => '#'.$par->par_color,
       # x => scalar($valT->values('val_time')),
       xMin => $begin, # $par->par_time_min,
@@ -253,6 +254,11 @@ Klasse aller Rangeslider.
 
 =over 4
 
+=item debug => $bool (Default: 0)
+
+Zeige über dem Diagramm die Formatierungsgrößen an, die bei
+unterschiedlicher Höhe oder Fontgröße angepasst werden müssen.
+
 =item diagrams => \@diagrams
 
 Liste der Diagramm-Objekte. Die Diagramm-Objekte sind vom Typ
@@ -286,6 +292,10 @@ Melde Fehler mittels alert(), nicht nur via console.log().
 
 Art der X-Achse: date=Zeit, linear=numerisch
 
+=item xTitle => $str
+
+Text unterhalb der X-Achse.
+
 =back
 
 =head4 Returns
@@ -306,14 +316,17 @@ sub new {
     # @_: @attVal
 
     my $self = $class->SUPER::new(
+        debug => 0,
         diagrams => [],
-        fontSize => undef,
+        fontSize => 11,
         height => 300,
         name => 'dgr',
+        petersen => 0, # undokumentierter Parameter
         shape => 'Spline',
         strict => 1,
         width => undef,
         xAxisType => 'date',
+        xTitle => undef,
     );
     $self->set(@_);
 
@@ -360,10 +373,12 @@ sub html {
     my ($self,$h) = @_;
 
     # Objektattribute
-    my ($diagramA,$fontSize,$height,$name,$shape,$strict,$width,
-        $xAxisType) =
-        $self->get(qw/diagrams fontSize height name shape strict width
-        xAxisType/);
+    # Undokumentierter Parameter: petersen
+
+    my ($debug,$diagramA,$fontSize,$height,$name,$shape,$strict,$width,
+        $xAxisType,$xTitle,$petersen) =
+        $self->get(qw/debug diagrams fontSize height name shape strict width
+        xAxisType xTitle petersen/);
 
     # Kein Code, wenn keine Diagram
 
@@ -378,16 +393,52 @@ sub html {
     my $axisBox = 1; # Zeichne eine Box um den Plotbereich. Die Box hat
         # die Farbe der Achsen (siehe axisColor).
 
-    # Einzel-Attribute (betreffen einzelnes Plotly-Attribut)
+    my ($topMargin,$leftMargin,$titleFontSize,$xTitleFontSize,$bottomMargin,
+        $rangeSliderThickness,$rangeSliderThicknessAsFraction);
+
+    if (!$petersen) {
+        # orig
+        # date: 250->100,300->110,350->120,400->130,450->140,...
+        # linear: ?
+        $topMargin = 45;
+        $leftMargin = undef;
+        $titleFontSize = int($fontSize*1.5);
+        $xTitleFontSize = $fontSize? int($fontSize*1.3): undef;
+        # FIXME: $xAxisLabelHeight in Berechnung einbeziehen
+        $bottomMargin = ($height-300)/50*10+($xAxisType eq 'date'?
+            ($xTitle? 120: 100): ($xTitle? 110: 90));
+        # $rangeSliderThickness 
+        $rangeSliderThicknessAsFraction = 0.2;
+    }
+    else {
+        # Petersen 1
+        # $titleFontSize = Quiq::Math->roundToInt(1.25*$fontSize-0.2);
+        # $xTitleFontSize = $fontSize+2;
+        # $topMargin = 0.6*$titleFontSize+36;
+        # $leftMargin = 5*($xTitleFontSize+2)-25;
+        # $bottomMargin = 0.2*$height+50+2.5*$fontSize-30;
+        # if ($xAxisType eq 'date') {
+        #     $bottomMargin += 20; # FIXME: hängt von Fontgröße ab
+        # }
+        # $rangeSliderThickness = 0.2;
+        # Petersen 2
+        $titleFontSize = Quiq::Math->roundToInt(1.25*$fontSize-0.2);
+        $xTitleFontSize = $fontSize+2;
+        $topMargin = Quiq::Math->roundToInt(1.2*$titleFontSize+25);
+        $leftMargin = 5*($xTitleFontSize+2)-15;
+        $rangeSliderThickness = Quiq::Math->roundToInt(
+            $height*(1.461E-11*$height**3 - 7.126E-08*$height**2 +
+            5.377E-05*$height + 1.406E-01));
+        $rangeSliderThicknessAsFraction = Quiq::Math->roundTo(
+            $rangeSliderThickness/$height,2);
+        $bottomMargin = $rangeSliderThickness+1.5*$fontSize+
+            1.5*$xTitleFontSize+22;
+        if ($xAxisType eq 'date') {
+            $bottomMargin += 20; # FIXME: hängt von Fontgröße ab
+        }
+    }
 
     # Maße für die Ränder
-
-    my $topMargin = 45;
-
-    # date: 250->100,300->110,350->120,400->130,450->140,...
-    # linear: ?
-    # FIXME: $xAxisLabelHeight in Berechnung einbeziehen
-    my $bottomMargin = ($height-300)/50*10+($xAxisType eq 'date'? 100: 90);
 
     my $axisColor = '#d0d0d0'; # Farbe der Achsenlinien
     my $fillColor = '#e0e0e0'; # Farbe zwischen Kurve und X-Achse
@@ -396,7 +447,7 @@ sub html {
     my $lineShape = 'spline'; # Linienform: 'spline'|'linear'|'hv'|
         # 'vh'|'hvh'|'vhv'
     my $lineWidth = 1;
-    my $margin = [$topMargin,undef,$bottomMargin,undef];
+    my $margin = [$topMargin,undef,$bottomMargin,$leftMargin];
     my $markerColor = $color;
     my $markerSize = 3;
     my $markerSymbol = 'circle';
@@ -426,11 +477,27 @@ sub html {
     my $yTickLen = 4;
     my $zeroLineColor = '#d0d0d0';
 
-    my $height1 = $height-($bottomMargin-$xAxisLabelHeight);
-    my $bottomMargin1 = $bottomMargin-($bottomMargin-$xAxisLabelHeight);
+    my ($height2,$bottomMargin2,$titleY,$titleY2);
 
-    my $titleY = 1-(15/$height); # Faktor für Titel-Position
-    my $titleY1 = 1-($height*(1-$titleY)/$height1);
+    if (!$petersen) {
+        # orig
+        $height2 = $height-($bottomMargin-$xAxisLabelHeight); # orig
+        $bottomMargin2 = $bottomMargin-($bottomMargin-$xAxisLabelHeight);
+        $titleY = 1-(15/$height); # Faktor für Titel-Position
+        $titleY2 = 1-($height*(1-$titleY)/$height2);
+    }
+    else {
+        # Petersen1
+        # $height2 = 0.8*$height-10;
+        # $bottomMargin2 = 40+2.5*$fontSize-30;
+        # Petersen2
+        $height2 = $height-$rangeSliderThickness;
+        $bottomMargin2 = $bottomMargin-$rangeSliderThickness;
+        $titleY = Quiq::Math->roundTo(
+            1-($topMargin-$titleFontSize)/2/$height,4);
+        $titleY2 = Quiq::Math->roundTo(
+            1-($topMargin-$titleFontSize)/2/$height2,4);
+    }
 
     my $title = undef;
     my $yTitle = undef;
@@ -455,6 +522,33 @@ sub html {
             let vars = __VARS__;
 
             // Methoden
+
+            let rescaleY = function (dId,yMinOrig,yMaxOrig) {
+                let d = $('#'+dId)[0];
+                if (d.layout.yaxis.range[0] != yMinOrig ||
+                        d.layout.yaxis.range[1] != yMaxOrig) {
+                    // Originalen Wertebereich wieder herstellen
+                    Plotly.relayout(dId,{'yaxis.range': [yMinOrig,yMaxOrig]});
+                    return;
+                };
+                let x = d.data[0].x;
+                if (x.length == 0)
+                    return;
+                let xMin = d.layout.xaxis.range[0];
+                let xMax = d.layout.xaxis.range[1];
+                let y = d.data[0].y;
+                let yMin, yMax;
+                for (let i = 0; i < x.length; i++) {
+                    if (x[i] >= xMin && x[i] <= xMax) {
+                        if (yMin === undefined || y[i] < yMin)
+                            yMin = y[i]
+                        if (yMax === undefined || y[i] > yMax)
+                            yMax = y[i]
+                    }
+                }
+                // alert(xMin+' '+xMax+' '+yMin+' '+yMax);
+                Plotly.relayout(dId,{'yaxis.range': [yMin,yMax]})
+            };
 
             let setRangeSlider = function (groupId,i,bool) {
                 let dId = groupId+'-d'+i;
@@ -493,7 +587,11 @@ sub html {
                     // (siehe console.log()). Daher nutzen wir
                     // ed['height'] === undefined zur Erkennung.
                     div.on('plotly_relayout',function(ed) {
-                        // console.log(JSON.stringify(ed,null,4));
+                        if (ed['yaxis.range']) {
+                            // Skalierung Y-Achse leiten wir nicht weiter
+                            return;
+                        }
+                        console.log(ed+JSON.stringify(ed,null,4));
                         $('#'+groupId+' '+'.diagram').each(function(j) {
                             if (j+1 != i && ed['height'] === undefined) {
                                 Plotly.relayout(this,ed);
@@ -563,6 +661,7 @@ sub html {
                     setRangeSlider(name,i,false);
                     $('#'+name+'-r'+i).prop('disabled',true);
                     $('#'+name+'-s'+i).prop('disabled',true);
+                    $('#'+name+'-y'+i).prop('disabled',true);
                 }
                 let dId = name+'-d'+i;
                 Plotly.deleteTraces(dId,0);
@@ -639,6 +738,20 @@ sub html {
                     }
                 );
                 setRangeSlider(name,i,showRangeSlider);
+
+                // Bei Doppelklick Y-Skalierung auf allen Diagrammen
+                // in Originalzustand zurückversetzen
+
+                let d = $('#'+dId)[0];
+                $(d).data('yMinOrig',yMin);
+                $(d).data('yMaxOrig',yMax);
+                d.on('plotly_doubleclick',function (data) {
+                    $('#'+name+' .diagram').each(function(i) {
+                        let yMin = $(this).data('yMinOrig');
+                        let yMax = $(this).data('yMaxOrig');
+                        Plotly.relayout(this,{'yaxis.range': [yMin,yMax]});
+                    });
+                });
             };
 
             let getZArray = function (i) {
@@ -651,6 +764,7 @@ sub html {
                 generatePlot: generatePlot,
                 setRangeSlider: setRangeSlider,
                 toggleRangeSliders: toggleRangeSliders,
+                rescaleY: rescaleY,
             };
         })();°,
         __NAME__ => $name,
@@ -681,7 +795,7 @@ sub html {
                 text => $title,
                 font => $j->o(
                     color => $color,
-                    size => $fontSize? int($fontSize*1.5): undef,
+                    size => $titleFontSize,
                 ),
                 yref => 'container', # container, paper
                 yanchor => 'top',
@@ -725,9 +839,15 @@ sub html {
                     autorange => \'true',
                     bordercolor => $rangeSliderBorderColor,
                     borderwidth => 1,
-                    thickness => 0.20,
+                    thickness => $rangeSliderThicknessAsFraction,
                     # visible => \'false',
                     visible => \'true',
+                ),
+                title => $j->o(
+                    text => $xTitle,
+                    font => $j->o(
+                        size => $xTitleFontSize,
+                    ),
                 ),
                 zeroline => \'true',
                 zerolinecolor => $zeroLineColor,
@@ -758,7 +878,7 @@ sub html {
                     text => $yTitle,
                     font => $j->o(
                         color => $color,
-                        size => $fontSize? int($fontSize*1.3): undef,
+                        size => $xTitleFontSize, # gleich groß wie x-Achse
                     ),
                 ),
                 zeroline => \'true',
@@ -772,9 +892,9 @@ sub html {
             responsive => \'true',
         ),
         __VARS__ => scalar $j->o(
-            height => [$height,$height1],
-            bottomMargin => [$bottomMargin,$bottomMargin1],
-            titleY => [$titleY,$titleY1],
+            height => [$height,$height2],
+            bottomMargin => [$bottomMargin,$bottomMargin2],
+            titleY => [$titleY,$titleY2],
             strict => $strict? \'true': \'false',
             zArrays => [],
         ),
@@ -782,7 +902,30 @@ sub html {
 
     # Gesamter HTML-Code
 
+    my $debugInfo = '';
+    if ($debug) {
+        $debugInfo = Quiq::Html::Table::Simple->html($h,
+            border => 1,
+            cellpadding => 2,
+            rows => [
+                [[-tag=>'th','height'],[-tag=>'th','fontSize'],
+                    [-tag=>'th','rangeSliderThickness'],[-tag=>'th','height2'],
+                    [-tag=>'th','xTitleFontSize'],[-tag=>'th','titleFontSize'],
+                    [-tag=>'th','topMargin'],[-tag=>'th','bottomMargin'],
+                    [-tag=>'th','bottomMargin2'],[-tag=>'th','titleY'],
+                    [-tag=>'th','titleY2'],[-tag=>'th','leftMargin']],
+                [[$height],[$fontSize],
+                    [$rangeSliderThickness.
+                        " ($rangeSliderThicknessAsFraction)"],
+                    [$height2],[$xTitleFontSize],[$titleFontSize],
+                    [$topMargin],[$bottomMargin],[$bottomMargin2],[$titleY],
+                    [$titleY2],[$leftMargin]],
+            ],
+        );
+    }
+
     return $h->cat(
+        $debugInfo,
         $h->tag('div',
             id => $name,
             class => 'diagramGroup',
@@ -862,16 +1005,16 @@ sub htmlDiagram {
     my $parameterName = $par->title;
     my $zName = $par->zName;
     my $color = $par->color;
-    return $h->tag('div',
+
+    return
+        Quiq::Html::Table::Simple->html($h,
+        width => $width? "${width}px": '100%',
         style => [
             border => '1px dotted #b0b0b0',
            'margin-top' => '0.6em',
            'background-color' => $paperBackground,
             position => 'relative',
         ],
-        '-',
-        Quiq::Html::Table::Simple->html($h,
-        width => $width? "${width}px": '100%',
         rows => [
             [[
                 id => "$name-d$i",
@@ -881,7 +1024,7 @@ sub htmlDiagram {
                 ],
             ]],
             [[
-                $h->tag('span',style=>'margin-left: 0.5em','Rangeslider:').
+                $h->tag('span',style=>'margin-left: 10px','Rangeslider:').
                 Quiq::Html::Widget::CheckBox->html($h,
                      id =>  "$name-r$i",
                      class => 'rangeslider',
@@ -937,6 +1080,14 @@ sub htmlDiagram {
                         ' splines or show markers',
                 ).
                 ' | '.Quiq::Html::Widget::Button->html($h,
+                    id => "$name-y$i",
+                    content => 'Scale Y Axis',
+                    onClick => sprintf("%s.rescaleY('%s',%s,%s)",
+                        $name,"$name-d$i",$par->yMin,$par->yMax),
+                    title => 'Rescale Y axis according to visible data or'.
+                        ' original state',
+                ).
+                ' | '.Quiq::Html::Widget::Button->html($h,
                     content => 'Download as PNG',
                     onClick => qq~
                         let plot = \$('#$name-d$i');
@@ -948,16 +1099,15 @@ sub htmlDiagram {
                         });
                     ~,
                     title => 'Download plot graphic as PNG',
-                ),
+                ).
+                $h->tag('div',
+                   id =>  "$name-c$i",
+                   style => 'position: absolute; bottom: 7px; right: 10px',
+                   ''
+                ).
+                ($par->get('html') // ''), # optionaler HTML-Code
            ]]
-        ]),
-        $h->tag('div',
-           id =>  "$name-c$i",
-           style => 'position: absolute; bottom: 0.3em; right: 0.5em',
-           ''
-        ),
-        $par->get('html'), # optionaler HTML-Code
-    );
+        ]);
 }
 
 # -----------------------------------------------------------------------------
@@ -1017,14 +1167,14 @@ sub jsDiagram {
     if ($url) {
         return sprintf("$name.generatePlot('%s',%s,'%s','%s','%s','%s'".
                 ",'%s',%s,%s,%s,'%s','%s');\n",
-            $name,$i,$par->title,$par->unit,$par->color,
+            $name,$i,$par->title,$par->yTitle,$par->color,
             $xMin,$xMax,$yMin,$yMax,$showRangeSlider,$shape,$url);
     }
     else {
         # mit x,y,z
         return sprintf("$name.generatePlot('%s',%s,'%s','%s','%s','%s'".
                 ",'%s',%s,%s,%s,'%s','',%s,%s,%s);\n",
-            $name,$i,$par->title,$par->unit,$par->color,
+            $name,$i,$par->title,$par->yTitle,$par->color,
             $xMin,$xMax,$yMin,$yMax,$showRangeSlider,$shape,
             scalar($j->encode($par->x)),scalar($j->encode($par->y)),
             scalar($j->encode($par->z)));
@@ -1035,7 +1185,7 @@ sub jsDiagram {
 
 =head1 VERSION
 
-1.187
+1.188
 
 =head1 AUTHOR
 

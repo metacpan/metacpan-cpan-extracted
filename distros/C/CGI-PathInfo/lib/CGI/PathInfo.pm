@@ -1,9 +1,10 @@
 package CGI::PathInfo;
 
 use strict;
+use warnings;
 
 BEGIN {
-	$CGI::PathInfo::VERSION = '1.03';
+	$CGI::PathInfo::VERSION = '1.06';
         $CGI::PathInfo::_mod_perl = 0;
 }
 

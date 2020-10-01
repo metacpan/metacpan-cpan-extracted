@@ -18,7 +18,7 @@ use base "File::HomeDir::Unix";
 
 BEGIN
 {
-    $VERSION = '1.004';
+    $VERSION = '1.006';
 }
 
 # xdg uses $ENV{XDG_CONFIG_HOME}/user-dirs.dirs to know where are the
@@ -133,6 +133,8 @@ L<File::HomeDir>, L<File::HomeDir::Win32> (legacy)
 Copyright 2009 - 2011 Jerome Quelin.
 
 Some parts copyright 2010 Adam Kennedy.
+
+Some parts copyright 2017 - 2020 Jens Rehsack
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

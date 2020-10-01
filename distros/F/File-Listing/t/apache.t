@@ -1,5 +1,10 @@
 #!perl -w
 
+use strict;
+use warnings;
+use Test::More;
+use File::Listing;
+
 my @URLS = (
     "http://www.apache.org/dist/apr/?C=N&O=D",
     "http://perl.apache.org/rpm/distrib/",
@@ -24,14 +29,10 @@ if (@ARGV && $ARGV[0] eq "--update") {
     exit;
 }
 
-use Test;
-
-use strict;
-use File::Listing;
 plan tests => scalar(@URLS) + 1;
 
 my @LISTING = split($SEP, scalar do { local $/; <DATA> });
-ok(scalar(@URLS), scalar(@LISTING));
+ok(scalar(@URLS), ' it is ' . scalar(@LISTING));
 
 for my $url (@URLS) {
     print "# $url\n";

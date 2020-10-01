@@ -176,7 +176,7 @@ sub wait_for_async_page_load {
     $variable_name //= "webkit2_to_reload";
 
     $self->wait_for_condition(sub {
-        not $self->run_javascript("window.$variable_name;");
+        not $self->run_javascript("return window.$variable_name;");
     }, $timeout);
     $self->wait_for_page_to_load;
 }

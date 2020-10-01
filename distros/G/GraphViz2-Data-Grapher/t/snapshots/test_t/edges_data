@@ -1,0 +1,195 @@
+{
+  '$REF2' => {
+    '&CODE1' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ]
+  },
+  '0' => {
+    '0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ':port2'
+      }
+    ]
+  },
+  '0_0_0_1_kids' => {
+    '&CODE1' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ''
+      }
+    ]
+  },
+  '0_0_0_2_kids' => {
+    '&CODE1' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ''
+      }
+    ]
+  },
+  '0_0_0_3_kids' => {
+    '$REF2' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ''
+      }
+    ]
+  },
+  '0_0_0_kids' => {
+    '0_0_0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ],
+    '0_0_0_1_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port2',
+        'to_port' => ':port1'
+      }
+    ],
+    '0_0_0_2_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port3',
+        'to_port' => ':port1'
+      }
+    ],
+    '0_0_0_3_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port4',
+        'to_port' => ':port1'
+      }
+    ]
+  },
+  '0_0_kids' => {
+    '0_0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port2'
+      }
+    ]
+  },
+  '0_1_0_0_0_0_0_1_kids' => {
+    '&CODE3' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ''
+      }
+    ]
+  },
+  '0_1_0_0_0_0_0_kids' => {
+    '0_1_0_0_0_0_0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ],
+    '0_1_0_0_0_0_0_1_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port2',
+        'to_port' => ':port1'
+      }
+    ],
+    '0_1_0_0_0_0_0_2_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port3',
+        'to_port' => ':port1'
+      }
+    ]
+  },
+  '0_1_0_0_0_0_kids' => {
+    '0_1_0_0_0_0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port2'
+      }
+    ]
+  },
+  '0_1_0_0_0_kids' => {
+    '0_1_0_0_0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ]
+  },
+  '0_1_0_0_kids' => {
+    '0_1_0_0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ]
+  },
+  '0_1_0_kids' => {
+    '0_1_0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ]
+  },
+  '0_1_kids' => {
+    '0_1_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ]
+  },
+  '0_2_kids' => {
+    '0_2_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port2'
+      }
+    ]
+  },
+  '0_kids' => {
+    '0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ],
+    '0_1_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port2',
+        'to_port' => ':port1'
+      }
+    ],
+    '0_2_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port3',
+        'to_port' => ':port1'
+      }
+    ]
+  }
+}

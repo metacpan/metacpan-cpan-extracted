@@ -833,7 +833,7 @@
 <dt id="aws---add-whitespace"><b>-aws</b>, <b>--add-whitespace</b></dt>
 <dd>
 
-<p>Setting this option allows perltidy to add certain whitespace improve code readability. This is the default. If you do not want any whitespace added, but are willing to have some whitespace deleted, use <b>-naws</b>. (Use <b>-fws</b> to leave whitespace completely unchanged).</p>
+<p>Setting this option allows perltidy to add certain whitespace to improve code readability. This is the default. If you do not want any whitespace added, but are willing to have some whitespace deleted, use <b>-naws</b>. (Use <b>-fws</b> to leave whitespace completely unchanged).</p>
 
 </dd>
 <dt id="dws---delete-old-whitespace"><b>-dws</b>, <b>--delete-old-whitespace</b></dt>
@@ -876,7 +876,7 @@
 <p><b>WARNING</b> Be sure to put these tokens in quotes to avoid having them misinterpreted by your command shell.</p>
 
 </dd>
-<dt id="Note:-Perltidy-does-always-follow-whitespace-controls">Note: Perltidy does always follow whitespace controls</dt>
+<dt id="Note1:-Perltidy-does-always-follow-whitespace-controls">Note1: Perltidy does always follow whitespace controls</dt>
 <dd>
 
 <p>The various parameters controlling whitespace within a program are requests which perltidy follows as well as possible, but there are a number of situations where changing whitespace could change program behavior and is not done. Some of these are obvious; for example, we should not remove the space between the two plus symbols in &#39;$x+ +$y&#39; to avoid creating a &#39;++&#39; operator. Some are more subtle and involve the whitespace around bareword symbols and locations of possible filehandles. For example, consider the problem of formatting the following subroutine:</p>
@@ -896,6 +896,23 @@
 <p>If formatted in this way, the program will not run (at least with recent versions of perl) because the $x is taken to be a filehandle and / is assumed to start a quote. In a complex program, there might happen to be a / which terminates the multiline quote without a syntax error, allowing the program to run, but not as intended.</p>
 
 <p>Related issues arise with other binary operator symbols, such as + and -, and in older versions of perl there could be problems with ternary operators. So to avoid changing program behavior, perltidy has the simple rule that whitespace around possible filehandles is left unchanged. Likewise, whitespace around barewords is left unchanged. The reason is that if the barewords are defined in other modules, or in code that has not even been written yet, perltidy will not have seen their prototypes and must treat them cautiously.</p>
+
+</dd>
+<dt id="Note2:-Perltidys-whitespace-rules-are-not-perfect">Note2: Perltidy&#39;s whitespace rules are not perfect</dt>
+<dd>
+
+<p>Despite these precautions, it is still possible to introduce syntax errors with some asymmetric whitespace rules, particularly when call parameters are not placed in containg parens or braces. For example, the following two lines will be parsed by perl without a syntax error:</p>
+
+<pre><code>  # original programming, syntax ok
+  my @newkeys = map $_-$nrecs+@data, @oldkeys;
+
+  # perltidy default, syntax ok
+  my @newkeys = map $_ - $nrecs + @data, @oldkeys;</code></pre>
+
+<p>But the following will give a syntax error:</p>
+
+<pre><code>  # perltidy -nwrs=&#39;-&#39;
+  my @newkeys = map $_ -$nrecs + @data, @oldkeys;</code></pre>
 
 </dd>
 <dt id="Space-between-specific-keywords-and-opening-paren">Space between specific keywords and opening paren</dt>
@@ -931,13 +948,13 @@
 
 <p><b>-skp</b> or <b>--space-keyword-paren</b></p>
 
-<p>You will probably also want to use the flag <b>-sfp</b> (next item) too.</p>
+<p>You may also want to use the flag <b>-sfp</b> (next item) too.</p>
 
 </dd>
 <dt id="Space-between-all-function-names-and-opening-parens">Space between all function names and opening parens</dt>
 <dd>
 
-<p>When an opening paren follows a function the default is not to introduce a space. To cause a space to be introduced use:</p>
+<p>When an opening paren follows a function the default and recommended formatting is not to introduce a space. To cause a space to be introduced use:</p>
 
 <p><b>-sfp</b> or <b>--space-function-paren</b></p>
 
@@ -945,6 +962,13 @@
   myfunc ( $a, $b, $c );   # -sfp</code></pre>
 
 <p>You will probably also want to use the flag <b>-skp</b> (previous item) too.</p>
+
+<p>The reason this is not recommended is that spacing a function paren can make a program vulnerable to parsing problems by Perl. For example, the following two-line program will run as written but will have a syntax error if reformatted with -sfp:</p>
+
+<pre><code>  if ( -e filename() ) { print &quot;exists\n&quot;; }
+  sub filename { return $0 }</code></pre>
+
+<p>The syntax error can be removed if the line order is reversed, so that Perl parses &#39;sub filename&#39; first.</p>
 
 </dd>
 <dt id="spp-n-or---space-prototype-paren-n"><b>-spp=n</b> or <b>--space-prototype-paren=n</b></dt>
@@ -1674,6 +1698,135 @@
 <pre><code>  -opr  or --opening-paren-right
   -ohbr or --opening-hash-brace-right
   -osbr or --opening-square-bracket-right</code></pre>
+
+</dd>
+<dt id="bbhb-n---break-before-hash-brace-n-and-related-flags"><b>-bbhb=n</b>, <b>--break-before-hash-brace=n</b> and related flags</dt>
+<dd>
+
+<p>When a list of items spans multiple lines, the default formatting is to place the opening brace (or other container token) at the end of the starting line, like this:</p>
+
+<pre><code>    $romanNumerals = {
+        one   =&gt; &#39;I&#39;,
+        two   =&gt; &#39;II&#39;,
+        three =&gt; &#39;III&#39;,
+        four  =&gt; &#39;IV&#39;,
+    };</code></pre>
+
+<p>This flag can change the default behavior to cause a line break to be placed before the opening brace according to the value given to the integer <b>n</b>:</p>
+
+<pre><code>  -bbhb=0 never break [default]
+  -bbhb=1 stable: break if the input script had a break
+  -bbhb=2 break if list is &#39;complex&#39; (see note below)
+  -bbhb=3 always break</code></pre>
+
+<p>For example,</p>
+
+<pre><code>    # perltidy -bbhb=3
+    $romanNumerals =
+      {
+        one   =&gt; &#39;I&#39;,
+        two   =&gt; &#39;II&#39;,
+        three =&gt; &#39;III&#39;,
+        four  =&gt; &#39;IV&#39;,
+      };</code></pre>
+
+<p>There are several points to note about this flag:</p>
+
+<ul>
+
+<li><p>This parameter only applies if the opening brace is preceded by an &#39;=&#39; or &#39;=&gt;&#39;.</p>
+
+</li>
+<li><p>This parameter only applies if the contents of the container looks like a list. The contents need to contain some commas or &#39;=&gt;&#39;s at the next interior level to be considered a list.</p>
+
+</li>
+<li><p>For the <b>n=2</b> option, a list is considered &#39;complex&#39; if it is part of a nested list structure which spans multiple lines in the input file.</p>
+
+</li>
+<li><p>If multiple opening tokens have been &#39;welded&#39; together with the <b>-wn</b> parameter, then this parameter has no effect.</p>
+
+</li>
+<li><p>The indentation of the braces will normally be one level of continuation indentation by default. This can be changed with the parameter <b>-bbhbi=n</b> in the next section.</p>
+
+</li>
+<li><p>Similar flags for controlling parens and square brackets are given in the subsequent section.</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="bbhbi-n---break-before-hash-brace-and-indent-n"><b>-bbhbi=n</b>, <b>--break-before-hash-brace-and-indent=n</b></dt>
+<dd>
+
+<p>This flag is a companion to <b>-bbhb=n</b> for controlling the indentation of an opening hash brace which is placed on a new line by that parameter. The indentation is as follows:</p>
+
+<pre><code>  -bbhbi=0 one continuation level [default]
+  -bbhbi=1 outdent by one continuation level
+  -bbhbi=2 indent one full indentation level</code></pre>
+
+<p>For example:</p>
+
+<pre><code>    # perltidy -bbhb=3 -bbhbi=1
+    $romanNumerals =
+    {
+        one   =&gt; &#39;I&#39;,
+        two   =&gt; &#39;II&#39;,
+        three =&gt; &#39;III&#39;,
+        four  =&gt; &#39;IV&#39;,
+    };
+
+    # perltidy -bbhb=3 -bbhbi=2
+    $romanNumerals =
+        {
+        one   =&gt; &#39;I&#39;,
+        two   =&gt; &#39;II&#39;,
+        three =&gt; &#39;III&#39;,
+        four  =&gt; &#39;IV&#39;,
+        };</code></pre>
+
+<p>Note that this parameter has no effect unless <b>-bbhb=n</b> is also set.</p>
+
+</dd>
+<dt id="bbsb-n---break-before-square-bracket-n"><b>-bbsb=n</b>, <b>--break-before-square-bracket=n</b></dt>
+<dd>
+
+<p>This flag is similar to the flag described above, except it applies to lists contained within square brackets.</p>
+
+<pre><code>  -bbsb=0 never break [default]
+  -bbsb=1 stable: break if the input script had a break
+  -bbsb=2 break if list is &#39;complex&#39; (part of nested list structure)
+  -bbsb=3 always break</code></pre>
+
+</dd>
+<dt id="bbsbi-n---break-before-square-bracket-and-indent-n"><b>-bbsbi=n</b>, <b>--break-before-square-bracket-and-indent=n</b></dt>
+<dd>
+
+<p>This flag is a companion to <b>-bbsb=n</b> for controlling the indentation of an opening square bracket which is placed on a new line by that parameter. The indentation is as follows:</p>
+
+<pre><code>  -bbsbi=0 one continuation level [default]
+  -bbsbi=1 outdent by one continuation level
+  -bbsbi=2 indent one full indentation level</code></pre>
+
+</dd>
+<dt id="bbp-n---break-before-paren-n"><b>-bbp=n</b>, <b>--break-before-paren=n</b></dt>
+<dd>
+
+<p>This flag is similar to <b>-bbhb=n</b>, described above, except it applies to lists contained within parens.</p>
+
+<pre><code>  -bbp=0 never break [default]
+  -bbp=1 stable: break if the input script had a break
+  -bpb=2 break if list is &#39;complex&#39; (part of nested list structure)
+  -bbp=3 always break</code></pre>
+
+</dd>
+<dt id="bbpi-n---break-before-paren-and-indent-n"><b>-bbpi=n</b>, <b>--break-before-paren-and-indent=n</b></dt>
+<dd>
+
+<p>This flag is a companion to <b>-bbp=n</b> for controlling the indentation of an opening paren which is placed on a new line by that parameter. The indentation is as follows:</p>
+
+<pre><code>  -bbpi=0 one continuation level [default]
+  -bbpi=1 outdent by one continuation level
+  -bbpi=2 indent one full indentation level</code></pre>
 
 </dd>
 <dt id="wn---weld-nested-containers"><b>-wn</b>, <b>--weld-nested-containers</b></dt>
@@ -2801,6 +2954,8 @@
 
 <p>If your script has leading lines of system commands or other text which are not valid perl code, and which are separated from the start of the perl code by a &quot;hash-bang&quot; line, ( a line of the form <code>#!...perl</code> ), you must use the <b>-x</b> flag to tell perltidy not to parse and format any lines before the &quot;hash-bang&quot; line. This option also invokes perl with a -x flag when checking the syntax. This option was originally added to allow perltidy to parse interactive VMS scripts, but it should be used for any script which is normally invoked with <code>perl -x</code>.</p>
 
+<p>Please note: do not use this flag unless you are sure your script needs it. Parsing errors can occur if it does not have a hash-bang, or, for example, if the actual first hash-bang is in a here-doc. In that case a parsing error will occur because the tokenization will begin in the middle of the here-doc.</p>
+
 </dd>
 <dt id="Making-a-file-unreadable">Making a file unreadable</dt>
 <dd>
@@ -3158,7 +3313,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>This man page documents perltidy version 20200907</p>
+<p>This man page documents perltidy version 20201001</p>
 
 <h1 id="BUG-REPORTS">BUG REPORTS</h1>
 

@@ -1,5 +1,10 @@
 Revision history for Perl module Crypt::Perl
 
+0.34 Mon Sep 28 2020
+- Deterministic ECDSA support added. sign_jwa() now always uses it,
+  and new sign_sha256() et al. methods encourage it for plain signatures.
+  PKCS10 and X509v3 signatures use it as well.
+
 0.33 Mon Aug 10 2020
 - Switch EC point multiplication algorithm to thwart timing attacks.
   (reported by Antonio de la Piedra)

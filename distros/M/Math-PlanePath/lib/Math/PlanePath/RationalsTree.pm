@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -145,7 +145,7 @@ use Carp 'croak';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -642,8 +642,30 @@ __END__
   #   }
   # }
 
+#
+# =head2 Calkin-Wilf Tree -- X,Y to Next X,Y
+#
+# Successive values of the CW tree can be calculated using a method be Moshe
+# Newman.
+# 
+#           X                     Y
+#     N is ---      N+1 is ---------------
+#           Y              X+Y - 2*(X % Y)      0 <= X%Y < Y
+#
+# This means that the tree X,Y values can be iterated by keeping just a
+# current X,Y pair.
+# 
+#     dX = Y - X
+#     dY = X+Y - 2*(X%Y) - Y
+#        = X - 2*(X%Y)
+#
+# floor(X/Y) = count trailing 1-bits of N
+#    10111
+#    11000  increment
+# floor(X/Y) = integer part = first term of continued fraction
 
-=for stopwords eg Ryde OEIS ie Math-PlanePath coprime encodings Moritz Achille Brocot Stern-Brocot mediant Calkin Wilf Calkin-Wilf 1abcde 1edcba Andreev Yu-Ting Shen AYT Ralf Hinze Haskell subtrees xoring Drib RationalsTree unflipped GCD Luschny Jerzy Czyz Minkowski Nstart Shallit's HCS Ndepth N-Ndepth Nparent subtree LRRL parameterization parameterized Jacobsthal Thue-Morse ceil Matematicheskoe Prosveshchenie Ser DOI
+
+=for stopwords eg Ryde OEIS ie Math-PlanePath coprime encodings Moritz Achille Brocot Stern-Brocot mediant Calkin Wilf Calkin-Wilf 1abcde 1edcba Andreev Yu-Ting Shen AYT Ralf Hinze Haskell subtrees xoring Drib RationalsTree unflipped GCD Luschny Jerzy Czyz Minkowski Nstart Shallit's HCS Ndepth N-Ndepth Nparent subtree LRRL parameterization parameterized Jacobsthal Thue-Morse ceil Matematicheskoe Prosveshchenie Ser DOI generalization
 
 =head1 NAME
 
@@ -790,8 +812,8 @@ Calkin and Wilf,
 Neil Calkin and Herbert Wilf, "Recounting the Rationals", American
 Mathematical Monthly, volume 107, number 4, April 2000, pages 360-363.
 
-L<http://www.math.upenn.edu/~wilf/reprints.html>
-L<http://www.math.upenn.edu/~wilf/website/recounting.pdf>
+L<http://www.math.upenn.edu/~wilf/reprints.html>,
+L<http://www.math.upenn.edu/~wilf/website/recounting.pdf>,
 L<http://www.jstor.org/stable/2589182>
 
 =back
@@ -1011,7 +1033,7 @@ Proof", The College Mathematics Journal, volume 34, number 5,
 November 2003, page 367.
 L<http://www.jstor.org/stable/3595818>
 
-L<http://www.cut-the-knot.org/do_you_know/countRatsCF.shtml>
+L<http://www.cut-the-knot.org/do_you_know/countRatsCF.shtml>,
 L<http://www.dm.unito.it/~cerruti/doc-html/tremattine/tre_mattine.pdf>
 
 =back
@@ -1668,7 +1690,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 
@@ -1686,25 +1708,3 @@ You should have received a copy of the GNU General Public License along with
 Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-
-#
-# =head2 Calkin-Wilf Tree -- X,Y to Next X,Y
-#
-# Successive values of the CW tree can be calculated using a method be Moshe
-# Newman.
-# 
-#           X                     Y
-#     N is ---      N+1 is ---------------
-#           Y              X+Y - 2*(X % Y)      0 <= X%Y < Y
-#
-# This means that the tree X,Y values can be iterated by keeping just a
-# current X,Y pair.
-# 
-#     dX = Y - X
-#     dY = X+Y - 2*(X%Y) - Y
-#        = X - 2*(X%Y)
-#
-# floor(X/Y) = count trailing 1-bits of N
-#    10111
-#    11000  increment
-# floor(X/Y) = integer part = first term of continued fraction

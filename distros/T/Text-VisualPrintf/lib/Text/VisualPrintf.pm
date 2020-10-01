@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "3.02";
+our $VERSION = "3.07";
 
 use Exporter 'import';
 our @EXPORT_OK = qw(&vprintf &vsprintf);
@@ -13,21 +13,25 @@ our @EXPORT_OK = qw(&vprintf &vsprintf);
 sub vprintf  { &printf (@_) }
 sub vsprintf { &sprintf(@_) }
 
+our $IS_TARGET = sub { $_[0] =~ /[\e\P{ASCII}]/ };
+
 sub sprintf {
     my($format, @args) = @_;
     my $uniqstr = _sub_uniqstr($format, @args)
 	or return CORE::sprintf $format, @args;
     my @replace;
-    for (@args) {
-	defined and /\P{ASCII}/ or next;
-	my($replace, $regex, $len) = @{$uniqstr->($_) // next};
-	push @replace, [ $regex, $_, $len ];
-	$_ = $replace;
+    for my $arg (@args) {
+	next if not defined $arg;
+	next if not $IS_TARGET->($arg);
+	my($replace, $regex, $len) = $uniqstr->($arg) or next;
+	push @replace, [ $regex, $arg, $len ];
+	$arg = $replace;
     }
     local $_ = CORE::sprintf $format, @args;
     while (@replace) {
 	my($regex, $orig, $len) = @{shift @replace};
-	s/($regex)/_replace($1, $orig, $len)/e;
+	# capture group is defined in $regex
+	s/$regex/_replace($1, $orig, $len)/e;
     }
     $_;
 }
@@ -39,35 +43,43 @@ sub printf {
 
 sub _replace {
     my($matched, $orig, $len) = @_;
-    if ((my $width = length $matched) == $len) {
-	$orig;
+    my $width = length $matched;
+    if ($width == $len) {
+	return $orig;
+    }
+    use Text::ANSI::Fold;
+    state $f = Text::ANSI::Fold->new(padding => 1);
+    my($folded, $rest, $w) = $f->fold($orig, width => $width);
+    if ($w <= $width) {
+	$folded;
+    } elsif ($width == 1) {
+	' '; # wide char not fit to single column
     } else {
-	require Text::ANSI::Fold;
-	Text::ANSI::Fold
-	    ->new(text => $orig, width => $width, padding => 1)
-	    ->retrieve;
+	die "Panic"; # should never reach here...
     }
 }
 
 use Text::VisualWidth::PP;
+our $VISUAL_WIDTH = \&Text::VisualWidth::PP::width;
 
 sub _sub_uniqstr {
     local $_ = join '', @_;
-    my @pair;
+    my @a;
     for my $i (1 .. 255) {
 	my $c = pack "C", $i;
 	next if $c =~ /\s/ || /\Q$c/;
-	push @pair, $c;
-	if (@pair >= 2) {
-	    my($a, $b) = @pair;
-	    return sub {
-		my $len = Text::VisualWidth::PP::width +shift;
-		return undef if $len-- < 2;
-		[ $a . ($b x $len), qr/\Q${a}${b}\E*/, ++$len ];
-	    };
-	}
+	push @a, $c;
+	last if @a >= @_;
     }
-    return undef;
+    return if @a < 2;
+    my $lead = do { local $" = ''; qr/[^\Q@a\E]*+/ };
+    my $b = pop @a;
+    return sub {
+	my $len = $VISUAL_WIDTH->(+shift);
+	return if $len < 1;
+	my $a = $a[ (state $n)++ % @a ];
+	( $a . ($b x ($len - 1)), qr/\G${lead}\K(\Q${a}${b}\E*)/, $len );
+    };
 }
 
 1;
@@ -92,7 +104,7 @@ Text::VisualPrintf - printf family functions to handle Non-ASCII characters
 
 =head1 VERSION
 
-Version 3.02
+Version 3.07
 
 =head1 DESCRIPTION
 
@@ -123,6 +135,17 @@ to work with FILEHANDLE and printf.
 
 =back
 
+=head1 VARIABLES
+
+=over 4
+
+=item $VISUAL_WIDTH
+
+Hold a function pointer to calculate visual width of given string.
+Default function is C<Text::VisualWidth::PP::width>.
+
+=back
+
 =head1 IMPLEMENTATION NOTES
 
 Strings in the LIST which contains wide-width character are replaced
@@ -139,13 +162,15 @@ L<Text::VisualPrintf>, L<Text::VisualPrintf::IO>
 
 L<https://github.com/kaz-utashiro/Text-VisualPrintf>
 
+L<Text::ANSI::Printf>
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright (C) 2011-2020 Kazumasa Utashiro.
+Copyright 2011-2020 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

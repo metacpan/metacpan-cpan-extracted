@@ -1,3 +1,10 @@
+2004/10/24 11:55 (-0400) rwmcfa1
+
+	* MANIFEST.SKIP: updates
+
+	* perl-Gnome2-Canvas.spec.in: new scheme that addresses x86_64 problems
+	found by Carl Nygard
+
 2004/08/15 22:11 (-0400) muppetman
 
 	* Canvas.pm, NEWS, README: stable bugfix release 1.002

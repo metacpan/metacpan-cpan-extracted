@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,7 +28,7 @@ use List::Util;
 *min = \&Math::PlanePath::_min;
 
 use vars '$VERSION','@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -97,7 +97,7 @@ use constant::defer parameter_info_array =>
                    # 'ExperimentalVisitNum',
                    # 'ExperimentalVisitCount',
                    # 'ExperimentalRevisit',
-                   'ExperimentalPairsXY','ExperimentalPairsYX',
+                   # 'ExperimentalPairsXY','ExperimentalPairsYX',
                   ];
     return [
             _parameter_info_planepath(),
@@ -2145,10 +2145,12 @@ sub characteristic_smaller {
   }
   use constant _NumSeq_Coord_oeis_anum =>
     { 'wider=0,n_start=1' =>
-      { X       => 'A174344',
-        SumAbs  => 'A214526', # "Manhattan" distance from n to 1
+      { X        => 'A174344',
+        SumAbs   => 'A214526', # "Manhattan" distance from n to 1
+        RSquared => 'A336336', # norm
         # OEIS-Catalogue: A174344 planepath=SquareSpiral coordinate_type=X
         # OEIS-Catalogue: A214526 planepath=SquareSpiral coordinate_type=SumAbs
+        # OEIS-Catalogue: A336336 planepath=SquareSpiral coordinate_type=RSquared
       },
       'wider=0,n_start=0' =>
       { Sum     => 'A180714', # X+Y of square spiral
@@ -2169,7 +2171,11 @@ sub characteristic_smaller {
   use constant _NumSeq_Coord_filling_type => 'plane';
   use constant _NumSeq_Coord_oeis_anum =>
     { 'n_start=0' =>
-      { ExperimentalAbsX => 'A053615', # runs n..0..n, OFFSET=0
+      { X => 'A329116',
+        Y => 'A329972',
+        # OEIS-Catalogue: A329116 planepath=PyramidSpiral,n_start=0 coordinate_type=X
+        # OEIS-Catalogue: A329972 planepath=PyramidSpiral,n_start=0 coordinate_type=Y
+        ExperimentalAbsX => 'A053615', # runs n..0..n, OFFSET=0
         # OEIS-Catalogue: A053615 planepath=PyramidSpiral,n_start=0 coordinate_type=ExperimentalAbsX
       },
     };
@@ -2187,8 +2193,10 @@ sub characteristic_smaller {
   use constant _NumSeq_Coord_oeis_anum =>
     { 'n_start=0' =>
       { X => 'A010751', # up 1, down 2, up 3, down 4, etc
+        Y => 'A305258',
         ExperimentalAbsY => 'A053616',
         # OEIS-Catalogue: A010751 planepath=DiamondSpiral,n_start=0
+        # OEIS-Catalogue: A305258 planepath=DiamondSpiral,n_start=0 coordinate_type=Y
         # OEIS-Other:     A053616 planepath=DiamondSpiral,n_start=0 coordinate_type=ExperimentalAbsY
       },
     };
@@ -2214,6 +2222,16 @@ sub characteristic_smaller {
   # X!=Y when wider odd
   *_NumSeq_Coord_ExperimentalHammingDist_min = \&_NumSeq_Coord_ExperimentalParity_min;
   *_NumSeq_Coord_MaxAbs_min = \&_NumSeq_Coord_ExperimentalParity_min;
+
+  use constant _NumSeq_Coord_oeis_anum =>
+    {
+     'wider=0,n_start=0' =>
+     {X        => 'A328818',
+      Y        => 'A307012',
+      # OEIS-Catalogue: A328818 planepath=HexSpiral,n_start=0 coordinate_type=X
+      # OEIS-Catalogue: A307012 planepath=HexSpiral,n_start=0 coordinate_type=Y
+     },
+    };
 }
 { package Math::PlanePath::HexSpiralSkewed;
   use constant _NumSeq_Coord_filling_type => 'plane';
@@ -2689,6 +2707,103 @@ sub characteristic_smaller {
   #           && ($path->{'coordinate_type'} ne 'AB'
   #               || $value == int($value)));
   # }
+
+  use constant _NumSeq_Coord_oeis_anum =>
+    { 'tree_type=UAD,coordinates=AB,digit_order=HtoL' =>
+      { X      => 'A321768',
+        Y      => 'A321769',
+        Radius => 'A321770',  # hypotenuse
+        # OEIS-Catalogue: A321768 planepath=PythagoreanTree coordinate_type=X
+        # OEIS-Catalogue: A321769 planepath=PythagoreanTree coordinate_type=Y
+        # OEIS-Other:     A321770 planepath=PythagoreanTree coordinate_type=Radius
+      },
+      'tree_type=UAD,coordinates=AC,digit_order=HtoL' =>
+      { X      => 'A321768',
+        Y      => 'A321770',
+        Min    => 'A321768',  # min = A
+        MinAbs => 'A321768',
+        Max    => 'A321770',  # min = C
+        MaxAbs => 'A321770',
+        # OEIS-Other:     A321768 planepath=PythagoreanTree,coordinates=AC coordinate_type=X
+        # OEIS-Catalogue: A321770 planepath=PythagoreanTree,coordinates=AC coordinate_type=Y
+        # OEIS-Other:     A321768 planepath=PythagoreanTree,coordinates=AC coordinate_type=Min
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=AC coordinate_type=Max
+        # OEIS-Other:     A321768 planepath=PythagoreanTree,coordinates=AC coordinate_type=MinAbs
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=AC coordinate_type=MaxAbs
+      },
+      'tree_type=UAD,coordinates=BC,digit_order=HtoL' =>
+      { X   => 'A321769',
+        Y   => 'A321770',
+        Min    => 'A321769',  # min = B
+        MinAbs => 'A321769',
+        Max    => 'A321770',  # max = C
+        MaxAbs => 'A321770',
+        # OEIS-Other:     A321769 planepath=PythagoreanTree,coordinates=BC coordinate_type=X
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=BC coordinate_type=Y
+        # OEIS-Other:     A321769 planepath=PythagoreanTree,coordinates=BC coordinate_type=Min
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=BC coordinate_type=Max
+        # OEIS-Other:     A321769 planepath=PythagoreanTree,coordinates=BC coordinate_type=MinAbs
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=BC coordinate_type=MaxAbs
+      },
+      'tree_type=UAD,coordinates=SM,digit_order=HtoL' =>
+      { Radius => 'A321770',  # hypotenuse
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=SM coordinate_type=Radius
+      },
+      'tree_type=UAD,coordinates=SC,digit_order=HtoL' =>
+      { Y      => 'A321770',
+        Max    => 'A321770',  # max = C
+        MaxAbs => 'A321770',
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=SC coordinate_type=Y
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=SC coordinate_type=Max
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=SC coordinate_type=MaxAbs
+      },
+      'tree_type=UAD,coordinates=MC,digit_order=HtoL' =>
+      { Y      => 'A321770',
+        Max    => 'A321770',  # max = C
+        MaxAbs => 'A321770',
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=MC coordinate_type=Y
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=MC coordinate_type=Max
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=MC coordinate_type=MaxAbs
+      },
+
+      'tree_type=UAD,coordinates=PQ,digit_order=HtoL' =>
+      { X        => 'A321782',
+        Y        => 'A321783',
+        Min      => 'A321783',  # min = Y
+        MinAbs   => 'A321783',
+        Max      => 'A321782',  # min = X
+        MaxAbs   => 'A321782',
+        Sum      => 'A321784',
+        SumAbs   => 'A321784',
+        DiffXY   => 'A321785',
+        AbsDiff  => 'A321785',
+        RSquared => 'A321770',  # p^2 + q^2 = C
+        # OEIS-Catalogue: A321782 planepath=PythagoreanTree,coordinates=PQ coordinate_type=X
+        # OEIS-Catalogue: A321783 planepath=PythagoreanTree,coordinates=PQ coordinate_type=Y
+        # OEIS-Other:     A321783 planepath=PythagoreanTree,coordinates=PQ coordinate_type=Min
+        # OEIS-Other:     A321783 planepath=PythagoreanTree,coordinates=PQ coordinate_type=MinAbs
+        # OEIS-Other:     A321782 planepath=PythagoreanTree,coordinates=PQ coordinate_type=Max
+        # OEIS-Other:     A321782 planepath=PythagoreanTree,coordinates=PQ coordinate_type=MaxAbs
+        # OEIS-Catalogue: A321784 planepath=PythagoreanTree,coordinates=PQ coordinate_type=Sum
+        # OEIS-Other:     A321784 planepath=PythagoreanTree,coordinates=PQ coordinate_type=SumAbs
+        # OEIS-Catalogue: A321785 planepath=PythagoreanTree,coordinates=PQ coordinate_type=DiffXY
+        # OEIS-Other:     A321785 planepath=PythagoreanTree,coordinates=PQ coordinate_type=AbsDiff
+        # OEIS-Other:     A321770 planepath=PythagoreanTree,coordinates=PQ coordinate_type=RSquared
+
+        # No, 2*p*q = B, not just p*q
+        # Product  => 'A321769',  # 2*p*q = B
+        # # OEIS-Other:     A321769 planepath=PythagoreanTree,coordinates=PQ coordinate_type=Product
+      },
+
+      'tree_type=UAD,coordinates=PQ,digit_order=LtoH' =>
+      { X        => 'A321782',  # P is same in HtoL and LtoH
+        Max      => 'A321782',  # min = X
+        MaxAbs   => 'A321782',
+        # OEIS-Other:     A321782 planepath=PythagoreanTree,coordinates=PQ,digit_order=LtoH coordinate_type=X
+        # OEIS-Other:     A321782 planepath=PythagoreanTree,coordinates=PQ,digit_order=LtoH coordinate_type=Max
+        # OEIS-Other:     A321782 planepath=PythagoreanTree,coordinates=PQ,digit_order=LtoH coordinate_type=MaxAbs
+      },
+    };
 }
 { package Math::PlanePath::RationalsTree;
   use constant _NumSeq_Coord_BitAnd_min => 0;  # X=1,Y=2
@@ -2745,6 +2860,7 @@ sub characteristic_smaller {
         # OEIS-Catalogue: A020650 planepath=RationalsTree,tree_type=AYT coordinate_type=X
         # OEIS-Catalogue: A020651 planepath=RationalsTree,tree_type=AYT coordinate_type=Y
         # OEIS-Other:     A086592 planepath=RationalsTree,tree_type=AYT coordinate_type=Sum
+        # OEIS-Other:     A086592 planepath=RationalsTree,tree_type=AYT coordinate_type=SumAbs
         # OEIS-Other:     A000523 planepath=RationalsTree,tree_type=AYT coordinate_type=Depth
         # OEIS-Catalogue: A135523 planepath=RationalsTree,tree_type=AYT coordinate_type=IntXY
 
@@ -2935,6 +3051,9 @@ sub characteristic_smaller {
      },
     };
 }
+{ package Math::PlanePath::PeanoDiagonals;
+  use constant _NumSeq_Coord_filling_type => 'quadrant';
+}
 { package Math::PlanePath::WunderlichSerpentine;
   use constant _NumSeq_Coord_filling_type => 'quadrant';
   use constant _NumSeq_Coord_oeis_anum =>
@@ -3014,10 +3133,14 @@ sub characteristic_smaller {
   use constant _NumSeq_Coord_filling_type => 'quadrant';
   use constant _NumSeq_Coord_oeis_anum =>
     { 'radix=2' =>
-      { X => 'A059905',  # alternate bits first
-        Y => 'A059906',  # alternate bits second
+      { X      => 'A059905',  # alternate bits first
+        Y      => 'A059906',  # alternate bits second
+        BitAnd => 'A292373',
+        BitXor => 'A309952',
         # OEIS-Catalogue: A059905 planepath=ZOrderCurve coordinate_type=X
         # OEIS-Catalogue: A059906 planepath=ZOrderCurve coordinate_type=Y
+        # OEIS-Catalogue: A292373 planepath=ZOrderCurve coordinate_type=BitAnd
+        # OEIS-Catalogue: A309952 planepath=ZOrderCurve coordinate_type=BitXor
       },
       'radix=3' =>
       { X => 'A163325',  # alternate ternary digits first
@@ -3025,21 +3148,19 @@ sub characteristic_smaller {
         # OEIS-Catalogue: A163325 planepath=ZOrderCurve,radix=3 coordinate_type=X
         # OEIS-Catalogue: A163326 planepath=ZOrderCurve,radix=3 coordinate_type=Y
       },
-      'radix=10,i_start=1' =>
+      'radix=10' =>
       {
-       # i_start=1 per A080463 offset=1, it skips initial zero
        Sum    => 'A080463',
        SumAbs => 'A080463',
-       # OEIS-Catalogue: A080463 planepath=ZOrderCurve,radix=10 coordinate_type=Sum i_start=1
-       # OEIS-Other:     A080463 planepath=ZOrderCurve,radix=10 coordinate_type=SumAbs i_start=1
+       # OEIS-Catalogue: A080463 planepath=ZOrderCurve,radix=10 coordinate_type=Sum
+       # OEIS-Other:     A080463 planepath=ZOrderCurve,radix=10 coordinate_type=SumAbs
       },
       'radix=10,i_start=10' =>
       {
        # i_start=10 per A080464 OFFSET=10, it skips all but one initial zeros
+       AbsDiff => 'A080465',
        Product => 'A080464',
        # OEIS-Catalogue: A080464 planepath=ZOrderCurve,radix=10 coordinate_type=Product i_start=10
-
-       AbsDiff => 'A080465',
        # OEIS-Catalogue: A080465 planepath=ZOrderCurve,radix=10 coordinate_type=AbsDiff i_start=10
       },
     };
@@ -3055,31 +3176,45 @@ sub characteristic_smaller {
                      SumAbs   => 'A163530',
                      RSquared => 'A163531',
                    };
-       my $z = { BitXor        => 'A059905',
+       my $z = { BitXor       => 'A059905',
                };
+       my $fst = { X          => 'A309952',  # ZOrder too
+                 };
        ('apply_type=TsF,gray_type=reflected,radix=3' => $peano,
         'apply_type=FsT,gray_type=reflected,radix=3' => $peano,
-         # OEIS-Other: A163528 planepath=GrayCode,apply_type=TsF,radix=3 coordinate_type=X
-         # OEIS-Other: A163529 planepath=GrayCode,apply_type=TsF,radix=3 coordinate_type=Y
-         # OEIS-Other: A163530 planepath=GrayCode,apply_type=TsF,radix=3 coordinate_type=Sum
-         # OEIS-Other: A163530 planepath=GrayCode,apply_type=TsF,radix=3 coordinate_type=SumAbs
-         # OEIS-Other: A163531 planepath=GrayCode,apply_type=TsF,radix=3 coordinate_type=RSquared
+        # OEIS-Other: A163528 planepath=GrayCode,apply_type=TsF,radix=3 coordinate_type=X
+        # OEIS-Other: A163529 planepath=GrayCode,apply_type=TsF,radix=3 coordinate_type=Y
+        # OEIS-Other: A163530 planepath=GrayCode,apply_type=TsF,radix=3 coordinate_type=Sum
+        # OEIS-Other: A163530 planepath=GrayCode,apply_type=TsF,radix=3 coordinate_type=SumAbs
+        # OEIS-Other: A163531 planepath=GrayCode,apply_type=TsF,radix=3 coordinate_type=RSquared
 
-         # OEIS-Other: A163528 planepath=GrayCode,apply_type=FsT,radix=3 coordinate_type=X
-         # OEIS-Other: A163529 planepath=GrayCode,apply_type=FsT,radix=3 coordinate_type=Y
-         # OEIS-Other: A163530 planepath=GrayCode,apply_type=FsT,radix=3 coordinate_type=Sum
-         # OEIS-Other: A163530 planepath=GrayCode,apply_type=FsT,radix=3 coordinate_type=SumAbs
-         # OEIS-Other: A163531 planepath=GrayCode,apply_type=FsT,radix=3 coordinate_type=RSquared
+        # OEIS-Other: A163528 planepath=GrayCode,apply_type=FsT,radix=3 coordinate_type=X
+        # OEIS-Other: A163529 planepath=GrayCode,apply_type=FsT,radix=3 coordinate_type=Y
+        # OEIS-Other: A163530 planepath=GrayCode,apply_type=FsT,radix=3 coordinate_type=Sum
+        # OEIS-Other: A163530 planepath=GrayCode,apply_type=FsT,radix=3 coordinate_type=SumAbs
+        # OEIS-Other: A163531 planepath=GrayCode,apply_type=FsT,radix=3 coordinate_type=RSquared
 
+        # TsF = Fs when radix=2
         'apply_type=TsF,gray_type=reflected,radix=2' => $z,
         'apply_type=TsF,gray_type=modular,radix=2' => $z,
         'apply_type=Fs,gray_type=reflected,radix=2' => $z,
         'apply_type=Fs,gray_type=modular,radix=2' => $z,
-         # OEIS-Other: A059905 planepath=GrayCode,apply_type=TsF coordinate_type=BitXor
-         # OEIS-Other: A059905 planepath=GrayCode,apply_type=TsF,gray_type=modular coordinate_type=BitXor
-         # OEIS-Other: A059905 planepath=GrayCode,apply_type=Fs coordinate_type=BitXor
-         # OEIS-Other: A059905 planepath=GrayCode,apply_type=Fs,gray_type=modular coordinate_type=BitXor
+        # OEIS-Other: A059905 planepath=GrayCode,apply_type=TsF coordinate_type=BitXor
+        # OEIS-Other: A059905 planepath=GrayCode,apply_type=TsF,gray_type=modular coordinate_type=BitXor
+        # OEIS-Other: A059905 planepath=GrayCode,apply_type=Fs coordinate_type=BitXor
+        # OEIS-Other: A059905 planepath=GrayCode,apply_type=Fs,gray_type=modular coordinate_type=BitXor
+
+        # FsT = Ts when radix=2
+        'apply_type=FsT,gray_type=reflected,radix=2' => $fst,
+        'apply_type=FsT,gray_type=modular,radix=2' => $fst,
+        'apply_type=Ts,gray_type=reflected,radix=2' => $fst,
+        'apply_type=Ts,gray_type=modular,radix=2' => $fst,
+        # OEIS-Other: A309952 planepath=GrayCode,apply_type=Ts coordinate_type=X
+        # OEIS-Other: A309952 planepath=GrayCode,apply_type=Ts,gray_type=modular coordinate_type=X
+        # OEIS-Other: A309952 planepath=GrayCode,apply_type=Ts coordinate_type=X
+        # OEIS-Other: A309952 planepath=GrayCode,apply_type=Ts,gray_type=modular coordinate_type=X
        ),
+
      },
     };
 }
@@ -3095,6 +3230,13 @@ sub characteristic_smaller {
 }
 { package Math::PlanePath::Flowsnake;
   use constant _NumSeq_Coord_ExperimentalParity_max => 0;  # even always
+
+  use constant _NumSeq_Coord_oeis_anum =>
+   { 'arms=1' =>
+     {Y        => 'A334486',
+      # OEIS-Catalogue: A334486 planepath=Flowsnake coordinate_type=Y
+     },
+   };
 }
 { package Math::PlanePath::FlowsnakeCentres;
   use constant _NumSeq_Coord_ExperimentalParity_max => 0;  # even always
@@ -3144,6 +3286,14 @@ sub characteristic_smaller {
 }
 { package Math::PlanePath::QuadricCurve;
   use constant _NumSeq_Coord_IntXY_min => undef; # negatives
+  use constant _NumSeq_Coord_oeis_anum =>
+   { '' =>
+     {X        => 'A332246',
+      Y        => 'A332247',
+      # OEIS-Catalogue: A332246 planepath=QuadricCurve coordinate_type=X
+      # OEIS-Catalogue: A332247 planepath=QuadricCurve coordinate_type=Y
+     },
+   };
 }
 { package Math::PlanePath::QuadricIslands;
   use constant _NumSeq_Coord_X_integer => 0;
@@ -3217,6 +3367,33 @@ sub characteristic_smaller {
   use constant _NumSeq_Coord_IntXY_min => -1; # wedge
   *_NumSeq_Coord_ExperimentalParity_max
     = \&Math::PlanePath::SierpinskiTriangle::_NumSeq_Coord_ExperimentalParity_max;
+
+  use constant _NumSeq_Coord_oeis_anum =>
+    { 'align=diagonal' =>
+      { X => 'A334483',
+        Y => 'A334484',
+        # OEIS-Catalogue: A334483 planepath=SierpinskiArrowhead,align=diagonal coordinate_type=X
+        # OEIS-Catalogue: A334484 planepath=SierpinskiArrowhead,align=diagonal coordinate_type=Y
+      },
+      'align=left' =>
+      { Sum    => 'A334483',
+        MinAbs => 'A334484',
+        # OEIS-Other: A334483 planepath=SierpinskiArrowhead,align=left coordinate_type=Sum
+        # OEIS-Other: A334484 planepath=SierpinskiArrowhead,align=left coordinate_type=MinAbs
+      },
+      'align=right' =>
+      { X      => 'A334483',
+        Min    => 'A334483',
+        MinAbs => 'A334483',
+        DiffYX  => 'A334484',
+        AbsDiff => 'A334484',
+        # OEIS-Other: A334483 planepath=SierpinskiArrowhead,align=right coordinate_type=X
+        # OEIS-Other: A334483 planepath=SierpinskiArrowhead,align=right coordinate_type=Min
+        # OEIS-Other: A334483 planepath=SierpinskiArrowhead,align=right coordinate_type=MinAbs
+        # OEIS-Other: A334484 planepath=SierpinskiArrowhead,align=right coordinate_type=DiffYX
+        # OEIS-Other: A334484 planepath=SierpinskiArrowhead,align=right coordinate_type=AbsDiff
+      },
+    };
 }
 { package Math::PlanePath::SierpinskiArrowheadCentres;
   use constant _NumSeq_Coord_IntXY_min => -1; # wedge
@@ -3278,9 +3455,27 @@ sub characteristic_smaller {
   use constant _NumSeq_Coord_filling_type => 'quadrant';
 #   # except 0/0=inf
 #   # use constant _NumSeq_Coord_IntXY_max => 1; # upper octant X<=Y so X/Y<=1
+
+  use constant _NumSeq_Coord_oeis_anum =>
+    { '' =>
+      { X => 'A334235',
+        Y => 'A334236',
+        # OEIS-Catalogue: A334235 planepath=HIndexing coordinate_type=X
+        # OEIS-Catalogue: A334236 planepath=HIndexing coordinate_type=Y
+      },
+    };
 }
 { package Math::PlanePath::DragonCurve;
   use constant _NumSeq_Coord_n_list_max => 2;
+
+  use constant _NumSeq_Coord_oeis_anum =>
+   { 'arms=1' =>
+     {X        => 'A332383',
+      Y        => 'A332384',
+      # OEIS-Catalogue: A332383 planepath=DragonCurve coordinate_type=X
+      # OEIS-Catalogue: A332384 planepath=DragonCurve coordinate_type=Y
+     },
+   };
 
   # 4-arm plane filling if full grid
   sub _NumSeq_Coord_ExperimentalNeighbours4_min {
@@ -3368,6 +3563,14 @@ sub characteristic_smaller {
       return $_NumSeq_Coord_IntXY_min[$self->arms_count];
     }
   }
+  use constant _NumSeq_Coord_oeis_anum =>
+   { 'arms=1' =>
+     {X        => 'A334576',
+      Y        => 'A334577',
+      # OEIS-Catalogue: A334576 planepath=AlternatePaperMidpoint coordinate_type=X
+      # OEIS-Catalogue: A334577 planepath=AlternatePaperMidpoint coordinate_type=Y
+     },
+   };
 }
 { package Math::PlanePath::TerdragonCurve;
   use constant _NumSeq_Coord_ExperimentalParity_max => 0;  # even always
@@ -3392,6 +3595,14 @@ sub characteristic_smaller {
 # }
 { package Math::PlanePath::CCurve;
   use constant _NumSeq_Coord_n_list_max => 4;
+  use constant _NumSeq_Coord_oeis_anum =>
+   { '' =>
+     {X        => 'A332251',
+      Y        => 'A332252',
+      # OEIS-Catalogue: A332251 planepath=CCurve coordinate_type=X
+      # OEIS-Catalogue: A332252 planepath=CCurve coordinate_type=Y
+     },
+   };
 }
 # { package Math::PlanePath::ComplexPlus;
   # Sum X+Y < 0 at N=16
@@ -3750,7 +3961,9 @@ sub characteristic_smaller {
 
   use constant _NumSeq_Coord_oeis_anum =>
     { 'n_start=0' =>
-      { Sum         => 'A003056',  # 0, 1,1, 2,2,2, 3,3,3,3
+      { X           => 'A319572',
+        Y           => 'A319573',
+        Sum         => 'A003056',  # 0, 1,1, 2,2,2, 3,3,3,3
         SumAbs      => 'A003056',  #   same
         Product     => 'A004247',  # 0, 0,0,0, 1, 0,0, 2,2, 0,0, 3,4,5, 0,0
         AbsDiff     => 'A049581',  # abs(Y-X) by anti-diagonals
@@ -3763,6 +3976,8 @@ sub characteristic_smaller {
         Max         => 'A003984',
         MaxAbs      => 'A003984',  # MaxAbs=Max
         ExperimentalHammingDist => 'A101080',
+        # OEIS-Catalogue: A319572 planepath=DiagonalsAlternating,n_start=0 coordinate_type=X
+        # OEIS-Catalogue: A319573 planepath=DiagonalsAlternating,n_start=0 coordinate_type=Y
         # OEIS-Other: A003056 planepath=DiagonalsAlternating,n_start=0 coordinate_type=Sum
         # OEIS-Other: A003056 planepath=DiagonalsAlternating,n_start=0 coordinate_type=SumAbs
         # OEIS-Other: A004247 planepath=DiagonalsAlternating,n_start=0 coordinate_type=Product
@@ -4788,6 +5003,16 @@ sub characteristic_smaller {
 }
 { package Math::PlanePath::QuintetReplicate;
   use constant _NumSeq_Coord_filling_type => 'plane';
+  use constant _NumSeq_Coord_oeis_anum =>
+   { 'numbering_type=fixed' =>
+     {X        => 'A316657',
+      Y        => 'A316658',
+      RSquared => 'A316707',
+      # OEIS-Catalogue: A316657 planepath=QuintetReplicate coordinate_type=X
+      # OEIS-Catalogue: A316658 planepath=QuintetReplicate coordinate_type=Y
+      # OEIS-Catalogue: A316707 planepath=QuintetReplicate coordinate_type=RSquared
+     },
+   };
 }
 { package Math::PlanePath::AR2W2Curve;
   use constant _NumSeq_Coord_filling_type => 'quadrant';

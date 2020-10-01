@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -35,7 +35,7 @@ use POSIX 'ceil';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
@@ -539,7 +539,7 @@ sub n_to_level {
 1;
 __END__
 
-=for stopwords eg Ryde Mandelbrot Math-PlanePath
+=for stopwords eg Ryde Mandelbrot Math-PlanePath OEIS
 
 =head1 NAME
 
@@ -577,7 +577,7 @@ but taking the centre of each square visited by that curve.
              22--23  20  27  18  45  48--47  71  56  69  66--67     3
                \   /   \   /   \      |        /   \      |
                  21   6  19  16--17  49  54--55  58--57  65         2
-                   /   \      |       |    \      |    /
+                    /  \      |       |    \      |    /
               4-- 5   8-- 7  15      50--51  53  59  64             1
                \      |    /              |/      |    \
           0-- 1   3   9  14              52      60--61  63     <- Y=0
@@ -780,7 +780,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

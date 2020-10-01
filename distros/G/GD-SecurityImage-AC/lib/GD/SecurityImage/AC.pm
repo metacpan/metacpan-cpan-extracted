@@ -1,6 +1,7 @@
 package GD::SecurityImage::AC;
 # drop-in replacement for Authen::Captcha
 use strict;
+use warnings;
 use vars qw($VERSION);
 use GD::SecurityImage;
 use Digest::MD5 qw(md5_hex);
@@ -9,7 +10,7 @@ use Fcntl qw(:flock); # imports LOCK_NB, LOCK_EX, LOCK_SH, LOCK_UN (among other 
 use Symbol; # imports 'gensym'
 
 BEGIN {
-   $VERSION = '1.11';
+   $VERSION = '1.12';
    @Authen::Captcha::ISA = ('GD::SecurityImage::AC');
 }
 

@@ -1,5 +1,11 @@
 Revision history for Hash-Digger
 
+0.0.5    2020-09-27T13:26:07
+         Fixed version
+
+0.0.4    2020-09-27T12:56:06
+         Fixed Makefile to include Test::Exception for tests
+
 0.0.3    2020-09-17T23:26:02
          Make it compatible with perl 5.8 (don't use //)
          perltidy code

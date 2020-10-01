@@ -1,4 +1,9 @@
-Revision history for Net-Cisco-FMC-v1: 0.004002
+Revision history for Net-Cisco-FMC-v1: 0.005001
+
+0.005001  2020-09-28 17:47:29+02:00 Europe/Vienna
+    - add methods for deployabledevices, deploymentrequest, devicerecords,
+      policyassignments and taskstatuses
+    - add wait_for_task helper method
 
 0.004002  2020-06-09 10:43:10+02:00 Europe/Vienna
     - fix skipping of api.t when environment variables aren't set

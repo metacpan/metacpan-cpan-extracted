@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2015, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2015, 2018, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 8;
+plan tests => 11;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,6 +29,53 @@ BEGIN { MyTestHelpers::nowarnings(); }
 
 use MyOEIS;
 use Math::PlanePath::DiagonalsAlternating;
+
+
+#------------------------------------------------------------------------------
+# A319571 -- X,Y coordinates
+
+MyOEIS::compare_values
+  (anum => 'A319571',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::DiagonalsAlternating->new (n_start => 0);
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+       @got < $count or last;
+       push @got, $y;
+     }
+     return \@got;
+   });
+
+# A319572 -- X coordinate
+MyOEIS::compare_values
+  (anum => 'A319572',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::DiagonalsAlternating->new (n_start => 0);
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+     }
+     return \@got;
+   });
+
+# A319573 -- Y coordinate
+MyOEIS::compare_values
+  (anum => 'A319573',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::DiagonalsAlternating->new (n_start => 0);
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------

@@ -36,7 +36,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
@@ -288,7 +288,7 @@ sub n_to_level {
 1;
 __END__
 
-=for stopwords eg Ryde Math-PlanePath ie Nstart Nlevel
+=for stopwords eg Ryde Math-PlanePath ie Nstart Nlevel twindragon DragonCurve OEIS
 
 =head1 NAME
 

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,7 +32,7 @@ use Math::PlanePath;
 use Math::PlanePath::MultipleRings;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 @ISA = ('Math::PlanePath');
 
 
@@ -273,9 +273,9 @@ Math::PlanePath::SacksSpiral -- circular spiral squaring each revolution
 
 =head1 DESCRIPTION
 
-X<Sacks, Robert>X<Square numbers>The Sacks spiral by Robert Sacks is an
-Archimedean spiral with points N placed on the spiral so the perfect squares
-fall on a line going to the right.  Read more at
+X<Square numbers>The Sacks spiral by Robert Sacks is an Archimedean spiral
+with points N placed on the spiral so the perfect squares fall on a line
+going to the right.  Read more at
 
 =over
 
@@ -283,8 +283,9 @@ L<http://www.numberspiral.com>
 
 =back
 
-An Archimedean spiral means each loop is a constant distance from the
-preceding, in this case 1 unit.  The polar coordinates are
+An Archimedean spiral means radial distance a constant factor of the angle,
+and so each loop a constant distance out from the preceding loop, in this
+case 1 unit out.  The polar coordinates are
 
     R = sqrt(N)
     theta = sqrt(N) * 2pi
@@ -423,7 +424,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

@@ -92,7 +92,7 @@ Config::AutoConf - A module to implement some of AutoConf macros in pure perl.
 
 =cut
 
-our $VERSION = '0.318';
+our $VERSION = '0.319';
 $VERSION = eval $VERSION;
 
 =head1 ABSTRACT
@@ -271,12 +271,13 @@ sub check_prog
     {
         for my $e (@exe_exts)
         {
-            my $cmd = $self->_sanitize_prog(File::Spec->catfile($p, $ac_prog . $e));
-            -x $cmd
+            my $cmd           = $self->_sanitize_prog(File::Spec->catfile($p, $ac_prog . $e));
+            my $is_executable = -x $cmd and -f $cmd;
+                  $is_executable
               and $options->{action_on_true}
               and ref $options->{action_on_true} eq "CODE"
               and $options->{action_on_true}->();
-            -x $cmd and return $cmd;
+            $is_executable and return $cmd;
         }
     }
 
@@ -2201,7 +2202,7 @@ sub check_alignof_type
             "#ifndef offsetof",
             "# ifdef __ICC",
             "#  define offsetof(type,memb) ((size_t)(((char *)(&((type*)0)->memb)) - ((char *)0)))",
-            "# else", "#  define offsetof(type,memb) ((size_t)&((type*)0)->memb)",
+            "# else",  "#  define offsetof(type,memb) ((size_t)&((type*)0)->memb)",
             "# endif", "#endif"
         );
 
@@ -3137,7 +3138,15 @@ sub check_lib
     );
 }
 
-=head2 search_libs( function, search-libs, @other-libs?, \%options? )
+=head2 search_libs( function, search-libs, @other-libs?, @extra_link_flags?, \%options? )
+
+    Config::AutoConf->search_libs("gethostent", "nsl", [qw(socket net)], {
+        action_on_true => sub { ... }
+    });
+    Config::AutoConf->search_libs("log4cplus_initialize", ["log4cplus"],
+        [[qw(stdc++)], [qw(stdc++ unwind)]],
+        [qw(-pthread -thread)]
+    );
 
 Search for a library defining function if it's not already available.
 This equates to calling
@@ -3179,7 +3188,7 @@ sub search_libs
     my $options = {};
     scalar @_ > 1 and ref $_[-1] eq "HASH" and $options = pop @_;
     my $self = shift->_get_instance();
-    my ($func, $libs, @other_libs) = @_;
+    my ($func, $libs, @other_libs, @other_link_flags) = @_;
 
     (defined($libs) and "ARRAY" eq ref($libs) and scalar(@{$libs}) > 0)
       or return 0;    # XXX would prefer croak
@@ -3189,12 +3198,17 @@ sub search_libs
       and ref($other_libs[0]) eq "ARRAY"
       and @other_libs = @{$other_libs[0]};
 
+    scalar(@other_link_flags) == 1
+      and ref($other_link_flags[0]) eq "ARRAY"
+      and @other_link_flags = @{$other_link_flags[0]};
+
     my $cache_name = $self->_cache_name("search", $func);
     my $check_sub  = sub {
         my $conftest = $self->lang_call("", $func);
 
-        my @save_libs = @{$self->{extra_libs}};
-        my $have_lib  = 0;
+        my @save_libs  = @{$self->{extra_libs}};
+        my @save_extra = @{$self->{extra_link_flags}};
+        my $have_lib   = 0;
 
         my $if_else_sub = sub {
             my ($libstest, @other) = @_;
@@ -3219,18 +3233,22 @@ sub search_libs
       LIBTEST:
         foreach my $libstest (undef, @$libs)
         {
-            # XXX would local work on array refs? can we omit @save_libs?
-            $self->{extra_libs} = [@save_libs];
-            if (defined $libstest and scalar(@other_libs) > 1 and ref($other_libs[0]) eq "ARRAY")
+            foreach my $linkextra (undef, @other_link_flags)
             {
-                foreach my $ol (@other_libs)
+                # XXX would local work on array refs? can we omit @save_libs?
+                $self->{extra_libs}       = [@save_libs];
+                $self->{extra_link_flags} = [@save_extra];
+                if (defined $libstest and scalar(@other_libs) > 1 and ref($other_libs[0]) eq "ARRAY")
                 {
-                    $if_else_sub->($libstest, @{$ol}) and last LIBTEST;
+                    foreach my $ol (@other_libs)
+                    {
+                        $if_else_sub->($libstest, @{$ol}) and last LIBTEST;
+                    }
                 }
-            }
-            else
-            {
-                $if_else_sub->($libstest, @other_libs) and last LIBTEST;
+                else
+                {
+                    $if_else_sub->($libstest, @other_libs) and last LIBTEST;
+                }
             }
         }
 

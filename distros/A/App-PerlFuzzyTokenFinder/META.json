@@ -1,0 +1,81 @@
+{
+   "abstract" : "Fuzzy finder for Perl statements",
+   "author" : [
+      "utgwkk <utagawakiki@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-PerlFuzzyTokenFinder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PPI" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::PerlFuzzyTokenFinder" : {
+         "file" : "lib/App/PerlFuzzyTokenFinder.pm",
+         "version" : "0.02"
+      },
+      "App::PerlFuzzyTokenFinder::CLI" : {
+         "file" : "lib/App/PerlFuzzyTokenFinder/CLI.pm"
+      },
+      "App::PerlFuzzyTokenFinder::MatchedPosition" : {
+         "file" : "lib/App/PerlFuzzyTokenFinder/MatchedPosition.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/utgwkk/App-PerlFuzzyTokenFinder/issues"
+      },
+      "homepage" : "https://github.com/utgwkk/App-PerlFuzzyTokenFinder",
+      "repository" : {
+         "url" : "git://github.com/utgwkk/App-PerlFuzzyTokenFinder.git",
+         "web" : "https://github.com/utgwkk/App-PerlFuzzyTokenFinder"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

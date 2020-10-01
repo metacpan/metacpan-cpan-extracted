@@ -1,0 +1,115 @@
+{
+  'Grammar' => {
+    'attributes' => {}
+  },
+  '_alternation_1_of_production_1_of_rule_test1' => {
+    'attributes' => {
+      'label' => '\'easy\'  '
+    }
+  },
+  '_alternation_1_of_production_1_of_rule_test3' => {
+    'attributes' => {
+      'label' => 'defn  typedef  fail  '
+    }
+  },
+  'a' => {
+    'attributes' => {
+      'label' => '\'a\'  '
+    }
+  },
+  'b' => {
+    'attributes' => {
+      'label' => '\'b\'  '
+    }
+  },
+  'cat' => {
+    'attributes' => {
+      'label' => '<reject: $arg\\[0\\] ne \'meows\'> \'cat\'   '
+    }
+  },
+  'defn' => {
+    'attributes' => {
+      'label' => '\'var\' id \'holds\' typename \';\'  '
+    }
+  },
+  'dog' => {
+    'attributes' => {
+      'label' => '\'dog\'  '
+    }
+  },
+  'fail' => {
+    'attributes' => {
+      'label' => ' '
+    }
+  },
+  'id' => {
+    'attributes' => {
+      'label' => '/\\[a-z\\]		# LEADING ALPHABETIC\\\\n		  \\\\w*		# FOLLOWED BY ALPHAS, DIGITS, OR UNDERSCORES\\\\n		 /ix  '
+    }
+  },
+  'is' => {
+    'attributes' => {
+      'label' => '\'is\'  \'are\'  '
+    }
+  },
+  'name' => {
+    'attributes' => {
+      'label' => '\'fred\'  '
+    }
+  },
+  'notname' => {
+    'attributes' => {
+      'label' => '/\\[a-z\\]\\\\w*/i  '
+    }
+  },
+  'test1' => {
+    'attributes' => {
+      'label' => '\'(\' \'the\' \'$::first\' /te+st/ is _alternation_1_of_production_1_of_rule_test1(s?)  '
+    }
+  },
+  'test2' => {
+    'attributes' => {
+      'label' => '$arg{article} $arg\\[3\\]\\[$arg{sound}\\]  '
+    }
+  },
+  'test3' => {
+    'attributes' => {
+      'label' => '_alternation_1_of_production_1_of_rule_test3(5..10)  '
+    }
+  },
+  'test4' => {
+    'attributes' => {
+      'label' => '\'a\' b /c/  '
+    }
+  },
+  'test5' => {
+    'attributes' => {
+      'label' => 'name notname  name  '
+    }
+  },
+  'test6' => {
+    'attributes' => {
+      'label' => '<rulevar: $test6 = 1>  \'a\' <commit> \'b\' <uncommit> \'c\' <reject: $test6 && $text>  <uncommit>  \'a\'  '
+    }
+  },
+  'test7' => {
+    'attributes' => {
+      'label' => '\'x\' <resync> /y+/  '
+    }
+  },
+  'the' => {
+    'attributes' => {
+      'label' => '\'the\'  '
+    }
+  },
+  'typedef' => {
+    'attributes' => {
+      'label' => '\'type\' id \'is\' typename \';\'  '
+    }
+  },
+  'typename' => {
+    'attributes' => {
+      'label' => '\'int\'  '
+    }
+  }
+}

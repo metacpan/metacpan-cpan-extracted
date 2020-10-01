@@ -6,7 +6,7 @@ use 5.010;
 # ABSTRACT: App::TimeTracker Trello plugin
 use App::TimeTracker::Utils qw(error_message warning_message);
 
-our $VERSION = "1.006";
+our $VERSION = "1.007";
 
 use Moose::Role;
 use WWW::Trello::Lite;
@@ -113,9 +113,9 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
     }
 
     if ( $self->meta->does_role('App::TimeTracker::Command::Git') ) {
-        my $branch = $self->trello;
+        my $branch = $card->{idShort};
         if ($name) {
-            $branch = $self->safe_branch_name($name) . '_' . $branch;
+            $branch .= '_'.$self->safe_branch_name($name);
         }
         $self->branch( lc($branch) ) unless $self->branch;
     }
@@ -415,9 +415,6 @@ sub _trello_just_the_name {
     my $tr   = $self->trello;
     $name =~ s/$tr:\s?//;
     $name =~ s/\[(.*?)\]//g;
-    $name =~ s/\s+/_/g;
-    $name =~ s/_$//;
-    $name =~ s/^_//;
     return $name;
 }
 
@@ -440,7 +437,8 @@ sub App::TimeTracker::Data::Task::trello_card_id {
 }
 
 no Moose::Role;
-1;
+
+q{ listening to: SarahBernhardt - langsam wiads wos }
 
 __END__
 
@@ -454,7 +452,7 @@ App::TimeTracker::Command::Trello - App::TimeTracker Trello plugin
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 DESCRIPTION
 
@@ -573,7 +571,7 @@ If C<--trello> is set and we can find a card with this id:
 
 =item * add the Card id to the tasks tags ("trello:s1d7prUx")
 
-=item * if C<Git> is also used, determine a save branch name from the Card name, and change into this branch ("rev_up_fluxcompensator_s1d7prUx")
+=item * if C<Git> is also used, determine a save branch name from idShort and the Card name, and change into this branch ("42_rev_up_fluxcompensator")
 
 =item * add member to list of members (if C<member_id> is set in config)
 

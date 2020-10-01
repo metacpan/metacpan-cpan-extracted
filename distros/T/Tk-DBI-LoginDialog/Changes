@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::DBI::LoginDialog.
 
+1.007	Thu, Nov 10, 2016  7:43:01 AM
+	- Fixed x-platform test results around 03driver.t plan deferral.
+	- Test harness tweaks to reduce duplicate code.
+
 1.006	Thu, Oct 20, 2016 12:39:47 AM
 	- Fixed button hard-naming in login (retry) routine.
 	- cutover tests to standardised harness to avoid duplicate code.

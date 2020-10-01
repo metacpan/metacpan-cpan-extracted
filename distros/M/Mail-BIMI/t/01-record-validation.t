@@ -2,88 +2,84 @@
 use 5.20.0;
 use strict;
 use warnings FATAL => 'all';
+BEGIN { $ENV{MAIL_BIMI_CACHE_BACKEND} = 'Null' };
 use lib 't';
-use Mail::BIMI::Pragmas;
+use Mail::BIMI::Prelude;
 use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Record;
 
-plan tests => 12;
+plan tests => 11;
 
 is_deeply(
-  test_record( 'v=bimi1; l=https://bimi.example.com/marks/file.svg', 'example.com', 'default' ),
+  test_record( 'v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg', 'example.com', 'default' ),
   [ 1, [] ],
   'Valid record'
 );
 
 is_deeply(
-  test_record( 'v=bimi1; l=https://bimi.example.com/marks/file.svg;', 'example.com', 'default' ),
+  test_record( 'v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg;', 'example.com', 'default' ),
   [ 1, [] ],
   'Valid record with terminator'
 );
 
 is_deeply(
-  test_record( 'v=bimi1; l=https://bimi.example.com/marks/file.svg; a=', 'example.com', 'default' ),
+  test_record( 'v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg; a=', 'example.com', 'default' ),
   [ 1, [] ],
   'Valid record with a'
 );
 
 is_deeply(
-  test_record( 'v=bimi1; l=https://bimi.example.com/marks/file.svg; a=;', 'example.com', 'default' ),
+  test_record( 'v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg; a=;', 'example.com', 'default' ),
   [ 1, [] ],
   'Valid record with a and terminator'
 );
 
 is_deeply(
-  test_record( 'v=bimi1; v=bimi2; l=https://bimi.example.com/marks/file.svg', 'example.com', 'default' ),
-  [ 0, ['Duplicate key in record','Invalid v tag'] ],
+  test_record( 'v=bimi1; v=bimi2; l=https://fastmaildmarc.com/FM_BIMI.svg', 'example.com', 'default' ),
+  [ 0, ['DUPLICATE_KEY','INVALID_V_TAG'] ],
   'Dupliacte key'
 );
 
 is_deeply(
-  test_record( 'l=https://bimi.example.com/marks/file.svg', 'example.com', 'default' ),
-  [ 0, ['Missing v tag'] ],
+  test_record( 'l=https://fastmaildmarc.com/FM_BIMI.svg', 'example.com', 'default' ),
+  [ 0, ['MISSING_V_TAG'] ],
   'Missing v tag'
 );
 is_deeply(
-  test_record( 'v=; l=https://bimi.example.com/marks/file.svg', 'example.com', 'default' ),
-  [ 0, ['Empty v tag', 'Invalid v tag'] ],
+  test_record( 'v=; l=https://fastmaildmarc.com/FM_BIMI.svg', 'example.com', 'default' ),
+  [ 0, ['EMPTY_V_TAG', 'INVALID_V_TAG'] ],
   'Empty v tag'
 );
 is_deeply(
-  test_record( 'v=foobar; l=https://bimi.example.com/marks/file.svg', 'example.com', 'default' ),
-  [ 0, ['Invalid v tag'] ],
+  test_record( 'v=foobar; l=https://fastmaildmarc.com/FM_BIMI.svg', 'example.com', 'default' ),
+  [ 0, ['INVALID_V_TAG'] ],
   'Invalid v tag'
 );
 
 is_deeply(
   test_record( 'v=bimi1', 'example.com', 'default' ),
-  [ 0, ['Missing l tag'] ],
+  [ 0, ['MISSING_L_TAG'] ],
   'Missing l tag'
 );
 is_deeply(
-  test_record( 'v=bimi1; l=http://bimi.example.com/marks/file.svg', 'example.com', 'default' ),
-  [ 0, ['Invalid transport in locations'] ],
-  'Invalid transport in locations'
-);
-is_deeply(
-  test_record( 'v=bimi1; l=foo,,bar', 'example.com', 'default' ),
-  [  0, ['Invalid transport in locations', 'Empty l tag', 'Invalid transport in locations'] ],
-  'Empty l entry'
+  test_record( 'v=bimi1; l=http://fastmaildmarc.com/FM_BIMI.svg', 'example.com', 'default' ),
+  [ 0, ['INVALID_TRANSPORT_L'] ],
+  'Invalid transport in location'
 );
 is_deeply(
   test_record( 'v=bimi1; l=', 'example.com', 'default' ),
-  [ 0, ['Empty l tag'] ],
+  [ 0, ['EMPTY_L_TAG'] ],
   'Empty l tag'
 );
 
 sub test_record {
   my ( $entry, $domain, $selector ) = @_;
-  my $record = Mail::BIMI::Record->new( domain => $domain, selector => $selector );
-  $record->record( $record->_parse_record( $entry ) );
+  my $bimi = Mail::BIMI->new;
+  my $record = Mail::BIMI::Record->new( bimi_object => $bimi, domain => $domain, selector => $selector );
+  $record->record_hashref( $record->_parse_record( $entry ) );
   $record->is_valid;
-  my @errors = ( $record->error->@*, $record->authorities->error->@*, $record->locations->error->@* );
-  return [ $record->is_valid, \@errors ];
+  return [ $record->is_valid, $record->error_codes ];
 }
 
 #!perl

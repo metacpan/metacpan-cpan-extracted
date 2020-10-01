@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -29,7 +29,7 @@ BEGIN { MyTestHelpers::nowarnings(); }
 #use Smart::Comments '###';
 
 
-my $test_count = (tests => 455)[1];
+my $test_count = (tests => 457)[1];
 plan tests => $test_count;
 
 # version 1.14 for abs() overload
@@ -403,6 +403,7 @@ my @modules = (
                # 'CornerReplicate',    # not defined yet
                'DigitGroups',
                'PeanoCurve',
+               'PeanoDiagonals',
                'ZOrderCurve',
 
                'HIndexing',

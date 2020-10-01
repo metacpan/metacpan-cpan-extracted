@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -16,12 +16,15 @@
 # with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
 
+# cf http://mathcurve.com/fractals/minkowski/minkowski.shtml
+
+
 package Math::PlanePath::QuadricCurve;
 use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -276,6 +279,7 @@ sub n_to_level {
   my @_UNDOCUMENTED__n_to_turn_LSR = (undef, 1,-1,-1, 0, 1,1,-1);
   sub _UNDOCUMENTED__n_to_turn_LSR {
     my ($self, $n) = @_;
+    if ($n < 1 || is_infinite($n)) { return undef; }
     while ($n) {
       if (my $digit = _divrem_mutate($n,8)) {  # lowest non-zero digit
         return $_UNDOCUMENTED__n_to_turn_LSR[$digit];
@@ -331,7 +335,7 @@ __END__
     #                                                 |
     #                                                 @
 
-=for stopwords eg Ryde Math-PlanePath zig-zag OEIS
+=for stopwords eg Ryde Math-PlanePath zig-zag OEIS quadric
 
 =head1 NAME
 
@@ -463,7 +467,9 @@ L<http://oeis.org/A133851> (etc)
 
 =back
 
-    A133851    Y at N=2^k, being successive powers 2^j at k=1mod4
+    A332246   X coordinate
+    A332247   Y coordinate
+    A133851   Y at N=2^k, being successive powers 2^j at k=1mod4
 
 =head1 SEE ALSO
 
@@ -479,7 +485,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

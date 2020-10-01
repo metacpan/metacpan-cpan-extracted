@@ -30,8 +30,7 @@ DESCRIPTION
 
     Two constructors are available: The new method is called upon startup
     and creates an object that will basically act as an anchor over the
-    complete program. It supports command line parsing via "Getopt::Long
-    (3)".
+    complete program. It supports command line parsing via Getopt::Long (3).
 
     Arguments of new are *$attr*, an hash ref of attributes (see below) and
     *$options* an array ref of options, typically command line arguments
@@ -85,7 +84,7 @@ DESCRIPTION
         level "debug" are created.
 
     *facility* (--facility=mode)
-        (UNIX only) Facility to use for "Sys::Syslog (3)". The default is
+        (UNIX only) Facility to use for Sys::Syslog (3). The default is
         daemon.
 
     *group* (--group=gid)
@@ -305,8 +304,8 @@ DESCRIPTION
       $server->Error($format, @args);
       $server->Fatal($format, @args);
 
-    The Log method is an interface to "Sys::Syslog (3)" or "Win32::EventLog
-    (3)". It's arguments are *$level*, a syslog level like debug, notice or
+    The Log method is an interface to Sys::Syslog (3) or Win32::EventLog
+    (3). It's arguments are *$level*, a syslog level like debug, notice or
     err, a format string in the style of printf and the format strings
     arguments.
 
@@ -363,17 +362,14 @@ EXAMPLE
       #
       # Calculator server
       #
-      require 5.004;
       use strict;
 
       require Net::Daemon;
 
-
       package Calculator;
 
-      use vars qw($VERSION @ISA);
-      $VERSION = '0.01';
-      @ISA = qw(Net::Daemon); # to inherit from Net::Daemon
+      our $VERSION = '0.01';
+      our @ISA = qw(Net::Daemon); # to inherit from Net::Daemon
 
       sub Version ($) { 'Calculator Example Server, 0.01'; }
 

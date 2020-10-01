@@ -2,15 +2,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
-use Test::Deep;
-use Test::Warnings qw[ :no_end_test had_no_warnings ];
+use FindBin;
 
-use Shared::Examples::Net::Amazon::S3::Client (
-    qw[ fixture ],
-    qw[ with_response_fixture ],
-    qw[ expect_client_bucket_acl_get ],
-);
+BEGIN { require "$FindBin::Bin/test-helper-s3-client.pl" }
+
+plan tests => 5;
+
+use Shared::Examples::Net::Amazon::S3::Client qw[ expect_client_bucket_acl_get ];
 
 expect_client_bucket_acl_get 'get bucket acl' => (
     with_bucket             => 'some-bucket',
@@ -19,18 +17,28 @@ expect_client_bucket_acl_get 'get bucket acl' => (
     expect_data             => fixture ('response::acl')->{content},
 );
 
-expect_client_bucket_acl_get 'get bucket acl with access denied error' => (
+expect_client_bucket_acl_get 'S3 error - Access Denied' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('error::access_denied'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?acl' },
     throws                  => qr/^AccessDenied: Access denied error message/,
 );
 
-expect_client_bucket_acl_get 'get bucket acl with bucket not found error' => (
+expect_client_bucket_acl_get 'S3 error - Bucket Not Found' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('error::no_such_bucket'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?acl' },
     throws                  => qr/^NoSuchBucket: No such bucket error message/,
 );
 
+expect_client_bucket_acl_get 'HTTP error - 400 Bad Request' => (
+    with_bucket             => 'some-bucket',
+    with_response_fixture ('error::http_bad_request'),
+    expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?acl' },
+    throws                  => qr/^400: Bad Request/,
+);
+
 had_no_warnings;
+
+done_testing;
+

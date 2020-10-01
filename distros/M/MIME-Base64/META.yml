@@ -1,25 +1,63 @@
 ---
-abstract: 'The RFC 2045 encodings; base64 and quoted-printable'
+abstract: 'Encoding and decoding of base64 strings'
 author:
-  - 'Gisle Aas <gisle@activestate.com>'
+  - 'Gisle Aas <gaas@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MIME-Base64
 no_index:
   directory:
-    - t
+    - eg
+    - examples
     - inc
+    - share
+    - t
+    - xt
+provides:
+  MIME::Base64:
+    file: lib/MIME/Base64.pm
+    version: '3.16'
+  MIME::QuotedPrint:
+    file: lib/MIME/QuotedPrint.pm
+    version: '3.16'
 requires:
-  XSLoader: 0
-  perl: 5.004
+  Exporter: '0'
+  XSLoader: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
-  repository: https://github.com/gisle/mime-base64
-version: 3.15
+  bugtracker: https://github.com/Dual-Life/mime-base64/issues
+  homepage: https://github.com/Dual-Life/mime-base64
+  repository: https://github.com/Dual-Life/mime-base64.git
+version: '3.16'
+x_contributors:
+  - 'Alexandr Ciornii <CHORNY@cpan.org>'
+  - 'Chase Whitener <capoeirab@cpan.org>'
+  - 'David Mitchell <davem@iabyn.com>'
+  - 'Jarkko Hietaniemi <jhi@iki.fi>'
+  - 'Nicholas Clark <nick@ccl4.org>'
+  - 'Nicolas R <nicolas@atoomic.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Peter J. Acklam <pjacklam@online.no>'
+  - 'Robert Sedlacek <rs@474.at>'
+  - 'Robin Barker <Robin.Barker@npl.co.uk>'
+  - 'Steve Hay <steve.m.hay@googlemail.com>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

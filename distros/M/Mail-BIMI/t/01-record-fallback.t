@@ -2,8 +2,9 @@
 use 5.20.0;
 use strict;
 use warnings FATAL => 'all';
+BEGIN { $ENV{MAIL_BIMI_CACHE_BACKEND} = 'Null' };
 use lib 't';
-use Mail::BIMI::Pragmas;
+use Mail::BIMI::Prelude;
 use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Record;
@@ -30,7 +31,7 @@ $resolver->zonefile_read('t/zonefile');
   $bimi->selector( 'FAKEfoobar' );
 
   my $record = $bimi->record;
-  $record->record;
+  $record->record_hashref;
   is_deeply( $record->domain, 'gallifreyburning.com', 'Fallback domain' );
   is_deeply( $record->selector, 'default', 'Fallback selector' );
 }
@@ -48,7 +49,7 @@ $resolver->zonefile_read('t/zonefile');
   $bimi->selector( 'FAKEfoobar' );
 
   my $record = $bimi->record;
-  $record->record;
+  $record->record_hashref;
 
   is_deeply( $record->domain, 'gallifreyburning.com', 'Fallback domain' );
   is_deeply( $record->selector, 'default', 'Fallback selector' );

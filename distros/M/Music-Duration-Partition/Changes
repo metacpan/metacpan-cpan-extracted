@@ -1,5 +1,9 @@
 Revision history for Music-Duration-Partition
 
+0.0515 2020-09-23 11:47:25
+    - Improve the eg/drum-fills-advanced program.
+    - Improve documentation.
+
 0.0514 2020-08-17 09:47:06
     - Simplify the eg/seven-eight program.
 

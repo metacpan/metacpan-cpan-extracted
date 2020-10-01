@@ -24,13 +24,13 @@ my %WriteMakefileArgs = (
     "Algorithm::CheckDigits" => 0,
     "Algorithm::CheckDigits::M10_004" => 0,
     "Algorithm::CheckDigits::M11_001" => 0,
-    "Data::Sah::Coerce" => "0.038",
+    "Data::Sah::Coerce" => "0.048",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %FallbackPrereqs = (
   "Algorithm::CheckDigits" => 0,
   "Algorithm::CheckDigits::M10_004" => 0,
   "Algorithm::CheckDigits::M11_001" => 0,
-  "Data::Sah::Coerce" => "0.038",
+  "Data::Sah::Coerce" => "0.048",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

@@ -10,7 +10,7 @@ sub run
   exit 2 if $?;
 }
 
-run( qw( git clone https://github.com/Perl5-FFI/FFI-Platypus.git \FFI-Platypus ) );
+run( qw( git clone https://github.com/PerlFFI/FFI-Platypus.git \FFI-Platypus ) );
 
 {
   local $CWD = "/FFI-Platypus";

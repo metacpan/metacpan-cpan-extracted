@@ -1,14 +1,15 @@
 package Search::InvertedIndex::Result;
 
-# $RCSfile: Result.pm,v $ $Revision: 1.5 $ $Date: 1999/10/20 16:35:45 $ $Author: snowhare $
-
 use strict;
+use warnings;
+
 use Carp;
 use Class::NamedParms;
 use Class::ParmList;
 use vars qw (@ISA $VERSION);
+
 @ISA     = qw (Class::NamedParms);
-$VERSION = "1.00";
+$VERSION = "1.17";
 
 =head1 NAME 
 
@@ -20,12 +21,6 @@ Search::InvertedIndex::Result - A list of result entries from a inverted index s
 
 Contains zero or more result entries from a search. Provides access methods
 to information in/from/about the entries.
-
-=head1 CHANGES
-
- 1.00 1999.6.16 - Initial release
-
- 1.01 1999.6.17 - Documentation fixes
 
 =head2 Public API
 
@@ -151,13 +146,12 @@ sub entry {
 
 =head1 COPYRIGHT
 
-Copyright 1999, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and 
-FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
-This software may be copied or redistributed under the same terms as Perl itelf.
+Copyright 1999-2020, Jerilyn Franz and FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). 
+All Rights Reserved.
 
 =head1 AUTHOR
 
-Benjamin Franz
+Jerilyn Franz
 
 =head1 TODO
 

@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -51,7 +51,7 @@ use Math::PlanePath::Base::Digits
   'round_up_pow';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 @ISA = ('Math::PlanePath');
 
 use Math::PlanePath::TerdragonMidpoint;
@@ -1119,14 +1119,13 @@ L<http://oeis.org/A080846> (etc)
 
 =back
 
-    A080846   next turn 0=left,1=right, by 120 degrees
-                (n=0 is turn at N=1)
-
     A060236   turn 1=left,2=right, by 120 degrees
                 (lowest non-zero ternary digit)
     A137893   turn 1=left,0=right (morphism)
-    A189673   turn 1=left,0=right (morphism, extra initial 0)
     A189640   turn 0=left,1=right (morphism, extra initial 0)
+    A080846   next turn 0=left,1=right, by 120 degrees
+                (n=0 is turn at N=1)
+    A189673   prev turn 1=left,0=right (morphism, extra initial 0)
     A038502   strip trailing ternary 0s,
                 taken mod 3 is turn 1=left,2=right
     A133162   1=segment, 2=right turn between
@@ -1136,20 +1135,23 @@ morphism definition.  That can be skipped to consider the turns starting
 with a left turn at N=1.
 
     A026225   N positions of left turns,
-                being (3*i+1)*3^j so lowest non-zero digit is a 1
+                being (3*i+1)*3^j so lowest non-zero digit is 1
     A026179   N positions of right turns (except initial 1)
+                being (3*i+2)*3^j so lowest non-zero digit is 2
     A060032   bignum turns 1=left,2=right to 3^level
     A189674   num left turns 1 to N
     A189641   num right turns 1 to N
     A189672     same
 
-    A026141   \ dN increment between left turns N
+    A026141   \ dTurnLeft increment between left turns N
     A026171   /
-    A026181   \ dN increment between left turns N
+    A026181   \ dTurnRight increment between right turns N
     A131989   /
 
-    A062756   total turn, count ternary 1s
-    A005823   N positions where net turn == 0, ternary no 1s
+    A062756   direction (net total turn), count ternary 1s
+    A005823   N positions where direction = 0, ternary no 1s
+    A023692 through A023698
+              N positions where direction = 1 to 7, ternary num 1s
 
     A111286   boundary length, N=0 to N=3^k, skip initial 1
     A003945   boundary/2
@@ -1192,11 +1194,16 @@ House of Graphs entries for the terdragon as a graph include
 
 =over
 
-=item level=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21138>
-
-=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21140>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655> etc
 
 =back
+
+    19655     level=0 (1-segment path)
+    594       level=1 (3-segment path)
+    21138     level=2
+    21140     level=3
+    33761     level=4
+    33763     level=5
 
 =head1 SEE ALSO
 
@@ -1218,7 +1225,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

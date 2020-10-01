@@ -5,6 +5,7 @@
     <retrievalinfo>
       <retrieval syntax="usmarc" />
       <retrieval syntax="xml" />
+      <retrieval syntax="json" />
       <retrieval syntax="opac">
         <backend syntax="xml" name="opac" />
       </retrieval>

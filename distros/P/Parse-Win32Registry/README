@@ -25,7 +25,7 @@ The tests require the Test::More and Data::Dumper modules.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2006-2012 by James Macfarlane
+Copyright (C) 2006-2020 by James Macfarlane
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

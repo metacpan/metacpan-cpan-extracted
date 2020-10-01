@@ -26,15 +26,17 @@ no_index:
 provides:
   App::Greple::msdoc:
     file: lib/App/Greple/msdoc.pm
-    version: '1.03'
+    version: '1.04'
 requires:
-  App::Greple: '8.26'
+  App::Greple: '8.40'
+  App::optex::textconv: '0.10'
+  Archive::Zip: '1.37'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-msdoc/issues
   homepage: https://github.com/kaz-utashiro/greple-msdoc
   repository: git://github.com/kaz-utashiro/greple-msdoc.git
-version: '1.03'
+version: '1.04'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

@@ -178,3 +178,60 @@ sub test_draw {
         is_deeply \@draws, $expected_draws, 'got expected draws using draw method';
     }
 }
+
+sub test_draw_with_mask {
+    my $probs = [
+        1, 5, 2, 6, 3, 5, 10
+    ];
+    
+    my $prng   = Math::Random::MT::Auto->new (seed => 2345);
+    my $object = Statistics::Sampler::Multinomial->new (
+        prng => $prng,
+        data => $probs,
+    );
+
+    my $mask = [1,2];  #  mask second and third items
+    my $expected_draws = [3, 6, 3, 4, 0];
+    my @draws = map {$object->draw_with_mask($mask)} (1..5);
+
+    SKIP: {
+        use Config;
+        skip 'prng sequence differs under 32 bit ints', 2
+          if $Config{ivsize} == 4;
+        is_deeply \@draws, $expected_draws, 'got expected draws using draw method';
+    }
+    
+    @draws = map {$object->draw_with_mask($mask)} (1..10000);
+    my $masked_count = grep {$_ == 1 || $_ == 2} @draws;
+    ok !$masked_count, 'did not get any of the masked iters';
+}
+
+sub test_draw_n_samples_with_mask {
+    my $probs = [
+        1, 5, 2, 6, 3, 5, 10
+    ];
+    
+    my $prng   = Math::Random::MT::Auto->new (seed => 2345);
+    my $object = Statistics::Sampler::Multinomial->new (
+        prng => $prng,
+        data => $probs,
+    );
+
+    my $mask = [1,2];  #  mask second and third items
+    my $expected_draws = [20, 0, 0, 122, 64, 111, 183];
+    my $draws = $object->draw_n_samples_with_mask(500, $mask);
+
+    SKIP: {
+        use Config;
+        skip 'prng sequence differs under 32 bit ints', 2
+          if $Config{ivsize} == 4;
+        is_deeply
+          $draws,
+          $expected_draws,
+          'got expected draws using draw_n_samples_with_mask method';
+    }
+    
+}
+
+
+1;

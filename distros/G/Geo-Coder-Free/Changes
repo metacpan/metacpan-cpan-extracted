@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-Free
 
+0.25	Wed Sep 30 22:33:06 EDT 2020
+	Maxmind: Improved handling of full state names in the US
+
 0.24	Mon Jun 15 11:50:14 EDT 2020
 	Deal with
 		https://github.com/apache/commons-csv/commit/914f2c41557bdd3dcde8d10d6f128fa3bb307b11

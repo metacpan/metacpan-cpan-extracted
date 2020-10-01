@@ -12,11 +12,10 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the 
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
- * Boston, MA  02111-1307  USA.
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
- * $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/GnomeCanvas/xs/GnomeCanvasUtil.xs,v 1.7 2004/08/16 02:03:12 muppetman Exp $
+ * $Id$
  */
 #include "gnomecanvasperl.h"
 

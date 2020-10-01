@@ -32,7 +32,7 @@
 #
 #========================================================================
 #
-# Version 0.74, released 17 Jan 2015.
+# Version 0.76, released 14 Sep 2020.
 #
 # See http://perlrsync.sourceforge.net.
 #
@@ -52,7 +52,7 @@ use Encode qw/from_to/;
 use Fcntl;
 
 use vars qw($VERSION);
-$VERSION = '0.74';
+$VERSION = '0.76';
 
 use constant S_IFMT       => 0170000;	# type of file
 use constant S_IFDIR      => 0040000; 	# directory
@@ -333,6 +333,8 @@ sub remoteStart
 
     socketpair(RSYNC, FH, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
 				      or die "socketpair: $!";
+    socketpair(RSYNC_STDERR, FH_STDERR, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
+				      or die "socketpair: $!";
     $rs->{remoteSend} = $remoteSend;
     $rs->{remoteDir}  = $remoteDir;
 
@@ -368,12 +370,13 @@ sub remoteStart
 	# The child execs rsync.
 	#
 	close(FH);
+	close(FH_STDERR);
 	close(STDIN);
 	close(STDOUT);
-	close(STDERR);
+        close(STDERR);
 	open(STDIN, "<&RSYNC");
 	open(STDOUT, ">&RSYNC");
-	open(STDERR, ">&RSYNC");
+        open(STDERR, ">&RSYNC_STDERR");
 	if ( ref($cmd) eq 'CODE' ) {
 	    &$cmd();
 	} else {
@@ -384,7 +387,9 @@ sub remoteStart
 	# exit(0);
     }
     close(RSYNC);
+    close(RSYNC_STDERR);
     $rs->{fh} = *FH;
+    $rs->{fh_stderr} = *FH_STDERR;
     $rs->{rsyncPID} = $pid;
     $rs->{pidHandler}->($rs->{rsyncPID}, $rs->{childPID})
 			if ( defined($rs->{pidHandler}) );
@@ -420,6 +425,8 @@ sub serverClose
     return if ( !defined($rs->{fh}) );
     close($rs->{fh});
     $rs->{fh} = undef;
+    close($rs->{fh_stderr}) if defined($rs->{fh_stderr});
+    $rs->{fh_stderr} = undef;
 }
 
 sub go
@@ -544,6 +551,8 @@ sub go
         close(WH);
         close(FHRd);
         $rs->{fh} = *FHWr;
+        close($rs->{fh_stderr});
+        $rs->{fh_stderr} = undef;
 
 	#
 	# Make our write handle non-blocking
@@ -1348,6 +1357,19 @@ sub statsGet
     }
 }
 
+sub processStderr
+{
+    my($rs) = @_;
+
+    my $stderr_data;
+    sysread($rs->{fh_stderr}, $stderr_data, 65536);
+    $rs->{stderr_data} .= $stderr_data;
+    while ( $rs->{stderr_data} =~ /[\n\r]/ ) {
+        (my $stderr_mesg, $rs->{stderr_data}) = split(/[\n\r]+/, $rs->{stderr_data}, 2);
+        $rs->log($stderr_mesg);
+    }
+}
+
 sub getData
 {
     my($rs, $len) = @_;
@@ -1359,7 +1381,12 @@ sub getData
 	return -1 if ( $rs->{abort} );
 	my $ein;
 	vec($ein, fileno($rs->{fh}), 1) = 1;
+	vec($ein, fileno($rs->{fh_stderr}), 1) = 1 if ( defined($rs->{fh_stderr}) );
 	select(my $rout = $ein, undef, $ein, undef);
+        if ( defined($rs->{fh_stderr}) && vec($rout, fileno($rs->{fh_stderr}), 1) ) {
+            $rs->processStderr();
+            next;
+        }
 	return -1 if ( $rs->{abort} );
         sysread($rs->{fh}, $data, 65536);
         if ( length($data) == 0 ) {
@@ -1451,8 +1478,8 @@ sub writeFlush
     while ( $rs->{writeBuf} ne "" ) {
 	#(my $chunk, $rs->{writeBuf}) = unpack("a4092 a*", $rs->{writeBuf});
 	#$chunk = pack("V", (7 << 24) | length($chunk)) . $chunk;
-	vec($FDread, fileno($rs->{childFh}), 1) = 1
-			    if ( defined($rs->{childFh}) );
+	vec($FDread, fileno($rs->{childFh}), 1) = 1   if ( defined($rs->{childFh}) );
+	vec($FDread, fileno($rs->{fh_stderr}), 1) = 1 if ( defined($rs->{fh_stderr}) );
 	vec($FDwrite, fileno($rs->{fh}), 1) = 1;
 	my $ein = $FDread;
 	vec($ein, fileno($rs->{fh}), 1) = 1;
@@ -1461,6 +1488,10 @@ sub writeFlush
 			&& vec($rout, fileno($rs->{childFh}), 1) ) {
 	    $rs->pollChild(0);
 	}
+        if ( defined($rs->{fh_stderr}) && vec($rout, fileno($rs->{fh_stderr}), 1) ) {
+            $rs->processStderr();
+            next;
+        }
 	return if ( $rs->{abort} );
 	if ( vec($rwrite, fileno($rs->{fh}), 1) ) {
 	    my $n = syswrite($rs->{fh}, $rs->{writeBuf});

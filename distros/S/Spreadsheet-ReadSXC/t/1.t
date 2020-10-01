@@ -3,7 +3,6 @@ use Test::More tests => 10;
 use File::Basename 'dirname';
 use Spreadsheet::ReadSXC;
 use Archive::Zip;
-use XML::Parser;
 use Data::Dumper;
 
 my $d = dirname($0);
@@ -33,7 +32,8 @@ my @sheet1_curr_date = ([-1500.99, 17, undef],[undef, undef, undef],['one', 'mor
 my @sheet3_data = (['Both alike', 'Both alike', undef], [undef, undef, undef], [undef, undef, undef], [undef, undef, undef], [undef, undef, undef], [undef, undef, undef], [undef, undef, undef], [undef, undef, undef], [undef, undef, undef], [undef, undef, undef], [undef, undef, undef], [undef, undef, undef], [undef, undef, undef], [undef, undef, 'Cell C14']);
 
 my @sheet1 = @{$$workbook_ref{"Sheet1"}};
-is_deeply \@sheet1, \@sheet1_data, 'Verifying Sheet1';
+is_deeply \@sheet1, \@sheet1_data, 'Verifying Sheet1'
+    or diag Dumper \@sheet1;
 
 is_deeply $workbook_ref->{"Sheet2"}, [], 'Verifying Sheet2';
 

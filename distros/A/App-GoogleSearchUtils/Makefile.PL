@@ -21,7 +21,12 @@ my %WriteMakefileArgs = (
   "NAME" => "App::GoogleSearchUtils",
   "PREREQ_PM" => {
     "Browser::Open" => 0,
+    "Data::Sah::Coerce::perl::To_duration::From_float::seconds" => 0,
+    "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" => 0,
+    "Data::Sah::Coerce::perl::To_duration::From_str::human" => 0,
+    "Data::Sah::Coerce::perl::To_duration::From_str::iso8601" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
+    "Data::Sah::Compiler::perl::TH::duration" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Log::ger" => "0.037",
@@ -39,7 +44,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +53,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Browser::Open" => 0,
+  "Data::Sah::Coerce::perl::To_duration::From_float::seconds" => 0,
+  "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" => 0,
+  "Data::Sah::Coerce::perl::To_duration::From_str::human" => 0,
+  "Data::Sah::Coerce::perl::To_duration::From_str::iso8601" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
+  "Data::Sah::Compiler::perl::TH::duration" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,

@@ -1,4 +1,4 @@
-IO-HTML version 1.001, released June 28, 2014
+IO-HTML version 1.004, released September 26, 2020
 
 
 This module opens a file and performs automatic charset detection
@@ -30,17 +30,17 @@ DEPENDENCIES
 
 
 CHANGES
-    Here's what's new in version 1.001 of IO-HTML:
+    Here's what's new in version 1.004 of IO-HTML:
     (See the file "Changes" for the full revision history.)
 
-	- No code changes, just documentation improvements
-	- Update links to the HTML5 draft specification
+	- No code changes since 1.003, just documentation improvements
+	- New example file: detect-encoding.pl
 
 
 
 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Christopher J. Madsen.
+This software is copyright (c) 2020 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

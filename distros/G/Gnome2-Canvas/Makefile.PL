@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/GnomeCanvas/Makefile.PL,v 1.29 2004/03/29 16:55:57 muppetman Exp $
+# $Id$
 #
 
 use strict;
@@ -31,6 +31,7 @@ unless (eval "use ExtUtils::Depends '$build_reqs{'perl-ExtUtils-Depends'}';"
    warn "$@\n";
    WriteMakefile(
          PREREQ_FATAL => 1,
+         NO_META      => 1,
          PREREQ_PM    => {
             Glib::                => $build_reqs{'perl-Glib'},
             Gtk2::                => $build_reqs{'perl-Gtk2'},
@@ -85,6 +86,7 @@ WriteMakefile(
     ABSTRACT        => 'Perl bindings for the 2.x series of the Gnome Canvas widget',
     XSPROTOARG      => '-noprototypes',
     MAN3PODS        => \%pod_files,
+    NO_META         => 1,
     $gnomecanvas->get_makefile_vars,
 );
 

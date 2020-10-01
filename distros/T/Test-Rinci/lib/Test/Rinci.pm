@@ -2,8 +2,8 @@
 
 package Test::Rinci;
 
-our $DATE = '2020-06-13'; # DATE
-our $VERSION = '0.154'; # VERSION
+our $DATE = '2020-09-23'; # DATE
+our $VERSION = '0.155'; # VERSION
 
 use 5.010001;
 use strict;
@@ -114,14 +114,31 @@ sub _test_function_metadata {
                     my $r = $Pa->request(call => $uri, {args=>$args});
                     $Test->is_num($r->[0], $eg->{status} // 200, "status")
                         or do { $Test->diag($Test->explain($r)); $ok = 0 };
+                    my $actual_r = $meta->{_orig_result_naked} ? $r->[2] : $r;
                     if (exists $eg->{result}) {
-                        my $actual_r = $meta->{_orig_result_naked} ?
-                            $r->[2] : $r;
                         Test::More::is_deeply(
                             $actual_r, $eg->{result}, "result")
                               or do {
                                   Test::More::diag(
                                       Test::More::explain($actual_r));
+                                  $ok = 0;
+                              };
+                    }
+                    if (exists $eg->{env_result}) {
+                        Test::More::is_deeply(
+                            $r, $eg->{env_result}, "env_result")
+                              or do {
+                                  Test::More::diag(
+                                      Test::More::explain($r));
+                                  $ok = 0;
+                              };
+                    }
+                    if (exists $eg->{naked_result}) {
+                        Test::More::is_deeply(
+                            $r->[2], $eg->{naked_result}, "naked_result")
+                              or do {
+                                  Test::More::diag(
+                                      Test::More::explain($r->[2]));
                                   $ok = 0;
                               };
                     }
@@ -369,7 +386,7 @@ Test::Rinci - Test Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.154 of Test::Rinci (from Perl distribution Test-Rinci), released on 2020-06-13.
+This document describes version 0.155 of Test::Rinci (from Perl distribution Test-Rinci), released on 2020-09-23.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,13 @@
 Revision history for Perl extension Parse::Win32Registry.
 
+** 1.1 2020-09-19
+
+Added fix for errors decoding registry timestamps. (This was due to the
+interpretation of dates in timegm changing in recent versions of Perl.)
+Thanks to B.M.W. and Slaven Rezic for their help with this.
+
+Updated as_regedit_export to handle undefined REG_SZ values.
+
 ** 1.0 2012-04-29
 
 Added support for decoding System Mandatory Label ACEs (a feature

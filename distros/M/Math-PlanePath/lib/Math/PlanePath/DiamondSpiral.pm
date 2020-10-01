@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 @ISA = ('Math::PlanePath');
@@ -48,11 +48,11 @@ use constant dx_minimum => -1;
 use constant dx_maximum => 1;
 use constant dy_minimum => -1;
 use constant dy_maximum => 1;
-use constant _UNDOCUMENTED__dxdy_list => (1,0,   # E  N=1 and other bottom
-                                          1,1,   # NE N=6
-                                          -1,1,  # NW N=2
-                                          -1,-1, # SW N=3
-                                          1,-1); # SE N=4
+use constant 1.02 _UNDOCUMENTED__dxdy_list => (1,0,   # E  N=1 and other bottom
+                                               1,1,   # NE N=6
+                                               -1,1,  # NW N=2
+                                               -1,-1, # SW N=3
+                                               1,-1); # SE N=4
 sub _UNDOCUMENTED__dxdy_list_at_n {
   my ($self) = @_;
   return $self->n_start + 5;
@@ -402,6 +402,7 @@ L<http://oeis.org/A010751> (etc)
 
     n_start=0
       A010751    X coordinate, runs 1 inc, 2 dec, 3 inc, etc
+      A305258    Y coordinate
       A053616    abs(Y), runs k to 0 to k
       A000384    N on X axis, hexagonal numbers
       A001105    N on Y axis, 2*n^2 (and cf similar A184636)
@@ -430,7 +431,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

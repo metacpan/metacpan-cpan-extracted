@@ -1,10 +1,10 @@
 {
-   "abstract" : "Stemming of words in various languages",
+   "abstract" : "Stemming of words",
    "author" : [
       "Jerilyn Franz <cpan@jerilyn.info>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,15 +13,25 @@
       "version" : "2"
    },
    "name" : "Lingua-Stem",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "Lingua::GL::Stemmer" : "0",
             "Lingua::PT::Stemmer" : "0",
             "Lingua::Stem::Fr" : "0.02",
@@ -34,64 +44,6 @@
             "perl" : "5.006",
             "warnings" : "0"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Carp" : "0",
-            "Lingua::GL::Stemmer" : "0",
-            "Lingua::PT::Stemmer" : "0",
-            "Lingua::Stem::Fr" : "0.02",
-            "Lingua::Stem::It" : "0",
-            "Lingua::Stem::Ru" : "0",
-            "Lingua::Stem::Snowball::Da" : "1.01",
-            "Lingua::Stem::Snowball::No" : "1.00",
-            "Lingua::Stem::Snowball::Se" : "1.01",
-            "Text::German" : "0",
-            "perl" : "5.006",
-            "warnings" : "0"
-         }
-      }
-   },
-   "provides" : {
-      "Lingua::Stem" : {
-         "file" : "lib/Lingua/Stem.pm",
-         "version" : "2.30"
-      },
-      "Lingua::Stem::AutoLoader" : {
-         "file" : "lib/Lingua/Stem/AutoLoader.pm",
-         "version" : "2.30"
-      },
-      "Lingua::Stem::Da" : {
-         "file" : "lib/Lingua/Stem/Da.pm",
-         "version" : "2.30"
-      },
-      "Lingua::Stem::De" : {
-         "file" : "lib/Lingua/Stem/De.pm",
-         "version" : "2.30"
-      },
-      "Lingua::Stem::En" : {
-         "file" : "lib/Lingua/Stem/En.pm",
-         "version" : "2.30"
-      },
-      "Lingua::Stem::EnBroken" : {
-         "file" : "lib/Lingua/Stem/EnBroken.pm",
-         "version" : "2.30"
-      },
-      "Lingua::Stem::Gl" : {
-         "file" : "lib/Lingua/Stem/Gl.pm",
-         "version" : "2.30"
-      },
-      "Lingua::Stem::No" : {
-         "file" : "lib/Lingua/Stem/No.pm",
-         "version" : "2.30"
-      },
-      "Lingua::Stem::Pt" : {
-         "file" : "lib/Lingua/Stem/Pt.pm",
-         "version" : "2.30"
-      },
-      "Lingua::Stem::Sv" : {
-         "file" : "lib/Lingua/Stem/Sv.pm",
-         "version" : "2.30"
       }
    },
    "release_status" : "stable",
@@ -109,6 +61,6 @@
          "web" : "https://github.com/JerilynFranz/perl-Lingua-Stem"
       }
    },
-   "version" : "2.30",
+   "version" : "2.31",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

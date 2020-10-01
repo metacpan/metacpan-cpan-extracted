@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.08
+    version 0.10
 
 SYNOPSIS
 
@@ -98,6 +98,9 @@ DESCRIPTION
     This distribution provides tools for building classes to interface for
     common C data types. Arrays, struct, union and nested types based on
     those are supported.
+
+    To work with C APIs that work with C file pointers you can use
+    FFI::C::File and FFI::C::PosixFile.
 
 METHODS
 
@@ -248,6 +251,10 @@ SEE ALSO
     FFI::C::ArrayDef
 
     FFI::C::Def
+
+    FFI::C::File
+
+    FFI::C::PosixFile
 
     FFI::C::Struct
 

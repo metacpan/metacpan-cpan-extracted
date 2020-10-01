@@ -4303,6 +4303,10 @@ sub cells_charts_post_worksheet_chart_title {
 # @param string $title Specifies chart title name. (optional)
 # @param string $folder The workbook folder. (optional)
 # @param string $storage_name storage name. (optional)
+# @param boolean $data_labels  (optional, default to true)
+# @param string $data_labels_position  (optional, default to Above)
+# @param string $pivot_table_sheet  (optional)
+# @param string $pivot_table_name  (optional)
 {
     my $params = {
     'name' => {
@@ -4373,6 +4377,26 @@ sub cells_charts_post_worksheet_chart_title {
     'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
+        required => '0',
+    },
+    'data_labels' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },
+    'data_labels_position' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'pivot_table_sheet' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'pivot_table_name' => {
+        data_type => 'string',
+        description => '',
         required => '0',
     },
     };
@@ -4475,6 +4499,26 @@ sub cells_charts_put_worksheet_add_chart {
     # query params
     if ( exists $args{'storage_name'}) {
         $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'data_labels'}) {
+        $query_params->{'dataLabels'} = $self->{api_client}->to_query_value($args{'data_labels'});
+    }
+
+    # query params
+    if ( exists $args{'data_labels_position'}) {
+        $query_params->{'dataLabelsPosition'} = $self->{api_client}->to_query_value($args{'data_labels_position'});
+    }
+
+    # query params
+    if ( exists $args{'pivot_table_sheet'}) {
+        $query_params->{'pivotTableSheet'} = $self->{api_client}->to_query_value($args{'pivot_table_sheet'});
+    }
+
+    # query params
+    if ( exists $args{'pivot_table_name'}) {
+        $query_params->{'pivotTableName'} = $self->{api_client}->to_query_value($args{'pivot_table_name'});
     }
 
     # path params
@@ -15291,6 +15335,340 @@ sub cells_pivot_tables_post_pivot_table_style {
 }
 
 #
+# cells_pivot_tables_post_pivot_table_update_pivot_field
+#
+# 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $pivot_table_index  (required)
+# @param int $pivot_field_index  (required)
+# @param string $pivot_field_type  (required)
+# @param PivotField $pivot_field  (required)
+# @param boolean $need_re_calculate  (optional, default to false)
+# @param string $folder  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'pivot_table_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'pivot_field_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'pivot_field_type' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'pivot_field' => {
+        data_type => 'PivotField',
+        description => '',
+        required => '1',
+    },
+    'need_re_calculate' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_pivot_tables_post_pivot_table_update_pivot_field' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_pivot_tables_post_pivot_table_update_pivot_field {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_pivot_tables_post_pivot_table_update_pivot_field");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_pivot_tables_post_pivot_table_update_pivot_field");
+    }
+
+    # verify the required parameter 'pivot_table_index' is set
+    unless (exists $args{'pivot_table_index'}) {
+      croak("Missing the required parameter 'pivot_table_index' when calling cells_pivot_tables_post_pivot_table_update_pivot_field");
+    }
+
+    # verify the required parameter 'pivot_field_index' is set
+    unless (exists $args{'pivot_field_index'}) {
+      croak("Missing the required parameter 'pivot_field_index' when calling cells_pivot_tables_post_pivot_table_update_pivot_field");
+    }
+
+    # verify the required parameter 'pivot_field_type' is set
+    unless (exists $args{'pivot_field_type'}) {
+      croak("Missing the required parameter 'pivot_field_type' when calling cells_pivot_tables_post_pivot_table_update_pivot_field");
+    }
+
+    # verify the required parameter 'pivot_field' is set
+    unless (exists $args{'pivot_field'}) {
+      croak("Missing the required parameter 'pivot_field' when calling cells_pivot_tables_post_pivot_table_update_pivot_field");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/pivottables/{pivotTableIndex}/PivotFields/{pivotFieldIndex}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'pivot_field_type'}) {
+        $query_params->{'pivotFieldType'} = $self->{api_client}->to_query_value($args{'pivot_field_type'});
+    }
+
+    # query params
+    if ( exists $args{'need_re_calculate'}) {
+        $query_params->{'needReCalculate'} = $self->{api_client}->to_query_value($args{'need_re_calculate'});
+    }
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'pivot_table_index'}) {
+        my $_base_variable = "{" . "pivotTableIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'pivot_table_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'pivot_field_index'}) {
+        my $_base_variable = "{" . "pivotFieldIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'pivot_field_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'pivot_field'}) {
+        $_body_data = $args{'pivot_field'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_pivot_tables_post_pivot_table_update_pivot_fields
+#
+# 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $pivot_table_index  (required)
+# @param string $pivot_field_type  (required)
+# @param PivotField $pivot_field  (required)
+# @param boolean $need_re_calculate  (optional, default to false)
+# @param string $folder  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'pivot_table_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'pivot_field_type' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'pivot_field' => {
+        data_type => 'PivotField',
+        description => '',
+        required => '1',
+    },
+    'need_re_calculate' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_pivot_tables_post_pivot_table_update_pivot_fields' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_pivot_tables_post_pivot_table_update_pivot_fields {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_pivot_tables_post_pivot_table_update_pivot_fields");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_pivot_tables_post_pivot_table_update_pivot_fields");
+    }
+
+    # verify the required parameter 'pivot_table_index' is set
+    unless (exists $args{'pivot_table_index'}) {
+      croak("Missing the required parameter 'pivot_table_index' when calling cells_pivot_tables_post_pivot_table_update_pivot_fields");
+    }
+
+    # verify the required parameter 'pivot_field_type' is set
+    unless (exists $args{'pivot_field_type'}) {
+      croak("Missing the required parameter 'pivot_field_type' when calling cells_pivot_tables_post_pivot_table_update_pivot_fields");
+    }
+
+    # verify the required parameter 'pivot_field' is set
+    unless (exists $args{'pivot_field'}) {
+      croak("Missing the required parameter 'pivot_field' when calling cells_pivot_tables_post_pivot_table_update_pivot_fields");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/pivottables/{pivotTableIndex}/PivotFields';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'pivot_field_type'}) {
+        $query_params->{'pivotFieldType'} = $self->{api_client}->to_query_value($args{'pivot_field_type'});
+    }
+
+    # query params
+    if ( exists $args{'need_re_calculate'}) {
+        $query_params->{'needReCalculate'} = $self->{api_client}->to_query_value($args{'need_re_calculate'});
+    }
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'pivot_table_index'}) {
+        my $_base_variable = "{" . "pivotTableIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'pivot_table_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'pivot_field'}) {
+        $_body_data = $args{'pivot_field'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
 # cells_pivot_tables_post_worksheet_pivot_table_calculate
 #
 # Calculates pivottable's data to cells.
@@ -23152,6 +23530,720 @@ sub cells_shapes_put_worksheet_shape {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('ShapeResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_sparkline_groups_delete_worksheet_sparkline_group
+#
+# 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $sparkline_index  (required)
+# @param string $folder  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sparkline_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_sparkline_groups_delete_worksheet_sparkline_group' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_sparkline_groups_delete_worksheet_sparkline_group {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_sparkline_groups_delete_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_sparkline_groups_delete_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'sparkline_index' is set
+    unless (exists $args{'sparkline_index'}) {
+      croak("Missing the required parameter 'sparkline_index' when calling cells_sparkline_groups_delete_worksheet_sparkline_group");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/sparklinegroups/{sparklineIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sparkline_index'}) {
+        my $_base_variable = "{" . "sparklineIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sparkline_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_sparkline_groups_delete_worksheet_sparkline_groups
+#
+# 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param string $folder  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_sparkline_groups_delete_worksheet_sparkline_groups' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_sparkline_groups_delete_worksheet_sparkline_groups {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_sparkline_groups_delete_worksheet_sparkline_groups");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_sparkline_groups_delete_worksheet_sparkline_groups");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/sparklinegroups';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_sparkline_groups_get_worksheet_sparkline_group
+#
+# 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $sparkline_index  (required)
+# @param string $folder  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sparkline_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_sparkline_groups_get_worksheet_sparkline_group' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'SparklineGroupResponse',
+        };
+}
+# @return SparklineGroupResponse
+#
+sub cells_sparkline_groups_get_worksheet_sparkline_group {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_sparkline_groups_get_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_sparkline_groups_get_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'sparkline_index' is set
+    unless (exists $args{'sparkline_index'}) {
+      croak("Missing the required parameter 'sparkline_index' when calling cells_sparkline_groups_get_worksheet_sparkline_group");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/sparklinegroups/{sparklineIndex}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sparkline_index'}) {
+        my $_base_variable = "{" . "sparklineIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sparkline_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SparklineGroupResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_sparkline_groups_get_worksheet_sparkline_groups
+#
+# Get worksheet charts description.
+# 
+# @param string $name Document name. (required)
+# @param string $sheet_name The worksheet name. (required)
+# @param string $folder Document&#39;s folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => 'The worksheet name.',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document&#39;s folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_sparkline_groups_get_worksheet_sparkline_groups' } = { 
+    	summary => 'Get worksheet charts description.',
+        params => $params,
+        returns => 'SparklineGroupsResponse',
+        };
+}
+# @return SparklineGroupsResponse
+#
+sub cells_sparkline_groups_get_worksheet_sparkline_groups {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_sparkline_groups_get_worksheet_sparkline_groups");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_sparkline_groups_get_worksheet_sparkline_groups");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/sparklinegroups';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SparklineGroupsResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_sparkline_groups_post_worksheet_sparkline_group
+#
+# 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $sparkline_group_index  (required)
+# @param SparklineGroup $sparkline_group  (required)
+# @param string $folder  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sparkline_group_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'sparkline_group' => {
+        data_type => 'SparklineGroup',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_sparkline_groups_post_worksheet_sparkline_group' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_sparkline_groups_post_worksheet_sparkline_group {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_sparkline_groups_post_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_sparkline_groups_post_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'sparkline_group_index' is set
+    unless (exists $args{'sparkline_group_index'}) {
+      croak("Missing the required parameter 'sparkline_group_index' when calling cells_sparkline_groups_post_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'sparkline_group' is set
+    unless (exists $args{'sparkline_group'}) {
+      croak("Missing the required parameter 'sparkline_group' when calling cells_sparkline_groups_post_worksheet_sparkline_group");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/sparklinegroups/{sparklineIndex}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'sparkline_group_index'}) {
+        $query_params->{'sparklineGroupIndex'} = $self->{api_client}->to_query_value($args{'sparkline_group_index'});
+    }
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'sparkline_group'}) {
+        $_body_data = $args{'sparkline_group'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_sparkline_groups_put_worksheet_sparkline_group
+#
+# 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param string $type  (required)
+# @param string $data_range  (required)
+# @param boolean $is_vertical  (required)
+# @param string $location_range  (required)
+# @param string $folder  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'type' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'data_range' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'is_vertical' => {
+        data_type => 'boolean',
+        description => '',
+        required => '1',
+    },
+    'location_range' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_sparkline_groups_put_worksheet_sparkline_group' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_sparkline_groups_put_worksheet_sparkline_group {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_sparkline_groups_put_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_sparkline_groups_put_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'type' is set
+    unless (exists $args{'type'}) {
+      croak("Missing the required parameter 'type' when calling cells_sparkline_groups_put_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'data_range' is set
+    unless (exists $args{'data_range'}) {
+      croak("Missing the required parameter 'data_range' when calling cells_sparkline_groups_put_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'is_vertical' is set
+    unless (exists $args{'is_vertical'}) {
+      croak("Missing the required parameter 'is_vertical' when calling cells_sparkline_groups_put_worksheet_sparkline_group");
+    }
+
+    # verify the required parameter 'location_range' is set
+    unless (exists $args{'location_range'}) {
+      croak("Missing the required parameter 'location_range' when calling cells_sparkline_groups_put_worksheet_sparkline_group");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/sparklinegroups';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'type'}) {
+        $query_params->{'type'} = $self->{api_client}->to_query_value($args{'type'});
+    }
+
+    # query params
+    if ( exists $args{'data_range'}) {
+        $query_params->{'dataRange'} = $self->{api_client}->to_query_value($args{'data_range'});
+    }
+
+    # query params
+    if ( exists $args{'is_vertical'}) {
+        $query_params->{'isVertical'} = $self->{api_client}->to_query_value($args{'is_vertical'});
+    }
+
+    # query params
+    if ( exists $args{'location_range'}) {
+        $query_params->{'locationRange'} = $self->{api_client}->to_query_value($args{'location_range'});
+    }
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 

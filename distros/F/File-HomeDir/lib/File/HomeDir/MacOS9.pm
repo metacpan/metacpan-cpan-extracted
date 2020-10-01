@@ -15,7 +15,7 @@ use base "File::HomeDir::Driver";
 
 BEGIN
 {
-    $VERSION = '1.004';
+    $VERSION = '1.006';
 }
 
 # Load early if in a forking environment and we have
@@ -140,6 +140,8 @@ L<File::HomeDir>
 =head1 COPYRIGHT
 
 Copyright 2005 - 2011 Adam Kennedy.
+
+Copyright 2017 - 2020 Jens Rehsack
 
 Some parts copyright 2000 Sean M. Burke.
 

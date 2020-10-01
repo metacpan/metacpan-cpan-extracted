@@ -122,6 +122,8 @@ distribution as benchmark_stemmers.plx.
 
 =head1 CHANGES
 
+ 2.31 2020.09.26 - Fix for Latin1/UTF8 issue in documentation
+
  2.30 2020.06.20 - Version renumber for module consistency
 
  0.84 2010.04.29 - Documentation fixes to the En stemmer and removal
@@ -453,7 +455,7 @@ are processing a lot of data.
 
 =head1 VERSION
 
- 2.30 2020.06.20
+ 2.31 2020.09.26
 
 =head1 NOTES
 
@@ -485,7 +487,7 @@ family stemming, use lower case words, only, for exceptions.
  xern                       <xern@cpan.org>
  Ask Solem Hoel             <ask@unixmonks.net>
  Dennis Haney               <davh@davh.dk>
- Sébastien Darribere-Pleyt  <sebastien.darribere@lefute.com>
+ SÃ©bastien Darribere-Pleyt  <sebastien.darribere@lefute.com>
  Aleksandr Guidrevitch      <pillgrim@mail.ru>
 
 =head1 SEE ALSO

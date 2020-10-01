@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojo::IOLoop::ReadWriteProcess:
     file: lib/Mojo/IOLoop/ReadWriteProcess.pm
-    version: '0.27'
+    version: '0.28'
   Mojo::IOLoop::ReadWriteProcess::CGroup:
     file: lib/Mojo/IOLoop/ReadWriteProcess/CGroup.pm
   Mojo::IOLoop::ReadWriteProcess::CGroup::v1:
@@ -87,7 +87,7 @@ resources:
   bugtracker: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess/issues
   homepage: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess
   repository: git://github.com/mudler/Mojo-IOLoop-ReadWriteProcess.git
-version: '0.27'
+version: '0.28'
 x_contributors:
   - 'Clemens Famulla-Conrad <cfamullaconrad@suse.de>'
   - 'Ettore Di Giacinto <mudler@gentoo.org>'

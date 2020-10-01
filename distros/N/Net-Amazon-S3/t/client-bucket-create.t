@@ -2,15 +2,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
-use Test::Deep v0.111; # 0.111 => obj_isa
-use Test::Warnings qw[ :no_end_test had_no_warnings ];
+use FindBin;
 
-use Shared::Examples::Net::Amazon::S3::Client (
-    qw[ fixture ],
-    qw[ with_response_fixture ],
-    qw[ expect_client_bucket_create ],
-);
+BEGIN { require "$FindBin::Bin/test-helper-s3-client.pl" }
+
+plan tests => 11;
+
+use Shared::Examples::Net::Amazon::S3::Client qw[ expect_client_bucket_create ];
 
 expect_client_bucket_create 'create bucket' => (
     with_bucket             => 'some-bucket',
@@ -33,7 +31,31 @@ expect_client_bucket_create 'create bucket in different region' => (
     ),
 );
 
-expect_client_bucket_create 'create bucket with acl' => (
+expect_client_bucket_create 'create bucket with deprecated acl_short' => (
+    with_bucket             => 'some-bucket',
+    with_acl_short          => 'private',
+    expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/' },
+    expect_request_content  => '',
+    expect_request_headers  => { x_amz_acl => 'private' },
+    expect_data             => all (
+        obj_isa ('Net::Amazon::S3::Client::Bucket'),
+        methods (name => 'some-bucket'),
+    ),
+);
+
+expect_client_bucket_create 'create bucket with canned acl' => (
+    with_bucket             => 'some-bucket',
+    with_acl                => Net::Amazon::S3::ACL::Canned->PRIVATE,
+    expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/' },
+    expect_request_content  => '',
+    expect_request_headers  => { x_amz_acl => 'private' },
+    expect_data             => all (
+        obj_isa ('Net::Amazon::S3::Client::Bucket'),
+        methods (name => 'some-bucket'),
+    ),
+);
+
+expect_client_bucket_create 'create bucket with canned acl coercion' => (
     with_bucket             => 'some-bucket',
     with_acl                => 'private',
     expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/' },
@@ -45,7 +67,26 @@ expect_client_bucket_create 'create bucket with acl' => (
     ),
 );
 
-expect_client_bucket_create 'error access denied' => (
+expect_client_bucket_create 'create bucket with explicit acl' => (
+    with_bucket             => 'some-bucket',
+    with_acl        => Net::Amazon::S3::ACL::Set->new
+		->grant_read (id => '123', id => '234')
+		->grant_write (id => '345')
+		,
+
+    expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/' },
+    expect_request_content  => '',
+    expect_request_headers  => {
+		x_amz_grant_read    => 'id="123", id="234"',
+		x_amz_grant_write   => 'id="345"',
+	},
+    expect_data             => all (
+        obj_isa ('Net::Amazon::S3::Client::Bucket'),
+        methods (name => 'some-bucket'),
+    ),
+);
+
+expect_client_bucket_create 'S3 error - Access Denied' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('error::access_denied'),
     expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/' },
@@ -53,7 +94,7 @@ expect_client_bucket_create 'error access denied' => (
     throws                  => qr/^AccessDenied: Access denied error message/,
 );
 
-expect_client_bucket_create 'error bucket already exists' => (
+expect_client_bucket_create 'S3 error - Bucket Already Exists' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('error::bucket_already_exists'),
     expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/' },
@@ -61,11 +102,20 @@ expect_client_bucket_create 'error bucket already exists' => (
     throws                  => qr/^BucketAlreadyExists: Bucket already exists error message/,
 );
 
-expect_client_bucket_create 'error invalid bucket name' => (
+expect_client_bucket_create 'S3 error - Invalid Bucket Name' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('error::invalid_bucket_name'),
     expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/' },
     throws                  => qr/^InvalidBucketName: Invalid bucket name error message/,
 );
 
+expect_client_bucket_create 'HTTP error - 400 Bad Request' => (
+    with_bucket             => 'some-bucket',
+    with_response_fixture ('error::http_bad_request'),
+    expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/' },
+    throws                  => qr/^400: Bad Request/,
+);
+
 had_no_warnings;
+
+done_testing;

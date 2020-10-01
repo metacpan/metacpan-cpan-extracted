@@ -812,6 +812,14 @@ DISTRIBUTIONS
       Exporter::Tiny 1.000000
       ExtUtils::MakeMaker 6.17
       perl 5.006001
+  Type-Tiny-XS-0.021
+    pathname: T/TO/TOBYINK/Type-Tiny-XS-0.021.tar.gz
+    provides:
+      Type::Tiny::XS 0.021
+      Type::Tiny::XS::Util 0.021
+    requirements:
+      ExtUtils::MakeMaker 6.17
+      perl 5.010001
   Variable-Magic-0.62
     pathname: V/VP/VPIT/Variable-Magic-0.62.tar.gz
     provides:

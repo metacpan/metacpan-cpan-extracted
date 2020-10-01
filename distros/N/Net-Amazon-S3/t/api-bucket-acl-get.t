@@ -2,15 +2,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
-use Test::Deep;
-use Test::Warnings qw[ :no_end_test had_no_warnings ];
+use FindBin;
 
-use Shared::Examples::Net::Amazon::S3::API (
-    qw[ fixture ],
-    qw[ with_response_fixture ],
-    qw[ expect_api_bucket_acl_get ],
-);
+BEGIN { require "$FindBin::Bin/test-helper-s3-api.pl" }
+
+use Shared::Examples::Net::Amazon::S3::API qw[ expect_api_bucket_acl_get ];
+
+plan tests => 5;
 
 expect_api_bucket_acl_get 'get bucket acl' => (
     with_bucket             => 'some-bucket',
@@ -19,7 +17,7 @@ expect_api_bucket_acl_get 'get bucket acl' => (
     expect_data             => fixture ('response::acl')->{content},
 );
 
-expect_api_bucket_acl_get 'with error access denied' => (
+expect_api_bucket_acl_get 'S3 error - Access Denied' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('error::access_denied'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?acl' },
@@ -28,7 +26,7 @@ expect_api_bucket_acl_get 'with error access denied' => (
     expect_s3_errstr        => '403 Forbidden',
 );
 
-expect_api_bucket_acl_get 'with error bucket not found' => (
+expect_api_bucket_acl_get 'S3 error - Bucket Not Found' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('error::no_such_bucket'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?acl' },
@@ -37,4 +35,16 @@ expect_api_bucket_acl_get 'with error bucket not found' => (
     expect_s3_errstr        => undef,
 );
 
+expect_api_bucket_acl_get 'HTTP error - 400 Bad Request' => (
+    with_bucket             => 'some-bucket',
+    with_response_fixture ('error::http_bad_request'),
+    expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?acl' },
+    throws                  => qr/^Net::Amazon::S3: Amazon responded with 400 Bad Request/i,
+    expect_data             => bool (0),
+    expect_s3_err           => 'network_error',
+    expect_s3_errstr        => '400 Bad Request',
+);
+
 had_no_warnings;
+
+done_testing;

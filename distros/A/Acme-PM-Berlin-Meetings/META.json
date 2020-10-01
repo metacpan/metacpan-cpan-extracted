@@ -44,6 +44,6 @@
          "url" : "git://github.com/eserte/acme-pm-berlin-meetings.git"
       }
    },
-   "version" : "202008.24",
+   "version" : "202009.26",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

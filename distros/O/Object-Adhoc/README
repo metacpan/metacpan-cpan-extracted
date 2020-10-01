@@ -103,7 +103,35 @@ BUGS
     <http://rt.cpan.org/Dist/Display.html?Queue=Object-Adhoc>.
 
 SEE ALSO
-    Object::Anon, Object::Result.
+  Comparison with Similar Modules
+    Object::Adhoc - requires Exporter::Tiny and uses Class::XSAccessor if
+    installed; read-only accessors; predicate methods; no recursion; no
+    overloading; dies on unknown keys.
+
+    Object::Anon only core dependencies; read-only accessors; no predicate
+    methods; recuses into nested hashrefs and arrayrefs; treats coderef values
+    as methods and supports overloading; dies on unknown keys.
+
+    Hash::Objectify - requires Class::XSAccessor; read-write accessors; no
+    predicate methods; no recursion; no overloading; dies on unknown keys (or
+    returns undef in lax mode).
+
+    Hash::AsObject - only core dependencies; read-write accessors (uses
+    AUTOLOAD, potentially slow); no predicate methods; recurses into nested
+    hashrefs; no overloading; returns undef for unknown keys.
+
+    Of the four, Object::Adhoc has the fastest accessors, and Hash::Objectify
+    has the fastest constructors. Object::Anon is the slowest.
+
+    I'd recommend Object::Adhoc if you want read-only accessors, or
+    Hash::Objectify if you want read-write accessors. Use Object::Anon only if
+    you need the additional features it supports for overloading, custom
+    methods, and recursive application to nested data structures.
+
+  Not Quite So Similar Modules
+    Object::Result - fairly different idea, but can be used for similar
+    purposes. Requires Perl 5.14, Keyword::Simple, PPI, and
+    Method::Signatures.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.

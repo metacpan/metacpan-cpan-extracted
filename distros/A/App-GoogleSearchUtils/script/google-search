@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-22'; # DATE
+our $DATE = '2020-10-01'; # DATE
 our $DIST = 'App-GoogleSearchUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,15 +36,16 @@ google-search - Open google search page in browser
 
 =head1 VERSION
 
-This document describes version 0.002 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2020-09-22.
+This document describes version 0.004 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % google-search [--config-path=path | -c] [--config-profile=profile | -P]
-     [--format=name] [--json] [--(no)naked-res] [--no-config | -C]
-     [--no-env] [--num=s] [--page-result[=program]] [--queries-json=s]
+ % google-search [--append=s] [--config-path=path | -c]
+     [--config-profile=profile | -P] [--delay=s] [--format=name] [--json]
+     [--(no)naked-res] [--no-config | -C] [--no-env] [--num=s]
+     [--page-result[=program]] [--prepend=s] [--queries-json=s]
      [--query=s+] <query> ...
 
 Examples:
@@ -73,6 +74,14 @@ C<*> marks required options.
 
 =over
 
+=item B<--append>=I<s>
+
+String to add at the end of each query.
+
+=item B<--delay>=I<s>
+
+Delay between opening each query.
+
 =item B<--num>=I<s>
 
 Number of results per page.
@@ -80,6 +89,10 @@ Number of results per page.
 Default value:
 
  100
+
+=item B<--prepend>=I<s>
+
+String to add at the beginning of each query.
 
 =item B<--queries-json>=I<s>
 
@@ -228,9 +241,12 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ append (see --append)
+ delay (see --delay)
  format (see --format)
  naked_res (see --naked-res)
  num (see --num)
+ prepend (see --prepend)
  queries (see --query)
 
 =head1 ENVIRONMENT

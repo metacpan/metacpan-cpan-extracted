@@ -1,5 +1,22 @@
 Changes file for Date-Holidays
 
+1.25 2020-09-27 Maintenance release, update recommended
+
+- Introduced some issues with references and test suite for the new addition Date::Holidays::AW
+
+Thanks to Wesley Schwengle for the PR
+
+1.24 2020-09-26 Feature release, update recommended
+
+- Added adapter for:
+    Date::Holidays::AW (Aruba) 
+
+- Added adapter for:
+    Date::Holidays::NL (Netherlands) 
+
+Thanks to Wesley Schwengle for mentioning his CPAN contributions to the Date::Holidays::* namespace
+
+
 1.23 2020-07-02 Maintenance release, update not required
 
 - Improvements to Dist::Zilla config, only ExtUtils::MakeMaker supported via Dist::Zilla now. Module::Build support having been removed

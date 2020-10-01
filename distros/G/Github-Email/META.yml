@@ -1,0 +1,32 @@
+---
+abstract: 'Search and print particular Github user emails.'
+author:
+  - 'Momozor <momozor4@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Github-Email
+requires:
+  Carp: '0'
+  Email::Valid: '0'
+  Getopt::Long::Descriptive: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/momozor/Github-Email/issues
+  homepage: https://github.com/momozor/App-Github-Email
+  repository: https://github.com/momozor/App-Github-Email.git
+version: 1.1.0
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

@@ -40,10 +40,6 @@ This module requires this other module:
 
 Which are available on CPAN.
 
-COPYRIGHT AND LICENCE
+COPYRIGHT
 
-Copyright (c) 2006 Burak Gürsoy <burak@cpan.org>, 2007 Benjamin Franz <snowhare@nihongo.org>. All rights reserved.
-
-This library is free software; you can redistribute it and/or modify 
-it under the same terms as Perl itself, either Perl version 5.8.7 or, 
-at your option, any later version of Perl 5 you may have available.
+Copyright (c) 2006 Burak Gürsoy <burak@cpan.org>, 2020 Jerilyn Franz <cpan@jerilyn.info>. All rights reserved.

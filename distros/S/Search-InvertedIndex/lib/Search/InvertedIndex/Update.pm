@@ -1,13 +1,13 @@
 package Search::InvertedIndex::Update;
 
-# $RCSfile: Update.pm,v $ $Revision: 1.5 $ $Date: 1999/06/15 22:31:07 $ $Author: snowhare $
-
 use strict;
+use warnings;
+
 use Class::NamedParms;
 use vars qw (@ISA $VERSION);
 
 @ISA     = qw (Class::NamedParms);
-$VERSION = '1.01';
+$VERSION = '1.17';
 
 =head1 NAME
 
@@ -19,10 +19,6 @@ Search::InvertedIndex::Update - A container for a mass data update for a -group/
 
 Provides a container for the information to perform an update for a -group/-index
 tuple.
-
-=head1 CHANGES
-
-1.01 2002.05.24 - Cleaned up 'new' method to improve performance.
 
 =head2 Public API
 
@@ -100,21 +96,16 @@ sub new {
 
 =head1 COPYRIGHT
 
-Copyright 1999, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and
-FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
-This software may be copied or redistributed under the same terms as Perl itelf.
+Copyright 1999-2020, Jerilyn Franz and FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>).
+All Rights Reserved.
 
 =head1 AUTHOR
 
-Benjamin Franz
+Jerilyn Franz
 
 =head1 TODO
 
 Everything.
-
-=head1 VERSION
-
-1.01 2002.05.24 - Changed initialization to improve performance
 
 =cut
 

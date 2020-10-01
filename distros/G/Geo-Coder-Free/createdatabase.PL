@@ -1107,7 +1107,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 	my $inserts = 0;
 
 	my %address_parsers;
-	my $wof_global_dbh;
+	# my $wof_global_dbh;
 	if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 		# Find all of the .geojson files in $WHOSONFIRST_HOME
 		foreach my $geojson_file (create_tree_from_git($whosonfirst, 0)) {

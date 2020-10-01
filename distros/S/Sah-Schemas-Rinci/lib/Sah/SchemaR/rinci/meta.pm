@@ -1,9 +1,9 @@
 package Sah::SchemaR::rinci::meta;
 
-our $DATE = '2019-05-24'; # DATE
-our $VERSION = '1.1.90.0'; # VERSION
+our $DATE = '2020-09-23'; # DATE
+our $VERSION = '1.1.94.0'; # VERSION
 
-our $rschema = do{my$a=["hash",[{_prop=>{caption=>{},default_lang=>{},defhash_v=>{},description=>{},entity_date=>{},entity_v=>{},links=>{_elem_prop=>{caption=>'fix',default_lang=>'fix',defhash_v=>'fix',description=>'fix',name=>{},summary=>{},tags=>{},url=>{},v=>{},x=>{}}},name=>'fix',summary=>'fix',tags=>'fix',v=>'fix',x=>'fix'},_ver=>1.1,summary=>"Rinci metadata"}],["hash"]];$a->[1][0]{_prop}{links}{_elem_prop}{caption}=$a->[1][0]{_prop}{caption};$a->[1][0]{_prop}{links}{_elem_prop}{default_lang}=$a->[1][0]{_prop}{default_lang};$a->[1][0]{_prop}{links}{_elem_prop}{defhash_v}=$a->[1][0]{_prop}{defhash_v};$a->[1][0]{_prop}{links}{_elem_prop}{description}=$a->[1][0]{_prop}{description};$a->[1][0]{_prop}{name}=$a->[1][0]{_prop}{links}{_elem_prop}{name};$a->[1][0]{_prop}{summary}=$a->[1][0]{_prop}{links}{_elem_prop}{summary};$a->[1][0]{_prop}{tags}=$a->[1][0]{_prop}{links}{_elem_prop}{tags};$a->[1][0]{_prop}{v}=$a->[1][0]{_prop}{links}{_elem_prop}{v};$a->[1][0]{_prop}{x}=$a->[1][0]{_prop}{links}{_elem_prop}{x};$a};
+our $rschema = do{my$a=["hash",[{_prop=>{caption=>{},default_lang=>{},defhash_v=>{},description=>{},entity_date=>{},entity_v=>{},links=>{_elem_prop=>{caption=>'fix',default_lang=>'fix',defhash_v=>'fix',description=>'fix',name=>{},summary=>{},tags=>{},url=>{},v=>{},x=>{}}},name=>'fix',summary=>'fix',tags=>'fix',v=>'fix',x=>'fix'},_ver=>1.1,examples=>[{valid=>1,value=>{}},{valid=>1,value=>{summary=>"Some summary"}}],summary=>"Rinci metadata"}],["hash"]];$a->[1][0]{_prop}{links}{_elem_prop}{caption}=$a->[1][0]{_prop}{caption};$a->[1][0]{_prop}{links}{_elem_prop}{default_lang}=$a->[1][0]{_prop}{default_lang};$a->[1][0]{_prop}{links}{_elem_prop}{defhash_v}=$a->[1][0]{_prop}{defhash_v};$a->[1][0]{_prop}{links}{_elem_prop}{description}=$a->[1][0]{_prop}{description};$a->[1][0]{_prop}{name}=$a->[1][0]{_prop}{links}{_elem_prop}{name};$a->[1][0]{_prop}{summary}=$a->[1][0]{_prop}{links}{_elem_prop}{summary};$a->[1][0]{_prop}{tags}=$a->[1][0]{_prop}{links}{_elem_prop}{tags};$a->[1][0]{_prop}{v}=$a->[1][0]{_prop}{links}{_elem_prop}{v};$a->[1][0]{_prop}{x}=$a->[1][0]{_prop}{links}{_elem_prop}{x};$a};
 
 1;
 # ABSTRACT: Rinci metadata
@@ -20,7 +20,7 @@ Sah::SchemaR::rinci::meta - Rinci metadata
 
 =head1 VERSION
 
-This document describes version 1.1.90.0 of Sah::SchemaR::rinci::meta (from Perl distribution Sah-Schemas-Rinci), released on 2019-05-24.
+This document describes version 1.1.94.0 of Sah::SchemaR::rinci::meta (from Perl distribution Sah-Schemas-Rinci), released on 2020-09-23.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

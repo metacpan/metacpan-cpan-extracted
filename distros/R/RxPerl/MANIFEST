@@ -5,10 +5,7 @@ META.json
 README.md
 cpanfile
 lib/RxPerl.pm
-lib/RxPerl/AnyEvent.pm
 lib/RxPerl/ConnectableObservable.pm
-lib/RxPerl/IOAsync.pm
-lib/RxPerl/Mojo.pm
 lib/RxPerl/Observable.pm
 lib/RxPerl/Operators/Creation.pm
 lib/RxPerl/Operators/Pipeable.pm
@@ -19,13 +16,7 @@ lib/RxPerl/SyncTimers.pm
 lib/RxPerl/Test.pm
 lib/RxPerl/Utils.pm
 minil.toml
-t/00_compile.t
-t/distinct_until_changed.t
-t/from.t
-t/new.t
-t/pluck.t
+t/marble.t
 t/simple.t
-t/start_with.t
-t/take_while.t
 META.yml
 MANIFEST

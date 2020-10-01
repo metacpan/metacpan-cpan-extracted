@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 use List::Util 'min','max';
 use Test;
-plan tests => 289;
+plan tests => 294;
 
 use lib 't';
 use MyTestHelpers;
@@ -39,7 +39,7 @@ my $path = Math::PlanePath::CCurve->new;
 # VERSION
 
 {
-  my $want_version = 127;
+  my $want_version = 128;
   ok ($Math::PlanePath::CCurve::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::CCurve->VERSION,  $want_version,
@@ -61,6 +61,115 @@ my $path = Math::PlanePath::CCurve->new;
   ok (! eval { $path->VERSION($check_version); 1 },
       1,
       "VERSION object check $check_version");
+}
+
+
+#------------------------------------------------------------------------------
+# n_start, x_negative, y_negative
+
+{
+  ok ($path->n_start, 0, 'n_start()');
+  ok ($path->x_negative, 1, 'x_negative() instance method');
+  ok ($path->y_negative, 1, 'y_negative() instance method');
+  ok ($path->class_x_negative, 1, 'class_x_negative()');
+  ok ($path->class_y_negative, 1, 'class_y_negative()');
+}
+{
+  my @pnames = map {$_->{'name'}}
+    Math::PlanePath::CCurve->parameter_info_list;
+  ok (join(',',@pnames), ''); # no arms yet
+}
+
+
+#------------------------------------------------------------------------------
+# n_to_dxdy()
+
+{
+  my @dxdy = $path->n_to_dxdy (-1);
+  ok(scalar(@dxdy), 0);
+}
+
+{
+  # random n_to_dxdy()
+  my $path = Math::PlanePath::CCurve->new;
+  # for (my $n = 1.25; $n < 40; $n++) {
+  foreach (1 .. 10) {
+    my $bits = int(rand(25));     # 0 to 25, inclusive
+    my $n = int(rand(2**$bits)) + 1;  # 1 to 2^bits, inclusive
+    $n += random_quarter();
+
+    my ($x,$y) = $path->n_to_xy ($n);
+    my ($next_x,$next_y) = $path->n_to_xy ($n+1);
+    my $delta_dx = $next_x - $x;
+    my $delta_dy = $next_y - $y;
+
+    my ($func_dx,$func_dy) = $path->n_to_dxdy ($n);
+    if ($func_dx == 0) { $func_dx = '0'; } # avoid -0 in perl 5.6
+    if ($func_dy == 0) { $func_dy = '0'; } # avoid -0 in perl 5.6
+
+    ok ($func_dx, $delta_dx, "n_to_dxdy($n) dx at xy=$x,$y");
+    ok ($func_dy, $delta_dy, "n_to_dxdy($n) dy at xy=$x,$y");
+  }
+}
+
+# return 0, 0.25, 0.5 or 0.75
+sub random_quarter {
+  int(rand(4)) / 4;
+}
+
+
+#------------------------------------------------------------------------------
+# first few values
+
+{
+  my @xy = $path->n_to_xy (-1);
+  ok(scalar(@xy), 0);
+}
+ok(! defined($path->_UNDOCUMENTED__n_to_turn_LSR(-1)), 1);
+ok(! defined($path->_UNDOCUMENTED__n_to_turn_LSR(0)), 1);
+ok($path->_UNDOCUMENTED__n_to_turn_LSR(1), 1);
+
+{
+  my @data = ([ 0,    0,0 ],
+              [ 0.25, 0.25,0 ],
+              [ 0.75, 0.75,0 ],
+              [ 1,    1,0 ],
+              [ 1.25, 1,0.25 ],
+              [ 1.75, 1,0.75 ],
+              [ 2,    1,1 ],
+              [ 3,    1,2 ],
+              [ 4,    0,2 ],
+              [ 5,    0,3 ],
+              [ 6,    -1,3 ],
+              [ 7,    -2,3 ],
+              [ 8,    -2,2 ],
+              [ 9,    -2,3 ],
+
+             );
+  my $path = Math::PlanePath::CCurve->new;
+  foreach my $elem (@data) {
+    my ($n, $want_x,$want_y) = @$elem;
+    {
+      my ($got_x, $got_y) = $path->n_to_xy ($n);
+      ok ($got_x == $want_x, 1, "x at n=$n");
+      ok ($got_y == $want_y, 1, "y at n=$n");
+    }
+    {
+      my ($next_x, $next_y) = $path->n_to_xy ($n+1);
+      my $want_dx = $next_x - $want_x;
+      my $want_dy = $next_y - $want_y;
+      my ($got_dx, $got_dy) = $path->n_to_dxdy ($n);
+      ok ($got_dx == $want_dx, 1, "dx at n=$n");
+      ok ($got_dy == $want_dy, 1, "dy at n=$n");
+    }
+  }
+
+  # foreach my $elem (@data) {
+  #   my ($want_n, $x, $y) = @$elem;
+  #   next unless $want_n == int($want_n);
+  #   my $got_n = $path->xy_to_n ($x, $y);
+  #   ok ($got_n, $want_n, "n at x=$x,y=$y");
+  # }
 }
 
 #------------------------------------------------------------------------------
@@ -227,98 +336,6 @@ my $path = Math::PlanePath::CCurve->new;
   }
 }
 
-#------------------------------------------------------------------------------
-# first few values
-
-{
-  my @data = ([ 0,    0,0 ],
-              [ 0.25, 0.25,0 ],
-              [ 0.75, 0.75,0 ],
-              [ 1,    1,0 ],
-              [ 1.25, 1,0.25 ],
-              [ 1.75, 1,0.75 ],
-              [ 2,    1,1 ],
-              [ 3,    1,2 ],
-              [ 4,    0,2 ],
-              [ 5,    0,3 ],
-              [ 6,    -1,3 ],
-              [ 7,    -2,3 ],
-              [ 8,    -2,2 ],
-              [ 9,    -2,3 ],
-
-             );
-  my $path = Math::PlanePath::CCurve->new;
-  foreach my $elem (@data) {
-    my ($n, $want_x, $want_y) = @$elem;
-    {
-      my ($got_x, $got_y) = $path->n_to_xy ($n);
-      ok ($got_x == $want_x, 1, "x at n=$n");
-      ok ($got_y == $want_y, 1, "y at n=$n");
-    }
-    {
-      my ($next_x, $next_y) = $path->n_to_xy ($n+1);
-      my $want_dx = $next_x - $want_x;
-      my $want_dy = $next_y - $want_y;
-      my ($got_dx, $got_dy) = $path->n_to_dxdy ($n);
-      ok ($got_dx == $want_dx, 1, "dx at n=$n");
-      ok ($got_dy == $want_dy, 1, "dy at n=$n");
-    }
-  }
-
-  # foreach my $elem (@data) {
-  #   my ($want_n, $x, $y) = @$elem;
-  #   next unless $want_n == int($want_n);
-  #   my $got_n = $path->xy_to_n ($x, $y);
-  #   ok ($got_n, $want_n, "n at x=$x,y=$y");
-  # }
-}
-
-#------------------------------------------------------------------------------
-# n_start, x_negative, y_negative
-
-{
-  ok ($path->n_start, 0, 'n_start()');
-  ok ($path->x_negative, 1, 'x_negative() instance method');
-  ok ($path->y_negative, 1, 'y_negative() instance method');
-  ok ($path->class_x_negative, 1, 'class_x_negative()');
-  ok ($path->class_y_negative, 1, 'class_y_negative()');
-}
-{
-  my @pnames = map {$_->{'name'}}
-    Math::PlanePath::CCurve->parameter_info_list;
-  ok (join(',',@pnames), ''); # no arms yet
-}
-
-
-#------------------------------------------------------------------------------
-# random n_to_dxdy()
-
-{
-  my $path = Math::PlanePath::CCurve->new;
-  # for (my $n = 1.25; $n < 40; $n++) {
-  foreach (1 .. 10) {
-    my $bits = int(rand(25));     # 0 to 25, inclusive
-    my $n = int(rand(2**$bits)) + 1;  # 1 to 2^bits, inclusive
-    $n += random_quarter();
-
-    my ($x,$y) = $path->n_to_xy ($n);
-    my ($next_x,$next_y) = $path->n_to_xy ($n+1);
-    my $delta_dx = $next_x - $x;
-    my $delta_dy = $next_y - $y;
-
-    my ($func_dx,$func_dy) = $path->n_to_dxdy ($n);
-    if ($func_dx == 0) { $func_dx = '0'; } # avoid -0 in perl 5.6
-    if ($func_dy == 0) { $func_dy = '0'; } # avoid -0 in perl 5.6
-
-    ok ($func_dx, $delta_dx, "n_to_dxdy($n) dx at xy=$x,$y");
-    ok ($func_dy, $delta_dy, "n_to_dxdy($n) dy at xy=$x,$y");
-  }
-}
-
-# return 0, 0.25, 0.5 or 0.75
-sub random_quarter {
-  int(rand(4)) / 4;
-}
 
 #------------------------------------------------------------------------------
 # turn sequence claimed in the pod

@@ -1,25 +1,30 @@
 #!/usr/bin/env perl
 
-use 5.012_005;
+use 5.012005;
+use version 0.77;
 my $pVer = version->parse('5.012_005');
 
 use strict;
 use warnings;
 use feature qw(say);
 
-our $VERSION = "0.03";
+our $VERSION = "0.10";
 use List::Util qw(first);
 use FastGlob qw(glob);
 use Getopt::Long;
-use version 0.77;
+use Module::CoreList;
 
 use lib 'lib';
 use App::findeps;
 
-my $usage = <<"EOL";
-Usage: $0 [ -s ] [ -L yourlib ] FILE | cpanm
-  -u | --upgradeAll : set it if you want to upgrade your dependencies
-  -L | --myLib      : defaults to 'lib'
+use File::Basename qw(basename);
+my $scriptName = basename($0);
+my $usage      = <<"EOL";
+Usage: $scriptName [ -u ] [ -L yourlib ] FILE | cpanm
+  -u | --upgradeAll         : flag it if you want to upgrade all your dependencies
+  -L | --myLib [yourLib]    : designate directory name of your library.
+                            : then it will be excluding from detection.
+                            : defaults to 'lib'
 
 EOL
 
@@ -47,9 +52,8 @@ sub scan {
     my $map  = App::findeps::scan( files => \@files );
     my @list = ();
     foreach my $key ( sort keys %$map ) {
-        next if $key =~ /\.pl$/;
         my $version = $map->{$key};
-        my $name    = _name($key);
+        my $name    = App::findeps::_name($key);
         my $dist    = $name;
         $dist .= "~$version" if length $version;
         push @list, $dist;
@@ -60,7 +64,8 @@ sub scan {
 sub makeCpanfile {
     die 'Too many Arguments' if @_ > 1;
     my $file = shift;
-    my $name = _name($file);
+    $App::findeps::Upgrade = 1;
+    my $name = App::findeps::_name($file);
     $file = _getPath($name) if $file =~ /::/;
     my @list = scan($file);
     my ( @require, @test_require );
@@ -69,44 +74,32 @@ sub makeCpanfile {
     for my $test ( scan( &glob('t/*.t') ) ) {
         push @test_require, make_line($test) unless first { $test =~ /^$_/ } @list, $name;
     }
-    local $" = "";
+    local $" = "\n";
     print <<"EOL";
 requires 'perl', '$pVer';
 
 @require
 EOL
-    local $" = "    ";
+    local $" = "\n    ";
     print <<"EOL" if @test_require;
 on 'test' => sub {
-    @test_require};
+    @test_require
+};
 EOL
     exit;
 }
 
 sub make_line {
     my ( $name, $version ) = split '~', shift;
-    my $res = qx"corelist $name";
+    return if Module::CoreList->is_core( $name, $version, $pVer );
     $version = $version ? ", '$version'" : '';
-    $res =~ /5.(\d+)/;
-    return "requires '$name'$version;\n"
-        if $res =~ /$name was not in CORE/
-        or $1 and version->parse($1) > $pVer;
-    return;
+    return "requires '$name'$version;";
 }
 
 sub _getPath {
     local $_ = shift;
     s!::!/!g;
     "lib/$_.pm";
-}
-
-sub _name {
-    my $str = shift;
-    $str =~ s!/!::!g;
-    $str =~ s!^lib::!!;
-    $str =~ s!.pm$!!i;
-    $str =~ s!^auto::(.+)::.*!$1!;
-    return $str;
 }
 
 __END__
@@ -134,6 +127,10 @@ without installing them every single time
 
 C<findeps> is a command line tool that resolves dependencies from too many Perl modules
 
+L<scandeps.pl> requires you to have L<CPANPLUS> that was deprecated in v5.17.9 and removed from v5.19.0 on CORE
+
+So I did I<reinvent> what requires just only L<cpanm>.
+
 =over
 
 =item -u --upgradeAll OPTION
@@ -151,8 +148,6 @@ you can choose it and the modules in there are ignored
 because you've already holden them.
 
 =back
-
-L<scandeps.pl> requires you to have L<CPANPLUS>, but this requires just only L<cpanm>.
 
 =head1 DANGEROUS OPTION
 

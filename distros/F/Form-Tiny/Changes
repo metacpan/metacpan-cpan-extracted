@@ -1,0 +1,9 @@
+Revision history for Perl extension Form::Tiny.
+
+1.01  Mon Sep 28 19:00:00 2020
+	- fix Type::Tiny dependency minimum version
+	- fix and improve documentation
+
+1.00  Sun Sep 27 22:00:00 2020
+	- first version
+

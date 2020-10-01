@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2015, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2015, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,9 +19,10 @@
 
 use 5.004;
 use strict;
+use List::Util 'sum';
 use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 16;
+plan tests => 23;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -45,7 +46,7 @@ use Math::PlanePath::KochCurve;
 # }
 
 #------------------------------------------------------------------------------
-
+# Helpers
 {
   my $bal = Math::NumSeq::BalancedBinary->new;
 
@@ -56,6 +57,121 @@ use Math::PlanePath::KochCurve;
     return $bal->value_to_i($value);
   }
 }
+sub CountLowZeros {
+  my ($n) = @_;
+  my $ret = 0;
+  until ($n & 1) {
+    $n>>=1; $ret++;
+    $n or die;
+  }
+  return $ret;
+}
+sub CountOnes {
+  my ($n) = @_;
+  my $ret = 0;
+  while ($n) {
+    $ret += $n&1; $n>>=1;
+  }
+  return $ret;
+}
+
+
+#------------------------------------------------------------------------------
+# A001316 - Gould's sequence, number of 1s in each row
+
+MyOEIS::compare_values
+  (anum => 'A001316',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::SierpinskiTriangle->new;
+     my @got;
+     my $prev_y = 0;
+     my $num = 0;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       if ($y == $prev_y) {
+         $num++;
+       } else {
+         push @got, $num;
+         $prev_y = $y;
+         $num = 1;
+       }
+     }
+     return \@got;
+   });
+
+# cf Sierpinski Graph
+# A233775 - num vertices across a row
+# each N is a unit triangle
+#
+#      *-----*-----*
+#       \ N / \N+1/        Y
+#        \ /   \ /                           any of  X,Y visited,
+#         X-----*    <--- row of vertices        or X-1,Y-1   below
+#          \ 1 /           Y-1                   or X+1,Y-1   below
+#           \ /
+#            *
+MyOEIS::compare_values
+  (anum => 'A233775',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::SierpinskiTriangle->new;
+     my @got;
+     for (my $y = 0; @got < $count; $y++) {
+       my $count = 0;
+       for (my $x = -$y; $x <= $y; $x+=2) {
+         if ($path->xy_is_visited    ($x,$y)
+             || $path->xy_is_visited ($x-1,$y-1)
+             || $path->xy_is_visited ($x+1,$y-1)) {
+           $count++;
+         }
+       }
+       push @got, $count;
+     }
+     return \@got;
+   });
+
+# Johan Falk has this as (2^CountLowZeros(n) + 1) * 2^(CountOnes(n)-1)
+MyOEIS::compare_values
+  (anum => q{A233775},
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::SierpinskiTriangle->new;
+     my @got = (1);
+     for (my $n = 1; @got < $count; $n++) {
+       push @got, (2**CountLowZeros($n) + 1) * 2**(CountOnes($n)-1);
+     }
+     return \@got;
+   });
+# GP-DEFINE  CountLowZeros(n) = valuation(n,2);
+# GP-DEFINE  CountOnes(n) = hammingweight(n);
+# GP-DEFINE  A233775(n) = {
+# GP-DEFINE    if(n==0,1, (2^CountLowZeros(n) + 1) * 2^(CountOnes(n)-1));
+# GP-DEFINE  }
+#  my(v=OEIS_samples("A233775")); vector(#v,n,n--;A233775(n)) == v
+# GP-Test  vector(8,k, vector(2^k-1,n, A233775(2^k + n))) == \
+# GP-Test  vector(8,k, vector(2^k-1,n, 2*A233775(n)))
+# GP-Test  vector(8,k, A233775(2^k)) == \
+# GP-Test  vector(8,k, 2^k + 1)
+# GP-Test  A233775(0) == 0 + 1
+
+# GP-DEFINE  ShuffleVector(v) = {
+# GP-DEFINE    forstep(i=#v,1,-1,
+# GP-DEFINE      if(v[i],
+# GP-DEFINE        v=concat(v[i..#v],select(b->b, v[1..i-1]));
+# GP-DEFINE        break));
+# GP-DEFINE    v;
+# GP-DEFINE  }
+# GP-Test  ShuffleVector([1,0,1,0,0]) == [1,0,0, 1]
+# GP-Test  ShuffleVector([1,0,1,1,0,0,0]) == [1,0,0,0, 1,1]
+# GP-Test  ShuffleVector([1,1,0,1,0,0,1,1]) == [1, 1,1,1,1]
+# GP-Test  ShuffleVector([1,0,1,1,0,1,0,0,0]) == [1,0,0,0,1,1,1]
+# GP-DEFINE  ShuffleOnes(n) = fromdigits(ShuffleVector(binary(n)),2);
+# GP-Test  vector(2^12,n,n--; A233775(n)) == \
+# GP-Test  vector(2^12,n,n--; ShuffleOnes(n) + 1)
+
+# vector(15,n, ShuffleOnes(n))
+# not in OEIS: 1, 2, 3, 4, 3, 5, 7, 8, 3, 5, 7, 9, 7, 11, 15
 
 
 #------------------------------------------------------------------------------
@@ -836,30 +952,6 @@ MyOEIS::compare_values
          $y += 1;
        }
        push @got, $total;
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A001316 - Gould's sequence, number of 1s in each row
-
-MyOEIS::compare_values
-  (anum => 'A001316',
-   func => sub {
-     my ($count) = @_;
-     my $path = Math::PlanePath::SierpinskiTriangle->new;
-     my @got;
-     my $prev_y = 0;
-     my $num = 0;
-     for (my $n = $path->n_start; @got < $count; $n++) {
-       my ($x,$y) = $path->n_to_xy($n);
-       if ($y == $prev_y) {
-         $num++;
-       } else {
-         push @got, $num;
-         $prev_y = $y;
-         $num = 1;
-       }
      }
      return \@got;
    });

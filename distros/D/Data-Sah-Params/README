@@ -1,7 +1,14 @@
-SYNOPSIS
+NAME
+    Data::Sah::Params - (DEPRECATED) Validate function arguments using Sah
+    schemas
 
+VERSION
+    This document describes version 0.005 of Data::Sah::Params (from Perl
+    distribution Data-Sah-Params), released on 2020-09-25.
+
+SYNOPSIS
      use Data::Sah::Params qw(compile Optional Slurpy Named);
-    
+
      # positional parameters, some optional
      sub f1 {
          state $check = compile(
@@ -19,7 +26,7 @@ SYNOPSIS
      f1("a", 1);          # ok, $bar = 1, $baz = undef
      f1("a", "x");        # dies, $bar is not an int
      f1("a", 3, [1,2,3]); # ok
-    
+
      # positional parameters, slurpy last parameter
      sub f2 {
          state $check = compile(
@@ -32,7 +39,7 @@ SYNOPSIS
      }
      f1("a", 3, 1,2,3);   # ok, $foo="a", $bar=3, $baz=[1,2,3]
      f1("a", 3, 1,2,"b"); # dies, third element of $baz not an integer
-    
+
      # named parameters, some optional
      sub f3 {
          state $check = compile(Named
@@ -48,28 +55,43 @@ SYNOPSIS
      f1(foo => "a", bar=>1, baz=>2); # dies, baz not an array
 
 DESCRIPTION
+    DEPRECATION NOTICE. Deprecated in favor of Params::Sah.
 
     Experimental.
 
     Currently mixing positional and named parameters not yet supported.
 
 FUNCTIONS
-
- compile([ \%opts, ] $schema, ...) => coderef
-
+  compile([ \%opts, ] $schema, ...) => coderef
     Create a validator. Accepts a list of schemas. Each schema can be
-    prefixed with Optional or Slurpy. Or, if your function will accept
-    named arguments (%args) you can use: Named(PARAM1=>$schema1,
-    PARAM2=>$schema2, ...) instead.
+    prefixed with "Optional" or "Slurpy". Or, if your function will accept
+    named arguments (%args) you can use: "Named(PARAM1=>$schema1,
+    PARAM2=>$schema2, ...)" instead.
 
     Known options:
 
-      * want_source => bool
+    *   want_source => bool
 
-      If set to 1, will return validator source code string instead of
-      compiled code (coderef). Useful for debugging.
+        If set to 1, will return validator source code string instead of
+        compiled code (coderef). Useful for debugging.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-Params>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-Params>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Params>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Params::Sah is now the preferred module over this.
 
     Sah for the schema language.
 
@@ -79,8 +101,16 @@ SEE ALSO
     the convenience of specifying other stuffs besides argument schemas),
     take a look at Perinci::Sub::ValidateArgs.
 
-    Params::Sah. I've actually implemented something similar the year
-    before (albeit with a slightly different interface), before
-    absent-mindedly reimplemented later :-) We'll see which one will
-    thrive.
+    Params::Sah. I've actually implemented something similar the year before
+    (albeit with a slightly different interface), before absent-mindedly
+    reimplemented later :-) We'll see which one will thrive.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

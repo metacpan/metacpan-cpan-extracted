@@ -2,6 +2,12 @@
 use strict;
 BEGIN { do 't/skip.test' or die "Can't include skip.test!" }
 
+unless ($ENV{'TEST_POD_COVERAGE'}) {
+    $|++;
+    print "1..0 # Skipped: To enable POD coverage test set TEST_POD_COVERAGE=1\n";
+    exit;
+}
+
 eval "use Test::Pod::Coverage;1";
 if($@) {
    plan skip_all => "Test::Pod::Coverage required for testing pod coverage";

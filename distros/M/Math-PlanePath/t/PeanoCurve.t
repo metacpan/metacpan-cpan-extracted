@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 20;
+plan tests => 2940;
 
 use lib 't';
 use MyTestHelpers;
@@ -33,7 +33,7 @@ require Math::PlanePath::PeanoCurve;
 # VERSION
 
 {
-  my $want_version = 127;
+  my $want_version = 128;
   ok ($Math::PlanePath::PeanoCurve::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::PeanoCurve->VERSION, $want_version,
@@ -66,6 +66,40 @@ require Math::PlanePath::PeanoCurve;
   ok ($path->n_start, 0, 'n_start()');
   ok ($path->x_negative, 0, 'x_negative() instance method');
   ok ($path->y_negative, 0, 'y_negative() instance method');
+}
+
+#------------------------------------------------------------------------------
+# X=Y diagonal is ternary digits duplicated
+# A163343, and A163344 sans factor 4
+
+#                    0 1 2     
+my @n_on_diagonal = (0,4,8);  # 4*digit
+sub n_on_diagonal {
+  my ($n) = @_;
+  my @n = Math::PlanePath::Base::Digits::digit_split_lowtohigh($n,3);
+  my $rev = 0;
+  foreach my $digit (reverse @n) {  # high to low, mutate array
+    $rev ^= ($digit==1);
+    if ($rev) { $digit = 2-$digit; }
+    $digit = $n_on_diagonal[$digit];
+  }
+  return Math::PlanePath::Base::Digits::digit_join_lowtohigh (\@n,9);
+}
+{
+  # d(3n)   = 9 d(n) + (8 if n odd)
+  # d(3n+1) = 9 d(n) + 4
+  # d(3n+2) = 9 d(n) + (8 if n even)
+  my $path = Math::PlanePath::PeanoCurve->new;
+  foreach my $i (0 .. 3**6) {
+    ok (n_on_diagonal($i), $path->xy_to_n($i,$i),
+        'N on X=Y diagonal');
+    ok (n_on_diagonal(3*$i),   9*n_on_diagonal($i) + ($i%2==1 ? 8 : 0),
+        'N on X=Y diagonal, recurrence 3i');
+    ok (n_on_diagonal(3*$i+1), 9*n_on_diagonal($i) + 4,
+        'N on X=Y diagonal, recurrence 3i+1');
+    ok (n_on_diagonal(3*$i+2), 9*n_on_diagonal($i) + ($i%2==0 ? 8 : 0),
+        'N on X=Y diagonal, recurrence 3i+2');
+  }
 }
 
 #------------------------------------------------------------------------------

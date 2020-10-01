@@ -1,15 +1,15 @@
 package Search::InvertedIndex::Query::Leaf;
 
-# $RCSfile: Leaf.pm,v $ $Revision: 1.5 $ $Date: 1999/06/15 17:17:18 $ $Author: snowhare $
-
 use strict;
+use warnings;
+
 use Carp;
 use Class::NamedParms;
 use Class::ParmList;
 use vars qw(@ISA $VERSION);
 
 @ISA     = qw (Class::NamedParms);
-$VERSION = '1.00';
+$VERSION = '1.17';
 
 =head1 NAME
 
@@ -78,13 +78,12 @@ sub new {
 
 =head1 COPYRIGHT
 
-Copyright 1999, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and 
-FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
-This software may be copied or redistributed under the same terms as Perl itelf.
+Copyright 1999-2020, Jerilyn Franz and FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>).
+All Rights Reserved.
 
 =head1 AUTHOR
 
-Benjamin Franz
+Jerilyn Franz
 
 =head1 TODO
 

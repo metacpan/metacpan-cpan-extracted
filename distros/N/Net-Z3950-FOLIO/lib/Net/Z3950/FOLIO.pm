@@ -19,12 +19,13 @@ use Data::Dumper; $Data::Dumper::Indent = 1;
 use Net::Z3950::FOLIO::ResultSet;
 use Net::Z3950::FOLIO::OPACXMLRecord qw(makeOPACXMLRecord);
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 
 sub FORMAT_USMARC { '1.2.840.10003.5.10' }
 sub FORMAT_XML { '1.2.840.10003.5.109.10' }
 sub FORMAT_OPAC { '1.2.840.10003.5.102' }
+sub FORMAT_JSON { '1.2.840.10003.5.1000.81.3' }
 sub ATTRSET_BIB1 { '1.2.840.10003.3.1' }
 
 
@@ -119,31 +120,52 @@ sub _reload_config_file {
 }
 
 
-# XXX note, does not currently support arrays, but we don't need them
 sub _expand_variable_references {
     my($obj) = @_;
 
     foreach my $key (sort keys %$obj) {
-	my $val = $obj->{$key};
-	if (!ref($val)) {
-	    $obj->{$key} = _expand_single_variable_reference($key, $val);
-	} else {
-	    _expand_variable_references($val);
-	}
+	$obj->{$key} = _expand_single_variable_reference($key, $obj->{$key});
+    }
+
+    return $obj;
+}
+
+sub _expand_single_variable_reference {
+    my($key, $val) = @_;
+
+    if (ref($val) eq 'HASH') {
+	return _expand_variable_references($val);
+    } elsif (ref($val) eq 'ARRAY') {
+	return [ map { _expand_single_variable_reference($key, $_) } @$val ];
+    } elsif (!ref($val)) {
+	return _expand_scalar_variable_reference($key, $val);
+    } else {
+	die "non-hash, non-array, non-scale configuration key '$key'";
     }
 }
 
-
-sub _expand_single_variable_reference {
+sub _expand_scalar_variable_reference {
     my ($key, $val) = @_;
 
+    my $orig = $val;
     while ($val =~ /(.*?)\$\{(.*?)}(.*)/) {
-	my $env = $ENV{$2};
+	my($pre, $inclusion, $post) = ($1, $2, $3);
+
+	my($name, $default);
+	if ($inclusion =~ /(.*?)-(.*)/) {
+	    $name = $1;
+	    $default = $2;
+	} else {
+	    $name = $inclusion;
+	    $default = undef;
+	}
+
+	my $env = $ENV{$name} || $default;
 	if (!defined $env) {
 	    warn "environment variable '$2' not defined for '$key'";
 	    $env = '';
 	}
-	$val = "$1$env$3";
+	$val = "$pre$env$post";
     }
 
     return $val;
@@ -220,30 +242,38 @@ sub _init_handler {
 
 sub _search_handler {
     my($args) = @_;
-    my $session = $args->{HANDLE};
     my $this = $args->{GHANDLE};
+    my $session = $args->{HANDLE};
 
     # For now, we ignore the dbname. In the future we will use this as
     # the tenant ID, which will mean postponing the authentication
     # call from the Init handler to now, when we first discover the
     # dbname.
 
-    my $cql;
     if ($args->{CQL}) {
-	$cql = $args->{CQL};
+	$this->{cql} = $args->{CQL};
     } else {
 	my $type1 = $args->{RPN}->{query};
-	$cql = $type1->_toCQL($args, $args->{RPN}->{attributeSet});
-	warn "search: translated '" . $args->{QUERY} . "' to '$cql'\n";
+	$this->{cql} = $type1->_toCQL($args, $args->{RPN}->{attributeSet});
+	warn "search: translated '" . $args->{QUERY} . "' to '" . $this->{cql} . "'\n";
     }
 
-    my $setname = $args->{SETNAME};
+    $this->{sortspec} = undef;
+    $args->{HITS} = $this->_rerun_search($session, $args->{SETNAME}, @_);
+}
+
+
+sub _rerun_search {
+    my $this = shift();
+    my($session, $setname) = @_;
+
+    my $cql = $this->{cql};
     my $rs = new Net::Z3950::FOLIO::ResultSet($setname, $cql);
     $session->{resultsets}->{$setname} = $rs;
 
     my $chunkSize = $this->{cfg}->{chunkSize} || 10;
     $this->_do_search($rs, 0, $chunkSize);
-    $args->{HITS} = $rs->total_count();
+    return $rs->total_count();
 }
 
 
@@ -284,15 +314,12 @@ sub _fetch_handler {
     warn "REQ_FORM=$format, COMP=$comp\n";
 
     my $res;
-    if ($format eq FORMAT_USMARC && $comp eq 'd') {
-	# Dynamically generated USMARC from the FOLIO inventory records
-	warn "Dynamically generated USMARC from the FOLIO inventory records";
+    if ($format eq FORMAT_JSON) {
+	$res = _pretty_json($rec);
+
+    } elsif ($format eq FORMAT_XML && $comp eq 'raw') {
+	# Mechanical XML translitation of the JSON response
 	$res = _xml_record($rec);
-	$args->{REP_FORM} = 'xml';
-    } elsif ($format eq FORMAT_USMARC) {
-	# Static USMARC from SRS
-	my $marc = $this->_marc_record($rs, $index1);
-	$res = $marc->as_usmarc();
     } elsif ($format eq FORMAT_XML && $comp eq 'usmarc') {
 	# MARCXML made from SRS Marc record
 	my $marc = $this->_marc_record($rs, $index1);
@@ -301,11 +328,16 @@ sub _fetch_handler {
 	# OPAC-format XML
 	my $marc = $this->_marc_record($rs, $index1);
 	$res = makeOPACXMLRecord($rec, $marc);
-    } elsif ($format eq FORMAT_OPAC) {
-	_throw(1, "OPAC format not yet supported");
     } elsif ($format eq FORMAT_XML) {
-	warn "XML";
-	$res = _xml_record($rec);
+	_throw(25, "XML records available in element-sets: raw, usmarc, opac");
+
+    } elsif ($format eq FORMAT_USMARC && (!$comp || $comp eq 'f' || $comp eq 'b')) {
+	# Static USMARC from SRS
+	my $marc = $this->_marc_record($rs, $index1);
+	$res = $marc->as_usmarc();
+    } elsif ($format eq FORMAT_USMARC) {
+	_throw(25, "USMARC records available in element-sets: f, b");
+
     } else {
 	_throw(239, $format); # 239 = Record syntax not supported
     }
@@ -395,6 +427,7 @@ sub _delete_handler {
 sub _sort_handler {
     my($args) = @_;
     my $session = $args->{HANDLE};
+    my $this = $args->{GHANDLE};
 
     my $setnames = $args->{INPUT};
     _throw(230, '1') if @$setnames > 1; # Sort: too many input results
@@ -402,23 +435,94 @@ sub _sort_handler {
     my $rs = $session->{resultsets}->{$setname};
     _throw(30, $args->{SETNAME}) if !$rs; # Result set does not exist
 
-    my $cqlSort = _sortspec2cql($args->{SEQUENCE});
+    my $cqlSort = $this->_sortspecs2cql($args->{SEQUENCE});
     _throw(207, Dumper($args->{SEQUENCE})) if !$cqlSort; # Cannot sort according to sequence
 
-    warn Dumper($args);
-    return;
+    $this->{sortspec} = $cqlSort;
+    $this->_rerun_search($session, $args->{OUTPUT}, @_);
 }
 
 
-sub _sortspec2cql {
+sub _sortspecs2cql {
+    my $this = shift();
     my($sequence) = @_;
 
     my @res = ();
-    foreach my $item (@$sequence) {
-	warn Dumper(ITEM => $item);
+    foreach my $item (@$sequence) {	
+	push @res, $this->_singleSortspecs2cql($item);
     }
 
-    return undef;
+    my $spec = join(' ', @res);
+    return $spec;
+}
+
+
+sub _singleSortspecs2cql {
+    my $this = shift();
+    my($item) = @_;
+    my $indexMap = $this->{cfg}->{indexMap};
+
+    my $set = $item->{ATTRSET};
+    if ($set ne Net::Z3950::FOLIO::ATTRSET_BIB1 && lc($set) ne 'bib-1') {
+	# Unknown attribute set (anything except BIB-1)
+	_throw(121, $set);
+    }
+
+    my @modifiers = (
+	[ missing => _translateSortParam($item->{MISSING}, 213, {
+	    1 => 'missingFail',
+	    2 => 'missingLow',
+	})],
+	[ relation => _translateSortParam($item->{RELATION}, 214, {
+	    0 => 'ascending',
+	    1 => 'descending',
+	})],
+	[ case => _translateSortParam($item->{CASE}, 215, {
+	    0 => 'respectCase',
+	    1 => 'ignoreCase',
+        })],
+    );
+
+    my($accessPoint, $cqlIndex, $entry);
+    my $attrs = $item->{SORT_ATTR};
+    foreach my $attr (@$attrs) {
+	my $type = $attr->{ATTR_TYPE};
+	_throw(237, "sort-attribute of type $type (only 1 is supported)") if defined $type && $type != 1;
+
+	$accessPoint = $attr->{ATTR_VALUE};
+	$entry = $indexMap->{$accessPoint};
+	_throw(207, "undefined sort-index $accessPoint") if !defined $entry;
+	if (ref $entry) {
+	    $cqlIndex = $entry->{cql};
+	} else {
+	    $cqlIndex = $entry;
+	    $entry = undef;
+	}
+	last;
+    }
+
+    my $res = $cqlIndex;
+
+    my $omitList = $entry ? $entry->{omitSortIndexModifiers} : [];
+    foreach my $modifier (@modifiers) {
+	my($name, $value) = @$modifier;
+	if (!$omitList || ! grep { $_ eq $name } @$omitList) {
+	    $res .= "/sort.$value";
+	} else {
+	    # warn "omitting '$name' sort-modifier for access-point $accessPoint ($cqlIndex)";
+	}
+    };
+
+    return $res;
+}
+
+
+sub _translateSortParam {
+    my($zval, $diag, $map) = @_;
+
+    my $cqlVal = $map->{$zval};
+    _throw($diag, $zval) if !$cqlVal;
+    return $cqlVal;
 }
 
 
@@ -431,6 +535,11 @@ sub _do_search {
     my $cql = $rs->{cql};
     if ($qf) {
 	$cql = $cql ? "($cql) and ($qf)" : $qf;
+    }
+    my $sortspec = $this->{sortspec};
+    if ($sortspec) {
+	$cql = "($cql) sortby $sortspec";
+	warn "search: added sortspec, yielding '$cql'";
     }
 
     my $url = $okapiCfg->{url};
@@ -527,7 +636,9 @@ sub _JSON_to_MARC {
 			push @subfields, $k2, $value->{subfields}->[$j]->{$k2};
 		    }
 		}
-		$marc->append_fields(new MARC::Field($key, $value->{ind1}, $value->{ind2}, @subfields));
+		if (@subfields) {
+		    $marc->append_fields(new MARC::Field($key, $value->{ind1}, $value->{ind2}, @subfields));
+		}
 	    }
 	}
     }
@@ -602,7 +713,8 @@ sub _toCQL {
     my $self = shift;
     my($args, $defaultSet) = @_;
     my $gh = $args->{GHANDLE};
-    my $field;
+    my $indexMap = $gh->{cfg}->{indexMap};
+    my($field, $relation);
 
     my $attrs = $self->{attributes};
     untie $attrs;
@@ -617,26 +729,32 @@ sub _toCQL {
 	}
 	if ($attr->{attributeType} == 1) {
 	    my $val = $attr->{attributeValue};
-	    $field = _ap2index($gh->{cfg}->{indexMap}, $val);
+	    $field = _ap2index($indexMap, $val);
+	    $relation = _ap2relation($indexMap, $val);
 	}
+    }
+
+    if (!$field && $indexMap) {
+	# No explicit access-point, fall back to default if specified
+	$field = _ap2index($indexMap, 'default');
+	$relation = _ap2relation($indexMap, 'default');
     }
 
     if ($field) {
 	my @fields = split(/,/, $field);
 	if (@fields > 1) {
-	    return '(' . join(' or ', map { $self->_CQLTerm($_) } @fields) . ')';
+	    return '(' . join(' or ', map { $self->_CQLTerm($_, $relation) } @fields) . ')';
 	}
     }
 
-    return $self->_CQLTerm($field);
+    return $self->_CQLTerm($field, $relation);
 }
 
 
 sub _CQLTerm {
     my $self = shift;
-    my($field) = @_;
+    my($field, $relation) = @_;
 
-    my $relation;
     my($left_anchor, $right_anchor) = (0, 0);
     my($left_truncation, $right_truncation) = (0, 0);
     my $term = $self->{term};
@@ -652,30 +770,32 @@ sub _CQLTerm {
         my $type = $attr->{attributeType};
         my $value = $attr->{attributeValue};
 
-        if ($type == 2 && !defined $relation) {
+        if ($type == 2) {
 	    # Relation.  The following switch hard-codes information
 	    # about the crrespondance between the BIB-1 attribute set
 	    # and CQL context set.
-	    if ($value == 1) {
-		$relation = "<";
-	    } elsif ($value == 2) {
-		$relation = "<=";
-	    } elsif ($value == 3) {
-		$relation = "=";
-	    } elsif ($value == 4) {
-		$relation = ">=";
-	    } elsif ($value == 5) {
-		$relation = ">";
-	    } elsif ($value == 6) {
-		$relation = "<>";
-	    } elsif ($value == 100) {
-		$relation = "=/phonetic";
-	    } elsif ($value == 101) {
-		$relation = "=/stem";
-	    } elsif ($value == 102) {
-		$relation = "=/relevant";
-	    } else {
-		_throw(117, $value);
+	    if ($relation) {
+		if ($value == 1) {
+		    $relation = "<";
+		} elsif ($value == 2) {
+		    $relation = "<=";
+		} elsif ($value == 3) {
+		    $relation = "=";
+		} elsif ($value == 4) {
+		    $relation = ">=";
+		} elsif ($value == 5) {
+		    $relation = ">";
+		} elsif ($value == 6) {
+		    $relation = "<>";
+		} elsif ($value == 100) {
+		    $relation = "=/phonetic";
+		} elsif ($value == 101) {
+		    $relation = "=/stem";
+		} elsif ($value == 102) {
+		    $relation = "=/relevant";
+		} else {
+		    _throw(117, $value);
+		}
 	    }
         }
 
@@ -752,7 +872,18 @@ sub _ap2index {
 
     my $field = $indexMap->{$value};
     _throw(114, $value) if !defined $field;
+    return $field->{cql} if ref $field;
     return $field;
+}
+
+
+sub _ap2relation {
+    my($indexMap, $value) = @_;
+
+    return undef if !defined $indexMap;
+    my $field = $indexMap->{$value};
+    return undef if !defined $field || !ref $field;
+    return $field->{relation};
 }
 
 

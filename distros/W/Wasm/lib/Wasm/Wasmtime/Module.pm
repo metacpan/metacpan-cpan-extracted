@@ -3,6 +3,7 @@ package Wasm::Wasmtime::Module;
 use strict;
 use warnings;
 use 5.008004;
+use Ref::Util qw( is_blessed_ref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Engine;
 use Wasm::Wasmtime::Store;
@@ -14,7 +15,7 @@ use Ref::Util qw( is_blessed_ref );
 use Carp ();
 
 # ABSTRACT: Wasmtime module class
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 $ffi_prefix = 'wasm_module_';
@@ -92,6 +93,22 @@ $ffi->attach( [ wasmtime_module_new => 'new' ] => ['wasm_engine_t', 'wasm_byte_v
   bless { ptr => $ptr, engine => $engine, store => $store }, $class;
 });
 
+
+$ffi->attach( [ wasmtime_module_deserialize => 'deserialize' ] => ['wasm_engine_t', 'wasm_byte_vec_t*', 'opaque*'] => 'wasmtime_error_t' => sub {
+  my $xsub  = shift;
+  my $class = shift;
+  my $engine;
+  $engine = defined $_[0] && is_blessed_ref $_[0] && $_[0]->isa('Wasm::Wasmtime::Engine') ? shift : Wasm::Wasmtime::Engine->new;
+  my $serialized = Wasm::Wasmtime::ByteVec->new($_[0]);
+  my $ptr;
+  if(my $error = $xsub->($engine, $serialized, \$ptr))
+  {
+    Carp::croak("error creating module: " . $error->message);
+  }
+  bless { ptr => $ptr, store => undef, engine => $engine }, $class;
+});
+
+
 $ffi->attach( [ wasmtime_module_validate => 'validate' ] => ['wasm_store_t', 'wasm_byte_vec_t*'] => 'wasmtime_error_t' => sub {
   my $xsub = shift;
   my $class = shift;
@@ -130,6 +147,22 @@ $ffi->attach( [ imports => '_imports' ] => [ 'wasm_module_t', 'wasm_importtype_v
 });
 
 
+$ffi->attach( [ 'wasmtime_module_serialize' => 'serialize' ] => [ 'wasm_module_t', 'wasm_byte_vec_t*' ] => 'wasmtime_error_t' => sub {
+  my($xsub, $self) = @_;
+  my $s = Wasm::Wasmtime::ByteVec->new;
+  if(my $error = $xsub->($self, $s))
+  {
+    Carp::croak("error serializing module: " . $error->message);
+  }
+  else
+  {
+    my $s2 = $s->get;
+    $s->delete;
+    return $s2;
+  }
+});
+
+
 sub engine { shift->{engine} }
 
 
@@ -162,7 +195,7 @@ Wasm::Wasmtime::Module - Wasmtime module class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -177,7 +210,7 @@ is under active development.  Use with caution.
 
 This class represents a WebAssembly module.
 
-=head1 CONSTRUCTOR
+=head1 CONSTRUCTORS
 
 =head2 new
 
@@ -226,6 +259,18 @@ You can provide a L<Wasm::Wasmtime::Store> instance instead of a L<Wasm::Wasmtim
 instance is no longer required internally to create a module instance, the engine object which is needed can
 be found from the store.  This form will be removed in a future version.
 
+=head2 deserialize
+
+ my $module = Wasm::Wasmtime::Module->deserialize(
+   $engine,       # Wasm::Wasmtime::Engine
+   $serialized,   # serialized module
+ );
+ my $module = Wasm::Wasmtime::Module->deserialize(
+   $serialized,   # serialized module
+ );
+
+Build a module from serialized data.  The serialized data can be gotten from the C<serialize> method documented below.
+
 =head1 METHODS
 
 =head2 validate
@@ -267,6 +312,13 @@ Returns a L<Wasm::Wasmtime::Module::Exports> object that can be used to query th
  my $imports = $module->imports;
 
 Returns a list of L<Wasm::Wasmtime::ImportType> objects for the objects imported by the WebAssembly module.
+
+=head2 serialize
+
+ my $serialized = $module->serialize;
+
+This function serializes compiled module artifacts as blob data.  This data can be reconstituted with the
+C<deserialize> constructor method documented above.
 
 =head2 engine
 

@@ -49,6 +49,9 @@ L<LWP::CurlLog>
 
 L<HTTP::Request::AsCurl> - for the inverse function
 
+The module HTTP::Request::AsCurl likely also implements a much better version
+of C<< ->as_curl >> than this module.
+
 L<https://github.com/NickCarneiro/curlconverter> - a converter for multiple
 target languages
 

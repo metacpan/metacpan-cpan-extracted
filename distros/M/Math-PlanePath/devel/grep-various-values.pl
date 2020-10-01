@@ -57,6 +57,66 @@ $|=1;
 
 
 {
+  # net direction as total turn
+
+  require Math::NumSeq::PlanePathTurn;
+  my @choices = @{Math::NumSeq::PlanePathTurn->parameter_info_hash
+      ->{'planepath'}->{'choices'}};
+  @choices = grep {$_ ne 'BinaryTerms'} @choices; # bit slow yet
+  @choices = grep {$_ =~ /Curve/} @choices;
+
+  my @turn_type_choices = @{Math::NumSeq::PlanePathTurn->parameter_info_hash
+      ->{'turn_type'}->{'choices'}};
+  push @turn_type_choices,  'Turn4','Turn4n', 'TTurn6', 'TTurn6n', 'TTurn3';
+
+  # force
+  # @turn_type_choices = 'TTurn3';
+
+  # force
+  # @choices = ('ComplexMinus');
+
+  my %seen;
+  foreach my $path_name (@choices) {
+    my $path_class = "Math::PlanePath::$path_name";
+    Module::Load::load($path_class);
+    my $parameters = parameter_info_list_to_parameters($path_class->parameter_info_list);
+  PATH: foreach my $p ([],      # paths with no parameters
+                       # @$parameters
+                      ) {
+      print "\n$path_class  ",join(',',@$p),"\n";
+      my $path = $path_class->new (@$p);
+
+      foreach my $turn_type (@turn_type_choices) {
+        my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
+                                                    turn_type => $turn_type);
+        print "$turn_type\n";
+
+        my $name = "$path_name $turn_type  ".join(',',@$p);
+        my $dir = 0;
+        my @values;
+        my $all_zeros = 1;
+        my $all_ones = 1;
+        foreach (1 .. 40) {
+          push @values, $dir;
+          my ($i,$value) = $seq->next or last;
+          $dir += $value;
+          if ($value != 0) { $all_zeros = 0; }
+          if ($value != 1) { $all_ones = 0; }
+        }
+        next if $all_zeros || $all_ones;
+        shift @values; shift @values;
+        next unless @values;
+
+        print "$turn_type  ",join(', ',@values),"\n";
+        Math::OEIS::Grep->search(name => $name,
+                                 array => \@values);
+      }
+    }
+  }
+  exit 0;
+}
+
+{
   # N on axes
 
   my @dir8_to_dx = (1, 1, 0,-1, -1, -1,  0, 1);

@@ -1,0 +1,191 @@
+package SPVM::AI::Util {
+  use SPVM::AI::Util::FloatMatrix;
+  use SPVM::StringBuffer;
+
+  precompile sub mat_transposef : SPVM::AI::Util::FloatMatrix ($mat : SPVM::AI::Util::FloatMatrix) {
+    my $rows_length = $mat->{rows_length};
+    my $columns_length = $mat->{columns_length};
+    my $length = $rows_length * $columns_length;
+
+    my $mat_trans = mat_newf(new float[$length], $columns_length, $rows_length);
+
+    my $values = $mat->{values};
+    my $mat_trans_values = $mat_trans->{values};
+
+    for (my $row_index = 0; $row_index < $rows_length; $row_index++) {
+      for (my $column_index = 0; $column_index < $columns_length; $column_index++) {
+        $mat_trans_values->[$row_index * $columns_length + $column_index] = $values->[$column_index * $rows_length+ $row_index];
+      }
+    }
+
+    return $mat_trans;
+  }
+
+  precompile sub mat_strf : string ($mat : SPVM::AI::Util::FloatMatrix) {
+    my $values = $mat->{values};
+    my $rows_length = $mat->{rows_length};
+    my $columns_length = $mat->{columns_length};
+    my $length = $rows_length * $columns_length;
+
+    my $buffer = SPVM::StringBuffer->new;
+    for (my $row_index = 0; $row_index < $rows_length; $row_index++) {
+      for (my $elemat_index = $row_index; $elemat_index < $length; $elemat_index += $rows_length) {
+        $buffer->push($values->[$elemat_index]);
+        if ($elemat_index < $length - $columns_length + 1) {
+          $buffer->push(" ");
+        }
+      }
+      $buffer->push("\n");
+    }
+
+    my $str = $buffer->to_string;
+
+    return $str;
+  }
+
+  precompile sub mat_addf : SPVM::AI::Util::FloatMatrix ($mat1 : SPVM::AI::Util::FloatMatrix, $mat2 : SPVM::AI::Util::FloatMatrix) {
+    my $mat1_values = $mat1->{values};
+    my $mat1_rows_length = $mat1->{rows_length};
+    my $mat1_columns_length = $mat1->{columns_length};
+
+    my $mat2_rows_length = $mat2->{rows_length};
+    my $mat2_columns_length = $mat2->{columns_length};
+    my $mat2_values = $mat2->{values};
+
+    if ($mat1_rows_length != $mat2_rows_length) {
+      die "mat1 row must be equals to mat2 row";
+    }
+
+    if ($mat1_columns_length != $mat2_columns_length) {
+      die "mat1 col must be equals to mat2 col";
+    }
+
+    my $mat1_length = $mat1_rows_length * $mat1_columns_length;
+    my $mat_out = mat_newf(new float[$mat1_length], $mat1_rows_length, $mat1_columns_length);
+    my $mat_out_values = $mat_out->{values};
+
+    for (my $i = 0; $i < $mat1_length; $i++) {
+      $mat_out_values->[$i] = (float)($mat1_values->[$i] + $mat2_values->[$i]);
+    }
+
+    return $mat_out;
+  }
+
+  precompile sub mat_subf : SPVM::AI::Util::FloatMatrix ($mat1 : SPVM::AI::Util::FloatMatrix, $mat2 : SPVM::AI::Util::FloatMatrix) {
+    my $mat1_values = $mat1->{values};
+    my $mat1_rows_length = $mat1->{rows_length};
+    my $mat1_columns_length = $mat1->{columns_length};
+
+    my $mat2_rows_length = $mat2->{rows_length};
+    my $mat2_columns_length = $mat2->{columns_length};
+    my $mat2_values = $mat2->{values};
+
+    if ($mat1_rows_length != $mat2_rows_length) {
+      die "mat1 row must be equals to mat2 row";
+    }
+
+    if ($mat1_columns_length != $mat2_columns_length) {
+      die "mat1 col must be equals to mat2 col";
+    }
+
+    my $mat1_length = $mat1_rows_length * $mat1_columns_length;
+    my $mat_out = mat_newf(new float[$mat1_length], $mat1_rows_length, $mat1_columns_length);
+    my $mat_out_values = $mat_out->{values};
+
+    for (my $i = 0; $i < $mat1_length; $i++) {
+      $mat_out_values->[$i] = (float)($mat1_values->[$i] - $mat2_values->[$i]);
+    }
+
+    return $mat_out;
+  }
+
+  precompile sub mat_scamulf : SPVM::AI::Util::FloatMatrix ($scalar : float, $mat1 : SPVM::AI::Util::FloatMatrix) {
+    my $mat1_values = $mat1->{values};
+    my $mat1_rows_length = $mat1->{rows_length};
+    my $mat1_columns_length = $mat1->{columns_length};
+
+    my $mat1_length = $mat1_rows_length * $mat1_columns_length;
+    my $mat_out = mat_newf(new float[$mat1_length], $mat1_rows_length, $mat1_columns_length);
+    my $mat_out_values = $mat_out->{values};
+
+    for (my $i = 0; $i < $mat1_length; $i++) {
+      $mat_out_values->[$i] = (float)($scalar * $mat1_values->[$i]);
+    }
+
+    return $mat_out;
+  }
+
+  precompile sub mat_mulf : SPVM::AI::Util::FloatMatrix ($mat1 : SPVM::AI::Util::FloatMatrix, $mat2 : SPVM::AI::Util::FloatMatrix) {
+    my $mat1_values = $mat1->{values};
+    my $mat1_rows_length = $mat1->{rows_length};
+    my $mat1_columns_length = $mat1->{columns_length};
+
+    my $mat2_rows_length = $mat2->{rows_length};
+    my $mat2_columns_length = $mat2->{columns_length};
+    my $mat2_values = $mat2->{values};
+
+    if ($mat1_columns_length != $mat2_rows_length) {
+      die "mat1 col must be equals to mat2 row";
+    }
+
+    my $mat_out_length = $mat1_rows_length * $mat2_columns_length;
+    my $mat_out = mat_newf(new float[$mat_out_length], $mat1_rows_length, $mat2_columns_length);
+    my $mat_out_values = $mat_out->{values};
+    my $mat_out_row = $mat_out->{rows_length};
+
+    for(my $row_index = 0; $row_index < $mat1_rows_length; $row_index++) {
+      for(my $column_index = 0; $column_index < $mat2_columns_length; $column_index++) {
+        for(my $incol = 0; $incol < $mat1_columns_length; $incol++) {
+          $mat_out_values->[$row_index + $column_index * $mat_out_row]
+            += $mat1_values->[$row_index + $incol * $mat1_rows_length] * $mat2_values->[$incol + $column_index * $mat2_rows_length];
+        }
+      }
+    }
+
+    return $mat_out;
+  }
+
+  precompile sub mat_newf : SPVM::AI::Util::FloatMatrix ($values : float[], $rows_length: int, $columns_length : int) {
+    unless ($values) {
+      die "Values must defined";
+    }
+
+    unless ($rows_length * $columns_length == scalar @$values) {
+      die "Values length must be row * col";
+    }
+    my $matrix = new SPVM::AI::Util::FloatMatrix;
+    $matrix->{values} = $values;
+    $matrix->{rows_length} = $rows_length;
+    $matrix->{columns_length} = $columns_length;
+    return $matrix;
+  }
+
+  precompile sub mat_new_zerof : SPVM::AI::Util::FloatMatrix ($rows_length: int, $columns_length : int) {
+    unless ($rows_length> 0) {
+      die "Row must be more than 0";
+    }
+    unless ($columns_length > 0) {
+      die "Col must be more than 0";
+    }
+    my $matrix = new SPVM::AI::Util::FloatMatrix;
+    my $length = $rows_length * $columns_length;
+    $matrix->{values} = new float[$length];
+    $matrix->{rows_length} = $rows_length;
+    $matrix->{columns_length} = $columns_length;
+    return $matrix;
+  }
+
+  precompile sub mat_new_identf : SPVM::AI::Util::FloatMatrix ($dim : int) {
+    if ($dim < 1) {
+      die "Dimension must be more than 0";
+    }
+
+    my $matrix = mat_new_zerof($dim, $dim);
+    my $values = $matrix->{values};
+    for (my $i = 0; $i < $dim; $i++) {
+      $values->[$i * $dim + $i] = 1;
+    }
+
+    return $matrix;
+  }
+}

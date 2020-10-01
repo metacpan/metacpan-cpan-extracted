@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Filter::signatures" : "0.09",
+            "Filter::signatures" : "0.16",
             "Getopt::Long" : "2.39",
             "HTTP::Request" : "6.07",
             "HTTP::Request::Common" : "6.07",
@@ -44,6 +44,7 @@
             "Moo" : "2",
             "PerlX::Maybe" : "0",
             "URI" : "0",
+            "URI::Escape" : "0",
             "URL::Encode" : "0",
             "perl" : "5.010"
          }
@@ -75,7 +76,7 @@
          "web" : "https://github.com/Corion/HTTP-Request-FromCurl"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1
 }

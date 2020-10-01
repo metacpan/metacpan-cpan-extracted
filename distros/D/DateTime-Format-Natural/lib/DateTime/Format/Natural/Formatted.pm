@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use boolean qw(true false);
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 sub _parse_formatted_ymd
 {
@@ -109,7 +109,27 @@ sub _parse_formatted_md
 
     my $date = $self->_split_formatted($date_string);
 
-    my ($month, $day) = split /\//, $date;
+    my @date_chunks = split /\//, $date;
+
+    # This method used to split the date with a format of m/d implicitly
+    # assumed, so provide it if needed to retain backward compatibility.
+    my $format = $self->{Format} =~ m{^[dm]{1,2}/[dm]{1,2}$}i
+      ? do { local $_ = lc $self->{Format}; tr/dm//s; $_ }
+      # XXX hack, remove implicit m/d after 2022-09-22
+      : $self->{format_provided}
+        ? undef
+        : 'm/d';
+
+    unless (defined $format && $format =~ m{^(?:(?:m/d)|(?:d/m))$}) {
+        $self->_set_failure;
+        $self->_set_error("('format' parameter invalid)");
+        return $self->_get_datetime_object;
+    }
+
+    my $i = 0;
+    my %format_index = map { $_ => $i++ } split /\//, $format;
+
+    my ($day, $month) = map $date_chunks[$format_index{$_}], qw(d m);
 
     unless ($self->_check_date($self->{datetime}->year, $month, $day)) {
         $self->_set_failure;

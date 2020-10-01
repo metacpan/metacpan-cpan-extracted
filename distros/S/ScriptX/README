@@ -2,8 +2,8 @@ NAME
     ScriptX - A plugin-based script framework
 
 VERSION
-    This document describes version 0.000001 of ScriptX (from Perl
-    distribution ScriptX), released on 2020-09-03.
+    This document describes version 0.000004 of ScriptX (from Perl
+    distribution ScriptX), released on 2020-10-01.
 
 SYNOPSIS
     In your script:
@@ -56,25 +56,26 @@ VARIABLES
 
      [ [$label, $prio, $handler], ... ]
 
-  %Plugins
-    A hash of activated plugins. Keys are plugin names without the
-    "ScriptX::" prefix (e.g. Exit) and values are plugin instances.
+  @Plugin_Instances
+    An array of activated plugin instances. For reference only.
 
 STASH KEYS
   event
-    The name of current event.
+    Str. The name of current event.
 
   handlers
-    Reference to the %Handlers package variable, for convenience.
+    Array. Reference to the %Handlers package variable, for convenience.
 
-  plugins
-    Reference to the %Plugins package variable, for convenience.
+  plugin_instances
+    Array. Reference to the @Plugin_Instances package variable, for
+    convenience.
 
   plugin_name
-    Set for "activate_plugin" event.
+    Str. Current plugin name. Set for "activate_plugin" event.
 
   plugin_args
-    Set for "activate_plugin" event.
+    Hash. Arguments hashref to instantiate plugin. Set for "activate_plugin"
+    event.
 
 EVENT HANDLER RETURN STATUS CODES
     The following are known event handler return status codes. They roughly
@@ -109,7 +110,7 @@ EVENT HANDLER RETURN STATUS CODES
 
   602
     This signifies repeating of event ("Repeat"), meaning the handler
-    instructs "run_event"() to cancel the event.
+    instructs "run_event"() to repeat the event.
 
 FUNCTIONS
     None exported by default, but they are exportable.

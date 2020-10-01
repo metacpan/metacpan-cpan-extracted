@@ -1,49 +1,39 @@
-_______________________________________________________________________________
-2012-02-15 File-Listing 6.04
+Revision history for File-Listing
 
-Erik Esterer (1):
-      Minor mistake in module description
+6.07 2020-09-30 08:47:18 -0600
+  - Production version identical to 6.06_01
 
-Gisle Aas (1):
-      Test parsing of dosftp listings
+6.06_01 2020-09-30 06:34:08 -0600
+  - Add examples to documentation.
 
-Peter Rabbitson (1):
-      This modulue works with 5.6.2
+6.05_01 2020-09-29 21:25:35 -0600
+  - New maintainer (Graham Ollis / plicease)
+  - New GitHub repository https://github.com/PerlAlien/File-Listing
+  - Include Perl core modules in prereqs (rt#85100 / gh#2)
+  - Converted Changes file to standard format (the original
+    Changes file is available as Changes.original)
+  - Migrate Test.pm tests to use Test::More, all tests
+    use strict and warnings now.
 
+6.04 2012-02-15
+  - Minor mistake in module description (Erik Esterer)
+  - Test parsing of dosftp listing (Gisle Aas)
+  - This module works with 5.6.2 (Peter Rabbitson)
 
+6.03 2011-09-20
+  - Minor mistake in module description (Erik Esterer)
+  - Fixes to the parsing of 'ls -l' file modes (rt#71054, Peter John Acklam)
 
-_______________________________________________________________________________
-2011-09-20 File-Listing 6.03
+6.02 2011-03-20
+  - Avoid running live test.  Embed the expected test data in  the test file.
+    Update the test data inline by invoking 'perl t/apache.t --update'.
 
-Erik Esterer (1):
-      Minor mistake in module description
+6.01 2011-03-13
+  - Added legal notice and updated the meta repository link
 
-Peter John Acklam (1):
-      Fixes to the parsing of 'ls -l' file modes [RT#71054]
+6.00 2011-02-25
+  - Initial release of File-Listing as a separate  distribution.  The File::Listing
+    module used to be bundled with the libwww-perl distribution.
 
-
-
-_______________________________________________________________________________
-2011-03-20 File-Listing 6.02
-
-Avoid running live test.  Embed the expected test data in the test file.
-Update the test data inline by invoking 'perl t/apache.t --update'.
-
-
-
-_______________________________________________________________________________
-2011-03-13 File-Listing 6.01
-
-Added legal notice and updated the meta repository link
-
-
-
-
-_______________________________________________________________________________
-2011-02-25 File-Listing 6.00
-
-Initial release of File-Listing as a separate distribution.  The File::Listing
-module used to be bundled with the libwww-perl distribution.
-
-Since libwww-perl-5.837 File::Listing has been made able to deal with listings
-full of table markup (like what we find at http://www.cpan.org/modules/by-module/).
+  - Since libwww-perl-5.837 File::Listing has been made able to deal with listings
+    full of table markup (like what we find at http://www.cpan.org/modules/by-module/).

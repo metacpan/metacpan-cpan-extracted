@@ -62,6 +62,6 @@
          "url" : "http://github.com/lstein/Perl-GD"
       }
    },
-   "version" : "2.72",
+   "version" : "2.73",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

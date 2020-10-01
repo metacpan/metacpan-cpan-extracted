@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -403,6 +403,18 @@ my @modules = (
                # 'FourReplicate',
 
                # module list begin
+
+               'PeanoDiagonals',
+               'PeanoDiagonals,radix=2',
+               'PeanoDiagonals,radix=4',
+               'PeanoDiagonals,radix=5',
+               'PeanoDiagonals,radix=17',
+
+               'PeanoCurve',
+               'PeanoCurve,radix=2',
+               'PeanoCurve,radix=4',
+               'PeanoCurve,radix=5',
+               'PeanoCurve,radix=17',
 
                'AlternateTerdragon',
                'AlternateTerdragon,arms=2',
@@ -1082,12 +1094,6 @@ my @modules = (
                'GosperIslands',
 
                'CubicBase',
-
-               'PeanoCurve',
-               'PeanoCurve,radix=2',
-               'PeanoCurve,radix=4',
-               'PeanoCurve,radix=5',
-               'PeanoCurve,radix=17',
 
                'KnightSpiral',
 

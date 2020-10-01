@@ -12,7 +12,7 @@ use base "File::HomeDir::Darwin";
 
 BEGIN
 {
-    $VERSION = '1.004';
+    $VERSION = '1.006';
 
     # Load early if in a forking environment and we have
     # prefork, or at run-time if not.
@@ -147,5 +147,11 @@ is not installed, L<File::HomeDir> will fall back to L<File::HomeDir::Darwin>.
   $pics    = File::HomeDir->my_pictures;  # /Users/mylogin/Pictures
   $videos  = File::HomeDir->my_videos;    # /Users/mylogin/Movies
   $data    = File::HomeDir->my_data;      # /Users/mylogin/Library/Application Support
+
+=head1 COPYRIGHT
+
+Copyright 2009 - 2011 Adam Kennedy.
+
+Copyright 2017 - 2020 Jens Rehsack
 
 =cut

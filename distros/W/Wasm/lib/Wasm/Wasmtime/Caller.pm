@@ -13,7 +13,7 @@ $ffi_prefix = 'wasmtime_caller_';
 $ffi->load_custom_type('::PtrObject' => 'wasmtime_caller_t' => __PACKAGE__);
 
 # ABSTRACT: Wasmtime caller interface
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 our @callers;
@@ -54,7 +54,7 @@ Wasm::Wasmtime::Caller - Wasmtime caller interface
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

@@ -14,7 +14,7 @@
 package Acme::PM::Berlin::Meetings;
 
 use strict;
-our $VERSION = '202008.24';
+our $VERSION = '202009.26';
 
 use Exporter 'import'; # needs Exporter 5.57
 our @EXPORT = qw(next_meeting);
@@ -49,6 +49,17 @@ sub next_meeting_dt {
 	    return $dt_aug_2020;
 	} elsif ($dt_berlin >= $dt_aug_2020 && $dt_berlin < $dt_aug_2020_until) {
 	    $dt_berlin = $dt_aug_2020_until;
+	}
+    }
+    {
+	# September 2020 (last Wed, 19h -> pre-last Wed, 18h)
+	my $dt_sep_2020       = DateTime->new(year=>2020, month=>9, day=>23, hour=>18, time_zone=>"Europe/Berlin");
+	my $dt_sep_2020_from  = DateTime->new(year=>2020, month=>8, day=>25, hour=>19, time_zone=>"Europe/Berlin");
+	my $dt_sep_2020_until = DateTime->new(year=>2020, month=>9, day=>30, hour=>19, time_zone=>"Europe/Berlin");
+	if ($dt_berlin > $dt_sep_2020_from && $dt_berlin < $dt_sep_2020) {
+	    return $dt_sep_2020;
+	} elsif ($dt_berlin >= $dt_sep_2020 && $dt_berlin < $dt_sep_2020_until) {
+	    $dt_berlin = $dt_sep_2020_until;
 	}
     }
 

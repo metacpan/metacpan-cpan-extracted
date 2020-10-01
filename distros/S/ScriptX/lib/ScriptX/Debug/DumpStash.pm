@@ -1,11 +1,11 @@
 package ScriptX::Debug::DumpStash;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-03'; # DATE
+our $DATE = '2020-10-01'; # DATE
 our $DIST = 'ScriptX'; # DIST
-our $VERSION = '0.000001'; # VERSION
+our $VERSION = '0.000004'; # VERSION
 
-use parent 'ScriptX::Base';
+use parent 'ScriptX_Base';
 
 sub meta {
     return {
@@ -41,7 +41,7 @@ ScriptX::Debug::DumpStash - Dump stash
 
 =head1 VERSION
 
-This document describes version 0.000001 of ScriptX::Debug::DumpStash (from Perl distribution ScriptX), released on 2020-09-03.
+This document describes version 0.000004 of ScriptX::Debug::DumpStash (from Perl distribution ScriptX), released on 2020-10-01.
 
 =head1 DESCRIPTION
 
@@ -55,6 +55,12 @@ on the command-line perl option:
 
  -MScriptX=-Debug::DumpStash@after_run
  -MScriptX=-Debug::DumpStash@after_run@99
+
+You can also dump at more than one events, since a plugin can be added multiple
+times:
+
+ use ScriptX 'Debug::DumpStash@before_run';
+ use ScriptX 'Debug::DumpStash@after_run';
 
 =for Pod::Coverage ^(.+)$
 

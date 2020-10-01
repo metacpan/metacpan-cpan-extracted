@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION	=> 5.16.0,
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Nice-Try-*' },
-    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {
+    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },
         dynamic_config => 1,
         resources => {
@@ -41,11 +41,11 @@ my %WriteMakefileArgs = (
                 web         => 'https://git.deguest.jp/jack/Nice-Try',
                 type        => 'git',
             },
-        #    bugtracker => {
-        #        web         => undef,
-        #    },
+            bugtracker => {
+                web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=Nice-Try',
+            },
         },
-    })),
+    }) : ()),
 );
 
 WriteMakefile(%WriteMakefileArgs);

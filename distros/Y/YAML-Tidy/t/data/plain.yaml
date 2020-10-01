@@ -1,0 +1,45 @@
+# Several combinations of nested mappings and sequences
+---
+top:
+    same: a   
+     b c
+     d
+       e
+      
+    next:
+        A B
+       C
+         D E
+a:
+    b:
+        c:
+            d:
+                f
+x:  	
+    - - y
+    -   - x
+---
+- a: 1
+  b:
+    c:
+---
+ a:
+  b:
+   c:
+
+---              
+    a: b
+---
+- a
+---
+? - a
+  - b
+:
+  - c
+  - d
+---
+- - a
+  - b
+-
+  - c
+  - d

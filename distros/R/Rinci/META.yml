@@ -20,11 +20,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Rinci
   homepage: https://metacpan.org/release/Rinci
   repository: git://github.com/perlancar/perl-Rinci.git
-version: 1.1.93
+version: 1.1.95
 x_Dist_Zilla:
   perl:
-    version: '5.028002'
+    version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -96,7 +100,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.597'
+      version: '0.602'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -128,18 +132,18 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -149,9 +153,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -163,7 +167,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: '@Author::PERLANCAR/OurPkgVersion'
-      version: '0.15'
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -275,7 +279,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.082'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -289,7 +293,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
@@ -297,7 +301,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -321,9 +325,15 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/Test::Compile'
       version: '2.058'
     -
-      class: Dist::Zilla::Plugin::Test::Perl::Critic
-      name: '@Author::PERLANCAR/Test::Perl::Critic'
-      version: '3.001'
+      class: Dist::Zilla::Plugin::Test::Perl::Critic::Subset
+      config:
+        Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
+          finder:
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
+      name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
+      version: 3.001.005
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
@@ -418,6 +428,6 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.012'
 x_authority: cpan:PERLANCAR
-x_generated_by_perl: v5.28.2
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

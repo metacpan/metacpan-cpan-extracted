@@ -1,5 +1,8 @@
 Revision history for Statistics-Sampler-Multinomial
 
+0.84 20200930
+  - Add draw_with_mask and draw_n_samples_with_mask to Statistics::Sampler::Multinomial
+
 0.83 20200909
   - Modify Statistics::Sampler::Multinomial->draw method
     to match documentation (and Statistics::Sampler::Multinomial::Alias->draw)

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,14 +19,21 @@
 # cf
 #
 # http://www.cut-the-knot.org/Curriculum/Geometry/PeanoComplete.shtml
-#     Java applet, directions in 9 sub-parts
+#     applet, directions in 9 sub-parts
 #
 # math-image --path=PeanoCurve,radix=5 --all --output=numbers
 # math-image --path=PeanoCurve,radix=5 --lines
 #
-# T = 0.a1 a2 ...
-# X = 0.b1 b2 ...
-# Y = 0.c1 c2 ...
+# -----------
+# Peano:
+# T = 0.a1 a2 a3 a4 ...
+#        x  y  x  y
+#
+# X = 0.b1        b2 ...
+#       a1        a3.k(a2)
+#
+# Y = 0.c1        c2 ...
+#       a2.k(a1)  a4.k(a1,a3)
 #
 # b1=a1
 # c1 = a2 comp(a1)
@@ -48,7 +55,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -104,7 +111,7 @@ sub _UNDOCUMENTED__dxdy_list {
 #  *---  b^2-1 -- b^2 ---- b^2+b-1 = (b+1)b-1
 #  |                          |
 #  *-------
-#          |   
+#          |
 #  0 ----- b
 #
 sub _UNDOCUMENTED__dxdy_list_at_n {
@@ -151,6 +158,41 @@ sub new {
   return $self;
 }
 
+sub _n_to_xykk {
+  my ($self, $n) = @_;
+  my $radix = $self->{'radix'};
+  my $radix_minus_1 = $radix - 1;
+
+  my @ndigits = digit_split_lowtohigh($n,$radix);
+  if (scalar(@ndigits) & 1) {
+    push @ndigits, 0;            # so even number of entries
+  }
+  ### @ndigits
+
+  my $xk = 0;
+  my $yk = 0;
+  my @ydigits;
+  my @xdigits;
+
+  for (my $i = $#ndigits >> 1; @ndigits; $i--) {    # high to low
+    ### $i
+    {
+      my $ndigit = pop @ndigits;  # high to low
+      $xk ^= $ndigit;
+      $ydigits[$i] = ($yk & 1 ? $radix_minus_1-$ndigit : $ndigit);
+    }
+    {
+      my $ndigit = pop @ndigits;
+      $yk ^= $ndigit;
+      $xdigits[$i] = ($xk & 1 ? $radix_minus_1-$ndigit : $ndigit);
+    }
+  }
+  my $zero = $n*0;
+  return ((map {digit_join_lowtohigh($_, $radix, $zero)} \@xdigits, \@ydigits),
+          $xk,$yk);
+}
+
+
 sub n_to_xy {
   my ($self, $n) = @_;
   ### PeanoCurve n_to_xy(): $n
@@ -178,93 +220,20 @@ sub n_to_xy {
     $n = $int; # BigFloat int() gives BigInt, use that
   }
 
-  my $radix = $self->{'radix'};
-  my @ndigits = digit_split_lowtohigh($n,$radix)
-    or return (0,0);
-
-  # high to low style
-  #
-  my $radix_minus_1 = $radix - 1;
-  my $xk = 0;
-  my $yk = 0;
-  my @ydigits;
-  my @xdigits;
-
-  $#ndigits |= 1;      # ensure even number of entries
-  $ndigits[-1] ||= 0;  # possible 0 as extra high digit
-  ### @ndigits
-
-  foreach my $i (reverse 0 .. ($#ndigits >> 1)) {
-    ### $i
-    {
-      my $ndigit = pop @ndigits;  # high to low
-      $xk ^= $ndigit;
-      $ydigits[$i] = ($yk & 1 ? $radix_minus_1-$ndigit : $ndigit);
-    }
-    @ndigits || last;
-    {
-      my $ndigit = pop @ndigits;
-      $yk ^= $ndigit;
-      $xdigits[$i] = ($xk & 1 ? $radix_minus_1-$ndigit : $ndigit);
-    }
-  }
-
-  ### @xdigits
-  ### @ydigits
-  my $zero = ($n * 0);  # inherit bignum 0
-  return (digit_join_lowtohigh(\@xdigits, $radix, $zero),
-          digit_join_lowtohigh(\@ydigits, $radix, $zero));
-
-
-
-  # low to high style
-  #
-  # my $x = my $y = ($n * 0);  # inherit bignum 0
-  # my $power = 1 + $x;        # inherit bignum 1
-  #
-  # while (@ndigits) {   # N digits low to high
-  #   ### $power
-  #   {
-  #     my $ndigit = shift @ndigits;  # low to high
-  #     if ($ndigit & 1) {
-  #       $y = $power-1 - $y;   # 99..99 - Y
-  #     }
-  #     $x += $power * $ndigit;
-  #   }
-  #   @ndigits || last;
-  #   {
-  #     my $ndigit = shift @ndigits;  # low to high
-  #     $y += $power * $ndigit;
-  #     $power *= $radix;
-  #
-  #     if ($ndigit & 1) {
-  #       $x = $power-1 - $x;
-  #     }
-  #   }
-  # }
-  # return ($x, $y);
+  my ($x,$y) = _n_to_xykk($self,$n);
+  return ($x,$y);
 }
 
-sub xy_to_n {
-  my ($self, $x, $y) = @_;
-  ### PeanoCurve xy_to_n(): "$x, $y"
+sub _xykk_to_n {
+  my ($self, $x,$y, $offset_xk,$offset_yk) = @_;
+  ### PeanoCurve _xykk_to_n(): "$x, $y offset $offset_xk,$offset_yk"
 
-  $x = round_nearest ($x);
-  $y = round_nearest ($y);
-
-  if ($x < 0 || $y < 0) {
-    return undef;
-  }
-  if (is_infinite($x)) {
-    return $x;
-  }
-  if (is_infinite($y)) {
-    return $y;
+  if (($offset_xk    && ($x-=$offset_xk) < 0)
+      || ($offset_yk && ($y-=$offset_yk) < 0)) {
+    return;    # offset goes negative
   }
 
   my $radix = $self->{'radix'};
-  my $zero = ($x * 0 * $y);  # inherit bignum 0
-
   my @x = digit_split_lowtohigh ($x, $radix);
   my @y = digit_split_lowtohigh ($y, $radix);
 
@@ -294,7 +263,27 @@ sub xy_to_n {
       $yk ^= $digit;
     }
   }
-  return digit_join_lowtohigh (\@n, $radix, $zero);
+  ### final n: @n
+  ### final xkyk: ($xk&1).' '.($yk&1)
+  return ((! defined $offset_xk    || ($xk&1) == $offset_xk)
+          && (! defined $offset_yk || ($yk&1) == $offset_yk)
+          ? (digit_join_lowtohigh (\@n, $radix,
+                                   $x*0*$y))  # inherit bignum 0
+          : ());
+}
+
+sub xy_to_n {
+  my ($self, $x, $y) = @_;
+  ### PeanoCurve xy_to_n(): "$x, $y"
+
+  $x = round_nearest ($x);
+  $y = round_nearest ($y);
+
+  if ($x < 0 || $y < 0) { return undef; }
+  if (is_infinite($x)) { return $x; }
+  if (is_infinite($y)) { return $y; }
+
+  return _xykk_to_n($self, $x,$y);
 }
 
 # exact
@@ -428,7 +417,6 @@ use Math::PlanePath::ZOrderCurve;
 1;
 __END__
 
-
 #    +--+
 #    |  |
 # +--+--+--+
@@ -449,8 +437,9 @@ __END__
 #          |
 #          +
 
+#-----
 
-=for stopwords Guiseppe Peano Peano's there'll eg Sur Une Courbe Qui Remplit Toute Aire Mathematische Annalen Ryde OEIS trit-twiddling ie bignums prepending trit Math-PlanePath versa Online Radix radix Georg representable Mephisto DOI bitwise
+=for stopwords Giuseppe Peano Peano's there'll eg Sur Une Courbe Qui Remplit Toute Aire Mathematische Annalen Ryde OEIS trit-twiddling ie bignums prepending trit Math-PlanePath versa Online Radix radix Georg representable Mephisto DOI bitwise PeanoDiagonals
 
 =head1 NAME
 
@@ -467,15 +456,16 @@ Math::PlanePath::PeanoCurve -- 3x3 self-similar quadrant traversal
 
 =head1 DESCRIPTION
 
-X<Peano, Guiseppe>This path is an integer version of the curve described by
-Peano for filling a unit square,
+This path is an integer version of the curve described by Peano for filling
+a unit square,
 
 =over
 
-Guiseppe Peano, "Sur Une Courbe, Qui Remplit Toute Une Aire Plane",
-Mathematische Annalen, volume 36, number 1, 1890, p157-160.  DOI
-10.1007/BF01199438.
-L<http://www.springerlink.com/content/w232301n53960133/>
+Giuseppe Peano, "Sur Une Courbe, Qui Remplit Toute Une Aire Plane",
+Mathematische Annalen, volume 36, number 1, 1890, pages 157-160.
+DOI 10.1007/BF01199438.
+L<https://eudml.org/doc/157489>,
+L<https://link.springer.com/article/10.1007/BF01199438>
 
 =back
 
@@ -587,9 +577,9 @@ bigger groupings there's various ways.
 
 Peano's original form was for filling a unit square by mapping a number T in
 the range 0E<lt>TE<lt>1 to a pair of X,Y coordinates 0E<lt>XE<lt>1 and
-0E<lt>YE<lt>1.  The curve is continuous and every such X,Y is reached, so it
-fills the unit square.  A unit cube or higher dimension can be filled
-similarly by developing three or more coordinates X,Y,Z, etc.  Georg Cantor
+0E<lt>YE<lt>1.  The curve is continuous and every such X,Y is reached by
+some T, so it fills the unit square.  A unit cube or higher dimension can be
+filled similarly by developing three or more coordinates X,Y,Z, etc.  Cantor
 had shown a line is equivalent to the plane, Peano's mapping is a continuous
 way to do that.
 
@@ -600,75 +590,8 @@ the first ternary digit).  Note that if T is a binary floating point then a
 power of 3 division will round off in general since 1/3 is not exactly
 representable.  (See C<HilbertCurve> or C<ZOrderCurve> for binary mappings.)
 
-=head2 Diagonal Lines
-
-Moore in
-
-=over
-
-X<Moore, Eliakim Hastings>E. H. Moore, "On Certain Crinkly
-Curves", Trans. Am. Math. Soc., volume 1, number 1, 1900, pages 72-90.
-
-L<http://www.ams.org/journals/tran/1900-001-01/S0002-9947-1900-1500526-4/>
-L<http://www.ams.org/tran/1900-001-01/S0002-9947-1900-1500526-4/S0002-9947-1900-1500526-4.pdf>
-
-L<http://www.ams.org/journals/tran/1900-001-04/S0002-9947-1900-1500428-3/>
-L<http://www.ams.org/journals/tran/1900-001-04/S0002-9947-1900-1500428-3/S0002-9947-1900-1500428-3.pdf>
-
-=back
-
-draws the curve as a base shape
-
-         +-----+
-         |     |
-    -----+-----+-----
-         |     |
-         +-----+
-
-with each line segment replaced by the same for the next level (with
-suitable mirror image in odd segments).
-
-The is equivalent to the square form by drawing diagonal lines alternately
-in the direction of the leading diagonal or opposite diagonal, per the ".."
-marked lines in the following.
-
-    +--------+--------+--------+        +--------+--------+--------+
-    |     .. | ..     |     .. |        |        |        |        |
-    |6  ..   |7  ..   |8  ..   |        |    6--------7--------8   |
-    | ..     |     .. | ..     |        |    |   |        |        |
-    +--------+--------+--------+        +----|---+--------+--------+
-    | ..     |     .. | ..     |        |    |   |        |        |
-    |   ..  5|   ..  4|   ..  3|        |    5--------4--------3   |
-    |     .. | ..     |     .. |        |        |        |    |   |
-    +--------+--------+--------+        +--------+--------+----|---+
-    |     .. | ..     |     .. |        |        |        |    |   |
-    |0  ..   |1  ..   |2  ..   |        |    0--------1--------2   |
-    | ..     |     .. | ..     |        |        |        |        |
-    +--------+--------+--------+        +--------+--------+--------+
-
-    X==Y mod 2 "even" points leading-diagonal  "/"
-    X!=Y mod 2 "odd"  points opposite-diagonal "\"
-
-Rounding off the corners of the diagonal form so they don't touch can help
-show the equivalence,
-
-=cut
-
-# cf Math::PlanePath::PeanoRounded ... if finished
-
-=pod
-
-      -----7        /
-     /      \      /
-    6        -----8
-    |
-    |        4-----
-     \      /      \
-      5-----        3
-                    |
-      -----1        |
-     /      \      /
-    0        -----2
+Sometimes the curve is drawn with line segments crossing unit squares.  See
+PeanoDiagonals for that sort of path.
 
 =head2 Power of 3 Patterns
 
@@ -734,20 +657,20 @@ default is ternary C<radix =E<gt> 3>.
 Return the X,Y coordinates of point number C<$n> on the path.  Points begin
 at 0 and if C<$n E<lt> 0> then the return is an empty list.
 
-Fractional positions give an X,Y position along a straight line between the
+Fractional C<$n> give an X,Y position along a straight line between the
 integer positions.  Integer positions are always just 1 apart either
 horizontally or vertically, so the effect is that the fraction part appears
 either added to or subtracted from X or Y.
 
 =item C<$n = $path-E<gt>xy_to_n ($x,$y)>
 
-Return an integer point number for coordinates C<$x,$y>.  Each integer N is
+Return the integer point number for coordinates C<$x,$y>.  Each integer N is
 considered the centre of a unit square and an C<$x,$y> within that square
 returns N.
 
 =item C<($n_lo, $n_hi) = $path-E<gt>rect_to_n_range ($x1,$y1, $x2,$y2)>
 
-Return a range of N values which occur in a rectangle with corners at
+Return the range of N values which occur the a rectangle with corners at
 C<$x1>,C<$y1> and C<$x2>,C<$y2>.  If the X,Y values are not integers then
 the curve is treated as unit squares centred on each integer point and
 squares which are partly covered by the given rectangle are included.
@@ -772,14 +695,14 @@ Return C<(0, $radix**(2*$level) - 1)>.
 =head2 N to X,Y
 
 Peano's calculation is based on putting base-3 digits of N alternately to X
-or Y.  From the high end of N a digit is appended to Y then the next
-appended to X.  Beginning at an even digit position in N makes the last
-digit go to X so the first N=0,1,2 goes along the X axis.
+or Y.  From the high end of N, a digit goes to Y then the next goes to X.
+Beginning at an even digit position in N makes the last digit go to X so the
+first N=0,1,2 is along the X axis.
 
 At each stage a "complement" state is maintained for X and for Y.  When
-complemented the digit is reversed to S<2 - digit>, so 0,1,2 becomes 2,1,0.
-This reverses the direction so points like N=12,13,14 shown above go to the
-left, or groups like 9,10,11 then 12,13,14 then 15,16,17 go downwards.
+complemented, the digit is reversed to S<2 - digit>, so 0,1,2 becomes 2,1,0.
+This reverses the direction so points like N=12,13,14 shown above go
+leftwards, or groups like 9,10,11 then 12,13,14 then 15,16,17 go downwards.
 
 The complement is calculated by adding the digits from N which went to the
 other one of X or Y.  So the X complement is the sum of digits which have
@@ -788,46 +711,154 @@ to X.  If the complement sum is odd then the reversal is done.  A bitwise
 XOR can be used instead of a sum to accumulate odd/even-ness the same way as
 a sum.
 
-When forming the complement state the original digits from N are added,
+When forming the complement state, the original digits from N are added,
 before applying any complementing for putting them to X or Y.  If the radix
 is odd, like the default 3, then complementing doesn't change it mod 2 so
-either before or after is fine, but if the radix is even then it's not the
+before or after are the same, but if the radix is even then it's not the
 same.
 
 It also works to take the base-3 digits of N from low to high, generating
-low to high digits in X and Y.  When an odd digit is put to X then the low
+low to high digits in X and Y.  If an odd digit is put to X then the low
 digits of Y so far must be complemented as S<22..22 - Y> (the 22..22 value
 being all 2s in base 3, ie. 3^k-1).  Conversely if an odd digit is put to Y
-then X must be complemented.  With this approach the high digit position in
-N doesn't have to be found, but instead peel off digits of N from the low
-end.  But the subtract to complement is then more work if using bignums.
+then X must be complemented.  With this approach, the high digit position in
+N doesn't have to be found, just peel off digits of N from the low end.  But
+the subtract to complement is then more work if using bignums.
 
 =head2 X,Y to N
 
 The X,Y to N calculation can be done by an inverse of either the high to low
 or low to high methods above.  In both cases digits are put alternately from
-X and Y onto N, with complement as necessary.
+X and Y into N, with complement as necessary.
 
-For the low to high approach it's not easy to complement just the X digits
+For the low to high approach, it's not easy to complement just the X digits
 in the N constructed so far, but it works to build and complement the X and
 Y digits separately then at the end interleave to make the final N.
 Complementing is the ternary equivalent of an XOR in binary.  On a ternary
-machine some trit-twiddling could no doubt do it.
+machine maybe some trit-twiddling would do it.
 
-For the low to high with even radix the complementing is also tricky since
+For low to high with even radix, the complementing is also tricky since
 changing the accumulated X affects the digits of Y below that, and vice
 versa.  What's the rule?  Is it alternate digits which end up complemented?
 In any case the current C<xy_to_n()> code goes high to low which is easier,
 but means breaking the X,Y inputs into arrays of digits before beginning.
 
+=pod
+
+=head2 N on Axes
+
+N on the X axis is all Y digits 0 in the X,Y to N described above.  This
+means N is the digits of X, and then digit 0 or 2 at each Y position
+according to odd or even sum of X digits above.  The Y digits are at odd
+positions so the 0 or 2 ternary is 0 or 6 for N in base-9.
+
+    N on X axis = 0,1,2, 15,16,17, 18,19,20, 141, ...   (A163480)
+          ternary 0,1,2, 120,121,122, 200,201,202, 12020
+
+=cut
+
+# GP-DEFINE  to_ternary(n) = fromdigits(digits(n,3));
+# GP-DEFINE  to_base9(n) = fromdigits(digits(n,9));
+#
+# GP-DEFINE  \\ similar in PeanoCurve-oeis.t
+# GP-DEFINE  N_on_X_axis(x) = {
+# GP-DEFINE    my(v=digits(x,3),s=Mod(0,2));
+# GP-DEFINE    for(i=1,#v, if(s,v[i]+=6); s+=v[i]);
+# GP-DEFINE    fromdigits(v,9);
+# GP-DEFINE  }
+# GP-Test  vector(10,x,x--; N_on_X_axis(x)) == \
+# GP-Test    [0,1,2, 15,16,17, 18,19,20, 141]
+# GP-Test  vector(10,x,x--; to_ternary(N_on_X_axis(x))) == \
+# GP-Test    [0,1,2, 120,121,122, 200,201,202, 12020]
+# not in OEIS: 1,2, 120,121,122, 200,201,202, 12020    \\ X in base 3
+# vector(10,x, to_base9(N_on_X_axis(x)))
+# not in OEIS: 1, 2, 16, 17, 18, 20, 21, 22, 166, 167  \\ N in base 9
+#
+# my(v=OEIS_samples("A163480")); vector(#v,x,x--; N_on_X_axis(x)) == v
+# GP-Test  vector(3^6,x,x--; N_on_X_axis(3*x)) == \
+# GP-Test  vector(3^6,x,x--; 9*N_on_X_axis(x) + if(x%2,6))
+# GP-Test  matrix(3^6,3,x,r,x--;r--; N_on_X_axis(3*x+r)) == \
+# GP-Test  matrix(3^6,3,x,r,x--;r--; 9*N_on_X_axis(x) + r + if(x%2==1,6))
+
+=pod
+
+The Y axis is similar but the X digits are at even positions.
+
+    N on Y axis = 0,5,6, 47,48,53, 54,59,60, 425, ...   (A163481)
+          ternary 0,12,20, 1202,1210,1222, 2000,2012,2020, 120202
+
+=cut
+
+# GP-DEFINE  \\ similar in PeanoCurve-oeis.t
+# GP-DEFINE  N_on_Y_axis(y) = {
+# GP-DEFINE    my(v=digits(y,3),s=Mod(0,2));
+# GP-DEFINE    for(i=1,#v, s+=v[i]; v[i] = 3*v[i]+if(s,2));
+# GP-DEFINE    fromdigits(v,9);
+# GP-DEFINE  }
+# GP-Test  vector(10,y,y--; N_on_Y_axis(y)) == \
+# GP-Test    [0,5,6, 47,48,53, 54,59,60, 425]
+# GP-Test  vector(10,y,y--; to_ternary(N_on_Y_axis(y))) == \
+# GP-Test    [0,12,20, 1202,1210,1222, 2000,2012,2020, 120202]
+# not in OEIS: 12,20, 1202,1210,1222, 2000,2012,2020, 120202
+# vector(10,x, to_base9(N_on_Y_axis(x)))
+# not in OEIS: 5, 6, 52, 53, 58, 60, 65, 66, 522, 523
+# my(v=OEIS_samples("A163481")); vector(#v,y,y--; N_on_Y_axis(y)) == v
+
+=pod
+
+N on the X=Y diagonal has the ternary digits of position d go to both X and
+Y and so both complemented according to sum of digits of d above.  That
+transformation within d is the ternary reflected Gray code.
+
+    Gray3(d) = ternary flip 0<->2 when sum of digits above is odd
+             = 0,1,2, 5,4,3, 6,7,8, 17, ...          (A128173)
+       ternary 0,1,2, 12,11,10, 20,21,22, 122, ...
+
+    N on X=Y diag = ternary Gray3(d) and 0,1,2 -> 0,4,8 base9,
+                                         which is 4*digit
+                  = 0,4,8, 44,40,36, 72,76,80, 404, ...  (A163343)
+            ternary 0,11,22, 1122,1111,1100, 2200,2211,2222, 112222,
+
+=cut
+
+# GP-DEFINE  Gray3(d) = {
+# GP-DEFINE    my(v=digits(d,3),s=Mod(0,2));
+# GP-DEFINE    for(i=1,#v, if(s,v[i]=2-v[i]); s+=v[i]);
+# GP-DEFINE    fromdigits(v,3);
+# GP-DEFINE  }
+# GP-Test  vector(10,d,d--; Gray3(d)) == \
+# GP-Test    [0,1,2, 5,4,3, 6,7,8, 17]
+# GP-Test  vector(10,d,d--; to_ternary(Gray3(d))) == \
+# GP-Test    [0,1,2, 12,11,10, 20,21,22, 122]
+# not in OEIS: 1,2, 12,11,10, 20,21,22, 122
+#
+# GP-DEFINE  N_on_XY_diagonal(d) = {
+# GP-DEFINE    my(v=digits(Gray3(d),3));
+# GP-DEFINE    v*=4;
+# GP-DEFINE    fromdigits(v,9);
+# GP-DEFINE  }
+# GP-Test  vector(10,d,d--; N_on_XY_diagonal(d)) == \
+# GP-Test    [0,4,8, 44,40,36, 72,76,80, 404]
+# GP-Test  vector(10,d,d--; to_ternary(N_on_XY_diagonal(d))) == \
+# GP-Test    [0,11,22, 1122,1111,1100, 2200,2211,2222, 112222]
+# not in OEIS: 12,20, 1202,1210,1222, 2000,2012,2020, 120202
+# vector(10,d, to_base9(N_on_XY_diagonal(d)))  \\ is 4*to_ternary(Gray3)
+# not in OEIS: 4, 8, 48, 44, 40, 80, 84, 88, 488, 484
+
+=pod
+
 =head2 N to abs(dX),abs(dY)
 
-The curve goes horizontally or vertically according to the number of trailing "2" digits when N is written in ternary,
+The curve goes horizontally or vertically according to the number of
+trailing "2" digits when N is written in ternary,
 
     N trailing 2s   direction     abs(dX)     abs(dY)
-    -------------   ---------     -------
-      even          horizontal       1          0
-      odd           vertical         0          1
+    -------------   ---------     -------     -------
+      even          horizontal       1           0
+      odd           vertical         0           1
+
+    abs(dX) = 1,1,0, 1,1,0, 1,1,1, 1,1,0, 1,1,0, 1,1,1, ...  (A014578)
+    abs(dY) = 0,0,1, 0,0,1, 0,0,0, 0,0,1, 0,0,1, 0,0,0, ...  (A182581)
 
 For example N=5 is "12" in ternary has 1 trailing "2" which is odd so the
 step from N=5 to N=6 is vertical.
@@ -839,6 +870,19 @@ Y so odd or even trailing 2s put that carry into an X digit or Y digit.
           X Y X Y X
     N   ... 2 2 2 2
     N+1   1 0 0 0 0  carry propagates
+
+=cut
+
+# GP-DEFINE  count_low_2s(n) = valuation(n+1,3);
+# GP-DEFINE  N_is_horizontal(N) = count_low_2s(N) % 2 == 0;
+# GP-DEFINE  N_is_vertical(N)   = count_low_2s(N) % 2 == 1;
+# GP-Test  vector(18,N,N--; N_is_horizontal(N)) == \
+# GP-Test    [1,1,0, 1,1,0, 1,1,1, 1,1,0, 1,1,0, 1,1,1]
+# GP-Test  vector(18,N,N--; N_is_vertical(N)) == \
+# GP-Test    [0,0,1, 0,0,1, 0,0,0, 0,0,1, 0,0,1, 0,0,0]
+# vector(100,N, N_is_vertical(N))
+
+=pod
 
 =head2 Rectangle to N Range
 
@@ -883,11 +927,9 @@ L<http://oeis.org/A163528> (etc)
     A163532    dX, change in X -1,0,1
     A163533    dY, change in Y -1,0,1
     A014578    abs(dX) from n-1 to n, 1=horiz 0=vertical
-                 thue-morse count low 0-bits + 1 mod 2
     A182581    abs(dY) from n-1 to n, 0=horiz 1=vertical
-                 thue-morse count low 0-bits mod 2
-    A163534    direction of each step (up,down,left,right)
-    A163535    direction, transposed X,Y
+    A163534    direction mod 4 of each step (ENWS)
+    A163535    direction mod 4, transposed X,Y
     A163536    turn 0=straight,1=right,2=left
     A163537    turn, transposed X,Y
     A163342    diagonal sums
@@ -900,8 +942,7 @@ L<http://oeis.org/A163528> (etc)
     A007417    N+1 of positions of horizontals, ternary even trailing 0s
     A145204    N+1 of positions of verticals, ternary odd trailing 0s
 
-    A163332    Peano N -> ZOrder radix=3 N mapping
-                 and vice versa since is self-inverse
+    A163332    Peano N <-> ZOrder radix=3 N mapping (self-inverse)
     A163333    with ternary digit swaps before and after
 
 And taking X,Y points by the Diagonals sequence, then the value of the
@@ -929,6 +970,7 @@ then asking what N the Diagonals would put there.
 =head1 SEE ALSO
 
 L<Math::PlanePath>,
+L<Math::PlanePath::PeanoDiagonals>,
 L<Math::PlanePath::HilbertCurve>,
 L<Math::PlanePath::ZOrderCurve>,
 L<Math::PlanePath::AR2W2Curve>,
@@ -945,7 +987,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Object;
-$Net::Amazon::S3::Client::Object::VERSION = '0.91';
+$Net::Amazon::S3::Client::Object::VERSION = '0.94';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use DateTime::Format::HTTP;
@@ -14,9 +14,10 @@ use Ref::Util ();
 
 # ABSTRACT: An easy-to-use Amazon S3 client object
 
-enum 'AclShort' =>
-    # Current list at https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
-    [ qw(private public-read public-read-write aws-exec-read authenticated-read bucket-owner-read bucket-owner-full-control log-delivery-write ) ];
+use Net::Amazon::S3::Constraint::ACL::Canned;
+
+with 'Net::Amazon::S3::Role::ACL';
+
 enum 'StorageClass' =>
     # Current list at https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html#AmazonS3-PutObject-request-header-StorageClass
     [ qw(standard reduced_redundancy standard_ia onezone_ia intelligent_tiering glacier deep_archive) ];
@@ -33,8 +34,6 @@ has 'last_modified' =>
 has 'last_modified_raw' =>
     ( is => 'ro', isa => 'Str', required => 0 );
 has 'expires' => ( is => 'rw', isa => DateTime, coerce => 1, required => 0 );
-has 'acl_short' =>
-    ( is => 'ro', isa => 'AclShort', required => 0, default => 'private' );
 has 'content_type' => (
     is       => 'ro',
     isa      => 'Str',
@@ -84,38 +83,34 @@ __PACKAGE__->meta->make_immutable;
 sub exists {
     my $self = shift;
 
-    my $http_request = Net::Amazon::S3::Request::GetObject->new(
-        s3     => $self->client->s3,
-        bucket => $self->bucket->name,
-        key    => $self->key,
-        method => 'HEAD',
-    )->http_request;
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Fetch',
 
-    my $http_response = $self->client->_send_request_raw($http_request);
-    return $http_response->code == 200 ? 1 : 0;
+        method => 'HEAD',
+    );
+
+    return $response->is_success;
 }
 
 sub _get {
     my $self = shift;
 
-    my $http_request = Net::Amazon::S3::Request::GetObject->new(
-        s3     => $self->client->s3,
-        bucket => $self->bucket->name,
-        key    => $self->key,
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Fetch',
+
         method => 'GET',
-    )->http_request;
+    );
 
-    my $http_response = $self->client->_send_request($http_request);
-    my $content       = $http_response->content;
-    $self->_load_user_metadata($http_response);
+    $self->_load_user_metadata ($response->http_response);
 
-    my $etag = $self->etag || $self->_etag($http_response);
-    unless ($self->_is_multipart_etag($etag)) {
-        my $md5_hex = md5_hex($content);
+    my $etag = $self->etag || $response->etag;
+    unless ($self->_is_multipart_etag ($etag)) {
+		my $content = $response->content;
+        my $md5_hex = md5_hex ($content);
         confess 'Corrupted download' if $etag ne $md5_hex;
     }
 
-    return $http_response;
+    return $response;
 }
 
 sub get {
@@ -131,35 +126,31 @@ sub get_decoded {
 sub get_callback {
     my ( $self, $callback ) = @_;
 
-    my $http_request = Net::Amazon::S3::Request::GetObject->new(
-        s3     => $self->client->s3,
-        bucket => $self->bucket->name,
-        key    => $self->key,
+    my $response = $self->__perform_operation (
+        response_class => 'Net::Amazon::S3::Operation::Object::Fetch::Response',
+        request_class  => 'Net::Amazon::S3::Operation::Object::Fetch::Request',
+        filename       => $callback,
+
         method => 'GET',
-    )->http_request;
+    );
 
-    my $http_response
-        = $self->client->_send_request( $http_request, $callback );
-
-    return $http_response;
+    return $response->http_response;
 }
 
 sub get_filename {
     my ( $self, $filename ) = @_;
 
-    my $http_request = Net::Amazon::S3::Request::GetObject->new(
-        s3     => $self->client->s3,
-        bucket => $self->bucket->name,
-        key    => $self->key,
+    my $response = $self->__perform_operation (
+        response_class => 'Net::Amazon::S3::Operation::Object::Fetch::Response',
+        request_class  => 'Net::Amazon::S3::Operation::Object::Fetch::Request',
+        filename       => $filename,
+
         method => 'GET',
-    )->http_request;
+    );
 
-    my $http_response
-        = $self->client->_send_request( $http_request, $filename );
+    $self->_load_user_metadata($response->http_response);
 
-    $self->_load_user_metadata($http_response);
-
-    my $etag = $self->etag || $self->_etag($http_response);
+    my $etag = $self->etag || $response->etag;
     unless ($self->_is_multipart_etag($etag)) {
         my $md5_hex = file_md5_hex($filename);
         confess 'Corrupted download' if $etag ne $md5_hex;
@@ -218,20 +209,21 @@ sub _put {
     $conf->{"x-amz-meta-\L$_"} = $self->user_metadata->{$_}
         for keys %{ $self->user_metadata };
 
-    my $http_request = Net::Amazon::S3::Request::PutObject->new(
-        s3         => $self->client->s3,
-        bucket     => $self->bucket->name,
-        key        => $self->key,
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Add',
+
         value      => $value,
         headers    => $conf,
-        acl_short  => $self->acl_short,
+        acl        => $self->acl,
         encryption => $self->encryption,
-    )->http_request;
+    );
 
-    my $http_response = $self->client->_send_request($http_request);
+    my $http_response = $response->http_response;
 
     confess 'Error uploading ' . $http_response->as_string
-        if $http_response->code != 200;
+        unless $http_response->is_success;
+
+	return '';
 }
 
 sub put_filename {
@@ -250,31 +242,69 @@ sub put_filename {
 sub delete {
     my $self = shift;
 
-    my $http_request = Net::Amazon::S3::Request::DeleteObject->new(
-        s3     => $self->client->s3,
-        bucket => $self->bucket->name,
-        key    => $self->key,
-    )->http_request;
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Delete',
+    );
 
-    $self->client->_send_request($http_request);
+    return $response->is_success;
+}
+
+sub set_acl {
+	my ($self, %params) = @_;
+
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Acl::Set',
+		%params,
+	);
+
+    return $response->is_success;
+}
+
+sub add_tags {
+	my ($self, %params) = @_;
+
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Tags::Add',
+		%params,
+	);
+
+    return $response->is_success;
+}
+
+sub delete_tags {
+    my ($self, %params) = @_;
+
+    my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Tags::Delete',
+
+		(version_id => $params{version_id}) x!! defined $params{version_id},
+	);
+
+    return $response->is_success;
 }
 
 sub initiate_multipart_upload {
     my $self = shift;
-    my %args = Ref::Util::is_plain_hashref($_[0]) ? %{$_[0]} : @_;
-    my $http_request = Net::Amazon::S3::Request::InitiateMultipartUpload->new(
-        s3     => $self->client->s3,
-        bucket => $self->bucket->name,
-        key    => $self->key,
-        encryption => $self->encryption,
-        ($args{headers} ? (headers => $args{headers}) : ()),
-    )->http_request;
-    my $xpc = $self->client->_send_request_xpc($http_request);
-    my $upload_id = $xpc->findvalue('//s3:UploadId');
-    confess "Couldn't get upload id from initiate_multipart_upload response XML"
-      unless $upload_id;
+    my %args = ref($_[0]) ? %{$_[0]} : @_;
 
-    return $upload_id;
+	$args{acl} = $args{acl_short} if exists $args{acl_short};
+	delete $args{acl_short};
+	$args{acl} = $self->acl unless $args{acl};
+
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Upload::Create',
+
+        encryption => $self->encryption,
+		($args{acl}       ? (acl       => $args{acl})     : ()),
+        ($args{headers}   ? (headers   => $args{headers}) : ()),
+    );
+
+    return unless $response->is_success;
+
+    confess "Couldn't get upload id from initiate_multipart_upload response XML"
+        unless $response->upload_id;
+
+    return $response->upload_id;
 }
 
 sub complete_multipart_upload {
@@ -282,14 +312,15 @@ sub complete_multipart_upload {
 
     my %args = ref($_[0]) ? %{$_[0]} : @_;
 
-    #set default args
-    $args{s3}       = $self->client->s3;
-    $args{key}      = $self->key;
-    $args{bucket}   = $self->bucket->name;
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Upload::Complete',
 
-    my $http_request =
-      Net::Amazon::S3::Request::CompleteMultipartUpload->new(%args)->http_request;
-    return $self->client->_send_request($http_request);
+        upload_id    => $args{upload_id},
+        etags        => $args{etags},
+        part_numbers => $args{part_numbers},
+    );
+
+    return $response->http_response;
 }
 
 sub abort_multipart_upload {
@@ -297,14 +328,13 @@ sub abort_multipart_upload {
 
     my %args = ref($_[0]) ? %{$_[0]} : @_;
 
-    #set default args
-    $args{s3}       = $self->client->s3;
-    $args{key}      = $self->key;
-    $args{bucket}   = $self->bucket->name;
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Upload::Abort',
 
-    my $http_request =
-      Net::Amazon::S3::Request::AbortMultipartUpload->new(%args)->http_request;
-    return $self->client->_send_request($http_request);
+        upload_id => $args{upload_id},
+    );
+
+    return $response->http_response;
 }
 
 
@@ -313,17 +343,22 @@ sub put_part {
 
     my %args = ref($_[0]) ? %{$_[0]} : @_;
 
-    #set default args
-    $args{s3}       = $self->client->s3;
-    $args{key}      = $self->key;
-    $args{bucket}   = $self->bucket->name;
     #work out content length header
     $args{headers}->{'Content-Length'} = length $args{value}
       if(defined $args{value});
 
-    my $http_request =
-      Net::Amazon::S3::Request::PutPart->new(%args)->http_request;
-    return $self->client->_send_request($http_request);
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Object::Upload::Part',
+
+        upload_id   => $args{upload_id},
+        part_number => $args{part_number},
+        acl_short   => $args{acl_short},
+        copy_source => $args{copy_source},
+        headers     => $args{headers},
+        value       => $args{value},
+    );
+
+    return $response->http_response;
 }
 
 sub list_parts {
@@ -334,7 +369,7 @@ sub list_parts {
 
 sub uri {
     my $self = shift;
-    return Net::Amazon::S3::Request::GetObject->new(
+    return Net::Amazon::S3::Operation::Object::Fetch::Request->new (
         s3     => $self->client->s3,
         bucket => $self->bucket->name,
         key    => $self->key,
@@ -344,36 +379,36 @@ sub uri {
 
 sub query_string_authentication_uri {
     my ($self, $query_form) = @_;
-    return Net::Amazon::S3::Request::GetObject->new(
+    return Net::Amazon::S3::Operation::Object::Fetch::Request->new (
         s3     => $self->client->s3,
         bucket => $self->bucket->name,
         key    => $self->key,
         method => 'GET',
-    )->query_string_authentication_uri( $self->expires->epoch, $query_form );
+    )->query_string_authentication_uri ($self->expires->epoch, $query_form);
 }
 
 sub head {
     my $self = shift;
 
-    my $http_request =
-        Net::Amazon::S3::Request::GetObject->new(
-            s3     => $self->client->s3,
-            bucket => $self->bucket->name,
-            key    => $self->key,
-            method => 'HEAD',
-        )->http_request;
+    my $http_request = Net::Amazon::S3::Operation::Object::Fetch::Request->new(
+		s3     => $self->client->s3,
+		bucket => $self->bucket->name,
+		key    => $self->key,
 
-    my $http_response = $self->client->_send_request($http_request);
+		method => 'HEAD',
+	);
+
+    my $http_response = $self->client->_send_request ($http_request)->http_response;
 
     confess 'Error head-object ' . $http_response->as_string
-        if $http_response->code != 200;
+        unless $http_response->is_success;
 
     my %metadata;
     my $headers = $http_response->headers;
     foreach my $name ($headers->header_field_names) {
-        if ($self->_is_metadata_header($name)) {
-            my $metadata_name = $self->_format_metadata_name($name);
-            $metadata{$metadata_name} = $http_response->header($name);
+        if ($self->_is_metadata_header ($name)) {
+            my $metadata_name = $self->_format_metadata_name ($name);
+           $metadata{$metadata_name} = $http_response->header ($name);
         }
     }
 
@@ -423,19 +458,18 @@ sub available {
 }
 
 sub restore {
-    my $self = shift;
-    my (%conf) = @_;
+	my $self = shift;
+	my (%conf) = @_;
 
-    my $http_request =
-        Net::Amazon::S3::Request::RestoreObject->new(
-            s3     => $self->client->s3,
-            bucket => $self->bucket->name,
-            key    => $self->key,
-            days   => $conf{days},
-            tier   => $conf{tier},
-        )->http_request;
+	my $request = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Restore',
 
-    return $self->client->_send_request($http_request);
+		key    => $self->key,
+		days   => $conf{days},
+		tier   => $conf{tier},
+	);
+
+    return $request->http_response;
 }
 
 sub _content_sub {
@@ -481,19 +515,18 @@ sub _content_sub {
     };
 }
 
-sub _etag {
-    my ( $self, $http_response ) = @_;
-    my $etag = $http_response->header('ETag');
-    if ($etag) {
-        $etag =~ s/^"//;
-        $etag =~ s/"$//;
-    }
-    return $etag;
-}
-
 sub _is_multipart_etag {
     my ( $self, $etag ) = @_;
     return 1 if($etag =~ /\-\d+$/);
+}
+
+sub _perform_operation {
+    my ($self, $operation, %params) = @_;
+
+    $self->bucket->_perform_operation ($operation => (
+        key => $self->key,
+        %params,
+    ));
 }
 
 1;
@@ -510,7 +543,7 @@ Net::Amazon::S3::Client::Object - An easy-to-use Amazon S3 client object
 
 =head1 VERSION
 
-version 0.91
+version 0.94
 
 =head1 SYNOPSIS
 
@@ -545,7 +578,7 @@ version 0.91
   # content-type of text/plain which expires on 2010-01-02
   my $object = $bucket->object(
     key          => 'this is the public key',
-    acl_short    => 'public-read',
+    acl          => Net::Amazon::S3::ACL::CANNED->PUBLIC_READ,
     content_type => 'text/plain',
     expires      => '2010-01-02',
   );
@@ -684,10 +717,12 @@ This module represents objects in buckets.
   # content-type of text/plain
   my $object = $bucket->object(
     key          => 'this is the public key',
-    acl_short    => 'public-read',
+    acl          => 'public-read',
     content_type => 'text/plain',
   );
   $object->put('this is the public value');
+
+For C<acl> refer L<Net::Amazon::S3::ACL>.
 
 You may also set Content-Encoding using C<content_encoding>, and
 Content-Disposition using C<content_disposition>.
@@ -758,11 +793,14 @@ C<user_metadata>.
 
 =head2 initiate_multipart_upload
 
-  #initiate a new multipart upload for this object
-  my $object = $bucket->object(
-    key         => 'massive_video.avi'
-  );
-  my $upload_id = $object->initiate_multipart_upload;
+	#initiate a new multipart upload for this object
+	my $object = $bucket->object(
+		key         => 'massive_video.avi',
+		acl         => ...,
+	);
+	my $upload_id = $object->initiate_multipart_upload;
+
+For description of C<acl> refer C<Net::Amazon::S3::ACL>.
 
 =head2 put_part
 
@@ -802,13 +840,32 @@ time to a hashref, with no C<x-amz-meta-> prefixes on the key names.  When
 downloading an object, the C<get>, C<get_decoded> and C<get_filename>
 ethods set the contents of C<user_metadata> to the same format.
 
+=head2 add_tags
+
+	$object->add_tags (
+		tags        => { tag1 => 'val1', tag2 => 'val2' },
+	);
+
+	$object->add_tags (
+		tags        => { tag1 => 'val1', tag2 => 'val2' },
+		version_id  => $version_id,
+	);
+
+=head2 delete_tags
+
+	$object->delete_tags;
+
+	$object->delete_tags (
+		version_id  => $version_id,
+	);
+
 =head1 AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,7 +23,7 @@
 # http://www.sciencenews.org/view/generic/id/2696/title/Prime_Spirals
 #     Ulam's spiral of primes
 #
-# http://yoyo.cc.monash.edu.au/%7Ebunyip/primes/primeSpiral.htm
+# http://web.archive.org/web/20160424015805id_/http://yoyo.cc.monash.edu.au/%7Ebunyip/primes/primeSpiral.htm
 # http://yoyo.cc.monash.edu.au/%7Ebunyip/primes/triangleUlam.htm
 #     Pulchritudinous Primes of Ulam spiral.
 
@@ -35,18 +35,18 @@
 # http://yoyo.cc.monash.edu.au/%7Ebunyip/primes/index.html
 # including image highlighting the lines
 
-# S. M. Ellerstein, The square spiral, J. Recreational
+# S. M. Ellerstein, The Square Spiral, Journal of Recreational
 # Mathematics 29 (#3, 1998) 188; 30 (#4, 1999-2000), 246-250.
 #
-# Stein, M. and Ulam, S. M. "An Observation on the
+# M. Stein and S. M. Ulam. "An Observation on the
 # Distribution of Primes." Amer. Math. Monthly 74, 43-44,
 # 1967.
 #
-# Stein, M. L.; Ulam, S. M.; and Wells, M. B. "A Visual
+# M.L. Stein; S. M. Ulam; and M. B. Wells. "A Visual
 # Display of Some Properties of the Distribution of Primes."
 # Amer. Math. Monthly 71, 516-520, 1964.
 
-# cf sides alternately prime and fibonacci
+# cf sides alternately prime and Fibonacci
 # A160790 corner N
 # A160791 side lengths, alternately integer and triangular adding that integer
 # A160792 corner N
@@ -62,7 +62,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 use Math::PlanePath::Base::NSEW;
@@ -95,7 +95,7 @@ use constant xy_is_visited => 1;
 #    2w+4 -- 2w+3 ----- w+2
 #      |                 |
 #    2w+5      0------- w+1
-#      |     
+#      |
 #    2w+6 ---
 #                  ^
 #                 X=0
@@ -495,7 +495,7 @@ sub _NOTDOCUMENTED_n_to_figure_boundary {
 __END__
 
 
-=for stopwords Stanislaw Ulam pronic PlanePath Ryde Math-PlanePath Ulam's Honaker's decagonal OEIS Nbase sqrt BigRat Nrem wl wr Nsig incrementing
+=for stopwords Stanislaw Ulam pronic PlanePath Ryde Math-PlanePath Ulam's Honaker's decagonal OEIS Nbase sqrt BigRat Nrem wl wr Nsig incrementing Oren Patashnik
 
 =head1 NAME
 
@@ -569,7 +569,7 @@ L<http://oeis.org/A143861/a143861.jpg>
 See F<examples/ulam-spiral-xpm.pl> for a standalone program, or see
 L<math-image> using this C<SquareSpiral> to draw this pattern and more.
 
-Stein, Ulam and Wells also considered primes on the
+Stein, Ulam and Wells above also considered primes on the
 L<Math::PlanePath::Corner> path, and on a half-plane like two corners.
 
 =head2 Straight Lines
@@ -581,13 +581,13 @@ half way between the squares fall on similar diagonals to the upper right
 and lower left.  The decagonal numbers 10,27,52,85 etc 4*k^2-3*k go
 horizontally to the right at Y=-1.
 
-In general straight lines and diagonals are 4*k^2 + b*k + c.  b=0 is the
+In general, straight lines and diagonals are 4*k^2 + b*k + c.  b=0 is the
 even perfect squares up to the left, then incrementing b is an eighth turn
 anti-clockwise, or clockwise if negative.  So b=1 is horizontal West, b=2
 diagonally down South-West, b=3 down South, etc.
 
 Honaker's prime-generating polynomial 4*k^2 + 4*k + 59 goes down to the
-right, after the first 30 or so values loop around a bit.
+right after the first 30 or so values loop around a bit.
 
 =head2 Wider
 
@@ -620,8 +620,8 @@ squares are still on diagonals, but the even squares go towards the bottom
 left (instead of top left when wider=0) and the odd squares to the top right
 (instead of the bottom right).
 
-Each loop is still 8 longer than the previous, as the widening is basically
-a constant amount in each loop.
+Each loop is still 8 longer than the previous, since the widening is a
+constant amount in each loop.
 
 =head2 N Start
 
@@ -638,14 +638,14 @@ start at 0,
     n_start => 0
 
     16-15-14-13-12 ...
-     |           |  | 
-    17  4--3--2 11 28 
-     |  |     |  |  | 
-    18  5  0--1 10 27 
-     |  |        |  | 
-    19  6--7--8--9 26 
-     |              | 
-    20-21-22-23-24-25 
+     |           |  |
+    17  4--3--2 11 28
+     |  |     |  |  |
+    18  5  0--1 10 27
+     |  |        |  |
+    19  6--7--8--9 26
+     |              |
+    20-21-22-23-24-25
 
 The only effect is to push the N values around by a constant amount.  It
 might help match coordinates with something else zero-based.
@@ -703,18 +703,18 @@ N=2,10,26,50,etc, If the first loop at N=2 is reckoned loop number d=1 then
 the loop starts at
 
     Nbase = 4*d^2 - 4*d + 2
-          = 2,10,26,50,... for d=1,2,3,4,... 
+          = 2,10,26,50,... for d=1,2,3,4,...
                    (A069894 but it going from d=0)
 
 For example d=3 is Nbase=4*3^2-4*3+2=26 at X=3,Y=-2.  The biggest d with
 Nbase E<lt>= N can be found by inverting with the usual quadratic formula
 
-    d = floor (1/2 + sqrt(N/4 - 1/4))
+    d = floor( 1/2 + sqrt(N/4 - 1/4) )
 
 For Perl it's good to keep the sqrt argument an integer (when a UV integer
-is bigger than an NV float, and for BigRat accuracy), so rearranging to
+is bigger than an NV float, and for BigRat accuracy), so rearrange to
 
-    d = floor ((1+sqrt(N-1)) / 2)
+    d = floor( (1+sqrt(N-1))/2 )
 
 So Nbase from this d leaves a remainder which is an offset into the loop
 
@@ -723,7 +723,7 @@ So Nbase from this d leaves a remainder which is an offset into the loop
 
 The loop starts at X=d,Y=d-1 and has sides length 2d, 2d+1, 2d+1 and 2d+2,
 
-             2d      
+             2d
          +------------+        <- Y=d
          |            |
     2d   |            |  2d-1
@@ -776,11 +776,25 @@ bottom.
     bottom    2d <= Nsig             X = -d+1+(Nsig-(2d+1)) = Nsig-3d
                                      Y = -d
 
-This calculation can be found as an exercise in Graham, Knuth and Patashnik
-"Concrete Mathematics", chapter 3 "Integer Functions", exercise 40, page 99.
-They start the spiral from 0, and vertically so their x is -Y here.  Their
-formula for x(n) tests a floor(2*sqrt(N)) to decide whether on a horizontal
-and so whether to apply the equivalent of Nrem to the result.
+This calculation can be found in
+
+=over
+
+Ronald L. Graham, Donald E. Knuth, Oren Patashnik, "Concrete Mathematics",
+Addison-Wesley, 1989, chapter 3 "Integer Functions", exercise 40 page 99,
+answer page 498.
+
+=back
+
+They start the spiral from 0, and first step North so their x is -Y here.
+Their formula for x(n) tests a floor(2*sqrt(N)) to decide whether on a
+horizontal and so whether to apply the equivalent of Nrem to the result.
+
+=cut
+
+# PDF: exercise page 113 answer page 512.
+
+=pod
 
 =head2 N to X,Y with Wider
 
@@ -802,7 +816,7 @@ position is written here as wl, and the other half wr arises too,
 The horizontal lengths increase by w, and positions shift by wl or wr, but
 the verticals are unchanged.
 
-             2d+w      
+             2d+w
          +------------+        <- Y=d
          |            |
     2d   |            |  2d-1
@@ -876,16 +890,28 @@ L<https://oeis.org/wiki/Ulam's_spiral>
     wider=0 (the default)
       A174344    X coordinate
       A274923    Y coordinate
+      A268038    negative Y
+      A296030    X,Y pairs
       A214526    abs(X)+abs(Y) "Manhattan" distance
 
       A079813    abs(dY), being k 0s followed by k 1s
+      A055086    direction (total turn)
+      A000267    direction + 1
       A063826    direction 1=right,2=up,3=left,4=down
 
       A027709    boundary length of N unit squares
       A078633    grid sticks to make N unit squares
 
+      A240025    turn 1=left,0=straight (extra initial 1)
+
       A033638    N turn positions (extra initial 1, 1)
       A172979    N turn positions which are primes too
+      A242601    X and Y location of origin then each turn,
+                   X=A242601(n+1), Y=A242601(n)
+      A080037    N straight-ahead (except initial 2)
+      A248333    num straight points among the first N
+      A083479    num non-turn points among the first N
+                   (straight and the origin)
 
       A054552    N values on X axis (East)
       A054556    N values on Y axis (North)
@@ -898,6 +924,7 @@ L<https://oeis.org/wiki/Ulam's_spiral>
       A200975    N values on all four diagonals
       A317186    N on Y axis positive and negative
       A267682    N on Y axis positive and negative (origin twice)
+      A265400    N inner neighbour
 
       A137928    N values on X=-Y+1 opposite diagonal
       A002061    N values on X=Y diagonal pos and neg
@@ -946,8 +973,7 @@ L<https://oeis.org/wiki/Ulam's_spiral>
     wider=1
       A069894    N on South-West diagonal
 
-The following have "offset 0" in the OEIS and therefore are based on
-starting from N=0.
+The following have "offset 0" S and therefore start from N=0.
 
     n_start=0
       A180714    X+Y coordinate sum
@@ -984,7 +1010,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

@@ -1,14 +1,14 @@
 package ScriptX::Run;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-03'; # DATE
+our $DATE = '2020-10-01'; # DATE
 our $DIST = 'ScriptX'; # DIST
-our $VERSION = '0.000001'; # VERSION
+our $VERSION = '0.000004'; # VERSION
 
 use strict;
 use Log::ger;
 
-use parent 'ScriptX::Base';
+use parent 'ScriptX_Base';
 
 sub meta {
     return {
@@ -87,11 +87,11 @@ ScriptX::Run - Run something (code, command) in the 'run' event
 
 =head1 VERSION
 
-This document describes version 0.000001 of ScriptX::Run (from Perl distribution ScriptX), released on 2020-09-03.
+This document describes version 0.000004 of ScriptX::Run (from Perl distribution ScriptX), released on 2020-10-01.
 
 =head1 DESCRIPTION
 
-=head1 CONFIGURATION
+=head1 SCRIPTX PLUGIN CONFIGURATION
 
 =head2 code
 

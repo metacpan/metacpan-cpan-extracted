@@ -3,6 +3,7 @@
 # Test file mode strings from Solaris /usr/ucb/ls (Berkeley compatibility).
 
 use strict;
+use warnings;
 use Test::More;
 plan tests => 4096;
 

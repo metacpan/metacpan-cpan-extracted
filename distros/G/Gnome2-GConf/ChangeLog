@@ -1,5 +1,9 @@
 2007-09-29  Torsten Schoenfeld  <tsch@cpan.org>
 
+	* GConf.pm: Post-release bump to 1.045.
+
+2007-09-29  Torsten Schoenfeld  <tsch@cpan.org>
+
 	* README:
 	* NEWS: Release 1.044.
 

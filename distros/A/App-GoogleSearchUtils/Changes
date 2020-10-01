@@ -1,3 +1,13 @@
+0.004   2020-10-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: --delay.
+
+
+0.003   2020-10-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add options: --append, --prepend.
+
+
 0.002   2020-09-22  Released-By: PERLANCAR; Urgency: medium
 
 	[cli google-search]

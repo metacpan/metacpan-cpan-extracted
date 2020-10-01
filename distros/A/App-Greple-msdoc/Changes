@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-msdoc
 
+1.04 2020-09-23T14:58:44Z
+
+    - Update to use App::optex::textconv::msdoc module.
+
 1.03 2020-09-16T19:10:06Z
 
     - Sort PowerPoint pages.

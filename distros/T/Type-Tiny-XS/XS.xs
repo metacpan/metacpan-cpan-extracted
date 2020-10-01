@@ -260,6 +260,33 @@ typetiny_tc_Str(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
 }
 
 int
+typetiny_tc_StringLike(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
+    HV *stash;
+    MAGIC *mg;
+    AMT *amtp;
+    CV **cvp;
+    
+    assert(sv);
+    
+    if ( SvOK(sv) && !SvROK(sv) && !isGV(sv) ) {
+        return TRUE;
+    }
+    
+    if ( SvAMAGIC(sv)
+    && ( stash = SvSTASH(SvRV(sv)) )
+    && Gv_AMG(stash)
+    && ( mg = mg_find((const SV*)stash, PERL_MAGIC_overload_table) )
+    && AMT_AMAGIC( amtp = (AMT*)mg->mg_ptr )
+    && ( cvp = amtp->table )
+    && cvp[0x0a]  // AMG_STRING
+    ) {
+        return TRUE;
+    }
+    
+    return FALSE;
+}
+
+int
 typetiny_tc_Enum(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
     assert(sv);
     return SvOK(sv) && !SvROK(sv) && !isGV(sv);
@@ -304,9 +331,63 @@ typetiny_tc_ArrayRef(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
 }
 
 int
+typetiny_tc_ArrayLike(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
+    HV *stash;
+    MAGIC *mg;
+    AMT *amtp;
+    CV **cvp;
+    
+    assert(sv);
+    
+    if ( IsArrayRef(sv) ) {
+        return TRUE;
+    }
+    
+    if ( SvAMAGIC(sv)
+    && ( stash = SvSTASH(SvRV(sv)) )
+    && Gv_AMG(stash)
+    && ( mg = mg_find((const SV*)stash, PERL_MAGIC_overload_table) )
+    && AMT_AMAGIC( amtp = (AMT*)mg->mg_ptr )
+    && ( cvp = amtp->table )
+    && cvp[0x02]  // AMG_TO_AV
+    ) {
+        return TRUE;
+    }
+    
+    return FALSE;
+}
+
+int
 typetiny_tc_HashRef(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
     assert(sv);
     return IsHashRef(sv);
+}
+
+int
+typetiny_tc_HashLike(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
+    HV *stash;
+    MAGIC *mg;
+    AMT *amtp;
+    CV **cvp;
+    
+    assert(sv);
+    
+    if ( IsHashRef(sv) ) {
+        return TRUE;
+    }
+    
+    if ( SvAMAGIC(sv)
+    && ( stash = SvSTASH(SvRV(sv)) )
+    && Gv_AMG(stash)
+    && ( mg = mg_find((const SV*)stash, PERL_MAGIC_overload_table) )
+    && AMT_AMAGIC( amtp = (AMT*)mg->mg_ptr )
+    && ( cvp = amtp->table )
+    && cvp[0x03]  // AMG_TO_HV
+    ) {
+        return TRUE;
+    }
+    
+    return FALSE;
 }
 
 int
@@ -325,6 +406,33 @@ int
 typetiny_tc_CodeRef(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
     assert(sv);
     return IsCodeRef(sv);
+}
+
+int
+typetiny_tc_CodeLike(pTHX_ SV* const data PERL_UNUSED_DECL, SV* const sv) {
+    HV *stash;
+    MAGIC *mg;
+    AMT *amtp;
+    CV **cvp;
+    
+    assert(sv);
+    
+    if ( IsCodeRef(sv) ) {
+        return TRUE;
+    }
+    
+    if ( SvAMAGIC(sv)
+    && ( stash = SvSTASH(SvRV(sv)) )
+    && Gv_AMG(stash)
+    && ( mg = mg_find((const SV*)stash, PERL_MAGIC_overload_table) )
+    && AMT_AMAGIC( amtp = (AMT*)mg->mg_ptr )
+    && ( cvp = amtp->table )
+    && cvp[0x05]  // AMG_TO_CV
+    ) {
+        return TRUE;
+    }
+    
+    return FALSE;
 }
 
 int
@@ -813,6 +921,7 @@ BOOT:
     DEFINE_TC(Value);
     DEFINE_TC(Ref);
     DEFINE_TC(Str);
+    DEFINE_TC(StringLike);
     DEFINE_TC(NonEmptyStr);
     DEFINE_TC(Num);
     DEFINE_TC(Int);
@@ -820,11 +929,14 @@ BOOT:
     DEFINE_TC(PositiveOrZeroInt);
     DEFINE_TC(ScalarRef);
     DEFINE_TC(ArrayRef);
+    DEFINE_TC(ArrayLike);
     DEFINE_TC(HashRef);
+    DEFINE_TC(HashLike);
     DEFINE_TC(Map);
     DEFINE_TC(Enum);
     DEFINE_TC(Tuple);
     DEFINE_TC(CodeRef);
+    DEFINE_TC(CodeLike);
     DEFINE_TC(GlobRef);
     DEFINE_TC(FileHandle);
     DEFINE_TC(RegexpRef);

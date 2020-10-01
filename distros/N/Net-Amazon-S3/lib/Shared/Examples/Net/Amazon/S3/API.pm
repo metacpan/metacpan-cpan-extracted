@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3::API;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::API::VERSION = '0.91';
+$Shared::Examples::Net::Amazon::S3::API::VERSION = '0.94';
 use strict;
 use warnings;
 
@@ -20,14 +20,18 @@ our @EXPORT_OK = (
     qw[ expect_api_bucket_acl_set ],
     qw[ expect_api_bucket_create ],
     qw[ expect_api_bucket_delete ],
-    qw[ expect_api_bucket_objects_list ],
     qw[ expect_api_bucket_objects_delete ],
+    qw[ expect_api_bucket_objects_list ],
+    qw[ expect_api_bucket_tags_add ],
+    qw[ expect_api_bucket_tags_delete ],
     qw[ expect_api_object_acl_get ],
     qw[ expect_api_object_acl_set ],
     qw[ expect_api_object_create ],
     qw[ expect_api_object_delete ],
     qw[ expect_api_object_fetch ],
     qw[ expect_api_object_head ],
+    qw[ expect_api_object_tags_add ],
+    qw[ expect_api_object_tags_delete ],
     qw[ with_fixture ],
 );
 
@@ -111,8 +115,9 @@ sub operation_bucket_acl_set {
     $self
         ->bucket ($params{with_bucket})
         ->set_acl ({
+            (acl       => $params{with_acl})       x!! exists $params{with_acl},
             (acl_short => $params{with_acl_short}) x!! exists $params{with_acl_short},
-            (acl_xml => $params{with_acl_xml}) x!! exists $params{with_acl_xml},
+            (acl_xml   => $params{with_acl_xml})   x!! exists $params{with_acl_xml},
         })
         ;
 }
@@ -123,7 +128,8 @@ sub operation_bucket_create {
     $self
         ->add_bucket ({
             bucket => $params{with_bucket},
-            (acl_short => $params{with_acl}) x!! exists $params{with_acl},
+            (acl       => $params{with_acl})       x!! exists $params{with_acl},
+            (acl_short => $params{with_acl_short}) x!! exists $params{with_acl_short},
             (location_constraint => $params{with_region}) x!! exists $params{with_region},
             (region => $params{with_region}) x!! exists $params{with_region},
         })
@@ -179,8 +185,9 @@ sub operation_object_acl_set {
         ->bucket ($params{with_bucket})
         ->set_acl ({
             key => $params{with_key},
+            (acl       => $params{with_acl})       x!! exists $params{with_acl},
             (acl_short => $params{with_acl_short}) x!! exists $params{with_acl_short},
-            (acl_xml => $params{with_acl_xml}) x!! exists $params{with_acl_xml},
+            (acl_xml   => $params{with_acl_xml})   x!! exists $params{with_acl_xml},
         })
         ;
 }
@@ -198,6 +205,8 @@ sub operation_object_create {
         qw[ content_type  ],
         qw[ encryption ],
         qw[ expires ],
+		qw[ acl_short ],
+		qw[ acl ],
         ;
 
     $headers->{x_amz_storage_class} = $params{with_storage_class}
@@ -243,6 +252,51 @@ sub operation_object_head {
         ;
 }
 
+sub operation_bucket_tags_add {
+    my ($self, %params) = @_;
+
+    $self
+        ->bucket ($params{with_bucket})
+        ->add_tags ({
+			tags => $params{with_tags},
+		})
+        ;
+}
+
+sub operation_object_tags_add {
+    my ($self, %params) = @_;
+
+    $self
+        ->bucket ($params{with_bucket})
+        ->add_tags ({
+			key  => $params{with_key},
+			tags => $params{with_tags},
+			(version_id => $params{with_version_id}) x!! defined $params{with_version_id},
+		})
+        ;
+}
+
+sub operation_bucket_tags_delete {
+    my ($self, %params) = @_;
+
+    $self
+        ->bucket ($params{with_bucket})
+        ->delete_tags
+        ;
+}
+
+sub operation_object_tags_delete {
+    my ($self, %params) = @_;
+
+    $self
+        ->bucket ($params{with_bucket})
+        ->delete_tags ({
+			key  => $params{with_key},
+			(version_id => $params{with_version_id}) x!! defined $params{with_version_id},
+		})
+        ;
+}
+
 1;
 
 __END__
@@ -257,15 +311,15 @@ Shared::Examples::Net::Amazon::S3::API - used for testing and as example
 
 =head1 VERSION
 
-version 0.91
+version 0.94
 
 =head1 AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

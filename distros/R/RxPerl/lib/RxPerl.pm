@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v0.27.1";
+our $VERSION = "v6.0.1";
 
 1;
 __END__
@@ -26,81 +26,40 @@ RxPerl - an implementation of Reactive Extensions / rxjs for Perl
 
 =head1 SYNOPSIS
 
-=pod
+    # one of...:
 
-    use RxPerl::AnyEvent ':all';
-    use AnyEvent;
+    > cpanm RxPerl::AnyEvent
+    > cpanm RxPerl::IOAsync
+    > cpanm RxPerl::Mojo
 
-    sub make_observer ($i) {
-        return {
-            next     => sub {say "next #$i: ", $_[0]},
-            error    => sub {say "error #$i: ", $_[0]},
-            complete => sub {say "complete #$i"},
-        };
-    }
 
-    my $o = rx_interval(0.7)->pipe(
-        op_map(sub {$_[0] * 2}),
-        op_take_until( rx_timer(5) ),
-    );
+    # ..and then (if installed RxPerl::Mojo, for example):
 
-    $o->subscribe(make_observer(1));
-
-    AnyEvent->condvar->recv;
-
-=pod
-
-    use RxPerl::IOAsync ':all';
-    use IO::Async::Loop;
-
-    my $loop = IO::Async::Loop->new;
-    RxPerl::IOAsync::set_loop($loop);
-
-    sub make_observer ($i) {
-        return {
-            next     => sub {say "next #$i: ", $_[0]},
-            error    => sub {say "error #$i: ", $_[0]},
-            complete => sub {say "complete #$i"},
-        };
-    }
-
-    my $o = rx_interval(0.7)->pipe(
-        op_map(sub {$_[0] * 2}),
-        op_take_until( rx_timer(5) ),
-    );
-
-    $o->subscribe(make_observer(1));
-
-    $loop->run;
-
-=pod
-
-    use RxPerl::Mojo ':all';
+    use RxPerl::Mojo 'rx_interval', 'op_take';
     use Mojo::IOLoop;
 
-    sub make_observer ($i) {
-        return {
-            next     => sub {say "next #$i: ", $_[0]},
-            error    => sub {say "error #$i: ", $_[0]},
-            complete => sub {say "complete #$i"},
-        };
-    }
-
-    my $o = rx_interval(0.7)->pipe(
-        op_map(sub {$_[0] * 2}),
-        op_take_until( rx_timer(5) ),
-    );
-
-    $o->subscribe(make_observer(1));
+    rx_interval(1.4)->pipe(
+        op_take(5),
+    )->subscribe(sub { say "next: ", $_[0] });
 
     Mojo::IOLoop->start;
+
+=head1 NOTE
+
+You probably want to install one of the three adapter modules for your project instead of this one:
+L<RxPerl::AnyEvent>, L<RxPerl::IOAsync> or L<RxPerl::Mojo>.
+
+Each of these three modules adapts RxPerl to one of three event interfaces available in Perl (L<AnyEvent>,
+L<IO::Async> and L<Mojo::IOLoop>), so pick the one that corresponds to the event interface that your app uses.
+
+The documentation in this POD applies to all three adapter modules as well.
 
 =head1 DESCRIPTION
 
 This module is an implementation of L<Reactive Extensions|http://reactivex.io/> in Perl. It replicates the
 behavior of L<rxjs 6|https://www.npmjs.com/package/rxjs> which is the JavaScript implementation of ReactiveX.
 
-Currently 44 of the 100+ operators in rxjs are implemented in this module.
+Currently 47 of the 100+ operators in rxjs are implemented in this module.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -550,6 +509,27 @@ L<https://rxjs.dev/api/operators/pluck>
 
 L<https://rxjs.dev/api/operators/refCount>
 
+=item op_repeat
+
+L<https://rxjs.dev/api/operators/repeat>
+
+    # 10, 20, 30, 10, 20, 30, 10, 20, 30, complete
+    rx_of(10, 20, 30)->pipe(
+        op_repeat(3),
+    )->subscribe($observer);
+
+=item op_retry
+
+L<https://rxjs.dev/api/operators/retry>
+
+    # 10, 20, 30, 10, 20, 30, 10, 20, 30, error: foo
+    rx_concat(
+        rx_of(10, 20, 30),
+        rx_throw_error('foo'),
+    )->pipe(
+        op_repeat(2),
+    )->subscribe($observer);
+
 =item op_sample_time
 
 L<https://rxjs.dev/api/operators/sampleTime>
@@ -585,6 +565,15 @@ L<https://rxjs.dev/api/operators/share>
 
     $o->subscribe($observer1);
     $o->subscribe($observer2);
+
+=item op_skip
+
+L<https://rxjs.dev/api/operators/skip>
+
+    # 40, 50, complete
+    rx_of(10, 20, 30, 40, 50)->pipe(
+        op_skip(3),
+    )->subscribe($observer);
 
 =item op_start_with
 
@@ -671,7 +660,7 @@ L<https://rxjs.dev/api/operators/withLatestFrom>
 
     # [0, 0], [1, 1], [2, 3], [3, 4], [4, 6], ...
     rx_interval(1)->pipe(
-        op_with_latest_from(rx_interval(1)),
+        op_with_latest_from(rx_interval(0.7)),
     )->subscribe($observer);
 
 =back
@@ -775,7 +764,7 @@ L<ReactiveX API|http://reactivex.io/documentation/operators.html> at a few point
 L<Rx* libraries|http://reactivex.io/languages.html>), RxPerl chose to behave like rxjs rather than
 ReactiveX to cater for web developers already familiar with rxjs.
 
-=head1 LEARNING MATERIAL
+=head1 LEARNING RESOURCES
 
 =over
 
@@ -787,21 +776,11 @@ ReactiveX to cater for web developers already familiar with rxjs.
 
 =back
 
-=head1 TODO
-
-=over
-
-=item * Fix the occasional bug
-
-=item * Implement more operators, based on user requests
-
-=back
-
 =head1 SEE ALSO
 
 =over
 
-=item * L<Ryu|https://metacpan.org/pod/Ryu>
+=item * L<Ryu>
 
 =back
 
@@ -818,6 +797,6 @@ it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-KARJALA Corp E<lt>karjala@cpan.orgE<gt>
+KARJALA E<lt>karjala@cpan.orgE<gt>
 
 =cut

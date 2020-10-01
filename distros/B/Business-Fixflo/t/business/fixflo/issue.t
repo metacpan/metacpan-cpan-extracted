@@ -45,6 +45,7 @@ can_ok(
 		TenantNotes
 		Address
 		Id
+		InvoiceRecipient
         IsCommunal
         Job
 		Firstname

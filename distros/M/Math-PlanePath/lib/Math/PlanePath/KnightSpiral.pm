@@ -23,7 +23,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_sqrtint = \&Math::PlanePath::_sqrtint;
@@ -52,15 +52,15 @@ use constant dx_minimum => -2;
 use constant dx_maximum => 2;
 use constant dy_minimum => -2;
 use constant dy_maximum => 2;
-use constant _UNDOCUMENTED__dxdy_list => (2,1,   # ENE
-                           1,2,   # NNE
-                           -1,2,  # NNW
-                           -2,1,  # WNW
-                           -2,-1, # WSW
-                           -1,-2, # SSW
-                           1,-2,  # SSE
-                           2,-1,  # ESE
-                          );
+use constant 1.02 _UNDOCUMENTED__dxdy_list => (2,1,   # ENE
+                                               1,2,   # NNE
+                                               -1,2,  # NNW
+                                               -2,1,  # WNW
+                                               -2,-1, # WSW
+                                               -1,-2, # SSW
+                                               1,-2,  # SSE
+                                               2,-1,  # ESE
+                                              );
 use constant absdx_minimum => 1;
 use constant absdy_minimum => 1;
 use constant dsumxy_minimum => -3; # -2,-1

@@ -15,7 +15,7 @@ configure_requires:
   Devel::CheckBin: '0'
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,7 @@ no_index:
 provides:
   App::BorgRestore:
     file: lib/App/BorgRestore.pm
-    version: v3.4.0
+    version: v3.4.3
   App::BorgRestore::Borg:
     file: lib/App/BorgRestore/Borg.pm
   App::BorgRestore::DB:
@@ -75,6 +75,6 @@ resources:
   bugtracker: https://github.com/Bluewind/App-BorgRestore/issues
   homepage: https://github.com/Bluewind/App-BorgRestore
   repository: git://github.com/Bluewind/App-BorgRestore.git
-version: 3.4.0
+version: 3.4.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

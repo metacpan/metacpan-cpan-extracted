@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -22,7 +22,7 @@ use strict;
 use List::Util 'min','max','sum';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -63,7 +63,7 @@ use Math::PlanePath::KochCurve;
 use constant n_start => 0;
 use constant x_negative_at_n => 6;
 use constant y_negative_at_n => 22;
-use constant _UNDOCUMENTED__dxdy_list_at_n => 7;
+use constant 1.02 _UNDOCUMENTED__dxdy_list_at_n => 7;
 
 
 #------------------------------------------------------------------------------
@@ -325,10 +325,13 @@ sub _rect_to_k {
 my @dir4_to_dx = (1,0,-1,0);
 my @dir4_to_dy = (0,1,0,-1);
 
+# Not yet supporting "arms" parameter ...
 sub n_to_dxdy {
   my ($self, $n) = @_;
   ### n_to_dxdy(): $n
 
+  if ($n < 0) { return; }
+  if (is_infinite($n)) { return ($n,$n); }
   my $int = int($n);
   $n -= $int;  # $n fraction part
 
@@ -503,7 +506,7 @@ sub n_to_level {
 1;
 __END__
 
-=for stopwords eg Ryde Math-PlanePath ie OEIS dX,dY dX combinatorial Ramus th zig zags stairstep Duvall Keesling vy Preprint
+=for stopwords eg Ryde Math-PlanePath ie OEIS dX,dY dX combinatorial Ramus th zig zags stairstep Duvall Keesling vy Preprint tilings optimization
 
 =head1 NAME
 
@@ -525,8 +528,8 @@ This is an integer version of the "C" curve by LE<233>vy.
 Semblables au Tout", Journal de l'E<201>cole Polytechnique, July 1938 pages
 227-247 and October 1938 pages 249-292
 
-L<http://gallica.bnf.fr/ark:/12148/bpt6k57344323/f53.image>
-L<http://gallica.bnf.fr/ark:/12148/bpt6k57344820>
+L<http://gallica.bnf.fr/ark:/12148/bpt6k57344323/f53.image>,
+L<http://gallica.bnf.fr/ark:/12148/bpt6k57344820/f3.image>
 
 =back
 
@@ -791,7 +794,7 @@ plane is still tiled.  See for example
 =over
 
 Larry Riddle
-L<http://ecademy.agnesscott.edu/~lriddle/ifs/levy/levy.htm>
+L<http://ecademy.agnesscott.edu/~lriddle/ifs/levy/levy.htm>,
 L<http://ecademy.agnesscott.edu/~lriddle/ifs/levy/tiling.htm>
 
 =back
@@ -1164,33 +1167,24 @@ leaving 4*2^(k-2) = 2^k.
     d(0) + d(2) + d(4) + d(6) = 0
     d(1) + d(3) + d(5) + d(7) = 0
 
-=for GP-DEFINE  Mdir_vec = [0, 1, 1, 1,  0, -1, -1, -1]
+=cut
 
-=for GP-DEFINE  Mdir(n) = Mdir_vec[(n%8)+1]  /* +1 for vector start index 1 */
+# GP-DEFINE  Mdir_vec = [0, 1, 1, 1,  0, -1, -1, -1]
+# GP-DEFINE  Mdir(n) = Mdir_vec[(n%8)+1]  /* +1 for vector start index 1 */
+# GP-DEFINE  M0half(k) = my(h=floor(k/2)); if(k==0,1, 2^(k-2) + Mdir(k+2)*2^(h-1))
+# GP-DEFINE  M1half(k) = my(h=floor(k/2)); if(k==0,0, 2^(k-2) + Mdir(k+0)*2^(h-1))
+# GP-DEFINE  M2half(k) = my(h=floor(k/2)); if(k==0,0, 2^(k-2) + Mdir(k-2)*2^(h-1))
+# GP-DEFINE  M3half(k) = my(h=floor(k/2)); if(k==0,0, 2^(k-2) + Mdir(k-4)*2^(h-1))
+# GP-DEFINE  M0samples = [ 1, 1, 1, 1, 2,  6, 16, 36, 72, 136, 256 ]
+# GP-DEFINE  M1samples = [ 0, 1, 2, 3, 4,  6, 12, 28, 64, 136, 272 ]
+# GP-DEFINE  M2samples = [ 0, 0, 1, 3, 6, 10, 16, 28, 56, 120, 256 ]
+# GP-DEFINE  M3samples = [ 0, 0, 0, 1, 4, 10, 20, 36, 64, 120, 240 ]
+# GP-Test  vector(length(M0samples),k,M0half(k-1)) == M0samples
+# GP-Test  vector(length(M1samples),k,M1half(k-1)) == M1samples
+# GP-Test  vector(length(M2samples),k,M2half(k-1)) == M2samples
+# GP-Test  vector(length(M3samples),k,M3half(k-1)) == M3samples
 
-=for GP-DEFINE  M0half(k) = my(h=floor(k/2)); if(k==0,1, 2^(k-2) + Mdir(k+2)*2^(h-1))
-
-=for GP-DEFINE  M1half(k) = my(h=floor(k/2)); if(k==0,0, 2^(k-2) + Mdir(k+0)*2^(h-1))
-
-=for GP-DEFINE  M2half(k) = my(h=floor(k/2)); if(k==0,0, 2^(k-2) + Mdir(k-2)*2^(h-1))
-
-=for GP-DEFINE  M3half(k) = my(h=floor(k/2)); if(k==0,0, 2^(k-2) + Mdir(k-4)*2^(h-1))
-
-=for GP-DEFINE  M0samples = [ 1, 1, 1, 1, 2,  6, 16, 36, 72, 136, 256 ]
-
-=for GP-DEFINE  M1samples = [ 0, 1, 2, 3, 4,  6, 12, 28, 64, 136, 272 ]
-
-=for GP-DEFINE  M2samples = [ 0, 0, 1, 3, 6, 10, 16, 28, 56, 120, 256 ]
-
-=for GP-DEFINE  M3samples = [ 0, 0, 0, 1, 4, 10, 20, 36, 64, 120, 240 ]
-
-=for GP-Test  vector(length(M0samples),k,M0half(k-1)) == M0samples
-
-=for GP-Test  vector(length(M1samples),k,M1half(k-1)) == M1samples
-
-=for GP-Test  vector(length(M2samples),k,M2half(k-1)) == M2samples
-
-=for GP-Test  vector(length(M3samples),k,M3half(k-1)) == M3samples
+=pod
 
 The counts can be calculated in two ways.  Firstly they satisfy mutual
 recurrences.  Each adds the preceding rotated M.
@@ -1223,21 +1217,18 @@ Some substitutions give 3rd order recurrences
     M2[k] = 4*M2[k-1] - 6*M2[k-2] + 4*M2[k-3]    initial 0,0,1,3
     M3[k] = 4*M3[k-1] - 6*M3[k-2] + 4*M3[k-3]    initial 0,0,0,1
 
-=for GP-DEFINE  M0rec(k) = if(k<4,1, 4*M0rec(k-1) - 6*M0rec(k-2) + 4*M0rec(k-3))
+=cut
 
-=for GP-DEFINE  M1rec(k) = if(k<4,k, 4*M1rec(k-1) - 6*M1rec(k-2) + 4*M1rec(k-3))
+# GP-DEFINE  M0rec(k) = if(k<4,1, 4*M0rec(k-1) - 6*M0rec(k-2) + 4*M0rec(k-3))
+# GP-DEFINE  M1rec(k) = if(k<4,k, 4*M1rec(k-1) - 6*M1rec(k-2) + 4*M1rec(k-3))
+# GP-DEFINE  M2rec(k) = if(k<2,0, if(k==2,1, if(k==3,3, 4*M2rec(k-1) - 6*M2rec(k-2) + 4*M2rec(k-3))))
+# GP-DEFINE  M3rec(k) = if(k<3,0, if(k==3,1, 4*M3rec(k-1) - 6*M3rec(k-2) + 4*M3rec(k-3)))
+# GP-Test  vector(20,k,M0rec(k-1)) == vector(20,k,M0half(k-1))
+# GP-Test  vector(20,k,M1rec(k-1)) == vector(20,k,M1half(k-1))
+# GP-Test  vector(20,k,M2rec(k-1)) == vector(20,k,M2half(k-1))
+# GP-Test  vector(20,k,M3rec(k-1)) == vector(20,k,M3half(k-1))
 
-=for GP-DEFINE  M2rec(k) = if(k<2,0, if(k==2,1, if(k==3,3, 4*M2rec(k-1) - 6*M2rec(k-2) + 4*M2rec(k-3))))
-
-=for GP-DEFINE  M3rec(k) = if(k<3,0, if(k==3,1, 4*M3rec(k-1) - 6*M3rec(k-2) + 4*M3rec(k-3)))
-
-=for GP-Test  vector(20,k,M0rec(k-1)) == vector(20,k,M0half(k-1))
-
-=for GP-Test  vector(20,k,M1rec(k-1)) == vector(20,k,M1half(k-1))
-
-=for GP-Test  vector(20,k,M2rec(k-1)) == vector(20,k,M2half(k-1))
-
-=for GP-Test  vector(20,k,M3rec(k-1)) == vector(20,k,M3half(k-1))
+=pod
 
 The characteristic polynomial  of these recurrences is
 
@@ -1255,21 +1246,18 @@ So explicit formulas can be written in powers of the roots 2, 1-i and 1+i,
     M2[k] = ( 2^k -   (1-i)^k -   (1+i)^k )/4
     M3[k] = ( 2^k - i*(1-i)^k + i*(1+i)^k )/4
 
-=for GP-DEFINE  M0pow(k) = if(k==0,1, (1/4)*(2^k +   (1-I)^k +   (1+I)^k))
+=cut
 
-=for GP-DEFINE  M1pow(k) = if(k==0,0, (1/4)*(2^k + I*(1-I)^k - I*(1+I)^k))
+# GP-DEFINE  M0pow(k) = if(k==0,1, (1/4)*(2^k +   (1-I)^k +   (1+I)^k))
+# GP-DEFINE  M1pow(k) = if(k==0,0, (1/4)*(2^k + I*(1-I)^k - I*(1+I)^k))
+# GP-DEFINE  M2pow(k) = if(k==0,0, (1/4)*(2^k -   (1-I)^k -   (1+I)^k))
+# GP-DEFINE  M3pow(k) = if(k==0,0, (1/4)*(2^k - I*(1-I)^k + I*(1+I)^k))
+# GP-Test  vector(50,k,M0pow(k-1)) == vector(50,k,M0half(k-1))
+# GP-Test  vector(50,k,M1pow(k-1)) == vector(50,k,M1half(k-1))
+# GP-Test  vector(50,k,M2pow(k-1)) == vector(50,k,M2half(k-1))
+# GP-Test  vector(50,k,M3pow(k-1)) == vector(50,k,M3half(k-1))
 
-=for GP-DEFINE  M2pow(k) = if(k==0,0, (1/4)*(2^k -   (1-I)^k -   (1+I)^k))
-
-=for GP-DEFINE  M3pow(k) = if(k==0,0, (1/4)*(2^k - I*(1-I)^k + I*(1+I)^k))
-
-=for GP-Test  vector(50,k,M0pow(k-1)) == vector(50,k,M0half(k-1))
-
-=for GP-Test  vector(50,k,M1pow(k-1)) == vector(50,k,M1half(k-1))
-
-=for GP-Test  vector(50,k,M2pow(k-1)) == vector(50,k,M2half(k-1))
-
-=for GP-Test  vector(50,k,M3pow(k-1)) == vector(50,k,M3half(k-1))
+=pod
 
 The complex numbers 1-i and 1+i are 45 degree lines clockwise and
 anti-clockwise respectively.  The powers turn them in opposite directions so
@@ -1296,21 +1284,18 @@ bits is k choose 0, 4, 8 etc.
     M3[k] = /k\ + /k\ + ... + / k  \    m = floor((k-3)/4)
             \3/   \7/         \4m+3/
 
-=for GP-DEFINE  M0sum(k) = sum(i=0,floor(k/4), binomial(k, 4*i))
+=cut
 
-=for GP-DEFINE  M1sum(k) = sum(i=0,floor(k/4), binomial(k, 4*i+1))
+# GP-DEFINE  M0sum(k) = sum(i=0,floor(k/4), binomial(k, 4*i))
+# GP-DEFINE  M1sum(k) = sum(i=0,floor(k/4), binomial(k, 4*i+1))
+# GP-DEFINE  M2sum(k) = sum(i=0,floor(k/4), binomial(k, 4*i+2))
+# GP-DEFINE  M3sum(k) = sum(i=0,floor(k/4), binomial(k, 4*i+3))
+# GP-Test  vector(length(M0samples),k,M0sum(k-1)) == M0samples
+# GP-Test  vector(length(M1samples),k,M1sum(k-1)) == M1samples
+# GP-Test  vector(length(M2samples),k,M2sum(k-1)) == M2samples
+# GP-Test  vector(length(M3samples),k,M3sum(k-1)) == M3samples
 
-=for GP-DEFINE  M2sum(k) = sum(i=0,floor(k/4), binomial(k, 4*i+2))
-
-=for GP-DEFINE  M3sum(k) = sum(i=0,floor(k/4), binomial(k, 4*i+3))
-
-=for GP-Test  vector(length(M0samples),k,M0sum(k-1)) == M0samples
-
-=for GP-Test  vector(length(M1samples),k,M1sum(k-1)) == M1samples
-
-=for GP-Test  vector(length(M2samples),k,M2sum(k-1)) == M2samples
-
-=for GP-Test  vector(length(M3samples),k,M3sum(k-1)) == M3samples
+=pod
 
 The power forms above are cases of the identity by Ramus for sums of
 binomial coefficients in arithmetic progression like this.  (See Knuth
@@ -1382,23 +1367,23 @@ the "C", from N=0 to N=2^k is
 
     R[k] = 2*R[k-1] + R[k-2] - 4*R[k-3] + 2*R[k-4]
 
-=for GP-DEFINE Rsamples = [1, 2, 4, 8, 14, 24, 38, 60, 90, 136, 198, 292, 418]
-
-=for GP-DEFINE Rcases(k)=if(k%2,10,7)*2^floor(k/2) - 2*k - 6
-
-=for GP-Test vector(length(Rsamples), k, Rcases(k-1)) == Rsamples
-
-=for GP-DEFINE Rrec(k)=if(k<4,Rsamples[k+1], 2*Rrec(k-1) + Rrec(k-2) - 4*Rrec(k-3) + 2*Rrec(k-4))
-
-=for GP-Test vector(length(Rsamples), k, Rrec(k-1)) == Rsamples
-
-=for GP-DEFINE nearint(x)=if(abs(x-round(x)) < 0.000001, round(x), x)
-
-=for GP-DEFINE Rpow(k)=nearint( (7/2 + 5/2 * sqrt(2))*( sqrt(2))^k + (7/2 - 5/2 * sqrt(2))*(-sqrt(2))^k ) - 2*k - 6
-
-=for GP-Test vector(length(Rsamples), k, Rpow(k-1)) == Rsamples
-
 =cut
+
+# GP-DEFINE  Rsamples = [1, 2, 4, 8, 14, 24, 38, 60, 90, 136, 198, 292, 418];
+# GP-DEFINE  Rcases(k)=if(k%2,10,7)*2^floor(k/2) - 2*k - 6;
+# GP-Test vector(length(Rsamples), k, Rcases(k-1)) == Rsamples
+# GP-DEFINE  Rrec(k) = {
+# GP-DEFINE    if(k<4,Rsamples[k+1],
+# GP-DEFINE       2*Rrec(k-1) + Rrec(k-2) - 4*Rrec(k-3) + 2*Rrec(k-4));
+# GP-DEFINE  }
+# GP-Test vector(length(Rsamples), k, Rrec(k-1)) == Rsamples
+# GP-DEFINE  nearint(x)=if(abs(x-round(x)) < 0.000001, round(x), x)
+# GP-DEFINE  Rpow(k) = {
+# GP-DEFINE    nearint(  (7/2 + 5/2 * sqrt(2))*( sqrt(2))^k
+# GP-DEFINE            + (7/2 - 5/2 * sqrt(2))*(-sqrt(2))^k )
+# GP-DEFINE    - 2*k - 6;
+# GP-DEFINE  }
+# GP-Test vector(length(Rsamples), k, Rpow(k-1)) == Rsamples
 
 # R[2k] =   (7/2 + 5/2 * sqrt(2))*( sqrt(2))^(2k)
 #         + (7/2 - 5/2 * sqrt(2))*(-sqrt(2))^(2k)
@@ -1665,21 +1650,24 @@ into the d to give a recurrence
 
     d[2h-1] = d[2h] = floor( 8/15 * 2^h )
 
-=for GP-DEFINE  gd(x)=(x+x^2) / ( (1-2*x^2)*(1-x^8) )
+=cut
 
-=for GP-Test  gd(x) == (x+x^2) / ( (1-x^2)*(1+x^2)*(1-2*x^2)*(1+x^4) )
+# GP-DEFINE  gd(x)=(x+x^2) / ( (1-2*x^2)*(1-x^8) )
+# GP-Test  gd(x) == (x+x^2) / ( (1-x^2)*(1+x^2)*(1-2*x^2)*(1+x^4) )
+# GP-Test  Vec(gd(x) - O(x^19)) ==   /* sans initial 0s */ \
+# GP-Test  [1,1,2,2,4,4,8,8,17,17,34,34,68,68,136,136,273,273]
 
-=for GP-Test Vec(gd(x) - O(x^19)) == [1,1,2,2,4,4,8,8,17,17,34,34,68,68,136,136,273,273] /* sans initial 0s */
+# GP-DEFINE  vector_modulo(v,i) = v[(i% #v)+1];
+# GP-DEFINE  d_by_powers(k) = \
+# GP-DEFINE    8/15*2^ceil(k/2) - 1/15*vector_modulo([8,1,1,2,2,4,4,8],k);
+# GP-Test vector(19,k,k--; d_by_powers(k)) == /* sans initial 0s */ \
+# GP-Test   [0,1,1,2,2,4,4,8,8,17,17,34,34,68,68,136,136,273,273]
 
-=for GP-DEFINE  vector_modulo(v,i) = v[(i% #v)+1];
+# GP-DEFINE  d_by_powers(k) = floor(8/15*2^ceil(k/2));
+# GP-Test vector(19,k,k--; d_by_powers(k)) == /* sans initial 0s */ \
+# GP-Test   [0,1,1,2,2,4,4,8,8,17,17,34,34,68,68,136,136,273,273]
 
-=for GP-DEFINE  d_by_powers(k) = 8/15*2^ceil(k/2) - 1/15*vector_modulo([8,1,1,2,2,4,4,8],k);
-
-=for GP-Test vector(19,k,k--; d_by_powers(k)) == [0,1,1,2,2,4,4,8,8,17,17,34,34,68,68,136,136,273,273] /* sans initial 0s */
-
-=for GP-DEFINE  d_by_powers(k) = floor(8/15*2^ceil(k/2));
-
-=for GP-Test vector(19,k,k--; d_by_powers(k)) == [0,1,1,2,2,4,4,8,8,17,17,34,34,68,68,136,136,273,273] /* sans initial 0s */
+=pod
 
 The recurrence begins with the single segment N=0 to N=1 and the two
 endpoints are not included so initial all zeros a[0]=...=h[0]=0.
@@ -1704,6 +1692,8 @@ L<http://oeis.org/A179868> (etc)
 
 =back
 
+    A332251   X coordinate
+    A332252   Y coordinate
     A010059   abs(dX), count1bits(N)+1 mod 2
     A010060   abs(dY), count1bits(N) mod 2, being Thue-Morse
 
@@ -1732,7 +1722,7 @@ L<http://oeis.org/A179868> (etc)
     A038505   number of West  segments in N=0 to N=2^k-1
     A000749   number of South segments in N=0 to N=2^k-1
 
-    A191689   fractal dimension of the interior boundary
+    A191689   fractal dimension of the boundary (including holes)
 
 A191689 is the fractal dimension which roughly speaking means what power r^k
 the boundary length grows by when each segment is taken as a little triangle
@@ -1747,6 +1737,26 @@ number 4, 1997, pages 627-632.  (Preprint "The Hausdorff Dimension of the
 Boundary of the LE<233>vy Dragon" L<http://at.yorku.ca/p/a/a/h/08.htm>.)
 
 =back
+
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for the C curve as a graph include
+
+=over
+
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655> etc
+
+=back
+
+    19655     level=0 (1-segment path)
+    32234     level=1 (2-segment path)
+    286       level=2 (4-segment path)
+    414       level=3 (8-segment path)
+    33785     level=4
+    33787     level=5
+    33789     level=6
+    33791     level=7
+    33793     level=8
 
 =head1 SEE ALSO
 
@@ -1764,7 +1774,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

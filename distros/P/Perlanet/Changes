@@ -1,3 +1,17 @@
+2020-09-24  2.0.4 Dave Cross <dave@perlhacks.com>
+
+  * Added missing new library to MANIFEST
+
+2020-09-24  2.0.3 Dave Cross <dave@perlhacks.com>
+
+  * Added "cutoff_duration" config option for feeds
+
+  * Fixed a long-standing bug in date cutoff
+
+2020-09-24  2.0.2 Dave Cross <dave@perlhacks.com>
+
+  * Added "max_entries" config option for feeds
+
 2020-09-22  2.0.1 Dave Cross <dave@perlhacks.com>
 
   * Require OPML module for testing.

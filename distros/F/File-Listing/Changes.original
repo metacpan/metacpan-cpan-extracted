@@ -1,0 +1,49 @@
+_______________________________________________________________________________
+2012-02-15 File-Listing 6.04
+
+Erik Esterer (1):
+      Minor mistake in module description
+
+Gisle Aas (1):
+      Test parsing of dosftp listings
+
+Peter Rabbitson (1):
+      This modulue works with 5.6.2
+
+
+
+_______________________________________________________________________________
+2011-09-20 File-Listing 6.03
+
+Erik Esterer (1):
+      Minor mistake in module description
+
+Peter John Acklam (1):
+      Fixes to the parsing of 'ls -l' file modes [RT#71054]
+
+
+
+_______________________________________________________________________________
+2011-03-20 File-Listing 6.02
+
+Avoid running live test.  Embed the expected test data in the test file.
+Update the test data inline by invoking 'perl t/apache.t --update'.
+
+
+
+_______________________________________________________________________________
+2011-03-13 File-Listing 6.01
+
+Added legal notice and updated the meta repository link
+
+
+
+
+_______________________________________________________________________________
+2011-02-25 File-Listing 6.00
+
+Initial release of File-Listing as a separate distribution.  The File::Listing
+module used to be bundled with the libwww-perl distribution.
+
+Since libwww-perl-5.837 File::Listing has been made able to deal with listings
+full of table markup (like what we find at http://www.cpan.org/modules/by-module/).

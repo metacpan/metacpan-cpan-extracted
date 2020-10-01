@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -29,28 +29,43 @@ use Math::PlanePath::PythagoreanTree;
 
 foreach my $tree_type ('UAD','UArD','FB','UMT') {
   my $str = <<"HERE";
-    tree_type => "$tree_type"
+    tree_type => "$tree_type"    coordinates A,B
 
-                      +-> 00005
-          +-> 00002 --+-> 00006
-          |           +-> 00007
-          |
-          |           +-> 00008
-    001 --+-> 00003 --+-> 00009
-          |           +-> 00010
-          |
-          |           +-> 00011
-          +-> 00004 --+-> 00012
-                      +-> 00013
+              ______________ 001 _____________
+             /                |               \\
+         00002              00003              00004
+        /  |  \\            /  |  \\           /   |  \\
+    0005 00006 00007  00008 00009 00010  00011 00012 00013
 
 HERE
+
     my $path = Math::PlanePath::PythagoreanTree->new(tree_type => $tree_type,
                                                     coordinates => 'AB');
     $str =~ s{(\d+)}
              {
                my ($x,$y) = $path->n_to_xy($1);
-               my $len = length($1);
-               sprintf '%-*s', $len, "$x,$y";
+               my $fieldlen = length($1);
+               sprintf '%-*s', $fieldlen, "$x,$y";
              }ge;
   print $str;
 }
+
+
+# Previous horizontal across.
+#
+#   my $str = <<"HERE";
+#     tree_type => "$tree_type"
+#
+#                       +-> 00005
+#           +-> 00002 --+-> 00006
+#           |           +-> 00007
+#           |
+#           |           +-> 00008
+#     001 --+-> 00003 --+-> 00009
+#           |           +-> 00010
+#           |
+#           |           +-> 00011
+#           +-> 00004 --+-> 00012
+#                       +-> 00013
+#
+# HERE

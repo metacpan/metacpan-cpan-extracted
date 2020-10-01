@@ -1,0 +1,14 @@
+Revision history for Parallel-Map-Segmented
+
+0.4.0       2020-09-30
+    - Use serial_run() from Parallel::ForkManager::Segmented::Base v0.4.0.
+
+0.2.2       2020-09-30
+    - Respect and propagate the nproc argument (to run()/etc.).
+
+0.2.1       2020-09-29
+    - Clarify the docs wrt fork/execve and other stuff.
+
+0.2.0       2020-09-29
+    - First release.
+

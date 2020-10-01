@@ -16,31 +16,35 @@ optional_features:
     description: Provides parsing of CSV streams
     requires: 
       Text::CSV_XS: '0.71'
-  opt_excel: 
+  opt_ods: 
+    description: Provides parsing of OpenOffice spreadsheets
+    requires: 
+      Spreadsheet::ParseODS: '0.25'
+  opt_sxc: 
+    description: Provides parsing of OpenOffice spreadsheets old style
+    requires: 
+      Spreadsheet::ReadSXC: '0.24'
+  opt_tools: 
+    description: Spreadsheet tools
+  opt_xls: 
     description: Provides parsing of Microsoft Excel files
     requires: 
       Spreadsheet::ParseExcel: '0.34'
       Spreadsheet::ParseExcel::FmtDefault: 0
-  opt_excelx: 
+  opt_xlsx: 
     description: Provides parsing of Microsoft Excel 2007 files
     requires: 
       Spreadsheet::ParseExcel::FmtDefault: 0
       Spreadsheet::ParseXLSX: '0.24'
-  opt_oo: 
-    description: Provides parsing of OpenOffice spreadsheets
-    requires: 
-      Spreadsheet::ReadSXC: '0.20'
-  opt_tools: 
-    description: Spreadsheet tools
 provides: 
   Spreadsheet::Read: 
     file: Read.pm
-    version: '0.81'
+    version: '0.82'
 recommends: 
-  Data::Peek: '0.48'
+  Data::Peek: '0.49'
   File::Temp: '0.2309'
   IO::Scalar: 0
-  Test::More: '1.302167'
+  Test::More: '1.302181'
 requires: 
   Carp: 0
   Data::Dumper: 0
@@ -48,6 +52,7 @@ requires:
   Encode: 0
   Exporter: 0
   File::Temp: '0.22'
+  List::Util: 0
   Test::Harness: 0
   Test::More: '0.88'
   Test::NoWarnings: 0
@@ -55,4 +60,4 @@ requires:
 resources: 
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Spreadsheet-Read
-version: '0.81'
+version: '0.82'

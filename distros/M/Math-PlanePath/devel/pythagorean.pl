@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,17 +20,209 @@
 use 5.010;
 use strict;
 use warnings;
-use List::Util 'min', 'max';
+use List::Util 'min', 'max', 'sum';
 use Math::Libm 'hypot';
 use Math::PlanePath::PythagoreanTree;
 use Math::PlanePath::Base::Digits
   'round_down_pow',
   'digit_join_lowtohigh',
   'digit_split_lowtohigh';
+use Math::PlanePath::GcdRationals;
+*gcd = \&Math::PlanePath::GcdRationals::_gcd;
+$|=1;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
+
+
+{
+  # A103605 equal perimeters area order
+
+  # ~/OEIS/b103605.txt
+  # ../../seq-pythagorean-perimeter/pythtripfind.txt
+  
+  # print "       triple    perimeter   area              gcd      primitive  prim_area\n";
+  print "       triple    perimeter   area\n";
+  require Math::NumSeq::OEIS::File;
+  my $seq = Math::NumSeq::OEIS::File->new(anum => 'A103605');
+  # my $seq = Math::NumSeq::OEIS::File->new(anum => 'A999999');
+  my $prev_perimeter = -1;
+  my (@as,@bs,@cs,@perimeters,@areas,@elems);
+  for (;;) {
+    my ($i,$a) = $seq->next or last;
+    my (undef,$b) = $seq->next or die "oops incomplete";
+    my (undef,$c) = $seq->next or die "oops incomplete";
+    $a**2 + $b**2 == $c**2 or die;
+    my $perimeter = $a+$b+$c;
+    my $area = $a*$b/2;
+    push @elems, [$a,$b,$c,$perimeter,2*$area];
+    if (@perimeters >= 2 && $perimeter != $perimeters[-1]) {
+      my $prev_dir;
+      foreach my $i (0 .. $#as) {
+        my $dir = ($i > 0 ? ($areas[$i] > $areas[$i-1] ? " inc" : " dec") : '');
+        my $g = gcd($as[$i], gcd($bs[$i],$cs[$i]));
+        my $aprim = $as[$i]/$g;
+        my $bprim = $bs[$i]/$g;
+        my $cprim = $cs[$i]/$g;
+        my $prim_area = $aprim*$bprim/2;
+
+        printf "%14s   %7s %8s%s%s\n",
+          "$as[$i],$bs[$i],$cs[$i]",
+          $perimeters[$i],
+          $areas[$i],
+          $dir,
+          ($i >= 2 && $dir ne $prev_dir ? ' ****' : '');
+
+        # printf "%14s   %7s %8s%-4s %4s    %3d %14s %7s\n",
+        #   "$as[$i],$bs[$i],$cs[$i]",
+        #   $perimeters[$i],
+        #   $areas[$i],
+        #   $dir,
+        #   ($i >= 2 && $dir ne $prev_dir ? '****' : ''),
+        #   $g,
+        #   "$aprim,$bprim,$cprim",
+        #   $prim_area;
+
+        $prev_dir = $dir;
+      }
+      print "\n";
+    }
+    if (@perimeters && $perimeter != $perimeters[-1]) {
+      @as = ();
+      @bs = ();
+      @cs = ();
+      @perimeters = ();
+      @areas = ();
+    }
+    push @as, $a;
+    push @bs, $b;
+    push @cs, $c;
+    push @perimeters, $perimeter;
+    push @areas, $area;
+  }
+
+  {
+    @elems = sort {$a->[3] <=> $b->[3]
+                     || $a->[4] <=> $b->[4] } @elems;
+    open my $fh, '>', '/tmp/b' or die;
+    my $i = 1;
+    foreach my $elem (@elems) {
+      print $fh $i++," ",join('  ',@$elem)," \n";
+    }
+  }
+  exit 0;
+}
+{
+  # A103605 perimeters then area
+  # 5412 + 5635 + 7813 == 18860
+
+  # 2050 + 8280 + 8530 == 18860
+
+  # 5412
+  # 5635
+  # 7813
+
+  # A^2 + B^2 = C^2
+  # X^2 + Y^2 = Z^2
+  # A+B+C = X+Y+Z
+  # A*B   < X*Y   equiv  A < X  ?
+
+  # A+B+sqrt(A^2+B^2) = X+Y+sqrt(X^2+Y^2)
+
+  my @ABC;
+  my $max_perimeter = 5412 + 5635 + 7813;
+  # $max_perimeter = 200;
+  print "max_perimeter $max_perimeter\n";
+  for (my $A = 1; $A+$A+$A <= $max_perimeter; $A++) {
+    ### $A
+    print "$A ",scalar(@ABC),"\r";
+    for (my $B = $A; $A+$B+$B <= $max_perimeter; $B++) {
+      ### $B
+      my $C2 = $A*$A + $B*$B;
+      my $C = int(sqrt($C2));
+      next unless $C*$C == $C2;
+      my $perimeter = $A + $B + $C;
+      last if $perimeter > $max_perimeter;
+      push @ABC, [$A,$B,$C];
+    }
+  }
+  @ABC = sort { ABC_to_perimeter($a) <=> ABC_to_perimeter($b)
+                  || ABC_to_2area($a) <=> ABC_to_2area($b) } @ABC;
+  {
+    foreach my $i (0 .. $#ABC) {
+      foreach my $j ($i+1 .. $#ABC) {
+        last if ABC_to_perimeter($ABC[$i]) != ABC_to_perimeter($ABC[$j]);
+        ABC_to_2area($ABC[$i]) != ABC_to_2area($ABC[$j])
+          or die;
+        (ABC_to_2area($ABC[$i]) <=> ABC_to_2area($ABC[$j]))
+          == ($ABC[$i]->[0] <=> $ABC[$j]->[0])
+          or die join(',',@{$ABC[$i]})," ",join(',',@{$ABC[$j]});
+      }
+    }
+  }
+  {
+    open my $fh, '>', '/tmp/p' or die;
+    my $i = 1;
+    foreach my $ABC (@ABC) {
+      print $fh $i++," ",$ABC->[0]," \n";
+      print $fh $i++," ",$ABC->[1]," \n";
+      print $fh $i++," ",$ABC->[2]," \n";
+    }
+  }
+  {
+    open my $fh, '>', '/tmp/q' or die;
+    my $i = 1;
+    foreach my $ABC (@ABC) {
+      my $perimeter = ABC_to_perimeter($ABC);
+      my $twoarea = ABC_to_2area($ABC);
+      print $fh $i++," $ABC->[0]  $ABC->[1]  $ABC->[2]  $perimeter  $twoarea \n";
+    }
+  }
+  system("ls -l ~/OEIS/b103605.txt");
+  system("ls -l ../../seq-pythagorean-perimeter/pythtripfind.txt");
+
+  exit 0;
+
+  sub ABC_to_perimeter {
+    my ($aref) = @_;
+    return sum(@$aref);
+  }
+  sub ABC_to_2area {
+    my ($aref) = @_;
+    return $aref->[0] * $aref->[1];
+  }
+}
+{
+  # p,q LtoH vs HtoL
+  {
+    my $path = Math::PlanePath::PythagoreanTree->new
+      (
+       tree_type => 'UAD',
+       # tree_type => 'FB',
+       coordinates => 'PQ',
+       digit_order => 'HtoL',
+      );
+    foreach my $n (12 .. 20) {
+      my ($x,$y) = $path->n_to_xy($n);
+      print "$x $y\n";
+    }
+  }
+  {
+    my $path = Math::PlanePath::PythagoreanTree->new
+      (
+       tree_type => 'UAD',
+       # tree_type => 'FB',
+       coordinates => 'PQ',
+       digit_order => 'LtoH',
+      );
+    foreach my $n (12 .. 20) {
+      my ($x,$y) = $path->n_to_xy($n);
+      print "$x $y\n";
+    }
+  }
+  exit 0;
+}
 
 {
   # powers

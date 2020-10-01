@@ -22,6 +22,8 @@ a standardized interface and caching.
 
 =head1 CHANGES
 
+2.31 2020.09.26 - Fix for Latin1/UTF8 issue in documentation
+
 2.30 2020.06.20 - Version renumber for module consistency
 
 1.02 2004.04.26 - Documenation fix
@@ -50,7 +52,7 @@ BEGIN {
     @EXPORT_OK   = qw (stem clear_stem_cache stem_caching);
     %EXPORT_TAGS = ();
 }
-$VERSION = "2.30";
+$VERSION = "2.31";
 
 my $Stem_Caching  = 0;
 my $Stem_Cache    = {};

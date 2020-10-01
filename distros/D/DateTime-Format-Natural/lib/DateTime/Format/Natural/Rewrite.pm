@@ -3,16 +3,17 @@ package DateTime::Format::Natural::Rewrite;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub _rewrite
 {
     my $self = shift;
     my ($date_string) = @_;
 
-    $self->_rewrite_regular($date_string);
-    $self->_rewrite_aliases($date_string);
-    $self->_rewrite_conditional($date_string);
+    foreach my $type (qw(regular aliases conditional)) {
+        my $method = "_rewrite_$type";
+        $self->$method($date_string);
+    }
 }
 
 sub _rewrite_regular

@@ -1,7 +1,7 @@
 package Role::Versioning::Scheme;
 
-our $DATE = '2019-04-14'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-10-01'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use Role::Tiny;
 
@@ -12,6 +12,13 @@ requires qw(
                bump_version
                parse_version
        );
+
+sub versioning_scheme {
+    my $class = shift;
+    $class = ref $class if ref $class;
+    $class =~ s/\AVersioning::Scheme:://;
+    $class;
+}
 
 1;
 # ABSTRACT: Role for Versioning::Scheme::* modules
@@ -28,7 +35,17 @@ Role::Versioning::Scheme - Role for Versioning::Scheme::* modules
 
 =head1 VERSION
 
-This document describes version 0.010 of Role::Versioning::Scheme (from Perl distribution Versioning-Scheme), released on 2019-04-14.
+This document describes version 0.011 of Role::Versioning::Scheme (from Perl distribution Versioning-Scheme), released on 2020-10-01.
+
+=head1 PROVIDED METHODS
+
+=head2 versioning_scheme
+
+Usage:
+
+ print $vs->versioning_scheme; # Dotted
+
+Print the versioning scheme name.
 
 =head1 REQUIRED METHODS
 
@@ -152,7 +169,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

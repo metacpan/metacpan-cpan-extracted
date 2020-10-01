@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,7 +23,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
@@ -169,7 +169,7 @@ sub rect_to_n_range {
 1;
 __END__
 
-=for stopwords eg Ryde ie HilbertSides Math-PlanePath
+=for stopwords eg Ryde ie HilbertSides Math-PlanePath Dekking unrotated Ns HilbertCurve dX OEIS
 
 =head1 NAME
 
@@ -218,7 +218,8 @@ N=0,4,8,12,16, etc.
           X=0    1     2     3     4     5     6     7
 
 If each point of the C<HilbertCurve> path is taken to be a unit square the
-effect here is to go along the sides of those squares.
+effect here is to go along the sides of those squares.  The square for a
+segment is on the left or right,
 
      -------3.       .
         v   |
@@ -231,12 +232,13 @@ effect here is to go along the sides of those squares.
     0-------1        .
 
 Some points are visited twice.  The first is at X=2,Y=3 which is N=7 and N=9
-where the two consecutive segments N=7to8 and N=8to9 overlap.
-Non-consecutive segments can overlap too, as for example N=27to28 and
-N=36to37 overlap.  Double-visited points occur also as corners touching, for
-example at X=4,Y=3 the two N=11 N=31 touch without overlapping segments.
+where the two segments N=7to8 and N=8to9 overlap.  These are consecutive
+segments, and non-consecutive segments can overlap too, as for example
+N=27to28 and N=36to37.  Double-visited points occur also as corners
+touching, for example at X=4,Y=3 the two N=11 N=31 touch without overlapping
+segments.
 
-The Hilbert curve squares fall within 2^k x 2^k blocks and so likewise the
+The HilbertCurve squares fall within 2^k x 2^k blocks and so likewise the
 segments here.  The right side 1 to 2 and 2 to 3 don't touch the 2^k side.
 This is so of the base figure N=0 to N=4 which doesn't touch X=2 and higher
 levels are unrotated replications so for example in the N=0 to N=64 shown
@@ -310,7 +312,7 @@ abs(dX),abs(dY) unchanged.
 
 =head2 Turn
 
-The path can turn left or right or go forward straight or 180 degree
+The path can turn left or right or go straight forward or 180 degree
 reverse.  Straight,reverse vs left,right is given by
 
     N num trailing 0 bits               turn
@@ -334,21 +336,20 @@ The number of line segments on the X and Y axes 0 to 2^k, which is N=0 to
              = 0, 0, 1, 2, 5, 10, 21, 42, 85,...         (A000975)
              = binary 101010...   k-1 many bits alternating
 
-=for GP-DEFINE  Xsegs(k) = 1/3*2^k + 1/2 + 1/6*(-1)^k;
+=cut
 
-=for GP-DEFINE  Ysegs(k) = 1/3*2^k - 1/2 + 1/6*(-1)^k;
+# GP-DEFINE  Xsegs(k) = 1/3*2^k + 1/2 + 1/6*(-1)^k;
+# GP-DEFINE  Ysegs(k) = 1/3*2^k - 1/2 + 1/6*(-1)^k;
+# GP-Test  vector(9,k,k--; Xsegs(k)) == [1,1,2,3,6,11,22,43,86]
+# GP-Test  vector(9,k,k--; Ysegs(k)) == [0,0,1,2,5,10,21,42,85]
+# GP-DEFINE  from_binary_vector(v) = subst(Polrev(v),'x,2);
+# GP-Test  from_binary_vector([1,1,0,1]) == 11
+# GP-DEFINE  Ysegs_by_binary(k) = \
+# GP-DEFINE    from_binary_vector(vector(max(0,k-1),i, (k-i)%2));
+# GP-Test  vector(100,k,k--; Ysegs_by_binary(k)) == \
+# GP-Test  vector(100,k,k--; Ysegs(k))
 
-=for GP-Test  vector(9,k,k--; Xsegs(k)) == [1,1,2,3,6,11,22,43,86]
-
-=for GP-Test  vector(9,k,k--; Ysegs(k)) == [0,0,1,2,5,10,21,42,85]
-
-=for GP-DEFINE  from_binary_vector(v) = subst(Polrev(v),'x,2);
-
-=for GP-Test  from_binary_vector([1,1,0,1]) == 11
-
-=for GP-DEFINE  Ysegs_by_binary(k) = from_binary_vector(vector(max(0,k-1),i, (k-i)%2));
-
-=for GP-Test  vector(100,k,k--; Ysegs_by_binary(k)) == vector(100,k,k--; Ysegs(k))
+=pod
 
 These counts can be calculated from the curve sub-parts
 
@@ -360,11 +361,11 @@ These counts can be calculated from the curve sub-parts
         |>T            |>    R<|
     o---+   .          o   .   +
 
-The block at the origin is X and Y segments of the k-1 level.  For k odd the
-X axis then has a transposed block which means the Y segments of k-1.  The Y
-axis has a 180 degree rotated block R.  The curve is symmetric in mirror
-image across its start to end so the count of segments it puts on the Y axis
-is the same as Y of level k-1.
+The block at the origin is X and Y segments of the k-1 level.  For k odd,
+the X axis then has a transposed block which means the Y segments of k-1.
+The Y axis has a 180 degree rotated block R.  The curve is symmetric in
+mirror image across its start to end so the count of segments it puts on the
+Y axis is the same as Y of level k-1.
 
     Xsegs[k] = Xsegs[k-1] +   Ysegs[k-1]       for k odd
     Ysegs[k] =              2*Ysegs[k-1]
@@ -409,7 +410,8 @@ L<http://oeis.org/A059285> (etc)
 =head1 SEE ALSO
 
 L<Math::PlanePath>,
-L<Math::PlanePath::HilbertCurve>
+L<Math::PlanePath::HilbertCurve>,
+L<Math::PlanePath::PeanoDiagonals>
 
 =head1 HOME PAGE
 
@@ -417,7 +419,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

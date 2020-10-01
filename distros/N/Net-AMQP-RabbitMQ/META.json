@@ -4,7 +4,7 @@
       "Mark Ellis <markellis@cpan.org>, Michael Stemle, Jr. <mstemle@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mozilla_1_1"
    ],
@@ -56,7 +56,7 @@
          "web" : "https://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq"
       }
    },
-   "version" : "2.40007",
+   "version" : "2.40008",
    "x_contributors" : [
       "jesus - Theo Schlossnagle <jesus@omniti.com>",
       "markellis - Mark Ellis <markellis@cpan.org>",
@@ -71,5 +71,5 @@
       "FGA - Fabrice Gabolde <fga@cpan.org>",
       "ikegami - Eric Brine <ikegami@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

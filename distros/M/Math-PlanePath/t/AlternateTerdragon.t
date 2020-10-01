@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2018 Kevin Ryde
+# Copyright 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -33,7 +33,7 @@ require Math::PlanePath::AlternateTerdragon;
 # VERSION
 
 {
-  my $want_version = 127;
+  my $want_version = 128;
   ok ($Math::PlanePath::AlternateTerdragon::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::AlternateTerdragon->VERSION,  $want_version,

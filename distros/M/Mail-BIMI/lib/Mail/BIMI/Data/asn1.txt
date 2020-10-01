@@ -1,0 +1,63 @@
+LogotypeExtn ::= SEQUENCE {
+   communityLogos  [0] EXPLICIT SEQUENCE OF LogotypeInfo OPTIONAL,
+   issuerLogo      [1] EXPLICIT LogotypeInfo OPTIONAL,
+   subjectLogo     [2] EXPLICIT LogotypeInfo OPTIONAL,
+   otherLogos      [3] EXPLICIT SEQUENCE OF OtherLogotypeInfo OPTIONAL }
+
+LogotypeInfo ::= CHOICE {
+   direct          [0] LogotypeData,
+   indirect        [1] LogotypeReference }
+
+LogotypeData ::= SEQUENCE {
+   image           SEQUENCE OF LogotypeImage OPTIONAL,
+   audio           [1] SEQUENCE OF LogotypeAudio OPTIONAL }
+
+LogotypeImage ::= SEQUENCE {
+   imageDetails    LogotypeDetails,
+   imageInfo       LogotypeImageInfo OPTIONAL }
+
+LogotypeAudio ::= SEQUENCE {
+   audioDetails    LogotypeDetails,
+   audioInfo       LogotypeAudioInfo OPTIONAL }
+
+LogotypeDetails ::= SEQUENCE {
+   mediaType       IA5String,
+   logotypeHash    SEQUENCE OF HashAlgAndValue,
+   logotypeURI     SEQUENCE OF IA5String }
+
+LogotypeImageInfo ::= SEQUENCE {
+   type            [0] LogotypeImageType,
+   fileSize        INTEGER,
+   xSize           INTEGER,
+   ySize           INTEGER,
+   resolution      LogotypeImageResolution OPTIONAL,
+   language        [4] IA5String OPTIONAL }
+
+LogotypeImageType ::= INTEGER
+
+LogotypeImageResolution ::= CHOICE {
+   numBits         [1] INTEGER,
+   tableSize       [2] INTEGER }
+
+LogotypeAudioInfo ::= SEQUENCE {
+   fileSize        INTEGER,
+   playTime        INTEGER,
+   channels        INTEGER,
+   sampleRate      [3] INTEGER OPTIONAL,
+   language        [4] IA5String OPTIONAL }
+
+OtherLogotypeInfo ::= SEQUENCE {
+   logotypeType    OBJECT IDENTIFIER,
+   info            LogotypeInfo }
+
+LogotypeReference ::= SEQUENCE {
+   refStructHash   SEQUENCE OF HashAlgAndValue,
+   refStructURI    SEQUENCE }
+
+HashAlgAndValue ::= SEQUENCE {
+   hashAlg         AlgorithmIdentifier,
+   hashValue       OCTET STRING }
+
+   AlgorithmIdentifier  ::=  SEQUENCE  {
+        algorithm               OBJECT IDENTIFIER,
+        parameters              ANY DEFINED BY algorithm OPTIONAL  }

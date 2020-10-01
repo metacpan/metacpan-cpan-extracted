@@ -25,10 +25,11 @@ optional_features: {}
 provides:
   Z:
     file: lib/Z.pm
-    version: '0.005'
+    version: '0.007'
 recommends:
   JSON::MaybeXS: '0'
   PerlX::Maybe::XS: '0'
+  Type::Tiny::XS: '0.021'
   indirect: '0'
   perl: '5.014000'
 requires:
@@ -39,6 +40,7 @@ requires:
   Path::Tiny: '0.101'
   Syntax::Keyword::Try: '0.018'
   Try::Tiny: '0.30'
+  Type::Tie: '0'
   Types::Common::Numeric: '0'
   Types::Common::String: '0'
   Types::Path::Tiny: '0'
@@ -53,5 +55,5 @@ resources:
   homepage: https://metacpan.org/release/Z
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-z.git
-version: '0.005'
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

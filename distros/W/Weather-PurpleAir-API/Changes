@@ -1,3 +1,9 @@
+0.06 - 2020-09-25
+  * Fixed bin/aqi documentation (thanks, Grinnz)
+  * Fixed lib/Weather/PurpleAir/API.pm documentation (=E<gt> to => in code-quoted section)
+  * Fixed missing dependencies in dist.ini
+  * Corrected dependency versions in dist.ini to match RHEL6 repo package versions
+
 0.05 - Sun Sep 20 18:20:50 2020
   * Fixed documentation.
   * dist.ini: Added missing prereq for JSON::MaybeXS

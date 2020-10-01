@@ -1,27 +1,28 @@
---- #YAML:1.0
-name:               Parse-Win32Registry
-version:            1.0
-abstract:           Parse Windows Registry Files
+---
+abstract: 'Parse Windows Registry Files'
 author:
-    - James Macfarlane
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'James Macfarlane'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Carp:            0
-    Data::Dumper:    0
-    Encode:          0
-    File::Basename:  0
-    Test::More:      0
-    Time::Local:     0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parse-Win32Registry
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Encode: '0'
+  File::Basename: '0'
+  Test::More: '0'
+  Time::Local: '0'
+version: '1.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

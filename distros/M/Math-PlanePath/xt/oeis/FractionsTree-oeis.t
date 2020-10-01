@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2015, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2015, 2018, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 2;
+plan tests => 9;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,57 +29,123 @@ use MyOEIS;
 
 use Math::PlanePath::FractionsTree;
 
+# GP-DEFINE  read("my-oeis.gp");
+
 
 #------------------------------------------------------------------------------
 # A093873 -- Kepler numerators
+# starting from 1/1 is duplicate tree halves, so repeat each row
 
-# {
-#   my $path  = Math::PlanePath::FractionsTree->new (tree_type => 'Kepler');
-#   my $anum = 'A093873';
-#   my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-#   my @got;
-#   if ($bvalues) {
-#     foreach my $n (1 .. @$bvalues) {
-#       my ($x, $y) = $path->n_to_xy (int(($n+1)/2));
-#       push @got, $x;
-#     }
-#   }
-#   skip (! $bvalues,
-#         numeq_array(\@got, $bvalues),
-#         1, "$anum -- Kepler tree numerators");
-# }
+#           1
+#           -
+#           1
 #
-# sub sans_high_bit {
-#   my ($n) = @_;
-#   return $n ^ high_bit($n);
-# }
-# sub high_bit {
-#   my ($n) = @_;
-#   my $bit;
-#   for ($bit = 1; $bit <= $n; $bit <<= 1) {
-#     $bit <<= 1;
-#   }
-#   return $bit >> 1;
-# }
+#         1   1        i/(i+j) and j/(i+j)
+#         -   -
+#         2   2
+#
+#       1 2   1 2
+#       - -   - -
+#       3 3   3 3
+#
+#    1 3 2 3  1 3 2 3
+#    - - - -  - - - -
+#    4 4 5 5  4 4 5 5
+#
+# 1 4 3 4 2 5 3 5  1 4 3 4 2 5 3
+# - - - - - - - -  - - - - - - -
+# 5 5 7 7 7 7 8 8  5 5 7 7 7 7 8
 
-#------------------------------------------------------------------------------
-# A093875 -- Kepler denominators
+#           1
+#       /       \
+#      1         1        i/(i+j) and j/(i+j)
+#     / \       / \
+#    1   2     1   2
+#   / \ / \   / \ / \
+#   1 3 2 3   1 3 2 3
 
-# {
-#   my $path  = Math::PlanePath::FractionsTree->new (tree_type => 'Kepler');
-#   my $anum = 'A093875';
-#   my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-#   my @got;
-#   if ($bvalues) {
-#     foreach my $n (2 .. @$bvalues) {
-#       my ($x, $y) = $path->n_to_xy (int($n/2));
-#       push @got, $y;
-#     }
-#   }
-#   skip (! $bvalues,
-#         numeq_array(\@got, $bvalues),
-#         1, "$anum -- Kepler tree denominators");
-# }
+#                 1/1
+#       1/2                1/2
+#    1/3     2/3       1/3     2/3
+#  1/4 3/4 2/5 3/4   1/4 3/4 2/5 3/5
+
+
+# GP-DEFINE  A093873_pq(n) = {
+# GP-DEFINE    my(p=1,q=1);
+# GP-DEFINE    forstep(i=logint(n,2)-1,0,-1,
+# GP-DEFINE      [p,q] = [if(bittest(n,i),q,p), p+q]);
+# GP-DEFINE    [p,q];
+# GP-DEFINE  }
+# GP-Test  my(v=OEIS_samples("A093873"));  /* OFFSET=1 */ \
+# GP-Test    vector(#v,n, A093873_pq(n)[1]) == v
+# GP-Test  my(v=OEIS_samples("A093875"));  /* OFFSET=1 */ \
+# GP-Test    vector(#v,n, A093873_pq(n)[2]) == v
+
+MyOEIS::compare_values
+  (anum => 'A093873',
+   func => sub {
+     my ($count) = @_;
+     my $path  = Math::PlanePath::FractionsTree->new (tree_type => 'Kepler');
+     my @got;
+     for (my $n = 1; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy(sans_second_highest_bit($n));
+       push @got, $x;
+     }
+     return \@got;
+   });
+
+# denominators
+MyOEIS::compare_values
+  (anum => 'A093875',
+   func => sub {
+     my ($count) = @_;
+     my $path  = Math::PlanePath::FractionsTree->new (tree_type => 'Kepler');
+     my @got = (1);
+     for (my $n = 2; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy(sans_second_highest_bit($n));
+       push @got, $y;
+     }
+     return \@got;
+   });
+
+sub sans_second_highest_bit {
+  my ($n) = @_;
+  my $h = high_bit($n);
+  $h >>= 1;
+  return $h + ($n & ($h-1));
+}
+ok (sans_second_highest_bit(7),  3);
+ok (sans_second_highest_bit(9),  5);
+ok (sans_second_highest_bit(13), 5);
+MyOEIS::compare_values
+  (anum => 'A162751',
+   name => 'sans_second_highest_bit()',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 1; @got < $count; $n++) {
+       push @got, sans_second_highest_bit($n+1);
+     }
+     return \@got;
+   });
+
+sub high_bit {
+  my ($n) = @_;
+  my $bit = 1;
+  while ($bit <= $n) { $bit <<= 1; }
+  return $bit >> 1;
+}
+MyOEIS::compare_values
+  (anum => 'A053644',  # OFFSET=0
+   name => 'high_bit()',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       push @got, high_bit($n);
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------

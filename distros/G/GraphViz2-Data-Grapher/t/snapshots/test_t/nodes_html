@@ -1,0 +1,73 @@
+{
+  '0' => {
+    'attributes' => {
+      'color' => 'green',
+      'label' => '%$html',
+      'shape' => 'doubleoctagon'
+    }
+  },
+  '0_0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> Heading 1',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_1_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> Paragraph 1',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> h1|<port2> p',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> %$body',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> Title of document',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> title',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_1_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> %$head',
+      'shape' => 'Mrecord'
+    }
+  },
+  '0_kids' => {
+    'attributes' => {
+      'color' => 'grey',
+      'fontcolor' => 'blue',
+      'label' => '<port1> body|<port2> head',
+      'shape' => 'Mrecord'
+    }
+  }
+}

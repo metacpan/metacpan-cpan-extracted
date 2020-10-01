@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -40,7 +40,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 4;
+plan tests => 9;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -49,13 +49,128 @@ use MyOEIS;
 
 use List::Util 'min', 'max';
 use Math::PlanePath::HexSpiral;
+use Math::NumSeq::PlanePathTurn;
 
 # uncomment this to run the ### lines
-#use Smart::Comments '###';
+# use Smart::Comments '###';
+
+my @dir6_to_dx = (2, 1,-1,-2, -1, 1);
+my @dir6_to_dy = (0, 1, 1, 0, -1,-1);
 
 
 #------------------------------------------------------------------------------
-# A135708 -- grid sticks of N hexagons 
+# A001399 -- N where turn left
+
+MyOEIS::compare_values
+  (anum => 'A001399',
+   max_value => 100_000,
+   func => sub {
+     my ($count) = @_;
+     my @got = (1);     # extra initial 1 in A001399
+     my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'HexSpiral,n_start=0',
+                                                 turn_type => 'Left');
+     while (@got < $count) {
+       my ($i,$value) = $seq->next;
+       if ($value) {
+         push @got, $i;
+       }
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A328818 -- X coordinate
+# A307012 -- Y coordinate
+
+MyOEIS::compare_values
+  (anum => 'A328818',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::HexSpiral->new (n_start => 0);
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+     }
+     return \@got;
+   });
+
+MyOEIS::compare_values
+  (anum => 'A307012',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::HexSpiral->new (n_start => 0);
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
+
+# A307011 horiz
+# A307012 60 deg
+# A307013 120 deg
+
+# (X-Y)/2
+MyOEIS::compare_values
+  (anum => 'A307011',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::HexSpiral->new (n_start => 0);
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, ($x-$y)/2;
+     }
+     return \@got;
+   });
+
+# (X+Y)/2
+MyOEIS::compare_values
+  (anum => 'A307013',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::HexSpiral->new (n_start => 0);
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, ($x+$y)/2;
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A274920 -- smallest of 0,1,2 not an existing neighbour
+
+MyOEIS::compare_values
+  (anum => q{A274920},  # not shown in POD
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::HexSpiral->new (n_start => 0);
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       my @seen;
+       foreach my $dir6 (0 .. 5) {
+         my $n2 = $path->xy_to_n($x + $dir6_to_dx[$dir6],
+                                 $y + $dir6_to_dy[$dir6]);
+         defined $n2 or die;
+         if ($n2 < $n) { $seen[$got[$n2]] = 1; }
+       }
+       for (my $i = 0; ; $i++) {
+         if (!$seen[$i]) { push @got, $i; last; }
+       }
+     }
+     return \@got;
+   });
+
+
+
+#------------------------------------------------------------------------------
+# A135708 -- grid sticks of N hexagons
 
 #    /\ /\
 #   |  |  |
@@ -76,7 +191,7 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A135711 -- boundary length of N hexagons 
+# A135711 -- boundary length of N hexagons
 
 #    /\ /\
 #   |  |  |

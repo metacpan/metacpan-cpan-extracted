@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2015, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2015, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -22,7 +22,7 @@ use 5.004;
 use strict;
 use Math::BigInt;
 use Test;
-plan tests => 1;
+plan tests => 6;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -31,13 +31,34 @@ use MyOEIS;
 
 use List::Util 'min', 'max';
 use Math::PlanePath::TriangleSpiral;
-use Math::PlanePath::TriangleSpiralSkewed;
 
 # uncomment this to run the ### lines
 #use Smart::Comments '###';
 
-my $path = Math::PlanePath::TriangleSpiral->new;
 
+#------------------------------------------------------------------------------
+# A010054 -- turn sequence
+#
+# morphism
+#   S -> S 1
+#   1 -> 1 0
+#   0 -> 0
+
+MyOEIS::compare_values
+  (anum => 'A010054',
+   func => sub {
+     my ($count) = @_;
+     my @got = ('S');
+     while (@got <= $count) {
+       @got = map { $_ eq 'S' ? ('S',1)
+                      : $_ eq '1' ? (1,0)
+                      : $_ eq '0' ? (0)
+                      : die } @got;
+     }
+     (shift @got) eq 'S' or die;
+     $#got = $count-1;
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A081272 -- N on Y axis
@@ -118,6 +139,7 @@ MyOEIS::compare_values
   (anum => 'A063177',
    func => sub {
      my ($count) = @_;
+     my $path = Math::PlanePath::TriangleSpiral->new;
      my @got;
      my %plotted;
      $plotted{0,0} = Math::BigInt->new(1);

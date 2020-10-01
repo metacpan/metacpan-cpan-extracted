@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,10 +19,11 @@
 
 use 5.004;
 use strict;
+use Math::BigInt;
 use Math::Prime::XS 0.23 'is_prime'; # version 0.23 fix for 1928099
 
 use Test;
-plan tests => 13;
+plan tests => 12;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -30,26 +31,15 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::GrayCode;
+use Math::PlanePath::Diagonals;
 
 use Math::PlanePath::Base::Digits
   'digit_split_lowtohigh',
   'digit_join_lowtohigh';
 use Math::PlanePath::Diagonals;
 
-sub numeq_array {
-  my ($a1, $a2) = @_;
-  if (! ref $a1 || ! ref $a2) {
-    return 0;
-  }
-  my $i = 0; 
-  while ($i < @$a1 && $i < @$a2) {
-    if ($a1->[$i] ne $a2->[$i]) {
-      return 0;
-    }
-    $i++;
-  }
-  return (@$a1 == @$a2);
-}
+# GP-DEFINE  read("my-oeis.gp");
+
 sub to_binary_gray {
   my ($n, $radix) = @_;
   my $digits = [ digit_split_lowtohigh($n,2) ];
@@ -59,52 +49,59 @@ sub to_binary_gray {
 
 
 #------------------------------------------------------------------------------
-# A048641 - binary gray cumulative sum
+# A195467 -- rows of Gray permutations by bit widths
+# (for a time it had been array by anti-diagonals something)
 
-{
-  my $anum = 'A048641';
-  my $radix = 2;
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    my $cumulative = 0;
-    for (my $n = 0; @got < @$bvalues; $n++) {
-      $cumulative += to_binary_gray($n);
-      push @got, $cumulative;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..20]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum - binary gray cumulative sum");
-}
+# n bits is A062383(n-1) different rows, next strictly higher power of 2
+
+MyOEIS::compare_values
+  (anum => 'A195467',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $bits = 0; @got < $count; $bits++) {
+       my @row = (0 .. 2**(2**$bits) - 1);
+       foreach (1 .. 2**$bits) {
+         push @got, @row;
+         @row = map {to_binary_gray($_)} @row;
+       }
+     }
+     $#got = $count-1;
+     return \@got;
+   });
+
 
 #------------------------------------------------------------------------------
-# A048644 - binary gray cumulative sum difference from triangular(n)
+# A048641 - binary Gray cumulative sum
 
-{
-  my $anum = 'A048644';
-  my $radix = 2;
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    my $cumulative = 0;
-    for (my $n = 0; @got < @$bvalues; $n++) {
-      $cumulative += to_binary_gray($n);
-      push @got, $cumulative - triangular($n);
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..20]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum - binary gray cumulative sum");
-}
+MyOEIS::compare_values
+  (anum => 'A048641',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my $cumulative = 0;
+     for (my $n = 0; @got < $count; $n++) {
+       $cumulative += to_binary_gray($n);
+       push @got, $cumulative;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A048644 - binary Gray cumulative sum difference from triangular(n)
+
+MyOEIS::compare_values
+  (anum => 'A048644',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my $cumulative = 0;
+     for (my $n = 0; @got < $count; $n++) {
+       $cumulative += to_binary_gray($n);
+       push @got, $cumulative - triangular($n);
+     }
+     return \@got;
+   });
 
 sub triangular {
   my ($n) = @_;
@@ -114,132 +111,87 @@ sub triangular {
 #------------------------------------------------------------------------------
 # A048642 - binary gray cumulative product
 
-{
-  my $anum = 'A048642';
-  my $radix = 2;
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    require Math::BigInt;
-    my $product = Math::BigInt->new(1);
-    for (my $n = 0; @got < @$bvalues; $n++) {
-      $product *= (to_binary_gray($n) || 1);
-      push @got, $product;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..20]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum - binary gray cumulative product");
-}
+MyOEIS::compare_values
+  (anum => 'A048642',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my $product = Math::BigInt->new(1);
+     for (my $n = 0; @got < $count; $n++) {
+       $product *= (to_binary_gray($n) || 1);
+       push @got, $product;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
 # A048643 - binary gray cumulative product, diff to factorial(n)
 
-{
-  my $anum = 'A048643';
-  my $radix = 2;
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    require Math::BigInt;
-    my $product = Math::BigInt->new(1);
-    my $factorial = Math::BigInt->new(1);
-    for (my $n = 0; @got < @$bvalues; $n++) {
-      $product *= (to_binary_gray($n) || 1);
-      $factorial *= ($n||1);
-
-      push @got, $product - $factorial;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..20]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum - binary gray cumulative product");
-}
+MyOEIS::compare_values
+  (anum => 'A048643',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my $factorial = Math::BigInt->new(1);
+     my $product   = Math::BigInt->new(1);
+     for (my $n = 0; @got < $count; $n++) {
+       $product *= (to_binary_gray($n) || 1);
+       $factorial *= ($n||1);
+       push @got, $product - $factorial;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
-# A143329 - gray(prime(n)) which is prime too
+# A143329 - Gray(prime(n)) which is prime too
 
-{
-  my $anum = 'A143329';
-  my $radix = 2;
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  my $diff;
-  if ($bvalues) {
-    for (my $n = 0; @got < @$bvalues; $n++) {
-      next unless is_prime($n);
-      my $gray = to_binary_gray($n);
-      next unless is_prime($gray);
-      push @got, $gray;
-    }
-    $diff = MyOEIS::diff_nums(\@got, $bvalues);
-    if ($diff) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..45]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..45]));
-    }
-  }
-  skip (! $bvalues,
-        $diff, undef,
-        "$anum - gray(prime(n)) which is prime too");
-}
+MyOEIS::compare_values
+  (anum => 'A143329',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       next unless is_prime($n);
+       my $gray = to_binary_gray($n);
+       next unless is_prime($gray);
+       push @got, $gray;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
-# A143292 - binary gray of primes
+# A143292 - binary Gray of primes
 
-{
-  my $anum = 'A143292';
-  my $radix = 2;
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    for (my $n = 0; @got < @$bvalues; $n++) {
-      next unless is_prime($n);
-      push @got, to_binary_gray($n);
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..20]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum - binary gray of primes");
-}
+MyOEIS::compare_values
+  (anum => 'A143292',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       next unless is_prime($n);
+       push @got, to_binary_gray($n);
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
-# A005811 - count 1 bits in gray(n), is num runs
+# A005811 - count 1 bits in Gray(n), is num runs
 
-{
-  my $anum = 'A005811';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    for (my $n = 0; @got < @$bvalues; $n++) {
-      my $gray = to_binary_gray($n);
-      push @got, count_1_bits($gray);
-    }
-
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..20]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum - primes for which binary gray is also prime");
-}
+MyOEIS::compare_values
+  (anum => 'A005811',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my $gray = to_binary_gray($n);
+       push @got, count_1_bits($gray);
+     }
+     return \@got;
+   });
 
 sub count_1_bits {
   my ($n) = @_;
@@ -255,170 +207,136 @@ sub count_1_bits {
 #------------------------------------------------------------------------------
 # A173318 - cumulative count 1 bits in gray(n) ie. of A005811
 
-{
-  my $anum = 'A173318';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    my $cumulative = 0;
-    for (my $n = 0; @got < @$bvalues; $n++) {
-      $cumulative += count_1_bits(to_binary_gray($n));
-      push @got, $cumulative;
-    }
-
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..20]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum - primes for which binary gray is also prime");
-}
+MyOEIS::compare_values
+  (anum => 'A173318',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my $cumulative = 0;
+     for (my $n = 0; @got < $count; $n++) {
+       $cumulative += count_1_bits(to_binary_gray($n));
+       push @got, $cumulative;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
-# A099891 -- triangle cumulative XOR
-# 
-{
-  my $anum = 'A099891';
-  my $radix = 2;
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    my @array;
-    for (my $y = 0; @got < @$bvalues; $y++) {
-      my $gray = to_binary_gray($y,$radix);
-      push @array, [ $gray ];
-      for (my $x = 1; $x <= $y; $x++) {
-        $array[$y][$x] = $array[$y-1][$x-1] ^ $array[$y][$x-1];
-      }
-      for (my $x = 0; $x <= $y && @got < @$bvalues; $x++) {
-        push @got, $array[$y][$x];
-      }
-    }
+# A099891 -- triangle cumulative XOR Grays
 
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1);
-}
+#  0,
+#  1, 1,
+#  3, 2, 3,
+#  2, 1, 3, 0,
+#  6, 4, 5, 6, 6,
+#  7, 1, 5, 0, 6, 0,
+#  5, 2, 3, 6, 6, 0, 0,
+#  4, 1, 3, 0, 6, 0, 0, 0,
+# 12, 8, 9,10,10,12,12,12,12,...
+# first column Gray codes, then pairs xored by
+#     A
+#     B  A^B
+# binomial mod 2 count of whether each Gray net odd or even into an entry
+
+MyOEIS::compare_values
+  (anum => 'A099891',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my @array;
+     for (my $y = 0; @got < $count; $y++) {
+       my $gray = to_binary_gray($y);
+       push @array, [ $gray ];
+       for (my $x = 1; $x <= $y; $x++) {
+         $array[$y][$x] = $array[$y-1][$x-1] ^ $array[$y][$x-1];
+       }
+       for (my $x = 0; $x <= $y && @got < $count; $x++) {
+         push @got, $array[$y][$x];
+       }
+     }
+     return \@got;
+   });
+
+# GP-DEFINE  LowOneBit(n) = 1<<valuation(n,2);
+# GP-DEFINE  A006519(n) = LowOneBit(n);
+# GP-Test  my(v=OEIS_samples("A006519")); \
+# GP-Test  v == vector(#v,n, A006519(n))  /* OFFSET=1 */
+#
+# GP-DEFINE  Gray(n) = bitxor(n,n>>1);
+# GP-Test  my(v=OEIS_samples("A003188")); \
+# GP-Test  v == vector(#v,n,n--; Gray(n))  /* OFFSET=0 */
+
+# GP-DEFINE  A099891(n,k) = my(B=0); for(i=0,k, if(binomial(k,i)%2, B=bitxor(B,Gray(n-i)))); B;
+# GP-Test  my(v=OEIS_samples("A099891"),l=List()); \
+# GP-Test  for(n=0,#v, for(k=0,n, if(#l>=#v,break(2)); listput(l,A099891(n,k)))); \
+# GP-Test  v == Vec(l)
+
+#--
+# second column k=1
+# GP-Test  /* my formula */ \
+# GP-Test  vector(256,n, A099891(n,1)) == \
+# GP-Test  vector(256,n, A006519(n))
+
+# GP-Test  vector(256,n, A099891(n,1)) == \
+# GP-Test  vector(256,n,   bitxor(Gray(n),Gray(n-1)))
+# GP-Test  vector(256,n, A099891(n,1)) == \
+# GP-Test  vector(256,n,   bitxor(bitxor(n,n-1), bitxor(n,n-1)>>1))
+# GP-Test  /* bitxor(n,n-1) changed bits by increment */ \
+# GP-Test  vector(256,n, bitxor(n,n-1)) == \
+# GP-Test  vector(256,n,   2*LowOneBit(n)-1)
+# GP-Test  vector(256,n, bitxor(n,n-1)>>1) == \
+# GP-Test  vector(256,n,   LowOneBit(n)-1)
+#
+# GP-Test  vector(256,n, A099891(n,1)) == \
+# GP-Test  vector(256,n,   Gray(2*LowOneBit(n)-1))
 
 
-#------------------------------------------------------------------------------
-# A195467 -- diagonals powered permutation, starting from perm^0=identity
-# 
-{
-  my $anum = 'A195467';
-  my $radix = 2;
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    require Math::PlanePath::Diagonals;
-    my $diagonal_path = Math::PlanePath::Diagonals->new;
 
-    for (my $n = $diagonal_path->n_start; @got < @$bvalues; $n++) {
-      my ($x, $y) = $diagonal_path->n_to_xy ($n);
-      my $digits = [ digit_split_lowtohigh($y,$radix) ];
-      foreach (1 .. $x) { # x=0 unpermuted
-        Math::PlanePath::GrayCode::_digits_to_gray_reflected($digits,$radix);
-      }
-      push @got, digit_join_lowtohigh($digits,$radix);
-    }
+#
+# GP-Test  my(v=OEIS_samples("A099892")); v == vector(#v,n,n--; A099891(n,n))
 
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1);
-}
+# Sierpinski triangle patterns of each bit, until 0s past column 2^k
+#
+# for(n=0,64, for(k=0,n, printf(" %2d",A099891(n,k))); print());
+# for(n=0,20, for(k=0,n, printf(" %d",A099891(n,k)%2)); print());
+# for(n=0,64, for(k=0,n, printf(" %s",if(bitand(A099891(n,k),8),8,"."))); print());
 
-
-#------------------------------------------------------------------------------
-# A064706 - binary gray reflected permutation applied twice
-
-{
-  my $anum = 'A064706';
-  my $radix = 2;
-
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    for (my $n = 0; @got < @$bvalues; $n++) {
-      push @got, to_binary_gray(to_binary_gray($n));
-    }
-
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..20]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum - binary gray applied twice");
-}
+# vector(20,n,n++; A099891(n,n-1))
+# not in OEIS: 2, 3, 6, 6, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 24, 24, 0, 0, 0, 0
+# vector(20,n,n++; A099891(n,2))
+# not in OEIS: 3, 3, 5, 5, 3, 3, 9, 9, 3, 3, 5, 5, 3, 3, 17, 17, 3, 3, 5, 5
 
 
 #------------------------------------------------------------------------------
-# A055975 - binary gray first diffs
+# A064706 - binary Gray twice
+# which is n XOR n>>2
 
-{
-  my $anum = 'A055975';
-  my $radix = 2;
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    my $prev = 0;
-    for (my $n = 1; @got < @$bvalues; $n++) {
-      my $digits = [ digit_split_lowtohigh($n,$radix) ];
-      Math::PlanePath::GrayCode::_digits_to_gray_reflected($digits,$radix);
-      my $gray = digit_join_lowtohigh($digits,$radix);
-      push @got, $gray - $prev;
-      $prev = $gray;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..20]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum - binary gray first diffs");
-}
+MyOEIS::compare_values
+  (anum => 'A064706',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       push @got, to_binary_gray(to_binary_gray($n));
+     }
+     return \@got;
+   });
+
 
 #------------------------------------------------------------------------------
-# A055975 - binary gray first diffs
+# A055975 - binary Gray increments
 
-{
-  my $anum = 'A055975';
-  my $radix = 2;
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    my $prev = 0;
-    for (my $n = 1; @got < @$bvalues; $n++) {
-      my $digits = [ digit_split_lowtohigh($n,$radix) ];
-      Math::PlanePath::GrayCode::_digits_to_gray_reflected($digits,$radix);
-      my $gray = digit_join_lowtohigh($digits,$radix);
-      push @got, $gray - $prev;
-      $prev = $gray;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..20]));
-    }
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum - binary gray first diffs");
-}
+MyOEIS::compare_values
+  (anum => 'A055975',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       push @got, to_binary_gray($n+1) - to_binary_gray($n);
+     }
+     return \@got;
+   });
+
 
 #------------------------------------------------------------------------------
 exit 0;

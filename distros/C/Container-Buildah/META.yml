@@ -1,0 +1,54 @@
+---
+abstract: 'wrapper around containers/buildah tool for multi-stage builds of OCI/Docker-compatible Linux containers'
+author:
+  - 'Ian Kluft <https://github.com/ikluft>'
+build_requires:
+  File::Basename: '0'
+  File::Path: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::RequiresInternet: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Container-Buildah
+no_index:
+  directory:
+    - inc
+requires:
+  Algorithm::Dependency: '0'
+  Algorithm::Dependency::Source::HoA: '0'
+  Carp: '0'
+  Class::Singleton: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  File::Sync: '0'
+  File::stat: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  IO::Handle: '0'
+  IPC::Run: '0'
+  Modern::Perl: '0'
+  Readonly: '0'
+  Template: '0'
+  YAML::XS: '0'
+  autodie: '0'
+  parent: '0'
+  perl: v5.20.0
+  strict: '0'
+resources:
+  bugtracker: https://github.com/ikluft/Container-Buildah/issues
+  homepage: https://github.com/ikluft/Container-Buildah
+  repository: https://github.com/ikluft/Container-Buildah.git
+version: 0.2.1
+x_generated_by_perl: v5.30.3
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,4 +1,7 @@
 Revision history for English::Script
 
+1.02      2020-09-25 12:07:39-07:00 America/Los_Angeles
+        - Add support for negative numbers
+
 1.01      2020-09-18 15:40:14-07:00 America/Los_Angeles
         - First version, released on an unsuspecting world.

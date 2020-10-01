@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,7 +23,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -291,7 +291,7 @@ sub _UNDOCUMENTED__yseg_is_traversed {
 1;
 __END__
 
-=for stopwords eg Ryde ie Math-PlanePath Dekking
+=for stopwords eg Ryde ie Math-PlanePath Dekking Gosper McKenna unrotated DFA
 
 =head1 NAME
 
@@ -314,7 +314,17 @@ pages 79-104, section 4.9 "Gosper-Type Curves"
 
 =back
 
-This is a horizontal mirror image of the E-curve of McKenna (1978).
+This is also a horizontal mirror image of the E-curve from
+
+=over
+
+Douglas M. McKenna, "SquaRecurves, E-Tours, Eddies, and Frenzies: Basic
+Families of Peano Curves on the Square Grid", in "The Lighter Side of
+Mathematics: Proceedings of the Eugene Strens Memorial Conference on
+Recreational Mathematics and its History", Mathematical Association of
+America, 1994, pages 49-73, ISBN 0-88385-516-X
+
+=back
 
 The base pattern is N=0 to N=25.  It repeats with rotations or reversals
 which make the ends join.  For example N=75 to N=100 is the base pattern in
@@ -672,7 +682,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

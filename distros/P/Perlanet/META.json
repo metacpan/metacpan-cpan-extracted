@@ -66,7 +66,7 @@
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "v2.0.1"
+         "version" : "v2.0.4"
       },
       "Perlanet::Entry" : {
          "file" : "lib/Perlanet/Entry.pm"
@@ -97,6 +97,9 @@
       },
       "Perlanet::Trait::YAMLConfig" : {
          "file" : "lib/Perlanet/Trait/YAMLConfig.pm"
+      },
+      "Perlanet::Types" : {
+         "file" : "lib/Perlanet/Types.pm"
       }
    },
    "release_status" : "stable",
@@ -111,6 +114,6 @@
          "web" : "https://github.com/davorg/perlanet"
       }
    },
-   "version" : "v2.0.1",
+   "version" : "v2.0.4",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -10,13 +10,13 @@ use File::Path		qw(rmtree);
 use Text::CSV;
 use oEdtk::Config	qw(config_read);
 use oEdtk::DBAdmin	qw(db_connect);
-use oEdtk::EDMS	qw(EDMS_prepare EDMS_process EDMS_import);
+use oEdtk::EDMS		qw(EDMS_prepare EDMS_process EDMS_import);
 use oEdtk::Outmngr	qw(omgr_import omgr_export);
 use oEdtk::TexDoc;
 
 use Exporter;
 
-our $VERSION	= 0.8011;
+our $VERSION	= 1.5041;
 our @ISA		= qw(Exporter);
 our @EXPORT_OK	= qw(
 	oe_status_to_msg
@@ -24,6 +24,7 @@ our @EXPORT_OK	= qw(
 	oe_after_compo
 	oe_csv_to_doc
 	oe_outmngr_output_run_tex
+	oe_cmd_run
 );
 
 sub oe_cmd_run($) {
@@ -57,20 +58,22 @@ sub oe_cmd_run_bg($$) {
 		if ($pid > 0) {
 			if ($? != 0) {
 				my $msg = oe_status_to_msg($?);
-				die "ERROR: LaTeX process exited prematurely : $msg\n";
+				warn "INFO : LaTex process exited prematurely : $msg\n";
+				die  "ERROR: LaTeX process exited prematurely : $msg\n"; ##### xxxxxx capture des die par le tracker ...
 			}
 			$$ref = 0;
 		}
 	};
 
 	$cmd .= ' >&2';
+	warn "INFO : start cmd = $cmd \n";
 	my $pid = fork();
 	if (!defined($pid)) {
 		die "ERROR: Cannot fork process: $!\n";
 	}
 	if ($pid) {
 		# Parent process.
-		warn "INFO : Successfully started subprocess, pid $pid\n";
+		warn "INFO : Successfully started subprocess, pid $pid - look log for details\n";
 	} else {
 		# Child process.
 		exec($cmd);

@@ -9,7 +9,7 @@ use Moo;
 
 use Text::ASCIITable 0.22;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 has cols => (
     is  => 'rwp',
@@ -123,7 +123,7 @@ Markdown::Table - Create and parse tables in Markdown
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -152,7 +152,7 @@ To get tables from an existing Markdown document
     This table shows all employees and their role.
 
     | Id | Name | Role |
-    +---+---+---+
+    |---|---|---|
     | 1 | John Smith | Testrole |
     | 2 | Jane Smith | Admin |
     ~;

@@ -174,7 +174,9 @@ sub sign {
 
         $sig_alg = "ecdsa-with-SHA$digest_length";
 
-        $signature = $signer_key->sign( Digest::SHA->can($digest_algorithm)->($tbs) );
+        my $fn = "sign_sha$digest_length";
+
+        $signature = $signer_key->$fn($tbs);
     }
     elsif ($signer_key->isa('Crypt::Perl::RSA::PrivateKey')) {
         require Digest::SHA;

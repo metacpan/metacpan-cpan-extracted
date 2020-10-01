@@ -1,0 +1,67 @@
+NAME
+    Data::Tree::Describe - Create annotated versions of complex data trees
+
+WARNING
+    This module is in active development and has been uploaded simply as
+    part of a standard and automated release procedure.
+
+    If you have any ideas for what would be helpful to implement, please
+    contact the author!
+
+SYNOPSIS
+        use Data::Tree::Describe;
+
+        my $data_object = {test=>['some','stuff']};
+
+        my $described_tree = Data::Tree::Describe->new($data_object);
+
+DESCRIPTION
+    This module was originally developed for data trees or objects created
+    from json::maybexs, though it technically will work on any perl data
+    tree.
+
+    The module is fairly heavy processing wise and recursively iterates
+    through a tree determining the type for every node as well as other
+    handy attributes such as how many children are in any HASH or ARRAY
+    type.
+
+METHODS
+    Callable methods
+
+  new
+    Create a new annotated data tree
+
+    Takes 1 argument an $object
+
+    BEWARE large objects will take some time to be processed.
+
+  paths_list
+    Return a list of all paths in the format:
+    [element,element,element],[element,element]
+
+    Of the list returned, the first element [0] will always have a blank
+    'child name' as it is representative of the parent node.
+
+  extract
+    Return a block of data starting from the point specified.
+
+    Accepts 1 argument; the path in the format of a list
+    ['some_node',3,'element']
+
+    If you pass a blank or undefined list to the function it will return the
+    entire tree, as it will presume you are selecting the root/base node.
+
+CORROSPONDANCE
+    Regarding bugs, featuire requests, patches, forks or other please view
+    the project on github here
+    <https://github.com/PaulGWebster/p5-Data-Tree-Describe>
+
+AUTHOR
+    Paul G Webster <daemon@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by Paul G Webster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

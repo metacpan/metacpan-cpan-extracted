@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "CPAN",
       "Distribution",
@@ -69,67 +69,67 @@
    "provides" : {
       "Dist::Inkt" : {
          "file" : "lib/Dist/Inkt.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Profile::Simple" : {
          "file" : "lib/Dist/Inkt/Profile/Simple.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::CPANfile" : {
          "file" : "lib/Dist/Inkt/Role/CPANfile.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::CopyFiles" : {
          "file" : "lib/Dist/Inkt/Role/CopyFiles.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::CopyStandardDocuments" : {
          "file" : "lib/Dist/Inkt/Role/CopyStandardDocuments.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::MetaProvides" : {
          "file" : "lib/Dist/Inkt/Role/MetaProvides.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::MetaProvidesScripts" : {
          "file" : "lib/Dist/Inkt/Role/MetaProvidesScripts.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::SignDistribution" : {
          "file" : "lib/Dist/Inkt/Role/SignDistribution.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::StaticInstall" : {
          "file" : "lib/Dist/Inkt/Role/StaticInstall.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::WriteDOAPLite" : {
          "file" : "lib/Dist/Inkt/Role/WriteDOAPLite.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::WriteINSTALL" : {
          "file" : "lib/Dist/Inkt/Role/WriteINSTALL.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::WriteLICENSE" : {
          "file" : "lib/Dist/Inkt/Role/WriteLICENSE.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::WriteMakefilePL" : {
          "file" : "lib/Dist/Inkt/Role/WriteMakefilePL.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::WriteMetaJSON" : {
          "file" : "lib/Dist/Inkt/Role/WriteMetaJSON.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::WriteMetaYML" : {
          "file" : "lib/Dist/Inkt/Role/WriteMetaYML.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       },
       "Dist::Inkt::Role::WriteREADME" : {
          "file" : "lib/Dist/Inkt/Role/WriteREADME.pm",
-         "version" : "0.024"
+         "version" : "0.025"
       }
    },
    "release_status" : "stable",
@@ -149,7 +149,7 @@
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Dist-Inkt/project",
       "x_wiki" : "https://github.com/tobyink/p5-dist-inkt/wiki"
    },
-   "version" : "0.024",
+   "version" : "0.025",
    "x_help_wanted" : [
       "documenter",
       "tester"
@@ -162,6 +162,6 @@
          "file" : "script/distinkt-travisyml"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

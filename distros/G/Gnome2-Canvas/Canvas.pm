@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/GnomeCanvas/Canvas.pm,v 1.22 2004/08/16 02:13:21 muppetman Exp $
+# $Id$
 #
 
 package Gnome2::Canvas;
@@ -14,7 +14,7 @@ require DynaLoader;
 
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '1.002';
+our $VERSION = '1.004';
 
 sub import {
 	my $class = shift;

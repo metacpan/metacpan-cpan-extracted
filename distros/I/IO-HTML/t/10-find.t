@@ -14,7 +14,7 @@ use Scalar::Util 'blessed';
 
 use IO::HTML 'find_charset_in';
 
-plan tests => 23;
+plan tests => 26;
 
 sub test
 {
@@ -128,6 +128,20 @@ test 'iso-8859-15' => <<'', 'bogus encoding';
   ok(blessed($encoding), 'encoding is an object');
 
   is(eval { $encoding->name }, 'utf-8-strict', 'encoding is UTF-8');
+}
+
+# Tests involving bytes_to_check
+
+test cp1252 => (' ' x 1023) . '<meta charset="ISO-8859-1">',
+    'found at 1023 bytes';
+
+test undef, (' ' x 1024) . '<meta charset="ISO-8859-1">',
+    'not found at 1024 bytes';
+
+{
+  local $IO::HTML::bytes_to_check = 1025;
+  test cp1252 => (' ' x 1024) . '<meta charset="ISO-8859-1">',
+      'found at 1024 bytes with bytes_to_check=1025';
 }
 
 done_testing;

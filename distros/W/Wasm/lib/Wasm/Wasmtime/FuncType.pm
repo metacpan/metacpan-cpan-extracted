@@ -11,7 +11,7 @@ use constant is_functype => 1;
 use constant kind => 'functype';
 
 # ABSTRACT: Wasmtime function type class
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 $ffi_prefix = 'wasm_functype_';
@@ -82,7 +82,7 @@ Wasm::Wasmtime::FuncType - Wasmtime function type class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

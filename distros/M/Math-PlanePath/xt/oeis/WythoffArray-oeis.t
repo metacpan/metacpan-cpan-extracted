@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -18,12 +18,14 @@
 # with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
+# cf
 # A141104 Lower Even Swappage of Upper Wythoff Sequence.
 # A141105 Upper Even Swappage of Upper Wythoff Sequence.
 # A141106 Lower Odd Swappage of Upper Wythoff Sequence.
 # A141107 Upper Odd Swappage of Upper Wythoff Sequence.
-
+#
+# decimal digits of sum reciprocals of row 2 to 5
+# A228040, A228041, A228042, A228043
 
 use 5.004;
 use strict;
@@ -173,7 +175,7 @@ sub path_find_row_with_pair {
   #   }
   #   print "\n\n";
   # }
-  # 
+  #
   # print "R(2,6) = ",$diag->xy_to_n(6,2),"\n";
 }
 
@@ -280,7 +282,7 @@ MyOEIS::compare_values
      my @got;
      for (my $d = $diag->n_start; @got < $count; $d++) {
        my ($x,$y) = $diag->n_to_xy($d);  # by anti-diagonals
-       push @got, path_rect_to_accumulation($path, 0,0, $x,$y)
+       push @got, path_rect_to_accumulation($path, 0,0, $x,$y);
      }
      return \@got;
    });
@@ -310,7 +312,7 @@ sub path_rect_to_accumulation {
 # Return pair ($a,$b) which is in the $k'th coprime row of WythoffArray $path
 # First pair at $k==1.
 sub coprime_pair {
-  my ($path, $k) = @_;  
+  my ($path, $k) = @_;
   my $x = $path->x_minimum;
   for (my $y = $path->y_minimum; ; $y++) {
     my $a = $path->xy_to_n($x,  $y);
@@ -527,7 +529,7 @@ sub A188436_func {
 # = [3r]-[(n+4)r]-[3r-nr-4r]
 # = [3r]-[nr+4r]-[-r-nr]
 # some of Y axis  4,12,17,25,33,38,46
-  
+
 
 #------------------------------------------------------------------------------
 # A003622 -- Y coordinate of right turns is "odd" Zeckendorf base
@@ -717,7 +719,6 @@ MyOEIS::compare_values
    func => sub {
      my ($count) = @_;
      my $path = Math::PlanePath::WythoffArray->new;
-     my $d = 0;
      my @got;
      for (my $d = 0; @got < $count; $d++) {
        my $total = 0;

@@ -12,7 +12,7 @@ use lib 't/lib';
 
 sub Devel::FIXME::rules { sub { Devel::FIXME::DROP() } }
 
-use_ok("Devel::FIXME");
+use_ok('Devel::FIXME');
 
 my $value = eval { require Devel::FIXME::Test::Scalar };
 

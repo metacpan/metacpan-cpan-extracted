@@ -6,11 +6,12 @@ t/2-pod-coverage.t
 t/3-simple.t
 t/4-taint.t
 t/skip.test
-Artistic_License.txt
 Changes
 Makefile.PL
 Build.PL
+LICENSE
 MANIFEST
 MANIFEST.SKIP
 README
 META.yml
+META.json

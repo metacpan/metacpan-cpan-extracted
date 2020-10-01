@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -33,7 +33,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -58,7 +58,7 @@ use constant n_start => 0;
 use constant class_x_negative => 0;
 use constant y_negative_at_n => 4;
 *xy_is_visited = \&Math::PlanePath::Base::Generic::_xy_is_visited_x_positive;
-use constant _UNDOCUMENTED__dxdy_list_at_n => 4;
+use constant 1.02 _UNDOCUMENTED__dxdy_list_at_n => 4;
 
 
 #------------------------------------------------------------------------------
@@ -438,7 +438,7 @@ X<Wierum, Jens-Michael>This is an integer version of the Beta-Omega curve
 =over
 
 Jens-Michael Wierum, "Definition of a New Circular Space-Filling Curve:
-Beta-Omega-Indexing", Technical Report TR-001-02, Paderborn Center for
+Beta-Omega-Indexing", Technical Report TR-001-02, Paderborn Centre for
 Parallel Computing, March 2002.
 
 =back
@@ -706,7 +706,7 @@ Canadian Conference on Computational Geometry (CCCG'02), 2002.
 
 =over
 
-L<http://www.cccg.ca/proceedings/2002/>
+L<http://www.cccg.ca/proceedings/2002/>,
 L<http://www.cccg.ca/proceedings/2002/27.ps> (shorter),
 L<http://www.cccg.ca/proceedings/2002/27l.ps> (longer)
 
@@ -718,7 +718,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

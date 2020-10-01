@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -171,6 +171,8 @@ my @all_classes = ('SquareSpiral',
 
                    'PeanoCurve',
                    'PeanoCurve,radix=5',
+                   'PeanoDiagonals',
+                   'PeanoDiagonals,radix=5',
                    'WunderlichSerpentine',
                    'WunderlichSerpentine,serpentine_type=coil',
                    'WunderlichSerpentine,radix=5,serpentine_type=01001_01110_01000_11111_00010',

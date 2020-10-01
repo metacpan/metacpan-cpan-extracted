@@ -1,4 +1,44 @@
-SEE ALSO
+NAME
+    Bencher::Scenarios::DataSahVSTypeTiny - Benchmark Data::Sah vs
+    Type::Tiny
 
+VERSION
+    This document describes version 0.003 of
+    Bencher::Scenarios::DataSahVSTypeTiny (from Perl distribution
+    Bencher-Scenarios-DataSahVSTypeTiny), released on 2020-10-01.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::DataSahVSTypeTiny::Validate
+
+    *   Bencher::Scenario::DataSahVSTypeTiny::Startup
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-DataSahVSTypeTiny>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenarios-DataSahVSTypeTiny>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Dat
+    aSahVSTypeTiny>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Bencher::Scenarios::DataSah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

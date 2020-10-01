@@ -1,12 +1,14 @@
 package Net::Amazon::S3::Signature::V2;
 # ABSTRACT: V2 signatures
-$Net::Amazon::S3::Signature::V2::VERSION = '0.91';
+$Net::Amazon::S3::Signature::V2::VERSION = '0.94';
 use Moose;
 use URI::Escape qw( uri_escape_utf8 );
 use HTTP::Date qw[ time2str ];
 use MIME::Base64 qw( encode_base64 );
 use URI::QueryParam;
 use URI;
+
+use Net::Amazon::S3::Constants;
 
 use namespace::clean;
 
@@ -81,7 +83,7 @@ sub _canonical_string {
 
     # just in case someone used this.  it's not necessary in this lib.
     $interesting_headers{'date'} = ''
-        if $interesting_headers{'x-amz-date'};
+        if $interesting_headers{Net::Amazon::S3::Constants->HEADER_DATE};
 
     # if you're using expires for query string auth, then it trumps date
     # (and x-amz-date)
@@ -157,15 +159,15 @@ Net::Amazon::S3::Signature::V2 - V2 signatures
 
 =head1 VERSION
 
-version 0.91
+version 0.94
 
 =head1 AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

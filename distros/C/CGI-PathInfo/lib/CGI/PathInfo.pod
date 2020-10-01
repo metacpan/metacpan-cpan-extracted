@@ -1,7 +1,7 @@
 
 =head1 NAME
 
-CGI::PathInfo - A lightweight CGI processing package for using PATH_INFO like GET method form parameters
+CGI::PathInfo - A lightweight CGI processing package for using CGI PATH_INFO as if it was GET method form parameters
 
 =head1 SYNOPSIS
 
@@ -84,27 +84,35 @@ CGI::PathInfo is compatible with ModPerl 1 in addition to normal CGI.
 
 =head1 CHANGES
 
- 1.03 2008.07.22 - Updated for ModPerl2 compatibility
+  1.06 2020.09.27     - Fix repository path errors in Build.PL
 
- 1.02 2005.10.08 - Extended test coverage to 100% of code, fixed bug
-                   with the 'stripleadingslash', 'striptrailingslash'
-                   code, added documentation of all instantation parameters
-                   to 'new' method, fixed missing 'Build.PL' declaration
-                   in MANIFEST. Fixed mis-calls of 'croak' after delayed
-                   load in error paths.
+  1.05 2020.09.26     - Permissions fix for build tools (Build.PL / Makefile.PL)
 
- 1.01 2005.09.30 - Seperated POD into .pod file. Added more build tests.
-                   Added Build.PL, META.yml, GPL_License.txt,
-                   Artistic_License.txt, LICENSE. Deferred loading
-                   of Carp and HTML::Entities unless needed.
+  1.04 2020.09.26     - Maintainer update. Relicensed under the MIT License.
+                        Minor tweaks to build process. Added meta_merge
+                        information for GitHub. Added 'use warnings'.
+ 
+  1.03 2008.07.22     - Updated for ModPerl2 compatibility
 
-                   Removed dependency on 'vars'. Fixed error in output
-                   HTML from the 'calling_parms_table' method.
+  1.02 2005.10.08     - Extended test coverage to 100% of code, fixed bug
+                       with the 'stripleadingslash', 'striptrailingslash'
+                       code, added documentation of all instantation parameters
+                       to 'new' method, fixed missing 'Build.PL' declaration
+                       in MANIFEST. Fixed mis-calls of 'croak' after delayed
+                       load in error paths.
 
-                   Extended documentation to explain what the module
-                   is used for more clearly.
+  1.01 2005.09.30    - Seperated POD into .pod file. Added more build tests.
+                       Added Build.PL, META.yml, GPL_License.txt, 
+                       Artistic_License.txt, LICENSE. Deferred loading
+                       of Carp and HTML::Entities unless needed.
+                       
+                       Removed dependency on 'vars'.  Fixed error in output
+                       HTML from the 'calling_parms_table' method.
 
- 1.00 2000.07.21 - Initial public release.
+                       Extended documentation to explain what the module
+                       is used for more clearly.
+ 
+  1.00 22 July 2000 - Initial public release.
 
 =head1 METHODS
 
@@ -254,27 +262,39 @@ Extend build tests. Investigate ModPerl2 compatibility.
 
 =head1 AUTHORS
 
-Benjamin Franz <snowhare@nihongo.org>
+Jerilyn Franz <cpan@jerilyn.info>
 
 =head1 VERSION
 
-1.03 - released 2008.07.22
+1.06 - released 2020.09.27
 
 =head1 COPYRIGHT
 
-Copyright (c) Benjamin Franz and FreeRun Technologies. All rights reserved.
+Copyright (c) Jerilyn Franz and FreeRun Technologies. All rights reserved.
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it
-and/or modify it under the same terms and conditions as
-Perl itself.
+MIT License
 
-This means that you can, at your option, redistribute it and/or modify it under
-either the terms the GNU Public License (GPL) version 1 or later, or under the
-Perl Artistic License.
+Copyright (c) 2020 Jerilyn Franz
 
-See http://dev.perl.org/licenses/
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =head1 DISCLAIMER
 

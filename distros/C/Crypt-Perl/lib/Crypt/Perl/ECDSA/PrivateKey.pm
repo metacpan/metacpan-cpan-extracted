@@ -137,19 +137,67 @@ sub new {
 }
 
 sub sign {
+    return $_[0]->_sign_and_serialize($_[1]);
+}
+
+sub _sign_and_serialize {
+    my ($self, $whatsit, $hashfn) = @_;
+
+    my ($r, $s) = $self->_sign($whatsit, $hashfn);
+    return $self->_serialize_sig( $r, $s );
+}
+
+sub _hash_sign_and_serialize {
+    my ($self, $whatsit, $hashfn) = @_;
+
+    require Digest::SHA;
+    $whatsit = Digest::SHA->can($hashfn)->($whatsit);
+
+    return $self->_sign_and_serialize($whatsit, $hashfn);
+}
+
+sub sign_sha1 {
     my ($self, $whatsit) = @_;
 
-    my ($r, $s) = $self->_sign($whatsit);
-    return $self->_serialize_sig( $r, $s );
+    return $_[0]->_hash_sign_and_serialize($whatsit, 'sha1');
+}
+
+sub sign_sha224 {
+    my ($self, $whatsit) = @_;
+
+    return $_[0]->_hash_sign_and_serialize($whatsit, 'sha224');
+}
+
+sub sign_sha256 {
+    my ($self, $whatsit) = @_;
+
+    return $_[0]->_hash_sign_and_serialize($whatsit, 'sha256');
+}
+
+sub sign_sha384 {
+    my ($self, $whatsit) = @_;
+
+    return $_[0]->_hash_sign_and_serialize($whatsit, 'sha384');
+}
+
+sub sign_sha512 {
+    my ($self, $whatsit) = @_;
+
+    return $_[0]->_hash_sign_and_serialize($whatsit, 'sha512');
 }
 
 #cf. RFC 7518, page 8
 sub sign_jwa {
     my ($self, $whatsit) = @_;
 
-    my $dgst_cr = $self->_get_jwk_digest_cr();
+    # As of version 0.34 this method creates deterministic signatures.
 
-    my ($r, $s) = map { $_->as_bytes() } $self->_sign($dgst_cr->($whatsit));
+    my $dgst_name = $self->_get_jwk_digest_name();
+
+    require Digest::SHA;
+    $whatsit = Digest::SHA->can($dgst_name)->($whatsit);
+
+    my ($r, $s) = map { $_->as_bytes() } $self->_sign($whatsit, $dgst_name);
 
     my $octet_length = Crypt::Perl::Math::ceil($self->max_sign_bits() / 8);
 
@@ -189,7 +237,7 @@ sub get_struct_for_private_jwk {
 
 #$whatsit is probably a message digest, e.g., from SHA256
 sub _sign {
-    my ($self, $whatsit) = @_;
+    my ($self, $whatsit, $det_hashfuncname) = @_;
 
     my $dgst = Crypt::Perl::BigInt->from_bytes( $whatsit );
 
@@ -205,30 +253,26 @@ sub _sign {
 
     #isa ECPoint
     my $G = $self->_G();
-#printf "G.x: %s\n", $G->{'x'}->to_bigint()->as_hex();
-#printf "G.y: %s\n", $G->{'y'}->to_bigint()->as_hex();
-#printf "G.z: %s\n", $G->{'z'}->as_hex();
-
     my ($k, $r);
 
     do {
-        $k = Crypt::Perl::Math::randint($n);
-#print "once\n";
-#printf "big random: %s\n", $k->as_hex();
-#$k = Crypt::Perl::BigInt->new("98452900523450592996995215574085435893040452563985855319633891614520662229711");
-#printf "k: %s\n", $k->bstr();
+        if ($det_hashfuncname) {
+            require Crypt::Perl::ECDSA::Deterministic;
+            $k = Crypt::Perl::ECDSA::Deterministic::generate_k(
+                $n,
+                $priv_num,
+                $whatsit,
+                $det_hashfuncname,
+            );
+        }
+        else {
+            $k = Crypt::Perl::Math::randint($n);
+        }
+
         my $Q = $G->multiply($k);   #$Q isa ECPoint
-#printf "Q.x: %s\n", $Q->{'x'}->to_bigint()->as_hex();
-#printf "Q.y: %s\n", $Q->{'y'}->to_bigint()->as_hex();
-#printf "Q.z: %s\n", $Q->{'z'}->as_hex();
+
         $r = $Q->get_x()->to_bigint()->copy()->bmod($n);
     } while !$r->is_positive();
-
-#printf "k: %s\n", $k->as_hex();
-#printf "n: %s\n", $n->as_hex();
-#printf "e: %s\n", $dgst->as_hex();
-#printf "d: %s\n", $priv_num->as_hex();
-#printf "r: %s\n", $r->as_hex();
 
     my $s = $k->bmodinv($n);
 

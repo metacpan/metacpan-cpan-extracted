@@ -4,10 +4,10 @@ use strict;
 use warnings;
 
 use Exporter;
-our $VERSION 	=0.8022;		# release number : Y.YMMS -> Year, Month, Sequence
+our $VERSION 	=1.5091;		# release number : Y.YMMS -> Year, Month, Sequence
 
 our @ISA	=	qw(Exporter);
-our @EXPORT 	= 	qw(
+our @EXPORT = 	qw(
 			c7Flux
 			date2time
 			fmt_address
@@ -37,6 +37,7 @@ our @EXPORT 	= 	qw(
 			oe_date_biggest
 			oe_date_smallest
 			oe_define_TeX_output
+			oe_define_Compuset_output
 			oe_env_var_completion
 			oe_fmt_date
 			oe_ID_LDOC
@@ -67,13 +68,13 @@ our @EXPORT 	= 	qw(
 			%motifs %ouTags %evalSsTrt
 			);
 
-use POSIX			qw(mkfifo);
+use POSIX		qw(mkfifo);
 use Date::Calc 	qw(Add_Delta_Days Delta_Days Date_to_Time Today Gmtime Week_of_Year);
 use Encode;
 use File::Basename;
 use Getopt::Long;
 use List::MoreUtils	qw(uniq);
-use List::Util 	qw(reduce);
+use List::Util		qw(reduce);
 use Math::Round 	qw(nearest);
 use Sys::Hostname;
 
@@ -941,13 +942,13 @@ sub oe_new_job(@) {
 	my $params = {};
 	# DEFAULT OPTION VALUES.
 	my %defaults = (
-#		xls	 	=> 0,
-#		tex		=> 0,
-		index 	=> 0,
-		massmail 	=> 0,
-		edms 	=> 0,
-		cgi		=> 0,
-		input_code=> 0
+#		xls	 		=> 0,
+#		tex			=> 0,
+		index 		=> 0,
+		massmail	=> 0,
+		edms 		=> 0,
+		cgi			=> 0,
+		input_code	=> 0
 	);
 
 	# exemples d'ajout de paramètres au lancement 
@@ -992,7 +993,7 @@ sub oe_new_job(@) {
 		exit 0;
 	} else {
 		$fi = $ARGV[0];	# TO KEEP COMPATIBILITY
-		open(IN, $params->{'input_code'}, $fi)						or die "ERROR: Cannot open \"$fi\" for reading: $!\n";
+		open(IN, $params->{'input_code'}, $fi)	or die "ERROR: Cannot open \"$fi\" for reading: $!\n";
 		warn "INFO : input perl data is $fi (encode \'". $params->{'input_code'} ."\' $ARGV[-1])\n";
 	}
 
@@ -1352,24 +1353,34 @@ return ${$rValue};
 }
 
 
-sub oe_ID_LDOC() {
+sub oe_ID_LDOC(;$) {
 	# UTILISE LA BIBLIOTHÈQUE : Date::Calc
 	# ID du lot de document
 	# format YWWWDHHMMSSPPPP.r (compuset se limite à 16 digits : 15 entiers, 1 decimal) 999999999999999.9
+	my $force_ID = shift;
 
 	if ($_ID_LDOC eq '') {		# on ne le génère qu'une fois par run : plusieurs appels dans la même instance retourne le même id
-		my $time =time;
-		my ($year,$month,$day, $hour,$min,$sec, $doy,$dow,$dst)=
-			Gmtime($time);
-		my ($week,) = Week_of_Year($year,$month,$day);
 
-		my $pid = "$$";
-		my $rnd = int(rand(10));
-		if (length $pid > 5) {
-			$pid = $pid/(10**((length $pid)-5));
+		if (!defined $force_ID){
+			my $time =time;
+			my ($year,$month,$day, $hour,$min,$sec, $doy,$dow,$dst)=
+				Gmtime($time);
+			my ($week,) = Week_of_Year($year,$month,$day);
+
+			my $pid = "$$";
+			my $rnd = int(rand(10));
+			if (length $pid > 5) {
+				$pid = $pid/(10**((length $pid)-5));
+			}
+
+			$_ID_LDOC =sprintf ("%1d%02d%1d%02d%02d%02d%05d%1d", $year % 10, $week, $dow, $hour, $min, $sec, $pid, $rnd );
+
+		} else {
+			if (length $force_ID > 25) {
+				die "ERROR: forced ID_LDOC too long (>25 car) : $force_ID \n";
+			}
+			$_ID_LDOC = $force_ID;
 		}
-
-		$_ID_LDOC =sprintf ("%1d%02d%1d%02d%02d%02d%05d%1d", $year % 10, $week, $dow, $hour, $min, $sec, $pid, $rnd );
 
 	}
 
@@ -1597,7 +1608,7 @@ my $_backup_date ;
 
 END {
 	_restore_sys_date;
-	# return "(c) 2005-2012 daunay\@cpan.org - edtk\@free.fr - oEdtk v$VERSION\n";
+	#warn "(c) 2005-2020 daunay\@cpan.org - edtk\@free.fr - oEdtk v$VERSION\n";
 }
 
 1;

@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Interface to WebAssembly global variables
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Wasm::Global - Interface to WebAssembly global variables
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

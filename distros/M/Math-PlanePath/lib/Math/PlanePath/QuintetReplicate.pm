@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,7 +26,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -317,7 +317,7 @@ sub _UNDOCUMENTED__n_is_boundary_level {
 1;
 __END__
 
-=for stopwords eg Ryde Math-PlanePath
+=for stopwords eg Ryde Math-PlanePath TerdragonCurve GosperSide OEIS
 
 =head1 NAME
 
@@ -746,7 +746,7 @@ Similarly the X,Y location, using -i for rotation back
 
 By symmetry the maximum extent is the same for Y vertically and for X or Y
 negative, suitably rotated.  The N in those cases has the digits 1,2,3,4
-cycled around as per L</Rotations> above.
+cycled around as per L</Axis Rotations> above.
 
 If the +1/2 in the floor is omitted then the effect is to find the maximum
 point in direction +45deg, so the point(s) with maximum sum S = X+Y.
@@ -827,6 +827,20 @@ N_smax(k)+1 are equal maximums.
 
 =pod
 
+=head1 OEIS
+
+Entries in Sloane's Online Encyclopedia of Integer Sequences related to
+this path include
+
+=over
+
+L<http://oeis.org/A318438> (etc)
+
+=back
+
+    A318438    X coordinate
+    A318439    Y coordinate
+
 =head1 SEE ALSO
 
 L<Math::PlanePath>,
@@ -840,7 +854,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

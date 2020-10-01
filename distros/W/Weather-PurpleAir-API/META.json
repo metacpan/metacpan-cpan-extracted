@@ -22,8 +22,10 @@
       "runtime" : {
          "requires" : {
             "File::Valet" : "1.07",
-            "JSON::MaybeXS" : "1.004000",
+            "HTTP::Tiny" : "0.043",
+            "JSON::MaybeXS" : "1.003005",
             "String::Similarity" : "1.04",
+            "Time::HiRes" : "1.9721",
             "perl" : "5.010000"
          }
       },
@@ -35,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05"
+   "version" : "0.06"
 }
 

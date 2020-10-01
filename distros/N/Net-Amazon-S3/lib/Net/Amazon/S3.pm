@@ -1,5 +1,5 @@
 package Net::Amazon::S3;
-$Net::Amazon::S3::VERSION = '0.91';
+$Net::Amazon::S3::VERSION = '0.94';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -14,27 +14,33 @@ use Net::Amazon::S3::Bucket;
 use Net::Amazon::S3::Client;
 use Net::Amazon::S3::Client::Bucket;
 use Net::Amazon::S3::Client::Object;
+use Net::Amazon::S3::Error::Handler::Legacy;
 use Net::Amazon::S3::HTTPRequest;
 use Net::Amazon::S3::Request;
-use Net::Amazon::S3::Request::AbortMultipartUpload;
-use Net::Amazon::S3::Request::CompleteMultipartUpload;
-use Net::Amazon::S3::Request::CreateBucket;
-use Net::Amazon::S3::Request::DeleteBucket;
-use Net::Amazon::S3::Request::DeleteMultiObject;
-use Net::Amazon::S3::Request::DeleteObject;
-use Net::Amazon::S3::Request::GetBucketAccessControl;
-use Net::Amazon::S3::Request::GetBucketLocationConstraint;
-use Net::Amazon::S3::Request::GetObject;
-use Net::Amazon::S3::Request::GetObjectAccessControl;
-use Net::Amazon::S3::Request::InitiateMultipartUpload;
-use Net::Amazon::S3::Request::ListAllMyBuckets;
-use Net::Amazon::S3::Request::ListBucket;
-use Net::Amazon::S3::Request::ListParts;
-use Net::Amazon::S3::Request::PutObject;
-use Net::Amazon::S3::Request::PutPart;
-use Net::Amazon::S3::Request::RestoreObject;
-use Net::Amazon::S3::Request::SetBucketAccessControl;
-use Net::Amazon::S3::Request::SetObjectAccessControl;
+use Net::Amazon::S3::Response;
+use Net::Amazon::S3::Operation::Bucket::Acl::Fetch;
+use Net::Amazon::S3::Operation::Bucket::Acl::Set;
+use Net::Amazon::S3::Operation::Bucket::Create;
+use Net::Amazon::S3::Operation::Bucket::Delete;
+use Net::Amazon::S3::Operation::Bucket::Location;
+use Net::Amazon::S3::Operation::Bucket::Tags::Add;
+use Net::Amazon::S3::Operation::Bucket::Tags::Delete;
+use Net::Amazon::S3::Operation::Buckets::List;
+use Net::Amazon::S3::Operation::Object::Acl::Fetch;
+use Net::Amazon::S3::Operation::Object::Acl::Set;
+use Net::Amazon::S3::Operation::Object::Add;
+use Net::Amazon::S3::Operation::Object::Fetch;
+use Net::Amazon::S3::Operation::Object::Delete;
+use Net::Amazon::S3::Operation::Object::Restore;
+use Net::Amazon::S3::Operation::Object::Tags::Add;
+use Net::Amazon::S3::Operation::Object::Tags::Delete;
+use Net::Amazon::S3::Operation::Object::Upload::Abort;
+use Net::Amazon::S3::Operation::Object::Upload::Complete;
+use Net::Amazon::S3::Operation::Object::Upload::Create;
+use Net::Amazon::S3::Operation::Object::Upload::Part;
+use Net::Amazon::S3::Operation::Object::Upload::Parts;
+use Net::Amazon::S3::Operation::Objects::Delete;
+use Net::Amazon::S3::Operation::Objects::List;
 use Net::Amazon::S3::Signature::V2;
 use Net::Amazon::S3::Signature::V4;
 use Net::Amazon::S3::Vendor;
@@ -78,6 +84,18 @@ has 'ua'     => ( is => 'rw', isa => 'LWP::UserAgent', required => 0 );
 has 'err'    => ( is => 'rw', isa => 'Maybe[Str]',     required => 0 );
 has 'errstr' => ( is => 'rw', isa => 'Maybe[Str]',     required => 0 );
 has keep_alive_cache_size => ( is => 'ro', isa => 'Int', required => 0, default => 10 );
+
+has error_handler_class => (
+    is => 'ro',
+    lazy => 1,
+    default => 'Net::Amazon::S3::Error::Handler::Legacy',
+);
+
+has error_handler => (
+    is => 'ro',
+    lazy => 1,
+    default => sub { $_[0]->error_handler_class->new (s3 => $_[0]) },
+);
 
 
 sub _build_arg_authorization_context {
@@ -173,35 +191,33 @@ sub BUILD {
 }
 
 
+sub bucket_class {
+    'Net::Amazon::S3::Bucket'
+}
+
 sub buckets {
     my $self = shift;
 
-    my $http_request
-        = Net::Amazon::S3::Request::ListAllMyBuckets->new( s3 => $self )
-        ->http_request;
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Buckets::List',
+    );
 
-    # die $request->http_request->as_string;
+    return unless $response->is_success;
 
-    my $xpc = $self->_send_request($http_request);
-
-    return undef unless $xpc && !$self->_remember_errors($xpc);
-
-    my $owner_id          = $xpc->findvalue("//s3:Owner/s3:ID");
-    my $owner_displayname = $xpc->findvalue("//s3:Owner/s3:DisplayName");
+    my $owner_id          = $response->owner_id;;
+    my $owner_displayname = $response->owner_displayname;
 
     my @buckets;
-    foreach my $node ( $xpc->findnodes(".//s3:Bucket") ) {
-        push @buckets,
-            Net::Amazon::S3::Bucket->new(
-            {   bucket => $xpc->findvalue( ".//s3:Name", $node ),
-                creation_date =>
-                    $xpc->findvalue( ".//s3:CreationDate", $node ),
-                account => $self,
-            }
-            );
+    foreach my $bucket ($response->buckets) {
+        push @buckets, $self->bucket_class->new (
+			account       => $self,
+			bucket        => $bucket->{name},
+			creation_date => $bucket->{creation_date},
+		);
 
     }
-    return {
+
+    return +{
         owner_id          => $owner_id,
         owner_displayname => $owner_displayname,
         buckets           => \@buckets,
@@ -210,29 +226,30 @@ sub buckets {
 
 
 sub add_bucket {
-    my ( $self, $conf ) = @_;
+    my ($self, $conf) = @_;
 
-    my $http_request = Net::Amazon::S3::Request::CreateBucket->new(
-        s3                  => $self,
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Bucket::Create',
+
         bucket              => $conf->{bucket},
-        acl_short           => $conf->{acl_short},
+        (acl                => $conf->{acl})       x!! defined $conf->{acl},
+        (acl_short          => $conf->{acl_short}) x!! defined $conf->{acl_short},
         location_constraint => $conf->{location_constraint},
         ( $conf->{region} ? (region => $conf->{region}) : () ),
-    )->http_request;
+    );
 
-    return 0
-        unless $self->_send_request_expect_nothing($http_request);
+    return unless $response->is_success;
 
-    return $self->bucket( $conf->{bucket} );
+    return $self->bucket ($conf->{bucket});
 }
 
 
 sub bucket {
     my ( $self, $bucket ) = @_;
 
-    return $bucket if $bucket->$Safe::Isa::_isa ('Net::Amazon::S3::Bucket');
+    return $bucket if $bucket->$Safe::Isa::_isa ($self->bucket_class);
 
-    return Net::Amazon::S3::Bucket->new(
+    return $self->bucket_class->new(
         { bucket => $bucket, account => $self } );
 }
 
@@ -247,78 +264,58 @@ sub delete_bucket {
     }
     croak 'must specify bucket' unless $bucket;
 
-    my $http_request = Net::Amazon::S3::Request::DeleteBucket->new(
-        s3     => $self,
-        bucket => $bucket,
-    )->http_request;
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Bucket::Delete',
 
-    return $self->_send_request_expect_nothing($http_request);
+        bucket => $bucket,
+    );
+
+    return unless $response->is_success;
+
+    return 1;
 }
 
 
 sub list_bucket {
     my ( $self, $conf ) = @_;
 
-    my $http_request = Net::Amazon::S3::Request::ListBucket->new(
-        s3        => $self,
+    my $response = $self->_perform_operation (
+        'Net::Amazon::S3::Operation::Objects::List',
+
         bucket    => $conf->{bucket},
         delimiter => $conf->{delimiter},
         max_keys  => $conf->{max_keys},
         marker    => $conf->{marker},
         prefix    => $conf->{prefix},
-    )->http_request;
+    );
 
-    my $xpc = $self->_send_request($http_request);
-
-    return undef unless $xpc && !$self->_remember_errors($xpc);
+    return unless $response->is_success;
 
     my $return = {
-        bucket      => $xpc->findvalue("//s3:ListBucketResult/s3:Name"),
-        prefix      => $xpc->findvalue("//s3:ListBucketResult/s3:Prefix"),
-        marker      => $xpc->findvalue("//s3:ListBucketResult/s3:Marker"),
-        next_marker => $xpc->findvalue("//s3:ListBucketResult/s3:NextMarker"),
-        max_keys    => $xpc->findvalue("//s3:ListBucketResult/s3:MaxKeys"),
-        is_truncated => (
-            scalar $xpc->findvalue("//s3:ListBucketResult/s3:IsTruncated") eq
-                'true'
-            ? 1
-            : 0
-        ),
+        bucket      => $response->bucket,
+        prefix      => $response->prefix,
+        marker      => $response->marker,
+        next_marker => $response->next_marker,
+        max_keys    => $response->max_keys,
+        is_truncated => $response->is_truncated,
     };
 
     my @keys;
-    foreach my $node ( $xpc->findnodes(".//s3:Contents") ) {
-        my $etag = $xpc->findvalue( ".//s3:ETag", $node );
-        $etag =~ s/^"//;
-        $etag =~ s/"$//;
-
-        push @keys,
-            {
-            key           => $xpc->findvalue( ".//s3:Key",          $node ),
-            last_modified => $xpc->findvalue( ".//s3:LastModified", $node ),
-            etag          => $etag,
-            size          => $xpc->findvalue( ".//s3:Size",         $node ),
-            storage_class => $xpc->findvalue( ".//s3:StorageClass", $node ),
-            owner_id      => $xpc->findvalue( ".//s3:ID",           $node ),
-            owner_displayname =>
-                $xpc->findvalue( ".//s3:DisplayName", $node ),
+    foreach my $node ($response->contents) {
+        push @keys, {
+            key           => $node->{key},
+            last_modified => $node->{last_modified},
+            etag          => $node->{etag},
+            size          => $node->{size},
+            storage_class => $node->{storage_class},
+            owner_id      => $node->{owner}{id},
+            owner_displayname => $node->{owner}{displayname},
             };
     }
     $return->{keys} = \@keys;
 
     if ( $conf->{delimiter} ) {
-        my @common_prefixes;
-        my $strip_delim = qr/$conf->{delimiter}$/;
-
-        foreach my $node ( $xpc->findnodes(".//s3:CommonPrefixes") ) {
-            my $prefix = $xpc->findvalue( ".//s3:Prefix", $node );
-
-            # strip delimiter from end of prefix
-            $prefix =~ s/$strip_delim//;
-
-            push @common_prefixes, $prefix;
-        }
-        $return->{common_prefixes} = \@common_prefixes;
+        $return->{common_prefixes} = [ $response->common_prefixes ];
     }
 
     return $return;
@@ -350,17 +347,11 @@ sub list_bucket_all {
     return $all;
 }
 
-sub _compat_bucket {
-    my ( $self, $conf ) = @_;
-    return Net::Amazon::S3::Bucket->new(
-        { account => $self, bucket => delete $conf->{bucket} } );
-}
-
 
 # compat wrapper; deprecated as of 2005-03-23
 sub add_key {
     my ( $self, $conf ) = @_;
-    my $bucket = $self->_compat_bucket($conf);
+    my $bucket = $self->bucket (delete $conf->{bucket});
     my $key    = delete $conf->{key};
     my $value  = delete $conf->{value};
     return $bucket->add_key( $key, $value, $conf );
@@ -370,7 +361,7 @@ sub add_key {
 # compat wrapper; deprecated as of 2005-03-23
 sub get_key {
     my ( $self, $conf ) = @_;
-    my $bucket = $self->_compat_bucket($conf);
+    my $bucket = $self->bucket (delete $conf->{bucket});
     return $bucket->get_key( $conf->{key} );
 }
 
@@ -378,7 +369,7 @@ sub get_key {
 # compat wrapper; deprecated as of 2005-03-23
 sub head_key {
     my ( $self, $conf ) = @_;
-    my $bucket = $self->_compat_bucket($conf);
+    my $bucket = $self->bucket (delete $conf->{bucket});
     return $bucket->head_key( $conf->{key} );
 }
 
@@ -386,109 +377,47 @@ sub head_key {
 # compat wrapper; deprecated as of 2005-03-23
 sub delete_key {
     my ( $self, $conf ) = @_;
-    my $bucket = $self->_compat_bucket($conf);
+    my $bucket = $self->bucket (delete $conf->{bucket});
     return $bucket->delete_key( $conf->{key} );
 }
 
-sub _validate_acl_short {
-    my ( $self, $policy_name ) = @_;
 
-    # Current list at https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
-    if (!grep( { $policy_name eq $_ }
-            qw(private public-read public-read-write aws-exec-read authenticated-read bucket-owner-read bucket-owner-full-control log-delivery-write ) ) )
-    {
-        croak "$policy_name is not a supported canned access policy";
-    }
-}
+sub _perform_operation {
+	my ($self, $operation, %params) = @_;
 
-# $self->_send_request($HTTP::Request)
-# $self->_send_request(@params_to_make_request)
-sub _send_request {
-    my ( $self, $http_request ) = @_;
+	my $error_handler = delete $params{error_handler};
+	$error_handler = $self->error_handler unless defined $error_handler;
 
-    # warn $http_request->as_string;
+    my $request_class  = $operation . '::Request';
+    my $response_class = $operation . '::Response';
+	my $filename = delete $params{filename};
 
-    my $response = $self->_do_http($http_request);
-    my $content  = $response->content;
+    my $request  = $request_class->new (s3 => $self, %params);
+    my $response = $self->_do_http ($request, $filename);
+    $response    = $response_class->new (http_response => $response->http_response);
 
-    return $content unless $response->content_type eq 'application/xml';
-    return unless $content;
-    return $self->_xpc_of_content($content);
+    $error_handler->handle_error ($response);
+
+    return $response;
 }
 
 # centralize all HTTP work, for debugging
 sub _do_http {
     my ( $self, $http_request, $filename ) = @_;
 
+	$http_request = $http_request->http_request
+		if $http_request->$Safe::Isa::_isa ('Net::Amazon::S3::Request');
+
     confess 'Need HTTP::Request object'
         if ( ref($http_request) ne 'HTTP::Request' );
 
-    # convenient time to reset any error conditions
-    $self->err(undef);
-    $self->errstr(undef);
-    return $self->ua->request( $http_request, $filename );
-}
+	my $response = Net::Amazon::S3::Response->new (
+		http_response => scalar $self->ua->request( $http_request, $filename ),
+	);
 
-sub _send_request_expect_nothing {
-    my ( $self, $http_request ) = @_;
+	$self->error_handler->handle_error ($response, $http_request);
 
-    # warn $http_request->as_string;
-
-    my $response = $self->_do_http($http_request);
-
-    return 1 if $response->code =~ /^2\d\d$/;
-
-    # anything else is a failure, and we save the parsed result
-    $self->_remember_errors( $response->content );
-    return 0;
-}
-
-sub _croak_if_response_error {
-    my ( $self, $response ) = @_;
-    unless ( $response->code =~ /^2\d\d$/ ) {
-        $self->err("network_error");
-        $self->errstr( $response->status_line );
-        croak "Net::Amazon::S3: Amazon responded with "
-            . $response->status_line . "\n";
-    }
-}
-
-sub _xpc_of_content {
-    my ( $self, $content ) = @_;
-    my $doc = $self->libxml->parse_string($content);
-
-    # warn $doc->toString(1);
-
-    my $xpc = XML::LibXML::XPathContext->new($doc);
-
-    # Set default XML document NS as S3 namespace.
-    # Or default Amazon xmlns (for documents without NS).
-    my $s3_ns = $doc->documentElement->lookupNamespaceURI
-       || 'http://s3.amazonaws.com/doc/2006-03-01/';
-    $xpc->registerNs( 's3', $s3_ns );
-
-    return $xpc;
-}
-
-# returns 1 if errors were found
-sub _remember_errors {
-    my ( $self, $src ) = @_;
-
-    # Do not try to parse non-xml
-    unless ( ref $src || $src =~ m/^[[:space:]]*</ ) {
-        ( my $code = $src ) =~ s/^[[:space:]]*\([0-9]*\).*$/$1/;
-        $self->err($code);
-        $self->errstr($src);
-        return 1;
-    }
-
-    my $xpc = ref $src ? $src : $self->_xpc_of_content($src);
-    if ( $xpc->findnodes("//Error") ) {
-        $self->err( $xpc->findvalue("//Error/Code") );
-        $self->errstr( $xpc->findvalue("//Error/Message") );
-        return 1;
-    }
-    return 0;
+	return $response;
 }
 
 sub _urlencode {
@@ -512,7 +441,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 =head1 VERSION
 
-version 0.91
+version 0.94
 
 =head1 SYNOPSIS
 
@@ -766,6 +695,17 @@ Default is Signature 4 if host is C<< s3.amazonaws.com >>, Signature 2 otherwise
 
 See L<#vendor> and L<Net::Amazon::S3::Vendor>.
 
+=item error_handler_class
+
+Error handler class name (package name), see L<< Net::Amazon::S3::Error::Handler >>
+for more.
+
+Default: L<< Net::Amazon::S3::Error::Handler::Legacy >>
+
+=item error_handler
+
+Instance of error handler class.
+
 =back
 
 =head3 Notes
@@ -792,11 +732,24 @@ Takes a hashref:
 
 The name of the bucket you want to add
 
-=item acl_short (optional)
+=item acl
 
-See the set_acl subroutine for documentation on the acl_short options
+	acl => 'private'
 
-=item location_constraint (option)
+	acl => Net::Amazon::S3::ACL::Canned->PRIVATE
+
+	acl => Net::Amazon::S3::ACL::Set
+		->grant_read (email => 'foo@bar.baz')
+
+Set ACL for newly created bucket. Refer L<Net::Amazon::S3::ACL>.
+
+=item acl_short (optional; deprecated)
+
+Deprecated. Use C<acl> now.
+
+=item region (optional)
+
+=item location_constraint (optional)
 
 Sets the location constraint of the new bucket. If left unspecified, the
 default S3 datacenter location will be used. Otherwise, you can set it
@@ -984,6 +937,21 @@ DEPRECATED. DO NOT USE
 
 DEPRECATED. DO NOT USE
 
+=head2 _perform_operation
+
+    my $response = $s3->_perform_operation ('Operation' => (
+        # ... operation request parameters
+    ));
+
+Internal operation implementation method, takes request construction parameters,
+performs necessary HTTP requests(s) and returns Response instance.
+
+Method takes same named parameters as realted Request class.
+
+Method provides available contextual parameters by default (eg s3, bucket)
+
+Method invokes contextual error handler.
+
 =head1 LICENSE
 
 This module contains code modified from Amazon that contains the
@@ -1036,11 +1004,11 @@ L<Net::Amazon::S3::Bucket>
 
 =head1 AUTHOR
 
-Leo Lapworth <llap@cpan.org>
+Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 16;
+our $VERSION = 17;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -26,6 +26,22 @@ sub new {
     my ($class, $server, $port, $username, $password, $clientname, $iscaching) = @_;
     my $self = bless {}, $class;
 
+    if(!defined($server) || !length($server)) {
+        croak("server not defined!");
+    }
+    if(!defined($port) || !length($port)) {
+        croak("port not defined!");
+    }
+    if(!defined($username) || !length($username)) {
+        croak("username not defined!");
+    }
+    if(!defined($password) || !length($password)) {
+        croak("password not defined!");
+    }
+    if(!defined($clientname) || !length($clientname)) {
+        croak("clientname not defined!");
+    }
+
     $self->{server} = $server;
     $self->{port} = $port;
 
@@ -37,6 +53,19 @@ sub new {
 sub newSocket {
     my ($class, $socketpath, $username, $password, $clientname, $iscaching) = @_;
     my $self = bless {}, $class;
+
+    if(!defined($socketpath) || !length($socketpath)) {
+        croak("socketpath not defined!");
+    }
+    if(!defined($username) || !length($username)) {
+        croak("username not defined!");
+    }
+    if(!defined($password) || !length($password)) {
+        croak("password not defined!");
+    }
+    if(!defined($clientname) || !length($clientname)) {
+        croak("clientname not defined!");
+    }
 
     my $udsloaded = 0;
     eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
@@ -64,7 +93,7 @@ sub init {
         croak("Password not defined!");
     }
 
-    if(!defined($clientname || $password eq '')) {
+    if(!defined($clientname || $clientname eq '')) {
         croak("Clientname not defined!");
     }
     $self->{clientname} = $clientname;
@@ -497,6 +526,11 @@ sub disablePing {
 sub notify {
     my ($self, $varname) = @_;
 
+    if(!defined($varname) || !length($varname)) {
+        carp("varname not defined!");
+        return;
+    }
+
     if($self->{needreconnect}) {
         $self->reconnect;
     }
@@ -521,6 +555,15 @@ sub notify {
 
 sub set { ## no critic (NamingConventions::ProhibitAmbiguousNames)
     my ($self, $varname, $value, $forcesend) = @_;
+
+    if(!defined($varname) || !length($varname)) {
+        carp("varname not defined!");
+        return;
+    }
+    if(!defined($value)) {
+        carp("value not defined!");
+        return;
+    }
 
     if(!defined($forcesend)) {
         $forcesend = 0;
@@ -562,6 +605,11 @@ sub set { ## no critic (NamingConventions::ProhibitAmbiguousNames)
 sub listen { ## no critic (Subroutines::ProhibitBuiltinHomonyms)
     my ($self, $varname) = @_;
 
+    if(!defined($varname) || !length($varname)) {
+        carp("varname not defined!");
+        return;
+    }
+
     if($self->{needreconnect}) {
         $self->reconnect;
     }
@@ -573,6 +621,11 @@ sub listen { ## no critic (Subroutines::ProhibitBuiltinHomonyms)
 
 sub unlisten {
     my ($self, $varname) = @_;
+
+    if(!defined($varname) || !length($varname)) {
+        carp("varname not defined!");
+        return;
+    }
 
     if($self->{needreconnect}) {
         $self->reconnect;
@@ -611,6 +664,15 @@ sub getServerinfo {
 sub store {
     my ($self, $varname, $value) = @_;
 
+    if(!defined($varname) || !length($varname)) {
+        carp("varname not defined!");
+        return;
+    }
+    if(!defined($value)) {
+        carp("value not defined!");
+        return;
+    }
+
     if($self->{needreconnect}) {
         $self->reconnect;
     }
@@ -635,6 +697,11 @@ sub store {
 
 sub retrieve {
     my ($self, $varname) = @_;
+
+    if(!defined($varname) || !length($varname)) {
+        carp("varname not defined!");
+        return;
+    }
 
     my $value;
 
@@ -688,6 +755,11 @@ sub retrieve {
 sub remove {
     my ($self, $varname) = @_;
 
+    if(!defined($varname) || !length($varname)) {
+        carp("varname not defined!");
+        return;
+    }
+
     if($self->{needreconnect}) {
         $self->reconnect;
     }
@@ -712,6 +784,11 @@ sub remove {
 
 sub increment {
     my ($self, $varname, $stepsize) = @_;
+
+    if(!defined($varname) || !length($varname)) {
+        carp("varname not defined!");
+        return;
+    }
 
     if($self->{needreconnect}) {
         $self->reconnect;
@@ -743,6 +820,11 @@ sub increment {
 
 sub decrement {
     my ($self, $varname, $stepsize) = @_;
+
+    if(!defined($varname) || !length($varname)) {
+        carp("varname not defined!");
+        return;
+    }
 
     if($self->{needreconnect}) {
         $self->reconnect;
@@ -1037,6 +1119,11 @@ sub autohandle_messages {
 sub sendRawCommand {
     my ($self, $command) = @_;
 
+    if(!defined($command) || !length($command)) {
+        carp("command not defined!");
+        return;
+    }
+
     if($self->{needreconnect}) {
         $self->reconnect;
     }
@@ -1049,6 +1136,16 @@ sub sendRawCommand {
 # Meta function that internally calls both SET and STORE
 sub setAndStore {
     my ($self, $varname, $value, $forcesend) = @_;
+
+    if(!defined($varname) || !length($varname)) {
+        carp("varname not defined!");
+        return;
+    }
+
+    if(!defined($value)) {
+        carp("value not defined!");
+        return;
+    }
 
     if(!defined($forcesend)) {
         $forcesend = 0;

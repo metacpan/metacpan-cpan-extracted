@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 51;
+plan tests => 58;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -36,6 +36,172 @@ sub is_square {
   my $sqrt = int(sqrt($n));
   return $n == $sqrt*$sqrt;
 }
+
+
+#------------------------------------------------------------------------------
+# A332383 -- X coordinate
+
+MyOEIS::compare_values
+  (anum => 'A332383',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::DragonCurve->new;
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+     }
+     return \@got;
+   });
+
+# A332384 -- Y coordinate
+MyOEIS::compare_values
+  (anum => 'A332384',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::DragonCurve->new;
+     my @got;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A106840 -- N positions of turns L,L
+
+MyOEIS::compare_values
+  (anum => 'A106840',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     require Math::NumSeq::PlanePathTurn;
+     my $seq = Math::NumSeq::PlanePathTurn->new(planepath_object=>$dragon,
+                                                turn_type => 'Left');
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       if ($value && $seq->ith($i+1)) {
+         push @got, $i;
+       }
+     }
+     return \@got;
+   });
+
+# A106841 -- N positions of turns L,L,L
+MyOEIS::compare_values
+  (anum => 'A106841',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     require Math::NumSeq::PlanePathTurn;
+     my $seq = Math::NumSeq::PlanePathTurn->new(planepath_object=>$dragon,
+                                                turn_type => 'Left');
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       if ($value && $seq->ith($i+1) && $seq->ith($i+2)) {
+         push @got, $i;
+       }
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A119972 -- turn sequence * index n
+
+MyOEIS::compare_values
+  (anum => 'A119972',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     require Math::NumSeq::PlanePathTurn;
+     my $seq = Math::NumSeq::PlanePathTurn->new(planepath_object=>$dragon,
+                                                turn_type => 'LSR');
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       push @got, $i * $value;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A126937 -- points X,Y coded by SquareSpiral, starting N=0
+
+MyOEIS::compare_values
+  (anum => 'A126937',
+   func => sub {
+     my ($count) = @_;
+     require Math::PlanePath::SquareSpiral;
+     my $square  = Math::PlanePath::SquareSpiral->new (n_start => 0);
+     my @got;
+     for (my $n = $dragon->n_start; @got < $count; $n++) {
+       my ($x, $y) = $dragon->n_to_xy ($n);
+       my $square_n = $square->xy_to_n ($x, -$y);
+       push @got, $square_n;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A091072 -- N positions of left turns
+
+MyOEIS::compare_values
+  (anum => 'A091072',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     require Math::NumSeq::PlanePathTurn;
+     my $seq = Math::NumSeq::PlanePathTurn->new(planepath_object=>$dragon,
+                                                turn_type => 'Left');
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       if ($value) {
+         push @got, $i;
+       }
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A106837 -- N positions of turns R,R
+
+MyOEIS::compare_values
+  (anum => 'A106837',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     require Math::NumSeq::PlanePathTurn;
+     my $seq = Math::NumSeq::PlanePathTurn->new(planepath_object=>$dragon,
+                                                turn_type => 'Right');
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       if ($value && $seq->ith($i+1)) {
+         push @got, $i;
+       }
+     }
+     return \@got;
+   });
+
+# A106838 -- N positions of turns R,R,R
+MyOEIS::compare_values
+  (anum => 'A106838',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     require Math::NumSeq::PlanePathTurn;
+     my $seq = Math::NumSeq::PlanePathTurn->new(planepath_object=>$dragon,
+                                                turn_type => 'Right');
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       if ($value && $seq->ith($i+1) && $seq->ith($i+2)) {
+         push @got, $i;
+       }
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
@@ -553,26 +719,6 @@ MyOEIS::compare_values
    });
 
 #------------------------------------------------------------------------------
-# A091072 -- N positions of left turns
-
-MyOEIS::compare_values
-  (anum => 'A091072',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     require Math::NumSeq::PlanePathTurn;
-     my $seq = Math::NumSeq::PlanePathTurn->new(planepath_object=>$dragon,
-                                                turn_type => 'Left');
-     while (@got < $count) {
-       my ($i, $value) = $seq->next;
-       if ($value) {
-         push @got, $i;
-       }
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
 # A099545 -- turn 1=left, 3=right
 
 MyOEIS::compare_values
@@ -770,7 +916,7 @@ MyOEIS::compare_values
      require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new(planepath_object=>$dragon,
                                                 turn_type => 'Right');
-     my ($i, $prev) = $seq->next;
+     my ($initial_i, $prev) = $seq->next;
      my $run = 1; # count for initial $prev_turn
      while (@got < $count) {
        my ($i, $value) = $seq->next;
@@ -809,7 +955,7 @@ MyOEIS::compare_values
      require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new(planepath_object=>$dragon,
                                                 turn_type => 'Right');
-     my ($i, $prev) = $seq->next;
+     my ($initial_i, $prev) = $seq->next;
      my $run = 1; # count for initial $prev_turn
      while (@got < $count) {
        my ($i, $value) = $seq->next;
@@ -865,24 +1011,6 @@ MyOEIS::compare_values
      while (@got < $count) {
        my ($i, $value) = $seq->next;
        push @got, $value; # 1=left,0=right
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A126937 -- points numbered as SquareSpiral, starting N=0
-
-MyOEIS::compare_values
-  (anum => 'A126937',
-   func => sub {
-     my ($count) = @_;
-     require Math::PlanePath::SquareSpiral;
-     my $square  = Math::PlanePath::SquareSpiral->new (n_start => 0);
-     my @got;
-     for (my $n = $dragon->n_start; @got < $count; $n++) {
-       my ($x, $y) = $dragon->n_to_xy ($n);
-       my $square_n = $square->xy_to_n ($x, -$y);
-       push @got, $square_n;
      }
      return \@got;
    });

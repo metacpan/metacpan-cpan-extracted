@@ -1,4 +1,4 @@
-# Copyright 2018 Kevin Ryde
+# Copyright 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -36,7 +36,7 @@ use Math::PlanePath::Base::Digits
   'round_up_pow';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 @ISA = ('Math::PlanePath');
 
 use Math::PlanePath::TerdragonMidpoint;
@@ -778,6 +778,23 @@ L<http://oeis.org/A156595> (etc)
     A189716   N positions of right turns
     A189717   count right turns so far
 
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for the alternate terdragon curve as a graph include
+
+=over
+
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655> etc
+
+=back
+
+    19655     level=0 (1-segment path)
+    594       level=1 (3-segment path)
+    30397     level=2
+    30399     level=3
+    33575     level=4
+    33577     level=5
+
 =head1 SEE ALSO
 
 L<Math::PlanePath>,
@@ -792,7 +809,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2018 Kevin Ryde
+Copyright 2018, 2019 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

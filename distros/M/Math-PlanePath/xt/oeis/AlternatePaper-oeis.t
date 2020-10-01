@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,6 +32,52 @@ use MyOEIS;
 
 my $paper = Math::PlanePath::AlternatePaper->new;
 
+
+#------------------------------------------------------------------------------
+# A004277 -- num visits in column X
+MyOEIS::compare_values
+  (anum => 'A004277',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $x = 0; @got < $count; $x++) {
+       my $total = 0;
+       for (my $y = 0; ; $y++) {
+         my @n_list = $paper->xy_to_n_list ($x,$y) or last;
+         $total += scalar(@n_list);
+       }
+       push @got, $total;
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A151666 -- predicate N on X axis
+MyOEIS::compare_values
+  (anum => 'A151666',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = $paper->n_start; @got < $count; $n++) {
+       my ($x, $y) = $paper->n_to_xy ($n);
+       push @got, $y==0 ? 1 : 0;
+     }
+     return \@got;
+   });
+
+# A270803 -- predicate segment N on X=Y leading diagonal, except not N=0
+MyOEIS::compare_values
+  (anum => 'A270803',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = $paper->n_start; @got < $count; $n++) {
+       my ($x,$y) = $paper->n_to_xy ($n);
+       my ($x1,$y1) = $paper->n_to_xy ($n+1);
+       push @got, $n!=0 && $x==$y || $x1==$y1 ? 1 : 0;
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A052955 single-visited points  to N=2^k
@@ -203,14 +249,13 @@ MyOEIS::compare_values
      my @got;
      for (my $k=0; @got < $count; $k++) {
        my $s = 2**$k;
-       my $min;
+       my @n_list;
        foreach my $y (0 .. $s) {
-         my $x = $s - $y;   # so x+y=s
-         my @n_list = $paper->xy_to_n_list($x,$y);
-         $min //= $n_list[0];
-         $min = min(@n_list, $min);
+         my $x = $s - $y;
+         $x+$y == $s or die;
+         push @n_list, $paper->xy_to_n_list($x,$y);
        }
-       push @got, $min;
+       push @got, min(@n_list);
      }
      return \@got;
    });
@@ -504,7 +549,7 @@ MyOEIS::compare_values
 # also is dSum in Math::NumSeq::PlanePathDelta
 
 MyOEIS::compare_values
-  (anum => q{A020985},
+  (anum => q{A020985},  # catalogued
    func => sub {
      my ($count) = @_;
      my @got;
@@ -517,6 +562,26 @@ MyOEIS::compare_values
        {
          my ($dx, $dy) = $paper->n_to_dxdy ($n++);
          push @got, $dy;
+       }
+     }
+     return \@got;
+   });
+
+# A020987 GRS as 0,1
+MyOEIS::compare_values
+  (anum => 'A020987',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = $paper->n_start; @got < $count; ) {
+       {
+         my ($dx, $dy) = $paper->n_to_dxdy ($n++);
+         push @got, $dx > 0 ? 1 : 0;
+       }
+       last unless @got < $count;
+       {
+         my ($dx, $dy) = $paper->n_to_dxdy ($n++);
+         push @got, $dy > 0 ? 1 : 0;
        }
      }
      return \@got;
@@ -549,7 +614,7 @@ MyOEIS::compare_values
        my @n_list;
        foreach my $y (0 .. $sum) {
          my $x = $sum - $y;
-         push @n_list, $paper->xy_to_n_list($x,$y);;
+         push @n_list, $paper->xy_to_n_list($x,$y);
        }
        @n_list = sort {$a<=>$b} @n_list;
        foreach my $n (@n_list) {

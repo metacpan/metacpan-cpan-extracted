@@ -2,21 +2,18 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
-use Test::Deep;
-use Test::Warnings qw[ :no_end_test had_no_warnings ];
+use FindBin;
 
-use HTTP::Status;
+BEGIN { require "$FindBin::Bin/test-helper-s3-api.pl" }
 
-use Shared::Examples::Net::Amazon::S3::API (
-    qw[ with_response_fixture ],
-    qw[ expect_api_object_head ],
-);
+plan tests => 6;
+
+use Shared::Examples::Net::Amazon::S3::API qw[ expect_api_object_head ];
 
 expect_api_object_head 'head existing object' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
-    with_response_code      => HTTP::Status::HTTP_OK,
+    with_response_code      => HTTP_OK,
     with_response_data      => '',
     with_response_headers   => {
         content_length      => 10,
@@ -39,7 +36,7 @@ expect_api_object_head 'head existing object' => (
     },
 );
 
-expect_api_object_head 'with error access denied' => (
+expect_api_object_head 'S3 error - Access Denied' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
     expect_request          => { HEAD => 'https://some-bucket.s3.amazonaws.com/some-key' },
@@ -49,7 +46,7 @@ expect_api_object_head 'with error access denied' => (
     expect_s3_errstr        => '403 Forbidden',
 );
 
-expect_api_object_head 'with error no such bucket' => (
+expect_api_object_head 'S3 error - Bucket Not Found' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
     expect_request          => { HEAD => 'https://some-bucket.s3.amazonaws.com/some-key' },
@@ -59,7 +56,7 @@ expect_api_object_head 'with error no such bucket' => (
     expect_s3_errstr        => undef,,
 );
 
-expect_api_object_head 'with error no such object' => (
+expect_api_object_head 'S3 error - Object Not Found' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
     expect_request          => { HEAD => 'https://some-bucket.s3.amazonaws.com/some-key' },
@@ -69,4 +66,17 @@ expect_api_object_head 'with error no such object' => (
     expect_s3_errstr        => undef,,
 );
 
+expect_api_object_head 'HTTP error - 400 Bad Request' => (
+    with_bucket             => 'some-bucket',
+    with_key                => 'some-key',
+    with_response_fixture ('error::http_bad_request'),
+    expect_request          => { HEAD => 'https://some-bucket.s3.amazonaws.com/some-key' },
+    throws                  => qr/^Net::Amazon::S3: Amazon responded with 400 Bad Request/i,
+    expect_data             => bool (0),
+    expect_s3_err           => 'network_error',
+    expect_s3_errstr        => '400 Bad Request',
+);
+
 had_no_warnings;
+
+done_testing;

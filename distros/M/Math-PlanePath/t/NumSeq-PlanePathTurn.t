@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -41,6 +41,18 @@ if (! eval { require Math::NumSeq; 1 }) {
 }
 
 require Math::NumSeq::PlanePathTurn;
+
+
+#------------------------------------------------------------------------------
+# _turn_func_TTurn3()
+
+# ok (Math::NumSeq::PlanePathTurn::_turn_func_TTurn3(2,0, 1,1),  .5,
+#     'turn +60');
+# ok (Math::NumSeq::PlanePathTurn::_turn_func_TTurn3(2,0, -1,1), 1,
+#     'turn +120');
+# ok (Math::NumSeq::PlanePathTurn::_turn_func_TTurn3(2,0, -1,-1), 2,
+#     'turn +240');
+
 
 #------------------------------------------------------------------------------
 # _turn_func_Left()

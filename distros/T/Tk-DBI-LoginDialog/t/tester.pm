@@ -36,8 +36,10 @@ our $AUTOLOAD;
 my %attribute = (
 	cycle => 0,
 	dummy => "IGNORE overidden dummy exit routine\n",
+	executed => 0,
 	log => get_logger(__FILE__),
-	count => 0,
+	_planned => 0,
+	this => undef,
 	timeout => TIMEOUT,
 	top => undef,
 );
@@ -64,9 +66,12 @@ sub AUTOLOAD {
 
 sub new {
 	my ($class) = shift;
+	my ($test_class) = shift;
 	my $self = { _permitted => \%attribute, %attribute };
 
 	bless ($self, $class);
+
+	confess "SYNTAX new(TEST_CLASS) value not specified" unless (defined $test_class);
 
 	my %args = @_;  # start processing any parameters passed
 	my ($method,$value);
@@ -80,25 +85,48 @@ sub new {
 		$self->$method($value);
 	}
 
-	my $top; eval { $top = new MainWindow; };
+	my $top = eval { new MainWindow; }; # ref. http://cpanwiki.grango.org/wiki/CPANAuthorNotes
+
+	unless ($top && Tk::Exists($top)) {
+
+		plan skip_all => 'No X server available';
+	}
+
 	$self->{'top'} = $top;
+	$self->{'this'} = $test_class;
 
 	return $self;
 }
 
 
-sub tests {
+sub done {
+	my $self = shift; 
+	my $extra = shift;
+ 
+	$self->{'executed'} += $extra
+		if (defined $extra);
+
+	done_testing($self->executed);
+}
+
+
+sub dummy_exit {
+	my $self = shift;
+	my ($o)=@_; 
+
+	$o->configure(-exit => sub { warn $self->dummy ; });
+}
+
+
+sub planned {
 	my $self = shift;
 	my $n_tests = shift;
 
-	if (Tk::Exists($self->{'top'})) {
+	confess "SYNTAX: plan(tests)" unless defined ($n_tests);
 
-		plan tests => $n_tests;
+	$self->{'_planned'} = $n_tests;
 
-	} else {
-
-		plan skip_all => 'No X server available';
-	}
+	plan tests => $n_tests;
 }
 
 
@@ -123,46 +151,18 @@ sub queue_button {
 	if ($action eq 'Login') {
 
 		isa_ok($o->login(1), "DBI::db",		"login handle cycle $cycle"); 
-		++$self->{'count'};
+		++$self->{'executed'};
 
 	} else {
 
 		is($o->Show, $action,		"show $action cycle $cycle");
-		++$self->{'count'};
+		++$self->{'executed'};
 	}
 
 	is($o->cget('-pressed'), $action,	"pressed $action cycle $cycle"); 
-	++$self->{'count'};
+	++$self->{'executed'};
 
 	return $button;
-}
-
-
-sub queue_login { 	# DO NOT USE; REDUNDANT!
-	my $self = shift;
-	my ($o,$action,$method)=@_; 
- 
-	my $button = $o->Subwidget("B_$action");
-
-	$self->log->debug("about to queue action [$action]"); 
- 
-	$button->after(TIMEOUT, sub{ $button->invoke; }); 
- 
-	if ($method eq "s") { 
-		is($o->Show, $action,			"show $action"); 
- 
-		is($o->cget('-pressed'), $action,	"pressed $action"); 
-	} else { 
-		isa_ok($o->login(1), "DBI::db",		"$action"); 
-	} 
-} 
- 
- 
-sub dummy_exit {
-	my $self = shift;
-	my ($o)=@_; 
-
-	$o->configure(-exit => sub { warn $self->dummy ; });
 }
 
 

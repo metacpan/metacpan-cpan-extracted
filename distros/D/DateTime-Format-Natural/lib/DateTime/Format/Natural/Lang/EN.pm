@@ -13,7 +13,7 @@ use constant skip  => true;
 
 use DateTime::Format::Natural::Helpers qw(%flag);
 
-our $VERSION = '1.68';
+our $VERSION = '1.69';
 
 our (%init,
      %timespan,
@@ -4811,6 +4811,8 @@ also parsable with precision in seconds):
  27/5/1979
  1/3
  1/3 16:00
+ 3/1
+ 3/1 16:00
  4:00
  17:00
  3:20:00

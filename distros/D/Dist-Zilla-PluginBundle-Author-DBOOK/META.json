@@ -114,11 +114,11 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::DBOOK" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/DBOOK.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.4"
       },
       "Dist::Zilla::PluginBundle::Author::DBOOK" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/DBOOK.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.4"
       }
    },
    "release_status" : "stable",
@@ -134,13 +134,13 @@
       },
       "x_IRC" : "irc://irc.perl.org/#distzilla"
    },
-   "version" : "v1.0.3",
+   "version" : "v1.0.4",
    "x_contributors" : [
       "Dan Book <grinnz@gmail.com>",
       "Dan Book <grinnz@grinnz.com>"
    ],
-   "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.23",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

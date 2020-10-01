@@ -15,7 +15,7 @@ use File::HomeDir::Test;
 use File::HomeDir;
 
 # Is the test driver enabled?
-is($File::HomeDir::Test::ENABLED, 1, 'File::HomeDir::Test is enabled');
+is($File::HomeDir::Test::ENABLED,  1,                     'File::HomeDir::Test is enabled');
 is($File::HomeDir::IMPLEMENTED_BY, 'File::HomeDir::Test', 'IMPLEMENTED_BY is correct');
 
 # Was everything hijacked correctly?

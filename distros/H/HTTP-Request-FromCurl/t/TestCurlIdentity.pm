@@ -140,6 +140,7 @@ sub compiles_ok( $code, $name ) {
     };
 };
 
+# Creates one test output
 sub identical_headers_ok( $code, $expected_request, $name,
     %options
 ) {
@@ -329,12 +330,14 @@ sub request_identical_ok {
     my @reconstructed = curl_request( @reconstructed_commandline );
 
     # Can we maybe even loop over all requests?!
+    # We need to fix our test count for numbers higher than 1
     for my $i ( 0..0 ) {
         if( $reconstructed[$i]->{error}) {
             SKIP: {
                 diag Dumper $test->{cmd};
                 diag Dumper \@reconstructed_commandline;
-                skip "$name (reconstructed): $reconstructed[$i]->{error_output}", 1;
+                diag Dumper $reconstructed[$i];
+                fail "$name (reconstructed): Curl error ($version): '$reconstructed[$i]->{error_output}'";
             };
         } else {
 
@@ -367,9 +370,13 @@ sub request_identical_ok {
             };
 
             if( !is_deeply $reconstructed[$i], $copy, "$name (reconstructed)" ) {
+                diag "Original command:";
                 diag Dumper $test->{cmd};
+                diag "Original request:";
                 diag Dumper $copy;
+                diag "Reconstructed command:";
                 diag Dumper \@reconstructed_commandline;
+                diag "Reconstructed request:";
                 diag Dumper $reconstructed[$i];
             };
             #request_logs_identical_ok( $test, "$name (reconstructed)", $reconstructed[$i], $res[$i] );
@@ -434,7 +441,7 @@ sub request_identical_ok {
 
         } else {
             SKIP: {
-                skip "Did not generate a request", 5;
+                skip "Did not generate a request", 4;
             };
         };
     };
@@ -446,6 +453,8 @@ sub run_curl_tests( @tests ) {
         $testcount = pop @tests;
     };
     plan tests => $testcount;
+
+    diag "Testing with curl version '$version'";
 
     for my $test ( @tests ) {
         request_identical_ok( $test );

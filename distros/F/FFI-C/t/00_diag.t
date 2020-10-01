@@ -18,6 +18,7 @@ $modules{$_} = $_ for qw(
   FFI::Platypus::Record
   FFI::Platypus::Type::Enum
   Math::Int64
+  Path::Tiny
   Ref::Util
   Sub::Identify
   Sub::Install
@@ -67,7 +68,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (sort @modules)
 {

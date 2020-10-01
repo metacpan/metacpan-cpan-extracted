@@ -7,7 +7,7 @@ BEGIN {
     binmode STDOUT, ':encoding(utf-8)';
 }
 
-use Test::More tests => 41;
+use Test::More tests => 51;
 
 use File::Spec::Functions;
 
@@ -152,4 +152,25 @@ for my $index (0 .. 7) {
         unless ( $index == 3 || $index == 4 );
 }
 
+}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Test UIDs
+{
+    note 'Testing UID input';
+
+    my $test_file = catfile( qw{ plists binary_uids.plist } );
+    my $plist = parse_plist_file( $test_file );
+
+    isa_ok( $plist, 'Mac::PropertyList::array' );
+
+    my @expect = qw{ 01 2a 04d2 0074cbb1 };
+    my @values = $plist->value();
+    is( scalar @values, scalar @expect, 'Right number of elements in array' );
+
+    for my $index ( 0 .. $#expect ) {
+	isa_ok( $values[$index], 'Mac::PropertyList::uid' );
+	is( $values[$index]->value, $expect[$index],
+	    "uid at index $index has right value" );
+    }
 }

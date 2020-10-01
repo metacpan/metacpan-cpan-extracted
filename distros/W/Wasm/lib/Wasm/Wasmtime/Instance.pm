@@ -13,7 +13,7 @@ use Ref::Util qw( is_ref is_blessed_ref is_plain_coderef is_plain_scalarref );
 use Carp ();
 
 # ABSTRACT: Wasmtime instance class
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 $ffi_prefix = 'wasm_instance_';
@@ -156,7 +156,7 @@ Wasm::Wasmtime::Instance - Wasmtime instance class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

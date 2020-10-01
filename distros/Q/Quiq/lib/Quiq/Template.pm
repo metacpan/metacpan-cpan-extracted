@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.187';
+our $VERSION = '1.188';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -75,7 +75,7 @@ Resultat C<$str>:
 
 =over 4
 
-=item --lineContinuation => $type (Default: undef)
+=item -lineContinuation => $type (Default: undef)
 
 Art der Zeilenfortsetzung. Mögliche Werte:
 
@@ -877,7 +877,7 @@ sub asStringNL {
 
 =head1 VERSION
 
-1.187
+1.188
 
 =head1 AUTHOR
 

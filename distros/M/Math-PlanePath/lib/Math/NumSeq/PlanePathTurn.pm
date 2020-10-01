@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,7 +32,7 @@ use strict;
 use Carp 'croak';
 
 use vars '$VERSION','@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -68,11 +68,12 @@ use constant::defer parameter_info_array =>
              default => 'Left',
              choices => ['Left','Right','Straight','NotStraight',
                          'LSR','SLR','SRL',
-                          
+
                          # 'RSL',
                          # 'Turn4',  # Turn4 is 0<=value<4.
                          # 'Turn4n',
                          # 'TTurn6',
+                         # 'TTurn6n',
                         ],
              description => 'Left is 1=left, 0=right or straight.
 Right is 1=right, 0=left or straight.
@@ -261,12 +262,6 @@ sub _turn_func_NotStraight {
 #---------------
 # experimental extras
 
-# sub _turn_func_LR_01 {
-#   my ($dx,$dy, $next_dx,$next_dy) = @_;
-#   ### _turn_func_LR_01() ...
-#   return ($next_dy * $dx >= $next_dx * $dy || 0);
-# }
-
 # 0,1,2,3 as ddir mod 4, incl fractional
 sub _turn_func_Turn4 {
   my ($dx,$dy, $next_dx,$next_dy) = @_;
@@ -276,8 +271,8 @@ sub _turn_func_Turn4 {
        - Math::NumSeq::PlanePathDelta::_delta_func_Dir360($dx,$dy)) % 360)
      / 90);
 }
-# 0,1,2, -1
-# MAYBE: 0 <= t < 2 and -2 <= t < 0 for symmetry, so reverse=-2
+# 0,1, -2,-1
+# 0 <= t < 2 and -2 <= t < 0 for symmetry, so reverse=-2
 sub _turn_func_Turn4n {
   my ($dx,$dy, $next_dx,$next_dy) = @_;
   require Math::NumSeq::PlanePathDelta;
@@ -285,7 +280,7 @@ sub _turn_func_Turn4n {
     = (((Math::NumSeq::PlanePathDelta::_delta_func_Dir360($next_dx,$next_dy)
          - Math::NumSeq::PlanePathDelta::_delta_func_Dir360($dx,$dy)) % 360)
        / 90);
-  if ($ret > 2) { $ret -= 4; }
+  if ($ret >= 2) { $ret -= 4; }
   return $ret;
 }
 
@@ -298,12 +293,19 @@ sub _turn_func_TTurn6 {
        - Math::NumSeq::PlanePathDelta::_delta_func_TDir360($dx,$dy)) % 360)
      / 60);
 }
-# 0,1,2,3, -2,-1
-# MAYBE: 0 <= t < 3 and -3 <= t < 0 for symmetry, so reverse=-3
+# 0,1,2, -3,-2,-1
+# 0 <= t < 3 and -3 <= t < 0 for symmetry, so reverse=-3
 sub _turn_func_TTurn6n {
   my $t = _turn_func_TTurn6(@_);
-  return ($t <= 3 ? $t : $t-6);
+  return ($t < 3 ? $t : $t-6);
 }
+
+# Would suit TerdragonCurve and similar, but SLR is the same as TTurn3
+# there, so would be different only on fractional turns.
+#
+# sub _turn_func_TTurn3 {
+#   return _turn_func_TTurn6(@_) / 2;
+# }
 
 #---------
 
@@ -472,7 +474,7 @@ sub characteristic_non_decreasing {
   sub _NumSeq_Turn_SLR_max {
     my ($self) = @_;
     return ($self->turn_any_right ? 2
-            : $self->_NumSeq_Turn_Left_max); # 1 if any Left 
+            : $self->_NumSeq_Turn_Left_max); # 1 if any Left
   }
   use constant _NumSeq_Turn_SLR_integer => 1;
 
@@ -506,6 +508,8 @@ sub characteristic_non_decreasing {
 #   # SquareSpiral
 #   # abs(A167752)==Left=LSR=Turn4 if that really is the quarter-squares
 #   # abs(A167753)==Left=LSR=Turn4 of wider=1 if that really is the ceil(n+1)^2
+#   # Left = A240025 characteristic of quarter-squares OFFSET=0
+#   #        except it has extra initial 1
 # }
 { package Math::PlanePath::GreekKeySpiral;
   sub _NumSeq_Turn_Turn4_max {
@@ -858,6 +862,8 @@ sub characteristic_non_decreasing {
       },
     };
 }
+# { package Math::PlanePath::PeanoDiagonals;
+# }
 # { package Math::PlanePath::WunderlichSerpentine;
 # }
 { package Math::PlanePath::HilbertCurve;
@@ -953,6 +959,9 @@ sub characteristic_non_decreasing {
     { '' =>
       { Left => 'A035263', # OFFSET=1 matches N=1
         # OEIS-Catalogue: A035263 planepath=KochCurve
+
+        LSR => 'A309873',  # (mine)
+        # OEIS-Catalogue: A309873 planepath=KochCurve turn_type=LSR
 
         SLR => 'A056832',
         # OEIS-Catalogue: A056832 planepath=KochCurve turn_type=SLR
@@ -1110,7 +1119,7 @@ sub characteristic_non_decreasing {
   use constant _NumSeq_Turn_Turn4_max => 3;
   # use constant _NumSeq_Turn_oeis_anum =>
   #   { 'arms=1' =>
-  #     { 
+  #     {
   #       # Not quite, A156595 OFFSET=0, whereas here N=1 first turn
   #       # Right => 'A156595',
   #     },
@@ -1143,7 +1152,7 @@ sub characteristic_non_decreasing {
 { package Math::PlanePath::ComplexMinus;
   # use constant _NumSeq_Turn_oeis_anum =>
   #   { 'realpart=1' =>
-  #     { 
+  #     {
   #       # Not quite, A011658 OFFSET=0 vs first turn N=1 here
   #       # NotStraight => 'A011658',  # repeat 0,0,0,1,1
   #       # # OEIS-Other: A011658 planepath=ComplexMinus turn_type=NotStraight
@@ -1253,7 +1262,9 @@ sub characteristic_non_decreasing {
       },
       'direction=down,n_start=-1,x_start=0,y_start=0' =>
       { Right => 'A023531', # 1 at m(m+3)/2
+        NotStraight => 'A097806',
         # OEIS-Other: A023531 planepath=Diagonals,n_start=-1 turn_type=Right
+        # OEIS-Catalogue: A097806 planepath=Diagonals,n_start=-1 turn_type=NotStraight
       },
 
       'direction=up,n_start=0,x_start=0,y_start=0' =>
@@ -1263,15 +1274,11 @@ sub characteristic_non_decreasing {
         # OEIS-Other: A156319 planepath=Diagonals,direction=up,n_start=0 turn_type=SLR
       },
 
-      'direction=down,n_start=-1,x_start=0,y_start=0' =>
-      { NotStraight => 'A097806',
-        # OEIS-Catalogue: A097806 planepath=Diagonals,n_start=-1 turn_type=NotStraight
-      },
       'direction=up,n_start=-1,x_start=0,y_start=0' =>
       { Left => 'A023531', # 1 at m(m+3)/2
         # OEIS-Other: A023531 planepath=Diagonals,direction=up,n_start=-1
-        
-        NotStraight => 'A097806',  # OFFSET=0 
+
+        NotStraight => 'A097806',  # OFFSET=0
         # OEIS-Other: A097806 planepath=Diagonals,direction=up,n_start=-1 turn_type=NotStraight
       },
     };
@@ -1774,10 +1781,10 @@ In each case the value at sequence index i is the turn at N=i,
     i-1 ---> i     turn at i
                    first turn at i = n_start + 1
 
-For multiple "arms", the turn follows that particular arm so it's i-arms, i,
-i+arms.  i values start C<n_start()+arms_count()> so that i-arms is
-C<n_start()>, the first N on the path.  A single arm path beginning N=0 has
-its first turn at i=1.
+For multiple "arms" in the path, the turn follows that particular arm so
+locations of N = i-arms to i to i+arms.  i values start
+C<n_start()+arms_count()> so that i-arms is C<n_start()> which is the first
+N on the path.  A single arm path beginning N=0 has its first turn at i=1.
 
 For "Straight", "LSR", "SLR", and "SRL", straight means either straight
 ahead or 180-degree reversal, ie. the direction N to N+1 is along the same
@@ -1890,7 +1897,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

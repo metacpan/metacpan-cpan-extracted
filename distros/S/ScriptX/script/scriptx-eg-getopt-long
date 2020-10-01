@@ -32,7 +32,7 @@ sub run {
 
 ScriptX->run;
 
-# ABSTRACT: Parse command-line options using simple heuristics (demos debugging by dumping stash)
+# ABSTRACT: Parse command-line options using Getopt::Long (demos modifying plugin)
 # PODNAME: scriptx-eg-getopt-long
 
 __END__
@@ -43,24 +43,43 @@ __END__
 
 =head1 NAME
 
-scriptx-eg-getopt-long - Parse command-line options using simple heuristics (demos debugging by dumping stash)
+scriptx-eg-getopt-long - Parse command-line options using Getopt::Long (demos modifying plugin)
 
 =head1 VERSION
 
-This document describes version 0.000001 of scriptx-eg-getopt-long (from Perl distribution ScriptX), released on 2020-09-03.
+This document describes version 0.000004 of scriptx-eg-getopt-long (from Perl distribution ScriptX), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
- % script-eg-getopt-specless
+Example 1:
+
+ % script-eg-getopt-long
  Please specify --name!
 
- % script-eg-getopt-specless --name=Budi
+Example 2:
+
+ % script-eg-getopt-long --name Budi
  Please specify --gender!
 
- % script-eg-getopt-specless --name=Budi --gender=x
+Example 3:
+
+ % script-eg-getopt-long --name Budi --gender x
  Invalid value in --gender, please specify m|f!
 
- % script-eg-getopt-specless --name=Budi --gender=m
+Example 4:
+
+ % script-eg-getopt-long --name Budi --gender m
+ Hello, Mr. Budi!
+
+Example 5 (execution is aborted because of unknown option):
+
+ % script-eg-getopt-long --name Budi --gender m --foo
+ Unknown option: foo
+
+Example 6 (execution continues despite unknown option):
+
+ % SCRIPTX_IMPORT_JSON='["ModifyPlugin",{"plugin":"Getopt::Long", "add_or_modify_args":{"abort_on_faiure":0}}]' scriptx-eg-getopt-long  --name Budi --gender m --foo
+ Unknown option: foo
  Hello, Mr. Budi!
 
 =head1 DESCRIPTION
@@ -68,6 +87,24 @@ This document describes version 0.000001 of scriptx-eg-getopt-long (from Perl di
 This script demonstrates the use of L<ScriptX::Getopt::Long> which, admittedly,
 does not do much. It's okay if you want to load and use L<Getopt::Long>
 directly.
+
+By default, the L</abort_on_failure> is set to 1 which means when Getopt::Long's
+GetOptions returns failure the execution is aborted, as shown in example 5. If
+you want to set C<abort_on_faiure> to 0, you can modify the script and set:
+
+ use ScriptX (
+     'Getopt::Long' => {
+         spec => ['name=s' => \$name, 'gender=s' => \$gender],
+         abort_on_faiure => 0,
+     },
+     ...
+ );
+
+or use the L<ScriptX::ModifyPlugin> plugin from the command-line:
+
+ % SCRIPTX_IMPORT_JSON='["ModifyPlugin",{"plugin":"Getopt::Long", "add_or_modify_args":{"abort_on_faiure":0}}]' scriptx-eg-getopt-long ...
+
+as shown in example 6.
 
 =head1 HOMEPAGE
 

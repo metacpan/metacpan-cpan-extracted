@@ -28,10 +28,13 @@ use MyOEIS;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
+
 =head2 Right Boundary Segment N
 
 The segment numbers which are the right boundary, being the X axis and
 notches there, are
+
+    FIXME:
 
     N such that N+2 in base-4 has
       least significant digit any 0,1,2,3
@@ -41,8 +44,10 @@ notches there, are
 
 =head2 Left Boundary Segment N
 
-The segment numbers which are the left boundary, being the stair-step
-diagonal, are
+The segment numbers which are the left boundary of the curve continued
+infinitely, being the stair-step diagonal, are
+
+    FIXME:
 
     N such that N+1 in base-4 has
       least significant digit any 0,1,2,3
@@ -813,4 +818,167 @@ sub dxdy_to_dir4 {
   if ($dx < 0) { return 2; }  # west
   if ($dy > 0) { return 1; }  # north
   if ($dy < 0) { return 3; }  # south
+}
+
+
+{
+  # Old code for n_to_xy() with explicit rotation etc rather than state table.
+  #
+  # my @dir4_to_dx = (1,0,-1,0);
+  # my @dir4_to_dy = (0,1,0,-1);
+  #
+  # my @arm_to_x = (0,0, 0,0, -1,-1, -1,-1);
+  # my @arm_to_y = (0,0, 1,1,   1,1,  0,0);
+  #
+  # sub XXn_to_xy {
+  #   my ($self, $n) = @_;
+  #   ### AlternatePaper n_to_xy(): $n
+  #
+  #   if ($n < 0) { return; }
+  #   if (is_infinite($n)) { return ($n, $n); }
+  #
+  #   my $frac;
+  #   {
+  #     my $int = int($n);
+  #     $frac = $n - $int;  # inherit possible BigFloat
+  #     $n = $int;          # BigFloat int() gives BigInt, use that
+  #   }
+  #   ### $frac
+  #
+  #   my $zero = ($n * 0);  # inherit bignum 0
+  #
+  #   my $arm = _divrem_mutate ($n, $self->{'arms'});
+  #
+  #   my @bits = bit_split_lowtohigh($n);
+  #   if (scalar(@bits) & 1) {
+  #     push @bits, 0;  # extra high to make even
+  #   }
+  #
+  #   my @sx;
+  #   my @sy;
+  #   {
+  #     my $sy = $zero;   # inherit BigInt
+  #     my $sx = $sy + 1; # inherit BigInt
+  #     ### $sx
+  #     ### $sy
+  #
+  #     foreach (1 .. scalar(@bits)/2) {
+  #       push @sx, $sx;
+  #       push @sy, $sy;
+  #
+  #       # (sx,sy) + rot+90(sx,sy)
+  #       ($sx,$sy) = ($sx - $sy,
+  #                    $sy + $sx);
+  #
+  #       push @sx, $sx;
+  #       push @sy, $sy;
+  #
+  #       # (sx,sy) + rot-90(sx,sy)
+  #       ($sx,$sy) = ($sx + $sy,
+  #                    $sy - $sx);
+  #     }
+  #   }
+  #
+  #   ### @bits
+  #   ### @sx
+  #   ### @sy
+  #   ### assert: scalar(@sx) == scalar(@bits)
+  #
+  #   my $rot = int($arm/2);  # arm to initial rotation
+  #   my $rev = 0;
+  #   my $x = $zero;
+  #   my $y = $zero;
+  #   while (@bits) {
+  #     {
+  #       my $bit = pop @bits;   # high to low
+  #       my $sx = pop @sx;
+  #       my $sy = pop @sy;
+  #       ### at: "$x,$y  $bit   side $sx,$sy"
+  #       ### $rot
+  #
+  #       if ($rot & 2) {
+  #         ($sx,$sy) = (-$sx,-$sy);
+  #       }
+  #       if ($rot & 1) {
+  #         ($sx,$sy) = (-$sy,$sx);
+  #       }
+  #
+  #       if ($rev) {
+  #         if ($bit) {
+  #           $x -= $sy;
+  #           $y += $sx;
+  #           ### rev add to: "$x,$y next is still rev"
+  #         } else {
+  #           $rot ++;
+  #           $rev = 0;
+  #         }
+  #       } else {
+  #         if ($bit) {
+  #           $rot ++;
+  #           $x += $sx;
+  #           $y += $sy;
+  #           $rev = 1;
+  #           ### add to: "$x,$y next is rev"
+  #         }
+  #       }
+  #     }
+  #
+  #     @bits || last;
+  #
+  #     {
+  #       my $bit = pop @bits;
+  #       my $sx = pop @sx;
+  #       my $sy = pop @sy;
+  #       ### at: "$x,$y  $bit   side $sx,$sy"
+  #       ### $rot
+  #
+  #       if ($rot & 2) {
+  #         ($sx,$sy) = (-$sx,-$sy);
+  #       }
+  #       if ($rot & 1) {
+  #         ($sx,$sy) = (-$sy,$sx);
+  #       }
+  #
+  #       if ($rev) {
+  #         if ($bit) {
+  #           $x += $sy;
+  #           $y -= $sx;
+  #           ### rev add to: "$x,$y next is still rev"
+  #         } else {
+  #           $rot --;
+  #           $rev = 0;
+  #         }
+  #       } else {
+  #         if ($bit) {
+  #           $rot --;
+  #           $x += $sx;
+  #           $y += $sy;
+  #           $rev = 1;
+  #           ### add to: "$x,$y next is rev"
+  #         }
+  #       }
+  #     }
+  #   }
+  #
+  #   ### $rot
+  #   ### $rev
+  #
+  #   if ($rev) {
+  #     $rot += 2;
+  #     ### rev change rot to: $rot
+  #   }
+  #
+  #   if ($arm & 1) {
+  #     ($x,$y) = ($y,$x);  # odd arms transpose
+  #   }
+  #
+  #   $rot &= 3;
+  #   $x = $frac * $dir4_to_dx[$rot] + $x + $arm_to_x[$arm];
+  #   $y = $frac * $dir4_to_dy[$rot] + $y + $arm_to_y[$arm];
+  #
+  #   ### final: "$x,$y"
+  #   return ($x,$y);
+  # }
+
+  exit 0;
 }

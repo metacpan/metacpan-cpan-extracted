@@ -11,7 +11,7 @@ use warnings;
 
 use Test::More 0.88;
 
-plan tests => 85;
+plan tests => 107;
 
 use IO::HTML;
 use File::Temp;
@@ -146,5 +146,24 @@ test 'iso-8859-15', '', <<"", { encoding => 1, need_pragma => 0 };
 <html>
 <meta content="text/html; charset=ISO-8859-15">
 <meta charset="UTF-16BE">
+
+test 'iso-8859-15', latin1 =>
+    '<html>' . (' ' x 985) . qq'<head><meta charset="ISO-8859-15">\n',
+    'found with 985 spaces';
+
+test undef, latin1 =>
+    '<html>' . (' ' x 986) . qq'<head><meta charset="ISO-8859-15">\n',
+    'not found with 986 spaces';
+
+{
+  local $IO::HTML::bytes_to_check = 1040;
+  test 'iso-8859-15', latin1 =>
+      '<html>' . (' ' x 1001) . qq'<head><meta charset="ISO-8859-15">\n',
+      'found with 1001 spaces';
+
+  test undef, latin1 =>
+      '<html>' . (' ' x 1002) . qq'<head><meta charset="ISO-8859-15">\n',
+      'not found with 1002 spaces';
+}
 
 done_testing;

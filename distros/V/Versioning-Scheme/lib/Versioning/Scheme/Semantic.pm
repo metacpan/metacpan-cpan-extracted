@@ -1,7 +1,7 @@
 package Versioning::Scheme::Semantic;
 
-our $DATE = '2019-04-14'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-10-01'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -106,7 +106,7 @@ Versioning::Scheme::Semantic - Semantic versioning
 
 =head1 VERSION
 
-This document describes version 0.010 of Versioning::Scheme::Semantic (from Perl distribution Versioning-Scheme), released on 2019-04-14.
+This document describes version 0.011 of Versioning::Scheme::Semantic (from Perl distribution Versioning-Scheme), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
@@ -162,6 +162,8 @@ L<Role::Versioning::Scheme>.
 
 =head1 METHODS
 
+=head2 versioning_scheme
+
 =head2 is_valid_version
 
 =head2 parse_version
@@ -200,7 +202,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

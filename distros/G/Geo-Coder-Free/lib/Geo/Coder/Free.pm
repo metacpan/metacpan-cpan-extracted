@@ -6,6 +6,7 @@ use warnings;
 use lib '.';
 
 use Config::Auto;
+# use Geo::Coder::Abbreviations;
 use Geo::Coder::Free::MaxMind;
 use Geo::Coder::Free::OpenAddresses;
 use List::MoreUtils;
@@ -17,13 +18,15 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 our $alternatives;
+
+sub _normalize($);
 
 =head1 SYNOPSIS
 
@@ -45,7 +48,7 @@ our $alternatives;
 =head1 DESCRIPTION
 
 Geo::Coder::Free provides an interface to free databases by acting as a front-end to
-Geo::Coder::Free::MaxMind and Geo::Coder::Free::OpenAddresses.
+L<Geo::Coder::Free::MaxMind> and L<Geo::Coder::Free::OpenAddresses>.
 
 The cgi-bin directory contains a simple DIY Geo-Coding website.
 
@@ -300,10 +303,10 @@ sub run {
 	print Data::Dumper->new([\@rc])->Dump();
 }
 
-sub _normalize {
+sub _normalize($) {
 	my $type = uc(shift);
 
-	$type = uc($type);
+	# return Geo::Coder::Abbreviations->new()->abbreviate($type);
 
 	if(($type eq 'AVENUE') || ($type eq 'AVE')) {
 		return 'AVE';
@@ -352,7 +355,7 @@ sub _normalize {
 
 =head1 AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne, C<< <njh@bandsman.co.uk> >>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

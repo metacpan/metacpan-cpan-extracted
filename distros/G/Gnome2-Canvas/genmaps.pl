@@ -1,7 +1,7 @@
 #read !grep _TYPE_ /usr/include/gtk-2.0/gtk/*.h | grep get_type  
 #% s/^.*[ \t]\([_A-Z0-9]*_TYPE_[_A-Z0-9]*\)[ \t].*$/\1/ 
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/GnomeCanvas/genmaps.pl,v 1.1 2003/06/16 17:50:27 muppetman Exp $
+# $Id$
 #
 
 

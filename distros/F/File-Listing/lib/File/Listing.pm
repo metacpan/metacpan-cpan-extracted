@@ -1,16 +1,16 @@
 package File::Listing;
 
-sub Version { $VERSION; }
-$VERSION = "6.04";
-
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT = qw(parse_dir);
-
 use strict;
-
+use warnings;
 use Carp ();
 use HTTP::Date qw(str2time);
+use base qw( Exporter );
+
+our $VERSION = '6.07';
+sub Version { $VERSION; }
+
+our @EXPORT = qw(parse_dir);
+
 
 
 
@@ -90,7 +90,7 @@ sub parse
    # file handles to read from.
 
    if (ref($dir) eq 'ARRAY') {
-       # Already splitted up
+       # Already split up
    }
    elsif (ref($dir) eq 'GLOB') {
        # A file handle
@@ -178,7 +178,7 @@ sub line
 	    $type = 'd';
 	    $size = undef;  # Don't believe the reported size
 	}
-	return [$name, $type, $size, str2time($date, $tz), 
+	return [$name, $type, $size, str2time($date, $tz),
               File::Listing::file_mode($kind)];
 
     }
@@ -385,51 +385,107 @@ File::Listing - parse directory listing
      next if $type ne 'f'; # plain file
      #...
  }
-
+ 
  # directory listing can also be read from a file
  open(LISTING, "zcat ls-lR.gz|");
  $dir = parse_dir(\*LISTING, '+0000');
 
 =head1 DESCRIPTION
 
-This module exports a single function called parse_dir(), which can be
+This module exports a single function called C<parse_dir>, which can be
 used to parse directory listings.
 
-The first parameter to parse_dir() is the directory listing to parse.
+=head1 FUNCTIONS
+
+=head2 parse_dir
+
+ my $dir = parse_dir( $listing );
+ my $dir = parse_dir( $listing, $time_zone );
+ my $dir = parse_dir( $listing, $time_zone, $type );
+ my $dir = parse_dir( $listing, $time_zone, $type, $error );
+ my @files = parse_dir( $listing );
+ my @files = parse_dir( $listing, $time_zone );
+ my @files = parse_dir( $listing, $time_zone, $type );
+ my @files = parse_dir( $listing, $time_zone, $type, $error );
+
+The first parameter (C<$listing>) is the directory listing to parse.
 It can be a scalar, a reference to an array of directory lines or a
 glob representing a filehandle to read the directory listing from.
 
-The second parameter is the time zone to use when parsing time stamps
-in the listing. If this value is undefined, then the local time zone is
-assumed.
+The second parameter (C<$time_zone>) is the time zone to use when
+parsing time stamps in the listing. If this value is undefined,
+then the local time zone is assumed.
 
-The third parameter is the type of listing to assume.  Currently
-supported formats are 'unix', 'apache' and 'dosftp'.  The default
-value is 'unix'.  Ideally, the listing type should be determined
-automatically.
+The third parameter (C<$type>) is the type of listing to assume.
+Currently supported formats are 'unix', 'apache' and 'dosftp'.
+The default value is 'unix'.  Ideally, the listing type should
+be determined automatically.
 
-The fourth parameter specifies how unparseable lines should be treated.
-Values can be 'ignore', 'warn' or a code reference.  Warn means that
-the perl warn() function will be called.  If a code reference is
-passed, then this routine will be called and the return value from it
-will be incorporated in the listing.  The default is 'ignore'.
+The fourth parameter (C<$error>) specifies how unparseable lines
+should be treated. Values can be C<'ignore'>, C<'warn'> or a code reference.
+Warn means that the perl warn() function will be called.  If a code
+reference is passed, then this routine will be called and the return
+value from it will be incorporated in the listing.  The default is
+C<'ignore'>.
 
 Only the first parameter is mandatory.
 
-The return value from parse_dir() is a list of directory entries.  In
-a scalar context the return value is a reference to the list.  The
-directory entries are represented by an array consisting of [
-$filename, $filetype, $filesize, $filetime, $filemode ].  The
-$filetype value is one of the letters 'f', 'd', 'l' or '?'.  The
-$filetime value is the seconds since Jan 1, 1970.  The
-$filemode is a bitmask like the mode returned by stat().
+ # list context
+ foreach my $file (parse_dir($listing)) {
+     my($name, $type, $size, $mtime, $mode) = @$file;
+ }
+ 
+ # scalar context
+ my $dir = parse_dir($listing);
+ foreach my $file (@$dir) {
+     my($name, $type, $size, $mtime, $mode) = @$file;
+ }
+
+The return value from parse_dir() is a list of directory entries.
+In a scalar context the return value is a reference to the list.
+The directory entries are represented by an array consisting of:
+
+=over 4
+
+=item name
+
+The name of the file.
+
+=item type
+
+One of: C<f> file, C<d> directory, C<l> symlink, C<?> unknown.
+
+=item size
+
+The size of the file.
+
+=item time
+
+The number of seconds since January 1, 1970.
+
+=item mode
+
+Bitmask a la the mode returned by C<stat>.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<File::Listing::Ftpcopy>
+
+Provides the same interface but uses XS and the parser implementation from C<ftpcopy>.
+
+=back
 
 =head1 COPYRIGHT
 
 Copyright 1996-2010, Gisle Aas
+Copyright 2020 Graham Ollis
 
 Based on lsparse.pl (from Lee McLoughlin's ftp mirror package) and
-Net::FTP's parse_dir (Graham Barr).
+L<Net::FTP>'s parse_dir (Graham Barr).
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

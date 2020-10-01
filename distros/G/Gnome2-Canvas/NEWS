@@ -1,3 +1,19 @@
+Overview of Changes in 1.004
+============================
+
+* Makefile.PL: added 'NO_META => 1'; Calling 'make dist' is clobbering the
+  META.yml file that's already included in the distribution, which is wrong
+  and breaks things
+
+Overview of Changes in 1.003
+============================
+
+* META.yml: tweak file to fix problems with using 'cpanm' to install module;
+  Moved 'Gtk2' from 'requires:' to 'configure_requires:'; Set the 'version:'
+  string to the current module version, instead of 'unknown'; both of these
+  changes fix RT#127878
+* Updated FSF address in all files that have it; this closes RT#111436
+
 Overview of Changes in 1.002
 ============================
 

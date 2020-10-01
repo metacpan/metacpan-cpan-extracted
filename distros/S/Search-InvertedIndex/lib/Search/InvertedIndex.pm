@@ -1,8 +1,8 @@
 package Search::InvertedIndex;
 
-# $RCSfile: InvertedIndex.pm,v $ $Revision: 1.31 $ $Date: 2000/01/25 19:53:26 $ $Author: snowhare $
-
 use strict;
+use warnings;
+
 use Carp;
 use Class::NamedParms;
 use Class::ParmList qw (simple_parms parse_parms);
@@ -10,7 +10,7 @@ use Search::InvertedIndex::AutoLoader;
 use vars qw (@ISA $VERSION);
 
 @ISA     = qw(Class::NamedParms);
-$VERSION = '1.14';
+$VERSION = '1.17';
 
 # Used to catch attempts to open the same -map
 # to multiple objects simultaneously and to
@@ -200,51 +200,56 @@ determine initialization requirements.
  1.00 1999.06.16 - Initial release
 
  1.01 1999.06.17 - Documentation fixes and fix to 'close' method in
-				   Search::InvertedIndex::DB::DB_File_SplitHash
+                   Search::InvertedIndex::DB::DB_File_SplitHash
 
  1.02 1999.06.18 - Major bugfix to locking system.
-				   Performance tweaking. Roughly 3x improvement.
+                   Performance tweaking. Roughly 3x improvement.
 
  1.03 1999.06.30 - Documentation fixes.
 
  1.04 1999.07.01 - Documentation fixes and caching system bugfixes.
+                   (never publically released)
 
  1.05 1999.10.20 - Altered ranking computation on search results
 
  1.06 1999.10.20 - Removed 'use attrs' usage to improve portability
 
- 1.07 1999.11.09 - "Cosmetic" changes to avoid warnings in Perl 5.004
+ 1.08 2000.01.25 - Bug fix to multi database code and documentation updates
 
- 1.08 2000.01.25 - Bugfix to 'Search::InvertedIndex::DB:DB_File_SplitHash' submodule
-				   and documentation additions/fixes
-
- 1.09 2000.03.23 - Bugfix to 'Search::InvertedIndex::DB:DB_File_SplitHash' submodule
-				   to manage case where 'open' is not performed before close is called.
+ 1.09 2000.03.23 - Bug fix to 'Search::InvertedIndex::DB:DB_File_SplitHash' submodule
+                   to manage case where 'open' is not performed before 'close' is called.
 
  1.10 2000.07.05 - Delayed loading of serializer and added option to select
-				   which serializer (Storable or Data::Dumper) to use at instance 'new' time.
-				   This should allow module to be loaded by mod_perl via the 'PerlModule'
-				   conf directive and enable use on platforms that do not support
-				   'Storable' (such as Macintosh).
+                   which serializer (Storable or Data::Dumper) to use at instance 'new' time.
+                   This should allow module to be loaded by mod_perl via the 'PerlModule'
+                   conf directive and enable use on platforms that do not support
+                   'Storable' (such as Macintosh).
 
  1.11 2000.11.29 - Added 'Search::InvertedIndex::DB::Mysql' (authored by
-				   Michael Cramer <cramer@webkist.com>) database driver
-				   to package.
+                   Michael Cramer <cramer@webkist.com>) database driver
+                   to package.
 
- 1.12 2002.04.09 - Squashed bug in removal of an index from a group when the index doesn't
-				   exist in that group that caused index counts for the group to be decremented
-				   in error.
+1.12 2002.04.09 - Squashed bug in removal of an index from a group when the index doesn't
+                  exist in that group that caused index counts for the group to be decremented
+                  in error.
 
- 1.13 2003.09.28 - Interim release. Fixed false error return from 'first_key_in_group' for a group
-                   that has not yet had any keys set.  Tightened calling
-                   parm parses. Tweaked performance of preload updating code.
-                   Added taint fix for stringifier identifier.
-                   This release was driven by the taint issue and code bug as crisis items.
-                   Hopefully a 1.14 release will be in the not too distant future.
+1.13 2003.09.28 - Iterim release. Fixed false error return from 'first_key_in_group' for a group
+                  that has not yet had any keys set.  Tightened calling
+                  parm parses. Tweaked performance of preload updating code.
+                  Added taint fix for stringifier identifier.
+                  This release was driven by the taint issue and the clear bug as crisis items.
+                  Hopefully a 1.14 release will be in the not too distant future.
 
- 1.14 2003.11.14 - Patch to the MySQL database driver to accomodate changes in DBD::mysql.
-                   Addition of a test for MySQL functionality. Patch and test thanks to
-                   Kate L Pugh.
+1.14 2003.11.14 - Patch to the MySQL database driver to accomodate changes in DBD::mysql.
+                  Addition of a test for MySQL functionality, Patch and test thanks to
+                  Kate L Pugh <kake@earth.li>.
+
+1.15 2020.09.27 - Updates to build tooling. Addition of 'use warnings'
+
+1.16 2020.09.27 - Fixed permissions for Build.PL and Makefile.PL. Added strict and warnings to
+                  Search::InvertedIndex::Db::Mysql
+
+1.17 2020.09.27 - Added LICENSE file to MANIFEST
 
 =head2 Public API
 
@@ -3790,17 +3795,40 @@ sub DESTROY {
 
 =head1 VERSION
 
-1.14
+1.17
 
 =head1 COPYRIGHT
 
-Copyright 1999-2002, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and
-FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
-This software may be copied or redistributed under the same terms as Perl itelf.
+Copyright 1999-2020, Jerilyn Franz and FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>).
+All Rights Reserved.
+
+=head1 LICENSE
+
+MIT License
+
+Copyright (c) 2020 Jerilyn Franz
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =head1 AUTHOR
 
-Benjamin Franz
+Jerilyn Franz
 
 =head1 TODO
 

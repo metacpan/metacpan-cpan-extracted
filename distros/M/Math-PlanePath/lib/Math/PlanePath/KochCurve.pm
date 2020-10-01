@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,17 +21,17 @@
 
 # continuous but nowhere differentiable
 #
-# Sur une courbe continue sans tangente, obtenue par une construction
-# géométrique élémentaire
+# Sur une Courbe Continue sans Tangente, Obtenue par une Construction
+# Géométrique Élémentaire
 #
 # http://www.nku.edu/~curtin/grenouille.html
 # http://www.nku.edu/~curtin/koch_171.jpg
 #
-# Cesàro, "Remarques sur la courbe de von Koch." Atti della
-# R. Accad. della Scienze fisiche e matem. Napoli 12, No. 15, 1-12,
+# Cesàro, "Remarques sur la Courbe de von Koch." Atti della
+# R. Accad. della Scienze Fisiche e Matem. Napoli 12, No. 15, 1-12,
 # 1905. Reprinted as §228 in Opere scelte, a cura dell'Unione matematica
 # italiana e col contributo del Consiglio nazionale delle ricerche, Vol. 2:
-# Geometria, analisi, fisica matematica. Rome: Edizioni Cremonese,
+# Geometria, Analisi, Fisica Matematica. Rome: Edizioni Cremonese,
 # pp. 464-479, 1964.
 #
 # Thue-Morse count 1s mod 2 is net direction
@@ -42,9 +42,9 @@
 # pages 191-206, 2005.
 # http://personal.kenyon.edu/holdenerj/StudentResearch/WhenThueMorsemeetsKochJan222005.pdf
 #
-# F.M. Dekking. On the distribution of digits in arithmetic sequences. In
-# Seminaire de Theorie des Nombres de Bordeaux, volume 12, pages 3201-3212,
-# 1983.
+# F.M. Dekking. On the Distribution of Digits In Arithmetic Sequences.
+# In Seminaire de Theorie des Nombres de Bordeaux, volume 12, 1983, pages
+# 3201-3212,
 #
 
 
@@ -55,7 +55,7 @@ use strict;
 use List::Util 'sum','first';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
@@ -706,9 +706,9 @@ Return C<(0, 4**$level)>.
 =head2 N to Turn
 
 The curve always turns either +60 degrees or -120 degrees, it never goes
-straight ahead.  In the base 4 representation of N the lowest non-zero digit
-gives the turn.  The first turn is at N=1 so there's always a non-zero digit
-in N.
+straight ahead.  In the base 4 representation of N, the lowest non-zero
+digit gives the turn.  The first turn is at N=1 so there's always a non-zero
+digit in N.
 
    low digit
     base 4         turn
@@ -898,20 +898,29 @@ L<http://oeis.org/A035263> (etc)
 
 =back
 
-    A177702   abs(dX) from N=1 onwards, being 1,1,2 repeating
-    A011655   abs(dY), being 0,1,1 repeating
+    A335358   (X-Y)/2 diagonal coordinate
+    A335359   Y coordinate
+
     A035263   turn 1=left,0=right, by morphism
-    A096268   turn 0=left,1=right, by morphism
+    A096268   turn 0=left,1=right, period doubling sequence
     A056832   turn 1=left,2=right, by replicate and flip last
+    A309873   turn 1=left,-1=right
     A029883   turn +/-1=left,0=right, Thue-Morse first differences
     A089045   turn +/-1=left,0=right, by +/- something
+
+    A177702   abs(dX) from N=1 onwards, being 1,1,2 repeating
+    A011655   abs(dY), being 0,1,1 repeating
 
     A003159   N positions of left turns, ending even number 0 bits
     A036554   N positions of right turns, ending odd number 0 bits
 
-    A020988   number of left turns N=0 to N < 4^k, being 2*(4^k-1)/3
-    A002450   number of right turns N=0 to N < 4^k, being (4^k-1)/3
-    A016153   area under the curve, (9^n-4^n)/5
+    A065359   segment direction, *60 degrees
+    A229216   segment direction, 1,2,3,-1,-2,-3
+    A050292   num left turns 1 to N
+    A123087   num right turns 1 to N
+    A020988   num left turns 1 to 4^k-1, being 2*(4^k-1)/3
+    A002450   num right turns 1 to 4^k-1, being (4^k-1)/3
+    A016153   area under the curve, (9^k-4^k)/5
 
 For reference, A217586 is not quite the same as A096268 right turn.  A217586
 differs by a 0E<lt>-E<gt>1 flip at N=2^k due to different initial a(1)=1.
@@ -933,7 +942,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -1,6 +1,16 @@
-Revision history for Data-Sah-Params
+0.005   2020-09-25  Released-By: PERLANCAR; Urgency: medium
 
-0.003   2016-05-30 (PERLANCAR)
+	- No functional changes.
+
+	- Forgot to add Deprecated in Abstract.
+
+
+0.004   2020-07-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Deprecate in favor of Params::Sah.
+
+
+0.003   2016-05-30  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -9,11 +19,11 @@ Revision history for Data-Sah-Params
 	- [doc] Forgot to document want_source option.
 
 
-0.002   2016-05-26 (PERLANCAR)
+0.002   2016-05-26  Released-By: PERLANCAR
 
 	- Add option: want_source like in Type::Params.
 
 
-0.001   2016-05-26 (PERLANCAR)
+0.001   2016-05-26  Released-By: PERLANCAR
 
          - First release.

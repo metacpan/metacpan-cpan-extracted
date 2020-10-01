@@ -13,7 +13,7 @@ use base "File::HomeDir::Driver";
 
 BEGIN
 {
-    $VERSION = '1.004';
+    $VERSION = '1.006';
     %DIR     = ();
     $ENABLED = 0;
 }
@@ -135,6 +135,8 @@ Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 =head1 COPYRIGHT
 
 Copyright 2005 - 2011 Adam Kennedy.
+
+Copyright 2017 - 2020 Jens Rehsack
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

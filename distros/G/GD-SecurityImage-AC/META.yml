@@ -1,20 +1,34 @@
 ---
-name: GD-SecurityImage-AC
-version: 1.11
+abstract: 'A drop-in replacement for Authen::Captcha'
 author:
-  - 'Benjamin Franz <snowhare@nihongo.org>'
-abstract: A drop-in replacement for Authen::Captcha.
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Digest::MD5: 0
-  GD::SecurityImage: 1.60
+  - 'Jerilyn Franz <cpan@jerilyn.info>'
+build_requires:
+  Digest::MD5: '0'
+  GD::SecurityImage: '1.60'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GD-SecurityImage-AC
 provides:
   GD::SecurityImage::AC:
     file: lib/GD/SecurityImage/AC.pm
-    version: 1.11
-generated_by: Module::Build version 0.2808
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: '1.12'
+requires:
+  Digest::MD5: '0'
+  GD::SecurityImage: '1.60'
+  perl: '5.006'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/JerilynFranz/perl-GD-SecurityImage-AC/issues
+  homepage: https://github.com/JerilynFranz/perl-GD-SecurityImage-AC
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://github.com/JerilynFranz/perl-GD-SecurityImage-AC.git
+version: '1.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

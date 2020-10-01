@@ -1,0 +1,31 @@
+Change log for Container::Buildah
+
+0.2.1 2020-09-25T03:25:35-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - CPAN testers feedback: back off Perl version requirement from 5.26 to
+   5.20 (which is 3 years older than buildah)
+ - CPAN testers feedback: remove buildah path check from t/011_prog.t
+   because of course test machines don't have it
+ - CPAN testers feedback: make t/014_buildah.t skip all tests if buildah
+   isn't found
+
+0.2.0 2020-09-24T15:27:13-07:00 America/Los_Angeles
+ [DOCS]
+ - add POD docs
+
+ [ENHANCEMENTS]
+ - update cmd() method to capture command output - add common
+   process_param() method for buildah subcommand wrapper functions
+
+ [MINOR]
+ - code cleanup for Perl::Critic compliance at severity 3 (harsh) level
+ - split off Container::Buildah::Stage and Container::Buildah::Subcommand
+   classes to their own files
+ - implement wrapper functions for all buildah subcommands
+ - tests: low-level infrastructure functions/methods - config, prog,
+   process_params
+ - tests: mid-level infrastructure functions/methods - cmd, buildah
+ - tests: minimal multi-stage container build
+
+0.1.0 2020-07-17
+ - preparation for posting to GitHub and CPAN

@@ -6,7 +6,7 @@
 use ScriptX;
 ScriptX->run;
 
-# ABSTRACT: The minimalistic ScriptX-based script that does nothing (demos viewing logs, loading plugins, putting plugin handler at another event)
+# ABSTRACT: The minimalistic ScriptX-based script that does nothing (demos viewing logs, loading plugins, putting plugin handler at another event, putting multiple handlers)
 # PODNAME: scriptx-eg-noop
 
 __END__
@@ -17,15 +17,15 @@ __END__
 
 =head1 NAME
 
-scriptx-eg-noop - The minimalistic ScriptX-based script that does nothing (demos viewing logs, loading plugins, putting plugin handler at another event)
+scriptx-eg-noop - The minimalistic ScriptX-based script that does nothing (demos viewing logs, loading plugins, putting plugin handler at another event, putting multiple handlers)
 
 =head1 VERSION
 
-This document describes version 0.000001 of scriptx-eg-noop (from Perl distribution ScriptX), released on 2020-09-03.
+This document describes version 0.000004 of scriptx-eg-noop (from Perl distribution ScriptX), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
- % script-eg-noop
+ % scriptx-eg-noop
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ the C<run()> static method.
 
 To see the logs being produced to the screen, you can use L<Log::ger::Screen>:
 
- % PERL5OPT=-MLog::ger::Screen TRACE=1 script-eg-noop
+ % PERL5OPT=-MLog::ger::Screen TRACE=1 scriptx-eg-noop
  [scriptx] -> run_event(name=run)
  [scriptx] <- run_event(name=run)
 
@@ -47,7 +47,7 @@ L<SCRIPTX_IMPORT_JSON|ScriptX/SCRIPTX_IMPORT_JSON> environment variable, so we
 do not have to modify the script to add behaviors. Let's load the simplest
 plugin L<ScriptX::Noop> which just logs a message:
 
- % PERL5OPT=-MLog::ger::Screen TRACE=1 SCRIPTX_IMPORT=-Noop script-eg-noop
+ % PERL5OPT=-MLog::ger::Screen TRACE=1 SCRIPTX_IMPORT=-Noop scriptx-eg-noop
  [scriptx] Reading env variable SCRIPTX_IMPORT ...
  [scriptx] -> run_event(name=activate_plugin)
  [scriptx] Running on_success ...
@@ -66,7 +66,7 @@ registers a handler for.
 
 Let's load another plugin L<ScriptX::Debug::DumpStash>:
 
- % PERL5OPT=-MLog::ger::Screen TRACE=1 SCRIPTX_IMPORT=-Noop,-Debug::DumpStash script-eg-noop
+ % PERL5OPT=-MLog::ger::Screen TRACE=1 SCRIPTX_IMPORT=-Noop,-Debug::DumpStash scriptx-eg-noop
  ...
  [scriptx] -> run_event({name=>"run"})
  [scriptx] [event before_run] [1/1] -> handler Debug::DumpStash ...
@@ -82,13 +82,57 @@ event and dumps the content of the stash. In ScriptX, you can put a plugin's
 handler at arbitrary event and priority. For example, to dump stash in the
 C<after_run> event instead:
 
- % PERL5OPT=-MLog::ger::Screen TRACE=1 SCRIPTX_IMPORT=-Noop,-Debug::DumpStash@after_run script-eg-noop
+ % PERL5OPT=-MLog::ger::Screen TRACE=1 SCRIPTX_IMPORT=-Noop,-Debug::DumpStash@after_run scriptx-eg-noop
  [scriptx] -> run_event({name=>"run"})
  [scriptx] [event run] [1/1] -> handler Noop ...
  Hello from the Noop plugin
  [scriptx] [event run] [1/1] <- handler Noop: [200,"OK"] (success)
  [scriptx] [event after_run] [1/1] -> handler Debug::DumpStash ...
  { event => "after_run" }
+ [scriptx] [event after_run] [1/1] <- handler Debug::DumpStash: [200,"OK"] (success)
+ [scriptx] <- run_event(name=run)
+
+You can also dump stash in several places, since you can add handler(s) of a
+plugin multiple times:
+
+ % PERL5OPT=-MLog::ger::Screen TRACE=1 SCRIPTX_IMPORT="-Noop,-Debug::DumpStash@before_run,-Debug::DumpStash@after_run" scriptx-eg-noop
+ ...
+ [scriptx] [event before_run] [1/1] -> handler Debug::DumpStash ...
+ {
+   event    => "before_run", # {0}
+   handlers => {
+                 activate_plugin => [],                                    # .{0}
+                 after_activate_plugin => [],                              # .{1}
+                 after_run => [["Debug::DumpStash", 99, sub { ... }, 2]],  # .{2}
+                 before_activate_plugin => [],                             # .{3}
+                 before_run => [["Debug::DumpStash", 99, sub { ... }, 1]], # .{4}
+                 run => [["Noop", 90, sub { ... }, 0]],                    # .{5}
+               },            # {1}
+   plugins  => {
+                 "Debug::DumpStash" => bless({}, "ScriptX::Debug::DumpStash"), # .{0}
+                 "Noop" => bless({}, "ScriptX::Noop"),                         # .{1}
+               },            # {2}
+ }
+ [scriptx] [event before_run] [1/1] <- handler Debug::DumpStash: [200,"OK"] (success)
+ [scriptx] [event run] [1/1] -> handler Noop ...
+ [ScriptX::Noop] Hello from the Noop plugin
+ [scriptx] [event run] [1/1] <- handler Noop: [200,"OK"] (success)
+ [scriptx] [event after_run] [1/1] -> handler Debug::DumpStash ...
+ {
+   event    => "after_run", # {0}
+   handlers => {
+                 activate_plugin => [],                                    # .{0}
+                 after_activate_plugin => [],                              # .{1}
+                 after_run => [["Debug::DumpStash", 99, sub { ... }, 2]],  # .{2}
+                 before_activate_plugin => [],                             # .{3}
+                 before_run => [["Debug::DumpStash", 99, sub { ... }, 1]], # .{4}
+                 run => [["Noop", 90, sub { ... }, 0]],                    # .{5}
+               },           # {1}
+   plugins  => {
+                 "Debug::DumpStash" => bless({}, "ScriptX::Debug::DumpStash"), # .{0}
+                 "Noop" => bless({}, "ScriptX::Noop"),                         # .{1}
+               },           # {2}
+ }
  [scriptx] [event after_run] [1/1] <- handler Debug::DumpStash: [200,"OK"] (success)
  [scriptx] <- run_event(name=run)
 

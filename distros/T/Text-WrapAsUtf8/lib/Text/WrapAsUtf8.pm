@@ -1,13 +1,16 @@
 package Text::WrapAsUtf8;
-
+$Text::WrapAsUtf8::VERSION = '0.0.2';
 use strict;
 use warnings;
 
-our $VERSION = '0.0.1';
-
 use parent 'Exporter';
 
-our @EXPORT_OK = (qw(print_utf8 wrap_as_utf8));
+our @EXPORT_OK = (
+    qw(
+        print_utf8
+        wrap_as_utf8
+        )
+);
 
 sub wrap_as_utf8
 {
@@ -43,19 +46,25 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Text::WrapAsUtf8 - temporarily wraps output to stdout as the UTF-8 binmode.
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
-    use Text::WrapAsUtf8 qw/ print_utf8 /;
+    use Text::WrapAsUtf8 qw/ print_utf8 wrap_as_utf8 /;
 
     print_utf8("Hello\n", "World\n");
+
+    wrap_as_utf8(sub {
+        print("string containing unicode\n");
+    });
 
 =head1 DESCRIPTION
 
@@ -78,36 +87,9 @@ argument, and sets binmode to raw.
 
 Prints @strings while inside wrap_as_utf8().
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2017 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/text-wrapasutf8/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Text::WrapAsUtf8
 
 =head2 Websites
 
@@ -122,15 +104,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Text-WrapAsUtf8>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Text-WrapAsUtf8>
+L<https://metacpan.org/release/Text-WrapAsUtf8>
 
 =item *
 
@@ -139,30 +113,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-WrapAsUtf8>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Text-WrapAsUtf8>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Text-WrapAsUtf8>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Text-WrapAsUtf8>
 
 =item *
 
@@ -176,7 +126,7 @@ L<http://cpants.cpanauthors.org/dist/Text-WrapAsUtf8>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/T/Text-WrapAsUtf8>
 
@@ -213,5 +163,26 @@ from your repository :)
 L<https://github.com/shlomif/Text-WrapAsUtf8>
 
   git clone https://github.com/shlomif/Text-WrapAsUtf8.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/text-wrapasutf8/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

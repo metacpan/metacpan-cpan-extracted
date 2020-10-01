@@ -12,6 +12,7 @@ lib/Crypt/Perl/ASN1/Encodee.pm
 lib/Crypt/Perl/ASN1/Signatures.pm
 lib/Crypt/Perl/BigInt.pm
 lib/Crypt/Perl/ECDSA.pm
+lib/Crypt/Perl/ECDSA/Deterministic.pm
 lib/Crypt/Perl/ECDSA/EC/Curve.pm
 lib/Crypt/Perl/ECDSA/EC/CurvesDB.pm
 lib/Crypt/Perl/ECDSA/EC/DB.pm
@@ -102,6 +103,7 @@ lib/Crypt/Perl/X509/SCT.pm
 lib/Crypt/Perl/X509v3.pm
 t/Crypt-Perl-ASN1-BitString.t
 t/Crypt-Perl-BigInt.t
+t/Crypt-Perl-ECDSA-Deterministic.t
 t/Crypt-Perl-ECDSA-EC-Point.t
 t/Crypt-Perl-ECDSA-Generate.t
 t/Crypt-Perl-ECDSA-Math.t

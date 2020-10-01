@@ -1,0 +1,55 @@
+{
+   "abstract" : "Quick and Dirty Interface to https://github.com/mapbox/geocoder-abbreviations",
+   "author" : [
+      "Nigel Horne <njh@bandsman.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geo-Coder-Abbreviations",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "LWP::Simple" : "0",
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Geo-Coder-Abbreviations.git",
+         "web" : "https://github.com/nigelhorne/Geo-Coder-Abbreviations"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

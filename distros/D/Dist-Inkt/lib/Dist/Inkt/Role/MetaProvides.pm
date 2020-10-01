@@ -1,7 +1,7 @@
 package Dist::Inkt::Role::MetaProvides;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.024';
+our $VERSION   = '0.025';
 
 use Moose::Role;
 use Module::Metadata;

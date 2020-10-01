@@ -20,12 +20,12 @@ if ($lang =~ m/^(ja|ja_JP|ja_JP.utf-8|ja_JP.utf8|ja.utf8|ja.utf-8)$/i) {
 }
 
 WriteMakefile(
-    'NAME'	     => 'Unicode::MapUTF8',
-    'VERSION_FROM'   => 'lib/Unicode/MapUTF8.pm',
-    'linkext'        => { LINKTYPE=>'' },	# no link needed
-    'dist'           => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
-	                 'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'},
-    'PREREQ_PM'      => {
+    NAME	     => 'Unicode::MapUTF8',
+    VERSION_FROM     => 'lib/Unicode/MapUTF8.pm',
+    MIN_PERL_VERSION => '5.006',
+    ($ExtUtils::MakeMaker::VERSION >= 6.3002 ? ('LICENSE'  => 'mit', ) : ()),
+    'linkext'        => { },	# no link needed
+    PREREQ_PM        => {
                             'Carp'             => 0,
                             'File::Copy'       => 0,
                             'Unicode::Map'     => 0,
@@ -33,12 +33,23 @@ WriteMakefile(
                             'Unicode::Map8'    => 0,
                             'Jcode'            => 0,
     }, 
+    META_MERGE => {
+       'meta-spec' => { version => 2 },
+        resources => {
+           bugtracker => {
+                web  => 'https://github.com/JerilynFranz/perl-Unicode-MapUTF8/issues',
+            },
+            homepage => 'https://github.com/JerilynFranz/perl-Unicode-MapUTF8',
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/JerilynFranz/perl-Unicode-MapUTF8.git',
+                web  => 'https://github.com/JerilynFranz/perl-Unicode-MapUTF8',
+            },
+        },
+    }, 
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Unicode/MapUTF8.pod', # retrieve abstract from module
-       AUTHOR         => 'Benjamin Franz <snowhare@nihongo.org>') : ()),
-
-       ($] >= 5.800 ?     ## Add these new keywords supported since 5.8
-             (NO_META      => 1) : ()),
+       AUTHOR         => 'Jerilyn Franz <cpan@jerilyn.info>') : ()),
 
        PL_FILES       => {},
 

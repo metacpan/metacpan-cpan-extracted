@@ -100,8 +100,24 @@ The following `curl` options are recognized but largely ignored:
 - ` --include `
 - ` --location `
 - ` --progress-bar `
+- ` --show-error `
+- ` --fail `
 - ` --silent `
 - ` --verbose `
+- ` --junk-session-cookies `
+
+    If you want to keep session cookies between subsequent requests, you need to
+    provide a cookie jar in your user agent.
+
+- `--next`
+
+    Resetting the UA between requests is something you need to handle yourself
+
+- `--parallel`
+- `--parallel-immediate`
+- `--parallel-max`
+
+    Parallel requests is something you need to handle in the UA
 
 # LIVE DEMO
 
@@ -144,6 +160,13 @@ in the raw body content and the `Content-Length` header.
     is slurped into memory completely. This can be problematic for large files
     and little available memory.
 
+- Mixed data instances
+
+    Multiple mixed instances of `--data`, `--data-ascii`, `--data-raw`,
+    `--data-binary` or `--data-raw` are sorted by type first instead of getting
+    concatenated in the order they appear on the command line.
+    If the order is important to you, use one type only.
+
 - Multiple sets of parameters from the command line
 
     Curl supports the `--next` command line switch which resets
@@ -160,6 +183,9 @@ in the raw body content and the `Content-Length` header.
 [LWP::CurlLog](https://metacpan.org/pod/LWP::CurlLog)
 
 [HTTP::Request::AsCurl](https://metacpan.org/pod/HTTP::Request::AsCurl) - for the inverse function
+
+The module HTTP::Request::AsCurl likely also implements a much better version
+of `->as_curl` than this module.
 
 [https://github.com/NickCarneiro/curlconverter](https://github.com/NickCarneiro/curlconverter) - a converter for multiple
 target languages

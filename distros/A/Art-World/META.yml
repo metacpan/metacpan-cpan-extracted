@@ -1,7 +1,7 @@
 ---
 abstract: 'Agents interactions modeling  🎨'
 author:
-  - =over
+  - 'Seb. Hu-Rillettes <shr@balik.network>'
 build_requires:
   Test::Pod: '== 1.52'
 configure_requires:
@@ -24,26 +24,22 @@ no_index:
     - author
     - builder
 provides:
-  Art:
-    file: lib/Art.pm
-  Art::Wildlife:
-    file: lib/Art/Wildlife.pm
   Art::World:
     file: lib/Art/World.pm
-    version: '0.16'
+    version: '0.17'
 requires:
   Data::Printer: '== 0.40'
   Faker: '== 1.03'
-  Zydeco: '== 0.605'
+  Type::Tiny::XS: '== 0.022'
+  Zydeco: '== 0.611'
   perl: v5.16.0
 resources:
   bugtracker: https://gitlab.com/smonff/art-world/issues
   homepage: https://gitlab.com/smonff/art-world
   repository: git://gitlab.com/smonff/art-world.git
-version: '0.16'
+version: '0.17'
 x_authority: cpan:SMONFF
 x_contributors:
-  - 'Seb Hu-Rillettes <shr@balik.network>'
   - 'Sébastien Feugère <smonff@riseup.net>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

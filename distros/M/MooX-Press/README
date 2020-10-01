@@ -147,7 +147,17 @@ DESCRIPTION
           MyApp::Cow->FACTORY->qualify('Pig')     # 'MyApp::Pig'
           MyApp::Cow->FACTORY->qualify('::Pig')   # 'Pig'
 
-        The factpry package will have a global variable %PACKAGES where the
+        There will also be `get_role` and `get_class` methods:
+
+          my $Clever = MyApp->get_role( 'Clever' );
+          my $Brave  = MyApp->get_role( 'Brave' );
+          my $Pig    = MyApp->get_class( 'Pig', $Clever, $Brave );
+          my $wilbur = $Pig->new( name => 'Wilbur' );
+
+        Class generators and role generators are also allowed; just follow the
+        name with an arrayref of parameters.
+
+        The factory package will have a global variable %PACKAGES where the
         keys are names of all the packages MooX::Press created for you, and
         the values are what kind of package they are:
 

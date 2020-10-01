@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -47,7 +47,7 @@ use List::Util 'min';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -316,7 +316,7 @@ sub n_to_level {
 1;
 __END__
 
-=for stopwords eg Ryde Math-PlanePath 0.abcde twindragon ie 0xC 0,1,0xC,0xD OEIS ACM abcde Xnew Ynew Realpart characterises
+=for stopwords eg Ryde Math-PlanePath 0.abcde twindragon ie 0xC 0,1,0xC,0xD OEIS ACM abcde Xnew Ynew Realpart Khmelnik Specialized DragonCurve visualize
 
 =head1 NAME
 
@@ -325,7 +325,7 @@ Math::PlanePath::ComplexMinus -- i-1 and other complex number bases i-r
 =head1 SYNOPSIS
 
  use Math::PlanePath::ComplexMinus;
- my $path = Math::PlanePath::ComplexMinus->new (realpart=>1);
+ my $path = Math::PlanePath::ComplexMinus->new (realpart => 1);
  my ($x, $y) = $path->n_to_xy (123);
 
 =head1 DESCRIPTION
@@ -339,8 +339,9 @@ Solomon I. Khmelnik "Specialized Digital Computer for Operations with
 Complex Numbers" (in Russian), Questions of Radio Electronics, volume 12,
 number 2, 1964.  L<http://lib.izdatelstwo.com/Papers2/s4.djvu>
 
-Walter Penny, "A 'Binary' System for Complex Numbers", Journal of the ACM,
+Walter Penney, "A 'Binary' System for Complex Numbers", Journal of the ACM,
 volume 12, number 2, April 1965, pages 247-248.
+L<http://www.nsa.gov/Portals/70/documents/news-features/declassified-documents/tech-journals/a-binary-system.pdf>
 
 =back
 
@@ -802,7 +803,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

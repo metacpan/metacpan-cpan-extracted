@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -47,6 +47,16 @@
 #
 # cf A004120 ??
 #
+#----------
+# corners alternating "shell"
+#
+# A319514 interleaved x,y
+# my(g=OEIS_bfile_gf("A319289")); x(n) = polcoeff(g,n);
+# my(g=OEIS_bfile_gf("A319290")); y(n) = polcoeff(g,n);
+# plothraw(vector(3^3,n,n--; x(n)), \
+#          vector(3^3,n,n--; y(n)), 1+8+16+32)
+
+
 
 package Math::PlanePath::Corner;
 use 5.004;
@@ -54,7 +64,7 @@ use strict;
 use List::Util 'min';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 @ISA = ('Math::PlanePath');
@@ -691,7 +701,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

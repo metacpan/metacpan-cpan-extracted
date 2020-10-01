@@ -225,6 +225,7 @@ subtest 'process execute()' => sub {
   $p->start();
   $p->stop();
   is $p->is_running, 1, 'process is still running';
+  is $p->_status, undef, 'no status yet';
   my $err = ${(@{$p->error})[0]};
   my $exp = qr/Could not kill process/;
   like $err, $exp, 'Error is not empty if process could not be killed';

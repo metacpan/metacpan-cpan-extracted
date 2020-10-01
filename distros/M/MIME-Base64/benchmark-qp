@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+use blib;
+
+use MIME::QuotedPrint;
+use Time::HiRes qw(time);
+
+my $file = shift || die "Usage: $0 <file> <old> <slurp>\n";
+
+if (shift) {
+    *enc = \&MIME::QuotedPrint::old_encode_qp;
+    *dec = \&MIME::QuotedPrint::old_decode_qp;
+}
+else {
+    *enc = \&MIME::QuotedPrint::encode_qp;
+    *dec = \&MIME::QuotedPrint::decode_qp;
+}
+
+open(FILE, $file) || die "Can't open $file: $!";
+1 while <FILE>;  # warmup
+close(FILE);
+
+my $tmp = "/tmp/qp-$$";
+die if -e $tmp;
+
+my $rounds = 100;
+
+my $before = time;
+
+undef($/) if shift;
+
+for (1 .. $rounds) {
+    open(FILE, $file) || die;
+    open(TMP, ">$tmp") || die;
+    while (<FILE>) {
+	print TMP enc($_);
+    }
+    close(TMP) || die;
+    close(FILE);
+}
+
+print "Real time encode: ", time - $before, "\n";
+
+$before = time;
+
+for (1 .. $rounds) {
+    open(TMP, $tmp) || die;
+    while (<TMP>) {
+	my $x = dec($_);
+    }
+}
+
+print "Real time decode: ", time - $before, "\n";
+
+unlink($tmp);
+
+

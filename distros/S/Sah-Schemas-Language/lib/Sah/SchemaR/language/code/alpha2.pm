@@ -1,9 +1,9 @@
 package Sah::SchemaR::language::code::alpha2;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-05-27'; # DATE
+our $VERSION = '0.004'; # VERSION
 
-our $rschema = ["str",[{description=>"\nAccept only current (not retired) codes. Only alpha-2 codes are accepted.\n\n",in=>["aa","ab","ae","af","ak","am","an","ar","as","av","ay","az","ba","be","bg","bh","bi","bm","bn","bo","br","bs","ca","ce","ch","co","cr","cs","cu","cv","cy","da","de","dv","dz","ee","el","en","eo","es","et","eu","fa","ff","fi","fj","fo","fr","fy","ga","gd","gl","gn","gu","gv","ha","he","hi","ho","hr","ht","hu","hy","hz","ia","id","ie","ig","ii","ik","io","is","it","iu","ja","jv","ka","kg","ki","kj","kk","kl","km","kn","ko","kr","ks","ku","kv","kw","ky","la","lb","lg","li","ln","lo","lt","lu","lv","mg","mh","mi","mk","ml","mn","mr","ms","mt","my","na","nb","nd","ne","ng","nl","nn","no","nr","nv","ny","oc","oj","om","or","os","pa","pi","pl","ps","pt","qu","rm","rn","ro","ru","rw","sa","sc","sd","se","sg","sh","si","sk","sl","sm","sn","so","sq","sr","ss","st","su","sv","sw","ta","te","tg","th","ti","tk","tl","tn","to","tr","ts","tt","tw","ty","ug","uk","ur","uz","ve","vi","vo","wa","wo","xh","yi","yo","za","zh","zu"],match=>"\\A[a-z]{2}\\z",summary=>"Language code (alpha-2)","x.perl.coerce_rules"=>["From_str::to_lower"]}],["str"]];
+our $rschema = ["str",[{description=>"\nAccept only current (not retired) codes. Only alpha-2 codes are accepted.\n\n",examples=>[{valid=>0,value=>""},{summary=>"Indonesian (2 letter)",valid=>1,validated_value=>"id",value=>"ID"},{summary=>"Indonesian (3 letter, rejected)",valid=>0,value=>"IND"},{summary=>"Unknown language code",valid=>0,value=>"qq"}],in=>["aa","ab","ae","af","ak","am","an","ar","as","av","ay","az","ba","be","bg","bh","bi","bm","bn","bo","br","bs","ca","ce","ch","co","cr","cs","cu","cv","cy","da","de","dv","dz","ee","el","en","eo","es","et","eu","fa","ff","fi","fj","fo","fr","fy","ga","gd","gl","gn","gu","gv","ha","he","hi","ho","hr","ht","hu","hy","hz","ia","id","ie","ig","ii","ik","io","is","it","iu","ja","jv","ka","kg","ki","kj","kk","kl","km","kn","ko","kr","ks","ku","kv","kw","ky","la","lb","lg","li","ln","lo","lt","lu","lv","mg","mh","mi","mk","ml","mn","mr","ms","mt","my","na","nb","nd","ne","ng","nl","nn","no","nr","nv","ny","oc","oj","om","or","os","pa","pi","pl","ps","pt","qu","rm","rn","ro","ru","rw","sa","sc","sd","se","sg","sh","si","sk","sl","sm","sn","so","sq","sr","ss","st","su","sv","sw","ta","te","tg","th","ti","tk","tl","tn","to","tr","ts","tt","tw","ty","ug","uk","ur","uz","ve","vi","vo","wa","wo","xh","yi","yo","za","zh","zu"],match=>"\\A[a-z]{2}\\z",summary=>"Language code (alpha-2)","x.perl.coerce_rules"=>["From_str::to_lower"]}],["str"]];
 
 1;
 # ABSTRACT: Language code (alpha-2)
@@ -20,7 +20,7 @@ Sah::SchemaR::language::code::alpha2 - Language code (alpha-2)
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::language::code::alpha2 (from Perl distribution Sah-Schemas-Language), released on 2019-11-29.
+This document describes version 0.004 of Sah::SchemaR::language::code::alpha2 (from Perl distribution Sah-Schemas-Language), released on 2020-05-27.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

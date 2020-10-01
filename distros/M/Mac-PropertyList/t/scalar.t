@@ -1,4 +1,4 @@
-use Test::More tests => 23;
+use Test::More tests => 28;
 
 use Mac::PropertyList;
 
@@ -33,6 +33,24 @@ isa_ok( $string, "Mac::PropertyList::integer" );
 is( $string->value, $value );
 is( $string->type, 'integer' );
 is( $string->write, "<integer>$value</integer>" );
+}
+
+########################################################################
+# Test the uid bits
+my $uid = Mac::PropertyList::uid->new();
+isa_ok( $uid, "Mac::PropertyList::uid" );
+
+{
+my $value = 37;
+$string = Mac::PropertyList::uid->integer( $value );
+isa_ok( $string, "Mac::PropertyList::uid" );
+is( $string->value, sprintf '%x', $value );
+is( $string->type, 'uid' );
+# Per plutil, this is the xml1 representation of a UID.
+is( $string->write, "<dict>
+	<key>CF\$UID</key>
+	<integer>$value</integer>
+</dict>" );
 }
 
 ########################################################################

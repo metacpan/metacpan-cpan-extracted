@@ -2832,16 +2832,22 @@ UA_Server_addVariableNode(server, requestedNewNodeId, parentNodeId, referenceTyp
 	OPCUA_Open62541_VariableAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
+    PREINIT:
+	SV *				nc = NULL;
     CODE:
 	if (!SvOK(nodeContext))
 		nodeContext = NULL;
 #ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 	nodeContext = NULL;
 #endif
+	if (nodeContext != NULL)
+		nc = newSVsv(nodeContext);
 	RETVAL = UA_Server_addVariableNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *typeDefinition, *attr, newSVsv(nodeContext), outoptNewNodeId);
-	if (outoptNewNodeId != NULL)
+	    *typeDefinition, *attr, nc, outoptNewNodeId);
+	if (RETVAL != UA_STATUSCODE_GOOD)
+		SvREFCNT_dec(nc);
+	else if (outoptNewNodeId != NULL)
 		XS_pack_UA_NodeId(SvRV(ST(8)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
@@ -2857,16 +2863,22 @@ UA_Server_addVariableTypeNode(server, requestedNewNodeId, parentNodeId, referenc
 	OPCUA_Open62541_VariableTypeAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
+    PREINIT:
+	SV *				nc = NULL;
     CODE:
 	if (!SvOK(nodeContext))
 		nodeContext = NULL;
 #ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 	nodeContext = NULL;
 #endif
+	if (nodeContext != NULL)
+		nc = newSVsv(nodeContext);
 	RETVAL = UA_Server_addVariableTypeNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *typeDefinition, *attr, newSVsv(nodeContext), outoptNewNodeId);
-	if (outoptNewNodeId != NULL)
+	    *typeDefinition, *attr, nc, outoptNewNodeId);
+	if (RETVAL != UA_STATUSCODE_GOOD)
+		SvREFCNT_dec(nc);
+	else if (outoptNewNodeId != NULL)
 		XS_pack_UA_NodeId(SvRV(ST(8)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
@@ -2882,16 +2894,22 @@ UA_Server_addObjectNode(server, requestedNewNodeId, parentNodeId, referenceTypeI
 	OPCUA_Open62541_ObjectAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
+    PREINIT:
+	SV *				nc = NULL;
     CODE:
 	if (!SvOK(nodeContext))
 		nodeContext = NULL;
 #ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 	nodeContext = NULL;
 #endif
+	if (nodeContext != NULL)
+		nc = newSVsv(nodeContext);
 	RETVAL = UA_Server_addObjectNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *typeDefinition, *attr, newSVsv(nodeContext), outoptNewNodeId);
-	if (outoptNewNodeId != NULL)
+	    *typeDefinition, *attr, nc, outoptNewNodeId);
+	if (RETVAL != UA_STATUSCODE_GOOD)
+		SvREFCNT_dec(nc);
+	else if (outoptNewNodeId != NULL)
 		XS_pack_UA_NodeId(SvRV(ST(8)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
@@ -2906,16 +2924,22 @@ UA_Server_addObjectTypeNode(server, requestedNewNodeId, parentNodeId, referenceT
 	OPCUA_Open62541_ObjectTypeAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
+    PREINIT:
+	SV *				nc = NULL;
     CODE:
 	if (!SvOK(nodeContext))
 		nodeContext = NULL;
 #ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 	nodeContext = NULL;
 #endif
+	if (nodeContext != NULL)
+		nc = newSVsv(nodeContext);
 	RETVAL = UA_Server_addObjectTypeNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *attr, newSVsv(nodeContext), outoptNewNodeId);
-	if (outoptNewNodeId != NULL)
+	    *attr, nc, outoptNewNodeId);
+	if (RETVAL != UA_STATUSCODE_GOOD)
+		SvREFCNT_dec(nc);
+	else if (outoptNewNodeId != NULL)
 		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
@@ -2930,16 +2954,22 @@ UA_Server_addViewNode(server, requestedNewNodeId, parentNodeId, referenceTypeId,
 	OPCUA_Open62541_ViewAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
+    PREINIT:
+	SV *				nc = NULL;
     CODE:
 	if (!SvOK(nodeContext))
 		nodeContext = NULL;
 #ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 	nodeContext = NULL;
 #endif
+	if (nodeContext != NULL)
+		nc = newSVsv(nodeContext);
 	RETVAL = UA_Server_addViewNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *attr, newSVsv(nodeContext), outoptNewNodeId);
-	if (outoptNewNodeId != NULL)
+	    *attr, nc, outoptNewNodeId);
+	if (RETVAL != UA_STATUSCODE_GOOD)
+		SvREFCNT_dec(nc);
+	else if (outoptNewNodeId != NULL)
 		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
@@ -2954,16 +2984,22 @@ UA_Server_addReferenceTypeNode(server, requestedNewNodeId, parentNodeId, referen
 	OPCUA_Open62541_ReferenceTypeAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
+    PREINIT:
+	SV *				nc = NULL;
     CODE:
 	if (!SvOK(nodeContext))
 		nodeContext = NULL;
 #ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 	nodeContext = NULL;
 #endif
+	if (nodeContext != NULL)
+		nc = newSVsv(nodeContext);
 	RETVAL = UA_Server_addReferenceTypeNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *attr, newSVsv(nodeContext), outoptNewNodeId);
-	if (outoptNewNodeId != NULL)
+	    *attr, nc, outoptNewNodeId);
+	if (RETVAL != UA_STATUSCODE_GOOD)
+		SvREFCNT_dec(nc);
+	else if (outoptNewNodeId != NULL)
 		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL
@@ -2978,16 +3014,22 @@ UA_Server_addDataTypeNode(server, requestedNewNodeId, parentNodeId, referenceTyp
 	OPCUA_Open62541_DataTypeAttributes	attr
 	SV *				nodeContext
 	OPCUA_Open62541_NodeId		outoptNewNodeId
+    PREINIT:
+	SV *				nc = NULL;
     CODE:
 	if (!SvOK(nodeContext))
 		nodeContext = NULL;
 #ifndef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 	nodeContext = NULL;
 #endif
+	if (nodeContext != NULL)
+		nc = newSVsv(nodeContext);
 	RETVAL = UA_Server_addDataTypeNode(server->sv_server,
 	    *requestedNewNodeId, *parentNodeId, *referenceTypeId, *browseName,
-	    *attr, newSVsv(nodeContext), outoptNewNodeId);
-	if (outoptNewNodeId != NULL)
+	    *attr, nc, outoptNewNodeId);
+	if (RETVAL != UA_STATUSCODE_GOOD)
+		SvREFCNT_dec(nc);
+	else if (outoptNewNodeId != NULL)
 		XS_pack_UA_NodeId(SvRV(ST(7)), *outoptNewNodeId);
     OUTPUT:
 	RETVAL

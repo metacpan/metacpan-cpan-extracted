@@ -8,7 +8,7 @@
 package Perl::Tidy::VerticalAligner::Line;
 use strict;
 use warnings;
-our $VERSION = '20200907';
+our $VERSION = '20201001';
 
 {
 
@@ -67,6 +67,25 @@ our $VERSION = '20200907';
         return $self;
     }
 
+    sub AUTOLOAD {
+
+        # Catch any undefined sub calls so that we are sure to get
+        # some diagnostic information.  This sub should never be called
+        # except for a programming error.
+        our $AUTOLOAD;
+        return if ( $AUTOLOAD eq 'DESTROY' );
+        my ( $pkg, $fname, $lno ) = caller();
+        print STDERR <<EOM;
+    ======================================================================
+    Unexpected call to Autoload looking for sub $AUTOLOAD
+    Called from package: '$pkg'  
+    Called from File '$fname'  at line '$lno'
+    This error is probably due to a recent programming change
+    ======================================================================
+EOM
+        exit 1;
+    }
+
     sub DESTROY {
         my $self = shift;
         $self->_decrement_count();
@@ -88,6 +107,12 @@ our $VERSION = '20200907';
     sub get_j_terminal_match {
         my $self = shift;
         return $self->{_j_terminal_match};
+    }
+
+    sub set_j_terminal_match {
+        my ( $self, $val ) = @_;
+        $self->{_j_terminal_match} = $val;
+        return;
     }
 
     sub get_is_terminal_else {
@@ -140,17 +165,30 @@ our $VERSION = '20200907';
 
     sub get_column {
         my ( $self, $j ) = @_;
-        return $self->{_ralignments}->[$j]->get_column();
+        my $col;
+        my $alignment = $self->{_ralignments}->[$j];
+        if ( defined($alignment) ) {
+            $col = $alignment->get_column();
+        }
+        return $col;
     }
 
     sub get_starting_column {
         my ( $self, $j ) = @_;
-        return $self->{_ralignments}->[$j]->get_starting_column();
+        my $col;
+        my $alignment = $self->{_ralignments}->[$j];
+        if ( defined($alignment) ) {
+            $col = $alignment->get_starting_column();
+        }
+        return $col;
     }
 
     sub increment_column {
         my ( $self, $k, $pad ) = @_;
-        $self->{_ralignments}->[$k]->increment_column($pad);
+        my $alignment = $self->{_ralignments}->[$k];
+        if ( defined($alignment) ) {
+            $alignment->increment_column($pad);
+        }
         return;
     }
 

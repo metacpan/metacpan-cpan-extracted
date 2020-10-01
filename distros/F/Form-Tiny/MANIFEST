@@ -1,0 +1,42 @@
+Changes
+examples/basic_form.pl
+examples/inline_form.pl
+lib/Form/Tiny.pm
+lib/Form/Tiny/Error.pm
+lib/Form/Tiny/FieldData.pm
+lib/Form/Tiny/FieldDefinition.pm
+lib/Form/Tiny/Filter.pm
+lib/Form/Tiny/Filtered.pm
+lib/Form/Tiny/Form.pm
+lib/Form/Tiny/Inline.pm
+lib/Form/Tiny/Manual.pod
+lib/Form/Tiny/PathValue.pm
+lib/Form/Tiny/Strict.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01-no-arguments.t
+t/02-inline.t
+t/03-errors.t
+t/04-format.t
+t/05-required.t
+t/06-strictness.t
+t/07-filtering.t
+t/08-adjustments.t
+t/09-cleaning.t
+t/10-subroutines.t
+t/11-tiny-types.t
+t/12-tiny-types-coerce.t
+t/13-arrays.t
+t/14-arrays-required.t
+t/15-nested-hash.t
+t/16-nested-form.t
+t/17-nested-mixed.t
+t/18-triple-nest.t
+t/19-hooks.t
+t/20-data.t
+t/99-examples.t
+t/lib/TestForm.pm
+t/lib/TestInnerForm.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

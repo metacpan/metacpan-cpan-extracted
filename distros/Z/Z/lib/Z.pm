@@ -5,7 +5,7 @@ use warnings;
 package Z;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.007';
 
 use Import::Into ();
 use Module::Runtime qw( use_module );
@@ -14,6 +14,14 @@ use Zydeco::Lite qw( true false );
 BEGIN {
 	*PERL_IS_MODERN = ( $] ge '5.014' ) ? \&true : \&false;
 }
+
+my $STRICT = 0;
+$ENV{$_} && ++$STRICT && last for qw(
+	EXTENDED_TESTING
+	AUTHOR_TESTING
+	RELEASE_TESTING
+	PERL_STRICT
+);
 
 sub import {
 	my ($target, $class ) = ( scalar caller, shift );
@@ -47,6 +55,10 @@ sub import {
 	eval {
 		require indirect;
 		'indirect'->unimport::out_of( $target );
+		1;
+	} or !$STRICT or do {
+		require Carp;
+		Carp::carp( "Could not load indirect.pm" );
 	};
 	
 	$class->also( $target, @_ );
@@ -155,6 +167,12 @@ my %also = (
 		require JSON::PP;
 		return \&JSON::PP::decode_json;
 	},
+	STRICT => sub {
+		$STRICT ? sub () { !!1 } : sub () { !!0 };
+	},
+	LAX => sub {
+		$STRICT ? sub () { !!0 } : sub () { !!1 };
+	},
 	all            => q(List::Util),
 	any            => q(List::Util),
 	first          => q(List::Util),
@@ -201,6 +219,17 @@ my %also = (
 	set_prototype  => q(Sub::Util),
 	set_subname    => q(Sub::Util),
 	subname        => q(Sub::Util),
+	check_module_name => q(Module::Runtime),
+	check_module_spec => q(Module::Runtime),
+	compose_module_name => q(Module::Runtime),
+	is_module_name => q(Module::Runtime),
+	is_module_spec => q(Module::Runtime),
+	is_valid_module_name => q(Module::Runtime),
+	is_valid_module_spec => q(Module::Runtime),
+	module_notional_filename => q(Module::Runtime),
+	require_module => q(Module::Runtime),
+	use_module     => q(Module::Runtime),
+	use_package_optimistically => q(Module::Runtime),
 );
 
 sub also {
@@ -331,9 +360,11 @@ The additional functions available are: everything from L<Scalar::Util>,
 everything from L<List::Util>, everything from L<Sub::Util>, everything
 from L<Carp> (wrapped versions with C<sprintf> functionality, except
 C<confess> which is part of the standard set of functions already),
+all the functions (but not the exported regexps) from L<Module::Runtime>,
 C<Dumper> from L<Data::Dumper>, C<maybe> and C<provided> from
-L<PerlX::Maybe>, and C<encode_json> and C<decode_json> from
-L<JSON::MaybeXS> or L<JSON::PP> (depending which is installed).
+L<PerlX::Maybe>, C<encode_json> and C<decode_json> from
+L<JSON::MaybeXS> or L<JSON::PP> (depending which is installed), and
+C<STRICT> and C<LAX> from L<Devel::StrictMode>.
 
 If you specify a compatibility mode (like C<< -modern >>), this must be
 first in the import list.

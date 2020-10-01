@@ -1,5 +1,19 @@
 Revision history for IO-HTML
 
+1.004  2020-09-26
+	- No code changes since 1.003, just documentation improvements
+	- New example file: detect-encoding.pl
+
+1.003  2015-09-26 Trial Release
+	- Do not use incomplete quoted attribute values in find_charset_in.
+	  If we reach the end of the string without finding the closing quote,
+	  terminate processing instead of using whatever we did collect as
+	  the attribute's value.
+	- Add tests for the $bytes_to_check configuration variable (GitHub#1)
+
+1.002  2015-09-19 Trial Release
+	- Add $bytes_to_check configuration variable (GitHub#1)
+
 1.001  2014-06-28
 	- No code changes, just documentation improvements
 	- Update links to the HTML5 draft specification

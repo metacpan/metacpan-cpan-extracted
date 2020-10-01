@@ -2,8 +2,9 @@
 use 5.20.0;
 use strict;
 use warnings FATAL => 'all';
+BEGIN { $ENV{MAIL_BIMI_CACHE_BACKEND} = 'Null' };
 use lib 't';
-use Mail::BIMI::Pragmas;
+use Mail::BIMI::Prelude;
 use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Record;
@@ -29,7 +30,8 @@ my $spf_request = Mail::SPF::Request->new(
 
 my $spf_result = $spf_server->process($spf_request);
 
-my $bimi = Mail::BIMI->new();
+my $bimi = Mail::BIMI->new;
+$bimi->options->strict_spf(1);
 $bimi->resolver($resolver);
 
 my $dmarc = Mail::DMARC::PurePerl->new;
@@ -45,5 +47,7 @@ my $result = $bimi->result;
 my $auth_results = $result->get_authentication_results;
 my $expected_result = 'bimi=skipped (SPF +all detected)';
 is( $auth_results, $expected_result, 'Auth results correcct' );
+
+is_deeply( $result->headers, {}, 'headers' );
 
 done_testing;

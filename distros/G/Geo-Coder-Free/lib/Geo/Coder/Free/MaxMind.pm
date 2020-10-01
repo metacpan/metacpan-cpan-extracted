@@ -5,6 +5,11 @@ package Geo::Coder::Free::MaxMind;
 # - note 'J5'
 # grep 'GB.ENG.J5' admin2.db
 
+# FIXME: If you search for something like "Sheppy, Kent, England" in list
+#	context, it returns them all.  That's a lot! Should limit to, say
+#	10 results (that number should be tunable, and be a LIMIT in DB.pm)
+#	And as the correct spelling in Sheppey, arguably it should return nothing
+
 use strict;
 use warnings;
 
@@ -23,6 +28,8 @@ use Locale::Country;
 our %admin1cache;
 our %admin2cache;	# e.g. maps 'Kent' => 'P5'
 
+sub _prepare($$);
+
 # Some locations aren't found because of inconsistencies in the way things are stored - these are some values I know
 # FIXME: Should be in a configuration file
 my %known_locations = (
@@ -38,11 +45,11 @@ Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -250,9 +257,16 @@ sub geocode {
 	my $region;
 	my @regions;
 	# ::diag(__LINE__, ": $country");
-	if(($country =~ /^(United States|USA|US)$/) && $county && (length($county) > 2)) {
-		if(my $twoletterstate = Locale::US->new()->{state2code}{uc($county)}) {
-			$county = $twoletterstate;
+	if($country =~ /^(United States|USA|US)$/) {
+		if($county && (length($county) > 2)) {
+			if(my $twoletterstate = Locale::US->new()->{state2code}{uc($county)}) {
+				$county = $twoletterstate;
+			}
+		}
+		if($state && (length($state) > 2)) {
+			if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+				$state = $twoletterstate;
+			}
 		}
 	} elsif(($country eq 'Canada') && $state && (length($state) > 2)) {
 		# ::diag(__LINE__, ": $state");
@@ -556,7 +570,7 @@ sub reverse_geocode {
 }
 
 # Change 'Charing Cross, P5, Gb' to 'Charing Cross, London, Gb'
-sub _prepare {
+sub _prepare($$) {
 	my ($self, $loc) = @_;
 
 	if(my $region = $loc->{'Region'}) {
@@ -591,7 +605,7 @@ sub ua {
 
 =head1 AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne, C<< <njh@bandsman.co.uk> >>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -613,13 +627,20 @@ L<https://github.com/apache/commons-csv/blob/master/src/test/resources/perf/worl
 are 7 years out of date,
 and are unconsistent with the Geonames database.
 
+If you search for something like "Sheppy, Kent, England" in list context,
+it returns them all.
+That's a lot!
+It should limit to,
+say 10 results (that number should be tunable, and be a LIMIT in DB.pm),
+and as the correct spelling in Sheppey, arguably it should return nothing.
+
 =head1 SEE ALSO
 
 VWF, MaxMind and geonames.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2019 Nigel Horne.
+Copyright 2017-2020 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

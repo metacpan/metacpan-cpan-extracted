@@ -32,10 +32,10 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::DBOOK:
     file: lib/Dist/Zilla/MintingProfile/Author/DBOOK.pm
-    version: v1.0.3
+    version: v1.0.4
   Dist::Zilla::PluginBundle::Author::DBOOK:
     file: lib/Dist/Zilla/PluginBundle/Author/DBOOK.pm
-    version: v1.0.3
+    version: v1.0.4
 requires:
   Data::Section: '0'
   Dist::Zilla: '0'
@@ -98,10 +98,10 @@ resources:
   bugtracker: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK/issues
   homepage: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK
   repository: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK.git
-version: v1.0.3
+version: v1.0.4
 x_contributors:
   - 'Dan Book <grinnz@gmail.com>'
   - 'Dan Book <grinnz@grinnz.com>'
-x_generated_by_perl: v5.30.2
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

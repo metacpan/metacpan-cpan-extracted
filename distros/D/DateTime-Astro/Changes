@@ -1,5 +1,8 @@
 Revision history for Perl extension DateTime-Astro
 
+1.04 2020-09-30T12:29:51Z
+    * Make sure it works with perl 5.26 
+
 1.03 2017-08-20T10:32:17Z
     * messed up previous release
 

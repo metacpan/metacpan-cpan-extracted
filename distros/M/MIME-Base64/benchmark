@@ -1,0 +1,18 @@
+use blib;
+
+use Benchmark;
+use MIME::Base64;
+
+$str = "x" x 10000;
+
+timethese(3000, {
+   'XS Encode'  => sub { encode_base64($str) },
+   'Old encode' => sub { MIME::Base64::old_encode_base64($str) },
+});
+
+$str = encode_base64("x" x 1000);
+
+timethese(8000, {
+   'XS Decode'  => sub { decode_base64($str) },
+   'Old decode' => sub { MIME::Base64::old_decode_base64($str) },
+});

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -50,8 +50,9 @@ use Math::Trig 'pi';
   $planepath = "GrayCode,radix=37";
   $planepath = "CellularRule,rule=8";
   $planepath = "LCornerTree,parts=1";
+  $planepath = "KochCurve";
   my $seq = Math::NumSeq::PlanePathTurn->new (planepath => $planepath,
-                                              turn_type => 'LSR');
+                                              turn_type => 'TTurn3');
 
   # $planepath = "FractionsTree";
   # my $seq = Math::NumSeq::PlanePathDelta->new (planepath => $planepath,

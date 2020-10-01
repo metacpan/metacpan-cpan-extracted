@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -30,6 +30,8 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::Diagonals;
+use Math::NumSeq::PlanePathTurn;
+use Math::NumSeq::PlanePathCoord;
 
 
 #------------------------------------------------------------------------------
@@ -40,7 +42,6 @@ foreach my $direction ('down','up') {
       (anum => 'A097806',
        func => sub {
          my ($count) = @_;
-         require Math::NumSeq::PlanePathTurn;
          my $path = Math::PlanePath::Diagonals->new(direction => $direction);
          my $seq = Math::NumSeq::PlanePathTurn->new(planepath_object => $path,
                                                     turn_type => 'NotStraight');
@@ -198,7 +199,7 @@ MyOEIS::compare_values
      my @got;
      for (my $d = $path->n_start; @got < $count; $d++) {
        my ($x,$y) = $path->n_to_xy($d);  # by anti-diagonals
-       push @got, path_rect_to_accumulation($path, 0,0, $x,$y)
+       push @got, path_rect_to_accumulation($path, 0,0, $x,$y);
      }
      return \@got;
    });
@@ -230,7 +231,6 @@ MyOEIS::compare_values
   (anum => 'A103451',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'Diagonals',
                                                  turn_type => 'LSR');
      my @got = (1);
@@ -249,7 +249,6 @@ MyOEIS::compare_values
   (anum => 'A103452',
    func => sub {
      my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
      my $seq = Math::NumSeq::PlanePathTurn->new (planepath => 'Diagonals',
                                                  turn_type => 'LSR');
      my @got = (1);
@@ -273,7 +272,6 @@ MyOEIS::compare_values
      my $path = Math::PlanePath::Diagonals->new (direction => 'up',
                                                  x_start => 0,
                                                  y_start => 1);
-     require Math::NumSeq::PlanePathCoord;
      my @got;
      for (my $n = $path->n_start; @got < $count; $n++) {
        my ($x,$y) = $path->n_to_xy ($n);

@@ -2,12 +2,12 @@ package oEdtk ;
 
 BEGIN {
 		use Exporter;
-		use vars 	qw($VERSION @ISA @EXPORT @EXPORT_OK); # %EXPORT_TAGS);
+		use vars 	qw($VERSION $YEAR @ISA @EXPORT @EXPORT_OK); # %EXPORT_TAGS);
 		use strict;
 
 		# a.ammr a.a année d'existence, mm mois, r release
-		$VERSION	= 0.8052; 
-		my $YEAR	= '2013';
+		$VERSION	= 1.5093; 
+		$YEAR	= '2020';
 		@ISA		= qw(Exporter);
 		@EXPORT	= qw(oEdtk_release);
 }
@@ -15,10 +15,12 @@ BEGIN {
 #
 # CODE - DOC AT THE END
 #
+use strict;
+use warnings;
 
 sub oEdtk_release {
 	# warn "DEBUG: >$?< \nDEBUG: >$@<\n";
-	return "\n(c) 2005-2013 daunay\@cpan.org - edtk\@free.fr - oEdtk v$VERSION\n";
+	return "(c) 2005-$YEAR grechary\@cpan.org - edtk\@free.fr - oEdtk v$VERSION\n";
 }
 
 

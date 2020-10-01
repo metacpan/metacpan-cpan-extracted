@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1;
-$Net::Cisco::FMC::v1::VERSION = '0.004002';
+$Net::Cisco::FMC::v1::VERSION = '0.005001';
 # ABSTRACT: Cisco Firepower Management Center (FMC) API version 1 client library
 
 use 5.024;
@@ -33,13 +33,13 @@ has '_refresh_token' => (
 
 with 'Net::Cisco::FMC::v1::Role::REST::Client';
 
-sub _create ($self, $url, $object_data, $query_params = {}) {
+sub _create ($self, $url, $object_data, $query_params = {}, $expected_code = 201) {
     my $params = $self->user_agent->www_form_urlencode( $query_params );
     my $res = $self->post("$url?$params", $object_data);
     my $code = $res->code;
     my $data = $res->data;
     croak($data->{error}->{messages}[0]->{description})
-        unless $code == 201;
+        unless $code == $expected_code;
     return $data;
 }
 
@@ -207,6 +207,16 @@ Net::Cisco::FMC::v1::Role::ObjectMethods->apply([
         object   => 'ports',
         singular => 'port',
     },
+    {
+        path     => 'devices',
+        object   => 'devicerecords',
+        singular => 'devicerecord',
+    },
+    {
+        path     => 'assignment',
+        object   => 'policyassignments',
+        singular => 'policyassignment',
+    },
 ]);
 
 
@@ -309,6 +319,61 @@ sub delete_accessrule ($self, $accesspolicy_id, $id) {
     ));
 }
 
+
+sub list_deployabledevices ($self, $query_params = {}) {
+    return $self->_list(join('/',
+        '/api/fmc_config/v1/domain',
+        $self->domain_uuid,
+        'deployment',
+        'deployabledevices'
+    ), $query_params);
+}
+
+
+sub create_deploymentrequest ($self, $object_data) {
+    my $data = $self->_create(join('/',
+        '/api/fmc_config/v1/domain',
+        $self->domain_uuid,
+        'deployment',
+        'deploymentrequests'
+    ), $object_data, {}, 202);
+    return $data;
+}
+
+
+sub get_task ($self, $id) {
+    return $self->_get(join('/',
+        '/api/fmc_config/v1/domain',
+        $self->domain_uuid,
+        'job',
+        'taskstatuses',
+        $id
+    ));
+}
+
+
+sub wait_for_task ($self, $id, $callback) {
+    croak "id missing"
+        unless defined $id;
+    croak "callback must be a coderef"
+        if defined $callback && ref $callback ne 'CODE';
+
+    my %in_progress_status_for_type = (
+        DEVICE_DEPLOYMENT => 'Deploying',
+    );
+
+    my $task = $self->get_task($id);
+    die "support for task type '$task->{taskType}' not implemented\n"
+        unless exists $in_progress_status_for_type{$task->{taskType}};
+    do {
+        &$callback($task)
+            if defined $callback;
+        sleep 1;
+        $task = $self->get_task($id);
+    } until (
+        $task->{status} ne $in_progress_status_for_type{$task->{taskType}});
+    return $task;
+}
 
 
 sub cleanup_protocolport ($self, $portobj) {
@@ -613,7 +678,7 @@ Net::Cisco::FMC::v1 - Cisco Firepower Management Center (FMC) API version 1 clie
 
 =head1 VERSION
 
-version 0.004002
+version 0.005001
 
 =head1 SYNOPSIS
 
@@ -691,6 +756,32 @@ a hashref of the updated access rule.
 Takes an access policy id and a rule object id.
 
 Returns true on success.
+
+=head2 list_deployabledevices
+
+Takes optional query parameters and returns a hashref with a
+single key 'items' that has a list of deployable devices similar to the FMC
+API.
+
+=head2 create_deploymentrequest
+
+Takes a hashref of deployment parameters.
+
+Returns the created task in the ->{metadata}->{task} hashref.
+
+=head2 get_task
+
+Takes a task id and returns its status.
+
+=head2 wait_for_task
+
+Takes a task id and an optional callback and checks its status every second
+until it isn't in-progress any more.
+The in-progress status is different for each task type, currently only
+'DEVICE_DEPLOYMENT' is supported.
+The callback coderef which is called for every check with the task as argument.
+
+Returns the task.
 
 =head2 cleanup_protocolport
 

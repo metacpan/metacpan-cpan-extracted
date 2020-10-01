@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2018, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -65,27 +65,17 @@ MyOEIS::compare_values
 #------------------------------------------------------------------------------
 # A006218 - cumulative count of divisors
 
-{
-  my $anum = 'A006218';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my $good = 1;
-  my $count = 0;
-  if ($bvalues) {
-    my $path = Math::PlanePath::DivisibleColumns->new;
-    for (my $i = 0; $i < @$bvalues; $i++) {
-      my $x = $i+1;
-      my $want = $bvalues->[$i];
-      my $got = $path->xy_to_n($x,1);
-      if ($got != $want) {
-        MyTestHelpers::diag ("wrong totient sum xy_to_n($x,1)=$got want=$want at i=$i of $filename");
-        $good = 0;
-      }
-      $count++;
-    }
-  }
-  ok ($good, 1, "$anum count $count");
-}
-
+MyOEIS::compare_values
+  (anum => 'A006218',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my $path = Math::PlanePath::DivisibleColumns->new;
+     for (my $x = 1; @got < $count; $x++) {
+       push @got, $path->xy_to_n($x,1);
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 exit 0;

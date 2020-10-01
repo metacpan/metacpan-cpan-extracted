@@ -30,7 +30,8 @@ subtest export => sub {
     is $int_child->export(), 42;
 
     my $float_child = $dict_obj->get('testfloat');
-    is $float_child->export(), 42.42;
+    ok $float_child->export() < 42.43;
+    ok $float_child->export() > 42.41;
 
     my $bool_child = $dict_obj->get('testbool-1');
     is $bool_child->export(), 0;
@@ -65,7 +66,8 @@ subtest keys => sub {
 };
 
 subtest get_value => sub {
-    is $dict_obj->get_value('testfloat'), 42.42;
+    ok $dict_obj->get_value('testfloat') < 42.43;
+    ok $dict_obj->get_value('testfloat') > 42.41;
     cmp_deeply $dict_obj->get_value('testhash'),
         {
             arr  => [1, 0],

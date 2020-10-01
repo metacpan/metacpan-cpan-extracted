@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -36,7 +36,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -799,7 +799,7 @@ sub _high_digit {
 1;
 __END__
 
-=for stopwords Ryde Math-PlanePath Heng coeffs GCD Calkin-Wilf ie Nstart OEIS k-ary
+=for stopwords Ryde Math-PlanePath Heng coeffs GCD Calkin-Wilf ie Nstart OEIS k-ary generalization
 
 =head1 NAME
 
@@ -1255,7 +1255,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

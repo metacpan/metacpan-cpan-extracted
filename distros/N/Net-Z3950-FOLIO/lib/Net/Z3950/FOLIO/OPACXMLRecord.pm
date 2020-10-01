@@ -69,8 +69,8 @@ sub _makeSingleHoldingsRecord {
     my $location = $holding->{temporaryLocation} || $holding->{permanentLocation};
     if ($location) {
 	$nucCode = ($location->{institution} || {})->{name};
-	$localLocation = ($location->{campus} || {})->{name};
-	$shelvingLocation = ($location->{library} || {})->{name};
+	$localLocation = ($location->{library} || {})->{name};
+	$shelvingLocation = $location->{name};
     }
 
     my $items = _makeItemRecords($holding->{holdingsItems});
@@ -189,7 +189,7 @@ sub _makeSingleItemRecord {
 	[ 'availabilityDate', _makeAvailabilityDate($item) ],
         [ 'availableThru', _makeAvailableThru($item) ],
         [ 'restrictions', _makeRestrictions($item) ],
-        [ 'itemId', $item->{hrid} ],
+        [ 'itemId', $item->{barcode} ],
 	# XXX Determining a correct value for <renewable> would be
 	# very complicated, involving loan policies. But we have to
 	# include _something_, because this element is mandatory in
@@ -290,6 +290,7 @@ sub _makeOnHold {
 sub _makeLocation {
     my($data) = @_;
     return undef if !defined $data;
+    return $data->{name} if defined $data->{name};
 
     my @tmp;
     foreach my $key (qw(institution campus library primaryServicePointObject)) {

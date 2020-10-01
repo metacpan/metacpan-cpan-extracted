@@ -16,7 +16,7 @@ use base qw(Exporter);
 
 BEGIN
 {
-    $VERSION = '1.004';
+    $VERSION = '1.006';
 
     # Inherit manually
     require Exporter;
@@ -156,8 +156,8 @@ sub my_data
 sub my_dist_data
 {
     my $params = ref $_[-1] eq 'HASH' ? pop : {};
-    my $dist = pop or Carp::croak("The my_dist_data method requires an argument");
-    my $data = my_data();
+    my $dist   = pop or Carp::croak("The my_dist_data method requires an argument");
+    my $data   = my_data();
 
     # If datadir is not defined, there's nothing we can do: bail out
     # and return nothing...
@@ -184,7 +184,7 @@ sub my_dist_data
 sub my_dist_config
 {
     my $params = ref $_[-1] eq 'HASH' ? pop : {};
-    my $dist = pop or Carp::croak("The my_dist_config method requires an argument");
+    my $dist   = pop or Carp::croak("The my_dist_config method requires an argument");
 
     # not all platforms support a specific my_config() method
     my $config =
@@ -703,6 +703,8 @@ L<File::ShareDir>, L<File::HomeDir::Win32> (legacy)
 =head1 COPYRIGHT
 
 Copyright 2005 - 2012 Adam Kennedy.
+
+Copyright 2017 - 2020 Jens Rehsack
 
 Some parts copyright 2000 Sean M. Burke.
 

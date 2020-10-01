@@ -4,6 +4,7 @@ use warnings;
 use HTTP::Request;
 use HTTP::Request::Common;
 use URI;
+use URI::Escape;
 use Getopt::Long;
 use File::Spec::Unix;
 use HTTP::Request::CurlParameters;
@@ -15,7 +16,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =head1 NAME
 
@@ -132,9 +133,30 @@ The following C<curl> options are recognized but largely ignored:
 
 =item C< --progress-bar >
 
+=item C< --show-error >
+
+=item C< --fail >
+
 =item C< --silent >
 
 =item C< --verbose >
+
+=item C< --junk-session-cookies >
+
+If you want to keep session cookies between subsequent requests, you need to
+provide a cookie jar in your user agent.
+
+=item C<--next>
+
+Resetting the UA between requests is something you need to handle yourself
+
+=item C<--parallel>
+
+=item C<--parallel-immediate>
+
+=item C<--parallel-max>
+
+Parallel requests is something you need to handle in the UA
 
 =back
 
@@ -142,14 +164,19 @@ The following C<curl> options are recognized but largely ignored:
 
 our @option_spec = (
     'user-agent|A=s',
-    'verbose|v',
-    'silent|s',
+    'verbose|v',         # ignored
+    'show-error|S',      # ignored
+    'fail|f',            # ignored
+    'silent|s',          # ignored
     'buffer!',
     'compressed',
     'cookie|b=s',
     'cookie-jar|c=s',
     'data|d=s@',
+    'data-ascii=s@',
     'data-binary=s@',
+    'data-raw=s@',
+    'data-urlencode=s@',
     'dump-header|D=s',   # ignored
     'referrer|e=s',
     'form|F=s@',
@@ -167,6 +194,11 @@ our @option_spec = (
     'output|o=s',
     'progress-bar|#',    # ignored
     'user|u=s',
+    'next',                      # ignored
+    'parallel|Z',                # ignored
+    'parallel-immediate',        # ignored
+    'parallel-max',              # ignored
+    'junk-session-cookies|j',    # ignored, must be set in code using the HTTP request
 );
 
 sub new( $class, %options ) {
@@ -182,6 +214,11 @@ sub new( $class, %options ) {
 
         # remove the implicit curl command:
         shift @$cmd;
+    };
+
+    for (@$cmd) {
+        $_ = '--next'
+            if $_ eq '-:'; # GetOptions does not like "next|:" as specification
     };
 
     my $p = Getopt::Long::Parser->new(
@@ -239,12 +276,40 @@ sub _add_header( $self, $headers, $h, $value ) {
     }
 }
 
+sub _maybe_read_data_file( $self, $read_files, $data ) {
+    my $res;
+    if( $read_files ) {
+        if( $data =~ /^\@(.*)/ ) {
+            open my $fh, '<', $1
+                or die "$1: $!";
+            local $/;
+            binmode $fh;
+            $res = <$fh>
+        } else {
+            $res = $_
+        }
+    } else {
+        $res = ($data =~ /^\@(.*)/)
+             ? "... contents of $1 ..."
+             : $data
+    }
+    return $res
+}
+
 sub _build_request( $self, $uri, $options, %build_options ) {
     my $body;
 
     my @headers = @{ $options->{header} || []};
     my $method = $options->{request};
-    my @post_data = @{ $options->{data} || $options->{'data-binary'} || []};
+    # Ideally, we shouldn't sort the data but process it in-order
+    my @post_read_data = (@{ $options->{'data'} || []},
+                          @{ $options->{'data-ascii'} || [] }
+                         );
+                         ;
+    my @post_raw_data = @{ $options->{'data-raw'} || [] },
+                    ;
+    my @post_urlencode_data = @{ $options->{'data-urlencode'} || [] };
+    my @post_binary_data = @{ $options->{'data-binary'} || [] };
     my @form_args = @{ $options->{form} || []};
 
     # expand the URI here if wanted
@@ -264,22 +329,47 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         my %request_default_headers = %default_headers;
 
         # Sluuuurp
-        if( $build_options{ read_files }) {
-            @post_data = map {
-                /^\@(.*)/ ? do {
-                                open my $fh, '<', $1
-                                    or die "$1: $!";
-                                local $/;
-                                binmode $fh;
-                                <$fh>
-                            }
-                        : $_
-            } @post_data;
-        } else {
-            @post_data = map {
-                /^\@(.*)/ ? "... contents of $1 ..."
-                        : $_
-            } @post_data;
+        # Thous should be hoisted out of the loop
+        @post_binary_data = map {
+            $self->_maybe_read_data_file( $build_options{ read_files }, $_ );
+        } @post_binary_data;
+
+        @post_read_data = map {
+            my $v = $self->_maybe_read_data_file( $build_options{ read_files }, $_ );
+            $v =~ s![\r\n]!!g;
+            $v
+        } @post_read_data;
+
+        @post_urlencode_data = map {
+            m/\A([^@=]*)([=@])?(.*)\z/sm
+                or die "This should never happen";
+            my ($name, $op, $content) = ($1,$2,$3);
+            if(! $op) {
+                $content = $name;
+            } elsif( $op eq '@' ) {
+                $content = "$op$content";
+            };
+            if( defined $name and length $name ) {
+                $name .= '=';
+            } else {
+                $name = '';
+            };
+            my $v = $self->_maybe_read_data_file( $build_options{ read_files }, $content );
+            $name . uri_escape( $v )
+        } @post_urlencode_data;
+
+        my $data;
+        if(    @post_read_data
+                or @post_binary_data
+                or @post_raw_data
+                or @post_urlencode_data
+        ) {
+            $data = join "&",
+                @post_read_data,
+                @post_binary_data,
+                @post_raw_data,
+                @post_urlencode_data
+                ;
         };
 
         if( @form_args) {
@@ -296,23 +386,23 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         } elsif( $options->{ get }) {
             $method = 'GET';
             # Also, append the POST data to the URL
-            if( @post_data ) {
+            if( $data ) {
                 my $q = $uri->query;
                 if( defined $q and length $q ) {
                     $q .= "&";
                 } else {
                     $q = "";
                 };
-                $q .= join "", @post_data;
+                $q .= $data;
                 $uri->query( $q );
             };
 
         } elsif( $options->{ head }) {
             $method = 'HEAD';
 
-        } elsif( @post_data ) {
+        } elsif( defined $data ) {
             $method = 'POST';
-            $body = join "", @post_data;
+            $body = $data;
             $request_default_headers{ 'Content-Type' } = 'application/x-www-form-urlencoded';
 
         } else {
@@ -401,6 +491,8 @@ sub _build_request( $self, $uri, $options, %build_options ) {
             maybe cookie_jar => $options->{'cookie-jar'},
             maybe cookie_jar_options => $options->{'cookie-jar-options'},
             maybe insecure => $options->{'insecure'},
+            maybe show_error => $options->{'show_error'},
+            maybe fail => $options->{'fail'},
         });
     }
 
@@ -456,6 +548,15 @@ and little available memory.
 
 =item *
 
+Mixed data instances
+
+Multiple mixed instances of C<--data>, C<--data-ascii>, C<--data-raw>,
+C<--data-binary> or C<--data-raw> are sorted by type first instead of getting
+concatenated in the order they appear on the command line.
+If the order is important to you, use one type only.
+
+=item *
+
 Multiple sets of parameters from the command line
 
 Curl supports the C<< --next >> command line switch which resets
@@ -474,6 +575,9 @@ L<LWP::Protocol::Net::Curl>
 L<LWP::CurlLog>
 
 L<HTTP::Request::AsCurl> - for the inverse function
+
+The module HTTP::Request::AsCurl likely also implements a much better version
+of C<< ->as_curl >> than this module.
 
 L<https://github.com/NickCarneiro/curlconverter> - a converter for multiple
 target languages

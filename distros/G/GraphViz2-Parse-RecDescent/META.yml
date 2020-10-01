@@ -1,0 +1,33 @@
+---
+abstract: 'Use GraphViz2 to visualize a Parse::RecDescent grammar'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Snapshot: '0.06'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GraphViz2-Parse-RecDescent
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  GraphViz2: '2.48'
+  Moo: '2.001001'
+  Parse::RecDescent: '1.965001'
+  perl: '5.010001'
+resources:
+  X_dynamic_config: 0
+  bugtracker: https://github.com/graphviz-perl/GraphViz2-Parse-RecDescent/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/graphviz-perl/GraphViz2-Parse-RecDescent.git
+version: '2.49'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

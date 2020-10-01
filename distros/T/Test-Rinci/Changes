@@ -1,3 +1,9 @@
+0.155   2020-09-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Rinci 1.1.94 (recognize function example's env_result &
+	  naked_result properties.
+
+
 0.154   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] test-rinci accepts arguments as shortcut for adding

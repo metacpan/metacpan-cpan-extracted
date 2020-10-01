@@ -7,7 +7,7 @@ use Carp ();
 use Ref::Util qw( is_ref is_plain_arrayref is_plain_hashref );
 
 # ABSTRACT: C data types for FFI
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 our %ffi;
@@ -150,7 +150,7 @@ FFI::C - C data types for FFI
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -244,6 +244,9 @@ In Perl:
 This distribution provides tools for building classes to interface for common C
 data types.  Arrays, C<struct>, C<union> and nested types based on those are
 supported.
+
+To work with C APIs that work with C file pointers you can use
+L<FFI::C::File> and L<FFI::C::PosixFile>.
 
 =head1 METHODS
 
@@ -395,6 +398,10 @@ So-called "pass-by-value" is not and will not be supported.  For
 =item L<FFI::C::ArrayDef>
 
 =item L<FFI::C::Def>
+
+=item L<FFI::C::File>
+
+=item L<FFI::C::PosixFile>
 
 =item L<FFI::C::Struct>
 

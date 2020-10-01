@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 16;
+our $VERSION = 17;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -114,8 +114,6 @@ sub disconnect {
 
 DESTROY {
     my ($self) = @_;
-
-    print STDERR "ClacksCache DESTROY $PID\n";
 
     eval {
         $self->{clacks}->disconnect();

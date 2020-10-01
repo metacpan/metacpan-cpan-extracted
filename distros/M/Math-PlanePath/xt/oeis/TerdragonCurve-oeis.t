@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -48,6 +48,43 @@ sub ternary_digit_above_low_zeros {
 }
 
 #------------------------------------------------------------------------------
+# A005823 - N positions with net turn == 0, no ternary 1s
+# A023692 through A023698
+#           N positions where direction = 1 to 7, ternary num 1s
+
+foreach my $elem (['A005823',0],
+                  ['A023692',1],
+                  ['A023693',2],
+                  ['A023694',3],
+                  ['A023695',4],
+                  ['A023696',5],
+                  ['A023697',6],
+                  ['A023698',7]) {
+  my ($anum, $want_dir) = @$elem;
+  MyOEIS::compare_values
+      (anum => $anum,
+       func => sub {
+         my ($count) = @_;
+         require Math::NumSeq::PlanePathTurn;
+         my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
+                                                     turn_type => 'LSR');
+         my $i = 0;
+         my $dir = 0;
+         my @got;
+         while (@got < $count) {
+           if ($dir == $want_dir) {
+             push @got, $i;
+           }
+           $i++;
+           my ($this_i, $value) = $seq->next;
+           $i == $this_i or die;
+           $dir += $value;
+         }
+         return \@got;
+       });
+}
+
+#------------------------------------------------------------------------------
 # A026141,A026171 - dTurnLeft step N positions of left turns
 
 foreach my $anum ('A026141','A026171') {
@@ -72,8 +109,7 @@ foreach my $anum ('A026141','A026171') {
        });
 }
 
-# A026181,A131989 - dTurnRight step N positions of left turns
-
+# A026181,A131989 - dTurnRight step N positions of right turns
 foreach my $anum ('A026181','A131989') {
   MyOEIS::compare_values
       (anum => $anum,
@@ -101,28 +137,6 @@ foreach my $anum ('A026181','A131989') {
          return \@got;
        });
 }
-
-#------------------------------------------------------------------------------
-# A005823 - N positions with net turn == 0, no ternary 1s
-
-MyOEIS::compare_values
-  (anum => 'A005823',
-   func => sub {
-     my ($count) = @_;
-     require Math::NumSeq::PlanePathTurn;
-     my $seq = Math::NumSeq::PlanePathTurn->new (planepath_object => $path,
-                                                 turn_type => 'LSR');
-     my $total_turn = 0;
-     my @got = (0);
-     while (@got < $count) {
-       my ($i, $value) = $seq->next;
-       $total_turn += $value;
-       if ($total_turn == 0) {
-         push @got, $i;
-       }
-     }
-     return \@got;
-   });
 
 #------------------------------------------------------------------------------
 # A057682 level X
@@ -487,7 +501,7 @@ MyOEIS::compare_values
 
 MyOEIS::compare_values
   (anum => 'A038502',
-   fixup => sub {
+   fixup => sub {         # mangle to mod 3
      my ($bvalues) = @_;
      @$bvalues = map { $_ % 3 } @$bvalues;
    },

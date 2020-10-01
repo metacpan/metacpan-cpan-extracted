@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -41,7 +41,7 @@ use Carp 'croak';
 use List::Util 'max';
 
 use vars '$VERSION','@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
 @ISA = ('Math::NumSeq::Base::IterateIth',
@@ -1845,6 +1845,8 @@ sub _dxdy_to_dir4 {
   #     },
   #   };
 }
+# { package Math::PlanePath::PeanoDiagonals;
+# }
 { package Math::PlanePath::WunderlichSerpentine;
   sub _NumSeq_Delta_dAbsDiff_min { return $_[0]->dsumxy_minimum; }
   sub _NumSeq_Delta_dAbsDiff_max { return $_[0]->dsumxy_maximum; }
@@ -1893,12 +1895,12 @@ sub _dxdy_to_dir4 {
   # Not quite, # A163538 path(n)-path(n-1) starting i=0 with path(-1)=0 for
   # first value 0
   # # dX => 'A163538',
-  #  # # OEIS-Catalogue: A163538 planepath=HilbertCurve delta_type=dX
-  #  # dY => 'A163539',
-  #  # # OEIS-Catalogue: A163539 planepath=HilbertCurve delta_type=dY
-  #  #
-  #  # cf A163541    absolute direction, transpose X,Y
-  #  # would be N=0,E=1,S=2,W=3
+  # # # OEIS-Catalogue: A163538 planepath=HilbertCurve delta_type=dX
+  # # dY => 'A163539',
+  # # # OEIS-Catalogue: A163539 planepath=HilbertCurve delta_type=dY
+  # #
+  # # cf A163541    absolute direction, transpose X,Y
+  # # would be N=0,E=1,S=2,W=3
   # },
 }
 { package Math::PlanePath::HilbertSides;
@@ -4319,7 +4321,7 @@ __END__
 # }
 
 
-=for stopwords Ryde dX dY dX+dY dX-dY dSum dDiffXY DiffXY dDiffYX dAbsDiff AbsDiff TDir6 Math-NumSeq Math-PlanePath NumSeq SquareSpiral PlanePath AbsdX AbsdY NSEW boolean dSumAbs SumAbs ENWS dRadius dRSquared RSquared supremum
+=for stopwords Ryde dX dY dX+dY dX-dY dSum dDiffXY DiffXY dDiffYX dAbsDiff AbsDiff TDir6 Math-NumSeq Math-PlanePath NumSeq SquareSpiral PlanePath AbsdX AbsdY NSEW boolean dSumAbs SumAbs ENWS dRadius dRSquared RSquared supremum OEIS
 
 =head1 NAME
 
@@ -4596,7 +4598,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

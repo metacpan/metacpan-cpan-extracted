@@ -1,6 +1,36 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 7211a2637c489b576834c2d60154b0358f2dae5b
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Tue Sep 22 17:47:52 2020 -0700
+
+    1.86: Fixed subtle bugin 1.85 (json object caching)
+    
+    Since 1.85 returned a cached JSON object and then could call utf8(0)
+    on it when embedding that effectively switched the cached object to
+    character mode.
+    
+    This can also happen in client code and there is no easy way to protect
+    the cached object, so removed the caching completely.
+
+commit dd29f042210768b0a92608a66576e68e5949a7af
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Tue Sep 22 16:45:21 2020 -0700
+
+    v1.85 Made it possible to output sorted "canonical" JSON
+    
+    This is useful for stabilizing output, making it unchanged on the same
+    data from one run to another.
+
+commit 20dd1d3bc5b811503f5722a16037b60197fe7ef4
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Thu Sep 17 20:22:22 2020 -0700
+
+    1.84 Security fix for json-embed in Web::Action
+    
+    Encoding <> characters in json output
+
 commit 88febab5e2a7b1a1b1ae8f31dd3fd8817a9e7ddf
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Wed Sep 9 16:15:38 2020 -0700
@@ -54,29 +84,4 @@ Date:   Mon Jan 13 15:19:08 2020 -0800
     POD warning fixes
     
     Thanks to @manwar for the tip.
-
-commit b57ea22655c9696f55e3215a4d3d67916f0ddfd2
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Thu Jan 9 17:16:33 2020 -0800
-
-    v1.80 Added /xao/page/default_https configuration
-    
-    Allows to set the default for HTTPS URLs for scripts.
-
-commit 26cc745be6b38599874aedccef25e961f37b7ef8
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Mon Dec 23 18:22:30 2019 -0800
-
-    1.79 Default parameters configuration for cookies
-    
-    Allows to easily set 'httpOnly' or 'secure' site-wide in the
-    configuration instead of setting on individual cookies. Then can be
-    overrided as needed for specific cookies in the config or when calling
-    add_cookie().
-
-commit 85732ce2e933246e6ed58f69401d0be1f3fd5e7c
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Nov 20 12:50:27 2019 -0800
-
-    1.78 Allowed for removing of headers set earlier
 

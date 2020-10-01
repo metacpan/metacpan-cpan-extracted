@@ -1,0 +1,34 @@
+---
+abstract: 'Use GraphViz2 to visualize a database schema'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  DBD::SQLite: '1.66'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GraphViz2-DBI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBIx::Admin::TableInfo: '3.00'
+  GraphViz2: '2.48'
+  Lingua::EN::PluralToSingular: '0.14'
+  Moo: '2.001001'
+  perl: '5.010001'
+resources:
+  X_dynamic_config: 0
+  bugtracker: https://github.com/graphviz-perl/GraphViz2-DBI/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/graphviz-perl/GraphViz2-DBI.git
+version: '2.49'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

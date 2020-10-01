@@ -12,19 +12,15 @@ use strict;
 
 use lib qw(blib/arch blib/lib);
 
-
 $| = 1;
 
 use Net::Daemon::Test ();
-use IO::Socket ();
+use IO::Socket        ();
 
 package Multiplier;
 
-use vars qw($VERSION @ISA);
-
-$VERSION = '0.01';
-@ISA = qw(Net::Daemon::Test);
-
+our $VERSION = '0.01';
+our @ISA     = qw(Net::Daemon::Test);
 
 sub Version ($) {
     return "Multiplier - A simple network calculator; 1998, Jochen Wiedmann";
@@ -42,65 +38,64 @@ sub Print {
 
 sub Loop {
     my $self = shift;
-    if ($self->{'loop-timeout'}) {
-	my $count = $self->{'loop-count'} || 0;
-	if (($self->{'loop-count'} = ++$count) == 10) {
-	    $self->Done();
-	    open(COUNT, ">ndtest.cnt");
-	    print COUNT "10\n";
-	    close(COUNT);
-	}
+    if ( $self->{'loop-timeout'} ) {
+        my $count = $self->{'loop-count'} || 0;
+        if ( ( $self->{'loop-count'} = ++$count ) == 10 ) {
+            $self->Done();
+            open( COUNT, ">ndtest.cnt" );
+            print COUNT "10\n";
+            close(COUNT);
+        }
     }
 }
 
 sub Run ($) {
     my $self = shift;
     sleep 1 if $self->{'mode'} eq "fork";
-      # Waiting one second sometimes helps the parent to catch
-      # children nicely, if they die immediately
-    my($line, $sock);
+
+    # Waiting one second sometimes helps the parent to catch
+    # children nicely, if they die immediately
+    my ( $line, $sock );
     $sock = $self->{'socket'};
     eval {
-	while (1) {
-	    if (!defined($line = GetLine($sock))) {
-		if ($sock->error()) {
-		    die "Client connection error " . $sock->error() . " ($!)";
-		}
-		last;
-	    }
-	    my $num;
-	    {
-		my $lock = lock($Net::Daemon::RegExpLock)
-		    if ($self->{'mode'} eq 'threads');
-		if ($line =~ /(\d+)/) {
-		    $num = $1;
-		}
-	    }
-	    if (defined($num)) {
-		if (!Print($sock, $num*2, "\n")) {
-		    die "Client connection error " . $sock->error() .
-			" ($!) while writing.";
-		}
-	    } else {
-		die "Server cannot parse input: $line";
-	    }
-	}
+        while (1) {
+            if ( !defined( $line = GetLine($sock) ) ) {
+                if ( $sock->error() ) {
+                    die "Client connection error " . $sock->error() . " ($!)";
+                }
+                last;
+            }
+            my $num;
+            {
+                my $lock = lock($Net::Daemon::RegExpLock)
+                  if ( $self->{'mode'} eq 'threads' );
+                if ( $line =~ /(\d+)/ ) {
+                    $num = $1;
+                }
+            }
+            if ( defined($num) ) {
+                if ( !Print( $sock, $num * 2, "\n" ) ) {
+                    die "Client connection error " . $sock->error() . " ($!) while writing.";
+                }
+            }
+            else {
+                die "Server cannot parse input: $line";
+            }
+        }
     };
     if ($@) {
-	print STDERR "$@\n";
-	$self->Error($@);
+        print STDERR "$@\n";
+        $self->Error($@);
     }
     $sock->close();
 }
 
-
 package main;
 
-my $server = Multiplier->new({ 'pidfile' => 'none'
-			       }, \@ARGV);
+my $server = Multiplier->new( { 'pidfile' => 'none' }, \@ARGV );
 
 eval { $server->Bind() };
 print STDERR "Unexpected return from Bind().\n"
-    if (!$server->Done());
+  if ( !$server->Done() );
 
 print STDERR "Server died: $@\n" if $@;

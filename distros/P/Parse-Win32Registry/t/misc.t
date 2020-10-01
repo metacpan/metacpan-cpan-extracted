@@ -502,7 +502,7 @@ foreach my $time_test (@time_tests) {
     if (defined($time)) {
         # The test data time is a Unix epoch time
         # so is adjusted to the local OS's epoch time
-        my $epoch_offset = timegm(0, 0, 0, 1, 0, 70);
+        my $epoch_offset = timegm(0, 0, 0, 1, 0, 1970);
         $time += $epoch_offset;
         cmp_ok($unpacked_time1, '==', $time,
             "$desc (scalar) unpack_windows_time");

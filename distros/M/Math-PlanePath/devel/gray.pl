@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2015 Kevin Ryde
+# Copyright 2011, 2012, 2015, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,15 +20,127 @@
 
 use 5.004;
 use strict;
+use Math::BaseCnv 'cnv';
 use Math::Prime::XS 0.23 'is_prime'; # version 0.23 fix for 1928099
 use Math::PlanePath::GrayCode;
 use Math::PlanePath::Base::Digits
   'digit_split_lowtohigh',
   'digit_join_lowtohigh';
+$|=1;
 
 # uncomment this to run the ### lines
-use Smart::Comments;
+# use Smart::Comments;
 
+
+
+{
+  # binary Gray twice cf base 4
+
+  foreach my $n (0 .. 16) {
+    my $b  = to_gray_reflected($n,2);
+    my $b2 = to_gray_reflected($b,2);
+    my $fr = to_gray_reflected($n,4);
+    my $fm = to_gray_modular($n,4);
+    printf "%5d %5d %5d\n",
+      cnv($b2,10,4),
+      cnv($fr,10,4),
+      cnv($fm,10,4);
+  }
+  exit 0;
+}
+
+
+{
+  # F. J. Budden and T. M. Sporton, "Some Unsolved Problems on Binary Codes",
+  # Mathematics in School, volume 11, number 3, May 1982, pages 26-28.
+  # http://www.jstor.org/stable/30213735
+
+  # 14,32,50,114
+  # 2* of
+  # A295921  (n+2) * 2^(n-2) + 1
+  #  maximal cliques in folded cube graph n
+  # folded cube = merge antipodals
+  #
+
+  # 6,5  10mins len 50
+
+  my $N  = 6;
+  my $MD = 5;
+  my @last = map {[-99]} 0 .. $N;
+  ### @last
+  my @seq = (-1);
+  my @values = (0);
+  my %values = (0 => 1);
+  my $limit = 2**$N;
+  my @flip = map {1<<$_} 0 .. $N-1;
+  ### @flip
+  my $new_value;
+  my @max_seq;
+  my @max_values;
+  for (;;) {
+    ### at: join('',@seq).' last '.join(',',map {$_->[-1]} @last).' values '.join(',',@values)
+
+    if (0) {
+      foreach my $i (0 .. $N-1) {
+        my $s1 = join(',',@{$last[$i]});
+        my $s2 = join(',',-99,grep {$seq[$_]==$i} 0 .. $#seq-1);
+        unless ($s1 eq $s2) {
+          print "i=$i\n";
+          print "  $s1\n";
+          print "  $s2\n";
+          die;
+        }
+      }
+      my @stepped_values = (0);
+      foreach my $i (0 .. $#seq-1) {
+        push @stepped_values, $stepped_values[-1] ^ $flip[$seq[$i]];
+      }
+      my $s1 = join(',',@stepped_values);
+      my $s2 = join(',',@values);
+      unless ($s1 eq $s2) {
+        print "  $s1\n";
+        print "  $s2\n";
+        die;
+      }
+    }
+
+    my $this = ++$seq[-1];
+    if ($this >= $N) {
+      ### backtrack ...
+      pop @seq;
+      last unless @seq;
+      pop @{$last[$seq[-1]]};
+      undef $values{pop @values};
+      next;
+    }
+    my $dist = scalar(@seq) - $last[$this]->[-1];
+    ### $dist
+    if ($dist > $MD
+        && !$values{$new_value = $values[-1] ^ $flip[$this]}) {
+      ### descend to: $this
+      $values{$new_value} = 1;
+      push @values, $new_value;
+      if (@seq > @max_seq) {
+        @max_seq = @seq;
+        @max_values = @values;
+        print "new high ",scalar(@max_values),"\n";
+      }
+      if (@values == $limit) {
+        print "found $limit\n";
+        print "  ",join('',@seq),"\n";
+        last;
+      }
+      push @{$last[$this]}, $#seq;
+      push @seq, -1;
+    }
+  }
+  my $max = scalar(@max_values);
+  print "max $max seq ",join('',@max_seq),"\n";
+  foreach my $i (0 .. $#max_values) {
+    printf "  %0*b  %s\n", $N, $max_values[$i], $max_seq[$i] // '[none]';
+  }
+  exit 0;
+}
 
 {
   my $from = from_gray(2**8-1,2);
@@ -372,5 +484,31 @@ sub _from_gray {
   #   $xor ^= $digit;
   # }
   # return $ret;
+}
+
+sub to_gray_reflected {
+  my ($n, $radix) = @_;
+  my $digits = [ digit_split_lowtohigh($n,$radix) ];
+  Math::PlanePath::GrayCode::_digits_to_gray_reflected($digits,$radix);
+  return digit_join_lowtohigh($digits,$radix);
+}
+sub from_gray_reflected {
+  my ($n, $radix) = @_;
+  my $digits = [ digit_split_lowtohigh($n,$radix) ];
+  Math::PlanePath::GrayCode::_digits_from_gray_reflected($digits,$radix);
+  return digit_join_lowtohigh($digits,$radix);
+}
+
+sub to_gray_modular {
+  my ($n, $radix) = @_;
+  my $digits = [ digit_split_lowtohigh($n,$radix) ];
+  Math::PlanePath::GrayCode::_digits_to_gray_modular($digits,$radix);
+  return digit_join_lowtohigh($digits,$radix);
+}
+sub from_gray_modular {
+  my ($n, $radix) = @_;
+  my $digits = [ digit_split_lowtohigh($n,$radix) ];
+  Math::PlanePath::GrayCode::_digits_from_gray_modular($digits,$radix);
+  return digit_join_lowtohigh($digits,$radix);
 }
 

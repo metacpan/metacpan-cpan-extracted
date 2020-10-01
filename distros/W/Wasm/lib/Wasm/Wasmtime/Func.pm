@@ -20,7 +20,7 @@ use overload
   ;
 
 # ABSTRACT: Wasmtime function class
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 $ffi_prefix = 'wasm_func_';
@@ -168,7 +168,7 @@ Wasm::Wasmtime::Func - Wasmtime function class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

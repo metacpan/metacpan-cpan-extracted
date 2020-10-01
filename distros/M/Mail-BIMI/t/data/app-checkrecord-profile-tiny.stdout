@@ -1,0 +1,20 @@
+BIMI domain checker
+
+Requested:
+[33m  Domain    [37m: [36m-none-[0m
+[33m  Record    [37m: [36mv=bimi1;l=[0m
+
+Record Returned: [91m⚠[0m
+[33m  Record    : v=bimi1;l=[0m
+[33m  Version   [37m: [36mbimi1[0m
+[33m  Domain    [37m: [36m-none-[0m
+[33m  Selector  [37m: [36mdefault[0m
+[33m  Authority [37m: [36m-none-[0m
+[33m  Location  [37m: [36m[0m
+[33m  Is Valid  [37m: [91mNo[0m
+Errors:
+[91m  EMPTY_L_TAG [37m: [36mDomain declined to participate[0m
+
+An authenticated email with this record would receive the following BIMI results:
+
+Authentication-Results: authservid.example.com; bimi=declined (Domain declined to participate)

@@ -1,0 +1,70 @@
+{
+  '0' => {
+    '0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ':port1'
+      }
+    ]
+  },
+  '0_0_0_kids' => {
+    '0_0_0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ],
+    '0_0_0_1_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port2',
+        'to_port' => ':port1'
+      }
+    ]
+  },
+  '0_0_kids' => {
+    '0_0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ]
+  },
+  '0_1_0_kids' => {
+    '0_1_0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ]
+  },
+  '0_1_kids' => {
+    '0_1_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ]
+  },
+  '0_kids' => {
+    '0_0_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port1',
+        'to_port' => ':port1'
+      }
+    ],
+    '0_1_kids' => [
+      {
+        'attributes' => {},
+        'from_port' => ':port2',
+        'to_port' => ':port1'
+      }
+    ]
+  }
+}

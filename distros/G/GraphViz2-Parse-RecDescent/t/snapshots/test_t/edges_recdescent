@@ -1,0 +1,263 @@
+{
+  'Grammar' => {
+    '_alternation_1_of_production_1_of_rule_test1' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    '_alternation_1_of_production_1_of_rule_test3' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'a' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'b' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'cat' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'defn' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'dog' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'fail' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'id' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'is' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'name' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'notname' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'test1' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'test2' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'test3' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'test4' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'test5' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'test6' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'test7' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'the' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'typedef' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'typename' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ]
+  },
+  '_alternation_1_of_production_1_of_rule_test3' => {
+    'defn' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'fail' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'typedef' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ]
+  },
+  'defn' => {
+    'id' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'typename' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ]
+  },
+  'test1' => {
+    '_alternation_1_of_production_1_of_rule_test1' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'is' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ]
+  },
+  'test3' => {
+    '_alternation_1_of_production_1_of_rule_test3' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ]
+  },
+  'test4' => {
+    'b' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ]
+  },
+  'test5' => {
+    'name' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'notname' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ]
+  },
+  'typedef' => {
+    'id' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ],
+    'typename' => [
+      {
+        'attributes' => {},
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ]
+  }
+}

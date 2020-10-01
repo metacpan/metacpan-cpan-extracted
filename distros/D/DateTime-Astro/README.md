@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/lestrrat/DateTime-Astro.svg?branch=master)](https://travis-ci.org/lestrrat/DateTime-Astro)
+[![Build Status](https://travis-ci.org/lestrrat-p5/DateTime-Astro.svg?branch=master)](https://travis-ci.org/lestrrat-p5/DateTime-Astro)
 # NAME
 
 DateTime::Astro - Functions For Astromical Calendars

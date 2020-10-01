@@ -5,7 +5,7 @@ use Test::More 'no_plan';
 
 BEGIN { use_ok('Parse::Win32Registry') };
 
-is($Parse::Win32Registry::VERSION, '1.0', 'correct version');
+is($Parse::Win32Registry::VERSION, '1.1', 'correct version');
 can_ok('Parse::Win32Registry', 'new');
 can_ok('Parse::Win32Registry', 'convert_filetime_to_epoch_time');
 can_ok('Parse::Win32Registry', 'iso8601');

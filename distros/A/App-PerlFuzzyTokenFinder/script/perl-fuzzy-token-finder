@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use App::PerlFuzzyTokenFinder::CLI;
+
+die "Usage: perl-fuzzy-token-finder <search pattern> <files>" unless @ARGV;
+
+my $cli = App::PerlFuzzyTokenFinder::CLI->new;
+my $find_token_str = shift @ARGV;
+
+$cli->set_find_tokens_from_string($find_token_str);
+
+if (@ARGV) {
+    $cli->set_target_files([ @ARGV ]);
+} else {
+    # read Perl code from STDIN
+    $cli->set_target_files([ '-' ]);
+}
+
+my $exit_status = $cli->find;
+exit $exit_status;
+
+__END__
+
+=head1 NAME
+
+perl-fuzzy-token-finder
+
+=head1 SYNOPSIS
+
+    $ perl-fuzzy-token-finder 'return ... unless ...'
+
+=head1 DESCRIPTION
+
+perl-fuzzy-token-finder is a fuzzy finder for Perl statements.
+
+=head1 LICENSE
+
+Copyright (C) utgwkk.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+utgwkk E<lt>utagawakiki@gmail.comE<gt>
+
+=cut

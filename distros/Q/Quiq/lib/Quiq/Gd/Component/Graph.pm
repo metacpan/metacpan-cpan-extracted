@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.187';
+our $VERSION = '1.188';
 
 use Quiq::Array;
 use Quiq::Math;
@@ -139,7 +139,9 @@ Code:
 
 Im Browser:
 
-Command failed: r1-gd-graphic-graph-example --format=pod 1=head2 Graph mit gekennzeichneten Datenpunkten
+    [Nur im Browser sichtbar]
+
+=head2 Graph mit gekennzeichneten Datenpunkten
 
 Code:
 
@@ -164,7 +166,9 @@ Code:
 
 Im Browser:
 
-Command failed: r1-gd-graphic-graph-example --format=pod 2Wir setzen die Punktfarbe und die Punktgröße. Die Endpunkte sind
+    [Nur im Browser sichtbar]
+
+Wir setzen die Punktfarbe und die Punktgröße. Die Endpunkte sind
 abgeschnitten, da ein Teil von ihnen außerhalb des Bildes liegt.
 
 =head2 Graph mit verschiedenfarbigen Datenpunkten und Linien
@@ -203,7 +207,9 @@ Code:
 
 Im Browser:
 
-Command failed: r1-gd-graphic-graph-example --format=pod 3Wenn Eigenschaft C<colors> definiert ist, werden die Punkte und
+    [Nur im Browser sichtbar]
+
+Wenn Eigenschaft C<colors> definiert ist, werden die Punkte und
 Verbindungslinien in den angegebenen Farben dargestellt.
 Die Linie hat die Farbe des Anfangspunktes, der letzte Punkt
 hat keine Verbindungsline. Mit C<pointColor> oder C<lineColor>
@@ -251,7 +257,9 @@ Code:
 
 Im Browser:
 
-Command failed: r1-gd-graphic-graph-example --format=pod 4Mit C<adaptPlotRegion> wird der Plotbereich so verkleinert, dass
+    [Nur im Browser sichtbar]
+
+Mit C<adaptPlotRegion> wird der Plotbereich so verkleinert, dass
 Punkte am Rand vollständig sichtbar sind.
 
 =head1 METHODS
@@ -598,7 +606,7 @@ sub yMax {
 
 =head1 VERSION
 
-1.187
+1.188
 
 =head1 AUTHOR
 

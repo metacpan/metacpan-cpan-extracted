@@ -32,13 +32,12 @@ use Test::More;
 use lib 't';
 use tester;
 
-my $ot = tester->new;
-$ot->tests(16);
+my $ot = tester->new('Tk::DBI::LoginDialog');
+$ot->planned(16);
 
 
 # ---- module ----
-my $c_this = 'Tk::DBI::LoginDialog';
-require_ok($c_this);
+require_ok($ot->this);
 
 
 # ---- globals ----
@@ -49,14 +48,14 @@ my $top = $ot->top;
 
 # ---- test buttons ----
 my $tld0 = $top->LoginDialog;
-isa_ok($tld0, $c_this,	"new object 1");
+isa_ok($tld0, $ot->this,	"new object 1");
 $ot->queue_button($tld0, "Cancel");
 
 
 # ---- override button labels ----
 my @buttons = qw/ help me rhonda /;
 my $tld1 = $top->LoginDialog(-buttons => [ @buttons ]);
-isa_ok($tld1, $c_this,	"new object 2");
+isa_ok($tld1, $ot->this,	"new object 2");
 $ot->dummy_exit($tld1);
 
 $ot->queue_button($tld1, $buttons[0]);	# help
@@ -69,7 +68,7 @@ $ot->queue_button($tld1, $buttons[-1]);	# rhonda
 my $b_dodgy ="extra";
 unshift @buttons, $b_dodgy;
 my $tld2 = $top->LoginDialog(-buttons => [ @buttons ]);
-isa_ok($tld2, $c_this,	"new object 3");
+isa_ok($tld2, $ot->this,	"new object 3");
 $ot->queue_button($tld2, $b_dodgy);
 #$ot->queue_button($tld2, $buttons[-1]);	# will fail; invalid action
 

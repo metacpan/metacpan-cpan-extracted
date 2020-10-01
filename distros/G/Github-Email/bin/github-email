@@ -1,0 +1,58 @@
+#!perl
+
+# ABSTRACT: A command line tool to get a list of email addresses from particular Github account.
+# PODNAME: github-email
+
+use strict;
+use warnings;
+
+use Github::Email;
+
+sub print_usage {
+    print "Usage: github-email <github_username>\n";
+    exit 1;
+}
+
+my $username = $ARGV[0];
+print_usage if not defined $username;
+
+my @addresses = Github::Email::get_emails( $username );
+for my $address (@addresses) {
+    print $address . "\n";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+github-email - A command line tool to get a list of email addresses from particular Github account.
+
+=head1 VERSION
+
+version 1.1.0
+
+=head1 SYNOPSIS
+
+    github-email gGithub_username>
+
+    # Examples
+
+    github-email momozor
+
+=head1 AUTHOR
+
+Momozor <momozor4@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017-2020 by Momozor.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

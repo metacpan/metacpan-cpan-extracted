@@ -35,6 +35,10 @@ foreach my $file ( @plists ) {
 	my $elapsed = Time::HiRes::tv_interval( $time1, $time2 );
 	diag( "$file [$b bytes] parsed in $elapsed seconds" );
 
-	# All of the test plists have a dict at the top level, except for binary2.
-	isa_ok( $plist, ( $file eq 'plists/binary2.plist' ) ? 'ARRAY' : 'HASH' );
+	# All of the test plists have a dict at the top level, except
+	# for binary2 and binary_uids.
+	isa_ok( $plist, {
+		'plists/binary2.plist'		=> 'ARRAY',
+		'plists/binary_uids.plist'	=> 'ARRAY',
+	    }->{$file} || 'HASH' );
 	}

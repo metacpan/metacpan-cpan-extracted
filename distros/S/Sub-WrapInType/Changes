@@ -1,0 +1,18 @@
+Revision history for Perl extension Sub-WrapInType
+
+0.03 2020-09-27T12:41:30Z
+
+    - New format support `wrap_sub($param, ...)`
+
+0.02 2020-09-26T17:52:53Z
+
+    - support multiple return values
+
+0.01_02 2020-02-24T20:11:41Z
+
+    - fix module name
+
+0.01_01 2020-02-24T19:50:34Z
+
+    - original version
+

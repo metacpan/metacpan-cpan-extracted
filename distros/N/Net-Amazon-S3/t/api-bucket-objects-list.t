@@ -2,18 +2,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
-use Test::Deep;
-use Test::Warnings qw[ :no_end_test had_no_warnings ];
+use FindBin;
 
-use Shared::Examples::Net::Amazon::S3 (
-    qw[ s3_api_with_signature_2 ],
-);
+BEGIN { require "$FindBin::Bin/test-helper-s3-api.pl" }
 
-use Shared::Examples::Net::Amazon::S3::API (
-    qw[ with_response_fixture ],
-    qw[ expect_api_bucket_objects_list ],
-);
+plan tests => 9;
+
+use Shared::Examples::Net::Amazon::S3::API qw[ expect_api_bucket_objects_list ];
 
 expect_api_bucket_objects_list 'list objects (version 1)' => (
     with_bucket             => 'some-bucket',
@@ -46,7 +41,7 @@ expect_api_bucket_objects_list 'list objects (version 1)' => (
     },
 );
 
-expect_api_bucket_objects_list 'list objects with filters (version 1)' => (
+expect_api_bucket_objects_list 'list objects (version 1) with filters' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('response::bucket_objects_list_v1_with_filter_truncated'),
     with_prefix             => 'N',
@@ -80,7 +75,7 @@ expect_api_bucket_objects_list 'list objects with filters (version 1)' => (
     },
 );
 
-expect_api_bucket_objects_list 'list objects with delimiter (version 1)' => (
+expect_api_bucket_objects_list 'list objects (version 1) with delimiter' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('response::bucket_objects_list_v1_with_delimiter'),
     with_delimiter          => '/',
@@ -107,7 +102,7 @@ expect_api_bucket_objects_list 'list objects with delimiter (version 1)' => (
     },
 );
 
-expect_api_bucket_objects_list 'list objects with prefix and delimiter (version 1)' => (
+expect_api_bucket_objects_list 'list objects (version 1) with prefix and delimiter' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('response::bucket_objects_list_v1_with_prefix_and_delimiter'),
     with_delimiter          => '/',
@@ -126,24 +121,6 @@ expect_api_bucket_objects_list 'list objects with prefix and delimiter (version 
             'photos/2006/January',
         ],
     },
-);
-
-expect_api_bucket_objects_list 'error access denied' => (
-    with_bucket             => 'some-bucket',
-    with_response_fixture ('error::access_denied'),
-    expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/' },
-    expect_data             => bool (0),
-    expect_s3_err           => 'AccessDenied',
-    expect_s3_errstr        => 'Access denied error message',
-);
-
-expect_api_bucket_objects_list 'error no such bucket' => (
-    with_bucket             => 'some-bucket',
-    with_response_fixture ('error::no_such_bucket'),
-    expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/' },
-    expect_data             => bool (0),
-    expect_s3_err           => 'NoSuchBucket',
-    expect_s3_errstr        => 'No such bucket error message',
 );
 
 expect_api_bucket_objects_list 'list objects (version 1) on Google Cloud Storage' => (
@@ -178,4 +155,33 @@ expect_api_bucket_objects_list 'list objects (version 1) on Google Cloud Storage
     },
 );
 
+expect_api_bucket_objects_list 'S3 error - Access Denied' => (
+    with_bucket             => 'some-bucket',
+    with_response_fixture ('error::access_denied'),
+    expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/' },
+    expect_data             => bool (0),
+    expect_s3_err           => 'AccessDenied',
+    expect_s3_errstr        => 'Access denied error message',
+);
+
+expect_api_bucket_objects_list 'S3 error - No Such Bucket' => (
+    with_bucket             => 'some-bucket',
+    with_response_fixture ('error::no_such_bucket'),
+    expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/' },
+    expect_data             => bool (0),
+    expect_s3_err           => 'NoSuchBucket',
+    expect_s3_errstr        => 'No such bucket error message',
+);
+
+expect_api_bucket_objects_list 'HTTP error - 400 Bad Request' => (
+    with_bucket             => 'some-bucket',
+    with_response_fixture ('error::http_bad_request'),
+    expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/' },
+    expect_data             => bool (0),
+    expect_s3_err           => '400',
+    expect_s3_errstr        => 'Bad Request',
+);
+
 had_no_warnings;
+
+done_testing;

@@ -1,5 +1,10 @@
 Revision history for Wasm},
 
+0.20      2020-10-01 05:35:43 -0600
+  - Added gc method to Wasm::Wasmtime::Store class (gh#91)
+  - Added serialize and deserialize methods to Wasm::Wasmtime::Module (gh#91)
+  - Require Alien::wasmtime 0.14 or wasmtime 0.20.0 (gh#94)
+
 0.19      2020-08-17 02:55:34 -0600
   - The deprecated store method on Wasm::Wasmtime::Module has been removed (gh#93)
   - The deprecated ability to create a Wasm::Wasmtime::Instance instance without a

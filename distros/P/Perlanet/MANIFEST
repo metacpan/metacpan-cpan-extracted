@@ -6,6 +6,7 @@ lib/Perlanet.pm
 lib/Perlanet/Entry.pm
 lib/Perlanet/Feed.pm
 lib/Perlanet/Simple.pm
+lib/Perlanet/Types.pm
 lib/Perlanet/Trait/Cache.pm
 lib/Perlanet/Trait/OPML.pm
 lib/Perlanet/Trait/TemplateToolkit.pm
@@ -24,6 +25,7 @@ t/05_cache.t
 t/06_youtube.t
 t/07_page.t
 t/08_opml.t
+t/09_entries.t
 t/pod.t
 t/pod_coverage.t
 t/testrc
@@ -33,6 +35,8 @@ t/cacherc
 t/mprc
 t/youtuberc
 t/youtube2rc
+t/allentriesrc
+t/5entriesrc
 t/index.tt
 README
 Changes

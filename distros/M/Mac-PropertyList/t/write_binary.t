@@ -4,10 +4,11 @@ use utf8;
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
+use Math::BigInt;
 
 our($val, $expect);
 
-use Test::More tests => 38;
+use Test::More tests => 42;
 
 BEGIN {
     my $class = 'Mac::PropertyList::WriteBinary';
@@ -80,6 +81,11 @@ sub testrep {
 
 &testrep( array => [],       "\xA0" );
 &testrep( dict => {},        "\xD0" );
+
+&testrep( uid => '1',          "\x80\x01" );
+&testrep( uid => '2a',         "\x80\x2a" );
+&testrep( uid => '04d2',       "\x81\x04\xd2" );
+&testrep( uid => '74cbb1',     "\x82\x74\xcb\xb1" );
 
 # The null object is part of the specification but rarely if ever used;
 # Apple's CFBinaryPList implementation of it appears to never have

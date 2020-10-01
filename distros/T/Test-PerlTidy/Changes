@@ -1,5 +1,9 @@
 CHANGES
 
+20200930        2020-09-30
+
+            * Fix the tests with lates Perl::Tidy
+
 20200412        2020-04-12
 
             * https://github.com/shlomif/Test-PerlTidy/issues/4

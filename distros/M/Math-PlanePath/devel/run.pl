@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -111,10 +111,8 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
   $path_class = 'Math::PlanePath::SumFractions';
   $path_class = 'Math::PlanePath::AztecDiamondRings';
   $path_class = 'Math::PlanePath::TriangleSpiralSkewed';
-  $path_class = 'Math::PlanePath::PeanoCurve';
   $path_class = 'Math::PlanePath::CellularRule190';
   $path_class = 'Math::PlanePath::CellularRule54';
-  $path_class = 'Math::PlanePath::PeanoVertices';
   $path_class = 'Math::PlanePath::OneOfEightByCells';
   $path_class = 'Math::PlanePath::ZeckendorfTerms';
   $path_class = 'Math::PlanePath::BinaryTerms';
@@ -156,7 +154,6 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
   $path_class = 'Math::PlanePath::DekkingCentres';
   $path_class = 'Math::PlanePath::DekkingCurve';
   $path_class = 'Math::PlanePath::SierpinskiTriangle';
-  $path_class = 'Math::PlanePath::AlternatePaper';
   $path_class = 'Math::PlanePath::HilbertSides';
   $path_class = 'Math::PlanePath::SquaRecurve';
   $path_class = 'Math::PlanePath::QuintetCurve';
@@ -165,14 +162,18 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
   $path_class = 'Math::PlanePath::AlternateTerdragon';
   $path_class = 'Math::PlanePath::TerdragonRounded';
   $path_class = 'Math::PlanePath::TerdragonCurve';
+  $path_class = 'Math::PlanePath::AlternatePaper';
+  $path_class = 'Math::PlanePath::PeanoCurve';
+  $path_class = 'Math::PlanePath::PeanoDiagonals';
 
   my $lo = 0;
-  my $hi = 40;
+  my $hi = 27;
 
   Module::Load::load($path_class);
   my $path = $path_class->new
     (
-     arms => 2,
+     arms => 1,
+     radix => 3,
 
      # numbering_type => 'rotate',
      # k=>5,
@@ -197,7 +198,6 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
      # digit_order => 'HtoL',
      # digit_order => 'LtoH',
      # reduced => 1,
-     # radix => 4,
 
      # rule => 14,
      # x_start => 5,

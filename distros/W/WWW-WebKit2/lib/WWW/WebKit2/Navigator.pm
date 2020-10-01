@@ -12,6 +12,7 @@ sub open {
 
     # make sure previous page, if existing, has finished all its work and there are no
     # ajax requests or the like stuck in the pipeline
+    $self->wait_for_pending_requests;
     $self->process_page_load;
 
     if ($url =~ /^http[s]?:/ or $url =~ /^file:/) {

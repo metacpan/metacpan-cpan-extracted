@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -16,8 +16,11 @@
 # with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
 
 
+# Archive of all Wunderlich's papers:
+# http://sodwana.uni-ak.ac.at/geom/mitarbeiter/wallner/wunderlich/
 # http://sodwana.uni-ak.ac.at/geom/mitarbeiter/wallner/wunderlich/pdf/125.pdf
 # [8.5mb]
+# https://eudml.org/doc/141086
 #
 # Walter Wunderlich. Uber Peano-Kurven. Elemente der Mathematik, 28(1):1-10,
 # 1973.
@@ -28,6 +31,16 @@
 # math-image --path=WunderlichSerpentine,radix=5 --all --output=numbers_dash
 # math-image --path=WunderlichSerpentine,serpentine_type=170 --all --output=numbers_dash
 #
+#
+# cf diagonals of alternating
+# turn(n) = n=n/9^valuation(n,9); [-1,1,1,1,-1,-1,-1,1][n%9];
+# vector(20,n,turn(n))
+# not in OEIS: -1,1,1,1,-1,-1,-1,1,-1,-1,1,1,1,-1,-1,-1,1,1,-1,1
+# vector(20,n,turn(9*n+3)) == vector(20,n, 1)
+# vector(20,n,turn(9*n+6)) == vector(20,n, -1)
+# [-1,1, 1, 1,-1, -1, -1,1]
+#   1 2  0  1  2   0   1 2    n mod 3
+#  01,02   11,12,     21,22      
 
 
 package Math::PlanePath::WunderlichSerpentine;
@@ -38,7 +51,7 @@ use Carp 'croak';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem = \&Math::PlanePath::_divrem;
@@ -639,9 +652,19 @@ Math::PlanePath::WunderlichSerpentine -- transpose parts of Peano curve, includi
 =head1 DESCRIPTION
 
 X<Wunderlich, Walter>This is an integer version of Walter Wunderlich's
-variations on the C<PeanoCurve>.  A "serpentine type" controls transposing
-of selected 3x3 sub-parts.  The default is "alternating" 010,101,010 which
-transposes every second sub-part,
+variations on the C<PeanoCurve>.
+
+=over
+
+Walter Wunderlich, "Uber Peano-Kurven", Elemente der Mathematik, volume 28,
+number 1, 1973, pages 1-10.
+L<http://sodwana.uni-ak.ac.at/geom/mitarbeiter/wallner/wunderlich/>,
+L<http://sodwana.uni-ak.ac.at/geom/mitarbeiter/wallner/wunderlich/pdf/125.pdf>
+
+=back
+
+A "serpentine type" controls transposing of selected 3x3 sub-parts.  The
+default is "alternating" 010,101,010 which transposes every second sub-part,
 
        8  | 60--61--62--63  68--69  78--79--80--81
           |  |           |   |   |   |           |
@@ -711,7 +734,7 @@ The result is like a coil viewed side-on,
 
            X=0   1   2   3   4   5   6   7   8
 
-Whenever C<serpentine_type> begins with a "1" the initial sub-part is
+Whenever C<serpentine_type> begins with a "1", the initial sub-part is
 transposed at each level.  The first step N=0 to N=1 is kept fixed along the
 X axis, then the higher levels are transposed.  For example in the coil
 above The N=9 to N=17 part is upwards, and then the N=81 to N=161 part is to
@@ -737,7 +760,7 @@ L<Math::PlanePath::PeanoCurve/Radix>).  For example radix 5 gives
         +---------------------------------------------------------
          X=0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
 
-Like the C<PeanoCurve> if the radix is even then the ends of each sub-part
+Like the C<PeanoCurve>, if the radix is even then the ends of each sub-part
 don't join up.  For example in radix 4 N=15 isn't next to N=16, nor N=31 to
 N=32, etc.
 
@@ -752,7 +775,7 @@ N=32, etc.
         +----------------------------------------------------------------
           X=0  1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 
-In the C<serpentine_type> 0,1 form, any space, comma, etc, separators should
+In the C<serpentine_type> 0,1 form, space, comma, etc, separators should
 group C<radix> many values, so for example
 
     serpentine_type => "00000_11111_00000_00000_11111"
@@ -786,17 +809,13 @@ etc.
 L<Math::PlanePath>,
 L<Math::PlanePath::PeanoCurve>
 
-Walter Wunderlich "Uber Peano-Kurven", Elemente der Mathematik, 28(1):1-10,
-1973.  L<http://sodwana.uni-ak.ac.at/geom/mitarbeiter/wallner/wunderlich/>Z<>
-L<http://sodwana.uni-ak.ac.at/geom/mitarbeiter/wallner/wunderlich/pdf/125.pdf>
-
 =head1 HOME PAGE
 
 L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

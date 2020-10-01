@@ -1,6 +1,6 @@
 package Bundle::DadaMail;
 
-$VERSION = '0.0.13';
+$VERSION = '0.0.14';
 
 1;
 
@@ -86,7 +86,11 @@ HTML::FormatText::WithLinks - Plaintext to HTML
 
 IO::Socket::SSL
 
-Image::Resize - used for resizing images when using Drag and Drop in CKEditor
+Image::Resize - used for resizing images
+
+Image::Scale - used for resizing images
+
+Image::Magick - used for resizing images
 
 JSON - actually required for Dada Mail - Pure Perl version included, but you probably want to use a faster version
 

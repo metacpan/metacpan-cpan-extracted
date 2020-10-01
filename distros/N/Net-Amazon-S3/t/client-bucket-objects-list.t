@@ -2,14 +2,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
-use Test::Deep v0.111; # 0.111 => obj_isa
-use Test::Warnings qw[ :no_end_test had_no_warnings ];
+use FindBin;
 
-use Shared::Examples::Net::Amazon::S3::Client (
-    qw[ with_response_fixture ],
-    qw[ expect_client_bucket_objects_list ],
-);
+BEGIN { require "$FindBin::Bin/test-helper-s3-client.pl" }
+
+plan tests => 8;
+
+use Shared::Examples::Net::Amazon::S3::Client qw[ expect_client_bucket_objects_list ];
 
 expect_client_bucket_objects_list 'list objects (version 1)' => (
     with_bucket             => 'some-bucket',
@@ -91,29 +90,52 @@ expect_client_bucket_objects_list 'list objects with prefix and delimiter (versi
     expect_data             => methods (get_more => undef),
 );
 
-expect_client_bucket_objects_list 'error access denied' => (
+expect_client_bucket_objects_list 'S3 error - Access Denied' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('error::access_denied'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?max-keys=1000' },
-    expect_data             => code(sub {
-        return 0, "expect throw but lives" if eval { $_[0]->get_more; 1 };
-        my $error = $@;
+	expect_data             => all (
+		obj_isa ('Data::Stream::Bulk::Callback'),
+		code(sub {
+        	return 0, "expect throw but lives" if eval { $_[0]->get_more; 1 };
+        	my $error = $@;
 
-        Test::Deep::cmp_details $error, re(qr/^AccessDenied: Access denied error message/);
-    }),
+        	Test::Deep::cmp_details $error, re(qr/^AccessDenied: Access denied error message/);
+		}),
+	),
 );
 
-expect_client_bucket_objects_list 'error no such bucket' => (
+expect_client_bucket_objects_list 'S3 error - No Such Bucket' => (
     with_bucket             => 'some-bucket',
     with_response_fixture ('error::no_such_bucket'),
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?max-keys=1000' },
     expect_data             => methods (get_more => undef),
-    expect_data             => code(sub {
-        return 0, "expect throw but lives" if eval { $_[0]->get_more; 1 };
-        my $error = $@;
+	expect_data             => all (
+		obj_isa ('Data::Stream::Bulk::Callback'),
+		code(sub {
+        	return 0, "expect throw but lives" if eval { $_[0]->get_more; 1 };
+        	my $error = $@;
 
-        Test::Deep::cmp_details $error, re(qr/^NoSuchBucket: No such bucket error message/);
-    }),
+        	Test::Deep::cmp_details $error, re(qr/^NoSuchBucket: No such bucket error message/);
+		}),
+	),
+);
+
+expect_client_bucket_objects_list 'HTTP error - 400 Bad Request' => (
+    with_bucket             => 'some-bucket',
+    with_response_fixture ('error::http_bad_request'),
+    expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/?max-keys=1000' },
+	expect_data             => all (
+		obj_isa ('Data::Stream::Bulk::Callback'),
+		code(sub {
+			return 0, "expect throw but lives" if eval { $_[0]->get_more; 1 };
+			my $error = $@;
+
+			Test::Deep::cmp_details $error, re(qr/^400: Bad Request/);
+		}),
+	),
 );
 
 had_no_warnings;
+
+done_testing;

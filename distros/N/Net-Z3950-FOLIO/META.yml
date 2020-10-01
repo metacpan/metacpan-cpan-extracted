@@ -27,4 +27,4 @@ requires:
   Net::Z3950::ZOOM: 1.3
   URI::Escape: 3.31
   XML::Simple: 2.25
-version: 1.2
+version: 1.3

@@ -52,3 +52,4 @@ t/70tagrole.t
 t/87weirdscopes.t
 t/88patchpackage.t
 t/89anonrolefun.t
+t/90withtraits.t

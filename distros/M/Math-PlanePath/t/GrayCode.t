@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -19,8 +19,9 @@
 
 use 5.004;
 use strict;
+use List::Util 'min';
 use Test;
-plan tests => 308;
+plan tests => 309;
 
 use lib 't';
 use MyTestHelpers;
@@ -48,7 +49,7 @@ sub binary_to_decimal {
 # VERSION
 
 {
-  my $want_version = 127;
+  my $want_version = 128;
   ok ($Math::PlanePath::GrayCode::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::GrayCode->VERSION,  $want_version,
@@ -260,6 +261,26 @@ sub is_pow2 {
     my $got_i = from_gray_modular($gray,8);
     ok ($got_i, $i);
   }
+}
+
+{
+  # to/from are inverses
+  my $bad = 0;
+ OUTER: foreach my $funcs ([\&to_gray_modular, \&from_gray_modular],
+                     [\&to_gray_reflected, \&from_gray_reflected],
+                    ) {
+    my ($to,$from) = @$funcs;
+    foreach my $radix (2 .. 7) {
+      foreach my $i (0 .. min(256,$radix**4)) {
+        my $g = $to->($i,$radix);
+        unless ($from->($g,$radix) == $i) {
+          MyTestHelpers::diag ("bad radix=$radix i=$i");
+          last OUTER if $bad++ > 10;
+        }
+      }
+    }
+  }
+  ok ($bad, 0);
 }
 
 #------------------------------------------------------------------------------

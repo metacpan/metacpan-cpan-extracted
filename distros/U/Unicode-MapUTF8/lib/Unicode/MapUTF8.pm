@@ -1,6 +1,8 @@
 package Unicode::MapUTF8;
 
 use strict;
+use warnings;
+
 use Carp qw(confess croak carp);
 use Unicode::String;
 use Unicode::Map;
@@ -16,7 +18,7 @@ BEGIN {
     @EXPORT      = qw ();
     @EXPORT_OK   = qw (utf8_supported_charset to_utf8 from_utf8 utf8_charset_alias);
     @EXPORT_TAGS = qw ();
-    $VERSION     = "1.11";
+    $VERSION     = "1.14";
 }
 
 ############################

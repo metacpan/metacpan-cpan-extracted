@@ -1,0 +1,62 @@
+{
+   "abstract" : "A drop-in replacement for Authen::Captcha",
+   "author" : [
+      "Jerilyn Franz <cpan@jerilyn.info>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GD-SecurityImage-AC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "GD::SecurityImage" : "1.60",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "GD::SecurityImage" : "1.60",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "GD::SecurityImage::AC" : {
+         "file" : "lib/GD/SecurityImage/AC.pm",
+         "version" : "1.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JerilynFranz/perl-GD-SecurityImage-AC/issues"
+      },
+      "homepage" : "https://github.com/JerilynFranz/perl-GD-SecurityImage-AC",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JerilynFranz/perl-GD-SecurityImage-AC.git",
+         "web" : "https://github.com/JerilynFranz/perl-GD-SecurityImage-AC"
+      }
+   },
+   "version" : "1.12",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

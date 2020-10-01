@@ -1,0 +1,78 @@
+{
+   "abstract" : "Mojo::IOLoop adapter for RxPerl",
+   "author" : [
+      "KARJALA <karjala@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RxPerl-Mojo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::IOLoop" : "0",
+            "RxPerl" : "v0.28.0",
+            "Sub::Util" : "1.41",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "RxPerl::Mojo" : {
+         "file" : "lib/RxPerl/Mojo.pm",
+         "version" : "v6.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/karjala/rxperl-mojo-for-perl/issues"
+      },
+      "homepage" : "https://gitlab.com/karjala/rxperl-mojo-for-perl",
+      "repository" : {
+         "url" : "git://gitlab.com/karjala/rxperl-mojo-for-perl.git",
+         "web" : "https://gitlab.com/karjala/rxperl-mojo-for-perl"
+      }
+   },
+   "version" : "v6.0.0",
+   "x_authority" : "cpan:KARJALA",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

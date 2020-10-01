@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013, 2018, 2019 Kevin Ryde
+# Copyright 2013, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 use Math::BigInt;
 use Test;
-plan tests => 1;
+plan tests => 3;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,6 +29,36 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::HIndexing;
+my $path = Math::PlanePath::HIndexing->new;
+
+
+#------------------------------------------------------------------------------
+# A334235 -- X coordinate
+
+MyOEIS::compare_values
+  (anum => 'A334235',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $x;
+     }
+     return \@got;
+   });
+
+# A334236 -- Y coordinate
+MyOEIS::compare_values
+  (anum => 'A334236',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 0; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       push @got, $y;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
@@ -38,7 +68,6 @@ MyOEIS::compare_values
   (anum => 'A097110',
    func => sub {
      my ($count) = @_;
-     my $path = Math::PlanePath::HIndexing->new;
      my @got;
      for (my $n = Math::BigInt->new(1); @got < $count; $n *= 2) {
        my ($x,$y) = $path->n_to_xy($n);

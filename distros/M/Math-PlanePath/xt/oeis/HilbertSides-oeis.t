@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -35,6 +35,8 @@ my $path  = Math::PlanePath::HilbertSides->new;
 #------------------------------------------------------------------------------
 # A000975 count segments on X axis to level k
 # = 10101010 binary
+
+# 10101010, 101010101, 1010101010
 
 MyOEIS::compare_values
   (anum => 'A000975',

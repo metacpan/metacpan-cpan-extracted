@@ -5,10 +5,11 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.075';
+our $VERSION   = '0.079';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
+use Type::Registry ();
 use Exporter::Tiny qw(mkopt);
 use Import::Into;
 use match::simple qw(match);
@@ -191,8 +192,12 @@ sub import {
 		
 		%methods = delete($opts{factory_package_can})->$_handle_list_add_nulls;
 		if ( my $p = $opts{'prefix'} ) {
-			$methods{qualify} ||= sub { $builder->qualify($_[1], $p) }
+			$methods{qualify} ||= sub { $builder->qualify_name($_[1], $p) }
 				unless exists &{$opts{'factory_package'}.'::qualify'};
+			$methods{get_class} ||= sub { shift; $builder->_get_class($p, @_) }
+				unless exists &{$opts{'factory_package'}.'::get_class'};
+			$methods{get_role} ||= sub { shift; $builder->_get_role($p, @_) }
+				unless exists &{$opts{'factory_package'}.'::get_role'};
 		}
 		$builder->$method_installer($opts{'factory_package'}, \%methods) if keys %methods;
 		
@@ -249,7 +254,7 @@ sub munge_options {
 	my $builder = shift;
 	my ($opts) = @_;
 	for my $key (sort keys %$opts) {
-		if ($key =~ /^(class|role|class_generator|role_generator):([^:].*)$/) {
+		if ($key =~ /^(class|role|class_generator|role_generator):((?:::)?[^:].*)$/) {
 			my ($kind, $pkg) = ($1, $2);
 			my $val = delete $opts->{$key};
 			if (ref $val) {
@@ -315,6 +320,68 @@ sub type_name {
 	$stub =~ s/^(main)?::// while $stub =~ /^(main)?::/;
 	$stub =~ s/::/_/g;
 	$stub;
+}
+
+sub _helper_for_get_class {
+	my $me  = shift;
+	my $pfx = shift;
+	
+	my @packages;
+	while ( @_ ) {
+		my $qname = $me->qualify_name( shift, $pfx );
+		push @packages, (
+			ref($_[0]) ? $qname->generate_package( shift->$_handle_list ) : $qname
+		);
+	}
+	
+	return @packages;
+}
+
+my %_anony_counter;
+sub _get_class {
+	my $me = shift;
+	my ($pfx) = @_;
+	my ($class, @roles) = $me->_helper_for_get_class( @_ );
+	
+	return make_absolute_package_name($class) unless @roles;
+	
+	no warnings qw( uninitialized numeric );
+	
+	my $new_class = $class->can('with_traits')
+		? $class->with_traits( @roles )
+		: $me->make_class(
+			make_absolute_package_name(
+				sprintf('%s::__WITH_TRAITS__::__GEN%06d__', $class, ++$_anony_counter{$class})
+			),
+			extends => make_absolute_package_name($class),
+			with    => [ map make_absolute_package_name($_), @roles ],
+			prefix  => do { no strict 'refs'; ${"$class\::PREFIX"} }  || $pfx,
+			factory => $class->FACTORY,
+			toolkit => do { no strict 'refs'; ${"$class\::TOOLKIT"} } || 'Moo',
+		);
+	
+	return make_absolute_package_name($new_class);
+}
+
+sub _get_role {
+	my $me = shift;
+	my ($pfx) = @_;
+	my (@roles) = $me->_helper_for_get_class( @_ );
+	
+	return make_absolute_package_name($roles[0]) if @roles==1;
+	
+	no warnings qw( uninitialized numeric );
+	
+	my $new_role = $me->make_role(
+		make_absolute_package_name(
+			sprintf('%s::__WITH_TRAITS__::__GEN%06d__', $roles[0], ++$_anony_counter{$roles[0]})
+		),
+		with    => [ map make_absolute_package_name($_), @roles ],
+		prefix  => do { no strict 'refs'; ${$roles[0]."::PREFIX"} }  || $pfx,
+		toolkit => do { no strict 'refs'; ${$roles[0]."::TOOLKIT"} } || 'Moo',
+	);
+	
+	return make_absolute_package_name($new_role);
 }
 
 sub croak {
@@ -851,7 +918,9 @@ sub _make_package {
 	else {
 		if ($toolkit eq 'Moose' && !$opts{'mutable'}) {
 			require Moose::Util;
-			Moose::Util::find_meta($qname)->make_immutable;
+			my %args = %{ $opts{'definition_context'} or {} };
+			delete $args{'package'};
+			Moose::Util::find_meta($qname)->make_immutable(%args);
 		}
 		
 		if ($toolkit eq 'Moo' && eval { require MooX::XSConstructor }) {
@@ -1177,7 +1246,7 @@ sub generate_package {
 	my %opts;
 	for my $key (qw/ extends with has can constant around before after
 		toolkit version authority mutable begin end requires import overload
-		before_apply after_apply multimethod /) {
+		before_apply after_apply multimethod definition_context /) {
 		if (exists $local_opts{$key}) {
 			$opts{$key} = delete $local_opts{$key};
 		}
@@ -1188,8 +1257,9 @@ sub generate_package {
 	}
 	
 	# must not generate types or factory methods
-	$opts{factory}   = undef;
-	$opts{type_name} = undef;
+	$opts{factory}      = undef;
+	$opts{multifactory} = undef;
+	$opts{type_name}    = undef;
 	
 	$_generate_counter{$generator_package} = 0 unless exists $_generate_counter{$generator_package};
 	my $qname = sprintf('%s::__GEN%06d__', $generator_package, ++$_generate_counter{$generator_package});
@@ -1347,7 +1417,7 @@ sub install_attributes {
 		if ($spec{is} eq 'lazy') {
 			$spec{is}   = 'ro';
 			$spec{lazy} = !!1;
-			$spec{builder} ||= $buildername;
+			$spec{builder} ||= $buildername unless exists $spec{default};
 		}
 		elsif ($spec{is} eq 'private') {
 			$spec{is}   = 'rw';
@@ -1523,7 +1593,9 @@ sub make_attribute_mouse {
 		$builder->_process_enum_mouse(@_);
 	}
 	require Mouse::Util;
-	(Mouse::Util::find_meta($class) or $class->meta)->add_attribute($attribute, %$spec);
+	my %spec = %$spec;
+	delete $spec{definition_context};
+	(Mouse::Util::find_meta($class) or $class->meta)->add_attribute($attribute, %spec);
 }
 
 sub _process_enum_mouse {
@@ -1702,7 +1774,7 @@ sub install_methods {
 	
 	for my $name (sort keys %$methods) {
 		no strict 'refs';
-		my ($code, $signature, $signature_style, $invocant_count, $is_coderef, $caller, $attrs, @curry);
+		my ($code, $signature, $signature_style, $invocant_count, $is_coderef, $caller, $attrs, @curry, $ctx);
 		$caller = $class;
 		
 		if (is_CodeRef($methods->{$name})) {
@@ -1720,6 +1792,7 @@ sub install_methods {
 				: ($methods->{$name}{named} ? 'named' : 'positional');
 			$is_coderef = !!$methods->{$name}{lexical};
 			$caller     = $methods->{$name}{caller};
+			$ctx = $methods->{$name}{'definition_context'};
 		}
 		
 		if ($signature) {
@@ -1749,20 +1822,26 @@ sub install_methods {
 		my $attrs_string = $is_coderef ? "" : ":method";
 		$attrs_string .= " :lvalue" if match("lvalue", $attrs);
 		
+		my $magic_comment = '';
+		if ($ctx) {
+			$magic_comment = sprintf("#line %d \"%s\"\n", $ctx->{line}, $ctx->{file});
+		}
+		
 		no warnings 'printf';
 		my $subcode = sprintf(
-			q{
-				package %-49s  # package name
-				%-49s          # my $check variable to close over
-				sub %-49s      # method name
-				{
-					%-49s          # strip @invocants from @_ if necessary
-					%-49s          # build $check
-					%-49s          # reassemble @_ from @invocants, @curry, and &$check
-					%-49s          # run sub code
-				};
-				%s
-			},
+			q{%s} .              # magic comment
+			q{package %-49s} .   # package name
+			q{%-49s} .           # my $check variable to close over
+			q{sub %-49s} .       # method name
+			q[{] .
+			q{%-49s} .           # strip @invocants from @_ if necessary
+			q{%-49s} .           # build $check
+			q{%-49s} .           # reassemble @_ from @invocants, @curry, and &$check
+			q{%-49s} .           # run sub code
+			q[};] .
+			q[%s]                # 1;
+			,
+			$magic_comment,
 			"$class;",
 			(($signature && !$optimized)
 				? 'my $check;'
@@ -2191,7 +2270,17 @@ names.
   MyApp::Cow->FACTORY->qualify('Pig')     # 'MyApp::Pig'
   MyApp::Cow->FACTORY->qualify('::Pig')   # 'Pig'
 
-The factpry package will have a global variable C<< %PACKAGES >> where the
+There will also be C<get_role> and C<get_class> methods:
+
+  my $Clever = MyApp->get_role( 'Clever' );
+  my $Brave  = MyApp->get_role( 'Brave' );
+  my $Pig    = MyApp->get_class( 'Pig', $Clever, $Brave );
+  my $wilbur = $Pig->new( name => 'Wilbur' );
+
+Class generators and role generators are also allowed; just follow the name
+with an arrayref of parameters.
+
+The factory package will have a global variable C<< %PACKAGES >> where the
 keys are names of all the packages MooX::Press created for you, and the values
 are what kind of package they are:
 

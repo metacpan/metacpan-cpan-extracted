@@ -1,4 +1,4 @@
-# Copyright 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION';
-$VERSION = 127;
+$VERSION = 128;
 
 use constant dx_minimum => -1; # NSEW straight only
 use constant dx_maximum => 1;
@@ -34,10 +34,11 @@ use constant ddiffxy_minimum => -1;
 use constant ddiffxy_maximum => 1;
 use constant dir_maximum_dxdy => (0,-1); # South
 
+use constant 1.02;
 use constant _UNDOCUMENTED__dxdy_list => (1,0,   # E
-                           0,1,   # N
-                           -1,0,  # W
-                           0,-1); # S
+                                          0,1,   # N
+                                          -1,0,  # W
+                                          0,-1); # S
 
 1;
 __END__
@@ -94,7 +95,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

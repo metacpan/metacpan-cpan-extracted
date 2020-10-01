@@ -32,9 +32,13 @@ AO:
 AR:
     A: Salta
     B: Buenos Aires
-    C: Ciudad Autónoma de Buenos Aires
+    C:
+      default: Ciudad Autónoma de Buenos Aires
+      alt_en: Autonomous City of Buenos Aires      
     D: San Luis
-    E: Entre Ríos
+    E:
+      default: Entre Ríos
+      alt_en: Entre Ríos Province
     F: La Rioja
     G: Santiago del Estero
     H: Chaco
@@ -44,16 +48,24 @@ AR:
     M: Mendoza
     N: Misiones
     P: Formosa
-    Q: Neuquén
-    R: Río Negro
+    Q:
+      default: Neuquén
+      alt_en: Neuquén Province
+    R:
+      default: Río Negro
+      alt_en: Río Negro Province
     S: Santa Fe
     T: Tucumán
     U: Chubut
-    V: Tierra del Fuego
+    V:
+      default: Tierra del Fuego
+      alt_en: Tierra del Fuego Province
     W: Corrientes
     X: Córdoba
     Y: Jujuy
-    Z: Santa Cruz
+    Z:
+      default: Santa Cruz
+      alt_en: Santa Cruz Province
 AU:
     # https://en.wikipedia.org/wiki/States_and_territories_of_Australia
     AAT: Australian Antarctic Territory
@@ -151,17 +163,21 @@ BA:
     BRC: Brčko distrikt
     SRP: Republika Srpska    
 BE:
-    BRU: Bruxelles-Capitale
-    VAN: Antwerpen
-    VBR: Vlaams Brabant
-    VLI: Limburg
-    VOV: Oost-Vlaanderen
-    VWV: West-Vlaanderen
-    WBR: Brabant wallon
-    WHT: Hainaut
-    WLG: Liège
-    WLX: Luxembourg
-    WNA: Namur
+    BRU:
+      default: Bruxelles-Capitale
+      alt_de: Brüssel-Hauptstadt      
+      alt_en: Brussels-Capital
+      alt_nl: Brussels Hoofdstedelijk Gewest
+    VLG:
+      default: Vlaanderen
+      alt_de: Flandern
+      alt_en: Flanders
+      alt_fr: Flandre
+    WAL:
+      default: Wallonie
+      alt_de: Wallonien
+      alt_en: Wallonia
+      alt_nl: Wallonië
 BF:
     BAL: Balé
     BAM: Bam
@@ -302,7 +318,7 @@ BW:
     SP: Selibe Phikwe
     ST: Sowa Town
 BZ:
-    BZ: Belize
+    BZ: Belize District
     CY: Cayo
     CZL: Corozal
     OW: Orange Walk
@@ -310,16 +326,30 @@ BZ:
     TOL: Toledo
 CA:
     AB: Alberta
-    BC: British Columbia
+    BC:
+      default: British Columbia
+      alt_fr: Colombie-Britannique
     MB: Manitoba
-    NB: New Brunswick
-    NL: Newfoundland and Labrador
-    NT: Northwest Territories
-    NS: Nova Scotia
+    NB:
+      default: New Brunswick
+      alt_fr: Nouveau-Brunswick
+    NL:
+      default: Newfoundland and Labrador
+      alt_fr: Terre-Neuve-et-Labrador
+    NT:
+      default: Northwest Territories
+      alt_fr: Territoires du Nord-Ouest
+    NS:
+      default: Nova Scotia
+      alt_fr: Nouvelle-Écosse
     NU: Nunavut
     "ON": Ontario
-    PE: Prince Edward Island
-    QC: Quebec
+    PE:
+      default: Prince Edward Island
+      alt_fr: Île-du-Prince-Édouard
+    QC:
+      default: Quebec
+      alt_fr: Québec
     SK: Saskatchewan
     YT: Yukon
 CD:
@@ -368,32 +398,108 @@ CF:
     UK: Ouaka
     VK: Vakaga
 CH:
-    AG: Aargau
-    AI: Appenzell Innerrhoden
-    AR: Appenzell Ausserrhoden
-    BE: Bern
-    BL: Basel-Landschaft
-    BS: Basel-Stadt
-    FR: Fribourg
-    GE: Genève
-    GL: Glarus
-    GR: Graubünden
-    JU: Jura
-    LU: Luzern
-    NE: Neuchâtel
-    NW: Nidwalden
-    OW: Obwalden
-    SG: Sankt Gallen
-    SH: Schaffhausen
-    SO: Solothurn
-    SZ: Schwyz
-    TG: Thurgau
-    TI: Ticino
+    AG:
+      default: Aargau
+      alt_fr: Argovie
+      alt_it: Argovia
+    AI:
+      default: Appenzell Innerrhoden
+      alt_fr: Appenzell Rhodes-Intérieures
+      alt_it: Appenzello Interno
+    AR: 
+      default: Appenzell Ausserrhoden
+      alt_fr: Appenzell Rhodes-Extérieures
+      alt_it: Appenzello Esterno
+    BE:
+      default: Bern
+      alt_fr: Berne
+      alt_it: Berna
+    BL: 
+      default: Basel-Landschaft
+      alt_fr: Bâle-Campagne
+      alt_it: Basilea Campagna
+    BS:
+      default: Basel-Stadt
+      alt_en: Basel-City
+      alt_fr: Bâle-Ville
+      alt_it: Basilea Città   
+    FR: 
+      default: Fribourg
+      alt_de: Freiburg
+      alt_it: Friburgo
+    GE: 
+      default: Geneva
+      alt_de: Genf
+      alt_fr: Genève
+      alt_it: Ginevra
+    GL:
+      default: Glarus
+      alt_fr: Glaris
+      alt_it: Glarona
+    GR: 
+      default: Graubünden
+      alt_en: Grisons
+      alt_fr: Grisons
+      alt_it: Grigioni
+    JU:
+      default: Jura
+      alt_it: Giura
+    LU: 
+      default: Luzern
+      alt_fr: Lucerne
+      alt_it: Lucerna
+    NE: 
+      default: Neuchâtel
+      alt_de: Neuenburg
+    NW: 
+      default: Nidwalden
+      alt_fr: Nidwald
+      alt_it: Nidvaldo
+    OW:
+      default: Obwalden
+      alt_fr: Obwald
+      alt_it: Obvaldo   
+    SG:
+      default: Sankt Gallen
+      alt_fr: Saint-Gall
+      alt_it: San Gallo
+    SH:
+      default: Schaffhausen
+      alt_fr: Schaffhouse
+      alt_it: Sciaffusa   
+    SO:
+      default: Solothurn
+      alt_fr: Soleure
+      alt_it: Soletta
+    SZ:
+      default: Schwyz
+      alt_it: Svitto
+    TG:
+      default: Thurgau
+      alt_fr: Thurgovie
+      alt_it: Turgovia
+    TI:
+      default: Ticino
+      alt_de: Tessin
+      alt_fr: Tessin
     UR: Uri
-    VD: Vaud
-    VS: Valais
-    ZG: Zug
-    ZH: Zürich
+    VD:
+      default: Vaud
+      alt_de: Waadt
+    VS:
+      default: Valais/Wallis
+      alt_de: Wallis
+      alt_fr: Valais
+      alt_it: Vallese
+    ZG:
+      default: Zug
+      alt_fr: Zoug
+      alt_it: Zugo
+    ZH:
+      default: Zürich
+      alt_en: Zurich      
+      alt_fr: Zurich
+      alt_fr: Zurigo      
 CI:    
     AB: Abidjan
     BS: Bas-Sassandra
@@ -509,17 +615,31 @@ DE:
       default: Bayern
       alt_en: Bavaria
     HB: Bremen
-    HE: Hessen
+    HE:
+      default: Hessen
+      alt_en: Hesse
     HH: Hamburg
     MV: Mecklenburg-Vorpommern
-    NI: Niedersachsen
-    NW: Nordrhein-Westfalen
-    RP: Rheinland-Pfalz
+    NI:
+      default: Niedersachsen
+      alt_en: Lower Saxony
+    NW:
+      default: Nordrhein-Westfalen
+      alt_en: North Rhine-Westphalia
+    RP:
+      default: Rheinland-Pfalz
+      alt_en: Rhineland-Palatinate
     SH: Schleswig-Holstein
     SL: Saarland
-    SN: Sachsen
-    ST: Sachsen-Anhalt
-    TH: Thüringen
+    SN:
+      default: Sachsen
+      alt_en: Saxony      
+    ST:
+      default: Sachsen-Anhalt
+      alt_en: Saxony-Anhalt
+    TH:
+      default: Thüringen
+      alt_en: Thuringia
 DJ:
     AR: Arta
     AS: Ali Sabieh
@@ -553,28 +673,51 @@ EC:
     Y: Pastaza
     Z: Zamora Chinchipe
 ES:
-    AN : Andalucía
-    AR : Aragón
+    AN :
+      default: Andalucía
+      alt_en:  Andalusia      
+    AR : 
+      default: Aragón
+      alt_en: Aragon    
     AS : Asturias
     CB : Cantabria
     CE : Ceuta
-    CL : Castilla y León
-    CM : Castilla-La Mancha
-    CN : Canarias
+    CL : 
+      default: Castilla y León
+      alt_en: Castile and León
+    CM :
+      default: Castilla-La Mancha
+      alt_en: Castile-La Mancha
+    CN :
+      default: Canarias
+      alt_en: Canary Islands   
     CT :
       default: Cataluña
       alt_ca: Catalunya
       alt_en: Catalonia
     EX : Extremadura
     GA : Galicia
-    IB : Islas Baleares
-    MC : Región de Murcia
-    MD : Comunidad de Madrid
+    IB :
+      default: Islas Baleares
+      alt_en: Balearic Islands    
+    MC :
+      default: Región de Murcia
+      alt_en: Region of Murcia
+    MD :
+      default: Comunidad de Madrid
+      alt_en: Community of Madrid
     ML : Melilla
     NC : Navarra
-    PV : País Vasco
-    RI : La Rioja
-    VC : Comunidad Valenciana
+    PV :
+      default: País Vasco
+      alt_en: Autonomous Community of the Basque Country
+      alt_eu: Euskadi
+    RI :
+      default: La Rioja
+      alt_en: Rioja
+    VC :
+      default: Comunidad Valenciana
+      alt_en: Valencian Community
 FM:
     KSA: Kosrae
     PNI: Pohnpei
@@ -583,18 +726,30 @@ FM:
 FR:
     ARA: Auvergne-Rhône-Alpes
     BFC: Bourgogne-Franche-Comté
-    BRE: Bretagne
+    BRE:
+      default: Bretagne
+      alt_en: Brittany 
     CVL: Centre-Val de Loire
-    COR: Corse
+    COR:
+      default: Corse
+      alt_en: Corsica
     GES: Grand Est
     GF: Guyane
     GP: Guadeloupe
     HDF: Hauts-de-France
-    IDF: Île-de-France
+    IDF:
+      default: Île-de-France
+      alt_en: Ile-de-France
     MQ: Martinique
-    NOR: Normandie
-    NAQ: Nouvelle-Aquitaine
-    OCC: Occitanie
+    NOR:
+      default: Normandie
+      alt_en: Normandy
+    NAQ:
+      default: Nouvelle-Aquitaine
+      alt_en: New Aquitaine
+    OCC:
+      default: Occitanie
+      alt_en: Occitania
     PDL: Pays de la Loire
     PAC: Provence-Alpes-Côte d'Azur
     RE: La Réunion
@@ -846,7 +1001,10 @@ IT:
     SAR: Sardegna
     SIC: Sicilia
     TOS: Toscana
-    TRE: Trentino-Alto Adige
+    TRE:
+      default: Trentino-Alto Adige/Südtirol
+      alt_de: Trentino-Südtirol
+      alt_it: Trentino-Alto Adige
     UMB: Umbria
     VAL: Valle d'Aosta
     VEN: Veneto
@@ -885,19 +1043,6 @@ LS:
     H: Qacha's Nek
     J: Mokhotlong
     K: Thaba-Tseka
-LU:
-    CA: Capellen
-    CL: Clervaux
-    DI: Diekirch
-    EC: Echternach
-    ES: Esch-sur-Alzette
-    GR: Gréivemaacher
-    LU: Luxembourg
-    ME: Mersch
-    RD: Redange
-    RM: Remich
-    VD: Vianden
-    WI: Wiltz
 MD:
     AN: Anenii Noi
     BA: Bălţi
@@ -950,7 +1095,9 @@ MX:
     CAM: Campeche
     CHH: Chihuahua
     CHP: Chiapas
-    CMX: Ciudad de México
+    CMX:
+      default: Ciudad de México
+      alt_en: Mexico City
     COA: Coahuila de Zaragoza
     COL: Colima
     DUR: Durango
@@ -959,7 +1106,9 @@ MX:
     HID: Hidalgo
     JAL: Jalisco
     MEX: México
-    MIC: Michoacán de Ocampo
+    MIC:
+      default: Michoacán de Ocampo
+      alt_en: Michoacán
     MOR: Morelos
     NAY: Nayarit
     NLE: Nuevo León
@@ -973,7 +1122,9 @@ MX:
     TAB: Tabasco
     TAM: Tamaulipas
     TLA: Tlaxcala
-    VER: Veracruz de Ignacio de la Llave
+    VER:
+      default: Veracruz de Ignacio de la Llave
+      alt_en: Veracruz
     YUC: Yucatán
     ZAC: Zacatecas
 MZ:
@@ -1066,12 +1217,18 @@ NL:
     GE: Gelderland
     GR: Groningen
     LI: Limburg
-    NB: Noord-Brabant
-    NH: Noord-Holland
+    NB:
+      default: Noord-Brabant
+      alt_en: North Brabant
+    NH:
+      default: Noord-Holland
+      alt_en: North Holland
     OV: Overijssel
     UT: Utrecht
     ZE: Zeeland
-    ZH: Zuid-Holland
+    ZH:
+      default: Zuid-Holland
+      alt_en: South Holland
 NZ:
     AUK: Auckland
     BOP: Bay of Plenty
@@ -1329,20 +1486,20 @@ SS:
     UY: Unity
     WR: Warrap
 SV:
-    AH: Ahuachapán
-    CA: Cabañas
-    CH: Chalatenango
-    CU: Cuscatlán
+    AH: Departamento de Ahuachapán
+    CA: Departamento de Cabañas
+    CH: Departamento de Chalatenango
+    CU: Departamento de Cuscatlán
     LI: La Libertad
-    MO: Morazán
-    PA: La Paz
-    SA: Santa Ana
-    SM: San Miguel
-    SO: Sonsonate
-    SS: San Salvador
+    MO: Departamento de Morazán
+    PA: Departamento de La Paz
+    SA: Departamento de Santa Ana
+    SM: Departamento de San Miguel
+    SO: Departamento de Sonsonate
+    SS: Departamento de San Salvador
     SV: San Vicente
-    UN: La Unión
-    US: Usulután
+    UN: Departamento de La Unión
+    US: Departamento de Usulután
 TD:
     BA: Batha
     BG: Baḩr al Ghazāl
@@ -1508,7 +1665,7 @@ VE:
     U: Yaracuy
     V: Zulia
     W: Dependencias Federales
-    X: vargas
+    X: La Guaira
     Y: Delta Amacuro
     Z: Amazonas    
 ZA:

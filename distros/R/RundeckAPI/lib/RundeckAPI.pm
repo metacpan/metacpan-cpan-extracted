@@ -44,7 +44,7 @@ our @EXPORT_OK = qw(get post put delete postFile putFile);
 ## CONSTANTS
 #####
 our $TIMEOUT = 10;
-our $VERSION = "1.2.4";
+our $VERSION = "1.2.6";
 #####
 ## VARIABLES
 #####
@@ -98,17 +98,22 @@ sub new {
 # if we have a token, use it
 	if (defined $self->{'token'}) {
 		$client->addHeader ("X-Rundeck-Auth-Token", $self->{'token'});
-		$client->GET("/api/11/tokens/$self->{'login'}");
+		$client->GET("/api/21/tokens/$self->{'login'}");
 # check if token match id, just to be sure
 		my $authJSON = $client->responseContent();
 		$rc = $client->responseCode ();
 		if ($rc-$rc%100 == 200) {
 			my $jHash = decode_json ($authJSON);
-			if ($jHash->[0]->{'user'} ne $self->{'login'}) {
-# should this really happen ?
-				$rc = 403;
-			}
-			else {
+			if (defined $jHash->[0]) {
+				if ($jHash->[0]->{'user'} ne $self->{'login'}) {
+	# should this really happen ?
+					$rc = 403;
+				}
+				else {
+					$rc = 200;
+				}
+			} else {
+	# empty hash, but res = OK
 				$rc = 200;
 			}
 		}

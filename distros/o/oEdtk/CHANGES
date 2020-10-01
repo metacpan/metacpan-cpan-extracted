@@ -1,0 +1,99 @@
+***************************************************************************
+***************************************************************************
+			- oEdtk -
+***************************************************************************
+***************************************************************************
+
+Release 1.5xxx
+
+- Config.pm
+Change the load lookup order for oedtk.ini file : looks prg directory, then in perl mod directory. 
+No change in the config file identification
+
+- DBAdmin.pm
+Use logger to track warning if set in config file oedtk.in
+Add insert_tData to insert tracking data from outside
+If mysql_local_infile detected, csv_import will automaticaly use to insert csv file directly
+Tracking table - Change : ed_singl_id 17=>25
+Tracking table - Add    : ED_OBJ_TYP (V3), ED_PARENT_ID (V32), ED_CHILD_ID (V32), ED_CHILD_TYP (V3)
+Lots table  - Change : ED_CPDEST (V8=>V10), ED_LOTNAME (V16=>V64)
+Index Table - Change : ED_CPDEST (V8=>V10), ED_LOTNAME (V16=>V64), ED_REFIDDOC (V25), ED_IDLDOC (V25)
+Index Table - Add : ED_WORKFLOW (V32), ED_CHANEL_OUT (V32), ED_COUNTRY (V5), ED_IDCONTRACT (V16), ED_IDPRODUCT (V8)
+Index Table - add ED_IDJOB into primary key
+
+- Tracking.pm
+Change WARN and DIE behaviour if requested in oedtk.ini to report events into tracking database
+Add track for entity account obj_typ child_typ child_id parent_id
+
+- Logger.pm
+Organise level as follow : 8 => '8-USER-', 7 => '7-DEBUG', 6 => '6-INFO-' , 5 => '5-PARSE' , 4 => '4-WARN-' , 3 => '3-ALERT' , 2 => '2-ALERT' , 1 => '1-ALERT' , 0 => '0-CRITC' , -1 => '-1 ERROR'
+
+
+
+
+HISTORY
+***************************************************************************
+Release 0.612x
+	contrôle d'exécution sur cgi
+	dictionnaire iso des codes pays
+	controle retour d'acquittement au façonnier pour vérification
+	foliotage technique dans le lotissement 	
+
+Release 0.6115
+	SGBD connexion retry (3 times)
+	correcting bug in FIFO configuration	
+
+Release 0.6000
+	ajout ed_host dans check ini
+	ALTER table edtk_index modify ED_SEQLOT VARCHAR2(7); => modifier les seqlot pour rajouter l'année '391123' => '1391123'
+	intégrer les contraintes de lotissement (ed_cpdest => ed_constraint (ex de val : "ED_CODRUPT = 'NOUVEL_ER'" ou "ED_CPDEST like '75%' and ED_CODRUPT = 'NOUVEL_ER'" ou "ED_HOST ='SRVPROD'" ))
+	nettoyer Main.pm => oEUser.pm
+	passer CodRupt sur 8 caractères 
+	regrouper les .tar dans le même repertoire de mep
+	reprise prévisu en fin de runEdtk.pl
+	gestion des arrondis oEdtk::Main::oe_round		
+
+Release 0.5000
+	LaTeX integration
+	Output management integration
+	Electronic Documents Management and Sharing integration
+
+Release 0.400
+	File configuration for developpements
+	Developpement application launcher
+	Integration of DSC Compuset launcher
+	Beta text user interface for developpements
+	Records methods for production
+	Excel file spliting
+	tracking module
+	Documentation
+
+Release 0.30
+	Optimized for production version.
+
+Release 0.21
+	Production test version.
+
+Release 0.10
+	Functionnal version.
+
+Release 0.01
+	Original beta version.
+
+
+COPYRIGHT AND LICENCE
+***************************************************************************
+These modules are under GNU GENERAL PUBLIC LICENSE (see COPYING file)
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+You can use these modules as you want without any warranty.
+
+You can contact us at edtk at free.fr 	
+reference site is cpan.org
+
+
+AUTHORS
+***************************************************************************
+D Aunay, G Chaillou Domingo, M Henrion, G Ballin 2005-2013
+
+

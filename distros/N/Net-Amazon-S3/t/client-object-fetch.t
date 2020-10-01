@@ -2,16 +2,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
-use Test::Deep;
-use Test::Warnings qw[ :no_end_test had_no_warnings ];
+use FindBin;
 
-use HTTP::Status;
+BEGIN { require "$FindBin::Bin/test-helper-s3-client.pl" }
 
-use Shared::Examples::Net::Amazon::S3::Client (
-    qw[ with_response_fixture ],
-    qw[ expect_client_object_fetch ],
-);
+plan tests => 6;
+
+use Shared::Examples::Net::Amazon::S3::Client qw[ expect_client_object_fetch ];
 
 expect_client_object_fetch 'fetch existing object' => (
     with_bucket             => 'some-bucket',
@@ -29,7 +26,7 @@ expect_client_object_fetch 'fetch existing object' => (
     expect_data             => 'some-value',
 );
 
-expect_client_object_fetch 'with error access denied' => (
+expect_client_object_fetch 'S3 error - Access Denied' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/some-key' },
@@ -37,7 +34,7 @@ expect_client_object_fetch 'with error access denied' => (
     throws                  => qr/^AccessDenied: Access denied error message/i,
 );
 
-expect_client_object_fetch 'with error no such bucket' => (
+expect_client_object_fetch 'S3 error - No Such Bucket' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/some-key' },
@@ -45,7 +42,7 @@ expect_client_object_fetch 'with error no such bucket' => (
     throws                  => qr/^NoSuchBucket: No such bucket error message/i,
 );
 
-expect_client_object_fetch 'with error no such object' => (
+expect_client_object_fetch 'S3 error - No Such Object' => (
     with_bucket             => 'some-bucket',
     with_key                => 'some-key',
     expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/some-key' },
@@ -53,4 +50,14 @@ expect_client_object_fetch 'with error no such object' => (
     throws                  => qr/^NoSuchKey: No such key error message/i,
 );
 
+expect_client_object_fetch 'HTTP error - 400 Bad Request' => (
+    with_bucket             => 'some-bucket',
+    with_key                => 'some-key',
+    expect_request          => { GET => 'https://some-bucket.s3.amazonaws.com/some-key' },
+    with_response_fixture ('error::http_bad_request'),
+    throws                  => qr/^400: Bad Request/,
+);
+
 had_no_warnings;
+
+done_testing;

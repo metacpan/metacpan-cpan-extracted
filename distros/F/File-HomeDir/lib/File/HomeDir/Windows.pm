@@ -14,7 +14,7 @@ use base "File::HomeDir::Driver";
 
 BEGIN
 {
-    $VERSION = '1.004';
+    $VERSION = '1.006';
 }
 
 sub CREATE () { 1 }
@@ -246,6 +246,8 @@ L<File::HomeDir>, L<File::HomeDir::Win32> (legacy)
 =head1 COPYRIGHT
 
 Copyright 2005 - 2011 Adam Kennedy.
+
+Copyright 2017 - 2020 Jens Rehsack
 
 Some parts copyright 2000 Sean M. Burke.
 

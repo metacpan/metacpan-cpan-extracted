@@ -3,6 +3,9 @@
 package Devel::FIXME::Rules::PerlFile;
 use base qw/Devel::FIXME/;
 
+use strict;
+use warnings;
+
 use Devel::FIXME qw/:constants/;
 
 my @rules;

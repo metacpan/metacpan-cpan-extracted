@@ -24,7 +24,7 @@ scriptx-eg-run-command - Run a command
 
 =head1 VERSION
 
-This document describes version 0.000001 of scriptx-eg-run-command (from Perl distribution ScriptX), released on 2020-09-03.
+This document describes version 0.000004 of scriptx-eg-run-command (from Perl distribution ScriptX), released on 2020-10-01.
 
 =head1 SYNOPSIS
 

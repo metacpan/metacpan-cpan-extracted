@@ -1,5 +1,26 @@
 Revision history for Perl extension App-findeps
 
+0.10 2020-09-29T06:04:22Z
+    - removed surplus files
+
+0.09 2020-09-28T12:14:18Z
+    - passed strict tests
+
+0.08 2020-09-26T23:27:30Z
+    - be faster with using Module::CoreList from using command `corelist`
+
+0.07 2020-09-26T09:28:38Z
+    - added around `if`
+
+0.06 2020-09-26T00:41:28Z
+    - fixed #2
+
+0.05 2020-09-25T13:24:24Z
+    - be strict for parsing with regex 
+
+0.04 2020-09-24T03:22:10Z
+    - try to fix a issue
+
 0.03 2020-09-21T10:54:00Z
     - improved Documents
 

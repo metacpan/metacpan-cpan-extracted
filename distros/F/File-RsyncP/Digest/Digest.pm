@@ -31,7 +31,7 @@
 #
 #========================================================================
 #
-# Version 0.74, released 17 Jan 2015.
+# Version 0.76, released 14 Sep 2020.
 #
 # See http://perlrsync.sourceforge.net.
 #
@@ -53,7 +53,7 @@ require AutoLoader;
 @EXPORT = qw(
 	
 );
-$VERSION = '0.74';
+$VERSION = '0.76';
 
 bootstrap File::RsyncP::Digest $VERSION;
 

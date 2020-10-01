@@ -2,7 +2,8 @@
 
 use Test2::V0;
 use File::Temp;
-use File::Slurper 'read_text';
+use Test::Lib;
+use My::Test;
 
 use IO::ReStoreFH;
 use IO::Handle;

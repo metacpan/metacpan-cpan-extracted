@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/PerlFuzzyTokenFinder.pm
+lib/App/PerlFuzzyTokenFinder/CLI.pm
+lib/App/PerlFuzzyTokenFinder/MatchedPosition.pm
+minil.toml
+script/perl-fuzzy-token-finder
+t/00_compile.t
+META.yml
+MANIFEST

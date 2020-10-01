@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,7 +23,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -483,9 +483,27 @@ Math::PlanePath::KochelCurve -- 3x3 self-similar R and F
 
 =head1 DESCRIPTION
 
-X<Haverkort, Herman>This is an integer version of the Kochel curve by Herman
-Haverkort.  It fills the first quadrant in a 3x3 self-similar pattern made
-from two base shapes.
+This is an integer version of the Kochel curve by
+
+=over
+
+Herman Haverkort, "Recursive Tilings and Space-Filling Curves with Little
+Fragmentation", Journal of Computational Geometry, volume 2, number 1, 2011,
+pages 92-127.
+
+L<http://jocg.org/index.php/jocg/article/view/68>,
+L<http://jocg.org/index.php/jocg/article/download/68/20>,
+L<http://arxiv.org/abs/1002.1843>
+
+L<http://alexandria.tue.nl/openaccess/Metis239505.pdf>
+(slides),
+L<http://www.win.tue.nl/~hermanh/stack/h-rtslf-eurocg2010-talk.pdf>
+(short form)
+
+=back
+
+It fills the first quadrant in a 3x3 self-similar pattern made from two base
+shapes.
 
 =cut
 
@@ -558,16 +576,15 @@ any N=9^k to N=8*9^k.
 =head2 Fractal
 
 The curve is conceived by Haverkort for filling a unit square by descending
-into ever-smaller replacements, like other space-filling curves.  For that
-the top-level can be any of the patterns.  To descend any of the shapes can
-be used for the start, but for the outward expanding version here the
-starting pattern must occur at the start of its next higher level, which
-means Rrev is the only choice as it's the only start in any of the three
-patterns.
+into ever-smaller replacements, similar to other space-filling curves.  For
+that, the top-level can be any of the patterns.  But for the outward
+expanding version here, the starting pattern must occur at the start of its
+next higher level, which means Rrev is the only choice as it's the only
+start in any of the three patterns.
 
-But all the patterns can be found in the path at any desired size.  For
-example the "1" part of Rrev is an F, which means F to a desired level can
-be found at
+All the patterns can be found in the path at any desired size.  For example
+the "1" part of Rrev is an F, which means F to a desired level can be found
+at
 
     NFstart = 1 * 9^level
     NFlast = NFstart + 9^level - 1
@@ -611,29 +628,13 @@ L<Math::PlanePath>,
 L<Math::PlanePath::PeanoCurve>,
 L<Math::PlanePath::WunderlichMeander>
 
-Herman Haverkort, "Recursive Tilings and Space-Filling Curves with Little
-Fragmentation", Journal of Computational Geometry, 2(1), 92-127, 2011.
-
-=over
-
-L<http://jocg.org/index.php/jocg/article/view/68>
-L<http://jocg.org/index.php/jocg/article/download/68/20>
-L<http://arxiv.org/abs/1002.1843>
-
-L<http://alexandria.tue.nl/openaccess/Metis239505.pdf>
-(slides)
-L<http://www.win.tue.nl/~hermanh/stack/h-rtslf-eurocg2010-talk.pdf>
-(short form)
-
-=back
-
 =head1 HOME PAGE
 
 L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

@@ -1,12 +1,28 @@
 Revision history for IO-ReStoreFH
 
-0.07      2020-09-03 22:21:17-04:00 America/New_York
+0.10      2020-09-29 15:49:27-04:00 America/New_York
+    * no changes
+
+
+0.09      2020-09-04 09:50:05-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+    * 2nd try to get tests to work on Windows.
+
+0.08      2020-09-04 09:50:05-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+    * updated tests failed on Windows because of CRLF problems
+
+0.07 : 2020-09-03 22:21:17-04:00 America/New_York
 
   [BUILD]
 
     * already building a Build.PL; don't also build Makefile.PL
 
-0.06      2020-09-03 22:21:17-04:00 America/New_York
+0.06 : 2020-09-03 22:21:17-04:00 America/New_York
 
   [BUILD]
 

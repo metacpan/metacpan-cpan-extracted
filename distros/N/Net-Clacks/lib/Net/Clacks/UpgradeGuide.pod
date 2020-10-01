@@ -152,6 +152,13 @@ Version 16 Server now croaks with a descriptive message if it encounters an inva
 
 This version does not introduce any incompatible changes.
 
+=head2 VERSION 17
+
+Version 17 Server has better checks for Net::Clacks::Client call arguments and croaks or carps where appropriate.
+
+This version does not introduce any incompatible changes but it will produce callback traces when called with missing arguments. Calling new() now
+croaks/dies when arguments are missing (as it should have from the beginning). 
+
 =head1 AUTHOR
 
 Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>

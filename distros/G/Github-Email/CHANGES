@@ -1,0 +1,295 @@
+==================================================
+Changes from 2019-10-02 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.1.0 at 2020-10-01 10:13:07 +0000
+------------------------------------------
+
+  Change: 35c15abda9f1c021ebce972b2bc79e569d838c4e
+  Author: Momozor <momozor4@gmail.com>
+  Date : 2020-10-01 18:12:13 +0000
+
+    Bump for 1.1.0 
+
+  Change: 7f292e1f1f38665bbf5308aa73c63589b77ee911
+  Author: Momozor <momozor4@gmail.com>
+  Date : 2020-09-29 13:40:18 +0000
+
+    Clean old function name 
+
+  Change: 4d60f3c20e4d3e8663f57d3cefdd1de0880fa5b9
+  Author: Momozor <momozor4@gmail.com>
+  Date : 2020-09-28 18:02:11 +0000
+
+    Bump to 0.5.0 
+
+  Change: 62b92da61563f75ffcd45a38c3d00703b151a9a8
+  Author: Momozor <momozor4@gmail.com>
+  Date : 2020-09-28 17:53:27 +0000
+
+    Fix tests 
+
+  Change: f6b68f7c8834217c682ae2016d88c138475d3493
+  Author: Momozor <momozor4@gmail.com>
+  Date : 2020-09-28 17:52:32 +0000
+
+    Fix xt 
+
+  Change: 9423bd333d0e2766a7ca6493b08772f277a1f300
+  Author: Momozor <momozor4@gmail.com>
+  Date : 2020-09-28 17:46:55 +0000
+
+    Ignore *.old files 
+
+  Change: 80ec269713222cda840feed8c1957840ded549ec
+  Author: Momozor <momozor4@gmail.com>
+  Date : 2020-09-28 17:04:01 +0000
+
+    Update to list proper emails 
+
+  Change: 9014d28df62f7c035d4bde50f738c7779e397590
+  Author: Momozor <skelic3@gmail.com>
+  Date : 2020-04-07 02:58:07 +0000
+
+    Remove redundant dependency
+
+    Getopt::Long::Descriptive is not being used anymore. Removing this
+    dependency from xt dependency check.
+
+    Purge at will. 
+
+  Change: 5af2103382ff2b72dda4e7d99e6d5183965625c3
+  Author: Momozor <skelic3@gmail.com>
+  Date : 2020-04-07 02:35:22 +0000
+
+    Update correct documentation
+
+    Yikes! How can I miss it. This Dist::Zilla setup depends on lib/*
+    documentation. README.pod in the root directory is the result
+    artifact, not the other way around. Anyway, this *should* fix the
+    documentation. 
+
+  Change: f7bccb08bf21f7a6dc92fe4e0fd70fd61cc7a35b
+  Author: Momozor <skelic3@gmail.com>
+  Date : 2020-04-07 02:26:47 +0000
+
+    Update README.pod CLI usage
+
+    Oops. I forgot to update the README.pod prior to v0.4.0. This should
+    fix it. 
+
+  Change: 71e2ae486333763107c8fc3a8a5b6a24a07616ae
+  Author: Momozor <skelic3@gmail.com>
+  Date : 2020-04-07 02:17:52 +0000
+
+    Simplify command-line usage
+
+    There is absolutely no need for -u and other flags options for such a
+    simple command-line program. --help is not so useful either. perldoc
+    github-email is much more descriptive and is expected to exists in
+    the user system if they can use this program.
+
+    I might supply a basic help option in the future, but for now it is
+    not necessary. 
+
+  Change: eb22ab0c065b0bf1f426c9ae7edd0c61f0f40658
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-08-31 11:47:42 +0000
+
+    change to v0.3.3 
+
+  Change: 69eec28e13ca6a18ef0ef6cb3659940c70396633
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-08-31 11:46:31 +0000
+
+    replaced say with print 
+
+  Change: dd18621ef8c15c47fc0031adc2cf4fcf6854a7c1
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-08-31 00:12:20 +0000
+
+    fixed missing binary program bug 
+
+  Change: 89954c04037243a8048103394690c1dd67af5c8f
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-08-31 00:07:52 +0000
+
+    emphasize bin/ for exes 
+
+  Change: ace882d064984edc7f6e6f8cccb7b52ffa9b1b70
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-08-31 00:05:30 +0000
+
+    organize tests and use only MakeMaker plugin 
+
+  Change: 8c26c307a883adb4f985fa7be30db2d0a0225dc9
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-23 22:38:11 +0000
+
+    Add test to use existing user. 
+
+  Change: 2c8b66bbde3091fd1c51bf2f82554155665d3e5a
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-23 22:37:43 +0000
+
+    Use confess(Carp) instead of plain die. 
+
+  Change: b0c30976d6ae42d0a20096026a2b255c86ba1b2a
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-20 22:24:51 +0000
+
+    Add pragma guard. 
+
+  Change: f68972d8a3e42affb33f8d1cf45f3ceb8f5c3e11
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-20 20:54:29 +0000
+
+    Updated documentation. 
+
+  Change: 044af77c33da9106fa17ff61e73bf357512d1ad8
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-20 20:52:49 +0000
+
+    Patch release contributed by @pali. 
+
+  Change: 240cb36620c21090ddbade5435191b83a790457e
+  Author: faraco <skelic2@yandex.com>
+  Date : 2018-01-20 20:50:00 +0000
+
+    Merge pull request #2 from pali/master
+
+    Do not depend on insecure module Email::Address 
+
+  Change: b7f052280d1c8ae97bdefc106ca3cbba4aea7213
+  Author: Pali <pali@cpan.org>
+  Date : 2018-01-20 12:34:31 +0000
+
+    Do not depend on insecure module Email::Address
+
+    Method Email::Address->parse is vulnerable to CVE-2015-7686 and also
+    does not parse list of email addresses correctly. This patch replace
+    searching for email addresses by proper JSON API decoding. 
+
+  Change: 11f405695590d38512fd18eb37b7c60ac6ab1fad
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 11:15:34 +0000
+
+    Minor update.
+
+    - Change project license to use MIT. - Better command line handling.
+    - Tidy up. 
+
+  Change: 0286ecae2169fb0b42a2386c39483b922a310c8b
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-21 19:52:33 +0000
+
+    Remove external changelog. 
+
+  Change: 82f0ca9277758786be201b09e0324fd6eb32292c
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-21 16:24:20 +0000
+
+    Update test. 
+
+  Change: f74ce7c7295e0711bd4b7dc9623c6bbeadbb3c97
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-18 22:08:32 +0000
+
+    Minor update. 
+
+  Change: d2b11c61b2ffd2f0e10da60e6bafa873e99f19c6
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-18 21:31:17 +0000
+
+    Add new prototype. 
+
+  Change: 24ef56ade8ed998e07b5bfa6d1fbc5677e6385ce
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-12-18 00:04:25 +0000
+
+    Add prototype. 
+
+  Change: eefbcf38f14e894ceaf3124b802ea4ea94150c0c
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-05-19 13:03:11 +0000
+
+    - added Modern::Perl module 
+
+  Change: 9e2e49c4685c74d31d3dea4ef59db3fd45d7b8bc
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-16 01:34:33 +0000
+
+    commited 
+
+  Change: a2a60c787424967450a949278327ea853dde9d57
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-05 19:17:42 +0000
+
+    v0.0.5
+
+    Updated documentation 
+
+  Change: dab20c117aa4fecfdfc8e6a68cfb86308e7668e3
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-03-11 18:43:58 +0000
+
+    0.0.4
+
+    Updated bin/github-email 
+
+  Change: 54ac05566ac0caf0f2ee42f1f035d6d14252bcd5
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-17 01:37:41 +0000
+
+    v0.0.3 
+
+  Change: 9bcef25b5d7497547cfdcf39793cbab38d874cae
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-16 20:56:13 +0000
+
+    v0.0.2 
+
+  Change: 0a8a5d1c124f87733a0d42b2ed2adae929526caa
+  Author: faraco <skelic2@yandex.com>
+  Date : 2017-01-16 20:49:44 +0000
+
+    Merge pull request #1 from manwar/fix-cpants-issues
+
+    Fix cpants issues 
+
+  Change: af1ad54a550cae3aab887d7a49c8f026a18ba072
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-01-16 12:02:46 +0000
+
+    Add MIN_PERL_VERSION using dzil plugin [MininmumPerlFast]. 
+
+  Change: c5c1f825be7357d5900abbbbfa2558459466c30b
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-01-16 12:01:21 +0000
+
+    Auto generate META.json using dzil plugin [MetaJSON] 
+
+  Change: 621c0b1391dc9ee7f71ee16be9ae67efe86c137c
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-16 16:02:51 +0000
+
+    v0.0.1
+
+    - First release 
+
+  Change: 5835eb9831de80c239f4e91b2e3e8f6397caf0fb
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-16 16:01:43 +0000
+
+    First release 
+
+  Change: eb36527afc1aa83df297dfd6853c63622b467e18
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-16 16:01:01 +0000
+
+    v0.0.1 
+
+================
+End of releases.
+================

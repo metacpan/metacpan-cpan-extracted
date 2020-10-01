@@ -571,6 +571,10 @@ END {}
 
 # puis, ou bien positionnez la variable d'environnement PERL5LIB avant de lancer les scripts utilisant ces modules/bibliothèques (voir la page de manuel perlrun), ou bien utilisez :
 #    use lib '/mydir/perl/lib';
+#
+# si on ne connait pas le répertoire à l'avance...
+#    use FindBin qw($Bin);
+#    use lib "$Bin/myPm";
 
 # =end comment
 

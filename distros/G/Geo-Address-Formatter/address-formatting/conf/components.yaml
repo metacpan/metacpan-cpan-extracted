@@ -7,6 +7,7 @@ name: house
 aliases:
     - building
     - public_building
+    - isolated_dwelling
 ---
 name: road
 aliases:
@@ -33,11 +34,15 @@ aliases:
     - city_district
     - district
     - quarter
+    - city_block
     - residential
     - commercial
     - industrial
     - houses
     - subdivision
+    - allotments
+---
+name: postal_city    
 ---
 name: city
 aliases:
@@ -52,6 +57,8 @@ aliases:
 name: state_district
 ---
 name: postcode
+aliases:
+    - partial_postcode
 ---
 name: state
 aliases:

@@ -20,7 +20,7 @@ configure_requires:
   Path::Tiny: '0'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/perlwasm/Alien-wasmtime/issues
   homepage: https://metacpan.org/pod/Alien::wasmtime
   repository: git://github.com/perlwasm/Alien-wasmtime.git
-version: '0.12'
+version: '0.14'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
   requires:

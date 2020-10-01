@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,7 +32,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 
 # inherit: new(), rect_to_n_range(), arms_count(), n_start(),
 #          parameter_info_array(), xy_is_visited()
@@ -81,7 +81,7 @@ use Math::PlanePath::Base::Digits
 # must override base Math::PlanePath::QuintetCentres
 sub _UNDOCUMENTED__turn_any_straight_at_n {
   my ($self) = @_;
-  # arms=1   4    only first arm has origin 0    
+  # arms=1   4    only first arm has origin 0
   # arms=2   7
   # arms=3  10
   # arms=4  13
@@ -292,7 +292,7 @@ sub n_to_level {
 
     $n += $self->{'arms'}-1;  # division rounding up
     _divrem_mutate ($n, $self->{'arms'});
-    if ($n < 1) { return undef; }
+    if ($n < 1 || is_infinite($n)) { return undef; }
 
     my $any_low_zeros;
     my $low;
@@ -335,7 +335,15 @@ Math::PlanePath::QuintetCurve -- self-similar "plus" shaped curve
 =head1 DESCRIPTION
 
 This path is Mandelbrot's "quartet" trace of spiralling self-similar "+"
-shape,
+shape.
+
+=over
+
+Benoit B. Mandelbrot, "The Fractal Geometry of Nature", W. H. Freeman and
+Co., 1983, ISBN 0-7167-1186-9, section 7, "Harnessing the Peano Monster
+Curves", pages 72-73.
+
+=back
 
             125--...                 93--92                      11
               |                       |   |
@@ -368,12 +376,6 @@ shape,
       ^
      X=0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 ...
 
-As per
-
-    Benoit B. Mandelbrot, "The Fractal Geometry of Nature", W. H. Freeman
-    and Co., 1983, ISBN 0-7167-1186-9, section 7, "Harnessing the Peano
-    Monster Curves", pages 72-73.
-
 Mandelbrot calls this a "quartet", taken as 4 parts around a further middle
 part (like 4 players around a table).  The module name "quintet" here is a
 mistake, though it does suggest the base-5 nature of the curve.
@@ -391,14 +393,14 @@ The base figure is the initial N=0 to N=5.
 It corresponds to a traversal of the following "+" shape,
 
          .... 5
-         .    |
+         .    ^
          .   <|
               |
-    0----1 .. 4 ....
-      v  |    |    .
+    0--->1 .. 4 ....
+      v  ^    |    .
     .    |>   |>   .
-    .    |    |    .
-    .... 2----3 ....
+    .    |    v    .
+    .... 2--->3 ....
          . v  .
          .    .
          .    .
@@ -407,8 +409,9 @@ It corresponds to a traversal of the following "+" shape,
 The "v" and ">" notches are the side the figure is directed at the higher
 replications.  The 0, 2 and 3 sub-curves are the right hand side of the line
 and are a plain repetition of the base figure.  The 1 and 4 parts are to the
-left and are a reversal.  The first such reversal is seen in the sample
-above as N=5 to N=10.
+left and are a reversal (rotate the base figure 180 degrees).  The first
+such reversal is seen in the sample above as N=5 to N=10.
+
         .....
         .   .
 
@@ -472,19 +475,20 @@ are rotated copies of it.
         ...                     67--71
 
 The curve is essentially an ever expanding "+" shape with one corner at the
-origin.  Four such shapes pack as follows,
+origin.  Four such shapes pack as follows.  O is the origin and each * is
+the end of the part on its right.
 
                 +---+
                 |   |
-        +---@---    +---+
+        +---*---    +---+
         |   |     B     |
-    +---+   +---+   +---@
+    +---+   +---+   +---*
     |     C     |   |   |
     +---+   +---O---+   +---+
         |   |   |     A     |
-        @---+   +---+   +---+
+        *---+   +---+   +---+
         |     D     |   |
-        +---+   +---@---+ 
+        +---+   +---*---+
             |   |
             +---+
 
@@ -544,6 +548,15 @@ arms*5^level + 1 many points starting from 0.
 
 =head1 FORMULAS
 
+Various properties are in my R5 Dragon mathematical write-up in section
+"Quartet Curve",
+
+=over
+
+L<http://user42.tuxfamily.org/r5dragon/index.html>
+
+=back
+
 =head2 X,Y to N
 
 The current approach uses the C<QuintetCentres> C<xy_to_n()>.  Because the
@@ -579,7 +592,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

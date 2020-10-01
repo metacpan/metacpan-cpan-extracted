@@ -12,7 +12,7 @@ use vars qw{$VERSION};
 
 BEGIN
 {
-    $VERSION = '1.004';
+    $VERSION = '1.006';
 }
 
 sub my_home
@@ -48,6 +48,8 @@ L<File::HomeDir>
 =head1 COPYRIGHT
 
 Copyright 2009 - 2011 Adam Kennedy.
+
+Copyright 2017 - 2020 Jens Rehsack
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

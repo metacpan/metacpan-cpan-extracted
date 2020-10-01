@@ -131,7 +131,7 @@
    "provides" : {
       "IO::ReStoreFH" : {
          "file" : "lib/IO/ReStoreFH.pm",
-         "version" : "0.07"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -145,7 +145,7 @@
          "web" : "https://gitlab.com/djerius/io-restorefh"
       }
    },
-   "version" : "0.07",
+   "version" : "0.10",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "GPL-3.0-only"

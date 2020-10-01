@@ -4,8 +4,4 @@ requires 'Sub::Util', '1.41';
 
 on 'test' => sub {
     requires 'Test2::V0';
-    requires 'Mojolicious';
-    requires 'Mojo::Promise';
-    requires 'IO::Async'; # TODO: find the right version
-    requires 'AnyEvent'; # TODO: find the right version
 };

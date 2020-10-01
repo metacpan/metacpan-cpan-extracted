@@ -4,7 +4,7 @@
       "Aspose.Cells"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -16,7 +16,12 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.10"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -39,9 +44,9 @@
             "Module::Runtime" : "0",
             "Scalar::Util" : "0",
             "Test::Exception" : "0",
+            "Test::More" : "0.10",
             "URI::Escape" : "0",
             "URI::Query" : "0",
-            "perl" : "v5.6.0",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -57,7 +62,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "20.8"
+         "version" : "20.9"
       },
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -623,6 +628,21 @@
       "AsposeCellsCloud::Object::SortKey" : {
          "file" : "lib/AsposeCellsCloud/Object/SortKey.pm"
       },
+      "AsposeCellsCloud::Object::SparklineGroup" : {
+         "file" : "lib/AsposeCellsCloud/Object/SparklineGroup.pm"
+      },
+      "AsposeCellsCloud::Object::SparklineGroupResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/SparklineGroupResponse.pm"
+      },
+      "AsposeCellsCloud::Object::SparklineGroups" : {
+         "file" : "lib/AsposeCellsCloud/Object/SparklineGroups.pm"
+      },
+      "AsposeCellsCloud::Object::SparklineGroupsResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/SparklineGroupsResponse.pm"
+      },
+      "AsposeCellsCloud::Object::Sparkline" : {
+         "file" : "lib/AsposeCellsCloud/Object/Sparkline.pm"
+      },
       "AsposeCellsCloud::Object::SplitResult" : {
          "file" : "lib/AsposeCellsCloud/Object/SplitResult.pm"
       },
@@ -673,9 +693,6 @@
       },
       "AsposeCellsCloud::Object::TextOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/TextOptions.pm"
-      },
-      "AsposeCellsCloud::Object::TextWaterMarkerRequest" : {
-         "file" : "lib/AsposeCellsCloud/Object/TextWaterMarkerRequest.pm"
       },
       "AsposeCellsCloud::Object::TextureFill" : {
          "file" : "lib/AsposeCellsCloud/Object/TextureFill.pm"
@@ -790,6 +807,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "20.8",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "20.9",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

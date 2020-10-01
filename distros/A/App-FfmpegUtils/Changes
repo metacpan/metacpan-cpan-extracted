@@ -1,7 +1,22 @@
+0.006   2020-09-23  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.005 and 0.004.1.
+
+
 0.005   2020-09-05  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option --frame-rate (-r) dan --audio-sample-rate
 	  (--sample-rate).
+
+
+0.004.1 2020-09-23  Released-By: PERLANCAR; Urgency: medium; Status: cancelled
+
+	- [INCOMPATIBLE CHANGE] Make scaling more flexible, replace
+	  --downsize-to option with --scale which accepts ImageMagick-like
+	  notation e.g. '720^>' to shrink shortest side to 720p.
+
+        - UPDATE: rename release from 0.004 to 0.004.1. Cancel release
+          (duplicate).
 
 
 0.004   2020-09-05  Released-By: PERLANCAR; Urgency: medium

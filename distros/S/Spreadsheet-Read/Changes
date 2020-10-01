@@ -1,3 +1,22 @@
+0.82	- 26 Sep 2020, H.Merijn Brand
+    * Move pod tests to xt (and do not distribute)
+    * Fix some links in the docs
+    * Add ".xlsm" to known XLSX file extensions
+    * Spreadsheet::ReadSXC has a new maintainer (Corion)
+      - support file handles
+      - suggest version 0.24 (0.22 causes fails)
+    * First attempt in supporting Spreadsheet::ParseODS (alpha code)
+      - version 0.25 should now pass the limited tests
+      - thanks to Corion for making this happen!
+    * It's 2020
+    * Fallback to Pod::Text if nroff not available in tools
+    * Extended support for merged cells with merge option
+      - Added $sheet->merged_from ("C2")
+    * Add --no-nl[=x] to xlscat
+    * xlscat: Align-right more numerics on -L (was only positive integers)
+    * xlsx2csv -Z : generate a ZIP file with a CSV for every sheet
+    * Doc fix (issue#33)
+
 0.81	- 25 Aug 2019, H.Merijn Brand
     * It's 2019
     * Allow -c + --sep in xlscat

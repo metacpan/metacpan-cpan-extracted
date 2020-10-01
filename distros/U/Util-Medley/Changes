@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2019-09-17 00:00:00 +0000 to present.
+Changes from 2019-09-29 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.043 at 2020-09-16 18:44:36 +0000
+version 0.044 at 2020-09-28 18:45:49 +0000
+------------------------------------------
+
+  Change: 9d9f0cbd3df56d3842cbd2815d45ea3271ab88de
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-09-28 13:45:43 +0000
+
+    minor bug fixes in lib/Util/Medley/Cache.pm 
+
+  Change: d85ada7edfdf3aca54e6cc0e5b6b4a5469c428d7
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-09-22 15:03:33 +0000
+
+    added some verbose logging to Util-Medley/lib/Util/Medley/Cache.pm 
+
+------------------------------------------
+version 0.043 at 2020-09-16 18:44:30 +0000
 ------------------------------------------
 
   Change: fac5c9f0a3d2cde0bfcb39f08a91d513e386f016

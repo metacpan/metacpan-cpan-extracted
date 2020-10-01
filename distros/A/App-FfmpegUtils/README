@@ -2,8 +2,8 @@ NAME
     App::FfmpegUtils - Utilities related to ffmpeg
 
 VERSION
-    This document describes version 0.005 of App::FfmpegUtils (from Perl
-    distribution App-FfmpegUtils), released on 2020-09-05.
+    This document describes version 0.006 of App::FfmpegUtils (from Perl
+    distribution App-FfmpegUtils), released on 2020-09-23.
 
 FUNCTIONS
   reencode_video_with_libx264
@@ -61,14 +61,6 @@ FUNCTIONS
 
     *   crf => *int*
 
-    *   downsize_to => *str* (default: "1080p")
-
-        Downsizing will only be done if the input video is indeed larger
-        then the target downsize.
-
-        To disable downsizing, set "--downsize-to" to '' (empty string), or
-        specify on "--dont-downsize" on the CLI.
-
     *   ffmpeg_path => *filename*
 
     *   files* => *array[filename]*
@@ -78,6 +70,18 @@ FUNCTIONS
         Set frame rate, in fps.
 
     *   preset => *str* (default: "veryslow")
+
+    *   scale => *str* (default: "1080^>")
+
+        Scale video to specified size. See Math::Image::CalcResized or
+        calc-image-resized-size for more details on scale specification.
+        Some examples include:
+
+        The default is "1080^>" which means to shrink to 1080p if video size
+        is larger than 1080p.
+
+        To disable scaling, set "--scale" to '' (empty string), or specify
+        "--dont-scale" on the CLI.
 
     Special arguments:
 

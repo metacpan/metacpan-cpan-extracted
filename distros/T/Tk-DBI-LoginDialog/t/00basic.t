@@ -32,12 +32,11 @@ use Test::More;
 use lib 't';
 use tester;
 
-my $ot = tester->new;
-$ot->tests(18);
+my $ot = tester->new('Tk::DBI::LoginDialog');
+$ot->planned(18);
 
 # ---- module ----
-my $c_this = 'Tk::DBI::LoginDialog';
-require_ok($c_this);
+require_ok($ot->this);
 
 
 # ---- globals ----
@@ -49,7 +48,7 @@ my ($dbh, $msg);
 
 # ---- create ----
 my $ld = $ot->top->LoginDialog;
-isa_ok($ld, $c_this,		"new");
+isa_ok($ld, $ot->this,		"new");
 
 
 # ---- cancel ----

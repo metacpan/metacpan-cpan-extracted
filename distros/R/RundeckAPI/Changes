@@ -1,3 +1,6 @@
+20200924
+	Fixed token auth problem -> API version must be >= 19
+
 20200522
 	Correct return value from internal method _handleResponse.
 	Added two levels of verbosity

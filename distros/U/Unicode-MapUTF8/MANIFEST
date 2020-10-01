@@ -1,6 +1,8 @@
 Build.PL
 Changes
+LICENSE
 MANIFEST
+MANIFEST.SKIP
 Makefile.PL
 README
 lib/Unicode/MapUTF8.pm
@@ -13,3 +15,4 @@ t/97_distribution.t
 t/98_pod_coverage.t
 t/99_pod.t
 META.yml
+META.json

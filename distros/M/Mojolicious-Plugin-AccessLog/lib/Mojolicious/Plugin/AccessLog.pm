@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed reftype weaken);
 use Socket qw(inet_aton AF_INET);
 use Time::HiRes qw(gettimeofday tv_interval);
 
-our $VERSION = '0.010';
+our $VERSION = '0.010001';
 
 my $DEFAULT_FORMAT = 'common';
 my %FORMATS = (
@@ -34,7 +34,6 @@ sub register {
     my $log = $conf->{log} // $app->log->handle;
     my ($pkg, $f, $l) = caller 2;   # :-/
 
-    $app->log->warn(__PACKAGE__ . '::VERSION = ' . $VERSION);
     unless ($log) { # somebody cleared $app->log->handle?
         # Log a warning nevertheless - there might be an event handler.
         $app->log->warn(__PACKAGE__ . ': Log handle is not defined');

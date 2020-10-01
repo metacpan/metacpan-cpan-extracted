@@ -116,16 +116,25 @@ practice.
 The default check_mode() method does not have any functionality and always
 simply throws an error with the content of 'mode':
 
- throw $self "check_mode - unknown mode ($mode)";
+ throw $self "- unknown mode ($mode)";
 
 Remember that using "throw $self" you actually throw an error that
 depends on the namespace of your object and therefore can be caught
 separately if required.
 
+=head2 JSON Encoding Configuration
+
+The JSON encoding can be controlled with two site configuration
+values:
+
+ /xao/action/json_pretty    - insert line breaks to make JSON easier to read
+ /xao/action/json_canonical - sort hash keys to stabilize the output
+
 =cut
 
 ###############################################################################
 package XAO::DO::Web::Action;
+use warnings;
 use strict;
 use POSIX qw(strftime);
 use JSON;
@@ -275,17 +284,12 @@ sub get_mode_sub ($$$$;$) {
 sub json ($) {
     my $self=shift;
 
-    my $json=$self->{'cached_json'};
+    my $json=JSON->new->utf8;
 
-    return $json if $json;
+    $json->canonical(1) if $self->siteconfig->get('/xao/action/json_canonical');
+    $json->pretty(1)    if $self->siteconfig->get('/xao/action/json_pretty');
 
-    $json=JSON->new->utf8;
-
-    if($self->siteconfig->get('test_site')) {
-        $json->pretty->canonical;
-    }
-
-    return $self->{'cached_json'}=$json;
+    return $json;
 }
 
 ###############################################################################
@@ -311,12 +315,11 @@ sub display_data ($@) {
     }
     elsif($format eq 'js' || $format eq 'json-embed') {
 
-        # The trick with embedded JSON is that it is printed as
-        # part of a larger page and as such has to be in characters that
-        # are then encoded into bytes of the page final encoding.
-        # JSON's to_json() call is exactly that, character output.
+        # The trick with embedded JSON is that it is printed as part of
+        # a larger page and as such has to be in characters that are
+        # then encoded into bytes of the page final encoding.
         #
-        my $json=to_json($data);
+        my $json=$self->json->utf8(0)->encode($data);
 
         # The data is typically embedded in a <script>...</script> set
         # of tags, so if the content of a data field has </script> then

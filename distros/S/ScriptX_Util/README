@@ -1,0 +1,81 @@
+NAME
+    ScriptX_Util - Utilities for ScriptX
+
+VERSION
+    This document describes version 0.001 of ScriptX_Util (from Perl
+    distribution ScriptX_Util), released on 2020-10-01.
+
+FUNCTIONS
+  detect_scriptx_script
+    Usage:
+
+     detect_scriptx_script(%args) -> [status, msg, payload, meta]
+
+    Detect whether a file is a ScriptX-based CLI script.
+
+    The criteria are:
+
+    *   the file must exist and readable;
+
+    *   (optional, if "include_noexec" is false) file must have its
+        executable mode bit set;
+
+    *   content must start with a shebang "#!";
+
+    *   either: must be perl script (shebang line contains 'perl') and must
+        contain something like "use ScriptX";
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename => *str*
+
+        Path to file to be checked.
+
+    *   include_noexec => *bool* (default: 1)
+
+        Include scripts that do not have +x mode bit set.
+
+    *   string => *buf*
+
+        String to be checked.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ScriptX_Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ScriptX_Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ScriptX_Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    ScriptX
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

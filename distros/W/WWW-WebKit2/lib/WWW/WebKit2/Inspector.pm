@@ -14,7 +14,7 @@ sub run_javascript {
     my $done = 0;
     my $js_result = '';
 
-    $self->view->run_javascript($javascript_string, undef, sub {
+    $self->view->run_javascript("(function () {$javascript_string})()", undef, sub {
         my ($object, $result, $user_data) = @_;
         $done = 1;
         $js_result = $self->get_javascript_result($result, $raw, $javascript_string);
@@ -84,7 +84,7 @@ sub resolve_locator {
 sub get_title {
     my ($self) = @_;
 
-    my $value = $self->run_javascript('document.title');
+    my $value = $self->run_javascript('return document.title');
 
     return $value;
 }
@@ -259,7 +259,7 @@ sub is_ordered {
         $second_element->prepare_element .
         'var second_element = element;' .
         'var position = first_element.compareDocumentPosition(second_element);' .
-        '(position == 4) ? 1 : 0';
+        'return (position == 4) ? 1 : 0';
 
     return decode_json $self->run_javascript($javascript_string);
 }

@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.8",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Text::ANSI::Fold" : "1.02",
+            "Text::ANSI::Fold" : "1.10",
             "Text::VisualWidth::PP" : "0.05",
             "perl" : "5.014"
          }
@@ -56,7 +56,7 @@
    "provides" : {
       "Text::VisualPrintf" : {
          "file" : "lib/Text/VisualPrintf.pm",
-         "version" : "3.02"
+         "version" : "3.07"
       },
       "Text::VisualPrintf::IO" : {
          "file" : "lib/Text/VisualPrintf/IO.pm"
@@ -73,10 +73,11 @@
          "web" : "https://github.com/kaz-utashiro/Text-VisualPrintf"
       }
    },
-   "version" : "3.02",
+   "version" : "3.07",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
-      "Kaz Utashiro <kaz@utashiro.com>"
+      "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

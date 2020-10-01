@@ -29,7 +29,7 @@
 #
 #========================================================================
 #
-# Version 0.74, released 17 Jan 2015.
+# Version 0.76, released 14 Sep 2020.
 #
 # See http://perlrsync.sourceforge.net.
 #
@@ -43,7 +43,7 @@ use File::Path;
 use File::Find;
 
 use vars qw($VERSION);
-$VERSION = '0.74';
+$VERSION = '0.76';
 
 use constant S_IFMT       => 0170000;	# type of file
 use constant S_IFDIR      => 0040000; 	# directory

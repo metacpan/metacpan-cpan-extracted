@@ -2,8 +2,8 @@ NAME
     App::GoogleSearchUtils - CLI utilites related to google searching
 
 VERSION
-    This document describes version 0.002 of App::GoogleSearchUtils (from
-    Perl distribution App-GoogleSearchUtils), released on 2020-09-22.
+    This document describes version 0.004 of App::GoogleSearchUtils (from
+    Perl distribution App-GoogleSearchUtils), released on 2020-10-01.
 
 SYNOPSIS
     This distribution provides the following utilities:
@@ -22,9 +22,21 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   append => *str*
+
+        String to add at the end of each query.
+
+    *   delay => *duration*
+
+        Delay between opening each query.
+
     *   num => *posint* (default: 100)
 
         Number of results per page.
+
+    *   prepend => *str*
+
+        String to add at the beginning of each query.
 
     *   queries* => *array[str]*
 

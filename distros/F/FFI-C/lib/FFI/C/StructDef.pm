@@ -18,7 +18,7 @@ use base qw( FFI::C::Def );
 our @CARP_NOT = qw( FFI::C::Util FFI::C );
 
 # ABSTRACT: Structured data definition for FFI
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub _is_kind
@@ -339,7 +339,7 @@ FFI::C::StructDef - Structured data definition for FFI
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -456,6 +456,10 @@ strings and be trimmed.
 =item L<FFI::C::ArrayDef>
 
 =item L<FFI::C::Def>
+
+=item L<FFI::C::File>
+
+=item L<FFI::C::PosixFile>
 
 =item L<FFI::C::Struct>
 

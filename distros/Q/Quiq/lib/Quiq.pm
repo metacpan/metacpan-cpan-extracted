@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.187';
+our $VERSION = '1.188';
 
 =encoding utf8
 
@@ -736,6 +736,10 @@ L<Quiq::Sql::Analyzer> - Analyse von SQL-Code
 
 =item *
 
+L<Quiq::Sql::Composer> - Klasse zum Erzeugen von SQL-Code
+
+=item *
+
 L<Quiq::Sql::Script::Reader> - Leser von SQL-Skripten
 
 =item *
@@ -874,7 +878,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.187
+1.188
 
 =head1 AUTHOR
 

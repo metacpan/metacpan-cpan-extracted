@@ -14,7 +14,7 @@ BEGIN {
         )
     );
     require $coretests;
-    use_ok('version', 0.9927);
+    use_ok('version', 0.9928);
 }
 
 BaseTests("version","new","qv");

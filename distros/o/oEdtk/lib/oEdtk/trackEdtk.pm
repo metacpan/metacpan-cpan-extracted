@@ -1,7 +1,7 @@
 package oEdtk::trackEdtk;
 
 BEGIN {
-		use oEdtk::Main	0.42;
+		use oEdtk::Main; 
 		use Config::IniFiles;
 		use Sys::Hostname;
 		use Digest::MD5 	qw(md5_base64);
@@ -12,7 +12,7 @@ BEGIN {
 		use Exporter;
 		use vars 		qw($VERSION @ISA  @EXPORT_OK); # @EXPORT %EXPORT_TAGS);
 	
-		$VERSION		= 0.0034;
+		$VERSION		= 0.8051; # à terme cette librairie devrait être reprise par oEdtk::Tracking
 		@ISA			= qw(Exporter);
 #		@EXPORT		= qw(
 #						);
@@ -39,21 +39,21 @@ BEGIN {
 	#
 	# ? A VOIR : bug dans la création dynamique du fichier SQLite, on utilise pas le TSTAMP/PROCESS_ID ???
 
-	my $DBI_DNS	="";
+	my $DBI_DNS		="";
 	my $DBI_USER	="";
 	my $DBI_PASS	="";
 	my $TABLENAME	="tracking_oEdtk";
 
-	my $ED_HOST	="";
+	my $ED_HOST		="";
 	my $ED_TSTAMP	="";
-	my $ED_PROC	="";
+	my $ED_PROC		="";
 	my $ED_SNGL_ID	="";
-	my $ED_USER	="";
-	my $ED_SEQ	="";
-	my $ED_APP	="";
+	my $ED_USER		="";
+	my $ED_SEQ		="";
+	my $ED_APP		="";
 	my $ED_MOD_ED	="";
 	my $ED_JOB_EVT	="";
-	my $ED_OBJS	="";
+	my $ED_OBJS		="";
 	my @ED_K_NAME;
 	my @ED_K_VAL;
 
@@ -312,11 +312,11 @@ return $ED_MOD_ED;
 
 sub define_Job_Evt ($) {
 	# Job Event : looking for one of the following : 
-	#	 Job (default), Spool, Document, Line, Warning, Error
+	#	 Job (default), Spool, Document, Line, Warning, Error, Halt (critic), Reject
 	my $value	 =shift;
 
 	if ($value) { $ED_JOB_EVT =$value };
-	$ED_JOB_EVT	=~ /([JSDLWE])/;
+	$ED_JOB_EVT	=~ /([JSDLWEHR])/;
 	$ED_JOB_EVT	=$1;
 	$ED_JOB_EVT	||="J"; 	# Job by default
 
@@ -472,14 +472,14 @@ sub create_Track_Table(){
 	$struct .="( ED_TSTAMP NUMBER(14)  NOT NULL";	# interesting for formated date and interval search
 #	$struct .="( ED_TSTAMP VARCHAR2(14)  NOT NULL";	# most used
 #	$struct .="( ED_TSTAMP DATE  NOT NULL";			# Not compatible
-#	$struct .=", ED_HOST VARCHAR2(15) NOT NULL";		# hostname
+#	$struct .=", ED_HOST VARCHAR2(15) NOT NULL";	# hostname
 #	$struct .=", ED_PROC VARCHAR2(6) NOT NULL";		# processus
-	$struct .=", ED_USER VARCHAR2(10) NOT NULL";		# job request user 
+	$struct .=", ED_USER VARCHAR2(10) NOT NULL";	# job request user 
 	$struct .=", ED_SEQ NUMBER(9) NOT NULL";		# sequence
 	$struct .=", ED_SNGL_ID VARCHAR2(22) NOT NULL";	# Single ID
 	$struct .=", ED_APP VARCHAR2(15) NOT NULL";		# application name
 	$struct .=", ED_MOD_ED CHAR";					# mode d'edition (Batch, Tp, Web, Mail)
-	$struct .=", ED_JOB_EVT CHAR";				# niveau de l'événement dans le job(Spool, Document, Line, Warning, Error)
+	$struct .=", ED_JOB_EVT CHAR";					# niveau de l'événement dans le job(Spool, Document, Line, Warning, Error)
 	$struct .=", ED_OBJ_COUNT NUMBER(15)";			# nombre d'éléments/objets attachés à l'événement
 
 	for (my $i=0 ; $i lt $ENV{EDTK_MAX_USER_KEY} ; $i++) {

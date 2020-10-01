@@ -2,8 +2,9 @@
 use 5.20.0;
 use strict;
 use warnings FATAL => 'all';
+BEGIN { $ENV{MAIL_BIMI_CACHE_BACKEND} = 'Null' };
 use lib 't';
-use Mail::BIMI::Pragmas;
+use Mail::BIMI::Prelude;
 use Test::More;
 use Test::Exception;
 use Mail::BIMI;

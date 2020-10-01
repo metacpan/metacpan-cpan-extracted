@@ -39,9 +39,7 @@ make
 make test
 make install
 
-Type 'perldoc Search::InvertedIndex' after installation for the documentation or
-go to <URL:http://www.nihongo.org/snowhare/utilities/modules/search-invertedindex/>
+Type 'perldoc Search::InvertedIndex' after installation for the documentation
 
-Copyright 1999-2002, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and
-FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
-This software may be copied or redistributed under the same terms as Perl itelf.
+Copyright 1999-2020, Jerilyn Franz and FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>).
+All Rights Reserved.

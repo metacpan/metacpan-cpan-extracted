@@ -2,14 +2,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
-use Test::Deep;
-use Test::Warnings qw[ :no_end_test had_no_warnings ];
+use FindBin;
 
-use Shared::Examples::Net::Amazon::S3::API (
-    qw[ with_response_fixture ],
-    qw[ expect_api_bucket_objects_delete ],
-);
+BEGIN { require "$FindBin::Bin/test-helper-s3-api.pl" }
+
+use Shared::Examples::Net::Amazon::S3::API qw[ expect_api_bucket_objects_delete ];
+
+plan tests => 5;
 
 expect_api_bucket_objects_delete 'delete multiple objects' => (
     with_bucket             => 'some-bucket',
@@ -26,7 +25,7 @@ expect_api_bucket_objects_delete 'delete multiple objects' => (
 XML
 );
 
-expect_api_bucket_objects_delete 'with error access denied' => (
+expect_api_bucket_objects_delete 'S3 error - Access Denied' => (
     with_bucket             => 'some-bucket',
     with_keys               => [qw[ key-1 key-2 ]],
     with_response_fixture ('error::access_denied'),
@@ -36,7 +35,7 @@ expect_api_bucket_objects_delete 'with error access denied' => (
     expect_s3_errstr        => 'Access denied error message',
 );
 
-expect_api_bucket_objects_delete 'with error no such bucket' => (
+expect_api_bucket_objects_delete 'S3 error - No Such Bucket' => (
     with_bucket             => 'some-bucket',
     with_keys               => [qw[ key-1 key-2 ]],
     with_response_fixture ('error::no_such_bucket'),
@@ -44,6 +43,16 @@ expect_api_bucket_objects_delete 'with error no such bucket' => (
     expect_data             => bool (0),
     expect_s3_err           => 'NoSuchBucket',
     expect_s3_errstr        => 'No such bucket error message',
+);
+
+expect_api_bucket_objects_delete 'HTTP error - 400 Bad Request' => (
+    with_bucket             => 'some-bucket',
+    with_keys               => [qw[ key-1 key-2 ]],
+    with_response_fixture ('error::http_bad_request'),
+    expect_request          => { POST => 'https://some-bucket.s3.amazonaws.com/?delete' },
+    expect_data             => bool (0),
+    expect_s3_err           => '400',
+    expect_s3_errstr        => 'Bad Request',
 );
 
 had_no_warnings;

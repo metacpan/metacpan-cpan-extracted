@@ -106,7 +106,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.141';
+our $VERSION = '0.142';
 our @EXPORT_OK = qw{
     shell
 
@@ -263,6 +263,7 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	meteosat	=> { name => 'Meteosat',	rms => 1 },
 	intelsat	=> { name => 'Intelsat',	rms => 1 },
 	ses		=> { name => 'SES',		rms => 1 },
+	telesat		=> { name => 'Telesat',		rms => 1 },
 	orbcomm		=> { name => 'Orbcomm (no rms data)' },
 	iss		=> { name => 'ISS (from NASA, no rms data)' },
 	cpf		=> { name => 'CPF TLEs',	rms => 1 },

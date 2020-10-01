@@ -3,7 +3,7 @@ package JSON::SchemaValidator;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use B        ();
 use Storable ();
@@ -424,6 +424,7 @@ sub _validate_subschemas {
                 uri       => $context->{pointer},
                 message   => "Must be all of",
                 attribute => 'allOf',
+                details   => [map { @{$_->errors} } @subresults]
             );
         }
     }
@@ -433,6 +434,7 @@ sub _validate_subschemas {
                 uri       => $context->{pointer},
                 message   => "Must be any of",
                 attribute => 'anyOf',
+                details   => [map { @{$_->errors} } @subresults]
             );
         }
     }
@@ -442,6 +444,7 @@ sub _validate_subschemas {
                 uri       => $context->{pointer},
                 message   => "Must be one of",
                 attribute => 'oneOf',
+                details   => [map { @{$_->errors} } @subresults]
             );
         }
     }
@@ -451,6 +454,7 @@ sub _validate_subschemas {
                 uri       => $context->{pointer},
                 message   => "Must not be of",
                 attribute => 'not',
+                details   => [map { @{$_->errors} } @subresults]
             );
         }
     }

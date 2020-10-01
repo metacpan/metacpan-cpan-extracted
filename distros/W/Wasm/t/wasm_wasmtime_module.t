@@ -15,8 +15,33 @@ is(
       call ['isa', 'Wasm::Wasmtime::Engine'] => T();
     };
     call to_string => "(module)\n";
+    call serialize => match qr/./;
   },
   'autocreate engine',
+);
+
+is(
+  Wasm::Wasmtime::Module->deserialize(Wasm::Wasmtime::Module->new(wat2wasm('(module)'))->serialize),
+  object {
+    call ['isa', 'Wasm::Wasmtime::Module'] => T();
+    call engine => object {
+      call ['isa', 'Wasm::Wasmtime::Engine'] => T();
+    };
+    call to_string => "(module)\n";
+  },
+  'created module from serealized',
+);
+
+is(
+  Wasm::Wasmtime::Module->deserialize(Wasm::Wasmtime::Engine->new, Wasm::Wasmtime::Module->new(wat2wasm('(module)'))->serialize),
+  object {
+    call ['isa', 'Wasm::Wasmtime::Module'] => T();
+    call engine => object {
+      call ['isa', 'Wasm::Wasmtime::Engine'] => T();
+    };
+    call to_string => "(module)\n";
+  },
+  'created module from store + serealized',
 );
 
 is(

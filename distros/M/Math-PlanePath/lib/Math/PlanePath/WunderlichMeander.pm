@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,7 +23,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -45,7 +45,7 @@ use constant n_start => 0;
 use constant class_x_negative => 0;
 use constant class_y_negative => 0;
 *xy_is_visited = \&Math::PlanePath::Base::Generic::xy_is_visited_quad1;
-use constant _UNDOCUMENTED__dxdy_list_at_n => 5;
+use constant 1.02 _UNDOCUMENTED__dxdy_list_at_n => 5;
 
 
 #------------------------------------------------------------------------------
@@ -358,8 +358,16 @@ Math::PlanePath::WunderlichMeander -- 3x3 self-similar "R" shape
 
 =head1 DESCRIPTION
 
-X<Wunderlich, Walter>This is an integer version of the 3x3 self-similar
-meander by Walter Wunderlich,
+This is an integer version of the 3x3 self-similar meander from
+
+=over
+
+Walter Wunderlich, "Uber Peano-Kurven", Elemente der Mathematik, volume 28,
+number 1, 1973, pages 1-10.
+L<http://sodwana.uni-ak.ac.at/geom/mitarbeiter/wallner/wunderlich/>,
+L<http://sodwana.uni-ak.ac.at/geom/mitarbeiter/wallner/wunderlich/pdf/125.pdf>
+
+=back
 
       8     20--21--22  29--30--31  38--39--40
              |       |   |       |   |       |
@@ -382,9 +390,9 @@ meander by Walter Wunderlich,
             X=0  1   2   3   4   5   6   7   8
 
 The base pattern is the N=0 to N=8 section.  It works as a traversal of a
-3x3 square going from one corner along one side.  The base figure goes
-upwards and it's then used rotated by 180 degrees and/or transposed to go in
-other directions,
+3x3 square starting in one corner and going along one side.  The base figure
+goes upwards and it's then used rotated by 180 degrees and/or transposed to
+go in other directions,
 
     +----------------+----------------+---------------+
     | ^              |              * | ^             |
@@ -412,11 +420,11 @@ across.  So N=0 to N=8 goes up, then the next level N=0,9,18,.,72 goes
 right, then N=81,162,..,648 up again, etc.
 
 Wunderlich's conception is successive lower levels of detail as a
-space-filling curve and the transposing in that case applies to ever smaller
-parts.  But for the integer version here the start direction is fixed and
-the successively higher levels alternate.  The first move N=0 to N=1 is
-rightwards per the "Schema" shown in Wunderlich's paper (and which is
-similar to the C<PeanoCurve> and various other C<PlanePath> curves).
+space-filling curve.  The transposing in that case applies to ever smaller
+parts.  But for the integer version here, the start direction is held fixed
+and the successively higher levels alternate.  The first move N=0 to N=1 is
+rightwards per the "Schema" shown in Wunderlich's paper (and like various
+other C<PlanePath> curves).
 
 =head1 FUNCTIONS
 
@@ -455,24 +463,13 @@ Return C<(0, 9**$level - 1)>.
 L<Math::PlanePath>,
 L<Math::PlanePath::PeanoCurve>
 
-Walter Wunderlich "Uber Peano-Kurven", Elemente der Mathematik, 28(1):1-10,
-1973.
-
-=over
-
-L<http://sodwana.uni-ak.ac.at/geom/mitarbeiter/wallner/wunderlich/>
-L<http://sodwana.uni-ak.ac.at/geom/mitarbeiter/wallner/wunderlich/pdf/125.pdf>
-(scanned copy, in German)
-
-=back
-
 =head1 HOME PAGE
 
 L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

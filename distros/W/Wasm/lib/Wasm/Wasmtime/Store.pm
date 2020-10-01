@@ -7,7 +7,7 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Engine;
 
 # ABSTRACT: Wasmtime store class
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
 $ffi_prefix = 'wasm_store_';
@@ -21,6 +21,9 @@ $ffi->attach( new => ['wasm_engine_t'] => 'wasm_store_t' => sub {
   $self->{engine} = $engine;
   $self;
 });
+
+
+$ffi->attach( [ wasmtime_store_gc => 'gc' ] => ['wasm_store_t'] => 'void' );
 
 
 sub engine { shift->{engine} }
@@ -41,7 +44,7 @@ Wasm::Wasmtime::Store - Wasmtime store class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -67,6 +70,14 @@ This class represents storage used by the WebAssembly engine.
 
 Creates a new storage instance.  If the optional L<Wasm::Wasmtime::Engine> object
 isn't provided, then a new one will be created.
+
+=head2 gc
+
+ $store->gc;
+
+Garbage collects C<externref>s that are used within this store. Any
+C<externref>s that are discovered to be unreachable by other code or objects
+will have their finalizers run.
 
 =head2 engine
 

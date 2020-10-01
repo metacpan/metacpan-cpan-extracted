@@ -14,7 +14,7 @@ can_ok q{Weather::NHC::TropicalCyclone::ForecastAdvisory}, @methods;
 my $fh          = File::Temp->new();
 my $output_file = $fh->filename;
 
-is 0, ( stat($output_file) )[6], q{Output file currently of size 0};
+is 0, ( stat($output_file) )[7], q{Output file currently of size 0};
 
 my $input_file = qq{$Bin/../../data/017.al202020.fst.txt};
 

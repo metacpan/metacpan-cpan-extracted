@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.187';
+our $VERSION = '1.188';
 
 # -----------------------------------------------------------------------------
 
@@ -75,6 +75,7 @@ Versionsnummer des DBMS.
 
   $d = $class->new($dbms);
   $d = $class->new($dbms,$version);
+  $d = $class->new($db);
 
 =head4 Arguments
 
@@ -105,7 +106,9 @@ DBMSe siehe $class->L<dbmsNames|"dbmsNames() - Liste der Namen der unterstützte
 # -----------------------------------------------------------------------------
 
 sub new {
-    my ($class,$dbms,$version) = @_;
+    my $class = shift;
+    my $dbms = ref $_[0]? shift->dbms: shift;
+    my $version = shift;
 
     # DBMS-Namen case insensitive suchen
 
@@ -322,7 +325,7 @@ sub isMSSQL {
 
 =head1 VERSION
 
-1.187
+1.188
 
 =head1 AUTHOR
 

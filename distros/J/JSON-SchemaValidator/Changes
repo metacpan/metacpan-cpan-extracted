@@ -1,5 +1,9 @@
 Revision history for perl module JSON::SchemaValidator
 
+1.04 2020-09-25T10:54:04Z
+
+ - More descriptive oneOf, anyOf, allOf, not errors
+
 1.03 2020-09-18T09:36:19Z
 
  - Fix draft required properties incompatibilities

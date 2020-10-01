@@ -1,5 +1,5 @@
 package Util::Medley::Cache;
-$Util::Medley::Cache::VERSION = '0.043';
+$Util::Medley::Cache::VERSION = '0.044';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -9,6 +9,8 @@ use File::Path 'remove_tree';
 use Data::Printer alias => 'pdump';
 use Kavorka qw(-all);
 
+with 'Util::Medley::Roles::Attributes::Logger';
+
 ########################################################
 
 =head1 NAME
@@ -17,7 +19,7 @@ Util::Medley::Cache - Simple caching mechanism.
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =cut
 
@@ -389,9 +391,12 @@ The cache namespace.
 multi method get (Str :$key!,
 				  Str :$ns) {
 
+    $ns = $self->_getNamespace($ns) if !$ns;
+    	
 	if ( $self->l1Enabled ) {
 		my $data = $self->_l1Get(@_);
 		if ($data) {
+		    $self->Logger->verbose( "L1 cache hit - get ('$ns', '$key')");
 			return $data;
 		}
 	}
@@ -399,6 +404,7 @@ multi method get (Str :$key!,
 	if ( $self->l2Enabled ) {
 		my $data = $self->_l2Get(@_);
 		if ($data) {
+		    $self->Logger->verbose( "L2 cache hit - get ('$ns', '$key')");
 			$self->_l1Set(@_, data => $data);
 			return $data;
 		}
@@ -538,6 +544,9 @@ multi method set (Str :$key!,
             	  Any :$data!,
             	  Str :$ns) {
 
+    $ns = $self->_getNamespace($ns) if !$ns;
+    $self->Logger->verbose("cache set ('$ns', '$key')");
+              
 	$self->_l1Set(@_) if $self->l1Enabled;
 	$self->_l2Set(@_) if $self->l2Enabled;
 

@@ -12,7 +12,7 @@ require 5.008;
 @EXPORT_OK = qw(peek_my peek_our closed_over peek_sub var_name set_closed_over);
 %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-$VERSION = '2.3';
+$VERSION = '2.5';
 
 bootstrap PadWalker $VERSION;
 

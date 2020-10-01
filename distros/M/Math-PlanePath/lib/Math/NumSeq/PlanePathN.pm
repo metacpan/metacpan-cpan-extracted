@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,7 +28,7 @@ use Carp 'croak';
 use constant 1.02;
 
 use vars '$VERSION','@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -772,7 +772,8 @@ sub values_max {
     };
 }
 { package Math::PlanePath::PentSpiral;
-  use constant _NumSeq_X_axis_step => 2;
+  use constant _NumSeq_X_axis_step => 2;  # not A2 grid, but X axis steps by 2
+  use constant _NumSeq_X_neg_step  => 2;
   use constant _NumSeq_X_axis_increasing => 1;
   use constant _NumSeq_Y_axis_increasing => 1;
   use constant _NumSeq_X_neg_increasing => 1;
@@ -1503,6 +1504,8 @@ sub values_max {
       # OEIS-Other: A163343 planepath=GrayCode,apply_type=FsT,radix=3 line_type=Diagonal
     };
 }
+# { package Math::PlanePath::PeanoDiagonals;
+# }
 { package Math::PlanePath::WunderlichSerpentine;
   sub _NumSeq_X_axis_increasing {
     my ($self) = @_;
@@ -1567,10 +1570,12 @@ sub values_max {
         # OEIS-Catalogue: A062880 planepath=ZOrderCurve line_type=Y_axis
         # OEIS-Catalogue: A001196 planepath=ZOrderCurve line_type=Diagonal
       },
+      'radix=3' =>
+      { X_axis => 'A037314',  # base 9 digits 0,1,2 only
+        # OEIS-Catalogue: A037314 planepath=ZOrderCurve,radix=3
+      },
       'radix=3,i_start=1' =>
-      { X_axis => 'A037314',  # base 9 digits 0,1,2 only, starting OFFSET=1 value=1
-        Y_axis => 'A208665',  # base 9 digits 0,3,6 only, starting OFFSET=1 value=3
-        # OEIS-Catalogue: A037314 planepath=ZOrderCurve,radix=3 i_start=1
+      { Y_axis => 'A208665',  # base 9 digits 0,3,6 only, starting OFFSET=1 value=3
         # OEIS-Catalogue: A208665 planepath=ZOrderCurve,radix=3 i_start=1 line_type=Y_axis
 
         # ZOrderCurve dir=2  radix,3: match 6,27,30,33,54,57,60,243,246,249,270,273,276,297,300
@@ -2030,8 +2035,8 @@ sub values_max {
   use constant _NumSeq_N_oeis_anum =>
     {
      'n_start=0,width=1' =>
-     { X_axis   => 'A001477',  # integers 0,1,2,3,etc
-       # OEIS-Other: A001477 planepath=Rows,width=1,n_start=0
+     { Y_axis   => 'A001477',  # integers 0,1,2,3,etc
+       # OEIS-Other: A001477 planepath=Rows,width=1,n_start=0 line_type=Y_axis
      },
      'n_start=1,width=2' =>
      { Y_axis   => 'A005408',  # odd 2n+1
@@ -2978,9 +2983,11 @@ sub values_max {
       { Diagonal    => 'A033587',  # 
         Diagonal_SW => 'A014635',  # even-index hexagonals
         Diagonal_SE => 'A033585',  #
+        Diagonal_NW => 'A139271',
         # OEIS-Other: A033587 planepath=ToothpickSpiral,n_start=0 line_type=Diagonal
         # OEIS-Other: A014635 planepath=ToothpickSpiral,n_start=0 line_type=Diagonal_SW
         # OEIS-Other: A033585 planepath=ToothpickSpiral,n_start=0 line_type=Diagonal_SE
+        # OEIS-Other: A139271 planepath=ToothpickSpiral,n_start=0 line_type=Diagonal_NW
       },
     };
 }
@@ -3137,8 +3144,8 @@ This module presents N values from a C<Math::PlanePath> as a sequence.  The
 default is the X axis, or the C<line_type> parameter (a string) can choose
 among
 
-    "X_axis"        X axis
-    "Y_axis"        Y axis
+    "X_axis"        X axis (positive part)
+    "Y_axis"        Y axis (positive part)
     "X_neg"         X negative axis
     "Y_neg"         Y negative axis
     "Diagonal"      leading diagonal X=i, Y=i
@@ -3212,7 +3219,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

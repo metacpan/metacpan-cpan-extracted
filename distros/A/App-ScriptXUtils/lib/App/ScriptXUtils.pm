@@ -1,9 +1,9 @@
 package App::ScriptXUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-25'; # DATE
+our $DATE = '2020-10-01'; # DATE
 our $DIST = 'App-ScriptXUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -81,7 +81,7 @@ App::ScriptXUtils - Collection of CLI utilities for ScriptX
 
 =head1 VERSION
 
-This document describes version 0.001 of App::ScriptXUtils (from Perl distribution App-ScriptXUtils), released on 2019-12-25.
+This document describes version 0.002 of App::ScriptXUtils (from Perl distribution App-ScriptXUtils), released on 2020-10-01.
 
 =head1 SYNOPSIS
 
@@ -89,6 +89,10 @@ This distribution provides the following command-line utilities related to
 L<ScriptX>:
 
 =over
+
+=item * L<detect-scriptx-script>
+
+=item * L<dump-scriptx-script>
 
 =item * L<list-scriptx-plugins>
 
@@ -162,6 +166,10 @@ Only return records where the 'dist' field is less than specified value.
 =item * B<dist.xmin> => I<str>
 
 Only return records where the 'dist' field is greater than specified value.
+
+=item * B<exclude_fields> => I<array[str]>
+
+Select fields to return.
 
 =item * B<fields> => I<array[str]>
 
@@ -280,11 +288,12 @@ Only return records where the 'summary' field is greater than specified value.
 
 =item * B<with_field_names> => I<bool>
 
-Return field names in each record (as hash/associative array).
+Return field names in each record (as hashE<sol>associative array).
 
 When enabled, function will return each record as hash/associative array
 (field name => value pairs). Otherwise, function will return each record
 as list/array (field value, field value, ...).
+
 
 =back
 
@@ -325,7 +334,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

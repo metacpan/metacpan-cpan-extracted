@@ -1,3 +1,6 @@
+0.004 2020-09-28
+- fix logic error with query-string and incoming path is empty-string
+
 0.003 2020-06-22
 - counter URL-unescaping of input paths by re-escaping normal but not "/"
 

@@ -36,10 +36,14 @@
 	At least, you can download the last release from http://www.cpan.org/
 	
 	BEFORE installation, you have to setup XML-LibXML :
+	Checking if XML-LibXML is set :
+	Perl -e "use XML::LibXML"
+
 	- windows : you have to setup XML-LibXML with PPM
 				you should also install dmake utils with PPM
 	- Linux   : you have to setup XML-LibXML with your distribution's  
-				package installer (or apt-get install)
+				package installer (or rpm / apt-get install)
+	
 	
 	Command line for manual installation :
 	perl Makefile.PL
@@ -62,5 +66,5 @@
 
 	AUTHORS
 	***************************************************************************
-	D Aunay, G Chaillou Domingo, M Henrion, G Ballin 2005-2013
+	D Aunay, G Chaillou Domingo, M Henrion, G Ballin 2005-2020
 	  		

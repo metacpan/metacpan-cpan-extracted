@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,7 +32,7 @@ use Math::PlanePath::GosperIslands;
 use Math::PlanePath::SacksSpiral;
 
 use vars '$VERSION', '@ISA', '@_xend','@_yend';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
@@ -75,7 +75,7 @@ use constant dy_maximum => 1;
 # -2,0,   # W  N=13
 # -1,-1,   # SW  N=40
 # 1,-1,   # SE  N=121
-use constant _UNDOCUMENTED__dxdy_list_at_n => 121;
+use constant 1.02 _UNDOCUMENTED__dxdy_list_at_n => 121;
 
 use constant absdx_minimum => 1;
 use constant dsumxy_minimum => -2; # diagonals
@@ -214,7 +214,7 @@ use Math::PlanePath::SierpinskiArrowhead;
 1;
 __END__
 
-=for stopwords eg Ryde Math-PlanePath Gosper
+=for stopwords eg Ryde Math-PlanePath Gosper OEIS terdragon
 
 =head1 NAME
 
@@ -453,7 +453,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 Math-PlanePath is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

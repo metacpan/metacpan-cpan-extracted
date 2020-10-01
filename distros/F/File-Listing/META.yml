@@ -1,26 +1,32 @@
---- #YAML:1.0
-name:               File-Listing
-version:            6.04
-abstract:           parse directory listing
+---
+abstract: 'parse directory listing'
 author:
-    - Gisle Aas <gisle@activestate.com>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Gisle Aas <gisle@activestate.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    HTTP::Date:  6
-    perl:        5.006002
-resources:
-    MailingList:  mailto:libwww@perl.org
-    repository:   http://github.com/gisle/libwww-perl/tree/File-Listing/master
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Listing
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  HTTP::Date: '6.00'
+  Time::Local: '0'
+  base: '0'
+  perl: '5.006002'
+resources:
+  bugtracker: https://github.com/PerlAlien/File-Listing/issues
+  homepage: https://metacpan.org/pod/File::Listing
+  repository: https://github.com/PerlAlien/File-Listing.git
+version: '6.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

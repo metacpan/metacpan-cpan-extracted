@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -33,7 +33,7 @@ use Math::PlanePath::CoprimeColumns;
 # VERSION
 
 {
-  my $want_version = 127;
+  my $want_version = 128;
   ok ($Math::PlanePath::CoprimeColumns::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::CoprimeColumns->VERSION,  $want_version,

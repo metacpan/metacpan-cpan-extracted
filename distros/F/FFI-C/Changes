@@ -1,5 +1,13 @@
 Revision history for FFI-C},
 
+0.10      2020-09-23 03:16:36 -0600
+  - Add tmpfile constructor for FFI::C::File (gh#41)
+
+0.09      2020-09-22 14:28:36 -0600
+  - Move to PerlFFI org (gh#37)
+  - Add FFI::C::File class (gh#38)
+  - Add FFI::C::PosixFile class (gh#38)
+
 0.08      2020-05-12 19:20:26 -0400
   - Added enum method to FFI::C (gh#23, gh#36)
 

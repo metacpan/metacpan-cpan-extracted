@@ -1,5 +1,36 @@
-0.16 2020-09-18T20:14:16Z
+0.17 2020-09-29T20:15:04Z
 
+        - Adding Space and Market role
+        - Adding Event, Opening, Sex, Collective, Magazine, Institution, Squat, Workshop, Website, Critic, Article, and Book classes
+        - Nesting Plaground and Place classes
+
+0.16_05 2020-09-28T21:38:22Z
+
+        - More documentation experimentations and details
+        - Preparing an underground role
+
+0.16_04 2020-09-28T20:40:48Z
+
+        - Separating the non-programming documentation to a separate .pod
+
+0.16_03 2020-09-28T07:55:39Z
+
+        - Fixing the Art import to an Art::World in tests
+        - Tests files names convention update
+
+0.16_02 2020-09-27T20:18:52Z
+
+        - Major refactoring of all the modules in only one
+
+0.16_01 2020-09-19T18:30:52Z
+
+        - Adding the Place::Gallery class
+        - Adding the Agent::Public class
+        - Adding The Place::Behavior::Exhibit role
+        - Adding a sale() method to the Wildlife::Behavior::Buyer role
+        - Added Type::Tiny::XS as a dependency for some optimization 
+
+0.16 2020-09-18T20:14:16Z
 
         - Renaming Buyable to Collectionable
         - Added is_for_sale() / is_sold() to Collectionable

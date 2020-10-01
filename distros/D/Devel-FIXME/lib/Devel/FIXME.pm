@@ -16,7 +16,7 @@ use Carp qw/carp croak/;
 our @EXPORT_OK = qw/FIXME SHOUT DROP CONT/;
 our %EXPORT_TAGS = ( "constants" => \@EXPORT_OK );
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # some constants for rules
 sub CONT () { 0 };
@@ -370,11 +370,21 @@ C<$nickles++>;
 
 =back
 
+=head1 VERSION CONTROL
+
+This module is maintained using Darcs. You can get the latest version from
+L<http://nothingmuch.woobling.org/Devel-FIXME/>, and use C<darcs send>
+to commit changes.
+
 =head1 AUTHOR
 
-Yuval Kogman <nothingmuch@woobling.org>
+Original Author:
+Yuval Kogman, C<< <nothingmuch@woobling.org> >>
 
-=head1 COPYRIGHT & LICNESE
+Current maintainer:
+Nigel Horne, C<< <njh@bandsman.co.uk> >>
+
+=head1 COPYRIGHT & LICENCE
 
 	Copyright (c) 2004 Yuval Kogman. All rights reserved
 	This program is free software; you can redistribute

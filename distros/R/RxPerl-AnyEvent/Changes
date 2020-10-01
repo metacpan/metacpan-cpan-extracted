@@ -1,0 +1,14 @@
+Revision history for Perl extension RxPerl-AnyEvent
+
+v6.0.0 2020-09-24T17:19:05Z
+
+    - no changes, release v6.0
+
+v0.28.4 2020-09-24T14:43:06Z
+
+    - fixed documentation
+
+v0.28.3 2020-09-22T22:12:02Z
+
+    - original version
+

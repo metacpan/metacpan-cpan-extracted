@@ -69,15 +69,17 @@ ok 21, "Loaded";
 use oEdtk::XPath; 
 ok 22, "Loaded";
 
-
 use oEdtk::libXls;
 ok 23, "Loaded";
 
-chdir 't';
-require "test_fixe_oEdtk.pl" ;
-ok 24, "Loaded";
+use XML::LibXML;
+ok 24, "Loaded"; 
+
+#chdir 't';
+#require "test_fixe_oEdtk.pl" ;
+#ok 25, "Loaded";
 #run();
-#ok 25, "Run test application";
+#ok 26, "Run test application";
 
 END
 {

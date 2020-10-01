@@ -65,7 +65,7 @@ BEGIN {
     @EXPORT_OK   = qw (stem clear_stem_cache stem_caching);
     %EXPORT_TAGS = ();
 }
-$VERSION = "2.30";
+$VERSION = "2.31";
 
 my $Stem_Caching  = 0;
 my $Stem_Cache    = {};

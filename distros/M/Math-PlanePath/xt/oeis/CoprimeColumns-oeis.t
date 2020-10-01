@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 10;
+plan tests => 8;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -34,48 +34,18 @@ use Math::PlanePath::CoprimeColumns;
 
 my $path = Math::PlanePath::CoprimeColumns->new;
 
+
 #------------------------------------------------------------------------------
 # A127368 - Y coordinate of coprimes, 0 for non-coprimes
 
-{
-  my $anum = 'A127368';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my $good = 1;
-  my $count = 0;
-  if ($bvalues) {
-    my $x = 1;
-    my $y = 1;
-    for (my $i = 0; $i < @$bvalues; $i++) {
-      my $want = $bvalues->[$i];
-      my $got = (Math::PlanePath::CoprimeColumns::_coprime($x,$y)
-                 ? $y : 0);
-      if ($got != $want) {
-        MyTestHelpers::diag ("wrong _coprime($x,$y)=$got want=$want at i=$i of $filename");
-        $good = 0;
-      }
-      $y++;
-      if ($y > $x) {
-        $x++;
-        $y = 1;
-      }
-      $count++;
-    }
-  }
-  ok ($good, 1, "$anum count $count");
-}
-
 MyOEIS::compare_values
-  (anum => q{A127368},
+  (anum => 'A127368',
    func => sub {
      my ($count) = @_;
      my @got;
    OUTER: for (my $x = 1; ; $x++) {
        foreach my $y (1 .. $x) {
-         if ($path->xy_is_visited($x,$y)) {
-           push @got, $y;
-         } else {
-           push @got, 0;
-         }
+         push @got, ($path->xy_is_visited($x,$y) ? $y : 0);
          last OUTER if @got >= $count;
        }
      }
@@ -152,7 +122,7 @@ MyOEIS::compare_values
    });
 
 MyOEIS::compare_values
-  (anum => qq{A002088},
+  (anum => q{A002088},
    func => sub {
      my ($count) = @_;
      my @got;
@@ -260,37 +230,8 @@ MyOEIS::compare_values
 #------------------------------------------------------------------------------
 # A054521 - by columns 1 if coprimes, 0 if not
 
-{
-  my $anum = 'A054521';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  {
-    my $good = 1;
-    my $count = 0;
-    if ($bvalues) {
-      my $x = 1;
-      my $y = 1;
-      for (my $i = 0; $i < @$bvalues; $i++) {
-        my $want = $bvalues->[$i];
-        my $got = (Math::PlanePath::CoprimeColumns::_coprime($x,$y)
-                   ? 1 : 0);
-        if ($got != $want) {
-          MyTestHelpers::diag ("wrong _coprime($x,$y)=$got want=$want at i=$i of $filename");
-          $good = 0;
-        }
-        $y++;
-        if ($y > $x) {
-          $x++;
-          $y = 1;
-        }
-        $count++;
-      }
-    }
-    ok ($good, 1, "$anum count $count");
-  }
-}
-
 MyOEIS::compare_values
-  (anum => q{A054521},
+  (anum => 'A054521',
    func => sub {
      my ($count) = @_;
      my @got;

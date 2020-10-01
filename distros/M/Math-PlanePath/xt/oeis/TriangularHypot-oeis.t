@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -885,21 +885,21 @@ MyOEIS::compare_values
   (anum => 'A035019',
    func => sub {
      my ($count) = @_;
-    my $path = Math::PlanePath::TriangularHypot->new;
-    my @got;
-    my $prev_h = 0;
-    my $num = 0;
-    for (my $n = $path->n_start; @got < $count; $n++) {
-      my ($x,$y) = $path->n_to_xy($n);
-      my $h = $x*$x + 3*$y*$y;
-      if ($h == $prev_h) {
-        $num++;
-      } else {
-        push @got, $num;
-        $num = 1;
-        $prev_h = $h;
-      }
-    }
+     my $path = Math::PlanePath::TriangularHypot->new;
+     my @got;
+     my $prev_h = 0;
+     my $num = 0;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x,$y) = $path->n_to_xy($n);
+       my $h = $x*$x + 3*$y*$y;
+       if ($h == $prev_h) {
+         $num++;
+       } else {
+         push @got, $num;
+         $num = 1;
+         $prev_h = $h;
+       }
+     }
      return \@got;
    });
 

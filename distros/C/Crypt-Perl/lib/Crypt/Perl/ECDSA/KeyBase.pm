@@ -190,7 +190,7 @@ sub _decompress_public_point {
     return $self->{'_public'}->get_uncompressed( $self->_curve() );
 }
 
-sub _get_jwk_digest_cr {
+sub _get_jwk_digest_name {
     my ($self) = @_;
 
     my $name = $self->get_curve_name();
@@ -200,9 +200,13 @@ sub _get_jwk_digest_cr {
         die Crypt::Perl::X::create('Generic', $err);
     };
 
-    require Digest::SHA;
+    return $getter_cr->();
+}
 
-    return Digest::SHA->can( $getter_cr->() );
+sub _get_jwk_digest_cr {
+
+    require Digest::SHA;
+    return Digest::SHA->can( $_[0]->_get_jwk_digest_name() );
 }
 
 sub _get_jwk_curve_name {

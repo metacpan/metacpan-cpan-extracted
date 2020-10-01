@@ -6,13 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ScriptXUtils.pm'
 );
 
 my @scripts = (
+    'script/detect-scriptx-script',
+    'script/dump-scriptx-script',
     'script/list-scriptx-plugins'
 );
 

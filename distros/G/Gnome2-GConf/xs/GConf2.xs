@@ -12,9 +12,8 @@
  * Library General Public License for more details.
  *
  * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the 
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330, 
- * Boston, MA  02111-1307  USA.
+ * License along with this library; if not, see
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include "gconfperl.h"
@@ -56,7 +55,7 @@ gconfperl_gconf_error_get_type (void)
 
 MODULE = Gnome2::GConf	PACKAGE = Gnome2::GConf PREFIX = gconf_
 
-=for object Gnome2::GConf::version
+=for object Gnome2::GConf::version the version of libgconf that Gnome2::GConf was built against
 
 =cut
 
@@ -95,7 +94,7 @@ CHECK_VERSION (class, major, minor, micro)
 
 ## gconf.h
 
-=for object Gnome2::GConf::main
+=for object Gnome2::GConf::main utility functions for Gnome2::GConf
 =cut
 
 =for apidoc

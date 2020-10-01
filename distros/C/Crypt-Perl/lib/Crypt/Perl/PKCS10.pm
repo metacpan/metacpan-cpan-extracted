@@ -194,10 +194,12 @@ sub _encode_params {
 
         $sig_alg = "ecdsa-with-SHA$bits";
 
+        my $fn = "sign_sha$bits";
+
         $sig_func = sub {
             my ($key, $msg) = @_;
 
-            return $key->sign( Digest::SHA->can("sha$bits")->($msg) );
+            return $key->$fn($msg);
         };
 
         $pk_der = $key->get_public_key()->to_der_with_curve_name();

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,6 +20,8 @@
 
 # Check PlanePathCoord etc sequences against OEIS data.
 #
+# The full catalogue takes a long time to run, hence the want_...()
+# restrictions below.
 
 use 5.004;
 use strict;
@@ -38,29 +40,31 @@ use MyOEIS;
 
 sub want_anum {
   my ($anum) = @_;
-  # return 0 unless $anum =~ /A246960/;
+  # return 0 unless $anum =~ /A001477/;
   # return 0 unless $anum =~ /A151922|A183060/;
   # return 0 unless $anum =~ /A177702|A102283|A131756/;
   return 1;
 }
 sub want_planepath {
   my ($planepath) = @_;
-   return 0 unless $planepath =~ /Complex/;
+  # return 0 unless $planepath =~ /PyramidSpi/;
   # return 0 unless $planepath =~ /Flowsnake/;
   # return 0 unless $planepath =~ /Octag|Pent|Hept/;
   # return 0 unless $planepath =~ /Divis|DiagonalRationals|CoprimeCol/;
-  # return 0 unless $planepath =~ /DiamondSpiral/;
-  # return 0 unless $planepath =~ /Coprime/;
+  # return 0 unless $planepath =~ /Rows/;
   # return 0 unless $planepath =~ /LCorn|RationalsTree/;
   # return 0 unless $planepath =~ /^Corner$/i;
-  # return 0 unless $planepath =~ /SierpinskiArrowheadC/;
+  # return 0 unless $planepath =~ /SierpinskiArrowhead/;
   # return 0 unless $planepath =~ /TriangleSpiralSkewed/;
-  # return 0 unless $planepath =~ /^Rows/;
+  # return 0 unless $planepath =~ /DiamondSpiral/;
   # return 0 unless $planepath =~ /AlternateTerdragon/;
+  # return 0 unless $planepath =~ /Pythagorean/;
+  # return 0 unless $planepath =~ /Square/;
   return 1;
 }
 sub want_coordinate {
   my ($type) = @_;
+  # return 0 unless $type =~ /^[XY]$/;
   # return 0 unless $type =~ /NotStraight/;
   # return 0 unless $type =~ /^Abs[XY]/;
   # return 0 unless $type =~ /DiffYX/i;

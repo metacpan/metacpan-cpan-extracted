@@ -149,7 +149,6 @@ my $GAF = $CLASS->new( conf_path => $path );
 
 
 # actually do some formatting
-
 {
     my $af_path = dirname(__FILE__) . '/../../address-formatting';
     my $conf_path = $af_path . '/conf/';
@@ -212,11 +211,40 @@ my $GAF = $CLASS->new( conf_path => $path );
     # now we can get the final_components    
     $rh_fincomp = $GAF->final_components();
     is($rh_fincomp->{state_code}, 'CT', 'set state_code correctly');
-    is($rh_fincomp->{county_code}, 'B', 'set county_code correctly');    
-
-    
+    is($rh_fincomp->{county_code}, 'B', 'set county_code correctly');        
 }
 
+
+
+# test post_formatting
+# actually do some formatting
+{
+    my $af_path = dirname(__FILE__) . '/../../address-formatting';
+    my $conf_path = $af_path . '/conf/';
+    my $GAF = $CLASS->new( conf_path => $conf_path );
+
+    my %pftests = (
+        'Berlin, Berlin' => {
+            'input' => 'Berlin, Berlin, Germany',
+            'expected' => 'Berlin, Germany',
+        },
+        'New York, New York' => {
+            'input' => 'New York, New York, USA',
+            'expected' => 'New York, New York, USA',
+        },        
+    );
+
+    foreach my $tname (sort keys %pftests){
+        my $input = $pftests{$tname}->{input};
+        my $expected = $pftests{$tname}->{expected};        
+        is(
+            $GAF->_postformat($input),
+            $expected,
+            'testing _postformat ' . $tname,
+        );
+    }
+    
+}
 done_testing();
 
 1;

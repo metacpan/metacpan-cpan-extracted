@@ -25,12 +25,10 @@ _Inline/.*
 ^_build/.*
 ~$
 .*\.planner
-.perltidyrc
 .travis.yml
 Config-AutoConf-.*
 ^applied_patches/
 \bxt
-^MYMETA\.json$
-^MYMETA\..*$
+^MYMETA\..*
 cover_db
 nytprof

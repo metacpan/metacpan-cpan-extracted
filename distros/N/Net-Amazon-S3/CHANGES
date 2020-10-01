@@ -1,5 +1,18 @@
 Revision history for Perl module Net::Amazon::S3:
 
+0.94 2020-09-27
+	- fix undefined method call in still untested methods (thanks Russell Jenkins)
+
+0.93 2020-09-27
+	- fix syntax failures on perl < v5.22 (thanks cpantesters)
+
+0.92 2020-09-26
+	- misc cleanups, more tests
+	- Net::Amazon::S3::Client now can be constructed with same arguments as Net::Amazon::S3
+	- Support explicit ACL in bucket/object/upload creation
+	- Support set_acl on Client::Bucket / Client::Object (issue #83)
+	- Add support for bucket/object tagging (issue #44)
+
 0.91 2020-08-19 23:25 +0
 	- fix regressions introduced by 0.90
 	  - undeclared dependency

@@ -1,0 +1,6 @@
+name = "App-PerlFuzzyTokenFinder"
+# badges = ["travis-ci.com"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+
+readme_from="script/perl-fuzzy-token-finder"

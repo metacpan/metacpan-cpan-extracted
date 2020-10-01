@@ -1,5 +1,7 @@
 package Geo::Coder::Free::OpenAddresses;
 
+# Includes both openaddresses and Whos On First data
+
 use strict;
 use warnings;
 
@@ -67,7 +69,7 @@ Refer to the source URL for licencing information for these files:
 
 To install:
 
-1. download the data from http://results.openaddresses.io/. You will find licencing information on that page.
+1. download the data from L<http://results.openaddresses.io/>. You will find licencing information on that page.
 2. unzip the data into a directory. To be clear, if you run "ls -l $OPENADDR_HOME" you should see a list of two-lettered countries e.g 'us'.
 3. point the environment variable OPENADDR_HOME to that directory and save in the profile of your choice.
 4. run the createdatabases.PL script which imports the data into an SQLite database.  This process will take some time.
@@ -127,7 +129,7 @@ sub geocode {
 		%param = %{$_[0]};
 	} elsif(ref($_[0])) {
 		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
-	} elsif(@_ % 2 == 0) {
+	} elsif(scalar(@_) % 2 == 0) {
 		%param = @_;
 	} else {
 		$param{location} = shift;
@@ -999,7 +1001,7 @@ VWF, openaddresses.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2018 Nigel Horne.
+Copyright 2017-2020 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

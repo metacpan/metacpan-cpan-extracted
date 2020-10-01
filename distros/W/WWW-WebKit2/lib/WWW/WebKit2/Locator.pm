@@ -290,7 +290,7 @@ sub get_screen_position {
         var win_left = window.screenLeft ? window.screenLeft : window.screenX;
         var win_top = window.screenTop ? window.screenTop : window.screenY;
         var result = { "y": win_top + y, "x": win_left + x };
-        JSON.stringify(result)';
+        return JSON.stringify(result)';
 
     my $result = decode_json $self->inspector->run_javascript($search);
     return ($result->{x}, $result->{y});
@@ -338,11 +338,11 @@ sub fire_event {
         }, { once: true });
         var event = new Event("' . $event_type . '", { "bubbles": true, "cancelable": true });
         element.dispatchEvent(event);
-    ';
+        ';
 
     my $result = $self->inspector->run_javascript($fire_event);
     $self->inspector->wait_for_condition(sub {
-        my $event_fired = $self->inspector->run_javascript("window.event_fired");
+        my $event_fired = $self->inspector->run_javascript("return window.event_fired");
         # event_fired will be undef if the event triggered a page load
         return 1 if (not $event_fired or $event_fired eq "fired");
         return 0;
@@ -369,7 +369,7 @@ sub is_visible {
 
     $search .= "
         $is_visible_function
-        isVisible(element)
+        return isVisible(element)
     ";
 
     return $self->inspector->run_javascript($search);
@@ -455,7 +455,7 @@ sub prepare_element {
         var $element_name = getElementsByXPath('$locator'$parent_param);
     ";
 
-    my $count = $self->inspector->run_javascript($search . "$element_name.length;");
+    my $count = $self->inspector->run_javascript($search . "return $element_name.length;");
     croak "xpath: $locator gave $count results" if $count != 1;
 
     $search .= "$element_name = $element_name" . "[0];";
@@ -471,7 +471,7 @@ sub prepare_element_search {
     my ($self, $function) = @_;
 
     my $search = $self->prepare_element;
-    $search .= "element.$function;";
+    $search .= "return element.$function;";
 
     return $search;
 }
@@ -501,7 +501,7 @@ sub prepare_elements_search {
     my ($self, $function) = @_;
 
     my $search = $self->prepare_elements;
-    $search .= "elements.$function;";
+    $search .= "return elements.$function;";
 
     return $search;
 }

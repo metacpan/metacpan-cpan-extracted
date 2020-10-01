@@ -1,7 +1,9 @@
 package Data::Sah::Params;
 
-our $DATE = '2016-05-30'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-25'; # DATE
+our $DIST = 'Data-Sah-Params'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -116,7 +118,7 @@ sub compile {
 }
 
 1;
-# ABSTRACT: Validate function arguments using Sah schemas
+# ABSTRACT: (DEPRECATED) Validate function arguments using Sah schemas
 
 __END__
 
@@ -126,11 +128,11 @@ __END__
 
 =head1 NAME
 
-Data::Sah::Params - Validate function arguments using Sah schemas
+Data::Sah::Params - (DEPRECATED) Validate function arguments using Sah schemas
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::Params (from Perl distribution Data-Sah-Params), released on 2016-05-30.
+This document describes version 0.005 of Data::Sah::Params (from Perl distribution Data-Sah-Params), released on 2020-09-25.
 
 =head1 SYNOPSIS
 
@@ -183,6 +185,8 @@ This document describes version 0.003 of Data::Sah::Params (from Perl distributi
 
 =head1 DESCRIPTION
 
+B<DEPRECATION NOTICE.> Deprecated in favor of L<Params::Sah>.
+
 Experimental.
 
 Currently mixing positional and named parameters not yet supported.
@@ -227,6 +231,8 @@ feature.
 
 =head1 SEE ALSO
 
+L<Params::Sah> is now the preferred module over this.
+
 L<Sah> for the schema language.
 
 Similar modules: L<Type::Params>, L<Params::Validate>, L<Params::CheckCompiler>.
@@ -245,7 +251,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

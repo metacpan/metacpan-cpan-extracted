@@ -9,7 +9,8 @@ use Archive::Zip;
 my $d = dirname($0);
 my $sxc_file = "$d/t.sxc";
 
-my $content = Archive::Zip->new($sxc_file)->memberNamed('content.xml')->contents;
+my $content = Archive::Zip->new($sxc_file)
+                  ->memberNamed('content.xml')->contents;
 my ($fh,$tempfile) = tempfile();
 binmode $fh;
 print $fh $content;

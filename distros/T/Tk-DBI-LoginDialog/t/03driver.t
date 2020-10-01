@@ -32,8 +32,7 @@ use Test::More;
 use lib 't';
 use tester;
 
-my $ot = tester->new;
-#$ot->tests(18);
+my $ot = tester->new('Tk::DBI::LoginDialog');
 my $tests = 18;  # we dynamically increment as number of DBI drivers unknown
 
 
@@ -44,16 +43,15 @@ my $top = $ot->top;
 
 
 # ---- module ----
-my $c_this = 'Tk::DBI::LoginDialog';
-require_ok($c_this);
+require_ok($ot->this);
 
 
 # ---- create ----
 my $ld0 = $top->LoginDialog;
 my $ld1 = $top->LoginDialog;
 
-isa_ok($ld0, $c_this, "new object 0");
-isa_ok($ld1, $c_this, "new object 1");
+isa_ok($ld0, $ot->this, "new object 0");
+isa_ok($ld1, $ot->this, "new object 1");
 
 
 # ---- override driver ----
@@ -130,5 +128,5 @@ ok(@{ $ld1->drivers } == $count,	"restored default drivers");
 
 $ot->queue_button($ld1, "Cancel");
 
-done_testing($tests + $ot->count);
+$ot->done($tests);
 

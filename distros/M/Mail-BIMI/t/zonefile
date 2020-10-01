@@ -1,8 +1,20 @@
-default._bimi.gallifreyburning.com TXT "v=bimi1; l=https://gallifreyburning.com/bimi.svg"
-foobar._bimi.gallifreyburning.com TXT "v=bimi1; l=https://bimi.example.com/marks/bazz.svg"
-spfall.gallifreyburning.com TXT "v=spf1 ip4:1.2.3.4 +all"
-spfnall.gallifreyburning.com TXT "v=spf1 ip4:1.2.3.4 -all"
-default._bimi.spfall.gallifreyburning.com TXT "v=bimi1; l=https://bimi.example.com/marks/spfall.svg"
+_dmarc.example.com TXT "v=DMARC1; p=reject; sp=reject;"
+_dmarc.gallifreyburning.com TXT "v=DMARC1; p=reject; sp=reject;"
+_dmarc.gallifreyburning.org TXT "v=DMARC1; p=reject; sp=reject;"
+_dmarc.multi.com TXT "v=DMARC1; p=reject; sp=reject;"
+_dmarc.nobimi.com TXT "v=DMARC1; p=reject; sp=reject;"
+_dmarc.test.example.com TXT "v=DMARC1; p=reject; sp=reject;"
+default._bimi.gallifreyburning.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
 default._bimi.multi.com TXT "v=bimi1; l=https://bimi.example.com/marks/first.svg"
 default._bimi.multi.com TXT "v=bimi1; l=https://bimi.example.com/marks/second.svg"
-
+default._bimi.spfall.gallifreyburning.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+example.com A 1.2.3.4
+foobar._bimi.gallifreyburning.com TXT "v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg"
+gallifreyburning.com A 1.2.3.4
+gallifreyburning.org A 1.2.3.4
+multi.com A 1.2.3.4
+nobimi.com A 1.2.3.4
+spfall.gallifreyburning.com TXT "v=spf1 ip4:1.2.3.4 +all"
+spfnall.gallifreyburning.com TXT "v=spf1 ip4:1.2.3.4 -all"
+test.example.com A 1.2.3.4
+default._bimi.fastmaildmarc.com TXT "v=BIMI1; l=https://fastmaildmarc.com/FM_BIMI.svg; a="

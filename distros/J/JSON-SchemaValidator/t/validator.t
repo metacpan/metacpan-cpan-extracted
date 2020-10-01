@@ -19,4 +19,41 @@ subtest 'validate object' => sub {
       ];
 };
 
+subtest 'oneOf' => sub {
+    my $result = $validator->validate(
+        {},
+        {
+            type       => 'object',
+            properties => {
+                foo => {type => 'string'},
+                bar => {type => 'string'},
+            },
+            oneOf => [{required => ['foo']}, {required => ['bar']}],
+        }
+    );
+
+    is_deeply $result->errors,
+      [
+        {
+            uri       => '#',
+            message   => "Must be one of",
+            attribute => 'oneOf',
+            details   => [
+                {
+                    'uri'       => '#/foo',
+                    'details'   => ['(true)'],
+                    'attribute' => 'required',
+                    'message'   => 'Required'
+                },
+                {
+                    'details'   => ['(true)'],
+                    'uri'       => '#/bar',
+                    'message'   => 'Required',
+                    'attribute' => 'required'
+                }
+            ]
+        }
+      ];
+};
+
 done_testing;

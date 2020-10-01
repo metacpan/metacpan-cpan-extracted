@@ -5,7 +5,7 @@ use warnings;
 use boolean qw(true false);
 
 use DateTime::Format::Natural;
-use Test::More tests => 16;
+use Test::More tests => 17;
 
 {
     # Assert for prefixed dates that an extracted unit which is
@@ -107,4 +107,11 @@ use Test::More tests => 16;
     my $parser = DateTime::Format::Natural->new;
     my @expressions = $parser->extract_datetime('23:30 some text jan 19th to 20th');
     is_deeply(\@expressions, ['23:30', 'jan 19th to 20th'], 'last matching token in left duration substring');
+}
+
+{
+    # Assert that parsing month/day with an explicit ymd-format fails.
+    my $parser = DateTime::Format::Natural->new(format => 'd/m/y');
+    $parser->parse_datetime('8/10');
+    ok(!$parser->success, 'parsing month/day with an explicit ymd-format failed');
 }

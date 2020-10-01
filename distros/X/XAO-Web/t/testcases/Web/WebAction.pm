@@ -10,6 +10,10 @@ use base qw(XAO::testcases::Web::base);
 sub test_all {
     my $self=shift;
 
+    $self->siteconfig->put('/xao/action/json_canonical' => 1);
+    $self->siteconfig->put('/xao/action/json_pretty' => 0);
+    $self->siteconfig->put('/xao/page/character_mode' => 1);
+
     my $page=XAO::Objects->new(objname => 'Web::Page');
     $self->assert(ref($page),
                   "Can't load Page object (page)");
@@ -21,7 +25,7 @@ sub test_all {
         '<%MyAction mode="test-one" arg="one"%>'                        => 'test-one-ok',
         '<%MyAction mode="test-two" arg="two"%>'                        => 'test-two-ok',
         '<%MyAction mode="test-three" format="json"%>'                  => qr/^\s*\[\s*"foo"\s*,\s*"bar"/s,
-        '<%MyAction mode="test-four"%>'                                 => qr/status.*:.*success/s,
+        '<%MyAction mode="test-four"%>'                                 => q({"bar":{"hash":"ref"},"foo":"scalar","status":"success"}),
         #
         # Alternate display methods
         #
@@ -30,7 +34,7 @@ sub test_all {
         '<%MyAction displaymode="test-alt" datamode="test-alt" arg="C"%>'   => 'ALT:C',
         '<%MyAction mode="test-alt" displaymode="" arg="D"%>'               => 'ALT:D',
         '<%MyAction mode="test-alt" datamode="" arg="E"%>'                  => 'ALT:E',
-        '<%MyAction datamode="test-alt" mode="data" arg="A"%>'              => qr/status.*:.*success/s,
+        '<%MyAction datamode="test-alt" mode="data" arg="A"%>'              => q({"arg":"A","status":"success"}),
         '<%MyAction mode="test-alt" datamode="test-two" arg="A"%>'          => 'ALT:xxA',
         #
         # Cross-polination of code cache checking
@@ -42,9 +46,14 @@ sub test_all {
         #
         '<%MyAction mode="test-four" format="xml"%>'                    => '<test-four><foo>scalar</foo><bar><hash>ref</hash></bar></test-four>',
         '<%MyAction mode="test-four" xmlmode="generic" format="xml"%>'  => '<data-keys>bar,foo,status</data-keys>',
+        #
+        qq(<\%MyAction datamode='test-alt' format='json' arg='a\x{2122}'\%>)        => Encode::encode('utf8',qq({"arg":"a\x{2122}","status":"success"})),
+        qq(<\%MyAction datamode='test-alt' format='json-embed' arg='a\x{2122}'\%>)  => qq({"arg":"a\x{2122}","status":"success"}),
+        qq(<\%MyAction datamode='test-alt' format='json' arg='b\x{2122}'\%>)        => Encode::encode('utf8',qq({"arg":"b\x{2122}","status":"success"})),
+        qq(<\%MyAction datamode='test-alt' format='json-embed' arg='b\x{2122}'\%>)  => qq({"arg":"b\x{2122}","status":"success"}),
     );
 
-    foreach my $template (keys %tests) {
+    foreach my $template (sort keys %tests) {
         my $expect=$tests{$template};
 
         my ($err_my,$err_base,$err_unknown)=('','','');
@@ -52,6 +61,7 @@ sub test_all {
         my $got;
 
         try {
+            $self->siteconfig->force_byte_output(0);        # Gets switched to 1 by application/json MIME on json's
             $got=$page->expand(template => $template);
         }
         catch XAO::E::DO::Web::MyAction with {

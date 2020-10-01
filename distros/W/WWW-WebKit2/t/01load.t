@@ -9,6 +9,9 @@ use FindBin qw($Bin $RealBin);
 use lib "$Bin/../../Gtk3-WebKit2/lib";
 use URI;
 
+#Running tests as root will sometimes spawn an X11 that cannot be closed automatically and leave the test hanging
+plan skip_all => 'Tests run as root may hang due to X11 server not closing.' unless $>;
+
 use_ok 'WWW::WebKit2';
 
 my $timeout = 1000;
@@ -58,8 +61,8 @@ ok($sel->is_ordered('id=first', 'id=second'), 'is_ordered is correct for ordered
 ok((not $sel->is_ordered('id=second', 'id=first')), 'is_ordered detects wrong order correctly');
 
 $sel->open("$Bin/test/eval.html");
-is($sel->eval_js('"foo"'), 'foo', 'string evaluated');
-is($sel->eval_js('document.getElementById("foo").firstChild.data'), 'bar', 'js evaluated');
+is($sel->eval_js('return "foo"'), 'foo', 'string evaluated');
+is($sel->eval_js('return document.getElementById("foo").firstChild.data'), 'bar', 'js evaluated');
 
 $sel->refresh;
 $sel->open("$Bin/test/type.html");

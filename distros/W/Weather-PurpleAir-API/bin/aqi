@@ -74,6 +74,10 @@ sub usage {
         "   38887   Litchfield\n";
 }
 
+=head1 NAME
+
+aqi -- command line utility for pulling sensor data from purpleair.com
+
 =head1 USAGE
 
     $ aqi --sensor=<id>[,<id>,...] [options]

@@ -5,7 +5,7 @@ use warnings;
 use base qw( FFI::C::Struct );
 
 # ABSTRACT: Union data instance for FFI
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ FFI::C::Union - Union data instance for FFI
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -70,6 +70,10 @@ Creates a new instance of the C<union>.
 =item L<FFI::C::ArrayDef>
 
 =item L<FFI::C::Def>
+
+=item L<FFI::C::File>
+
+=item L<FFI::C::PosixFile>
 
 =item L<FFI::C::Struct>
 

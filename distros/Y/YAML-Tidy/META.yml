@@ -1,0 +1,60 @@
+---
+abstract: 'Tidy YAML files'
+author:
+  - 'Tina Müller <tinita@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::More: '0.98'
+  Test::Warnings: '0.029'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YAML-Tidy
+provides:
+  YAML::Tidy:
+    file: lib/YAML/Tidy.pm
+    version: '0.002'
+  YAML::Tidy::Config:
+    file: lib/YAML/Tidy/Config.pm
+    version: '0.002'
+  YAML::Tidy::Node:
+    file: lib/YAML/Tidy/Node.pm
+    version: '0.002'
+  YAML::Tidy::Node::Collection:
+    file: lib/YAML/Tidy/Node.pm
+    version: '0.002'
+  YAML::Tidy::Node::Scalar:
+    file: lib/YAML/Tidy/Node.pm
+    version: '0.002'
+requires:
+  Cwd: '0'
+  Data::Dumper: '0'
+  Encode: '0'
+  Getopt::Long::Descriptive: '0'
+  YAML::LibYAML::API: '0.012'
+  YAML::LibYAML::API::XS: '0'
+  YAML::PP::Common: '0'
+  YAML::PP::Highlight: '0'
+  YAML::PP::Parser: '0'
+  base: '0'
+  constant: '0'
+  experimental: '0'
+  perl: v5.20.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/perlpunk/yamltidy/issues
+  repository: https://github.com/perlpunk/yamltidy
+version: '0.002'
+x_generated_by_perl: v5.30.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -51,7 +51,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 *_sqrtint = \&Math::PlanePath::_sqrtint;
 @ISA = ('Math::PlanePath');
@@ -459,6 +459,11 @@ L<http://oeis.org/A056105> (etc)
 
 =back
 
+    A328818    X coordinate
+    A307012    Y coordinate
+    A307011    (X-Y)/2
+    A307013    (X+Y)/2
+
     A056105    N on X axis
     A056106    N on X=Y diagonal
     A056107    N on North-West diagonal
@@ -471,6 +476,7 @@ L<http://oeis.org/A056105> (etc)
     A135708    grid sticks of N hexagons 
 
     n_start=0
+      A001399    N positions of turns (extra initial 1)
       A000567    N on X axis, octagonal numbers
       A049451    N on X negative axis
       A049450    N on X=Y diagonal north-east
@@ -493,7 +499,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

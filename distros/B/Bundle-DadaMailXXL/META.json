@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Bundle-DadaMailXXL",
    "no_index" : {
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.5",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v0.0.7",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

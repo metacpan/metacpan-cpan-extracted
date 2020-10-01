@@ -32,13 +32,12 @@ use Test::More;
 use lib 't';
 use tester;
 
-my $ot = tester->new;
-$ot->tests(35);
+my $ot = tester->new('Tk::DBI::LoginDialog');
+$ot->planned(35);
 
 
 # ---- module ----
-my $c_this = 'Tk::DBI::LoginDialog';
-require_ok($c_this);
+require_ok($ot->this);
 
 
 # ---- globals ----
@@ -50,19 +49,19 @@ my $top = $ot->top;
 # ---- main ----
 my $ld0 = $top->LoginDialog;
 
-isa_ok( $ld0, $c_this, "new no parm");
+isa_ok( $ld0, $ot->this, "new no parm");
 is( Tk::Exists($ld0), 1,	"exists");
 
 eval { $ld0->update; };
-is($@, "", "update $c_this");
+is($@, "", "update $ot->this");
 
 eval { $ld0->destroy; };
-is($@, "", "destroy $c_this");
+is($@, "", "destroy $ot->this");
 
-isnt(Tk::Exists($ld0), 1, "destroyed $c_this");
+isnt(Tk::Exists($ld0), 1, "destroyed $ot->this");
 
 my $ld1 = $top->LoginDialog;
-isa_ok( $ld1, $c_this, "new no parm");
+isa_ok( $ld1, $ot->this, "new no parm");
 
 isnt($ld1->driver, "",			"driver non-null");
 isnt($ld1->driver("DUMMY"), "DUMMY",	"driver override invalid");

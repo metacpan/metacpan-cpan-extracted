@@ -9,9 +9,7 @@ use Carp 'croak';
 use Test2::V0;
 
 use Exporter 'import';
-our @EXPORT = qw/ obs_is /;
-our @EXPORT_OK = qw/ obs_is cold /;
-our %EXPORT_TAGS = (all => \@EXPORT_OK);
+our @EXPORT = qw/ obs_is cold /;
 
 sub cold {
     my ($marble, $mapping) = @_;
@@ -20,10 +18,10 @@ sub cold {
     $mapping //= {};
 
     # Syntax check
-    croak 'Invalid syntax in marble diagram of cold' if $marble !~ /^((?:\((?:[a-z]|\|)+?\))|-|[a-z]|\|)*\z/gx;
+    croak 'Invalid syntax in marble diagram of cold' if $marble !~ /^((?:\((?:[a-z0-9|#])+?\))|[a-z0-9|#-])*\z/gx;
     pos $marble = 0;
 
-    my @tokens = $marble =~ /[a-z]|\(|\)|\-|\|/g;
+    my @tokens = $marble =~ /[a-z0-9\(\)\-\|\#]/g;
 
     my @components;
     my $time = 0;
@@ -32,7 +30,7 @@ sub cold {
 
     TOKEN: for (my $i = 0; $i < @tokens; $i++) {
         my $token = $tokens[$i];
-        if ($token =~ /^[a-z]\z/) {
+        if ($token =~ /^[a-z0-9]\z/) {
             $token = $mapping->{$token} if exists $mapping->{$token};
             push @components, rx_of($token)->pipe(op_delay($time));
             $have_waited = $time;
@@ -48,6 +46,12 @@ sub cold {
             if ($time > $have_waited) {
                 push @components, rx_EMPTY->pipe(op_delay($time));
             }
+            last TOKEN;
+        } elsif ($token eq '#') {
+            push @components, rx_concat(
+                rx_EMPTY->pipe(op_delay($time)),
+                rx_throw_error,
+            );
             last TOKEN;
         }
     }

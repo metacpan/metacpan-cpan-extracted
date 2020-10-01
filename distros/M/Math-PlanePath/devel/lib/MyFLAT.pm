@@ -1,4 +1,4 @@
-# Copyright 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -23,6 +23,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 use List::Util 'max','sum';
+use Scalar::Util 'looks_like_number';
 use Regexp::Common 'balanced';
 
 # uncomment this to run the ### lines
@@ -40,7 +41,8 @@ our @EXPORT_OK
      # 'separate_sinks','add_sink',
      # 'rename_accepting_last',
      # 'is_accepting_sink',
-     # 'blocks',
+     # 'blocks','binary_to_base4',
+     # 'transmute',
 
      # generic functions
      'fraction_digits',
@@ -57,6 +59,7 @@ our @EXPORT_OK
      'FLAT_count_contains',
      'FLAT_rename',
      'FLAT_to_perl_re',
+
 
      # personal preferences
      'view',
@@ -227,11 +230,12 @@ sub predecessors {
   my ($self, $state, $symb) = @_;
   my %targets;
   @targets{ref $state eq 'ARRAY' ? @$state : $state} = ();  # hash slice
+  ### %targets
   my @ret;
   foreach my $from ($self->get_states) {
     foreach my $to ($self->successors($from,$symb)) {
       if (exists $targets{$to}) {
-        push @ret, $state;
+        push @ret, $from;
       }
     }
   }
@@ -526,7 +530,7 @@ going to accepting, then any state with all symbols going to either
 accepting or eventually accepting, and so on until no more such further
 states.
 
-In an NFA any epsilon transitions are crossed in the usual way, but there
+In an NFA, any epsilon transitions are crossed in the usual way, but there
 should be just one starting state (or just one which ever leads to
 accepting).  If multiple starting states then the simple rule used will
 sometimes fail to find all eventually accepting states and hence strings.
@@ -739,7 +743,7 @@ sub fraction_digits {
   #     $f->{'name'} = "$num/$den radix $radix";
   #     return $f;
   #   }
-  # 
+  #
   #   ### $num
   #   ### assert: $num >= 0
   #   ### assert: $num < $den
@@ -800,19 +804,19 @@ sub fraction_also_nines {
 # sub fraction_nines {
 #   my ($fa, %options) = @_;
 #   ### digits_increment() ...
-# 
+#
 #   # starting state is flip
 #   # in flip 0-bit successor as a 1-bit, and thereafter unchanged
 #   #         1-bit successor as a 0-bit, continue flip
-# 
+#
 #   my $direction = $options{'direction'} || 'hightolow';
 #   my $radix     = $options{'radix'} || max($fa->alphabet)+1;
 #   my $nine      = $radix-1;
-# 
+#
 #   my $is_dfa = $fa->isa('FLAT::DFA');
 #   $fa = $fa->clone->MyFLAT::as_nfa;
 #   if ($direction eq 'hightolow') { $fa = $fa->reverse; }
-# 
+#
 #   my %flipped_states;
 #   {
 #     # states reachable by runs of 9s from starting states
@@ -822,7 +826,7 @@ sub fraction_also_nines {
 #         my ($new_state) = $fa->add_states(1);
 #         ### add: "state=$state new=$new_state"
 #         $flipped_states{$state} = $new_state;
-# 
+#
 #         if ($fa->is_starting($state)) {
 #           $fa->set_starting($new_state);
 #           $fa->unset_starting($state);
@@ -831,10 +835,10 @@ sub fraction_also_nines {
 #       }
 #     }
 #   }
-# 
+#
 #   while (my ($state, $flipped_state) = each %flipped_states) {
 #     ### setup: "$state nines becomes $flipped_state"
-# 
+#
 #     foreach my $digit (0 .. $nine-1) {
 #       foreach my $successor ($fa->successors($state, $digit)) {
 #         ### digit: "digit=$digit  $flipped_state -> $successor on 1"
@@ -849,18 +853,18 @@ sub fraction_also_nines {
 #       $fa->add_transition($flipped_state, $new_state, 1);
 #       ### carry above accepting: $new_state
 #     }
-# 
+#
 #     foreach my $successor ($fa->successors($state, $nine)) {
 #       ### nine: "$flipped_state -> $flipped_states{$successor} on 0"
 #       $fa->add_transition($flipped_state, $flipped_states{$successor}, 0);
 #     }
 #   }
-# 
+#
 #   if (defined $fa->{'name'}) {
 #     $fa->{'name'} =~ s{\+(\d+)$}{'+'.($1+1)}e
 #       or $fa->{'name'} .= '+1';
 #   }
-# 
+#
 #   if ($direction eq 'hightolow') { $fa = $fa->reverse; }
 #   if ($is_dfa) { $fa = $fa->as_dfa; }
 #   return $fa;
@@ -930,6 +934,10 @@ sub is_sink {
   my ($fa, $state) = @_;
   my @next = $fa->successors($state);
   return @next==1 && $next[0]==$state;
+}
+sub get_sink_states {
+  my ($fa) = @_;
+  return grep {$fa->MyFLAT::is_sink($_)} $fa->get_states;
 }
 
 sub is_accepting_sink {
@@ -1040,6 +1048,42 @@ sub rename_accepting_last {
                      [ $fa->MyFLAT::get_non_accepting, $fa->get_accepting ]);
 }
 
+sub _sort_sensibly {
+  if (grep {!looks_like_number($_)} @_) {
+    return sort @_;
+  } else {
+    return sort {$a<=>$b} @_;
+  }
+}
+
+sub alphabet_sorted {
+  my ($fa) = @_;
+  return _sort_sensibly($fa->alphabet);
+}
+
+sub states_breadth_first {
+  my ($fa) = @_;
+  my @ret;
+  my $upto = 0;
+  my @alphabet = $fa->MyFLAT::alphabet_sorted;
+  my @pending = sort {$a<=>$b} $fa->get_starting;
+  while (@pending) {
+    my $state = shift @pending;
+    next if defined $ret[$state];
+    $ret[$state] = $upto++;
+    foreach my $symbol (@alphabet) {
+      push @pending, sort {$a<=>$b} $fa->successors($state, $symbol);
+    }    
+  }    
+  return @ret;
+}
+
+sub rename_breadth_first {
+  my ($fa) = @_;
+  return FLAT_rename($fa, states_list => [$fa->MyFLAT::states_breadth_first]);
+}
+
+
 #------------------------------------------------------------------------------
 
 # zero_digits_flat() returns a FLAT::DFA matching a run of 0 digits,
@@ -1090,11 +1134,26 @@ use constant::defer bits_N_odd_flat => sub {
 # Return a FLAT::DFA which matches exactly $len many bits 0,1.
 sub bits_of_length_flat {
   my ($len) = @_;
-  require FLAT::Regex;
-  return FLAT::Regex->new('(0|1)' x $len)
-    ->as_dfa
-    ->MyFLAT::minimize
-    ->MyFLAT::set_name("$len bits");
+  my $f = FLAT::DFA->new;
+  if ($len < 0) { $len = -1; }
+  $f->add_states($len+2);
+  $f->set_starting(0);
+  if ($len >= 0) {
+    $f->set_accepting($len);
+  }
+  foreach my $state (0 .. $len) {
+    $f->add_transition($state,$state+1, 0);
+    $f->add_transition($state,$state+1, 1);
+  }
+  my $non = $len+1;
+  $f->add_transition($non,$non, 0);
+  $f->add_transition($non,$non, 1);
+  return $f->MyFLAT::set_name("$len bits");
+
+  # return FLAT::Regex->new('(0|1)' x $len)
+  #   ->as_dfa
+  #   ->MyFLAT::minimize
+  #   ->MyFLAT::set_name("$len bits");
 }
 sub bits_of_length_or_more_flat {
   my ($len) = @_;
@@ -1191,8 +1250,8 @@ sub FLAT_print_gp_inline_table {
   my @states = $fa->get_states;
   foreach my $state (@states) {
     my @row = map { my @to = $fa->successors($state,$_);
-                    @to==1 or die "oops, not a DFA";
-                    $to[0]+1 } @alphabet;
+                    @to<=1 or die "oops, not a DFA";
+                    @to ? $to[0]+1 : "'none" } @alphabet;
     MyPrintwrap::printwrap(join(',',@row)
                            . ($state == $#states ? '' : ';'));
   }
@@ -1218,6 +1277,8 @@ sub FLAT_print_tikz {
   my $node_prefix = $options{'node_prefix'} // 's';
   my $flow = $options{'flow'} // $fa->{'flow'} // 'east';
   my $state_labels = $options{'state_labels'};
+
+  print "% accepting ", join(',',$fa->get_accepting), "\n";
 
   my @column_to_states;
   my @state_to_column;
@@ -1281,10 +1342,12 @@ sub FLAT_print_tikz {
         print "  \\draw [->,loop below] ($from_state_name) to node[pos=.12,auto=left] {$labels} ();\n";
       } else {
         my $bend = '';
+        my $pos = '.45';
         if ($fa->get_transition($to_state,$from_state)) {
           $bend = ',bend left=10';
+          $pos = '.5';
         }
-        print "  \\draw [->$bend] ($from_state_name) to node[pos=.45,auto=left] {$labels} ($to_state_name);\n";
+        print "  \\draw [->$bend] ($from_state_name) to node[pos=$pos,auto=left] {$labels} ($to_state_name);\n";
       }
     }
     print "\n";
@@ -1370,24 +1433,49 @@ sub aref_to_FLAT_DFA {
 # count_recurrence($fa)
 #
 sub FLAT_count_contains {
-  my ($fa, $max_len) = @_;
+  my ($fa, $max_len, %options) = @_;
   my @states    = $fa->get_states;
   my @accepting = $fa->get_accepting;
   my @alphabet  = $fa->alphabet;
-  my @counts = ($max_len*0) x scalar(@states);  # inherit bignum from $max_len
+  my $zero = $max_len*0;  # inherit bignum from $max_len
+  my $ret_type = $options{'ret_type'} || 'accepting';
+  my @counts = map {$zero} 0 .. $#states;
 
   ### starting: $fa->get_starting
   ### @accepting
-  foreach my $state ($fa->get_starting) { $counts[$state]++; }
+  ### @counts
+  foreach my $state ($fa->get_starting) {
+    $counts[$state]++;
+  }
 
   my @ret;
+  if ($ret_type eq 'rows') {
+    @ret = map {[]} 0 .. $#counts;
+  }
+
   foreach my $k (0 .. $max_len) {
     ### at: "k=$k  ".join(',',map{$_//'_'}@counts)." total ".sum(0,map{$_//0}@counts)." accepting ".sum(0,map{$counts[$_]//0}@accepting)
 
-    push @ret, sum($max_len*0, map {$counts[$_]//0} @accepting);
+    {
+      my $accepting_count = $zero;
+      foreach my $state (@accepting) {
+        if ($counts[$state]) {
+          $accepting_count += $counts[$state];
+        }
+      }
+      if ($ret_type eq 'accepting') {
+        push @ret, $accepting_count;
+      } elsif ($ret_type eq 'columns') {
+        push @ret, \@counts;
+      } elsif ($ret_type eq 'rows') {
+        foreach my $i (0 .. $#counts) {
+          push @{$ret[$i]}, $counts[$i];
+        }
+      }
+    }
     last if $k == $max_len;
 
-    my @new_counts;
+    my @new_counts = map {$zero} 0 .. $#states;
     foreach my $from_state (@states) {
       my $from_count = $counts[$from_state] || next;
       foreach my $symbol (@alphabet) {
@@ -1400,6 +1488,41 @@ sub FLAT_count_contains {
     @counts = @new_counts;
   }
   return @ret;
+}
+
+sub counts_starting {
+  my ($fa, $zero) = @_;
+  if (! defined $zero) { $zero = 0; }
+  return [ map { $zero + ($fa->is_starting($_) ? 1 : 0) }
+           0 .. $fa->num_states-1 ];
+}
+sub counts_next {
+  my ($fa, $aref) = @_;
+
+  # ENHANCE-ME: This is a bit slow.  What's the right way to iterate all
+  # transitions?
+
+  my $zero = $aref->[0] * 0;
+  my @new_counts = ($zero) x scalar(@$aref);
+  my @alphabet  = $fa->alphabet;
+  foreach my $from_state ($fa->get_states) {
+    my $from_count = $aref->[$from_state] || next;
+    foreach my $symbol (@alphabet) {
+      foreach my $to_state ($fa->epsilon_closure
+                            ($fa->successors($from_state, $symbol))) {
+        $new_counts[$to_state] += $from_count;
+      }
+    }
+  }
+  return \@new_counts;
+}
+sub counts_accepting {
+  my ($fa, $aref) = @_;
+  my $ret = $aref->[0] * 0;
+  foreach my $state ($fa->get_accepting) {
+    $ret += $aref->[$state];
+  }
+  return $ret;
 }
 
 # FIXME: Not right for non-accepting cycles.
@@ -1471,6 +1594,15 @@ sub concat {
   }
   return $fa;
 }
+# workaround for FLAT::DFA ->star() infinite recursion, can star in NFA
+sub star {
+  my ($fa) = @_;
+  if ($fa->isa('FLAT::DFA')) {
+    $fa->MyFLAT::as_nfa($fa)->star->as_dfa;
+  } else {
+    $fa->star;
+  }
+}
 
 #------------------------------------------------------------------------------
 sub view {
@@ -1496,6 +1628,14 @@ sub FLAT_check_is_equal {
   if ($f1->equals($f2)) {
     print "$names[0] = $names[1], ok\n";
     return;
+  }
+  {
+    my $a1 = join(',',sort $f1->alphabet);
+    my $a2 = join(',',sort $f2->alphabet);
+    unless ($a1 eq $a2) {
+      print "different alphabet: $a1\n";
+      print "          alphabet: $a2\n";
+    }
   }
   my $radix = $options{'radix'}
     // do { my @labels = $f1->alphabet; scalar(@labels) };
@@ -1903,8 +2043,6 @@ ENHANCE-ME: maybe parameter $n to skip how many.
 
 =cut
 
-#use Smart::Comments;
-
 sub skip_initial {
   my ($fa) = @_;
   ### skip_initial(): $fa
@@ -1993,7 +2131,7 @@ sub skip_initial {
     my @members = $self->members;
 
     # skip initial members which are the empty string and nothing else
-    while (@members >= 2 
+    while (@members >= 2
            && ! $members[0]->is_empty
            && ! $members[0]->has_nonempty_string) {
       shift @members;
@@ -2067,7 +2205,7 @@ sub skip_initial {
     }
     return (@alts
             ? FLAT::Regex::Op::alt->new (@alts)
-            : FLAT::Regex::Op::atomic->new(undef))
+            : FLAT::Regex::Op::atomic->new(undef));
   }
   sub MyFLAT_skip_initial {
     my $self = shift;
@@ -2089,15 +2227,15 @@ sub skip_initial {
   #     $member = $member->MyFLAT_skip_initial(@_);  # mutate array
   #   }
   #   if (%initial) {
-  # 
+  #
   #   return (%initial
   #           ? FLAT::Regex::Op::concat->new
   #           (FLAT::Regex::Op::alt->new
   #            (map {FLAT::Regex::Op::atomic->new($_)} keys %initial),
   #           __PACKAGE__->new(@members))
-  # 
+  #
   #           : FLAT::Regex::Op::atomic->new(undef))
-  # 
+  #
   #   return $self->MyFLAT__map_skip('MyFLAT_skip_final',@_);
   # }
 }
@@ -2121,6 +2259,12 @@ sub skip_final {
   return $fa;
 }
 
+# sub skip_initial_0s {
+#   my ($fa) = @_;
+#   my $s = $fa->MyFLAT::skip_initial;
+# }
+
+
 #------------------------------------------------------------------------------
 
 # $fa is a FLAT::NFA or FLAT::DFA which matches strings of bits.
@@ -2128,11 +2272,12 @@ sub skip_final {
 #
 # MAYBE: a general transform of list of symbols -> single symbol
 #
-# lowtohigh or hightolow only affects how a high 0-bit 
+# lowtohigh or hightolow only affects how a high 0-bit
 #
 sub binary_to_base4 {
   my ($fa, %options) = @_;
   my $direction = $options{'direction'} || 'hightolow';
+  ### binary_to_base4(): $direction
 
   my $name = $fa->{'name'};
   my $is_dfa = $fa->isa('FLAT::DFA');
@@ -2296,17 +2441,17 @@ sub perl_regexp_to_flat_regex {
 
   # [123] char classes
   $str =~ s{\[([^\]]*)\]}{ '(' . join('|',split //, $1) . ')' }eg;
-  
+
   # (| or |) empty alternative
   $str =~ s/\(\|/([]|/g;
   $str =~ s/\|\)/|[])/g;
-  
+
   # X+ repeats, possibly nested
   while ($str =~ s{($RE{'balanced'}{-parens=>'()'}|[^)])\+}{$1$1*}o) {}
-  
+
   # X? optional, possibly nested
   while ($str =~ s{($RE{'balanced'}{-parens=>'()'}|[^)])\?}{($1|[])}o) {}
-  
+
   ### $str
   return $str;
 }
@@ -2316,6 +2461,356 @@ sub flat_regex_to_perl_regexp {
   $str =~ s/\[\]//g;
   return qr/^$str$/x;
 }
+
+
+#------------------------------------------------------------------------------
+# Read and Write AT&T FSM Format
+#
+# AT&T format is transitions in lines like (and in no particular order)
+#
+#     FromState  ToState  InputSymbol  OutputSymbol
+#
+# States are numbered 0 upwards.  0 is the starting state.  The accepting
+# states are one per line after the transition lines.
+#
+# The symbols are non-whitespace, and normally 0 means the "epsilon"
+# transition of an NFA.
+#
+
+sub ensure_states {
+  my $fa = shift;
+  foreach my $state (@_) {
+    if ((my $more = ($state+1 - $fa->num_states)) > 0) {
+      $fa->add_states($more);
+    }
+  }
+}
+
+# $filename contains an "AT&T" format finite state machine or finite state
+# transducer.  Return a FLAT::NFA of it.  Key/value options are
+#
+#     epsilon_symbol    => string, default 0
+#     no_epsilon_symbol => boolean, default false
+#
+# Symbol 0 in the file means an epsilon transition for the NFA and becomes
+# the FLAT style empty symbol ''.  Another symbol can be given with
+# "epsilon_symbol", or no_epsilon_symbol => 1 for no epsilon.
+#
+sub read_att_file {
+  my ($class, $filename, %options) = @_;
+  open my $fh, '<', $filename
+    or croak "Cannot read $filename: $!";
+  my $fa = $class->MyFLAT::read_att_fh($fh, %options);
+  close $fh
+    or croak "Error reading $filename: $!";
+  return $fa;
+}
+sub read_att_fh {
+  my ($class, $fh, %options) = @_;
+  ### $fh
+  my $fa = $class->new;
+  $fa->add_states(1);
+  $fa->set_starting(0);
+  my $epsilon_symbol = '0';
+  if (defined $options{'epsilon_symbol'}) {
+    $epsilon_symbol = $options{'epsilon_symbol'};
+  }
+  if ($options{'no_epsilon_symbol'}) {
+    $epsilon_symbol = undef;
+  }
+
+  while (defined(my $line = readline $fh)) {
+    chomp $line;
+    if (my ($from,$to,$symbol) = $line =~ /^(\d+)\s+(\d+)\s+(\S+)/) {
+      next if $symbol eq '@_IDENTITY_SYMBOL_@';
+      $fa->MyFLAT::ensure_states($from, $to);
+      if (defined $epsilon_symbol && $symbol eq $epsilon_symbol) {
+        $symbol = '';  # FLAT epsilon transition
+      }
+      $symbol =~ s/\./_/g;
+      $symbol =~ s/@/flag/g;
+      ### transition: "$from $to $symbol"
+      $fa->add_transition($from,$to,$symbol);
+    } elsif (my ($state) = $line =~ /^(\d+)$/) {
+      $fa->set_accepting($state);
+    } else {
+      croak "Unrecognised AT&T line: ",$line;
+    }
+  }
+  return $fa;
+}
+
+# $fa is a FLAT::NFA or FLAT::DFA.
+# Write it in "AT&T" format finite state machine format to $filename.
+#
+# $fa must have a single starting state 0, since that is all the file format
+# allows.  Apply some renumbering if necessary before calling here.  For an
+# NFA, there's no need to convert entirely to a DFA, just renumber and make
+# state 0 have epsilon transitions to the actual desired start states.
+#
+# The key/value options are
+#
+#     epsilon_symbol    => string, default 0
+#
+# Epsilon transitions are written to the file as symbol 0 in the usual way
+# for the file format, by default.  The epsilon_symbol option can write
+# something else.  If $fa is a DFA, or if it's an NFA without epsilons, then
+# this has no effect.
+#
+sub write_att_file {
+  my ($fa, $filename, %options) = @_;
+  open my $fh, '>', $filename
+    or croak "Cannot write $filename: $!";
+  $fa->MyFLAT::write_att_fh ($fh, %options);
+  close $fh
+    or croak "Error writing $filename: $!";
+  return $fa;
+}
+sub write_att_fh {
+  my ($fa, $fh, %options) = @_;
+  my $epsilon_symbol = '0';
+  if (defined $options{'epsilon_symbol'}) {
+    $epsilon_symbol = $options{'epsilon_symbol'};
+  }
+  my @states = sort {$a<=>$b} $fa->get_states;
+  my @starting = $fa->get_starting;
+  unless (@starting==1 && $starting[0]==0) {
+    croak "AT&T format must be single starting state 0";
+  }
+  foreach my $from (@states) {
+    foreach my $symbol (sort $fa->alphabet, '') {
+      my $att_symbol = ($symbol eq '' ? $epsilon_symbol : $symbol);
+      foreach my $to (sort {$a<=>$b} $fa->successors($from,$symbol)) {
+        print $fh "$from\t$to\t$att_symbol\t$att_symbol\n";
+      }
+    }
+  }
+  foreach my $state (sort {$a<=>$b} $fa->get_accepting) {
+    print $fh $state,"\n";
+  }
+}
+
+
+#------------------------------------------------------------------------------
+
+sub _DFA_to_Regex_union {
+  return join('|', grep {defined} @_);
+}
+sub _DFA_to_Regex_parens {
+  my ($re) = @_;
+  return ($re eq '' ? '' : "($re)");
+}
+sub _DFA_to_Regex_star {
+  my ($re) = @_;
+  return (defined $re && $re ne '' ? "($re)*" : '');
+}
+
+# FLAT::DFA
+sub DFA_to_Regex {
+  my ($fa) = @_;
+  my @edges;
+  my @states = $fa->get_states;
+  my $starting = $states[-1]+1;
+  my $accepting = $states[-1]+2;
+  ### $starting
+  ### $accepting
+  foreach my $to ($fa->get_starting) {
+    $edges[$starting]->[$to] = '';
+  }
+  foreach my $from ($fa->get_accepting) {
+    $edges[$from]->[$accepting] = '';
+  }
+  foreach my $symbol ($fa->alphabet) {
+    foreach my $from (@states) {
+      foreach my $to ($fa->successors([$fa->epsilon_closure($from)],
+                                      $symbol)) {
+        $edges[$from]->[$to] = _DFA_to_Regex_union($edges[$from]->[$to],
+                                                   $symbol);
+      }
+    }
+  }
+
+  unshift @states, $starting, $accepting;
+  ### @states
+  ### @edges
+  while (@states > 2) {
+    my $s = pop @states;
+    my $star = _DFA_to_Regex_star($edges[$s]->[$s]);
+    ### $s
+    ### $star
+    foreach my $pre_state (@states) {
+      my $pre_re = $edges[$pre_state]->[$s];
+      ### $pre_state
+      ### $pre_re
+      next unless defined $pre_re;
+      $pre_re = _DFA_to_Regex_parens($pre_re);
+      foreach my $post_state (@states) {
+        my $post_re = $edges[$s]->[$post_state];
+        ### $post_state
+        ### $post_re
+        next unless defined $post_re;
+        $post_re = _DFA_to_Regex_parens($post_re);
+        $edges[$pre_state]->[$post_state]
+          = _DFA_to_Regex_union($edges[$pre_state]->[$post_state],
+                                "$pre_re $star $post_re");
+        ### now: "$pre_state to $post_state is ".$edges[$pre_state]->[$post_state]
+      }
+    }
+    undef $edges[$s];
+  }
+
+  ### stop ...
+  ### @states
+  ### return: $edges[$starting]->[$accepting]
+  my $ret = $edges[$starting]->[$accepting];
+  return (! defined $ret ? '#' : $ret);
+}
+
+sub FLAT_re_to_xfsm_re {
+  my ($str) = @_;
+  $str =~ tr/()0/[]z/;
+  return $str;
+}
+
+
+#------------------------------------------------------------------------------
+
+sub FLAT_transition_split {
+  my ($fa, %options) = @_;
+  my @alphabet = $fa->alphabet;
+
+  my $symbols_func = $options{'symbols_func'}
+    // do {
+      my $symbols_map  = $options{'symbols_map'} // {};
+      sub {
+        my ($symbol) = @_;
+        my $aref = $symbols_map->{$symbol};
+        return ($aref ? @$aref : ());
+      }
+    };
+
+  my $new = (ref $fa)->new;
+  $new->add_states($fa->num_states);
+  $new->{'name'} = $fa->{'name'};
+
+  $new->set_accepting($fa->get_accepting);
+  $new->set_starting($fa->get_starting);
+  foreach my $symbol (@alphabet) {
+    my @new_symbols = $symbols_func->($symbol);
+    if (! @new_symbols) {
+      @new_symbols = ($symbol);  # unchanged
+    }
+    foreach my $state ($fa->get_states) {
+      foreach my $old_to ($fa->successors($state, $symbol)) {
+        ### split: "$state to $old_to symbol $symbol becomes ".join(' ',@new_symbols)
+        my $from = $state;
+        foreach my $i (0 .. $#new_symbols - 1) {
+          my ($to) = $new->add_states(1);
+          if ($options{'new_accepting_to'} && $fa->is_accepting($old_to)) {
+            ### new accepting: $to
+            $new->set_accepting($to);
+          }
+          $new->add_transition($from, $to, $new_symbols[$i]);
+          $from = $to;
+        }
+        $new->add_transition($from, $old_to, $new_symbols[-1]);
+      }
+    }
+  }
+  return $new;
+}
+
+
+
+#------------------------------------------------------------------------------
+
+
+sub optional_leading_0s {
+  my ($f) = @_;
+  $f = $f->MyFLAT::as_nfa;
+  my $count = 0;
+  for (;;) {
+    my @starting = $f->get_starting;
+    ### $count
+    ### @starting
+    last if $count == scalar(@starting);
+    $count = scalar(@starting);
+    my @new_starting = $f->successors([$f->epsilon_closure(@starting)],'0');
+    ### @new_starting
+    $f->set_starting(@new_starting);
+  }
+  return $f->as_dfa;
+}
+
+
+
+# func => $func called
+#   ($new_transmute,$new_symbol) = $func->($transmute,$symbol)
+#
+# $transmute is a string representing the current transmutation conditions.
+
+sub transmute {
+  my ($fa, %options) = @_;
+  ### transmute() ...
+
+  my $direction = $options{'direction'} || 'forward';
+  my $func    = $options{'func'};
+  my $initial = $options{'initial'};
+  if (! defined $initial) { $initial = ''; }
+
+  my $is_dfa = $fa->isa('FLAT::DFA');
+  $fa = $fa->MyFLAT::as_nfa->clone;
+  if ($direction eq 'reverse') { $fa = $fa->reverse; }
+  my @alphabet = $fa->alphabet;
+
+  my $new_fa = (ref $fa)->new;
+  my @state_and_transmute_to_new_state;
+  my $find_new_state = sub {
+    my ($state, $transmute) = @_;
+    return ($state_and_transmute_to_new_state[$state]->{$transmute} //= do {
+      my ($new_state) = $new_fa->add_states(1);
+      if ($fa->is_starting($state) && $transmute eq $initial) {
+        $new_fa->set_starting($new_state);
+      }
+      if ($fa->is_accepting($state)) {
+        $new_fa->set_accepting($new_state);
+      }
+      $new_state;
+    });
+  };
+    
+  my @state_and_transmute_done;
+  my @pending = map {[$_,$initial]} $fa->get_starting;
+  while (my $elem = shift @pending) {
+    my ($state,$transmute) = @$elem;
+    ### elem: "state=$state transmute=$transmute"
+    if ($state_and_transmute_done[$state]->{$transmute}++) {
+      ### already seen ...
+      next;
+    }
+    my $new_from = $find_new_state->($state,$transmute);
+
+    foreach my $symbol (@alphabet) {
+      my @to = $fa->successors([$fa->epsilon_closure($state)],$symbol) or next;
+      my ($new_transmute,$new_symbol) = $func->($transmute,$symbol) or next;
+      ### for transition: "symbol=$symbol  new_symbol=$new_symbol new_transmute=$new_transmute"
+      foreach my $to (@to) {
+        my $new_to = $find_new_state->($to,$new_transmute);
+        $new_fa->add_transition($new_from, $new_to, $new_symbol);
+        push @pending, [$to, $new_transmute];
+        ### add new: "new_symbol=$new_symbol  $new_from -> $new_to"
+      }
+    }
+  }
+
+  if ($direction eq 'reverse') { $new_fa = $new_fa->reverse; }
+  if ($is_dfa) { $new_fa = $new_fa->as_dfa; }
+  if (defined(my $name = $options{'name'})) {
+    $new_fa->MyFLAT::set_name($name);
+  }
+  return $new_fa;
+}
+
 
 #------------------------------------------------------------------------------
 1;

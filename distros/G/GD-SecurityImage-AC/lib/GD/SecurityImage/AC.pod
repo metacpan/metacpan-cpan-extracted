@@ -1,3 +1,4 @@
+=encoding utf8
 
 =head1 NAME
 
@@ -153,22 +154,30 @@ definitely doing something that bears close examination.
 
 =head1 CHANGES
 
-1.11 2008.05.02 - Maintenance taken over by Benjamin Franz. 
-                  Taint compatibility fixed and documented.
-                  Locking fixed.
-                  Example of CGI usage added (see examples/ folder).
-                  Artistic License file added.
-                  POD split into .pod file.
-                  Removed pointless AUTOLOAD subs.
-                  Add build test for taint.
-                  Removed use of 'base' module.
 
-1.10 2006.02.19
-        => First release after separation from GD::SecurityImage
-           distribution.
-        => Fixed a bug in setting attributes in new() and AUTOLOAD().
-        => (Hopefully) fixed a bug related to unlink()ing images.
-           Reported by GribUser.
+1.12 Sun Sep 27 07:02:00 2020
+        => Changed license to MIT
+        => Fixed encoding issue in POD
+        => Updated build tooling
+        => Updated maintainer info
+        => Made POD tests optional
+        => Added 'use warnings'
+
+1.11 Sun May 02 07:29:00 2008
+        => Seperated POD into .pod file
+        => Fixed taint compatibility and added documentation note on it
+        => Fixed locking
+        => Removed pointless AUTOLOAD (and consequent DESTROY) subs
+        => Replaced use of 'base' module with direct setting of @Authen::Captcha::ISA 
+        => Added build test for taint compatibility
+        => Benjamin Franz took over as maintainer
+
+1.10 Sun Feb 19 23:33:56 2006
+	=> First release after separation from GD::SecurityImage 
+	   distribution.
+	=> Fixed a bug in setting attributes in new() and AUTOLOAD().
+	=> (Hopefully) fixed a bug related to unlink()ing images.
+	   Reported by GribUser.
 
 =head1 SEE ALSO
 

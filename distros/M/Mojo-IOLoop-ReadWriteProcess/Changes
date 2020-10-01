@@ -1,6 +1,9 @@
 
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+0.28 2020-09-30T11:51:40Z
+ - Avoid executing "blocking stop" code when process has already terminated by Martchus 
+
 0.27 2020-07-03T00:25:15Z
   - Fix CircleCI build
   - Fix perl required version

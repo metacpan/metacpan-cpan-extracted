@@ -80,7 +80,21 @@ method _migrate() {
 				my $archive_id = $self->get_archive_id($archive);
 				$self->{dbh}->do("alter table `files` rename column `timestamp-$archive` to `$archive_id`");
 			}
-},
+		},
+		3 => sub {
+			# Drop all cached files due to a bug in
+			# lib/App/BorgRestore/PathTimeTable/DB.pm that caused certain files
+			# to be skipped rather than being added to the `files` table.
+			$self->{dbh}->do('delete from `archives`');
+			$self->{dbh}->do('delete from `files`');
+		},
+		4 => sub {
+			# Drop all cached files due to a bug in
+			# lib/App/BorgRestore/PathTimeTable/DB.pm that caused certain files
+			# to be skipped rather than being added to the `files` table.
+			$self->{dbh}->do('delete from `archives`');
+			$self->{dbh}->do('delete from `files`');
+		},
 	};
 
 	for my $target_version (sort { $a <=> $b } keys %$schema) {

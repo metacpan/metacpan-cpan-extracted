@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -24,7 +24,7 @@ use Carp 'croak';
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 127;
+$VERSION = 128;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
@@ -380,7 +380,7 @@ sub _digit_permutation_interleave {
 1;
 __END__
 
-=for stopwords eg Ryde Math-PlanePath quater-imaginary radix Radix ie radix-1 Proth XYX XXY Xn
+=for stopwords eg Ryde Math-PlanePath radix Radix ie radix-1 Proth XYX XXY Xn
 
 =head1 NAME
 
@@ -641,7 +641,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

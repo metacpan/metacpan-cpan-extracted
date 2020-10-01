@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/lib";
 use OpenSSL_Control ();
 
 use Test::More;
-use Test::NoWarnings;
+use Test::FailWarnings;
 use Test::Deep;
 use Test::Exception;
 
@@ -39,11 +39,7 @@ use Crypt::Perl::ECDSA::Generate ();
 use Crypt::Perl::ECDSA::Parse ();
 use Crypt::Perl::ECDSA::PublicKey ();
 
-if ( !caller ) {
-    my $test_obj = __PACKAGE__->new();
-    plan tests => $test_obj->expected_tests(+1);
-    $test_obj->runtests();
-}
+__PACKAGE__->new()->runtests() if !caller;
 
 #----------------------------------------------------------------------
 
@@ -52,7 +48,9 @@ sub new {
 
     my $self = $class->SUPER::new(@args);
 
-    $self->num_method_tests( 'test_sign', 12 * @{ [ $class->_CURVE_NAMES() ] } );
+    my $total_curves = @{ [ $class->_CURVE_NAMES() ] };
+
+    $self->num_method_tests( 'test_sign', 24 * $total_curves );
 
     return $self;
 }
@@ -62,7 +60,7 @@ sub _CURVE_NAMES {
 
     opendir( my $dh, $dir );
 
-    return map { m<(.+)\.key\z> ? $1 : () } readdir $dh;
+    return sort map { m<(.+)\.key\z> ? $1 : () } readdir $dh;
 }
 
 sub test_get_public_key : Tests(1) {
@@ -137,6 +135,53 @@ sub test_seed : Tests(2) {
     return;
 }
 
+sub test_sign_deterministic__specific : Tests(10) {
+    my ($self) = @_;
+
+    my $key_pem = <<END;
+-----BEGIN EC PRIVATE KEY-----
+MIHcAgEBBEIAv28oIsE2drCHfA3Jhkhc/kjsm2VcZywFpFAM1QuH/KmOu3iucI2r
+Q/bz2G3Fqhg4gSOq4Wo/WNkF+2djB49fGmmgBwYFK4EEACOhgYkDgYYABAHP4J5m
+Tvsh+RBJauItPWOOraBVslPOkAHp4aPHKKHCHSqvnc8Rd35hrd4qHGAEijehicrA
+eXThDZUZ9ampjgdyNgDlsIIYpL/kS7Ryx9bujpTsDPEa3zsRFmftoAuteT45n8Is
+X75cA6vjBy2iqZZDGCTCpB0qs8hakzocogUboszkzw==
+-----END EC PRIVATE KEY-----
+END
+
+    my $key = Crypt::Perl::ECDSA::Parse::private($key_pem);
+
+    my $msg = 'sample';
+
+    # Generated with python-ecdsa:
+    my @t = (
+        [ sha1 => '3081880242013810418d469f68bc927377b736b8f0ebdb7461191375ec1aadafefa33841af408911c1f0b5d9c3760c61a998c062facf04bc36caa358b799e98d8ea5543a98fc28024201d8020ebc23387a5d6bc94f8fe2060052eb90f0fee21c66e73011c95f407fa5ae3114deba730aeead003291fe9a1cfd5077210556bf85af38ea58e04f09c54fc819' ],
+        [ sha224 => '3081880242010cbfcdf601b4d21de4fec949897d137c8de88ef462030d5010758a00ac151b1ce613d2b90e768454b618386ffbb9cdeb12121d910da25fd2d23965bf1501f7538b024201a2a9245c82506418333ed10933762741da7141371a48db3535d455037f1d14304158ef5c113cc9b11172432492b5e8d8989c1c40984741425451ddff94f4b0d525' ],
+        [ sha256 => '308187024150905e2399a61e80b74bd49b9bacfebc1fa15d994c0a56bb98534e14831d915abc425fa2735d3b832661baf4af9627a10ebed2f5e6c449837e3646209e61bcc9df0242012ba95f06ca4659f09c7e2e87e16cc130513fef55c56b643cf6115d27609aedc005073a189816d12911c867d35adcc8185934dacf660c5d10049175532b8b0a9a60' ],
+        [ sha384 => '30818802420087e28d2067c922fd3a2856e82bfef3a3f1bbcc077bf4fb5f5c375b4b210b11f71e681b7181896fe15d14d672871c3a597e7a8d847131f7d164fc567c34c0fb1160024200a5e925c61532fe22562cbc1fe6121767f75115fe5ef77c8641a339ffe069e800ff20dad1ba886dae2e9787c8cfb44c5d8df7e3f87f39ba374e1ddf7e8a5dbb405e' ],
+        [ sha512 => '3081880242008d031ef7ce25ae7f93769597037d5c53ca3a597938b30957039641b2186268b21e96e7d4c30de0f605537d129d14e2d32df137dfea3d9b6c449bf2eb4137dd0520024201ddec83a86f556cf87d2137f8ef47ebb58ffb70211254a42a22bd49d151fce663a33ca0f4036acee2478b145bae7e19a2f1aeeab2241c5792fc2dbdad383a2be434' ],
+    );
+
+    for my $tt (@t) {
+        my ($hashfn, $sig) = @$tt;
+
+        my $fn = "sign_$hashfn";
+        my $got_sig = $key->$fn($msg);
+
+        is(
+            unpack('H*', $got_sig),
+            $sig,
+            "$hashfn: deterministic signature matches from python-ecdsa",
+        );
+
+        ok(
+            $key->verify( Digest::SHA->can($hashfn)->($msg), $got_sig ),
+            "$hashfn: self-verify",
+        );
+    }
+
+    return;
+}
+
 sub test_sign : Tests() {
     my ($self) = @_;
 
@@ -180,58 +225,72 @@ sub test_sign : Tests() {
 
                         if ($ok) {
                             $SKIPPED{$curve_label} = ref;
-                            skip $_->to_string(), 2;
+                            skip $_->to_string(), 4;
                         }
 
                         local $@ = $_;
                         die;
                     };
 
-                    my $signature;
+                    my ($signature, $det_signature);
 
                     try {
                         $signature = $ecdsa->sign($dgst);
+                        diag "Random Sig: " . unpack('H*', $signature);
+
+                        my $fn = "sign_$digest_alg";
+                        $det_signature = $ecdsa->$fn($msg);
+                        diag "Deterministic Sig: " . unpack('H*', $det_signature);
                     }
                     catch {
                         if ( try { $_->isa('Crypt::Perl::X::TooLongToSign') } ) {
                             $SKIPPED{$curve_label} = ref;
-                            skip $_->to_string(), 2;
+                            skip $_->to_string(), 4;
                         }
 
                         local $@ = $_;
                         die;
                     };
 
-                    diag "Sig: " . unpack('H*', $signature);
-
-                    ok(
-                        $ecdsa->verify( $dgst, $signature ),
-                        "$curve, $param_enc parameters, $conv_form: self-verify",
+                    my @sub_t = (
+                        [ random => $signature ],
+                        [ deterministic => $det_signature ],
                     );
 
-                    if (!OpenSSL_Control::can_ecdsa()) {
-                        $SKIPPED{$curve_label} = '!can_ecdsa';
-                        skip 'Your OpenSSL can’t ECDSA!', 1;
+                    for my $st_ar (@sub_t) {
+                        my ($label, $signature) = @$st_ar;
+
+                        ok(
+                            $ecdsa->verify( $dgst, $signature ),
+                            "$curve, $param_enc parameters, $conv_form, $label signature: self-verify",
+                        );
+
+                      SKIP: {
+                            if (!OpenSSL_Control::can_ecdsa()) {
+                                $SKIPPED{$curve_label} = '!can_ecdsa';
+                                skip 'Your OpenSSL can’t ECDSA!', 1;
+                            }
+
+                            if (!OpenSSL_Control::can_load_private_pem($ecdsa->to_pem_with_explicit_curve())) {
+                                $SKIPPED{$curve_label} = '!can_load_private_pem';
+                                skip 'Your OpenSSL can’t load this key!', 1;
+                            }
+
+                            if (OpenSSL_Control::has_ecdsa_verify_private_bug()) {
+                                $SKIPPED{$curve_label} = 'has_ecdsa_verify_private_bug';
+                                skip 'Your OpenSSL can’t correctly verify an ECDSA digest against a private key!', 1;
+                            }
+
+                            my $ok = OpenSSL_Control::verify_private(
+                                $ecdsa->to_pem_with_explicit_curve(),
+                                $msg,
+                                $digest_alg,
+                                $signature,
+                            );
+
+                            ok( $ok, "$curve, $param_enc parameters, $conv_form, $label signature: OpenSSL binary verifies our digest signature for “$msg” ($digest_alg)" );
+                        }
                     }
-
-                    if (!OpenSSL_Control::can_load_private_pem($ecdsa->to_pem_with_explicit_curve())) {
-                        $SKIPPED{$curve_label} = '!can_load_private_pem';
-                        skip 'Your OpenSSL can’t load this key!', 1;
-                    }
-
-                    if (OpenSSL_Control::has_ecdsa_verify_private_bug()) {
-                        $SKIPPED{$curve_label} = 'has_ecdsa_verify_private_bug';
-                        skip 'Your OpenSSL can’t correctly verify an ECDSA digest against a private key!', 1;
-                    }
-
-                    my $ok = OpenSSL_Control::verify_private(
-                        $ecdsa->to_pem_with_explicit_curve(),
-                        $msg,
-                        $digest_alg,
-                        $signature,
-                    );
-
-                    ok( $ok, "$curve, $param_enc parameters, $conv_form: OpenSSL binary verifies our digest signature for “$msg” ($digest_alg)" );
                 }
             }
         }
@@ -242,7 +301,7 @@ sub test_sign : Tests() {
     return;
 }
 
-sub test_jwa : Tests(6) {
+sub test_jwa : Tests(9) {
     my ($self) = @_;
 
     my %curve_dgst = (
@@ -263,6 +322,9 @@ sub test_jwa : Tests(6) {
 
         my $sig = $key->sign_jwa($msg);
         note( "Signature: " . unpack 'H*', $sig );
+
+        my $sig2 = $key->sign_jwa($msg);
+        is( $sig2, $sig, 'signature is constant for message' );
 
         is(
             $key->verify_jwa($msg, $sig),

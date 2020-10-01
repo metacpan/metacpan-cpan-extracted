@@ -20,6 +20,11 @@ is(
         'console.log( 42 );',
     ],
     [
+        'say a number',
+        'Say -42.',
+        'console.log( -42 );',
+    ],
+    [
         'say a string',
         'Say "Hello World".',
         'console.log( "Hello World" );',

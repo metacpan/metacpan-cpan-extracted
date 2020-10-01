@@ -1,5 +1,9 @@
 Changes for Perl extension File-HomeDir
 
+1.006	2020-09-28
+    - re-release with minor fixes to cover modern toolchain
+    - apply fix for RT#128096 reported by ANDK, thank you Andreas
+
 1.004	2018-05-02
     - release 1.003_002 without further changes
 

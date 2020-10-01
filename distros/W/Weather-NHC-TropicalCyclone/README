@@ -1,5 +1,5 @@
 This archive contains the distribution Weather-NHC-TropicalCyclone,
-version 0.16:
+version 0.20:
 
   Provides a convenient interface to NHC's Tropical Cyclone JSON format.
 

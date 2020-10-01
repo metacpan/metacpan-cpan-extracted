@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=ScriptX
   homepage: https://metacpan.org/release/ScriptX
   repository: git://github.com/perlancar/perl-ScriptX.git
-version: '0.000001'
+version: '0.000004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -42,6 +42,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ScriptX
       name: ScriptX
+      version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
       version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -114,7 +118,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.600'
+      version: '0.602'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -167,9 +171,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -297,7 +301,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::ScriptX
               name: -ScriptX
-              version: '0.002'
+              version: '0.003'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

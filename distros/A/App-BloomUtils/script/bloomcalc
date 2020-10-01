@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-05-24'; # DATE
 our $DIST = 'App-BloomUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ bloomcalc - Shorter alias for bloom-filter-calculator
 
 =head1 VERSION
 
-This document describes version 0.006 of bloomcalc (from Perl distribution App-BloomUtils), released on 2020-05-24.
+This document describes version 0.007 of bloomcalc (from Perl distribution App-BloomUtils), released on 2020-05-24.
 
 =head1 SYNOPSIS
 

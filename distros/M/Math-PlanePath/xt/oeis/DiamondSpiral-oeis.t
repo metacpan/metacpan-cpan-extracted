@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -21,7 +21,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 6;
+plan tests => 7;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -30,6 +30,44 @@ use MyOEIS;
 
 use Math::PlanePath::DiamondSpiral;
 my $path = Math::PlanePath::DiamondSpiral->new;
+
+
+#------------------------------------------------------------------------------
+# A217296 -- permutation DiamondSpiral -> SquareSpiral rotate +90
+#   1  2  3  4  5  6   7  8
+#   1, 4, 6, 8, 2, 3, 15, 5,
+
+MyOEIS::compare_values
+  (anum => 'A217296',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     require Math::PlanePath::SquareSpiral;
+     my $square = Math::PlanePath::SquareSpiral->new;
+     for (my $n = $path->n_start; @got < $count; $n++) {
+       my ($x, $y) = $path->n_to_xy ($n);
+       ($x,$y) = (-$y,$x); # rotate +90
+       push @got, $square->xy_to_n ($x, $y);
+     }
+     return \@got;
+   });
+
+# inverse
+# not in OEIS: 1,3,10,4,12,5,6,2,8,18,9,20,35,21,11,23,39,24,13,14
+# MyOEIS::compare_values
+#   (anum => 'A217296',
+#    func => sub {
+#      my ($count) = @_;
+#      my @got;
+#      require Math::PlanePath::SquareSpiral;
+#      my $square = Math::PlanePath::SquareSpiral->new;
+#      for (my $n = $path->n_start; @got < $count; $n++) {
+#        my ($x, $y) = $square->n_to_xy ($n);
+#        ($x,$y) = (-$y,$x); # rotate +90
+#        push @got, $path->xy_to_n ($x, $y);
+#      }
+#      return \@got;
+#    });
 
 
 #------------------------------------------------------------------------------
@@ -92,29 +130,37 @@ MyOEIS::compare_values
 
 
 #------------------------------------------------------------------------------
-# A217296 -- permutation DiamondSpiral -> SquareSpiral rotate +90
-#   1  2  3  4  5  6   7  8
-#   1, 4, 6, 8, 2, 3, 15, 5,
-
-MyOEIS::compare_values
-  (anum => 'A217296',
-   func => sub {
-     my ($count) = @_;
-     my @got;
-     require Math::PlanePath::SquareSpiral;
-     my $square = Math::PlanePath::SquareSpiral->new;
-     for (my $n = $path->n_start; @got < $count; $n++) {
-       my ($x, $y) = $path->n_to_xy ($n);
-       ($x,$y) = (-$y,$x); # rotate +90
-       push @got, $square->xy_to_n ($x, $y);
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
 # A217015 -- permutation SquareSpiral rotate -90 -> DiamondSpiral
 #   1  2  3  4  5  6
 #   1, 5, 6, 2, 8, 3, 10, 4,
+#
+#               19                    3
+#             /    \
+#           20   9  18                2
+#         /    /       \
+#       21  10---3---8  17            1
+#     /    / |       |\   \
+#   22  11   4   1   2   7  16    <- Y=0
+#     \    \     |   | /   /
+#       23  12   5---6  15  ...      -1
+#         \   \        /   /
+#           24  13--14  27           -2
+#             \        /
+#               25--26               -3
+
+#   37--36--35--34--33--32--31              3
+#    |                       |
+#   38  17--16--15--14--13  30              2
+#    |   |               |   |
+#   39  18   5---4---3  12  29              1
+#    |   |   |       |   |   |
+#   40  19   6   1---2  11  28  ...    <- Y=0
+#    |   |   |           |   |   |
+#   41  20   7---8---9--10  27  52         -1
+#    |   |                   |   |
+#   42  21--22--23--24--25--26  51         -2
+#    |                           |
+#   43--44--45--46--47--48--49--50         -3
 
 MyOEIS::compare_values
   (anum => 'A217015',

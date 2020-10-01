@@ -1,6 +1,6 @@
 package Bundle::DadaMailXXL;
 
-$VERSION = '0.0.5';
+$VERSION = '0.0.7';
 
 1;
 
@@ -22,11 +22,15 @@ C<Bundle::DadaMailXXL> is a CPAN Bundle of I<required> CPAN modules used by Dada
 
 Dada Mail is a self-hosted mailing list manager and the distribution does include the CPAN modules that it requires. This bundle keeps track of those modules, as well as gives you an easy way to install them via CPAN into your Perl environment. 
 
-The copies of the CPAN module that Dada Mail provides may very well be out of date, or contain bugs, so have versions that are up to date is generally a good idea.
+The copies of the CPAN module that Dada Mail provides may very well be out of date, or contain bugs, so having versions that are up to date is generally a good idea. We treat bugs/problems introduced from using the most up-to-date Perl modules in Dada Mail (rather than something we ship with the app's distro) a bug those should be reported: 
+
+L<https://github.com/justingit/dada-mail/issues>
 
 =head1 See Also
 
 L<http://dadamailproject.com>
+
+L<https://github.com/justingit/Bundle-DadaMailXXL>
 
 =head1 CONTENTS
 
@@ -47,8 +51,6 @@ Class::Accessor
 Class::Accessor::Chained::Fast
 
 Data::Page
-
-Data::PageSet
 
 Date::Format
 
@@ -152,11 +154,13 @@ Number::Bytes::Human
 
 Parse::RecDescent
 
-id/D/DC/DCONWAY/Text-Balanced-1.98.tar.gz
+Text::Balanced
 
 PHP::Session
 
-Scalar-List-Utils
+Scalar::Util
+
+List::Util 
 
 Text::CSV
 

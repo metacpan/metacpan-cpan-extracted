@@ -1,47 +1,121 @@
 {
-   "abstract" : "The RFC 2045 encodings; base64 and quoted-printable",
+   "abstract" : "Encoding and decoding of base64 strings",
    "author" : [
-      "Gisle Aas <gisle@activestate.com>"
+      "Gisle Aas <gaas@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MIME-Base64",
    "no_index" : {
       "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
          "t",
-         "inc"
+         "xt"
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::PluginBundle::Starter" : "v4.0.0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.4",
+            "Test::CPAN::Meta" : "0",
+            "Test::CheckManifest" : "1.29",
+            "Test::Kwalitee" : "1.22",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::Spelling::CommonMistakes" : "1.000",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "2.00"
          }
       },
       "runtime" : {
          "requires" : {
+            "Exporter" : "0",
             "XSLoader" : "0",
-            "perl" : "5.004"
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
          }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MIME::Base64" : {
+         "file" : "lib/MIME/Base64.pm",
+         "version" : "3.16"
+      },
+      "MIME::QuotedPrint" : {
+         "file" : "lib/MIME/QuotedPrint.pm",
+         "version" : "3.16"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Dual-Life/mime-base64/issues"
+      },
+      "homepage" : "https://github.com/Dual-Life/mime-base64",
       "repository" : {
-         "url" : "https://github.com/gisle/mime-base64"
+         "type" : "git",
+         "url" : "https://github.com/Dual-Life/mime-base64.git",
+         "web" : "https://github.com/Dual-Life/mime-base64"
       }
    },
-   "version" : "3.15"
+   "version" : "3.16",
+   "x_contributors" : [
+      "Alexandr Ciornii <CHORNY@cpan.org>",
+      "Chase Whitener <capoeirab@cpan.org>",
+      "David Mitchell <davem@iabyn.com>",
+      "Jarkko Hietaniemi <jhi@iki.fi>",
+      "Nicholas Clark <nick@ccl4.org>",
+      "Nicolas R <nicolas@atoomic.org>",
+      "Olivier Mengu\u00e9 <dolmen@cpan.org>",
+      "Peter J. Acklam <pjacklam@online.no>",
+      "Robert Sedlacek <rs@474.at>",
+      "Robin Barker <Robin.Barker@npl.co.uk>",
+      "Steve Hay <steve.m.hay@googlemail.com>"
+   ],
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
+

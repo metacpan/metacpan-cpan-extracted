@@ -9,7 +9,7 @@ package English::Script {
     use Parse::RecDescent;
     use YAML::XS 'Dump';
 
-    our $VERSION = '1.01'; # VERSION
+    our $VERSION = '1.02'; # VERSION
 
     sub new {
         my $self = shift;
@@ -169,8 +169,11 @@ package English::Script {
                 | <error>
 
             number :
-                /(?:\d+,)*(?:\d+\.)*\d+\b/
-                { $item[1] =~ s/[^\d\.]//g; +{@item} }
+                /\-?(?:\d+,)*(?:\d+\.)*\d+\b/
+                {
+                    $item[1] =~ s/[^\d\.\-]//g;
+                    +{@item};
+                }
                 | <error>
 
             word :
@@ -364,7 +367,7 @@ package English::Script::JavaScript {
     use warnings;
     use JavaScript::Packer;
 
-    our $VERSION = '1.01'; # VERSION
+    our $VERSION = '1.02'; # VERSION
 
     sub new {
         my ( $self, $args ) = @_;
@@ -621,7 +624,7 @@ English::Script - Parse English subset and convert to data or code
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/English-Script.svg)](https://travis-ci.org/gryphonshafer/English-Script)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/English-Script/badge.png)](https://coveralls.io/r/gryphonshafer/English-Script)

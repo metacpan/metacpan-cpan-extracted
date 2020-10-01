@@ -1,5 +1,13 @@
 Revision history for Perl extension GD::SecurityImage::AC.
 
+1.12 Sun Sep 27 07:02:00 2020
+        => Changed license to MIT
+        => Fixed encoding issue in POD
+        => Updated build tooling
+        => Updated maintainer info
+        => Made POD tests optional
+        => Added 'use warnings'
+
 1.11 Sun May 02 07:29:00 2008
         => Seperated POD into .pod file
         => Fixed taint compatibility and added documentation note on it

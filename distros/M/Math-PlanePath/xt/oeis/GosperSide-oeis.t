@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -225,7 +225,7 @@ MyOEIS::compare_values
 
 MyOEIS::compare_values
   (anum => 'A038502',
-   fixup => sub {
+   fixup => sub {           # mangle to mod 3
      my ($bvalues) = @_;
      @$bvalues = map { $_ % 3 } @$bvalues;
    },

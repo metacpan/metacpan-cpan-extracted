@@ -2,26 +2,35 @@
 use 5.20.0;
 use strict;
 use warnings FATAL => 'all';
+BEGIN { $ENV{MAIL_BIMI_CACHE_BACKEND} = 'Null' };
 use lib 't';
-use Mail::BIMI::Pragmas;
+use Mail::BIMI::Prelude;
 use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Record;
 use Mail::DMARC::PurePerl;
+use Net::DNS::Resolver::Mock 1.20200214;
 
-process_bimi( 'test.example.com', 'default', 'v=bimi1; l=https://bimi.example.com/marks/', 'pass', 'reject',
-    'bimi=pass header.d=test.example.com selector=default', 'Pass' );
-process_bimi( 'test.example.com', 'default', 'v=bimi1; l=https://bimi.example.com/marks/', 'fail', 'reject',
-    'bimi=skipped (DMARC fail)', 'DMARC Fail');
-process_bimi( 'test.example.com', 'default', 'v=foobar; l=https://bimi.example.com/marks/', 'pass', 'reject',
-    'bimi=fail (Invalid BIMI Record)', 'Skipped Invalid');
+process_bimi( 'test.example.com', 'default', 'v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg', 'pass', 'reject',
+    'bimi=pass header.d=test.example.com header.selector=default', 'Pass' );
+process_bimi( 'test.example.com', 'default', 'v=bimi1; l=https://fastmaildmarc.com/FM_BIMI.svg', 'fail', 'reject',
+    'bimi=skipped (DMARC did not pass)', 'DMARC Fail');
+process_bimi( 'test.example.com', 'default', 'v=foobar; l=https://fastmaildmarc.com/FM_BIMI.svg', 'pass', 'reject',
+    'bimi=fail (Invalid v tag)', 'Skipped Invalid');
 
 sub process_bimi {
   my ( $domain, $selector, $entry, $dmarc_result, $dmarc_disposition, $expected_result, $test ) = @_;
 
-  my $record = Mail::BIMI::Record->new( domain => $domain, selector => $selector );
-  $record->record( $record->_parse_record( $entry ) );
-  my $bimi = Mail::BIMI->new( domain => $domain, selector => $selector, record => $record, dmarc_object => get_dmarc_result( $dmarc_result, $dmarc_disposition ) );
+  my $bimi = Mail::BIMI->new( domain => $domain, selector => $selector );
+
+  my $resolver = Net::DNS::Resolver::Mock->new;
+  $resolver->zonefile_read('t/zonefile');
+  $bimi->resolver($resolver);
+
+  my $record = Mail::BIMI::Record->new( bimi_object => $bimi, domain => $domain, selector => $selector );
+  $record->record_hashref( $record->_parse_record( $entry ) );
+  $bimi->record($record);
+  $bimi->dmarc_object( get_dmarc_result( $dmarc_result, $dmarc_disposition ) );
 
   my $result = $bimi->result;
   my $auth_results = $result->get_authentication_results;

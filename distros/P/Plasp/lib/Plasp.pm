@@ -20,7 +20,7 @@ use namespace::clean;
 
 with 'Plasp::Compiler', 'Plasp::Parser', 'Plasp::State';
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 =head1 NAME
 
@@ -28,7 +28,7 @@ Plasp - PerlScript/ASP
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ has '_mm' => (
 has '_magic' => (
     is      => 'ro',
     default => sub {
-        return File::LibMagic->new( magic_file => '/etc/magic' );
+        return File::LibMagic->new;
     },
 );
 

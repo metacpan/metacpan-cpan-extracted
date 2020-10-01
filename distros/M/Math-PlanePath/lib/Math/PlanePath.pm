@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION';
-$VERSION = 127;
+$VERSION = 128;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -201,6 +201,7 @@ use constant dy_maximum => undef;
 # Return the N at which all possible dX,dY will have been seen.  If there is
 # not a finite set of possible dX,dY steps then return C<undef>.
 #
+use constant 1.02;
 use constant _UNDOCUMENTED__dxdy_list => ();  # default empty for not a finite list
 use constant _UNDOCUMENTED__dxdy_list_at_n => undef; # maybe dxdy_at_n()
 use constant _UNDOCUMENTED__dxdy_list_three => (2,0,    # E
@@ -368,8 +369,10 @@ sub _UNDOCUMENTED__n_to_turn_LSR {
   my ($self, $n) = @_;
   ### _UNDOCUMENTED__n_to_turn_LSR(): $n
 
-  my ($dx,$dy) = $self->n_to_dxdy($n - $self->arms_count) or return undef;
-  my ($next_dx,$next_dy) = $self->n_to_dxdy($n)   or return undef;
+  my ($dx,$dy) = $self->n_to_dxdy($n - $self->arms_count)
+    or return undef;
+  my ($next_dx,$next_dy) = $self->n_to_dxdy($n)
+    or return undef;
 
   ### dxdy: "$dx,$dy and $next_dx,$next_dy  arms=".$self->arms_count
 
@@ -611,7 +614,7 @@ sub _divrem_mutate {
 1;
 __END__
 
-=for stopwords PlanePath Ryde Math-PlanePath Math-PlanePath-Toothpick 7-gonals 8-gonal (step+2)-gonal heptagonals octagonals bignum multi-arm eg PerlMagick NaN NaNs subclasses incrementing arrayref hashref filename enum radix ie dX dY dX,dY Rsquared radix SUBCLASSING Ns onwards supremum radix radix-1 octant dSum dDiffXY RSquared Manhattan SumAbs infimum
+=for stopwords PlanePath Ryde Math-PlanePath Math-PlanePath-Toothpick 7-gonals 8-gonal (step+2)-gonal heptagonals octagonals bignum multi-arm eg PerlMagick NaN NaNs subclasses incrementing arrayref hashref filename enum radix ie dX dY dX,dY Rsquared radix SUBCLASSING Ns onwards supremum radix radix-1 octant dSum dDiffXY RSquared Manhattan SumAbs infimum uninitialized factorization characterize characterized
 
 =head1 NAME
 
@@ -668,9 +671,10 @@ related things are further down like C<Math::PlanePath::Base::Xyzzy>.
     PythagoreanTree        X^2+Y^2=Z^2 by trees
 
     PeanoCurve             3x3 self-similar quadrant
+    PeanoDiagonals         across unit squares
     WunderlichSerpentine   transpose parts of PeanoCurve
     HilbertCurve           2x2 self-similar quadrant
-    HilbertSides           2x2 self-similar quadrant segments
+    HilbertSides           along sides of unit squares
     HilbertSpiral          2x2 self-similar whole-plane
     ZOrderCurve            replicating Z shapes
     GrayCode               Gray code splits
@@ -687,7 +691,7 @@ related things are further down like C<Math::PlanePath::Base::Xyzzy>.
     CubicBase              replicate in three directions
     SquareReplicate        3x3 replicating squares
     CornerReplicate        2x2 replicating "U"
-    LTiling                self-simlar L shapes
+    LTiling                self-similar L shapes
     DigitGroups            digits grouped by zeros
     FibonacciWordFractal   turns by Fibonacci word bits
 
@@ -880,7 +884,7 @@ a little less work.
 Return the radial distance R=sqrt(X^2+Y^2) of point C<$n>, or the radius
 squared R^2=X^2+Y^2.  If there's no point C<$n> then the return is C<undef>.
 
-For a few paths these might be calculated with less work than C<n_to_xy()>.
+For a few paths, these might be calculated with less work than C<n_to_xy()>.
 For example the C<SacksSpiral> is simply R^2=N, or the C<MultipleRings> path
 with its default step=6 has an integer radius for integer C<$n> whereas
 C<$x,$y> are fractional (and so inexact).
@@ -948,7 +952,7 @@ C<$n>.
 =item C<@n_list = $path-E<gt>xyxy_to_n_list_either($x1,$y1, $x2,$y2)>
 
 Return <$n> which goes from C<$x1,$y1> to C<$x2,$y2>.  <$n> is at C<$x1,$y1>
-and C<$n+1> is at C<$x2,$y2>, or for a multi-arm path C<$n+$arms> so a step
+and C<$n+1> is at C<$x2,$y2>, or for a multi-arm path C<$n+$arms>, so a step
 along the same arm.  If there's no such C<$n> then return C<undef>.
 
 The C<either()> forms allow <$n> in either direction, so C<$x1,$y1> to
@@ -963,7 +967,7 @@ C<xy_to_n()>.
 
 =item C<($n_lo, $n_hi) = $path-E<gt>rect_to_n_range ($x1,$y1, $x2,$y2)>
 
-Return a range of N values covering or exceeding a rectangle with corners at
+Return a range of N values covering the rectangle with corners at
 C<$x1>,C<$y1> and C<$x2>,C<$y2>.  The range is inclusive.  For example,
 
      my ($n_lo, $n_hi) = $path->rect_to_n_range (-5,-5, 5,5);
@@ -973,16 +977,15 @@ C<$x1>,C<$y1> and C<$x2>,C<$y2>.  The range is inclusive.  For example,
      }
 
 The return might be an over-estimate of the N range required to cover the
-rectangle.  Even if the range is exact the nature of the path may mean many
+rectangle.  Even if the range is exact, the nature of the path may mean many
 points between C<$n_lo> and C<$n_hi> are outside the rectangle.  But the
 range is at least a lower and upper bound on the N values which occur in the
-rectangle.  Classes which can guarantee an exact lo/hi range say so in their
-docs.
+rectangle.  Classes which guarantee an exact lo/hi say so in their docs.
 
 C<$n_hi> is usually no more than an extra partial row, revolution, or
 self-similar level.  C<$n_lo> might be merely the starting
 C<$path-E<gt>n_start()>, which is fine if the origin is in the desired
-rectangle but away from the origin might actually start higher.
+rectangle but away from the origin could actually start higher.
 
 C<$x1>,C<$y1> and C<$x2>,C<$y2> can be fractional.  If they partly overlap
 some N figures then those N's are included in the return.
@@ -990,7 +993,7 @@ some N figures then those N's are included in the return.
 If there's no points in the rectangle then the return can be a "crossed"
 range like C<$n_lo=1>, C<$n_hi=0> (which makes a C<foreach> do no loops).
 But C<rect_to_n_range()> may not always notice there's no points in the
-rectangle and might instead return some over-estimate.
+rectangle and might instead return an over-estimate.
 
 =back
 
@@ -1110,7 +1113,7 @@ C<dy_minimum()> is 0.
 =item C<$ady = $path-E<gt>absdy_maximum()>
 
 Return the minimum or maximum change abs(dX) or abs(dY) occurring in the
-path for integer N to N+1.  For a multi-arm path the change is N to N+arms
+path for integer N to N+1.  For a multi-arm path, the change is N to N+arms
 so it's the change along the same arm.
 
 C<absdx_maximum()> is simply max(dXmax,-dXmin), the biggest change either
@@ -1228,7 +1231,7 @@ S<C<- diffxy_maximum()>>.
 =item C<$ddiffxy = $path-E<gt>ddiffxy_maximum()>
 
 Return the minimum or maximum change dSum or dDiffXY occurring in the path
-for integer N to N+1.  For a multi-arm path the change is N to N+arms so
+for integer N to N+1.  For a multi-arm path, the change is N to N+arms so
 it's the change along the same arm.
 
 =item C<$rsquared = $path-E<gt>rsquared_minimum()>
@@ -1269,7 +1272,7 @@ in some direction.  C<rsquared_maximum()> returns C<undef> in that case.
 =item C<($dx,$dy) = $path-E<gt>dir_maximum_dxdy()>
 
 Return a vector which is the minimum or maximum angle taken by a step
-integer N to N+1, or for a multi-arm path N to N+arms so it's the change
+integer N to N+1, or for a multi-arm path N to N+arms, so it's the change
 along the same arm.  Directions are reckoned anti-clockwise around from the
 X axis.
 
@@ -1439,7 +1442,7 @@ For example,
 At N=0 and all of the left side the tree continues infinitely so the
 sub-height there is C<undef> for infinite.  For N=2 the sub-height is 2
 because the longest path down is 2 levels (to N=7 or N=8).  For a leaf node
-such as N=5 the sub-height is 0.
+such as N,=5 the sub-height is 0.
 
 =back
 
@@ -1736,9 +1739,9 @@ C<KochPeaks> and C<GosperIslands>.
                   ComplexRevolving, DragonCurve, DragonRounded,
                   DragonMidpoint, AlternatePaper, AlternatePaperMidpoint,
                   CCurve, DigitGroups (default), PowerArray (default)
-      3         PeanoCurve (default), WunderlichSerpentine (default),
-                  WunderlichMeander, KochelCurve,
-                  GosperIslands, GosperSide
+      3         PeanoCurve (default), PeanoDiagonals (default), 
+                  WunderlichSerpentine (default),WunderlichMeander,
+                  KochelCurve, GosperIslands, GosperSide
                   SierpinskiTriangle, SierpinskiArrowhead,
                   SierpinskiArrowheadCentres,
                   TerdragonCurve, TerdragonRounded, TerdragonMidpoint,
@@ -1753,9 +1756,10 @@ C<KochPeaks> and C<GosperIslands>.
       8         QuadricCurve, QuadricIslands
       9         SquareReplicate
     Fibonacci   FibonacciWordFractal, WythoffArray
-    parameter   PeanoCurve, WunderlichSerpentine, ZOrderCurve, GrayCode,
-                  ImaginaryBase, ImaginaryHalf, CubicBase, ComplexPlus,
-                  ComplexMinus, DigitGroups, PowerArray
+    parameter   PeanoCurve, PeanoDiagonals, WunderlichSerpentine,
+                  ZOrderCurve, GrayCode, ImaginaryBase, ImaginaryHalf,
+                  CubicBase, ComplexPlus, ComplexMinus, DigitGroups,
+                  PowerArray
 
 =for my_pod base end
 
@@ -1875,7 +1879,7 @@ calculations.  This might be of interest even if the code is not.
 
 =head2 Triangular Calculations
 
-For a triangular lattice the rotation formulas above allow calculations to
+For a triangular lattice, the rotation formulas above allow calculations to
 be done in the rectangular X,Y coordinates which are the inputs and outputs
 of the PlanePath functions.  Another way is to number vertically on a 60
 degree angle with coordinates i,j,
@@ -1973,7 +1977,7 @@ or change to the next dX,dY.
 
 =head2 N to dX,dY -- Self-Similar
 
-For most of the self-similar paths such as C<HilbertCurve> the change dX,dY
+For most of the self-similar paths such as C<HilbertCurve>, the change dX,dY
 is determined by following the state table transitions down through either
 all digits of N, or to the last non-9 digit, ie. drop any low digits equal
 to radix-1.
@@ -1983,9 +1987,9 @@ which are the centres of a tiling stop at the lowest non-9.  This can be
 seen for example in the C<DekkingCurve> using all digits, whereas its
 C<DekkingCentres> variant stops at the lowest non-24.
 
-Perhaps this all-digits vs low-non-9 even characterizes path style as edges
-or centres of a tiling, when a path is specified in some way that a tiling
-is not quite obvious.
+Perhaps this all-digits vs low-non-9 would even characterize path style as
+edges or centres of a tiling, when a path is specified in some way that a
+tiling is not quite obvious.
 
 =head1 SUBCLASSING
 
@@ -2000,16 +2004,16 @@ It sometimes happens that one of C<n_to_xy()> or C<xy_to_n()> is easier than
 the other but both should be implemented.
 
 C<n_to_xy()> should do something sensible on fractional N.  The suggestion
-is to make it an X,Y proportionally between integer N positions.  It can be
-along a straight line or an arc as best suits the path.  A straight line can
-be done simply by two calculations of the surrounding integer points, until
-it's clear how to work the fraction into the code directly.
+is to make it an X,Y proportionally between integer N positions.  It could
+be along a straight line or an arc as best suits the path.  A straight line
+can be done simply by two calculations of the surrounding integer points,
+until it's clear how to work the fraction into the code directly.
 
 C<xy_to_n_list()> has a base implementation calling plain C<xy_to_n()> to
 give a single N at X,Y.  If a path has multiple Ns at an X,Y
-(eg. C<DragonCurve>) then it should implement C<xy_to_n_list()> to return
-all those Ns and also implement a plain C<xy_to_n()> returning the first of
-them.
+(eg. C<DragonCurve>) then it must implement C<xy_to_n_list()> to return all
+those Ns, and must also implement a plain C<xy_to_n()> returning the first
+of them.
 
 C<rect_to_n_range()> can initially be any convenient over-estimate.  It
 should give N big enough that from there onwards all points are sure to be
@@ -2169,6 +2173,7 @@ L<Math::PlanePath::TriangularHypot>,
 L<Math::PlanePath::PythagoreanTree>
 
 L<Math::PlanePath::PeanoCurve>,
+L<Math::PlanePath::PeanoDiagonals>,
 L<Math::PlanePath::WunderlichSerpentine>,
 L<Math::PlanePath::WunderlichMeander>,
 L<Math::PlanePath::HilbertCurve>,

@@ -3,7 +3,9 @@
 # Test file mode strings from Solaris /usr/bin/ls.
 
 use strict;
+use warnings;
 use Test::More;
+
 plan tests => 4096;
 
 use File::Listing;

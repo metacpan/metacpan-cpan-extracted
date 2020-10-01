@@ -14,8 +14,6 @@ DEVELOPMENT.txt
 doc_save.txt
 examples/complex/complex.pl
 examples/complex/lib/MyComplex.spvm
-examples/matrix/lib/MyMatrix.spvm
-examples/matrix/matrix.pl
 examples/native/bind_clib/bind_clib.pl
 examples/native/bind_clib/lib/BindCLib.c
 examples/native/bind_clib/lib/BindCLib.config
@@ -338,6 +336,12 @@ examples/native/gsl/lib/MyGSL.c
 examples/native/gsl/lib/MyGSL.config
 examples/native/gsl/lib/MyGSL.spvm
 examples/native/gsl/mygsl.pl
+examples/native/opencv/resize/lib/MyOpenCVResize.config
+examples/native/opencv/resize/lib/MyOpenCVResize.cpp
+examples/native/opencv/resize/lib/MyOpenCVResize.spvm
+examples/native/opencv/resize/linux-pengin-output.png
+examples/native/opencv/resize/linux-pengin.png
+examples/native/opencv/resize/opencv_resize.pl
 examples/native/openmp/lib/MyOpenMP.c
 examples/native/openmp/lib/MyOpenMP.config
 examples/native/openmp/lib/MyOpenMP.spvm
@@ -490,10 +494,6 @@ lib/SPVM/Math.c
 lib/SPVM/Math.config
 lib/SPVM/Math.pm
 lib/SPVM/Math.spvm
-lib/SPVM/Matrix/Double.pm
-lib/SPVM/Matrix/Double.spvm
-lib/SPVM/Matrix/Float.pm
-lib/SPVM/Matrix/Float.spvm
 lib/SPVM/ObjectList.pm
 lib/SPVM/ObjectList.spvm
 lib/SPVM/Regex.pm
@@ -537,8 +537,6 @@ Makefile.PL
 MANIFEST			This list of files
 ppport.h
 README.md
-regen/regen_complex.pl
-regen/regen_matrix.pl
 solo/Main.spvm
 solo/solo_Makefile.PL
 solo/SPVM/Byte.spvm
@@ -792,7 +790,6 @@ t/default/lib/TestCase/Lib/SPVM/IO/Stdout.spvm
 t/default/lib/TestCase/Lib/SPVM/Long.spvm
 t/default/lib/TestCase/Lib/SPVM/LongList.spvm
 t/default/lib/TestCase/Lib/SPVM/Math.spvm
-t/default/lib/TestCase/Lib/SPVM/Matrix.spvm
 t/default/lib/TestCase/Lib/SPVM/ObjectList.spvm
 t/default/lib/TestCase/Lib/SPVM/Regex.spvm
 t/default/lib/TestCase/Lib/SPVM/Short.spvm
@@ -880,7 +877,6 @@ t/default/literal-integer.t
 t/default/literal-string.t
 t/default/literal-undef.t
 t/default/logical-operator.t
-t/default/matrix.t
 t/default/multiply.t
 t/default/native-api.t
 t/default/numeric-operator.t

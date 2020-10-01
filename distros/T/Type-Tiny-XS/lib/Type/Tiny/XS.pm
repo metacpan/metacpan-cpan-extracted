@@ -6,7 +6,7 @@ use XSLoader ();
 package Type::Tiny::XS;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021';
+our $VERSION   = '0.022';
 
 __PACKAGE__->XSLoader::load($VERSION);
 
@@ -17,6 +17,7 @@ my %names = (map +( $_ => __PACKAGE__ . "::$_" ), qw/
 	FileHandle GlobRef HashRef Int Num Object
 	Ref RegexpRef ScalarRef Str Undef Value
 	PositiveInt PositiveOrZeroInt NonEmptyStr
+	ArrayLike HashLike CodeLike StringLike
 	Map Tuple Enum AnyOf AllOf
 /);
 $names{Item} = $names{Any};
@@ -252,9 +253,14 @@ L<Type::Tiny>, L<Types::Standard>.
 Toby Inkster E<lt>tobyink@cpan.orgE<gt> forked all this from
 L<Mouse::Util::TypeConstraints>.
 
+B<ArrayLike>, B<HashLike>, B<CodeLike>, and B<StringLike> constraints
+based on code by ikegami on StackOverflow.
+
+L<https://stackoverflow.com/a/64019481/1990570>.
+
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2014 by Toby Inkster.
+This software is copyright (c) 2014, 2018-2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
