@@ -3,8 +3,12 @@ Excel-Table0.xls
 Excel-Table1.xlsx
 lib/Excel/Table.pm
 LICENSE
+Makefile
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
 README
 README.md
 README.pod

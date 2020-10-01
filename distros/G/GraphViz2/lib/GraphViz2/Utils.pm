@@ -14,8 +14,6 @@ use File::Slurp; # For read_file().
 use GraphViz2::Config;
 use GraphViz2::Filer;
 
-use HTML::Entities::Interpolate;
-
 use Moo;
 
 use Text::Xslate 'mark_raw';

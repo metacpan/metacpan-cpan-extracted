@@ -46,7 +46,9 @@ use strict;
 
 use Data::Dumper;
 use Log::Log4perl qw/ :easy /;
-Log::Log4perl->easy_init($ERROR);
+
+my $g_dbg = ($ENV{'DEBUG'} eq '') ? $ERROR : $TRACE;
+Log::Log4perl->easy_init($g_dbg);
 
 
 # ---- globals ----
@@ -153,7 +155,7 @@ Sheet extraction, intension, and statistics.
 
 =head1 VERSION
 
-Build V1.022
+Build V1.023
 
 =head1 AUTHOR
 

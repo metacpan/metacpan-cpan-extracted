@@ -7,7 +7,7 @@ use Carp qw( croak );
 require FFI::Platypus;
 
 # ABSTRACT: Defining types for FFI::Platypus
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.33'; # VERSION
 
 # The TypeParser and Type classes are used internally ONLY and
 # are not to be exposed to the user.  External users should
@@ -58,7 +58,7 @@ FFI::Platypus::Type - Defining types for FFI::Platypus
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 SYNOPSIS
 
@@ -363,6 +363,9 @@ at install time.  See L<FFI::Platypus::Constant> for details.
 
 The main FAQ (L<FFI::Platypus/FAQ>) also has a discussion on dealing
 with constants and enumerated types.
+
+There is also a type plugin (L<FFI::Platypus::Type::Enum>) that can be helpful
+in writing interfaces that use enums.
 
 =head3 Boolean types
 

@@ -7,7 +7,7 @@ use warnings  qw(FATAL utf8);    # Fatalize encoding glitches.
 use open      qw(:std :utf8);    # Undeclared streams in UTF-8.
 use charnames qw(:full :short);  # Unneeded in v5.16.
 
-use Capture::Tiny 'capture';
+use IPC::Run3; # For run3().
 
 use File::Spec;
 use File::Temp;
@@ -33,7 +33,12 @@ for my $key (sort keys %script)
 {
 	$count++;
 
-	($stdout, $stderr)	= capture{system $^X, '-Ilib', $script{$key}, 'svg', File::Spec -> catfile($temp_dir, "$key.svg")};
+	run3
+		[$^X, '-Ilib', $script{$key}, 'svg', File::Spec -> catfile($temp_dir, "$key.svg")],
+		undef,
+		\my $stdout,
+		\my $stderr,
+		;
 	@stderr				= grep{! /Insecure (?:\$ENV\{PATH}|dependency)/} split(/\n/, $stderr);
 	$stderr				= '' if ($#stderr < 0);
 

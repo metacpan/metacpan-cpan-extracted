@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use warnings  qw(FATAL utf8);    # Fatalize encoding glitches.
 
-use Capture::Tiny 'capture';
-
 use File::Slurp; # For write_file().
 use File::Spec;
 

@@ -4,6 +4,10 @@ package Excel::Table;
 
 Excel::Table - Table processing class for Excel worksheets. 
 
+=head1 AUTHOR
+
+Copyright (C) 2012-2020  Tom McMeekin E<lt>tmcmeeki@cpan.orgE<gt>
+
 =head1 SYNOPSIS
 
   use Excel::Table;
@@ -188,24 +192,17 @@ Returns an array of maximum lengths of any (non-title) data in each column.
 =cut
 
 use strict;
-use warnings;
 
-use Data::Dumper;
-use Spreadsheet::ParseExcel 0.57;
-use Spreadsheet::XLSX;
-use File::Basename;
-
+# --- includes ---
 use Carp qw(cluck confess);     # only use stack backtrace within class
+use Data::Dumper;
+use File::Basename;
 use Log::Log4perl qw/ get_logger /;
+use Spreadsheet::ParseExcel 0.57;
+use Spreadsheet::ParseXLSX 0.27;	# rt.cpan.org #133420
 
-use vars qw/ @EXPORT $VERSION /;
 
-$VERSION = "1.022";	# update this on new release
-
-#@ISA = qw(Exporter);
-#@EXPORT = qw();
-
-# package constants
+# --- package constants ---
 use constant S_RID => "rowid";
 use constant S_NULL => "(null)";
 use constant EXT_EXCEL => qw/
@@ -213,18 +210,18 @@ use constant EXT_EXCEL => qw/
 	\.xlv \.xlw \.xls \.xlt
 /;	# known extensions for EXCEL file
 
-#	need the Spreadsheet::XLSX module for the following:
+#	need the Spreadsheet::ParseXLSX module for the following:
 use constant EXT_EXCEL_2007 => qw/
 	\.xlsx \.xlsm \.xlsb \.xltm \.xlam 
 /;	# known extensions for EXCEL 2007 file
 
 
-# package globals
-
+# --- package globals ---
 our $AUTOLOAD;
+our $VERSION = "1.023";	# update this on new release
 
 
-# package locals
+# --- package locals ---
 my $n_Objects = 0;	# counter of objects created.
 
 my %attribute = (
@@ -374,12 +371,9 @@ sub open {
 	my $parser;
 
 	if ($self->_xl_vers eq 'xl2007') {
-		$parser = Spreadsheet::XLSX->new($pn);
+		$parser = Spreadsheet::ParseXLSX->new;
+		$self->workbook($parser->parse($pn));
 
-		$self->_log->logcroak("Spreadsheet::XLSX->new($pn) failed")
-			unless defined $parser;
-
-		$self->workbook($parser);
 	} else {
 		$parser = Spreadsheet::ParseExcel->new();
 		$self->workbook($parser->Parse($pn));
@@ -387,6 +381,8 @@ sub open {
 		$self->_log->logcroak("Parse() failed, error: " . $self->workbook->error())
 			unless defined $self->workbook;
 	}
+	$self->_log->logcroak("parsing failed for [$pn]")
+		unless defined $self->workbook;
 
 
 	return $self->workbook;
@@ -715,17 +711,13 @@ __END__
 
 =head1 VERSION
 
-Build V1.022
-
-=head1 AUTHOR
-
-Copyright (C) 2012  Tom McMeekin E<lt>tmcmeeki@cpan.orgE<gt>
+Build V1.023
 
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published
-by the Free Software Foundation; either version 2 of the License,
+by the Free Software Foundation; either version 3 of the License,
 or any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -734,12 +726,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =head1 SEE ALSO
 
-L<perl>, L<Spreadsheet::ParseExcel>, L<Spreadsheet::XLSX>.
+L<perl>, L<Spreadsheet::ParseExcel>, L<Spreadsheet::ParseXLSX>.
 
 =cut
 

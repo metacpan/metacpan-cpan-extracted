@@ -67466,3 +67466,6 @@ D/DA/DADAMS/WWW-Shodan-API-0.013.tar.gz
 J/JC/JCARTY/WWW-WebKit2-0.124.tar.gz
 T/TI/TINITA/YAML-Tidy-0.002.tar.gz
 T/TO/TOBYINK/Z-0.007.tar.gz
+T/TM/TMCMEEKI/Excel-Table-1.023.tar.gz
+P/PL/PLICEASE/FFI-Platypus-1.33.tar.gz
+E/ET/ETJ/GraphViz2-2.49.tar.gz

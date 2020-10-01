@@ -4,8 +4,8 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 
 
-my $preop = 'find $(DISTVNAME) -type f -exec egrep -q Build V1.022 {} \; -exec sed -i "s/___EUMM_VERSION___/Build V$(VERSION)/" {} \; -print ;' .
-'perldoc -uT $(DISTVNAME)/$(VERSION_FROM) > $(DISTVNAME)/README.pod';
+my $preop = 'find $(DISTVNAME) -type f -exec egrep -q Build V1.023 {} \; -exec sed -i "s/___EUMM_VERSION___/Build V$(VERSION)/" {} \; -print ;' .
+'perldoc -uT $(DISTVNAME)/$(VERSION_FROM) > README.pod';
 
 WriteMakefile(
     NAME              => 'Excel::Table',
@@ -14,8 +14,8 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Excel/Table.pm', # finds $VERSION
     PREREQ_PM         => {
         'Data::Dumper' => '0',
-        'Spreadsheet::ParseExcel' => '0.57',
-        'Spreadsheet::XLSX' => '0',
+        'Spreadsheet::ParseExcel' => '0.65',
+        'Spreadsheet::ParseXLSX' => '0.27',
         'File::Basename' => '0',
         'Carp' => '0',
         'Log::Log4perl' => '0',

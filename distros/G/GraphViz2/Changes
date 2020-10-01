@@ -1,3 +1,6 @@
+2.49 2020-09-27
+- split out into own distro: GraphViz2::DBI, GraphViz2::Parse::XML, GraphViz2::Parse::ISA, GraphViz2::Data::Grapher, GraphViz2::Parse::RecDescent
+
 2.48 2020-09-17
 - updated graphviz URLs to current graphviz.org ones
 - use GitHub issue tracker

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
 
-use Capture::Tiny 'capture';
+use IPC::Run3; # For run3().
 
 use GraphViz2;
 
@@ -47,7 +47,12 @@ sub create
 {
 	my($self, %arg)      = @_;
 	my($regexp)          = $arg{regexp};
-	my($stdout, $stderr) = capture{system $^X, '-e', qq|use re 'debug'; qr/$regexp/;|};
+        run3
+		[$^X, '-e', qq|use re 'debug'; qr/$regexp/;|],
+                undef,
+                \my $stdout,
+                \my $stderr,
+                ;
 
     my(%following);
     my($last_id);

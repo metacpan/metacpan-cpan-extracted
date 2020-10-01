@@ -1,4 +1,4 @@
-Excel-Table Build V1.022
+Excel-Table Build V1.023
 ===========
 
 Many spreadsheets are used to store semi-structured lists, such as
@@ -39,7 +39,7 @@ This module requires these other modules and libraries:
 
   Data::Dumper
   Spreadsheet::ParseExcel
-  Spreadsheet::XLSX
+  Spreadsheet::ParseXLSX
   File::Basename
   Carp
   Log::Log4perl

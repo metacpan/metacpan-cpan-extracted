@@ -2,6 +2,10 @@
 
 Excel::Table - Table processing class for Excel worksheets. 
 
+=head1 AUTHOR
+
+Copyright (C) 2012-2020  Tom McMeekin E<lt>tmcmeeki@cpan.orgE<gt>
+
 =head1 SYNOPSIS
 
   use Excel::Table;
@@ -188,17 +192,13 @@ Returns an array of maximum lengths of any (non-title) data in each column.
 
 =head1 VERSION
 
-Build V1.022
-
-=head1 AUTHOR
-
-Copyright (C) 2012  Tom McMeekin E<lt>tmcmeeki@cpan.orgE<gt>
+Build V1.023
 
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published
-by the Free Software Foundation; either version 2 of the License,
+by the Free Software Foundation; either version 3 of the License,
 or any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -207,12 +207,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =head1 SEE ALSO
 
-L<perl>, L<Spreadsheet::ParseExcel>, L<Spreadsheet::XLSX>.
+L<perl>, L<Spreadsheet::ParseExcel>, L<Spreadsheet::ParseXLSX>.
 
 
 =cut

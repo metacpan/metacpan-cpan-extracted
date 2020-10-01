@@ -1,0 +1,5 @@
+\.bak*
+blib*
+\.git*
+\.swp$
+\.tar\.gz$

@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
 
-use Capture::Tiny 'capture';
-
 use Data::Section::Simple 'get_data_section';
 
 use File::Basename;	# For fileparse().
@@ -142,7 +140,7 @@ has valid_attributes =>
 	required => 0,
 );
 
-our $VERSION = '2.48';
+our $VERSION = '2.49';
 
 # -----------------------------------------------
 
@@ -582,7 +580,12 @@ sub load_valid_attributes
 	# Since V 2.24, output formats are no longer read from the __DATA__ section.
 	# Rather, they are extracted from the stderr output of 'dot -T?'.
 
-	my($stdout, $stderr)			= capture{system 'dot', '-T?'};
+	run3
+		['dot', "-T?"],
+		undef,
+		\my $stdout,
+		\my $stderr,
+		;
 	my(@field)						= split(/one of:\s+/, $stderr);
 	$attribute{output_format}{$_}	= 1 for split(/\s+/, $field[1]);
 
@@ -1060,46 +1063,10 @@ A directed graph is the same, except that the edges have a direction, normally i
 A quick inspection of L<Graphviz|http://www.graphviz.org/>'s L<gallery|http://www.graphviz.org/gallery/> will show better than words
 just how good L<Graphviz|http://www.graphviz.org/> is, and will reinforce the point that humans are very visual creatures.
 
-=head1 Distributions
-
-This module is available as a Unix-style distro (*.tgz).
-
-See L<http://savage.net.au/Perl-modules/html/installing-a-module.html>
-for help on unpacking and installing distros.
-
 =head1 Installation
 
 Of course you need to install AT&T's Graphviz before using this module.
 See L<http://www.graphviz.org/download/>.
-
-You are strongly advised to download the stable version of Graphviz, because the
-development snapshots (click on 'Source code'), are sometimes non-functional.
-
-Install L<GraphViz2> as you would for any C<Perl> module:
-
-Run:
-
-	cpanm GraphViz2
-
-	Note: cpanm ships in App::cpanminus. See also App::perlbrew.
-
-or run:
-
-	sudo cpan GraphViz2
-
-or unpack the distro, and then either:
-
-	perl Build.PL
-	./Build
-	./Build test
-	sudo ./Build install
-
-or:
-
-	perl Makefile.PL
-	make (or dmake or nmake)
-	make test
-	make install
 
 =head1 Constructor and Initialization
 
@@ -2182,8 +2149,6 @@ Use L<GraphViz2::Parse::XML> instead, which uses the pure-Perl XML::Tiny.
 Alternately, see L<GraphViz2/Scripts Shipped with this Module> for how to use L<XML::Bare>, L<GraphViz2>
 and L<GraphViz2::Data::Grapher> instead.
 
-See L</scripts/parse.xml.pp.pl> or L</scripts/parse.xml.bare.pl> below.
-
 =head2 GraphViz returned a node name from add_node() when given an anonymous node. What does GraphViz2 do?
 
 You can give the node a name, and an empty string for a label, to suppress plotting the name.
@@ -2245,28 +2210,6 @@ See also scripts/macro.*.pl below.
 
 End users have no need to run this script.
 
-=head2 scripts/dbi.schema.pl
-
-If the environment vaiables DBI_DSN, DBI_USER and DBI_PASS are set (the latter 2 are optional [e.g. for SQLite]),
-then this demonstrates building a graph from a database schema.
-
-Also, for Postgres, you can set $ENV{DBI_SCHEMA} to a comma-separated list of schemas, e.g. when processing the
-MusicBrainz database. See scripts/dbi.schema.pl.
-
-For details, see L<http://blogs.perl.org/users/ron_savage/2013/03/graphviz2-and-the-dread-musicbrainz-db.html>.
-
-Outputs to ./html/dbi.schema.svg by default.
-
-=head2 scripts/dependency.pl
-
-Demonstrates graphing an L<Algorithm::Dependency> source.
-
-Outputs to ./html/dependency.svg by default.
-
-The default for L<GraphViz2> is to plot from the top to the bottom. This is the opposite of L<GraphViz2::Parse::ISA>.
-
-See also parse.isa.pl below.
-
 =head2 scripts/extract.arrow.shapes.pl
 
 Downloads the arrow shapes from L<Graphviz's Arrow Shapes|https://www.graphviz.org/doc/info/arrows.html> and outputs them to ./data/arrow.shapes.html.
@@ -2281,11 +2224,6 @@ Then it extracts the reserved words into ./data/attributes.dat.
 
 Downloads the node shapes from L<Graphviz's Node Shapes|http://www.graphviz.org/doc/info/shapes.html> and outputs them to ./data/node.shapes.html.
 Then it extracts the reserved words into ./data/node.shapes.dat.
-
-=head2 scripts/extract.output.formats.pl
-
-Downloads the output formats from L<Graphviz's Output Formats|https://www.graphviz.org/doc/info/output.html> and outputs them to ./data/output.formats.html.
-Then it extracts the reserved words into ./data/output.formats.dat.
 
 =head2 find.config.pl
 
@@ -2371,39 +2309,6 @@ Demonstrates compound cluster subgraphs via a macro.
 
 Outputs to ./html/macro.5.svg by default.
 
-=head2 scripts/parse.data.pl
-
-Demonstrates graphing a Perl data structure.
-
-Outputs to ./html/parse.data.svg by default.
-
-=head2 scripts/parse.html.pl
-
-Demonstrates using L<XML::Bare> to parse HTML.
-
-Inputs from ./t/sample.html, and outputs to ./html/parse.html.svg by default.
-
-=head2 scripts/parse.isa.pl
-
-Demonstrates combining 2 Perl class hierarchies on the same graph.
-
-Outputs to ./html/parse.isa.svg by default.
-
-The default for L<GraphViz2::Parse::ISA> is to plot from the bottom to the top (Grandchild to Parent).
-This is the opposite of L<GraphViz2>.
-
-See also dependency.pl, above.
-
-=head2 scripts/parse.recdescent.pl
-
-Demonstrates graphing a L<Parse::RecDescent>-style grammar.
-
-Inputs from t/sample.recdescent.1.dat and outputs to ./html/parse.recdescent.svg by default.
-
-The input grammar was extracted from t/basics.t in L<Parse::RecDescent> V 1.965001.
-
-You can patch the *.pl to read from t/sample.recdescent.2.dat, which was copied from L<a V 2 bug report|https://rt.cpan.org/Ticket/Display.html?id=36057>.
-
 =head2 scripts/parse.regexp.pl
 
 Demonstrates graphing a Perl regular expression.
@@ -2473,18 +2378,6 @@ Edit t/calc.input to delete the code, leaving the grammar after the __DATA__toke
 	rm t/calc.pm
 
 It's the file calc.output which ships in the t/ directory.
-
-=head2 scripts/parse.xml.bare.pl
-
-Demonstrates using L<XML::Bare> to parse XML.
-
-Inputs from ./t/sample.xml, and outputs to ./html/parse.xml.bare.svg by default.
-
-=head2 scripts/parse.xml.pp.pl
-
-Demonstrates using L<XML::Tiny> to parse XML.
-
-Inputs from ./t/sample.xml, and outputs to ./html/parse.xml.pp.svg by default.
 
 =head2 scripts/quote.pl
 
@@ -2583,12 +2476,6 @@ Prints all current L<Graphviz|http://www.graphviz.org/> attributes, along with a
 
 Outputs to STDOUT.
 
-=head2 scripts/sqlite.foreign.keys.pl
-
-Demonstrates how to find foreign key info by calling SQLite's pragma foreign_key_list.
-
-Outputs to STDOUT.
-
 =head2 scripts/sub.graph.frames.pl
 
 Demonstrates clusters with and without frames.
@@ -2662,19 +2549,9 @@ And thanks to L<Leon Brocard|http://search.cpan.org/~lbrocard/>, who wrote L<Gra
 
 Version numbers < 1.00 represent development versions. From 1.00 up, they are production versions.
 
-=head1 Machine-Readable Change Log
-
-The file Changes was converted into Changelog.ini by L<Module::Metadata::Changes>.
-
 =head1 Repository
 
 L<https://github.com/ronsavage/GraphViz2.git>
-
-=head1 Support
-
-Email the author, or log a bug on RT:
-
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=GraphViz2>.
 
 =head1 Author
 

@@ -5,7 +5,8 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '1.001002'
-  Test::Pod: '1.48'
+  charnames: '0'
+  open: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -20,51 +21,22 @@ no_index:
     - t
     - inc
 requires:
-  Algorithm::Dependency: '1.11'
-  Algorithm::Dependency::Source::HoA: '1.11'
-  Capture::Tiny: '0.36'
-  Class::ISA: '0.36'
-  Class::Load: '0.23'
-  Config: '0'
   Config::Tiny: '2.16'
-  DBI: '1.616'
-  DBIx::Admin::TableInfo: '3'
   Data::Section::Simple: '0.02'
-  Date::Simple: '3.03'
-  File::Basename: '2.77'
-  File::Copy: '2.14'
   File::HomeDir: '0.99'
   File::Slurp: '9999.19'
-  File::Spec: '3.4'
-  File::Temp: '0.22'
   File::Which: '1.21'
-  HTML::Entities::Interpolate: '1.04'
-  HTML::TreeBuilder: '4.2'
-  HTTP::Tiny: '0.012'
   IPC::Run3: '0.048'
-  Lingua::EN::PluralToSingular: '0.14'
   Log::Handler: '0.84'
   Moo: '2.001001'
-  Parse::RecDescent: '1.965001'
-  Scalar::Util: '1.23'
   Set::Array: '0.23'
-  Text::Xslate: '1.2'
-  Tree::DAG_Node: '1.06'
   Try::Tiny: '0.09'
   Types::Standard: '1.000005'
-  XML::Bare: '0'
-  XML::Tiny: '2.06'
-  charnames: '0'
-  open: '0'
-  parent: '0.225'
   perl: '5.010001'
-  strict: '0'
-  utf8: '0'
-  warnings: '0'
 resources:
   X_dynamic_config: 0
   bugtracker: https://github.com/ronsavage/GraphViz2/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/GraphViz2.git
-version: '2.48'
+version: '2.49'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

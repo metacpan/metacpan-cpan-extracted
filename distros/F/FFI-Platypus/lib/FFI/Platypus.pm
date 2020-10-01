@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.33'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -583,7 +583,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 SYNOPSIS
 
@@ -2036,6 +2036,9 @@ described above from an FFI perspective.  Thus the process of defining enum valu
 is identical to the process of defining macro constants in Perl.
 
 For more details on enumerated types see L<FFI::Platypus::Type/"Enum types">.
+
+There is also a type plugin (L<FFI::Platypus::Type::Enum>) that can be helpful
+in writing interfaces that use enums.
 
 =head2 Memory leaks
 
