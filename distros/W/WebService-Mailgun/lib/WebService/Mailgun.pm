@@ -8,8 +8,9 @@ use JSON::XS;
 use URI;
 use Try::Tiny;
 use Carp;
+use HTTP::Request::Common;
 
-our $VERSION = "0.08";
+our $VERSION = "0.10";
 our $API_BASE = 'api.mailgun.net/v3';
 
 use Class::Accessor::Lite (
@@ -94,7 +95,20 @@ sub domain_api_url {
 sub message {
     my ($self, $args) = @_;
 
-    my $res = $self->client->post($self->domain_api_url('messages'), [], $args);
+    my @content;
+    if (ref($args) eq 'HASH') {
+        @content = %$args;
+    }
+    elsif (ref($args) eq 'ARRAY') {
+        @content = @$args;
+    }
+    else {
+        die 'unsupport argument. message() need HashRef or ArrayRef.';
+    }
+
+    my $req = POST $self->domain_api_url('messages'), Content_type => 'form-data', Content => \@content;
+
+    my $res = $self->client->request($req);
     $self->decode_response($res);
 }
 
@@ -258,7 +272,7 @@ Send email message.
         text    => 'text',
     });
 
-L<https://documentation.mailgun.com/api-sending.html#sending>
+L<https://documentation.mailgun.com/en/latest/api-sending.html#sending>
 
 =head2 lists()
 
@@ -268,7 +282,7 @@ Get list of mailing lists.
     my $lists = $mailgun->lists();
     # => ArrayRef of mailing list object.
 
-L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+L<https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists>
 
 =head2 add_list($args)
 
@@ -282,7 +296,7 @@ Add mailing list.
         access_level => 'members',   # readonly(default), members, everyone
     });
 
-L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+L<https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists>
 
 =head2 list($address)
 
@@ -291,7 +305,7 @@ Get detail for mailing list.
     # get mailing list detail
     my $data = $mailgun->list('ml@exmaple.com');
 
-L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+L<https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists>
 
 =head2 update_list($address, $args)
 
@@ -305,7 +319,7 @@ Update mailing list detail.
         access_level => 'members',   # readonly(default), members, everyone
     });
 
-L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+L<https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists>
 
 =head2 delete_list($address)
 
@@ -314,7 +328,7 @@ Delete mailing list.
     # delete mailing list
     my $res = $mailgun->delete_list('ml@example.com');
 
-L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+L<https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists>
 
 =head2 list_members($address)
 
@@ -323,7 +337,7 @@ Get members for mailing list.
     # get members
     my $res = $mailgun->list_members('ml@example.com');
 
-L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+L<https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists>
 
 =head2 add_list_member($address, $args)
 
@@ -338,7 +352,7 @@ Add member for mailing list.
         upsert     => 'no',            # no (default). if yes, update exists member
     });
 
-L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+L<https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists>
 
 =head2 add_list_members($address, $args)
 
@@ -361,7 +375,7 @@ Adds multiple members for mailing list.
         members => encode_json [qw/user1@example.com user2@example.com/],
     });
 
-L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+L<https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists>
 
 =head2 list_member($address, $member_address)
 
@@ -370,7 +384,7 @@ Get member detail.
     # update member
     my $res = $mailgun->list_member('ml@example.com', 'user@example.com');
 
-L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+L<https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists>
 
 =head2 update_list_member($address, $member_address, $args)
 
@@ -384,7 +398,7 @@ Update member detail.
         subscribed => 'yes',           # yes(default) or no
     });
 
-L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+L<https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists>
 
 =head2 delete_list_members($address, $member_address)
 
@@ -393,7 +407,7 @@ Delete member for mailing list.
     # delete member
     my $res = $mailgun->delete_list_member('ml@example.com' => 'user@example.com');
 
-L<https://documentation.mailgun.com/api-mailinglists.html#mailing-lists>
+L<https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists>
 
 =head2 event($args)
 
@@ -402,7 +416,7 @@ Get event data.
     # get event data
     my ($events, $purl) = $mailgun->event({ event => 'stored', limit => 50 });
 
-L<Events|https://documentation.mailgun.com/api-events.html>
+L<Events|https://documentation.mailgun.com/en/latest/api-events.html>
 
 =head2 get_message_from_event($event)
 
@@ -412,7 +426,7 @@ Get stored message.
     my ($events, $purl) = $mailgun->event({ event => 'stored' });
     my $msg = $mailgun->get_message_from_event($events->[0]);
 
-L<Stored Message|https://documentation.mailgun.com/api-sending.html#retrieving-stored-messages>
+L<Stored Message|https://documentation.mailgun.com/en/latest/api-sending.html#retrieving-stored-messages>
 
 =head1 Event Pooling
 
@@ -424,7 +438,7 @@ event method return previous url. it can use for fetch event.
     $events = $mailgun->event($purl);
     // ...
 
-L<Event Polling|https://documentation.mailgun.com/api-events.html#event-polling>    
+L<Event Polling|https://documentation.mailgun.com/en/latest/api-events.html#event-polling>    
 
 =head1 TODO
 
@@ -432,25 +446,25 @@ this API not implement yet.
 
 =over
 
-=item * L<Domains|https://documentation.mailgun.com/api-domains.html>
+=item * L<Domains|https://documentation.mailgun.com/en/latest/api-domains.html>
 
-=item * L<Stats|https://documentation.mailgun.com/api-stats.html>
+=item * L<Stats|https://documentation.mailgun.com/en/latest/api-stats.html>
 
-=item * L<Tags|https://documentation.mailgun.com/api-tags.html>
+=item * L<Tags|https://documentation.mailgun.com/en/latest/api-tags.html>
 
-=item * L<Suppressions|https://documentation.mailgun.com/api-suppressions.html>
+=item * L<Suppressions|https://documentation.mailgun.com/en/latest/api-suppressions.html>
 
-=item * L<Routes|https://documentation.mailgun.com/api-routes.html>
+=item * L<Routes|https://documentation.mailgun.com/en/latest/api-routes.html>
 
-=item * L<Webhooks|https://documentation.mailgun.com/api-webhooks.html>
+=item * L<Webhooks|https://documentation.mailgun.com/en/latest/api-webhooks.html>
 
-=item * L<Email Validation|https://documentation.mailgun.com/api-email-validation.html>
+=item * L<Email Validation|https://documentation.mailgun.com/en/latest/api-email-validation.html>
 
 =back
 
 =head1 SEE ALSO
 
-L<WWW::Mailgun>, L<https://documentation.mailgun.com/>
+L<WWW::Mailgun>, L<https://documentation.mailgun.com/en/latest/>
 
 =head1 LICENSE
 

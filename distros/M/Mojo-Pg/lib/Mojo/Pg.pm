@@ -22,7 +22,7 @@ has options         => sub {
 has [qw(password username)] => '';
 has pubsub                  => sub { Mojo::Pg::PubSub->new(pg => shift) };
 
-our $VERSION = '4.19';
+our $VERSION = '4.20';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -64,7 +64,8 @@ sub _dequeue {
   my $self = shift;
 
   # Fork-safety
-  delete @$self{qw(pid queue)} unless ($self->{pid} //= $$) eq $$;
+  delete @$self{qw(pid queue)} if $self->{pid} && $self->{pid} ne $$;
+  $self->{pid} //= $$;
 
   while (my $dbh = shift @{$self->{queue} || []}) { return $dbh if $dbh->ping }
   my $dbh = DBI->connect(map { $self->$_ } qw(dsn username password options));
@@ -476,7 +477,7 @@ You can set the C<DBI_TRACE> environment variable to get some advanced diagnosti
   DBI_TRACE=15
   DBI_TRACE=SQL
 
-=head1 REFERENCE
+=head1 API
 
 This is the class hierarchy of the L<Mojo::Pg> distribution.
 

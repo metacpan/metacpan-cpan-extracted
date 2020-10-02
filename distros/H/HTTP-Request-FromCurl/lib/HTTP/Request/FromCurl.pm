@@ -16,7 +16,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =head1 NAME
 
@@ -282,7 +282,7 @@ sub _maybe_read_data_file( $self, $read_files, $data ) {
         if( $data =~ /^\@(.*)/ ) {
             open my $fh, '<', $1
                 or die "$1: $!";
-            local $/;
+            local $/; # / for Filter::Simple
             binmode $fh;
             $res = <$fh>
         } else {

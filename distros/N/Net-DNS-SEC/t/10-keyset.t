@@ -1,7 +1,10 @@
-# $Id: 10-keyset.t 1777 2020-05-07 08:24:01Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 10-keyset.t 1808 2020-09-28 22:08:11Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
+use IO::File;
 use Test::More;
 
 my %prerequisite = (
@@ -11,8 +14,8 @@ my %prerequisite = (
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
-	my @revision = grep $_, $prerequisite{$package};
-	next if eval "use $package @revision; 1;";
+	my @revision = grep {$_} $prerequisite{$package};
+	next if eval "use $package @revision; 1;";		## no critic
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
@@ -42,7 +45,7 @@ END {
 #
 # RSA keypair 1
 #
-my $keyrr1 = new Net::DNS::RR <<'END';
+my $keyrr1 = Net::DNS::RR->new( <<'END' );
 test.tld.	IN	DNSKEY	( 256 3 5
 	AQO1gY5UFltQ4f0ZHnXPFQZfcQQNpXK5r0Rk05rLLmY0XeA1lu8ek7W1VHsBjkge9WU7efdp3U4a
 	mxULRMQj7F0ByOK318agap2sIWYN13jV1RLxF5GPyLq+tp2ihEyI8x0P8c9RzgVn1ix4Xcoq+vKm
@@ -52,8 +55,8 @@ END
 ok( $keyrr1, join ' ', algorithm( $keyrr1->algorithm ), 'public key created' );
 
 my $keyfile1 = $filename{key1} = $keyrr1->privatekeyname;
-open( KEY1, ">$keyfile1" ) or die "Could not open $keyfile1";
-print KEY1 << 'END';
+my $handle1  = IO::File->new( $keyfile1, '>' ) or die qq(open: "$keyfile1" $!);
+print $handle1 <<'END';
 Private-key-format: v1.2
 Algorithm: 5 (RSASHA1)
 Modulus: tYGOVBZbUOH9GR51zxUGX3EEDaVyua9EZNOayy5mNF3gNZbvHpO1tVR7AY5IHvVlO3n3ad1OGpsVC0TEI+xdAcjit9fGoGqdrCFmDdd41dUS8ReRj8i6vradooRMiPMdD/HPUc4FZ9YseF3KKvryplqg09YxxOKAWPw8yPIMric=
@@ -65,13 +68,13 @@ Exponent1: k2zxcfl5q+utLrGcNch5quxx5crg74Byery41lJFWFO+gcjni29XTahHiQRZ2akAtc7y6
 Exponent2: jBR0mpwTlf5V9U+wAHyNmeMstsjyNUYl6lxhSM9VQgqNtYFagmSMqI1UAFPII6eB3nljL5BOjvQtqtAXrFjjGw==
 Coefficient: YJYWzNpbdj/11mE4kUwaiH9GQbY+uA28tv4aVAwAEcKPaU1QQ2k8Jlm+VXxh9v02QCFJYln3416972oeCx9eyw==
 END
-close(KEY1);
+close($handle1);
 
 
 #
 # RSA keypair 2
 #
-my $keyrr2 = new Net::DNS::RR <<'END';
+my $keyrr2 = Net::DNS::RR->new( <<'END' );
 test.tld.	IN	DNSKEY	( 256 3 8
 	AwEAAcXr1phQtnOdThOrgcwRplS/btblbtLGeHQoba55Gr8Scbx7AAw+LjwtFmbPlDhklC8+4BAf
 	QB+6Jv7hOFT45J/RqDV3W5p0qDYcLYJObNbiFxQ64ogMYHx62w4oUeTS5CvpHNzSoiyhhFlf71RL
@@ -83,8 +86,8 @@ END
 ok( $keyrr2, join ' ', algorithm( $keyrr2->algorithm ), 'public key created' );
 
 my $keyfile2 = $filename{key2} = $keyrr2->privatekeyname;
-open( KEY2, ">$keyfile2" ) or die "Could not open $keyfile2";
-print KEY2 << 'END';
+my $handle2  = IO::File->new( $keyfile2, '>' ) or die qq(open: "$keyfile2" $!);
+print $handle2 <<'END';
 Private-key-format: v1.2
 Algorithm: 8 (RSASHA256)
 Modulus: xevWmFC2c51OE6uBzBGmVL9u1uVu0sZ4dChtrnkavxJxvHsADD4uPC0WZs+UOGSULz7gEB9AH7om/uE4VPjkn9GoNXdbmnSoNhwtgk5s1uIXFDriiAxgfHrbDihR5NLkK+kc3NKiLKGEWV/vVEsRV4Erv3yH6F094Ra8d3NvDAzFkYhc/9403m7m2Q0TG66qrd7oF6C4Iuy4uAzMd1+mXtbbTPcETENzbwOA9FYcm0lwH6JR3mhB2vD4b2pKriRvu+Tc5lQauCRmySJxPUDmtCw6BzhKtPh3blB3p+2GaLaFnzpj/YM/819HWbBZo3y3Lt1qp1w2kVCYrBD6qkhXlw==
@@ -96,18 +99,18 @@ Exponent1: nMBIbKCTR0VtyyG8K3w43hyo7e7cgSA9SgragP9FgWf2XD0JtTpHlcIL82GbwQsJplA87
 Exponent2: FyUHR/4VFcpcs1d6pnqOHVaT1fR/u4u93Rwd6IZT75nE/xwMWMfdA9vl6FFKVM5AVJhzZ8qjh7jsljYSsQnRfC31TI3rASsw1Pcqw+vJcgdIrnbATCjHCmUtOUlkvRl3NhXAf81atu0ozzsRs2yiERXOqCaeMN+nQNuyjTnpM8U=
 Coefficient: iUz9xrXzP2UaBruIps61HAbh6MV+OYDmliSnudXW5Ii1s3ANXMJodzgwqD+VesjC9dDE2nXMTCXKhpk46Qy8i3OYJ4T7vxoyHEYfID1PM0+whAwebRoKHBqQDEYgwTcqDX+qD4MMc1TaG/do/cgNc/1EyE03DP1plH6HhItECIo=
 END
-close(KEY2);
+close($handle2);
 
 
 # Create keysets
 
 my $datarrset = [$keyrr1, $keyrr2];
 
-my $sigrr1 = create Net::DNS::RR::RRSIG( $datarrset, $keyfile1, ttl => 3600 );
+my $sigrr1 = Net::DNS::RR::RRSIG->create( $datarrset, $keyfile1, ttl => 3600 );
 
 ok( $sigrr1, join ' ', algorithm( $sigrr1->algorithm ), 'signature created' );
 
-my $sigrr2 = create Net::DNS::RR::RRSIG( $datarrset, $keyfile2, ttl => 3600 );
+my $sigrr2 = Net::DNS::RR::RRSIG->create( $datarrset, $keyfile2, ttl => 3600 );
 
 ok( $sigrr2, join ' ', algorithm( $sigrr2->algorithm ), 'signature created' );
 
@@ -133,8 +136,8 @@ my @ds = $keyset->extract_ds;
 my $string0 = $ds[0]->string;
 my $string1 = $ds[1]->string;
 
-my $expect0 = new Net::DNS::RR('test.tld. IN DS 15791 5 1 C355F0F3F30C69BF2F7EA253ED82FBC280C2496B')->string;
-my $expect1 = new Net::DNS::RR('test.tld. IN DS 63426 8 1 6173eae9bf79853e2c041b1cda02a3d70c86a20b')->string;
+my $expect0 = Net::DNS::RR->new('test.tld. IN DS 15791 5 1 C355F0F3F30C69BF2F7EA253ED82FBC280C2496B')->string;
+my $expect1 = Net::DNS::RR->new('test.tld. IN DS 63426 8 1 6173eae9bf79853e2c041b1cda02a3d70c86a20b')->string;
 
 my $alg0 = algorithm( $ds[0]->algorithm );
 my $dig0 = digtype( $ds[0]->digtype );
@@ -148,19 +151,19 @@ is( $string1, $expect1, "DS ($alg1/$dig1) created from keyset" );
 ##
 #  Corrupted keyset
 
-open( KEYSET, ">$filename{set3}" ) or die "Could not open $filename{set3}";
+my $handle3 = IO::File->new( $filename{set3}, '>' ) or die qq(open: "$filename{set3}" $!);
 
-print KEYSET $keyrr1->string, "\n";
-print KEYSET $keyrr2->string, "\n";
+print $handle3 $keyrr1->string, "\n";
+print $handle3 $keyrr2->string, "\n";
 
 my $sigstr = lc $sigrr1->string;				# corrupt the base64 signature
 $sigstr =~ s/in.rrsig/IN RRSIG/;				# fix collateral damage
 $sigstr =~ s/dnskey/DNSKEY/;
 
-print KEYSET $sigstr . "\n";
-print KEYSET $sigrr2->string . "\n";
+print $handle3 $sigstr . "\n";
+print $handle3 $sigrr2->string . "\n";
 
-close(KEYSET);
+close($handle3);
 
 my $corrupt = Net::DNS::SEC::Keyset->new( $filename{set3} );
 
@@ -212,7 +215,7 @@ $HexadecimalPacket =~ s/\n//g;
 $HexadecimalPacket =~ s/\s//g;
 
 my $packetdata = pack( "H*", $HexadecimalPacket );
-my $packet = Net::DNS::Packet->new( \$packetdata );
+my $packet     = Net::DNS::Packet->new( \$packetdata );
 
 
 $keyset = Net::DNS::SEC::Keyset->new($packet);
@@ -238,108 +241,72 @@ my @sigrr;
 
 # All signatures have expiration date in 2030... this test should work for a while
 
-$rr = Net::DNS::RR->new(
-	"example.com	100 IN	DNSKEY	256 3 5 (
-					AQOxFlzX8vShSG3JG2J/fngkgy64RoWr8ovG
-					e7MuvPJqOMHTLM5V8+TJIahSoyUd990ictNv
-					hDegUqLtZ8k5oQq44viFCU/H1apdEaJnLnXs
-					cVo+08ATlEb90MYznK9K0pm2ixbyspzRrrXp
-					nPi9vo9iU2xqWqw/Efha4vfi6QVs4w==
-					) "
-	);
-
-push( @keyrr, $rr );
+push( @keyrr, Net::DNS::RR->new( <<'END' ) );
+example.com	100 IN	DNSKEY	256 3 5 (
+	AQOxFlzX8vShSG3JG2J/fngkgy64RoWr8ovGe7MuvPJqOMHTLM5V8+TJIahSoyUd990ictNv
+	hDegUqLtZ8k5oQq44viFCU/H1apdEaJnLnXscVo+08ATlEb90MYznK9K0pm2ixbyspzRrrXp
+	nPi9vo9iU2xqWqw/Efha4vfi6QVs4w== )
+END
 
 
-$rr = Net::DNS::RR->new(
-	"example.com	100 IN	DNSKEY	256 3 5 (
-					AQO4jhl6ilWV2mYjwWl7kcxrYyQsnnbV7pxX
-					m48p+SgAr+R5SKyihkjg86IjZBQHFJKZ8RsZ
-					dhclH2dikM+53uUEhrqVGhsqF8FsNi4nE9aM
-					ISiX9Zs61pTYGYboYDvgpD1WwFbD4YVVlfk7
-					rCDP/zOE7H/AhkOenK2w7oiO0Jehcw==
-					) "
-	);
-
-push( @keyrr, $rr );
+push( @keyrr, Net::DNS::RR->new( <<'END' ) );
+example.com	100 IN	DNSKEY	256 3 5 (
+	AQO4jhl6ilWV2mYjwWl7kcxrYyQsnnbV7pxXm48p+SgAr+R5SKyihkjg86IjZBQHFJKZ8RsZ
+	dhclH2dikM+53uUEhrqVGhsqF8FsNi4nE9aMISiX9Zs61pTYGYboYDvgpD1WwFbD4YVVlfk7
+	rCDP/zOE7H/AhkOenK2w7oiO0Jehcw== )
+END
 
 
-$rr = Net::DNS::RR->new(
-	"example.com	100 IN	DNSKEY	256 3 5 (
-					AQO5fWabr7bNxDXT8YrIeclI9nvYYdKni3ef
-					gJfU749O3QVX9MON6WK0ed00odQF4cLeN3vP
-					SdhasLDI3Z3TzyAPBQS926oodxe78K9zwtPT
-					1kzJxvunOdJr6+6a7/+B6rF/cwfWTW50I0+q
-					FykldldB44a1uS34u3HgZRQXDmAesw==
-					) "
-	);
-
-push( @keyrr, $rr );
+push( @keyrr, Net::DNS::RR->new( <<'END' ) );
+example.com	100 IN	DNSKEY	256 3 5 (
+	AQO5fWabr7bNxDXT8YrIeclI9nvYYdKni3efgJfU749O3QVX9MON6WK0ed00odQF4cLeN3vP
+	SdhasLDI3Z3TzyAPBQS926oodxe78K9zwtPT1kzJxvunOdJr6+6a7/+B6rF/cwfWTW50I0+q
+	FykldldB44a1uS34u3HgZRQXDmAesw== )
+END
 
 
-$rr = Net::DNS::RR->new(
-	"example.com	100 IN	DNSKEY	256 3 5 (
-					AQO6uGWsox2oH36zusGA0+w3uxkZMdByanSC
-					jiaRHtkOA+gIxT8jmFvohxQBpVfYD+xG2pt+
-					qUWauWPFPjsIUBoFqHNpqr2/B4CTiZm/rSay
-					HDghZBIMceMa6t4NpaOep79QmiE6oGq6yWRB
-					swBkPZx9uZE7BqG+WLKEp136iwWyyQ==
-					) "
-	);
-
-push( @keyrr, $rr );
+push( @keyrr, Net::DNS::RR->new( <<'END' ) );
+example.com	100 IN	DNSKEY	256 3 5 (
+	AQO6uGWsox2oH36zusGA0+w3uxkZMdByanSCjiaRHtkOA+gIxT8jmFvohxQBpVfYD+xG2pt+
+	qUWauWPFPjsIUBoFqHNpqr2/B4CTiZm/rSayHDghZBIMceMa6t4NpaOep79QmiE6oGq6yWRB
+	swBkPZx9uZE7BqG+WLKEp136iwWyyQ== )
+END
 
 
-$rr = Net::DNS::RR->new(
-	"example.com	100 IN	RRSIG	DNSKEY 5 2 100 20300101000000 (
-					20040601105519 11354 example.com.
-					GTqyJTRbKJ0LuWbAnNni1M4JZ1pn+nXY1Zuz
-					Z0Kvt6OMTYCAFMFt0Wv9bncYkUuUSMGM7yGG
-					9Z7g7tcdb4TKCqQPYo4gr3Qj/xgC4LESoQs0
-					yAsJtLUiDfO6e4aWHmanpMGyGixYzHriS1pt
-					SRzirL1fTgV+kdNs5zBatUHRnQc=) "
-	);
-
-push( @sigrr, $rr );
+push( @sigrr, Net::DNS::RR->new( <<'END' ) );
+example.com	100 IN	RRSIG	DNSKEY 5 2 100 20300101000000 (
+	20040601105519 11354 example.com.
+	GTqyJTRbKJ0LuWbAnNni1M4JZ1pn+nXY1ZuzZ0Kvt6OMTYCAFMFt0Wv9bncYkUuUSMGM7yGG
+	9Z7g7tcdb4TKCqQPYo4gr3Qj/xgC4LESoQs0yAsJtLUiDfO6e4aWHmanpMGyGixYzHriS1pt
+	SRzirL1fTgV+kdNs5zBatUHRnQc= )
+END
 
 
-$rr = Net::DNS::RR->new(
-	"example.com	100 IN	RRSIG	DNSKEY 5 2 100 20300101000000 (
-					20040601105519 28109 example.com.
-					WemQqA+uaeKqCy6sEVBU3LDORG3f+Zmix6qK
-					9j1WL83UMWdd6sxNh0QJ0YL54lh9NBx+Viz7
-					gajO+IM4MmayxKY4QVjp+6mHeE5zBVHMpTTu
-					r5T0reNtTsa8sHr15fsI49yn5KOvuq+DKG1C
-					gI6siM5RdFpDsS3Rmf8fiK1PyTs= )"
-	);
-
-push( @sigrr, $rr );
+push( @sigrr, Net::DNS::RR->new( <<'END' ) );
+example.com	100 IN	RRSIG	DNSKEY 5 2 100 20300101000000 (
+	20040601105519 28109 example.com.
+	WemQqA+uaeKqCy6sEVBU3LDORG3f+Zmix6qK9j1WL83UMWdd6sxNh0QJ0YL54lh9NBx+Viz7
+	gajO+IM4MmayxKY4QVjp+6mHeE5zBVHMpTTur5T0reNtTsa8sHr15fsI49yn5KOvuq+DKG1C
+	gI6siM5RdFpDsS3Rmf8fiK1PyTs= )
+END
 
 
-$rr = Net::DNS::RR->new(
-	"example.com	100 IN	RRSIG	DNSKEY 5 2 100 20300101000000 (
-					20040601105519 33695 example.com.
-					M3yVwTOMw+jAKYY5c6oS4DH7OjOdfMOevpIe
-					zdKqWXkehoDg9YOwz8ai17AmfgkjZnsoNu0W
-					NMIcaVubR3n02bkVhJb7dEd8bhbegF8T1xkL
-					7rf9EQrPmM5GhHmVC90BGrcEhe//94hdXSVU
-					CRBi6KPFWSZDldd1go133bk/b/o= )"
-	);
-
-push( @sigrr, $rr );
+push( @sigrr, Net::DNS::RR->new( <<'END' ) );
+example.com	100 IN	RRSIG	DNSKEY 5 2 100 20300101000000 (
+	20040601105519 33695 example.com.
+	M3yVwTOMw+jAKYY5c6oS4DH7OjOdfMOevpIezdKqWXkehoDg9YOwz8ai17AmfgkjZnsoNu0W
+	NMIcaVubR3n02bkVhJb7dEd8bhbegF8T1xkL7rf9EQrPmM5GhHmVC90BGrcEhe//94hdXSVU
+	CRBi6KPFWSZDldd1go133bk/b/o= )
+END
 
 
-$rr = Net::DNS::RR->new(
-	"example.com	100 IN	RRSIG	DNSKEY 5 2 100 20300101000000 (
-					20040601105519 39800 example.com.
-					Mmhn2Ql6ExmyHvZFWgt+CBRw5No8yM0rdH1b
-					eU4is5gRbd3I0j5z6PdtpYjAkWiZNdYsRT0o
-					P7TQIsADfB0FLIFojoREg8kp+OmbpRTsLTgO
-					QYC95u5WodYGz03O0EbnQ7k4gkje6385G40D
-					JVl0xVfujHBMbB+keiSphD3mG4I= )"
-	);
-
-push( @sigrr, $rr );
+push( @sigrr, Net::DNS::RR->new( <<'END' ) );
+example.com	100 IN	RRSIG	DNSKEY 5 2 100 20300101000000 (
+	20040601105519 39800 example.com.
+	Mmhn2Ql6ExmyHvZFWgt+CBRw5No8yM0rdH1beU4is5gRbd3I0j5z6PdtpYjAkWiZNdYsRT0o
+	P7TQIsADfB0FLIFojoREg8kp+OmbpRTsLTgOQYC95u5WodYGz03O0EbnQ7k4gkje6385G40D
+	JVl0xVfujHBMbB+keiSphD3mG4I= )
+END
 
 
 my $ks = Net::DNS::SEC::Keyset->new( [@keyrr], [@sigrr] );
@@ -358,9 +325,9 @@ is( scalar(@keydiff), 0, "Keys out equal to keys in" );
 
 $datarrset = [$keyrr1, $keyrr2];
 
-$sigrr1 = create Net::DNS::RR::RRSIG( $datarrset, $keyfile1, ttl => 3600 );
+$sigrr1 = Net::DNS::RR::RRSIG->create( $datarrset, $keyfile1, ttl => 3600 );
 
-$sigrr2 = create Net::DNS::RR::RRSIG( $datarrset, $keyfile2, ttl => 3600 );
+$sigrr2 = Net::DNS::RR::RRSIG->create( $datarrset, $keyfile2, ttl => 3600 );
 
 ok( $sigrr1, 'RSA signature created' );
 
@@ -376,15 +343,15 @@ ok( !$keyset->verify(9734), "Verification against keytag 9734 failed" );
 is( $keyset->keyset_err, "No signature made with 9734 found", "Expected error message" );
 
 
-my $corruptible = create Net::DNS::RR::RRSIG( $datarrset, $keyfile1, ttl => 3600 );
+my $corruptible	 = Net::DNS::RR::RRSIG->create( $datarrset, $keyfile1, ttl => 3600 );
 my $unverifiable = Net::DNS::SEC::Keyset->new( $datarrset, [$corruptible] );
-my $badsig = create Net::DNS::RR::RRSIG( [$sigrr1], $keyfile1, ttl => 3600 );
+my $badsig	 = Net::DNS::RR::RRSIG->create( [$sigrr1], $keyfile1, ttl => 3600 );
 $corruptible->sigbin( $badsig->sigbin );
 
 is( scalar( $unverifiable->extract_ds ), 0, 'No DS from unverifiable keyset' );
 
 
-my $bogus = new Net::DNS::RR <<'END';
+my $bogus = Net::DNS::RR->new( <<'END' );
 bogus.tld.	IN	DNSKEY	257 3 5 (
 	AQO1gY5UFltQ4f0ZHnXPFQZfcQQNpXK5r0Rk05rLLmY0XeA1lu8ek7W1VHsBjkge9WU7efdp3U4a
 	mxULRMQj7F0ByOK318agap2sIWYN13jV1RLxF5GPyLq+tp2ihEyI8x0P8c9RzgVn1ix4Xcoq+vKm

@@ -2,8 +2,10 @@
 
 package Software::Catalog::SW::zcoin::qt;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-02'; # DATE
+our $DIST = 'Software-Catalog-SW-zcoin-qt'; # DIST
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,9 +20,73 @@ with 'Software::Catalog::Role::Software';
 
 use Software::Catalog::Util qw(extract_from_url);
 
+sub archive_info {
+    my ($self, %args) = @_;
+    [200, "OK", {
+        programs => [
+            {name=>"zcoin-cli", path=>"/bin"},
+            {name=>"zcoin-qt", path=>"/bin"},
+            {name=>"zcoind", path=>"/bin"},
+        ],
+    }];
+}
+
+sub available_versions {
+    my ($self, %args) = @_;
+
+    my $res = extract_from_url(
+        url => "https://github.com/zcoinofficial/zcoin/releases",
+        re  => qr!/zcoinofficial/zcoin/tree/([^"/]+)!,
+        all => 1,
+    );
+    return $res unless $res->[0] == 200;
+    # sort versions from earliest
+    $res->[2] = [ sort { $self->cmp_version($a, $b) }
+                      map { s/\Av//; $_ }
+                      @{$res->[2]}];
+    $res;
+}
+
+sub canon2native_arch_map {
+    return +{
+        'linux-x86_64' => 'linux64',
+        'win64' => 'win64',
+    },
+}
+
+sub download_url {
+    my ($self, %args) = @_;
+
+    my $version  = $args{version};
+    my $rversion = $args{version};
+    if (!$version) {
+        my $verres = $self->latest_version(maybe arch => $args{arch});
+        return [500, "Can't get latest version: $verres->[0] - $verres->[1]"]
+            unless $verres->[0] == 200;
+        $version  = $verres->[2];
+        $rversion = $verres->[3]{'func.real_v'};
+    }
+
+    my $filename;
+    if ($args{arch} =~ /linux/) {
+        $filename = "zcoin-$version-" . $self->_canon2native_arch($args{arch}) . ".tar.gz";
+    } else {
+        $filename = "zcoin-qt-$version-" . $self->_canon2native_arch($args{arch}) . ".exe";
+    }
+
+    [200, "OK",
+     join(
+         "",
+         "https://github.com/zcoinofficial/zcoin/releases/download/$rversion/$filename",
+     ), {
+         'func.version' => $version,
+         'func.filename' => $filename,
+     }];
+}
+
 sub homepage_url {"http://zcoin.io/" }
 
-sub versioning_scheme { "Dotted" }
+sub is_dedicated_profile { 0 }
 
 sub latest_version {
     my ($self, %args) = @_;
@@ -38,29 +104,6 @@ sub latest_version {
             }
         },
     );
-}
-
-sub canon2native_arch_map {
-    return +{
-        'linux-x86_64' => 'linux64',
-        'win64' => 'win64',
-    },
-}
-
-sub available_versions {
-    my ($self, %args) = @_;
-
-    my $res = extract_from_url(
-        url => "https://github.com/zcoinofficial/zcoin/releases",
-        re  => qr!/zcoinofficial/zcoin/tree/([^"/]+)!,
-        all => 1,
-    );
-    return $res unless $res->[0] == 200;
-    # sort versions from earliest
-    $res->[2] = [ sort { $self->cmp_version($a, $b) }
-                      map { s/\Av//; $_ }
-                      @{$res->[2]}];
-    $res;
 }
 
 sub release_note {
@@ -100,48 +143,7 @@ sub release_note {
   );
 }
 
-# version
-# arch
-sub download_url {
-    my ($self, %args) = @_;
-
-    my $version  = $args{version};
-    my $rversion = $args{version};
-    if (!$version) {
-        my $verres = $self->latest_version(maybe arch => $args{arch});
-        return [500, "Can't get latest version: $verres->[0] - $verres->[1]"]
-            unless $verres->[0] == 200;
-        $version  = $verres->[2];
-        $rversion = $verres->[3]{'func.real_v'};
-    }
-
-    my $filename;
-    if ($args{arch} =~ /linux/) {
-        $filename = "zcoin-$version-" . $self->_canon2native_arch($args{arch}) . ".tar.gz";
-    } else {
-        $filename = "zcoin-qt-$version-" . $self->_canon2native_arch($args{arch}) . ".exe";
-    }
-
-    [200, "OK",
-     join(
-         "",
-         "https://github.com/zcoinofficial/zcoin/releases/download/$rversion/$filename",
-     ), {
-         'func.version' => $version,
-         'func.filename' => $filename,
-     }];
-}
-
-sub archive_info {
-    my ($self, %args) = @_;
-    [200, "OK", {
-        programs => [
-            {name=>"zcoin-cli", path=>"/bin"},
-            {name=>"zcoin-qt", path=>"/bin"},
-            {name=>"zcoind", path=>"/bin"},
-        ],
-    }];
-}
+sub versioning_scheme { "Dotted" }
 
 1;
 # ABSTRACT: Zcoin desktop GUI client
@@ -158,7 +160,7 @@ Software::Catalog::SW::zcoin::qt - Zcoin desktop GUI client
 
 =head1 VERSION
 
-This document describes version 0.007 of Software::Catalog::SW::zcoin::qt (from Perl distribution Software-Catalog-SW-zcoin-qt), released on 2019-10-26.
+This document describes version 0.008 of Software::Catalog::SW::zcoin::qt (from Perl distribution Software-Catalog-SW-zcoin-qt), released on 2020-10-02.
 
 =for Pod::Coverage ^(.+)$
 
@@ -184,7 +186,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

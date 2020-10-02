@@ -53,6 +53,7 @@
             "IO::Handle" : "0",
             "IPC::Run" : "0",
             "Modern::Perl" : "0",
+            "POSIX" : "0",
             "Readonly" : "0",
             "Template" : "0",
             "YAML::XS" : "0",
@@ -84,7 +85,7 @@
          "web" : "https://github.com/ikluft/Container-Buildah"
       }
    },
-   "version" : "0.2.1",
+   "version" : "0.3.1",
    "x_generated_by_perl" : "v5.30.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }

@@ -1,9 +1,9 @@
 package Net::DNS::SEC::EdDSA;
 
-#
-# $Id: EdDSA.pm 1758 2019-10-14 13:17:11Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1758 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: EdDSA.pm 1807 2020-09-28 11:38:28Z willem $)[2];
 
 
 =head1 NAME
@@ -41,9 +41,7 @@ public key resource record.
 
 =cut
 
-use strict;
 use integer;
-use warnings;
 use MIME::Base64;
 
 use constant EdDSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_raw_public_key');
@@ -56,7 +54,7 @@ my %parameters = (
 	16 => [1088, 57, 114],
 	);
 
-sub _index { keys %parameters }
+sub _index { return keys %parameters }
 
 
 sub sign {
@@ -64,12 +62,12 @@ sub sign {
 
 	my $algorithm = $private->algorithm;
 	my ( $nid, $keylen ) = @{$parameters{$algorithm} || []};
-	die 'private key not EdDSA' unless $keylen;
+	die 'private key not EdDSA' unless $nid;
 
 	my $rawkey = pack "a$keylen", decode_base64( $private->PrivateKey );
 	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_raw_private_key( $nid, $rawkey );
 
-	Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey );
+	return Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey );
 }
 
 
@@ -78,7 +76,7 @@ sub verify {
 
 	my $algorithm = $keyrr->algorithm;
 	my ( $nid, $keylen, $siglen ) = @{$parameters{$algorithm} || []};
-	die 'public key not EdDSA' unless $keylen;
+	die 'public key not EdDSA' unless $nid;
 
 	return unless $signature;
 
@@ -86,7 +84,7 @@ sub verify {
 	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_raw_public_key( $nid, $rawkey );
 
 	my $sigbin = pack "a$siglen", $signature;
-	Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $sigbin, $evpkey );
+	return Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $sigbin, $evpkey );
 }
 
 

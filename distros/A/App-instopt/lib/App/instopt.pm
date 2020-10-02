@@ -1,7 +1,9 @@
 package App::instopt;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-02'; # DATE
+our $DIST = 'App-instopt'; # DIST
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -63,11 +65,13 @@ our %argopt_download = (
 );
 
 sub _set_args_default {
+    require Software::Catalog::Util;
+
     my ($args, $opts) = @_;
 
     if ($opts->{set_default_arch}) {
         if (!$args->{arch}) {
-            $args->{arch} = App::swcat::_detect_arch();
+            $args->{arch} = Software::Catalog::Util::detect_arch();
         }
     }
     if (!$args->{download_dir}) {
@@ -689,6 +693,7 @@ sub update {
     require File::MoreUtil;
     require File::Path;
     require Filename::Archive;
+    require Filename::Executable;
     require IPC::System::Options;
 
     my %args = @_;
@@ -774,83 +779,154 @@ sub update {
 
         log_info "Updating software %s to version %s ...", $sw, $v;
 
-        my $cafres = Filename::Archive::check_archive_filename(
-            filename => $filename);
-        unless ($cafres) {
-            my $errmsg = "Can't install $sw: Currently cannot handle software that has downloaded file that is not an archive";
+        my $installed;
+      INSTALL_ARCHIVE: {
+            my $cafres = Filename::Archive::check_archive_filename(
+                filename => $filename);
+            unless ($cafres) {
+                log_trace "$filename is not an archive, skipped installing archive";
+                last;
+            }
+            log_trace "Installing archive $filename ...";
+
+            my $target_name = join(
+                "",
+                $sw, "-", $v,
+            );
+            my $target_dir = join(
+                "",
+                $args{install_dir},
+                "/", $target_name,
+            );
+
+            my $aires = $mod->archive_info(%args, version => $v);
+            unless ($aires->[0] == 200) {
+                my $errmsg = "Can't install $sw: Can't get archive info: $aires->[0] - $aires->[1]";
+                log_error $errmsg;
+                $envres->add_result(500, $errmsg, {item_id=>$sw});
+                next SW;
+            }
+
+          EXTRACT: {
+                if (-d $target_dir) {
+                    log_debug "Target dir '$target_dir' already exists, skipping extract";
+                    last EXTRACT;
+                }
+                log_trace "Creating %s ...", $target_dir;
+                File::Path::make_path($target_dir);
+
+                log_trace "Extracting %s to %s ...", $filepath, $target_dir;
+                my $ar = Archive::Any->new($filepath);
+                $ar->extract($target_dir);
+
+                _unwrap($target_dir) unless
+                    defined($aires->[2]{unwrap}) && !$aires->[2]{unwrap};
+            } # EXTRACT
+
+          SYMLINK_OR_HARDLINK_DIR: {
+                local $CWD = $args{install_dir};
+                log_trace "Creating/updating directory symlink/hardlink to latest version ...";
+                if (File::MoreUtil::file_exists($sw)) {
+                    File::Path::remove_tree($sw);
+                }
+                my $use_symlink = !$mod->is_dedicated_profile;
+                if ($use_symlink) {
+                    symlink $target_name, $sw or die "Can't symlink $sw -> $target_name: $!";
+                } else {
+                    IPC::System::Options::system(
+                        {log=>1, die=>1},
+                        "cp", "-la", $target_name, $sw,
+                    );
+                    File::Slurper::write_text("$sw/instopt.version", $v);
+                }
+            }
+
+          SYMLINK_PROGRAMS: {
+                local $CWD = $args{program_dir};
+                log_trace "Creating/updating program symlinks ...";
+                my $programs = $aires->[2]{programs} // [];
+                for my $e (@$programs) {
+                    if ((-l $e->{name}) || !File::MoreUtil::file_exists($e->{name})) {
+                        unlink $e->{name};
+                        my $target = "$args{install_dir}/$sw$e->{path}/$e->{name}";
+                        $target =~ s!//!/!g;
+                        log_trace "Creating symlink $args{program_dir}/$e->{name} -> $target ...";
+                        symlink $target, $e->{name} or die "Can't symlink $e->{name} -> $target: $!";
+                    } else {
+                        log_warn "%s/%s is not a symlink, skipping", $args{program_dir}, $e->{name};
+                        next;
+                    }
+                }
+            }
+
+            $installed++;
+        } # INSTALL_ARCHIVE
+
+      INSTALL_EXEC: {
+            last if $installed;
+            my $cefres = Filename::Executable::check_executable_filename(
+                filename => $filename);
+            unless ($cefres) {
+                log_trace "$filename is not an executable, skipped installing executable";
+                last;
+            }
+            log_trace "Installing executable $filename ...";
+
+            my $target_name = join(
+                "",
+                $sw, "-", $v,
+            );
+
+          CHMOD_EXEC_IN_DOWNLOAD_DIR: {
+                last if -x $filepath;
+                log_trace "Chmod +x $filepath ...";
+                system "chmod", "+x", $filepath;
+                if ($?) {
+                    $envres->add_result(500, "Can't install $sw: can't chmod +x $filepath: $!", {item_id=>$sw});
+                    next SW;
+                }
+            }
+
+            {
+                local $CWD = $args{install_dir};
+
+              SYMLINK_EXEC_FROM_DOWNLOAD_DIR: {
+                    log_trace "Symlink $filepath -> $target_name ...";
+                    symlink $filepath, $target_name or do {
+                        $envres->add_result(500, "Can't install $sw: can't symlink $filepath -> $target_name: $!", {item_id=>$sw});
+                    };
+                }
+
+              SYMLINK_EXEC_IN_INSTALL_DIR: {
+                    log_trace "Creating/updating symlink to latest version ...";
+                    if (File::MoreUtil::file_exists($sw)) {
+                        unlink($sw);
+                    }
+                    symlink $target_name, $sw or die "Can't symlink $sw -> $target_name: $!";
+                }
+            }
+
+          SYMLINK_EXEC_IN_PROGRAM_DIR: {
+                local $CWD = $args{program_dir};
+                log_trace "Creating/updating program symlink ...";
+                if ((-l $sw) || !File::MoreUtil::file_exists($sw)) {
+                    unlink $sw;
+                    my $target = "$args{install_dir}/$sw";
+                    $target =~ s!//!/!g;
+                    log_trace "Creating symlink $args{program_dir}/$sw -> $target ...";
+                    symlink $target, $sw or die "Can't symlink $sw -> $target: $!";
+                }
+            }
+
+            $installed++;
+        } # INSTALL_EXEC
+
+      UNSUPPORTED: {
+            last if $installed;
+            my $errmsg = "Can't install $sw: filename $filename not an archive nor an executable, cannot handle";
             log_error $errmsg;
             $envres->add_result(412, $errmsg, {item_id=>$sw});
             next SW;
-        }
-
-        my $target_name = join(
-            "",
-            $sw, "-", $v,
-        );
-        my $target_dir = join(
-            "",
-            $args{install_dir},
-            "/", $target_name,
-        );
-
-        my $aires = $mod->archive_info(%args, version => $v);
-        unless ($aires->[0] == 200) {
-            my $errmsg = "Can't install $sw: Can't get archive info: $aires->[0] - $aires->[1]";
-            log_error $errmsg;
-            $envres->add_result(500, $errmsg, {item_id=>$sw});
-            next SW;
-        }
-
-      EXTRACT: {
-            if (-d $target_dir) {
-                log_debug "Target dir '$target_dir' already exists, skipping extract";
-                last EXTRACT;
-            }
-            log_trace "Creating %s ...", $target_dir;
-            File::Path::make_path($target_dir);
-
-            log_trace "Extracting %s to %s ...", $filepath, $target_dir;
-            my $ar = Archive::Any->new($filepath);
-            $ar->extract($target_dir);
-
-            _unwrap($target_dir) unless
-                defined($aires->[2]{unwrap}) && !$aires->[2]{unwrap};
-        } # EXTRACT
-
-      SYMLINK_OR_HARDLINK_DIR: {
-            local $CWD = $args{install_dir};
-            log_trace "Creating/updating directory symlink/hardlink to latest version ...";
-            if (File::MoreUtil::file_exists($sw)) {
-                File::Path::remove_tree($sw);
-            }
-            my $use_symlink = !$mod->can("dedicated_profile") || !$mod->dedicated_profile;
-            if ($use_symlink) {
-                symlink $target_name, $sw or die "Can't symlink $sw -> $target_name: $!";
-            } else {
-                IPC::System::Options::system(
-                    {log=>1, die=>1},
-                    "cp", "-la", $target_name, $sw,
-                );
-                File::Slurper::write_text("$sw/instopt.version", $v);
-            }
-        }
-
-      SYMLINK_PROGRAMS: {
-            local $CWD = $args{program_dir};
-            log_trace "Creating/updating program symlinks ...";
-            my $programs = $aires->[2]{programs} // [];
-            for my $e (@$programs) {
-                if ((-l $e->{name}) || !File::MoreUtil::file_exists($e->{name})) {
-                    unlink $e->{name};
-                    my $target = "$args{install_dir}/$sw$e->{path}/$e->{name}";
-                    $target =~ s!//!/!g;
-                    log_trace "Creating symlink $args{program_dir}/$e->{name} -> $target ...";
-                    symlink $target, $e->{name} or die "Can't symlink $e->{name} -> $target: $!";
-                } else {
-                    log_warn "%s/%s is not a symlink, skipping", $args{program_dir}, $e->{name};
-                    next;
-                }
-            }
         }
 
         $envres->add_result(200, "OK", {item_id=>$sw});
@@ -892,7 +968,7 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.014 of App::instopt (from Perl distribution App-instopt), released on 2019-10-26.
+This document describes version 0.015 of App::instopt (from Perl distribution App-instopt), released on 2020-10-02.
 
 =head1 SYNOPSIS
 
@@ -924,6 +1000,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<program_dir> => I<dirname>
 
+
 =back
 
 Special arguments:
@@ -932,7 +1009,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -972,6 +1049,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<program_dir> => I<dirname>
 
+
 =back
 
 Special arguments:
@@ -980,7 +1058,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1016,6 +1094,7 @@ Arguments ('*' denotes required arguments):
 =item * B<install_dir> => I<dirname>
 
 =item * B<program_dir> => I<dirname>
+
 
 =back
 
@@ -1056,6 +1135,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<softwares_or_patterns>* => I<array[str]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1092,6 +1172,7 @@ Arguments ('*' denotes required arguments):
 =item * B<install_dir> => I<dirname>
 
 =item * B<program_dir> => I<dirname>
+
 
 =back
 
@@ -1136,6 +1217,7 @@ Return per-arch hash in the all_versions field.
 
 =item * B<program_dir> => I<dirname>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1175,6 +1257,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<software>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1212,6 +1295,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<program_dir> => I<dirname>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1248,6 +1332,7 @@ Arguments ('*' denotes required arguments):
 =item * B<program_dir> => I<dirname>
 
 =item * B<software>* => I<str>
+
 
 =back
 
@@ -1290,6 +1375,7 @@ Whether to download latest version from URLor just find from download dir.
 
 =item * B<softwares_or_patterns>* => I<array[str]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1329,6 +1415,7 @@ Whether to download latest version from URLor just find from download dir.
 
 =item * B<program_dir> => I<dirname>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1364,7 +1451,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,9 +5,9 @@ use warnings;
 package Data::Fake;
 # ABSTRACT: Declaratively generate fake structured data for testing
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
-use Import::Into;
+use Import::Into 1.002005;
 
 sub import {
     my $class = shift;
@@ -34,7 +34,7 @@ Data::Fake - Declaratively generate fake structured data for testing
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -217,7 +217,7 @@ need to wrap it in a code reference.
 If you have ideas for additional generator functions and think they would
 be sensible additions to the main distribution, please open a support ticket
 to discuss it.  To be included in the main distribution, additional
-dependencies should add few, if any, additional dependencies.
+generator functions should add few, if any, additional dependencies.
 
 If you would like to release your own distributions in the C<Data::Fake::*>
 namespace, please follow the conventions of the existing modules:
@@ -260,34 +260,23 @@ L<Text::Lorem> – just fake text
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
-=head1 SUPPORT
-
-=head2 Bugs / Feature Requests
-
-Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/dagolden/Data-Fake/issues>.
-You will be notified automatically of any progress on your issue.
-
-=head2 Source Code
-
-This is open source software.  The code repository is available for
-public review and contribution under the terms of the license.
-
-L<https://github.com/dagolden/Data-Fake>
-
-  git clone https://github.com/dagolden/Data-Fake.git
-
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ricardo Signes Stuart Skelton
+=for stopwords Chloé Kekoa José Joaquín Atria Ricardo Signes Stuart Skelton
 
 =over 4
+
+=item *
+
+Chloé Kekoa <50083900+chloekek@users.noreply.github.com>
+
+=item *
+
+José Joaquín Atria <jjatria@gmail.com>
 
 =item *
 

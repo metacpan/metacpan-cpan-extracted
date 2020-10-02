@@ -4,7 +4,7 @@
       "Kan Fushihara <kan.fushihara@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -41,6 +41,7 @@
          "requires" : {
             "Class::Accessor::Lite" : "0",
             "Furl" : "0",
+            "HTTP::Request::Common" : "0",
             "IO::Socket::SSL" : "0",
             "JSON::XS" : "0",
             "Try::Tiny" : "0",
@@ -61,7 +62,7 @@
    "provides" : {
       "WebService::Mailgun" : {
          "file" : "lib/WebService/Mailgun.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -75,7 +76,7 @@
          "web" : "https://github.com/kan/p5-web-service-mailgun"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_contributors" : [
       "Josh Rabinowitz <joshr@joshr.com>"
    ],

@@ -4,7 +4,7 @@
 
 ## no critic (Modules::RequireExplicitPackage)
 # 'use strict' and 'use warnings' included here
-use Modern::Perl qw(2018); # require 5.26 security update
+use Modern::Perl qw(2015); # require 5.20.0
 ## use critic (Modules::RequireExplicitPackage)
 
 use autodie;

@@ -8,9 +8,10 @@ use Modern::Perl qw(2015); # require 5.20.0
 ## use critic (Modules::RequireExplicitPackage)
 
 package Container::Buildah::Subcommand;
-$Container::Buildah::Subcommand::VERSION = '0.2.1';
+$Container::Buildah::Subcommand::VERSION = '0.3.1';
 use autodie;
 use Carp qw(croak confess);
+use POSIX qw(uname);
 use IPC::Run;
 use Data::Dumper;
 use YAML::XS;
@@ -397,12 +398,54 @@ sub cmd
 	return $outstr;
 }
 
+# check that the OS kernel is capable of running containers
+# returns true/false, caches result in config data
+# used by buildah() method and unit tests
+# public class method
+sub container_compat_check
+{
+	my ($class_or_obj, @in_args) = @_;
+	my $cb = (ref $class_or_obj) ? $class_or_obj : $class_or_obj->instance();
+
+	# check if kernel has already been tested
+	my $config_key = "container_compat";
+	my $test_result = $cb->get_config($config_key);
+	if (defined $test_result) {
+		$cb->debug({level => 4}, "container_compat_check: cached result $test_result");
+		return $test_result;
+	}
+
+	# call POSIX::uname() to get kernel name and release
+	$test_result = 0; # reset value and assume false
+	my ($sysname, $nodename, $release, $version, $machine) = POSIX::uname();
+	my ($kmajor, $kminor) = ($release =~ /^([0-9]+)\.([0-9]+)\./x);
+
+	# currently only Linux 2.8 kernels and above support containers
+	# adjust as necessary if others (i.e. BSD variants) add container compatibility in the future
+	if ($sysname eq "Linux") {
+		if ($kmajor >= 3) {
+			$test_result = 1;
+		} elsif ($kmajor == 2 and $kminor >= 8) {
+			$test_result = 1;
+		}
+	}
+
+	# cache the result in the config data and return it
+	my $config = $cb->get_config();
+	$config->{$config_key} = $test_result;
+	$cb->debug({level => 4}, "container_compat_check: test result $test_result");
+	return $test_result
+}
+
 # run buildah command with parameters
 # public class method
 sub buildah
 {
 	my ($class_or_obj, @in_args) = @_;
 	my $cb = (ref $class_or_obj) ? $class_or_obj : $class_or_obj->instance();
+
+	# verify kernel compatibility
+	$cb->container_compat_check() or croak "buildah(): kernel is not container-compatible";
 
 	# collect options to pass along to cmd() method
 	my $opts = {};
@@ -1056,7 +1099,7 @@ Container::Buildah::Subcommand - wrapper class for Container::Buildah to run sub
 
 =head1 VERSION
 
-version 0.2.1
+version 0.3.1
 
 =head1 SYNOPSIS
 
@@ -1064,47 +1107,74 @@ version 0.2.1
 
 =head1 DESCRIPTION
 
-=head1 METHODS
+Container::Buildah::Subcommand provides the following methods, which should be called as methods of
+L<Container::Buildah>. Since Container::Buildah is a singleton, these methods can be called as
+class or instance methods. For example:
 
-=head2 buildah
+=over 1
 
-=head2 bud
+=item call buildah() as a class method
 
-=head2 containers
+Container::Buildah->buildah("run", @args, $container_name, "--", @command);
 
-=head2 from
+=item call buildah() as an instance method
 
-=head2 images
+my $cb = Container::Buildah->instance("run", @args, $container_name, "--", @command);
+$cb->buildah();
 
-=head2 info
+=back
 
-=head2 inspect
+=head1 FUNCTIONS AND METHODS
 
-=head2 mount
+=over 1
 
-=head2 pull
+=item prog
 
-=head2 push
+=item cmd
 
-=head2 rename
+=item buildah
 
-=head2 rm
+=item bud
 
-=head2 rmi
+=item containers
 
-=head2 tag
+=item from
 
-=head2 umount
+=item images
 
-=head2 unshare
+=item info
 
-=head2 version
+=item inspect
+
+=item mount
+
+=item pull
+
+=item push
+
+=item rename
+
+=item rm
+
+=item rmi
+
+=item tag
+
+=item umount
+
+=item unshare
+
+=item version
+
+=back
 
 =head1 BUGS AND LIMITATIONS
 
 Please report bugs via GitHub at L<https://github.com/ikluft/Container-Buildah/issues>
 
 Patches and enhancements may be submitted via a pull request at L<https://github.com/ikluft/Container-Buildah/pulls>
+
+Containers can only be run with a Linux kernel revision 2.8 or newer.
 
 =head1 AUTHOR
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension Spreadsheet::ReadSXC.
 
+0.30  2020-10-02
+    * No code changes, no need to upgrade
+    * Remove "use XML::Parser;" line, which was not used anymore in the code.
+      Spotted by MANWAR
+    * This version will be (re)released as 1.00 if the smoke tests come up green
+
 0.29  2020-09-30
     * Make the test for the error message on non-existing files more lax.
       This addresses RT #133432

@@ -1,7 +1,5 @@
-package Net::DNS::SEC::libcrypto;
-
 #
-# $Id: libcrypto.pod 1616 2018-01-22 08:54:52Z willem $
+# $Id: libcrypto.pod 1807 2020-09-28 11:38:28Z willem $
 #
 
 =head1 NAME
@@ -13,12 +11,6 @@ Net::DNS::SEC::libcrypto - Perl interface to OpenSSL libcrypto
 
 Perl XS extension providing access to the OpenSSL libcrypto library
 upon which the Net::DNS::SEC cryptographic components are built.
-
-=cut
-
-
-1;
-__END__
 
 
 =head1 ACKNOWLEDGMENT

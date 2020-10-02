@@ -3,6 +3,9 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '6.17',
                                         'perl' => '5.008001'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
@@ -31,7 +34,7 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Exporter' => '5.57',
-                                      'Import::Into' => '0',
+                                      'Import::Into' => '1.002005',
                                       'List::Util' => '0',
                                       'Text::Lorem' => '0',
                                       'Time::Piece' => '1.27',

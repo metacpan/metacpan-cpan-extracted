@@ -197,7 +197,9 @@ for my $path (qw(/usr/bin /sbin /usr/sbin /bin)) {
 	}
 }
 my $test_total;
-if (not $buildah_found) {
+if (not $cb->container_compat_check()) {
+	plan skip_all => 'kernel is not container-compatible';
+} elsif (not $buildah_found) {
 	plan skip_all => 'buildah command not available';
 } else {
 	$test_total = count_tests(@tests);

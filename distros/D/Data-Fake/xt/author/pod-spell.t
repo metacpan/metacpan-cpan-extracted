@@ -10,6 +10,9 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+50083900
+Atria
+Chloé
 Company
 Core
 Data
@@ -20,6 +23,9 @@ Fake
 Glassdoor
 Golden
 Internet
+Joaquín
+José
+Kekoa
 Names
 Ricardo
 Signes
@@ -28,6 +34,7 @@ Stuart
 Text
 dagolden
 declaratively
+jjatria
 lib
 rjbs
 stuarts

@@ -1,10 +1,12 @@
 #!/usr/bin/perl
-#$Id: make-signed-keyset 1661 2018-04-04 09:51:45Z willem $
+#$Id: make-signed-keyset 1807 2020-09-28 11:38:28Z willem $
 
 #
 # takes a bind public key file and creates a self-signed keyset
 #
 
+use strict;
+use warnings;
 use Getopt::Std;
 use Net::DNS::SEC;
 use Net::DNS::SEC::Keyset;
@@ -64,7 +66,7 @@ sub version {
 }
 
 sub make_keyset {
-	my $source    = new Net::DNS::ZoneFile(shift);
+	my $source    = Net::DNS::ZoneFile->new(shift);
 	my $file      = $source->name;
 	my $directory = dirname($file);
 	print("Processing file: $file\n");
@@ -96,10 +98,12 @@ sub make_keyset {
 	if ($printds) {
 		print("Extracting DS RR\n") if $verbose;
 		my @ds = $keyset->extract_ds();
-		foreach $ds (@ds) {
+		foreach my $ds (@ds) {
 			$ds->print();
 		}
 	}
+
+	return;
 }
 
 

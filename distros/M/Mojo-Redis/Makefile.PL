@@ -8,6 +8,7 @@ my %WriteMakefileArgs = (
   ABSTRACT_FROM  => 'lib/Mojo/Redis.pm',
   VERSION_FROM   => 'lib/Mojo/Redis.pm',
   EXE_FILES      => [qw()],
+  OBJECT         => '',
   BUILD_REQUIRES => {}
 ,
   TEST_REQUIRES  => {

@@ -1,5 +1,5 @@
 package Log::Progress::Parser;
-$Log::Progress::Parser::VERSION = '0.11';
+$Log::Progress::Parser::VERSION = '0.12';
 use Moo 2;
 use JSON;
 
@@ -118,7 +118,7 @@ Log::Progress::Parser - Parse progress data from a file
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -231,7 +231,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2020 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

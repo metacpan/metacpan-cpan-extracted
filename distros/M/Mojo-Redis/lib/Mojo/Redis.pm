@@ -9,7 +9,7 @@ use Mojo::Redis::Database;
 use Mojo::Redis::PubSub;
 use Scalar::Util 'blessed';
 
-our $VERSION = '3.24';
+our $VERSION = '3.25';
 
 $ENV{MOJO_REDIS_URL} ||= 'redis://localhost:6379';
 
@@ -25,16 +25,17 @@ has protocol_class => do {
 };
 
 has pubsub => sub {
-  my $pubsub = Mojo::Redis::PubSub->new(redis => $_[0]);
+  my $self   = shift;
+  my $pubsub = Mojo::Redis::PubSub->new(redis => $self);
   Scalar::Util::weaken($pubsub->{redis});
   return $pubsub;
 };
 
 has url => sub { Mojo::URL->new($ENV{MOJO_REDIS_URL}) };
 
-sub cache { Mojo::Redis::Cache->new(redis => shift, @_) }
+sub cache  { Mojo::Redis::Cache->new(redis => shift, @_) }
 sub cursor { Mojo::Redis::Cursor->new(redis => shift, command => [@_ ? @_ : (scan => 0)]) }
-sub db { Mojo::Redis::Database->new(redis => shift) }
+sub db     { Mojo::Redis::Database->new(redis => shift) }
 
 sub new {
   my $class = shift;

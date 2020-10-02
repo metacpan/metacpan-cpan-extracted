@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Preprocess::Ops;
-our $VERSION = 202009027;
+our $VERSION = 202009030;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -17,7 +17,7 @@ use utf8;
 my $logFile = q(/home/phil/c/z/z/zzz.txt);                                      # Log to this file if present
 binModeAllUtf8;
 
-#D1 Preprocess                                                                  # Preprocess ◁, ▷ and ▶ as operators.
+#D1 Preprocess                                                                  # Preprocess ◁, ◀, ▷ and ▶ as operators in ANSI-C.
 
 sub trim($)                                                                     #P Remove trailing white space and comment
  {my ($s) = @_;                                                                 # String
@@ -304,8 +304,9 @@ sub c($$$;$)                                                                    
 
   if (1)                                                                        # Write prototypes
    {my @h;                                                                      # Generated code
-    for my $s(sort keys %structureParameters)                                   # Each structure
-     {next unless $structures{$s};                                              # The structure must be one defined in this file
+#   for my $s(sort keys %structureParameters)                                   # Each structure
+    for my $s(sort keys %structures)                                            # Each structure
+     {#next unless $structures{$s};                                              # The structure must be one defined in this file
       push @h, "struct ProtoTypes_$s {";                                        # Start structure
       for my $m(sort keys $structureParameters{$s}->%*)                         # Methods in structure
        {my $method = $methods{$m};                                              # Method
@@ -411,7 +412,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 =head1 Name
 
-Preprocess::Ops - Preprocess ◁,  ▷ and ▶ as operators in ANSI-C.
+Preprocess::Ops - Preprocess ◁, ◀, ▷ and ▶ as operators in ANSI-C.
 
 =head1 Synopsis
 
@@ -607,10 +608,10 @@ explicitly mentioned function B<data_$Node>.
 
 =head1 Description
 
-Preprocess ◁,  ▷ and ▶ as operators in ANSI-C.
+Preprocess ◁, ◀, ▷ and ▶ as operators in ANSI-C.
 
 
-Version 202009027.
+Version 202009030.
 
 
 The following sections describe the methods in each functional area of this
@@ -844,8 +845,7 @@ B<Example:>
   };
     clearFolder($d, 10);
 
-  if (1)
-   {my $d = temporaryFolder;
+    my $d = temporaryFolder;
 
     my $c = owf(fpe($d, qw(source c)), <<'END');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
@@ -857,6 +857,34 @@ B<Example:>
   ◉
     ✓ a[0] == 'a';
    }
+  END
+
+    my $h = fpe($d, qw(source  h));
+
+    my $g = fpe($d, qw(derived c));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    my $o = fpe($d, qw(out     txt));
+
+
+    my $r = c($c, $g, $h);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  # qx(gcc $g; ./a.out 2>$o);
+
+  # owf($logFile, readFile($g));
+    is_deeply [nws readCFile($g)], [nws <<'END'];
+  #include <assert.h>
+  int main(void)
+   {char *a =
+  "a
+"
+  "  b
+"
+  ;
+    assert( a[0] == 'a');
+   }
+  END
+
+    clearFolder($d, 10);
 
 
 

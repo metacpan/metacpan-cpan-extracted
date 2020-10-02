@@ -5,7 +5,7 @@ package Alien::Plotly::Orca;
 use strict;
 use warnings;
 
-our $VERSION = '0.0001'; # VERSION
+our $VERSION = '0.0002'; # VERSION
 
 use parent 'Alien::Base';
 
@@ -23,7 +23,7 @@ Alien::Plotly::Orca - Finds or installs plotly-orca
 
 =head1 VERSION
 
-version 0.0001
+version 0.0002
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ version 0.0001
 =head1 DESCRIPTION
 
 This module finds L<plotly-orca|https://github.com/plotly/orca> from your
-system, or installs it (version 1.2.1).
+system, or installs it (version 1.3.1).
 
 For installation it uses prebuilt packages and would supports 3 OS
 platforms: Windows, Linux and OSX.
@@ -88,7 +88,7 @@ service, or ran as a wrapper every time like C<xvfb-run orca ...>.
 
 "open sans" font
 
-Not having this font would cause installation to fail, but texts could be
+Not having this font won't cause installation to fail, but texts could be
 not properly rendered in the exported image file. See also
 L<https://github.com/plotly/orca/issues/148>.
 
@@ -104,7 +104,7 @@ long paths for some extractd files which could exceed Windows's default
 MAX_PATH limit of 260 characters.
 And Archive::Tar cannot handle that properly.
 
-=head2 Max OSX
+=head2 Mac OSX
 
 For Mac OSX I can't really test it as I don't have such a system at
 hand. Travis CI does not seem to support Perl for OSX...
@@ -120,9 +120,15 @@ L<https://github.com/plotly/orca>
 
 Stephan Loyd <sloyd@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Thibault Duponchelle
+
+Thibault Duponchelle <thibault.duponchelle@amadeus.com>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Stephan Loyd.
+This software is copyright (c) 2019-2020 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

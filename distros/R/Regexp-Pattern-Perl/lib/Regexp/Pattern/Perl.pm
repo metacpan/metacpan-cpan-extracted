@@ -1,9 +1,9 @@
 package Regexp::Pattern::Perl;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-16'; # DATE
+our $DATE = '2020-10-02'; # DATE
 our $DIST = 'Regexp-Pattern-Perl'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Regexp patterns related to Perl
@@ -20,13 +20,13 @@ Regexp::Pattern::Perl - Regexp patterns related to Perl
 
 =head1 VERSION
 
-This document describes version 0.002 of Regexp::Pattern::Perl (from Perl distribution Regexp-Pattern-Perl), released on 2020-06-16.
+This document describes version 0.004 of Regexp::Pattern::Perl (from Perl distribution Regexp-Pattern-Perl), released on 2020-10-02.
 
 =head1 DESCRIPTION
 
 L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 
-=head1 PATTERNS
+=head1 REGEXP PATTERNS
 
 =over
 

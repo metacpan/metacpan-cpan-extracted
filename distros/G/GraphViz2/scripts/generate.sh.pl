@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use warnings  qw(FATAL utf8);    # Fatalize encoding glitches.
 
-use File::Slurp; # For write_file().
 use File::Spec;
 
 use GraphViz2::Filer;
@@ -14,14 +13,12 @@ use GraphViz2::Filer;
 sub format_output
 {
 	my($format, @output) = @_;
-
-push @output, <<EOS;
+	open my $fh, '>:encoding(UTF-8)', "scripts/generate.$format.sh" or die "generate.$format.sh: $!";
+	print $fh @output;
+	print $fh <<EOS;
 
 perl -Ilib scripts/generate.demo.pl $format
 EOS
-
-	write_file("scripts/generate.$format.sh", @output);
-
 } # End of format_output;
 
 # ------------------------------------------------

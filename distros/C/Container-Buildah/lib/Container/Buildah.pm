@@ -8,7 +8,7 @@ use Modern::Perl qw(2015); # require 5.20.0
 ## use critic (Modules::RequireExplicitPackage)
 
 package Container::Buildah;
-$Container::Buildah::VERSION = '0.2.1';
+$Container::Buildah::VERSION = '0.3.1';
 use autodie;
 use Carp qw(croak confess);
 use Exporter;
@@ -30,8 +30,8 @@ Container::Buildah::Subcommand->import(qw(process_params prog));
 
 # methods delegated to Container::Buildah::Subcommand that need to be imported into this class' symbol table
 # (methods should not be handled by Exporter - we are doing the same thing but keeping it private to the class)
-Readonly::Array my @subcommand_methods => qw(cmd buildah bud containers from images info inspect
-	mount pull push_image rename rm rmi tag umount unshare version);
+Readonly::Array my @subcommand_methods => qw(cmd container_compat_check buildah bud containers from images info
+	inspect mount pull push_image rename rm rmi tag umount unshare version);
 
 # aliases to de-conflict wrapper methods that have same name as Perl builtins
 Readonly::Hash my %subcommand_aliases => (push => "push_image", rename => "rename_image");
@@ -152,7 +152,7 @@ sub init_config
 }
 
 # print status messages
-# public class function
+# public class method
 sub status
 {
 	# get Container::Buildah ref from method-call parameter or class singleton instance
@@ -171,7 +171,7 @@ sub status
 }
 
 # print debug messages
-# public class function
+# public class method
 sub debug
 {
 	my ($cb, @in_args) = @_;
@@ -545,7 +545,7 @@ sub main
 	my %cmd_opts;
 	my @added_opts = (exists $init_config{added_opts} and ref $init_config{added_opts} eq "ARRAY")
 		? @{$init_config{added_opts}} : ();
-	GetOptions(\%cmd_opts, "debug:i", "config:s", "internal:s", @added_opts);
+	GetOptions(\%cmd_opts, "debug:i", "add-history", "config:s", "internal:s", @added_opts);
 	if (exists $cmd_opts{debug}) {
 		set_debug($cmd_opts{debug});
 	}
@@ -613,7 +613,7 @@ Container::Buildah - wrapper around containers/buildah tool for multi-stage buil
 
 =head1 VERSION
 
-version 0.2.1
+version 0.3.1
 
 =head1 SYNOPSIS
 
@@ -681,6 +681,10 @@ The data is similar to what would be in a Dockerfile, except this module makes i
 
 =head1 METHODS
 
+=head2 status
+
+prints a list of strings to STDERR, if debugging is set to level 1 or higher.
+
 =head2 debug
 
 Prints a list of strings to STDERR, if debugging is at the specified level.
@@ -704,27 +708,63 @@ Return integer value of debug level
 
 Take an integer value parameter to set the debug level. A level of 0 means debugging is turned off. The default is 0.
 
+=head2 main
+
 =head2 prog
+
+=head2 cmd
 
 =head2 buildah
 
+=head2 bud
+
+=head2 containers
+
+=head2 from
+
+=head2 images
+
+=head2 info
+
+=head2 inspect
+
+=head2 mount
+
+=head2 pull
+
+=head2 push
+
+=head2 rename
+
+=head2 rm
+
+=head2 rmi
+
 =head2 tag
 
-=head2 main
+=head2 umount
+
+=head2 unshare
+
+=head2 version
 
 =head1 FUNCTIONS
 
 =head2 init_config
 
-=head2 status
+=head1 FUNCTIONS AND METHODS
 
-prints a list of strings to STDOUT
+=head2 Container::Buildah core functions and methods
+
+=head2 methods provided by Container::Buildah::Subcommand
 
 =head1 BUGS AND LIMITATIONS
 
 Please report bugs via GitHub at L<https://github.com/ikluft/Container-Buildah/issues>
 
 Patches and enhancements may be submitted via a pull request at L<https://github.com/ikluft/Container-Buildah/pulls>
+
+Containers can only be run with a Linux kernel revision 2.8 or newer.
 
 =head1 AUTHOR
 

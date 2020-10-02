@@ -1,13 +1,11 @@
 package Net::DNS::SEC;
 
-#
-# $Id: SEC.pm 1792 2020-06-26 14:43:25Z willem $
-#
+use strict;
+use warnings;
+
 our $VERSION;
-$VERSION = '1.17';
-our $SVNVERSION = (qw$LastChangedRevision: 1792 $)[1];
-our $XS_VERSION = $VERSION;
-$VERSION = eval $VERSION;
+$VERSION = '1.18';
+our $SVNVERSION = (qw$Id: SEC.pm 1810 2020-10-02 12:44:37Z willem $)[2];
 
 
 =head1 NAME
@@ -35,16 +33,13 @@ Net::DNS::SEC in the use declaration.
 =cut
 
 
-use strict;
 use base qw(Exporter DynaLoader);
 
 use Net::DNS 1.01 qw(:DEFAULT);
 
 our @EXPORT = ( @Net::DNS::EXPORT, qw(algorithm digtype key_difference) );
 
-
 use integer;
-use warnings;
 use Carp;
 
 
@@ -62,7 +57,7 @@ the corresponding mnemonic.
 
 =cut
 
-sub algorithm { &Net::DNS::RR::DS::algorithm; }
+sub algorithm { return &Net::DNS::RR::DS::algorithm; }
 
 
 =head2 digtype
@@ -77,7 +72,7 @@ corresponding mnemonic.
 
 =cut
 
-sub digtype { &Net::DNS::RR::DS::digtype; }
+sub digtype { return &Net::DNS::RR::DS::digtype; }
 
 
 =head2 key_difference
@@ -95,11 +90,11 @@ sub key_difference {
 
 	eval {
 		local $SIG{__DIE__};
-		my ($x) = grep !$_->isa('Net::DNS::RR::DNSKEY'), @$a, @$b;
+		my ($x) = grep { !$_->isa('Net::DNS::RR::DNSKEY') } @$a, @$b;
 		die sprintf 'unexpected %s object in key list', ref($x) if $x;
 
 		my %index = map { ( $_->privatekeyname => 1 ) } @$b;
-		@$r = grep !$index{$_->privatekeyname}, @$a;
+		@$r = grep { !$index{$_->privatekeyname} } @$a;
 		1;
 	} || do {
 		croak($@) if wantarray;
@@ -111,11 +106,11 @@ sub key_difference {
 
 ########################################
 
-eval { Net::DNS::SEC->bootstrap($XS_VERSION) } || warn;
+eval { Net::DNS::SEC->bootstrap($VERSION) } || croak;
 
 
 foreach (qw(DS CDS RRSIG)) {
-	new Net::DNS::RR( type => $_ );				# pre-load to access class methods
+	Net::DNS::RR->new( type => $_ );			# pre-load to access class methods
 }
 
 

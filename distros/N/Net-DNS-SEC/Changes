@@ -1,6 +1,13 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.18 Oct 2, 2020
+
+	Eliminate bareword filehandle usage.
+	Eliminate indirect object syntax.
+	Eliminate grep/map <expression>.
+
+
 **** 1.17 Jun 26, 2020
 
 	Recognise BIND private key accessed via symbolic link.
@@ -643,4 +650,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1792 2020-06-26 14:43:25Z willem $
+$Id: Changes 1810 2020-10-02 12:44:37Z willem $

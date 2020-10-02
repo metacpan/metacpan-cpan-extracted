@@ -37,6 +37,7 @@
             "Data::Dmp" : "0.240",
             "Exporter" : "5.57",
             "Module::Patch" : "0.270",
+            "ScriptX" : "0.000004",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -47,8 +48,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::Exception" : "0",
-            "Test::More" : "0.98"
+            "Test::More" : "0"
          }
       }
    },
@@ -64,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-ScriptX_Util"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

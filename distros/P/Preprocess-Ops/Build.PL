@@ -4,7 +4,7 @@ use Module::Build;
 my $b = Module::Build->new
  (module_name   => 'Preprocess::Ops',
   dist_author   => 'philiprbrenan@gmail.com',
-  dist_abstract => 'Preprocess ▷ and ▶ as method dispatch operators in ANSI-C.',
+  dist_abstract => 'Preprocess ◁, ◀, ▷ and ▶ as operators in ANSI-C.',
   license       => 'perl',
   requires      =>
    {'Carp'              =>0,

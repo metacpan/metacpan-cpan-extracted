@@ -1,3 +1,19 @@
+1.0.7   2020-10-01  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	[Role specification]
+
+        - [incompatible change] Now require 'archive_info', 'homepage_url',
+          'is_dedicated_profile', 'release_note' methods.
+
+        - Provide 'available_archs' method.
+
+        - Provide default value for 'arch' and 'version' arguments.
+
+        [Documentation]
+
+        - Expand role documentation.
+
+
 1.0.6   2019-10-26  Released-By: PERLANCAR; Urgency: high
 
 	[INCOMPATIBLE CHANGES]

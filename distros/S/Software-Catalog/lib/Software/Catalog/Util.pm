@@ -1,7 +1,7 @@
 package Software::Catalog::Util;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '1.0.6'; # VERSION
+our $DATE = '2020-10-02'; # DATE
+our $VERSION = '1.0.7'; # VERSION
 
 use 5.010001;
 use strict;
@@ -77,6 +77,26 @@ sub extract_from_url {
     $res;
 }
 
+$SPEC{detect_arch} = {
+    v => 1.1,
+};
+sub detect_arch {
+    require Config; Config->import;
+    my $archname = do { no strict 'vars'; no warnings 'once'; $Config{archname} };
+    if ($archname =~ /\Ax86-linux/) {
+        return "linux-x86"; # linux i386
+    } elsif ($archname =~ /\Ax86-linux/) {
+    } elsif ($archname =~ /\Ax86_64-linux/) {
+        return "linux-x86_64";
+    } elsif ($archname =~ /\AMSWin32-x86(-|\z)/) {
+        return "win32";
+    } elsif ($archname =~ /\AMSWin32-x64(-|\z)/) {
+        return "win64";
+    } else {
+        die "Unsupported arch '$archname'";
+    }
+}
+
 1;
 # ABSTRACT: Utility routines
 
@@ -92,9 +112,32 @@ Software::Catalog::Util - Utility routines
 
 =head1 VERSION
 
-This document describes version 1.0.6 of Software::Catalog::Util (from Perl distribution Software-Catalog), released on 2019-10-26.
+This document describes version 1.0.7 of Software::Catalog::Util (from Perl distribution Software-Catalog), released on 2020-10-02.
 
 =head1 FUNCTIONS
+
+
+=head2 detect_arch
+
+Usage:
+
+ detect_arch() -> [status, msg, payload, meta]
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 
 
 =head2 extract_from_url
@@ -116,6 +159,7 @@ Arguments ('*' denotes required arguments):
 =item * B<re> => I<re>
 
 =item * B<url>* => I<url>
+
 
 =back
 
@@ -152,7 +196,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

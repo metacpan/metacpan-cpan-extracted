@@ -100,7 +100,7 @@
          "url" : "https://github.com/rurban/Cpanel-JSON-XS"
       }
    },
-   "version" : "4.23",
+   "version" : "4.24",
    "x_contributors" : [
       "Ashley Willis <ashleyw@cpan.org>",
       "Chip Salzenberg <chip@pobox.com>",

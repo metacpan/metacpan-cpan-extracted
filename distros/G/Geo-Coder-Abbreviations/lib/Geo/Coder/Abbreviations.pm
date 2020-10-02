@@ -11,11 +11,12 @@ Geo::Coder::Abbreviations - Quick and Dirty Interface to https://github.com/mapb
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our %abbreviations;
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -37,8 +38,13 @@ sub new {
 
 	return unless(defined($class));
 
-	my $data = get('https://raw.githubusercontent.com/mapbox/geocoder-abbreviations/master/tokens/en.json');
-	my %abbreviations = map { uc($_->{'full'}) => uc($_->{'canonical'}) } @{JSON->new()->utf8()->decode($data)};
+	unless(scalar keys(%abbreviations)) {
+		my $data = get('https://raw.githubusercontent.com/mapbox/geocoder-abbreviations/master/tokens/en.json');
+
+		die unless(defined($data));
+
+		%abbreviations = map { (defined($_->{'type'}) && ($_->{'type'} eq 'way')) ? (uc($_->{'full'}) => uc($_->{'canonical'})) : () } @{JSON->new()->utf8()->decode($data)};
+	}
 
 	return bless {
 		table => \%abbreviations
@@ -49,10 +55,10 @@ sub new {
 
 Abbreviate a place.
 
-	use Geo::Coder::Abbreviations;
+    use Geo::Coder::Abbreviations;
 
-	my $abbr = Geo::Coder::Abbreviations->new();
-	print $abbr->abbreviate('Road'), "\n";	# prints 'RD'
+    my $abbr = Geo::Coder::Abbreviations->new();
+    print $abbr->abbreviate('Road'), "\n";	# prints 'RD'
 
 =cut
 
@@ -71,6 +77,9 @@ L<https://github.com/mapbox/geocoder-abbreviations>
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
+
+If you give an an already abbreviated text, it returns undef.
+It would be better to return the given text.
 
 =head1 SUPPORT
 

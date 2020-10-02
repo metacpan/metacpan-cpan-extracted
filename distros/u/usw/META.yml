@@ -1,0 +1,41 @@
+---
+abstract: 'use utf8; use strict; use warnings; in one line.'
+author:
+  - 'Yuki Yoshida(L<worthmine|https://github.com/worthmine>)'
+build_requires:
+  Test::More: '1.302181'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: usw
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  usw:
+    file: lib/usw.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/worthmine/usw/issues
+  homepage: https://github.com/worthmine/usw
+  repository: git://github.com/worthmine/usw.git
+version: '0.01'
+x_authority: cpan:WORTHMINE
+x_contributors:
+  - 'worthmine <worthmine@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

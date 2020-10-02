@@ -2,8 +2,8 @@ NAME
     CPAN::Info::FromURL - Extract/guess information from a URL
 
 VERSION
-    This document describes version 0.090 of CPAN::Info::FromURL (from Perl
-    distribution CPAN-Info-FromURL), released on 2018-12-30.
+    This document describes version 0.091 of CPAN::Info::FromURL (from Perl
+    distribution CPAN-Info-FromURL), released on 2020-10-02.
 
 FUNCTIONS
   extract_cpan_info_from_url
@@ -239,7 +239,46 @@ FUNCTIONS
 
          { module => "Mojo::DOM::CSS", site => "mojo" }
 
-    *   Example #28 (unknown):
+    *   Example #28 (github (https, .git)):
+
+         extract_cpan_info_from_url("https://github.com/perlancar/perl-CPAN-Info-FromURL.git");
+
+        Result:
+
+         {
+           dist => "CPAN-Info-FromURL",
+           github_repo => "perl-CPAN-Info-FromURL",
+           github_user => "perlancar",
+           site => "github",
+         }
+
+    *   Example #29 (github (https, no .git)):
+
+         extract_cpan_info_from_url("https://github.com/perlancar/perl-CPAN-Info-FromURL");
+
+        Result:
+
+         {
+           dist => "CPAN-Info-FromURL",
+           github_repo => "perl-CPAN-Info-FromURL",
+           github_user => "perlancar",
+           site => "github",
+         }
+
+    *   Example #30 (github (git)):
+
+         extract_cpan_info_from_url("https://github.com/perlancar/perl-CPAN-Info-FromURL");
+
+        Result:
+
+         {
+           dist => "CPAN-Info-FromURL",
+           github_repo => "perl-CPAN-Info-FromURL",
+           github_user => "perlancar",
+           site => "github",
+         }
+
+    *   Example #31 (unknown):
 
          extract_cpan_info_from_url("https://www.google.com/"); # -> undef
 
@@ -288,7 +327,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018, 2017, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

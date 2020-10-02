@@ -1,9 +1,9 @@
 package Net::DNS::SEC::Keyset;
 
-#
-# $Id: Keyset.pm 1777 2020-05-07 08:24:01Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1777 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: Keyset.pm 1809 2020-10-02 12:42:17Z willem $)[2];
 
 
 =head1 NAME
@@ -30,11 +30,9 @@ Attributes and methods are subject to change.
 =cut
 
 
-use strict;
-use integer;
-use warnings;
 use Carp;
 use File::Spec;
+use IO::File;
 
 use Net::DNS::ZoneFile;
 
@@ -75,7 +73,7 @@ sub _new_from_file {
 
 	my $file = File::Spec->catfile( @path, $name );
 
-	my @rr = new Net::DNS::ZoneFile($file)->read;
+	my @rr = Net::DNS::ZoneFile->new($file)->read;
 
 	return $class->_new_from_keys_sigs( \@rr, \@rr );
 }
@@ -84,6 +82,7 @@ sub _new_from_file {
 =head2 new (by signing keys)
 
     $keyset = Net::DNS::SEC::Keyset->new( [@keyrr], $privatekeypath );
+    die Net::DNS::SEC::Keyset->keyset_err unless $keyset;
 
 Creates a keyset object from the keys provided through the reference to an
 array of Net::DNS::RR::DNSKEY objects.
@@ -100,11 +99,11 @@ sub _new_from_keys {
 	my ( $class, $keylist, @keypath ) = @_;
 
 	my @sigrr;
-	foreach my $key ( grep $_->type eq 'DNSKEY', @$keylist ) {
+	foreach my $key ( grep { $_->type eq 'DNSKEY' } @$keylist ) {
 		my $keyname = $key->privatekeyname;
 		my $keyfile = File::Spec->catfile( @keypath, $keyname );
 		my @rrsig   = Net::DNS::RR::RRSIG->create( $keylist, $keyfile );
-		push @sigrr, grep defined, @rrsig;
+		push @sigrr, grep {defined} @rrsig;
 	}
 
 	return $class->_new_from_keys_sigs( $keylist, \@sigrr );
@@ -114,6 +113,7 @@ sub _new_from_keys {
 =head2 new (from key and sig RRsets)
 
     $keyset = Net::DNS::Keyset->new( [@keyrr], [@sigrr] );
+    die Net::DNS::SEC::Keyset->keyset_err unless $keyset;
 
 Creates a keyset object from the keys provided through the references
 to arrays of Net::DNS::RR::DNSKEY and Net::DNS::RR::RRSIG objects.
@@ -125,8 +125,8 @@ Sets keyset_err and returns undef on failure.
 sub _new_from_keys_sigs {
 	my ( $class, $key_ref, $sig_ref ) = @_;
 
-	my @keyrr = grep $_->type eq 'DNSKEY', @$key_ref;
-	my @sigrr = grep $_->type eq 'RRSIG',  @$sig_ref;
+	my @keyrr = grep { $_->type eq 'DNSKEY' } @$key_ref;
+	my @sigrr = grep { $_->type eq 'RRSIG' } @$sig_ref;
 
 	my $keyset = bless {keys => \@keyrr, sigs => \@sigrr}, $class;
 
@@ -136,15 +136,16 @@ sub _new_from_keys_sigs {
 
 =head2 new (from Packet)
 
-    $res = Net::DNS::Resolver->new;
-    $res->dnssec(1);
+    $resolver = Net::DNS::Resolver->new;
+    $resolver->dnssec(1);
    
-    $packet = $res->query ( "example.com", "DNSKEY", "IN" );
+    $reply = $res->send ( "example.com", "DNSKEY" );
 
-    $keyset = Net::DNS::SEC::Keyset->new( $packet )
+    $keyset = Net::DNS::SEC::Keyset->new( $reply );
+    die Net::DNS::SEC::Keyset->keyset_err unless $keyset;
 
 Creates a keyset object from a Net::DNS::Packet that contains the answer
-to a query for the apex key records.
+to a query for key records at the zone apex.
 
 This is the method you should use for automatically fetching keys.
 
@@ -170,6 +171,7 @@ Returns an array of Net::DNS::RR::DNSKEY objects.
 sub keys {
 	my $self = shift;
 	my @keys = @{$self->{keys}};
+	return @keys;
 }
 
 
@@ -184,13 +186,14 @@ Returns an array of Net::DNS::RR::RRSIG objects.
 sub sigs {
 	my $self = shift;
 	my @sigs = @{$self->{sigs}};
+	return @sigs;
 }
 
 
 =head2 extract_ds
 
     @ds = $keyset->extract_ds;
-    die $keyset->keyset_err unless @ds;
+    die Net::DNS::SEC::Keyset->keyset_err unless @ds;
 
 Extracts DS records from the keyset. Note that the keyset will be verified
 during extraction. All keys will need to have a valid self-signature.
@@ -202,7 +205,7 @@ The method sets keyset_err if verification fails.
 sub extract_ds {
 	my $self = shift;
 	my @ds;
-	@ds = map Net::DNS::RR::DS->create($_), $self->keys if $self->verify;
+	@ds = map { Net::DNS::RR::DS->create($_) } $self->keys if $self->verify;
 	return @ds;
 }
 
@@ -210,7 +213,7 @@ sub extract_ds {
 =head2 verify
 
     @keytags = $keyset->verify();
-    die $keyset->keyset_err unless @keytags;
+    die Net::DNS::SEC::Keyset->keyset_err unless @keytags;
 
     $keyset->verify( $keytag ) || die $keyset->keyset_err;
 
@@ -259,12 +262,12 @@ sub verify {
 	push @keyset_err, "Multiple names in keyset: @names" if scalar(@names) > 1;
 
 	if ($keyid) {
-		@sigs = grep $_->keytag == $keyid, @sigs;
+		@sigs = grep { $_->keytag == $keyid } @sigs;
 		push @keyset_err, "No signature made with $keyid found" unless @sigs;
-	} elsif ( my @sepkeys = grep $_->sep, @keys ) {
+	} elsif ( my @sepkeys = grep { $_->sep } @keys ) {
 		my %sepkey = map { ( $_->keytag => $_ ) } @sepkeys;
 		push @keyset_err, 'No signature found for key with SEP flag'
-				unless grep $sepkey{$_->keytag}, @sigs;
+				unless grep { $sepkey{$_->keytag} } @sigs;
 	}
 
 	foreach my $sig (@sigs) {
@@ -278,7 +281,7 @@ sub verify {
 	$keyset_err = join "\n", @keyset_err;
 
 	my @tags_verified;
-	@tags_verified = map $_->keytag, @sigs unless $keyset_err;
+	@tags_verified = map { $_->keytag } @sigs unless $keyset_err;
 	return @tags_verified;
 }
 
@@ -286,8 +289,6 @@ sub verify {
 =head2 keyset_err
     
     $keyset_err = Net::DNS::SEC::Keyset->keyset_err;
-
-    $keyset_err = $keyset->keyset_err;
 
 Returns the keyset error string.
 
@@ -308,7 +309,7 @@ Returns a string representation of the keyset.
 
 sub string {
 	my $self = shift;
-	return join "\n", map $_->string, ( $self->keys, $self->sigs );
+	return join "\n", map { $_->string } ( $self->keys, $self->sigs );
 }
 
 
@@ -323,6 +324,7 @@ Prints the keyset.
 sub print {
 	my $self = shift;
 	foreach ( $self->keys, $self->sigs ) { $_->print }
+	return;
 }
 
 
@@ -342,8 +344,8 @@ prepended to the domain name to form the keyset filename.
 =cut
 
 sub writekeyset {
-	my $self = shift;
-	my ( $arg1, @path ) = @_;
+	my ( $self, $arg1, @path ) = @_;
+	shift;
 	@path = shift() if $arg1 && File::Spec->file_name_is_absolute($arg1);
 	my $prefix = shift || 'keyset-';
 
@@ -352,9 +354,9 @@ sub writekeyset {
 	my $keysetname = "$prefix$domainname.";
 	my $filename   = File::Spec->catfile( @path, $keysetname );
 	$filename =~ s/[.]+/\./;	## avoid antisocial consequences of $path with ..
-	open( KEYSET, ">$filename" ) or croak qq(open: "$filename" $!);
-	select( ( select(KEYSET), $self->print )[0] );
-	close(KEYSET);
+	my $handle = IO::File->new( $filename, '>' ) or die qq("$filename": $!);
+	select( ( select($handle), $self->print )[0] );
+	close($handle);
 	return $filename;
 }
 

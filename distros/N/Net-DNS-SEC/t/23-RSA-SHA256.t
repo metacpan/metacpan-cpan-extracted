@@ -1,7 +1,10 @@
-# $Id: 23-RSA-SHA256.t 1777 2020-05-07 08:24:01Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 23-RSA-SHA256.t 1808 2020-09-28 22:08:11Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
+use IO::File;
 use Test::More;
 
 my %prerequisite = (
@@ -10,8 +13,8 @@ my %prerequisite = (
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
-	my @revision = grep $_, $prerequisite{$package};
-	next if eval "use $package @revision; 1;";
+	my @revision = grep {$_} $prerequisite{$package};
+	next if eval "use $package @revision; 1;";		## no critic
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
@@ -33,10 +36,10 @@ END {
 
 use_ok('Net::DNS::SEC');
 use_ok('Net::DNS::SEC::Private');
-use_ok('Net::DNS::SEC::RSA');
+use_ok( my $class = 'Net::DNS::SEC::RSA' );
 
 
-my $key = new Net::DNS::RR <<'END';
+my $key = Net::DNS::RR->new( <<'END' );
 RSASHA256.example.	IN	DNSKEY	256 3 8 (
 	AwEAAZRSF/5NLnExp5n4M6ynF2Yok3N2aG9AWu8/vKQrZGFQcbL+WPGYbWUtMpiNXmvzTr2j86kN
 	QU4wBawm589mjzXgVQRfXYDMMFhHMtagzEKOiNy2ojhhFyS7r2O2vUbo4hGbnM54ynSM1al+ygKU
@@ -49,8 +52,8 @@ ok( $key, 'set up RSA public key' );
 
 my $keyfile = $filename{keyfile} = $key->privatekeyname;
 
-open( KEY, ">$keyfile" ) or die "$keyfile $!";
-print KEY <<'END';
+my $privatekey = IO::File->new( $keyfile, '>' ) or die qq(open: "$keyfile" $!);
+print $privatekey <<'END';
 Private-key-format: v1.2
 Algorithm: 8 (RSASHA256)
 Modulus: lFIX/k0ucTGnmfgzrKcXZiiTc3Zob0Ba7z+8pCtkYVBxsv5Y8ZhtZS0ymI1ea/NOvaPzqQ1BTjAFrCbnz2aPNeBVBF9dgMwwWEcy1qDMQo6I3LaiOGEXJLuvY7a9RujiEZucznjKdIzVqX7KApQbLVM3Me5gyLCH6CxAKwLmF8k=
@@ -62,24 +65,24 @@ Exponent1: lgk3AxTWfjcqA8wVpesv/ezzku0W95Xtto9YhhDg54m5XYOR8e1A7znDsaO2OnAyAIXlD
 Exponent2: KyNVekFYhgtqkFFvxs2TPIAewDZoExayLTzFaZK2E0PllxVfZnLwFV04wpA//K6zzC3BxCbI2HIygPA2JGHo7Q==
 Coefficient: R3pSnerhKwfAHrH3iyojUzKzhM+AQ+97CWavx36eyKT3Yr/SIDANeeXGlT9U7RdxbkZzyeWbFNCnT+b89UX1RQ==
 END
-close(KEY);
+close($privatekey);
 
-my $private = new Net::DNS::SEC::Private($keyfile);
+my $private = Net::DNS::SEC::Private->new($keyfile);
 ok( $private, 'set up RSA private key' );
 
 
 my $sigdata = 'arbitrary data';
+my $corrupt = 'corrupted data';
 
-my $signature = Net::DNS::SEC::RSA->sign( $sigdata, $private );
+my $signature = $class->sign( $sigdata, $private );
 ok( $signature, 'signature created using private key' );
 
 
-my $verified = Net::DNS::SEC::RSA->verify( $sigdata, $key, $signature );
+my $verified = $class->verify( $sigdata, $key, $signature );
 is( $verified, 1, 'signature verified using public key' );
 
 
-my $corrupt = 'corrupted data';
-my $verifiable = Net::DNS::SEC::RSA->verify( $corrupt, $key, $signature );
+my $verifiable = $class->verify( $corrupt, $key, $signature );
 is( $verifiable, 0, 'signature not verifiable if data corrupt' );
 
 

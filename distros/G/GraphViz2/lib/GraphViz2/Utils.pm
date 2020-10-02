@@ -9,7 +9,6 @@ use Config;
 use Date::Simple;
 
 use File::Spec;
-use File::Slurp; # For read_file().
 
 use GraphViz2::Config;
 use GraphViz2::Filer;
@@ -29,6 +28,11 @@ has config =>
 our $VERSION = '2.47';
 
 # ------------------------------------------------
+
+sub read_file {
+  open my $fh, '<:encoding(UTF-8)', $_[0] or die "$_[0]: $!";
+  map +((chomp, $_)[1]), <$fh>;
+}
 
 sub generate_demo_environment
 {
@@ -62,7 +66,7 @@ sub generate_demo_index
 
 	for my $key (sort keys %script_file)
 	{
-		@line      = read_file($script_file{$key}, {binmode => ':utf8'});
+		@line      = read_file($script_file{$key});
 		$note      = $line[3];
 		$note      =~ s/Annotation: //;
 		$html_name = "$html_dir_name/$key.svg";

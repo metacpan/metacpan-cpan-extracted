@@ -50,31 +50,34 @@ for (@tests) {
 	like( $text, $out_pattern, $name );
 }
 
-# Now test 'render', which might emit some warnings if it can't detect terminal
-# type or dimensions.  (but it should only warn, and not fail)
-open my $save_stdout, '>&', \*STDOUT or die $!;
-close STDOUT;
-open STDOUT, '>', \my $capture_stdout or die $!;
+SKIP: {
+	skip "No TERM defined", 1 unless $ENV{TERM};
+	# Now test 'render', which might emit some warnings if it can't detect terminal
+	# type or dimensions.  (but it should only warn, and not fail)
+	open my $save_stdout, '>&', \*STDOUT or die $!;
+	close STDOUT;
+	open STDOUT, '>', \my $capture_stdout or die $!;
 
-open my $save_stderr, '>&', \*STDERR or die $!;
-close STDERR;
-open STDERR, '>', \my $capture_stderr or die $!;
+	open my $save_stderr, '>&', \*STDERR or die $!;
+	close STDERR;
+	open STDERR, '>', \my $capture_stderr or die $!;
 
-my $err;
-try {
-	my $parser= Log::Progress::Parser->new(input => $tests[-1][1]);
-	$renderer->parser($parser);
-	$renderer->render;
-} catch { chomp($err= $_) };
+	my $err;
+	try {
+		my $parser= Log::Progress::Parser->new(input => $tests[-1][1]);
+		$renderer->parser($parser);
+		$renderer->render;
+	} catch { chomp($err= $_) };
 
-close STDOUT;
-open STDOUT, '>&', $save_stdout or die $!;
+	close STDOUT;
+	open STDOUT, '>&', $save_stdout or die $!;
 
-close STDERR;
-open STDERR, '>&', $save_stderr or die $!;
+	close STDERR;
+	open STDERR, '>&', $save_stderr or die $!;
 
-note $err if defined $err;
-note $capture_stderr if length $capture_stderr;
-like( $capture_stdout, $tests[-1][2], 'rendered to stdout' );
+	note "Exception: $err" if defined $err;
+	note "STDERR: $capture_stderr" if length $capture_stderr;
+	like( $capture_stdout, $tests[-1][2], 'rendered to stdout' );
+}
 
 done_testing;

@@ -1,7 +1,8 @@
 #!/usr/bin/perl
-#$Id: getkeyset 1705 2018-08-23 10:24:02Z willem $
+#$Id: getkeyset 1807 2020-09-28 11:38:28Z willem $
 
 use strict;
+use warnings;
 use Net::DNS::SEC;
 use Net::DNS::SEC::Keyset;
 

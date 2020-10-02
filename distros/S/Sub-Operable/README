@@ -1,0 +1,134 @@
+NAME
+    Sub::Operable - apply Perl built-in operators to coderefs
+
+SYNOPSIS
+      use Sub::Operable 'subop';
+  
+      # f(x) = x²
+      #
+      my $f = subop { $_ ** 2 };
+  
+      # f(4) = 4²
+      #      = 16
+      #
+      say $f->(4);   # ==> 16
+  
+      # g(x) = 2x
+      #
+      my $g = subop { 2 * $_ };
+  
+      # h = f + g + 3
+      #
+      my $h = $f + $g + 3;
+  
+      # h(10) = f(10) + g(10) + 3
+      #       = 10²   + 2(10) + 3
+      #       = 100   + 20    + 3
+      #       = 123
+      #
+      say $h->(10);   # ==> 123
+
+DESCRIPTION
+    Sub::Operator allows you to define functions and apply operations to the
+    functions like you can in algebra class.
+
+    All the standard built-in binary, string, numeric, and comparison
+    operators should work fine. Operators like `+=` which mutate their
+    operands are not supported.
+
+    Additionally if you call a Sub::Operator-enabled function passing another
+    Sub::Operator-enabled function as an argument, you get a composed
+    Sub::Operator-enabled function as the result.
+
+      # Assume $f and $g defined as above.
+  
+      # m(x) = g( f(x) )
+      #
+      my $m = $g->( $f );
+  
+      # m(10) = g( f(10) )
+      #       = g( 10² )
+      #       = g( 100 )
+      #       = 2 * 100
+      #       = 200
+      #
+      say $m->(10);   # ==> 200
+
+  Object-Oriented Constructor
+      use Sub::Operable;
+  
+      my $coderef = 'Sub::Operable'->new(sub { ... });
+
+    When the coderefs are called, $_ will be an alias of $_[0].
+
+  Shortcut Constructor
+      use Sub::Operable qw( subop );
+  
+      my $coderef = subop { ... };
+
+    When the coderefs are called, $_ will be an alias of $_[0].
+
+  Utility Function
+      use Sub::Operable qw( isa_Sub_Operable );
+  
+      my $bool = isa_Sub_Operable( $coderef );
+
+  Constants
+    You can get lists of supported operators:
+
+      use Sub::Operable;
+  
+      my @prefix = Sub::Operable::PREFIX_OPS;
+      my @infix  = Sub::Operable::INFIX_OPS;
+
+  Symbol Table Frickery
+    You don't have to just deal with coderefs. You can put these functions
+    into the symbol table.
+
+      use Sub::Operable 'subop';
+  
+      # f(x) = x²
+      #
+      *f = subop { $_ ** 2 };
+  
+      # f(4) = 4²
+      #      = 16
+      #
+      say f(4);   # ==> 16
+  
+      # g(x) = 2x
+      #
+      *g = subop { 2 * $_ };
+  
+      # h = f + g + 3
+      #
+      *h = \&f + \&g + 3;
+  
+      # h(10) = f(10) + g(10) + 3
+      #       = 10²   + 2(10) + 3
+      #       = 100   + 20    + 3
+      #       = 123
+      #
+      say h(10);   # ==> 123
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Operable>.
+
+SEE ALSO
+    curry, I guess?
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2020 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

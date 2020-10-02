@@ -1,3 +1,10 @@
+0.015   2020-10-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Support installing executable in addition to archive.
+
+	- Adjust to Software::Catalog 1.0.7 and App::swcat 0.015.
+
+
 0.014   2019-10-26  Released-By: PERLANCAR; Urgency: high
 
 	- Adjust to Software::Catalog 1.0.6 (incompatible change, renamed

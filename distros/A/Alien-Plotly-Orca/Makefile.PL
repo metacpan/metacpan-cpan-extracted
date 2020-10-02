@@ -17,7 +17,11 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "Alien::Build" => "1.19",
     "Alien::Build::MM" => "0.32",
-    "ExtUtils::MakeMaker" => "6.52"
+    "Capture::Tiny" => 0,
+    "ExtUtils::MakeMaker" => "6.52",
+    "File::Copy::Recursive" => 0,
+    "File::Which" => 0,
+    "Path::Tiny" => 0
   },
   "DISTNAME" => "Alien-Plotly-Orca",
   "LICENSE" => "perl",
@@ -36,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.0001",
+  "VERSION" => "0.0002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,8 +83,16 @@ WriteMakefile(%WriteMakefileArgs);
 
 
 # BEGIN code inserted by Dist::Zilla::Plugin::AlienBuild
-sub MY::postamble {
-  $abmm->mm_postamble;
+{ package
+    MY;
+  sub postamble {
+    $abmm->mm_postamble(@_);
+  }
+  sub install {
+    $abmm->can('mm_install')
+      ? $abmm->mm_install(@_)
+      : shift->SUPER::install(@_);
+  }
 }
 # END code inserted by Dist::Zilla::Plugin::AlienBuild
 

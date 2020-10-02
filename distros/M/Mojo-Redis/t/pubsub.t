@@ -21,10 +21,9 @@ Mojo::IOLoop->start;
 memory_cycle_ok($redis, 'cycle ok after listen');
 
 $pubsub->notify("rtest:$$:1" => 'message one');
-$db->publish_p("rtest:$$:2" => 'message two');
+$db->publish_p("rtest:$$:2" => 'message two')->wait;
 memory_cycle_ok($redis, 'cycle ok after notify');
 
-Mojo::IOLoop->start;
 is_deeply [sort @messages], ['message one', 'message two'], 'got messages' or diag join ", ", @messages;
 
 $pubsub->channels_p('rtest*')->then(sub { @res = @_ })->wait;

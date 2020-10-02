@@ -1,9 +1,9 @@
 package ScriptX_Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-01'; # DATE
+our $DATE = '2020-10-02'; # DATE
 our $DIST = 'ScriptX_Util'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -150,7 +150,7 @@ ScriptX_Util - Utilities for ScriptX
 
 =head1 VERSION
 
-This document describes version 0.001 of ScriptX_Util (from Perl distribution ScriptX_Util), released on 2020-10-01.
+This document describes version 0.003 of ScriptX_Util (from Perl distribution ScriptX_Util), released on 2020-10-02.
 
 =head1 FUNCTIONS
 

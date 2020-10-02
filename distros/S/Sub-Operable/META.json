@@ -1,0 +1,76 @@
+{
+   "abstract" : "apply Perl built-in operators to coderefs",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sub-Operable",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Tiny" : "0",
+            "isa" : "0",
+            "perl" : "5.008009"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Sub::Operable" : {
+         "file" : "lib/Sub/Operable.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Sub-Operable"
+      },
+      "homepage" : "https://metacpan.org/release/Sub-Operable",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-sub-operable.git",
+         "web" : "https://github.com/tobyink/p5-sub-operable"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Sub-Operable/project"
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
+}

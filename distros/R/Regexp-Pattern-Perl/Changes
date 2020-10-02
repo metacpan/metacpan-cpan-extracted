@@ -1,3 +1,16 @@
+0.004   2020-10-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Do not anchor the patterns, to make it more
+	  reusable.
+
+	- [bugfix] Do not capture group in perl_distname.
+
+
+0.003   2020-10-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add module: Regexp::Pattern::Perl::Dist.
+
+
 0.002   2020-06-16  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

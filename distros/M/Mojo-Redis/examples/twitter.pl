@@ -111,7 +111,7 @@ sub add_dummy_user {
     $uid = shift;
 
     # Password should not be in plain text!
-    Mojo::Promise->alll(
+    Mojo::Promise->all(
       $db->hmset_p("twitter_clone:user:$uid", username => 'batgirl', password => 's3cret'),
       $db->hset_p('twitter_clone:users', batgirl => $uid),
     );

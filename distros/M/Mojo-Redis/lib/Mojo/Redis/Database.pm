@@ -48,13 +48,13 @@ our @BLOCKING_COMMANDS = ('blpop', 'brpop', 'brpoplpush', 'bzpopmax', 'bzpopmin'
 
 has redis => sub { Carp::confess('redis is required in constructor') };
 
-__PACKAGE__->_add_method('bnb,p' => $_) for @BASIC_COMMANDS;
-__PACKAGE__->_add_method('nb,p'  => $_) for @BLOCKING_COMMANDS;
+__PACKAGE__->_add_method('bnb,p' => $_)                    for @BASIC_COMMANDS;
+__PACKAGE__->_add_method('nb,p'  => $_)                    for @BLOCKING_COMMANDS;
 __PACKAGE__->_add_method('bnb'   => qw(_exec EXEC));
 __PACKAGE__->_add_method('bnb'   => qw(_discard DISCARD));
 __PACKAGE__->_add_method('bnb'   => qw(_multi MULTI));
 __PACKAGE__->_add_method('bnb,p' => "${_}_structured", $_) for qw(info xread);
-__PACKAGE__->_add_method('bnb,p' => $_) for qw(unwatch watch);
+__PACKAGE__->_add_method('bnb,p' => $_)                    for qw(unwatch watch);
 
 sub call {
   my $cb   = ref $_[-1] eq 'CODE' ? pop : undef;
@@ -179,10 +179,12 @@ sub _generate_p_method {
   };
 }
 
-sub _process_geopos { [map { ref $_ ? +{lng => $_->[0], lat => $_->[1]} : undef } @{$_[1]}] }
-sub _process_blpop  { reverse @{$_[1]} }
-sub _process_brpop  { reverse @{$_[1]} }
-sub _process_hgetall { +{@{$_[1]}} }
+sub _process_geopos {
+  ref $_[1] eq 'ARRAY' ? [map { ref $_ ? +{lng => $_->[0], lat => $_->[1]} : undef } @{$_[1]}] : $_[1];
+}
+sub _process_blpop   { ref $_[1] eq 'ARRAY' ? reverse @{$_[1]} : $_[1] }
+sub _process_brpop   { ref $_[1] eq 'ARRAY' ? reverse @{$_[1]} : $_[1] }
+sub _process_hgetall { ref $_[1] eq 'ARRAY' ? +{@{$_[1]}}      : $_[1] }
 
 sub _process_info_structured {
   my $self    = shift;

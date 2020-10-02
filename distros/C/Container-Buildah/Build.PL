@@ -22,7 +22,7 @@ my %module_build_args = (
     "Ian Kluft <https://github.com/ikluft>"
   ],
   "dist_name" => "Container-Buildah",
-  "dist_version" => "0.2.1",
+  "dist_version" => "0.3.1",
   "license" => "apache",
   "module_name" => "Container::Buildah",
   "recursive_test_files" => 1,
@@ -42,6 +42,7 @@ my %module_build_args = (
     "IO::Handle" => 0,
     "IPC::Run" => 0,
     "Modern::Perl" => 0,
+    "POSIX" => 0,
     "Readonly" => 0,
     "Template" => 0,
     "YAML::XS" => 0,

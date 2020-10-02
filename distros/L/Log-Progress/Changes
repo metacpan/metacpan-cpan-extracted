@@ -1,3 +1,6 @@
+Version 0.12 - 2020-10-02
+  - Fix a test failure when TERM not defined (by skipping it)
+
 Version 0.10 - 2017-04-06
   (All changes fully backward-compatible)
   Logger

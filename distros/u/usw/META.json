@@ -1,0 +1,78 @@
+{
+   "abstract" : "use utf8; use strict; use warnings; in one line.",
+   "author" : [
+      "Yuki Yoshida(L<worthmine|https://github.com/worthmine>)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.11",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "usw",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302181"
+         }
+      }
+   },
+   "provides" : {
+      "usw" : {
+         "file" : "lib/usw.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/worthmine/usw/issues"
+      },
+      "homepage" : "https://github.com/worthmine/usw",
+      "repository" : {
+         "url" : "git://github.com/worthmine/usw.git",
+         "web" : "https://github.com/worthmine/usw"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:WORTHMINE",
+   "x_contributors" : [
+      "worthmine <worthmine@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
+}

@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 5ba8764c9fd105ce664ff5bfb28caf1778133caf5afca67268028a2dced866b0 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 4eb3911a6cc81acdc68147c005fb3372a724bdd442a9e22701039d8352b1909d Changes
+SHA256 de24c7cc99bb7e9db484eefb013498a7a64a3a9c22bf2264306d5ead4ff8311c INSTALL
+SHA256 1fb7395e76eabf94c421912d7d0a4f7fa745d49e1acb76b222c21d605b66bd25 LICENSE
+SHA256 d41d4884e6baf9e202890e2c2bc2287bf83edb77aeb378e706defc81bc5a5464 MANIFEST
+SHA256 12bbf8c177a0415828ae0b5e54b097586abd7bf855e4ef441ab521b2a39d1e0c META.json
+SHA256 b9c3b1599c0c41ac05f692eb95aaa5dfb28eccb8e420afdc180fdd928dace283 META.yml
+SHA256 9813daf61df922f17f9e26c0a3e2a47a3731856ad2b1e82f6762bc42f1d61cd0 Makefile.PL
+SHA256 3cc13d6aa004ad1c55bbaff8827e0f3569acc16bbb0d9a51ba4c86efecca29cc README
+SHA256 86779e9aba31a1d93107be8fe4ffdc56d2924b360d348910fd65be7cc2b771d2 dist.ini
+SHA256 6dbb7035f7e776e07123aabeea688eb2ec9189dae3e3495fbba1fbe45e697d5d doap.ttl
+SHA256 b967d86d7a8c6d571598a3a281edcd69dda5e7f7d2dd6a3fb989edd968cb7e9f lib/Sub/Operable.pm
+SHA256 9f129dfb179ab4313b5429d451df5b1dd8eaf759b29046af72fe15d62d22ea79 t/01basic.t
+SHA256 ad915615a13a225244d4b7e451e0327b1257eefab39bbd1d6743f12c0c5c22ab t/02oo.t
+SHA256 30e5daceb45e0a4a710c06c5a69c4e3e390c92d2fd6673e81ee1ad4823c848b9 t/03nonop.t
+SHA256 11502b27860279bcca01be251ce5234569259ca6d54703a1647bbbfa5854f4f6 t/04globass.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCX3dhTwAKCRDOv4Eoaip9
+OczKAJwJSHCibkUAB2g1cZpKkQX7fW8SIQCfTA1tJ7VTgJWFM/smh1f0Ra7MT1w=
+=tXMP
+-----END PGP SIGNATURE-----

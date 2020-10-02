@@ -140,7 +140,7 @@ has valid_attributes =>
 	required => 0,
 );
 
-our $VERSION = '2.49';
+our $VERSION = '2.50';
 
 # -----------------------------------------------
 

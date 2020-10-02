@@ -1,0 +1,105 @@
+NAME
+    Filename::Executable - Check whether filename indicates being an
+    executable program/script
+
+VERSION
+    This document describes version 0.001 of Filename::Executable (from Perl
+    distribution Filename-Executable), released on 2020-10-02.
+
+SYNOPSIS
+     use Filename::Executable qw(check_executable_filename);
+     my $res = check_executable_filename(filename => "foo.sh");
+     if ($res) {
+         printf "File is an executable (type: %s, ext: %s)\n",
+             $res->{exec_type},
+             $res->{exec_ext};
+     } else {
+         print "File is not an executable\n";
+     }
+
+DESCRIPTION
+FUNCTIONS
+  check_executable_filename
+    Usage:
+
+     check_executable_filename(%args) -> bool|hash
+
+    Check whether filename indicates being an executable program/script.
+
+    Examples:
+
+    *   Example #1:
+
+         check_executable_filename(filename => "foo.pm"); # -> [200, "OK", 0, {}]
+
+    *   Example #2:
+
+         check_executable_filename(filename => "foo.appimage");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           { exec_ext => ".appimage", exec_name => "foo", exec_type => "appimage" },
+           {},
+         ]
+
+    *   Case-insensitive by default:
+
+         check_executable_filename(filename => "foo.Appimage");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           { exec_ext => ".Appimage", exec_name => "foo", exec_type => "appimage" },
+           {},
+         ]
+
+    *   Case-sensitive:
+
+         check_executable_filename(filename => "foo.Appimage", ci => 0); # -> [200, "OK", 0, {}]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ci => *bool* (default: 1)
+
+        Whether to match case-insensitively.
+
+    *   filename* => *str*
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information, which contains these keys: "exec_type", "exec_ext",
+    "exec_name".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Filename-Executable>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Filename-Executable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Executable>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

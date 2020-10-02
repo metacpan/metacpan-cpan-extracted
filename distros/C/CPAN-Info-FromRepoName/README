@@ -1,0 +1,97 @@
+NAME
+    CPAN::Info::FromRepoName - Extract/guess information from a repo name
+
+VERSION
+    This document describes version 0.001 of CPAN::Info::FromRepoName (from
+    Perl distribution CPAN-Info-FromRepoName), released on 2020-10-02.
+
+FUNCTIONS
+  extract_cpan_info_from_repo_name
+    Usage:
+
+     extract_cpan_info_from_repo_name($repo_name) -> hash
+
+    Extract/guess information from a repo name.
+
+    Examples:
+
+    *   Example #1 (perl-<dist>):
+
+         extract_cpan_info_from_repo_name("perl-Foo-Bar"); # -> { dist => "Foo-Bar" }
+
+    *   Example #2 (p5-<dist>):
+
+         extract_cpan_info_from_repo_name("perl-Foo-Bar"); # -> { dist => "Foo-Bar" }
+
+    *   Example #3 (cpan-<dist>):
+
+         extract_cpan_info_from_repo_name("cpan-Foo-Bar"); # -> { dist => "Foo-Bar" }
+
+    *   Example #4 (<dist>-perl):
+
+         extract_cpan_info_from_repo_name("Foo-Bar-perl"); # -> { dist => "Foo-Bar" }
+
+    *   Example #5 (<dist>-p5):
+
+         extract_cpan_info_from_repo_name("Foo-Bar-p5"); # -> { dist => "Foo-Bar" }
+
+    *   Example #6 (<dist>-cpan):
+
+         extract_cpan_info_from_repo_name("Foo-Bar-cpan"); # -> { dist => "Foo-Bar" }
+
+    *   Example #7 (<dist>):
+
+         extract_cpan_info_from_repo_name("CPAN-Foo-Bar"); # -> { dist => "CPAN-Foo-Bar" }
+
+    *   Example #8 (unknown):
+
+         extract_cpan_info_from_repo_name("\@foo"); # -> undef
+
+    Guess information from a repo name and return a hash (or undef if
+    nothing can be guessed). Possible keys include "dist" (Perl distribution
+    name).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $repo_name* => *str*
+
+    Return value: (hash)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/CPAN-Info-FromRepoName>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-CPAN-Info-FromRepoName>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Info-FromRepoNam
+    e>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    CPAN::Info::FromURL
+
+    CPAN::Author::FromRepoName
+
+    CPAN::Dist::FromRepoName
+
+    CPAN::Module::FromRepoName
+
+    CPAN::Release::FromRepoName
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

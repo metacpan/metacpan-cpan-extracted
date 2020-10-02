@@ -55,10 +55,7 @@ my(%params) =
   MIN_PERL_VERSION => 5.010001,
   NAME => 'GraphViz2',
   PREREQ_PM => {
-    'Config::Tiny' => 2.16,
     'Data::Section::Simple' => 0.02,
-    'File::HomeDir' => 0.99,
-    'File::Slurp' => 9999.19,
     'File::Which' => 1.21,
     'IPC::Run3' => 0.048,
     'Log::Handler' => 0.84,
@@ -78,8 +75,8 @@ my(%params) =
     'meta-spec' => {
       version => 2,
     },
+    dynamic_config => 0,
     resources => {
-      dynamic_config => 0,
       bugtracker => { web => 'https://github.com/ronsavage/GraphViz2/issues' },
       license => 'http://dev.perl.org/licenses/',
       repository => {
@@ -100,6 +97,8 @@ my(%params) =
           'HTTP::Tiny' => 0.012,
           'HTML::TreeBuilder' => 4.2,
           'Date::Simple' => 3.03,
+          'Config::Tiny' => 2.16,
+          'File::HomeDir' => 0.99,
         },
       },
     },

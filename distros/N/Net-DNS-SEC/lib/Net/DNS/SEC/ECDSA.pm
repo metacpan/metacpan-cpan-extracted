@@ -1,9 +1,9 @@
 package Net::DNS::SEC::ECDSA;
 
-#
-# $Id: ECDSA.pm 1758 2019-10-14 13:17:11Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1758 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: ECDSA.pm 1807 2020-09-28 11:38:28Z willem $)[2];
 
 
 =head1 NAME
@@ -41,9 +41,7 @@ public key resource record.
 
 =cut
 
-use strict;
 use integer;
-use warnings;
 use MIME::Base64;
 
 use constant ECDSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_EC_KEY');
@@ -52,11 +50,11 @@ BEGIN { die 'ECDSA disabled or application has no "use Net::DNS::SEC"' unless EC
 
 
 my %parameters = (
-	13 => [415, 32, sub { Net::DNS::SEC::libcrypto::EVP_sha256() }],
-	14 => [715, 48, sub { Net::DNS::SEC::libcrypto::EVP_sha384() }],
+	13 => [415, 32, Net::DNS::SEC::libcrypto::EVP_sha256()],
+	14 => [715, 48, Net::DNS::SEC::libcrypto::EVP_sha384()],
 	);
 
-sub _index { keys %parameters }
+sub _index { return keys %parameters }
 
 
 sub sign {
@@ -74,8 +72,8 @@ sub sign {
 	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
 	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_EC_KEY( $evpkey, $eckey );
 
-	my $asn1 = Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, &$evpmd );
-	_ASN1decode( $asn1, $keylen );
+	my $asn1 = Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, $evpmd );
+	return _ASN1decode( $asn1, $keylen );
 }
 
 
@@ -84,7 +82,7 @@ sub verify {
 
 	my $algorithm = $keyrr->algorithm;
 	my ( $nid, $keylen, $evpmd ) = @{$parameters{$algorithm} || []};
-	die 'private key not ECDSA' unless $nid;
+	die 'public key not ECDSA' unless $nid;
 
 	return unless $sigbin;
 
@@ -96,7 +94,7 @@ sub verify {
 	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_EC_KEY( $evpkey, $eckey );
 
 	my $asn1 = _ASN1encode( $sigbin, $keylen );
-	Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $asn1, $evpkey, &$evpmd );
+	return Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $asn1, $evpkey, $evpmd );
 }
 
 
@@ -113,7 +111,7 @@ sub _ASN1encode {
 		$_ = pack 'C2 a*', 2, length, $_;
 		$length += length;
 	}
-	pack 'C2 a* a*', 0x30, $length, @part;
+	return pack 'C2 a* a*', 0x30, $length, @part;
 }
 
 sub _ASN1decode {
@@ -121,7 +119,7 @@ sub _ASN1decode {
 	my $n	 = unpack 'x3 C',	   $asn1;
 	my $m	 = unpack "x5 x$n C",	   $asn1;
 	my @part = unpack "x4 a$n x2 a$m", $asn1;
-	pack 'a* a*', map substr( pack( "x$size a*", $_ ), -$size ), @part;
+	return pack 'a* a*', map { substr( pack( "x$size a*", $_ ), -$size ) } @part;
 }
 
 

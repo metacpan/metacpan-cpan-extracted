@@ -1,3 +1,15 @@
+0.003   2020-10-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add missing prereq to ScriptX (RT#133456).
+
+
+0.002   2020-10-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix copy-paste mistake.
+
+
 0.001   2020-10-01  Released-By: PERLANCAR
 
         - First release.

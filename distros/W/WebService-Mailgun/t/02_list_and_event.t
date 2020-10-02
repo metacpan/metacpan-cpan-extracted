@@ -35,6 +35,7 @@ subtest 'add mailing list' => sub {
         description => 'list',
         access_level => 'everyone',
         members_count => 0,
+        reply_preference => 'list',
     }, 'check list detail';
 };
 
@@ -52,6 +53,7 @@ subtest 'update mailing list' => sub {
         description => 'list+fix',
         access_level => 'members',
         members_count => 0,
+        reply_preference => 'list',
     }, 'check list detail';
 };
 

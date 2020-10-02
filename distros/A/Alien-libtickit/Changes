@@ -1,12 +1,12 @@
 Revision history for Alien-libtickit
 
-0.08_002 2020-05-20
+0.10    2020-10-01
         [CHANGES]
-         * Use libtickit 0.4.0-RC3
+         * Use libtickit 0.4.1
 
-0.08_001 2020-05-19
+0.09    2020-05-25
         [CHANGES]
-         * Use libtickit 0.4.0-RC2
+         * Use libtickit 0.4.0
 
 0.08    2020-01-27 01:12:43
         [CHANGES]

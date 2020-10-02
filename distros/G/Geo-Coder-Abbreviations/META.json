@@ -30,7 +30,8 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON" : "0",
+            "JSON" : "4.02",
+            "LWP::Protocol::https" : "0",
             "LWP::Simple" : "0",
             "perl" : "5.006002"
          }
@@ -50,6 +51,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Abbreviations"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

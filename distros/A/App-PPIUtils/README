@@ -1,0 +1,109 @@
+NAME
+    App::PPIUtils - Command-line utilities related to PPI
+
+VERSION
+    This document describes version 0.001 of App::PPIUtils (from Perl
+    distribution App-PPIUtils), released on 2020-10-02.
+
+SYNOPSIS
+    This distribution provides the following command-line utilities related
+    to PPI:
+
+    *   reverse-perl-subs
+
+    *   sort-perl-subs
+
+FUNCTIONS
+  reverse_perl_subs
+    Usage:
+
+     reverse_perl_subs(%args) -> any
+
+    Reverse Perl subroutines.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename => *filename* (default: "-")
+
+        Path to Perl script/module.
+
+    Return value: (any)
+
+  sort_perl_subs
+    Usage:
+
+     sort_perl_subs(%args) -> any
+
+    Sort Perl named subroutines by their name.
+
+    This utility sorts Perl subroutine definitions in source code. By
+    default it sorts asciibetically. For example this source:
+
+     sub one {
+        ...
+     }
+ 
+     sub two { ... }
+ 
+     sub three {}
+
+    After the sort, it will become:
+
+     sub one {
+        ...
+     }
+ 
+     sub three {}
+ 
+     sub two { ... }
+
+    Caveat: if you intersperse POD documentation, currently it will not be
+    moved along with the subroutines.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename => *filename* (default: "-")
+
+        Path to Perl script/module.
+
+    *   sort_args => *array[str]*
+
+        Arguments to pass to the Sort::Sub::* routine.
+
+    *   sort_sub => *sortsub::spec*
+
+        Name of a Sort::Sub::* module (without the prefix).
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PPIUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PPIUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PPIUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    PPI
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

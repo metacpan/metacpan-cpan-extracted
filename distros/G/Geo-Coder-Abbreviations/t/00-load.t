@@ -5,7 +5,7 @@ use strict;
 use Test::Most tests => 2;
 
 BEGIN {
-    use_ok('Geo::Coder::Abbreviations') || print 'Bail out!';
+	use_ok('Geo::Coder::Abbreviations') || print 'Bail out!';
 }
 
 require_ok('Geo::Coder::Abbreviations') || print 'Bail out!';

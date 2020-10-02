@@ -5,7 +5,7 @@ use warnings;
 package Data::Fake::Core;
 # ABSTRACT: General purpose generators
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Exporter 5.57 qw/import/;
 
@@ -84,7 +84,7 @@ sub fake_hash {
 #pod
 #pod     $generator = fake_array( 5, fake_digits("###-###-####") );
 #pod
-#pod The C<fake_array> takes a positive integer size and source argument and
+#pod The C<fake_array> takes a positive integer size and source argument and
 #pod returns a generator that returns an array reference with each element built
 #pod from the source.
 #pod
@@ -390,7 +390,7 @@ Data::Fake::Core - General purpose generators
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -467,7 +467,7 @@ generating hashes that have missing keys (e.g. using L</fake_binomial>):
 
     $generator = fake_array( 5, fake_digits("###-###-####") );
 
-The C<fake_array> takes a positive integer size and source argument and
+The C<fake_array> takes a positive integer size and source argument and
 returns a generator that returns an array reference with each element built
 from the source.
 

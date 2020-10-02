@@ -1,7 +1,9 @@
 package App::PowerManagementUtils;
 
-our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-25'; # DATE
+our $DIST = 'App-PowerManagementUtils'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,6 +20,10 @@ Uses <pm:Proc::Govern> to run a command, with the option `no-sleep' to instruct
 Proc::Govern to disable system from sleeping while running the command. For more
 options when running command, e.g. timeout, load control, autorestart,
 screensaver control, use the module or its CLI <prog:govproc> directly.
+
+Note that sleep prevention survives reboot, so if this script is terminated
+prematurely before it can unprevent sleep again, you'll need to invoke
+<prog:unprevent-sleep> to restore normal sleep.
 
 _
     args => {
@@ -50,6 +56,10 @@ $SPEC{prevent_sleep_until_interrupted} = {
 Uses <pm:Proc::Govern> to run `sleep infinity`, with the option `no-sleep' to
 instruct Proc::Govern to disable system from sleeping. To stop preventing sleep,
 you can press Ctrl-C.
+
+Note that sleep prevention survives reboot, so if this script is terminated
+prematurely before it can unprevent sleep again, you'll need to invoke
+<prog:unprevent-sleep> to restore normal sleep.
 
 _
     args => {
@@ -85,7 +95,7 @@ App::PowerManagementUtils - CLI utilities related to power management
 
 =head1 VERSION
 
-This document describes version 0.004 of App::PowerManagementUtils (from Perl distribution App-PowerManagementUtils), released on 2019-09-15.
+This document describes version 0.005 of App::PowerManagementUtils (from Perl distribution App-PowerManagementUtils), released on 2020-09-25.
 
 =head1 DESCRIPTION
 
@@ -122,6 +132,10 @@ Uses L<Proc::Govern> to run C<sleep infinity>, with the option `no-sleep' to
 instruct Proc::Govern to disable system from sleeping. To stop preventing sleep,
 you can press Ctrl-C.
 
+Note that sleep prevention survives reboot, so if this script is terminated
+prematurely before it can unprevent sleep again, you'll need to invoke
+L<unprevent-sleep> to restore normal sleep.
+
 This function is not exported.
 
 No arguments.
@@ -152,6 +166,10 @@ Proc::Govern to disable system from sleeping while running the command. For more
 options when running command, e.g. timeout, load control, autorestart,
 screensaver control, use the module or its CLI L<govproc> directly.
 
+Note that sleep prevention survives reboot, so if this script is terminated
+prematurely before it can unprevent sleep again, you'll need to invoke
+L<unprevent-sleep> to restore normal sleep.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -159,6 +177,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<command>* => I<array[str]>
+
 
 =back
 
@@ -195,7 +214,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

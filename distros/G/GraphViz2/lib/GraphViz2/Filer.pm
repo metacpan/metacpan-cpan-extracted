@@ -5,13 +5,17 @@ use warnings;
 use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
 
 use File::Basename; # For basename().
-use File::Slurp;    # For read_file().
 
 use Moo;
 
 our $VERSION = '2.47';
 
 # ------------------------------------------------
+
+sub read_file {
+  open my $fh, '<:encoding(UTF-8)', $_[0] or die "$_[0]: $!";
+  map +((chomp, $_)[1]), <$fh>;
+}
 
 sub get_annotations
 {
@@ -30,7 +34,7 @@ sub get_annotations
 
 	for my $file_name (@file_name)
 	{
-		@line = read_file(File::Spec -> catfile($dir_name, $file_name), {chomp => 1});
+		@line = read_file(File::Spec -> catfile($dir_name, $file_name));
 
 		if ( ($#line >= 3) && ($line[3] =~ /^# Annotation: (.+)$/) )
 		{
@@ -82,7 +86,7 @@ sub get_scripts
 
 	for my $file_name (map{File::Spec -> catfile($dir_name, $_)} @file_name)
 	{
-		@line = read_file($file_name, {chomp => 1});
+		@line = read_file($file_name);
 
 		if ( ($#line >= 3) && ($line[3] =~ /^# Annotation: (?:.+)$/) )
 		{

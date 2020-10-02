@@ -2,8 +2,8 @@ NAME
     ScriptX_Util - Utilities for ScriptX
 
 VERSION
-    This document describes version 0.001 of ScriptX_Util (from Perl
-    distribution ScriptX_Util), released on 2020-10-01.
+    This document describes version 0.003 of ScriptX_Util (from Perl
+    distribution ScriptX_Util), released on 2020-10-02.
 
 FUNCTIONS
   detect_scriptx_script

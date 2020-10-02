@@ -1,0 +1,14 @@
+Sub-Operable
+============
+
+Created:      2020-10-02
+Home page:    <https://metacpan.org/release/Sub-Operable>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-Operable>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2020-10-02
+
+ [ Documentation ]
+ - Fix typo in SYNOPSIS.
+
+0.001	2020-10-02	Initial release

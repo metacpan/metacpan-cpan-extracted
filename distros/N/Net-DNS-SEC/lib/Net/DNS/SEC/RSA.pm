@@ -1,9 +1,9 @@
 package Net::DNS::SEC::RSA;
 
-#
-# $Id: RSA.pm 1763 2020-02-02 21:48:03Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1763 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: RSA.pm 1807 2020-09-28 11:38:28Z willem $)[2];
 
 
 =head1 NAME
@@ -41,9 +41,7 @@ public key resource record.
 
 =cut
 
-use strict;
 use integer;
-use warnings;
 use MIME::Base64;
 
 use constant RSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_RSA');
@@ -52,14 +50,14 @@ BEGIN { die 'RSA disabled or application has no "use Net::DNS::SEC"' unless RSA_
 
 
 my %parameters = (
-	1  => sub { Net::DNS::SEC::libcrypto::EVP_md5() },
-	5  => sub { Net::DNS::SEC::libcrypto::EVP_sha1() },
-	7  => sub { Net::DNS::SEC::libcrypto::EVP_sha1() },
-	8  => sub { Net::DNS::SEC::libcrypto::EVP_sha256() },
-	10 => sub { Net::DNS::SEC::libcrypto::EVP_sha512() },
+	1  => Net::DNS::SEC::libcrypto::EVP_md5(),
+	5  => Net::DNS::SEC::libcrypto::EVP_sha1(),
+	7  => Net::DNS::SEC::libcrypto::EVP_sha1(),
+	8  => Net::DNS::SEC::libcrypto::EVP_sha256(),
+	10 => Net::DNS::SEC::libcrypto::EVP_sha512(),
 	);
 
-sub _index { keys %parameters }
+sub _index { return keys %parameters }
 
 
 sub sign {
@@ -68,7 +66,7 @@ sub sign {
 	my $index = $private->algorithm;
 	my $evpmd = $parameters{$index} || die 'private key not RSA';
 
-	my ( $n, $e, $d, $p, $q ) = map decode_base64( $private->$_ ),
+	my ( $n, $e, $d, $p, $q ) = map { decode_base64( $private->$_ ) }
 			qw(Modulus PublicExponent PrivateExponent Prime1 Prime2);
 
 	my $rsa = Net::DNS::SEC::libcrypto::RSA_new();
@@ -78,7 +76,7 @@ sub sign {
 	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
 	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_RSA( $evpkey, $rsa );
 
-	Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, &$evpmd );
+	return Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, $evpmd );
 }
 
 
@@ -101,7 +99,7 @@ sub verify {
 	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
 	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_RSA( $evpkey, $rsa );
 
-	Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $sigbin, $evpkey, &$evpmd );
+	return Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $sigbin, $evpkey, $evpmd );
 }
 
 

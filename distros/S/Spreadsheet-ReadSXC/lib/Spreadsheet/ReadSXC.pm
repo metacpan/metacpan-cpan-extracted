@@ -7,7 +7,7 @@ use warnings;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(read_sxc read_sxc_fh read_xml_file read_xml_string);
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Archive::Zip ':ERROR_CODES';
 use Carp qw(croak);
@@ -226,7 +226,7 @@ and pass the string to the function read_xml_string(). Both
 functions also take a reference to a hash of options as an
 optional second argument.
 
-Spreadsheet::ReadSXC requires XML::Parser to parse the XML
+Spreadsheet::ReadSXC uses XML::Twig to parse the XML
 contained in .sxc files. Only the contents of text:p elements are
 returned, not the actual values of table:value attributes. For
 example, a cell might have a table:value-type attribute of

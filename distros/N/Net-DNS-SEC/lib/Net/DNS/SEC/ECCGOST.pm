@@ -1,9 +1,9 @@
 package Net::DNS::SEC::ECCGOST;
 
-#
-# $Id: ECCGOST.pm 1758 2019-10-14 13:17:11Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1758 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: ECCGOST.pm 1807 2020-09-28 11:38:28Z willem $)[2];
 
 
 =head1 NAME
@@ -37,18 +37,14 @@ public key resource record.
 =cut
 
 
-use strict;
-use integer;
-use warnings;
-
-use constant Digest_GOST => defined( eval 'require Digest::GOST::CryptoPro' );
+use constant Digest_GOST	=> defined( eval { require Digest::GOST } );
 use constant ECCGOST_configured => Digest_GOST && Net::DNS::SEC::libcrypto->can('ECCGOST_verify');
 
 BEGIN { die 'ECCGOST disabled or application has no "use Net::DNS::SEC"' unless ECCGOST_configured }
 
 my %parameters = ( 12 => [840, 'Digest::GOST::CryptoPro'] );
 
-sub _index { keys %parameters }
+sub _index { return keys %parameters }
 
 
 sub sign {
@@ -73,7 +69,7 @@ sub verify {
 	Net::DNS::SEC::libcrypto::EC_KEY_set_public_key_affine_coordinates( $eckey, $x, $y );
 
 	my ( $s, $r ) = unpack 'a32 a32', $sigbin;		# RFC5933, RFC4490
-	Net::DNS::SEC::libcrypto::ECCGOST_verify( $H, $r, $s, $eckey );
+	return Net::DNS::SEC::libcrypto::ECCGOST_verify( $H, $r, $s, $eckey );
 }
 
 

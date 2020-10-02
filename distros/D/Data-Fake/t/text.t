@@ -7,29 +7,46 @@ use Test::Deep;
 use Data::Fake::Text;
 
 subtest 'fake_words' => sub {
-    for my $i ( 0 .. 5 ) {
-        my $got = fake_words($i)->();
+    for my $i ( undef, 0 .. 5 ) {
+        my @args = defined $i ? $i : ();
+        my $got = fake_words(@args)->();
         ok( defined($got), "word is defined" );
-        is( scalar split( / /, $got ), $i, "word list of length $i" );
+
+        my $n = defined $i ? $i : 1;
+        my $msg = "word list of length $n";
+        $msg .= " (default)" unless defined $i;
+
+        is( scalar split( / /, $got ), $n, $msg );
     }
 };
 
 subtest 'fake_sentences' => sub {
-    for my $i ( 0 .. 5 ) {
-        my $got = fake_sentences($i)->();
+    for my $i ( undef, 0 .. 5 ) {
+        my @args = defined $i ? $i : ();
+        my $got = fake_sentences(@args)->();
         ok( defined($got), "sentence is defined" );
+
+        my $n = defined $i ? $i : 1;
+        my $msg = "sentence list of length $n";
+        $msg .= " (default)" unless defined $i;
+
         my $count =()= ( $got =~ /\./g );
-        is( $count, $i, "sentence list of length $i" ) or diag $got;
+        is( $count, $n, $msg ) or diag $got;
     }
 };
 
 subtest 'fake_paragraphs' => sub {
-    for my $i ( 0 .. 5 ) {
-        my $got = fake_paragraphs($i)->();
+    for my $i ( undef, 0 .. 5 ) {
+        my @args = defined $i ? $i : ();
+        my $got = fake_paragraphs(@args)->();
         ok( defined($got), "paragraph is defined" );
+
+        my $n = defined $i ? ( $i == 0 ? 0 : 2 * $i - 1 ) : 1;
+        my $msg = "paragraph list of length $n";
+        $msg .= " (default)" unless defined $i;
+
         my $count = scalar split /^/, $got;
-        is( $count, ( $i == 0 ? 0 : 2 * $i - 1 ), "paragraph list of length $i" )
-          or diag $got;
+        is( $count, $n, $msg ) or diag $got;
     }
 };
 

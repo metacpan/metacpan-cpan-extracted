@@ -9,9 +9,14 @@ META.yml
 Makefile.PL
 README.md
 build/perlcritic.rc
+container-buildah-logo.png
 dist.ini
-examples/bind9-build.pl
-examples/bind9.yaml
+dzil.spec
+examples/bind9/bind9-build.pl
+examples/bind9/bind9.yaml
+examples/hello/hello.c
+examples/hello/hello.yaml
+examples/hello/hello_build.pl
 inc/Devel/AssertOS.pm
 inc/Devel/AssertOS/Android.pm
 inc/Devel/AssertOS/Linux.pm

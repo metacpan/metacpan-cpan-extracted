@@ -1,7 +1,9 @@
 package Software::Catalog::SW::zotero;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-02'; # DATE
+our $DIST = 'Software-Catalog-SW-zotero'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,21 +16,16 @@ use Role::Tiny::With;
 with 'Versioning::Scheme::Dotted';
 with 'Software::Catalog::Role::Software';
 
-sub homepage_url { "https://www.zotero.org/" }
-
-sub latest_version {
+sub archive_info {
     my ($self, %args) = @_;
-
-    my $carch = $args{arch};
-    return [400, "Please specify arch"] unless $carch;
-
-    my $narch = $self->_canon2native_arch($carch);
-
-    extract_from_url(
-        url => "https://www.zotero.org/download/",
-        re  => qr!"standaloneVersions".+"\Q$narch\E":"([^"]+)"!,
-    );
+    [200, "OK", {
+        programs => [
+            {name=>"zotero", path=>"/"},
+        ],
+    }];
 }
+
+sub available_versions { [501, "Not implemented"] }
 
 sub canon2native_arch_map {
     return +{
@@ -61,14 +58,25 @@ sub download_url {
      }];
 }
 
-sub archive_info {
+sub homepage_url { "https://www.zotero.org/" }
+
+sub is_dedicated_profile { 0 }
+
+sub latest_version {
     my ($self, %args) = @_;
-    [200, "OK", {
-        programs => [
-            {name=>"zotero", path=>"/"},
-        ],
-    }];
+
+    my $carch = $args{arch};
+    return [400, "Please specify arch"] unless $carch;
+
+    my $narch = $self->_canon2native_arch($carch);
+
+    extract_from_url(
+        url => "https://www.zotero.org/download/",
+        re  => qr!"standaloneVersions".+"\Q$narch\E":"([^"]+)"!,
+    );
 }
+
+sub release_note { [501, "Not implemented"] }
 
 1;
 # ABSTRACT: Zotero
@@ -85,7 +93,7 @@ Software::Catalog::SW::zotero - Zotero
 
 =head1 VERSION
 
-This document describes version 0.005 of Software::Catalog::SW::zotero (from Perl distribution Software-Catalog-SW-zotero), released on 2019-10-26.
+This document describes version 0.006 of Software::Catalog::SW::zotero (from Perl distribution Software-Catalog-SW-zotero), released on 2020-10-02.
 
 =for Pod::Coverage ^(.+)$
 
@@ -111,7 +119,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

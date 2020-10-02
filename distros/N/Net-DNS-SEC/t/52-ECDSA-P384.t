@@ -1,17 +1,20 @@
-# $Id: 52-ECDSA-P384.t 1777 2020-05-07 08:24:01Z willem $	-*-perl-*-
+#!/usr/bin/perl
+# $Id: 52-ECDSA-P384.t 1808 2020-09-28 22:08:11Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
+use IO::File;
 use Test::More;
 
 my %prerequisite = (
-	'Net::DNS::SEC'	=> 1.01,
+	'Net::DNS::SEC' => 1.01,
 	'MIME::Base64'	=> 2.13,
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
-	my @revision = grep $_, $prerequisite{$package};
-	next if eval "use $package @revision; 1;";
+	my @revision = grep {$_} $prerequisite{$package};
+	next if eval "use $package @revision; 1;";		## no critic
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
@@ -33,10 +36,10 @@ END {
 
 use_ok('Net::DNS::SEC');
 use_ok('Net::DNS::SEC::Private');
-use_ok('Net::DNS::SEC::ECDSA');
+use_ok( my $class = 'Net::DNS::SEC::ECDSA' );
 
 
-my $key = new Net::DNS::RR <<'END';
+my $key = Net::DNS::RR->new( <<'END' );
 ECDSAP384SHA384.example.	IN	DNSKEY	256 3 14 (
 	K4t0AhWiJcLZ25BlpvfxCi2KMlkBr14zECH3Y2imMYOzn5zcMpOh0iPbI9Hnfep8L+BBzQrRFNmc
 	5r3r0l0y+snHIc/npdK/1Ks0ZG/aMB5r/PfJGeB5MLdtcanFir2S ; Key ID = 25812
@@ -48,8 +51,8 @@ ok( $key, 'set up ECDSA public key' );
 
 my $keyfile = $filename{keyfile} = $key->privatekeyname;
 
-open( KEY, ">$keyfile" ) or die "$keyfile $!";
-print KEY <<'END';
+my $privatekey = IO::File->new( $keyfile, '>' ) or die qq(open: "$keyfile" $!);
+print $privatekey <<'END';
 Private-key-format: v1.3
 Algorithm: 14 (ECDSAP384SHA384)
 PrivateKey: mvuhyr+QDMqo4bpeREFRM2w8qZsBiLiCouR0sihdinvpRA3zA/dByohgH4CLI7Kr
@@ -57,24 +60,24 @@ Created: 20141209021155
 Publish: 20141209021155
 Activate: 20141209021155
 END
-close(KEY);
+close($privatekey);
 
-my $private = new Net::DNS::SEC::Private($keyfile);
+my $private = Net::DNS::SEC::Private->new($keyfile);
 ok( $private, 'set up ECDSA private key' );
 
 
 my $sigdata = 'arbitrary data';
+my $corrupt = 'corrupted data';
 
-my $signature = Net::DNS::SEC::ECDSA->sign( $sigdata, $private );
+my $signature = $class->sign( $sigdata, $private );
 ok( $signature, 'signature created using private key' );
 
 
-my $verified = Net::DNS::SEC::ECDSA->verify( $sigdata, $key, $signature );
+my $verified = $class->verify( $sigdata, $key, $signature );
 is( $verified, 1, 'signature verified using public key' );
 
 
-my $corrupt = 'corrupted data';
-my $verifiable = Net::DNS::SEC::ECDSA->verify( $corrupt, $key, $signature );
+my $verifiable = $class->verify( $corrupt, $key, $signature );
 is( $verifiable, 0, 'signature not verifiable if data corrupted' );
 
 

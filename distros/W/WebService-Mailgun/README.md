@@ -58,7 +58,7 @@ my $res = $mailgun->message({
 });
 ```
 
-[https://documentation.mailgun.com/api-sending.html#sending](https://documentation.mailgun.com/api-sending.html#sending)
+[https://documentation.mailgun.com/en/latest/api-sending.html#sending](https://documentation.mailgun.com/en/latest/api-sending.html#sending)
 
 ## lists()
 
@@ -70,7 +70,7 @@ my $lists = $mailgun->lists();
 # => ArrayRef of mailing list object.
 ```
 
-[https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
+[https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists)
 
 ## add\_list($args)
 
@@ -86,7 +86,7 @@ my $res = $mailgun->add_list({
 });
 ```
 
-[https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
+[https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists)
 
 ## list($address)
 
@@ -97,7 +97,7 @@ Get detail for mailing list.
 my $data = $mailgun->list('ml@exmaple.com');
 ```
 
-[https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
+[https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists)
 
 ## update\_list($address, $args)
 
@@ -113,7 +113,7 @@ my $res = $mailgun->update_list('ml@example.com' => {
 });
 ```
 
-[https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
+[https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists)
 
 ## delete\_list($address)
 
@@ -124,7 +124,7 @@ Delete mailing list.
 my $res = $mailgun->delete_list('ml@example.com');
 ```
 
-[https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
+[https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists)
 
 ## list\_members($address)
 
@@ -135,7 +135,7 @@ Get members for mailing list.
 my $res = $mailgun->list_members('ml@example.com');
 ```
 
-[https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
+[https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists)
 
 ## add\_list\_member($address, $args)
 
@@ -152,7 +152,7 @@ my $res = $mailgun->add_list_member('ml@example.com' => {
 });
 ```
 
-[https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
+[https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists)
 
 ## add\_list\_members($address, $args)
 
@@ -177,7 +177,7 @@ my $res = $mailgun->add_list_members('ml@example.com' => {
 });
 ```
 
-[https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
+[https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists)
 
 ## list\_member($address, $member\_address)
 
@@ -188,7 +188,7 @@ Get member detail.
 my $res = $mailgun->list_member('ml@example.com', 'user@example.com');
 ```
 
-[https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
+[https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists)
 
 ## update\_list\_member($address, $member\_address, $args)
 
@@ -204,7 +204,7 @@ my $res = $mailgun->update_list_member('ml@example.com', 'user@example.com' => {
 });
 ```
 
-[https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
+[https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists)
 
 ## delete\_list\_members($address, $member\_address)
 
@@ -215,7 +215,7 @@ Delete member for mailing list.
 my $res = $mailgun->delete_list_member('ml@example.com' => 'user@example.com');
 ```
 
-[https://documentation.mailgun.com/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/api-mailinglists.html#mailing-lists)
+[https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists](https://documentation.mailgun.com/en/latest/api-mailinglists.html#mailing-lists)
 
 ## event($args)
 
@@ -226,7 +226,7 @@ Get event data.
 my ($events, $purl) = $mailgun->event({ event => 'stored', limit => 50 });
 ```
 
-[Events](https://documentation.mailgun.com/api-events.html)
+[Events](https://documentation.mailgun.com/en/latest/api-events.html)
 
 ## get\_message\_from\_event($event)
 
@@ -238,7 +238,7 @@ my ($events, $purl) = $mailgun->event({ event => 'stored' });
 my $msg = $mailgun->get_message_from_event($events->[0]);
 ```
 
-[Stored Message](https://documentation.mailgun.com/api-sending.html#retrieving-stored-messages)
+[Stored Message](https://documentation.mailgun.com/en/latest/api-sending.html#retrieving-stored-messages)
 
 # Event Pooling
 
@@ -252,23 +252,23 @@ $events = $mailgun->event($purl);
 // ...
 ```
 
-[Event Polling](https://documentation.mailgun.com/api-events.html#event-polling)    
+[Event Polling](https://documentation.mailgun.com/en/latest/api-events.html#event-polling)    
 
 # TODO
 
 this API not implement yet.
 
-- [Domains](https://documentation.mailgun.com/api-domains.html)
-- [Stats](https://documentation.mailgun.com/api-stats.html)
-- [Tags](https://documentation.mailgun.com/api-tags.html)
-- [Suppressions](https://documentation.mailgun.com/api-suppressions.html)
-- [Routes](https://documentation.mailgun.com/api-routes.html)
-- [Webhooks](https://documentation.mailgun.com/api-webhooks.html)
-- [Email Validation](https://documentation.mailgun.com/api-email-validation.html)
+- [Domains](https://documentation.mailgun.com/en/latest/api-domains.html)
+- [Stats](https://documentation.mailgun.com/en/latest/api-stats.html)
+- [Tags](https://documentation.mailgun.com/en/latest/api-tags.html)
+- [Suppressions](https://documentation.mailgun.com/en/latest/api-suppressions.html)
+- [Routes](https://documentation.mailgun.com/en/latest/api-routes.html)
+- [Webhooks](https://documentation.mailgun.com/en/latest/api-webhooks.html)
+- [Email Validation](https://documentation.mailgun.com/en/latest/api-email-validation.html)
 
 # SEE ALSO
 
-[WWW::Mailgun](https://metacpan.org/pod/WWW%3A%3AMailgun), [https://documentation.mailgun.com/](https://documentation.mailgun.com/)
+[WWW::Mailgun](https://metacpan.org/pod/WWW%3A%3AMailgun), [https://documentation.mailgun.com/en/latest/](https://documentation.mailgun.com/en/latest/)
 
 # LICENSE
 

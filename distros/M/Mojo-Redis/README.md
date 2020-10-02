@@ -21,7 +21,7 @@ Mojo::Redis - Redis driver based on Mojo::IOLoop
 ## Pipelining
 
 Pipelining is built into the API by sending a lot of commands and then use
-["all" in Mojo::Promise](https://metacpan.org/pod/Mojo::Promise#all) to wait for all the responses.
+["all" in Mojo::Promise](https://metacpan.org/pod/Mojo%3A%3APromise#all) to wait for all the responses.
 
     Mojo::Promise->all(
       $db->set_p($key, 10),
@@ -36,15 +36,15 @@ Pipelining is built into the API by sending a lot of commands and then use
 
 # DESCRIPTION
 
-[Mojo::Redis](https://metacpan.org/pod/Mojo::Redis) is a Redis driver that use the [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop), which makes it
+[Mojo::Redis](https://metacpan.org/pod/Mojo%3A%3ARedis) is a Redis driver that use the [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop), which makes it
 integrate easily with the [Mojolicious](https://metacpan.org/pod/Mojolicious) framework.
 
-It tries to mimic the same interface as [Mojo::Pg](https://metacpan.org/pod/Mojo::Pg), [Mojo::mysql](https://metacpan.org/pod/Mojo::mysql) and
-[Mojo::SQLite](https://metacpan.org/pod/Mojo::SQLite), but the methods for talking to the database vary.
+It tries to mimic the same interface as [Mojo::Pg](https://metacpan.org/pod/Mojo%3A%3APg), [Mojo::mysql](https://metacpan.org/pod/Mojo%3A%3Amysql) and
+[Mojo::SQLite](https://metacpan.org/pod/Mojo%3A%3ASQLite), but the methods for talking to the database vary.
 
-This module is in no way compatible with the 1.xx version of [Mojo::Redis](https://metacpan.org/pod/Mojo::Redis)
+This module is in no way compatible with the 1.xx version of [Mojo::Redis](https://metacpan.org/pod/Mojo%3A%3ARedis)
 and this version also tries to fix a lot of the confusing methods in
-[Mojo::Redis2](https://metacpan.org/pod/Mojo::Redis2) related to pubsub.
+[Mojo::Redis2](https://metacpan.org/pod/Mojo%3A%3ARedis2) related to pubsub.
 
 This module is currently EXPERIMENTAL, and bad design decisions will be fixed
 without warning. Please report at
@@ -58,7 +58,7 @@ useful, annoying or if you simply find bugs. Feedback can also be sent to
 
     $cb = $redis->on(connection => sub { my ($redis, $connection) = @_; });
 
-Emitted when [Mojo::Redis::Connection](https://metacpan.org/pod/Mojo::Redis::Connection) connects to the Redis.
+Emitted when [Mojo::Redis::Connection](https://metacpan.org/pod/Mojo%3A%3ARedis%3A%3AConnection) connects to the Redis.
 
 # ATTRIBUTES
 
@@ -68,7 +68,7 @@ Emitted when [Mojo::Redis::Connection](https://metacpan.org/pod/Mojo::Redis::Con
     $redis = $redis->encoding("UTF-8");
 
 The value of this attribute will be passed on to
-["encoding" in Mojo::Redis::Connection](https://metacpan.org/pod/Mojo::Redis::Connection#encoding) when a new connection is created. This
+["encoding" in Mojo::Redis::Connection](https://metacpan.org/pod/Mojo%3A%3ARedis%3A%3AConnection#encoding) when a new connection is created. This
 means that updating this attribute will not change any connection that is
 in use.
 
@@ -87,14 +87,14 @@ Maximum number of idle database handles to cache for future use, defaults to
     $str   = $redis->protocol_class;
     $redis = $redis->protocol_class("Protocol::Redis::XS");
 
-Default to [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) if the optional module is available and at
-least version 0.06, or falls back to [Protocol::Redis::Faster](https://metacpan.org/pod/Protocol::Redis::Faster).
+Default to [Protocol::Redis::XS](https://metacpan.org/pod/Protocol%3A%3ARedis%3A%3AXS) if the optional module is available and at
+least version 0.06, or falls back to [Protocol::Redis::Faster](https://metacpan.org/pod/Protocol%3A%3ARedis%3A%3AFaster).
 
 ## pubsub
 
     $pubsub = $redis->pubsub;
 
-Lazy builds an instance of [Mojo::Redis::PubSub](https://metacpan.org/pod/Mojo::Redis::PubSub) for this object, instead of
+Lazy builds an instance of [Mojo::Redis::PubSub](https://metacpan.org/pod/Mojo%3A%3ARedis%3A%3APubSub) for this object, instead of
 returning a new instance like ["db"](#db) does.
 
 ## url
@@ -102,7 +102,7 @@ returning a new instance like ["db"](#db) does.
     $url   = $redis->url;
     $redis = $redis->url(Mojo::URL->new("redis://localhost/3"));
 
-Holds an instance of [Mojo::URL](https://metacpan.org/pod/Mojo::URL) that describes how to connect to the Redis server.
+Holds an instance of [Mojo::URL](https://metacpan.org/pod/Mojo%3A%3AURL) that describes how to connect to the Redis server.
 
 # METHODS
 
@@ -110,21 +110,21 @@ Holds an instance of [Mojo::URL](https://metacpan.org/pod/Mojo::URL) that descri
 
     $db = $redis->db;
 
-Returns an instance of [Mojo::Redis::Database](https://metacpan.org/pod/Mojo::Redis::Database).
+Returns an instance of [Mojo::Redis::Database](https://metacpan.org/pod/Mojo%3A%3ARedis%3A%3ADatabase).
 
 ## cache
 
     $cache = $redis->cache(%attrs);
 
-Returns an instance of [Mojo::Redis::Cache](https://metacpan.org/pod/Mojo::Redis::Cache).
+Returns an instance of [Mojo::Redis::Cache](https://metacpan.org/pod/Mojo%3A%3ARedis%3A%3ACache).
 
 ## cursor
 
     $cursor = $redis->cursor(@command);
 
-Returns an instance of [Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo::Redis::Cursor) with
-["command" in Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo::Redis::Cursor#command) set to the arguments passed. See
-["new" in Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo::Redis::Cursor#new). for possible commands.
+Returns an instance of [Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo%3A%3ARedis%3A%3ACursor) with
+["command" in Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo%3A%3ARedis%3A%3ACursor#command) set to the arguments passed. See
+["new" in Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo%3A%3ARedis%3A%3ACursor#new). for possible commands.
 
 ## new
 
@@ -133,7 +133,7 @@ Returns an instance of [Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo::Redi
     $redis = Mojo::Redis->new(\%attrs);
     $redis = Mojo::Redis->new(%attrs);
 
-Object constructor. Can coerce a string into a [Mojo::URL](https://metacpan.org/pod/Mojo::URL) and set ["url"](#url)
+Object constructor. Can coerce a string into a [Mojo::URL](https://metacpan.org/pod/Mojo%3A%3AURL) and set ["url"](#url)
 if present.
 
 # AUTHORS
@@ -151,4 +151,4 @@ the terms of the Artistic License version 2.0.
 
 # SEE ALSO
 
-[Mojo::Redis2](https://metacpan.org/pod/Mojo::Redis2).
+[Mojo::Redis2](https://metacpan.org/pod/Mojo%3A%3ARedis2).

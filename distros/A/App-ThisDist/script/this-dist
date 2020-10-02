@@ -1,0 +1,157 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-02'; # DATE
+our $DIST = 'App-ThisDist'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Cwd 'getcwd';
+use File::Slurper 'read_text';
+
+my $debug = $ENV{DEBUG};
+my $quiet = @ARGV && $ARGV[0] =~ /\A(-q|--quiet)\z/;
+my $cwd = getcwd();
+(my $cwd_basename = $cwd) =~ s!.+[/\\]!!;
+
+my $dist;
+GUESS: {
+  FROM_DIST_INI: {
+        if (-f "dist.ini") {
+            my $ct = read_text "dist.ini";
+            while ($ct =~ /^\s*name\s*=\s*(.+)/mg) {
+                $dist = $1;
+                warn "this-dist: Guessed dist=$dist from dist.ini\n" if $debug;
+                last GUESS;
+            }
+        }
+    }
+
+  FROM_GIT_CONFIG: {
+        if (-f ".git/config") {
+            my $ct = read_text ".git/config";
+            while ($ct =~ /^\s*url\s*=\s*(.+)/mg) {
+                my $url = $1;
+                warn "this-dist: Found URL '$url'\n" if $debug;
+                require CPAN::Dist::FromURL;
+                my $res = CPAN::Dist::FromURL::extract_cpan_dist_from_url($url);
+                if (defined $dist) {
+                    warn "this-dist: Guessed dist=$dist from .git/config URL '$url'\n" if $debug;
+                    last GUESS;
+                }
+            }
+        }
+    }
+
+  FROM_REPO_NAME: {
+        require CPAN::Dist::FromRepoName;
+        my $res = CPAN::Dist::FromRepoName::extract_cpan_dist_from_repo_name($cwd_basename);
+        if (defined $res) {
+            $dist = $res;
+            warn "this-dist: Guessed dist=$dist from repo name '$cwd_basename'\n" if $debug;
+            last GUESS;
+        }
+    }
+}
+
+if (defined $dist) {
+    print $dist, "\n";
+} else {
+    if ($quiet) {
+    } else {
+        warn "this-dist: No perl distribution name can be associated with current directory '$cwd'\n";
+    }
+    exit 1;
+}
+
+# ABSTRACT: Return name of Perl distribution associated with the current directory
+# PODNAME: this-dist
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+this-dist - Return name of Perl distribution associated with the current directory
+
+=head1 VERSION
+
+This document describes version 0.003 of this-dist (from Perl distribution App-ThisDist), released on 2020-10-02.
+
+=head1 SYNOPSIS
+
+ % pwd
+ /home/budi/perl-Foo-Bar
+
+ % this-dist
+ Foo-Bar
+
+ # See how distribution is guessed
+ % DEBUG=1 this-dist
+
+ % cd /
+ % this-dist
+ this-dist: No perl distribution name can be associated with current directory '/'
+
+ # Don't show error message when guessing is failed
+ % this-dist -q
+
+ % _
+
+=head1 DESCRIPTION
+
+This script tries these methods when guessing Perl distribution name associated
+with current directory:
+
+=over
+
+=item * Name in F<dist.ini>, if the file is available
+
+=item * L<CPAN::Info::FromURL> against URL in F<.git/config>, the file is available
+
+=item * L<CPAN::Dist::FromRepoName> against current directory name
+
+=back
+
+=head1 FAQ
+
+=head2 Where is this-mod?
+
+For now you can use L<dist2mod>:
+
+ % this-dist | dist2mod
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ThisDist>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ThisDist>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ThisDist>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -2,7 +2,7 @@ NAME
     Data::Fake - Declaratively generate fake structured data for testing
 
 VERSION
-    version 0.004
+    version 0.005
 
 SYNOPSIS
         use Data::Fake qw/Core Names Text Dates/;
@@ -158,7 +158,8 @@ CONTRIBUTING
     If you have ideas for additional generator functions and think they
     would be sensible additions to the main distribution, please open a
     support ticket to discuss it. To be included in the main distribution,
-    additional dependencies should add few, if any, additional dependencies.
+    additional generator functions should add few, if any, additional
+    dependencies.
 
     If you would like to release your own distributions in the
     "Data::Fake::*" namespace, please follow the conventions of the existing
@@ -180,24 +181,14 @@ SEE ALSO
 
     *   Text::Lorem – just fake text
 
-SUPPORT
-  Bugs / Feature Requests
-    Please report any bugs or feature requests through the issue tracker at
-    <https://github.com/dagolden/Data-Fake/issues>. You will be notified
-    automatically of any progress on your issue.
-
-  Source Code
-    This is open source software. The code repository is available for
-    public review and contribution under the terms of the license.
-
-    <https://github.com/dagolden/Data-Fake>
-
-      git clone https://github.com/dagolden/Data-Fake.git
-
 AUTHOR
     David Golden <dagolden@cpan.org>
 
 CONTRIBUTORS
+    *   Chloé Kekoa <50083900+chloekek@users.noreply.github.com>
+
+    *   José Joaquín Atria <jjatria@gmail.com>
+
     *   Ricardo Signes <rjbs@users.noreply.github.com>
 
     *   Stuart Skelton <stuarts@broadbean.com>

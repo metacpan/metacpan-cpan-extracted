@@ -1,5 +1,5 @@
 ---
-abstract: "Preprocess â\x96· and â\x96¶ as method dispatch operators in ANSI-C."
+abstract: "Preprocess â\x97\x81, â\x97\x80, â\x96· and â\x96¶ as operators in ANSI-C."
 author:
   - philiprbrenan@gmail.com
 build_requires: {}
@@ -15,7 +15,7 @@ name: Preprocess-Ops
 provides:
   Preprocess::Ops:
     file: lib/Preprocess/Ops.pm
-    version: '202009028'
+    version: '202009030'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -24,5 +24,5 @@ requires:
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '202009028'
+version: '202009030'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

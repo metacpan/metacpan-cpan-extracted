@@ -8,8 +8,6 @@ use GraphViz2;
 
 use Moo;
 
-use File::Slurp; # For read_file().
-
 has graph =>
 (
 	default  => sub{return ''},
@@ -21,6 +19,11 @@ has graph =>
 our $VERSION = '2.47';
 
 # -----------------------------------------------
+
+sub read_file {
+  open my $fh, '<:encoding(UTF-8)', $_[0] or die "$_[0]: $!";
+  map +((chomp, $_)[1]), <$fh>;
+}
 
 sub BUILD
 {
@@ -53,7 +56,7 @@ sub create
 	my($rule, $rule_label);
 	my($text);
 
-	for my $line (read_file($arg{file_name}, {chomp => 1}) )
+	for my $line (read_file($arg{file_name}) )
 	{
 		if ( ($line !~ /\w/) || ($line !~ /^\d+:\s+/) )
 		{

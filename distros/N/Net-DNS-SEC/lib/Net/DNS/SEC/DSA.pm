@@ -1,9 +1,9 @@
 package Net::DNS::SEC::DSA;
 
-#
-# $Id: DSA.pm 1763 2020-02-02 21:48:03Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1763 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: DSA.pm 1807 2020-09-28 11:38:28Z willem $)[2];
 
 
 =head1 NAME
@@ -41,9 +41,7 @@ public key resource record.
 
 =cut
 
-use strict;
 use integer;
-use warnings;
 use MIME::Base64;
 
 use constant DSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_DSA');
@@ -52,11 +50,11 @@ BEGIN { die 'DSA disabled or application has no "use Net::DNS::SEC"' unless DSA_
 
 
 my %parameters = (
-	3 => sub { Net::DNS::SEC::libcrypto::EVP_sha1() },
-	6 => sub { Net::DNS::SEC::libcrypto::EVP_sha1() },
+	3 => Net::DNS::SEC::libcrypto::EVP_sha1(),
+	6 => Net::DNS::SEC::libcrypto::EVP_sha1(),
 	);
 
-sub _index { keys %parameters }
+sub _index { return keys %parameters }
 
 
 sub sign {
@@ -65,7 +63,7 @@ sub sign {
 	my $index = $private->algorithm;
 	my $evpmd = $parameters{$index} || die 'private key not DSA';
 
-	my ( $p, $q, $g, $x, $y ) = map decode_base64( $private->$_ ),
+	my ( $p, $q, $g, $x, $y ) = map { decode_base64( $private->$_ ) }
 			qw(prime subprime base private_value public_value);
 	my $t = ( length($g) - 64 ) / 8;
 
@@ -76,8 +74,8 @@ sub sign {
 	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
 	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_DSA( $evpkey, $dsa );
 
-	my $asn1 = Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, &$evpmd );
-	_ASN1decode( $asn1, $t );
+	my $asn1 = Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, $evpmd );
+	return _ASN1decode( $asn1, $t );
 }
 
 
@@ -101,7 +99,7 @@ sub verify {
 	Net::DNS::SEC::libcrypto::EVP_PKEY_assign_DSA( $evpkey, $dsa );
 
 	my $asn1 = _ASN1encode($sigbin);
-	Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $asn1, $evpkey, &$evpmd );
+	return Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $asn1, $evpkey, $evpmd );
 }
 
 
@@ -117,7 +115,7 @@ sub _ASN1encode {
 		$_ = pack 'C2 a*', 2, length, $_;
 		$length += length;
 	}
-	pack 'C2 a* a*', 0x30, $length, @part;
+	return pack 'C2 a* a*', 0x30, $length, @part;
 }
 
 sub _ASN1decode {
@@ -125,7 +123,7 @@ sub _ASN1decode {
 	my $n	 = unpack 'x3 C',	   $asn1;
 	my $m	 = unpack "x5 x$n C",	   $asn1;
 	my @part = unpack "x4 a$n x2 a$m", $asn1;
-	pack 'C a* a*', $t, map substr( pack( 'x20 a*', $_ ), -20 ), @part;
+	return pack 'C a* a*', $t, map { substr( pack( 'x20 a*', $_ ), -20 ) } @part;
 }
 
 

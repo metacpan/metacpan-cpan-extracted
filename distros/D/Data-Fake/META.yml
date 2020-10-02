@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,29 +29,29 @@ no_index:
 provides:
   Data::Fake:
     file: lib/Data/Fake.pm
-    version: '0.004'
+    version: '0.005'
   Data::Fake::Company:
     file: lib/Data/Fake/Company.pm
-    version: '0.004'
+    version: '0.005'
   Data::Fake::Core:
     file: lib/Data/Fake/Core.pm
-    version: '0.004'
+    version: '0.005'
   Data::Fake::Dates:
     file: lib/Data/Fake/Dates.pm
-    version: '0.004'
+    version: '0.005'
   Data::Fake::Internet:
     file: lib/Data/Fake/Internet.pm
-    version: '0.004'
+    version: '0.005'
   Data::Fake::Names:
     file: lib/Data/Fake/Names.pm
-    version: '0.004'
+    version: '0.005'
   Data::Fake::Text:
     file: lib/Data/Fake/Text.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Carp: '0'
   Exporter: '5.57'
-  Import::Into: '0'
+  Import::Into: '1.002005'
   List::Util: '0'
   Text::Lorem: '0'
   Time::Piece: '1.27'
@@ -62,10 +62,13 @@ resources:
   bugtracker: https://github.com/dagolden/Data-Fake/issues
   homepage: https://github.com/dagolden/Data-Fake
   repository: https://github.com/dagolden/Data-Fake.git
-version: '0.004'
+version: '0.005'
 x_authority: cpan:DAGOLDEN
 x_contributors:
+  - 'Chloé Kekoa <50083900+chloekek@users.noreply.github.com>'
+  - 'José Joaquín Atria <jjatria@gmail.com>'
   - 'Ricardo Signes <rjbs@users.noreply.github.com>'
   - 'Stuart Skelton <stuarts@broadbean.com>'
-x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Apache-2.0

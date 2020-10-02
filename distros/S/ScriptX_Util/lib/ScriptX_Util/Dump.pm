@@ -1,9 +1,9 @@
 package ScriptX_Util::Dump;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-01'; # DATE
+our $DATE = '2020-10-02'; # DATE
 our $DIST = 'ScriptX_Util'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,7 +16,7 @@ our %SPEC;
 
 $SPEC{dump_scriptx_script} = {
     v => 1.1,
-    summary => 'Run a Getopt::Long-based script but only to '.
+    summary => 'Run a ScriptX-based script but only to '.
         'dump the import arguments',
     description => <<'_',
 
@@ -29,7 +29,7 @@ documentation about it or do other things (e.g. `App::shcompgen` to generate a
 completion script for the original script).
 
 CLI script needs to use `ScriptX`. This is detected currently by a simple regex.
-If script is not detected as using `Getopt::Long`, status 412 is returned.
+If script is not detected as using `ScriptX`, status 412 is returned.
 
 _
     args => {
@@ -105,7 +105,7 @@ sub dump_scriptx_script {
 }
 
 1;
-# ABSTRACT: Run a Getopt::Long-based script but only to dump the import arguments
+# ABSTRACT: Run a ScriptX-based script but only to dump the import arguments
 
 __END__
 
@@ -115,11 +115,11 @@ __END__
 
 =head1 NAME
 
-ScriptX_Util::Dump - Run a Getopt::Long-based script but only to dump the import arguments
+ScriptX_Util::Dump - Run a ScriptX-based script but only to dump the import arguments
 
 =head1 VERSION
 
-This document describes version 0.001 of ScriptX_Util::Dump (from Perl distribution ScriptX_Util), released on 2020-10-01.
+This document describes version 0.003 of ScriptX_Util::Dump (from Perl distribution ScriptX_Util), released on 2020-10-02.
 
 =head1 FUNCTIONS
 
@@ -130,7 +130,7 @@ Usage:
 
  dump_scriptx_script(%args) -> [status, msg, payload, meta]
 
-Run a Getopt::Long-based script but only to dump the import arguments.
+Run a ScriptX-based script but only to dump the import arguments.
 
 This function runs a CLI script that uses C<ScriptX> but monkey-patches
 beforehand so that C<import()> will dump the import arguments and then exit. The
@@ -141,7 +141,7 @@ documentation about it or do other things (e.g. C<App::shcompgen> to generate a
 completion script for the original script).
 
 CLI script needs to use C<ScriptX>. This is detected currently by a simple regex.
-If script is not detected as using C<Getopt::Long>, status 412 is returned.
+If script is not detected as using C<ScriptX>, status 412 is returned.
 
 This function is not exported by default, but exportable.
 

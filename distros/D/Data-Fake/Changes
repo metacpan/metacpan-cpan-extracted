@@ -1,5 +1,13 @@
 Revision history for Data-Fake
 
+0.005     2020-10-01 16:59:05-04:00 America/New_York
+
+    [FIXED]
+
+    - Require Import::Into 1.002005
+
+    - Allow calling text generators with no argument
+
 0.004     2018-06-20 14:40:25-06:00 America/Denver
 
     [ADDED]

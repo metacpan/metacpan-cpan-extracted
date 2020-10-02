@@ -6,7 +6,14 @@ use Mojo::JSON qw(from_json to_json);
 use constant DEBUG => $ENV{MOJO_REDIS_DEBUG};
 
 has connection => sub { shift->redis->_connection };
-has db         => sub { shift->redis->db };
+
+has db => sub {
+  my $self = shift;
+  my $db   = $self->redis->db;
+  Scalar::Util::weaken($db->{redis});
+  return $db;
+};
+
 has reconnect_interval => 1;
 has redis              => sub { Carp::confess('redis is requried in constructor') };
 
@@ -37,11 +44,13 @@ sub listen {
   return $cb;
 }
 
-sub notify {
+sub notify_p {
   my ($self, $name, $payload) = @_;
   $payload = to_json $payload if $self->{json}{$name};
   shift->db->call_p(PUBLISH => $name, $payload);
 }
+
+sub notify { shift->notify_p(@_)->wait }
 
 sub numsub_p {
   shift->db->call_p(qw(PUBSUB NUMSUB), @_)->then(sub { +{@{$_[0]}} });
@@ -240,19 +249,19 @@ L<Mojo::JSON/"from_json"> for a channel.
 
 =head2 keyspace_listen
 
-  $cb = $pubsub->keyspace_listen($key, $op, sub { my ($pubsub, $message) = @_ }) });
-  $cb = $pubsub->keyspace_listen($key, $op, \%args, sub { my ($pubsub, $message) = @_ }) });
+  $cb = $pubsub->keyspace_listen(\%args,              sub { my ($pubsub, $message) = @_ }) });
+  $cb = $pubsub->keyspace_listen({key => "cool:key"}, sub { my ($pubsub, $message) = @_ }) });
+  $cb = $pubsub->keyspace_listen({op  => "del"},      sub { my ($pubsub, $message) = @_ }) });
 
 Used to listen for keyspace notifications. See L<https://redis.io/topics/notifications>
-for more details.
-
-C<$key> C<$op> and C<%args> are optional. C<$key> and C<$op> will default to
-"*" and C<%args> can have the following key values:
-
-The channel that will be subscribed to will look like one of these:
+for more details. The channel that will be subscribed to will look like one of
+these:
 
   __keyspace@${db}__:$key $op
   __keyevent@${db}__:$op $key
+
+This means that "key" and "op" is mutually exclusive from the list of
+parameters below:
 
 =over 2
 
@@ -269,11 +278,6 @@ Alternative to passing in C<$key>. Default value is "*".
 =item * op
 
 Alternative to passing in C<$op>. Default value is "*".
-
-=item * type
-
-Will default to "keyevent" if C<$key> is "*", and "keyspace" if not. It can
-also be set to "key*" for listening to both "keyevent" and "keyspace" events.
 
 =back
 
@@ -296,7 +300,15 @@ can have. The returning code ref can be passed on to L</unlisten>.
 
   $pubsub->notify($channel => $message);
 
-Send a plain string message to a channel.
+Send a plain string message to a channel. This method is the same as:
+
+  $pubsub->notify_p($channel => $message)->wait;
+
+=head2 notify_p
+
+  $p = $pubsub->notify_p($channel => $message);
+
+Send a plain string message to a channel and returns a L<Mojo::Promise> object.
 
 =head2 numpat_p
 

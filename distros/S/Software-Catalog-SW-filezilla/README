@@ -2,9 +2,9 @@ NAME
     Software::Catalog::SW::filezilla - FileZilla
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Software::Catalog::SW::filezilla (from Perl distribution
-    Software-Catalog-SW-filezilla), released on 2019-10-26.
+    Software-Catalog-SW-filezilla), released on 2020-10-02.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -26,7 +26,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

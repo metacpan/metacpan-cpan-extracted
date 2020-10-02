@@ -1,7 +1,9 @@
 package CPAN::Info::FromURL;
 
-our $DATE = '2018-12-30'; # DATE
-our $VERSION = '0.090'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-10-02'; # DATE
+our $DIST = 'CPAN-Info-FromURL'; # DIST
+our $VERSION = '0.091'; # VERSION
 
 use 5.010001;
 use strict;
@@ -198,6 +200,22 @@ _
         },
 
         {
+            name => "github (https, .git)",
+            args => {url=>'https://github.com/perlancar/perl-CPAN-Info-FromURL.git'},
+            result => {site=>'github', github_user=>"perlancar", github_repo=>"perl-CPAN-Info-FromURL", dist=>'CPAN-Info-FromURL'},
+        },
+        {
+            name => "github (https, no .git)",
+            args => {url=>'https://github.com/perlancar/perl-CPAN-Info-FromURL'},
+            result => {site=>'github', github_user=>"perlancar", github_repo=>"perl-CPAN-Info-FromURL", dist=>'CPAN-Info-FromURL'},
+        },
+        {
+            name => "github (git)",
+            args => {url=>'https://github.com/perlancar/perl-CPAN-Info-FromURL'},
+            result => {site=>'github', github_user=>"perlancar", github_repo=>"perl-CPAN-Info-FromURL", dist=>'CPAN-Info-FromURL'},
+        },
+
+        {
             name => 'unknown',
             args => {url=>'https://www.google.com/'},
             result => undef,
@@ -341,6 +359,13 @@ sub extract_cpan_info_from_url {
             $res->{module} = $mod;
         }
 
+    } elsif ($url =~ m!\A(?:$re_proto_http|\w+\@)?github\.com[:/]([A-Za-z0-9_-]+)/([A-Za-z0-9_-]+)(\.git|\z|/)!i) {
+        $res->{site} = 'github';
+        $res->{github_user} = $1;
+        $res->{github_repo} = $2;
+        require CPAN::Dist::FromRepoName;
+        my $dist = CPAN::Dist::FromRepoName::extract_cpan_dist_from_repo_name($2);
+        $res->{dist} = $dist if defined $dist;
     } elsif ($url =~ m!/authors/id/(\w)/\1(\w)/(\1\2\w+)
                        (?:/
                            (?:[^/]+/)* # subdir
@@ -373,7 +398,7 @@ CPAN::Info::FromURL - Extract/guess information from a URL
 
 =head1 VERSION
 
-This document describes version 0.090 of CPAN::Info::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2018-12-30.
+This document describes version 0.091 of CPAN::Info::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2020-10-02.
 
 =head1 FUNCTIONS
 
@@ -384,21 +409,21 @@ Usage:
 
  extract_cpan_info_from_url($url) -> hash
 
-Extract/guess information from a URL.
+ExtractE<sol>guess information from a URL.
 
 Examples:
 
 =over
 
-=item * Example #1 (mcpan/pod/MOD):
+=item * Example #1 (mcpanE<sol>podE<sol>MOD):
 
  extract_cpan_info_from_url("https://metacpan.org/pod/Foo::Bar"); # -> { module => "Foo::Bar", site => "mcpan" }
 
-=item * Example #2 (mcpan/module/MOD):
+=item * Example #2 (mcpanE<sol>moduleE<sol>MOD):
 
  extract_cpan_info_from_url("metacpan.org/module/Foo?"); # -> { module => "Foo", site => "mcpan" }
 
-=item * Example #3 (mcpan/pod/release/AUTHOR/DIST-VERSION/lib/MOD.pm):
+=item * Example #3 (mcpanE<sol>podE<sol>releaseE<sol>AUTHORE<sol>DIST-VERSIONE<sol>libE<sol>MOD.pm):
 
  extract_cpan_info_from_url("http://metacpan.org/pod/release/SRI/Mojolicious-6.46/lib/Mojo.pm");
 
@@ -412,7 +437,7 @@ Result:
    version => 6.46,
  }
 
-=item * Example #4 (mcpan/pod/release/AUTHOR/DIST-VERSION/bin/SCRIPT):
+=item * Example #4 (mcpanE<sol>podE<sol>releaseE<sol>AUTHORE<sol>DIST-VERSIONE<sol>binE<sol>SCRIPT):
 
  extract_cpan_info_from_url("http://metacpan.org/pod/release/PERLANCAR/App-PMUtils-1.23/bin/pmpath");
 
@@ -426,7 +451,7 @@ Result:
    version => 1.23,
  }
 
-=item * Example #5 (mcpan/source/AUTHOR/DIST-VERSION/lib/MOD.pm):
+=item * Example #5 (mcpanE<sol>sourceE<sol>AUTHORE<sol>DIST-VERSIONE<sol>libE<sol>MOD.pm):
 
  extract_cpan_info_from_url("http://metacpan.org/source/SRI/Mojolicious-6.46/lib/Mojo.pm?");
 
@@ -440,7 +465,7 @@ Result:
    version => 6.46,
  }
 
-=item * Example #6 (api.mcpan/source/AUTHOR/DIST-VERSION):
+=item * Example #6 (api.mcpanE<sol>sourceE<sol>AUTHORE<sol>DIST-VERSION):
 
  extract_cpan_info_from_url("http://api.metacpan.org/source/SRI/Mojolicious-6.46?");
 
@@ -448,7 +473,7 @@ Result:
 
  { author => "SRI", dist => "Mojolicious", site => "mcpan", version => 6.46 }
 
-=item * Example #7 (fastapi.mcpan/v1/module/MODULE):
+=item * Example #7 (fastapi.mcpanE<sol>v1E<sol>moduleE<sol>MODULE):
 
  extract_cpan_info_from_url("http://fastapi.metacpan.org/v1/module/Moose");
 
@@ -456,11 +481,11 @@ Result:
 
  { module => "Moose", site => "mcpan" }
 
-=item * Example #8 (mcpan/release/DIST):
+=item * Example #8 (mcpanE<sol>releaseE<sol>DIST):
 
  extract_cpan_info_from_url("https://metacpan.org/release/Foo-Bar"); # -> { dist => "Foo-Bar", site => "mcpan" }
 
-=item * Example #9 (mcpan/release/AUTHOR/DIST-VERSION):
+=item * Example #9 (mcpanE<sol>releaseE<sol>AUTHORE<sol>DIST-VERSION):
 
  extract_cpan_info_from_url("https://metacpan.org/release/FOO/Bar-1.23");
 
@@ -468,11 +493,11 @@ Result:
 
  { author => "FOO", dist => "Bar", site => "mcpan", version => 1.23 }
 
-=item * Example #10 (mcpan/author/AUTHOR):
+=item * Example #10 (mcpanE<sol>authorE<sol>AUTHOR):
 
  extract_cpan_info_from_url("https://metacpan.org/author/FOO"); # -> { author => "FOO", site => "mcpan" }
 
-=item * Example #11 (mcpan/changes/distribution/DIST):
+=item * Example #11 (mcpanE<sol>changesE<sol>distributionE<sol>DIST):
 
  extract_cpan_info_from_url("https://metacpan.org/changes/distribution/Module-XSOrPP");
 
@@ -480,7 +505,7 @@ Result:
 
  { dist => "Module-XSOrPP", site => "mcpan" }
 
-=item * Example #12 (mcpan/requires/distribution/DIST):
+=item * Example #12 (mcpanE<sol>requiresE<sol>distributionE<sol>DIST):
 
  extract_cpan_info_from_url("https://metacpan.org/requires/distribution/Module-XSOrPP?sort=[[2,1]]");
 
@@ -488,11 +513,11 @@ Result:
 
  { dist => "Module-XSOrPP", site => "mcpan" }
 
-=item * Example #13 (sco/dist/DIST):
+=item * Example #13 (scoE<sol>distE<sol>DIST):
 
  extract_cpan_info_from_url("http://search.cpan.org/dist/Foo-Bar/"); # -> { dist => "Foo-Bar", site => "sco" }
 
-=item * Example #14 (sco/perldoc?MOD):
+=item * Example #14 (scoE<sol>perldoc?MOD):
 
  extract_cpan_info_from_url("http://search.cpan.org/perldoc?Foo::Bar");
 
@@ -500,7 +525,7 @@ Result:
 
  { module => "Foo::Bar", site => "sco" }
 
-=item * Example #15 (sco/search?mode=module&query=MOD):
+=item * Example #15 (scoE<sol>search?mode=module&query=MOD):
 
  extract_cpan_info_from_url("http://search.cpan.org/search?mode=module&query=DBIx%3A%3AClass");
 
@@ -508,7 +533,7 @@ Result:
 
  { module => "DBIx::Class", site => "sco" }
 
-=item * Example #16 (sco/search?module=MOD):
+=item * Example #16 (scoE<sol>search?module=MOD):
 
  extract_cpan_info_from_url("http://search.cpan.org/search?module=ToolSet");
 
@@ -516,7 +541,7 @@ Result:
 
  { module => "ToolSet", site => "sco" }
 
-=item * Example #17 (sco/search?module=MOD (#2)):
+=item * Example #17 (scoE<sol>search?module=MOD (#2)):
 
  extract_cpan_info_from_url("http://search.cpan.org/search?module=Acme::Don't");
 
@@ -524,11 +549,11 @@ Result:
 
  { module => "Acme::Don::t", site => "sco" }
 
-=item * Example #18 (sco/~AUTHOR):
+=item * Example #18 (scoE<sol>~AUTHOR):
 
  extract_cpan_info_from_url("http://search.cpan.org/~unera?"); # -> { author => "unera", site => "sco" }
 
-=item * Example #19 (sco/~AUTHOR/DIST-REL/lib/MOD.pm):
+=item * Example #19 (scoE<sol>~AUTHORE<sol>DIST-RELE<sol>libE<sol>MOD.pm):
 
  extract_cpan_info_from_url("http://search.cpan.org/~unera/DR-SunDown-0.02/lib/DR/SunDown.pm");
 
@@ -542,7 +567,7 @@ Result:
    version => 0.02,
  }
 
-=item * Example #20 (sco/~AUTHOR/DIST-REL/bin/SCRIPT.pm):
+=item * Example #20 (scoE<sol>~AUTHORE<sol>DIST-RELE<sol>binE<sol>SCRIPT.pm):
 
  extract_cpan_info_from_url("http://search.cpan.org/~perlancar/App-PMUtils-1.23/bin/pmpath");
 
@@ -556,11 +581,11 @@ Result:
    version => 1.23,
  }
 
-=item * Example #21 (cpan/authors/id/A/AU/AUTHOR):
+=item * Example #21 (cpanE<sol>authorsE<sol>idE<sol>AE<sol>AUE<sol>AUTHOR):
 
  extract_cpan_info_from_url("file:/cpan/authors/id/A/AU/AUTHOR?"); # -> { author => "AUTHOR", site => "cpan" }
 
-=item * Example #22 (cpan/authors/id/A/AU/AUTHOR/DIST-VERSION.tar.gz):
+=item * Example #22 (cpanE<sol>authorsE<sol>idE<sol>AE<sol>AUE<sol>AUTHORE<sol>DIST-VERSION.tar.gz):
 
  extract_cpan_info_from_url("file:/cpan/authors/id/A/AU/AUTHOR/Foo-Bar-1.0.tar.gz");
 
@@ -574,7 +599,7 @@ Result:
    version => "1.0",
  }
 
-=item * Example #23 (cpanratings/dist/DIST):
+=item * Example #23 (cpanratingsE<sol>distE<sol>DIST):
 
  extract_cpan_info_from_url("http://cpanratings.perl.org/dist/Submodules");
 
@@ -582,7 +607,7 @@ Result:
 
  { dist => "Submodules", site => "cpanratings" }
 
-=item * Example #24 (perldoc.perl.org/MOD/SUBMOD.html):
+=item * Example #24 (perldoc.perl.orgE<sol>MODE<sol>SUBMOD.html):
 
  extract_cpan_info_from_url("http://perldoc.perl.org/Module/CoreList.html");
 
@@ -590,7 +615,7 @@ Result:
 
  { module => "Module::CoreList", site => "perldoc.perl.org" }
 
-=item * Example #25 (rt/(Public/)Dist/Display.html?Queue=DIST):
+=item * Example #25 (rtE<sol>(PublicE<sol>)DistE<sol>Display.html?Queue=DIST):
 
  extract_cpan_info_from_url("https://rt.cpan.org/Dist/Display.html?Queue=Perinci-Sub-Gen-AccessTable-DBI");
 
@@ -614,7 +639,46 @@ Result:
 
  { module => "Mojo::DOM::CSS", site => "mojo" }
 
-=item * Example #28 (unknown):
+=item * Example #28 (github (https, .git)):
+
+ extract_cpan_info_from_url("https://github.com/perlancar/perl-CPAN-Info-FromURL.git");
+
+Result:
+
+ {
+   dist => "CPAN-Info-FromURL",
+   github_repo => "perl-CPAN-Info-FromURL",
+   github_user => "perlancar",
+   site => "github",
+ }
+
+=item * Example #29 (github (https, no .git)):
+
+ extract_cpan_info_from_url("https://github.com/perlancar/perl-CPAN-Info-FromURL");
+
+Result:
+
+ {
+   dist => "CPAN-Info-FromURL",
+   github_repo => "perl-CPAN-Info-FromURL",
+   github_user => "perlancar",
+   site => "github",
+ }
+
+=item * Example #30 (github (git)):
+
+ extract_cpan_info_from_url("https://github.com/perlancar/perl-CPAN-Info-FromURL");
+
+Result:
+
+ {
+   dist => "CPAN-Info-FromURL",
+   github_repo => "perl-CPAN-Info-FromURL",
+   github_user => "perlancar",
+   site => "github",
+ }
+
+=item * Example #31 (unknown):
 
  extract_cpan_info_from_url("https://www.google.com/"); # -> undef
 
@@ -636,6 +700,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$url>* => I<str>
+
 
 =back
 
@@ -673,7 +738,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

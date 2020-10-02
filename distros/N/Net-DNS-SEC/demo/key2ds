@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#$Id: key2ds 1295 2015-01-08 13:14:03Z willem $
+#$Id: key2ds 1807 2020-09-28 11:38:28Z willem $
 
 #	A little util to convert DNSKEY records to DS records
 #	from stdin to stdout
@@ -8,17 +8,17 @@
 
 
 use strict;
+use warnings;
 use Net::DNS::SEC;
 use Net::DNS::ZoneFile;
 
-my $handle = \*STDIN;
-my $source = new Net::DNS::ZoneFile($handle);
+my $source = Net::DNS::ZoneFile->new('-');			# STDIN
 while ( my $keyrr = $source->read ) {
 	next unless $keyrr->isa('Net::DNS::RR::DNSKEY');
 
 	foreach my $digtype (qw(SHA256 SHA1)) {
-		my $ds = create Net::DNS::RR::DS( $keyrr, digtype => $digtype );
-		$ds->print;
+		my $ds = Net::DNS::RR::DS->create( $keyrr, digtype => $digtype );
+		$ds->print;					# STDOUT
 	}
 }
 
@@ -44,5 +44,3 @@ it under the same terms as Perl itself.
 
 =cut
 
-
-0;

@@ -11,7 +11,7 @@ use Mojo::Promise;
 use Mojo::Util qw(monkey_patch);
 
 has 'dbh';
-has pg            => undef, weak => 1;
+has pg => undef, weak => 1;
 has results_class => 'Mojo::Pg::Results';
 
 for my $name (qw(delete insert select update)) {
@@ -31,7 +31,7 @@ sub DESTROY {
   my $waiting = $self->{waiting};
   $waiting->{cb}($self, 'Premature connection close', undef) if $waiting->{cb};
 
-  return unless (my $pg = $self->pg) && (my $dbh = $self->dbh);
+  return              unless (my $pg = $self->pg) && (my $dbh = $self->dbh);
   $pg->_enqueue($dbh) unless $dbh->{private_mojo_no_reuse};
 }
 

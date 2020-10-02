@@ -1,9 +1,9 @@
 package Net::DNS::SEC::Digest;
 
-#
-# $Id: Digest.pm 1777 2020-05-07 08:24:01Z willem $
-#
-our $VERSION = (qw$LastChangedRevision: 1777 $)[1];
+use strict;
+use warnings;
+
+our $VERSION = (qw$Id: Digest.pm 1807 2020-09-28 11:38:28Z willem $)[2];
 
 
 =head1 NAME
@@ -15,7 +15,7 @@ Net::DNS::SEC::Digest - Message Digest Algorithms
 
     require Net::DNS::SEC::Digest;
 
-    $object = new Net::DNS::SEC::Digest::SHA(256);
+    $object = Net::DNS::SEC::Digest::SHA->new(256);
     $object->add($text);
     $object->add($more);
     $digest = $object->digest;
@@ -29,9 +29,6 @@ implementations within the OpenSSL libcrypto library.
 =cut
 
 
-use strict;
-use integer;
-use warnings;
 
 use constant libcrypto_available => Net::DNS::SEC::libcrypto->can('EVP_MD_CTX_new');
 
@@ -55,30 +52,31 @@ my %digest = (
 
 
 sub new {
-	my $class   = shift;
-	my ($index) = reverse split '::', join '_', $class, @_;
+	my ( $class, @param ) = @_;
+	my ($index) = reverse split '::', join '_', $class, @param;
 	my $evpmd   = $digest{$index};
 	my $mdobj   = Net::DNS::SEC::libcrypto::EVP_MD_CTX_new();
 	Net::DNS::SEC::libcrypto::EVP_DigestInit( $mdobj, &$evpmd );
-	bless( \$mdobj, $class );
+	return bless( \$mdobj, $class );
 }
 
 sub add {
 	my $object = shift;
-	Net::DNS::SEC::libcrypto::EVP_DigestUpdate( $$object, shift );
+	return Net::DNS::SEC::libcrypto::EVP_DigestUpdate( $$object, shift );
 }
 
 sub digest {
 	my $object = shift;
-	Net::DNS::SEC::libcrypto::EVP_DigestFinal($$object);
+	return Net::DNS::SEC::libcrypto::EVP_DigestFinal($$object);
 }
 
 DESTROY {
 	my $object = shift;
-	Net::DNS::SEC::libcrypto::EVP_MD_CTX_free($$object);
+	return Net::DNS::SEC::libcrypto::EVP_MD_CTX_free($$object);
 }
 
 
+## no critic ProhibitMultiplePackages
 package Net::DNS::SEC::Digest::MD5;
 our @ISA = qw(Net::DNS::SEC::Digest);
 
@@ -100,10 +98,10 @@ __END__
 =head2 new
 
     require Net::DNS::SEC::Digest;
-    $object = new Net::DNS::SEC::Digest::SHA(256);
+    $object = Net::DNS::SEC::Digest::SHA->new(256);
 
 Creates and initialises a new digest object instance for the specified
-algorithm.
+algorithm class.
 
 
 =head2 add

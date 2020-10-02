@@ -5,7 +5,7 @@ use warnings;
 package Data::Fake::Text;
 # ABSTRACT: Fake text data generators
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Exporter 5.57 qw/import/;
 
@@ -33,6 +33,7 @@ my $LOREM;
 
 sub fake_words {
     my ($count) = @_;
+    $count = 1 unless defined $count;
     require Text::Lorem;
     $LOREM ||= Text::Lorem->new;
     return sub { $LOREM->words( _transform($count) ) };
@@ -52,6 +53,7 @@ sub fake_words {
 
 sub fake_sentences {
     my ($count) = @_;
+    $count = 1 unless defined $count;
     return sub { "" }
       if $count == 0;
     require Text::Lorem;
@@ -73,6 +75,7 @@ sub fake_sentences {
 
 sub fake_paragraphs {
     my ($count) = @_;
+    $count = 1 unless defined $count;
     require Text::Lorem;
     $LOREM ||= Text::Lorem->new;
     return sub { $LOREM->paragraphs( _transform($count) ) };
@@ -95,7 +98,7 @@ Data::Fake::Text - Fake text data generators
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

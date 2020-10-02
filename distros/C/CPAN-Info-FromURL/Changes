@@ -1,4 +1,10 @@
-0.090   2018-12-30 (PERLANCAR)
+0.091   2020-10-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Parse github repo URL, e.g.
+	  https://github.com/perlancar/perl-Foo-Bar.git -> dist Foo-Bar.
+
+
+0.090   2018-12-30  Released-By: PERLANCAR
 
 	- Fix regexes with regard to anchor character (#).
 
@@ -7,12 +13,12 @@
 	  Mojo::DOM::CSS.
 
 
-0.08    2017-06-09 (PERLANCAR)
+0.08    2017-06-09  Released-By: PERLANCAR
 
 	- Handle fastapi.metacpan.org URLs.
 
 
-0.07    2016-11-07 (PERLANCAR)
+0.07    2016-11-07  Released-By: PERLANCAR
 
 	- Normalize single quote in package name to double colon, e.g.
 	  Module::SubMod'SubSubMod to Module::SubMod::SubSubMod.
@@ -22,12 +28,12 @@
 	- Parse search.cpan.org/search?module=MOD.
 
 
-0.06    2016-03-07 (PERLANCAR)
+0.06    2016-03-07  Released-By: PERLANCAR
 
 	- Allow URL without http:// or https://.
 
 
-0.05    2016-03-07 (PERLANCAR)
+0.05    2016-03-07  Released-By: PERLANCAR
 
          - First release. CPAN::Module::FromURL from CPAN-Module-FromURL is now
            merged here, and uses CPAN::Info::FromURL.

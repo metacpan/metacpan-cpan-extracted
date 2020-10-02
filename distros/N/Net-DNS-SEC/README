@@ -30,8 +30,6 @@ interface for doing fun things with them.
 See also the 'pod' documentation in: 
 	Net::DNS::RR::DNSKEY
 	Net::DNS::RR::DS
-	Net::DNS::RR::NSEC
-	Net::DNS::RR::NSEC3
 	Net::DNS::RR::RRSIG
 	Net::DNS::SEC::Private
 and for the use of SIG0 see:
@@ -107,12 +105,12 @@ Alternatively, install the package using CPAN:
 	perl -MCPAN -e shell;
 	cpan> install Net::DNS::SEC
 
-To build the libcrypto.so library, run the following:
+To build the libcrypto library, run the following:
 
-	tar xvzf openssl-1.1.*.tar.gz
-	cd openssl-1.1.*
+	tar xvzf openssl-3.*.tar.gz
+	cd openssl-3.*
 	./config shared
-	make	# require only libcrypto.so.1.1 and include/openssl/*.h
+	make	# require only libcrypto.so* and include/openssl/*.h
 
 
 5. MAINTENANCE
@@ -183,4 +181,4 @@ DEALINGS IN THE SOFTWARE.
 
 
 ------------------------------------------------------------------------------
-$Id: README 1677 2018-05-22 11:59:10Z willem $
+$Id: README 1807 2020-09-28 11:38:28Z willem $

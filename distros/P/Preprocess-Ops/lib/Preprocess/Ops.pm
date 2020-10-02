@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Preprocess::Ops;
-our $VERSION = 202009028;
+our $VERSION = 202009030;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -17,7 +17,7 @@ use utf8;
 my $logFile = q(/home/phil/c/z/z/zzz.txt);                                      # Log to this file if present
 binModeAllUtf8;
 
-#D1 Preprocess                                                                  # Preprocess ◁, ▷ and ▶ as operators.
+#D1 Preprocess                                                                  # Preprocess ◁, ◀, ▷ and ▶ as operators in ANSI-C.
 
 sub trim($)                                                                     #P Remove trailing white space and comment
  {my ($s) = @_;                                                                 # String
@@ -304,8 +304,9 @@ sub c($$$;$)                                                                    
 
   if (1)                                                                        # Write prototypes
    {my @h;                                                                      # Generated code
-    for my $s(sort keys %structureParameters)                                   # Each structure
-     {next unless $structures{$s};                                              # The structure must be one defined in this file
+#   for my $s(sort keys %structureParameters)                                   # Each structure
+    for my $s(sort keys %structures)                                            # Each structure
+     {#next unless $structures{$s};                                              # The structure must be one defined in this file
       push @h, "struct ProtoTypes_$s {";                                        # Start structure
       for my $m(sort keys $structureParameters{$s}->%*)                         # Methods in structure
        {my $method = $methods{$m};                                              # Method
@@ -411,7 +412,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 =head1 Name
 
-Preprocess::Ops - Preprocess ◁,  ▷ and ▶ as operators in ANSI-C.
+Preprocess::Ops - Preprocess ◁, ◀, ▷ and ▶ as operators in ANSI-C.
 
 =head1 Synopsis
 
@@ -607,10 +608,10 @@ explicitly mentioned function B<data_$Node>.
 
 =head1 Description
 
-Preprocess ◁,  ▷ and ▶ as operators in ANSI-C.
+Preprocess ◁, ◀, ▷ and ▶ as operators in ANSI-C.
 
 
-Version 202009027.
+Version 202009030.
 
 
 The following sections describe the methods in each functional area of this
@@ -620,7 +621,7 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 =head1 Preprocess
 
-Preprocess ◁, ▷ and ▶ as operators.
+Preprocess ◁, ◀, ▷ and ▶ as operators in ANSI-C.
 
 =head2 printData($lineNumber, $line)
 
@@ -645,58 +646,58 @@ B<Example:>
 
     my $d = temporaryFolder;
     my $I   =     fpd($d, qw(includes));
-
+  
     my $sbc = owf(fpe($d, qw(source base c)), <<'END');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   exports aaa new$Node key_$Node
-
+  
   typedef struct $Node                                                            // Node definition
    {char * key;                                                                   // Key
    } $Node;
-
+  
   static char * key_$Node                                                         // Get the key for a node
    (const $Node n)                                                                // Node
    {return n.key;
    }
   duplicate s/key/data/
-
+  
   static void dump_$Node                                                          // Dump a node
    (const $Node n)
    {printf("%s", n ▷ key);
    }
-
+  
   $Node n = new$Node(key: "a");                                                   //TnewNode
   assert(!strcmp(n ▷ key, "a"));
         n ▷ dump;                                                                 //Tdump
   END
-
-
+  
+  
     my $sdc = owf(fpe($d, qw(source derived c)), <<'END');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   typedef struct $Node                                                            // Node definition
    {wchar * key;
    } $Node;
-
-
+  
+  
   include base.c :aaa dump_$Node  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   END
-
-
+  
+  
     my $bc = fpe($I, qw(base c));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $bh = fpe($I, qw(base h));
-
+  
     my $dc = fpe($I, qw(derived c));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $dh = fpe($I, qw(derived h));
-
-
+  
+  
     my $r = c($sbc, $bc, $bh);                                                    # Preprocess base.c  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
   # owf($logFile, readCFile($bc)); exit;
-
+  
     is_deeply readCFile($bc), <<'END';                                            # Generated base.c  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   typedef struct BaseNode                                                            // Node definition
@@ -718,7 +719,7 @@ B<Example:>
   assert(!strcmp(n.proto->key(n), "a"));
         n.proto->dump(n);                                                                 //Tdump
   END
-
+  
   # owf($logFile, readCFile($bh)); exit;
     is_deeply readCFile($bh), <<END;                                              # Generated base.h
   static char * key_BaseNode
@@ -741,8 +742,8 @@ B<Example:>
   {data_BaseNode, key_BaseNode};
   BaseNode newBaseNode(BaseNode allocator) {return allocator;}
   END
-
-
+  
+  
     my $R = c($sdc, $dc, $dh);                                                    # Preprocess derived.c  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   # owf($logFile, readCFile($dc)); exit;
@@ -759,7 +760,7 @@ B<Example:>
    {printf("%s", n.proto->key(n));
    }
   END
-
+  
   # owf($logFile, readCFile($dh)); exit;
     is_deeply readCFile($dh), <<'END';
   static char * key_DerivedNode
@@ -776,7 +777,7 @@ B<Example:>
   {key_DerivedNode};
   DerivedNode newDerivedNode(DerivedNode allocator) {return allocator;}
   END
-
+  
   # owf($logFile, dump(unbless $r)); exit;
     is_deeply $r,
   {
@@ -813,7 +814,7 @@ B<Example:>
     testsFound          => { dump => 1, newNode => 1 },
     testsNeeded         => { data => 1, key => 1 },
   };
-
+  
   #  owf($logFile, dump(unbless $R)); exit;
      is_deeply $R,
   {
@@ -843,9 +844,9 @@ B<Example:>
     testsNeeded         => {},
   };
     clearFolder($d, 10);
-
+  
     my $d = temporaryFolder;
-
+  
     my $c = owf(fpe($d, qw(source c)), <<'END');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   #include <assert.h>
@@ -857,18 +858,18 @@ B<Example:>
     ✓ a[0] == 'a';
    }
   END
-
+  
     my $h = fpe($d, qw(source  h));
-
+  
     my $g = fpe($d, qw(derived c));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my $o = fpe($d, qw(out     txt));
-
-
+  
+  
     my $r = c($c, $g, $h);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   # qx(gcc $g; ./a.out 2>$o);
-
+  
   # owf($logFile, readFile($g));
     is_deeply [nws readCFile($g)], [nws <<'END'];
   #include <assert.h>
@@ -882,9 +883,9 @@ B<Example:>
     assert( a[0] == 'a');
    }
   END
-
+  
     clearFolder($d, 10);
-
+  
 
 
 =head2 PreprocessOpsMap Definition

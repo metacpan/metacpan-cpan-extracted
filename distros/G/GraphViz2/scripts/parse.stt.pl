@@ -13,7 +13,11 @@ use GraphViz2::Parse::STT;
 
 use Log::Handler;
 
-use File::Slurp; # For read_file().
+sub read_file {
+  open my $fh, '<:encoding(UTF-8)', $_[0] or die "$_[0]: $!";
+  local $/;
+  <$fh>;
+}
 
 # ------------------------------------------------
 

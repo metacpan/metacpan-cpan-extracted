@@ -1,33 +1,35 @@
-# $Id: 00-load.t 1763 2020-02-02 21:48:03Z willem $
+#!/usr/bin/perl
+# $Id: 00-load.t 1809 2020-10-02 12:42:17Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More tests => 4;
 
 my @module = qw(
-	Net::DNS::SEC
-	Net::DNS::SEC::DSA
-	Net::DNS::SEC::ECDSA
-	Net::DNS::SEC::ECCGOST
-	Net::DNS::SEC::EdDSA
-	Net::DNS::SEC::RSA
-	Net::DNS::SEC::Digest
-	Net::DNS::SEC::Keyset
-	Net::DNS::SEC::Private
-	Net::DNS::SEC::libcrypto
-	File::Find
-	File::Spec
-	IO::File
-	MIME::Base64
-	Net::DNS
-	Test::More
-	);
+		Net::DNS::SEC
+		Net::DNS::SEC::DSA
+		Net::DNS::SEC::ECDSA
+		Net::DNS::SEC::ECCGOST
+		Net::DNS::SEC::EdDSA
+		Net::DNS::SEC::RSA
+		Net::DNS::SEC::Digest
+		Net::DNS::SEC::Keyset
+		Net::DNS::SEC::Private
+		Net::DNS::SEC::libcrypto
+		File::Find
+		File::Spec
+		IO::File
+		MIME::Base64
+		Net::DNS
+		Test::More
+		);
 
 
 my @diag = "\nThese tests were run using:";
 foreach my $module ( sort @module ) {
-	eval "use $module";
-	for ( grep $_, eval { $module->VERSION } ) {
+	eval "require $module";		## no critic
+	for ( eval { $module->VERSION || () } ) {
 		s/^(\d+\.\d)$/${1}0/;
 		push @diag, sprintf "%-25s  %s", $module, $_;
 	}
@@ -42,16 +44,16 @@ use_ok('Net::DNS::SEC');
 
 
 my @index;
-foreach my $class ( map "Net::DNS::SEC::$_", qw(RSA DSA ECCGOST ECDSA EdDSA) ) {
-	my @algorithms = eval join '', qw(r e q u i r e), " $class; $class->_index";
-	push @index, map( ( $_ => $class ), @algorithms );
+foreach my $class ( map {"Net::DNS::SEC::$_"} qw(RSA DSA ECCGOST ECDSA EdDSA) ) {
+	my @algorithms = eval join '', qw(r e q u i r e), " $class; $class->_index";	## no critic
+	push @index, map { $_ => $class } @algorithms;
 }
 ok( scalar(@index), 'create consolidated algorithm index' );
 
 
 eval {
 	# Exercise checkerr() response to failed OpenSSL operation
-	Net::DNS::SEC::libcrypto::checkerr(0)
+	Net::DNS::SEC::libcrypto::checkerr(0);
 };
 my ($exception) = split /\n/, "$@\n";
 ok( $exception, "XS libcrypto error\t[$exception]" );

@@ -1,12 +1,12 @@
 #
-# $Id: Makefile.PL 1787 2020-06-18 07:39:28Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1809 2020-10-02 12:42:17Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 use Config;
 use ExtUtils::MakeMaker;
-use constant MM => eval $ExtUtils::MakeMaker::VERSION;
+my $MM = $ExtUtils::MakeMaker::VERSION;
 
 
 # See perldoc ExtUtils::MakeMaker for details of how to influence
@@ -18,22 +18,26 @@ my %metadata = (
 	NAME		 => 'Net::DNS::SEC',
 	VERSION_FROM	 => 'lib/Net/DNS/SEC.pm',
 	ABSTRACT_FROM	 => 'lib/Net/DNS/SEC.pm',
-	AUTHOR		 => MM < 6.58 ? "$author[0] et al" : [@author],
+	AUTHOR		 => $MM < 6.58 ? "$author[0] et al" : [@author],
 	LICENSE		 => 'mit',
 	MIN_PERL_VERSION => 5.006,
-	);
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.66,
+		},
+	TEST_REQUIRES => {
+		'File::Find'	=> 1.05,
+		'File::Spec'	=> 0.86,
+		'Test::More'	=> 0.47,
+		} );
 
 
 my %prerequisite = (
 	'Carp'	       => 1.10,
 	'DynaLoader'   => 1.04,
 	'Exporter'     => 5.56,
-	'File::Find'   => 1.05,
 	'File::Spec'   => 0.86,
-	'IO::File'     => 1.08,
 	'MIME::Base64' => 2.13,
 	'Net::DNS'     => 1.08,
-	'Test::More'   => 0.47,
 	);
 
 
@@ -63,7 +67,6 @@ if ( my $dir = $ENV{OPENSSL_PREFIX} ) {
 $inc = $ENV{OPENSSL_INCLUDE} if $ENV{OPENSSL_INCLUDE};
 $lib = $ENV{OPENSSL_LIB}     if $ENV{OPENSSL_LIB};
 
-
 WriteMakefile(
 	%metadata,
 	PREREQ_PM  => {%prerequisite},
@@ -79,7 +82,7 @@ package MY;				## customise generated Makefile
 sub test {
 	return shift->SUPER::test() if $^O =~ /cygwin|MSWin/i;
 
-	join '', shift->SUPER::test(), <<'END';
+	return join '', shift->SUPER::test(), <<'END';
 # suppress parallel test execution
 FULLPERLRUN = HARNESS_OPTIONS=c $(FULLPERL)
 END
@@ -105,21 +108,20 @@ sub install {
 		s|([/])[/]+|$1|g;				# remove gratuitous //s
 	}
 
-	eval 'require Net::DNS::SEC; $Net::DNS::SEC::VERSION =~ s/(\.\d)$/${1}0/';
-	my @version = grep $_, ( 'version', $Net::DNS::SEC::VERSION );
+	my @version = ( 'version', eval { require Net::DNS::SEC; $Net::DNS::SEC::VERSION; } );
 
 	my $nameregex = '\W+Net\W+DNS\W+SEC.pm$';
-	my @installed = grep $_ && m/$nameregex/io, values %INC;
+	my @installed = grep { $_ && m/$nameregex/io } values %INC;
 	my %occluded;
 
 	foreach (@installed) {
-		my $path = $1 if m/^(.+)$nameregex/i;
+		my $path = m/^(.+)$nameregex/io ? $1 : '';
 		my %seen;
 		foreach (@INC) {
 			$seen{$_}++;				# find $path in @INC
 			last if $_ eq $path;
 		}
-		foreach ( grep !$seen{$_}, @INC ) {
+		foreach ( grep { !$seen{$_} } @INC ) {
 			$occluded{$_}++;			# suppress install
 		}
 	}
@@ -133,11 +135,11 @@ sub install {
 ##	from the existing @version in your perl library at
 ##	@installed
 ##
-##	The installation will be rendered ineffective because the
-##	old version will be found on the library search path before
+##	The installation would be rendered ineffective because the
+##	installed version occurs in the library search path before
 ##	$install_site
 ##
-##	Makefile has been generated to support build and test only.
+##	The generated Makefile supports build and test only.
 ##
 AMEN
 	my $echo = '	$(NOECHO) $(ECHO) "##"';
@@ -155,8 +157,8 @@ END
 
 
 sub postamble {
-	my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
-	return <<"PlanB" unless `gcov -v 2>$nul`;
+	my $devnull = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
+	return <<"PlanB" unless `gcov -v 2>$devnull`;
 test_cover :
 	cover -delete
 	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) test

@@ -1,5 +1,23 @@
 Change log for Container::Buildah
 
+0.3.1 2020-10-01T18:05:43-07:00 America/Los_Angeles
+ [DOCS]
+ - rearrange bind9 example into a subdirectory
+ - add hello world example
+
+0.3.0 2020-10-01T15:23:03-07:00 America/Los_Angeles
+ [DOCS]
+ - small expansion of POD docs
+
+ [MINOR]
+ - don't force --add-history on every image layer, allow it to be set by a
+   global option from main()
+
+ [REVISION]
+ - add tests for kernel compatibility with containers (Linux 2.8 or above)
+ - t/014_buildah.t and t/100_hello.t report kernel compatibility as a
+   reason to skip all tests
+
 0.2.1 2020-09-25T03:25:35-07:00 America/Los_Angeles
  [BUG FIXES]
  - CPAN testers feedback: back off Perl version requirement from 5.26 to

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Preprocess â· and â¶ as method dispatch operators in ANSI-C.",
+   "abstract" : "Preprocess â, â, â· and â¶ as operators in ANSI-C.",
    "author" : [
       "philiprbrenan@gmail.com"
    ],
@@ -32,7 +32,7 @@
    "provides" : {
       "Preprocess::Ops" : {
          "file" : "lib/Preprocess/Ops.pm",
-         "version" : "202009028"
+         "version" : "202009030"
       }
    },
    "release_status" : "stable",
@@ -41,6 +41,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "202009028",
+   "version" : "202009030",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -2,8 +2,8 @@ NAME
     App::PowerManagementUtils - CLI utilities related to power management
 
 VERSION
-    This document describes version 0.004 of App::PowerManagementUtils (from
-    Perl distribution App-PowerManagementUtils), released on 2019-09-15.
+    This document describes version 0.005 of App::PowerManagementUtils (from
+    Perl distribution App-PowerManagementUtils), released on 2020-09-25.
 
 DESCRIPTION
     This distribution contains the following CLI utilities related to
@@ -33,6 +33,10 @@ FUNCTIONS
     instruct Proc::Govern to disable system from sleeping. To stop
     preventing sleep, you can press Ctrl-C.
 
+    Note that sleep prevention survives reboot, so if this script is
+    terminated prematurely before it can unprevent sleep again, you'll need
+    to invoke unprevent-sleep to restore normal sleep.
+
     This function is not exported.
 
     No arguments.
@@ -60,6 +64,10 @@ FUNCTIONS
     command. For more options when running command, e.g. timeout, load
     control, autorestart, screensaver control, use the module or its CLI
     govproc directly.
+
+    Note that sleep prevention survives reboot, so if this script is
+    terminated prematurely before it can unprevent sleep again, you'll need
+    to invoke unprevent-sleep to restore normal sleep.
 
     This function is not exported.
 
@@ -98,7 +106,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

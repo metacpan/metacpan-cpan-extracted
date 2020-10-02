@@ -1,7 +1,7 @@
 package Software::Catalog;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '1.0.6'; # VERSION
+our $DATE = '2020-10-02'; # DATE
+our $VERSION = '1.0.7'; # VERSION
 
 1;
 # ABSTRACT: Software catalog
@@ -18,7 +18,7 @@ Software::Catalog - Software catalog
 
 =head1 VERSION
 
-This document describes version 1.0.6 of Software::Catalog (from Perl distribution Software-Catalog), released on 2019-10-26.
+This document describes version 1.0.7 of Software::Catalog (from Perl distribution Software-Catalog), released on 2020-10-02.
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

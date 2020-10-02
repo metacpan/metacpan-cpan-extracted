@@ -39,6 +39,7 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Run" => 0,
     "Modern::Perl" => 0,
+    "POSIX" => 0,
     "Readonly" => 0,
     "Template" => 0,
     "YAML::XS" => 0,
@@ -53,7 +54,7 @@ my %WriteMakefileArgs = (
     "Test::RequiresInternet" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.2.1",
+  "VERSION" => "0.3.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,6 +80,7 @@ my %FallbackPrereqs = (
   "IPC::Run" => 0,
   "Modern::Perl" => 0,
   "Module::Build" => "0.28",
+  "POSIX" => 0,
   "Readonly" => 0,
   "Template" => 0,
   "Test::More" => 0,

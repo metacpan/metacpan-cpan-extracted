@@ -14,7 +14,11 @@ build_requires:
 configure_requires:
   Alien::Build: '1.19'
   Alien::Build::MM: '0.32'
+  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '6.52'
+  File::Copy::Recursive: '0'
+  File::Which: '0'
+  Path::Tiny: '0'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -25,7 +29,7 @@ name: Alien-Plotly-Orca
 provides:
   Alien::Plotly::Orca:
     file: lib/Alien/Plotly/Orca.pm
-    version: '0.0001'
+    version: '0.0002'
 requires:
   Alien::Base: '0'
   parent: '0'
@@ -34,14 +38,17 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/stphnlyd/perl5-Alien-Plotly-Orca.git
-version: '0.0001'
+version: '0.0002'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.26'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.29'
   requires:
     share:
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      Net::SSLeay: '1.49'
       URI: '0'
-      URI::Escape: '0'
-      URI::file: '0'
     system: {}
+x_contributors:
+  - 'Thibault Duponchelle <thibault.duponchelle@amadeus.com>'
 x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

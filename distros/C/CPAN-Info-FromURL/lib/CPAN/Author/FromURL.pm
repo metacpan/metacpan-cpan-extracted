@@ -1,7 +1,7 @@
 package CPAN::Author::FromURL;
 
-our $DATE = '2018-12-30'; # DATE
-our $VERSION = '0.090'; # VERSION
+our $DATE = '2020-10-02'; # DATE
+our $VERSION = '0.091'; # VERSION
 
 use 5.010001;
 use strict;
@@ -71,7 +71,7 @@ CPAN::Author::FromURL - Extract CPAN author from a URL
 
 =head1 VERSION
 
-This document describes version 0.090 of CPAN::Author::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2018-12-30.
+This document describes version 0.091 of CPAN::Author::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2020-10-02.
 
 =head1 FUNCTIONS
 
@@ -88,11 +88,11 @@ Examples:
 
 =over
 
-=item * Example #1 (mcpan/pod/MOD):
+=item * Example #1 (mcpanE<sol>podE<sol>MOD):
 
  extract_cpan_author_from_url("https://metacpan.org/pod/Foo::Bar"); # -> undef
 
-=item * Example #2 (mcpan/pod/release/AUTHOR/DIST-VERSION/lib/MOD.pm):
+=item * Example #2 (mcpanE<sol>podE<sol>releaseE<sol>AUTHORE<sol>DIST-VERSIONE<sol>libE<sol>MOD.pm):
 
  extract_cpan_author_from_url("http://metacpan.org/pod/release/SRI/Mojolicious-6.46/lib/Mojo.pm"); # -> "SRI"
 
@@ -109,6 +109,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$url>* => I<str>
+
 
 =back
 
@@ -146,7 +147,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -306,7 +306,18 @@ sub request_identical_ok {
         read_files => 1,
     );
 
-    my @reconstructed_commandline = ('--verbose', map {"$_"} $r[0]->as_curl(curl => undef));
+    my @reconstructed_commandline = ('--verbose', '--silent', map {"$_"} $r[0]->as_curl(curl => undef));
+
+    for( @reconstructed_commandline ) {
+        # fudge --data-* into --data if version is below (whatever)
+        # 7.43: --data-raw
+        # 7.18: --data-urlencode
+        # 7.2:  --data-binary
+        if( $_ eq '--data-raw' ) {
+            $_ = '--data'
+                if $cmp_version < 7043000;
+        };
+    };
 
     my @reparse;
     my $lived = eval {

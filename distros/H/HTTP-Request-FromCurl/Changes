@@ -1,3 +1,11 @@
+0.19 2020-10-02
+    * No functionality changes, no need to upgrade
+    * Fix Filter::signatures usage for Perl versions below 5.20
+    * Force "--silent" in tests for curl versions that insist on a progress meter
+      ( RT #133454 )
+    * Replace --data-raw by --data in tests if the Curl version doesn't support
+      --data-raw (RT #133455)
+
 0.18 2020-09-30
     * Add support for --data-raw, --data-ascii, --data-binary, --data-urlencode
     * --data now strips newlines and linefeeds, as does curl

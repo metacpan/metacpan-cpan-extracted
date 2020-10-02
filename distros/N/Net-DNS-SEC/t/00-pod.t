@@ -1,16 +1,16 @@
-# $Id: 00-pod.t 1613 2018-01-15 13:47:13Z willem $
+#!/usr/bin/perl
+# $Id: 00-pod.t 1808 2020-09-28 22:08:11Z willem $	-*-perl-*-
 #
 
 use strict;
+use warnings;
 use Test::More;
 
-my %prerequisite = (
-		'Test::Pod' => 1.45
-		);
+my %prerequisite = ( 'Test::Pod' => 1.45 );
 
 foreach my $package ( sort keys %prerequisite ) {
-	my @revision = grep $_, $prerequisite{$package};
-	next if eval "use $package @revision; 1;";
+	my @revision = grep {$_} $prerequisite{$package};
+	next if eval "use $package @revision; 1;";		## no critic
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
