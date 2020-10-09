@@ -1,9 +1,10 @@
 package OpenTracing::WrapScope;
-our $VERSION = 'v0.106.5';
+our $VERSION = 'v0.106.6';
 use strict;
 use warnings;
 use warnings::register;
 use B::Hooks::OP::Check::LeaveEval;
+use Caller::Hide qw/hide_package/;
 use Carp qw/croak/;
 use List::Util qw/uniq/;
 use OpenTracing::GlobalTracer;
@@ -11,24 +12,7 @@ use PerlX::Maybe;
 use Scalar::Util qw/blessed/;
 use Sub::Info qw/sub_info/;
 
-{  # transparent caller, stolen from Hook::LexWrap
-no warnings 'redefine';
-*CORE::GLOBAL::caller = sub (;$) {
-    my ($height) = ($_[0]||0);
-    my $i=1;
-    my $name_cache;
-    while (1) {
-        my @caller = CORE::caller() eq 'DB'
-            ? do { package DB; CORE::caller($i++) }
-            : CORE::caller($i++);
-        return if not @caller;
-        $caller[3] = $name_cache if $name_cache;
-        $name_cache = $caller[0] eq __PACKAGE__ ? $caller[3] : '';
-        next if $name_cache || $height-- != 0;
-        return wantarray ? @_ ? @caller : @caller[0..2] : $caller[0];
-    }
-};
-}
+hide_package(__PACKAGE__);
 
 my %subs_to_install;    # sub => warn about undetected subs toggle
 END {

@@ -67623,3 +67623,4 @@ S/SY/SYBER/XS-libpanda-1.4.8.tar.gz
 S/SY/SYBER/XS-libunievent-1.0.0.tar.gz
 S/SY/SYBER/XS-libuv-1.35.0.3.tar.gz
 T/TI/TINITA/YAML-Tidy-0.003.tar.gz
+S/SN/SNEZ/OpenTracing-AutoScope-v0.106.6.tar.gz

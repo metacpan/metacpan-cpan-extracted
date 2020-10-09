@@ -22,6 +22,7 @@ no_index:
     - inc
 requires:
   B::Hooks::OP::Check::LeaveEval: v0.0.3
+  Caller::Hide: '0'
   List::MoreUtils: '0'
   OpenTracing::GlobalTracer: '0'
   OpenTracing::Implementation::NoOp: '0'
@@ -31,5 +32,5 @@ requires:
   Scope::Context: '0'
   Sub::Info: '0'
   YAML::XS: '0'
-version: v0.106.5
+version: v0.106.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

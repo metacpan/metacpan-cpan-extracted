@@ -1,6 +1,14 @@
 CHANGE LOG
 ==========
 
+2020-10-08 - v0.106.6
+---------------------
+
+### Changed
+  - WrapScope now uses Caller::Hide to hide from stack traces
+
+
+
 2020-09-07 - v0.106.5
 ---------------------
 

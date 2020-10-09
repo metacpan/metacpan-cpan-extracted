@@ -1,4 +1,5 @@
 requires            'B::Hooks::OP::Check::LeaveEval', 'v0.0.3';
+requires            'Caller::Hide';
 requires            'List::MoreUtils';
 requires            'OpenTracing::GlobalTracer';
 requires            'OpenTracing::Implementation::NoOp';
