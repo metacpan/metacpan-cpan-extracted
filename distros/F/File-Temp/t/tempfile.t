@@ -105,8 +105,15 @@ push(@files, File::Spec->rel2abs($tempfile));
 			    DIR => $tempdir,
 			   );
 
-ok( (-f $tempfile && -r _ && -w _),
-    "Created tempfile with default permissions" );
+# From perlport on chmod:
+#
+#     (Win32) Only good for changing "owner" read-write access;
+#     "group" and "other" bits are meaningless.
+#
+# So we don't check the full permissions -- it will be 0444 on Win32
+# instead of 0400.  Instead, just check the owner bits.
+
+is((stat($tempfile))[2] & 00700, 0600, 'created tempfile with default permissions');
 push(@files, File::Spec->rel2abs($tempfile));
 
 # Test tempfile
@@ -116,15 +123,7 @@ push(@files, File::Spec->rel2abs($tempfile));
 			    PERMS => 0400,
 			   );
 
-# From perlport on chmod:
-#
-#     (Win32) Only good for changing "owner" read-write access;
-#     "group" and "other" bits are meaningless.
-#
-# So don't check actual file permissions -- it will be 0444 on Win32
-# instead of 0400.  Instead, just check that no longer writable.
-ok( (-f $tempfile && -r _ && ! -w _),
-    "Created tempfile with changed permissions" );
+is((stat($tempfile))[2] & 00700, 0400, 'created tempfile with changed permissions');
 push(@files, File::Spec->rel2abs($tempfile));
 
 print "# TEMPFILE: Created $tempfile\n";

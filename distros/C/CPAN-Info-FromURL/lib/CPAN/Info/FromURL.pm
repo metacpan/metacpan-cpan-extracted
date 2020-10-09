@@ -3,7 +3,7 @@ package CPAN::Info::FromURL;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-10-02'; # DATE
 our $DIST = 'CPAN-Info-FromURL'; # DIST
-our $VERSION = '0.091'; # VERSION
+our $VERSION = '0.092'; # VERSION
 
 use 5.010001;
 use strict;
@@ -211,8 +211,19 @@ _
         },
         {
             name => "github (git)",
-            args => {url=>'https://github.com/perlancar/perl-CPAN-Info-FromURL'},
+            args => {url=>'git@github.com:perlancar/perl-CPAN-Info-FromURL.git'},
             result => {site=>'github', github_user=>"perlancar", github_repo=>"perl-CPAN-Info-FromURL", dist=>'CPAN-Info-FromURL'},
+        },
+        {
+            name => "github (git)",
+            args => {url=>'git://github.com/perlancar/perl-CPAN-Info-FromURL'},
+            result => {site=>'github', github_user=>"perlancar", github_repo=>"perl-CPAN-Info-FromURL", dist=>'CPAN-Info-FromURL'},
+        },
+
+        {
+            name => "gitlab (https, .git)",
+            args => {url=>'https://gitlab.com/perlancar/perl-CPAN-Info-FromURL.git'},
+            result => {site=>'gitlab', github_user=>"perlancar", github_repo=>"perl-CPAN-Info-FromURL", dist=>'CPAN-Info-FromURL'},
         },
 
         {
@@ -359,12 +370,12 @@ sub extract_cpan_info_from_url {
             $res->{module} = $mod;
         }
 
-    } elsif ($url =~ m!\A(?:$re_proto_http|\w+\@)?github\.com[:/]([A-Za-z0-9_-]+)/([A-Za-z0-9_-]+)(\.git|\z|/)!i) {
-        $res->{site} = 'github';
-        $res->{github_user} = $1;
-        $res->{github_repo} = $2;
+    } elsif ($url =~ m!\A(?:$re_proto_http|\w+\@|git://)?(gitlab|github)\.com[:/]([A-Za-z0-9_-]+)/([A-Za-z0-9_-]+)(\.git|\z|/)!i) {
+        $res->{site} = $1;
+        $res->{github_user} = $2;
+        $res->{github_repo} = $3;
         require CPAN::Dist::FromRepoName;
-        my $dist = CPAN::Dist::FromRepoName::extract_cpan_dist_from_repo_name($2);
+        my $dist = CPAN::Dist::FromRepoName::extract_cpan_dist_from_repo_name($3);
         $res->{dist} = $dist if defined $dist;
     } elsif ($url =~ m!/authors/id/(\w)/\1(\w)/(\1\2\w+)
                        (?:/
@@ -398,7 +409,7 @@ CPAN::Info::FromURL - Extract/guess information from a URL
 
 =head1 VERSION
 
-This document describes version 0.091 of CPAN::Info::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2020-10-02.
+This document describes version 0.092 of CPAN::Info::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2020-10-02.
 
 =head1 FUNCTIONS
 
@@ -667,7 +678,7 @@ Result:
 
 =item * Example #30 (github (git)):
 
- extract_cpan_info_from_url("https://github.com/perlancar/perl-CPAN-Info-FromURL");
+ extract_cpan_info_from_url("git\@github.com:perlancar/perl-CPAN-Info-FromURL.git");
 
 Result:
 
@@ -678,7 +689,33 @@ Result:
    site => "github",
  }
 
-=item * Example #31 (unknown):
+=item * Example #31 (github (git)):
+
+ extract_cpan_info_from_url("git://github.com/perlancar/perl-CPAN-Info-FromURL");
+
+Result:
+
+ {
+   dist => "CPAN-Info-FromURL",
+   github_repo => "perl-CPAN-Info-FromURL",
+   github_user => "perlancar",
+   site => "github",
+ }
+
+=item * Example #32 (gitlab (https, .git)):
+
+ extract_cpan_info_from_url("https://gitlab.com/perlancar/perl-CPAN-Info-FromURL.git");
+
+Result:
+
+ {
+   dist => "CPAN-Info-FromURL",
+   github_repo => "perl-CPAN-Info-FromURL",
+   github_user => "perlancar",
+   site => "gitlab",
+ }
+
+=item * Example #33 (unknown):
 
  extract_cpan_info_from_url("https://www.google.com/"); # -> undef
 

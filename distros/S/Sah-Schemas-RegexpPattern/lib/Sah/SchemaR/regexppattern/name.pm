@@ -1,9 +1,9 @@
 package Sah::SchemaR::regexppattern::name;
 
-our $DATE = '2020-01-03'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-05-27'; # DATE
+our $VERSION = '0.002'; # VERSION
 
-our $rschema = ["str",[{match=>qr(\A\w+((::|/|\.)\w+)+\z),summary=>"Name of pattern, with module prefix but without the 'Regexp::Pattern'","x.completion"=>["regexppattern_name"],"x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}],["str"]];
+our $rschema = ["str",[{examples=>[{valid=>0,value=>""},{valid=>0,value=>"Float"},{valid=>1,value=>"Float::float"},{valid=>1,validated_value=>"Float::float",value=>"Float/float"},{valid=>0,value=>"foo bar"}],match=>qr(\A\w+((::|/|\.)\w+)+\z),summary=>"Name of pattern, with module prefix but without the 'Regexp::Pattern'","x.completion"=>["regexppattern_name"],"x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]}],["str"]];
 
 1;
 # ABSTRACT: Name of pattern, with module prefix but without the 'Regexp::Pattern'
@@ -20,7 +20,7 @@ Sah::SchemaR::regexppattern::name - Name of pattern, with module prefix but with
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::regexppattern::name (from Perl distribution Sah-Schemas-RegexpPattern), released on 2020-01-03.
+This document describes version 0.002 of Sah::SchemaR::regexppattern::name (from Perl distribution Sah-Schemas-RegexpPattern), released on 2020-05-27.
 
 =head1 DESCRIPTION
 

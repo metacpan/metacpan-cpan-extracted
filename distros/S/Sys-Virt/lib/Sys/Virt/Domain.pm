@@ -1163,6 +1163,15 @@ certificate does not match the destination hostname and the
 expected cetificate's hostname is known, this parameter can be
 used to pass this expected hostname when starting the migration.
 
+=item C<Sys::Virt::Domain::MIGRATE_PARAM_DISKS_URI>
+
+The URI to use for initializing the domain migration for storage. It takes
+a hypervisor specific format. The uri_transports element of the hypervisor
+capabilities XML includes details of the supported URI schemes. When
+omitted libvirt will auto-generate suitable default URI. It is typically
+only necessary to specify this URI if the destination host has multiple
+interfaces and a specific interface is required to transmit storage data.
+
 =back
 
 =item $ddom = $dom->migrate(destcon, flags=0, dname=undef, uri=undef, bandwidth=0)

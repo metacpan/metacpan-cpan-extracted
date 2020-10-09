@@ -16,8 +16,9 @@ use Metabolomics::Banks qw( :all ) ;
 use Metabolomics::Banks::BloodExposome qw( :all ) ;
 use Metabolomics::Banks::MaConDa qw( :all ) ;
 use Metabolomics::Banks::AbInitioFragments qw( :all ) ;
+use Metabolomics::Banks::Knapsack qw( :all ) ;
 
-use Test::More tests => 20 ;
+use Test::More tests => 21 ;
 use Data::Dumper ;
 
 
@@ -766,6 +767,22 @@ BEGIN {
 		$modulePath.'/in_test02_pos__BLOODEXP_ANNOTATED__.TSV'),
 		$modulePath.'/in_test02_pos__BLOODEXP_ANNOTATED__.TSV',
 		'Method \'fullCompare_ExpPeakList_And_TheoBloodExposomeBank_FromDataAnalysis\' works with a bank and tabular template');
+		
+		
+#########################	
+
+	print "\n** Test $current_test fullCompare_ExpPeakList_And_TheoKnapSackBank_FromDataAnalysis **\n" ; $current_test++;
+	is_deeply( fullCompare_ExpPeakList_And_TheoKnapSackBank_FromDataAnalysis_TEST(
+		# my ($expFile, $col, $delta, $source, $ionMode, $template, $tabular)
+		$modulePath.'/in_test02_pos.tabular',
+		2, 
+		5,
+		$modulePath.'/Knapsack__dump.csv',
+		'POSITIVE',
+		$modulePath.'/_template.tabular',
+		$modulePath.'/in_test02_pos__KNAPSACK_ANNOTATED__.TSV'),
+		$modulePath.'/in_test02_pos__KNAPSACK_ANNOTATED__.TSV',
+		'Method \'fullCompare_ExpPeakList_And_TheoKnapSackBank_FromDataAnalysis\' works with a bank and tabular template');
 
 ## #################################################################################################################################
 ##
@@ -929,6 +946,38 @@ BEGIN {
 #		print Dumper $oAnalysis ;
 		
 #		my $tabularfile = $oAnalysis->writeFullTabularWithPeakBankObject($expFile, $template, $tabular) ;
+		my $tabularfile = $oAnalysis->writeTabularWithPeakBankObject($template, $tabular) ;
+		
+		return($tabularfile) ;		
+	}
+	
+##
+#########################	######################### 	KNAPSACK TESTS SUB	 #########################  ####################
+##
+
+	## sub fullCompareExpPeakListAndTheoFragmentBankFromDataAnalysis
+	sub fullCompare_ExpPeakList_And_TheoKnapSackBank_FromDataAnalysis_TEST {
+		# get values
+		my ($expFile, $col, $delta, $source, $IonMode, $template, $tabular) = @_ ;
+				
+		my $oBank = Metabolomics::Banks::Knapsack->new() ;
+#		print Dumper $oBank ;
+
+	    $oBank->getKSMetabolitesFromSource($source) ;
+#	    print Dumper $oBank ;
+
+	    my $nb = $oBank->buildTheoPeakBankFromKnapsack($IonMode) ;
+	    print Dumper $oBank ;
+
+		$oBank->parsingMsFragments($expFile, 'asheader', $col) ; # get mz in colunm 2
+#		print Dumper $oBank ;
+
+		my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;
+#		print Dumper $oAnalysis ;
+
+		$oAnalysis->compareExpMzToTheoMzList('PPM', $delta) ;		
+#		print Dumper $oAnalysis ;
+		
 		my $tabularfile = $oAnalysis->writeTabularWithPeakBankObject($template, $tabular) ;
 		
 		return($tabularfile) ;		

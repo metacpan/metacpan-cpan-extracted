@@ -38,8 +38,12 @@ t/scripts/04/podBeforeEND.pl
 t/scripts/05/here01.pl
 t/scripts/05/here02.pl
 t/scripts/05/here03.pl
-t/scripts/06/if01.pl
-t/scripts/06/if02.pl
-t/scripts/06/if03.pl
+t/scripts/06/00_if.pl
+t/scripts/06/01_if.pl
+t/scripts/06/02_if.pl
+t/scripts/06/03_unless.pl
+t/scripts/06/04_unless.pl
+t/scripts/06/05_unless.pl
+t/scripts/06/06_mixed.pl
 META.yml
 MANIFEST

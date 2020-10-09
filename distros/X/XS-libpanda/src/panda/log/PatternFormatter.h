@@ -31,10 +31,10 @@ namespace panda { namespace log {
 extern string_view default_format;
 
 struct PatternFormatter : IFormatter {
-    PatternFormatter (string_view fmt) : _fmt(fmt) {}
+    PatternFormatter (string_view fmt) : _fmt(string(fmt)) {}
     string format (std::string&, const Info&) const override;
 private:
-    string_view _fmt;
+    string _fmt;
 };
 
 void set_format (string_view pattern);

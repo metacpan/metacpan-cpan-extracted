@@ -1,3 +1,9 @@
+0.603   2020-09-27  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to remove [PERLANCAR::Authority] instead of
+	  [Authority] in bundles that want to remove [Authority] plugin.
+
+
 0.602   2020-08-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Add plugin: PERLANCAR::CheckPendingRelease.

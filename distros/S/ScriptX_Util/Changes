@@ -1,3 +1,8 @@
+0.004   2020-10-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq to Module::Patch 0.276 (RT#133462).
+
+
 0.003   2020-10-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Add missing prereq to ScriptX (RT#133456).

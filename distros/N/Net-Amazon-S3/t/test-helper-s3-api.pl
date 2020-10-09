@@ -14,12 +14,12 @@ use Net::Amazon::S3::Constants;
 use Net::Amazon::S3::ACL::Canned;
 
 use Shared::Examples::Net::Amazon::S3::Client (
-    qw[ fixture ],
-    qw[ with_response_fixture ],
+	qw[ fixture ],
+	qw[ with_response_fixture ],
 );
 
 use Shared::Examples::Net::Amazon::S3 (
-    qw[ s3_api_with_signature_2 ],
+	qw[ s3_api_with_signature_2 ],
 );
 
 sub expect_error {

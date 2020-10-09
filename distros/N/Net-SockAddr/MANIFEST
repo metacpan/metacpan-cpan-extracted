@@ -4,25 +4,28 @@ lib/Net/SockAddr.pod
 lib/Net/SockAddr/Inet4.pod
 lib/Net/SockAddr/Inet6.pod
 lib/Net/SockAddr/Unix.pod
+libnet-sockaddr/CMakeLists.txt
+libnet-sockaddr/src/panda/net/pton.impl
+libnet-sockaddr/src/panda/net/sockaddr.cc
+libnet-sockaddr/src/panda/net/sockaddr.h
+libnet-sockaddr/tests/base.cc
+libnet-sockaddr/tests/inet4.cc
+libnet-sockaddr/tests/inet6.cc
+libnet-sockaddr/tests/lib/test.cc
+libnet-sockaddr/tests/lib/test.h
+libnet-sockaddr/tests/main.cc
+libnet-sockaddr/tests/unix.cc
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 SockAddr.xs
-src/panda/net/pton.impl
-src/panda/net/sockaddr.cc
-src/panda/net/sockaddr.h
 src/xs/net/sockaddr.cc
 src/xs/net/sockaddr.h
-t/base.cc
 t/base.t
 t/constants.t
-t/inet4.cc
 t/inet4.t
-t/inet6.cc
 t/inet6.t
 t/lib/MyTest.pm
-t/lib/test.cc
-t/lib/test.h
-t/unix.cc
 t/unix.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

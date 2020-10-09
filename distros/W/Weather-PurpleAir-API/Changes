@@ -1,3 +1,7 @@
+0.07 - 2020-10-05
+  * Fixed broken link in documentation (thanks, Dave Smith)
+  * Fixed bin/aqi documentation
+
 0.06 - 2020-09-25
   * Fixed bin/aqi documentation (thanks, Grinnz)
   * Fixed lib/Weather/PurpleAir/API.pm documentation (=E<gt> to => in code-quoted section)

@@ -15,7 +15,7 @@ use Text::CSV_XS qw/csv/;
 use YAML::XS qw//;
 
 use 5.006;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our $validate;
 BEGIN {
@@ -244,7 +244,7 @@ Feed::Data - dynamic data feeds
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS 
 

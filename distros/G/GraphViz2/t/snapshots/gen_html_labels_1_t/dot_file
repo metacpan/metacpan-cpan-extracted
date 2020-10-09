@@ -1,0 +1,17 @@
+'digraph Perl {
+ graph [ label="HTML label demo # 1 - Using \\< ... \\>" rankdir="TB" ]
+ node [ shape="oval" ]
+ edge [ color="grey" ]
+ node [ shape="circle" style="filled" ]
+ edge [ arrowsize="4" color="grey" ]
+ "Carnegie" [ shape="circle" ]
+ "Carnegie" [ color="red" shape="circle" ]
+ node [ shape="circle" style="rounded" ]
+ "Murrumbeena" [ color="green" label=<Murrumbeena<br/><font color="#0000ff">Victoria</font><br/>Australia> shape="doublecircle" ]
+ "Oakleigh" [ color="blue" label="<port1> West Oakleigh|<port2> East Oakleigh" shape="record" ]
+ "Murrumbeena" -> "Carnegie" [ arrowsize="2" label=<Bike<br/>Train<br/>Stroll> ]
+ edge [ arrowsize="1" color="grey" ]
+ "Murrumbeena" -> "Oakleigh":port1 [ color="brown" label=<Meander<br/>Promenade<br/>Saunter> ]
+ "Murrumbeena" -> "Oakleigh":port2 [ color="green" label=<Drive<br/>Run<br/>Sprint> ]
+}
+'

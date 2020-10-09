@@ -1,2 +1,5 @@
+2.50 2020-10-04
+- fix test to not need File::Slurp
+
 2.49 2020-09-27
 - split out from GraphViz2 2.48

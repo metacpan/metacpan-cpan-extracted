@@ -1,0 +1,24 @@
+'digraph Perl {
+ graph [ label="Named and unnamed subgraphs" rankdir="TB" ]
+ node [ shape="oval" ]
+ edge [ color="grey" ]
+
+ subgraph {
+  graph [ label="Subgraph One" rankdir="TB" ]
+  node [ color="magenta" shape="diamond" ]
+  edge [ color="grey" ]
+  "Chadstone" [ shape="hexagon" ]
+  "Waverley" [ color="orange" ]
+  "Chadstone" -> "Waverley"
+ }
+
+ subgraph {
+  graph [ label="" rankdir="TB" ]
+  node [ color="blue3" shape="diamond" ]
+  edge [ color="grey" ]
+  "Glen Waverley" [ shape="pentagon" ]
+  "Mount Waverley" [ color="darkslategrey" shape="rectangle" ]
+  "Glen Waverley" -> "Mount Waverley"
+ }
+}
+'

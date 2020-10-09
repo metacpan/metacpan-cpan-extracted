@@ -1,12 +1,12 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Delimiter;
 # ABSTRACT: delimiter query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Delimiter::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::Query::Param::Delimiter::VERSION = '0.97';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
-    param => 'delimiter',
-    constraint => 'Maybe[Str]',
-    required => 0,
+	param => 'delimiter',
+	constraint => 'Maybe[Str]',
+	required => 0,
 };
 
 1;
@@ -23,7 +23,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Delimiter - delimiter query param 
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@ NAME
     CPAN::Info::FromURL - Extract/guess information from a URL
 
 VERSION
-    This document describes version 0.091 of CPAN::Info::FromURL (from Perl
+    This document describes version 0.092 of CPAN::Info::FromURL (from Perl
     distribution CPAN-Info-FromURL), released on 2020-10-02.
 
 FUNCTIONS
@@ -267,7 +267,7 @@ FUNCTIONS
 
     *   Example #30 (github (git)):
 
-         extract_cpan_info_from_url("https://github.com/perlancar/perl-CPAN-Info-FromURL");
+         extract_cpan_info_from_url("git\@github.com:perlancar/perl-CPAN-Info-FromURL.git");
 
         Result:
 
@@ -278,7 +278,33 @@ FUNCTIONS
            site => "github",
          }
 
-    *   Example #31 (unknown):
+    *   Example #31 (github (git)):
+
+         extract_cpan_info_from_url("git://github.com/perlancar/perl-CPAN-Info-FromURL");
+
+        Result:
+
+         {
+           dist => "CPAN-Info-FromURL",
+           github_repo => "perl-CPAN-Info-FromURL",
+           github_user => "perlancar",
+           site => "github",
+         }
+
+    *   Example #32 (gitlab (https, .git)):
+
+         extract_cpan_info_from_url("https://gitlab.com/perlancar/perl-CPAN-Info-FromURL.git");
+
+        Result:
+
+         {
+           dist => "CPAN-Info-FromURL",
+           github_repo => "perl-CPAN-Info-FromURL",
+           github_user => "perlancar",
+           site => "gitlab",
+         }
+
+    *   Example #33 (unknown):
 
          extract_cpan_info_from_url("https://www.google.com/"); # -> undef
 

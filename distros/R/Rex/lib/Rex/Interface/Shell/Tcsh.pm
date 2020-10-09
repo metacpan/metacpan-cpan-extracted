@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Rex::Interface::Shell::Csh;
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 use base qw(Rex::Interface::Shell::Csh);
 

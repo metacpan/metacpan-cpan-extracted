@@ -1,3 +1,6 @@
+1.5       2020-10-06 00:54:06Z
+* Added cookie jar capability to non-server usage (Torsten Raudssus)
+
 1.4      2015-01-06
 
 * Re-assign copyright to chromatic.

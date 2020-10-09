@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Signature::V4Implementation;
 # ABSTRACT: Implements the Amazon Web Services signature version 4, AWS4-HMAC-SHA256 (copy of Net::Amazon::Signature::V4)
-$Net::Amazon::S3::Signature::V4Implementation::VERSION = '0.94';
+$Net::Amazon::S3::Signature::V4Implementation::VERSION = '0.97';
 
 use strict;
 use warnings;
@@ -51,9 +51,9 @@ sub sign {
 
 
 sub sign_uri {
-	my ( $self, $uri, $expires_in ) = @_;
+	my ( $self, $uri, $expires_in, $for_method ) = @_;
 
-	my $request = $self->_augment_uri( $uri, $expires_in );
+	my $request = $self->_augment_uri( $uri, $expires_in, $for_method );
 
 	my $signature = $self->_signature( $request );
 
@@ -99,9 +99,9 @@ sub _augment_request {
 # Append mandatory uri parameters
 
 sub _augment_uri {
-	my ($self, $uri, $expires_in) = @_;
+	my ($self, $uri, $expires_in, $method) = @_;
 
-	my $request = HTTP::Request->new( GET => $uri );
+	my $request = HTTP::Request->new( $method || GET => $uri );
 
 	$request->uri->query_param( $X_AMZ_DATE => $self->_format_amz_date( $self->_now ) )
 		unless $request->uri->query_param( $X_AMZ_DATE );
@@ -140,7 +140,11 @@ sub _canonical_request {
 
 	# Ensure Host header is present as its required
 	if (!$req->header('host')) {
-		$req->header('Host' => $req->uri->host);
+		my $host = $req->uri->_port
+			? $req->uri->host_port
+			: $req->uri->host
+		;
+		$req->header('Host' => $host);
 	}
 	my $creq_payload_hash = $req->header($X_AMZ_CONTENT_SHA256)
 		# Signed uri doesn't have content
@@ -309,7 +313,7 @@ Net::Amazon::S3::Signature::V4Implementation - Implements the Amazon Web Service
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 
@@ -329,13 +333,15 @@ Maintained by Dan Book, C<< <dbook at cpan.org> >>
 
 Signs a request with your credentials by appending the Authorization header. $request should be an HTTP::Request. The signed request is returned.
 
-=head2 sign_uri( $uri, $expires_in? )
+=head2 sign_uri( $uri, $expires_in?, $for_method? )
 
 Signs an uri with your credentials by appending the Authorization query parameters.
 
 C<< $expires_in >> integer value in range 1..604800 (1 second .. 7 days).
 
 C<< $expires_in >> default value is its maximum: 604800
+
+C<< $for_method >> HTTP method this uri should be signed for, default C<GET>
 
 The signed uri is returned.
 

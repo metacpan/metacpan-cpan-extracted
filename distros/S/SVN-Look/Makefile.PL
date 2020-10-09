@@ -28,17 +28,17 @@ if ($@) {
     exit 0;
 }
 
-use ExtUtils::MakeMaker 6.30;
+use ExtUtils::MakeMaker ;
 
 my %WriteMakefileArgs = (
-      'ABSTRACT' => 'A caching wrapper around the svnlook command.',
+      'ABSTRACT' => 'Caching wrapper around the svnlook command',
   'AUTHOR' => 'Gustavo L. de M. Chaves <gnustavo@cpan.org>',
   'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.30'
+    'ExtUtils::MakeMaker' => '0'
   },
   'DISTNAME' => 'SVN-Look',
   'LICENSE' => 'perl',
-  'MIN_PERL_VERSION' => '5.008_000',
+  'MIN_PERL_VERSION' => '5.008',
   'NAME' => 'SVN::Look',
   'PREREQ_PM' => {
     'Carp' => '0',
@@ -58,7 +58,7 @@ my %WriteMakefileArgs = (
     'URI::file' => '0',
     'lib' => '0'
   },
-  'VERSION' => '0.41',
+  'VERSION' => '0.42',
   'test' => {
     'TESTS' => 't/*.t'
   },

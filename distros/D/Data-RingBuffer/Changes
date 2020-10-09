@@ -1,0 +1,8 @@
+Revision history for Data-RingBuffer
+
+0.02    09.10.2020
+        * Improved tests, implemented die_overflow parameter.
+
+0.01    08.10.2020
+        * First version, released on an unsuspecting world.
+

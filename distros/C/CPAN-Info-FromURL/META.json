@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-CPAN-Info-FromURL"
       }
    },
-   "version" : "0.091",
+   "version" : "0.092",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

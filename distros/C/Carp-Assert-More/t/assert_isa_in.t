@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 13;
+use Test::More tests => 20;
 use Carp::Assert::More;
 
 use Test::Exception;
@@ -28,9 +28,7 @@ lives_ok { assert_isa_in( bless({}, 'y'), [ 'x' ] ) } 'Matches base class';
 dies_ok  { assert_isa_in( bless({}, 'x'), [ 'y' ] ) } 'Parent does not match child';
 
 
-subtest assert_isa_in => sub {
-    plan tests => 8;
-
+ASSERT_ISA_IN: {
     package a;
     sub foo {}
     package main;

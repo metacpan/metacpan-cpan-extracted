@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 97;
+use Test::Most tests => 98;
 use Test::Carp;
 use Test::Deep;
 use Test::Number::Delta;
@@ -24,7 +24,7 @@ MAXMIND: {
 			diag('This may take some time and consume a lot of memory if the database is not SQLite');
 
 			if($ENV{'TEST_VERBOSE'}) {
-				Geo::Coder::Free::DB::init(logger => new_ok('MyLogger'));
+				Geo::Coder::Free::DB::init(logger => MyLogger->new());
 			}
 
 			my $geo_coder = new_ok('Geo::Coder::Free::MaxMind');
@@ -174,7 +174,7 @@ MAXMIND: {
 
 			@locations = $geo_coder->geocode('Sheppey, Kent, England');
 			ok(scalar(@locations) > 1);
-			diag(scalar(@locations));
+			# diag(scalar(@locations));
 
 			$location = $geo_coder->geocode('Nebraska, USA');
 			ok(defined($location));
@@ -185,7 +185,22 @@ MAXMIND: {
 			# Check a second lookup still works
 			check($geo_coder, 'Westoe, South Tyneside, England', 54.98, -1.42);
 
-			like($geo_coder->reverse_geocode(latlng => '51.50,-0.13'), qr/London/i, 'test reverse');
+			# like($geo_coder->reverse_geocode(latlng => '51.50,-0.13'), qr/London/i, 'test reverse');
+			@locations = $geo_coder->reverse_geocode(latlng => '51.50,-0.13');
+			ok(scalar(@locations) > 1);
+			my $found = 0;
+			foreach my $location(@locations) {
+				if($location =~ /London,/i) {
+					$found = 1;
+					last;
+				}
+			}
+
+			if(!$found) {
+				diag("Failed reverse lookup $location");
+				diag(Data::Dumper->new([\@locations])->Dump());
+			}
+			ok($found);
 
 			does_croak(sub {
 				$location = $geo_coder->geocode();
@@ -206,7 +221,7 @@ MAXMIND: {
 			}
 		} else {
 			diag('Author tests not required for installation');
-			skip('Author tests not required for installation', 96);
+			skip('Author tests not required for installation', 97);
 		}
 	}
 }

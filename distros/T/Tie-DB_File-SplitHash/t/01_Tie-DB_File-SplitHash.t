@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 
 use lib ('./blib','../blib', './lib','../lib');
 
@@ -9,6 +10,12 @@ use Tie::DB_File::SplitHash;
 
 #########################
 # change 'tests => 9' to 'tests => last_test_to_print';
+
+use English;
+use File::Spec;
+use File::Path qw( rmtree );
+
+my $windows = ($OSNAME eq 'MSWin32') ? 1 : 0;
 
 eval {
     require File::Temp;
@@ -39,19 +46,19 @@ my $TESTDIR = tempdir(CLEANUP => 1);
 
 #########
 # Test 1
-ok (test_tie());
+ok (test_tie(), "test_tie() returned true value");
 
 #########
 # Test 2
-ok (test_tied_hash());
+ok (test_tied_hash(), "test_tied_hash() returned true value");
 
 #########
 # Test 3
-ok (test_obj_hash());
+ok (test_obj_hash(), "test_obj_hash() returned true value");
 
 #########
 # Test 4
-ok (test_permissions());
+ok (test_permissions(), "test_permissions() returned true value");
 
 exit;
 
@@ -68,7 +75,7 @@ sub test_directory {
 sub test_permissions {
  
     {
-        my $filename = tempdir( DIR => test_directory(), CLEANUP => 1 );
+        my $filename = tempdir( CLEANUP => 1 );
         my $multi_n = 4;
         my $flags   = &O_RDWR() | &O_CREAT();
         my $mode    = 0666;
@@ -87,15 +94,21 @@ sub test_permissions {
         }
     }
 
-    {
-        my $filename = tempdir( DIR => test_directory(), CLEANUP => 1 );
+    my $seed = 0;
+    if (not $windows) {
+        my $tdir = File::Spec->catdir(
+            File::Spec->tmpdir(),
+            $$ . sprintf("%02s" => ++$seed),
+        );
+        mkdir($tdir, 0700) || return "could not create tmpdir $tdir";
         my $multi_n = 4;
         my $flags   = &O_RDWR() | &O_CREAT();
         my $mode    = 0666;
         my %hash;
     
+        my $extra_dir;
         my $result = eval {
-            my $extra_dir = File::Spec->catdir($filename,'extra');
+            $extra_dir = File::Spec->catdir($tdir,'extra');
             mkdir($extra_dir, 0000) || return "could not create scratch directory $extra_dir: $!";
             my $final_dir = File::Spec->catdir($extra_dir,'subdir');
             my $db = tie %hash, 'Tie::DB_File::SplitHash', $final_dir, $flags, $mode, $DB_HASH, $multi_n;
@@ -108,17 +121,25 @@ sub test_permissions {
             diag("did not detect failure to tie database due to directory permissions");
             return 0;
         }
+        chmod 0700, $extra_dir;
+        File::Path::rmtree($tdir, 0, 1);
+        (! -d $tdir) or warn "Directory $tdir not removed";
     }
 
-    {
-        my $filename = tempdir( DIR => test_directory(), CLEANUP => 1 );
+    if (not $windows) {
+        my $tdir = File::Spec->catdir(
+            File::Spec->tmpdir(),
+            $$ . sprintf("%02s" => ++$seed),
+        );
+        mkdir($tdir, 0700) || return "could not create tmpdir $tdir";
         my $multi_n = 4;
         my $flags   = &O_RDWR() | &O_CREAT();
         my $mode    = 0666;
         my %hash;
     
+        my $extra_dir;
         my $result = eval {
-            my $extra_dir = File::Spec->catdir($filename,'extra');
+            $extra_dir = File::Spec->catdir($tdir,'extra');
             unless (mkdir($extra_dir, 0000)) {
                 diag("failed to make test directory $extra_dir");
                 die;
@@ -133,10 +154,13 @@ sub test_permissions {
             diag("did not detect failure to tie database in forbidden directory");
             return 0;
         }
+        chmod 0700, $extra_dir;
+        File::Path::rmtree($tdir, 0, 1);
+        (! -d $tdir) or warn "Directory $tdir not removed";
     }
 
     {
-        my $filename = tempdir( DIR => test_directory(), CLEANUP => 1 );
+        my $filename = tempdir( CLEANUP => 1 );
         my $multi_n = 4;
         my $flags   = &O_RDWR() | &O_CREAT();
         my $mode    = 0666;
@@ -153,7 +177,7 @@ sub test_permissions {
     }
 
     {
-        my $filename = tempdir( DIR => test_directory(), CLEANUP => 1 );
+        my $filename = tempdir( CLEANUP => 1 );
         my $multi_n = 4;
         my $flags   = &O_RDWR() | &O_CREAT();
         my $mode    = 0666;
@@ -350,7 +374,7 @@ sub test_obj_hash {
             diag("delete on non-existent key returned unexpected value");
             return 0;
         }
-        unless ($obj->fd) {
+        if (not ($windows or $obj->fd)) { 
             diag("'fd' failed to return file descriptor");
             return 0;
         }

@@ -56,8 +56,7 @@ set of Perl modules. It also generates the DateTime::TimeZone::Catalog
 module, which contains a list of all the available time zone names.
 
 By default, it looks for files named africa, antarctica, asia, australasia,
-europe, northamerica, pacificnew, southamerica, and backward. All other files
-are ignored.
+europe, northamerica, southamerica, and backward. All other files are ignored.
 
 It takes the following arguments:
 
@@ -97,12 +96,18 @@ if ( $opts{file} ) {
     @files = $opts{file};
 }
 else {
-    @files = qw( africa antarctica asia australasia
-        europe northamerica pacificnew
-        southamerica backward
+    @files = qw(
+        africa
+        antarctica
+        asia
+        australasia
+        europe
+        northamerica
+        southamerica
+        backward
     );
 
-    push @files, qw( etcetera systemv )
+    push @files, qw( etcetera )
         if $opts{old};
 }
 

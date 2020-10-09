@@ -7,9 +7,9 @@ using namespace panda::log;
 struct PerlSubLogger : ILogger {
     Sub f;
     PerlSubLogger (const Sub& f) : f(f) {}
-    void log (const string& msg, const Info&) override {
+    void log (const string& msg, const Info& info) override {
         if (!is_perl_thread()) throw std::logic_error("can't call pure-perl logging callback: log() called from perl-foreign thread");
-        f.call(xs::out(msg));
+        f.call(xs::out(msg), xs::out(info.level));
     }
 };
 

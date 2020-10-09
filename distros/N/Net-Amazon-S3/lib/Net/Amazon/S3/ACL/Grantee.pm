@@ -1,6 +1,6 @@
 package Net::Amazon::S3::ACL::Grantee;
 # ABSTRACT: Base class for misc ACL grantee representations
-$Net::Amazon::S3::ACL::Grantee::VERSION = '0.94';
+$Net::Amazon::S3::ACL::Grantee::VERSION = '0.97';
 use Moose;
 
 1;
@@ -17,7 +17,7 @@ Net::Amazon::S3::ACL::Grantee - Base class for misc ACL grantee representations
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

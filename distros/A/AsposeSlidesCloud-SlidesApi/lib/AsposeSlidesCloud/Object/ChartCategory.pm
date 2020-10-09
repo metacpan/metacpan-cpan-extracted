@@ -37,7 +37,6 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
-use AsposeSlidesCloud::Object::ChartCategory;
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::LineFormat;
@@ -168,10 +167,17 @@ __PACKAGE__->class_documentation({description => 'Represents chart category reso
 }                                 );
 
 __PACKAGE__->method_documentation({
-    'categories' => {
-    	datatype => 'ARRAY[ChartCategory]',
-    	base_name => 'Categories',
-    	description => 'Gets or sets the categories for chart data',
+    'parent_categories' => {
+    	datatype => 'ARRAY[string]',
+    	base_name => 'ParentCategories',
+    	description => 'Gets or sets the parent categories. Used with Sunburst &amp;amp; treemap categories; ignored for other chart types.',
+    	format => '',
+    	read_only => '',
+    		},
+    'level' => {
+    	datatype => 'int',
+    	base_name => 'Level',
+    	description => 'Gets or sets the grouping level for the category. Used with Sunburst &amp;amp; treemap categories; ignored for other chart types.',
     	format => '',
     	read_only => '',
     		},
@@ -213,7 +219,8 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
-    'categories' => 'ARRAY[ChartCategory]',
+    'parent_categories' => 'ARRAY[string]',
+    'level' => 'int',
     'value' => 'string',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
@@ -222,7 +229,8 @@ __PACKAGE__->swagger_types( {
 } );
 
 __PACKAGE__->attribute_map( {
-    'categories' => 'Categories',
+    'parent_categories' => 'ParentCategories',
+    'level' => 'Level',
     'value' => 'Value',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',

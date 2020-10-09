@@ -1,5 +1,15 @@
 Revision history for Perl extension Spreadsheet::ReadSXC.
 
+0.32  2020-10-06
+    * Eliminate a warning when reading a numeric format without a defined
+      number of digits, reported by Tux
+
+0.31  2020-10-03
+    * No code changes, no need to upgrade
+    * Change code to work around an ambiguity in Perl to placate Filter::signatures
+      / Filter::Simple. "-s _" could also be parsed as "-(s _foo_bar_g)"
+      by Filter::Simple.
+
 0.30  2020-10-02
     * No code changes, no need to upgrade
     * Remove "use XML::Parser;" line, which was not used anymore in the code.

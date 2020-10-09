@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008001"
+            "perl" : "5.012005"
          }
       },
       "test" : {
@@ -54,7 +54,11 @@
    "provides" : {
       "usw" : {
          "file" : "lib/usw.pm",
-         "version" : "0.01"
+         "version" : "0.11"
+      },
+      "usww" : {
+         "file" : "lib/usww.pm",
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -68,7 +72,7 @@
          "web" : "https://github.com/worthmine/usw"
       }
    },
-   "version" : "0.01",
+   "version" : "0.11",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "worthmine <worthmine@gmail.com>"

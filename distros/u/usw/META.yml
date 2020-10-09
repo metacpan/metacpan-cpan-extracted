@@ -26,14 +26,17 @@ no_index:
 provides:
   usw:
     file: lib/usw.pm
-    version: '0.01'
+    version: '0.11'
+  usww:
+    file: lib/usww.pm
+    version: '0.11'
 requires:
-  perl: '5.008001'
+  perl: '5.012005'
 resources:
   bugtracker: https://github.com/worthmine/usw/issues
   homepage: https://github.com/worthmine/usw
   repository: git://github.com/worthmine/usw.git
-version: '0.01'
+version: '0.11'
 x_authority: cpan:WORTHMINE
 x_contributors:
   - 'worthmine <worthmine@gmail.com>'

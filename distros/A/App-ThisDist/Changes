@@ -1,3 +1,16 @@
+0.005   2020-10-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [internal] Move logic to this_dist() function in App::ThisDist
+	  for reusability.
+
+
+0.004   2020-10-03  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak/expand docs.
+
+
 0.003   2020-10-02  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::Deep      v0.111 qw[ !cmp_deeply !bool ];
+use Test::Deep      v0.111 qw[ !cmp_deeply !bool !code ];
 use Test::More      import => [qw[ !ok !is !is_deeply ]];
 use Test::Warnings  qw[ :no_end_test had_no_warnings ];
 
@@ -70,6 +70,18 @@ sub bool {
 	return $param if $param->$Safe::Isa::_isa ('Test::Deep::Cmp');
 
 	return Test::Deep::bool ($param);
+}
+
+sub code (&) {
+	goto \& Test::Deep::code;
+}
+
+sub expect_coderef {
+	return code {
+		return Ref::Util::is_plain_coderef ($_[0])
+			? (1)
+			: (0, "Expect CODEREF")
+	};
 }
 
 1;

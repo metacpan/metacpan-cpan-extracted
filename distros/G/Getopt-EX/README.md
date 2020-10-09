@@ -5,7 +5,7 @@ Getopt::EX - Getopt Extender
 
 # VERSION
 
-Version v1.19.1
+Version v1.20.0
 
 # DESCRIPTION
 
@@ -232,7 +232,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright (C) 2015-2020 Kazumasa Utashiro
+Copyright 2015-2020 Kazumasa Utashiro
 
 # LICENSE
 

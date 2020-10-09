@@ -5,7 +5,7 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader
-our $VERSION = '0.3.1'; # VERSION
+our $VERSION = '0.3.2'; # VERSION
 
 1;
 
@@ -70,7 +70,7 @@ and C<class> are 0.
 
 Bonds, or edges of a molecular graph, rely completely on
 L<Graph::Undirected|Graph::Undirected> internal representation. Bond
-orders other than sinlge (C<->, which is also a default) are represented
+orders other than single (C<->, which is also a default) are represented
 as values of edge attribute C<bond>. They correspond to the symbols used
 in OpenSMILES specification.
 

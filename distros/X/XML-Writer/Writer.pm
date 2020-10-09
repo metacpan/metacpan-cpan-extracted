@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Carp;
 use IO::Handle;
-$VERSION = "0.625";
+$VERSION = "0.900";
 
 use overload '""' => \&_overload_string;
 
@@ -266,8 +266,9 @@ sub new {
   my $SAFE_startTag = sub {
     my $name = $_[0];
 
+    _croakUnlessValidName($name);
     &{$checkUnencodedRepertoire}($name);
-    _checkAttributes(\@_);
+    _checkAttributes(\@_, $checkUnencodedRepertoire);
 
     if ($seen{ELEMENT} && $elementLevel == 0) {
       croak("Attempt to insert start tag after close of document element");
@@ -301,8 +302,9 @@ sub new {
   my $SAFE_emptyTag = sub {
     my $name = $_[0];
 
+    _croakUnlessValidName($name);
     &{$checkUnencodedRepertoire}($name);
-    _checkAttributes(\@_);
+    _checkAttributes(\@_, $checkUnencodedRepertoire);
 
     if ($seen{ELEMENT} && $elementLevel == 0) {
       croak("Attempt to insert empty tag after close of document element");
@@ -470,9 +472,13 @@ sub new {
   $self->{'SETOUTPUT'} = sub {
     my $newOutput = $_[0];
 
-    if (defined($newOutput) && !ref($newOutput) && 'self' eq $newOutput ) {
-      $newOutput = \$selfcontained_output;
-      $use_selfcontained_output = 1;
+    if (defined($newOutput) && !ref($newOutput)) {
+      if ('self' eq $newOutput ) {
+        $newOutput = \$selfcontained_output;
+        $use_selfcontained_output = 1;
+      } else {
+        die "Output must be a handle, a reference or 'self'";
+      }
     }
 
     if (ref($newOutput) eq 'SCALAR') {
@@ -776,6 +782,8 @@ sub to_string {
 sub _checkAttributes {
   my %anames;
   my $i = 1;
+  my $checkUnencodedRepertoire = $_[1];
+
   while ($_[0]->[$i]) {
     my $name = $_[0]->[$i];
     $i += 1;
@@ -784,6 +792,8 @@ sub _checkAttributes {
     } else {
       $anames{$name} = 1;
     }
+    _croakUnlessValidName($name);
+    &{$checkUnencodedRepertoire}($name);
     _croakUnlessDefinedCharacters($_[0]->[$i]);
     $i += 1;
   }
@@ -819,6 +829,30 @@ sub _croakUnlessDefinedCharacters($) {
   if ($_[0] =~ /([\x00-\x08\x0B-\x0C\x0E-\x1F])/) {
     croak(sprintf('Code point \u%04X is not a valid character in XML', ord($1)));
   }
+}
+
+# Ensure element and attribute names are non-empty, contain no whitespace and are
+#  otherwise valid XML names
+sub _croakUnlessValidName($) {
+  if ($_[0] eq '') {
+    croak('Empty identifiers are not permitted in this part of an XML document');
+  }
+  if ($_[0] =~ /\s/) {
+    croak('Space characters are not permitted in this part of an XML identifier');
+  }
+
+  # From REC-xml-20081126
+  #  [4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
+  #  [4a]   	NameChar	   ::=   	NameStartChar | "-" | "." | [0-9] | #xB7 | [#x0300-#x036F] | [#x203F-#x2040]
+  #  [5]   	Name	   ::=   	NameStartChar (NameChar)*
+
+  if ($_[0] !~ /^[:A-Z_a-z\x{C0}-\x{D6}\x{D8}-\x{F6}\x{F8}-\x{2FF}\x{370}-\x{37D}\x{37F}-\x{1FFF}\x{200C}-\x{200D}\x{2070}-\x{218F}\x{2C00}-\x{2FEF}\x{3001}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFFD}\x{10000}\x{EFFFF}][-.0-9\x{B7}\x{0300}-\x{036F}\x{203F}-\x{2040}:A-Z_a-z\x{C0}-\x{D6}\x{D8}-\x{F6}\x{F8}-\x{2FF}\x{370}-\x{37D}\x{37F}-\x{1FFF}\x{200C}-\x{200D}\x{2070}-\x{218F}\x{2C00}-\x{2FEF}\x{3001}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFFD}\x{10000}\x{EFFFF}]*$/) {
+    croak('Not a valid XML name: '.$_[0]);
+  }
+
+	  #	  ":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
+
+	  #	  | "-" | "." | [0-9] | #xB7 | [#x0300-#x036F] | [#x203F-#x2040]
 }
 
 sub _overload_string {
@@ -914,9 +948,11 @@ sub new {
       $clashMap{$p} = $u;
     }
 
-    while (!defined($prefix) || ($clashMap{$prefix} && $clashMap{$prefix} ne $uri)) {
-      $prefix = "__NS$prefixCounter";
-      $prefixCounter++;
+    if (!defined($prefix)) {
+      do {
+        $prefix = "__NS$prefixCounter";
+        $prefixCounter++;
+      } while ($clashMap{$prefix});
     }
 
     return $prefix;

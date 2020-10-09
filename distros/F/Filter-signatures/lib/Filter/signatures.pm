@@ -2,7 +2,7 @@ package Filter::signatures;
 use strict;
 use Filter::Simple;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 NAME
 
@@ -44,8 +44,14 @@ as default values may work by accident. Commas within default values happen
 to work due to the design of L<Filter::Simple>, which removes them for
 the application of this filter.
 
+=head2 Syntax peculiarities
+
 Note that this module inherits all the bugs of L<Filter::Simple> and potentially
-adds some of its own. Most notable is that Filter::Simple sometimes will
+adds some of its own.
+
+=head3 Slashes
+
+Most notable is that Filter::Simple sometimes will
 misinterpret the division operator C<< / >> as a leading character to starting
 a regex match:
 
@@ -61,7 +67,29 @@ A better hotfix is to upgrade to Perl 5.20 or higher and use the native
 signatures support there. No other code change is needed, as this module will
 disable its functionality when it is run on a Perl supporting signatures.
 
-=head2 Parentheses in default expresisons
+=head3 Size operator interpreted as replacement
+
+Filter::Simple sometimes will
+misinterpret the file size operator on the default filehandle C<< -s _ >>
+as the start of a replacement
+
+    my $filesize = -s _;
+
+# Misinterpreted as
+
+    my $filesize = -(s _;..._g);
+
+This will manifest itself through syntax errors appearing where everything
+seems in order. The hotfix is to indicate that C<<_>> is a filehandle by
+prefixing it with C<<*>>:
+
+    my $filesize = -s *_;
+
+A better hotfix is to upgrade to Perl 5.20 or higher and use the native
+signatures support there. No other code change is needed, as this module will
+disable its functionality when it is run on a Perl supporting signatures.
+
+=head2 Parentheses in default expressisons
 
 Ancient versions of Perl before version 5.10 do not have recursive regular
 expressions. These will not be able to properly handle statements such
@@ -258,27 +286,35 @@ if( $] >= 5.010 ) {
 sub transform_arguments {
     # We also want to handle arbitrarily deeply nested balanced parentheses here
         no warnings 'uninitialized';
-
-        s{\bsub(\s*)       #1
-           (\w*)           #2
-           (\s*)           #3
-           \(
+        # If you are staring at this, somewhere in your source code, you have
+        # $/ and you want to make sure there is a second slash on the same line,
+        # like `local $/; # / for Filter::signatures`
+        # Or "-s _" , this also trips up Filter::Simple. Replace by "-s *_"
+        #my $msg = $_;
+        #$msg =~ s!([\x00-\x09\x0b-\x1F])!sprintf "\\%03o", ord $1!ge;
+        #print "$msg\n---\n";
+        #use Regexp::Debugger;
+        s{(?<sub>\bsub\b)  #1
+           (?>(\s*))       #2
+           (?>(\b\w+\b|))  #3
            (\s*)           #4
-           (               #5
-                (          #6
+           \(
+           (\s*)           #5
+           (               #6
+                (          #7
                    (?:
                      \\.            # regex escapes and references
                      |
-                     (?>".{4}")     # strings (that are placeholders)
+                     (?>".{5}")     # strings (that are placeholders)
                      |
                      (?>"[^"]+")    # strings (that are not placeholders, mainly for the test suite)
                      |
                      \(
-                         (?6)?      # recurse for parentheses
+                         (?7)?      # recurse for parentheses
                      \)
                      |
                      \{
-                         (?6)?      # recurse for curly brackets
+                         (?7)?      # recurse for curly brackets
                      \}
                      |
                      (?>[^\\\(\)\{\}"]+) # other stuff
@@ -288,7 +324,7 @@ sub transform_arguments {
            )
            (\s*)\)
            (\s*)\{}{
-                parse_argument_list("$2","$5","$1$3$4$8$9")
+                parse_argument_list("$3","$6","$2$4$5$9$10")
          }mgex;
         $_
 }

@@ -8,7 +8,8 @@ use HTTP::Status;
 use Shared::Examples::Net::Amazon::S3::Fixture;
 
 Shared::Examples::Net::Amazon::S3::Fixture::error_fixture
-    BucketAlreadyExists => HTTP::Status::HTTP_CONFLICT;
+	BucketAlreadyExists => HTTP::Status::HTTP_CONFLICT,
+	;
 
 __END__
 
@@ -22,7 +23,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::error::bucket_already_exists - Share
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

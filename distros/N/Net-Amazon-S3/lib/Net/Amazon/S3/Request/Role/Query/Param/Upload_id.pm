@@ -1,13 +1,13 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Upload_id;
 # ABSTRACT: upload_id query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Upload_id::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::Query::Param::Upload_id::VERSION = '0.97';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
-    param => 'upload_id',
-    query_param => 'uploadId',
-    constraint => 'Str',
-    required => 1,
+	param => 'upload_id',
+	query_param => 'uploadId',
+	constraint => 'Str',
+	required => 1,
 };
 
 1;
@@ -24,7 +24,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Upload_id - upload_id query param 
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

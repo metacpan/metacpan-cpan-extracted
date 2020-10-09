@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Upload::Parts::Request;
 # ABSTRACT: List the parts in a multipart upload.
-$Net::Amazon::S3::Operation::Object::Upload::Parts::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Upload::Parts::Request::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request::Object';
@@ -9,14 +9,14 @@ with 'Net::Amazon::S3::Request::Role::Query::Param::Upload_id';
 with 'Net::Amazon::S3::Request::Role::HTTP::Method::GET';
 
 has 'headers' =>
-    ( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
+	( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
 
 __PACKAGE__->meta->make_immutable;
 
 sub _request_headers {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    return %{ $self->headers };
+	return %{ $self->headers };
 }
 
 1;
@@ -33,7 +33,7 @@ Net::Amazon::S3::Operation::Object::Upload::Parts::Request - List the parts in a
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

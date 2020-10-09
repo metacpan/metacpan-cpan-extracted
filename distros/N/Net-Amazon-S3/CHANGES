@@ -1,5 +1,15 @@
 Revision history for Perl module Net::Amazon::S3:
 
+0.97 2020-10-09
+	- presigned object access uri supports also PUT/DELETE methods (#89)
+
+0.96 2020-10-07
+	- Signature V4 didn't work properly for services on non-standard port (issue #88)
+
+0.95 2020-10-06
+	- bugfix release, with new test coverage
+	- small cleanups
+
 0.94 2020-09-27
 	- fix undefined method call in still untested methods (thanks Russell Jenkins)
 

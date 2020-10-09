@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Buckets::List;
 # ABSTRACT: Internal class for service operation ListBuckets
-$Net::Amazon::S3::Operation::Buckets::List::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Buckets::List::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Buckets::List - Internal class for service operation
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 Implements operation L<< ListBuckets|https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListBuckets.html >>
 

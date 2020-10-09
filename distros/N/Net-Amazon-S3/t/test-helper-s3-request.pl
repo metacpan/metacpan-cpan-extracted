@@ -9,11 +9,11 @@ use lib $FindBin::Bin;
 BEGIN { require 'test-helper-common.pl' }
 
 use Shared::Examples::Net::Amazon::S3 (
-    qw[ fixture ],
+	qw[ fixture ],
 );
 
 use Shared::Examples::Net::Amazon::S3::Request (
-    qw[ behaves_like_net_amazon_s3_request ],
+	qw[ behaves_like_net_amazon_s3_request ],
 );
 
 1;

@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Preprocess::Ops;
-our $VERSION = 202009030;
+our $VERSION = 202010080;
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -193,6 +193,7 @@ sub c($$$;$)                                                                    
   my %testsNeeded;                                                              # Tests needed
   my @forwards;                                                                 # Forward declarations of functions used as methods
   my @code = readFile($inputFile);                                              # Read code
+  my %exports;                                                                  # Export statements encountered
 
   for my $i(keys @code)                                                         # Execute preprocessor commands found in the source
    {my $c = $code[$i];
@@ -203,7 +204,8 @@ sub c($$$;$)                                                                    
      {$code[$i] = duplicateFunction($i, $inputFile, \@code);
      }
     elsif ($c =~ m(\A(exports)\s+))                                             # Skip export commands in open source
-     {$code[$i] = "\n";
+     {$exports{$c} = $i+1;
+      $code[$i] = "\n";
      }
     elsif ($c =~ m(\Aprint))                                                    # Expand print statements
      {$code[$i] = printData($i, $c);
@@ -212,11 +214,13 @@ sub c($$$;$)                                                                    
 
   @code = map {"$_\n"} split /\n/, join '', @code;                              # Resplit code plus any additions into lines
 
-  for my $c(@code)                                                              # Replace $ with package name.
-   {$c =~ s(\$\$) ($baseFile)gs;                                                # $$ is base file name with first char lower cased
-    $c =~ s(\$)   ($packageName)gs;                                             # $  is base file name with first character uppercased
-    $c =~ s(\@)   (${shortBaseFile}_)gs;                                        # @ is  translated to short base file name followed by underscore to support Gnome naming conventions
+  my sub expand($)                                                              # Expand $ and @
+   {$_[0] =~ s(\$\$) ($baseFile)gs;                                             # $$ is base file name with first char lower cased
+    $_[0] =~ s(\$)   ($packageName)gs;                                          # $  is base file name with first character uppercased
+    $_[0] =~ s(\@)   (${shortBaseFile}_)gs;                                     # @ is  translated to short base file name followed by underscore to support Gnome naming conventions
    }
+
+  expand($_) for @code;                                                         # Replace $ with package name.
 
   if (1)                                                                        # Parse source code
    {my %duplicates; my @duplicates;                                             # Duplication check for first parameter plus short method name
@@ -339,9 +343,10 @@ END
    }
 
   if (1)                                                                        # Preprocess input C file
-   {for my $c(@code)                                                            # Source code lines
-     {$c =~ s{([a-z0-9\$_>.*-]+)\s*◀\s*(.*?);}       {typeof($2) $1 = $2;}gis;  # Variable creation
-      $c =~ s{([a-z0-9\$_>.*-]+)\s*◁\s*(.*?);} {const typeof($2) $1 = $2;}gis;  # Constant creation
+   {my $e = q([a-z0-9𝗮-𝘇\$_>.*-]);
+    for my $c(@code)                                                            # Source code lines
+     {$c =~ s{($e+)\s*◀\s*(.*?);}       {typeof($2) $1 = $2;}gis;               # Variable creation
+      $c =~ s{($e+)\s*◁\s*(.*?);} {const typeof($2) $1 = $2;}gis;               # Constant creation
 
       $c =~ s{new\s*(\w+\s*)\(([^:)]*:[^)]*)\)}                                 # Constructor with named arguments in parenthesis based on: https://gcc.gnu.org/onlinedocs/gcc-10.2.0/gcc/Designated-Inits.html#Designated-Inits
              {new$1(({struct $1 t = {$2, proto: &ProtoTypes_$1}; t;}))}gs;
@@ -349,10 +354,10 @@ END
       $c =~ s{new\s*(\w+\s*)(\(\))?([,;])}                                      # Constructor followed by [,;] calls for default constructor.
              {new$1(({struct $1 t = {proto: &ProtoTypes_$1};   t;}))$3}gs;
 
-      $c =~ s{([a-z0-9\$_>.*-]+)\s*▶\s*(\w+)\s*\(} {$1->proto->$2($1, }gis;     # Method call with arguments
-      $c =~ s{([a-z0-9\$_>.*-]+)\s*▶\s*(\w+)}      {$1->proto->$2($1)}gis;      # Method call with no arguments
-      $c =~ s{([a-z0-9\$_>.*-]+)\s*▷\s*(\w+)\s*\(} {$1.proto->$2($1, }gis;      # Method call with arguments
-      $c =~ s{([a-z0-9\$_>.*-]+)\s*▷\s*(\w+)}      {$1.proto->$2($1)}gis;       # Method call with no arguments
+      $c =~ s{($e+)\s*▶\s*(\w+)\s*\(} {$1->proto->$2($1, }gis;                  # Method call with arguments
+      $c =~ s{($e+)\s*▶\s*(\w+)}      {$1->proto->$2($1)}gis;                   # Method call with no arguments
+      $c =~ s{($e+)\s*▷\s*(\w+)\s*\(} {$1.proto->$2($1, }gis;                   # Method call with arguments
+      $c =~ s{($e+)\s*▷\s*(\w+)}      {$1.proto->$2($1)}gis;                    # Method call with no arguments
 
       $c =~ s{✓([^;]*)} {assert($1)}gis;                                        # Tick becomes assert
 
@@ -377,6 +382,26 @@ END
         $code[$i] = qq("$c\\n"\n);
        }
       elsif ($code[$i] =~ s(◉(.*)\Z)()) {$state  = $1}                          # Start here document
+     }
+   }
+
+  if (1)                                                                        # Report export requests for methods that are missing
+   {my @m;
+    for my $x(sort keys %exports)
+     {my ($command, $list, @e) = split /\s+/, $x;
+
+      for my $e(@e)
+       {expand($e);
+        next unless $e =~ m(\A[a-z])i;
+        push @m, [$exports{$x}, $e] unless $methods{$e} or $structures{$e};
+       }
+     }
+    if (keys @m)
+     {say STDERR formatTable(\@m, <<END,
+Line   Line on which the missing method was exported
+Export Method requested but missing
+END
+      title => q(Missing exports));
      }
    }
 
@@ -504,11 +529,11 @@ to make B<assert> function calls more prominent in tests.
 Occurrences of the B<$> character are replaced by the base name of the file
 containing the source with the first letter capitalized, so that:
 
-  typedef struct $Node $Node;
+  typedef struct $Node {...} $Node;
 
 in a file called B<tree.c> becomes:
 
-  typedef struct TreeNode TreeNode;
+  typedef struct TreeNode {...} TreeNode;
 
 =head2 new operator
 
@@ -518,7 +543,7 @@ Occurrences of:
 
 are replaced by:
 
-  new XXX(({struct XXX t = {proto: &ProtoTypes_$1}; t;}))
+  newXXX(({struct XXX t = {proto: &ProtoTypes_$1}; t;}))
 
 Occurrences of:
 
@@ -611,7 +636,7 @@ explicitly mentioned function B<data_$Node>.
 Preprocess ◁, ◀, ▷ and ▶ as operators in ANSI-C.
 
 
-Version 202009030.
+Version 202010080.
 
 
 The following sections describe the methods in each functional area of this

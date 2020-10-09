@@ -1,0 +1,23 @@
+'digraph Perl {
+ graph [ label="HTML label demo # 2 - Using \\<\\<table\\> ... \\</table\\>\\>" rankdir="TB" ]
+ node [ shape="oval" ]
+ edge [ color="grey" ]
+ "Legend" [ label=<<table bgcolor = \'white\'>
+<tr>
+	<td bgcolor = \'palegreen\'>The green node is the start node</td>
+</tr>
+<tr>
+	<td bgcolor = \'lightblue\'>Lightblue nodes are for lexeme attributes</td>
+</tr>
+<tr>
+	<td bgcolor = \'orchid\'>Orchid nodes are for lexemes</td>
+</tr>
+<tr>
+	<td bgcolor = \'goldenrod\'>Golden nodes are for actions</td>
+</tr>
+<tr>
+	<td bgcolor = \'firebrick1\'>Red nodes are for events</td>
+</tr>
+</table>> shape="plaintext" ]
+}
+'

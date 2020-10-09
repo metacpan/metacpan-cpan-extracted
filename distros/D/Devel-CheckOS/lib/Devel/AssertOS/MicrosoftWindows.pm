@@ -7,9 +7,9 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 
-sub matches { return qw(Cygwin MSWin32); }
+sub matches { return qw(Cygwin MSWin32 MSYS); }
 sub os_is { Devel::CheckOS::os_is(matches()); }
 Devel::CheckOS::die_unsupported() unless(os_is());
 

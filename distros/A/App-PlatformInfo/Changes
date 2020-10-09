@@ -1,8 +1,21 @@
-0.002   2019-04-30 (PERLANCAR)
+0.004   2020-10-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Avoid the use of non-core module IPC::System::Options.
+
+
+0.003   2020-10-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Use $Data::Dumper::Terse = 1.
+
+	- [testing] Add a dummy test that basically collects the output of
+	  platform-info script on test machine.
+
+
+0.002   2019-04-30  Released-By: PERLANCAR
 
 	- [ux] Set Data::Dumper's Sortkeys to 1 for output consistency.
 
 
-0.001   2016-04-10 (PERLANCAR)
+0.001   2016-04-10  Released-By: PERLANCAR
 
         - First release.

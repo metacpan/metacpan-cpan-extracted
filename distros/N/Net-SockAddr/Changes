@@ -1,3 +1,5 @@
+1.0.3    09.10.2020
+         - makefile related changes
 1.0.2    19.06.2020
          - fix unitialized bits usage in SockAddr::Unix when converted to Perl
          - more correct construction of SockAddr::Unix when zero-size path is provided

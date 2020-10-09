@@ -19,7 +19,7 @@ use Contextual::Return;
 
 extends 'VCS::Which::Plugin';
 
-our $VERSION = version->new('0.6.6');
+our $VERSION = version->new('0.6.7');
 our $name    = 'Git';
 our $exe     = 'git';
 our $meta    = '.git';
@@ -127,10 +127,8 @@ sub cat {
         }
 
         my $repo = Git->repository(Directory => $self->_base);
-        my @revs = reverse $repo->command('rev-list', '--all', '--', $file);
-        my $rev = $revision =~ /^[-]?\d+$/xms && $revs[$revision] ? $revs[$revision] : $revision;
-
-        return join "\n", $repo->command('show', $rev . ':' . $file);
+        my @revs = reverse $repo->command('log', '--format=format:%H', '--', $file);
+        $revision = $revision =~ /^[-]?\d+$/xms && $revs[$revision] ? $revs[$revision] : $revision;
     }
     elsif ( !defined $revision ) {
         $revision = '';
@@ -316,7 +314,7 @@ VCS::Which::Plugin::Git - The Git plugin for VCS::Which
 
 =head1 VERSION
 
-This documentation refers to VCS::Which::Plugin::Git version 0.6.6.
+This documentation refers to VCS::Which::Plugin::Git version 0.6.7.
 
 =head1 SYNOPSIS
 

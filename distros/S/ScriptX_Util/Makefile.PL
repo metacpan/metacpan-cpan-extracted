@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => 0,
     "Data::Dmp" => "0.240",
     "Exporter" => "5.57",
-    "Module::Patch" => "0.270",
+    "Module::Patch" => "0.276",
     "ScriptX" => "0.000004",
     "strict" => 0,
     "warnings" => 0
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Module::Patch" => "0.270",
+  "Module::Patch" => "0.276",
   "ScriptX" => "0.000004",
   "Test::More" => 0,
   "strict" => 0,

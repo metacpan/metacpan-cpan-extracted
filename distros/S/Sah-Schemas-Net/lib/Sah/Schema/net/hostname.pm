@@ -1,11 +1,29 @@
 package Sah::Schema::net::hostname;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-05-27'; # DATE
+our $DIST = 'Sah-Schemas-Net'; # DIST
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [str => {
     summary => 'Hostname',
-    match => '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$', # as per RFC 1123
+    match => '\\A(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])\\z', # as per RFC 1123
+
+    examples => [
+        {value=>'', valid=>0},
+        {value=>'example', valid=>1},
+        {value=>'example.com', valid=>1},
+        {value=>'www.example.com', valid=>1},
+        {value=>'12.34.56.78', valid=>1},
+        #{value=>'12.34.56.789', valid=>0}, # should invalid ipv4 be allowed?
+        {value=>'www_new.example.com', valid=>0, summary=>'Underscore not allowed'},
+        {value=>'www.example-two.com', valid=>1},
+        {value=>'www.example--two.com', valid=>1},
+        {value=>'www.example-.com', valid=>0, summary=>'Word ending in dash not allowed'},
+        {value=>'www.-example.com', valid=>0, summary=>'Word starting in dash not allowed'},
+        {value=>'www.-example.com', valid=>0, summary=>'Word starting in dash not allowed'},
+    ],
+
 }, {}];
 
 1;
@@ -23,7 +41,92 @@ Sah::Schema::net::hostname - Hostname
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::net::hostname (from Perl distribution Sah-Schemas-Net), released on 2019-11-29.
+This document describes version 0.009 of Sah::Schema::net::hostname (from Perl distribution Sah-Schemas-Net), released on 2020-05-27.
+
+=head1 SYNOPSIS
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("net::hostname*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("net::hostname*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['net::hostname*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ ""  # INVALID
+
+ "example"  # valid
+
+ "example.com"  # valid
+
+ "www.example.com"  # valid
+
+ "12.34.56.78"  # valid
+
+ "www_new.example.com"  # INVALID (Underscore not allowed)
+
+ "www.example-two.com"  # valid
+
+ "www.example--two.com"  # valid
+
+ "www.example-.com"  # INVALID (Word ending in dash not allowed)
+
+ "www.-example.com"  # INVALID (Word starting in dash not allowed)
+
+ "www.-example.com"  # INVALID (Word starting in dash not allowed)
 
 =head1 DESCRIPTION
 
@@ -53,7 +156,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

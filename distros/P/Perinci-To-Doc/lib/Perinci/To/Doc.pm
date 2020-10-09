@@ -1,7 +1,7 @@
 package Perinci::To::Doc;
 
-our $DATE = '2020-04-27'; # DATE
-our $VERSION = '0.872'; # VERSION
+our $DATE = '2020-10-07'; # DATE
+our $VERSION = '0.873'; # VERSION
 
 1;
 # ABSTRACT: Convert Rinci metadata to documentation
@@ -18,7 +18,7 @@ Perinci::To::Doc - Convert Rinci metadata to documentation
 
 =head1 VERSION
 
-This document describes version 0.872 of Perinci::To::Doc (from Perl distribution Perinci-To-Doc), released on 2020-04-27.
+This document describes version 0.873 of Perinci::To::Doc (from Perl distribution Perinci-To-Doc), released on 2020-10-07.
 
 =head1 DESCRIPTION
 

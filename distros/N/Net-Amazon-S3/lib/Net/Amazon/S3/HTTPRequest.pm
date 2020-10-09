@@ -1,5 +1,5 @@
 package Net::Amazon::S3::HTTPRequest;
-$Net::Amazon::S3::HTTPRequest::VERSION = '0.94';
+$Net::Amazon::S3::HTTPRequest::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use HTTP::Date;
@@ -25,109 +25,109 @@ has 's3'     => ( is => 'ro', isa => 'Net::Amazon::S3', required => 1 );
 has 'method' => ( is => 'ro', isa => 'HTTPMethod',      required => 1 );
 has 'path'   => ( is => 'ro', isa => 'Str',             required => 1 );
 has 'headers' =>
-    ( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
+	( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
 has 'content' =>
-    ( is => 'ro', isa => 'Str|CodeRef|ScalarRef', required => 0, default => '' );
+	( is => 'ro', isa => 'Str|CodeRef|ScalarRef', required => 0, default => '' );
 has 'metadata' =>
-    ( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
+	( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
 has use_virtual_host => (
-    is => 'ro',
-    isa => 'Bool',
-    lazy => 1,
-    default => sub { $_[0]->s3->use_virtual_host },
+	is => 'ro',
+	isa => 'Bool',
+	lazy => 1,
+	default => sub { $_[0]->s3->use_virtual_host },
 );
 has authorization_method => (
-    is => 'ro',
-    isa => 'Str',
-    lazy => 1,
-    default => sub { $_[0]->s3->authorization_method },
+	is => 'ro',
+	isa => 'Str',
+	lazy => 1,
+	default => sub { $_[0]->s3->authorization_method },
 );
 has region => (
-    is => 'ro',
-    isa => 'Str',
-    lazy => 1,
-    default => sub { $_[0]->bucket->region },
+	is => 'ro',
+	isa => 'Str',
+	lazy => 1,
+	default => sub { $_[0]->bucket->region },
 );
 
 has request_uri => (
-    is => 'ro',
-    init_arg => undef,
-    lazy => 1,
-    builder => '_build_uri',
+	is => 'ro',
+	init_arg => undef,
+	lazy => 1,
+	builder => '_build_uri',
 );
 
 __PACKAGE__->meta->make_immutable;
 
 sub _build_uri {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    my $path = $self->path;
+	my $path = $self->path;
 
-    my $protocol = $self->s3->secure ? 'https' : 'http';
-    my $host = $self->s3->host;
-    my $uri = "$protocol://$host/$path";
+	my $protocol = $self->s3->secure ? 'https' : 'http';
+	my $host = $self->s3->host;
+	my $uri = "$protocol://$host/$path";
 
-    if ($self->use_virtual_host) {
-        # use https://bucketname.s3.amazonaws.com instead of https://s3.amazonaws.com/bucketname
-        # see http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html
-        $uri =~ s{$host/(.*?)/}{$1.$host/};
-    }
+	if ($self->use_virtual_host) {
+		# use https://bucketname.s3.amazonaws.com instead of https://s3.amazonaws.com/bucketname
+		# see http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html
+		$uri =~ s{$host/(.*?)/}{$1.$host/};
+	}
 
-    return $uri;
+	return $uri;
 }
 
 # make the HTTP::Request object
 sub _build_request {
-    my $self     = shift;
+	my $self     = shift;
 
-    my $method   = $self->method;
-    my $headers  = $self->headers;
-    my $content  = $self->content;
-    my $metadata = $self->metadata;
+	my $method   = $self->method;
+	my $headers  = $self->headers;
+	my $content  = $self->content;
+	my $metadata = $self->metadata;
 
-    my $http_headers = $self->_merge_meta( $headers, $metadata );
-    my $uri          = $self->request_uri;
+	my $http_headers = $self->_merge_meta( $headers, $metadata );
+	my $uri          = $self->request_uri;
 
-    my $http_request = HTTP::Request->new( $method, $uri, $http_headers, $content );
+	my $http_request = HTTP::Request->new( $method, $uri, $http_headers, $content );
 	$http_request->content_length (0) unless $http_request->content_length;
 
 	return $http_request;
 }
 
 sub http_request {
-    my $self     = shift;
+	my $self     = shift;
 
-    my $request = $self->_build_request;
+	my $request = $self->_build_request;
 
-    $self->authorization_method->new( http_request => $self )->sign_request( $request )
-        unless $request->header( 'Authorization' );
+	$self->authorization_method->new( http_request => $self )->sign_request( $request )
+		unless $request->header( 'Authorization' );
 
-    return $request;
+	return $request;
 }
 
 sub query_string_authentication_uri {
-    my ( $self, $expires ) = @_;
+	my ( $self, $expires ) = @_;
 
-    my $request = $self->_build_request;
-    my $sign = $self->authorization_method->new( http_request => $self );
+	my $request = $self->_build_request;
+	my $sign = $self->authorization_method->new( http_request => $self );
 
-    return $sign->sign_uri( $request, $expires );
+	return $sign->sign_uri( $request, $expires );
 }
 
 sub _merge_meta {
-    my ( $self, $headers, $metadata ) = @_;
-    $headers  ||= {};
-    $metadata ||= {};
+	my ( $self, $headers, $metadata ) = @_;
+	$headers  ||= {};
+	$metadata ||= {};
 
-    my $http_header = HTTP::Headers->new;
-    while ( my ( $k, $v ) = each %$headers ) {
-        $http_header->header( $k => $v );
-    }
-    while ( my ( $k, $v ) = each %$metadata ) {
-        $http_header->header( "$METADATA_PREFIX$k" => $v );
-    }
+	my $http_header = HTTP::Headers->new;
+	while ( my ( $k, $v ) = each %$headers ) {
+		$http_header->header( $k => $v );
+	}
+	while ( my ( $k, $v ) = each %$metadata ) {
+		$http_header->header( "$METADATA_PREFIX$k" => $v );
+	}
 
-    return $http_header;
+	return $http_header;
 }
 
 1;
@@ -144,7 +144,7 @@ Net::Amazon::S3::HTTPRequest - Create a signed HTTP::Request
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,8 @@
+2.20201006.1 2020-10-06 UTC
+  - Require newer Crypt::OpenSSL::X509 object
+    Older versions will not extract extensions properly
+  - Don't fail if an indicator won't decode from a VMC
+
 2.20200930.1 2020-09-30 UTC
   - Add cacheing for remote calls
   - Class to model a retrieved indicator

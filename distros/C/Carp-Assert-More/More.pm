@@ -15,12 +15,12 @@ Carp::Assert::More - convenience wrappers around Carp::Assert
 
 =head1 VERSION
 
-Version 1.20
+Version 1.24
 
 =cut
 
 BEGIN {
-    $VERSION = '1.20';
+    $VERSION = '1.24';
     @ISA = qw(Exporter);
     @EXPORT = qw(
         assert_all_keys_in
@@ -39,6 +39,7 @@ BEGIN {
         assert_isa
         assert_isa_in
         assert_isnt
+        assert_keys_are
         assert_lacks
         assert_like
         assert_listref
@@ -690,9 +691,11 @@ Asserts that C<$date> is a DateTime object.
 
 =cut
 
-sub assert_datetime {
+sub assert_datetime($;$) {
     my $datetime = shift;
-    my $desc     = shift // 'Must be a DateTime object';
+    my $desc     = shift;
+
+    $desc = 'Must be a DateTime object' unless defined($desc);
 
     assert_isa( $datetime, 'DateTime', $desc );
 
@@ -796,13 +799,13 @@ This is used to ensure that there are no extra keys in a given hash.
 
 =cut
 
-sub assert_all_keys_in {
+sub assert_all_keys_in($$;$) {
     my $hash       = shift;
     my $valid_keys = shift;
     my $name       = shift;
 
     assert_hashref( $hash );
-    assert_listref( $valid_keys );
+    assert_arrayref( $valid_keys );
 
     foreach my $key ( keys %{$hash} ) {
         assert_in( $key, $valid_keys, $name );
@@ -811,6 +814,29 @@ sub assert_all_keys_in {
     return;
 }
 
+
+=head2 assert_keys_are( \%hash, \@keys [, $name ] )
+
+Asserts that the keys for C<%hash> are exactly C<@keys>, no more and no less.
+
+=cut
+
+sub assert_keys_are($$;$) {
+    my $hash       = shift;
+    my $valid_keys = shift;
+    my $name       = shift;
+
+    assert_hashref( $hash );
+    assert_arrayref( $valid_keys );
+
+    foreach my $key ( keys %{$hash} ) {
+        assert_in( $key, $valid_keys, $name );
+    }
+
+    assert_is(scalar keys %{$hash}, scalar @{$valid_keys}, 'There are the correct number of keys');
+
+    return;
+}
 
 
 =head1 UTILITY ASSERTIONS
@@ -839,7 +865,7 @@ sub _any(&;@) {
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2019 Andy Lester.
+Copyright 2005-2020 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License version 2.0.
@@ -859,4 +885,4 @@ for code and fixes.
 
 =cut
 
-"I stood on the porch in a tie."
+1;

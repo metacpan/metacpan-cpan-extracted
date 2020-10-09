@@ -50,11 +50,11 @@ Metabolomics::Fragment::Annotation - Perl extension for fragment annotation in m
 
 =head1 VERSION
 
-Version 0.5.2
+Version 0.6.0
 
 =cut
 
-our $VERSION = '0.5.2';
+our $VERSION = '0.6.0';
 
 
 =head1 SYNOPSIS
@@ -70,6 +70,11 @@ our $VERSION = '0.5.2';
     	my $oBank = Metabolomics::Banks::BloodExposome->new() ;							# init the bank object
 		$oBank->getMetabolitesFromSource($source) ;										# get theorical metabolites from local database version
 	    $oBank->buildTheoPeakBankFromEntries($IonMode) ;								# produce the new theorical bank depending of chosen acquisition mode
+    
+        Metabolomics::Banks::BloodExposome is giving access to a local Knapsack database (Cf publication here L<>):
+    	my $oBank = Metabolomics::Banks::Knapsack->new() ;							# init the bank object
+		$oBank->getKSMetabolitesFromSource($source) ;										# get theorical metabolites from local database version
+	    $oBank->buildTheoPeakBankFromKnapsack($IonMode) ;								# produce the new theorical bank depending of chosen acquisition mode
     
     Metabolomics::Banks::AbInitioFragments is used abinitio fragment, adduct and isotope annotation:
     

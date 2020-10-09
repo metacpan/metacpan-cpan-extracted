@@ -19,7 +19,7 @@ use VCS::Which;
 use Path::Tiny;
 use Time::HiRes qw/time/;
 
-our $VERSION = version->new('0.6.6');
+our $VERSION = version->new('0.6.7');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -112,7 +112,7 @@ __DATA__
 
 =head1 VERSION
 
-This documentation refers to <Name> version 0.6.6.
+This documentation refers to <Name> version 0.6.7.
 
 =head1 SYNOPSIS
 

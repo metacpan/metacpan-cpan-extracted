@@ -7,7 +7,7 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 use PerlX::Maybe;
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 =head1 NAME
 
@@ -83,7 +83,7 @@ sub part_to_format( $self, $part ) {
         };
         #warn $part->toString;
     } elsif( $t eq 'number:number' ) {
-        $res = '#' x $part->att('number:min-integer-digits');
+        $res = '#' x ($part->att('number:min-integer-digits') || 1);
 
         if( defined( my $dec = $part->att('number:decimal-places'))) {
             $res .= '.' . ('0' x $dec);

@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/App/sersh.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+sersh
+t/01_compiles.t
+t/pod-spell.t

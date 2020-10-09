@@ -4,7 +4,7 @@ use 5.012005;
 use strict;
 use warnings;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 use Carp qw(carp croak);
 use ExtUtils::Installed;
@@ -53,7 +53,7 @@ sub scan {
                 warnIgnored( $2, $1, 'eval' );
             }
             state $if = 0;
-            if (/^\s*if\s*\(.*\)\s*{$/) {
+            if (/^\s*(?:if|unless)\s*\(.*\)\s*{$/) {
                 $if++;
             } elsif ( $if > 0 and /^\s*}$/ ) {
                 $if--;
@@ -101,8 +101,8 @@ sub scan_line {
         $names[0] = $2;
     } elsif (/eval\s*(['"{])\s*(require|use)\s+($qr4name).*(?:\1|})/) {
         warnIgnored( $3, $2, 'eval' );
-    } elsif ( /if\s+\(.*\)\s*\{.*require\s+($qr4name).*\}/
-        or /require\s+($qr4name)\s+if\s+\(?.*\)?/ )
+    } elsif ( /(?:if|unless)\s+\(.*\)\s*\{.*require\s+($qr4name).*\}/
+        or /require\s+($qr4name)\s+(?:if|unless)\s+\(?.*\)?/ )
     {
         warnIgnored( $1, 'require', 'if' );
     } elsif (/^\s*(?:require|use)\s+($qr4name)/) {

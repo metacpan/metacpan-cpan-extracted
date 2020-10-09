@@ -1,7 +1,5 @@
-.perltidyrc
 Changes
 cpanfile
-cpanfile.snapshot
 lib/Mojo/DOM/Role/Form.pm
 lib/Mojo/Transaction/HTTP/Role/Mechanize.pm
 Makefile.PL

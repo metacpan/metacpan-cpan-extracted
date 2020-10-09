@@ -1,9 +1,9 @@
 package Sah::Schemas::RegexpPattern;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2020-05-27'; # DATE
 our $DIST = 'Sah-Schemas-RegexpPattern'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to Regexp::Pattern
@@ -20,7 +20,7 @@ Sah::Schemas::RegexpPattern - Sah schemas related to Regexp::Pattern
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::RegexpPattern (from Perl distribution Sah-Schemas-RegexpPattern), released on 2020-01-03.
+This document describes version 0.002 of Sah::Schemas::RegexpPattern (from Perl distribution Sah-Schemas-RegexpPattern), released on 2020-05-27.
 
 =head1 HOMEPAGE
 

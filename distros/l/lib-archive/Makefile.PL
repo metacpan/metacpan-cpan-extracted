@@ -19,6 +19,14 @@ WriteMakefile(
     },
     no_index => {directory => ['t']}
   },
-
+  PREREQ_PM => {qw(
+    Carp                     0
+    Archive::Tar             0
+    File::Spec::Functions    0
+    File::Basename           0
+    MIME::Base64             0
+    IO::Uncompress::Gunzip   0
+    HTTP::Tiny               0
+  )},
   test => {TESTS => 't/*.t'}
 );

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+examples/history.pl
+lib/Tickit/Widget/Entry/Plugin/History.pm
+MANIFEST			This list of files
+t/00use.t
+t/01history.t
+t/02pending.t
+t/03duplicates.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

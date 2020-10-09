@@ -1,0 +1,39 @@
+---
+abstract: 'serial port shell'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - app
+  - serial
+  - port
+  - shell
+  - console
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-sersh
+provides:
+  App::sersh:
+    file: lib/App/sersh.pm
+    version: '0.01'
+requires:
+  AnyEvent: '0'
+  AnyEvent::ReadLine::Gnu: '0'
+  AnyEvent::SerialPort: '0'
+  File::HomeDir: '0'
+  Getopt::Long: '0'
+  Path::Class: '0'
+  Pod::Usage: '0'
+resources:
+  bugtracker: http://github.com/jozef/App-sersh/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jozef/App-sersh/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

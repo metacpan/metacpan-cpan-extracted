@@ -28,9 +28,9 @@ plan skip_all => 'HPUX is weird'
 DateTime::TimeZone::Local->_load_subclass() =~ /Unix$/
     or plan skip_all => 'These tests only run on Unix-ish OSes';
 
-my $IsMaintainer = hostname() =~ /houseabsolute|quasar/ && -d '.hg';
+my $IsMaintainer         = hostname() =~ /houseabsolute|quasar/ && -d '.hg';
 my $CanWriteEtcLocaltime = -w '/etc/localtime' && -l '/etc/localtime';
-my $CanSymlink = try {
+my $CanSymlink           = try {
 ## no critic (InputOutput::RequireCheckedSyscalls)
     symlink q{}, q{};
     1;

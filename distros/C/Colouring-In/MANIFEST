@@ -17,6 +17,7 @@ t/08-fadeout.t
 t/09-fadein.t
 t/10-tools.t
 t/11-rest.t
+t/12-validate.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

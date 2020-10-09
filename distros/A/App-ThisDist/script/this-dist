@@ -1,61 +1,21 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-02'; # DATE
+our $DATE = '2020-10-03'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger::Screen;
 
-use Cwd 'getcwd';
-use File::Slurper 'read_text';
+use App::ThisDist 'this_dist';
+use Cwd;
 
-my $debug = $ENV{DEBUG};
-my $quiet = @ARGV && $ARGV[0] =~ /\A(-q|--quiet)\z/;
 my $cwd = getcwd();
-(my $cwd_basename = $cwd) =~ s!.+[/\\]!!;
-
-my $dist;
-GUESS: {
-  FROM_DIST_INI: {
-        if (-f "dist.ini") {
-            my $ct = read_text "dist.ini";
-            while ($ct =~ /^\s*name\s*=\s*(.+)/mg) {
-                $dist = $1;
-                warn "this-dist: Guessed dist=$dist from dist.ini\n" if $debug;
-                last GUESS;
-            }
-        }
-    }
-
-  FROM_GIT_CONFIG: {
-        if (-f ".git/config") {
-            my $ct = read_text ".git/config";
-            while ($ct =~ /^\s*url\s*=\s*(.+)/mg) {
-                my $url = $1;
-                warn "this-dist: Found URL '$url'\n" if $debug;
-                require CPAN::Dist::FromURL;
-                my $res = CPAN::Dist::FromURL::extract_cpan_dist_from_url($url);
-                if (defined $dist) {
-                    warn "this-dist: Guessed dist=$dist from .git/config URL '$url'\n" if $debug;
-                    last GUESS;
-                }
-            }
-        }
-    }
-
-  FROM_REPO_NAME: {
-        require CPAN::Dist::FromRepoName;
-        my $res = CPAN::Dist::FromRepoName::extract_cpan_dist_from_repo_name($cwd_basename);
-        if (defined $res) {
-            $dist = $res;
-            warn "this-dist: Guessed dist=$dist from repo name '$cwd_basename'\n" if $debug;
-            last GUESS;
-        }
-    }
-}
+my $dist = this_dist($cwd);
+my $quiet = @ARGV && $ARGV[0] =~ /\A(-q|--quiet)\z/;
 
 if (defined $dist) {
     print $dist, "\n";
@@ -82,7 +42,7 @@ this-dist - Return name of Perl distribution associated with the current directo
 
 =head1 VERSION
 
-This document describes version 0.003 of this-dist (from Perl distribution App-ThisDist), released on 2020-10-02.
+This document describes version 0.005 of this-dist (from Perl distribution App-ThisDist), released on 2020-10-03.
 
 =head1 SYNOPSIS
 
@@ -94,15 +54,22 @@ This document describes version 0.003 of this-dist (from Perl distribution App-T
 
  # See how distribution is guessed
  % DEBUG=1 this-dist
+ this-dist: Guessed dist=App-PPIUtils from dist.ini
+ Foo-Bar
 
+ # Will exit with code 1 and print error message to stderr when dist cannot be guessed
  % cd /
  % this-dist
  this-dist: No perl distribution name can be associated with current directory '/'
 
- # Don't show error message when guessing is failed
+ # Don't show error message when guessing is failed (just exit with code 1)
  % this-dist -q
-
  % _
+
+Some recipes:
+
+ # Show metacpan distribution page in browser (requires L<lcpan> from L<App::lcpan>)
+ % lcpan metacpan-dist `this-dist`
 
 =head1 DESCRIPTION
 
@@ -111,9 +78,9 @@ with current directory:
 
 =over
 
-=item * Name in F<dist.ini>, if the file is available
+=item * Name in F<dist.ini> (L<Dist::Zilla> configuration file), if the file is available
 
-=item * L<CPAN::Info::FromURL> against URL in F<.git/config>, the file is available
+=item * L<CPAN::Info::FromURL> against URLs in F<.git/config> (git repository configuration file), if the file is available
 
 =item * L<CPAN::Dist::FromRepoName> against current directory name
 

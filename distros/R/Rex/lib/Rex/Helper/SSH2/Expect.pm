@@ -56,7 +56,7 @@ package Rex::Helper::SSH2::Expect;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 =head2 new($ssh2)
 

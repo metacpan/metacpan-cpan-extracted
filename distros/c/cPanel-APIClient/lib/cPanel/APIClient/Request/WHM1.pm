@@ -55,7 +55,7 @@ sub get_cli_command {
         '--output=json',
         ( $username ? "--user=$username" : () ),
         $self->[0],
-        cPanel::APIClient::Utils::CLIRequest::to_args( $self->[2] ),
+        cPanel::APIClient::Utils::CLIRequest::to_args( $self->[1] ),
     );
 }
 

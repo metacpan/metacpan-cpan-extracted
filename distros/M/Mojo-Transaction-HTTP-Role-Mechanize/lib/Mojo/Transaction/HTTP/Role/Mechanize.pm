@@ -3,7 +3,7 @@ package Mojo::Transaction::HTTP::Role::Mechanize;
 use Mojo::Base -role;
 use Mojo::UserAgent::Transactor;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 requires qw{error res};
 
@@ -44,7 +44,7 @@ sub submit {
   return Mojo::UserAgent::Transactor->new->tx(
     $method => $target,
     {}, form => $state
-  );
+  )->previous($self);
 }
 
 1;
@@ -53,10 +53,12 @@ sub submit {
 
 =begin html
 
-<a href="https://travis-ci.com/kiwiroy/mojo-transaction-http-role-mechanize">
-  <img alt="Travis Build Status"
-       src="https://travis-ci.com/kiwiroy/mojo-transaction-http-role-mechanize.svg?branch=master" />
-</a>
+<img alt="Build Status - Linux"
+     src="https://github.com/kiwiroy/mojo-transaction-http-role-mechanize/workflows/linux/badge.svg" />
+<img alt="Build Status - Macos"
+    src="https://github.com/kiwiroy/mojo-transaction-http-role-mechanize/workflows/macos/badge.svg" />
+<img alt="Build Status - Windows"
+     src="https://github.com/kiwiroy/mojo-transaction-http-role-mechanize/workflows/windows/badge.svg" />
 <a href="https://kritika.io/users/kiwiroy/repos/7509235145731088/heads/master/">
   <img alt="Kritika Analysis Status"
        src="https://kritika.io/users/kiwiroy/repos/7509235145731088/heads/master/status.svg?type=score%2Bcoverage%2Bdeps" />
@@ -66,7 +68,7 @@ sub submit {
        src="https://coveralls.io/repos/github/kiwiroy/mojo-transaction-http-role-mechanize/badge.svg?branch=master" />
 </a>
 <a href="https://badge.fury.io/pl/Mojo-Transaction-HTTP-Role-Mechanize">
-  <img alt="CPAN version" height="18"
+  <img alt="CPAN version"
        src="https://badge.fury.io/pl/Mojo-Transaction-HTTP-Role-Mechanize.svg" />
 </a>
 
@@ -132,8 +134,6 @@ will be used for the submission.
 =head1 AUTHOR
 
 kiwiroy - Roy Storey C<kiwiroy@cpan.org>
-
-=head1 CONTRIBUTORS
 
 tekki - Rolf Stöckli C<tekki@cpan.org>
 

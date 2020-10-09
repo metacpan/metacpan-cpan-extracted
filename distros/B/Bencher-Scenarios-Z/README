@@ -1,9 +1,10 @@
 NAME
-    Bencher::Scenarios::Z - Scenarios for benchmarking Z
+    Bencher::Scenarios::Z - Scenarios for benchmarking Z (and related
+    modules)
 
 VERSION
-    This document describes version 0.001 of Bencher::Scenarios::Z (from
-    Perl distribution Bencher-Scenarios-Z), released on 2020-09-21.
+    This document describes version 0.005 of Bencher::Scenarios::Z (from
+    Perl distribution Bencher-Scenarios-Z), released on 2020-10-08.
 
 DESCRIPTION
     This distribution contains the following Bencher scenario modules:

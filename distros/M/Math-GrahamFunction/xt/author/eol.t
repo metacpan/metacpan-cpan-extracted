@@ -12,8 +12,8 @@ my @files = (
     'lib/Math/GrahamFunction/SqFacts.pm',
     'lib/Math/GrahamFunction/SqFacts/Dipole.pm',
     't/00-compile.t',
-    't/00-load.t',
-    't/01-results.t'
+    't/01-results.t',
+    't/01-results.t~'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

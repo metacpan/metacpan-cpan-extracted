@@ -1,0 +1,35 @@
+'digraph Perl {
+ graph [ rankdir="TB" ]
+ node [ color="blue" shape="oval" ]
+ edge [ color="grey" ]
+ "1" [ label="START \\$1" ]
+ "3"
+ "1" -> "3"
+ "3" [ label="" shape="diamond" ]
+ "4"
+ "3" -> "4"
+ "20"
+ "3" -> "20"
+ "20" [ label="START \\$3" ]
+ "22"
+ "20" -> "22"
+ "22" [ label="foo" shape="box" ]
+ "24"
+ "22" -> "24"
+ "24" [ label="END \\$3" ]
+ "26"
+ "24" -> "26"
+ "26" [ label="END \\$1" ]
+ "28"
+ "26" -> "28"
+ "28" [ label="END" ]
+ "4" [ label="START \\$2" ]
+ "6"
+ "4" -> "6"
+ "6" [ label="\\[0-9a-d\\]" shape="box" ]
+ "17"
+ "6" -> "17"
+ "17" [ label="END \\$2" ]
+ "17" -> "26"
+}
+'

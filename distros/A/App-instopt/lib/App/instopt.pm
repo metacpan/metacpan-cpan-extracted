@@ -1,9 +1,9 @@
 package App::instopt;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-02'; # DATE
+our $DATE = '2020-10-08'; # DATE
 our $DIST = 'App-instopt'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -17,7 +17,7 @@ use Perinci::Object;
 use PerlX::Maybe;
 use Sah::Schema::software::arch;
 
-use vars '%Config';
+our %Config;
 our %SPEC;
 
 our @all_known_archs = @{ $Sah::Schema::software::arch::schema->[1]{in} };
@@ -61,6 +61,13 @@ our %argopt_download = (
         cmdline_aliases => {
             D => {is_flag=>1, summary => 'Shortcut for --no-download', code=>sub {$_[0]{download} = 0}},
         },
+    },
+);
+
+our %argopt_quiet = (
+    quiet => {
+        schema => 'bool*',
+        cmdline_aliases => {q=>{}},
     },
 );
 
@@ -191,15 +198,73 @@ sub _unwrap {
     rmdir "$dir/$entries[0].$rand" or die "Can't rmdir $dir/$entries[0].$rand: $!";
 }
 
-$SPEC{list_installed} = {
+$SPEC{list} = {
     v => 1.1,
-    summary => 'List all installed software',
+    summary => 'List software',
     args => {
         %args_common,
         %argopt_detail,
+        installed => {
+            summary => 'If true, will only list installed software',
+            schema =>  'bool*',
+            tags => ['category:filtering'],
+        },
+        latest_installed => {
+            summary => 'If true, will only list software which have their latest version installed',
+            schema =>  'bool*',
+            tags => ['category:filtering'],
+            description => <<'_',
+
+If set to true, a software which is not installed, or installed but does not
+have the latest version installed, will not be included.
+
+If set to false, a software which is not installed, or does not have the latest
+version installed, will be included.
+
+_
+        },
+        downloaded => {
+            summary => 'If true, will only list downloaded software',
+            schema =>  'bool*',
+            tags => ['category:filtering'],
+        },
+        latest_downloaded => {
+            summary => 'If true, will only list software which have their latest version downloaded',
+            schema =>  'bool*',
+            tags => ['category:filtering'],
+            description => <<'_',
+
+If set to true, a software which is not downloaded, or downloaded but does not
+have the latest version downloaded, will not be included.
+
+If set to false, a software which has no downloaded versions, or does not have
+the latest version downloaded, will be included.
+
+_
+        },
     },
+    examples => [
+        {
+            summary => 'List software that are installed but out-of-date',
+            argv => [qw/--installed --nolatest-installed/],
+            test => 0,
+            'x.dow.show_result' => 0,
+        },
+        {
+            summary => 'List software that have been downloaded but out-of-date',
+            argv => [qw/--downloaded --nolatest-downloaded/],
+            test => 0,
+            'x.dow.show_result' => 0,
+        },
+        {
+            summary => 'List software that have their latest version downloaded but not installed',
+            argv => [qw/--latest-downloaded --nolatest-installed/],
+            test => 0,
+            'x.dow.show_result' => 0,
+        },
+    ],
 };
-sub list_installed {
+sub list {
     require File::Slurper;
 
     my %args = @_;
@@ -218,8 +283,9 @@ sub list_installed {
         $swlist = $known;
     }
 
-    my %active_versions;
-    my %all_versions;
+    my %installed_active_versions;
+    my %installed_versions;
+  CHECK_INSTALLED:
     {
         local $CWD = $args{install_dir};
         log_trace "Listing installed software in $args{install_dir} ...";
@@ -234,13 +300,13 @@ sub list_installed {
                     log_trace "Skipping symlink $e: does not point to software in software list";
                     next;
                 }
-                $active_versions{$e} = $v;
+                $installed_active_versions{$e} = $v;
             } elsif ((-d $e) && (-f "$e/instopt.version")) {
                 unless (grep { $e eq $_ } @$swlist) {
                     log_trace "Skipping directory $e: name not in software list even though it has instopt.version file";
                     next;
                 }
-                chomp($active_versions{$e} =
+                chomp($installed_active_versions{$e} =
                           File::Slurper::read_text("$e/instopt.version"));
             } elsif (-d $e) {
                 my ($n, $v) = $e =~ /(.+)-(.+)/ or do {
@@ -251,86 +317,16 @@ sub list_installed {
                     log_trace "Skipping directory $e: name '$n' is not in software list";
                     next;
                 }
-                $all_versions{$n} //= [];
-                push @{ $all_versions{$n} }, $v;
+                $installed_versions{$n} //= [];
+                push @{ $installed_versions{$n} }, $v;
             }
         }
-    }
+    } # CHECK_INSTALLED
 
-    my @rows;
-    for my $sw (sort keys %all_versions) {
-        push @rows, {
-            software => $sw,
-            #version => $active_versions{$sw},
-            active_version => $active_versions{$sw},
-            inactive_versions => join(", ", grep { !defined($active_versions{$sw}) || $_ ne $active_versions{$sw} } @{ $all_versions{$sw} }),
-        };
-    }
-
-    my $resmeta = {};
-
-    if ($args{detail}) {
-        $resmeta->{'table.fields'} = [qw/software active_version inactive_versions/];
-    } else {
-        @rows = map { $_->{software} } @rows;
-    }
-
-    [200, "OK", \@rows, $resmeta];
-}
-
-$SPEC{list_installed_versions} = {
-    v => 1.1,
-    summary => 'List all installed versions of a software',
-    args => {
-        %args_common,
-        %App::swcat::arg0_software,
-    },
-};
-sub list_installed_versions {
-    my %args = @_;
-    my $state = _init(\%args);
-
-    my $res = list_installed(%args, _software=>$args{software}, detail=>1);
-    return $res unless $res->[0] == 200;
-    my $row = $res->[2][0];
-    return [200, "OK (none installed)"] unless $row;
-    return [200, "OK", [map {(split /, /, $_)} grep {defined} ($row->{active_version}, $row->{inactive_versions})]];
-}
-
-$SPEC{list_downloaded} = {
-    v => 1.1,
-    summary => 'List all downloaded software',
-    args => {
-        %args_common,
-        %argopt_arch,
-        %argopt_detail,
-        per_arch => {
-            summary => 'Return per-arch hash in the all_versions field',
-            schema => 'true*',
-        },
-    },
-    args_rels => {
-        #choose_one => ['arch', 'per_arch'],
-    },
-};
-sub list_downloaded {
-    my %args = @_;
-    my $state = _init(\%args, {set_default_arch=>0});
-
-    my $res = App::swcat::list();
-    return [500, "Can't list known software: $res->[0] - $res->[1]"] if $res->[0] != 200;
-    my $known = $res->[2];
-
-    my $swlist;
-    if ($args{_software}) {
-        return [412, "Unknown software '$args{_software}'"] unless
-            grep { $_ eq $args{_software} } @$known;
-        $swlist = [$args{_software}];
-    } else {
-        $swlist = $known;
-    }
-
-    my @rows;
+    my %downloaded_latest_versions;
+    my %downloaded_versions;
+    my %downloaded_archs;
+  CHECK_DOWNLOADED:
     {
         local $CWD = $args{download_dir};
       SW:
@@ -374,24 +370,215 @@ sub list_downloaded {
                 log_trace "Skipping software '$sw': no downloaded versions found";
                 next;
             }
-            push @rows, {
-                software => $sw,
-                latest_version => $vers[-1],
-                all_versions => $args{per_arch} ? \%arch_vers : join(", ", @vers),
-                (arch => $args{arch}) x !!defined($args{arch}),
+            $downloaded_latest_versions{$sw} = $vers[-1];
+            $downloaded_versions{$sw} = \%arch_vers;
             };
-        }
+        } # CHECK_DOWNLOADED
+
+    my @all_rows;
+    for my $sw (@$swlist) {
+        push @all_rows, {
+            software => $sw,
+            (arch => $args{arch}) x !!defined($args{arch}),
+            downloaded_versions => $downloaded_versions{$sw},
+            downloaded_latest_version => $downloaded_latest_versions{$sw},
+            installed_versions => $installed_versions{$sw},
+            installed_active_version => $installed_active_versions{$sw},
+            installed_inactive_versions => join(", ", grep { !defined($installed_active_versions{$sw}) || $_ ne $installed_active_versions{$sw} } @{ $installed_versions{$sw} }),
+        };
     }
 
-    my $resmeta = {};
+    my @rows;
+  FILTER:
+    for my $row (@all_rows) {
+        my $latest_v;
+        if (defined $args{installed}) {
+            next FILTER if (defined $row->{installed_active_version}) xor $args{installed};
+        }
+        if (defined $args{downloaded}) {
+            next FILTER if (defined $row->{downloaded_latest_version}) xor $args{downloaded};
+        }
+        if (defined $args{latest_installed} || defined $args{latest_downloaded} || $args{_check_latest_version}) {
+            my $res = App::swcat::latest_version(%args, softwares_or_patterns=>[$row->{software}]);
+            my $latest_v;
+            if ($res->[0] == 200) {
+                $latest_v = $res->[2];
+                $row->{latest_version} = $latest_v;
+            } else {
+                log_error "Can't check latest version of $row->{software}: $res->[0] - $res->[1], skipping software";
+                next FILTER;
+            }
+            if (defined $args{latest_installed}) {
+                my $latest_installed = defined $row->{installed_active_version} && $row->{installed_active_version} eq $latest_v;
+                next FILTER if $args{latest_installed} xor $latest_installed;
+            }
+            if (defined $args{latest_downloaded}) {
+                my $latest_downloaded = defined $row->{downloaded_latest_version} && $row->{downloaded_latest_version} eq $latest_v;
+                next FILTER if $args{latest_downloaded} xor $latest_downloaded;
+            }
+        }
+        push @rows, $row;
+    } # FILTER
 
+    my $resmeta = {};
     if ($args{detail}) {
-        $resmeta->{'table.fields'} = [qw/software latest_version all_versions/];
+        $resmeta->{'table.fields'} = [qw/software downloaded_versions installed_versions installed_active_versions installed_inactive_versions/];
     } else {
         @rows = map { $_->{software} } @rows;
     }
 
     [200, "OK", \@rows, $resmeta];
+}
+
+$SPEC{list_installed} = {
+    v => 1.1,
+    summary => 'List all installed software',
+    args => {
+        %args_common,
+        %argopt_detail,
+    },
+};
+sub list_installed {
+    my %args = @_;
+    list(%args, installed=>1);
+}
+
+$SPEC{list_installed_versions} = {
+    v => 1.1,
+    summary => 'List all installed versions of a software',
+    args => {
+        %args_common,
+        %App::swcat::arg0_software,
+    },
+};
+sub list_installed_versions {
+    my %args = @_;
+    my $state = _init(\%args);
+
+    return [400, "Please specify software"] unless $args{software};
+
+    my $res = list(%args, installed=>1, _software=>$args{software}, detail=>1);
+    return $res unless $res->[0] == 200;
+    return [200, "OK (none installed)"] unless @{ $res->[2] };
+    return [200, "OK", $res->[2][0]{installed_versions}];
+}
+
+$SPEC{is_installed_any} = {
+    v => 1.1,
+    summary => 'Check if any version of a software is installed',
+    description => <<'_',
+
+The installed version does not need to be the latest. To check whether the
+latest version of a software is installed, use `is-installed-latest`.
+
+_
+    args => {
+        %args_common,
+        %App::swcat::arg0_software,
+        %argopt_quiet,
+    },
+};
+sub is_installed_any {
+    my %args = @_;
+    my $res = list(%args, _software=>$args{software}, installed=>1);
+    return $res unless $res->[0] == 200;
+    my $is_installed = @{ $res->[2] } ? 1:0;
+    [200, "OK", $is_installed, {
+        'cmdline.result' => $args{quiet} ? "" : "$args{software} is ".($is_installed ? "":"NOT ")."installed",
+        'cmdline.exit_code' => $is_installed ? 0:1,
+     }];
+}
+
+$SPEC{is_installed_latest} = {
+    v => 1.1,
+    summary => 'Check if latest version of a software is installed',
+    description => <<'_',
+
+To only check whether any version of a software is installed, use
+`is-installed-any`.
+
+_
+    args => {
+        %args_common,
+        %App::swcat::arg0_software,
+        %argopt_quiet,
+    },
+};
+sub is_installed_latest {
+    my %args = @_;
+    my $res = list(%args, _software=>$args{software}, latest_installed=>1);
+    return $res unless $res->[0] == 200;
+    my $is_installed = @{ $res->[2] } ? 1:0;
+    [200, "OK", $is_installed, {
+        'cmdline.result' => $args{quiet} ? "" : "Latest version of $args{software} is ".($is_installed ? "":"NOT ")."installed",
+        'cmdline.exit_code' => $is_installed ? 0:1,
+     }];
+}
+
+$SPEC{list_downloaded} = {
+    v => 1.1,
+    summary => 'List all downloaded software',
+    args => {
+        %args_common,
+        %argopt_arch,
+        %argopt_detail,
+    },
+};
+sub list_downloaded {
+    my %args = @_;
+    list(%args, downloaded=>1);
+}
+
+$SPEC{is_downloaded_any} = {
+    v => 1.1,
+    summary => 'Check if any version of a software is downloaded',
+    description => <<'_',
+
+The download does not need to be the latest version. To check if the latest
+version of a software is downloaded, use `is-downloaded-latest`.
+
+_
+    args => {
+        %args_common,
+        %App::swcat::arg0_software,
+        %argopt_quiet,
+    },
+};
+sub is_downloaded_any {
+    my %args = @_;
+    my $res = list(%args, _software=>$args{software}, downloaded=>1);
+    return $res unless $res->[0] == 200;
+    my $is_downloaded = @{ $res->[2] } ? 1:0;
+    [200, "OK", $is_downloaded, {
+        'cmdline.result' => $args{quiet} ? "" : "$args{software} is ".($is_downloaded ? "":"NOT ")."downloaded",
+        'cmdline.exit_code' => $is_downloaded ? 0:1,
+     }];
+}
+
+$SPEC{is_downloaded_latest} = {
+    v => 1.1,
+    summary => 'Check if latest version of a software has been downloaded',
+    description => <<'_',
+
+To only check whether any version of a software has been downloaded, use
+`is-downloaded-any`.
+
+_
+    args => {
+        %args_common,
+        %App::swcat::arg0_software,
+        %argopt_quiet,
+    },
+};
+sub is_downloaded_latest {
+    my %args = @_;
+    my $res = list(%args, _software=>$args{software}, latest_downloaded=>1);
+    return $res unless $res->[0] == 200;
+    my $is_downloaded = @{ $res->[2] } ? 1:0;
+    [200, "OK", $is_downloaded, {
+        'cmdline.result' => $args{quiet} ? "" : "Latest version of $args{software} is ".($is_downloaded ? "":"NOT ")."downloaded",
+        'cmdline.exit_code' => $is_downloaded ? 0:1,
+     }];
 }
 
 $SPEC{list_downloaded_versions} = {
@@ -409,11 +596,10 @@ sub list_downloaded_versions {
 
     return [400, "Please specify software"] unless $args{software};
 
-    my $res = list_downloaded(%args, _software=>$args{software}, arch=>$args{arch}, detail=>1);
+    my $res = list(%args, downloaded=>1, _software=>$args{software}, arch=>$args{arch}, detail=>1);
     return $res unless $res->[0] == 200;
-    my $row = $res->[2][0];
-    return [200, "OK (none downloaded)"] unless $row;
-    return [200, "OK", [map {(split /, /, $_)} grep {defined} $row->{all_versions}]];
+    return [200, "OK (none downloaded)"] unless @{ $res->[2] };
+    return [200, "OK", $res->[2][0]{downloaded_versions}];
 }
 
 $SPEC{compare_versions} = {
@@ -430,54 +616,24 @@ sub compare_versions {
 
     my $res;
 
-    $res = list_installed(%args, detail=>1);
+    $res = list(%args, installed=>1, detail=>1, _check_latest_version=>1);
     return $res unless $res->[0] == 200;
-    my $installed = $res->[2];
 
-    for my $row (@$installed) {
-        my $sw = $row->{software};
-        my $mod = App::swcat::_load_swcat_mod($sw);
-
-        $row->{installed} = delete $row->{active_version};
-        $row->{installed_inactive} = delete $row->{inactive_versions};
-
-        my $downloaded_vv;
-        $res = list_downloaded_versions(%args, software=>$sw);
-        if ($res->[0] == 200) {
-            $downloaded_vv = join ", ", @{$res->[2]};
-        } else {
-            log_error "Can't check downloaded versions of $sw: $res->[0] - $res->[1]";
-        }
-        $row->{downloaded} = $downloaded_vv;
-
-        my $latest_v;
-        $res = App::swcat::latest_version(%args, softwares_or_patterns=>[$sw]);
-        if ($res->[0] == 200) {
-            $latest_v = $res->[2];
-        } else {
-            log_error "Can't check latest version of $sw: $res->[0] - $res->[1]";
-        }
-        $row->{latest} = $latest_v;
-
-        my @vv;
-        push @vv, split(/,\s*/, $downloaded_vv) if defined $downloaded_vv;
-        push @vv, $latest_v if defined $latest_v;
-        @vv = sort { $mod->cmp_version($a, $b) } @vv;
-
+    for my $row (@{ $res->[2] }) {
+        my $mod = App::swcat::_load_swcat_mod($row->{software});
         $row->{status} = '';
-        if (@vv) {
-            my $cmp = $mod->cmp_version($row->{installed}, $vv[-1]);
-            if ($cmp >= 0) {
-                $row->{status} = 'up to date';
-            } else {
-                $row->{status} = "updatable to $vv[-1]";
-            }
+        my $cmp = $mod->cmp_version($row->{installed_active_version}, $row->{latest_version});
+        if ($cmp >= 0) {
+            $row->{status} = 'up to date';
+        } else {
+            $row->{status} = "updatable to $row->{latest_version}";
         }
+        # to keep table rendering simple in CLI
+        delete $row->{downloaded_versions};
+        delete $row->{installed_versions};
+        delete $row->{installed_inactive_versions};
     }
-    my $resmeta = {
-        'table.fields' => [qw/software installed installed_inactive downloaded latest status/],
-    };
-    [200, "OK", $installed, $resmeta];
+    $res;
 }
 
 $SPEC{download} = {
@@ -650,7 +806,7 @@ sub cleanup_download_dir {
     my $state = _init(\%args, {set_default_arch=>0});
 
     local $CWD = $args{download_dir};
-    my $res = list_downloaded(%args, detail=>1, per_arch=>1);
+    my $res = list_downloaded(%args, detail=>1);
     return $res unless $res->[0] == 200;
   SW:
     for my $row (@{ $res->[2] }) {
@@ -779,27 +935,42 @@ sub update {
 
         log_info "Updating software %s to version %s ...", $sw, $v;
 
-        my $installed;
-      INSTALL_ARCHIVE: {
+        my $target_name = join(
+            "",
+            $sw, "-", $v,
+        );
+        my $target_dir = join(
+            "",
+            $args{install_dir},
+            "/", $target_name,
+        );
+
+        my $fileformat;
+      CHECK_SW_TYPE: {
             my $cafres = Filename::Archive::check_archive_filename(
                 filename => $filename);
-            unless ($cafres) {
-                log_trace "$filename is not an archive, skipped installing archive";
+            if ($cafres) {
+                log_trace "$filename is an archive";
+                $fileformat = "archive";
                 last;
             }
-            log_trace "Installing archive $filename ...";
+            my $cefres = Filename::Executable::check_executable_filename(
+                filename => $filename);
+            if ($cefres) {
+                log_trace "$filename is an executable";
+                $fileformat = "executable";
+                last;
+            }
+            my $errmsg = "Can't install $sw: filename $filename is not an archive nor an executable, cannot handle";
+            log_error $errmsg;
+            $envres->add_result(412, $errmsg, {item_id=>$sw});
+            next SW;
+        }
 
-            my $target_name = join(
-                "",
-                $sw, "-", $v,
-            );
-            my $target_dir = join(
-                "",
-                $args{install_dir},
-                "/", $target_name,
-            );
-
-            my $aires = $mod->archive_info(%args, version => $v);
+        my $aires;
+      EXTRACT_ARCHIVE: {
+            last unless $fileformat eq 'archive';
+            $aires = $mod->archive_info(%args, version => $v);
             unless ($aires->[0] == 200) {
                 my $errmsg = "Can't install $sw: Can't get archive info: $aires->[0] - $aires->[1]";
                 log_error $errmsg;
@@ -807,126 +978,104 @@ sub update {
                 next SW;
             }
 
-          EXTRACT: {
-                if (-d $target_dir) {
-                    log_debug "Target dir '$target_dir' already exists, skipping extract";
-                    last EXTRACT;
-                }
-                log_trace "Creating %s ...", $target_dir;
-                File::Path::make_path($target_dir);
-
-                log_trace "Extracting %s to %s ...", $filepath, $target_dir;
-                my $ar = Archive::Any->new($filepath);
-                $ar->extract($target_dir);
-
-                _unwrap($target_dir) unless
-                    defined($aires->[2]{unwrap}) && !$aires->[2]{unwrap};
-            } # EXTRACT
-
-          SYMLINK_OR_HARDLINK_DIR: {
-                local $CWD = $args{install_dir};
-                log_trace "Creating/updating directory symlink/hardlink to latest version ...";
-                if (File::MoreUtil::file_exists($sw)) {
-                    File::Path::remove_tree($sw);
-                }
-                my $use_symlink = !$mod->is_dedicated_profile;
-                if ($use_symlink) {
-                    symlink $target_name, $sw or die "Can't symlink $sw -> $target_name: $!";
-                } else {
-                    IPC::System::Options::system(
-                        {log=>1, die=>1},
-                        "cp", "-la", $target_name, $sw,
-                    );
-                    File::Slurper::write_text("$sw/instopt.version", $v);
-                }
+            if (-d $target_dir) {
+                log_debug "Target dir '$target_dir' already exists, skipping extract";
+                last EXTRACT;
             }
+            log_trace "Creating %s ...", $target_dir;
+            File::Path::make_path($target_dir);
 
-          SYMLINK_PROGRAMS: {
-                local $CWD = $args{program_dir};
-                log_trace "Creating/updating program symlinks ...";
-                my $programs = $aires->[2]{programs} // [];
-                for my $e (@$programs) {
-                    if ((-l $e->{name}) || !File::MoreUtil::file_exists($e->{name})) {
-                        unlink $e->{name};
-                        my $target = "$args{install_dir}/$sw$e->{path}/$e->{name}";
-                        $target =~ s!//!/!g;
-                        log_trace "Creating symlink $args{program_dir}/$e->{name} -> $target ...";
-                        symlink $target, $e->{name} or die "Can't symlink $e->{name} -> $target: $!";
-                    } else {
-                        log_warn "%s/%s is not a symlink, skipping", $args{program_dir}, $e->{name};
-                        next;
-                    }
-                }
+            log_trace "Extracting %s to %s ...", $filepath, $target_dir;
+            my $ar = Archive::Any->new($filepath);
+            $ar->extract($target_dir);
+
+            _unwrap($target_dir) unless
+                defined($aires->[2]{unwrap}) && !$aires->[2]{unwrap};
+        } # EXTRACT_ARCHIVE
+
+      MAKE_EXEC_DIR: {
+            last unless $fileformat eq 'executable';
+            if (-d $target_dir) {
+                log_debug "Target dir '$target_dir' already exists, skipping mkdir";
+                last MKDIR;
             }
+            mkdir $target_dir, 0755 or do {
+                $envres->add_result(500, "Can't install $sw: can't mkdir $target_dir: $!", {item_id=>$sw});
+                next SW;
+            };
 
-            $installed++;
-        } # INSTALL_ARCHIVE
-
-      INSTALL_EXEC: {
-            last if $installed;
-            my $cefres = Filename::Executable::check_executable_filename(
-                filename => $filename);
-            unless ($cefres) {
-                log_trace "$filename is not an executable, skipped installing executable";
-                last;
-            }
-            log_trace "Installing executable $filename ...";
-
-            my $target_name = join(
-                "",
-                $sw, "-", $v,
-            );
-
-          CHMOD_EXEC_IN_DOWNLOAD_DIR: {
-                last if -x $filepath;
-                log_trace "Chmod +x $filepath ...";
-                system "chmod", "+x", $filepath;
-                if ($?) {
-                    $envres->add_result(500, "Can't install $sw: can't chmod +x $filepath: $!", {item_id=>$sw});
+            if ($mod->is_dedicated_profile) {
+                require File::Copy;
+                File::Copy::copy($filepath, "$target_dir/$filename") or do {
+                    $envres->add_result(500, "Can't install $sw: can't copy $filepath -> $target_dir/$filename: $!", {item_id=>$sw});
                     next SW;
-                }
+                };
+            } else {
+                log_trace "Symlink $filepath -> $target_dir/$filename ...";
+                symlink $filepath, "$target_dir/$filename" or do {
+                    $envres->add_result(500, "Can't install $sw: can't symlink $filepath -> $target_dir/$filename: $!", {item_id=>$sw});
+                    next SW;
+                };
             }
+        }
 
-            {
-                local $CWD = $args{install_dir};
-
-              SYMLINK_EXEC_FROM_DOWNLOAD_DIR: {
-                    log_trace "Symlink $filepath -> $target_name ...";
-                    symlink $filepath, $target_name or do {
-                        $envres->add_result(500, "Can't install $sw: can't symlink $filepath -> $target_name: $!", {item_id=>$sw});
-                    };
-                }
-
-              SYMLINK_EXEC_IN_INSTALL_DIR: {
-                    log_trace "Creating/updating symlink to latest version ...";
-                    if (File::MoreUtil::file_exists($sw)) {
-                        unlink($sw);
-                    }
-                    symlink $target_name, $sw or die "Can't symlink $sw -> $target_name: $!";
-                }
+      SYMLINK_OR_HARDLINK_DIR: {
+            log_trace "Creating/updating directory symlink/hardlink to latest version ...";
+            local $CWD = $args{install_dir};
+            if (File::MoreUtil::file_exists($sw)) {
+                File::Path::remove_tree($sw);
             }
+            my $use_symlink = !$mod->is_dedicated_profile;
+            if ($use_symlink) {
+                symlink $target_name, $sw or do {
+                    $envres->add_result(500, "Can't install $sw: Can't symlink $sw -> $target_name: $!", {item_id=>$sw});
+                    next SW;
+                };
+            } else {
+                IPC::System::Options::system(
+                    {log=>1, die=>1},
+                    "cp", "-la", $target_name, $sw,
+                );
+                File::Slurper::write_text("$sw/instopt.version", $v);
+            }
+        }
 
-          SYMLINK_EXEC_IN_PROGRAM_DIR: {
-                local $CWD = $args{program_dir};
-                log_trace "Creating/updating program symlink ...";
-                if ((-l $sw) || !File::MoreUtil::file_exists($sw)) {
-                    unlink $sw;
-                    my $target = "$args{install_dir}/$sw";
+      SYMLINK_ARCHIVE_PROGRAMS: {
+            last unless $fileformat eq 'archive';
+            local $CWD = $args{program_dir};
+            log_trace "Creating/updating program symlinks ...";
+            my $programs = $aires->[2]{programs} // [];
+            for my $e (@$programs) {
+                if ((-l $e->{name}) || !File::MoreUtil::file_exists($e->{name})) {
+                    unlink $e->{name};
+                    my $target = "$args{install_dir}/$sw$e->{path}/$e->{name}";
                     $target =~ s!//!/!g;
-                    log_trace "Creating symlink $args{program_dir}/$sw -> $target ...";
-                    symlink $target, $sw or die "Can't symlink $sw -> $target: $!";
+                    log_trace "Creating symlink $args{program_dir}/$e->{name} -> $target ...";
+                    symlink $target, $e->{name} or do {
+                        $envres->add_result(500, "Can't install $sw: Can't symlink $e->{name} -> $target: $!", {item_id=>$sw});
+                        next SW;
+                    };
+                } else {
+                    log_warn "%s/%s is not a symlink, skipping", $args{program_dir}, $e->{name};
+                    next;
                 }
             }
+        }
 
-            $installed++;
-        } # INSTALL_EXEC
-
-      UNSUPPORTED: {
-            last if $installed;
-            my $errmsg = "Can't install $sw: filename $filename not an archive nor an executable, cannot handle";
-            log_error $errmsg;
-            $envres->add_result(412, $errmsg, {item_id=>$sw});
-            next SW;
+      SYMLINK_EXEC_IN_PROGRAM_DIR: {
+            last unless $fileformat eq 'executable';
+            local $CWD = $args{program_dir};
+            log_trace "Creating/updating program symlink ...";
+            if ((-l $sw) || !File::MoreUtil::file_exists($sw)) {
+                unlink $sw;
+                my $target = "$args{install_dir}/$sw/$filename";
+                $target =~ s!//!/!g;
+                log_trace "Creating symlink $args{program_dir}/$sw -> $target ...";
+                symlink $target, $sw or do {
+                    $envres->add_result(500, "Can't install $sw: Can't symlink $sw -> $target: $!", {item_id=>$sw});
+                    next SW;
+                };
+            }
         }
 
         $envres->add_result(200, "OK", {item_id=>$sw});
@@ -968,7 +1117,7 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.015 of App::instopt (from Perl distribution App-instopt), released on 2020-10-02.
+This document describes version 0.016 of App::instopt (from Perl distribution App-instopt), released on 2020-10-08.
 
 =head1 SYNOPSIS
 
@@ -1189,6 +1338,282 @@ Return value:  (any)
 
 
 
+=head2 is_downloaded_any
+
+Usage:
+
+ is_downloaded_any(%args) -> [status, msg, payload, meta]
+
+Check if any version of a software is downloaded.
+
+The download does not need to be the latest version. To check if the latest
+version of a software is downloaded, use C<is-downloaded-latest>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<download_dir> => I<dirname>
+
+=item * B<install_dir> => I<dirname>
+
+=item * B<program_dir> => I<dirname>
+
+=item * B<quiet> => I<bool>
+
+=item * B<software>* => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 is_downloaded_latest
+
+Usage:
+
+ is_downloaded_latest(%args) -> [status, msg, payload, meta]
+
+Check if latest version of a software has been downloaded.
+
+To only check whether any version of a software has been downloaded, use
+C<is-downloaded-any>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<download_dir> => I<dirname>
+
+=item * B<install_dir> => I<dirname>
+
+=item * B<program_dir> => I<dirname>
+
+=item * B<quiet> => I<bool>
+
+=item * B<software>* => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 is_installed_any
+
+Usage:
+
+ is_installed_any(%args) -> [status, msg, payload, meta]
+
+Check if any version of a software is installed.
+
+The installed version does not need to be the latest. To check whether the
+latest version of a software is installed, use C<is-installed-latest>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<download_dir> => I<dirname>
+
+=item * B<install_dir> => I<dirname>
+
+=item * B<program_dir> => I<dirname>
+
+=item * B<quiet> => I<bool>
+
+=item * B<software>* => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 is_installed_latest
+
+Usage:
+
+ is_installed_latest(%args) -> [status, msg, payload, meta]
+
+Check if latest version of a software is installed.
+
+To only check whether any version of a software is installed, use
+C<is-installed-any>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<download_dir> => I<dirname>
+
+=item * B<install_dir> => I<dirname>
+
+=item * B<program_dir> => I<dirname>
+
+=item * B<quiet> => I<bool>
+
+=item * B<software>* => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 list
+
+Usage:
+
+ list(%args) -> [status, msg, payload, meta]
+
+List software.
+
+Examples:
+
+=over
+
+=item * List software that are installed but out-of-date:
+
+ list( installed => 1, latest_installed => 0);
+
+Result:
+
+ [
+   500,
+   "Function died: Failed to change directory to '/home/u1/software': No such file or directory at lib/App/instopt.pm line 331.\n",
+   undef,
+   {
+     logs => [
+       {
+         file    => "/home/u1/perl5/perlbrew/perls/perl-5.30.0/lib/site_perl/5.30.0/Perinci/Access/Schemeless.pm",
+         func    => "Perinci::Access::Schemeless::action_call",
+         line    => 494,
+         package => "Perinci::Access::Schemeless",
+         time    => 1602119125,
+         type    => "create",
+       },
+     ],
+   },
+ ]
+
+=item * List software that have been downloaded but out-of-date:
+
+ list( downloaded => 1, latest_downloaded => 0); # -> [200, "OK", [], {}]
+
+=item * List software that have their latest version downloaded but not installed:
+
+ list( latest_downloaded => 1, latest_installed => 0); # -> [200, "OK", [], {}]
+
+=back
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<detail> => I<true>
+
+=item * B<download_dir> => I<dirname>
+
+=item * B<downloaded> => I<bool>
+
+If true, will only list downloaded software.
+
+=item * B<install_dir> => I<dirname>
+
+=item * B<installed> => I<bool>
+
+If true, will only list installed software.
+
+=item * B<latest_downloaded> => I<bool>
+
+If true, will only list software which have their latest version downloaded.
+
+If set to true, a software which is not downloaded, or downloaded but does not
+have the latest version downloaded, will not be included.
+
+If set to false, a software which has no downloaded versions, or does not have
+the latest version downloaded, will be included.
+
+=item * B<latest_installed> => I<bool>
+
+If true, will only list software which have their latest version installed.
+
+If set to true, a software which is not installed, or installed but does not
+have the latest version installed, will not be included.
+
+If set to false, a software which is not installed, or does not have the latest
+version installed, will be included.
+
+=item * B<program_dir> => I<dirname>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 list_downloaded
 
 Usage:
@@ -1210,10 +1635,6 @@ Arguments ('*' denotes required arguments):
 =item * B<download_dir> => I<dirname>
 
 =item * B<install_dir> => I<dirname>
-
-=item * B<per_arch> => I<true>
-
-Return per-arch hash in the all_versions field.
 
 =item * B<program_dir> => I<dirname>
 

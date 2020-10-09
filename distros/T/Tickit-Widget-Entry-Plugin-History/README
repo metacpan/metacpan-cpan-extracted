@@ -1,0 +1,45 @@
+NAME
+
+    Tickit::Widget::Entry::Plugin::History - add readline-like history to a
+    Tickit::Widget::Entry
+
+SYNOPSIS
+
+       use Tickit::Widget::Entry;
+       use Tickit::Widget::Entry::Plugin::History;
+    
+       my $entry = Tickit::Widget::Entry->new( ... );
+       Tickit::Widget::Entry::Plugin::History->apply( $entry );
+    
+       ...
+
+DESCRIPTION
+
+    This package applies code to a Tickit::Widget::Entry instance to
+    implement a history mechanism, which stores previously-entered values
+    allowing them to be recalled and reused later.
+
+METHODS
+
+ apply
+
+       Tickit::Widget::Entry::Plugin::History->apply( $entry, %opts )
+
+    Applies the plugin code to the given Tickit::Widget::Entry instance.
+
+    The following named options are recognised:
+
+    storage => ARRAY
+
+      An optional reference to an array to store the history in. If absent,
+      a new anonymous array will be created.
+
+    ignore_duplicates => BOOL
+
+      If true, an entry will not be pushed into history if it is equal to
+      the most recent item already there.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

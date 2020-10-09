@@ -1,2 +1,5 @@
+1.0.1  09.10.2020
+           - add log level to logger subs params
+           - add "format" param to multi logger ctor
 1.0.0  26.08.2020
            - initial release

@@ -1,5 +1,9 @@
 Revision history for Text::Sprintf::Named
 
+0.0404  2020-10-06
+        * Dist-Zilla / tidyall / etc. cleanups and corrections.
+            * Fairly minor and not related to the production-code.
+
 0.0403  2018-05-20
         * Convert to Dist-Zilla .
 

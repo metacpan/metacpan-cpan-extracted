@@ -27,6 +27,7 @@ t/05await-expr.t
 t/06await-nested.t
 t/07await-label.t
 t/08await-cancel.t
+t/09await-cancel-block.t
 t/10pad.t
 t/11contexts.t
 t/12closure.t

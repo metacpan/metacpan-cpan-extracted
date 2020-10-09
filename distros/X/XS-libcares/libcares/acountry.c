@@ -69,7 +69,12 @@
 #define INADDR_NONE 0xffffffff
 #endif
 
-static const char *usage      = "acountry [-vh?] {host|addr} ...\n";
+/* By using a double cast, we can get rid of the bogus warning of
+ * warning: cast from 'const struct sockaddr *' to 'const struct sockaddr_in6 *' increases required alignment from 1 to 4 [-Wcast-align]
+ */
+#define CARES_INADDR_CAST(type, var) ((type)((void *)var))
+
+static const char *usage      = "acountry [-?hdv] {host|addr} ...\n";
 static const char  nerd_fmt[] = "%u.%u.%u.%u.zz.countries.nerd.dk";
 static const char *nerd_ver1  = nerd_fmt + 14;  /* .countries.nerd.dk */
 static const char *nerd_ver2  = nerd_fmt + 11;  /* .zz.countries.nerd.dk */
@@ -84,6 +89,7 @@ static void wait_ares(ares_channel channel);
 static void callback(void *arg, int status, int timeouts, struct hostent *host);
 static void callback2(void *arg, int status, int timeouts, struct hostent *host);
 static void find_country_from_cname(const char *cname, struct in_addr addr);
+static void print_help_info_acountry();
 
 static void Abort(const char *fmt, ...)
 {
@@ -124,7 +130,11 @@ int main(int argc, char **argv)
         verbose++;
         break;
       case 'h':
+        print_help_info_acountry();
+        break;
       case '?':
+        print_help_info_acountry();
+        break;
       default:
         Abort(usage);
       }
@@ -233,7 +243,7 @@ static void callback(void *arg, int status, int timeouts, struct hostent *host)
   if (!cname)
     printf("Failed to get CNAME for %s\n", name);
   else
-    find_country_from_cname(cname, *(struct in_addr*)host->h_addr);
+    find_country_from_cname(cname, *(CARES_INADDR_CAST(struct in_addr *, host->h_addr)));
 }
 
 /*
@@ -618,4 +628,14 @@ static void find_country_from_cname(const char *cname, struct in_addr addr)
              country->long_name, country->short_name, cnumber);
     }
   free(ccopy);
+}
+
+/* Information from the man page. Formatting taken from man -h */
+static void print_help_info_acountry() {
+    printf("acountry, version %s \n\n", ARES_VERSION_STR);
+    printf("usage: acountry [-hdv] {host|addr} ...\n\n"
+    "  d : Print some extra debugging output.\n"
+    "  h : Display this help and exit.\n"
+    "  v : Be more verbose. Print extra information.\n\n");
+    exit(0);
 }

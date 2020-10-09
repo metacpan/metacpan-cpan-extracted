@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/graphviz-perl/GraphViz2-Parse-RecDescent/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphviz-perl/GraphViz2-Parse-RecDescent.git
-version: '2.49'
+version: '2.50'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

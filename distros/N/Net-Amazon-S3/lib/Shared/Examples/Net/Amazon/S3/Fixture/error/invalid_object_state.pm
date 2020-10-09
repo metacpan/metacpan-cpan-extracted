@@ -8,7 +8,7 @@ use HTTP::Status;
 use Shared::Examples::Net::Amazon::S3::Fixture;
 
 Shared::Examples::Net::Amazon::S3::Fixture::error_fixture
-    InvalidObjectState => HTTP::Status::HTTP_FORBIDDEN,
+	InvalidObjectState => HTTP::Status::HTTP_FORBIDDEN,
 	q<The operation is not valid for the object's storage class>,
 	;
 
@@ -24,7 +24,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::error::invalid_object_state - Shared
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

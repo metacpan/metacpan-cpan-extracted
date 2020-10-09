@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Bucket::Location::Request;
 # ABSTRACT: An internal class to get a bucket's location constraint
-$Net::Amazon::S3::Operation::Bucket::Location::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Bucket::Location::Request::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request::Bucket';
@@ -24,7 +24,7 @@ Net::Amazon::S3::Operation::Bucket::Location::Request - An internal class to get
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

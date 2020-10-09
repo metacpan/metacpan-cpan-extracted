@@ -23,7 +23,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::error::http_bad_request - Shared::Ex
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

@@ -12,7 +12,7 @@ use HTTP::Tiny;
 use Time::HiRes;
 use String::Similarity qw(similarity);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # Litchfield  38887 38888   City of Santa Rosa Laguna Treatment Plant 22961 22962    Geek Orchard 26363 26364
 
@@ -438,7 +438,7 @@ sub report {
 
 This method implements the official USA EPA guideline for converting PM2.5 
 concentration to AQI, per 
-L<https://www3.epa.gov/airnow/aqi-technical-assistance-document-sept2018.pdf>.
+L<https://www.airnow.gov/sites/default/files/2020-05/aqi-technical-assistance-document-sept2018.pdf>.
 
 The sensors do not report AQI metrics, only raw concentrations, so conversion 
 is necessary.  The C<report> method does this automatically (unless the C<raw> 

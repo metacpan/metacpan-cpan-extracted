@@ -1,5 +1,12 @@
 Revision history for Geo::Coder::Abbreviations
 
+0.04	Sun Oct  4 20:41:12 EDT 2020
+	Fix skipped count when not testing on the Internet
+	
+0.03	Sun Oct  4 11:52:30 EDT 2020
+	Use HTTP::Cache::Transparent if that has been installed
+	Handle more abbreviations and when given an abbreviated argument
+
 0.02	Thu Oct  1 14:16:59 EDT 2020
 	Use less memory
 	Don't load the abbreviations table each time a new object is instatiated

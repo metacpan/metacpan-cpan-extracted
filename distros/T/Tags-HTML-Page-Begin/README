@@ -59,6 +59,8 @@ METHODS
 
             Document character set.
 
+            Parameter is required.
+
             Default value is 'UTF-8'.
 
     *       "description"
@@ -87,6 +89,22 @@ METHODS
             Default value is 'Perl module: Tags::HTML::Page::Begin, Version:
             __MODULE_VERSION__'.
 
+    *       "html_lang"
+
+            HTML element lang attribute. Creates html element in form: <html
+            lang="en">
+
+            Default value is 'en'.
+
+    *       "http_equiv_content_type"
+
+            http-equiv content-type meta element. If defined creates meta in
+            form: <meta http-equiv="Content-Type" content="text/html;
+            charset=UTF-8" /> Unless defined creates meta in form: <meta
+            charset="UTF-8" />
+
+            Defaut value is 'text/html'.
+
     *       "keywords"
 
             Document keywords.
@@ -109,6 +127,12 @@ METHODS
     *       "robots"
 
             Robots meta.
+
+            Default value is undef.
+
+    *       "rss"
+
+            RSS link.
 
             Default value is undef.
 
@@ -151,6 +175,7 @@ ERRORS
              Parameter 'css_src' must be a array.
              Parameter 'css_src' must be a array of hash structures.
              Parameter 'css_src' must be a array of hash structures with 'media' and 'link' keys.
+             Parameter 'charset' is required.
              Parameter 'script_js' must be a array.
              Parameter 'script_js_src' must be a array.
              Parameter 'tags' must be a 'Tags::Output::*' class.
@@ -200,10 +225,9 @@ EXAMPLE1
 
      # Output:
      # <!DOCTYPE html>
-     # <html>
+     # <html lang="en">
      #   <head>
      #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-     #     <meta charset="UTF-8" />
      #     <meta name="generator" content=
      #       "Perl module: Tags::HTML::Page::Begin, Version: 0.06" />
      #     <title>
@@ -244,5 +268,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.09
+    0.10
 

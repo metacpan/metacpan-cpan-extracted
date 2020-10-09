@@ -49,10 +49,7 @@
             "Data::Section::Simple" : "0.02",
             "File::Which" : "1.21",
             "IPC::Run3" : "0.048",
-            "Log::Handler" : "0.84",
             "Moo" : "2.001001",
-            "Set::Array" : "0.23",
-            "Try::Tiny" : "0.09",
             "Types::Standard" : "1.000005",
             "perl" : "5.010001"
          }
@@ -60,6 +57,7 @@
       "test" : {
          "requires" : {
             "Test::More" : "1.001002",
+            "Test::Snapshot" : "0.06",
             "charnames" : "0",
             "open" : "0"
          }
@@ -79,6 +77,6 @@
          "web" : "https://github.com/ronsavage/GraphViz2"
       }
    },
-   "version" : "2.50",
+   "version" : "2.54",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

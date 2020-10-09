@@ -1,0 +1,32 @@
+NAME
+    Device::Chip::MAX31855 - chip driver for MAX31855 thermocouple amplifier
+
+SYNOPSIS
+        use Device::Chip::MAX31855;
+        my $chip = Device::Chip:MAX31855->new;
+        $chip->mount(Device::Chip::Adapter::...->new)->get;
+    
+        my $temp = $chip->read_thermocouple()->get;
+
+DESCRIPTION
+    Device::Chip::MAX31855 communicates with the MAX31855 SPI thermocouple
+    amplifier.
+
+    The MAX31855 is a digital thermocouple amplifier and converter
+    containing a thermocouple measurement circuit, cold junction
+    compensator, and digital SPI interface. It provides temperature
+    measurements of an attached K-type thermocouple and the local cold
+    junction sensor, and can detect faults such as open circuit and short to
+    ground (reading faults is not implemented yet).
+
+METHODS
+  read_thermocouple
+    Returns the termperature of the attached thermocouple in degrees
+    Celsius.
+
+  read_cold_junction
+    Returns the temperature of the local (cold) junction in degrees Celsius.
+
+AUTHOR
+    Stephen Cavilia <sac+cpan@atomicradi.us>
+

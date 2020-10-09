@@ -85,11 +85,11 @@ sub create
 		$labels{$rule} .= $rule_label;
 	}
 
-	for my $from (keys %edges)
+	for my $from (sort keys %edges)
 	{
 		next if (! $is_rule{$from});
 
-		for my $to (keys %{$edges{$from} })
+		for my $to (sort keys %{$edges{$from} })
 		{
 			next if (! $is_rule{$to});
 
@@ -97,7 +97,7 @@ sub create
 		}
 	}
 
-	for my $rule (keys %labels)
+	for my $rule (sort keys %labels)
 	{
 		$self -> graph -> add_node(name => $rule, label => [$rule, $labels{$rule}]);
 	}
@@ -128,28 +128,11 @@ L<GraphViz2::Parse::Yapp> - Visualize a yapp grammar as a graph
 	use GraphViz2;
 	use GraphViz2::Parse::Yapp;
 
-	use Log::Handler;
-
-	# ------------------------------------------------
-
-	my($logger) = Log::Handler -> new;
-
-	$logger -> add
-		(
-		 screen =>
-		 {
-			 maxlevel       => 'debug',
-			 message_layout => '%m',
-			 minlevel       => 'error',
-		 }
-		);
-
 	my($graph)  = GraphViz2 -> new
 		(
 		 edge   => {color => 'grey'},
 		 global => {directed => 1},
 		 graph  => {concentrate => 1, rankdir => 'TB'},
-		 logger => $logger,
 		 node   => {color => 'blue', shape => 'oval'},
 		);
 	my($g) = GraphViz2::Parse::Yapp -> new(graph => $graph);

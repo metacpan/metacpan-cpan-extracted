@@ -1,25 +1,29 @@
 Revision history for Perl extension GD::SecurityImage::AC.
 
+1.13 Mon Oct 05 06:40:00 2020
+    * Fixed tests with improper file path handling
+    * Parameterized lock timeout
+    * Fixed problem with unlocking on Win32 caused by using LOCK_NB with LOCK_UN
+    * Changed license to MIT License
+
 1.12 Sun Sep 27 07:02:00 2020
-        => Changed license to MIT
-        => Fixed encoding issue in POD
-        => Updated build tooling
-        => Updated maintainer info
-        => Made POD tests optional
-        => Added 'use warnings'
+    * Changed license to MIT
+    * Fixed encoding issue in POD
+    * Updated build tooling
+    * Updated maintainer info
+    * Made POD tests optional
+    * Added 'use warnings'
 
 1.11 Sun May 02 07:29:00 2008
-        => Seperated POD into .pod file
-        => Fixed taint compatibility and added documentation note on it
-        => Fixed locking
-        => Removed pointless AUTOLOAD (and consequent DESTROY) subs
-        => Replaced use of 'base' module with direct setting of @Authen::Captcha::ISA 
-        => Added build test for taint compatibility
-        => Benjamin Franz took over as maintainer
+    * Seperated POD into .pod file
+    * Fixed taint compatibility and added documentation note on it
+    * Fixed locking
+    * Removed pointless AUTOLOAD (and consequent DESTROY) subs
+    * Replaced use of 'base' module with direct setting of @Authen::Captcha::ISA 
+    * Added build test for taint compatibility
+    * Benjamin Franz took over as maintainer
 
 1.10 Sun Feb 19 23:33:56 2006
-	=> First release after separation from GD::SecurityImage 
-	   distribution.
-	=> Fixed a bug in setting attributes in new() and AUTOLOAD().
-	=> (Hopefully) fixed a bug related to unlink()ing images.
-	   Reported by GribUser.
+    * First release after separation from GD::SecurityImage distribution.
+    * Fixed a bug in setting attributes in new() and AUTOLOAD().
+    * (Hopefully) fixed a bug related to unlink()ing images. Reported by GribUser.

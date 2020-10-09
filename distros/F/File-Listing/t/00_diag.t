@@ -7,15 +7,18 @@ use Test::More tests => 1;
 # make changes instead to dist.ini
 
 my %modules;
+my $post_diag;
 
 $modules{$_} = $_ for qw(
-  base
+  Carp
   Exporter
   ExtUtils::MakeMaker
   HTTP::Date
   Test::More
   Time::Local
 );
+
+
 
 my @modules = sort keys %modules;
 
@@ -73,6 +76,12 @@ foreach my $module (@modules)
   {
     diag sprintf $format, $module, '-';
   }
+}
+
+if($post_diag)
+{
+  spacer;
+  $post_diag->();
 }
 
 spacer;

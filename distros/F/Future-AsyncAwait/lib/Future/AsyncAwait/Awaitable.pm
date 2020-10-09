@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait::Awaitable 0.43;
+package Future::AsyncAwait::Awaitable 0.44;
 
 use v5.14;
 use warnings;
@@ -164,6 +164,10 @@ An implementation that does not support cancellation can simply ignore this
 method.
 
    sub AWAIT_ON_CANCEL { }
+
+A newer version of this API specification will rename this to
+C<AWAIT_CHAIN_CANCEL>, so it is a good idea to alias the method under both
+names for now.
 
 =cut
 

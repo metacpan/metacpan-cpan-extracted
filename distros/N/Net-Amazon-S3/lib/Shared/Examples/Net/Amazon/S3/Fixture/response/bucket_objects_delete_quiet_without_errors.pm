@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 package
-    Shared::Examples::Net::Amazon::S3::Fixture::bucket::objects::delete::quiet_without_errors;
+	Shared::Examples::Net::Amazon::S3::Fixture::bucket::objects::delete::quiet_without_errors;
 
 use HTTP::Status;
 use Shared::Examples::Net::Amazon::S3::Fixture qw[ fixture ];
@@ -28,7 +28,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::response::bucket_objects_delete_quie
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

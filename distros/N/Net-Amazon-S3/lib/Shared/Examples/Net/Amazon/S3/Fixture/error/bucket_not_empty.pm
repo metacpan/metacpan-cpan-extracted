@@ -8,7 +8,8 @@ use HTTP::Status;
 use Shared::Examples::Net::Amazon::S3::Fixture;
 
 Shared::Examples::Net::Amazon::S3::Fixture::error_fixture
-    BucketNotEmpty => HTTP::Status::HTTP_CONFLICT;
+	BucketNotEmpty => HTTP::Status::HTTP_CONFLICT,
+	;
 
 __END__
 
@@ -22,7 +23,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::error::bucket_not_empty - Shared::Ex
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

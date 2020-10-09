@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Error::Handler::Legacy;
-$Net::Amazon::S3::Error::Handler::Legacy::VERSION = '0.94';
+$Net::Amazon::S3::Error::Handler::Legacy::VERSION = '0.97';
 # ABSTRACT: An internal class to report errors like legacy API
 
 use Moose;
@@ -11,26 +11,26 @@ use HTTP::Status;
 our @CARP_NOT = __PACKAGE__;
 
 my %croak_on_response = map +($_ => 1), (
-    'Net::Amazon::S3::Operation::Bucket::Acl::Fetch::Response',
-    'Net::Amazon::S3::Operation::Object::Acl::Fetch::Response',
-    'Net::Amazon::S3::Operation::Object::Fetch::Response',
+	'Net::Amazon::S3::Operation::Bucket::Acl::Fetch::Response',
+	'Net::Amazon::S3::Operation::Object::Acl::Fetch::Response',
+	'Net::Amazon::S3::Operation::Object::Fetch::Response',
 );
 
 override handle_error => sub {
-    my ($self, $response, $request) = @_;
+	my ($self, $response, $request) = @_;
 
-    return super unless exists $croak_on_response{ref $response};
+	return super unless exists $croak_on_response{ref $response};
 
-    $self->s3->err (undef);
-    $self->s3->errstr (undef);
+	$self->s3->err (undef);
+	$self->s3->errstr (undef);
 
-    return 1 unless $response->is_error;
-    return 0 if $response->http_response->code == HTTP::Status::HTTP_NOT_FOUND;
+	return 1 unless $response->is_error;
+	return 0 if $response->http_response->code == HTTP::Status::HTTP_NOT_FOUND;
 
-    $self->s3->err ("network_error");
-    $self->s3->errstr ($response->http_response->status_line);
+	$self->s3->err ("network_error");
+	$self->s3->errstr ($response->http_response->status_line);
 
-    Carp::croak ("Net::Amazon::S3: Amazon responded with ${\ $self->s3->errstr }\n");
+	Carp::croak ("Net::Amazon::S3: Amazon responded with ${\ $self->s3->errstr }\n");
 };
 
 1;
@@ -47,7 +47,7 @@ Net::Amazon::S3::Error::Handler::Legacy - An internal class to report errors lik
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

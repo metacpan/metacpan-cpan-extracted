@@ -1,4 +1,7 @@
 Revision history for Net-Amazon-Signature-v4
+0.21
+		- Include non-standard ports in request Host header (GH#9)
+
 0.20	2020-02-11
 		- Don't double-escape URI segments for S3 (RT#128728, GH#7)
 		- Allow passing attributes to new() in a hashref

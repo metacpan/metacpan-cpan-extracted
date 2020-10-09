@@ -186,10 +186,10 @@ Otherwise, set minimum log level only for specified module and its children. Eff
 
 Set backend. Must be a subref or logging object compatible with XLog.
 
-If C<$logger> is subref it will receive a single parameter - formatted message.
+If C<$logger> is subref it will receive formatted message and log level.
 
     XLog::set_logger({
-        my $msg = shift;
+        my ($msg, $level) = @_;
         say $msg;
     });
     

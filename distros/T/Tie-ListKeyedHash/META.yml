@@ -1,14 +1,33 @@
 ---
-name: Tie-ListKeyedHash
-version: 1.02
+abstract: 'A system allowing the use of anonymous arrays as keys to a hash.'
 author:
-  - Benjamin Franz <snowhare@nihongo.org>
-abstract: A system allowing the use of anonymous arrays as keys to a hash.
-license: perl
-requires:
-  Test::More: 0
+  - 'Jerilyn Franz <cpan@jerilyn.info>'
+build_requires:
+  Carp: '0'
+  Test::More: '0'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-ListKeyedHash
 provides:
   Tie::ListKeyedHash:
     file: lib/Tie/ListKeyedHash.pm
-    version: 1.02
-generated_by: Module::Build version 0.261
+    version: '1.03'
+requires:
+  Carp: '0'
+  perl: '5.006'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/JerilynFranz/perl-Tie-ListKeyedHash/issues
+  homepage: https://github.com/JerilynFranz/perl-Tie-ListKeyedHash
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://github.com/JerilynFranz/perl-Tie-ListKeyedHash.git
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

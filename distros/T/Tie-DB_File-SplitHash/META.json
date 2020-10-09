@@ -1,0 +1,72 @@
+{
+   "abstract" : "Transparently divides a DB_File hash into multiple smaller files",
+   "author" : [
+      "Jerilyn Franz <cpan@jerilyn.info>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-DB_File-SplitHash",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DB_File" : "0",
+            "Digest::SHA1" : "0",
+            "Fcntl" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "DB_File" : "0",
+            "Digest::SHA1" : "0",
+            "Fcntl" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Tie::DB_File::SplitHash" : {
+         "file" : "lib/Tie/DB_File/SplitHash.pm",
+         "version" : "1.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JerilynFranz/perl-Tie-DB_File-SplitHash/issues"
+      },
+      "homepage" : "https://github.com/JerilynFranz/perl-Tie-DB_File-SplitHash",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JerilynFranz/perl-Tie-DB_File-SplitHash.git",
+         "web" : "https://github.com/JerilynFranz/perl-Tie-DB_File-SplitHash"
+      }
+   },
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

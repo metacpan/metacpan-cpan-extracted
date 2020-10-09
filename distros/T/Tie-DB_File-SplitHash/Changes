@@ -1,3 +1,10 @@
+ 1.07 2020.10.04 - Fixes for MSWin directory permissions
+                   and file descriptor behavior breaking tests.
+
+ 1.06 2020.10.03 - Fixes for temp directory issue in tests (thanks goes
+                   to jkeenan [...] cpan.org for identifying the problem
+                   and submitting a patch for it). Updated maintainer info.
+                   Updated build support. Relicensed under MIT license.
 
  1.05 2005.11.18 - Added version requirement for Pod::Coverage to tests
 

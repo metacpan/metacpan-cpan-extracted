@@ -1,0 +1,3 @@
+1.0.0     09.10.2020
+           - C++ part moved from UniEvent
+           - added streamers (abstract, file, stream)

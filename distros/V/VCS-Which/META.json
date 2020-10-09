@@ -4,13 +4,13 @@
       "Ivan Wills <ivan.wills@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "VCS-Which",
    "prereqs" : {
@@ -47,27 +47,27 @@
    "provides" : {
       "VCS::Which" : {
          "file" : "lib/VCS/Which.pm",
-         "version" : "v0.6.6"
+         "version" : "v0.6.7"
       },
       "VCS::Which::Plugin" : {
          "file" : "lib/VCS/Which/Plugin.pm",
-         "version" : "v0.6.6"
+         "version" : "v0.6.7"
       },
       "VCS::Which::Plugin::Bazaar" : {
          "file" : "lib/VCS/Which/Plugin/Bazaar.pm",
-         "version" : "v0.6.6"
+         "version" : "v0.6.7"
       },
       "VCS::Which::Plugin::CVS" : {
          "file" : "lib/VCS/Which/Plugin/CVS.pm",
-         "version" : "v0.6.6"
+         "version" : "v0.6.7"
       },
       "VCS::Which::Plugin::Git" : {
          "file" : "lib/VCS/Which/Plugin/Git.pm",
-         "version" : "v0.6.6"
+         "version" : "v0.6.7"
       },
       "VCS::Which::Plugin::Subversion" : {
          "file" : "lib/VCS/Which/Plugin/Subversion.pm",
-         "version" : "v0.6.6"
+         "version" : "v0.6.7"
       }
    },
    "release_status" : "stable",
@@ -82,6 +82,6 @@
          "url" : "http://github.com/ivanwills/VCS-Which"
       }
    },
-   "version" : "v0.6.6",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v0.6.7",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

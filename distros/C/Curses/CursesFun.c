@@ -3846,7 +3846,10 @@ XS(XS_Curses_enclose)
     int c_mret  = c_x ? c_domove(win, ST(c_x-1), ST(c_x)) : OK;
     int y   = (int)SvIV(ST(c_arg));
     int x   = (int)SvIV(ST(c_arg+1));
-    bool    ret = c_mret == ERR ? ERR : wenclose(win, y, x);
+    /* We don't have any way to return an error, so if we couldn't move the
+       window, we just say the window does not enclose the location.
+    */
+    bool    ret = c_mret == ERR ? false : wenclose(win, y, x);
     
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), (IV)ret);
@@ -3869,7 +3872,7 @@ XS(XS_Curses_mouse_trafo)
     int pY  = 0;
     int pX  = 0;
     bool    to_screen   = (int)SvIV(ST(c_arg+2));
-    bool    ret = c_mret == ERR ? ERR : wmouse_trafo(win, &pY, &pX, to_screen);
+    bool    ret = c_mret == ERR ? false : wmouse_trafo(win, &pY, &pX, to_screen);
     
     sv_setiv(ST(c_arg), (IV)pY);;
     sv_setiv(ST(c_arg+1), (IV)pX);;

@@ -117,8 +117,6 @@ sub _compile_tzdata {
         etcetera
         factory
         backward
-        systemv
-        pacificnew
     );
 
     for my $f (@files) {

@@ -19,6 +19,6 @@ Mac::PropertyList::SAX->import( ":all" );
 
 foreach my $name ( @Mac::PropertyList::EXPORT_OK )
 	{
-	ok( defined( &$name ), "$name is now defined yet" );
+	ok( defined( &$name ), "$name is now defined" );
 	}
 

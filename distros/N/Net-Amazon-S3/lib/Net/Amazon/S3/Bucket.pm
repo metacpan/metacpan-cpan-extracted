@@ -1,433 +1,436 @@
 package Net::Amazon::S3::Bucket;
-$Net::Amazon::S3::Bucket::VERSION = '0.94';
+# ABSTRACT: convenience object for working with Amazon S3 buckets
+$Net::Amazon::S3::Bucket::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Carp;
 use File::stat;
 use IO::File 1.14;
 
-has 'account' => ( is => 'ro', isa => 'Net::Amazon::S3', required => 1 );
+has 'account' => (
+	is => 'ro',
+	isa => 'Net::Amazon::S3',
+	required => 1,
+	handles => [qw[ err errstr ]],
+);
 has 'bucket'  => ( is => 'ro', isa => 'Str',             required => 1 );
 has 'creation_date' => ( is => 'ro', isa => 'Maybe[Str]', required => 0 );
 
 has 'region' => (
-    is => 'ro',
-    lazy => 1,
-    predicate => 'has_region',
-    default => sub {
+	is => 'ro',
+	lazy => 1,
+	predicate => 'has_region',
+	default => sub {
 		return $_[0]->account->vendor->guess_bucket_region ($_[0]);
 	},
 );
 
 __PACKAGE__->meta->make_immutable;
 
-# ABSTRACT: convenience object for working with Amazon S3 buckets
-
-
-
 # returns bool
 sub add_key {
-    my ( $self, $key, $value, $conf ) = @_;
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments (\@_, ['key', 'value']);
 
-    if ( ref($value) eq 'SCALAR' ) {
-        $conf->{'Content-Length'} ||= -s $$value;
-        $value = _content_sub($$value);
-    } else {
-        $conf->{'Content-Length'} ||= length $value;
-    }
+	my $key = delete $args{key};
+	my $value = delete $args{value};
 
-    my $acl;
-	$acl = delete $conf->{acl_short} if exists $conf->{acl_short};
-	$acl = delete $conf->{acl}       if exists $conf->{acl};
+	if ( ref($value) eq 'SCALAR' ) {
+		$args{'Content-Length'} ||= -s $$value;
+		$value = _content_sub($$value);
+	} else {
+		$args{'Content-Length'} ||= length $value;
+	}
 
-    my $encryption = delete $conf->{encryption};
-    my %headers = %$conf;
+	my $acl;
+	$acl = delete $args{acl_short} if exists $args{acl_short};
+	$acl = delete $args{acl}       if exists $args{acl};
 
-    # we may get a 307 redirect; ask server to signal 100 Continue
-    # before reading the content from CODE reference (_content_sub)
-    $headers{expect} = '100-continue' if ref $value;
+	my $encryption = delete $args{encryption};
+	my %headers = %args;
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Add',
+	# we may get a 307 redirect; ask server to signal 100 Continue
+	# before reading the content from CODE reference (_content_sub)
+	$headers{expect} = '100-continue' if ref $value;
 
-        key       => $key,
-        value     => $value,
-        (acl      => $acl) x!! defined $acl,
-        ((encryption => $encryption) x!! defined $encryption),
-        headers   => \%headers,
-    );
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Add',
 
-    return $response->is_success;
+		key       => $key,
+		value     => $value,
+		(acl      => $acl) x!! defined $acl,
+		((encryption => $encryption) x!! defined $encryption),
+		headers   => \%headers,
+	);
+
+	return $response->is_success;
 }
-
 
 sub add_key_filename {
-    my ( $self, $key, $value, $conf ) = @_;
-    return $self->add_key( $key, \$value, $conf );
-}
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments (\@_, ['key', 'value']);
+	$args{value} = \ delete $args{value};
 
+	return $self->add_key (%args);
+}
 
 sub copy_key {
-    my ( $self, $key, $source, $conf ) = @_;
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments (\@_, ['key', 'source' ]);
 
-    my $acl_short;
-    if ( defined $conf ) {
-        if ( $conf->{acl_short} ) {
-            $acl_short = $conf->{acl_short};
-            delete $conf->{acl_short};
-        }
-        $conf->{Net::Amazon::S3::Constants->HEADER_METADATA_DIRECTIVE} ||= 'REPLACE';
-    } else {
-        $conf = {};
-    }
+	my $key = delete $args{key};
+	my $source = delete $args{source};
 
-    $conf->{Net::Amazon::S3::Constants->HEADER_COPY_SOURCE} = $source;
+	my $acl_short;
+	if (%args) {
+		if ( $args{acl_short} ) {
+			$acl_short = $args{acl_short};
+			delete $args{acl_short};
+		}
+		$args{Net::Amazon::S3::Constants->HEADER_METADATA_DIRECTIVE} ||= 'REPLACE';
+	}
 
-    my $encryption = delete $conf->{encryption};
+	$args{Net::Amazon::S3::Constants->HEADER_COPY_SOURCE} = $source;
 
-    my $acct    = $self->account;
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Add',
+	my $encryption = delete $args{encryption};
 
-        key       => $key,
-        value     => '',
-        acl_short => $acl_short,
-        (encryption => $encryption) x!! defined $encryption,
-        headers   => $conf,
-    );
+	my $acct    = $self->account;
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Add',
 
-    return unless $response->is_success;
+		value     => '',
+		key       => $key,
+		acl_short => $acl_short,
+		(encryption => $encryption) x!! defined $encryption,
+		headers   => \%args,
+	);
+
+	return unless $response->is_success;
 }
-
 
 sub edit_metadata {
-    my ( $self, $key, $conf ) = @_;
-    croak "Need configuration hash" unless defined $conf;
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments_with_object (\@_);
 
-    return $self->copy_key( $key, "/" . $self->bucket . "/" . $key, $conf );
+	my $key = delete $args{key};
+	croak "Need some metadata to change" unless %args;
+
+	return $self->copy_key (
+		key    => $key,
+		source => "/" . $self->bucket . "/" . $key,
+		%args,
+	);
 }
-
 
 sub head_key {
-    my ( $self, $key ) = @_;
-    return $self->get_key( $key, "HEAD" );
-}
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments_with_object (\@_);
 
+	return $self->get_key (%args, method => 'HEAD', filename => undef);
+}
 
 sub query_string_authentication_uri {
-    my ( $self, $key, $expires_at ) = @_;
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments (\@_, ['key', 'expires_at']);
 
-    my $request = Net::Amazon::S3::Operation::Object::Fetch::Request->new (
-        s3     => $self->account,
-        bucket => $self,
-        key    => $key,
-        method => 'GET',
-    );
+	$args{method} = 'GET' unless exists $args{method};
 
-    return $request->query_string_authentication_uri ($expires_at);
+	my $request = Net::Amazon::S3::Operation::Object::Fetch::Request->new (
+		s3     => $self->account,
+		bucket => $self,
+		key    => $args{key},
+		method => $args{method},
+	);
+
+	return $request->query_string_authentication_uri ($args{expires_at});
 }
-
 
 sub get_key {
-    my ( $self, $key, $method, $filename ) = @_;
-    $filename = $$filename if ref $filename;
-    my $acct = $self->account;
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments (\@_, ['key', 'method', 'filename']);
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Fetch',
-		filename => $filename,
+	$args{filename} = ${ delete $args{filename} }
+		if ref $args{filename};
 
-        key    => $key,
-        method => $method || 'GET',
-    );
+	$args{method} ||= 'GET';
 
-    return unless $response->is_success;
-    my $etag = $response->etag;
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Fetch',
 
-    my $return;
-    foreach my $header ($response->headers->header_field_names) {
-        $return->{ lc $header } = $response->header ($header);
-    }
-    $return->{content_length} = $response->content_length || 0;
-    $return->{content_type}   = $response->content_type;
-    $return->{etag}           = $etag;
-    $return->{value}          = $response->content;
+		filename => $args{filename},
 
-    return $return;
+		key    => $args{key},
+		method => $args{method},
+	);
+
+	return unless $response->is_success;
+	my $etag = $response->etag;
+
+	my $return;
+	foreach my $header ($response->headers->header_field_names) {
+		$return->{ lc $header } = $response->header ($header);
+	}
+	$return->{content_length} = $response->content_length || 0;
+	$return->{content_type}   = $response->content_type;
+	$return->{etag}           = $etag;
+	$return->{value}          = $response->content;
+
+	return $return;
 
 }
-
 
 sub get_key_filename {
-    my ( $self, $key, $method, $filename ) = @_;
-    return $self->get_key( $key, $method, \$filename );
-}
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments (\@_, ['key', 'method', 'filename']);
 
+	$args{filename} = \ delete $args{filename};
+	return $self->get_key (%args);
+}
 
 # returns bool
 sub delete_multi_object {
-    my $self = shift;
-    my @objects = @_;
-    return unless( scalar(@objects) );
+	my $self = shift;
+	my @objects = @_;
+	return unless( scalar(@objects) );
 
-    # Since delete can handle up to 1000 requests, be a little bit nicer
-    # and slice up requests and also allow keys to be strings
-    # rather than only objects.
-    my $last_result;
-    while (scalar(@objects) > 0) {
-        my $response = $self->_perform_operation (
-            'Net::Amazon::S3::Operation::Objects::Delete',
+	# Since delete can handle up to 1000 requests, be a little bit nicer
+	# and slice up requests and also allow keys to be strings
+	# rather than only objects.
+	my $last_result;
+	while (scalar(@objects) > 0) {
+		my $response = $self->_perform_operation (
+			'Net::Amazon::S3::Operation::Objects::Delete',
 
-            keys    => [
+			keys    => [
 				map { ref ($_) ? $_->key : $_ }
 				splice @objects, 0, ((scalar(@objects) > 1000) ? 1000 : scalar(@objects))
 			]
-        );
+		);
 
-        return unless $response->is_success;
-    }
+		return unless $response->is_success;
+	}
 
-    return 1;
+	return 1;
 }
 
 sub delete_key {
-    my ( $self, $key ) = @_;
-    croak 'must specify key' unless defined $key && length $key;
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments_with_object (\@_);
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Delete',
+	croak 'must specify key' unless defined $args{key} && length $args{key};
 
-        key    => $key,
-    );
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Delete',
+		%args,
+	);
 
-    return $response->is_success;
+	return $response->is_success;
 }
-
 
 sub delete_bucket {
-    my $self = shift;
-    croak "Unexpected arguments" if @_;
-    return $self->account->delete_bucket($self);
+	my $self = shift;
+	return $self->account->delete_bucket (bucket => $self, @_);
 }
-
 
 sub list {
-    my $self = shift;
-    my $conf = shift || {};
-    $conf->{bucket} = $self->bucket;
-    return $self->account->list_bucket($conf);
-}
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments (\@_);
 
+	return $self->account->list_bucket ($self, %args);
+}
 
 sub list_all {
-    my $self = shift;
-    my $conf = shift || {};
-    $conf->{bucket} = $self->bucket;
-    return $self->account->list_bucket_all($conf);
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments (\@_);
+
+	return $self->account->list_bucket_all ($self, %args);
 }
 
-
 sub get_acl {
-    my ($self, $key) = @_;
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments_with_object (\@_);
 
-    my $response;
-    if ($key) {
-        $response = $self->_perform_operation (
-            'Net::Amazon::S3::Operation::Object::Acl::Fetch',
-
-            key    => $key,
-        );
-    } else {
-        $response = $self->_perform_operation (
-            'Net::Amazon::S3::Operation::Bucket::Acl::Fetch',
-        );
-    }
+	my $response;
+	if (defined $args{key}) {
+		$response = $self->_perform_operation (
+			'Net::Amazon::S3::Operation::Object::Acl::Fetch',
+			%args,
+		);
+	} else {
+		delete $args{key};
+		$response = $self->_perform_operation (
+			'Net::Amazon::S3::Operation::Bucket::Acl::Fetch',
+			%args,
+		);
+	}
 
 	return unless $response->is_success;
 	return $response->content;
 }
 
-
 sub set_acl {
-    my ( $self, $conf ) = @_;
-    $conf ||= {};
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments_with_object (\@_);
 
-    my $response;
-    my $key = $conf->{key};
-    if ($key) {
-        $response = $self->_perform_operation (
-            'Net::Amazon::S3::Operation::Object::Acl::Set',
+	my $response;
+	if (defined $args{key}) {
+		$response = $self->_perform_operation (
+			'Net::Amazon::S3::Operation::Object::Acl::Set',
+			%args,
+		);
+	} else {
+		delete $args{key};
+		$response = $self->_perform_operation (
+			'Net::Amazon::S3::Operation::Bucket::Acl::Set',
+			%args,
+		);
+	}
 
-            key       => $key,
-            (acl       => $conf->{acl})       x!! defined $conf->{acl},
-            (acl_short => $conf->{acl_short}) x!! defined $conf->{acl_short},
-            (acl_xml   => $conf->{acl_xml})   x!! defined $conf->{acl_xml},
-        );
-    } else {
-        $response = $self->_perform_operation (
-            'Net::Amazon::S3::Operation::Bucket::Acl::Set',
-
-            (acl       => $conf->{acl})       x!! defined $conf->{acl},
-            (acl_short => $conf->{acl_short}) x!! defined $conf->{acl_short},
-            (acl_xml   => $conf->{acl_xml})   x!! defined $conf->{acl_xml},
-        );
-    }
-
-    return unless $response->is_success;
-    return 1;
+	return unless $response->is_success;
+	return 1;
 }
-
 
 sub get_location_constraint {
-    my ($self) = @_;
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments (\@_);
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Bucket::Location',
-    );
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Bucket::Location',
+		%args,
+	);
 
-    return unless $response->is_success;
-    return $response->location;
+	return unless $response->is_success;
+	return $response->location;
 }
-
-# proxy up the err requests
-
-
-sub err { $_[0]->account->err }
-
-
-sub errstr { $_[0]->account->errstr }
-
 
 sub add_tags {
-    my ($self, $conf) = @_;
+	my $self = shift;
+	my %args = @_ == 1 ? %{ $_[0] } : @_;
 
-    my $response;
-    if (exists $conf->{key}) {
-        $response = $self->_perform_operation (
-            'Net::Amazon::S3::Operation::Object::Tags::Add',
+	my $response;
+	if (defined $args{key}) {
+		$response = $self->_perform_operation (
+			'Net::Amazon::S3::Operation::Object::Tags::Add',
+			%args,
+		);
+	} else {
+		delete $args{key};
+		$response = $self->_perform_operation (
+			'Net::Amazon::S3::Operation::Bucket::Tags::Add',
+			%args,
+		);
+	}
 
-            tags   => $conf->{tags},
-            key    => $conf->{key},
-            (version_id => $conf->{version_id}) x!! defined $conf->{version_id},
-        );
-    } else {
-        $response = $self->_perform_operation (
-            'Net::Amazon::S3::Operation::Bucket::Tags::Add',
-
-            tags   => $conf->{tags},
-        );
-    }
-
-    return $response->is_success;
+	return $response->is_success;
 }
 
-
 sub delete_tags {
-    my ($self, $conf) = @_;
+	my $self = shift;
+	my %args = Net::Amazon::S3::Utils->parse_arguments_with_object (\@_);
 
-    my $response;
-    if (exists $conf->{key}) {
-        $response = $self->_perform_operation (
-            'Net::Amazon::S3::Operation::Object::Tags::Delete',
+	my $response;
+	if (defined $args{key}) {
+		$response = $self->_perform_operation (
+			'Net::Amazon::S3::Operation::Object::Tags::Delete',
+			%args,
+		);
+	} else {
+		delete $args{key};
+		$response = $self->_perform_operation (
+			'Net::Amazon::S3::Operation::Bucket::Tags::Delete',
+			%args,
+		);
+	}
 
-            key    => $conf->{key},
-            (version_id => $conf->{version_id}) x!! defined $conf->{version_id},
-        );
-    } else {
-        $response = $self->_perform_operation (
-            'Net::Amazon::S3::Operation::Bucket::Tags::Delete',
-        );
-    }
-
-    return $response->is_success;
+	return $response->is_success;
 }
 
 sub _content_sub {
-    my $filename  = shift;
-    my $stat      = stat($filename);
-    my $remaining = $stat->size;
-    my $blksize   = $stat->blksize || 4096;
+	my $filename  = shift;
+	my $stat      = stat($filename);
+	my $remaining = $stat->size;
+	my $blksize   = $stat->blksize || 4096;
 
-    croak "$filename not a readable file with fixed size"
-        unless -r $filename and ( -f _ || $remaining );
-    my $fh = IO::File->new( $filename, 'r' )
-        or croak "Could not open $filename: $!";
-    $fh->binmode;
+	croak "$filename not a readable file with fixed size"
+		unless -r $filename and ( -f _ || $remaining );
+	my $fh = IO::File->new( $filename, 'r' )
+		or croak "Could not open $filename: $!";
+	$fh->binmode;
 
-    return sub {
-        my $buffer;
+	return sub {
+		my $buffer;
 
-        # upon retries the file is closed and we must reopen it
-        unless ( $fh->opened ) {
-            $fh = IO::File->new( $filename, 'r' )
-                or croak "Could not open $filename: $!";
-            $fh->binmode;
-            $remaining = $stat->size;
-        }
+		# upon retries the file is closed and we must reopen it
+		unless ( $fh->opened ) {
+			$fh = IO::File->new( $filename, 'r' )
+				or croak "Could not open $filename: $!";
+			$fh->binmode;
+			$remaining = $stat->size;
+		}
 
-        # warn "read remaining $remaining";
-        unless ( my $read = $fh->read( $buffer, $blksize ) ) {
+		# warn "read remaining $remaining";
+		unless ( my $read = $fh->read( $buffer, $blksize ) ) {
 
 #                       warn "read $read buffer $buffer remaining $remaining";
-            croak
-                "Error while reading upload content $filename ($remaining remaining) $!"
-                if $! and $remaining;
+			croak
+				"Error while reading upload content $filename ($remaining remaining) $!"
+				if $! and $remaining;
 
-            # otherwise, we found EOF
-            $fh->close
-                or croak "close of upload content $filename failed: $!";
-            $buffer ||= ''
-                ;    # LWP expects an emptry string on finish, read returns 0
-        }
-        $remaining -= length($buffer);
-        return $buffer;
-    };
+			# otherwise, we found EOF
+			$fh->close
+				or croak "close of upload content $filename failed: $!";
+			$buffer ||= ''
+				;    # LWP expects an emptry string on finish, read returns 0
+		}
+		$remaining -= length($buffer);
+		return $buffer;
+	};
 }
 
 sub _head_region {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    my $protocol = $self->account->secure ? 'https' : 'http';
-    my $host = $self->account->host;
-    my $path = $self->bucket;
-    my @retry = (1, 2, (4) x 8);
+	my $protocol = $self->account->secure ? 'https' : 'http';
+	my $host = $self->account->host;
+	my $path = $self->bucket;
+	my @retry = (1, 2, (4) x 8);
 
-    if ($self->account->use_virtual_host) {
-        $host = "$path.$host";
-        $path = '';
-    }
+	if ($self->account->use_virtual_host) {
+		$host = "$path.$host";
+		$path = '';
+	}
 
-    my $request_uri = "${protocol}://${host}/$path";
-    while (@retry) {
-        my $request = HTTP::Request->new (HEAD => $request_uri);
+	my $request_uri = "${protocol}://${host}/$path";
+	while (@retry) {
+		my $request = HTTP::Request->new (HEAD => $request_uri);
 
-        # Disable redirects
-        my $requests_redirectable = $self->account->ua->requests_redirectable;
-        $self->account->ua->requests_redirectable( [] );
+		# Disable redirects
+		my $requests_redirectable = $self->account->ua->requests_redirectable;
+		$self->account->ua->requests_redirectable( [] );
 
-        my $response = $self->account->_do_http( $request );
+		my $response = $self->account->ua->request ($request);
 
-        $self->account->ua->requests_redirectable( $requests_redirectable );
+		$self->account->ua->requests_redirectable( $requests_redirectable );
 
-        return $response->header (Net::Amazon::S3::Constants->HEADER_BUCKET_REGION)
-            if $response->header (Net::Amazon::S3::Constants->HEADER_BUCKET_REGION);
+		return $response->header (Net::Amazon::S3::Constants->HEADER_BUCKET_REGION)
+			if $response->header (Net::Amazon::S3::Constants->HEADER_BUCKET_REGION);
 
-        print STDERR "Invalid bucket head response; $request_uri\n";
-        print STDERR $response->as_string;
+		print STDERR "Invalid bucket head response; $request_uri\n";
+		print STDERR $response->as_string;
 
-        sleep shift @retry;
-    }
+		sleep shift @retry;
+	}
 
-    die "Cannot determine bucket region; bucket=${\ $self->bucket }";
+	die "Cannot determine bucket region; bucket=${\ $self->bucket }";
 }
 
 sub _perform_operation {
-    my ($self, $operation, %params) = @_;
+	my ($self, $operation, %params) = @_;
 
-    $self->account->_perform_operation ($operation => (
-        bucket => $self,
-        %params,
-    ));
+	$self->account->_perform_operation ($operation => (
+		bucket => $self,
+		%params,
+	));
 }
 
 1;
@@ -444,7 +447,7 @@ Net::Amazon::S3::Bucket - convenience object for working with Amazon S3 buckets
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 
@@ -497,8 +500,6 @@ version 0.94
 
 This module represents an S3 bucket.  You get a bucket object
 from the Net::Amazon::S3 object.
-
-=for test_synopsis no strict 'vars'
 
 =head1 METHODS
 
@@ -607,8 +608,53 @@ Takes the name of a key in this bucket and returns its configuration hash
 
 =head2 query_string_authentication_uri KEY, EXPIRES_AT
 
-Takes key and expiration time (epoch time) and returns uri signed
-with query parameter
+	my $uri = $bucket->query_string_authentication_uri (
+		key => 'foo',
+		expires_at => time + 3_600, # valid for one hour
+	);
+
+	my $uri = $bucket->query_string_authentication_uri (
+		key => 'foo',
+		expires_at => time + 3_600,
+		method => 'PUT',
+	);
+
+Returns uri presigned with your credentials.
+
+When used with Signature V4 you have to specify also HTTP method this
+presigned uri will be used for (default: C<GET>)
+
+Method provides authenticated uri only for direct object operations.
+
+Method follows API's L</"CALLING CONVENTION">.
+
+Recognized positional arguments (mandatory).
+
+=over
+
+=item key
+
+=item expires_at
+
+Expiration time (epoch time).
+
+=back
+
+Optional arguments
+
+=over
+
+=item method
+
+Default: C<GET>
+
+Intended HTTP method this uri will be presigned for.
+
+Signature V2 doesn't use it but Signature V4 does.
+
+See L<https://docs.aws.amazon.com/AmazonS3/latest/dev/PresignedUrlUploadObject.html>
+
+=back
 
 =head2 get_key $key_name [$method]
 
@@ -770,19 +816,18 @@ Returns C<true> on success.
 
 Returns C<false> and sets C<err>/C<errstr> otherwise.
 
-=head2 add_tags
+=head2 delete_tags
 
 	# Add tags for a bucket
-	$s3->add_tags ({
+	$s3->delete_tags ({
 		bucket => 'bucket-name',
-		tags   => { tag1 => 'value-1', tag2 => 'value-2' },
 	});
 
 	# Add tags for an object
-	$s3->add_tags ({
-		bucket => 'bucket-name',
-		key    => 'key',
-		tags   => { tag1 => 'value-1', tag2 => 'value-2' },
+	$s3->delete_tags ({
+		bucket     => 'bucket-name',
+		key        => 'key',
+		version_id => $version_id,
 	});
 
 Takes configuration parameters

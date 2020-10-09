@@ -5413,7 +5413,7 @@ _migrate(dom, destcon, newparams, flags=0)
      virTypedParameterPtr params;
      int nparams;
     CODE:
-     nparams = 18;
+     nparams = 19;
      Newx(params, nparams, virTypedParameter);
 
      strncpy(params[0].field, VIR_MIGRATE_PARAM_URI,
@@ -5487,6 +5487,10 @@ _migrate(dom, destcon, newparams, flags=0)
      strncpy(params[17].field, VIR_MIGRATE_PARAM_TLS_DESTINATION,
              VIR_TYPED_PARAM_FIELD_LENGTH);
      params[17].type = VIR_TYPED_PARAM_STRING;
+
+     strncpy(params[18].field, VIR_MIGRATE_PARAM_DISKS_URI,
+             VIR_TYPED_PARAM_FIELD_LENGTH);
+     params[18].type = VIR_TYPED_PARAM_STRING;
 
      nparams = vir_typed_param_from_hv(newparams, params, nparams);
 
@@ -5516,7 +5520,7 @@ _migrate_to_uri(dom, desturi, newparams, flags=0)
      virTypedParameterPtr params;
      int nparams;
   PPCODE:
-     nparams = 18;
+     nparams = 19;
      Newx(params, nparams, virTypedParameter);
 
      strncpy(params[0].field, VIR_MIGRATE_PARAM_URI,
@@ -5590,6 +5594,10 @@ _migrate_to_uri(dom, desturi, newparams, flags=0)
      strncpy(params[17].field, VIR_MIGRATE_PARAM_TLS_DESTINATION,
              VIR_TYPED_PARAM_FIELD_LENGTH);
      params[17].type = VIR_TYPED_PARAM_STRING;
+
+     strncpy(params[18].field, VIR_MIGRATE_PARAM_DISKS_URI,
+             VIR_TYPED_PARAM_FIELD_LENGTH);
+     params[18].type = VIR_TYPED_PARAM_STRING;
 
      nparams = vir_typed_param_from_hv(newparams, params, nparams);
 
@@ -9295,6 +9303,7 @@ BOOT:
       REGISTER_CONSTANT_STR(VIR_MIGRATE_PARAM_BANDWIDTH_POSTCOPY, MIGRATE_PARAM_BANDWIDTH_POSTCOPY);
       REGISTER_CONSTANT_STR(VIR_MIGRATE_PARAM_PARALLEL_CONNECTIONS, MIGRATE_PARAM_PARALLEL_CONNECTIONS);
       REGISTER_CONSTANT_STR(VIR_MIGRATE_PARAM_TLS_DESTINATION, MIGRATE_PARAM_TLS_DESTINATION);
+      REGISTER_CONSTANT_STR(VIR_MIGRATE_PARAM_DISKS_URI, MIGRATE_PARAM_DISKS_URI);
 
       REGISTER_CONSTANT(VIR_DOMAIN_MIGRATE_MAX_SPEED_POSTCOPY, MIGRATE_MAX_SPEED_POSTCOPY);
 
@@ -10097,6 +10106,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_MDEV, LIST_CAP_MDEV);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_MDEV_TYPES, LIST_CAP_MDEV_TYPES);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_CCW_DEV, LIST_CAP_CCW_DEV);
+      REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_CSS_DEV, LIST_CAP_CSS_DEV);
 
       REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_ID_LIFECYCLE, EVENT_ID_LIFECYCLE);
       REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_ID_UPDATE, EVENT_ID_UPDATE);

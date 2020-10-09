@@ -9,7 +9,7 @@ package Rex::Inventory;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 use Rex::Inventory::DMIDecode;
 use Rex::Inventory::Hal;
@@ -133,7 +133,7 @@ sub get {
             type          => $hp_raid->{$key}->{"description"},
             model         => $hp_raid->{$key}->{"model"},
             serial_number => $hp_raid->{$key}->{"serial_number"},
-            cache_status =>
+            cache_status  =>
               ( $hp_raid->{$key}->{"cache_status"} eq "OK" ? 1 : 0 ),
             shelfs => \%raid_shelfs,
           }

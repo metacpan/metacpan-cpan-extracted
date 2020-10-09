@@ -1,5 +1,8 @@
 Revision history for Perl extension App-findeps
 
+0.11 2020-10-07T13:44:46Z
+    - fiexd #4
+
 0.10 2020-09-29T06:04:22Z
     - removed surplus files
 

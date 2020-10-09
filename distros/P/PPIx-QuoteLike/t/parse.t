@@ -37,7 +37,6 @@ if ( ok $obj, q<Able to parse ''> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{  } ],
 	q<'' interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<'' postderef>;
     cmp_ok scalar $obj->elements(), '==', 3,
 	q<Number of elements of ''>;
     cmp_ok scalar $obj->children(), '==', 0,
@@ -59,7 +58,6 @@ if ( ok $obj, q{Able to parse qq xyx} ) {
 	    [ qw{  } ],
 	    q{qq xyx interpolated variables};
     }
-    cmp_ok $obj->postderef(), '==', 1, q{qq xyx postderef};
     cmp_ok scalar $obj->elements(), '==', 5,
 	q{Number of elements of qq xyx};
     cmp_ok scalar $obj->children(), '==', 1,
@@ -93,7 +91,6 @@ if ( ok $obj, q<Able to parse "foo\"bar"> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{  } ],
 	q<"foo\"bar" interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<"foo\"bar" postderef>;
     cmp_ok scalar $obj->elements(), '==', 4,
 	q<Number of elements of "foo\"bar">;
     cmp_ok scalar $obj->children(), '==', 1,
@@ -127,7 +124,6 @@ if ( ok $obj, q<Able to parse q{\Qx}> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{  } ],
 	q<q{\Qx} interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<q{\Qx} postderef>;
     cmp_ok scalar $obj->elements(), '==', 4,
 	q<Number of elements of q{\Qx}>;
     cmp_ok scalar $obj->children(), '==', 1,
@@ -161,7 +157,6 @@ if ( ok $obj, q<Able to parse qq {\Qx}> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{  } ],
 	q<qq {\Qx} interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<qq {\Qx} postderef>;
     cmp_ok scalar $obj->elements(), '==', 6,
 	q<Number of elements of qq {\Qx}>;
     cmp_ok scalar $obj->children(), '==', 2,
@@ -209,7 +204,6 @@ if ( ok $obj, q<Able to parse qx '$foo'> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{  } ],
 	q<qx '$foo' interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<qx '$foo' postderef>;
     cmp_ok scalar $obj->elements(), '==', 5,
 	q<Number of elements of qx '$foo'>;
     cmp_ok scalar $obj->children(), '==', 1,
@@ -243,7 +237,6 @@ if ( ok $obj, q<Able to parse "$foo"> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $foo } ],
 	q<"$foo" interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<"$foo" postderef>;
     cmp_ok scalar $obj->elements(), '==', 4,
 	q<Number of elements of "$foo">;
     cmp_ok scalar $obj->children(), '==', 1,
@@ -280,7 +273,6 @@ if ( ok $obj, q<Able to parse "$$foo"> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $foo } ],
 	q<"$$foo" interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<"$$foo" postderef>;
     cmp_ok scalar $obj->elements(), '==', 4,
 	q<Number of elements of "$$foo">;
     cmp_ok scalar $obj->children(), '==', 1,
@@ -317,7 +309,6 @@ if ( ok $obj, q<Able to parse qx{${foo}bar}> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $foo } ],
 	q<qx{${foo}bar} interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<qx{${foo}bar} postderef>;
     cmp_ok scalar $obj->elements(), '==', 5,
 	q<Number of elements of qx{${foo}bar}>;
     cmp_ok scalar $obj->children(), '==', 2,
@@ -368,7 +359,6 @@ if ( ok $obj, q<Able to parse <$foo>> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $foo } ],
 	q<<$foo> interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<<$foo> postderef>;
     cmp_ok scalar $obj->elements(), '==', 4,
 	q<Number of elements of <$foo>>;
     cmp_ok scalar $obj->children(), '==', 1,
@@ -405,7 +395,6 @@ if ( ok $obj, q<Able to parse "foo@{[ qq<$bar$baz> ]}buzz"> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $bar $baz } ],
 	q<"foo@{[ qq<$bar$baz> ]}buzz" interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<"foo@{[ qq<$bar$baz> ]}buzz" postderef>;
     cmp_ok scalar $obj->elements(), '==', 6,
 	q<Number of elements of "foo@{[ qq<$bar$baz> ]}buzz">;
     cmp_ok scalar $obj->children(), '==', 3,
@@ -470,7 +459,6 @@ if ( ok $obj, q<Able to parse "$foo::$bar"> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $bar $foo } ],
 	q<"$foo::$bar" interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<"$foo::$bar" postderef>;
     cmp_ok scalar $obj->elements(), '==', 6,
 	q<Number of elements of "$foo::$bar">;
     cmp_ok scalar $obj->children(), '==', 3,
@@ -538,7 +526,6 @@ if ( ok $obj, q<Able to parse "@{$x[$i]}"> ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $i @x } ],
 	q<"@{$x[$i]}" interpolated variables>;
-    cmp_ok $obj->postderef(), '==', 1, q<"@{$x[$i]}" postderef>;
     cmp_ok scalar $obj->elements(), '==', 4,
 	q<Number of elements of "@{$x[$i]}">;
     cmp_ok scalar $obj->children(), '==', 1,
@@ -577,7 +564,6 @@ if ( ok $obj, q{Able to parse "\N{$foo}"} ) {
 	    [ qw{  } ],
 	    q{"\N{$foo}" interpolated variables};
     }
-    cmp_ok $obj->postderef(), '==', 1, q{"\N{$foo}" postderef};
     cmp_ok scalar $obj->elements(), '==', 4,
 	q{Number of elements of "\N{$foo}"};
     cmp_ok scalar $obj->children(), '==', 1,
@@ -623,7 +609,6 @@ __END_OF_HERE_DOCUMENT
 	is_deeply [ sort $obj->variables() ],
 	    [ qw{ $burfle $foo } ],
 	    q{HERE_DOCUMENT interpolated variables};
-	cmp_ok $obj->postderef(), '==', 1, q{HERE_DOCUMENT postderef};
 	cmp_ok scalar $obj->elements(), '==', 10,
 	    q{Number of elements of HERE_DOCUMENT};
 	cmp_ok scalar $obj->children(), '==', 4,
@@ -695,7 +680,6 @@ if ( ok $obj, q{Able to parse "@@x"} ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ @x } ],
 	q{"@@x" interpolated variables};
-    cmp_ok $obj->postderef(), '==', 1, q{"@@x" postderef};
     cmp_ok scalar $obj->elements(), '==', 5,
 	q{Number of elements of "@@x"};
     cmp_ok scalar $obj->children(), '==', 2,
@@ -746,7 +730,6 @@ if ( ok $obj, q{Able to parse "x@*y"} ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{  } ],
 	q{"x@*y" interpolated variables};
-    cmp_ok $obj->postderef(), '==', 1, q{"x@*y" postderef};
     cmp_ok scalar $obj->elements(), '==', 4,
 	q{Number of elements of "x@*y"};
     cmp_ok scalar $obj->children(), '==', 1,
@@ -780,7 +763,6 @@ if ( ok $obj, q{Able to parse "$@"} ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $@ } ],
 	q{"$@" interpolated variables};
-    cmp_ok $obj->postderef(), '==', 1, q{"$@" postderef};
     cmp_ok scalar $obj->elements(), '==', 4,
 	q{Number of elements of "$@"};
     cmp_ok scalar $obj->children(), '==', 1,
@@ -817,7 +799,6 @@ if ( ok $obj, q{Able to parse "${x}[0]"} ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $x } ],
 	q{"${x}[0]" interpolated variables};
-    cmp_ok $obj->postderef(), '==', 1, q{"${x}[0]" postderef};
     cmp_ok scalar $obj->elements(), '==', 5,
 	q{Number of elements of "${x}[0]"};
     cmp_ok scalar $obj->children(), '==', 2,
@@ -868,7 +849,6 @@ if ( ok $obj, q{Able to parse "$x[$[]"} ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $[ @x } ],
 	q{"$x[$[]" interpolated variables};
-    cmp_ok $obj->postderef(), '==', 1, q{"$x[$[]" postderef};
     cmp_ok scalar $obj->elements(), '==', 4,
 	q{Number of elements of "$x[$[]"};
     cmp_ok scalar $obj->children(), '==', 1,
@@ -905,7 +885,6 @@ if ( ok $obj, q{Able to parse "$${foo}"} ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $foo } ],
 	q{"$${foo}" interpolated variables};
-    cmp_ok $obj->postderef(), '==', 1, q{"$${foo}" postderef};
     cmp_ok scalar $obj->elements(), '==', 4,
 	q{Number of elements of "$${foo}"};
     cmp_ok scalar $obj->children(), '==', 1,
@@ -942,7 +921,6 @@ if ( ok $obj, q{Able to parse "${$}"} ) {
     is_deeply [ sort $obj->variables() ],
 	[ qw{ $$ } ],
 	q{"${$}" interpolated variables};
-    cmp_ok $obj->postderef(), '==', 1, q{"${$}" postderef};
     cmp_ok scalar $obj->elements(), '==', 4,
 	q{Number of elements of "${$}"};
     cmp_ok scalar $obj->children(), '==', 1,
@@ -981,7 +959,6 @@ if ( ok $obj, q{Able to parse "@{[ ${ foo } ]}"} ) {
 	    [ qw{ $foo } ],
 	    q{"@{[ ${ foo } ]}" interpolated variables};
     }
-    cmp_ok $obj->postderef(), '==', 1, q{"@{[ ${ foo } ]}" postderef};
     cmp_ok scalar $obj->elements(), '==', 4,
 	q{Number of elements of "@{[ ${ foo } ]}"};
     cmp_ok scalar $obj->children(), '==', 1,
@@ -1022,7 +999,6 @@ if ( ok $obj, q{Able to parse "<$a->@*>"} ) {
 	    [ qw{ $a } ],
 	    q{"<$a->@*>" interpolated variables};
     }
-    cmp_ok $obj->postderef(), '==', 1, q{"<$a->@*>" postderef};
     cmp_ok scalar $obj->elements(), '==', 6,
 	q{Number of elements of "<$a->@*>"};
     cmp_ok scalar $obj->children(), '==', 3,
@@ -1091,7 +1067,6 @@ if ( ok $obj, q{Able to parse "<$a->@[0..2]>"} ) {
 	    [ qw{ $a } ],
 	    q{"<$a->@[0..2]>" interpolated variables};
     }
-    cmp_ok $obj->postderef(), '==', 1, q{"<$a->@[0..2]>" postderef};
     cmp_ok scalar $obj->elements(), '==', 6,
 	q{Number of elements of "<$a->@[0..2]>"};
     cmp_ok scalar $obj->children(), '==', 3,
@@ -1179,7 +1154,6 @@ SKIP: {
 		[ qw{  } ],
 		q{qq ?y? with noncharacter delimiter interpolated variables};
 	}
-	cmp_ok $obj->postderef(), '==', 1, q{qq ?y? with noncharacter delimiter postderef};
 	cmp_ok scalar $obj->elements(), '==', 5,
 	    q{Number of elements of qq ?y? with noncharacter delimiter};
 	cmp_ok scalar $obj->children(), '==', 1,
@@ -1225,7 +1199,6 @@ SKIP: {
 		[ qw{  } ],
 		q{qq ?y? with illegal character delimiter interpolated variables};
 	}
-	cmp_ok $obj->postderef(), '==', 1, q{qq ?y? with illegal character delimiter postderef};
 	cmp_ok scalar $obj->elements(), '==', 5,
 	    q{Number of elements of qq ?y? with illegal character delimiter};
 	cmp_ok scalar $obj->children(), '==', 1,

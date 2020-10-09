@@ -1,6 +1,11 @@
 Revision history for Perl extension XML::Writer.
 
-0.625 Thu 05 Jun 2014 23:55:42 +1000    <joe@kafsemo.org>
+0.900 Fri Mar  8 00:19:28 2019 +1100    <joe@kafsemo.org>
+        - Drop support for building on (very) old perls.
+        - Check for valid element names (#107239)
+        - Fail when a scalar other than 'self' is passed as OUTPUT.
+
+0.625 Thu Jun  5 23:55:42 2014 +1000    <joe@kafsemo.org>
         - Allow xml-model processing instructions (#94078).
         - Don't warn when undef is passed to setOutput (#94369).
 

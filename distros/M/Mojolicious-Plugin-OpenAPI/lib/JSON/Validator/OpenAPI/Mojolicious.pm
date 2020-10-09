@@ -2,6 +2,7 @@ package JSON::Validator::OpenAPI::Mojolicious;
 use Mojo::Base 'JSON::Validator';
 
 use Carp 'confess';
+use JSON::Validator::Util qw(schema_type);
 use Mojo::JSON qw(false true);
 use Mojo::Parameters;
 use Mojo::Util;
@@ -32,7 +33,7 @@ sub load_and_validate_schema {
   my @errors;
   my $gather = sub {
     push @errors, E($_[1], 'Only one parameter can have "in":"body"')
-      if 1 < grep { $_->{in} eq 'body' } @{$_[0] || []};
+      if 1 < grep { $_->{in} and $_->{in} eq 'body' } @{$_[0] || []};
   };
 
   $self->_get($self->_resolve($spec), ['paths', undef, undef, 'parameters'], '', $gather);
@@ -68,8 +69,8 @@ sub validate_request {
 
   for my $p (@{$schema->{parameters} || []}) {
     my ($in, $name, $type) = @$p{qw(in name type)};
-    $type ||= $p->{schema}{type} if $p->{schema};    # v3
     my ($exists, $value) = (0, undef);
+    $type ||= schema_type($p->{schema} || $p);
 
     if ($in eq 'body') {
       $value  = $self->_get_request_data($c, $in);
@@ -86,11 +87,11 @@ sub validate_request {
       $value  = $value->{$key};
     }
 
-    if (defined $value and $type eq 'array') {
+    if ($in ne 'body' and $type eq 'array') {
       $value = $self->_coerce_by_collection_format($value, $p);
     }
 
-    if ($type eq 'object') {
+    if ($in ne 'body' and $type eq 'object') {
       $value  = $self->_coerce_object_by_style($c, $value, $p);
       $exists = defined $value ? 1 : 0;
     }
@@ -101,7 +102,7 @@ sub validate_request {
       and exists $p->{schema}{default};
     ($exists, $value) = (1, $p->{default}) if !$exists and exists $p->{default};
 
-    $self->_coerce_input($type, $value);
+    $self->_coerce_input($type, $value) unless $in eq 'body';
 
     if (my @e = $self->_validate_request_value($p, $name => $value)) {
       push @errors, @e;
@@ -182,6 +183,7 @@ sub _coerce_input {
 
 sub _coerce_by_collection_format {
   my ($self, $data, $p) = @_;
+  return $data unless defined $data;
 
   my $schema = $p->{schema}                                                  || $p;
   my $type   = ($schema->{items} ? $schema->{items}{type} : $schema->{type}) || '';
@@ -508,7 +510,8 @@ sub _validate_request_body {
   }
 
   return JSON::Validator::E('/' => "No requestBody rules defined for Content-Type $ct.") if $ct;
-  return JSON::Validator::E('/', 'Invalid Content-Type.');
+  return JSON::Validator::E('/', 'Invalid Content-Type.') if $body_schema->{required};
+  return;
 }
 
 sub _validate_request_value {

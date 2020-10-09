@@ -45,11 +45,11 @@ Geo::Coder::Free::OpenAddresses - Provides a geocoding functionality to the data
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -296,7 +296,7 @@ sub geocode {
 	}
 	if($ap) {
 		my $l = $location;
-		if($l =~ /(.+), (England|UK)$/) {
+		if($l =~ /(.+), (England|UK)$/i) {
 			$l = "$1, GB";
 		}
 		if(my $error = $ap->parse($l)) {
@@ -305,16 +305,11 @@ sub geocode {
 		} else {
 			my %c = $ap->components();
 			# ::diag(Data::Dumper->new([\%c])->Dump());
-			my %addr;
+			my %addr = ( 'location' => $l );
 			$street = $c{'street_name'};
 			if(my $type = $c{'street_type'}) {
-				$type = uc($type);
-				if($type eq 'STREET') {
-					$street = "$street ST";
-				} elsif($type eq 'ROAD') {
-					$street = "$street RD";
-				} elsif($type eq 'AVENUE') {
-					$street = "$street AVE";
+				if(my $a = Geo::Coder::Free::_abbreviate($type)) {
+					$street .= " $a";
 				} else {
 					$street .= " $type";
 				}
@@ -346,13 +341,14 @@ sub geocode {
 			}
 			$addr{'house_number'} = $c{'property_identifier'};
 			$addr{'city'} = $c{'suburb'};
-			if(my $rc = $self->_search(\%addr, ('house_number', 'road', 'city', 'state', 'country'))) {
-				return $rc;
-			}
+			# ::diag(Data::Dumper->new([\%addr])->Dump());
 			if($addr{'house_number'}) {
-				if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
+				if(my $rc = $self->_search(\%addr, ('house_number', 'road', 'city', 'state', 'country'))) {
 					return $rc;
 				}
+			}
+			if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
+				return $rc;
 			}
 		}
 	}
@@ -366,6 +362,7 @@ sub geocode {
 
 		# Work around for RT#122617
 		if(($location !~ /\sCounty,/i) && (my $href = (Geo::StreetAddress::US->parse_location($l) || Geo::StreetAddress::US->parse_address($l)))) {
+			# ::diag(Data::Dumper->new([$href])->Dump());
 			if($state = $href->{'state'}) {
 				if(length($state) > 2) {
 					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
@@ -377,7 +374,7 @@ sub geocode {
 					$city = uc($href->{city});
 				}
 				if($street = $href->{street}) {
-					if($href->{'type'} && (my $type = Geo::Coder::Free::_normalize($href->{'type'}))) {
+					if($href->{'type'} && (my $type = Geo::Coder::Free::_abbreviate($href->{'type'}))) {
 						$street .= " $type";
 					}
 					if($href->{suffix}) {
@@ -411,7 +408,25 @@ sub geocode {
 				}
 			}
 			if(length($state) == 2) {
+				$addr[1] = Geo::Coder::Free::_normalize($addr[1]);
+				# ::diag(Data::Dumper->new([\@addr])->Dump());
 				if(my $rc = $self->_get($addr[0], $addr[1], $addr[2], $state, 'US')) {
+					# ::diag(Data::Dumper->new([$rc])->Dump());
+					$rc->{'country'} = 'US';
+					return $rc;
+				}
+			}
+			# Hack to find "street, town, county, state, US"
+			if(length($state) == 2) {
+				$addr[0] = Geo::Coder::Free::_normalize($addr[0]);
+				$addr[2] =~ s/\s+COUNTY$//i;
+				# ::diag(Data::Dumper->new([\@addr])->Dump());
+				if(my $rc = $self->_get($addr[0], $addr[1], $addr[2], $state, 'US')) {
+					# ::diag(Data::Dumper->new([$rc])->Dump());
+					$rc->{'country'} = 'US';
+					return $rc;
+				}
+				if(my $rc = $self->_get($addr[0], $addr[1], $state, 'US')) {
 					# ::diag(Data::Dumper->new([$rc])->Dump());
 					$rc->{'country'} = 'US';
 					return $rc;
@@ -470,33 +485,44 @@ sub geocode {
 							$state = $twoletterstate;
 						}
 					}
-					my %args = (state => $state, country => 'US');
 					if($href->{city}) {
-						$city = $args{city} = uc($href->{city});
+						$city = uc($href->{city});
 					}
-					if($href->{number}) {
-						$args{number} = $href->{number};
-					}
-					if($street = $href->{street}) {
-						if(my $type = Geo::Coder::Free::_normalize($href->{'type'})) {
+					# Unabbreviated - look up both, helps with fallback to Maxmind
+					my $fullstreet = $href->{'street'};
+					if($street = $fullstreet) {
+						$fullstreet .= ' ' . $href->{'type'};
+						if(my $type = Geo::Coder::Free::_abbreviate($href->{'type'})) {
 							$street .= " $type";
 						}
 						if($href->{suffix}) {
 							$street .= ' ' . $href->{suffix};
+							$fullstreet .= ' ' . $href->{suffix};
 						}
 					}
 					if($street) {
 						if(my $prefix = $href->{prefix}) {
 							$street = "$prefix $street";
+							$fullstreet = "$prefix $fullstreet";
 						}
-						$args{street} = uc($street);
 						if($href->{'number'}) {
+							# ::diag($href->{'number'}, "$street$city$state", 'US');
 							if($rc = $self->_get($href->{'number'}, "$street$city$state", 'US')) {
 								$rc->{'country'} = 'US';
 								return $rc;
 							}
+							if($rc = $self->_get($href->{'number'}, "$fullstreet$city$state", 'US')) {
+								$rc->{'country'} = 'US';
+								return $rc;
+							}
 						}
+						# ::diag("$street$city$state", 'US');
 						if($rc = $self->_get("$street$city$state", 'US')) {
+							$rc->{'country'} = 'US';
+							return $rc;
+						}
+						# ::diag("$fullstreet$city$state", 'US');
+						if($rc = $self->_get("$fullstreet$city$state", 'US')) {
 							$rc->{'country'} = 'US';
 							return $rc;
 						}
@@ -529,7 +555,7 @@ sub geocode {
 								$args{number} = $href->{number};
 							}
 							if($street = $href->{street}) {
-								if(my $type = Geo::Coder::Free::_normalize($href->{'type'})) {
+								if(my $type = Geo::Coder::Free::_abbreviate($href->{'type'})) {
 									$street .= " $type";
 								}
 								if($href->{suffix}) {
@@ -637,7 +663,7 @@ sub geocode {
 						$args{number} = $href->{number};
 					}
 					if($street = $href->{street}) {
-						if(my $type = Geo::Coder::Free::_normalize($href->{'type'})) {
+						if(my $type = Geo::Coder::Free::_abbreviate($href->{'type'})) {
 							$street .= " $type";
 						}
 						if($href->{suffix}) {
@@ -704,43 +730,22 @@ sub geocode {
 					# City includes a street name
 					my $street = uc($1);
 					$city = uc($2);
+					my $number;
+					if($street =~ /^(\d+)\s+(.+)/) {
+						$number = $1;
+						$street = $2;
+					}
 
 					# TODO: Configurable - or better still remove the need
 					if($city eq 'MINSTER, THANET') {
 						$city = 'RAMSGATE';
 					}
-					if($street =~ /(.+)\s+STREET$/) {
-						$street = "$1 ST";
-					} elsif($street =~ /(.+)\s+ROAD$/) {
-						$street = "$1 RD";
-					} elsif($street =~ /(.+)\s+AVENUE$/) {
-						$street = "$1 AVE";
-					} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
-						$street = "$1 AVE $2";
-					} elsif($street =~ /(.+)\s+CT$/) {
-						$street = "$1 COURT";
-					} elsif($street =~ /(.+)\s+CIRCLE$/) {
-						$street = "$1 CIR";
-					} elsif($street =~ /(.+)\s+DRIVE$/) {
-						$street = "$1 DR";
-					} elsif($street =~ /(.+)\s+PARKWAY$/) {
-						$street = "$1 PKWY";
-					} elsif($street =~ /(.+)\s+CREEK$/) {
-						$street = "$1 CRK";
-					} elsif($street =~ /(.+)\s+LANE$/) {
-						$street = "$1 LN";
-					} elsif($street =~ /(.+)\s+PLACE$/) {
-						$street = "$1 PL";
-					} elsif($street =~ /(.+)\s+GARDENS$/) {
-						$street = "$1 GRDNS";
-					}
-					$street =~ s/^0+//;	# Turn 04th St into 4th St
-					if($street =~ /^(\d+)\s+(.+)/) {
-						my $number = $1;
-						$street = $2;
+					$street = Geo::Coder::Free::_normalize($street);
+					if($number) {
 						if(my $rc = $self->_get("$number$street$city$state$c")) {
 							return $rc;
 						}
+						# If we can't find the number, at least find the road
 					}
 					if(my $rc = $self->_get("$street$city$state$c")) {
 						return $rc;
@@ -786,6 +791,7 @@ sub geocode {
 
 	# Finally try libpostal,
 	# which is good but uses a lot of memory
+	# ::diag("try libpostal on $location");
 	if($libpostal_is_installed == LIBPOSTAL_UNKNOWN) {
 		if(eval { require Geo::libpostal; } ) {
 			Geo::libpostal->import();
@@ -799,33 +805,7 @@ sub geocode {
 		# print Data::Dumper->new([\%addr])->Dump();
 		if($addr{'country'} && $addr{'state'} && ($addr{'country'} =~ /^(Canada|United States|USA|US)$/i)) {
 			if($street = $addr{'road'}) {
-				$street = uc($street);
-				if($street =~ /(.+)\s+STREET$/) {
-					$street = "$1 ST";
-				} elsif($street =~ /(.+)\s+ROAD$/) {
-					$street = "$1 RD";
-				} elsif($street =~ /(.+)\s+AVENUE$/) {
-					$street = "$1 AVE";
-				} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
-					$street = "$1 AVE $2";
-				} elsif($street =~ /(.+)\s+COURT$/) {
-					$street = "$1 CT";
-				} elsif($street =~ /(.+)\s+CIRCLE$/) {
-					$street = "$1 CIR";
-				} elsif($street =~ /(.+)\s+DRIVE$/) {
-					$street = "$1 DR";
-				} elsif($street =~ /(.+)\s+PARKWAY$/) {
-					$street = "$1 PKWY";
-				} elsif($street =~ /(.+)\s+GARDENS$/) {
-					$street = "$1 GRDNS";
-				} elsif($street =~ /(.+)\s+LANE$/) {
-					$street = "$1 LN";
-				} elsif($street =~ /(.+)\s+PLACE$/) {
-					$street = "$1 PL";
-				} elsif($street =~ /(.+)\s+CREEK$/) {
-					$street = "$1 CRK";
-				}
-				$street =~ s/^0+//;	# Turn 04th St into 4th St
+				$street = Geo::Coder::Free::_normalize($street);
 				$addr{'road'} = $street;
 			}
 			if($addr{'country'} =~ /Canada/i) {

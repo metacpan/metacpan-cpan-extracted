@@ -1,0 +1,25 @@
+'digraph Perl {
+ graph [ label="sub.graph.pl" rankdir="TB" ]
+ node [ shape="oval" ]
+ edge [ color="grey" ]
+ "Carnegie" [ shape="circle" ]
+ "Murrumbeena" [ color="green" shape="doublecircle" ]
+ "Oakleigh" [ color="blue" ]
+ "Murrumbeena" -> "Carnegie" [ arrowsize="2" ]
+ "Murrumbeena" -> "Oakleigh" [ color="brown" ]
+
+ subgraph "cluster_1" {
+  graph [ label="Child" rankdir="TB" ]
+  node [ color="magenta" shape="diamond" ]
+  edge [ color="grey" ]
+  "Chadstone" [ shape="hexagon" ]
+  "Waverley" [ color="orange" ]
+  "Chadstone" -> "Waverley"
+ }
+ node [ color="cyan" shape="diamond" ]
+ "Malvern"
+ "Prahran" [ shape="trapezium" ]
+ "Malvern" -> "Prahran"
+ "Malvern" -> "Murrumbeena"
+}
+'

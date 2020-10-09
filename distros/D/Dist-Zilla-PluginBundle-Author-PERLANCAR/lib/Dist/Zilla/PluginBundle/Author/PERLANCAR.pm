@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2020-08-14'; # DATE
-our $VERSION = '0.602'; # VERSION
+our $DATE = '2020-09-27'; # DATE
+our $VERSION = '0.603'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -77,7 +77,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.602 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2020-08-14.
+This document describes version 0.603 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2020-09-27.
 
 =head1 SYNOPSIS
 

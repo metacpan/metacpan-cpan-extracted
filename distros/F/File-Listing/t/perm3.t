@@ -1,5 +1,3 @@
-#!perl -w
-#
 # Test file mode strings from Solaris /usr/xpg4/bin/ls.
 
 use strict;
@@ -9,8 +7,8 @@ plan tests => 4096;
 
 use File::Listing;
 
-while (<DATA>) {
-    chomp;
+while (my $line = <DATA>) {
+    chomp $line;
 
     # Expected output value.
 
@@ -23,11 +21,11 @@ while (<DATA>) {
 
     # Information text.
 
-    my $text = sprintf('"%s" -> "%05o"', $_, $expected);
+    my $text = sprintf('"%s" -> "%05o"', $line, $expected);
 
     # Get output and keep only permission (no file type info).
 
-    my $got = File::Listing::file_mode($_);
+    my $got = File::Listing::file_mode($line);
     $got &= 07777;
 
     cmp_ok($got, '==', $expected, $text);

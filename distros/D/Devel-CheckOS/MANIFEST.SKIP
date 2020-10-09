@@ -1,2 +1,5 @@
 .travis.yml
 ^\.git
+.appveyor.yml
+.cirrus.yml
+makefile-expect-driver.pl

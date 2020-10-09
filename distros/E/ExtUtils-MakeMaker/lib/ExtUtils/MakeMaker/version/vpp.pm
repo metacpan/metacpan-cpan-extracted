@@ -125,10 +125,11 @@ package ExtUtils::MakeMaker::version::vpp;
 
 use 5.006001;
 use strict;
+use warnings;
 
 use Config;
 use vars qw($VERSION $CLASS @ISA $LAX $STRICT);
-$VERSION = '7.46';
+$VERSION = '7.48';
 $VERSION =~ tr/_//d;
 $CLASS = 'ExtUtils::MakeMaker::version::vpp';
 
@@ -171,7 +172,7 @@ sub import {
 
     # Set up any derived class
     unless ($class eq $CLASS) {
-	local $^W;
+	no warnings;
 	*{$class.'::declare'} =  \&{$CLASS.'::declare'};
 	*{$class.'::qv'} = \&{$CLASS.'::qv'};
     }
@@ -203,7 +204,7 @@ sub import {
     }
 
     if (exists($args{'UNIVERSAL::VERSION'})) {
-	local $^W;
+	no warnings;
 	*UNIVERSAL::VERSION
 		= \&{$CLASS.'::_VERSION'};
     }

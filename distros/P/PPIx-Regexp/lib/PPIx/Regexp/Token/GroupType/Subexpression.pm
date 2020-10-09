@@ -36,7 +36,7 @@ use base qw{ PPIx::Regexp::Token::GroupType };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.074';
+our $VERSION = '0.075';
 
 {
     my $expl = 'Match subexpression without backtracking';

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,10 +19,17 @@ no_index:
     - inc
     - t
 requires:
+  Archive::Tar: '0'
+  Carp: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  HTTP::Tiny: '0'
+  IO::Uncompress::Gunzip: '0'
+  MIME::Base64: '0'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/tomk3003/lib-archive/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/tomk3003/lib-archive
-version: '0.7'
+version: '0.8'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

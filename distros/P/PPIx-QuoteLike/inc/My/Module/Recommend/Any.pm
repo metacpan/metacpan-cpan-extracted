@@ -12,7 +12,7 @@ use Exporter;
 BEGIN {
     *import	= \&Exporter::import;
 }
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 our @EXPORT_OK = qw{ __any };
 

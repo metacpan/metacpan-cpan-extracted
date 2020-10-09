@@ -1,0 +1,52 @@
+NAME
+
+    Chart::Kaleido - Base class for Chart::Kaleido
+
+VERSION
+
+    version 0.004
+
+SYNOPSIS
+
+        use Chart::Kaleido::Plotly;
+        use JSON;
+    
+        my $data = decode_json(<<'END_OF_TEXT');
+        { "data": [{"y": [1,2,1]}] }
+        END_OF_TEXT
+    
+        my $kaleido = Chart::Plotly::Kaleido->new();
+        $kaleido->save( file => "foo.png", plot => $data,
+                        widht => 1024, height => 768 );
+
+DESCRIPTION
+
+    This is base class that wraps plotly's kaleido command. Instead of this
+    class you would mostly want to use its subclass like
+    Chart::Kaleido::Plotly.
+
+ATTRIBUTES
+
+ timeout
+
+SEE ALSO
+
+    https://github.com/plotly/Kaleido
+
+    Chart::Kaleido::Plotly, Alien::Plotly::Kaleido
+
+AUTHOR
+
+    Stephan Loyd <sloyd@cpan.org>
+
+CONTRIBUTOR
+
+    Gabor Szabo <gabor@szabgab.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2020 by Stephan Loyd.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -10,6 +10,9 @@ use My::Module::Test;
 use PPIx::Regexp::Constant qw{ MINIMUM_PERL };
 use Scalar::Util qw{ refaddr };
 
+local @PPIx::Regexp::Constant::CARP_NOT = (
+    @PPIx::Regexp::Constant::CARP_NOT, 'My::Module::Test' );
+
 my $is_ascii = ord( "\t" ) == 9;	# per perlebcdic
 
 my $have_charnames;
@@ -1864,27 +1867,27 @@ value   ( perl_version_removed => [], undef );
 
 # postderef
 note	'postderef was added experimentally in 5.19.5';
-tokenize( '/$x->$*foo/', postderef => 1 );
+tokenize( '/$x->$*foo/' );
 count   ( 8 );
 choose  ( 2 );
 klass   ( 'PPIx::Regexp::Token::Interpolation' );
 content ( '$x->$*' );
-tokenize( '/$x->$#*foo/', postderef => 1 );
+tokenize( '/$x->$#*foo/' );
 count   ( 8 );
 choose  ( 2 );
 klass   ( 'PPIx::Regexp::Token::Interpolation' );
 content ( '$x->$#*' );
-tokenize( '/$x->@*foo/', postderef => 1 );
+tokenize( '/$x->@*foo/' );
 count   ( 8 );
 choose  ( 2 );
 klass   ( 'PPIx::Regexp::Token::Interpolation' );
 content ( '$x->@*' );
-tokenize( '/$x->@[1,2]/', postderef => 1 );
+tokenize( '/$x->@[1,2]/' );
 count   ( 5 );
 choose  ( 2 );
 klass   ( 'PPIx::Regexp::Token::Interpolation' );
 content ( '$x->@[1,2]' );
-tokenize( 's/x/$x->%{foo,bar}/e', postderef => 1 );
+tokenize( 's/x/$x->%{foo,bar}/e' );
 count   ( 7 );
 choose  ( 4 );
 klass   ( 'PPIx::Regexp::Token::Code' );

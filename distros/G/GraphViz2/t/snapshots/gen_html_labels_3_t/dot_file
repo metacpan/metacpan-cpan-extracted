@@ -1,0 +1,10 @@
+'digraph Perl {
+ graph [ label="HTML label demo # 3 - Fixing newlines" rankdir="TB" ]
+ node [ shape="oval" ]
+ edge [ color="grey" ]
+ "One" [ label=<One<br/><font color="#0000ff">Blue</font><br/>> ]
+ "Two" [ label=<Two<br/><font color="#00ff00">Green</font><br/>> ]
+ "Three" [ color="red" label=<<table border="1"><tr><td align="left">Three</td></tr><tr align="right"><td>Red</td></tr></table>> ]
+ "Four" [ color="magenta" label=<<table border="1"><tr><td align="left">Four<br />magenta</td></tr></table>> ]
+}
+'

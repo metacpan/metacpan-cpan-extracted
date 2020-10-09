@@ -14,17 +14,13 @@ use Moo;
 
 use IPC::Run3; # For run3().
 
-use Set::Array;
-
-use Try::Tiny;
-
-use Types::Standard qw/Any HashRef Int Str/;
+use Types::Standard qw/Any ArrayRef HasMethods HashRef Int Str/;
 
 has command =>
 (
-	default  => sub{return Set::Array -> new},
-	is       => 'rw',
-	isa      => Any,
+	default  => sub{[]},
+	is       => 'ro',
+	isa      => ArrayRef,
 	required => 0,
 );
 
@@ -86,9 +82,8 @@ has im_meta =>
 
 has logger =>
 (
-	default  => sub{return ''},
 	is       => 'rw',
-	isa      => Any,
+	isa      => HasMethods[qw(debug error)],
 	required => 0,
 );
 
@@ -110,9 +105,9 @@ has node_hash =>
 
 has scope =>
 (
-	default  => sub{return Set::Array -> new},
-	is       => 'rw',
-	isa      => Any,
+	default  => sub{[]},
+	is       => 'ro',
+	isa      => ArrayRef,
 	required => 0,
 );
 
@@ -140,7 +135,7 @@ has valid_attributes =>
 	required => 0,
 );
 
-our $VERSION = '2.50';
+our $VERSION = '2.54';
 
 # -----------------------------------------------
 
@@ -151,39 +146,38 @@ sub BUILD
 	my($dot)     = which('dot');
 	my($global)  =
 	{
-		directed		=> $$globals{directed}			? 'digraph'				: 'graph',
-		driver			=> $$globals{driver}			? $$globals{driver}		: $dot,
-		format			=> $$globals{format}			? $$globals{format}		: 'svg',
-		im_format		=> $$globals{im_format}			? $$globals{im_format}	: 'cmapx',
-		label			=> $$globals{directed}			? '->'					: '--',
-		name			=> defined($$globals{name})		? $$globals{name}		: 'Perl',
+		directed		=> $$globals{directed} ? 'digraph' : 'graph',
+		driver			=> $$globals{driver} || $dot,
+		format			=> $$globals{format} ||	'svg',
+		im_format		=> $$globals{im_format} || 'cmapx',
+		label			=> $$globals{directed} ? '->' : '--',
+		name			=> $$globals{name} // 'Perl',
 		record_shape	=> ($$globals{record_shape} && $$globals{record_shape} =~ /^(M?record)$/) ? $1 : 'Mrecord',
-		strict			=> defined($$globals{strict})	? $$globals{strict}		:  0,
-		subgraph		=> $$globals{subgraph}			? $$globals{subgraph}	: {},
-		timeout			=> defined($$globals{timeout})	? $$globals{timeout}	: 10,
+		strict			=> $$globals{strict} //  0,
+		subgraph		=> $$globals{subgraph} || {},
+		timeout			=> $$globals{timeout} // 10,
 	};
 	my($im_metas)	= $self -> im_meta;
 	my($im_meta)	=
 	{
-		URL => $$im_metas{URL} ? $$im_metas{URL} : '',
+		URL => $$im_metas{URL} || '',
 	};
 
 	$self -> global($global);
 	$self -> im_meta($im_meta);
 	$self -> load_valid_attributes;
-	$self -> validate_params('global',		%{$self -> global});
-	$self -> validate_params('graph',		%{$self -> graph});
-	$self -> validate_params('im_meta',		%{$self -> im_meta});
-	$self -> validate_params('node',		%{$self -> node});
-	$self -> validate_params('edge',		%{$self -> edge});
-	$self -> validate_params('subgraph',	%{$self -> subgraph});
-	$self -> scope -> push
-		({
-			edge     => $self -> edge,
-			graph    => $self -> graph,
-			node     => $self -> node,
-			subgraph => $self -> subgraph,
-		 });
+	$self->validate_params('global',	$self->global);
+	$self->validate_params('graph',		$self->graph);
+	$self->validate_params('im_meta',	$self->im_meta);
+	$self->validate_params('node',		$self->node);
+	$self->validate_params('edge',		$self->edge);
+	$self->validate_params('subgraph',	$self->subgraph);
+	push @{ $self->scope }, {
+		edge     => $self -> edge,
+		graph    => $self -> graph,
+		node     => $self -> node,
+		subgraph => $self -> subgraph,
+	 };
 
 	my(%global)		= %{$self -> global};
 	my(%im_meta)	= %{$self -> im_meta};
@@ -194,14 +188,14 @@ sub BUILD
 	my($command) = (${$self -> global}{strict} ? 'strict ' : '')
 		. (${$self -> global}{directed} . ' ')
 		. ${$self -> global}{name}
-		. "\n{\n";
+		. " {\n";
 
 	for my $key (grep{$im_meta{$_} } sort keys %im_meta)
 	{
 		$command .= qq|$key = "$im_meta{$key}"; \n|;
 	}
 
-	$self -> command -> push($command);
+	push @{ $self->command }, $command;
 
 	$self -> default_graph;
 	$self -> default_node;
@@ -214,18 +208,14 @@ sub BUILD
 sub add_edge
 {
 	my($self, %arg) = @_;
-	my($from)   = delete $arg{from};
-	$from       = defined($from) ? $from : '';
-	my($to)     = delete $arg{to};
-	$to         = defined($to) ? $to : '';
-	my($label)  = defined($arg{label}) ? $arg{label} : '';
-	$label      =~ s/^\s+(<)/$1/;
-	$label      =~ s/(>)\s+$/$1/;
-	$label      =~ s/^(<)\n/$1/;
-	$label      =~ s/\n(>)$/$1/;
+	my $from    = delete $arg{from} // '';
+	my $to      = delete $arg{to} // '';
+	my $label   = $arg{label} // '';
+	$label      =~ s/^\s*(<)\n?/$1/;
+	$label      =~ s/\n?(>)\s*$/$1/;
 	$arg{label} = $label if (defined $arg{label});
 
-	$self -> validate_params('edge', %arg);
+	$self->validate_params('edge', \%arg);
 
 	# If either 'from' or 'to' is unknown, add a new node.
 
@@ -272,10 +262,6 @@ sub add_edge
 		}
 	}
 
-	# Add these nodes to the hashref of all nodes, if necessary.
-
-	$self -> node_hash($node) if ($new);
-
 	# Add this edge to the hashref of all edges.
 
 	my($edge)          = $self -> edge_hash;
@@ -289,35 +275,38 @@ sub add_edge
 		to_port    => $node[1][1],
 	};
 
-	$self -> edge_hash($edge);
-
 	# Add this edge to the DOT output string.
 
 	my($dot) = $self -> stringify_attributes(qq|"$from"$node[0][1] ${$self -> global}{label} "$to"$node[1][1]|, {%arg});
 
-	$self -> command -> push($dot);
+	push @{ $self->command }, _indent($dot, $self->scope);
 	$self -> log(debug => "Added edge: $dot");
 
 	return $self;
 
 } # End of add_edge.
 
+sub _indent {
+	my ($text, $scope) = @_;
+	return '' if $text !~ /\S/;
+	(' ' x @$scope) . $text;
+}
+
 # -----------------------------------------------
 
 sub add_node
 {
 	my($self, %arg) = @_;
-	my($name) = delete $arg{name};
-	$name     = defined($name) ? $name : '';
+	my $name = delete $arg{name} // '';
 
-	$self -> validate_params('node', %arg);
+	$self->validate_params('node', \%arg);
 
 	my($node)                 = $self -> node_hash;
-	$$node{$name}             = {} if (! $$node{$name});
-	$$node{$name}{attributes} = {} if (! $$node{$name}{attributes});
+	$$node{$name}             ||= {};
+	$$node{$name}{attributes} ||= {};
 	$$node{$name}{attributes} = {%{$$node{$name}{attributes} }, %arg};
 	%arg                      = %{$$node{$name}{attributes} };
-	my($label)                = defined($arg{label}) ? $arg{label} : '';
+	my($label)                = $arg{label} // '';
 	$label                    =~ s/^\s+(<)/$1/;
 	$label                    =~ s/(>)\s+$/$1/;
 	$label                    =~ s/^(<)\n/$1/;
@@ -377,8 +366,7 @@ sub add_node
 	$$node{$name}{attributes} = {%arg};
 	my($dot)                  = $self -> stringify_attributes(qq|"$name"|, {%arg});
 
-	$self -> command -> push($dot);
-	$self -> node_hash($node);
+	push @{ $self->command }, _indent($dot, $self->scope);
 	$self -> log(debug => "Added node: $dot");
 
 	return $self;
@@ -391,14 +379,12 @@ sub default_edge
 {
 	my($self, %arg) = @_;
 
-	$self -> validate_params('edge', %arg);
+	$self->validate_params('edge', \%arg);
 
-	my($scope)    = $self -> scope -> last;
+	my $scope    = $self->scope->[-1];
 	$$scope{edge} = {%{$$scope{edge} }, %arg};
-	my($tos)      = $self -> scope -> length - 1;
 
-	$self -> command -> push($self -> stringify_attributes('edge', $$scope{edge}) );
-	$self -> scope -> fill($scope, $tos, 1);
+	push @{ $self->command }, _indent($self->stringify_attributes('edge', $$scope{edge}), $self->scope);
 	$self -> log(debug => 'Default edge: ' . join(', ', map{"$_ => $$scope{edge}{$_}"} sort keys %{$$scope{edge} }) );
 
 	return $self;
@@ -411,14 +397,12 @@ sub default_graph
 {
 	my($self, %arg) = @_;
 
-	$self -> validate_params('graph', %arg);
+	$self->validate_params('graph', \%arg);
 
-	my($scope)     = $self -> scope -> last;
+	my $scope    = $self->scope->[-1];
 	$$scope{graph} = {%{$$scope{graph} }, %arg};
-	my($tos)       = $self -> scope -> length - 1;
 
-	$self -> command -> push($self -> stringify_attributes('graph', $$scope{graph}) );
-	$self -> scope -> fill($scope, $tos, 1);
+	push @{ $self->command }, _indent($self->stringify_attributes('graph', $$scope{graph}), $self->scope);
 	$self -> log(debug => 'Default graph: ' . join(', ', map{"$_ => $$scope{graph}{$_}"} sort keys %{$$scope{graph} }) );
 
 	return $self;
@@ -431,14 +415,12 @@ sub default_node
 {
 	my($self, %arg) = @_;
 
-	$self -> validate_params('node', %arg);
+	$self->validate_params('node', \%arg);
 
-	my($scope)    = $self -> scope -> last;
+	my $scope    = $self->scope->[-1];
 	$$scope{node} = {%{$$scope{node} }, %arg};
-	my($tos)      = $self -> scope -> length - 1;
 
-	$self -> command -> push($self -> stringify_attributes('node', $$scope{node}) );
-	$self -> scope -> fill($scope, $tos, 1);
+	push @{ $self->command }, _indent($self->stringify_attributes('node', $$scope{node}), $self->scope);
 	$self -> log(debug => 'Default node: ' . join(', ', map{"$_ => $$scope{node}{$_}"} sort keys %{$$scope{node} }) );
 
 	return $self;
@@ -451,14 +433,12 @@ sub default_subgraph
 {
 	my($self, %arg) = @_;
 
-	$self -> validate_params('subgraph', %arg);
+	$self->validate_params('subgraph', \%arg);
 
-	my($scope)        = $self -> scope -> last;
+	my $scope    = $self->scope->[-1];
 	$$scope{subgraph} = {%{$$scope{subgraph} }, %arg};
-	my($tos)          = $self -> scope -> length - 1;
 
-	$self -> command -> push($self -> stringify_attributes('subgraph', $$scope{subgraph}) );
-	$self -> scope -> fill($scope, $tos, 1);
+	push @{ $self->command }, _indent($self->stringify_attributes('subgraph', $$scope{subgraph}), $self->scope);
 	$self -> log(debug => 'Default subgraph: ' . join(', ', map{"$_ => $$scope{subgraph}{$_}"} sort keys %{$$scope{subgraph} }) );
 
 	return $self;
@@ -603,18 +583,11 @@ sub log
 	$level   ||= 'debug';
 	$message ||= '';
 
-	if ($level eq 'error')
-	{
-		die $message;
-	}
-
-	if ($self -> logger)
-	{
-		$self -> logger -> $level($message);
-	}
-	elsif ($self -> verbose)
-	{
-		print "$level: $message\n";
+	if ($self->logger) {
+		$self->logger->$level($message);
+	} else {
+		die $message if $level eq 'error';
+		print "$level: $message\n" if $self->verbose;
 	}
 
 	return $self;
@@ -627,8 +600,8 @@ sub pop_subgraph
 {
 	my($self) = @_;
 
-	$self -> command -> push("}\n");
-	$self -> scope -> pop;
+	pop @{ $self->scope };
+	push @{ $self->command }, _indent("}\n", $self->scope);
 
 	return $self;
 
@@ -642,21 +615,21 @@ sub push_subgraph
 	my($name) = delete $arg{name};
 	$name     = defined($name) && length($name) ? qq|"$name"| : '';
 
-	$self -> validate_params('graph',    %{$arg{graph} });
-	$self -> validate_params('node',     %{$arg{node} });
-	$self -> validate_params('edge',     %{$arg{edge} });
-	$self -> validate_params('subgraph', %{$arg{subgraph} });
+	$self->validate_params('graph',    $arg{graph});
+	$self->validate_params('node',     $arg{node});
+	$self->validate_params('edge',     $arg{edge});
+	$self->validate_params('subgraph', $arg{subgraph});
 
 	# Child inherits parent attributes.
 
-	my($scope)        = $self -> scope -> last;
-	$$scope{edge}     = {%{$$scope{edge} },     %{$arg{edge} } };
-	$$scope{graph}    = {%{$$scope{graph} },    %{$arg{graph} } };
-	$$scope{node}     = {%{$$scope{node} },     %{$arg{node} } };
-	$$scope{subgraph} = {%{$$scope{subgraph} }, %{$arg{subgraph} } };
+	my $scope        = $self->scope->[-1];
+	$$scope{edge}     = {%{$$scope{edge} || {}}, %{$arg{edge} || {}}};
+	$$scope{graph}    = {%{$$scope{graph} || {}}, %{$arg{graph} || {}}};
+	$$scope{node}     = {%{$$scope{node} || {}}, %{$arg{node} || {}}};
+	$$scope{subgraph} = {%{$$scope{subgraph} || {}}, %{$arg{subgraph} || {}}};
 
-	$self -> scope -> push($scope);
-	$self -> command -> push(qq|\nsubgraph $name\n{\n|);
+	push @{ $self->command }, "\n" . _indent(join(' ', grep length, "subgraph", $name, "{\n"), $self->scope);
+	push @{ $self->scope }, $scope;
 	$self -> default_graph;
 	$self -> default_node;
 	$self -> default_edge;
@@ -665,89 +638,6 @@ sub push_subgraph
 	return $self;
 
 }	# End of push_subgraph.
-
-# -----------------------------------------------
-
-sub report_valid_attributes
-{
-	my($self)       = @_;
-	my($attributes) = $self -> valid_attributes;
-
-	$self -> log(info => 'Global attributes:');
-
-	for my $a (sort keys %{$$attributes{global} })
-	{
-		$self -> log(info => $a);
-	}
-
-	$self -> log;
-	$self -> log(info => 'Graph attributes:');
-
-	for my $a (sort keys %{$$attributes{graph} })
-	{
-		$self -> log(info => $a);
-	}
-
-	$self -> log;
-	$self -> log(info => 'Cluster attributes:');
-
-	for my $n (sort keys %{$$attributes{cluster} })
-	{
-		$self -> log(info => $n);
-	}
-
-	$self -> log;
-	$self -> log(info => 'Subgraph attributes:');
-
-	for my $n (sort keys %{$$attributes{subgraph} })
-	{
-		$self -> log(info => $n);
-	}
-
-	$self -> log;
-	$self -> log(info => 'Node attributes:');
-
-	for my $n (sort keys %{$$attributes{node} })
-	{
-		$self -> log(info => $n);
-	}
-
-	$self -> log;
-	$self -> log(info => 'Arrow modifiers:');
-
-	for my $a (sort keys %{$$attributes{arrow_modifier} })
-	{
-		$self -> log(info => $a);
-	}
-
-	$self -> log;
-	$self -> log(info => 'Arrow attributes:');
-
-	for my $a (sort keys %{$$attributes{arrow} })
-	{
-		$self -> log(info => $a);
-	}
-
-	$self -> log;
-	$self -> log(info => 'Edge attributes:');
-
-	for my $a (sort keys %{$$attributes{edge} })
-	{
-		$self -> log(info => $a);
-	}
-
-	$self -> log;
-	$self -> log(info => 'Output formats:');
-
-	for my $a (sort keys %{$$attributes{output_format} })
-	{
-		$self -> log(info => $a);
-	}
-
-	$self -> log(info => 'Output formats for the form png:gd etc are also supported');
-	$self -> log;
-
-} # End of report_valid_attributes.
 
 # -----------------------------------------------
 
@@ -764,14 +654,14 @@ sub run
 	$prefix				=~ s/:.+$//; # In case of 'png:gd', etc.
 	%arg				= ($prefix => 1);
 
-	$self -> validate_params('output_format', %arg);
+	$self->validate_params('output_format', \%arg);
 
 	my($prefix_1)	= $im_format;
 	$prefix_1		=~ s/:.+$//; # In case of 'png:gd', etc.
 	%arg			= ($prefix_1 => 1);
 
-	$self -> validate_params('output_format', %arg);
-	$self -> dot_input(join('', @{$self -> command -> print}) . "}\n");
+	$self->validate_params('output_format', \%arg);
+	$self -> dot_input(join('', @{ $self->command }) . "}\n");
 	$self -> log(debug => $self -> dot_input);
 
 	# Warning: Do not use $im_format in this 'if', because it has a default value.
@@ -792,36 +682,16 @@ sub run
 sub run_map
 {
 	my($self, $driver, $output_file, $format, $timeout, $im_output_file, $im_format) = @_;
-
 	$self -> log(debug => "Driver: $driver. Output file: $output_file. Format: $format. IM output file: $im_output_file. IM format: $im_format. Timeout: $timeout second(s)");
-	$self -> log;
-
-	my($result);
-
-	try
-	{
-		# The EXLOCK option is for BSD-based systems.
-
-		my($temp_dir)	= File::Temp -> newdir('temp.XXXX', CLEANUP => 1, EXLOCK => 0, TMPDIR => 1);
-		my($temp_file)	= File::Spec -> catfile($temp_dir, 'temp.gv');
-
-		open(my $fh, '> :raw', $temp_file) || die "Can't open(> $temp_file): $!";
-		print $fh $self -> dot_input;
-		close $fh;
-
-		my(@args) = ("-T$im_format", "-o$im_output_file", "-T$format", "-o$output_file", $temp_file);
-
-		system($driver, @args);
-	}
-	catch
-	{
-		$result = $_;
-	};
-
-	die $result if ($result);
-
+	# The EXLOCK option is for BSD-based systems.
+	my($temp_dir)	= File::Temp -> newdir('temp.XXXX', CLEANUP => 1, EXLOCK => 0, TMPDIR => 1);
+	my($temp_file)	= File::Spec -> catfile($temp_dir, 'temp.gv');
+	open(my $fh, '> :raw', $temp_file) || die "Can't open(> $temp_file): $!";
+	print $fh $self -> dot_input;
+	close $fh;
+	my(@args) = ("-T$im_format", "-o$im_output_file", "-T$format", "-o$output_file", $temp_file);
+	system($driver, @args);
 	return $self;
-
 } # End of run_map.
 
 # -----------------------------------------------
@@ -829,53 +699,29 @@ sub run_map
 sub run_mapless
 {
 	my($self, $driver, $output_file, $format, $timeout) = @_;
-
 	$self -> log(debug => "Driver: $driver. Output file: $output_file. Format: $format. Timeout: $timeout second(s)");
-	$self -> log;
-
-	my($result);
-
-	try
-	{
-		my($stdout, $stderr);
-
-		# Usage of utf8 here relies on ISO-8859-1 matching Unicode for low chars.
-		# It saves me the effort of determining if the input contains Unicode.
-
-
-		run3
-			[$driver, "-T$format"],
-			\$self -> dot_input,
-			\$stdout,
-			\$stderr,
-			{
-				binmode_stdin  => ':utf8',
-				binmode_stdout => ':raw',
-				binmode_stderr => ':raw',
-			};
-
-		die $stderr if ($stderr);
-
-		$self -> dot_output($stdout);
-
-		if ($output_file)
+	# Usage of utf8 here relies on ISO-8859-1 matching Unicode for low chars.
+	# It saves me the effort of determining if the input contains Unicode.
+	run3
+		[$driver, "-T$format"],
+		\$self -> dot_input,
+		\my $stdout,
+		\my $stderr,
 		{
-			open(my $fh, '> :raw', $output_file) || die "Can't open(> $output_file): $!";
-			print $fh $stdout;
-			close $fh;
-
-			$self -> log(debug => "Wrote $output_file. Size: " . length($stdout) . ' bytes');
-		}
-	}
-	catch
+			binmode_stdin  => ':utf8',
+			binmode_stdout => ':raw',
+			binmode_stderr => ':raw',
+		};
+	die $stderr if ($stderr);
+	$self -> dot_output($stdout);
+	if ($output_file)
 	{
-		$result = $_;
-	};
-
-	die $result if ($result);
-
+		open(my $fh, '> :raw', $output_file) || die "Can't open(> $output_file): $!";
+		print $fh $stdout;
+		close $fh;
+		$self -> log(debug => "Wrote $output_file. Size: " . length($stdout) . ' bytes');
+	}
 	return $self;
-
 } # End of run_mapless.
 
 # -----------------------------------------------
@@ -889,7 +735,7 @@ sub stringify_attributes
 
 	for my $key (sort keys %$option)
 	{
-		$$option{$key} = '' if (! defined $$option{$key});
+		$$option{$key} //= '';
 		$$option{$key} =~ s/^\s+(<)/$1/;
 		$$option{$key} =~ s/(>)\s+$/$1/;
 		$dot           .= ($$option{$key} =~ /^<.+>$/s) ? qq|$key=$$option{$key} | : qq|$key="$$option{$key}" |;
@@ -916,12 +762,12 @@ sub stringify_attributes
 
 sub validate_params
 {
-	my($self, $context, %attributes) = @_;
-	my(%attr) = %{$self -> valid_attributes};
+	my($self, $context, $attributes) = @_;
+	my $valid = $self->valid_attributes;
 
-	for my $a (sort keys %attributes)
+	for my $a (sort keys %$attributes)
 	{
-		next if ($attr{$context}{$a} || ( ($context eq 'subgraph') && $attr{cluster}{$a}) );
+		next if ($valid->{$context}{$a} || ( ($context eq 'subgraph') && $valid->{cluster}{$a}) );
 
 		$self -> log(error => "Error: '$a' is not a valid attribute in the '$context' context");
 	}
@@ -944,11 +790,7 @@ GraphViz2 - A wrapper for AT&T's Graphviz
 
 =head2 Sample output
 
-Unpack the distro and copy html/*.html and html/*.svg to your web server's doc root directory.
-
-Then, point your browser at 127.0.0.1/index.html.
-
-Or, hit L<the demo page|http://savage.net.au/Perl-modules/html/graphviz2/index.html>.
+See L<https://graphviz-perl.github.io/>.
 
 =head2 Perl code
 
@@ -1808,11 +1650,10 @@ are constrained to be horizontally aligned.
 
 See scripts/rank.sub.graph.[12].pl and scripts/sub.graph.frames.pl for sample code.
 
-=head2 report_valid_attributes()
+=head2 valid_attributes()
 
-Prints all attributes known to this module.
-
-Returns nothing.
+Returns a hashref of all attributes known to this module, keyed by type
+to hashrefs to true values.
 
 You wouldn't normally need to use this method.
 
@@ -1876,7 +1717,7 @@ $context is one of 'edge', 'graph', 'node', or a special string. See the code fo
 
 You wouldn't normally need to use this method.
 
-=head2 validate_params($context, %attributes)
+=head2 validate_params($context, \%attributes)
 
 Validate the given attributes within the given context.
 
@@ -2168,7 +2009,9 @@ is ignored.
 
 =head2 Why such a different approach to logging?
 
-As you can see from scripts/*.pl, I always use L<Log::Handler>.
+As you can see from scripts/*.pl, I always use L<Log::Handler>,
+but you don't have to: any object with C<debug> and C<error> methods
+will do, since these are the only levels emitted by this module.
 
 By default (i.e. without a logger object), L<GraphViz2> prints warning and debug messages to STDOUT,
 and dies upon errors.
@@ -2515,10 +2358,6 @@ Outputs to ./html/utf8.2.svg by default.
 =head1 TODO
 
 =over 4
-
-=item o Does GraphViz2 need to emulate the sort option in GraphViz?
-
-That depends on what that option really does.
 
 =item o Handle edges such as 1 -> 2 -> {A B}, as seen in L<Graphviz|http://www.graphviz.org/>'s graphs/directed/switch.gv
 

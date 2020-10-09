@@ -1,0 +1,32 @@
+'digraph Perl {
+ graph [ clusterrank="local" compound="1" rankdir="TB" ]
+ node [ shape="oval" ]
+ edge [ color="grey" ]
+
+ subgraph "cluster_Europe" {
+  graph [ bgcolor="grey" clusterrank="local" compound="1" label="Europe" rankdir="TB" ]
+  node [ shape="oval" ]
+  edge [ color="grey" ]
+  "London" [ color="blue" ]
+  "Paris" [ color="green" label="City of\\nlurve" ]
+  "London" -> "Paris"
+  "Paris" -> "London"
+ }
+ "New York" [ color="yellow" ]
+ "London" -> "New York" [ label="Far" ]
+
+ subgraph "cluster_Australia" {
+  graph [ bgcolor="grey" clusterrank="local" compound="1" label="Australia" rankdir="TB" ]
+  node [ shape="oval" ]
+  edge [ color="grey" ]
+  "Victoria" [ color="blue" ]
+  "New South Wales" [ color="green" ]
+  "Tasmania" [ color="red" ]
+  "Victoria" -> "New South Wales"
+  "Victoria" -> "Tasmania"
+ }
+ "cluster_Australia"
+ "cluster_Europe"
+ "cluster_Australia" -> "cluster_Europe"
+}
+'

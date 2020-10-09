@@ -49,7 +49,7 @@ package Rex::Commands::Fs;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;
@@ -1018,7 +1018,7 @@ sub mount {
   if ( $option->{ensure} eq "absent" ) {
     &umount(
       $mount_point,
-      device => $device,
+      device    => $device,
       on_change =>
         ( exists $option->{on_change} ? $option->{on_change} : undef )
     );

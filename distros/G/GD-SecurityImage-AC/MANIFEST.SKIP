@@ -7,3 +7,7 @@
 ^_build/
 \.tmp$
 \.old$
+^MYMETA\.yml$
+^MYMETA\.json$
+^\.git.*
+^t/captcha_temp.*

@@ -2,12 +2,13 @@ package Mojo::PDF;
 
 use Mojo::Base -base;
 
-our $VERSION = '1.005001'; # VERSION
+our $VERSION = '1.005003'; # VERSION
 
 use Carp qw/croak/;
 $Carp::Internal{ (__PACKAGE__) }++;
 use PDF::Reuse 0.36;
 use Number::RGB 1.41;
+use Image::Size;
 use List::AllUtils qw/sum/;
 use Mojo::PDF::Primitive::Table;
 use namespace::clean;
@@ -164,6 +165,43 @@ sub page {
     my $self = shift;
     prPage;
 
+    $self;
+}
+
+sub pic {
+    my ($self, $pic, %args) = @_;
+    my ($width, $height, $int_name);
+    if (ref $pic eq 'SCALAR') { # we have a data string rather than file
+        open my $fh, '<', $pic or die "Failed to read image bytes: $!";
+        ($width, $height) = Image::Size::imgsize($fh);
+        $int_name = prJpeg $$pic, $width, $height, 1;
+    }
+    else {
+        ($width, $height) = Image::Size::imgsize($pic);
+        $int_name = prJpeg $pic, $width, $height, 0;
+    }
+
+    if ($args{scale}) {
+        $width  *= $args{scale};
+        $height *= $args{scale};
+    }
+
+    my ($x, $y) = map $_||0, @args{qw/x y/};
+    $self->__inv_y($y);
+    $y -= $height;
+
+    my $str = "q\n";
+    $str   .= "$width 0 0 $height $x $y cm\n";
+    $str   .= "/$int_name Do\n";
+    $str   .= "Q\n";
+    prAdd $str;
+
+    $self;
+}
+
+sub raw {
+    my $self = shift;
+    prAdd shift;
     $self;
 }
 
@@ -356,13 +394,14 @@ Mojo::PDF - Generate PDFs with the goodness of Mojo!
 
 Mojotastic, no-nonsense PDF generation.
 
-=head1 WARNING
+=head1 CAVEATS
 
-=for html  <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-warning.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
-
-This module is currently experimental. Things will change.
-
-=for html  </div></div>
+B<Note:> due to the way L<PDF::Reuse>, which is used under the hood, is
+implemented, it's not possible to simultaneously handle multiple
+L<Mojo::PDF> objects, as all of the internal L<PDF::Reuse> output
+variables are shared. Thus, L<Mojo::PDF> merely provides a more convenient
+interface for L<PDF::Reuse>, rather than being a truly object-oriented way
+to produce PDFs.
 
 =head1 METHODS
 
@@ -375,6 +414,18 @@ Unless otherwise indicated, all methods return their invocant.
 
 Creates a new C<Mojo::PDF> object. Takes one mandatory argument: the filename
 of the PDF you want to generate, followed by optional key/value attributes.
+
+If filename is not specified or C<undef>, the PDF will be output to C<STDOUT>.
+An L<IO::String> object can be specified to output the PDF into a variable:
+
+    # IO::String
+    my $pdf = Mojo::PDF->new(IO::String->new(my $pdf_bytes));
+    $pdf->text('Viva la Mojo!', 306, 396)->end;
+
+    # Then use the bytes somewhere:
+    open my $fh, '>', 'the.pdf' or die $!;
+    print $fh $pdf_bytes;
+    close $fh;
 
 =head3 C<page_size>
 
@@ -431,11 +482,38 @@ mandatory argument, the filename of the PDF to include. An optional second
 argument specifies the page number to include (starting from 1),
 which defaults to the first page.
 
+B<Note:> If you get an error along the lines of I<can't be used as a form. See the documentation under prForm how to concatenate streams>, it likely means the PDF is not compatible with this feature. The details are described in
+L<PDF::Reuse::prForm documentation|https://metacpan.org/pod/release/CNIGHS/PDF-Reuse-0.39/lib/PDF/Reuse.pm#prForm-use-a-page-from-an-old-document-as-a-form/background>. I had to convert my InDesign-generated PDFs with
+L<Win2PDF "printer"|https://www.win2pdf.com/> to get them to work with this
+method.
+
 =head2 C<page>
 
     $pdf->page;
 
 Add a new blank page to your document and sets it as the currently active page.
+
+=head2 C<pic>
+
+    $pdf->pic(
+        'cat.jpg',     # use scalar ref (\$data) to provide raw bytes instead
+        x     => 42,   # place at X points from the left of page
+        y     => 100,  # place at Y points from the top  of page
+        scale => .5    # scale image by this factor
+    );
+
+Add a JPEG image to the active page (other formats currently unsupported). Takes the filename (string) or raw image bytes (in a scalar ref) as the first
+argument, the rest are key-value pairs: the C<x> for X position, C<y> for Y
+position, and C<scale> as the scale factor for the image.
+
+=head2 C<raw>
+
+    $pdf->raw("0 0 m\n10 10 l\nS\nh\n");
+
+Use L<prAdd|PDF::Reuse/"prAdd"> to "add whatever you want to the current content stream".
+
+See, for example, section 4.4.1 on page 196 of the
+L<Adobe Acrobat SDK PDF Reference Manual|https://web.archive.org/web/20060212001631/http://partners.adobe.com/public/developer/en/acrobat/sdk/pdf/pdf_creation_apis_and_specs/PDFReference.pdf>.
 
 =head2 C<rule>
 
@@ -481,7 +559,7 @@ Specifies active font size in points. Defaults to C<12> points.
             $conf->{at}[1] = 50;
             $pdf->page;
             $data;
-        },
+        } ],
         min_width      => 571.2,
         padding        => [3, 6],
         row_height     => 24,

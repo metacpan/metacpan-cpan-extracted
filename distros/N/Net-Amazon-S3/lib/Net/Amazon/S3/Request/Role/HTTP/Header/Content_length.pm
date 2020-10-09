@@ -1,15 +1,15 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header::Content_length;
 # ABSTRACT: Content-Lenghth header role
-$Net::Amazon::S3::Request::Role::HTTP::Header::Content_length::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::HTTP::Header::Content_length::VERSION = '0.97';
 use Moose::Role;
 use Digest::MD5 qw[];
 use MIME::Base64 qw[];
 
 around _request_headers => sub {
-    my ($inner, $self) = @_;
-    my $content = $self->_http_request_content;
+	my ($inner, $self) = @_;
+	my $content = $self->_http_request_content;
 
-    return ($self->$inner, ('Content-Length' => length $content));
+	return ($self->$inner, ('Content-Length' => length $content));
 };
 
 1;
@@ -26,7 +26,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header::Content_length - Content-Lenghth h
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

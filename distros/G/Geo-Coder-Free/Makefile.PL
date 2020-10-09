@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
-use version;
 
 if(eval { require Geo::libpostal; }) {
 	my $v = Geo::libpostal->VERSION;
@@ -12,27 +11,10 @@ if(eval { require Geo::libpostal; }) {
 	print "Consider installing Geo::libpostal for improved parsing\n";
 }
 
-unless(eval { require File::Fetch; }) {
-	if($ENV{'AUTOMATED_TESTING'}) {
-		# This probably isn't the way to do it - need to find documentation
-		print STDERR "UNKNOWN: Needs File::Fetch >= 0.56";
-		exit;
-	}
-	die 'Install File::Fetch >= 0.56 first';
-}
-
-if(version->parse($File::Fetch::VERSION) < 0.56) {
-	if($ENV{'AUTOMATED_TESTING'}) {
-		print STDERR "UNKNOWN: Needs File::Fetch >= 0.56";
-		exit;
-	}
-	die 'Install File::Fetch >= 0.56 first, you have ', $File::Fetch::VERSION;
-}
-
 (-d 'lib/Geo/Coder/Free/GeoNames') || mkdir 'lib/Geo/Coder/Free/GeoNames';
 (-d 'lib/Geo/Coder/Free/GeoNames/databases') || mkdir 'lib/Geo/Coder/Free/GeoNames/databases';
+(-d 'lib/Geo/Coder/Free/MaxMind/databases') || mkdir 'lib/Geo/Coder/Free/MaxMind/databases';
 
-File::Fetch->import();
 my %urls = (
 	'http://download.geonames.org/export/dump/admin1CodesASCII.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db',
 	'http://download.geonames.org/export/dump/admin2Codes.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db',
@@ -56,9 +38,20 @@ if(eval { require HTTP::Cache::Transparent; }) {
 	HTTP::Cache::Transparent::init({
 		BasePath => $cachedir,
 		# Verbose => $opts{'v'} ? 1 : 0,
+		Verbose => 1,
 		NoUpdate => 60 * 60 * 24,
 		MaxAge => 30 * 24
 	}) || die "$0: $cachedir: $!";
+} else {
+	print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
+}
+
+# Put this after so that H:C:T can try its magic on the internal $ua in
+# LWP::Simple
+if(eval { require LWP::Simple; }) {
+	LWP::Simple->import();
+} else {
+	die "Can't find LWP::Simple";
 }
 
 foreach my $url(keys %urls) {
@@ -69,20 +62,19 @@ foreach my $url(keys %urls) {
 	}
 
 	print "Downloading $url\n";
-	my $ff = File::Fetch->new(uri => $url);
-	if(my $path = $ff->fetch($url)) {
-		print "Moving $path to $file\n";
-		rename $path, $file or die "$file: $!";
-	} elsif(my $err = $ff->error(1)) {
-		die "$url: $err";
-	} else {
-		die "There was a problem downloading $url";
+	if(is_error(my $rc = getstore($url, $file))) {
+		die "$url: LWP error $rc";
 	}
 }
 
 if(!(-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt')) {
-	system('unzip lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip');
+	my $zip = 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip';
+	system("unzip $zip");
 	rename 'allCountries.txt', 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt';
+	# Save disc space, but prevent more than one download
+	if(open(my $fout, '>', $zip)) {
+		close($fout);
+	}
 }
 
 # London's areas are not complete within Maxmind.  Here are a few to get started
@@ -129,7 +121,7 @@ WriteMakefile(
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
-	BUILD_REQUIRES => {	# For bin/createdatabase
+	BUILD_REQUIRES => {	# For bin/create_sqlite
 		'App::csv2sqlite' => 0,
 		'CHI' => 0,
 		'CHI::Driver::RawMemory' => 0,
@@ -141,6 +133,7 @@ WriteMakefile(
 		'File::Slurp' => 0,
 		'File::Spec' => 0,
 		'autodie' => 0,
+		'Geo::Coder::Abbreviations' => 0.03,
 		'Geo::Location::Point' => 0.02,
 		'IO::AIO' => 0,
 		'IPC::System::Simple' => 0,
@@ -207,6 +200,6 @@ WriteMakefile(
 		},
 	},
 	# PPM_INSTALL_EXEC	=> 'bash',
-	# PPM_INSTALL_SCRIPT	=> 'bin/createdatabase',
+	# PPM_INSTALL_SCRIPT	=> 'bin/create_sqlite',
 	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
 );

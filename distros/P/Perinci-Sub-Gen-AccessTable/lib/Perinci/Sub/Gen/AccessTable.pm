@@ -1,7 +1,7 @@
 package Perinci::Sub::Gen::AccessTable;
 
-our $DATE = '2020-02-23'; # DATE
-our $VERSION = '0.583'; # VERSION
+our $DATE = '2020-10-07'; # DATE
+our $VERSION = '0.585'; # VERSION
 
 use 5.010001;
 use strict;
@@ -116,6 +116,8 @@ sub _add_arg {
 }
 
 sub _gen_meta {
+    require Data::Sah::Resolve;
+
     my ($table_spec, $opts) = @_;
     my $langs = $opts->{langs};
 
@@ -272,7 +274,8 @@ _
     for my $fname (keys %{$table_spec->{fields}}) {
         my $fspec   = $table_spec->{fields}{$fname};
         my $fschema = $fspec->{schema};
-        my $ftype   = $fschema->[0];
+        my $frschema = Data::Sah::Resolve::resolve_schema($fschema);
+        my $ftype   = $frschema->[0];
 
         next unless $opts->{enable_filtering};
         next if defined($fspec->{filterable}) && !$fspec->{filterable};
@@ -483,6 +486,8 @@ _
 }
 
 sub __parse_query {
+    require Data::Sah::Resolve;
+
     my ($table_spec, $opts, $func_meta, $args) = @_;
     my $query = {args=>$args};
 
@@ -525,10 +530,15 @@ sub __parse_query {
 
     my @filter_fields;
     my @filters; # ([field, field-type, operator, operand...])
+    my %frschemas;
 
-    for my $f (grep {$fspecs->{$_}{schema}[0] eq 'bool'} @fields) {
+    for my $f (@fields) {
+        $frschemas{$f} = Data::Sah::Resolve::resolve_schema($fspecs->{$f}{schema});
+    }
+
+    for my $f (grep {$frschemas{$_}[0] eq 'bool'} @fields) {
         my $fspec = $fspecs->{$f};
-        my $ftype   = $fspec->{schema}[0];
+        my $ftype = $frschemas{$f}[0];
         my $exists;
         if (defined $args->{"$f.is"}) {
             $exists++;
@@ -543,9 +553,9 @@ sub __parse_query {
         push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
     }
 
-    for my $f (grep {$fspecs->{$_}{schema}[0] eq 'array'} @fields) {
+    for my $f (grep {$frschemas{$_}[0] eq 'array'} @fields) {
         my $fspec = $fspecs->{$f};
-        my $ftype   = $fspec->{schema}[0];
+        my $ftype = $frschemas{$f}[0];
         my $exists;
         if (defined $args->{"$f.has"}) {
             $exists++;
@@ -558,9 +568,9 @@ sub __parse_query {
         push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
     }
 
-    for my $f (grep {!($fspecs->{$_}{schema}[0] ~~ ['array','bool'])} @fields) {
+    for my $f (grep {!($frschemas{$_}[0] ~~ ['array','bool'])} @fields) {
         my $fspec = $fspecs->{$f};
-        my $ftype   = $fspec->{schema}[0];
+        my $ftype = $frschemas{$f}[0];
         my $exists;
         if (defined $args->{"$f.in"}) {
             $exists++;
@@ -572,10 +582,10 @@ sub __parse_query {
         }
     }
 
-    for my $f (grep {$fspecs->{$_}{schema}[0] =~ /^(int|float|str|date)$/}
+    for my $f (grep {$frschemas{$_}[0] =~ /^(int|float|str|date)$/}
                    @fields) { # XXX all Comparable
         my $fspec = $fspecs->{$f};
-        my $ftype = $fspec->{schema}[0];
+        my $ftype = $frschemas{$f}[0];
         my $exists;
         if (defined $args->{"$f.is"}) {
             $exists++;
@@ -612,9 +622,9 @@ sub __parse_query {
         push @filter_fields, $f if $exists && !($f ~~ @filter_fields);
     }
 
-    for my $f (grep {$fspecs->{$_}{schema}[0] =~ /^str$/} @fields) {
+    for my $f (grep {$frschemas{$_}[0] =~ /^str$/} @fields) {
         my $fspec = $fspecs->{$f};
-        my $ftype = $fspec->{schema}[0];
+        my $ftype = $frschemas{$f}[0];
         my $exists;
         if (defined $args->{"$f.contains"}) {
             $exists++;
@@ -665,10 +675,10 @@ sub __parse_query {
     unless ($opts->{custom_search}) {
         $query->{search_fields} = \@searchable_fields;
         $query->{search_str_fields} = [grep {
-            $fspecs->{$_}{schema}[0] =~ /^(str)$/
+            $frschemas{$_}[0] =~ /^(str)$/
         } @searchable_fields];
         $query->{search_array_fields} = [grep {
-            $fspecs->{$_}{schema}[0] =~ /^(array)$/
+            $frschemas{$_}[0] =~ /^(array)$/
         } @searchable_fields];
         $query->{search_re} = $search_re;
     }
@@ -681,7 +691,7 @@ sub __parse_query {
             return err(400, "Unknown field in sort: $f")
                 unless $f ~~ @fields;
             my $fspec = $fspecs->{$f};
-            my $ftype = $fspec->{schema}[0];
+            my $ftype = $frschemas{$f}[0];
             return err(400, "Field $f is not sortable")
                 unless !defined($fspec->{sortable}) || $fspec->{sortable};
             my $op = $ftype =~ /^(int|float)$/ ? '<=>' : 'cmp';
@@ -1530,7 +1540,7 @@ Perinci::Sub::Gen::AccessTable - Generate function (and its metadata) to read ta
 
 =head1 VERSION
 
-This document describes version 0.583 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2020-02-23.
+This document describes version 0.585 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2020-10-07.
 
 =head1 SYNOPSIS
 
@@ -1633,10 +1643,6 @@ metadata) that accepts arguments for specifying fields, filtering, sorting, and
 paging. The resulting function can then be run via command-line using
 L<Perinci::CmdLine> (as demonstrated in Synopsis), or served via HTTP using
 L<Perinci::Access::HTTP::Server>, or consumed normally by Perl programs.
-
-=head1 CAVEATS
-
-It is often not a good idea to expose your database schema directly as API.
 
 =head1 FUNCTIONS
 
@@ -2030,6 +2036,10 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 CAVEATS
+
+It is often not a good idea to expose your database schema directly as API.
 
 =head1 SEE ALSO
 

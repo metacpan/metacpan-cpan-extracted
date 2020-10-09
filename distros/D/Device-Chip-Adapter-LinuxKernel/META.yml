@@ -1,24 +1,44 @@
 ---
-abstract: ~
+abstract: 'A C<Device::Chip::Adapter> implementation'
 author:
-  - 'Ryan Voots <ryan@voots.org>'
+  - 'Ryan Voots <simcop@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
-license: unknown
+  ExtUtils::MakeMaker: '7.12'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Device-Chip-Adapter-LinuxKernel
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
+    - t
+    - xt
+provides:
+  Device::Chip::Adapter::LinuxKernel:
+    file: lib/Device/Chip/Adapter/LinuxKernel.pm
+    version: '0.00004'
 requires:
-  Carp: 0
-  Device::Chip: 0
-  Device::SMBus: 0
-version: '0.000002'
+  Carp: '0'
+  Device::Chip::Adapter: '0'
+  Device::SMBus: '0'
+  XSLoader: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/simcop2387/device-chip-adapter-linuxkernel/issues
+  repository: git://github.com/simcop2387/device-chip-adapter-linuxkernel.git
+version: '0.00004'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -107,5 +107,9 @@ lib/Devel/AssertOS/iOS.pm
 lib/Devel/AssertOS/Hurd.pm
 lib/Devel/AssertOS/MacOSX/v10_11.pm
 lib/Devel/AssertOS/MacOSX/v10_12.pm
+lib/Devel/AssertOS/MacOSX/v10_13.pm
+lib/Devel/AssertOS/MacOSX/v10_14.pm
+lib/Devel/AssertOS/MacOSX/v10_15.pm
+lib/Devel/AssertOS/MSYS.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

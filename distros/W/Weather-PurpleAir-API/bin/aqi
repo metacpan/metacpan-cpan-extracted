@@ -97,7 +97,7 @@ aqi -- command line utility for pulling sensor data from purpleair.com
   --raw            report raw concentration numbers, not EPA PM2.5 AQI
   --sensor=<IDS>   numeric IDs of sensors to query (default 25407)
   --stash-path=<DIRECTORY>
-                   save fetched JSON blobs to given directory",
+                   save fetched JSON blobs to given directory
 
 See documentation for L<Weather::PurpleAir::API> for details on these options.
 

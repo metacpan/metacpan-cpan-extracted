@@ -39,9 +39,10 @@ Keep in mind that if you override C<new> method you MUST create object by callin
 because there will be a C++ proxy object attached to perl object.
 
 
-=head4 log($msg)
+=head4 log($msg, $level)
 
 You must override this method and do the logging work. C<$msg> is a final formatted by formatter message.
+C<$level> is log level for information purpose.
 
 =cut
 

@@ -1,5 +1,10 @@
 Revision history for perl module Sys::Virt
 
+6.8.0 2020-10-05
+
+ - Add VIR_DOMAIN_MIGRATE_PARAM_DISKS_URI constant
+ - Add VIR_CONNECT_LIST_NODE_DEVICES_CAP_CSS_DEV constant
+
 6.3.0 2020-05-05
 
  - Add VIR_DOMAIN_JOB_ERRMSG constant

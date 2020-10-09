@@ -99,12 +99,12 @@ sub copy_file {
     my ($self, %args) = @_;
 
     # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'}) {
+    unless (exists $args{'src_path'} && $args{'src_path'}) {
       croak("Missing the required parameter 'src_path' when calling copy_file");
     }
 
     # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'}) {
+    unless (exists $args{'dest_path'} && $args{'dest_path'}) {
       croak("Missing the required parameter 'dest_path' when calling copy_file");
     }
 
@@ -208,12 +208,12 @@ sub copy_folder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'}) {
+    unless (exists $args{'src_path'} && $args{'src_path'}) {
       croak("Missing the required parameter 'src_path' when calling copy_folder");
     }
 
     # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'}) {
+    unless (exists $args{'dest_path'} && $args{'dest_path'}) {
       croak("Missing the required parameter 'dest_path' when calling copy_folder");
     }
 
@@ -300,7 +300,7 @@ sub create_folder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling create_folder");
     }
 
@@ -407,7 +407,7 @@ sub delete_chart_category {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_chart_category");
     }
 
@@ -570,7 +570,7 @@ sub delete_chart_data_point {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_chart_data_point");
     }
 
@@ -739,7 +739,7 @@ sub delete_chart_series {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_chart_series");
     }
 
@@ -872,7 +872,7 @@ sub delete_file {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_file");
     }
 
@@ -960,7 +960,7 @@ sub delete_folder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_folder");
     }
 
@@ -1060,7 +1060,7 @@ sub delete_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_notes_slide");
     }
 
@@ -1193,7 +1193,7 @@ sub delete_notes_slide_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_notes_slide_paragraph");
     }
 
@@ -1350,7 +1350,7 @@ sub delete_notes_slide_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_notes_slide_paragraphs");
     }
 
@@ -1506,7 +1506,7 @@ sub delete_notes_slide_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_notes_slide_portion");
     }
 
@@ -1681,7 +1681,7 @@ sub delete_notes_slide_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_notes_slide_portions");
     }
 
@@ -1837,7 +1837,7 @@ sub delete_notes_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_notes_slide_shape");
     }
 
@@ -1976,7 +1976,7 @@ sub delete_notes_slide_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_notes_slide_shapes");
     }
 
@@ -2114,7 +2114,7 @@ sub delete_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_paragraph");
     }
 
@@ -2271,7 +2271,7 @@ sub delete_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_paragraphs");
     }
 
@@ -2427,7 +2427,7 @@ sub delete_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_portion");
     }
 
@@ -2602,7 +2602,7 @@ sub delete_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_portions");
     }
 
@@ -2703,6 +2703,263 @@ sub delete_portions {
 }
 
 #
+# delete_section
+#
+# Delete a presentation section.
+# 
+# @param string $name Document name. (required)
+# @param int $section_index Section index. (required)
+# @param boolean $with_slides True to delete the slides related to the deleted section; move them to the remaining sections otherwise. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'section_index' => {
+        data_type => 'int',
+        description => 'Section index.',
+        required => '1',
+    },
+    'with_slides' => {
+        data_type => 'boolean',
+        description => 'True to delete the slides related to the deleted section; move them to the remaining sections otherwise.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_section' } = { 
+    	summary => 'Delete a presentation section.',
+        params => $params,
+        returns => 'Sections',
+        };
+}
+# @return Sections
+#
+sub delete_section {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_section");
+    }
+
+    # verify the required parameter 'section_index' is set
+    unless (exists $args{'section_index'}) {
+      croak("Missing the required parameter 'section_index' when calling delete_section");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/sections/{sectionIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'with_slides'} && defined $args{'with_slides'}) {
+        $query_params->{'withSlides'} = $self->{api_client}->to_boolean_query_value($args{'with_slides'});
+    }
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'section_index'}) {
+        my $_base_variable = "{" . "sectionIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'section_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Sections', $response);
+    return $_response_object;
+}
+
+#
+# delete_sections
+#
+# Delete presentation sections.
+# 
+# @param string $name Document name. (required)
+# @param string $sections The indices of the sections to be deleted; delete all by default. (optional)
+# @param boolean $with_slides True to delete the slides related to the deleted sections; move them to the remaining sections otherwise. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'sections' => {
+        data_type => 'string',
+        description => 'The indices of the sections to be deleted; delete all by default.',
+        required => '0',
+    },
+    'with_slides' => {
+        data_type => 'boolean',
+        description => 'True to delete the slides related to the deleted sections; move them to the remaining sections otherwise.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_sections' } = { 
+    	summary => 'Delete presentation sections.',
+        params => $params,
+        returns => 'Sections',
+        };
+}
+# @return Sections
+#
+sub delete_sections {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_sections");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/sections';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'sections'} && defined $args{'sections'}) {
+        $query_params->{'sections'} = $self->{api_client}->to_query_value($args{'sections'});
+    }
+
+    # query params
+    if (exists $args{'with_slides'} && defined $args{'with_slides'}) {
+        $query_params->{'withSlides'} = $self->{api_client}->to_boolean_query_value($args{'with_slides'});
+    }
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Sections', $response);
+    return $_response_object;
+}
+
+#
 # delete_slide_animation
 #
 # Remove animation from a slide.
@@ -2752,7 +3009,7 @@ sub delete_slide_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_animation");
     }
 
@@ -2879,7 +3136,7 @@ sub delete_slide_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_animation_effect");
     }
 
@@ -3018,7 +3275,7 @@ sub delete_slide_animation_interactive_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_animation_interactive_sequence");
     }
 
@@ -3163,7 +3420,7 @@ sub delete_slide_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_animation_interactive_sequence_effect");
     }
 
@@ -3308,7 +3565,7 @@ sub delete_slide_animation_interactive_sequences {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_animation_interactive_sequences");
     }
 
@@ -3429,7 +3686,7 @@ sub delete_slide_animation_main_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_animation_main_sequence");
     }
 
@@ -3550,7 +3807,7 @@ sub delete_slide_by_index {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_by_index");
     }
 
@@ -3677,7 +3934,7 @@ sub delete_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_shape");
     }
 
@@ -3816,7 +4073,7 @@ sub delete_slide_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_shapes");
     }
 
@@ -3954,7 +4211,7 @@ sub delete_slide_subshape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_subshape");
     }
 
@@ -3964,7 +4221,7 @@ sub delete_slide_subshape {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_slide_subshape");
     }
 
@@ -4111,7 +4368,7 @@ sub delete_slide_subshapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slide_subshapes");
     }
 
@@ -4121,7 +4378,7 @@ sub delete_slide_subshapes {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_slide_subshapes");
     }
 
@@ -4249,7 +4506,7 @@ sub delete_slides_clean_slides_list {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slides_clean_slides_list");
     }
 
@@ -4357,7 +4614,7 @@ sub delete_slides_document_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slides_document_properties");
     }
 
@@ -4466,12 +4723,12 @@ sub delete_slides_document_property {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slides_document_property");
     }
 
     # verify the required parameter 'property_name' is set
-    unless (exists $args{'property_name'}) {
+    unless (exists $args{'property_name'} && $args{'property_name'}) {
       croak("Missing the required parameter 'property_name' when calling delete_slides_document_property");
     }
 
@@ -4587,7 +4844,7 @@ sub delete_slides_slide_background {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_slides_slide_background");
     }
 
@@ -4726,7 +4983,7 @@ sub delete_subshape_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_subshape_paragraph");
     }
 
@@ -4736,7 +4993,7 @@ sub delete_subshape_paragraph {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_subshape_paragraph");
     }
 
@@ -4901,7 +5158,7 @@ sub delete_subshape_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_subshape_paragraphs");
     }
 
@@ -4911,7 +5168,7 @@ sub delete_subshape_paragraphs {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_subshape_paragraphs");
     }
 
@@ -5075,7 +5332,7 @@ sub delete_subshape_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_subshape_portion");
     }
 
@@ -5085,7 +5342,7 @@ sub delete_subshape_portion {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_subshape_portion");
     }
 
@@ -5268,7 +5525,7 @@ sub delete_subshape_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling delete_subshape_portions");
     }
 
@@ -5278,7 +5535,7 @@ sub delete_subshape_portions {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_subshape_portions");
     }
 
@@ -5418,7 +5675,7 @@ sub download_file {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling download_file");
     }
 
@@ -5567,7 +5824,7 @@ sub get_file_versions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_file_versions");
     }
 
@@ -5648,7 +5905,7 @@ sub get_files_list {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_files_list");
     }
 
@@ -5747,7 +6004,7 @@ sub get_layout_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_layout_slide");
     }
 
@@ -5862,7 +6119,7 @@ sub get_layout_slides_list {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_layout_slides_list");
     }
 
@@ -5971,7 +6228,7 @@ sub get_master_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_master_slide");
     }
 
@@ -6086,7 +6343,7 @@ sub get_master_slides_list {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_master_slides_list");
     }
 
@@ -6195,7 +6452,7 @@ sub get_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_notes_slide");
     }
 
@@ -6316,7 +6573,7 @@ sub get_notes_slide_exists {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_notes_slide_exists");
     }
 
@@ -6388,6 +6645,127 @@ sub get_notes_slide_exists {
 }
 
 #
+# get_notes_slide_header_footer
+#
+# Get header/footer info for the notes slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $folder Document folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_header_footer' } = { 
+    	summary => 'Get header/footer info for the notes slide.',
+        params => $params,
+        returns => 'NotesSlideHeaderFooter',
+        };
+}
+# @return NotesSlideHeaderFooter
+#
+sub get_notes_slide_header_footer {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_notes_slide_header_footer");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_notes_slide_header_footer");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/headerFooter';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('NotesSlideHeaderFooter', $response);
+    return $_response_object;
+}
+
+#
 # get_notes_slide_shape
 #
 # Read slide shape info.
@@ -6443,7 +6821,7 @@ sub get_notes_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_notes_slide_shape");
     }
 
@@ -6588,7 +6966,7 @@ sub get_notes_slide_shape_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_notes_slide_shape_paragraph");
     }
 
@@ -6739,7 +7117,7 @@ sub get_notes_slide_shape_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_notes_slide_shape_paragraphs");
     }
 
@@ -6890,7 +7268,7 @@ sub get_notes_slide_shape_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_notes_slide_shape_portion");
     }
 
@@ -7059,7 +7437,7 @@ sub get_notes_slide_shape_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_notes_slide_shape_portions");
     }
 
@@ -7204,7 +7582,7 @@ sub get_notes_slide_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_notes_slide_shapes");
     }
 
@@ -7349,7 +7727,7 @@ sub get_notes_slide_with_format {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_notes_slide_with_format");
     }
 
@@ -7359,7 +7737,7 @@ sub get_notes_slide_with_format {
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling get_notes_slide_with_format");
     }
 
@@ -7515,7 +7893,7 @@ sub get_paragraph_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_paragraph_portion");
     }
 
@@ -7684,7 +8062,7 @@ sub get_paragraph_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_paragraph_portions");
     }
 
@@ -7780,6 +8158,109 @@ sub get_paragraph_portions {
 }
 
 #
+# get_sections
+#
+# Read presentation sections info.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_sections' } = { 
+    	summary => 'Read presentation sections info.',
+        params => $params,
+        returns => 'Sections',
+        };
+}
+# @return Sections
+#
+sub get_sections {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_sections");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/sections';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Sections', $response);
+    return $_response_object;
+}
+
+#
 # get_slide_animation
 #
 # Read slide animation effects.
@@ -7835,7 +8316,7 @@ sub get_slide_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_animation");
     }
 
@@ -7912,6 +8393,127 @@ sub get_slide_animation {
 }
 
 #
+# get_slide_header_footer
+#
+# Get footer info for the slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index The position of the slide to be reordered. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'The position of the slide to be reordered.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_header_footer' } = { 
+    	summary => 'Get footer info for the slide.',
+        params => $params,
+        returns => 'HeaderFooter',
+        };
+}
+# @return HeaderFooter
+#
+sub get_slide_header_footer {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_slide_header_footer");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_slide_header_footer");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/headerFooter';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('HeaderFooter', $response);
+    return $_response_object;
+}
+
+#
 # get_slide_shape
 #
 # Read slide shape info.
@@ -7967,7 +8569,7 @@ sub get_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_shape");
     }
 
@@ -8112,7 +8714,7 @@ sub get_slide_shape_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_shape_paragraph");
     }
 
@@ -8263,7 +8865,7 @@ sub get_slide_shape_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_shape_paragraphs");
     }
 
@@ -8396,7 +8998,7 @@ sub get_slide_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_shapes");
     }
 
@@ -8529,7 +9131,7 @@ sub get_slide_subshape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_subshape");
     }
 
@@ -8539,7 +9141,7 @@ sub get_slide_subshape {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_slide_subshape");
     }
 
@@ -8692,7 +9294,7 @@ sub get_slide_subshape_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_subshape_paragraph");
     }
 
@@ -8702,7 +9304,7 @@ sub get_slide_subshape_paragraph {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_slide_subshape_paragraph");
     }
 
@@ -8861,7 +9463,7 @@ sub get_slide_subshape_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_subshape_paragraphs");
     }
 
@@ -8871,7 +9473,7 @@ sub get_slide_subshape_paragraphs {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_slide_subshape_paragraphs");
     }
 
@@ -9012,7 +9614,7 @@ sub get_slide_subshapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slide_subshapes");
     }
 
@@ -9022,7 +9624,7 @@ sub get_slide_subshapes {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_slide_subshapes");
     }
 
@@ -9191,7 +9793,7 @@ sub get_slides_document {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_document");
     }
 
@@ -9294,7 +9896,7 @@ sub get_slides_document_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_document_properties");
     }
 
@@ -9403,12 +10005,12 @@ sub get_slides_document_property {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_document_property");
     }
 
     # verify the required parameter 'property_name' is set
-    unless (exists $args{'property_name'}) {
+    unless (exists $args{'property_name'} && $args{'property_name'}) {
       croak("Missing the required parameter 'property_name' when calling get_slides_document_property");
     }
 
@@ -9524,7 +10126,7 @@ sub get_slides_image_with_default_format {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_image_with_default_format");
     }
 
@@ -9651,7 +10253,7 @@ sub get_slides_image_with_format {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_image_with_format");
     }
 
@@ -9661,7 +10263,7 @@ sub get_slides_image_with_format {
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling get_slides_image_with_format");
     }
 
@@ -9778,7 +10380,7 @@ sub get_slides_images {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_images");
     }
 
@@ -9893,7 +10495,7 @@ sub get_slides_placeholder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_placeholder");
     }
 
@@ -10026,7 +10628,7 @@ sub get_slides_placeholders {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_placeholders");
     }
 
@@ -10147,7 +10749,7 @@ sub get_slides_presentation_text_items {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_presentation_text_items");
     }
 
@@ -10261,7 +10863,7 @@ sub get_slides_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_slide");
     }
 
@@ -10382,7 +10984,7 @@ sub get_slides_slide_background {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_slide_background");
     }
 
@@ -10503,7 +11105,7 @@ sub get_slides_slide_comments {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_slide_comments");
     }
 
@@ -10624,7 +11226,7 @@ sub get_slides_slide_images {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_slide_images");
     }
 
@@ -10751,7 +11353,7 @@ sub get_slides_slide_text_items {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_slide_text_items");
     }
 
@@ -10871,7 +11473,7 @@ sub get_slides_slides_list {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_slides_list");
     }
 
@@ -10980,7 +11582,7 @@ sub get_slides_theme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_theme");
     }
 
@@ -11101,7 +11703,7 @@ sub get_slides_theme_color_scheme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_theme_color_scheme");
     }
 
@@ -11222,7 +11824,7 @@ sub get_slides_theme_font_scheme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_theme_font_scheme");
     }
 
@@ -11343,7 +11945,7 @@ sub get_slides_theme_format_scheme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_theme_format_scheme");
     }
 
@@ -11458,7 +12060,7 @@ sub get_slides_view_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_slides_view_properties");
     }
 
@@ -11591,7 +12193,7 @@ sub get_subshape_paragraph_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_subshape_paragraph_portion");
     }
 
@@ -11601,7 +12203,7 @@ sub get_subshape_paragraph_portion {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_subshape_paragraph_portion");
     }
 
@@ -11778,7 +12380,7 @@ sub get_subshape_paragraph_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling get_subshape_paragraph_portions");
     }
 
@@ -11788,7 +12390,7 @@ sub get_subshape_paragraph_portions {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_subshape_paragraph_portions");
     }
 
@@ -11935,12 +12537,12 @@ sub move_file {
     my ($self, %args) = @_;
 
     # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'}) {
+    unless (exists $args{'src_path'} && $args{'src_path'}) {
       croak("Missing the required parameter 'src_path' when calling move_file");
     }
 
     # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'}) {
+    unless (exists $args{'dest_path'} && $args{'dest_path'}) {
       croak("Missing the required parameter 'dest_path' when calling move_file");
     }
 
@@ -12044,12 +12646,12 @@ sub move_folder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'src_path' is set
-    unless (exists $args{'src_path'}) {
+    unless (exists $args{'src_path'} && $args{'src_path'}) {
       croak("Missing the required parameter 'src_path' when calling move_folder");
     }
 
     # verify the required parameter 'dest_path' is set
-    unless (exists $args{'dest_path'}) {
+    unless (exists $args{'dest_path'} && $args{'dest_path'}) {
       croak("Missing the required parameter 'dest_path' when calling move_folder");
     }
 
@@ -12142,7 +12744,7 @@ sub object_exists {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling object_exists");
     }
 
@@ -12204,7 +12806,7 @@ sub object_exists {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
-# @param Paragraph $dto Paragraph DTO. (optional)
+# @param Paragraph $dto Paragraph DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -12229,7 +12831,7 @@ sub object_exists {
     'dto' => {
         data_type => 'Paragraph',
         description => 'Paragraph DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -12264,7 +12866,7 @@ sub post_add_new_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_add_new_paragraph");
     }
 
@@ -12276,6 +12878,11 @@ sub post_add_new_paragraph {
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling post_add_new_paragraph");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling post_add_new_paragraph");
     }
 
     # parse inputs
@@ -12366,7 +12973,7 @@ sub post_add_new_paragraph {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
-# @param Portion $dto Portion DTO. (optional)
+# @param Portion $dto Portion DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -12396,7 +13003,7 @@ sub post_add_new_paragraph {
     'dto' => {
         data_type => 'Portion',
         description => 'Portion DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -12431,7 +13038,7 @@ sub post_add_new_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_add_new_portion");
     }
 
@@ -12448,6 +13055,11 @@ sub post_add_new_portion {
     # verify the required parameter 'paragraph_index' is set
     unless (exists $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling post_add_new_portion");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling post_add_new_portion");
     }
 
     # parse inputs
@@ -12604,7 +13216,7 @@ sub post_add_new_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_add_new_shape");
     }
 
@@ -12764,7 +13376,7 @@ sub post_add_new_subshape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_add_new_subshape");
     }
 
@@ -12774,7 +13386,7 @@ sub post_add_new_subshape {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling post_add_new_subshape");
     }
 
@@ -12871,7 +13483,7 @@ sub post_add_new_subshape {
 # @param int $slide_index Slide index. (required)
 # @param string $path Shape path. (required)
 # @param int $shape_index Shape index. (required)
-# @param Paragraph $dto Paragraph DTO. (optional)
+# @param Paragraph $dto Paragraph DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -12901,7 +13513,7 @@ sub post_add_new_subshape {
     'dto' => {
         data_type => 'Paragraph',
         description => 'Paragraph DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -12936,7 +13548,7 @@ sub post_add_new_subshape_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_add_new_subshape_paragraph");
     }
 
@@ -12946,13 +13558,18 @@ sub post_add_new_subshape_paragraph {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling post_add_new_subshape_paragraph");
     }
 
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling post_add_new_subshape_paragraph");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling post_add_new_subshape_paragraph");
     }
 
     # parse inputs
@@ -13051,7 +13668,7 @@ sub post_add_new_subshape_paragraph {
 # @param string $path Shape path. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
-# @param Portion $dto Portion DTO. (optional)
+# @param Portion $dto Portion DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -13086,7 +13703,7 @@ sub post_add_new_subshape_paragraph {
     'dto' => {
         data_type => 'Portion',
         description => 'Portion DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -13121,7 +13738,7 @@ sub post_add_new_subshape_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_add_new_subshape_portion");
     }
 
@@ -13131,7 +13748,7 @@ sub post_add_new_subshape_portion {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling post_add_new_subshape_portion");
     }
 
@@ -13143,6 +13760,11 @@ sub post_add_new_subshape_portion {
     # verify the required parameter 'paragraph_index' is set
     unless (exists $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling post_add_new_subshape_portion");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling post_add_new_subshape_portion");
     }
 
     # parse inputs
@@ -13245,7 +13867,7 @@ sub post_add_new_subshape_portion {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param NotesSlide $dto A NotesSlide object with notes slide data. (optional)
+# @param NotesSlide $dto A NotesSlide object with notes slide data. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -13264,7 +13886,7 @@ sub post_add_new_subshape_portion {
     'dto' => {
         data_type => 'NotesSlide',
         description => 'A NotesSlide object with notes slide data.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -13294,13 +13916,18 @@ sub post_add_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_add_notes_slide");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling post_add_notes_slide");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling post_add_notes_slide");
     }
 
     # parse inputs
@@ -13378,7 +14005,7 @@ sub post_add_notes_slide {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
-# @param ChartCategory $category Category DTO. (optional)
+# @param ChartCategory $category Category DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -13402,7 +14029,7 @@ sub post_add_notes_slide {
     'category' => {
         data_type => 'ChartCategory',
         description => 'Category DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -13432,7 +14059,7 @@ sub post_chart_category {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_chart_category");
     }
 
@@ -13444,6 +14071,11 @@ sub post_chart_category {
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling post_chart_category");
+    }
+
+    # verify the required parameter 'category' is set
+    unless (exists $args{'category'} && $args{'category'}) {
+      croak("Missing the required parameter 'category' when calling post_chart_category");
     }
 
     # parse inputs
@@ -13529,7 +14161,7 @@ sub post_chart_category {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $series_index Series index. (required)
-# @param DataPoint $data_point Data point DTO. (optional)
+# @param DataPoint $data_point Data point DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -13558,7 +14190,7 @@ sub post_chart_category {
     'data_point' => {
         data_type => 'DataPoint',
         description => 'Data point DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -13588,7 +14220,7 @@ sub post_chart_data_point {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_chart_data_point");
     }
 
@@ -13605,6 +14237,11 @@ sub post_chart_data_point {
     # verify the required parameter 'series_index' is set
     unless (exists $args{'series_index'}) {
       croak("Missing the required parameter 'series_index' when calling post_chart_data_point");
+    }
+
+    # verify the required parameter 'data_point' is set
+    unless (exists $args{'data_point'} && $args{'data_point'}) {
+      croak("Missing the required parameter 'data_point' when calling post_chart_data_point");
     }
 
     # parse inputs
@@ -13696,7 +14333,7 @@ sub post_chart_data_point {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index (must be a chart). (required)
-# @param Series $series Series DTO. (optional)
+# @param Series $series Series DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -13720,7 +14357,7 @@ sub post_chart_data_point {
     'series' => {
         data_type => 'Series',
         description => 'Series DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -13750,7 +14387,7 @@ sub post_chart_series {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_chart_series");
     }
 
@@ -13762,6 +14399,11 @@ sub post_chart_series {
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling post_chart_series");
+    }
+
+    # verify the required parameter 'series' is set
+    unless (exists $args{'series'} && $args{'series'}) {
+      croak("Missing the required parameter 'series' when calling post_chart_series");
     }
 
     # parse inputs
@@ -13906,12 +14548,12 @@ sub post_copy_layout_slide_from_source_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_copy_layout_slide_from_source_presentation");
     }
 
     # verify the required parameter 'clone_from' is set
-    unless (exists $args{'clone_from'}) {
+    unless (exists $args{'clone_from'} && $args{'clone_from'}) {
       croak("Missing the required parameter 'clone_from' when calling post_copy_layout_slide_from_source_presentation");
     }
 
@@ -14069,12 +14711,12 @@ sub post_copy_master_slide_from_source_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_copy_master_slide_from_source_presentation");
     }
 
     # verify the required parameter 'clone_from' is set
-    unless (exists $args{'clone_from'}) {
+    unless (exists $args{'clone_from'} && $args{'clone_from'}) {
       croak("Missing the required parameter 'clone_from' when calling post_copy_master_slide_from_source_presentation");
     }
 
@@ -14168,20 +14810,20 @@ sub post_copy_master_slide_from_source_presentation {
 #
 # Read notes slide info.
 # 
+# @param File $document Document data. (required)
 # @param int $slide_index Slide index. (required)
-# @param File $document Document data. (optional)
 # @param string $password Document password. (optional)
 {
     my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
         required => '1',
-    },
-    'document' => {
-        data_type => 'File',
-        description => 'Document data.',
-        required => '0',
     },
     'password' => {
         data_type => 'string',
@@ -14199,6 +14841,11 @@ sub post_copy_master_slide_from_source_presentation {
 #
 sub post_get_notes_slide {
     my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_get_notes_slide");
+    }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
@@ -14260,20 +14907,20 @@ sub post_get_notes_slide {
 #
 # Get info whether a notes slide exists.
 # 
+# @param File $document Document data. (required)
 # @param int $slide_index Slide index. (required)
-# @param File $document Document data. (optional)
 # @param string $password Document password. (optional)
 {
     my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
         required => '1',
-    },
-    'document' => {
-        data_type => 'File',
-        description => 'Document data.',
-        required => '0',
     },
     'password' => {
         data_type => 'string',
@@ -14291,6 +14938,11 @@ sub post_get_notes_slide {
 #
 sub post_get_notes_slide_exists {
     my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_get_notes_slide_exists");
+    }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
@@ -14352,15 +15004,20 @@ sub post_get_notes_slide_exists {
 #
 # Convert notes slide to the specified image format.
 # 
+# @param File $document Document data. (required)
 # @param int $slide_index Slide index. (required)
 # @param string $format Output file format. (required)
-# @param File $document Document data. (optional)
 # @param int $width Output file width. (optional)
 # @param int $height Output file height. (optional)
 # @param string $password Document password. (optional)
 # @param string $fonts_folder Storage folder containing custom fonts to be used with the document. (optional)
 {
     my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
@@ -14370,11 +15027,6 @@ sub post_get_notes_slide_exists {
         data_type => 'string',
         description => 'Output file format.',
         required => '1',
-    },
-    'document' => {
-        data_type => 'File',
-        description => 'Document data.',
-        required => '0',
     },
     'width' => {
         data_type => 'int',
@@ -14408,13 +15060,18 @@ sub post_get_notes_slide_exists {
 sub post_get_notes_slide_with_format {
     my ($self, %args) = @_;
 
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_get_notes_slide_with_format");
+    }
+
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling post_get_notes_slide_with_format");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling post_get_notes_slide_with_format");
     }
 
@@ -14498,7 +15155,7 @@ sub post_get_notes_slide_with_format {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
-# @param Paragraph $dto Paragraph DTO. (optional)
+# @param Paragraph $dto Paragraph DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -14523,7 +15180,7 @@ sub post_get_notes_slide_with_format {
     'dto' => {
         data_type => 'Paragraph',
         description => 'Paragraph DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -14558,7 +15215,7 @@ sub post_notes_slide_add_new_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_notes_slide_add_new_paragraph");
     }
 
@@ -14570,6 +15227,11 @@ sub post_notes_slide_add_new_paragraph {
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling post_notes_slide_add_new_paragraph");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling post_notes_slide_add_new_paragraph");
     }
 
     # parse inputs
@@ -14660,7 +15322,7 @@ sub post_notes_slide_add_new_paragraph {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
-# @param Portion $dto Portion DTO. (optional)
+# @param Portion $dto Portion DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -14690,7 +15352,7 @@ sub post_notes_slide_add_new_paragraph {
     'dto' => {
         data_type => 'Portion',
         description => 'Portion DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -14725,7 +15387,7 @@ sub post_notes_slide_add_new_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_notes_slide_add_new_portion");
     }
 
@@ -14742,6 +15404,11 @@ sub post_notes_slide_add_new_portion {
     # verify the required parameter 'paragraph_index' is set
     unless (exists $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling post_notes_slide_add_new_portion");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling post_notes_slide_add_new_portion");
     }
 
     # parse inputs
@@ -14837,7 +15504,7 @@ sub post_notes_slide_add_new_portion {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param ShapeBase $dto Shape DTO. (optional)
+# @param ShapeBase $dto Shape DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -14858,7 +15525,7 @@ sub post_notes_slide_add_new_portion {
     'dto' => {
         data_type => 'ShapeBase',
         description => 'Shape DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -14898,13 +15565,18 @@ sub post_notes_slide_add_new_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_notes_slide_add_new_shape");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling post_notes_slide_add_new_shape");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling post_notes_slide_add_new_shape");
     }
 
     # parse inputs
@@ -15076,7 +15748,7 @@ sub post_notes_slide_shape_save_as {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_notes_slide_shape_save_as");
     }
 
@@ -15091,7 +15763,7 @@ sub post_notes_slide_shape_save_as {
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling post_notes_slide_shape_save_as");
     }
 
@@ -15202,7 +15874,7 @@ sub post_notes_slide_shape_save_as {
 # Merge the presentation with other presentations specified in the request parameter.
 # 
 # @param string $name Document name. (required)
-# @param PresentationsMergeRequest $request PresentationsMergeRequest with a list of presentations to merge. (optional)
+# @param PresentationsMergeRequest $request PresentationsMergeRequest with a list of presentations to merge. (required)
 # @param string $password Document password. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
@@ -15216,7 +15888,7 @@ sub post_notes_slide_shape_save_as {
     'request' => {
         data_type => 'PresentationsMergeRequest',
         description => 'PresentationsMergeRequest with a list of presentations to merge.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -15246,8 +15918,13 @@ sub post_presentation_merge {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_presentation_merge");
+    }
+
+    # verify the required parameter 'request' is set
+    unless (exists $args{'request'} && $args{'request'}) {
+      croak("Missing the required parameter 'request' when calling post_presentation_merge");
     }
 
     # parse inputs
@@ -15307,6 +15984,278 @@ sub post_presentation_merge {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('Document', $response);
+    return $_response_object;
+}
+
+#
+# post_section
+#
+# Create a section starting at a specified slide index.
+# 
+# @param string $name Document name. (required)
+# @param string $section_name Section name. (required)
+# @param int $slide_index Slide index (one-based). (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'section_name' => {
+        data_type => 'string',
+        description => 'Section name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index (one-based).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_section' } = { 
+    	summary => 'Create a section starting at a specified slide index.',
+        params => $params,
+        returns => 'Sections',
+        };
+}
+# @return Sections
+#
+sub post_section {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_section");
+    }
+
+    # verify the required parameter 'section_name' is set
+    unless (exists $args{'section_name'} && $args{'section_name'}) {
+      croak("Missing the required parameter 'section_name' when calling post_section");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_section");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/sections';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'section_name'} && defined $args{'section_name'}) {
+        $query_params->{'sectionName'} = $self->{api_client}->to_query_value($args{'section_name'});
+    }
+
+    # query params
+    if (exists $args{'slide_index'} && defined $args{'slide_index'}) {
+        $query_params->{'slideIndex'} = $self->{api_client}->to_query_value($args{'slide_index'});
+    }
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Sections', $response);
+    return $_response_object;
+}
+
+#
+# post_section_move
+#
+# Move presentation section to a specified position.
+# 
+# @param string $name Document name. (required)
+# @param int $section_index The position of the section to be reordered. (required)
+# @param int $new_position The new position of the reordered section. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'section_index' => {
+        data_type => 'int',
+        description => 'The position of the section to be reordered.',
+        required => '1',
+    },
+    'new_position' => {
+        data_type => 'int',
+        description => 'The new position of the reordered section.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_section_move' } = { 
+    	summary => 'Move presentation section to a specified position.',
+        params => $params,
+        returns => 'Sections',
+        };
+}
+# @return Sections
+#
+sub post_section_move {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_section_move");
+    }
+
+    # verify the required parameter 'section_index' is set
+    unless (exists $args{'section_index'}) {
+      croak("Missing the required parameter 'section_index' when calling post_section_move");
+    }
+
+    # verify the required parameter 'new_position' is set
+    unless (exists $args{'new_position'}) {
+      croak("Missing the required parameter 'new_position' when calling post_section_move");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/sections/{sectionIndex}/move';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'new_position'} && defined $args{'new_position'}) {
+        $query_params->{'newPosition'} = $self->{api_client}->to_query_value($args{'new_position'});
+    }
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'section_index'}) {
+        my $_base_variable = "{" . "sectionIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'section_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Sections', $response);
     return $_response_object;
 }
 
@@ -15402,7 +16351,7 @@ sub post_shape_save_as {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_shape_save_as");
     }
 
@@ -15417,7 +16366,7 @@ sub post_shape_save_as {
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling post_shape_save_as");
     }
 
@@ -15529,7 +16478,7 @@ sub post_shape_save_as {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param Effect $effect Animation effect DTO. (optional)
+# @param Effect $effect Animation effect DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -15548,7 +16497,7 @@ sub post_shape_save_as {
     'effect' => {
         data_type => 'Effect',
         description => 'Animation effect DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -15578,13 +16527,18 @@ sub post_slide_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slide_animation_effect");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling post_slide_animation_effect");
+    }
+
+    # verify the required parameter 'effect' is set
+    unless (exists $args{'effect'} && $args{'effect'}) {
+      croak("Missing the required parameter 'effect' when calling post_slide_animation_effect");
     }
 
     # parse inputs
@@ -15661,7 +16615,7 @@ sub post_slide_animation_effect {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param InteractiveSequence $sequence Animation sequence DTO. (optional)
+# @param InteractiveSequence $sequence Animation sequence DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -15680,7 +16634,7 @@ sub post_slide_animation_effect {
     'sequence' => {
         data_type => 'InteractiveSequence',
         description => 'Animation sequence DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -15710,13 +16664,18 @@ sub post_slide_animation_interactive_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slide_animation_interactive_sequence");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling post_slide_animation_interactive_sequence");
+    }
+
+    # verify the required parameter 'sequence' is set
+    unless (exists $args{'sequence'} && $args{'sequence'}) {
+      croak("Missing the required parameter 'sequence' when calling post_slide_animation_interactive_sequence");
     }
 
     # parse inputs
@@ -15794,7 +16753,7 @@ sub post_slide_animation_interactive_sequence {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param int $sequence_index The position of the interactive sequence. (required)
-# @param Effect $effect Animation effect DTO. (optional)
+# @param Effect $effect Animation effect DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -15818,7 +16777,7 @@ sub post_slide_animation_interactive_sequence {
     'effect' => {
         data_type => 'Effect',
         description => 'Animation effect DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -15848,7 +16807,7 @@ sub post_slide_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slide_animation_interactive_sequence_effect");
     }
 
@@ -15860,6 +16819,11 @@ sub post_slide_animation_interactive_sequence_effect {
     # verify the required parameter 'sequence_index' is set
     unless (exists $args{'sequence_index'}) {
       croak("Missing the required parameter 'sequence_index' when calling post_slide_animation_interactive_sequence_effect");
+    }
+
+    # verify the required parameter 'effect' is set
+    unless (exists $args{'effect'} && $args{'effect'}) {
+      croak("Missing the required parameter 'effect' when calling post_slide_animation_interactive_sequence_effect");
     }
 
     # parse inputs
@@ -16016,7 +16980,7 @@ sub post_slide_save_as {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slide_save_as");
     }
 
@@ -16026,7 +16990,7 @@ sub post_slide_save_as {
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling post_slide_save_as");
     }
 
@@ -16175,7 +17139,7 @@ sub post_slides_add {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_add");
     }
 
@@ -16249,21 +17213,21 @@ sub post_slides_add {
 #
 # Convert presentation from request content to format specified.
 # 
+# @param File $document Document data. (required)
 # @param string $format Export format. (required)
-# @param File $document Document data. (optional)
 # @param string $password Document password. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
 {
     my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
     'format' => {
         data_type => 'string',
         description => 'Export format.',
         required => '1',
-    },
-    'document' => {
-        data_type => 'File',
-        description => 'Document data.',
-        required => '0',
     },
     'password' => {
         data_type => 'string',
@@ -16287,8 +17251,13 @@ sub post_slides_add {
 sub post_slides_convert {
     my ($self, %args) = @_;
 
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_slides_convert");
+    }
+
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling post_slides_convert");
     }
 
@@ -16421,7 +17390,7 @@ sub post_slides_copy {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_copy");
     }
 
@@ -16566,7 +17535,7 @@ sub post_slides_document {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_document");
     }
 
@@ -16685,7 +17654,7 @@ sub post_slides_document_from_html {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_document_from_html");
     }
 
@@ -16811,7 +17780,7 @@ sub post_slides_document_from_source {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_document_from_source");
     }
 
@@ -16959,12 +17928,12 @@ sub post_slides_document_from_template {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_document_from_template");
     }
 
     # verify the required parameter 'template_path' is set
-    unless (exists $args{'template_path'}) {
+    unless (exists $args{'template_path'} && $args{'template_path'}) {
       croak("Missing the required parameter 'template_path' when calling post_slides_document_from_template");
     }
 
@@ -17053,13 +18022,13 @@ sub post_slides_document_from_template {
 #
 # Performs slides pipeline.
 # 
-# @param Pipeline $pipeline A Pipeline object. (optional)
+# @param Pipeline $pipeline A Pipeline object. (required)
 {
     my $params = {
     'pipeline' => {
         data_type => 'Pipeline',
         description => 'A Pipeline object.',
-        required => '0',
+        required => '1',
     },
     };
     __PACKAGE__->method_documentation->{ 'post_slides_pipeline' } = { 
@@ -17072,6 +18041,11 @@ sub post_slides_document_from_template {
 #
 sub post_slides_pipeline {
     my ($self, %args) = @_;
+
+    # verify the required parameter 'pipeline' is set
+    unless (exists $args{'pipeline'} && $args{'pipeline'}) {
+      croak("Missing the required parameter 'pipeline' when calling post_slides_pipeline");
+    }
 
     # parse inputs
     my $_resource_path = '/slides/pipeline';
@@ -17173,17 +18147,17 @@ sub post_slides_presentation_replace_text {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_presentation_replace_text");
     }
 
     # verify the required parameter 'old_value' is set
-    unless (exists $args{'old_value'}) {
+    unless (exists $args{'old_value'} && $args{'old_value'}) {
       croak("Missing the required parameter 'old_value' when calling post_slides_presentation_replace_text");
     }
 
     # verify the required parameter 'new_value' is set
-    unless (exists $args{'new_value'}) {
+    unless (exists $args{'new_value'} && $args{'new_value'}) {
       croak("Missing the required parameter 'new_value' when calling post_slides_presentation_replace_text");
     }
 
@@ -17313,7 +18287,7 @@ sub post_slides_reorder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_reorder");
     }
 
@@ -17450,7 +18424,7 @@ sub post_slides_reorder_many {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_reorder_many");
     }
 
@@ -17581,12 +18555,12 @@ sub post_slides_save_as {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_save_as");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling post_slides_save_as");
     }
 
@@ -17668,7 +18642,7 @@ sub post_slides_save_as {
 # Set document properties.
 # 
 # @param string $name Document name. (required)
-# @param DocumentProperties $properties New properties. (optional)
+# @param DocumentProperties $properties New properties. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -17682,7 +18656,7 @@ sub post_slides_save_as {
     'properties' => {
         data_type => 'DocumentProperties',
         description => 'New properties.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -17712,8 +18686,13 @@ sub post_slides_set_document_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_set_document_properties");
+    }
+
+    # verify the required parameter 'properties' is set
+    unless (exists $args{'properties'} && $args{'properties'}) {
+      croak("Missing the required parameter 'properties' when calling post_slides_set_document_properties");
     }
 
     # parse inputs
@@ -17844,7 +18823,7 @@ sub post_slides_slide_replace_text {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_slide_replace_text");
     }
 
@@ -17854,12 +18833,12 @@ sub post_slides_slide_replace_text {
     }
 
     # verify the required parameter 'old_value' is set
-    unless (exists $args{'old_value'}) {
+    unless (exists $args{'old_value'} && $args{'old_value'}) {
       croak("Missing the required parameter 'old_value' when calling post_slides_slide_replace_text");
     }
 
     # verify the required parameter 'new_value' is set
-    unless (exists $args{'new_value'}) {
+    unless (exists $args{'new_value'} && $args{'new_value'}) {
       croak("Missing the required parameter 'new_value' when calling post_slides_slide_replace_text");
     }
 
@@ -18032,7 +19011,7 @@ sub post_slides_split {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_slides_split");
     }
 
@@ -18229,7 +19208,7 @@ sub post_subshape_save_as {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling post_subshape_save_as");
     }
 
@@ -18239,7 +19218,7 @@ sub post_subshape_save_as {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling post_subshape_save_as");
     }
 
@@ -18249,7 +19228,7 @@ sub post_subshape_save_as {
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling post_subshape_save_as");
     }
 
@@ -18370,7 +19349,7 @@ sub post_subshape_save_as {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $category_index Category index. (required)
-# @param ChartCategory $category Category DTO. (optional)
+# @param ChartCategory $category Category DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -18399,7 +19378,7 @@ sub post_subshape_save_as {
     'category' => {
         data_type => 'ChartCategory',
         description => 'Category DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -18429,7 +19408,7 @@ sub put_chart_category {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_chart_category");
     }
 
@@ -18446,6 +19425,11 @@ sub put_chart_category {
     # verify the required parameter 'category_index' is set
     unless (exists $args{'category_index'}) {
       croak("Missing the required parameter 'category_index' when calling put_chart_category");
+    }
+
+    # verify the required parameter 'category' is set
+    unless (exists $args{'category'} && $args{'category'}) {
+      croak("Missing the required parameter 'category' when calling put_chart_category");
     }
 
     # parse inputs
@@ -18539,7 +19523,7 @@ sub put_chart_category {
 # @param int $shape_index Shape index. (required)
 # @param int $series_index Series index. (required)
 # @param int $point_index Data point index. (required)
-# @param DataPoint $data_point Data point DTO. (optional)
+# @param DataPoint $data_point Data point DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -18573,7 +19557,7 @@ sub put_chart_category {
     'data_point' => {
         data_type => 'DataPoint',
         description => 'Data point DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -18603,7 +19587,7 @@ sub put_chart_data_point {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_chart_data_point");
     }
 
@@ -18625,6 +19609,11 @@ sub put_chart_data_point {
     # verify the required parameter 'point_index' is set
     unless (exists $args{'point_index'}) {
       croak("Missing the required parameter 'point_index' when calling put_chart_data_point");
+    }
+
+    # verify the required parameter 'data_point' is set
+    unless (exists $args{'data_point'} && $args{'data_point'}) {
+      croak("Missing the required parameter 'data_point' when calling put_chart_data_point");
     }
 
     # parse inputs
@@ -18724,7 +19713,7 @@ sub put_chart_data_point {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index (must be a chart). (required)
 # @param int $series_index Series index. (required)
-# @param Series $series Series DTO. (optional)
+# @param Series $series Series DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -18753,7 +19742,7 @@ sub put_chart_data_point {
     'series' => {
         data_type => 'Series',
         description => 'Series DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -18783,7 +19772,7 @@ sub put_chart_series {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_chart_series");
     }
 
@@ -18800,6 +19789,11 @@ sub put_chart_series {
     # verify the required parameter 'series_index' is set
     unless (exists $args{'series_index'}) {
       croak("Missing the required parameter 'series_index' when calling put_chart_series");
+    }
+
+    # verify the required parameter 'series' is set
+    unless (exists $args{'series'} && $args{'series'}) {
+      croak("Missing the required parameter 'series' when calling put_chart_series");
     }
 
     # parse inputs
@@ -18890,7 +19884,7 @@ sub put_chart_series {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param LayoutSlide $slide_dto Slide update data. (optional)
+# @param LayoutSlide $slide_dto Slide update data. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -18909,7 +19903,7 @@ sub put_chart_series {
     'slide_dto' => {
         data_type => 'LayoutSlide',
         description => 'Slide update data.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -18939,13 +19933,18 @@ sub put_layout_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_layout_slide");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling put_layout_slide");
+    }
+
+    # verify the required parameter 'slide_dto' is set
+    unless (exists $args{'slide_dto'} && $args{'slide_dto'}) {
+      croak("Missing the required parameter 'slide_dto' when calling put_layout_slide");
     }
 
     # parse inputs
@@ -19012,6 +20011,143 @@ sub put_layout_slide {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('LayoutSlide', $response);
+    return $_response_object;
+}
+
+#
+# put_notes_slide_header_footer
+#
+# Set header/footer the notes slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param NotesSlideHeaderFooter $dto Header/footer to set. (required)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $folder Document folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'NotesSlideHeaderFooter',
+        description => 'Header/footer to set.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_notes_slide_header_footer' } = { 
+    	summary => 'Set header/footer the notes slide.',
+        params => $params,
+        returns => 'NotesSlideHeaderFooter',
+        };
+}
+# @return NotesSlideHeaderFooter
+#
+sub put_notes_slide_header_footer {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_notes_slide_header_footer");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling put_notes_slide_header_footer");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_notes_slide_header_footer");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/headerFooter';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('NotesSlideHeaderFooter', $response);
     return $_response_object;
 }
 
@@ -19113,7 +20249,7 @@ sub put_notes_slide_shape_save_as {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_notes_slide_shape_save_as");
     }
 
@@ -19128,12 +20264,12 @@ sub put_notes_slide_shape_save_as {
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling put_notes_slide_shape_save_as");
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'}) {
+    unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling put_notes_slide_shape_save_as");
     }
 
@@ -19245,7 +20381,7 @@ sub put_notes_slide_shape_save_as {
 # Merge the presentation with other presentations or some of their slides specified in the request parameter.
 # 
 # @param string $name Document name. (required)
-# @param OrderedMergeRequest $request OrderedMergeRequest with a list of presentations and slide indices to merge. (optional)
+# @param OrderedMergeRequest $request OrderedMergeRequest with a list of presentations and slide indices to merge. (required)
 # @param string $password Document password. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
@@ -19259,7 +20395,7 @@ sub put_notes_slide_shape_save_as {
     'request' => {
         data_type => 'OrderedMergeRequest',
         description => 'OrderedMergeRequest with a list of presentations and slide indices to merge.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -19289,8 +20425,13 @@ sub put_presentation_merge {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_presentation_merge");
+    }
+
+    # verify the required parameter 'request' is set
+    unless (exists $args{'request'} && $args{'request'}) {
+      croak("Missing the required parameter 'request' when calling put_presentation_merge");
     }
 
     # parse inputs
@@ -19354,6 +20495,262 @@ sub put_presentation_merge {
 }
 
 #
+# put_section
+#
+# Update section name.
+# 
+# @param string $name Document name. (required)
+# @param int $section_index The position of the section to be updated. (required)
+# @param string $section_name Section name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'section_index' => {
+        data_type => 'int',
+        description => 'The position of the section to be updated.',
+        required => '1',
+    },
+    'section_name' => {
+        data_type => 'string',
+        description => 'Section name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_section' } = { 
+    	summary => 'Update section name.',
+        params => $params,
+        returns => 'Sections',
+        };
+}
+# @return Sections
+#
+sub put_section {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_section");
+    }
+
+    # verify the required parameter 'section_index' is set
+    unless (exists $args{'section_index'}) {
+      croak("Missing the required parameter 'section_index' when calling put_section");
+    }
+
+    # verify the required parameter 'section_name' is set
+    unless (exists $args{'section_name'} && $args{'section_name'}) {
+      croak("Missing the required parameter 'section_name' when calling put_section");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/sections/{sectionIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'section_name'} && defined $args{'section_name'}) {
+        $query_params->{'sectionName'} = $self->{api_client}->to_query_value($args{'section_name'});
+    }
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'section_index'}) {
+        my $_base_variable = "{" . "sectionIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'section_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Sections', $response);
+    return $_response_object;
+}
+
+#
+# put_sections
+#
+# Replace existing presentation sections with the ones provided in the sections DTO.
+# 
+# @param string $name Document name. (required)
+# @param Sections $sections Sections DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'sections' => {
+        data_type => 'Sections',
+        description => 'Sections DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_sections' } = { 
+    	summary => 'Replace existing presentation sections with the ones provided in the sections DTO.',
+        params => $params,
+        returns => 'Sections',
+        };
+}
+# @return Sections
+#
+sub put_sections {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_sections");
+    }
+
+    # verify the required parameter 'sections' is set
+    unless (exists $args{'sections'} && $args{'sections'}) {
+      croak("Missing the required parameter 'sections' when calling put_sections");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/sections';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'sections'}) {
+        $_body_data = $args{'sections'};
+    }
+
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Sections', $response);
+    return $_response_object;
+}
+
+#
 # put_set_paragraph_portion_properties
 #
 # Update portion properties.
@@ -19363,7 +20760,7 @@ sub put_presentation_merge {
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param int $portion_index Portion index. (required)
-# @param Portion $dto Portion DTO. (optional)
+# @param Portion $dto Portion DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -19397,7 +20794,7 @@ sub put_presentation_merge {
     'dto' => {
         data_type => 'Portion',
         description => 'Portion DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -19427,7 +20824,7 @@ sub put_set_paragraph_portion_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_set_paragraph_portion_properties");
     }
 
@@ -19449,6 +20846,11 @@ sub put_set_paragraph_portion_properties {
     # verify the required parameter 'portion_index' is set
     unless (exists $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling put_set_paragraph_portion_properties");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_set_paragraph_portion_properties");
     }
 
     # parse inputs
@@ -19548,7 +20950,7 @@ sub put_set_paragraph_portion_properties {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
-# @param Paragraph $dto Paragraph DTO. (optional)
+# @param Paragraph $dto Paragraph DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -19577,7 +20979,7 @@ sub put_set_paragraph_portion_properties {
     'dto' => {
         data_type => 'Paragraph',
         description => 'Paragraph DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -19607,7 +21009,7 @@ sub put_set_paragraph_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_set_paragraph_properties");
     }
 
@@ -19624,6 +21026,11 @@ sub put_set_paragraph_properties {
     # verify the required parameter 'paragraph_index' is set
     unless (exists $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling put_set_paragraph_properties");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_set_paragraph_properties");
     }
 
     # parse inputs
@@ -19718,7 +21125,7 @@ sub put_set_paragraph_properties {
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param int $portion_index Portion index. (required)
-# @param Portion $dto Portion DTO. (optional)
+# @param Portion $dto Portion DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -19757,7 +21164,7 @@ sub put_set_paragraph_properties {
     'dto' => {
         data_type => 'Portion',
         description => 'Portion DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -19787,7 +21194,7 @@ sub put_set_subshape_paragraph_portion_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_set_subshape_paragraph_portion_properties");
     }
 
@@ -19797,7 +21204,7 @@ sub put_set_subshape_paragraph_portion_properties {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling put_set_subshape_paragraph_portion_properties");
     }
 
@@ -19814,6 +21221,11 @@ sub put_set_subshape_paragraph_portion_properties {
     # verify the required parameter 'portion_index' is set
     unless (exists $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling put_set_subshape_paragraph_portion_properties");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_set_subshape_paragraph_portion_properties");
     }
 
     # parse inputs
@@ -19921,7 +21333,7 @@ sub put_set_subshape_paragraph_portion_properties {
 # @param string $path Shape path. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
-# @param Paragraph $dto Paragraph DTO. (optional)
+# @param Paragraph $dto Paragraph DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -19955,7 +21367,7 @@ sub put_set_subshape_paragraph_portion_properties {
     'dto' => {
         data_type => 'Paragraph',
         description => 'Paragraph DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -19985,7 +21397,7 @@ sub put_set_subshape_paragraph_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_set_subshape_paragraph_properties");
     }
 
@@ -19995,7 +21407,7 @@ sub put_set_subshape_paragraph_properties {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling put_set_subshape_paragraph_properties");
     }
 
@@ -20007,6 +21419,11 @@ sub put_set_subshape_paragraph_properties {
     # verify the required parameter 'paragraph_index' is set
     unless (exists $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling put_set_subshape_paragraph_properties");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_set_subshape_paragraph_properties");
     }
 
     # parse inputs
@@ -20195,7 +21612,7 @@ sub put_shape_save_as {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_shape_save_as");
     }
 
@@ -20210,12 +21627,12 @@ sub put_shape_save_as {
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling put_shape_save_as");
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'}) {
+    unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling put_shape_save_as");
     }
 
@@ -20328,7 +21745,7 @@ sub put_shape_save_as {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param SlideAnimation $animation Animation DTO. (optional)
+# @param SlideAnimation $animation Animation DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -20347,7 +21764,7 @@ sub put_shape_save_as {
     'animation' => {
         data_type => 'SlideAnimation',
         description => 'Animation DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -20377,13 +21794,18 @@ sub put_slide_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slide_animation");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling put_slide_animation");
+    }
+
+    # verify the required parameter 'animation' is set
+    unless (exists $args{'animation'} && $args{'animation'}) {
+      croak("Missing the required parameter 'animation' when calling put_slide_animation");
     }
 
     # parse inputs
@@ -20461,7 +21883,7 @@ sub put_slide_animation {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param int $effect_index The position of the effect to be modified. (required)
-# @param Effect $effect Animation effect DTO. (optional)
+# @param Effect $effect Animation effect DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -20485,7 +21907,7 @@ sub put_slide_animation {
     'effect' => {
         data_type => 'Effect',
         description => 'Animation effect DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -20515,7 +21937,7 @@ sub put_slide_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slide_animation_effect");
     }
 
@@ -20527,6 +21949,11 @@ sub put_slide_animation_effect {
     # verify the required parameter 'effect_index' is set
     unless (exists $args{'effect_index'}) {
       croak("Missing the required parameter 'effect_index' when calling put_slide_animation_effect");
+    }
+
+    # verify the required parameter 'effect' is set
+    unless (exists $args{'effect'} && $args{'effect'}) {
+      croak("Missing the required parameter 'effect' when calling put_slide_animation_effect");
     }
 
     # parse inputs
@@ -20612,7 +22039,7 @@ sub put_slide_animation_effect {
 # @param int $slide_index Slide index. (required)
 # @param int $sequence_index The position of the interactive sequence. (required)
 # @param int $effect_index The position of the effect to be modified. (required)
-# @param Effect $effect Animation effect DTO. (optional)
+# @param Effect $effect Animation effect DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -20641,7 +22068,7 @@ sub put_slide_animation_effect {
     'effect' => {
         data_type => 'Effect',
         description => 'Animation effect DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -20671,7 +22098,7 @@ sub put_slide_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slide_animation_interactive_sequence_effect");
     }
 
@@ -20688,6 +22115,11 @@ sub put_slide_animation_interactive_sequence_effect {
     # verify the required parameter 'effect_index' is set
     unless (exists $args{'effect_index'}) {
       croak("Missing the required parameter 'effect_index' when calling put_slide_animation_interactive_sequence_effect");
+    }
+
+    # verify the required parameter 'effect' is set
+    unless (exists $args{'effect'} && $args{'effect'}) {
+      croak("Missing the required parameter 'effect' when calling put_slide_animation_interactive_sequence_effect");
     }
 
     # parse inputs
@@ -20768,6 +22200,143 @@ sub put_slide_animation_interactive_sequence_effect {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('SlideAnimation', $response);
+    return $_response_object;
+}
+
+#
+# put_slide_header_footer
+#
+# Set footer the slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index The position of the slide to be reordered. (required)
+# @param HeaderFooter $dto Footer to set. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'The position of the slide to be reordered.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'HeaderFooter',
+        description => 'Footer to set.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slide_header_footer' } = { 
+    	summary => 'Set footer the slide.',
+        params => $params,
+        returns => 'HeaderFooter',
+        };
+}
+# @return HeaderFooter
+#
+sub put_slide_header_footer {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_slide_header_footer");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling put_slide_header_footer");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_slide_header_footer");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/headerFooter';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('HeaderFooter', $response);
     return $_response_object;
 }
 
@@ -20857,7 +22426,7 @@ sub put_slide_save_as {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slide_save_as");
     }
 
@@ -20867,12 +22436,12 @@ sub put_slide_save_as {
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling put_slide_save_as");
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'}) {
+    unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling put_slide_save_as");
     }
 
@@ -20974,7 +22543,7 @@ sub put_slide_save_as {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
-# @param ShapeBase $dto Shape DTO. (optional)
+# @param ShapeBase $dto Shape DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -20998,7 +22567,7 @@ sub put_slide_save_as {
     'dto' => {
         data_type => 'ShapeBase',
         description => 'Shape DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -21028,7 +22597,7 @@ sub put_slide_shape_info {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slide_shape_info");
     }
 
@@ -21040,6 +22609,11 @@ sub put_slide_shape_info {
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling put_slide_shape_info");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_slide_shape_info");
     }
 
     # parse inputs
@@ -21125,7 +22699,7 @@ sub put_slide_shape_info {
 # @param int $slide_index Slide index. (required)
 # @param string $path Shape path. (required)
 # @param int $shape_index Shape index. (required)
-# @param ShapeBase $dto Shape DTO. (optional)
+# @param ShapeBase $dto Shape DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -21154,7 +22728,7 @@ sub put_slide_shape_info {
     'dto' => {
         data_type => 'ShapeBase',
         description => 'Shape DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -21184,7 +22758,7 @@ sub put_slide_subshape_info {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slide_subshape_info");
     }
 
@@ -21194,13 +22768,18 @@ sub put_slide_subshape_info {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling put_slide_subshape_info");
     }
 
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling put_slide_subshape_info");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_slide_subshape_info");
     }
 
     # parse inputs
@@ -21289,13 +22868,18 @@ sub put_slide_subshape_info {
 #
 # Convert presentation from request content to format specified.
 # 
+# @param File $document Document data. (required)
 # @param string $format Export format. (required)
 # @param string $out_path Path to save result. (required)
-# @param File $document Document data. (optional)
 # @param string $password Document password. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
 {
     my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
     'format' => {
         data_type => 'string',
         description => 'Export format.',
@@ -21305,11 +22889,6 @@ sub put_slide_subshape_info {
         data_type => 'string',
         description => 'Path to save result.',
         required => '1',
-    },
-    'document' => {
-        data_type => 'File',
-        description => 'Document data.',
-        required => '0',
     },
     'password' => {
         data_type => 'string',
@@ -21333,13 +22912,18 @@ sub put_slide_subshape_info {
 sub put_slides_convert {
     my ($self, %args) = @_;
 
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling put_slides_convert");
+    }
+
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling put_slides_convert");
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'}) {
+    unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling put_slides_convert");
     }
 
@@ -21449,7 +23033,7 @@ sub put_slides_document_from_html {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slides_document_from_html");
     }
 
@@ -21494,6 +23078,125 @@ sub put_slides_document_from_html {
     # body params
     if ( exists $args{'html'}) {
         $_body_data = $args{'html'};
+    }
+
+    my $files;
+    # files
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Document', $response);
+    return $_response_object;
+}
+
+#
+# put_slides_header_footer
+#
+# Set footers for all slides in a presentation.
+# 
+# @param string $name Document name. (required)
+# @param HeaderFooter $dto HeaderFooter instance. (required)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $folder Document folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'HeaderFooter',
+        description => 'HeaderFooter instance.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_header_footer' } = { 
+    	summary => 'Set footers for all slides in a presentation.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub put_slides_header_footer {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_slides_header_footer");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_slides_header_footer");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/headerFooter';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
     }
 
     my $files;
@@ -21581,17 +23284,17 @@ sub put_slides_save_as {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slides_save_as");
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'}) {
+    unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling put_slides_save_as");
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling put_slides_save_as");
     }
 
@@ -21675,7 +23378,7 @@ sub put_slides_save_as {
 # 
 # @param string $name Document name. (required)
 # @param string $property_name The property name. (required)
-# @param DocumentProperty $property Property with the value. (optional)
+# @param DocumentProperty $property Property with the value. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -21694,7 +23397,7 @@ sub put_slides_save_as {
     'property' => {
         data_type => 'DocumentProperty',
         description => 'Property with the value.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -21724,13 +23427,18 @@ sub put_slides_set_document_property {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slides_set_document_property");
     }
 
     # verify the required parameter 'property_name' is set
-    unless (exists $args{'property_name'}) {
+    unless (exists $args{'property_name'} && $args{'property_name'}) {
       croak("Missing the required parameter 'property_name' when calling put_slides_set_document_property");
+    }
+
+    # verify the required parameter 'property' is set
+    unless (exists $args{'property'} && $args{'property'}) {
+      croak("Missing the required parameter 'property' when calling put_slides_set_document_property");
     }
 
     # parse inputs
@@ -21807,7 +23515,7 @@ sub put_slides_set_document_property {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param Slide $slide_dto Slide update data. (optional)
+# @param Slide $slide_dto Slide update data. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -21826,7 +23534,7 @@ sub put_slides_set_document_property {
     'slide_dto' => {
         data_type => 'Slide',
         description => 'Slide update data.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -21856,13 +23564,18 @@ sub put_slides_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slides_slide");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling put_slides_slide");
+    }
+
+    # verify the required parameter 'slide_dto' is set
+    unless (exists $args{'slide_dto'} && $args{'slide_dto'}) {
+      croak("Missing the required parameter 'slide_dto' when calling put_slides_slide");
     }
 
     # parse inputs
@@ -21939,7 +23652,7 @@ sub put_slides_slide {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param SlideBackground $background Slide background update data. (optional)
+# @param SlideBackground $background Slide background update data. (required)
 # @param string $folder Document folder. (optional)
 # @param string $password Document password. (optional)
 # @param string $storage Document storage. (optional)
@@ -21958,7 +23671,7 @@ sub put_slides_slide {
     'background' => {
         data_type => 'SlideBackground',
         description => 'Slide background update data.',
-        required => '0',
+        required => '1',
     },
     'folder' => {
         data_type => 'string',
@@ -21988,13 +23701,18 @@ sub put_slides_slide_background {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slides_slide_background");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling put_slides_slide_background");
+    }
+
+    # verify the required parameter 'background' is set
+    unless (exists $args{'background'} && $args{'background'}) {
+      croak("Missing the required parameter 'background' when calling put_slides_slide_background");
     }
 
     # parse inputs
@@ -22120,7 +23838,7 @@ sub put_slides_slide_background_color {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slides_slide_background_color");
     }
 
@@ -22130,7 +23848,7 @@ sub put_slides_slide_background_color {
     }
 
     # verify the required parameter 'color' is set
-    unless (exists $args{'color'}) {
+    unless (exists $args{'color'} && $args{'color'}) {
       croak("Missing the required parameter 'color' when calling put_slides_slide_background_color");
     }
 
@@ -22269,7 +23987,7 @@ sub put_slides_slide_size {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slides_slide_size");
     }
 
@@ -22354,7 +24072,7 @@ sub put_slides_slide_size {
 # Update presentation document properties.
 # 
 # @param string $name Document name. (required)
-# @param ViewProperties $dto The view properties data. (optional)
+# @param ViewProperties $dto The view properties data. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -22368,7 +24086,7 @@ sub put_slides_slide_size {
     'dto' => {
         data_type => 'ViewProperties',
         description => 'The view properties data.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -22398,8 +24116,13 @@ sub put_slides_view_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_slides_view_properties");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_slides_view_properties");
     }
 
     # parse inputs
@@ -22566,7 +24289,7 @@ sub put_subshape_save_as {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_subshape_save_as");
     }
 
@@ -22576,7 +24299,7 @@ sub put_subshape_save_as {
     }
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling put_subshape_save_as");
     }
 
@@ -22586,12 +24309,12 @@ sub put_subshape_save_as {
     }
 
     # verify the required parameter 'format' is set
-    unless (exists $args{'format'}) {
+    unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling put_subshape_save_as");
     }
 
     # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'}) {
+    unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling put_subshape_save_as");
     }
 
@@ -22711,7 +24434,7 @@ sub put_subshape_save_as {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param NotesSlide $dto A NotesSlide object with notes slide data. (optional)
+# @param NotesSlide $dto A NotesSlide object with notes slide data. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -22730,7 +24453,7 @@ sub put_subshape_save_as {
     'dto' => {
         data_type => 'NotesSlide',
         description => 'A NotesSlide object with notes slide data.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -22760,13 +24483,18 @@ sub put_update_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_update_notes_slide");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
       croak("Missing the required parameter 'slide_index' when calling put_update_notes_slide");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_update_notes_slide");
     }
 
     # parse inputs
@@ -22844,7 +24572,7 @@ sub put_update_notes_slide {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
-# @param ShapeBase $dto Shape DTO. (optional)
+# @param ShapeBase $dto Shape DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -22868,7 +24596,7 @@ sub put_update_notes_slide {
     'dto' => {
         data_type => 'ShapeBase',
         description => 'Shape DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -22898,7 +24626,7 @@ sub put_update_notes_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_update_notes_slide_shape");
     }
 
@@ -22910,6 +24638,11 @@ sub put_update_notes_slide_shape {
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling put_update_notes_slide_shape");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_update_notes_slide_shape");
     }
 
     # parse inputs
@@ -22995,7 +24728,7 @@ sub put_update_notes_slide_shape {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
-# @param Paragraph $dto Paragraph DTO. (optional)
+# @param Paragraph $dto Paragraph DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -23024,7 +24757,7 @@ sub put_update_notes_slide_shape {
     'dto' => {
         data_type => 'Paragraph',
         description => 'Paragraph DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -23054,7 +24787,7 @@ sub put_update_notes_slide_shape_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_update_notes_slide_shape_paragraph");
     }
 
@@ -23071,6 +24804,11 @@ sub put_update_notes_slide_shape_paragraph {
     # verify the required parameter 'paragraph_index' is set
     unless (exists $args{'paragraph_index'}) {
       croak("Missing the required parameter 'paragraph_index' when calling put_update_notes_slide_shape_paragraph");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_update_notes_slide_shape_paragraph");
     }
 
     # parse inputs
@@ -23164,7 +24902,7 @@ sub put_update_notes_slide_shape_paragraph {
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param int $portion_index Portion index. (required)
-# @param Portion $dto Portion DTO. (optional)
+# @param Portion $dto Portion DTO. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -23198,7 +24936,7 @@ sub put_update_notes_slide_shape_paragraph {
     'dto' => {
         data_type => 'Portion',
         description => 'Portion DTO.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -23228,7 +24966,7 @@ sub put_update_notes_slide_shape_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
+    unless (exists $args{'name'} && $args{'name'}) {
       croak("Missing the required parameter 'name' when calling put_update_notes_slide_shape_portion");
     }
 
@@ -23250,6 +24988,11 @@ sub put_update_notes_slide_shape_portion {
     # verify the required parameter 'portion_index' is set
     unless (exists $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling put_update_notes_slide_shape_portion");
+    }
+
+    # verify the required parameter 'dto' is set
+    unless (exists $args{'dto'} && $args{'dto'}) {
+      croak("Missing the required parameter 'dto' when calling put_update_notes_slide_shape_portion");
     }
 
     # parse inputs
@@ -23366,7 +25109,7 @@ sub storage_exists {
     my ($self, %args) = @_;
 
     # verify the required parameter 'storage_name' is set
-    unless (exists $args{'storage_name'}) {
+    unless (exists $args{'storage_name'} && $args{'storage_name'}) {
       croak("Missing the required parameter 'storage_name' when calling storage_exists");
     }
 
@@ -23448,12 +25191,12 @@ sub upload_file {
     my ($self, %args) = @_;
 
     # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
+    unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling upload_file");
     }
 
     # verify the required parameter 'file' is set
-    unless (exists $args{'file'}) {
+    unless (exists $args{'file'} && $args{'file'}) {
       croak("Missing the required parameter 'file' when calling upload_file");
     }
 

@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.90"
+            "Rinci" : "v1.1.94"
          }
       },
       "runtime" : {
@@ -75,7 +75,7 @@
          "web" : "https://github.com/perlancar/perl-App-BrowserUtils"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

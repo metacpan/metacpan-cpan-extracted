@@ -115,7 +115,7 @@
          "web" : "https://github.com/rustyconover/net-amazon-s3"
       }
    },
-   "version" : "0.94",
+   "version" : "0.97",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",
       "Ali Anari <ali@anari.me>",

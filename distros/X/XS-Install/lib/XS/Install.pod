@@ -200,7 +200,7 @@ module, which already provides all needed glue. To let C++ test work, there will
 	Test::Catch::run('[tag]');
 
 	# t/some-file.cc
-	#include <catch.hpp>
+	#include <catch2/catch.hpp>
 	TEST_CASE("description", "[tag]") {
 		...
 	}

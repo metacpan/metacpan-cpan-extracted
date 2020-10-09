@@ -1,5 +1,4 @@
 use Test::More 0.98 tests => 4;
-use lib 'lib';
 
 no strict;    # Of course it defaults no, but declare it explicitly
 

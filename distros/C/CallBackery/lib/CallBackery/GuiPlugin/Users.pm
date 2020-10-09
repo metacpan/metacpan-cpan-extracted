@@ -194,7 +194,7 @@ sub getTableData {
     }
     my $userTbl = $db->dbh->quote_identifier('cbuser');
     my $rightTbl = $db->dbh->quote_identifier('cbright');
-    my $data = $db->dbh->selectall_arrayref(<<"SQL",{Slice => {}}, $args->{lastRow}-$args->{firstRow},$args->{firstRow});
+    my $data = $db->dbh->selectall_arrayref(<<"SQL",{Slice => {}}, $args->{lastRow}-$args->{firstRow}+1,$args->{firstRow});
 SELECT cbuser_id,cbuser_login, cbuser_given, cbuser_family, cbuser_note
 FROM $userTbl
 $WHERE

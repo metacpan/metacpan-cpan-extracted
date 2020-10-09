@@ -1,18 +1,18 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5;
 # ABSTRACT: Content-MD5 header role
-$Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5::VERSION = '0.97';
 use Moose::Role;
 use Digest::MD5 qw[];
 use MIME::Base64 qw[];
 
 around _request_headers => sub {
-    my ($inner, $self) = @_;
-    my $content = $self->_http_request_content;
+	my ($inner, $self) = @_;
+	my $content = $self->_http_request_content;
 
-    my $value = MIME::Base64::encode_base64( Digest::MD5::md5( $content ) );
-    chomp $value;
+	my $value = MIME::Base64::encode_base64( Digest::MD5::md5( $content ) );
+	chomp $value;
 
-    return ($self->$inner, ('Content-MD5' => $value));
+	return ($self->$inner, ('Content-MD5' => $value));
 };
 
 1;
@@ -29,7 +29,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5 - Content-MD5 header r
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

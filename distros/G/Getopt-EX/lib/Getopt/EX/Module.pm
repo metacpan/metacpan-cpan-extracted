@@ -597,6 +597,17 @@ For example,
 replaces option "I<--dig>" to "I<-Mdig --dig>", and I<dig> module is
 loaded before processing I<--dig> option.
 
+=item B<mode> [I<no>]I<name>
+
+Set or unset mode I<name>.  Currently, B<funciton> and B<wildcard> can
+be used as a name.  See METHODS section.
+
+Next is an example used in L<App::Greple::subst::dyncmap> module to
+produce parameters on the fly.
+
+    mode function
+    option --dyncmap &dyncmap($<shift>)
+
 =back
 
 

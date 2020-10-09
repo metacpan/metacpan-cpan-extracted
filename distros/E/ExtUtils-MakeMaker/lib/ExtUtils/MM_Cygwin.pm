@@ -1,6 +1,7 @@
 package ExtUtils::MM_Cygwin;
 
 use strict;
+use warnings;
 
 use ExtUtils::MakeMaker::Config;
 use File::Spec;
@@ -9,7 +10,7 @@ require ExtUtils::MM_Unix;
 require ExtUtils::MM_Win32;
 our @ISA = qw( ExtUtils::MM_Unix );
 
-our $VERSION = '7.46';
+our $VERSION = '7.48';
 $VERSION =~ tr/_//d;
 
 

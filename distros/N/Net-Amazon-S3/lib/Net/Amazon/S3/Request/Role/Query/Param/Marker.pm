@@ -1,12 +1,12 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Marker;
 # ABSTRACT: marker query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Marker::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::Query::Param::Marker::VERSION = '0.97';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
-    param => 'marker',
-    constraint => 'Maybe[Str]',
-    required => 0,
+	param => 'marker',
+	constraint => 'Maybe[Str]',
+	required => 0,
 };
 
 1;
@@ -23,7 +23,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Marker - marker query param role
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

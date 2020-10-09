@@ -1,3 +1,7 @@
+1.06 2020.10.08  - Changed license to MIT License. Updated maintainer info.
+                   Updated build files. Added GitHub repo meta to build.
+                   Changed minimum supported version of Perl to 5.6.
+
 1.05 2005.09.13  - Changes to pod tests to make them more CPANTS friendly.
                    No functional changes.
 

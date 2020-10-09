@@ -1,0 +1,87 @@
+{
+   "abstract" : "A C<Device::Chip::Adapter> implementation",
+   "author" : [
+      "Ryan Voots <simcop@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Device-Chip-Adapter-LinuxKernel",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Device::Chip::Adapter" : "0",
+            "Device::SMBus" : "0",
+            "XSLoader" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Device::Chip::Adapter::LinuxKernel" : {
+         "file" : "lib/Device/Chip/Adapter/LinuxKernel.pm",
+         "version" : "0.00004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/simcop2387/device-chip-adapter-linuxkernel/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/simcop2387/device-chip-adapter-linuxkernel.git",
+         "web" : "https://github.com/simcop2387/device-chip-adapter-linuxkernel"
+      }
+   },
+   "version" : "0.00004",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.23",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

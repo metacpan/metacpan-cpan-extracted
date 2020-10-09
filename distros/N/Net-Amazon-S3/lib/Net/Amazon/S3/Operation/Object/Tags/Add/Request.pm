@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Tags::Add::Request;
 # ABSTRACT: Internal class to build PutObjectTagging request
-$Net::Amazon::S3::Operation::Object::Tags::Add::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Tags::Add::Request::VERSION = '0.97';
 use Moose 0.85;
 
 extends 'Net::Amazon::S3::Request::Object';
@@ -24,7 +24,7 @@ Net::Amazon::S3::Operation::Object::Tags::Add::Request - Internal class to build
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

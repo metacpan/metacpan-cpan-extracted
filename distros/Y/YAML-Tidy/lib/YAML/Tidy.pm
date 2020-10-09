@@ -5,7 +5,7 @@ use v5.20;
 use experimental qw/ signatures /;
 package YAML::Tidy;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use YAML::Tidy::Node;
 use YAML::Tidy::Config;
@@ -46,6 +46,7 @@ sub tidy($self, $yaml) {
 sub _process($self, $parent, $node) {
     my $type = $node->{type} || '';
     if ($node->{flow}) {
+        $self->_process_flow($parent, $node);
         return;
     }
     my $level = $node->{level};
@@ -65,14 +66,33 @@ sub _process($self, $parent, $node) {
     }
     my $before = substr($line, 0, $col);
 
-    my $pre = $parent ? $parent->pre($node) : undef;
     my $start = $node->start;
-    if ($pre and $trimtrailing) {
-        if (defined $pre->{line} and $pre->{line} <= $start->{line}) {
-            my ($from, $to) = ($pre->{line}, $start->{line});
-            $self->_trim($from, $to);
+    if ($trimtrailing) {
+        my $pre = $parent ? $parent->pre($node) : undef;
+        if ($pre) {
+            if ($pre->{line} <= $start->{line}) {
+                my ($from, $to) = ($pre->{line}, $start->{line});
+                $self->_trim($from, $to);
+            }
         }
-        if ($type eq 'DOC') {
+        if ($level < 1 and $type ne '') {
+            # trim trailing spaces at the end of the node
+            my $last = $node->{children}->[-1];
+            my $from;
+            if ($last) {
+                my $end = $last->closestart;
+                $from = $end->{line} + 1;
+            }
+            else {
+                # empty node
+                $from = $node->open->{end}->{line};
+            }
+
+            my $end2 = $node->closestart;
+            my $to = $end2->{line};
+            if ($from <= $to) {
+                $self->_trim($from, $to);
+            }
         }
     }
 
@@ -124,6 +144,7 @@ sub _process($self, $parent, $node) {
         return;
     }
     else {
+        my $ignore_firstlevel = ($self->{partial} and $level == 0);
         my $multiline = $node->multiline;
         if ($parent->{type} eq 'MAP' and ($node->{index} % 2 and not $multiline)) {
             return;
@@ -159,6 +180,7 @@ sub _process($self, $parent, $node) {
         if ($trimtrailing) {
             $self->_trim($startline, $realstart);
         }
+        unless ($ignore_firstlevel) {
         for my $i ($startline .. $realstart) {
             my $line = $lines->[ $i ];
             if ($i == $startline and $col > 0) {
@@ -172,6 +194,7 @@ sub _process($self, $parent, $node) {
             }
             $line =~ s/^ */$new_spaces/;
             $lines->[ $i] = $line;
+        }
         }
         # leave alone explicitly indented block scalars
         return if $explicit_indent;
@@ -201,7 +224,7 @@ sub _process($self, $parent, $node) {
             }
             my @slice = @$lines[$startline .. $endline ];
             my ($sp) = $lines->[ $startline ] =~ m/^( *)/;
-            if (length($sp) != $new_indent) {
+            if (not $ignore_firstlevel and length($sp) != $new_indent) {
                 for my $line (@slice) {
                     unless (length $line) {
                         next;
@@ -246,27 +269,94 @@ sub _process($self, $parent, $node) {
                 $node->{style} == YAML_SINGLE_QUOTED_SCALAR_STYLE or
                 $node->{style} == YAML_DOUBLE_QUOTED_SCALAR_STYLE) {
             $startline++ if $skipfirst;
-            $endline = $node->{end}->{line};
+            $endline = $node->close->{line};
             return if $startline >= @$lines;
+            if ($trimtrailing) {
+                $self->_trim($startline, $endline);
+            }
+            my $line = $lines->[ $startline ];
+            my ($sp) = $line =~ m/^( *)/;
+            if ($ignore_firstlevel) {
+                $new_indent = length $sp;
+                $new_spaces = ' ' x $new_indent;
+            }
             my @slice = @$lines[$startline .. $endline ];
             if ($level == 0 and not $indenttoplevelscalar) {
                 $new_spaces = ' ' x ($new_indent - $indent);
             }
             for my $line (@slice) {
-                if ($line !~ tr/ //c) {
-                    if ($trimtrailing) {
-                        $line = '';
-                    }
-                }
-                else {
+                if ($line =~ tr/ //c) {
                     $line =~ s/^[\t ]*/$new_spaces/;
-                }
-                if ($trimtrailing) {
-                    $line =~ s/[\t ]+$//;
                 }
             }
             @$lines[$startline .. $endline ] = @slice;
         }
+    }
+}
+
+sub _process_flow($self, $parent, $node, $block_indent = undef) {
+    return unless $parent;
+    my $level = $node->{level};
+    my $flow = $node->{flow} || 0;
+    $block_indent //= $parent->indent + $self->cfg->indent;
+    $block_indent = 0 if $level == 0;
+
+    unless ($node->is_collection) {
+        $self->_process_flow_scalar($parent, $node, $block_indent);
+        return;
+    }
+    if ($parent->{type} eq 'MAP' and $node->{index} % 2) {
+        return;
+    }
+    my $lines = $self->{lines};
+    my $startline = $node->start->{line};
+    my $end = $node->end;
+    my $endline = $end->{line};
+    if ($flow == 1 and $self->cfg->trimtrailing) {
+        $self->_trim($startline, $endline);
+    }
+
+    my $before = substr($lines->[ $startline ], 0, $node->start->{column});
+    if ($before =~ tr/ \t//c) {
+        $startline++;
+    }
+    my @lines = ($startline .. $node->open->{end}->{line});
+    my $before_end = substr($lines->[ $endline ], 0, $end->{column} - 1);
+    unless ($before_end =~ tr/ \t//c) {
+        push @lines, $endline;
+    }
+    for my $i (@lines) {
+        my $new_spaces = ' ' x $block_indent;
+        $lines->[ $i ] =~ s/^([ \t]*)/$new_spaces/;
+        my $old = length $1;
+        $node->_fix_flow_indent(line => $i, diff => $block_indent - $old);
+    }
+
+    for my $c (@{ $node->{children} }) {
+        $self->_process_flow($node, $c, $block_indent + $self->cfg->indent);
+    }
+}
+
+sub _process_flow_scalar($self, $parent, $node, $block_indent) {
+    if ($node->empty_scalar) {
+        return;
+    }
+    my $startline = $node->line;
+    my $lines = $self->{lines};
+    my $line = $lines->[ $startline ];
+    my $col = $node->start->{column};
+    my $before = substr($line, 0, $col);
+    if ($before =~ tr/ \t//c) {
+        $startline++;
+    }
+    my $endline = $node->end->{line};
+    for my $i ($startline .. $endline) {
+        my $line = $lines->[ $i ];
+        my $new_spaces = ' ' x $block_indent;
+        $line =~ s/^([ \t]*)/$new_spaces/;
+        my $old = length $1;
+        $node->_fix_flow_indent(line => $i, diff => $block_indent - $old);
+        $lines->[ $i ] = $line;
     }
 }
 
@@ -388,6 +478,9 @@ sub _tree($self, $yaml, $lines) {
     $self->{events} = $events;
     my $first = shift @$events;
     my $end = pop @$events;
+    $_->{level} = -1 for ($first, $end);
+    $first->{id} = -1;
+    _pp($first) if DEBUG;
     my @stack;
 
     my $level = -1;
@@ -477,6 +570,8 @@ sub _tree($self, $yaml, $lines) {
         }
         _pp($event) if DEBUG;
     }
+    $end->{id} = $id + 1;
+    _pp($end) if DEBUG;
     $self->{tree} = $docs;
     return $docs;
 }
@@ -546,24 +641,27 @@ __END__
 
 =head1 NAME
 
-YAML::Tidy - Clean YAML files
+YAML::Tidy - Tidy YAML files
 
 =head1 SYNOPSIS
 
     % cat in.yaml
-    a:
+    a: # a comment
         b:
          c: d
     % yamltidy in.yaml
-    a:
+    a: # a comment
       b:
         c: d
 
 For documentation see L<https://github.com/perlpunk/yamltidy>
 
+For examples see L<https://perlpunk.github.io/yamltidy>
+
 =head1 DESCRIPTION
 
-yamltidy can automatically fix indentation in your YAML files.
+yamltidy can automatically tidy formatting in your YAML files, for example
+adjust indentation and remove trailing spaces.
 
 For more information, see L<https://github.com/perlpunk/yamltidy>.
 

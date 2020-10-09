@@ -1,6 +1,6 @@
 #pragma once
 #include <cstring>
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <panda/string.h>
 #include <panda/optional.h>
 #include <panda/memory.h>

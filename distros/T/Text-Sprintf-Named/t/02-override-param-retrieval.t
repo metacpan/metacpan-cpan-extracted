@@ -5,11 +5,11 @@ use Test::More tests => 1;
 
 package MySprintf;
 
-use base 'Text::Sprintf::Named';
+use parent 'Text::Sprintf::Named';
 
 sub calc_param
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     my $method = $args->{name};
 
@@ -21,10 +21,10 @@ package MyObj;
 sub new
 {
     my $class = shift;
-    my $self = {};
+    my $self  = {};
     bless $self, $class;
     $self->_init(@_);
-    return $self
+    return $self;
 }
 
 sub _init
@@ -42,12 +42,15 @@ sub hello
 package main;
 
 {
-    my $formatter = MySprintf->new({fmt => "{%(hello)s}"});
+    my $formatter = MySprintf->new( { fmt => "{%(hello)s}" } );
 
-    my $hello_obj = MyObj->new;
+    my $hello_obj = MyObj->new();
 
     # TEST
-    is ($formatter->format({args => {obj => $hello_obj, hello => "Though I am here"}}),
+    is(
+        $formatter->format(
+            { args => { obj => $hello_obj, hello => "Though I am here" } }
+        ),
         "{Twalidoo}",
         "Customizability of Text::Sprintf::Named",
     );

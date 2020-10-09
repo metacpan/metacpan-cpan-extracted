@@ -47,15 +47,21 @@
             "Dist::Zilla::Plugin::Test::TidyAll" : "0",
             "Dist::Zilla::PluginBundle::SHLOMIF" : "0",
             "HTML::Spelling::Site::Whitelist" : "0",
+            "HTML::Toc" : "0",
+            "HTML::TocGenerator" : "0",
+            "Markdent" : "0",
+            "Parallel::ForkManager::Segmented" : "0",
             "Perl::Critic::Freenode" : "0",
             "Pod::Weaver::PluginBundle::SHLOMIF" : "0",
             "Pod::Weaver::Section::Support" : "0",
             "Task::FreecellSolver::Testing" : "0",
             "Template" : "0",
             "Template::Stash" : "0",
+            "Test::File::Find::CaseCollide" : "0",
             "Test::HTML::Recursive::DeprecatedTags" : "0",
             "Test::Perl::Critic::Policy" : "0",
             "Test::Pod::Coverage" : "0",
+            "Text::WrapAsUtf8" : "0",
             "perl" : "5.012",
             "strict" : "0",
             "warnings" : "0"
@@ -73,7 +79,7 @@
    "provides" : {
       "Task::FreecellSolver::Testing::MultiConfig" : {
          "file" : "lib/Task/FreecellSolver/Testing/MultiConfig.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -88,10 +94,10 @@
          "web" : "https://github.com/shlomif/fc-solve"
       }
    },
-   "version" : "0.0.3",
+   "version" : "0.0.4",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030003"
+         "version" : "5.032000"
       },
       "plugins" : [
          {
@@ -449,8 +455,8 @@
          "version" : "6.015"
       }
    },
-   "x_generated_by_perl" : "v5.30.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
    "x_spdx_expression" : "MIT"
 }
 

@@ -14,11 +14,12 @@ use warnings;
 use Metabolomics::Fragment::Annotation qw( :all ) ;
 
 use Metabolomics::Banks qw( :all ) ;
-use Metabolomics::Banks::BloodExposome qw( :all ) ;
+use Metabolomics::Banks::BloodExposome qw( ) ;
 use Metabolomics::Banks::AbInitioFragments qw( :all ) ;
 use Metabolomics::Banks::MaConDa qw( :all ) ;
+use Metabolomics::Banks::Knapsack qw( ) ;
 
-use Test::More tests =>  25 ;
+use Test::More tests =>  28 ;
 use Data::Dumper ;
 
 
@@ -199,7 +200,8 @@ BEGIN {
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_TYPE_' => 'adduct',
-                                                  '_ANNOTATION_IN_POS_MODE_' => undef
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
                                                   '_ID_' => undef,
@@ -211,6 +213,7 @@ BEGIN {
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '156.042',
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_TYPE_' => 'adduct',
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -223,6 +226,7 @@ BEGIN {
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_ANNOTATION_TYPE_' => 'isotope',
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_PPM_ERROR_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -235,6 +239,7 @@ BEGIN {
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_MMU_ERROR_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '119.083',
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0
                                                 }, 'Metabolomics::Banks' )
                                        ],
@@ -312,6 +317,7 @@ BEGIN {
                                                   '_ID_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 159.93784,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0
                                                 }, 'Metabolomics::Banks' ),
@@ -325,6 +331,7 @@ BEGIN {
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_TYPE_' => 'adduct',
                                                   '_ID_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_NAME_' => '-H+K'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -337,6 +344,7 @@ BEGIN {
                                                   '_ANNOTATION_NAME_' => '13C db ',
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_PPM_ERROR_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -349,6 +357,7 @@ BEGIN {
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 100.99704
                                                 }, 'Metabolomics::Banks' )
                                        ],
@@ -424,6 +433,7 @@ BEGIN {
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 159.93784,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -436,6 +446,7 @@ BEGIN {
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_TYPE_' => 'adduct',
                                                   '_ID_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_NAME_' => '-H+K'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -448,6 +459,7 @@ BEGIN {
                                                   '_ANNOTATION_NAME_' => '13C db ',
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_PPM_ERROR_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -459,6 +471,7 @@ BEGIN {
                                                   '_ANNOTATION_TYPE_' => 'isotope',
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 100.99704
                                                 }, 'Metabolomics::Banks' )
@@ -533,6 +546,7 @@ BEGIN {
                                                   '_MMU_ERROR_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '159.93784',
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_TYPE_' => 'adduct'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -545,6 +559,7 @@ BEGIN {
                                                   '_PPM_ERROR_' => 0,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_ANNOTATION_NAME_' => '-H+K',
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ID_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -557,6 +572,7 @@ BEGIN {
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '100.50169',
                                                   '_MMU_ERROR_' => 0,
                                                   '_ANNOTATION_TYPE_' => 'isotope',
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -569,6 +585,7 @@ BEGIN {
                                                   '_MMU_ERROR_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '100.99704',
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_TYPE_' => 'isotope'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -581,6 +598,7 @@ BEGIN {
                                                   '_PPM_ERROR_' => 0,
                                                   '_ID_' => undef,
                                                   '_ANNOTATION_NAME_' => '2M+3H2O+2H',
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -593,6 +611,7 @@ BEGIN {
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_ID_' => undef,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_NAME_' => '2M+ACN+H'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -604,6 +623,7 @@ BEGIN {
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_ID_' => undef,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_ONLY_IN_' => undef
                                                 }, 'Metabolomics::Banks' ),
@@ -617,6 +637,7 @@ BEGIN {
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_ANNOTATION_NAME_' => '2M+H',
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ID_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -629,6 +650,7 @@ BEGIN {
                                                   '_MMU_ERROR_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '238.96318',
                                                   '_ANNOTATION_TYPE_' => 'dimeric adduct',
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => '2M+K'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -640,6 +662,7 @@ BEGIN {
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_ID_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
@@ -652,6 +675,7 @@ BEGIN {
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_ANNOTATION_NAME_' => '2M+NH4',
                                                   '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef
                                                 }, 'Metabolomics::Banks' )
@@ -724,6 +748,7 @@ BEGIN {
                                                   '_ID_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 159.93784,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0
                                                 }, 'Metabolomics::Banks' ),
@@ -737,6 +762,7 @@ BEGIN {
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_TYPE_' => 'adduct',
                                                   '_ID_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_NAME_' => '-H+K'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -749,6 +775,7 @@ BEGIN {
                                                   '_ANNOTATION_NAME_' => '13C db ',
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_PPM_ERROR_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -760,6 +787,7 @@ BEGIN {
                                                   '_ANNOTATION_TYPE_' => 'isotope',
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 100.99704
                                                 }, 'Metabolomics::Banks' )
@@ -877,6 +905,7 @@ BEGIN {
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '159.93784',
                                                   '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -889,6 +918,7 @@ BEGIN {
                                                   '_ANNOTATION_TYPE_' => 'adduct',
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_NAME_' => '-H+K'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -901,6 +931,7 @@ BEGIN {
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_ANNOTATION_TYPE_' => 'isotope',
                                                   '_ID_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -913,6 +944,7 @@ BEGIN {
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '100.99704',
                                                   '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -925,6 +957,7 @@ BEGIN {
                                                   '_ANNOTATION_TYPE_' => 'isotopic massif',
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_ANNOTATION_NAME_' => '-2H+Na+K_13C db ',
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_MMU_ERROR_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
@@ -936,6 +969,7 @@ BEGIN {
                                                   '_ANNOTATION_TYPE_' => 'isotopic massif',
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '160.93487',
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0
                                                 }, 'Metabolomics::Banks' ),
@@ -947,6 +981,7 @@ BEGIN {
                                                   '_ANNOTATION_NAME_' => '-H+K_13C db ',
                                                   '_MMU_ERROR_' => 0,
                                                   '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '138.45757',
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef
@@ -961,6 +996,7 @@ BEGIN {
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '138.95292',
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_PPM_ERROR_' => 0
                                                 }, 'Metabolomics::Banks' )
                                        ],
@@ -1645,6 +1681,7 @@ BEGIN {
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_FORMULA_' => undef,
                                                   '_ANNOTATION_TYPE_' => 'Solvent',
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '59.0138536',
                                                   '_ANNOTATION_IN_NEG_MODE_' => '[M-H]-',
@@ -1658,7 +1695,419 @@ BEGIN {
 		## MSG
 		'Method \'buildTheoPeakBankFromContaminants\' works with Bank and Contaminants objects and \'ION\' mode');
 		
+## #################################################################################################################################
+##
+#########################	######################### KNAPSACK TESTS #########################  #########################
+##
+####################################################################################################################################
+
+#########################		
+	print "\n** Test $current_test initKnapSackBankObject **\n" ; $current_test++;
+	is_deeply( init_KnapSackBankObject_TEST(),
+		bless( {
+                 '_DATABASE_NAME_' => 'Knapsack',
+                 '_DATABASE_DOI_' => '10.1093/pcp/pct176',
+                 '_DATABASE_ENTRIES_NB_' => 51187,
+                 '_DATABASE_VERSION_' => '1.1',
+                 '_DATABASE_URL_' => 'http://www.knapsackfamily.com/KNApSAcK_Family/',
+                 '_DATABASE_ENTRIES_' => [],
+                 '_THEO_PEAK_LIST_' => [],
+                 '_EXP_PEAK_LIST_' => [],
+               }, 'Metabolomics::Banks' ) ,
+		'Method \'initKnapSackBankObject\' init a well formatted bank object'
+	) ;
+	
+	
+#########################	
+
+	print "\n** Test $current_test getMetaboliteFromSource **\n" ; $current_test++;
+	is_deeply( getKnapSackFromSourceTest(
+			$modulePath.'/Knapsack__dump.csv'),
+			45, ## Nb of entries
+			'Method \'getMetabolitesFromSource\' works with KnapSack db as a well formatted source file');
 		
+#########################	
+	print "\n** Test $current_test buildTheoPeakBankKnapSack **\n" ; $current_test++;
+	is_deeply( buildTheoPeakBankFromKSTest(
+		# oBank
+		bless( {
+                 '_DATABASE_ENTRIES_' => [
+                                           bless( {
+                                                    '_CAS_' => '545-97-1',
+                                                    '_INCHIKEY_' => 'JLJLRLWOEMWYQK-BKYUDGNBNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00000001',
+                                                    '_COMPOUND_NAME_' => 'Gibberellin A1,GA1',
+                                                    '_MOLECULAR_FORMULA_' => 'C19H24O6',
+                                                    '_EXACT_MASS_' => '348.1572885'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_CAS_' => '63959-45-5',
+                                                    '_INCHIKEY_' => 'QYOJSKGCWNAKGW-BIWBQAJPNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00000002',
+                                                    '_COMPOUND_NAME_' => 'Shikimic acid 3-phosphate,S3P',
+                                                    '_EXACT_MASS_' => '254.01915382',
+                                                    '_MOLECULAR_FORMULA_' => 'C7H11O8P'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C25H32O9',
+                                                    '_EXACT_MASS_' => '476.20463262',
+                                                    '_CAS_' => '65256-31-7',
+                                                    '_COMPOUND_NAME_' => 'Aurovertin D,(-)-Aurovertin D',
+                                                    '_INCHIKEY_' => 'UKPVUEBWITXZRF-YELUXDJBNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038536'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_CAS_' => '146345-73-5',
+                                                    '_COMPOUND_NAME_' => 'Bastadin 14',
+                                                    '_INCHIKEY_' => 'HXWATZFIMWEHEG-YUALJMAISA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038582',
+                                                    '_EXACT_MASS_' => '1011.75892831',
+                                                    '_MOLECULAR_FORMULA_' => 'C34H25Br5N4O8'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_COMPOUND_NAME_' => 'Bastadin 21',
+                                                    '_CAS_' => '437762-27-1',
+                                                    '_INCHIKEY_' => 'TUYUXKVFCXANLL-QHTJZBTGSA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038583',
+                                                    '_MOLECULAR_FORMULA_' => 'C34H29Br3N4O8',
+                                                    '_EXACT_MASS_' => '857.95355263'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '1107.68000586',
+                                                    '_MOLECULAR_FORMULA_' => 'C34H26Br6N4O9',
+                                                    '_CAS_' => '1016170-12-9',
+                                                    '_KNAPSACK_ID_' => 'C00038584',
+                                                    '_INCHIKEY_' => 'MHAGECXZXFMEGD-OJYBBUQINA-N',
+                                                    '_COMPOUND_NAME_' => 'Bastadin 24,(-)-Bastadin 24'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_CAS_' => '1019854-19-3',
+                                                    '_KNAPSACK_ID_' => 'C00038585',
+                                                    '_INCHIKEY_' => 'XUYBKWQPNPBFTE-UVWHYCHGNA-N',
+                                                    '_COMPOUND_NAME_' => 'Berkeleyamide A,(-)-Berkeleyamide A',
+                                                    '_MOLECULAR_FORMULA_' => 'C18H25NO3',
+                                                    '_EXACT_MASS_' => '303.18344367'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '371.13688741',
+                                                    '_MOLECULAR_FORMULA_' => 'C20H21NO6',
+                                                    '_INCHIKEY_' => 'TYALAHHUSALVLR-UHFFFAOYNA-N',
+                                                    '_CAS_' => '1019854-22-8',
+                                                    '_KNAPSACK_ID_' => 'C00038586',
+                                                    '_COMPOUND_NAME_' => 'Berkeleyamide B,(+)-Berkeleyamide B'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_CAS_' => '1019854-23-9',
+                                                    '_INCHIKEY_' => 'QLDSNWFOEOVFHQ-UHFFFAOYNA-N',
+                                                    '_COMPOUND_NAME_' => 'Berkeleyamide C,(+)-Berkeleyamide C',
+                                                    '_KNAPSACK_ID_' => 'C00038587',
+                                                    '_EXACT_MASS_' => '414.17908658',
+                                                    '_MOLECULAR_FORMULA_' => 'C22H26N2O6'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_CAS_' => '1019854-25-1',
+                                                    '_INCHIKEY_' => 'XIINWDLLZRIJAK-UHFFFAOYNA-N',
+                                                    '_COMPOUND_NAME_' => 'Berkeleyamide D,(-)-Berkeleyamide D',
+                                                    '_KNAPSACK_ID_' => 'C00038588',
+                                                    '_MOLECULAR_FORMULA_' => 'C18H21NO5',
+                                                    '_EXACT_MASS_' => '331.14197279'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C7H15NO4',
+                                                    '_EXACT_MASS_' => '177.10010798',
+                                                    '_CAS_' => '125711-55-9',
+                                                    '_INCHIKEY_' => 'ZEWFPWKROPWRKE-QIJQUKAINA-N',
+                                                    '_COMPOUND_NAME_' => 'beta-L-Homofuconojirimycin',
+                                                    '_KNAPSACK_ID_' => 'C00038589'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '956.46169474',
+                                                    '_MOLECULAR_FORMULA_' => 'C47H72O20',
+                                                    '_CAS_' => '168111-48-6',
+                                                    '_KNAPSACK_ID_' => 'C00038590',
+                                                    '_INCHIKEY_' => 'GNCYMXULNXKROG-YRMWMADHNA-N',
+                                                    '_COMPOUND_NAME_' => 'Betavulgaroside III'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_CAS_' => '168111-49-7',
+                                                    '_INCHIKEY_' => 'VYVPIFXAYNIMKK-BJVKLRLMNA-N',
+                                                    '_COMPOUND_NAME_' => 'Betavulgaroside V,(+)-Betavulgaroside V',
+                                                    '_KNAPSACK_ID_' => 'C00038591',
+                                                    '_EXACT_MASS_' => '1118.51451817',
+                                                    '_MOLECULAR_FORMULA_' => 'C53H82O25'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_INCHIKEY_' => 'HDASKGQSKPVDTC-XHBZCXTENA-N',
+                                                    '_CAS_' => '181301-33-7',
+                                                    '_COMPOUND_NAME_' => 'Betonyoside F,(-)-Betonyoside F',
+                                                    '_KNAPSACK_ID_' => 'C00038592',
+                                                    '_EXACT_MASS_' => '756.24767923',
+                                                    '_MOLECULAR_FORMULA_' => 'C34H44O19'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '584.19473664',
+                                                    '_MOLECULAR_FORMULA_' => 'C36H28N2O6',
+                                                    '_CAS_' => '113425-61-9',
+                                                    '_INCHIKEY_' => 'ORORFDPGSXPOAI-UHFFFAOYSA-N',
+                                                    '_COMPOUND_NAME_' => 'Bidebiline E',
+                                                    '_KNAPSACK_ID_' => 'C00038593'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C23H24O10',
+                                                    '_EXACT_MASS_' => '460.13694699',
+                                                    '_CAS_' => '99552-25-7',
+                                                    '_INCHIKEY_' => 'AMXQRHQMVKOSQE-ZNSZPHFHNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038594',
+                                                    '_COMPOUND_NAME_' => 'Bipinnatin E'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C23H26O9',
+                                                    '_EXACT_MASS_' => '446.15768243',
+                                                    '_INCHIKEY_' => 'GXPJROHGAPZOAA-HIUAZFPXNA-N',
+                                                    '_CAS_' => '1020661-83-9',
+                                                    '_KNAPSACK_ID_' => 'C00038595',
+                                                    '_COMPOUND_NAME_' => 'Bipinnatin K,(-)-Bipinnatin K'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_CAS_' => '1020661-84-0',
+                                                    '_KNAPSACK_ID_' => 'C00038596',
+                                                    '_INCHIKEY_' => 'KQNTYLDBCDIZDP-YRHBYULONA-N',
+                                                    '_COMPOUND_NAME_' => 'Bipinnatin L,(+)-Bipinnatin L',
+                                                    '_EXACT_MASS_' => '538.16864105',
+                                                    '_MOLECULAR_FORMULA_' => 'C25H30O13'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C25H30O12',
+                                                    '_EXACT_MASS_' => '522.17372642',
+                                                    '_INCHIKEY_' => 'XXCSCQVYTNDURK-VYZIPOFDNA-N',
+                                                    '_CAS_' => '1020661-85-1',
+                                                    '_KNAPSACK_ID_' => 'C00038597',
+                                                    '_COMPOUND_NAME_' => 'Bipinnatin M,(+)-Bipinnatin M'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C20H24O6',
+                                                    '_EXACT_MASS_' => '360.1572885',
+                                                    '_INCHIKEY_' => 'SMFDDGNKJZPWQS-UHFFFAOYNA-N',
+                                                    '_CAS_' => '1020661-91-9',
+                                                    '_KNAPSACK_ID_' => 'C00038598',
+                                                    '_COMPOUND_NAME_' => 'Bipinnatin N'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C23H26O10',
+                                                    '_EXACT_MASS_' => '462.15259705',
+                                                    '_COMPOUND_NAME_' => 'Bipinnatin O,(+)-Bipinnatin O',
+                                                    '_CAS_' => '1020661-93-1',
+                                                    '_INCHIKEY_' => 'ZBWYJRQHHPDMIG-DNSXWDLYNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038599'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_CAS_' => '1020661-86-2',
+                                                    '_INCHIKEY_' => 'RNDAYVNSDZTQEQ-QQYWDQJINA-N',
+                                                    '_COMPOUND_NAME_' => 'Bipinnatin P,(+)-Bipinnatin P',
+                                                    '_KNAPSACK_ID_' => 'C00038600',
+                                                    '_MOLECULAR_FORMULA_' => 'C25H28O11',
+                                                    '_EXACT_MASS_' => '504.16316174'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C23H26O11',
+                                                    '_EXACT_MASS_' => '478.14751167',
+                                                    '_INCHIKEY_' => 'KSXUAYYEMGKRGW-CGBYMSTNNA-N',
+                                                    '_CAS_' => '1020661-88-4',
+                                                    '_COMPOUND_NAME_' => 'Bipinnatin Q,(+)-Bipinnatin Q',
+                                                    '_KNAPSACK_ID_' => 'C00038601'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_INCHIKEY_' => 'SJBBGMVJNAOUOI-VLURGLOZSA-N',
+                                                    '_CAS_' => '1065546-02-2',
+                                                    '_COMPOUND_NAME_' => 'Bipinnatone A',
+                                                    '_KNAPSACK_ID_' => 'C00038602',
+                                                    '_MOLECULAR_FORMULA_' => 'C30H38O5',
+                                                    '_EXACT_MASS_' => '478.27192432'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C25H30O5',
+                                                    '_EXACT_MASS_' => '410.20932407',
+                                                    '_INCHIKEY_' => 'NJIYMLLTXNGJHV-REZTVBANSA-N',
+                                                    '_CAS_' => '1065546-06-6',
+                                                    '_KNAPSACK_ID_' => 'C00038603',
+                                                    '_COMPOUND_NAME_' => 'Bipinnatone B'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_INCHIKEY_' => 'PGWUCFFEOUVLTN-UHFFFAOYSA-N',
+                                                    '_CAS_' => '52897-70-8',
+                                                    '_COMPOUND_NAME_' => 'Bis(2,3,6-tribromo-4,5-dihydroxybenzyl) ether',
+                                                    '_KNAPSACK_ID_' => 'C00038604',
+                                                    '_EXACT_MASS_' => '589.89746296',
+                                                    '_MOLECULAR_FORMULA_' => 'C16H29Br3O3Si3'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_COMPOUND_NAME_' => 'Bisaprasin',
+                                                    '_CAS_' => '112514-43-9',
+                                                    '_INCHIKEY_' => 'VVFUCWCIWIOTJW-QEYYFATHSA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038605',
+                                                    '_MOLECULAR_FORMULA_' => 'C44H46Br4N8O12S4',
+                                                    '_EXACT_MASS_' => '1321.88515351'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_INCHIKEY_' => 'CUPRGZVKNKNTTN-IMZWYYTHNA-N',
+                                                    '_CAS_' => '244247-14-1',
+                                                    '_COMPOUND_NAME_' => 'Bisezakyne A,(-)-Bisezakyne A',
+                                                    '_KNAPSACK_ID_' => 'C00038606',
+                                                    '_EXACT_MASS_' => '330.03860587',
+                                                    '_MOLECULAR_FORMULA_' => 'C15H20BrClO'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '424.02076292',
+                                                    '_MOLECULAR_FORMULA_' => 'C17H23BrCl2O3',
+                                                    '_CAS_' => '244247-15-2',
+                                                    '_INCHIKEY_' => 'WLCJKJLAQCETBJ-NWVDLYHONA-N',
+                                                    '_COMPOUND_NAME_' => 'Bisezakyne B,(-)-Bisezakyne B',
+                                                    '_KNAPSACK_ID_' => 'C00038607'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '428.29265977',
+                                                    '_MOLECULAR_FORMULA_' => 'C27H40O4',
+                                                    '_COMPOUND_NAME_' => 'Bisgravillol',
+                                                    '_CAS_' => '932033-22-2',
+                                                    '_INCHIKEY_' => 'HACJVLBLYFAKNF-UHFFFAOYSA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038608'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C20H20O6',
+                                                    '_EXACT_MASS_' => '356.12598837',
+                                                    '_CAS_' => '260969-76-4',
+                                                    '_INCHIKEY_' => 'RSPDYFDYHDJBLU-OMQMIFNENA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038609',
+                                                    '_COMPOUND_NAME_' => 'Blepharolide A,(-)-Blepharolide A'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_COMPOUND_NAME_' => 'Blepharolide B,(-)-Blepharolide B',
+                                                    '_CAS_' => '260969-77-5',
+                                                    '_INCHIKEY_' => 'VXXMAEFQGRAWNP-KSGRVOAUNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038610',
+                                                    '_EXACT_MASS_' => '340.13107375',
+                                                    '_MOLECULAR_FORMULA_' => 'C20H20O5'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C32H52O2',
+                                                    '_EXACT_MASS_' => '468.39673089999997',
+                                                    '_COMPOUND_NAME_' => 'Boehmerol acetate',
+                                                    '_CAS_' => '123409-83-6',
+                                                    '_INCHIKEY_' => 'LVDIOSHGTKUVMX-VGHIVREWNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038611'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_KNAPSACK_ID_' => 'C00038612',
+                                                    '_CAS_' => '960233-06-1',
+                                                    '_INCHIKEY_' => 'SPNFRQDQOJKTSQ-ZNZUWQLQNA-N',
+                                                    '_COMPOUND_NAME_' => 'Boivinide A',
+                                                    '_MOLECULAR_FORMULA_' => 'C36H54O14',
+                                                    '_EXACT_MASS_' => '710.35135643'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_INCHIKEY_' => 'CSVNMGCNZRUZHN-LHNIQKSDNA-N',
+                                                    '_CAS_' => '960233-12-9',
+                                                    '_COMPOUND_NAME_' => 'Boivinide B',
+                                                    '_KNAPSACK_ID_' => 'C00038613',
+                                                    '_EXACT_MASS_' => '694.35644181',
+                                                    '_MOLECULAR_FORMULA_' => 'C36H54O13'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '680.37717725',
+                                                    '_MOLECULAR_FORMULA_' => 'C36H56O12',
+                                                    '_CAS_' => '960233-19-6',
+                                                    '_COMPOUND_NAME_' => 'Boivinide C',
+                                                    '_INCHIKEY_' => 'BPGWSHOXZQEBEG-PVEWUKRWNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038614'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '680.34079175',
+                                                    '_MOLECULAR_FORMULA_' => 'C35H52O13',
+                                                    '_CAS_' => '960233-26-5',
+                                                    '_COMPOUND_NAME_' => 'Boivinide D',
+                                                    '_INCHIKEY_' => 'DNLXAKKKWMFLON-QMMKOHGYNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038615'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '696.33570637',
+                                                    '_MOLECULAR_FORMULA_' => 'C35H52O14',
+                                                    '_COMPOUND_NAME_' => 'Boivinide E',
+                                                    '_CAS_' => '960233-32-3',
+                                                    '_INCHIKEY_' => 'ZVWJQICTCWWGNW-MNGQFYAGNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038616'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '752.36192112',
+                                                    '_MOLECULAR_FORMULA_' => 'C38H56O15',
+                                                    '_COMPOUND_NAME_' => 'Boivinide F',
+                                                    '_CAS_' => '960233-36-7',
+                                                    '_INCHIKEY_' => 'PFTYEQWDSBMMNY-RFNQMGJHNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038617'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_KNAPSACK_ID_' => 'C00038618',
+                                                    '_CAS_' => '955999-16-3',
+                                                    '_INCHIKEY_' => 'ZYLJCUKCYXHXHV-BBUVWLLZNA-N',
+                                                    '_COMPOUND_NAME_' => 'Bonducellpin E,(+)-Bonducellpin E',
+                                                    '_MOLECULAR_FORMULA_' => 'C23H30O8',
+                                                    '_EXACT_MASS_' => '434.19406794'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_MOLECULAR_FORMULA_' => 'C22H28O6',
+                                                    '_EXACT_MASS_' => '388.18858863',
+                                                    '_CAS_' => '955999-17-4',
+                                                    '_COMPOUND_NAME_' => 'Bonducellpin F,(+)-Bonducellpin F',
+                                                    '_INCHIKEY_' => 'XKTJWVAVUXZAPA-MCDREQFLNA-N',
+                                                    '_KNAPSACK_ID_' => 'C00038619'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_CAS_' => '955999-18-5',
+                                                    '_INCHIKEY_' => 'IHXOABPCUNFFPZ-IHYGVPAINA-N',
+                                                    '_COMPOUND_NAME_' => 'Bonducellpin G,(+)-Bonducellpin G',
+                                                    '_KNAPSACK_ID_' => 'C00038620',
+                                                    '_EXACT_MASS_' => '432.21480338',
+                                                    '_MOLECULAR_FORMULA_' => 'C24H32O7'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '214.08412356',
+                                                    '_MOLECULAR_FORMULA_' => 'C10H14O5',
+                                                    '_CAS_' => '1005344-34-2',
+                                                    '_KNAPSACK_ID_' => 'C00038621',
+                                                    '_INCHIKEY_' => 'BVFFUSVHPGHUFQ-ONCWJTSGNA-N',
+                                                    '_COMPOUND_NAME_' => 'Botryolide A,(-)-Botryolide A'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_INCHIKEY_' => '',
+                                                    '_CAS_' => '',
+                                                    '_COMPOUND_NAME_' => 'Nororientaline',
+                                                    '_KNAPSACK_ID_' => 'C00052018',
+                                                    '_EXACT_MASS_' => '315.14705817',
+                                                    '_MOLECULAR_FORMULA_' => 'C18H21NO4'
+                                                  }, 'Metabolomics::Banks::Knapsack' ),
+                                           bless( {
+                                                    '_KNAPSACK_ID_' => 'C00052019',
+                                                    '_CAS_' => '',
+                                                    '_INCHIKEY_' => '',
+                                                    '_COMPOUND_NAME_' => 'Notoamide E',
+                                                    '_EXACT_MASS_' => '433.23654188',
+                                                    '_MOLECULAR_FORMULA_' => 'C26H31N3O3'
+                                                  }, 'Metabolomics::Banks::Knapsack' )
+                                         ],
+                 '_DATABASE_ENTRIES_NB_' => 51187,
+                 '_EXP_PEAK_LIST_' => [],
+                 '_DATABASE_URL_' => 'http://www.knapsackfamily.com/KNApSAcK_Family/',
+                 '_DATABASE_VERSION_' => '1.1',
+                 '_DATABASE_DOI_' => '10.1093/pcp/pct176',
+                 '_DATABASE_NAME_' => 'Knapsack',
+                 '_THEO_PEAK_LIST_' => []
+               }, 'Metabolomics::Banks' ),
+        # query mode
+        'POSITIVE'
+		),
+		##### Expected results
+		45,
+		## MSG
+		'Method \'buildTheoPeakBankFromContaminants\' works with Bank and Contaminants objects and \'ION\' mode');		
 
 
 ## #################################################################################################################################
@@ -1887,6 +2336,41 @@ BEGIN {
 	    return($oBank) ;
 	}
 	## End SUB
+	
+	
+##
+#########################	######################### 	KNAPSACK TESTS SUB	 #########################  ####################
+##
+
+	## SUB TEST for test bank object init
+	sub init_KnapSackBankObject_TEST {
+	    # get values
+	    my (  ) = @_;
+	    my $o = Metabolomics::Banks::Knapsack->new() ;
+#	    print Dumper $o ;
+	    return($o) ;
+	}
+	## End SUB
+
+	## sub
+	sub getKnapSackFromSourceTest {
+		my ( $source ) = @_ ;
+		my $o = Metabolomics::Banks::Knapsack->new() ;
+		my $MetaboliteNb = $o->getKSMetabolitesFromSource($source) ;
+#		print Dumper $o ;
+		return ($MetaboliteNb) ;
+	}
+	
+	## sub
+	sub buildTheoPeakBankFromKSTest {
+		# get values
+	    my ( $oBank, $queryMode ) = @_;
+	    
+	    my $oBankNb = $oBank->buildTheoPeakBankFromKnapsack($queryMode ) ;
+#	    print Dumper $oBank ;
+	    return($oBankNb) ;
+	}	
+
 	
 }## END BEGIN part
 

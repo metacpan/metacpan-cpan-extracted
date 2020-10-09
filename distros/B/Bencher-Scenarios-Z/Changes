@@ -1,3 +1,24 @@
+0.005   2020-10-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [dist] Show used modules' versions in POD.
+
+
+0.004   2020-10-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [scenario Z::Overhead] Add participant: Moose.
+
+
+0.003   2020-10-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [dist] Re-add accidentally removed sample benchmarks.
+
+
+0.002   2020-10-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Add startup overhead benchmarks for some related modules: Zydeco,
+	  Zydeco::Lite, MooX::Press, Moo, et al.
+
+
 0.001   2020-09-21  Released-By: PERLANCAR
 
         - First release.

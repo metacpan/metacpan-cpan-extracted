@@ -57,7 +57,7 @@ package Rex::Commands::SCM;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Config;

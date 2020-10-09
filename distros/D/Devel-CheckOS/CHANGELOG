@@ -1,3 +1,8 @@
+1.84    2020-10-05      Add some more versions of MacOS;
+                        Note change of name Mac OS X -> MacOS, but don't
+                          change the module name for backward compatibility;
+                        Add MSYS (reported by perl in MinGW environments)
+
 1.83    2020-02-15      Remove dependency on Data::Compare, which in turn
                           depends on non-pure-perl XS in CLone.pm
 

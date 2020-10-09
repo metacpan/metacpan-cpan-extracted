@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.43;
+package Future::AsyncAwait 0.44;
 
 use v5.14;
 use warnings;
@@ -148,6 +148,64 @@ This module is still under active development. While it now seems relatively
 stable enough for most use-cases and has received a lot of "battle-testing" in
 a wide variety of scenarios, there may still be the occasional case of memory
 leak left in it, especially if still-pending futures are abandoned.
+
+=head2 C<CANCEL>
+
+I<Experimental. Since version 0.44.>
+
+The C<CANCEL> keyword declares a block of code which will be run in the event
+that the future returned by the C<async sub> is cancelled.
+
+   async sub f
+   {
+      CANCEL { warn "This task was cancelled"; }
+
+      await ...
+   }
+
+   f()->cancel;
+
+A C<CANCEL> block is a self-contained syntax element, similar to perl
+constructions like C<BEGIN>, and does not need a terminating semicolon.
+
+When a C<CANCEL> block is encountered during execution of the C<async sub>,
+the code in its block is stored for the case that the returned future is
+cancelled. Each will take effect as it is executed, possibly multiple times if
+it appears inside a loop, or not at all if it appears conditionally in a
+branch that was not executed.
+
+   async sub g
+   {
+      if(0) {
+         CANCEL { warn "This does not happen"; }
+      }
+
+      foreach my $x ( 1..3 ) {
+         CANCEL { warn "This happens for x=$x"; }
+      }
+
+      await ...
+   }
+
+   g()->cancel;
+
+C<CANCEL> blocks are only invoked if a still-pending future is cancelled. They
+are discarded without being executed if the function finishes; either
+successfully or if it throws an exception.
+
+=head1 Experimental Features
+
+Some of the features of this module are currently marked as experimental. They
+will provoke warnings in the C<experimental> category, unless silenced.
+
+You can silence this with C<no warnings 'experimental'> but then that will
+silence every experimental warning, which may hide others unintentionally. For
+a more fine-grained approach you can instead use the import line for this
+module to only silence this module's warnings selectively:
+
+   use Future::AsyncAwait qw( :experimental(cancel) );
+
+   use Future::AsyncAwait qw( :experimental );  # all of the above
 
 =head1 SUPPORTED USES
 
@@ -374,6 +432,8 @@ sub import
    $class->import_into( $caller, @_ );
 }
 
+my @EXPERIMENTAL = qw( cancel );
+
 sub import_into
 {
    my $class = shift;
@@ -381,10 +441,18 @@ sub import_into
 
    $^H{"Future::AsyncAwait/async"}++; # Just always turn this on
 
-   while( @_ ) {
+   SYM: while( @_ ) {
       my $sym = shift;
 
       $^H{"Future::AsyncAwait/future"} = shift, next if $sym eq "future_class";
+
+      foreach ( @EXPERIMENTAL ) {
+         $^H{"Future::AsyncAwait/experimental($_)"}++, next SYM if $sym eq ":experimental($_)";
+      }
+      if( $sym eq ":experimental" ) {
+         $^H{"Future::AsyncAwait/experimental($_)"}++ for @EXPERIMENTAL;
+         next SYM;
+      }
 
       croak "Unrecognised import symbol $sym";
    }

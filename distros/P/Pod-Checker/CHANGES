@@ -1,3 +1,16 @@
+ 3-Oct-2020           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.74
+ + CPAN#133312: Add strict compliance to Pod-Checker
+   Thanks TODDR for the patch to make the code "use strict" compliant
+ + CPAN#98326: Can we make “A non-empty Z<>” a warning and not an error
+   This is a corner case... and since Pod::Simple anyway "nixes" anything
+   inside Z<...>, this is a warning, not an error. Mind the caveats.
+ + Added an additional test to achieve 100% statement coverage and added
+   some POD to also have 100% POD coverage
+ + Made all text files unixish, no CRLF
+
+
  30-May-2016           Marek Rouchal                        <marekr@cpan.org>
  -----------------------------------------------------------------------------
  Version 1.73

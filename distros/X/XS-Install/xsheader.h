@@ -35,3 +35,11 @@
     #undef do_open  // perl's macros do_open, do_close breaks <iostream>, undef it as they are not used in general
     #undef do_close
 #endif
+
+#ifdef ERROR
+    #undef ERROR
+#endif
+
+#ifdef DELETE
+    #undef DELETE
+#endif

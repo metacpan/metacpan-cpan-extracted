@@ -32,7 +32,7 @@ package Rex::Commands::Partition;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);

@@ -1,0 +1,16 @@
+Revision history of Chart-Kaleido
+
+0.004       2020-10-10
+    - Breaking change: Rename save() and transform() funcs' plotly
+      parameter to plot, to align with existing Chart::Plotly's api.
+    - Synopsic fix. Thanks Gabor Szabo!
+
+0.003       2020-10-07
+    - Rename Chart::Kaleido::Base to take the Chart::Kaleido namespace.
+
+0.002       2020-10-05
+    - Fix file mime type test.
+
+0.001       2020-10-04
+    - First release.
+

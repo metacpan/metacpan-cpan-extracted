@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use Symbol;
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 use Rex::Config;
 use Rex::Logger;
@@ -117,7 +117,7 @@ sub parse {
   );
 
   eval {
-    no strict 'vars'; ## no critic ProhibitNoStrict
+    no strict 'vars';
 
     for my $var ( keys %{$vars} ) {
       Rex::Logger::debug("Registering: $var");

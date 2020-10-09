@@ -1,5 +1,11 @@
 Revision history for Perl extension Getopt-EX
 
+v1.20.0 2020-10-07T01:48:46Z
+
+    - Add 'mode' section in Module.pm document.
+    - Eliminate indirect object call in test code.
+    - Introduce $SPLIT_ANSI to produce separate SGR code.
+
 v1.19.1 2020-07-03T15:20:43Z
 
     - Eliminate indirect object call.

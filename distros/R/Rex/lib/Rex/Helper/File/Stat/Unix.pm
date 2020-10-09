@@ -9,7 +9,7 @@ package Rex::Helper::File::Stat::Unix;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 use Fcntl;
 

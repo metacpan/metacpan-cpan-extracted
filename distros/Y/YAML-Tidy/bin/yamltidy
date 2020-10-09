@@ -4,6 +4,7 @@ use warnings;
 use 5.010;
 use YAML::Tidy;
 use YAML::Tidy::Config;
+use YAML::LibYAML::API;
 use Getopt::Long::Descriptive;
 use Encode;
 

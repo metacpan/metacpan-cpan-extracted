@@ -29,3 +29,9 @@ Change to how page loading is checked in fire events.
 
 0.124 Thu Oct 1 08:16:00 CET 2020
 - error correction for tests when run as root. Use ok in wrong position
+
+0.125 Mon Oct 5 13:15 CET 2020
+- allow multiple concurrent navigations (can be caused by iframes) and turn die into opt-in warn
+
+0.126 Tue Oct 6 11:00 CET 2020
+- navigation requests to about:blank never properly finish and cause WebKit to hang

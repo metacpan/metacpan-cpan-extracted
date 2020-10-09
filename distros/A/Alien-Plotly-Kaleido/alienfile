@@ -1,0 +1,89 @@
+#!perl
+
+use 5.010;
+use alienfile;
+
+use lib 'util';
+use MyInstallUtil;
+
+use Config;
+
+# We download from plotly-orca's github repo releases.
+
+my $kaleido_version = 'v0.0.3.post1';
+
+my $github_base_url = "https://github.com/plotly/Kaleido/releases/download";
+
+sub download_url {
+    my $kaleido_version = shift;
+
+    my $make_url_github = sub {
+        join( '/', $github_base_url, $kaleido_version, $_[0] );
+    };
+
+    if ( $^O eq 'linux' ) {
+        return $make_url_github->('kaleido_linux_x64.zip');
+    }
+    elsif ( $^O eq 'MSWin32' ) {
+        my $filename = sprintf( "kaleido_win_%s.zip",
+            $Config{ptrsize} == 4 ? 'x86' : 'x64' );
+        return $make_url_github->($filename);
+    }
+    elsif ( $^O eq 'darwin' ) {
+        return $make_url_github->('kaleido_linux_x64.zip');
+    }
+    else {
+        die 'Unsupported OS';
+    }
+}
+
+configure {
+    requires 'File::Copy::Recursive' => 0;
+    requires 'File::Which'           => 0;
+    requires 'IPC::Run'              => 0;
+    requires 'JSON'                  => 0;
+};
+
+probe sub {
+    eval { MyInstallUtil::detect_kaleido_version() };
+    if ($@) {
+        warn "Failed to detect kaleido from system";
+        return 'share';
+    }
+    else {
+        warn "Detected kaleido from system";
+        return 'system';
+    }
+};
+
+share {
+    require File::Copy::Recursive;
+
+    start_url( $ENV{ALIEN_PLOTLY_KALEIDO_DOWNLOAD_URL}
+          || download_url($kaleido_version) );
+
+    plugin 'Download';
+    plugin 'Extract' => 'zip';
+
+    build sub {
+        my ($build) = @_;
+
+        my $extract = $build->install_prop->{extract};
+        my $prefix  = $build->install_prop->{prefix};
+
+        File::Copy::Recursive::dircopy( $extract, $prefix );
+    };
+
+    gather sub {
+        my ($build) = @_;
+
+        $ENV{PATH} = join(
+            $Config{path_sep},
+            $build->install_prop->{prefix},
+            $ENV{PATH} // ''
+        );
+        $build->runtime_prop->{version} =
+          MyInstallUtil::detect_kaleido_version();
+    };
+};
+

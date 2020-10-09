@@ -33,12 +33,13 @@ my %WriteMakefileArgs = (
     "POSIX" => 0,
     "Pod::Usage" => 0,
     "WWW::Mechanize" => 0,
+    "XML::FeedPP" => 0,
     "XML::Simple" => 0,
     "strict" => 0,
     "vars" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.190840",
+  "VERSION" => "1.202830",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,6 +59,7 @@ my %FallbackPrereqs = (
   "POSIX" => 0,
   "Pod::Usage" => 0,
   "WWW::Mechanize" => 0,
+  "XML::FeedPP" => 0,
   "XML::Simple" => 0,
   "strict" => 0,
   "vars" => 0,

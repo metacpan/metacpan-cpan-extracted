@@ -437,10 +437,8 @@ tzsrc/localtime.c
 tzsrc/newctime.3
 tzsrc/newtzset.3
 tzsrc/northamerica
-tzsrc/pacificnew
 tzsrc/private.h
 tzsrc/southamerica
-tzsrc/systemv
 tzsrc/theory.html
 tzsrc/time2posix.3
 tzsrc/tz-art.html
@@ -451,7 +449,6 @@ tzsrc/tzfile.h
 tzsrc/tzselect.8
 tzsrc/tzselect.ksh
 tzsrc/workman.sh
-tzsrc/yearistype.sh
 tzsrc/zdump.8
 tzsrc/zdump.c
 tzsrc/zic.8

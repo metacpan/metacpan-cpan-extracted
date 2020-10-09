@@ -163,21 +163,14 @@ __PACKAGE__->class_documentation({description => 'Represents export options for 
 }                                 );
 
 __PACKAGE__->method_documentation({
-    'format' => {
-    	datatype => 'string',
-    	base_name => 'Format',
-    	description => 'Export format.',
-    	format => '',
-    	read_only => '',
-    		},
 });
 
 __PACKAGE__->swagger_types( {
-    'format' => 'string'
+    
 } );
 
 __PACKAGE__->attribute_map( {
-    'format' => 'Format'
+    
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

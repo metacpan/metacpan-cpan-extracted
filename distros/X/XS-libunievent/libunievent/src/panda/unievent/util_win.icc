@@ -1,0 +1,133 @@
+#include <io.h>
+#include <Windows.h>
+#include <process.h>
+#include <Winsock2.h>
+
+namespace panda { namespace unievent {
+
+static inline HANDLE fd2handle (fd_t fd) {
+    HANDLE h = (HANDLE)_get_osfhandle(fd);
+    if (h == INVALID_HANDLE_VALUE) throw Error(last_sys_error());
+    return h;
+}
+
+static inline fd_t handle2fd (HANDLE h) {
+    int mode = 0; // TODO: ????
+    fd_t fd = _open_osfhandle((intptr_t)h, mode);
+    if (fd < 0) throw Error(last_sys_error());
+    return fd;
+}
+
+fd_t file_dup (fd_t src) {
+    HANDLE h = fd2handle(src);
+    HANDLE proc = GetCurrentProcess();
+    HANDLE dup_h;
+    
+    auto ok = DuplicateHandle(proc, h, proc, &dup_h, 0, false, DUPLICATE_SAME_ACCESS);
+    if (!ok) throw Error(last_sys_error());
+    
+    int dup_fd;
+    try {
+        dup_fd = handle2fd(dup_h);
+    } catch (...) {
+        CloseHandle(dup_h);
+        throw;
+    }
+    
+    return dup_fd;
+}
+
+sock_t sock_dup (sock_t sock) {
+    WSAPROTOCOL_INFOW info;
+    if (WSADuplicateSocketW(sock, GetCurrentProcessId(), &info)) throw Error(last_sys_sock_error());
+    
+    auto new_sock = WSASocketW(
+        FROM_PROTOCOL_INFO,
+        FROM_PROTOCOL_INFO,
+        FROM_PROTOCOL_INFO,
+        &info,
+        0,
+        WSA_FLAG_OVERLAPPED
+    );
+
+    if (new_sock == INVALID_SOCKET) throw Error(last_sys_sock_error());
+    
+    return new_sock;
+}
+
+sock_t fd2sock (fd_t fd) {
+    return (sock_t)fd2handle(fd);
+}
+
+fd_t sock2fd (sock_t sock) {
+    return handle2fd((HANDLE)sock);
+}
+
+std::error_code sys_error (int syserr) {
+    //printf("win sys_error %d -> %d -> %d\n", syserr, uv_translate_sys_error(syserr), uvx_error(uv_translate_sys_error(syserr)).value());
+    return uvx_error(uv_translate_sys_error(syserr));
+}
+
+std::error_code last_sys_error () {
+    return sys_error(GetLastError());
+}
+
+std::error_code last_sys_sock_error () {
+    return sys_error(WSAGetLastError());
+}
+
+excepted<sock_t, std::error_code> socket (int domain, int type, int protocol) {
+    auto sock = ::socket(domain, type, protocol);
+    if (sock == INVALID_SOCKET) return make_unexpected(last_sys_sock_error());
+    return sock;
+}
+
+excepted<sock_t, std::error_code> accept (sock_t srv, net::SockAddr* sa) {
+    net::SockAddr stub;
+    if (!sa) sa = &stub;
+    int sz = sizeof(stub);
+    auto sock = ::accept(srv, sa->get(), &sz);
+    if (sock == INVALID_SOCKET) return make_unexpected(last_sys_sock_error());
+    return sock;
+}
+
+excepted<void, std::error_code> setsockopt (sock_t sock, int level, int optname, const void* optval, int optlen) {
+    auto status = ::setsockopt(sock, level, optname, (const char*)optval, optlen);
+    if (status != 0) return make_unexpected(last_sys_sock_error());
+    return {};
+}
+
+excepted<void, std::error_code> setblocking (sock_t sock, bool val) {
+    unsigned long mode = val ? 0 : 1;
+    auto status = ioctlsocket(sock, FIONBIO, &mode);
+    if (status != 0) return make_unexpected(last_sys_sock_error());
+    return {};
+}
+
+excepted<void, std::error_code> close (sock_t sock) {
+    auto status = ::closesocket(sock);
+    if (status != 0) return make_unexpected(last_sys_sock_error());
+    return {};
+}
+
+excepted<std::array<sock_t,2>, std::error_code> socketpair (int, int type, int protocol) {
+    return inet_socketpair(type, protocol);
+}
+
+excepted<net::SockAddr, std::error_code> getsockname (sock_t sock) {
+    net::SockAddr ret;
+    int sz = sizeof(ret);
+    auto status = ::getsockname(sock, ret.get(), &sz);
+    if (status != 0) return make_unexpected(last_sys_sock_error());
+    return ret;
+}
+
+excepted<net::SockAddr, std::error_code> getpeername (sock_t sock) {
+    net::SockAddr ret;
+    int sz = sizeof(ret);
+    auto status = ::getpeername(sock, ret.get(), &sz);
+    if (status != 0) return make_unexpected(last_sys_sock_error());
+    return ret;
+}
+
+}}

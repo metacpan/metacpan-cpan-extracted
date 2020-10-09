@@ -74,6 +74,7 @@ require Data::Dumper;
 require Devel::Platform::Info;
 
 $Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Terse = 1;
 print Data::Dumper::Dumper(Devel::Platform::Info->new->get_info);
 
 # ABSTRACT: Print platform information gathered by Devel::Platform::Info
@@ -91,7 +92,7 @@ platform-info - Print platform information gathered by Devel::Platform::Info
 
 =head1 VERSION
 
-This document describes version 0.002 of platform-info (from Perl distribution App-PlatformInfo), released on 2019-04-30.
+This document describes version 0.004 of platform-info (from Perl distribution App-PlatformInfo), released on 2020-10-08.
 
 =head1 HOMEPAGE
 
@@ -115,7 +116,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -138,9 +139,9 @@ Devel/Platform/Info/Win32.pm,31657,3303,9;984
 ### App/PlatformInfo.pm ###
 #package App::PlatformInfo;
 #
-#our $DATE = '2019-04-30'; 
+#our $DATE = '2020-10-08'; 
 #our $DIST = 'App-PlatformInfo'; 
-#our $VERSION = '0.002'; 
+#our $VERSION = '0.004'; 
 #
 #1;
 #

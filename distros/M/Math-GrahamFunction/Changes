@@ -1,5 +1,8 @@
 Revision history for Math::GrahamFunction
 
+0.02004     2020-10-07
+    - Cleanups and minor updates.
+
 0.02003     2019-08-23
     - Now at https://github.com/shlomif/perl-math-grahamfunction .
 

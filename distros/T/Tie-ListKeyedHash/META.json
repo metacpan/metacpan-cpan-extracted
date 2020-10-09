@@ -1,0 +1,61 @@
+{
+   "abstract" : "A system allowing the use of anonymous arrays as keys to a hash.",
+   "author" : [
+      "Jerilyn Franz <cpan@jerilyn.info>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-ListKeyedHash",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Tie::ListKeyedHash" : {
+         "file" : "lib/Tie/ListKeyedHash.pm",
+         "version" : "1.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JerilynFranz/perl-Tie-ListKeyedHash/issues"
+      },
+      "homepage" : "https://github.com/JerilynFranz/perl-Tie-ListKeyedHash",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JerilynFranz/perl-Tie-ListKeyedHash.git",
+         "web" : "https://github.com/JerilynFranz/perl-Tie-ListKeyedHash"
+      }
+   },
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

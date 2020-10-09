@@ -1,6 +1,6 @@
 package Net::Amazon::S3::ACL::Set;
 # Abstract: Representation of explicit ACL
-$Net::Amazon::S3::ACL::Set::VERSION = '0.94';
+$Net::Amazon::S3::ACL::Set::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Moose::Util::TypeConstraints;
@@ -128,7 +128,7 @@ Net::Amazon::S3::ACL::Set
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.98 tests => 20;
+use Test::More 0.98 tests => 24;
 use FastGlob qw(glob);
 
 my @files = &glob('t/scripts/*/*.pl');

@@ -1,3 +1,8 @@
+0.011   2020-10-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Detect Firefox process when it is upgraded.
+
+
 0.010   2020-08-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Tweak browser detection (check exec also in addition to fname).

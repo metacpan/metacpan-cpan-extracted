@@ -8,6 +8,10 @@ namespace xs {
             Sv val;
             if ((val = h.fetch("min_level"))) ret.min_level = xs::in<Level>(val);
             if ((val = h.fetch("formatter"))) ret.formatter = xs::in<IFormatterSP>(val);
+            if ((val = h.fetch("format")) && val.defined()) {
+                auto fmt = xs::in<string_view>(val);
+                if (fmt.length()) ret.formatter = new PatternFormatter(fmt);
+            }
             return ret;
         }
     };

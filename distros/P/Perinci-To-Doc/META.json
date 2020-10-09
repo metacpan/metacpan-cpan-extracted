@@ -29,7 +29,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.90"
+            "Rinci" : "v1.1.94"
          }
       },
       "runtime" : {
@@ -37,7 +37,7 @@
             "Data::Dump::OneLine" : "0",
             "Data::Dump::SortKeys" : "0.04",
             "Data::Sah::Terse" : "0",
-            "File::Temp" : "0",
+            "File::Temp" : "0.2307",
             "File::Which" : "0",
             "Locale::TextDomain::UTF8" : "0",
             "Log::ger" : "0.037",
@@ -47,7 +47,7 @@
             "Perinci::Access" : "0.44",
             "Perinci::Object" : "0.310",
             "Perinci::Sub::ConvertArgs::Array" : "0",
-            "Perinci::Sub::GetArgs::Argv" : "0.842",
+            "Perinci::Sub::GetArgs::Argv" : "0.845",
             "Perinci::Sub::Normalize" : "0.19",
             "Perinci::Sub::Util" : "0.46",
             "Perinci::Sub::Util::Sort" : "0",
@@ -82,12 +82,17 @@
          "web" : "https://github.com/perlancar/perl-Perinci-To-Doc"
       }
    },
-   "version" : "0.872",
+   "version" : "0.873",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
             "config" : {
@@ -177,7 +182,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.602"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -246,9 +251,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
@@ -433,7 +438,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
             "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
-            "version" : "0.250"
+            "version" : "0.251"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",

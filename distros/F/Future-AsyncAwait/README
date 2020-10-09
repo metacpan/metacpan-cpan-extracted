@@ -136,6 +136,66 @@ DESCRIPTION
     occasional case of memory leak left in it, especially if still-pending
     futures are abandoned.
 
+ CANCEL
+
+    Experimental. Since version 0.44.
+
+    The CANCEL keyword declares a block of code which will be run in the
+    event that the future returned by the async sub is cancelled.
+
+       async sub f
+       {
+          CANCEL { warn "This task was cancelled"; }
+    
+          await ...
+       }
+    
+       f()->cancel;
+
+    A CANCEL block is a self-contained syntax element, similar to perl
+    constructions like BEGIN, and does not need a terminating semicolon.
+
+    When a CANCEL block is encountered during execution of the async sub,
+    the code in its block is stored for the case that the returned future
+    is cancelled. Each will take effect as it is executed, possibly
+    multiple times if it appears inside a loop, or not at all if it appears
+    conditionally in a branch that was not executed.
+
+       async sub g
+       {
+          if(0) {
+             CANCEL { warn "This does not happen"; }
+          }
+    
+          foreach my $x ( 1..3 ) {
+             CANCEL { warn "This happens for x=$x"; }
+          }
+    
+          await ...
+       }
+    
+       g()->cancel;
+
+    CANCEL blocks are only invoked if a still-pending future is cancelled.
+    They are discarded without being executed if the function finishes;
+    either successfully or if it throws an exception.
+
+Experimental Features
+
+    Some of the features of this module are currently marked as
+    experimental. They will provoke warnings in the experimental category,
+    unless silenced.
+
+    You can silence this with no warnings 'experimental' but then that will
+    silence every experimental warning, which may hide others
+    unintentionally. For a more fine-grained approach you can instead use
+    the import line for this module to only silence this module's warnings
+    selectively:
+
+       use Future::AsyncAwait qw( :experimental(cancel) );
+    
+       use Future::AsyncAwait qw( :experimental );  # all of the above
+
 SUPPORTED USES
 
     Most cases involving awaiting on still-pending futures should work

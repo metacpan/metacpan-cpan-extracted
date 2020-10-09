@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Object;
-$Net::Amazon::S3::Client::Object::VERSION = '0.94';
+$Net::Amazon::S3::Client::Object::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use DateTime::Format::HTTP;
@@ -19,234 +19,230 @@ use Net::Amazon::S3::Constraint::ACL::Canned;
 with 'Net::Amazon::S3::Role::ACL';
 
 enum 'StorageClass' =>
-    # Current list at https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html#AmazonS3-PutObject-request-header-StorageClass
-    [ qw(standard reduced_redundancy standard_ia onezone_ia intelligent_tiering glacier deep_archive) ];
+	# Current list at https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html#AmazonS3-PutObject-request-header-StorageClass
+	[ qw(standard reduced_redundancy standard_ia onezone_ia intelligent_tiering glacier deep_archive) ];
 
 has 'client' =>
-    ( is => 'ro', isa => 'Net::Amazon::S3::Client', required => 1 );
+	( is => 'ro', isa => 'Net::Amazon::S3::Client', required => 1 );
 has 'bucket' =>
-    ( is => 'ro', isa => 'Net::Amazon::S3::Client::Bucket', required => 1 );
+	( is => 'ro', isa => 'Net::Amazon::S3::Client::Bucket', required => 1 );
 has 'key'  => ( is => 'ro', isa => 'Str',  required => 1 );
 has 'etag' => ( is => 'ro', isa => 'Etag', required => 0 );
 has 'size' => ( is => 'ro', isa => 'Int',  required => 0 );
 has 'last_modified' =>
-    ( is => 'ro', isa => DateTime, coerce => 1, required => 0, default => sub { shift->last_modified_raw }, lazy => 1 );
+	( is => 'ro', isa => DateTime, coerce => 1, required => 0, default => sub { shift->last_modified_raw }, lazy => 1 );
 has 'last_modified_raw' =>
-    ( is => 'ro', isa => 'Str', required => 0 );
+	( is => 'ro', isa => 'Str', required => 0 );
 has 'expires' => ( is => 'rw', isa => DateTime, coerce => 1, required => 0 );
 has 'content_type' => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 0,
-    default  => 'binary/octet-stream'
+	is       => 'ro',
+	isa      => 'Str',
+	required => 0,
+	default  => 'binary/octet-stream'
 );
 has 'content_disposition' => (
-    is => 'ro',
-    isa => 'Str',
-    required => 0,
+	is => 'ro',
+	isa => 'Str',
+	required => 0,
 );
 has 'content_encoding' => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 0,
+	is       => 'ro',
+	isa      => 'Str',
+	required => 0,
 );
 has 'cache_control' => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 0,
+	is       => 'ro',
+	isa      => 'Str',
+	required => 0,
 );
 has 'storage_class' => (
-    is       => 'ro',
-    isa      => 'StorageClass',
-    required => 0,
-    default  => 'standard',
+	is       => 'ro',
+	isa      => 'StorageClass',
+	required => 0,
+	default  => 'standard',
 );
 has 'user_metadata' => (
-    is       => 'ro',
-    isa      => 'HashRef',
-    required => 0,
-    default  => sub { {} },
+	is       => 'ro',
+	isa      => 'HashRef',
+	required => 0,
+	default  => sub { {} },
 );
 has 'website_redirect_location' => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 0,
+	is       => 'ro',
+	isa      => 'Str',
+	required => 0,
 );
 has 'encryption' => (
-    is       => 'ro',
-    isa      => 'Maybe[Str]',
-    required => 0,
+	is       => 'ro',
+	isa      => 'Maybe[Str]',
+	required => 0,
 );
 
 __PACKAGE__->meta->make_immutable;
 
 sub exists {
-    my $self = shift;
+	my $self = shift;
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Fetch',
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Fetch',
 
-        method => 'HEAD',
-    );
+		method => 'HEAD',
+	);
 
-    return $response->is_success;
+	return $response->is_success;
 }
 
 sub _get {
-    my $self = shift;
+	my $self = shift;
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Fetch',
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Fetch',
 
-        method => 'GET',
-    );
+		method => 'GET',
+	);
 
-    $self->_load_user_metadata ($response->http_response);
+	$self->_load_user_metadata ($response->http_response);
 
-    my $etag = $self->etag || $response->etag;
-    unless ($self->_is_multipart_etag ($etag)) {
+	my $etag = $self->etag || $response->etag;
+	unless ($self->_is_multipart_etag ($etag)) {
 		my $content = $response->content;
-        my $md5_hex = md5_hex ($content);
-        confess 'Corrupted download' if $etag ne $md5_hex;
-    }
+		my $md5_hex = md5_hex ($content);
+		confess 'Corrupted download' if $etag ne $md5_hex;
+	}
 
-    return $response;
+	return $response;
 }
 
 sub get {
-    my $self = shift;
-    return $self->_get->content;
+	my $self = shift;
+	return $self->_get->content;
 }
 
 sub get_decoded {
-    my $self = shift;
-    return $self->_get->decoded_content(@_);
+	my $self = shift;
+	return $self->_get->decoded_content(@_);
 }
 
 sub get_callback {
-    my ( $self, $callback ) = @_;
+	my ( $self, $callback ) = @_;
 
-    my $response = $self->__perform_operation (
-        response_class => 'Net::Amazon::S3::Operation::Object::Fetch::Response',
-        request_class  => 'Net::Amazon::S3::Operation::Object::Fetch::Request',
-        filename       => $callback,
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Fetch',
+		filename       => $callback,
+		method => 'GET',
+	);
 
-        method => 'GET',
-    );
-
-    return $response->http_response;
+	return $response->http_response;
 }
 
 sub get_filename {
-    my ( $self, $filename ) = @_;
+	my ( $self, $filename ) = @_;
 
-    my $response = $self->__perform_operation (
-        response_class => 'Net::Amazon::S3::Operation::Object::Fetch::Response',
-        request_class  => 'Net::Amazon::S3::Operation::Object::Fetch::Request',
-        filename       => $filename,
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Fetch',
+		filename       => $filename,
+		method => 'GET',
+	);
 
-        method => 'GET',
-    );
+	$self->_load_user_metadata($response->http_response);
 
-    $self->_load_user_metadata($response->http_response);
-
-    my $etag = $self->etag || $response->etag;
-    unless ($self->_is_multipart_etag($etag)) {
-        my $md5_hex = file_md5_hex($filename);
-        confess 'Corrupted download' if $etag ne $md5_hex;
-    }
+	my $etag = $self->etag || $response->etag;
+	unless ($self->_is_multipart_etag($etag)) {
+		my $md5_hex = file_md5_hex($filename);
+		confess 'Corrupted download' if $etag ne $md5_hex;
+	}
 }
 
 sub _load_user_metadata {
-    my ( $self, $http_response ) = @_;
+	my ( $self, $http_response ) = @_;
 
-    my %user_metadata;
-    for my $header_name ($http_response->header_field_names) {
-        my ($metadata_name) = lc($header_name) =~ /\A x-amz-meta- (.*) \z/xms
-            or next;
-        $user_metadata{$metadata_name} = $http_response->header($header_name);
-    }
+	my %user_metadata;
+	for my $header_name ($http_response->header_field_names) {
+		my ($metadata_name) = lc($header_name) =~ /\A x-amz-meta- (.*) \z/xms
+			or next;
+		$user_metadata{$metadata_name} = $http_response->header($header_name);
+	}
 
-    %{ $self->user_metadata } = %user_metadata;
+	%{ $self->user_metadata } = %user_metadata;
 }
 
 sub put {
-    my ( $self, $value ) = @_;
-    $self->_put( $value, length $value, md5_hex($value) );
+	my ( $self, $value ) = @_;
+	$self->_put( $value, length $value, md5_hex($value) );
 }
 
 sub _put {
-    my ( $self, $value, $size, $md5_hex ) = @_;
+	my ( $self, $value, $size, $md5_hex ) = @_;
 
-    my $md5_base64 = encode_base64( pack( 'H*', $md5_hex ) );
-    chomp $md5_base64;
+	my $md5_base64 = encode_base64( pack( 'H*', $md5_hex ) );
+	chomp $md5_base64;
 
-    my $conf = {
-        'Content-MD5'    => $md5_base64,
-        'Content-Length' => $size,
-        'Content-Type'   => $self->content_type,
-    };
+	my $conf = {
+		'Content-MD5'    => $md5_base64,
+		'Content-Length' => $size,
+		'Content-Type'   => $self->content_type,
+	};
 
-    if ( $self->expires ) {
-        $conf->{Expires}
-            = DateTime::Format::HTTP->format_datetime( $self->expires );
-    }
-    if ( $self->content_encoding ) {
-        $conf->{'Content-Encoding'} = $self->content_encoding;
-    }
-    if ( $self->content_disposition ) {
-        $conf->{'Content-Disposition'} = $self->content_disposition;
-    }
-    if ( $self->cache_control ) {
-        $conf->{'Cache-Control'} = $self->cache_control;
-    }
-    if ( $self->storage_class && $self->storage_class ne 'standard' ) {
-        $conf->{'x-amz-storage-class'} = uc $self->storage_class;
-    }
-    if ( $self->website_redirect_location ) {
-        $conf->{'x-amz-website-redirect-location'} = $self->website_redirect_location;
-    }
-    $conf->{"x-amz-meta-\L$_"} = $self->user_metadata->{$_}
-        for keys %{ $self->user_metadata };
+	if ( $self->expires ) {
+		$conf->{Expires}
+			= DateTime::Format::HTTP->format_datetime( $self->expires );
+	}
+	if ( $self->content_encoding ) {
+		$conf->{'Content-Encoding'} = $self->content_encoding;
+	}
+	if ( $self->content_disposition ) {
+		$conf->{'Content-Disposition'} = $self->content_disposition;
+	}
+	if ( $self->cache_control ) {
+		$conf->{'Cache-Control'} = $self->cache_control;
+	}
+	if ( $self->storage_class && $self->storage_class ne 'standard' ) {
+		$conf->{'x-amz-storage-class'} = uc $self->storage_class;
+	}
+	if ( $self->website_redirect_location ) {
+		$conf->{'x-amz-website-redirect-location'} = $self->website_redirect_location;
+	}
+	$conf->{"x-amz-meta-\L$_"} = $self->user_metadata->{$_}
+		for keys %{ $self->user_metadata };
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Add',
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Add',
 
-        value      => $value,
-        headers    => $conf,
-        acl        => $self->acl,
-        encryption => $self->encryption,
-    );
+		value      => $value,
+		headers    => $conf,
+		acl        => $self->acl,
+		encryption => $self->encryption,
+	);
 
-    my $http_response = $response->http_response;
+	my $http_response = $response->http_response;
 
-    confess 'Error uploading ' . $http_response->as_string
-        unless $http_response->is_success;
+	confess 'Error uploading ' . $http_response->as_string
+		unless $http_response->is_success;
 
 	return '';
 }
 
 sub put_filename {
-    my ( $self, $filename ) = @_;
+	my ( $self, $filename ) = @_;
 
-    my $md5_hex = $self->etag || file_md5_hex($filename);
-    my $size = $self->size;
-    unless ($size) {
-        my $stat = stat($filename) || confess("No $filename: $!");
-        $size = $stat->size;
-    }
+	my $md5_hex = $self->etag || file_md5_hex($filename);
+	my $size = $self->size;
+	unless ($size) {
+		my $stat = stat($filename) || confess("No $filename: $!");
+		$size = $stat->size;
+	}
 
-    $self->_put( $self->_content_sub($filename), $size, $md5_hex );
+	$self->_put( $self->_content_sub($filename), $size, $md5_hex );
 }
 
 sub delete {
-    my $self = shift;
+	my $self = shift;
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Delete',
-    );
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Delete',
+	);
 
-    return $response->is_success;
+	return $response->is_success;
 }
 
 sub set_acl {
@@ -257,7 +253,7 @@ sub set_acl {
 		%params,
 	);
 
-    return $response->is_success;
+	return $response->is_success;
 }
 
 sub add_tags {
@@ -268,129 +264,134 @@ sub add_tags {
 		%params,
 	);
 
-    return $response->is_success;
+	return $response->is_success;
 }
 
 sub delete_tags {
-    my ($self, %params) = @_;
+	my ($self, %params) = @_;
 
-    my $response = $self->_perform_operation (
+	my $response = $self->_perform_operation (
 		'Net::Amazon::S3::Operation::Object::Tags::Delete',
 
 		(version_id => $params{version_id}) x!! defined $params{version_id},
 	);
 
-    return $response->is_success;
+	return $response->is_success;
 }
 
 sub initiate_multipart_upload {
-    my $self = shift;
-    my %args = ref($_[0]) ? %{$_[0]} : @_;
+	my $self = shift;
+	my %args = ref($_[0]) ? %{$_[0]} : @_;
 
 	$args{acl} = $args{acl_short} if exists $args{acl_short};
 	delete $args{acl_short};
 	$args{acl} = $self->acl unless $args{acl};
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Upload::Create',
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Upload::Create',
 
-        encryption => $self->encryption,
+		encryption => $self->encryption,
 		($args{acl}       ? (acl       => $args{acl})     : ()),
-        ($args{headers}   ? (headers   => $args{headers}) : ()),
-    );
+		($args{headers}   ? (headers   => $args{headers}) : ()),
+	);
 
-    return unless $response->is_success;
+	return unless $response->is_success;
 
-    confess "Couldn't get upload id from initiate_multipart_upload response XML"
-        unless $response->upload_id;
+	confess "Couldn't get upload id from initiate_multipart_upload response XML"
+		unless $response->upload_id;
 
-    return $response->upload_id;
+	return $response->upload_id;
 }
 
 sub complete_multipart_upload {
-    my $self = shift;
+	my $self = shift;
 
-    my %args = ref($_[0]) ? %{$_[0]} : @_;
+	my %args = ref($_[0]) ? %{$_[0]} : @_;
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Upload::Complete',
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Upload::Complete',
 
-        upload_id    => $args{upload_id},
-        etags        => $args{etags},
-        part_numbers => $args{part_numbers},
-    );
+		upload_id    => $args{upload_id},
+		etags        => $args{etags},
+		part_numbers => $args{part_numbers},
+	);
 
-    return $response->http_response;
+	return $response->http_response;
 }
 
 sub abort_multipart_upload {
-    my $self = shift;
+	my $self = shift;
 
-    my %args = ref($_[0]) ? %{$_[0]} : @_;
+	my %args = ref($_[0]) ? %{$_[0]} : @_;
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Upload::Abort',
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Upload::Abort',
 
-        upload_id => $args{upload_id},
-    );
+		upload_id => $args{upload_id},
+	);
 
-    return $response->http_response;
+	return $response->http_response;
 }
 
 
 sub put_part {
-    my $self = shift;
+	my $self = shift;
 
-    my %args = ref($_[0]) ? %{$_[0]} : @_;
+	my %args = ref($_[0]) ? %{$_[0]} : @_;
 
-    #work out content length header
-    $args{headers}->{'Content-Length'} = length $args{value}
-      if(defined $args{value});
+	#work out content length header
+	$args{headers}->{'Content-Length'} = length $args{value}
+		if(defined $args{value});
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Object::Upload::Part',
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Object::Upload::Part',
 
-        upload_id   => $args{upload_id},
-        part_number => $args{part_number},
-        acl_short   => $args{acl_short},
-        copy_source => $args{copy_source},
-        headers     => $args{headers},
-        value       => $args{value},
-    );
+		upload_id   => $args{upload_id},
+		part_number => $args{part_number},
+		acl_short   => $args{acl_short},
+		copy_source => $args{copy_source},
+		headers     => $args{headers},
+		value       => $args{value},
+	);
 
-    return $response->http_response;
+	return $response->http_response;
 }
 
 sub list_parts {
-    confess "Not implemented";
-    # TODO - Net::Amazon::S3::Request:ListParts is implemented, but need to
-    # define better interface at this level. Currently returns raw XML.
+	confess "Not implemented";
+	# TODO - Net::Amazon::S3::Request:ListParts is implemented, but need to
+	# define better interface at this level. Currently returns raw XML.
 }
 
 sub uri {
-    my $self = shift;
-    return Net::Amazon::S3::Operation::Object::Fetch::Request->new (
-        s3     => $self->client->s3,
-        bucket => $self->bucket->name,
-        key    => $self->key,
-        method => 'GET',
-    )->http_request->uri;
+	my $self = shift;
+	return Net::Amazon::S3::Operation::Object::Fetch::Request->new (
+		s3     => $self->client->s3,
+		bucket => $self->bucket->name,
+		key    => $self->key,
+		method => 'GET',
+	)->http_request->uri;
 }
 
 sub query_string_authentication_uri {
-    my ($self, $query_form) = @_;
-    return Net::Amazon::S3::Operation::Object::Fetch::Request->new (
-        s3     => $self->client->s3,
-        bucket => $self->bucket->name,
-        key    => $self->key,
-        method => 'GET',
-    )->query_string_authentication_uri ($self->expires->epoch, $query_form);
+	my ($self, $query_form) = @_;
+	return $self->query_string_authentication_uri_for_method (GET => $query_form);
+}
+
+sub query_string_authentication_uri_for_method {
+	my ($self, $method, $query_form) = @_;
+	return Net::Amazon::S3::Operation::Object::Fetch::Request->new (
+		s3     => $self->client->s3,
+		bucket => $self->bucket->name,
+		key    => $self->key,
+		method => $method,
+	)->query_string_authentication_uri ($self->expires->epoch, $query_form);
 }
 
 sub head {
-    my $self = shift;
+	my $self = shift;
 
-    my $http_request = Net::Amazon::S3::Operation::Object::Fetch::Request->new(
+	my $http_request = Net::Amazon::S3::Operation::Object::Fetch::Request->new(
 		s3     => $self->client->s3,
 		bucket => $self->bucket->name,
 		key    => $self->key,
@@ -398,63 +399,63 @@ sub head {
 		method => 'HEAD',
 	);
 
-    my $http_response = $self->client->_send_request ($http_request)->http_response;
+	my $http_response = $self->client->_send_request ($http_request)->http_response;
 
-    confess 'Error head-object ' . $http_response->as_string
-        unless $http_response->is_success;
+	confess 'Error head-object ' . $http_response->as_string
+		unless $http_response->is_success;
 
-    my %metadata;
-    my $headers = $http_response->headers;
-    foreach my $name ($headers->header_field_names) {
-        if ($self->_is_metadata_header ($name)) {
-            my $metadata_name = $self->_format_metadata_name ($name);
-           $metadata{$metadata_name} = $http_response->header ($name);
-        }
-    }
+	my %metadata;
+	my $headers = $http_response->headers;
+	foreach my $name ($headers->header_field_names) {
+		if ($self->_is_metadata_header ($name)) {
+			my $metadata_name = $self->_format_metadata_name ($name);
+			$metadata{$metadata_name} = $http_response->header ($name);
+		}
+	}
 
-    return \%metadata;
+	return \%metadata;
 }
 
 sub _is_metadata_header {
-    my (undef, $header) = @_;
-    $header = lc($header);
+	my (undef, $header) = @_;
+	$header = lc($header);
 
-    my %valid_metadata_headers = map +($_ => 1), (
-        'accept-ranges',
-        'cache-control',
-        'etag',
-        'expires',
-        'last-modified',
-    );
+	my %valid_metadata_headers = map +($_ => 1), (
+		'accept-ranges',
+		'cache-control',
+		'etag',
+		'expires',
+		'last-modified',
+	);
 
-    return 1 if exists $valid_metadata_headers{$header};
-    return 1 if $header =~ m/^x-amz-(?!id-2$)/;
-    return 1 if $header =~ m/^content-/;
-    return 0;
+	return 1 if exists $valid_metadata_headers{$header};
+	return 1 if $header =~ m/^x-amz-(?!id-2$)/;
+	return 1 if $header =~ m/^content-/;
+	return 0;
 }
 
 sub _format_metadata_name {
-    my (undef, $header) = @_;
-    $header = lc($header);
-    $header =~ s/^x-amz-//;
+	my (undef, $header) = @_;
+	$header = lc($header);
+	$header =~ s/^x-amz-//;
 
-    my $metadata_name = join('', map (ucfirst, split(/-/, $header)));
-    $metadata_name = 'ETag' if ($metadata_name eq 'Etag');
+	my $metadata_name = join('', map (ucfirst, split(/-/, $header)));
+	$metadata_name = 'ETag' if ($metadata_name eq 'Etag');
 
-    return $metadata_name;
+	return $metadata_name;
 }
 
 sub available {
-    my $self = shift;
+	my $self = shift;
 
-    my %metadata = %{$self->head};
+	my %metadata = %{$self->head};
 
-    # An object is available if:
-    # - the storage class isn't GLACIER;
-    # - the storage class is GLACIER and the object was fully restored (Restore: ongoing-request="false");
-    my $glacier = (exists($metadata{StorageClass}) and $metadata{StorageClass} eq 'GLACIER') ? 1 : 0;
-    my $restored = (exists($metadata{Restore}) and $metadata{Restore} =~ m/ongoing-request="false"/) ? 1 : 0;
-    return (!$glacier or $restored) ? 1 :0;
+	# An object is available if:
+	# - the storage class isn't GLACIER;
+	# - the storage class is GLACIER and the object was fully restored (Restore: ongoing-request="false");
+	my $glacier = (exists($metadata{StorageClass}) and $metadata{StorageClass} eq 'GLACIER') ? 1 : 0;
+	my $restored = (exists($metadata{Restore}) and $metadata{Restore} =~ m/ongoing-request="false"/) ? 1 : 0;
+	return (!$glacier or $restored) ? 1 :0;
 }
 
 sub restore {
@@ -469,64 +470,64 @@ sub restore {
 		tier   => $conf{tier},
 	);
 
-    return $request->http_response;
+	return $request->http_response;
 }
 
 sub _content_sub {
-    my $self      = shift;
-    my $filename  = shift;
-    my $stat      = stat($filename);
-    my $remaining = $stat->size;
-    my $blksize   = $stat->blksize || 4096;
+	my $self      = shift;
+	my $filename  = shift;
+	my $stat      = stat($filename);
+	my $remaining = $stat->size;
+	my $blksize   = $stat->blksize || 4096;
 
-    confess "$filename not a readable file with fixed size"
-        unless -r $filename and ( -f _ || $remaining );
-    my $fh = IO::File->new( $filename, 'r' )
-        or confess "Could not open $filename: $!";
-    $fh->binmode;
+	confess "$filename not a readable file with fixed size"
+		unless -r $filename and ( -f _ || $remaining );
+	my $fh = IO::File->new( $filename, 'r' )
+		or confess "Could not open $filename: $!";
+	$fh->binmode;
 
-    return sub {
-        my $buffer;
+	return sub {
+		my $buffer;
 
-        # upon retries the file is closed and we must reopen it
-        unless ( $fh->opened ) {
-            $fh = IO::File->new( $filename, 'r' )
-                or confess "Could not open $filename: $!";
-            $fh->binmode;
-            $remaining = $stat->size;
-        }
+		# upon retries the file is closed and we must reopen it
+		unless ( $fh->opened ) {
+			$fh = IO::File->new( $filename, 'r' )
+				or confess "Could not open $filename: $!";
+			$fh->binmode;
+			$remaining = $stat->size;
+		}
 
-        # warn "read remaining $remaining";
-        unless ( my $read = $fh->read( $buffer, $blksize ) ) {
+		# warn "read remaining $remaining";
+		unless ( my $read = $fh->read( $buffer, $blksize ) ) {
 
 #                       warn "read $read buffer $buffer remaining $remaining";
-            confess
-                "Error while reading upload content $filename ($remaining remaining) $!"
-                if $! and $remaining;
+			confess
+				"Error while reading upload content $filename ($remaining remaining) $!"
+				if $! and $remaining;
 
-            # otherwise, we found EOF
-            $fh->close
-                or confess "close of upload content $filename failed: $!";
-            $buffer ||= ''
-                ;    # LWP expects an emptry string on finish, read returns 0
-        }
-        $remaining -= length($buffer);
-        return $buffer;
-    };
+			# otherwise, we found EOF
+			$fh->close
+				or confess "close of upload content $filename failed: $!";
+			$buffer ||= ''
+				;    # LWP expects an emptry string on finish, read returns 0
+		}
+		$remaining -= length($buffer);
+		return $buffer;
+	};
 }
 
 sub _is_multipart_etag {
-    my ( $self, $etag ) = @_;
-    return 1 if($etag =~ /\-\d+$/);
+	my ( $self, $etag ) = @_;
+	return 1 if($etag =~ /\-\d+$/);
 }
 
 sub _perform_operation {
-    my ($self, $operation, %params) = @_;
+	my ($self, $operation, %params) = @_;
 
-    $self->bucket->_perform_operation ($operation => (
-        key => $self->key,
-        %params,
-    ));
+	$self->bucket->_perform_operation ($operation => (
+		key => $self->key,
+		%params,
+	));
 }
 
 1;
@@ -543,7 +544,7 @@ Net::Amazon::S3::Client::Object - An easy-to-use Amazon S3 client object
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 
@@ -625,12 +626,19 @@ version 0.94
   my $object = $bucket->object( key => 'images/my_hat.jpg' );
   $object->get_filename('hat_backup.jpg');
 
-  # use query string authentication
+  # use query string authentication for object fetch
   my $object = $bucket->object(
     key          => 'images/my_hat.jpg',
     expires      => '2009-03-01',
   );
   my $uri = $object->query_string_authentication_uri();
+
+	# use query string authentication for object upload
+	my $object = $bucket->object(
+		key          => 'images/my_hat.jpg',
+		expires      => '2009-03-01',
+	);
+	my $uri = $object->query_string_authentication_uri_for_method('PUT');
 
 =head1 DESCRIPTION
 
@@ -779,6 +787,17 @@ C<user_metadata>.
   my $uri = $object->query_string_authentication_uri({
     'response-content-disposition' => 'attachment; filename=abc.doc',
   });
+
+=head2 query_string_authentication_uri_for_method
+
+	my $uri = $object->query_string_authentication_uri_for_method ('PUT');
+
+Similar to L</query_string_authentication_uri> but creates presigned uri
+for specified HTTP method (Signature V4 uses also HTTP method).
+
+Methods providee authenticated uri only for direct object operations.
+
+See L<https://docs.aws.amazon.com/AmazonS3/latest/dev/PresignedUrlUploadObject.html>
 
 =head2 size
 

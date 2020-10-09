@@ -1,6 +1,6 @@
 libcares/build/
 
-#!start included /home/syber/perl5/perlbrew/perls/5.30.3/lib/5.30.3/ExtUtils/MANIFEST.SKIP
+#!start included /home/syber/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -73,5 +73,5 @@ libcares/build/
 
 # Avoid AppVeyor file
 ^\.?appveyor.yml
-#!end included /home/syber/perl5/perlbrew/perls/5.30.3/lib/5.30.3/ExtUtils/MANIFEST.SKIP
+#!end included /home/syber/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/ExtUtils/MANIFEST.SKIP
 

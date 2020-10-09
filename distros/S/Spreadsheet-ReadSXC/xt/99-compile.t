@@ -19,6 +19,7 @@ sub check {
     return if (! m{(\.pm|\.pl) \z}xmsi);
 
     my ($stdout, $stderr, $exit) = capture(sub {
+        local $ENV{FORCE_FILTER_SIGNATURES} = 1;
         system( $^X, '-Mblib', '-c', $_ );
     });
 

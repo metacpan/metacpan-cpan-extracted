@@ -1,6 +1,6 @@
 package Net::Amazon::S3::ACL::Canned;
 # Abstract: Representation of canned ACL
-$Net::Amazon::S3::ACL::Canned::VERSION = '0.94';
+$Net::Amazon::S3::ACL::Canned::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Moose::Util::TypeConstraints;
@@ -60,7 +60,7 @@ Net::Amazon::S3::ACL::Canned
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

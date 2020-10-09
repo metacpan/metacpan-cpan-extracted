@@ -16,11 +16,11 @@ Net::Amazon::Signature::V4 - Implements the Amazon Web Services signature versio
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 
 =head1 SYNOPSIS
@@ -115,7 +115,8 @@ sub _canonical_request {
 
 	# Ensure Host header is present as its required
 	if (!$req->header('host')) {
-		$req->header('Host' => $req->uri->host);
+		my $host = $req->uri->_port ? $req->uri->host_port : $req->uri->host;
+		$req->header('Host' => $host);
 	}
 	my $creq_payload_hash = $req->header('x-amz-content-sha256');
 	if (!$creq_payload_hash) {

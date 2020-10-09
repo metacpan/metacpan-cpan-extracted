@@ -4,7 +4,7 @@ Geo::Coder::Abbreviations - Quick and Dirty Interface to https://github.com/mapb
 
 # VERSION
 
-Version 0.02
+Version 0.04
 
 # SYNOPSIS
 
@@ -17,6 +17,9 @@ One small function for now, I'll add others later.
 
 Creates a Geo::Coder::Abbreviations object.
 It takes no arguments.
+If you have [HTTP::Cache::Transparent](https://metacpan.org/pod/HTTP%3A%3ACache%3A%3ATransparent) installed, it will load much
+faster, otherwise it will download the database from the Internet
+when the class is first instatiated.
 
 ## abbreviate
 
@@ -26,19 +29,18 @@ Abbreviate a place.
 
     my $abbr = Geo::Coder::Abbreviations->new();
     print $abbr->abbreviate('Road'), "\n";      # prints 'RD'
+    print $abbr->abbreviate('RD'), "\n";        # prints 'RD'
 
 # SEE ALSO
 
 [https://github.com/mapbox/geocoder-abbreviations](https://github.com/mapbox/geocoder-abbreviations)
+[HTTP::Cache::Transparent](https://metacpan.org/pod/HTTP%3A%3ACache%3A%3ATransparent)
 
 # AUTHOR
 
 Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
-
-If you give an an already abbreviated text, it returns undef.
-It would be better to return the given text.
 
 # SUPPORT
 

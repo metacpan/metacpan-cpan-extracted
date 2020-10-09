@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,6 +25,7 @@ requires:
   POSIX: '0'
   Pod::Usage: '0'
   WWW::Mechanize: '0'
+  XML::FeedPP: '0'
   XML::Simple: '0'
   perl: '5.006'
   strict: '0'
@@ -33,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/petrkle/webservice-rajce/issues
   repository: git://github.com/petrkle/webservice-rajce.git
-version: '1.190840'
+version: '1.202830'
 x_serialization_backend: 'YAML::Tiny version 1.70'

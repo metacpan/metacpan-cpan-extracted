@@ -1,3 +1,6 @@
+0.2311    2020-10-03 04:04:15Z
+          - Fix new PERMS test so as to also pass on root (RT#133443)
+
 0.2310    2020-09-26 17:37:56Z
           - add AppVeyor CI
           - Add PERMS options to create temp file with given file permissions

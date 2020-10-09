@@ -1,12 +1,12 @@
 package Net::Amazon::S3::Role::Bucket;
 # ABSTRACT: Bucket role
-$Net::Amazon::S3::Role::Bucket::VERSION = '0.94';
+$Net::Amazon::S3::Role::Bucket::VERSION = '0.97';
 use Moose::Role;
 use Scalar::Util;
 use Safe::Isa ();
 
 around BUILDARGS => sub {
-    my ($orig, $class, %params) = @_;
+	my ($orig, $class, %params) = @_;
 
 	# bucket can be optional in HTTPRequest
 	if ($params{bucket}) {
@@ -30,13 +30,13 @@ around BUILDARGS => sub {
 		delete $params{region};
 	}
 
-    $class->$orig( %params );
+	$class->$orig( %params );
 };
 
 has bucket => (
-    is => 'ro',
-    isa => 'Net::Amazon::S3::Bucket',
-    required => 1,
+	is => 'ro',
+	isa => 'Net::Amazon::S3::Bucket',
+	required => 1,
 );
 
 1;
@@ -53,7 +53,7 @@ Net::Amazon::S3::Role::Bucket - Bucket role
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

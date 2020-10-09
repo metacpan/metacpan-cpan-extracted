@@ -20,12 +20,13 @@ use IO::Prompt qw/prompt/;
 use Path::Tiny;
 use File::Copy qw/copy/;
 
-our $VERSION = version->new('0.6.6');
+our $VERSION = version->new('0.6.7');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
     revision => '',
     diff     => 'vimdiff',
+    diff_option => [],
     verbose  => 0,
     man      => 0,
     help     => 0,
@@ -52,6 +53,7 @@ sub main {
         'three|3',
         'diff|d=s',
         'diff_option|diff-option|o=s@',
+        'readonly|n',
         'test|t!',
         'verbose|v+',
         'man',
@@ -68,6 +70,10 @@ sub main {
     }
     elsif ( $option{'help'} ) {
         pod2usage( -verbose => 1 );
+    }
+
+    if ( $option{readonly} && $option{diff} eq 'vimdiff' ) {
+        push @{$option{diff_option}}, '-R';
     }
 
     # sort out the revision names
@@ -123,7 +129,7 @@ sub replay {
     my $tmp = "$temp_dir/$$.$name." . path($file)->basename;
 
     my $warned   = 0;
-    my $versions = $vcs->log( $file );
+    my $versions = $vcs->log( ($rev_old ? ($rev_old) : ()), $file );
     if ( $option{verbose} > 2 ) {
         my $i = 0;
         my $j = -2;
@@ -355,7 +361,7 @@ vcsvimdiff - Uses vimdiff to compare a file with it unmodified version or histor
 
 =head1 VERSION
 
-This documentation refers to vcsvimdiff version 0.6.6.
+This documentation refers to vcsvimdiff version 0.6.7.
 
 =head1 SYNOPSIS
 

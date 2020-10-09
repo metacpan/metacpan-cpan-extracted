@@ -1,0 +1,145 @@
+NAME
+    Regexp::Pattern::Int - Regexp patterns related to integers
+
+VERSION
+    This document describes version 0.001 of Regexp::Pattern::Int (from Perl
+    distribution Regexp-Pattern-Int), released on 2020-05-27.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Int::int");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+PATTERNS
+    *   int
+
+        Integer number.
+
+        Examples:
+
+         "" =~ re("Int::int");  # DOESN'T MATCH
+
+         123 =~ re("Int::int");  # matches
+
+         "+123" =~ re("Int::int");  # matches
+
+         -123 =~ re("Int::int");  # matches
+
+         123.1 =~ re("Int::int");  # DOESN'T MATCH
+
+         "1e2" =~ re("Int::int");  # DOESN'T MATCH
+
+    *   negint
+
+        Negative integer number.
+
+        Examples:
+
+         "" =~ re("Int::negint");  # DOESN'T MATCH
+
+         0 =~ re("Int::negint");  # DOESN'T MATCH
+
+         "+0" =~ re("Int::negint");  # DOESN'T MATCH
+
+         "-0" =~ re("Int::negint");  # DOESN'T MATCH
+
+         123 =~ re("Int::negint");  # DOESN'T MATCH
+
+         "+123" =~ re("Int::negint");  # DOESN'T MATCH
+
+         -1 =~ re("Int::negint");  # matches
+
+         -123 =~ re("Int::negint");  # matches
+
+         -123.1 =~ re("Int::negint");  # DOESN'T MATCH
+
+         "-1e2" =~ re("Int::negint");  # DOESN'T MATCH
+
+    *   posint
+
+        Positive integer number.
+
+        Examples:
+
+         "" =~ re("Int::posint");  # DOESN'T MATCH
+
+         0 =~ re("Int::posint");  # DOESN'T MATCH
+
+         "+0" =~ re("Int::posint");  # DOESN'T MATCH
+
+         "-0" =~ re("Int::posint");  # DOESN'T MATCH
+
+         1 =~ re("Int::posint");  # matches
+
+         123 =~ re("Int::posint");  # matches
+
+         "+123" =~ re("Int::posint");  # matches
+
+         -1 =~ re("Int::posint");  # DOESN'T MATCH
+
+         -123 =~ re("Int::posint");  # DOESN'T MATCH
+
+         123.1 =~ re("Int::posint");  # DOESN'T MATCH
+
+         "1e2" =~ re("Int::posint");  # DOESN'T MATCH
+
+    *   uint
+
+        Non-negative integer number.
+
+        Examples:
+
+         "" =~ re("Int::uint");  # DOESN'T MATCH
+
+         0 =~ re("Int::uint");  # matches
+
+         "+0" =~ re("Int::uint");  # matches
+
+         "-0" =~ re("Int::uint");  # DOESN'T MATCH
+
+         123 =~ re("Int::uint");  # matches
+
+         "+123" =~ re("Int::uint");  # matches
+
+         -123 =~ re("Int::uint");  # DOESN'T MATCH
+
+         123.1 =~ re("Int::uint");  # DOESN'T MATCH
+
+         "1e2" =~ re("Int::uint");  # DOESN'T MATCH
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Int>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Int>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Int>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern::Float
+
+    Sah::Schema::uint, Sah::Schema::negint, Sah::Schema::negint,
+
+    Regexp::Pattern
+
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

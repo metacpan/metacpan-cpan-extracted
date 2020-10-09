@@ -1,11 +1,13 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 
 use Test::More;
 use version;
 
-our $cpan_ok = 0;
-eval {
+my $cpan_ok = 0;
+my $rc = eval {
     require HTTP::Tiny;
     my $rp = HTTP::Tiny->new->get('https://www.cpan.org/modules/by-authors/id/');
     $cpan_ok = 1 if $rp->{success};

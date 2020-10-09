@@ -1,7 +1,9 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN;
 
-our $DATE = '2020-08-14'; # DATE
-our $VERSION = '0.602'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-27'; # DATE
+our $DIST = 'Dist-Zilla-PluginBundle-Author-PERLANCAR'; # DIST
+our $VERSION = '0.603'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -13,7 +15,7 @@ sub configure {
 
     $self->add_bundle(Filter => {
         -bundle => '@Author::PERLANCAR',
-        -remove => [qw/Authority ConfirmRelease UploadToCPAN::WWWPAUSESimple/],
+        -remove => [qw/PERLANCAR::Authority ConfirmRelease UploadToCPAN::WWWPAUSESimple/],
     });
 }
 
@@ -34,7 +36,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN - Dist::Zilla like PERLANC
 
 =head1 VERSION
 
-This document describes version 0.602 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2020-08-14.
+This document describes version 0.603 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2020-09-27.
 
 =head1 SYNOPSIS
 
@@ -45,7 +47,7 @@ is equivalent to:
 
  [@Filter]
  bundle=@Author::PERLANCAR
- remove=Authority
+ remove=PERLANCAR::Authority
  remove=ConfirmRelease
  remove=UploadToCPAN
 

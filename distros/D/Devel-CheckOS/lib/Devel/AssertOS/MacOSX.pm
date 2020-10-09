@@ -5,11 +5,13 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 sub os_is { $^O =~ /^darwin$/i ? 1 : 0; }
 
 Devel::CheckOS::die_unsupported() unless(os_is());
+
+sub expn { "Either Mac OS X, or OS X, or MacOS, they're all the same thing really" }
 
 =head1 COPYRIGHT and LICENCE
 

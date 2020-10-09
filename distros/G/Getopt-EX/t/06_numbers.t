@@ -14,7 +14,7 @@ sub call {
 sub spec { call 'range', @_ }
 sub seq  { call 'sequence', @_ }
 
-$obj = new Getopt::EX::Numbers max => 10;
+$obj = Getopt::EX::Numbers->new(max => 10);
 spec '1' => [ [1,1] ];
 spec '1:2' => [ [1,2] ];
 spec ':10' => [ [0,10] ];
@@ -28,7 +28,7 @@ seq  '::' => [0..10];
 seq  '::2' => [0,2,4,6,8,10];
 seq  '1::2' => [1,3,5,7,9];
 
-$obj = new Getopt::EX::Numbers min => 1, max => 10;
+$obj = Getopt::EX::Numbers->new(min => 1, max => 10);
 spec '1'   => [ [1,1] ];
 spec '1:2' => [ [1,2] ];
 spec ':10' => [ [1,10] ];

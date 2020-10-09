@@ -1,0 +1,10 @@
+'digraph mainmap {
+URL = "gen.map.4.1.html"; 
+ graph [ rankdir="TB" ]
+ node [ shape="oval" ]
+ edge [ color="grey" ]
+ "source" [ URL="gen.map.4.2.html" ]
+ "destination"
+ "source" -> "destination" [ URL="gen.map.4.3.html" ]
+}
+'

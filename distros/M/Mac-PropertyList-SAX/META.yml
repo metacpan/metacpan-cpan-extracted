@@ -3,9 +3,14 @@ abstract: 'work with Mac plists at a low level, fast'
 author:
   - 'Darren M. Kulp, C<< <kulp @ cpan.org> >>'
 build_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 0
-generated_by: 'Module::Install version 0.680, CPAN::Meta::Converter version 2.133380'
+  ExtUtils::MakeMaker: 6.36
+  LWP: 0
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,14 +24,14 @@ requires:
   Encode: 0
   HTML::Entities: 0
   HTML::Entities::Numbered: 0.04
-  LWP: 0
   MIME::Base64: 0
-  Mac::PropertyList: 1.29
+  Mac::PropertyList: 1.501
   Object::MultiType: 0.02
-  Test::More: 0.42
   XML::SAX::Base: 0
   XML::SAX::Expat: 0.4
   XML::SAX::ParserFactory: 0
   constant: 1.06
   enum: 0
-version: 0.86
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.90'

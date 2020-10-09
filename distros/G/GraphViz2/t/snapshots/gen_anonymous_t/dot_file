@@ -1,0 +1,10 @@
+'digraph Perl {
+ graph [ rankdir="TB" ]
+ node [ shape="oval" ]
+ edge [ color="grey" ]
+ "" [ label="" ]
+ "Anonymous label 1" [ label="" ]
+ "Anonymous label 2" [ label="" ]
+ "" -> ""
+}
+'

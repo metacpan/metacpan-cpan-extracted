@@ -1,0 +1,18 @@
+"digraph Perl {
+ graph [ rankdir=\"TB\" ]
+ node [ shape=\"oval\" ]
+ edge [ color=\"grey\" ]
+ \"Zero\" [ label=\"The Orient Express\" ]
+ \"One\" [ label=\"Reichwaldstra\x{df}e\" ]
+ \"Two\" [ label=\"B\x{f6}hme\" ]
+ \"Three\" [ label=\"\x{28e} \x{28f} \x{290} \x{291} \x{292} \x{293} \x{299} \x{29a}\" ]
+ \"Four\" [ label=\"\x{3a0}\x{3b7}\x{3bb}\x{3b7}\x{3ca}\x{3ac}\x{3b4}\x{3b5}\x{3c9} \x{1f08}\x{3c7}\x{3b9}\x{3bb}\x{1fc6}\x{3bf}\x{3c2}\" ]
+ \"Five\" [ label=\"\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\x{394}\" ]
+ \"Zero\" -> \"One\"
+ \"Zero\" -> \"Three\"
+ \"One\" -> \"Two\"
+ \"Three\" -> \"Four\"
+ \"Two\" -> \"Five\" [ label=\"Label has a \x{2603}\" ]
+ \"Four\" -> \"Five\" [ label=\"Label has a \x{2714}\" ]
+}
+"

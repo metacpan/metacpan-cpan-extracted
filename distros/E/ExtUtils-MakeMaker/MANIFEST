@@ -50,6 +50,7 @@ lib/ExtUtils/MM_DOS.pm
 lib/ExtUtils/MM_MacOS.pm
 lib/ExtUtils/MM_NW5.pm
 lib/ExtUtils/MM_OS2.pm
+lib/ExtUtils/MM_OS390.pm
 lib/ExtUtils/MM_QNX.pm
 lib/ExtUtils/MM_Unix.pm
 lib/ExtUtils/MM_UWIN.pm
@@ -143,7 +144,6 @@ t/test_boilerplate.t
 t/testdata/reallylongdirectoryname/arch1/Config.pm
 t/testdata/reallylongdirectoryname/arch2/Config.pm
 t/testlib.t
-t/testrules.yml
 t/unicode.t
 t/VERSION_FROM.t
 t/vstrings.t

@@ -1,6 +1,5 @@
 use Test::More 0.98 tests => 5;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
-use lib 'lib';
 
 no utf8;    # Of course it defaults no, but declare it explicitly
 

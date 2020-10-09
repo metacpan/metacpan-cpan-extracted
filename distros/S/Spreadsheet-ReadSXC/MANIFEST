@@ -34,6 +34,7 @@ t/12-active-sheet-name.t
 t/13-merged-areas.t
 t/14-no-settings.t
 t/15-gh3-warnings-with-empty-sheet-name.t
+t/16-warnings-with-styles.t
 t/20200617_Testnummers_inclusief_omnummertabel_GBA-V.ods
 t/active-sheet-2.ods
 t/attr.ods
@@ -44,6 +45,7 @@ t/Dates.ods
 t/empty.ods
 t/formats.ods
 t/formula.ods
+t/GasLichtWater.ods
 t/hidden-cols.fods
 t/hidden-cols.ods
 t/hidden-rows.fods

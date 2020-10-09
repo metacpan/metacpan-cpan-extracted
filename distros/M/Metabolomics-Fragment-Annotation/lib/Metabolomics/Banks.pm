@@ -14,7 +14,7 @@ use Carp qw (cluck croak carp) ;
 
 require Exporter;
 
-our @ISA = qw(Exporter Metabolomics::Banks::BloodExposome Metabolomics::Banks::AbInitioFragments Metabolomics::Banks::MaConDa);
+our @ISA = qw(Exporter Metabolomics::Banks::Knapsack Metabolomics::Banks::BloodExposome Metabolomics::Banks::AbInitioFragments Metabolomics::Banks::MaConDa);
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -292,6 +292,7 @@ sub __refPeak__ {
     $self->{_ANNOTATION_ONLY_IN_} = undef ; # STRING as [undef|NEG|POS], undef is default
     $self->{_ANNOTATION_TYPE_} = undef ; # STRING as adducts, fragment or isotope
     $self->{_ANNOTATION_NAME_} = undef ; # STRING for metabolite common name
+    $self->{_ANNOTATION_FORMULA_} = undef ; # STRING for metabolite molecular formula
 
     return $self ;
 }
@@ -709,7 +710,26 @@ sub _setPeak_ANNOTATION_ID {
 }
 ### END of SUB
 
+=head2 METHOD _setPeak_ANNOTATION_FORMULA
 
+	## Description : _setPeak_ANNOTATION_FORMULA
+	## Input : $ANNOTATION_FORMULA
+	## Output : TRUE
+	## Usage : $self->_setPeak_ANNOTATION_FORMULA ( $ANNOTATION_ID ) ;
+	
+=cut
+## START of SUB
+sub _setPeak_ANNOTATION_FORMULA {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $ANNOTATION_FORMULA ) = @_;
+    
+    if ( (defined $ANNOTATION_FORMULA) and ($ANNOTATION_FORMULA ne '')  ) {	$self->{_ANNOTATION_FORMULA_} = $ANNOTATION_FORMULA ; }
+    else {	carp "[ERROR] the method _setANNOTATION_FORMULA can't set any undef or non numerical value\n" ; }
+    
+    return (0) ;
+}
+### END of SUB
 
 
 

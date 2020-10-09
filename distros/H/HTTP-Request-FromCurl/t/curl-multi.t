@@ -8,19 +8,29 @@ use lib 't';
 use TestCurlIdentity 'run_curl_tests', '$server';
 
 my @tests = (
-    { cmd => [ '--verbose', '-s', '$url', '$url?foo=bar', ] },
-    { cmd => [ '--verbose', '-s', '$url', '--junk-session-cookies', '$url?foo=bar', ] },
-    { cmd => [ '--verbose', '-s', '$url', '--next', '$url?foo=bar', ] },
-    { cmd => [ '--verbose', '-s', '$url', '-:', '$url?foo=bar', ] },
-    { cmd => [ '--verbose', '-s', '$url?foo={bar,baz}', ] },
-    { cmd => [ '--verbose', '-s', '-g', '$url', '$url?foo={bar,baz}', ] },
-    { cmd => [ '--verbose', '-s', '--globoff', '$url', '$url?foo={bar,baz}', ] },
+    { cmd => [ '--verbose', '-s', '$url', '$url?foo=bar', ],
+      ignore_headers => 'Cookie', # Curl handling of these is inconsistent
+    },
+    { cmd => [ '--verbose', '-s', '$url', '--junk-session-cookies', '$url?foo=bar', ],
+      ignore_headers => 'Cookie', # Curl handling of these is inconsistent
+    },
+    { cmd => [ '--verbose', '-s', '$url', '--next', '$url?foo=bar', ],
+      version => 7036000,
+      ignore_headers => 'Cookie', # Curl handling of these is inconsistent
+    },
+    { cmd => [ '--verbose', '-s', '$url', '-:', '$url?foo=bar', ],
+      version => 7036000,
+      ignore_headers => 'Cookie', # Curl handling of these is inconsistent
+    },
+    { cmd => [ '--verbose', '-s', '$url?foo={bar,baz}', ],
+      ignore_headers => 'Cookie', # Curl handling of these is inconsistent
+    },
+    { cmd => [ '--verbose', '-s', '-g', '$url', '$url?foo={bar,baz}', ],
+      ignore_headers => 'Cookie', # Curl handling of these is inconsistent
+    },
+    { cmd => [ '--verbose', '-s', '--globoff', '$url', '$url?foo={bar,baz}', ],
+      ignore_headers => 'Cookie', # Curl handling of these is inconsistent
+    },
 );
 
-#if( $server->url =~ m!\[! ) {
-#    my $port = $server->port;
-#    $server->server_url->host('localhost');
-#    my $url = $server->url;
-#    note "Fudged server URL to '$url', hopefully they resolve both to the same process";
-#};
 run_curl_tests( @tests, 14*@tests );

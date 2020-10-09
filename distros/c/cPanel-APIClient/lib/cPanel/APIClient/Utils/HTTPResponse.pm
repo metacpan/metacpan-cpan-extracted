@@ -7,6 +7,9 @@ package cPanel::APIClient::Utils::HTTPResponse;
 # This is free software; you can redistribute it and/or modify it under the
 # same terms as Perl itself. See L<perlartistic>.
 
+use strict;
+use warnings;
+
 # Right now these are the only pieces of HTTP::Response that we need.
 # HTTP::Response is fairly large, so since we only need a small part of it,
 # we implement those parts ourselves.

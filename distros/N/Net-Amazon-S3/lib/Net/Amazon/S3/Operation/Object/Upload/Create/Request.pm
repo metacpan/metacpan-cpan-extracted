@@ -1,12 +1,12 @@
 package Net::Amazon::S3::Operation::Object::Upload::Create::Request;
 #ABSTRACT: An internal class to begin a multipart upload
-$Net::Amazon::S3::Operation::Object::Upload::Create::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Upload::Create::Request::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request::Object';
 
 has 'headers' =>
-    ( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
+	( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
 
 with 'Net::Amazon::S3::Request::Role::Query::Action::Uploads';
 with 'Net::Amazon::S3::Request::Role::HTTP::Header::ACL';
@@ -16,9 +16,9 @@ with 'Net::Amazon::S3::Request::Role::HTTP::Method::POST';
 __PACKAGE__->meta->make_immutable;
 
 sub _request_headers {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    return %{ $self->headers };
+	return %{ $self->headers };
 }
 
 1;
@@ -35,7 +35,7 @@ Net::Amazon::S3::Operation::Object::Upload::Create::Request - An internal class 
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

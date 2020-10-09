@@ -1,9 +1,9 @@
 package Sah::SchemaR::net::ipv4;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2020-05-27'; # DATE
+our $VERSION = '0.009'; # VERSION
 
-our $rschema = ["obj",[{isa=>"NetAddr::IP",summary=>"IPv4 address","x.perl.coerce_rules"=>["From_str::net_ipv4"]}],["obj"]];
+our $rschema = ["obj",[{examples=>[{valid=>0,value=>""},{valid=>0,value=>"12.345.67.89"}],isa=>"NetAddr::IP",summary=>"IPv4 address","x.perl.coerce_rules"=>["From_str::net_ipv4"]}],["obj"]];
 
 1;
 # ABSTRACT: IPv4 address
@@ -20,7 +20,7 @@ Sah::SchemaR::net::ipv4 - IPv4 address
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::SchemaR::net::ipv4 (from Perl distribution Sah-Schemas-Net), released on 2019-11-29.
+This document describes version 0.009 of Sah::SchemaR::net::ipv4 (from Perl distribution Sah-Schemas-Net), released on 2020-05-27.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

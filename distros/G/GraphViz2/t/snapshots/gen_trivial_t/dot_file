@@ -1,0 +1,16 @@
+'digraph Perl {
+ graph [ rankdir="TB" ]
+ node [ shape="oval" ]
+ edge [ color="grey" ]
+ node [ shape="circle" style="filled" ]
+ edge [ arrowsize="4" color="grey" ]
+ "Carnegie" [ shape="circle" ]
+ "Carnegie" [ color="red" shape="circle" ]
+ node [ shape="circle" style="rounded" ]
+ "Murrumbeena" [ color="green" shape="doublecircle" ]
+ "Oakleigh" [ color="blue" shape="oval" ]
+ "Murrumbeena" -> "Carnegie" [ arrowsize="2" ]
+ edge [ arrowsize="4" color="grey" ]
+ "Murrumbeena" -> "Oakleigh" [ color="brown" ]
+}
+'

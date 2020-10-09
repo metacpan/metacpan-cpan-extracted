@@ -11,6 +11,9 @@ use constant MARKDOWN => eval 'require Text::Markdown;1';
 sub register {
   my ($self, $app, $config) = @_;
 
+  $app->defaults(openapi_spec_renderer_logo        => '/mojolicious/plugin/openapi/logo.png');
+  $app->defaults(openapi_spec_renderer_theme_color => '#508a25');
+
   $self->{standalone} = $config->{openapi} ? 0 : 1;
   $app->helper('openapi.render_spec' => sub { $self->_render_spec(@_) });
 
@@ -151,9 +154,10 @@ sub _render_spec {
   if ($format eq 'html') {
     for my $path (keys %{$spec{paths}}) {
       next if $path =~ $x_re;
-      for my $method (keys %{$spec{paths}{$path}}) {
+      my $path_spec = $openapi ? $openapi->validator->get([paths => $path]) : $spec{paths}{$path};
+      for my $method (keys %$path_spec) {
         next if $method =~ $x_re;
-        my $op_spec = $spec{paths}{$path}{$method};
+        my $op_spec = $path_spec->{$method};
         next unless ref $op_spec eq 'HASH';
         push @operations,
           {
@@ -329,11 +333,10 @@ Variables available in the templates:
   %= $slugify->(@str)
   %= $spec->{info}{title}
 
-In addition, there is a static image that you can override:
-
-  mojolicious/plugin/openapi/logo.png
-
-This image makes up the logo inside the default "header.html.ep" template.
+In addition, there is a logo in "header.html.ep" that can be overriden by
+either changing the static file "mojolicious/plugin/openapi/logo.png" or set
+"openapi_spec_renderer_logo" in L<stash|Mojolicious::Controller/stash> to a
+custom URL.
 
 =head1 SEE ALSO
 
@@ -350,7 +353,7 @@ __DATA__
 
 <nav class="openapi-nav">
   <a href="#top" class="openapi-logo">
-    %= image '/mojolicious/plugin/openapi/logo.png', alt => 'OpenAPI Logo'
+    %= image stash('openapi_spec_renderer_logo'), alt => 'OpenAPI Logo'
   </a>
   %= include 'mojolicious/plugin/openapi/toc'
 </nav>
@@ -618,6 +621,51 @@ new SpecRenderer().setup();
 <script>
 var SpecRenderer = function() {};
 
+function findVisibleElements(containerEl) {
+  var els = [].slice.call(containerEl.childNodes, 0);
+  var haystack = [];
+
+  // Filter out comments, text nodes, ...
+  var i = 0;
+  while (i < els.length) {
+    if (els[i].nodeType == Node.ELEMENT_NODE) {
+      haystack.push([i, els[i]]);
+      i++;
+    }
+    else {
+      els.splice(i, 1);
+    }
+  }
+
+  // No child nodes
+  if (!els.length) return [];
+
+  // Find fist visible element
+  var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  while (haystack.length > 1) {
+    var i = Math.floor(haystack.length / 2);
+    if (haystack[i][1].offsetTop <= scrollTop) {
+      haystack.splice(0, i);
+    }
+    else {
+      haystack.splice(i);
+    }
+  }
+
+  if (!haystack.length) haystack.push([0, els[0]]);
+
+  // Figure out the first and last visible element
+  var offsetHeight = window.innerHeight;
+  var firstIdx = haystack[0][0];
+  var lastIdx = firstIdx;
+  while (lastIdx < els.length) {
+    if (els[lastIdx].offsetTop > scrollTop + offsetHeight) break;
+    lastIdx++;
+  }
+
+  return els.slice(firstIdx, lastIdx);
+}
+
 SpecRenderer.prototype.jsonhtmlify
   = function(e){let n=document.createElement('div');const t=[[e,n]],s=[];for(;t.length;){const[e,l]=t.shift();let a,c,o=typeof e;if(null===e||'undefined'==o?o='null':Array.isArray(e)&&(o='array'),'array'==o)(c=(e=>e)).len=e.length,(a=document.createElement('div')).className='json-array '+(c.len?'has-items':'is-empty');else if('object'==o){const n=Object.keys(e).sort();(c=(e=>n[e])).len=n.length,(a=document.createElement('div')).className='json-object '+(c.len?'has-items':'is-empty')}else(a=document.createElement('span')).className='json-'+o,a.textContent='null'==o?'null':'boolean'!=o?e:e?'true':'false';if(c){const i=document.createElement('span');if(i.className='json-type',i.textContent=c.len?o+'['+c.len+']':'{}',l.appendChild(i),-1!=s.indexOf(e))n.classList.add('has-recursive-items'),a.classList.add('is-seen');else{for(let n=0;n<c.len;n++){const s=c(n),l=document.createElement('div'),o=document.createElement('span');o.className='json-key',o.textContent=s,l.appendChild(o),a.appendChild(l),t.push([e[s],l])}s.push(e)}}l.className='json-item '+a.className.replace(/^json-/,'contains-'),l.appendChild(a)}return n}
 
@@ -638,24 +686,49 @@ SpecRenderer.prototype.renderNav = function() {
   }
 };
 
-SpecRenderer.prototype.renderPre = function() {
-  var els = document.querySelectorAll('pre');
-  for (var i = 0; i < els.length; i++) {
-    var jsonEl = this.jsonhtmlify(JSON.parse(els[i].innerText));
+SpecRenderer.prototype.renderPreTags = function() {
+  var ki, pi;
+  for (pi = 0; pi < this.visiblePreTags.length; pi++) {
+    var preEl = this.visiblePreTags[pi];
+    var jsonEl = this.jsonhtmlify(JSON.parse(preEl.innerText));
     jsonEl.classList.add('json-container');
-    els[i].parentNode.replaceChild(jsonEl, els[i]);
-  }
+    preEl.parentNode.replaceChild(jsonEl, preEl);
 
-  els = document.querySelectorAll('.json-key');
-  for (var i = 0; i < els.length; i++) {
-    if (els[i].textContent != '$ref') continue;
-    var refEl = els[i].nextElementSibling;
-    refEl.parentNode.replaceChild(this._createRefLink(refEl), refEl);
+    var keyEls = jsonEl.querySelectorAll('.json-key');
+    for (ki = 0; ki < keyEls.length; ki++) {
+      if (keyEls[ki].textContent != '$ref') continue;
+      var refEl = keyEls[ki].nextElementSibling;
+      refEl.parentNode.replaceChild(this.renderRefLink(refEl), refEl);
+    }
   }
 };
 
-SpecRenderer.prototype.renderUpButton = function(e) {
+SpecRenderer.prototype.renderRefLink = function(refEl) {
+  var a = document.createElement('a');
+  var href = refEl.textContent.replace(/'/g, '');
+  a.textContent = refEl.textContent;
+  a.href = href.match(/^#/) ? '#ref-' + href.replace(/\W/g, '-').substring(2).toLowerCase() : href;
+  return a;
+};
+
+SpecRenderer.prototype.renderUpButton = function() {
   this.upButton.classList[this.scrollTop > 150 ? 'add' : 'remove']('is-visible');
+};
+
+SpecRenderer.prototype.render = function() {
+  this.scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+
+  var visiblePreTags = [];
+  findVisibleElements(document.querySelector('.openapi-spec')).forEach(function(el) {
+    findVisibleElements(el).forEach(function(el) {
+      if (el.tagName.toLowerCase() == 'pre') visiblePreTags.push(el);
+    });
+  });
+
+  this.visiblePreTags = visiblePreTags;
+  this.renderNav();
+  this.renderPreTags();
+  this.renderUpButton();
 };
 
 SpecRenderer.prototype.scrollSpy = function(e) {
@@ -666,10 +739,7 @@ SpecRenderer.prototype.scrollSpy = function(e) {
 
   this.wh = window.innerHeight;
   this.headingOffsetTop = parseInt(this.wh / 2.3, 10);
-  this.scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-
-  this.renderNav();
-  this.renderUpButton();
+  this.render();
 }
 
 SpecRenderer.prototype.setup = function() {
@@ -678,20 +748,10 @@ SpecRenderer.prototype.setup = function() {
   this.headings = document.querySelectorAll('h3[id]');
   this.upButton = document.querySelector('.openapi-up-button');
   this.scrollSpy = this.scrollSpy.bind(this);
-
-  this.renderPre();
-  this.renderNav();
+  this.render();
 
   var self = this;
   ['click', 'resize', 'scroll'].forEach(function(name) { window.addEventListener(name, self.scrollSpy) });
-};
-
-SpecRenderer.prototype._createRefLink = function(refEl) {
-  var a = document.createElement('a');
-  var href = refEl.textContent.replace(/'/g, '');
-  a.textContent = refEl.textContent;
-  a.href = href.match(/^#/) ? '#ref-' + href.replace(/\W/g, '-').substring(2).toLowerCase() : href;
-  return a;
 };
 </script>
 @@ mojolicious/plugin/openapi/style.html.ep
@@ -709,7 +769,7 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
   body {
     padding: 1rem;
   }
-  a { color: #508a25; text-decoration: underline; word-break: break-word; }
+  a { color: <%= $openapi_spec_renderer_theme_color %>; text-decoration: underline; word-break: break-word; }
   a:hover { text-decoration: none; }
   h1, h2, h3, h4 { font-family: Verdana; color: #403f41; font-weight: bold; line-height: 1.2em; margin: 1em 0; padding-top: 0.4rem; }
   h1 a, h2 a, h3 a, h4 a { text-decoration: none; color: inherit; }
@@ -756,7 +816,7 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
     font-size: 0.9rem;
     line-height: 1.4em;
     letter-spacing: -0.02em;
-    border-left: 4px solid #6cab3e;
+    border-left: 4px solid <%= $openapi_spec_renderer_theme_color %>;
     padding: 0.5em;
     margin: 1rem 0rem;
     overflow: auto;
@@ -787,9 +847,10 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
     padding-left: 0.4rem;
   }
 
-  .json-array > .json-item > .json-key { display: none; }
+  .json-array > .json-item > .json-key,
+  .json-array > .json-item > .json-key + .json-type { display: none; }
   .json-array > .json-item > .json-string:before { content: '- '; color: #222; font-weight: bold; }
-  .json-boolean, .json-number, .json-string { color: #356710; font-weight: 500; }
+  .json-boolean, .json-number, .json-string { color: <%= $openapi_spec_renderer_theme_color %>; font-weight: 500; }
   .json-key:after { content: ': '; color: #222; }
   .json-null { color: #222; }
   .json-type { color: #c5a138; display: none; }
@@ -800,7 +861,7 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
 
   @media only screen {
     .openapi-up-button {
-      background: #436d24;
+      background: <%= $openapi_spec_renderer_theme_color %>;
       color: #f2f3ed;
       font-weight: bold;
       font-size: 1.2rem;
@@ -864,6 +925,11 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
       margin-bottom: 1rem;
     }
 
+    .openapi-logo img {
+      max-height: 100px;
+      max-width 100%;
+    }
+
     .openapi-nav ol {
       list-style: none;
       padding: 0;
@@ -877,7 +943,7 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
     }
 
     .openapi-nav li a:hover {
-      background: #dbe4cd;
+      background: #e5e8df;
       text-decoration: none;
     }
 
@@ -889,7 +955,7 @@ SpecRenderer.prototype._createRefLink = function(refEl) {
     }
 
     .openapi-nav li.is-active a {
-      background: #e3e8d4;
+      background: #e3e6de;
     }
 
     .openapi-nav .method {

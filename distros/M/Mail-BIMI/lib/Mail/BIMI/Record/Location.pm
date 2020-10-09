@@ -1,6 +1,6 @@
 package Mail::BIMI::Record::Location;
 # ABSTRACT: Class to model a BIMI location
-our $VERSION = '2.20200930.1'; # VERSION
+our $VERSION = '2.20201006.1'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -73,7 +73,7 @@ Mail::BIMI::Record::Location - Class to model a BIMI location
 
 =head1 VERSION
 
-version 2.20200930.1
+version 2.20201006.1
 
 =head1 DESCRIPTION
 

@@ -1,11 +1,18 @@
-0.06    2017-07-11 (PERLANCAR)
+0.070   2020-09-30  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [ux] Show file path in error message.
+
+
+0.06    2017-07-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [test] Replace File::Slurp::Tiny with File::Slurper.
 
 
-0.05    2015-09-03 (PERLANCAR)
+0.05    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -14,7 +21,7 @@
 	  requirement.
 
 
-0.04    2014-12-24 (PERLANCAR)
+0.04    2014-12-24  Released-By: PERLANCAR
 
         - Add support for 'mc' editor. Its temporary symlink is the same as
           'joe' so when we cannot determine further, the result's 'editor' key
@@ -26,18 +33,18 @@
           Proc::Find module is available).
 
 
-0.03    2014-12-14 (PERLANCAR)
+0.03    2014-12-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Typo in example.
 
 
-0.02    2014-10-09 (PERLANCAR)
+0.02    2014-10-09  Released-By: PERLANCAR
 
         - Add support for vim & joe.
 
 
-0.01    2014-10-09 (PERLANCAR)
+0.01    2014-10-09  Released-By: PERLANCAR
 
         - First release, only has support for Emacs.

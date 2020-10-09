@@ -22,10 +22,12 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Text::ANSITable",
   "PREREQ_PM" => {
+    "BorderStyles::Standard" => 0,
     "Carp" => "1.12",
     "Color::RGB::Util" => "0.600",
     "ColorThemeBase::Static::FromStructColors" => "0.006",
     "ColorThemeUtil::ANSI" => 0,
+    "ColorThemes::Standard" => 0,
     "Function::Fallback::CoreOrPP" => 0,
     "JSON::MaybeXS" => 0,
     "Log::ger" => "0.037",
@@ -53,7 +55,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.600",
+  "VERSION" => "0.601",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,10 +63,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "BorderStyles::Standard" => 0,
   "Carp" => "1.12",
   "Color::RGB::Util" => "0.600",
   "ColorThemeBase::Static::FromStructColors" => "0.006",
   "ColorThemeUtil::ANSI" => 0,
+  "ColorThemes::Standard" => 0,
   "File::Spec" => 0,
   "Function::Fallback::CoreOrPP" => 0,
   "IO::Handle" => 0,

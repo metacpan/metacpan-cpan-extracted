@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Info-FromURL
   homepage: https://metacpan.org/release/CPAN-Info-FromURL
   repository: git://github.com/perlancar/perl-CPAN-Info-FromURL.git
-version: '0.091'
+version: '0.092'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

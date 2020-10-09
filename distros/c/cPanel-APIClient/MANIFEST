@@ -44,6 +44,7 @@ lib/cPanel/APIClient/X/Base.pm
 lib/cPanel/APIClient/X/CommandFailed.pm
 lib/cPanel/APIClient/X/HTTP.pm
 lib/cPanel/APIClient/X/SubTransport.pm
+t/cPanel-APIClient-Request-WHM1.t
 t/http_sync.t
 t/http_sync_tls_verify_by_default.t
 t/lib/MockCpsrvd.pm

@@ -15,6 +15,7 @@ if($@) {
    plan tests => 1;
    # by-pass Authen::Captcha methods
    pod_coverage_ok('GD::SecurityImage::AC', { trustme => [qw/
+      lock_timeout
       check_code
       create_image_file
       database_data

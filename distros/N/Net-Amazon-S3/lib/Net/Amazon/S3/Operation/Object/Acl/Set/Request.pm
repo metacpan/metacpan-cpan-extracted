@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Acl::Set::Request;
 # ABSTRACT: An internal class to set an object's access control
-$Net::Amazon::S3::Operation::Object::Acl::Set::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Acl::Set::Request::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -15,21 +15,21 @@ with 'Net::Amazon::S3::Request::Role::HTTP::Method::PUT';
 __PACKAGE__->meta->make_immutable;
 
 sub _request_content {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    return $self->acl_xml || '';
+	return $self->acl_xml || '';
 }
 
 sub BUILD {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    unless ( $self->acl_xml || $self->acl ) {
-        confess "need either acl_xml or acl";
-    }
+	unless ( $self->acl_xml || $self->acl ) {
+		confess "need either acl_xml or acl";
+	}
 
-    if ( $self->acl_xml && $self->acl ) {
-        confess "can not provide both acl_xml and acl";
-    }
+	if ( $self->acl_xml && $self->acl ) {
+		confess "can not provide both acl_xml and acl";
+	}
 }
 
 1;
@@ -46,7 +46,7 @@ Net::Amazon::S3::Operation::Object::Acl::Set::Request - An internal class to set
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

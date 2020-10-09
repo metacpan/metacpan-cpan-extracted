@@ -39,6 +39,10 @@ local $Getopt::EX::Colormap::LINEAR256 = 1;
 
 is(ansi_code("R"), "\e[31m", "color name");
 is(ansi_code("W/R"), "\e[37;41m", "background");
+{
+    local $Getopt::EX::Colormap::SPLIT_ANSI = 1;
+    is(ansi_code("W/R"), "\e[37m\e[41m", "background (SPLIT_ANSI)");
+}
 is(ansi_code("RDPIUFQSVX"), "\e[31;1;2;3;4;5;6;7;8;9m", "effect");
 
 is(ansi_code("ABCDEF"), "\e[38;5;152m", "hex24");

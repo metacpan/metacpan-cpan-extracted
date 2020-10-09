@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Carp-Assert-More",
    "no_index" : {
@@ -52,6 +52,6 @@
          "url" : "https://github.com/petdance/carp-assert-more/tree/master"
       }
    },
-   "version" : "1.20",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.24",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

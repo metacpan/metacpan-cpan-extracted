@@ -26,35 +26,24 @@ use warnings;
 use vars qw($VERSION);
 
 
-our $VERSION = '0.3';
-# Облигации T+1 (ОФЗ)
-our $BONDS_URL_T1 = "https://iss.moex.com/iss/engines/stock/markets/bonds/boardgroups/58/securities.csv";
-# Облигации T0 (Всё остальное)
-our $BONDS_URL_T0 = "https://iss.moex.com/iss/engines/stock/markets/bonds/boardgroups/7/securities.csv";
-# Акции 
-our $STOCK_URL = "https://iss.moex.com/iss/engines/stock/markets/shares/boardgroups/57/securities.csv";
-# Rbc.ru
-our $MICEX_URL = "http://export.rbc.ru/free/micex.0/free.fcgi?period=DAILY&tickers=NULL&lastdays=5&separator=;&data_format=EXCEL&header=0";
+our $VERSION = '0.4';
+
+our %bond_group_urls = (tplus => "58", # Т+: Основной режим - безадрес.
+                    tplus_usd => "193", # 	Т+: Основной режим (USD) - безадрес. 	0 	1
+                    settle => "105", #	Поставка по СК 	0 	1
+                    distribution => "123", #Размещение - безадрес. 	0 	1
+                    darkpools => "77", # Крупные пакеты - безадрес. 	0 	1
+                    tplus_eur => "207", # Т+: Облигации (EUR) - безадрес. 	0 	1
+                    darkpools_usd => "167", # Крупные пакеты – Облигации (USD) - безадрес. 	0 	1
+                    tplus_d => "211", #Т+: Облигации Д - безадрес. 	0 	1
+                    tplus_d_usd => "213", #Т+: Облигации Д (USD) - безадрес. 	0 	1
+                    tplus_pir => "227", # Т+ Облигации ПИР - безадрес. 	0 	1
+                    tplus_pir_usd => "233", # Т+: Облигации ПИР (USD) - безадрес. 	0 	1
+                    auct_pact => "257" # Аукцион: адресные заявки 	0 	1
+                    );
 
 use LWP::UserAgent;
 use HTTP::Request::Common;
-
-# Возможные методы
-
-# moex_bond_ofz
-# Облигации T+1 (ОФЗ). Цена не включает НКД
-
-# moex_bond_ofz_nkd
-# Облигации T+1 (ОФЗ). Цена включает НКД
-
-# moex_bond
-# Облигации T0 (Всё остальное). Цена не включает НКД
-
-# moex_bond_nkd
-# Облигации T0 (Всё остальное). Цена включает НКД
-
-# moex_stock
-# Акции
 
 sub methods { return ( micex => \&micex ); }
 
@@ -64,52 +53,109 @@ sub methods { return ( micex => \&micex ); }
 	sub labels { return ( micex => \@labels ); }
 }
 
-sub methods { return (moex_bond => \&moex_bond,
-                      moex_bond_ofz => \&moex_bond_ofz,
-					  moex_stock => \&moex_stock,
-					  moex_bond_nkd => \&moex_bond_nkd,
-                      moex_bond_ofz_nkd => \&moex_bond_ofz_nkd,
-                      micex => \&micex) 
+sub methods { return (moex_stock => \&moex_stock,
+                                            
+                      moex_bond_tplus => \&moex_bond_tplus,
+                      moex_bond_tplus_nkd => \&moex_bond_tplus_nkd,
+                      
+                      moex_bond_ofz => \&moex_bond_tplus, # deprecated
+                      moex_bond_ofz_nkd => \&moex_bond_tplus_nkd, # deprecated
+                      
+                      moex_bond_tplus_usd => \&moex_bond_tplus_usd,
+                      moex_bond_tplus_usd_nkd => \&moex_bond_tplus_usd_nkd,
+                      
+                      moex_bond_tplus_eur => \&moex_bond_tplus_eur,
+                      moex_bond_tplus_eur_nkd => \&moex_bond_tplus_eur_nkd,
+                      
+                      moex_bond_tplus_pir => \&moex_bond_tplus_pir,
+                      moex_bond_tplus_pir_nkd => \&moex_bond_tplus_pir_nkd,
+                      
+                      moex_bond_tplus_pir_usd => \&moex_bond_tplus_pir_usd,
+                      moex_bond_tplus_pir_usd_nkd => \&moex_bond_tplus_pir_usd_nkd
+                      ),
 					  }
 
 {
   my @labels_moex = qw/name price date isodate currency/;
   my @labels_micex = qw/name last open low high close waprice date isodate currency/;
 	
-  sub labels { return (moex_bond => \@labels_moex,
-                       moex_bond_ofz => \@labels_moex,
+  sub labels { return (moex_bond_ofz => \@labels_moex,
 					   moex_stock => \@labels_moex,
-					   moex_bond_nkd => \@labels_moex,
-                       moex_bond_ofz_nkd => \@labels_moex,
-                       micex => \@labels_micex) }
+					   moex_bond_ofz_nkd => \@labels_moex,
+					   
+					   moex_bond_tplus => \@labels_moex,
+					   moex_bond_tplus_nkd => \@labels_moex,
+					   
+					   moex_bond_tplus_usd => \@labels_moex,
+					   moex_bond_tplus_usd_nkd => \@labels_moex,
+					   
+					   moex_bond_tplus_eur => \@labels_moex,
+					   moex_bond_tplus_eur_nkd => \@labels_moex,
+					   
+					   moex_bond_tplus_pir => \@labels_moex,
+					   moex_bond_tplus_pir_nkd => \@labels_moex,
+					   
+					   moex_bond_tplus_pir_usd => \@labels_moex,
+					   moex_bond_tplus_pir_usd_nkd => \@labels_moex,
+					   
+                       #micex => \@labels_micex
+                       ) }
 }
 # get qutes from moex.com	
-sub moex_bond_ofz
-	{
-	&moex($BONDS_URL_T1, "1", @_);
-	}
 
-sub moex_bond
-	{
-	&moex($BONDS_URL_T0, "1", @_);
-	}
-sub moex_bond_ofz_nkd
-	{
-	&moex($BONDS_URL_T1, "2", @_);
-	}
-
-sub moex_bond_nkd
-	{
-	&moex($BONDS_URL_T0, "2", @_);
-	}
-		
 sub moex_stock
 	{
-	&moex($STOCK_URL, "", @_);
+	&moex("57", "", @_);
 	}
 
+# tplus
+sub moex_bond_tplus
+	{
+	&moex($bond_group_urls{"tplus"}, "1", @_);
+	}
+sub moex_bond_tplus_nkd
+	{
+	&moex($bond_group_urls{"tplus"}, "2", @_);
+	}	
+# tplus_usd
+sub moex_bond_tplus_usd
+	{
+	&moex($bond_group_urls{"tplus_usd"}, "1", @_);
+	}
+sub moex_bond_tplus_usd_nkd
+	{
+	&moex($bond_group_urls{"tplus_usd"}, "2", @_);
+	}
+# tplus_eur
+sub moex_bond_tplus_eur
+	{
+	&moex($bond_group_urls{"tplus_eur"}, "1", @_);
+	}
+sub moex_bond_tplus_eur_nkd
+	{
+	&moex($bond_group_urls{"tplus_eur"}, "2", @_);
+	}
+# tplus_pir
+sub moex_bond_tplus_pir
+	{
+	&moex($bond_group_urls{"tplus_pir"}, "1", @_);
+	}
+sub moex_bond_tplus_pir_nkd
+	{
+	&moex($bond_group_urls{"tplus_pir"}, "2", @_);
+	}
+# tplus_pir_usd
+sub moex_bond_tplus_pir_usd
+	{
+	&moex($bond_group_urls{"tplus_pir_usd"}, "1", @_);
+	}
+sub moex_bond_tplus_pir_usd_nkd
+	{
+	&moex($bond_group_urls{"tplus_pir_usd"}, "2", @_);
+	}	
+	
 sub moex {
-	my $url = shift;
+	my $url_group = shift;
 	my $is_bond = shift;
 	my $quoter = shift;
 	my @stocks = @_;
@@ -124,6 +170,7 @@ sub moex {
 	my $price_field;
 	my $nkd_field;
 	my $currency;
+	my $url;
 	
 	foreach my $stock (@stocks) # Обнуляем признаки обработки тикеров
 	  {
@@ -134,10 +181,15 @@ sub moex {
 		{
 		$price_field = "PREVWAPRICE"; # Колонка с ценой для облигаций (средневзвешенная цена)
 		$nkd_field = "ACCRUEDINT"; # Колнока с НКД для облигаций
+		
+		# Get url
+		$url = "https://iss.moex.com/iss/engines/stock/markets/bonds/boardgroups/$url_group/securities.csv";
 		}
 	else
 		{
 		$price_field = "PREVLEGALCLOSEPRICE"; # Колонка с ценой для акций (цена закрытия)
+		# Get url
+		$url = "https://iss.moex.com/iss/engines/stock/markets/shares/boardgroups/$url_group/securities.csv";
 		}
 	
 	
@@ -235,91 +287,7 @@ sub moex {
 		
 	
 }
-# return quotes from rbc.ru
-sub micex {
-	my $quoter = shift;
-	my @stocks = @_;
-	my $sym;
-	my $stock;
-	my %info;
-	my %stockhash;
-	my @q;
-	
-	
-	my $ua = $quoter->user_agent; #http
-	
-	foreach my $stock (@stocks) # Обнуляем признаки обработки тикеров
-	  {
-	    $stockhash{$stock} = 0;
-	  }
 
-	
-	my $url=$MICEX_URL;
-	
-		 my $response = $ua->request(GET $url); #http begin
-		unless ($response->is_success) {
-			foreach my $stock (@stocks) {
-				$info{$stock, "success"} = 0;
-				$info{$stock, "errormsg"} = "HTTP failure";
-			}
-		
-			return wantarray() ? %info : \%info;
-		     } #http end
-		
-		my $content = $response->content; #http
-		
-		
-		foreach (split(/\n/,$content)) #http
-		      {#chomp;
-		      
-		      
-		      @q = split(/;/,$_);
-		      
-		      
-		      $sym = $q[0]; #Код бумаги
-		      if ($sym) {		      
-		      
-			foreach my $stock (@stocks) {
-			if ( $sym eq $stock ) {  
-			#if ($stockhash{$stock} == 0)
-			 # {
-			    #print (Msg "Found sym $stock close=$q[5] date=$q[1] \n");
-		      $info{$stock, "symbol"} = $stock; #Код
-					$info{$stock, "name"} = $stock; 
-					$info{$stock, "currency"} = "RUB";
-					$info{$stock, "method"} = "micex";
-					$info{$stock, "open"} = $q[2];
-					  $info{$stock, "high"} = $q[3];
-					  $info{$stock, "low"} = $q[4];
-					$info{$stock, "waprice"} = $q[7];
-					$info{$stock, "close"} = $q[5];
-					#$info{$stock, "ask"} = $q[11];
-					$info{$stock, "last"} = $q[5];
-					$quoter->store_date(\%info, $stock,  {isodate => $q[1]});
-					$info{$stock, "success"} = 1;
-					$stockhash{$stock} = 1;
-					#print (Msg "Found sym $stock last=$info{$stock,'last'} date=$info{$stock,'date'} \n");  
-			#		}
-				  }
-			    }
-			}
-
-		      }
-		    # check to make sure a value was returned for every fund requested
-		foreach my $stock (keys %stockhash)
-		    {
-		    if ($stockhash{$stock} == 0)
-			{
-			$info{$stock, "success"}  = 0;
-			$info{$stock, "errormsg"} = "Stock lookup failed";
-			 }
-		    }
-		
-		
-		return wantarray() ? %info : \%info;
-		
-	
-}
 
 # возвращает ассоциативный массив - ключ - имя поля, значение - порядковый номр колонки
 # По строке с названиями полей ИмяПоля;ИмяПоля1;ИмяПоля2
@@ -349,7 +317,7 @@ Finance::Quote::Moex - Perl module. Obtain quotes from Moex exchange.
 	use Finance::Quote;
 
 	my $quoter = Finance::Quote->new("Moex");
-	my %info = $quoter->fetch("moex_bond_ofz", "SU26218RMFS6"); # ОФЗ 26218
+	my %info = $quoter->fetch("moex_bond_tplus", "SU26218RMFS6"); # ОФЗ 26218
 	print "$info{'SU26218RMFS6','date'} $info{'SU26218RMFS6','price'}\n";
 
 =head1 DESCRIPTION
@@ -370,7 +338,7 @@ name price date isodate currency
  
 =head1 AUTHOR
 
-Partizand, partizand@cpan.org, https://github.com/partizand/finquote
+Partizand, partizand@gmail.com, https://github.com/partizand/finquote
 
 =head1 COPYRIGHT AND LICENSE
 

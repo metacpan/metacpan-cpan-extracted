@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Action::Uploads;
 # ABSTRACT: uploads query action role
-$Net::Amazon::S3::Request::Role::Query::Action::Uploads::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::Query::Action::Uploads::VERSION = '0.97';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Action' => { action => 'uploads' };
@@ -19,7 +19,7 @@ Net::Amazon::S3::Request::Role::Query::Action::Uploads - uploads query action ro
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

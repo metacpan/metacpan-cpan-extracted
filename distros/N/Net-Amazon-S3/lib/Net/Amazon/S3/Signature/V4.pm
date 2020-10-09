@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Signature::V4;
 # ABSTRACT: V4 signatures
-$Net::Amazon::S3::Signature::V4::VERSION = '0.94';
+$Net::Amazon::S3::Signature::V4::VERSION = '0.97';
 use Moose;
 
 use Net::Amazon::S3::Signature::V4Implementation;
@@ -85,7 +85,7 @@ sub sign_uri {
     my $sign = $self->_sign;
     $self->_host_to_region_host( $sign, $request );
 
-    return $sign->sign_uri( $request->uri, $expires_at - time );
+    return $sign->sign_uri( $request->uri, $expires_at - time, $request->method );
 }
 
 1;
@@ -102,7 +102,7 @@ Net::Amazon::S3::Signature::V4 - V4 signatures
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

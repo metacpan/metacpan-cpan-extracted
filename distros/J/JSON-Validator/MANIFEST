@@ -105,6 +105,7 @@ t/load-json.t
 t/load-yaml-pp.t
 t/load-yaml.t
 t/more-bundle.t
+t/predictable-errors.t
 t/random-errors.t
 t/recursive_data_protection.t
 t/relative-ref.t

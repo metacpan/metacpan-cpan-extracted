@@ -52,6 +52,7 @@ lib/AsposeSlidesCloud/Object/GradientFill.pm
 lib/AsposeSlidesCloud/Object/GradientFillStop.pm
 lib/AsposeSlidesCloud/Object/GraphicalObject.pm
 lib/AsposeSlidesCloud/Object/GroupShape.pm
+lib/AsposeSlidesCloud/Object/HeaderFooter.pm
 lib/AsposeSlidesCloud/Object/HtmlExportOptions.pm
 lib/AsposeSlidesCloud/Object/Image.pm
 lib/AsposeSlidesCloud/Object/ImageExportFormat.pm
@@ -74,6 +75,7 @@ lib/AsposeSlidesCloud/Object/NoFill.pm
 lib/AsposeSlidesCloud/Object/NormalViewRestoredProperties.pm
 lib/AsposeSlidesCloud/Object/NotesSlide.pm
 lib/AsposeSlidesCloud/Object/NotesSlideExportFormat.pm
+lib/AsposeSlidesCloud/Object/NotesSlideHeaderFooter.pm
 lib/AsposeSlidesCloud/Object/ObjectExist.pm
 lib/AsposeSlidesCloud/Object/OleObjectFrame.pm
 lib/AsposeSlidesCloud/Object/OneValueChartDataPoint.pm
@@ -116,6 +118,8 @@ lib/AsposeSlidesCloud/Object/SaveSlide.pm
 lib/AsposeSlidesCloud/Object/ScaleType.pm
 lib/AsposeSlidesCloud/Object/ScatterChartDataPoint.pm
 lib/AsposeSlidesCloud/Object/ScatterSeries.pm
+lib/AsposeSlidesCloud/Object/Section.pm
+lib/AsposeSlidesCloud/Object/Sections.pm
 lib/AsposeSlidesCloud/Object/Series.pm
 lib/AsposeSlidesCloud/Object/SeriesMarker.pm
 lib/AsposeSlidesCloud/Object/Shape.pm

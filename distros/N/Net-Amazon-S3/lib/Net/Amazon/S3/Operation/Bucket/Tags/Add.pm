@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Bucket::Tags::Add;
 # ABSTRACT: Internal class to perform PutBucketTagging operation
-$Net::Amazon::S3::Operation::Bucket::Tags::Add::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Bucket::Tags::Add::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Bucket::Tags::Add - Internal class to perform PutBuc
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

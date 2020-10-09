@@ -8,7 +8,8 @@ use HTTP::Status;
 use Shared::Examples::Net::Amazon::S3::Fixture;
 
 Shared::Examples::Net::Amazon::S3::Fixture::error_fixture
-    NoSuchBucket => HTTP::Status::HTTP_NOT_FOUND;
+	NoSuchBucket => HTTP::Status::HTTP_NOT_FOUND,
+	;
 
 __END__
 
@@ -22,7 +23,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::error::no_such_bucket - Shared::Exam
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

@@ -9,7 +9,7 @@ package Rex::Cloud::OpenStack;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 use Rex::Logger;
 
@@ -54,7 +54,7 @@ sub _request {
   Rex::Logger::debug("  $_ => $params{$_}") for keys %params;
 
   {
-    no strict 'refs'; ## no critic ProhibitNoStrict
+    no strict 'refs';
     $response = $self->{_agent}->request( $method->( $url, %params ) );
   }
 

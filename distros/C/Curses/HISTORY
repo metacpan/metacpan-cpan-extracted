@@ -11,6 +11,15 @@ The module has always been distributed via CPAN.
 Curses itself is much older than the Perl implementation.  Curses was
 originally only a C programming library.
 
+New in 1.37 (Not released yet)
+
+  Fix printw for wide characters.
+
+  Fix bug: wenclose() and mouse_trafo() treat an integer as a boolean.  The
+  functional effect is they return true if they fail to do the window move (I
+  don't understand this - there's some kind of window move that is part of
+  every function).  False is better.
+
 New in 1.36 (Released August 14, 2016)
 
   Fix the GNU Hurd thing from 1.35 by including the hints file in the

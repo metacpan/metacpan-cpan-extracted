@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.39';
+our $VERSION = '2.41';
 
 our @ALL =
 qw(
@@ -1892,7 +1892,6 @@ our %LINKS =
   'US/Michigan' => 'America/Detroit',
   'US/Mountain' => 'America/Denver',
   'US/Pacific' => 'America/Los_Angeles',
-  'US/Pacific-New' => 'America/Los_Angeles',
   'US/Samoa' => 'Pacific/Pago_Pago',
   'Universal' => 'UTC',
   'W-SU' => 'Europe/Moscow',
@@ -1901,7 +1900,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2020a' }
+sub OlsonVersion { '2020b' }
 
 
 1;
@@ -2250,10 +2249,10 @@ so that applications can easily present a list of timezones.
 
 =head3 Indian
 
+  Indian/Kerguelen
   Indian/Mahe
   Indian/Mauritius
   Indian/Reunion
-  Indian/Kerguelen
   Indian/Christmas
   Indian/Cocos
   Indian/Chagos
@@ -3672,7 +3671,6 @@ A linked zone is an alias from one name to another.
   US/Michigan => America/Detroit
   US/Mountain => America/Denver
   US/Pacific => America/Los_Angeles
-  US/Pacific-New => America/Los_Angeles
   US/Samoa => Pacific/Pago_Pago
   Universal => UTC
   W-SU => Europe/Moscow

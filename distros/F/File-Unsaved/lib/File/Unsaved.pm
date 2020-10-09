@@ -1,7 +1,9 @@
 package File::Unsaved;
 
-our $DATE = '2017-07-11'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-30'; # DATE
+our $DIST = 'File-Unsaved'; # DIST
+our $VERSION = '0.070'; # VERSION
 
 use 5.010001;
 use strict;
@@ -90,7 +92,7 @@ sub check_unsaved_file{
     my $check_proc_name = $args{check_proc_name} // 1;
     my $path = $args{path};
 
-    (-f $path) or die "File does not exist or not a regular file";
+    (-f $path) or die "File does not exist or not a regular file: '$path'";
 
     my ($vol, $dir, $file) = File::Spec->splitpath($path);
 
@@ -159,7 +161,7 @@ File::Unsaved - Check whether file has unsaved modification in an editor
 
 =head1 VERSION
 
-This document describes version 0.06 of File::Unsaved (from Perl distribution File-Unsaved), released on 2017-07-11.
+This document describes version 0.070 of File::Unsaved (from Perl distribution File-Unsaved), released on 2020-09-30.
 
 =head1 SYNOPSIS
 
@@ -225,6 +227,7 @@ differently-named fork/derivative of said editor, although this should be rare.
 
 =item * B<path>* => I<str>
 
+
 =back
 
 Return value:  (bool|hash)
@@ -259,7 +262,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

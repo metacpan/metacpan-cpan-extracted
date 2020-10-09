@@ -1,5 +1,21 @@
 Revision history for perl distribution Mojolicious-Plugin-OpenAPI
 
+3.39 2020-10-08T15:52:42+0900
+ - Add support optional requestBody in OpenAPIv3 #170 #194
+   Contributor: Ji-Hyeon Gim
+
+3.38 2020-10-07T12:39:18+0900
+ - Fix failing CPAN testers tests
+ - Fix uninitialized warnings
+ - Fix not coercing body with array into object
+
+3.37 2020-10-06T13:47:47+0900
+ - Can also render doc for spec with $ref inside paths
+ - Can specify SpecRenderer logo
+ - Can specify SpecRenderer theme color
+ - Will block less when rendering big JSON documents in browser
+ - Bump JSON::Validator to 4.05
+
 3.36 2020-09-22T09:42:10+0900
  - Fix writeOnly handling OpenAPI v3 #191
 

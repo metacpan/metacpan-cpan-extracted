@@ -1,3 +1,4 @@
+# Stolen from Mac::PropertyList (by bdfoy) for use in Mac::PropertyList::XS (by kulp)
 BEGIN { @plists = glob( 'plists/*.plist' ); }
 
 use Test::More;

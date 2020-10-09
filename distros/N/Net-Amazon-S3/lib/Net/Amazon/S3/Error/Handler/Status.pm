@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Error::Handler::Status;
-$Net::Amazon::S3::Error::Handler::Status::VERSION = '0.94';
+$Net::Amazon::S3::Error::Handler::Status::VERSION = '0.97';
 # ABSTRACT: An internal class to report response errors via err properties
 
 use Moose;
@@ -7,17 +7,17 @@ use Moose;
 extends 'Net::Amazon::S3::Error::Handler';
 
 sub handle_error {
-    my ($self, $response) = @_;
+	my ($self, $response) = @_;
 
-    $self->s3->err (undef);
-    $self->s3->errstr (undef);
+	$self->s3->err (undef);
+	$self->s3->errstr (undef);
 
-    return 1 unless $response->is_error;
+	return 1 unless $response->is_error;
 
-    $self->s3->err ($response->error_code);
-    $self->s3->errstr ($response->error_message);
+	$self->s3->err ($response->error_code);
+	$self->s3->errstr ($response->error_message);
 
-    return 0;
+	return 0;
 }
 
 1;
@@ -34,7 +34,7 @@ Net::Amazon::S3::Error::Handler::Status - An internal class to report response e
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

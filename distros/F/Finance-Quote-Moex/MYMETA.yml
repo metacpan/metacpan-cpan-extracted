@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   Finance::Quote: '0'
-version: '0.3'
+version: '0.4'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

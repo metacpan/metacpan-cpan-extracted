@@ -1,0 +1,30 @@
+0.005   2020-10-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump perl prereq from 5.010001 to 5.014 because CPAN Testers
+	  shows it's failing in older perls.
+
+
+0.004   2020-10-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Add function: match_platform_bool.
+
+        - Fix 32bit aliases.
+
+
+0.003   2020-10-08  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Documentation tweaks/fixes, add examples.
+
+
+0.002   2020-10-08  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add Synopsis.
+
+
+0.001   2020-10-08  Released-By: PERLANCAR
+
+        - First release.

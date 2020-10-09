@@ -12,8 +12,8 @@ my $file = __FILE__;
 my $this_dir = dirname($file);
 my @this_dirs = File::Spec->splitdir( $this_dir );
 my $temp_dir = File::Spec->catdir(@this_dirs,'captcha_temp');
-my $temp_datadir = "$temp_dir/data";
-my $temp_outputdir = "$temp_dir/img";
+my $temp_datadir = File::Spec->catdir($temp_dir,'data');
+my $temp_outputdir = File::Spec->catdir($temp_dir, 'img');
 # we set this only for testing, it is not actually used
 my $temp_imagesdir = 'Captcha/images';
 

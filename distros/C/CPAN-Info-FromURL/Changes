@@ -1,3 +1,10 @@
+0.092   2020-10-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Parse gitlab repo URL.
+
+	- Recognize git:// in addition to git@ for github.
+
+
 0.091   2020-10-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Parse github repo URL, e.g.

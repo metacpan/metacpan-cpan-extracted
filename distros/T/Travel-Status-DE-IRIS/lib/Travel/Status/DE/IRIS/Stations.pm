@@ -22,7 +22,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.48';
+our $VERSION = '1.49';
 
 # Automatically generated, see share/stations.json
 my @stations = (
@@ -3901,6 +3901,7 @@ my @stations = (
 ['WJAB','Jabel(Meckl)',8011939,12.547559,53.545263],
 ['XTJP','Jablonne v Podjestedi',5400066,14.758118,50.769452],
 ['BJF','Jacobsdorf(Mark)',8011940,14.355037,52.332626],
+['HJAH','Jaderberg',8003105,8.18455,53.34492],
 ['WJS','Jagdschloß',8011947,13.619872,54.376479],
 ['TJZ','Jagstzell',8003111,10.098819,49.031239],
 ['DJD','Jahnsdorf(Erzgeb)',8011948,12.857511,50.754946],
@@ -8953,7 +8954,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,20 @@
+0.585   2020-10-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Also use Data::Sah::Resolve in filters. Data::Sah::Resolve has been
+          used in determining what argument specification to produce for each
+          table field. But when parsing query, Data::Sah::Resolve has not been
+          used in interpreting the arguments properly, so table field with
+          schema like "uint" (instead of just "int") do not get filtered even
+          though the associated argument has been passed. This release fixes
+          that.
+
+
+0.584   2020-10-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Use Data::Sah::Resolve. This allows us to produce, e.g. --foo-min &
+          --foo-max options for 'uint' fields instead of just 'int' fields.
+
+
 0.583   2020-02-23  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix previous commit.

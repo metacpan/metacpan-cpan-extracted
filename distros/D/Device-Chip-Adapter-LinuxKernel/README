@@ -1,0 +1,31 @@
+Device::Chip::Adapter::LinuxKernel
+
+This class implements the "Device::Chip::Adapter" interface for the
+*LinuxKernel*, allowing an instance of Device::Chip driver to
+communicate with the actual chip hardware by using the Linux Kernel
+interfaces for GPIO, I2C (SMbus), and SPI. Suitble for use on any Linux
+system including Raspberry PI (RPI), Beaglebone, Banana PI or any other
+single board computer that exposes IO via the standard Linux Kernel
+interfaces.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

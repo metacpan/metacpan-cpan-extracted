@@ -38,11 +38,6 @@ Steps to release:
     in there by name (Curses::Window, Curses::Screen, etc.).
 
 
-For Bryan's Giraffe test system:
-
-  export CURSES_LDFLAGS="-L/usr/link/ncurses -lncurses -ldl"
-  export CURSES_CFLAGS="-I/usr/include/ncurses"
-
 For Bryan's Rhino test system:
 
   Copy hints/c-linux.ncurses.h as c-config.h and edit it

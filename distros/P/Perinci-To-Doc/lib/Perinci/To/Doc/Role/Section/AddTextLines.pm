@@ -1,7 +1,7 @@
 package Perinci::To::Doc::Role::Section::AddTextLines;
 
-our $DATE = '2020-04-27'; # DATE
-our $VERSION = '0.872'; # VERSION
+our $DATE = '2020-10-07'; # DATE
+our $VERSION = '0.873'; # VERSION
 
 use 5.010;
 use Log::ger;
@@ -112,7 +112,7 @@ Perinci::To::Doc::Role::Section::AddTextLines - Provide add_doc_lines() to add t
 
 =head1 VERSION
 
-This document describes version 0.872 of Perinci::To::Doc::Role::Section::AddTextLines (from Perl distribution Perinci-To-Doc), released on 2020-04-27.
+This document describes version 0.873 of Perinci::To::Doc::Role::Section::AddTextLines (from Perl distribution Perinci-To-Doc), released on 2020-10-07.
 
 =head1 DESCRIPTION
 

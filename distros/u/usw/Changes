@@ -1,6 +1,37 @@
 Revision history for Perl extension usw
 
+0.11 2020-10-07T23:41:07Z
+    - fixed the issue #2
+    - tried to skip tests that seem impossible
+
+0.10 2020-10-07T04:03:42Z
+    - some windows have no `cat`? try to use `type` instead of cat
+
+0.09 2020-10-06T06:43:39Z
+    - fixed #1 incorrect tests run on Windows other than with cp932.
+
+0.08 2020-10-05T11:13:26Z
+    - now we can use usw; in Windows
+    - therefore, usww is deprecated
+
+0.07 2020-10-05T00:35:15Z
+    - added the features for STDIN
+    - strictly tested for them
+
+0.06 2020-10-04T04:02:46Z
+    - there is no test for STDIN so drop it
+
+0.05 2020-10-04T02:31:32Z
+    - forked usww especially for Windows
+
+0.04 2020-10-03T15:24:06Z
+    - became helpful on Windows
+
+0.03 2020-10-03T12:22:14Z
+    - be able to replace $SIG{__WARN__} and/or $SIG{__DIE__}
+
+0.02 2020-10-03T03:25:23Z
+    - start to require v5.12.5 or later
+
 0.01 2020-10-02T14:48:03Z
-
     - original version
-

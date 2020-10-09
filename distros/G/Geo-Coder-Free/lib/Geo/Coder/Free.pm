@@ -1,12 +1,15 @@
 package Geo::Coder::Free;
 
+# TODO: Don't have Maxmind as a separate database
+# TODO: Rename openaddresses.sql as geo_code_free.sql
+
 use strict;
 use warnings;
 
 use lib '.';
 
 use Config::Auto;
-# use Geo::Coder::Abbreviations;
+use Geo::Coder::Abbreviations;
 use Geo::Coder::Free::MaxMind;
 use Geo::Coder::Free::OpenAddresses;
 use List::MoreUtils;
@@ -18,14 +21,16 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 our $alternatives;
+our $abbreviations;
 
+sub _abbreviate($);
 sub _normalize($);
 
 =head1 SYNOPSIS
@@ -97,7 +102,6 @@ sub new {
 			$alternatives->{$key} = join(', ', @{$value});
 		}
 	}
-
 	my $rc = {
 		maxmind => Geo::Coder::Free::MaxMind->new(%param),
 		alternatives => $alternatives
@@ -304,53 +308,80 @@ sub run {
 }
 
 sub _normalize($) {
+	my $street = shift;
+
+	$abbreviations ||= Geo::Coder::Abbreviations->new();
+
+	$street = uc($street);
+	if($street =~ /(.+)\s+(.+)\s+(.+)/) {
+		my $a;
+		if($a = $abbreviations->abbreviate($2)) {
+			$street = "$1 $a $3";
+		} elsif($a = $abbreviations->abbreviate($3)) {
+			$street = "$1 $2 $a";
+		}
+	} elsif($street =~ /(.+)\s(.+)$/) {
+		if(my $a = $abbreviations->abbreviate($2)) {
+			$street = "$1 $a";
+		}
+	}
+	$street =~ s/^0+//;	# Turn 04th St into 4th St
+	return $street;
+}
+
+sub _abbreviate($) {
 	my $type = uc(shift);
 
-	# return Geo::Coder::Abbreviations->new()->abbreviate($type);
+	$abbreviations ||= Geo::Coder::Abbreviations->new();
 
-	if(($type eq 'AVENUE') || ($type eq 'AVE')) {
-		return 'AVE';
-	} elsif(($type eq 'STREET') || ($type eq 'ST')) {
-		return 'ST';
-	} elsif(($type eq 'ROAD') || ($type eq 'RD')) {
-		return 'RD';
-	} elsif(($type eq 'COURT') || ($type eq 'CT')) {
-		return 'CT';
-	} elsif(($type eq 'CIR') || ($type eq 'CIRCLE')) {
-		return 'CIR';
-	} elsif(($type eq 'FT') || ($type eq 'FORT')) {
-		return 'FT';
-	} elsif(($type eq 'CTR') || ($type eq 'CENTER')) {
-		return 'CTR';
-	} elsif(($type eq 'PARKWAY') || ($type eq 'PKWY')) {
-		return 'PKWY';
-	} elsif($type eq 'BLVD') {
-		return 'BLVD';
-	} elsif($type eq 'PIKE') {
-		return 'PIKE';
-	} elsif(($type eq 'DRIVE') || ($type eq 'DR')) {
-		return 'DR';
-	} elsif(($type eq 'SPRING') || ($type eq 'SPG')) {
-		return 'SPRING';
-	} elsif(($type eq 'RDG') || ($type eq 'RIDGE')) {
-		return 'RDG';
-	} elsif(($type eq 'CRK') || ($type eq 'CREEK')) {
-		return 'CRK';
-	} elsif(($type eq 'LANE') || ($type eq 'LN')) {
-		return 'LN';
-	} elsif(($type eq 'PLACE') || ($type eq 'PL')) {
-		return 'PL';
-	} elsif(($type eq 'GRDNS') || ($type eq 'GARDENS')) {
-		return 'GRDNS';
-	} elsif(($type eq 'HWY') || ($type eq 'HIGHWAY')) {
-		return 'HWY';
+	if(my $rc = $abbreviations->abbreviate($type)) {
+		return $rc;
 	}
+	return $type;
 
-	# Most likely failure of Geo::StreetAddress::US, but warn anyway, just in case
-	if($ENV{AUTHOR_TESTING}) {
-		# warn $self->{'location'}, ": add type $type";
-		warn "Add type $type";
-	}
+	# if(($type eq 'AVENUE') || ($type eq 'AVE')) {
+		# return 'AVE';
+	# } elsif(($type eq 'STREET') || ($type eq 'ST')) {
+		# return 'ST';
+	# } elsif(($type eq 'ROAD') || ($type eq 'RD')) {
+		# return 'RD';
+	# } elsif(($type eq 'COURT') || ($type eq 'CT')) {
+		# return 'CT';
+	# } elsif(($type eq 'CIR') || ($type eq 'CIRCLE')) {
+		# return 'CIR';
+	# } elsif(($type eq 'FT') || ($type eq 'FORT')) {
+		# return 'FT';
+	# } elsif(($type eq 'CTR') || ($type eq 'CENTER')) {
+		# return 'CTR';
+	# } elsif(($type eq 'PARKWAY') || ($type eq 'PKWY')) {
+		# return 'PKWY';
+	# } elsif($type eq 'BLVD') {
+		# return 'BLVD';
+	# } elsif($type eq 'PIKE') {
+		# return 'PIKE';
+	# } elsif(($type eq 'DRIVE') || ($type eq 'DR')) {
+		# return 'DR';
+	# } elsif(($type eq 'SPRING') || ($type eq 'SPG')) {
+		# return 'SPRING';
+	# } elsif(($type eq 'RDG') || ($type eq 'RIDGE')) {
+		# return 'RDG';
+	# } elsif(($type eq 'CRK') || ($type eq 'CREEK')) {
+		# return 'CRK';
+	# } elsif(($type eq 'LANE') || ($type eq 'LN')) {
+		# return 'LN';
+	# } elsif(($type eq 'PLACE') || ($type eq 'PL')) {
+		# return 'PL';
+	# } elsif(($type eq 'GRDNS') || ($type eq 'GARDENS')) {
+		# return 'GRDNS';
+	# } elsif(($type eq 'HWY') || ($type eq 'HIGHWAY')) {
+		# return 'HWY';
+	# }
+
+	# # Most likely failure of Geo::StreetAddress::US, but warn anyway, just in case
+	# if($ENV{AUTHOR_TESTING}) {
+		# # warn $self->{'location'}, ": add type $type";
+		# warn "Add type $type";
+	# }
 }
 
 =head1 AUTHOR

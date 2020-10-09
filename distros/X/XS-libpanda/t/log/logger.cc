@@ -8,6 +8,7 @@ TEST("set_logger") {
     std::string str;
     uint32_t    chk_line;
     bool        grep = false;
+    set_formatter(nullptr); // formatter.cc doesn't clean after run
 
     SECTION("formatting callback") {
         set_logger([&](std::string& _str, const Info& _info, const IFormatter&) {

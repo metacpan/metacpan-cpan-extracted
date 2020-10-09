@@ -1,0 +1,78 @@
+NAME
+    Data::Dmp::Prune - Dump Perl data structures as Perl code, prune some
+    branches
+
+VERSION
+    This document describes version 0.240.0 of Data::Dmp::Prune (from Perl
+    distribution Data-Dmp-Prune), released on 2020-10-04.
+
+SYNOPSIS
+    In Perl code:
+
+     use Data::Dmp; # exports dd() and dmp()
+     {
+         local $Data::Dmp::Prune::OPT_PRUNE = ['/3', '/b', '/c/foo'];
+         dd [1, 2, 3, 4, 5]; # prints "[1,2,3,'PRUNED',5]"
+         $a = dmp({a => 1, b => 2, c => {foo=>1, bar=>2}}); # -> "{a=>1,c=>{bar=>2}}"
+     }
+
+    On the command line:
+
+     % DATA_DMP_PRUNE_OPT_PRUNE="/3 /b /c/foo" yourscript.pl ...
+
+DESCRIPTION
+    This is a fork of Data::Dmp 0.240, with an option to prune some data
+    structure branches.
+
+VARIABLES
+    These section only lists variables specific to Data::Dmp::Prune. For
+    other variables see Data::Dmp's documentation.
+
+  $Data::Dmp::Prune::OPT_PRUNE
+    Array reference containing data structure paths to prune. Data structure
+    path uses "/" as path separator so currently you cannot prune hash key
+    that contains "/". Each path element represents hash key name or array
+    element index.
+
+FUNCTIONS
+    See Data::Dmp's documentation for more details on each function.
+
+  dd
+  dmp
+  dd_ellipsis
+  dmp_ellipsis
+ENVIRONMENT
+  DATA_DMP_PRUNE_OPT_PRUNE
+    Provide default for "$Data::Dmp::Prune::OPT_PRUNE". Value is a string
+    that will be split on whitespace to become array reference, so currently
+    you cannot prune hash key that contains whitespace (as well as "/").
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Dmp-Prune>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Dmp-Prune>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dmp-Prune>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Dmp.
+
+    Partial dumpers like Data::Dump::Partial, etc.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

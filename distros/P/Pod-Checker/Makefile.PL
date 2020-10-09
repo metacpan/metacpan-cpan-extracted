@@ -40,7 +40,7 @@ push @testdirs, $test2dir if (-d $test2dir);
 
 # needed for new pod2usage2.t
 my %prereq = (
-  'Pod::Simple'    => 3.28,
+  'Pod::Simple'    => 3.40,
   'Test::More'     => 0.60,
   'Cwd'            => 0,
   'File::Basename' => 0
@@ -53,7 +53,7 @@ if ($] < 5.005) {
 WriteMakefile(
     NAME         => $DISTMOD,
     DISTNAME     => $DISTNAME,
-    VERSION      => '1.73',
+    VERSION      => '1.74',
     INSTALLDIRS  => ($] >= 5.006 ? 'perl' : 'site'),
     PL_FILES     => { map { (script("$_.PL") => script($_)) } @SCRIPTS },
     EXE_FILES    => [ @EXE_FILES ],

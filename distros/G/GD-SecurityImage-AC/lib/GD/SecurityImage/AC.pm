@@ -10,7 +10,7 @@ use Fcntl qw(:flock); # imports LOCK_NB, LOCK_EX, LOCK_SH, LOCK_UN (among other 
 use Symbol; # imports 'gensym'
 
 BEGIN {
-   $VERSION = '1.12';
+   $VERSION = '1.13';
    @Authen::Captcha::ISA = ('GD::SecurityImage::AC');
 }
 
@@ -24,6 +24,11 @@ sub new {
                   GDSI_CALLED => 0,
    };
    bless $self, $class;
+   if ($opts{'lock_timeout'} and $opts{'lock_timeout'} >= 1) {
+     $self->lock_timeout($opts{'lock_timeout'});
+   } else {
+     $self->lock_timeout(10);
+   }
    foreach my $name (qw[keep_failures data_folder output_folder]) {
       $self->{'_'.$name} = $opts{$name} if $opts{$name};
    }
@@ -46,13 +51,25 @@ sub _lock { # Non-blocking locking with a timeout
    my ($lock_mode) = @_;
 
    my $lock_handle  = $self->_lock_handle;
-   my $timeout      = 10; # seconds
+   my $timeout      = $self->lock_timeout + 0; # seconds
+   if (0 <= $timeout) {
+       $timeout = 10;
+   }
    my $count_timer  = 10 * $timeout;
    my $lock_result;
-   while (! ($lock_result = flock ($lock_handle, $lock_mode | &LOCK_NB))) {
+   my $effective_lock_mode = (&LOCK_UN == $lock_mode) ? $lock_mode : $lock_mode | &LOCK_NB;
+   while (! ($lock_result = flock ($lock_handle, $effective_lock_mode))) {
       if (! $count_timer--) {
          my $package = __PACKAGE__;
-         die("${package}::_lock() - Failed to obtain lock in $timeout seconds: $!");
+         my $lock_description = 'non-blocking ';
+         if (&LOCK_EX == $lock_mode) {
+            $lock_description .= ' exclusive lock'
+         } elsif (&LOCK_SH == $lock_mode) {
+            $lock_description .= ' shared lock'
+         } elsif (&LOCK_UN == $lock_mode) {
+            $lock_description .= ' unlock'
+         }
+         die("${package}::_lock() - Failed to obtain $lock_description in $timeout seconds: $!");
       }
       # sleep for 1/10th of a second before trying again
       select (undef,undef,undef,0.1);
@@ -291,9 +308,10 @@ sub output_folder { my ($self, $val) = @_; $self->{"_output_folder"} = $val if d
 sub images_folder { my ($self, $val) = @_; $self->{"_images_folder"} = $val if defined $val; return $self->{"_images_folder"}; }
 sub data_folder   { my ($self, $val) = @_; $self->{"_data_folder"}   = $val if defined $val; return $self->{"_data_folder"};   }
 sub debug         { my ($self, $val) = @_; $self->{"_debug"}         = $val if defined $val; return $self->{"_debug"};         }
-sub expire        { my ($self, $val) = @_; $self->{"_expire"} =  $val if $val and $val >= 0; return $self->{"_expire"}; }
-sub width         { my ($self, $val) = @_; $self->{"_width"} =   $val if $val and $val >= 0; return $self->{"_width"};  }
-sub height        { my ($self, $val) = @_; $self->{"_height"} =  $val if $val and $val >= 0; return $self->{"_height"}; }
+sub expire        { my ($self, $val) = @_; $self->{"_expire"}        = $val if $val and $val >= 0; return $self->{"_expire"}; }
+sub width         { my ($self, $val) = @_; $self->{"_width"}         = $val if $val and $val >= 0; return $self->{"_width"};  }
+sub height        { my ($self, $val) = @_; $self->{"_height"}        = $val if $val and $val >= 0; return $self->{"_height"}; }
+sub lock_timeout  { my ($self, $val) = @_; $self->{"_lock_timeout"}  = $val if $val and $val >= 1; return $self->{"_lock_timeout"}; }
 sub version       { return $VERSION; }
 sub keep_failures { my ($self, $val) = @_; $self->{"_keep_failures"} = $val ? 1 : 0 if defined $val; return $self->{"_keep_failures"}; }
 sub create_sound_file { return 'there is no such thing!'; }

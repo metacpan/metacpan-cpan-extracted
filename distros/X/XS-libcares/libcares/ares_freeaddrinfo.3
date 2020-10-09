@@ -13,23 +13,25 @@
 .\" this software for any purpose.  It is provided "as is"
 .\" without express or implied warranty.
 .\"
-.TH ARES_FREEADDRINFO 3 "22 October 2018"
+.TH ARES_FREEADDRINFO 3 "31 October 2018"
 .SH NAME
-ares_freeaddrinfo \- Free data allocated by ares_getaddrinfo 
+ares_freeaddrinfo \- Free addrinfo structure allocated by ares functions
 .SH SYNOPSIS
 .nf
-.B #include <ares.h>
-.PP
-.B void ares_freeaddrinfo(struct ares_addrinfo *\fIai\fP)
+#include <ares.h>
+
+void ares_freeaddrinfo(struct ares_addrinfo *\fIai\fP)
 .fi
 .SH DESCRIPTION
 The
 .B ares_freeaddrinfo
-function frees data allocated by 
-.B ares_getaddrinfo
-function.
+function frees a
+.B struct ares_addrinfo
+returned in \fIresult\fP of
+.B ares_addrinfo_callback
 .SH SEE ALSO
 .BR ares_getaddrinfo (3),
 .SH AUTHOR
-Andrew Selivanov <andrew.selivanov@gmail.com>, on behalf of Crazy Panda http://www.crazypandagames.com
 Christian Ammer
+.BR
+Andrew Selivanov <andrew.selivanov@gmail.com>

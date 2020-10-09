@@ -59,7 +59,7 @@ HTTP::Request::Generator - generate HTTP requests
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request
     expand_curl_pattern
 );
@@ -357,6 +357,7 @@ sub _build_uri( $req ) {
           my( $req ) = @_;
           # Fix up some values
           $req->{headers}->{'Content-Length'} = 666;
+          return $req;
       },
   );
   while( my $r = $g->()) {
@@ -381,6 +382,7 @@ returns the complete list of requests:
           my( $req ) = @_;
           # Fix up some values
           $req->{headers}->{'Content-Length'} = 666;
+          return $req;
       },
   );
   for my $r (@requests) {

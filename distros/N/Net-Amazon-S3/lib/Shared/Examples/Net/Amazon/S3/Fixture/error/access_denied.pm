@@ -8,7 +8,8 @@ use HTTP::Status;
 use Shared::Examples::Net::Amazon::S3::Fixture;
 
 Shared::Examples::Net::Amazon::S3::Fixture::error_fixture
-    AccessDenied => HTTP::Status::HTTP_FORBIDDEN;
+	AccessDenied => HTTP::Status::HTTP_FORBIDDEN,
+	;
 
 __END__
 
@@ -22,7 +23,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::error::access_denied - Shared::Examp
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

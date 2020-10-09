@@ -1,4 +1,4 @@
-#!perl -wT
+#!perl -w
 
 use warnings;
 use strict;
@@ -17,7 +17,7 @@ OPENADDR: {
 	SKIP: {
 		if($ENV{'OPENADDR_HOME'}) {
 			if($ENV{'TEST_VERBOSE'}) {
-				Geo::Coder::Free::DB::init(logger => new_ok('MyLogger'));
+				Geo::Coder::Free::DB::init(logger => MyLogger->new());
 			}
 
 			my $geo_coder = new_ok('Geo::Coder::Free' => [ openaddr => $ENV{'OPENADDR_HOME'} ]);

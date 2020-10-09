@@ -5,7 +5,7 @@ use v5.20;
 use experimental qw/ signatures /;
 package YAML::Tidy::Node;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub new($class, %args) {
     my $self = {
@@ -18,7 +18,7 @@ sub pre($self, $node) {
     my $index = $node->{index} - 1;
     my $end;
     if ($index < 1) {
-        $end = $self->{start}->{end};
+        $end = $self->open->{end};
     }
     else {
         my $previous = $self->{children}->[ $index -1 ];
@@ -37,7 +37,7 @@ use base 'YAML::Tidy::Node';
 sub is_collection { 1 }
 
 sub indent($self) {
-    my $firstevent = $self->{start};
+    my $firstevent = $self->open;
     if ($firstevent->{name} eq 'document_start_event') {
         return 0;
     }
@@ -46,16 +46,23 @@ sub indent($self) {
     return $startcol;
 }
 
+sub open($self) { $self->{start} }
+sub close($self) { $self->{end} }
+
 sub end($self) {
-    return $self->{end}->{end};
+    return $self->close->{end};
+}
+
+sub closestart($self) {
+    return $self->close->{start};
 }
 
 sub realendline($self) {
-    $self->{end}->{end}->{line} - 1;
+    $self->close->{end}->{line} - 1;
 }
 
 sub start($self) {
-    return $self->{start}->{start};
+    return $self->open->{start};
 }
 
 sub line($self) {
@@ -65,12 +72,12 @@ sub line($self) {
 }
 
 sub contentstart($self) {
-    my $firstevent = $self->{start};
+    my $firstevent = $self->open;
     return $firstevent->{end};
 }
 
 sub fix_node_indent($self, $fix) {
-    for my $e (@$self{qw/ start end /}) {
+    for my $e ($self->open, $self->close) {
         for my $pos (@$e{qw/ start end /}) {
             $pos->{column} += $fix;
         }
@@ -80,6 +87,20 @@ sub fix_node_indent($self, $fix) {
     }
 }
 
+sub _fix_flow_indent($self, %args) {
+    my $line = $args{line};
+    my $diff = $args{diff};
+    my $start = $self->open;
+    my $end = $self->close;
+    for my $pos ($start->{start}, $start->{end}, $end->{start}, $end->{end}) {
+        if ($pos->{line} == $line) {
+            $pos->{column} += $diff;
+        }
+    }
+    for my $c (@{ $self->{children} }) {
+        $c->_fix_flow_indent(%args);
+    }
+}
 
 package YAML::Tidy::Node::Scalar;
 use YAML::PP::Common qw/
@@ -96,20 +117,26 @@ use base 'YAML::Tidy::Node';
 sub is_collection { 0 }
 
 sub indent($self) {
-
-    return $self->{start}->{column};
+    return $self->open->{column};
 }
 
 sub start($self) {
-    return $self->{start};
+    return $self->open;
 }
 
+sub open($self) { $self->{start} }
+sub close($self) { $self->{end} }
+
 sub end($self) {
-    return $self->{end};
+    return $self->close;
+}
+
+sub closestart($self) {
+    return $self->close;
 }
 
 sub realendline($self) {
-    my $end = $self->{end};
+    my $end = $self->close;
     if ($self->{style} == YAML_LITERAL_SCALAR_STYLE
         or $self->{style} == YAML_FOLDED_SCALAR_STYLE) {
             if ($end->{column} == 0) {
@@ -125,18 +152,18 @@ sub line($self) {
 }
 
 sub contentstart($self) {
-    return $self->{start};
+    return $self->start;
 }
 
 sub multiline($self) {
-    if ($self->{start}->{line} < $self->{end}->{line}) {
+    if ($self->open->{line} < $self->close->{line}) {
         return 1;
     }
     return 0;
 }
 
 sub empty_scalar($self) {
-    my ($start, $end) = @$self{qw/ start end /};
+    my ($start, $end) = ($self->open, $self->close);
     if ($start->{line} == $end->{line} and $start->{column} == $end->{column}) {
         return 1;
     }
@@ -145,10 +172,19 @@ sub empty_scalar($self) {
 
 
 sub fix_node_indent($self, $fix) {
-    for my $pos (@$self{qw/ start end /}) {
+    for my $pos ($self->open, $self->close) {
         $pos->{column} += $fix;
     }
 }
 
+sub _fix_flow_indent($self, %args) {
+    my $line = $args{line};
+    my $diff = $args{diff};
+    for my $pos ($self->open, $self->close) {
+        if ($pos->{line} == $line) {
+            $pos->{column} += $diff;
+        }
+    }
+}
 
 1;

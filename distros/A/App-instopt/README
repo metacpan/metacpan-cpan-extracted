@@ -2,8 +2,8 @@ NAME
     App::instopt - Download and install software
 
 VERSION
-    This document describes version 0.015 of App::instopt (from Perl
-    distribution App-instopt), released on 2020-10-02.
+    This document describes version 0.016 of App::instopt (from Perl
+    distribution App-instopt), released on 2020-10-08.
 
 SYNOPSIS
     See instopt script.
@@ -172,6 +172,243 @@ FUNCTIONS
 
     Return value: (any)
 
+  is_downloaded_any
+    Usage:
+
+     is_downloaded_any(%args) -> [status, msg, payload, meta]
+
+    Check if any version of a software is downloaded.
+
+    The download does not need to be the latest version. To check if the
+    latest version of a software is downloaded, use "is-downloaded-latest".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
+
+    *   quiet => *bool*
+
+    *   software* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_downloaded_latest
+    Usage:
+
+     is_downloaded_latest(%args) -> [status, msg, payload, meta]
+
+    Check if latest version of a software has been downloaded.
+
+    To only check whether any version of a software has been downloaded, use
+    "is-downloaded-any".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
+
+    *   quiet => *bool*
+
+    *   software* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_installed_any
+    Usage:
+
+     is_installed_any(%args) -> [status, msg, payload, meta]
+
+    Check if any version of a software is installed.
+
+    The installed version does not need to be the latest. To check whether
+    the latest version of a software is installed, use
+    "is-installed-latest".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
+
+    *   quiet => *bool*
+
+    *   software* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_installed_latest
+    Usage:
+
+     is_installed_latest(%args) -> [status, msg, payload, meta]
+
+    Check if latest version of a software is installed.
+
+    To only check whether any version of a software is installed, use
+    "is-installed-any".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
+
+    *   quiet => *bool*
+
+    *   software* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list
+    Usage:
+
+     list(%args) -> [status, msg, payload, meta]
+
+    List software.
+
+    Examples:
+
+    *   List software that are installed but out-of-date:
+
+         list( installed => 1, latest_installed => 0);
+
+        Result:
+
+         [
+           500,
+           "Function died: Failed to change directory to '/home/u1/software': No such file or directory at lib/App/instopt.pm line 331.\n",
+           undef,
+           {
+             logs => [
+               {
+                 file    => "/home/u1/perl5/perlbrew/perls/perl-5.30.0/lib/site_perl/5.30.0/Perinci/Access/Schemeless.pm",
+                 func    => "Perinci::Access::Schemeless::action_call",
+                 line    => 494,
+                 package => "Perinci::Access::Schemeless",
+                 time    => 1602119125,
+                 type    => "create",
+               },
+             ],
+           },
+         ]
+
+    *   List software that have been downloaded but out-of-date:
+
+         list( downloaded => 1, latest_downloaded => 0); # -> [200, "OK", [], {}]
+
+    *   List software that have their latest version downloaded but not
+        installed:
+
+         list( latest_downloaded => 1, latest_installed => 0); # -> [200, "OK", [], {}]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *true*
+
+    *   download_dir => *dirname*
+
+    *   downloaded => *bool*
+
+        If true, will only list downloaded software.
+
+    *   install_dir => *dirname*
+
+    *   installed => *bool*
+
+        If true, will only list installed software.
+
+    *   latest_downloaded => *bool*
+
+        If true, will only list software which have their latest version
+        downloaded.
+
+        If set to true, a software which is not downloaded, or downloaded
+        but does not have the latest version downloaded, will not be
+        included.
+
+        If set to false, a software which has no downloaded versions, or
+        does not have the latest version downloaded, will be included.
+
+    *   latest_installed => *bool*
+
+        If true, will only list software which have their latest version
+        installed.
+
+        If set to true, a software which is not installed, or installed but
+        does not have the latest version installed, will not be included.
+
+        If set to false, a software which is not installed, or does not have
+        the latest version installed, will be included.
+
+    *   program_dir => *dirname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   list_downloaded
     Usage:
 
@@ -190,10 +427,6 @@ FUNCTIONS
     *   download_dir => *dirname*
 
     *   install_dir => *dirname*
-
-    *   per_arch => *true*
-
-        Return per-arch hash in the all_versions field.
 
     *   program_dir => *dirname*
 

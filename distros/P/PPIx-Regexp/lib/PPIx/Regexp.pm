@@ -17,9 +17,9 @@ put through a deprecation cycle and retracted. After the retraction,
 postfix dereferences will always be recognized. This is the default
 behaviour now.
 
-Starting with the first release after October 1 2020, the first use of
-this argument will warn. Six months after that all uses will warn. After
-a further six months, all uses will become fatal.
+Starting with version 0.074_01, the first use of this argument will
+warn. With the first release after April 1 2021, all uses will warn.
+After a further six months, all uses will become fatal.
 
 =head1 INHERITANCE
 
@@ -186,7 +186,7 @@ use PPIx::Regexp::Util qw{
 use Scalar::Util qw{ refaddr };
 use Text::Tabs ();
 
-our $VERSION = '0.074';
+our $VERSION = '0.075';
 
 =head2 new
 
@@ -273,8 +273,9 @@ This option is passed on to the tokenizer, where it specifies whether
 postfix dereferences are recognized in interpolations and code. This
 experimental feature was introduced in Perl 5.19.5.
 
-The default is the value of
-C<$PPIx::Regexp::Tokenizer::DEFAULT_POSTDEREF>, which is true. When
+As of version 0.074_01, the default is true.  Through release 0.074, the
+default was the value of
+C<$PPIx::Regexp::Tokenizer::DEFAULT_POSTDEREF>, which was true. When
 originally introduced this was false, but was documented as becoming
 true when and if postfix dereferencing became mainstream. The  intent to
 mainstream was announced with Perl 5.23.1, and became official (so to

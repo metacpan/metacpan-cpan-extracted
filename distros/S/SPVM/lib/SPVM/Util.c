@@ -149,32 +149,6 @@ int32_t SPNATIVE__SPVM__Util__isdigit(SPVM_ENV* env, SPVM_VALUE* stack) {
   return SPVM_SUCCESS;
 }
 
-// https://github.com/lattera/glibc/blob/master/stdlib/rand_r.c
-static int
-SPVM_rand_r (uint32_t *seed)
-{
-  uint32_t next = *seed;
-  int result;
-
-  next *= 1103515245;
-  next += 12345;
-  result = (uint32_t) (next / 65536) % 2048;
-
-  next *= 1103515245;
-  next += 12345;
-  result <<= 10;
-  result ^= (uint32_t) (next / 65536) % 1024;
-
-  next *= 1103515245;
-  next += 12345;
-  result <<= 10;
-  result ^= (uint32_t) (next / 65536) % 1024;
-
-  *seed = next;
-
-  return result;
-}
-
 int32_t SPNATIVE__SPVM__Util__memcpyb(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_dest_data = stack[0].oval;
@@ -934,5 +908,28 @@ int32_t SPNATIVE__SPVM__Util__DBL_MIN(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   stack[0].dval = DBL_MIN;
   
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__Util__srand(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int64_t seed = stack[0].lval;
+  
+  srand((unsigned)seed);
+
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__Util__crand(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  stack[0].ival = rand();
+
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__Util__RAND_MAX(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  stack[0].ival = RAND_MAX;
+
   return SPVM_SUCCESS;
 }

@@ -1,0 +1,19 @@
+
+The Root object in pic.png couldn't be found, aborting
+
+The error occurred when executing:
+ at blib/lib/PDF/Reuse.pm (autosplit into blib/lib/auto/PDF/Reuse/xRefs.al) line 4333.
+	PDF::Reuse::xRefs(3641, "pic.png") called at blib/lib/PDF/Reuse.pm (autosplit into blib/lib/auto/PDF/Reuse/getPage.al) line 4760
+	PDF::Reuse::getPage("pic.png", 1, "") called at blib/lib/PDF/Reuse.pm (autosplit into blib/lib/auto/PDF/Reuse/prImage.al) line 3435
+	PDF::Reuse::prImage(HASH(0x3567298)) called at lib/Mojo/PDF.pm line 172
+	Mojo::PDF::pic(Mojo::PDF=HASH(0x1eabfc8), "pic.png", "x", 300, "y", 200) called at test.pl line 6
+
+Situation when the error occurred
+
+   Bytes written to the current pdf-file,    pos    = 56590
+   Object processed, not necessarily written objNr  = 44
+   Current pdf-file,                         utfil  = test.pdf
+   File logging the run,                     runfil = undef
+   Local time                                       = Sun Oct  4 17:27:36 2020
+
+

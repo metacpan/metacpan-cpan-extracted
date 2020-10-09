@@ -1,6 +1,6 @@
 package Mail::BIMI::Base;
 # ABSTRACT: Base class for Mail::BIMI subclasses
-our $VERSION = '2.20200930.1'; # VERSION
+our $VERSION = '2.20201006.1'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -39,7 +39,7 @@ Mail::BIMI::Base - Base class for Mail::BIMI subclasses
 
 =head1 VERSION
 
-version 2.20200930.1
+version 2.20201006.1
 
 =head1 DESCRIPTION
 

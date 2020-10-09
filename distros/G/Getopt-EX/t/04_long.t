@@ -19,7 +19,7 @@ unshift @INC, $app_lib;
 {
     my $rc_content = "option default --default_inrc\n";
     my $rc_path = "t/home/.examplerc";
-    my $fh = new IO::File(">$rc_path") or die "$rc_path: $!\n";
+    my $fh = IO::File->new(">$rc_path") or die "$rc_path: $!\n";
     print $fh $rc_content;
     $fh->close;
 

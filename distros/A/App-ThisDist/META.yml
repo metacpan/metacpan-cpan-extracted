@@ -20,7 +20,11 @@ requires:
   CPAN::Dist::FromRepoName: '0'
   CPAN::Dist::FromURL: '0'
   Cwd: '0'
+  Exporter: '5.57'
   File::Slurper: '0'
+  File::chdir: '0'
+  Log::ger: '0.037'
+  Log::ger::Screen: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -28,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ThisDist
   homepage: https://metacpan.org/release/App-ThisDist
   repository: git://github.com/perlancar/perl-App-ThisDist.git
-version: '0.003'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

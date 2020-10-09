@@ -47,15 +47,16 @@ our @EXPORT_OK = qw(
     create_from_ref
     create_from_hash
     create_from_array
+    create_from_string
 );
 
 our %EXPORT_TAGS = (
     all    => \@EXPORT_OK,
-    create => [ qw(create_from_ref create_from_hash create_from_array plist_as_string) ],
+    create => [ qw(create_from_ref create_from_hash create_from_array create_from_string plist_as_string) ],
     parse  => [ qw(parse_plist parse_plist_fh parse_plist_file parse_plist_string) ],
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;  # see L<perlmodstyle>
 
@@ -199,6 +200,14 @@ create_from_ref.
 
 Provided for backward compatibility with L<Mac::PropertyList>: aliases
 create_from_ref.
+
+=item create_from_string( STRING )
+
+Provided for backward compatibility with L<Mac::PropertyList>: aliases C<Mac::PropertyList::create_from_string()>.
+
+=cut
+
+*create_from_string = \&Mac::PropertyList::create_from_string;
 
 =back
 

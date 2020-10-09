@@ -1,3 +1,7 @@
+0.10 2020-10-08
+    * Fix documentation for the "wrap" callback option
+      This adresses RT #133482, reported by Toby Inkster
+
 0.09 2020-04-10
     * More robust IPv6 handling in face of expansion
       The module now tries hard to distinguish between for example [::1]

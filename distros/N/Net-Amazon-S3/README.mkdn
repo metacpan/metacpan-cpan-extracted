@@ -4,7 +4,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 # VERSION
 
-version 0.94
+version 0.97
 
 # SYNOPSIS
 
@@ -273,35 +273,63 @@ Returns undef on error, else hashref of results
 
 ## add\_bucket
 
-Takes a hashref:
+        # Create new bucket with default location
+        my $bucket = $s3->add_bucket ('new-bucket');
+
+        # Create new bucket in another location
+        my $bucket = $s3->add_bucket ('new-bucket', location_constraint => 'eu-west-1');
+        my $bucket = $s3->add_bucket ('new-bucket', { location_constraint => 'eu-west-1' });
+        my $bucket = $s3->add_bucket (bucket => 'new-bucket', location_constraint => 'eu-west-1');
+        my $bucket = $s3->add_bucket ({ bucket => 'new-bucket', location_constraint => 'eu-west-1' });
+
+Method creates and returns new bucket.
+
+In case of error it reports it and returns `undef` (refer ["ERROR HANDLING"](#error-handling)).
+
+Recognized positional arguments (refer ["CALLING CONVENTION"](#calling-convention))
 
 - bucket
 
-    The name of the bucket you want to add
+    Required, recognized as positional.
+
+    The name of the bucket you want to add.
+
+Recognized optional arguments
 
 - acl
 
             acl => 'private'
-
             acl => Net::Amazon::S3::ACL::Canned->PRIVATE
+            acl => Net::Amazon::S3::ACL::Set->grant_read (email => 'foo@bar.baz')
 
-            acl => Net::Amazon::S3::ACL::Set
-                    ->grant_read (email => 'foo@bar.baz')
+    _Available since v0.94_
 
-    Set ACL for newly created bucket. Refer [Net::Amazon::S3::ACL](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AACL).
+    Set ACL to the newly created bucket. Refer [Net::Amazon::S3::ACL](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AACL) for possibilities.
 
-- acl\_short (optional; deprecated)
+- acl\_short (deprecated)
 
-    Deprecated. Use `acl` now.
+    _Deprecated since v0.94_
 
-- region (optional)
-- location\_constraint (optional)
+    When specified its value is used to populate `acl` argument (unless it exists).
+
+- location\_constraint
+
+    Optional.
 
     Sets the location constraint of the new bucket. If left unspecified, the
-    default S3 datacenter location will be used. Otherwise, you can set it
-    to 'EU' for a European data center - note that costs are different.
+    default S3 datacenter location will be used.
 
-Returns 0 on failure, Net::Amazon::S3::Bucket object on success
+    This library recognizes regions according Amazon S3 documentation
+
+    - →
+
+        [https://docs.aws.amazon.com/general/latest/gr/rande.html#s3\_region](https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region)
+
+    - →
+
+        [https://docs.aws.amazon.com/AmazonS3/latest/API/API\_CreateBucket.html#API\_CreateBucket\_RequestSyntax](https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateBucket.html#API_CreateBucket_RequestSyntax)
+
+Provides operation [CreateBucket](https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateBucket.html).
 
 ## bucket BUCKET
 
@@ -311,15 +339,24 @@ Returns an (unverified) bucket object from an account. Does no network access.
 
 ## delete\_bucket
 
-Takes either a [Net::Amazon::S3::Bucket](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3ABucket) object or a hashref containing
+        $s3->delete_bucket ($bucket);
+        $s3->delete_bucket (bucket => $bucket);
+
+Deletes bucket from account.
+
+Returns `true` if the bucket is successfully deleted.
+
+Returns `false` and reports an error otherwise (refer ["ERROR HANDLING"](#error-handling))
+
+Positional arguments (refer ["CALLING CONVENTION"](#calling-convention))
 
 - bucket
 
-    The name of the bucket to remove
+    Required.
 
-Returns false (and fails) if the bucket isn't empty.
+    The name of the bucket or [Net::Amazon::S3::Bucket](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3ABucket) instance you want to delete.
 
-Returns true if the bucket is successfully deleted.
+Provides operation ["DeleteBucket"](https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteBucket.html)
 
 ## list\_bucket
 
@@ -449,22 +486,6 @@ to S3 under the hood.
 
 Takes the same arguments as list\_bucket.
 
-## add\_key
-
-DEPRECATED. DO NOT USE
-
-## get\_key
-
-DEPRECATED. DO NOT USE
-
-## head\_key
-
-DEPRECATED. DO NOT USE
-
-## delete\_key
-
-DEPRECATED. DO NOT USE
-
 ## \_perform\_operation
 
     my $response = $s3->_perform_operation ('Operation' => (
@@ -479,6 +500,52 @@ Method takes same named parameters as realted Request class.
 Method provides available contextual parameters by default (eg s3, bucket)
 
 Method invokes contextual error handler.
+
+# CALLING CONVENTION
+
+_Available since v0.97_ - calling convention extentend
+
+In order to make method calls somehow consistent, backward compatible,
+and extendable, API's methods support multiple ways how to provide their arguments
+
+- plain named arguments (preferred)
+
+            method (named => 'argument', another => 'argument');
+
+- trailing configuration hash
+
+            method ({ named => 'argument', another => 'argument' });
+            method (positional, { named => 'argument', another => 'argument' } );
+
+    Last argument of every method can be configuration hash, treated as additional
+    named arguments. Can be combined with named arguments.
+
+- positional arguments with optional named arguments
+
+            method (positional, named => 'argument', another => 'argument');
+            method (positional, { named => 'argument', another => 'argument' } );
+
+    For methods supporting mandatory positional arguments additional named
+    arguments and/or configuration hash is supported.
+
+    Named arguments or configuration hash can specify value of positional
+    arguments as well removing it from list of required positional arguments
+    for given call (see example)
+
+            $s3->bucket->add_key ('key', 'value', acl => $acl);
+            $s3->bucket->add_key ('value', key => 'key', acl => $acl);
+            $s3->bucket->add_key (key => 'key', value => 'value', acl => $acl);
+
+# ERROR HANDLING
+
+[Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3) supports pluggable error handling via
+[Net::Amazon::S3::Error::Handler](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AError%3A%3AHandler).
+
+When response ends up with an error, every method reports it, and in case it
+receives control back (no exception), it returns `undef`.
+
+Default error handling for [Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3) is [Net::Amazon::S3::Error::Handler::Legacy](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AError%3A%3AHandler%3A%3ALegacy)
+which (mostly) sets `err` and `errstr`.
 
 # LICENSE
 
@@ -521,6 +588,8 @@ Leon Brocard <acme@astray.com> and unknown Amazon Digital Services programmers.
 Brad Fitzpatrick <brad@danga.com> - return values, Bucket object
 
 Pedro Figueiredo <me@pedrofigueiredo.org> - since 0.54
+
+Branislav Zahradník <barney@cpan.org> - since v0.81
 
 # SEE ALSO
 

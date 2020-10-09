@@ -1,5 +1,13 @@
 Revision history for Perl module YAML::Tidy
 
+0.003 2020-10-07 21:19:08+02:00
+
+    - Indent flow collections
+    - Fix --version option
+    - Remove trailing spaces also at the end of events
+    - Fix partial processing for scalars
+    - Trim trailing spaces in flow
+
 0.002 2020-09-29 18:25:51+02:00
 
     - Improve finding of node start and end

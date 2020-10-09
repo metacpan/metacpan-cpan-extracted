@@ -1,5 +1,5 @@
 package Text::Sprintf::Named;
-$Text::Sprintf::Named::VERSION = '0.0403';
+$Text::Sprintf::Named::VERSION = '0.0404';
 use warnings;
 use strict;
 
@@ -153,7 +153,7 @@ Text::Sprintf::Named - sprintf-like function with named conversions
 
 =head1 VERSION
 
-version 0.0403
+version 0.0404
 
 =head1 SYNOPSIS
 
@@ -188,10 +188,6 @@ only they are associated with the key of an associative array of
 parameters. So for example C<"%(name)s"> will emit the C<'name'> parameter
 as a string, and C<"%(num)4d"> will emit the C<'num'> parameter
 as a variable with a width of 4.
-
-=head1 VERSION
-
-version 0.0403
 
 =head1 FUNCTIONS
 
@@ -315,36 +311,9 @@ This program is released under the following license: MIT/X11:
 
 L<http://www.opensource.org/licenses/mit-license.php>
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/text-sprintf-named/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Text::Sprintf::Named
 
 =head2 Websites
 
@@ -363,35 +332,11 @@ L<https://metacpan.org/release/Text-Sprintf-Named>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Text-Sprintf-Named>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Sprintf-Named>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Text-Sprintf-Named>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Text-Sprintf-Named>
 
 =item *
 
@@ -442,5 +387,26 @@ from your repository :)
 L<https://github.com/shlomif/text-sprintf-named>
 
   git clone https://bitbucket.org/shlomif/perl-text-sprintf
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/text-sprintf-named/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

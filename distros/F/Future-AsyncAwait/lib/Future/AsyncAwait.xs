@@ -68,6 +68,16 @@ typedef SV PADNAME;
 #  define PadnamelistMAX(pnl)     AvFILLp(pnl)
 #endif
 
+/* Before perl 5.22 these were not visible */
+
+#ifndef block_end
+#define block_end(a,b)         Perl_block_end(aTHX_ a,b)
+#endif
+
+#ifndef block_start
+#define block_start(a)         Perl_block_start(aTHX_ a)
+#endif
+
 #ifndef wrap_keyword_plugin
 #  include "wrap_keyword_plugin.c.inc"
 #endif
@@ -1694,7 +1704,8 @@ static bool MY_future_check(pTHX_ SV *f, const char *method)
   SAVETMPS;
 
   PUSHMARK(SP);
-  XPUSHs(f);
+  EXTEND(SP, 1);
+  PUSHs(f);
   PUTBACK;
 
   call_method(method, G_SCALAR);
@@ -1718,7 +1729,8 @@ static void MY_future_get_to_stack(pTHX_ SV *f, I32 gimme)
   ENTER_with_name("future_get_to_stack");
 
   PUSHMARK(SP);
-  XPUSHs(f);
+  EXTEND(SP, 1);
+  PUSHs(f);
   PUTBACK;
 
   call_method("AWAIT_GET", gimme);
@@ -1735,14 +1747,35 @@ static void MY_future_on_ready(pTHX_ SV *f, CV *code)
   SAVETMPS;
 
   PUSHMARK(SP);
-  XPUSHs(f);
-  mXPUSHs(newRV_inc((SV *)code));
+  EXTEND(SP, 2);
+  PUSHs(f);
+  mPUSHs(newRV_inc((SV *)code));
   PUTBACK;
 
   call_method("AWAIT_ON_READY", G_VOID);
 
   FREETMPS;
   LEAVE_with_name("future_on_ready");
+}
+
+#define future_on_cancel(f, code)  MY_future_on_cancel(aTHX_ f, code)
+static void MY_future_on_cancel(pTHX_ SV *f, SV *code)
+{
+  dSP;
+
+  ENTER_with_name("future_on_cancel");
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  EXTEND(SP, 2);
+  PUSHs(f);
+  mPUSHs(code);
+  PUTBACK;
+
+  call_method("on_cancel", G_VOID);
+
+  FREETMPS;
+  LEAVE_with_name("future_on_cancel");
 }
 
 #define future_chain_on_cancel(f1, f2)  MY_future_chain_on_cancel(aTHX_ f1, f2)
@@ -1754,8 +1787,9 @@ static void MY_future_chain_on_cancel(pTHX_ SV *f1, SV *f2)
   SAVETMPS;
 
   PUSHMARK(SP);
-  XPUSHs(f1);
-  XPUSHs(f2);
+  EXTEND(SP, 2);
+  PUSHs(f1);
+  PUSHs(f2);
   PUTBACK;
 
   call_method("AWAIT_ON_CANCEL", G_VOID);
@@ -1767,6 +1801,26 @@ static void MY_future_chain_on_cancel(pTHX_ SV *f1, SV *f2)
 /*
  * Custom ops
  */
+
+static XOP xop_enterasync;
+static OP *pp_enterasync(pTHX)
+{
+  PADOFFSET precancel_padix = PL_op->op_targ;
+
+  if(precancel_padix) {
+    PAD_SVl(precancel_padix) = (SV *)newAV();
+    save_clearsv(&PAD_SVl(precancel_padix));
+  }
+
+  return PL_op->op_next;
+}
+
+static OP *newENTERASYNCOP(I32 flags)
+{
+  OP *op = newOP(OP_CUSTOM, flags);
+  op->op_ppaddr = &pp_enterasync;
+  return op;
+}
 
 static XOP xop_leaveasync;
 static OP *pp_leaveasync(pTHX)
@@ -1832,6 +1886,8 @@ static OP *pp_await(pTHX)
   CV *curcv = find_runcv(0);
   CV *origcv = curcv;
   bool defer_mortal_curcv = FALSE;
+
+  AV *precancel = PL_op->op_targ ? (AV *)PAD_SVl(PL_op->op_targ) : NULL;
 
   SuspendedState *state = suspendedstate_get(curcv);
 
@@ -1967,8 +2023,15 @@ static OP *pp_await(pTHX)
   state->awaiting_future = newSVsv(f);
   sv_rvweaken(state->awaiting_future);
 
-  if(!state->returning_future)
+  if(!state->returning_future) {
     state->returning_future = future_new_from_proto(f);
+    if(PL_op->op_targ) {
+      I32 i;
+      for(i = 0; i < av_count(precancel); i++)
+        future_on_cancel(state->returning_future, AvARRAY(precancel)[i]);
+      AvFILLp(precancel) = -1;
+    }
+  }
 
   if(defer_mortal_curcv)
     SvREFCNT_dec((SV *)curcv);
@@ -2006,6 +2069,32 @@ static OP *newAWAITOP(I32 flags, OP *expr)
   op->op_ppaddr = &pp_await;
 
   return op;
+}
+
+static XOP xop_pushcancel;
+static OP *pp_pushcancel(pTHX)
+{
+  SuspendedState *state = suspendedstate_get(find_runcv(0));
+
+  CV *on_cancel = cv_clone((CV *)cSVOP->op_sv);
+
+  if(state && state->returning_future) {
+    future_on_cancel(state->returning_future, newRV_noinc((SV *)on_cancel));
+  }
+  else {
+    AV *precancel = (AV *)PAD_SVl(PL_op->op_targ);
+    av_push(precancel, newRV_noinc((SV *)on_cancel));
+  }
+
+  return PL_op->op_next;
+}
+
+#define newPUSHCANCELOP(on_cancel)  MY_newPUSHCANCELOP(aTHX_ on_cancel)
+static OP *MY_newPUSHCANCELOP(pTHX_ CV *on_cancel)
+{
+  OP *op = newSVOP_CUSTOM(0, (SV *)on_cancel);
+  op->op_ppaddr = &pp_pushcancel;
+  return (OP *)op;
 }
 
 enum {
@@ -2096,6 +2185,8 @@ static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void 
    * await_keyword_plugin() can check
    */
   hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", newSVuv(PTR2UV(PL_compcv)));
+
+  hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", newRV_noinc(newSVuv(0)));
 }
 
 static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
@@ -2113,6 +2204,16 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
    */
 
   OP *op = newSTATEOP(0, NULL, NULL);
+
+  PADOFFSET precancel_padix = SvUV(SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));
+  if(precancel_padix) {
+    OP *enterasync;
+    op = op_append_elem(OP_LINESEQ, op,
+      enterasync = newENTERASYNCOP(0));
+
+    enterasync->op_targ = precancel_padix;
+  }
+
   op = op_append_elem(OP_LINESEQ, op, newOP(OP_PUSHMARK, 0));
 
   OP *try;
@@ -2173,7 +2274,57 @@ static int await_keyword_plugin(pTHX_ OP **op_ptr)
 
   *op_ptr = newAWAITOP(0, expr);
 
+  PADOFFSET precancel_padix = SvUV(SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));
+  if(precancel_padix)
+    (*op_ptr)->op_targ = precancel_padix;
+
   return KEYWORD_PLUGIN_EXPR;
+}
+
+static int cancel_phaser_keyword_plugin(pTHX_ OP **op_ptr)
+{
+  SV **asynccvp = hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", 0);
+  if(!asynccvp || SvUV(*asynccvp) != PTR2UV(PL_compcv))
+    croak(CvEVAL(PL_compcv) ?
+      "CANCEL is not allowed inside string eval" :
+      "Cannot 'CANCEL' outside of an 'async sub'");
+
+#ifdef WARN_EXPERIMENTAL
+      if(!hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/experimental(cancel)", 0)) {
+        Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+          "CANCEL block syntax is experimental and may be changed or removed without notice");
+      }
+#endif
+
+  lex_read_space(0);
+
+  I32 floor_ix = start_subparse(FALSE, CVf_ANON);
+  SAVEFREESV(PL_compcv);
+
+  I32 save_ix = block_start(0);
+  OP *body = parse_block(0);
+  SvREFCNT_inc(PL_compcv);
+  body = block_end(save_ix, body);
+
+  CV *on_cancel = newATTRSUB(floor_ix, NULL, NULL, NULL, body);
+
+  lex_read_space(0);
+
+  OP *pushcancel;
+
+  *op_ptr = op_prepend_elem(OP_LINESEQ,
+    (pushcancel = newPUSHCANCELOP(on_cancel)), NULL);
+
+  SV *sv;
+  PADOFFSET precancel_padix = SvUV(sv = SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));
+  if(!precancel_padix) {
+    precancel_padix = pad_add_name_pvs("@(Future::AsyncAwait/precancel)", 0, NULL, NULL);
+    sv_setuv(sv, precancel_padix);
+  }
+
+  pushcancel->op_targ = precancel_padix;
+
+  return KEYWORD_PLUGIN_STMT;
 }
 
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
@@ -2194,6 +2345,10 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
       hv_fetchs(hints, "Future::AsyncAwait/async", 0))
     return await_keyword_plugin(aTHX_ op_ptr);
 
+  if(kwlen == 6 && strEQ(kw, "CANCEL") &&
+      hv_fetchs(hints, "Future::AsyncAwait/async", 0))
+    return cancel_phaser_keyword_plugin(aTHX_ op_ptr);
+
   return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
 }
 
@@ -2207,6 +2362,11 @@ __cxstack_ix()
     RETVAL
 
 BOOT:
+  XopENTRY_set(&xop_enterasync, xop_name, "enterasync");
+  XopENTRY_set(&xop_enterasync, xop_desc, "enterasync()");
+  XopENTRY_set(&xop_enterasync, xop_class, OA_BASEOP);
+  Perl_custom_op_register(aTHX_ &pp_enterasync, &xop_enterasync);
+
   XopENTRY_set(&xop_leaveasync, xop_name, "leaveasync");
   XopENTRY_set(&xop_leaveasync, xop_desc, "leaveasync()");
   XopENTRY_set(&xop_leaveasync, xop_class, OA_UNOP);
@@ -2216,6 +2376,11 @@ BOOT:
   XopENTRY_set(&xop_await, xop_desc, "await()");
   XopENTRY_set(&xop_await, xop_class, OA_UNOP);
   Perl_custom_op_register(aTHX_ &pp_await, &xop_await);
+
+  XopENTRY_set(&xop_pushcancel, xop_name, "pushcancel");
+  XopENTRY_set(&xop_pushcancel, xop_desc, "pushcancel()");
+  XopENTRY_set(&xop_pushcancel, xop_class, OA_SVOP);
+  Perl_custom_op_register(aTHX_ &pp_pushcancel, &xop_pushcancel);
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
 #ifdef HAVE_DMD_HELPER

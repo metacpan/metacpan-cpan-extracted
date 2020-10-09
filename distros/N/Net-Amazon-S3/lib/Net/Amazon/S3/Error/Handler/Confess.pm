@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Error::Handler::Confess;
-$Net::Amazon::S3::Error::Handler::Confess::VERSION = '0.94';
+$Net::Amazon::S3::Error::Handler::Confess::VERSION = '0.97';
 # ABSTRACT: An internal class to report errors via Carp::confess
 
 use Moose;
@@ -11,11 +11,11 @@ extends 'Net::Amazon::S3::Error::Handler';
 our @CARP_NOT = (__PACKAGE__);
 
 sub handle_error {
-    my ($self, $response) = @_;
+	my ($self, $response) = @_;
 
-    return 1 unless $response->is_error;
+	return 1 unless $response->is_error;
 
-    Carp::confess ("${\ $response->error_code }: ${\ $response->error_message }");
+	Carp::confess ("${\ $response->error_code }: ${\ $response->error_message }");
 }
 
 1;
@@ -32,7 +32,7 @@ Net::Amazon::S3::Error::Handler::Confess - An internal class to report errors vi
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

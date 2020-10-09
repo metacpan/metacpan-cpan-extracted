@@ -17,11 +17,11 @@ Proc::ProcessTable::ncps - New Colorized(optional) PS, a enhanced version of PS 
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 
 =head1 SYNOPSIS
@@ -230,8 +230,9 @@ sub run{
 	}
 
 	my $tb = Text::ANSITable->new;
-	$tb->border_style('Default::none_ascii');
-	$tb->color_theme('Default::no_color');
+	$tb->border_style('ASCII::None');
+	# this seems to be a bit broken currently
+	#$tb->color_theme();
 
 	#
 	# assemble the headers

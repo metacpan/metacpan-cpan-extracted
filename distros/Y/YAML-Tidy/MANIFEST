@@ -10,6 +10,9 @@ Makefile.PL
 README.md
 bin/yamltidy
 dist.ini
+etc/Dockerfile
+etc/Dockerfile.base
+etc/install-yamltidy.sh
 lib/YAML/Tidy.pm
 lib/YAML/Tidy/Config.pm
 lib/YAML/Tidy/Node.pm
@@ -20,6 +23,7 @@ t/12.config.t
 t/data/foo.yaml
 t/data/indent.yaml
 t/data/plain.yaml
+t/data/trailing.yaml
 utils/config0.yaml
 utils/config1.yaml
 utils/config2.yaml

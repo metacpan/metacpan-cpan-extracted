@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Parts::Complete;
 # ABSTRACT: Internal class to perform ListParts operation
-$Net::Amazon::S3::Operation::Object::Parts::Complete::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Parts::Complete::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Object::Parts::Complete - Internal class to perform 
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

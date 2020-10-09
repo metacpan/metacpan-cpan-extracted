@@ -26,21 +26,28 @@ if($ENV{AUTOMATED_TESTING}) {
     close(T);
 
     if(@notOSes) { # user told us we got it wrong
-        push @extrafiles, File::Spec->catfile('t', "XX-autodetected-$^O-as-".join('--', map { s/::/-/g; $_ } @notOSes).".t");
-        open(FAIL, '>'.$extrafiles[-1]) ||
-            die("Coulsn't write ".$extrafiles[-1].": $!\n");
-        print FAIL 'print "1..1\\n";print "not ok 1\\n"';
-        close(FAIL);
-    } elsif(!@OSes && $ENV{AUTOMATED_TESTING}) { # didn't detect anything!
+        foreach my $os (@notOSes) {
+            (my $filename_os = $os) =~ s/::/-/g;
+            push @extrafiles, File::Spec->catfile('t', "XX-autodetected-$^O-as-$filename_os.t");
+            open(FAIL, '>'.$extrafiles[-1]) ||
+                die("Couldn't write ".$extrafiles[-1].": $!\n");
+            print FAIL 'print "1..1\\nnot ok 1\\n"';
+            close(FAIL);
+        }
+    }
+    if(!@notOSes && !@OSes) { # didn't detect anything!
         push @extrafiles, File::Spec->catfile('t', "XX-autodetected-$^O-as-nothing.t");
-        open(FAIL, '>'.$extrafiles[-1]);
-        print FAIL 'print "1..1\\n";print "not ok 1\\n"';
+        open(FAIL, '>'.$extrafiles[-1]) ||
+            die("Couldn't write ".$extrafiles[-1].": $!\n");
+        print FAIL 'print "1..1\\nnot ok 1\\n"';
         close(FAIL);
-    } elsif(@OSes) {
+    }
+    if(@OSes) {
         foreach my $os (@OSes) {
             (my $filename_os = $os) =~ s/::/-/g;
             push @extrafiles, File::Spec->catfile('t', "XX-autodetected-$^O-as-$filename_os.t");
-            open(PASS, '>'.$extrafiles[-1]);
+            open(PASS, '>'.$extrafiles[-1]) ||
+                die("Couldn't write ".$extrafiles[-1].": $!\n");
             print PASS qq{
                 use Devel::AssertOS::$os;
                 print "1..1\\n";print "ok 1\\n";

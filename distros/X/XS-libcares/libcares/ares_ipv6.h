@@ -1,3 +1,4 @@
+
 /* Copyright (C) 2005 by Dominick Meglio
  *
  * Permission to use, copy, modify, and distribute this
@@ -15,10 +16,6 @@
 
 #ifndef ARES_IPV6_H
 #define ARES_IPV6_H
-
-#ifdef HAVE_NETINET_IN_H
-#include <netinet/in.h>
-#endif
 
 #ifndef HAVE_PF_INET6
 #define PF_INET6 AF_INET6
@@ -41,6 +38,20 @@ typedef union
   struct sockaddr_in  sa4;
   struct sockaddr_in6 sa6;
 } ares_sockaddr;
+
+#ifndef HAVE_STRUCT_ADDRINFO
+struct addrinfo
+{
+  int              ai_flags;
+  int              ai_family;
+  int              ai_socktype;
+  int              ai_protocol;
+  ares_socklen_t   ai_addrlen;   /* Follow rfc3493 struct addrinfo */
+  char            *ai_canonname;
+  struct sockaddr *ai_addr;
+  struct addrinfo *ai_next;
+};
+#endif
 
 #ifndef NS_IN6ADDRSZ
 #ifndef HAVE_STRUCT_IN6_ADDR

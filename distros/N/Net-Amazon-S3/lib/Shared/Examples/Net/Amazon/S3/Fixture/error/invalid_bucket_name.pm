@@ -8,7 +8,8 @@ use HTTP::Status;
 use Shared::Examples::Net::Amazon::S3::Fixture;
 
 Shared::Examples::Net::Amazon::S3::Fixture::error_fixture
-    InvalidBucketName => HTTP::Status::HTTP_BAD_REQUEST;
+	InvalidBucketName => HTTP::Status::HTTP_BAD_REQUEST,
+	;
 
 __END__
 
@@ -22,7 +23,7 @@ Shared::Examples::Net::Amazon::S3::Fixture::error::invalid_bucket_name - Shared:
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

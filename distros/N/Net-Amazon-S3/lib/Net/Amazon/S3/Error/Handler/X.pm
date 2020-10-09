@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Error::Handler::X;
-$Net::Amazon::S3::Error::Handler::X::VERSION = '0.94';
+$Net::Amazon::S3::Error::Handler::X::VERSION = '0.97';
 # ABSTRACT: Throw error specific exception
 
 use Moose;
@@ -9,7 +9,7 @@ extends 'Net::Amazon::S3::Error::Handler';
 use Net::Amazon::S3::X;
 
 override handle_error => sub {
-    my ($self, $response, $request) = @_;
+	my ($self, $response, $request) = @_;
 
 	return 1 unless $response->is_error;
 
@@ -19,7 +19,7 @@ override handle_error => sub {
 		response => $response,
 	);
 
-    die $exception;
+	die $exception;
 };
 
 1;
@@ -36,7 +36,7 @@ Net::Amazon::S3::Error::Handler::X - Throw error specific exception
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

@@ -9,6 +9,7 @@ META.yml
 README
 dist.ini
 lib/Task/FreecellSolver/Testing/MultiConfig.pm
+scripts/tag-release.pl
 t/00-compile.t
 t/00-load.t
 t/placeholder.t

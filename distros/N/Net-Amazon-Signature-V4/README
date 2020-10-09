@@ -3,7 +3,7 @@ NAME
     signature version 4, AWS4-HMAC-SHA256
 
 VERSION
-    Version 0.20
+    Version 0.21
 
 SYNOPSIS
         use Net::Amazon::Signature::V4;

@@ -3,9 +3,9 @@ NAME
     read table data
 
 VERSION
-    This document describes version 0.583 of Perinci::Sub::Gen::AccessTable
+    This document describes version 0.585 of Perinci::Sub::Gen::AccessTable
     (from Perl distribution Perinci-Sub-Gen-AccessTable), released on
-    2020-02-23.
+    2020-10-07.
 
 SYNOPSIS
     In list_countries.pl:
@@ -107,10 +107,6 @@ DESCRIPTION
     command-line using Perinci::CmdLine (as demonstrated in Synopsis), or
     served via HTTP using Perinci::Access::HTTP::Server, or consumed
     normally by Perl programs.
-
-CAVEATS
-    It is often not a good idea to expose your database schema directly as
-    API.
 
 FUNCTIONS
   gen_read_table_func
@@ -514,6 +510,10 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+CAVEATS
+    It is often not a good idea to expose your database schema directly as
+    API.
 
 SEE ALSO
     Perinci::Sub::Gen::AccessTable::Simple for a simpler variant.

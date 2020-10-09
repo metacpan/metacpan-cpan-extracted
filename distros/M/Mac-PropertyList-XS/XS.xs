@@ -1,7 +1,3 @@
-#include <assert.h>
-#include <ctype.h>
-#include <search.h>
-
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -96,15 +92,11 @@ struct state {
     } *stack;
 };
 
-/// root of search tree of states
-void *statetree;
-
-#define countof(X) (sizeof (X) / sizeof (X)[0])
+/// map from parsers to state structures
+HV *statehash;
 
 /// TODO use our own ::XS namespace
-#define PACKAGE_PREFIX "Mac::PropertyList::SAX::"
-// long enough to cover any type name
-#define TYPE_FILLER    "XXXXXXXX"
+#define PACKAGE_PREFIX "Mac::PropertyList::SAX"
 
 static inline unsigned int hash(register const char *str)
 {
@@ -127,27 +119,13 @@ static inline unsigned int hash(register const char *str)
     return asso_values[(unsigned char)str[3]] + asso_values[(unsigned char)str[0]];
 }
 
-static int _find_parser(const void *a, const void *b)
+static struct state* state_for_parser(SV *expat)
 {
-    assert(a != NULL);
-    assert(b != NULL);
-
-    const struct state *x = a;
-    const struct state *y = b;
-
-    assert(x->parser != NULL);
-    assert(y->parser != NULL);
-
-    return SvRV(x->parser) - SvRV(y->parser);
-}
-
-static struct state* state_for_parser(SV *parser)
-{
-    struct state st = { .parser = parser };
-    struct state **result = tfind(&st, &statetree, _find_parser);
-    if (*result == NULL)
+    HE *p = hv_fetch_ent(statehash, SvRV(expat), false, 0);
+    if (p == NULL)
         croak("Failed to look up state object by parser argument");
-    return *result;
+    struct state *st = INT2PTR(struct state *, SvUV(HeVAL(p)));
+    return st;
 }
 
 // base64 decode
@@ -159,7 +137,7 @@ static int base64_decode(size_t ilen, const char in[ilen], size_t olen, char out
     for (i = 0; in[i]; i++) {
         unsigned char c = in[i];
         if (c == '=') break;
-        if (isspace(c)) continue;
+        if (isSPACE(c)) continue;
         // maybe handle bogus data better ?
         bits += decoder[c];
         char_count++;
@@ -220,11 +198,8 @@ handle_start(SV *expat, SV *element, ...)
             st->stack->next = old;
 
             if (is_COMPLEX_type(name)) {
-                char temp[] = PACKAGE_PREFIX TYPE_FILLER;
-                strcpy(&temp[sizeof PACKAGE_PREFIX - 1], name);
-
                 PUSHMARK(SP);
-                XPUSHs(sv_2mortal(newSVpv(temp, 0)));
+                XPUSHs(sv_2mortal(newSVpvf("%s::%s", PACKAGE_PREFIX, name)));
                 PUTBACK;
                 int count = call_method("new", G_SCALAR);
                 SPAGAIN;
@@ -264,11 +239,8 @@ handle_end(SV *expat, SV *element)
             st->base = *elt;
 
             if (is_SIMPLE_type(name)) {
-                char pv[] = PACKAGE_PREFIX TYPE_FILLER;
-                strcpy(&pv[sizeof PACKAGE_PREFIX - 1], name);
-
                 PUSHMARK(SP);
-                XPUSHs(sv_2mortal(newSVpv(pv, 0)));
+                XPUSHs(sv_2mortal(newSVpvf("%s::%s", PACKAGE_PREFIX, name)));
                 if (st->accum) {
                     if (hash(name) == HASH_FOR_data) {
                         size_t len;
@@ -334,8 +306,7 @@ handle_init(SV *expat)
         struct state *st;
         Newxz(st, 1, struct state);
         st->parser = expat;
-        // this is fragile : what if the expat object moves ? can it ?
-        tsearch(st, &statetree, _find_parser);
+        hv_store_ent(statehash, SvRV(expat), newSVuv(PTR2UV(st)), 0);
 
         if (!decoder[0]) {
             int i;
@@ -348,7 +319,7 @@ SV *
 handle_final(SV *expat)
     CODE:
         struct state *st = state_for_parser(expat);
-        tdelete(st, &statetree, _find_parser);
+        hv_delete_ent(statehash, SvRV(expat), G_DISCARD, 0);
         RETVAL = st->base.val;
         while (st->stack) {
             struct stack *temp = st->stack;
@@ -361,3 +332,5 @@ handle_final(SV *expat)
 
 INCLUDE: const-xs.inc
 
+BOOT:
+	statehash = newHV();

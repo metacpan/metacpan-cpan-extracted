@@ -6,6 +6,7 @@ lib/XS/libpanda.pod
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 misc/mytest.pl
 misc/trun.plx
 src/panda/basic_string.h
@@ -85,8 +86,8 @@ t/log/module.cc
 t/log/module.t
 t/log/multi.cc
 t/log/multi.t
+t/main.cc
 t/MyTest.pm
-t/MyTest.xs
 t/owning_list.cc
 t/owning_list.t
 t/string_char.cc

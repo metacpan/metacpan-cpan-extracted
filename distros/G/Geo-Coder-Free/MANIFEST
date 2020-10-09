@@ -1,16 +1,4 @@
-bin/address_lookup
-bin/createdatabase
-bin/geodecode
-bin/testcgibin
-cgi-bin/page.fcgi
 Changes
-conf/microcenter
-conf/ncbimac2024
-conf/njh
-conf/page.l4pconf
-createdatabase.PL
-css/style.css
-ignore.txt
 index.html
 lib/Geo/Coder/Free.pm
 lib/Geo/Coder/Free/bin/db2sql

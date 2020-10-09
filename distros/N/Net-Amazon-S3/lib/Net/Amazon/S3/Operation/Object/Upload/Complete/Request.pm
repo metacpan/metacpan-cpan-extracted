@@ -1,19 +1,14 @@
 package Net::Amazon::S3::Operation::Object::Upload::Complete::Request;
 # ABSTRACT: An internal class to complete a multipart upload
-$Net::Amazon::S3::Operation::Object::Upload::Complete::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Upload::Complete::Request::VERSION = '0.97';
 use Moose 0.85;
-use Digest::MD5 qw/md5 md5_hex/;
-use MIME::Base64;
 use Carp qw/croak/;
-use XML::LibXML;
 
 extends 'Net::Amazon::S3::Request::Object';
 
-with 'Net::Amazon::S3::Request::Role::Query::Param::Upload_id';
-with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_length';
-with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5';
-with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_type' => { content_type => 'application/xml' };
 with 'Net::Amazon::S3::Request::Role::HTTP::Method::POST';
+with 'Net::Amazon::S3::Request::Role::Query::Param::Upload_id';
+with 'Net::Amazon::S3::Request::Role::XML::Content';
 
 has 'etags'         => ( is => 'ro', isa => 'ArrayRef',   required => 1 );
 has 'part_numbers'  => ( is => 'ro', isa => 'ArrayRef',   required => 1 );
@@ -21,29 +16,21 @@ has 'part_numbers'  => ( is => 'ro', isa => 'ArrayRef',   required => 1 );
 __PACKAGE__->meta->make_immutable;
 
 sub _request_content {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    #build XML doc
-    my $xml_doc = XML::LibXML::Document->new('1.0','UTF-8');
-    my $root_element = $xml_doc->createElement('CompleteMultipartUpload');
-    $xml_doc->addChild($root_element);
-
-    #add content
-    for(my $i = 0; $i < scalar(@{$self->part_numbers}); $i++ ){
-        my $part = $xml_doc->createElement('Part');
-        $part->appendTextChild('PartNumber' => $self->part_numbers->[$i]);
-        $part->appendTextChild('ETag' => $self->etags->[$i]);
-        $root_element->addChild($part);
-    }
-
-    return $xml_doc->toString;
+	return $self->_build_xml (CompleteMultipartUpload => [
+		map +{ Part => [
+			{ PartNumber => $self->part_numbers->[$_] },
+			{ ETag       => $self->etags->[$_] },
+		]}, 0 ..  (@{$self->part_numbers} - 1)
+	]);
 }
 
 sub BUILD {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    croak "must have an equally sized list of etags and part numbers"
-        unless scalar(@{$self->part_numbers}) == scalar(@{$self->etags});
+	croak "must have an equally sized list of etags and part numbers"
+		unless scalar(@{$self->part_numbers}) == scalar(@{$self->etags});
 }
 
 1;
@@ -60,7 +47,7 @@ Net::Amazon::S3::Operation::Object::Upload::Complete::Request - An internal clas
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

@@ -2,9 +2,9 @@ NAME
     Sah::Schemas::RegexpPattern - Sah schemas related to Regexp::Pattern
 
 VERSION
-    This document describes version 0.001 of Sah::Schemas::RegexpPattern
+    This document describes version 0.002 of Sah::Schemas::RegexpPattern
     (from Perl distribution Sah-Schemas-RegexpPattern), released on
-    2020-01-03.
+    2020-05-27.
 
 HOMEPAGE
     Please visit the project's homepage at

@@ -1,5 +1,13 @@
 Revision history for VCS-Which
 
+0.6.7   2020-10-04
+        Updating for release of version 0.6.7
+        Updating date (Ivan Wills)
+        New param to open vimdiff in readonly mode (Ivan Wills)
+        Adding the ability to track versions of a commitish revision (Ivan Wills)
+        Fixing getting old revisions (Ivan Wills)
+        Adding the lastest perl versions (Ivan Wills)
+
 0.6.6   2018-12-02
         Updating for release of version 0.6.6
         Adding perl 5.26 to travis (Ivan Wills)

@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 
@@ -15,7 +17,8 @@ ok(fileno($dfh), 'handle ok');
 ok($dfh->can('seek'), 'can seek') if $] ge '5.020';
 ok(seek($dfh, 0, 0), 'seek successful');
 
-my $data = join '', <$dfh>;
+local $/ = undef;
+my $data = <$dfh>;
 $data =~ s/^.*\n__DATA__\r?\n/\n/s;
 
 like($data, qr/^\s+TestData\s+$/, 'data ok');

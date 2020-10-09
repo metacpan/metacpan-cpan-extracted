@@ -2,11 +2,10 @@ MANIFEST
 README
 Changes
 LICENSE
-Artistic_License.txt
-GPL_License.txt
 Makefile.PL
 Build.PL
 META.yml
+META.json
 lib/Tie/DB_File/SplitHash.pm
 lib/Tie/DB_File/SplitHash.pod
 t/01_Tie-DB_File-SplitHash.t

@@ -32,6 +32,7 @@
             "File::Open::NoCache::ReadOnly" : "0.02",
             "File::Slurp" : "0",
             "File::Spec" : "0",
+            "Geo::Coder::Abbreviations" : "0.03",
             "Geo::Location::Point" : "0.02",
             "IO::AIO" : "0",
             "IPC::System::Simple" : "0",
@@ -98,6 +99,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -1,6 +1,7 @@
 package Tie::FileLRUCache;
 
 use strict;
+use warnings;
 
 use Class::ParmList qw (simple_parms parse_parms);
 use Digest::SHA1 qw(sha1_hex);
@@ -12,7 +13,7 @@ use Symbol qw (gensym);
 use vars qw ($VERSION);
 
 BEGIN {
-    $VERSION = "1.05";
+    $VERSION = "1.06";
 }
 
 ###########################################################################
@@ -23,21 +24,31 @@ Tie::FileLRUCache - A lightweight but robust filesystem based persistent LRU cac
 
 =head1 CHANGES
 
- 1.05 2005.09.14   - Changes to pod tests to make them more CPANTS friendly.
-                     No functional changes.
+1.06 2020.10.08  - Changed license to MIT License. Updated maintainer info.
+                   Updated build files. Added GitHub repo meta to build.
+                   Changed minimum supported version of Perl to 5.6.
 
- 1.04 2005.09.13   - Removed use of 'warnings' to fix compatibility with Perl 5.005.
-                     Fixed minor typographical errors in documentation.
+1.05 2005.09.13  - Changes to pod tests to make them more CPANTS friendly.
+                   No functional changes.
 
- 1.03 2005.09.10   - Changed build test to handle difference in treatment of hashes
-                     in scalar contect between 5.6.x and 5.8.x versions of Perl that
-                     caused a test failure under Perl 5.6.x.
+1.04 2005.09.13  - Removed use of lexical warnings pragma to fix compatibility
+                   with Perl 5.005.
 
- 1.02 2005.09.08   - Added build tests. Major code cleanup. Improved platform portability.
-                     Added and documented 'cache_dir', 'keep_last' and 'number_of_entries'
-                     methods. Added Module::Build support.
+                   Fixed minor typographical errors in documentation.
 
- 1.01 1999.12.09   - Added 'detainting' to cache management code.
+1.03 2005.09.10 - Changed build test to handle difference in treatment of hashes
+                  in scalar context between 5.6.x and 5.8.x versions of Perl that
+                  caused a test failure under Perl 5.6.x.
+
+1.02 2005.09.08 - Added build tests. Major code cleanup. Improved platform portability.
+                  Added and documented 'cache_dir', 'keep_last' and 'number_of_entries'
+                  methods. Added Module::Build support.
+
+
+
+1.01 1999.12.09 - Added detainting in internal cache maintaining
+                  functions to evade Taint's tainting
+                  of filenames read via readdir().
 
 =head1 SYNOPSIS
 
@@ -990,22 +1001,35 @@ sub SCALAR {
 
 =head1 COPYRIGHT
 
-Copyright 1999, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and
-FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
+Copyright 1999, 2020 Jerilyn Franz and FreeRun Technologies, Inc. All Rights Reserved.
 
 =head1 VERSION
 
- 1.05 released 2005.09.14
+ 1.06 released 2020.10.08
 
 =head1 LICENSE
 
-This software may be copied or redistributed under the same terms as Perl itelf.
+MIT License
 
-This means that you can, at your option, redistribute it and/or modify it under
-either the terms the GNU Public License (GPL) version 1 or later, or under the
-Perl Artistic License.
+Copyright (c) 2020 Jerilyn Franz
 
-See http://dev.perl.org/licenses/
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =head1 DISCLAIMER
 
@@ -1027,7 +1051,7 @@ POSSIBILITY OF SUCH DAMAGE
 
 =head1 AUTHOR
 
-Benjamin Franz
+Jerilyn Franz
 
 =head1 TODO
 

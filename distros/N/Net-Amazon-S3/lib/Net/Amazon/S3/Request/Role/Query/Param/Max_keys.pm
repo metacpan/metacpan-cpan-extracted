@@ -1,14 +1,14 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Max_keys;
 # ABSTRACT: max-keys query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Max_keys::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::Query::Param::Max_keys::VERSION = '0.97';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
-    param => 'max_keys',
-    query_param => 'max-keys',
-    constraint => 'Maybe[Str]',
-    required => 0,
-    default => 1000,
+	param => 'max_keys',
+	query_param => 'max-keys',
+	constraint => 'Maybe[Str]',
+	required => 0,
+	default => 1000,
 };
 
 1;
@@ -25,7 +25,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Max_keys - max-keys query param ro
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

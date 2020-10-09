@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Bucket::Create;
 # ABSTRACT: Internal class to perform CreateBucket operation
-$Net::Amazon::S3::Operation::Bucket::Create::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Bucket::Create::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Bucket::Create - Internal class to perform CreateBuc
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

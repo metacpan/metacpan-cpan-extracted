@@ -64,9 +64,7 @@ use Scalar::Util qw{ refaddr };
 
     use PPIx::Regexp::Tokenizer;
     my %arg = (
-	tokenizer	=> PPIx::Regexp::Tokenizer->new( '',
-	    postderef	=> 1,	# TODO
-	),
+	tokenizer	=> PPIx::Regexp::Tokenizer->new( '' ),
     );
     foreach my $short ( qw{ Code Interpolation } ) {
 	my $class = "PPIx::Regexp::Token::$short";

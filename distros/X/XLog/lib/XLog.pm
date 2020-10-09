@@ -4,7 +4,7 @@ use Export::XS;
 use XS::libpanda;
 use XS::Framework;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 XS::Loader::load();
 

@@ -1,25 +1,34 @@
 NAME
-    File::Listing - parse directory listing
+
+    File::Listing - Parse directory listing
+
+VERSION
+
+    version 6.11
 
 SYNOPSIS
+
      use File::Listing qw(parse_dir);
      $ENV{LANG} = "C";  # dates in non-English locales not supported
-     for (parse_dir(`ls -l`)) {
-         ($name, $type, $size, $mtime, $mode) = @$_;
+     foreach my $file (parse_dir(`ls -l`)) {
+         my ($name, $type, $size, $mtime, $mode) = @$file;
          next if $type ne 'f'; # plain file
          #...
      }
- 
+     
      # directory listing can also be read from a file
-     open(LISTING, "zcat ls-lR.gz|");
-     $dir = parse_dir(\*LISTING, '+0000');
+     open my $listing, "zcat ls-lR.gz|";
+     $dir = parse_dir($listing, '+0000');
 
 DESCRIPTION
-    This module exports a single function called "parse_dir", which can be
+
+    This module exports a single function called parse_dir, which can be
     used to parse directory listings.
 
 FUNCTIONS
-  parse_dir
+
+ parse_dir
+
      my $dir = parse_dir( $listing );
      my $dir = parse_dir( $listing, $time_zone );
      my $dir = parse_dir( $listing, $time_zone, $type );
@@ -29,8 +38,8 @@ FUNCTIONS
      my @files = parse_dir( $listing, $time_zone, $type );
      my @files = parse_dir( $listing, $time_zone, $type, $error );
 
-    The first parameter ($listing) is the directory listing to parse. It can
-    be a scalar, a reference to an array of directory lines or a glob
+    The first parameter ($listing) is the directory listing to parse. It
+    can be a scalar, a reference to an array of directory lines or a glob
     representing a filehandle to read the directory listing from.
 
     The second parameter ($time_zone) is the time zone to use when parsing
@@ -39,7 +48,8 @@ FUNCTIONS
 
     The third parameter ($type) is the type of listing to assume. Currently
     supported formats are 'unix', 'apache' and 'dosftp'. The default value
-    is 'unix'. Ideally, the listing type should be determined automatically.
+    is 'unix'. Ideally, the listing type should be determined
+    automatically.
 
     The fourth parameter ($error) specifies how unparseable lines should be
     treated. Values can be 'ignore', 'warn' or a code reference. Warn means
@@ -53,7 +63,7 @@ FUNCTIONS
      foreach my $file (parse_dir($listing)) {
          my($name, $type, $size, $mtime, $mode) = @$file;
      }
- 
+     
      # scalar context
      my $dir = parse_dir($listing);
      foreach my $file (@$dir) {
@@ -65,31 +75,42 @@ FUNCTIONS
     directory entries are represented by an array consisting of:
 
     name
-        The name of the file.
+
+      The name of the file.
 
     type
-        One of: "f" file, "d" directory, "l" symlink, "?" unknown.
+
+      One of: f file, d directory, l symlink, ? unknown.
 
     size
-        The size of the file.
+
+      The size of the file.
 
     time
-        The number of seconds since January 1, 1970.
+
+      The number of seconds since January 1, 1970.
 
     mode
-        Bitmask a la the mode returned by "stat".
+
+      Bitmask a la the mode returned by stat.
 
 SEE ALSO
+
     File::Listing::Ftpcopy
-        Provides the same interface but uses XS and the parser
-        implementation from "ftpcopy".
 
-COPYRIGHT
-    Copyright 1996-2010, Gisle Aas Copyright 2020 Graham Ollis
+      Provides the same interface but uses XS and the parser implementation
+      from ftpcopy.
 
-    Based on lsparse.pl (from Lee McLoughlin's ftp mirror package) and
-    Net::FTP's parse_dir (Graham Barr).
+AUTHORS
 
-    This library is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
+      * Gisle Aas
+
+      * Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 1996-2020 by Gisle Aas.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

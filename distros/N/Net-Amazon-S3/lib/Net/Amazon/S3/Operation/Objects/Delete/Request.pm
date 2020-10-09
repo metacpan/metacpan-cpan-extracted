@@ -1,46 +1,33 @@
 package Net::Amazon::S3::Operation::Objects::Delete::Request;
 # ABSTRACT: An internal class to delete multiple objects from a bucket
-$Net::Amazon::S3::Operation::Objects::Delete::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Objects::Delete::Request::VERSION = '0.97';
 use Moose 0.85;
-use Digest::MD5 qw/md5 md5_hex/;
-use MIME::Base64;
 use Carp qw/croak/;
 
 extends 'Net::Amazon::S3::Request::Bucket';
 
 has 'keys'      => ( is => 'ro', isa => 'ArrayRef',   required => 1 );
 
-with 'Net::Amazon::S3::Request::Role::Query::Action::Delete';
-with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_length';
-with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5';
-with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_type' => { content_type => 'application/xml' };
 with 'Net::Amazon::S3::Request::Role::HTTP::Method::POST';
+with 'Net::Amazon::S3::Request::Role::Query::Action::Delete';
+with 'Net::Amazon::S3::Request::Role::XML::Content';
 
 __PACKAGE__->meta->make_immutable;
 
 sub _request_content {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    #build XML doc
-    my $xml_doc = XML::LibXML::Document->new('1.0','UTF-8');
-    my $root_element = $xml_doc->createElement('Delete');
-    $xml_doc->addChild($root_element);
-    $root_element->appendTextChild('Quiet'=>'true');
-    #add content
-    foreach my $key (@{$self->keys}){
-        my $obj_element = $xml_doc->createElement('Object');
-        $obj_element->appendTextChild('Key' => $key);
-        $root_element->addChild($obj_element);
-    }
-
-    return $xml_doc->toString;
+	return $self->_build_xml (Delete => [
+		{ Quiet => 'true' },
+		map +{ Object => [ { Key => $_ } ] }, @{ $self->keys }
+	]);
 }
 
 sub BUILD {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    croak "The maximum number of keys is 1000"
-        if (scalar(@{$self->keys}) > 1000);
+	croak "The maximum number of keys is 1000"
+		if (scalar(@{$self->keys}) > 1000);
 }
 
 1;
@@ -57,7 +44,7 @@ Net::Amazon::S3::Operation::Objects::Delete::Request - An internal class to dele
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

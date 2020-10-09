@@ -1,0 +1,66 @@
+{
+   "abstract" : "serial port shell",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "app",
+      "serial",
+      "port",
+      "shell",
+      "console"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-sersh",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::ReadLine::Gnu" : "0",
+            "AnyEvent::SerialPort" : "0",
+            "File::HomeDir" : "0",
+            "Getopt::Long" : "0",
+            "Path::Class" : "0",
+            "Pod::Usage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::sersh" : {
+         "file" : "lib/App/sersh.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/App-sersh/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jozef/App-sersh/"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

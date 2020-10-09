@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::XML::Content;
 # ABSTRACT: Role providing XML content
-$Net::Amazon::S3::Request::Role::XML::Content::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::XML::Content::VERSION = '0.97';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_length';
@@ -11,8 +11,8 @@ sub _build_xml {
 
 	my $ns = Net::Amazon::S3::Constants->S3_NAMESPACE_URI;
 
-    my $xml_doc = XML::LibXML::Document->new ('1.0','UTF-8');
-    my $root_element = $xml_doc->createElementNS ($ns, $root_name);
+	my $xml_doc = XML::LibXML::Document->new ('1.0','UTF-8');
+	my $root_element = $xml_doc->createElementNS ($ns, $root_name);
 	$xml_doc->setDocumentElement ($root_element);
 
 	my @queue = ([ $root_element, $root_content ]);
@@ -52,7 +52,7 @@ Net::Amazon::S3::Request::Role::XML::Content - Role providing XML content
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

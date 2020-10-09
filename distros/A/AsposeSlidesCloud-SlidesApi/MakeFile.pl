@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
   NAME             => 'AsposeSlidesCloud::SlidesApi',
-  VERSION          => 20.08,
+  VERSION          => 20.09,
   ABSTRACT         => 'Aspose.Slides Cloud SDK',
   AUTHOR           => 'Victor Putrov',
   LICENSE          => 'MIT',

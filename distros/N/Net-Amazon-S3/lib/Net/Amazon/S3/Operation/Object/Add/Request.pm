@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Add::Request;
 # ABSTRACT: An internal class to add an object to a bucket.
-$Net::Amazon::S3::Operation::Object::Add::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Add::Request::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -12,22 +12,22 @@ with 'Net::Amazon::S3::Request::Role::HTTP::Method::PUT';
 
 has 'value'     => ( is => 'ro', isa => 'Str|CodeRef|ScalarRef',     required => 1 );
 has 'headers' =>
-    ( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
+	( is => 'ro', isa => 'HashRef', required => 0, default => sub { {} } );
 
 __PACKAGE__->meta->make_immutable;
 
 sub _request_headers {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    return %{ $self->headers };
+	return %{ $self->headers };
 }
 
 sub http_request {
-    my $self    = shift;
+	my $self    = shift;
 
-    return $self->_build_http_request(
-        content => $self->value,
-    );
+	return $self->_build_http_request(
+		content => $self->value,
+	);
 }
 
 1;
@@ -44,7 +44,7 @@ Net::Amazon::S3::Operation::Object::Add::Request - An internal class to add an o
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

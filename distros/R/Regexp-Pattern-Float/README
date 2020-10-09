@@ -1,0 +1,384 @@
+NAME
+    Regexp::Pattern::Float - Regexp patterns related to floating (decimal)
+    numbers
+
+VERSION
+    This document describes version 0.001 of Regexp::Pattern::Float (from
+    Perl distribution Regexp-Pattern-Float), released on 2020-05-27.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Float::float");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+PATTERNS
+    *   float
+
+        Floating number (decimal or exponent form, or Inf/NaN).
+
+        Examples:
+
+         "" =~ re("Float::float");  # DOESN'T MATCH
+
+         123 =~ re("Float::float");  # matches
+
+         "+123." =~ re("Float::float");  # matches
+
+         "+12.3" =~ re("Float::float");  # matches
+
+         "-.123" =~ re("Float::float");  # matches
+
+         "123e1" =~ re("Float::float");  # matches
+
+         "123.e2" =~ re("Float::float");  # matches
+
+         "-1.23E+3" =~ re("Float::float");  # matches
+
+         "+.5e-3" =~ re("Float::float");  # matches
+
+         "Inf" =~ re("Float::float");  # matches
+
+         "-Inf" =~ re("Float::float");  # matches
+
+         "+infinity" =~ re("Float::float");  # matches
+
+         "infini" =~ re("Float::float");  # DOESN'T MATCH
+
+        nan.
+
+         "NaN" =~ re("Float::float");  # matches
+
+        nan.
+
+         "nan" =~ re("Float::float");  # matches
+
+        nan does not recognize sign.
+
+         "+NaN" =~ re("Float::float");  # DOESN'T MATCH
+
+        nan does not recognize sign.
+
+         "-NaN" =~ re("Float::float");  # DOESN'T MATCH
+
+         "abc" =~ re("Float::float");  # DOESN'T MATCH
+
+    *   float_decimal
+
+        Floating number (decimal form, e.g. +12, -12.3, .4, -5.).
+
+        Examples:
+
+         "" =~ re("Float::float_decimal");  # DOESN'T MATCH
+
+         123 =~ re("Float::float_decimal");  # matches
+
+         "+123" =~ re("Float::float_decimal");  # matches
+
+         -123 =~ re("Float::float_decimal");  # matches
+
+         "123." =~ re("Float::float_decimal");  # matches
+
+         "+123." =~ re("Float::float_decimal");  # matches
+
+         "-123." =~ re("Float::float_decimal");  # matches
+
+         "123.0" =~ re("Float::float_decimal");  # matches
+
+         "+123.0" =~ re("Float::float_decimal");  # matches
+
+         "-123.0" =~ re("Float::float_decimal");  # matches
+
+         123.0456 =~ re("Float::float_decimal");  # matches
+
+         "+123.0456" =~ re("Float::float_decimal");  # matches
+
+         -123.0456 =~ re("Float::float_decimal");  # matches
+
+         ".5" =~ re("Float::float_decimal");  # matches
+
+         "+.5" =~ re("Float::float_decimal");  # matches
+
+         "-.5" =~ re("Float::float_decimal");  # matches
+
+         "." =~ re("Float::float_decimal");  # DOESN'T MATCH
+
+         "+." =~ re("Float::float_decimal");  # DOESN'T MATCH
+
+         "-." =~ re("Float::float_decimal");  # DOESN'T MATCH
+
+        Exponent form.
+
+         "1e1" =~ re("Float::float_decimal");  # DOESN'T MATCH
+
+        infinity.
+
+         "Inf" =~ re("Float::float_decimal");  # DOESN'T MATCH
+
+        nan.
+
+         "NaN" =~ re("Float::float_decimal");  # DOESN'T MATCH
+
+         "abc" =~ re("Float::float_decimal");  # DOESN'T MATCH
+
+    *   float_decimal_or_exp
+
+        Floating number (decimal or exponent form).
+
+        Examples:
+
+         "" =~ re("Float::float_decimal_or_exp");  # DOESN'T MATCH
+
+         123 =~ re("Float::float_decimal_or_exp");  # matches
+
+         "+123." =~ re("Float::float_decimal_or_exp");  # matches
+
+         "+12.3" =~ re("Float::float_decimal_or_exp");  # matches
+
+         "-.123" =~ re("Float::float_decimal_or_exp");  # matches
+
+         "123e1" =~ re("Float::float_decimal_or_exp");  # matches
+
+         "123.e2" =~ re("Float::float_decimal_or_exp");  # matches
+
+         "-1.23E+3" =~ re("Float::float_decimal_or_exp");  # matches
+
+         "+.5e-3" =~ re("Float::float_decimal_or_exp");  # matches
+
+        infinity.
+
+         "Inf" =~ re("Float::float_decimal_or_exp");  # DOESN'T MATCH
+
+        nan.
+
+         "NaN" =~ re("Float::float_decimal_or_exp");  # DOESN'T MATCH
+
+    *   float_exp
+
+        Floating number (exponent form, e.g. 1.2e+3, -1.2e-3).
+
+        Examples:
+
+         "" =~ re("Float::float_exp");  # DOESN'T MATCH
+
+        Decimal form.
+
+         123 =~ re("Float::float_exp");  # DOESN'T MATCH
+
+        Decimal form.
+
+         "+123" =~ re("Float::float_exp");  # DOESN'T MATCH
+
+        Decimal form.
+
+         -123 =~ re("Float::float_exp");  # DOESN'T MATCH
+
+         "123e1" =~ re("Float::float_exp");  # matches
+
+         "12.3E2" =~ re("Float::float_exp");  # matches
+
+         "-123.e+3" =~ re("Float::float_exp");  # matches
+
+         "+.5e-3" =~ re("Float::float_exp");  # matches
+
+        infinity.
+
+         "Inf" =~ re("Float::float_exp");  # DOESN'T MATCH
+
+        nan.
+
+         "NaN" =~ re("Float::float_exp");  # DOESN'T MATCH
+
+    *   float_inf
+
+        Infinity.
+
+        Examples:
+
+         "" =~ re("Float::float_inf");  # DOESN'T MATCH
+
+         123 =~ re("Float::float_inf");  # DOESN'T MATCH
+
+         "Inf" =~ re("Float::float_inf");  # matches
+
+         "-Inf" =~ re("Float::float_inf");  # matches
+
+         "+infinity" =~ re("Float::float_inf");  # matches
+
+         "infini" =~ re("Float::float_inf");  # DOESN'T MATCH
+
+        nan.
+
+         "NaN" =~ re("Float::float_inf");  # DOESN'T MATCH
+
+    *   float_nan
+
+        NaN.
+
+        Examples:
+
+         "" =~ re("Float::float_nan");  # DOESN'T MATCH
+
+         123 =~ re("Float::float_nan");  # DOESN'T MATCH
+
+        infinity.
+
+         "Inf" =~ re("Float::float_nan");  # DOESN'T MATCH
+
+        nan.
+
+         "NaN" =~ re("Float::float_nan");  # matches
+
+        nan.
+
+         "nan" =~ re("Float::float_nan");  # matches
+
+        nan does not recognize sign.
+
+         "+NaN" =~ re("Float::float_nan");  # DOESN'T MATCH
+
+        nan does not recognize sign.
+
+         "-NaN" =~ re("Float::float_nan");  # DOESN'T MATCH
+
+    *   ufloat
+
+        Unsigned floating number (decimal or exponent form, or Inf/NaN).
+
+        Examples:
+
+         "" =~ re("Float::ufloat");  # DOESN'T MATCH
+
+         123 =~ re("Float::ufloat");  # matches
+
+         "+123." =~ re("Float::ufloat");  # matches
+
+         "+12.3" =~ re("Float::ufloat");  # matches
+
+         "-.123" =~ re("Float::ufloat");  # DOESN'T MATCH
+
+         "123e1" =~ re("Float::ufloat");  # matches
+
+         "123.e2" =~ re("Float::ufloat");  # matches
+
+         "-1.23E+3" =~ re("Float::ufloat");  # DOESN'T MATCH
+
+         "+.5e-3" =~ re("Float::ufloat");  # matches
+
+         "Inf" =~ re("Float::ufloat");  # matches
+
+         "-Inf" =~ re("Float::ufloat");  # DOESN'T MATCH
+
+         "+infinity" =~ re("Float::ufloat");  # matches
+
+         "infini" =~ re("Float::ufloat");  # DOESN'T MATCH
+
+        nan.
+
+         "NaN" =~ re("Float::ufloat");  # matches
+
+        nan.
+
+         "nan" =~ re("Float::ufloat");  # matches
+
+        nan does not recognize sign.
+
+         "+NaN" =~ re("Float::ufloat");  # DOESN'T MATCH
+
+        nan does not recognize sign.
+
+         "-NaN" =~ re("Float::ufloat");  # DOESN'T MATCH
+
+         "abc" =~ re("Float::ufloat");  # DOESN'T MATCH
+
+    *   ufloat_decimal
+
+        Unsigned floating number (decimal form, e.g. 12, +12.3, .4, 5.).
+
+        Examples:
+
+         "" =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+         123 =~ re("Float::ufloat_decimal");  # matches
+
+         "+123" =~ re("Float::ufloat_decimal");  # matches
+
+         -123 =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+         "123." =~ re("Float::ufloat_decimal");  # matches
+
+         "+123." =~ re("Float::ufloat_decimal");  # matches
+
+         "-123." =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+         "123.0" =~ re("Float::ufloat_decimal");  # matches
+
+         "+123.0" =~ re("Float::ufloat_decimal");  # matches
+
+         "-123.0" =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+         123.0456 =~ re("Float::ufloat_decimal");  # matches
+
+         "+123.0456" =~ re("Float::ufloat_decimal");  # matches
+
+         -123.0456 =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+         ".5" =~ re("Float::ufloat_decimal");  # matches
+
+         "+.5" =~ re("Float::ufloat_decimal");  # matches
+
+         "-.5" =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+         "." =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+         "+." =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+         "-." =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+        Exponent form.
+
+         "1e1" =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+        infinity.
+
+         "Inf" =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+        nan.
+
+         "NaN" =~ re("Float::ufloat_decimal");  # DOESN'T MATCH
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Float>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Float>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Float>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern::Int
+
+    Sah schemas in Sah::Schemas::Float, e.g. Sah::Schema::ufloat
+
+    Regexp::Pattern
+
+    Some utilities related to Regexp::Pattern: App::RegexpPatternUtils,
+    rpgrep from App::rpgrep.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

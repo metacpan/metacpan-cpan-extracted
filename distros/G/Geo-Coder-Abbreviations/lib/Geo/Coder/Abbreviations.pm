@@ -11,12 +11,12 @@ Geo::Coder::Abbreviations - Quick and Dirty Interface to https://github.com/mapb
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
 our %abbreviations;
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -29,6 +29,9 @@ One small function for now, I'll add others later.
 
 Creates a Geo::Coder::Abbreviations object.
 It takes no arguments.
+If you have L<HTTP::Cache::Transparent> installed, it will load much
+faster, otherwise it will download the database from the Internet
+when the class is first instatiated.
 
 =cut
 
@@ -39,11 +42,41 @@ sub new {
 	return unless(defined($class));
 
 	unless(scalar keys(%abbreviations)) {
+		if(eval { require HTTP::Cache::Transparent; }) {
+			require File::Spec;	# That should be installed
+
+			File::Spec->import();
+			HTTP::Cache::Transparent->import();
+
+			my $cachedir;
+			if(my $e = $ENV{'CACHEDIR'}) {
+				$cachedir = File::Spec->catfile($e, 'http-cache-transparent');
+			} else {
+				$cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
+			}
+
+			HTTP::Cache::Transparent::init({
+				BasePath => $cachedir,
+				# Verbose => $opts{'v'} ? 1 : 0,
+				NoUpdate => 60 * 60 * 24,
+				MaxAge => 30 * 24
+			}) || die "$0: $cachedir: $!";
+		}
+
 		my $data = get('https://raw.githubusercontent.com/mapbox/geocoder-abbreviations/master/tokens/en.json');
 
 		die unless(defined($data));
 
-		%abbreviations = map { (defined($_->{'type'}) && ($_->{'type'} eq 'way')) ? (uc($_->{'full'}) => uc($_->{'canonical'})) : () } @{JSON->new()->utf8()->decode($data)};
+		%abbreviations = map {
+			my %rc = ();
+			if(defined($_->{'type'}) && ($_->{'type'} eq 'way')) {
+				foreach my $token(@{$_->{'tokens'}}) {
+					$rc{uc($token)} = uc($_->{'canonical'});
+				}
+			}
+			%rc;
+		} @{JSON->new()->utf8()->decode($data)};
+		# %abbreviations = map { (defined($_->{'type'}) && ($_->{'type'} eq 'way')) ? (uc($_->{'full'}) => uc($_->{'canonical'})) : () } @{JSON->new()->utf8()->decode($data)};
 	}
 
 	return bless {
@@ -59,6 +92,7 @@ Abbreviate a place.
 
     my $abbr = Geo::Coder::Abbreviations->new();
     print $abbr->abbreviate('Road'), "\n";	# prints 'RD'
+    print $abbr->abbreviate('RD'), "\n";	# prints 'RD'
 
 =cut
 
@@ -71,15 +105,13 @@ sub abbreviate {
 =head1 SEE ALSO
 
 L<https://github.com/mapbox/geocoder-abbreviations>
+L<HTTP::Cache::Transparent>
 
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
-
-If you give an an already abbreviated text, it returns undef.
-It would be better to return the given text.
 
 =head1 SUPPORT
 

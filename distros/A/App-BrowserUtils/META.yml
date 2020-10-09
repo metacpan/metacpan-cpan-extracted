@@ -40,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BrowserUtils
   homepage: https://metacpan.org/release/App-BrowserUtils
   repository: git://github.com/perlancar/perl-App-BrowserUtils.git
-version: '0.010'
+version: '0.011'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

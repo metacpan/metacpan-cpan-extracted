@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Upload::Abort;
 # ABSTRACT: Internal class to perform AbortMultipartUpload operation
-$Net::Amazon::S3::Operation::Object::Upload::Abort::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Upload::Abort::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Object::Upload::Abort - Internal class to perform Ab
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

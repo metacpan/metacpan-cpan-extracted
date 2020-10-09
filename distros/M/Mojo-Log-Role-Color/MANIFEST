@@ -6,6 +6,7 @@ MANIFEST			This list of files
 t/00-basic.t
 t/auto.t
 t/color.t
+t/func.t
 t/without.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

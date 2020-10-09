@@ -1,7 +1,7 @@
-package File::Temp; # git description: v0.2309-16-g1d3137c
+package File::Temp; # git description: v0.2310-3-gc7148fe
 # ABSTRACT: return name and handle of a temporary file safely
 
-our $VERSION = '0.2310';
+our $VERSION = '0.2311';
 
 #pod =begin :__INTERNALS
 #pod
@@ -1382,7 +1382,7 @@ sub DESTROY {
 #pod
 #pod EXLOCK flag available since 0.19.
 #pod
-#pod PERMS flag available since 0.24.
+#pod PERMS flag available since 0.2310.
 #pod
 #pod =cut
 
@@ -2596,7 +2596,7 @@ sub unlink1 {
 package ## hide from PAUSE
   File::Temp::Dir;
 
-our $VERSION = '0.2310';
+our $VERSION = '0.2311';
 
 use File::Path qw/ rmtree /;
 use strict;
@@ -2663,7 +2663,7 @@ File::Temp - return name and handle of a temporary file safely
 
 =head1 VERSION
 
-version 0.2310
+version 0.2311
 
 =head1 SYNOPSIS
 
@@ -3037,7 +3037,7 @@ TMPDIR flag available since 0.19.
 
 EXLOCK flag available since 0.19.
 
-PERMS flag available since 0.24.
+PERMS flag available since 0.2310.
 
 =item B<tempdir>
 

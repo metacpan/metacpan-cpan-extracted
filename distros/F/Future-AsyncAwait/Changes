@@ -1,5 +1,12 @@
 Revision history for Future-AsyncAwait
 
+0.44    2020-10-09
+        [CHANGES]
+         * Added initial attempt at `CANCEL` blocks for handling Future
+           cancellation - experimental
+         * Announce upcoming API method rename of `AWAIT_ON_CANCEL` to
+           `AWAIT_CHAIN_CANCEL`
+
 0.43    2020-07-06
         [CHANGES]
          * Added explicit use VERSION declarations to every perl file

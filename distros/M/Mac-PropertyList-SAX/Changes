@@ -115,3 +115,8 @@ Revision history for Mac-PropertyList-SAX
         Delegate binary plist handling to Mac::PropertyList, resolving RT
         #99072.
 
+0.90    2020-10-03T10:00-07:00
+        Integrate fix from GitHub user @trwyant for API change in upstream
+        Mac::PropertyList v1.501. Thanks !
+        Made minor tweaks like upgrading bundled Module::Install version.
+

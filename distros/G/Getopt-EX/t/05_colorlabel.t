@@ -15,8 +15,9 @@ my %hash = (
     REVERSE_BLUE  => "",
     );
 
-my $cm = new Getopt::EX::Colormap
-    HASH => \%hash;
+my $cm = Getopt::EX::Colormap->new(
+    HASH => \%hash,
+    );
 
 my @opt_colormap = qw(
     *RED=R

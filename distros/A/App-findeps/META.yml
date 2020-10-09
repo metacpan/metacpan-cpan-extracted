@@ -26,7 +26,7 @@ no_index:
 provides:
   App::findeps:
     file: lib/App/findeps.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   FastGlob: '1.5'
   List::Util: '1.55'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/worthmine/App-findeps/issues
   homepage: https://github.com/worthmine/App-findeps
   repository: git://github.com/worthmine/App-findeps.git
-version: '0.10'
+version: '0.11'
 x_authority: cpan:WORTHMINE
 x_contributors:
   - 'worthmine <worthmine@gmail.com>'

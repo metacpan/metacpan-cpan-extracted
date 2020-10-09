@@ -1,9 +1,9 @@
 package App::BrowserUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-18'; # DATE
+our $DATE = '2020-10-07'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -21,13 +21,18 @@ our %browsers = (
     firefox => {
         filter => sub {
             my $p = shift;
+
+            # when firefox is upgraded while an instance is still running, the
+            # exec field becomes empty and we need to use cmndline
+            my $prog = $p->{exec} || $p->{cmndline};
+
             # in some OS like linux the binary is firefox-bin, while in some
             # other like FreeBSD, it's firefox.
-            do { $p->{_note} = "exec is firefox or firefox-bin"; goto FOUND } if defined $p->{exec} && $p->{exec} =~ m![/\\](firefox-bin|firefox)\z!;
+            do { $p->{_note} = "program is firefox or firefox-bin"; goto FOUND } if $prog =~ m![/\\](firefox-bin|firefox)(\z|\s)!;
             do { $p->{_note} = "fname looks like firefox"; goto FOUND } if $p->{fname} =~ /\A(Web Content|WebExtensions|firefox-bin|firefox)\z/;
             goto NOT_FOUND;
           FOUND:
-            log_trace "Found firefox process (PID=%d, cmdline=%s, note=%s)", $p->{pid}, $p->{cmndline}, $p->{_note};
+            log_trace "Found firefox process (PID=%d, prog (exec|cmndline)=%s, note=%s)", $p->{pid}, $prog, $p->{_note};
             return 1;
           NOT_FOUND:
             0;
@@ -598,7 +603,7 @@ App::BrowserUtils - Utilities related to browsers, particularly modern GUI ones
 
 =head1 VERSION
 
-This document describes version 0.010 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2020-08-18.
+This document describes version 0.011 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2020-10-07.
 
 =head1 SYNOPSIS
 

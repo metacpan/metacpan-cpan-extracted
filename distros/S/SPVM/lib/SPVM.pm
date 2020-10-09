@@ -19,7 +19,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0914';
+our $VERSION = '0.0918';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -77,6 +77,7 @@ sub bind_to_perl {
   my ($builder, $added_package_names) = @_;
   
   for my $package_name (@$added_package_names) {
+    
     unless ($package_name_h->{$package_name}) {
       
       my $code = "package $package_name; our \@ISA = ('SPVM::BlessedObject::Package');";
@@ -91,7 +92,12 @@ sub bind_to_perl {
     my $sub_names = $builder->get_sub_names($package_name);
     
     for my $sub_name (@$sub_names) {
+      # Destrutor is skip
       if ($sub_name eq 'DESTROY') {
+        next;
+      }
+      # Anon subroutine is skip
+      elsif (length $sub_name == 0) {
         next;
       }
       
@@ -101,6 +107,7 @@ sub bind_to_perl {
       no strict 'refs';
       
       my ($package_name, $sub_name) = $sub_abs_name =~ /^(?:(.+)::)(.*)/;
+      
       # Declare subroutine
       *{"$sub_abs_name"} = sub {
         SPVM::init() unless $SPVM_INITED;

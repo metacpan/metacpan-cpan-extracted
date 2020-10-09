@@ -15,7 +15,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use File::chdir;
 
-our $VERSION = version->new('0.6.6');
+our $VERSION = version->new('0.6.7');
 
 has [qw/_installed _base/] => (
     is => 'rw',
@@ -122,7 +122,7 @@ VCS::Which::Plugin - Base class for the various VCS plugins
 
 =head1 VERSION
 
-This documentation refers to VCS::Which::Plugin version 0.6.6.
+This documentation refers to VCS::Which::Plugin version 0.6.7.
 
 =head1 SYNOPSIS
 

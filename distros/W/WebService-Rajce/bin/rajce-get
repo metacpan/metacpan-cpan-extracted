@@ -5,6 +5,7 @@
 use warnings;
 use strict;
 use WWW::Mechanize;
+use XML::FeedPP ();
 use File::Basename;
 use File::Path 2.06_05 qw(make_path);
 use Pod::Usage;
@@ -21,7 +22,6 @@ my %opt;
 
 GetOptions(
 	'u|url=s' => \$opt{u},
-	's|sorted' => \$opt{s},
 	'v|verbose' => \$opt{v},
 	'V|version' => \$opt{V},
 	'h|help' => \$opt{h},
@@ -46,40 +46,25 @@ if(!$opt{u} or $opt{u} !~ /$url_pattern/ or $opt{h}){
 
 my ($schema,$username,$album) = $opt{u} =~ $url_pattern;
 
-my $url = "$schema://$username.rajce.idnes.cz/$album";
+my $url = "$schema://$username.rajce.idnes.cz/$album/\?rss=media";
 
 my $bot = WWW::Mechanize->new(autocheck => 1, agent => 'rajce-get/'.$version);
 $bot->env_proxy();
 $bot->add_header('Accept-Encoding'=>'text/html');
 $bot->cookie_jar(HTTP::Cookies->new());
 
-my $gal = $bot->get($url);
-
-my $storageurl = $gal->content();
-$storageurl =~ s/.*var storage = "https:([^"]*)";.*/$1/s;
-
-my @images = $bot->find_all_links(tag => "a", url_regex => qr/$storageurl/ );
+my $feed = XML::FeedPP->new( $url );
 
 my $outdir = "$username/$album";
 
 info("Creating directory $outdir\n",%opt);
 make_path($outdir);
 
-# required number of base-10 digits for output name prefix
-my $prefixlen = 0;
-for (split //, scalar @images) {
-	$prefixlen++;
-}
-
-my $outidx = 0;
-foreach my $imglink (@images){
-	my $outname = basename($imglink->url());
-	if($opt{s}){
-		$outname = sprintf("%0".$prefixlen."d", $outidx)."_".$outname;
-	}
-	info("Downloading ".basename($imglink->url())." ...",%opt);
-	$bot->get($imglink->url, ':content_file' => "$outdir/".$outname);
-	$outidx++;
+foreach my $item ($feed->get_item()){
+	my $url = $item->get('media:content@url');
+	my $outname = basename($url);
+	info("Downloading ".basename($url)." ...",%opt);
+	$bot->get($url, ':content_file' => "$outdir/".$outname);
 	sleep 1;
 	info(" OK\n",%opt);
 }
@@ -103,7 +88,7 @@ rajce-get - Download images from rajce.net.
 
 =head1 VERSION
 
-version 1.190840
+version 1.202830
 
 =head1 SYNOPSIS
 
@@ -127,10 +112,6 @@ export https_proxy=http://login:password@proxyserver:port
 	 -v, --verbose
 			Verbose mode
 
-	 -s, --sorted
-			Sort output file names in the same order as they
-			appear in album
-
 	 -V, --version
 			Show version and exit
 
@@ -139,7 +120,7 @@ export https_proxy=http://login:password@proxyserver:port
 
 =head1 EXAMPLES
 
-rajce-get --sorted --verbose --url https://username.rajce.idnes.cz/album
+rajce-get --verbose --url https://username.rajce.idnes.cz/album
 
 =head1 SEE ALSO
 

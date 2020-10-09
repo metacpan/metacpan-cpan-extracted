@@ -3,9 +3,16 @@ NAME
     with current directory
 
 VERSION
-    This document describes version 0.003 of App::ThisDist (from Perl
-    distribution App-ThisDist), released on 2020-10-02.
+    This document describes version 0.005 of App::ThisDist (from Perl
+    distribution App-ThisDist), released on 2020-10-03.
 
+DESCRIPTION
+    See included scripts:
+
+    *   this-dist
+
+FUNCTIONS
+  this_dist
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-ThisDist>.
@@ -22,9 +29,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    See included scripts:
-
-    *   this-dist
+    App::DistUtils
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -1,0 +1,12 @@
+'digraph Perl {
+ graph [ rankdir="TB" ]
+ node [ shape="oval" ]
+ edge [ color="grey" ]
+ "Here"
+ "There"
+ "Here" -> "There"
+ "Everywhere"
+ "There" -> "Everywhere"
+ "Everywhere" -> "Here"
+}
+'

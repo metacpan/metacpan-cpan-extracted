@@ -1,20 +1,44 @@
 ---
-name: Tie-DB_File-SplitHash
-version: 1.05
+abstract: 'Transparently divides a DB_File hash into multiple smaller files'
 author:
-  - Benjamin Franz <snowhare@nihongo.org>
-abstract: Transparently divides a DB_File hash into multiple smaller files
-license: perl
-requires:
-  Carp: 0
-  DB_File: 0
-  Digest::SHA1: 0
-  Fcntl: 0
-  File::Path: 0
-  File::Spec: 0
-  File::Temp: 0
+  - 'Jerilyn Franz <cpan@jerilyn.info>'
+build_requires:
+  Carp: '0'
+  DB_File: '0'
+  Digest::SHA1: '0'
+  Fcntl: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::More: '0'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-DB_File-SplitHash
 provides:
   Tie::DB_File::SplitHash:
     file: lib/Tie/DB_File/SplitHash.pm
-    version: 1.05
-generated_by: Module::Build version 0.261
+    version: '1.07'
+requires:
+  Carp: '0'
+  DB_File: '0'
+  Digest::SHA1: '0'
+  Fcntl: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  perl: '5.006'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/JerilynFranz/perl-Tie-DB_File-SplitHash/issues
+  homepage: https://github.com/JerilynFranz/perl-Tie-DB_File-SplitHash
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://github.com/JerilynFranz/perl-Tie-DB_File-SplitHash.git
+version: '1.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

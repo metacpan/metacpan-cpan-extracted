@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Operation::Buckets::List::Request;
-$Net::Amazon::S3::Operation::Buckets::List::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Buckets::List::Request::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request::Service';
@@ -15,11 +15,11 @@ __PACKAGE__->meta->make_immutable;
 # https://docs.aws.amazon.com/general/latest/gr/rande.html
 
 sub http_request {
-    my $self    = shift;
-    return $self->_build_http_request (
-        use_virtual_host => 0,
-        region => 'us-east-1',
-    );
+	my $self    = shift;
+	return $self->_build_http_request (
+		use_virtual_host => 0,
+		region => 'us-east-1',
+	);
 }
 
 1;
@@ -36,7 +36,7 @@ Net::Amazon::S3::Operation::Buckets::List::Request - An internal class to list a
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

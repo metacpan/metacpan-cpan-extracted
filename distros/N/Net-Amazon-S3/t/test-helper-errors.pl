@@ -8,12 +8,28 @@ sub expect_s3_error_access_denied {
 	expect_error AccessDenied => 'Access denied error message';
 }
 
+sub expect_s3_error_bucket_exists {
+	expect_error BucketAlreadyExists => 'Bucket already exists error message';
+}
+
 sub expect_s3_error_bucket_not_empty {
 	expect_error BucketNotEmpty => 'Bucket not empty error message';
 }
 
 sub expect_s3_error_bucket_not_found {
 	expect_error NoSuchBucket => 'No such bucket error message';
+}
+
+sub expect_s3_error_invalid_bucket_name {
+	expect_error InvalidBucketName => 'Invalid bucket name error message';
+}
+
+sub expect_s3_error_invalid_object_state {
+	expect_error InvalidObjectState => 'Invalid object state error message';
+}
+
+sub expect_s3_error_object_not_found {
+	expect_error NoSuchKey => 'No such key error message';
 }
 
 sub expect_http_error_bad_request {

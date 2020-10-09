@@ -2,7 +2,7 @@ package Test2::Manual::Testing;
 use strict;
 use warnings;
 
-our $VERSION = '0.000135';
+our $VERSION = '0.000136';
 
 1;
 
@@ -124,7 +124,7 @@ using the L<Test2> tools.
 =head2 MIGRATING FROM TEST::BUILDER and TEST::MORE
 
 L<Test2::Manual::Testing::Migrating> Is a tutorial for converting old tests
-that use L<Test2::Builder> or L<Test::More> to the newer L<Test2> way of doing
+that use L<Test::Builder> or L<Test::More> to the newer L<Test2> way of doing
 things.
 
 =head2 ADVANCED PLANNING

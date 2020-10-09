@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Geo::Location::Point;
+use Geo::Coder::Free;
 use Geo::StreetAddress::US;
 use Lingua::EN::AddressParse;
 use Locale::CA;
@@ -19,11 +20,11 @@ inspecting GeoTagged photographs.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
@@ -57,7 +58,7 @@ Geo::Coder::Free::Local provides an interface to your own location data.
 =cut
 
 sub new {
-	my($proto, %param) = @_;
+	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
 	# Geo::Coder::Free::Local->new not Geo::Coder::Free::Local::new
@@ -153,13 +154,8 @@ sub geocode {
 			my %addr = ( 'location' => $l );
 			my $street = $c{'street_name'};
 			if(my $type = $c{'street_type'}) {
-				$type = uc($type);
-				if($type eq 'STREET') {
-					$street = "$street ST";
-				} elsif($type eq 'ROAD') {
-					$street = "$street RD";
-				} elsif($type eq 'AVENUE') {
-					$street = "$street AVE";
+				if(my $a = Geo::Coder::Free::_abbreviate($type)) {
+					$street .= " $a";
 				} else {
 					$street .= " $type";
 				}
@@ -222,7 +218,7 @@ sub geocode {
 					$city = uc($href->{city});
 				}
 				if(my $street = $href->{street}) {
-					if($href->{'type'} && (my $type = Geo::Coder::Free::_normalize($href->{'type'}))) {
+					if($href->{'type'} && (my $type = Geo::Coder::Free::_abbreviate($href->{'type'}))) {
 						$street .= " $type";
 					}
 					if($href->{suffix}) {
@@ -417,8 +413,6 @@ sub geocode {
 sub _search {
 	my ($self, $data, @columns) = @_;
 
-	my $location;
-
 	# FIXME: linear search is slow
 	# ::diag(__LINE__, ': ', Data::Dumper->new([\@columns, $data])->Dump());
 	# print Data::Dumper->new([\@columns, $data])->Dump();
@@ -585,7 +579,7 @@ __DATA__
 "",3516,"SW MACVICAR AVE","TOPEKA","SHAWNEE","KS","US",39.005175,-95.706681
 "THE ATRIUM AT ROCK SPRING PARK",6555,"ROCKLEDGE DR","BETHESDA","MONTGOMERY","MD","US",39.028326,-77.136774
 "","","MOUTH OF MONOCACY RD","DICKERSON","MONTGOMERY","MD","US",39.2244603797302,-77.449615439877
-"PATAPSCO VALLEY STATE PARK'",8020,"BALTIMORE NATIONAL PIKE","ELLICOTT CITY","HOWARD","MD","US",39.29491,-76.78051
+"PATAPSCO VALLEY STATE PARK'",8020,"BALTIMORE NATIONAL PK","ELLICOTT CITY","HOWARD","MD","US",39.29491,-76.78051
 "UTICA DISTRICT PARK",,,"FREDERICK","FREDERICK","MD","US",39.5167883333333,-77.4015166666667
 "ALBERT EINSTEIN HIGH SCHOOL",11135,"NEWPORT MILL RD","KENSINGTON","MONTGOMERY","MD","US",39.03869019,-77.0682871
 "POST OFFICE",10325,"KENSINGTON PKWY","KENSINGTON","MONTGOMERY","MD","US",39.02554455,-77.07178215
@@ -603,7 +597,7 @@ __DATA__
 "",1956,"SEMINARY RD","SILVER SPRING","MONTGOMERY","MD","US",39.008845,-77.043317
 "",9315,"WARREN ST","SILVER SPRING","MONTGOMERY","MD","US",39.00881,-77.048953
 "",9411,"WARREN ST","SILVER SPRING","MONTGOMERY","MD","US",39.010436,-77.04855
-"SILVER DINER",12276,"ROCKVILLE PIKE","ROCKVILLE","MONTGOMERY","MD","US",39.05798753,-77.12165374
+"SILVER DINER",12276,"ROCKVILLE PK","ROCKVILLE","MONTGOMERY","MD","US",39.05798753,-77.12165374
 "",1605,"VIERS MILL RD","ROCKVILLE","MONTGOMERY","MD","US",39.07669788,-77.12306436
 "",1406,"LANGBROOK PLACE","ROCKVILLE","MONTGOMERY","MD","US",39.075583,-77.123833
 "BP",2601,"FOREST GLEN RD","SILVER SPRING","MONTGOMERY","MD","US",39.0147541,-77.05466857

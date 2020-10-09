@@ -111,7 +111,7 @@ package Rex::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 require Rex::Exporter;
 use Rex::TaskList;
@@ -1203,7 +1203,7 @@ With the LOCAL function you can do local commands within a task that is defined 
 
 =cut
 
-sub LOCAL (&) { ## no critic ProhibitSubroutinePrototypes
+sub LOCAL (&) {
   my $cur_conn      = Rex::get_current_connection();
   my $local_connect = Rex::Interface::Connection->create("Local");
 
@@ -1954,7 +1954,7 @@ sub FALSE {
   return 0;
 }
 
-sub make(&) { ## no critic ProhibitSubroutinePrototypes
+sub make(&) {
   return $_[0];
 }
 

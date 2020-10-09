@@ -1,23 +1,23 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header::Content_type;
 # ABSTRACT: Content-Type header role
-$Net::Amazon::S3::Request::Role::HTTP::Header::Content_type::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::HTTP::Header::Content_type::VERSION = '0.97';
 use MooseX::Role::Parameterized;
 
 parameter content_type => (
-    is => 'ro',
-    isa => 'Str',
-    required => 1,
+	is => 'ro',
+	isa => 'Str',
+	required => 1,
 );
 
 role {
-    my ($params) = @_;
-    my $content_type = $params->content_type;
+	my ($params) = @_;
+	my $content_type = $params->content_type;
 
-    around _request_headers => sub {
-        my ($inner, $self) = @_;
+	around _request_headers => sub {
+		my ($inner, $self) = @_;
 
-        return ($self->$inner, ('Content-Type' => $content_type));
-    };
+		return ($self->$inner, ('Content-Type' => $content_type));
+	};
 };
 
 1;
@@ -34,7 +34,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header::Content_type - Content-Type header
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

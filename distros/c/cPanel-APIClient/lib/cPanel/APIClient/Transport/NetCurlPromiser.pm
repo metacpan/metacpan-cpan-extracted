@@ -197,7 +197,9 @@ sub request {
             $easy->pushopt( Net::Curl::Easy::CURLOPT_HTTPHEADER, \@header_strs );
         }
 
-        my $promise = $self->{'promiser'}->add_handle($easy)->then(
+        my $promise1 = $self->{'promiser'}->add_handle($easy);
+
+        my $promise2 = $promise1->then(
             sub {
                 return _xform_easy_response( $_[0], $request_obj );
             },
@@ -209,9 +211,11 @@ sub request {
             },
         );
 
-        $promise->catch( sub { } )->finally( sub { $settled = 1 } );
+        my $promise3 = $promise2->finally( sub {
+            $settled = 1;
+        } );
 
-        return $promise;
+        return $promise3;
     };
 
     my $promise = $self->_get_session_promise($service_obj);

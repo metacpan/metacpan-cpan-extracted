@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Acl::Set::Response;
 # ABSTRACT: An internal class to handle set object acl response
-$Net::Amazon::S3::Operation::Object::Acl::Set::Response::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Acl::Set::Response::VERSION = '0.97';
 use Moose;
 
 extends 'Net::Amazon::S3::Response';
@@ -19,7 +19,7 @@ Net::Amazon::S3::Operation::Object::Acl::Set::Response - An internal class to ha
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

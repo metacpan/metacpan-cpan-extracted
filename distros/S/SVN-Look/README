@@ -1,4 +1,4 @@
-SVN::Look - A caching wrapper around the svnlook command.
+SVN::Look - Caching wrapper around the svnlook command
 
 The svnlook command is the workhorse of Subversion hook scripts, being
 used to gather all sorts of information about a repository, its

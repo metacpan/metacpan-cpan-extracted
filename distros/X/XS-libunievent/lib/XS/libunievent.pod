@@ -1,0 +1,22 @@
+=head1 NAME
+
+XS::libunievent - unievent C++ library for XS.
+
+=head1 DESCRIPTION
+
+This library is intended to use only from XS modules.
+No perl interface.
+
+=head1 SEE ALSO
+
+L<XS::Install>
+
+=head1 AUTHOR
+
+Grigory Smorkalov <g.smorkalov@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

@@ -4,7 +4,7 @@
       "Tim Nordenfur <tim@gurka.se>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
          "web" : "https://github.com/Grinnz/Net-Amazon-Signature-V4"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_contributors" : [
       "Arthur Axel fREW Schmidt <frioux@gmail.com>",
       "Dan Book <dbook@cpan.org>",
@@ -66,5 +66,5 @@
       "Steven Hartland <steven.hartland@multiplay.co.uk>",
       "Tim Mullin <tim@cpanel.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

@@ -15,7 +15,7 @@ use strict;
 
 use Errno;
 
-use Test::More(tests => 246);
+use Test::More(tests => 262);
 
 
 # Catch warnings
@@ -34,20 +34,9 @@ sub wasNoWarning($)
 	}
 }
 
-# Constants for Unicode support
-my $unicodeSkipMessage = 'Unicode only supported with Perl >= 5.8.1';
-
-sub isUnicodeSupported()
-{
-	return $] >= 5.008001;
-}
-
 require XML::Writer;
 
-SKIP: {
-	skip "Perls before 5.6 always warn when loading XML::Writer", 1 if $] <=
-	5.006;
-
+TEST: {
 	wasNoWarning('Loading XML::Writer should not result in warnings');
 }
 
@@ -62,7 +51,7 @@ my $outputFile = IO::File->new_tmpfile or die "Unable to create temporary file: 
 sub getBufStr()
 {
 	local($/);
-	binmode($outputFile, ':bytes') if isUnicodeSupported();
+	binmode($outputFile, ':bytes');
 	$outputFile->seek(0, 0);
 	return <$outputFile>;
 }
@@ -279,6 +268,35 @@ TEST: {
 	checkResult("<foo></foo>\n", 'A separate start and end tag');
 };
 
+# Empty element names and names with spaces
+TEST: {
+	initEnv();
+	expectError("Empty identifiers are not permitted in this part of ", eval {
+		$w->emptyTag("");
+	});
+}
+
+TEST: {
+	initEnv();
+	expectError("Space characters are not permitted in this part of ", eval {
+		$w->emptyTag("a\tb");
+	});
+}
+
+TEST: {
+	initEnv(ENCODING => 'us-ascii');
+	expectError("Empty identifiers are not permitted in this part of ", eval {
+		$w->emptyTag("");
+	});
+}
+
+TEST: {
+	initEnv(ENCODING => 'us-ascii');
+	expectError("Space characters are not permitted in this part of ", eval {
+		$w->emptyTag("a\tb");
+	});
+}
+
 # Attributes
 TEST: {
 	initEnv();
@@ -286,6 +304,20 @@ TEST: {
 	$w->end();
 	checkResult("<foo x=\"1&gt;2\" />\n", 'Simple attributes');
 };
+
+TEST: {
+	initEnv();
+	expectError("Space characters are not permitted in this part of ", eval {
+		$w->emptyTag("foo", "a b" => "2>1");
+	});
+}
+
+TEST: {
+	initEnv(ENCODING => 'us-ascii');
+	expectError("Space characters are not permitted in this part of ", eval {
+		$w->emptyTag("foo", "a b" => "2>1");
+	});
+}
 
 # Character data
 TEST: {
@@ -1405,9 +1437,7 @@ TEST: {
 };
 
 # Make sure UTF-8 is written properly
-SKIP: {
-	skip $unicodeSkipMessage, 2 unless isUnicodeSupported();
-
+TEST: {
 	initEnv(ENCODING => 'utf-8', DATA_MODE => 1);
 
 	$w->xmlDecl();
@@ -1439,6 +1469,30 @@ SKIP: {
 <c><![CDATA[ \$ \x{C2}\x{A3} \x{E2}\x{82}\x{AC} ]]></c>
 </a>
 EOR
+};
+
+# Test UTF-8 element name
+TEST: {
+	# I need U+00E9 as an is_utf8 string; I want to keep the source ASCII.
+	# There must be a better way to do this.
+	require Encode;
+	my $text = Encode::decode('iso-8859-1', "\x{E9}");
+
+	initEnv(ENCODING => 'utf-8');
+	$w->emptyTag("r${text}sum${text}");
+	checkResult("<r\x{C3}\x{A9}sum\x{C3}\x{A9} />", 'E-acute element name permitted');
+};
+
+# Test UTF-8 attribute name
+TEST: {
+	# I need U+00E9 as an is_utf8 string; I want to keep the source ASCII.
+	# There must be a better way to do this.
+	require Encode;
+	my $text = Encode::decode('iso-8859-1', "\x{E9}");
+
+	initEnv(ENCODING => 'utf-8');
+	$w->emptyTag("foo", "fianc${text}" => 'true');
+	checkResult("<foo fianc\x{C3}\x{A9}=\"true\" />", 'E-acute attribute name permitted');
 };
 
 # Capture generated XML in a scalar
@@ -1489,9 +1543,7 @@ TEST: {
 }
 
 # Make sure scalars are built up as UTF-8 (if UTF-8 is passed in)
-SKIP: {
-	skip $unicodeSkipMessage, 2 unless isUnicodeSupported();
-
+TEST: {
 	initEnv();
 	my $s;
 
@@ -1520,9 +1572,7 @@ SKIP: {
 }
 
 # Test US-ASCII encoding
-SKIP: {
-	skip $unicodeSkipMessage, 7 unless isUnicodeSupported();
-
+TEST: {
 	initEnv(ENCODING => 'us-ascii', DATA_MODE => 1);
 
 	$w->xmlDecl();
@@ -1571,6 +1621,18 @@ EOR
 	initEnv(ENCODING => 'us-ascii', DATA_MODE => 1);
 	expectError('ASCII', eval {
 		$w->emptyTag("\x{DC}berpr\x{FC}fung");
+	});
+
+
+	initEnv(ENCODING => 'us-ascii', DATA_MODE => 1);
+	expectError("Non-ASCII characters are not permitted in this part of ", eval {
+		$w->emptyTag("r\x{E9}sum\x{E9}");
+	});
+
+
+	initEnv(ENCODING => 'us-ascii', DATA_MODE => 1);
+	expectError("Non-ASCII characters are not permitted in this part of ", eval {
+		$w->emptyTag("foo", "fianc\x{E9}" => 'true');
 	});
 
 
@@ -1636,9 +1698,7 @@ EOR
 }
 
 # Test characters outside the BMP
-SKIP: {
-	skip $unicodeSkipMessage, 4 unless isUnicodeSupported();
-
+TEST: {
 	my $s = "\x{10480}"; # U+10480 OSMANYA LETTER ALEF
 
 	initEnv(ENCODING => 'utf-8');
@@ -1759,9 +1819,7 @@ EOR
 }
 
 # Cover XML declaration encoding cases
-SKIP: {
-	skip $unicodeSkipMessage, 8 unless isUnicodeSupported();
-
+TEST: {
 	# No declaration unless specified
 	initEnv();
 	$w->xmlDecl();
@@ -2028,14 +2086,42 @@ TEST: {
 };
 
 # We should try to set the encoding on GLOBs as well as IO::Handles
-SKIP: {
-	skip $unicodeSkipMessage, 1 unless isUnicodeSupported();
-
+TEST: {
 	expectError('encoding', eval {
 		initEnv(OUTPUT => \*STDOUT,
 			ENCODING => 'x-unsupported-encoding');
 	});
 };
+
+# Confirm that a scalar other than 'self' is treated as an error
+TEST: {
+	expectError('Output must be a handle', eval {
+		initEnv(OUTPUT => 'not-self');
+	});
+}
+
+# Unsafe mode should not enforce element name checks
+TEST: {
+	initEnv(UNSAFE => 1);
+
+	$w->startTag('te<xt');
+	$w->emptyTag('te<xt');
+	$w->endTag('te<xt');
+	$w->end();
+
+	checkResult(<<"EOR", 'Unsafe mode should not enforce element name checks');
+<te<xt><te<xt /></te<xt>
+EOR
+}
+
+# Safe mode should enforce element name checks
+TEST: {
+	initEnv();
+
+	expectError("Not a valid XML name: te<xt", eval {
+		$w->emptyTag("te<xt");
+        });
+}
 
 # Free test resources
 $outputFile->close() or die "Unable to close temporary file: $!";

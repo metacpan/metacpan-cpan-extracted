@@ -23,10 +23,12 @@ recommends:
   Data::Unixish::Apply: '1.33'
   Text::ANSI::WideUtil: '0.21'
 requires:
+  BorderStyles::Standard: '0'
   Carp: '1.12'
   Color::RGB::Util: '0.600'
   ColorThemeBase::Static::FromStructColors: '0.006'
   ColorThemeUtil::ANSI: '0'
+  ColorThemes::Standard: '0'
   Function::Fallback::CoreOrPP: '0'
   JSON::MaybeXS: '0'
   Log::ger: '0.037'
@@ -50,7 +52,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSITable
   homepage: https://metacpan.org/release/Text-ANSITable
   repository: git://github.com/perlancar/perl-Text-ANSITable.git
-version: '0.600'
+version: '0.601'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -67,6 +69,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InsertCodeOutput
       name: InsertCodeOutput
       version: '0.042'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Filter/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -138,7 +144,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Filter/PERLANCAR::BeforeBuild'
-      version: '0.600'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Filter/Rinci::AbstractFromMeta'
@@ -191,9 +197,9 @@ x_Dist_Zilla:
       name: '@Filter/MetaConfig'
       version: '6.014'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Filter/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Filter/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Filter/OurDate'

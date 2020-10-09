@@ -50,6 +50,33 @@ WriteMakefile(
         'Test::Deep' => 0,
         'Test::FailWarnings' => 0,
         'Test::Class' => 0,
-        'Test::MockModule' => 0.173,
+        'Test::MockModule' => '0.170',
+
+        'Promise::ES6' => 0.23,
+
+        $ENV{'AUTOMATED_TESTING'} ? (
+            'AnyEvent' => 0,
+            'IO::Async::Loop' => 0,
+            'Net::Curl::Promiser' => 0.14,
+            'IO::Socket::SSL' => 0,
+        ) : (),
     },
 );
+
+# For tracking down CPAN Testers failures:
+force_verbose_output() if $ENV{'PERL_CPAN_REPORTER_CONFIG'};
+
+# Useful for diagnosing CPAN Testers issues …
+sub force_verbose_output {
+    my $path = 'Makefile';
+
+    open my $fh, '+<', 'Makefile' or do {
+        print "No “Makefile” …$/";
+        return;
+    };
+
+    my $txt = do { local $/; <$fh> };
+    $txt =~ s<TEST_VERBOSE=0><TEST_VERBOSE=1>;
+    seek $fh, 0, 0;
+    print {$fh} $txt;
+}

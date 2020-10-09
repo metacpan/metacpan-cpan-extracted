@@ -1,0 +1,14 @@
+0.00004 - Oct 4 2020
+  * Use rev 4 of starter-git
+  * fix config requires
+
+0.00003 - Oct 4 2020
+  * Move code around so that the SPI code is properly named and handled
+
+0.00002 - Oct 4 2020
+  * Merged SPI support from zgu
+  * Port to distzilla, fix docs and other missing bits
+  * Add perlcritic, and fix bug it found in gpio code
+
+0.00001 - Jan 24 2016
+  * Initial public release

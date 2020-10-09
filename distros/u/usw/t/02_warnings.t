@@ -1,9 +1,8 @@
 use Test::More 0.98 tests => 3;
-use lib 'lib';
 
 my @array = qw(0 1 2 3 4 5 6 7 8 9);
 
-$SIG{__WARN__} = sub {
+local $SIG{__WARN__} = sub {
     like $_[0], qr/^\QArgument "2:" isn't numeric in addition (+)/,
         , 'warnings pragma DOES work now';
 };

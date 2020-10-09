@@ -1,10 +1,10 @@
 package Math::GrahamFunction::SqFacts::Dipole;
-$Math::GrahamFunction::SqFacts::Dipole::VERSION = '0.02003';
+$Math::GrahamFunction::SqFacts::Dipole::VERSION = '0.02004';
 use strict;
 use warnings;
 
 
-use base qw(Math::GrahamFunction::SqFacts);
+use parent qw(Math::GrahamFunction::SqFacts);
 
 use List::Util ();
 __PACKAGE__->mk_accessors(qw(result compose));
@@ -97,7 +97,7 @@ a composition.
 
 =head1 VERSION
 
-version 0.02003
+version 0.02004
 
 =head1 WARNING!
 
@@ -130,36 +130,9 @@ Returns the C<first()> factor of the result vector.
 
 Equivalent to C<$dipole->result()->factors()>.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2019 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-math-grahamfunction/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Math::GrahamFunction::SqFacts::Dipole
 
 =head2 Websites
 
@@ -178,35 +151,11 @@ L<https://metacpan.org/release/Math-GrahamFunction>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Math-GrahamFunction>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-GrahamFunction>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Math-GrahamFunction>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Math-GrahamFunction>
 
 =item *
 
@@ -257,5 +206,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-math-grahamfunction>
 
   git clone git://github.com/shlomif/perl-math-grahamfunction.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-math-grahamfunction/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

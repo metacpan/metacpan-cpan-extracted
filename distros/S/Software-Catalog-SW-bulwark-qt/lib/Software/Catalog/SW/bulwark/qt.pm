@@ -1,7 +1,7 @@
 package Software::Catalog::SW::bulwark::qt;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2020-10-02'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,15 +15,19 @@ with 'Software::Catalog::Role::Software';
 
 use Software::Catalog::Util qw(extract_from_url);
 
-sub homepage_url { "https://bulwarkcrypto.com/" }
-
-sub latest_version {
+sub archive_info {
     my ($self, %args) = @_;
 
-    extract_from_url(
-        url => "https://github.com/bulwark-crypto/Bulwark/releases",
-        re  => qr!/bulwark-crypto/Bulwark/releases/download/\d+(?:\.\d+)+/bulwark-(\d+(?:\.\d+)+)-linux64\.!,
-    );
+    my $v = $args{version} // latest_version()->[2];
+
+    [200, "OK", {
+        programs => [
+            {name=>"bulwark-cli", path=>"/"},
+            {name=>"bulwark-qt", path=>"/"},
+            {name=>"bulwarkd", path=>"/"},
+        ],
+        unwrap => $self->cmp_version($v, '2.0.0.0') == -1 ? 1:0,
+    }];
 }
 
 sub available_versions {
@@ -38,6 +42,66 @@ sub available_versions {
     # sort versions from earliest
     $res->[2] = [ sort { $self->cmp_version($a, $b) } @{$res->[2]}];
     $res;
+}
+
+sub canon2native_arch_map {
+    return +{
+        'linux-x86' => 'linux32',
+        'linux-x86_64' => 'linux64',
+        'win32' => 'win32',
+        'win64' => 'win64',
+    },
+}
+
+sub download_url {
+    my ($self, %args) = @_;
+
+    my $version = $args{version};
+    if (!$version) {
+        my $verres = $self->latest_version(maybe arch => $args{arch});
+        return [500, "Can't get latest version: $verres->[0] - $verres->[1]"]
+            unless $verres->[0] == 200;
+        $version = $verres->[2];
+    }
+
+    my $v0;
+    if ($version =~ /\A(\d+\.\d+\.\d+)\.\d+\z/) {
+        $v0 = $1;
+    } else {
+        die "Can't recognize version format $version (not x.y.z.a)";
+    }
+
+    my $ext;
+    if ($args{arch} =~ /linux/) {
+        $ext = ".tar.gz";
+    } else {
+        $ext = ".zip";
+    }
+
+    my $filename = join(
+        "",
+        "bulwark-$version-", $self->_canon2native_arch($args{arch}), $ext);
+
+    [200, "OK",
+     join(
+         "",
+         "https://github.com/bulwark-crypto/Bulwark/releases/download/$v0/$filename",
+     ), {
+         'func.filename' => $filename,
+     }];
+}
+
+sub homepage_url { "https://bulwarkcrypto.com/" }
+
+sub is_dedicated_profile { 0 }
+
+sub latest_version {
+    my ($self, %args) = @_;
+
+    extract_from_url(
+        url => "https://github.com/bulwark-crypto/Bulwark/releases",
+        re  => qr!/bulwark-crypto/Bulwark/releases/download/\d+(?:\.\d+)+/bulwark-(\d+(?:\.\d+)+)-linux64\.!,
+    );
 }
 
 sub release_note {
@@ -77,70 +141,6 @@ sub release_note {
   );
 }
 
-sub canon2native_arch_map {
-    return +{
-        'linux-x86' => 'linux32',
-        'linux-x86_64' => 'linux64',
-        'win32' => 'win32',
-        'win64' => 'win64',
-    },
-}
-
-# version
-# arch
-sub download_url {
-    my ($self, %args) = @_;
-
-    my $version = $args{version};
-    if (!$version) {
-        my $verres = $self->latest_version(maybe arch => $args{arch});
-        return [500, "Can't get latest version: $verres->[0] - $verres->[1]"]
-            unless $verres->[0] == 200;
-        $version = $verres->[2];
-    }
-
-    my $v0;
-    if ($version =~ /\A(\d+\.\d+\.\d+)\.\d+\z/) {
-        $v0 = $1;
-    } else {
-        die "Can't recognize version format $version (not x.y.z.a)";
-    }
-
-    my $ext;
-    if ($args{arch} =~ /linux/) {
-        $ext = ".tar.gz";
-    } else {
-        $ext = ".zip";
-    }
-
-    my $filename = join(
-        "",
-        "bulwark-$version-", $self->_canon2native_arch($args{arch}), $ext);
-
-    [200, "OK",
-     join(
-         "",
-         "https://github.com/bulwark-crypto/Bulwark/releases/download/$v0/$filename",
-     ), {
-         'func.filename' => $filename,
-     }];
-}
-
-sub archive_info {
-    my ($self, %args) = @_;
-
-    my $v = $args{version} // latest_version()->[2];
-
-    [200, "OK", {
-        programs => [
-            {name=>"bulwark-cli", path=>"/"},
-            {name=>"bulwark-qt", path=>"/"},
-            {name=>"bulwarkd", path=>"/"},
-        ],
-        unwrap => $self->cmp_version($v, '2.0.0.0') == -1 ? 1:0,
-    }];
-}
-
 1;
 # ABSTRACT: Bulwark desktop GUI client
 
@@ -156,7 +156,7 @@ Software::Catalog::SW::bulwark::qt - Bulwark desktop GUI client
 
 =head1 VERSION
 
-This document describes version 0.007 of Software::Catalog::SW::bulwark::qt (from Perl distribution Software-Catalog-SW-bulwark-qt), released on 2019-10-26.
+This document describes version 0.008 of Software::Catalog::SW::bulwark::qt (from Perl distribution Software-Catalog-SW-bulwark-qt), released on 2020-10-02.
 
 =for Pod::Coverage ^(.+)$
 
@@ -182,7 +182,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

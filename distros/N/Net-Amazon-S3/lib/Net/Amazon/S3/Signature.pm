@@ -1,11 +1,11 @@
 package Net::Amazon::S3::Signature;
 # ABSTRACT: S3 Signature implementation base class
-$Net::Amazon::S3::Signature::VERSION = '0.94';
+$Net::Amazon::S3::Signature::VERSION = '0.97';
 use Moose;
 
 has http_request => (
-    is => 'ro',
-    isa => 'Net::Amazon::S3::HTTPRequest',
+	is => 'ro',
+	isa => 'Net::Amazon::S3::HTTPRequest',
 );
 
 sub _append_authorization_headers {
@@ -55,15 +55,15 @@ sub _populate_default_query_param {
 }
 
 sub sign_request {
-    my ($self, $request);
+	my ($self, $request);
 
-    return;
+	return;
 }
 
 sub sign_uri {
-    my ($self, $uri, $expires_at);
+	my ($self, $uri, $expires_at);
 
-    return;
+	return;
 }
 
 1;
@@ -80,7 +80,7 @@ Net::Amazon::S3::Signature - S3 Signature implementation base class
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 METHODS
 
@@ -94,7 +94,7 @@ required parameter via this instance
 Signature class should return authenticated request based on given parameter.
 Parameter can be modified.
 
-=head2 sign_uri( $request, $expires_at? )
+=head2 sign_uri( $request, $expires_at?, $method? )
 
 Signature class should return authenticated uri based on given request.
 

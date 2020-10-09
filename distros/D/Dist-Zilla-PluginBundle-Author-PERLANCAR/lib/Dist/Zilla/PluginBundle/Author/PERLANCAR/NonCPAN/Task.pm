@@ -3,7 +3,10 @@ package Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task;
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
-our $VERSION = '0.602'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-27'; # DATE
+our $DIST = 'Dist-Zilla-PluginBundle-Author-PERLANCAR'; # DIST
+our $VERSION = '0.603'; # VERSION
 
 use Dist::Zilla::PluginBundle::Filter;
 
@@ -12,7 +15,7 @@ sub configure {
 
     $self->add_bundle(Filter => {
         -bundle => '@Author::PERLANCAR::Task',
-        -remove => [qw/Authority ConfirmRelease UploadToCPAN/],
+        -remove => [qw/PERLANCAR::Authority ConfirmRelease UploadToCPAN/],
     });
 }
 
@@ -33,7 +36,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task - Dist::Zilla like P
 
 =head1 VERSION
 
-This document describes version 0.602 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2020-08-14.
+This document describes version 0.603 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2020-09-27.
 
 =head1 SYNOPSIS
 

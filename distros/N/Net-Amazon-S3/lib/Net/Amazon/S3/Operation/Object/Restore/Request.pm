@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Restore::Request;
 # ABSTRACT: An internal class implementing RestoreObject operation
-$Net::Amazon::S3::Operation::Object::Restore::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Restore::Request::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -9,11 +9,9 @@ use Moose::Util::TypeConstraints;
 use MooseX::StrictConstructor 0.16;
 
 extends 'Net::Amazon::S3::Request::Object';
-with 'Net::Amazon::S3::Request::Role::Query::Action::Restore';
-with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_length';
-with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5';
-with 'Net::Amazon::S3::Request::Role::HTTP::Header::Content_type' => { content_type => 'application/xml' };
 with 'Net::Amazon::S3::Request::Role::HTTP::Method::POST';
+with 'Net::Amazon::S3::Request::Role::Query::Action::Restore';
+with 'Net::Amazon::S3::Request::Role::XML::Content';
 
 enum 'Tier' => [ qw(Standard Expedited Bulk) ];
 has 'days' => (is => 'ro', isa => 'Int', required => 1);
@@ -22,12 +20,14 @@ has 'tier' => (is => 'ro', isa => 'Tier', required => 1);
 __PACKAGE__->meta->make_immutable;
 
 sub _request_content {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    return '<RestoreRequest xmlns="http://s3.amazonaws.com/doc/2006-03-01/">'
-        . '<Days>' . $self->days . '</Days>'
-        . '<GlacierJobParameters><Tier>' . $self->tier . '</Tier></GlacierJobParameters>'
-        . '</RestoreRequest>';
+	return $self->_build_xml (RestoreRequest => [
+		{ Days => $self->days },
+		{ GlacierJobParameters => [
+			{ Tier => $self->tier },
+		]},
+	]);
 }
 
 1;
@@ -44,7 +44,7 @@ Net::Amazon::S3::Operation::Object::Restore::Request - An internal class impleme
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

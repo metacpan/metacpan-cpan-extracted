@@ -12,3 +12,10 @@ Revision history for Colouring-In
 
 0.20    2020-04-30
 	- Adds mix, tint, shade, saturate, desaturate and greyscale methods.
+
+0.21    2020-04-30
+	- Adds validate method
+	- overload the object for stringification
+
+0.22    2020-10-05
+	- Remove Anonymous::Object dependency

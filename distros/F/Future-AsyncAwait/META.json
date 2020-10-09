@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -42,15 +42,15 @@
    "provides" : {
       "Future::AsyncAwait" : {
          "file" : "lib/Future/AsyncAwait.pm",
-         "version" : "0.43"
+         "version" : "0.44"
       },
       "Future::AsyncAwait::Awaitable" : {
          "file" : "lib/Future/AsyncAwait/Awaitable.pm",
-         "version" : "0.43"
+         "version" : "0.44"
       },
       "Test::Future::AsyncAwait::Awaitable" : {
          "file" : "lib/Test/Future/AsyncAwait/Awaitable.pm",
-         "version" : "0.43"
+         "version" : "0.44"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.43",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.44",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

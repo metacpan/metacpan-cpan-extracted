@@ -42,8 +42,14 @@ as default values may work by accident. Commas within default values happen
 to work due to the design of [Filter::Simple](https://metacpan.org/pod/Filter::Simple), which removes them for
 the application of this filter.
 
+## Syntax peculiarities
+
 Note that this module inherits all the bugs of [Filter::Simple](https://metacpan.org/pod/Filter::Simple) and potentially
-adds some of its own. Most notable is that Filter::Simple sometimes will
+adds some of its own.
+
+### Slashes
+
+Most notable is that Filter::Simple sometimes will
 misinterpret the division operator `/` as a leading character to starting
 a regex match:
 
@@ -59,7 +65,29 @@ A better hotfix is to upgrade to Perl 5.20 or higher and use the native
 signatures support there. No other code change is needed, as this module will
 disable its functionality when it is run on a Perl supporting signatures.
 
-## Parentheses in default expresisons
+### Size operator interpreted as replacement
+
+Filter::Simple sometimes will
+misinterpret the file size operator on the default filehandle `-s _`
+as the start of a replacement
+
+    my $filesize = -s _;
+
+\# Misinterpreted as
+
+    my $filesize = -(s _;..._g);
+
+This will manifest itself through syntax errors appearing where everything
+seems in order. The hotfix is to indicate that `<_`> is a filehandle by
+prefixing it with `<*`>:
+
+    my $filesize = -s *_;
+
+A better hotfix is to upgrade to Perl 5.20 or higher and use the native
+signatures support there. No other code change is needed, as this module will
+disable its functionality when it is run on a Perl supporting signatures.
+
+## Parentheses in default expressisons
 
 Ancient versions of Perl before version 5.10 do not have recursive regular
 expressions. These will not be able to properly handle statements such

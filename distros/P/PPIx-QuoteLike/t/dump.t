@@ -7,7 +7,11 @@ use warnings;
 
 use Test::More 0.88;	# Because of done_testing();
 
+use PPIx::QuoteLike::Constant ();
 use PPIx::QuoteLike::Dumper;
+
+local @PPIx::QuoteLike::Constant::CARP_NOT = (
+    @PPIx::QuoteLike::Constant::CARP_NOT, 'My::Module::Test' );
 
 is _dump( '"foo$bar"' ), <<'EOD', 'Dump "foo$bar"';
 
@@ -82,6 +86,8 @@ done_testing;
 
 sub _dump {
     my ( @arg ) = @_;
+    package
+    My::Module::Test;	# Cargo cult to hide from CPAN indexer
     return scalar PPIx::QuoteLike::Dumper->dump( @arg );
 }
 

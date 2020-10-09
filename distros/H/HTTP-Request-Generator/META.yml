@@ -31,6 +31,6 @@ requires:
   perl: '5.006'
 resources:
   repository: git://github.com/Corion/HTTP-Request-Generator.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

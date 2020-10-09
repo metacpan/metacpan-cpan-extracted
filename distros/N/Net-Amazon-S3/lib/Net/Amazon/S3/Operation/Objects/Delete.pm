@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Buckets::Delete;
 # ABSTRACT: Internal class for service operation DeleteObjects
-$Net::Amazon::S3::Operation::Buckets::Delete::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Buckets::Delete::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Buckets::Delete - Internal class for service operati
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

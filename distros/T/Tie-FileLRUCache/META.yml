@@ -1,18 +1,41 @@
 ---
-name: Tie-FileLRUCache
-version: 1.05
+abstract: 'A lightweight but robust filesystem based persistent LRU cache'
 author:
-  - Benjamin Franz <snowhare@nihongo.org>
-abstract: A lightweight but robust filesystem based persistent LRU cache
-license: perl
-requires:
-  Class::ParmList: 1.03
-  Digest::SHA1: 0
-  File::Temp: 0
-  Storable: 0
-  Test::More: 0
+  - 'Jerilyn Franz <cpan@jerilyn.info>'
+build_requires:
+  Carp: '0'
+  Class::ParmList: '1.03'
+  Digest::SHA1: '0'
+  File::Temp: '0'
+  Storable: '0'
+  Test::More: '0'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-FileLRUCache
 provides:
   Tie::FileLRUCache:
     file: lib/Tie/FileLRUCache.pm
-    version: 1.05
-generated_by: Module::Build version 0.261
+    version: '1.06'
+requires:
+  Carp: '0'
+  Class::ParmList: '1.03'
+  Digest::SHA1: '0'
+  File::Temp: '0'
+  Storable: '0'
+  perl: '5.006'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/JerilynFranz/perl-Tie-FileLRUCache/issues
+  homepage: https://github.com/JerilynFranz/perl-Tie-FileLRUCache
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://github.com/JerilynFranz/perl-Tie-FileLRUCache.git
+version: '1.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

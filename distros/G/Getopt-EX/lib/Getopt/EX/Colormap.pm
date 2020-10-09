@@ -16,6 +16,8 @@ use Carp;
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 
+use List::Util qw(min max first);
+
 use Getopt::EX::LabeledParam;
 use Getopt::EX::Util;
 use Getopt::EX::Func qw(callable);
@@ -23,6 +25,7 @@ use Getopt::EX::Func qw(callable);
 our $RGB24       = $ENV{GETOPTEX_RGB24};
 our $LINEAR256   = $ENV{GETOPTEX_LINEAR256};
 our $NO_RESET_EL = $ENV{GETOPTEX_NO_RESET_EL};
+our $SPLIT_ANSI  = $ENV{GETOPTEX_SPLIT_ANSI};
 
 my @nonlinear = do {
     map { ( $_->[0] ) x $_->[1] } (
@@ -200,7 +203,14 @@ sub ansi_numbers {
 	else {
 	    die "$_: Something strange.\n";
 	}
-	
+    } continue {
+	if ($SPLIT_ANSI) {
+	    my $index = first { not ref $numbers[$_] } 0 .. $#numbers;
+	    if (defined $index) {
+		my @sgr = splice @numbers, $index;
+		push @numbers, [ 'SGR', @sgr ];
+	    }
+	}
     }
     @numbers;
 }
@@ -354,8 +364,6 @@ sub color {
 
     cached_colorize($obj->{CACHE}, $c, $text);
 }
-
-use List::Util qw(min max);
 
 sub colormap {
     my $obj = shift;

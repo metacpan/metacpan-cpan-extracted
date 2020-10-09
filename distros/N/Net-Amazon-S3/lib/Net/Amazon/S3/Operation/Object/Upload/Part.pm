@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Part;
 # ABSTRACT: Internal class to perform UploadPart operation
-$Net::Amazon::S3::Operation::Object::Part::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Part::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Object::Part - Internal class to perform UploadPart 
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

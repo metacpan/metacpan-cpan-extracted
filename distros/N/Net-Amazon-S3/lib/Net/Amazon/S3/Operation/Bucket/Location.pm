@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Bucket::Location;
 # ABSTRACT: Internal class for service operation ListBuckets
-$Net::Amazon::S3::Operation::Bucket::Location::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Bucket::Location::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Bucket::Location - Internal class for service operat
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

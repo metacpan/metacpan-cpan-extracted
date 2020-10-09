@@ -79,9 +79,9 @@ sub create
 		push @{$edge{$field[0]}{$field[2]} }, $field[1];
 	}
 
-	for my $from (keys %edge)
+	for my $from (sort keys %edge)
 	{
-		for my $to (keys %{$edge{$from} })
+		for my $to (sort keys %{$edge{$from} })
 		{
 			for my $edge (@{$edge{$from}{$to} })
 			{
@@ -116,30 +116,13 @@ L<GraphViz2::Parse::STT> - Visualize a Set::FA::Element state transition table a
 	use GraphViz2;
 	use GraphViz2::Parse::STT;
 
-	use Log::Handler;
-
 	use File::Slurp; # For read_file().
-
-	# ------------------------------------------------
-
-	my($logger) = Log::Handler -> new;
-
-	$logger -> add
-		(
-		 screen =>
-		 {
-			 maxlevel       => 'debug',
-			 message_layout => '%m',
-			 minlevel       => 'error',
-		 }
-		);
 
 	my($graph)  = GraphViz2 -> new
 		(
 		 edge   => {color => 'grey'},
 		 global => {directed => 1},
 		 graph  => {rankdir => 'TB'},
-		 logger => $logger,
 		 node   => {color => 'green', shape => 'oval'},
 		);
 	my($g)  = GraphViz2::Parse::STT -> new(graph => $graph);

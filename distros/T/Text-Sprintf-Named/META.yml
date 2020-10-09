@@ -9,12 +9,11 @@ build_requires:
   Module::Build: '0.28'
   Test::More: '0.88'
   Test::Warn: '0'
-  base: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 keywords:
   - conversions
   - format
@@ -30,7 +29,7 @@ name: Text-Sprintf-Named
 provides:
   Text::Sprintf::Named:
     file: lib/Text/Sprintf/Named.pm
-    version: '0.0403'
+    version: '0.0404'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -44,10 +43,10 @@ resources:
   bugtracker: https://github.com/shlomif/text-sprintf-named/issues
   homepage: http://metacpan.org/release/Text-Sprintf-Named
   repository: https://bitbucket.org/shlomif/perl-text-sprintf
-version: '0.0403'
+version: '0.0404'
 x_Dist_Zilla:
   perl:
-    version: '5.027011'
+    version: '5.032000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -56,15 +55,15 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@SHLOMIF/TestMoreDoneTesting'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@SHLOMIF/AutoPrereqs'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@SHLOMIF/ExecDir'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -77,27 +76,27 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@SHLOMIF/GatherDir'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::License
       name: '@SHLOMIF/License'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@SHLOMIF/ManifestSkip'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@SHLOMIF/MetaYAML'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@SHLOMIF/PruneCruft'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@SHLOMIF/Readme'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -108,14 +107,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@SHLOMIF/ShareDir'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@SHLOMIF/MakeMaker'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@SHLOMIF/CheckChangesHasContent'
@@ -123,19 +122,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@SHLOMIF/ConfirmRelease'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@SHLOMIF/Manifest'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@SHLOMIF/MetaConfig'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@SHLOMIF/MetaJSON'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -144,7 +143,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@SHLOMIF/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.012'
+              version: '6.015'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -152,37 +151,33 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@SHLOMIF/MetaProvides::Package'
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@SHLOMIF/MetaResources'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ModuleBuild
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@SHLOMIF/ModuleBuild'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@SHLOMIF/PkgVersion'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@SHLOMIF/PodCoverageTests'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@SHLOMIF/PodSyntaxTests'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::PodVersion
-      name: '@SHLOMIF/PodVersion'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -238,7 +233,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@SHLOMIF/TestRelease'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -248,6 +243,14 @@ x_Dist_Zilla:
             - ':ExecFiles'
           plugins:
             -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@SHLOMIF/SingleEncoding'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::WikiDoc
+              name: '@SHLOMIF/WikiDoc'
+              version: '0.093004'
+            -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
               version: '4.015'
@@ -256,71 +259,95 @@ x_Dist_Zilla:
               name: '@CorePrep/H1Nester'
               version: '4.015'
             -
-              class: Pod::Weaver::Plugin::SingleEncoding
-              name: -SingleEncoding
-              version: '4.015'
-            -
               class: Pod::Weaver::Section::Generic
-              name: NAME
+              name: '@SHLOMIF/Name'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Version
-              name: Version
+              name: '@SHLOMIF/Version'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Region
-              name: prelude
+              name: '@SHLOMIF/Prelude'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
-              name: SYNOPSIS
+              name: '@SHLOMIF/Synopsis'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
-              name: DESCRIPTION
+              name: '@SHLOMIF/Description'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
-              name: OVERVIEW
+              name: '@SHLOMIF/Usage'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Overview'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Stability'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
-              name: ATTRIBUTES
+              name: Requirements
               version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
-              name: METHODS
+              name: Attributes
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Constructors
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Methods
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Functions
               version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
-              name: Leftovers
+              name: '@SHLOMIF/Leftovers'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Region
-              name: postlude
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Authors
-              name: Authors
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Legal
-              name: Legal
-              version: '4.015'
-            -
-              class: Pod::Weaver::Section::Bugs
-              name: Bugs
+              name: '@SHLOMIF/postlude'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Support
-              name: Support
-              version: '1.010'
+              name: '@SHLOMIF/Support'
+              version: '1.013'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@SHLOMIF/Authors'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Bugs
+              name: '@SHLOMIF/Bugs'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Contributors
+              name: '@SHLOMIF/Contributors'
+              version: '0.009'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@SHLOMIF/Legal'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: '@SHLOMIF/List'
+              version: '4.015'
       name: '@SHLOMIF/PodWeaver'
       version: '4.008'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@SHLOMIF/UploadToCPAN'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Keywords
       config:
@@ -337,51 +364,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.012'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@SHLOMIF/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.012'
+      version: '6.015'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.012'
-x_generated_by_perl: v5.27.11
+    version: '6.015'
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

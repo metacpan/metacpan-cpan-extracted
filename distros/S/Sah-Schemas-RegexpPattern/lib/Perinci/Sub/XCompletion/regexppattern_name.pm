@@ -1,9 +1,9 @@
 package Perinci::Sub::XCompletion::regexppattern_name;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2020-05-27'; # DATE
 our $DIST = 'Sah-Schemas-RegexpPattern'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,7 +45,7 @@ Perinci::Sub::XCompletion::regexppattern_name - Generate completion for Regexp::
 
 =head1 VERSION
 
-This document describes version 0.001 of Perinci::Sub::XCompletion::regexppattern_name (from Perl distribution Sah-Schemas-RegexpPattern), released on 2020-01-03.
+This document describes version 0.002 of Perinci::Sub::XCompletion::regexppattern_name (from Perl distribution Sah-Schemas-RegexpPattern), released on 2020-05-27.
 
 =head1 ARGUMENTS
 

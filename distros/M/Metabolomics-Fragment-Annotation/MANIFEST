@@ -3,6 +3,7 @@ lib/Metabolomics/Banks.pm
 lib/Metabolomics/Banks/AbInitioFragments.pm
 lib/Metabolomics/Banks/BloodExposome.pm
 lib/Metabolomics/Banks/MaConDa.pm
+lib/Metabolomics/Banks/Knapsack.pm
 lib/Metabolomics/Formats/W4M.pm
 lib/Metabolomics/Fragment/Annotation.pm
 lib/Metabolomics/Utils.pm
@@ -13,6 +14,7 @@ metabolomics-references/BloodExposome_v1_0.txt
 metabolomics-references/MaConDa__v1_0.xml
 metabolomics-references/MaConDa__v1_0__extensive.xml
 metabolomics-references/MS_fragments-adducts-isotopes.txt
+metabolomics-references/Knapsack__V1_1.csv
 MYMETA.json
 MYMETA.yml
 README
@@ -47,6 +49,9 @@ t/pfs007110.tsv
 t/pfs007110__ANNOTATED__.TSV
 t/pfs003129.tsv
 t/pfs003129__ANNOTATED__.TSV
+t/in_test02_pos__KNAPSACK_ANNOTATED__.TSV
+t/Knapsack__dump.csv
+
 
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -6,10 +6,9 @@ use warnings;
 use Test::More;
 use Plack::Test::Agent;
 
-my $app = sub
-{
+my $app = sub {
     my $content = shift->{HTTP_ACCEPT_LANGUAGE};
-    return [ 200, [], [ $content ] ];
+    return [ 200, [], [$content] ];
 };
 
 my $agent = Plack::Test::Agent->new( app => $app );

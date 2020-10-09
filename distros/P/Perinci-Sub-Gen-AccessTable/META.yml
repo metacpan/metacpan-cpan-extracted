@@ -21,16 +21,17 @@ meta-spec:
 name: Perinci-Sub-Gen-AccessTable
 requires:
   Data::Sah::Normalize: '0'
+  Data::Sah::Resolve: '0.003'
   Data::Sah::Util::Type::Date: '0.68'
   Exporter: '5.57'
   Function::Fallback::CoreOrPP: '0'
   List::Util: '1.45'
   Locale::Set: '0'
   Locale::TextDomain::UTF8: '0'
-  Log::ger: '0.027'
+  Log::ger: '0.037'
   Perinci::Object::Metadata: '0'
   Perinci::Sub::Gen: '0'
-  Perinci::Sub::GetArgs::Argv: '0.842'
+  Perinci::Sub::GetArgs::Argv: '0.845'
   Perinci::Sub::Property::result::table: '0'
   Perinci::Sub::Util: '0.46'
   Time::Moment: '0'
@@ -42,11 +43,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Gen-AccessTable
   homepage: https://metacpan.org/release/Perinci-Sub-Gen-AccessTable
   repository: git://github.com/perlancar/perl-Perinci-Sub-Gen-AccessTable.git
-version: '0.583'
+version: '0.585'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -112,17 +117,13 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::FileFinder::ByName
-      name: '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.599'
+      version: '0.602'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -175,9 +176,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -301,7 +302,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.081'
+              version: '0.082'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -323,7 +324,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -351,9 +352,11 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
           finder:
-            - '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.003
+      version: 3.001.005
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'

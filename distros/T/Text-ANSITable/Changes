@@ -1,3 +1,9 @@
+0.601   2020-10-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Add prereqs to ColorThemes::Standard and BorderStyles::Standard
+	  (RT#133472).
+
+
 0.600   2020-09-13  Released-By: PERLANCAR
 
         - Release after 2 development releases.

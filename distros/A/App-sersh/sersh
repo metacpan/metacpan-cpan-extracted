@@ -1,0 +1,198 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use AnyEvent;
+use AnyEvent::SerialPort;
+use AnyEvent::ReadLine::Gnu;
+use Path::Class qw(file dir);
+use File::HomeDir;
+use Getopt::Long;
+use Pod::Usage;
+
+our $VERSION = '0.01';
+
+my $HISTSIZE_MAX = $ENV{HISTSIZE} // 1000;
+
+exit main() unless caller();
+
+sub main {
+    my ($help);
+    my $serial_fn = '/dev/ttyUSB0';
+    my $baudrate  = 19200;
+    my $parity    = 'none';
+    my $databits  = 8;
+    my $stopbits  = 1;
+    my $handshake = 'none';
+    GetOptions(
+        'baudrate|b=s'  => \$baudrate,
+        'parity|p=s'    => \$parity,
+        'databits|d=s'  => \$databits,
+        'stopbits|s=s'  => \$stopbits,
+        'handshake|s=s' => \$handshake,
+        'help|h'        => \$help,
+    ) or pod2usage(1);
+    pod2usage(0) if $help;
+
+    if (@ARGV) {
+        pod2usage('too many arguments') if @ARGV > 1;
+        ($serial_fn) = @ARGV;
+    }
+
+    pod2usage('invalid baudrate')
+        if ($baudrate !~ m{^\d+$});
+    pod2usage('invalid parity')
+        if ($parity !~ m{^(?:none|odd|even)$});
+    pod2usage('invalid databits')
+        if ($databits !~ m{^[5-8]$});
+    pod2usage('invalid stopbits')
+        if ($stopbits !~ m{^[1-2]$});
+    pod2usage('invalid handshake')
+        if ($handshake !~ m{^(?:none|rts|xoff)$});
+
+    # read & truncate history lines
+    my $cfg_dir = dir(File::HomeDir->my_home, '.config', 'sersh');
+    if (!-d $cfg_dir) {
+        $cfg_dir->mkpath or die 'failed to create "' . $cfg_dir . '": $!';
+    }
+    my $hist_file      = $cfg_dir->file('.sersh_history');
+    my @histfile_lines = $hist_file->slurp();
+    if (@histfile_lines > $HISTSIZE_MAX) {
+        splice(@histfile_lines, 0, (@histfile_lines - $HISTSIZE_MAX));
+        $hist_file->spew(\@histfile_lines);
+    }
+    @histfile_lines = map {chomp($_); $_;} @histfile_lines;
+
+    my $run_cv        = AnyEvent->condvar;
+    my $prompt_prefix = $serial_fn . "> ";
+
+    my $serial_ae = AnyEvent::SerialPort->new(
+        serial_port => [
+            $serial_fn,
+            [baudrate  => $baudrate],
+            [parity    => $parity],
+            [databits  => $databits],
+            [stopbits  => $stopbits],
+            [handshake => $handshake],
+        ],
+        on_error => sub {
+            my ($hdl, $fatal, $msg) = @_;
+            die $msg;
+        },
+        on_eof => sub {
+            $run_cv->send;
+        },
+    );
+
+    # print data from serial
+    $serial_ae->on_read(
+        sub {
+            my ($hdl) = @_;
+            AnyEvent::ReadLine::Gnu->print($hdl->rbuf);
+            $hdl->rbuf = '';
+        }
+    );
+
+    my $term_rl = AnyEvent::ReadLine::Gnu->new(
+        prompt  => $prompt_prefix,
+        on_line => sub {
+            my ($line) = @_;
+
+            # EOF
+            if (!defined($line)) {
+                AnyEvent::ReadLine::Gnu->print("\n");
+                $run_cv->send;
+                return;
+            }
+
+            # send line to serial
+            $serial_ae->push_write($line . "\n");
+
+            # append line to history file
+            use AnyEvent::IO qw(aio_open aio_write :flags);
+            aio_open(
+                $hist_file,
+                (O_WRONLY | O_CREAT | O_APPEND),
+                0600,
+                sub {
+                    my ($fh) = @_ or die "$!";
+                    aio_write($fh, $line . "\n", sub { });
+                }
+            );
+        },
+        on_eof => sub {
+            $run_cv->send;
+        },
+    );
+
+    # add history
+    $term_rl->AddHistory(@histfile_lines);
+    $term_rl->history_set_pos(scalar($term_rl->GetHistory));
+
+    # terminate on sighup/term
+    my $term_cb = sub {
+        AnyEvent::ReadLine::Gnu->print("terminating, bye bye\n");
+        $run_cv->send();
+    };
+    my $wt = AE::signal TERM => $term_cb;
+    my $wh = AE::signal HUP  => $term_cb;
+
+    # on Ctrl-C cancel current command
+    my $wi = AE::signal INT => sub {
+        my $old_text = $term_rl->Attribs->{line_buffer};
+        $term_rl->modifying;
+        $term_rl->delete_text;
+        $term_rl->Attribs->{point} = $term_rl->Attribs->{end} = 0;
+        $term_rl->redisplay;
+        AnyEvent::ReadLine::Gnu->print($prompt_prefix . $old_text . "^C\n");
+    };
+
+    AnyEvent::ReadLine::Gnu->print(
+        'connected to ', $serial_fn, ', baudrate: ', $baudrate, ', databits: ',  $databits,
+        ', parity: ',    $parity,    ', stobits: ',  $stopbits, ', handshake: ', $handshake,
+        "\n"
+    );
+    $run_cv->recv;
+
+    return 0;
+}
+
+__END__
+
+=head1 NAME
+
+sersh - serial port shell
+
+=head1 SYNOPSIS
+
+    sersh --baudrate 19200 /dev/ttyUSB1
+
+        --baudrate [Int]            - dft.: 19200
+        --parity [none|odd|even]    - dft.: none
+        --databits [5,6,7,8]        - dft: 8
+        --stopbits [1,2]            - dft: 1
+        --handshake [none,rts,xoff] - dft: none
+
+=head1 DESCRIPTION
+
+Serial port shell with Gnu readline support for command editing and history.
+
+Launch with serial device as argument and then write commands that will
+be sent over serial port after you hit enter. All input from serial
+port is printed on the screen as it arrives.
+
+=head1 AUTHOR
+
+Jozef Kutej, C<< <jkutej at cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2020 Jozef Kutej, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut

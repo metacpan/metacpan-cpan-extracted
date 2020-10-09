@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
+    "File::Copy" => 0,
     "File::MoreUtil" => "0.624",
     "File::Path" => 0,
     "File::Slurper" => 0,
@@ -50,7 +51,6 @@ my %WriteMakefileArgs = (
     "Software::Catalog::Util" => "1.0.7",
     "URI::Escape" => 0,
     "strict" => 0,
-    "vars" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -59,7 +59,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.016",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,6 +74,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
+  "File::Copy" => 0,
   "File::MoreUtil" => "0.624",
   "File::Path" => 0,
   "File::Slurper" => 0,
@@ -101,7 +102,6 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "URI::Escape" => 0,
   "strict" => 0,
-  "vars" => 0,
   "warnings" => 0
 );
 

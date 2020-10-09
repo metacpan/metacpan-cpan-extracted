@@ -259,10 +259,10 @@ klass(	'PPIx::Regexp::Token::Code', note => 'Code', report => 0 );
 token(	'{foo}', note => 'Code' );
 m_call(	perl_version_introduced	=> '5.005' );	# see ::GroupType::Code
 m_call(	perl_version_removed	=> undef );
-token(   '$x->&*', postderef => 1, note => 'Code with postderef' );
+token(   '$x->&*', note => 'Code with postderef' );
 m_call(	perl_version_introduced	=> '5.019005', note => 'perl5195delta' );
 m_call(	perl_version_removed	=> undef );
-token(   '$x->%{foo,bar}', postderef => 1, note => 'Code with postderef slice' );
+token(   '$x->%{foo,bar}', note => 'Code with postderef slice' );
 m_call(	perl_version_introduced	=> '5.019005', note => 'perl5195delta' );
 m_call(	perl_version_removed	=> undef );
 # The( interesting version functionality is on
@@ -469,10 +469,10 @@ token(	'$foo', cookie => COOKIE_REGEX_SET,
     note => 'Interpolation in regex set' );
 m_call(	perl_version_introduced	=> '5.017009', note => 'perl5179delta' );
 m_call(	perl_version_removed	=> undef );
-token(	'$x->@*', postderef => 1, note => 'Postfix deref' );
+token(	'$x->@*', note => 'Postfix deref' );
 m_call(	perl_version_introduced => '5.019005', note => 'perl5195delta' );
 m_call(	perl_version_removed	=> undef );
-token(	'$x->@[1,2]', postderef => 1, note => 'Postfix deref slice' );
+token(	'$x->@[1,2]', note => 'Postfix deref slice' );
 m_call(	perl_version_introduced => '5.019005', note => 'perl5195delta' );
 m_call(	perl_version_removed	=> undef );
 
@@ -1012,7 +1012,6 @@ sub token {
 	if ( eval {
 		my $tokenizer = PPIx::Regexp::Tokenizer->new(
 		    $content || '',
-		    postderef	=> $args{postderef},
 		);
 		if ( my $code = $class->can( '__make_group_type_matcher' ) ) {
 		    foreach my $matcher ( @{ $code->( $class )->{''} } ) {

@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Bucket;
 # ABSTRACT: Base class for all S3 Bucket operations
-$Net::Amazon::S3::Request::Bucket::VERSION = '0.94';
+$Net::Amazon::S3::Request::Bucket::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request::Service';
@@ -8,9 +8,9 @@ extends 'Net::Amazon::S3::Request::Service';
 with 'Net::Amazon::S3::Role::Bucket';
 
 override _request_path => sub {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    return super . $self->bucket->bucket . "/";
+	return super . $self->bucket->bucket . "/";
 };
 
 __PACKAGE__->meta->make_immutable;
@@ -29,7 +29,7 @@ Net::Amazon::S3::Request::Bucket - Base class for all S3 Bucket operations
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

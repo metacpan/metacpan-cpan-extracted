@@ -161,8 +161,11 @@ Module::~Module () {
     for (auto& m : children) m->parent = nullptr;
     if (parent) {
         auto it = std::find(parent->children.begin(), parent->children.end(), this);
-        assert(it != parent->children.end());
-        parent->children.erase(it);
+        if (it == parent->children.end()) {
+            panda_log_warn(*this, "Wrong module destruction order for " << name);
+        } else {
+            parent->children.erase(it);
+        }
     }
 
     if (name) {

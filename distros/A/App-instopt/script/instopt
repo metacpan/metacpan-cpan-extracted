@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-10-02'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2020-10-08'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 use 5.010;
 use strict;
@@ -27,17 +27,22 @@ my $cli = Perinci::CmdLine::Any->new(
     url => $prefix,
     log => 1,
     subcommands => {
-        'list-installed'           => {url=>"${prefix}list_installed"},
-        'list-installed-versions'  => {url=>"${prefix}list_installed_versions"},
+        'cleanup-download-dir'     => {url=>"${prefix}cleanup_download_dir"},
+        'cleanup-install-dir'      => {url=>"${prefix}cleanup_install_dir"},
+        'compare-versions'         => {url=>"${prefix}compare_versions"},
+        'download-all'             => {url=>"${prefix}download_all"},
+        'download'                 => {url=>"${prefix}download"},
+        'is-downloaded-any'        => {url=>"${prefix}is_downloaded_any"},
+        'is-downloaded-latest'     => {url=>"${prefix}is_downloaded_latest"},
+        'is-installed-any'         => {url=>"${prefix}is_installed_any"},
+        'is-installed-latest'      => {url=>"${prefix}is_installed_latest"},
         'list-downloaded'          => {url=>"${prefix}list_downloaded"},
         'list-downloaded-versions' => {url=>"${prefix}list_downloaded_versions"},
-        'download'                 => {url=>"${prefix}download"},
-        'download-all'             => {url=>"${prefix}download_all"},
-        'update'                   => {url=>"${prefix}update"},
-        'cleanup-install-dir'      => {url=>"${prefix}cleanup_install_dir"},
-        'cleanup-download-dir'     => {url=>"${prefix}cleanup_download_dir"},
+        'list-installed'           => {url=>"${prefix}list_installed"},
+        'list-installed-versions'  => {url=>"${prefix}list_installed_versions"},
+        'list'                     => {url=>"${prefix}list"},
         'update-all'               => {url=>"${prefix}update_all"},
-        'compare-versions'         => {url=>"${prefix}compare_versions"},
+        'update'                   => {url=>"${prefix}update"},
     },
 );
 Perinci::CmdLineX::CommonOptions::SelfUpgrade->apply_to_object($cli);
@@ -58,7 +63,7 @@ instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.015 of instopt (from Perl distribution App-instopt), released on 2020-10-02.
+This document describes version 0.016 of instopt (from Perl distribution App-instopt), released on 2020-10-08.
 
 =head1 SYNOPSIS
 
@@ -233,6 +238,42 @@ Download latest version of one or more software.
 
 Download latest version of all known software.
 
+=head2 B<is-downloaded-any>
+
+Check if any version of a software is downloaded.
+
+The download does not need to be the latest version. To check if the latest
+version of a software is downloaded, use C<is-downloaded-latest>.
+
+
+=head2 B<is-downloaded-latest>
+
+Check if latest version of a software has been downloaded.
+
+To only check whether any version of a software has been downloaded, use
+C<is-downloaded-any>.
+
+
+=head2 B<is-installed-any>
+
+Check if any version of a software is installed.
+
+The installed version does not need to be the latest. To check whether the
+latest version of a software is installed, use C<is-installed-latest>.
+
+
+=head2 B<is-installed-latest>
+
+Check if latest version of a software is installed.
+
+To only check whether any version of a software is installed, use
+C<is-installed-any>.
+
+
+=head2 B<list>
+
+List software.
+
 =head2 B<list-downloaded>
 
 List all downloaded software.
@@ -386,6 +427,84 @@ See C<--software-or-pattern>.
 
 =back
 
+=head2 Options for subcommand is-downloaded-any
+
+=over
+
+=item B<--quiet-arg>, B<-q>
+
+=item B<--software>=I<s>*
+
+=back
+
+=head2 Options for subcommand is-downloaded-latest
+
+=over
+
+=item B<--quiet-arg>, B<-q>
+
+=item B<--software>=I<s>*
+
+=back
+
+=head2 Options for subcommand is-installed-any
+
+=over
+
+=item B<--quiet-arg>, B<-q>
+
+=item B<--software>=I<s>*
+
+=back
+
+=head2 Options for subcommand is-installed-latest
+
+=over
+
+=item B<--quiet-arg>, B<-q>
+
+=item B<--software>=I<s>*
+
+=back
+
+=head2 Options for subcommand list
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--downloaded>
+
+If true, will only list downloaded software.
+
+=item B<--installed>
+
+If true, will only list installed software.
+
+=item B<--latest-downloaded>
+
+If true, will only list software which have their latest version downloaded.
+
+If set to true, a software which is not downloaded, or downloaded but does not
+have the latest version downloaded, will not be included.
+
+If set to false, a software which has no downloaded versions, or does not have
+the latest version downloaded, will be included.
+
+
+=item B<--latest-installed>
+
+If true, will only list software which have their latest version installed.
+
+If set to true, a software which is not installed, or installed but does not
+have the latest version installed, will not be included.
+
+If set to false, a software which is not installed, or does not have the latest
+version installed, will be included.
+
+
+=back
+
 =head2 Options for subcommand list-downloaded
 
 =over
@@ -393,10 +512,6 @@ See C<--software-or-pattern>.
 =item B<--arch>=I<s>
 
 =item B<--detail>, B<-l>
-
-=item B<--per-arch>
-
-Return per-arch hash in the all_versions field.
 
 =back
 
@@ -547,11 +662,38 @@ List of available configuration parameters:
 
  arch (see --arch)
 
+=head2 Configuration for subcommand is-downloaded-any
+
+ quiet (see --quiet-arg)
+ software (see --software)
+
+=head2 Configuration for subcommand is-downloaded-latest
+
+ quiet (see --quiet-arg)
+ software (see --software)
+
+=head2 Configuration for subcommand is-installed-any
+
+ quiet (see --quiet-arg)
+ software (see --software)
+
+=head2 Configuration for subcommand is-installed-latest
+
+ quiet (see --quiet-arg)
+ software (see --software)
+
+=head2 Configuration for subcommand list
+
+ detail (see --detail)
+ downloaded (see --downloaded)
+ installed (see --installed)
+ latest_downloaded (see --latest-downloaded)
+ latest_installed (see --latest-installed)
+
 =head2 Configuration for subcommand list-downloaded
 
  arch (see --arch)
  detail (see --detail)
- per_arch (see --per-arch)
 
 =head2 Configuration for subcommand list-downloaded-versions
 

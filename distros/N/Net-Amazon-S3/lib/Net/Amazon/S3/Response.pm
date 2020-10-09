@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Response;
 # Abstract: Behaviour common to most S3 responses.
-$Net::Amazon::S3::Response::VERSION = '0.94';
+$Net::Amazon::S3::Response::VERSION = '0.97';
 use Moose;
 
 use Carp ();
@@ -36,10 +36,10 @@ has xml_document => (
 );
 
 has xpath_context => (
-   is          => 'ro',
-   init_arg    => undef,
-   lazy        => 1,
-   builder     => '_build_xpath_context',
+	is          => 'ro',
+	init_arg    => undef,
+	lazy        => 1,
+	builder     => '_build_xpath_context',
 );
 
 has error_code => (
@@ -255,7 +255,7 @@ Net::Amazon::S3::Response
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

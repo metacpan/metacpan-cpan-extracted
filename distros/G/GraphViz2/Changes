@@ -1,3 +1,20 @@
+2.54 2020-10-09
+- zap report_valid_attributes method
+- drop Log::Handler, any object that can "debug" or "error" works
+
+2.53 2020-10-09
+- drop Try::Tiny
+
+2.52 2020-10-09
+- zap obsolete special case in a test/webgen for Darwin - fix #7. Thanks @dbevans for report!
+
+2.51 2020-10-08
+- DOT input now prettier
+- tests rearranged so can run in parallel, ergo quicker
+- tests now rigorously capture DOT input in each scenario
+- generating web content updated, output removed from distro so smaller
+- drop Set::Array
+
 2.50 2020-10-02
 - dropped 3 more unnecessary deps, metadata tweak
 

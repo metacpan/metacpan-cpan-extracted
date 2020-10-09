@@ -199,28 +199,11 @@ L<GraphViz2::Parse::Regexp> - Visualize a Perl regular expression as a graph
 	use GraphViz2;
 	use GraphViz2::Parse::Regexp;
 
-	use Log::Handler;
-
-	# ------------------------------------------------
-
-	my($logger) = Log::Handler -> new;
-
-	$logger -> add
-		(
-		 screen =>
-		 {
-			 maxlevel       => 'debug',
-			 message_layout => '%m',
-			 minlevel       => 'error',
-		 }
-		);
-
 	my($graph)  = GraphViz2 -> new
 		(
 		 edge   => {color => 'grey'},
 		 global => {directed => 1},
 		 graph  => {rankdir => 'TB'},
-		 logger => $logger,
 		 node   => {color => 'blue', shape => 'oval'},
 		);
 	my($g) = GraphViz2::Parse::Regexp -> new(graph => $graph);

@@ -38,10 +38,12 @@
             "Text::ANSI::WideUtil" : "0.21"
          },
          "requires" : {
+            "BorderStyles::Standard" : "0",
             "Carp" : "1.12",
             "Color::RGB::Util" : "0.600",
             "ColorThemeBase::Static::FromStructColors" : "0.006",
             "ColorThemeUtil::ANSI" : "0",
+            "ColorThemes::Standard" : "0",
             "Function::Fallback::CoreOrPP" : "0",
             "JSON::MaybeXS" : "0",
             "Log::ger" : "0.037",
@@ -86,7 +88,7 @@
          "web" : "https://github.com/perlancar/perl-Text-ANSITable"
       }
    },
-   "version" : "0.600",
+   "version" : "0.601",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -107,6 +109,11 @@
             "class" : "Dist::Zilla::Plugin::InsertCodeOutput",
             "name" : "InsertCodeOutput",
             "version" : "0.042"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Filter/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -197,7 +204,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Filter/PERLANCAR::BeforeBuild",
-            "version" : "0.600"
+            "version" : "0.603"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -266,9 +273,9 @@
             "version" : "6.014"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Filter/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Filter/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",

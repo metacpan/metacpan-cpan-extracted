@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Add;
 # ABSTRACT: Internal class to perform PutObject operation
-$Net::Amazon::S3::Operation::Object::Add::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Add::VERSION = '0.97';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Net::Amazon::S3::Operation::Object::Add - Internal class to perform PutObject op
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

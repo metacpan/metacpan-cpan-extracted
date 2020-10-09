@@ -30,6 +30,8 @@ my %bond_order = (
     '$' => 4,
 );
 
+sub _is_organic($);
+
 %}
 
 %%
@@ -58,6 +60,14 @@ chain: atom
             $_[2]->{index} = $_[1]->{last}{index};
 
             $_[2]->{graph}->add_edge( $_[1]->{last}, $_[2] );
+
+            if( _is_organic $_[1]->{last} && _is_organic $_[1]->{last} ) {
+                $_[2]->{graph}->set_edge_attribute( $_[1]->{last},
+                                                    $_[2],
+                                                    'bond',
+                                                    ':' );
+            }
+
             $_[1]->{last} = $_[2];
 
             return $_[1];
@@ -99,6 +109,15 @@ chain: atom
             }
 
             $_[1]->{last}{graph}->add_edge( $_[1]->{last}, $_[3]->{first} );
+
+
+            if( _is_organic $_[1]->{last} && _is_organic $_[3]->{first} ) {
+                $_[1]->{last}{graph}->set_edge_attribute( $_[1]->{last},
+                                                          $_[3]->{first},
+                                                          'bond',
+                                                          ':' );
+            }
+
             return $_[1];
         }
      | chain '(' bond chain ')'
@@ -308,6 +327,11 @@ sub _add_ring_bond
         }
         ( $bond ) = grep { defined }
                          ( $bond, $self->{USER}{RINGBONDS}{$ring_bond}{bond} );
+        if( !$bond &&
+            _is_organic $self->{USER}{RINGBONDS}{$ring_bond}{atom} &&
+            _is_organic $atom ) {
+            $bond = ':';
+        }
         if( $bond && $bond ne '-' ) {
             $atom->{graph}->set_edge_attribute( $self->{USER}{RINGBONDS}{$ring_bond}{atom},
                                                 $atom,
@@ -322,6 +346,12 @@ sub _add_ring_bond
         $self->{USER}{RINGBONDS}{$ring_bond} =
             { atom => $atom, $bond ? ( bond => $bond ) : () };
     }
+}
+
+sub _is_organic($)
+{
+    my( $atom ) = @_;
+    return $atom->{symbol} ne ucfirst $atom->{symbol};
 }
 
 sub _merge_graphs

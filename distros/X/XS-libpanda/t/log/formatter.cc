@@ -72,7 +72,7 @@ TEST("set_format") {
         SECTION("full name") {
             set_format("FILE=%1f");
             panda_log_alert();
-            REGCHECK(c.fstr, "FILE=t[\\/]log[\\/]formatter.cc");
+            REGCHECK(c.fstr, "FILE=.*t[\\/]log[\\/]formatter.cc");
         }
     }
 

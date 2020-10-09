@@ -1,3 +1,19 @@
+0.016   2020-10-08  Released-By: PERLANCAR; Urgency: medium
+
+	[Bug fixes]
+
+        - Fix installing executable. When downloaded software is an executable
+	  instead of an archive, the install process is different and not
+	  compatible with that of an archive. A directory in install dir should
+	  be created instead of direct symlink to the executable in download
+	  dir.
+
+        [Enhancements]
+
+	- Add subcommands list, is-installed-any, is-installed-latest,
+          is-downloaded-any, is-downloaded-latest.
+
+
 0.015   2020-10-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Support installing executable in addition to archive.

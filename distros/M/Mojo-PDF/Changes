@@ -1,5 +1,12 @@
 Revision history for Mojo-PDF
 
+1.005003  2020-10-04
+  - Implement `->pic` method
+  - Documentation tweaks
+
+1.005002  2020-10-04
+  - Documented STDOUT/to-variable output options [#12]
+
 1.005001  2019-09-27
   - Implement adjustable page size [#10]
 

@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Objects::List::Request;
 # ABSTRACT: An internal class to list a bucket (List Objects Version 1)
-$Net::Amazon::S3::Operation::Objects::List::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Objects::List::Request::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use URI::Escape qw(uri_escape_utf8);
@@ -28,7 +28,7 @@ Net::Amazon::S3::Operation::Objects::List::Request - An internal class to list a
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

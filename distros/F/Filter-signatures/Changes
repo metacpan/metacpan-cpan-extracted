@@ -1,3 +1,8 @@
+0.17 2020-10-03
+    * Make some capture groups atomic to speed up matching
+    * Documentation updates to mention more common code pitfalls that trip up
+      Filter::Simple and Filter::signatures
+
 0.16 2020-08-23
     + Fix signature parsing when there are more than 40 placeholder strings
       This was an interesting bug to chase down. Filter::Simple replaces all

@@ -11,7 +11,7 @@ use warnings;
 use Rex::Interface::Cache::Base;
 use base qw(Rex::Interface::Cache::Base);
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 require Rex::Commands;
 require Rex::Commands::Fs;

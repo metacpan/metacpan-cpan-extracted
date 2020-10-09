@@ -1,6 +1,6 @@
 package Net::Amazon::S3::ACL::Grantee::Group;
 # ABSTRACT: Represents group reference for ACL
-$Net::Amazon::S3::ACL::Grantee::Group::VERSION = '0.94';
+$Net::Amazon::S3::ACL::Grantee::Group::VERSION = '0.97';
 use Moose;
 
 extends 'Net::Amazon::S3::ACL::Grantee';
@@ -50,7 +50,7 @@ Net::Amazon::S3::ACL::Grantee::Group - Represents group reference for ACL
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

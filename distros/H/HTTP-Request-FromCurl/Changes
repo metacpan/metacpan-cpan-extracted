@@ -1,3 +1,13 @@
+0.21 2020-10-09
+    * --next was introduced in Curl 7.36.0, skip tests on versions before that
+    * Adjust test count when things fail
+    * No functionality changes, no need to upgrade
+
+0.20 2020-10-05
+    * No functionality changes, no need to upgrade
+    * Only test --data-* switches on Curl versions that support --data-*
+    * Ignore sent cookies when testing multiple URIs
+
 0.19 2020-10-02
     * No functionality changes, no need to upgrade
     * Fix Filter::signatures usage for Perl versions below 5.20

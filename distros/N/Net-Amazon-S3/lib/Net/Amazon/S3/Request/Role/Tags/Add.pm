@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Tags::Add;
 # ABSTRACT: Add tags request parts common to Bucket and Object
-$Net::Amazon::S3::Request::Role::Tags::Add::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::Tags::Add::VERSION = '0.97';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::HTTP::Method::PUT';
@@ -14,7 +14,7 @@ has 'tags' => (
 );
 
 sub _request_content {
-    my ($self) = @_;
+	my ($self) = @_;
 
 	$self->_build_xml (Tagging => [
 		{ TagSet => [
@@ -41,7 +41,7 @@ Net::Amazon::S3::Request::Role::Tags::Add - Add tags request parts common to Buc
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

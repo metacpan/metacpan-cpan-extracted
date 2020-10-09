@@ -4,22 +4,9 @@ use Colouring::In;
 
 my $color = Colouring::In->new([0, 0, 0], 'a');
 is($color->toRGB(1), 'rgb(0,0,0)');
-is_deeply($color->rgb(0,0,0,1), {
-	'alpha' => 1,
-	'colour' => [
-		'0',
-		'0',
-		'0'
-	]
-});
-is_deeply($color->hsl('0', '0', '0', 1), {
-	'alpha' => 1,
-	'colour' => [
-		'0',
-		'0',
-		'0'
-	]
-});
+
+is_deeply($color->rgb(0,0,0,1), '#000');
+is_deeply($color->hsl('0', '0', '0', 1), '#000');
 
 is($color->lighten('100%', 'exists')->toRGB(), 'rgb(255,255,255)');
 my $col2 = Colouring::In->new([0, 0, 0, 1]);

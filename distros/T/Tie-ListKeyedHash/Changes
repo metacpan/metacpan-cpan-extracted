@@ -1,3 +1,7 @@
+ 1.03 08 Oct 2020 - Relicensed under MIT License. Maintainer info updated.
+                    Build configs updated. GitHub repo meta added.
+                    Added 'use warnings'
+
  1.02 17 Sep 2005 - Extended tests to 100% coverage. Fixed bugs in 'exists'.
                     Fixed returned value for undefined values and handling
                     of setting undefined values. Miscellaneous code cleanups

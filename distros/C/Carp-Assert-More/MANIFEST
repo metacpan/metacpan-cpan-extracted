@@ -21,6 +21,7 @@ t/assert_is.t
 t/assert_isa.t
 t/assert_isa_in.t
 t/assert_isnt.t
+t/assert_keys_are.t
 t/assert_lacks.t
 t/assert_like.t
 t/assert_listref.t

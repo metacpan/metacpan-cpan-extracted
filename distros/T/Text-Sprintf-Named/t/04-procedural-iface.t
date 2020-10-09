@@ -5,20 +5,20 @@ use warnings;
 
 use Test::More tests => 2;
 
-use Text::Sprintf::Named qw(named_sprintf);
+use Text::Sprintf::Named qw/ named_sprintf /;
 
 {
     # TEST
-    is (
-        scalar( named_sprintf('Hello %(name)s!', { name => "Sophie", }) ),
+    is(
+        scalar( named_sprintf( 'Hello %(name)s!', { name => "Sophie", } ) ),
         'Hello Sophie!',
-        'named_sprintf works with an hash-ref as the parameters designator',
+        q#named_sprintf works with a hash-ref as the parameters' container#,
     );
 }
 
 {
     # TEST
-    is (
+    is(
         scalar(
             named_sprintf(
                 'Hello %(name)s! Are you from %(city)s?',

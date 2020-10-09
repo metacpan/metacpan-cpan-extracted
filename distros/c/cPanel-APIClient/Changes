@@ -1,6 +1,13 @@
 Revision history for Perl module cPanel::APIClient
 
-0.05
+0.06 - 7 Oct 2020
+- BUG FIX: WHM1 CLI arguments are now passed.
+- Downgrade Test::MockModule requirement.
+- Avoid testing Mojo in 5.10 (to avoid a length(undef) warning).
+- Add diagnostics to tests.
+- Fix missing strict/warnings.
+
+0.05 - 6 Jul 2020
 - Fix cancel() tests and documentation.
 - Use pure-Perl IO::Async in tests.
   (Avoids epoll EBADF bug: https://rt.cpan.org/Public/Bug/Display.html?id=132537)

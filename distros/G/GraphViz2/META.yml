@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '1.001002'
+  Test::Snapshot: '0.06'
   charnames: '0'
   open: '0'
 configure_requires:
@@ -24,15 +25,12 @@ requires:
   Data::Section::Simple: '0.02'
   File::Which: '1.21'
   IPC::Run3: '0.048'
-  Log::Handler: '0.84'
   Moo: '2.001001'
-  Set::Array: '0.23'
-  Try::Tiny: '0.09'
   Types::Standard: '1.000005'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/ronsavage/GraphViz2/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/GraphViz2.git
-version: '2.50'
+version: '2.54'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

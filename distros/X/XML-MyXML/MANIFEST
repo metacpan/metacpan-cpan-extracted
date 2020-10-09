@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/XML/MyXML.pm
+lib/XML/MyXML/Object.pm
 minil.toml
 t/01.t
 t/02.t

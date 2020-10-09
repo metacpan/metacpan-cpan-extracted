@@ -1,5 +1,5 @@
 name = "usw"
-badges = ["travis-ci.com"]
+badges = ["travis-ci.com",'appveyor']
 authority="cpan:WORTHMINE"
 
 module_maker="ModuleBuildTiny"

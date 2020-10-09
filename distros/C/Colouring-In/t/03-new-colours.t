@@ -39,16 +39,11 @@ subtest 'basics - black' => sub {
                 start => '#000000',
                 expected => [0, 0, 0],
         );
-        
+
         convert_colour(
                 start => '#000',
                 expected => [0, 0, 0],
         );
-
-        convert_colour(
-                expected => [0, 0, 0],
-                start => 'hsl(0,0%,0%)',
-        );  
         
         convert_colour(
                 expected => [0, 0, 0],

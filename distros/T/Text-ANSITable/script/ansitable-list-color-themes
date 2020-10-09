@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-09-13'; # DATE
-our $VERSION = '0.600'; # VERSION
+our $DATE = '2020-10-05'; # DATE
+our $VERSION = '0.601'; # VERSION
 
 use 5.010;
 use strict;
@@ -67,7 +67,7 @@ ansitable-list-color-themes - List available color themes for Text::ANSITable
 
 =head1 VERSION
 
-This document describes version 0.600 of ansitable-list-color-themes (from Perl distribution Text-ANSITable), released on 2020-09-13.
+This document describes version 0.601 of ansitable-list-color-themes (from Perl distribution Text-ANSITable), released on 2020-10-05.
 
 =head1 SYNOPSIS
 
@@ -116,13 +116,13 @@ Sample output:
  .-------------------------------------------------------.
  |  num   percent%          date           bool?   text  |
  |                                                       |
- |    1     40,00%   2020-09-13 07:38:35     Y     hello |
- | -3.3    100,00%   2020-09-13 07:38:35     N     world |
+ |    1     40,00%   2020-10-05 08:34:27     Y     hello |
+ | -3.3    100,00%   2020-10-05 08:34:27     N     world |
  +-------------------------------------------------------+
- |    1     10,00%   2013-05-02 09:26:24     N     x1    |
- |    2     20,00%   2013-05-02 12:13:04     Y     x2    |
- |    3     30,00%   2013-05-02 14:59:44     N     x3    |
- |    4     40,00%   2013-05-02 17:46:24     Y     x4    |
+ |    1     10,00%   2013-05-02 09:26:24     Y     x1    |
+ |    2     20,00%   2013-05-02 12:13:04     N     x2    |
+ |    3     30,00%   2013-05-02 14:59:44     Y     x3    |
+ |    4     40,00%   2013-05-02 17:46:24     N     x4    |
  |    5     50,00%   2013-05-02 20:33:04     N     x5    |
  `-------------------------------------------------------'
 

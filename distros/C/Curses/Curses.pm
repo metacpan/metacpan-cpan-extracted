@@ -51,7 +51,7 @@ sub DESTROY { }
 
 package Curses;
 
-$VERSION = '1.36'; # Makefile.PL picks this up
+$VERSION = '1.37'; # Makefile.PL picks this up
 
 use Carp;
 require Exporter;
@@ -80,7 +80,12 @@ sub AUTOLOAD {
         "functions.  ";
 }
 
-sub printw   { addstr(sprintf shift, @_) }
+sub printw($@) {
+
+    my ($format, @substitutions) = @_;
+
+    addstring(sprintf($format, @substitutions));
+}
 
 tie $LINES,       Curses::Vars, 1;
 tie $COLS,        Curses::Vars, 2;
@@ -437,7 +442,7 @@ failure.
 
 =over 4
 
-	addstring("Hällö, Wörld") || die "addstring failed";
+	addstring("Hällö, Wörld") || die "addstring failed";
 
 =back
 

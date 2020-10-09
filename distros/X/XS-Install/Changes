@@ -1,3 +1,5 @@
+1.2.19   09.10.2020
+           - basic CMake suport
 1.2.18   22.06.2020
            - more safely use flock
 1.2.17   19.06.2020

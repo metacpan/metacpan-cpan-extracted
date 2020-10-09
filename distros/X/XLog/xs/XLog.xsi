@@ -22,10 +22,10 @@ struct PerlObjectLogger : ILogger, Backref {
         sub.call(o.ref(), xs::out(msg), xs::out(i.level), xs::out(i.module->name), xs::out(i.file), xs::out(i.line), xs::out(i.func), xs::out(&fmt));
     }
     
-    void log (const string& msg, const Info&) override {
+    void log (const string& msg, const Info& info) override {
         if (!is_perl_thread()) throw std::logic_error("can't call pure-perl logging callback: log() called from perl-foreign thread");
         Object o = xs::out(this);
-        o.call("log", xs::out(msg));
+        o.call("log", xs::out(msg), xs::out(info.level));
     }
     
     ~PerlObjectLogger () { Backref::dtor(); }

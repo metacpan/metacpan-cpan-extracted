@@ -1,7 +1,7 @@
 package Sah::Schemas::Net;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2020-05-27'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Schemas related to network (IP address, hostnames, etc)
@@ -18,7 +18,7 @@ Sah::Schemas::Net - Schemas related to network (IP address, hostnames, etc)
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schemas::Net (from Perl distribution Sah-Schemas-Net), released on 2019-11-29.
+This document describes version 0.009 of Sah::Schemas::Net (from Perl distribution Sah-Schemas-Net), released on 2020-05-27.
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

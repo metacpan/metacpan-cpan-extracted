@@ -27,10 +27,10 @@ no_index:
 provides:
   XML::MyXML:
     file: lib/XML/MyXML.pm
-    version: '1.05'
+    version: '1.06'
   XML::MyXML::Object:
-    file: lib/XML/MyXML.pm
-    version: '1.05'
+    file: lib/XML/MyXML/Object.pm
+    version: '1.06'
 requires:
   Carp: '0'
   Encode: '0'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/akarelas/xml-myxml/issues
   homepage: https://github.com/akarelas/xml-myxml
   repository: git://github.com/akarelas/xml-myxml.git
-version: '1.05'
+version: '1.06'
 x_authority: cpan:KARJALA
 x_contributors:
   - 'Alexander Karelas <alex.karelas@gmail.com>'

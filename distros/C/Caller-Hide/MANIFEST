@@ -1,0 +1,12 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README.md
+lib/Caller/Hide.pm
+t/hide.t
+t/compat.t
+xt/changelog.t
+xt/kwalitee.t
+xt/manifest.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

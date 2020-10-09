@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.39';
+our $VERSION = '2.41';
 
 # Note that while we make use of DateTime::Duration in this module if we
 # actually try to load it here all hell breaks loose with circular
@@ -509,7 +509,7 @@ sub offset_as_seconds {
         return undef;
     }
 
-    $sign = '+' unless defined $sign;
+    $sign = '+'  unless defined $sign;
     return undef unless $hours >= 0   && $hours <= 99;
     return undef unless $minutes >= 0 && $minutes <= 59;
     return undef
@@ -614,7 +614,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 2.39
+version 2.41
 
 =head1 SYNOPSIS
 

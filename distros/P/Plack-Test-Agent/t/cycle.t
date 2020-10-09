@@ -9,9 +9,8 @@ use Test::More;
 use Plack::Test::Agent;
 use Test::Memory::Cycle;
 
-my $app = sub
-{
-    return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello World' ] ];
+my $app = sub {
+    return [ 200, [ 'Content-Type' => 'text/plain' ], ['Hello World'] ];
 };
 
 my $agent = Plack::Test::Agent->new(

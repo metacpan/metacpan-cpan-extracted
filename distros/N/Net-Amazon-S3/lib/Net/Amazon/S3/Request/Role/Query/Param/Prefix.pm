@@ -1,12 +1,12 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Prefix;
 # ABSTRACT: prefix query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Prefix::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::Query::Param::Prefix::VERSION = '0.97';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
-    param => 'prefix',
-    constraint => 'Maybe[Str]',
-    required => 0,
+	param => 'prefix',
+	constraint => 'Maybe[Str]',
+	required => 0,
 };
 
 1;
@@ -23,7 +23,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Prefix - prefix query param role
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

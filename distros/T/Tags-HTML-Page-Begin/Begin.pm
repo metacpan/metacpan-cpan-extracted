@@ -13,7 +13,7 @@ Readonly::Hash my %LANG => (
 	'title' => 'Page title',
 );
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -52,6 +52,12 @@ sub new {
 
 	# Generator.
 	$self->{'generator'} = 'Perl module: '.__PACKAGE__.', Version: '.$VERSION;
+
+	# HTML element lang attribute.
+	$self->{'html_lang'} = 'en';
+
+	# http-equiv content-type.
+	$self->{'http_equiv_content_type'} = 'text/html';
 
 	# Keywords.
 	$self->{'keywords'} = undef;
@@ -109,6 +115,11 @@ sub new {
 		}
 	}
 
+	# Check charset.
+	if (! defined $self->{'charset'}) {
+		err "Parameter 'charset' is required.";
+	}
+
 	# Check for 'script_js' array.
 	if (ref $self->{'script_js'} ne 'ARRAY') {
 		err "Parameter 'script_js' must be a array.";
@@ -142,13 +153,19 @@ sub process {
 		['r', $self->{'doctype'}],
 		['r', "\n"],
 		['b', 'html'],
+		['a', 'lang', $self->{'html_lang'}],
 		['b', 'head'],
-
-		['b', 'meta'],
-		['a', 'http-equiv', 'Content-Type'],
-		['a', 'content', 'text/html; charset=UTF-8'],
-		['e', 'meta'],
 	);
+
+	if (defined $self->{'http_equiv_content_type'}) {
+		$self->{'tags'}->put(
+			['b', 'meta'],
+			['a', 'http-equiv', 'Content-Type'],
+			['a', 'content', $self->{'http_equiv_content_type'}.
+				'; charset='.$self->{'charset'}],
+			['e', 'meta'],
+		);
+	}
 	if (defined $self->{'base_href'}) {
 		$self->{'tags'}->put(
 			['b', 'base'],
@@ -159,7 +176,7 @@ sub process {
 			['e', 'base'],
 		);
 	}
-	if (defined $self->{'charset'}) {
+	if (! defined $self->{'http_equiv_content_type'}) {
 		$self->{'tags'}->put(
 			['b', 'meta'],
 			['a', 'charset', $self->{'charset'}],
@@ -378,6 +395,8 @@ Default value is [].
 
 Document character set.
 
+Parameter is required.
+
 Default value is 'UTF-8'.
 
 =item * C<description>
@@ -404,6 +423,21 @@ Default value is undef.
 Generator value.
 
 Default value is 'Perl module: Tags::HTML::Page::Begin, Version: __MODULE_VERSION__'.
+
+=item * C<html_lang>
+
+HTML element lang attribute.
+Creates html element in form: <html lang="en">
+
+Default value is 'en'.
+
+=item * C<http_equiv_content_type>
+
+http-equiv content-type meta element.
+If defined creates meta in form: <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+Unless defined creates meta in form: <meta charset="UTF-8" />
+
+Defaut value is 'text/html'.
 
 =item * C<keywords>
 
@@ -480,6 +514,7 @@ Returns undef.
          Parameter 'css_src' must be a array.
          Parameter 'css_src' must be a array of hash structures.
          Parameter 'css_src' must be a array of hash structures with 'media' and 'link' keys.
+         Parameter 'charset' is required.
          Parameter 'script_js' must be a array.
          Parameter 'script_js_src' must be a array.
          Parameter 'tags' must be a 'Tags::Output::*' class.
@@ -530,10 +565,9 @@ Returns undef.
 
  # Output:
  # <!DOCTYPE html>
- # <html>
+ # <html lang="en">
  #   <head>
  #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
- #     <meta charset="UTF-8" />
  #     <meta name="generator" content=
  #       "Perl module: Tags::HTML::Page::Begin, Version: 0.06" />
  #     <title>
@@ -588,6 +622,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

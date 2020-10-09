@@ -1,0 +1,196 @@
+NAME
+    Devel::Platform::Match - Match platform information with platform
+    specification
+
+VERSION
+    This document describes version 0.005 of Devel::Platform::Match (from
+    Perl distribution Devel-Platform-Match), released on 2020-10-09.
+
+SYNOPSIS
+     use Devel::Platform::Match qw(
+         match_platform
+         match_platform_bool
+         parse_platform_spec
+     );
+
+     # assuming we're on an Ubuntu Linux 20.04 64bit
+     my $envres = match_platform("osflag=linux"); # -> [200, "OK", 1]
+     my $envres = match_platform("linux32");      # -> [200, "OK", 0] # linux32 is alias for "osflag=linux archname=x86"; archname doesn't match
+     my $envres = match_platform("win64");        # -> [200, "OK", 0] # win64 is alias for "osflag=Win32 archname=x86_64"; osflag doesn't match
+     my $envres = match_platform("osflag=linux oslabel=~/Debian|Ubuntu|Mint/");                 # -> [200, "OK", 1]
+     my $envres = match_platform("osflag=linux, oslabel=~/Debian|Ubuntu|Mint/, osvers >= 21"); # -> [200, "OK", 0] # osvers doesn't match
+     my $envres = match_platform("foo");                                                       # -> [412, "Invalid syntax in platform spec 'foo'"]
+
+DESCRIPTION
+    This module lets you match platform information with platform
+    specification.
+
+PLATFORM SPECIFICATION SYNTAX
+    Platform specification syntax is modelled after CSS attribute selector
+    (more specifically, Data::CSel's attribute selector).
+
+    Platform specification is a whitespace- (or comma-) separated list of
+    clauses.
+
+    Each clause is of the form: "key" "op" "literal".
+
+    "key" is any key of the hash returned by Devel::Platform::Info.
+
+    "op" is operator supported by Data::CSel.
+
+    "literal" is a bareword number or word, or a quoted string. See
+    Data::CSel for more information.
+
+    A platform specification with zero clauses ("") will match all
+    platforms.
+
+    For convenience, some aliases will be coerced into a proper platform
+    specification first:
+
+        "linux32"      => "osflag=linux archname=i686",
+        "linux64"      => "osflag=linux archname=x86_64",
+        "linux-i386"   => "osflag=linux archname=i386",
+        "linux-i686"   => "osflag=linux archname=i686",
+        "linux-amd64"  => "osflag=linux archname=x86_64",
+        "linux-x86_64" => "osflag=linux archname=x86_64",
+        "win32"        => "osflag=Win32 archname=i686",
+        "win64"        => "osflag=Win32 archname=x86_64",
+        "all"          => "",
+
+    Some examples of valid and invalid platform specifications:
+
+     specification                  parse result                                            note
+     -------------                  ------------                                            ----
+     linux32                        [["osflag","=","linux"], ["archname","=","x86"]]        coerced to "osflag=linux archname=x86" before parsing
+     oslabel=Ubuntu                 [["oslabel","=","Ubuntu"]]
+     osflag=linux oslabel=Ubuntu    [["osflag","=","linux"], ["oslabel","=","Ubuntu"]]
+     osflag=linux, oslabel=Ubuntu   [["osflag","=","linux"], ["oslabel","=","Ubuntu"]]      either whitespace or comma is okay as separator
+     oslabel=~/Debian|Ubuntu/       [["oslabel","=~",qr/Debian|Ubuntu/]]
+     is32bit=1                      [["is32bit","=",1]]                                     any 32bit platform
+     is32bit is true                [["is32bit","is",1]]                                    any 64bit platform
+     "" (empty string)              []                                                      no clauses, will match any platform info
+     foo                            undef                                                   invalid syntax, unknown alias
+     oslabel=Ubuntu,oslabel=Debian  [["osflag","=","Ubuntu"], ["osflag","=","Debian"]]      valid, but won't match any platform
+     archname=amd64                 [["archname","=","amd64"]]                              Will match platform info {archname=>"x86_64"} because of normalization
+
+PLATFORM MATCHING
+    First, some normalization is performed on the info hash. For archname,
+    "amd64" will be coerced to "x86_64".
+
+    Then each clause will be tested. When the hash does not have the key
+    specified in the clause, the test fails.
+
+    Platform matches if all clauses pass.
+
+FUNCTIONS
+  match_platform
+    Usage:
+
+     match_platform($spec, $info, $quiet) -> [status, msg, payload, meta]
+
+    Match platform information against platform spec.
+
+    Examples:
+
+    *   Example #1:
+
+         match_platform("osflag=linux", { osflag => "linux", oslabel => "Debian" });
+
+        Result:
+
+         [200, "OK (envelope generated)", 1]
+
+    See section "PLATFORM MATCHING" for details on how matching is done.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $info => *hash*
+
+        Hash(ref) of information returned by Devel::Platform::Info's
+        get_info().
+
+        If not specified, will retrieve from Devel::Platform::Info.
+
+    *   $quiet => *bool*
+
+    *   $spec* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  parse_platform_spec
+    Usage:
+
+     parse_platform_spec($spec) -> array
+
+    Parse platform specification string into array of clauses.
+
+    Examples:
+
+    *   coercion of alias:
+
+         parse_platform_spec("linux32"); # -> undef
+
+    *   Example #2:
+
+         parse_platform_spec("osflag!=linux"); # -> undef
+
+    *   Example #3:
+
+         parse_platform_spec("foo"); # -> undef
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $spec* => *str*
+
+    Return value: (array)
+
+  match_platform_bool
+    Usage:
+
+     my $match = match_platform_bool($spec [ , $info [ , $quiet ] ]); # -> bool
+
+    Just like "match_platform" but return a simple boolean value.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Devel-Platform-Match>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Devel-Platform-Match>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Platform-Match>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Devel::Platform::Info
+
+    App::PlatformMatchUtils provides CLI's for "parse_platform_spec" and
+    "match_platform".
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

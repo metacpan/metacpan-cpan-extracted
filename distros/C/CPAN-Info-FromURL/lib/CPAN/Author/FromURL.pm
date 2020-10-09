@@ -1,7 +1,7 @@
 package CPAN::Author::FromURL;
 
 our $DATE = '2020-10-02'; # DATE
-our $VERSION = '0.091'; # VERSION
+our $VERSION = '0.092'; # VERSION
 
 use 5.010001;
 use strict;
@@ -71,7 +71,7 @@ CPAN::Author::FromURL - Extract CPAN author from a URL
 
 =head1 VERSION
 
-This document describes version 0.091 of CPAN::Author::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2020-10-02.
+This document describes version 0.092 of CPAN::Author::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2020-10-02.
 
 =head1 FUNCTIONS
 

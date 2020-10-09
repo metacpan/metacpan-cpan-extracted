@@ -21,6 +21,8 @@ use parent (
     'TestHTTPUAPIMixin',
 );
 
+use Test::More;
+
 use Test::FailWarnings;
 
 __PACKAGE__->new()->runtests() if !caller;
@@ -28,6 +30,12 @@ __PACKAGE__->new()->runtests() if !caller;
 use constant _CP_REQUIRE => (
     'Mojo::UserAgent',
     [ 'Mojolicious', '7.80' ],
+    sub { diag "Using Mojolicious $Mojolicious::VERSION"; },
+    sub {
+        if ( $^V le v5.12.0 ) {
+            die 'Avoiding pre-5.12 length(undef) warnings …';
+        }
+    },
 );
 
 sub TRANSPORT_PIECE {

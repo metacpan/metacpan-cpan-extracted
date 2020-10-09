@@ -1,6 +1,6 @@
 package Net::Amazon::S3::ACL::Grantee::User;
 # ABSTRACT: Represents user reference for ACL
-$Net::Amazon::S3::ACL::Grantee::User::VERSION = '0.94';
+$Net::Amazon::S3::ACL::Grantee::User::VERSION = '0.97';
 use Moose;
 
 extends 'Net::Amazon::S3::ACL::Grantee';
@@ -38,7 +38,7 @@ Net::Amazon::S3::ACL::Grantee::User - Represents user reference for ACL
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

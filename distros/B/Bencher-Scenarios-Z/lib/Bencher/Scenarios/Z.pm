@@ -1,12 +1,12 @@
 package Bencher::Scenarios::Z;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-21'; # DATE
+our $DATE = '2020-10-08'; # DATE
 our $DIST = 'Bencher-Scenarios-Z'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
-# ABSTRACT: Scenarios for benchmarking Z
+# ABSTRACT: Scenarios for benchmarking Z (and related modules)
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Bencher::Scenarios::Z - Scenarios for benchmarking Z
+Bencher::Scenarios::Z - Scenarios for benchmarking Z (and related modules)
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenarios::Z (from Perl distribution Bencher-Scenarios-Z), released on 2020-09-21.
+This document describes version 0.005 of Bencher::Scenarios::Z (from Perl distribution Bencher-Scenarios-Z), released on 2020-10-08.
 
 =head1 DESCRIPTION
 

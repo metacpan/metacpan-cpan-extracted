@@ -99,6 +99,9 @@ sub checkCopyCorrectModulesLinux26MicrosoftWindows {
         $projectdir, qw(inc Devel AssertOS MicrosoftWindows.pm)),
 	"inc/Devel/AssertOS/MicrosoftWindows.pm exists");
     ok(-e File::Spec->catfile(
+        $projectdir, qw(inc Devel AssertOS MSYS.pm)),
+	"inc/Devel/AssertOS/MSYS.pm exists");
+    ok(-e File::Spec->catfile(
         $projectdir, qw(inc Devel AssertOS.pm)),
 	"inc/Devel/AssertOS.pm exists");
     ok(-e File::Spec->catfile(
@@ -110,6 +113,7 @@ sub checkCopyCorrectModulesLinux26MicrosoftWindows {
 	    inc/Devel/AssertOS/Linux/v2_6.pm inc/Devel/AssertOS/Linux.pm
 	    inc/Devel/AssertOS/MSWin32.pm inc/Devel/AssertOS/Cygwin.pm
 	    inc/Devel/AssertOS/MicrosoftWindows.pm
+        inc/Devel/AssertOS/MSYS.pm
 	    inc/Devel/CheckOS.pm inc/Devel/AssertOS.pm
 	    MANIFEST Makefile.PL
 	)],

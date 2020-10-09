@@ -29,23 +29,24 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.90",
+            "Rinci" : "v1.1.94",
             "TableDef" : "v1.0.4"
          }
       },
       "runtime" : {
          "requires" : {
             "Data::Sah::Normalize" : "0",
+            "Data::Sah::Resolve" : "0.003",
             "Data::Sah::Util::Type::Date" : "0.68",
             "Exporter" : "5.57",
             "Function::Fallback::CoreOrPP" : "0",
             "List::Util" : "1.45",
             "Locale::Set" : "0",
             "Locale::TextDomain::UTF8" : "0",
-            "Log::ger" : "0.027",
+            "Log::ger" : "0.037",
             "Perinci::Object::Metadata" : "0",
             "Perinci::Sub::Gen" : "0",
-            "Perinci::Sub::GetArgs::Argv" : "0.842",
+            "Perinci::Sub::GetArgs::Argv" : "0.845",
             "Perinci::Sub::Property::result::table" : "0",
             "Perinci::Sub::Util" : "0.46",
             "Time::Moment" : "0",
@@ -78,12 +79,17 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-Gen-AccessTable"
       }
    },
-   "version" : "0.583",
+   "version" : "0.585",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
+            "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",
+            "version" : "0.001"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
             "config" : {
@@ -166,11 +172,6 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
-            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.012"
@@ -178,7 +179,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.599"
+            "version" : "0.602"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -247,9 +248,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Authority",
-            "name" : "@Author::PERLANCAR/Authority",
-            "version" : "1.009"
+            "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
+            "name" : "@Author::PERLANCAR/PERLANCAR::Authority",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
@@ -403,7 +404,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.081"
+                        "version" : "0.082"
                      }
                   ]
                }
@@ -434,7 +435,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
             "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
-            "version" : "0.250"
+            "version" : "0.251"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",
@@ -469,12 +470,14 @@
             "config" : {
                "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
                   "finder" : [
-                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                     ":ExecFiles",
+                     ":InstallModules",
+                     ":TestFiles"
                   ]
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.003"
+            "version" : "3.001.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

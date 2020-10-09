@@ -5,7 +5,7 @@ use v5.20;
 use experimental qw/ signatures /;
 package YAML::Tidy::Config;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Cwd;
 

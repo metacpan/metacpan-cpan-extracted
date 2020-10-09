@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Fetch::Request;
 # ABSTRACT: An internal class to get an object
-$Net::Amazon::S3::Operation::Object::Fetch::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Fetch::Request::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -11,14 +11,14 @@ with 'Net::Amazon::S3::Request::Role::HTTP::Method';
 __PACKAGE__->meta->make_immutable;
 
 sub query_string_authentication_uri {
-    my ( $self, $expires, $query_form ) = @_;
+	my ( $self, $expires, $query_form ) = @_;
 
-    my $uri = URI->new( $self->_request_path );
-    $uri->query_form( %$query_form ) if $query_form;
+	my $uri = URI->new( $self->_request_path );
+	$uri->query_form( %$query_form ) if $query_form;
 
-    return $self->_build_signed_request(
-        path   => $uri->as_string,
-    )->query_string_authentication_uri($expires);
+	return $self->_build_signed_request(
+		path   => $uri->as_string,
+	)->query_string_authentication_uri($expires);
 }
 
 1;
@@ -35,7 +35,7 @@ Net::Amazon::S3::Operation::Object::Fetch::Request - An internal class to get an
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.48';
+our $VERSION = '1.49';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -113,7 +113,7 @@ Travel::Status::DE::IRIS::Result->mk_ro_accessors(
 	  date datetime delay
 	  departure departure_delay departure_is_additional departure_is_cancelled
 	  ds100 is_transfer is_unscheduled is_wing
-	  line_no old_train_id old_train_no platform raw_id
+	  line_no old_train_id old_train_no operator platform raw_id
 	  realtime_xml route_start route_end
 	  sched_arrival sched_departure sched_platform sched_route_start
 	  sched_route_end start
@@ -841,7 +841,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 DESCRIPTION
 

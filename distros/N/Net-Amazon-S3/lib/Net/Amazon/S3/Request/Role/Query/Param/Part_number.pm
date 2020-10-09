@@ -1,13 +1,13 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Part_number;
 # ABSTRACT: partNumber query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Part_number::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::Query::Param::Part_number::VERSION = '0.97';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
-    param => 'part_number',
-    query_param => 'partNumber',
-    constraint => 'Int',
-    required => 1,
+	param => 'part_number',
+	query_param => 'partNumber',
+	constraint => 'Int',
+	required => 1,
 };
 
 1;
@@ -24,7 +24,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Part_number - partNumber query par
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

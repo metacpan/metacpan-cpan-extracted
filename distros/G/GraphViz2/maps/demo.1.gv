@@ -1,8 +1,0 @@
-digraph mainmap
-{
-	/* Note: URL must be in caps and quotes must be doubles. */
-
-	URL = "http://savage.net.au/";
-	command [URL = "http://savage.net.au/maps/demo.1.html"];
-	command -> output [URL = "/maps/demo.1.1.html"];
-}

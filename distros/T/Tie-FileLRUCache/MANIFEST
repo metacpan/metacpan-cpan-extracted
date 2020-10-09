@@ -1,12 +1,12 @@
-MANIFEST
-Makefile.PL
 Build.PL
+MANIFEST
+LICENSE
+Makefile.PL
+META.json
+META.yml
 README
 Changes
 lib/Tie/FileLRUCache.pm
 t/01_Tie-FileLRUCache.t
 t/98_pod_coverage.t
 t/99_pod.t
-META.yml
-Artistic_License.txt
-GPL_License.txt

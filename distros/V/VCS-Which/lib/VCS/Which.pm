@@ -15,7 +15,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use Path::Tiny;
 
-our $VERSION = version->new('0.6.6');
+our $VERSION = version->new('0.6.7');
 
 our %systems;
 
@@ -348,7 +348,7 @@ VCS::Which - Generically interface with version control systems
 
 =head1 VERSION
 
-This documentation refers to VCS::Which version 0.6.6.
+This documentation refers to VCS::Which version 0.6.7.
 
 =head1 SYNOPSIS
 

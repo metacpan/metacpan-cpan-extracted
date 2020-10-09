@@ -85,7 +85,7 @@ sub call_api {
     my $had_token = defined $self->{config}{access_token} && $self->{config}{access_token} ne "";
     my $response = $self->call_api_once($resource_path, $method, $query_params, $post_params, $header_params, $body_data, $files);
     my $content = sprintf("%s", $response->content);
-    if ($had_token && ($response->code eq 401 || ($response->code eq 400 && index($content, ' Authority') != -1))) {
+    if ($had_token && ($response->code eq 401 || ($response->code eq 500 && !$content))) {
         $self->{config}{access_token} = "";
         $response = $self->call_api_once($resource_path, $method, $query_params, $post_params, $header_params, $body_data, $files);
         $content = sprintf("%s", $response->content);
@@ -378,10 +378,16 @@ sub update_params_for_auth {
         my $_url = $self->{config}{auth_base_url} . "/connect/token";
         my $_request = POST($_url, {}, Content => 'grant_type=client_credentials&client_id='.$self->{config}{app_sid}.'&client_secret='.$self->{config}{app_key});
         my $_response = $self->{ua}->request($_request);
+        unless ($_response->is_success) {
+            my $content = sprintf("%s", $_response->content);
+            croak(sprintf "API Exception(%s): %s\n%s", 401, $_response->message, $content);
+        }
         my $decoded_data = decode_json $_response->content;
         $self->{config}{access_token} = $decoded_data->{access_token};
     }
-    $header_params->{'Authorization'} = 'Bearer ' . $self->{config}{access_token};
+    if (defined $self->{config}{access_token} && $self->{config}{access_token} ne "") {
+        $header_params->{'Authorization'} = 'Bearer ' . $self->{config}{access_token};
+    }
 }
 
 1;

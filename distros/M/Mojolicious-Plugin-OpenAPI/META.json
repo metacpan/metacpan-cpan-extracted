@@ -30,9 +30,8 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON::Validator" : "4.00",
-            "Mojolicious" : "8.00",
-            "YAML::XS" : "0.80"
+            "JSON::Validator" : "4.05",
+            "Mojolicious" : "8.00"
          }
       },
       "test" : {
@@ -53,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-openapi"
       }
    },
-   "version" : "3.36",
+   "version" : "3.39",
    "x_contributors" : [
       "Henrik Andersen",
       "Ilya Rassadin",

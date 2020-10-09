@@ -1,12 +1,11 @@
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 Build.PL
 README
 Changes
 LICENSE
-GPL_License.txt
-Artistic_License.txt
 examples/simple.pl
 examples/tie_existing_hash.pl
 lib/Tie/ListKeyedHash.pm

@@ -67,7 +67,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "JSON::MaybeXS" => 0,
     "LWP::UserAgent" => 0,
-    "List::MoreUtils" => 0,
+    "List::MoreUtils" => "0.416",
     "List::Util" => 0,
     "MIME::Base64" => 0,
     "Net::OpenSSH::ShellQuoter" => 0,
@@ -108,7 +108,7 @@ my %WriteMakefileArgs = (
     "autodie" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.12.2",
+  "VERSION" => "1.13.0",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/issue/*.t"
   }
@@ -142,7 +142,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
   "LWP::UserAgent" => 0,
-  "List::MoreUtils" => 0,
+  "List::MoreUtils" => "0.416",
   "List::Util" => 0,
   "MIME::Base64" => 0,
   "Net::OpenSSH::ShellQuoter" => 0,

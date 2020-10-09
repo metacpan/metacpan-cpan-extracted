@@ -1,13 +1,13 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Version_id;
 # ABSTRACT: version_id query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Version_id::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::Query::Param::Version_id::VERSION = '0.97';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
-    param => 'version_id',
-    query_param => 'versionId',
-    constraint => 'Str',
-    required => 0,
+	param => 'version_id',
+	query_param => 'versionId',
+	constraint => 'Str',
+	required => 0,
 };
 
 1;
@@ -24,7 +24,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Version_id - version_id query para
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

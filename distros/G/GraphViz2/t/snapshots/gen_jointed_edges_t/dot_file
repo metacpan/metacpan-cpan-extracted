@@ -1,0 +1,20 @@
+'digraph Perl {
+ graph [ rankdir="TB" ]
+ node [ shape="oval" style="filled" ]
+ edge [ color="grey" ]
+ "Carnegie" [ color="aquamarine" ]
+ "Murrumbeena" [ color="bisque" ]
+ "Oakleigh" [ color="blueviolet" ]
+ "one" [ color="grey" shape="point" width="0" ]
+ "Murrumbeena" -> "one" [ arrowhead="none" ]
+ "Carnegie" -> "one" [ arrowhead="none" ]
+ "one" -> "Oakleigh"
+ "Ashburton" [ color="lawngreen" ]
+ "Chadstone" [ color="coral" ]
+ "Waverley" [ color="crimson" ]
+ "two" [ color="grey" shape="point" width="0" ]
+ "Ashburton" -> "two" [ arrowhead="none" ]
+ "Chadstone" -> "two" [ arrowhead="none" ]
+ "two" -> "Waverley"
+}
+'

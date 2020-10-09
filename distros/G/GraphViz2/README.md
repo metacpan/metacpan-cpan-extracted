@@ -6,11 +6,7 @@ GraphViz2 - A wrapper for AT&T's Graphviz
 
 ## Sample output
 
-Unpack the distro and copy html/\*.html and html/\*.svg to your web server's doc root directory.
-
-Then, point your browser at 127.0.0.1/index.html.
-
-Or, hit [the demo page](http://savage.net.au/Perl-modules/html/graphviz2/index.html).
+See [https://graphviz-perl.github.io/](https://graphviz-perl.github.io/).
 
 ## Perl code
 
@@ -834,11 +830,10 @@ are constrained to be horizontally aligned.
 
 See scripts/rank.sub.graph.\[12\].pl and scripts/sub.graph.frames.pl for sample code.
 
-## report\_valid\_attributes()
+## valid\_attributes()
 
-Prints all attributes known to this module.
-
-Returns nothing.
+Returns a hashref of all attributes known to this module, keyed by type
+to hashrefs to true values.
 
 You wouldn't normally need to use this method.
 
@@ -891,7 +886,7 @@ $context is one of 'edge', 'graph', 'node', or a special string. See the code fo
 
 You wouldn't normally need to use this method.
 
-## validate\_params($context, %attributes)
+## validate\_params($context, \\%attributes)
 
 Validate the given attributes within the given context.
 
@@ -1168,7 +1163,9 @@ is ignored.
 
 ## Why such a different approach to logging?
 
-As you can see from scripts/\*.pl, I always use [Log::Handler](https://metacpan.org/pod/Log::Handler).
+As you can see from scripts/\*.pl, I always use [Log::Handler](https://metacpan.org/pod/Log::Handler),
+but you don't have to: any object with `debug` and `error` methods
+will do, since these are the only levels emitted by this module.
 
 By default (i.e. without a logger object), [GraphViz2](https://metacpan.org/pod/GraphViz2) prints warning and debug messages to STDOUT,
 and dies upon errors.
@@ -1513,10 +1510,6 @@ Demonstrates using utf8 characters in labels.
 Outputs to ./html/utf8.2.svg by default.
 
 # TODO
-
-- o Does GraphViz2 need to emulate the sort option in GraphViz?
-
-    That depends on what that option really does.
 
 - o Handle edges such as 1 -> 2 -> {A B}, as seen in [Graphviz](http://www.graphviz.org/)'s graphs/directed/switch.gv
 

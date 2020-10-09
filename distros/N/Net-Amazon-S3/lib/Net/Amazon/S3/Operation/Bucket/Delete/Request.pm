@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Bucket::Delete::Request;
 # ABSTRACT: An internal class to delete a bucket
-$Net::Amazon::S3::Operation::Bucket::Delete::Request::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Bucket::Delete::Request::VERSION = '0.97';
 use Moose 0.85;
 extends 'Net::Amazon::S3::Request::Bucket';
 
@@ -22,7 +22,7 @@ Net::Amazon::S3::Operation::Bucket::Delete::Request - An internal class to delet
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

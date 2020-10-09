@@ -35,7 +35,7 @@ BIN: {
 				ok(script_stderr_is('', 'no error output'));
 
 				script_runs(['bin/address_lookup', 'Fairfield Road,', 'Broadstairs,', ' Kent,', ' UK']);
-				ok(script_stdout_like(qr/51\.35/, 'test 5'));
+				ok(script_stdout_like(qr/51\.36/, 'test 5'));
 				ok(script_stderr_is('', 'no error output'));
 			} else {
 				diag('Author tests not required for installation');

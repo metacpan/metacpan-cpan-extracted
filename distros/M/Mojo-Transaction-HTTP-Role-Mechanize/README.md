@@ -1,8 +1,10 @@
 <div>
-    <a href="https://travis-ci.com/kiwiroy/mojo-transaction-http-role-mechanize">
-      <img alt="Travis Build Status"
-           src="https://travis-ci.com/kiwiroy/mojo-transaction-http-role-mechanize.svg?branch=master" />
-    </a>
+    <img alt="Build Status - Linux"
+         src="https://github.com/kiwiroy/mojo-transaction-http-role-mechanize/workflows/linux/badge.svg" />
+    <img alt="Build Status - Macos"
+        src="https://github.com/kiwiroy/mojo-transaction-http-role-mechanize/workflows/macos/badge.svg" />
+    <img alt="Build Status - Windows"
+         src="https://github.com/kiwiroy/mojo-transaction-http-role-mechanize/workflows/windows/badge.svg" />
     <a href="https://kritika.io/users/kiwiroy/repos/7509235145731088/heads/master/">
       <img alt="Kritika Analysis Status"
            src="https://kritika.io/users/kiwiroy/repos/7509235145731088/heads/master/status.svg?type=score%2Bcoverage%2Bdeps" />
@@ -12,7 +14,7 @@
            src="https://coveralls.io/repos/github/kiwiroy/mojo-transaction-http-role-mechanize/badge.svg?branch=master" />
     </a>
     <a href="https://badge.fury.io/pl/Mojo-Transaction-HTTP-Role-Mechanize">
-      <img alt="CPAN version" height="18"
+      <img alt="CPAN version"
            src="https://badge.fury.io/pl/Mojo-Transaction-HTTP-Role-Mechanize.svg" />
     </a>
 </div>
@@ -77,8 +79,6 @@ will be used for the submission.
 # AUTHOR
 
 kiwiroy - Roy Storey `kiwiroy@cpan.org`
-
-# CONTRIBUTORS
 
 tekki - Rolf Stöckli `tekki@cpan.org`
 

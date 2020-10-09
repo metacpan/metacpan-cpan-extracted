@@ -12,8 +12,8 @@ my $file = __FILE__;
 my $this_dir = dirname($file);
 my @this_dirs = File::Spec->splitdir( $this_dir );
 my $tainted_temp_dir = File::Spec->catdir(@this_dirs,'captcha_temp');
-my $tainted_temp_datadir = "$tainted_temp_dir/data";
-my $tainted_temp_outputdir = "$tainted_temp_dir/img";
+my $tainted_temp_datadir = File::Spec->catdir($tainted_temp_dir, 'data');
+my $tainted_temp_outputdir = File::Spec->catdir($tainted_temp_dir, 'img');
 
 my $temp_dir = _untaint($tainted_temp_dir);
 my $temp_datadir = _untaint($tainted_temp_datadir);

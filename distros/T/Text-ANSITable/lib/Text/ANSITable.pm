@@ -1,9 +1,9 @@
 package Text::ANSITable;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-13'; # DATE
+our $DATE = '2020-10-05'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.600'; # VERSION
+our $VERSION = '0.601'; # VERSION
 
 use 5.010001;
 use Carp;
@@ -1714,7 +1714,7 @@ Text::ANSITable - Create nice formatted tables using extended ASCII and ANSI col
 
 =head1 VERSION
 
-This document describes version 0.600 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2020-09-13.
+This document describes version 0.601 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2020-10-05.
 
 =head1 SYNOPSIS
 

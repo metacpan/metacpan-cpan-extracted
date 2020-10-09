@@ -4,9 +4,13 @@ use 5.006;
 use strict;
 use warnings;
 use smallnum;
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
-our %TOOL;
+our (%TOOL, $ANOBJECT);
+
+use overload 
+	'""' => sub { $_[0]->toCSS() };
+
 
 BEGIN {
 	%TOOL = (
@@ -52,28 +56,30 @@ BEGIN {
 				'rgb' => 'rgb2rgb',
 				'hsl' => 'hsl2rgb',
 				'hsla' => 'hsl2rgb',
-				'hsv' => 'hsv2rgb',
 			);
 			my $reg = join '|', reverse sort keys %converter;
 			if ( $colour =~ s/^($reg)// ) {
 				return $TOOL{ $converter{$1} }($colour);
 			}
-			die 'Cannot convert the colour format';
+			die $TOOL{MESSAGES}{INVALID_COLOUR} || 'Cannot convert the colour format';
 		},
 		rgb2rgb => sub {
-			return $TOOL{numbers}(shift);
+			my @numbers = $TOOL{numbers}(shift);
+			die $TOOL{MESSAGES}{INVALID_RGB} || 'Cannot convert rgb colour format' unless (scalar @numbers > 2);
+			return @numbers;
 		},
 		hex2rgb => sub {
 			my $hex = shift;
 			my $l = length $hex;
 			return $l != 6
 				? $l == 3
-					? map { hex( $_ . $_ ) } $hex =~ m/./g
+					? map { my $h = hex( $_ . $_ ); $_ =~ 0 || $h ? $h : die( $TOOL{MESSAGES}{INVALID_HEX} || 'Cannot convert hex colour format' ) } $hex =~ m/./g
 					: die 'hex length must be 3 or 6'
-				: map { hex($_) } $hex =~ m/../g;
+				: map { my $h = hex( $_ ); $_ =~ m/00/ || $h ? $h : die( $TOOL{MESSAGES}{INVALID_HEX} || 'Cannot convert hex colour format' ) } $hex =~ m/../g;
 		},
 		hsl2rgb => sub {
 			my ( $h, $s, $l, $a, $m1, $m2 ) = scalar @_ > 1 ? @_ : $TOOL{numbers}(shift);
+			defined $_ && $_ =~ m/([0-9.]+)/ or die $TOOL{MESSAGES}{INVALID_HSL} || 'Cannot convert hsl colour format' for ($h, $s, $l);
 			$h = ( $h % 360 ) / 360;
 			unless ($m1) {
 				$s = $TOOL{depercent}($s);
@@ -134,7 +140,7 @@ BEGIN {
 sub import {
 	my ($pkg, @exports) = @_;
 	my $caller = caller;
-
+	$TOOL{MESSAGES} = pop @exports if (ref $exports[-1] eq 'HASH');
 	if (scalar @exports) {
 		no strict 'refs';
 		*{"${caller}::${_}"} = \&{"${_[0]}::${_}"} foreach @exports;
@@ -378,6 +384,24 @@ sub colour {
 	return ( $r, $g, $b );
 }
 
+sub validate {
+	my ($self, $colour) = @_;
+	my $new = eval { $self->new($colour) };
+	if ($@) {
+		return {
+			valid => \0,
+			message => $TOOL{MESSAGES}{VALIDATE_ERROR} || 'The string passed to Colouring::In::validate is not a valid color.',
+			color => $colour
+		};
+	}
+	return {
+		valid => \1,
+		message => $TOOL{MESSAGES}{VALIDATE} || 'The string passed to Colouring::In::validate is a valid color',
+		color => $colour,
+		colour => $new
+	};
+}
+
 1;
 
 __END__
@@ -388,7 +412,7 @@ Colouring::In - color or colour.
 
 =head1 VERSION
 
-Version 0.20
+Version 0.22
 
 =cut
 
@@ -563,6 +587,8 @@ Returns either an rgba or hex colour string based on whether the alpha value is 
 
 	my $string = $colour->toCSS;
 
+This method is called on stringification of a Colouring::In Object.
+
 =cut
 
 =head2 toRGB
@@ -624,6 +650,15 @@ valid for Term::ANSIColor background content.
 Returns an array containeing the red, green and blue (RGB) values.
 
 	my $string = $colour->colour;
+
+=cut
+
+=head2 validate
+
+Validate that the passed colour is a color.
+
+	my $valid = $colour->validate('#abc'); # valid
+	my $invalid = $colour->validate('#xyz'); # invalid
 
 =cut
 

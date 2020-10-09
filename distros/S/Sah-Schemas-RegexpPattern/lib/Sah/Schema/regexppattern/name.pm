@@ -1,15 +1,24 @@
 package Sah::Schema::regexppattern::name;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2020-05-27'; # DATE
 our $DIST = 'Sah-Schemas-RegexpPattern'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $schema = ['str', {
     summary => "Name of pattern, with module prefix but without the 'Regexp::Pattern'",
     match => qr!\A\w+((::|/|\.)\w+)+\z!,
     'x.completion' => ['regexppattern_name'],
     'x.perl.coerce_rules' => ['From_str::normalize_perl_modname'],
+
+    examples => [
+        {value=>'', valid=>0},
+        {value=>'Float', valid=>0},
+        {value=>'Float::float', valid=>1},
+        {value=>'Float/float', valid=>1, validated_value=>'Float::float'},
+        {value=>'foo bar', valid=>0},
+    ],
+
 }, {}];
 
 1;
@@ -27,7 +36,80 @@ Sah::Schema::regexppattern::name - Name of pattern, with module prefix but witho
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::regexppattern::name (from Perl distribution Sah-Schemas-RegexpPattern), released on 2020-01-03.
+This document describes version 0.002 of Sah::Schema::regexppattern::name (from Perl distribution Sah-Schemas-RegexpPattern), released on 2020-05-27.
+
+=head1 SYNOPSIS
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("regexppattern::name*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("regexppattern::name*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['regexppattern::name*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ ""  # INVALID
+
+ "Float"  # INVALID
+
+ "Float::float"  # valid
+
+ "Float/float"  # valid, becomes "Float::float"
+
+ "foo bar"  # INVALID
 
 =head1 HOMEPAGE
 

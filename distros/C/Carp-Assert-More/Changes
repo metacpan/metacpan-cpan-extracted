@@ -1,5 +1,13 @@
 Revision history for Perl extension Carp::Assert::More.
 
+1.24    Tue Oct  6 22:37:06 CDT 2020
+        [ENHANCEMENTS]
+        The requirement for Perl 5.10 has been reverted to 5.6.1.
+
+1.22    Tue Oct  6 22:03:55 CDT 2020
+        [ENHANCEMENTS]
+        Add assert_keys_are() for asserting an exact list of keys.
+
 1.20    Fri Aug  9 10:10:06 CDT 2019
         [ENHANCEMENTS]
         Add assert_datetime() for asserting DateTime objects.

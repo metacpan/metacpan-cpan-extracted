@@ -23,7 +23,11 @@ my %WriteMakefileArgs = (
     "CPAN::Dist::FromRepoName" => 0,
     "CPAN::Dist::FromURL" => 0,
     "Cwd" => 0,
+    "Exporter" => "5.57",
     "File::Slurper" => 0,
+    "File::chdir" => 0,
+    "Log::ger" => "0.037",
+    "Log::ger::Screen" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -33,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,10 +48,14 @@ my %FallbackPrereqs = (
   "CPAN::Dist::FromRepoName" => 0,
   "CPAN::Dist::FromURL" => 0,
   "Cwd" => 0,
+  "Exporter" => "5.57",
   "File::Slurper" => 0,
   "File::Spec" => 0,
+  "File::chdir" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::ger" => "0.037",
+  "Log::ger::Screen" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

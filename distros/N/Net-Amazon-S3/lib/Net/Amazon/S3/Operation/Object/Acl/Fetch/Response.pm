@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Acl::Fetch::Response;
 # ABSTRACT: An internal class to handle fetch object acl response
-$Net::Amazon::S3::Operation::Object::Acl::Fetch::Response::VERSION = '0.94';
+$Net::Amazon::S3::Operation::Object::Acl::Fetch::Response::VERSION = '0.97';
 use Moose;
 extends 'Net::Amazon::S3::Response';
 
@@ -18,7 +18,7 @@ Net::Amazon::S3::Operation::Object::Acl::Fetch::Response - An internal class to 
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 DESCRIPTION
 

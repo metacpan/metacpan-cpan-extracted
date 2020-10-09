@@ -9,13 +9,13 @@ build_requires:
   Test::More: '0'
   Test::Simple: '0.96'
   XS::Framework: v1.3.2
-  XS::libpanda: v1.4.7
+  XS::libpanda: v1.4.8
   next::XS: v1.0.7
 configure_requires:
   Export::XS: v3.0.5
   XS::Framework: v1.3.2
-  XS::Install: v1.2.18
-  XS::libpanda: v1.4.7
+  XS::Install: v1.2.19
+  XS::libpanda: v1.4.8
   next::XS: v1.0.7
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
@@ -31,8 +31,8 @@ no_index:
 requires:
   Export::XS: v3.0.5
   XS::Framework: v1.3.2
-  XS::Install: v1.2.18
-  XS::libpanda: v1.4.7
+  XS::Install: v1.2.19
+  XS::libpanda: v1.4.8
   next::XS: v1.0.7
-version: v1.0.0
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

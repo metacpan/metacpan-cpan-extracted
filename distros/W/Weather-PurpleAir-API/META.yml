@@ -21,4 +21,4 @@ requires:
   String::Similarity: '1.04'
   Time::HiRes: '1.9721'
   perl: '5.010000'
-version: '0.06'
+version: '0.07'

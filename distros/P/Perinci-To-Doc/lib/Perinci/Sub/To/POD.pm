@@ -1,7 +1,7 @@
 package Perinci::Sub::To::POD;
 
-our $DATE = '2020-04-27'; # DATE
-our $VERSION = '0.872'; # VERSION
+our $DATE = '2020-10-07'; # DATE
+our $VERSION = '0.873'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -162,6 +162,13 @@ sub after_gen_doc {
                 unless ($orig_result_naked) {
                     $tff = $res->[3]{'table.fields'};
                 }
+            } elsif (exists $eg->{naked_result}) {
+                $res = $orig_result_naked ? $eg->{naked_result} : [200, "OK (envelope generated)", $eg->{naked_result}];
+            } elsif (exists $eg->{env_result}) {
+                $res = $orig_result_naked ? $eg->{env_result}[2] : $eg->{env_result};
+                unless ($orig_result_naked) {
+                    $tff = $res->[3]{'table.fields'};
+                }
             } else {
                 # XXX since we retrieve the result by calling through Riap,
                 # the result will be json-cleaned.
@@ -185,7 +192,7 @@ sub after_gen_doc {
                     $tff = $res->[3]{'table.fields'};
                 }
             }
-            $res = $res->[2] unless $orig_result_naked;
+            $res = $res->[2] if $orig_result_naked;
             local $Data::Dump::SortKeys::SORT_KEYS = do {
                 if ($tff) {
                     require Sort::ByExample;
@@ -440,7 +447,7 @@ Perinci::Sub::To::POD - Generate POD documentation from Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.872 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2020-04-27.
+This document describes version 0.873 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2020-10-07.
 
 =head1 SYNOPSIS
 

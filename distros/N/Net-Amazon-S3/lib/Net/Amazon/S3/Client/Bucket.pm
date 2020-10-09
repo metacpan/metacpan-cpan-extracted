@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Bucket;
-$Net::Amazon::S3::Client::Bucket::VERSION = '0.94';
+$Net::Amazon::S3::Client::Bucket::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Data::Stream::Bulk::Callback;
@@ -8,58 +8,58 @@ use MooseX::Types::DateTime::MoreCoercions 0.07 qw( DateTime );
 # ABSTRACT: An easy-to-use Amazon S3 client bucket
 
 has 'client' =>
-    ( is => 'ro', isa => 'Net::Amazon::S3::Client', required => 1 );
+	( is => 'ro', isa => 'Net::Amazon::S3::Client', required => 1 );
 has 'name' => ( is => 'ro', isa => 'Str', required => 1 );
 has 'creation_date' =>
-    ( is => 'ro', isa => DateTime, coerce => 1, required => 0 );
+	( is => 'ro', isa => DateTime, coerce => 1, required => 0 );
 has 'owner_id'           => ( is => 'ro', isa => 'Str', required => 0 );
 has 'owner_display_name' => ( is => 'ro', isa => 'Str',     required => 0 );
 has 'region' => (
-    is => 'ro',
-    lazy => 1,
-    predicate => 'has_region',
-    default => sub { $_[0]->location_constraint },
+	is => 'ro',
+	lazy => 1,
+	predicate => 'has_region',
+	default => sub { $_[0]->location_constraint },
 );
 
 
 __PACKAGE__->meta->make_immutable;
 
 sub _create {
-    my ($self, %conf) = @_;
+	my ($self, %conf) = @_;
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Bucket::Create',
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Bucket::Create',
 
-        (acl                => $conf{acl})       x!! defined $conf{acl},
-        (acl_short          => $conf{acl_short}) x!! defined $conf{acl_short},
-        location_constraint => $conf{location_constraint},
-    );
+		(acl                => $conf{acl})       x!! defined $conf{acl},
+		(acl_short          => $conf{acl_short}) x!! defined $conf{acl_short},
+		(location_constraint => $conf{location_constraint}) x!! defined $conf{location_constraint},
+	);
 
-    return unless $response->is_success;
+	return unless $response->is_success;
 
-    return $response->http_response;
+	return $response->http_response;
 }
 
 sub delete {
-    my $self = shift;
+	my $self = shift;
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Bucket::Delete',
-    );
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Bucket::Delete',
+	);
 
-    return unless $response->is_success;
-    return $response->http_response;
+	return unless $response->is_success;
+	return $response->http_response;
 }
 
 sub acl {
-    my $self = shift;
+	my $self = shift;
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Bucket::Acl::Fetch',
-    );
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Bucket::Acl::Fetch',
+	);
 
-    return if $response->is_error;
-    return $response->http_response->content;
+	return if $response->is_error;
+	return $response->http_response->content;
 }
 
 sub set_acl {
@@ -70,7 +70,7 @@ sub set_acl {
 		%params,
 	);
 
-    return $response->is_success;
+	return $response->is_success;
 }
 
 sub add_tags {
@@ -86,118 +86,118 @@ sub add_tags {
 }
 
 sub delete_tags {
-    my ($self, $conf) = @_;
+	my ($self, $conf) = @_;
 
 	my $response = $self->_perform_operation (
 		'Net::Amazon::S3::Operation::Bucket::Tags::Delete',
 	);
 
-    return $response->is_success;
+	return $response->is_success;
 }
 
 sub location_constraint {
-    my $self = shift;
+	my $self = shift;
 
-    my $response = $self->_perform_operation (
-        'Net::Amazon::S3::Operation::Bucket::Location',
-    );
+	my $response = $self->_perform_operation (
+		'Net::Amazon::S3::Operation::Bucket::Location',
+	);
 
-    return unless $response->is_success;
-    return $response->location;
+	return unless $response->is_success;
+	return $response->location;
 }
 
 sub object_class { 'Net::Amazon::S3::Client::Object' }
 
 sub list {
-    my ( $self, $conf ) = @_;
-    $conf ||= {};
-    my $prefix = $conf->{prefix};
-    my $delimiter = $conf->{delimiter};
+	my ( $self, $conf ) = @_;
+	$conf ||= {};
+	my $prefix = $conf->{prefix};
+	my $delimiter = $conf->{delimiter};
 
-    my $marker = undef;
-    my $end    = 0;
+	my $marker = undef;
+	my $end    = 0;
 
-    return Data::Stream::Bulk::Callback->new(
-        callback => sub {
+	return Data::Stream::Bulk::Callback->new(
+		callback => sub {
 
-            return undef if $end;
+			return undef if $end;
 
-            my $response = $self->_perform_operation (
-                'Net::Amazon::S3::Operation::Objects::List',
+			my $response = $self->_perform_operation (
+				'Net::Amazon::S3::Operation::Objects::List',
 
-                marker    => $marker,
-                prefix    => $prefix,
-                delimiter => $delimiter,
-            );
+				marker    => $marker,
+				prefix    => $prefix,
+				delimiter => $delimiter,
+			);
 
-            return unless $response->is_success;
+			return unless $response->is_success;
 
-            my @objects;
-            foreach my $node ($response->contents) {
-                push @objects, $self->object_class->new (
-                    client => $self->client,
-                    bucket => $self,
-                    key    => $node->{key},
-                    etag   => $node->{etag},
-                    size   => $node->{size},
-                    last_modified_raw => $node->{last_modified},
+			my @objects;
+			foreach my $node ($response->contents) {
+				push @objects, $self->object_class->new (
+					client => $self->client,
+					bucket => $self,
+					key    => $node->{key},
+					etag   => $node->{etag},
+					size   => $node->{size},
+					last_modified_raw => $node->{last_modified},
 				);
-            }
+			}
 
-            return undef unless @objects;
+			return undef unless @objects;
 
-            $end = 1 unless $response->is_truncated;
+			$end = 1 unless $response->is_truncated;
 
-            $marker = $response->next_marker
-                || $objects[-1]->key;
+			$marker = $response->next_marker
+				|| $objects[-1]->key;
 
-            return \@objects;
-        }
-    );
+			return \@objects;
+		}
+	);
 }
 
 sub delete_multi_object {
-    my $self = shift;
-    my @objects = @_;
-    return unless( scalar(@objects) );
+	my $self = shift;
+	my @objects = @_;
+	return unless( scalar(@objects) );
 
-    # Since delete can handle up to 1000 requests, be a little bit nicer
-    # and slice up requests and also allow keys to be strings
-    # rather than only objects.
-    my $last_result;
-    while (scalar(@objects) > 0) {
-        my $response = $self->_perform_operation (
-            'Net::Amazon::S3::Operation::Objects::Delete',
+	# Since delete can handle up to 1000 requests, be a little bit nicer
+	# and slice up requests and also allow keys to be strings
+	# rather than only objects.
+	my $last_result;
+	while (scalar(@objects) > 0) {
+		my $response = $self->_perform_operation (
+			'Net::Amazon::S3::Operation::Objects::Delete',
 
-            keys    => [
+			keys    => [
 				map { ref ($_) ? $_->key : $_ }
 				splice @objects, 0, ((scalar(@objects) > 1000) ? 1000 : scalar(@objects))
 			]
-        );
+		);
 
-        $last_result = $response;
+		$last_result = $response;
 
-        last unless $response->is_success;
-    }
-    return $last_result->http_response;
+		last unless $response->is_success;
+	}
+	return $last_result->http_response;
 }
 
 sub object {
-    my ( $self, %conf ) = @_;
-    return $self->object_class->new(
-        client => $self->client,
-        bucket => $self,
-        %conf,
-    );
+	my ( $self, %conf ) = @_;
+	return $self->object_class->new(
+		client => $self->client,
+		bucket => $self,
+		%conf,
+	);
 }
 
 sub _perform_operation {
-    my ($self, $operation, %params) = @_;
+	my ($self, $operation, %params) = @_;
 
-    $self->client->_perform_operation ($operation => (
-        bucket => $self->name,
-        %params,
-    ));
+	$self->client->_perform_operation ($operation => (
+		bucket => $self->name,
+		%params,
+	));
 }
 
 1;
@@ -214,7 +214,7 @@ Net::Amazon::S3::Client::Bucket - An easy-to-use Amazon S3 client bucket
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 SYNOPSIS
 

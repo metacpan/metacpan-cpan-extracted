@@ -1,9 +1,9 @@
 package ScriptX_Util::Patcher::DumpAndExit;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-02'; # DATE
+our $DATE = '2020-10-03'; # DATE
 our $DIST = 'ScriptX_Util'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,7 +53,7 @@ ScriptX_Util::Patcher::DumpAndExit - Patch ScriptX to dump import arguments and 
 
 =head1 VERSION
 
-This document describes version 0.003 of ScriptX_Util::Patcher::DumpAndExit (from Perl distribution ScriptX_Util), released on 2020-10-02.
+This document describes version 0.004 of ScriptX_Util::Patcher::DumpAndExit (from Perl distribution ScriptX_Util), released on 2020-10-03.
 
 =head1 DESCRIPTION
 

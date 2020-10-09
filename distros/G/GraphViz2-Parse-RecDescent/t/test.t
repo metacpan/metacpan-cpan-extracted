@@ -4,10 +4,15 @@ use Test::More;
 use Test::Snapshot;
 
 use GraphViz2;
-use File::Slurp; # For read_file().
 use File::Spec;
 use GraphViz2::Parse::RecDescent;
 use Parse::RecDescent;
+
+sub read_file {
+  open my $fh, '<:encoding(UTF-8)', $_[0] or die "$_[0]: $!";
+  local $/;
+  <$fh>;
+}
 
 my $g_rd = GraphViz2::Parse::RecDescent->new;
 my $grammar = read_file(File::Spec->catfile('t', 'sample.recdescent.1.dat') );

@@ -1,4 +1,5 @@
 #include "ares-test.h"
+#include "ares-test-ai.h"
 #include "dns-proto.h"
 
 // Include ares internal files for DNS protocol details
@@ -566,7 +567,7 @@ void HostCallback(void *data, int status, int timeouts,
 
 std::ostream& operator<<(std::ostream& os, const AddrInfoResult& result) {
   os << '{';
-  if (result.done_) {
+  if (result.done_ && result.ai_) {
     os << StatusToString(result.status_) << " " << result.ai_;
   } else {
     os << "(incomplete)";
@@ -577,11 +578,30 @@ std::ostream& operator<<(std::ostream& os, const AddrInfoResult& result) {
 
 std::ostream& operator<<(std::ostream& os, const AddrInfo& ai) {
   os << '{';
-  struct ares_addrinfo *next = ai.get();
-  while(next) {
-    if(next->ai_canonname) {
-      os << "'" << next->ai_canonname << "' ";
+  if (ai == nullptr) {
+    os << "nullptr}";
+    return os;
+  }
+
+  struct ares_addrinfo_cname *next_cname = ai->cnames;
+  while(next_cname) {
+    if(next_cname->alias) {
+      os << next_cname->alias << "->";
     }
+    if(next_cname->name) {
+      os << next_cname->name;
+    }
+    if((next_cname = next_cname->next))
+      os << ", ";
+    else
+      os << " ";
+  }
+
+  struct ares_addrinfo_node *next = ai->nodes;
+  while(next) {
+    //if(next->ai_canonname) {
+      //os << "'" << next->ai_canonname << "' ";
+    //}
     unsigned short port = 0;
     os << "addr=[";
     if(next->ai_family == AF_INET) {
@@ -592,15 +612,12 @@ std::ostream& operator<<(std::ostream& os, const AddrInfo& ai) {
     else if (next->ai_family == AF_INET6) {
       sockaddr_in6* sin = (sockaddr_in6*)next->ai_addr;
       port = ntohs(sin->sin6_port);
-      if(port)
-        os << "[" << AddressToString(&sin->sin6_addr, 16) << "]";
-      else
-        os << AddressToString(&sin->sin6_addr, 16);
+      os << "[" << AddressToString(&sin->sin6_addr, 16) << "]";
     }
     else
       os << "unknown family";
     if(port) {
-      os << ":" << port;  
+      os << ":" << port;
     }
     os << "]";
     if((next = next->ai_next))

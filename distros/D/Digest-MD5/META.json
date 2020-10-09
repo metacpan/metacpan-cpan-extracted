@@ -4,13 +4,13 @@
       "Gisle Aas <gisle@activestate.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Digest-MD5",
    "no_index" : {
@@ -40,9 +40,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Dual-Life/digest-md5/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
-         "url" : "https://github.com/gisle/digest-md5"
+         "url" : "https://github.com/dual-Life/digest-md5/"
       }
    },
-   "version" : "2.55"
+   "version" : "2.58",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

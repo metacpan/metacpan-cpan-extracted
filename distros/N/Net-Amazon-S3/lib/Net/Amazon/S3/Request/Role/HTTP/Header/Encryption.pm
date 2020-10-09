@@ -1,15 +1,15 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header::Encryption;
 # ABSTRACT: x-amz-server-side-encryption header role
-$Net::Amazon::S3::Request::Role::HTTP::Header::Encryption::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::HTTP::Header::Encryption::VERSION = '0.97';
 use Moose::Role;
 
 use Net::Amazon::S3::Constants;
 
 with 'Net::Amazon::S3::Request::Role::HTTP::Header' => {
-    name => 'encryption',
-    header => Net::Amazon::S3::Constants->HEADER_SERVER_ENCRYPTION,
-    isa => 'Maybe[Str]',
-    required => 0,
+	name => 'encryption',
+	header => Net::Amazon::S3::Constants->HEADER_SERVER_ENCRYPTION,
+	isa => 'Maybe[Str]',
+	required => 0,
 };
 
 1;
@@ -26,7 +26,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header::Encryption - x-amz-server-side-enc
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

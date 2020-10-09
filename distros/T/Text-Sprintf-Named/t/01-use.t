@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 14;
 
-use Text::Sprintf::Named;
+use Text::Sprintf::Named ();
 
 # Instantiate an object.
 {

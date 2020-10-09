@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header::ACL;
 # ABSTRACT: Headers builders for ACL
-$Net::Amazon::S3::Request::Role::HTTP::Header::ACL::VERSION = '0.94';
+$Net::Amazon::S3::Request::Role::HTTP::Header::ACL::VERSION = '0.97';
 use Moose::Role;
 use Moose::Util::TypeConstraints;
 
@@ -31,7 +31,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header::ACL - Headers builders for ACL
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

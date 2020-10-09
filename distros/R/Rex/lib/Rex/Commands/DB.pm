@@ -59,7 +59,7 @@ package Rex::Commands::DB;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.2'; # VERSION
+our $VERSION = '1.13.0'; # VERSION
 
 BEGIN {
   use Rex::Require;

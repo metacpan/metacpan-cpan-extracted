@@ -1,8 +1,5 @@
 package Plack::Test::Agent;
-# git description: v1.3-1-g41fa5a5
-$Plack::Test::Agent::VERSION = '1.4';
-# ABSTRACT: OO interface for testing low-level Plack/PSGI apps
-
+our $VERSION = '1.5';
 use strict;
 use warnings;
 
@@ -12,134 +9,131 @@ use HTTP::Response;
 use HTTP::Message::PSGI;
 use HTTP::Request::Common;
 use Test::WWW::Mechanize;
+use HTTP::Cookies;
 
-use Plack::Util::Accessor qw( app host port server ua );
+use Plack::Util::Accessor qw( app host port server ua jar );
 
-sub new
-{
-    my ($class, %args) = @_;
+sub new {
+    my ( $class, %args ) = @_;
 
     my $self = bless {}, $class;
 
-    $self->app(  delete $args{app}  );
-    $self->ua(   delete $args{ua}   );
+    $self->app( delete $args{app} );
+    $self->ua( delete $args{ua} );
     $self->host( delete $args{host} || 'localhost' );
     $self->port( delete $args{port} );
+    $self->jar( delete $args{jar} || HTTP::Cookies->new );
 
     $self->start_server( delete $args{server} ) if $args{server};
 
     return $self;
 }
 
-sub start_server
-{
-    my ($self, $server_class) = @_;
+sub start_server {
+    my ( $self, $server_class ) = @_;
 
     my $app  = $self->app;
     my $host = $self->host;
 
     my $server = Test::TCP->new(
-        code => sub
-        {
+        code => sub {
             my $port = shift;
             my %args = ( host => $host, port => $port );
             return $server_class
-                ? Plack::Loader->load( $server_class, %args )->run( $app )
-                : Plack::Loader->auto( %args )->run( $app );
+                ? Plack::Loader->load( $server_class, %args )->run($app)
+                : Plack::Loader->auto(%args)->run($app);
         },
     );
 
     $self->port( $server->port );
     $self->ua( $self->get_mech ) unless $self->ua;
-    $self->server( $server );
+    $self->server($server);
 }
 
-sub execute_request
-{
-    my ($self, $req) = @_;
+sub execute_request {
+    my ( $self, $req ) = @_;
 
-    my $res = $self->server
-            ? $self->ua->request( $req )
-            : HTTP::Response->from_psgi( $self->app->( $req->to_psgi ) );
+    if ( !$self->server && $self->jar ) {
+        $self->jar->add_cookie_header($req);
+    }
 
-    $res->request( $req );
+    my $res
+        = $self->server
+        ? $self->ua->request($req)
+        : HTTP::Response->from_psgi( $self->app->( $req->to_psgi ) );
+
+    $res->request($req);
+
+    if ( !$self->server && $self->jar ) {
+        $self->jar->extract_cookies($res);
+    }
+
     return $res;
 }
 
 sub get {
     my ( $self, $uri, @args ) = @_;
-    my $req                   = GET $self->normalize_uri($uri), @args;
+    my $req = GET $self->normalize_uri($uri), @args;
     return $self->execute_request($req);
 }
 
-sub post
-{
-    my ($self, $uri, @args) = @_;
-    my $req                 = POST $self->normalize_uri($uri), @args;
-    return $self->execute_request( $req );
+sub post {
+    my ( $self, $uri, @args ) = @_;
+    my $req = POST $self->normalize_uri($uri), @args;
+    return $self->execute_request($req);
 }
 
-sub normalize_uri
-{
-    my ($self, $uri) = @_;
-    my $normalized   = URI->new( $uri );
-    my $port         = $self->port;
+sub normalize_uri {
+    my ( $self, $uri ) = @_;
+    my $normalized = URI->new($uri);
+    my $port       = $self->port;
 
-    $normalized->scheme( 'http' )      unless $normalized->scheme;
-    $normalized->host(   'localhost' ) unless $normalized->host;
-    $normalized->port( $port )         if $port;
+    $normalized->scheme('http')    unless $normalized->scheme;
+    $normalized->host('localhost') unless $normalized->host;
+    $normalized->port($port) if $port;
 
     return $normalized;
 }
 
-sub get_mech
-{
+sub get_mech {
     my $self = shift;
     return Test::WWW::Mechanize::Bound->new(
-        bound_uri => $self->normalize_uri( '/' )
-    );
+        bound_uri => $self->normalize_uri('/') );
 }
 
-package
-   Test::WWW::Mechanize::Bound;
+package Test::WWW::Mechanize::Bound;
+our $VERSION = '1.5';
+use parent 'Test::WWW::Mechanize';
 
-    use parent 'Test::WWW::Mechanize';
+sub new {
+    my ( $class, %args ) = @_;
+    my $bound_uri = delete $args{bound_uri};
+    my $self      = $class->SUPER::new(%args);
+    $self->bound_uri($bound_uri);
+    return $self;
+}
 
-    sub new
-    {
-        my ($class, %args) = @_;
-        my $bound_uri      = delete $args{bound_uri};
-        my $self           = $class->SUPER::new( %args );
-        $self->bound_uri( $bound_uri );
-        return $self;
+sub bound_uri {
+    my ( $self, $base_uri ) = @_;
+    $self->_elem( bound_uri => $base_uri ) if @_ == 2;
+    return $self->_elem('bound_uri');
+}
+
+sub prepare_request {
+    my $self  = shift;
+    my ($req) = @_;
+    my $uri   = $req->uri;
+    my $base  = $self->bound_uri;
+
+    unless ( $uri->scheme ) {
+        $uri->scheme( $base->scheme );
+        $uri->host( $base->host );
+        $uri->port( $base->port );
     }
-
-    sub bound_uri
-    {
-        my ($self, $base_uri) = @_;
-        $self->_elem( bound_uri => $base_uri ) if @_ == 2;
-        return $self->_elem( 'bound_uri' );
-    }
-
-    sub prepare_request
-    {
-        my $self  = shift;
-        my ($req) = @_;
-        my $uri   = $req->uri;
-        my $base  = $self->bound_uri;
-
-        unless ($uri->scheme)
-        {
-            $uri->scheme( $base->scheme );
-            $uri->host( $base->host );
-            $uri->port( $base->port );
-        }
-        return $self->SUPER::prepare_request( @_ );
-    }
+    return $self->SUPER::prepare_request(@_);
+}
 
 1;
-
-__END__
 
 =pod
 
@@ -149,7 +143,9 @@ Plack::Test::Agent - OO interface for testing low-level Plack/PSGI apps
 
 =head1 VERSION
 
-version 1.4
+version 1.5
+
+=encoding utf-8
 
 =head2 SYNOPSIS
 
@@ -205,6 +201,9 @@ details on the selection of the port number.)
 L<LWP::UserAgent> interface such that it provides a C<request> method which
 takes an L<HTTP::Request> object and returns an L<HTTP::Response> object. The
 default is an instance of C<LWP::UserAgent>.
+
+=item * C<jar> is an optional argument for a L<HTTP::Cookies> instance that
+will be used as cookie jar for the requests, by default plain one is created.
 
 =back
 
@@ -283,7 +282,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dave Rolsky Olaf Alders Ran Eilam
+=for stopwords Dave Rolsky Olaf Alders Ran Eilam Syohei YOSHIDA Torsten Raudssus
 
 =over 4
 
@@ -299,13 +298,26 @@ Olaf Alders <oalders@maxmind.com>
 
 Ran Eilam <reilam@maxmind.com>
 
+=item *
+
+Syohei YOSHIDA <syohex@gmail.com>
+
+=item *
+
+Torsten Raudssus <torsten@raudss.us>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2015 by chromatic.
+This software is copyright (c) 2011 by chromatic.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__END__
+
+
+# ABSTRACT: OO interface for testing low-level Plack/PSGI apps

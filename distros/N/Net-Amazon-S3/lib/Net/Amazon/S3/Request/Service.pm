@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Service;
 # ABSTRACT: Base class for all S3 Service operations
-$Net::Amazon::S3::Request::Service::VERSION = '0.94';
+$Net::Amazon::S3::Request::Service::VERSION = '0.97';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request';
@@ -21,7 +21,7 @@ Net::Amazon::S3::Request::Service - Base class for all S3 Service operations
 
 =head1 VERSION
 
-version 0.94
+version 0.97
 
 =head1 AUTHOR
 

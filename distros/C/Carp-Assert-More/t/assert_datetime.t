@@ -7,9 +7,10 @@ use Test::More;
 
 use Carp::Assert::More;
 
-my $rc = eval 'use DateTime; 1;';
-if ( !$rc ) {
-    plan skip_all => 'DateTime must be installed to test assert_datetime()';
+my $module = 'DateTime';
+
+if ( !eval "use $module; 1;" ) { ## no critic (ProhibitStringyEval)
+    plan skip_all => "$module required for testing assert_datetime()";
 }
 
 plan tests => 11;

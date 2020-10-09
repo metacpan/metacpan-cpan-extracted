@@ -40,7 +40,7 @@ use PPIx::QuoteLike::Utils qw{
 use Scalar::Util ();
 use Text::Tabs ();
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use constant CLASS_CONTROL       => 'PPIx::QuoteLike::Token::Control';
 use constant CLASS_DELIMITER     => 'PPIx::QuoteLike::Token::Delimiter';
@@ -57,8 +57,6 @@ use constant ILLEGAL_FIRST	=>
 use constant MISMATCHED_DELIM	=>
     'Tokenizer found mismatched delimiters';
 
-$PPIx::QuoteLike::DEFAULT_POSTDEREF = 1;
-
 {
     my $match_sq = __match_enclosed( qw< ' > );
     my $match_dq = __match_enclosed( qw< " > );
@@ -69,8 +67,11 @@ $PPIx::QuoteLike::DEFAULT_POSTDEREF = 1;
 
 	my @children;
 
-	defined $arg{postderef}
-	    or $arg{postderef} = $PPIx::QuoteLike::DEFAULT_POSTDEREF;
+	if ( defined $arg{postderef} ) {
+	    $class->_deprecation_notice( attribute => 'postderef' );
+	} else {
+	    $arg{postderef} = 1;
+	}
 
 	if ( $arg{location} ) {
 	    ARRAY_REF eq ref $arg{location}
@@ -287,6 +288,48 @@ sub delimiters {
 	qw{ start finish };
 }
 
+#	$self->_deprecation_notice( $type, $name );
+#
+#	This method centralizes deprecation. Type is 'attribute' or
+#	'method'. Deprecation is driven of the %deprecate hash. Values
+#	are:
+#	    false - no warning
+#	    1 - warn on first use
+#	    2 - warn on each use
+#	    3 - die on each use.
+#
+#	$self->_deprecation_in_progress( $type, $name )
+#
+#	This method returns true if the deprecation is in progress. In
+#	fact it returns the deprecation level.
+
+{
+
+    my %deprecate = (
+	attribute => {
+	    postderef	=> 1,
+	},
+    );
+
+    sub _deprecation_notice {
+	my ( undef, $type, $name, $repl ) = @_;		# Invocant unused
+	$deprecate{$type} or return;
+	$deprecate{$type}{$name} or return;
+	my $msg = sprintf 'The %s %s is %s', $name, $type,
+	    $deprecate{$type}{$name} > 2 ? 'removed' : 'deprecated';
+	defined $repl
+	    and $msg .= "; use $repl instead";
+	$deprecate{$type}{$name} >= 3
+	    and croak $msg;
+	warnings::enabled( 'deprecated' )
+	    and carp $msg;
+	$deprecate{$type}{$name} == 1
+	    and $deprecate{$type}{$name} = 0;
+	return;
+    }
+
+}
+
 sub _get_value_scalar {
     my ( $self, $method ) = @_;
     defined( my $val = $self->$method() )
@@ -430,6 +473,9 @@ sub perl_version_removed {
 
 sub postderef {
     my ( $self ) = @_;
+    # TODO postderef - eventually this goes away.
+    __PACKAGE__ eq caller
+	or $self->_deprecation_notice( attribute => 'postderef' );
     return $self->{postderef};
 }
 
@@ -797,9 +843,9 @@ through a deprecation cycle and retracted. After the retraction, postfix
 dereferences will always be recognized. This is the default behaviour
 now.
 
-Starting with the first release after October 1 2020, the first use of
-this argument will warn. Six months after that all uses will warn. After
-a further six months, all uses will become fatal.
+Starting with version 0.012_01, the first use of this argument will
+warn. With the first release after April 8 2020, all uses will warn.
+After a further six months, all uses will become fatal.
 
 =head1 INHERITANCE
 
@@ -870,11 +916,9 @@ See L<DEPRECATION NOTICE|/DEPRECATION NOTICE> above for the details.
 
 This Boolean argument determines whether postfix dereferencing is
 recognized in interpolation. If unspecified, or specified as C<undef>,
-it defaults to the value of C<$PPIx::QuoteLike::DEFAULT_POSTDEREF>. This
-variable is not exported, and is true by default. If you change the
-value, the change should be properly localized:
-
- local $PPIx::QuoteLike::DEFAULT_POSTDEREF = 0;
+it defaults to true. In version 0.012 it defaulted to the value of
+C<$PPIx::QuoteLike::DEFAULT_POSTDEREF>. This variable was not exported,
+and was true by default.
 
 =item trace
 

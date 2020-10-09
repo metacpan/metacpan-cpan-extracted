@@ -6,7 +6,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Page::Begin;
 use Tags::Output::Raw;
-use Test::More 'tests' => 14;
+use Test::More 'tests' => 15;
 use Test::NoWarnings;
 
 # Test.
@@ -172,5 +172,19 @@ is(
 	"Parameter 'css_src' must be a array of hash structures with 'media' ".
 		"and 'link' keys.\n",
 	"Parameter 'css_src' is array of hashes with bad key.",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Page::Begin->new(
+		'charset' => undef,
+		'tags' => Tags::Output::Raw->new,
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'charset' is required.\n",
+	"Parameter 'charset' is undefined.",
 );
 clean();

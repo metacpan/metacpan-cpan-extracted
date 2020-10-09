@@ -5,18 +5,19 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   FindBin: '0'
+  Promise::ES6: '0.23'
   Test::Class: '0'
   Test::Deep: '0'
   Test::FailWarnings: '0'
   Test::Fatal: '0'
-  Test::MockModule: '0.173'
+  Test::MockModule: '0.170'
   Test::More: '0'
   autodie: '0'
   mro: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,5 +37,5 @@ requires:
 resources:
   bugtracker: https://github.com/cpanel/p5-cPanel-APIClient/issues
   repository: https://github.com/cpanel/p5-cPanel-APIClient
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

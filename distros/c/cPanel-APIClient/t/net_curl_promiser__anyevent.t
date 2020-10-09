@@ -27,9 +27,23 @@ use Test::FailWarnings;
 
 __PACKAGE__->new()->runtests() if !caller;
 
+my $diagged;
+
 use constant _CP_REQUIRE => (
     'AnyEvent::Loop',
+
     'Net::Curl::Promiser::AnyEvent',
+
+    [ 'Promise::ES6', '0.23' ],
+
+    sub {
+        $diagged++ or do {
+            diag "Using libcurl " . Net::Curl::version();
+            diag "Using Net::Curl $Net::Curl::VERSION";
+            diag "Using Net::Curl::Promiser $Net::Curl::Promiser::VERSION";
+            diag "Using AnyEvent $AnyEvent::VERSION";
+        },
+    },
 );
 
 sub TRANSPORT_PIECE {
@@ -45,25 +59,24 @@ sub TRANSPORT_PIECE {
 sub AWAIT {
     my ( $self, $pending ) = @_;
 
-    my ( $ok, $value, $reason );
-
     my $cv = AnyEvent->condvar();
+
     $pending->promise()->then(
-        sub { $value = shift; $ok = 1 },
-        sub { $reason = shift },
-    )->finally($cv);
-    $cv->recv();
+        $cv,
+        sub { $cv->croak(shift) },
+    );
 
-    die $reason if !$ok;
-
-    return $value;
+    return $cv->recv();
 }
 
 sub test_uapi_cancel : Tests(1) {
     my ($self) = @_;
 
+    no warnings 'once';
+    local $cPanel::APIClient::DEBUG = 1;
+
   SKIP: {
-        my $version = Net::Curl::Promiser->VERSION();
+        my $version = $Net::Curl::Promiser::VERSION;
         my $min_version = 0.12;
         if ( $version < $min_version ) {
             skip "This test requires Net::Curl::Promiser $min_version or newer.", $self->num_tests();
@@ -103,21 +116,26 @@ sub test_uapi_cancel : Tests(1) {
 
         my $pending = $remote_cp->call_uapi( 'Whatsit', 'heyhey' );
 
-        my $reason;
-        $pending->promise()->catch( sub { $reason = shift } );
+        my $fate;
+
+        my $main_p = $pending->promise();
+
+        {
+            my $sub_p = $main_p->then(
+                sub { $fate = [0, shift()] },
+                sub { $fate = [1, shift()] },
+            );
+        }
 
         $cv1->recv();
+
+        if ($fate) {
+            skip 'We already finished what we were about to cancel.', 1;
+        }
 
         $remote_cp->cancel( $pending );
 
         my $cv2 = AnyEvent->condvar();
-
-        my $fate;
-
-        $pending->promise()->then(
-            sub { $fate = [0, shift()] },
-            sub { $fate = [1, shift()] },
-        );
 
         my $timeout = AnyEvent->timer(
             after => 1,
@@ -126,7 +144,7 @@ sub test_uapi_cancel : Tests(1) {
 
         $cv2->recv();
 
-        is( $fate, undef, 'promise for canceled request doesn’t resolve' );
+        is( $fate, undef, 'promise for canceled request still doesn’t resolve' ) or diag explain $fate;
     }
 
     return;

@@ -311,55 +311,12 @@ void SearchCallback(void *data, int status, int timeouts,
                     unsigned char *abuf, int alen);
 void NameInfoCallback(void *data, int status, int timeouts,
                       char *node, char *service);
-void AddrInfoCallback(void *data, int status, int timeouts, 
+void AddrInfoCallback(void *data, int status, int timeouts,
                       struct ares_addrinfo *res);
-
-// Matchers for AddrInfo
-MATCHER_P(IncludesNumAddresses, n, "") {
-  if(!arg)
-    return false;
-  int cnt = 0;
-  for (const ares_addrinfo* ai = arg.get(); ai != NULL; ai = ai->ai_next)
-    cnt++;
-  return n == cnt;
-}
-
-MATCHER_P(IncludesV4Address, address, "") {
-  if(!arg)
-    return false;
-  in_addr addressnum = {};
-  if (!ares_inet_pton(AF_INET, address, &addressnum))
-    return false; // wrong number format?
-  for (const ares_addrinfo* ai = arg.get(); ai != NULL; ai = ai->ai_next) {
-    if (ai->ai_family != AF_INET)
-      continue;
-    if (reinterpret_cast<sockaddr_in*>(ai->ai_addr)->sin_addr.s_addr ==
-        addressnum.s_addr)
-      return true; // found
-  }
-  return false;
-}
-
-MATCHER_P(IncludesV6Address, address, "") {
-  if(!arg)
-    return false;
-  in6_addr addressnum = {};
-  if (!ares_inet_pton(AF_INET6, address, &addressnum)) {
-    return false; // wrong number format?
-  }
-  for (const ares_addrinfo* ai = arg.get(); ai != NULL; ai = ai->ai_next) {
-    if (ai->ai_family != AF_INET6)
-      continue;
-    if (!memcmp(
-        reinterpret_cast<sockaddr_in6*>(ai->ai_addr)->sin6_addr.s6_addr,
-        addressnum.s6_addr, sizeof(addressnum.s6_addr)))
-      return true; // found
-  }
-  return false;
-}
 
 // Retrieve the name servers used by a channel.
 std::vector<std::string> GetNameServers(ares_channel channel);
+
 
 // RAII class to temporarily create a directory of a given name.
 class TransientDir {
@@ -391,7 +348,40 @@ class TempFile : public TransientFile {
   const char* filename() const { return filename_.c_str(); }
 };
 
-#ifndef WIN32
+#ifdef _WIN32
+extern "C" {
+
+static int setenv(const char *name, const char *value, int overwrite)
+{
+  char  *buffer;
+  size_t buf_size;
+
+  if (name == NULL)
+    return -1;
+
+  if (value == NULL)
+    value = ""; /* For unset */
+
+  if (!overwrite && getenv(name) != NULL) {
+    return -1;
+  }
+
+  buf_size = strlen(name) + strlen(value) + 1 /* = */ + 1 /* NULL */;
+  buffer   = (char *)malloc(buf_size);
+  _snprintf(buffer, buf_size, "%s=%s", name, value);
+  _putenv(buffer);
+  free(buffer);
+  return 0;
+}
+
+static int unsetenv(const char *name)
+{
+  return setenv(name, NULL, 1);
+}
+
+} /* extern "C" */
+#endif
+
 // RAII class for a temporary environment variable value.
 class EnvValue {
  public:
@@ -415,7 +405,6 @@ class EnvValue {
   bool restore_;
   std::string original_;
 };
-#endif
 
 
 #ifdef HAVE_CONTAINER
@@ -496,7 +485,6 @@ private:
     InnerTestBody();                                                            \
   }                                                                             \
   void VCLASS_NAME(casename, testname)::InnerTestBody()
-
 
 }  // namespace test
 }  // namespace ares

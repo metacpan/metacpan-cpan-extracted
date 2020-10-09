@@ -32,6 +32,6 @@ is_deeply(
 );
 is_deeply(
     scalar(Devel::CheckOS::list_family_members('MicrosoftWindows')),
-    [qw(Cygwin MSWin32)],
+    [qw(Cygwin MSWin32 MSYS)],
     'scalar list_family_members works for MicrosoftWindows family'
 );

@@ -9,8 +9,10 @@ use XS::Loader;
 use XS::Install::Deps;
 use XS::Install::Util;
 use XS::Install::Payload;
+use XS::Install::CMake;
+use Data::Dumper;
 
-our $VERSION = '1.2.18';
+our $VERSION = '1.2.19';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -65,13 +67,10 @@ sub makemaker_args {
     process_binary($params);
     process_PM($params);
     process_PAYLOAD($params);
-    process_CLIB($params);
-    process_BIN_SHARE($params);
-    attach_BIN_DEPENDENT($params);
-    warn_BIN_DEPENDENT($params);
     process_CPLUS($params);
     process_CCFLAGS($params);
     $params->{OPTIMIZE} = merge_optimize($Config{optimize}, '-O2', $params->{OPTIMIZE});
+    process_CLIB($params);
     process_LD($params);
     
     my $test_mm_args;
@@ -79,7 +78,12 @@ sub makemaker_args {
         process_test_makefile($params);
     } else {
         $test_mm_args = process_test($params);
+        my $cmake_params = process_cmake_test($params, $params->{CMAKE_PARAMS}, $test_mm_args);
+        run_cmake($params, $cmake_params, $test_mm_args) if ($cmake_params);
     }
+    process_BIN_SHARE($params);
+    attach_BIN_DEPENDENT($params);
+    warn_BIN_DEPENDENT($params);
     
     post_process($params);
     
@@ -245,29 +249,13 @@ sub _apply_BIN_DEPS {
         my $incdir = XS::Install::Payload::include_dir($module);
         _string_merge($params->{INC}, "-I$incdir");
     }
-    
+
     _string_merge($params->{INC},     $info->{INC});
     _string_merge($params->{CCFLAGS}, $info->{CCFLAGS});
     _string_merge($params->{DEFINE},  $info->{DEFINE});
     _string_merge($params->{XSOPT},   $info->{XSOPT});
-    
-    if (my $add_libs = $info->{LIBS}) {{
-        last unless @$add_libs;
-        my $libs = $params->{LIBS} or last;
-        $libs = [$libs] unless ref($libs) eq 'ARRAY';
-        if ($libs and @$libs) {
-            my @result;
-            foreach my $l1 (@$libs) {
-                foreach my $l2 (@$add_libs) {
-                    push @result, "$l1 $l2";
-                }
-            }
-            $params->{LIBS} = \@result;
-        }
-        else {
-            $params->{LIBS} = $add_libs;
-        }
-    }}
+
+    _merge_libs($params, $info->{LIBS});
     
     if (my $passthrough = $info->{PASSTHROUGH}) {
         _apply_BIN_DEPS($params, $_, $seen) for @$passthrough;
@@ -383,6 +371,44 @@ sub process_binary {
     $params->{clean}{FILES} .= ' $(O_FILES)';
 }
 
+sub process_CMAKE {
+    my ($target, $params, $info) = @_;
+
+    my $bdir = $info->{DIR}.'/build';
+    my $pdir = $info->{DIR}.'/cmake_props';
+    mkdir($bdir) unless -d $bdir;
+    mkdir($pdir) unless -d $pdir;
+
+    my $make = '$(MAKE)';
+    $make = 'gmake' if $info->{GMAKE} and $native_bsd_make;
+
+    my $cflags = $params->{INC};
+    _string_merge($cflags, $params->{CCFLAGS});
+    _string_merge($cflags, $params->{DEFINE});
+    _string_merge($cflags, $params->{OPTIMIZE});
+
+    $params->{CMAKE_PARAMS} = {
+        BUILD_DIR   => $bdir,
+        PROP_DIR    => $pdir,
+        MAIN_TARGET => $target,
+        TARGETS => {
+            $target     => "-fPIC $cflags",
+        }
+    };
+
+    $info->{DIR} = $bdir;
+    $info->{TARGET} = $target;
+    $info->{FLAGS} ||= '';
+    $info->{BUILD_CMD} = "$make $info->{FLAGS} $info->{TARGET}";
+    $info->{CLEAN_CMD} = '';
+    $info->{FORCE_TRACKING} = 1;
+
+    $params->{clean}{FILES} .= " $bdir $pdir";
+
+    my $cmake_share = run_cmake($params, $params->{CMAKE_PARAMS});
+    apply_CMAKE($params, $cmake_share);
+}
+
 sub process_CLIB {
     my $params = shift;
     my $clibs = '';
@@ -394,6 +420,11 @@ sub process_CLIB {
     my $wa_close = $mac ? ''            : '-Wl,--no-whole-archive';
     
     foreach my $info (@$clib) {
+        my $cmake_target = $info->{CMAKE_TARGET};
+        if ($cmake_target) {
+            process_CMAKE($cmake_target, $params, $info);
+        }
+
         my $build_cmd = $info->{BUILD_CMD};
         my $clean_cmd = $info->{CLEAN_CMD};
         
@@ -414,8 +445,10 @@ sub process_CLIB {
             $path .= $info->{DIR}.'/'.$f.' ';
         }
         $clibs .= $path;
+
+        my $force = $info->{FORCE_TRACKING} ? 'FORCE' : '';
         
-        push @{$params->{postamble}}, "$path : ; cd $info->{DIR} && $build_cmd\n";
+        push @{$params->{postamble}}, "$path : $force; cd $info->{DIR} && $build_cmd\n";
         push @{$params->{postamble}}, "clean :: ; cd $info->{DIR} && $clean_cmd\n" if $clean_cmd;
         if ($static) {
             push @{$params->{MODULE_INFO}{STATIC_LIBS}}, "$wa_open $path $wa_close";
@@ -556,7 +589,7 @@ sub process_LD {
 sub process_test {
     my $params = shift;
     my $tp = $params->{test} or return;
-    return unless $tp->{SRC} or $tp->{XS};
+    return unless $tp->{SRC} or $tp->{XS} or $tp->{CLIB};
     
     canonize_array_split($tp->{$_}) for qw/TYPEMAPS BIN_DEPS/;
 
@@ -587,16 +620,16 @@ sub process_test {
         DEFINE    => string_merge($params->{DEFINE}, $tp->{DEFINE}),
         XSOPT     => string_merge($params->{XSOPT}, $tp->{XSOPT}),
         LIBS      => $params->{LIBS},
+        CLIB      => $tp->{CLIB},
         MAKEFILE  => 'Makefile.test',
         OPTIMIZE  => merge_optimize($params->{OPTIMIZE}, "-O0", $tp->{OPTIMIZE}, $ENV{TEST_OPTIMIZE}),
         PARSE_XS  => $tp->{PARSE_XS} || $params->{PARSE_XS},
-        XS        => {},
         NO_MYMETA => 1,
         _XSTEST   => 1,
     );
     
     my $mm_args = makemaker_args(%args);
-    return undef unless has_binary($mm_args);
+    return undef unless has_binary($mm_args) || $tp->{CLIB};
 
     my $make_params = '';
     $make_params .= ' --no-print-directory' if $linux;
@@ -631,18 +664,95 @@ sub process_test_makefile {
     push @{$params->{postamble}}, 'object : $(OBJECT)';
 }
 
+sub process_cmake_test {
+    my ($params, $cmake_params, $test) = @_;
+
+    my $clibs = '';
+    my $clib = $params->{test}{CLIB} or return $cmake_params;
+    $clib = [$clib] unless ref($clib) eq 'ARRAY';
+    return $cmake_params unless @$clib;
+
+    my $cflags = $test->{INC} || '';
+    _string_merge($cflags, $test->{CCFLAGS});
+    _string_merge($cflags, $test->{DEFINE});
+    _string_merge($cflags, $test->{OPTIMIZE});
+
+    foreach my $info (@$clib) {
+        my $cmake_target = $info->{CMAKE_TARGET};
+        next unless ($cmake_target);
+
+        $cmake_params->{TARGETS}{$cmake_target} = "-fPIC $cflags";
+    }
+
+    return $cmake_params;
+}
+
+sub run_cmake {
+    my ($params, $cmake_params) = @_;
+
+    my @options;
+    while (my ($target, $opts) = each(%{$cmake_params->{TARGETS}})) {
+        push @options, qq(-D${target}_COMP_OPTIONS="$opts");
+    }
+
+    my $targets = join(';', keys %{$cmake_params->{TARGETS}});
+    my $options = join(' ', @options);
+
+    return XS::Install::CMake::configure($cmake_params->{BUILD_DIR}, $cmake_params->{PROP_DIR}, $cmake_params->{MAIN_TARGET}, qq(-DCONF_TARGETS="$targets" $options));
+}
+
+sub apply_CMAKE {
+    my ($params, $props) = @_;
+    $params->{INC} ||= '';
+    for my $i (@{$props->{INCLUDE}}) {
+        $params->{BIN_SHARE}{INCLUDE}{$i} = '/';
+        _string_merge($params->{INC}, "-I$i");
+        _string_merge($params->{test}{INC}, "-I$i") if $params->{test};
+    }
+    _uniq_list($props->{LIBS});
+    my $libs_str = string_merge(@{$props->{LIBS}});
+
+    $params->{BIN_SHARE} ||= {};
+    _merge_libs($params->{BIN_SHARE}, [$libs_str]);
+    _string_merge($params->{BIN_SHARE}->{CCFLAGS}, @{$props->{CCFLAGS}});
+    _string_merge($params->{BIN_SHARE}->{DEFINE}, @{$props->{DEFINE}});
+
+    _merge_libs($params, [$libs_str]);
+    $params->{CCFLAGS} = string_merge($params->{CCFLAGS}, @{$props->{CCFLAGS}});
+    $params->{DEFINE} = string_merge($params->{DEFINE}, @{$props->{DEFINE}});
+}
+
 sub post_process {
     my $params = shift;
     my $postamble = $params->{postamble};
     my $mi = $params->{MODULE_INFO};
     
     delete @$params{qw/C H OBJECT XS CCFLAGS LDFROM OPTIMIZE XSOPT/} unless has_binary($params);
-    delete @$params{qw/CPLUS PARSE_XS SRC MODULE_INFO _XSTEST/};
+    delete @$params{qw/CPLUS PARSE_XS SRC MODULE_INFO _XSTEST CMAKE_PARAMS/};
     
     # convert array to hash for postamble
     $params->{postamble} = {};
     my $i = 0;
     $params->{postamble}{++$i} = $_ for @$postamble;
+}
+
+sub _merge_libs {
+    my ($params, $add_libs) = @_;
+    return unless $add_libs and @$add_libs;
+    my $libs = $params->{LIBS} || [];
+    $libs = [$libs] unless ref($libs) eq 'ARRAY';
+    if ($libs and @$libs) {
+        my @result;
+        foreach my $l1 (@$libs) {
+            foreach my $l2 (@$add_libs) {
+                push @result, $l2 ? "$l1 $l2" : $l1;
+            }
+        }
+        $params->{LIBS} = \@result;
+    }
+    else {
+        $params->{LIBS} = $add_libs;
+    }
 }
 
 sub canonize_array {
@@ -676,7 +786,7 @@ sub binary_module_version {
 sub has_c      { return $_[0]->{C} && scalar(@{$_[0]->{C}}) ? 1 : 0 }
 sub has_object { return $_[0]->{OBJECT} && scalar(@{$_[0]->{OBJECT}}) ? 1 : 0 }
 sub has_xs     { return $_[0]->{XS} && scalar(keys %{$_[0]->{XS}}) ? 1 : 0 }
-sub has_ext    { return $_[0]->{MODULE_INFO}{STATIC_LIBS} && scalar(@{$_[0]->{MODULE_INFO}{STATIC_LIBS}}) ? 1 : 0 }
+sub has_ext    { return $_[0]->{MODULE_INFO} && $_[0]->{MODULE_INFO}{STATIC_LIBS} && scalar(@{$_[0]->{MODULE_INFO}{STATIC_LIBS}}) ? 1 : 0 }
 sub has_binary { return has_c($_[0]) || has_object($_[0]) || has_xs($_[0]) || has_ext($_[0]) }
 
 sub merge_optimize {
